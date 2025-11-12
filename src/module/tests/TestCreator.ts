@@ -706,7 +706,7 @@ export const TestCreator = {
      * 
      * @param event A PointerEvent by user interaction
      */
-    shouldHideDialog(event: Shadowrun.RollEvent|undefined): boolean {
+    shouldHideDialog(event?: Event): boolean {
         if (!event) return false;
         const bindings = game.keybindings.get("shadowrun5e", "hide-test-dialog");
         return bindings.some(binding => event[binding.key] === true);
@@ -717,7 +717,7 @@ export const TestCreator = {
      * 
      * @param event A PointerEvent by user interaction
      */
-    shouldShowDialog(event: Shadowrun.RollEvent|undefined): boolean {
+    shouldShowDialog(event?: Event): boolean {
         return !TestCreator.shouldHideDialog(event);
     },
 
@@ -726,7 +726,7 @@ export const TestCreator = {
      * 
      * @param event A PointerEvent by user interaction
      */
-    shouldPostItemDescription(event: Shadowrun.RollEvent|undefined): boolean {
+    shouldPostItemDescription(event?: Event): boolean {
         if (!event) return false;
         const bindings = game.keybindings.get("shadowrun5e", "show-item-card");
         return bindings.some(binding => event[binding.key] === true);

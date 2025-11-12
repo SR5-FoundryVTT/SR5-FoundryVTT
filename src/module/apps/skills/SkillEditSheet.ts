@@ -77,7 +77,7 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<Actor.I
         }
     }
 
-    static override PARTS: any = {
+    static override PARTS = {
         header: {
             template: SheetFlow.templateBase('actor/apps/skill/header'),
         },
@@ -95,7 +95,7 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<Actor.I
         },
     }
 
-    static override TABS: any = {
+    static override TABS = {
         primary: {
             initial: 'description',
             tabs: [

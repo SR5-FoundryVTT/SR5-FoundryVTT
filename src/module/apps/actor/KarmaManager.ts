@@ -56,11 +56,11 @@ export class KarmaManager extends HandlebarsApplicationMixin(ApplicationV2)<any>
         await this.render();
     }
 
-    static async #reduceKarma(this: KarmaManager, event) {
+    static async #reduceKarma(this: KarmaManager, event: Event) {
         event.preventDefault();
         event.stopPropagation();
         if (!(event.target instanceof HTMLElement)) return;
-        const amount = Number(event.target.closest('[data-amount]')!.dataset.amount);
+        const amount = Number(event.target.closest<HTMLElement>('[data-amount]')?.dataset.amount);
         this.karmaModifier -= amount;
         if (this.getModifiedKarma() < 0) {
             this.karmaModifier = -this.getModifiedKarma();
@@ -68,7 +68,7 @@ export class KarmaManager extends HandlebarsApplicationMixin(ApplicationV2)<any>
         await this.render();
     }
 
-    static async #submitChanges(this: KarmaManager, event) {
+    static async #submitChanges(this: KarmaManager, event: Event) {
         event.preventDefault();
         event.stopPropagation();
         if (!(event.target instanceof HTMLElement)) return;
@@ -81,8 +81,8 @@ export class KarmaManager extends HandlebarsApplicationMixin(ApplicationV2)<any>
         await this.close();
     }
 
-    static async #cancel(this: KarmaManager, event) {
-        this.close();
+    static #cancel(this: KarmaManager, event: Event) {
+        void this.close();
     }
 
     override async _onRender(context, options) {

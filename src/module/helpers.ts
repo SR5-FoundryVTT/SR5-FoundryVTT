@@ -245,10 +245,6 @@ export class Helpers {
         return obj;
     }
 
-    static hasModifiers(event) {
-        return event && (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey);
-    }
-
     static filter(obj, comp) {
         const retObj = {};
         if (typeof obj === 'object' && obj !== null) {
@@ -919,8 +915,8 @@ export class Helpers {
      *
      * @param event A PointerEvent by user interaction.
      */
-    static async renderEntityLinkSheet(event) {
-        const element = $(event.currentTarget);
+    static async renderEntityLinkSheet(event: Event) {
+        const element = $(event.currentTarget as HTMLElement);
         const uuid = element.data('uuid');
         await Helpers.renderDocumentSheet(uuid);
     }

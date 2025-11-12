@@ -178,7 +178,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         }
     }
 
-    static async #pickDriver(this: SR5VehicleActorSheet, event) {
+    static async #pickDriver(this: SR5VehicleActorSheet, event: Event) {
         event.preventDefault();
         const actors = Helpers.getControlledTokenActors();
         if (actors.length > 0) {
@@ -190,25 +190,25 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
 
     }
 
-    static async #removeVehicleDriver(this: SR5VehicleActorSheet, event) {
+    static async #removeVehicleDriver(this: SR5VehicleActorSheet, event: Event) {
         event.preventDefault();
         await this.actor.removeVehicleDriver();
         void this.render();
     }
 
-    static async #toggleChaseEnvironment(this: SR5VehicleActorSheet, event) {
+    static async #toggleChaseEnvironment(this: SR5VehicleActorSheet, event: Event) {
         event.preventDefault();
         const environment = this.actor.system.environment === 'handling' ? 'speed' : 'handling';
         await this.actor.update({system: { environment }});
     }
 
-    static async #toggleOffRoad(this: SR5VehicleActorSheet, event) {
+    static async #toggleOffRoad(this: SR5VehicleActorSheet, event: Event) {
         event.preventDefault();
         const isOffRoad = !this.actor.system.isOffRoad;
         await this.actor.update({system: { isOffRoad }});
     }
 
-    static async #removeMaster(this: SR5VehicleActorSheet, event) {
+    static async #removeMaster(this: SR5VehicleActorSheet, event: Event) {
         event.preventDefault();
 
         await MatrixNetworkFlow.removeSlaveFromMaster(this.actor);

@@ -19,10 +19,8 @@ import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
 import { AmmunitionType, RangeType } from '../types/item/Weapon';
 
-// eslint-disable-next-line @typescript-eslint/no-use-before-define
-import RenderContext = foundry.applications.sheets.ItemSheet.RenderContext;
+import ItemSheet = foundry.applications.sheets.ItemSheet;
 
-const { ItemSheet } = foundry.applications.sheets;
 const { FilePicker } = foundry.applications.apps;
 const { DragDrop } = foundry.applications.ux
 const { fromUuid, fromUuidSync } = foundry.utils;
@@ -30,7 +28,7 @@ const { fromUuid, fromUuidSync } = foundry.utils;
 /**
  * Shadowrun 5e ItemSheetData typing shared across all item types
  */
-export interface SR5BaseItemSheetData extends RenderContext, SR5ApplicationMixinTypes.RenderContext {
+export interface SR5BaseItemSheetData extends ItemSheet.RenderContext, SR5ApplicationMixinTypes.RenderContext {
     // SR5-FoundryVTT configuration
     config: typeof SR5;
 

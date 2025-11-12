@@ -27,7 +27,7 @@ export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData>
         },
     }
 
-    override async _prepareContext(options) {
+    override async _prepareContext(options: Parameters<SR5ItemSheet["_prepareContext"]>[0]) {
         const data = await super._prepareContext(options);
 
         const system = data.system as Item.SystemOfType<'call_in_action'>;
@@ -49,7 +49,7 @@ export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData>
         }
     }
 
-    override async _onDropActor(event, actor) {
+    override async _onDropActor(event: DragEvent, actor: SR5Actor) {
         if (actor.isType('spirit')) await this.updatePreparedSpirit(actor);
         if (actor.isType('sprite')) await this.updatePreparedSprite(actor);
     }
@@ -83,14 +83,14 @@ export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData>
     /**
      * Handling the removal of a spirit by any sheet action.
      */
-    static async #removeSpirit(this: SR5CallInActionSheet, event) {
+    static async #removeSpirit(this: SR5CallInActionSheet, event: Event) {
         await this.item.update({ system: { spirit: { uuid: '' } } });
     }
     
     /**
      * User requested removal of the prepared sprite.
      */
-    static async #removeSprite(this: SR5CallInActionSheet, event) {
+    static async #removeSprite(this: SR5CallInActionSheet, event: Event) {
         await this.item.update({ system: { sprite: { uuid: '' } } });
     }
 

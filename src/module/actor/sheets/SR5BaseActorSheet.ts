@@ -574,7 +574,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
 
         // Situation modifiers application
-        // @ts-expect-error
         html.find('.show-situation-modifiers-application').on('click', this._onShowSituationModifiersApplication.bind(this));
 
         html.find('select[name="initiative-select"]').on('change', this._onInitiativePerceptionChange.bind(this));
@@ -1815,7 +1814,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * @param event A mouse/pointer event
      */
-    async _onMatrixAttributeSelected(event) {
+    async _onMatrixAttributeSelected(event: Event) {
         if (!("matrix" in this.actor.system)) return;
 
         const iid = this.actor.system.matrix!.device;
@@ -1824,10 +1823,11 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             console.error('could not find item');
             return;
         }
+        const currentTarget = event.currentTarget as HTMLInputElement;
         // grab matrix attribute (sleaze, attack, etc.)
-        const attribute = event.currentTarget.dataset.att;
+        const attribute = currentTarget.dataset.att as MatrixAttribute;
         // grab device attribute (att1, att2, ...)
-        const changedSlot = event.currentTarget.value;
+        const changedSlot = currentTarget.value;
 
         return item.changeMatrixAttributeSlot(changedSlot, attribute);
     }
@@ -1892,10 +1892,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     /**
      * Show the situation modifiers application for this actor doucment
-     *
-     * @param event
      */
-    _onShowSituationModifiersApplication(event: PointerEvent) {
+    _onShowSituationModifiersApplication(event: Event) {
         new SituationModifiersApplication(this.actor).render(true);
     }
 

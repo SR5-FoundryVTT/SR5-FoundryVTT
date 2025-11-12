@@ -247,7 +247,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @param event A PointerEvent by user interaction.
      * @param actor
      */
-    async castAction(event?: RollEvent, actor?: SR5Actor) {
+    async castAction(event?: Event, actor?: SR5Actor) {
 
         // Only show the item's description by user intention or by lack of testability.
         let dontRollTest = TestCreator.shouldPostItemDescription(event);

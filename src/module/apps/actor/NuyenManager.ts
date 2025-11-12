@@ -52,11 +52,11 @@ export class NuyenManager extends HandlebarsApplicationMixin(ApplicationV2)<any>
         const currentNuyen = this.getNuyen();
         const modifiedNuyen = currentNuyen + this.nuyenModifier;
         await this.actor.update({system: { nuyen: modifiedNuyen }});
-        this.close();
+        void this.close();
     }
 
-    static async #cancel(this: NuyenManager, event) {
-        this.close();
+    static async #cancel(this: NuyenManager, event: Event) {
+        void this.close();
     }
 
     override async _onRender(context, options) {
@@ -64,8 +64,9 @@ export class NuyenManager extends HandlebarsApplicationMixin(ApplicationV2)<any>
             ?.addEventListener('change', (event: any) => {
                 console.log(event);
                 this.nuyenModifier = Number(event.target?.value ?? 0);
-                this.render();
-        })
+                void this.render();
+            }
+        );
         return super._onRender(context, options);
     }
 
