@@ -1,3 +1,4 @@
+import { DeepPartial } from 'fvtt-types/utils';
 import { SituationModifier } from '../../rules/modifiers/SituationModifier';
 import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
 import { Helpers } from '../../helpers';
@@ -12,7 +13,7 @@ import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
 import { InventoryType } from 'src/module/types/actor/Common';
 import { SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
 
-import SR5ApplicationMixin from '@/module/handlebars/SR5ApplicationMixin';
+import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { PackActionFlow } from '@/module/item/flows/PackActionFlow';
 import { SkillEditSheet } from '@/module/apps/skills/SkillEditSheet';
@@ -22,9 +23,9 @@ import { InventoryRenameApp } from '@/module/apps/actor/InventoryRenameApp';
 import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
 
 import MatrixAttribute = Shadowrun.MatrixAttribute;
+import ActorSheetV2 = foundry.applications.sheets.ActorSheetV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
-const { ActorSheetV2 } = foundry.applications.sheets;
 const { TextEditor } = foundry.applications.ux;
 const { fromUuid, fromUuidSync } = foundry.utils;
 
@@ -53,10 +54,10 @@ export type InventoriesSheetData = Record<string, InventorySheetData>;
 
 export interface SR5SheetFilters {
     skills: string
-    showUntrainedSkills
+    showUntrainedSkills: boolean
 }
 
-export interface SR5ActorSheetData extends foundry.applications.sheets.ActorSheetV2.RenderContext {
+export interface SR5ActorSheetData extends ActorSheetV2.RenderContext {
     config: typeof SR5CONFIG
     system: Actor.Implementation['system']
     filters: SR5SheetFilters
@@ -208,13 +209,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * Extend and override the default options used by the 5e Actor Sheet
      * @returns {Object}
      */
-    static override DEFAULT_OPTIONS: typeof foundry.applications.sheets.ActorSheetV2.DEFAULT_OPTIONS &
-        {
-            filters?: {
-                inputSelector: string,
-                callback: (...args: any[]) => Promise<void> | void,
-            }[]
-        } = {
+    static override DEFAULT_OPTIONS: DeepPartial<SR5ApplicationMixinTypes.Configuration> = {
         classes: ['actor', 'named-sheet'],
         position: {
             width: 700,
@@ -269,7 +264,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             clearConditionMonitor: SR5BaseActorSheet.#clearConditionMonitor,
             rollConditionMonitor: SR5BaseActorSheet.#rollConditionMonitor,
         },
-        filters: [{ inputSelector: '#filter-active-skills', callback: SR5BaseActorSheet.#handleFilterActiveSkills }],
+        filters: [{ inputSelector: '#filter-active-skills', contentSelector: '', callback: SR5BaseActorSheet.#handleFilterActiveSkills }],
     }
 
     static override TABS = {
@@ -335,7 +330,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         this._prepareSpecialFields(data);
         this._prepareSkillsWithFilters(data);
 
-        data.itemType = await this._prepareItemTypes(data);
+        data.itemType = this._prepareItemTypes();
         data.effects = prepareSortedEffects(this.actor.effects.contents);
         data.itemEffects = prepareSortedItemEffects(this.actor, { applyTo: this.itemEffectApplyTos });
 
@@ -475,7 +470,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     // handle start dragging a favorite to reorder
-    async _onDragStartFavorite(event: DragEvent) {
+    _onDragStartFavorite(event: DragEvent) {
         const target = event.currentTarget;
 
         const uuid = SheetFlow.closestUuid(target);
@@ -490,7 +485,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.dataTransfer?.setData("text/plain", JSON.stringify(dragData));
     }
 
-    async _onDragDropFavorite(event: DragEvent) {
+    _onDragDropFavorite(event: DragEvent) {
         const target = event.target;
         const favorites = this.actor.system.favorites.slice();
         const data = TextEditor.getDragEventData(event) as any;
@@ -513,13 +508,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             const ft = favorites[targetIndex];
             favorites[targetIndex] = fs;
             favorites[sourceIndex] = ft;
-            await this.actor.update({system: { favorites }})
+            void this.actor.update({system: { favorites }});
         }
     }
 
     /** Listeners used by _all_ actor types! */
-    activateListeners_LEGACY(html) {
-        Helpers.setupCustomCheckbox(this, html)
+    activateListeners_LEGACY(html: JQuery<HTMLElement>) {
+        Helpers.setupCustomCheckbox(this, html);
 
         // General item header/list actions...
         html.find('.item-qty').on('change', this._onListItemChangeQuantity.bind(this));
@@ -533,6 +528,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
 
         // Situation modifiers application
+        // @ts-expect-error
         html.find('.show-situation-modifiers-application').on('click', this._onShowSituationModifiersApplication.bind(this));
 
         html.find('select[name="initiative-select"]').on('change', this._onInitiativePerceptionChange.bind(this));
@@ -664,7 +660,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             }
         }
 
-        return { options, value }
+        return { options, value };
     }
 
     /**
@@ -673,24 +669,24 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * - this is more of a band-aid until we do appv2
      * @param event
      */
-    async _onInitiativePerceptionChange(event) {
-        const newValue = event.currentTarget?.value;
+    async _onInitiativePerceptionChange(event: Event) {
+        const newValue = (event.currentTarget as HTMLSelectElement)?.value;
         if (newValue === 'meatspace' || newValue === 'astral') {
             // meatspace and magic can be directly applied as the perception type
             // disable VR as well
-            await this.actor.update({ system: {
+            await this.actor.update({
+                system: {
                     initiative: { perception: newValue, },
                     matrix: { vr: false, hot_sim: false }
-                }});
+                }
+            });
         } else if (newValue === 'hot_sim' || newValue === 'cold_sim') {
             // if we are hot sim or cold sim, we are in VR and using matrix init perception
             await this.actor.update({
                 system: {
-                    initiative: {
-                        perception: 'matrix',
-                    },
+                    initiative: { perception: 'matrix' },
                     matrix: { vr: true, hot_sim: newValue === 'hot_sim' }
-                },
+                }
             });
         }
     }
@@ -702,7 +698,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * Inventory types means they should always be shown, even if there are none.
      * All other item types will be collected at some tab / place on the sheet.
      */
-    _addInventoryItemTypes(inventory) {
+    _addInventoryItemTypes(inventory: InventorySheetData) {
         // Show all item types but remove empty unexpected item types.
         const inventoryTypes = this.getInventoryItemTypes();
         for (const type of Object.keys(inventory.types)) {
@@ -760,7 +756,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return null;
     }
 
-    static async #toggleInventoryVisibility(this: SR5BaseActorSheet, event: PointerEvent) {
+    static #toggleInventoryVisibility(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
         if (!(event.target instanceof HTMLElement)) return;
         const listHeader = event.target?.closest<HTMLElement>('.list-item-header');
@@ -770,7 +766,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const current = this._inventoryOpenClose[type] ?? true;
 
         this._setInventoryTypeVisibility(type, !current);
-        this.render();
+        void this.render();
     }
 
     _setInventoryVisibility(this: SR5BaseActorSheet, isOpen: boolean) {
@@ -844,15 +840,15 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     protected async _handleCreateItem(event: PointerEvent) {
         if (!(event.target instanceof HTMLElement)) return;
-        const type = SheetFlow.closestAction(event.target).dataset.itemType;
+        const type = SheetFlow.closestAction(event.target)!.dataset.itemType!;
 
         // Unhide section it it was
         this._setInventoryTypeVisibility(type, true);
 
         const itemData = {
-            type,
+            type: type as Item.ConfiguredSubType,
             name: `${game.i18n.localize('SR5.New')} ${game.i18n.localize(SR5.itemTypes[type])}`
-        };
+        } satisfies Item.CreateData;
         const items = await this.actor.createEmbeddedDocuments('Item', [itemData]);
         if (!items) return;
 
@@ -886,9 +882,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     async _handleDeleteItem(item: SR5Item) {
         // remove from the inventory tracking system
-        return this.actor.inventory.removeItem(item).then(() => {
-            return this.actor.deleteEmbeddedDocuments('Item', [item.id!]);
-        })
+        return this.actor.inventory.removeItem(item).then(async () =>
+            this.actor.deleteEmbeddedDocuments('Item', [item.id!])
+        );
     }
 
     static async #deleteItem(this: SR5BaseActorSheet, event: PointerEvent) {
@@ -1124,12 +1120,12 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             const { name, label, itemIds } = inventory;
 
             // Avoid re-adding default inventories.
-            if (!inventoriesSheet.hasOwnProperty(name)) {
+            if (!Object.hasOwn(inventoriesSheet, name)) {
                 inventoriesSheet[name] = {
                     name,
                     label,
                     types: {}
-                }
+                };
             }
 
             // Add default inventory types for this sheet type first, so they appear on top.
@@ -1271,7 +1267,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @param data An object containing Actor Sheet data, as would be returned by ActorSheet.getData
      * @returns Sorted item lists per sheet item type.
      */
-    async _prepareItemTypes(data): Promise<Record<string, SR5Item[]>> {
+    _prepareItemTypes(): Record<string, SR5Item[]> {
         const itemsByType: Record<string, SR5Item[]> = {};
 
         // Most sheet items are raw item types, some are sub types.
@@ -1310,7 +1306,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             }
         });
 
-        return itemsByType
+        return itemsByType;
     }
 
     /**
@@ -1369,7 +1365,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return Helpers.sortSkills(filteredSkills);
     }
 
-    _showSkill(key, skill, data) {
+    _showSkill(key: string, skill: SkillFieldType, data: SR5ActorSheetData) {
         if (this._showMagicSkills(key, skill, data)) {
             return true;
         }
@@ -1380,15 +1376,15 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return this._showGeneralSkill(key, skill);
     }
 
-    _showGeneralSkill(skillId, skill: SkillFieldType) {
+    _showGeneralSkill(skillId: string, skill: SkillFieldType) {
         return !this._isSkillMagic(skillId, skill) && !this._isSkillResonance(skill);
     }
 
-    _showMagicSkills(skillId, skill: SkillFieldType, sheetData: SR5ActorSheetData) {
+    _showMagicSkills(skillId: string, skill: SkillFieldType, sheetData: SR5ActorSheetData) {
         return this._isSkillMagic(skillId, skill) && sheetData.system.special === 'magic';
     }
 
-    _showResonanceSkills(skillId, skill: SkillFieldType, sheetData: SR5ActorSheetData) {
+    _showResonanceSkills(skillId: string, skill: SkillFieldType, sheetData: SR5ActorSheetData) {
         return this._isSkillResonance(skill) && sheetData.system.special === 'resonance';
     }
 
@@ -1407,7 +1403,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         this.#filterActiveSkillsElements();
     }
 
-    static async #handleFilterActiveSkills(this: SR5BaseActorSheet, event, query, rgx, html) {
+    static async #handleFilterActiveSkills(
+        this: SR5BaseActorSheet, event: KeyboardEvent | null, query: string, rgx: RegExp, content: HTMLElement | null
+    ) {
         this._filters.skills = query;
         this.#filterActiveSkillsElements();
     }
@@ -1442,7 +1440,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             });
     }
 
-    _isSkillFiltered(skillId, skill) {
+    _isSkillFiltered(skillId: string, skill: SkillFieldType) {
         // a newly created skill shouldn't be filtered, no matter what.
         // Therefore disqualify empty skill labels/names from filtering and always show them.
         const isFilterable = this._getSkillLabelOrName(skill).length > 0;
@@ -1452,11 +1450,11 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return !(isFilterable && (isHiddenForUntrained || isHiddenForText));
     }
 
-    _getSkillLabelOrName(skill) {
+    _getSkillLabelOrName(skill: SkillFieldType) {
         return Helpers.getSkillLabelOrName(skill);
     }
 
-    _doesSkillContainText(key, skill, text) {
+    _doesSkillContainText(key: string, skill: SkillFieldType, text: string) {
         if (!text) {
             return true;
         }
@@ -1476,19 +1474,19 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         sheetData.system.skills.active = this._filterSkills(sheetData, sheetData.system.skills.active);
     }
 
-    _isSkillMagic(id, skill) {
+    _isSkillMagic(id: string, skill: SkillFieldType) {
         return skill.attribute === 'magic' || id === 'astral_combat' || id === 'assensing';
     }
 
-    _isSkillResonance(skill) {
+    _isSkillResonance(skill: SkillFieldType) {
         return skill.attribute === 'resonance';
     }
 
-    private _closestSkillTarget(target) {
+    private _closestSkillTarget(target: HTMLElement): HTMLElement | null {
         return target.closest('[data-skill-id]');
     }
 
-    async _editSkill(target) {
+    async _editSkill(target: HTMLElement) {
         const closest = this._closestSkillTarget(target);
         const skillId = closest?.dataset.skillId;
         const category = closest?.dataset.category;
@@ -1535,10 +1533,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
     }
 
-    async _openSkillSource(target) {
-        const skillId = this._closestSkillTarget(target).dataset.skillId;
+    async _openSkillSource(target: HTMLElement) {
+        const skillId = this._closestSkillTarget(target)?.dataset.skillId;
 
-        const skill = this.actor.getSkill(skillId);
+        const skill = skillId ? this.actor.getSkill(skillId) : null;
         if (!skill) {
             console.error(`Shadowrun 5e | Editing skill failed due to missing skill ${skillId}`); return;
         }
@@ -1622,14 +1620,15 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * @param event A DOM mouse/touch event
      */
-    async _onListItemChangeQuantity(event) {
+    async _onListItemChangeQuantity(event: Event) {
         const iid = SheetFlow.closestItemId(event.currentTarget);
         const item = this.actor.items.get(iid);
-        const quantity = parseInt(event.currentTarget.value);
+        const quantity = parseInt((event.currentTarget as HTMLInputElement).value);
 
         // Inform users about issues with templating or programming.
-        if (!item?.system || !('technology' in item?.system) || item?.system.technology === undefined || !(item && quantity && item.system.technology)) {
-            console.error(`Shadowrun 5e | Tried alterting technology quantity on an item without technology data: ${item?.id}`, item); return;
+        if (!item?.system?.technology) {
+            console.error(`Shadowrun 5e | Tried altering technology quantity on an item without technology data: ${item?.id}`, item);
+            return;
         }
 
         await item.update({ system: { technology: { quantity } } });
@@ -1722,29 +1721,26 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     /**
      * Change selected inventory for this sheet.
-     *
-     * @param event
      */
-    async _onSelectInventory(event) {
+    _onSelectInventory(event: Event) {
         event.preventDefault();
 
-        const inventory = String($(event.currentTarget).val());
+        const inventory = String($(event.currentTarget!).val());
 
         if (inventory)
             this.selectedInventory = inventory;
 
-        this.render();
+        void this.render();
     }
 
     /**
      * After selecting a new ammo for a weapon
-     * @param event
      */
-    async _onWeaponAmmoSelect(event) {
+    async _onWeaponAmmoSelect(event: Event) {
         const id = SheetFlow.closestItemId(event.currentTarget);
         const item = this.actor.items.get(id);
         if (!item || !item.isType('weapon')) return;
-        const newTarget = event.currentTarget.value;
+        const newTarget = (event.currentTarget as HTMLSelectElement).value;
         if (!newTarget) return;
         await item.equipAmmo(newTarget);
     }
@@ -1878,7 +1874,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * @param event
      */
-    static async #resetActorRunData(this: SR5BaseActorSheet, event) {
+    static async #resetActorRunData(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
@@ -1938,9 +1934,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             {
                 name: "SR5.ContextOptions.AddSkillEffect",
                 icon: "<i class='fas fa-file-circle-plus'></i>",
-                callback: async (target) => {
-                    const skillTarget = this._closestSkillTarget(target);
-                    const skillId = skillTarget.dataset.skillId;
+                callback: async (target: HTMLElement) => {
+                    const skillTarget = this._closestSkillTarget(target)!;
+                    const skillId = skillTarget.dataset.skillId!;
                     const subCategory = skillTarget.dataset.subcategory;
                     let path = '';
                     switch (skillTarget.dataset.category) {
@@ -1958,45 +1954,45 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                     if (!path) return;
                     const skill = this.actor.getSkill(skillId)!;
                     const effectData = {
-                            name: `${game.i18n.localize(skill.label) ?? skill.name} ${game.i18n.localize('SR5.Effect')}`,
-                            system: {
-                                applyTo: 'actor' as const,
-                            },
-                            changes: [
-                                {
-                                    key: path,
-                                    mode: 0 as any,
-                                    priority: 0,
-                                    value: '',
-                                }
-                            ]
-                        }
-                        await this.actor.createEmbeddedDocuments("ActiveEffect", [effectData], { renderSheet: true });
+                        name: `${game.i18n.localize(skill.label) ?? skill.name} ${game.i18n.localize('SR5.Effect')}`,
+                        system: {
+                            applyTo: 'actor' as const,
+                        },
+                        changes: [
+                            {
+                                key: path,
+                                mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+                                priority: 0,
+                                value: '',
+                            }
+                        ]
+                    };
+                    await this.actor.createEmbeddedDocuments("ActiveEffect", [effectData], { renderSheet: true });
                 }
             },
             {
                 name: "SR5.ContextOptions.EditSkill",
                 icon: "<i class='fas fa-pen-to-square'></i>",
-                callback: async (target) => {
+                callback: async (target: HTMLElement) => {
                     await this._editSkill(target);
                 }
             },
             {
                 name: "SR5.ContextOptions.DeleteSkill",
                 icon: "<i class='fas fa-trash'></i>",
-                callback: async (target) => {
+                callback: async (target: HTMLElement) => {
                     const userConsented = await Helpers.confirmDeletion();
                     if (!userConsented) return;
 
-                    const skillTarget = this._closestSkillTarget(target);
-                    const skillId = skillTarget.dataset.skillId;
-                    const subCategory = skillTarget.dataset.subcategory;
+                    const skillTarget = this._closestSkillTarget(target)!;
+                    const skillId = skillTarget.dataset.skillId!;
+                    const subCategory = skillTarget.dataset.subcategory!;
                     switch (skillTarget.dataset.category) {
                         case 'active':
                             await this.actor.removeActiveSkill(skillId);
                             break;
                         case 'knowledge':
-                            await this.actor.removeKnowledgeSkill(skillId, subCategory);
+                            await this.actor.removeKnowledgeSkill(skillId, subCategory as any);
                             break;
                         case 'language':
                             await this.actor.removeLanguageSkill(skillId);
@@ -2013,8 +2009,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             {
                 name: "SR5.ContextOptions.AddAttributeEffect",
                 icon: "<i class='fas fa-file-circle-plus'></i>",
-                callback: async (target) => {
-                    const attributeId = target.closest('[data-attribute-id]')?.dataset.attributeId;
+                callback: async (target: HTMLElement) => {
+                    const attributeId = (target.closest<HTMLElement>('[data-attribute-id]'))?.dataset.attributeId;
                     if (!attributeId) return;
                     const attribute = this.actor.getAttribute(attributeId);
                     if (!attribute) return;
@@ -2031,7 +2027,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                         changes: [
                             {
                                 key: path,
-                                mode: 0 as any,
+                                mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
                                 priority: 0,
                                 value: '',
                             }
@@ -2039,7 +2035,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                         system: {
                             applyTo: 'actor' as const,
                         }
-                    }
+                    };
                     await this.actor.createEmbeddedDocuments("ActiveEffect", [effectData], { renderSheet: true });
                 }
             },
@@ -2053,7 +2049,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 // context menu to view items that aren't an embedded item of this actor
                 name: "SR5.ContextOptions.ViewItem",
                 icon: "<i class='fas fa-eye'></i>",
-                condition: (target) => {
+                condition: (target: HTMLElement) => {
                     const id = SheetFlow.closestItemId(target);
                     const item = this.actor.items.get(id);
                     if (item) return false;
@@ -2061,7 +2057,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                     const document = fromUuidSync(uuid);
                     return document && document instanceof SR5Item;
                 },
-                callback: async (target) => {
+                callback: async (target: HTMLElement) => {
                     const uuid = SheetFlow.closestUuid(target);
                     const document = await fromUuid(uuid);
                     if (document instanceof SR5Item) {
@@ -2072,12 +2068,12 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             {
                 name: "SR5.ContextOptions.EditItem",
                 icon: "<i class='fas fa-pen-to-square'></i>",
-                condition: (target) => {
+                condition: (target: HTMLElement) => {
                     const id = SheetFlow.closestItemId(target);
                     const item = this.actor.items.get(id);
                     return item !== undefined;
                 },
-                callback: async (target) => {
+                callback: async (target: HTMLElement) => {
                     const id = SheetFlow.closestItemId(target);
                     const item = this.actor.items.get(id);
                     if (item) {
@@ -2088,25 +2084,25 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             {
                 name: "SR5.ContextOptions.MoveItem",
                 icon: "<i class='fas fa-arrow-right-arrow-left'></i>",
-                condition: (target) => {
+                condition: (target: HTMLElement) => {
                     const id = SheetFlow.closestItemId(target);
                     const item = this.actor.items.get(id);
                     if (!item) return false;
                     return item.isType('equipment', 'weapon', 'ammo', 'modification', 'armor', 'bioware', 'cyberware', 'device');
                 },
-                callback: async (target) => {
+                callback: async (target: HTMLElement) => {
                     await this._moveItemToInventory(target);
                 }
             },
             {
                 name: "SR5.ContextOptions.DeleteItem",
                 icon: "<i class='fas fa-trash'></i>",
-                condition: (target) => {
+                condition: (target: HTMLElement) => {
                     const id = SheetFlow.closestItemId(target);
                     const item = this.actor.items.get(id);
                     return item !== undefined;
                 },
-                callback: async (target) => {
+                callback: async (target: HTMLElement) => {
                     const userConsented = await Helpers.confirmDeletion();
                     if (!userConsented) return;
 
@@ -2126,15 +2122,15 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             {
                 name: "SR5.ContextOptions.EditEffect",
                 icon: "<i class='fas fa-pen-to-square'></i>",
-                condition: (target) => {
+                condition: (target: HTMLElement) => {
                     const id = SheetFlow.closestEffectId(target);
                     const item = this.actor.effects.get(id);
                     if (item) return true;
                     const uuid = SheetFlow.closestUuid(target);
                     const doc = fromUuidSync(uuid);
-                    return !!(doc && doc instanceof SR5ActiveEffect);
+                    return (doc instanceof SR5ActiveEffect);
                 },
-                callback: async (target) => {
+                callback: async (target: HTMLElement) => {
                     const id = SheetFlow.closestEffectId(target);
                     const item = this.actor.effects.get(id);
                     if (item) {
@@ -2142,7 +2138,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                     } else {
                         const uuid = SheetFlow.closestUuid(target);
                         const doc = fromUuidSync(uuid);
-                        if (doc && doc instanceof SR5ActiveEffect) {
+                        if (doc instanceof SR5ActiveEffect) {
                             await doc.sheet?.render(true);
                         }
                     }
@@ -2151,13 +2147,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             {
                 name: "SR5.ContextOptions.DeleteEffect",
                 icon: "<i class='fas fa-trash'></i>",
-                condition: (target) => {
+                condition: (target: HTMLElement) => {
                     const id = SheetFlow.closestEffectId(target);
                     const item = this.actor.effects.get(id);
                     return item !== undefined;
                     // don't check for effects by uuid for deletion
                 },
-                callback: async (target) => {
+                callback: async (target: HTMLElement) => {
                     const userConsented = await Helpers.confirmDeletion();
                     if (!userConsented) return;
 
@@ -2198,8 +2194,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         await this.actor.rollInitiative();
     }
 
-    static async #renameInventory(this: SR5BaseActorSheet, event) {
-        const inventory = SheetFlow.closestAction(event.target).dataset.inventory;
+    static async #renameInventory(this: SR5BaseActorSheet, event: Event) {
+        const inventory = SheetFlow.closestAction(event.target)!.dataset.inventory!;
         if (this.actor.inventory.disallowRename(inventory)) {
             ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
             return;
@@ -2210,24 +2206,23 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     /**
      * Create an inventory place on the actor for gear organization.
      */
-    static async #createInventory(this: SR5BaseActorSheet, event) {
+    static async #createInventory(this: SR5BaseActorSheet, event: Event) {
         event.preventDefault();
         const app = new InventoryRenameApp(this.actor, '', 'create');
         await app.render(true);
-        this.render();
+        void this.render();
     }
 
     /**
      * Remove the currently selected inventory.
-     * @param event
      */
-    static async #removeInventory(this: SR5BaseActorSheet, event) {
+    static async #removeInventory(this: SR5BaseActorSheet, event: Event) {
         event.preventDefault();
 
         // TODO: Allow for options overwriting title/message and so forth.
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
-        const inventory = SheetFlow.closestAction(event.target).dataset.inventory;
+        const inventory = SheetFlow.closestAction(event.target)!.dataset.inventory!;
 
         if (this.actor.inventory.disallowRemove(inventory)) {
             ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantRemoveDefaultInventory'));
@@ -2238,10 +2233,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         // Preselect default instead of none.
         this.selectedInventory = this.actor.defaultInventory.name;
-        this.render();
+        void this.render();
     }
 
-    async _moveItemToInventory(target) {
+    async _moveItemToInventory(target: HTMLElement) {
 
         const id = SheetFlow.closestItemId(target);
         const item = this.actor.items.get(id);
@@ -2271,7 +2266,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     static async #toggleSkillDescription(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
         if (!(event.target instanceof HTMLElement)) return;
-        const id = this._closestSkillTarget(event.target).dataset.skillId;
+        const id = this._closestSkillTarget(event.target)?.dataset.skillId;
         if (!id) return;
         if (this.expandedSkills.has(id)) {
             this.expandedSkills.delete(id);

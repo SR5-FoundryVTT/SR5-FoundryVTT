@@ -21,7 +21,7 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet {
         ];
     }
 
-    static override DEFAULT_OPTIONS = {
+    static override DEFAULT_OPTIONS: any = {
         actions: {
             pickSummoner: SR5SpiritActorSheet.#pickSummoner,
             removeSummoner: SR5SpiritActorSheet.#removeSummoner,

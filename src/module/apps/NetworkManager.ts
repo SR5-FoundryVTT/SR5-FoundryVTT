@@ -1,7 +1,7 @@
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
-import SR5ApplicationMixin from '@/module/handlebars/SR5ApplicationMixin';
+import { SR5ApplicationMixin } from '@/module/handlebars/SR5ApplicationMixin';
 import { SR5Item } from '@/module/item/SR5Item';
 import { MatrixNetworkFlow } from '@/module/item/flows/MatrixNetworkFlow';
 import { Helpers } from '@/module/helpers';
@@ -72,10 +72,6 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
         context.driver = this.actor.getVehicleDriver();
 
         return context;
-    }
-
-    override async _onRender(context, options) {
-        return super._onRender(context, options);
     }
 
     /**

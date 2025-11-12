@@ -83,24 +83,29 @@ export const SheetFlow = {
         }, [])
     },
 
-    closestItemId(target) {
-        return target.closest('[data-item-id]')?.dataset?.itemId ?? '';
+    closestItemId(target: EventTarget | null) {
+        if (!(target instanceof HTMLElement)) return '';
+        return target?.closest<HTMLElement>('[data-item-id]')?.dataset?.itemId ?? '';
     },
 
-    closestUuid(target) {
-        return target.closest('[data-uuid]')?.dataset?.uuid ?? '';
+    closestUuid(target: EventTarget | null) {
+        if (!(target instanceof HTMLElement)) return '';
+        return target?.closest<HTMLElement>('[data-uuid]')?.dataset?.uuid ?? '';
     },
 
-    closestEffectId(target) {
-        return target.closest('[data-effect-id]')?.dataset?.effectId ?? '';
+    closestEffectId(target: EventTarget | null) {
+        if (!(target instanceof HTMLElement)) return '';
+        return target?.closest<HTMLElement>('[data-effect-id]')?.dataset?.effectId ?? '';
     },
 
-    closestAction(target) {
-        return target.closest('[data-action]');
+    closestAction(target: EventTarget | null) {
+        if (!(target instanceof HTMLElement)) return null;
+        return target?.closest<HTMLElement>('[data-action]');
     },
 
-    closestSource(target) {
-        return target.closest('[data-source]')?.dataset?.source ?? '';
+    closestSource(target: EventTarget | null) {
+        if (!(target instanceof HTMLElement)) return '';
+        return target?.closest<HTMLElement>('[data-source]')?.dataset?.source ?? '';
     },
 
     /**
@@ -114,7 +119,7 @@ export const SheetFlow = {
                 const source = this.closestSource(target);
                 return !!source;
             },
-            callback: async (target) => {
+            callback: async (target: HTMLElement) => {
                 const source = this.closestSource(target);
                 if (source) {
                     await LinksHelpers.openSource(source);
@@ -125,10 +130,8 @@ export const SheetFlow = {
 
     /**
      * Add Quantity to an item based on the event
-     * @param item
-     * @param event
      */
-    async addToQuantity(item: SR5Item, event) {
+    async addToQuantity(item: SR5Item, event: Event) {
         const qty = item.getTechnologyData()?.quantity ?? 0;
         const someBindings = game.keybindings.get("shadowrun5e", "add-remove-some-qty");
         const manyBindings = game.keybindings.get("shadowrun5e", "add-remove-many-qty");
@@ -145,10 +148,8 @@ export const SheetFlow = {
 
     /**
      * Remove Quantity from an item based on the event
-     * @param item
-     * @param event
      */
-    async removeFromQuantity(item: SR5Item, event) {
+    async removeFromQuantity(item: SR5Item, event: Event) {
         const qty = item.getTechnologyData()?.quantity ?? 0;
         const someBindings = game.keybindings.get("shadowrun5e", "add-remove-some-qty");
         const manyBindings = game.keybindings.get("shadowrun5e", "add-remove-many-qty");

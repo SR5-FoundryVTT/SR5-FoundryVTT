@@ -13,15 +13,27 @@ import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicati
 const { TextEditor, SearchFilter } = foundry.applications.ux;
 const { fromUuid } = foundry.utils;
 
-declare abstract class AnyApplicationV2 extends ApplicationV2<any,any,any> { constructor(...args: any[]); }
+export namespace SR5ApplicationMixinTypes {
+    export type Configuration = ApplicationV2.Configuration & {
+        filters?: SearchFilter.Configuration[];
+        dragDrop?: DragDrop.Configuration[];
+    };
 
-export default function <BaseClass extends Identity<typeof AnyApplicationV2>>(base: BaseClass) {
+    export type RenderOptions = ApplicationV2.RenderOptions & {
+        mode?: 'play' | 'edit';
+        renderContext?: string;
+    };
+};
+
+declare abstract class AnyApplicationV2 extends ApplicationV2<any, SR5ApplicationMixinTypes.Configuration, ApplicationV2.RenderOptions> { constructor(...args: any[]); }
+
+export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplicationV2>>(base: BaseClass) {
     type BaseType = InstanceType<
         HandlebarsApplicationMixin.Mix<
             typeof ApplicationV2<
                 ApplicationV2.RenderContext,
-                ApplicationV2.Configuration,
-                ApplicationV2.RenderOptions & { mode: "play" | "edit"; renderContext: string; }
+                SR5ApplicationMixinTypes.Configuration,
+                ApplicationV2.RenderOptions & { mode?: "play" | "edit"; renderContext?: string; }
             >
         >
     >;
@@ -61,7 +73,7 @@ export default function <BaseClass extends Identity<typeof AnyApplicationV2>>(ba
 
         #createFilters() {
             return this.options?.filters?.map((s) => {
-                s.callback = s.callback.bind(this);
+                s.callback = s.callback?.bind(this);
                 return new SearchFilter(s);
             }) ?? [];
         }

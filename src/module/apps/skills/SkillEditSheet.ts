@@ -1,6 +1,6 @@
 import { SR5 } from "../../config";
 import { parseDropData } from "../../utils/sheets";
-import SR5ApplicationMixin from '@/module/handlebars/SR5ApplicationMixin';
+import { SR5ApplicationMixin } from '@/module/handlebars/SR5ApplicationMixin';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { Helpers } from '@/module/helpers';
@@ -8,10 +8,10 @@ import { Helpers } from '@/module/helpers';
 const { DocumentSheetV2 } = foundry.applications.api;
 const { FilePicker } = foundry.applications.apps;
 
-export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Actor, any> {
+export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Actor> {
     skillId: string;
 
-    constructor(options, skillId) {
+    constructor(options, skillId: string) {
         super(options);
         this.skillId = skillId;
     }
@@ -43,7 +43,7 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
         return `system.skills.active.${this.skillId}`;
     }
 
-    static override DEFAULT_OPTIONS: any = {
+    static override DEFAULT_OPTIONS = {
         classes: ['actor', 'skill', 'named-sheet'],
         position: {
             width: 550,
@@ -98,9 +98,10 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
                 console.log(path);
                 if (path) {
                     const key = `${this._updateString()}.img`
-                    this.document.update({ [key] : path });
+                    void this.document.update({ [key] : path });
                 }
-            }}).render(true);
+            }
+        }).render(true);
     }
 
     static async #addBonus(this: SkillEditSheet, event: PointerEvent) {
@@ -123,8 +124,8 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
         if (!canDelete) return;
 
         const skill = this.document.getSkill(this.skillId);
-        const index = SheetFlow.closestAction(event.target).dataset.index;
-        if (skill && Number.isNumeric(index) && index >= 0) {
+        const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
+        if (skill && index >= 0) {
             const bonus = skill.bonus.slice();
             bonus.splice(index, 1);
             const key = `${this._updateString()}.bonus`
@@ -140,7 +141,7 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
             const specs = skill.specs.slice();
             specs.push(game.i18n.localize('SR5.NewSpecialization'));
             const key = `${this._updateString()}.specs`
-            this.document.update({ [key] : specs });
+            void this.document.update({ [key] : specs });
         }
     }
 
@@ -152,12 +153,12 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
         if (!canDelete) return;
 
         const skill = this.document.getSkill(this.skillId);
-        const index = SheetFlow.closestAction(event.target).dataset.index;
-        if (skill && Number.isNumeric(index) && index >= 0) {
+        const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
+        if (skill && index >= 0) {
             const specs = skill.specs.slice();
             specs.splice(index, 1);
             const key = `${this._updateString()}.specs`
-            this.document.update({ [key] : specs });
+            void this.document.update({ [key] : specs });
         }
     }
 
@@ -167,7 +168,7 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
         await this.document.rollSkill(this.skillId);
     }
 
-    async _onDrop(event) {
+    async _onDrop(event: DragEvent) {
         if (!game.items || !game.actors || !game.scenes) return;
 
         event.preventDefault();

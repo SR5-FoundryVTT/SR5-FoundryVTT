@@ -55,7 +55,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         return data;
     }
 
-    static override DEFAULT_OPTIONS: typeof foundry.applications.sheets.ActorSheetV2.DEFAULT_OPTIONS = {
+    static override DEFAULT_OPTIONS: typeof SR5BaseActorSheet.DEFAULT_OPTIONS = {
         actions: {
             toggleConnectedMatrixIcons: SR5MatrixActorSheet.#toggleConnectedMatrixIcons,
             selectMatrixTarget: SR5MatrixActorSheet.#selectMatrixTarget,
@@ -215,7 +215,9 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         return parts;
     }
 
-    override async _preparePartContext(partId, context, options) {
+    override async _preparePartContext(
+        ...[partId, context, options]: Parameters<SR5BaseActorSheet["_preparePartContext"]>
+    ) {
         const partContext = await super._preparePartContext(partId, context, options);
 
         if (partId === 'matrixActions') {
@@ -336,7 +338,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         else this._connectedIconsOpenClose[uuid] = true;
 
         // Trigger new icons to be shown or hidden.
-        this.render();
+        void this.render();
     }
 
     /**
@@ -480,7 +482,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
 
         this.informAboutOfflineSelection();
 
-        this.render();
+        void this.render();
     }
 
     /**
@@ -661,7 +663,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         if (!target || !(target instanceof SR5Item)) return;
 
         await this.actor.connectNetwork(target);
-        this.render();
+        void this.render();
     }
 
     /**
@@ -673,7 +675,6 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         if (!(event.target instanceof HTMLElement)) return;
 
         await this.actor.disconnectNetwork();
-        this.render();
+        void this.render();
     }
-
 }

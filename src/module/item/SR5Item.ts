@@ -278,14 +278,11 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *
      * The original naming leans on the dnd5e systems use of it for chat messages.
      * NOTE: This is very legacy, difficult to read and should be improved upon.
-     *
-     * @param htmlOptions
-     * @returns
      */
-    async getChatData(htmlOptions = {}) {
+    async getChatData(htmlOptions: TextEditor.EnrichmentOptions = {}) {
         const system = foundry.utils.duplicate(this.system) as SR5Item['system'];
 
-        system.description.value = await foundry.applications.ux.TextEditor.implementation.enrichHTML(system.description.value, { ...htmlOptions });
+        system.description.value = await foundry.applications.ux.TextEditor.implementation.enrichHTML(system.description.value, htmlOptions);
 
         return system;
     }
@@ -312,15 +309,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return parts;
     }
 
-    getBlastData(actionTestData?: any): { radius: number, dropoff: number } | undefined {
+    getBlastData(): { radius: number, dropoff: number } | undefined {
         if (this.isType('spell') && this.isAreaOfEffect()) {
             // By default spell distance is equal to it's Force.
             let distance = this.getLastSpellForce().value;
-
-            // Except for predefined user test selection.
-            if (actionTestData?.spell) {
-                distance = actionTestData.spell.force;
-            }
 
             // Extended spells have a longer range.
             if (this.system.extended) distance *= 10;
@@ -373,7 +365,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * Toggle equipment state of a single Modification item.
      * @param iid Modification item id to be equip toggled
      */
-    async equipWeaponMod(iid) {
+    async equipWeaponMod(iid: string | null) {
         await this.equipNestedItem(iid, 'modification', { unequipOthers: false, toggle: true });
     }
 
@@ -523,19 +515,19 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         await ammo?.update({ system: { technology: { quantity: Math.max(0, ammoQty - reloaded) } } });
     }
 
-    async equipNestedItem(id: string, type: string, options: { unequipOthers?: boolean, toggle?: boolean } = {}) {
+    async equipNestedItem(id: string | null, type: string, options: { unequipOthers?: boolean, toggle?: boolean } = {}) {
         const unequipOthers = options.unequipOthers || false;
         const toggle = options.toggle || false;
 
         // Collect all item data and update at once.
-        const updateData: Record<any, any>[] = [];
+        const updateData: Item.UpdateData[] = [];
         const ammoItems = this.items.filter(item => item.type === type);
 
         for (const item of ammoItems) {
             if (!unequipOthers && item.id !== id) continue;
             const equip = toggle ? !item.system.technology?.equipped : id === item.id;
 
-            updateData.push({ _id: item.id, 'system.technology.equipped': equip });
+            updateData.push({ _id: item.id, system: { technology: { equipped: equip } } });
         }
 
         if (updateData) await this.updateNestedItems(updateData);
@@ -546,7 +538,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *
      * @param id Item id of the to be exclusively equipped ammo item.
      */
-    async equipAmmo(id) {
+    async equipAmmo(id: string) {
         // first unload the current ammo
         await this.unloadAmmo();
         const equippedAmmo = this.getEquippedAmmo();
@@ -597,7 +589,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *
      * @param index The license list index
      */
-    async removeLicense(index) {
+    async removeLicense(index: number) {
         if (this.isType('sin')) {
             const licenses = this.system.licenses.splice(index, 1);
             await this.update({ system: { licenses } });
@@ -609,12 +601,9 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *
      * The chat message must contain a data attribute containing a 'SceneId.TokenId' mapping.
      * See chat.ts#getTokenSceneId for further context.
-     *
-     *
-     * @param html
      */
-    static getItemFromMessage(html): SR5Item | undefined {
-        if (!game || !game.scenes || !game.ready || !canvas || !canvas.ready || !canvas.scene) return;
+    static getItemFromMessage(html: JQuery): SR5Item | undefined {
+        if (!game?.scenes || !game.ready || !canvas || !canvas.ready || !canvas.scene) return;
 
         const card = html.find('.chat-card');
         let actor;

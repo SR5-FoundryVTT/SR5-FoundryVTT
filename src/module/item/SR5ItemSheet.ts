@@ -10,7 +10,7 @@ import { AmmunitionType, RangeType } from '../types/item/Weapon';
 import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 import { MatrixRules } from '../rules/MatrixRules';
 import { SINFlow } from './flows/SINFlow';
-import SR5ApplicationMixin from '@/module/handlebars/SR5ApplicationMixin';
+import { SR5ApplicationMixin } from '@/module/handlebars/SR5ApplicationMixin';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 
 // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -275,18 +275,18 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      */
     protected _cleanParts(item: SR5Item, parts: Record<string, any>) {
         if (item.isType('contact', 'lifestyle', 'sin', 'grid', 'program')) {
-            delete parts['details'];
+            delete parts.details;
         }
         if (!item.canBeMaster) {
-            delete parts['network'];
+            delete parts.network;
         }
         if (!item.isType('weapon')) {
-            delete parts['weaponModifications'];
-            delete parts['weaponAmmo'];
+            delete parts.weaponModifications;
+            delete parts.weaponAmmo;
         }
         if (!item.isType('sin')) {
-            delete parts['licenses'];
-            delete parts['sinNetworks'];
+            delete parts.licenses;
+            delete parts.sinNetworks;
         }
         return parts;
     }
@@ -439,21 +439,21 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @param options TextEditor, enrichHTML.options passed through
      * @returns Enriched HTML result
      */
-    async enrichEditorFieldToHTML(editorValue: string, options: any = { async: false }): Promise<string> {
+    async enrichEditorFieldToHTML(editorValue: string, options?: TextEditor.EnrichmentOptions): Promise<string> {
         return foundry.applications.ux.TextEditor.implementation.enrichHTML(editorValue, options);
     }
 
     /**
      * Action limits currently contain limits for all action types. Be it matrix, magic or physical.
      */
-    _getSortedLimitsForSelect(): Record<string, string> {
+    _getSortedLimitsForSelect() {
         return Helpers.sortConfigValuesByTranslation(SR5.limits);
     }
 
     /**
      * Sorted (by translation) actor attributes.
      */
-    _getSortedAttributesForSelect(): Record<string, string> {
+    _getSortedAttributesForSelect() {
         return Helpers.sortConfigValuesByTranslation(SR5.attributes);
     }
 
@@ -480,11 +480,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * Activate event listeners using the prepared sheet HTML
      * @param html -  The prepared HTML object ready to be rendered into the DOM
      */
-    activateListeners_LEGACY(html) {
+    activateListeners_LEGACY(html: JQuery<HTMLElement>) {
         Helpers.setupCustomCheckbox(this, html);
 
         // Active Effect management
-        html.find(".effect-control").click(event => onManageActiveEffect(event, this.item));
+        html.find(".effect-control").on('click', event => { void onManageActiveEffect(event, this.item)});
 
         /**
          * General item handling
@@ -494,8 +494,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         /**
          * Weapon item specific
          */
-        html.find('select[name="change-ammo"]').on('change', async (event) => this._onAmmoSelect(event.target.value));
-        html.find('select[name="change-clip-type"]').on('change', async (event) => this._onClipSelect(event.target.value));
+        html.find('select[name="change-ammo"]').on('change', this._onAmmoSelect.bind(this));
+        html.find('select[name="change-clip-type"]').on('change', (event) => { void this._onClipSelect((event.target as HTMLSelectElement).value) });
 
         // Marks handling
         html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
@@ -515,17 +515,17 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.update({ system: { linkedActor: actor.uuid } });
     }
 
-    async _onSelectRangedRangeCategory(event) {
+    async _onSelectRangedRangeCategory(event: Event) {
         await this._onSelectRangeCategory("system.range.ranges", event);
     }
 
-    async _onSelectThrownRangeCategory(event) {
+    async _onSelectThrownRangeCategory(event: Event) {
         await this._onSelectRangeCategory("system.thrown.ranges", event);
     }
 
-    async _onSelectRangeCategory(key: string, event) {
+    async _onSelectRangeCategory(key: string, event: Event) {
         event.stopPropagation();
-        const selectedRangeCategory = event.currentTarget.value as keyof typeof SR5.weaponRangeCategories;
+        const selectedRangeCategory = (event.currentTarget as HTMLSelectElement).value as keyof typeof SR5.weaponRangeCategories;
 
         if (selectedRangeCategory === "manual") {
             await this.item.update({
@@ -551,20 +551,21 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * User selected a new matrix attribute on a specific matrix attribute slot (att1, att2,)
      * Switch out slots for the old and selected matrix attribute.
      */
-    async _onMatrixAttributeSelected(event) {
+    async _onMatrixAttributeSelected(event: Event) {
         if (!this.item.system.atts) return;
 
-        const attribute = event.currentTarget.value;
-        const changedSlot = event.currentTarget.dataset.att;
+        const target = event.currentTarget as HTMLSelectElement;
+        const attribute = target.value as Shadowrun.MatrixAttribute;
+        const changedSlot = target.dataset.att;
 
-        await this.item.changeMatrixAttributeSlot(changedSlot, attribute);
+        await this.item.changeMatrixAttributeSlot(changedSlot!, attribute);
     }
 
-    async _onEntityRemove(event) {
+    async _onEntityRemove(event: Event) {
         event.preventDefault();
 
         // Grab the data position to remove the correct entity from the list.
-        const entityRemove = $(event.currentTarget).closest('.entity-remove');
+        const entityRemove = $(event.currentTarget as HTMLElement).closest('.entity-remove');
         const list = entityRemove.data('list');
         const position = entityRemove.data('position');
 
@@ -573,21 +574,21 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             await this.item.removeIC(position);
     }
 
-    static async #addLicense(this: SR5ItemSheet, event) {
+    static async #addLicense(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         await this.item.addNewLicense();
     }
 
-    static async #removeLicense(this: SR5ItemSheet, event) {
+    static async #removeLicense(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
-        const index = SheetFlow.closestAction(event.target)?.dataset.index;
+        const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
         if (index >= 0) await this.item.removeLicense(index);
     }
 
     /**
      * User wants to remove a network from a SIN item.
      */
-    static async #removeNetwork(this: SR5ItemSheet, event) {
+    static async #removeNetwork(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
@@ -598,7 +599,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await SINFlow.removeNetwork(this.item, uuid);
     }
 
-    static async #removeAllNetworks(this: SR5ItemSheet, event) {
+    static async #removeAllNetworks(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
@@ -606,7 +607,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await SINFlow.removeAllNetworks(this.item);
     }
 
-    static async #addItemQty(this: SR5ItemSheet, event) {
+    static async #addItemQty(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         const id = SheetFlow.closestItemId(event.target);
         const item = this.item.getOwnedItem(id);
@@ -615,7 +616,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
     }
 
-    static async #removeItemQty(this: SR5ItemSheet, event) {
+    static async #removeItemQty(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         const id = SheetFlow.closestItemId(event.target);
         const item = this.item.getOwnedItem(id);
@@ -624,7 +625,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
     }
 
-    static async #equipItem(this: SR5ItemSheet, event) {
+    static async #equipItem(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         const id = SheetFlow.closestItemId(event.target);
         const item = this.item.getOwnedItem(id);
@@ -637,7 +638,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
     }
 
-    static async #editItem(this: SR5ItemSheet, event) {
+    static async #editItem(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         const id = SheetFlow.closestItemId(event.target);
         const item = this.item.getOwnedItem(id);
@@ -646,7 +647,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
     }
 
-    static async #deleteItem(this: SR5ItemSheet, event) {
+    static async #deleteItem(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();
@@ -659,13 +660,13 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
     }
 
-    static async #addItem(this: SR5ItemSheet, event) {
+    static async #addItem(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
-        const type = SheetFlow.closestAction(event.target)?.dataset.itemType;
+        const type = SheetFlow.closestAction(event.target)?.dataset.itemType as Item.ConfiguredSubType;
         const itemData = {
             name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
             type,
-        };
+        } satisfies Item.CreateData;
         if (type === 'modification') {
             // add system type to be a weapon when adding a weapon mod
             itemData['system'] = { type: 'weapon' }
@@ -674,49 +675,45 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.createNestedItem(item._source);
     }
 
-    static async #reloadAmmo(this: SR5ItemSheet, event) {
+    static async #reloadAmmo(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         await this.item.reloadAmmo(false);
     }
 
-    static async #partialReloadAmmo(this: SR5ItemSheet, event) {
+    static async #partialReloadAmmo(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         await this.item.reloadAmmo(true);
     }
 
-    static async #resetSpareReloads(this: SR5ItemSheet, event) {
+    static async #resetSpareReloads(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         const spareClips = this.item.system.ammo?.spare_clips.max ?? 0;
         await this.item.update({ system: { ammo: { spare_clips: { value: spareClips }}}});
     }
 
-    async _onAmmoSelect(input) {
-        let id;
+    _onAmmoSelect(event: Event) {
+        const id = SheetFlow.closestItemId(event.currentTarget);
 
-        if (input.currentTarget) {
-            id = SheetFlow.closestItemId(input);
-        } else {
-            id = input;
-        }
-
-        await this.item.equipAmmo(id);
+        if (!id) return;
+        void this.item.equipAmmo(id);
     }
 
-    async _onClipSelect(clipType: AmmunitionType['clip_type']) {
+    async _onClipSelect(clipType: string) {
         if (!clipType || !Object.keys(SR5.weaponCliptypes).includes(clipType)) return;
+        const clip_type = clipType as AmmunitionType['clip_type'];
 
         const agilityValue = this.item.actor ? this.item.actor.getAttribute('agility').value : 0;
         await this.item.update({
             system: {
                 ammo: {
-                    clip_type: clipType,
-                    partial_reload_value: RangedWeaponRules.partialReload(clipType, agilityValue)
+                    clip_type,
+                    partial_reload_value: RangedWeaponRules.partialReload(clip_type, agilityValue)
                 }
             }
         }, { render: true });
     }
 
-    static async #removeOwnedItem(this: SR5ItemSheet, event) {
+    static async #removeOwnedItem(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();
@@ -727,7 +724,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.deleteOwnedItem(id);
     }
 
-    static async #removeAllSlaves(this: SR5ItemSheet, event) {
+    static async #removeAllSlaves(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();
@@ -736,7 +733,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.removeAllSlaves();
     }
 
-    static async #removeSlave(this: SR5ItemSheet, event) {
+    static async #removeSlave(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();
@@ -749,36 +746,37 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.removeSlave(document);
     }
 
-    async _onMarksQuantityChange(event) {
+    async _onMarksQuantityChange(event: Event) {
         event.stopPropagation();
 
         if (!this.item.isType('host')) return;
 
-        const markId = event.currentTarget.dataset.markId;
+        const currentTarget = event.currentTarget as HTMLInputElement | null;
+        const markId = currentTarget?.dataset.markId;
         if (!markId) return;
 
         const markedDocument = await ActorMarksFlow.getMarkedDocument(markId);
         if (!markedDocument) return;
 
-        const marks = parseInt(event.currentTarget.value);
+        const marks = parseInt(currentTarget.value);
         await this.item.setMarks(markedDocument, marks, { overwrite: true });
     }
 
-    static async #addOneQty(this: SR5ItemSheet, event) {
+    static async #addOneQty(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         await SheetFlow.addToQuantity(this.item, event);
     }
 
-    static async #removeOneQty(this: SR5ItemSheet, event) {
+    static async #removeOneQty(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         await SheetFlow.removeFromQuantity(this.item, event);
     }
 
-    static async #addOneMark(this: SR5ItemSheet, event) {
+    static async #addOneMark(this: SR5ItemSheet, event: Event) {
         await this._onMarksQuantityChangeBy(event, 1);
     }
 
-    static async #removeOneMark(this: SR5ItemSheet, event) {
+    static async #removeOneMark(this: SR5ItemSheet, event: Event) {
         await this._onMarksQuantityChangeBy(event, -1);
     }
 
@@ -796,12 +794,12 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.setMarks(markedDocument, by);
     }
 
-    static async #deleteMarks(this: SR5ItemSheet, event) {
+    static async #deleteMarks(this: SR5ItemSheet, event: Event) {
         event.stopPropagation();
 
         if (!this.item.isType('host')) return;
 
-        const markId = SheetFlow.closestAction(event.target).dataset.markId;
+        const markId = SheetFlow.closestAction(event.target)?.dataset.markId;
         if (!markId) return;
 
         const userConsented = await Helpers.confirmDeletion();
@@ -810,7 +808,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.clearMark(markId);
     }
 
-    static async #deleteAllMarks(this: SR5ItemSheet, event) {
+    static async #deleteAllMarks(this: SR5ItemSheet, event: Event) {
         event.stopPropagation();
 
         if (!this.item.isType('host')) return;
@@ -821,14 +819,14 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.clearMarks();
     }
 
-    static async #removeMaster(this: SR5ItemSheet, event) {
+    static async #removeMaster(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
 
         await this.item.disconnectFromNetwork();
-        this.render(false);
+        void this.render(false);
     }
 
-    static async #removeLinkedActor(this: SR5ItemSheet, event) {
+    static async #removeLinkedActor(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
 
         await this.item.update({ system: { linkedActor: '' }});
@@ -839,7 +837,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      *
      * @param event
      */
-    static async #toggleFreshImportFlag(this: SR5ItemSheet, event) {
+    static async #toggleFreshImportFlag(this: SR5ItemSheet, event: Event) {
         const onOff = !this.item.system.importFlags.isFreshImport;
         console.debug('Toggling isFreshImport on item to ->', onOff, event);
         const item = this.item;
@@ -848,16 +846,16 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
     }
 
-    static async #toggleEquipped(this: SR5ItemSheet, event) {
+    static async #toggleEquipped(this: SR5ItemSheet, event: Event) {
         if (this.item.isType('device') && this.item.parent instanceof SR5Actor) {
             await this.item.parent.equipOnlyOneItemOfType(this.item);
-            this.render();
+            void this.render();
         } else if (this.item.isType('ammo') && this.item.parent instanceof SR5Item) {
-            await (this.item.parent as SR5Item).equipAmmo(this.item.id);
-            this.render();
+            await (this.item.parent as SR5Item).equipAmmo(this.item.id!);
+            void this.render();
         } else if (this.item.isType('modification') && this.item.parent instanceof SR5Item) {
             await (this.item.parent as SR5Item).equipWeaponMod(this.item.id);
-            this.render();
+            void this.render();
         } else {
             const equipped = this.item.isEquipped();
             if (this.item.isType('critter_power', 'sprite_power')) {
@@ -870,9 +868,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
     /**
      * Toggle the Wireless state of an item, iterating through the different states
-     * @param event
      */
-    static async #toggleWirelessState(this: SR5ItemSheet, event) {
+    static async #toggleWirelessState(this: SR5ItemSheet, event: MouseEvent) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -889,10 +886,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     }
 
     /**
+     * Review 123: unused function?
      * Clicking on equipped status should trigger unequipping all other devices of the same type.
      * @param event Click event on the equipped checkbox.
      */
-    static async #toggleEquippedDisableOtherDevices(this: SR5ItemSheet, event) {
+    static async #toggleEquippedDisableOtherDevices(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
 
         // Assure owned item device.
@@ -903,7 +901,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.document.parent.equipOnlyOneItemOfType(this.document);
     }
 
-    static async #addEffect(this: SR5ItemSheet, event) {
+    static async #addEffect(this: SR5ItemSheet, event: Event) {
         // TODO handle nested items
         event.preventDefault();
         const effect = [{
@@ -913,36 +911,35 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.createEmbeddedDocuments('ActiveEffect', effect);
     }
 
-    static async #editEffect(this: SR5ItemSheet, event) {
+    static async #editEffect(this: SR5ItemSheet, event: MouseEvent) {
         const effectId = SheetFlow.closestEffectId(event.target);
         const effect = this.item.effects.get(effectId);
-        if (effect && effect instanceof SR5ActiveEffect) {
+        if (effect instanceof SR5ActiveEffect) {
             await effect.sheet?.render(true);
         } else {
             const uuid = SheetFlow.closestUuid(event.target);
             const doc = fromUuidSync(uuid);
-            if (doc && doc instanceof SR5ActiveEffect) {
+            if (doc instanceof SR5ActiveEffect) {
                 await doc.sheet?.render(true);
             }
         }
-
     }
 
-    static async #toggleEffect(this: SR5ItemSheet, event) {
+    static async #toggleEffect(this: SR5ItemSheet, event: MouseEvent) {
         const effectId = SheetFlow.closestEffectId(event.target);
         const effect = this.item.effects.get(effectId);
-        if (effect && effect instanceof SR5ActiveEffect) {
+        if (effect instanceof SR5ActiveEffect) {
             await effect.update({ disabled: !effect.disabled })
         } else {
             const uuid = SheetFlow.closestUuid(event.target);
             const doc = await fromUuid(uuid);
-            if (doc && doc instanceof SR5ActiveEffect) {
+            if (doc instanceof SR5ActiveEffect) {
                 await doc.update({ disabled: !doc.disabled })
             }
         }
     }
 
-    static async #deleteEffect(this: SR5ItemSheet, event) {
+    static async #deleteEffect(this: SR5ItemSheet, event: MouseEvent) {
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
@@ -974,7 +971,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             {
                 name: "SR5.ContextOptions.EditItem",
                 icon: "<i class='fas fa-pen-to-square'></i>",
-                callback: async (target) => {
+                callback: async (target: HTMLElement) => {
                     const id = SheetFlow.closestItemId(target);
                     const item = this.item.getOwnedItem(id);
                     if (item) {
@@ -985,7 +982,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             {
                 name: "SR5.ContextOptions.DeleteItem",
                 icon: "<i class='fas fa-trash'></i>",
-                callback: async (target) => {
+                callback: async (target: HTMLElement) => {
                     const userConsented = await Helpers.confirmDeletion();
                     if (!userConsented) return;
                     const id = SheetFlow.closestItemId(target);
@@ -1004,7 +1001,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             {
                 name: "SR5.ContextOptions.EditEffect",
                 icon: "<i class='fas fa-pen-to-square'></i>",
-                callback: async (target) => {
+                callback: async (target: HTMLElement) => {
                     const id = SheetFlow.closestEffectId(target);
                     const item = this.item.effects.get(id);
                     if (item) {
@@ -1021,13 +1018,13 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             {
                 name: "SR5.ContextOptions.DeleteEffect",
                 icon: "<i class='fas fa-trash'></i>",
-                condition: (target) => {
+                condition: (target: HTMLElement) => {
                     const id = SheetFlow.closestEffectId(target);
                     const item = this.item.effects.get(id);
                     return item !== undefined;
                     // don't check for effects by uuid for deletion
                 },
-                callback: async (target) => {
+                callback: async (target: HTMLElement) => {
                     const userConsented = await Helpers.confirmDeletion();
                     if (!userConsented) return;
                     const id = SheetFlow.closestEffectId(target);
@@ -1039,6 +1036,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         ]
     }
 
+    // 123 Type it
     override async _processSubmitData(event, form, submitData, options) {
         if (this.item._isNestedItem) {
             await this.item.update(submitData, options);
@@ -1047,42 +1045,42 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
     }
 
-    static async #toggleActionSpecialization(this: SR5ItemSheet, event) {
+    static async #toggleActionSpecialization(this: SR5ItemSheet) {
         const action = this.item.getAction();
         if (action) {
             await this.item.update({system: { action: { spec: !action.spec }}});
         }
     }
 
-    static async #toggleActionArmor(this: SR5ItemSheet, event) {
+    static async #toggleActionArmor(this: SR5ItemSheet) {
         const action = this.item.getAction();
         if (action) {
             await this.item.update({system: { action: { armor: !action.armor }}});
         }
     }
 
-    static async #toggleOpposedArmor(this: SR5ItemSheet, event) {
+    static async #toggleOpposedArmor(this: SR5ItemSheet) {
         const action = this.item.getAction();
         if (action) {
             await this.item.update({system: { action: { opposed: { armor: !action.opposed.armor }}}});
         }
     }
 
-    static async #toggleResistArmor(this: SR5ItemSheet, event) {
+    static async #toggleResistArmor(this: SR5ItemSheet) {
         const action = this.item.getAction();
         if (action) {
             await this.item.update({system: { action: { opposed: { resist: { armor: !action.opposed.resist.armor }}}}});
         }
     }
 
-    static async #editImage(this: SR5ItemSheet, event) {
+    static async #editImage(this: SR5ItemSheet, event: MouseEvent) {
         event.preventDefault();
 
         await new FilePicker({
             type: 'image',
             callback: (path) => {
                 if (path) {
-                    this.item.update({ img : path });
+                    void this.item.update({ img : path });
                 }
             }}).render(true);
     }
@@ -1092,8 +1090,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @returns {DragDrop[]}     An array of DragDrop handlers
      * @private
      */
-    #createDragDropHandlers() {
-        return this.options.dragDrop.map((d) => {
+    #createDragDropHandlers(): DragDrop[] {
+        return this.options.dragDrop!.map((d) => {
             d.permissions = {
                 dragstart: this._canDragStart.bind(this),
                 drop: this._canDragDrop.bind(this),
@@ -1111,20 +1109,17 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * Define whether a user is able to begin a dragstart workflow for a given drag selector
      * @param {string} selector       The candidate HTML selector for dragging
      * @returns {boolean}             Can the current user drag this selector?
-     * @protected
      */
-    _canDragStart(selector) {
+    protected _canDragStart(selector): boolean {
         return this.isEditable;
     }
-
 
     /**
      * Define whether a user is able to conclude a drag-and-drop workflow for a given drop selector
      * @param {string} selector       The candidate HTML selector for the drop target
      * @returns {boolean}             Can the current user drop on this selector?
-     * @protected
      */
-    _canDragDrop(selector) {
+    protected _canDragDrop(selector): boolean {
         return this.isEditable;
     }
 
@@ -1134,7 +1129,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @param {DragEvent} event       The originating DragEvent
      * @protected
      */
-    _onDragOver(event) {}
+    protected _onDragOver(event: DragEvent) {}
 
     /* -------------------------------------------- */
 
@@ -1144,7 +1139,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @returns {Promise<void>}
      * @protected
      */
-    async _onDrop(event) {
+    async _onDrop(event: DragEvent) {
         const data = TextEditor.getDragEventData(event) as any;
         if (!data) return;
         const item = this.item;
@@ -1170,7 +1165,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      *                                    or null in case of failure or no action being taken
      * @protected
      */
-    async _onDropDocument(event, document) {
+    protected async _onDropDocument(event, document) {
         switch (document.documentName) {
             case "ActiveEffect":
                 return (await this._onDropActiveEffect(event, document)) ?? null;
@@ -1214,7 +1209,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      *                                          being taken
      * @protected
      */
-    async _onDropActor(event, actor) {
+    async _onDropActor(event: DragEvent, actor: SR5Actor) {
         if (this.item.isNetwork()) {
             return this.item.addSlave(actor);
         }
@@ -1233,10 +1228,10 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      *                                         or a nullish value in case of failure or no action being taken
      * @protected
      */
-    async _onDropItem(event, item) {
+    protected async _onDropItem(event: DragEvent, item: SR5Item) {
         // dropped ammo and mods to weapons get added as a nested item
         if (this.item.isType('weapon') && item.isType('ammo', 'modification')) {
-            return this.item.createNestedItem(item);
+            return this.item.createNestedItem(item.toObject());
         }
         // dropped Grid and Hosts on SIN allows for adding the SIN as a network option
         if (this.item.isType('sin') && item.isNetwork()) {
@@ -1275,9 +1270,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @returns {Promise<void>}
      * @protected
      */
-    async _onDragStart(event) {
-        const target = event.currentTarget;
-        if ( "link" in event.target.dataset ) return;
+    _onDragStart(event: DragEvent) {
+        const target = event.currentTarget as HTMLElement;
+        if ( "link" in (event.target as HTMLElement)?.dataset ) return;
         let dragData;
 
         // Owned Items
@@ -1298,7 +1293,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         // Set data transfer
         if (!dragData) return;
-        event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+        event.dataTransfer?.setData("text/plain", JSON.stringify(dragData));
     }
 
     /**
@@ -1306,10 +1301,10 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      *
      * @event Most return a currentTarget with a value dataset
      */
-    static async #modifyConditionMonitor(this: SR5ItemSheet, event) {
+    static async #modifyConditionMonitor(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
 
-        const target = event.target.closest('[data-action="modifyConditionMonitor"]');
+        const target = (event.target as HTMLElement).closest<HTMLElement>('[data-action="modifyConditionMonitor"]')!;
 
         const track = target.dataset.id;
         let value = Number(target.dataset.value);
@@ -1326,26 +1321,22 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
     /**
      * Reset all condition tracks to zero values.
-     * @param event
      */
-    static async #clearConditionMonitor(this: SR5ItemSheet, event) {
+    static async #clearConditionMonitor(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
 
-        const track = event.target.closest('[data-id]').dataset.id;
+        const track = (event.target as HTMLElement).closest<HTMLElement>('[data-id]')?.dataset.id;
         if (track === 'matrix') {
             await this.item.setMatrixDamage(0);
         }
     }
 
     /**
+     * 123 Review: does it do anything?
      * Handle interaction with a damage track title.
-     * @param event
      */
-    static async #rollConditionMonitor(this: SR5ItemSheet, event) {
+    static async #rollConditionMonitor(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
-        const track = event.target.closest('[data-id]').dataset.id;
-
-        switch (track) {
-        }
+        const track = (event.target as HTMLElement).closest<HTMLElement>('[data-id]')?.dataset.id;
     }
 }
