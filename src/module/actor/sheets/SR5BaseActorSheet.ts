@@ -1671,7 +1671,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const quantity = parseInt((event.currentTarget as HTMLInputElement).value);
 
         // Inform users about issues with templating or programming.
-        if (!item?.system?.technology) {
+        if (!quantity || !item?.system?.technology) {
             console.error(`Shadowrun 5e | Tried altering technology quantity on an item without technology data: ${item?.id}`, item);
             return;
         }
