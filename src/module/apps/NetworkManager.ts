@@ -23,7 +23,7 @@ export interface NetworkManagerData extends SR5ApplicationMixinTypes.RenderConte
     driver?: SR5Actor;
 }
 
-export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<any> {
+export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<NetworkManagerData> {
     declare document: SR5Actor;
 
     static override PARTS = {
