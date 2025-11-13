@@ -1073,10 +1073,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         ]
     }
 
-    // 123 Type it
-    override async _processSubmitData(event, form, submitData, options) {
+    override async _processSubmitData(
+        ...[event, form, submitData, options]: Parameters<ItemSheet['_processSubmitData']>
+    ) {
         if (this.item._isNestedItem) {
-            await this.item.update(submitData, options);
+            await this.item.update(submitData as any, options as any);
         } else {
             await super._processSubmitData(event, form, submitData, options);
         }
@@ -1369,11 +1370,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     }
 
     /**
-     * 123 Review: does it do anything?
      * Handle interaction with a damage track title.
      */
     static async #rollConditionMonitor(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
-        const track = (event.target as HTMLElement).closest<HTMLElement>('[data-id]')?.dataset.id;
     }
 }

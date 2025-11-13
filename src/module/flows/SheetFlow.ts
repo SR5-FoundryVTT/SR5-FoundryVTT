@@ -115,7 +115,7 @@ export const SheetFlow = {
         return {
             name: "SR5.ContextOptions.Source",
             icon: "<i class='fas fa-page'></i>",
-            condition: (target) => {
+            condition: (target: HTMLElement) => {
                 const source = this.closestSource(target);
                 return !!source;
             },

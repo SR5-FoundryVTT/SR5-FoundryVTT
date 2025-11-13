@@ -17,7 +17,7 @@ export namespace SR5ApplicationMixinTypes {
     export interface RenderContext extends ApplicationV2.RenderContext, HandlebarsApplicationMixin.RenderContext {
         user: User;
         config: typeof SR5;
-        system: Actor.Implementation['system'] | Item.Implementation['system'];
+        system: SR5Actor['system'] | SR5Item['system'];
 
         isLimited: boolean;
         isEditable: boolean;
