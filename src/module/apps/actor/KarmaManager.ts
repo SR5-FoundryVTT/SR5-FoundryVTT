@@ -1,10 +1,19 @@
+import { DeepPartial } from 'fvtt-types/utils';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
+import ApplicationV2 = foundry.applications.api.ApplicationV2;
+import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
-const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
+interface KarmaManagerContext extends HandlebarsApplicationMixin.RenderContext {
+    karma: number;
+    careerKarma: number;
+    karmaModifier: number;
+    modifiedKarma: number;
+    modifiedCareerKarma: number;
+};
 
-export class KarmaManager extends HandlebarsApplicationMixin(ApplicationV2)<any> {
+export class KarmaManager extends HandlebarsApplicationMixin(ApplicationV2)<KarmaManagerContext> {
     karmaModifier = 0;
 
     constructor(private readonly actor: SR5Actor, options = {}) {
@@ -34,7 +43,7 @@ export class KarmaManager extends HandlebarsApplicationMixin(ApplicationV2)<any>
         return game.i18n.localize("SR5.KarmaManager.Title");
     }
 
-    override async _prepareContext(options) {
+    override async _prepareContext(options: Parameters<ApplicationV2['_prepareContext']>[0]) {
         const context = await super._prepareContext(options);
         context.karma = this.getKarma();
         context.careerKarma = this.getCareerKarma();
@@ -85,14 +94,17 @@ export class KarmaManager extends HandlebarsApplicationMixin(ApplicationV2)<any>
         void this.close();
     }
 
-    override async _onRender(context, options) {
+    override async _onRender(
+        context: DeepPartial<KarmaManagerContext>,
+        options: DeepPartial<ApplicationV2.RenderOptions>
+    ) {
         this.element.querySelector<HTMLInputElement>('[name="incoming-karma"]')
             ?.addEventListener('change', (event: any) => {
                 this.karmaModifier = Number(event.target?.value ?? 0);
                 if (this.getModifiedKarma() < 0) {
                     this.karmaModifier = -this.getModifiedKarma();
                 }
-                this.render();
+                void this.render();
         })
         return super._onRender(context, options);
     }

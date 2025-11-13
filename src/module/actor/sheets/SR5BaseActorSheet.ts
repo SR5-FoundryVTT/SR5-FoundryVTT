@@ -485,7 +485,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return this.actor.hasItemOfType('spell', 'adept_power', 'ritual', 'call_in_action');
     }
 
-    override async _onRender(context, options) {
+    override async _onRender(
+        context: DeepPartial<T>,
+        options: DeepPartial<SR5ApplicationMixinTypes.RenderOptions>
+    ) {
         await super._onRender(context, options);
         this.activateListeners_LEGACY($(this.element));
         this.prepareModifierTooltips();
