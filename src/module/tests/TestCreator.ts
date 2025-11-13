@@ -63,8 +63,7 @@ export const TestCreator = {
      *
      * @returns Tries to create a SuccessTest from given action item or undefined if it failed.
      */
-    fromItem: async function(item: SR5Item, document?: SR5Actor|SR5Item, options?: TestOptions): Promise<SuccessTest | undefined> {
-        //@ts-expect-error Default to item parent actor, if none given.
+    fromItem: async function(item: SR5Item, document?: SR5Actor|SR5Item|null, options?: TestOptions): Promise<SuccessTest | undefined> {
         if (!document) document = item.parent;
         if (!(document instanceof SR5Actor)) {
             console.error("Shadowrun 5e | A SuccessTest can only be created with an explicit Actor or Item with an actor parent.")

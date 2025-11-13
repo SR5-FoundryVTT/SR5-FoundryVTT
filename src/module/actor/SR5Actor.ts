@@ -1285,7 +1285,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options.byLabel true to search the skill by label as displayed on the sheet.
      * @param options.specialization true to configure the skill test to use a specialization.
      */
-    async startTeamworkTest(skillId: string, options: SkillRollOptions = {}) {
+    async startTeamworkTest(skillId: string, options?: ChatMessage.Database.CreateOperation<undefined>) {
         console.info(`Shadowrun5e | Starting teamwork test for ${skillId}`);
 
         // Prepare message content.
@@ -1301,11 +1301,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const content = await renderTemplate('systems/shadowrun5e/dist/templates/rolls/teamwork-test-message.hbs', templateData);
         // Prepare the actual message.
         const messageData =  {
-            user: game.user?.id,
+            user: game.user.id,
             speaker: {
-                actor: this.id,
-                alias: game.user?.name,
-                token: this.token
+                actor: this.id!,
+                alias: game.user.name,
+                token: this.token?.id ?? null
             },
             content,
             // Manually build flag data to give renderChatMessage hook flag access.
@@ -1316,9 +1316,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
                 'core.canPopout': true
             },
             sound: CONFIG.sounds.dice,
-        };
+        } as const;
 
-        //@ts-expect-error // TODO: foundry-vtt-types v10
         const message = await ChatMessage.create(messageData, options);
 
         if (!message) return;
@@ -1353,10 +1352,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Is the given attribute id a matrix attribute
-     * @param attribute
      */
     _isMatrixAttribute(attribute: string): boolean {
-        return SR5.matrixAttributes.hasOwnProperty(attribute);
+        return Object.hasOwn(SR5.matrixAttributes, attribute);
     }
 
     /**
