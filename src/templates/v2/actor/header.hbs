@@ -1,7 +1,7 @@
 <header class="sheet-header">
     <img class="sheet-image" src="{{actor.img}}" data-tooltip="{{#if @root.isEditMode}}{{actor.img}}{{else}}{{actor.name}}{{/if}}"
         {{#if @root.isEditMode}}
-        data-edit="img"
+            data-action="editImage"
         {{/if}}
     />
     <div class="sheet-header-labels">
