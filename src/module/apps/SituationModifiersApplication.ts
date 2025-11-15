@@ -152,7 +152,7 @@ class MagicModifiersHandler extends ModifiersHandler {
         modifier.append(modifierDescription);
     }
 
-    async handleClearMagicModifiers(event) {
+    async handleClearMagicModifiers(event: Event) {
         event.preventDefault();
 
         this.app.modifiers = await DocumentSituationModifiers.clearTypeOn(this.app.target, 'background_count');
@@ -189,7 +189,7 @@ class RecoilModifiersHandler extends ModifiersHandler {
      * 
      * This method is related to SituationModifierApplication#applyModifierDelta
      */
-    async applyRecoilDelta(event) {
+    async applyRecoilDelta(event: Event) {
         event.preventDefault();
 
         if (!this.app.modifiers.documentIsActor) return;
@@ -198,8 +198,8 @@ class RecoilModifiersHandler extends ModifiersHandler {
 
         // Expect the element group to siblings.
         // Triggering DOMElement should contain the delta...
-        const triggerElement = event.target;
-        if (!triggerElement || !triggerElement.dataset.hasOwnProperty('delta')) 
+        const triggerElement = event.target as HTMLElement;
+        if (!Object.hasOwn(triggerElement?.dataset, 'delta')) 
             return console.error('Shadowrun5e | Expected a DOMElement with a different structure');
 
         const delta = Number(triggerElement.dataset['delta']);
@@ -217,7 +217,7 @@ class RecoilModifiersHandler extends ModifiersHandler {
 
         // Setup and connect tokenHUD elements.
         const modifier = $('<div class="modifier-row"></div>');
-        const modifierValue = $(`<div class="modifier-value modifier-value-recoil">${modifiers.recoil.applied!.total}</div>`);
+        const modifierValue = $(`<div class="modifier-value modifier-value-recoil">${modifiers.recoil.applied.total}</div>`);
         const modifierDescription = $(`<div class="modifier-description open-recoil-modifier">${game.i18n.localize("SR5.ModifierTypes.Recoil")}</div>`);
         modifierDescription.on('click', SituationModifiersApplication.openForTokenHUD(tokenId, 'recoil'));
 
@@ -331,13 +331,13 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
     /**
      * Apply a formData change based on a custom numerical input element.
      */
-    async applyModifierDelta(event) {
+    async applyModifierDelta(event: Event) {
         event.preventDefault();
 
         // Expect the element group to siblings.
         // Triggering DOMElement should contain the delta...
-        const triggerElement = event.target;
-        if (!triggerElement || !triggerElement.dataset.hasOwnProperty('delta')) 
+        const triggerElement = event.target as HTMLElement;
+        if (!Object.hasOwn(triggerElement?.dataset, 'delta')) 
             return console.error('Shadowrun5e | Expected a DOMElement with a different structure');
 
         const delta = Number(triggerElement.dataset['delta']);
@@ -345,7 +345,7 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
 
         // Value DOMElement should contain the data key...
         const valueElement = $(triggerElement).siblings().closest('input');
-        if (!valueElement || !valueElement.attr('name')) 
+        if (!valueElement?.attr('name')) 
             return console.error('Shadowrun5e | Expected a DOMElement with a name attribute');
 
         // Extract value from data using value DOMElement data key...
@@ -397,7 +397,7 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
     /**
      * Override _onChangeInput to include a render on changing modifier values.
      */
-    override async _onChangeInput(event) {
+    override async _onChangeInput(event: JQuery.ChangeEvent) {
         await super._onChangeInput(event);
         this.render(true);
     }

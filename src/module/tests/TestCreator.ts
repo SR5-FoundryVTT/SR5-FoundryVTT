@@ -63,8 +63,7 @@ export const TestCreator = {
      *
      * @returns Tries to create a SuccessTest from given action item or undefined if it failed.
      */
-    fromItem: async function(item: SR5Item, document?: SR5Actor|SR5Item, options?: TestOptions): Promise<SuccessTest | undefined> {
-        //@ts-expect-error Default to item parent actor, if none given.
+    fromItem: async function(item: SR5Item, document?: SR5Actor|SR5Item|null, options?: TestOptions): Promise<SuccessTest | undefined> {
         if (!document) document = item.parent;
         if (!(document instanceof SR5Actor)) {
             console.error("Shadowrun 5e | A SuccessTest can only be created with an explicit Actor or Item with an actor parent.")
@@ -706,7 +705,7 @@ export const TestCreator = {
      * 
      * @param event A PointerEvent by user interaction
      */
-    shouldHideDialog(event: Shadowrun.RollEvent|undefined): boolean {
+    shouldHideDialog(event?: Event): boolean {
         if (!event) return false;
         const bindings = game.keybindings.get("shadowrun5e", "hide-test-dialog");
         return bindings.some(binding => event[binding.key] === true);
@@ -717,7 +716,7 @@ export const TestCreator = {
      * 
      * @param event A PointerEvent by user interaction
      */
-    shouldShowDialog(event: Shadowrun.RollEvent|undefined): boolean {
+    shouldShowDialog(event?: Event): boolean {
         return !TestCreator.shouldHideDialog(event);
     },
 
@@ -726,7 +725,7 @@ export const TestCreator = {
      * 
      * @param event A PointerEvent by user interaction
      */
-    shouldPostItemDescription(event: Shadowrun.RollEvent|undefined): boolean {
+    shouldPostItemDescription(event?: Event): boolean {
         if (!event) return false;
         const bindings = game.keybindings.get("shadowrun5e", "show-item-card");
         return bindings.some(binding => event[binding.key] === true);

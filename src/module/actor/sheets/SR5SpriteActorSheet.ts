@@ -3,8 +3,8 @@ import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { Helpers } from '@/module/helpers';
 
-export type SpriteActorSheetData = MatrixActorSheetData & {
-    technomancer: SR5Actor | null;
+export interface SpriteActorSheetData extends MatrixActorSheetData {
+    technomancer?: SR5Actor | null;
     isSprite: boolean;
 }
 
@@ -58,20 +58,21 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
         ];
     }
 
-    override async _prepareContext(options) {
+    override async _prepareContext(options: Parameters<SR5MatrixActorSheet["_prepareContext"]>[0]) {
         const data = await super._prepareContext(options);
 
         // Collect sprite technomancer for easy interaction.
         if (this.document.isType('sprite') && this.document.system.technomancerUuid !== '')
-            data['technomancer'] = await fromUuid(this.document.system.technomancerUuid);
+            data.technomancer = await fromUuid(this.document.system.technomancerUuid) as SR5Actor;
 
         data.isSprite = true;
 
         return data;
     }
 
-    override async _onDropActor(event, actor) {
+    override async _onDropActor(event: DragEvent, actor: SR5Actor) {
         await this.actor.addTechnomancer(actor);
+        return null;
     }
 
     /**

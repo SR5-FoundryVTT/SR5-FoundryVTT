@@ -129,7 +129,7 @@ export class SpiritInfoUpdater {
 
              // Horror Terrors
              'corps_cadavre',
-        ]
+        ] as const;
 
         const specialMapping = new Map([
             ['Noxious Spirit', 'toxic_air'],
@@ -138,16 +138,15 @@ export class SpiritInfoUpdater {
             ['Nuclear Spirit', 'toxic_fire'],
             ['Plague Spirit', 'toxic_man'],
             ['Sludge Spirit', 'toxic_water']
-        ])
+        ]);
 
         const type = spiritTypes.find(v => chummerType?.toLowerCase().includes(v)) ?? specialMapping.get(chummerType);
-       
+
         if(!type) {
             ui.notifications?.error(game.i18n.format("SR5.Import.Spirit.SpiritTypeNotFound"))
             return;
         }
 
-        // TODO shawn fix typing
         system.spiritType = type as any;
     }
 }

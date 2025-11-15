@@ -3,7 +3,9 @@ import { LanguageSkillEditSheet } from './LanguageSkillEditSheet';
 
 export class KnowledgeSkillEditSheet extends LanguageSkillEditSheet {
     category: KnowledgeSkillCategory;
-    constructor(options, skillId, category) {
+    override readonly canBeNative: boolean = false;
+
+    constructor(options, skillId: string, category: KnowledgeSkillCategory) {
         super(options, skillId);
         this.category = category;
     }
@@ -11,8 +13,6 @@ export class KnowledgeSkillEditSheet extends LanguageSkillEditSheet {
     override _getSkillFields(systemFields) {
         return systemFields.skills.fields.knowledge.fields[this.category].fields.value.element.fields;
     }
-
-    override readonly canBeNative: boolean = false;
 
     override _updateString() {
         return `system.skills.knowledge.${this.category}.value.${this.skillId}`;

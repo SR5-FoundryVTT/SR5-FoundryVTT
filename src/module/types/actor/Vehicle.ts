@@ -1,14 +1,14 @@
 import { SR5 } from "@/module/config";
-import { ActorBase, CommonData, CreateModifiers, PhysicalCombatValues } from './Common';
-import { AttributeChoices, AttributeField, Attributes } from '../template/Attributes';
-import { VehicleLimits } from '../template/Limits';
-import { Movement } from '../template/Movement';
-import { Tracks } from '../template/ConditionMonitors';
-import { ActorArmorData } from '../template/Armor';
-import { Initiative } from '../template/Initiative';
-import { MatrixData } from '../template/Matrix';
-import { VisibilityChecks } from '../template/Visibility';
-import { ModifiableField } from '../fields/ModifiableField';
+import { Movement } from "../template/Movement";
+import { MatrixData } from "../template/Matrix";
+import { VehicleLimits } from "../template/Limits";
+import { ActorArmorData } from "../template/Armor";
+import { Initiative } from "../template/Initiative";
+import { Tracks } from "../template/ConditionMonitors";
+import { VisibilityChecks } from "../template/Visibility";
+import { ModifiableField } from "../fields/ModifiableField";
+import { Attributes, AttributeField } from "../template/Attributes";
+import { CommonData, PhysicalCombatValues, CreateModifiers, ActorBase } from "./Common";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const VehicleStats = () => ({
@@ -69,7 +69,11 @@ const VehicleData = () => ({
     // === Matrix & Initiative ===
     matrix: new SchemaField(MatrixData()),
     initiative: new SchemaField(Initiative('meatspace', 'matrix')),
-    full_defense_attribute: new StringField({ required: true, initial: "willpower", choices: AttributeChoices() }),
+    full_defense_attribute: new StringField({
+        required: true,
+        initial: "willpower",
+        choices: SR5.attributes
+    }),
     visibilityChecks: new SchemaField(VisibilityChecks("matrix", "meatspace")),
 
     // === Driver & Networking ===

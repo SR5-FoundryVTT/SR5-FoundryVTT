@@ -1,11 +1,11 @@
+import { SR5 } from "@/module/config";
 import { MatrixData } from "../template/Matrix";
-import { Attributes, MatrixActorAttributes } from '../template/Attributes';
 import { Initiative } from "../template/Initiative";
 import { VisibilityChecks } from "../template/Visibility";
 import { Limits, MatrixLimits } from "../template/Limits";
 import { ActorBase, CommonData, CreateModifiers } from "./Common";
-import { SR5 } from '@/module/config';
 import { Tracks } from '@/module/types/template/ConditionMonitors';
+import { Attributes, MatrixActorAttributes } from '../template/Attributes';
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const SpriteData = () => ({

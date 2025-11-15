@@ -112,15 +112,15 @@ export class InventoryFlow {
     }
 
     /**
- * Does this actor have the given inventory already?
- *
- * Note: Comparisons will only be against lower case.
- *
- * @param name The inventory name.
- */
-    exists(name): boolean {
-        return name === Object.keys(this.actor.system.inventories)
-            .find(inventory => inventory.toLowerCase() === name.toLowerCase());
+     * Does this actor have the given inventory already?
+     *
+     * Note: Comparisons will only be against lower case.
+     *
+     * @param name The inventory name.
+     */
+    exists(name: string): boolean {
+        return Object.keys(this.actor.system.inventories)
+            .some(inventory => inventory.toLowerCase() === name.toLowerCase());
     }
 
     /**

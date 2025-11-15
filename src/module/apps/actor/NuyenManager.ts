@@ -1,10 +1,17 @@
+import { DeepPartial } from 'fvtt-types/utils';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
+import ApplicationV2 = foundry.applications.api.ApplicationV2;
+import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
-const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
+interface NuyenManagerContext extends HandlebarsApplicationMixin.RenderContext {
+    nuyen: number;
+    nuyenModifier: number;
+    modifiedNuyen: number;
+};
 
-export class NuyenManager extends HandlebarsApplicationMixin(ApplicationV2)<any> {
+export class NuyenManager extends HandlebarsApplicationMixin(ApplicationV2)<NuyenManagerContext> {
     nuyenModifier = 0;
 
     getNuyen() {
@@ -19,7 +26,7 @@ export class NuyenManager extends HandlebarsApplicationMixin(ApplicationV2)<any>
         return game.i18n.localize("SR5.NuyenManager.Title");
     }
 
-    override async _prepareContext(options) {
+    override async _prepareContext(options: Parameters<ApplicationV2['_prepareContext']>[0]) {
         const context = await super._prepareContext(options);
         context.nuyen = this.getNuyen();
         context.nuyenModifier = this.nuyenModifier ?? 0;
@@ -52,20 +59,24 @@ export class NuyenManager extends HandlebarsApplicationMixin(ApplicationV2)<any>
         const currentNuyen = this.getNuyen();
         const modifiedNuyen = currentNuyen + this.nuyenModifier;
         await this.actor.update({system: { nuyen: modifiedNuyen }});
-        this.close();
+        void this.close();
     }
 
-    static async #cancel(this: NuyenManager, event) {
-        this.close();
+    static async #cancel(this: NuyenManager, event: Event) {
+        void this.close();
     }
 
-    override async _onRender(context, options) {
+    override async _onRender(
+        context: DeepPartial<NuyenManagerContext>,
+        options: DeepPartial<ApplicationV2.RenderOptions>
+    ) {
         this.element.querySelector<HTMLInputElement>('[name="incoming-nuyen"]')
             ?.addEventListener('change', (event: any) => {
                 console.log(event);
                 this.nuyenModifier = Number(event.target?.value ?? 0);
-                this.render();
-        })
+                void this.render();
+            }
+        );
         return super._onRender(context, options);
     }
 

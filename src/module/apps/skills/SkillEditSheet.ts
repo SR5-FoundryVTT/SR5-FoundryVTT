@@ -1,49 +1,67 @@
 import { SR5 } from "../../config";
 import { parseDropData } from "../../utils/sheets";
-import SR5ApplicationMixin from '@/module/handlebars/SR5ApplicationMixin';
+import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { Helpers } from '@/module/helpers';
+import { DeepPartial } from "fvtt-types/utils";
+import { SkillFieldType } from "@/module/types/template/Skills";
+import DocumentSheetV2 = foundry.applications.api.DocumentSheetV2;
 
-const { DocumentSheetV2 } = foundry.applications.api;
 const { FilePicker } = foundry.applications.apps;
 
-export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Actor, any> {
+interface SkillEditSheetData extends 
+    SR5ApplicationMixinTypes.RenderContext,
+    DocumentSheetV2.RenderContext<Actor.Implementation>
+{
+    actor: SR5Actor;
+    skillFields: any;
+    system: Actor.Implementation['system'];
     skillId: string;
+    skill?: SkillFieldType;
+    skill_name: string;
+    editable_name: boolean;
+    editable_canDefault: boolean;
+    editable_attribute: boolean;
+    attributes: Record<string, string>;
+    canBeNative: boolean;
+};
 
-    constructor(options, skillId) {
+export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<Actor.Implementation, SkillEditSheetData> {
+    skillId: string;    
+    readonly canBeNative: boolean = false;
+
+    constructor(options, skillId: string) {
         super(options);
         this.skillId = skillId;
     }
 
-    override async _prepareContext(options) {
-        const data = await super._prepareContext(options);
+    override async _prepareContext(options: DeepPartial<SR5ApplicationMixinTypes.RenderOptions> & { isFirstRender: boolean }) {
+        const data = await super._prepareContext(options) as SkillEditSheetData;
         data.actor = this.document;
 
         data.skillFields = this._getSkillFields(data.systemFields);
 
         // skill property will hold a direct skill reference
-        data['skillId'] = this.skillId;
-        data['skill'] = this.document.getSkill(this.skillId);
-        data['skill_name'] = this._updateString();
-        data['editable_name'] = this._allowSkillNameEditing();
-        data['editable_canDefault'] = true;
-        data['editable_attribute'] = true;
-        data['attributes'] = this._getSkillAttributesForSelect();
-        data['canBeNative'] = this.canBeNative;
+        data.skillId = this.skillId;
+        data.skill = this.document.getSkill(this.skillId);
+        data.skill_name = this._updateString();
+        data.editable_name = this._allowSkillNameEditing();
+        data.editable_canDefault = true;
+        data.editable_attribute = true;
+        data.attributes = this._getSkillAttributesForSelect();
+        data.canBeNative = this.canBeNative;
 
         data.primaryTabs = this._prepareTabs('primary');
 
         return data;
     }
 
-    readonly canBeNative: boolean = false;
-
     _updateString() {
         return `system.skills.active.${this.skillId}`;
     }
 
-    static override DEFAULT_OPTIONS: any = {
+    static override DEFAULT_OPTIONS = {
         classes: ['actor', 'skill', 'named-sheet'],
         position: {
             width: 550,
@@ -59,7 +77,7 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
         }
     }
 
-    static override PARTS: any = {
+    static override PARTS = {
         header: {
             template: SheetFlow.templateBase('actor/apps/skill/header'),
         },
@@ -77,7 +95,7 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
         },
     }
 
-    static override TABS: any = {
+    static override TABS = {
         primary: {
             initial: 'description',
             tabs: [
@@ -98,9 +116,10 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
                 console.log(path);
                 if (path) {
                     const key = `${this._updateString()}.img`
-                    this.document.update({ [key] : path });
+                    void this.document.update({ [key] : path });
                 }
-            }}).render(true);
+            }
+        }).render(true);
     }
 
     static async #addBonus(this: SkillEditSheet, event: PointerEvent) {
@@ -123,8 +142,8 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
         if (!canDelete) return;
 
         const skill = this.document.getSkill(this.skillId);
-        const index = SheetFlow.closestAction(event.target).dataset.index;
-        if (skill && Number.isNumeric(index) && index >= 0) {
+        const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
+        if (skill && index >= 0) {
             const bonus = skill.bonus.slice();
             bonus.splice(index, 1);
             const key = `${this._updateString()}.bonus`
@@ -140,7 +159,7 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
             const specs = skill.specs.slice();
             specs.push(game.i18n.localize('SR5.NewSpecialization'));
             const key = `${this._updateString()}.specs`
-            this.document.update({ [key] : specs });
+            void this.document.update({ [key] : specs });
         }
     }
 
@@ -152,12 +171,12 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
         if (!canDelete) return;
 
         const skill = this.document.getSkill(this.skillId);
-        const index = SheetFlow.closestAction(event.target).dataset.index;
-        if (skill && Number.isNumeric(index) && index >= 0) {
+        const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
+        if (skill && index >= 0) {
             const specs = skill.specs.slice();
             specs.splice(index, 1);
             const key = `${this._updateString()}.specs`
-            this.document.update({ [key] : specs });
+            void this.document.update({ [key] : specs });
         }
     }
 
@@ -167,7 +186,7 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<SR5Acto
         await this.document.rollSkill(this.skillId);
     }
 
-    async _onDrop(event) {
+    async _onDrop(event: DragEvent) {
         if (!game.items || !game.actors || !game.scenes) return;
 
         event.preventDefault();

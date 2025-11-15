@@ -24,7 +24,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
      * @returns An array of item types from the template.json Item section.
      */
     override getHandledItemTypes(): Item.ConfiguredSubType[] {
-        let itemTypes = super.getHandledItemTypes();
+        const itemTypes = super.getHandledItemTypes();
 
         return [
             ...itemTypes,
@@ -66,7 +66,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         ];
     }
 
-    override async _prepareContext(options) {
+    override async _prepareContext(options: Parameters<SR5MatrixActorSheet["_prepareContext"]>[0]) {
         const data = await super._prepareContext(options);
 
         // Vehicle actor type specific fields.
@@ -89,15 +89,18 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         });
     }
 
-    override async _onDropActor(event, actor) {
+    override async _onDropActor(event: DragEvent, actor: SR5Actor) {
         await this.actor.addVehicleDriver(actor.uuid);
+        return null
     }
 
-    override async _onDropItem(event, item) {
+    override async _onDropItem(event: DragEvent, item: SR5Item) {
         if (item.canBeMaster) {
-            return await this.actor.connectNetwork(item);
+            await this.actor.connectNetwork(item);
+            return null;
         }
-        await super._onDropItem(event, item);
+
+        return super._onDropItem(event, item);
     }
 
     _prepareVehicleFields() {
@@ -166,7 +169,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
             const device = driver.getMatrixDevice();
             if (device) {
                 await device.addSlave(this.actor);
-                this.render(false);
+                void this.render(false);
             } else {
                 ui.notifications.error("No Device found on Driver")
             }
@@ -175,37 +178,37 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         }
     }
 
-    static async #pickDriver(this: SR5VehicleActorSheet, event) {
+    static async #pickDriver(this: SR5VehicleActorSheet, event: Event) {
         event.preventDefault();
         const actors = Helpers.getControlledTokenActors();
         if (actors.length > 0) {
             // pick the first controlled actor
             const actor = actors[0];
             await this.actor.addVehicleDriver(actor.uuid);
-            this.render();
+            void this.render();
         }
 
     }
 
-    static async #removeVehicleDriver(this: SR5VehicleActorSheet, event) {
+    static async #removeVehicleDriver(this: SR5VehicleActorSheet, event: Event) {
         event.preventDefault();
         await this.actor.removeVehicleDriver();
-        this.render();
+        void this.render();
     }
 
-    static async #toggleChaseEnvironment(this: SR5VehicleActorSheet, event) {
+    static async #toggleChaseEnvironment(this: SR5VehicleActorSheet, event: Event) {
         event.preventDefault();
         const environment = this.actor.system.environment === 'handling' ? 'speed' : 'handling';
         await this.actor.update({system: { environment }});
     }
 
-    static async #toggleOffRoad(this: SR5VehicleActorSheet, event) {
+    static async #toggleOffRoad(this: SR5VehicleActorSheet, event: Event) {
         event.preventDefault();
         const isOffRoad = !this.actor.system.isOffRoad;
         await this.actor.update({system: { isOffRoad }});
     }
 
-    static async #removeMaster(this: SR5VehicleActorSheet, event) {
+    static async #removeMaster(this: SR5VehicleActorSheet, event: Event) {
         event.preventDefault();
 
         await MatrixNetworkFlow.removeSlaveFromMaster(this.actor);

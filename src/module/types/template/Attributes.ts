@@ -3,31 +3,15 @@ import { ModifiableValue } from "./Base";
 import { ModifiableField } from "../fields/ModifiableField";
 const { NumberField, BooleanField, StringField } = foundry.data.fields;
 
-export const AttributeChoices = () => ({
-    body: 'SR5.AttrBody',
-    agility: "SR5.AttrAgility",
-    reaction: "SR5.AttrReaction",
-    strength: "SR5.AttrStrength",
-    willpower: "SR5.AttrWillpower",
-    logic: "SR5.AttrLogic",
-    intuition: "SR5.AttrIntuition",
-    charisma: "SR5.AttrCharisma",
-    magic: "SR5.AttrMagic",
-    resonance: "SR5.AttrResonance",
-    essence: "SR5.AttrEssence",
-
-    edge: "SR5.AttrEdge",
-})
-
 export const AttributeField = (limit?: keyof typeof SR5.limits) => ({
     ...ModifiableValue(),
     hidden: new BooleanField(),
     label: new StringField({ required: true }),
     limit: new StringField({
+        blank: true,
         readonly: true,
-        required: false,
-        choices: Object.keys(SR5.limits) as Array<keyof typeof SR5.limits>,
-        ...(limit ? { initial: limit } : {})
+        ...(limit ? { initial: limit } : {}),
+        choices: limit ? { [limit]: SR5.limits[limit] } : SR5.limits,
     }),
 });
 
@@ -65,10 +49,10 @@ export const MatrixActorAttributes = () => ({
 })
 
 export const TechnologyAttributes = () => ({
-    willpower: new ModifiableField(AttributeField('mental')),
-    logic: new ModifiableField(AttributeField('mental')),
-    intuition: new ModifiableField(AttributeField('mental')),
-    charisma: new ModifiableField(AttributeField('social')),
+    willpower: new ModifiableField(AttributeField("mental")),
+    logic: new ModifiableField(AttributeField("mental")),
+    intuition: new ModifiableField(AttributeField("mental")),
+    charisma: new ModifiableField(AttributeField("social")),
     ...MatrixActorAttributes(),
 });
 

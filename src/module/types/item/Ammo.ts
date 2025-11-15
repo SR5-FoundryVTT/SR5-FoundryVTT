@@ -1,7 +1,7 @@
 import { BlastData } from "./Weapon";
+import { SR5 } from "@/module/config";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { TechnologyPartData } from "../template/Technology";
-import { SR5 } from '@/module/config';
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const AmmoData = () => ({

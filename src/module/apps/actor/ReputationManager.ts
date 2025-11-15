@@ -1,10 +1,20 @@
+import { DeepPartial } from 'fvtt-types/utils';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
+import ApplicationV2 = foundry.applications.api.ApplicationV2;
+import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
-const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
+interface ReputationManagerContext extends HandlebarsApplicationMixin.RenderContext {
+    streetCred: number;
+    streetCredModifier: number;
+    notoriety: number;
+    notorietyModifier: number;
+    publicAwareness: number;
+    publicAwarenessModifier: number;
+};
 
-export class ReputationManager extends HandlebarsApplicationMixin(ApplicationV2)<any> {
+export class ReputationManager extends HandlebarsApplicationMixin(ApplicationV2)<ReputationManagerContext> {
     streetCredModifier = 0;
     notorietyModifier = 0;
     publicAwarenessModifier = 0;
@@ -29,7 +39,7 @@ export class ReputationManager extends HandlebarsApplicationMixin(ApplicationV2)
         return game.i18n.localize("SR5.ReputationManager.Title");
     }
 
-    override async _prepareContext(options) {
+    override async _prepareContext(options: Parameters<ApplicationV2['_prepareContext']>[0]) {
         const context = await super._prepareContext(options);
         context.streetCred = this.getStreetCred() + this.streetCredModifier;
         context.streetCredModifier = this.streetCredModifier;
@@ -40,21 +50,24 @@ export class ReputationManager extends HandlebarsApplicationMixin(ApplicationV2)
         return context;
     }
 
-    override async _onRender(context, options) {
+    override async _onRender(
+        context: DeepPartial<ReputationManagerContext>,
+        options: DeepPartial<ApplicationV2.RenderOptions>
+    ) {
         this.element.querySelector<HTMLInputElement>('[name="incoming-street-cred"]')
             ?.addEventListener('change', (event: any) => {
                 this.streetCredModifier = Number(event.target?.value ?? 0);
-                this.render();
+                void this.render();
             })
         this.element.querySelector<HTMLInputElement>('[name="incoming-notoriety"]')
             ?.addEventListener('change', (event: any) => {
                 this.notorietyModifier = Number(event.target?.value ?? 0);
-                this.render();
+                void this.render();
             })
         this.element.querySelector<HTMLInputElement>('[name="incoming-public-awareness"]')
             ?.addEventListener('change', (event: any) => {
                 this.publicAwarenessModifier = Number(event.target?.value ?? 0);
-                this.render();
+                void this.render();
             })
         return super._onRender(context, options);
     }
@@ -103,11 +116,11 @@ export class ReputationManager extends HandlebarsApplicationMixin(ApplicationV2)
         if (!isEmpty(updateData)) {
             await this.actor.update(updateData);
         }
-        this.close();
+        void this.close();
     }
 
     static async #cancel(this: ReputationManager) {
-        this.close();
+        void this.close();
     }
 
     static override PARTS = {
