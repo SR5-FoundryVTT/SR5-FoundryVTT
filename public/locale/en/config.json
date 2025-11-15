@@ -1915,6 +1915,7 @@
         },
         "Networks": "Networks",
         "New": "New",
+        "NewSpecialization": "New Specialization",
         "NoCover": "No Cover",
         "NoSelectableToken": "Actor has no selectable token on canvas",
         "None": "None",
