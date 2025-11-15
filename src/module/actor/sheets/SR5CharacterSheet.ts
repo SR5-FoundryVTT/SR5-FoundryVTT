@@ -8,6 +8,7 @@ import { ReputationManager } from '@/module/apps/actor/ReputationManager';
 
 export interface CharacterSheetData extends MatrixActorSheetData {
     isCharacter: boolean;
+    hasLanguageKnowledgeSkills: boolean;
 }
 
 export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
@@ -126,7 +127,7 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         ];
     }
 
-    override async _prepareContext(options) {
+    override async _prepareContext(options: Parameters<SR5MatrixActorSheet["_prepareContext"]>[0]) {
         const data = await super._prepareContext(options);
 
         // Character actor types are matrix actors.
@@ -164,8 +165,10 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         return parts;
     }
 
-    override async _preparePartContext(partId, context, options) {
-        const partContext = await super._preparePartContext(partId, context, options);
+    override async _preparePartContext(
+        ...[partId, context, options]: Parameters<SR5MatrixActorSheet["_preparePartContext"]>
+    ) {
+        const partContext = await super._preparePartContext(partId, context, options) as CharacterSheetData;
 
         if (partId === 'skills') {
             // initialize the check by seeing if we have language skills to skill over the other check

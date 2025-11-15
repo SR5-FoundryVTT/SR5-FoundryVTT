@@ -13,6 +13,7 @@ import { NetworkManager } from '@/module/apps/NetworkManager';
 import MatrixTargetDocument = Shadowrun.MatrixTargetDocument;
 import ActorAttribute = Shadowrun.ActorAttribute;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
+import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
 
 const { fromUuid, fromUuidSync } = foundry.utils;
 
@@ -36,6 +37,9 @@ export interface MatrixActorSheetData extends SR5ActorSheetData {
     matrixDevice: SR5Item | undefined;
     // Matrix ICONs that are owned by this actor
     ownedIcons: MatrixTargetDocument[];
+
+    matrixLeftTabs: Record<string, SR5Tab>;
+    matrixRightTabs: Record<string, SR5Tab>;
 }
 
 export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorSheetData> extends SR5BaseActorSheet<T> {
@@ -44,7 +48,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     selectedMatrixTarget: string | undefined;
     _connectedIconsOpenClose: Record<string, boolean> = {};
 
-    override async _prepareContext(options) {
+    override async _prepareContext(options: Parameters<SR5BaseActorSheet["_prepareContext"]>[0]) {
         const data = await super._prepareContext(options);
 
         data.network = this.actor.network;
@@ -55,7 +59,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         return data;
     }
 
-    static override DEFAULT_OPTIONS: typeof foundry.applications.sheets.ActorSheetV2.DEFAULT_OPTIONS = {
+    static override DEFAULT_OPTIONS: typeof SR5BaseActorSheet.DEFAULT_OPTIONS = {
         actions: {
             toggleConnectedMatrixIcons: SR5MatrixActorSheet.#toggleConnectedMatrixIcons,
             selectMatrixTarget: SR5MatrixActorSheet.#selectMatrixTarget,
@@ -215,8 +219,10 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         return parts;
     }
 
-    override async _preparePartContext(partId, context, options) {
-        const partContext = await super._preparePartContext(partId, context, options);
+    override async _preparePartContext(
+        ...[partId, context, options]: Parameters<SR5BaseActorSheet["_preparePartContext"]>
+    ): Promise<MatrixActorSheetData> {
+        const partContext = await super._preparePartContext(partId, context, options) as MatrixActorSheetData;
 
         if (partId === 'matrixActions') {
             partContext.matrixActions = await this._prepareMatrixActions();
@@ -336,7 +342,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         else this._connectedIconsOpenClose[uuid] = true;
 
         // Trigger new icons to be shown or hidden.
-        this.render();
+        void this.render();
     }
 
     /**
@@ -480,7 +486,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
 
         this.informAboutOfflineSelection();
 
-        this.render();
+        void this.render();
     }
 
     /**
@@ -661,7 +667,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         if (!target || !(target instanceof SR5Item)) return;
 
         await this.actor.connectNetwork(target);
-        this.render();
+        void this.render();
     }
 
     /**
@@ -673,7 +679,6 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         if (!(event.target instanceof HTMLElement)) return;
 
         await this.actor.disconnectNetwork();
-        this.render();
+        void this.render();
     }
-
 }

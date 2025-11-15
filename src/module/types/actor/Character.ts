@@ -1,13 +1,14 @@
-import { CommonData, CharacterLimits, CreateModifiers, MagicData, ActorBase, CharacterValues, } from "./Common";
-import { Attributes, AttributeField, MatrixActorAttributes, AttributeChoices } from '../template/Attributes';
-import { ModifiableValue, ValueMaxPair } from "../template/Base";
-import { Tracks } from "../template/ConditionMonitors";
-import { ActorArmorData } from "../template/Armor";
+import { SR5 } from "@/module/config";
 import { Movement } from "../template/Movement";
-import { Initiative } from "../template/Initiative";
 import { MatrixData } from '../template/Matrix';
+import { ActorArmorData } from "../template/Armor";
+import { Initiative } from "../template/Initiative";
+import { Tracks } from "../template/ConditionMonitors";
 import { VisibilityChecks } from "../template/Visibility";
 import { ModifiableField } from "../fields/ModifiableField";
+import { ModifiableValue, ValueMaxPair } from "../template/Base";
+import { Attributes, AttributeField, MatrixActorAttributes } from '../template/Attributes';
+import { CommonData, CharacterLimits, CreateModifiers, MagicData, ActorBase, CharacterValues, } from "./Common";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const CharacterAttributes = () => ({
@@ -23,26 +24,26 @@ const CharacterData = () => ({
     // === Core Identity ===
     metatype: new StringField({
         required: true,
-        initial: 'human',
-        choices: {
-            human: 'SR5.Character.Types.Human',
-            elf: 'SR5.Character.Types.Elf',
-            ork: 'SR5.Character.Types.Ork',
-            dwarf: 'SR5.Character.Types.Dwarf',
-            troll: 'SR5.Character.Types.Troll',
-        }}),
+        initial: "human",
+        choices: SR5.character.types
+    }),
     is_critter: new BooleanField(),
     is_npc: new BooleanField(),
     npc: new SchemaField({ is_grunt: new BooleanField() }),
-    full_defense_attribute: new StringField({ required: true, initial: "willpower", choices: AttributeChoices() }),
-    matrix_full_defense_attribute: new StringField({ required: true, initial: "willpower", choices: AttributeChoices() }),
-    special: new StringField({ required: true,
-        choices: {
-            magic: 'SR5.Awakened',
-            resonance: 'SR5.Emerged',
-            mundane: 'SR5.Mundane'
-        },
-        initial: 'mundane'
+    full_defense_attribute: new StringField({
+        required: true,
+        initial: "willpower",
+        choices: SR5.attributes
+    }),
+    matrix_full_defense_attribute: new StringField({
+        required: true,
+        initial: "willpower",
+        choices: SR5.attributes
+    }),
+    special: new StringField({
+        required: true,
+        initial: 'mundane',
+        choices: SR5.specialTypes
     }),
 
     // === Attributes & Limits ===
@@ -65,7 +66,11 @@ const CharacterData = () => ({
     magic: new SchemaField(MagicData()),
     matrix: new SchemaField(MatrixData()),
     technomancer: new SchemaField({
-        attribute: new StringField({ required: true, initial: "willpower", choices: AttributeChoices() }), // fade attribute
+        attribute: new StringField({
+            required: true,
+            initial: "willpower",
+            choices: SR5.attributes
+        }), // fade attribute
         submersion: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     }),
 

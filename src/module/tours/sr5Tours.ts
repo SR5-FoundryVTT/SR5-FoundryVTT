@@ -22,8 +22,7 @@ export default class Sr5Tour extends foundry.nue.Tour {
             });
         }
 
-        // @ts-expect-error
-        await this.actor.sheet?._render(true, {editable: false});
+        await this.actor.sheet?.render(true, {editable: false});
 
         // @ts-expect-error
         if(this.config.tab) {

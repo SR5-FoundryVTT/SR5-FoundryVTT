@@ -1,11 +1,15 @@
+import { SR5 } from "@/module/config";
 import { BaseItemData, ItemBase } from "./ItemBase";
-import { SR5 } from '@/module/config';
 const { NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const LifestyleData = () => ({
     ...BaseItemData(),
 
-    type: new StringField({ required: true, blank: true, choices: SR5.lifestyleTypes }),
+    type: new StringField({
+        blank: true,
+        required: true,
+        choices: SR5.lifestyleTypes
+    }),
     comforts: new NumberField({ required: true, nullable: false, initial: 0 }),
     security: new NumberField({ required: true, nullable: false, initial: 0 }),
     neighborhood: new NumberField({ required: true, nullable: false, initial: 0 }),

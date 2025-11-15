@@ -1,6 +1,6 @@
+import { SR5 } from "@/module/config";
 import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
-import { SR5 } from '@/module/config';
 const { NumberField, StringField } = foundry.data.fields;
 
 const QualityData = () => ({

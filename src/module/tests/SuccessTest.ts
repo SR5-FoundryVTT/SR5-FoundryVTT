@@ -1965,17 +1965,17 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Select a Token on the current scene based on the link id.
      * @params event Any user PointerEvent
     */
-    static async _selectSceneToken(event) {
+    static async _selectSceneToken(event: Event) {
         event.preventDefault();
         event.stopPropagation();
 
         if (!game || !game.ready || !canvas || !canvas.ready) return;
 
-        const selectLink = $(event.currentTarget);
+        const selectLink = $(event.currentTarget as HTMLElement);
         const tokenId = selectLink.data('tokenId');
         const token = canvas.tokens?.get(tokenId);
 
-        if (token && token instanceof Token) {
+        if (token instanceof Token) {
             token.control();
         } else {
             ui.notifications?.warn(game.i18n.localize('SR5.NoSelectableToken'))
@@ -1987,13 +1987,13 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * 
      * @param event Any pointer event
      */
-    static async _castTestAction(event) {
+    static async _castTestAction(event: Event) {
         event.preventDefault();
 
-        const element = $(event.currentTarget);
+        const element = $(event.currentTarget as HTMLElement);
         // Grab item uuid or fallback to empty string for foundry
         const uuid = element.data('uuid') ?? '';
-        const item = await fromUuid(uuid) as SR5Item;
+        const item = await fromUuid(uuid) as SR5Item | undefined;
 
         if (!item) return console.error("Shadowrun 5e | Item doesn't exist for uuid", uuid);
 
@@ -2017,13 +2017,13 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      *
      * @param event A PointerEvent triggered from anywhere within the chat-card
      */
-    static async _placeItemBlastZoneTemplate(event) {
+    static async _placeItemBlastZoneTemplate(event: Event) {
         event.preventDefault();
         event.stopPropagation();
 
         // Get test data from message.
-        const element = $(event.currentTarget);
-        const card = element.closest('.chat-message');
+        const element = $(event.currentTarget as HTMLElement);
+        const card = element.closest<HTMLElement>('.chat-message');
         const messageId = card.data('messageId');
         const test = await TestCreator.fromMessage(messageId);
         if (!test) return;
@@ -2109,11 +2109,12 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      *
      * @param event Called from within a card html element.
      */
-    static async _chatToggleCardRolls(event) {
+    static async _chatToggleCardRolls(event: Event) {
         event.preventDefault();
         event.stopPropagation();
 
-        const card = $(event.currentTarget).closest('.chat-card');
+        const currentTarget = event.currentTarget as HTMLElement;
+        const card = $(currentTarget).closest('.chat-card');
         const element = card.find('.dice-rolls');
         if (element.is(':visible')) element.slideUp(200);
         else element.css('display', 'flex').hide().slideDown(200);
@@ -2125,11 +2126,12 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * This will hide / show them, when called with a card event.
      * @param event A PointerEvent triggered anywhere from within a chat-card
      */
-    static async _chatToggleCardDescription(event) {
+    static async _chatToggleCardDescription(event: Event) {
         event.preventDefault();
         event.stopPropagation();
 
-        const card = $(event.currentTarget).closest('.chat-card');
+        const currentTarget = event.currentTarget as HTMLElement;
+        const card = $(currentTarget).closest('.chat-card');
         const element = card.find('.card-description');
         if (element.is(':visible')) element.slideUp(200);
         else element.slideDown(200);

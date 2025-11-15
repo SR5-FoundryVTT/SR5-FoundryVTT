@@ -67,8 +67,10 @@ export const MatrixICFlow = {
             // All sidebar actors should also include tokens with linked actors.
             ...(game.actors as unknown as SR5Actor[]).filter(actor => actor.isType('ic') && actor.hasHost()) as SR5Actor<'ic'>[],
             // All token actors that aren't linked.
-            // @ts-expect-error // TODO: foundry-vtt-types v10
-            ...canvas.scene.tokens.filter(token => !token.actorLink && token.actor?.isType('ic') && token.actor?.hasHost()).map(t => t.actor)
+            ...canvas.scene!.tokens.filter(token => {
+                    const actor = token.actor;
+                    return !token.actorLink && !!actor && actor.isType('ic') && actor.hasHost();
+                }).map(t => t.actor)
         ];
 
         // Update host data on the ic actor.

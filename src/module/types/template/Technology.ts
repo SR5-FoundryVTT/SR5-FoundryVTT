@@ -1,9 +1,9 @@
+import { SR5 } from "@/module/config";
 import { ModifiableValue } from "./Base";
 import { ConditionData } from "./Condition";
 import { MatrixMasterData } from "./MatrixNetwork";
 import { TechnologyAttributes } from "./Attributes";
 import { ModifiableField } from "../fields/ModifiableField";
-import { SR5 } from '@/module/config';
 const { SchemaField, NumberField, BooleanField, StringField, DocumentUUIDField } = foundry.data.fields;
 
 export const TechnologyData = () => ({

@@ -1,7 +1,7 @@
+import { SR5 } from "@/module/config";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { MatrixAttributes } from "../template/Matrix";
 import { TechnologyPartData } from "../template/Technology";
-import { SR5 } from '@/module/config';
 const { SchemaField, ArrayField, StringField, DocumentUUIDField, NumberField } = foundry.data.fields;
 
 export const DevicePartData = () => ({

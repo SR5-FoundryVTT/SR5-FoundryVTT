@@ -34,7 +34,6 @@ import { Grid } from "../types/item/Grid";
 import { Lifestyle } from "../types/item/Lifestyle";
 import { Metamagic } from "../types/item/Metamagic";
 import { Modification } from "../types/item/Modification";
-import { MovementField } from "../types/template/Movement";
 import { Program } from "../types/item/Program";
 import { Quality } from "../types/item/Quality";
 import { Ritual } from "../types/item/Ritual";
@@ -98,7 +97,6 @@ const schemaMap = {
     license: LicenseData,
     limit_field: LimitField,
     minimal_action: MinimalActionData,
-    movement_field: MovementField,
     range: RangeData,
     range_weapon: RangeWeaponData,
     skill_field: SkillField,

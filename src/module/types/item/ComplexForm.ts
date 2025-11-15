@@ -1,7 +1,6 @@
-import { BaseItemData, ItemBase } from './ItemBase';
-import { ActionRollData } from './Action';
-import { SR5 } from '@/module/config';
-
+import { SR5 } from "@/module/config";
+import { ActionRollData } from "./Action";
+import { BaseItemData, ItemBase } from "./ItemBase";
 const { SchemaField, NumberField, StringField, ArrayField } = foundry.data.fields;
 
 const ComplexFormData = () => ({

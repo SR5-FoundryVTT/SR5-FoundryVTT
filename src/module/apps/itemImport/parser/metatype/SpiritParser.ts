@@ -13,7 +13,6 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
 
         switch (jsonData.category?._TEXT) {
             case "Insect Spirits":
-                // TODO shawn fix typing
                 system.spiritType = jsonData.name._TEXT.split(/[ /]/)[0].toLowerCase() as any;
                 break;
 
@@ -24,8 +23,7 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
                     ['Plague Spirit', 'toxic_man'], ['Sludge Spirit', 'toxic_water']
                 ]);
 
-                // TODO shawn fix typing
-                system.spiritType = specialMapping.get(jsonData.name._TEXT) ?? "" as any;
+                system.spiritType = (specialMapping.get(jsonData.name._TEXT) ?? "") as any;
                 break;
             }
 
@@ -42,28 +40,23 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
                 system.attributes.magic.base = Number(jsonData.magmin?._TEXT) || 0;
                 system.attributes.resonance.base = Number(jsonData.resmin?._TEXT) || 0;
 
-                // TODO shawn fix typing
                 system.spiritType = ["Watcher", "Corps Cadavre"].includes(jsonData.name._TEXT)
                     ? (jsonData.name._TEXT.replace(" ", "_").toLowerCase() as any) : "homunculus";
                 break;
             default:
-                // TODO shawn fix typing
                 system.spiritType = jsonData.name._TEXT
                     .replace(" Spirit", "").replace("Spirit of ", "")
                     .replace(" (Demon)", "").replace(/[\s\-]/g, "_")
                     .split("/")[0].toLowerCase() as any;
         }
 
-        if (jsonData.run) {
-            const [value, mult, base] = jsonData.run._TEXT.split('/').map((v) => +v || 0);
-            system.movement.run = DataDefaults.createData('movement_field', { value, mult, base })
-        }
+        if (jsonData.walk)
+            system.movement.walk.base = Number(jsonData.walk._TEXT.split('/')[0] ?? 0);
 
-        if (jsonData.walk) {
-            const [value, mult, base] = jsonData.walk._TEXT.split('/').map((v) => +v || 0);
-            system.movement.walk = DataDefaults.createData('movement_field', { value, mult, base })
-        }
-        system.movement.sprint = +(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
+        if (jsonData.run)
+            system.movement.run.base = Number(jsonData.run._TEXT.split('/')[0] ?? 0);
+
+        system.movement.sprint = Number(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
 
         return system;
     }
@@ -81,7 +74,7 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
 
         const translationMap: Record<string, string> = {};
         const addTranslations = (items: any[], type: TranslationType) =>
-            items.forEach(i => translationMap[i] = TH.getTranslation(i, { type }));
+            items.forEach(i => { translationMap[i] = TH.getTranslation(i, { type }) });
 
         addTranslations(powerList, 'power');
         addTranslations(qualityList, 'quality');

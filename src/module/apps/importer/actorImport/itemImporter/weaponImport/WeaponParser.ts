@@ -2,6 +2,7 @@ import { parseDescription, getArray, getValues, parseTechnology, createItemData,
 import * as IconAssign from '../../../../iconAssigner/iconAssign';
 import { DamageTypeType } from "src/module/types/item/Action";
 import { DataDefaults } from "src/module/data/DataDefaults";
+import { RangeType } from "@/module/types/item/Weapon";
 import { SR5Item } from "src/module/item/SR5Item";
 import { ActorSchema } from "../../ActorSchema";
 import { Unwrap } from "../ItemsParser";
@@ -235,7 +236,7 @@ export class WeaponParser {
                 extreme: parseInt(ranges.extreme.split('-')[1]),
                 category: 'manual' as const,
                 attribute: ''
-            };
+            } satisfies RangeType;
             if(system.category === "range") {
                 range.ranges = rangeData;
             }

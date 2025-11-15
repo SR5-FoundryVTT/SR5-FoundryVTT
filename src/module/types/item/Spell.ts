@@ -1,6 +1,6 @@
+import { SR5 } from "@/module/config";
 import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
-import { SR5 } from '@/module/config';
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const SpellData = () => ({
@@ -63,13 +63,6 @@ const SpellData = () => ({
         mental: new BooleanField(),
         environmental: new BooleanField(),
         physical: new BooleanField(),
-    }),
-    ritual: new SchemaField({
-        type: new StringField({
-            blank: true,
-            required: true,
-            choices: SR5.ritualSpellTypes
-        }),
     }),
 });
 

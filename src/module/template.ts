@@ -160,7 +160,7 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
      * Move the template preview when the mouse moves.
      * @param {Event} event  Triggering mouse event.
      */
-    _onMovePlacement(event) {
+    _onMovePlacement(event: PIXI.FederatedPointerEvent) {
         event.stopPropagation();
         const now = Date.now(); // Apply a 20ms throttle
         if (now - this.#moveTime <= 20) return;
@@ -177,7 +177,7 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
      * Rotate the template preview by 3˚ increments when the mouse wheel is rotated.
      * @param {Event} event  Triggering mouse event.
      */
-    _onRotatePlacement(event) {
+    _onRotatePlacement(event: WheelEvent) {
         if (event.ctrlKey) event.preventDefault(); // Avoid zooming the browser window
         event.stopPropagation();
         const delta = canvas.grid!.type > CONST.GRID_TYPES.SQUARE ? 30 : 15;
@@ -193,7 +193,7 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
      * Confirm placement when the left mouse button is clicked.
      * @param {Event} event  Triggering mouse event.
      */
-    async _onConfirmPlacement(event) {
+    async _onConfirmPlacement(event: PointerEvent) {
         await this._finishPlacement(event);
         const destination = canvas.grid!.getSnappedPoint({x: this.document.x, y: this.document.y}, {mode: CONST.GRID_SNAPPING_MODES.CENTER});
         this.document.updateSource(destination);
@@ -206,7 +206,7 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
      * Cancel placement when the right mouse button is clicked.
      * @param {Event} event  Triggering mouse event.
      */
-    async _onCancelPlacement(event) {
+    async _onCancelPlacement(event: PointerEvent) {
         await this._finishPlacement(event);
         this.#events.reject();
     }
