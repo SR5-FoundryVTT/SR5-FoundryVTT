@@ -153,8 +153,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             removeMaster: SR5ItemSheet.#removeMaster,
             removeLinkedActor: SR5ItemSheet.#removeLinkedActor,
 
-            editImage: SR5ItemSheet.#editImage,
-
             toggleActionSpecialization: SR5ItemSheet.#toggleActionSpecialization,
             toggleFreshImport: SR5ItemSheet.#toggleFreshImportFlag,
             toggleEquipped: SR5ItemSheet.#toggleEquipped,
@@ -1109,18 +1107,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (action) {
             await this.item.update({system: { action: { opposed: { resist: { armor: !action.opposed.resist.armor }}}}});
         }
-    }
-
-    static async #editImage(this: SR5ItemSheet, event: MouseEvent) {
-        event.preventDefault();
-
-        await new FilePicker({
-            type: 'image',
-            callback: (path) => {
-                if (path) {
-                    void this.item.update({ img : path });
-                }
-            }}).render(true);
     }
 
     /**

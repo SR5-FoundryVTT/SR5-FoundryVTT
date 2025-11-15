@@ -259,8 +259,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             height: 600,
         },
         actions: {
-            editImage: SR5BaseActorSheet.#editImage,
-
             rollAttribute: SR5BaseActorSheet.#rollAttribute,
             rollItem: SR5BaseActorSheet.#rollItem,
             rollSkill: SR5BaseActorSheet.#rollSkill,
@@ -2361,23 +2359,4 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             await SheetFlow.removeFromQuantity(item, event);
         }
     }
-
-    /**
-     * Pick a new image for an actor
-     * @param event
-     * @private
-     */
-    static async #editImage(this: SR5BaseActorSheet, event: PointerEvent) {
-        event.preventDefault();
-
-        await new FilePicker({
-            type: 'image',
-            callback: (path) => {
-                if (path) {
-                    this.actor.update({ img : path });
-                }
-            }}).render(true);
-    }
-
-
 }
