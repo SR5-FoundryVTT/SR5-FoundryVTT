@@ -174,7 +174,7 @@
                                 localize=true classes="short" rootId=rootId }}
                 </span>
             {{else}}
-                <label>{{localizeOb system.vehicleType config.vehicle.types}}</label>
+                <label>{{#if system.isDrone}}{{localizeOb system.category config.vehicle.categories}}&nbsp;{{/if}}{{localizeOb system.vehicleType config.vehicle.types}}</label>
             {{/if}}
 
             {{#if @root.isEditMode}}
@@ -184,6 +184,14 @@
                 </div>
             {{else if system.isDrone}}
                 <label>{{localize "SR5.Vehicle.Drone"}}</label>
+            {{/if}}
+
+            {{#if (and @root.isEditMode system.isDrone)}}
+                <div class="basic-row">
+                    <label>{{localize "SR5.Vehicle.Category"}}</label>
+                    {{formInput systemFields.category value=source.system.category
+                                localize=true classes="short" rootId=rootId }}
+                </div>
             {{/if}}
 
             {{#if (and @root.isPlayMode (not isLimited))}}
