@@ -60,7 +60,7 @@ export function iconAssign(
 
     const importFlags = system.importFlags;
     const imgName = IH.formatAsSlug(importFlags.name || '');
-    const imgType = IH.formatAsSlug(doc.type);
+    const imgType = doc.type;
     const imgCategory = IH.formatAsSlug(importFlags.category || '');
     const useOverrides = game.settings.get(SYSTEM_NAME, FLAGS.UseImportIconOverrides);
     const imgFolder = game.settings.get(SYSTEM_NAME, FLAGS.ImportIconFolder)
