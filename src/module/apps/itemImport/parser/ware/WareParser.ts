@@ -2,7 +2,6 @@ import { Parser } from '../Parser';
 import { CompendiumKey } from '../../importer/Constants';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { Bioware, BiowareSchema } from '../../schema/BiowareSchema';
-import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 import { Cyberware, CyberwareSchema } from '../../schema/CyberwareSchema';
 
 export class WareParser extends Parser<'bioware' | 'cyberware'> {
@@ -33,7 +32,7 @@ export class WareParser extends Parser<'bioware' | 'cyberware'> {
     protected override async getFolder(jsonData: Bioware | Cyberware, compendiumKey: CompendiumKey): Promise<Folder> {
         let rootFolder: string = "Other";
         const categoryData = jsonData.category._TEXT;
-        const folderName = TH.getTranslation(categoryData, {type: 'category'});
+        const folderName = IH.getTranslatedCategory(this.parseType, categoryData);
 
         for (const category of this.categories)
             if (category._TEXT === categoryData)

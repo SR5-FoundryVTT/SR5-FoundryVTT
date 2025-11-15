@@ -341,4 +341,13 @@ export const registerSystemSettings = () => {
         config: false,
         type: String
     });
+
+    game.settings.register(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder, {
+        name: "Actor Importer Compendium Order",
+        hint: "The ordered list of compendium packs to search when importing items to an actor.",
+        scope: "world",
+        config: false,
+        type: Array,
+        default: [],
+    });
 };
