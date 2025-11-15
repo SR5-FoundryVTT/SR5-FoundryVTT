@@ -11,9 +11,9 @@ export class CritterPowerParser extends Parser<'critter_power'> {
 
         system.powerType = itemData.type_english === "P" ? 'physical' : 'mana';
         if (itemData.range_english)
-            system.range = itemData.range_english;
+            system.range = itemData.range_english as any;
 
         if (itemData.duration_english)
-            system.duration = itemData.duration_english;
+            system.duration = itemData.duration_english as any;
     }
 }

@@ -6,6 +6,7 @@ import { BlankItem, ExtractItemType, Parser } from "../Parser";
 import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
 import { AccessoryParser } from "./AccessoryParser";
 import { ClipParser } from "./ClipParser";
+import { RangeType } from "@/module/types/item/Weapon";
 
 export class WeaponParser extends Parser<'weapon'> {
     protected readonly parseType = 'weapon';
@@ -214,10 +215,12 @@ export class WeaponParser extends Parser<'weapon'> {
                 extreme: parseInt(ranges.extreme.split('-')[1]),
                 category: 'manual',
                 attribute: ''
-            };
+            } satisfies RangeType;
+
             if(system.category === "range") {
                 range.ranges = rangeData;
             }
+
             if(system.category === "thrown") {
                 system.thrown = {
                     ...system.thrown,

@@ -13,11 +13,15 @@ const SpriteData = () => ({
     attributes: new SchemaField({...Attributes(), ...MatrixActorAttributes() }),
     spriteType: new StringField({
         required: true,
-        initial: "courier",
-        choices: Object.keys(SR5.spriteTypes) as Array<keyof typeof SR5.spriteTypes>,
+        initial: 'courier',
+        choices: SR5.spriteTypes,
     }),
     special: new StringField({ required: true, initial: "resonance", choices: ["resonance"], readonly: true }),
-    full_defense_attribute: new StringField({ required: true, initial: "willpower" }),
+    full_defense_attribute: new StringField({
+        required: true,
+        initial: "willpower",
+        choices: SR5.attributes
+    }),
 
     // === Matrix & Host ===
     matrix: new SchemaField(MatrixData()),

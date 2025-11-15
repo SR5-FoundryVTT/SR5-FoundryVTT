@@ -2,6 +2,8 @@ import { VersionMigration } from "../VersionMigration";
 
 /**
  * Update importFlags to their correct values.
+ * Update all dataSchema to their correct values choices.
+ * Fixes a typo in the lifestyle type "luxory" -> "luxury"
  */
 export class Version0_31_0 extends VersionMigration {
     readonly TargetVersion = "0.31.0";
@@ -20,5 +22,8 @@ export class Version0_31_0 extends VersionMigration {
 
     override migrateItem(item: any): void {
         this.migrateImportFlags(item);
+
+        if (item.type === 'lifestyle' && item.system.type === 'luxory')
+            item.system.type = 'luxury';
     }
 }

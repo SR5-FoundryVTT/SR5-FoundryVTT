@@ -12,7 +12,7 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
 
         switch (jsonData.category?._TEXT) {
             case "Insect Spirits":
-                system.spiritType = jsonData.name._TEXT.split(/[ /]/)[0].toLowerCase();
+                system.spiritType = jsonData.name._TEXT.split(/[ /]/)[0].toLowerCase() as typeof system.spiritType;
                 break;
 
             case "Toxic Spirits": {
@@ -22,7 +22,7 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
                     ['Plague Spirit', 'toxic_man'], ['Sludge Spirit', 'toxic_water']
                 ]);
 
-                system.spiritType = specialMapping.get(jsonData.name._TEXT) ?? "";
+                system.spiritType = (specialMapping.get(jsonData.name._TEXT) ?? "") as typeof system.spiritType;
                 break;
             }
 
@@ -39,26 +39,23 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
                 system.attributes.magic.base = Number(jsonData.magmin?._TEXT) || 0;
                 system.attributes.resonance.base = Number(jsonData.resmin?._TEXT) || 0;
 
-                system.spiritType = ["Watcher", "Corps Cadavre"].includes(jsonData.name._TEXT)
-                    ? jsonData.name._TEXT.replace(" ", "_").toLowerCase() : "homunculus";
+                system.spiritType = (["Watcher", "Corps Cadavre"].includes(jsonData.name._TEXT)
+                    ? jsonData.name._TEXT.replace(" ", "_").toLowerCase() : "homunculus") as typeof system.spiritType;
                 break;
             default:
                 system.spiritType = jsonData.name._TEXT
                     .replace(" Spirit", "").replace("Spirit of ", "")
-                    .replace(" (Demon)", "").replace(/[\s\-]/g, "_")
-                    .split("/")[0].toLowerCase();
+                    .replace(" (Demon)", "").replace(/[\s-]/g, "_")
+                    .split("/")[0].toLowerCase() as typeof system.spiritType;
         }
 
-        if (jsonData.run) {
-            const [value, mult, base] = jsonData.run._TEXT.split('/').map((v) => +v || 0);
-            system.movement.run = DataDefaults.createData('movement_field', { value, mult, base })
-        }
+        if (jsonData.walk)
+            system.movement.walk.base = Number(jsonData.walk._TEXT.split('/')[0] ?? 0);
 
-        if (jsonData.walk) {
-            const [value, mult, base] = jsonData.walk._TEXT.split('/').map((v) => +v || 0);
-            system.movement.walk = DataDefaults.createData('movement_field', { value, mult, base })
-        }
-        system.movement.sprint = +(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
+        if (jsonData.run)
+            system.movement.run.base = Number(jsonData.run._TEXT.split('/')[0] ?? 0);
+
+        system.movement.sprint = Number(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
 
         return system;
     }

@@ -425,17 +425,18 @@ export class SR5ActiveEffect extends ActiveEffect {
             return {};
         }
 
-        // Foundry default effect application will use DataModel.applyChange.
-        const changes = super.apply(model, change);
+        // Skip applying this change if the target key does not exist on the model.
+        // TypedObjectField will otherwise create the missing property as a string,
+        // which breaks data integrity and can result in errors like "undefined[object Object]".
+        // For example, a change targeting "firstaid" instead of "first_aid" would trigger this case.
+        if (!foundry.utils.hasProperty(model, change.key))
+            return {};
 
         // ModifiableField applies some changes outside of Foundry behavior, not causing a override value.
         // Those override values are then undefined and should be hidden from Foundries 'override' behavior.
-        for (const key of Object.keys(changes))
-            if (changes[key] === undefined)
-                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-                delete changes[key];
-
-        return changes;
+        return Object.fromEntries(
+            Object.entries(super.apply(model, change)).filter(([, v]) => v !== undefined)
+        );
     }
 
     /**

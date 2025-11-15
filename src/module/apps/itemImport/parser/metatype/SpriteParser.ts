@@ -9,7 +9,7 @@ export class SpriteParser extends MetatypeParserBase<'sprite'> {
     protected override getSystem(jsonData: Metatype) {
         const system = this.getBaseSystem();
 
-        system.spriteType = jsonData.name._TEXT.split(" ")[0].toLowerCase() as typeof system.spriteType;
+        system.spriteType = jsonData.name._TEXT.split(" ")[0].toLowerCase() as any;
 
         return system;
     }

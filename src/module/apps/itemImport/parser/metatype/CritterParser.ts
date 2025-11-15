@@ -91,16 +91,13 @@ export class CritterParser extends MetatypeParserBase<'character'> {
 
         system.karma.value = Number(jsonData.karma?._TEXT || 0);
 
-        if (jsonData.run) {
-            const [value, mult, base] = jsonData.run._TEXT.split('/').map((v) => Number(v) || 0);
-            system.movement.run = DataDefaults.createData('movement_field', { value, mult, base });
-        }
+        if (jsonData.walk)
+            system.movement.walk.base = Number(jsonData.walk._TEXT.split('/')[0] ?? 0);
 
-        if (jsonData.walk) {
-            const [value, mult, base] = jsonData.walk._TEXT.split('/').map((v) => Number(v) || 0);
-            system.movement.walk = DataDefaults.createData('movement_field', { value, mult, base });
-        }
-        system.movement.sprint = Number(jsonData.sprint?._TEXT.split('/')[0]) || 0;
+        if (jsonData.run)
+            system.movement.run.base = Number(jsonData.run._TEXT.split('/')[0] ?? 0);
+
+        system.movement.sprint = Number(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
 
         this.setSkills(system, jsonData);
 

@@ -1,3 +1,4 @@
+import { SR5 } from "@/module/config";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { MatrixAttributes } from "../template/Matrix";
 import { TechnologyPartData } from "../template/Technology";
@@ -7,7 +8,7 @@ export const DevicePartData = () => ({
     category: new StringField({
         required: true,
         initial: 'commlink',
-        choices: ['commlink', 'cyberdeck', 'rcc', 'host', 'living_persona'],
+        choices: SR5.deviceCategories,
     }),
     atts: new SchemaField(MatrixAttributes(true)),
     slaves: new ArrayField(new DocumentUUIDField({ blank: true, required: true, nullable: false })),

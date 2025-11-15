@@ -1,3 +1,4 @@
+import { SR5 } from "@/module/config";
 import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { TechnologyPartData } from "../template/Technology";
@@ -16,7 +17,7 @@ const AmmunitionData = () => ({
     clip_type: new StringField({
         blank: true,
         required: true,
-        choices: ['removable_clip', 'break_action', 'belt_fed', 'internal_magazin', 'muzzle_loader', 'cylinder', 'drum', 'bow'],
+        choices: SR5.weaponCliptypes,
     }),
     partial_reload_value: new NumberField({ required: true, nullable: false, integer: true, initial: -1 }),
 });
@@ -26,7 +27,11 @@ export const RangeData = () => ({
     medium: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     long: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     extreme: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
-    category: new StringField({ required: true, initial: 'manual' }), // I believe we don't use this, we could use the value from the RangeWeaponData
+    category: new StringField({
+        required: true,
+        initial: 'manual',
+        choices: SR5.weaponRangeCategories
+    }),
     attribute: new StringField({ required: true }),
 });
 
@@ -38,7 +43,11 @@ const FiringModeData = () => ({
 });
 
 export const RangeWeaponData = () => ({
-    category: new StringField({ required: true, initial: 'manual' }),
+    category: new StringField({
+        required: true,
+        initial: 'manual',
+        choices: SR5.weaponRangeCategories
+    }),
     ranges: new SchemaField(RangeData()),
     rc: new ModifiableField(ModifiableValue()),
     modes: new SchemaField(FiringModeData()),
@@ -61,7 +70,7 @@ const WeaponData = () => ({
     category: new StringField({
         blank: true,
         required: true,
-        choices: ['melee', 'range', 'thrown'],
+        choices: SR5.weaponCategories,
     }),
     subcategory: new StringField({ required: true }),
     ammo: new SchemaField(AmmunitionData()),

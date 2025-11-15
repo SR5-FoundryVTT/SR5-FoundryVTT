@@ -1,3 +1,4 @@
+import { SR5 } from "@/module/config";
 import { ModifiableValue } from "../template/Base";
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
@@ -14,7 +15,11 @@ export const CharacterSkills = () => ({
 
 
 export const MagicData = () => ({
-    attribute: new StringField({ required: true, initial: "logic" }), // Drain attribute
+    attribute: new StringField({
+        required: true,
+        initial: "logic",
+        choices: SR5.attributes
+    }), // Drain attribute
     projecting: new BooleanField(),
     initiation: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
 });

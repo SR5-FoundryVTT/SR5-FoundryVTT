@@ -11,9 +11,7 @@ export class LifestyleParser extends Parser<'lifestyle'> {
         // Map the chummer lifestyle type to our sr5 foundry type.
         const chummerLifestyleType = itemData.baselifestyle.toLowerCase();
         if (SR5.lifestyleTypes[chummerLifestyleType]) {
-            system.type = chummerLifestyleType;
-        } else if (chummerLifestyleType === 'luxury') {
-            system.type = 'luxory'; // typo in SR5 config
+            system.type = chummerLifestyleType as any;
         } else {
             system.type = 'other';
         }

@@ -16,7 +16,7 @@ export interface BlankSpirit extends Actor.CreateData {
 export class SpiritImporter {
     static async import(
         chummerData: ActorSchema,
-        type: Actor.SystemOfType<'spirit'>['spiritType'],
+        type: string,
         importOptions: importOptionsType
     ): Promise<SR5Actor<'spirit'> | null> {
         const spirit = {
@@ -28,7 +28,7 @@ export class SpiritImporter {
             name: chummerData.alias ?? chummerData.name ?? '[Name not found]',
         } satisfies BlankSpirit;
 
-        spirit.system.spiritType = type;
+        spirit.system.spiritType = type as any;
 
         const edgeAttribute = chummerData.attributes[1]?.attribute.find(
             att => att.name_english.toLowerCase() === 'edg'
