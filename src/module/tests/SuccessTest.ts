@@ -205,7 +205,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         this.effects = new SuccessTestEffectsFlow<this>(this);
 
         this.calculateBaseValues();
-        
+
         this.dialog = null;
 
         console.debug(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);

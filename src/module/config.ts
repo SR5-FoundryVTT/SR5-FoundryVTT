@@ -1235,11 +1235,9 @@ export const SR5 = {
         'modifier': 'SR5.Modifier'
     },
 
-    itemSubTypeIconOverrides: {
+    itemCategoryIconOverrides: {
         action: {},
-        adept_power: {
-            'adept-spell': 'spell/spell'
-        },
+        adept_power: {},
         ammo: {
             'ammo': '',
             'arrow': '',
@@ -1396,9 +1394,9 @@ export const SR5 = {
             'side': '',
             'stock': '',
             'top': '',
-            'under': 'modification/modification'
+            'under': ''
         },
-        program:        {
+        program: {
             'common_program': '',
             'hacking_program': ''
         },

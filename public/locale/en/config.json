@@ -706,6 +706,7 @@
             "sr5drone": "Drones & Vehicles",
             "sr5gear": "Armors & Gears",
             "sr5magic": "Spell & Complex Forms",
+            "sr5misc": "Miscellaneous",
             "sr5modification": "Modifications",
             "sr5trait": "Quality & Powers",
             "sr5ware": "Bioware & Cyberware",
@@ -1182,8 +1183,17 @@
             }
         },
         "Import": {
+            "ActorImporter": {
+                "Title": "Actor Importer"
+            },
+            "BulkImporter": {
+                "Title": "Bulk Importer"
+            },
             "Spirit": {
                 "SpiritTypeNotFound": "The spirit type was not found. Please open a github issue with your chummer export json."
+            },
+            "ImporterSourcesConfig": {
+                "Title": "Importer Sources Configuration"
             }
         },
         "ImportCharacter": "Import Character",

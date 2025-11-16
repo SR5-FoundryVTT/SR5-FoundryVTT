@@ -15,7 +15,8 @@ import { _combatantGetInitiativeFormula, SR5Combat } from './combat/SR5Combat';
 import { HandlebarManager } from './handlebars/HandlebarManager';
 
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
-import { Import } from './apps/itemImport/apps/import-form';
+import { ActorImporter } from './apps/itemImport/apps/ActorImporter';
+import { BulkImporter } from './apps/itemImport/apps/BulkImporter';
 import {ChangelogApplication} from "./apps/ChangelogApplication";
 import { SituationModifiersApplication } from './apps/SituationModifiersApplication';
 import {SR5ICActorSheet} from "./actor/sheets/SR5ICActorSheet";
@@ -156,6 +157,7 @@ export class HooksManager {
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons.bind(HooksManager));
         Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions.bind(SR5Combat));
         Hooks.on('renderCompendiumDirectory', HooksManager.renderCompendiumDirectory.bind(HooksManager));
+        Hooks.on('renderActorDirectory', HooksManager.renderActorDirectory.bind(HooksManager));
         // Hooks.on('renderTokenHUD', EnvModifiersApplication.addTokenHUDFields);
         Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD.bind(SituationModifiersApplication));
         Hooks.on('renderTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
@@ -567,16 +569,22 @@ ___________________
         $(html).find('.header-actions').append(browser);
         browser.on('click', () => { void new CompendiumBrowser().render({ force: true }); });
 
-        if (!game.user?.isGM) {
+        if (!game.user?.isGM) return;
+
+        const button = $('<button class="sr5 import-button"><i class="fa-solid fa-file-import"></i><span>Import Chummer Data</span></button>');
+        $(html).find('.header-actions').append(button);
+
+        button.on('click', () => { void new BulkImporter().render({ force: true }); });
+    }
+
+    static renderActorDirectory(app: foundry.appv1.api.Application, html: HTMLElement) {
+        if(!game.user?.can("ACTOR_CREATE"))
             return;
-        }
 
-        const button = $('<button class="sr5 flex0">Import Chummer Data</button>');
-        $(html).find('.directory-footer').append(button);
+        const button = $('<button class="sr5 import-button"><i class="fa-solid fa-file-import"></i><span>Import Actor</span></button>');
+        $(html).find('.header-actions').append(button);
 
-        button.on('click', (event) => {
-            new Import().render(true);
-        });
+        button.on('click', () => { void new ActorImporter().render({ force: true }); });
     }
 
     /**
@@ -588,11 +596,8 @@ ___________________
      */
     static async updateIcConnectedToHostItem(item: SR5Item, data: SR5Item['system'], id: string) {
         // Trigger type specific behaviour.
-        switch (item.type) {
-            case 'host':
-                await MatrixICFlow.handleUpdateItemHost(item);
-                break;
-        }
+        if (item.isType('host'))
+            await MatrixICFlow.handleUpdateItemHost(item);
     }
 
     /**

@@ -1,65 +1,61 @@
 import { Parser } from 'xml2js';
-import { SR5 } from "../../../config";
-import { ParseData } from "../parser/Parser";
-import { CompendiumKey, Constants } from './Constants';
+import { SR5Item } from '@/module/item/SR5Item';
+import { SR5Actor } from '@/module/actor/SR5Actor';
+import { ParseData, Schemas } from "../parser/Types";
 import { ImportHelper as IH } from '../helper/ImportHelper';
+import { ChummerFileXML, CompendiumKey, Constants } from './Constants';
 
 /**
- * The most basic chummer item data importer, meant to handle one or more Chummer5a data <type>.xml file.
- *
- * Generic type ItemDataType is the items data type DataImporter creates per entry in that Chummer5a data .xml file.
+ * The most basic Chummer item data importer, designed to handle one or more Chummer5a data <type>.xml files.
  */
 export abstract class DataImporter {
-    public static SR5 = SR5;
-    public abstract files: string[];
-    public static iconList: string[];
-    public static setIcons: boolean = true;
-    public static supportedBooks: string[] = ['2050'];
-    public static translationMap: Record<string, any> = {};
-
-    // Used to filter down a files entries based on category.
-    // See filterObjects for use.
-    // Leave on null to support all categories.
-    public unsupportedCategories: string[]|null = [];
+    /**
+     * Set of icon paths to use for imported items.
+     */
+    public static iconSet: Set<string> | null = null;
 
     /**
-     * Validate if this importer is capable of parsing the provided JSON data.
-     * @param jsonObject JSON data to check import capability for.
-     * @returns boolean True if the importer is capable of parsing the provided XML data.
+     * Whether to override existing documents in the compendium.
      */
-    public abstract CanParse(jsonObject: object): boolean;
+    public static overrideDocuments = true;
 
     /**
-     * Parse the specified jsonObject and return Item representations.
-     * @param chummerData The JSON data to parse.
-     * @returns An array of created objects.
+     * The list of Chummer XML files this importer can handle.
      */
-    public abstract Parse(chummerData: object): Promise<void>;
+    public readonly abstract files: readonly ChummerFileXML[];
 
     /**
-     * Parse an XML string into a JSON object.
-     * @param xmlString The string to parse as XML.
-     * @returns A json object converted from the string.
+     * Parses the specified JSON object and creates item representations.
+     * @param chummerData - The JSON data to parse.
      */
-    public static async xml2json(xmlString: string): Promise<object> {
+    protected abstract _parse(chummerData: Schemas): Promise<void>;
+
+    /**
+     * Parses an XML string into a JSON object.
+     * @param xmlString - The XML string to parse.
+     * @returns A JSON object converted from the XML string.
+     */
+    private static async _xml2json(xmlString: string): Promise<Schemas> {
         const parser = new Parser({
-            explicitArray: false,
-            explicitCharkey: true,
-            charkey: IH.CHAR_KEY,
+            trim: true,             // Remove whitespace around text nodes
+            attrkey: "$",           // Attributes will appear under the this key
+            charkey: "_TEXT",       // Text content will appear under the this key
+            emptyTag: () => null,   // Self-closing or empty tags value
+            explicitRoot: false,    // Skip wrapping the root in an extra object
+            explicitArray: false,   // Only create arrays when multiple elements exist
+            explicitCharkey: true,  // Always use the charKey key for text nodes
         });
 
-        return (await parser.parseStringPromise(xmlString))['chummer'];
+        return parser.parseStringPromise(xmlString);
     }
 
     /**
-     * Checks if the provided JSON object originates from a supported book source.
-     * 
-     * @param jsonObject - The JSON object containing source information.
-     * @returns `true` if the source is supported or undefined; otherwise, `false`.
+     * Parses an XML string and processes it using the importer.
+     * @param xml - The XML string to parse and import.
      */
-    private static supportedBookSource(jsonObject: ParseData): boolean {
-        const source = jsonObject?.source?._TEXT ?? '';
-        return !source || this.supportedBooks.includes(source);
+    public async parse(xml: string) {
+        const schema = await DataImporter._xml2json(xml);
+        return this._parse(schema);
     }
 
     /**
@@ -87,36 +83,65 @@ export abstract class DataImporter {
     protected static async ParseItems<TInput extends ParseData>(
         inputs: TInput[],
         options: {
+            documentType: string;
             compendiumKey: (data: TInput) => CompendiumKey;
             parser: { Parse: (data: TInput, compendiumKey: CompendiumKey) => Promise<Actor.CreateData | Item.CreateData> };
             filter?: (input: TInput) => boolean;
             injectActionTests?: (item: Item.CreateData) => void;
-            errorPrefix?: string;
         }
     ): Promise<void> {
-        const { compendiumKey, parser, filter = () => true, injectActionTests, errorPrefix = "Failed Parsing Item"} = options;
+        const { compendiumKey, parser, filter, injectActionTests, documentType } = options;
         const itemMap = new Map<CompendiumKey, (Actor.CreateData | Item.CreateData)[]>();
+        const compendiums: Partial<Record<CompendiumKey, CompendiumCollection<'Actor' | 'Item'>>> = {};
+        const dataInput = filter ? inputs.filter(filter) : inputs;
 
-        for (const data of inputs) {
+        let counter = 0;
+        let current = 0;
+        const total = dataInput.length;
+        const progressBar = ui.notifications.info(`Importing ${documentType}`, { progress: true });
+
+        for (const data of dataInput) {
             try {
-                if (!this.supportedBookSource(data) || !filter(data)) continue;
-                
+                current += 1;
+                progressBar.update({
+                    pct: current / total,
+                    message: `${documentType} (${current}/${total}) Parsing: ${data?.name?._TEXT || "Unknown"}`,
+                });
+
+                const id = IH.guidToId(data.id._TEXT);
                 const key = compendiumKey(data);
-                const item = await parser.Parse(data, key);
+                const compendium = compendiums[key] ??= (await IH.GetCompendium(key));
+
+                if (!this.overrideDocuments && compendium.index.has(id)) {
+                    IH.setItem(key, data.name._TEXT, id);
+                    continue;
+                }
+
+                const item = await parser.Parse(data, key);                
                 injectActionTests?.(item as Item.CreateData);
+
+                item._id = id;
+                IH.setItem(key, data.name._TEXT, id);
+
+                counter++;
 
                 if (!itemMap.has(key)) itemMap.set(key, []);
                 itemMap.get(key)!.push(item);
             } catch (error) {
                 console.error(error);
-                ui.notifications?.error(`${errorPrefix}: ${data?.name?._TEXT ?? "Unknown"}`);
+                ui.notifications?.error(`Failed parsing ${documentType}: ${data?.name?._TEXT ?? "Unknown"}`);
             }
         };
 
+        progressBar.remove();
+        const notification = ui.notifications?.info(`${documentType}: Creating ${counter} documents`, { permanent: true });
+
         for (const [key, items] of itemMap.entries()) {
-            await IH.GetCompendium(key);
-            const compendium = Constants.MAP_COMPENDIUM_CONFIG[Constants.MAP_COMPENDIUM_KEY[key]];
-            await (compendium.type === 'Actor' ? Actor : Item).create(items as any, { pack: compendium.pack });
+            const compendium = Constants.MAP_COMPENDIUM_KEY[key];
+            await (compendium.type === 'Actor' ? SR5Actor : SR5Item).create(items as any, { pack: "world." + compendium.pack, keepId: true });
         }
+
+        notification.remove();
+        ui.notifications?.info(`${documentType}: ${counter} documents created`);
     }
 }

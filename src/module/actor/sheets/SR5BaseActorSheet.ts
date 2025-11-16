@@ -912,8 +912,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     /**
      * Create a new item based on the Item Header creation action and the item type of that header.
-     * 
-     * @param event 
+     *
+     * @param event
      */
     static async #createItem(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();

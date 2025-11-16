@@ -68,6 +68,7 @@ export const FLAGS = {
     MatrixNetworkMarkInvite: 'MatrixNetworkMarkInvite',
     CompendiaSettingsMenu: 'CompendiaSettingsMenu',
     CompendiumBrowserBlacklist: 'CompendiumBrowserBlacklist',
+    ImporterCompendiumOrder: 'ImporterCompendiumOrder',
     DieFaceLabels: "DieFaceLabels"
 } as const;
 export const CORE_NAME = 'core';

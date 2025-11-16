@@ -60,7 +60,7 @@ const InventoryData = () => ({
 
 export const CommonData = () => ({
     description: new SchemaField(DescriptionData()),
-    importFlags: new SchemaField(ImportFlagData()),
+    importFlags: new SchemaField(ImportFlagData(), { nullable: true }),
 
     skills: new SchemaField(CharacterSkills()),
 

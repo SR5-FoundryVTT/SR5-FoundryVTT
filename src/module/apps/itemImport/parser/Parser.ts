@@ -1,37 +1,16 @@
+import { ParseData } from "./Types";
+import { CompendiumKey } from "../importer/Constants";
 import { DataImporter } from "../importer/DataImporter";
-import { TranslationHelper as TH, TranslationType } from "../helper/TranslationHelper";
-import * as IconAssign from "../../iconAssigner/iconAssign";
-import { ImportHelper as IH } from "../helper/ImportHelper";
+import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 import { BonusHelper as BH } from "../helper/BonusHelper";
-import { CompendiumKey, Constants } from "../importer/Constants";
-
-import { Armor, Mod as ArmorMod } from "../schema/ArmorSchema";
-import { Bioware } from "../schema/BiowareSchema";
-import { Power as CritterPower } from "../schema/CritterpowersSchema";
-import { Cyberware } from "../schema/CyberwareSchema";
-import { Complexform } from "../schema/ComplexformsSchema";
-import { Echo } from "../schema/EchoesSchema";
-import { Gear } from "../schema/GearSchema";
-import { Metatype } from "../schema/MetatypeSchema";
-import { Power, Enhancement } from "../schema/PowersSchema";
-import { Quality } from "../schema/QualitiesSchema";
-import { Spell } from "../schema/SpellsSchema";
-import { Vehicle, Mod as VehicleMod, Weaponmount } from "../schema/VehiclesSchema";
-import { Accessory, Weapon } from "../schema/WeaponsSchema";
-
+import * as IconAssign from "../../iconAssigner/iconAssign";
 import { TechnologyType } from "src/module/types/template/Technology";
 import { DataDefaults, SystemConstructorArgs, SystemEntityType } from "src/module/data/DataDefaults";
-import { Sanitizer } from "@/module/sanitizer/Sanitizer";
-
-export type ParseData =
-    Armor | ArmorMod | Bioware | CritterPower | Cyberware | Complexform | Echo | Gear | Metatype |
-    Power | Enhancement | Quality | Spell | Vehicle | VehicleMod | Weaponmount | Weapon | Accessory;
 
 export type SystemType<T extends SystemEntityType> = ReturnType<Parser<T>["getBaseSystem"]>;
 
 export abstract class Parser<SubType extends SystemEntityType> {
     protected abstract readonly parseType: SubType;
-    protected folders: Record<string, Promise<Folder>> = {};
 
     private isActor(): this is Parser<SystemEntityType & Actor.SubType> {
         return Object.keys(CONFIG.Actor.dataModels).includes(this.parseType);
@@ -62,33 +41,33 @@ export abstract class Parser<SubType extends SystemEntityType> {
         const itemPromise = this.getItems(jsonData);
         let bonusPromise: Promise<void> | undefined;
 
-        const name = jsonData.name._TEXT;
-        const typeOption = Constants.MAP_TRANSLATION_TYPE[this.parseType as string];
-        const options = {id: jsonData.id._TEXT, type: typeOption};
-
         const entity = {
-            name: TH.getTranslation(name, options),
+            img: undefined as string | undefined | null,
+            name: jsonData.translate?._TEXT ?? jsonData.name._TEXT,
             type: this.parseType as any,
-            folder: (await this.getFolder(jsonData, compendiumKey)).id,
             system: this.getSanitizedSystem(jsonData),
+            folder: (await this.getFolder(jsonData, compendiumKey)).id,
         } satisfies Actor.CreateData | Item.CreateData;
 
         const system = entity.system;
 
         // Add technology
-        if (system && 'technology' in system && system.technology)
+        if ('technology' in system && system.technology)
             this.setTechnology(system.technology, jsonData);
 
-        // Add Icon
-        if (DataImporter.setIcons)
-            this.setIcons(entity, system, jsonData);
+        this.setImporterFlags(entity, jsonData);
+
+        if (DataImporter.iconSet)
+            entity.img = IconAssign.iconAssign(DataImporter.iconSet, entity);
 
         if ('bonus' in jsonData && jsonData.bonus)
             bonusPromise = BH.addBonus(entity as any, jsonData.bonus);
 
-        const page = jsonData.page._TEXT;
-        const source = jsonData.source._TEXT;
-        system.description = DataDefaults.createData('description', {source: `${source} ${TH.getAltPage(name, page, options)}`});
+        if (jsonData.page && jsonData.source) {
+            const page = jsonData.altpage?._TEXT ?? jsonData.page._TEXT;
+            const source = jsonData.source._TEXT;
+            system.description.source = `${source} ${page}`;
+        }
 
         // Runtime branching
         if (this.isActor())
@@ -108,20 +87,15 @@ export abstract class Parser<SubType extends SystemEntityType> {
         technology.conceal.base = 'conceal' in jsonData && jsonData.conceal ? Number(jsonData.conceal._TEXT) || 0 : 0;
     }
 
-    protected setIcons(entity: Actor.CreateData | Item.CreateData, system: SystemType<SubType>, jsonData: ParseData) {
-        // Why don't we have importFlags as base in actors?
-        if ('importFlags' in system && system.importFlags) {
-            system.importFlags.name = IH.formatAsSlug(jsonData.name._TEXT);
-            system.importFlags.type = this.parseType;
-            system.importFlags.subType = '';
-            system.importFlags.isFreshImport = true;
+    protected setImporterFlags(entity: Actor.CreateData | Item.CreateData, jsonData: ParseData) {
+        const category = 'category' in jsonData ? jsonData.category?._TEXT || '' : '';
 
-            const subType = 'category' in jsonData ? IH.formatAsSlug(jsonData.category?._TEXT || '') : '';
-            if (subType && Object.keys(DataImporter.SR5.itemSubTypeIconOverrides[this.parseType as string]).includes(subType))
-                system.importFlags.subType = subType;
-
-            entity.img = IconAssign.iconAssign(system.importFlags, DataImporter.iconList, entity.system);
-        }
+        entity.system!.importFlags = {
+            category,
+            isFreshImport: true,
+            name: jsonData.name._TEXT,
+            sourceid: jsonData.id._TEXT,
+        };
     }
 
     protected getBaseSystem(createData: SystemConstructorArgs<SubType> = {}) {

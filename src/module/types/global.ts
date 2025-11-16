@@ -216,6 +216,7 @@ declare module "fvtt-types/configuration" {
             getSceneControlButtons: (arg0: any) => void;
             getCombatTrackerEntryContext: (arg0: any, arg1: any) => void;
             renderCompendiumDirectory: (arg0: foundry.appv1.api.Application, arg1: HTMLElement) => void;
+            renderActorDirectory: (arg0: foundry.appv1.api.Application, arg1: HTMLElement) => void;
             renderTokenHUD: (arg0: foundry.applications.hud.TokenHUD, arg1: JQuery, arg2: any) => void;
             updateItem: (args0: SR5Item, args1: SR5Item['system'], arg2: string) => void;
             deleteItem: (args0: SR5Item, args1: SR5Item['system'], arg2: string) => void;
@@ -263,6 +264,7 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.MatrixActionsPack": string;
         "shadowrun5e.ICActionsPack": string;
         "shadowrun5e.CompendiumBrowserBlacklist": string[];
+        "shadowrun5e.ImporterCompendiumOrder": string[];
         "shadowrun5e.DieFaceLabels": string;
     }
 }
