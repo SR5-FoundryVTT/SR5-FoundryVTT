@@ -50,7 +50,7 @@ export class ActionParser extends Parser<'action'> {
         }
 
         // 1. Set basic action properties
-        action.type = jsonData.type._TEXT.toLowerCase();
+        action.type = jsonData.type._TEXT.toLowerCase() as ActionRollType['type'];
         action.extended = jsonData.type._TEXT === "Extended";
         description.value = jsonData.test?.bonusstring?._TEXT ?? "";
 

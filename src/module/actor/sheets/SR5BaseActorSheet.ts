@@ -8,7 +8,6 @@ import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
 
 import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
 import { MoveInventoryDialog } from '../../apps/dialogs/MoveInventoryDialog';
-import { ChummerImportForm } from '../../apps/chummer-import-form';
 import { InventoryRenameApp } from '@/module/apps/actor/InventoryRenameApp';
 import { SkillEditSheet } from '@/module/apps/skills/SkillEditSheet';
 import { KnowledgeSkillEditSheet } from '@/module/apps/skills/KnowledgeSkillEditSheet';
@@ -26,12 +25,10 @@ import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handleba
 import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { PackActionFlow } from '@/module/item/flows/PackActionFlow';
-
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import ActorSheetV2 = foundry.applications.sheets.ActorSheetV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
-const { FilePicker } = foundry.applications.apps;
 const { TextEditor } = foundry.applications.ux;
 const { fromUuid, fromUuidSync } = foundry.utils;
 
@@ -274,7 +271,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             removeActiveSkill: SR5BaseActorSheet.#deleteActiveSkill,
 
             resetActorRunData: SR5BaseActorSheet.#resetActorRunData,
-            showImportCharacter: SR5BaseActorSheet.#showImportCharacter,
 
             addEffect: SR5BaseActorSheet.#createEffect,
             editEffect: SR5BaseActorSheet.#editEffect,
@@ -640,12 +636,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     protected override _getHeaderControls() {
         const controls = super._getHeaderControls();
-        controls.unshift({
-            action: 'showImportCharacter',
-            icon: 'fas fa-cloud-arrow-up',
-            label: 'SR5.ImportCharacter',
-            ownership: 3, // OWNER
-        })
         controls.unshift({
             action: 'resetActorRunData',
             icon: 'fas fa-arrow-rotate-right',
@@ -1834,20 +1824,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const changedSlot = currentTarget.value;
 
         return item.changeMatrixAttributeSlot(changedSlot, attribute);
-    }
-
-    /**
-     * Open the Chummer Character import handling.
-     * @param event
-     */
-    static async #showImportCharacter(this: SR5BaseActorSheet, event: PointerEvent) {
-        event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
-        const options = {
-            name: 'chummer-import',
-            title: 'Chummer Import',
-        };
-        new ChummerImportForm(this.actor, options).render(true);
     }
 
     /**

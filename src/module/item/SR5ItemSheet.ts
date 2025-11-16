@@ -873,7 +873,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @param event
      */
     static async #toggleFreshImportFlag(this: SR5ItemSheet, event: Event) {
-        const onOff = !this.item.system.importFlags.isFreshImport;
+        const onOff = !this.item.system.importFlags?.isFreshImport;
         console.debug('Toggling isFreshImport on item to ->', onOff, event);
         const item = this.item;
         if (item.system.importFlags) {
