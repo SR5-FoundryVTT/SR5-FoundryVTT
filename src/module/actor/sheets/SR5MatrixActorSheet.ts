@@ -119,7 +119,7 @@ export class SR5MatrixActorSheet extends SR5BaseActorSheet {
 
     async _prepareMarkedDocuments(data: MatrixActorSheetData) {
         // When marked documents overview is shown, collect all marked documents.
-        const markedDocuments = await this.actor.getAllMarkedDocuments();
+        const markedDocuments = this.actor.getAllMarkedDocuments();
         data.markedDocuments = this._prepareMarkedDocumentTargets(markedDocuments);
     }
 

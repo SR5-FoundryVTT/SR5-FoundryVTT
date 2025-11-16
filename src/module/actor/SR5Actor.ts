@@ -2082,7 +2082,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *
      * @returns The document to retrieve all marks this actor has access to.
      */
-    async _getDocumentWithMarks(): Promise<SR5Actor | SR5Item | undefined | null> {
+    _getDocumentWithMarks(): SR5Actor | SR5Item | undefined | null {
         // CASE - IC marks are stored on their host item.
         if (this.isType('ic')) {
             return this.network;
@@ -2116,8 +2116,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     /**
      * Retrieve all documents this actor has a mark placed on, directly or indirectly.
      */
-    async getAllMarkedDocuments(): Promise<Shadowrun.MarkedDocument[]> {
-        const marksDevice = await this._getDocumentWithMarks();
+    getAllMarkedDocuments(): Shadowrun.MarkedDocument[] {
+        const marksDevice = this._getDocumentWithMarks();
         if (!marksDevice) return [];
         const marks = marksDevice.marksData;
         if (!marks) return [];
