@@ -293,15 +293,17 @@ declare global {
 
     interface ObjectConstructor {
         keys<T extends object>(o: T):
-            T extends readonly any[] ? `${bigint}`[] : (`${Exclude<keyof T, symbol>}`)[]
+            T extends readonly unknown[]
+                ? Array<{ [K in keyof T]: number extends K ? `${bigint}` : K }[number]>
+                : Array<`${Exclude<keyof T, symbol>}`>
 
-        entries<T extends object>(obj: T): (
-            T extends ReadonlyArray<infer E>
-                ? [`${bigint}`, E]
-                : { [K in keyof T & string]: [K, T[K]] }[keyof T & string]
-        )[];
+        entries<T extends object>(obj: T):
+            T extends readonly unknown[]
+                ? Array<{ [K in keyof T]: [number extends K ? `${bigint}` : K, T[K]] }[number]>
+                : Array<{ [K in keyof T & string]: [K, T[K]] }[keyof T & string]>;
 
-        fromEntries<E extends readonly [PropertyKey, any]>(obj: Iterable<E>):
-            { [K in E[0]]: Extract<E, readonly [K, any]>[1] };
+        fromEntries<E extends readonly [PropertyKey, unknown]>(obj: ArrayLike<E>):
+            { [K in E[0]]: Extract<E, readonly [K, unknown]>[1] };
+        fromEntries<K extends PropertyKey, V>(obj: Iterable<readonly [K, V]>): Record<K, V>;
     }
 }
