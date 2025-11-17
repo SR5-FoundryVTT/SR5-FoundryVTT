@@ -302,7 +302,7 @@ declare global {
                 ? Array<{ [K in keyof T]: [number extends K ? `${bigint}` : K, T[K]] }[number]>
                 : Array<{ [K in keyof T & string]: [K, T[K]] }[keyof T & string]>;
 
-        fromEntries<E extends readonly [PropertyKey, unknown]>(obj: ArrayLike<E>):
+        fromEntries<E extends readonly [PropertyKey, unknown]>(obj: Array<E>):
             { [K in E[0]]: Extract<E, readonly [K, unknown]>[1] };
         fromEntries<K extends PropertyKey, V>(obj: Iterable<readonly [K, V]>): Record<K, V>;
     }
