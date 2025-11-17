@@ -78,7 +78,7 @@ export class BonusHelper {
 
         for (const [key, data] of Object.entries(bonus)) {
             const baseEffect = BC.BonusConstant.simpleEffects[key] as BC.AECreateData | undefined;
-            if (baseEffect) {
+            if (data && typeof data === 'object' && '_TEXT' in data && baseEffect) {
                 const applyEffect = foundry.utils.deepClone(baseEffect);
                 for (const change of applyEffect.changes ?? [])
                     change.value = data._TEXT as string;

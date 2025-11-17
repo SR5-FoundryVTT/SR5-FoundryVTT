@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/method-signature-style */
 import { Quench } from "@ethaks/fvtt-quench";
 import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
@@ -288,5 +289,19 @@ declare global {
         pdfpager?: {
             openPDFByCode: (pdfcode: string, options?: { page?: number; uuid?: string }) => void;
         }
+    }
+
+    interface ObjectConstructor {
+        keys<T extends object>(o: T):
+            T extends readonly any[] ? `${bigint}`[] : (`${Exclude<keyof T, symbol>}`)[]
+
+        entries<T extends object>(obj: T): (
+            T extends ReadonlyArray<infer E>
+                ? [`${bigint}`, E]
+                : { [K in keyof T & string]: [K, T[K]] }[keyof T & string]
+        )[];
+
+        fromEntries<E extends readonly [PropertyKey, any]>(obj: Iterable<E>):
+            { [K in E[0]]: Extract<E, readonly [K, any]>[1] };
     }
 }
