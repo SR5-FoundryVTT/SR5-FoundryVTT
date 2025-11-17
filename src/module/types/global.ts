@@ -269,6 +269,9 @@ declare module "fvtt-types/configuration" {
     }
 }
 
+// Helper type to convert 'never' to 'unknown' in Object.fromEntries
+type _NeverToUnknown<T> = [T] extends [never] ? unknown : T;
+
 declare global {
     // eslint-disable-next-line no-var
     var routinglib: RoutingLib | null;
@@ -303,7 +306,7 @@ declare global {
                 : Array<{ [K in keyof T & string]: [K, T[K]] }[keyof T & string]>;
 
         fromEntries<E extends readonly [PropertyKey, unknown]>(obj: Array<E>):
-            { [K in E[0]]: Extract<E, readonly [K, unknown]>[1] };
+            { [K in E[0]]: _NeverToUnknown<Extract<E, readonly [K, unknown]>[1]> };
         fromEntries<K extends PropertyKey, V>(obj: Iterable<readonly [K, V]>): Record<K, V>;
     }
 }
