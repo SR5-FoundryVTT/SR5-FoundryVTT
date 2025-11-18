@@ -11,12 +11,12 @@ export const shadowrunNPC = (context: QuenchBatchContext) => {
 
     describe('NPC Character testing', () => {
         it('A grunt npc should only take physical damage', async () => {
-            // grunt NPCs only show a phsyical track and stun damage should transfer over to that.
-            const systemData = { is_npc: true, is_critter: true };
+            // grunt NPCs only show a physical track and stun damage should transfer over to that.
+            const systemData = { is_npc: true, npc: { is_grunt: true } };
             const actor = await factory.createActor({ type: 'character', system: systemData });
             
             assert.equal(actor.system.is_npc, true);
-            assert.equal(actor.system.is_critter, true);
+            assert.equal(actor.system.npc.is_grunt, true);
             assert.equal(actor.system.track.stun.value, 0);
             assert.equal(actor.system.track.physical.value, 0);
 
