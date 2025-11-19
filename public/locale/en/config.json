@@ -13,10 +13,14 @@
         "AutomateMultiDefenseModifierDescription": "Will automatically apply defense mod for multiple attacks",
         "AutomateProgressiveRecoil": "Automate progressive recoil",
         "AutomateProgressiveRecoilDescription": "Characters accrue progressive recoil until reset",
+        "CompendiumBrowserBlacklist": "Compendium Browser Blacklist",
+        "CompendiumBrowserBlacklistDescription": "List of compendiums to hide from the compendium browser",
         "DefaultOpposedTestActorSelection": "Overwrite opposed test token selections",
         "DefaultOpposedTestActorSelectionDescription": "Always overwrite selected tokens with targets used for testing",
         "DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
         "DiagonalMovementName": "Diagonal Movement",
+        "DieFaceLabels": "Test Die Face Labels",
+        "DieFaceLabelsDescription": "[Dice So Nice] Comma-separated list of 6 labels for the test die faces, starting with 1.",
         "DisplayDefaultRollCardDescription": "Should the default roll-card be displayed along with the Shadowrun roll-card",
         "DisplayDefaultRollCardName": "Display Default Roll Card",
         "EstimateDiagonal": "Estimate Diagonal Movement (1-2-1)",
@@ -293,6 +297,20 @@
             },
             "Title": "System compendiums"
         },
+        "CompendiumBrowser": {
+            "Filters": {
+                "ClearSearch": "Clear Search",
+                "SearchPlaceholder": "Search results...",
+                "System": "System",
+                "World": "World"
+            },
+            "Tabs": {
+                "Actors": "Actors",
+                "Items": "Items",
+                "Settings": "Settings"
+            },
+            "Title": "Compendium Browser"
+        },
         "Compendiums": {
             "Folders": {
                 "Root": "SR5e Imports"
@@ -301,6 +319,7 @@
             "sr5drone": "Drones & Vehicles",
             "sr5gear": "Armors & Gears",
             "sr5magic": "Spell & Complex Forms",
+            "sr5misc": "Miscellaneous",
             "sr5modification": "Modifications",
             "sr5trait": "Quality & Powers",
             "sr5ware": "Bioware & Cyberware",
@@ -658,8 +677,17 @@
             }
         },
         "Import": {
+            "ActorImporter": {
+                "Title": "Actor Importer"
+            },
+            "BulkImporter": {
+                "Title": "Bulk Importer"
+            },
             "Spirit": {
                 "SpiritTypeNotFound": "The spirit type was not found. Please open a github issue with your chummer export json."
+            },
+            "ImporterSourcesConfig": {
+                "Title": "Importer Sources Configuration"
             }
         },
         "ImportCharacter": "Import Character",
@@ -849,7 +877,7 @@
         "LifestyleGuests": "Guests",
         "LifestyleHigh": "High",
         "LifestyleLow": "Low",
-        "LifestyleLuxory": "Luxury",
+        "LifestyleLuxury": "Luxury",
         "LifestyleMiddle": "Medium",
         "LifestyleNeighborhood": "Neighborhood",
         "LifestyleOther": "Other",
@@ -1668,6 +1696,17 @@
         "UseEdgeForInitiativeRoll": "Use edge rule blitz for initiative",
         "Value": "Value",
         "Vehicle": {
+            "Category": "Category",
+            "Categories": {
+                "Micro": "Micro",
+                "Mini": "Mini",
+                "Small": "Small",
+                "Medium": "Medium",
+                "Large": "Large",
+                "Huge": "Huge",
+                "Anthro": "Anthromorphic",
+                "Missile": "Missile"
+            },
             "ChaseEnvironment": "Chase Environment",
             "Clearsight": "Clearsight",
             "ControlMode": "Control Mode",

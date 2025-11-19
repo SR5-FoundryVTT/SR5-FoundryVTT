@@ -65,7 +65,10 @@ export const FLAGS = {
     UpdateDocumentsAsGM: 'UpdateDocumentsAsGM',
     MatrixNetworkMarkInvite: 'MatrixNetworkMarkInvite',
     CompendiaSettingsMenu: 'CompendiaSettingsMenu',
-    TokenAutoRunning: 'TokenAutoRunning'
+    TokenAutoRunning: 'TokenAutoRunning',
+    CompendiumBrowserBlacklist: 'CompendiumBrowserBlacklist',
+    ImporterCompendiumOrder: 'ImporterCompendiumOrder',
+    DieFaceLabels: "DieFaceLabels"
 } as const;
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {
@@ -113,13 +116,7 @@ export const SR = {
 
         INI_RESULT_MOD_AFTER_INI_PASS: -10,
         INITIAL_INI_PASS: 1,
-        INITIAL_INI_ROUND: 1,
-        ROUND_TIME_SECONDS: 3,
-        TURN_TIME_SECONDS: 0,
-    },
-    die: {
-        glitch: [1],
-        success: [5, 6]
+        INITIAL_INI_ROUND: 1
     },
     defense: {
         spell: {

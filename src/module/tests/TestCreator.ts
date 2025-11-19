@@ -635,9 +635,10 @@ export const TestCreator = {
 
             // Iterate over complete MinimalActionData to avoid tests providing other ActionRollData fields they're not
             // supposed to override.
-            for (const key of Object.keys(DataDefaults.createData('minimal_action'))) {
+            for (const key of Object.keys(defaultAction)) {
                 if (TestCreator._keepItemActionValue(sourceAction, defaultAction, key)) continue;
 
+                // @ts-expect-error defaultActions are DeepPartial<MinimalActionType>, so keys might not be present.
                 resultAction[key] = defaultAction[key];
             }
         }
@@ -657,7 +658,7 @@ export const TestCreator = {
      * @returns true for when the original action value should be kept, false if it's to be overwritten.
      */
     _keepItemActionValue(action: ActionRollType, defaultAction: DeepPartial<MinimalActionType>, key: string): boolean {
-        if (!defaultAction.hasOwnProperty(key)) return true;
+        if (!Object.hasOwn(defaultAction, key)) return true;
 
         // Avoid user confusion. A user might change one value of a logical value grouping (skill+attribute)
         // and get a default value for the other. 
@@ -683,8 +684,7 @@ export const TestCreator = {
      * @returns false, when the value behind key is a default value. true, when it's a custom value.
      */
     _actionHasNoneDefaultValue(action: ActionRollType, key: string): boolean {
-        if (!action.hasOwnProperty(key)) return false;
-
+        if (!Object.hasOwn(action, key)) return false;
         // NOTE: A more complete comparison would take a default ActionRollData object and compare the sub-key against it.
         const value = action[key];
         const type = foundry.utils.getType(value);

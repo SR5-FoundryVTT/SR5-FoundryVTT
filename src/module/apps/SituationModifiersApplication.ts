@@ -383,7 +383,7 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
         this.render(true);
     }
 
-    async _updateObject(event: Event, formData?: object | undefined): Promise<void> {
+    async _updateObject(event: Event, formData?: Record<string, unknown> | undefined): Promise<void> {
             if (!formData) return;
 
             for (const [key, value] of Object.entries(formData)) {

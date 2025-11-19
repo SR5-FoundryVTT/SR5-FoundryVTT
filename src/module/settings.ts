@@ -285,6 +285,27 @@ export const registerSystemSettings = () => {
         type: new foundry.data.fields.AlphaField({ nullable: false, initial: 0.5, min: 0, max: 1, step: 0.01 } as const),
     });
 
+    game.settings.register(SYSTEM_NAME, FLAGS.CompendiumBrowserBlacklist, {
+        name: 'SETTINGS.CompendiumBrowserBlacklist.label',
+        hint: 'SETTINGS.CompendiumBrowserBlacklist.hint',
+        scope: 'user',
+        config: false,
+        type: Array,
+        default: []
+    });
+
+    if (game.modules.get('dice-so-nice')?.active) {
+        game.settings.register(SYSTEM_NAME, FLAGS.DieFaceLabels, {
+            name: 'SETTINGS.DieFaceLabels',
+            hint: 'SETTINGS.DieFaceLabelsDescription',
+            scope: 'world',
+            config: true,
+            type: String,
+            default: '1,2,3,4,5,6',
+            requiresReload: true,
+        });
+    }
+
     /**
      * Select compendia to use for system porpuses like different action packs
      */
@@ -328,5 +349,14 @@ export const registerSystemSettings = () => {
         scope: 'world',
         config: false,
         type: String
+    });
+
+    game.settings.register(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder, {
+        name: "Actor Importer Compendium Order",
+        hint: "The ordered list of compendium packs to search when importing items to an actor.",
+        scope: "world",
+        config: false,
+        type: Array,
+        default: [],
     });
 };

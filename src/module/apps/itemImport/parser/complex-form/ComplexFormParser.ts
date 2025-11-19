@@ -44,6 +44,7 @@ export class ComplexFormParser extends Parser<'complex_form'> {
     }
 
     protected override async getFolder(jsonData: Complexform, compendiumKey: CompendiumKey): Promise<Folder> {
-        return IH.getFolder(compendiumKey, "Complex Forms");
+        const folder = game.i18n.localize("SR5.ItemTypes.ComplexForm");
+        return IH.getFolder(compendiumKey, folder);
     }
 }

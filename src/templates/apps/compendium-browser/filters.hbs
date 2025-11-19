@@ -1,0 +1,25 @@
+<div class="compendium-filters">
+    <div class="search-bar">
+        <i class="search-icon fa-solid fa-magnifying-glass"></i>
+        <input 
+            type="text" 
+            name="search" 
+            id="compendium-browser-search"
+            value="{{searchQuery}}" 
+            placeholder={{localize "SR5.CompendiumBrowser.Filters.SearchPlaceholder"}}>
+        <a class="clear-filter" data-action="clearSearch" title={{localize "SR5.CompendiumBrowser.Filters.ClearSearch"}}>
+            <i class="fa-solid fa-xmark"></i>
+        </a>
+    </div>
+    <div class="types">
+        {{#each types as |type|}}
+        <label class="type">
+            <input 
+                type="checkbox" 
+                data-type="{{type.id}}" 
+                {{#if type.selected}}checked{{/if}}>
+            <span>{{type.value}}</span>
+        </label>
+        {{/each}}
+    </div>
+</div>

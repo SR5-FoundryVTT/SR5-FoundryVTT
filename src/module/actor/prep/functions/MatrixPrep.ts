@@ -4,6 +4,7 @@ import { SR5 } from "../../../config";
 import { AttributesPrep } from "./AttributesPrep";
 import { SR5Item } from 'src/module/item/SR5Item';
 import { DataDefaults } from '@/module/data/DataDefaults';
+import { MatrixAttributeFieldType } from '@/module/types/template/Matrix';
 
 export class MatrixPrep {
     /**
@@ -51,9 +52,9 @@ export class MatrixPrep {
             for (const [key, value] of Object.entries(deviceAtts)) {
                 if (!value) continue;
                 // create a new attribute field from the current one, this also works if the matrix[key] field doesn't exist
-                const att = DataDefaults.createData('attribute_field', matrix[key]);
+                const att = DataDefaults.createData('attribute_field', matrix[key]) as MatrixAttributeFieldType;
                 att.base = value.value;
-                att['device_att'] = value.device_att;
+                att.device_att = value.device_att;
                 matrix[key] = att;
             }
         } // if we don't have a device, use living persona

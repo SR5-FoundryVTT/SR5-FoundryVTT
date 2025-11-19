@@ -711,7 +711,7 @@ export const SR5 = {
         low: 'SR5.LifestyleLow',
         medium: 'SR5.LifestyleMiddle',
         high: 'SR5.LifestyleHigh',
-        luxory: 'SR5.LifestyleLuxory',
+        luxury: 'SR5.LifestyleLuxury',
         other: 'SR5.LifestyleOther',
     },
 
@@ -1101,6 +1101,16 @@ export const SR5 = {
             walker: 'SR5.Vehicle.Types.Walker',
             exotic: 'SR5.Vehicle.Types.Exotic',
         },
+        categories: {
+            micro: 'SR5.Vehicle.Categories.Micro',
+            mini: 'SR5.Vehicle.Categories.Mini',
+            small: 'SR5.Vehicle.Categories.Small',
+            medium: 'SR5.Vehicle.Categories.Medium',
+            large: 'SR5.Vehicle.Categories.Large',
+            huge: 'SR5.Vehicle.Categories.Huge',
+            anthro: 'SR5.Vehicle.Categories.Anthro',
+            missile: 'SR5.Vehicle.Categories.Missile',
+        },
         stats: {
             handling: 'SR5.Vehicle.Stats.Handling',
             off_road_handling: 'SR5.Vehicle.Stats.OffRoadHandling',
@@ -1285,11 +1295,9 @@ export const SR5 = {
         'modifier': 'SR5.Modifier'
     },
 
-    itemSubTypeIconOverrides: {
+    itemCategoryIconOverrides: {
         action: {},
-        adept_power: {
-            'adept-spell': 'spell/spell'
-        },
+        adept_power: {},
         ammo: {
             'ammo': '',
             'arrow': '',
@@ -1446,9 +1454,9 @@ export const SR5 = {
             'side': '',
             'stock': '',
             'top': '',
-            'under': 'modification/modification'
+            'under': ''
         },
-        program:        {
+        program: {
             'common_program': '',
             'hacking_program': ''
         },

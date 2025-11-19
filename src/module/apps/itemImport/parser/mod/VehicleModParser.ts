@@ -26,10 +26,9 @@ export class VehicleModParser extends Parser<'modification'> {
     }
 
     protected override async getFolder(jsonData: Mod, compendiumKey: CompendiumKey): Promise<Folder> {
-        const validCategory = ['Body', 'Cosmetic', 'Electromagnetic', 'Powertrain', 'Protection', 'Weapons'];
         const category = jsonData.category._TEXT;
         const rootFolder = "Vehicle-Mods";
-        const folderName = validCategory.includes(category) ? category : "Other";
+        const folderName = IH.getTranslatedCategory('vehicles', category);
 
         return IH.getFolder(compendiumKey, rootFolder, folderName);
     }

@@ -17,7 +17,8 @@ import { SR5CombatTracker } from './token/SR5CombatTracker';
 import { HandlebarManager } from './handlebars/HandlebarManager';
 
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
-import { Import } from './apps/itemImport/apps/import-form';
+import { ActorImporter } from './apps/itemImport/apps/ActorImporter';
+import { BulkImporter } from './apps/itemImport/apps/BulkImporter';
 import {ChangelogApplication} from "./apps/ChangelogApplication";
 import { SituationModifiersApplication } from './apps/SituationModifiersApplication';
 import {SR5ICActorSheet} from "./actor/sheets/SR5ICActorSheet";
@@ -27,6 +28,7 @@ import {SR5CharacterSheet} from "./actor/sheets/SR5CharacterSheet";
 import {SR5SpiritActorSheet} from "./actor/sheets/SR5SpiritActorSheet";
 import {SR5SpriteActorSheet} from "./actor/sheets/SR5SpriteActorSheet";
 
+import { SR5Die } from './rolls/SR5Die';
 import {SR5Roll} from "./rolls/SR5Roll";
 import {SuccessTest} from "./tests/SuccessTest";
 import {TeamworkTest} from "./actor/flows/TeamworkFlow";
@@ -82,6 +84,7 @@ import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
 import { DataStorage } from './data/DataStorage';
 import { RoutingLibIntegration } from './integrations/routingLibIntegration';
+import { initDiceSoNice } from './rolls/DiceSoNice';
 import { SR5TokenDocument } from './token/SR5TokenDocument';
 import { SR5TokenRuler } from './token/SR5TokenRuler';
 
@@ -129,6 +132,7 @@ import { SocketMessage } from './sockets';
 import { TagifyHooks } from '@/module/tagify/TagifyHooks';
 import { RiggingHooks } from '@/module/tests/hooks/RiggingHooks';
 import { SocketMessageFlow } from './flows/SocketMessageFlow';
+import { CompendiumBrowser } from './apps/compendiumBrowser/CompendiumBrowser';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -146,6 +150,10 @@ export class HooksManager {
             if (game.modules.get('routinglib')?.active) {
                 RoutingLibIntegration.init();
             }
+
+            if (game.modules.get('dice-so-nice')?.active) {
+                initDiceSoNice();
+            }
         });
         Hooks.once('setup', AutocompleteInlineHooksFlow.setupHook);
 
@@ -154,6 +162,7 @@ export class HooksManager {
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons.bind(HooksManager));
         Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions.bind(SR5Combat));
         Hooks.on('renderCompendiumDirectory', HooksManager.renderCompendiumDirectory.bind(HooksManager));
+        Hooks.on('renderActorDirectory', HooksManager.renderActorDirectory.bind(HooksManager));
         Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD.bind(SituationModifiersApplication));
         Hooks.on('moveToken', SR5TokenDocument.moveToken.bind(SR5Token));
         Hooks.on('renderTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
@@ -202,6 +211,11 @@ ___________________
              * check the Test implementations.
              */
             SR5Roll,
+
+            /**
+             * You want to open the compendium browser?
+             */
+            CompendiumBrowser,
 
             /**
              * You want to create a test from whatever source?
@@ -373,6 +387,7 @@ ___________________
         CONFIG.Combat.initiative.formula =  "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
 
         // Register general SR5Roll for JSON serialization support.
+        CONFIG.Dice.terms[SR5Die.DENOMINATION] = SR5Die;
         CONFIG.Dice.rolls.push(SR5Roll);
         // @ts-expect-error // Register the SR5Roll dnd5e style.
         CONFIG.Roll = SR5Roll;
@@ -382,6 +397,9 @@ ___________________
         CONFIG.SR5 = SR5;
 
         CONFIG.statusEffects.splice(5, 0, ...SRStatus);
+
+        CONFIG.Actor.compendiumIndexFields.push("system.description", "system.importFlags.isFreshImport");
+        CONFIG.Item.compendiumIndexFields.push("system.description", "system.importFlags.isFreshImport");
 
         CONFIG.ActiveEffect.dataModels["base"] = ActiveEffectDM;
 
@@ -560,16 +578,26 @@ ___________________
      * @returns 
      */
     static renderCompendiumDirectory(app: foundry.appv1.api.Application, html: HTMLElement) {
-        if (!game.user?.isGM) {
+        const browser = $('<button class="sr5 import-button"><i class="fa-solid fa-book-open-reader"></i><span>Open Compendium Browser</span></button>');
+        $(html).find('.header-actions').append(browser);
+        browser.on('click', () => { void new CompendiumBrowser().render({ force: true }); });
+
+        if (!game.user?.isGM) return;
+
+        const button = $('<button class="sr5 import-button"><i class="fa-solid fa-file-import"></i><span>Import Chummer Data</span></button>');
+        $(html).find('.header-actions').append(button);
+
+        button.on('click', () => { void new BulkImporter().render({ force: true }); });
+    }
+
+    static renderActorDirectory(app: foundry.appv1.api.Application, html: HTMLElement) {
+        if(!game.user?.can("ACTOR_CREATE"))
             return;
-        }
 
-        const button = $('<button class="sr5 flex0">Import Chummer Data</button>');
-        $(html).find('.directory-footer').append(button);
+        const button = $('<button class="sr5 import-button"><i class="fa-solid fa-file-import"></i><span>Import Actor</span></button>');
+        $(html).find('.header-actions').append(button);
 
-        button.on('click', (event) => {
-            new Import().render(true);
-        });
+        button.on('click', () => { void new ActorImporter().render({ force: true }); });
     }
 
     /**
@@ -581,11 +609,8 @@ ___________________
      */
     static async updateIcConnectedToHostItem(item: SR5Item, data: SR5Item['system'], id: string) {
         // Trigger type specific behaviour.
-        switch (item.type) {
-            case 'host':
-                await MatrixICFlow.handleUpdateItemHost(item);
-                break;
-        }
+        if (item.isType('host'))
+            await MatrixICFlow.handleUpdateItemHost(item);
     }
 
     /**

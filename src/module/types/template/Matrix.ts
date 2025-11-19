@@ -1,16 +1,17 @@
-import { ModifiableField } from "../fields/ModifiableField";
-import { AttributeField } from "./Attributes";
+import { SR5 } from "@/module/config";
 import { ConditionData } from "./Condition";
+import { AttributeField } from "./Attributes";
+import { ModifiableField } from "../fields/ModifiableField";
 
 const { SchemaField, NumberField, BooleanField, AnyField, StringField, ArrayField, DocumentUUIDField } = foundry.data.fields;
 
-const DeviceAttribute = (initialAtt: '' | 'attack' | 'sleaze' | 'data_processing' | 'firewall', editable: boolean) => ({
+const DeviceAttribute = (initialAtt: '' | keyof typeof SR5.matrixAttributes, editable: boolean) => ({
     value: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     att: new StringField({
         blank: true,
         required: true,
         initial: initialAtt,
-        choices: ['', 'attack', 'sleaze', 'data_processing', 'firewall'],
+        choices: SR5.matrixAttributes,
     }),
     editable: new BooleanField({ initial: editable }),
 });
@@ -68,4 +69,5 @@ export const MatrixData = () => ({
 
 export type MatrixType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MatrixData>>;
 export type MatrixAttributesType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MatrixAttributes>>;
+export type MatrixAttributeFieldType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MatrixAttributeField>>;
 export type MatrixMarksType = MatrixType['marks'];

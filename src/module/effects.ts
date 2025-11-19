@@ -33,7 +33,7 @@ export async function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
             const effect = [{
                 name: game.i18n.localize("SR5.ActiveEffect.New"),
                 origin: owner.uuid
-            }];
+            }] satisfies ActiveEffect.CreateData[];
 
             if (owner instanceof Item && owner._isNestedItem) {
                 effect[0]._id = foundry.utils.randomID();

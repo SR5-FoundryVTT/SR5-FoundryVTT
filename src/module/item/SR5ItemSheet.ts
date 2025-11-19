@@ -187,46 +187,38 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         data['config'] = SR5;
 
         /**
-         * Reduce nested items into typed lists.
+         * Groups nested items by their type for rendering on the item sheet.
+         * - Ammo items are grouped under 'ammo'.
+         * - Modification items are grouped by their specific system type (e.g., 'weapon', 'armor', etc.).
+         * - All other items are grouped under 'other'.
          */
-        const [ammunition, weaponMods, armorMods, vehicleMods, droneMods] = this.item.items.reduce<[
-                SR5Item<'ammo'>[],
-                SR5Item<'modification'>[],
-                SR5Item<'modification'>[],
-                SR5Item<'modification'>[],
-                SR5Item<'modification'>[]
-            ]>(
-            (acc, item: SR5Item) => {
-                const data = item.toObject() as unknown as SR5Item;
-                if (item.type === 'ammo') acc[0].push(data as SR5Item<'ammo'>);
-                else if (item.type === 'modification') {
-                    const type = item.system?.type;
-                    if (type === 'weapon') acc[1].push(data as SR5Item<'modification'>);
-                    else if (type === 'armor') acc[2].push(data as SR5Item<'modification'>);
-                    else if (type === 'vehicle') acc[3].push(data as SR5Item<'modification'>);
-                    else if (type === 'drone') acc[4].push(data as SR5Item<'modification'>);
-                }
-                return acc;
-            },
-            [[], [], [], [], []]
-        );
+        const grouped = Object.groupBy(this.item.items, item => {
+            if (item.isType('ammo')) return 'ammo';
+            if (item.isType('modification')) return item.system.type;
+            return 'other';
+        });
 
-        // Enrich descriptions
+        // Enrich all descriptions
         await Promise.all(
-            [ammunition, weaponMods, armorMods, vehicleMods, droneMods].flat().map(
-                async item => {
-                    const html = await foundry.applications.ux.TextEditor.implementation.enrichHTML(item.system.description.value);
-                    item.descriptionHTML = html;
-                }
-            )
+            Object.values(grouped).flat().map(async item => {
+                if (!item) return;
+
+                const html = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
+                    item.system.description.value
+                );
+                item.descriptionHTML = html;
+            })
         );
 
-        // Assign to template data
-        data['ammunition'] = ammunition;
-        data['weaponMods'] = weaponMods;
-        data['armorMods'] = armorMods;
-        data['vehicleMods'] = vehicleMods;
-        data['droneMods'] = droneMods;
+        // Sort nested items by name before assigning to template data
+        const sortByName = <T extends { name: string }>(arr: T[]) =>
+            arr.toSorted((a, b) => a.name.localeCompare(b.name, game.i18n.lang));
+
+        data['ammunition'] = sortByName((grouped.ammo ?? []) as SR5Item<'ammo'>[]);
+        data['weaponMods'] = sortByName((grouped.weapon ?? []) as SR5Item<'modification'>[]);
+        data['armorMods'] = sortByName((grouped.armor ?? []) as SR5Item<'modification'>[]);
+        data['vehicleMods'] = sortByName((grouped.vehicle ?? []) as SR5Item<'modification'>[]);
+        data['droneMods'] = sortByName((grouped.drone ?? []) as SR5Item<'modification'>[]);
 
         data['activeSkills'] = this._getSortedActiveSkillsForSelect();
         data['attributes'] = this._getSortedAttributesForSelect();
@@ -236,7 +228,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         data['itemEffects'] = prepareSortedItemEffects(this.object);
 
         if (this.item.isType('host')) {
-            data['markedDocuments'] = await this.item.getAllMarkedDocuments();
+            data['markedDocuments'] = this.item.getAllMarkedDocuments();
         }
 
         if (this.item.isType('sin')) {
