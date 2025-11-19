@@ -594,8 +594,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return this.system.limits?.[name];
     }
 
+    /**
+     * Determine if this actor is a grunt enemy.
+     *
+     * @returns true will determine it to be a grunt.
+     */
     isGrunt(this: SR5Actor): boolean {
-        return Boolean(this.system.is_npc || this.system.npc?.is_grunt);
+        return Boolean(this.system.is_npc && this.system.npc?.is_grunt);
     }
 
     /** Return actor type, which can be different kind of actors from 'character' to 'vehicle'.

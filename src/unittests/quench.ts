@@ -25,6 +25,7 @@ import { spriteImporterTesting } from './actorImport/sr5.SpriteImporter.spec';
 import { shadowrunSR5ItemDataPrep } from './sr5.ItemDataPrep.spec';
 import { shadowrunMatrixTesting } from './sr5.MatrixTesting.spec';
 import { shadowrunDriver } from './sr5.Driver.spec';
+import { shadowrunNPC } from './sr5.NPC.spec';
 
 import { Quench } from '@ethaks/fvtt-quench';
 import { shadowrunRiggerTesting } from '@/unittests/sr5.RiggerTesting.spec';
@@ -120,5 +121,8 @@ export const quenchRegister = (quench: Quench) => {
     });
     quench.registerBatch('shadowrun5e.flow.matrix', shadowrunMatrixFlow, {
         displayName: 'SHADOWRUN5e: Matrix Flow Test',
+    });
+    quench.registerBatch('shadowrun5e.actor.npc', shadowrunNPC, {
+        displayName: 'SHADOWRUN5e: NPC Character Test',
     });
 };
