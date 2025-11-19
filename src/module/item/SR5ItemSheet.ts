@@ -228,7 +228,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         data['itemEffects'] = prepareSortedItemEffects(this.object);
 
         if (this.item.isType('host')) {
-            data['markedDocuments'] = await this.item.getAllMarkedDocuments();
+            data['markedDocuments'] = this.item.getAllMarkedDocuments();
         }
 
         if (this.item.isType('sin')) {
