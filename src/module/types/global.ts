@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/method-signature-style */
 import { Quench } from "@ethaks/fvtt-quench";
 import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
@@ -268,6 +269,9 @@ declare module "fvtt-types/configuration" {
     }
 }
 
+// Helper type to convert 'never' to 'unknown' in Object.fromEntries
+type _NeverToUnknown<T> = [T] extends [never] ? unknown : T;
+
 declare global {
     // eslint-disable-next-line no-var
     var routinglib: RoutingLib | null;
@@ -288,5 +292,21 @@ declare global {
         pdfpager?: {
             openPDFByCode: (pdfcode: string, options?: { page?: number; uuid?: string }) => void;
         }
+    }
+
+    interface ObjectConstructor {
+        keys<T extends object>(o: T):
+            T extends readonly unknown[]
+                ? Array<{ [K in keyof T]: number extends K ? `${bigint}` : K }[number]>
+                : Array<`${Exclude<keyof T, symbol>}`>
+
+        entries<T extends object>(obj: T):
+            T extends readonly unknown[]
+                ? Array<{ [K in keyof T]: [number extends K ? `${bigint}` : K, T[K]] }[number]>
+                : Array<{ [K in keyof T & string]: [K, T[K]] }[keyof T & string]>;
+
+        fromEntries<E extends readonly [PropertyKey, unknown]>(obj: Array<E>):
+            { [K in E[0]]: _NeverToUnknown<Extract<E, readonly [K, unknown]>[1]> };
+        fromEntries<K extends PropertyKey, V>(obj: Iterable<readonly [K, V]>): Record<K, V>;
     }
 }

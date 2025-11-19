@@ -1,11 +1,10 @@
-import { Typed } from "../typed";
 import { SR5 } from "@/module/config";
 import { ArmorPartData } from "./Armor";
 import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
 const { NumberField, BooleanField, StringField } = foundry.data.fields;
 
-export const CritterPowerCategories = Typed.keys(SR5.critterPower.categories);
+export const CritterPowerCategories = Object.keys(SR5.critterPower.categories);
 
 const CritterPowerData = () => ({
     ...BaseItemData(),
