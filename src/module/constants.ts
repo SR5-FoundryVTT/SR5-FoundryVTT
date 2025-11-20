@@ -116,7 +116,9 @@ export const SR = {
 
         INI_RESULT_MOD_AFTER_INI_PASS: -10,
         INITIAL_INI_PASS: 1,
-        INITIAL_INI_ROUND: 1
+        INITIAL_INI_ROUND: 1,
+        ROUND_TIME_SECONDS: 3,
+        TURN_TIME_SECONDS: 0,
     },
     defense: {
         spell: {
