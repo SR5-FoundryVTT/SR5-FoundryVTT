@@ -323,7 +323,8 @@ export class MatrixNetworkFlow {
     }
 
     /**
-     * Collect networks to select based on GRIDs on character.
+     * Collect networks to select based on what a character should be able to connect to
+     * based on marks, public grids and SINs network subscriptions.
      * 
      * @param character Collect networks based on this character.
      */
@@ -351,6 +352,30 @@ export class MatrixNetworkFlow {
             }
         }
 
+        // add marked grids and hosts that aren't already in the list
+        for (const network of this.getMarkedNetworks(character)) {
+            if (!networks.includes(network)) {
+                networks.push(network);
+            }
+        }
+
+        return networks;
+    }
+
+    /**
+     * Retrieve all networks that have marks placed on them by the given actor.
+     * 
+     * @param actor The marks of this actor will be used.
+     */
+    static getMarkedNetworks(actor: SR5Actor) {
+        const markedDocuments = actor.getAllMarkedDocuments();
+
+        // For typesafety use a separate list with explicit type.
+        const networks: Item.Implementation[] = [];
+        markedDocuments.forEach(({document}) => {
+            if (!(document instanceof SR5Item && document.isNetwork())) return;
+            networks.push(document);
+        });
         return networks;
     }
 

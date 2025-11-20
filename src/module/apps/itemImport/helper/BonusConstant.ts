@@ -7,11 +7,11 @@ export type DocCreateData = (
 export type AECreateData = Omit<ActiveEffect.CreateData, "name"> & { name?: string, changes?: any[] };
 
 export type ActiveEffectMode = typeof CONST.ACTIVE_EFFECT_MODES[keyof typeof CONST.ACTIVE_EFFECT_MODES];
-export const { CUSTOM, MULTIPLY, ADD, DOWNGRADE, UPGRADE, OVERRIDE } = CONST.ACTIVE_EFFECT_MODES;
-export type EffectChangeParameter = { key: string; value: string | number; mode?: number; priority?: ActiveEffectMode; }
+export const { CUSTOM: MODIFY, MULTIPLY, ADD, DOWNGRADE, UPGRADE, OVERRIDE } = CONST.ACTIVE_EFFECT_MODES;
+export type EffectChangeParameter = { key: string; value: string | number; mode?: number; priority?: ActiveEffectMode; };
 
 export class BonusConstant {
-    public static skillGroupTable: Record<string, string[]> = {
+    public static readonly skillGroupTable = {
         "Acting": ["con", "impersonation", "performance"],
         "Athletics": ["gymnastics", "running", "swimming", "flight"],
         "Biotech": ["biotechnology", "cybertechnology", "first_aid", "medicine"],
@@ -29,7 +29,7 @@ export class BonusConstant {
         "Tasking": ["compiling", "decompiling", "registering"],
     } as const;
 
-    public static skillCategoryTable: Record<string, string[]> = {
+    public static readonly skillCategoryTable = {
         "Combat Active": ["archery", "automatics", "blades", "clubs", "exotic_melee", "exotic_range", "heavy_weapons", "longarms", "pistols", "throwing_weapons", "unarmed_combat"],
         "Physical Active": ["disguise", "diving", "escape_artist", "flight", "free_fall", "gymnastics", "palming", "perception", "running", "sneaking", "survival", "swimming", "tracking"],
         "Social Active": ["con", "etiquette", "impersonation", "instruction", "intimidation", "leadership", "negotiation", "performance"],
@@ -60,29 +60,38 @@ export class BonusConstant {
             changes: [{ key: "data.pool" }],
             system: { applyTo: 'test_all', selection_tests: [{ id: "PhysicalResistTest" }] },
         },
-        defensetest: { changes: [{ key: "system.modifiers.defense" }] },
-        dodge: { changes: [{ key: "system.modifiers.defense" }] },
+        defensetest: {
+            changes: [{ key: "data.pool" }],
+            system: { applyTo: 'test_all', selection_tests: [
+                { value: "Physical Defense", id: "PhysicalDefenseTest" },
+                { value: "Suppression Defense", id: "SuppressionDefenseTest" }
+            ]},
+        },
+        dodge: {
+            changes: [{ key: "data.pool" }],
+            system: { applyTo: 'test_all', selection_tests: [
+                { value: "Physical Defense", id: "PhysicalDefenseTest" },
+                { value: "Suppression Defense", id: "SuppressionDefenseTest" }
+            ]},
+        },
         drainresist: {
             name: "Add Drain Resistance",
             changes: [{ key: "data.pool" }],
             system: { applyTo: 'test_all', selection_tests: [{ id: "DrainTest" }] },
         },
-        essencemax: { changes: [{ key: "system.attributes.essence" }] },
+        essencemax: { changes: [{ key: "system.attributes.essence.base" }] },
+        essencepenalty: { changes: [{ key: "system.attributes.essence" }] },
         fadingresist: {
             name: "Add Fading Resistance",
             changes: [{ key: "data.pool" }],
             system: { applyTo: 'test_all', selection_tests: [{ id: "FadeTest" }] },
         },
         handling: { changes: [{ key: "system.vehicle_stats.handling" }] },
-        initiativedice: {
-            name: "Increase Initiative Dice",
-            changes: [{ key: "system.modifiers.meat_initiative_dice" }]
-        },
+        initiative: { changes: [{ key: "system.modifiers.meat_initiative" }] },
+        initiativedice: { changes: [{ key: "system.modifiers.meat_initiative_dice" }] },
+        initiativepass: { changes: [{ key: "system.modifiers.meat_initiative_dice" }] },
         judgeintentions: { changes: [{ key: "system.modifiers.judge_intentions"}] },
-        matrixinitiativediceadd: {
-            name: "Increase Matrix Initiative Dice",
-            changes: [{ key: "system.modifiers.matrix_initiative_dice" }]
-        },
+        matrixinitiativediceadd: { changes: [{ key: "system.modifiers.matrix_initiative_dice" }] },
         mentallimit: { changes: [{ key: "system.limits.mental" }] },
         memory: { changes: [{ key: "system.modifiers.memory" }] },
         offroadhandling: { changes: [{ key: "system.vehicle_stats.off_road_handling" }] },
@@ -97,6 +106,7 @@ export class BonusConstant {
         reach: { changes: [{ key: "system.modifiers.reach" }] },
         seats: { changes: [{ key: "system.vehicle_stats.seats" }] },
         sensor: { changes: [{ key: "system.vehicle_stats.sensor" }] },
+        sociallimit: { changes: [{ key: "system.limits.social" }] },
         speed: { changes: [{ key: "system.vehicle_stats.speed" }] },
         spellresistance: {
             name: "Add Spell Resistance",

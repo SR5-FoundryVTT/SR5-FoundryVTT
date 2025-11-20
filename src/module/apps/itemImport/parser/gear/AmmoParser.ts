@@ -2,7 +2,6 @@ import { Parser, SystemType } from "../Parser";
 import { CompendiumKey } from "../../importer/Constants";
 import { Gear, GearSchema } from "../../schema/GearSchema";
 import { ImportHelper as IH } from "../../helper/ImportHelper";
-import { TranslationHelper as TH } from "../../helper/TranslationHelper";
 
 export class AmmoParser extends Parser<'ammo'> {
     protected readonly parseType = 'ammo';
@@ -21,15 +20,23 @@ export class AmmoParser extends Parser<'ammo'> {
             system.damage = Number(bonusData.damage?._TEXT) || 0;
 
             const damageType = bonusData.damagetype?._TEXT ?? '';
-            if (damageType.includes('P'))
-                system.damageType = 'physical';
-            else if (damageType.includes('S'))
+            if (damageType.includes('S'))
                 system.damageType = 'stun';
             else if (damageType.includes('M'))
                 system.damageType = 'matrix';
+            else
+                system.damageType = 'physical';
         }
 
         return system;
+    }
+
+    protected override setImporterFlags(entity: Item.CreateData, jsonData: Gear) {
+        super.setImporterFlags(entity, jsonData);
+
+        if (entity.system!.importFlags!.category === 'Ammunition') {
+            entity.system!.importFlags!.category = entity.name.split(':')[0].trim();
+        }
     }
 
     public override async Parse(jsonData: Gear, compendiumKey: CompendiumKey): Promise<Item.CreateData> {
@@ -39,8 +46,7 @@ export class AmmoParser extends Parser<'ammo'> {
         // TODO: This can be improved by using the stored english name in item.system.importFlags.name
         if (jsonData.addweapon?._TEXT) {
             const weaponName = jsonData.addweapon._TEXT;
-            const weaponTranslation = TH.getTranslation(weaponName, { type: 'weapon' });
-            const [foundWeapon] = await IH.findItem('Weapon', weaponTranslation, 'weapon') ?? [];
+            const foundWeapon = (await IH.findItems('Weapon', [weaponName]))[0];
 
             if (foundWeapon && "action" in foundWeapon.system) {
                 const weaponData = foundWeapon.system as SystemType<'weapon'>;
@@ -59,13 +65,13 @@ export class AmmoParser extends Parser<'ammo'> {
 
     protected override async getFolder(jsonData: Gear, compendiumKey: CompendiumKey): Promise<Folder> {
         const categoryData = jsonData.category._TEXT;
-        const rootFolder = TH.getTranslation("Weapons", {type: 'category'})
-        const folderName = TH.getTranslation(categoryData, {type: 'category'});
+        const rootFolder = game.i18n.localize("SR5.ItemTypes.Ammo");
+        const folderName = IH.getTranslatedCategory("gear", categoryData);
 
         let specFolder: string | undefined;
         if (categoryData === "Ammunition") {
             specFolder = 'Misc';
-            const splitName = TH.getTranslation(jsonData.name._TEXT).split(':');
+            const splitName = IH.getTranslatedCategory('gear', jsonData.name._TEXT).split(':');
             if (splitName.length > 1)
                 specFolder = splitName[0].trim();
         }

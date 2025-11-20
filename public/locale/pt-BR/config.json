@@ -13,8 +13,12 @@
         "AutomateMultiDefenseModifierDescription": "Aplicará automaticamente o modificador de defesa para múltiplos ataques",
         "AutomateProgressiveRecoil": "Automatizar recuo progressivo",
         "AutomateProgressiveRecoilDescription": "Personagens acumulam recuo progressivo até serem reiniciados",
+        "CompendiumBrowserBlacklist": "Lista Negra do Navegador de Compêndio",
+        "CompendiumBrowserBlacklistDescription": "Lista de compêndios a serem ocultados no navegador de compêndios",
         "DefaultOpposedTestActorSelection": "Sobrescrever seleções de token de testes de oposição",
         "DefaultOpposedTestActorSelectionDescription": "Sempre sobrescrever tokens selecionados com alvos usados para testes",
+        "DieFaceLabels": "Rótulos das Faces dos Dados",
+        "DieFaceLabelsDescription": "[Dice so Nice] Lista separada por vírgulas de 6 rótulos para as faces dos dados de teste, começando com 1.",
         "FreshColor": "Destacar Apenas com Cor do Texto",
         "FreshColorAndIcon": "Destacar com Cor do Texto e Ícone",
         "FreshIcon": "Destacar Apenas com Ícone",
@@ -230,6 +234,20 @@
         "Collapse": "Recolher",
         "CollapseAll": "Recolher Tudo",
         "CommonProgram": "Programa Comum",
+        "CompendiumBrowser": {
+            "Filters": {
+                "ClearSearch": "Limpar Pesquisa",
+                "SearchPlaceholder": "Pesquisar por...",
+                "System": "Sistema",
+                "World": "Mundo"
+            },
+            "Tabs": {
+                "Actors": "Atores",
+                "Items": "Itens",
+                "Settings": "Configurações"
+            },
+            "Title": "Navegador de Compêndio"
+        },
         "Compendiums": {
             "sr5critter": "Criaturas & Espíritos & Sprites",
             "sr5drone": "Drones & Veículos",
@@ -531,6 +549,12 @@
             }
         },
         "Import": {
+            "ActorImporter": {
+                "Title": "Importador de Ator"
+            },
+            "BulkImporter": {
+                "Title": "Importador em Massa"
+            },
             "Spirit": {
                 "SpiritTypeNotFound": "O tipo de espírito não foi encontrado. Por favor, abra uma questão no github com seu json de exportação chummer."
             }
@@ -678,7 +702,7 @@
         "LifestyleGuests": "Convidados",
         "LifestyleHigh": "Alto",
         "LifestyleLow": "Baixo",
-        "LifestyleLuxory": "Luxo",
+        "LifestyleLuxury": "Luxo",
         "LifestyleMiddle": "Médio",
         "LifestyleNeighborhood": "Vizinhança",
         "LifestyleOther": "Outros",
@@ -1408,6 +1432,17 @@
         "UseEdgeForInitiativeRoll": "Use a regra de vantagem blitz para iniciativa",
         "Value": "Valor",
         "Vehicle": {
+            "Category": "Categoria",
+            "Categories": {
+                "Micro": "Micro",
+                "Mini": "Mini",
+                "Small": "Pequeno",
+                "Medium": "Médio",
+                "Large": "Grande",
+                "Huge": "Enorme",
+                "Anthro": "Anthromórfico",
+                "Missile": "Míssil"
+            },
             "ChaseEnvironment": "Ambiente de Perseguição",
             "Clearsight": "Visão Clara",
             "ControlMode": "Modo de Controle",

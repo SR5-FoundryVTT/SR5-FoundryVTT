@@ -99,18 +99,17 @@ export class DrainTest extends SuccessTest<DrainTestData> {
     }
 
     /**
-     * A drain test is successful whenever it has more hits than drain damage
+     * Drain isn't really a pass/fail thing, it always "succeeds".
      */
     override get success(): boolean {
-        return this.data.modifiedDrain.value <= 0;
+        return true;
     }
 
     override get successLabel(): Translation {
-        return 'SR5.TestResults.ResistedAllDamage';
-    }
-
-    override get failureLabel(): Translation {
-        return 'SR5.TestResults.ResistedSomeDamage'
+        if(this.data.modifiedDrain.value <= 0){
+            return 'SR5.TestResults.ResistedAllDamage';
+        }
+        return 'SR5.TestResults.ResistedSomeDamage';
     }
 
     override async processResults() {
@@ -118,5 +117,9 @@ export class DrainTest extends SuccessTest<DrainTestData> {
         this.data.modifiedDrain = DrainRules.modifyDrainDamage(this.data.modifiedDrain, this.hits.value);
 
         await super.processResults();
+    }
+
+    override get showSuccessLabel(): boolean {
+        return this.success;
     }
 }

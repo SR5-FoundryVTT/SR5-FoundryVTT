@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/method-signature-style */
 import { Quench } from "@ethaks/fvtt-quench";
 import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
@@ -50,6 +51,7 @@ import AstralPerceptionDetectionMode from "../vision/astralPerception/astralPerc
 import AugmentedRealityVisionDetectionMode from "../vision/augmentedReality/arDetectionMode";
 import LowlightVisionDetectionMode from "../vision/lowlightVision/lowlightDetectionMode";
 import ThermographicVisionDetectionMode from "../vision/thermographicVision/thermographicDetectionMode";
+import { DiceSoNice } from "../rolls/DiceSoNice";
 
 declare module "fvtt-types/configuration" {
     interface DocumentClassConfig {
@@ -215,12 +217,14 @@ declare module "fvtt-types/configuration" {
             getSceneControlButtons: (arg0: any) => void;
             getCombatTrackerEntryContext: (arg0: any, arg1: any) => void;
             renderCompendiumDirectory: (arg0: foundry.appv1.api.Application, arg1: HTMLElement) => void;
+            renderActorDirectory: (arg0: foundry.appv1.api.Application, arg1: HTMLElement) => void;
             renderTokenHUD: (arg0: foundry.applications.hud.TokenHUD, arg1: JQuery, arg2: any) => void;
             updateItem: (args0: SR5Item, args1: SR5Item['system'], arg2: string) => void;
             deleteItem: (args0: SR5Item, args1: SR5Item['system'], arg2: string) => void;
             getChatMessageContextOptions: (args0: any, args1: any) => void;
             quenchReady: (args0: Quench) => void;
             renderChatMessage: (args0: SR5ChatMessage, args1: any, arg2: any) => void;
+            diceSoNiceReady: (dice3d: DiceSoNice) => void;
         }
     }
 
@@ -259,12 +263,22 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.GeneralActionsPack": string;
         "shadowrun5e.MatrixActionsPack": string;
         "shadowrun5e.ICActionsPack": string;
+        "shadowrun5e.CompendiumBrowserBlacklist": string[];
+        "shadowrun5e.ImporterCompendiumOrder": string[];
+        "shadowrun5e.DieFaceLabels": string;
     }
 }
+
+// Helper type to convert 'never' to 'unknown' in Object.fromEntries
+type _NeverToUnknown<T> = [T] extends [never] ? unknown : T;
 
 declare global {
     // eslint-disable-next-line no-var
     var routinglib: RoutingLib | null;
+
+    interface Game {
+        dice3d: DiceSoNice | undefined;
+    }
 
     // Use declaration merging to add strong typing to Foundry's game.i18n localize and format functions,
     // sourcing valid translation strings from this system's english translations file
@@ -278,5 +292,21 @@ declare global {
         pdfpager?: {
             openPDFByCode: (pdfcode: string, options?: { page?: number; uuid?: string }) => void;
         }
+    }
+
+    interface ObjectConstructor {
+        keys<T extends object>(o: T):
+            T extends readonly unknown[]
+                ? Array<{ [K in keyof T]: number extends K ? `${bigint}` : K }[number]>
+                : Array<`${Exclude<keyof T, symbol>}`>
+
+        entries<T extends object>(obj: T):
+            T extends readonly unknown[]
+                ? Array<{ [K in keyof T]: [number extends K ? `${bigint}` : K, T[K]] }[number]>
+                : Array<{ [K in keyof T & string]: [K, T[K]] }[keyof T & string]>;
+
+        fromEntries<E extends readonly [PropertyKey, unknown]>(obj: Array<E>):
+            { [K in E[0]]: _NeverToUnknown<Extract<E, readonly [K, unknown]>[1]> };
+        fromEntries<K extends PropertyKey, V>(obj: Iterable<readonly [K, V]>): Record<K, V>;
     }
 }

@@ -176,6 +176,9 @@ export const preloadHandlebarsTemplates = async () => {
         // Application - Matrix Network Hacking
         'systems/shadowrun5e/dist/templates/apps/matrix-network-hacking/tabs/networks.hbs',
 
+        // Application - Compendium Browser
+        'systems/shadowrun5e/dist/templates/apps/compendium-browser/settings-folder.hbs',
+
         // Application - Situational Modifiers
         'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs'
     ];

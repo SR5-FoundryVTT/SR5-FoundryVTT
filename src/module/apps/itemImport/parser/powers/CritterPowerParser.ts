@@ -2,7 +2,6 @@ import { Parser } from '../Parser';
 import { CompendiumKey } from '../../importer/Constants';
 import { Power } from '../../schema/CritterpowersSchema';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
-import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 import { CritterPowerCategories } from 'src/module/types/item/CritterPower';
 
 export class CritterPowerParser extends Parser<'critter_power'> {
@@ -14,10 +13,10 @@ export class CritterPowerParser extends Parser<'critter_power'> {
         let category = jsonData.category._TEXT.toLowerCase();
         category = (category.includes("infected") ? "infected" : category);
         system.category = CritterPowerCategories.includes(category as any)
-            ? (category as typeof CritterPowerCategories[number])
+            ? (category as typeof system.category)
             : "";
 
-        system.duration = jsonData.duration ? jsonData.duration._TEXT.toLowerCase() : "";
+        system.duration = jsonData.duration ? jsonData.duration._TEXT.toLowerCase() as typeof system.duration : "always";
 
         const range = jsonData.range ? jsonData.range._TEXT : "";
         system.range = CritterPowerParser.rangeMap[range] ?? 'special';
@@ -32,19 +31,19 @@ export class CritterPowerParser extends Parser<'critter_power'> {
 
     protected override async getFolder(jsonData: Power, compendiumKey: CompendiumKey): Promise<Folder> {
         const rootFolder = "Critter Powers";
-        const category = TH.getTranslation(jsonData.category._TEXT, { type: 'category' });
+        const category = IH.getTranslatedCategory('critterpowers', jsonData.category._TEXT);
 
         return IH.getFolder(compendiumKey, rootFolder, category);
     }
 
-    protected static readonly rangeMap: Record<string, string> = {
+    protected static readonly rangeMap = {
         'T': 'touch',
         'LOS': 'los',
         'LOS (A)': 'los_a',
         'Self': 'self',
     } as const;
 
-    protected static readonly typeMap: Record<string, string> = {
+    protected static readonly typeMap = {
         'P': 'physical',
         'M': 'mana',
     } as const;

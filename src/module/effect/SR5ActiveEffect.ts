@@ -202,6 +202,13 @@ export class SR5ActiveEffect extends ActiveEffect {
             return {};
         }
 
+        // Skip applying this change if the target key does not exist on the model.
+        // TypedObjectField will otherwise create the missing property as a string,
+        // which breaks data integrity and can result in errors like "undefined[object Object]".
+        // For example, a change targeting "firstaid" instead of "first_aid" would trigger this case.
+        if (!foundry.utils.hasProperty(model, change.key))
+            return {};
+
         return Object.fromEntries(
             Object.entries(super.apply(model, change)).filter(([, v]) => v != null)
         );

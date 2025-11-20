@@ -1,3 +1,4 @@
+import { SR5 } from "@/module/config";
 import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
 const { BooleanField, StringField } = foundry.data.fields;
@@ -6,8 +7,16 @@ const SpritePowerData = () => ({
     ...BaseItemData(),
     ...ActionPartData(),
 
-    duration: new StringField({ required: true, initial: 'always' }),
-    optional: new StringField({ required: true, initial: 'standard', choices: ['standard', 'enabled_option', 'disabled_option'] }),
+    duration: new StringField({
+        required: true,
+        initial: 'always',
+        choices: SR5.spritePower.durations
+    }),
+    optional: new StringField({
+        required: true,
+        initial: 'standard',
+        choices: SR5.spritePower.optional
+    }),
     enabled: new BooleanField({ initial: true }),
 });
 

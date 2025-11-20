@@ -1,17 +1,22 @@
-import { Tracks } from "../template/ConditionMonitors";
-import { Attributes, MatrixActorAttributes } from '../template/Attributes';
-import { ActorBase, CommonData, CreateModifiers } from "./Common";
-import { MatrixAttributes, MatrixData } from "../template/Matrix";
-import { Initiative } from "../template/Initiative";
-import { VisibilityChecks } from "../template/Visibility";
+import { SR5 } from "@/module/config";
 import { MatrixLimits } from "../template/Limits";
+import { Initiative } from "../template/Initiative";
+import { Tracks } from "../template/ConditionMonitors";
+import { VisibilityChecks } from "../template/Visibility";
+import { MatrixAttributes, MatrixData } from "../template/Matrix";
+import { ActorBase, CommonData, CreateModifiers } from "./Common";
+import { Attributes, MatrixActorAttributes } from '../template/Attributes';
 const { SchemaField, NumberField, StringField } = foundry.data.fields;
 
 // === Main Schema ===
 const ICData = () => ({
     // === Core Identity ===
     ...CommonData(),
-    icType: new StringField({ required: true }),
+    icType: new StringField({
+        required: true,
+        initial: "acid",
+        choices: SR5.ic.types
+    }),
     special: new StringField({ required: true, initial: 'mundane', choices: ['mundane'], readonly: true }),
 
     // === Matrix & Host ===
