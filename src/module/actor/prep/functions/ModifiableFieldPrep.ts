@@ -12,7 +12,7 @@ export class ModifiableFieldPrep {
     ): void {
         if (!source || (typeof source !== "object")) return;
 
-        for (const [fieldName, value] of Object.entries(source)) {
+        for (const [fieldName, value] of Object.entries(source as any)) {
             const field = resolveField(fieldName);
 
             if (field instanceof ModifiableField)
