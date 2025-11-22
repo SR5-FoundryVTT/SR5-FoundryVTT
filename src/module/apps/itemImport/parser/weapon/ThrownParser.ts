@@ -10,16 +10,16 @@ export class ThrownParser extends WeaponParserBase {
 
         const blastCode = jsonData.damage._TEXT;
 
-        let radiusMatch = blastCode.match(/([0-9]+m)/)?.[0];
+        let radiusMatch = /([0-9]+m)/.exec(blastCode)?.[0];
         if (radiusMatch) {
-            radiusMatch = radiusMatch.match(/[0-9]+/)?.[0];
+            radiusMatch = /[0-9]+/.exec(radiusMatch)?.[0];
             if (radiusMatch)
                 blastData.radius = parseInt(radiusMatch);
         }
 
-        let dropoffMatch = blastCode.match(/(-[0-9]+\/m)/)?.[0];
+        let dropoffMatch = /(-[0-9]+\/m)/.exec(blastCode)?.[0];
         if (dropoffMatch) {
-            dropoffMatch = dropoffMatch.match(/-[0-9]+/)?.[0];
+            dropoffMatch = /-[0-9]+/.exec(dropoffMatch)?.[0];
             if (dropoffMatch)
                 blastData.dropoff = parseInt(dropoffMatch);
         }

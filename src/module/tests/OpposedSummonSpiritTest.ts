@@ -207,7 +207,7 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
      */
     override async _cleanUpAfterDialogCancel() {
         if (!this.data.summonedSpiritUuid) return;
-        const actor = await fromUuid(this.data.summonedSpiritUuid as any) as SR5Actor | null;
+        const actor = await fromUuid<Actor>(this.data.summonedSpiritUuid);
         await actor?.delete();
         delete this.actor;
     }

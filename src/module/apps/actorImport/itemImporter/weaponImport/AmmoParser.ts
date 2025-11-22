@@ -21,7 +21,7 @@ export class AmmoParser extends Parser<'ammo'> {
             else
                 system.damageType = 'physical';
 
-            system.element = (itemData.weaponbonusdamage_english || '').match(/\(e\)/)?.pop() === '(e)' ? 'electricity' : '';
+            system.element = /\(e\)/.exec(itemData.weaponbonusdamage_english || '')?.pop() === '(e)' ? 'electricity' : '';
         }
 
         system.accuracy = Number(itemData.weaponbonusacc) || 0;

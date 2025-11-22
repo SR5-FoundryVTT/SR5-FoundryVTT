@@ -110,7 +110,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         // Check for test limits used.
         const limits = effect.system.selection_limits.map(test => test.id);
-        const limit = this.test.data.action.limit.attribute!;
+        const limit = this.test.data.action.limit.attribute;
         if (limits.length > 0 && !limits.includes(limit)) return true;
 
         return false;

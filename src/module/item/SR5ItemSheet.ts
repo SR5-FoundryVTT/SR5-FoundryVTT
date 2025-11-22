@@ -1261,7 +1261,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      */
     _onDragStart(event: DragEvent) {
         const target = event.currentTarget as HTMLElement;
-        if ( "link" in (event.target as HTMLElement)?.dataset ) return;
+        const targetElement = event.target as HTMLElement;
+        if (targetElement?.dataset && 'link' in targetElement.dataset) return;
         let dragData;
 
         // Owned Items

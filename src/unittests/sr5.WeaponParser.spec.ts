@@ -23,12 +23,9 @@ function getData(damageString: string): Partial<Weapon> {
 }
 
 export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
-    const { describe, it, assert, before, after } = context;
+    const { describe, it, assert } = context;
 
     const mut = new TestWeaponParser();
-
-    before(async () => {})
-    after(async () => {})
 
     describe("Weapon Damage Values", () => {
         it("Parses simple damage", () => {

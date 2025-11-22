@@ -5,9 +5,7 @@ import { RitualSpellcastingTest } from './RitualSpellcastingTest';
 import { Translation } from '../utils/strings';
 
 
-interface OpposedRitualTestData extends OpposedTestData {
-
-}
+type OpposedRitualTestData = OpposedTestData;
 
 /**
  * The opposed test of summoning a spirit.
@@ -76,7 +74,7 @@ export class OpposedRitualTest extends OpposedTest<OpposedRitualTestData> {
 
     async updateRitualTestForFollowup() {
         // Finalize the original test values.
-        let opposingHits = this.hits.value
+        const opposingHits = this.hits.value
 
         this.against.calcDrain(opposingHits);
         await this.against.saveToMessage();

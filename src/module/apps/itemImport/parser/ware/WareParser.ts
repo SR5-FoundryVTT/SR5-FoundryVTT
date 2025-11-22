@@ -30,7 +30,7 @@ export class WareParser extends Parser<'bioware' | 'cyberware'> {
     }
 
     protected override async getFolder(jsonData: Bioware | Cyberware, compendiumKey: CompendiumKey): Promise<Folder> {
-        let rootFolder: string = "Other";
+        let rootFolder = "Other";
         const categoryData = jsonData.category._TEXT;
         const folderName = IH.getTranslatedCategory(this.parseType, categoryData);
 

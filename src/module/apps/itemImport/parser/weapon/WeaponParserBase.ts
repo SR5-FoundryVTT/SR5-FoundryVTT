@@ -115,7 +115,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
 
         let damageType: DamageTypeType = 'physical';
         let damageAttribute: PhysicalAttribute | undefined;
-        let damageBase: number = 0;
+        let damageBase = 0;
         let damageElement: DamageElement = '';
 
         if(simpleDamage) {

@@ -1778,7 +1778,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     async _onWeaponAmmoSelect(event: Event) {
         const id = SheetFlow.closestItemId(event.currentTarget);
         const item = this.actor.items.get(id);
-        if (!item || !item.isType('weapon')) return;
+        if (!item?.isType('weapon')) return;
         const newTarget = (event.currentTarget as HTMLSelectElement).value;
         if (!newTarget) return;
         await item.equipAmmo(newTarget);

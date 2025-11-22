@@ -17,7 +17,7 @@ export const RiggingTestDataFlow = {
      */
     addControlRigModifier: (test: SuccessTest) => {
         const vehicle = test.actor?.asType('vehicle');
-        if (!vehicle || !vehicle.isControlledByDriver('rigger')) return;
+        if (!vehicle?.isControlledByDriver('rigger')) return;
         const driver = vehicle.getVehicleDriver();
         if (!driver) return;
         const rating = driver.getControlRigRating();
@@ -38,7 +38,7 @@ export const RiggingTestDataFlow = {
      */
     addMatrixModifier: (test: SuccessTest) => {
         const vehicle = test.actor?.asType('vehicle');
-        if (!vehicle || !vehicle.isControlledByDriver('rigger')) return;
+        if (!vehicle?.isControlledByDriver('rigger')) return;
         const driver = vehicle.getVehicleDriver();
         if (!driver) return;
         if (RiggingRules.isConsideredMatrixAction(test.data)) {
@@ -55,7 +55,7 @@ export const RiggingTestDataFlow = {
     replacePhysicalAttributesForMentalDriver: (action: ActionRollType, document?: SR5Actor|SR5Item) => {
         if (!document) return;
         const actor = document instanceof SR5Actor ? document : document.actorOwner;
-        if (!actor || !actor.isControlledByDriver('rigger', 'remote')) return;
+        if (!actor?.isControlledByDriver('rigger', 'remote')) return;
         AttributeRules.replacePhysicalAttributesWithMentalAttributes(action);
     },
 }

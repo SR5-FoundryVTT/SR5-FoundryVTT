@@ -161,7 +161,7 @@ export const MatrixTargetingFlow = {
         // Collect all scene tokens, which might also include personas outside any grid.
         if (canvas.scene?.tokens) {
             // Collect all scene tokens.
-            for (const token of canvas.scene?.tokens) {
+            for (const token of canvas.scene.tokens) {
                 // Throw away unneeded tokens.
                 if (!token.actor) continue;
                 const target = token.actor;

@@ -33,7 +33,7 @@ export class Version0_31_0 extends VersionMigration {
         const tempFields: TempField[] = [];
 
         for (const [key, v] of Object.entries(_actor.system.attributes)) {
-            const attribute = v as any;
+            const attribute = v;
             if (attribute?.['temp']) {
                 tempFields.push({
                     label: `${game.i18n.localize(attribute.label || SR5.attributes[key]) || 'Attribute'} Adjustment`,
@@ -58,7 +58,7 @@ export class Version0_31_0 extends VersionMigration {
         }
         if (_actor.type === 'vehicle') {
             for (const [key, v] of Object.entries(_actor.system.vehicle_stats)) {
-                const attribute = v as any;
+                const attribute = v;
                 if (attribute?.['temp']) {
                     tempFields.push({
                         label: `${game.i18n.localize(attribute.label || SR5.vehicle.stats[key]) || 'Vehicle Attribute'} Adjustment`,
@@ -70,7 +70,7 @@ export class Version0_31_0 extends VersionMigration {
             }
         }
         for (const [key, v] of Object.entries(_actor.system.skills.active)) {
-            const skill = v as any;
+            const skill = v;
             if (skill?.['temp']) {
                 tempFields.push({
                     label: `${game.i18n.localize(skill.label || SR5.activeSkills[key]) || 'Skill'} Adjustment`,

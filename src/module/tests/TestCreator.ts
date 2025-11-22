@@ -531,7 +531,7 @@ export const TestCreator = {
 
         
         // Prepare test modifiers and possible applicable selections
-        const modifiers: {[key in Shadowrun.ModifierTypes]?: string[]} = {};
+        const modifiers: Partial<Record<Shadowrun.ModifierTypes, string[]>> = {};
         for (const modifier of data.action.modifiers) {
             // A modifier with an applicable selection is found.
             if (modifier.includes('.')) {

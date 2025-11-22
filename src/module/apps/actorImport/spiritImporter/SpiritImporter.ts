@@ -34,7 +34,7 @@ export class SpiritImporter {
             att => att.name_english.toLowerCase() === 'edg'
         );
         spirit.system.attributes.edge.base = Number(edgeAttribute?.total) || 0;
-        const magic = Number(chummerData.attributes[1]?.attribute.filter(att => att.name_english.toLowerCase() === 'mag')[0].total);
+        const magic = Number(chummerData.attributes[1]?.attribute.find(att => att.name_english.toLowerCase() === 'mag')!.total);
         spirit.system.force = magic;
 
         const consoleLogs = Sanitizer.sanitize(CONFIG.Actor.dataModels.spirit.schema, spirit.system);

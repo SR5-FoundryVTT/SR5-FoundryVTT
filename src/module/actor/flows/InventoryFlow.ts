@@ -190,7 +190,7 @@ export class InventoryFlow {
      * @param items The items in question. A single item can be given.
      * @param removeFromCurrent By default the item added will be removed from another inventory it might be in.
      */
-    async addItems(inventoryName: string, items: SR5Item[] | SR5Item, removeFromCurrent: boolean = true) {
+    async addItems(inventoryName: string, items: SR5Item[] | SR5Item, removeFromCurrent = true) {
         console.debug(`Shadowrun 5e | Adding items to to inventory ${inventoryName}`, items);
 
         // Default inventory is valid target here.

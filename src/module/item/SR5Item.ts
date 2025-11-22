@@ -30,7 +30,6 @@ import { RollDataOptions } from './Types';
 import { SetMarksOptions } from '../storage/MarksStorage';
 import { MatrixDeviceFlow } from './flows/MatrixDeviceFlow';
 import { StorageFlow } from '@/module/flows/StorageFlow';
-import RollEvent = Shadowrun.RollEvent;
 import Document = foundry.abstract.Document;
 import GetEmbeddedDocumentOptions = Document.GetEmbeddedDocumentOptions;
 import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
@@ -375,7 +374,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @param rounds The amount of rounds to be fired
      * @returns Either the weapon has no ammo at all or not enough.
      */
-    hasAmmo(rounds: number = 0): boolean {
+    hasAmmo(rounds = 0): boolean {
         return this.ammoLeft() >= rounds;
     }
 
@@ -542,7 +541,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         // first unload the current ammo
         await this.unloadAmmo();
         const equippedAmmo = this.getEquippedAmmo();
-        if (equippedAmmo && id === equippedAmmo.id) {
+        if (id === equippedAmmo?.id) {
             await equippedAmmo.update({ system: { technology: { equipped: false } } });
         } else {
             // then equip the new ammo
@@ -942,8 +941,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *
      */
     isAreaOfEffect(): boolean {
-        return false
-            || (this.isType('weapon') && this.system.category === 'thrown' && this.system.thrown.blast.radius > 0)
+        return (this.isType('weapon') && this.system.category === 'thrown' && this.system.thrown.blast.radius > 0)
             || (this.isType('weapon') && (this.getEquippedAmmo()?.system.blast?.radius ?? 0) > 0)
             || (this.isType('spell') && this.system.range === 'los_a')
             || (this.isType('ammo') && this.system.blast.radius > 0);
