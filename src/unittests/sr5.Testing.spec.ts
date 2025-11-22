@@ -118,10 +118,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
         });
     });
 
-    describe('OpposedTest', () => {
-
-    });
-
     
     /**
      * Testing around the TestCreator and SuccessTest getting their rolldata from an SR5Item instead of an SR5Actor.

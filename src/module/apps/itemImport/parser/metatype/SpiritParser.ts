@@ -87,7 +87,7 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
         const category = jsonData.category ? jsonData.category._TEXT : "Other";
         const rootFolder = game.i18n.localize("TYPES.Actor.spirit");
         const folderName = IH.getTranslatedCategory('metatypes', category);
-        const specFolder = category === 'Insect Spirits' ? jsonData.name._TEXT.match(/\(([^)]+)\)/)?.[1] : undefined;
+        const specFolder = category === 'Insect Spirits' ? /\(([^)]+)\)/.exec(jsonData.name._TEXT)?.[1] : undefined;
 
         return IH.getFolder(compendiumKey, rootFolder, folderName, specFolder);
     }

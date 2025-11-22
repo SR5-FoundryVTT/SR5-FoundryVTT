@@ -31,7 +31,7 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
     /**
      * Track the timestamp when the last mouse move event was captured.
      */
-    #moveTime: number = 0;
+    #moveTime = 0;
 
     /* -------------------------------------------- */
 

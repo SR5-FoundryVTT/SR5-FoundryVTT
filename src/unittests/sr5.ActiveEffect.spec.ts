@@ -388,7 +388,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             const action = DataDefaults.createData('action_roll', { test: 'SuccessTest' });
 
-            const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SuccessTest;
+            const test = (await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }))!;
 
             await test.execute();
 
@@ -426,7 +426,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 ]
             }]);
 
-            const test = await TestCreator.fromItem(item as SR5Item, actor, { showDialog: false, showMessage: false }) as SuccessTest;
+            const test = (await TestCreator.fromItem(item as SR5Item, actor, { showDialog: false, showMessage: false }))!;
 
             await test.execute();
 
@@ -495,7 +495,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
 
             // Test is created using the correct item.
-            const test = await TestCreator.fromItem(item as SR5Item, actor, { showDialog: false, showMessage: false }) as SuccessTest;
+            const test = (await TestCreator.fromItem(item as SR5Item, actor, { showDialog: false, showMessage: false }))!;
 
             await test.execute();
 
@@ -630,7 +630,9 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
              * @param name The modifier name
              * @returns the sum of all modifier values matching the name
              */
-            const reduceModifiersByName = (name: string) => (acc: number, { name: n, value }) => n === name ? acc + value : acc;
+            const reduceModifiersByName = (name: string) => 
+                (acc: number, modifier: { name: string, value: number }) => 
+                    modifier.name === name ? acc + modifier.value : acc;
 
             const actor = await factory.createActor({ type: 'character' });
             let actions = await actor.createEmbeddedDocuments('Item', [{ name: 'Test Action', type: 'action' }]);
@@ -640,7 +642,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 changes: [{ key: 'data.pool', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
-            let test = await TestCreator.fromItem(actions[0] as SR5Item, actor, { showDialog: false, showMessage: false }) as SuccessTest;
+            let test = (await TestCreator.fromItem(actions[0] as SR5Item, actor, { showDialog: false, showMessage: false }))!;
             await test.execute();
 
             // The first roll should have the effect applied
@@ -652,7 +654,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.equal(test.pool.mod.reduce(reduceModifiersByName('Test Effect'), 0), 2);
 
             actions = await actor.createEmbeddedDocuments('Item', [{ name: 'Test Action', type: 'action', system: { action: { extended : true  } } }]);
-            test = await TestCreator.fromItem(actions[0] as SR5Item, actor, { showDialog: false, showMessage: false }) as SuccessTest;
+            test = (await TestCreator.fromItem(actions[0] as SR5Item, actor, { showDialog: false, showMessage: false }))!;
 
             // This will trigger the first and all extended rolls...
             await test.execute();
@@ -691,7 +693,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 changes: [{ key: 'data.damage', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
             }]);
 
-            const test = await TestCreator.fromItem(weapon, actor, { showDialog: false, showMessage: false }) as SuccessTest;
+            const test = (await TestCreator.fromItem(weapon, actor, { showDialog: false, showMessage: false }))!;
 
             await test.execute();
 
@@ -747,7 +749,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             // CASE - Test uses the same category
             let action = DataDefaults.createData('action_roll', { test: 'SkillTest', categories: ['social'] });
-            let test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SuccessTest;
+            let test = (await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }))!;
 
             // Simulate relevant part of #execute
             test.prepareTestCategories();
@@ -759,7 +761,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             // CASE - Test uses different category
             action = DataDefaults.createData('action_roll', { test: 'SkillTest', categories: ['matrix'] });
-            test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SuccessTest;
+            test = (await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }))!;
 
             // Simulate relevant part of #execute
             test.prepareTestCategories();
@@ -771,7 +773,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             // CASE - Test uses no category
             action = DataDefaults.createData('action_roll', { test: 'SkillTest', categories: [] });
-            test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SuccessTest;
+            test = (await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }))!;
 
             // Simulate relevant part of #execute
             test.prepareTestCategories();

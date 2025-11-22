@@ -634,14 +634,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await SINFlow.removeNetwork(this.item, uuid);
     }
 
-    static async #removeAllNetworks(this: SR5ItemSheet, event: Event) {
-        event.preventDefault();
-        const userConsented = await Helpers.confirmDeletion();
-        if (!userConsented) return;
-
-        await SINFlow.removeAllNetworks(this.item);
-    }
-
     static async #addItemQty(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         const id = SheetFlow.closestItemId(event.target);
@@ -746,17 +738,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 }
             }
         }, { render: true });
-    }
-
-    static async #removeOwnedItem(this: SR5ItemSheet, event: Event) {
-        event.preventDefault();
-
-        const userConsented = await Helpers.confirmDeletion();
-        if (!userConsented) return;
-
-        const id = SheetFlow.closestItemId(event.target);
-
-        await this.item.deleteOwnedItem(id);
     }
 
     static async #removeAllSlaves(this: SR5ItemSheet, event: Event) {
@@ -918,22 +899,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         // update the embedded item with the new wireless state
         await this.item.update({ system: { technology: { wireless: newState } } });
-    }
-
-    /**
-     * Review 123: unused function?
-     * Clicking on equipped status should trigger unequipping all other devices of the same type.
-     * @param event Click event on the equipped checkbox.
-     */
-    static async #toggleEquippedDisableOtherDevices(this: SR5ItemSheet, event: Event) {
-        event.preventDefault();
-
-        // Assure owned item device.
-        if (!(this.document.parent instanceof SR5Actor)) return;
-        if (!this.document.isType('device')) return;
-        if (!this.document.isEquipped()) return;
-
-        await this.document.parent.equipOnlyOneItemOfType(this.document);
     }
 
     static async #addEffect(this: SR5ItemSheet, event: Event) {
@@ -1296,7 +1261,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      */
     _onDragStart(event: DragEvent) {
         const target = event.currentTarget as HTMLElement;
-        if ( "link" in (event.target as HTMLElement)?.dataset ) return;
+        const targetElement = event.target as HTMLElement;
+        if (targetElement?.dataset && 'link' in targetElement.dataset) return;
         let dragData;
 
         // Owned Items

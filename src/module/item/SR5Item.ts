@@ -942,8 +942,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *
      */
     isAreaOfEffect(): boolean {
-        return false
-            || (this.isType('weapon') && this.system.category === 'thrown' && this.system.thrown.blast.radius > 0)
+        return (this.isType('weapon') && this.system.category === 'thrown' && this.system.thrown.blast.radius > 0)
             || (this.isType('weapon') && (this.getEquippedAmmo()?.system.blast?.radius ?? 0) > 0)
             || (this.isType('spell') && this.system.range === 'los_a')
             || (this.isType('ammo') && this.system.blast.radius > 0);

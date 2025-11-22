@@ -28,7 +28,7 @@ export class WeaponParser extends Parser<'weapon'> {
         const split = val.split(' ');
 
         if (split.length > 0) {
-            const l = split[0].match(/(\d+)(\w+)/);
+            const l = /(\d+)(\w+)/.exec(split[0]);
             
             if (l?.[1]) {
                 damage.damage = parseInt(l[1]);
@@ -40,7 +40,7 @@ export class WeaponParser extends Parser<'weapon'> {
         }
 
         for (let i = 1; i < split.length; i++) {
-            const l = split[i].match(/(-?\d+)(.*)/);
+            const l = /(-?\d+)(.*)/.exec(split[i]);
             if (l?.[2]) {
                 if (l[2].toLowerCase().includes('/m')) { 
                     damage.dropoff = parseInt(l[1]);
@@ -173,7 +173,7 @@ export class WeaponParser extends Parser<'weapon'> {
         if (system.action.skill.toLowerCase().includes('throw'))
             system.category = 'thrown';
 
-        system.ammo.current.value = Number(itemData.ammo_english.match(/\d+/)?.[0]) || 0;
+        system.ammo.current.value = Number((/\d+/.exec(itemData.ammo_english))?.[0]) || 0;
         system.ammo.current.max = system.ammo.current.value;
 
         if (itemData.clips?.clip) {

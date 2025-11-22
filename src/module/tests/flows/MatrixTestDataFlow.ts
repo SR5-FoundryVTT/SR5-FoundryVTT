@@ -8,11 +8,9 @@ import { MatrixTest, MatrixTestData, OpposedMatrixTestData } from "../MatrixTest
 import { MatrixRules } from "../../rules/MatrixRules";
 import { MatrixDefenseTest } from "../MatrixDefenseTest";
 import { MatrixResistTest, MatrixResistTestData } from "../MatrixResistTest";
-import { OpposedBruteForceTest } from "../OpposedBruteForceTest";
-import { OpposedHackOnTheFlyTest } from "../OpposedHackOnTheFlyTest";
 import { BiofeedbackResistTest } from "../BiofeedbackResistTest";
-import { OpposedCheckOverwatchScoreTest } from '@/module/tests/OpposedCheckOverwatchScoreTest';
 import { OpposedMatrixTest } from '@/module/tests/OpposedMatrixTest';
+import Document = foundry.abstract.Document;
 
 /**
  * Apply Matrix Rules to Success Test Data relating to matrix.
@@ -465,11 +463,11 @@ export const MatrixTestDataFlow = {
      * @param options
      */
     async executeMessageAction(testCls: any, againstData: MatrixTestData, messageId: string, options: TestOptions): Promise<void> {
-        let document: any | null;
+        let document: Document.Any | null = null;
         if (againstData.iconUuid) {
             document = await fromUuid(againstData.iconUuid)
         }
-        // if (!(document instanceof SR5Item)) return;
+
         if (!document) {
             const actor = Helpers.getSelectedActorsOrCharacter()[0];
             document = actor;

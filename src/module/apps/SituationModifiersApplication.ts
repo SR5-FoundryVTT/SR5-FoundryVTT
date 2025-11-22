@@ -104,7 +104,7 @@ class EnvironmentalModifiersHandler extends ModifiersHandler {
 
 
 class MatrixModifiersHandler extends ModifiersHandler {
-    override getData(options?: object | undefined) {
+    override getData(options?: object) {
         return {}
     }
 
@@ -127,7 +127,7 @@ class MatrixModifiersHandler extends ModifiersHandler {
 }
 
 class MagicModifiersHandler extends ModifiersHandler {
-    override getData(options?: object | undefined) {
+    override getData(options?: object) {
         return {}
     }
 
@@ -166,7 +166,7 @@ class MagicModifiersHandler extends ModifiersHandler {
  * 
  */
 class RecoilModifiersHandler extends ModifiersHandler {
-    override getData(options?: object | undefined) {
+    override getData(options?: object) {
         return {}
     }
 
@@ -383,7 +383,7 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
         this.render(true);
     }
 
-    async _updateObject(event: Event, formData?: Record<string, unknown> | undefined): Promise<void> {
+    async _updateObject(event: Event, formData?: Record<string, unknown>): Promise<void> {
             if (!formData) return;
 
             for (const [key, value] of Object.entries(formData)) {
