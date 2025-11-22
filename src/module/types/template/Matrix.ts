@@ -69,5 +69,5 @@ export const MatrixData = () => ({
 
 export type MatrixType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MatrixData>>;
 export type MatrixAttributesType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MatrixAttributes>>;
-export type MatrixAttributeType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MatrixAttributeField>>;
+export type MatrixAttributeFieldType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof MatrixAttributeField>>;
 export type MatrixMarksType = MatrixType['marks'];

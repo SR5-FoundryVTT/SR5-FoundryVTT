@@ -411,7 +411,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         data['itemEffects'] = prepareSortedItemEffects(this.item);
 
         if (this.item.isType('host')) {
-            data['markedDocuments'] = await this.item.getAllMarkedDocuments();
+            data['markedDocuments'] = this.item.getAllMarkedDocuments();
         }
 
         if (this.item.isType('sin')) {

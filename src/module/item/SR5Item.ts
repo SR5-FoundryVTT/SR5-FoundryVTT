@@ -1379,7 +1379,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *
      * @returns Foundry Documents with marks placed.
      */
-    async getAllMarkedDocuments(): Promise<Shadowrun.MarkedDocument[]> {
+    getAllMarkedDocuments(): Shadowrun.MarkedDocument[] {
         if (!this.isType('host')) return [];
 
         const marksData = this.marksData;

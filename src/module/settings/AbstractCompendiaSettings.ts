@@ -82,7 +82,7 @@ export default abstract class AbstractCompendiaSettings extends HandlebarsApplic
         const expanded = foundry.utils.expandObject(formData.object);
         // id is expected to be the "name" of the field
         // value is expected to be the selected value
-        for (const [id, value] of Object.entries(expanded)) {
+        for (const [id, value] of Object.entries(expanded as any)) {
             if (validIds.includes(id as any)) {
                 await game.settings.set(SYSTEM_NAME, id as any, value);
             }

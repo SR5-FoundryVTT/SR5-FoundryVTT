@@ -10,7 +10,7 @@ class TestWeaponParser extends WeaponParserBase {
     }
 }
 
-function mockXmlData(data: object): object {
+function mockXmlData(data: Record<string, unknown>): Record<string, unknown> {
     return Object.fromEntries(Object.entries(data)
         .map(([key, value]) =>
             [key, { '_TEXT': value }]));

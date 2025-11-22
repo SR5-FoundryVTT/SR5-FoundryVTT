@@ -14,9 +14,9 @@ const THRESHOLD_PREFIX = "Threshold:";
 export class ActionParser extends Parser<'action'> {
     protected readonly parseType = 'action';
 
-    private readonly attrs = Object.keys(SR5.attributes) as (keyof typeof SR5.attributes)[];
-    private readonly limits = Object.keys(SR5.limits) as (keyof typeof SR5.limits)[];
-    private readonly skills = Object.keys(SR5.activeSkills) as (keyof typeof SR5.activeSkills)[];
+    private readonly attrs = Object.keys(SR5.attributes);
+    private readonly limits = Object.keys(SR5.limits);
+    private readonly skills = Object.keys(SR5.activeSkills);
     private storedActions: Record<string, ActionRollType> = {};
     private readonly systemActions: Item.Stored[];
 

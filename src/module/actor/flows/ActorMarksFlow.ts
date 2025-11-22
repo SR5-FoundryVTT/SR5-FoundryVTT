@@ -142,7 +142,7 @@ export const ActorMarksFlow = {
      * @param matrixData Any documents matrix mark data.
      * @returns The documents that have been marked.
      */
-    async getMarkedDocuments(matrixData: MatrixMarksType) {
+    getMarkedDocuments(matrixData: MatrixMarksType) {
         const documents: Shadowrun.MarkedDocument[] = [];
 
         for (const {uuid, name, marks} of matrixData) {

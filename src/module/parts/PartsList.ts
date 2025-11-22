@@ -46,7 +46,7 @@ export class PartsList<TType> {
         this._list.length = 0;
     }
 
-    private _list: ModList<TType>;
+    private readonly _list: ModList<TType>;
 
     constructor(parts?: ModList<TType>) {
         let actualParts = [] as ModList<TType>;
@@ -54,7 +54,7 @@ export class PartsList<TType> {
             if (Array.isArray(parts)) {
                 actualParts = parts;
             } else if (typeof parts === 'object') {
-                for (const [name, value] of Object.entries(parts)) {
+                for (const [name, value] of Object.entries(parts as any)) {
                     if (value !== null && value !== undefined) {
                         // if it's a number, we are dealing with an array as an object
                         if (!isNaN(Number(name)) && typeof value === 'object') {
@@ -63,10 +63,7 @@ export class PartsList<TType> {
                                 value: (value as ModListEntry<TType>).value,
                             });
                         } else {
-                            actualParts.push({
-                                name,
-                                value,
-                            } as ModListEntry<TType>);
+                            actualParts.push({ name, value } as ModListEntry<TType>);
                         }
                     }
                 }
