@@ -2275,16 +2275,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     /**
-     * Move an item between two inventories.
-     * @param event
-     */
-    static async #moveItemToInventory(this: SR5BaseActorSheet, event: PointerEvent) {
-        event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
-        await this._moveItemToInventory(event.target);
-    }
-
-    /**
      * Show / hide the items description within a sheet item l ist.
      */
     static async #toggleSkillDescription(this: SR5BaseActorSheet, event: PointerEvent) {
