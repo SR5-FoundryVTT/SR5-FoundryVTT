@@ -245,7 +245,7 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
         RecoilModifiersHandler
     ];
     // The default sheet tab to open.
-    static _defaultTabId: string = 'physical';
+    static _defaultTabId = 'physical';
     
     // Manage modifiers stored on this target document. This might not be the document meant for those modifiers to be applied to.
     // While a scene can store modifiers, actors have them applied
@@ -472,7 +472,7 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
         return async (event) => {
             event.preventDefault();
 
-            if (!token || !token.actor) return;
+            if (!token?.actor) return;
             const app = new SituationModifiersApplication(token.actor);
             // Use async render as activateTab needs tabs to bind to rendered result.
             await app._render(true);

@@ -725,7 +725,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (this.targets.length === 0 && this.data.targetUuids) {
             this.targets = [];
             for (const uuid of this.data.targetUuids) {
-                const document = await fromUuid(uuid as any) as SR5Actor | SR5Item | null;
+                const document = await fromUuid<SR5Actor|SR5Item|TokenDocument>(uuid);
                 if (!document) continue;
 
                 if (document instanceof SR5Item) {
@@ -1327,7 +1327,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const formula = `${dice}d6`;
         const roll = new SR5Roll(formula);
         this.rolls.push(roll);
-        return;
     }
 
     /**
@@ -1920,7 +1919,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         }
 
         // Instead of manually applying whisper ids, let Foundry do it.
-        ChatMessage.applyRollMode(messageData, game.settings.get("core", "rollMode")!);
+        ChatMessage.applyRollMode(messageData, game.settings.get("core", "rollMode"));
 
         return messageData;
     }
@@ -1969,7 +1968,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         event.preventDefault();
         event.stopPropagation();
 
-        if (!game || !game.ready || !canvas || !canvas.ready) return;
+        if (!game?.ready || !canvas?.ready) return;
 
         const selectLink = $(event.currentTarget as HTMLElement);
         const tokenId = selectLink.data('tokenId');

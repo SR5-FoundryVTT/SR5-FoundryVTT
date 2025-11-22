@@ -22,7 +22,7 @@ export const NetworkStorage = {
      * @param slave A network icon document.
      * @param removeFromOthers When true, the slave will be removed from all other networks.
      */
-    async addSlave(master: SR5Item, slave: SR5Actor | SR5Item, removeFromOthers: boolean = false) {
+    async addSlave(master: SR5Item, slave: SR5Actor | SR5Item, removeFromOthers = false) {
         const networks = NetworkStorage.getStorage();
         const masterUuid = Helpers.uuidForStorage(master.uuid);
         const slaveUuid = Helpers.uuidForStorage(slave.uuid);

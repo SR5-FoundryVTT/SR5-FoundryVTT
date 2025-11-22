@@ -15,7 +15,7 @@ export const FireModeRules = {
      *
      * @returns a negative defense modifier value
      */
-    fireModeDefenseModifier: function(fireMode: FireModeType, ammoLeft: number=0): number {
+    fireModeDefenseModifier: function(fireMode: FireModeType, ammoLeft=0): number {
         // For negative rounds use a sane default.
         const rounds = fireMode.value < 0 ? fireMode.value * -1 : fireMode.value;
         // Due to legecy value, sometimes a string numerical sneaks in...
@@ -45,7 +45,7 @@ export const FireModeRules = {
      * @return compensation Amount of compensation left.
      * @return new recoil modifier.
      */
-    recoilModifierAfterAttack: function(fireMode: FireModeType, compensation: number, recoil: number=0, ammoLeft: number = 0): number {
+    recoilModifierAfterAttack: function(fireMode: FireModeType, compensation: number, recoil=0, ammoLeft = 0): number {
         // Sanitze negative fire mode values by pretending not to shoot.
         if (fireMode.value < 0) return 0;
         // Sanitaze negative ammo values by pretending to have just enough.
@@ -77,7 +77,7 @@ export const FireModeRules = {
      * 
      * @returns a negative number or zero.
      */
-    recoilModifier: function(compensation: number, recoil: number, additionalRecoil: number=0) {
+    recoilModifier: function(compensation: number, recoil: number, additionalRecoil=0) {
         return Math.min(compensation - (recoil + additionalRecoil), 0);
     },
 

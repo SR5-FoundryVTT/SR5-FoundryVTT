@@ -95,12 +95,12 @@ export const PackActionFlow = {
         // TODO: Use predefined ids instead of names...
         // TODO: use replaceAll instead, which needs an change to es2021 at least for the ts compiler
         actionName = this.packDocumentName(actionName).toLocaleLowerCase();
-        // eslint-disable-next-line
+
         const packEntry = pack.index.find(data => this.packDocumentName(data.name) === actionName);
         if (!packEntry) return undefined;
 
         const item = await pack.getDocument(packEntry._id) as unknown as SR5Item;
-        if (!item || item.type !== 'action') return undefined;
+        if (item?.type !== 'action') return undefined;
 
         console.debug(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, item);
         return item;

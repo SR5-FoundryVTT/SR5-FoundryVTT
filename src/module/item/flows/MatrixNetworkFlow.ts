@@ -249,7 +249,7 @@ export class MatrixNetworkFlow {
         if (!matrixData?.grid.uuid) return;
 
         const grid = foundry.utils.fromUuidSync(matrixData.grid.uuid) as SR5Item<'grid'> | undefined;
-        if (!grid || !grid.isType('grid')) return;
+        if (!grid?.isType('grid')) return;
         await NetworkStorage.addSlave(grid, slave);
     }
 

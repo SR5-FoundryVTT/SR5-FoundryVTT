@@ -36,7 +36,7 @@ export class ItemsParser {
         Parser.compendiumCache.clear();
         for (const packId of compendiumList) {
             const pack = game.packs.get(packId) as CompendiumCollection<"Item"> | undefined;
-            if (!pack || pack.metadata.type !== "Item") continue;
+            if (pack?.metadata.type !== "Item") continue;
 
             const index = await pack.getIndex({ fields: ["_id", "name", "type"] });
             Parser.compendiumCache.set(packId, index);

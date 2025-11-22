@@ -375,7 +375,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @param rounds The amount of rounds to be fired
      * @returns Either the weapon has no ammo at all or not enough.
      */
-    hasAmmo(rounds: number = 0): boolean {
+    hasAmmo(rounds = 0): boolean {
         return this.ammoLeft() >= rounds;
     }
 
@@ -542,7 +542,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         // first unload the current ammo
         await this.unloadAmmo();
         const equippedAmmo = this.getEquippedAmmo();
-        if (equippedAmmo && id === equippedAmmo.id) {
+        if (id === equippedAmmo?.id) {
             await equippedAmmo.update({ system: { technology: { equipped: false } } });
         } else {
             // then equip the new ammo

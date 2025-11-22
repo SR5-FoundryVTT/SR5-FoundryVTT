@@ -47,7 +47,7 @@ export const CreateModifiers = <T extends readonly string[]>(...keys: T) => {
     const field = () => new NumberField({ required: true, nullable: false, integer: true, initial: 0 });
     return Object.fromEntries(
         keys.map(modifier => [modifier, field()])
-    ) as { [K in T[number]]: ReturnType<typeof field> };
+    ) as Record<T[number], ReturnType<typeof field>>;
 };
 
 const InventoryData = () => ({

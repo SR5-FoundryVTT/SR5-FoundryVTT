@@ -419,9 +419,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *
      * NOTE: This doesn't only include characters but spirits, critters and more.
      */
-    async useEdge(this: SR5Actor, by: number = -1) {
+    async useEdge(this: SR5Actor, by = -1) {
         const edge = this.getEdge();
-        if (edge && edge.value === 0) return;
+        if (edge?.value === 0) return;
         // NOTE: There used to be a bug which could lower edge usage below zero. Let's quietly ignore and reset. :)
         const usesLeft = edge.uses > 0 ? edge.uses : by * -1;
 
@@ -1502,7 +1502,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         condition = this.__addDamageToTrackValue(damage, condition);
 
         await device.update({ system: { technology: { condition_monitor: condition } } });
-        return;
+        
     }
 
     /**

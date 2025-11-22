@@ -424,7 +424,7 @@ export const MatrixTestDataFlow = {
         // Assure main icon selection is set as the target icon.
         if (test.data.targetMainIcon) test.data.iconUuid = this._getMainIconUuid(test);
         // Document might have changed in between initial preparation and dialog selections.
-        test.icon = fromUuidSync(test.data.iconUuid!) as SR5Item | SR5Actor;
+        test.icon = fromUuidSync(test.data.iconUuid) as SR5Item | SR5Actor;
     },
 
     /**

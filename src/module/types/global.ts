@@ -274,7 +274,6 @@ declare module "fvtt-types/configuration" {
 type _NeverToUnknown<T> = [T] extends [never] ? unknown : T;
 
 declare global {
-    // eslint-disable-next-line no-var
     var routinglib: RoutingLib | null;
 
     interface Game {

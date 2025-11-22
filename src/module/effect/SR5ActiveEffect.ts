@@ -92,7 +92,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     /**
      * Render the sheet of the active effect source
      */
-    public renderSourceSheet() {
+    public async renderSourceSheet() {
         if (this.source instanceof SR5Actor || this.source instanceof SR5Item)
             return this.source?.sheet?.render(true);
         return undefined;
