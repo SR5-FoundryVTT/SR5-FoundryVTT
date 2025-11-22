@@ -5,7 +5,6 @@ import { AttributesPrep } from "./AttributesPrep";
 import { SR5Item } from 'src/module/item/SR5Item';
 import { DataDefaults } from '@/module/data/DataDefaults';
 import { MatrixAttributeFieldType } from '@/module/types/template/Matrix';
-import { Typed } from '@/module/types/typed';
 
 export class MatrixPrep {
     /**
@@ -98,7 +97,7 @@ export class MatrixPrep {
         const { matrix, attributes, limits } = system;
 
         // add matrix attributes to both limits and attributes as hidden entries
-        for (const attributeName of Typed.keys(SR5.matrixAttributes)) {
+        for (const attributeName of Object.keys(SR5.matrixAttributes)) {
             const attribute = matrix[attributeName];
             AttributesPrep.prepareAttribute(attributeName, attribute);
             const { value, base, mod, label } = attribute;

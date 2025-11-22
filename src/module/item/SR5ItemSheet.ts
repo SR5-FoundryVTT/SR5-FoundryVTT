@@ -734,7 +734,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     }
 
     async _onClipSelect(clipType: string) {
-        if (!clipType || !Object.keys(SR5.weaponCliptypes).includes(clipType)) return;
+        if (!clipType || !(Object.keys(SR5.weaponCliptypes) as string[]).includes(clipType)) return;
         const clip_type = clipType as AmmunitionType['clip_type'];
 
         const agilityValue = this.item.actor ? this.item.actor.getAttribute('agility').value : 0;
