@@ -26,6 +26,7 @@ export default [
             },
         },
         rules: {
+            "@typescript-eslint/no-deprecated": "warn",
             "@typescript-eslint/await-thenable": "warn",
             "@typescript-eslint/no-floating-promises": "warn",
             "@typescript-eslint/no-misused-promises": "warn",
