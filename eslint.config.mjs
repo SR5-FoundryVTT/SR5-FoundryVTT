@@ -1,10 +1,10 @@
 import globals from "globals";
 import pluginJs from "@eslint/js";
 import tseslint from "typescript-eslint";
-import { defineConfig } from 'eslint/config';
 import prettierConfig from "eslint-config-prettier";
 
-export default defineConfig(
+/** @type {import('eslint').Linter.Config[]} */
+export default [
     { ignores: ["**/*.js", "**/*.mjs", "dist/**", "node_modules/**"] },
     pluginJs.configs.recommended,
     ...tseslint.configs.recommendedTypeChecked,
@@ -21,7 +21,6 @@ export default defineConfig(
                 ...globals.es2021,
             },
             parserOptions: {
-                // 'projectService' is the new, faster way to handle type-checking in v8/9
                 projectService: true,
                 tsconfigRootDir: import.meta.dirname,
             },
@@ -40,16 +39,16 @@ export default defineConfig(
             "@typescript-eslint/no-unnecessary-type-assertion": "warn",
             "@typescript-eslint/non-nullable-type-assertion-style": "off",
             "@typescript-eslint/no-redundant-type-constituents": "warn",
-
-            // Replaced 'ban-types' (deprecated) with these two:
             "@typescript-eslint/no-unsafe-function-type": "warn",
             "@typescript-eslint/no-wrapper-object-types": "warn",
-
-            "@typescript-eslint/no-unsafe-argument": "warn",
-            "@typescript-eslint/no-unsafe-assignment": "warn", // Relaxed for Quench/Foundry contexts
-            "@typescript-eslint/no-unsafe-call": "warn",       // Relaxed for Quench/Foundry contexts
             "@typescript-eslint/no-unsafe-member-access": "warn",
             "@typescript-eslint/no-unsafe-return": "warn",
+            
+            // Relaxed for Quench/Foundry contexts
+            "@typescript-eslint/no-unsafe-argument": "warn",
+            "@typescript-eslint/no-unsafe-assignment": "warn", 
+            "@typescript-eslint/no-unsafe-call": "warn", 
+
             "eqeqeq": "warn",
             "no-case-declarations": "warn",
             "no-empty": "warn",
@@ -83,7 +82,7 @@ export default defineConfig(
             "@typescript-eslint/require-array-sort-compare": "warn",
             "@typescript-eslint/unbound-method": "warn",
 
-            // Formatting rules explicitly handled by Prettier (kept off to avoid conflicts)
+            // Handled by Prettier
             "@typescript-eslint/comma-spacing": "off",
             "@typescript-eslint/lines-between-class-members": "off",
             "new-cap": "off",
@@ -91,7 +90,7 @@ export default defineConfig(
             "spaced-comment": "off",
             "@typescript-eslint/space-before-function-paren": "off",
 
-            // Style preferences
+            // Style Preferences / Off
             "@typescript-eslint/array-type": "off",
             "@typescript-eslint/consistent-type-definitions": "off",
             "@typescript-eslint/consistent-type-imports": "off",
@@ -113,4 +112,4 @@ export default defineConfig(
             "@typescript-eslint/no-var-requires": "warn",
         },
     }
-);
+];
