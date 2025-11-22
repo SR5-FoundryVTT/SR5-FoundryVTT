@@ -135,7 +135,7 @@ export class TestDialog extends FormDialog {
         Object.entries(data).forEach(([key, value]) => {
             // key is expected to be relative from TestDialog.data and begin with 'test'
             const valueField = foundry.utils.getProperty(this.data, key) as ModifiableValueType | undefined | null;
-            if (!valueField || foundry.utils.getType(valueField) !== 'Object' || !valueField.hasOwnProperty('mod')) return;
+            if (!valueField || foundry.utils.getType(valueField) !== 'Object' || !Object.hasOwn(valueField, 'mod')) return;
 
             // Remove from further automatic data merging.
             delete data[key];

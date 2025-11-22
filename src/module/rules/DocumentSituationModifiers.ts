@@ -132,7 +132,7 @@ export class DocumentSituationModifiers {
      * @returns true, when a total modifier can be calculated by a handler.
      */
     handlesTotalFor(category: string) {
-        return this._modifiers.hasOwnProperty(category);
+        return Object.hasOwn(this._modifiers, category);
     }
 
     /**
@@ -181,7 +181,7 @@ export class DocumentSituationModifiers {
         data = foundry.utils.duplicate(data);
 
         for (const [category, modifiers] of Object.entries(DocumentSituationModifiers._defaultModifiers)) {
-            if (!data.hasOwnProperty(category)) data[category] = modifiers;
+            if (!Object.hasOwn(data, category)) data[category] = modifiers;
         }
 
         return data as SituationModifiersSourceData;
@@ -271,7 +271,7 @@ export class DocumentSituationModifiers {
     static async clearTypeOn(document: ModifiableDocumentTypes, category: keyof SituationModifiersSourceData): Promise<DocumentSituationModifiers> {
         const modifiers = DocumentSituationModifiers.getDocumentModifiers(document);
 
-        if (!modifiers.source.hasOwnProperty(category)) return modifiers;
+        if (!Object.hasOwn(modifiers.source, category)) return modifiers;
         modifiers.source[category] = DocumentSituationModifiers._defaultModifier;
 
         await DocumentSituationModifiers.setDocumentModifiers(document, modifiers.source);

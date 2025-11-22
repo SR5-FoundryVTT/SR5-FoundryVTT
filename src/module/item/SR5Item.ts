@@ -1211,7 +1211,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     get _isNestedItem(): boolean {
-        return this.hasOwnProperty('parent') && this.parent instanceof SR5Item;
+        return Object.hasOwn(this, 'parent') && this.parent instanceof SR5Item;
     }
 
     /**

@@ -227,7 +227,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * @returns 
      */
     static async _handleCreateTargetedEffectsSocketMessage(message: Shadowrun.SocketMessageData) {
-        if (!message.data.hasOwnProperty('actorUuid') && !message.data.hasOwnProperty('effectsData')) {
+        if (!Object.hasOwn(message.data, 'actorUuid') && !Object.hasOwn(message.data, 'effectsData')) {
             console.error(`Shadowrun 5e | ${this.name} Socket Message is missing necessary properties`, message);
             return;
         }

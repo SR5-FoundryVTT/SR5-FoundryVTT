@@ -24,7 +24,7 @@ export class InventoryFlow {
     constructor(actor: SR5Actor) {
         // Check for sub-type actors.
         // NOTE: This should be checked through actor.system.modelProvider, though this doesn´t exist sometimes?
-        if (actor.type.includes('.') || !game.model.Actor.hasOwnProperty(actor.type)) {
+        if (actor.type.includes('.') || !Object.hasOwn(game.model.Actor, actor.type)) {
             console.debug(`Shadowrun 5e | InventoryFlow ignored actor ${actor.name} as it has a non-system DataModel`);
             return;
         }
