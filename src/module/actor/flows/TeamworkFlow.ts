@@ -128,7 +128,9 @@ export class TeamworkTest {
      * @returns 
      */
     static async _handleUpdateSocketMessage(socketMessage: Shadowrun.SocketMessageData) {
-        if (!socketMessage.data.hasOwnProperty('messageUuid') || !socketMessage.data.hasOwnProperty('content') || !socketMessage.data.hasOwnProperty('teamworkData')) {
+        const requiredProps = ['messageUuid', 'content', 'teamworkData'] as const;
+        const missingProps = requiredProps.some(prop => !Object.hasOwn(socketMessage.data, prop));
+        if (missingProps) {
             console.error(`Shadowrun 5e | Teamwork Socket Message is missing necessary properties`, socketMessage);
             return;
         }

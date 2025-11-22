@@ -257,7 +257,7 @@ export class Helpers {
 
     static addLabels(obj, label) {
         if (typeof obj === 'object' && obj !== null) {
-            if (!obj.hasOwnProperty('label') && obj.hasOwnProperty('value') && label !== '') {
+            if (!Object.hasOwn(obj, 'label') && Object.hasOwn(obj, 'value') && label !== '') {
                 obj.label = label;
             }
             Object.entries(obj)
@@ -404,7 +404,7 @@ export class Helpers {
     static convertLengthUnit(length: number, fromUnit: string): number {
         fromUnit = fromUnit.toLowerCase();
 
-        if (!LENGTH_UNIT_TO_METERS_MULTIPLIERS.hasOwnProperty(fromUnit)) {
+        if (!Object.hasOwn(LENGTH_UNIT_TO_METERS_MULTIPLIERS, fromUnit)) {
             console.error(`Distance can't be converted from ${fromUnit} to ${LENGTH_UNIT}`);
             return 0;
         }
@@ -901,7 +901,7 @@ export class Helpers {
      */
     static objectHasKeys(obj: object, keys: string[]): boolean {
         for (const key of keys) {
-            if (!obj.hasOwnProperty(key)) return false;
+            if (!Object.hasOwn(obj, key)) return false;
         }
 
         return true;
