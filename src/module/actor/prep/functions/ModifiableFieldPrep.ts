@@ -6,17 +6,17 @@ const { ArrayField, TypedObjectField, SchemaField } = foundry.data.fields;
 export class ModifiableFieldPrep {
 
     private static traverseFields(
-        source: object,
+        source: unknown,
         resolveField: (key: string) => foundry.data.fields.DataField.Any,
         func: (mod: ModifiableValueType) => void
     ): void {
         if (!source || (typeof source !== "object")) return;
 
-        for (const [fieldName, value] of Object.entries(source as any)) {
+        for (const [fieldName, value] of Object.entries(source)) {
             const field = resolveField(fieldName);
 
             if (field instanceof ModifiableField)
-                func(value);
+                func(value as ModifiableValueType);
             else if (field instanceof SchemaField)
                 this.traverseFields(value, (subKey) => field.fields[subKey], func);
             else if (field instanceof TypedObjectField || field instanceof ArrayField)

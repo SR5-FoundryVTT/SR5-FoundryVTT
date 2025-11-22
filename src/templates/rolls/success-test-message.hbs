@@ -45,7 +45,7 @@
         </div>
         {{/if}}
         {{#unless test.autoSuccess}}
-        <div class="card-content {{#if showDescription}}clickable show-description{{/if}} {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
+        <div class="card-content {{#if showDescription}} show-description{{/if}} {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
             <div class="left-side">
                 {{#if test.opposing}}
                 <div class="test-value">
@@ -54,15 +54,17 @@
                 </div>
                 {{/if}}
                 {{#if test.hasLimit}}
-                <div class="test-value">
+                <div class="test-value value-mod">
                     <span class="value">{{localize test.limit.label}}:</span>
                     <span class="value-result">{{test.limit.value}}</span>
+                    {{> "systems/shadowrun5e/dist/templates/common/ValueModifiers.hbs" card=true value=test.limit}}
                 </div>
                 {{/if}}
                 {{#if test.hasThreshold}}
-                <div class="test-value">
+                <div class="test-value value-mod">
                     <span class="value">{{localize test.threshold.label}}:</span>
                     <span class="value-result">{{test.threshold.value}}</span>
+                    {{> "systems/shadowrun5e/dist/templates/common/ValueModifiers.hbs" card=true value=test.threshold}}
                 </div>
                 {{/if}}
                 {{#if test.opposing}}
@@ -73,9 +75,10 @@
                 {{/if}}
             </div>
             <div class="right-side">
-                <div class="test-value">
+                <div class="test-value value-mod">
                     <span class="value">{{localize test.pool.label}}:</span>
                     <span class="value-result">{{test.pool.value}}</span>
+                    {{> "systems/shadowrun5e/dist/templates/common/ValueModifiers.hbs" card=true value=test.pool}}
                 </div>
                 <div class="test-value">
                     <span class="value">{{localize test.hits.label}}:</span>

@@ -1,7 +1,9 @@
-<div class="value-modifiers-container">
+<div class="value-modifiers-container {{#if card}}card-style{{/if}}">
     <div class="value-modifiers">
-        <div class="value-modifier-name">{{localize 'SR5.BaseValue'}}</div>
-        <div class="value-modifiers-base">{{value.base}}</div>
+        {{#if (or (not card) value.base)}}
+            <div class="value-modifier-name">{{localize 'SR5.BaseValue'}}</div>
+            <div class="value-modifiers-base">{{value.base}}</div>
+        {{/if}}
         {{#each value.changes as |change|}}
             <div class="value-modifier-name {{#if change.masked}}value-modifiers-invalid-total{{/if}}">{{localize change.name}}</div>
             <div class="value-modifiers-modifier {{#if change.masked}}value-modifiers-invalid-total{{/if}}">{{getChangeValue change}}</div>

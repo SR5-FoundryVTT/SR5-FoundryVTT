@@ -2,7 +2,7 @@
 <div class="list-item item-section space-evenly flexrow">    
     {{#each system.limits as |limit id|}} {{#unless limit.hidden}}
         <div class="limit">
-            <div class="limit-row value">
+            <div class="limit-row value-mod">
                 <span class="limit-title">{{localize limit.label}}</span>
                 <span class="limit-value" value="{{limit.value}}">{{limit.value}}</span>
                 {{> "systems/shadowrun5e/dist/templates/common/ValueModifiers.hbs" value=limit}}

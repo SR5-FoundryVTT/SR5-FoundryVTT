@@ -581,7 +581,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     roundBaseValueParts() {
         const roundAllMods = (value: ValueFieldType) => {
             value.base = Math.ceil(value.base);
-            for (const change of value.changes) change.value = Math.ceil(change.value);
+            for (const change of value.changes)
+                change.value = Math.ceil(change.value);
         }
 
         roundAllMods(this.data.pool);
