@@ -388,7 +388,8 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             const action = DataDefaults.createData('action_roll', { test: 'SuccessTest' });
 
-            const test = (await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }))!;
+            const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false });
+            if (!test) throw new Error('Failed to create test from action.');
 
             await test.execute();
 
@@ -713,6 +714,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             const action = DataDefaults.createData('action_roll', { test: SkillTest.name, limit: { attribute: 'social' } });
             const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SkillTest;
+            if (!test) throw new Error('Failed to create test from action.');
 
             // Simulate relevant part of #execute
             test.effects.applyAllEffects();
@@ -749,7 +751,8 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             // CASE - Test uses the same category
             let action = DataDefaults.createData('action_roll', { test: 'SkillTest', categories: ['social'] });
-            let test = (await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }))!;
+            let test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false });
+            if (!test) throw new Error('Failed to create test from action.');
 
             // Simulate relevant part of #execute
             test.prepareTestCategories();
@@ -761,7 +764,8 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             // CASE - Test uses different category
             action = DataDefaults.createData('action_roll', { test: 'SkillTest', categories: ['matrix'] });
-            test = (await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }))!;
+            test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false });
+            if (!test) throw new Error('Failed to create test from action.');
 
             // Simulate relevant part of #execute
             test.prepareTestCategories();
@@ -773,7 +777,8 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             // CASE - Test uses no category
             action = DataDefaults.createData('action_roll', { test: 'SkillTest', categories: [] });
-            test = (await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }))!;
+            test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false });
+            if (!test) throw new Error('Failed to create test from action.');
 
             // Simulate relevant part of #execute
             test.prepareTestCategories();
