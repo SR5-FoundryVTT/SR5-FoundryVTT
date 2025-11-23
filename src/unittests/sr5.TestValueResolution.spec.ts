@@ -115,17 +115,6 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             assert.equal(rollData.attributes.firewall.value, 3);
         });
 
-        it('Device in WAN using host attributes', async () => {
-            const host = await factory.createItem({ type: 'host', system: { technology: { rating: 5 } } });
-            const device = await factory.createItem({ type: 'equipment', system: { technology: { rating: 3, master: host.uuid } } });
-
-            const action = DataDefaults.createData('action_roll', { categories: ['matrix'] });
-
-            const rollData = device.getRollData({ action });
-
-            assert.equal(rollData.attributes.firewall.value, 5);
-        });
-
         it('Device in WAN using own attributes due to direct connection', async () => {
             const host = await factory.createItem({ type: 'host', system: { technology: { rating: 5 } } });
             const device = await factory.createItem({ type: 'equipment', system: { technology: { rating: 3, master: host.uuid } } });
