@@ -46,8 +46,7 @@ const PACK_SRC = 'packs/_source';
             .alias('help', 'h')
             .parse();
     } catch (e) {
-        console.error(e);
-        process.exit(1);
+        console.error("Please close the Foundry VTT application before running this script.");
     }
 })();
 

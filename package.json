@@ -33,9 +33,12 @@
         "yargs": "^18.0.0"
     },
     "scripts": {
-        "prebuild": "tsc",
         "build": "vite build",
         "watch": "vite build --watch --mode development",
+        "prebuild": "tsc",
+        "test": "tsc --project tsconfig.json --noEmit",
+        "build:db": "node ./utils/packs.mjs package pack",
+        "unpack:db": "node ./utils/packs.mjs package unpack",
         "dev": "vite",
         "lint": "npx eslint .",
         "lint:fix": "npx eslint . --fix",

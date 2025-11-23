@@ -1,5 +1,5 @@
+import { SR5TestFactory } from '../utils';
 import { SR5Actor } from '@/module/actor/SR5Actor';
-import { SR5TestFactory } from 'src/unittests/utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { CompanionSprite } from './Examples/CompanionSprite';
 import { SpriteImporter } from '../../module/apps/actorImport/spriteImporter/SpriteImporter';
