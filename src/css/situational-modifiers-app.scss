@@ -1,3 +1,5 @@
+@use "config/variables";
+
 .sr5v2 {
     /** CSS for the Environmental Modifier Application Window
      *
@@ -13,8 +15,8 @@
     .env-modifier-active {
         border-radius: 8px;
         //box-shadow: $dark-sunken-box-shadow;
-        background-color: $darkred; //$dark-sunken;
-        color: $yellow;
+        background-color: variables.$darkred; //$dark-sunken;
+        color: variables.$yellow;
     }
 
     .env-modifier-total {

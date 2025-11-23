@@ -1,6 +1,5 @@
 {
   "_id": "rz7mXCyM8YQjcvO1",
-  "_key": "!items!rz7mXCyM8YQjcvO1",
   "folder": null,
   "name": "Binder",
   "type": "action",
@@ -115,5 +114,6 @@
     }
   },
   "effects": [],
-  "flags": {}
+  "flags": {},
+  "_key": "!items!rz7mXCyM8YQjcvO1"
 }

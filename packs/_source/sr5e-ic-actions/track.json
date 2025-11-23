@@ -1,6 +1,5 @@
 {
   "_id": "JEsjfsfvsaxHt2co",
-  "_key": "!items!JEsjfsfvsaxHt2co",
   "folder": null,
   "name": "Track",
   "type": "action",
@@ -115,5 +114,6 @@
     }
   },
   "effects": [],
-  "flags": {}
+  "flags": {},
+  "_key": "!items!JEsjfsfvsaxHt2co"
 }

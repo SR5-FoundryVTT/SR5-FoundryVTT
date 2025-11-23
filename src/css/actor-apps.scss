@@ -1,3 +1,5 @@
+@use "config/variables";
+
 .sr5v2 {
     &.karma-manager, &.nuyen-manager, &.reputation-manager, &.inventory-rename {
         .sheet-footer {
@@ -12,12 +14,12 @@
         label.label {
             font-size: 1.25rem;
             &.positive {
-                color: $matrix-green;
-                text-shadow: 0 0 2px 1px $matrix-green;
+                color: variables.$matrix-green;
+                text-shadow: 0 0 2px 1px variables.$matrix-green;
             }
             &.negative {
-                color: $physical;
-                text-shadow: 0 0 2px 1px $physical;
+                color: variables.$physical;
+                text-shadow: 0 0 2px 1px variables.$physical;
             }
         }
         .mod-input {

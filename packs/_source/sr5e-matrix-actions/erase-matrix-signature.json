@@ -1,5 +1,4 @@
 {
-  "_key": "!items!h3BIx7VKwI6c2Ufy",
   "_id": "h3BIx7VKwI6c2Ufy",
   "name": "Erase Matrix Signature",
   "type": "action",
@@ -133,5 +132,7 @@
       "isImported": false
     }
   },
-  "folder": null
+  "folder": null,
+  "flags": {},
+  "_key": "!items!h3BIx7VKwI6c2Ufy"
 }

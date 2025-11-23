@@ -1,3 +1,4 @@
+@use "sass:color";
 /* --- Shadowrun 5th Edition Compendium Browser (SCSS Version) --- */
 
 /* --- Variables --- */
@@ -115,7 +116,7 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                     background: $border-strong;
                     border-radius: 4px;
                     &:hover {
-                        background: lighten($border-strong, 10%);
+                        background: color.adjust($border-strong, $lightness: 10%);
                     }
                 }
             }
@@ -213,7 +214,7 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                     background: $border-strong;
                     border-radius: 4px;
                     &:hover {
-                        background: lighten($border-strong, 5%);
+                        background: color.adjust($border-strong, $lightness: 5%);
                     }
                 }
             }
@@ -303,7 +304,7 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
             .loading {
                 padding: 40px 20px;
                 text-align: center;
-                color: darken($text-placeholder, 5%);
+                color: color.adjust($text-placeholder, $lightness: -5%);
                 font-style: italic;
                 background: $bg-primary;
             }
@@ -311,7 +312,7 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
             .no-results {
                 padding: 40px 20px;
                 text-align: center;
-                color: darken($text-placeholder, 5%);
+                color: color.adjust($text-placeholder, $lightness: -5%);
                 font-style: italic;
                 background: $bg-primary;
             }

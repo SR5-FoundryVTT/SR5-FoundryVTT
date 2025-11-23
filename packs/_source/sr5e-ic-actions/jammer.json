@@ -1,6 +1,5 @@
 {
   "_id": "dQeflPIJct1jEVfx",
-  "_key": "!items!dQeflPIJct1jEVfx",
   "folder": null,
   "name": "Jammer",
   "type": "action",
@@ -115,5 +114,6 @@
     }
   },
   "effects": [],
-  "flags": {}
+  "flags": {},
+  "_key": "!items!dQeflPIJct1jEVfx"
 }

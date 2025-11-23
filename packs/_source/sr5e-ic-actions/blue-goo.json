@@ -1,6 +1,5 @@
 {
   "_id": "GEzglPiLS2oDoDdd",
-  "_key": "!items!GEzglPiLS2oDoDdd",
   "folder": null,
   "name": "Blue Goo",
   "type": "action",
@@ -115,5 +114,6 @@
     }
   },
   "effects": [],
-  "flags": {}
+  "flags": {},
+  "_key": "!items!GEzglPiLS2oDoDdd"
 }

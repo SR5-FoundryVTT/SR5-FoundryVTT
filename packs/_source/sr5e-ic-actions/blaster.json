@@ -1,6 +1,5 @@
 {
   "_id": "2QszeZgotxb4QJPa",
-  "_key": "!items!2QszeZgotxb4QJPa",
   "folder": null,
   "name": "Blaster",
   "type": "action",
@@ -116,5 +115,6 @@
     }
   },
   "effects": [],
-  "flags": {}
+  "flags": {},
+  "_key": "!items!2QszeZgotxb4QJPa"
 }

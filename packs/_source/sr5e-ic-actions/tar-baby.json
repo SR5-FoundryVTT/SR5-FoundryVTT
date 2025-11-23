@@ -1,6 +1,5 @@
 {
   "_id": "FjPwjlnpmY8BR0fR",
-  "_key": "!items!FjPwjlnpmY8BR0fR",
   "folder": null,
   "name": "Tar Baby",
   "type": "action",
@@ -115,5 +114,6 @@
     }
   },
   "effects": [],
-  "flags": {}
+  "flags": {},
+  "_key": "!items!FjPwjlnpmY8BR0fR"
 }

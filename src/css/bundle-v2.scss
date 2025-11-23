@@ -1,31 +1,35 @@
+@use "sass:color";
+@use "config/mixins";
+@use "config/variables";
+
 .sr5v2 {
-    box-shadow: 0 0 10px 5px rgba($yellow, 0.4);
+    box-shadow: 0 0 10px 5px rgba(variables.$yellow, 0.4);
     background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
     background-repeat: repeat;
     background-size: 100% 20px auto;
 
     // color links as light and be white on hover
     a {
-        color: $light;
+        color: variables.$light;
         &:hover {
-            color: $white;
+            color: variables.$white;
         }
     }
     // labels are all yellow to differentiate between links
     label {
-        color: $yellow;
+        color: variables.$yellow;
     }
     // buttons use the link color for border and text color, on hover it fills in with a darkred background
     button {
-        color: $light;
-        border-color: $light;
+        color: variables.$light;
+        border-color: variables.$light;
         &:not(:disabled):hover {
-            color: $white;
-            background: $darkred;
+            color: variables.$white;
+            background: variables.$darkred;
         }
         &:disabled {
-            color: $yellow;
-            border-color: $yellow;
+            color: variables.$yellow;
+            border-color: variables.$yellow;
         }
     }
 
@@ -42,26 +46,26 @@
             vertical-align: middle;
             margin-left: 1px;
             width: auto;
-            text-shadow: 1px 1px 1px $white,
-                        1px -1px 1px $white,
-                        -1px -1px 1px $white,
-                        -1px 1px 1px $white;
+            text-shadow: 1px 1px 1px variables.$white,
+                        1px -1px 1px variables.$white,
+                        -1px -1px 1px variables.$white,
+                        -1px 1px 1px variables.$white;
         }
     }
 
     // a named sheet is a sheet which shows its name elsewhere so we can hide most of the top bar and hide the name
     &.named-sheet {
         input.sheet-name {
-            @include systemFonts;
+            @include mixins.systemFonts;
             flex-shrink: 0;
-            background: $nameplate-background;
+            background: variables.$nameplate-background;
             border: none;
             margin-bottom: 0;
             font-size: 1.5rem;
             height: 100%;
             padding: .5rem;
             vertical-align: center;
-            color: $light; // always use light color for our custom name
+            color: variables.$light; // always use light color for our custom name
         }
         &:not(.minimized) {
             .window-header {
@@ -132,7 +136,7 @@
             align-items: center;
             justify-content: start;
             margin-top: .25rem;
-            border-top: 1px solid $yellow;
+            border-top: 1px solid variables.$yellow;
             flex-shrink: 0;
             vertical-align: bottom;
         }
@@ -143,10 +147,10 @@
                 padding: .5rem .25rem;
                 margin: 0;
                 label {
-                    color: $yellow;
+                    color: variables.$yellow;
                 }
                 p.hint {
-                    color: darken($yellow, 20%);
+                    color: color.adjust(variables.$yellow, $lightness: -20%);
                 }
             }
         }
@@ -157,21 +161,21 @@
             padding-inline: 1px;
             margin-top: .5rem;
             border-top: none;
-            border-bottom: 1px solid $darkred;
+            border-bottom: 1px solid variables.$darkred;
             a {
-                color: $light; // use light regardless of theme
+                color: variables.$light; // use light regardless of theme
                 line-height: 1.5rem;
                 border-top-left-radius: .25rem;
                 border-top-right-radius: .25rem;
-                border: 1px solid $darkred;
+                border: 1px solid variables.$darkred;
                 border-bottom: none;
-                background: rgba($darkred, 0.7);
+                background: rgba(variables.$darkred, 0.7);
                 width: 100%;
                 white-space: nowrap;
                 &.active {
-                    color: $darkred;
-                    background: $light-2;
-                    box-shadow: 0 0 5px 5px rgba($white, 0.2);
+                    color: variables.$darkred;
+                    background: variables.$light-2;
+                    box-shadow: 0 0 5px 5px rgba(variables.$white, 0.2);
                 }
                 &.skinny {
                     flex: 0 0 2rem;
@@ -194,10 +198,10 @@
 
     // default all selects and inputs to light color until we have proper theme handling
     input, select {
-        color: $light;
+        color: variables.$light;
 
         > option {
-            color: $yellow;
+            color: variables.$yellow;
         }
     }
     input.nuyen {
@@ -250,16 +254,16 @@
         width: 100%;
         &.sr5-submit {
             background: #227836;
-            color: $light;
+            color: variables.$light;
             &:hover {
-                color: $white;
+                color: variables.$white;
             }
         }
         &.sr5-cancel {
-            background: $darkred;
-            color: $light;
+            background: variables.$darkred;
+            color: variables.$light;
             &:hover {
-                color: $white;
+                color: variables.$white;
             }
         }
     }
@@ -267,18 +271,18 @@
         height: 1.5rem;
         max-height: 1.5rem;
         background-color: transparent;
-        color: $light;
+        color: variables.$light;
         margin: 0;
         padding: 0;
         vertical-align: center;
 
         &:hover {
-            color: $white;
+            color: variables.$white;
         }
 
         > option {
-            color: $yellow;
-            background-color: rgba($black, 0.9);
+            color: variables.$yellow;
+            background-color: rgba(variables.$black, 0.9);
         }
     }
     button.sr5-icon {
@@ -287,7 +291,7 @@
         padding: 0 !important;
         margin: 0 !important;
         &:hover {
-            border-color: $white;
+            border-color: variables.$white;
         }
     }
 
@@ -318,11 +322,11 @@
     .inline-roll {
         border: 0;
         background: none;
-        color: $white !important;
+        color: variables.$white !important;
     }
 
     .entity-link.content-link {
-        color: $white !important;
+        color: variables.$white !important;
     }
 
     .basic-row {
@@ -349,7 +353,7 @@
         border-radius: 2px;
         white-space: nowrap;
         word-break: break-all;
-        color: $black;
+        color: variables.$black;
     }
 
     .editor {
@@ -358,7 +362,7 @@
     }
 
     .editor .tox-edit-area {
-        background: $mce-background;
+        background: variables.$mce-background;
     }
 
     // Styling for any prosemirror editors within shadowrun applications.
@@ -366,7 +370,7 @@
 
         .editor-menu {
             padding: 2px 4px;
-            background: $darkred;
+            background: variables.$darkred;
             li {
                 padding: 0;
                 > button {
@@ -376,33 +380,33 @@
         }
         // handles dropdown menus, not select based.
         .pm-dropdown {
-            color: $color;
-            background: rgba($black, 0.05);
+            color: variables.$color;
+            background: rgba(variables.$black, 0.05);
             border-radius: 0.3em;
-            border-color: $dark;
+            border-color: variables.$dark;
 
             // Icons like chevron and ticks.
             i,
             i:hover {
-                color: $color;
+                color: variables.$color;
             }
 
             // ul will contain menus and sub-menus and can be nested.
             ul {
-                background-color: $dark;
+                background-color: variables.$dark;
             }
 
             // li represents each menu entry in both menus and sub-menus
             ul > li:hover {
-                color: $color;
-                border-color: rgba($white, 0.1);
-                background: rgba($black, 0.05);
+                color: variables.$color;
+                border-color: rgba(variables.$white, 0.1);
+                background: rgba(variables.$black, 0.05);
             }
         }
 
         // HTML editing uses a class-less textarea
         textarea {
-            color: $color;
+            color: variables.$color;
         }
     }
 
@@ -410,7 +414,7 @@
         height: 95%;
         min-height: 15em;
         width: 100%;
-        color: $color;
+        color: variables.$color;
     }
 
     img {
@@ -421,14 +425,14 @@
     }
 
     .sheet .editor-content {
-        color: $white;
+        color: variables.$white;
         height: 100%;
         overflow-y: auto;
         word-break: break-word;
     }
 
     .container {
-        max-width: $sheet-max-width;
+        max-width: variables.$sheet-max-width;
         margin: 0 auto;
 
         &--fluid {
@@ -443,9 +447,9 @@
         }
 
         // Auto create grid style classes for a fixed max column grid
-        @for $i from 1 through $grid__cols {
+        @for $i from 1 through variables.$grid__cols {
             &__col-#{$i} {
-                flex-basis: calc(100 / ($grid__cols / $i)) * 1%;
+                flex-basis: calc(100 / (variables.$grid__cols / $i)) * 1%;
                 overflow: hidden;
             }
         }
@@ -515,7 +519,7 @@
         }
         > *:not(:first-child) {
             padding-left: 0.25rem;
-            border-left: $groove;
+            border-left: variables.$groove;
         }
         > *:not(:last-child) {
             padding-right: 0.25rem;

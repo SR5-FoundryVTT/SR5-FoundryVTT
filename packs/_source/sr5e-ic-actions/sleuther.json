@@ -1,6 +1,5 @@
 {
   "_id": "ZTMuPy8dAeu6qRvc",
-  "_key": "!items!ZTMuPy8dAeu6qRvc",
   "folder": null,
   "name": "Sleuther",
   "type": "action",
@@ -115,5 +114,6 @@
     }
   },
   "effects": [],
-  "flags": {}
+  "flags": {},
+  "_key": "!items!ZTMuPy8dAeu6qRvc"
 }

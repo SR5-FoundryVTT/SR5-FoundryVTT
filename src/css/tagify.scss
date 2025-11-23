@@ -1,10 +1,12 @@
+@use "config/variables";
+
 .sr5v2 {
 
     // change tagify input selection to match our theme better
     .tagify-selection {
         border-radius: 4px;
-        background: $dark;
-        border: 1px solid $light;
+        background: variables.$dark;
+        border: 1px solid variables.$light;
         width: 100%;
     }
 }

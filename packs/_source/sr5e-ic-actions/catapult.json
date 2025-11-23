@@ -1,6 +1,5 @@
 {
   "_id": "xwF64xDi2jiUVmc5",
-  "_key": "!items!xwF64xDi2jiUVmc5",
   "folder": null,
   "name": "Catapult",
   "type": "action",
@@ -115,5 +114,6 @@
     }
   },
   "effects": [],
-  "flags": {}
+  "flags": {},
+  "_key": "!items!xwF64xDi2jiUVmc5"
 }
