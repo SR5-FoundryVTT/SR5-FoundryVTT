@@ -1,3 +1,5 @@
+@use "config/variables";
+
 .sr5v2 {
     .matrix-condition-monitor-property {
         .icon-container {
@@ -18,22 +20,22 @@
         align-items: center;
 
         &.stun .cell {
-            box-shadow: 0 0 5px 1px rgba($stun, 0.5);
+            box-shadow: 0 0 5px 1px rgba(variables.$stun, 0.5);
         }
 
         &.physical .cell {
-            box-shadow: 0 0 5px 1px rgba($physical, 0.5);
+            box-shadow: 0 0 5px 1px rgba(variables.$physical, 0.5);
         }
 
         &.edge .cell {
-            box-shadow: 0 0 5px 1px rgba($edge, 0.5);
+            box-shadow: 0 0 5px 1px rgba(variables.$edge, 0.5);
             &.filled {
-                background: rgba($edge, 0.9) !important;
+                background: rgba(variables.$edge, 0.9) !important;
             }
         }
 
         &.matrix .cell {
-            box-shadow: 0 0 5px 1px rgba($matrix, 0.5);
+            box-shadow: 0 0 5px 1px rgba(variables.$matrix, 0.5);
         }
 
         .clear-container {
@@ -65,22 +67,22 @@
                 cursor: pointer;
                 text-align: center;
                 font-size: 80%;
-                border: $groove;
-                color: $light-2;
+                border: variables.$groove;
+                color: variables.$light-2;
                 border-radius: 4px;
-                background: $black;
+                background: variables.$black;
                 width: 24px;
                 height: 18px;
                 margin: 2px;
 
                 &.filled {
-                    background: $light-2;
-                    border-color: $black;
-                    color: $black;
+                    background: variables.$light-2;
+                    border-color: variables.$black;
+                    color: variables.$black;
                 }
 
                 &:hover {
-                    border-color: $light;
+                    border-color: variables.$light;
                 }
             }
         }

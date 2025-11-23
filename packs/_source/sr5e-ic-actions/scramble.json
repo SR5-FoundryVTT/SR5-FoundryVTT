@@ -1,6 +1,5 @@
 {
   "_id": "uAmdnncqLNM7CkDG",
-  "_key": "!items!uAmdnncqLNM7CkDG",
   "folder": null,
   "name": "Scramble",
   "type": "action",
@@ -115,5 +114,6 @@
     }
   },
   "effects": [],
-  "flags": {}
+  "flags": {},
+  "_key": "!items!uAmdnncqLNM7CkDG"
 }

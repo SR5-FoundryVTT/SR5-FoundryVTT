@@ -1,3 +1,5 @@
+@use "variables";
+
 @mixin basic-rollable {
     &:hover {
         @include linkHovered;
@@ -17,19 +19,19 @@
 }
 
 @mixin systemFonts {
-    font-family: $systemFonts;
+    font-family: variables.$systemFonts;
 }
 
 @mixin title {
-    font-family: $systemFonts;
-    color: $color;
+    font-family: variables.$systemFonts;
+    color: variables.$color;
     @include textOutline;
 }
 
 @mixin textOutline {
-    color: $color;
-    text-shadow: -1px -1px 0 $outline-color, 1px -1px 0 $outline-color, -1px 1px 0 $outline-color,
-        1px 1px 0 $outline-color;
+    color: variables.$color;
+    text-shadow: -1px -1px 0 variables.$outline-color, 1px -1px 0 variables.$outline-color, -1px 1px 0 variables.$outline-color,
+        1px 1px 0 variables.$outline-color;
 }
 
 @mixin shortUnder {
@@ -40,16 +42,16 @@
         position: absolute;
         width: 50%;
         transform: translateX(50%);
-        border-bottom: $border-under;
+        border-bottom: variables.$border-under;
     }
 }
 
 @mixin sheet {
     background: linear-gradient(rgba(0, 0, 0, 0.60), rgba(0, 0, 0, 0.60)), url("assets/page.webp") repeat;
-    color: $color;
+    color: variables.$color;
 }
 
 @mixin linkHovered {
     text-shadow: 0 0 8px var(--color-shadow-primary);
-    color: $fLightRed;
+    color: variables.$fLightRed;
 }

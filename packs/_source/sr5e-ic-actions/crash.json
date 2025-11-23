@@ -1,6 +1,5 @@
 {
   "_id": "4mbZk7QT5X9irZK9",
-  "_key": "!items!4mbZk7QT5X9irZK9",
   "folder": null,
   "name": "Crash",
   "type": "action",
@@ -115,5 +114,6 @@
     }
   },
   "effects": [],
-  "flags": {}
+  "flags": {},
+  "_key": "!items!4mbZk7QT5X9irZK9"
 }

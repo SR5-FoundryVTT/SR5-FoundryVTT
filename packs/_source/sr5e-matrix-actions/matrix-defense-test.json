@@ -83,7 +83,11 @@
         "armor": false,
         "mod": 0
       },
-      "modifiers": ["global", "wounds", "defense_matrix"],
+      "modifiers": [
+        "global",
+        "wounds",
+        "defense_matrix"
+      ],
       "category": {
         "matrix": {
           "owner": false,
@@ -111,7 +115,7 @@
     "systemVersion": "0.30.0",
     "createdTime": 1753300286021,
     "modifiedTime": 1753300286038,
-    "lastModifiedBy": "gprTC3Md255Kv3Xm"
+    "lastModifiedBy": "sr5ebuilder"
   },
   "_key": "!items!9yudm48WK9eeb5Qe"
 }

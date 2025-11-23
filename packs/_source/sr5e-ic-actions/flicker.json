@@ -1,6 +1,5 @@
 {
   "_id": "azxx0Iy5VgREjYN8",
-  "_key": "!items!azxx0Iy5VgREjYN8",
   "folder": null,
   "name": "Flicker",
   "type": "action",
@@ -115,5 +114,6 @@
     }
   },
   "effects": [],
-  "flags": {}
+  "flags": {},
+  "_key": "!items!azxx0Iy5VgREjYN8"
 }

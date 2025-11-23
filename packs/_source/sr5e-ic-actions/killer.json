@@ -1,6 +1,5 @@
 {
   "_id": "RfjfXuY8b3KhE4b8",
-  "_key": "!items!RfjfXuY8b3KhE4b8",
   "folder": null,
   "name": "Killer",
   "type": "action",
@@ -116,5 +115,6 @@
     }
   },
   "effects": [],
-  "flags": {}
+  "flags": {},
+  "_key": "!items!RfjfXuY8b3KhE4b8"
 }

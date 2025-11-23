@@ -1,24 +1,29 @@
-@import 'node_modules/@yaireo/tagify/dist/tagify';
+@use 'sass:meta';
 
 // import config first to get all the variables and mixins set
-@import 'config';
-@import 'importer';
-@import 'compendium-browser';
-@import 'item';
-@import 'actor';
-@import 'chat';
-@import 'test';
-@import 'tagify';
-@import 'modifiers';
-@import 'modifiers-container';
-@import 'foundry';
-@import 'module';
-@import 'effect';
-@import 'list-item';
-@import "horixontal-cells";
-@import "situational-modifiers-app";
-@import "actor-apps";
-@import "bundle-v2";
+@use 'config';
+@use 'importer';
+@use 'compendium-browser';
+@use 'item';
+@use 'actor';
+@use 'chat';
+@use 'test';
+@use 'tagify';
+@use 'modifiers';
+@use 'modifiers-container';
+@use 'foundry';
+@use 'module';
+@use 'effect';
+@use 'list-item';
+@use "horixontal-cells";
+@use "situational-modifiers-app";
+@use "actor-apps";
+@use "bundle-v2";
+@use "config/mixins";
+@use "config/variables";
+
+// This explicitly loads the CSS content into this location
+@include meta.load-css('../../node_modules/@yaireo/tagify/dist/tagify');
 
 /**
  * These are default FoundryVTT classes that have been used within Shadowrun5 CSS while not behaving as default.
@@ -96,7 +101,7 @@
     }
 
     .show-situation-modifiers-application {
-        @include rollable;
+        @include mixins.rollable;
     }
     .grid-2-col {
         display: grid;
@@ -250,7 +255,7 @@
     position: relative;
 
     .unit {
-        @include textOutline;
+        @include mixins.textOutline;
         position: absolute;
         display: block;
         left: 5px;
@@ -271,7 +276,7 @@ label.checkbox {
     -ms-user-select: none;
 
     &:hover input ~ .checkmark {
-        text-shadow: 0 0 0.2em $rollcolor;
+        text-shadow: 0 0 0.2em variables.$rollcolor;
     }
 
     &.init-edge-label {
@@ -302,10 +307,10 @@ label.checkbox {
 
 button.plus1_button {
     padding: 2px;
-    color: $black;
+    color: variables.$black;
     line-height: 0;
     flex: 0;
-    background: rgba($light, 0.1);
+    background: rgba(variables.$light, 0.1);
     border-radius: 0.3em;
     text-align: center;
 
@@ -324,7 +329,7 @@ input[type='checkbox'].toggle {
     max-height: 0;
     overflow-y: auto;
     transition: max-height 0.25s ease-in-out;
-    color: $white;
+    color: variables.$white;
 }
 
 .toggle:checked + .list-item-content + .collapsible-content {
@@ -333,33 +338,33 @@ input[type='checkbox'].toggle {
 //Collapsible End
 input[type='checkbox'].display {
     background: transparent;
-    color: $color;
+    color: variables.$color;
     border: none;
     text-align: center;
     font-size: 1em;
 
     &:hover {
         background: transparent;
-        border: $groove;
+        border: variables.$groove;
     }
 }
 
 input[type='text'].disabled-for-display {
-    color: $black;
+    color: variables.$black;
     background-color: rgba(0, 0, 0, 0);
 }
 
 input[type='text'].display {
-    @include textOutline;
-    background: rgba($light, 0.1);
-    color: $color;
+    @include mixins.textOutline;
+    background: rgba(variables.$light, 0.1);
+    color: variables.$color;
     border-radius: 0.3em;
-    border-color: $black;
+    border-color: variables.$black;
     text-align: center;
     min-height: 1em;
 
     &::placeholder {
-        color: $light-2;
+        color: variables.$light-2;
     }
 
     &.short {
@@ -367,7 +372,7 @@ input[type='text'].display {
     }
 
     &.text {
-        background: rgba($dark, 0.1);
+        background: rgba(variables.$dark, 0.1);
         border-radius: 0;
     }
 
@@ -380,7 +385,7 @@ input[type='text'].display {
     }
 
     &:disabled {
-        color: $color;
+        color: variables.$color;
         background: transparent;
         border-color: transparent;
         padding-left: 0;
@@ -410,18 +415,18 @@ input[type='text'].display {
      */
 .sr5 {
     hr {
-        border-color: $yellow;
+        border-color: variables.$yellow;
     }
 
     select.display,
     select {
-        color: $color;
-        background: rgba($black, 0.05);
+        color: variables.$color;
+        background: rgba(variables.$black, 0.05);
         border-radius: 0.3em;
-        border-color: $dark;
+        border-color: variables.$dark;
 
         > option {
-            background-color: $dark;
+            background-color: variables.$dark;
         }
     }
 
@@ -430,12 +435,12 @@ input[type='text'].display {
      */
     .form-group {
         label {
-            color: $white;
+            color: variables.$white;
             font-weight: bold;
         }
 
         input {
-            color: $white;
+            color: variables.$white;
         }
 
         .form-group-element-numerical {
@@ -443,7 +448,7 @@ input[type='text'].display {
             flex-direction: row;
 
             button {
-                border-color: $grey;
+                border-color: variables.$grey;
             }
 
             button,
@@ -475,11 +480,11 @@ input[type='text'].display {
     .inline-roll {
         border: 0;
         background: none;
-        color: $white !important;
+        color: variables.$white !important;
     }
 
     .entity-link.content-link {
-        color: $white !important;
+        color: variables.$white !important;
     }
 
     // An origin link is a uuid based entity link, without drag support.
@@ -490,11 +495,11 @@ input[type='text'].display {
         border-radius: 2px;
         white-space: nowrap;
         word-break: break-all;
-        color: $black;
+        color: variables.$black;
     }
 
     .roll {
-        @include rollable;
+        @include mixins.rollable;
     }
 
     .editor {
@@ -503,40 +508,40 @@ input[type='text'].display {
     }
 
     .editor .tox-edit-area {
-        background: $mce-background;
+        background: variables.$mce-background;
     }
 
     // Styling for any prosemirror editors within shadowrun applications.
     .editor.prosemirror {
         // handles dropdown menus, not select based.
         .pm-dropdown {
-            color: $color;
-            background: rgba($black, 0.05);
+            color: variables.$color;
+            background: rgba(variables.$black, 0.05);
             border-radius: 0.3em;
-            border-color: $dark;
+            border-color: variables.$dark;
 
             // Icons like chevron and ticks.
             i,
             i:hover {
-                color: $color;
+                color: variables.$color;
             }
 
             // ul will contain menus and sub-menus and can be nested.
             ul {
-                background-color: $dark;
+                background-color: variables.$dark;
             }
 
             // li represents each menu entry in both menus and sub-menus
             ul > li:hover {
-                color: $color;
-                border-color: rgba($white, 0.1);
-                background: rgba($black, 0.05);
+                color: variables.$color;
+                border-color: rgba(variables.$white, 0.1);
+                background: rgba(variables.$black, 0.05);
             }
         }
 
         // HTML editing uses a class-less textarea
         textarea {
-            color: $color;
+            color: variables.$color;
         }
     }
 
@@ -579,9 +584,9 @@ input[type='text'].display {
     }
 
     .window-content {
-        @include sheet;
+        @include mixins.sheet;
         overflow: hidden;
-        border: 1px solid $dark2;
+        border: 1px solid variables.$dark2;
         border-top: 0px;
     }
 
@@ -589,7 +594,7 @@ input[type='text'].display {
         height: 95%;
         min-height: 15em;
         width: 100%;
-        color: $color;
+        color: variables.$color;
     }
 
     .mods-scroll,
@@ -597,7 +602,7 @@ input[type='text'].display {
         margin-bottom: 0.5em;
         flex: 1;
         overflow-y: auto;
-        color: $white;
+        color: variables.$white;
     }
     .flexcontainer-skills {
         display: flex;
@@ -644,7 +649,7 @@ input[type='text'].display {
     .tabs {
         flex: 0;
         align-items: stretch; // Make tabs stretch instead of space horizontally.
-        border-bottom: 1px solid $yellow;
+        border-bottom: 1px solid variables.$yellow;
 
         > a {
             margin: 0.25em;
@@ -652,26 +657,26 @@ input[type='text'].display {
             margin-bottom: 0;
             position: relative;
             font-size: 1.15em;
-            @include rollable;
+            @include mixins.rollable;
 
             &.active {
-                @include linkHovered;
-                color: $color;
+                @include mixins.linkHovered;
+                color: variables.$color;
                 // border-color: $black;
                 // border-bottom: 0px;
-                background: rgba($light, 0.1);
+                background: rgba(variables.$light, 0.1);
             }
         }
 
         > .item {
             // Make tabs stretch across horizontally.
-            color: $white;
+            color: variables.$white;
             flex: 1;
             text-align: center;
         }
     }
     .sheet .editor-content {
-        color: $white;
+        color: variables.$white;
         height: 100%;
         overflow-y: auto;
         word-break: break-word;
@@ -681,11 +686,11 @@ input[type='text'].display {
     }
 
     label.item-text.item-name[for='select-inventory'] {
-        color: $yellow;
+        color: variables.$yellow;
     }
 
     label.item-text.item-name {
-        color: $white;
+        color: variables.$white;
     }
 
     .tab {
@@ -724,13 +729,13 @@ input[type='text'].display {
         }
 
         > *:not(:last-child) {
-            border-right: $groove;
+            border-right: variables.$groove;
             padding-right: 0.25em;
         }
     }
 
     .container {
-        max-width: $sheet-max-width;
+        max-width: variables.$sheet-max-width;
         margin: 0 auto;
 
         &--fluid {
@@ -745,9 +750,9 @@ input[type='text'].display {
         }
 
         // Auto create grid style classes for a fixed max column grid
-        @for $i from 1 through $grid__cols {
+        @for $i from 1 through variables.$grid__cols {
             &__col-#{$i} {
-                flex-basis: calc(100 / ($grid__cols / $i)) * 1%;
+                flex-basis: calc(100 / (variables.$grid__cols / $i)) * 1%;
                 overflow: hidden;
             }
         }
@@ -793,7 +798,7 @@ input[type='text'].display {
             }
 
             &.border-bottom {
-                border-bottom: $groove;
+                border-bottom: variables.$groove;
             }
 
             &.gap-4 {
@@ -815,19 +820,19 @@ input[type='text'].display {
         padding: 4px;
 
         &.stun .cell {
-            box-shadow: 0 0 5px 1px rgba($stun, 0.5);
+            box-shadow: 0 0 5px 1px rgba(variables.$stun, 0.5);
         }
 
         &.physical .cell {
-            box-shadow: 0 0 5px 1px rgba($physical, 0.5);
+            box-shadow: 0 0 5px 1px rgba(variables.$physical, 0.5);
         }
 
         &.edge .cell {
-            box-shadow: 0 0 5px 1px rgba($edge, 0.5);
+            box-shadow: 0 0 5px 1px rgba(variables.$edge, 0.5);
         }
 
         &.matrix .cell {
-            box-shadow: 0 0 5px 1px rgba($matrix, 0.5);
+            box-shadow: 0 0 5px 1px rgba(variables.$matrix, 0.5);
         }
 
         .cell-container {
@@ -839,10 +844,10 @@ input[type='text'].display {
                 cursor: pointer;
                 text-align: center;
                 font-size: 80%;
-                border: $groove;
-                color: $light-2;
+                border: variables.$groove;
+                color: variables.$light-2;
                 border-radius: 4px;
-                background: $black;
+                background: variables.$black;
                 min-width: 26px;
                 height: 18px;
 
@@ -855,13 +860,13 @@ input[type='text'].display {
                 }
 
                 &.filled {
-                    background: $light-2;
-                    border-color: $black;
-                    color: $black;
+                    background: variables.$light-2;
+                    border-color: variables.$black;
+                    color: variables.$black;
                 }
 
                 &:hover {
-                    border-color: $light;
+                    border-color: variables.$light;
                 }
             }
         }
@@ -881,13 +886,13 @@ input[type='text'].display {
         padding: 0.1em 0.25em;
         min-height: 26px;
         margin: 0.1em;
-        margin-right: $groove-width;
-        margin-left: $groove-width;
+        margin-right: variables.$groove-width;
+        margin-left: variables.$groove-width;
         &.matrix {
-            color: $white;
+            color: variables.$white;
         }
         .has-desc {
-            @include rollable;
+            @include mixins.rollable;
         }
 
         &.no-border {
@@ -904,20 +909,20 @@ input[type='text'].display {
 
         &.item-section {
             background: black;
-            color: $yellow;
+            color: variables.$yellow;
             margin-right: 0;
             margin-left: 0;
             // background: rgba($grey, 0.2);
             // padding: 0.25em;
             // border-radius: 0.2em;
-            border-bottom: 1px solid $yellow;
+            border-bottom: 1px solid variables.$yellow;
             border-radius: 0.2em;
             padding-top: 5px;
             &.sprite {
                 background: none;
             }
             &.faded {
-                color: $grey;
+                color: variables.$grey;
             }
             // &:first-child {
             //     border-top: 1px solid $yellow;
@@ -971,7 +976,7 @@ input[type='text'].display {
                 max-width: 50px;
 
                 &.item-roll {
-                    @include rollable;
+                    @include mixins.rollable;
 
                     &:hover {
                         > img {
@@ -1000,7 +1005,7 @@ input[type='text'].display {
                 flex-flow: row nowrap;
                 justify-content: space-evenly;
                 align-items: center;
-                color: $grey;
+                color: variables.$grey;
                 font-size: 12px;
                 height: 100%;
             }
@@ -1011,18 +1016,18 @@ input[type='text'].display {
                 flex: 1 0 auto;
                 text-align: center;
                 height: 100%;
-                border: $light;
+                border: variables.$light;
                 padding-right: 10px;
 
                 &.is-broken {
-                    color: $crimson;
+                    color: variables.$crimson;
                 }
                 &.is-damaged {
-                    color: $yellow;
+                    color: variables.$yellow;
                 }
 
                 &.faded {
-                    color: $grey;
+                    color: variables.$grey;
                 }
 
                 &.center {
@@ -1039,10 +1044,10 @@ input[type='text'].display {
                     width: auto;
 
                     &.fresh-import {
-                        color: $freshImportColor;
+                        color: variables.$freshImportColor;
                     }
                     &.mods-label {
-                        color: $white;
+                        color: variables.$white;
                     }
                 }
 
@@ -1079,7 +1084,7 @@ input[type='text'].display {
                     width: 16em;
                 }
                 .content-inner {
-                    color: $white;
+                    color: variables.$white;
                 }
             }
 
@@ -1092,16 +1097,16 @@ input[type='text'].display {
             }
 
             &.skill-header {
-                @include rollable;
+                @include mixins.rollable;
             }
         }
         .selected-list-item {
-            color: $edge;
+            color: variables.$edge;
         }
     }
 
     .list-item:nth-of-type(even) {
-        background: rgba($white, 0.03);
+        background: rgba(variables.$white, 0.03);
     }
 
     .list-item-description {
@@ -1117,11 +1122,11 @@ input[type='text'].display {
 
                 > * {
                     flex-shrink: 0;
-                    border-right: $groove;
-                    border-bottom: $groove;
+                    border-right: variables.$groove;
+                    border-bottom: variables.$groove;
                     padding: 0.25em 0.5em;
                     margin: 0.1em 0.25em;
-                    box-shadow: 0.2em 0.2em 0.3em $black;
+                    box-shadow: 0.2em 0.2em 0.3em variables.$black;
                 }
             }
 
@@ -1147,15 +1152,15 @@ input[type='text'].display {
         display: contents;
     }
     .modified-target-damage {
-        margin-top: $large-distance;
-        margin-bottom: $large-distance;
+        margin-top: variables.$large-distance;
+        margin-bottom: variables.$large-distance;
         display: grid;
         grid-template-columns: 40px auto auto;
 
         .modified-target-damage-cell {
             display: flex;
             align-items: center;
-            margin-bottom: $small-distance;
+            margin-bottom: variables.$small-distance;
         }
     }
 
@@ -1165,15 +1170,15 @@ input[type='text'].display {
 
     button,
     button.display {
-        color: $color;
-        border-color: $black;
-        background: rgba($light, 0.1);
+        color: variables.$color;
+        border-color: variables.$black;
+        background: rgba(variables.$light, 0.1);
         border-radius: 0.3em;
         text-align: center;
 
         &:hover {
             cursor: pointer;
-            background: $bgrButton;
+            background: variables.$bgrButton;
         }
 
         &.short {
@@ -1181,15 +1186,15 @@ input[type='text'].display {
         }
 
         &.light {
-            color: $black;
-            background: $light;
+            color: variables.$black;
+            background: variables.$light;
         }
     }
 
     button.display.import-character {
-        color: $color;
-        border-color: $black;
-        background: $dark-sunken;
+        color: variables.$color;
+        border-color: variables.$black;
+        background: variables.$dark-sunken;
         border-radius: 0.3em;
         text-align: center;
 
@@ -1202,13 +1207,13 @@ input[type='text'].display {
         }
 
         &.light {
-            color: $black;
-            background: $light;
+            color: variables.$black;
+            background: variables.$light;
         }
     }
     button.display.show-hidden-skills {
-        color: $color;
-        border-color: $black;
+        color: variables.$color;
+        border-color: variables.$black;
         background: rgb(70, 7, 7);
         border-radius: 0.3em;
         text-align: center;
@@ -1222,14 +1227,14 @@ input[type='text'].display {
         }
 
         &.light {
-            color: $black;
-            background: $light;
+            color: variables.$black;
+            background: variables.$light;
         }
     }
 
     button.display.reset-actor-run-data {
-        color: $color;
-        border-color: $black;
+        color: variables.$color;
+        border-color: variables.$black;
         background: rgb(70, 7, 7);
         border-radius: 0.3em;
         text-align: center;
@@ -1243,8 +1248,8 @@ input[type='text'].display {
         }
 
         &.light {
-            color: $black;
-            background: $light;
+            color: variables.$black;
+            background: variables.$light;
         }
     }
 
@@ -1262,8 +1267,8 @@ input[type='text'].display {
     .env-modifier-active {
         border-radius: 8px;
         //box-shadow: $dark-sunken-box-shadow;
-        background-color: $darkred; //$dark-sunken;
-        color: $yellow;
+        background-color: variables.$darkred; //$dark-sunken;
+        color: variables.$yellow;
     }
 
     .env-modifier-total {
@@ -1285,18 +1290,18 @@ input[type='text'].display {
     }
 
     .document-name {
-        @include systemFonts;
+        @include mixins.systemFonts;
         font-size: var(--font-size-18);
         font-weight: bold;
     }
 
     .cell-input-roll {
-        color: $yellow;
+        color: variables.$yellow;
     }
 
     // Intended to affect icons only within the url/pdf source controls.
     .source-button i.fas {
-        color: $pdfColor;
+        color: variables.$pdfColor;
     }
 }
 //END SR5 Style

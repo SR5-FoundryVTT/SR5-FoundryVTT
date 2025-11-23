@@ -1,6 +1,5 @@
 {
   "_id": "jcc9or6rjlSw7xhn",
-  "_key": "!items!jcc9or6rjlSw7xhn",
   "folder": null,
   "name": "Acid",
   "type": "action",
@@ -115,5 +114,6 @@
     }
   },
   "effects": [],
-  "flags": {}
+  "flags": {},
+  "_key": "!items!jcc9or6rjlSw7xhn"
 }

@@ -1,6 +1,5 @@
 {
   "_id": "1tHEar7TdhGl9pjv",
-  "_key": "!items!1tHEar7TdhGl9pjv",
   "folder": null,
   "name": "Black",
   "type": "action",
@@ -116,5 +115,6 @@
     }
   },
   "effects": [],
-  "flags": {}
+  "flags": {},
+  "_key": "!items!1tHEar7TdhGl9pjv"
 }

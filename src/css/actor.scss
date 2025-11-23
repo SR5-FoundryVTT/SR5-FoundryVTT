@@ -1,8 +1,11 @@
-@import 'config';
+@use 'config';
+@use "config/mixins";
+@use "config/variables";
+
 
 .sr5v2.actor {
     .limit {
-        @include systemFonts;
+        @include mixins.systemFonts;
         padding: 0 0.1em;
         margin-top: -2px;
         text-align: center;
@@ -54,7 +57,7 @@
             .attribute-button {
                 border-color: transparent;
                 &:hover {
-                    border-color: $light;
+                    border-color: variables.$light;
                 }
             }
 
@@ -75,10 +78,10 @@
             cursor: pointer;
         }
         &:hover {
-            background: radial-gradient(rgba($darkred, 0.7), rgba($darkred, 0.1));
-            color: $white !important;
+            background: radial-gradient(rgba(variables.$darkred, 0.7), rgba(variables.$darkred, 0.1));
+            color: variables.$white !important;
             label {
-                color: $white !important;
+                color: variables.$white !important;
             }
         }
     }
@@ -86,8 +89,8 @@
     #filter-active-skills {
         background: none;
         padding-left: 4px;
-        color: $yellow;
-        border-bottom: $groove;
+        color: variables.$yellow;
+        border-bottom: variables.$groove;
     }
 
     select#select-inventory {
@@ -135,9 +138,9 @@
         }
 
         @keyframes blitzShine {
-            0% { color: $white; }
-            50% { color: $edge; }
-            100% { color: $white; }
+            0% { color: variables.$white; }
+            50% { color: variables.$edge; }
+            100% { color: variables.$white; }
         }
 
         .initiative-col {
