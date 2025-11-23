@@ -10,7 +10,7 @@
       "source": ""
     },
     "action": {
-      "type": "",
+      "type": "none",
       "test": "BiofeedbackResistTest",
       "categories": [
         "resist_biofeedback"
