@@ -14,8 +14,6 @@ export default defineConfig(({ mode }) => {
         plugins: [
             checker({
                 typescript: true,
-                // enableBuild: false,
-                overlay: { initialIsOpen: false },
             }),
             tsconfigPaths(),
             viteStaticCopy({
