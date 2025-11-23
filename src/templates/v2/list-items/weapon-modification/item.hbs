@@ -6,9 +6,9 @@
          data-uuid="{{item.uuid}}">
 
         <div class="list-item-start">
-            {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
-            {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
-            {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
+            {{> "systems/shadowrun5e/templates/v2/list-items/item-roll-image.hbs" item }}
+            {{> "systems/shadowrun5e/templates/v2/common/import-flag.hbs" item }}
+            {{> "systems/shadowrun5e/templates/v2/list-items/item-name.hbs" item }}
         </div>
 
         <div class="list-item-col thicc-col">
@@ -44,15 +44,15 @@
         </div>
 
         <div class="list-item-icons">
-            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/open-source-icon.hbs' item }}
-            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/wireless-icon.hbs' item }}
-            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/equip-icon.hbs' item }}
-            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
+            {{> 'systems/shadowrun5e/templates/v2/list-items/open-source-icon.hbs' item }}
+            {{> 'systems/shadowrun5e/templates/v2/list-items/wireless-icon.hbs' item }}
+            {{> 'systems/shadowrun5e/templates/v2/list-items/equip-icon.hbs' item }}
+            {{> 'systems/shadowrun5e/templates/v2/list-items/edit-delete-icons.hbs' item }}
         </div>
     </div>
     <div class="list-item-desc">
         <div class="list-item-properties">
-            {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/technology.hbs' item=item }}
+            {{> 'systems/shadowrun5e/templates/v2/item-properties/technology.hbs' item=item }}
         </div>
         <div class="description-body">
             {{{objValue (objValue @root.expandedUuids item.uuid) 'html'}}}

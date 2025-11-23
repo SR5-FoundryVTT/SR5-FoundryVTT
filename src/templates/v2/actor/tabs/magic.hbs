@@ -2,12 +2,12 @@
     <div class="fill-container">
         <div class="scrollable">
             {{#if (isType actor 'character' 'critter')}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/adept-powers.hbs' }}
+                {{> 'systems/shadowrun5e/templates/v2/actor/parts/adept-powers.hbs' }}
             {{/if}}
-            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/spells.hbs' }}
-            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/rituals.hbs' }}
+            {{> 'systems/shadowrun5e/templates/v2/actor/parts/spells.hbs' }}
+            {{> 'systems/shadowrun5e/templates/v2/actor/parts/rituals.hbs' }}
             {{#if (isType actor 'character' 'critter')}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/summonings.hbs' }}
+                {{> 'systems/shadowrun5e/templates/v2/actor/parts/summonings.hbs' }}
             {{/if}}
         </div>
     </div>

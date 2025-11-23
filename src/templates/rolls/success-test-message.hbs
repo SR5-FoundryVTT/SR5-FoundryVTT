@@ -128,7 +128,7 @@
     <div class="card-rolls {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
         {{#if (not test.usingManualRoll)}}
         {{#each test.rolls}}
-            {{> 'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.hbs'
+            {{> 'systems/shadowrun5e/templates/rolls/parts/rolled-dice.hbs'
                 roll=this
             }}
         {{/each}}
@@ -202,7 +202,7 @@
 <div class="sr5 chat-card roll-card">
     <div class="card-content">
         <div class="left-side">
-            {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.hbs'
+            {{> 'systems/shadowrun5e/templates/rolls/parts/Damage.hbs'
                 name=(localize "SR5.Incoming")
                 damage=test.data.damage
                 showAP=true

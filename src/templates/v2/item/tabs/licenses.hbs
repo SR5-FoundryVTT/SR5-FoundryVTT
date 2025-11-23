@@ -1,13 +1,13 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
-        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/license/header.hbs'
+        {{> 'systems/shadowrun5e/templates/v2/list-items/license/header.hbs'
             label='SR5.Licenses'
             type='license'
             cssClass='header-for-scrollable'
         }}
         <div class="scrollable">
             {{#each @root.system.licenses as |license id|}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/license/item.hbs' item=license id=id }}
+                {{> 'systems/shadowrun5e/templates/v2/list-items/license/item.hbs' item=license id=id }}
             {{/each}}
         </div>
     </div>

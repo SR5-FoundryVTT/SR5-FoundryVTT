@@ -51,11 +51,11 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
     }
 
     override get _chatMessageTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/chat/matrix-defense-test-message.hbs';
+        return 'systems/shadowrun5e/templates/chat/matrix-defense-test-message.hbs';
     }
 
     override get _dialogTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/matrix-resist-test-dialog.hbs';
+        return 'systems/shadowrun5e/templates/apps/dialogs/matrix-resist-test-dialog.hbs';
     }
 
     override get successLabel(): Translation {

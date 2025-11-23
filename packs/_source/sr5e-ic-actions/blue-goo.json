@@ -3,7 +3,7 @@
   "folder": null,
   "name": "Blue Goo",
   "type": "action",
-  "img": "systems/shadowrun5e/dist/icons/ice-bomb.svg",
+  "img": "systems/shadowrun5e/icons/ice-bomb.svg",
   "system": {
     "description": {
       "value": "",

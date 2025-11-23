@@ -2,7 +2,7 @@
   "name": "Matrix Perception",
   "type": "action",
   "flags": {},
-  "img": "systems/shadowrun5e/dist/icons/cyber-eye.svg",
+  "img": "systems/shadowrun5e/icons/cyber-eye.svg",
   "effects": [],
   "_id": "TlyfJlNObNuJGSLx",
   "system": {

@@ -2,7 +2,7 @@
     <div class="fill-container">
         <div class="attributes">
             {{#each config.matrixAttributes as |label key|}}
-                {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/matrix-attribute.hbs"
+                {{> "systems/shadowrun5e/templates/v2/actor/parts/matrix-attribute.hbs"
                         matrixAtt=(lookup ../system.matrix key)
                         attributeField=(objValue @root.systemFields.matrix.fields key)
                         label=label
@@ -10,14 +10,14 @@
                         matrixAttributes=../config/matrixAttributes
                 }}
             {{/each}}
-            {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+            {{> "systems/shadowrun5e/templates/v2/actor/parts/attribute.hbs"
                     attributeId='resonance'
                     attribute=system.attributes.resonance
             }}
         </div>
 
         <div class="full-container">
-            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/active-skills.hbs' }}
+            {{> 'systems/shadowrun5e/templates/v2/actor/parts/active-skills.hbs' }}
         </div>
     </div>
 </section>

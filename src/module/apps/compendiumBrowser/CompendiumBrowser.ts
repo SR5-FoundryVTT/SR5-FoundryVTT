@@ -102,10 +102,10 @@ export class CompendiumBrowser extends BaseClass {
     };
 
     static override PARTS = {
-        tabs: { template: "systems/shadowrun5e/dist/templates/apps/compendium-browser/tabs.hbs" },
-        filters: { template: "systems/shadowrun5e/dist/templates/apps/compendium-browser/filters.hbs" },
-        results: { template: "systems/shadowrun5e/dist/templates/apps/compendium-browser/results.hbs" },
-        settings: { template: "systems/shadowrun5e/dist/templates/apps/compendium-browser/settings.hbs" },
+        tabs: { template: "systems/shadowrun5e/templates/apps/compendium-browser/tabs.hbs" },
+        filters: { template: "systems/shadowrun5e/templates/apps/compendium-browser/filters.hbs" },
+        results: { template: "systems/shadowrun5e/templates/apps/compendium-browser/results.hbs" },
+        settings: { template: "systems/shadowrun5e/templates/apps/compendium-browser/settings.hbs" },
     };
 
     static override TABS = {
@@ -459,7 +459,7 @@ export class CompendiumBrowser extends BaseClass {
         for (let idx = indexStart; idx < indexEnd; idx++) {
             const entry = this.scrollState.entries[idx];
             const html = await foundry.applications.handlebars.renderTemplate(
-                "systems/shadowrun5e/dist/templates/apps/compendium-browser/entries.hbs",
+                "systems/shadowrun5e/templates/apps/compendium-browser/entries.hbs",
                 { entry },
             );
             const template = document.createElement("template");
@@ -500,7 +500,7 @@ export class CompendiumBrowser extends BaseClass {
         const tree = this._buildPackTree();
         const context = { tree };
         const html = await foundry.applications.handlebars.renderTemplate(
-            "systems/shadowrun5e/dist/templates/apps/compendium-browser/settings.hbs",
+            "systems/shadowrun5e/templates/apps/compendium-browser/settings.hbs",
             context,
         );
 

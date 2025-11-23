@@ -2,7 +2,7 @@
 <div class="list-item-container {{cssClass}}">
     <div class="list-item {{#if item.selected}}list-item-selected{{/if}}" data-uuid="{{item.document.uuid}}">
         <div class="list-item-start">
-            {{> "systems/shadowrun5e/dist/templates/v2/list-items/matrix-icon-image.hbs" item.document }}
+            {{> "systems/shadowrun5e/templates/v2/list-items/matrix-icon-image.hbs" item.document }}
             <a data-action="openUuid">
                 {{item.name}}
             </a>
@@ -39,8 +39,8 @@
         </div>
 
         <div class="list-item-icons midd-icons">
-            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/connect-network-icon.hbs' item.document }}
-            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/connected-icons-toggle.hbs' item }}
+            {{> 'systems/shadowrun5e/templates/v2/list-items/connect-network-icon.hbs' item.document }}
+            {{> 'systems/shadowrun5e/templates/v2/list-items/connected-icons-toggle.hbs' item }}
         </div>
     </div>
 </div>

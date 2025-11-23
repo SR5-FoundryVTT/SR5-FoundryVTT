@@ -271,7 +271,7 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
     }
 
     override get template() {
-        return 'systems/shadowrun5e/dist/templates/apps/situational-modifiers.hbs';
+        return 'systems/shadowrun5e/templates/apps/situational-modifiers.hbs';
     }
 
     static override get defaultOptions() {

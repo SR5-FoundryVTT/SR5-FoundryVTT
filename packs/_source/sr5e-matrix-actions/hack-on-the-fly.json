@@ -2,7 +2,7 @@
   "name": "Hack on the Fly",
   "type": "action",
   "flags": {},
-  "img": "systems/shadowrun5e/dist/icons/cpu.svg",
+  "img": "systems/shadowrun5e/icons/cpu.svg",
   "effects": [],
   "_id": "OHe7RED8UzZc1aKc",
   "system": {

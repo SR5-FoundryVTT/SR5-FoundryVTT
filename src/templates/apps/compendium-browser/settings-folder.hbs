@@ -23,7 +23,7 @@
         </label>
         {{#if (eq node.type "Folder")}}
             <div class="children-container">
-                {{> 'systems/shadowrun5e/dist/templates/apps/compendium-browser/settings-folder.hbs' nodes=node.children depth=(sum ../depth 1)}}
+                {{> 'systems/shadowrun5e/templates/apps/compendium-browser/settings-folder.hbs' nodes=node.children depth=(sum ../depth 1)}}
             </div>
         {{/if}}
     </div>

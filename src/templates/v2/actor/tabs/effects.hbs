@@ -1,19 +1,19 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
-        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/effect/header.hbs'
+        {{> 'systems/shadowrun5e/templates/v2/list-items/effect/header.hbs'
             label='SR5.Effects'
             cssClass="header-for-scrollable" }}
         <div class="scrollable">
             {{#each effects}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/effect/item.hbs' item=this }}
+                {{> 'systems/shadowrun5e/templates/v2/list-items/effect/item.hbs' item=this }}
             {{/each}}
             <!-- Owned Item Effects. Actor only. -->
             {{#if itemEffects}}
-            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/effect/header.hbs'
+            {{> 'systems/shadowrun5e/templates/v2/list-items/effect/header.hbs'
                 label='SR5.Labels.Sheet.ItemEffects'
                 isItemEffect=true }}
             {{#each itemEffects}}
-                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/effect/item.hbs' item=this isItemEffect=true }}
+                {{> 'systems/shadowrun5e/templates/v2/list-items/effect/item.hbs' item=this isItemEffect=true }}
             {{/each}}
             {{/if}}
         </div>

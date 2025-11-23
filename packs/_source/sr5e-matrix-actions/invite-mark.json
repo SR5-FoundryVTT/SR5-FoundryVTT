@@ -2,7 +2,7 @@
   "name": "Invite Mark",
   "type": "action",
   "flags": {},
-  "img": "systems/shadowrun5e/dist/icons/check-mark.svg",
+  "img": "systems/shadowrun5e/icons/check-mark.svg",
   "effects": [],
   "_id": "cXDEcqOyy1IE4JkO",
   "system": {

@@ -37,7 +37,7 @@ export async function getIconFiles(): Promise<Set<string>> {
     }
 
     const imgFolder = game.settings.get(SYSTEM_NAME, FLAGS.ImportIconFolder)
-                        || "systems/shadowrun5e/dist/icons/importer/";
+                        || "systems/shadowrun5e/icons/importer/";
 
     const allFiles = await browseRecursively(imgFolder);    
     return new Set(allFiles);
@@ -64,7 +64,7 @@ export function iconAssign(
     const imgCategory = IH.formatAsSlug(importFlags.category || '');
     const useOverrides = game.settings.get(SYSTEM_NAME, FLAGS.UseImportIconOverrides);
     const imgFolder = game.settings.get(SYSTEM_NAME, FLAGS.ImportIconFolder)
-                        || "systems/shadowrun5e/dist/icons/importer/";
+                        || "systems/shadowrun5e/icons/importer/";
 
     let override = '';
     if (useOverrides) {

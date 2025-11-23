@@ -48,7 +48,7 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
     }
 
     override get _chatMessageTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/rolls/opposed-actor-creator-message.hbs'
+        return 'systems/shadowrun5e/templates/rolls/opposed-actor-creator-message.hbs'
     }
 
     /**

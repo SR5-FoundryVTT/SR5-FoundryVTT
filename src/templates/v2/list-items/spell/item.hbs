@@ -5,9 +5,9 @@
          data-item-id="{{item.id}}"
          data-uuid="{{item.uuid}}">
         <div class="list-item-start">
-            {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
-            {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
-            {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
+            {{> "systems/shadowrun5e/templates/v2/list-items/item-roll-image.hbs" item }}
+            {{> "systems/shadowrun5e/templates/v2/common/import-flag.hbs" item }}
+            {{> "systems/shadowrun5e/templates/v2/list-items/item-name.hbs" item }}
         </div>
 
         <div class="list-item-col">
@@ -33,18 +33,18 @@
 
         {{#if @root.isEditMode}}
             <div class="list-item-icons">
-                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/open-source-icon.hbs' item }}
-                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/favorite-icon.hbs' item }}
+                {{> 'systems/shadowrun5e/templates/v2/list-items/open-source-icon.hbs' item }}
+                {{> 'systems/shadowrun5e/templates/v2/list-items/favorite-icon.hbs' item }}
                 {{#if (isOwner item owner=@root.actor)}}
-                    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/edit-delete-icons.hbs' item }}
+                    {{> 'systems/shadowrun5e/templates/v2/list-items/edit-delete-icons.hbs' item }}
                 {{/if}}
             </div>
         {{/if}}
     </div>
     <div class="list-item-desc">
         <div class="list-item-properties">
-            {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/spell.hbs' item=item }}
-            {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/action.hbs' item=item }}
+            {{> 'systems/shadowrun5e/templates/v2/item-properties/spell.hbs' item=item }}
+            {{> 'systems/shadowrun5e/templates/v2/item-properties/action.hbs' item=item }}
         </div>
         <div class="description-body">
             {{{objValue (objValue @root.expandedUuids item.uuid) 'html'}}}

@@ -3,7 +3,7 @@
   "folder": null,
   "name": "Flicker",
   "type": "action",
-  "img": "systems/shadowrun5e/dist/icons/cancel.svg",
+  "img": "systems/shadowrun5e/icons/cancel.svg",
   "system": {
     "description": {
       "value": "",

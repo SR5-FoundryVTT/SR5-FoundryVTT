@@ -68,7 +68,7 @@ export const SheetFlow = {
     },
 
     templateBase(path: string) {
-        return `systems/shadowrun5e/dist/templates/v2/${path}.hbs`
+        return `systems/shadowrun5e/templates/v2/${path}.hbs`
     },
 
     templateActorSystemParts(...parts: string[]) {

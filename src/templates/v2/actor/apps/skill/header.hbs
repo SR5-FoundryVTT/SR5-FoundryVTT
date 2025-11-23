@@ -8,7 +8,7 @@
     />
     <div class="sheet-header-labels">
         <div class="sheet-header-name">
-            {{> 'systems/shadowrun5e/dist/templates/v2/common/document-source-icon.hbs' skill.link }}
+            {{> 'systems/shadowrun5e/templates/v2/common/document-source-icon.hbs' skill.link }}
             <div style="flex: 1">
                 {{#if editable_name}}
                     {{formInput skillFields.label value=skill.name name=(concat skill_name '.name') classes='sheet-name'

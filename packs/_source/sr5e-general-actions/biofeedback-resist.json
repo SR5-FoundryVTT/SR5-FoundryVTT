@@ -2,7 +2,7 @@
   "_id": "vg7YocE4lcCUNhCK",
   "name": "Biofeedback Resist",
   "type": "action",
-  "img": "systems/shadowrun5e/dist/icons/importer/adept_power.svg",
+  "img": "systems/shadowrun5e/icons/importer/adept_power.svg",
   "system": {
     "description": {
       "value": "",
