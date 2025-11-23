@@ -1,6 +1,7 @@
 import path from 'path';
 import { defineConfig } from 'vite';
 import { execSync } from 'child_process';
+import checker from 'vite-plugin-checker';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 
@@ -11,6 +12,11 @@ export default defineConfig(({ mode }) => {
         base: './',
 
         plugins: [
+            checker({
+                typescript: true,
+                // enableBuild: false,
+                overlay: { initialIsOpen: false },
+            }),
             tsconfigPaths(),
             viteStaticCopy({
                 targets: [
@@ -42,10 +48,7 @@ export default defineConfig(({ mode }) => {
             }
         ],
 
-        esbuild: {
-            keepNames: true,
-        },
-
+        esbuild: { keepNames: true },
         build: {
             sourcemap: true,
             minify: false,
@@ -61,27 +64,13 @@ export default defineConfig(({ mode }) => {
                 output: {
                     assetFileNames: (assetInfo) => {
                         if (assetInfo.name === 'style.css') return 'bundle.css';
-                        return assetInfo.names;
+                        return 'assets/[name][extname]';
                     },
                 },
             },
-            watch: {
-                buildDelay: 100
-            }
+            watch: { buildDelay: 100 }
         },
-
-        css: {
-            preprocessorOptions: {
-                scss: {
-                    api: 'modern-compiler'
-                }
-            }
-        },
-
-        resolve: {
-            alias: {
-                '@': path.resolve(__dirname, './src'),
-            },
-        },
+        css: { preprocessorOptions: { scss: { api: 'modern-compiler' } } },
+        resolve: { alias: { '@': path.resolve(__dirname, './src') } },
     };
 });

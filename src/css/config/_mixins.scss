@@ -47,7 +47,7 @@
 }
 
 @mixin sheet {
-    background: linear-gradient(rgba(0, 0, 0, 0.60), rgba(0, 0, 0, 0.60)), url("assets/page.webp") repeat;
+    background: linear-gradient(rgba(0, 0, 0, 0.60), rgba(0, 0, 0, 0.60)), url("./page.webp") repeat;
     color: variables.$color;
 }
 
