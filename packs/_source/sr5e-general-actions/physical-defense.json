@@ -2,7 +2,7 @@
   "_id": "qNPQyOXZMYPNPngE",
   "name": "Physical Defense",
   "type": "action",
-  "img": "systems/shadowrun5e/icons/redist/dodge.svg",
+  "img": "systems/shadowrun5e/dist/icons/redist/dodge.svg",
   "effects": [],
   "folder": null,
   "sort": 0,

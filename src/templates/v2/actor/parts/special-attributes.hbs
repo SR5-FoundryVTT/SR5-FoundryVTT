@@ -9,23 +9,23 @@
     </div>
     <div class="attributes center">
         {{#if awakened}}
-            {{> "systems/shadowrun5e/templates/v2/actor/parts/attribute.hbs"
+            {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
                 attribute=system.attributes.magic
                 attributeField=@root.systemFields.attributes.fields.magic }}
 
             {{#if (or @root.isEditMode system.attributes.initiation.value)}}
-                {{> "systems/shadowrun5e/templates/v2/actor/parts/fake-attribute.hbs"
+                {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/fake-attribute.hbs"
                     attribute=system.attributes.initiation
                     attributeField=@root.systemFields.attributes.fields.initiation }}
             {{/if}}
         {{/if}}
         {{#if emerged}}
-            {{> "systems/shadowrun5e/templates/v2/actor/parts/attribute.hbs"
+            {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
                 attribute=system.attributes.resonance
                 attributeField=@root.systemFields.attributes.fields.resonance }}
 
             {{#if (or @root.isEditMode system.attributes.submersion.value)}}
-                {{> "systems/shadowrun5e/templates/v2/actor/parts/fake-attribute.hbs"
+                {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/fake-attribute.hbs"
                     attribute=system.attributes.submersion
                     attributeField=@root.systemFields.attributes.fields.submersion }}
             {{/if}}

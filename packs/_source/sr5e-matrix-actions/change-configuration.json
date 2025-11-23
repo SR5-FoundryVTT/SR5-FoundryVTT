@@ -2,7 +2,7 @@
   "name": "Change Configuration",
   "type": "action",
   "flags": {},
-  "img": "systems/shadowrun5e/icons/card-exchange.svg",
+  "img": "systems/shadowrun5e/dist/icons/card-exchange.svg",
   "effects": [],
   "_id": "t63je4r8eHA0tPvn",
   "system": {

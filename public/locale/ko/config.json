@@ -27,7 +27,7 @@
         "HideGMOnlyChatContent": "GM 판정에서 중요한 정보 숨기기",
         "HideGMOnlyChatContentDescription": "사용된 액터를 소유한 플레이어어만 GM 판정 메시지에서 모든 정보를 볼 수 있음",
         "IgnoreDiagonal": "대각선 이동 무시 (1-1-1)",
-        "ImportIconFolderDescription": "불러오기 도구가 있는 폴더에 아이콘 파일이 있습니다. 기본 위치: 'systems/shadowrun5e/icons/importer/'",
+        "ImportIconFolderDescription": "불러오기 도구가 있는 폴더에 아이콘 파일이 있습니다. 기본 위치: 'systems/shadowrun5e/dist/icons/importer/'",
         "ImportIconFolderName": "아이콘 폴더 불러오기 도구",
         "ManualRollOnSuccessTest": "모든 판정에서 수동 주사위 굴림",
         "ManualRollOnSuccessTestDescription": "판정 시 사용자가 주사위를 수동으로 굴리고, 성공횟수를 보고하게 함",

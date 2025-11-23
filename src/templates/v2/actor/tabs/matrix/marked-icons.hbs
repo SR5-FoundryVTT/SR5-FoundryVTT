@@ -1,16 +1,16 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
-        {{> 'systems/shadowrun5e/templates/v2/list-items/marked_icon/header.hbs'
+        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/marked_icon/header.hbs'
             label='SR5.Labels.ActorSheet.Icons'
             type='marked_icon'
             cssClass="header-for-scrollable"
         }}
         <div id="marked-icons-scroll" class="scrollable">
         {{#each @root.markedDocuments}}
-            {{> 'systems/shadowrun5e/templates/v2/list-items/marked_icon/item.hbs' item=this}}
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/marked_icon/item.hbs' item=this}}
             {{! -- Overview of icons connected to the main icon (devices of persona) -- }}
             {{#each this.icons}}
-                {{> 'systems/shadowrun5e/templates/v2/list-items/marked_icon/item.hbs' item=this cssClass="list-item-subcategory"}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/marked_icon/item.hbs' item=this cssClass="list-item-subcategory"}}
             {{/each}}
         {{/each}}
         </div>

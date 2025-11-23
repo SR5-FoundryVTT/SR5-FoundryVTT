@@ -2,7 +2,7 @@
   "_id": "WreZIjCXEV43lYXD",
   "name": "Lift Carry",
   "type": "action",
-  "img": "systems/shadowrun5e/icons/redist/fist.svg",
+  "img": "systems/shadowrun5e/dist/icons/redist/fist.svg",
   "effects": [],
   "folder": null,
   "sort": 0,

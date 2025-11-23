@@ -20,7 +20,7 @@ export class OpposedCheckOverwatchScoreTest extends OpposedMatrixTest {
     }
 
     override get _chatMessageTemplate() {
-        return 'systems/shadowrun5e/templates/rolls/opposing-check-overwatch-score-message.hbs';
+        return 'systems/shadowrun5e/dist/templates/rolls/opposing-check-overwatch-score-message.hbs';
     }
 
     override get successLabel(): Translation {

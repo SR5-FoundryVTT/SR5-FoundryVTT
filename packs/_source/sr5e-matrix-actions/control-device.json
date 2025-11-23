@@ -2,7 +2,7 @@
   "name": "Control Device",
   "type": "action",
   "flags": {},
-  "img": "systems/shadowrun5e/icons/atomic-slashes.svg",
+  "img": "systems/shadowrun5e/dist/icons/atomic-slashes.svg",
   "effects": [],
   "_id": "X47LoIcFZFRd59ld",
   "system": {

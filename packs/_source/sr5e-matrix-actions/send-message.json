@@ -2,7 +2,7 @@
   "name": "Send Message",
   "type": "action",
   "flags": {},
-  "img": "systems/shadowrun5e/icons/letter-bomb.svg",
+  "img": "systems/shadowrun5e/dist/icons/letter-bomb.svg",
   "effects": [],
   "_id": "rQIxXNz4iFSGs2bW",
   "system": {

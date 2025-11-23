@@ -2,7 +2,7 @@
   "_id": "12kCkFNP5jEaSV28",
   "name": "Armor",
   "type": "action",
-  "img": "systems/shadowrun5e/icons/redist/shield.svg",
+  "img": "systems/shadowrun5e/dist/icons/redist/shield.svg",
   "effects": [],
   "folder": null,
   "sort": 0,

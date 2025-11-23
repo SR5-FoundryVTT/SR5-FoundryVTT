@@ -49,7 +49,7 @@ export default abstract class AbstractCompendiaSettings extends HandlebarsApplic
 
     static override PARTS = {
         form: {
-            template: `systems/shadowrun5e/templates/apps/settings/compendia-settings.hbs`,
+            template: `systems/shadowrun5e/dist/templates/apps/settings/compendia-settings.hbs`,
         },
         footer: {
             template: 'templates/generic/form-footer.hbs',

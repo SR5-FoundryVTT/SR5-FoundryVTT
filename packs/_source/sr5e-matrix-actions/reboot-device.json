@@ -2,7 +2,7 @@
   "name": "Reboot Device",
   "type": "action",
   "flags": {},
-  "img": "systems/shadowrun5e/icons/anticlockwise-rotation.svg",
+  "img": "systems/shadowrun5e/dist/icons/anticlockwise-rotation.svg",
   "effects": [],
   "_id": "6PNPh9hLcxNOb54v",
   "system": {

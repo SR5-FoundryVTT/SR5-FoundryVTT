@@ -1,7 +1,7 @@
-{{> "systems/shadowrun5e/templates/v2/actor/parts/limits.hbs" }}
+{{> "systems/shadowrun5e/dist/templates/v2/actor/parts/limits.hbs" }}
 <div class="attributes">
     {{#each system.attributes as |attribute attributeId|}} {{#unless attribute.hidden}}
-        {{> "systems/shadowrun5e/templates/v2/actor/parts/attribute.hbs"
+        {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
                 attribute=attribute
                 attributeField=(objValue @root.systemFields.attributes.fields attributeId)
                 rootId=@root.rootId

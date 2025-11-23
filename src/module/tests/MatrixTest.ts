@@ -70,11 +70,11 @@ export class MatrixTest<T extends MatrixTestData = MatrixTestData> extends Succe
     }
 
     override get _dialogTemplate(): string {
-        return 'systems/shadowrun5e/templates/apps/dialogs/matrix-test-dialog.hbs';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/matrix-test-dialog.hbs';
     }
 
     override get _chatMessageTemplate() {
-        return 'systems/shadowrun5e/templates/chat/matrix-test-message.hbs';
+        return 'systems/shadowrun5e/dist/templates/chat/matrix-test-message.hbs';
     }
 
     override prepareBaseValues() {

@@ -2,7 +2,7 @@
   "name": "Hide",
   "type": "action",
   "flags": {},
-  "img": "systems/shadowrun5e/icons/duality.svg",
+  "img": "systems/shadowrun5e/dist/icons/duality.svg",
   "effects": [],
   "_id": "gyGL48YYCENpxIGR",
   "system": {

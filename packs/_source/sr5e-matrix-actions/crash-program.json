@@ -2,7 +2,7 @@
   "name": "Crash Program",
   "type": "action",
   "flags": {},
-  "img": "systems/shadowrun5e/icons/cancel.svg",
+  "img": "systems/shadowrun5e/dist/icons/cancel.svg",
   "effects": [],
   "_id": "jZebcxUjAiJUSUCz",
   "system": {

@@ -24,7 +24,7 @@
         "FreshIcon": "Destacar Apenas com Ícone",
         "HideGMOnlyChatContent": "Ocultar informações críticas no teste para o GM",
         "HideGMOnlyChatContentDescription": "As mensagens de teste para o GM só mostrarão todas as informações para os jogadores que possuem o ator usado",
-        "ImportIconFolderDescription": "A pasta onde o importador pode encontrar arquivos de ícone. Localização padrão: 'systems/shadowrun5e/icons/importer/'",
+        "ImportIconFolderDescription": "A pasta onde o importador pode encontrar arquivos de ícone. Localização padrão: 'systems/shadowrun5e/dist/icons/importer/'",
         "ImportIconFolderName": "Pasta de Ícones do Importador",
         "ManualRollOnSuccessTest": "Rolar dados manualmente em qualquer teste",
         "ManualRollOnSuccessTestDescription": "Permitir que o usuário role dados manualmente em testes e reporte acertos",

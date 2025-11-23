@@ -2,7 +2,7 @@
   "name": "Edit File",
   "type": "action",
   "flags": {},
-  "img": "systems/shadowrun5e/icons/files.svg",
+  "img": "systems/shadowrun5e/dist/icons/files.svg",
   "effects": [],
   "_id": "0yF3z7r8ObzUISud",
   "system": {

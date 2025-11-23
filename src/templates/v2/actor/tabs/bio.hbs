@@ -1,26 +1,26 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="split-container">
         <div>
-            {{> 'systems/shadowrun5e/templates/v2/list-items/quality/header.hbs'
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/quality/header.hbs'
                 label='SR5.ItemTypes.Quality'
                 cssClass="header-for-scrollable"
                 type='quality' }}
             <div class="scrollable" id="quality-scroll-list">
                 {{#each itemType.quality}}
-                    {{> 'systems/shadowrun5e/templates/v2/list-items/quality/item.hbs' item=this }}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/quality/item.hbs' item=this }}
                 {{/each}}
             </div>
         </div>
         {{#ife actor.type 'character'}}
             {{#if awakened}}
             <div>
-                {{> 'systems/shadowrun5e/templates/v2/list-items/metamagic/header.hbs'
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/metamagic/header.hbs'
                     label='SR5.Metamagics'
                     cssClass="header-for-scrollable"
                     type='metamagic' }}
                 <div class="scrollable" id="metamagics-scroll-list">
                     {{#each itemType.metamagic}}
-                        {{> 'systems/shadowrun5e/templates/v2/list-items/metamagic/item.hbs'
+                        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/metamagic/item.hbs'
                             item=this
                         }}
                     {{/each}}
@@ -29,13 +29,13 @@
             {{/if}}
             {{#if emerged}}
                 <div>
-                    {{> 'systems/shadowrun5e/templates/v2/list-items/echo/header.hbs'
+                    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/echo/header.hbs'
                         label='SR5.Echoes'
                         cssClass="header-for-scrollable"
                         type='echo' }}
                     <div class="scrollable" id="echoes-scroll-list">
                         {{#each itemType.echo}}
-                            {{> 'systems/shadowrun5e/templates/v2/list-items/echo/item.hbs' item=this }}
+                            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/echo/item.hbs' item=this }}
                         {{/each}}
                     </div>
                 </div>

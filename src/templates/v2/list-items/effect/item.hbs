@@ -44,7 +44,7 @@
             </a>
             {{#if @root.isEditMode}}
                 {{#if @root.actor}}
-                    {{> 'systems/shadowrun5e/templates/v2/list-items/toggle-visible-icon.hbs' item }}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/toggle-visible-icon.hbs' item }}
                 {{/if}}
                 <a data-tooltip="SR5.EditEffect" data-action="editEffect">
                     <i class="fas fa-pen-to-square"></i>
@@ -59,7 +59,7 @@
     </div>
     <div class="list-item-desc">
         <div class="list-item-properties">
-            {{> 'systems/shadowrun5e/templates/v2/item-properties/effect.hbs' item=item }}
+            {{> 'systems/shadowrun5e/dist/templates/v2/item-properties/effect.hbs' item=item }}
         </div>
         <div class="description-body">
             {{{objValue (objValue @root.expandedUuids item.uuid) 'html'}}}

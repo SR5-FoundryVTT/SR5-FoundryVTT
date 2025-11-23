@@ -1,4 +1,4 @@
-{{> 'systems/shadowrun5e/templates/v2/common/horizontal-cells.hbs'
+{{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
         tooltip=tooltip
         value=track.value
         max=track.max
@@ -9,7 +9,7 @@
 }}
 {{#if track.overflow}}
     {{#ife track.value track.max}}
-        {{> 'systems/shadowrun5e/templates/v2/common/horizontal-cells.hbs'
+        {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
                 tooltip=(localize "SR5.Overflow")
                 value=track.overflow.value
                 max=track.overflow.max

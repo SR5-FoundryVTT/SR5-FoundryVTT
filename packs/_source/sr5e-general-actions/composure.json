@@ -2,7 +2,7 @@
   "_id": "oOKa7tt1wZIo20Eu",
   "name": "Composure",
   "type": "action",
-  "img": "systems/shadowrun5e/icons/redist/aprotect.svg",
+  "img": "systems/shadowrun5e/dist/icons/redist/aprotect.svg",
   "effects": [],
   "folder": null,
   "sort": 0,

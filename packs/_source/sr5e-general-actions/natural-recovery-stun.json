@@ -2,7 +2,7 @@
   "_id": "bVuagJE5ze31KrJC",
   "name": "Natural Recovery Stun",
   "type": "action",
-  "img": "systems/shadowrun5e/icons/redist/healing.svg",
+  "img": "systems/shadowrun5e/dist/icons/redist/healing.svg",
   "effects": [],
   "folder": null,
   "sort": 0,

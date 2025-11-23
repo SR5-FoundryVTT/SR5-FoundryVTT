@@ -2,7 +2,7 @@
   "name": "Enter/Exit Host",
   "type": "action",
   "flags": {},
-  "img": "systems/shadowrun5e/icons/dodging.svg",
+  "img": "systems/shadowrun5e/dist/icons/dodging.svg",
   "effects": [],
   "_id": "skYgsxr9IkXYkI8n",
   "system": {

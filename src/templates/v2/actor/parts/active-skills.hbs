@@ -1,5 +1,5 @@
 <div class="fill-container">
-    {{> 'systems/shadowrun5e/templates/v2/list-items/skill/header.hbs'
+    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/header.hbs'
         label="SR5.ActiveSkills"
         headerAction="filterTrainedSkills"
         addAction="addActiveSkill"
@@ -16,7 +16,7 @@
     </div>
     <section id="active-skills-scroll" class="scrollable">
         {{#each system.skills.active as |skill sid|}}
-            {{> 'systems/shadowrun5e/templates/v2/list-items/skill/item.hbs'
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/item.hbs'
                 skillPath=(concat "system.skills.active." sid)
                 category='active'
                 skill=skill

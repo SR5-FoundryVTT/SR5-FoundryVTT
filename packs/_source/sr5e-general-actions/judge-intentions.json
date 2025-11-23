@@ -2,7 +2,7 @@
   "_id": "0RHkpnQA1qNjyxKE",
   "name": "Judge Intentions",
   "type": "action",
-  "img": "systems/shadowrun5e/icons/redist/eye.svg",
+  "img": "systems/shadowrun5e/dist/icons/redist/eye.svg",
   "effects": [],
   "folder": null,
   "sort": 0,

@@ -78,7 +78,7 @@ export class BulkImporter extends BaseClass {
      */
     static override PARTS = {
         content: {
-            template: "systems/shadowrun5e/templates/apps/bulk-importer.hbs",
+            template: "systems/shadowrun5e/dist/templates/apps/bulk-importer.hbs",
         },
     };
 

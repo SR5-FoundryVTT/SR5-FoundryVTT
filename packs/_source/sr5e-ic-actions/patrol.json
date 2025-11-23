@@ -3,7 +3,7 @@
   "folder": null,
   "name": "Patrol",
   "type": "action",
-  "img": "systems/shadowrun5e/icons/cyber-eye.svg",
+  "img": "systems/shadowrun5e/dist/icons/cyber-eye.svg",
   "system": {
     "description": {
       "value": "",

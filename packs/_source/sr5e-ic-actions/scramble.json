@@ -3,7 +3,7 @@
   "folder": null,
   "name": "Scramble",
   "type": "action",
-  "img": "systems/shadowrun5e/icons/amplitude.svg",
+  "img": "systems/shadowrun5e/dist/icons/amplitude.svg",
   "system": {
     "description": {
       "value": "",

@@ -42,7 +42,7 @@ export class ThrownAttackTest extends SuccessTest<ThrownAttackTestData> {
     }
 
     override get _dialogTemplate(): string {
-        return 'systems/shadowrun5e/templates/apps/dialogs/thrown-attack-test-dialog.hbs';
+        return 'systems/shadowrun5e/dist/templates/apps/dialogs/thrown-attack-test-dialog.hbs';
     }
 
     /**

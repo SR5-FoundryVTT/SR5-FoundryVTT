@@ -47,7 +47,7 @@ export const MatrixRebootFlow = {
             alias: game.user?.name,
             token: actor.getActiveTokens(true)[0]?.id,
         };
-        const content = await foundry.applications.handlebars.renderTemplate('systems/shadowrun5e/templates/chat/reboot-device-message.hbs', {
+        const content = await foundry.applications.handlebars.renderTemplate('systems/shadowrun5e/dist/templates/chat/reboot-device-message.hbs', {
             speaker,
             delay,
             device,

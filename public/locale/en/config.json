@@ -31,7 +31,7 @@
         "HideGMOnlyChatContent": "Hide critical information on GM test",
         "HideGMOnlyChatContentDescription": "GM test messages will only show all information to players that own the used actor",
         "IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",
-        "ImportIconFolderDescription": "The folder where the importer can find icon files. Default location: 'systems/shadowrun5e/icons/importer/'",
+        "ImportIconFolderDescription": "The folder where the importer can find icon files. Default location: 'systems/shadowrun5e/dist/icons/importer/'",
         "ImportIconFolderName": "Importer Icon Folder",
         "ManualRollOnSuccessTest": "Manual dice roll on any test",
         "ManualRollOnSuccessTestDescription": "Allow user to manually roll dice on tests and report back hits",

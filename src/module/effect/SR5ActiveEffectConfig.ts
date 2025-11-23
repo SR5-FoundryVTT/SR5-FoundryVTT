@@ -113,11 +113,11 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     static override PARTS = {
         ...super.PARTS,
         // override the changes tab so we can use autoinline properties
-        changes: {template: 'systems/shadowrun5e/templates/effect/active-effect-changes.hbs', scrollable: ["ol[data-changes]"]},
+        changes: {template: 'systems/shadowrun5e/dist/templates/effect/active-effect-changes.hbs', scrollable: ["ol[data-changes]"]},
         // override the details tab so we can include our extra settings
-        details: {template: 'systems/shadowrun5e/templates/effect/active-effect-details.hbs', scrollable: [""]},
-        applyTo: {template: 'systems/shadowrun5e/templates/effect/active-effect-apply-to.hbs'},
-        help: {template: 'systems/shadowrun5e/templates/effect/active-effect-help.hbs'},
+        details: {template: 'systems/shadowrun5e/dist/templates/effect/active-effect-details.hbs', scrollable: [""]},
+        applyTo: {template: 'systems/shadowrun5e/dist/templates/effect/active-effect-apply-to.hbs'},
+        help: {template: 'systems/shadowrun5e/dist/templates/effect/active-effect-help.hbs'},
     }
 
     /**

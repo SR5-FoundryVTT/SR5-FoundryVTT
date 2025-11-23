@@ -2,7 +2,7 @@
   "name": "Format Device",
   "type": "action",
   "flags": {},
-  "img": "systems/shadowrun5e/icons/exploding-planet.svg",
+  "img": "systems/shadowrun5e/dist/icons/exploding-planet.svg",
   "effects": [],
   "_id": "L39vCc4rWMjfNxQO",
   "system": {

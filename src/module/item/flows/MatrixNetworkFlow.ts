@@ -424,7 +424,7 @@ export class MatrixNetworkFlow {
             return;
         }
 
-        const content = await renderTemplate('systems/shadowrun5e/templates/chat/matrix-network-mark-invite.hbs', {
+        const content = await renderTemplate('systems/shadowrun5e/dist/templates/chat/matrix-network-mark-invite.hbs', {
             target
         });
 

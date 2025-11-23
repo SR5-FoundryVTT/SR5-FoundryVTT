@@ -27,7 +27,7 @@
         "HideGMOnlyChatContent": "Verstecke kritische Informationen bei SL-Proben",
         "HideGMOnlyChatContentDescription": "Nachrichten durch SL-Proben zeigen kritische Informationen nur Spielern mit Besitzer-Rechten für den genutzten Akteur.",
         "IgnoreDiagonal": "Ignoriere diagonale Bewegung (1-1-1)",
-        "ImportIconFolderDescription": "Der Ordner, in dem der Importer die Icon-Dateien finden kann. Standard-Ort: 'systems/shadowrun5e/icons/importer/'",
+        "ImportIconFolderDescription": "Der Ordner, in dem der Importer die Icon-Dateien finden kann. Standard-Ort: 'systems/shadowrun5e/dist/icons/importer/'",
         "ImportIconFolderName": "Importer Icon-Ordner",
         "ManualRollOnSuccessTest": "Manuelles Würfeln bei Proben",
         "ManualRollOnSuccessTestDescription": "Erlaubt Benutzern manuelle Würfelwürfe bei Proben und Rückmeldungen von Erfolgen und Patzern.",

@@ -3,7 +3,7 @@
         <div class="list-item list-item-header">
             {{#if matrixDevice}}
                 <div class="basic-row" data-item-id="{{matrixDevice.id}}" data-uuid="{{matrixDevice.uuid}}">
-                    {{> "systems/shadowrun5e/templates/v2/list-items/item-roll-image.hbs" matrixDevice }}
+                    {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" matrixDevice }}
                     <a data-action="editItem">
                         {{matrixDevice.name}}
                     </a>
@@ -44,11 +44,11 @@
         <div class="split-container">
             <div>
                 {{#if (isType actor 'ic')}}
-                    {{> 'systems/shadowrun5e/templates/v2/actor/parts/ic-attributes.hbs' }}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/ic-attributes.hbs' }}
                 {{else}}
                     <div class="attributes">
                         {{#each config.matrixAttributes as |label key|}}
-                            {{> "systems/shadowrun5e/templates/v2/actor/parts/matrix-attribute.hbs"
+                            {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/matrix-attribute.hbs"
                                 matrixAtt=(lookup ../system.matrix key)
                                 attributeField=(objValue @root.systemFields.matrix.fields key)
                                 isCyberdeck=../system.matrix.is_cyberdeck
@@ -64,14 +64,14 @@
                         {{#if vehicle.master}}
                             <label>{{localize "SR5.Labels.ActorSheet.ConnectedTo"}}:&nbsp;</label>
                             <div class="basic-row">
-                                {{> "systems/shadowrun5e/templates/v2/list-items/item-roll-image.hbs" network }}
+                                {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" network }}
                                 <a data-action="openUuid" data-uuid="{{vehicle.master.uuid}}">{{vehicle.master.name}}</a>
                             </div>
                         {{else}}
                             {{#if network}}
                                 <label>{{localize "SR5.Labels.ActorSheet.ConnectedTo"}}:&nbsp;</label>
                                 <div class="basic-row">
-                                    {{> "systems/shadowrun5e/templates/v2/list-items/item-roll-image.hbs" network }}
+                                    {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" network }}
                                     <a data-action="openUuid" data-uuid="{{network.uuid}}">{{network.name}}</a>
                                 </div>
                             {{else}}
@@ -108,7 +108,7 @@
                 {{#if (isType actor 'character' 'vehicle')}}
                     {{#if system.matrix.condition_monitor.max}}
                         <div class="condition-monitor-container">
-                            {{> 'systems/shadowrun5e/templates/v2/common/horizontal-cells.hbs'
+                            {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
                                 tooltip=(localize "SR5.Labels.ActorSheet.Matrix")
                                 value=system.matrix.condition_monitor.value
                                 max=system.matrix.condition_monitor.max

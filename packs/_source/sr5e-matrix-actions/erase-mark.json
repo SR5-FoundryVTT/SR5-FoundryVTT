@@ -2,7 +2,7 @@
   "name": "Erase Mark",
   "type": "action",
   "flags": {},
-  "img": "systems/shadowrun5e/icons/cross-mark.svg",
+  "img": "systems/shadowrun5e/dist/icons/cross-mark.svg",
   "effects": [],
   "_id": "NjAyfCxoU0zvmbcO",
   "system": {

@@ -2,7 +2,7 @@
   "name": "Trace Icon",
   "type": "action",
   "_id": "2Dc0o0KbeOfYnwxl",
-  "img": "systems/shadowrun5e/icons/dodge.svg",
+  "img": "systems/shadowrun5e/dist/icons/dodge.svg",
   "system": {
     "description": {
       "value": "",

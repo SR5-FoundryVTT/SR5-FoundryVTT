@@ -2,7 +2,7 @@
   "name": "Disarm Data Bomb",
   "type": "action",
   "flags": {},
-  "img": "systems/shadowrun5e/icons/auto-repair.svg",
+  "img": "systems/shadowrun5e/dist/icons/auto-repair.svg",
   "effects": [],
   "_id": "brwvXUwFFzQ31kKh",
   "system": {

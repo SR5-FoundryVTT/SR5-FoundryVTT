@@ -2,7 +2,7 @@
   "name": "Switch Interface Mode",
   "type": "action",
   "flags": {},
-  "img": "systems/shadowrun5e/icons/arrow-dunk.svg",
+  "img": "systems/shadowrun5e/dist/icons/arrow-dunk.svg",
   "effects": [],
   "_id": "3hXaxVSZkHdeklZB",
   "system": {

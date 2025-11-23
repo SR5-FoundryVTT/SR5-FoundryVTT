@@ -3,7 +3,7 @@
   "folder": null,
   "name": "Track",
   "type": "action",
-  "img": "systems/shadowrun5e/icons/world.svg",
+  "img": "systems/shadowrun5e/dist/icons/world.svg",
   "system": {
     "description": {
       "value": "",

@@ -3,7 +3,7 @@
   "folder": null,
   "name": "Catapult",
   "type": "action",
-  "img": "systems/shadowrun5e/icons/importer/echo.svg",
+  "img": "systems/shadowrun5e/dist/icons/importer/echo.svg",
   "system": {
     "description": {
       "value": "",

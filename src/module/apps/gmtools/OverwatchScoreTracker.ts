@@ -12,7 +12,7 @@ export class OverwatchScoreTracker extends foundry.appv1.api.Application {
         options.id = 'overwatch-score-tracker';
         options.classes = ['sr5'];
         options.title = game.i18n.localize('SR5.OverwatchScoreTrackerTitle');
-        options.template = 'systems/shadowrun5e/templates/apps/gmtools/overwatch-score-tracker.hbs';
+        options.template = 'systems/shadowrun5e/dist/templates/apps/gmtools/overwatch-score-tracker.hbs';
         options.width = 550;
         options.height = 'auto';
         options.resizable = true;

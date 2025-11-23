@@ -29,7 +29,7 @@ export class OpposedRitualTest extends OpposedTest<OpposedRitualTestData> {
     }
 
     override get _chatMessageTemplate(): string {
-        return 'systems/shadowrun5e/templates/rolls/success-test-message.hbs'
+        return 'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs'
     }
 
     /**

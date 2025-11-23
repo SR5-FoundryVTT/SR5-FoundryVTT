@@ -2,7 +2,7 @@
   "name": "Jump Into Rigged Device",
   "type": "action",
   "flags": {},
-  "img": "systems/shadowrun5e/icons/delivery-drone.svg",
+  "img": "systems/shadowrun5e/dist/icons/delivery-drone.svg",
   "effects": [],
   "_id": "S9dGv1zkGlEtvUf1",
   "system": {

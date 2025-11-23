@@ -3,7 +3,7 @@ import { SR5 } from '@/module/config';
 export const preloadHandlebarsTemplates = async () => {
 
     const templateBase = (path: string) => {
-        return `systems/shadowrun5e/templates/v2/${path}.hbs`
+        return `systems/shadowrun5e/dist/templates/v2/${path}.hbs`
     }
 
     const templateListItem = (...parts: string[]) => {
@@ -75,49 +75,49 @@ export const preloadHandlebarsTemplates = async () => {
             'special-attributes',
         ),
 
-        'systems/shadowrun5e/templates/rolls/parts/parts-list.hbs',
-        'systems/shadowrun5e/templates/rolls/parts/Damage.hbs',
+        'systems/shadowrun5e/dist/templates/rolls/parts/parts-list.hbs',
+        'systems/shadowrun5e/dist/templates/rolls/parts/Damage.hbs',
 
         // to wrap the bodies of tabs
-        'systems/shadowrun5e/templates/common/TabWrapper.hbs',
-        'systems/shadowrun5e/templates/common/ValueInput.hbs',
+        'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs',
+        'systems/shadowrun5e/dist/templates/common/ValueInput.hbs',
 
         // Useful wrapper and implemented components
-        'systems/shadowrun5e/templates/common/ValueMaxAttribute.hbs',
-        'systems/shadowrun5e/templates/common/Attribute.hbs',
-        'systems/shadowrun5e/templates/common/ValueModifiers.hbs',
+        'systems/shadowrun5e/dist/templates/common/ValueMaxAttribute.hbs',
+        'systems/shadowrun5e/dist/templates/common/Attribute.hbs',
+        'systems/shadowrun5e/dist/templates/common/ValueModifiers.hbs',
 
         // useful select template for the common pattern
-        'systems/shadowrun5e/templates/common/Select.hbs',
+        'systems/shadowrun5e/dist/templates/common/Select.hbs',
 
         // to create the condition monitors and edge counter
-        'systems/shadowrun5e/templates/common/HorizontalCellInput.hbs',
+        'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.hbs',
 
         // looks like a ListHeader
-        'systems/shadowrun5e/templates/common/HeaderBlock.hbs',
+        'systems/shadowrun5e/dist/templates/common/HeaderBlock.hbs',
 
-        'systems/shadowrun5e/templates/common/NameLineBlock.hbs',
+        'systems/shadowrun5e/dist/templates/common/NameLineBlock.hbs',
 
         // list components
-        'systems/shadowrun5e/templates/common/List/ListItem.hbs',
-        'systems/shadowrun5e/templates/common/List/ListEntityItem.hbs',
-        'systems/shadowrun5e/templates/common/List/ListHeader.hbs',
+        'systems/shadowrun5e/dist/templates/common/List/ListItem.hbs',
+        'systems/shadowrun5e/dist/templates/common/List/ListEntityItem.hbs',
+        'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs',
 
         // dialogs
-        'systems/shadowrun5e/templates/apps/dialogs/damage-application.hbs',
-        'systems/shadowrun5e/templates/apps/dialogs/parts/success-test-common.hbs',
-        'systems/shadowrun5e/templates/apps/dialogs/parts/success-test-documents.hbs',
-        'systems/shadowrun5e/templates/apps/dialogs/parts/attack-range-dialog-fragment.hbs',
+        'systems/shadowrun5e/dist/templates/apps/dialogs/damage-application.hbs',
+        'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.hbs',
+        'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-documents.hbs',
+        'systems/shadowrun5e/dist/templates/apps/dialogs/parts/attack-range-dialog-fragment.hbs',
 
         // Test chat messages and their parts
-        'systems/shadowrun5e/templates/rolls/success-test-message.hbs',
-        'systems/shadowrun5e/templates/rolls/parts/rolled-dice.hbs',
+        'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs',
+        'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.hbs',
 
         // Application - Compendium Browser
-        'systems/shadowrun5e/templates/apps/compendium-browser/settings-folder.hbs',
+        'systems/shadowrun5e/dist/templates/apps/compendium-browser/settings-folder.hbs',
 
         // Application - Situational Modifiers
-        'systems/shadowrun5e/templates/apps/partials/modifiers-physical.hbs'
+        'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs'
     ];
 
     for (const type of Object.keys(SR5.itemTypes)) {

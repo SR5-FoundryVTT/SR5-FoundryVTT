@@ -3,7 +3,7 @@
   "folder": null,
   "name": "Binder",
   "type": "action",
-  "img": "systems/shadowrun5e/icons/atomic-slashes.svg",
+  "img": "systems/shadowrun5e/dist/icons/atomic-slashes.svg",
   "system": {
     "description": {
       "value": "",

@@ -2,7 +2,7 @@
   "_id": "IyYJOPovXGure9SJ",
   "name": "Fade",
   "type": "action",
-  "img": "systems/shadowrun5e/icons/redist/swirl.svg",
+  "img": "systems/shadowrun5e/dist/icons/redist/swirl.svg",
   "effects": [],
   "folder": null,
   "sort": 0,

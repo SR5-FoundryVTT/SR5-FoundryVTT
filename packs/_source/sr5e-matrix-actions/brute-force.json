@@ -2,7 +2,7 @@
   "name": "Brute Force",
   "type": "action",
   "flags": {},
-  "img": "systems/shadowrun5e/icons/cpu-shot.svg",
+  "img": "systems/shadowrun5e/dist/icons/cpu-shot.svg",
   "effects": [],
   "_id": "qqdJRdGwldDQA6JG",
   "system": {
