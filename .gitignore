@@ -1,14 +1,23 @@
+# OS
 *.swp
-.idea
-node_modules
-foundryconfig.json
-.vscode
-.vscode/launch.json
-shadowrun5e.lock
-*.code-workspace
-dist
 .vs
 
-# NOTE: v11 packs must be ignored until system goes v11 only and drops v10 support. Until then use v11 migration path for v11 support.
+# Editor / IDE
+.idea
+.vscode
+.vscode/launch.json
+*.code-workspace
+
+# Node / dependencies / lock files
+node_modules
+shadowrun5e.lock
+
+# Build / distribution
+dist
+
+# Foundry
+foundryconfig.json
+
+# Packs: ignore all built packs but keep source
 packs/*
-!packs/_source/
+!packs/_source

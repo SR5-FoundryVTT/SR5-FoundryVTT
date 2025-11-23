@@ -21,7 +21,10 @@
         "globals": "^16.5.0",
         "gulp": "^5.0.1",
         "gulp-sass": "^6.0.1",
+        "husky": "^9.1.7",
         "jszip": "^3.10.1",
+        "lint-staged": "^16.1.6",
+        "prettier": "^3.6.2",
         "sass": "^1.94.2",
         "stream": "^0.0.3",
         "timers": "^0.1.1",
@@ -39,6 +42,17 @@
         "lint:fix": "npx eslint . --fix",
         "lint:errors": "npx eslint . --quiet",
         "lint:errors:fix": "npx eslint . --quiet --fix",
-        "prettier": "npx prettier --write **/*.ts"
+        "prettier": "npx prettier --write **/*.ts",
+        "prepare": "husky",
+        "lint-staged": "lint-staged"
+    },
+    "lint-staged": {
+        "*.{ts,js,mjs,cjs}": [
+            "eslint --fix",
+            "prettier --write"
+        ],
+        "*.{json,md,scss,css,html,yml}": [
+            "prettier --write"
+        ]
     }
 }

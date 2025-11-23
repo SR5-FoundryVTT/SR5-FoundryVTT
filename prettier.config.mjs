@@ -1,0 +1,16 @@
+export default {
+    printWidth: 120,
+    tabWidth: 4,
+    useTabs: false,
+    singleQuote: true,
+    semi: true,
+    quoteProps: 'as-needed',
+    trailingComma: 'all',
+    bracketSpacing: true,
+    bracketSameLine: false,
+    arrowParens: 'always',
+    htmlWhitespaceSensitivity: 'css',
+    endOfLine: 'lf',
+    singleAttributePerLine: false,
+    proseWrap: 'always',
+};

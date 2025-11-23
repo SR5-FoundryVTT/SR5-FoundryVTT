@@ -1,0 +1,8 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# 1. Check for TypeScript errors (entire project)
+npm run test
+
+# 2. Lint and Format only staged files
+npx lint-staged
