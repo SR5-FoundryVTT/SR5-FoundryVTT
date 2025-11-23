@@ -191,7 +191,7 @@
 
 .chummer-import-modal {
   // 🔽 Local variables mapped to Global Config
-  $primary: variables.$darkred;
+  $primary: color.adjust(variables.$red, $lightness: -15%);
   $warning: variables.$yellow;
   $text: variables.$white;
   $text-muted: variables.$silver;
