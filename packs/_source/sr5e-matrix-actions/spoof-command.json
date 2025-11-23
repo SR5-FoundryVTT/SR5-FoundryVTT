@@ -22,7 +22,7 @@
       "skill": "hacking",
       "armor": false,
       "spec": false,
-      "mod": null,
+      "mod": 0,
       "mod_description": "",
       "roll_mode": "",
       "limit": {

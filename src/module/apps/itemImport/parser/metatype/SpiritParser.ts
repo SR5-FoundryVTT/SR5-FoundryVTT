@@ -3,7 +3,6 @@ import { CompendiumKey } from "../../importer/Constants";
 import { MetatypeParserBase } from './MetatypeParserBase';
 import { DataDefaults } from "src/module/data/DataDefaults";
 import { ImportHelper as IH } from '../../helper/ImportHelper';
-import { TranslationHelper as TH, TranslationType } from '../../helper/TranslationHelper';
 
 export class SpiritParser extends MetatypeParserBase<'spirit'> {
     protected readonly parseType = 'spirit';
@@ -13,7 +12,7 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
 
         switch (jsonData.category?._TEXT) {
             case "Insect Spirits":
-                system.spiritType = jsonData.name._TEXT.split(/[ /]/)[0].toLowerCase();
+                system.spiritType = jsonData.name._TEXT.split(/[ /]/)[0].toLowerCase() as any;
                 break;
 
             case "Toxic Spirits": {
@@ -23,7 +22,7 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
                     ['Plague Spirit', 'toxic_man'], ['Sludge Spirit', 'toxic_water']
                 ]);
 
-                system.spiritType = specialMapping.get(jsonData.name._TEXT) ?? "";
+                system.spiritType = (specialMapping.get(jsonData.name._TEXT) ?? "") as any;
                 break;
             }
 
@@ -41,25 +40,22 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
                 system.attributes.resonance.base = Number(jsonData.resmin?._TEXT) || 0;
 
                 system.spiritType = ["Watcher", "Corps Cadavre"].includes(jsonData.name._TEXT)
-                    ? jsonData.name._TEXT.replace(" ", "_").toLowerCase() : "homunculus";
+                    ? (jsonData.name._TEXT.replace(" ", "_").toLowerCase() as any) : "homunculus";
                 break;
             default:
                 system.spiritType = jsonData.name._TEXT
                     .replace(" Spirit", "").replace("Spirit of ", "")
                     .replace(" (Demon)", "").replace(/[\s\-]/g, "_")
-                    .split("/")[0].toLowerCase();
+                    .split("/")[0].toLowerCase() as any;
         }
 
-        if (jsonData.run) {
-            const [value, mult, base] = jsonData.run._TEXT.split('/').map((v) => +v || 0);
-            system.movement.run = DataDefaults.createData('movement_field', { value, mult, base })
-        }
+        if (jsonData.walk)
+            system.movement.walk.base = Number(jsonData.walk._TEXT.split('/')[0] ?? 0);
 
-        if (jsonData.walk) {
-            const [value, mult, base] = jsonData.walk._TEXT.split('/').map((v) => +v || 0);
-            system.movement.walk = DataDefaults.createData('movement_field', { value, mult, base })
-        }
-        system.movement.sprint = +(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
+        if (jsonData.run)
+            system.movement.run.base = Number(jsonData.run._TEXT.split('/')[0] ?? 0);
+
+        system.movement.sprint = Number(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
 
         return system;
     }
@@ -75,30 +71,23 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
             ...IH.getArray(qualities?.negative?.quality),
         ].map(i => i._TEXT);
 
-        const translationMap: Record<string, string> = {};
-        const addTranslations = (items: any[], type: TranslationType) =>
-            items.forEach(i => translationMap[i] = TH.getTranslation(i, { type }));
-
-        addTranslations(powerList, 'power');
-        addTranslations(qualityList, 'quality');
-
-        const allPowers = await IH.findItem('Critter_Power', powerList.map(i => translationMap[i]));
-        const allQualities = await IH.findItem('Quality', qualityList.map(i => translationMap[i]));
+        const allPowers = await IH.findItems('Critter_Power', powerList);
+        const allQualities = await IH.findItems('Quality', qualityList);
         const spiritName = name._TEXT;
 
         return [
-            ...this.getMetatypeItems(allPowers, powers?.power, { type: 'Power', critter: spiritName }, translationMap),
-            ...this.getMetatypeItems(allQualities, qualities?.positive?.quality, { type: 'Power', critter: spiritName }, translationMap),
-            ...this.getMetatypeItems(allQualities, qualities?.negative?.quality, { type: 'Power', critter: spiritName }, translationMap),
-            ...this.getMetatypeItems(allPowers, optionalpowers?.optionalpower, { type: 'Optional Power', critter: spiritName }, translationMap),
+            ...this.getMetatypeItems(allPowers, powers?.power, { type: 'Power', critter: spiritName }),
+            ...this.getMetatypeItems(allQualities, qualities?.positive?.quality, { type: 'Power', critter: spiritName }),
+            ...this.getMetatypeItems(allQualities, qualities?.negative?.quality, { type: 'Power', critter: spiritName }),
+            ...this.getMetatypeItems(allPowers, optionalpowers?.optionalpower, { type: 'Optional Power', critter: spiritName }),
         ];
     }
 
     protected override async getFolder(jsonData: Metatype, compendiumKey: CompendiumKey): Promise<Folder> {
         const category = jsonData.category ? jsonData.category._TEXT : "Other";
-        const rootFolder = TH.getTranslation("Spirit", {type: 'category'});
-        const folderName = TH.getTranslation(category, {type: 'category'});
-        const specFolder = category === 'Insect Spirits' ? jsonData.name._TEXT.match(/\(([^)]+)\)/)?.[1] : undefined;
+        const rootFolder = game.i18n.localize("TYPES.Actor.spirit");
+        const folderName = IH.getTranslatedCategory('metatypes', category);
+        const specFolder = category === 'Insect Spirits' ? /\(([^)]+)\)/.exec(jsonData.name._TEXT)?.[1] : undefined;
 
         return IH.getFolder(compendiumKey, rootFolder, folderName, specFolder);
     }

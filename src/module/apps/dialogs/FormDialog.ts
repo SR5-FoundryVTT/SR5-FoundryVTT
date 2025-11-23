@@ -160,10 +160,11 @@ export class FormDialog extends foundry.appv1.api.Dialog<FormDialogOptions> {
         return {};
     }
 
-    /** Allow for the selected button to be addressed by its key, not it's localized label.
+    /**
+     * Allow for the selected button to be addressed by its key, not it's localized label.
      */
-    _amendButtonsWithName(buttons) {
-        Object.keys(buttons).forEach(name => buttons[name].name = name);
+    _amendButtonsWithName(buttons: Record<string, Dialog.Button<unknown, HTMLElement> & { name?: string }>) {
+        Object.keys(buttons).forEach(name => { buttons[name].name = name; });
     }
 
     /**
@@ -184,7 +185,7 @@ export class FormDialog extends foundry.appv1.api.Dialog<FormDialogOptions> {
     /**
      * Based on FormDialog.options configuration apply changes to data.
      */
-    async _onChangeInput(event) {
+    async _onChangeInput(event: Event) {
         if ( this.options.applyFormChangesOnSubmit ) {
             this.applyFormData();
             this.render();

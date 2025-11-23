@@ -439,7 +439,7 @@ export class SR5Combat<SubType extends Combat.SubType = Combat.SubType> extends 
     }
 
     static async _handleDoNextRoundSocketMessage(message: SocketMessageData) {
-        if (!message.data.hasOwnProperty('id') && typeof message.data.id !== 'string') {
+        if (!Object.hasOwn(message.data, 'id') && typeof message.data.id !== 'string') {
             console.error(`SR5Combat Socket Message ${FLAGS.DoNextRound} data.id must be a string (combat id) but is ${typeof message.data} (${message.data})!`);
             return;
         }
@@ -448,7 +448,7 @@ export class SR5Combat<SubType extends Combat.SubType = Combat.SubType> extends 
     }
 
     static async _handleDoInitPassSocketMessage(message: SocketMessageData) {
-        if (!message.data.hasOwnProperty('id') && typeof message.data.id !== 'string') {
+        if (!Object.hasOwn(message.data, 'id') && typeof message.data.id !== 'string') {
             console.error(`SR5Combat Socket Message ${FLAGS.DoInitPass} data.id must be a string (combat id) but is ${typeof message.data} (${message.data})!`);
             return;
         }
@@ -461,7 +461,7 @@ export class SR5Combat<SubType extends Combat.SubType = Combat.SubType> extends 
      * @param message 
      */
     static async _handleDoNewActionPhaseSocketMessage(message: SocketMessageData) {
-        if (!message.data.hasOwnProperty('id') && typeof message.data.id !== 'string') {
+        if (!Object.hasOwn(message.data, 'id') && typeof message.data.id !== 'string') {
             console.error(`SR5Combat Socket Message ${FLAGS.DoNewActionPhase} data.id must be a string (combat id) but is ${typeof message.data} (${message.data})!`);
             return;
         }

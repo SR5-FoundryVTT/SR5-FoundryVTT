@@ -7,7 +7,7 @@ import { Version0_27_0 } from './versions/Version0_27_0';
 import { Version0_30_0 } from './versions/Version0_30_0';
 import { Version0_30_3 } from './versions/Version0_30_3';
 import { Version0_30_6 } from './versions/Version0_30_6';
-import { Version0_30_7 } from './versions/Version0_30_7';
+import { Version0_31_0 } from './versions/Version0_31_0';
 import { VersionMigration, MigratableDocument, MigratableDocumentName } from "./VersionMigration";
 const { deepClone } = foundry.utils;
 
@@ -41,10 +41,10 @@ export class Migrator {
         new Version0_30_0(),
         new Version0_30_3(),
         new Version0_30_6(),
-        new Version0_30_7(),
+        new Version0_31_0(),
     ] as const;
 
-    private static documentsToBeMigrated: number = 0;
+    private static documentsToBeMigrated = 0;
 
     // Generate the migration version mark used to track current system version in documents.
     private static get _migrationMark() {
@@ -77,7 +77,7 @@ export class Migrator {
      * Note: This method was previously called during `_initializeSource`,
      * but that caused migration of embedded items to be skipped in synthetic documents.
      */
-    public static migrate(type: MigratableDocumentName, data: any, nested: boolean = false, path: string[] = []): boolean {
+    public static migrate(type: MigratableDocumentName, data: any, nested = false, path: string[] = []): boolean {
         // Nested Items and AEs before V10 doesn't have _stats and also is not automatically added when loaded from server.
         if (nested || (type === "ActiveEffect" && data.label)) {
             data.type ??= "base";

@@ -1,17 +1,21 @@
 import {SR5Actor} from "../SR5Actor";
 import { SR5Item } from '../../item/SR5Item';
 import { MatrixNetworkFlow } from "@/module/item/flows/MatrixNetworkFlow";
-import { SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
+import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
 import { Helpers } from '@/module/helpers';
 import { MatrixRules } from '@/module/rules/MatrixRules';
 import { PackActionFlow } from "@/module/item/flows/PackActionFlow";
+import { SheetFlow } from '@/module/flows/SheetFlow';
 
-interface VehicleSheetDataFields {
-    driver: SR5Actor|undefined
-    master: SR5Item | undefined
+interface VehicleSheetDataFields extends MatrixActorSheetData {
+    isVehicle: boolean;
+    vehicle: {
+        driver: SR5Actor|undefined,
+        master: SR5Item | undefined
+    }
 }
 
-export class SR5VehicleActorSheet extends SR5MatrixActorSheet {
+export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFields> {
     /**
      * Vehicle actors will handle these item types specifically.
      *
@@ -19,13 +23,24 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet {
      *
      * @returns An array of item types from the template.json Item section.
      */
-    override getHandledItemTypes(): string[] {
-        let itemTypes = super.getHandledItemTypes();
+    override getHandledItemTypes(): Item.ConfiguredSubType[] {
+        const itemTypes = super.getHandledItemTypes();
 
         return [
             ...itemTypes,
             'program',
         ];
+    }
+
+    static override DEFAULT_OPTIONS = {
+        actions: {
+            pickDriver: SR5VehicleActorSheet.#pickDriver,
+            connectToDriver: SR5VehicleActorSheet.#connectToDriver,
+            removeMaster: SR5VehicleActorSheet.#removeMaster,
+            removeVehicleDriver: SR5VehicleActorSheet.#removeVehicleDriver,
+            toggleChaseEnvironment: SR5VehicleActorSheet.#toggleChaseEnvironment,
+            toggleOffRoad: SR5VehicleActorSheet.#toggleOffRoad,
+        }
     }
 
     /**
@@ -35,7 +50,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet {
      *
      * @returns An array of item types from the template.json Item section.
      */
-    override getInventoryItemTypes(): string[] {
+    override getInventoryItemTypes(): Item.ConfiguredSubType[] {
         const itemTypes = super.getInventoryItemTypes();
 
         return [
@@ -51,11 +66,13 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet {
         ];
     }
 
-    override async getData(options) {
-        const data = await super.getData(options);
+    override async _prepareContext(options: Parameters<SR5MatrixActorSheet["_prepareContext"]>[0]) {
+        const data = await super._prepareContext(options);
 
         // Vehicle actor type specific fields.
         data.vehicle = this._prepareVehicleFields();
+
+        data.isVehicle = true;
 
         return data;
     }
@@ -72,47 +89,21 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet {
         });
     }
 
-    override activateListeners(html: JQuery) {
-        super.activateListeners(html);
-
-        // Vehicle Sheet related handlers...
-        html.find('.driver-remove').on('click', this._handleRemoveVehicleDriver.bind(this));
-        html.find('.driver-pick').on('click', this._handlePickDriver.bind(this));
-
-        // PAN/WAN
-        html.find('.origin-link').on('click', this._onOpenOriginLink.bind(this));
-        html.find('.controller-remove').on('click', this._onControllerRemove.bind(this));
-
-        html.find('.connect-to-driver').on('click', this._onConnectToDriver.bind(this));
+    override async _onDropActor(event: DragEvent, actor: SR5Actor) {
+        await this.actor.addVehicleDriver(actor.uuid);
+        return null
     }
 
-    /**
-     * Vehicle specific drop events
-     * @param event A DataTransferEvent containing some form of FoundryVTT Document / Data
-     */
-    override async _onDrop(event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (!event.dataTransfer) return;
-
-        const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
-
-        if (dropData.type === 'Actor') {
-            return this.actor.addVehicleDriver(dropData.uuid)
-        } else if (dropData.type === 'Item') {
-            // if an item is dropped on us that can be a Master, connect to it
-            const item = await fromUuid(dropData.uuid) as SR5Item | undefined;
-            if (item && item.canBeMaster) {
-                return await this.actor.connectNetwork(item);
-            }
+    override async _onDropItem(event: DragEvent, item: SR5Item) {
+        if (item.canBeMaster) {
+            await this.actor.connectNetwork(item);
+            return null;
         }
 
-        // Handle none specific drop events.
-        return super._onDrop(event);
+        return super._onDropItem(event, item);
     }
 
-    _prepareVehicleFields(): VehicleSheetDataFields {
+    _prepareVehicleFields() {
         const driver = this.actor.getVehicleDriver();
 
         const master = this.actor.master || undefined;
@@ -123,18 +114,62 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet {
         };
     }
 
+    static override TABS = {
+        ...super.TABS,
+        primary: {
+            initial: 'skills',
+            labelPrefix: 'SR5.Tabs.Actor',
+            tabs: [
+                { id: 'actions', label: 'SR5.Tabs.Actor.Actions', cssClass: '' },
+                { id: 'skills', label: 'SR5.Tabs.Actor.Vehicle', cssClass: '' },
+                { id: 'inventory', label: 'SR5.Tabs.Actor.Inventory', cssClass: '' },
+                { id: 'matrix', label: 'SR5.Tabs.Actor.Matrix', cssClass: '' },
+                { id: 'effects', label: 'SR5.Tabs.Actor.Effects', cssClass: '' },
+                { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Actor.Description', cssClass: 'skinny' },
+                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Actor.MiscConfig', cssClass: 'skinny' },
+            ]
+        },
+    }
+
+    static override PARTS = {
+        ...super.PARTS,
+        matrix: {
+            template: SheetFlow.templateBase('actor/tabs/matrix'),
+            scrollable: [
+                '#matrix-actions-scroll',
+                '#marked-icons-scroll' ,
+                '#owned-icons-scroll',
+                '#network-icons-scroll',
+                '#programs-scroll',
+            ]
+        },
+        skills: {
+            template: SheetFlow.templateBase('actor/tabs/vehicle-skills'),
+            templates: [...SheetFlow.templateActorSystemParts(
+                'active-skills', 'vehicle-attributes'
+            ), ...SheetFlow.templateListItem('skill')],
+            scrollable: ['#active-skills-scroll']
+        },
+        inventory: {
+            template: SheetFlow.templateBase('actor/tabs/inventory'),
+            scrollable: ['.scrollable']
+        },
+    }
+
+
     /**
      * Connect to the PAN of the Driver
      * @param event
      */
-    async _onConnectToDriver(event) {
+    static async #connectToDriver(this: SR5VehicleActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
         const driver = this.actor.getVehicleDriver();
         if (driver) {
             const device = driver.getMatrixDevice();
             if (device) {
                 await device.addSlave(this.actor);
-                this.render(false);
+                void this.render(false);
             } else {
                 ui.notifications.error("No Device found on Driver")
             }
@@ -143,41 +178,40 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet {
         }
     }
 
-    async _handlePickDriver(event) {
+    static async #pickDriver(this: SR5VehicleActorSheet, event: Event) {
         event.preventDefault();
         const actors = Helpers.getControlledTokenActors();
         if (actors.length > 0) {
             // pick the first controlled actor
             const actor = actors[0];
             await this.actor.addVehicleDriver(actor.uuid);
-            this.render();
+            void this.render();
         }
 
     }
 
-    async _handleRemoveVehicleDriver(event) {
+    static async #removeVehicleDriver(this: SR5VehicleActorSheet, event: Event) {
         event.preventDefault();
         await this.actor.removeVehicleDriver();
-        this.render();
+        void this.render();
     }
 
-    async _onOpenOriginLink(event) {
+    static async #toggleChaseEnvironment(this: SR5VehicleActorSheet, event: Event) {
         event.preventDefault();
-
-        console.log('Shadowrun 5e | Opening PAN/WAN network controller');
-
-        const originLink = event.currentTarget.dataset.originLink;
-        const device = await fromUuid(originLink);
-        if (!device) return;
-
-        if (device instanceof SR5Item || device instanceof SR5Actor)
-            device?.sheet?.render(true);
+        const environment = this.actor.system.environment === 'handling' ? 'speed' : 'handling';
+        await this.actor.update({system: { environment }});
     }
 
-    async _onControllerRemove(event) {
+    static async #toggleOffRoad(this: SR5VehicleActorSheet, event: Event) {
+        event.preventDefault();
+        const isOffRoad = !this.actor.system.isOffRoad;
+        await this.actor.update({system: { isOffRoad }});
+    }
+
+    static async #removeMaster(this: SR5VehicleActorSheet, event: Event) {
         event.preventDefault();
 
         await MatrixNetworkFlow.removeSlaveFromMaster(this.actor);
-        this.render();
+        await this.render();
     }
 }

@@ -1,6 +1,7 @@
-import { BaseItemData, ItemBase } from "./ItemBase";
+import { SR5 } from "@/module/config";
 import { ArmorPartData } from "./Armor";
 import { ActionPartData } from "./Action";
+import { BaseItemData, ItemBase } from "./ItemBase";
 import { TechnologyPartData } from "../template/Technology";
 const { NumberField, StringField } = foundry.data.fields;
 
@@ -15,7 +16,7 @@ const BiowareData = () => ({
     grade: new StringField({
         required: true,
         initial: 'standard',
-        choices: ['alpha', 'beta', 'delta', 'gamma', 'standard', 'used'],
+        choices: SR5.cyberwareGrades,
     }),
 });
 
@@ -23,6 +24,7 @@ export class Bioware extends ItemBase<ReturnType<typeof BiowareData>> {
     static override defineSchema() {
         return BiowareData();
     }
+    static override LOCALIZATION_PREFIXES = ["SR5.Item", "SR5.Armor"];
 }
 
 console.log("BiowareData", BiowareData(), new Bioware());

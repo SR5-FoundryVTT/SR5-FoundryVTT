@@ -1,3 +1,4 @@
+import { SR5 } from "@/module/config";
 import { ArmorPartData } from "./Armor";
 import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
@@ -15,7 +16,7 @@ const CyberwareData = () => ({
     grade: new StringField({
         required: true,
         initial: 'standard',
-        choices: ['alpha', 'beta', 'delta', 'gamma', 'standard', 'used'],
+        choices: SR5.cyberwareGrades,
     }),
 });
 
@@ -23,6 +24,7 @@ export class Cyberware extends ItemBase<ReturnType<typeof CyberwareData>> {
     static override defineSchema() {
         return CyberwareData();
     }
+    static override LOCALIZATION_PREFIXES = ["SR5.Item", "SR5.Armor"];
 }
 
 console.log("CyberwareData", CyberwareData(), new Cyberware());

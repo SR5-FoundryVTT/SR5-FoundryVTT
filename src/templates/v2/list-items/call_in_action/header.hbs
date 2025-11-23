@@ -1,0 +1,37 @@
+<div class="list-item list-item-header {{cssClass}}">
+    <div class="list-item-start">
+        <label>
+            {{localize label}}
+        </label>
+    </div>
+
+    {{#if (eq actor_type 'spirit')}}
+        <div class="list-item-col thicc-col">
+            <label>
+                {{localize "SR5.Summoning.SpiritType"}}
+            </label>
+        </div>
+        <div class="list-item-col skinny-col">
+            <label>
+                {{localize "SR5.Force"}}
+            </label>
+        </div>
+    {{else if (eq actor_type 'sprite')}}
+        <div class="list-item-col thicc-col">
+            <label>
+                {{localize "SR5.Compilation.SpriteType"}}
+            </label>
+        </div>
+        <div class="list-item-col skinny-col">
+            <label>
+                {{localize "SR5.Level"}}
+            </label>
+        </div>
+    {{/if}}
+
+    {{#if @root.isEditMode}}
+        <div class="list-item-icons">
+            {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type }}
+        </div>
+    {{/if}}
+</div>

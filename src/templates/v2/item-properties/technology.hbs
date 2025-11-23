@@ -1,0 +1,13 @@
+{{#if item.system.technology.calculated.cost.value}}
+    <label data-tooltip="SR5.Cost">
+        <i class="fas fa-yen-sign"></i>&nbsp;{{nuyenValue item.system.technology.calculated.cost.value}}
+    </label>
+{{/if}}
+{{#if item.system.technology.rating}}
+    <label>{{localize "SR5.Rtg"}}&nbsp;{{item.system.technology.rating}}</label>
+{{/if}}
+{{#if item.system.technology.conceal.value}}
+    <label data-tooltip="SR5.Conceal">
+        <i class="fas fa-magnifying-glass"></i>&nbsp;{{numberFormat item.system.technology.conceal.value sign=true}}
+    </label>
+{{/if}}

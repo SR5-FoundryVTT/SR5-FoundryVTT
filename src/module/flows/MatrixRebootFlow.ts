@@ -16,7 +16,7 @@ export const MatrixRebootFlow = {
      * @param device The device to reboot.
      * @param delay The delay duration of combat turns after which the devices has rebooted.
      */
-    async rebootPersona(actor: SR5Actor, delay: number = 1) {
+    async rebootPersona(actor: SR5Actor, delay = 1) {
         console.debug('Shadowrun 5e | Rebooting Persona Device', actor);
         // TODO: Mark devices as rebooting to prohibit usage until end of next combat turn (effect with duration).
         // TODO: Allow for user input delay when rebooting device

@@ -1,8 +1,47 @@
 import { SR5Actor } from '../SR5Actor';
-import { SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
+import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
+import { SheetFlow } from '@/module/flows/SheetFlow';
+import { Helpers } from '@/module/helpers';
 
+export interface SpriteActorSheetData extends MatrixActorSheetData {
+    technomancer?: SR5Actor | null;
+    isSprite: boolean;
+}
 
-export class SR5SpriteActorSheet extends SR5MatrixActorSheet {
+export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetData> {
+    static override DEFAULT_OPTIONS = {
+        actions: {
+            pickTechnomancer: SR5SpriteActorSheet.#pickTechnomancer,
+            removeTechnomancer: SR5SpriteActorSheet.#onRemoveTechnomancer,
+        }
+    }
+
+    static override TABS = {
+        ...super.TABS,
+        primary: {
+            initial: 'skills',
+            tabs: [
+                { id: 'actions', label: 'SR5.Tabs.Actor.Actions', cssClass: '' },
+                { id: 'skills', label: 'SR5.Tabs.Actor.Sprite', cssClass: '' },
+                { id: 'matrix', label: 'SR5.Tabs.Actor.Matrix', cssClass: '' },
+                { id: 'effects', label: 'SR5.Tabs.Actor.Effects', cssClass: '' },
+                { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Actor.Description', cssClass: 'skinny' },
+                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Actor.MiscConfig', cssClass: 'skinny' },
+            ]
+        },
+    }
+
+    static override PARTS = {
+        ...super.PARTS,
+        skills: {
+            template: SheetFlow.templateBase('actor/tabs/sprite-skills'),
+            templates: [
+                ...SheetFlow.templateActorSystemParts('active-skills'),
+                ...SheetFlow.templateListItem('skill')
+            ],
+            scrollable: ['#active-skills-scroll']
+        },
+    }
     /**
      * Sprite actors will handle these item types specifically.
      *
@@ -10,8 +49,8 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet {
      *
      * @returns An array of item types from the template.json Item section.
      */
-    override getHandledItemTypes(): string[] {
-        let itemTypes = super.getHandledItemTypes();
+    override getHandledItemTypes(): Item.ConfiguredSubType[] {
+        const itemTypes = super.getHandledItemTypes();
 
         return [
             ...itemTypes,
@@ -19,83 +58,46 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet {
         ];
     }
 
-    override activateListeners(html) {
-        super.activateListeners(html);
-
-        html.find('.technomancer-remove').on('click', this._onRemoveTechnomancer.bind(this));
-    }
-
-    override async getData(options: any) {
-        const data = await super.getData(options);
+    override async _prepareContext(options: Parameters<SR5MatrixActorSheet["_prepareContext"]>[0]) {
+        const data = await super._prepareContext(options);
 
         // Collect sprite technomancer for easy interaction.
         if (this.document.isType('sprite') && this.document.system.technomancerUuid !== '')
-            data['technomancer'] = await fromUuid(this.document.system.technomancerUuid as any);
+            data.technomancer = await fromUuid(this.document.system.technomancerUuid) as SR5Actor;
+
+        data.isSprite = true;
 
         return data;
     }
 
-    /**
-     * Sprites have support for dropping actors onto them.
-     */
-    override async _onDrop(event: DragEvent) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (event.dataTransfer === null) return;
-
-        const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
-
-        // Handle technomancer drops, ignore other actor drops as sprites can't handle them.
-        if (dropData.type === 'Actor') {
-            await this._addTechnomancerOnDrop(dropData);
-            return [];
-        }
-
-        return super._onDrop(event);
-    }
-
-    /**
-     * Determine if a dropped actor should be used as a technomancer.
-     * @param dropData Drop Data of any kind
-     */
-    async _addTechnomancerOnDrop(dropData: any): Promise<void> {
-        if (dropData.type !== 'Actor') return;
-        const actor = await fromUuid(dropData.uuid) as SR5Actor;
-        if (!actor.isType('character')) return;
-
-        this.document.addTechnomancer(actor);
+    override async _onDropActor(event: DragEvent, actor: SR5Actor) {
+        await this.actor.addTechnomancer(actor);
+        return null;
     }
 
     /**
      * Remove the technomancer from the sprite.
      */
-    async _onRemoveTechnomancer(event: MouseEvent): Promise<void> {
+    static async #pickTechnomancer(this: SR5SpriteActorSheet, event: MouseEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const actors = Helpers.getControlledTokenActors();
+        if (actors.length > 0) {
+            // pick the first controlled actor
+            const actor = actors[0];
+            await this.actor.addTechnomancer(actor);
+            await this.render();
+        }
+    }
+
+    /**
+     * Remove the technomancer from the sprite.
+     */
+    static async #onRemoveTechnomancer(this: SR5SpriteActorSheet, event: MouseEvent) {
         event.preventDefault();
         event.stopPropagation();
 
         await this.document.removeTechnomancer();
-    }
-
-    /**
-     * Custom behavior for ListHeader item creation for sprites.
-     */
-    override async _onItemCreate(event: any) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const type = event.currentTarget.closest('.list-header').dataset.itemId;
-        const optional = event.currentTarget.closest('.list-header').dataset.optional;
-
-        switch (type) {
-            // Sprite powers need special handling, as there are different sections for them.
-            case 'sprite_power':
-                if (!optional) return console.error('Shadowrun 5e | Sprite Actor Sheet: Missing optional value for sprite power item creation.');
-                await super._onItemCreate(event, {system: {optional}});
-                break;
-            default:
-                await super._onItemCreate(event);
-                break;
-        }
     }
 }

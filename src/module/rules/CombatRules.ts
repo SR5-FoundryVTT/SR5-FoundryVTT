@@ -143,7 +143,7 @@ export class CombatRules {
      * @param defenderHits The attackers hits. Should be a positive number.
      * @param actor The active defender
      */
-    static isBlockedByHardenedArmor(incomingDamage: DamageType, attackerHits: number = 0, defenderHits: number = 0, actor: SR5Actor): boolean {
+    static isBlockedByHardenedArmor(incomingDamage: DamageType, attackerHits = 0, defenderHits = 0, actor: SR5Actor): boolean {
         const armor = actor.getArmor(incomingDamage);
 
         if(!armor.hardened) {
@@ -226,7 +226,7 @@ export class CombatRules {
         if (hits < 0) hits = 0;
 
         // modifiedDamage.mod = PartsList.AddUniquePart(modifiedDamage.mod, 'SR5.Resist', -hits);
-        let {modified} = SoakRules.reduceDamage(actor, damage, hits);
+        const { modified } = SoakRules.reduceDamage(actor, damage, hits);
 
         Helpers.calcTotal(modified, {min: 0});
 

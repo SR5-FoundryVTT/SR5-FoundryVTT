@@ -1,0 +1,35 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <div class="list-item list-item-header header-for-scrollable">
+            <div class="list-item-start">
+                <label>{{localize "SR5.Labels.ActorSheet.Networks"}}</label>
+            </div>
+            <div class="list-item-icons">
+                {{#if @root.isEditMode}}
+                    <a data-tooltip="SR5.Tooltips.Actor.RemoveAllNetworks" data-action="removeAllNetworks">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                {{/if}}
+            </div>
+        </div>
+        <div class="scrollable">
+            {{#each networks}}
+                <div class="list-item" data-uuid="{{this.uuid}}">
+                    <div class="list-item-start">
+                            <span class="list-item-image-container">
+                                <img src="{{speakerImg this}}" />
+                            </span>
+                        <a data-action="openUuid">{{this.name}}</a>
+                    </div>
+                    <div class="list-item-icons">
+                        {{#if @root.isEditMode}}
+                            <a data-tooltip="SR5.Tooltips.Actor.RemoveNetwork" data-action="removeNetwork">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        {{/if}}
+                    </div>
+                </div>
+            {{/each}}
+        </div>
+    </div>
+</section>

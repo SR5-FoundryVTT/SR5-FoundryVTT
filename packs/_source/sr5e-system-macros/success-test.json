@@ -1,6 +1,5 @@
 {
   "_id": "ZWfyY8P4y1LEstU1",
-  "_key": "!macros!ZWfyY8P4y1LEstU1",
   "name": "Success Test",
   "type": "script",
   "command": "game.shadowrun5e.test.promptSuccessTest()",
@@ -8,5 +7,6 @@
   "author": "gprTC3Md255Kv3Xm",
   "scope": "global",
   "folder": null,
-  "flags": {}
+  "flags": {},
+  "_key": "!macros!ZWfyY8P4y1LEstU1"
 }

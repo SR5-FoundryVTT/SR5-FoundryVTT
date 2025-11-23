@@ -11,7 +11,7 @@ export class SpellcastingRules {
      * @param drainModifier The drain modifier defined within the spells action configuration.
      * @param reckless Set this to true should the spell be cast recklessly as defined in SR5#281 Cast Spell.
      */
-    static calculateDrain(force: number, drainModifier: number, reckless: boolean = false): number {
+    static calculateDrain(force: number, drainModifier: number, reckless = false): number {
         const recklessModifier = reckless ? this.recklessDrainModifier : 0;
         const drain = force + drainModifier + recklessModifier;
         return Math.max(this.minimalDrain, drain);
@@ -51,7 +51,7 @@ export class SpellcastingRules {
      * @param reagents The amount of reagents / drams used for the spell.
      * @returns The limit value to be applied.
      */
-    static calculateLimit(force: number, reagents: number=0): number {
+    static calculateLimit(force: number, reagents=0): number {
         return SpellcastingRules.limitIsReagentInsteadOfForce(reagents) ? 
             reagents : force;
     }
@@ -61,7 +61,7 @@ export class SpellcastingRules {
      * @param reagents The amount of drams used from reagents
      * @returns True if reagents should be used 
      */
-    static limitIsReagentInsteadOfForce(reagents: number=0): boolean {
+    static limitIsReagentInsteadOfForce(reagents=0): boolean {
         return reagents > 0;
     }
 }

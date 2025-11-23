@@ -24,7 +24,7 @@ export class InventoryFlow {
     constructor(actor: SR5Actor) {
         // Check for sub-type actors.
         // NOTE: This should be checked through actor.system.modelProvider, though this doesn´t exist sometimes?
-        if (actor.type.includes('.') || !game.model.Actor.hasOwnProperty(actor.type)) {
+        if (actor.type.includes('.') || !Object.hasOwn(game.model.Actor, actor.type)) {
             console.debug(`Shadowrun 5e | InventoryFlow ignored actor ${actor.name} as it has a non-system DataModel`);
             return;
         }
@@ -112,15 +112,15 @@ export class InventoryFlow {
     }
 
     /**
- * Does this actor have the given inventory already?
- *
- * Note: Comparisons will only be against lower case.
- *
- * @param name The inventory name.
- */
-    exists(name): boolean {
-        return name === Object.keys(this.actor.system.inventories)
-            .find(inventory => inventory.toLowerCase() === name.toLowerCase());
+     * Does this actor have the given inventory already?
+     *
+     * Note: Comparisons will only be against lower case.
+     *
+     * @param name The inventory name.
+     */
+    exists(name: string): boolean {
+        return Object.keys(this.actor.system.inventories)
+            .some(inventory => inventory.toLowerCase() === name.toLowerCase());
     }
 
     /**
@@ -190,7 +190,7 @@ export class InventoryFlow {
      * @param items The items in question. A single item can be given.
      * @param removeFromCurrent By default the item added will be removed from another inventory it might be in.
      */
-    async addItems(inventoryName: string, items: SR5Item[] | SR5Item, removeFromCurrent: boolean = true) {
+    async addItems(inventoryName: string, items: SR5Item[] | SR5Item, removeFromCurrent = true) {
         console.debug(`Shadowrun 5e | Adding items to to inventory ${inventoryName}`, items);
 
         // Default inventory is valid target here.

@@ -36,5 +36,17 @@ export const SINFlow = {
 
         const networks = sin.system.networks.filter(uuid => uuid !== networkUuid);
         await item.update({ system: { networks } });
+    },
+
+    /**
+     * Remove all networks from a SIN item.
+     * @param item The SIN item to remove the network from.
+     * @param networkUuid The UUID of the network to remove.
+     */
+    async removeAllNetworks(item: SR5Item) {
+        const sin = item.asType('sin');
+        if (!sin) return;
+
+        await item.update({ system: { networks: [] } });
     }
 }

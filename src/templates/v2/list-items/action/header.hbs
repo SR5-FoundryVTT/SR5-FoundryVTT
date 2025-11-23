@@ -1,0 +1,23 @@
+<div class="list-item list-item-header {{cssClass}}">
+    <div class="list-item-start">
+        <label>
+            {{localize label}}
+        </label>
+    </div>
+
+    <div class="list-item-col">
+        {{#if (eq type 'matrix_action')}}
+            <label>{{localize "SR5.Marks"}}</label>
+        {{/if}}
+    </div>
+
+    <div class="list-item-col">
+        <label>
+            {{localize "SR5.ActionType"}}
+        </label>
+    </div>
+
+    <div class="list-item-icons {{#if @root.isPlayMode}} skinny-icons {{/if}}">
+        {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type }}
+    </div>
+</div>

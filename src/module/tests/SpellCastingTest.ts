@@ -71,7 +71,6 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
             case 'health': return ['spell_healing'];
             case 'illusion': return ['spell_illusion'];
             case 'manipulation': return ['spell_manipulation'];
-            case 'ritual': return ['spell_ritual'];
         }
 
         return []
@@ -138,7 +137,6 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
         const magic = this.actor.getAttribute('magic').value;
 
         this.data.drainDamage = DrainRules.calcDrainDamage(drain, force, magic, this.hits.value);
-        return;
     }
 
     override async processResults() {

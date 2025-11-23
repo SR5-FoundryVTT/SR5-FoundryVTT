@@ -14,22 +14,16 @@ import { shadowrunSR5SpriteDataPrep } from './sr5.SpriteDataPrep.spec';
 import { shadowrunSR5ICDataPrep } from './sr5.ICDataPrep.spec';
 import { shadowrunSR5VehicleDataPrep } from './sr5.VehicleDataPrep.spec';
 import { shadowrunSR5ActiveEffect } from './sr5.ActiveEffect.spec';
-import { shadowrunNetworkDevices } from './sr5.NetworkDevices.spec';
 import { shadowrunTesting } from './sr5.Testing.spec';
 import { shadowrunInventoryFlow } from './sr5.Inventory.spec';
-import { shadowrunMatrixFlow } from './sr5.MatrixFlow.spec';
 import { weaponParserBaseTesting } from './sr5.WeaponParser.spec';
-import { characterImporterTesting } from './actorImport/characterImporter/sr5.CharacterImporter.spec';
-import { characterInfoUpdaterTesting } from './actorImport/characterImporter/sr5.CharacterInfoUpdater.spec';
-import { spiritImporterTesting } from './actorImport/spiritImporter/sr5.SpiritImporter.spec';
-import { spiritInfoUpdaterTesting } from './actorImport/spiritImporter/sr5.SpiritInfoUpdater.spec';
-import { weaponParserTesting } from './actorImport/itemImporter/weaponImport/sr5.WeaponImport.spec';
-import { mountedWeaponParserTesting } from './actorImport/itemImporter/vehicleImport/sr5.VehicleImporterMountedWeapon.spec';
+import { characterImporterTesting } from './actorImport/sr5.CharacterImporter.spec';
+import { spiritImporterTesting } from './actorImport/sr5.SpiritImporter.spec';
+import { spriteImporterTesting } from './actorImport/sr5.SpriteImporter.spec';
 import { shadowrunSR5ItemDataPrep } from './sr5.ItemDataPrep.spec';
-import { vehicleImporterTesting } from './actorImport/itemImporter/vehicleImport/sr5.VehicleImporter.spec';
-import { vehicleModParserTesting } from './actorImport/itemImporter/vehicleImport/sr5.VehicleModImporter.spec';
 import { shadowrunMatrixTesting } from './sr5.MatrixTesting.spec';
 import { shadowrunDriver } from './sr5.Driver.spec';
+import { shadowrunNPC } from './sr5.NPC.spec';
 
 import { Quench } from '@ethaks/fvtt-quench';
 import { shadowrunRiggerTesting } from '@/unittests/sr5.RiggerTesting.spec';
@@ -61,26 +55,11 @@ export const quenchRegister = (quench: Quench) => {
     quench.registerBatch('shadowrun5e.characterImporter', characterImporterTesting, {
         displayName: 'SHADOWRUN5e: Chummer Character Importer',
     });
-    quench.registerBatch('shadowrun5e.characterInfoUpdater', characterInfoUpdaterTesting, {
-        displayName: 'SHADOWRUN5e: Chummer Character Info Updater',
-    });
     quench.registerBatch('shadowrun5e.spiritImporter', spiritImporterTesting, {
         displayName: 'SHADOWRUN5e: Chummer Spirit Importer',
     });
-    quench.registerBatch('shadowrun5e.spiritInfoUpdater', spiritInfoUpdaterTesting, {
-        displayName: 'SHADOWRUN5e: Chummer Spirit Info Updater',
-    });
-    quench.registerBatch('shadowrun5e.importerWeapons', weaponParserTesting, {
-        displayName: 'SHADOWRUN5e: Chummer Actor Weapon Importer',
-    });
-    quench.registerBatch('shadowrun5e.importerVehicles', vehicleImporterTesting, {
-        displayName: 'SHADOWRUN5e: Chummer Vehicle Importer',
-    });
-    quench.registerBatch('shadowrun5e.importerVehicleMountedWeapons', mountedWeaponParserTesting, {
-        displayName: 'SHADOWRUN5e: Chummer Vehicle Mounted Weapon Importer',
-    });
-    quench.registerBatch('shadowrun5e.importerVehicleMods', vehicleModParserTesting, {
-        displayName: 'SHADOWRUN5e: Chummer Vehicle Modification Importer',
+    quench.registerBatch('shadowrun5e.spriteImporter', spriteImporterTesting, {
+        displayName: 'SHADOWRUN5e: Chummer Sprite Importer',
     });
     quench.registerBatch('shadowrun5e.entities.items', shadowrunSR5Item, { displayName: 'SHADOWRUN5e: SR5Item Test' });
     quench.registerBatch('shadowrun5e.entities.effects', shadowrunSR5ActiveEffect, {
@@ -106,9 +85,6 @@ export const quenchRegister = (quench: Quench) => {
     });
     quench.registerBatch('shadowrun5e.data_prep.item', shadowrunSR5ItemDataPrep, {
         displayName: 'SHADOWRUN5e: SR5ItemDataPreparation Test',
-    });
-    quench.registerBatch('shadowrun5e.flow.networkDevices', shadowrunNetworkDevices, {
-        displayName: 'SHADOWRUN5e: Matrix Network Devices Test',
     });
     quench.registerBatch('shadowrun5e.flow.marks', shadowrunMarks, {
         displayName: 'SHADOWRUN5e: Matrix Marks Test',
@@ -138,7 +114,7 @@ export const quenchRegister = (quench: Quench) => {
     quench.registerBatch('shadowrun5e.flow.damage', shadowrunDamage, {
         displayName: 'SHADOWRUN5e: Damage Application',
     });
-    quench.registerBatch('shadowrun5e.flow.matrix', shadowrunMatrixFlow, {
-        displayName: 'SHADOWRUN5e: Matrix Flow Test',
+    quench.registerBatch('shadowrun5e.actor.npc', shadowrunNPC, {
+        displayName: 'SHADOWRUN5e: NPC Character Test',
     });
 };

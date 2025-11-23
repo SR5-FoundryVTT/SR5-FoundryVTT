@@ -62,10 +62,10 @@ export class AttributeRules {
      */
     static replacePhysicalAttributesWithMentalAttributes(action: MinimalActionType) {
         // check the attributes used by the action
-        if (this.PhysicalToMentalAttributeMap.hasOwnProperty(action.attribute)) {
+        if (Object.hasOwn(this.PhysicalToMentalAttributeMap, action.attribute)) {
             action.attribute = this.PhysicalToMentalAttributeMap[action.attribute];
         }
-        if (this.PhysicalToMentalAttributeMap.hasOwnProperty(action.attribute2)) {
+        if (Object.hasOwn(this.PhysicalToMentalAttributeMap, action.attribute2)) {
             action.attribute2 = this.PhysicalToMentalAttributeMap[action.attribute2];
         }
     }

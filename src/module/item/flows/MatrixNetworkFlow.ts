@@ -249,7 +249,7 @@ export class MatrixNetworkFlow {
         if (!matrixData?.grid.uuid) return;
 
         const grid = foundry.utils.fromUuidSync(matrixData.grid.uuid) as SR5Item<'grid'> | undefined;
-        if (!grid || !grid.isType('grid')) return;
+        if (!grid?.isType('grid')) return;
         await NetworkStorage.addSlave(grid, slave);
     }
 
@@ -307,7 +307,7 @@ export class MatrixNetworkFlow {
      *
      * @param options.players If true, only networks visible to players are returned.
      */
-    static getNetworks(options = {players: false}): SR5Item[] {
+    static getNetworks(options = {players: false}) {
         const networks = (game.items as unknown as SR5Item[]).filter(item => item.isNetwork()) ?? [];
         if (options.players) return networks.filter(network => network.matrixIconVisibleToPlayer());
         return networks;
@@ -318,12 +318,13 @@ export class MatrixNetworkFlow {
      *
      * @param options.players If true, only networks visible to players are returned.
      */
-    static getPublicGrids(options = {players: false}): SR5Item[] {
+    static getPublicGrids(options = {players: false}) {
         return this.getGrids(options).filter(network => network.isPublicGrid());
     }
 
     /**
-     * Collect networks to select based on GRIDs on character.
+     * Collect networks to select based on what a character should be able to connect to
+     * based on marks, public grids and SINs network subscriptions.
      * 
      * @param character Collect networks based on this character.
      */
@@ -351,6 +352,30 @@ export class MatrixNetworkFlow {
             }
         }
 
+        // add marked grids and hosts that aren't already in the list
+        for (const network of this.getMarkedNetworks(character)) {
+            if (!networks.includes(network)) {
+                networks.push(network);
+            }
+        }
+
+        return networks;
+    }
+
+    /**
+     * Retrieve all networks that have marks placed on them by the given actor.
+     * 
+     * @param actor The marks of this actor will be used.
+     */
+    static getMarkedNetworks(actor: SR5Actor) {
+        const markedDocuments = actor.getAllMarkedDocuments();
+
+        // For typesafety use a separate list with explicit type.
+        const networks: Item.Implementation[] = [];
+        markedDocuments.forEach(({document}) => {
+            if (!(document instanceof SR5Item && document.isNetwork())) return;
+            networks.push(document);
+        });
         return networks;
     }
 
@@ -364,19 +389,18 @@ export class MatrixNetworkFlow {
      * @param slave The network slave to update.
      */
     static async _triggerUpdateForNetworkConnectionChange(master: SR5Item | undefined | null, slave: SR5Actor | SR5Item | undefined | null) {
-        const updateData = { system: { matrix: { updatedConnections: Date.now() } } };
+        const updateData = { system: { matrix: { updatedConnections: Date.now() } } } satisfies Actor.UpdateData | Item.UpdateData;
 
         // Players will trigger this workflow as well and likely can't update one of the documents.
         if (game.user?.isGM) {
             // Duplicate data, as update will inject id and type fields into it after the first call...
             if (slave) await slave.update(foundry.utils.duplicate(updateData));
             if (master) await master.update(foundry.utils.duplicate(updateData));
-        }
-        else {
-            const documentsData: {uuid: string, updateData: any}[] = [];
+        } else {
+            const documentsData: {uuid: string, updateData: Actor.UpdateData | Item.UpdateData}[] = [];
             if (slave) documentsData.push({uuid: slave.uuid, updateData});
             if (master) documentsData.push({uuid: master.uuid, updateData});
-            if (documentsData) await this._triggerUpdatesAsGM(documentsData);
+            if (documentsData) this._triggerUpdatesAsGM(documentsData);
         }
     }
 
@@ -385,8 +409,8 @@ export class MatrixNetworkFlow {
      * 
      * @param documentsData A list of objects containing the uuid and update data for each.
      */
-    static async _triggerUpdatesAsGM(documentsData: {uuid: string, updateData: any}[]) {
-        await SocketMessage.emitForGM(FLAGS.UpdateDocumentsAsGM, documentsData);
+    static _triggerUpdatesAsGM(documentsData: {uuid: string, updateData: Actor.UpdateData | Item.UpdateData}[]) {
+        SocketMessage.emitForGM(FLAGS.UpdateDocumentsAsGM, documentsData);
     }
 
     /**
@@ -424,7 +448,7 @@ export class MatrixNetworkFlow {
      *
      * @param event User clicking on button in chat message.
      */
-    static async acknowledgeMarkInvite(event) {
+    static async acknowledgeMarkInvite(event: Event) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -435,9 +459,9 @@ export class MatrixNetworkFlow {
 
 
         // Collect necessary data from chat message.
-        const element = event.currentTarget.closest('.chat-message');
-        const messageId = element.dataset.messageId;
-        const message = game.messages?.get(messageId);
+        const element = (event.currentTarget as HTMLElement).closest<HTMLElement>('.chat-message');
+        const messageId = element?.dataset.messageId;
+        const message = messageId ? game.messages?.get(messageId) : null;
         if (!message) return;
 
         const {actorUuid, targetUuid} = message.getFlag(SYSTEM_NAME, FLAGS.MatrixNetworkMarkInvite);
@@ -473,28 +497,32 @@ export class MatrixNetworkFlow {
     /**
      * Collect visible hosts for selection.
      */
-    static visibleHosts() {
-        return (game.items as unknown as SR5Item[])?.filter(item => item.isType('host') && item.matrixIconVisibleToPlayer()) ?? [];
+    static visibleHosts(): SR5Item<'host'>[] {
+        return (game.items as unknown as SR5Item[])?.filter(
+            item => item.isType('host') && item.matrixIconVisibleToPlayer()
+        ) as SR5Item<'host'>[] ?? [];
     }
 
     /**
      * Collect all hosts for selection.
      */
-    static allHosts() {
+    static allHosts(): SR5Item<'host'>[] {
         return (game.items as unknown as SR5Item[])?.filter(item => item.isType('host')) ?? [];
     }
 
     /**
      * Collect visible grids for selection.
      */
-    static visibleGrids() {
-        return (game.items as unknown as SR5Item[])?.filter(item => item.isType('grid') && item.matrixIconVisibleToPlayer()) ?? [];
+    static visibleGrids(): SR5Item<'grid'>[] {
+        return (game.items as unknown as SR5Item[]).filter(
+            item => item.isType('grid') && item.matrixIconVisibleToPlayer()
+        ) as SR5Item<'grid'>[] ?? [];
     }
 
     /**
      * Collect all grids for selection.
      */
-    static allGrids() {
+    static allGrids(): SR5Item<'grid'>[] {
         return (game.items as unknown as SR5Item[])?.filter(item => item.isType('grid')) ?? [];
     }
 
@@ -524,7 +552,7 @@ export class MatrixNetworkFlow {
         const isItem = document instanceof SR5Item;
         if (isItem && document.type === 'host') return 'SR5.ItemTypes.Host';
         if (isItem && document.type === 'grid') return 'SR5.ItemTypes.Grid';
-        if (isItem) return 'SR5.Device';
+        if (isItem) return 'SR5.ItemTypes.Device';
 
         if (isActor && document.type === 'ic') return 'SR5.ActorTypes.IC';
         if (isActor && document.type === 'vehicle') return 'SR5.ActorTypes.Vehicle';

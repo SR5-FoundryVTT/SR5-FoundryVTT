@@ -1,0 +1,35 @@
+import { BlankItem, ExtractItemType, Parser } from "../Parser";
+
+/**
+ * Parses ammunition
+ */
+export class AmmoParser extends Parser<'ammo'> {
+    protected readonly parseType = 'ammo';
+
+    protected parseItem(item: BlankItem<'ammo'>, itemData: ExtractItemType<'gears', 'gear'>) {
+        const system = item.system;
+        if (itemData.weaponbonusap_english)
+            system.ap = Number(itemData.weaponbonusap_english) || 0;
+
+        if (itemData.weaponbonusdamage_english) {
+            system.damage = Number(itemData.weaponbonusdamage_english) || 0;
+
+            if (itemData.weaponbonusdamage_english.includes('S'))
+                system.damageType = 'stun';
+            else if (itemData.weaponbonusdamage_english.includes('M'))
+                system.damageType = 'matrix';
+            else
+                system.damageType = 'physical';
+
+            system.element = /\(e\)/.exec(itemData.weaponbonusdamage_english || '')?.pop() === '(e)' ? 'electricity' : '';
+        }
+
+        system.accuracy = Number(itemData.weaponbonusacc) || 0;
+        system.blast = { radius: 0, dropoff: 0 };
+        system.replaceDamage = false;
+    }
+
+    protected override parseCategoryFlags(item: BlankItem<'ammo'>, itemData: ExtractItemType<'gears', 'gear'>) {
+        return itemData.name_english.split(':')[0];
+    }
+}

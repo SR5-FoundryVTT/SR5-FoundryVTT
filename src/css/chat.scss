@@ -1,8 +1,11 @@
-@import 'config';
+@use 'config';
+@use "config/mixins";
+@use "config/variables";
+
 
 .sr5 {
     &.chat-card {
-        @include sheet;
+        @include mixins.sheet;
         font-style: normal;
         font-size: 1rem;
 
@@ -17,12 +20,12 @@
         .clickable:hover {
             cursor: pointer;
             background: #4b4a44;
-            color: $white;
+            color: variables.$white;
         }
 
         .card-header {
             padding: 0.25em 0;
-            border-bottom: $groove;
+            border-bottom: variables.$groove;
             
 
             img {
@@ -43,13 +46,13 @@
             }
         }
         .card-header:first-of-type {
-            color: $yellow;
-            border-color: $yellow;
+            color: variables.$yellow;
+            border-color: variables.$yellow;
         }
         .button {
-            color: $color;
-            border-color: $black;
-            background: rgba($light, 0.2);
+            color: variables.$color;
+            border-color: variables.$black;
+            background: rgba(variables.$light, 0.2);
             border-radius: 0.3em;
             text-align: center;
             margin-top: 0.5em;
@@ -69,7 +72,7 @@
         }
         .card-description {
             span {
-                border-right: $groove;
+                border-right: variables.$groove;
                 padding: 0;
                 padding-right: 0.3em;
                 font-size: 0.75em;
@@ -80,7 +83,7 @@
                 }
             }
             .card-description-content {
-                border-bottom: $groove;
+                border-bottom: variables.$groove;
             }
         }        
 
@@ -98,7 +101,7 @@
 
         .card-title {
             display: flex;
-            border-bottom: $groove;
+            border-bottom: variables.$groove;
             justify-content: flex-start;
             align-content: center;
             align-items: flex-end;
@@ -126,10 +129,10 @@
                 white-space: nowrap;
                 // Override Foundry default header styling.
                 border-bottom: none;
-                color: $white;
+                color: variables.$white;
 
                 &:hover {
-                    text-shadow: -1px -1px 0 $cornflower, 1px -1px 0 $cornflower, -1px 1px 0 $cornflower, 1px 1px 0 $cornflower;
+                    text-shadow: -1px -1px 0 variables.$cornflower, 1px -1px 0 variables.$cornflower, -1px 1px 0 variables.$cornflower, 1px 1px 0 variables.$cornflower;
                 }
             }
 
@@ -161,7 +164,7 @@
             .place-template {
                 padding: 2px 5px;
                 line-height: 1em;
-                color: $black;
+                color: variables.$black;
                 font-size: 18px;
                 margin-right: 1em;
                 flex: 0;
@@ -176,11 +179,11 @@
         }
         .card-description {
             padding: 0.25em;
-            border-bottom: $groove;
+            border-bottom: variables.$groove;
             display: none;
         }
         .card-content {
-            border-bottom: $groove;
+            border-bottom: variables.$groove;
 
             padding: 0.25em 0.25em 0.25em;
             display: flex;
@@ -270,7 +273,7 @@
                 }
             }
             .test-code {
-                @include systemFonts;
+                @include mixins.systemFonts;
                 font-size: var(--font-size-12);
             }
             &.can-wrap {
@@ -288,8 +291,12 @@
         }
         .dice-rolls {
             display: none;
-            border-bottom: $groove;
+            border-bottom: variables.$groove;
+            flex-flow: row wrap;
+            justify-content: center;
         }
+        // Legacy dice display, kept for compatibility with old chat messages.
+        // New messages should use the dice-rolls above.
         .dice-roll-content {
             padding: 0.5em 0.5em;
             display: flex;
@@ -303,7 +310,8 @@
                 text-align: center;
                 width: 24px;
                 line-height: 24px;
-                
+                color: #000;
+
                 // Consistent margin on top, if missing result boxes will clip.
                 margin-top: 5px;
 
@@ -320,7 +328,7 @@
         .glitch-content {
             display: flex;
             flex-flow: column;
-            border-bottom: $groove;
+            border-bottom: variables.$groove;
 
             .glitch {
                 position: relative;
@@ -410,6 +418,6 @@
     }
     .chat-select-link img:hover {
         padding: 0;
-        border: $groove;
+        border: variables.$groove;
     }
 }

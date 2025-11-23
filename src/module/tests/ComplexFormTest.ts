@@ -116,7 +116,6 @@ export class ComplexFormTest extends SuccessTest<ComplexFormTestData> {
         const resonance = this.actor.getAttribute('resonance').value;
 
         this.data.fadeDamage = FadeRules.calcFadeDamage(fade, this.hits.value, resonance);
-        return;
     }
 
     override async processResults() {

@@ -4,6 +4,7 @@ import { SR5Actor } from "../actor/SR5Actor";
 import { ModifiableValueType } from "../types/template/Base";
 import DataModel = foundry.abstract.DataModel;
 import { Migrator } from "../migrator/Migrator";
+import { LinksHelpers } from '@/module/utils/links';
 
 /**
  * Shadowrun Active Effects implement additional ways of altering document data.
@@ -48,6 +49,17 @@ export class SR5ActiveEffect extends ActiveEffect {
         return false;
     }
 
+    async openSource() {
+        const source = this.origin;
+        if (source) {
+            await LinksHelpers.openSource(source);
+        }
+    }
+
+    get hasSource(): boolean {
+        return !!this.origin;
+    }
+
     public get source() {
         return this.origin ? fromUuidSync(this.origin) : null;
     }
@@ -80,7 +92,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     /**
      * Render the sheet of the active effect source
      */
-    public renderSourceSheet() {
+    public async renderSourceSheet() {
         if (this.source instanceof SR5Actor || this.source instanceof SR5Item)
             return this.source?.sheet?.render(true);
         return undefined;
@@ -354,7 +366,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * Return keys expected in the ModifiableField shape
      */
     static get modifiableValueProperties() {
-        return ['base', 'value', 'mod', 'override', 'temp'];
+        return ['base', 'value', 'mod', 'override'];
     }
 
     override get isSuppressed(): boolean {
@@ -425,17 +437,18 @@ export class SR5ActiveEffect extends ActiveEffect {
             return {};
         }
 
-        // Foundry default effect application will use DataModel.applyChange.
-        const changes = super.apply(model, change);
+        // Skip applying this change if the target key does not exist on the model.
+        // TypedObjectField will otherwise create the missing property as a string,
+        // which breaks data integrity and can result in errors like "undefined[object Object]".
+        // For example, a change targeting "firstaid" instead of "first_aid" would trigger this case.
+        if (!foundry.utils.hasProperty(model, change.key))
+            return {};
 
         // ModifiableField applies some changes outside of Foundry behavior, not causing a override value.
         // Those override values are then undefined and should be hidden from Foundries 'override' behavior.
-        for (const key of Object.keys(changes))
-            if (changes[key] === undefined)
-                // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-                delete changes[key];
-
-        return changes;
+        return Object.fromEntries(
+            Object.entries(super.apply(model, change)).filter(([, v]) => v !== undefined)
+        );
     }
 
     /**

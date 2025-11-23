@@ -1,19 +1,27 @@
+import { SR5 } from "@/module/config";
 import { ModifiableValue } from "./Base";
 import { ModifiableField } from "../fields/ModifiableField";
 import { FixedTypeObjectField } from "../fields/FixedTypeObjectField";
-const { SchemaField, BooleanField, ArrayField, NumberField, StringField, TypedObjectField } = foundry.data.fields;
+const { SchemaField, BooleanField, ArrayField, NumberField, StringField, TypedObjectField, HTMLField } = foundry.data.fields;
 
 export type SkillCategories = 'active' | 'language' | 'knowledge';
 
 export const SkillField = () => ({
     ...ModifiableValue(),
     name: new StringField({ required: true }),
+    img: new StringField({ required: true }),
+    description: new HTMLField({ required: true }),
     hidden: new BooleanField(),
     label: new StringField({ required: true }),
-    attribute: new StringField({ required: true }),
+    attribute: new StringField({
+        blank: true,
+        required: true,
+        choices: SR5.attributes
+    }),
     _delete: new BooleanField(), // Does it use it?
     specs: new ArrayField(new StringField({ required: true })),
     canDefault: new BooleanField({ initial: true }),
+    isNative: new BooleanField({ initial: false }), // this only actually applies to language skills
     id: new StringField({ required: true }),
     link: new StringField({ required: true }),
     group: new StringField({ required: true }),
@@ -105,7 +113,7 @@ export const Skills = () => new FixedTypeObjectField(
             computer: skill({ attribute: 'logic', group: 'Electronics', id: 'computer' }),
             cybercombat: skill({ attribute: 'logic', group: 'Cracking', id: 'cybercombat' }),
             cybertechnology: skill({ attribute: 'logic', group: 'Biotech', canDefault: false, id: 'cybertechnology' }),
-            demolitions: skill({ attribute: 'logic', id: 'deomilitions' }),
+            demolitions: skill({ attribute: 'logic', id: 'demolitions' }),
             electronic_warfare: skill({ attribute: 'logic', group: 'Cracking', canDefault: false, id: 'electronic_warfare' }),
             first_aid: skill({ attribute: 'logic', group: 'Biotech', id: 'first_aid' }),
             forgery: skill({ attribute: 'logic', id: 'forgery' }),

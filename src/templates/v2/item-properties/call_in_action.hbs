@@ -1,0 +1,7 @@
+{{#if (eq item.system.actor_type 'sprite')}}
+    <label>{{localize 'SR5.Compilation.SpriteType'}}&nbsp;{{localizeOb item.system.sprite.type @root.config.spriteTypes}}</label>
+    <label>{{localize 'SR5.Level'}}&nbsp;{{item.system.sprite.level}}</label>
+{{else if (eq item.system.actor_type 'spirit')}}
+    <label>{{localize 'SR5.Compilation.SpriritType'}}&nbsp;{{localizeOb item.system.spirit.type @root.config.spiritTypes}}</label>
+    <label>{{localize 'SR5.Force'}}&nbsp;{{item.system.spirit.force}}</label>
+{{/if}}

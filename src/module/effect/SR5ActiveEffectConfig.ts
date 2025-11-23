@@ -57,7 +57,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
             // override the onAdd so we can change the default mode to custom
             addChange: this.#onAddChange,
         },
-        classes: ["active-effect-config", SR5_APPV2_CSS_CLASS],
+        classes: ["active-effect-config", SR5_APPV2_CSS_CLASS, 'named-sheet'],
         position: { width: 560 },
     }
 

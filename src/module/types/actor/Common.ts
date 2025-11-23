@@ -1,3 +1,4 @@
+import { SR5 } from "@/module/config";
 import { ModifiableValue } from "../template/Base";
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
@@ -12,9 +13,12 @@ export const CharacterSkills = () => ({
     knowledge: new SchemaField(KnowledgeSkills()),
 });
 
-
 export const MagicData = () => ({
-    attribute: new StringField({ required: true, initial: "logic" }), // Drain attribute
+    attribute: new StringField({
+        required: true,
+        initial: "logic",
+        choices: SR5.attributes
+    }), // Drain attribute
     projecting: new BooleanField(),
     initiation: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
 });
@@ -43,7 +47,7 @@ export const CreateModifiers = <T extends readonly string[]>(...keys: T) => {
     const field = () => new NumberField({ required: true, nullable: false, integer: true, initial: 0 });
     return Object.fromEntries(
         keys.map(modifier => [modifier, field()])
-    ) as { [K in T[number]]: ReturnType<typeof field> };
+    ) as Record<T[number], ReturnType<typeof field>>;
 };
 
 const InventoryData = () => ({
@@ -56,9 +60,14 @@ const InventoryData = () => ({
 
 export const CommonData = () => ({
     description: new SchemaField(DescriptionData()),
-    importFlags: new SchemaField(ImportFlagData()),
+    importFlags: new SchemaField(ImportFlagData(), { nullable: true }),
 
     skills: new SchemaField(CharacterSkills()),
+
+    // favorites and hidden_items can be Local ID or UUID depending on if the item comes from a compendium or not
+    favorites: new ArrayField(new StringField({ required: true })),
+    // note that hidden_items includes ActiveEffects as well as Items
+    hidden_items: new ArrayField(new StringField({ required: true })),
 
     situation_modifiers: new SchemaField({
         environmental: new SchemaField({ active: new ObjectField({ initial: {} }) }),

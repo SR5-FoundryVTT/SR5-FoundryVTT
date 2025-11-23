@@ -116,7 +116,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
         });
 
         it('Device in WAN using host attributes', async () => {
-            const host = await factory.createItem({ type: 'device', system: { category: 'host', technology: { rating: 5 } } });
+            const host = await factory.createItem({ type: 'host', system: { technology: { rating: 5 } } });
             const device = await factory.createItem({ type: 'equipment', system: { technology: { rating: 3, master: host.uuid } } });
 
             const action = DataDefaults.createData('action_roll', { categories: ['matrix'] });
@@ -127,7 +127,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
         });
 
         it('Device in WAN using own attributes due to direct connection', async () => {
-            const host = await factory.createItem({ type: 'device', system: { category: 'host', technology: { rating: 5 } } });
+            const host = await factory.createItem({ type: 'host', system: { technology: { rating: 5 } } });
             const device = await factory.createItem({ type: 'equipment', system: { technology: { rating: 3, master: host.uuid } } });
 
             const action = DataDefaults.createData('action_roll', { categories: ['matrix'] });

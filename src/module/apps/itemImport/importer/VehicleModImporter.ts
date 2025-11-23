@@ -1,25 +1,24 @@
 import { DataImporter } from './DataImporter';
+import { ImportHelper as IH } from '../helper/ImportHelper';
 import { VehiclesSchema, Mod } from '../schema/VehiclesSchema';
 import { VehicleModParser } from '../parser/mod/VehicleModParser';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 
 export class VehicleModImporter extends DataImporter {
-    public files = ['vehicles.xml'];
+    public readonly files = ['vehicles.xml'] as const;
 
-    CanParse(jsonObject: object): boolean {
-        return jsonObject.hasOwnProperty('mods') && jsonObject['mods'].hasOwnProperty('mod');
-    }
+    async _parse(jsonObject: VehiclesSchema): Promise<void> {
+        IH.setTranslatedCategory('vehicles', jsonObject.modcategories.category);
 
-    async Parse(jsonObject: VehiclesSchema): Promise<void> {
         return VehicleModImporter.ParseItems<Mod>(
             jsonObject.mods.mod,
             {
                 compendiumKey: () => "Vehicle_Mod",
                 parser: new VehicleModParser(),
                 injectActionTests: item => {
-                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type!, item, item);
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
-                errorPrefix: "Failed Parsing Vehicle Mod"
+                documentType: "Vehicle Mod"
             }
         );
     }

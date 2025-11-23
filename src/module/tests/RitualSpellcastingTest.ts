@@ -176,7 +176,6 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
         this.data.drain = RitualRules.drainValue(opposingHits, this.data.reagents, this.data.force);
         this.data.drainDamage = RitualRules.calcDrainDamage(opposingHits, this.data.drain, this.actor.getAttribute('magic').value);
         this.data.drainReady = true;
-        return;
     }
 
     /**

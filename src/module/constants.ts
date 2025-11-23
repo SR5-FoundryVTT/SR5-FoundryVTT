@@ -67,6 +67,9 @@ export const FLAGS = {
     UpdateDocumentsAsGM: 'UpdateDocumentsAsGM',
     MatrixNetworkMarkInvite: 'MatrixNetworkMarkInvite',
     CompendiaSettingsMenu: 'CompendiaSettingsMenu',
+    CompendiumBrowserBlacklist: 'CompendiumBrowserBlacklist',
+    ImporterCompendiumOrder: 'ImporterCompendiumOrder',
+    DieFaceLabels: "DieFaceLabels"
 } as const;
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {
@@ -115,10 +118,6 @@ export const SR = {
         INI_RESULT_MOD_AFTER_INI_PASS: -10,
         INITIAL_INI_PASS: 1,
         INITIAL_INI_ROUND: 1
-    },
-    die: {
-        glitch: [1],
-        success: [5, 6]
     },
     defense: {
         spell: {
@@ -259,4 +258,4 @@ export const SR = {
         grey: { essence: 0.75, avail: 0, cost: 1.3 },
         used: { essence: 1.25, avail: -4, cost: 0.75 },
     }
-}
+} as const;

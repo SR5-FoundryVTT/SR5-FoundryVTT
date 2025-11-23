@@ -1,0 +1,6 @@
+<label>{{localizeOb item.system.powerTypes @root.config.critterPower.types}}</label>
+<label>{{localizeOb item.system.duration @root.config.critterPower.durations}}</label>
+<label>{{localizeOb item.system.range @root.config.critterPower.ranges}}</label>
+{{#if item.system.rating}}
+    <label>{{localize "SR5.Rtg"}}&nbsp;{{item.system.rating}}</label>
+{{/if}}

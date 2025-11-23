@@ -104,7 +104,7 @@ class EnvironmentalModifiersHandler extends ModifiersHandler {
 
 
 class MatrixModifiersHandler extends ModifiersHandler {
-    override getData(options?: object | undefined) {
+    override getData(options?: object) {
         return {}
     }
 
@@ -127,7 +127,7 @@ class MatrixModifiersHandler extends ModifiersHandler {
 }
 
 class MagicModifiersHandler extends ModifiersHandler {
-    override getData(options?: object | undefined) {
+    override getData(options?: object) {
         return {}
     }
 
@@ -152,7 +152,7 @@ class MagicModifiersHandler extends ModifiersHandler {
         modifier.append(modifierDescription);
     }
 
-    async handleClearMagicModifiers(event) {
+    async handleClearMagicModifiers(event: Event) {
         event.preventDefault();
 
         this.app.modifiers = await DocumentSituationModifiers.clearTypeOn(this.app.target, 'background_count');
@@ -166,7 +166,7 @@ class MagicModifiersHandler extends ModifiersHandler {
  * 
  */
 class RecoilModifiersHandler extends ModifiersHandler {
-    override getData(options?: object | undefined) {
+    override getData(options?: object) {
         return {}
     }
 
@@ -189,7 +189,7 @@ class RecoilModifiersHandler extends ModifiersHandler {
      * 
      * This method is related to SituationModifierApplication#applyModifierDelta
      */
-    async applyRecoilDelta(event) {
+    async applyRecoilDelta(event: Event) {
         event.preventDefault();
 
         if (!this.app.modifiers.documentIsActor) return;
@@ -198,8 +198,8 @@ class RecoilModifiersHandler extends ModifiersHandler {
 
         // Expect the element group to siblings.
         // Triggering DOMElement should contain the delta...
-        const triggerElement = event.target;
-        if (!triggerElement || !triggerElement.dataset.hasOwnProperty('delta')) 
+        const triggerElement = event.target as HTMLElement;
+        if (!Object.hasOwn(triggerElement?.dataset, 'delta')) 
             return console.error('Shadowrun5e | Expected a DOMElement with a different structure');
 
         const delta = Number(triggerElement.dataset['delta']);
@@ -217,7 +217,7 @@ class RecoilModifiersHandler extends ModifiersHandler {
 
         // Setup and connect tokenHUD elements.
         const modifier = $('<div class="modifier-row"></div>');
-        const modifierValue = $(`<div class="modifier-value modifier-value-recoil">${modifiers.recoil.applied!.total}</div>`);
+        const modifierValue = $(`<div class="modifier-value modifier-value-recoil">${modifiers.recoil.applied.total}</div>`);
         const modifierDescription = $(`<div class="modifier-description open-recoil-modifier">${game.i18n.localize("SR5.ModifierTypes.Recoil")}</div>`);
         modifierDescription.on('click', SituationModifiersApplication.openForTokenHUD(tokenId, 'recoil'));
 
@@ -245,7 +245,7 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
         RecoilModifiersHandler
     ];
     // The default sheet tab to open.
-    static _defaultTabId: string = 'physical';
+    static _defaultTabId = 'physical';
     
     // Manage modifiers stored on this target document. This might not be the document meant for those modifiers to be applied to.
     // While a scene can store modifiers, actors have them applied
@@ -331,13 +331,13 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
     /**
      * Apply a formData change based on a custom numerical input element.
      */
-    async applyModifierDelta(event) {
+    async applyModifierDelta(event: Event) {
         event.preventDefault();
 
         // Expect the element group to siblings.
         // Triggering DOMElement should contain the delta...
-        const triggerElement = event.target;
-        if (!triggerElement || !triggerElement.dataset.hasOwnProperty('delta')) 
+        const triggerElement = event.target as HTMLElement;
+        if (!Object.hasOwn(triggerElement?.dataset, 'delta')) 
             return console.error('Shadowrun5e | Expected a DOMElement with a different structure');
 
         const delta = Number(triggerElement.dataset['delta']);
@@ -345,7 +345,7 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
 
         // Value DOMElement should contain the data key...
         const valueElement = $(triggerElement).siblings().closest('input');
-        if (!valueElement || !valueElement.attr('name')) 
+        if (!valueElement?.attr('name')) 
             return console.error('Shadowrun5e | Expected a DOMElement with a name attribute');
 
         // Extract value from data using value DOMElement data key...
@@ -383,7 +383,7 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
         this.render(true);
     }
 
-    async _updateObject(event: Event, formData?: object | undefined): Promise<void> {
+    async _updateObject(event: Event, formData?: Record<string, unknown>): Promise<void> {
             if (!formData) return;
 
             for (const [key, value] of Object.entries(formData)) {
@@ -397,7 +397,7 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
     /**
      * Override _onChangeInput to include a render on changing modifier values.
      */
-    override async _onChangeInput(event) {
+    override async _onChangeInput(event: JQuery.ChangeEvent) {
         await super._onChangeInput(event);
         this.render(true);
     }
@@ -472,7 +472,7 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
         return async (event) => {
             event.preventDefault();
 
-            if (!token || !token.actor) return;
+            if (!token?.actor) return;
             const app = new SituationModifiersApplication(token.actor);
             // Use async render as activateTab needs tabs to bind to rendered result.
             await app._render(true);

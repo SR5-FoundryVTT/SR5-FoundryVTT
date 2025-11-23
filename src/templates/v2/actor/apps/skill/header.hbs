@@ -1,0 +1,85 @@
+<div class="sheet-header">
+    <img class="sheet-image"
+         src="{{skill.img}}"
+         data-tooltip="{{#if @root.isEditMode}}{{skill.img}}{{else}}{{skill.name}}{{/if}}"
+        {{#if @root.isEditMode}}
+         data-action="editImage"
+        {{/if}}
+    />
+    <div class="sheet-header-labels">
+        <div class="sheet-header-name">
+            {{> 'systems/shadowrun5e/dist/templates/v2/common/document-source-icon.hbs' skill.link }}
+            <div style="flex: 1">
+                {{#if editable_name}}
+                    {{formInput skillFields.label value=skill.name name=(concat skill_name '.name') classes='sheet-name'
+                                placeholder=(localize "SR5.Name") disabled=@root.isPlayMode rootId=rootId}}
+                {{else}}
+                    <input class="sheet-name" type="text" value={{localize skill.label}} disabled>
+                {{/if}}
+            </div>
+        </div>
+        {{#if @root.isEditMode}}
+            <div class="sheet-header-source">
+                {{formInput skillFields.link value=skill.link name=(concat skill_name '.link')
+                            placeholder=(localize "SR5.Source") rootId=rootId}}
+            </div>
+        {{else}}
+            <div>
+                <div class="list-item">
+                    <div class="list-item-start">
+                        <label>{{localize "SR5.Value"}}&nbsp;</label>
+                        {{#if skill.isNative}}
+                            <button class="icon sr5-icon" type="button" data-action="rollSkill">{{localize "SR5.Skill.abbr.Native"}}</button>
+                        {{else}}
+                            <button class="icon sr5-icon" type="button" data-action="rollSkill">{{skill.value}}</button>
+                        {{/if}}
+                    </div>
+                    {{#if skill.group}}
+                        <div class="list-item-start">
+                            <label>{{localize "SR5.Skill.SkillGroup"}}&nbsp;{{skill.group}}</label>
+                        </div>
+                    {{/if}}
+                </div>
+            </div>
+        {{/if}}
+    </div>
+    {{#if @root.isEditMode}}
+    <div>
+        {{#if canBeNative}}
+            <div>
+                <div class="list-item">
+                    <div class="list-item-start">
+                        <label>{{localize "SR5.Skill.Native"}}</label>
+                    </div>
+                    <div class="list-item-start">
+                        {{formInput skillFields.isNative name=(concat skill_name '.isNative')
+                                    value=skill.isNative rootId=@root.rootId }}
+                    </div>
+                </div>
+            </div>
+        {{/if}}
+        <div>
+            <div class="list-item">
+                <div class="list-item-start">
+                    <label>{{localize "SR5.Value"}}&nbsp;</label>
+                </div>
+                <div class="list-item-start">
+                    {{formInput skillFields.base name=(concat skill_name '.base') value=skill.base
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                </div>
+            </div>
+        </div>
+        <div>
+            <div class="list-item">
+                <div class="list-item-start">
+                    <label>{{localize "SR5.Skill.SkillGroup"}}</label>
+                </div>
+                <div class="list-item-start">
+                    {{formInput skillFields.group value=skill.group name=(concat skill_name '.group')
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/if}}
+</div>

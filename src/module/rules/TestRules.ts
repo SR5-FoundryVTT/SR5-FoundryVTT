@@ -11,7 +11,7 @@ export const TestRules = {
      *
      * @param current The current extended test modifier or zero.
      */
-    calcNextExtendedModifier: (current: number = 0): number => {
+    calcNextExtendedModifier: (current = 0): number => {
         return current + TestRules.extendedModifierValue;
     },
 

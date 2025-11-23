@@ -35,13 +35,13 @@
       "skill": "",
       "armor": true,
       "spec": false,
-      "mod": null,
+      "mod": 0,
       "mod_description": "",
       "roll_mode": "",
       "limit": {
         "value": 0,
         "base": 0,
-        "attribute": null
+        "attribute": ""
       },
       "threshold": {
         "value": 0,

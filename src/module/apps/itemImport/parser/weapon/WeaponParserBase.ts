@@ -5,9 +5,7 @@ import { RangeType } from 'src/module/types/item/Weapon';
 import { DataDefaults } from '../../../../data/DataDefaults';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { CompendiumKey, Constants } from '../../importer/Constants';
-import { TranslationHelper as TH } from '../../helper/TranslationHelper';
 import { DamageType, DamageTypeType } from 'src/module/types/item/Action';
-
 import PhysicalAttribute = Shadowrun.PhysicalAttribute;
 type DamageElement = DamageType['element']['base'];
 
@@ -19,35 +17,29 @@ export class WeaponParserBase extends Parser<'weapon'> {
 
         const accessories = IH.getArray(jsonData.accessories.accessory);
         const accessoriesNames = accessories.map(acc => acc.name._TEXT);
-        const translationMap: Record<string, string> = {};
-        for (const name of accessoriesNames)
-            translationMap[name] = TH.getTranslation(name, { type: 'accessory' });
 
-        const foundItems = await IH.findItem('Weapon_Mod', Object.values(translationMap));
-        const itemMap = new Map(foundItems.map(item => [item.name, item]));
+        const foundItems = await IH.findItems('Weapon_Mod', accessoriesNames);
+        const itemMap = new Map(foundItems.map(({name_english, ...i}) => [name_english, i]));
 
         const result: Item.Source[] = [];
         for (const accessory of accessories) {
-            const rawName = accessory.name._TEXT;
-            const translatedName = translationMap[rawName] || rawName;
-            const foundItem = itemMap.get(translatedName);
+            const name = accessory.name._TEXT;
+            const item = itemMap.get(name);
 
-            if (!foundItem) {
-                console.log(`[Accessory Missing]\nWeapon: ${jsonData.name._TEXT}\nAccessory: ${rawName}, ${translatedName}`);
+            if (!item) {
+                console.log(`[Accessory Missing]\nWeapon: ${jsonData.name._TEXT}\nAccessory: ${name}`);
                 continue;
             }
 
-            // Create a new _id since it will not be created on the creation of the item.
-            const accessoryBase = game.items.fromCompendium(foundItem, { keepId: true });
-            accessoryBase._id = foundry.utils.randomID();
-            const system = accessoryBase.system as SystemType<'modification'>;
+            item._id = foundry.utils.randomID();
+            const system = item.system as SystemType<'modification'>;
             system.technology.equipped = true;
 
             const ratingText = accessory.rating?._TEXT;
             if (ratingText)
                 system.technology.rating = Number(ratingText) || 0;
 
-            result.push(accessoryBase as Item.Source);
+            result.push(item);
         }
 
         return result;
@@ -91,22 +83,24 @@ export class WeaponParserBase extends Parser<'weapon'> {
         system.action.type = 'varies';
         system.action.attribute = 'agility';
 
-        let category = jsonData.category._TEXT;
-        // A single item does not meet normal rules, thanks Chummer!
-        // TODO: Check these rules after localization using a generic, non-english approach.
-        if (category === 'Hold-outs') {
-            category = 'Holdouts';
-        }
+        const category = jsonData.category._TEXT;
 
         system.category = WeaponParserBase.GetWeaponType(jsonData);
         system.subcategory = category.toLowerCase();
-        
+
         system.action.skill = this.GetSkill(jsonData);
         system.action.damage = this.GetDamage(jsonData as any);
-        
-        system.action.limit.value = Number(jsonData.accuracy?._TEXT) || 0;
-        system.action.limit.base = Number(jsonData.accuracy?._TEXT) || 0;
-        
+
+        if (jsonData.accuracy?._TEXT) {
+            let accuracy: string = jsonData.accuracy._TEXT;
+            if (accuracy.includes('Physical')) {
+                system.action.limit.attribute = 'physical';
+                accuracy = accuracy.replace('Physical', '').trim();
+            }
+
+            system.action.limit.base = Number(accuracy) || 0;
+        }
+
         system.technology.conceal.base = Number(jsonData.conceal?._TEXT);
 
         return system;
@@ -121,7 +115,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
 
         let damageType: DamageTypeType = 'physical';
         let damageAttribute: PhysicalAttribute | undefined;
-        let damageBase: number = 0;
+        let damageBase = 0;
         let damageElement: DamageElement = '';
 
         if(simpleDamage) {
@@ -192,10 +186,18 @@ export class WeaponParserBase extends Parser<'weapon'> {
         };
     }
 
+    protected override setImporterFlags(entity: Item.CreateData, jsonData: Weapon): void {
+        super.setImporterFlags(entity, jsonData);
+
+        if (entity.system!.importFlags!.category === 'Gear') {
+            entity.system!.importFlags!.category = entity.name.split(':')[0].trim();
+        }
+    }
+
     protected override async getFolder(jsonData: Weapon, compendiumKey: CompendiumKey): Promise<Folder> {
         const categoryData = jsonData.category._TEXT;
         const root = WeaponParserBase.GetWeaponType(jsonData).capitalize() ?? "Other";
-        const folderName = TH.getTranslation(categoryData, { type: 'category' });
+        const folderName = IH.getTranslatedCategory('weapons', categoryData);
 
         return IH.getFolder(compendiumKey, root, root === 'Thrown' ? undefined : folderName);
     }

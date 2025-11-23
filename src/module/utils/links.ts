@@ -28,7 +28,6 @@ export class LinksHelpers {
         if (LinksHelpers.isUuid(candidate)) return false;
 
         try {
-            // eslint-disable-next-line no-new
             new URL(candidate, window.location.origin);
             return true;
         } catch (error) {

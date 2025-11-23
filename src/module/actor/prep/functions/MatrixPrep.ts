@@ -4,6 +4,7 @@ import { SR5 } from "../../../config";
 import { AttributesPrep } from "./AttributesPrep";
 import { SR5Item } from 'src/module/item/SR5Item';
 import { DataDefaults } from '@/module/data/DataDefaults';
+import { MatrixAttributeFieldType } from '@/module/types/template/Matrix';
 
 export class MatrixPrep {
     /**
@@ -51,9 +52,9 @@ export class MatrixPrep {
             for (const [key, value] of Object.entries(deviceAtts)) {
                 if (!value) continue;
                 // create a new attribute field from the current one, this also works if the matrix[key] field doesn't exist
-                const att = DataDefaults.createData('attribute_field', matrix[key]);
+                const att = DataDefaults.createData('attribute_field', matrix[key]) as MatrixAttributeFieldType;
                 att.base = value.value;
-                att['device_att'] = value.device_att;
+                att.device_att = value.device_att;
                 matrix[key] = att;
             }
         } // if we don't have a device, use living persona
@@ -96,15 +97,8 @@ export class MatrixPrep {
         const { matrix, attributes, limits } = system;
 
         // add matrix attributes to both limits and attributes as hidden entries
-        Object.keys(SR5.matrixAttributes).forEach((attributeName) => {
-            if (!matrix.hasOwnProperty(attributeName)) {
-                return console.error(`SR5Actor matrix preparation failed due to missing matrix attributes`);
-            }
-
+        for (const attributeName of Object.keys(SR5.matrixAttributes)) {
             const attribute = matrix[attributeName];
-            // Helpers.calcTotal(matrix[attributeName]);
-            // const label = SR5.matrixAttributes[attributeName];
-            // const { value, base, mod } = matrix[attributeName];
             AttributesPrep.prepareAttribute(attributeName, attribute);
             const { value, base, mod, label } = attribute;
             const hidden = true;
@@ -126,17 +120,17 @@ export class MatrixPrep {
                 label,
                 hidden,
             };
-        });
+        }
     }
 
     static prepareMatrixAttributesForDevice(system: Actor.SystemOfType<'vehicle'>, rating?: number) {
         const { matrix } = system;
         rating = rating ?? matrix.rating;
-        const matrixAttributes = ['firewall', 'data_processing'];
+        const matrixAttributes = ['firewall', 'data_processing'] as const;
         matrixAttributes.forEach((attribute) => {
             matrix[attribute].base = rating;
         });
-        [...matrixAttributes, 'sleaze', 'attack'].forEach((attId) => {
+        ([...matrixAttributes, 'sleaze', 'attack'] as const).forEach((attId) => {
             Helpers.calcTotal(matrix[attId]);
         });
     }

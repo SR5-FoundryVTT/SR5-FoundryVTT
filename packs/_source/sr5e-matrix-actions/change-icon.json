@@ -22,7 +22,7 @@
       "skill": "",
       "armor": false,
       "spec": false,
-      "mod": null,
+      "mod": 0,
       "mod_description": "",
       "roll_mode": "",
       "limit": {
@@ -89,10 +89,10 @@
         "mod": 0
       },
       "category": {
-          "matrix": {
-              "marks": 0,
-              "owner": true
-          }
+        "matrix": {
+          "marks": 0,
+          "owner": true
+        }
       },
       "modifiers": [],
       "alt_mod": 0,

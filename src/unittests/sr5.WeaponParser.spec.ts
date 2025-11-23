@@ -10,7 +10,7 @@ class TestWeaponParser extends WeaponParserBase {
     }
 }
 
-function mockXmlData(data: object): object {
+function mockXmlData(data: Record<string, unknown>): Record<string, unknown> {
     return Object.fromEntries(Object.entries(data)
         .map(([key, value]) =>
             [key, { '_TEXT': value }]));
@@ -23,12 +23,9 @@ function getData(damageString: string): Partial<Weapon> {
 }
 
 export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
-    const { describe, it, assert, before, after } = context;
+    const { describe, it, assert } = context;
 
     const mut = new TestWeaponParser();
-
-    before(async () => {})
-    after(async () => {})
 
     describe("Weapon Damage Values", () => {
         it("Parses simple damage", () => {
