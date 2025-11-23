@@ -1,7 +1,8 @@
 @import 'node_modules/@yaireo/tagify/dist/tagify';
 
-@import 'importer';
+// import config first to get all the variables and mixins set
 @import 'config';
+@import 'importer';
 @import 'compendium-browser';
 @import 'item';
 @import 'actor';
@@ -13,11 +14,11 @@
 @import 'foundry';
 @import 'module';
 @import 'effect';
-
-// .Roll class is used for labels that will look for data-roll-id on itself or a parent RollId
-.Roll {
-    @include rollable;
-}
+@import 'list-item';
+@import "horixontal-cells";
+@import "situational-modifiers-app";
+@import "actor-apps";
+@import "bundle-v2";
 
 /**
  * These are default FoundryVTT classes that have been used within Shadowrun5 CSS while not behaving as default.
@@ -212,6 +213,7 @@
     }
     span.selection-inventory {
         display: flex;
+        gap: .25rem;
         margin: 0.2em;
     }
 }
@@ -828,11 +830,6 @@ input[type='text'].display {
             box-shadow: 0 0 5px 1px rgba($matrix, 0.5);
         }
 
-        .roll {
-            width: 60px;
-            margin-right: 8px;
-        }
-
         .cell-container {
             display: flex;
             flex-flow: row;
@@ -1303,47 +1300,3 @@ input[type='text'].display {
     }
 }
 //END SR5 Style
-
-.custom-item-element {
-    color: $white; /* Text color */
-}
-//lable back to white color
-.matrix-label {
-    color: $white;
-}
-
-.scroll-area-matrix {
-    overflow-y: auto;
-    color: $white;
-}
-
-//table in any Item
-.SR5 th {
-    color: $yellow;
-    padding: 10px; /* Padding */
-    text-align: left; /* Left text */
-    border-bottom: 2px solid $edge; /* Add a border at the bottom */
-    font-size: medium;
-}
-.SR5 th:hover {
-    color: $pdfColor;
-}
-.SR5 caption {
-    background: none;
-    color: $yellow;
-    padding: 6px;
-    text-align: left;
-    font-size: medium;
-}
-.SR5 caption:hover {
-    color: $fDarkRed;
-}
-.SR5 tr {
-    color: $white;
-}
-.SR5 tr:hover {
-    color: $pdfColor;
-}
-.SR5 tr p:not(th p) {
-    padding-left: 10px; /* Padding on the left */
-}

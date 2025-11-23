@@ -1,4 +1,4 @@
-import { SR5 } from "@/module/config";
+import { SR5 } from '@/module/config';
 
 const { SchemaField, NumberField, ArrayField, StringField } = foundry.data.fields;
 
@@ -50,7 +50,6 @@ export const ModifiableValue = () => ({
     override: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
     downgrade: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
     upgrade: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
-    temp: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
 });
 
 export const ModifiableValueLinked = () => ({
@@ -59,7 +58,7 @@ export const ModifiableValueLinked = () => ({
     base_formula_operator: new StringField({
         required: false,
         initial: 'add',
-        choices: SR5.actionDamageFormulaOperators
+        choices: SR5.actionDamageFormulaOperators,
     }),
 });
 

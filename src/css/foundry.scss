@@ -226,9 +226,22 @@ body:not(.theme-dark) {
     right: -150px;
 }
 
-.list-header.item-section[data-item-id='weapon'][data-item-type=''] {
-    color: $yellow; /* set the color to yellow */
-    font-size: small;
+nav#context-menu, menu.controls-dropdown {
+    box-shadow: 0 0 5px 2px rgba($yellow, 0.4);
+    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
+    background-repeat: repeat;
+    background-size: 100% 20px auto;
+
+    li {
+        color: $light;
+        &:not(:hover):nth-of-type(even) {
+            background: rgba(white, 0.03);
+        }
+        &:hover {
+            color: $white;
+            background: rgba($darkred, 0.7);
+        }
+    }
 }
 
 .common-test {
@@ -243,10 +256,6 @@ body:not(.theme-dark) {
         margin-bottom: 0;
         border: 0;
     }
-}
-.fas.fa-file-pdf //.fas.fa-suitcase.sr5, .fas.fa-book-open.sr5 For now these can´t get changed
-{
-    color: $pdfColor;
 }
 .window-resizable-handle {
     .fa-solid {

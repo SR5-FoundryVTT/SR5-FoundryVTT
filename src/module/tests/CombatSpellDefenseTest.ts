@@ -131,7 +131,7 @@ export class CombatSpellDefenseTest extends DefenseTest<CombatSpellDefenseTestDa
 
         const spell = this.item?.asType('spell');
         
-        if (!spell || spell.system.category !== 'combat' || spell.system.combat.type === 'direct')
+        if (spell?.system.category !== 'combat' || spell.system.combat.type === 'direct')
             return;
 
         this.actor.calculateNextDefenseMultiModifier();

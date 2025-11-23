@@ -49,7 +49,7 @@ export const GmOnlyMessageContentFlow = {
         const testData = TestCreator.getTestDataFromMessage(message.id as string);
         if (!testData?.data) return;
         const actorUuid = testData.data.sourceActorUuid as string;
-        const actor = await fromUuid(actorUuid) as SR5Actor | null;
+        const actor = await fromUuid<Actor>(actorUuid);
 
         // SuccessTest doesn't NEED an actor, if one is cast that way: show gm-only-content
         if (!actor || !game.user) {

@@ -19,7 +19,7 @@
       "attribute2": "",
       "skill": "",
       "armor": false,
-      "spec": "",
+      "spec": false,
       "mod": 0,
       "mod_description": "",
       "roll_mode": "",

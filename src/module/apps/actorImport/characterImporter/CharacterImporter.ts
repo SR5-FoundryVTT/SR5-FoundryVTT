@@ -176,7 +176,7 @@ export class CharacterImporter {
                     .map((item) => item.trim());
             }
 
-            const filteredAttr = attr.filter((att) => att !== 'willpower')[0];
+            const filteredAttr = attr.find((att) => att !== 'willpower');
             if (filteredAttr) {
                 system.magic.attribute = this.parseAttName(filteredAttr) as any;
             }

@@ -161,7 +161,7 @@ export const MatrixTargetingFlow = {
         // Collect all scene tokens, which might also include personas outside any grid.
         if (canvas.scene?.tokens) {
             // Collect all scene tokens.
-            for (const token of canvas.scene?.tokens) {
+            for (const token of canvas.scene.tokens) {
                 // Throw away unneeded tokens.
                 if (!token.actor) continue;
                 const target = token.actor;
@@ -174,6 +174,9 @@ export const MatrixTargetingFlow = {
 
                 // Filter out persona based on matrix rules.
                 if (!actor.matrixPersonaIsVisible(target)) continue;
+
+                // filter out targets that don't have a persona or any wireless devices
+                if (!target.hasPersona && !target.hasWirelessDevices()) continue;
 
                 const type = MatrixNetworkFlow.getDocumentType(target);
                 targets.push({

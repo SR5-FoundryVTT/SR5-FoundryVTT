@@ -1,0 +1,34 @@
+<div class="list-item list-item-header">
+    <div class="list-item-start">
+        <label>
+            {{localize label}}
+        </label>
+    </div>
+
+    <div class="list-item-col">
+        <label>
+            {{localize "SR5.Spell.Type"}}
+        </label>
+    </div>
+    <div class="list-item-col">
+        <label>
+            {{localize "SR5.Spell.Range"}}
+        </label>
+    </div>
+    <div class="list-item-col">
+        <label>
+            {{localize "SR5.Duration"}}
+        </label>
+    </div>
+    <div class="list-item-col">
+        <label>
+            {{localize "SR5.Drain"}}
+        </label>
+    </div>
+
+    {{#if @root.isEditMode}}
+        <div class="list-item-icons">
+            {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type }}
+        </div>
+    {{/if}}
+</div>

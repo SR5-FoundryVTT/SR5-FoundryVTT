@@ -15,7 +15,7 @@ export const MonitorRules = {
      * @param damageTolerance Apply this damage tolerance to the base damage
      * @param baseDamage The amount of damage boxes taken before applying a wound modifier.
      */
-    woundModifierBoxesThreshold(damageTolerance: number=0, baseDamage: number=3): number {
+    woundModifierBoxesThreshold(damageTolerance=0, baseDamage=3): number {
         return baseDamage + damageTolerance;
     },
 
@@ -34,7 +34,7 @@ export const MonitorRules = {
      *                      Expects a positive number when applying High Pain Tolerance Ratings
      * @returns The amount of wounds on a damage monitor.
      */
-    wounds(damageTaken: number, woundBoxesThreshold: number, painTolerance: number=0): number {
+    wounds(damageTaken: number, woundBoxesThreshold: number, painTolerance=0): number {
         const relevantDamageTaken = Math.max(damageTaken - painTolerance, 0);
         return Math.floor(relevantDamageTaken / woundBoxesThreshold);
     },
@@ -45,7 +45,7 @@ export const MonitorRules = {
      * @param wounds Amount of wounds (not damage) taken
      * @param modifierPerWound base modifier to apply to given wounds
      */
-    woundModifier(wounds:number, modifierPerWound: number=-1): number {
+    woundModifier(wounds:number, modifierPerWound=-1): number {
         return wounds * modifierPerWound;
     }
 }

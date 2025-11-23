@@ -20,6 +20,8 @@ export class Grid extends ItemBase<typeof GridData> {
     static override defineSchema() {
         return GridData;
     }
+
+    static override LOCALIZATION_PREFIXES = ["SR5.Grid", "SR5.Item"];
 }
 
 console.log("GridData", GridData, new Grid());

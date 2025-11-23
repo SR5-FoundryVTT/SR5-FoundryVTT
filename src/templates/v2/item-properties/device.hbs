@@ -1,0 +1,6 @@
+<label>{{localizeOb item.system.category @root.config.deviceCategories}}</label>
+{{#each item.system.atts}}
+    {{#if this.value}}
+        <label>{{localizeOb this.att @root.config.matrixAttributes}}&nbsp;{{this.value}}</label>
+    {{/if}}
+{{/each}}

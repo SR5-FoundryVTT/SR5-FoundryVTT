@@ -1,0 +1,23 @@
+{{#if @root.isPlayMode}}
+    {{#if (canBeWireless this)}}
+        {{#if (isBroken this)}}
+            <a data-tooltip="SR5.Broken"
+               data-action="repairBrokenItem">
+                <i class="fas fa-link-slash"></i>
+            </a>
+        {{else}}
+            <a data-tooltip="SR5.Tooltips.Actor.MatrixRunningSilentToggle"
+                data-action="toggleItemWireless">
+                <i
+            {{#if (isRunningSilent this)}}
+                   class="fa-duotone fa-wifi-fair"
+            {{else if (isWireless this)}}
+                   class="fas fa-wifi"
+            {{else}}
+                   class="fas fa-wifi-slash"
+            {{/if}}
+                ></i>
+            </a>
+        {{/if}}
+    {{/if}}
+{{/if}}

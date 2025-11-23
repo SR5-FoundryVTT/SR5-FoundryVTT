@@ -39,4 +39,16 @@ export const registerSystemKeybindings = () => {
         hint: game.i18n.localize("SR5.Keybinding.ShowItemCard.Hint"),
         editable: [{key: "ctrlKey"}]
     });
+
+    game.keybindings.register("shadowrun5e", "add-remove-some-qty", {
+        name: game.i18n.localize("SR5.Keybinding.AddRemoveSomeQty.Label"),
+        hint: game.i18n.localize("SR5.Keybinding.AddRemoveSomeQty.Hint"),
+        editable: [{key: "shiftKey"}]
+    });
+
+    game.keybindings.register("shadowrun5e", "add-remove-many-qty", {
+        name: game.i18n.localize("SR5.Keybinding.AddRemoveManyQty.Label"),
+        hint: game.i18n.localize("SR5.Keybinding.AddRemoveManyQty.Hint"),
+        editable: [{key: "ctrlKey"}]
+    });
 }

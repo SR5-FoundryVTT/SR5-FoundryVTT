@@ -1,0 +1,38 @@
+<div class="basic-row">
+    {{#if (isType actor 'vehicle')}}
+        {{#if (eq system.vehicleType 'air')}}
+            {{#if system.isDrone}}
+                <label class="fas fa-drone-front"></label>
+            {{else}}
+                <label class="fas fa-helicopter"></label>
+            {{/if}}
+        {{else if (eq system.vehicleType 'aerospace')}}
+            <label class="fas fa-rocket"></label>
+        {{else if (eq system.vehicleType 'ground')}}
+            <label class="fas fa-car-side"></label>
+        {{else if (eq system.vehicleType 'water')}}
+            <label class="fas fa-ship"></label>
+        {{else if (eq system.vehicleType 'walker')}}
+            <label class="fas fa-robot-astromech"></label>
+        {{else if (eq system.vehicleType 'exotic')}}
+            <label class="fas fa-transporter"></label>
+        {{/if}}
+    {{else}}
+        <label class="fas fa-person-walking"></label>
+    {{/if}}
+    <label data-tooltip="SR5.WalkingSpeed">{{system.movement.walk.value}}m</label>
+    <label>/</label>
+    <label data-tooltip="SR5.RunningSpeed">{{system.movement.run.value}}m</label>
+    {{#unless isVehicle}}
+        <label>/</label>
+        {{#if @root.isEditMode}}
+            {{formInput systemFields.movement.fields.sprint value=source.system.movement.sprint classes="short skinny" rootId=rootId}}
+        {{else}}
+            <label>
+                <span style="white-space: nowrap" data-tooltip="SR5.SprintingBonus">
+                    +{{system.movement.sprint}}
+                </span>
+            </label>
+        {{/if}}
+    {{/unless}}
+</div>

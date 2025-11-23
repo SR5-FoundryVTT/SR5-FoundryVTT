@@ -16,10 +16,14 @@ const CritterPowerData = () => ({
         required: true,
         choices: SR5.critterPower.categories,
     }),
-    powerType: new StringField({ required: true }),
-    range: new StringField({
+    powerType: new StringField({
+        blank: true,
         required: true,
-        initial: "los",
+        choices: SR5.critterPower.types
+    }),
+    range: new StringField({
+        blank: true,
+        required: true,
         choices: SR5.critterPower.ranges
     }),
     duration: new StringField({
@@ -41,6 +45,8 @@ export class CritterPower extends ItemBase<ReturnType<typeof CritterPowerData>> 
     static override defineSchema() {
         return CritterPowerData();
     }
+
+    static override LOCALIZATION_PREFIXES = ["SR5.CritterPower", "SR5.Armor", "SR5.Item"];
 }
 
 console.log("CritterPowerData", CritterPowerData(), new CritterPower());

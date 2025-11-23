@@ -1,48 +1,73 @@
-import { RangedWeaponRules } from './../rules/RangedWeaponRules';
+import { DeepPartial } from 'fvtt-types/utils';
+
+import { SR5 } from '../config';
 import { Helpers } from '../helpers';
-import { SR5Item } from './SR5Item';
-import { SR5 } from "../config";
-import { onManageActiveEffect, prepareSortedEffects, prepareSortedItemEffects } from "../effects";
-import { createTagify, parseDropData } from '../utils/sheets';
 import { SR5Actor } from '../actor/SR5Actor';
+import { SR5Item } from './SR5Item';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
-import { ActionFlow } from './flows/ActionFlow';
-import { AmmunitionType, RangeType } from '../types/item/Weapon';
-import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
+
 import { MatrixRules } from '../rules/MatrixRules';
+import { RangedWeaponRules } from '../rules/RangedWeaponRules';
+
+import { onManageActiveEffect, prepareSortedEffects, prepareSortedItemEffects } from '../effects';
+
+import { ActionFlow } from './flows/ActionFlow';
 import { SINFlow } from './flows/SINFlow';
+import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
+import { SheetFlow } from '@/module/flows/SheetFlow';
 
-/**
- * FoundryVTT ItemSheetData typing
- */
-interface FoundryItemSheetData {
-    // Item type
-    type: string
-    // Legacy Item Document Data
-    data: SR5Item
-    // Item Document System Data
-    system: SR5Item['system']
-    // A descriptive document  reference
-    item: SR5Item
-    document: SR5Item
+import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
+import { AmmunitionType, RangeType } from '../types/item/Weapon';
 
-    cssClass: string
-    editable: boolean
-    limited: boolean
-    owner: boolean
-    title: string
-}
+import ItemSheet = foundry.applications.sheets.ItemSheet;
+
+const { FilePicker } = foundry.applications.apps;
+const { DragDrop } = foundry.applications.ux
+const { fromUuid, fromUuidSync } = foundry.utils;
 
 /**
  * Shadowrun 5e ItemSheetData typing shared across all item types
  */
-export interface SR5BaseItemSheetData extends FoundryItemSheetData {
+export interface SR5BaseItemSheetData extends ItemSheet.RenderContext, SR5ApplicationMixinTypes.RenderContext {
     // SR5-FoundryVTT configuration
-    config: typeof SR5
-    effects: SR5ActiveEffect[]
-    itemEffects: SR5ActiveEffect[]
+    config: typeof SR5;
+
+    // Effects
+    effects: SR5ActiveEffect[];
+    itemEffects: SR5ActiveEffect[];
+
     // FoundryVTT rollmodes
-    rollModes: CONFIG.Dice.RollModes
+    rollModes: CONFIG.Dice.RollModes;
+
+    // Document references
+    actor?: SR5Actor;
+    item?: SR5Item;
+    slaves?: (SR5Item | SR5Actor)[];
+
+    // State flags
+    isNestedItem: boolean;
+    calculatedEssence?: boolean;
+    calculatedCost: boolean;
+    calculatedAvailability: boolean;
+    ratingForCalculation: boolean;
+    isUsingRangeCategory: boolean;
+
+    // Tests
+    tests: typeof game.shadowrun5e.tests;
+    opposedTests: typeof game.shadowrun5e.opposedTests;
+    activeTests: typeof game.shadowrun5e.activeTests;
+    resistTests: typeof game.shadowrun5e.resistTests;
+
+    // Description
+    descriptionHTML?: string;
+
+    // Source flags
+    sourceIsURL: boolean;
+    sourceIsPDF: boolean;
+    sourceIsUuid: boolean;
+
+    // Keybindings
+    bindings: { qtySome: string, qtyMany: string };
 }
 
 /**
@@ -85,12 +110,6 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 
     isUsingRangeCategory: boolean
 
-    // Define if the miscellaneous tab is shown or not.
-    showMiscTab: boolean
-
-    // Misc. Tab has different sections that can be shown or hidden.
-    miscMatrixPart: boolean
-
     // Allow users to view what values is calculated and what isn´t
     calculatedEssence: boolean
     calculatedCost: boolean
@@ -101,25 +120,210 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
 /**
  * Extend the basic ItemSheet with some very simple modifications
  */
-export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
-    private _shownDesc: any[] = [];
-    private _scroll: string | undefined;
+export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> extends SR5ApplicationMixin(ItemSheet)<T> {
+    readonly #dragDrop: DragDrop[];
 
-    /**
-     * Extend and override the default options used by the Simple Item Sheet
-     * @returns {Object}
-     */
-    static override get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
-            classes: Array.from(['sr5', 'sheet', 'item']),
-            width: 735,
-            height: 450,
-            tabs: Array.from([{ navSelector: '.tabs', contentSelector: '.sheetbody' }]),
-        });
+    static override DEFAULT_OPTIONS = {
+        classes: ['item', 'named-sheet'],
+        position: {
+            width: 600,
+            height: 500,
+        },
+        actions: {
+            addItem: SR5ItemSheet.#addItem,
+            equipItem: SR5ItemSheet.#equipItem,
+            editItem: SR5ItemSheet.#editItem,
+            deleteItem: SR5ItemSheet.#deleteItem,
+            addItemQty: SR5ItemSheet.#addItemQty,
+            removeItemQty: SR5ItemSheet.#removeItemQty,
+
+            addLicense: SR5ItemSheet.#addLicense,
+            removeLicense: SR5ItemSheet.#removeLicense,
+            removeNetwork: SR5ItemSheet.#removeNetwork,
+
+            reload: SR5ItemSheet.#reloadAmmo,
+            partialReload: SR5ItemSheet.#partialReloadAmmo,
+            resetSpareReloads: SR5ItemSheet.#resetSpareReloads,
+
+            addOneMark: SR5ItemSheet.#addOneMark,
+            removeOneMark: SR5ItemSheet.#removeOneMark,
+            clearMarks: SR5ItemSheet.#deleteMarks,
+            clearAllMark: SR5ItemSheet.#deleteAllMarks,
+
+            removeMaster: SR5ItemSheet.#removeMaster,
+            removeLinkedActor: SR5ItemSheet.#removeLinkedActor,
+
+            toggleActionSpecialization: SR5ItemSheet.#toggleActionSpecialization,
+            toggleFreshImport: SR5ItemSheet.#toggleFreshImportFlag,
+            toggleEquipped: SR5ItemSheet.#toggleEquipped,
+            toggleWireless: SR5ItemSheet.#toggleWirelessState,
+
+            addOneQty: SR5ItemSheet.#addOneQty,
+            removeOneQty: SR5ItemSheet.#removeOneQty,
+
+            addEffect: SR5ItemSheet.#addEffect,
+            editEffect: SR5ItemSheet.#editEffect,
+            toggleEffect: SR5ItemSheet.#toggleEffect,
+            deleteEffect: SR5ItemSheet.#deleteEffect,
+
+            removeSlave: SR5ItemSheet.#removeSlave,
+            removeAllSlaves: SR5ItemSheet.#removeAllSlaves,
+
+            toggleActionArmor: SR5ItemSheet.#toggleActionArmor,
+            toggleOpposedArmor: SR5ItemSheet.#toggleOpposedArmor,
+            toggleResistArmor: SR5ItemSheet.#toggleResistArmor,
+
+            modifyConditionMonitor: SR5ItemSheet.#modifyConditionMonitor,
+            clearConditionMonitor: SR5ItemSheet.#clearConditionMonitor,
+            rollConditionMonitor: SR5ItemSheet.#rollConditionMonitor,
+        },
+        dragDrop: [{ dragSelector: '.draggable', dropSelector: null }],
     }
 
-    override get template() {
-        return `systems/shadowrun5e/dist/templates/item/${this.item.type}.hbs`;
+    static override PARTS = {
+        header: {
+            template: SheetFlow.templateBase('item/header'),
+            scrollable: ['.scrollable']
+        },
+        tabs: {
+            template: SheetFlow.templateBase('common/primary-tab-group'),
+            scrollable: ['.scrollable']
+        },
+        description: {
+            template: SheetFlow.templateBase('item/tabs/description'),
+            scrollable: ['.scrollable']
+        },
+        details: {
+            template: SheetFlow.templateBase('item/tabs/details'),
+            scrollable: ['.scrollable']
+        },
+        network: {
+            template: SheetFlow.templateBase('item/tabs/network'),
+            templates: SheetFlow.templateListItem('slaved_icon'),
+            scrollable: ['.scrollable']
+        },
+        sinNetworks: {
+            template: SheetFlow.templateBase('item/tabs/sin-networks'),
+            scrollable: ['.scrollable']
+        },
+        licenses: {
+            template: SheetFlow.templateBase('item/tabs/licenses'),
+            templates: SheetFlow.templateListItem('license'),
+            scrollable: ['.scrollable']
+        },
+        weaponAmmo: {
+            template: SheetFlow.templateBase('item/tabs/weapon-ammo'),
+            templates: SheetFlow.templateListItem('weapon-ammo'),
+            scrollable: ['.scrollable']
+        },
+        weaponModifications: {
+            template: SheetFlow.templateBase('item/tabs/weapon-modifications'),
+            templates: SheetFlow.templateListItem('weapon-modification'),
+            scrollable: ['.scrollable']
+        },
+        effects: {
+            template: SheetFlow.templateBase('item/tabs/effects'),
+            templates: SheetFlow.templateListItem('effect'),
+            scrollable: ['.scrollable']
+        },
+        footer: {
+            template: SheetFlow.templateBase('item/footer'),
+            scrollable: ['.scrollable']
+        },
+    }
+
+    static override TABS = {
+        primary: {
+            initial: 'description',
+            tabs: [
+                { id: 'description', label: 'SR5.Tabs.Item.Description', cssClass: '' },
+                { id: 'details', label: 'SR5.Tabs.Item.Details', cssClass: '' },
+                { id: 'network', label: 'SR5.Tabs.Item.Network', cssClass: '' },
+                { id: 'sinNetworks', label: 'SR5.Tabs.Item.SinNetworks', cssClass: '' },
+                { id: 'weaponAmmo', label: 'SR5.Tabs.Item.WeaponAmmo', cssClass: '' },
+                { id: 'weaponModifications', label: 'SR5.Tabs.Item.WeaponMods', cssClass: '' },
+                { id: 'licenses', label: 'SR5.Tabs.Item.SinLicenses', cssClass: '' },
+                { id: 'effects', label: 'SR5.Tabs.Item.Effects', cssClass: '' },
+            ]
+        }
+    }
+
+    constructor(...args: any) {
+        super(...args);
+        this.#dragDrop = this.#createDragDropHandlers();
+    }
+
+    /**
+     * Prepare keybindings to be shown when hovering over a rolling icon
+     * in any list item view that has rolls.
+     */
+    _prepareKeybindings() {
+        return {
+            qtySome: game.keybindings.get('shadowrun5e', 'add-remove-some-qty').map(binding => binding.key.replace('Key', '').toUpperCase()).join(', '),
+            qtyMany: game.keybindings.get('shadowrun5e', 'add-remove-many-qty').map(binding => binding.key.replace('Key', '').toUpperCase()).join(', '),
+        }
+    }
+
+    /**
+     * Configure the Tabs that are actually used
+     * @param group
+     * @protected
+     */
+    protected override _prepareTabs(group: string) {
+        const parts = super._prepareTabs(group);
+        if (group === 'primary' && !game.user?.isGM && this.item.limited) {
+            const description = parts.description;
+            description.active = true;
+            return { description };
+        }
+        if (group === 'primary') {
+            this._cleanParts(this.item, parts);
+        }
+        return parts;
+    }
+
+    /**
+     * Configure the parts that are actually used
+     * @param options
+     * @protected
+     */
+    protected override _configureRenderParts(options) {
+        const retVal = super._configureRenderParts(options);
+        if (!game.user?.isGM && this.item.limited) {
+            return {
+                header: retVal.header,
+                tabs: retVal.tabs,
+                description: retVal.description,
+                footer: retVal.footer,
+            }
+        }
+        this._cleanParts(this.item, retVal);
+        return retVal;
+    }
+
+    /**
+     * Clean Parts will remove PARTS from the static property and Primary TABS
+     * - this removes parts that aren't used by types
+     * @param item
+     * @param parts
+     * @protected
+     */
+    protected _cleanParts(item: SR5Item, parts: Record<string, any>) {
+        if (item.isType('contact', 'lifestyle', 'sin', 'grid', 'program')) {
+            delete parts.details;
+        }
+        if (!item.canBeMaster) {
+            delete parts.network;
+        }
+        if (!item.isType('weapon')) {
+            delete parts.weaponModifications;
+            delete parts.weaponAmmo;
+        }
+        if (!item.isType('sin')) {
+            delete parts.licenses;
+            delete parts.sinNetworks;
+        }
+        return parts;
     }
 
     /* -------------------------------------------- */
@@ -128,18 +332,11 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
      * Prepare data for rendering the Item sheet
      * The prepared data object contains both the actor data as well as additional sheet options
      */
-    override async getData(options): Promise<any> {
-        const data = super.getData(options) as unknown as SR5ItemSheetData;
-
-        // Rework v9 style data mapping to v10 style, while waiting for foundry-vtt-types to be update to v10.
-        data.type = data.data.type;
-        data.system = data.item.system;
-        //@ts-expect-error // TODO: remove TODO: foundry-vtt-types v10
-        data.data = data.item.system;
+    override async _prepareContext(options: DeepPartial<SR5ApplicationMixinTypes.RenderOptions> & { isFirstRender: boolean }) {
+        const data = await super._prepareContext(options) as T;
         const itemData = this.item.toObject(false).system as SR5Item['system'];
+        data.actor = this.item.actorOwner;
 
-        const linkedActor = await this.item.getLinkedActor();
-        
         // Calculated values for derived data.
         data.calculatedEssence = itemData.technology?.calculated.essence.adjusted ?? false;
         data.calculatedCost = data.calculatedEssence ? true : itemData.technology?.calculated.cost.adjusted ?? false;
@@ -184,8 +381,6 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
             }
         }
 
-        data['config'] = SR5;
-
         /**
          * Groups nested items by their type for rendering on the item sheet.
          * - Ammo items are grouped under 'ammo'.
@@ -197,18 +392,6 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
             if (item.isType('modification')) return item.system.type;
             return 'other';
         });
-
-        // Enrich all descriptions
-        await Promise.all(
-            Object.values(grouped).flat().map(async item => {
-                if (!item) return;
-
-                const html = await foundry.applications.ux.TextEditor.implementation.enrichHTML(
-                    item.system.description.value
-                );
-                item.descriptionHTML = html;
-            })
-        );
 
         // Sort nested items by name before assigning to template data
         const sortByName = <T extends { name: string }>(arr: T[]) =>
@@ -225,7 +408,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         data['limits'] = this._getSortedLimitsForSelect();
 
         data['effects'] = prepareSortedEffects(this.item.effects.contents);
-        data['itemEffects'] = prepareSortedItemEffects(this.object);
+        data['itemEffects'] = prepareSortedItemEffects(this.item);
 
         if (this.item.isType('host')) {
             data['markedDocuments'] = this.item.getAllMarkedDocuments();
@@ -275,16 +458,13 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
 
         data.rollModes = CONFIG.Dice.rollModes;
 
-        // What tabs should be shown on this sheet?
-        data.showMiscTab = this._prepareShowMiscTab();
+        data.primaryTabs = this._prepareTabs('primary');
+        data.item = this.item;
 
-        // What sections should be shown on the misc. tab?
-        data.miscMatrixPart = this.item.hasActionCategory('matrix');
+        data.isNestedItem = this.item._isNestedItem;
+        data.bindings = this._prepareKeybindings();
 
-        return {
-            ...data,
-            linkedActor
-        }
+        return data;
     }
 
     /**
@@ -294,21 +474,21 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
      * @param options TextEditor, enrichHTML.options passed through
      * @returns Enriched HTML result
      */
-    async enrichEditorFieldToHTML(editorValue: string, options: any = { async: false }): Promise<string> {
+    async enrichEditorFieldToHTML(editorValue: string, options?: TextEditor.EnrichmentOptions): Promise<string> {
         return foundry.applications.ux.TextEditor.implementation.enrichHTML(editorValue, options);
     }
 
     /**
      * Action limits currently contain limits for all action types. Be it matrix, magic or physical.
      */
-    _getSortedLimitsForSelect(): Record<string, string> {
+    _getSortedLimitsForSelect() {
         return Helpers.sortConfigValuesByTranslation(SR5.limits);
     }
 
     /**
      * Sorted (by translation) actor attributes.
      */
-    _getSortedAttributesForSelect(): Record<string, string> {
+    _getSortedAttributesForSelect() {
         return Helpers.sortConfigValuesByTranslation(SR5.attributes);
     }
 
@@ -325,266 +505,62 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
 
     /* -------------------------------------------- */
 
+    override async _onRender(context, options) {
+        this.activateListeners_LEGACY($(this.element));
+        this.#dragDrop.forEach(d => d.bind(this.element));
+        return super._onRender(context, options);
+    }
+
     /**
      * Activate event listeners using the prepared sheet HTML
      * @param html -  The prepared HTML object ready to be rendered into the DOM
      */
-    override activateListeners(html) {
-        super.activateListeners(html);
-
+    activateListeners_LEGACY(html: JQuery<HTMLElement>) {
         Helpers.setupCustomCheckbox(this, html);
 
-        /**
-         * Drag and Drop Handling
-         */
-        //@ts-expect-error
-        this.form.ondragover = (event) => {
-            this._onDragOver(event);
-        }
-        //@ts-expect-error
-        this.form.ondrop = (event) => this._onDrop(event);
-
         // Active Effect management
-        html.find(".effect-control").click(event => onManageActiveEffect(event, this.item));
+        html.find(".effect-control").on('click', event => { void onManageActiveEffect(event, this.item)});
 
         /**
          * General item handling
          */
-        html.find('.edit-item').click(this._onEditItem.bind(this));
-        html.find('.open-source').on('click', this._onOpenSource.bind(this));
-        html.find('.has-desc').click(this._onListItemToggleDescriptionVisibility.bind(this));
         html.find('.hidden').hide();
-        html.find('.entity-remove').on('click', this._onEntityRemove.bind(this));
-
-        /**
-         * Contact item specific
-         */
-        html.find('.actor-remove').click(this.handleLinkedActorRemove.bind(this));
 
         /**
          * Weapon item specific
          */
-        html.find('.add-new-ammo').click(this._onAddNewAmmo.bind(this));
-        html.find('.ammo-equip').click(this._onAmmoEquip.bind(this));
-        html.find('select[name="change-ammo"]').on('change', async (event) => this._onAmmoEquip(event.target.value));
-        html.find('.ammo-delete').click(this._onAmmoRemove.bind(this));
-        html.find('.ammo-reload').on('click', async (event) => this._onAmmoReload(event, false));
-        html.find('select[name="change-clip-type"]').on('change', async (event) => this._onClipEquip(event.target.value));
-
-        html.find('.add-new-mod').click(this._onAddWeaponMod.bind(this));
-        html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
-        html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
-
-        /**
-         * SIN item specific
-         */
-        html.find('.add-new-license').click(this._onAddLicense.bind(this));
-        html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
-        html.find('.sin-remove-network').on('click', this._onRemoveNetwork.bind(this));
-
-        html.find('.network-clear').on('click', this._onRemoveAllSlaves.bind(this));
-        html.find('.network-device-remove').on('click', this._onRemoveSlave.bind(this));
+        html.find('select[name="change-ammo"]').on('change', this._onAmmoSelect.bind(this));
+        html.find('select[name="change-clip-type"]').on('change', (event) => { void this._onClipSelect((event.target as HTMLSelectElement).value) });
 
         // Marks handling
         html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
-        html.find('.marks-add-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, 1));
-        html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
-        html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
-        html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
-
-        // Origin Link handling
-        html.find('.origin-link').on('click', this._onOpenOriginLink.bind(this));
-        html.find('.controller-remove').on('click', this._onControllerRemove.bind(this));
 
         html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
 
-        // Freshly imported item toggle
-        html.find('.toggle-fresh-import-off').on('click', async (event) => this._toggleFreshImportFlag(event, false));
-
-        html.find('.select-ranged-range-category').on('change', this._onSelectRangedRangeCategory.bind(this));
-        html.find('.select-thrown-range-category').on('change', this._onSelectThrownRangeCategory.bind(this));
-
-        html.find('input[name="system.technology.equipped"').on('change', this._onToggleEquippedDisableOtherDevices.bind(this))
-
-        html.find('.list-item').each(this._addDragSupportToListItemTemplatePartial.bind(this));
-        html.find('.open-matrix-slave').on('click', this._onOpenSlave.bind(this));
-
-        html.find('.power-optional-input').on('change', this._onPowerOptionalInputChanged.bind(this));
-
-        this._activateTagifyListeners(html);
-    }
-
-    /**
-     * User requested removal of the linked actor.
-     */
-    async handleLinkedActorRemove(event: any) {
-        await this.item.update({ system: { linkedActor: '' } });
+        html.find('select[name="system.range.ranges.category"]').on('change', this._onSelectRangedRangeCategory.bind(this));
+        html.find('select[name="system.thrown.ranges.category"]').on('change', this._onSelectThrownRangeCategory.bind(this));
     }
 
     /**
      * Updating the contacts linked actor.
-     * 
+     *
      * @param actor The prepared actor
      */
     async updateLinkedActor(actor: SR5Actor) {
         await this.item.update({ system: { linkedActor: actor.uuid } });
     }
 
-    _addDragSupportToListItemTemplatePartial(i, item) {
-        if (item.dataset?.itemId) {
-            item.setAttribute('draggable', true);
-            item.addEventListener('dragstart', this._onDragStart.bind(this), false);
-        }
-    }
-
-    override async _onDragStart(event) {
-        const element = event.currentTarget;
-        if (element) {
-            // Create drag data object to use
-            const dragData = {
-                actor: this.item.actor,
-                actorId: this.item.actor?.id,
-                itemId: this.item.id,
-                type: '',
-                data: {}
-            };
-
-            switch (element.dataset.itemType) {
-                // if we are dragging an active effect, get the effect from our list of effects and set it in the data transfer
-                case 'ActiveEffect':
-                    {
-                        const effectId = element.dataset.itemId;
-                        const effect = this.item.effects.get(effectId);
-                        if (effect) {
-                            // Prepare data transfer
-                            dragData.type = 'ActiveEffect';
-                            dragData.data = effect; // this may blow up
-
-                            // Set data transfer
-                            event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
-                            return;
-                        }
-                    }
-            }
-        }
-        return super._onDragStart(event);
-    }
-
-
-    override async _onDrop(event) {
-        if (!game.items || !game.actors || !game.scenes) return;
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        // Parse drop data.
-        const data = parseDropData(event);
-        if (!data) return;
-
-        // CASE - Handle dropping of documents directly into the source field like urls and pdfs.
-        const targetElement = event.toElement || event.target;
-        if (targetElement?.name === 'system.description.source')
-            return this.item.setSource(data.uuid);
-
-        // CASE - Handle ActiveEffects
-        if (data.type === 'ActiveEffect') {
-            if (data.itemId === this.item.id) {
-                return; // don't add effects to ourselves
-            }
-            // the effect should be just the data itself
-            const effect = data.data;
-            // delete the id on it so a new one is generated
-            delete effect._id;
-            // add this to the embedded ActiveEffect documents
-            await this.item.createEmbeddedDocuments('ActiveEffect', [effect]);
-
-            return;
-        }
-
-        // CASE - Add items to a weapons modification / ammo
-        if (this.item.isType('weapon') && data.type === 'Item') {
-            let item;
-            // Case 1 - Data explicitly provided
-            if (data.data) {
-                if (this.item.isOwned && data.actorId === this.item.actor?.id && data.data._id === this.item.id) {
-                    return console.warn('Shadowrun 5e | Cant drop items onto themselves');
-                }
-                item = data;
-                // Case 2 - From a Compendium Pack
-            } else if (data.pack) {
-                item = await Helpers.getEntityFromCollection(data.pack, data.id);
-                // Case 3 - From a World Entity
-            } else {
-                item = await fromUuid(data.uuid);
-            }
-
-            // Provide readable error for failing item retrieval assumptions.
-            if (!item) return console.error('Shadowrun 5e | Item could not be created from DropData', data);
-
-            // if it's a master device, add ourself as a slave to it
-            if (item.canBeMaster) {
-                await item.addSlave(this.item);
-                return;
-            }
-            return this.item.createNestedItem(item._source);
-        }
-
-        // Add actors to WAN, both GRID and HOST
-        if (this.item.isNetwork() && ['Item', 'Actor'].includes(data.type)) {
-            const document = await fromUuid(data.uuid) as SR5Actor;
-            if (!document) return console.error('Shadowrun 5e | Document could not be retrieved from DropData', data);
-            await this.object.addSlave(document);
-            return;
-        }
-
-        // Add document to a PAN.
-        if (this.item.isType('device') && ['Item', 'Actor'].includes(data.type)) {
-            const document = await fromUuid(data.uuid) as SR5Item | SR5Actor;
-            if (!document) return console.error('Shadowrun 5e | Document could not be retrieved from DropData', data);
-            await this.object.addSlave(document);
-            return;
-        }
-
-        // Link actors to existing contacts.
-        if (this.item.isType('contact') && data.type === 'Actor') {
-            const actor = await fromUuid(data.uuid) as SR5Actor;
-
-            if (!actor?.id) return console.error('Shadowrun 5e | Actor could not be retrieved from DropData', data);
-
-            return this.updateLinkedActor(actor);
-        }
-
-        // Add networks to SINs.
-        if (this.item.isType('sin') && data.type === 'Item') {
-            const item = await fromUuid(data.uuid) as SR5Item;
-            if (!item) return;
-            if (!item.isNetwork()) return;
-
-            await this.item.addNewNetwork(item);
-        }
-    }
-
-    _eventId(event) {
-        event.preventDefault();
-        return event.currentTarget.closest('.list-item').dataset.itemId;
-    }
-
-    async _onOpenSource(event) {
-        event.preventDefault();
-        await this.item.openSource();
-    }
-
-    async _onSelectRangedRangeCategory(event) {
+    async _onSelectRangedRangeCategory(event: Event) {
         await this._onSelectRangeCategory("system.range.ranges", event);
     }
 
-    async _onSelectThrownRangeCategory(event) {
+    async _onSelectThrownRangeCategory(event: Event) {
         await this._onSelectRangeCategory("system.thrown.ranges", event);
     }
 
-    async _onSelectRangeCategory(key: string, event) {
+    async _onSelectRangeCategory(key: string, event: Event) {
         event.stopPropagation();
-        const selectedRangeCategory = event.currentTarget.value as keyof typeof SR5.weaponRangeCategories;
+        const selectedRangeCategory = (event.currentTarget as HTMLSelectElement).value as keyof typeof SR5.weaponRangeCategories;
 
         if (selectedRangeCategory === "manual") {
             await this.item.update({
@@ -610,25 +586,21 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
      * User selected a new matrix attribute on a specific matrix attribute slot (att1, att2,)
      * Switch out slots for the old and selected matrix attribute.
      */
-    async _onMatrixAttributeSelected(event) {
+    async _onMatrixAttributeSelected(event: Event) {
         if (!this.item.system.atts) return;
 
-        const attribute = event.currentTarget.value;
-        const changedSlot = event.currentTarget.dataset.att;
+        const target = event.currentTarget as HTMLSelectElement;
+        const attribute = target.value as Shadowrun.MatrixAttribute;
+        const changedSlot = target.dataset.att;
 
-        await this.item.changeMatrixAttributeSlot(changedSlot, attribute);
+        await this.item.changeMatrixAttributeSlot(changedSlot!, attribute);
     }
 
-    async _onEditItem(event) {
-        const item = this.item.getOwnedItem(this._eventId(event));
-        return item?.sheet?.render(true);
-    }
-
-    async _onEntityRemove(event) {
+    async _onEntityRemove(event: Event) {
         event.preventDefault();
 
         // Grab the data position to remove the correct entity from the list.
-        const entityRemove = $(event.currentTarget).closest('.entity-remove');
+        const entityRemove = $(event.currentTarget as HTMLElement).closest('.entity-remove');
         const list = entityRemove.data('list');
         const position = entityRemove.data('position');
 
@@ -637,106 +609,138 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
             await this.item.removeIC(position);
     }
 
-    async _onAddLicense(event) {
+    static async #addLicense(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         await this.item.addNewLicense();
     }
 
-    async _onRemoveLicense(event) {
+    static async #removeLicense(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
-        const index = event.currentTarget.dataset.index;
+        const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
         if (index >= 0) await this.item.removeLicense(index);
     }
 
     /**
      * User wants to remove a network from a SIN item.
      */
-    async _onRemoveNetwork(event) {
+    static async #removeNetwork(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const uuid = Helpers.listItemUuid(event);
+        const uuid = SheetFlow.closestUuid(event.target);
         if (!uuid) return;
 
         await SINFlow.removeNetwork(this.item, uuid);
     }
 
-    async _onWeaponModRemove(event) {
-        await this._onOwnedItemRemove(event);
-    }
-
-    async _onWeaponModEquip(event) {
-        await this.item.equipWeaponMod(this._eventId(event));
-    }
-
-    async _onAddWeaponMod(event) {
+    static async #addItemQty(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
-        const type = 'modification';
-        const name = `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`;
-        const item = new SR5Item({
-            name, type,
-            system: { type: 'weapon' }
-        });
-        await this.item.createNestedItem(item.toObject());
-    }
-
-    async _onAmmoReload(event, partialReload: boolean) {
-        event.preventDefault();
-        await this.item.reloadAmmo(partialReload);
-    }
-
-    async _onAmmoRemove(event) {
-        await this._onOwnedItemRemove(event);
-    }
-
-    async _onAmmoEquip(input) {
-        let id;
-
-        if (input.currentTarget) {
-            id = this._eventId(input);
-        } else {
-            id = input;
+        const id = SheetFlow.closestItemId(event.target);
+        const item = this.item.getOwnedItem(id);
+        if (item) {
+            await SheetFlow.addToQuantity(item, event);
         }
-
-        await this.item.equipAmmo(id);
     }
 
-    async _onAddNewAmmo(event) {
+    static async #removeItemQty(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
-        const type = 'ammo';
-        const itemData = {
-            name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
-            type: type as Item.SubType
-        };
-        const item = new SR5Item(itemData);
-        await this.item.createNestedItem(item._source);
+        const id = SheetFlow.closestItemId(event.target);
+        const item = this.item.getOwnedItem(id);
+        if (item) {
+            await SheetFlow.removeFromQuantity(item, event);
+        }
     }
 
-    async _onClipEquip(clipType: AmmunitionType['clip_type']) {
-        if (!clipType || !Object.keys(SR5.weaponCliptypes).includes(clipType)) return;
-
-        const agilityValue = this.item.actor ? this.item.actor.getAttribute('agility').value : 0;
-        await this.item.update({
-            system: {
-                ammo: {
-                    clip_type: clipType,
-                    partial_reload_value: RangedWeaponRules.partialReload(clipType, agilityValue)
-                }
+    static async #equipItem(this: SR5ItemSheet, event: Event) {
+        event.preventDefault();
+        const id = SheetFlow.closestItemId(event.target);
+        const item = this.item.getOwnedItem(id);
+        if (id && item) {
+            if (item.type === 'modification') {
+                await this.item.equipWeaponMod(id);
+            } else if (item.type === 'ammo') {
+                await this.item.equipAmmo(id);
             }
-        }, { render: true });
+        }
     }
 
-    async _onOwnedItemRemove(event) {
+    static async #editItem(this: SR5ItemSheet, event: Event) {
+        event.preventDefault();
+        const id = SheetFlow.closestItemId(event.target);
+        const item = this.item.getOwnedItem(id);
+        if (item) {
+            await item.sheet?.render(true);
+        }
+    }
+
+    static async #deleteItem(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        await this.item.deleteOwnedItem(this._eventId(event));
+        const id = SheetFlow.closestItemId(event.target);
+        const item = this.item.getOwnedItem(id);
+        if (id && item) {
+            await this.item.deleteOwnedItem(id);
+        }
     }
 
-    async _onRemoveAllSlaves(event) {
+    static async #addItem(this: SR5ItemSheet, event: Event) {
+        event.preventDefault();
+        const type = SheetFlow.closestAction(event.target)?.dataset.itemType as Item.ConfiguredSubType;
+        const itemData = {
+            name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
+            type,
+        } satisfies Item.CreateData;
+        if (type === 'modification') {
+            // add system type to be a weapon when adding a weapon mod
+            itemData['system'] = { type: 'weapon' }
+        }
+        const item = new SR5Item(itemData);
+        await this.item.createNestedItem(item._source);
+    }
+
+    static async #reloadAmmo(this: SR5ItemSheet, event: Event) {
+        event.preventDefault();
+        await this.item.reloadAmmo(false);
+    }
+
+    static async #partialReloadAmmo(this: SR5ItemSheet, event: Event) {
+        event.preventDefault();
+        await this.item.reloadAmmo(true);
+    }
+
+    static async #resetSpareReloads(this: SR5ItemSheet, event: Event) {
+        event.preventDefault();
+        const spareClips = this.item.system.ammo?.spare_clips.max ?? 0;
+        await this.item.update({ system: { ammo: { spare_clips: { value: spareClips }}}});
+    }
+
+    _onAmmoSelect(event: Event) {
+        const id = SheetFlow.closestItemId(event.currentTarget);
+
+        if (!id) return;
+        void this.item.equipAmmo(id);
+    }
+
+    async _onClipSelect(clipType: string) {
+        if (!clipType || !(Object.keys(SR5.weaponCliptypes) as string[]).includes(clipType)) return;
+        const clip_type = clipType as AmmunitionType['clip_type'];
+
+        const agilityValue = this.item.actor ? this.item.actor.getAttribute('agility').value : 0;
+        await this.item.update({
+            system: {
+                ammo: {
+                    clip_type,
+                    partial_reload_value: RangedWeaponRules.partialReload(clip_type, agilityValue)
+                }
+            }
+        }, { render: true });
+    }
+
+    static async #removeAllSlaves(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();
@@ -745,175 +749,51 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         await this.item.removeAllSlaves();
     }
 
-    async _onRemoveSlave(event) {
+    static async #removeSlave(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const uuid = Helpers.listItemUuid(event);
-        const document = await fromUuid(uuid) as SR5Actor | SR5Item;
+        const uuid = SheetFlow.closestUuid(event.target);
+        const document = fromUuidSync(uuid) as SR5Actor | SR5Item;
         if (!document) return;
 
         await this.item.removeSlave(document);
     }
 
-    /**
-     * Open a document from a DOM node containing a dataset uuid.
-     *
-     * This is intended to let deckers open marked documents they're FoundryVTT user has permissions for.
-     *
-     * @param event Any interaction event
-     */
-    async _onOpenSlave(event) {
-        event.stopPropagation();
-
-        const uuid = Helpers.listItemUuid(event);
-        if (!uuid) return;
-
-        // Marked documents can´t live in packs.
-        const document = fromUuidSync(uuid) as SR5Item|SR5Actor;
-        if (!document) return;
-
-        await document.sheet?.render(true);
-    }
-
-    /**
-     * @private
-     */
-    _findActiveList() {
-        return $(this.element).find('.tab.active .scroll-area');
-    }
-
-    /**
-     * Add a tagify element for an action-modifier dom element.
-     *
-     * Usage: Call method after render with a singular item's html sub-dom-tree.
-     * 
-     * Only action items will trigger the creation of a tagify element.
-     *
-     * @param html see DocumentSheet.activateListeners#html param for documentation.
-     */
-    _createActionModifierTagify(html) {
-        if (!('action' in this.item.system)) return;
-        const inputElement = html.find('input#action-modifier').get(0);
-
-        if (!inputElement)
-            return console.error('Shadowrun 5e | Action item sheet does not contain an action-modifier input element');
-
-        // Tagify expects this format for localized tags.
-        const whitelist = Object.keys(SR5.modifierTypes).map(modifier => ({
-            value: game.i18n.localize(SR5.modifierTypes[modifier]),
-            id: modifier
-        }));
-
-        // Tagify dropdown should show all whitelist tags.
-        const maxItems = Object.keys(SR5.modifierTypes).length;
-
-        // Use localized label as value, and modifier as the later to be extracted value
-        const modifiers = this.item.system.action?.modifiers ?? [];
-        const tags = modifiers.map(modifier => ({
-            value: game.i18n.localize(SR5.modifierTypes[modifier]),
-            id: modifier
-        }));
-
-        const tagify = createTagify(inputElement, { whitelist, maxItems, tags });
-
-        html.find('input#action-modifier').on('change', async (event) => {
-            const modifiers = tagify.value.map(tag => tag.id);
-            // render would loose tagify input focus. submit on close will save.
-            await this.item.update({ system: { action: { modifiers } } }, { render: false });
-        });
-    }
-
-    /**
-     * Add a tagify element for an action-categories dom element.
-     * 
-     * Usage: Call method after render with a singular item's html sub-dom-tree.
-     * 
-     * Only action items will trigger the creation of a tagify element.
-     * @param html 
-     */
-    _createActionCategoriesTagify(html) {
-        if (!('action' in this.item.system)) return;
-        const inputElement = html.find('input#action-categories').get(0) as HTMLInputElement;
-
-        if (!inputElement) {
-            console.error('Shadowrun 5e | Action item sheet does not contain an action-categories input element');
-            return;
-        }
-
-        // Tagify expects this format for localized tags.
-        const whitelist = Object.keys(SR5.actionCategories).map(category => ({
-            value: game.i18n.localize(SR5.actionCategories[category]),
-            id: category
-        }));
-
-        // Tagify dropdown should show all whitelist tags.
-        const maxItems = Object.keys(SR5.actionCategories).length;
-
-        // Use localized label as value, and category as the later to be extracted value
-        const categories = this.item.system.action?.categories ?? [];
-        const tags = categories.map(category => ({
-            value: game.i18n.localize(SR5.actionCategories[category]) ?? category,
-            id: category
-        }));
-
-        const tagify = createTagify(inputElement, { whitelist, maxItems, tags });
-
-        html.find('input#action-categories').on('change', async (event) => {
-            // Custom tags will not have an id, so use value as id.
-            const categories = tagify.value.map(tag => tag.id ?? tag.value);
-            // render would loose tagify input focus. submit on close will save.
-            await this.item.update({ system: { action: { categories } } }, { render: false });
-        });
-    }
-
-    /**
-     * @private
-     */
-    override async _render(force = false, options = {}) {
-        // NOTE: This is for a timing bug. See function doc for code removal. Good luck, there be dragons here. - taM
-        // this.fixStaleRenderedState();
-
-        this._saveScrollPositions();
-        await super._render(force, options);
-        this._restoreScrollPositions();
-    }
-
-    /**
-     * @private
-     */
-    override _restoreScrollPositions() {
-        const activeList = this._findActiveList();
-        if (activeList.length && this._scroll != null) {
-            activeList.prop('scrollTop', this._scroll);
-        }
-    }
-
-    /**
-     * @private
-     */
-    override _saveScrollPositions() {
-        const activeList = this._findActiveList();
-        if (activeList.length) {
-            this._scroll = activeList.prop('scrollTop');
-        }
-    }
-
-    async _onMarksQuantityChange(event) {
+    async _onMarksQuantityChange(event: Event) {
         event.stopPropagation();
 
         if (!this.item.isType('host')) return;
 
-        const markId = event.currentTarget.dataset.markId;
+        const currentTarget = event.currentTarget as HTMLInputElement | null;
+        const markId = currentTarget?.dataset.markId;
         if (!markId) return;
 
         const markedDocument = await ActorMarksFlow.getMarkedDocument(markId);
         if (!markedDocument) return;
 
-        const marks = parseInt(event.currentTarget.value);
+        const marks = parseInt(currentTarget.value);
         await this.item.setMarks(markedDocument, marks, { overwrite: true });
+    }
+
+    static async #addOneQty(this: SR5ItemSheet, event: Event) {
+        event.preventDefault();
+        await SheetFlow.addToQuantity(this.item, event);
+    }
+
+    static async #removeOneQty(this: SR5ItemSheet, event: Event) {
+        event.preventDefault();
+        await SheetFlow.removeFromQuantity(this.item, event);
+    }
+
+    static async #addOneMark(this: SR5ItemSheet, event: Event) {
+        await this._onMarksQuantityChangeBy(event, 1);
+    }
+
+    static async #removeOneMark(this: SR5ItemSheet, event: Event) {
+        await this._onMarksQuantityChangeBy(event, -1);
     }
 
     async _onMarksQuantityChangeBy(event, by: number) {
@@ -930,12 +810,12 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         await this.item.setMarks(markedDocument, by);
     }
 
-    async _onMarksDelete(event) {
+    static async #deleteMarks(this: SR5ItemSheet, event: Event) {
         event.stopPropagation();
 
         if (!this.item.isType('host')) return;
 
-        const markId = event.currentTarget.dataset.markId;
+        const markId = SheetFlow.closestAction(event.target)?.dataset.markId;
         if (!markId) return;
 
         const userConsented = await Helpers.confirmDeletion();
@@ -944,7 +824,7 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         await this.item.clearMark(markId);
     }
 
-    async _onMarksClearAll(event) {
+    static async #deleteAllMarks(this: SR5ItemSheet, event: Event) {
         event.stopPropagation();
 
         if (!this.item.isType('host')) return;
@@ -955,52 +835,17 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         await this.item.clearMarks();
     }
 
-    async _onOpenOriginLink(event) {
-        event.preventDefault();
-
-        console.log('Shadowrun 5e | Opening PAN/WAN network controller');
-
-        const originLink = event.currentTarget.dataset.originLink;
-        const device = await fromUuid(originLink);
-        if (!device) return;
-
-        if (device instanceof SR5Item || device instanceof SR5Actor)
-            await device?.sheet?.render(true);
-    }
-
-    async _onControllerRemove(event) {
+    static async #removeMaster(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
 
         await this.item.disconnectFromNetwork();
-        this.render(false);
+        void this.render(false);
     }
 
-    /**
-     * Activate listeners for tagify elements for item types that allow changing action
-     * modifiers.
-     *
-     * @param html The JQuery HTML as given by the activateListeners method.
-     */
-    _activateTagifyListeners(html) {
-        if (!['action', 'metamagic', 'bioware', 'cyberware', 'equipment', 'quality', 'ritual', 'call_in_action', 'sprite_power', 'critter_power', 'adept_power'].includes(this.document.type)) return;
-
-        this._createActionModifierTagify(html);
-        this._createActionCategoriesTagify(html);
-    }
-
-    /**
-     * Show / hide the items description within a sheet item l ist.
-     */
-    async _onListItemToggleDescriptionVisibility(event) {
+    static async #removeLinkedActor(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
-        const item = $(event.currentTarget).parents('.list-item');
-        const iid = $(item).data().item;
-        const field = item.find('.list-item-description');
-        field.toggle();
-        if (iid) {
-            if (field.is(':visible')) this._shownDesc.push(iid);
-            else this._shownDesc = this._shownDesc.filter((val) => val !== iid);
-        }
+
+        await this.item.update({ system: { linkedActor: '' }});
     }
 
     /**
@@ -1008,7 +853,8 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
      *
      * @param event
      */
-    async _toggleFreshImportFlag(event, onOff: boolean) {
+    static async #toggleFreshImportFlag(this: SR5ItemSheet, event: Event) {
+        const onOff = !this.item.system.importFlags?.isFreshImport;
         console.debug('Toggling isFreshImport on item to ->', onOff, event);
         const item = this.item;
         if (item.system.importFlags) {
@@ -1016,68 +862,469 @@ export class SR5ItemSheet extends foundry.appv1.sheets.ItemSheet {
         }
     }
 
-    /**
-     * Clicking on equipped status should trigger unequipping all other devices of the same type.
-     * @param event Click event on the equipped checkbox.
-     */
-    async _onToggleEquippedDisableOtherDevices(event: PointerEvent) {
-        event.preventDefault();
-
-        // Assure owned item device.
-        if (!(this.document.parent instanceof SR5Actor)) return;
-        if (!this.document.isType('device')) return;
-        if (!this.document.isEquipped()) return;
-
-        await this.document.parent.equipOnlyOneItemOfType(this.document);
-    }
-
-    /**
-     * Change the enabled status of an item shown within a sheet item list.
-     */
-    async _onPowerOptionalInputChanged(event) {
-        event.preventDefault();
-        const power = this.item.asType('critter_power') || this.item.asType('sprite_power') || undefined;
-        if (!power) return;
-
-        let selectedRangeCategory;
-
-        if (this.item.isType('critter_power')) {
-            selectedRangeCategory = event.currentTarget.value as keyof typeof SR5.critterPower.optional;
+    static async #toggleEquipped(this: SR5ItemSheet, event: Event) {
+        if (this.item.isType('device') && this.item.parent instanceof SR5Actor) {
+            await this.item.parent.equipOnlyOneItemOfType(this.item);
+            void this.render();
+        } else if (this.item.isType('ammo') && this.item.parent instanceof SR5Item) {
+            await (this.item.parent as SR5Item).equipAmmo(this.item.id!);
+            void this.render();
+        } else if (this.item.isType('modification') && this.item.parent instanceof SR5Item) {
+            await (this.item.parent as SR5Item).equipWeaponMod(this.item.id);
+            void this.render();
         } else {
-            selectedRangeCategory = event.currentTarget.value as keyof typeof SR5.spritePower.optional;
+            const equipped = this.item.isEquipped();
+            if (this.item.isType('critter_power', 'sprite_power')) {
+                await this.item.update({system: { optional : equipped ? 'disabled_option' : 'enabled_option'}});
+            } else {
+                await this.item.update({system: { technology: { equipped: !equipped }}});
+            }
         }
-
-        power.system.optional = selectedRangeCategory;
-
-        switch (power.system.optional) {
-            case 'standard':
-            case 'enabled_option':
-                power.system.enabled = true;
-                break;
-            case 'disabled_option':
-                power.system.enabled = false;
-                break;
-        }
-
-        this.item.render(false);
     }
 
     /**
-     * Go through an action item action categories and if at least one is found that needs additional
-     * configuration, let the sheet show the misc. tab.
-     *
-     * @returns true, when the tab is to be shown.
+     * Toggle the Wireless state of an item, iterating through the different states
      */
-    _prepareShowMiscTab() {
-        // Currently, only action items use this tab.
-        const action = this.object.asType('action');
-        if (!action) return false;
+    static async #toggleWirelessState(this: SR5ItemSheet, event: MouseEvent) {
+        event.preventDefault();
+        event.stopPropagation();
 
-        const relevantCategories: Shadowrun.ActionCategories[] = ['matrix'];
-        for (const category of relevantCategories) {
-            if (this.document.hasActionCategory(category)) return true;
+        // iterate through the states of online -> silent -> offline
+        const newState = event.shiftKey ? 'none'
+            : this.item.isWireless()
+                ? this.item.isRunningSilent()
+                    ? 'offline'
+                    : 'silent'
+                : 'online';
+
+        // update the embedded item with the new wireless state
+        await this.item.update({ system: { technology: { wireless: newState } } });
+    }
+
+    static async #addEffect(this: SR5ItemSheet, event: Event) {
+        // TODO handle nested items
+        event.preventDefault();
+        const effect = [{
+            name: game.i18n.localize("SR5.ActiveEffect.New"),
+        }];
+
+        await this.item.createEmbeddedDocuments('ActiveEffect', effect);
+    }
+
+    static async #editEffect(this: SR5ItemSheet, event: MouseEvent) {
+        const effectId = SheetFlow.closestEffectId(event.target);
+        const effect = this.item.effects.get(effectId);
+        if (effect instanceof SR5ActiveEffect) {
+            await effect.sheet?.render(true);
+        } else {
+            const uuid = SheetFlow.closestUuid(event.target);
+            const doc = fromUuidSync(uuid);
+            if (doc instanceof SR5ActiveEffect) {
+                await doc.sheet?.render(true);
+            }
+        }
+    }
+
+    static async #toggleEffect(this: SR5ItemSheet, event: MouseEvent) {
+        const effectId = SheetFlow.closestEffectId(event.target);
+        const effect = this.item.effects.get(effectId);
+        if (effect instanceof SR5ActiveEffect) {
+            await effect.update({ disabled: !effect.disabled })
+        } else {
+            const uuid = SheetFlow.closestUuid(event.target);
+            const doc = await fromUuid(uuid);
+            if (doc instanceof SR5ActiveEffect) {
+                await doc.update({ disabled: !doc.disabled })
+            }
+        }
+    }
+
+    static async #deleteEffect(this: SR5ItemSheet, event: MouseEvent) {
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        const effectId = SheetFlow.closestEffectId(event.target);
+        const effect = this.item.effects.get(effectId);
+        if (effect?.id) {
+            await this.item.deleteEmbeddedDocuments('ActiveEffect', [effect.id]);
+        }
+    }
+
+    override async _onFirstRender(context, options) {
+        await super._onFirstRender(context, options);
+
+        this._createContextMenu(this._getNestedItemContextOptions.bind(this), "[data-item-id]", {
+            hookName: "getNestedItemContextOptions",
+            jQuery: false,
+            fixed: true,
+        });
+        this._createContextMenu(this._getEffectContextOptions.bind(this), "[data-effect-id]", {
+            hookName: "getEffectContextOptions",
+            jQuery: false,
+            fixed: true,
+        });
+    }
+
+    _getNestedItemContextOptions() {
+        return [
+            SheetFlow._getSourceContextOption(),
+            {
+                name: "SR5.ContextOptions.EditItem",
+                icon: "<i class='fas fa-pen-to-square'></i>",
+                callback: async (target: HTMLElement) => {
+                    const id = SheetFlow.closestItemId(target);
+                    const item = this.item.getOwnedItem(id);
+                    if (item) {
+                        await item.sheet?.render(true)
+                    }
+                }
+            },
+            {
+                name: "SR5.ContextOptions.DeleteItem",
+                icon: "<i class='fas fa-trash'></i>",
+                callback: async (target: HTMLElement) => {
+                    const userConsented = await Helpers.confirmDeletion();
+                    if (!userConsented) return;
+                    const id = SheetFlow.closestItemId(target);
+                    const item = this.item.getOwnedItem(id);
+                    if (item) {
+                        await this.item.deleteOwnedItem(item.id);
+                    }
+                }
+            }
+        ]
+    }
+
+    _getEffectContextOptions() {
+        return [
+            SheetFlow._getSourceContextOption(),
+            {
+                name: "SR5.ContextOptions.EditEffect",
+                icon: "<i class='fas fa-pen-to-square'></i>",
+                callback: async (target: HTMLElement) => {
+                    const id = SheetFlow.closestEffectId(target);
+                    const item = this.item.effects.get(id);
+                    if (item) {
+                        await item.sheet?.render(true)
+                    } else {
+                        const uuid = SheetFlow.closestUuid(target);
+                        const effect = fromUuidSync(uuid);
+                        if (effect && effect instanceof SR5ActiveEffect) {
+                            await effect.sheet?.render(true);
+                        }
+                    }
+                }
+            },
+            {
+                name: "SR5.ContextOptions.DeleteEffect",
+                icon: "<i class='fas fa-trash'></i>",
+                condition: (target: HTMLElement) => {
+                    const id = SheetFlow.closestEffectId(target);
+                    const item = this.item.effects.get(id);
+                    return item !== undefined;
+                    // don't check for effects by uuid for deletion
+                },
+                callback: async (target: HTMLElement) => {
+                    const userConsented = await Helpers.confirmDeletion();
+                    if (!userConsented) return;
+                    const id = SheetFlow.closestEffectId(target);
+                    if (id) {
+                        await this.item.deleteEmbeddedDocuments('ActiveEffect', [id]);
+                    }
+                }
+            }
+        ]
+    }
+
+    override async _processSubmitData(
+        ...[event, form, submitData, options]: Parameters<ItemSheet['_processSubmitData']>
+    ) {
+        if (this.item._isNestedItem) {
+            await this.item.update(submitData as any, options as any);
+        } else {
+            await super._processSubmitData(event, form, submitData, options);
+        }
+    }
+
+    static async #toggleActionSpecialization(this: SR5ItemSheet) {
+        const action = this.item.getAction();
+        if (action) {
+            await this.item.update({system: { action: { spec: !action.spec }}});
+        }
+    }
+
+    static async #toggleActionArmor(this: SR5ItemSheet) {
+        const action = this.item.getAction();
+        if (action) {
+            await this.item.update({system: { action: { armor: !action.armor }}});
+        }
+    }
+
+    static async #toggleOpposedArmor(this: SR5ItemSheet) {
+        const action = this.item.getAction();
+        if (action) {
+            await this.item.update({system: { action: { opposed: { armor: !action.opposed.armor }}}});
+        }
+    }
+
+    static async #toggleResistArmor(this: SR5ItemSheet) {
+        const action = this.item.getAction();
+        if (action) {
+            await this.item.update({system: { action: { opposed: { resist: { armor: !action.opposed.resist.armor }}}}});
+        }
+    }
+
+    /**
+     * Create drag-and-drop workflow handlers for this Application
+     * @returns {DragDrop[]}     An array of DragDrop handlers
+     * @private
+     */
+    #createDragDropHandlers(): DragDrop[] {
+        return this.options.dragDrop!.map((d) => {
+            d.permissions = {
+                dragstart: this._canDragStart.bind(this),
+                drop: this._canDragDrop.bind(this),
+            };
+            d.callbacks = {
+                dragstart: this._onDragStart.bind(this),
+                dragover: this._onDragOver.bind(this),
+                drop: this._onDrop.bind(this),
+            };
+            return new DragDrop(d);
+        });
+    }
+
+    /**
+     * Define whether a user is able to begin a dragstart workflow for a given drag selector
+     * @param {string} selector       The candidate HTML selector for dragging
+     * @returns {boolean}             Can the current user drag this selector?
+     */
+    protected _canDragStart(selector): boolean {
+        return this.isEditable;
+    }
+
+    /**
+     * Define whether a user is able to conclude a drag-and-drop workflow for a given drop selector
+     * @param {string} selector       The candidate HTML selector for the drop target
+     * @returns {boolean}             Can the current user drop on this selector?
+     */
+    protected _canDragDrop(selector): boolean {
+        return this.isEditable;
+    }
+
+
+    /**
+     * Callback actions which occur when a dragged element is over a drop target.
+     * @param {DragEvent} event       The originating DragEvent
+     * @protected
+     */
+    protected _onDragOver(event: DragEvent) {}
+
+    /* -------------------------------------------- */
+
+    /**
+     * An event that occurs when data is dropped into a drop target.
+     * @param {DragEvent} event
+     * @returns {Promise<void>}
+     * @protected
+     */
+    async _onDrop(event: DragEvent) {
+        const data = TextEditor.getDragEventData(event) as any;
+        if (!data) return;
+        const item = this.item;
+        const allowed = Hooks.call("dropItemSheetData", item, this, data);
+        if (!allowed) return;
+
+        // Dropped Documents
+        const documentClass = foundry.utils.getDocumentClass(data.type);
+        if (documentClass) {
+            const document = await documentClass.fromDropData(data);
+            await this._onDropDocument(event, document);
+        }
+    }
+
+    /* -------------------------------------------- */
+
+    /**
+     * Handle a dropped document on the ActorSheet
+     * @template {Document} TDocument
+     * @param {DragEvent} event         The initiating drop event
+     * @param {TDocument} document       The resolved Document class
+     * @returns {Promise<TDocument|null>} A Document of the same type as the dropped one in case of a successful result,
+     *                                    or null in case of failure or no action being taken
+     * @protected
+     */
+    protected async _onDropDocument(event, document) {
+        switch (document.documentName) {
+            case "ActiveEffect":
+                return (await this._onDropActiveEffect(event, document)) ?? null;
+            case "Actor":
+                return (await this._onDropActor(event, document)) ?? null;
+            case "Item":
+                return (await this._onDropItem(event, document)) ?? null;
+            case "Folder":
+                return (await this._onDropFolder(event, document)) ?? null;
+            default:
+                return null;
+        }
+    }
+
+    /* -------------------------------------------- */
+
+    /**
+     * Handle a dropped Active Effect on the Actor Sheet.
+     * The default implementation creates an Active Effect embedded document on the Actor.
+     * @param {DragEvent} event       The initiating drop event
+     * @param {ActiveEffect} effect   The dropped ActiveEffect document
+     * @returns {Promise<ActiveEffect|null|undefined>} A Promise resolving to a newly created ActiveEffect, if one was
+     *                                                 created, or otherwise a nullish value
+     * @protected
+     */
+    async _onDropActiveEffect(event, effect) {
+        if ( !this.item.isOwner ) return null;
+        const keepId = !this.item.effects.has(effect.id);
+        const result = await SR5ActiveEffect.create(effect.toObject(), {parent: this.item, keepId});
+        return result ?? null;
+    }
+
+    /* -------------------------------------------- */
+
+    /**
+     * Handle a dropped Actor on the Actor Sheet.
+     * @param {DragEvent} event     The initiating drop event
+     * @param {Actor} actor         The dropped Actor document
+     * @returns {Promise<Actor|null|undefined>} A Promise resolving to an Actor identical or related to the dropped Actor
+     *                                          to indicate success, or a nullish value to indicate failure or no action
+     *                                          being taken
+     * @protected
+     */
+    async _onDropActor(event: DragEvent, actor: SR5Actor) {
+        if (this.item.isNetwork()) {
+            return this.item.addSlave(actor);
+        }
+        if (this.item.isType('contact')) {
+            return this.updateLinkedActor(actor);
+        }
+    }
+
+    /* -------------------------------------------- */
+
+    /**
+     * Handle a dropped Item on the Item Sheet.
+     * @param {DragEvent} event     The initiating drop event
+     * @param {Item} item           The dropped Item document
+     * @returns {Promise<Item|null|undefined>} A Promise resolving to the dropped Item (if sorting), a newly created Item,
+     *                                         or a nullish value in case of failure or no action being taken
+     * @protected
+     */
+    protected async _onDropItem(event: DragEvent, item: SR5Item) {
+        // dropped ammo and mods to weapons get added as a nested item
+        if (this.item.isType('weapon') && item.isType('ammo', 'modification')) {
+            return this.item.createNestedItem(item.toObject());
+        }
+        // dropped Grid and Hosts on SIN allows for adding the SIN as a network option
+        if (this.item.isType('sin') && item.isNetwork()) {
+            return this.item.addNewNetwork(item);
+        }
+        // dropped Network on any other type should result in connecting to that network
+        if (this.item.isNetwork() && item.canBeSlave) {
+            return this.item.addSlave(item);
+        }
+        if (this.item.canBeMaster && item.canBeSlave) {
+            return this.item.addSlave(item);
+        }
+        // if this item can be slaved and the dropped item can be a master, add ourselves as a slave to it
+        if (this.item.canBeSlave && item.canBeMaster) {
+            return item.addSlave(this.item);
+        }
+    }
+
+    /* -------------------------------------------- */
+
+    /**
+     * Handle a dropped Folder on the Item Sheet.
+     * @param {DragEvent} event     The initiating drop event
+     * @param {Folder} folder       The dropped Folder document
+     * @returns {Promise<Folder|null|undefined>} A Promise resolving to the dropped Folder indicate success, or a nullish
+     *                                           value to indicate failure or no action being taken
+     * @protected
+     */
+    async _onDropFolder(event, folder) {
+        return null;
+    }
+
+    /**
+     * An event that occurs when a drag workflow begins for a draggable item on the sheet.
+     * @param {DragEvent} event       The initiating drag start event
+     * @returns {Promise<void>}
+     * @protected
+     */
+    _onDragStart(event: DragEvent) {
+        const target = event.currentTarget as HTMLElement;
+        const targetElement = event.target as HTMLElement;
+        if (targetElement?.dataset && 'link' in targetElement.dataset) return;
+        let dragData;
+
+        // Owned Items
+        if (target.dataset.itemId) {
+            const item = this.item.getOwnedItem(target.dataset.itemId);
+            if (item) {
+                dragData = item.toDragData();
+            }
         }
 
-        return false;
+        // Active Effect
+        if (target.dataset.effectId) {
+            const effect = this.item.effects.get(target.dataset.effectId);
+            if (effect) {
+                dragData = effect.toDragData();
+            }
+        }
+
+        // Set data transfer
+        if (!dragData) return;
+        event.dataTransfer?.setData("text/plain", JSON.stringify(dragData));
+    }
+
+    /**
+     * Set any kind of condition monitor to a specific cell value.
+     *
+     * @event Most return a currentTarget with a value dataset
+     */
+    static async #modifyConditionMonitor(this: SR5ItemSheet, event: Event) {
+        event.preventDefault();
+
+        const target = (event.target as HTMLElement).closest<HTMLElement>('[data-action="modifyConditionMonitor"]')!;
+
+        const track = target.dataset.id;
+        let value = Number(target.dataset.value);
+
+        // if the clicked on cell is the current value for it's track, set the value to 0 to clear it
+        if (track === 'matrix' && this.item.getConditionMonitor()?.value === value) {
+            value = 0;
+        }
+
+        if (track === 'matrix') {
+            await this.item.setMatrixDamage(value);
+        }
+    }
+
+    /**
+     * Reset all condition tracks to zero values.
+     */
+    static async #clearConditionMonitor(this: SR5ItemSheet, event: Event) {
+        event.preventDefault();
+
+        const track = (event.target as HTMLElement).closest<HTMLElement>('[data-id]')?.dataset.id;
+        if (track === 'matrix') {
+            await this.item.setMatrixDamage(0);
+        }
+    }
+
+    /**
+     * Handle interaction with a damage track title.
+     */
+    static async #rollConditionMonitor(this: SR5ItemSheet, event: Event) {
+        event.preventDefault();
     }
 }

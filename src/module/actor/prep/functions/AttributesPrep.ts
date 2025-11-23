@@ -14,9 +14,11 @@ export class AttributesPrep {
     static prepareAttributes(system: SR5Actor['system'], ranges?: Record<string, {min: number, max?: number}>) {
         const {attributes} = system;
 
-        // always have special attributes set to hidden
-        attributes.magic.hidden = true;
-        attributes.resonance.hidden = true;
+        // hide magic and resonance based on the actor's special property
+        attributes.magic.hidden = system.special !== 'magic';
+        attributes.resonance.hidden = system.special !== 'resonance';
+
+        // always hide edge and essence, we display these separately
         attributes.edge.hidden = true;
         attributes.essence.hidden = true;
 
@@ -32,7 +34,7 @@ export class AttributesPrep {
      */
     static prepareAttribute(name: string, attribute: AttributeFieldType, ranges?: Record<string, {min: number, max?: number}>) {
         // Check for valid attributes. Active Effects can cause unexpected properties to appear.
-        if (!SR5.attributes.hasOwnProperty(name) || !attribute) return;
+        if (!Object.hasOwn(SR5.attributes, name) || !attribute) return;
 
         // Each attribute can have a unique value range.
         // TODO:  Implement metatype attribute value ranges for character actors.
@@ -50,7 +52,7 @@ export class AttributesPrep {
      */
     static calculateAttribute(name: string, attribute: AttributeFieldType, ranges?: Record<string, {min: number, max?: number}>) {
         // Check for valid attributes. Active Effects can cause unexpected properties to appear.
-        if (!SR5.attributes.hasOwnProperty(name) || !attribute) return;
+        if (!Object.hasOwn(SR5.attributes, name) || !attribute) return;
 
         // Each attribute can have a unique value range.
         // TODO:  Implement metatype attribute value ranges for character actors.

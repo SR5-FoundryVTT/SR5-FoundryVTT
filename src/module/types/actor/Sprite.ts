@@ -4,6 +4,7 @@ import { Initiative } from "../template/Initiative";
 import { VisibilityChecks } from "../template/Visibility";
 import { Limits, MatrixLimits } from "../template/Limits";
 import { ActorBase, CommonData, CreateModifiers } from "./Common";
+import { Tracks } from '@/module/types/template/ConditionMonitors';
 import { Attributes, MatrixActorAttributes } from '../template/Attributes';
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
@@ -13,15 +14,10 @@ const SpriteData = () => ({
     attributes: new SchemaField({...Attributes(), ...MatrixActorAttributes() }),
     spriteType: new StringField({
         required: true,
-        initial: 'courier',
+        initial: 'data',
         choices: SR5.spriteTypes,
     }),
     special: new StringField({ required: true, initial: "resonance", choices: ["resonance"], readonly: true }),
-    full_defense_attribute: new StringField({
-        required: true,
-        initial: "willpower",
-        choices: SR5.attributes
-    }),
 
     // === Matrix & Host ===
     matrix: new SchemaField(MatrixData()),
@@ -33,7 +29,7 @@ const SpriteData = () => ({
     technomancerUuid: new StringField({ required: true }),
 
     // === Condition & Monitoring ===
-    // track: new SchemaField(Tracks('matrix')),
+    track: new SchemaField(Tracks('matrix')),
     initiative: new SchemaField(Initiative('matrix')),
     limits: new SchemaField({ ...Limits(), ...MatrixLimits() }),
 
@@ -65,6 +61,7 @@ export class Sprite extends ActorBase<ReturnType<typeof SpriteData>> {
     static override defineSchema() {
         return SpriteData();
     }
+    static override LOCALIZATION_PREFIXES = ["SR5.Sprite", "SR5.Actor"];
 }
 
 console.log("SpriteData", SpriteData(), new Sprite());

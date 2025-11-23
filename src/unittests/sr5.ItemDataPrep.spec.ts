@@ -68,7 +68,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
 
         it('Setup damage source data', async () => {
             const character = await factory.createActor({ type: 'character' });
-            const documents = (await character.createEmbeddedDocuments('Item', [{type: 'action', name: 'TestAction'}]))!;
+            const documents = await character.createEmbeddedDocuments('Item', [{type: 'action', name: 'TestAction'}]);
             const action = documents[0] as SR5Item<'action'>;
 
             ActionPrep.prepareDamageSource(action.system.action, action)

@@ -115,6 +115,7 @@ export class Vehicle extends ActorBase<ReturnType<typeof VehicleData>> {
     static override defineSchema() {
         return VehicleData();
     }
+    static override LOCALIZATION_PREFIXES = ["SR5.Vehicle", "SR5.Actor"];
 }
 
 console.log("VehicleData", VehicleData(), new Vehicle());

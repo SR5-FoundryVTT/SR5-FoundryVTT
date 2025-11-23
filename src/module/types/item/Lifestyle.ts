@@ -22,6 +22,8 @@ export class Lifestyle extends ItemBase<ReturnType<typeof LifestyleData>> {
     static override defineSchema() {
         return LifestyleData();
     }
+
+    static override LOCALIZATION_PREFIXES = ["SR5.Lifestyle", "SR5.Item"];
 }
 
 console.log("LifestyleData", LifestyleData(), new Lifestyle());

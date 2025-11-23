@@ -25,9 +25,9 @@ export class ClipParser extends Parser<'ammo'> {
         system.accuracy = Number(ammobonus.weaponbonusacc) || 0;
 
         if (ammobonus.weaponbonusdamage != null) {
-            system.damage = Number(ammobonus.weaponbonusdamage_english.match(/(\d+)/)?.pop()) || 0;
-            system.damageType = ammobonus.weaponbonusdamage_english.match(/S/)?.pop() === 'S' ? 'stun' : 'physical';
-            system.element = (ammobonus.weaponbonusdamage_english || '').match(/\(e\)/)?.pop() === '(e)' ? 'electricity' : '';
+            system.damage = Number(/(\d+)/.exec(ammobonus.weaponbonusdamage_english)?.pop()) || 0;
+            system.damageType = /S/.exec(ammobonus.weaponbonusdamage_english)?.pop() === 'S' ? 'stun' : 'physical';
+            system.element = /\(e\)/.exec(ammobonus.weaponbonusdamage_english || '')?.pop() === '(e)' ? 'electricity' : '';
         }
     }
 

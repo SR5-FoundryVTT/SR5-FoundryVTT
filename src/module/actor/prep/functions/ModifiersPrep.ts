@@ -5,7 +5,7 @@ export class ModifiersPrep {
         const { attributes } = system;
         for (const [name, attribute] of Object.entries(attributes)) {
             // Check for valid attributes. Active Effects can cause unexpected properties to appear.
-            if (!SR5.attributes.hasOwnProperty(name) || !attribute) return;
+            if (!Object.hasOwn(SR5.attributes, name) || !attribute) return;
 
             attribute.mod = [];
         }
@@ -20,7 +20,7 @@ export class ModifiersPrep {
     static clearLimitMods(system: Actor.SystemOfType<'character' | 'critter' | 'spirit' | 'sprite' | 'vehicle'>) {
         const {limits} = system;
         for (const [name, limit] of Object.entries(limits)) {
-            if (!SR5.limits.hasOwnProperty(name) || !limit) return;
+            if (!Object.hasOwn(SR5.limits, name) || !limit) return;
 
             limit.mod = [];
         }

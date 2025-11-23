@@ -26,6 +26,8 @@ export class Device extends ItemBase<ReturnType<typeof DeviceData>> {
     static override defineSchema() {
         return DeviceData();
     }
+
+    static override LOCALIZATION_PREFIXES = ["SR5.Device", "SR5.Item"];
 }
 
 console.log("DeviceData", DeviceData(), new Device());

@@ -50,6 +50,8 @@ import { PackActionFlow } from '../item/flows/PackActionFlow';
 import { MatrixRules } from '@/module/rules/MatrixRules';
 import { StorageFlow } from '@/module/flows/StorageFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
+import { LinksHelpers } from '@/module/utils/links';
+import ItemTypes = Actor.ItemTypes;
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -417,9 +419,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *
      * NOTE: This doesn't only include characters but spirits, critters and more.
      */
-    async useEdge(this: SR5Actor, by: number = -1) {
+    async useEdge(this: SR5Actor, by = -1) {
         const edge = this.getEdge();
-        if (edge && edge.value === 0) return;
+        if (edge?.value === 0) return;
         // NOTE: There used to be a bug which could lower edge usage below zero. Let's quietly ignore and reset. :)
         const usesLeft = edge.uses > 0 ? edge.uses : by * -1;
 
@@ -804,7 +806,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     isEmerged(this: SR5Actor): boolean {
         if (this.isType('sprite')) return true;
-        if (this.isType('character') && this.system.special === 'resonance') return true;
+        if (this.isType('character', 'critter') && this.system.special === 'resonance') return true;
 
         return false;
     }
@@ -858,17 +860,17 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const skills = rollData?.skills ?? this.getSkills();
 
         // Find skill by direct id to key matching.
-        if (skills.active.hasOwnProperty(id)) {
+        if (Object.hasOwn(skills.active, id)) {
             return skills.active[id];
         }
-        if (skills.language.value.hasOwnProperty(id)) {
+        if (Object.hasOwn(skills.language.value, id)) {
             return skills.language.value[id];
         }
         // Knowledge skills are de-normalized into categories (street, hobby, ...)
         for (const categoryKey in skills.knowledge) {
-            if (skills.knowledge.hasOwnProperty(categoryKey)) {
+            if (Object.hasOwn(skills.knowledge, categoryKey)) {
                 const category = skills.knowledge[categoryKey];
-                if (category.value.hasOwnProperty(id)) {
+                if (Object.hasOwn(category.value, id)) {
                     return category.value[id];
                 }
             }
@@ -898,7 +900,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         // Iterate over all different knowledge skill categories
         for (const categoryKey in skills.knowledge) {
-            if (!skills.knowledge.hasOwnProperty(categoryKey)) continue;
+            if (!Object.hasOwn(skills.knowledge, categoryKey)) continue;
             // TODO: check this function Typescript can't follow the flow here...
             const categorySkills = skills.knowledge[categoryKey].value as SkillFieldType[];
             for (const [id, skill] of Object.entries(categorySkills)) {
@@ -945,7 +947,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         category: KnowledgeSkillCategory,
         skill: Partial<SkillFieldType> = { name: SKILL_DEFAULT_NAME }
     ): Promise<string|undefined> {
-        if (!this.system.skills.knowledge.hasOwnProperty(category)) {
+        if (!Object.hasOwn(this.system.skills.knowledge, category)) {
             console.error(`Shadowrun5e | Tried creating knowledge skill with unknown category ${category}`);
             return;
         }
@@ -1038,7 +1040,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     async removeActiveSkill(skillId: string) {
         const activeSkills = this.getActiveSkills();
-        if (!activeSkills.hasOwnProperty(skillId)) return;
+        if (!Object.hasOwn(activeSkills, skillId)) return;
         const skill = this.getSkill(skillId);
         if (!skill) return;
 
@@ -1288,7 +1290,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options.byLabel true to search the skill by label as displayed on the sheet.
      * @param options.specialization true to configure the skill test to use a specialization.
      */
-    async startTeamworkTest(skillId: string, options: SkillRollOptions = {}) {
+    async startTeamworkTest(skillId: string, options?: ChatMessage.Database.CreateOperation<undefined>) {
         console.info(`Shadowrun5e | Starting teamwork test for ${skillId}`);
 
         // Prepare message content.
@@ -1304,11 +1306,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const content = await renderTemplate('systems/shadowrun5e/dist/templates/rolls/teamwork-test-message.hbs', templateData);
         // Prepare the actual message.
         const messageData =  {
-            user: game.user?.id,
+            user: game.user.id,
             speaker: {
-                actor: this.id,
-                alias: game.user?.name,
-                token: this.token
+                actor: this.id!,
+                alias: game.user.name,
+                token: this.token?.id ?? null
             },
             content,
             // Manually build flag data to give renderChatMessage hook flag access.
@@ -1319,9 +1321,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
                 'core.canPopout': true
             },
             sound: CONFIG.sounds.dice,
-        };
+        } as const;
 
-        //@ts-expect-error // TODO: foundry-vtt-types v10
         const message = await ChatMessage.create(messageData, options);
 
         if (!message) return;
@@ -1356,10 +1357,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Is the given attribute id a matrix attribute
-     * @param attribute
      */
     _isMatrixAttribute(attribute: string): boolean {
-        return SR5.matrixAttributes.hasOwnProperty(attribute);
+        return Object.hasOwn(SR5.matrixAttributes, attribute);
     }
 
     /**
@@ -1502,7 +1502,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         condition = this.__addDamageToTrackValue(damage, condition);
 
         await device.update({ system: { technology: { condition_monitor: condition } } });
-        return;
+        
     }
 
     /**
@@ -2071,7 +2071,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * - this will check for items and for actors in the case of Vehicles/Drones
      * @param uuid - uuid of the instance to check
      */
-    async isOwnerOf(uuid: string): Promise<boolean> {
+    isOwnerOf(uuid: string): boolean {
         return ActorOwnershipFlow.isOwnerOf(this, uuid);
     }
 
@@ -2298,5 +2298,30 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     override async _preDelete(...args: Parameters<Actor["_preDelete"]>) {
         await StorageFlow.deleteStorageReferences(this);
         return super._preDelete(...args);
+    }
+
+    getSource() {
+        return this.system.description.source ?? '';
+    }
+
+    get hasSource(): boolean {
+        return !!this.getSource()
+    }
+
+    async openSource() {
+        const source = this.getSource();
+        await LinksHelpers.openSource(source);
+    }
+
+    favorites() {
+        return new Set(this.system.favorites);
+    }
+
+    hiddenItems() {
+        return new Set(this.system.hidden_items);
+    }
+
+    hasItemOfType(...types: Item.ConfiguredSubType[]): boolean {
+        return this.items.filter(i => i.isType(...types)).length > 0;
     }
 }

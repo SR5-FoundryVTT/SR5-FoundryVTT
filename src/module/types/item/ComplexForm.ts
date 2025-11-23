@@ -13,9 +13,9 @@ const ComplexFormData = () => ({
     target: new StringField({
         blank: true,
         required: true,
-        choices: SR5.matrixTargets, // what to do with 'host' (from chummer)?
+        choices: SR5.matrixTargets,
     }),
-    duration: new StringField({ required: true }),
+    duration: new StringField({ required: true, blank: true, choices: SR5.complexForm.durations }),
     fade: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
 });
 
@@ -23,6 +23,8 @@ export class ComplexForm extends ItemBase<ReturnType<typeof ComplexFormData>> {
     static override defineSchema() {
         return ComplexFormData();
     }
+
+    static override LOCALIZATION_PREFIXES = ["SR5.ComplexForm", "SR5.Item"];
 }
 
 console.log("ComplexFormData", ComplexFormData(), new ComplexForm());

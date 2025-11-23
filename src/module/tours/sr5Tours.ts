@@ -3,7 +3,7 @@ const { DOCUMENT_OWNERSHIP_LEVELS } = foundry.CONST;
 
 export default class Sr5Tour extends foundry.nue.Tour {
     //the tab for the tour
-    tab?: String
+    tab?: string
 
     //this field is only for internal handling
     actor?: SR5Actor;
@@ -22,8 +22,7 @@ export default class Sr5Tour extends foundry.nue.Tour {
             });
         }
 
-        // @ts-expect-error
-        await this.actor.sheet?._render(true, {editable: false});
+        await this.actor.sheet?.render(true, {editable: false});
 
         // @ts-expect-error
         if(this.config.tab) {

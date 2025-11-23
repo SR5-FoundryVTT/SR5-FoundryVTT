@@ -1,0 +1,12 @@
+{{#if item.system.technology.condition_monitor.max}}
+    <div class="condition-monitor-container matrix-condition-monitor-property">
+        {{> 'systems/shadowrun5e/dist/templates/v2/common/horizontal-cells.hbs'
+            tooltip=(localize "SR5.Labels.ActorSheet.Matrix")
+            uuid=item.uuid
+            itemId=item.id
+            value=item.system.technology.condition_monitor.value
+            max=item.system.technology.condition_monitor.max
+            id='matrix'
+            disabled=item.system.technology.condition_monitor.disabled }}
+    </div>
+{{/if}}

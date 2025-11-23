@@ -110,7 +110,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         // Check for test limits used.
         const limits = effect.system.selection_limits.map(test => test.id);
-        const limit = this.test.data.action.limit.attribute!;
+        const limit = this.test.data.action.limit.attribute;
         if (limits.length > 0 && !limits.includes(limit)) return true;
 
         return false;
@@ -227,7 +227,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * @returns 
      */
     static async _handleCreateTargetedEffectsSocketMessage(message: Shadowrun.SocketMessageData) {
-        if (!message.data.hasOwnProperty('actorUuid') && !message.data.hasOwnProperty('effectsData')) {
+        if (!Object.hasOwn(message.data, 'actorUuid') && !Object.hasOwn(message.data, 'effectsData')) {
             console.error(`Shadowrun 5e | ${this.name} Socket Message is missing necessary properties`, message);
             return;
         }
