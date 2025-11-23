@@ -12,10 +12,8 @@ export default defineConfig(({ mode }) => {
         base: './',
 
         plugins: [
-            checker({
-                typescript: true,
-            }),
             tsconfigPaths(),
+            checker({ typescript: true }),
             viteStaticCopy({
                 targets: [
                     { src: 'LICENSE', dest: '.' },
