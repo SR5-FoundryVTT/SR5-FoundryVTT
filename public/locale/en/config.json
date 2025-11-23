@@ -2626,6 +2626,7 @@
         "ToggleWireless": "Toggle Wireless",
         "Tooltips": {
             "Actor": {
+                "AddOneService": "Add One Service",
                 "Blitz": "Use a point of Edge to roll the Maximum (5) number of dice for initiative",
                 "ConnectNetwork": "Enter this host/grid",
                 "Critter": "Allow the use of critter powers",
@@ -2643,9 +2644,12 @@
                 "NoCombatant": "Initiative Roll (Must be in an Encounter)",
                 "NPC": "Mark actor as NPC to get additional features",
                 "PlaceMark": "Action to be used to place marks on already marked targets",
+                "RemoveOneService": "Remove One Service",
                 "ResetActorForNewRun": "Reset damage, edge, etc. for a new run",
                 "RollInitiative": "Roll Initiative",
                 "PickControlledTokenAsDriver": "Pick the currently Controlled Token Actor as the Driver",
+                "PickControlledTokenAsSummoner": "Pick the currently Controlled Token Actor as the Summoner",
+                "PickControlledTokenAsTechnomancer": "Pick the currently Controlled Token Actor as the Compiler (Technomancer)",
                 "RebootPersonaAndClearAllMarks": "Reboot your Persona and clear all Marks you have placed",
                 "SetupPAN": "Add all Equipped Wireless Devices to this character's Persona"
             },
