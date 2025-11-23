@@ -61,6 +61,7 @@
             height: 100%;
             padding: .5rem;
             vertical-align: center;
+            color: $light; // always use light color for our custom name
         }
         &:not(.minimized) {
             .window-header {
@@ -131,7 +132,6 @@
             align-items: center;
             justify-content: start;
             margin-top: .25rem;
-            box-shadow: 0 -.25rem .5rem $black;
             border-top: 1px solid $yellow;
             flex-shrink: 0;
             vertical-align: bottom;
@@ -159,6 +159,7 @@
             border-top: none;
             border-bottom: 1px solid $darkred;
             a {
+                color: $light; // use light regardless of theme
                 line-height: 1.5rem;
                 border-top-left-radius: .25rem;
                 border-top-right-radius: .25rem;
@@ -191,6 +192,14 @@
         padding: 0;
     }
 
+    // default all selects and inputs to light color until we have proper theme handling
+    input, select {
+        color: $light;
+
+        > option {
+            color: $yellow;
+        }
+    }
     input.nuyen {
         width: 5rem;
     }

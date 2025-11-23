@@ -71,10 +71,8 @@
 
     .active-skills-header {
         cursor: pointer;
-        color: $light !important;
         label {
             cursor: pointer;
-            color: $light !important;
         }
         &:hover {
             background: radial-gradient(rgba($darkred, 0.7), rgba($darkred, 0.1));
