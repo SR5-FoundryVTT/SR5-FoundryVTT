@@ -133,27 +133,27 @@
         {
             "lang": "en",
             "name": "English",
-            "path": "public/locale/en/config.json"
+            "path": "dist/locale/en/config.json"
         },
         {
             "lang": "de",
             "name": "Deutsch",
-            "path": "public/locale/de/config.json"
+            "path": "dist/locale/de/config.json"
         },
         {
             "lang": "pt-BR",
             "name": "Português (Brasil)",
-            "path": "public/locale/pt-BR/config.json"
+            "path": "dist/locale/pt-BR/config.json"
         },
         {
             "lang": "fr",
             "name": "Français",
-            "path": "public/locale/fr/config.json"
+            "path": "dist/locale/fr/config.json"
         },
         {
             "lang": "ko",
             "name": "Korean",
-            "path": "public/locale/ko/config.json"
+            "path": "dist/locale/ko/config.json"
         }
     ],
     "packs": [
