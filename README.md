@@ -33,7 +33,7 @@ There is also the [README-dev.md](https://github.com/SR5-FoundryVTT/SR5-FoundryV
 
 - **Font Awesome**  
   Icons provided by [Font Awesome](https://fontawesome.com).
-  The system uses a Font Awesome Pro license provided by one of our system authors ([T.J.](https://github.com/tjlanza)).
+  The system uses a Font Awesome Pro license provided by one of our system authors ([Timothy J. Lanza](https://github.com/tjlanza)).
 
 - **Bella Carvalho**  
   Additional icons created by [Bella Carvalho](https://www.behance.net/bellcarvalho).  
