@@ -4,7 +4,7 @@ import { Helpers } from '../../../helpers';
 import { SR5 } from "../../../config";
 
 export class LimitsPrep {
-    static prepareLimits(system: Actor.SystemOfType<'character' | 'critter' | 'spirit' | 'sprite' | 'vehicle'>) {
+    static prepareLimits(system: Actor.SystemOfType<'character' | 'spirit' | 'sprite' | 'vehicle'>) {
         const { limits, modifiers, special } = system;
 
         // Apply the actor local modifiers defined on the sheet.
@@ -22,7 +22,7 @@ export class LimitsPrep {
         }
     }
 
-    static prepareLimitBaseFromAttributes(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
+    static prepareLimitBaseFromAttributes(system: Actor.SystemOfType<'character' | 'spirit'>) {
         const { limits, attributes } = system;
 
         // Default limits are derived directly from attributes.
@@ -34,7 +34,7 @@ export class LimitsPrep {
     /**
      * Some limits are derived from others or must be caluclated last.
      */
-    static prepareDerivedLimits(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
+    static prepareDerivedLimits(system: Actor.SystemOfType<'character' | 'spirit'>) {
         const {limits, modifiers, special, attributes} = system;
 
         if (special === 'magic') {

@@ -72,7 +72,7 @@ export class CharacterPrep {
      * 
      * @param system Physical humanoid system data.
      */
-    static prepareRecoil(system: Actor.SystemOfType<'character' | 'critter' | 'spirit' | 'vehicle'>) {
+    static prepareRecoil(system: Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>) {
         Helpers.calcTotal(system.values.recoil, { min: 0 });
     }
 
@@ -81,7 +81,7 @@ export class CharacterPrep {
      * 
      * @param system Character system data
      */
-    static prepareRecoilCompensation(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
+    static prepareRecoilCompensation(system: Actor.SystemOfType<'character' | 'spirit'>) {
         const recoilCompensation = RangedWeaponRules.humanoidRecoilCompensationValue(system.attributes.strength.value);
         const baseRc = RangedWeaponRules.humanoidBaseRecoilCompensation();
         system.values.recoil_compensation.base = baseRc;
@@ -93,7 +93,7 @@ export class CharacterPrep {
     static addSpecialAttributes(system: Actor.SystemOfType<'character'>) {
         const { attributes } = system;
 
-        // This is necessary to support critter actor types.
+        // This is necessary to support critter actor types. Should we keep it?
         attributes.initiation = DataDefaults.createData('attribute_field', { base: system.magic.initiation, label: "SR5.Initiation", hidden: true });;
         attributes.submersion = DataDefaults.createData('attribute_field', { base: system.technomancer.submersion, label: "SR5.Submersion", hidden: true });;
     }

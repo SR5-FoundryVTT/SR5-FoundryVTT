@@ -15,7 +15,6 @@ It's complicated, it's a work in progress, but it is _kinda_ stable. We try to b
 - Spirit
 - Sprite
 - Vehicle
-- Critter
 - IC
 
 ## Learn more

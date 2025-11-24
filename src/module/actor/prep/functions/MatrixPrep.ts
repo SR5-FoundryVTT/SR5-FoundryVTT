@@ -12,7 +12,7 @@ export class MatrixPrep {
      * - if an item is equipped, it will use that data
      * - if it isn't and player is technomancer, it will use that data
      */
-    static prepareMatrix(system: Actor.SystemOfType<'character' | 'critter'>, items: SR5Item[]) {
+    static prepareMatrix(system: Actor.SystemOfType<'character'>, items: SR5Item[]) {
         const { matrix, attributes, modifiers } = system;
 
         const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'];
@@ -93,7 +93,7 @@ export class MatrixPrep {
      * Add Matrix Attributes to Limits and Attributes
      * @param system
      */
-    static prepareMatrixToLimitsAndAttributes(system: Actor.SystemOfType<'character' | 'critter' | 'ic' | 'sprite' | 'vehicle'>) {
+    static prepareMatrixToLimitsAndAttributes(system: Actor.SystemOfType<'character' | 'ic' | 'sprite' | 'vehicle'>) {
         const { matrix, attributes, limits } = system;
 
         // add matrix attributes to both limits and attributes as hidden entries

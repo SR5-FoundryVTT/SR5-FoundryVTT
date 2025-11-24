@@ -8,7 +8,6 @@ import { shadowrunRulesModifiers } from './sr5.Modifiers.spec';
 import { shadowrunSR5Item } from './sr5.SR5Item.spec';
 import { shadowrunMatrix } from './sr5.Matrix.spec';
 import { shadowrunSR5CharacterDataPrep } from './sr5.CharacterDataPrep.spec';
-import { shadowrunSR5CritterDataPrep } from './sr5.CritterDataPrep.spec';
 import { shadowrunSR5SpiritDataPrep } from './sr5.SpiritDataPrep.spec';
 import { shadowrunSR5SpriteDataPrep } from './sr5.SpriteDataPrep.spec';
 import { shadowrunSR5ICDataPrep } from './sr5.ICDataPrep.spec';
@@ -67,9 +66,6 @@ export const quenchRegister = (quench: Quench) => {
     });
     quench.registerBatch('shadowrun5e.data_prep.character', shadowrunSR5CharacterDataPrep, {
         displayName: 'SHADOWRUN5e: SR5CharacterDataPreparation Test',
-    });
-    quench.registerBatch('shadowrun5e.data_prep.critter', shadowrunSR5CritterDataPrep, {
-        displayName: 'SHADOWRUN5e: SR5CritterDataPreparation Test',
     });
     quench.registerBatch('shadowrun5e.data_prep.sprite', shadowrunSR5SpriteDataPrep, {
         displayName: 'SHADOWRUN5e: SR5CSpriteDataPreparation Test',
