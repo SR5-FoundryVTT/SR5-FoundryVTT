@@ -13,7 +13,11 @@ export default defineConfig(({ mode }) => {
 
         plugins: [
             tsconfigPaths(),
-            checker({ typescript: true }),
+            checker({
+                terminal: true,
+                typescript: true,
+                enableBuild: true, 
+            }),
             viteStaticCopy({
                 targets: [
                     { src: 'LICENSE', dest: '.' },
