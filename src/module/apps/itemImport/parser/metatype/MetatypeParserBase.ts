@@ -1,7 +1,7 @@
 import { Parser } from '../Parser';
 import { ImportHelper as IH, OneOrMany, RetrievedItem } from '../../helper/ImportHelper';
 
-export abstract class MetatypeParserBase<TResult extends ('character' | 'critter' | 'spirit' | 'sprite')> extends Parser<TResult> {
+export abstract class MetatypeParserBase<TResult extends ('character' | 'spirit' | 'sprite')> extends Parser<TResult> {
     getMetatypeItems(
         items: RetrievedItem[],
         itemsData: undefined | OneOrMany<{$?: { select?: string; rating?: string; removable?: string; }; _TEXT: string }>,

@@ -9,7 +9,7 @@ export class ItemPrep {
      * - will only allow one "Base" armor item to be used (automatically takes the best one if multiple are equipped)
      * - all "accessories" will be added to the armor
      */
-    static prepareArmor(system: Actor.SystemOfType<'character' | 'critter' | 'spirit' | 'vehicle'>, items: SR5Item[]) {
+    static prepareArmor(system: Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>, items: SR5Item[]) {
         const { armor } = system;
         armor.base = 0;
         armor.value = 0;
@@ -50,7 +50,7 @@ export class ItemPrep {
      * 
      * Modify essence by items essence loss
      */
-    static prepareWareEssenceLoss(system: Actor.SystemOfType<'character' | 'critter'>, items: SR5Item[]) {
+    static prepareWareEssenceLoss(system: Actor.SystemOfType<'character'>, items: SR5Item[]) {
         const parts = new PartsList<number>(system.attributes.essence.mod);
         
         for (const item of items) {
