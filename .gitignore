@@ -1,13 +1,17 @@
-*.swp
+# IDE and Editor files
 .idea
-node_modules
-foundryconfig.json
 .vscode
 .vscode/launch.json
-shadowrun5e.lock
-*.code-workspace
-dist
 .vs
-.tsbuildinfo
+*.swp
+*.code-workspace
 
-packs/*
+# Build and Dependency folders
+.tsbuildinfo
+node_modules
+dist
+packs
+
+# FoundryVTT specific files
+foundryconfig.json
+shadowrun5e.lock
