@@ -128,7 +128,7 @@
     },
     "scripts": [],
     "esmodules": ["dist/bundle.mjs"],
-    "styles": ["dist/assets/bundle.css"],
+    "styles": ["dist/bundle.css"],
     "languages": [
         {
             "lang": "en",

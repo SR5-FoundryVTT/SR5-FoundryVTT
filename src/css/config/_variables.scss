@@ -60,10 +60,10 @@ $large-distance: 0.5em;
 $border-under: 1px groove $groove-color;
 
 $sheetbackground: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)),
-    url('./brushed_metal.jpg') repeat;
+    url('assets/brushed_metal.jpg') repeat;
 
 $popupbackground: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)),
-    url('./brushed_metal.jpg') repeat;
+    url('assets/brushed_metal.jpg') repeat;
 
 $grid__cols: 12;
 $sheet-max-width: 690px;

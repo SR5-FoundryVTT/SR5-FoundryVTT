@@ -4,7 +4,7 @@
 
 .sr5v2 {
     box-shadow: 0 0 10px 5px rgba(variables.$yellow, 0.4);
-    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url("./page.webp") repeat;
+    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
     background-repeat: repeat;
     background-size: 100% 20px auto;
 
@@ -81,7 +81,7 @@
     .window-content {
         padding: 0 .25rem .25rem .25rem;
         // transparent doesn't seem to show the background from above so set it to the same thing with a slightly different gradient
-        background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url("./page.webp") repeat;
+        background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
         background-repeat: repeat;
         background-size: 100% 20px auto;
 

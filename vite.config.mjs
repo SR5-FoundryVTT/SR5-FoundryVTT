@@ -60,14 +60,6 @@ export default defineConfig(({ mode }) => {
                 fileName: 'bundle',
                 formats: ['es'],
             },
-            rollupOptions: {
-                output: {
-                    assetFileNames: (assetInfo) => {
-                        if (assetInfo.name === 'style.css') return 'bundle.css';
-                        return 'assets/[name][extname]';
-                    },
-                },
-            },
             watch: { buildDelay: 100 }
         },
         css: { preprocessorOptions: { scss: { api: 'modern-compiler' } } },
