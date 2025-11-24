@@ -32,7 +32,7 @@ const PACK_DEST = 'packs';
  * Folder where source JSON files should be located relative to the 5e system folder.
  * @type {string}
  */
-const PACK_SRC = 'packs/_source';
+const PACK_SRC = 'src/packs';
 
 // -------------------------------------------------------------------------
 //  EXECUTION
