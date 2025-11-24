@@ -11,6 +11,12 @@ export default defineConfig(({ mode }) => {
         publicDir: 'public',
         base: './',
 
+        define: {
+            'import.meta.env.DEV': mode === 'development',
+            'import.meta.env.PROD': mode === 'production',
+            'process.env.NODE_ENV': JSON.stringify(mode),
+        },
+
         plugins: [
             tsconfigPaths(),
             checker({
