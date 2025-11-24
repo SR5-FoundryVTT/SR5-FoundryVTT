@@ -5,7 +5,6 @@ import checker from 'vite-plugin-checker';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 
-// Change to function syntax to access 'mode'
 export default defineConfig(({ mode }) => {
     return {
         publicDir: 'public',
