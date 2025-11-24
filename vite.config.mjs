@@ -60,7 +60,7 @@ export default defineConfig(({ mode }) => {
                 fileName: 'bundle',
                 formats: ['es'],
             },
-            watch: { buildDelay: 100 }
+            watch: mode === 'development' ? { buildDelay: 100 } : null
         },
         css: { preprocessorOptions: { scss: { api: 'modern-compiler' } } },
         resolve: { alias: { '@': path.resolve(__dirname, './src') } },

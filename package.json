@@ -33,7 +33,7 @@
         "yargs": "^18.0.0"
     },
     "scripts": {
-        "build": "tsc --noEmit && vite build",
+        "build": "vite build",
         "watch": "vite build --watch --mode development",
         "prebuild": "tsc",
         "test": "tsc --project tsconfig.json --noEmit",

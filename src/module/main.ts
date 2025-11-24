@@ -7,5 +7,5 @@ import '../css/bundle.scss';
 /* -------------------------------------------- */
 
 
-HooksManager.registerHooks();
 HandlebarManager.registerHelpers();
+HooksManager.registerHooks();
