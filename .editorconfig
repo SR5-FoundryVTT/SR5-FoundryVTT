@@ -7,6 +7,4 @@ end_of_line = lf
 indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
-
-# VS Code–specific: not an official EditorConfig property
 spelling_language = en
