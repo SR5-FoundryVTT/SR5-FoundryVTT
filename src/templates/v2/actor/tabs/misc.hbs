@@ -1,0 +1,204 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+
+    <div {{#if @root.isEditMode}} class="split-container" {{else}} class="fill-container" {{/if}}>
+        {{#if @root.isEditMode}}
+            <div>
+                <section class="scrollable standard-form">
+                    {{#if hasSkills}}
+                        <div class="form-group">
+                            <button type="button" class="display show-hidden-skills">
+                                {{localize "SR5.RestoreDefaultSkills"}}
+                            </button>
+                        </div>
+                    {{/if}}
+                    {{#if canAlterSpecial }}
+                        <div class="list-item">
+                            <div class="list-item-start">
+                                <label data-tooltip="{{systemFields.special.hint}}">
+                                    {{systemFields.special.label}}
+                                </label>
+                            </div>
+                            <div class="list-item-col">
+                                {{formInput systemFields.special value=source.system.special classes="short"
+                                            rootId=rootId localize=true }}
+                            </div>
+                        </div>
+                    {{/if}}
+                    {{#if awakened}}
+                        <div class="list-item">
+                            <div class="list-item-start">
+                                <label data-tooltip="{{systemFields.magic.fields.attribute.hint}}">
+                                    {{systemFields.magic.fields.attribute.label}}
+                                </label>
+                            </div>
+                            <div class="list-item-col">
+                                {{formInput systemFields.magic.fields.attribute value=source.system.magic.attribute
+                                                classes="short" rootId=rootId disabled=@root.isPlayMode localize=true }}
+                            </div>
+                        </div>
+                    {{/if}}
+                    {{#if emerged}}
+                        <div class="list-item">
+                            <div class="list-item-start">
+                                <label data-tooltip="{{systemFields.technomancer.fields.attribute.hint}}">
+                                    {{systemFields.technomancer.fields.attribute.label}}
+                                </label>
+                            </div>
+                            <div class="list-item-col">
+                                {{formInput systemFields.technomancer.fields.attribute
+                                            value=source.system.technomancer.attribute
+                                            rootId=rootId disabled=@root.isPlayMode localize=true }}
+                            </div>
+                        </div>
+                    {{/if}}
+                    <!--Defense Selector -->
+                    {{#if hasFullDefense }}
+                        <div class="list-item">
+                            <div class="list-item-start">
+                                <label data-tooltip="{{systemFields.full_defense_attribute.hint}}">
+                                    {{systemFields.full_defense_attribute.label}}
+                                </label>
+                            </div>
+                            <div class="list-item-col">
+                                {{formInput systemFields.full_defense_attribute value=source.system.full_defense_attribute
+                                            classes="short" rootId=rootId disabled=@root.isPlayMode localize=true }}
+                            </div>
+                        </div>
+                    {{/if}}
+                    {{#if isCharacter }}
+                        <div class="list-item">
+                            <div class="list-item-start">
+                                <label data-tooltip="{{systemFields.matrix_full_defense_attribute.hint}}">
+                                    {{systemFields.matrix_full_defense_attribute.label}}
+                                </label>
+                            </div>
+                            <div class="list-item-col">
+                                {{formInput systemFields.matrix_full_defense_attribute value=source.system.matrix_full_defense_attribute
+                                            classes="short" rootId=rootId disabled=@root.isPlayMode localize=true }}
+                            </div>
+                        </div>
+                    {{/if}}
+                    {{#if isCharacter}}
+                        <div class="list-item">
+                            <div class="list-item-start">
+                                <label data-tooltip="{{systemFields.is_critter.hint}}">
+                                    {{systemFields.is_critter.label}}
+                                </label>
+                            </div>
+                            <div class="list-item-col">
+                                {{formInput systemFields.is_critter value=source.system.is_critter
+                                            classes="short" rootId=rootId disabled=@root.isPlayMode }}
+                            </div>
+                        </div>
+                        <div class="list-item">
+                            <div class="list-item-start">
+                                <label data-tooltip="{{systemFields.is_npc.hint}}">
+                                    {{systemFields.is_npc.label}}
+                                </label>
+                            </div>
+                            <div class="list-item-col">
+                                {{formInput systemFields.is_npc value=source.system.is_npc
+                                            classes="short" rootId=rootId disabled=@root.isPlayMode }}
+                            </div>
+                        </div>
+                    {{/if}}
+                    {{#if system.is_npc }}
+                        <div class="list-item">
+                            <div class="list-item-start">
+                                <label data-tooltip="{{systemFields.is_grunt.hint}}">
+                                    {{systemFields.is_grunt.label}}
+                                </label>
+                            </div>
+                            <div class="list-item-col">
+                                {{formInput systemFields.is_grunt value=source.system.is_grunt
+                                            classes="short" rootId=rootId disabled=@root.isPlayMode }}
+                            </div>
+                        </div>
+                    {{/if}}
+                    <div class="list-item">
+                        <div class="list-item-start">
+                            <label data-tooltip="{{systemFields.category_visibility.fields.default.hint}}">
+                                {{systemFields.category_visibility.fields.default.label}}
+                            </label>
+                        </div>
+                        <div class="list-item-col">
+                            {{formInput systemFields.category_visibility.fields.default value=source.system.category_visibility.default
+                                        rootId=rootId disabled=@root.isPlayMode }}
+                        </div>
+                    </div>
+                </section>
+            </div>
+        {{/if}}
+        <div {{#if @root.isPlayMode}}class="fill-container"{{/if}}>
+            <!-- Situational Modifiers Section -->
+            {{#if situationModifiers}}
+            <div>
+                <div class="list-item list-item-header header-for-scrollable">
+                    <div class="list-item-start">
+                        <label>
+                            {{localize "SR5.SituationalModifiersApplication.Title"}}
+                        </label>
+                    </div>
+                    <div class="list-item-col">
+                        <label>{{localize "SR5.Value"}}</label>
+                    </div>
+                </div>
+                {{#each situationModifiers}}
+                {{#if (not this.hidden)}}
+                    <div class="list-item header-for-scrollable">
+                        <div class="list-item-start">
+                            <label>{{localize this.label}}</label>
+                        </div>
+                        <div class="list-item-col">
+                            <label>{{this.value}}</label>
+                        </div>
+                    </div>
+                {{/if}}
+                {{/each}}
+            </div>
+            {{/if}}
+
+            <!-- Modifier Section -->
+            <div class="list-item list-item-header header-for-scrollable">
+                <div class="list-item-start">
+                    <label>
+                        {{localize "SR5.Modifier"}}
+                    </label>
+                </div>
+                <div class="list-item-col">
+                    <label>{{localize "SR5.Value"}}</label>
+                </div>
+            </div>
+            <section class="scrollable standard-form">
+                {{#if @root.isPlayMode}}
+                    {{#each system.modifiers as |value id|}} {{#ifne id 'wound'}} {{#if value}}
+                        <div class="list-item">
+                            <div class="list-item-start">
+                                <label data-tooltip="{{objValue (objValue @root.systemFields.modifiers.fields id) 'hint'}}">
+                                    {{objValue (objValue @root.systemFields.modifiers.fields id) 'label'}}
+                                </label>
+                            </div>
+                            <div class="list-item-col">
+                                <label>{{value}}</labeL>
+                            </div>
+                        </div>
+                    {{/if}} {{/ifne}} {{/each}}
+                {{else}}
+                    {{#each source.system.modifiers as |value id|}} {{#ifne id 'wound'}}
+                        <div class="list-item">
+                            <div class="list-item-start">
+                                <label data-tooltip="{{objValue (objValue @root.systemFields.modifiers.fields id) 'hint'}}">
+                                    {{objValue (objValue @root.systemFields.modifiers.fields id) 'label'}}
+                                </label>
+                            </div>
+                            <div class="list-item-col">
+                                {{formInput (objValue @root.systemFields.modifiers.fields id) value=value
+                                            classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode }}
+                            </div>
+                        </div>
+                    {{/ifne}} {{/each}}
+                {{/if}}
+            </section>
+        </div>
+    </div>
+</section>

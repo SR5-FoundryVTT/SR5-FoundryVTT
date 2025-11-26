@@ -24,6 +24,7 @@ export class Bioware extends ItemBase<ReturnType<typeof BiowareData>> {
     static override defineSchema() {
         return BiowareData();
     }
+    static override LOCALIZATION_PREFIXES = ["SR5.Item", "SR5.Armor"];
 }
 
 console.log("BiowareData", BiowareData(), new Bioware());

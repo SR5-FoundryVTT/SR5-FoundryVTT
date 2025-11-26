@@ -1,0 +1,5 @@
+<label>{{localizeOb item.system.target @root.config.matrixTargets}}</label>
+{{#if item.system.duration}}
+    <label>{{item.system.duration}}</label>
+{{/if}}
+<label>{{localize "SR5.Fade"}}&nbsp;{{localize "SR5.Level"}}{{#if item.system.fade}}{{numberFormat item.system.fade sign=true}}{{/if}}</label>

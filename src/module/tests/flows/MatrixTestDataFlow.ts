@@ -1,15 +1,16 @@
-import { SR5Actor } from '../../actor/SR5Actor';
-import { SR5Item } from '../../item/SR5Item';
-import { SR5 } from '../../config';
-import { Helpers } from '../../helpers';
-import { PartsList } from '../../parts/PartsList';
-import { MatrixRules } from '../../rules/MatrixRules';
-import { SuccessTest, TestOptions } from '../SuccessTest';
-import { MatrixTest, MatrixTestData, OpposedMatrixTestData } from '../MatrixTest';
-import { MatrixDefenseTest } from '../MatrixDefenseTest';
-import { MatrixResistTest, MatrixResistTestData } from '../MatrixResistTest';
-import { BiofeedbackResistTest } from '../BiofeedbackResistTest';
+import { SR5Actor } from "../../actor/SR5Actor";
+import { SR5 } from "../../config";
+import { Helpers } from "../../helpers";
+import { SR5Item } from "../../item/SR5Item";
+import { PartsList } from "../../parts/PartsList";
+import { SuccessTest, TestOptions } from "../SuccessTest";
+import { MatrixTest, MatrixTestData, OpposedMatrixTestData } from "../MatrixTest";
+import { MatrixRules } from "../../rules/MatrixRules";
+import { MatrixDefenseTest } from "../MatrixDefenseTest";
+import { MatrixResistTest, MatrixResistTestData } from "../MatrixResistTest";
+import { BiofeedbackResistTest } from "../BiofeedbackResistTest";
 import { OpposedMatrixTest } from '@/module/tests/OpposedMatrixTest';
+import Document = foundry.abstract.Document;
 
 /**
  * Apply Matrix Rules to Success Test Data relating to matrix.
@@ -419,7 +420,7 @@ export const MatrixTestDataFlow = {
         // Assure main icon selection is set as the target icon.
         if (test.data.targetMainIcon) test.data.iconUuid = this._getMainIconUuid(test);
         // Document might have changed in between initial preparation and dialog selections.
-        test.icon = fromUuidSync(test.data.iconUuid!) as SR5Item | SR5Actor;
+        test.icon = fromUuidSync(test.data.iconUuid) as SR5Item | SR5Actor;
     },
 
     /**
@@ -458,11 +459,11 @@ export const MatrixTestDataFlow = {
      * @param options
      */
     async executeMessageAction(testCls: any, againstData: MatrixTestData, messageId: string, options: TestOptions): Promise<void> {
-        let document: any | null;
+        let document: Document.Any | null = null;
         if (againstData.iconUuid) {
             document = await fromUuid(againstData.iconUuid)
         }
-        // if (!(document instanceof SR5Item)) return;
+
         if (!document) {
             const actor = Helpers.getSelectedActorsOrCharacter()[0];
             document = actor;

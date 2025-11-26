@@ -33,7 +33,7 @@ export namespace CompendiumBrowserTypes {
         types: FilterEntry[];
     }
 
-    export interface Configuration extends foundry.applications.api.ApplicationV2.Configuration {}
+    export type Configuration = foundry.applications.api.ApplicationV2.Configuration
 
     export interface RenderOptions extends foundry.applications.api.ApplicationV2.RenderOptions {
         tab: Tabs;
@@ -190,7 +190,7 @@ export class CompendiumBrowser extends BaseClass {
     private activeTab: CompendiumBrowserTypes.Tabs = "Item";
     private allFilters: CompendiumBrowserTypes.FilterEntry[] = [];
     private packBlackList: string[] = [];
-    private _searchQuery: string = "";
+    private _searchQuery = "";
 
     /** State for virtual scrolling */
     private readonly scrollState = {
@@ -378,8 +378,7 @@ export class CompendiumBrowser extends BaseClass {
         const uuid = el?.dataset.uuid;
         if (!uuid) return;
 
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-        void fromUuid(uuid).then(doc => { void (doc as Actor | Item | null)?.sheet?.render(true); });
+        void fromUuid<Actor|Item>(uuid).then(doc => { void doc?.sheet?.render(true); });
     }
 
     /** Handles a click on the source element within a result row to open the sourcebook reference. */

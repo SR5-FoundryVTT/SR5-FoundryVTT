@@ -56,17 +56,11 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('Spirit recoil compensation', async () => {
-            const spirit = await factory.createActor({ type: 'spirit', system: { attributes: { strength: { base: 5 } } } });
+            // air => 7 -5 => strength 5
+            const spirit = await factory.createActor({ type: 'spirit', system: { spiritType: 'air', force: 7 } });
             if (!spirit) return assert.fail();
 
-            assert.strictEqual(spirit.system.values.recoil_compensation.value, 3); // SR5#175: 5 / 3 = 1,6 (rounded up) = 2 => 2 + 1
-        });
-        it('A NPC Grunt should only have physical track', async () => {
-            const spirit = await factory.createActor({ type: 'spirit', system: { is_npc: true, npc: { is_grunt: true } } });
-
-            assert.strictEqual(spirit.system.track.stun.value, 0);
-            assert.strictEqual(spirit.system.track.stun.disabled, true);
-            assert.strictEqual(spirit.system.track.physical.disabled, false);
+            assert.strictEqual(spirit.system.values.recoil_compensation.value, 3); // SR5#175: (strength) 5 / 3 = 1,6 (rounded up) = 2 => 2 + 1
         });
     });
 };

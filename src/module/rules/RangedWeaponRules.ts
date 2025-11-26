@@ -113,7 +113,7 @@ export const RangedWeaponRules = {
      * Free recoil compensation according to SR5#175 'Recoil'
      * @param baseRc Optional parameter allowing you to define a custom base rc.
      */
-    humanoidBaseRecoilCompensation(baseRc: number = 1): number {
+    humanoidBaseRecoilCompensation(baseRc = 1): number {
         return baseRc;
     },
 
@@ -123,7 +123,7 @@ export const RangedWeaponRules = {
      * @param agi The owning actors agility value
      * @returns The number of bullets when reloading during a complex action or -1 if it can only be fully reloaded directly
      */
-    partialReload(clip: AmmunitionType['clip_type'], agi: number = 1): number {
+    partialReload(clip: AmmunitionType['clip_type'], agi = 1): number {
         switch (clip) {
             case 'internal_magazin':
             case 'cylinder':

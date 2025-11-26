@@ -4,6 +4,7 @@ import { SYSTEM_NAME } from "../constants";
 import { SR5Actor } from "../actor/SR5Actor";
 import { Translation } from '../utils/strings';
 import { SkillFieldType } from '../types/template/Skills';
+import { LinksHelpers } from '@/module/utils/links';
 
 export const registerBasicHelpers = () => {
     /**
@@ -23,27 +24,15 @@ export const registerBasicHelpers = () => {
         return game.i18n.localize(i18nTypeLabel as Translation);
     });
 
-    Handlebars.registerHelper('localizeSkill', function (skill: SkillFieldType): string {
+    Handlebars.registerHelper('localizeSkill', function (skill: SkillFieldType | string, options): string {
+        if (typeof skill === 'string') {
+            const actor = options.data.root.actor as SR5Actor;
+            if (!actor) return skill;
+            const newSkill = actor.getSkill(skill) as SkillFieldType;
+            if (!newSkill) return skill;
+            skill = newSkill;
+        }
         return skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
-        // NOTE: Below is code to append a shortened attribute name to the skill name. It's been removed for readability.
-        //       But still might useful for someone.
-        // if (!game.settings.get(SYSTEM_NAME, FLAGS.ShowSkillsWithDetails) || !translatedSkill || !skill.attribute)
-        //     return translatedSkill;
-        //
-        // // Try showing the first three letters, or less.
-        // const translatedAttribute = game.i18n.localize(SR5.attributes[skill.attribute]);
-        // if (!translatedAttribute) return translatedSkill;
-        //
-        // const cutToIndex = translatedAttribute.length < SR.attributes.SHORT_NAME_LENGTH ?
-        //     translatedAttribute.length -1 :
-        //     SR.attributes.SHORT_NAME_LENGTH;
-        // const translatedAttributeShorthand = translatedAttribute.substring(0, cutToIndex).toUpperCase();
-        // return `${translatedSkill} (${translatedAttributeShorthand})`;
-    });
-
-    Handlebars.registerHelper('toHeaderCase', function (str) {
-        if (str) return Helpers.label(str);
-        return '';
     });
 
     Handlebars.registerHelper('concatStrings', function (...args) {
@@ -66,7 +55,7 @@ export const registerBasicHelpers = () => {
         return v1 / v2;
     });
     Handlebars.registerHelper('hasprop', function (this: any, obj, prop, options) {
-        if (obj.hasOwnProperty(prop)) {
+        if (Object.hasOwn(obj, prop)) {
             return options.fn(this);
         } else return options.inverse(this);
     });
@@ -219,5 +208,49 @@ export const registerBasicHelpers = () => {
             return Object.values(collection).includes(value);
 
         return false;
+    });
+
+    Handlebars.registerHelper('isURL', function(value: string) {
+        return LinksHelpers.isURL(value);
+    })
+
+    Handlebars.registerHelper('isPDF', function(value: string) {
+        return LinksHelpers.isPDF(value);
+    })
+
+    Handlebars.registerHelper('isUuid', function(value: string) {
+        return LinksHelpers.isUuid(value);
+    })
+
+    /**
+     * Expects a config object and turns it into an array of objects for FormGroup options
+     */
+    Handlebars.registerHelper('config2Array', function(config: Record<string, string>) {
+        return Object.keys(config).map(category => ({
+            label: config[category] ?? category,
+            value: category
+        }));
+    })
+
+    /**
+     * Expects a config object and turns it into an array of objects for FormGroup options
+     */
+    Handlebars.registerHelper('tests2Array', function(config: Record<string, any>) {
+        return Object.keys(config).map(test => ({
+            label: test,
+            value: test
+        }));
+    })
+
+    /**
+     * Display the Nuyen value in a format using locale separators
+     */
+    Handlebars.registerHelper('nuyenValue', function(nuyen: number) {
+        return Number(nuyen).toLocaleString(game.i18n.lang);
+    })
+
+    Handlebars.registerHelper('hasKey', function(obj: Record<string, unknown>, key: string) {
+        if (!obj || typeof obj !== 'object') return false;
+        return Object.hasOwn(obj, key);
     });
 };

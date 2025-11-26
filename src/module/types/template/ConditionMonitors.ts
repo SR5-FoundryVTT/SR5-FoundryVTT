@@ -35,7 +35,6 @@ export const Tracks = <
         matrix: new ModifiableField(Track())
     };
 
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     return {
         ...( types.includes('matrix') ? matrixTrack : {} ),
         ...( types.includes('physical') ? physicalTrack : {} ),

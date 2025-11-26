@@ -63,8 +63,7 @@ export const TestCreator = {
      *
      * @returns Tries to create a SuccessTest from given action item or undefined if it failed.
      */
-    fromItem: async function(item: SR5Item, document?: SR5Actor|SR5Item, options?: TestOptions): Promise<SuccessTest | undefined> {
-        //@ts-expect-error Default to item parent actor, if none given.
+    fromItem: async function(item: SR5Item, document?: SR5Actor|SR5Item|null, options?: TestOptions): Promise<SuccessTest | undefined> {
         if (!document) document = item.parent;
         if (!(document instanceof SR5Actor)) {
             console.error("Shadowrun 5e | A SuccessTest can only be created with an explicit Actor or Item with an actor parent.")
@@ -79,7 +78,7 @@ export const TestCreator = {
             console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
         }
 
-        if (!game.shadowrun5e.tests.hasOwnProperty(action.test)) {
+        if (!Object.hasOwn(game.shadowrun5e.tests, action.test)) {
             console.error(`Shadowrun 5e | Test registration for test ${action.test} is missing`);
             return;
         }
@@ -106,7 +105,7 @@ export const TestCreator = {
             console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
         }
 
-        if (!game.shadowrun5e.tests.hasOwnProperty(action.test)) {
+        if (!Object.hasOwn(game.shadowrun5e.tests, action.test)) {
             console.error(`Shadowrun 5e | Test registration for test ${action.test} is missing`);
             return;
         }
@@ -330,7 +329,7 @@ export const TestCreator = {
      */
     _getTestClass: function(testName: string): any | undefined {
         if (!testName) return;
-        if (!game.shadowrun5e.tests.hasOwnProperty(testName)) {
+        if (!Object.hasOwn(game.shadowrun5e.tests, testName)) {
             console.error(`Shadowrun 5e | Tried getting a Test Class ${testName}, which isn't registered in: `, game.shadowrun5e.tests);
             return;
         }
@@ -491,7 +490,7 @@ export const TestCreator = {
         // Add the armor value as a pool modifier, since 'armor' is part of the test description.
         if (action.armor) {
             const armor = actor.getArmor();
-            PartsList.addUniqueBasePart(data.pool, 'SR5.Armor', armor.value);
+            PartsList.addUniqueBasePart(data.pool, 'SR5.Armor.label', armor.value);
         }
 
         // Prepare limit values...
@@ -531,7 +530,7 @@ export const TestCreator = {
         }
 
         // Prepare test modifiers and possible applicable selections
-        const modifiers: {[key in Shadowrun.ModifierTypes]?: string[]} = {};
+        const modifiers: Partial<Record<Shadowrun.ModifierTypes, string[]>> = {};
         for (const modifier of data.action.modifiers) {
             // A modifier with an applicable selection is found.
             if (modifier.includes('.')) {
@@ -705,7 +704,7 @@ export const TestCreator = {
      * 
      * @param event A PointerEvent by user interaction
      */
-    shouldHideDialog(event: Shadowrun.RollEvent|undefined): boolean {
+    shouldHideDialog(event?: Event): boolean {
         if (!event) return false;
         const bindings = game.keybindings.get("shadowrun5e", "hide-test-dialog");
         return bindings.some(binding => event[binding.key] === true);
@@ -716,7 +715,7 @@ export const TestCreator = {
      * 
      * @param event A PointerEvent by user interaction
      */
-    shouldShowDialog(event: Shadowrun.RollEvent|undefined): boolean {
+    shouldShowDialog(event?: Event): boolean {
         return !TestCreator.shouldHideDialog(event);
     },
 
@@ -725,7 +724,7 @@ export const TestCreator = {
      * 
      * @param event A PointerEvent by user interaction
      */
-    shouldPostItemDescription(event: Shadowrun.RollEvent|undefined): boolean {
+    shouldPostItemDescription(event?: Event): boolean {
         if (!event) return false;
         const bindings = game.keybindings.get("shadowrun5e", "show-item-card");
         return bindings.some(binding => event[binding.key] === true);

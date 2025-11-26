@@ -1,0 +1,142 @@
+import { DeepPartial } from 'fvtt-types/utils';
+import { SR5Actor } from '@/module/actor/SR5Actor';
+import { SheetFlow } from '@/module/flows/SheetFlow';
+import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
+import ApplicationV2 = foundry.applications.api.ApplicationV2;
+import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
+
+interface KarmaManagerContext extends HandlebarsApplicationMixin.RenderContext {
+    karma: number;
+    careerKarma: number;
+    karmaModifier: number;
+    modifiedKarma: number;
+    modifiedCareerKarma: number;
+};
+
+export class KarmaManager extends HandlebarsApplicationMixin(ApplicationV2)<KarmaManagerContext> {
+    karmaModifier = 0;
+
+    constructor(private readonly actor: SR5Actor, options = {}) {
+        super(options);
+    }
+
+    getKarma() {
+        return this.actor.asType('character')?.system._source.karma.value ?? 0;
+    }
+
+    getCareerKarma() {
+        return this.actor.asType('character')?.system._source.karma.max ?? 0;
+    }
+
+    getModifiedKarma() {
+        return this.getKarma() + this.karmaModifier;
+    }
+
+    getModifiedCareerKarma() {
+        if (this.karmaModifier > 0) {
+            return this.getCareerKarma() + this.karmaModifier;
+        }
+        return this.getCareerKarma();
+    }
+
+    override get title() {
+        return game.i18n.localize("SR5.KarmaManager.Title");
+    }
+
+    override async _prepareContext(options: Parameters<ApplicationV2['_prepareContext']>[0]) {
+        const context = await super._prepareContext(options);
+        context.karma = this.getKarma();
+        context.careerKarma = this.getCareerKarma();
+        context.karmaModifier = this.karmaModifier ?? 0;
+        context.modifiedKarma = this.getModifiedKarma();
+        context.modifiedCareerKarma = this.getModifiedCareerKarma();
+        return context;
+    }
+
+    static async #increaseKarma(this: KarmaManager, event: PointerEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!(event.target instanceof HTMLElement)) return;
+        const amount = Number(event.target.closest<HTMLElement>('[data-amount]')!.dataset.amount);
+        this.karmaModifier += amount;
+        if (this.getModifiedKarma() < 0) {
+            this.karmaModifier = -this.getModifiedKarma();
+        }
+        await this.render();
+    }
+
+    static async #reduceKarma(this: KarmaManager, event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!(event.target instanceof HTMLElement)) return;
+        const amount = Number(event.target.closest<HTMLElement>('[data-amount]')?.dataset.amount);
+        this.karmaModifier -= amount;
+        if (this.getModifiedKarma() < 0) {
+            this.karmaModifier = -this.getModifiedKarma();
+        }
+        await this.render();
+    }
+
+    static async #submitChanges(this: KarmaManager, event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!(event.target instanceof HTMLElement)) return;
+        if (this.getModifiedKarma() < 0) {
+            this.karmaModifier = -this.getModifiedKarma();
+        }
+        const finalKarma = this.getModifiedKarma();
+        const finalCareerKarma = this.getModifiedCareerKarma();
+        await this.actor.update({system: { karma: { value: finalKarma, max: finalCareerKarma } }});
+        await this.close();
+    }
+
+    static #cancel(this: KarmaManager, event: Event) {
+        void this.close();
+    }
+
+    override async _onRender(
+        context: DeepPartial<KarmaManagerContext>,
+        options: DeepPartial<ApplicationV2.RenderOptions>
+    ) {
+        this.element.querySelector<HTMLInputElement>('[name="incoming-karma"]')
+            ?.addEventListener('change', (event: any) => {
+                this.karmaModifier = Number(event.target?.value ?? 0);
+                if (this.getModifiedKarma() < 0) {
+                    this.karmaModifier = -this.getModifiedKarma();
+                }
+                void this.render();
+        })
+        return super._onRender(context, options);
+    }
+
+    static override PARTS = {
+        details: {
+            template: SheetFlow.templateBase('actor/apps/karma-manager/details')
+        },
+        footer: {
+            template: SheetFlow.templateBase('actor/apps/karma-manager/footer')
+        }
+    }
+
+    static override DEFAULT_OPTIONS = {
+        classes: [SR5_APPV2_CSS_CLASS, 'karma-manager'],
+        form: {
+            submitOnChange: false,
+            closeOnSubmit: false,
+        },
+        position: {
+            width: 400,
+        },
+        window: {
+            resizable: true,
+        },
+        actions: {
+            increaseKarma: KarmaManager.#increaseKarma,
+            reduceKarma: KarmaManager.#reduceKarma,
+
+            submitChanges: KarmaManager.#submitChanges,
+            cancel: KarmaManager.#cancel,
+        }
+    }
+
+}

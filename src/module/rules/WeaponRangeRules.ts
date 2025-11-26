@@ -115,7 +115,6 @@ export class WeaponRangeTestBehavior {
         // Provide test context to allow effects to limit application.
         modifiers.environmental.apply({test});
         test.data.range = modifiers.environmental.applied.active.range || test.data.targetRanges[0].range.modifier;
-        return;
     }
 
     static prepareDocumentData(test:WeaponRangeTest, rangesAccessor: (weapon: SR5Item<'weapon'>) => RangeType){
@@ -196,7 +195,7 @@ export class WeaponRangeTestBehavior {
     }
 
     private static async markActionPhaseAsAttackUsed(test: WeaponRangeTest) {
-        if (!test.actor! || !test.actor.combatActive) return;
+        if (!test.actor?.combatActive) return;
 
         const combatant = test.actor.combatant;
         if (!combatant) return;

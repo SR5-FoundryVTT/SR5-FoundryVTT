@@ -50,7 +50,7 @@ export class ActionParser extends Parser<'action'> {
         }
 
         // 1. Set basic action properties
-        action.type = jsonData.type._TEXT.toLowerCase();
+        action.type = jsonData.type._TEXT.toLowerCase() as ActionRollType['type'];
         action.extended = jsonData.type._TEXT === "Extended";
         description.value = jsonData.test?.bonusstring?._TEXT ?? "";
 
@@ -79,7 +79,7 @@ export class ActionParser extends Parser<'action'> {
     }
 
     private handleSpecial(action: ActionRollType, bonusstring: string) {
-        const marks = Number(bonusstring.match(/Requires\s+(\d+)\s+marks?/i)?.[1]);
+        const marks = Number(/Requires\s+(\d+)\s+marks?/i.exec(bonusstring)?.[1]);
         if (marks)
             action.category.matrix.marks = marks;
 

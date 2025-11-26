@@ -20,10 +20,10 @@ export class DefenseModifier extends SituationModifier {
      * 
      */
     override _calcActiveTotal(options:SituationalModifierApplyOptions): number {
-        if (!this.modifiers || !this.modifiers.documentIsActor) return 0;
+        if (!this.modifiers?.documentIsActor) return 0;
         
         const actor = this.modifiers.document as SR5Actor;
-        if (!options.test || options.test.type !== 'PhysicalDefenseTest') return Number(actor.system.modifiers.defense);
+        if (options.test?.type !== 'PhysicalDefenseTest') return Number(actor.system.modifiers.defense);
 
         const test = options.test as PhysicalDefenseTest;
 

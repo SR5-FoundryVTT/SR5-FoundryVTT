@@ -12,7 +12,7 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
 
         switch (jsonData.category?._TEXT) {
             case "Insect Spirits":
-                system.spiritType = jsonData.name._TEXT.split(/[ /]/)[0].toLowerCase() as typeof system.spiritType;
+                system.spiritType = jsonData.name._TEXT.split(/[ /]/)[0].toLowerCase() as any;
                 break;
 
             case "Toxic Spirits": {
@@ -22,7 +22,7 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
                     ['Plague Spirit', 'toxic_man'], ['Sludge Spirit', 'toxic_water']
                 ]);
 
-                system.spiritType = (specialMapping.get(jsonData.name._TEXT) ?? "") as typeof system.spiritType;
+                system.spiritType = (specialMapping.get(jsonData.name._TEXT) ?? "") as any;
                 break;
             }
 
@@ -39,14 +39,14 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
                 system.attributes.magic.base = Number(jsonData.magmin?._TEXT) || 0;
                 system.attributes.resonance.base = Number(jsonData.resmin?._TEXT) || 0;
 
-                system.spiritType = (["Watcher", "Corps Cadavre"].includes(jsonData.name._TEXT)
-                    ? jsonData.name._TEXT.replace(" ", "_").toLowerCase() : "homunculus") as typeof system.spiritType;
+                system.spiritType = ["Watcher", "Corps Cadavre"].includes(jsonData.name._TEXT)
+                    ? (jsonData.name._TEXT.replace(" ", "_").toLowerCase() as any) : "homunculus";
                 break;
             default:
                 system.spiritType = jsonData.name._TEXT
                     .replace(" Spirit", "").replace("Spirit of ", "")
-                    .replace(" (Demon)", "").replace(/[\s-]/g, "_")
-                    .split("/")[0].toLowerCase() as typeof system.spiritType;
+                    .replace(" (Demon)", "").replace(/[\s\-]/g, "_")
+                    .split("/")[0].toLowerCase() as any;
         }
 
         if (jsonData.walk)
@@ -87,7 +87,7 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
         const category = jsonData.category ? jsonData.category._TEXT : "Other";
         const rootFolder = game.i18n.localize("TYPES.Actor.spirit");
         const folderName = IH.getTranslatedCategory('metatypes', category);
-        const specFolder = category === 'Insect Spirits' ? jsonData.name._TEXT.match(/\(([^)]+)\)/)?.[1] : undefined;
+        const specFolder = category === 'Insect Spirits' ? /\(([^)]+)\)/.exec(jsonData.name._TEXT)?.[1] : undefined;
 
         return IH.getFolder(compendiumKey, rootFolder, folderName, specFolder);
     }

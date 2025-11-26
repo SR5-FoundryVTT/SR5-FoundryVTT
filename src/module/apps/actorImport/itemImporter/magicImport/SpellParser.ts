@@ -81,7 +81,7 @@ export class SpellParser extends Parser<'spell'> {
         }
 
         if(damage.includes("0")) {
-            system.action.damage.type.base = damage.match(/[SG]/) !== null  ? 'stun' : 'physical' ;
+            system.action.damage.type.base = /[SG]/.exec(damage) !== null  ? 'stun' : 'physical' ;
             system.action.damage.type.value = system.action.damage.type.base;
         }
     }

@@ -5,15 +5,13 @@ export default class ThermographicVisionDetectionMode extends foundry.canvas.per
         return (this._detectionFilter ??= ThermographicVisionFilter.create());
     }
   
-    override _canDetect(visionSource, target) {
-        const tgt = target?.document;
-        const targetHasHeat =
-            tgt instanceof TokenDocument && tgt.actor !== null
-            && tgt.actor?.system.visibilityChecks.meat.hasHeat;
+    override _canDetect(
+        ...[visionSource, target]: Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>
+    ) {
+        const tgt = target?.document instanceof TokenDocument ? target.document : null;
+        const targetHasHeat = !!tgt?.actor?.system.visibilityChecks.meat.hasHeat;
 
-        const targetIsVisible =
-            tgt instanceof TokenDocument
-            && !tgt.actor?.statuses.has(CONFIG.specialStatusEffects.INVISIBLE);
+        const targetIsVisible = !tgt?.actor?.statuses.has(CONFIG.specialStatusEffects.INVISIBLE);
 
         const isAstralPerceiving = visionSource?.visionMode?.id === "astralPerception";
 

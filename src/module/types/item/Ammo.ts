@@ -21,6 +21,7 @@ export const AmmoData = () => ({
         choices: SR5.damageTypes,
     }),
     replaceDamage: new BooleanField(),
+    replaceAP: new BooleanField(),
     blast: new SchemaField(BlastData()),
     accuracy: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
 });
@@ -29,6 +30,7 @@ export class Ammo extends ItemBase<ReturnType<typeof AmmoData>> {
     static override defineSchema() {
         return AmmoData();
     }
+    static override LOCALIZATION_PREFIXES = ["SR5.Item", "SR5.Ammo"];
 }
 
 console.log("AmmoData", AmmoData(), new Ammo());

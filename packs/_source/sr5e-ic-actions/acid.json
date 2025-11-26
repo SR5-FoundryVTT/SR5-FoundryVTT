@@ -1,6 +1,5 @@
 {
   "_id": "jcc9or6rjlSw7xhn",
-  "_key": "!items!jcc9or6rjlSw7xhn",
   "folder": null,
   "name": "Acid",
   "type": "action",
@@ -27,7 +26,6 @@
         "base": 0,
         "mod": [],
         "override": null,
-        "temp": 0,
         "attribute": "attack",
         "base_formula_operator": "add"
       },
@@ -57,7 +55,6 @@
         "base": 0,
         "mod": [],
         "override": null,
-        "temp": 0,
         "attribute": "",
         "base_formula_operator": "add",
         "type": {
@@ -73,7 +70,6 @@
           "base": 0,
           "mod": [],
           "override": null,
-          "temp": 0,
           "attribute": "",
           "base_formula_operator": "add"
         },
@@ -118,5 +114,6 @@
     }
   },
   "effects": [],
-  "flags": {}
+  "flags": {},
+  "_key": "!items!jcc9or6rjlSw7xhn"
 }

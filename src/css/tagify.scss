@@ -1,8 +1,12 @@
-.sr5 {
-    /**
-     * Rules applied to elements of the tagify input components
-     */
+@use "config/variables";
+
+.sr5v2 {
+
+    // change tagify input selection to match our theme better
     .tagify-selection {
-        border-color: $dark;
+        border-radius: 4px;
+        background: variables.$dark;
+        border: 1px solid variables.$light;
+        width: 100%;
     }
 }

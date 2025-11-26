@@ -1,0 +1,21 @@
+{{#if item.system.damageType}}
+    <label data-tooltip="SR5.DamageType">{{localizeOb item.system.damageType @root.config.damageTypes}}</label>
+{{/if}}
+{{#if item.system.damage}}
+    <label>{{localize "SR5.DamageValue"}}&nbsp;{{numberFormat item.system.damage sign=true}}</label>
+{{/if}}
+{{#if item.system.element}}
+    <label data-tooltip="SR5.Element">
+        <i class="{{elementIcon item.system.element}}"></i>
+        {{localizeOb item.system.element @root.elementTypes}}
+    </label>
+{{/if}}
+{{#if item.system.ap}}
+    <label>{{localize "SR5.AP"}}&nbsp;{{numberFormat item.system.ap sign=true}}</label>
+{{/if}}
+{{#if item.system.blast.radius}}
+    <label>{{localize "SR5.BlastRadius"}}&nbsp;{{item.system.blast.radius}}m</label>
+{{/if}}
+{{#if item.system.blast.dropoff}}
+    <label>{{localize "SR5.Dropoff"}}&nbsp;{{item.system.blast.dropoff}}/m</label>
+{{/if}}

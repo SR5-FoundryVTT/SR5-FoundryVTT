@@ -1,0 +1,29 @@
+<footer class="sheet-footer">
+    <div class="list-item">
+        <label data-tooltip="SR5.Attribute">
+            {{#if @root.isEditMode}}
+                {{formInput skillFields.attribute name=(concat skill_name '.attribute') value=skill.attribute
+                            choices=@root.attributes localize=true classes="short thicc"
+                            rootId=@root.rootId disabled=(and @root.isPlayMode editable_attribute)}}
+            {{else}}
+                {{localizeOb skill.attribute @root.config.attributes}}
+            {{/if}}
+        </label>
+        {{#if @root.isEditMode}}
+            <label>{{localize "SR5.CanDefault"}}&nbsp;
+                {{formInput skillFields.canDefault name=(concat skill_name '.canDefault') value=skill.canDefault
+                            rootId=@root.rootId disabled=editable_canDefault}}
+            </label>
+        {{else if skill.canDefault}}
+            <label>{{localize "SR5.CanDefault"}}</label>
+        {{/if}}
+        {{#if @root.isPlayMode}}
+            <span>
+                {{#each skill.specs}}
+                    &nbsp;<a data-action="rollSpecialization">{{this}}</a>&nbsp;
+                {{/each}}
+            </span>
+        {{/if}}
+        <div></div>
+    </div>
+</footer>

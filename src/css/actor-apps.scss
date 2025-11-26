@@ -1,0 +1,48 @@
+@use "config/variables";
+
+.sr5v2 {
+    &.karma-manager, &.nuyen-manager, &.reputation-manager, &.inventory-rename {
+        .sheet-footer {
+            border-color: transparent;
+        }
+        .window-header {
+            // hide buttons in the header since we are a simple interface
+            button {
+                visibility: hidden;
+            }
+        }
+        label.label {
+            font-size: 1.25rem;
+            &.positive {
+                color: variables.$matrix-green;
+                text-shadow: 0 0 2px 1px variables.$matrix-green;
+            }
+            &.negative {
+                color: variables.$physical;
+                text-shadow: 0 0 2px 1px variables.$physical;
+            }
+        }
+        .mod-input {
+            font-size: 1.25rem;
+        }
+        .input-row {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+        }
+        .input-col {
+            flex: none;
+            display: flex;
+            flex-flow: column nowrap;
+            align-items: center;
+            gap: .5rem;
+        }
+        .mod-button-container {
+            display: flex;
+            flex-flow: row nowrap;
+            gap: .5rem;
+        }
+    }
+}

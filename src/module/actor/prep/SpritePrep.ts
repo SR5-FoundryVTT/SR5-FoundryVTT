@@ -6,6 +6,8 @@ import { MatrixPrep } from './functions/MatrixPrep';
 import { SR5Item } from 'src/module/item/SR5Item';
 import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
 import { PartsList } from '@/module/parts/PartsList';
+import { MatrixRules } from '@/module/rules/MatrixRules';
+import { SR5 } from '@/module/config';
 
 /**
  * Prepare a Sprite Type of Actor
@@ -29,7 +31,7 @@ export class SpritePrep {
 
         MatrixPrep.prepareMatrixToLimitsAndAttributes(system);
 
-        SpritePrep.prepareSpriteConditionMonitor(system);
+        SpritePrep.prepareMatrixTrack(system);
         SpritePrep.prepareSpriteInitiative(system);
 
         InitiativePrep.prepareCurrentInitiative(system);
@@ -80,10 +82,18 @@ export class SpritePrep {
         }
     }
 
-    static prepareSpriteConditionMonitor(system: Actor.SystemOfType<'sprite'>) {
-        const {matrix, level, modifiers} = system;
+    static prepareMatrixTrack(system: Actor.SystemOfType<'sprite'>) {
+        const { modifiers, track, matrix, level } = system;
 
-        matrix.condition_monitor.max = 8 + Math.ceil(level / 2) + Number(modifiers.matrix_track);
+        // Prepare internal matrix condition monitor values
+        // LEGACY: matrix.condition_monitor is no TrackType. It will only be used as a info, should ever be needed anywhere
+        matrix.condition_monitor.max = modifiers['matrix_track'] + MatrixRules.getConditionMonitor(level);
+
+        // Prepare user visible matrix track values
+        track.matrix.base = MatrixRules.getConditionMonitor(level);
+        PartsList.addUniquePart(track.matrix, "SR5.Bonus", modifiers['matrix_track']);
+        track.matrix.max = matrix.condition_monitor.max;
+        track.matrix.label = SR5.damageTypes.matrix;
     }
 
     static prepareSpriteInitiative(system: Actor.SystemOfType<'sprite'>) {

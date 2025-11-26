@@ -26,13 +26,7 @@ export class ModifiableFieldPrep {
 
     static resetAllModifiers(system: Actor['system'] | Item['system']) {
         const resolveField = (key: string) => system.schema.fields[key] as foundry.data.fields.DataField.Any;
-        const resetFunc = (mod: ModifiableValueType) => {
-            mod.changes = [];
-
-            if (mod.temp) {
-                PartsList.addPart(mod, "SR5.Temporary", mod.temp);
-            }
-        };
+        const resetFunc = (mod: ModifiableValueType) => { mod.changes = []; };
 
         return this.traverseFields(system, resolveField, resetFunc);
     }

@@ -1,0 +1,31 @@
+<div class="list-item list-item-header {{cssClass}} {{#if @root.isPlayMode}} collapsible-header{{/if}}"
+    {{#unless @root.isEditMode}}
+     data-action="toggleExpanded"
+     data-item-type="{{type}}"
+    {{/unless}}>
+    <div class="list-item-start{{#unless isOpen}} label-collapsed{{/unless}}">
+        <label>
+            {{localize label}}
+        </label>
+    </div>
+
+    <div class="list-item-col thicc-col">
+        <label>{{localize "SR5.MountPoint"}}</label>
+    </div>
+    <div class="list-item-col skinny-col">
+        <label>{{localize "SR5.DP"}}</label>
+    </div>
+    <div class="list-item-col skinny-col">
+        <label data-tooltip="{{localize "SR5.Accuracy"}}"><i class="fas fa-crosshairs-simple"></i></label>
+    </div>
+    <div class="list-item-col skinny-col">
+        <label>{{localize "SR5.RecoilCompensation"}}</label>
+    </div>
+    <div class="list-item-col skinny-col">
+        <label data-tooltip="{{localize "SR5.Conceal"}}"><i class="fas fa-magnifying-glass"></i></label>
+    </div>
+
+    <div class="list-item-icons">
+        {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type }}
+    </div>
+</div>

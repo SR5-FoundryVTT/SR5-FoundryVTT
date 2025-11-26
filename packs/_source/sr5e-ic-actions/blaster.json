@@ -1,6 +1,5 @@
 {
   "_id": "2QszeZgotxb4QJPa",
-  "_key": "!items!2QszeZgotxb4QJPa",
   "folder": null,
   "name": "Blaster",
   "type": "action",
@@ -27,7 +26,6 @@
         "base": 0,
         "mod": [],
         "override": null,
-        "temp": 0,
         "attribute": "attack",
         "base_formula_operator": "add"
       },
@@ -58,7 +56,6 @@
         "base": 0,
         "mod": [],
         "override": null,
-        "temp": 0,
         "attribute": "attack",
         "base_formula_operator": "add",
         "type": {
@@ -74,7 +71,6 @@
           "base": 0,
           "mod": [],
           "override": null,
-          "temp": 0,
           "attribute": "",
           "base_formula_operator": "add"
         },
@@ -119,5 +115,6 @@
     }
   },
   "effects": [],
-  "flags": {}
+  "flags": {},
+  "_key": "!items!2QszeZgotxb4QJPa"
 }

@@ -23,7 +23,7 @@ export class Helpers {
      * @param decimals The number of decimal places (default: 3).
      * @returns The rounded number.
      */
-    static roundTo(value: number, decimals: number = 3): number {
+    static roundTo(value: number, decimals=3): number {
         const multiplier = Math.pow(10, decimals);
         return Math.round(value * multiplier) / multiplier;
     }
@@ -42,6 +42,28 @@ export class Helpers {
 
     static eventUuid(event): string {
         return event.currentTarget?.dataset?.uuid ?? '';
+    }
+
+    // replace 'SR5.'s on keys with 'SR5_DOT_'
+    static onSetFlag(data) {
+        if (!data || typeof data !== 'object') return data;
+        const newData = {};
+        for (const [key, value] of Object.entries(data)) {
+            const newKey = key.replace('SR5.', 'SR5_DOT_');
+            newData[newKey] = this.onSetFlag(value);
+        }
+        return newData;
+    }
+
+    // replace 'SR5_DOT_' with 'SR5.' on keys
+    static onGetFlag(data) {
+        if (!data || typeof data !== 'object') return data;
+        const newData = {};
+        for (const [key, value] of Object.entries(data)) {
+            const newKey = key.replace('SR5_DOT_', 'SR5.');
+            newData[newKey] = this.onGetFlag(value);
+        }
+        return newData;
     }
 
     static isMatrix(atts: boolean | OneOrMany<string | AttributeFieldType | SkillFieldType>): boolean {
@@ -130,6 +152,16 @@ export class Helpers {
         return event && (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey);
     }
 
+    static filter(obj, comp) {
+        const retObj = {};
+        if (typeof obj === 'object' && obj !== null) {
+            Object.entries(obj).forEach(([key, value]) => {
+                if (comp([key, value])) retObj[key] = value;
+            });
+        }
+        return retObj;
+    }
+
     static addLabels(obj, label) {
         if (typeof obj === 'object' && obj !== null) {
             if (!Object.hasOwn(obj, 'label') && Object.hasOwn(obj, 'value') && label !== '') {
@@ -142,7 +174,7 @@ export class Helpers {
     }
 
     /* Handle Shadowrun style shortened attribute names with typical three letter shortening. */
-    static shortenAttributeLocalization(label: string, length: number = 3): string {
+    static shortenAttributeLocalization(label: string, length = 3): string {
         const name = game.i18n.localize(label as Translation);
 
         if (length <= 0) {
@@ -279,7 +311,7 @@ export class Helpers {
     static convertLengthUnit(length: number, fromUnit: string): number {
         fromUnit = fromUnit.toLowerCase();
 
-        if (!LENGTH_UNIT_TO_METERS_MULTIPLIERS.hasOwnProperty(fromUnit)) {
+        if (!Object.hasOwn(LENGTH_UNIT_TO_METERS_MULTIPLIERS, fromUnit)) {
             console.error(`Distance can't be converted from ${fromUnit} to ${LENGTH_UNIT}`);
             return 0;
         }
@@ -308,7 +340,7 @@ export class Helpers {
      * @returns An array token actors.
      */
     static getControlledTokenActors(): SR5Actor[] {
-        if (!canvas || !canvas.ready) return []
+        if (!canvas?.ready) return []
 
         const tokens = Helpers.getControlledTokens();
         return tokens.map(token => token.actor) as SR5Actor[];
@@ -482,7 +514,7 @@ export class Helpers {
     static createDamageData(
         value: number,
         type: DamageType['type']['value'],
-        ap: number = 0,
+        ap = 0,
         element: DamageType['element']['value'] = '',
         biofeedback: BiofeedbackDamageType = '',
         sourceItem?: SR5Item
@@ -652,7 +684,7 @@ export class Helpers {
      * @param asc Set to true for ascending sorting order and to false for descending order.
      * @return Sorted Skills given by the skills parameter
      */
-    static sortSkills(skills: SkillsType, asc: boolean = true): SkillsType {
+    static sortSkills(skills: SkillsType, asc = true): SkillsType {
         // Filter entries instead of values to have a store of ids for easy rebuild.
         const sortedEntries = Object.entries(skills).sort(([aId, a], [bId, b]) => {
             const comparatorA = Helpers.localizeSkill(a) || aId;
@@ -682,7 +714,7 @@ export class Helpers {
      * @param asc Set to true for ascending sorting order and to false for descending order.
      * @return Sorted config values given by the configValues parameter
      */
-    static sortConfigValuesByTranslation(configValues: Record<string, Translation>, asc: boolean = true): Record<string, string> {
+    static sortConfigValuesByTranslation(configValues: Record<string, Translation>, asc = true): Record<string, string> {
         // Filter entries instead of values to have a store of ids for easy rebuild.
         const sortedEntries = Object.entries(configValues).sort(([aId, a], [bId, b]) => {
             const comparatorA = game.i18n.localize(a);
@@ -712,7 +744,7 @@ export class Helpers {
     static getPlayersWithPermission(
         document: SR5Actor | SR5Item,
         permission: keyof typeof CONST.DOCUMENT_OWNERSHIP_LEVELS,
-        active: boolean = true
+        active = true
     ): User[] {
         if (!game.users) return [];
 
@@ -774,7 +806,11 @@ export class Helpers {
      * Values don't matter for this comparison.
      */
     static objectHasKeys(obj: object, keys: string[]): boolean {
-        return keys.every(key => Object.hasOwn(obj, key));
+        for (const key of keys) {
+            if (!obj.hasOwnProperty(key)) return false;
+        }
+
+        return true;
     }
 
     /**
@@ -785,8 +821,8 @@ export class Helpers {
      *
      * @param event A PointerEvent by user interaction.
      */
-    static async renderEntityLinkSheet(event) {
-        const element = $(event.currentTarget);
+    static async renderEntityLinkSheet(event: Event) {
+        const element = $(event.currentTarget as HTMLElement);
         const uuid = element.data('uuid');
         await Helpers.renderDocumentSheet(uuid);
     }
@@ -814,7 +850,7 @@ export class Helpers {
      * @param replace The characters to replaces prohibited characters with
      * @returns key without
      */
-    static sanitizeDataKey(key: string, replace: string=''): string {
+    static sanitizeDataKey(key: string, replace=''): string {
         const spicyCharacters = ['.', '-='];
         for (const character of spicyCharacters)
             key = key.replace(character, replace);

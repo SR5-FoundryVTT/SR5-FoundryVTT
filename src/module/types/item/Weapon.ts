@@ -43,11 +43,6 @@ const FiringModeData = () => ({
 });
 
 export const RangeWeaponData = () => ({
-    category: new StringField({
-        required: true,
-        initial: 'manual',
-        choices: SR5.weaponRangeCategories
-    }),
     ranges: new SchemaField(RangeData()),
     rc: new ModifiableField(ModifiableValue()),
     modes: new SchemaField(FiringModeData()),
@@ -83,6 +78,8 @@ export class Weapon extends ItemBase<ReturnType<typeof WeaponData>> {
     static override defineSchema() {
         return WeaponData();
     }
+
+    static override LOCALIZATION_PREFIXES = ["SR5.Weapon", "SR5.Item"];
 }
 
 console.log("WeaponData", WeaponData(), new Weapon());

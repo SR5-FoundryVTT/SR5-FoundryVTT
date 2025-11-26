@@ -19,7 +19,6 @@ export class MatrixPrep {
         // clear matrix data to defaults
         for (const key of MatrixList) {
             matrix[key].base = 0;
-            PartsList.addUniquePart(matrix[key], "SR5.Temporary", matrix[key].temp);
             PartsList.calcTotal(matrix[key]);
         }
 
@@ -94,7 +93,7 @@ export class MatrixPrep {
         const { matrix, attributes, limits } = system;
 
         // add matrix attributes to both limits and attributes as hidden entries
-        for (const attributeName of Object.keys(SR5.matrixAttributes) as (keyof typeof SR5.matrixAttributes)[]) {
+        for (const attributeName of Object.keys(SR5.matrixAttributes)) {
             const attribute = matrix[attributeName];
 
             AttributesPrep.prepareAttribute(attributeName, attribute);

@@ -1,0 +1,19 @@
+<div class="attribute" data-attribute-id="{{attributeField.name}}">
+    <label {{#if @root.isEditMode}}class="edit-mode"{{/if}}>
+        {{#if label}}
+            {{localize label}}
+        {{else}}
+            {{localize attribute.label}}
+        {{/if}}
+    </label>
+    <div class="attribute-value">
+        {{#if @root.isEditMode}}
+            {{formInput attributeField.fields.base value=attribute.base
+                        classes="short skinny center" rootId=rootId }}
+        {{else}}
+            <button class="icon sr5-icon" type="button"
+                    data-action="rollAttribute"
+                    data-attribute-modifier-tooltip="{{attributeField.name}}">{{attribute.value}}</button>
+        {{/if}}
+    </div>
+</div>

@@ -9,13 +9,13 @@ export default class AugmentedRealityVisionDetectionMode extends foundry.canvas.
         return this._detectionFilter ??= AugmentedRealityVisionFilter.create();
     }
   
-    override _canDetect(visionSource, target) {
-        const tgt = target?.document;
-        const targetHasIcon =
-            tgt instanceof TokenDocument && tgt.actor !== null
-            && tgt.actor.system.visibilityChecks.matrix.hasIcon;
+    override _canDetect(
+        ...[visionSource, target]: Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>
+    ) {
+        const tgt = target?.document instanceof TokenDocument ? target.document : null;
+        const targetHasIcon = !!tgt?.actor?.system.visibilityChecks.matrix.hasIcon;
 
-        const targetIsNotRunningSilent = !tgt.actor?.system.visibilityChecks.matrix.runningSilent
+        const targetIsNotRunningSilent = !tgt?.actor?.system.visibilityChecks.matrix.runningSilent
 
         const isAstralPerceiving = visionSource?.visionMode?.id === "astralPerception";
 

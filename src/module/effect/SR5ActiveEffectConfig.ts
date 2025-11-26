@@ -53,7 +53,11 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
 
     static override DEFAULT_OPTIONS = {
         ...super.DEFAULT_OPTIONS,
-        classes: ["active-effect-config", SR5_APPV2_CSS_CLASS],
+        actions: {
+            // override the onAdd so we can change the default mode to custom
+            addChange: this.#onAddChange,
+        },
+        classes: ["active-effect-config", SR5_APPV2_CSS_CLASS, 'named-sheet'],
         position: { width: 560 },
     }
 
@@ -158,6 +162,23 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         await super._postRender(...args);
         // once we render, process the Tagify Elements to we rendered
         Hooks.call('sr5_processTagifyElements', this.element);
+    }
+
+    /**
+     * Handle adding a new change to the changes array.
+     *
+     * This overrides the Foundry default behavior of using ADD as default.
+     * Shadowrun mostly uses MODIFY, so we use that as default.
+     *
+     * - this here is the SR5ActiveEffectConfig, however not all the types work correctly so I used any
+     */
+    static async #onAddChange(this: any, event: PointerEvent, target: HTMLElement) {
+        if (this.form) {
+            const submitData = this._processFormData(null, this.form, new FormDataExtended(this.form));
+            const changes = Object.values(submitData.changes ?? {});
+            changes.push({ mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM });
+            return this.submit({updateData: {changes}});
+        }
     }
 
     /**

@@ -1,0 +1,55 @@
+{{#if item.system.appliedByTest}}
+    <label>{{localize "SR5.ActiveEffect.FIELDS.appliedByTest.label"}}</label>
+{{/if}}
+{{#if item.system.onlyForEquipped}}
+    <label>{{localize "SR5.ActiveEffect.FIELDS.onlyForEquipped.label"}}</label>
+{{/if}}
+{{#if item.system.onlyForWireless}}
+    <label>{{localize "SR5.ActiveEffect.FIELDS.onlyForWireless.label"}}</label>
+{{/if}}
+{{#if item.system.onlyForItemTest}}
+    <label>{{localize "SR5.ActiveEffect.FIELDS.onlyForItemTest.label"}}</label>
+{{/if}}
+<label>{{localize "SR5.ActiveEffect.FIELDS.applyTo.label"}}&nbsp;{{localizeOb item.system.applyTo @root.config.effectApplyTo}}</label>
+{{#if item.system.selection_attributes.length}}
+    <label>{{localize "SR5.ActiveEffect.FIELDS.selection_attributes.label"}}:
+       {{#each item.system.selection_attributes}}
+           {{this.value}}
+       {{/each}}
+    </label>
+{{/if}}
+{{#if item.system.selection_categories.length}}
+    <label>{{localize "SR5.ActiveEffect.FIELDS.selection_categories.label"}}:
+        {{#each item.system.selection_categories}}
+            {{this.value}}
+        {{/each}}
+    </label>
+{{/if}}
+{{#if item.system.selection_limits.length}}
+    <label>{{localize "SR5.ActiveEffect.FIELDS.selection_limits.label"}}:
+        {{#each item.system.selection_limits}}
+            {{this.value}}
+        {{/each}}
+    </label>
+{{/if}}
+{{#if item.system.selection_skills.length}}
+    <label>{{localize "SR5.ActiveEffect.FIELDS.selection_skills.label"}}:
+        {{#each item.system.selection_skills}}
+            {{this.value}}
+        {{/each}}
+    </label>
+{{/if}}
+{{#if item.system.selection_tests.length}}
+    <label>{{localize "SR5.ActiveEffect.FIELDS.selection_tests.label"}}:
+        {{#each item.system.selection_tests}}
+            {{this.value}}
+        {{/each}}
+    </label>
+{{/if}}
+{{!--
+{{#each item.changes}}
+    <label>
+        <code>{{this.key}}</code>&nbsp;{{this.mode}}&nbsp;<code>{{this.value}}</code>
+    </label>
+{{/each}}
+--}}

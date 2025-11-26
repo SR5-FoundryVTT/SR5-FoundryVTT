@@ -19,7 +19,7 @@ export class ComplexFormParser extends Parser<'complex_form'> {
 
         const duration = jsonData.duration._TEXT;
         if (duration === 'I')
-            system.duration = 'instant';
+            system.duration = 'immediate';
         else if (duration === 'S')
             system.duration = 'sustained';
         else if (duration === 'P')

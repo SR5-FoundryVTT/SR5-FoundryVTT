@@ -1,3 +1,5 @@
+@use "config/variables";
+
 /**
   * Is used on TokenHUDs to display a additional segment per situational modifer.
   */
@@ -46,7 +48,7 @@
             cursor: pointer;
 
             &:hover {
-                box-shadow: 0 0 0.25em 0.15em $white;
+                box-shadow: 0 0 0.25em 0.15em variables.$white;
                 border-radius: 8px;
             }
         }
@@ -65,15 +67,15 @@
     }
 
     h1 {
-        border-bottom: 1px solid $yellow;
-        color: $yellow;
+        border-bottom: 1px solid variables.$yellow;
+        color: variables.$yellow;
         font-weight: bold;
     }
 
     // Add back in stylings as necessary
     h2,
     h3 {
-        color: $yellow;
+        color: variables.$yellow;
         border-bottom: none;
         font-weight: normal;
     }

@@ -1,0 +1,36 @@
+{{#if @root.isPlayMode}}
+    <div class="initiative-container">
+        <div class="initiative-col">
+            <div class="initiative-center">
+                <label class="initiative-label">
+                    {{localize "SR5.Initiative"}}
+                </label>
+            </div>
+            {{#if (or isCharacter isSpirit)}}
+                <div class="initiative-col">
+                    <select class="presence-select sr5-select" name="initiative-select">
+                        {{selectOptions initiativePerception.options selected=initiativePerception.value localize=true}}
+                    </select>
+                </div>
+            {{/if}}
+        </div>
+        <div class="initiative-col">
+            <div class="initiative-end">
+                <a data-action="toggleInitiativeBlitz" {{#if system.initiative.edge}}class="blitz-active"{{/if}}
+                   data-tooltip="SR5.Tooltips.Actor.Blitz">
+                    {{localize "SR5.Blitz"}}&nbsp;
+                    {{#if system.initiative.edge}}
+                        <i class="fas fa-toggle-on"></i>
+                    {{else}}
+                        <i class="fas fa-toggle-off"></i>
+                    {{/if}}
+                </a>
+            </div>
+            <button id="roll-init-button" data-action="rollInitiative" type="button" class="short button sr5-button"
+                    {{#unless @root.canRollInitiative}} disabled {{/unless}}
+                    data-tooltip="{{#if @root.canRollInitiative}}SR5.Tooltips.Actor.RollInitiative{{else}}SR5.Tooltips.Actor.NoCombatant{{/if}}">
+                <span>{{system.initiative.current.base.value}}&nbsp;+&nbsp;{{system.initiative.current.dice.value}}d6</span>
+            </button>
+        </div>
+    </div>
+{{/if}}

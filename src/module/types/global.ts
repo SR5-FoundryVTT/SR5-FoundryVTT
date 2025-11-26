@@ -225,6 +225,7 @@ declare module "fvtt-types/configuration" {
             quenchReady: (args0: Quench) => void;
             renderChatMessage: (args0: SR5ChatMessage, args1: any, arg2: any) => void;
             diceSoNiceReady: (dice3d: DiceSoNice) => void;
+            dropItemSheetData: any;
         }
     }
 
@@ -276,7 +277,6 @@ type _NormalizeNever<T> = [T] extends [never] ? unknown : T;
 type _NormalizeEmptyEntries<T> = [T] extends [never[]] ? [string, unknown][] : T;
 
 declare global {
-    // eslint-disable-next-line no-var
     var routinglib: RoutingLib | null;
 
     interface Game {

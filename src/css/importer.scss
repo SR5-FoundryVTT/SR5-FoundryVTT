@@ -1,11 +1,28 @@
-@import 'config';
+// importer.scss
+@use "sass:color";
+@use "config/variables";
 
 // _chummer-import.scss
 .chummer-import {
   /* --- THEME VARIABLES --- */
-  --ci-border-color: #ced4da;
-  --ci-border-radius: 6px;
+  // Mapped to global variables for consistent theming
+  --ci-primary-color: #{variables.$darkred};
+  --ci-primary-hover: #{color.adjust(variables.$darkred, $lightness: 10%)};
+  --ci-focus-ring-color: #{rgba(variables.$darkred, 0.5)};
+  
+  --ci-bg-color: #{variables.$dark2};
+  --ci-text-color: #{variables.$light};
+  --ci-muted-text-color: #{variables.$silver};
+  
+  --ci-border-color: #{variables.$groove-color};
+  --ci-border-radius: #{variables.$radius};
   --ci-spacing-unit: 6px;
+  
+  --ci-error-color: #{variables.$fDarkRed};
+  --ci-error-bg: #{variables.$roll-failure-background};
+  --ci-error-border: #{variables.$roll-failure-border};
+
+  color: var(--ci-text-color);
 
   label {
     display: flex;
@@ -14,11 +31,14 @@
     font-weight: 500;
     margin-bottom: calc(var(--ci-spacing-unit) / 2);
     white-space: nowrap;
+    font-family: variables.$systemFonts;
   }
 
   textarea {
     width: 100%;
     padding: calc(var(--ci-spacing-unit) * 1.5);
+    background-color: color.adjust(variables.$white, $alpha: -0.9); // Slight transparecy
+    color: variables.$white;
     border: 1px solid var(--ci-border-color);
     border-radius: var(--ci-border-radius);
     font-family: monospace;
@@ -29,7 +49,7 @@
     &::placeholder {
       color: var(--ci-muted-text-color);
       white-space: pre;
-      opacity: 0.9;
+      opacity: 0.7;
     }
   }
 
@@ -55,12 +75,19 @@
   .configure-button {
     background-color: transparent;
     font-weight: 500;
+    color: var(--ci-text-color);
+    border: 1px solid var(--ci-border-color);
+    
+    &:hover {
+        border-color: var(--ci-text-color);
+    }
   }
 
   legend {
     font-weight: 600;
     font-size: 1.1em;
     padding: 0 var(--ci-spacing-unit);
+    color: var(--ci-primary-color);
   }
 
   /* Organized grid for import options */
@@ -75,6 +102,7 @@
       display: flex;
       align-items: center;
       gap: calc(var(--ci-spacing-unit) / 2);
+      color: var(--ci-text-color);
     }
 
     input[type="checkbox"] {
@@ -105,6 +133,8 @@
     > select {
       flex: 1 1 200px;
       min-width: 180px;
+      background-color: variables.$dark;
+      color: variables.$white;
     }
 
     > button {
@@ -120,12 +150,13 @@
     border: 1px solid var(--ci-border-color);
     border-radius: var(--ci-border-radius);
     height: 38px;
+    font-family: variables.$systemFonts;
   }
 
   button {
     background-color: var(--ci-primary-color);
-    color: white;
-    border-color: var(--ci-primary-color);
+    color: variables.$white;
+    border-color: var(--ci-border-color);
     cursor: pointer;
     font-weight: 600;
     transition: background-color 0.15s ease-in-out;
@@ -133,6 +164,7 @@
     &:hover {
       background-color: var(--ci-primary-hover);
       border-color: var(--ci-primary-hover);
+      box-shadow: 0 0 5px var(--ci-primary-hover);
     }
   }
 
@@ -142,7 +174,7 @@
   button:focus-visible {
     outline: none;
     border-color: var(--ci-primary-color);
-    box-shadow: 0 0 0 4px var(--ci-focus-ring-color);
+    box-shadow: 0 0 0 2px var(--ci-focus-ring-color);
   }
 
   /* Error message */
@@ -151,43 +183,41 @@
     margin: var(--ci-spacing-unit) 0;
     padding: var(--ci-spacing-unit);
     color: var(--ci-error-color);
-    background-color: #f8d7da;
-    border: 1px solid #f5c6cb;
+    background-color: var(--ci-error-bg);
+    border: 1px solid var(--ci-error-border);
     border-radius: var(--ci-border-radius);
   }
 }
 
 .chummer-import-modal {
-  // 🔽 Local variables
-  $primary: #5d7f9c;
-  $warning: #e67e22;
-  $text: #ddd;
-  $text-muted: #aaa;
-  $bg: #1a1a1a;
-  $border: #333;
-  $hover: darken($primary, 10%);
-  $warning-bg: rgba($warning, 0.15);
+  // 🔽 Local variables mapped to Global Config
+  $primary: color.adjust(variables.$red, $lightness: -15%);
+  $warning: variables.$yellow;
+  $text: variables.$white;
+  $text-muted: variables.$silver;
+  $bg: variables.$dark2; 
+  $border: variables.$groove-color;
+  $hover: color.adjust($primary, $lightness: 10%);
+  $warning-bg: color.adjust($warning, $alpha: -0.85);
 
   // 🔽 Reset & Base
-  font-family: "Signika", sans-serif;
+  font-family: variables.$systemFonts;
   font-size: 14px;
-  color: $text;
   line-height: 1.6;
-  border-radius: 6px;
+  border-radius: variables.$radius;
   margin: 0 auto;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 
   strong {
-    color: lighten($primary, 6%);
+    color: $primary;
   }
 
   a {
-    color: $primary;
+    color: variables.$cornflower; // Use a distinct link color or $primary
     text-decoration: underline;
 
     &:hover,
     &:focus {
-      color: $hover;
+      color: color.adjust(variables.$cornflower, $lightness: 10%);
     }
   }
 
@@ -207,7 +237,7 @@
     }
 
     u {
-      color: #f5d6a8;
+      color: color.adjust($warning, $lightness: -10%);
       text-decoration-color: $warning;
     }
   }
@@ -224,8 +254,7 @@
     margin: 1.5rem 0;
     padding: 1.1rem;
     border: 1px solid $border;
-    border-radius: 6px;
-    background: lighten($bg, 2%);
+    border-radius: variables.$radius;
 
     legend {
       font-weight: 600;
@@ -252,9 +281,8 @@
         -webkit-appearance: none;
         width: 16px;
         height: 16px;
-        border: 2px solid $border;
+        border: 1px solid $border;
         border-radius: 3px;
-        background: darken($bg, 5%);
         position: relative;
 
         &:checked {
@@ -270,14 +298,17 @@
             transform: translate(-50%, -50%);
           }
         }
-      }
-
-      span {
-        color: $text;
+        &::before {
+          content: "";
+          color: transparent;
+        }
       }
 
       &:hover {
-        color: lighten($primary, 10%);
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        input[type="checkbox"] {
+            border-color: $primary;
+        }
       }
     }
   }
@@ -311,8 +342,7 @@
         padding: 0 1rem;
         background: rgba($primary, 0.1);
         border: 1px dashed $border;
-        border-radius: 6px;
-        color: $text-muted;
+        border-radius: variables.$radius;
         font-size: 0.95rem;
         text-align: center;
         transition: all 0.2s ease;
@@ -331,7 +361,7 @@
 
         &:hover {
           border-color: $primary;
-          background: rgba($primary, 0.15);
+          background: rgba($primary, 0.25);
           color: $text;
         }
       }
@@ -341,10 +371,10 @@
     .import-button {
       font-size: 1rem;
       font-weight: 600;
-      color: #fff;
+      color: variables.$white;
       background: $primary;
-      border: none;
-      border-radius: 6px;
+      border: 1px solid $border;
+      border-radius: variables.$radius;
       cursor: pointer;
       transition: all 0.2s ease;
       display: flex;
@@ -354,6 +384,7 @@
 
       &:hover:not(:disabled) {
         background: $hover;
+        box-shadow: 0 0 8px rgba($primary, 0.4);
         transform: translateY(-1px);
       }
 
@@ -364,6 +395,7 @@
       &:disabled {
         opacity: 0.6;
         cursor: not-allowed;
+        background: variables.$grey;
       }
 
       &[aria-busy="true"] {
@@ -373,7 +405,7 @@
           display: inline-block;
           width: 1em;
           height: 1em;
-          border: 2px solid #fff;
+          border: 2px solid variables.$white;
           border-top-color: transparent;
           border-radius: 50%;
           animation: chummer-spin 1s linear infinite;
@@ -394,7 +426,6 @@
   }
 
   // 🛡️ Optional: Reset any inherited fieldset or button styles
-  // (helps if parent dialog applies global styles)
   fieldset,
   button,
   input,
@@ -416,15 +447,16 @@
 
   .import-progress-bar {
     height: 20px;
-    background: #e0e0e0;
+    background: variables.$dark;
     border-radius: 10px;
     overflow: hidden;
     width: 100%;
+    border: 1px solid variables.$border-under;
   }
 
   .import-progress-fill {
     height: 100%;
-    background: #4caf50;
+    background: variables.$matrix-green; // Themed Matrix Green
     width: 0;
     transition: width 0.3s ease;
   }
@@ -432,6 +464,7 @@
   .import-progress-text {
     font-size: 0.9em;
     text-align: center;
+    color: $text-muted;
   }
 
   .import-done-container {
@@ -444,22 +477,23 @@
   }
 
   .import-done-text {
-    color: #4caf50;
+    color: variables.$matrix-green;
     font-weight: bold;
+    text-shadow: 0 0 2px rgba(variables.$matrix-green, 0.5);
   }
 
   .reset-button {
     padding: 8px 16px;
-    background: #007acc;
-    color: white;
-    border: none;
-    border-radius: 6px;
+    background: variables.$darkblue;
+    color: variables.$white;
+    border: 1px solid variables.$groove-color;
+    border-radius: variables.$radius;
     cursor: pointer;
     font-size: 1em;
   }
 
   .reset-button:hover {
-    background: #005a99;
+    background: color.adjust(variables.$darkblue, $lightness: 10%);
   }
 
   .import-actions {
@@ -473,6 +507,8 @@
 #importer-config-app {
   min-width: 700px;
   min-height: 300px;
+  background-color: variables.$dark2; // Consistent background
+  color: variables.$light;
 }
 
 #importer-source-config-form {
@@ -486,6 +522,13 @@
     text-align: right;
     button {
       width: 100%;
+      background: variables.$darkred;
+      color: variables.$white;
+      border: 1px solid variables.$groove-color;
+      
+      &:hover {
+        background: color.adjust(variables.$darkred, $lightness: 10%);
+      }
     }
   }
 }
@@ -500,18 +543,20 @@
   flex: 1;
   padding: 10px;
   overflow-y: auto;
-  border-top: 1px solid #ccc;
+  border-top: 1px solid variables.$groove-color;
+  scrollbar-color: variables.$darkred variables.$dark;
 }
 
 .importer-config-container .available-packs {
-  border-right: 1px solid #ccc;
+  border-right: 1px solid variables.$groove-color;
 }
 
 .importer-config-container .pane-title {
   font-weight: bold;
-  border-bottom: 1px solid #aaa;
+  border-bottom: 1px solid variables.$grey;
   padding-bottom: 5px;
   margin: 0 0 5px 0;
+  color: variables.$white;
 }
 
 .importer-config-container .pack-list {
@@ -525,7 +570,11 @@
   justify-content: space-between;
   align-items: center;
   padding: 5px 2px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid variables.$dark-sunken; // lighter border for list items
+  
+  &:hover {
+    background-color: rgba(variables.$white, 0.05);
+  }
 }
 
 .importer-config-container .pack-item .label-container {
@@ -539,11 +588,12 @@
 .importer-config-container .pack-item .label {
   line-height: 1.2;
   font-weight: bold;
+  color: variables.$light;
 }
 
 .importer-config-container .pack-item .pack-id {
   font-size: 0.8em;
-  color: #777;
+  color: variables.$silver;
   font-style: italic;
   line-height: 1;
 }
@@ -558,11 +608,19 @@
   line-height: 1.2;
   flex-shrink: 0;
   align-self: center;
+  background: variables.$dark;
+  color: variables.$white;
+  border: 1px solid variables.$grey;
+  
+  &:hover {
+      border-color: variables.$darkred;
+      color: variables.$darkred;
+  }
 }
 
 .importer-config-container .pack-item-empty {
   padding: 10px;
   text-align: center;
-  color: #777;
+  color: variables.$silver;
   font-style: italic;
 }

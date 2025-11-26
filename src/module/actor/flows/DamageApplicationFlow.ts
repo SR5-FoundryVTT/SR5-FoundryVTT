@@ -268,7 +268,7 @@ export class DamageApplicationFlow {
             return device.update({ system: { technology: { condition_monitor: track } } });
 
         // IC actors use a matrix track.
-        if (actor.isType('ic'))
+        if (actor.isType('ic', 'sprite'))
             return actor.update({ system: { track: { matrix: track } } });
 
         // Emerged actors use a personal device like condition monitor.

@@ -1,0 +1,17 @@
+<div class="list-item-col qty-input-col hover-show-button-container">
+    {{#if @root.isEditMode}}
+        <input type="number" class="item-quantity-input short midd" value="{{this.system.technology.quantity}}" min="0" max="999">
+    {{else}}
+        <a class="hover-show-button"
+           data-action="removeItemQty"
+           data-tooltip="{{localize 'SR5.Tooltips.Item.RemoveQuantity' qtySome=@root.bindings.qtySome qtyMany=@root.bindings.qtyMany}}">
+            <i class="fas fa-minus-square"></i>
+        </a>
+        <label class="qty-label">{{this.system.technology.quantity}}</label>
+        <a class="hover-show-button"
+           data-action="addItemQty"
+           data-tooltip="{{localize 'SR5.Tooltips.Item.AddQuantity' qtySome=@root.bindings.qtySome qtyMany=@root.bindings.qtyMany}}">
+            <i class="fas fa-plus-square"></i>
+        </a>
+    {{/if}}
+</div>

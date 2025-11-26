@@ -3,6 +3,7 @@ import { registerRollAndLabelHelpers } from './RollAndLabelHelpers';
 import { registerItemLineHelpers } from './ItemLineHelpers';
 import { registerSkillLineHelpers } from './SkillLineHelpers';
 import { registerAppHelpers } from "./AppHelpers";
+import { registerAppv2Helpers } from "./Appv2Helpers";
 import { registerBasicHelpers } from "./BasicHelpers";
 import { registerActorHelpers } from './ActorHelpers';
 import { registerLocalizationHelpers } from './LocalizationHelpers';
@@ -21,5 +22,6 @@ export class HandlebarManager {
         registerModifierHelpers();
         registerActorHelpers();
         registerLocalizationHelpers();
+        registerAppv2Helpers();
     }
 }

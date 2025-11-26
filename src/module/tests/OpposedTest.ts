@@ -216,11 +216,11 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
      *
      * @param event A PointerEvent by user interaction to trigger the test action.
      */
-    static async _castResistAction(event) {
+    static async _castResistAction(event: Event) {
         event.preventDefault();
 
-        const button = $(event.currentTarget);
-        const card = button.closest('.chat-message');
+        const button = $(event.currentTarget as HTMLElement);
+        const card = button.closest<HTMLElement>('.chat-message');
 
         // Collect information needed to create the opposed action test.
         const messageId = card.data('messageId');
@@ -235,11 +235,11 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
      *
      * @param event A PointerEvent by user interaction to trigger the test action.
      */
-    static async _castOpposedAction(event) {
+    static async _castOpposedAction(event: Event) {
         event.preventDefault();
 
-        const button = $(event.currentTarget);
-        const card = button.closest('.chat-message');
+        const button = $(event.currentTarget as HTMLElement);
+        const card = button.closest<HTMLElement>('.chat-message');
 
         // Collect information needed to create the opposed action test.
         const messageId = card.data('messageId');
@@ -249,9 +249,9 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         await TestCreator.fromMessageAction(messageId, opposedActionTest, {showDialog});
     }
 
-    static override async chatMessageListeners(message: ChatMessage, html, data) {
-        $(html).find('.opposed-action').on('click', OpposedTest._castOpposedAction.bind(this));
-        $(html).find('.resist-action').on('click', OpposedTest._castResistAction.bind(this));
+    static override async chatMessageListeners(message: ChatMessage, html: HTMLElement, data) {
+        $(html).find<HTMLElement>('.opposed-action').on('click', OpposedTest._castOpposedAction.bind(this));
+        $(html).find<HTMLElement>('.resist-action').on('click', OpposedTest._castResistAction.bind(this));
     }
 
     /**

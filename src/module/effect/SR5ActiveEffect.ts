@@ -3,6 +3,7 @@ import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
 import { PartsList } from "../parts/PartsList";
 import { Migrator } from "../migrator/Migrator";
+import { LinksHelpers } from '@/module/utils/links';
 import { ModifiableValueType } from "../types/template/Base";
 import DataModel = foundry.abstract.DataModel;
 
@@ -38,6 +39,17 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (path[0] === 'Actor' && path.length === 4) return true;
 
         return false;
+    }
+
+    async openSource() {
+        const source = this.origin;
+        if (source) {
+            await LinksHelpers.openSource(source);
+        }
+    }
+
+    get hasSource(): boolean {
+        return !!this.origin;
     }
 
     public get source() {
@@ -134,7 +146,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * Return keys expected in the ModifiableField shape
      */
     static get modifiableValueProperties(): string[] {
-        return ['base', 'changes', 'temp', 'value'] satisfies (keyof ModifiableValueType)[];
+        return ['base', 'changes', 'value'] satisfies (keyof ModifiableValueType)[];
     }
 
     override get isSuppressed(): boolean {

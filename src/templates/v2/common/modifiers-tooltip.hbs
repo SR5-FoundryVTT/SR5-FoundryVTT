@@ -1,0 +1,108 @@
+<div class="value-modifiers-container">
+    <div class="value-modifiers">
+        <div class="list-item">
+            <div class="value-modifier-name">
+                <label>{{localize 'SR5.BaseValue'}}</label>
+            </div>
+            <div class="value-modifiers-base">
+                {{#if isEssence}}
+                    <label>{{numberFormat value.base decimals=2}}</label>
+                {{else}}
+                    <label>{{value.base}}</label>
+                {{/if}}
+            </div>
+        </div>
+        {{#each value.mod}}
+            <div class="list-item">
+                <div class="value-modifier-name">
+                    <label>{{localize this.name}}</label>
+                </div>
+                <div class="value-modifiers-modifier">
+                    {{#if @root.isEssence}}
+                        <label>{{numberFormat this.value decimals=2 sign=true}}</label>
+                    {{else}}
+                        <label>{{numberFormat this.value sign=true}}</label>
+                    {{/if}}
+                </div>
+            </div>
+        {{/each}}
+
+        {{#if (eq (ModifierMode value) "override")}}
+            <div class="list-item invalid-total">
+                <div class="value-modifier-name">
+                    <label>{{localize 'SR5.Total'}}</label>
+                </div>
+                <div class="value-modifiers-total">
+                    <label>?</label>
+                </div>
+            </div>
+            <div class="list-item total">
+                <div class="value-modifier-name">
+                    <label>{{localize value.override.name}}</label>
+                </div>
+                <div class="value-modifiers-total">
+                    {{#if isEssence}}
+                        <label>{{numberFormat value.override.value decimals=2}}</label>
+                    {{else}}
+                        <label>{{value.override.value}}</label>
+                    {{/if}}
+                </div>
+            </div>
+        {{else if (eq (ModifierMode value) "upgrade")}}
+            <div class="list-item invalid-total">
+                <div class="value-modifier-name">
+                    <label>{{localize 'SR5.Total'}}</label>
+                </div>
+                <div class="value-modifiers-total">
+                    <label>?</label>
+                </div>
+            </div>
+            <div class="list-item total">
+                <div class="value-modifier-name">
+                    <label>{{localize value.upgrade.name}}</label>
+                </div>
+                <div class="value-modifiers-total">
+                    {{#if isEssence}}
+                        <label>{{numberFormat value.value decimals=2}}</label>
+                    {{else}}
+                        <label>{{value.value}}</label>
+                    {{/if}}
+                </div>
+            </div>
+        {{else if (eq (ModifierMode value) "downgrade")}}
+            <div class="list-item invalid-total">
+                <div class="value-modifier-name">
+                    <label>{{localize 'SR5.Total'}}</label>
+                </div>
+                <div class="value-modifiers-total">
+                    <label>?</label>
+                </div>
+            </div>
+            <div class="list-item total">
+                <div class="value-modifier-name">
+                    <label>{{localize value.downgrade.name}}</label>
+                </div>
+                <div class="value-modifiers-total">
+                    {{#if isEssence}}
+                        <label>{{numberFormat value.value decimals=2}}</label>
+                    {{else}}
+                        <label>{{value.value}}</label>
+                    {{/if}}
+                </div>
+            </div>
+        {{else}}
+            <div class="list-item total">
+                <div class="value-modifier-name">
+                    <label>{{localize 'SR5.Total'}}</label>
+                </div>
+                <div class="value-modifiers-total">
+                    {{#if isEssence}}
+                        <label>{{numberFormat value.value decimals=2}}</label>
+                    {{else}}
+                        <label>{{value.value}}</label>
+                    {{/if}}
+                </div>
+            </div>
+        {{/if}}
+    </div>
+</div>
