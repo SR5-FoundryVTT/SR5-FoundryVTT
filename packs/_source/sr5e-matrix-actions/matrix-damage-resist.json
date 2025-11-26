@@ -1,6 +1,5 @@
 {
   "_id": "ZBQo18L3WsmBLnKs",
-  "_key": "!items!ZBQo18L3WsmBLnKs",
   "name": "Matrix Damage Resist",
   "type": "action",
   "img": "systems/shadowrun5e/dist/icons/importer/quality/negative.svg",
@@ -20,7 +19,7 @@
       "attribute2": "firewall",
       "skill": "",
       "armor": false,
-      "spec": "",
+      "spec": false,
       "mod": 0,
       "mod_description": "",
       "roll_mode": "",
@@ -112,7 +111,7 @@
     "systemVersion": "0.30.0",
     "createdTime": 1753649477699,
     "modifiedTime": 1753649575111,
-    "lastModifiedBy": "gprTC3Md255Kv3Xm",
+    "lastModifiedBy": "sr5ebuilder",
     "exportSource": {
       "worldId": "sr5-buffalo",
       "uuid": "Item.JEDjokdhO6DBcNZi",
@@ -120,5 +119,6 @@
       "systemId": "shadowrun5e",
       "systemVersion": "0.30.0"
     }
-  }
+  },
+  "_key": "!items!ZBQo18L3WsmBLnKs"
 }

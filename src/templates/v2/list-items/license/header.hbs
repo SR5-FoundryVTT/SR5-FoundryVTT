@@ -1,0 +1,16 @@
+<div class="list-item list-item-header {{cssClass}}">
+    <div class="list-item-start">
+        <label>{{localize "SR5.License"}}</label>
+    </div>
+    <div class="list-item-col">
+        <label>{{localize "SR5.Rtg"}}</label>
+    </div>
+    <div class="list-item-col">
+        <label>{{localize "SR5.Description"}}</label>
+    </div>
+    {{#if @root.isEditMode}}
+        <div class="list-item-icons">
+            {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type }}
+        </div>
+    {{/if}}
+</div>

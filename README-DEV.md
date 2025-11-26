@@ -26,18 +26,10 @@ There are multiple gulp tasks available to help development:
 The resulting application used for FoundryVTT will only use contents in `/dist`.
 
 ## Linking the dev and system folder
-It's helpful, but not strictly necessary, to place your development folder separate from the FoundryVTT system folder as a system update will overwrite your development folder otherwise. This can be done with linking the two. For both options to work, the shadowrun5e system can't be installed in your local Foundry.
-
-### Option A: gulp link 
-For the `gulp link` command to work, you need to include the following file as _foundryconfig.json_ directly underneath your development shadowrun5e system directory.
-`{
-  "dataPath": "C:\\Users\\<addYourUserHere>\\AppData\\Local\\FoundryVTT\\",
-  "linkTargetDirName": "shadowrun5e"
-}
-`
+It's helpful, but not strictly necessary, to place your development folder separate from the FoundryVTT system folder as a system update will overwrite your development folder otherwise. This can be done by linking the two. For this to work, the shadowrun5e system can't be installed in your local Foundry.
 
 ### Option B: (Windows) mklink
-Instead of using the built in `gulp link` command, you can also execute this from within your `cmd` or `Windows Terminal`:
+You can execute this command from within your `cmd` or `Windows Terminal`:
 `mklink /D "C:\Users\<yourUser>\AppData\Local\FoundryVTT\Data\systems\shadowrun5e" "<yourClonedRepoPath>"`
 
 <yourClonedRepoPath> must be the cloned repository that includes the `dist` folder within it.
@@ -98,7 +90,6 @@ There is unit testing support using the FVTT Quench module. It's encouraged to d
 
 Afterwards open a terminal (cmd.exe on Windows) with administrative permissions ([see here for help](https://www.howtogeek.com/194041/how-to-open-the-command-prompt-as-administrator-in-windows-8.1/)):
 * `cd <the_cloned_fork_directory>`
-* `gulp link` (should this fail, remove the existing shadowrun5e system or check for administrative permissions)
 
 You should see a success message and a little arrow symbol on the shadowrun5e folder within the FoundryVTT _Data/systems_ directory. Now you can use the Gulp watch-Task as described above. This needs to be repeated after each Shadowrun5eVTT system update.
 

@@ -1,0 +1,39 @@
+<div class="fill-container">
+    <div class="input-row">
+        <div>
+            <label>{{localize "SR5.KarmaManager.StartingKarma"}}</label>
+            <div>
+                <span>
+                    <label class="label" data-tooltip="SR5.KarmaManager.CurrentKarma">{{karma}}</label>&nbsp;
+                    <label class="label" data-tooltip="SR5.KarmaManager.CareerKarma">(&nbsp;{{careerKarma}}&nbsp;)</label>
+                </span>
+            </div>
+        </div>
+        <label><i class="fas fa-plus"></i></label>
+        <div class="input-col">
+            <div class="mod-button-container">
+                <a data-action="increaseKarma" data-amount=1>+1</a>
+                <a data-action="increaseKarma" data-amount=5>+5</a>
+            </div>
+            <div>
+                <input class="short midd center mod-input" type="number" name="incoming-karma" value={{karmaModifier}} />
+            </div>
+            <div class="mod-button-container">
+                <a data-action="reduceKarma" data-amount=1>-1</a>
+                <a data-action="reduceKarma" data-amount=5>-5</a>
+            </div>
+        </div>
+        <label><i class="fas fa-equals"></i></label>
+        <div>
+            <label>{{localize "SR5.KarmaManager.FinalKarma"}}</label>
+            <div>
+                <span>
+                    <label class="label {{#if (gt karmaModifier 0)}} positive {{else if (lt karmaModifier 0)}} negative {{/if}}"
+                        data-tooltip="SR5.KarmaManager.FinalCurrentKarma">{{modifiedKarma}}</label>&nbsp;
+                    <label class="label {{#if (gt karmaModifier 0)}} positive {{/if}}"
+                           data-tooltip="SR5.KarmaManager.FinalCareerKarma">(&nbsp;{{modifiedCareerKarma}}&nbsp;)</label>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

@@ -2,13 +2,15 @@ import { SR5 } from "@/module/config";
 import { ModifiableValue } from "./Base";
 import { ModifiableField } from "../fields/ModifiableField";
 import { FixedTypeObjectField } from "../fields/FixedTypeObjectField";
-const { SchemaField, BooleanField, ArrayField, NumberField, StringField, TypedObjectField } = foundry.data.fields;
+const { SchemaField, BooleanField, ArrayField, NumberField, StringField, TypedObjectField, HTMLField } = foundry.data.fields;
 
 export type SkillCategories = 'active' | 'language' | 'knowledge';
 
 export const SkillField = () => ({
     ...ModifiableValue(),
     name: new StringField({ required: true }),
+    img: new StringField({ required: true }),
+    description: new HTMLField({ required: true }),
     hidden: new BooleanField(),
     label: new StringField({ required: true }),
     attribute: new StringField({
@@ -19,6 +21,7 @@ export const SkillField = () => ({
     _delete: new BooleanField(), // Does it use it?
     specs: new ArrayField(new StringField({ required: true })),
     canDefault: new BooleanField({ initial: true }),
+    isNative: new BooleanField({ initial: false }), // this only actually applies to language skills
     id: new StringField({ required: true }),
     link: new StringField({ required: true }),
     group: new StringField({ required: true }),

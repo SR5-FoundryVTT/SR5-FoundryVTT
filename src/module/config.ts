@@ -107,8 +107,6 @@ export const SR5 = {
     },
 
     biofeedbackOptions: {
-        // create an empty string option, this should not be needed after appv2
-        '': '',
         physical: 'SR5.DmgTypePhysical',
         stun: 'SR5.DmgTypeStun',
     },
@@ -391,7 +389,7 @@ export const SR5 = {
         detection: 'SR5.Spell.CatDetection',
         health: 'SR5.Spell.CatHealth',
         illusion: 'SR5.Spell.CatIllusion',
-        manipulation: 'SR5.Spell.CatManipulation'
+        manipulation: 'SR5.Spell.CatManipulation',
     },
 
     spellTypes: {
@@ -424,6 +422,14 @@ export const SR5 = {
     illusionSpellSenses: {
         'single-sense': 'SR5.Spell.IllusionSingleSense',
         'multi-sense': 'SR5.Spell.IllusionMultiSense',
+    },
+
+    ritualSpellTypes: {
+        anchored: 'SR5.Spell.Ritual.Anchored',
+        material_link: 'SR5.Spell.Ritual.MaterialLink',
+        minion: 'SR5.Spell.Ritual.Minion',
+        spell: 'SR5.Spell.Ritual.Spell',
+        spotter: 'SR5.Spell.Ritual.Spotter',
     },
 
     attributeRolls: {
@@ -501,6 +507,7 @@ export const SR5 = {
         cyberdeck: 'SR5.DeviceCatCyberdeck',
         rcc: 'SR5.DeviceCatRCC',
         living_persona: 'SR5.LivingPersona',
+        host: 'SR5.ItemTypes.Host',
     },
 
     cyberwareGrades: {
@@ -682,14 +689,14 @@ export const SR5 = {
     // Gear modification types. :) Not modifiers.
     modificationTypes: {
         weapon: 'SR5.Weapon.Weapon',
-        armor: 'SR5.Armor',
+        armor: 'SR5.Armor.label',
         vehicle: 'SR5.Vehicle.Vehicle',
         drone: 'SR5.Vehicle.Drone'
     },
 
     mountPoints: {
         barrel: 'SR5.Barrel',
-        under_barrel: 'SR5.UnderBarrel',
+        under: 'SR5.UnderBarrel',
         stock: 'SR5.Stock',
         top: 'SR5.Top',
         side: 'SR5.Side',
@@ -713,104 +720,6 @@ export const SR5 = {
         high: 'SR5.LifestyleHigh',
         luxury: 'SR5.LifestyleLuxury',
         other: 'SR5.LifestyleOther',
-    },
-
-    /**
-     * Labels for ALL actor types actor based local modifiers.
-     *
-     * All modifiers across all actor types must be included here, this is only used for display.
-     */
-    actorModifiers: {
-        armor: 'SR5.ModifierTypes.Armor',
-        astral_initiative_dice: 'SR5.ModifierTypes.AstralDice',
-        astral_initiative: 'SR5.ModifierTypes.AstralInit',
-        astral_limit: 'SR5.ModifierTypes.AstralLimit',
-        composure: 'SR5.ModifierTypes.Composure',
-        defense_block: 'SR5.ModifierTypes.DefenseBlock',
-        defense_dodge: 'SR5.ModifierTypes.DefenseDodge',
-        defense_parry: 'SR5.ModifierTypes.DefenseParry',
-        defense_melee: 'SR5.ModifierTypes.DefenseMelee',
-        defense_ranged: 'SR5.ModifierTypes.DefenseRanged',
-        defense: 'SR5.ModifierTypes.Defense',
-        drain: 'SR5.ModifierTypes.Drain',
-        essence: 'SR5.ModifierTypes.Essence',
-        fade: 'SR5.ModifierTypes.Fade',
-        global: 'SR5.ModifierTypes.Global',
-        judge_intentions: 'SR5.ModifierTypes.JudgeIntentions',
-        lift_carry: 'SR5.ModifierTypes.LiftCarry',
-        mark_damage: 'SR5.ModifierTypes.MarkDamage',
-        matrix_initiative_dice: 'SR5.ModifierTypes.MatrixDice',
-        matrix_initiative: 'SR5.ModifierTypes.MatrixInit',
-        matrix_track: 'SR5.ModifierTypes.MatrixTrack',
-        meat_initiative_dice: 'SR5.ModifierTypes.MeatSpaceDice',
-        meat_initiative: 'SR5.ModifierTypes.MeatSpaceInit',
-        memory: 'SR5.ModifierTypes.Memory',
-        mental_limit: 'SR5.ModifierTypes.MentalLimit',
-        multi_defense: 'SR5.ModifierTypes.DefenseMulti',
-        pain_tolerance_physical: 'SR5.ModifierTypes.PainTolerancePhysical',
-        pain_tolerance_stun: 'SR5.ModifierTypes.PainToleranceStun',
-        physical_limit: 'SR5.ModifierTypes.PhysicalLimit',
-        physical_overflow_track: 'SR5.ModifierTypes.PhysicalOverflowTrack',
-        physical_track: 'SR5.ModifierTypes.PhysicalTrack',
-        public_grid: 'SR5.ModifierTypes.PublicGrid',
-        reach: 'SR5.ModifierTypes.Reach',
-        recoil: 'SR5.ModifierTypes.Recoil',
-        run: 'SR5.ModifierTypes.Run',
-        soak: 'SR5.ModifierTypes.Soak',
-        social_limit: 'SR5.ModifierTypes.SocialLimit',
-        stun_track: 'SR5.ModifierTypes.StunTrack',
-        place_two_marks: "SR5.ModifierTypes.TwoMarks",
-        place_three_marks: "SR5.ModifierTypes.ThreeMarks",
-        walk: 'SR5.ModifierTypes.Walk',
-        wound_tolerance: 'SR5.ModifierTypes.WoundTolerance',
-    },
-
-    /**
-     * Tooltip labels used for actor modifiers. Key should use actorModifiers key.
-     */
-    actorModifiersTooltip: {
-        armor: 'SR5.Tooltips.Modifiers.armor',
-        astral_initiative_dice: 'SR5.Tooltips.Modifiers.astral_initiative_dice',
-        astral_initiative: 'SR5.Tooltips.Modifiers.astral_initiative',
-        astral_limit: 'SR5.Tooltips.Modifiers.astral_limit',
-        composure: 'SR5.Tooltips.Modifiers.composure',
-        defense_block: 'SR5.Tooltips.Modifiers.defense_block',
-        defense_dodge: 'SR5.Tooltips.Modifiers.defense_dodge',
-        defense_parry: 'SR5.Tooltips.Modifiers.defense_parry',
-        defense_melee: 'SR5.Tooltips.Modifiers.defense_melee',
-        defense_ranged: 'SR5.Tooltips.Modifiers.defense_ranged',
-        defense: 'SR5.Tooltips.Modifiers.defense',
-        drain: 'SR5.Tooltips.Modifiers.drain',
-        essence: 'SR5.Tooltips.Modifiers.essence',
-        fade: 'SR5.Tooltips.Modifiers.fade',
-        global: 'SR5.Tooltips.Modifiers.global',
-        judge_intentions: 'SR5.Tooltips.Modifiers.judge_intentions',
-        mark_damage: 'SR5.Tooltips.Modifiers.mark_damage',
-        lift_carry: 'SR5.Tooltips.Modifiers.lift_carry',
-        matrix_initiative_dice: 'SR5.Tooltips.Modifiers.matrix_initiative_dice',
-        matrix_initiative: 'SR5.Tooltips.Modifiers.matrix_initiative',
-        matrix_track: 'SR5.Tooltips.Modifiers.matrix_track',
-        meat_initiative_dice: 'SR5.Tooltips.Modifiers.meat_initiative_dice',
-        meat_initiative: 'SR5.Tooltips.Modifiers.meat_initiative',
-        memory: 'SR5.Tooltips.Modifiers.memory',
-        mental_limit: 'SR5.Tooltips.Modifiers.mental_limit',
-        multi_defense: 'SR5.Tooltips.Modifiers.multi_defense',
-        pain_tolerance_physical: 'SR5.Tooltips.Modifiers.pain_tolerance_physical',
-        pain_tolerance_stun: 'SR5.Tooltips.Modifiers.pain_tolerance_stun',
-        physical_limit: 'SR5.Tooltips.Modifiers.physical_limit',
-        physical_overflow_track: 'SR5.Tooltips.Modifiers.physical_overflow_track',
-        physical_track: 'SR5.Tooltips.Modifiers.physical_track',
-        public_grid: 'SR5.Tooltips.Modifiers.public_grid',
-        reach: 'SR5.Tooltips.Modifiers.reach',
-        recoil: 'SR5.Tooltips.Modifiers.recoil',
-        run: 'SR5.Tooltips.Modifiers.run',
-        soak: 'SR5.Tooltips.Modifiers.soak',
-        social_limit: 'SR5.Tooltips.Modifiers.social_limit',
-        stun_track: 'SR5.Tooltips.Modifiers.stun_track',
-        place_two_marks: 'SR5.Tooltips.Modifiers.place_two_marks',
-        place_three_marks: 'SR5.Tooltips.Modifiers.place_three_marks',
-        walk: 'SR5.Tooltips.Modifiers.walk',
-        wound_tolerance: 'SR5.Tooltips.Modifiers.wound_tolerance',
     },
 
     /**
@@ -912,6 +821,29 @@ export const SR5 = {
         common_program: 'SR5.CommonProgram',
         hacking_program: 'SR5.HackingProgram',
         agent: 'SR5.Agent',
+    },
+
+    icTypes: {
+        acid: "SR5.IC.Types.Acid",
+        binder: "SR5.IC.Types.Binder",
+        black_ic: "SR5.IC.Types.BlackIC",
+        blaster: "SR5.IC.Types.Blaster",
+        bloodhound: "SR5.IC.Types.Bloodhound",
+        blue_goo: "SR5.IC.Types.BlueGoo",
+        catapult: "SR5.IC.Types.Catapult",
+        crash: "SR5.IC.Types.Crash",
+        flicker: "SR5.IC.Types.Flicker",
+        jammer: "SR5.IC.Types.Jammer",
+        killer: "SR5.IC.Types.Killer",
+        marker: "SR5.IC.Types.Marker",
+        patrol: "SR5.IC.Types.Patrol",
+        probe: "SR5.IC.Types.Probe",
+        scramble: "SR5.IC.Types.Scramble",
+        shocker: "SR5.IC.Types.Shocker",
+        sleuther: "SR5.IC.Types.Sleuther",
+        sparky: "SR5.IC.Types.Sparky",
+        tar_baby: "SR5.IC.Types.TarBaby",
+        track: "SR5.IC.Types.Track"
     },
 
     spiritTypes: {
@@ -1065,6 +997,14 @@ export const SR5 = {
             enabled_option: 'SR5.CritterPower.Optional.EnabledOption',
             disabled_option: 'SR5.CritterPower.Optional.DisabledOption',
         },
+    },
+
+    complexForm: {
+        durations: {
+            immediate: 'SR5.ComplexForm.Durations.Immediate',
+            sustained: 'SR5.ComplexForm.Durations.Sustained',
+            permanent: 'SR5.ComplexForm.Durations.Permanent',
+        }
     },
 
     spriteTypes: {

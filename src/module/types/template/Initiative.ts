@@ -24,7 +24,5 @@ export const Initiative = <
     return {
         ...fields,
         ...Object.fromEntries(types.map(type => [type, initiativeField()]))
-    } as unknown as typeof fields & {
-        [K in T[number]]: ReturnType<typeof initiativeField>;
-    };
+    } as unknown as typeof fields & Record<T[number], ReturnType<typeof initiativeField>>;
 };

@@ -18,7 +18,7 @@ import { SkillFieldType } from './types/template/Skills';
  * @param slot The slot to be dropped into on the Macro bar
  */
 export async function createItemMacro(dropData, slot) {
-    if (!game || !game.macros) return;
+    if (!game?.macros) return;
 
     const item = await SR5Item.fromDropData(dropData);
     if (!(item instanceof SR5Item)) return console.error(`Shadowrun 5e | Macro Drop expected an item document but got a different document type`, item);
@@ -48,7 +48,7 @@ export async function createItemMacro(dropData, slot) {
  * @return {Promise}
  */
 export function rollItemMacro(itemName) {
-    if (!game || !game.actors) return;
+    if (!game?.actors) return;
 
     const speaker = ChatMessage.getSpeaker();
     let actor;
@@ -96,7 +96,7 @@ export async function createSkillMacro(data: {skillId: string, skill: SkillField
  * @param skillLabel Custom skill names must be supported and legacy skill names might be translated.
  */
 export async function rollSkillMacro(skillLabel): Promise<SuccessTest<SuccessTestData>| void> {
-    if (!game || !game.actors) return;
+    if (!game?.actors) return;
     if (!skillLabel) return;
 
     // Fetch the actor from the current users token or the actor collection.

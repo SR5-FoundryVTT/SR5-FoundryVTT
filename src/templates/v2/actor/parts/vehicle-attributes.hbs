@@ -1,0 +1,78 @@
+{{> "systems/shadowrun5e/dist/templates/v2/actor/parts/limits.hbs" }}
+<div class="attributes">
+    {{#if @root.isEditMode}}
+        {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+            attribute=system.vehicle_stats.handling
+            attributeField=systemFields.vehicle_stats.fields.handling
+        }}
+        {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+            attribute=system.vehicle_stats.off_road_handling
+            attributeField=systemFields.vehicle_stats.fields.off_road_handling
+        }}
+        {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+            attribute=system.vehicle_stats.speed
+            attributeField=systemFields.vehicle_stats.fields.speed
+        }}
+        {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+            attribute=system.vehicle_stats.off_road_speed
+            attributeField=systemFields.vehicle_stats.fields.off_road_speed
+        }}
+    {{else}}
+        {{#if system.isOffRoad}}
+            {{#if (eq system.environment 'handling')}}
+                {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+                    attribute=system.vehicle_stats.off_road_handling
+                    attributeField=systemFields.vehicle_stats.fields.off_road_handling
+                }}
+            {{else}}
+                {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+                    attribute=system.vehicle_stats.off_road_speed
+                    attributeField=systemFields.vehicle_stats.fields.off_road_speed
+                }}
+            {{/if}}
+        {{else}}
+            {{#if (eq system.environment 'handling')}}
+                {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+                    attribute=system.vehicle_stats.handling
+                    attributeField=systemFields.vehicle_stats.fields.handling
+                }}
+            {{else}}
+                {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+                    attribute=system.vehicle_stats.speed
+                    attributeField=systemFields.vehicle_stats.fields.speed
+                }}
+            {{/if}}
+        {{/if}}
+    {{/if}}
+    {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+        attribute=system.vehicle_stats.acceleration
+        attributeField=systemFields.vehicle_stats.fields.acceleration
+    }}
+    {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+        attribute=system.attributes.body
+        attributeField=systemFields.attributes.fields.body
+    }}
+    {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+        label="SR5.Armor.label"
+        attribute=system.armor
+        attributeField=systemFields.armor
+    }}
+    {{#unless system.vehicle_stats.pilot.hidden}}
+        {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+            attribute=system.vehicle_stats.pilot
+            attributeField=systemFields.vehicle_stats.fields.pilot
+        }}
+    {{/unless}}
+    {{#unless system.vehicle_stats.sensor.hidden}}
+        {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+            attribute=system.vehicle_stats.sensor
+            attributeField=systemFields.vehicle_stats.fields.sensor
+        }}
+    {{/unless}}
+    {{#unless system.vehicle_stats.seats.hidden}}
+        {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
+            attribute=system.vehicle_stats.seats
+            attributeField=systemFields.vehicle_stats.fields.seats
+        }}
+    {{/unless}}
+</div>

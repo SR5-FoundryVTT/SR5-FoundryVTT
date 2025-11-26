@@ -235,6 +235,7 @@ declare module "fvtt-types/configuration" {
             renderChatMessage: (args0: SR5ChatMessage, args1: any, arg2: any) => void;
             diceSoNiceReady: (dice3d: DiceSoNice) => void;
             moveToken: (...args: Parameters<typeof SR5TokenDocument.moveToken>) => void;
+            dropItemSheetData: any;
         }
     }
 
@@ -284,7 +285,6 @@ declare module "fvtt-types/configuration" {
 type _NeverToUnknown<T> = [T] extends [never] ? unknown : T;
 
 declare global {
-    // eslint-disable-next-line no-var
     var routinglib: RoutingLib | null;
 
     interface Game {

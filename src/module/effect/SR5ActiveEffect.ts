@@ -4,6 +4,7 @@ import { SR5Actor } from "../actor/SR5Actor";
 import { ModifiableValueType } from "../types/template/Base";
 import DataModel = foundry.abstract.DataModel;
 import { Migrator } from "../migrator/Migrator";
+import { LinksHelpers } from '@/module/utils/links';
 
 /**
  * Shadowrun Active Effects implement additional ways of altering document data.
@@ -48,6 +49,17 @@ export class SR5ActiveEffect extends ActiveEffect {
         return false;
     }
 
+    async openSource() {
+        const source = this.origin;
+        if (source) {
+            await LinksHelpers.openSource(source);
+        }
+    }
+
+    get hasSource(): boolean {
+        return !!this.origin;
+    }
+
     public get source() {
         return this.origin ? fromUuidSync(this.origin) : null;
     }
@@ -80,7 +92,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     /**
      * Render the sheet of the active effect source
      */
-    public renderSourceSheet() {
+    public async renderSourceSheet() {
         if (this.source instanceof SR5Actor || this.source instanceof SR5Item)
             return this.source?.sheet?.render(true);
         return undefined;
@@ -354,7 +366,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * Return keys expected in the ModifiableField shape
      */
     static get modifiableValueProperties() {
-        return ['base', 'value', 'mod', 'override', 'temp'];
+        return ['base', 'value', 'mod', 'override'];
     }
 
     override get isSuppressed(): boolean {

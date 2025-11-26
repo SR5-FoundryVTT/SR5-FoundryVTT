@@ -1,0 +1,113 @@
+<div class="fill-container">
+    <div class="scrollable">
+        <div class="list-item list-item-header">
+            <div class="list-item-start">
+                <label>{{localize "SR5.NetworkManager.AvailableNetworks"}}</label>
+            </div>
+            <div class="list-item-col midd-col">
+                <label>
+                    {{localize "SR5.NetworkManager.NetworkType"}}
+                </label>
+            </div>
+            <div class="list-item-icons">
+                <a data-action="refresh"><i class="fas fa-rotate"></i></a>
+            </div>
+        </div>
+        {{#if (isType actor 'vehicle')}}
+            {{#if driver}}{{#unless (eq driver.uuid @root.connected_network.uuid)}}
+                <div class="list-item" data-uuid="{{this.uuid}}">
+                    <div class="list-item-start">
+                        <button class="list-item-image-container icon sr5-icon" data-action="connectToDriver" data-tooltip="SR5.ConnectToDriver">
+                            <img class="list-item-image-connect" src="{{speakerImg driver}}" />
+                        </button>
+                        <a data-action="connectToDriver">
+                            {{localize "SR5.Labels.ActorSheet.ConnectToDriver"}}
+                        </a>
+                    </div>
+                    <div class="list-item-col midd-col">
+                        <label>
+                            {{matrixIconType driver}}
+                        </label>
+                    </div>
+                    <div class="list-item-icons">
+                        <a data-action="connectToDriver" data-tooltip="SR5.ConnectToDriver">
+                            <i class="fas fa-right-to-bracket"></i>
+                        </a>
+                    </div>
+                </div>
+            {{/unless}}{{/if}}
+        {{/if}}
+        {{#each selectable_networks}}{{#unless (eq this.uuid @root.connected_network.uuid)}}
+            <div class="list-item" data-uuid="{{this.uuid}}">
+
+                <div class="list-item-start">
+                    <button class="list-item-image-container icon sr5-icon" data-action="connectToNetwork" data-tooltip="SR5.ConnectToNetwork">
+                        <img class="list-item-image-connect" src="{{speakerImg this}}" />
+                    </button>
+                    <a data-action="openUuid" data-uuid="{{this.uuid}}">{{this.name}}</a>
+                </div>
+                <div class="list-item-col midd-col">
+                    <label>
+                        {{localize (concat 'TYPES.Item.' this.type)}}
+                    </label>
+                </div>
+                <div class="list-item-icons">
+                    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/connect-network-icon.hbs' this }}
+                </div>
+            </div>
+        {{/unless}}{{/each}}
+
+        <div class="list-item list-item-header">
+            <div class="list-item-start">
+                <label>{{localize "SR5.Grids"}}</label>
+            </div>
+        </div>
+        {{#each grids}}
+            <div class="list-item" data-uuid="{{this.uuid}}">
+                <div class="list-item-start">
+                    <span class="list-item-image-container">
+                        <img src="{{speakerImg this}}" />
+                    </span>
+                    <label>{{this.name}}</label>
+                </div>
+                <div class="list-item-icons">
+                    <a data-action="inviteMark" data-tooltip="SR5.NetworkManager.InviteMark">
+                        <i class="fas fa-door-open"></i>
+                    </a>
+                    <a data-action="bruteForce" data-tooltip="SR5.NetworkManager.BruteForce">
+                        <i class="fas fa-explosion"></i>
+                    </a>
+                    <a data-action="hackOnTheFly" data-tooltip="SR5.NetworkManager.HackOnTheFly">
+                        <i class="fas fa-microchip"></i>
+                    </a>
+                </div>
+            </div>
+        {{/each}}
+        <div class="list-item list-item-header">
+            <div class="list-item-start">
+                <label>{{localize "SR5.Hosts"}}</label>
+            </div>
+        </div>
+        {{#each hosts}}
+            <div class="list-item" data-uuid="{{this.uuid}}">
+                <div class="list-item-start">
+                    <span class="list-item-image-container">
+                        <img src="{{speakerImg this}}" />
+                    </span>
+                    <label>{{this.name}}</label>
+                </div>
+                <div class="list-item-icons">
+                    <a data-action="inviteMark" data-tooltip="SR5.NetworkManager.InviteMark">
+                        <i class="fas fa-door-open"></i>
+                    </a>
+                    <a data-action="bruteForce" data-tooltip="SR5.NetworkManager.BruteForce">
+                        <i class="fas fa-explosion"></i>
+                    </a>
+                    <a data-action="hackOnTheFly" data-tooltip="SR5.NetworkManager.HackOnTheFly">
+                        <i class="fas fa-microchip"></i>
+                    </a>
+                </div>
+            </div>
+        {{/each}}
+    </div>
+</div>

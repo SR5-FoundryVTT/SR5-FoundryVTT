@@ -1,0 +1,16 @@
+<div class="attribute">
+    <label>
+        {{#if label}}
+            {{localize label}}
+        {{else}}
+            {{localize attribute.label}}
+        {{/if}}
+    </label>
+    <div class="attribute-value">
+    {{#if @root.isEditMode}}
+        {{formInput attributeField.fields.base value=attribute.base classes="short" rootId=rootId }}
+    {{else}}
+        <span class="attribute-value-total">{{attribute.value}}</span>
+    {{/if}}
+    </div>
+</div>

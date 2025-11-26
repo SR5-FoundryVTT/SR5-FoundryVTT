@@ -14,10 +14,8 @@ import { shadowrunSR5SpriteDataPrep } from './sr5.SpriteDataPrep.spec';
 import { shadowrunSR5ICDataPrep } from './sr5.ICDataPrep.spec';
 import { shadowrunSR5VehicleDataPrep } from './sr5.VehicleDataPrep.spec';
 import { shadowrunSR5ActiveEffect } from './sr5.ActiveEffect.spec';
-import { shadowrunNetworkDevices } from './sr5.NetworkDevices.spec';
 import { shadowrunTesting } from './sr5.Testing.spec';
 import { shadowrunInventoryFlow } from './sr5.Inventory.spec';
-import { shadowrunMatrixFlow } from './sr5.MatrixFlow.spec';
 import { weaponParserBaseTesting } from './sr5.WeaponParser.spec';
 import { characterImporterTesting } from './actorImport/sr5.CharacterImporter.spec';
 import { spiritImporterTesting } from './actorImport/sr5.SpiritImporter.spec';
@@ -88,9 +86,6 @@ export const quenchRegister = (quench: Quench) => {
     quench.registerBatch('shadowrun5e.data_prep.item', shadowrunSR5ItemDataPrep, {
         displayName: 'SHADOWRUN5e: SR5ItemDataPreparation Test',
     });
-    quench.registerBatch('shadowrun5e.flow.networkDevices', shadowrunNetworkDevices, {
-        displayName: 'SHADOWRUN5e: Matrix Network Devices Test',
-    });
     quench.registerBatch('shadowrun5e.flow.marks', shadowrunMarks, {
         displayName: 'SHADOWRUN5e: Matrix Marks Test',
     });
@@ -118,9 +113,6 @@ export const quenchRegister = (quench: Quench) => {
     });
     quench.registerBatch('shadowrun5e.flow.damage', shadowrunDamage, {
         displayName: 'SHADOWRUN5e: Damage Application',
-    });
-    quench.registerBatch('shadowrun5e.flow.matrix', shadowrunMatrixFlow, {
-        displayName: 'SHADOWRUN5e: Matrix Flow Test',
     });
     quench.registerBatch('shadowrun5e.actor.npc', shadowrunNPC, {
         displayName: 'SHADOWRUN5e: NPC Character Test',

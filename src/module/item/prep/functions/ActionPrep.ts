@@ -75,8 +75,12 @@ export const ActionPrep = {
             action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name, ammoData.damage);
         }
 
-        // add mods to ap from ammo
-        action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name, ammoData.ap);
+        // some ammunition wants to replace the weapons AP, others modify it
+        if (ammoData.replaceAP) {
+            action.damage.ap.override = { name: equippedAmmo.name, value: Number(ammoData.ap) };
+        } else {
+            action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name, ammoData.ap);
+        }
 
         if (ammoData.accuracy) limitParts.addUniquePart(equippedAmmo.name, ammoData.accuracy);
 

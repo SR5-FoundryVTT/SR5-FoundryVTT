@@ -1,0 +1,95 @@
+<div class="list-item-container {{cssClass}} {{#if (hasKey @root.expandedSkills id)}} expanded {{/if}}">
+    <div class="list-item {{skillClass skill}}"
+         data-skill-id="{{id}}"
+         data-category="{{category}}"
+         data-subcategory="{{subcategory}}">
+        <div class="list-item-start">
+            <button class="list-item-image-container icon sr5-icon"
+               data-tooltip="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers'
+                                        skip=@root.bindings.skip descr=@root.bindings.card}}"
+                {{#if @root.isPlayMode}} data-action="rollSkill" {{else}} data-action="editSkill" {{/if}}
+               >
+                <img
+                    {{#if skill.img}}
+                        src="{{skill.img}}"
+                    {{else}}
+                        {{#if (eq skill.attribute 'agility')}}
+                            src="systems/shadowrun5e/dist/icons/redist/run.svg"
+                        {{else if (eq skill.attribute 'body')}}
+                            src="systems/shadowrun5e/dist/icons/importer/bioware/cultured.svg"
+                        {{else if (eq skill.attribute 'strength')}}
+                            src="systems/shadowrun5e/dist/icons/redist/fist.svg"
+                        {{else if (eq skill.attribute 'reaction')}}
+                            src="systems/shadowrun5e/dist/icons/dodge.svg"
+                        {{else if (eq skill.attribute 'willpower')}}
+                            src="systems/shadowrun5e/dist/icons/bell-shield.svg"
+                        {{else if (eq skill.attribute 'logic')}}
+                            src="systems/shadowrun5e/dist/icons/redist/brain.svg"
+                        {{else if (eq skill.attribute 'intuition')}}
+                            src="systems/shadowrun5e/dist/icons/dodging.svg"
+                        {{else if (eq skill.attribute 'charisma')}}
+                            src="systems/shadowrun5e/dist/icons/importer/adept_power.svg"
+                        {{else}}
+                            src="systems/shadowrun5e/dist/icons/importer/action.svg"
+                        {{/if}}
+                    {{/if}}
+                    {{#if @root.isEditMode}}
+                     class="list-item-image-edit"
+                    {{else}}
+                     class="list-item-image-roll"
+                    {{/if}}
+                />
+            </button>
+            <a data-action="openSkillDescription">{{localizeSkill skill}}</a>
+        </div>
+        {{#if @root.isPlayMode}}
+        <div class="list-item-col">
+            {{skillSpecializations skill}}
+        </div>
+        {{/if}}
+        <div class="list-item-col {{#if @root.isPlayMode}} skinny-col {{/if}}">
+            {{#if @root.isEditMode}}
+                {{!-- use the original method of setting data because skills are weird in data model, they'll be items eventually --}}
+                <input type="number" name="{{concat skillPath '.base'}}" class="short skinny" value="{{skill.base}}" data-skill="{{id}}" >
+            {{else}}
+                <label data-skill-modifier-tooltip="{{id}}">
+                    {{#if skill.isNative}}
+                        {{localize "SR5.Skill.abbr.Native"}}
+                    {{else}}
+                        {{skill.value}}
+                    {{/if}}
+                </label>
+            {{/if}}
+        </div>
+        <div class="list-item-icons{{#if @root.isPlayMode}} skinny-icons {{/if}}">
+            {{#if @root.isEditMode}}
+                <a data-action="editSkill"
+                   data-tooltip="SR5.Edit">
+                    <i class="fas fa-pen-to-square"></i>
+                </a>
+                <a data-action="removeSkill"
+                   data-tooltip="SR5.DeleteSkill">
+                    <i class="fas fa-trash"></i>
+                </a>
+            {{else if skill.link}}
+                <a data-action="openSource" data-source="{{skill.link}}" data-tooltip="SR5.OpenSource">
+                    <i class="fas fa-file"></i>
+                </a>
+            {{/if}}
+        </div>
+    </div>
+    <div class="list-item-desc">
+        <div class="list-item-properties">
+            <label>{{localizeOb skill.attribute @root.config.attributes}}</label>
+            {{#if skill.group}}
+                <label>{{skill.group}}</label>
+            {{/if}}
+            {{#if skill.canDefault}}
+                <label>{{localize "SR5.CanDefault"}}</label>
+            {{/if}}
+        </div>
+        <div class="description-body">
+            {{{objValue (objValue @root.expandedSkills id) 'html'}}}
+        </div>
+    </div>
+</div>

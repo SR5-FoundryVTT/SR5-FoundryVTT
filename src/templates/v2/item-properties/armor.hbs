@@ -1,0 +1,36 @@
+{{#if item.system.armor.value}}
+    <label>
+        <i data-tooltip="SR5.Armor.label" class="fas fa-shield-halved"></i>
+        {{#if item.system.armor.mod}}+{{/if}}{{item.system.armor.value}}
+    </label>
+{{/if}}
+{{#if item.system.armor.acid}}
+    <label>
+        <i data-tooltip="SR5.ElementAcid" class="{{elementIcon 'acid'}}"></i>
+        {{item.system.armor.acid}}
+    </label>
+{{/if}}
+{{#if item.system.armor.cold}}
+    <label>
+        <i data-tooltip="SR5.ElementCold" class="{{elementIcon 'cold'}}"></i>
+        {{item.system.armor.cold}}
+    </label>
+{{/if}}
+{{#if item.system.armor.fire}}
+    <label>
+        <i data-tooltip="SR5.ElementFire" class="{{elementIcon 'fire'}}"></i>
+        {{item.system.armor.fire}}
+    </label>
+{{/if}}
+{{#if item.system.armor.electricity}}
+    <label>
+        <i data-tooltip="SR5.ElementElectricity" class="{{elementIcon 'electricity'}}"></i>
+        {{item.system.armor.electricity}}
+    </label>
+{{/if}}
+{{#if item.system.armor.radiation}}
+    <label>
+        <i data-tooltip="SR5.ElementRadiation" class="{{elementIcon 'radiation'}}"></i>
+        {{item.system.armor.radiation}}
+    </label>
+{{/if}}

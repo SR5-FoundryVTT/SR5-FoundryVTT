@@ -1,0 +1,14 @@
+<div class="list-item list-item-header {{cssClass}}">
+    <div class="list-item-start">
+        <label>
+            {{localize label}}
+        </label>
+    </div>
+
+    <div class="list-item-icons {{#if @root.isPlayMode}} skinny-icons {{/if}}">
+        {{#if @root.isPlayMode}}
+            <label>{{@root.program_count}}</label>
+        {{/if}}
+        {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type }}
+    </div>
+</div>

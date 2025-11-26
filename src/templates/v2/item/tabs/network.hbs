@@ -1,0 +1,14 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/slaved_icon/header.hbs'
+            label='SR5.Labels.ActorSheet.Icons'
+            type='slaved_icon'
+            cssClass="header-for-scrollable"
+        }}
+        <div class="scrollable">
+            {{#each @root.slaves}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/slaved_icon/item.hbs' item=this }}
+            {{/each}}
+        </div>
+    </div>
+</section>

@@ -1,0 +1,24 @@
+<div class="list-item list-item-header{{#if @root.isPlayMode}} collapsible-header{{/if}}"
+    {{#unless @root.isEditMode}}
+     data-action="toggleExpanded"
+     data-item-type="{{type}}"
+    {{/unless}}>
+    <div class="list-item-start{{#unless isOpen}} label-collapsed{{/unless}}">
+        <label>
+            {{localize label}}
+        </label>
+    </div>
+
+    <div class="list-item-col mod-category-col">
+        <label>{{localize "SR5.ModificationCategory"}}</label>
+    </div>
+
+    <div class="list-item-col slots-col">
+        <label>{{localize "SR5.ModificationSlots"}}</label>
+    </div>
+
+    <div class="list-item-icons">
+        {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type }}
+        {{> "systems/shadowrun5e/dist/templates/v2/list-items/toggle-expand-icon.hbs" isOpen=isOpen }}
+    </div>
+</div>

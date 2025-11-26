@@ -1,6 +1,5 @@
 {
   "_id": "7CsaOjwsF1qEd9go",
-  "_key": "!items!7CsaOjwsF1qEd9go",
   "folder": null,
   "name": "Probe",
   "type": "action",
@@ -27,7 +26,6 @@
         "base": 0,
         "mod": [],
         "override": null,
-        "temp": 0,
         "attribute": "attack",
         "base_formula_operator": "add"
       },
@@ -57,7 +55,6 @@
         "base": 0,
         "mod": [],
         "override": null,
-        "temp": 0,
         "attribute": "",
         "base_formula_operator": "add",
         "type": {
@@ -73,7 +70,6 @@
           "base": 0,
           "mod": [],
           "override": null,
-          "temp": 0,
           "attribute": "",
           "base_formula_operator": "add"
         },
@@ -118,5 +114,6 @@
     }
   },
   "effects": [],
-  "flags": {}
+  "flags": {},
+  "_key": "!items!7CsaOjwsF1qEd9go"
 }

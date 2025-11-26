@@ -1,0 +1,59 @@
+{{#if item.system.action}}
+    {{#if item.system.action.type}}
+        {{#unless (eq item.type 'weapon')}}
+            {{#unless (or (eq item.system.action.type 'varies') (eq item.system.action.type 'none'))}}
+                <label>{{localizeOb item.system.action.type @root.config.actionTypes}}</label>
+            {{/unless}}
+        {{/unless}}
+    {{/if}}
+    <label>
+        {{#if item.system.action.skill}}
+                {{#if @root.actor.system.skills.active}}
+                    {{localizeSkill (objValue @root.actor.system.skills.active item.system.action.skill)}}
+                {{else}}
+                    {{localizeOb item.system.action.skill @root.config.activeSkills}}
+                {{/if}}&nbsp;+&nbsp;{{localizeOb item.system.action.attribute @root.config.attributes}}
+        {{else if item.system.action.attribute2}}
+            {{localizeOb item.system.action.attribute @root.config.attributes}}&nbsp;+&nbsp;{{localizeOb item.system.action.attribute2 @root.config.attributes}}
+        {{else if item.system.action.attribute}}
+            {{localizeOb item.system.action.attribute @root.config.attributes}}
+        {{/if}}
+        {{#if item.system.action.mod}}
+            <span data-tooltip="SR5.ItemMod">{{numberFormat item.system.action.mod sign=true}}</span>
+        {{/if}}
+        {{#if (or item.system.action.limit.value item.system.action.limit.attribute)}}
+            <span data-tooltip="{{#if (eq item.type 'weapon')}}{{localize "SR5.Accuracy"}}{{else}}{{localize "SR5.Limit"}}{{/if}}">
+                [
+                {{#if item.system.action.limit.attribute}}{{localizeOb item.system.action.limit.attribute @root.config.limits}}{{/if}}
+                {{#if (and item.system.action.limit.value item.system.action.limit.attribute)}}+{{/if}}
+                {{#if item.system.action.limit.value}}{{item.system.action.limit.value}}{{/if}}
+                ]
+            </span>
+        {{/if}}
+    </label>
+    {{#if (or item.system.action.damage.value item.system.action.damage.attribute)}}
+        <label>
+            {{localize "SR5.DV"}}
+            {{#if item.system.action.damage.attribute}}{{localizeOb item.system.action.damage.attribute @root.config.attributes}}{{/if}}
+            {{#if (and item.system.action.damage.value item.system.action.damage.attribute)}}
+                {{objValue @root.config.actionDamageFormulaOperators item.system.action.damage.base_formula_operator}}
+            {{/if}}
+            {{#if item.system.action.damage.value}}{{item.system.action.damage.value}}{{/if}}
+            {{damageAbbreviation item.system.action.damage.type.value}}
+            {{#if item.system.action.damage.element.value}}
+                <i data-tooltip="{{localizeOb item.system.action.damage.element.value @root.config.elementTypes}}"
+                   class="{{elementIcon item.system.action.damage.element.value}}"></i>
+            {{/if}}
+        </label>
+        {{#if (or item.system.action.damage.ap.value item.system.action.ap.attribute)}}
+            <label>
+                {{localize "SR5.AP"}}
+                {{#if item.system.action.damage.ap.attribute}}{{localizeOb item.system.action.damage.ap.attribute @root.config.attributes}}{{/if}}
+                {{#if (and item.system.action.damage.ap.value item.system.action.damage.ap.attribute)}}
+                    {{objValue @root.config.actionDamageFormulaOperators item.system.action.damage.ap.base_formula_operator}}
+                {{/if}}
+                {{#if item.system.action.damage.ap.value}}{{item.system.action.damage.ap.value}}{{/if}}
+            </label>
+        {{/if}}
+    {{/if}}
+{{/if}}

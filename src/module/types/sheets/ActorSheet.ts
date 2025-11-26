@@ -1,29 +1,6 @@
 declare namespace Shadowrun {
-    export interface SR5ActorSheetData {
-        config: typeof SR5CONFIG
-        system: Actor.Implementation['system']
-        filters: SR5SheetFilters
-        isCharacter: boolean
-        isSpirit: boolean
-        isCritter: boolean
-        isVehicle: boolean
-        awakened: boolean
-        emerged: boolean
-        woundTolerance: number
-        vehicle: SR5VehicleSheetData
-        hasSkills: boolean
-        canAlterSpecial: boolean
-        hasFullDefense: boolean
-        effects: any[]
-    }
 
     type AllEnabledEffectsSheetData = any[];
-
-    export interface SR5SheetFilters {
-        skills: string
-        showUntrainedSkills
-    }
-
 
     // Describe a targeted FoundryVTT document.
     export interface TargetedDocument {
@@ -56,32 +33,4 @@ declare namespace Shadowrun {
         marks: number // The amount of marks placed.
         markId: string | null // A foundryvtt uuid.
     }
-
-    /**
-     * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
-     */
-    interface SheetItemData {
-        type: string,
-        name: string,
-        data: Item.Implementation['system']
-        system: Item.Implementation['system']
-        properties: any,
-        description: any
-        isBroken?: boolean
-    }
-
-    interface InventorySheetDataByType {
-        type: string;
-        label: string;
-        isOpen: boolean;
-        items: SheetItemData[];
-    }
-
-    interface InventorySheetData {
-        name: string,
-        label: string,
-        types: Record<string, InventorySheetDataByType>
-    }
-
-    type InventoriesSheetData = Record<string, InventorySheetData>;
 }

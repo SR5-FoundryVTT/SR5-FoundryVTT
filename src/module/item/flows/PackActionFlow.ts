@@ -95,17 +95,65 @@ export const PackActionFlow = {
         // TODO: Use predefined ids instead of names...
         // TODO: use replaceAll instead, which needs an change to es2021 at least for the ts compiler
         actionName = this.packDocumentName(actionName).toLocaleLowerCase();
-        // eslint-disable-next-line
+
         const packEntry = pack.index.find(data => this.packDocumentName(data.name) === actionName);
         if (!packEntry) return undefined;
 
         const item = await pack.getDocument(packEntry._id) as unknown as SR5Item;
-        if (!item || item.type !== 'action') return undefined;
+        if (item?.type !== 'action') return undefined;
 
         console.debug(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, item);
         return item;
     },
-    
+    /**
+     * Collect all actions of an actor.
+     *
+     * @param actor The actor to collect actions from.
+     * @return List of action items the actor has.
+     */
+    getActions(actor: SR5Actor): SR5Item<'action'>[] {
+        const actions = actor.itemsForType.get('action') as SR5Item<'action'>[];
+        // Normally all item types should exist, though during actor creation this might not be the case.
+        if (!actions) {
+            return [];
+        }
+        return actions;
+    },
+
+    /**
+     * Collect all actions of an actor for their sheet
+     *
+     * @param actor The actor to collect actions from.
+     * @returns Combined list of pack and actor actions.
+     */
+    async getActorSheetActions(actor: SR5Actor) {
+        const packName = this.getGeneralActionsPackName();
+        // Collect all sources for matrix actions.
+        const packActions = await this.getPackActions(packName);
+        const filteredPackActions = packActions.filter(action => {
+            const testName = action.getAction()?.test ?? '';
+            if (['DronePerceptionTest', 'DroneInfiltrationTest', 'PilotVehicleTest'].includes(testName)) {
+                return actor.isType('vehicle');
+            }
+            if (testName === 'DrainTest') {
+                return actor.isAwakened();
+            }
+            if (testName === 'FadeTest') {
+                return actor.isEmerged();
+            }
+            if (['NaturalRecoveryPhysicalTest', 'NaturalRecoveryStunTest'].includes(testName)) {
+                return false;
+            }
+            // hide these rolls on some sheets
+            if (['Composure', 'Lift Carry', 'Memory', 'Judge Intentions'].includes(action.name)) {
+                return !actor.isType('vehicle', 'ic', 'sprite');
+            }
+            return true;
+        })
+        const actorActions = this.getActions(actor);
+        return [...filteredPackActions, ...actorActions];
+    },
+
     /**
      * Collect all matrix actions of an actor.
      *

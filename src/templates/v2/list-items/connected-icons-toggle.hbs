@@ -1,0 +1,5 @@
+{{#if (hasConnectedIcons this)}}
+    <a data-action="toggleConnectedMatrixIcons">
+        <i class="{{#ifgt this.icons.length 0}}fas fa-square-chevron-down{{else}}fas fa-square-chevron-right{{/ifgt}}"></i>
+    </a>
+{{/if}}

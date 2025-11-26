@@ -1,0 +1,11 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <div class="scrollable">
+            {{#if @root.isEditMode}}
+                {{formInput skillFields.description name=(concat skill_name '.description') value=skill.description rootId=@root.rootId}}
+            {{else}}
+                {{{skill.description}}}
+            {{/if}}
+        </div>
+    </div>
+</section>

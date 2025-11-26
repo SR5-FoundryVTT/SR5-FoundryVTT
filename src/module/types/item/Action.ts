@@ -2,7 +2,8 @@ import { SR5 } from "@/module/config";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { ModifiableField } from "../fields/ModifiableField";
 import { ModifiableValueLinked, BaseValuePair, ModList } from "../template/Base";
-const { SchemaField, NumberField, BooleanField, ArrayField, StringField } = foundry.data.fields;
+import { TagifyAltField } from '@/module/types/fields/TagifyAltField';
+const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const ResultActionData = () => ({
     action: new StringField({
@@ -53,19 +54,19 @@ export const DamageData = () => ({
         base: new StringField({
             blank: true,
             required: true,
-            choices: SR5.damageTypes
+            choices: SR5.damageTypes,
         }),
         value: new StringField({
             blank: true,
             required: true,
-            choices: SR5.damageTypes
+            choices: SR5.damageTypes,
         }),
     }),
     element: new SchemaField({
         base: new StringField({
             blank: true,
             required: true,
-            choices: SR5.elementTypes
+            choices: SR5.elementTypes,
         }),
         value: new StringField({
             blank: true,
@@ -75,8 +76,8 @@ export const DamageData = () => ({
     }),
     ap: new ModifiableField(ModifiableValueLinked()),
     biofeedback: new StringField({
-        required: true,
         blank: true,
+        required: true,
         choices: SR5.biofeedbackOptions,
     }),
     attribute: new StringField({
@@ -109,14 +110,14 @@ export const ActionRollData = (
 ) => ({
     ...MinimalActionData(),
     test: new StringField({ required: true, initial: test }),
-    type: new StringField({ required: true, initial: type }),
+    type: new StringField({ required: true, initial: type, blank: true, choices: SR5.actionTypes }),
     category: new SchemaField(ActionCategory()),
-    categories: new ArrayField(new StringField({ required: true })),
+    categories: new TagifyAltField(new StringField({ required: true })),
     spec: new BooleanField(),
     mod_description: new StringField({ required: true }),
     threshold: new SchemaField(BaseValuePair()),
     extended: new BooleanField({ initial: false }),
-    modifiers: new ArrayField(new StringField({ required: true })),
+    modifiers: new TagifyAltField(new StringField({ required: true })),
     damage: new ModifiableField(DamageData()),
     opposed: new SchemaField({
         test: new StringField({ required: true, initial: opposedTest }),

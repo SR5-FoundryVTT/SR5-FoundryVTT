@@ -1,0 +1,55 @@
+{{!-- item and id are expected to be license objects and index, respectively --}}
+<div class="list-item-container">
+    <div class="list-item">
+        <div class="list-item-start">
+            {{#if @root.isPlayMode}}
+                <label>{{item.name}}</label>
+            {{else}}
+                <input
+                    type="text"
+                    name="system.licenses.{{id}}.name"
+                    value="{{item.name}}"
+                    placeholder=""
+                    {{#if @root.isPlayMode}}disabled{{/if}}
+                />
+            {{/if}}
+        </div>
+        <div class="list-item-col">
+            {{#if @root.isPlayMode}}
+                <label>{{item.rtg}}</label>
+            {{else}}
+                <input size="3"
+                       type="text"
+                       name="system.licenses.{{id}}.rtg"
+                       value="{{item.rtg}}"
+                       data-dtype="Number"
+                       placeholder="0"
+                       {{#if @root.isPlayMode}}disabled{{/if}}
+                />
+            {{/if}}
+        </div>
+        <div class="list-item-col">
+            {{#if @root.isPlayMode}}
+                    <label>{{item.description}}</label>
+            {{else}}
+                <input
+                    type="text"
+                    name="system.licenses.{{id}}.description"
+                    value="{{item.description}}"
+                    placeholder='{{localize "SR5.Description"}}'
+                    {{#if @root.isPlayMode}}disabled{{/if}}
+                />
+            {{/if}}
+        </div>
+        {{#if @root.isEditMode}}
+        <div class="list-item-icons">
+            <a data-action="deleteLicense" data-tooltip="SR5.DeleteLicense" data-index="{{id}}">
+                <i class="fas fa-trash"></i>
+            </a>
+        </div>
+        {{/if}}
+    </div>
+    <div class="list-item-desc">
+        {{item.description}}
+    </div>
+</div>

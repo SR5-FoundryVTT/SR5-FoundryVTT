@@ -55,12 +55,13 @@ export class OverwatchScoreTracker extends foundry.appv1.api.Application {
     }
 
     // returns the actor that this event is acting on
-    _getActorFromEvent(event) {
-        const uuid = $(event.currentTarget).closest('.list-item').data('uuid');
-        return fromUuidSync(uuid) as SR5Actor;
+    _getActorFromEvent(event: Event): SR5Actor | null {
+        const currentTarget = event.currentTarget as HTMLElement;
+        const uuid = $(currentTarget).closest<HTMLElement>('.list-item').data('uuid');
+        return fromUuidSync(uuid) as SR5Actor | null;
     }
 
-    _onAddActor(event) {
+    _onAddActor(event: Event) {
         event.preventDefault();
 
         const tokens = Helpers.getControlledTokens();

@@ -1,6 +1,5 @@
 {
   "_id": "RfjfXuY8b3KhE4b8",
-  "_key": "!items!RfjfXuY8b3KhE4b8",
   "folder": null,
   "name": "Killer",
   "type": "action",
@@ -27,7 +26,6 @@
         "base": 0,
         "mod": [],
         "override": null,
-        "temp": 0,
         "attribute": "attack",
         "base_formula_operator": "add"
       },
@@ -58,7 +56,6 @@
         "base": 0,
         "mod": [],
         "override": null,
-        "temp": 0,
         "attribute": "attack",
         "base_formula_operator": "add",
         "type": {
@@ -74,7 +71,6 @@
           "base": 0,
           "mod": [],
           "override": null,
-          "temp": 0,
           "attribute": "",
           "base_formula_operator": "add"
         },
@@ -119,5 +115,6 @@
     }
   },
   "effects": [],
-  "flags": {}
+  "flags": {},
+  "_key": "!items!RfjfXuY8b3KhE4b8"
 }

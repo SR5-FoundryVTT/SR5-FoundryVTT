@@ -1,0 +1,9 @@
+{{#if (or @root.isEditMode itemType.ritual.length)}}
+    {{> 'systems/shadowrun5e/dist/templates/v2/list-items/ritual/header.hbs'
+        label='SR5.Labels.ActorSheet.Rituals'
+        type='ritual'
+    }}
+    {{#each itemType.ritual}}
+        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/ritual/item.hbs' item=this }}
+    {{/each}}
+{{/if}}

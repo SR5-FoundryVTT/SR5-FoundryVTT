@@ -1,0 +1,23 @@
+<div class="list-item list-item-header {{cssClass}} {{#if @root.isPlayMode}} collapsible-header{{/if}}"
+     {{#unless @root.isEditMode}}
+     data-action="toggleExpanded"
+     data-item-type="{{type}}"
+     {{/unless}}>
+    <div class="list-item-start{{#unless isOpen}} label-collapsed{{/unless}}">
+        <label>
+            {{#if label}}
+                {{localize label}}
+            {{else}}
+                {{localize "SR5.ItemTypes.Ammo"}}
+            {{/if}}
+        </label>
+    </div>
+
+    <div class="list-item-col qty-input-col">
+        <label>{{localize "SR5.Qty"}}</label>
+    </div>
+
+    <div class="list-item-icons">
+        {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type }}
+    </div>
+</div>

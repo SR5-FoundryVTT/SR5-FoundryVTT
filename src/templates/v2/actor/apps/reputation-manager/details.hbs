@@ -1,0 +1,53 @@
+<div class="fill-container">
+    <div class="list-item">
+        <div class="list-item-start">
+            <label>{{localize "SR5.StreetCred"}}</label>
+        </div>
+        <div class="list-item-col">
+            <a type="button" data-action="reduce" data-type="street_cred">-1</a>
+            &nbsp;
+            <input class="short midd center mod-input" type="number" name="incoming-street-cred" value={{streetCredModifier}} />
+            &nbsp;
+            <a data-action="increase" data-type="street_cred">+1</a>
+        </div>
+        <div class="list-item-col">
+            <label class="label {{#if (gt streetCredModifier 0)}} positive {{else if (lt streetCredModifier 0)}} negative {{/if}}">
+                {{streetCred}}
+            </label>
+        </div>
+    </div>
+    <div class="list-item">
+        <div class="list-item-start">
+            <label>{{localize "SR5.Notoriety"}}</label>
+        </div>
+        <div class="list-item-col">
+            <a data-action="reduce" data-type="notoriety">-1</a>
+            &nbsp;
+            <input class="short midd center mod-input" type="number" name="incoming-notoriety" value={{notorietyModifier}} />
+            &nbsp;
+            <a data-action="increase" data-type="notoriety">+1</a>
+        </div>
+        <div class="list-item-col">
+            <label class="label {{#if (gt notorietyModifier 0)}} positive {{else if (lt notorietyModifier 0)}} negative {{/if}}">
+                {{notoriety}}
+            </label>
+        </div>
+    </div>
+    <div class="list-item">
+        <div class="list-item-start">
+            <label>{{localize "SR5.PublicAwareness"}}</label>
+        </div>
+        <div class="list-item-col">
+            <a data-action="reduce" data-type="public_awareness">-1</a>
+            &nbsp;
+            <input class="short midd center mod-input" type="number" name="incoming-public-awareness" value={{publicAwarenessModifier}} />
+            &nbsp;
+            <a data-action="increase" data-type="public_awareness">+1</a>
+        </div>
+        <div class="list-item-col">
+            <label class="label {{#if (gt publicAwarenessModifier 0)}} positive {{else if (lt publicAwarenessModifier 0)}} negative {{/if}}">
+                {{publicAwareness}}
+            </label>
+        </div>
+    </div>
+</div>

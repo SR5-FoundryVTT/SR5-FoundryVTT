@@ -97,15 +97,8 @@ export class MatrixPrep {
         const { matrix, attributes, limits } = system;
 
         // add matrix attributes to both limits and attributes as hidden entries
-        Object.keys(SR5.matrixAttributes).forEach((attributeName) => {
-            if (!matrix.hasOwnProperty(attributeName)) {
-                return console.error(`SR5Actor matrix preparation failed due to missing matrix attributes`);
-            }
-
+        for (const attributeName of Object.keys(SR5.matrixAttributes)) {
             const attribute = matrix[attributeName];
-            // Helpers.calcTotal(matrix[attributeName]);
-            // const label = SR5.matrixAttributes[attributeName];
-            // const { value, base, mod } = matrix[attributeName];
             AttributesPrep.prepareAttribute(attributeName, attribute);
             const { value, base, mod, label } = attribute;
             const hidden = true;
@@ -127,17 +120,17 @@ export class MatrixPrep {
                 label,
                 hidden,
             };
-        });
+        }
     }
 
     static prepareMatrixAttributesForDevice(system: Actor.SystemOfType<'vehicle'>, rating?: number) {
         const { matrix } = system;
         rating = rating ?? matrix.rating;
-        const matrixAttributes = ['firewall', 'data_processing'];
+        const matrixAttributes = ['firewall', 'data_processing'] as const;
         matrixAttributes.forEach((attribute) => {
             matrix[attribute].base = rating;
         });
-        [...matrixAttributes, 'sleaze', 'attack'].forEach((attId) => {
+        ([...matrixAttributes, 'sleaze', 'attack'] as const).forEach((attId) => {
             Helpers.calcTotal(matrix[attId]);
         });
     }

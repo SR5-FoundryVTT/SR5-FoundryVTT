@@ -1,42 +1,49 @@
-import { SituationModifier } from '../../rules/modifiers/SituationModifier';
-import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
-import { Helpers } from "../../helpers";
-import { SR5Item } from "../../item/SR5Item";
-import { onManageActiveEffect, onManageItemActiveEffect, prepareSortedItemEffects, prepareSortedEffects } from "../../effects";
-import { SR5 } from "../../config";
-import { SkillEditSheet } from "../../apps/skills/SkillEditSheet";
-import { SR5Actor } from "../SR5Actor";
-import { KnowledgeSkillEditSheet } from "../../apps/skills/KnowledgeSkillEditSheet";
-import { LanguageSkillEditSheet } from "../../apps/skills/LanguageSkillEditSheet";
-import { MoveInventoryDialog } from "../../apps/dialogs/MoveInventoryDialog";
-import SR5SheetFilters = Shadowrun.SR5SheetFilters;
-import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
-import MatrixAttribute = Shadowrun.MatrixAttribute;
-import { LinksHelpers } from '../../utils/links';
+import { DeepPartial } from 'fvtt-types/utils';
+
+import { SR5 } from '../../config';
+import { Helpers } from '../../helpers';
+import { SR5Actor } from '../SR5Actor';
+import { SR5Item } from '../../item/SR5Item';
 import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
-import { parseDropData } from '../../utils/sheets';
+
+import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
+import { MoveInventoryDialog } from '../../apps/dialogs/MoveInventoryDialog';
+import { InventoryRenameApp } from '@/module/apps/actor/InventoryRenameApp';
+import { SkillEditSheet } from '@/module/apps/skills/SkillEditSheet';
+import { KnowledgeSkillEditSheet } from '@/module/apps/skills/KnowledgeSkillEditSheet';
+import { LanguageSkillEditSheet } from '@/module/apps/skills/LanguageSkillEditSheet';
+
+import { SituationModifier } from '../../rules/modifiers/SituationModifier';
+import { prepareSortedEffects, prepareSortedItemEffects } from '../../effects';
+
+import { LinksHelpers } from '../../utils/links';
+
 import { InventoryType } from 'src/module/types/actor/Common';
 import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
-import { DescriptionType } from 'src/module/types/template/Description';
-import { ChatData } from 'src/module/item/ChatData';
-import { ActorMarksFlow } from '../flows/ActorMarksFlow';
 
-/**
- * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
- */
-export interface SheetItemData<SubType extends Item.ConfiguredSubType = Item.ConfiguredSubType> {
-    type: string,
-    name: string,
-    system: SR5Item<SubType>['system'],
-    properties: string[],
-    description: DescriptionType
-}
+import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
+import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
+import { SheetFlow } from '@/module/flows/SheetFlow';
+import { PackActionFlow } from '@/module/item/flows/PackActionFlow';
+import MatrixAttribute = Shadowrun.MatrixAttribute;
+import ActorSheetV2 = foundry.applications.sheets.ActorSheetV2;
+import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
+
+const { TextEditor } = foundry.applications.ux;
+const { fromUuid, fromUuidSync } = foundry.utils;
 
 export interface InventorySheetDataByType {
     type: string;
     label: string;
     isOpen: boolean;
-    items: SheetItemData[];
+    items: SR5Item[];
+}
+
+// Meant for sheet display only. Doesn't use the SR5Item.getChatData approach to avoid changing system data.
+type sheetAction = {
+    name: string,
+    description: string,
+    action: SR5Item
 }
 
 export interface InventorySheetData {
@@ -47,10 +54,71 @@ export interface InventorySheetData {
 
 export type InventoriesSheetData = Record<string, InventorySheetData>;
 
-// Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
-// Should multiple instances be open, Foundry will cause cross talk between skills and actors,
-// when opened in succession, causing SkillEditSheet to wrongfully overwrite the wrong system.
-let globalSkillAppId: number = -1;
+export interface SR5SheetFilters {
+    skills: string
+    showUntrainedSkills: boolean
+}
+
+export interface SR5ActorSheetData extends ActorSheetV2.RenderContext, SR5ApplicationMixinTypes.RenderContext {
+    actor: SR5Actor;
+    config: typeof SR5CONFIG;
+    system: SR5Actor['system'];
+
+    // Sheet filters
+    filters: SR5SheetFilters;
+
+    // Actor type flags
+    isCharacter: boolean;
+    isSpirit: boolean;
+    isCritter: boolean;
+    isVehicle: boolean;
+    awakened: boolean;
+    emerged: boolean;
+    canAlterSpecial: boolean;
+    hasSkills: boolean;
+    hasFullDefense: boolean;
+    woundTolerance: number;
+
+    // Effects
+    effects: SR5ActiveEffect[];
+    itemEffects: SR5ActiveEffect[];
+
+    // Items & Inventory
+    handledItemTypes: string[];
+    itemType: Record<string, SR5Item[]>;
+    inventories: InventoriesSheetData;
+    inventory: InventorySheetData;
+    hasInventory: boolean;
+    selectedInventory: string;
+    spells: Record<string, SR5Item[]>;
+    program_count: string;
+
+    // UI
+    tab: SR5Tab;
+    contentVisibility: Record<string, boolean>;
+    bindings: Record<string, string>;
+    expandedSkills: Record<string, { html: string }>;
+    canRollInitiative: boolean;
+    biographyHTML?: string;
+
+    // Actions & Favorites
+    actions?: sheetAction[];
+    favorites?: SR5Item[];
+
+    // Initiative
+    initiativePerception: {
+        value: string;
+        options: { label: string; value: string }[];
+    };
+
+    // Situation Modifiers
+    situationModifiers: {
+        category: string;
+        label: string;
+        value: number;
+        hidden: boolean;
+    }[];
+}
 
 
 /**
@@ -71,7 +139,7 @@ const sortByName = (a: { name: string }, b: { name: string }) => {
  * @param b Any type of item data
  * @returns
  */
-const sortByEquipped = (a: SheetItemData, b: SheetItemData) => {
+const sortByEquipped = (a: SR5Item, b: SR5Item) => {
     const leftEquipped = a.system?.technology?.equipped;
     const rightEquipped = b.system?.technology?.equipped;
 
@@ -87,7 +155,7 @@ const sortByEquipped = (a: SheetItemData, b: SheetItemData) => {
  * @param b A quality item data
  * @returns
  */
-const sortByQuality = (a: SheetItemData<'quality'>, b: SheetItemData<'quality'>) => {
+const sortByQuality = (a: SR5Item<'quality'>, b: SR5Item<'quality'>) => {
     if (a.system.type === 'positive' && b.system.type === 'negative') return -1;
     if (a.system.type === 'negative' && b.system.type === 'positive') return 1;
     return sortByName(a, b);
@@ -97,39 +165,50 @@ export interface SR5BaseSheetDelays {
     skills: ReturnType<typeof setTimeout> | null;
 }
 
-
-
 /**
  * This class should not be used directly but be extended for each actor type.
  *
  */
-export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
-    // What document description is shown on sheet. Allow displaying multiple descriptions at the same time.
-    _shownDesc: string[] = [];
+export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> extends SR5ApplicationMixin(ActorSheetV2)<T> {
     // If something needs filtering, store those filters here.
     _filters: SR5SheetFilters = {
         skills: '', // filter based on user input and skill name/label.
         showUntrainedSkills: true, // filter based on pool size.
     };
-    // Used together with _filters to delay textinput
-    _delays: SR5BaseSheetDelays = {
-        skills: null
-    }
-    // Used to store the scroll position on rerender. Needed as Foundry fully re-renders on Document update.
-    _scroll!: string;
     // Indicate if specific sections on sheet should be opened or closed.
     _inventoryOpenClose: Record<string, boolean> = {};
-    _connectedIconsOpenClose: Record<string, boolean> = {};
 
     // Store the currently selected inventory.
     selectedInventory: string;
 
-    constructor(object: SR5Actor, options?: Partial<ActorSheet.Options> | undefined) {
-        super(object, options);
+    private readonly expandedSkills = new Set<string>();
+
+    constructor(...args: any) {
+        super(...args);
 
         // Preselect default inventory.
         this.selectedInventory = this.actor.defaultInventory.name;
         this._setInventoryVisibility(true);
+
+        // List to when a combatant is created for this actor to enable the roll initiative button
+        Hooks.on("createCombatant", this._updateInitiativeButton.bind(this));
+
+        // Listen to when a combatant is deleted for this actor to disable the roll initiative button
+        Hooks.on("deleteCombatant", this._updateInitiativeButton.bind(this));
+    }
+
+    private _updateInitiativeButton() {
+        const inCombat = this.actor.inCombat;
+        const selector = this.element?.querySelector<HTMLElement>('button#roll-init-button');
+        if (selector) {
+            if (inCombat) {
+                selector.removeAttribute('disabled');
+                selector.dataset.tooltip = game.i18n.localize("SR5.Tooltips.Actor.RollInitiative");
+            } else {
+                selector.setAttribute('disabled', '');
+                selector.dataset.tooltip = game.i18n.localize("SR5.Tooltips.Actor.NoCombatant");
+            }
+        }
     }
 
     /**
@@ -139,7 +218,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      *
      * @return A string of item types from the template.json Item section.
      */
-    getHandledItemTypes(): string[] {
+    getHandledItemTypes(): Item.ConfiguredSubType[] {
         return ['action'];
     }
 
@@ -153,7 +232,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      *
      * @return An array of item types from the template.json Item section.
      */
-    getInventoryItemTypes(): string[] {
+    getInventoryItemTypes():Item.ConfiguredSubType[] {
         return [];
     }
 
@@ -162,7 +241,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      *
      * This includes dropping them onto this actor.
      */
-    getForbiddenItemTypes(): string[] {
+    getForbiddenItemTypes(): Item.ConfiguredSubType[] {
         return [];
     }
 
@@ -170,54 +249,119 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      * Extend and override the default options used by the 5e Actor Sheet
      * @returns {Object}
      */
-    static override get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
-            classes: ['sr5', 'sheet', 'actor'],
-            width: 930,
-            height: 690,
-            tabs: [
-                {
-                    navSelector: '.tabs[data-group="primary"]',
-                    contentSelector: '.tabsbody[data-group="primary"]',
-                    initial: 'skills',
-                },
-            ] as {navSelector: string, contentSelector: string, initial: string}[],
-        });
+    static override DEFAULT_OPTIONS: DeepPartial<SR5ApplicationMixinTypes.Configuration> = {
+        classes: ['actor', 'named-sheet'],
+        position: {
+            width: 700,
+            height: 600,
+        },
+        actions: {
+            rollAttribute: SR5BaseActorSheet.#rollAttribute,
+            rollItem: SR5BaseActorSheet.#rollItem,
+            rollSkill: SR5BaseActorSheet.#rollSkill,
+            editSkill: SR5BaseActorSheet.#editSkill,
+            rollSkillSpecialization: SR5BaseActorSheet.#rollSkillSpec,
+            openSkillDescription: SR5BaseActorSheet.#toggleSkillDescription,
+            filterTrainedSkills: SR5BaseActorSheet.#filterUntrainedSkills,
+            addKnowledgeSkill: SR5BaseActorSheet.#createKnowledgeSkill,
+            addLanguageSkill: SR5BaseActorSheet.#createLanguageSkill,
+            addActiveSkill: SR5BaseActorSheet.#createActiveSkill,
+            removeKnowledgeSkill: SR5BaseActorSheet.#deleteKnowledgeSkill,
+            removeLanguageSkill: SR5BaseActorSheet.#deleteLanguageSkill,
+            removeActiveSkill: SR5BaseActorSheet.#deleteActiveSkill,
+
+            resetActorRunData: SR5BaseActorSheet.#resetActorRunData,
+
+            addEffect: SR5BaseActorSheet.#createEffect,
+            editEffect: SR5BaseActorSheet.#editEffect,
+            deleteEffect: SR5BaseActorSheet.#deleteEffect,
+            toggleEffect: SR5BaseActorSheet.#toggleEffect,
+
+            addItem: SR5BaseActorSheet.#createItem,
+            editItem: SR5BaseActorSheet.#editItem,
+            deleteItem: SR5BaseActorSheet.#deleteItem,
+            favoriteItem: SR5BaseActorSheet.#favoriteItem,
+
+            renameInventory: SR5BaseActorSheet.#renameInventory,
+            removeInventory: SR5BaseActorSheet.#removeInventory,
+            createInventory: SR5BaseActorSheet.#createInventory,
+
+            addItemQty: SR5BaseActorSheet.#addItemQty,
+            removeItemQty: SR5BaseActorSheet.#removeItemQty,
+            equipItem: SR5BaseActorSheet.#onToggleEquippedItem,
+            toggleItemWireless: SR5BaseActorSheet.#toggleWirelessState,
+            toggleExpanded: SR5BaseActorSheet.#toggleInventoryVisibility,
+            toggleItemVisible: SR5BaseActorSheet.#toggleItemVisible,
+
+            weaponFullReload: SR5BaseActorSheet.#reloadAmmo,
+            weaponPartialReload: SR5BaseActorSheet.#partialReloadAmmo,
+
+            toggleInitiativeBlitz: SR5BaseActorSheet.#toggleInitiativeBlitz,
+            rollInitiative: SR5BaseActorSheet.#rollInitiative,
+
+            modifyConditionMonitor: SR5BaseActorSheet.#modifyConditionMonitor,
+            clearConditionMonitor: SR5BaseActorSheet.#clearConditionMonitor,
+            rollConditionMonitor: SR5BaseActorSheet.#rollConditionMonitor,
+        },
+        filters: [{ inputSelector: '#filter-active-skills', contentSelector: '', callback: SR5BaseActorSheet.#handleFilterActiveSkills }],
     }
 
-    /**
-     * Decide which template to render both for actor types and user permissions.
-     *
-     *
-     * This could also be done within individual ActorType sheets, however, for ease of use, it's
-     * centralized here.
-     *
-     * @override
-     */
-    override get template() {
-        const path = 'systems/shadowrun5e/dist/templates';
+    static override TABS = {
+        primary: {
+            initial: 'actions',
+            tabs: [
+                { id: 'actions', label: 'SR5.Tabs.Actor.Actions', cssClass: '' },
+                { id: 'effects', label: 'SR5.Tabs.Actor.Effects', cssClass: '' },
+                { id: 'description', label: '', icon: 'far fa-info', tooltip: 'SR5.Tooltips.Actor.Description', cssClass: 'skinny' },
+                { id: 'misc', label: '', icon: 'fas fa-gear', tooltip: 'SR5.Tooltips.Actor.MiscConfig', cssClass: 'skinny' },
+            ]
+        },
+    }
 
-        // v10 actor.limited doesn't take GM into account, so we have to do it ourselves.
-        if (!game.user?.isGM && this.actor.limited) {
-            return `${path}/actor-limited/${this.actor.type}.hbs`;
-        }
-
-        return `${path}/actor/${this.actor.type}.hbs`;
+    static override PARTS: Record<string, HandlebarsApplicationMixin.HandlebarsTemplatePart> = {
+        header: {
+            template: SheetFlow.templateBase('actor/header'),
+            templates: SheetFlow.templateActorSystemParts('movement', 'initiative'),
+        },
+        rollBar: {
+            template: SheetFlow.templateBase('actor/parts/common-rolls'),
+            templates: SheetFlow.templateActorSystemParts('movement'),
+        },
+        tabs: {
+            template: SheetFlow.templateBase('common/primary-tab-group'),
+        },
+        actions: {
+            template: SheetFlow.templateBase('actor/tabs/actions'),
+            scrollable: ['.scrollable']
+        },
+        effects: {
+            template: SheetFlow.templateBase('actor/tabs/effects'),
+            templates: SheetFlow.templateListItem('effect'),
+            scrollable: ['.scrollable']
+        },
+        misc: {
+            template: SheetFlow.templateBase('actor/tabs/misc'),
+            scrollable: ['scrollable']
+        },
+        description: {
+            template: SheetFlow.templateBase('actor/tabs/description'),
+            scrollable: ['.scrollable']
+        },
+        footer: {
+            template: SheetFlow.templateBase('actor/footer'),
+        },
     }
 
     /** SheetData used by _all_ actor types! */
-    override async getData(options) {
+    override async _prepareContext(options: DeepPartial<SR5ApplicationMixinTypes.RenderOptions> & { isFirstRender: boolean }) {
         // Remap Foundry default v8/v10 mappings to better match systems legacy foundry versions mapping accross it's templates.
         // NOTE: If this is changed, you'll have to match changes on all actor sheets.
-        const data = super.getData() as any;
-        data.system = this.actor.toObject(false).system;
-        data.user = game.user;
+        const data = await super._prepareContext(options) as T;
+        data.actor = this.actor;
 
         // Sheet related general purpose fields. These aren't persistent.
-        data.config = SR5;
         data.filters = this._filters;
 
-        this._prepareActorAttributes(data);
         this._prepareActorModifiers(data);
 
         // Valid data fields for all actor types.
@@ -225,14 +369,14 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         this._prepareSpecialFields(data);
         this._prepareSkillsWithFilters(data);
 
-        data.itemType = await this._prepareItemTypes(data);
+        data.itemType = this._prepareItemTypes();
         data.effects = prepareSortedEffects(this.actor.effects.contents);
         data.itemEffects = prepareSortedItemEffects(this.actor, { applyTo: this.itemEffectApplyTos });
+
         data.inventories = await this._prepareItemsInventory();
         data.inventory = this._prepareSelectedInventory(data.inventories);
         data.spells = this._prepareSortedCategorizedSpells(data.itemType["spell"]);
         data.hasInventory = this._prepareHasInventory(data.inventories);
-        data.hasActions = this._prepareHasActions(data);
         data.selectedInventory = this.selectedInventory;
         data.program_count = this._prepareProgramCount(data.itemType);
 
@@ -240,145 +384,322 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
         data.contentVisibility = this._prepareContentVisibility(data);
 
-        if ('description' in data.system)
-            data.biographyHTML = await foundry.applications.ux.TextEditor.implementation.enrichHTML(data.system.description.value, {
-                // secrets: this.actor.isOwner,
-                // rollData: this.actor.getRollData.bind(this.actor),
-                relativeTo: this.actor
-            });
-
         data.bindings = this._prepareKeybindings();
 
-        data.initiativePerception = this._prepareInitiativePerception();
+        data.initiativePerception = this._prepareInitiativePresence();
+
+        data.primaryTabs = this._prepareTabs('primary');
+
+        data.canRollInitiative = this.actor.inCombat;
+
+        data.expandedSkills = {};
+        for (const id of this.expandedSkills) {
+            const skill = this.actor.getSkill(id);
+            if (skill) {
+                const html = await TextEditor.enrichHTML(skill.description, { secrets: this.actor.isOwner, });
+                data.expandedSkills[id] = { html, }
+            }
+        }
 
         return data;
     }
 
+    override async _preparePartContext(
+        partId: string,
+        context: SR5ActorSheetData,
+        options: DeepPartial<SR5ApplicationMixinTypes.RenderOptions>,
+    ): Promise<SR5ActorSheetData> {
+        const partContext = await super._preparePartContext(partId, context, options) as T;
+        if (partId === 'actions') {
+            partContext.actions = await this._prepareActions();
+        }
+        if (partId === 'rollBar') {
+            partContext.favorites = await this._prepareFavorites();
+        }
+        if (partId === 'description') {
+            if ('description' in this.actor.system) {
+                partContext.biographyHTML = await TextEditor.enrichHTML(this.actor.system.description.value, {
+                    relativeTo: this.actor,
+                    secrets: this.actor.isOwner,
+                });
+            }
+        }
+
+        return partContext;
+    }
+
+    async _prepareFavorites() {
+        const favorites: SR5Item[] = [];
+        for (const idOrUuid of this.actor.system.favorites) {
+            if (idOrUuid.includes('.')) {
+                const doc = await fromUuid(idOrUuid);
+                if (doc && doc instanceof SR5Item) favorites.push(doc);
+            } else {
+                const item = this.actor.items.get(idOrUuid);
+                if (item) favorites.push(item);
+            }
+        }
+        return favorites;
+    }
+
+    protected override _prepareTabs(group: string) {
+        const parts = super._prepareTabs(group) as Record<string, SR5Tab>;
+        if (group === 'primary' && !game.user?.isGM && this.actor.limited) {
+            const description = parts.description;
+            description.active = true;
+            return { description };
+        }
+        if (group === 'primary') {
+            // if we should hide empty tabs
+            if (this.isPlayMode && this.hideEmptyCategories()) {
+                // look for actor items that go in the inventory tab and delete the tab/part if none exist
+                if (!this.actor.hasItemOfType(...this.getInventoryItemTypes()) && parts.inventory) {
+                    parts.inventory.hidden = true;
+                }
+            }
+        }
+        return parts;
+    }
+
+    protected override _configureRenderParts(options: SR5ApplicationMixinTypes.RenderOptions) {
+        const retVal = super._configureRenderParts(options);
+        if (!game.user?.isGM && this.actor.limited) {
+            return {
+                header: retVal.header,
+                tabs: retVal.tabs,
+                description: retVal.description,
+                footer: retVal.footer,
+            }
+        }
+        return retVal;
+    }
+
+    protected _hasCritterPowers() {
+        return this.actor.hasItemOfType('critter_power');
+    }
+
+    protected _hasMagicItems() {
+        return this.actor.hasItemOfType('spell', 'adept_power', 'ritual', 'call_in_action');
+    }
+
+    override async _onRender(
+        context: DeepPartial<T>,
+        options: DeepPartial<SR5ApplicationMixinTypes.RenderOptions>
+    ) {
+        await super._onRender(context, options);
+        this.activateListeners_LEGACY($(this.element));
+        this.prepareModifierTooltips();
+        this.#filterActiveSkillsElements();
+
+        // drag and drop handling to change the positions of favorited items
+        const dragDropFavorites = new foundry.applications.ux.DragDrop({
+            dragSelector: '.favorite',
+            dropSelector: '.favorite',
+            permissions: {
+                dragstart: this._canDragStartFavorite.bind(this),
+                drop: this._canDragDropFavorite.bind(this),
+            },
+            callbacks: {
+                dragstart: this._onDragStartFavorite.bind(this),
+                drop: this._onDragDropFavorite.bind(this),
+            }
+        });
+        dragDropFavorites.bind(this.element);
+    }
+
+    _canDragStartFavorite() {
+        return this.isEditable;
+    }
+
+    _canDragDropFavorite() {
+        return this.isEditable;
+    }
+
+    // handle start dragging a favorite to reorder
+    _onDragStartFavorite(event: DragEvent) {
+        const target = event.currentTarget;
+
+        const uuid = SheetFlow.closestUuid(target);
+        const itemId = SheetFlow.closestItemId(target);
+
+        const dragData = {
+            uuid,
+            itemId,
+        }
+
+        // Set data transfer data
+        event.dataTransfer?.setData("text/plain", JSON.stringify(dragData));
+    }
+
+    _onDragDropFavorite(event: DragEvent) {
+        const target = event.target;
+        const favorites = this.actor.system.favorites.slice();
+        const data = TextEditor.getDragEventData(event) as any;
+        const srcUuid = data.uuid;
+        let sourceIndex = favorites.indexOf(srcUuid);
+        if (sourceIndex < 0) {
+            const srcItemId = data.id;
+            sourceIndex = favorites.indexOf(srcItemId);
+        }
+
+        const targetUuid = SheetFlow.closestUuid(target);
+        let targetIndex = favorites.indexOf(targetUuid);
+        if (targetIndex < 0) {
+            const targetItemId = SheetFlow.closestItemId(target);
+            targetIndex = favorites.indexOf(targetItemId);
+        }
+
+        if (sourceIndex >= 0 && targetIndex >= 0) {
+            const fs = favorites[sourceIndex];
+            const ft = favorites[targetIndex];
+            favorites[targetIndex] = fs;
+            favorites[sourceIndex] = ft;
+            void this.actor.update({system: { favorites }});
+        }
+    }
+
     /** Listeners used by _all_ actor types! */
-    override activateListeners(html) {
-        super.activateListeners(html);
-
-        Helpers.setupCustomCheckbox(this, html)
-
-        // Active Effect management
-        html.find(".effect-control").on('click', async event => onManageActiveEffect(event, this.actor));
-        html.find(".item-effect-control").on('click', async event => onManageItemActiveEffect(event));
-
-        // Inventory visibility switch
-        html.find('.item-toggle').on('click', this._onInventorySectionVisiblitySwitch.bind(this));
-
-        // General item CRUD management...
-        html.find('.item-create').on('click', this._onItemCreate.bind(this));
-        html.find('.item-edit').on('click', this._onItemEdit.bind(this));
-        html.find('.item-delete').on('click', this._onItemDelete.bind(this));
+    activateListeners_LEGACY(html: JQuery<HTMLElement>) {
+        Helpers.setupCustomCheckbox(this, html);
 
         // General item header/list actions...
         html.find('.item-qty').on('change', this._onListItemChangeQuantity.bind(this));
-        html.find('.item-rtg').on('change', this._onListItemChangeRating.bind(this));
-        html.find('.item-equip-toggle').on('click', this._onListItemToggleEquipped.bind(this));
-        html.find('.item-enable-toggle').on('click', this._onListItemToggleEnabled.bind(this));
-        html.find('.item-wireless-toggle').on('click', this._onListItemToggleWireless.bind(this));
-
-        // Item list description display handling...
-        html.find('.hidden').hide();
-        html.find('.has-desc').on('click', this._onListItemToggleDescriptionVisibility.bind(this));
-
-        // General item test rolling...
-        html.find('.item-roll').on('click', this._onItemRoll.bind(this));
-        html.find('.Roll').on('click', this._onRoll.bind(this));
 
         // Actor inventory handling....
-        html.find('.inventory-inline-create').on('click', this._onInventoryCreate.bind(this));
-        html.find('.inventory-collapse').on('click', this._onInventorySectionVisibilityChange.bind(this, false));
-        html.find('.inventory-expand').on('click', this._onInventorySectionVisibilityChange.bind(this, true));
-        html.find('.inventory-remove').on('click', this._onInventoryRemove.bind(this));
-        html.find('.inventory-edit').on('click', this._onInplaceInventoryEdit.bind(this));
-        html.find('.inventory-input-cancel').on('click', this._onInplaceInventoryEditCancel.bind(this));
-        html.find('.inventory-input-save').on('click', this._onInplaceInventoryEditSave.bind(this));
-        html.find('input#input-inventory').on('keydown', this._onInplaceInventoryEditCancel.bind(this));
-        html.find('input#input-inventory').on('keydown', this._onInplaceInventoryEditSave.bind(this));
-        html.find('input#input-inventory').on('change', this._onInventoryChangePreventSheetSubmit.bind(this));
         html.find('#select-inventory').on('change', this._onSelectInventory.bind(this));
-        html.find('.inventory-item-move').on('click', this._onItemMoveToInventory.bind(this));
-
-        // Condition monitor track handling...
-        html.find('.horizontal-cell-input .cell').on('click', this._onSetConditionTrackCell.bind(this));
-        html.find('.horizontal-cell-input .cell').on('contextmenu', this._onClearConditionTrack.bind(this));
-
-        // Matrix data handling...
-        html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
-        html.find('.marks-add-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, 1));
-        html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
-        html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
-        html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
-        html.find('.marks-connect-network').on('click', this._onMarksConnectToNetwork.bind(this));
-        html.find('.marks-place-mark').on('click', this._onMarksPlaceMark.bind(this));
-        html.find('.disconnect-network').on('click', this._onDisconnectNetwork.bind(this))
-
-        // Skill Filter handling...
-        html.find('.skill-header').find('.item-name').on('click', this._onFilterUntrainedSkills.bind(this));
-        html.find('.skill-header').find('.skill-spec-item').on('click', this._onFilterUntrainedSkills.bind(this));
-        html.find('.skill-header').find('.rtg').on('click', this._onFilterUntrainedSkills.bind(this));
-        html.find('#filter-skills').on('input', this._onFilterSkills.bind(this));
-
-        // Skill CRUD handling...
-        html.find('.skill-opensource').on('click', this._onOpenSourceSkill.bind(this));
-        html.find('.knowledge-skill-opensource').on('click', this._onOpenSourceSkill.bind(this));
-        html.find('.language-skill-opensource').on('click', this._onOpenSourceSkill.bind(this));
-        html.find('.skill-edit').on('click', this._onShowEditSkill.bind(this));
-        html.find('.knowledge-skill-edit').on('click', this._onShowEditKnowledgeSkill.bind(this));
-        html.find('.language-skill-edit').on('click', this._onShowEditLanguageSkill.bind(this));
-        html.find('.add-knowledge').on('click', this._onAddKnowledgeSkill.bind(this));
-        html.find('.add-language').on('click', this._onAddLanguageSkill.bind(this));
-        html.find('.add-active').on('click', this._onAddActiveSkill.bind(this));
-        html.find('.remove-knowledge').on('click', this._onRemoveKnowledgeSkill.bind(this));
-        html.find('.remove-language').on('click', this._onRemoveLanguageSkill.bind(this));
-        html.find('.remove-active').on('click', this._onRemoveActiveSkill.bind(this));
-
-        // Attribute test rolling...
-        html.find('.attribute-roll').on('click', this._onRollAttribute.bind(this));
-
-        // Conditon monitor test rolling...
-        html.find('.cell-input-roll').on('click', this._onRollCellInput.bind(this));
-
-        // Skill test rolling...
-        html.find('.skill-roll').on('click', this._onRollSkill.bind(this));
-        html.find('.knowledge-skill').on('click', this._onRollSkill.bind(this));
-        html.find('.language-skill').on('click', this._onRollSkill.bind(this));
-        html.find('.skill-spec-roll').on('click', this._onRollSkillSpec.bind(this));
 
         // Misc. actor actions...
         html.find('.show-hidden-skills').on('click', this._onShowHiddenSkills.bind(this));
-        html.find('.open-source').on('click', this._onOpenSource.bind(this));
-        html.find('.list-item').each(this._addDragSupportToListItemTemplatePartial.bind(this));
 
-        // Misc. item type actions...
-        html.find('.reload-ammo').on('click', async (event) => this._onReloadAmmo(event, false));
-        html.find('.partial-reload-ammo').on('click', async (event) => this._onReloadAmmo(event, true));
         html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
 
         // Situation modifiers application
         html.find('.show-situation-modifiers-application').on('click', this._onShowSituationModifiersApplication.bind(this));
 
-        // Freshly imported item toggle
-        html.find('.toggle-fresh-import-all-off').on('click', async (event) => this._toggleAllFreshImportFlags(event, false));
-        html.find('.toggle-fresh-import-all-on').on('click', async (event) => this._toggleAllFreshImportFlags(event, true));
-
-        // Reset Actor Run Data
-        html.find('.reset-actor-run-data').on('click', this._onResetActorRunData.bind(this));
-
         html.find('select[name="initiative-select"]').on('change', this._onInitiativePerceptionChange.bind(this));
+
+        html.find('select.weapon-ammo-select').on('change', this._onWeaponAmmoSelect.bind(this));
+    }
+
+    /**
+     * Prepare Tooltips For Skills, Attributes, and Limits
+     * - these tooltips display all the modifiers for the ModifiedValue
+     */
+    prepareModifierTooltips() {
+        this.element?.querySelectorAll('[data-attribute-modifier-tooltip]').forEach((el) => {
+            el.addEventListener('mouseenter', async (e: any) => {
+                const attributeId = e.target.closest('[data-attribute-modifier-tooltip]').dataset.attributeModifierTooltip;
+                const attribute = this.actor.getAttribute(attributeId);
+                if (attribute) {
+                    const html = await foundry.applications.handlebars.renderTemplate(
+                        SheetFlow.templateBase('common/modifiers-tooltip'),
+                        {
+                            value: attribute,
+                            isEssence: attributeId === 'essence'
+                        });
+                    game.tooltip.activate(e.target, { html, cssClass: 'sr5v2' });
+                }
+            })
+            el.addEventListener('mouseleave', () => { game.tooltip.deactivate(); });
+        })
+        this.element?.querySelectorAll('[data-limit-modifier-tooltip]').forEach((el) => {
+            el.addEventListener('mouseenter', async (e: any) => {
+                const limitId = e.target.closest('[data-limit-modifier-tooltip]').dataset.limitModifierTooltip;
+                const limit = this.actor.getLimit(limitId);
+                if (limit) {
+                    const html = await foundry.applications.handlebars.renderTemplate(
+                        SheetFlow.templateBase('common/modifiers-tooltip'),
+                        {
+                            value: limit,
+                        });
+                    game.tooltip.activate(e.target, { html, cssClass: 'sr5v2' });
+                }
+            })
+            el.addEventListener('mouseleave', () => { game.tooltip.deactivate(); });
+        })
+        this.element?.querySelectorAll('[data-skill-modifier-tooltip]').forEach((el) => {
+            el.addEventListener('mouseenter', async (e: any) => {
+                const skillId = e.target.closest('[data-skill-modifier-tooltip]').dataset.skillModifierTooltip;
+                const skill = this.actor.getSkill(skillId);
+                if (skill) {
+                    const html = await foundry.applications.handlebars.renderTemplate(
+                        SheetFlow.templateBase('common/modifiers-tooltip'),
+                        {
+                            value: skill,
+                        });
+                    game.tooltip.activate(e.target, { html, cssClass: 'sr5v2' });
+                }
+            })
+            el.addEventListener('mouseleave', () => { game.tooltip.deactivate(); });
+        })
+    }
+
+    protected override _getHeaderControls() {
+        const controls = super._getHeaderControls();
+        controls.unshift({
+            action: 'resetActorRunData',
+            icon: 'fas fa-arrow-rotate-right',
+            label: 'SR5.Labels.ActorSheet.ResetActorForNewRun',
+            ownership: 3, // OWNER
+        })
+
+        return controls;
+    }
+
+    static async #favoriteItem(this: SR5BaseActorSheet, event: PointerEvent) {
+        if (!(event.target instanceof HTMLElement)) return;
+        const uuid = SheetFlow.closestUuid(event.target);
+        const itemId = SheetFlow.closestItemId(event.target);
+
+        const favoriteId = this.actor.items.get(itemId) ? itemId : uuid;
+
+        const newFavorites = this.actor.system.favorites.slice();
+
+        if (newFavorites.includes(favoriteId)) {
+            newFavorites.splice(newFavorites.indexOf(favoriteId), 1);
+        } else {
+            newFavorites.push(favoriteId);
+        }
+        await this.actor.update({system: { favorites: newFavorites }});
     }
 
     /**
      * Get the options for Initiative Perception
      */
-    _prepareInitiativePerception() {
-        const initiative = this.actor.system.initiative.perception;
-        if (initiative === 'matrix') {
-            return this.actor.isUsingHotSim ? 'hot_sim' : 'cold_sim';
+    _prepareInitiativePresence() {
+        const options: { label: string, value: string }[] = [];
+        let value = '';
+        if (this.actor.isType('spirit', 'character')) {
+            const initiative = this.actor.system.initiative;
+            value = initiative.perception === 'matrix'
+                ? this.actor.isUsingHotSim
+                    ? 'hot_sim' : 'cold_sim'
+                : initiative.perception;
+            if (initiative.meatspace) {
+                options.push({
+                    label: 'SR5.InitCatMeatspace',
+                    value: 'meatspace'
+                })
+            }
+            if (this.actor.system.special === 'magic') {
+                options.push({
+                    label: 'SR5.InitCatAstral',
+                    value: 'astral'
+                })
+            }
+            if (initiative['matrix']) {
+                options.push({
+                    label: 'SR5.Labels.ActorSheet.ColdSim',
+                    value: 'cold_sim',
+                });
+                options.push({
+                    label: 'SR5.HotSim',
+                    value: 'hot_sim'
+                });
+            }
         }
-        return initiative;
+
+        return { options, value };
     }
 
     /**
@@ -387,24 +708,24 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      * - this is more of a band-aid until we do appv2
      * @param event
      */
-    async _onInitiativePerceptionChange(event) {
-        const newValue = event.currentTarget?.value;
-        if (newValue === 'meatspace' || newValue === 'magic') {
+    async _onInitiativePerceptionChange(event: Event) {
+        const newValue = (event.currentTarget as HTMLSelectElement)?.value;
+        if (newValue === 'meatspace' || newValue === 'astral') {
             // meatspace and magic can be directly applied as the perception type
             // disable VR as well
-            await this.actor.update({ system: {
+            await this.actor.update({
+                system: {
                     initiative: { perception: newValue, },
                     matrix: { vr: false, hot_sim: false }
-                }});
+                }
+            });
         } else if (newValue === 'hot_sim' || newValue === 'cold_sim') {
             // if we are hot sim or cold sim, we are in VR and using matrix init perception
             await this.actor.update({
                 system: {
-                    initiative: {
-                        perception: 'matrix',
-                    },
+                    initiative: { perception: 'matrix' },
                     matrix: { vr: true, hot_sim: newValue === 'hot_sim' }
-                },
+                }
             });
         }
     }
@@ -416,11 +737,11 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      * Inventory types means they should always be shown, even if there are none.
      * All other item types will be collected at some tab / place on the sheet.
      */
-    _addInventoryItemTypes(inventory) {
+    _addInventoryItemTypes(inventory: InventorySheetData) {
         // Show all item types but remove empty unexpected item types.
         const inventoryTypes = this.getInventoryItemTypes();
         for (const type of Object.keys(inventory.types)) {
-            if (inventoryTypes.includes(type)) continue;
+            if (inventoryTypes.includes(type as Item.ConfiguredSubType)) continue;
             if (inventory.types[type].items.length === 0) delete inventory.types[type];
         }
 
@@ -434,7 +755,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      */
     _addInventoryTypes(inventory: InventorySheetData) {
         for (const type of this.getInventoryItemTypes()) {
-            if (inventory.types.hasOwnProperty(type)) continue;
+            if (Object.hasOwn(inventory.types, type)) continue;
 
             inventory.types[type] = {
                 type,
@@ -445,383 +766,193 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         }
     }
 
-    /**
-     * @override Default drag start handler to add Skill support
-     * @param event
-     */
-    override async _onDragStart(event) {
-        // Create drag data
-        const dragData = {
-            actorId: this.actor.id,
-            sceneId: this.actor.isToken ? canvas.scene?.id : null,
-            tokenId: this.actor.isToken ? this.actor.token?.id : null,
-            type: '',
-            data: {}
+    protected override async _onDropItem(event: DragEvent, item: SR5Item) {
+        // Avoid adding item types to the actor, that aren't handled on the sheet anywhere.
+        if (this.getHandledItemTypes().includes(item.type) || this.getInventoryItemTypes().includes(item.type)) {
+            return super._onDropItem(event, item);
+        }
+        return null;
+    }
+
+    protected override async _onDropActiveEffect(event: DragEvent, effect: SR5ActiveEffect) {
+        if (effect.actor?.uuid === this.actor.uuid) return null;
+        // if the effect is just supposed to apply to the item's test, it won't work on an actor
+        if (effect.system.applyTo === 'test_item') {
+            ui.notifications?.warn(game.i18n.localize('SR5.ActiveEffect.CannotAddTestViaItemToActor'));
+            return null;
+        }
+        return super._onDropActiveEffect(event, effect);
+    }
+
+    protected override async _onDropActor(event: DragEvent, actor: SR5Actor) {
+        await super._onDropActor(event, actor);
+        const itemData = {
+            name: actor.name ?? `${game.i18n.localize('SR5.New')} ${game.i18n.localize(SR5.itemTypes['contact'])}`,
+            type: 'contact' as Item.SubType,
+            system: {linkedActor: actor.uuid }
         };
-
-        // Handle different item type data transfers.
-        // These handlers depend on behavior of the template partial ListItem.html.
-        const element = event.currentTarget;
-        switch (element.dataset.itemType) {
-            // Skill data transfer. (Active and language skills)
-            case 'skill':
-                // Prepare data transfer
-                dragData.type = 'Skill';
-                dragData.data = {
-                    skillId: element.dataset.itemId,
-                    skill: this.actor.getSkill(element.dataset.itemId)
-                };
-
-                // Set data transfer
-                event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
-
-                return;
-
-            // Knowlege skill data transfer
-            case 'knowledgeskill': {
-                // Knowledge skills have a multi purpose id built: <id>.<knowledge_category>
-                const skillId = element.dataset.itemId.includes('.') ? element.dataset.itemId.split('.')[0] : element.dataset.itemId;
-
-                dragData.type = 'Skill';
-                dragData.data = {
-                    skillId,
-                    skill: this.actor.getSkill(skillId)
-                };
-
-                // Set data transfer
-                event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
-
-                return;
-            }
-            // if we are dragging an active effect, get the effect from our list of effects and set it in the data transfer
-            case 'ActiveEffect':
-                {
-                    const effectId = element.dataset.itemId;
-                    let effect = this.actor.effects.get(effectId);
-                    if (!effect) {
-                        // check to see if it belongs to an item we own
-                        effect = await fromUuid(effectId) as SR5ActiveEffect | undefined;
-                    }
-                    if (effect) {
-                        // Prepare data transfer
-                        dragData.type = 'ActiveEffect';
-                        dragData.data = effect;
-
-                        // Set data transfer
-                        event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
-                    }
-                    return;
-                }
-
-            // All default Foundry data transfer.
-            default:
-                // Let default Foundry handler deal with default drag cases.
-                { super._onDragStart(event); return; }
-        }
+        await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
+        return null;
     }
 
-    /** Handle all document drops onto all actor sheet types.
-     *
-     * @param event
-     */
-    override async _onDrop(event: DragEvent): Promise<unknown> {
+    static #toggleInventoryVisibility(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        event.stopPropagation();
+        if (!(event.target instanceof HTMLElement)) return;
+        const listHeader = event.target?.closest<HTMLElement>('.list-item-header');
+        const type = listHeader?.dataset?.itemType;
+        if (!type) return;
 
-        if (!event.dataTransfer) return;
+        const current = this._inventoryOpenClose[type] ?? true;
 
-        const data = parseDropData(event);
-        if (data !== undefined) {
-            if (data.type === 'ActiveEffect' && data.actorId !== this.actor.id) {
-                const effect = data.data;
-                // if the effect is just supposed to apply to the item's test, it won't work on an actor
-                if (effect.system.applyTo === 'test_item') {
-                    ui.notifications?.warn(game.i18n.localize('SR5.ActiveEffect.CannotAddTestViaItemToActor'));
-                    return;
-                }
-                // delete the id so a new one is generated
-                delete effect._id;
-                await this.actor.createEmbeddedDocuments('ActiveEffect', [effect]);
-                // don't process anything else since we handled the drop
-                return;
-            }
-            if (data.type === 'Actor' && data.uuid !== this.actor.uuid) {
-                const actor = await fromUuid(data.uuid) as SR5Actor;
-                const itemData = {
-                    name: actor.name ?? `${game.i18n.localize('SR5.New')} ${game.i18n.localize(SR5.itemTypes['contact'])}`,
-                    type: 'contact' as Item.SubType,
-                    system: {linkedActor: actor.uuid }
-                };
-                await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
-            }
-        }
-        // Keep upstream document created for actions base on it.
-        const documents = await (super._onDrop(event) as unknown as Promise<unknown>);
-
-        // Handle specific system drop events.
-        // const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
-
-        // Add any created items to the selected inventory.
-        if (Array.isArray(documents)) {
-            const items = documents.filter(document => document instanceof SR5Item);
-            await this.actor.inventory.addItems(this.selectedInventory, items);
-        }
-
-        return documents;
+        this._setInventoryTypeVisibility(type, !current);
+        void this.render();
     }
 
-    /**
-     * Enhance Foundry state restore on rerender by more user interaction state.
-     */
-    override async _render(...args) {
-        const focus = this._saveInputCursorPosition();
-        this._saveScrollPositions();
-
-        await super._render(...args);
-
-        this._restoreScrollPositions();
-        this._restoreInputCursorPosition(focus);
-    }
-
-    /**
-     * Use together with _restoreInputCursorPosition during render calls.
-     * Without this the cursor will always be on the first character, causing writing in reverse.
-     */
-    _saveInputCursorPosition(): any | null {
-        const focusList = $(this.element).find('input:focus');
-        return focusList.length ? focusList[0] : null;
-    }
-
-    /**
-     * Use together with _restoreInputCursorPosition during render calls.
-     */
-    _restoreInputCursorPosition(focus) {
-        if (focus?.name) {
-            if (!this.form) return;
-
-            const element = this.form[focus.name];
-            if (element) {
-                // Set general focus for allem input types.
-                element.focus();
-
-                // Set selection range for supported input types.
-                if (['checkbox', 'radio'].includes(element.type)) return;
-                // set the selection range on the focus formed from before (keeps track of cursor in input)
-                element.setSelectionRange?.(focus.selectionStart, focus.selectionEnd);
-            }
-        }
-
-    }
-
-    /**
-     * Used together with _restoreScrollPositions during render calls.
-     * @private
-     */
-    override _saveScrollPositions() {
-        const activeList = this._findActiveList();
-        if (activeList.length) {
-            this._scroll = activeList.prop('scrollTop');
-        }
-    }
-
-    /**
-     * Used together with _storeScrollPositions during render calls.
-     * @private
-     */
-    override _restoreScrollPositions() {
-        const activeList = this._findActiveList();
-        if (activeList.length && this._scroll != null) {
-            activeList.prop('scrollTop', this._scroll);
-        }
-    }
-
-    /**
-     * Return scroll area of the currently opened tab.
-     * @private
-     */
-    _findActiveList() {
-        return $(this.element).find('.tab.active .scroll-area');
-    }
-
-    async _onInventorySectionVisibilityChange(isOpen: boolean, event) {
-        event.preventDefault();
-        this._setInventoryVisibility(isOpen);
-        this.render();
-    }
-
-    async _onInventorySectionVisiblitySwitch(event) {
-        event.preventDefault();
-        const type = Helpers.listHeaderId(event);
-
-        this._setInventoryTypeVisibility(type, !this._inventoryOpenClose[type]);
-        this.render();
-    }
-
-    _setInventoryVisibility(isOpen: boolean) {
+    _setInventoryVisibility(this: SR5BaseActorSheet, isOpen: boolean) {
         Object.keys(CONFIG.Item.typeLabels).forEach(type => { this._setInventoryTypeVisibility(type, isOpen); });
     }
 
-    _setInventoryTypeVisibility(type: string, isOpen: boolean) {
+    _setInventoryTypeVisibility(this: SR5BaseActorSheet, type: string, isOpen: boolean) {
         this._inventoryOpenClose[type] = isOpen
     }
 
-    /**
-     * Create a new item based on the Item Header creation action and the item type of that header.
-     * 
-     * @param event 
-     * @param data Optional additional data to be injected into the create item data.
-     */
-    async _onItemCreate(event, data = {}) {
+    static async #createEffect(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        const type = event.currentTarget.closest('.list-header').dataset.itemId;
+        if (!(event.target instanceof HTMLElement)) return;
+        const effect = [{
+            name: game.i18n.localize("SR5.ActiveEffect.New"),
+            origin: this.actor.uuid,
+        }];
 
-        // Unhide section it it was
-        this._setInventoryTypeVisibility(type, true);
-
-        // TODO: Add translation for item names...
-        const itemData = {
-            ...data, type,
-            name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`
-        };
-        const items = await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
-        if (!items) return;
-
-        // Add the item to the selected inventory.
-        if (this.selectedInventory !== this.actor.defaultInventory.name)
-            await this.actor.inventory.addItems(this.selectedInventory, items as SR5Item[]);
+        await this.actor.createEmbeddedDocuments('ActiveEffect', effect);
     }
 
-    async _onItemEdit(event) {
+    static async #editEffect(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        const iid = Helpers.listItemId(event);
-        const item = this.actor.items.get(iid);
-        if (item) await item.sheet?.render(true);
+        if (!(event.target instanceof HTMLElement)) return;
+        const id = SheetFlow.closestEffectId(event.target);
+        const item = this.actor.effects.get(id);
+        if (item) {
+            await item.sheet?.render(true);
+        } else {
+            // check for uuid
+            const uuid = SheetFlow.closestUuid(event.target);
+            const doc = await fromUuid(uuid);
+            if (doc && doc instanceof SR5ActiveEffect) {
+                await doc.sheet?.render(true);
+            }
+        }
     }
 
-    async _onItemDelete(event) {
+    static async #toggleEffect(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
+
+        const id = SheetFlow.closestEffectId(event.target);
+        const item = this.actor.effects.get(id);
+        if (item) {
+            const disabled = !item.disabled;
+            await item.update({disabled});
+        } else {
+            const uuid = SheetFlow.closestUuid(event.target);
+            const doc = await fromUuid(uuid);
+            if (doc instanceof SR5ActiveEffect) {
+                const disabled = !doc.disabled;
+                await doc.update({disabled});
+            }
+        }
+    }
+
+    static async #deleteEffect(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const iid = Helpers.listItemId(event);
-        const item = this.actor.items.get(iid);
+        const id = SheetFlow.closestEffectId(event.target);
+        const item = this.actor.effects.get(id);
         if (!item) return;
-        await this.actor.inventory.removeItem(item);
 
-        return this.actor.deleteEmbeddedDocuments('Item', [iid]);
+        await this.actor.deleteEmbeddedDocuments('ActiveEffect', [id]);
     }
 
-    async _onItemRoll(event) {
-        event.preventDefault();
-        const iid = Helpers.listItemId(event);
-        const item = this.actor.items.get(iid);
+    protected async _handleCreateItem(event: PointerEvent) {
+        if (!(event.target instanceof HTMLElement)) return;
+        const type = SheetFlow.closestAction(event.target)!.dataset.itemType!;
 
-        if (!item) return;
-        if (!Hooks.call('SR5_PreActorItemRoll', this.actor, item)) return;
-        await item.castAction(event);
+        // Unhide section it it was
+        this._setInventoryTypeVisibility(type, true);
+
+        const itemData = {
+            type: type as Item.ConfiguredSubType,
+            name: `${game.i18n.localize('SR5.New')} ${game.i18n.localize(SR5.itemTypes[type])}`
+        } satisfies Item.CreateData;
+        const items = await this.actor.createEmbeddedDocuments('Item', [itemData]);
+        if (!items) return;
+
+        // Add the item to the selected inventory.
+        if (this.selectedInventory !== this.actor.defaultInventory.name) {
+            await this.actor.inventory.addItems(this.selectedInventory, items as SR5Item[]);
+        }
+        for (const item of items) {
+            await item.sheet?.render(true, { mode: 'edit' });
+        }
     }
 
     /**
-     * Setup all general system rolls after clicking on their roll on the sheet.
+     * Create a new item based on the Item Header creation action and the item type of that header.
      *
-     * @param event Must contain a currentTarget with a rollId dataset
+     * @param event
      */
-    async _onRoll(event) {
+    static async #createItem(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
+        return this._handleCreateItem(event);
+    }
 
-        // look for roll id data in the current line
-        let rollId = $(event.currentTarget).data()?.rollId as string;
-        // if that doesn't exist, look for a prent with RollId name
-        rollId = rollId ?? $(event.currentTarget).parent('.RollId').data().rollId;
+    static async #editItem(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
+        const id = SheetFlow.closestItemId(event.target);
+        const item = this.actor.items.get(id);
+        if (item) await item.sheet?.render(true, { mode: 'edit' });
+    }
 
-        const split = rollId.split('.');
-        const options = { event };
-        switch (split[0]) {
-            case 'prompt-roll':
-                await this.actor.promptRoll();
-                break;
-            case 'armor':
-                await this.actor.rollGeneralAction('armor', options);
-                break;
-            case 'fade':
-                await this.actor.rollGeneralAction('fade', options);
-                break;
-            case 'drain':
-                await this.actor.rollGeneralAction('drain', options);
-                break;
-            case 'defense':
-                // await this.actor.rollAttackDefense(options);
-                await this.actor.rollGeneralAction('physical_defense', options);
-                break;
-            case 'damage-resist':
-                await this.actor.rollGeneralAction('physical_damage_resist', options);
-                break;
+    async _handleDeleteItem(item: SR5Item) {
+        // remove from the inventory tracking system
+        return this.actor.inventory.removeItem(item).then(async () =>
+            this.actor.deleteEmbeddedDocuments('Item', [item.id!])
+        );
+    }
 
-            // attribute only rolls
-            case 'composure':
-                await this.actor.rollGeneralAction('composure', options);
-                break;
-            case 'judge-intentions':
-                await this.actor.rollGeneralAction('judge_intentions', options);
-                break;
-            case 'lift-carry':
-                await this.actor.rollGeneralAction('lift_carry', options);
-                break;
-            case 'memory':
-                await this.actor.rollGeneralAction('memory', options);
-                break;
+    static async #deleteItem(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
 
-            case 'vehicle-stat':
-                console.log('roll vehicle stat', rollId);
-                break;
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
 
-            case 'drone': {
-                const droneRoll = split[1];
-                switch (droneRoll) {
-                    case 'perception':
-                        await this.actor.rollGeneralAction('drone_perception', options);
-                        break;
-                    case 'infiltration':
-                        await this.actor.rollGeneralAction('drone_infiltration', options);
-                        break;
-                    case 'pilot-vehicle':
-                        await this.actor.rollGeneralAction('drone_pilot_vehicle', options);
-                        break;
-                }
-                break;
-            }
+        const id = SheetFlow.closestItemId(event.target);
+        const item = this.actor.items.get(id);
+        if (!item) return;
+        await this._handleDeleteItem(item);
+    }
 
-            case 'attribute': {
-                const attribute = split[1];
-                if (attribute) {
-                    await this.actor.rollAttribute(attribute, options);
-                }
-                break;
-            }
+    static async #rollItem(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
+        const iid = SheetFlow.closestUuid(event.target);
+        const item = await fromUuid(iid);
 
-            case 'skill': {
-                const skillId = split[2];
-                await this.actor.rollSkill(skillId, options);
-                break;
-            }
+        if (!(item instanceof SR5Item)) return;
+        await this._handleRollItem(item, event);
+    }
 
-            case 'matrix': {
-                const matrixRoll = split[1];
-                switch (matrixRoll) {
-                    case 'attribute': {
-                        const attr = split[2];
-                        await this.actor.rollAttribute(attr, options);
-                        break;
-                    }
-                    case 'device-rating':
-                        await this.actor.rollDeviceRating(options);
-                        break;
-                }
-
-                break;
-            }
-        }
+    async _handleRollItem(item: SR5Item, event: PointerEvent) {
+        if (!(event.target instanceof HTMLElement)) return;
+        if (!Hooks.call('SR5_PreActorItemRoll', this.actor, item)) return;
+        await item.castAction(event, this.actor);
     }
 
     /**
@@ -829,12 +960,40 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      *
      * @event Most return a currentTarget with a value dataset
      */
-    async _onSetConditionTrackCell(event) {
+    static async #modifyConditionMonitor(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
 
-        const value = Number(event.currentTarget.dataset.value);
-        const track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+        const target = event.target?.closest<HTMLElement>('[data-action="modifyConditionMonitor"]');
+        if (!target) return;
+        const track = target.dataset?.id;
+
+        // if this is a matrix track for an item, handle it differently
+        const uuid = event.target?.closest<HTMLElement>('[data-uuid]')?.dataset?.uuid ?? '';
+        if (track === 'matrix' && uuid) {
+            const document = await fromUuid(uuid);
+            if (document instanceof SR5Item) {
+                let value = Number(target.dataset.value);
+                if (document.getConditionMonitor().value === value) {
+                    value = 0;
+                }
+                return document.setMatrixDamage(value);
+            }
+        }
+
         const data: Actor.UpdateData = {};
+        let value = Number(target.dataset.value as string);
+
+        // if the clicked on cell is the current value for it's track, set the value to 0 to clear it
+        if (track === 'stun' && this.actor.getStunTrack()?.value === value) {
+            value = 0;
+        } else if (track === 'physical' && this.actor.getPhysicalTrack()?.value === value) {
+            value = 0;
+        } else if (track === 'edge' && this.actor.getEdge().uses === value) {
+            value = 0;
+        } else if (track === 'matrix' && this.actor.getMatrixTrack()?.value === value) {
+            value = 0;
+        }
 
         if (track === 'stun' || track === 'physical') {
             const property = `system.track.${track}.value`;
@@ -858,10 +1017,20 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      * Reset all condition tracks to zero values.
      * @param event
      */
-    async _onClearConditionTrack(event) {
+    static async #clearConditionMonitor(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
 
-        const track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+        const track = event.target?.closest<HTMLElement>('[data-id]')?.dataset?.id;
+
+        const uuid = event.target?.closest<HTMLElement>('[data-uuid]')?.dataset?.uuid ?? '';
+        if (track === 'matrix' && uuid) {
+            const document = await fromUuid(uuid);
+            if (document instanceof SR5Item) {
+                return await document.setMatrixDamage(0);
+            }
+        }
+
         const data = {};
         if (track === 'stun') {
             data[`system.track.stun.value`] = 0;
@@ -883,6 +1052,28 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
         if (data) await this.actor.update(data);
         await this.actor.applyDefeatedStatus();
+    }
+
+    /**
+     * Handle interaction with a damage track title.
+     * @param event
+     */
+    static async #rollConditionMonitor(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
+        const track = event.target?.closest<HTMLElement>('[data-id]')?.dataset?.id;
+
+        switch (track) {
+            case 'stun':
+                await this.actor.rollGeneralAction('natural_recovery_stun', { event });
+                break;
+            case 'physical':
+                await this.actor.rollGeneralAction('natural_recovery_physical', { event });
+                break;
+            case 'edge':
+                await this.actor.rollAttribute('edge', { event });
+                break;
+        }
     }
 
     /**
@@ -917,20 +1108,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
             sorted[modifier] = Number(modifiers[modifier]) || '';
         }
 
-        sheetData.system.modifiers = sorted as any;
+        sheetData.system.modifiers = sorted as typeof modifiers;
         sheetData.woundTolerance = 3 + ('wound_tolerance' in modifiers ? modifiers.wound_tolerance : 0);
-    }
-
-    _prepareActorAttributes(sheetData: SR5ActorSheetData) {
-        // Clear visible, zero value attributes temporary modifiers so they appear blank.
-        const attributes = sheetData.system.attributes;
-        for (const [, attribute] of Object.entries(attributes)) {
-            if (!attribute.hidden) {
-                if (attribute.temp === 0)
-                    // @ts-expect-error - temp is not defined in the SR5Attribute type
-                    attribute.temp = null;
-            }
-        }
     }
 
     _prepareMatrixAttributes(sheetData: SR5ActorSheetData) {
@@ -940,9 +1119,6 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
                 const att = matrix[attribute];
                 if (att) {
                     if (!att.mod) att.mod = [];
-                    if (att.temp === 0)
-                        // @ts-expect-error - so it doesn't show in sheet
-                        att.temp = null;
                 }
             };
 
@@ -983,12 +1159,12 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
             const { name, label, itemIds } = inventory;
 
             // Avoid re-adding default inventories.
-            if (!inventoriesSheet.hasOwnProperty(name)) {
+            if (!Object.hasOwn(inventoriesSheet, name)) {
                 inventoriesSheet[name] = {
                     name,
                     label,
                     types: {}
-                }
+                };
             }
 
             // Add default inventory types for this sheet type first, so they appear on top.
@@ -1009,8 +1185,6 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
             // Handled types are on the sheet outside the inventory.
             if (handledTypes.includes(item.type)) continue;
 
-            const sheetItem = await this._prepareSheetItem(item);
-
             // Determine what inventory the item sits in.
             const inventory = itemIdInventory[item.id] || this.actor.defaultInventory;
             // Build inventory list this item should be shown an.
@@ -1030,7 +1204,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
                     };
                 }
 
-                inventorySheet.types[item.type].items.push(sheetItem);
+                inventorySheet.types[item.type].items.push(item);
             }
         }
 
@@ -1060,8 +1234,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      * 
      * @param inventories 
      */
-    _prepareSortedCategorizedSpells(spellSheets: SheetItemData[]) {
-        const sortedSpells : Record<string, SheetItemData[]> = {};
+    _prepareSortedCategorizedSpells(spellSheets: SR5Item[]) {
+        const sortedSpells : Record<string, SR5Item[]> = {};
         const spellTypes : string[] = ['combat', 'detection', 'health', 'illusion', 'manipulation', 'notfound'];
 
         // Add all spell types in system.
@@ -1089,7 +1263,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      */
     _prepareContentVisibility(data) {
         const contentVisibility : Record<string, boolean> = {}
-        const defaultVisibility = data.system.category_visibility.default;
+        const defaultVisibility = !this.hideEmptyCategories();
 
         // If prefix is empty uses the category as a prefix
         const setVisibility = (category: string, prefix?: string) => {
@@ -1124,34 +1298,6 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
     }
 
     /**
-     * Prepare if this actor has an "Action" Items in their list of items
-     * @param data - sheet data
-     */
-    _prepareHasActions(data) {
-        return data.items.filter(item => item.type === 'action').length > 0;
-    }
-
-    /**
-     * Enhance SR5Item data for display on actors sheets.
-     *
-     * @param item: The item to transform into a 'sheet item'
-     */
-    async _prepareSheetItem<SI extends Item.ConfiguredSubType>(item: SR5Item<SI>): Promise<Shadowrun.SheetItemData> {
-        // Copy derived schema data instead of source data (false)
-        const sheetItem = item.toObject(false) as unknown as Shadowrun.SheetItemData;
-
-        const chatData = await item.getChatData();
-        sheetItem.description = chatData.description;
-
-        // Add additional chat data fields depending on item type.
-        sheetItem.properties = ChatData[item.type](item).filter(Boolean);
-
-        sheetItem.isBroken = item.isBroken;
-
-        return sheetItem;
-    }
-
-    /**
      * Prepare items for easy type by type display on actors sheets with lists per item type.
      *
      * NOTE: This method uses sheet item types, instead of item types. A sheet item type allows
@@ -1160,8 +1306,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      * @param data An object containing Actor Sheet data, as would be returned by ActorSheet.getData
      * @returns Sorted item lists per sheet item type.
      */
-    async _prepareItemTypes(data): Promise<Record<string, SheetItemData[]>> {
-        const itemsByType: Record<string, SheetItemData[]> = {};
+    _prepareItemTypes(): Record<string, SR5Item[]> {
+        const itemsByType: Record<string, SR5Item[]> = {};
 
         // Most sheet items are raw item types, some are sub types.
         // These are just for display purposes and has been done for call_in_action items.
@@ -1178,18 +1324,17 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
         // Add existing items to their sheet types as sheet items
         for (const item of this.actor.items) {
-            const sheetItem = await this._prepareSheetItem(item);
-            itemsByType[sheetItem.type].push(sheetItem);
+            itemsByType[item.type].push(item);
 
-            if (item.isSummoning) itemsByType['summoning'].push(sheetItem);
-            if (item.isCompilation) itemsByType['compilation'].push(sheetItem);
+            if (item.isSummoning) itemsByType['summoning'].push(item);
+            if (item.isCompilation) itemsByType['compilation'].push(item);
         }
 
         // Sort items for each sheet type.
         Object.entries(itemsByType).forEach(([type, items]) => {
             switch (type) {
                 case 'quality':
-                    (items as SheetItemData<'quality'>[]).sort(sortByQuality);
+                    (items as SR5Item<'quality'>[]).sort(sortByQuality);
                     break;
                 case 'program':
                     items.sort(sortByEquipped);
@@ -1200,7 +1345,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
             }
         });
 
-        return itemsByType
+        return itemsByType;
     }
 
     /**
@@ -1224,7 +1369,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      * @param itemTypes 
      * @returns (<active>/<max>) or ''
      */
-    _prepareProgramCount(itemTypes: Record<string, Shadowrun.SheetItemData[]>): string {
+    _prepareProgramCount(itemTypes: Record<string, SR5Item[]>): string {
         if (!itemTypes.program) return '';
         if (!this.actor.hasDevicePersona()) return '';
 
@@ -1234,106 +1379,6 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
         return `(${active}/${max})`;
     }
-
-    async _onMarksQuantityChange(event) {
-        event.stopPropagation();
-
-        if (this.actor.hasHost()) {
-            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
-            return;
-        }
-
-        const uuid = Helpers.listItemUuid(event);
-        if (!uuid) return;
-
-        const markedDocument = await ActorMarksFlow.getMarkedDocument(uuid);
-        if (!markedDocument) return;
-
-        const marks = parseInt(event.currentTarget.value);
-        await this.actor.setMarks(markedDocument, marks, { overwrite: true });
-    }
-
-    async _onMarksQuantityChangeBy(event, by: number) {
-        event.stopPropagation();
-
-        if (this.actor.hasHost()) {
-            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
-            return;
-        }
-
-        const uuid = Helpers.listItemUuid(event);
-        if (!uuid) return;
-
-        const markedDocument = await ActorMarksFlow.getMarkedDocument(uuid);
-        if (!markedDocument) return;
-
-        await this.actor.setMarks(markedDocument, by);
-    }
-
-    async _onMarksDelete(event) {
-        event.stopPropagation();
-
-        if (this.actor.hasHost()) {
-            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
-            return;
-        }
-
-        const uuid = Helpers.listItemUuid(event);
-        if (!uuid) return;
-
-        const userConsented = await Helpers.confirmDeletion();
-        if (!userConsented) return;
-
-        await this.actor.clearMark(uuid);
-    }
-
-    async _onMarksClearAll(event) {
-        event.stopPropagation();
-
-        if (this.actor.hasHost()) {
-            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
-            return;
-        }
-
-        const userConsented = await Helpers.confirmDeletion();
-        if (!userConsented) return;
-
-        await this.actor.clearMarks();
-    }
-
-    /**
-     * When clicking on a specific mark, connect to the actor to this host/grid behind that.
-     * 
-     * @param event Any interaction action
-     */
-    async _onMarksConnectToNetwork(event) {
-        event.stopPropagation();
-
-        const uuid = Helpers.listItemUuid(event);
-        if (!uuid) return;
-
-        const target = fromUuidSync(uuid) as SR5Item;
-        if (!target || !(target instanceof SR5Item)) return;
-
-        await this.actor.connectNetwork(target);
-        this.render();
-    }
-
-    async _onMarksPlaceMark(event) {
-        console.error('IMPLEMENT PLACE MARK ON TARGET');
-    }
-
-    /**
-     * When clicking on the disconnect button for the connected network, disconnect from it.
-     * @param event Any interaction event.
-     */
-    async _onDisconnectNetwork(event) {
-        event.stopPropagation();
-
-        await this.actor.disconnectNetwork();
-        this.render();
-    }
-
     /**
      * Prepare skills with sorting and filtering given by this sheet.
      * 
@@ -1359,7 +1404,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         return Helpers.sortSkills(filteredSkills);
     }
 
-    _showSkill(key, skill, data) {
+    _showSkill(key: string, skill: SkillFieldType, data: SR5ActorSheetData) {
         if (this._showMagicSkills(key, skill, data)) {
             return true;
         }
@@ -1370,19 +1415,71 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         return this._showGeneralSkill(key, skill);
     }
 
-    _showGeneralSkill(skillId, skill: SkillFieldType) {
-        return !this._isSkillMagic(skillId, skill) && !this._isSkillResonance(skill) && this._isSkillFiltered(skillId, skill);
+    _showGeneralSkill(skillId: string, skill: SkillFieldType) {
+        return !this._isSkillMagic(skillId, skill) && !this._isSkillResonance(skill);
     }
 
-    _showMagicSkills(skillId, skill: SkillFieldType, sheetData: SR5ActorSheetData) {
-        return this._isSkillMagic(skillId, skill) && sheetData.system.special === 'magic' && this._isSkillFiltered(skillId, skill);
+    _showMagicSkills(skillId: string, skill: SkillFieldType, sheetData: SR5ActorSheetData) {
+        return this._isSkillMagic(skillId, skill) && sheetData.system.special === 'magic';
     }
 
-    _showResonanceSkills(skillId, skill: SkillFieldType, sheetData: SR5ActorSheetData) {
-        return this._isSkillResonance(skill) && sheetData.system.special === 'resonance' && this._isSkillFiltered(skillId, skill);
+    _showResonanceSkills(skillId: string, skill: SkillFieldType, sheetData: SR5ActorSheetData) {
+        return this._isSkillResonance(skill) && sheetData.system.special === 'resonance';
     }
 
-    _isSkillFiltered(skillId, skill) {
+    hideEmptyCategories() {
+        return !this.actor.system.category_visibility.default;
+    }
+
+    /** Setup untrained skill filter within getData */
+    static async #filterUntrainedSkills(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
+        this._filters.showUntrainedSkills = !this._filters.showUntrainedSkills;
+        event.target.closest<HTMLElement>('.active-skills-header')!
+            .querySelector<HTMLElement>('.skill-rtg-label')!
+            .innerText = game.i18n.localize(this._filters.showUntrainedSkills ? 'SR5.Rtg' : 'SR5.RtgAboveZero');
+        this.#filterActiveSkillsElements();
+    }
+
+    static async #handleFilterActiveSkills(
+        this: SR5BaseActorSheet, event: KeyboardEvent | null, query: string, rgx: RegExp, content: HTMLElement | null
+    ) {
+        this._filters.skills = query;
+        this.#filterActiveSkillsElements();
+    }
+
+    #filterActiveSkillsElements() {
+        let count = 0;
+        this.element.querySelector('#active-skills-scroll')
+            ?.querySelectorAll<HTMLDivElement>('[data-skill-id]')
+            .forEach((listItemElem) => {
+
+                const container = listItemElem.parentElement;
+                if (!container) return;
+                const id = listItemElem.dataset.skillId;
+                if (!id) return;
+                const skill = this.actor.getSkill(id);
+                if (!skill) return;
+                if (this._isSkillFiltered(id, skill)) {
+                    container.classList.remove('hidden')
+                    count++;
+                    if (count % 2) {
+                        container.classList.add('nobg')
+                        container.classList.remove('forcebg')
+                    } else {
+                        container.classList.add('forcebg')
+                        container.classList.remove('nobg')
+                    }
+                } else {
+                    container.classList.add('hidden');
+                    container.classList.remove('nobg')
+                    container.classList.remove('forcebg')
+                }
+            });
+    }
+
+    _isSkillFiltered(skillId: string, skill: SkillFieldType) {
         // a newly created skill shouldn't be filtered, no matter what.
         // Therefore disqualify empty skill labels/names from filtering and always show them.
         const isFilterable = this._getSkillLabelOrName(skill).length > 0;
@@ -1392,11 +1489,11 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         return !(isFilterable && (isHiddenForUntrained || isHiddenForText));
     }
 
-    _getSkillLabelOrName(skill) {
+    _getSkillLabelOrName(skill: SkillFieldType) {
         return Helpers.getSkillLabelOrName(skill);
     }
 
-    _doesSkillContainText(key, skill, text) {
+    _doesSkillContainText(key: string, skill: SkillFieldType, text: string) {
         if (!text) {
             return true;
         }
@@ -1416,160 +1513,110 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         sheetData.system.skills.active = this._filterSkills(sheetData, sheetData.system.skills.active);
     }
 
-    _isSkillMagic(id, skill) {
+    _isSkillMagic(id: string, skill: SkillFieldType) {
         return skill.attribute === 'magic' || id === 'astral_combat' || id === 'assensing';
     }
 
-    _isSkillResonance(skill) {
+    _isSkillResonance(skill: SkillFieldType) {
         return skill.attribute === 'resonance';
     }
 
-    /** Setup untrained skill filter within getData */
-    async _onFilterUntrainedSkills(event) {
-        event.preventDefault();
-        this._filters.showUntrainedSkills = !this._filters.showUntrainedSkills;
-        await this.render();
+    private _closestSkillTarget(target: HTMLElement): HTMLElement | null {
+        return target.closest('[data-skill-id]');
     }
 
-    /**
-     * Parameterize skill filtering within getData and implement a general delay around it.
-     *
-     * NOTE: Be aware of UTF-8/16 multi character input languages, using mulitple separate input symbol to form a single alphabet character.
-     * NOTE: This is ONLY necessary as shadowrun5e filters through the render -> getData -> template chain instead of
-     *       hiding HTML elements based on their text.
-     */
-    async _onFilterSkills(event) {
-        if (this._delays.skills)
-            clearTimeout(this._delays.skills);
+    async _editSkill(target: HTMLElement) {
+        const closest = this._closestSkillTarget(target);
+        const skillId = closest?.dataset.skillId;
+        const category = closest?.dataset.category;
 
-        this._delays.skills = setTimeout(() => {
-            this._filters.skills = event.currentTarget.value;
-            this.render();
-        }, game.shadowrun5e.inputDelay);
+        if (skillId) {
+            if (!category || category === 'active') {
+                const app = new SkillEditSheet({document: this.actor}, skillId)
+                await app.render(true, {mode: 'edit'} as any);
+            } else if (category === 'knowledge') {
+                const subcategory = closest?.dataset.subcategory as KnowledgeSkillCategory;
+                if (subcategory) {
+                    const app = new KnowledgeSkillEditSheet({document: this.actor}, skillId, subcategory)
+                    await app.render(true, {mode: 'edit'} as any);
+                }
+            } else if (category === 'language') {
+                const app = new LanguageSkillEditSheet({document: this.actor}, skillId)
+                await app.render(true, {mode: 'edit'} as any);
+            }
+        }
     }
 
-    async _onRollSkill(event) {
-        event.preventDefault();
-        const itemId = Helpers.listItemId(event);
-        // NOTE: Knowledge skills still use a combined id in order for the legacy skill editing dialog to work.
-        const skillId = itemId.includes('.') ? itemId.split('.')[0] : itemId;
-        if (!skillId) { console.error(`Shadowrun 5e | Rolling skill with item id (${itemId}). But (${skillId}) doesn't seem to be an id`); return; }
-        return this.actor.rollSkill(skillId, { event });
+    static async #editSkill(this: SR5BaseActorSheet, event: PointerEvent) {
+        if (!(event.target instanceof HTMLElement)) return;
+        await this._editSkill(event.target);
     }
 
-    async _onRollSkillSpec(event) {
+    static async #rollSkill(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        const itemId = Helpers.listItemId(event);
-        // NOTE: Knowledge skills still use a combined id in order for the legacy skill editing dialog to work.
-        const skillId = itemId.includes('.') ? itemId.split('.')[0] : itemId;
-        return this.actor.rollSkill(skillId, { event, specialization: true });
+        if (!(event.target instanceof HTMLElement)) return;
+        const closest = this._closestSkillTarget(event.target);
+        const skillId = closest?.dataset.skillId;
+        if (skillId) {
+            await this.actor.rollSkill(skillId, { event });
+        }
     }
 
-    async _onOpenSourceSkill(event) {
+    static async #rollSkillSpec(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        const [skillId,] = Helpers.listItemId(event).split('.');
+        if (!(event.target instanceof HTMLElement)) return;
+        const closest = this._closestSkillTarget(event.target);
+        const skillId = closest?.dataset.skillId;
+        if (skillId) {
+            await this.actor.rollSkill(skillId, { event, specialization: true });
+        }
+    }
 
-        const skill = this.actor.getSkill(skillId);
+    async _openSkillSource(target: HTMLElement) {
+        const skillId = this._closestSkillTarget(target)?.dataset.skillId;
+
+        const skill = skillId ? this.actor.getSkill(skillId) : null;
         if (!skill) {
             console.error(`Shadowrun 5e | Editing skill failed due to missing skill ${skillId}`); return;
         }
 
-        LinksHelpers.openSource(skill.link);
+        await LinksHelpers.openSource(skill.link);
     }
 
-    async _onShowEditSkill(event) {
+    static async #createLanguageSkill(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        const skill = Helpers.listItemId(event);
-
-        if (!skill) {
-            console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} id`); return;
-        }
-
-        // new SkillEditSheet(this.actor, skill, { event: event }).render(true);
-        await this._showSkillEditForm(SkillEditSheet, this.actor, { event }, skill);
+        if (!(event.target instanceof HTMLElement)) return;
+        await this.actor.addLanguageSkill({ name: '' });
     }
 
-    /** Keep track of each SkillEditSheet instance and close before opening another.
-     *
-     * @param skillEditFormImplementation Any extending class! of SkillEditSheet
-     * @param actor
-     * @param options
-     * @param args Collect arguments of the different renderWithSkill implementations.
-     */
-    async _showSkillEditForm(skillEditFormImplementation, actor: SR5Actor, options: object, ...args) {
-        await this._closeOpenSkillApp();
-
-        const skillEditForm = new skillEditFormImplementation(actor, options, ...args);
-        globalSkillAppId = skillEditForm.appId;
-        await skillEditForm.render(true);
-    }
-
-    _onShowEditKnowledgeSkill(event) {
+    static async #deleteLanguageSkill(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        const [skill, category] = Helpers.listItemId(event).split('.');
-
-        if (!skill || !category) {
-            console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} or category id ${category}`); return;
-        }
-
-        void this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, { event }, skill, category);
-    }
-
-    async _onShowEditLanguageSkill(event) {
-        event.preventDefault();
-        const skill = Helpers.listItemId(event);
-
-        if (!skill) {
-            console.error(`Shadowrun 5e | Editing knowledge skill failed due to missing skill ${skill} id`); return;
-        }
-
-        // new LanguageSkillEditSheet(this.actor, skill, { event: event }).render(true);
-        await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, { event }, skill);
-    }
-
-    async _closeOpenSkillApp() {
-        if (globalSkillAppId !== -1) {
-            if (ui.windows[globalSkillAppId]) {
-                await ui.windows[globalSkillAppId].close();
-            }
-            globalSkillAppId = -1;
-        }
-    }
-
-    async _onAddLanguageSkill(event) {
-        event.preventDefault();
-        const skillId = await this.actor.addLanguageSkill({ name: '' });
-        if (!skillId) return;
-
-        await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, { event }, skillId);
-    }
-
-    async _onRemoveLanguageSkill(event) {
-        event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const skillId = Helpers.listItemId(event);
+        const skillId = $(event.target).closest('a').data().skill;
         await this.actor.removeLanguageSkill(skillId);
     }
 
-    async _onAddKnowledgeSkill(event) {
+    static async #createKnowledgeSkill(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        const category = Helpers.listHeaderId(event) as KnowledgeSkillCategory;
+        if (!(event.target instanceof HTMLElement)) return;
+        const category = $(event.target).closest('a').data().skillType;
         const skillId = await this.actor.addKnowledgeSkill(category);
         if (!skillId) return;
-
-        await this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, { event }, skillId, category);
     }
 
-    async _onRemoveKnowledgeSkill(event) {
+    static async #deleteKnowledgeSkill(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const [skillId, category] = Helpers.listItemId(event).split('.') as [string, KnowledgeSkillCategory];
+        const skillId = $(event.target).closest('a').data().skill;
+        const category = $(event.target).closest('a').data().category;
         await this.actor.removeKnowledgeSkill(skillId, category);
     }
 
@@ -1577,76 +1624,34 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      *
      * @param event The HTML event from which the action resulted.
      */
-    async _onAddActiveSkill(event: Event) {
-        event.preventDefault();
-        const skillId = await this.actor.addActiveSkill();
-        if (!skillId) return;
-
-        await this._showSkillEditForm(SkillEditSheet, this.actor, { event }, skillId);
+    static async #createActiveSkill(this: SR5BaseActorSheet) {
+        await this.actor.addActiveSkill();
     }
 
-    async _onRemoveActiveSkill(event: Event) {
+    static async #deleteActiveSkill(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const skillId = Helpers.listItemId(event);
+        const skillId = event.target?.closest<HTMLElement>('[data-skill]')?.dataset?.skill ?? '';
         await this.actor.removeActiveSkill(skillId);
     }
 
-    async _onRollAttribute(event) {
+    static async #rollAttribute(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        const attribute = event.currentTarget.closest('.attribute').dataset.attribute;
-        return this.actor.rollAttribute(attribute, { event });
-    }
-
-    /**
-     * Handle interaction with a damage track title.
-     * @param event
-     */
-    async _onRollCellInput(event) {
-        event.preventDefault();
-        const track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
-
-        switch (track) {
-            case 'stun':
-                await this.actor.rollGeneralAction('natural_recovery_stun', { event });
-                break;
-            case 'physical':
-                await this.actor.rollGeneralAction('natural_recovery_physical', { event });
-                break;
-            case 'edge':
-                await this.actor.rollAttribute('edge', { event });
-                break;
+        if (!(event.target instanceof HTMLElement)) return;
+        const attribute = event.target?.closest<HTMLElement>('[data-attribute-id]')?.dataset?.attributeId;
+        if (attribute === 'rating') {
+            await this.actor.rollDeviceRating();
+        } else if (attribute) {
+            await this.actor.rollAttribute(attribute, { event });
         }
     }
 
-    async _onShowHiddenSkills(event) {
-        event.preventDefault();
-
+    async _onShowHiddenSkills() {
         await this.actor.showHiddenSkills();
-    }
-
-    async _onOpenSource(event) {
-        event.preventDefault();
-        const field = $(event.currentTarget).parents('.list-item');
-        const iid = $(field).data().itemId;
-        const item = this.actor.items.get(iid);
-        if (item) {
-            await item.openSource();
-        }
-    }
-    /**
-     * Augment each item of the ListItem template partial with drag support.
-     * @param i
-     * @param item
-     */
-    _addDragSupportToListItemTemplatePartial(i, item) {
-        if (item.dataset?.itemId) {
-            item.setAttribute('draggable', true);
-            item.addEventListener('dragstart', this._onDragStart.bind(this), false);
-        }
     }
 
     /**
@@ -1654,64 +1659,92 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      *
      * @param event A DOM mouse/touch event
      */
-    async _onListItemChangeQuantity(event) {
-        const iid = Helpers.listItemId(event);
+    async _onListItemChangeQuantity(event: Event) {
+        const iid = SheetFlow.closestItemId(event.currentTarget);
         const item = this.actor.items.get(iid);
-        const quantity = parseInt(event.currentTarget.value);
+        const quantity = parseInt((event.currentTarget as HTMLInputElement).value);
 
         // Inform users about issues with templating or programming.
-        if (!item?.system || !('technology' in item?.system) || item?.system.technology === undefined || !(item && quantity && item.system.technology)) {
-            console.error(`Shadowrun 5e | Tried alterting technology quantity on an item without technology data: ${item?.id}`, item); return;
+        if (!quantity || !item?.system?.technology) {
+            console.error(`Shadowrun 5e | Tried altering technology quantity on an item without technology data: ${item?.id}`, item);
+            return;
         }
 
         await item.update({ system: { technology: { quantity } } });
     }
 
     /**
-     * Change the rating on an item shown within a sheet item list.
+     * Toggle an Item or Effect to be hidden/visible on an actor sheet
+     * - this is used in part with the `isVisible` handlebar helper
+     * @param event
+     * @private
      */
-    async _onListItemChangeRating(event) {
-        const iid = Helpers.listItemId(event);
-        const item = this.actor.items.get(iid);
-        const rtg = parseInt(event.currentTarget.value);
-        if (item && rtg) {
-            await item.update({ system: { technology: { rating: rtg } } });
+    static async #toggleItemVisible(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
+        const uuid = SheetFlow.closestUuid(event.target);
+        const itemId = SheetFlow.closestItemId(event.target);
+        const effectId = SheetFlow.closestEffectId(event.target);
+        // if we got an effectId, use its Effect ID to make actor's hidden effects keep when getting imported or made as token actors
+        const hiddenId = effectId || (this.actor.items.get(itemId) ? itemId : uuid);
+        if (hiddenId) {
+            const hidden_items = this.actor.system.hidden_items.slice();
+
+            const index = hidden_items.indexOf(hiddenId);
+
+            if (index >= 0) {
+                hidden_items.splice(index, 1);
+            } else {
+                hidden_items.push(hiddenId);
+            }
+            await this.actor.update({system: { hidden_items }});
         }
     }
 
     /**
      * Change the equipped status of an item shown within a sheet item list.
      */
-    async _onListItemToggleEquipped(event) {
+    static async #onToggleEquippedItem(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        const iid = Helpers.listItemId(event);
-        const item = this.actor.items.get(iid);
+        if (!(event.target instanceof HTMLElement)) return;
+        const id = SheetFlow.closestItemId(event.target);
+        const item = this.actor.items.get(id);
         if (!item) return;
 
-        // Handle the equipped state.
-        if (item.isType('device')) {
-            await this.document.equipOnlyOneItemOfType(item);
-        } else {
-            await this.actor.updateEmbeddedDocuments('Item', [{
-                _id: iid,
-                system: { technology: { equipped: !item.isEquipped() } }
-            }]);
+        if (item.isType('critter_power', 'sprite_power')) {
+            switch (item.system.optional) {
+                case 'standard':
+                    return;
+                case 'enabled_option':
+                    await item.update({ system: { optional: 'disabled_option', enabled: false } });
+                    break;
+                case 'disabled_option':
+                    await item.update({ system: { optional: 'enabled_option', enabled: true } });
+                    break;
+            }
+        } else if (item.canBeEquipped()) {
+            // Handle the equipped state.
+            if (item.isType('device')) {
+                await this.document.equipOnlyOneItemOfType(item);
+            } else {
+                await item.update({ system: { technology: { equipped: !item.isEquipped() }}})
+            }
+            this.actor.render(false);
         }
-
-        this.actor.render(false);
     }
 
     /**
      * Toggle the Wireless state of an item, iterating through the different states
      * @param event
      */
-    async _onListItemToggleWireless(event: MouseEvent) {
+    static async #toggleWirelessState(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
         event.stopPropagation();
+        if (!(event.target instanceof HTMLElement)) return;
 
-        const iid = Helpers.listItemId(event);
-        const item = this.actor.items.get(iid);
-        if (!item) return;
+        const uuid = SheetFlow.closestUuid(event.target);
+        const item = await fromUuid(uuid);
+        if (!(item instanceof SR5Item)) return;
 
         // iterate through the states of online -> silent -> offline
         const newState = event.shiftKey ? 'none'
@@ -1722,225 +1755,49 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
                                             : 'online';
 
         // update the embedded item with the new wireless state
-        await this.actor.updateEmbeddedDocuments('Item', [{
-            '_id': iid,
-            system: { technology: { wireless: newState } }
-        }]);
-    }
-
-    /**
-     * Change the enabled status of an item shown within a sheet item list.
-     */
-    async _onListItemToggleEnabled(event) {
-        event.preventDefault();
-        const iid = Helpers.listItemId(event);
-        const item = this.actor.items.get(iid);
-        if (!item) return;
-        if (!item.isType('critter_power') && !item.isType('sprite_power')) return;
-
-        switch (item.system.optional) {
-            case 'standard':
-                return;
-            case 'enabled_option':
-                await this.actor.updateEmbeddedDocuments('Item', [{
-                    _id: iid,
-                    system: { optional: 'disabled_option', enabled: false }
-                }]);
-                break;
-            case 'disabled_option':
-                await this.actor.updateEmbeddedDocuments('Item', [{
-                    _id: iid,
-                    system: { optional: 'enabled_option', enabled: true }
-                }]);
-                break;
-        }
-
-        this.actor.render(false);
-    }
-
-    /**
-     * Show / hide the items description within a sheet item l ist.
-     */
-    async _onListItemToggleDescriptionVisibility(event) {
-        event.preventDefault();
-        const item = $(event.currentTarget).parents('.list-item');
-        const iid = item.data().itemId;
-        const field = item.find('.list-item-description');
-        field.toggle();
-        if (iid) {
-            if (field.is(':visible')) this._shownDesc.push(iid);
-            else this._shownDesc = this._shownDesc.filter((val) => val !== iid);
-        }
-    }
-
-    /**
-     * Create an inventory place on the actor for gear organization.
-     */
-    async _onInventoryCreate(event) {
-        event.preventDefault();
-
-        // Overwrite currently selected inventory.
-        $('#input-inventory').val('');
-        await this._onInplaceInventoryEdit(event, 'create');
-    }
-
-    /**
-     * Remove the currently selected inventory.
-     * @param event
-     */
-    async _onInventoryRemove(event) {
-        event.preventDefault();
-
-        // TODO: Allow for options overwriting title/message and so forth.
-        const userConsented = await Helpers.confirmDeletion();
-        if (!userConsented) return;
-
-        await this.actor.inventory.remove(this.selectedInventory);
-
-        // Preselect default instead of none.
-        this.selectedInventory = this.actor.defaultInventory.name;
-        this.render();
-    }
-
-    /**
-     * Hide inventory selection and show inline editing instead.
-     *
-     * @param event
-     * @param action What action to take during later saving event.
-     */
-    async _onInplaceInventoryEdit(event, action: 'edit' | 'create' = 'edit') {
-        event.preventDefault();
-
-        // Disallow editing of default inventory.
-        if (action === 'edit' && this.actor.inventory.disallowRename(this.selectedInventory)) {
-            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
-            return;
-        }
-
-        $('.selection-inventory').hide();
-        $('.inline-input-inventory').show();
-
-        // Mark action and pre-select.
-        $('#input-inventory').data('action', action).select();
-    }
-
-    /**
-     * Hide inline inventory editing and show inventory selection instead.
-     *
-     * Cancel edit workflow and do nothing.
-     *
-     * @param event Can be an event of type click or keydown.
-     */
-    async _onInplaceInventoryEditCancel(event) {
-        if (event.type === 'keydown' && event.code !== 'Escape') return;
-
-        event.preventDefault();
-
-        $('.selection-inventory').show();
-        $('.inline-input-inventory').hide();
-
-        // Reset to selected inventory for next try.
-        $('#input-inventory')
-            .data('action', undefined)
-            .val(this.selectedInventory);
-    }
-
-    /**
-     * Complete inline editing and either save changes or create a missing inventory.
-     *
-     * @param event Either a click or keydown event.
-     */
-    async _onInplaceInventoryEditSave(event) {
-        if (event.type === 'keydown' && event.code !== 'Enter') return;
-
-        event.preventDefault();
-
-        const inputElement = $('#input-inventory');
-        const action = inputElement.data('action');
-        let inventory: string | void = String(inputElement.val());
-        if (!inventory) return;
-
-        switch (action) {
-            case 'edit':
-                inventory = await this.actor.inventory.rename(this.selectedInventory, inventory);
-                break;
-            case 'create':
-                inventory = await this.actor.inventory.create(inventory);
-                break;
-        }
-
-        await this._onInplaceInventoryEditCancel(event);
-
-        if (!inventory) return;
-
-        // Preselect the new or previous inventory.
-        this.selectedInventory = inventory;
-        this.render();
+        await item.update({ system: { technology: { wireless: newState } } });
     }
 
     /**
      * Change selected inventory for this sheet.
-     *
-     * @param event
      */
-    async _onSelectInventory(event) {
+    _onSelectInventory(event: Event) {
         event.preventDefault();
 
-        const inventory = String($(event.currentTarget).val());
+        const inventory = String($(event.currentTarget!).val());
 
         if (inventory)
             this.selectedInventory = inventory;
 
-        this.render();
+        void this.render();
     }
 
     /**
-     * Move an item between two inventories.
-     * @param event
+     * After selecting a new ammo for a weapon
      */
-    async _onItemMoveToInventory(event) {
+    async _onWeaponAmmoSelect(event: Event) {
+        const id = SheetFlow.closestItemId(event.currentTarget);
+        const item = this.actor.items.get(id);
+        if (!item?.isType('weapon')) return;
+        const newTarget = (event.currentTarget as HTMLSelectElement).value;
+        if (!newTarget) return;
+        await item.equipAmmo(newTarget);
+    }
+
+    static async #reloadAmmo(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-
-        const itemId = Helpers.listItemId(event);
-        const item = this.actor.items.get(itemId);
-        if (!item) return;
-
-        // Ask user about what inventory to move the item to.
-        const dialog = new MoveInventoryDialog(this.actor, item, this.selectedInventory);
-        const inventory = await dialog.select();
-        if (dialog.canceled) return;
-
-        await this.actor.inventory.addItems(inventory, item);
+        if (!(event.target instanceof HTMLElement)) return;
+        const id = SheetFlow.closestItemId(event.target);
+        const item = this.actor.items.get(id);
+        if (item) return item.reloadAmmo(false);
     }
 
-    /**
-     * When editing an existing or new inventory on a new actor for the frist time,
-     * the initial change event (by leaving the element focus, i.e. leaving or clicking on submit)
-     * will cause a general form submit (Foundry FormApplication onChangeSubmit), causing a render
-     * and removing the inventory input box.
-     *
-     * Note: This ONLY happens on new actors and NOT on inventory changes on old actors. The root cause
-     * is unclear.
-     *
-     * As the inventory inpunt box lives outside of Foundries default form handling, prevent
-     * this by stopping propagation into Foundries onChange listeners.
-     *
-     * @param event Any event
-     */
-    _onInventoryChangePreventSheetSubmit(event: Event) {
-        event.stopPropagation();
-    }
-
-    /**
-     * Initiative a reload from a sheet event.
-     *
-     * @param event
-     */
-    async _onReloadAmmo(event, partialReload: boolean) {
+    static async #partialReloadAmmo(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
-        const iid = Helpers.listItemId(event);
-        const item = this.actor.items.get(iid);
-        if (item) return item.reloadAmmo(partialReload);
+        if (!(event.target instanceof HTMLElement)) return;
+        const id = SheetFlow.closestItemId(event.target);
+        const item = this.actor.items.get(id);
+        if (item) return item.reloadAmmo(true);
     }
 
     /**
@@ -1951,7 +1808,7 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      *
      * @param event A mouse/pointer event
      */
-    async _onMatrixAttributeSelected(event) {
+    async _onMatrixAttributeSelected(event: Event) {
         if (!("matrix" in this.actor.system)) return;
 
         const iid = this.actor.system.matrix!.device;
@@ -1960,31 +1817,13 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
             console.error('could not find item');
             return;
         }
+        const currentTarget = event.currentTarget as HTMLInputElement;
         // grab matrix attribute (sleaze, attack, etc.)
-        const attribute = event.currentTarget.dataset.att;
+        const attribute = currentTarget.dataset.att as MatrixAttribute;
         // grab device attribute (att1, att2, ...)
-        const changedSlot = event.currentTarget.value;
+        const changedSlot = currentTarget.value;
 
         return item.changeMatrixAttributeSlot(changedSlot, attribute);
-    }
-
-    _setupCustomCheckbox(html) {
-        const setContent = (el) => {
-            const checkbox = $(el).children('input[type=checkbox]');
-            const checkmark = $(el).children('.checkmark');
-            if ($(checkbox).prop('checked')) {
-                $(checkmark).addClass('fa-check-circle');
-                $(checkmark).removeClass('fa-circle');
-            } else {
-                $(checkmark).addClass('fa-circle');
-                $(checkmark).removeClass('fa-check-circle');
-            }
-        };
-        html.find('label.checkbox').each(function (this: any) {
-            setContent(this);
-        });
-        html.find('label.checkbox').click((event) => { setContent(event.currentTarget); });
-        html.find('.submit-checkbox').change(async (event) => this._onSubmit(event));
     }
 
     /**
@@ -2033,10 +1872,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
 
     /**
      * Show the situation modifiers application for this actor doucment
-     *
-     * @param event
      */
-    _onShowSituationModifiersApplication(event) {
+    _onShowSituationModifiersApplication(event: Event) {
         new SituationModifiersApplication(this.actor).render(true);
     }
 
@@ -2045,7 +1882,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      *
      * @param event
      */
-    async _toggleAllFreshImportFlags(event, onOff: boolean) {
+    async _toggleAllFreshImportFlags(event: PointerEvent, onOff: boolean) {
+        if (!(event.target instanceof HTMLElement)) return;
         const allItems = this.actor.items;
         console.debug('Toggling all importFlags on owned items to ->', onOff, event);
         for (const item of allItems) {
@@ -2060,8 +1898,11 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      *
      * @param event
      */
-    _onResetActorRunData(event) {
-        this.actor.resetRunData()
+    static async #resetActorRunData(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+        await this.actor.resetRunData()
     }
 
     /**
@@ -2072,6 +1913,8 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
         return {
             skip: game.keybindings.get('shadowrun5e', 'hide-test-dialog').map(binding => binding.key.replace('Key', '').toUpperCase()).join(', '),
             card: game.keybindings.get('shadowrun5e', 'show-item-card').map(binding => binding.key.replace('Key', '').toUpperCase()).join(', '),
+            qtySome: game.keybindings.get('shadowrun5e', 'add-remove-some-qty').map(binding => binding.key.replace('Key', '').toUpperCase()).join(', '),
+            qtyMany: game.keybindings.get('shadowrun5e', 'add-remove-many-qty').map(binding => binding.key.replace('Key', '').toUpperCase()).join(', '),
         }
     }
 
@@ -2083,5 +1926,403 @@ export class SR5BaseActorSheet extends foundry.appv1.sheets.ActorSheet {
      */
     get itemEffectApplyTos() {
         return ['actor', 'item', 'test_all', 'test_item', 'modifier'];
+    }
+
+    override async _onFirstRender(context, options) {
+        await super._onFirstRender(context, options);
+
+        this._createContextMenu(this._getItemListContextOptions.bind(this), "[data-item-id]", {
+            hookName: "getItemListContextOptions",
+            jQuery: false,
+            fixed: true,
+        });
+        this._createContextMenu(this._getEffectListContextOptions.bind(this), "[data-effect-id]", {
+            hookName: "getEffectListContextOptions",
+            jQuery: false,
+            fixed: true,
+        });
+        this._createContextMenu(this._getSkillListContextOptions.bind(this), "[data-skill-id]", {
+            hookName: "getSkillListContextOptions",
+            jQuery: false,
+            fixed: true,
+        });
+        this._createContextMenu(this._getAttributeContextOptions.bind(this), "[data-attribute-id]", {
+            hookName: "getAttributeContextOptions",
+            jQuery: false,
+            fixed: true,
+        });
+    }
+    _getSkillListContextOptions() {
+        return [
+            SheetFlow._getSourceContextOption(),
+            {
+                name: "SR5.ContextOptions.AddSkillEffect",
+                icon: "<i class='fas fa-file-circle-plus'></i>",
+                callback: async (target: HTMLElement) => {
+                    const skillTarget = this._closestSkillTarget(target)!;
+                    const skillId = skillTarget.dataset.skillId!;
+                    const subCategory = skillTarget.dataset.subcategory;
+                    let path = '';
+                    switch (skillTarget.dataset.category) {
+                        case 'knowledge':
+                            path = `system.skills.knowledge.${subCategory}.${skillId}`;
+                            break;
+                        case 'language':
+                            path = `system.skills.language.${skillId}`;
+                            break;
+                        case 'active':
+                        default:
+                            path = `system.skills.active.${skillId}`;
+                            break;
+                    }
+                    if (!path) return;
+                    const skill = this.actor.getSkill(skillId)!;
+                    const effectData = {
+                        name: `${game.i18n.localize(skill.label) ?? skill.name} ${game.i18n.localize('SR5.Effect')}`,
+                        system: {
+                            applyTo: 'actor' as const,
+                        },
+                        changes: [
+                            {
+                                key: path,
+                                mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+                                priority: 0,
+                                value: '',
+                            }
+                        ]
+                    };
+                    await this.actor.createEmbeddedDocuments("ActiveEffect", [effectData], { renderSheet: true });
+                }
+            },
+            {
+                name: "SR5.ContextOptions.EditSkill",
+                icon: "<i class='fas fa-pen-to-square'></i>",
+                callback: async (target: HTMLElement) => {
+                    await this._editSkill(target);
+                }
+            },
+            {
+                name: "SR5.ContextOptions.DeleteSkill",
+                icon: "<i class='fas fa-trash'></i>",
+                callback: async (target: HTMLElement) => {
+                    const userConsented = await Helpers.confirmDeletion();
+                    if (!userConsented) return;
+
+                    const skillTarget = this._closestSkillTarget(target)!;
+                    const skillId = skillTarget.dataset.skillId!;
+                    const subCategory = skillTarget.dataset.subcategory!;
+                    switch (skillTarget.dataset.category) {
+                        case 'active':
+                            await this.actor.removeActiveSkill(skillId);
+                            break;
+                        case 'knowledge':
+                            await this.actor.removeKnowledgeSkill(skillId, subCategory as any);
+                            break;
+                        case 'language':
+                            await this.actor.removeLanguageSkill(skillId);
+                            break;
+                    }
+                }
+            }
+        ]
+    }
+
+    _getAttributeContextOptions() {
+        return [
+            SheetFlow._getSourceContextOption(),
+            {
+                name: "SR5.ContextOptions.AddAttributeEffect",
+                icon: "<i class='fas fa-file-circle-plus'></i>",
+                callback: async (target: HTMLElement) => {
+                    const attributeId = (target.closest<HTMLElement>('[data-attribute-id]'))?.dataset.attributeId;
+                    if (!attributeId) return;
+                    const attribute = this.actor.getAttribute(attributeId);
+                    if (!attribute) return;
+                    let path = '';
+                    if (this.actor.matrixData()?.[attributeId]) {
+                        path = `system.matrix.${attributeId}`;
+                    } else if (this.actor.getVehicleStats()?.[attributeId]) {
+                        path = `system.vehicle_stats.${attributeId}`;
+                    } else if (this.actor.getAttributes()[attributeId]) {
+                        path = `system.attributes.${attributeId}`;
+                    }
+                    const effectData = {
+                        name: `${game.i18n.localize(attribute.label)} ${game.i18n.localize('SR5.Effect')}`,
+                        changes: [
+                            {
+                                key: path,
+                                mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+                                priority: 0,
+                                value: '',
+                            }
+                        ],
+                        system: {
+                            applyTo: 'actor' as const,
+                        }
+                    };
+                    await this.actor.createEmbeddedDocuments("ActiveEffect", [effectData], { renderSheet: true });
+                }
+            },
+        ]
+    }
+
+    _getItemListContextOptions() {
+        return [
+            SheetFlow._getSourceContextOption(),
+            {
+                // context menu to view items that aren't an embedded item of this actor
+                name: "SR5.ContextOptions.ViewItem",
+                icon: "<i class='fas fa-eye'></i>",
+                condition: (target: HTMLElement) => {
+                    const id = SheetFlow.closestItemId(target);
+                    const item = this.actor.items.get(id);
+                    if (item) return false;
+                    const uuid = SheetFlow.closestUuid(target);
+                    const document = fromUuidSync(uuid);
+                    return document && document instanceof SR5Item;
+                },
+                callback: async (target: HTMLElement) => {
+                    const uuid = SheetFlow.closestUuid(target);
+                    const document = await fromUuid(uuid);
+                    if (document instanceof SR5Item) {
+                        await document.sheet?.render(true)
+                    }
+                }
+            },
+            {
+                name: "SR5.ContextOptions.EditItem",
+                icon: "<i class='fas fa-pen-to-square'></i>",
+                condition: (target: HTMLElement) => {
+                    const id = SheetFlow.closestItemId(target);
+                    const item = this.actor.items.get(id);
+                    return item !== undefined;
+                },
+                callback: async (target: HTMLElement) => {
+                    const id = SheetFlow.closestItemId(target);
+                    const item = this.actor.items.get(id);
+                    if (item) {
+                        await item.sheet?.render(true, { mode: 'edit' })
+                    }
+                }
+            },
+            {
+                name: "SR5.ContextOptions.MoveItem",
+                icon: "<i class='fas fa-arrow-right-arrow-left'></i>",
+                condition: (target: HTMLElement) => {
+                    const id = SheetFlow.closestItemId(target);
+                    const item = this.actor.items.get(id);
+                    if (!item) return false;
+                    return item.isType('equipment', 'weapon', 'ammo', 'modification', 'armor', 'bioware', 'cyberware', 'device');
+                },
+                callback: async (target: HTMLElement) => {
+                    await this._moveItemToInventory(target);
+                }
+            },
+            {
+                name: "SR5.ContextOptions.DeleteItem",
+                icon: "<i class='fas fa-trash'></i>",
+                condition: (target: HTMLElement) => {
+                    const id = SheetFlow.closestItemId(target);
+                    const item = this.actor.items.get(id);
+                    return item !== undefined;
+                },
+                callback: async (target: HTMLElement) => {
+                    const userConsented = await Helpers.confirmDeletion();
+                    if (!userConsented) return;
+
+                    const id = SheetFlow.closestItemId(target);
+                    const item = this.actor.items.get(id);
+                    if (item) {
+                        await this._handleDeleteItem(item);
+                    }
+                }
+            }
+        ]
+    }
+
+    _getEffectListContextOptions() {
+        return [
+            SheetFlow._getSourceContextOption(),
+            {
+                name: "SR5.ContextOptions.EditEffect",
+                icon: "<i class='fas fa-pen-to-square'></i>",
+                condition: (target: HTMLElement) => {
+                    const id = SheetFlow.closestEffectId(target);
+                    const item = this.actor.effects.get(id);
+                    if (item) return true;
+                    const uuid = SheetFlow.closestUuid(target);
+                    const doc = fromUuidSync(uuid);
+                    return (doc instanceof SR5ActiveEffect);
+                },
+                callback: async (target: HTMLElement) => {
+                    const id = SheetFlow.closestEffectId(target);
+                    const item = this.actor.effects.get(id);
+                    if (item) {
+                        await item.sheet?.render(true)
+                    } else {
+                        const uuid = SheetFlow.closestUuid(target);
+                        const doc = fromUuidSync(uuid);
+                        if (doc instanceof SR5ActiveEffect) {
+                            await doc.sheet?.render(true);
+                        }
+                    }
+                }
+            },
+            {
+                name: "SR5.ContextOptions.DeleteEffect",
+                icon: "<i class='fas fa-trash'></i>",
+                condition: (target: HTMLElement) => {
+                    const id = SheetFlow.closestEffectId(target);
+                    const item = this.actor.effects.get(id);
+                    return item !== undefined;
+                    // don't check for effects by uuid for deletion
+                },
+                callback: async (target: HTMLElement) => {
+                    const userConsented = await Helpers.confirmDeletion();
+                    if (!userConsented) return;
+
+                    const id = SheetFlow.closestEffectId(target);
+                    await this.actor.deleteEmbeddedDocuments('ActiveEffect', [id]);
+                }
+            }
+        ]
+    }
+
+    async _prepareActions() {
+        const actions = await PackActionFlow.getActorSheetActions(this.actor);
+
+        // Prepare sorting and display of a possibly translated document name.
+        const sheetActions: sheetAction[] = [];
+        for (const action of actions) {
+            sheetActions.push({
+                name: PackActionFlow.localizePackAction(action.name),
+                description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(action.system.description.value),
+                action
+            });
+        }
+
+        return sheetActions.sort(Helpers.sortByName.bind(Helpers));
+    }
+
+    static async #toggleInitiativeBlitz(this: SR5BaseActorSheet, event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const blitz = this.actor.system.initiative.blitz;
+        await this.actor.update({system: { initiative: { blitz: !blitz }}});
+    }
+
+    static async #rollInitiative(this: SR5BaseActorSheet, event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+        await this.actor.rollInitiative();
+    }
+
+    static async #renameInventory(this: SR5BaseActorSheet, event: Event) {
+        const inventory = SheetFlow.closestAction(event.target)!.dataset.inventory!;
+        if (this.actor.inventory.disallowRename(inventory)) {
+            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
+            return;
+        }
+        const app = new InventoryRenameApp(this.actor, inventory, 'edit');
+        await app.render(true);
+    }
+    /**
+     * Create an inventory place on the actor for gear organization.
+     */
+    static async #createInventory(this: SR5BaseActorSheet, event: Event) {
+        event.preventDefault();
+        const app = new InventoryRenameApp(this.actor, '', 'create');
+        await app.render(true);
+        void this.render();
+    }
+
+    /**
+     * Remove the currently selected inventory.
+     */
+    static async #removeInventory(this: SR5BaseActorSheet, event: Event) {
+        event.preventDefault();
+
+        // TODO: Allow for options overwriting title/message and so forth.
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+        const inventory = SheetFlow.closestAction(event.target)!.dataset.inventory!;
+
+        if (this.actor.inventory.disallowRemove(inventory)) {
+            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantRemoveDefaultInventory'));
+            return;
+        }
+
+        await this.actor.inventory.remove(this.selectedInventory);
+
+        // Preselect default instead of none.
+        this.selectedInventory = this.actor.defaultInventory.name;
+        void this.render();
+    }
+
+    async _moveItemToInventory(target: HTMLElement) {
+
+        const id = SheetFlow.closestItemId(target);
+        const item = this.actor.items.get(id);
+        if (!item) return;
+
+        // Ask user about what inventory to move the item to.
+        const dialog = new MoveInventoryDialog(this.actor, item, this.selectedInventory);
+        const inventory = await dialog.select();
+        if (dialog.canceled) return;
+
+        await this.actor.inventory.addItems(inventory, item);
+    }
+
+    /**
+     * Show / hide the items description within a sheet item l ist.
+     */
+    static async #toggleSkillDescription(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
+        const id = this._closestSkillTarget(event.target)?.dataset.skillId;
+        if (!id) return;
+        if (this.expandedSkills.has(id)) {
+            this.expandedSkills.delete(id);
+            event.target?.closest('.list-item-container')?.classList.remove('expanded');
+        } else {
+            this.expandedSkills.add(id);
+            event.target?.closest('.list-item-container')?.classList.add('expanded');
+            const skill = this.actor.getSkill(id);
+            if (skill) {
+                const html = await TextEditor.enrichHTML(skill.description, { secrets: this.actor.isOwner, });
+                if (html) {
+                    event.target.closest('.list-item-container')!.querySelector('.description-body')!.innerHTML = html;
+                }
+            }
+        }
+    }
+
+    static async #addItemQty(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
+        const id = SheetFlow.closestItemId(event.target);
+        let item = this.actor.items.get(id);
+        if (!item) {
+            const uuid = SheetFlow.closestUuid(event.target);
+            item = await fromUuid(uuid) as any;
+        }
+        if (item instanceof SR5Item) {
+            await SheetFlow.addToQuantity(item, event);
+        }
+    }
+
+    static async #removeItemQty(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
+        const id = SheetFlow.closestItemId(event.target);
+        let item = this.actor.items.get(id);
+        if (!item) {
+            const uuid = SheetFlow.closestUuid(event.target);
+            item = await fromUuid(uuid) as any;
+        }
+        if (item instanceof SR5Item) {
+            await SheetFlow.removeFromQuantity(item, event);
+        }
     }
 }

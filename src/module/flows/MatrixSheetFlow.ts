@@ -1,6 +1,6 @@
 import { SR5Actor } from '../actor/SR5Actor';
 import { FormDialog, FormDialogOptions } from '@/module/apps/dialogs/FormDialog';
-import { SelectMatrixNetworkDialog } from '@/module/apps/dialogs/SelectMatrixNetworkDialog';
+import { NetworkManager } from '@/module/apps/NetworkManager';
 
 /**
  * Handling of sheet presentation around matrix data.
@@ -73,11 +73,8 @@ export const MatrixSheetFlow = {
      * @param actor
      */
     async promptConnectToMatrixNetwork(actor: SR5Actor): Promise<boolean> {
-        const dialog = new SelectMatrixNetworkDialog(actor);
-        const network = await dialog.select();
-        if (dialog.canceled) return false;
-
-        await actor.connectNetwork(network);
+        const app = new NetworkManager(actor);
+        await app.render(true);
         return true;
     }
 }

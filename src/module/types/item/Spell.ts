@@ -15,7 +15,7 @@ const SpellData = () => ({
     category: new StringField({
         blank: true,
         required: true,
-        choices: SR5.spellCategories
+        choices: SR5.spellCategories // what to do with enchantment (from chummer)?
     }),
     drain: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     range: new StringField({
@@ -70,6 +70,8 @@ export class Spell extends ItemBase<ReturnType<typeof SpellData>> {
     static override defineSchema() {
         return SpellData();
     }
+
+    static override LOCALIZATION_PREFIXES = ["SR5.Spell", "SR5.Item"];
 }
 
 console.log("SpellData", SpellData(), new Spell());

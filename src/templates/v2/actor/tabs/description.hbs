@@ -1,0 +1,16 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <div class="list-item list-item-header">
+            <div class="list-item-start">
+                <label>{{localize "SR5.Description"}}</label>
+            </div>
+        </div>
+        <div class="scrollable">
+            {{#if @root.isEditMode}}
+                {{formInput systemFields.description.fields.value value=source.system.description.value rootId=@root.rootId}}
+            {{else}}
+                {{{biographyHTML}}}
+            {{/if}}
+        </div>
+    </div>
+</section>

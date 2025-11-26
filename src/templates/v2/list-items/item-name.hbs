@@ -1,0 +1,13 @@
+<a class="{{#if (isBroken this)}}faded {{/if}}{{#if this.system.importFlags.isFreshImport}}{{#if (itemMarking "COLOR")}}fresh-import{{/if}}{{/if}}"
+   {{#if (isBroken this)}}
+       disabled
+   {{else}}
+       data-action="showItemDescription"
+   {{/if}}
+>
+    {{#if name}}
+        {{name}}
+    {{else}}
+        {{item.name}}
+    {{/if}}
+</a>

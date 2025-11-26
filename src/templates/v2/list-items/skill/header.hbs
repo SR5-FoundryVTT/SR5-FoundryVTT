@@ -1,0 +1,33 @@
+<div class="list-item list-item-header {{cssClass}}"
+     {{#if headerAction}}
+     data-action="{{headerAction}}"
+     {{/if}}
+>
+    <div class="list-item-start">
+        <label>{{localize label}}</label>
+    </div>
+    {{#if @root.isPlayMode}}
+    <div class="list-item-col">
+        <label>{{localize "SR5.Specializations"}}</label>
+    </div>
+    {{/if}}
+    <div class="list-item-col {{#if @root.isPlayMode}} skinny-col {{/if}}">
+        <label class="skill-rtg-label">
+            {{#if (or @root.filters.showUntrainedSkills (not (eq category 'active')))}}
+                {{localize "SR5.Rtg"}}
+            {{else}}
+                {{localize "SR5.RtgAboveZero"}}
+            {{/if}}
+        </label>
+    </div>
+    <div class="list-item-icons{{#if @root.isPlayMode}} skinny-icons {{/if}}">
+        {{#if @root.isEditMode}}
+            {{#if addAction}}
+                <a data-action="{{addAction}}"
+                   data-skill-type="{{addSkillType}}">
+                    {{localize "SR5.Add"}}&nbsp;<i class="fas fa-plus"></i>
+                </a>
+            {{/if}}
+        {{/if}}
+    </div>
+</div>

@@ -14,8 +14,8 @@ const ICData = () => ({
     ...CommonData(),
     icType: new StringField({
         required: true,
-        initial: "acid",
-        choices: SR5.ic.types
+        initial:'patrol',
+        choices: SR5.icTypes,
     }),
     special: new StringField({ required: true, initial: 'mundane', choices: ['mundane'], readonly: true }),
 
@@ -59,6 +59,7 @@ export class IC extends ActorBase<ReturnType<typeof ICData>> {
     static override defineSchema() {
         return ICData();
     }
+    static override LOCALIZATION_PREFIXES = ["SR5.IC", "SR5.Actor"];
 }
 
 console.log("ICData", ICData(), new IC());

@@ -1,0 +1,24 @@
+<div class="fill-container">
+    <div class="input-row">
+        <label class="label" data-tooltip="SR5.NuyenManager.CurrentNuyen">¥{{nuyenValue nuyen}}</label>
+        <label><i class="fas fa-plus"></i></label>
+        <div class="input-col">
+            <div class="mod-button-container">
+                <a data-action="increaseNuyen" data-amount=10>+¥10</a>
+                <a data-action="increaseNuyen" data-amount=100>+¥100</a>
+                <a data-action="increaseNuyen" data-amount=1000>+¥1000</a>
+            </div>
+            <div>
+                <input class="short nuyen center mod-input" type="number" name="incoming-nuyen" value={{nuyenModifier}} />
+            </div>
+            <div class="mod-button-container">
+                <a data-action="reduceNuyen" data-amount=10>-¥10</a>
+                <a data-action="reduceNuyen" data-amount=100>-¥100</a>
+                <a data-action="reduceNuyen" data-amount=1000>-¥1000</a>
+            </div>
+        </div>
+        <label><i class="fas fa-equals"></i></label>
+        <label class="label {{#if (gt nuyenModifier 0)}} positive {{else if (lt nuyenModifier 0)}} negative {{/if}}"
+               data-tooltip="SR5.NuyenManager.FinalNuyen">¥{{nuyenValue modifiedNuyen}}</label>
+    </div>
+</div>

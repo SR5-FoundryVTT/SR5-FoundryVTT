@@ -132,14 +132,14 @@ export class SituationModifier {
      * Determine if a fixed value has been set.
      */
     get hasFixed(): boolean {
-        return this.applied.hasOwnProperty('fixed');
+        return Object.hasOwn(this.applied, 'fixed');
     }
 
     /**
      * Determine if a fixed user selection has been made.
      */
     get hasFixedSelection(): boolean {
-        return this.applied.active.hasOwnProperty('value');
+        return Object.hasOwn(this.applied.active, 'value');
     }
 
     /**
@@ -189,7 +189,7 @@ export class SituationModifier {
      * @param modifier The possibly active modifier to check
      */
     isActive(modifier: string) {
-        return this.source.active.hasOwnProperty(modifier);
+        return Object.hasOwn(this.source.active, modifier);
     }
 
     /**

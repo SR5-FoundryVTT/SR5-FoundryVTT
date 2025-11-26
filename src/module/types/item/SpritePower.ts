@@ -1,4 +1,4 @@
-import { SR5 } from "@/module/config";
+import { SR5 } from '@/module/config';
 import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
 const { BooleanField, StringField } = foundry.data.fields;
@@ -24,6 +24,9 @@ export class SpritePower extends ItemBase<ReturnType<typeof SpritePowerData>> {
     static override defineSchema() {
         return SpritePowerData();
     }
+    static override LOCALIZATION_PREFIXES = ["SR5.SpritePower", "SR5.Item"];
 }
+
+export type SpritePowerType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof SpritePowerData>>;
 
 console.log("SpritePowerData", SpritePowerData(), new SpritePower());

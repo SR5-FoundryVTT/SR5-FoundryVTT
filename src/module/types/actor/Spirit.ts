@@ -7,7 +7,7 @@ import { Tracks } from "../template/ConditionMonitors";
 import { VisibilityChecks } from "../template/Visibility";
 import { AwakendLimits, Limits } from "../template/Limits";
 import { ModifiableField } from "../fields/ModifiableField";
-import { AttributeField, Attributes } from "../template/Attributes";
+import { AttributeField, Attributes } from '../template/Attributes';
 import { CommonData, PhysicalCombatValues, CreateModifiers, MagicData, ActorBase } from "./Common";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
@@ -51,7 +51,7 @@ const SpiritData = () => ({
 
     // === Summoning ===
     summonerUuid: new StringField({ required: true }),
-    services: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+    services: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0, step: 1 }),
     bound: new BooleanField(),
 
     // === Visibility ===
@@ -85,6 +85,7 @@ export class Spirit extends ActorBase<ReturnType<typeof SpiritData>> {
     static override defineSchema() {
         return SpiritData();
     }
+    static override LOCALIZATION_PREFIXES = ["SR5.Spirit", "SR5.Actor"];
 }
 
 console.log("SpiritData", SpiritData(), new Spirit());
