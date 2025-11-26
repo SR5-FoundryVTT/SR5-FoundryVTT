@@ -11,10 +11,10 @@ type TagifyList = { id: string; label: string }[];
 export class TagifyField<
     const ElementFieldType extends DataField.Any | Document.AnyConstructor,
     const Options extends ArrayField.AnyOptions = ArrayField.DefaultOptions,
-    // eslint-disable-next-line deprecation/deprecation
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     const AssignmentElementType = ArrayField.AssignmentElementType<ElementFieldType>,
     const InitializedElementType = ArrayField.InitializedElementType<ElementFieldType>,
-    // eslint-disable-next-line deprecation/deprecation
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     const AssignmentType = ArrayField.AssignmentType<AssignmentElementType, Options>,
     const InitializedType = ArrayField.InitializedType<InitializedElementType, Options>,
     const PersistedElementType = ArrayField.PersistedElementType<ElementFieldType>,

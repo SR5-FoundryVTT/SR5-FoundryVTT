@@ -24,7 +24,7 @@ import SchemaField = foundry.data.fields.SchemaField;
 export class ModifiableField<
     Fields extends ReturnType<typeof ModifiableValue>,
     Options extends SchemaField.Options<Fields> = SchemaField.DefaultOptions,
-    // eslint-disable-next-line deprecation/deprecation
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
     AssignmentType = SchemaField.Internal.AssignmentType<Fields, Options>,
     InitializedType = SchemaField.Internal.InitializedType<Fields, Options>,
     PersistedType extends AnyObject | null | undefined = SchemaField.Internal.PersistedType<Fields, Options>
