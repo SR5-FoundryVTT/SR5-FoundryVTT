@@ -12,7 +12,7 @@ import { SR5ActiveEffect } from "./effect/SR5ActiveEffect";
 /**
  * Manage Active Effect instances through the Actor Sheet via effect control buttons.
  * @param {JQuery.ClickEvent} event      The left-click event on the effect control
- * @param {Actor|Item} owner      The owning entity which manages this effect
+ * @param {SR5Item} owner      The owning entity which manages this effect
  */
 export async function onManageActiveEffect(
     event: JQuery.ClickEvent<HTMLElement, undefined, HTMLElement, HTMLElement>,
@@ -77,7 +77,7 @@ export async function onManageItemActiveEffect(event: MouseEvent) {
     if (effectUuidIsNestedItem(uuid))
         return ui.notifications.error("Effects on nested items can't be managed. Move the item to the sidebar to manage.");
 
-    const effect = await fromUuid(uuid) as SR5ActiveEffect;
+    const effect = await fromUuid<SR5ActiveEffect>(uuid);
     if (!effect) return;
 
     switch (icon?.dataset?.action) {
