@@ -46,11 +46,11 @@
                 {{#if @root.actor}}
                     {{> 'systems/shadowrun5e/dist/templates/v2/list-items/toggle-visible-icon.hbs' item }}
                 {{/if}}
-                <a data-tooltip="SR5.EditEffect" data-action="editEffect">
+                <a data-tooltip="SR5.Tooltips.Effect.EditEffect" data-action="editEffect">
                     <i class="fas fa-pen-to-square"></i>
                 </a>
                 {{#unless isItemEffect}}
-                    <a data-tooltip="SR5.Delete" data-action="deleteEffect">
+                    <a data-tooltip="SR5.Tooltips.Effect.DeleteEffect" data-action="deleteEffect">
                         <i class="fas fa-trash"></i>
                     </a>
                 {{/unless}}

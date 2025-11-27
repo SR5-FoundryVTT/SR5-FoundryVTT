@@ -9,7 +9,7 @@ import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { MatrixRules } from '../rules/MatrixRules';
 import { RangedWeaponRules } from '../rules/RangedWeaponRules';
 
-import { onManageActiveEffect, prepareSortedEffects, prepareSortedItemEffects } from '../effects';
+import { prepareSortedEffects, prepareSortedItemEffects } from '../effects';
 
 import { ActionFlow } from './flows/ActionFlow';
 import { SINFlow } from './flows/SINFlow';
@@ -521,9 +521,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     activateListeners_LEGACY(html: JQuery<HTMLElement>) {
         Helpers.setupCustomCheckbox(this, html);
 
-        // Active Effect management
-        html.find(".effect-control").on('click', event => { void onManageActiveEffect(event, this.item)});
-
         /**
          * General item handling
          */
@@ -905,13 +902,18 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     }
 
     static async #addEffect(this: SR5ItemSheet, event: Event) {
-        // TODO handle nested items
         event.preventDefault();
         const effect = [{
             name: game.i18n.localize("SR5.ActiveEffect.New"),
         }];
 
-        await this.item.createEmbeddedDocuments('ActiveEffect', effect);
+        if (this.item._isNestedItem) {
+            effect[0]['_id'] = foundry.utils.randomID();
+            const sr5Effect = new SR5ActiveEffect(effect[0], { parent: this.item });
+            await this.item.createNestedActiveEffect(sr5Effect);
+        } else {
+            await this.item.createEmbeddedDocuments('ActiveEffect', effect);
+        }
     }
 
     static async #editEffect(this: SR5ItemSheet, event: MouseEvent) {
@@ -947,9 +949,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (!userConsented) return;
 
         const effectId = SheetFlow.closestEffectId(event.target);
-        const effect = this.item.effects.get(effectId);
-        if (effect?.id) {
-            await this.item.deleteEmbeddedDocuments('ActiveEffect', [effect.id]);
+        if (this.item._isNestedItem) {
+            this.item.effects.delete(effectId);
+            await this.render(true);
+        } else {
+            await this.item.deleteEmbeddedDocuments('ActiveEffect', [effectId]);
         }
     }
 
@@ -1030,9 +1034,14 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 callback: async (target: HTMLElement) => {
                     const userConsented = await Helpers.confirmDeletion();
                     if (!userConsented) return;
-                    const id = SheetFlow.closestEffectId(target);
-                    if (id) {
-                        await this.item.deleteEmbeddedDocuments('ActiveEffect', [id]);
+                    const effectId = SheetFlow.closestEffectId(target);
+                    if (effectId) {
+                        if (this.item._isNestedItem) {
+                            this.item.effects.delete(effectId);
+                            await this.render(true);
+                        } else {
+                            await this.item.deleteEmbeddedDocuments('ActiveEffect', [effectId]);
+                        }
                     }
                 }
             }
