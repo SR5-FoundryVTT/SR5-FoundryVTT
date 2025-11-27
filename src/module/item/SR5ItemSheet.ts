@@ -949,9 +949,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (!userConsented) return;
 
         const effectId = SheetFlow.closestEffectId(event.target);
-        const effect = this.item.effects.get(effectId);
-        if (effect?.id) {
-            await this.item.deleteEmbeddedDocuments('ActiveEffect', [effect.id]);
+        if (this.item._isNestedItem) {
+            this.item.effects.delete(effectId);
+            await this.render(true);
+        } else {
+            await this.item.deleteEmbeddedDocuments('ActiveEffect', [effectId]);
         }
     }
 
@@ -1032,9 +1034,14 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 callback: async (target: HTMLElement) => {
                     const userConsented = await Helpers.confirmDeletion();
                     if (!userConsented) return;
-                    const id = SheetFlow.closestEffectId(target);
-                    if (id) {
-                        await this.item.deleteEmbeddedDocuments('ActiveEffect', [id]);
+                    const effectId = SheetFlow.closestEffectId(target);
+                    if (effectId) {
+                        if (this.item._isNestedItem) {
+                            this.item.effects.delete(effectId);
+                            await this.render(true);
+                        } else {
+                            await this.item.deleteEmbeddedDocuments('ActiveEffect', [effectId]);
+                        }
                     }
                 }
             }
