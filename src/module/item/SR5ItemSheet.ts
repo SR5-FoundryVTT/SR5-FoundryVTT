@@ -19,9 +19,9 @@ import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
 import { AmmunitionType, RangeType } from '../types/item/Weapon';
 
+import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import ItemSheet = foundry.applications.sheets.ItemSheet;
 
-const { FilePicker } = foundry.applications.apps;
 const { DragDrop } = foundry.applications.ux
 const { fromUuid, fromUuidSync } = foundry.utils;
 
@@ -505,7 +505,10 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
     /* -------------------------------------------- */
 
-    override async _onRender(context, options) {
+    override async _onRender(
+        context: DeepPartial<T>,
+        options: DeepPartial<ApplicationV2.RenderOptions>
+    ) {
         this.activateListeners_LEGACY($(this.element));
         this.#dragDrop.forEach(d => d.bind(this.element));
         return super._onRender(context, options);

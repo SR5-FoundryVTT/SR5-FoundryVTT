@@ -1,4 +1,3 @@
-//@ts-nocheck // This is JavaScript code.
 /**
  * All functions have been taken from : https://gitlab.com/foundrynet/dnd5e/-/blob/master/module/effects.js
  *
@@ -12,10 +11,13 @@ import { SR5ActiveEffect } from "./effect/SR5ActiveEffect";
 
 /**
  * Manage Active Effect instances through the Actor Sheet via effect control buttons.
- * @param {MouseEvent} event      The left-click event on the effect control
+ * @param {JQuery.ClickEvent} event      The left-click event on the effect control
  * @param {Actor|Item} owner      The owning entity which manages this effect
  */
-export async function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
+export async function onManageActiveEffect(
+    event: JQuery.ClickEvent<HTMLElement, undefined, HTMLElement, HTMLElement>,
+    owner: SR5Item
+) {
     // NOTE: This here is temporary until FoundryVTT has built-in support for nested item updates.
     // if ( owner.isOwned )
     //     return ui.notifications.warn("Managing Active Effects within an Owned Item is not currently supported and will be added in a subsequent update.");
@@ -23,27 +25,27 @@ export async function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
     event.preventDefault();
     // These element grabs rely heavily on HTML structure within the templates.
     const icon = event.currentTarget;    
-    const item = event.currentTarget.closest('.list-item-effect');
+    const item = icon.closest<HTMLElement>('.list-item-effect')!;
     const effect = item.dataset.itemId ? owner.effects.get(item.dataset.itemId)! : null;
 
     // The HTML dataset must be defined
     switch (icon.dataset.action) {
         case "create": {
-            const effect = [{
+            const newEffect: ActiveEffect.CreateData[] = [{
                 name: game.i18n.localize("SR5.ActiveEffect.New"),
                 origin: owner.uuid
-            }] satisfies ActiveEffect.CreateData[];
+            }];
 
             if (owner instanceof Item && owner._isNestedItem) {
-                effect[0]._id = foundry.utils.randomID();
-                const sr5Effect = new SR5ActiveEffect(effect[0], { parent: owner });
+                newEffect[0]._id = foundry.utils.randomID();
+                const sr5Effect = new SR5ActiveEffect(newEffect[0], { parent: owner });
                 return owner.createNestedActiveEffect(sr5Effect);
             }
 
-            return owner.createEmbeddedDocuments('ActiveEffect', effect);
+            return owner.createEmbeddedDocuments('ActiveEffect', newEffect);
         }
         case "edit":
-            return effect?.sheet.render(true);
+            return effect?.sheet?.render(true);
 
         case "delete": {
             const userConsented = await Helpers.confirmDeletion();
@@ -66,19 +68,21 @@ export async function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
 export async function onManageItemActiveEffect(event: MouseEvent) {
     event.preventDefault();
 
-    const icon = event.currentTarget;
-    const listItem = event.currentTarget.closest('.list-item-effect');
-    const uuid = listItem.dataset.itemId;
+    const icon = event.currentTarget as HTMLElement;
+    const listItem = icon.closest<HTMLElement>('.list-item-effect')!;
+    const uuid = listItem.dataset.itemId!;
     // Foundry doesn't support direct update on nested item effects.
     // Instead of implementing a custom solution, we just show an error message.
     // In the future NestedItems should be replaced by a linked items approach.
-    if (effectUuidIsNestedItem(uuid)) return ui.notifications.error("Effects on nested items can't be managed. Move the item to the sidebar to manage.");
+    if (effectUuidIsNestedItem(uuid))
+        return ui.notifications.error("Effects on nested items can't be managed. Move the item to the sidebar to manage.");
+
     const effect = await fromUuid(uuid) as SR5ActiveEffect;
     if (!effect) return;
 
-    switch (icon.dataset.action) {
+    switch (icon?.dataset?.action) {
         case "edit":
-            return effect.sheet.render(true);
+            return effect.sheet?.render(true);
         case "toggle":
             return effect.toggleDisabled();
         case "open-origin":
