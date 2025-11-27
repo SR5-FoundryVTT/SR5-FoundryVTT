@@ -80,7 +80,7 @@ export async function onManageItemActiveEffect(event: MouseEvent) {
     const effect = await fromUuid<SR5ActiveEffect>(uuid);
     if (!effect) return;
 
-    switch (icon?.dataset?.action) {
+    switch (icon.dataset.action) {
         case "edit":
             return effect.sheet?.render(true);
         case "toggle":
