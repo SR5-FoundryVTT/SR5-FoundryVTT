@@ -129,6 +129,7 @@
     > button {
       flex-shrink: 0;
       margin-left: auto; // Push button to the right if space allows
+      color: variables.$white;
     }
   }
 
