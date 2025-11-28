@@ -6,13 +6,13 @@
 .chummer-import {
   /* --- THEME VARIABLES --- */
   // Mapped to global variables for consistent theming
-  --ci-primary-color: #{variables.$darkred};
+  --ci-primary-color: #{color.adjust(variables.$red, $lightness: -15%)};
   --ci-primary-hover: #{color.adjust(variables.$darkred, $lightness: 10%)};
   --ci-focus-ring-color: #{rgba(variables.$darkred, 0.5)};
   
   --ci-bg-color: #{variables.$dark2};
   --ci-text-color: #{variables.$light};
-  --ci-muted-text-color: #{variables.$silver};
+  --ci-muted-text-color: #{color.adjust(variables.$silver, $lightness: -15%)};
   
   --ci-border-color: #{variables.$groove-color};
   --ci-border-radius: #{variables.$radius};
@@ -21,8 +21,6 @@
   --ci-error-color: #{variables.$fDarkRed};
   --ci-error-bg: #{variables.$roll-failure-background};
   --ci-error-border: #{variables.$roll-failure-border};
-
-  color: var(--ci-text-color);
 
   label {
     display: flex;
@@ -47,7 +45,6 @@
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 
     &::placeholder {
-      color: var(--ci-muted-text-color);
       white-space: pre;
       opacity: 0.7;
     }
@@ -75,12 +72,7 @@
   .configure-button {
     background-color: transparent;
     font-weight: 500;
-    color: var(--ci-text-color);
     border: 1px solid var(--ci-border-color);
-    
-    &:hover {
-        border-color: var(--ci-text-color);
-    }
   }
 
   legend {
@@ -102,7 +94,6 @@
       display: flex;
       align-items: center;
       gap: calc(var(--ci-spacing-unit) / 2);
-      color: var(--ci-text-color);
     }
 
     input[type="checkbox"] {
@@ -133,8 +124,6 @@
     > select {
       flex: 1 1 200px;
       min-width: 180px;
-      background-color: variables.$dark;
-      color: variables.$white;
     }
 
     > button {
@@ -155,7 +144,6 @@
 
   button {
     background-color: var(--ci-primary-color);
-    color: variables.$white;
     border-color: var(--ci-border-color);
     cursor: pointer;
     font-weight: 600;
