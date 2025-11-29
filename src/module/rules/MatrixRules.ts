@@ -117,7 +117,7 @@ export class MatrixRules {
 
     /**
      * Return modifier for marks placed. See SR5#240 'Hack on the Fly' or SR5#238 'Brut Force'
-     * @param marks Mount of marks to be placed
+     * @param marks Amount of marks to be placed
      */
     static getMarkPlacementModifier(marks: number): number {
         marks = MatrixRules.getValidMarksPlacementCount(marks);
@@ -256,7 +256,7 @@ export class MatrixRules {
             netHits = 0;
         }
         const damage = DataDefaults.createData('damage', { base: netHits, type: { base: 'matrix', value: 'matrix' }, biofeedback });
-        Helpers.calcTotal(damage, { min: 0 })
+        damage.value = Helpers.calcTotal(damage, { min: 0 });
         return damage;
     }
 
