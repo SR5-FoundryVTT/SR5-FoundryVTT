@@ -3,8 +3,8 @@ import { VersionMigration } from "../VersionMigration";
 /**
  * Migrates skill names, spirit types, and vehicle modification categories to match official book conventions.
  */
-export class Version0_31_1 extends VersionMigration {
-    readonly TargetVersion = "0.31.1";
+export class Version0_32_0 extends VersionMigration {
+    readonly TargetVersion = "0.32.0";
 
     override migrateActor(_actor: any): void {
         if (_actor.system?.skills?.active) {
