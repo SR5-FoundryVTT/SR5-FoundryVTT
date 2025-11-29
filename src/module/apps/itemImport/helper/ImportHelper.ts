@@ -1,4 +1,5 @@
 import { Constants, CompendiumKey, ChummerFile } from '../importer/Constants';
+import CompendiumCollection = foundry.documents.collections.CompendiumCollection;
 
 export type OneOrMany<T> = T | T[];
 export type ArrayItem<T> = T extends (infer U)[] ? U : never;
@@ -12,9 +13,9 @@ export type RetrievedItem = Item.Source & { name_english: string };
  */
 export class ImportHelper {
     static folders: Record<string, Promise<Folder>> = {};
-    private static readonly categoryMap: Partial<Record<ChummerFile, Record<string, string>>> = {};
-    private static readonly nameToId: Partial<Record<CompendiumKey, Record<string, string>>> = {};
-    private static readonly idToName: Partial<Record<CompendiumKey, Record<string, string>>> = {};
+    static categoryMap: Partial<Record<ChummerFile, Record<string, string>>> = {};
+    static nameToId: Partial<Record<CompendiumKey, Record<string, string>>> = {};
+    static idToName: Partial<Record<CompendiumKey, Record<string, string>>> = {};
 
     /**
      * Ensures the provided value is returned as an array.
@@ -101,7 +102,7 @@ export class ImportHelper {
             names.length === 1
                 ? [await pack.getDocument(ids[0])] as Item.Stored[]
                 : await pack.getDocuments({ _id__in: ids }) as Item.Stored[];
-        return docs.map(doc => ({
+        return docs.filter(Boolean).map(doc => ({
             ...game.items.fromCompendium(doc) as RetrievedItem,
             name_english: this.idToName[compKey]![doc._id]
         }));
