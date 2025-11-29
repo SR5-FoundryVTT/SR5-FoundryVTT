@@ -137,13 +137,10 @@ export class ActorImporter extends BaseClass {
     }
 
     private getSpiritType(chummerChar: ActorSchema) {
-        const chummerType = chummerChar.metatype_english;
-
         const spiritTypes = [
             'air', 'aircraft', 'airwave', 'ally', 'automotive', 'beasts', 'ceramic', 'earth', 'energy',
             'fire', 'guardian', 'guidance', 'homunculus', 'man', 'metal','plant', 'ship', 'task', 'train',
-            'water', 'watcher', 'toxic_air', 'toxic_beasts', 'toxic_earth', 'toxic_fire', 'toxic_man',
-            'toxic_water', 'blood', 'muse', 'nightmare', 'shade', 'succubus', 'wraith',
+            'water', 'watcher', 'blood', 'muse', 'nightmare', 'shade', 'succubus', 'wraith',
 
             //shedim
             'shedim', 'hopper', 'blade_summoned', 'horror_show', 'unbreakable', 'master_shedim',
@@ -163,17 +160,26 @@ export class ActorImporter extends BaseClass {
 
             // Horror Terrors
             'corps_cadavre',
-        ]
+        ] as const;
 
         const specialMapping = new Map([
-            ['Noxious Spirit', 'toxic_air'],
-            ['Abomination Spirit', 'toxic_beasts'],
-            ['Barren Spirit', 'toxic_earth'],
-            ['Nuclear Spirit', 'toxic_fire'],
-            ['Plague Spirit', 'toxic_man'],
-            ['Sludge Spirit', 'toxic_water']
+            ['noxious', 'toxic_air'],
+            ['abomination', 'toxic_beasts'],
+            ['barren', 'toxic_earth'],
+            ['nuclear', 'toxic_fire'],
+            ['plague', 'toxic_man'],
+            ['sludge', 'toxic_water']
         ]);
 
-        return spiritTypes.find(v => chummerType?.toLowerCase().includes(v)) ?? specialMapping.get(chummerType);
+        // Normalize the metatype string to a spirit type key
+        const chummerType = chummerChar.metatype_english
+            .replace(/\s*\(.*?\)\s*/g, '')
+            .replace(/^Spirit of /, '')
+            .replace(/ Spirit$/, '')
+            .replace(/[\s-]/g, '_')
+            .toLowerCase()
+            .trim();
+
+        return spiritTypes.find(v => RegExp(`\\b${v}\\b`, "i").test(chummerType)) ?? specialMapping.get(chummerType);
     }
 }

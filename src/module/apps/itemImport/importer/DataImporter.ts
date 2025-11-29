@@ -4,6 +4,7 @@ import { SR5Actor } from '@/module/actor/SR5Actor';
 import { ParseData, Schemas } from "../parser/Types";
 import { ImportHelper as IH } from '../helper/ImportHelper';
 import { ChummerFileXML, CompendiumKey, Constants } from './Constants';
+import CompendiumCollection = foundry.documents.collections.CompendiumCollection;
 
 /**
  * The most basic Chummer item data importer, designed to handle one or more Chummer5a data <type>.xml files.
@@ -93,7 +94,10 @@ export abstract class DataImporter {
         const { compendiumKey, parser, filter, injectActionTests, documentType } = options;
         const itemMap = new Map<CompendiumKey, (Actor.CreateData | Item.CreateData)[]>();
         const compendiums: Partial<Record<CompendiumKey, CompendiumCollection<'Actor' | 'Item'>>> = {};
-        const dataInput = filter ? inputs.filter(filter) : inputs;
+        const dataInput = filter ? inputs.filter(x => {
+            try { return filter(x); }
+            catch (e) { console.error("Error:\n", e, "\nData:\n", x); return false; }
+        }) : inputs;
 
         let counter = 0;
         let current = 0;
@@ -128,7 +132,7 @@ export abstract class DataImporter {
                 if (!itemMap.has(key)) itemMap.set(key, []);
                 itemMap.get(key)!.push(item);
             } catch (error) {
-                console.error(error);
+                console.error("Error:\n", error, "\nData:\n", data);
                 ui.notifications?.error(`Failed parsing ${documentType}: ${data?.name?._TEXT ?? "Unknown"}`);
             }
         };
@@ -136,9 +140,13 @@ export abstract class DataImporter {
         progressBar.remove();
         const notification = ui.notifications?.info(`${documentType}: Creating ${counter} documents`, { permanent: true });
 
-        for (const [key, items] of itemMap.entries()) {
+        for (const [key, docs] of itemMap.entries()) {
             const compendium = Constants.MAP_COMPENDIUM_KEY[key];
-            await (compendium.type === 'Actor' ? SR5Actor : SR5Item).create(items as any, { pack: "world." + compendium.pack, keepId: true });
+            if (compendium.type === 'Actor') {
+                await SR5Actor.create(docs as Actor.CreateData[], { pack: `world.${compendium.pack}`, keepId: true });
+            } else {
+                await SR5Item.create(docs as Item.CreateData[], { pack: `world.${compendium.pack}`, keepId: true });
+            }
         }
 
         notification.remove();
