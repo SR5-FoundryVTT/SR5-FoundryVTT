@@ -160,16 +160,10 @@ export class ActorImporter extends BaseClass {
 
             // Horror Terrors
             'corps_cadavre',
-        ] as const;
 
-        const specialMapping = new Map([
-            ['noxious', 'toxic_air'],
-            ['abomination', 'toxic_beasts'],
-            ['barren', 'toxic_earth'],
-            ['nuclear', 'toxic_fire'],
-            ['plague', 'toxic_man'],
-            ['sludge', 'toxic_water']
-        ]);
+            // Toxic
+            'abomination', 'barren', 'noxious', 'nuclear', 'plague', 'sludge'
+        ] as const;
 
         // Normalize the metatype string to a spirit type key
         const chummerType = chummerChar.metatype_english
@@ -180,6 +174,6 @@ export class ActorImporter extends BaseClass {
             .toLowerCase()
             .trim();
 
-        return spiritTypes.find(v => RegExp(`\\b${v}\\b`, "i").test(chummerType)) ?? specialMapping.get(chummerType);
+        return spiritTypes.find(v => RegExp(`\\b${v}\\b`, "i").test(chummerType));
     }
 }

@@ -48,8 +48,8 @@ export const Skills = () => new FixedTypeObjectField(
             automatics: skill({ attribute: 'agility', group: 'Firearms', id: 'automatics' }),
             blades: skill({ attribute: 'agility', group: 'Close Combat', id: 'blades', }),
             clubs: skill({ attribute: 'agility', group: 'Close Combat', id: 'clubs' }),
-            exotic_melee: skill({ attribute: 'agility', canDefault: false, id: 'exotic_melee' }), // how to deal with exotic melee weapons?
-            exotic_range: skill({ attribute: 'agility', canDefault: false, id: 'exotic_range' }), // how to deal with exotic ranged weapons?
+            exotic_melee_weapon: skill({ attribute: 'agility', canDefault: false, id: 'exotic_melee_weapon' }),
+            exotic_ranged_weapon: skill({ attribute: 'agility', canDefault: false, id: 'exotic_ranged_weapon' }),
             heavy_weapons: skill({ attribute: 'agility', group: 'Firearms', id: 'heavy_weapons' }),
             longarms: skill({ attribute: 'agility', group: 'Firearms', id: 'longarms' }),
             pistols: skill({ attribute: 'agility', group: 'Firearms', id: 'pistols' }),
@@ -130,7 +130,7 @@ export const Skills = () => new FixedTypeObjectField(
             pilot_aircraft: skill({ attribute: 'reaction', canDefault: false, id: 'pilot_aircraft' }),
             pilot_walker: skill({ attribute: 'reaction', canDefault: false, id: 'pilot_walker' }),
             pilot_ground_craft: skill({ attribute: 'reaction', id: 'pilot_ground_craft' }),
-            pilot_water_craft: skill({ attribute: 'reaction', id: 'pilot_water_craft' }),
+            pilot_watercraft: skill({ attribute: 'reaction', id: 'pilot_watercraft' }),
             pilot_exotic_vehicle: skill({ attribute: 'reaction', canDefault: false, id: 'pilot_exotic_vehicle' }), // how to deal with exotic vehicles?
         }
     }

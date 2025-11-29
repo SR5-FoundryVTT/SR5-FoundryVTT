@@ -1,7 +1,6 @@
 import { Metatype } from "../../schema/MetatypeSchema";
 import { CompendiumKey } from "../../importer/Constants";
 import { MetatypeParserBase } from './MetatypeParserBase';
-import { DataDefaults } from "src/module/data/DataDefaults";
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 
 export class SpiritParser extends MetatypeParserBase<'spirit'> {
@@ -14,17 +13,6 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
             case "Insect Spirits":
                 system.spiritType = jsonData.name._TEXT.split(/[ /]/)[0].toLowerCase() as any;
                 break;
-
-            case "Toxic Spirits": {
-                const specialMapping = new Map<string, string>([
-                    ['Noxious Spirit', 'toxic_air'], ['Abomination Spirit', 'toxic_beasts'],
-                    ['Barren Spirit', 'toxic_earth'], ['Nuclear Spirit', 'toxic_fire'],
-                    ['Plague Spirit', 'toxic_man'], ['Sludge Spirit', 'toxic_water']
-                ]);
-
-                system.spiritType = (specialMapping.get(jsonData.name._TEXT) ?? "") as any;
-                break;
-            }
 
             case "Ritual":
                 system.attributes.body.base = Number(jsonData.bodmin._TEXT) || 0;
