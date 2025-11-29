@@ -94,7 +94,10 @@ export abstract class DataImporter {
         const { compendiumKey, parser, filter, injectActionTests, documentType } = options;
         const itemMap = new Map<CompendiumKey, (Actor.CreateData | Item.CreateData)[]>();
         const compendiums: Partial<Record<CompendiumKey, CompendiumCollection<'Actor' | 'Item'>>> = {};
-        const dataInput = filter ? inputs.filter(x => { try { return filter(x) } catch { return false } }) : inputs;
+        const dataInput = filter ? inputs.filter(x => {
+            try { return filter(x); }
+            catch (e) { console.error("Error:\n", e, "\nData:\n", x); return false; }
+        }) : inputs;
 
         let counter = 0;
         let current = 0;
@@ -129,7 +132,7 @@ export abstract class DataImporter {
                 if (!itemMap.has(key)) itemMap.set(key, []);
                 itemMap.get(key)!.push(item);
             } catch (error) {
-                console.error(error);
+                console.error("Error:\n", error, "\nData:\n", data);
                 ui.notifications?.error(`Failed parsing ${documentType}: ${data?.name?._TEXT ?? "Unknown"}`);
             }
         };
