@@ -56,7 +56,7 @@ export class AmmoParser extends Parser<'ammo'> {
                 system.ap = weaponData.action.damage.ap.value;
                 system.blast = weaponData.thrown.blast;
             } else if (!foundWeapon) {
-                console.log(`[Weapon Missing (Ammo)]\nAmmo: ${item.name}\nWeapon: ${weaponName}`);
+                console.warn(`[Weapon Missing (Ammo)]\nAmmo: ${item.name}\nWeapon: ${weaponName}`);
             }
         }
 

@@ -15,7 +15,7 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'critter
             const item = itemMap.get(name);
 
             if (!item) {
-                console.log(`[${msg_field.type} Missing]\nCritter: ${msg_field.critter}\n${msg_field.type}: ${name}`);
+                console.warn(`[${msg_field.type} Missing]\nCritter: ${msg_field.critter}\n${msg_field.type}: ${name}`);
                 continue;
             }
 
