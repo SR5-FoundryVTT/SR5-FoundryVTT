@@ -84,25 +84,24 @@ export class ImportHelper {
      * Finds items in the given compendium by name, clones them with a new ID,
      * and adds their original English name for tracking purposes.
      */
-    public static async findItems(
-        compKey: CompendiumKey,
-        names: string[],
-    ): Promise<RetrievedItem[]> {
+    public static async findItems(compKey: CompendiumKey,names: string[]): Promise<RetrievedItem[]> {
         if (!names.length) return [];
 
         const pack = game.packs?.get(
             `world.${Constants.MAP_COMPENDIUM_KEY[compKey].pack}`
         ) as CompendiumCollection<'Item'>;
 
-        const ids = names
-            .map(n => this.nameToId[compKey]?.[n])
-            .filter((id): id is string => !!id);
+        const ids = names.map(n => this.nameToId[compKey]?.[n]).filter((id): id is string => !!id);
 
-        const docs =
-            names.length === 1
-                ? [await pack.getDocument(ids[0])] as Item.Stored[]
-                : await pack.getDocuments({ _id__in: ids }) as Item.Stored[];
-        return docs.filter(Boolean).map(doc => ({
+        let docs: Item.Stored[];
+        if (ids.length === 1) {
+            const doc = await pack.getDocument(ids[0]);
+            docs = doc ? [doc] : [];
+        } else {
+            docs = await pack.getDocuments({ _id__in: ids }) as Item.Stored[];
+        }
+
+        return docs.map(doc => ({
             ...game.items.fromCompendium(doc) as RetrievedItem,
             name_english: this.idToName[compKey]![doc._id]
         }));
