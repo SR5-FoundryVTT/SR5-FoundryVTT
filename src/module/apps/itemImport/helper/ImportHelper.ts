@@ -1,4 +1,5 @@
 import { Constants, CompendiumKey, ChummerFile } from '../importer/Constants';
+import CompendiumCollection = foundry.documents.collections.CompendiumCollection;
 
 export type OneOrMany<T> = T | T[];
 export type ArrayItem<T> = T extends (infer U)[] ? U : never;
@@ -12,9 +13,9 @@ export type RetrievedItem = Item.Source & { name_english: string };
  */
 export class ImportHelper {
     static folders: Record<string, Promise<Folder>> = {};
-    private static readonly categoryMap: Partial<Record<ChummerFile, Record<string, string>>> = {};
-    private static readonly nameToId: Partial<Record<CompendiumKey, Record<string, string>>> = {};
-    private static readonly idToName: Partial<Record<CompendiumKey, Record<string, string>>> = {};
+    static categoryMap: Partial<Record<ChummerFile, Record<string, string>>> = {};
+    static nameToId: Partial<Record<CompendiumKey, Record<string, string>>> = {};
+    static idToName: Partial<Record<CompendiumKey, Record<string, string>>> = {};
 
     /**
      * Ensures the provided value is returned as an array.
@@ -83,24 +84,23 @@ export class ImportHelper {
      * Finds items in the given compendium by name, clones them with a new ID,
      * and adds their original English name for tracking purposes.
      */
-    public static async findItems(
-        compKey: CompendiumKey,
-        names: string[],
-    ): Promise<RetrievedItem[]> {
+    public static async findItems(compKey: CompendiumKey,names: string[]): Promise<RetrievedItem[]> {
         if (!names.length) return [];
 
         const pack = game.packs?.get(
             `world.${Constants.MAP_COMPENDIUM_KEY[compKey].pack}`
         ) as CompendiumCollection<'Item'>;
 
-        const ids = names
-            .map(n => this.nameToId[compKey]?.[n])
-            .filter((id): id is string => !!id);
+        const ids = names.map(n => this.nameToId[compKey]?.[n]).filter((id): id is string => !!id);
 
-        const docs =
-            names.length === 1
-                ? [await pack.getDocument(ids[0])] as Item.Stored[]
-                : await pack.getDocuments({ _id__in: ids }) as Item.Stored[];
+        let docs: Item.Stored[];
+        if (ids.length === 1) {
+            const doc = await pack.getDocument(ids[0]);
+            docs = doc ? [doc] : [];
+        } else {
+            docs = await pack.getDocuments({ _id__in: ids }) as Item.Stored[];
+        }
+
         return docs.map(doc => ({
             ...game.items.fromCompendium(doc) as RetrievedItem,
             name_english: this.idToName[compKey]![doc._id]
