@@ -1,7 +1,7 @@
 import { VersionMigration } from "../VersionMigration";
 
 /**
- * Make sure that readonly fields are set to their correct values.
+ * Migrates skill names, spirit types, and vehicle modification categories to match official book conventions.
  */
 export class Version0_31_1 extends VersionMigration {
     readonly TargetVersion = "0.31.1";
@@ -39,10 +39,10 @@ export class Version0_31_1 extends VersionMigration {
         } as const;
 
         if (_actor.type === "spirit" && spiritTypeMap[_actor.system.spiritType]) {
-            _actor.system.type = spiritTypeMap[_actor.system.spiritType];
+            _actor.system.spiritType = spiritTypeMap[_actor.system.spiritType];
         }
 
-        if (_actor.type === "vehicle" && _actor.system?.modificationCategories) {
+        if (_actor.type === "vehicle" && _actor.system?.modificationCategories?.power_train) {
             _actor.system.modificationCategories.powertrain = _actor.system.modificationCategories.power_train;
             delete _actor.system.modificationCategories.power_train;
         }
