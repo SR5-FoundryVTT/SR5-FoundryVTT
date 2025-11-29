@@ -94,7 +94,7 @@ export abstract class DataImporter {
         const { compendiumKey, parser, filter, injectActionTests, documentType } = options;
         const itemMap = new Map<CompendiumKey, (Actor.CreateData | Item.CreateData)[]>();
         const compendiums: Partial<Record<CompendiumKey, CompendiumCollection<'Actor' | 'Item'>>> = {};
-        const dataInput = filter ? inputs.filter(filter) : inputs;
+        const dataInput = filter ? inputs.filter(x => { try { return filter(x) } catch { return false } }) : inputs;
 
         let counter = 0;
         let current = 0;
