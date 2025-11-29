@@ -62,7 +62,6 @@ import { BiofeedbackResistTest } from './tests/BiofeedbackResistTest';
 import { CheckOverwatchScoreTest} from '@/module/tests/CheckOverwatchScoreTest';
 import { OpposedCheckOverwatchScoreTest } from '@/module/tests/OpposedCheckOverwatchScoreTest';
 
-import { quenchRegister } from '../unittests/quench';
 import { createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro } from './macros';
 
 import { registerSystemKeybindings } from './keybindings';
@@ -168,7 +167,11 @@ export class HooksManager {
         Hooks.on("renderChatLog", HooksManager.chatLogListeners.bind(HooksManager));
         Hooks.on('preUpdateCombatant', SR5Combat.onPreUpdateCombatant.bind(SR5Combat));
 
-        Hooks.on('quenchReady', quenchRegister);
+        if (import.meta.env.DEV) {
+            void import('../unittests/quench').then(quench =>
+                Hooks.on('quenchReady', quench.quenchRegister)
+            );
+        }
 
         MatrixHooks.registerHooks();
         RiggingHooks.registerHooks();

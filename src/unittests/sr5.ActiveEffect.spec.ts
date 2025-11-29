@@ -4,7 +4,6 @@ import { SR5Item } from "../module/item/SR5Item";
 import { SkillTest } from "../module/tests/SkillTest";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { TestCreator } from "../module/tests/TestCreator";
-import { SuccessTest } from "../module/tests/SuccessTest";
 import { DataDefaults } from "../module/data/DataDefaults";
 import { SR5ActiveEffect } from "src/module/effect/SR5ActiveEffect";
 

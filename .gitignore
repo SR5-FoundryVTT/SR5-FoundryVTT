@@ -1,14 +1,17 @@
-*.swp
+# IDE and Editor files
 .idea
-node_modules
-foundryconfig.json
 .vscode
 .vscode/launch.json
-shadowrun5e.lock
-*.code-workspace
-dist
 .vs
+*.swp
+*.code-workspace
 
-# NOTE: v11 packs must be ignored until system goes v11 only and drops v10 support. Until then use v11 migration path for v11 support.
-packs/*
-!packs/_source/
+# Build and Dependency folders
+.tsbuildinfo
+node_modules
+dist
+packs
+
+# FoundryVTT specific files
+foundryconfig.json
+shadowrun5e.lock
