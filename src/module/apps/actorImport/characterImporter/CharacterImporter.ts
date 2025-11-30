@@ -66,12 +66,7 @@ export class CharacterImporter {
     }
 
     static parseSkillName(skillName: string): string {
-        let name = skillName.trim().toLowerCase().replace(/[\s-]/g, '_');
-        if (name.includes('exotic') && name.includes('_weapon')) name = name.replace('_weapon', '');
-        if (name.includes('exotic') && name.includes('_ranged')) name = name.replace('_ranged', '_range');
-        if (name === 'pilot_watercraft') name = 'pilot_water_craft';
-
-        return name;
+        return skillName.trim().toLowerCase().replace(/[\s-]/g, '_');
     }
 
     // --------------------------------------------------------------------------
