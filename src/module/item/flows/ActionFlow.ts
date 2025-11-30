@@ -28,10 +28,10 @@ export class ActionFlow {
             damage.source = ActionFlow._damageSource(actor, item);
 
         this._applyModifiableValue(damage, actor);
-        damage.value = Helpers.calcTotal(damage, { min: 0 });
+        damage.value = PartsList.calcTotal(damage, { min: 0 });
 
         this._applyModifiableValue(damage.ap, actor);
-        damage.ap.value = Helpers.calcTotal(damage.ap, { min: 0 });
+        damage.ap.value = PartsList.calcTotal(damage.ap, { min: 0 });
 
         return damage;
     }
@@ -48,20 +48,20 @@ export class ActionFlow {
         // Avoid altering base OR value fields and raising the resulting damage on multiple function calls.
         switch (value.base_formula_operator) {
             case "add":
-                PartsList.AddUniquePart(value.mod, attribute.label, attribute.value);
+                PartsList.addUniquePart(value, attribute.label, attribute.value);
                 break;
             case "subtract":
-                PartsList.AddUniquePart(value.mod, attribute.label, -attribute.value);
+                PartsList.addUniquePart(value, attribute.label, -attribute.value);
                 break;
             case "multiply":
-                PartsList.AddUniquePart(value.mod, 'SR5.Value', (value.base * attribute.value) - value.base);
+                PartsList.addUniquePart(value, 'SR5.Value', (value.base * attribute.value) - value.base);
                 break;
             case "divide": {
                 // Remove base from value by modifying.
-                PartsList.AddUniquePart(value.mod, 'SR5.BaseValue', value.base * -1);
+                PartsList.addUniquePart(value, 'SR5.BaseValue', value.base * -1);
                 // Add division result as modifier on zero.
                 const denominator = attribute.value === 0 ? 1 : attribute.value;
-                PartsList.AddUniquePart(value.mod, 'SR5.Value', Math.floor(value.base / denominator));
+                PartsList.addUniquePart(value, 'SR5.Value', Math.floor(value.base / denominator));
                 break;
             }
         }

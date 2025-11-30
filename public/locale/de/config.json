@@ -883,8 +883,9 @@
             "WarningTitle": "Alarm"
         },
         "Magic": "Magie",
-        "ManualGlitches": "Man. Patzer",
-        "ManualHits": "Man. Erfolge",
+        "Manual": "Manuell",
+        "ManualGlitches": "Patzer",
+        "ManualHits": "Erfolge",
         "ManualOverride": "Manuelle Eingabe",
         "MarkImportedItemReviewed": "Importiertes Item überprüft.",
         "MarkImportedItemTooltip": "Markiert dieses importierte Item als überprüft.",

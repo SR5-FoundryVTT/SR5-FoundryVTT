@@ -3,10 +3,8 @@ import { AttributesPrep } from './functions/AttributesPrep';
 import { LimitsPrep } from './functions/LimitsPrep';
 import { MovementPrep } from './functions/MovementPrep';
 import { WoundsPrep } from './functions/WoundsPrep';
-import { ModifiersPrep } from './functions/ModifiersPrep';
 import { InitiativePrep } from './functions/InitiativePrep';
 import { Helpers } from '../../helpers';
-import { PartsList } from "../../parts/PartsList";
 import { SkillFlow } from "../flows/SkillFlow";
 import { CharacterPrep } from './CharacterPrep';
 import { GruntPrep } from './functions/GruntPrep';
@@ -16,16 +14,14 @@ import { SR } from '../../constants';
 import { SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
 import { SR5Item } from 'src/module/item/SR5Item';
 import { AttributesType } from 'src/module/types/template/Attributes';
-
+import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
+import { PartsList } from '@/module/parts/PartsList';
 
 export class SpiritPrep {
     static prepareBaseData(system: Actor.SystemOfType<'spirit'>) {
-        SpiritPrep.prepareSpiritSpecial(system);
-        SkillsPrep.prepareSkillData(system);
+        ModifiableFieldPrep.resetAllModifiers(system);
 
-        ModifiersPrep.clearAttributeMods(system);
-        ModifiersPrep.clearArmorMods(system);
-        ModifiersPrep.clearLimitMods(system);
+        SpiritPrep.prepareSpiritSpecial(system);
     }
 
     static prepareDerivedData(system: Actor.SystemOfType<'spirit'>, items: SR5Item[]) {
@@ -83,15 +79,15 @@ export class SpiritPrep {
             }
 
             // prepare initiative data
-            initiative.meatspace.base.base = force * overrides.init_mult + overrides.init + Number(modifiers['astral_initiative']);
-            initiative.meatspace.base.mod = PartsList.AddUniquePart(initiative.meatspace.base.mod, "SR5.Bonus", Number(modifiers['meat_initiative']));
+            initiative.meatspace.base.base = force * overrides.init_mult + overrides.init + modifiers.astral_initiative;
+            PartsList.addUniquePart(initiative.meatspace.base, "SR5.Bonus", modifiers.astral_initiative);
             initiative.meatspace.dice.base = overrides.init_dice;
-            initiative.meatspace.dice.mod = PartsList.AddUniquePart(initiative.meatspace.dice.mod, "SR5.Bonus", Number(modifiers['meat_initiative_dice']));
+            PartsList.addUniquePart(initiative.meatspace.dice, "SR5.Bonus", modifiers.meat_initiative_dice);
 
-            initiative.astral.base.base = force * overrides.astral_init_mult + overrides.astral_init + Number(modifiers['astral_initiative_dice']);
-            initiative.astral.base.mod = PartsList.AddUniquePart(initiative.astral.base.mod, "SR5.Bonus", Number(modifiers['astral_initiative']));
+            initiative.astral.base.base = force * overrides.astral_init_mult + overrides.astral_init + modifiers.astral_initiative_dice;
+            PartsList.addUniquePart(initiative.astral.base, "SR5.Bonus", modifiers.astral_initiative);
             initiative.astral.dice.base = overrides.astral_init_dice;
-            initiative.astral.dice.mod = PartsList.AddUniquePart(initiative.astral.dice.mod, "SR5.Bonus", Number(modifiers['astral_initiative_dice']));
+            PartsList.addUniquePart(initiative.astral.dice, "SR5.Bonus", modifiers.astral_initiative_dice);
         }
     }
 
@@ -115,12 +111,12 @@ export class SpiritPrep {
      */
     static prepareSpiritArmor(system: Actor.SystemOfType<'spirit'>) {
         const { armor, attributes } = system;
-        const armorModParts = new PartsList<number>(armor.mod);
 
-        armor.base = (attributes.essence.value ?? 0) * 2;
-        if (system.modifiers['armor'])
-            armorModParts.addUniquePart(game.i18n.localize('SR5.Bonus'), system.modifiers['armor']);
-        armor.value = Helpers.calcTotal(armor);
+        armor.base = attributes.essence.value * 2;
+        if (system.modifiers.armor)
+            PartsList.addUniquePart(armor, game.i18n.localize('SR5.Bonus'), system.modifiers.armor);
+
+        PartsList.calcTotal(armor);
         armor.hardened = true;
     }
 
@@ -879,7 +875,7 @@ export class SpiritPrep {
 
         // Allow value to be understandable when displayed.
         attributes.force.base = 0;
-        PartsList.AddUniquePart(attributes.force.mod, 'SR5.Force', force);
+        PartsList.addUniquePart(attributes.force, 'SR5.Force', force);
         AttributesPrep.calculateAttribute('force', attributes.force);
     }
 }

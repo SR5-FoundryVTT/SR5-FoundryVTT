@@ -1,6 +1,5 @@
 import { SuccessTest, SuccessTestData } from "./SuccessTest";
 import { ComplexFormTest, ComplexFormTestData } from "./ComplexFormTest";
-import { Helpers } from "../helpers";
 import { FadeRules } from "../rules/FadeRules";
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { Translation } from '../utils/strings';
@@ -9,6 +8,7 @@ import { SR5Item } from "../item/SR5Item";
 import { DataDefaults } from "../data/DataDefaults";
 import { DamageType, MinimalActionType } from "../types/item/Action";
 import { DeepPartial } from "fvtt-types/utils";
+import { PartsList } from "../parts/PartsList";
 
 export interface FadeTestData extends SuccessTestData {
     incomingFade: DamageType
@@ -97,7 +97,7 @@ export class FadeTest extends SuccessTest<FadeTestData> {
         super.calculateBaseValues();
 
         // Avoid using a user defined value override.
-        this.data.modifiedFade.base = Helpers.calcTotal(this.data.incomingFade, { min: 0 });
+        this.data.modifiedFade.base = PartsList.calcTotal(this.data.incomingFade, { min: 0 });
     }
 
     override async processResults() {

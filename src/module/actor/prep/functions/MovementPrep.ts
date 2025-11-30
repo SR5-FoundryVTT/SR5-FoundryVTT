@@ -1,5 +1,4 @@
-import { Helpers } from "@/module/helpers";
-import {PartsList} from "../../../parts/PartsList";
+import { PartsList } from "@/module/parts/PartsList";
 
 export class MovementPrep {
     static prepareMovement(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
@@ -7,10 +6,10 @@ export class MovementPrep {
 
         const movement = system.movement;
         // default movement: WALK = AGI * 2, RUN = AGI * 4
-        movement.walk.base = attributes.agility.value * (2 + Number(modifiers['walk'])) + new PartsList(movement.walk.mod).total;
-        movement.run.base = attributes.agility.value * (4 + Number(modifiers['run'])) + new PartsList(movement.run.mod).total;
+        movement.walk.base = attributes.agility.value * (2 + modifiers.walk);
+        movement.run.base = attributes.agility.value * (4 + modifiers.run);
 
-        Helpers.calcTotal(movement.walk, {min: 0});
-        Helpers.calcTotal(movement.run, {min: 0});
+        PartsList.calcTotal(movement.walk, { min: 0 });
+        PartsList.calcTotal(movement.run, { min: 0 });
     }
 }

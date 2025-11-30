@@ -73,11 +73,6 @@ export interface TestData {
 
     damage: DamageType
 
-    // A list of modifier descriptions to be used for this test.
-    // These are designed to work with SR5Actor.getModifier()
-    // modifiers: Record<ModifierTypes, TestModifier>
-    modifiers: ValueFieldType
-
     // A list of test categories to be used for this test.
     // Check typing documentation for more information.
     categories: Shadowrun.ActionCategories[]
@@ -123,7 +118,7 @@ export interface SuccessTestData extends TestData {
 export interface TestOptions {
     showDialog?: boolean // Show dialog when defined as true.
     showMessage?: boolean // Show message when defined as true.
-    rollMode?: Roll.ConfiguredRollModes
+    rollMode?: foundry.dice.Roll.Mode
 }
 
 export interface SuccessTestMessageData {
@@ -266,7 +261,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         data.manualGlitches = data.manualGlitches || DataDefaults.createData('value_field', { label: "SR5.ManualGlitches" });
 
         data.opposed = data.opposed || undefined;
-        data.modifiers = this._prepareModifiersData(data.modifiers);
 
         data.damage = data.damage || DataDefaults.createData('damage');
 
@@ -281,19 +275,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * The tests roll mode can be given by specific option, action setting or global configuration.
      * @param options The test options for the whole test
      */
-    _prepareRollMode(data, options: TestOptions): Roll.ConfiguredRollModes {
+    _prepareRollMode(data, options: TestOptions): foundry.dice.Roll.Mode {
         if (options.rollMode != null) return options.rollMode;
         if (data?.action?.roll_mode) return data.action.roll_mode;
-        else return game.settings.get(CORE_NAME, 'rollMode') as Roll.ConfiguredRollModes;
-    }
-
-    /**
-     * Prepare a default modifier object.
-     *
-     * This should be used for whenever a Test doesn't modifiers specified externally.
-     */
-    _prepareModifiersData(modifiers?: ValueFieldType): ValueFieldType {
-        return modifiers || DataDefaults.createData('value_field', { label: 'SR5.Labels.Action.Modifiers' });
+        else return game.settings.get(CORE_NAME, 'rollMode') as foundry.dice.Roll.Mode;
     }
 
     /**
@@ -392,13 +377,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
-     * Determine if this test has any kind of modifier types active
-     */
-    get hasModifiers(): boolean {
-        return this.data.modifiers.mod.length > 0;
-    }
-
-    /**
      * Create the default formula for this test based on it's pool
      *
      * FoundryVTT documentation:
@@ -406,7 +384,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * 
      */
     get formula(): string {
-        const pool = Helpers.calcTotal(this.data.pool, { min: 0 });
+        const pool = PartsList.calcTotal(this.data.pool, { min: 0 });
         return this.buildFormula(pool, this.hasPushTheLimit);
     }
 
@@ -437,32 +415,24 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Automatics + Agility + 3 (3) [2 + Physical]
      */
     get code(): string {
-        // Add action dynamic value sources as labels.
-        const pool = this.pool.mod
-                        .filter(mod => mod.value)
-                        // Dev code for pool display. This should be replaced by attribute style value calculation info popup
-                        .map(mod => `${game.i18n.localize(mod.name as Translation)} ${mod.value}`);
+        // Helper to format a ValueFieldType for code display
+        const formatValueField = (field: ValueFieldType) => {
+            const parts = field.changes
+                .filter(change => change.priority === -Infinity && change.mode === CONST.ACTIVE_EFFECT_MODES.ADD)
+                .map(change => `${game.i18n.localize(change.name as Translation)}`)
 
-        // Threshold and Limit are values that can be overwritten.
-        const threshold = this.threshold.override
-            ? [game.i18n.localize(this.threshold.override.name as Translation)]
-            : this.threshold.mod.map(mod => game.i18n.localize(mod.name as Translation));
-        const limit = this.limit.override
-            ? [game.i18n.localize(this.limit.override.name as Translation)]
-            : this.limit.mod.map(mod => game.i18n.localize(mod.name as Translation));
+            if (field.base) parts.push(String(field.base));
+            return parts;
+        };
 
-
-        // Add action static value modifiers as numbers.
-        if (this.pool.base > 0 && !this.pool.override) pool.push(String(this.pool.base));
-        if (this.threshold.base > 0 && !this.threshold.override) threshold.push(String(this.threshold.base));
-        if (this.limit.base > 0 && !this.limit.override) limit.push(String(this.limit.base));
+        const pool = formatValueField(this.pool);
+        const limit = formatValueField(this.limit);
+        const threshold = formatValueField(this.threshold);
 
         // Pool portion can be dynamic or static.
         let code = pool.join(' + ').trim() || `${this.pool.value}`;
-
-        // Only add threshold / limit portions when appropriate.
-        if (threshold.length > 0 && this.threshold.value > 0) code = `${code} (${threshold.join(' + ').trim()})`;
-        if (limit.length > 0 && this.limit.value > 0) code = `${code} [${limit.join(' + ').trim()}]`;
+        if (limit.length > 0) code = `${code} [${limit.join(' + ').trim()}]`;
+        if (threshold.length > 0) code = `${code} (${threshold.join(' + ').trim()})`;
 
         return code;
     }
@@ -473,7 +443,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * All parts of the test code can be dynamic, any will do.
      */
     get hasCode(): boolean {
-        return this.pool.mod.length > 0 || this.threshold.mod.length > 0 || this.limit.mod.length > 0;
+        return this.pool.changes.length > 0 || this.threshold.changes.length > 0 || this.limit.changes.length > 0;
     }
 
     /**
@@ -594,27 +564,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      *       a modifier. Rather set it to zero, causing it to not be shown.
      */
     applyPoolModifiers() {
-        const pool = new PartsList(this.pool.mod);
+        const pool = new PartsList(this.pool);
 
         // Remove override modifier from pool.
         pool.removePart('SR5.Labels.Action.Modifiers');
-
-        // If applicable apply only override to pool. (User interaction)
-        if (this.data.modifiers.override) {
-            // Remove all modifiers and only apply override.
-            for (const modifier of this.data.modifiers.mod) {
-                pool.removePart(modifier.name);
-            }
-
-            pool.addUniquePart('SR5.Labels.Action.Modifiers', this.data.modifiers.override.value)
-            return;
-        }
-
-        // Otherwise apply automated modifiers to pool.
-        for (const modifier of this.data.modifiers.mod) {
-            // A modifier might have been asked for, but not given by the actor.
-            pool.addUniquePart(modifier.name, modifier.value);
-        }
     }
 
     /**
@@ -628,11 +581,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     roundBaseValueParts() {
         const roundAllMods = (value: ValueFieldType) => {
             value.base = Math.ceil(value.base);
-            if (value.override) value.override.value = Math.ceil(value.override.value);
-            value.mod.forEach(mod => { mod.value = Math.ceil(mod.value) });
+            for (const change of value.changes)
+                change.value = Math.ceil(change.value);
         }
 
-        roundAllMods(this.data.modifiers);
         roundAllMods(this.data.pool);
         roundAllMods(this.data.threshold);
         roundAllMods(this.data.limit);
@@ -646,17 +598,15 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     calculateBaseValues() {
         this.roundBaseValueParts();
 
-        this.data.modifiers.value = Helpers.calcTotal(this.data.modifiers);
+        PartsList.calcTotal(this.data.pool, { min: 0 });
+        PartsList.calcTotal(this.data.threshold, { min: 0 });
+        PartsList.calcTotal(this.data.limit, { min: 0 });
 
-        this.data.pool.value = Helpers.calcTotal(this.data.pool, { min: 0 });
-        this.data.threshold.value = Helpers.calcTotal(this.data.threshold, { min: 0 });
-        this.data.limit.value = Helpers.calcTotal(this.data.limit, { min: 0 });
-
-        this.data.manualHits.value = Helpers.calcTotal(this.data.manualHits, { min: 0 });
-        this.data.manualGlitches.value = Helpers.calcTotal(this.data.manualGlitches, { min: 0 });
+        PartsList.calcTotal(this.data.manualHits, { min: 0 });
+        PartsList.calcTotal(this.data.manualGlitches, { min: 0 });
 
         // Shows AP on incoming attacks
-        this.data.damage.ap.value = Helpers.calcTotal(this.data.damage.ap);
+        PartsList.calcTotal(this.data.damage.ap);
 
         console.debug(`Shadowrun 5e | Calculated base values for ${this.constructor.name}`, this.data);
     }
@@ -825,7 +775,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         for (const type of this.testModifiers) {
             const { name, value } = this.prepareActorModifier(this.actor, type);
-            PartsList.AddUniquePart(this.data.modifiers.mod, name, value, true);
+            if (value) PartsList.addUniquePart(this.data.pool, name, value);
         }
     }
 
@@ -936,11 +886,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             hits.value;
 
         // Calculate a ValueField for standardization.
-        const netHits = DataDefaults.createData('value_field', {
-            label: "SR5.NetHits",
-            base
-        });
-        netHits.value = Helpers.calcTotal(netHits, { min: 0 });
+        const netHits = DataDefaults.createData('value_field', { label: "SR5.NetHits", base });
+        PartsList.calcTotal(netHits, { min: 0 });
 
         return netHits;
     }
@@ -960,9 +907,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // Sum of all rolls!
         this.hits.base = rollHits;
-        
+
         // First, calculate hits based on roll and modifiers.
-        this.hits.value = Helpers.calcTotal(this.hits, { min: 0 });
+        PartsList.calcTotal(this.hits, { min: 0 });
         // Second, reduce hits by limit.
         this.hits.value = this.hasLimit ? Math.min(this.limit.value, this.hits.value) : this.hits.value;
 
@@ -991,7 +938,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     get appendedHits(): number | undefined {
-        return this.hits.mod.find((mod) => mod.name === "SR5.AppendedHits")?.value;
+        return new PartsList(this.hits).getPartValue('SR5.AppendedHits');
     }
 
     // In the case we've added appended hits, we want to separately display the hits value and the appended hits (ie. "7 + 5" instead of "12")
@@ -1015,7 +962,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Determine if this success test must automated roll or can use a manual roll given by user.
      */
     get usingManualRoll(): boolean {
-        return this.allowManualHits && (Boolean(this.data.manualHits.override) || Boolean(this.data.manualGlitches.override))
+        return this.allowManualHits && (Boolean(this.data.manualHits.value) || Boolean(this.data.manualGlitches.value))
     }
 
     /**
@@ -1031,7 +978,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             label: "SR5.Glitches",
             base: rollGlitches
         })
-        glitches.value = Helpers.calcTotal(glitches, { min: 0 });
+        glitches.value = PartsList.calcTotal(glitches, { min: 0 });
 
         return glitches;
     }
@@ -1043,9 +990,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!this.extended) return DataDefaults.createData('value_field', { label: 'SR5.ExtendedHits' });
 
         const extendedHits = this.extendedHits;
-        extendedHits.mod = PartsList.AddPart(extendedHits.mod, 'SR5.Hits', this.hits.value);
+        PartsList.addBasePart(extendedHits, 'SR5.Hits', this.hits.value);
 
-        Helpers.calcTotal(extendedHits, { min: 0 });
+        PartsList.calcTotal(extendedHits, { min: 0 });
 
         return extendedHits;
     }
@@ -1270,7 +1217,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     applyPushTheLimit() {
         if (!this.actor) return;
 
-        const parts = new PartsList(this.pool.mod);
+        const parts = new PartsList(this.pool);
 
         // During the lifetime of a test (dialog/recasting) the user might want to remove push the limit again.
         if (!this.hasPushTheLimit) {
@@ -1281,7 +1228,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Edge will be applied differently for when the test has been already been cast or not.
         // Exploding dice will be handled during normal roll creation.
         const edge = this.actor.getEdge().value;
-        parts.addUniquePart('SR5.PushTheLimit', edge, true);
+        parts.addUniqueBasePart('SR5.PushTheLimit', edge);
 
         // Before casting edge will be part of the whole dice pool and that pool will explode.
         if (!this.evaluated) return;
@@ -1301,7 +1248,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     applySecondChance() {
         if (!this.actor) return;
 
-        const parts = new PartsList(this.pool.mod);
+        const parts = new PartsList(this.pool);
 
         // During test lifetime (dialog/recasting) the user might want to remove second chance again.
         if (!this.hasSecondChance) {
@@ -1321,7 +1268,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // Apply second chance modifiers.
         // Overwrite existing, as only ONE edge per test is allowed, therefore stacking is not possible.
-        parts.addUniquePart('SR5.SecondChance', dice, true);
+        parts.addUniqueBasePart('SR5.SecondChance', dice);
 
         // Add new dice as fully separate Roll.
         const formula = `${dice}ds`;
@@ -1632,19 +1579,15 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!data.type) return;
 
         // Apply the extended modifier according the current iteration
-        const pool = new PartsList(data.pool.mod);
+        const pool = new PartsList(data.pool);
 
         const currentModifierValue = pool.getPartValue('SR5.ExtendedTest') || 0;
         const nextModifierValue = TestRules.calcNextExtendedModifier(currentModifierValue);
 
         // A pool could be overwritten or not.
-        if (data.pool.override) {
-            data.pool.override.value = Math.max(data.pool.override.value - 1, 0);
-        } else {
-            pool.addUniquePart('SR5.ExtendedTest', nextModifierValue);
-        }
+        pool.addUniqueBasePart('SR5.ExtendedTest', nextModifierValue);
 
-        Helpers.calcTotal(data.pool, { min: 0 });
+        PartsList.calcTotal(data.pool, { min: 0 });
 
         if (!TestRules.canExtendTest(data.pool.value, this.threshold.value, this.extendedHits.value)) {
             return ui.notifications?.warn('SR5.Warnings.CantExtendTestFurther', { localize: true });
@@ -1940,10 +1883,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Register listeners for ChatMessage html created by a SuccessTest.
      *
      * This listener needs to be registered to the 'renderChatMessage' FoundryVTT hook.
-     *
-     * @param message
-     * @param html
-     * @param data
      */
     static async chatMessageListeners(message: ChatMessage, html, data) {
         $(html).find('.show-roll').on('click', this._chatToggleCardRolls.bind(this));

@@ -215,6 +215,10 @@ body:not(.theme-dark) {
     flex-wrap: wrap;
 }
 
+.form-dialog {
+    min-width: 250px;
+}
+
 .form-dialog .window-content .dialog-buttons > * {
     flex: 1;
 }
@@ -251,6 +255,7 @@ nav#context-menu, menu.controls-dropdown {
     margin-top: 4px;
     color: variables.$white;
     display: flex;
+    justify-content: center;
     .test-icon {
         width: 17px;
         height: 17px;
@@ -262,5 +267,72 @@ nav#context-menu, menu.controls-dropdown {
 .window-resizable-handle {
     .fa-solid {
         transform: rotate(45deg);
+    }
+}
+
+.manual-override-section {
+    display: flex;
+    flex-direction: column;
+    font-weight: bold;
+    margin-bottom: 4px;
+
+    .manual-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .toggle-manual-override {
+            flex: 0 0 20px;
+            height: 24px;
+            font-size: 1em;
+            text-align: center;
+            line-height: 24px;
+            cursor: pointer;
+            color: #ccc;
+
+            &:hover {
+                color: #fff;
+            }
+
+            .fa-chevron-left {
+                transition: transform 0.2s ease-in-out;
+                transform: rotate(0deg);
+            }
+        }
+    }
+
+    .manual-content {
+        display: none;
+        margin-top: 8px;
+    }
+
+    &.expanded {
+        .manual-content {
+            display: block;
+        }
+
+        .toggle-manual-override .fa-chevron-up {
+            transform: rotate(-180deg);
+        }
+    }
+
+    .manual-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 7px 1em;
+    }
+
+    .manual-entry {
+        display: contents;
+    }
+
+    label {
+        flex: 0 0 auto;
+    }
+
+    input[type="number"] {
+        flex: 1 1 0;
+        width: 55px;
     }
 }

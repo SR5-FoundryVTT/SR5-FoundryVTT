@@ -78,13 +78,13 @@ export class SkillTest extends SuccessTest<SkillTestData> {
         const usedAttribute = this.actor.getAttribute(selectedAttribute);
         const lastUsedAttribute = this.actor.getAttribute(this.lastUsedAttribute);
 
-        if (!usedAttribute || !lastUsedAttribute) return; 
+        if (!usedAttribute || !lastUsedAttribute || usedAttribute.label === lastUsedAttribute.label) return;
 
-        const pool = new PartsList<number>(this.pool.mod);
+        const pool = new PartsList(this.pool);
 
         // Replace previous attribute with new one, without changing other modifiers
         pool.removePart(lastUsedAttribute.label);
-        pool.addPart(usedAttribute.label, usedAttribute.value);
+        pool.addBasePart(usedAttribute.label, usedAttribute.value);
 
         this.lastUsedAttribute = selectedAttribute;
         this.data.action.attribute = selectedAttribute;
@@ -102,13 +102,13 @@ export class SkillTest extends SuccessTest<SkillTestData> {
         const usedLimit = this.actor.getLimit(selectedLimit);
         const lastUsedLimit = this.actor.getLimit(this.lastUsedLimit);
 
-        if (!usedLimit || !lastUsedLimit) return;
+        if (!usedLimit || !lastUsedLimit || usedLimit.label === lastUsedLimit.label) return;
 
-        const limit = new PartsList<number>(this.limit.mod);
+        const limit = new PartsList(this.limit);
 
         // Replace previous limit with new one, without changing other modifiers.
         limit.removePart(lastUsedLimit.label);
-        limit.addPart(usedLimit.label, usedLimit.value);
+        limit.addBasePart(usedLimit.label, usedLimit.value);
 
         this.lastUsedLimit = selectedLimit;
 

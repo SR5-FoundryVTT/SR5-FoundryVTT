@@ -9,30 +9,53 @@
 
     <hr/>
     <div>
-        <div class="form-group">
-            <label data-tooltip="SR5.Tooltips.Test.Modifier">{{localize test.data.modifiers.label}}</label>
-            <input type="number" name="test.data.modifiers" data-dtype="Number" value="{{test.data.modifiers.value}}"/>
-        </div>
-    </div>
-    <div>
-        <div class="form-group">
-            <label data-tooltip="SR5.Tooltips.Test.Pool">{{localize "SR5.DicePool"}}</label>
-            <input type='number' name='test.data.pool' size='3' maxlength='3' value='{{test.pool.value}}'
-                   data-dtype="Number"/>
-        </div>
-        <div class="form-group">
-            <label data-tooltip="SR5.Tooltips.Test.Limit">{{localize "SR5.Limit"}}</label>
-            <input type='number' name='test.data.limit' size='3' maxlength='3' value='{{test.limit.value}}'
-                   data-dtype="Number"/>
-        </div>
-        <div class="form-group">
-            <label data-tooltip="SR5.Tooltips.Test.Threshold">{{localize "SR5.Threshold"}}</label>
-            <input type='number' name='test.data.threshold' size='3' maxlength='3'
-                   value='{{test.threshold.value}}'
-                   data-dtype="Number"/>
-        </div>
+        {{! --- Dice Pool --- }}
+        {{> "systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-entry.hbs"
+            path="test.data.pool"
+            data=test.data.pool
+            label="SR5.DicePool"
+            tooltip="SR5.Tooltips.Test.Pool"
+        }}
+        {{! --- Limit --- }}
+        {{> "systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-entry.hbs"
+            path="test.data.limit"
+            data=test.data.limit
+            label="SR5.Limit"
+            tooltip="SR5.Tooltips.Test.Limit"
+        }}
+        {{! --- Threshold --- }}
+        {{> "systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-entry.hbs"
+            path="test.data.threshold"
+            data=test.data.threshold
+            label="SR5.Threshold"
+            tooltip="SR5.Tooltips.Test.Threshold"
+        }}
     </div>
 
+    {{#if test.allowManualHits}}
+    <hr/>
+    <div class="manual-override-section {{#if (includes expandedPaths 'manual')}}expanded{{/if}}" data-section="manual-override">
+        <div class="manual-header">
+            <label class="manual-title">{{localize "SR5.ManualOverride"}}</label>
+            <a class="toggle-manual-override" title="{{localize 'SR5.ToggleSection'}}">
+                <i class="fas fa-chevron-up"></i>
+            </a>
+        </div>
+
+        <div class="manual-content">
+            <div class="manual-row">
+                <div class="form-group manual-entry">
+                    <label data-tooltip="SR5.Tooltips.Test.ManualHits">{{localize "SR5.ManualHits"}}</label>
+                    <input type='number' name='test.data.manualHits' ... />
+                </div>
+                <div class="form-group manual-entry">
+                    <label data-tooltip="SR5.Tooltips.Test.ManualGlitches">{{localize "SR5.ManualGlitches"}}</label>
+                    <input type='number' name='test.data.manualGlitches' ... />
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/if}}
     {{#if test.actor}}
     <hr/>
     <div>
@@ -43,22 +66,8 @@
         </div>
     </div>
     {{/if}}
-    
-    {{#if test.allowManualHits}}
-    <hr/>
-    <div>
-        <div class="form-group">
-            <label data-tooltip="SR5.Tooltips.Test.ManualHits">{{localize "SR5.ManualHits"}}</label>
-            <input type='number' name='test.data.manualHits' size='3' maxlength='3' value='{{#if test.data.manualHits.override}}{{test.data.manualHits.value}}{{/if}}' data-dtype="Number" placeholder=""/>
-        </div>
-        <div class="form-group">
-            <label data-tooltip="SR5.Tooltips.Test.ManualGlitches">{{localize "SR5.ManualGlitches"}}</label>
-            <input type='number' name='test.data.manualGlitches' size='3' maxlength='3' value='{{#if test.data.manualGlitches.override}}{{test.data.manualGlitches.value}}{{/if}}' data-dtype="Number" placeholder=""/>
-        </div>
-    </div>
-    <hr/>
-    {{/if}}
 
+    <hr/>
     <div>
         {{#if test.canBeExtended}}
         <div class="form-group">

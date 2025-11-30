@@ -1,4 +1,4 @@
-import { Helpers } from '../../helpers';
+import { PartsList } from '@/module/parts/PartsList';
 import { SuccessTestData, TestOptions } from '../SuccessTest';
 import { DataDefaults } from '../../data/DataDefaults';
 import { DefenseTestData } from '../DefenseTest';
@@ -31,22 +31,18 @@ export const ResistTestDataFlow = {
      */
     calculateBaseValues(data: ResistTestData) {
         // Calculate damage values in case of user dialog interaction.
-        Helpers.calcTotal(data.incomingDamage, {min: 0});
-        Helpers.calcTotal(data.incomingDamage.ap);
+        PartsList.calcTotal(data.incomingDamage, {min: 0});
+        PartsList.calcTotal(data.incomingDamage.ap);
 
         // Remove user override and resulting incoming damage as base.
         data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage) as DamageType;
         data.modifiedDamage.base = data.incomingDamage.value;
-        data.modifiedDamage.mod = [];
-        // @ts-expect-error taM check this 
-        delete data.modifiedDamage.override;
+        data.modifiedDamage.changes = [];
         data.modifiedDamage.ap.base = data.incomingDamage.ap.value;
-        data.modifiedDamage.ap.mod = [];
-        // @ts-expect-error taM check this 
-        delete data.modifiedDamage.ap.override;
+        data.modifiedDamage.ap.changes = [];
 
-        Helpers.calcTotal(data.modifiedDamage);
-        Helpers.calcTotal(data.modifiedDamage.ap);
+        PartsList.calcTotal(data.modifiedDamage);
+        PartsList.calcTotal(data.modifiedDamage.ap);
     },
 
     /**
@@ -85,7 +81,6 @@ export const ResistTestDataFlow = {
             //@ts-expect-error SuccessTest.prepareData is adding missing values, however these aren't actually optional.
             values: {},
 
-            modifiers: DataDefaults.createData('value_field', {label: 'SR5.Labels.Action.Modifiers'}),
             incomingDamage: opposedData.incomingDamage,
             modifiedDamage: opposedData.modifiedDamage,
 

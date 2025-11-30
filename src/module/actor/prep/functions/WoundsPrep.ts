@@ -1,5 +1,5 @@
+import { PartsList } from '@/module/parts/PartsList';
 import { MonitorRules } from './../../../rules/MonitorRules';
-import { Helpers } from 'src/module/helpers';
 
 export class WoundsPrep {
     static prepareWounds(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
@@ -10,8 +10,8 @@ export class WoundsPrep {
         const woundBoxesThreshold = MonitorRules.woundModifierBoxesThreshold(damageTolerance);
 
         // Each track defines it's local pain tolerance.
-        track.stun.pain_tolerance = Number(modifiers['pain_tolerance_stun']);
-        track.physical.pain_tolerance = Number(modifiers['pain_tolerance_physical']);
+        track.stun.pain_tolerance = modifiers.pain_tolerance_stun;
+        track.physical.pain_tolerance = modifiers.pain_tolerance_physical;
 
         // Legacy system provides a way of disabling a track, which will always return no wounds
         const stunWounds = track.stun.disabled ? 0 : MonitorRules.wounds(track.stun.value, woundBoxesThreshold, track.stun.pain_tolerance);
@@ -23,6 +23,6 @@ export class WoundsPrep {
 
         // The actor as a whole derives these wounds for wound modifier calculation
         system.wounds.base = stunWounds + physicalWounds;
-        system.wounds.value = Helpers.calcTotal(system.wounds);
+        PartsList.calcTotal(system.wounds);
     }
 }

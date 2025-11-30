@@ -1,6 +1,6 @@
 import { SR5 } from '@/module/config';
 
-const { SchemaField, NumberField, ArrayField, StringField } = foundry.data.fields;
+const { ArrayField, BooleanField, DocumentUUIDField, NumberField, SchemaField, StringField } = foundry.data.fields;
 
 export const PhysicalAttribute = new StringField({
     choices: SR5.physicalAttributes,
@@ -30,26 +30,19 @@ export const ValueMaxPair = () => ({
 
 export const ModListEntry = () => ({
     name: new StringField({ required: true }),
+    applied: new BooleanField({ initial: true }),
+    masked: new BooleanField({ initial: false }),
+    mode: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     value: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
-});
-
-export const OverrideModEntry = () => ({
-    ...ModListEntry(),
+    priority: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+    effectUuid: new DocumentUUIDField({ required: true, nullable: true }),
 });
 
 export const ModList = () => new ArrayField(new SchemaField(ModListEntry()));
 
 export const ModifiableValue = () => ({
     ...BaseValuePair(),
-    mod: ModList(),
-    mode: new StringField({
-        required: true,
-        nullable: true,
-        choices: ['override', 'upgrade', 'downgrade']
-    }),
-    override: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
-    downgrade: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
-    upgrade: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
+    changes: new ArrayField(new SchemaField(ModListEntry())),
 });
 
 export const ModifiableValueLinked = () => ({
@@ -69,6 +62,7 @@ export const ValueField = () => ({
 });
 
 export type ValueFieldType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ValueField>>;
+export type ModListEntryType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ModListEntry>>;
 export type BaseValuePairType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof BaseValuePair>>;
 export type ModifiableValueType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ModifiableValue>>;
 export type ModifiableValueLinkedType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ModifiableValueLinked>>;

@@ -177,7 +177,7 @@ export class WeaponRangeTestBehavior {
     private static prepareEnvironmentalModifier(test: WeaponRangeTest) {
         if (!test.actor) return;
 
-        const poolMods = new PartsList(test.data.modifiers.mod);
+        const poolMods = new PartsList(test.data.pool);
 
         // Apply altered environmental modifiers
         const range = test.hasTargets ? test.data.targetRanges[test.data.targetRangesSelected].range.modifier : test.data.range;

@@ -1,5 +1,4 @@
 import { DataDefaults } from '../data/DataDefaults';
-import { Helpers } from '../helpers';
 import { Translation } from '../utils/strings';
 import { BruteForceTest } from './BruteForceTest';
 import { TestCreator } from './TestCreator';
@@ -7,6 +6,7 @@ import { MarkPlacementFlow } from './flows/MarkPlacementFlow';
 import { OpposedMatrixTestData } from './MatrixTest';
 import { DamageType } from '@/module/types/item/Action';
 import { OpposedMatrixTest } from '@/module/tests/OpposedMatrixTest';
+import { PartsList } from '../parts/PartsList';
 
 type OpposedBruteForceTestData = OpposedMatrixTestData & {
     incomingDamage: DamageType;
@@ -58,7 +58,7 @@ export class OpposedBruteForceTest extends OpposedMatrixTest<OpposedBruteForceTe
         // Setup optional damage value
         const damage = Math.floor(this.againstNetHits.value / 2);
         this.data.modifiedDamage = DataDefaults.createData('damage', {base: damage, type: {base: 'matrix', value: 'matrix'}});
-        Helpers.calcTotal(this.data.modifiedDamage);
+        PartsList.calcTotal(this.data.modifiedDamage);
         this.data.incomingDamage = this.data.modifiedDamage;
     }
 

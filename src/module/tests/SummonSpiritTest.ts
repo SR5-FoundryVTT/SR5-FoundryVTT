@@ -136,12 +136,12 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
 
         // Cleanup previous calculation and add new limit part.
         // NOTE: Instead of removing all parts, be specific in case of future additions to limit parts elsewhere.
-        const limitParts = new PartsList(this.data.limit.mod);
+        const limitParts = new PartsList(this.data.limit);
 
         limitParts.removePart('SR5.Force');
         limitParts.removePart('SR5.Reagent');
 
-        limitParts.addUniquePart(label, limit);
+        limitParts.addUniqueBasePart(label, limit);
     }
 
     /**

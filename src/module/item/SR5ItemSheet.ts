@@ -353,17 +353,17 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                     //@ts-expect-error fvtt-types doesn't know about non-required field.
                     action.limit = undefined;
                 if (action.damage) {
-                    if (action.damage.mod.length === 0) 
+                    if (action.damage.changes.length === 0) 
                         //@ts-expect-error fvtt-types doesn't know about non-required field.
-                        action.damage.mod = undefined;
-                    if (action.damage.ap.mod.length === 0)
+                        action.damage.changes = undefined;
+                    if (action.damage.ap.changes.length === 0)
                         //@ts-expect-error fvtt-types doesn't know about non-required field.
-                        action.damage.ap.mod = undefined;
+                        action.damage.ap.changes = undefined;
                 }
                 if (action.limit) {
-                    if (action.limit.mod.length === 0)
+                    if (action.limit.changes.length === 0)
                         //@ts-expect-error fvtt-types doesn't know about non-required field.
-                        action.limit.mod = undefined;
+                        action.limit.changes = undefined;
                 }
             } catch (e) {
                 console.error(e);

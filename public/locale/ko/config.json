@@ -883,8 +883,9 @@
             "WarningTitle": "경고"
         },
         "Magic": "마법",
-        "ManualGlitches": "수동 글리치",
-        "ManualHits": "수동 성공횟수",
+        "Manual":"수동 조종",
+        "ManualGlitches": "글리치",
+        "ManualHits": "성공횟수",
         "ManualOverride": "수동 오버라이드",
         "MarkImportedItemReviewed": "불러온 항목 검토 완료 표시",
         "MarkImportedItemTooltip": "불러온 항목이 검토된 것으로 표시합니다.",

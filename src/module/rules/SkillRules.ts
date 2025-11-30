@@ -1,8 +1,7 @@
-import {PartsList} from "../parts/PartsList";
-import {SR} from "../constants";
-import { SkillFieldType } from "../types/template/Skills";
+import { SR } from "../constants";
+import { PartsList } from "../parts/PartsList";
 import { SR5Actor } from '@/module/actor/SR5Actor';
-import { DataDefaults } from '@/module/data/DataDefaults';
+import { SkillFieldType } from "../types/template/Skills";
 
 export class SkillRules {
 
@@ -44,33 +43,25 @@ export class SkillRules {
      * Add the defaulting modifier part to a parts list
      * @param parts Should be a PartsList involved with skills.
      */
-    static addDefaultingPart(parts: PartsList<number>) {
+    static addDefaultingPart(parts: PartsList) {
         parts.addUniquePart('SR5.Defaulting', SkillRules.defaultingModifier);
     }
 
     /**
      * Get the level a specific skill without its attribute.
-     * @param skill
-     * @param options
-     * @param options.specialization If true will add the default specialization bonus onto the level.
      */
-    static level(skill: SkillFieldType, options = {specialization: false}): number {
-        if (this.mustDefaultToRoll(skill)) {
+    static level(skill: SkillFieldType) {
+        if (this.mustDefaultToRoll(skill))
             return SkillRules.defaultingModifier;
-        }
 
-        // An attribute can have a NaN value if no value has been set yet. Do the skill for consistency.
-        const skillValue = typeof skill.value === 'number' ? skill.value : 0;
-        const specializationBonus = options.specialization ? SR.skill.SPECIALIZATION_MODIFIER : 0;
-
-        return skillValue + specializationBonus;
+        return skill.value;
     }
 
-    static get defaultingModifier(): number {
+    static get defaultingModifier() {
         return SR.skill.DEFAULTING_MODIFIER;
     }
 
-    static get SpecializationModifier(): number {
+    static get SpecializationModifier() {
         return SR.skill.SPECIALIZATION_MODIFIER;
     }
 

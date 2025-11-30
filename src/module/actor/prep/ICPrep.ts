@@ -1,19 +1,18 @@
-import {ModifiersPrep} from "./functions/ModifiersPrep";
 import {InitiativePrep} from "./functions/InitiativePrep";
 import {AttributesPrep} from "./functions/AttributesPrep";
-import {PartsList} from "../../parts/PartsList";
 import {SR5} from "../../config";
 import {MatrixPrep} from "./functions/MatrixPrep";
 import {DataDefaults} from "../../data/DataDefaults";
 import {MatrixRules} from "../../rules/MatrixRules";
 import {SkillsPrep} from "./functions/SkillsPrep";
 import { SR5Item } from "src/module/item/SR5Item";
+import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
+import { PartsList } from "@/module/parts/PartsList";
 
 
 export class ICPrep {
     static prepareBaseData(system: Actor.SystemOfType<'ic'>) {
-        ModifiersPrep.clearAttributeMods(system);
-        SkillsPrep.prepareSkillData(system);
+        ModifiableFieldPrep.resetAllModifiers(system);
 
         ICPrep.hideMeatAttributes(system);
         ICPrep.addHostAttributes(system);
@@ -49,7 +48,7 @@ export class ICPrep {
 
         // Prepare user visible matrix track values
         track.matrix.base = MatrixRules.getConditionMonitor(matrix.rating);
-        track.matrix.mod = PartsList.AddUniquePart(track.matrix.mod, "SR5.Bonus", Number(modifiers['matrix_track']));
+        PartsList.addUniquePart(track.matrix, "SR5.Bonus", Number(modifiers['matrix_track']));
         track.matrix.max = matrix.condition_monitor.max;
         track.matrix.label = SR5.damageTypes.matrix;
     }
@@ -62,10 +61,10 @@ export class ICPrep {
 
         // Prepare used initiative parts
         initiative.matrix.base.base = MatrixRules.getICInitiativeBase(host.rating);
-        initiative.matrix.base.mod = PartsList.AddUniquePart(initiative.matrix.base.mod, "SR5.Bonus", Number(modifiers['matrix_initiative']));
+        PartsList.addUniquePart(initiative.matrix.base, "SR5.Bonus", modifiers.matrix_initiative);
 
         initiative.matrix.dice.base = MatrixRules.getICInitiativeDice();
-        initiative.matrix.dice.mod = PartsList.AddUniquePart(initiative.matrix.dice.mod, "SR5.Bonus", Number(modifiers['matrix_initiative_dice']));
+        PartsList.addUniquePart(initiative.matrix.dice, "SR5.Bonus", modifiers.matrix_initiative_dice);
     }
 
     /**
@@ -114,9 +113,7 @@ export class ICPrep {
             // from it's host attributes.
             attribute.base = 0;
 
-            const parts = new PartsList(attribute.mod);
-            parts.addPart('SR5.Host.Rating', MatrixRules.getICMeatAttributeBase(host.rating));
-            attribute.mod = parts.list;
+            PartsList.addPart(attribute, 'SR5.Host.Rating', MatrixRules.getICMeatAttributeBase(host.rating));
 
             AttributesPrep.prepareAttribute(id, attribute);
         }

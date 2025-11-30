@@ -30,8 +30,7 @@ export class NaturalRecoveryPhysicalTest extends SuccessTest {
         const track = this.actor.getPhysicalTrack();
         const boxes = track?.value || 0;
 
-        const threshold = new PartsList(this.threshold.mod);
-        threshold.addUniquePart('SR5.PhysicalTrack', boxes)
+        PartsList.addUniqueBasePart(this.threshold, 'SR5.PhysicalTrack', boxes)
     }
 
     /**

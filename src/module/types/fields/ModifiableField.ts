@@ -1,6 +1,5 @@
-import { ModifiableValue } from "../template/Base";
-import { AnyObject, SimpleMerge } from "fvtt-types/utils";
-import { SR5ActiveEffect } from "src/module/effect/SR5ActiveEffect";
+import { ModifiableValue, ModifiableValueType } from "../template/Base";
+import { AnyObject } from "fvtt-types/utils";
 
 import DataModel = foundry.abstract.DataModel;
 import SchemaField = foundry.data.fields.SchemaField;
@@ -25,37 +24,30 @@ import SchemaField = foundry.data.fields.SchemaField;
 export class ModifiableField<
     Fields extends ReturnType<typeof ModifiableValue>,
     Options extends SchemaField.Options<Fields> = SchemaField.DefaultOptions,
-    AssignmentType = SchemaField.Internal.AssignmentType<Fields, SimpleMerge<Options, SchemaField.DefaultOptions>>,
-    InitializedType = SchemaField.Internal.InitializedType<Fields, SimpleMerge<Options, SchemaField.DefaultOptions>>,
-    PersistedType extends AnyObject | null | undefined = SchemaField.Internal.PersistedType<
-        Fields,
-        SimpleMerge<Options, SchemaField.DefaultOptions>
-    >
+    // eslint-disable-next-line @typescript-eslint/no-deprecated
+    AssignmentType = SchemaField.Internal.AssignmentType<Fields, Options>,
+    InitializedType = SchemaField.Internal.InitializedType<Fields, Options>,
+    PersistedType extends AnyObject | null | undefined = SchemaField.Internal.PersistedType<Fields, Options>
 > extends foundry.data.fields.SchemaField<Fields, Options, AssignmentType, InitializedType, PersistedType> {
-    override _applyChangeCustom(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData) {
-        if (SR5ActiveEffect.applyModifyToModifiableValue(change.effect, model, change, value, delta)) return undefined;
-        return super._applyChangeCustom(value, delta, model, change);
-    }
+    override applyChange(value: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData): undefined {
+        const changeValue = Number(change.value);
+        if (isNaN(changeValue)) return undefined;
 
-    protected override _applyChangeOverride(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData) {
-        if (SR5ActiveEffect.applyOverrideToModifiableValue(change.effect, model, change, value, delta)) return undefined;
-        return super._applyChangeOverride(value, delta, model, change);
-    }
+        const field = value as ModifiableValueType;
+        const effectName = change.effect.name;
+        const effectMode = change.mode;
+        const effectPriority = change.priority ?? 10 * effectMode;
 
-    protected override _applyChangeUpgrade(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData) {
-        if (SR5ActiveEffect.applyUpgradeToModifiableValue(change.effect, model, change, value, delta)) return undefined;
-        return super._applyChangeUpgrade(value, delta, model, change);
-    }
+        field.changes.push({
+            applied: true,
+            masked: false,
+            name: effectName,
+            mode: effectMode,
+            value: changeValue,
+            priority: effectPriority,
+            effectUuid: change.effect.uuid,
+        });
 
-    protected override _applyChangeDowngrade(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData) {
-        if (SR5ActiveEffect.applyDowngradeToModifiableValue(change.effect, model, change, value, delta)) return undefined;
-        return super._applyChangeDowngrade(value, delta, model, change);
-    }
-
-    /**
-     * Avoid breaking sheet rendering by assuring Foundry never applies any naive multiplication of an 'object'
-     */
-    protected override _applyChangeMultiply(value: InitializedType, delta: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData) {
         return undefined;
     }
 }

@@ -1,8 +1,7 @@
-import { Helpers } from '../../../helpers';
-import { PartsList } from '../../../parts/PartsList';
 import { SR5 } from "../../../config";
 import { AttributesPrep } from "./AttributesPrep";
 import { SR5Item } from 'src/module/item/SR5Item';
+import { PartsList } from '@/module/parts/PartsList';
 import { DataDefaults } from '@/module/data/DataDefaults';
 import { MatrixAttributeFieldType } from '@/module/types/template/Matrix';
 
@@ -15,17 +14,14 @@ export class MatrixPrep {
     static prepareMatrix(system: Actor.SystemOfType<'character' | 'critter'>, items: SR5Item[]) {
         const { matrix, attributes, modifiers } = system;
 
-        const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'];
+        const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'] as const;
 
         // clear matrix data to defaults
-        MatrixList.forEach((key) => {
-            const parts = new PartsList(matrix[key].mod);
-            if (matrix[key].temp) parts.addUniquePart('SR5.Temporary', matrix[key].temp);
-            // LEGACY from when the sheet used 'mod.Temporary'
-            parts.removePart('Temporary');
-            matrix[key].mod = parts.list;
-            matrix[key].value = parts.total;
-        });
+        for (const key of MatrixList) {
+            matrix[key].base = 0;
+            PartsList.calcTotal(matrix[key]);
+        }
+
         matrix.condition_monitor.max = 0;
         matrix.rating = 0;
         matrix.name = '';
@@ -59,11 +55,11 @@ export class MatrixPrep {
             }
         } // if we don't have a device, use living persona
         else if (system.special === 'resonance') {
-            matrix.firewall.base = Helpers.calcTotal(attributes.willpower);
-            matrix.data_processing.base = Helpers.calcTotal(attributes.logic);
-            matrix.rating = Helpers.calcTotal(attributes.resonance);
-            matrix.attack.base = Helpers.calcTotal(attributes.charisma);
-            matrix.sleaze.base = Helpers.calcTotal(attributes.intuition);
+            matrix.firewall.base = PartsList.calcTotal(attributes.willpower);
+            matrix.data_processing.base = PartsList.calcTotal(attributes.logic);
+            matrix.rating = PartsList.calcTotal(attributes.resonance);
+            matrix.attack.base = PartsList.calcTotal(attributes.charisma);
+            matrix.sleaze.base = PartsList.calcTotal(attributes.intuition);
             // if we have a Living Persona device, we want to use some of its data to make the sheet sync up best
             if (device && device.isLivingPersona()) {
                 matrix.device = device._id!;
@@ -99,27 +95,15 @@ export class MatrixPrep {
         // add matrix attributes to both limits and attributes as hidden entries
         for (const attributeName of Object.keys(SR5.matrixAttributes)) {
             const attribute = matrix[attributeName];
+
             AttributesPrep.prepareAttribute(attributeName, attribute);
-            const { value, base, mod, label } = attribute;
-            const hidden = true;
+            const { value, base, changes, label } = attribute;
 
             // Each matrix attribute also functions as a limit.
-            limits[attributeName] = {
-                value,
-                base,
-                mod,
-                label,
-                hidden,
-            };
+            limits[attributeName] = DataDefaults.createData('attribute_field', { value, base, changes, label, hidden: true });
 
             // Copy matrix attribute data into attributes for ease of access during testing.
-            attributes[attributeName] = {
-                value,
-                base,
-                mod,
-                label,
-                hidden,
-            };
+            attributes[attributeName] = DataDefaults.createData('attribute_field', { value, base, changes, label, hidden: true });
         }
     }
 
@@ -127,12 +111,10 @@ export class MatrixPrep {
         const { matrix } = system;
         rating = rating ?? matrix.rating;
         const matrixAttributes = ['firewall', 'data_processing'] as const;
-        matrixAttributes.forEach((attribute) => {
-            matrix[attribute].base = rating;
-        });
-        ([...matrixAttributes, 'sleaze', 'attack'] as const).forEach((attId) => {
-            Helpers.calcTotal(matrix[attId]);
-        });
-    }
 
+        for (const attribute of matrixAttributes)
+            matrix[attribute].base = rating;
+        for (const attId of [...matrixAttributes, 'sleaze', 'attack'])
+            PartsList.calcTotal(matrix[attId]);
+    }
 }
