@@ -18,13 +18,12 @@ export const AutocompleteInlineHooksFlow =  {
      * This is taken from: https://github.com/schultzcole/FVTT-Autocomplete-Inline-Properties/blob/master/CONTRIBUTING.md
      * It partially uses: https://github.com/schultzcole/FVTT-Autocomplete-Inline-Properties/blob/master/package-config.mjs#L141
      */
-    setupHook: () => {
+    aipSetupHook: (packageConfig) => {
         // Module might not be installed.
-        const aipModule = game.modules.get("autocomplete-inline-properties") as any;
+        const aipModule = game.modules.get("autocomplete-inline-properties");
         if (!aipModule) return;
-        // API might be missing.
-        const api = aipModule.API;
-        if (!api) return;
+        // @ts-expect-error TODO: Add API Typings
+        const api = aipModule.API as any;
 
         console.debug('Shadowrun 5e | Registering support for autocomplete-inline-properties');
         const DATA_MODE = api.CONST.DATA_MODE;
@@ -48,7 +47,7 @@ export const AutocompleteInlineHooksFlow =  {
             }]
         };
 
-        api.PACKAGE_CONFIG.push(config);
+        packageConfig.push(config);
     },
 
     /**

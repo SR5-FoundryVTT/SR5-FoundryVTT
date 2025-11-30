@@ -150,7 +150,8 @@ export class HooksManager {
                 initDiceSoNice();
             }
         });
-        Hooks.once('setup', AutocompleteInlineHooksFlow.setupHook);
+        // @ts-expect-error TODO: Add AIP Typings
+        Hooks.on('aipSetup', AutocompleteInlineHooksFlow.aipSetupHook);
 
         Hooks.on('ready', HooksManager.ready.bind(HooksManager));
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop.bind(HooksManager));
