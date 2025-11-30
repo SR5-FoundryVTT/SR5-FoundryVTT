@@ -405,7 +405,7 @@ export class Helpers {
         fromUnit = fromUnit.toLowerCase();
 
         if (!Object.hasOwn(LENGTH_UNIT_TO_METERS_MULTIPLIERS, fromUnit)) {
-            console.error(`Distance can't be converted from ${fromUnit} to ${LENGTH_UNIT}`);
+            console.debug(`Shadowrun 5e | Distance can't be converted from ${fromUnit} to ${LENGTH_UNIT}. If empty, the scene unit configuration is missing.`);
             return 0;
         }
 
