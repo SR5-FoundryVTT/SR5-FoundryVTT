@@ -2,6 +2,7 @@
 
 // import config first to get all the variables and mixins set
 @use 'config';
+@use 'combat';
 @use 'importer';
 @use 'compendium-browser';
 @use 'item';

@@ -7,52 +7,16 @@ import { DamageType } from "../types/item/Action";
 import { ValueFieldType } from "../types/template/Base";
 
 export class CombatRules {
-    static iniOrderCanDoAnotherPass(scores: number[]): boolean {
-        for (const score of scores) {
-            if (CombatRules.iniScoreCanDoAnotherPass(score)) return true;
-        }
-        return false;
-    }
-    /**
-     * Check if there is another initiative pass possible with the given score.
-     * @param score
-     * @return true means another initiative pass is possible
-     */
-    static iniScoreCanDoAnotherPass(score: number): boolean {
-        return CombatRules.reduceIniResultAfterPass(score) > 0;
-    }
     /**
      * Reduce the given initiative score according to @PDF SR5#159
      * @param score This given score can't be reduced under zero.
      */
-    static reduceIniResultAfterPass(score: number): number {
+    static initAfterPass(score: null): null;
+    static initAfterPass(score: number): number;
+    static initAfterPass(score: number | null): number | null;
+    static initAfterPass(score: number | null): number | null {
+        if (score === null) return null;
         return Math.max(score + SR.combat.INI_RESULT_MOD_AFTER_INI_PASS, 0);
-    }
-
-    /**
-     * Reduce the initiative score according to the current initiative pass @PDF SR5#160.
-     * @param score
-     * @param pass The current initiative pass. Each combat round starts at the initiative pass of 1.
-     */
-    static reduceIniOnLateSpawn(score: number, pass: number): number {
-        // Assure valid score ranges.
-        // Shift initiative pass value range from min 1 to min 0 for multiplication.
-        pass = Math.max(pass - 1, 0);
-        score = Math.max(score, 0);
-
-        // Reduce the new score according to. NOTE: Modifier is negative
-        const reducedScore = score + pass * SR.combat.INI_RESULT_MOD_AFTER_INI_PASS;
-        return CombatRules.getValidInitiativeScore(reducedScore);
-    }
-
-    /**
-     * Return a valid initiative score on updates or score changes
-     *
-     * @param score The initiative score after it's been updated.
-     * @returns A valid initiative score
-     */
-    static getValidInitiativeScore(score: number): number {
-        return Math.max(score, 0);
     }
 
     /**
@@ -278,20 +242,6 @@ export class CombatRules {
     }
 
     /**
-     * Determine the amount of initiative score modifier change.
-     * 
-     * According to SR5#170 'Wound Modifiers'.
-     * 
-     * @param woundModBefore A negative wound modifier, before taking latest damage.
-     * @param woundModAfter A negative wound modifier, after taking latest damage.
-     * @return An to be applied initiative score modifier
-     */
-    static combatInitiativeScoreModifierAfterDamage(woundModBefore: number, woundModAfter: number): number {
-        // Make sure no positive values are passed into.
-        return Math.min(woundModBefore, 0) - Math.min(woundModAfter, 0);
-    }
-
-    /**
      * Can a defense mode be used with a specific initiative score
      * 
      * @param iniScore The combatants ini score
@@ -324,5 +274,9 @@ export class CombatRules {
      */
     static initiativeScoreWoundAdjustment(woundsBefore: number, woundsAfter: number) {
         return woundsAfter - woundsBefore;
+    }
+
+    static getProneModifier(actor: SR5Actor, target?: SR5Actor) {
+
     }
 }
