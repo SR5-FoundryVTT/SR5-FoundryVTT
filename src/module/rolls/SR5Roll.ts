@@ -22,7 +22,7 @@ export class SR5Roll extends Roll {
     }
 
     get hits(): number {
-        return this.total || 0;
+        return this.results.filter(result => result.success).length;
     }
 
     get glitches(): number {
