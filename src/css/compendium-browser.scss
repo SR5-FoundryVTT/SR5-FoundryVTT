@@ -42,6 +42,9 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
         nav.tabs {
             grid-row: 1;
             grid-column: 1 / -1;
+            a {
+                color: #e7d1b1;
+            }
         }
 
         /* --- Filters Sidebar --- */
@@ -199,6 +202,7 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                     margin: 0;
                     font-size: 1.2em;
                     text-shadow: 0 0 5px rgba($accent-gold, 0.4);
+                    color: rgb(247, 243, 232);
                 }
                 .header-source {
                     font-size: 0.9em;
