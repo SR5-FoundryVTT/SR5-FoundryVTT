@@ -47,7 +47,10 @@ export const AutocompleteInlineHooksFlow =  {
             }]
         };
 
-        packageConfig.push(config);
+        // NOTE: unshift is used to give priority to SR5 over core modules, as AIP 3.1.0 has issues here: 
+        // - See their GitHub issue #748
+        // - Our Github issue #1684
+        packageConfig.unshift(config);
     },
 
     /**
