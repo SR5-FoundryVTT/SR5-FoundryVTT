@@ -47,10 +47,12 @@ export const AutocompleteInlineHooksFlow =  {
             }]
         };
 
-        // NOTE: unshift is used to give priority to SR5 over core modules, as AIP 3.1.0 has issues here: 
+        // NOTE: AIP 3.1.0 has issues with 'core' fieldConfig overwriting custom fieldConfigs. Replace all configs with ours, works.
+        // Other fieldConfigs are 'core' and built-in systems, which we don't need, as we custom map all our fields for AIP.
         // - See their GitHub issue #748
         // - Our Github issue #1684
-        packageConfig.unshift(config);
+        packageConfig.splice(0, packageConfig.length);
+        packageConfig.push(config);
     },
 
     /**
