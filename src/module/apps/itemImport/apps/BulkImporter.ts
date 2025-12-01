@@ -233,7 +233,6 @@ export class BulkImporter extends BaseClass {
         const ZIP = BulkImporter.zipFile ? await (new JSZip()).loadAsync(BulkImporter.zipFile) : null;
 
         // Configure shared importer settings
-        ImportHelper.folders = {};
         DataImporter.overrideDocuments = BulkImporter.overrideDocuments;
         DataImporter.iconSet = BulkImporter.setIcons ? await IconAssign.getIconFiles() : null;
 
@@ -290,6 +289,12 @@ export class BulkImporter extends BaseClass {
         BulkImporter.isImporting = false;
         BulkImporter.importDone = true;
         await this.render();
+
+        // Clear ImportHelper caches
+        ImportHelper.folders = {};
+        ImportHelper.categoryMap = {};
+        ImportHelper.nameToId = {};
+        ImportHelper.idToName = {};
 
         console.debug(`Bulk import time: ${(performance.now() - start).toFixed(2)} ms`);
     }

@@ -416,8 +416,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Dice:       https://foundryvtt.com/article/dice-advanced/
      * Modifiers:  https://foundryvtt.com/article/dice-modifiers/
      * 
-     * @param dice Amount of d6 to use.
-     * @param explode Should the d6 be exploded.
+     * @param dice Amount of ds to use.
+     * @param explode Should the ds be exploded.
      * @returns The complete formula string.
      */
     buildFormula(dice: number, explode: boolean): string {
@@ -1324,7 +1324,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         parts.addUniquePart('SR5.SecondChance', dice, true);
 
         // Add new dice as fully separate Roll.
-        const formula = `${dice}d6`;
+        const formula = `${dice}ds`;
         const roll = new SR5Roll(formula);
         this.rolls.push(roll);
     }
@@ -1893,7 +1893,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const actor = this.actor?.id;
         const alias = game.user?.name;
 
-        const formula = `0d6`;
+        const formula = `0ds`;
         const roll = new SR5Roll(formula);
         // evaluation is necessary for Roll DataModel validation.
         await roll.evaluate();
