@@ -41,7 +41,7 @@ export class CritterParser extends MetatypeParserBase<'character'> {
             } else if (name === 'flight') {
                 system.skills.active[name] = DataDefaults.createData('skill_field', { attribute: "agility", base: skillValue });
             } else {
-                console.log(`[Skill Missing] Actor: ${jsonData.name._TEXT}\nSkill: ${name}`);
+                console.warn(`[Skill Missing] Actor: ${jsonData.name._TEXT}\nSkill: ${name}`);
             }
         };
 

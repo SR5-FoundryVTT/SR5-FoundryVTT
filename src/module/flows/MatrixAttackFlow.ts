@@ -10,8 +10,9 @@ export const MatrixAttackFlow = {
 
     /**
      * Determine the outcome of a failed matrix attack.
+     * 
+     * Implements SR5#231 'Illegal Actions' for attack actions.
      * @param test The test being evaluated.
-     * @returns 
      */
     async determineMatrixFailedAttack(test: SuccessTest | OpposedTest) {
         if (!test.opposing) return;
@@ -33,11 +34,14 @@ export const MatrixAttackFlow = {
             const alias = game.user?.name;
             const linkedTokens = actor.getActiveTokens(true) || [];
             const token = linkedTokens.length === 1 ? linkedTokens[0].id : undefined;
+
+            // Use the successful defending test's net hits for base damage. See SR5#231 'Illegal Actions' for attack actions.
+            const netHits = test.netHits.value;
             // if biofeedback was enabled by the attacker, it should deal damage in a failed attack action back
             const biofeedback = against.data.damage.biofeedback;
 
             const templateData = {
-                damage: MatrixRules.failedAttackDamage(biofeedback),
+                damage: MatrixRules.failedAttackDamage(netHits, biofeedback),
                 speaker: {
                     actor,
                     alias,
@@ -46,7 +50,6 @@ export const MatrixAttackFlow = {
             };
             await this.sendFailedAttackActionMessage(templateData);
         }
-
     },
 
     /**

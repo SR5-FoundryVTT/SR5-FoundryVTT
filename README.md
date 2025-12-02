@@ -10,12 +10,13 @@ Should you need an older version you can check [releases](https://github.com/SR5
 ## General Information (read before playing)
 It's complicated, it's a work in progress, but it is _kinda_ stable. We try to break as little as possible.
 
-#### Currently Supported Actor Sheets 
-- Character
-- Spirit
-- Sprite
-- Vehicle
-- IC
+#### Currently supported rule sections
+- All character types
+- Most equipment types
+- Partially automated combat
+- Partially automated matrix and technomancy
+- Partially automated magic
+- Partially supported rigging
 
 ## Learn more
 To learn more about the features of the system and how to use them, please visit [our wiki](http://sr5-foundryvtt.privateworks.com/index.php/Main_Page).
@@ -31,8 +32,8 @@ There is also the [README-dev.md](https://github.com/SR5-FoundryVTT/SR5-FoundryV
 ## Licenses
 
 - **Font Awesome**  
-  Icons provided by Font Awesome.
-  [License](https://fontawesome.com/license).
+  Icons provided by [Font Awesome](https://fontawesome.com).
+  The system uses a Font Awesome Pro license provided by one of our system authors ([Timothy J. Lanza](https://github.com/tjlanza)).
 
 - **Bella Carvalho**  
   Additional icons created by [Bella Carvalho](https://www.behance.net/bellcarvalho).  

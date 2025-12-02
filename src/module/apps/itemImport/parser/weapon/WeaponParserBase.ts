@@ -27,7 +27,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
             const item = itemMap.get(name);
 
             if (!item) {
-                console.log(`[Accessory Missing]\nWeapon: ${jsonData.name._TEXT}\nAccessory: ${name}`);
+                console.warn(`[Accessory Missing]\nWeapon: ${jsonData.name._TEXT}\nAccessory: ${name}`);
                 continue;
             }
 
