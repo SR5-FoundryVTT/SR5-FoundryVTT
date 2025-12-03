@@ -19,7 +19,7 @@ export class VehicleParser extends Parser<'vehicle'> {
             const item = itemMap.get(name);
 
             if (!item) {
-                console.log(`[Vehicle Mod Missing]\nVehicle: ${vehicleName}\nMod: ${name}`);
+                console.warn(`[Vehicle Mod Missing]\nVehicle: ${vehicleName}\nMod: ${name}`);
                 continue;
             }
 

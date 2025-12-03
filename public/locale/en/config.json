@@ -2669,7 +2669,10 @@
             "Effect": {
                 "AlterApplyToWithChanges": "Remove changes before changing what the effect applies to.",
                 "ApplyTo": "Changes of this effect will apply to this target only",
+                "CreateEffect": "Create Effect",
+                "DeleteEffect": "Delete Effect",
                 "DocumentEffects": "Effects directly on this document",
+                "EditEffect": "Edit Effect",
                 "ItemEffects": "Effects collected from items on this document",
                 "OnlyAllFilteredUsed": "This effect will only apply for tests matching all selections",
                 "OnlyFilteredUsed": "This effect will only apply for tests matching at least one selection",

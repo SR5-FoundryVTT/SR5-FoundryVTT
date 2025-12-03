@@ -55,5 +55,5 @@ export class GearImporter extends DataImporter {
                 documentType: "Gear"
             }
         );
-    }    
+    }
 }
