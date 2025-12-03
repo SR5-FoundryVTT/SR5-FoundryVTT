@@ -1,23 +1,21 @@
-import { LimitRules } from './../../../rules/LimitRules';
-import { PartsList } from '../../../parts/PartsList';
-import { Helpers } from '../../../helpers';
 import { SR5 } from "../../../config";
+import { PartsList } from "@/module/parts/PartsList";
 
 export class LimitsPrep {
     static prepareLimits(system: Actor.SystemOfType<'character' | 'critter' | 'spirit' | 'sprite' | 'vehicle'>) {
         const { limits, modifiers, special } = system;
 
         // Apply the actor local modifiers defined on the sheet.
-        limits.physical.mod = PartsList.AddUniquePart(limits.physical.mod, 'SR5.Bonus', Number(modifiers['physical_limit']));
-        limits.mental.mod = PartsList.AddUniquePart(limits.mental.mod, 'SR5.Bonus', Number(modifiers['mental_limit']));
-        limits.social.mod = PartsList.AddUniquePart(limits.social.mod, "SR5.Bonus", Number(modifiers['social_limit']));
-        
+        PartsList.addUniquePart(limits.physical, 'SR5.Bonus', modifiers.physical_limit);
+        PartsList.addUniquePart(limits.mental, 'SR5.Bonus', modifiers.mental_limit);
+        PartsList.addUniquePart(limits.social, 'SR5.Bonus', modifiers.social_limit);
+
         // Determine if the astral limit is relevant.
         if ('astral' in limits)
             limits.astral.hidden = special !== 'magic';
 
         for (const [name, limit] of Object.entries(limits)) {
-            Helpers.calcTotal(limit);
+            PartsList.calcTotal(limit);
             limit.label = SR5.limits[name];
         }
     }
@@ -38,18 +36,23 @@ export class LimitsPrep {
         const {limits, modifiers, special, attributes} = system;
 
         if (special === 'magic') {
-            // Astral limit.
-            limits.astral = LimitRules.calculateAstralLimit(limits.astral, limits.mental, limits.social);
-            limits.astral.mod = PartsList.AddUniquePart(limits.astral.mod, "SR5.Bonus", Number(modifiers['astral_limit']));
-            Helpers.calcTotal(limits.astral);
+            // Astral limit SR5#278.
+            limits.astral.label = SR5.limits.astral;
+            limits.astral.base = Math.max(limits.mental.value, limits.social.value);
+            PartsList.addUniquePart(limits.astral, "SR5.Bonus", modifiers.astral_limit);
+            PartsList.calcTotal(limits.astral);
 
             // Magic attribute as limit, hidden as it's directly derived from an attribute.
-            limits.magic = LimitRules.calculateMagicLimit(attributes.magic);
+            limits.magic.base = attributes.magic.value;
+            limits.magic.label = SR5.limits.magic;
             limits.magic.hidden = true;
-            Helpers.calcTotal(limits.magic);
+            PartsList.calcTotal(limits.magic);
         }
 
-        limits.initiation = LimitRules.calculateInitiationSubmersionLimit(system.magic.initiation)
-        Helpers.calcTotal(limits.initiation, {min: 0});
+        // Derive the initiation limit of a character from its initiation rank.
+        limits.initiation.label = SR5.limits.initiation;
+        limits.initiation.base = system.magic.initiation;
+        limits.initiation.hidden = true;
+        PartsList.calcTotal(limits.initiation, { min: 0 });
     }
 }

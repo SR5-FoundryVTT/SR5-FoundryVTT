@@ -91,11 +91,9 @@ export class ComplexFormTest extends SuccessTest<ComplexFormTestData> {
      */
     prepareLimitValue() {
         const level = Number(this.data.level);
-        this.data.limit.mod = PartsList.AddUniquePart(
-            this.data.limit.mod,
-            'SR5.Level',
-            ComplexFormRules.calculateLimit(level)
-        )
+        PartsList.addUniqueBasePart(
+            this.data.limit, 'SR5.Level', ComplexFormRules.calculateLimit(level)
+        );
     }
 
     override calculateBaseValues() {

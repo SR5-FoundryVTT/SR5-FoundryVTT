@@ -102,10 +102,8 @@ export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
      */
     prepareLimitValue() {
         const level = Number(this.data.level);
-        const label = 'SR5.Level';
-        
-        const limitParts = new PartsList<number>(this.data.limit.mod);
-        limitParts.addUniquePart(label, level);
+
+        PartsList.addUniqueBasePart(this.data.limit, 'SR5.Level', level);
     }
 
     /**

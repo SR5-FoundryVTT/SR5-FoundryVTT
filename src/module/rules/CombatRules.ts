@@ -111,9 +111,10 @@ export class CombatRules {
         if (defenderHits < 0) defenderHits = 0;
 
         // SR5#173  Step3: Defend B.
-        PartsList.AddUniquePart(modified.mod, 'SR5.Attacker', attackerHits);
-        PartsList.AddUniquePart(modified.mod, 'SR5.Defender', -defenderHits);
-        modified.value = Helpers.calcTotal(modified, {min: 0});
+        const mod = new PartsList(modified);
+        mod.addUniquePart('SR5.Attacker', attackerHits);
+        mod.addUniquePart('SR5.Defender', -defenderHits);
+        PartsList.calcTotal(modified, { min: 0 });
 
         // SR5#173 Step 3: Defend B.
         modified = CombatRules.modifyDamageTypeAfterHit(modified, defender);
@@ -191,7 +192,7 @@ export class CombatRules {
     }
 
     /**
-     * Modify damage according to combat sequence (SR5#173 part defend. Missing attack.
+     * Modify damage according to combat sequence SR5#173 part defend. Missing attack.
      * @param damage Incoming damage to be modified
      * @param isHitWithNoDamage Optional parameter used for physical defense tests when attack hits but will deal no damage
      * @return A new damage object for modified damage.
@@ -200,10 +201,10 @@ export class CombatRules {
         const modifiedDamage = foundry.utils.duplicate(damage) as DamageType;
 
         // Keep base and modification intact, only overwriting the result.
-        modifiedDamage.override = {name: 'SR5.TestResults.Success', value: 0};
-        Helpers.calcTotal(modifiedDamage, {min: 0});
-        modifiedDamage.ap.override = {name: 'SR5.TestResults.Success', value: 0};
-        Helpers.calcTotal(modifiedDamage.ap);
+        PartsList.addPart(modifiedDamage, 'SR5.TestResults.Success', 0, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, Infinity);
+        PartsList.calcTotal(modifiedDamage, { min: 0 });
+        PartsList.addPart(modifiedDamage.ap, 'SR5.TestResults.Success', 0, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, Infinity);
+        PartsList.calcTotal(modifiedDamage.ap);
         modifiedDamage.type.value = 'physical';
 
         // If attack hits but deals no damage, keep the element of the attack for any side effects.
@@ -225,10 +226,8 @@ export class CombatRules {
     static modifyDamageAfterResist(actor: SR5Actor, damage: DamageType, hits: number): DamageType {
         if (hits < 0) hits = 0;
 
-        // modifiedDamage.mod = PartsList.AddUniquePart(modifiedDamage.mod, 'SR5.Resist', -hits);
         const { modified } = SoakRules.reduceDamage(actor, damage, hits);
-
-        Helpers.calcTotal(modified, {min: 0});
+        PartsList.calcTotal(modified, { min: 0 });
 
         return modified;
     }
@@ -247,8 +246,8 @@ export class CombatRules {
         if (damage.ap.value <= 0) return modifiedArmor;
 
         console.error('Check if ap is a negative value or positive value during weapon item configuration');
-        PartsList.AddUniquePart(modifiedArmor.mod, 'SR5.AP', damage.ap.value);
-        modifiedArmor.value = Helpers.calcTotal(modifiedArmor, {min: 0});
+        PartsList.addUniquePart(modifiedArmor, 'SR5.AP', damage.ap.value);
+        modifiedArmor.value = PartsList.calcTotal(modifiedArmor, {min: 0});
 
         return modifiedArmor;
     }

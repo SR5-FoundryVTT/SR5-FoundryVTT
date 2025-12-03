@@ -24,7 +24,7 @@ export const MatrixTestDataFlow = {
 
         MatrixTestDataFlow.removeMatrixModifiers(test);
 
-        const pool = new PartsList<number>(test.data.pool.mod);
+        const pool = new PartsList(test.data.pool);
         const action = test.data.action;
         const actor = test.source;
 
@@ -57,21 +57,15 @@ export const MatrixTestDataFlow = {
      * @param test A Value.mod field as a PartsList
      */
     removeMatrixModifiers(test: SuccessTest) {
-        const pool = new PartsList<number>(test.data.pool.mod);
+        const pool = new PartsList(test.data.pool);
         ['SR5.HotSim', 'SR5.RunningSilent', 'SR5.PublicGrid'].forEach(part => pool.removePart(part));
     },
 
     /**
-     * Wrapping legacy implementation of SR5Actor._addMatrixParts.
      *
      * Will add modifiers based on actor data to test pool
-     * @param actor
-     * @param pool
-     * @param atts
-     * @param directConnection
-     * @returns
      */
-    addMatrixModifiersToPool(actor: SR5Actor, pool: PartsList<number>, atts: any, directConnection = false) {
+    addMatrixModifiersToPool(actor: SR5Actor, pool: PartsList, atts: any, directConnection = false) {
         if (Helpers.isMatrix(atts)) {
             if (!("matrix" in actor.system)) return;
 
@@ -88,7 +82,6 @@ export const MatrixTestDataFlow = {
 
     /**
      * Add Matrix damage to a Test that is a Matrix Attack and will do extra damage based on the number of marks
-     * @param test
      */
     addMatrixDamageForTargetMarks(test: SuccessTest) {
         if (!test.opposed || !test.hasDamage) return;
@@ -107,18 +100,21 @@ export const MatrixTestDataFlow = {
                 const marks = actor.getMarksPlaced(targetItem.uuid);
                 if (marks > 0) {
                     // add damage per mark on the target item
-                    test.data.damage.mod = PartsList.AddUniquePart(test.data.damage.mod,
-                        "SR5.Marks", marks * (targetItem.actor?.getExtraMarkDamageModifier() ?? MatrixRules.getExtraMarkDamageModifier()));
-                    test.data.damage.value = Helpers.calcTotal(test.data.damage, { min: 0 })
+                    PartsList.addUniquePart(
+                        test.data.damage, "SR5.Marks",
+                        marks * (targetItem.actor?.getExtraMarkDamageModifier() ?? MatrixRules.getExtraMarkDamageModifier())
+                    );
+                    test.data.damage.value = PartsList.calcTotal(test.data.damage, { min: 0 })
                 }
                 // if there wasn't a matrix device, see if we have marks placed on the actor itself
             } else if (icon instanceof SR5Actor) {
                 const marks = actor.getMarksPlaced(icon.uuid);
                 if (marks > 0) {
                     // add damage per mark on the target item
-                    test.data.damage.mod = PartsList.AddUniquePart(test.data.damage.mod,
-                        "SR5.Marks", marks * icon.getExtraMarkDamageModifier());
-                    test.data.damage.value = Helpers.calcTotal(test.data.damage, { min: 0 })
+                    PartsList.addUniquePart(
+                        test.data.damage, "SR5.Marks", marks * icon.getExtraMarkDamageModifier()
+                    );
+                    test.data.damage.value = PartsList.calcTotal(test.data.damage, { min: 0 })
                 }
             }
         }
@@ -195,22 +191,22 @@ export const MatrixTestDataFlow = {
      */
     prepareTestModifiers(test: MatrixTest) {
 
-        const modifiers = new PartsList<number>(test.data.modifiers.mod);
+        const pool = new PartsList(test.data.pool);
 
         // Check for grid modifiers.
         if (!test.data.sameGrid) {
-            modifiers.addUniquePart('SR5.ModifierTypes.DifferentGrid', MatrixRules.differentGridModifier());
+            pool.addUniquePart('SR5.ModifierTypes.DifferentGrid', MatrixRules.differentGridModifier());
         } else {
-            modifiers.addUniquePart('SR5.ModifierTypes.DifferentGrid', 0);
+            pool.addUniquePart('SR5.ModifierTypes.DifferentGrid', 0);
         }
 
         // Check for direct connection modifiers.
         if (test.data.directConnection) {
             // Grid modifiers don't apply when directly connected.
-            modifiers.addUniquePart('SR5.ModifierTypes.DifferentGrid', 0);
-            modifiers.addUniquePart('SR5.ModifierTypes.Noise', 0);
+            pool.addUniquePart('SR5.ModifierTypes.DifferentGrid', 0);
+            pool.addUniquePart('SR5.ModifierTypes.Noise', 0);
         } else {
-            modifiers.addUniquePart('SR5.ModifierTypes.Noise', test.actor.modifiers.totalFor('noise'));
+            pool.addUniquePart('SR5.ModifierTypes.Noise', test.actor.modifiers.totalFor('noise'));
         }
     },
 

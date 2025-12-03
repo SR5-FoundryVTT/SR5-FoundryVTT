@@ -1,6 +1,6 @@
-import { DataDefaults } from "../data/DataDefaults";
-import { Helpers } from "../helpers";
+import { PartsList } from "../parts/PartsList";
 import { DamageType } from "../types/item/Action";
+import { DataDefaults } from "../data/DataDefaults";
 
 /**
  * Rules around Compiling Sprites in SR5.
@@ -44,7 +44,7 @@ export const CompilationRules = {
         damage.base = CompilationRules.compilationFadeValue(spriteHits);
         damage.type.base = damage.type.value = CompilationRules.calcFadeDamageType(level, resonance);
 
-        Helpers.calcTotal(damage, {min: 0});
+        PartsList.calcTotal(damage, {min: 0});
 
         return damage;
     },

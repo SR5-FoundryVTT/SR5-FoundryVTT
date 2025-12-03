@@ -32,13 +32,12 @@ export const TechnologyPrep = {
      * @param equippedMods Those item mods that are equipped.
      */
     prepareConceal(technology: TechnologyType, equippedMods: SR5Item<'modification'>[]) {
-        const concealParts = new PartsList<number>();
+        const concealParts = new PartsList(technology.conceal);
         for (const mod of equippedMods)
             if (mod.system.conceal > 0)
                 concealParts.addUniquePart(mod.name, mod.system.conceal);
 
-        technology.conceal.mod = concealParts.list;
-        technology.conceal.value = Helpers.calcTotal(technology.conceal);
+        concealParts.calcTotal();
     },
 
     /**
@@ -86,7 +85,7 @@ export const TechnologyPrep = {
 
         // Add device rating as attribute to allow for rolls with it.
         const rating = Number(technology.rating ?? 0);
-        const parts = new PartsList(attributes.rating.mod);
+        const parts = new PartsList(attributes.rating);
         parts.addPart('SR5.Host.Rating', rating);
     },
 
@@ -129,5 +128,4 @@ export const TechnologyPrep = {
 
         technology.calculated.cost.value = value;
     },
-
 }

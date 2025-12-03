@@ -736,8 +736,9 @@
             "WarningTitle": "Alerta"
         },
         "Magic": "Magia",
-        "ManualGlitches": "Falhas Man.",
-        "ManualHits": "Acertos Man.",
+        "Manual":"Manual",
+        "ManualGlitches": "Falhas",
+        "ManualHits": "Acertos",
         "ManualOverride": "Substituição Manual",
         "MarkImportedItemReviewed": "Marcar Item Importado Como Revisado",
         "MarkImportedItemTooltip": "Marca este item importado como tendo sido revisado.",

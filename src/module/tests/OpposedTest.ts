@@ -77,7 +77,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
     calculateAgainstNetHits() {
         const base = Math.max(this.against.hits.value - this.hits.value, 0);
         const againstNetHits = DataDefaults.createData('value_field', {label: 'SR5.NetHits', base});
-        againstNetHits.value = Helpers.calcTotal(againstNetHits, {min: 0});
+        againstNetHits.value = PartsList.calcTotal(againstNetHits, {min: 0});
         return againstNetHits;
     }
 
@@ -120,8 +120,6 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
             threshold: DataDefaults.createData('value_field', {label: 'SR5.Threshold'}),
             //@ts-expect-error SuccessTest.prepareData is adding missing values, however these aren't actually optional.
             values: {},
-
-            modifiers: DataDefaults.createData('value_field', {label: 'SR5.Labels.Action.Modifiers'}),
 
             sourceItemUuid: againstData.sourceItemUuid,
             against: againstData
@@ -205,11 +203,11 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         if (!this.item) return;
 
         // NOTE: This is a legacy method for applying item data based modifiers, but it will do.
-        const opposedMod = this.item.getOpposedTestMod();
+        const opposedMod = this.item.getOpposedTestMod(this.data.pool);
 
         // Do not simply concat list to avoid double applying an otherwise unique test modifier.
-        for (const modifier of opposedMod.list) {
-            PartsList.AddUniquePart(this.data.modifiers.mod, modifier.name, modifier.value, true);
+        for (const modifier of opposedMod.changes) {
+            PartsList.addUniquePart(this.data.pool, modifier.name, modifier.value);
         }
     }
 

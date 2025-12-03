@@ -1,154 +1,195 @@
-import ModList = Shadowrun.ModList;
-import ModListEntry = Shadowrun.ModListEntry;
+import { ModifiableValueType } from "../types/template/Base";
 
-export class PartsList<TType> {
-    get list(): ModList<TType> {
-        return this._list.slice();
+/**
+ * A class for managing a list of named parts with generic values.
+ * This class provides methods for adding, removing, and querying parts,
+ * as well as calculating the total of numerical parts.
+ */
+export class PartsList<Field extends ModifiableValueType = ModifiableValueType> {
+    private readonly _field: Field;
+
+    get changes() {
+        return this._field.changes;
     }
 
-    get length(): number {
-        return this._list.length;
+    constructor(field: Field) {
+        this._field = field;
+    }
+
+    private _markPreviousChangesMasked(currentIndex: number): void {
+        for (let i = 0; i < currentIndex; i++) {
+            if (!this._field.changes[i].applied) continue;
+            this._field.changes[i].masked = true;
+        }
+    }
+
+    private _createPartChange(
+        name: string,
+        value: number,
+        mode: CONST.ACTIVE_EFFECT_MODES = CONST.ACTIVE_EFFECT_MODES.ADD,
+        priority = 0,
+    ): ModifiableValueType['changes'][number] {
+        return { name, value, mode, priority, masked: false, applied: true, effectUuid: null };
     }
 
     /**
-     * Return the sum total of the list.
-     *
-     * This can be used for numerical lists, that need the sum of all their list elements.
+     * Finds and returns the value of the first part with a matching name.
+     * @param name The name of the part to find.
+     * @returns The part's value, or undefined if not found.
      */
-    get total(): number {
-        let total = 0;
-        for (const part of this._list) {
-            if (typeof part.value === 'number') {
-                total += part.value;
-            }
-        }
-        return total;
+    getPartValue(name: string) {
+        return this._field.changes.find(part => part.name === name)?.value;
     }
 
     /**
-     * Return the last element in the list.
-     *
-     * This can be used for none numerical parts lists, in which the latest value would be whatever the value is.
+     * Adds a new part to the list.
      */
-    get last(): any {
-        return this._list[this._list.length - 1];
+    addPart(...args: Parameters<PartsList["_createPartChange"]>): void {
+        this._field.changes.push(this._createPartChange(...args));
     }
 
-    get isEmpty(): boolean {
-        return this.length === 0;
+    addBasePart(name: string, value: number): void {
+        return this.addPart(name, value, CONST.ACTIVE_EFFECT_MODES.ADD, -Infinity);
     }
 
-    getPartValue(name: string): TType | undefined {
-        return this._list.find((part) => part.name === name)?.value;
-    }
+    /**
+     * Adds a part with a unique name, optionally overwriting an existing one.
+     */
+    addUniquePart(
+        name: string,
+        value: number | undefined | null,
+        mode: CONST.ACTIVE_EFFECT_MODES = CONST.ACTIVE_EFFECT_MODES.ADD,
+        priority: number = 0,
+    ): void {
+        const index = this._field.changes.findIndex(part => part.name === name);
 
-    clear(): void {
-        this._list.length = 0;
-    }
+        if (value != null) {
+            const newPart = this._createPartChange(name, value, mode, priority);
+            if (index !== -1) {
+                newPart.masked = this._field.changes[index].masked;
+                newPart.applied = this._field.changes[index].applied;
 
-    private readonly _list: ModList<TType>;
-
-    constructor(parts?: ModList<TType>) {
-        let actualParts = [] as ModList<TType>;
-        if (parts) {
-            if (Array.isArray(parts)) {
-                actualParts = parts;
-            } else if (typeof parts === 'object') {
-                for (const [name, value] of Object.entries(parts as any)) {
-                    if (value !== null && value !== undefined) {
-                        // if it's a number, we are dealing with an array as an object
-                        if (!isNaN(Number(name)) && typeof value === 'object') {
-                            actualParts.push({
-                                name: (value as ModListEntry<TType>).name,
-                                value: (value as ModListEntry<TType>).value,
-                            });
-                        } else {
-                            actualParts.push({ name, value } as ModListEntry<TType>);
-                        }
-                    }
-                }
+                this._field.changes[index] = newPart;
+            } else {
+                this._field.changes.push(newPart);
             }
-        }
-        this._list = actualParts;
-    }
-
-    addPart(name: string, value: TType): void {
-        this._list.push({
-            name,
-            value,
-        });
-    }
-
-    addUniquePart(name: string, value?: TType, overwrite = true): void {
-        const index = this._list.findIndex((part) => part.name === name);
-        if (index > -1) {
-            // if we exist and should've overwrite, return
-            if (!overwrite) return;
-
-            this._list.splice(index, 1);
-            // if we are passed undefined, remove the value
-            if (value === undefined || value === null) return;
-            // recursively go through until we no longer have a part of this name
-            this.addUniquePart(name, value);
-        } else if (value !== undefined) {
-            this.addPart(name, value);
+        } else if (index === -1) {
+            console.warn(`Shadowrun 5e | Cannot add a part with an undefined value. Part: ${name}`);
         } else {
-            console.warn('Shadowrun 5e | PartsList cant add a none-numerical modifier.', name, value);
+            this._field.changes.splice(index, 1);
         }
     }
 
-    /**
-     * Remove all occurences of the given part modifier.
-     * 
-     * @param name Search parts for this name (exactly)
-     * @returns true for when all parts have been removed, otherwise falls.
-     */
-    removePart(name: string): boolean {
-        let index = this._list.findIndex((part) => part.name === name);
-        let removed = false;
-        while (index > -1) {
-            removed = true;
-            this._list.splice(index, 1);
-            index = this._list.findIndex((part) => part.name === name);
+    addUniqueBasePart(name: string, value: number | undefined | null): void {
+        return this.addUniquePart(name, value, CONST.ACTIVE_EFFECT_MODES.ADD, -Infinity);
+    }
+
+    removePart(name: string): void {
+        this._field.changes = this._field.changes.filter(part => part.name !== name);
+    }
+
+    calcTotal(options?: { min?: number; max?: number }): number {
+        this._field.value = this._field.base;
+
+        this._field.changes.sort((a, b) => a.priority - b.priority);
+        for (let i = 0; i < this._field.changes.length; i++) {
+            const change = this._field.changes[i];
+            change.masked = false;
+
+            if (!change.applied) continue;
+
+            switch (change.mode) {
+                case CONST.ACTIVE_EFFECT_MODES.ADD:
+                case CONST.ACTIVE_EFFECT_MODES.CUSTOM:
+                    this._field.value += change.value;
+                    break;
+                case CONST.ACTIVE_EFFECT_MODES.MULTIPLY:
+                    this._field.value *= change.value;
+                    break;
+                case CONST.ACTIVE_EFFECT_MODES.OVERRIDE:
+                    this._field.value = change.value;
+                    this._markPreviousChangesMasked(i);
+                    break;
+                case CONST.ACTIVE_EFFECT_MODES.UPGRADE:
+                    if (this._field.value < change.value) {
+                        this._field.value = change.value;
+                        this._markPreviousChangesMasked(i);
+                    } else {
+                        change.masked = true;
+                    }
+                    break;
+                case CONST.ACTIVE_EFFECT_MODES.DOWNGRADE:
+                    if (this._field.value > change.value) {
+                        this._field.value = change.value;
+                        this._markPreviousChangesMasked(i);
+                    } else {
+                        change.masked = true;
+                    }
+                    break;
+                default:
+                    console.warn(`Unknown Active Effect mode ${change.mode} encountered.`);
+                    break;
+            }
         }
-        
-        return removed;
+
+        this.removePart('SR5.EnforcedMaximum');
+        if (options?.max != null && this._field.value > options.max) {
+            this._markPreviousChangesMasked(this._field.changes.length);
+            this.addUniquePart('SR5.EnforcedMaximum', options.max, CONST.ACTIVE_EFFECT_MODES.DOWNGRADE, Infinity);
+            this._field.value = options.max;
+        }
+
+        this.removePart('SR5.EnforcedMinimum');
+        if (options?.min != null && this._field.value < options.min) {
+            this._markPreviousChangesMasked(this._field.changes.length);
+            this.addUniquePart('SR5.EnforcedMinimum', options.min, CONST.ACTIVE_EFFECT_MODES.UPGRADE, Infinity);
+            this._field.value = options.min;
+        }
+
+        // SR5#78 - All values are rounded up
+        this._field.value = Math.ceil(this._field.value);
+
+        return this._field.value;
     }
 
-    /**
-     * Check if this part list contains at least one part with a matching name.
-     * 
-     * @param name Needle in the part list stack
-     * @returns true, when a matching part is found.
-     */
-    hasPart(name: string): boolean {
-        return this._list.some(part => part.name === name);
+    static isModifiableValue(list: any): list is ModifiableValueType {
+        const keys = ['base', 'changes', 'value'] satisfies ReadonlyArray<keyof ModifiableValueType>;
+        return typeof list === 'object' && keys.every(key => Object.hasOwn(list, key));
     }
 
-    getMessageOutput() {
-        return this.list;
+    static addPart<F extends ModifiableValueType>(
+        list: F, ...args: Parameters<PartsList<F>["addPart"]>
+    ): void {
+        new PartsList(list).addPart(...args);
     }
 
-    static AddPart<TType>(list: ModList<TType>, name: string, value: TType): ModList<TType> {
-        const parts = new PartsList(list);
-        parts.addPart(name, value);
-        return parts._list;
+    static addBasePart<F extends ModifiableValueType>(
+        list: F, ...args: Parameters<PartsList<F>["addBasePart"]>
+    ): void {
+        new PartsList(list).addBasePart(...args);
     }
 
-    static AddUniquePart<TType>(list: ModList<TType>, name: string, value: TType, overwrite = true): ModList<TType> {
-        const parts = new PartsList(list);
-        parts.addUniquePart(name, value, overwrite);
-        return parts._list;
+    static addUniquePart<F extends ModifiableValueType>(
+        list: F, ...args: Parameters<PartsList["addUniquePart"]>
+    ): void {
+        new PartsList(list).addUniquePart(...args);
     }
 
-    static RemovePart<TType>(list: ModList<TType>, name: string) {
-        const parts = new PartsList(list);
-        parts.removePart(name);
-        return parts._list;
+    static addUniqueBasePart<F extends ModifiableValueType>(
+        list: F, ...args: Parameters<PartsList["addUniqueBasePart"]>
+    ): void {
+        new PartsList(list).addUniqueBasePart(...args);
     }
 
-    static Total(list: ModList<number>) {
-        const parts = new PartsList(list);
-        return parts.total;
+    static removePart<F extends ModifiableValueType>(
+        list: F, ...args: Parameters<PartsList<F>["removePart"]>
+    ): void {
+        new PartsList(list).removePart(...args);
+    }
+
+    static calcTotal<F extends ModifiableValueType>(
+        list: F, ...args: Parameters<PartsList<F>["calcTotal"]>
+    ): number {
+        return new PartsList(list).calcTotal(...args);
     }
 }

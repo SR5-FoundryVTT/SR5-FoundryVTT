@@ -1,12 +1,36 @@
 @use "config/variables";
 
 /**
+ * Styles for the value modifier pop up container
+ */
+#chat-popout {
+    .value-mod {
+        .value-modifiers-container.card-style {
+            right: 0;
+            width: Calc(100% - 2em);
+            margin: 1.4em 1em;
+        }
+    }
+}
+
+#chat {
+    .value-mod {
+        .value-modifiers-container.card-style {
+            right: 0;
+            width: Calc(100% - 3em);
+            margin: 1.4em 1em;
+        }
+    }
+}
+
+/**
  * Rules around the value modifier pop up that's shown for Value style data structures like Attributes, Skills, etc.
  */
-.sr5 .value {
-    >.value-modifiers-container {
+.value-mod {
+    .value-modifiers-container {
         display: none;
         visibility: hidden;
+        pointer-events: none;
 
         position: absolute;
         /* We WILL be on top! */
@@ -28,26 +52,22 @@
         background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/page.webp") repeat;
         border: 1px solid variables.$dark;
         padding: 0.5em 0.5em 0.5em 0.5em;
-        text-align: left;
         font-weight: normal;
 
         >.value-modifier-name {
             font-weight: bold;
+            text-align: left;
         }
 
         >.value-modifiers-base {
             border-bottom: 1px solid variables.$yellow;
             color: variables.$white;
+            text-align: right;
         }
 
         >.value-modifiers-modifier {
             color: variables.$white;
-        }
-
-        >.value-modifiers-total {
-            font-weight: bold;
-            border-top: 1px double variables.$yellow;
-            color: variables.$white;
+            text-align: right;
         }
 
         >.value-modifiers-invalid-total {

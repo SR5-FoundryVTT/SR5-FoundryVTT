@@ -1,7 +1,5 @@
-import { PartsList } from './../../parts/PartsList';
 import { RangedWeaponRules } from './../../rules/RangedWeaponRules';
 import { InitiativePrep } from './functions/InitiativePrep';
-import { ModifiersPrep } from './functions/ModifiersPrep';
 import { MatrixPrep } from './functions/MatrixPrep';
 import { ItemPrep } from './functions/ItemPrep';
 import { SkillsPrep } from './functions/SkillsPrep';
@@ -14,16 +12,13 @@ import { Helpers } from '../../helpers';
 import { GruntPrep } from './functions/GruntPrep';
 import { DataDefaults } from '../../data/DataDefaults';
 import { SR5Item } from 'src/module/item/SR5Item';
+import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
+import { PartsList } from '@/module/parts/PartsList';
 
 export class CharacterPrep {
     static prepareBaseData(system: Actor.SystemOfType<'character'>) {
+        ModifiableFieldPrep.resetAllModifiers(system);
         CharacterPrep.addSpecialAttributes(system);
-        SkillsPrep.prepareSkillData(system);
-
-        ModifiersPrep.clearAttributeMods(system);
-        ModifiersPrep.clearArmorMods(system);
-        ModifiersPrep.clearLimitMods(system);
-        ModifiersPrep.clearValueMods(system);
     }
 
     /**
@@ -73,7 +68,7 @@ export class CharacterPrep {
      * @param system Physical humanoid system data.
      */
     static prepareRecoil(system: Actor.SystemOfType<'character' | 'critter' | 'spirit' | 'vehicle'>) {
-        Helpers.calcTotal(system.values.recoil, { min: 0 });
+        PartsList.calcTotal(system.values.recoil, { min: 0 });
     }
 
     /**
@@ -85,9 +80,10 @@ export class CharacterPrep {
         const recoilCompensation = RangedWeaponRules.humanoidRecoilCompensationValue(system.attributes.strength.value);
         const baseRc = RangedWeaponRules.humanoidBaseRecoilCompensation();
         system.values.recoil_compensation.base = baseRc;
-        PartsList.AddUniquePart(system.values.recoil_compensation.mod, 'SR5.RecoilCompensation', recoilCompensation);
 
-        Helpers.calcTotal(system.values.recoil_compensation, { min: 0 });
+        const mod = new PartsList(system.values.recoil_compensation);
+        mod.addUniquePart("SR5.RecoilCompensation", recoilCompensation);
+        mod.calcTotal({ min: 0 });
     }
 
     static addSpecialAttributes(system: Actor.SystemOfType<'character'>) {

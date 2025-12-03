@@ -1,0 +1,25 @@
+<div
+    class="form-group modifiable-value {{#if (includes @root.expandedPaths path)}}expanded{{/if}}"
+    data-path="{{path}}"
+>
+    <label data-tooltip="{{tooltip}}">{{localize label}}</label>
+
+    <div class="form-fields">
+        <input type="number" name="{{path}}" value="{{data.value}}" size="3" maxlength="3" data-dtype="Number"/>
+
+        <a class="toggle-breakdown {{#if (not data.changes.length)}}disabled{{/if}}" title="{{localize 'SR5.ToggleBreakdown'}}">
+            <i class="fas fa-chevron-up"></i>
+        </a>
+    </div>
+
+    <ol class="breakdown-list">
+        {{#each data.changes as |change index|}}
+        <li class="breakdown-entry {{getChangeCSS change}}" data-index="{{index}}">
+            <span class="mod-name" data-tooltip="{{getChangeDescription change}}">{{localize change.name}}</span>
+            <span class="mod-value">{{getChangeValue change}}</span>
+
+            <input type="checkbox" name="{{../path}}.changes.{{index}}.applied" data-dtype="Boolean" {{checked change.applied}} />
+        </li>
+        {{/each}}
+    </ol>
+</div>

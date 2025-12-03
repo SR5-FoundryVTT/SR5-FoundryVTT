@@ -7,7 +7,6 @@ import { SR5Item } from './item/SR5Item';
 import { PartsList } from './parts/PartsList';
 import { SuccessTestData } from "./tests/SuccessTest";
 import { Translation } from './utils/strings';
-import { ModifiableValueType } from "./types/template/Base";
 import { AttributeFieldType } from "./types/template/Attributes";
 import { SkillFieldType, SkillsType } from "./types/template/Skills";
 import { ModifiedDamageType } from "./types/rolls/ActorRolls";
@@ -16,94 +15,33 @@ import { MatrixTestData, OpposedMatrixTestData } from './tests/MatrixTest';
 
 type OneOrMany<T> = T | T[];
 
-interface CalcTotalOptions {
-    // Min/Max value range
-    min?: number,
-    max?: number,
-    // Round total to a given decimal, 0 rounds to the next integer.
-    roundDecimals?: number
-}
-
 export class Helpers {
     /**
-     * Calculate the total value for a ModifiableValue shape.
+     * Round a number to a given number of decimal places.
      *
-     * This can either be the sum of all modify values or the override total value as given.
-     *
-     * ActiveEffect modes are related to the expected data:
-     * - Modify / Add => Will insert into the .mod array
-     * - Override => Will create a .override value with no min and max
-     * - Upgrade => Will create a .override value with min
-     * - Downgrade => Will create a .override value with max
-     *
-     * Depending on the override value it's possible that a overriden value can be
-     * downgraded or upgraded but still be changed further by the options.min or options.max
-     * params of the overall method. That way effect changes can't override system min/max borders.
-     *
-     * @param value The ModifiableValue shape.
-     * @param options min will a apply a minimum value, max will apply a maximum value.
-     */
-    static calcTotal(value: ModifiableValueType, options?: CalcTotalOptions): number {
-        // reset operation
-        value.mode = null;
-
-        // Some values will have their total overridden directly.
-        if (value.override) {
-            // Still apply a possible value range, even if override says otherwise.
-            value.value = Helpers.applyRange(value.override.value, options);
-            value.mode = 'override';
-            return value.value;
-        }
-
-        const parts = new PartsList(value.mod);
-
-        value.value = parts.total + value.base;
-
-        // Apply both down- and upgrade, should multiple effect changes have been applied.
-        if (value.downgrade) {
-            const previousValue = value.value;
-            value.value = Helpers.applyRange(value.value, { max: value.downgrade.value });
-            if (value.value !== previousValue)
-                value.mode = 'downgrade';
-        }
-        if (value.upgrade) {
-            const previousValue = value.value;
-            value.value = Helpers.applyRange(value.value, { min: value.upgrade.value });
-            if (value.value !== previousValue)
-                value.mode = 'upgrade';
-        }
-
-        value.value = Helpers.roundTo(value.value, options?.roundDecimals);
-        value.value = Helpers.applyRange(value.value, options);
-
-        value.mod = parts.list;
-
-        return value.value;
-    }
-
-    /** Round a number to a given degree.
-     *
-     * @param value Number to round with.
-     * @param decimals Amount of decimals after the decimal point.
+     * @param value The number to round.
+     * @param decimals The number of decimal places (default: 3).
+     * @returns The rounded number.
      */
     static roundTo(value: number, decimals=3): number {
         const multiplier = Math.pow(10, decimals);
         return Math.round(value * multiplier) / multiplier;
     }
 
-    /** Make sure a given value is in between a range.
-     *
-     * @param value
-     * @param options Define the range the given value must be in (or none)
-     * @returns True if the value was modified, false otherwise
-     */
-    static applyRange(value: number, options?: CalcTotalOptions) {
-        if (options?.min != null)
-            value = Math.max(options.min, value);
-        if (options?.max != null)
-            value = Math.min(options.max, value);
+    static listItemId(event): string {
+        return event.currentTarget.closest('.list-item').dataset.itemId;
+    }
 
-        return value;
+    static listItemUuid(event): string {
+        return event.currentTarget.closest('.list-item').dataset.uuid;
+    }
+
+    static listHeaderId(event): string {
+        return event.currentTarget.closest('.list-header').dataset.itemId;
+    }
+
+    static eventUuid(event): string {
+        return event.currentTarget?.dataset?.uuid ?? '';
     }
 
     // replace 'SR5.'s on keys with 'SR5_DOT_'
@@ -156,32 +94,6 @@ export class Helpers {
         return false;
     }
 
-    static parseInputToString(val: number | string | string[] | undefined): string {
-        if (val === undefined) return '';
-        if (typeof val === 'number') return val.toString();
-        if (typeof val === 'string') return val;
-        if (Array.isArray(val)) {
-            return val.join(',');
-        }
-        return '';
-    }
-
-    static parseInputToNumber(val: number | string | string[] | undefined): number {
-        if (typeof val === 'number') return val;
-        if (typeof val === 'string') {
-            const ret = +val;
-            if (!isNaN(ret)) return ret;
-            return 0;
-        }
-        if (Array.isArray(val)) {
-            const str = val.join('');
-            const ret = +str;
-            if (!isNaN(ret)) return ret;
-            return 0;
-        }
-        return 0;
-    }
-
     static setupCustomCheckbox(app, html) {
         const setContent = (el) => {
             const checkbox = $(el).children('input[type=checkbox]');
@@ -199,15 +111,6 @@ export class Helpers {
         });
         html.find('label.checkbox').click((event) => setContent(event.currentTarget));
         html.find('.submit-checkbox').change((event) => app._onSubmit(event));
-    }
-
-    static mapRoundsToDefenseDesc(rounds) {
-        if (rounds === 1) return '';
-        if (rounds === 3) return '-2';
-        if (rounds === 6) return '-5';
-        if (rounds === 10) return '-9';
-        if (rounds === 20) return 'SR5.DuckOrCover';
-        return '';
     }
 
     static label(str: string) {
@@ -243,6 +146,10 @@ export class Helpers {
             obj[keys[i]] = after[keys[i]];
         }
         return obj;
+    }
+
+    static hasModifiers(event) {
+        return event && (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey);
     }
 
     static filter(obj, comp) {
@@ -687,10 +594,12 @@ export class Helpers {
      */
     static modifyDamageByHits(incoming: DamageType, hits: number, modificationLabel: string): ModifiedDamageType {
         const modified = foundry.utils.duplicate(incoming) as DamageType;
-        modified.mod = PartsList.AddUniquePart(modified.mod, modificationLabel, hits);
-        modified.value = Helpers.calcTotal(modified, {min: 0});
 
-        return {incoming, modified};
+        const mod = new PartsList(modified);
+        mod.addUniquePart(modificationLabel, hits);
+        mod.calcTotal({ min: 0 });
+
+        return { incoming, modified };
     }
 
     /** Reduces given damage value and returns both original and modified damage.
@@ -895,13 +804,10 @@ export class Helpers {
     /**
      * Return true if all given keys are present in the given object.
      * Values don't matter for this comparison.
-     *
-     * @param obj
-     * @param keys
      */
     static objectHasKeys(obj: object, keys: string[]): boolean {
         for (const key of keys) {
-            if (!Object.hasOwn(obj, key)) return false;
+            if (!obj.hasOwnProperty(key)) return false;
         }
 
         return true;
@@ -946,7 +852,8 @@ export class Helpers {
      */
     static sanitizeDataKey(key: string, replace=''): string {
         const spicyCharacters = ['.', '-='];
-        spicyCharacters.forEach(character => key = key.replace(character, replace));
+        for (const character of spicyCharacters)
+            key = key.replace(character, replace);
         return key;
     }
 

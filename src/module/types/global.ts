@@ -270,8 +270,11 @@ declare module "fvtt-types/configuration" {
     }
 }
 
-// Helper type to convert 'never' to 'unknown' in Object.fromEntries
-type _NeverToUnknown<T> = [T] extends [never] ? unknown : T;
+// Helper type to ensure Object.fromEntries returns 'unknown' instead of 'never'
+type _NormalizeNever<T> = [T] extends [never] ? unknown : T;
+
+// Normalizes empty array entries in a type for Object.entries
+type _NormalizeEmptyEntries<T> = [T] extends [never[]] ? [string, unknown][] : T;
 
 declare global {
     var routinglib: RoutingLib | null;
@@ -303,10 +306,10 @@ declare global {
         entries<T extends object>(obj: T):
             T extends readonly unknown[]
                 ? Array<{ [K in keyof T]: [number extends K ? `${bigint}` : K, T[K]] }[number]>
-                : Array<{ [K in keyof T & string]: [K, T[K]] }[keyof T & string]>;
+                : _NormalizeEmptyEntries<Array<{ [K in keyof T & string]: [K, T[K]] }[keyof T & string]>>;
 
         fromEntries<E extends readonly [PropertyKey, unknown]>(obj: Array<E>):
-            { [K in E[0]]: _NeverToUnknown<Extract<E, readonly [K, unknown]>[1]> };
+            { [K in E[0]]: _NormalizeNever<Extract<E, readonly [K, unknown]>[1]> };
         fromEntries<K extends PropertyKey, V>(obj: Iterable<readonly [K, V]>): Record<K, V>;
     }
 }

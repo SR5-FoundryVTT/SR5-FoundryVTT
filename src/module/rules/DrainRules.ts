@@ -1,7 +1,6 @@
 /**
  * Handle all rules related to Shadowrun 5 magic drain.
  */
-import { Helpers } from "../helpers";
 import { PartsList } from "../parts/PartsList";
 import { DataDefaults } from "../data/DataDefaults";
 import { DamageType, DamageTypeType } from "../types/item/Action";
@@ -22,7 +21,7 @@ export class DrainRules {
 
         const damage = DataDefaults.createData('damage');
         damage.base = drain;
-        Helpers.calcTotal(damage, {min: 0});
+        PartsList.calcTotal(damage, {min: 0});
         damage.type.base = damage.type.value = DrainRules.calcDrainDamageType(hits, magic);
 
         return damage;
@@ -50,8 +49,8 @@ export class DrainRules {
 
         drainDamage = foundry.utils.duplicate(drainDamage) as DamageType;
 
-        PartsList.AddUniquePart(drainDamage.mod, 'SR5.Hits', -hits);
-        Helpers.calcTotal(drainDamage, {min: 0});
+        PartsList.addUniquePart(drainDamage, 'SR5.Hits', -hits);
+        PartsList.calcTotal(drainDamage, {min: 0});
 
         return drainDamage;
     }

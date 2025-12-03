@@ -9,7 +9,7 @@ export class SkillFlow {
      * @param skill
      * @param parts
      */
-    static handleDefaulting(skill: SkillFieldType, parts: PartsList<number>) {
+    static handleDefaulting(skill: SkillFieldType, parts: PartsList) {
         if (!SkillRules.mustDefaultToRoll(skill)) return;
 
         if (!SkillFlow.allowDefaultingRoll(skill)) {

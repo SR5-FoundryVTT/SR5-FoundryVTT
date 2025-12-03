@@ -130,9 +130,6 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
     override async _prepareContext(options: Parameters<SR5MatrixActorSheet["_prepareContext"]>[0]) {
         const data = await super._prepareContext(options);
 
-        // Character actor types are matrix actors.
-        super._prepareMatrixAttributes(data);
-
         data.isCharacter = true;
         return data;
     }

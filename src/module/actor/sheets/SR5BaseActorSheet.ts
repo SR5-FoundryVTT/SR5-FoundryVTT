@@ -1112,20 +1112,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         sheetData.woundTolerance = 3 + ('wound_tolerance' in modifiers ? modifiers.wound_tolerance : 0);
     }
 
-    _prepareMatrixAttributes(sheetData: SR5ActorSheetData) {
-        const { matrix } = sheetData.system;
-        if (matrix) {
-            const cleanupAttribute = (attribute: MatrixAttribute) => {
-                const att = matrix[attribute];
-                if (att) {
-                    if (!att.mod) att.mod = [];
-                }
-            };
-
-            (['firewall', 'data_processing', 'sleaze', 'attack'] as MatrixAttribute[]).forEach(att => { cleanupAttribute(att); });
-        }
-    }
-
     /**
      * Prepare Actor Sheet Inventory display.
      *

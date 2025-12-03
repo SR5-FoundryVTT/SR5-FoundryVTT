@@ -43,10 +43,10 @@ export const MarkPlacementFlow = {
      */
     prepareTestModifiers(test: MarkPlacementTests) {
 
-        const modifiers = new PartsList<number>(test.data.modifiers.mod);
+        const pool = new PartsList(test.data.pool);
 
         // Apply mark modifier
-        modifiers.addUniquePart('SR5.ModifierTypes.Marks', MarkPlacementFlow.getMarkPlacementModifier(test));
+        pool.addUniquePart('SR5.ModifierTypes.Marks', MarkPlacementFlow.getMarkPlacementModifier(test));
 
         MatrixTestDataFlow.prepareTestModifiers(test);
     },
@@ -69,9 +69,8 @@ export const MarkPlacementFlow = {
         if (!test.device?.isType('grid')) return;
         const modifier = MatrixRules.gridMarkPlacementDefensePool(test.device);
         if (!modifier) return;
-        
-        const mods = new PartsList<number>(test.pool.mod);
-        mods.addUniquePart(modifier.name, modifier.value);
+
+        new PartsList(test.pool).addUniquePart(modifier.name, modifier.value);
     },
 
     /**
