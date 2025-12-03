@@ -256,7 +256,7 @@ export class MatrixRules {
             netHits = 0;
         }
         const damage = DataDefaults.createData('damage', { base: netHits, type: { base: 'matrix', value: 'matrix' }, biofeedback });
-        damage.value = Helpers.calcTotal(damage, { min: 0 });
+        PartsList.calcTotal(damage, { min: 0 });
         return damage;
     }
 
