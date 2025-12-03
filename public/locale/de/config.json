@@ -173,7 +173,6 @@
         "ActiveSkills": "Aktionsfertigkeiten",
         "ActorTypes": {
             "Character": "Charakter",
-            "Critter": "Critter",
             "IC": "IC",
             "Spirit": "Geist",
             "Sprite": "Sprite",
@@ -1840,7 +1839,6 @@
     "TYPES": {
         "Actor": {
             "character": "Charakter",
-            "critter": "Critter (deprecated)",
             "ic": "IC",
             "spirit": "Geist",
             "sprite": "Sprite",
