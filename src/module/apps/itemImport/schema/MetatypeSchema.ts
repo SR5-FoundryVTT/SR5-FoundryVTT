@@ -100,8 +100,9 @@ export interface Metatype {
     wilaug: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+4" | "F-1" | "F-2"; };
     wilmax: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+4" | "F-1" | "F-2"; };
     wilmin: { _TEXT: IntegerString | "F" | "F+1" | "F+2" | "F+4" | "F-1" | "F-2"; };
-    translate?: { _TEXT: string; };
-    altpage?: { _TEXT: string; };
+    translate?: OneOrMany<{ _TEXT: string; }>;
+    altpage?: OneOrMany<{ _TEXT: string; }>;
+    altnameonpage?: OneOrMany<Empty>;
 };
 
 export interface MetatypeSchema {

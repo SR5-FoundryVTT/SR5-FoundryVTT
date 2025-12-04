@@ -2,7 +2,7 @@
 
 import { BonusSchema } from './BonusSchema';
 import { ConditionsSchema } from './ConditionsSchema';
-import { Many, IntegerString } from './Types';
+import { Empty, Many, OneOrMany, IntegerString } from './Types';
 
 export interface Complexform {
     bonus?: BonusSchema;
@@ -14,8 +14,9 @@ export interface Complexform {
     required?: ConditionsSchema;
     source?: { _TEXT: "CF" | "DT" | "KC" | "SR5"; };
     target: { _TEXT: "Cyberware" | "Device" | "File" | "Host" | "IC" | "Icon" | "Persona" | "Self" | "Sprite"; };
-    translate?: { _TEXT: string; };
-    altpage?: { _TEXT: string; };
+    translate?: OneOrMany<{ _TEXT: string; }>;
+    altpage?: OneOrMany<{ _TEXT: string; }>;
+    altnameonpage?: OneOrMany<Empty>;
 };
 
 export interface ComplexformsSchema {
