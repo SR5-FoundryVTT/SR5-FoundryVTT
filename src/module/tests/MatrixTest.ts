@@ -7,7 +7,7 @@ import { MatrixTestDataFlow } from './flows/MatrixTestDataFlow';
 export interface MatrixTestData extends SuccessTestData {
     // If decker and target reside on different Grids
     sameGrid: boolean
-    // Disallow chaning of the sameGrid checkbox in the dialog. Used when targeting defines this values.
+    // Disallow changing of the sameGrid checkbox in the dialog. Used when targeting defines this values.
     sameGridDisabled: boolean
     // If decker has a direct connection to the target
     directConnection: boolean
