@@ -4,6 +4,7 @@ import { DataImporter } from "../importer/DataImporter";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 import { BonusHelper as BH } from "../helper/BonusHelper";
 import * as IconAssign from "../../iconAssigner/iconAssign";
+import { ImportHelper as IH } from "../helper/ImportHelper";
 import { TechnologyType } from "src/module/types/template/Technology";
 import { DataDefaults, SystemConstructorArgs, SystemEntityType } from "src/module/data/DataDefaults";
 
@@ -43,7 +44,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
 
         const entity = {
             img: undefined as string | undefined | null,
-            name: jsonData.translate?._TEXT ?? jsonData.name._TEXT,
+            name: IH.getArray(jsonData.translate)[0]?._TEXT ?? jsonData.name._TEXT,
             type: this.parseType as any,
             system: this.getSanitizedSystem(jsonData),
             folder: (await this.getFolder(jsonData, compendiumKey)).id,
@@ -64,7 +65,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
             bonusPromise = BH.addBonus(entity as any, jsonData.bonus);
 
         if (jsonData.page && jsonData.source) {
-            const page = jsonData.altpage?._TEXT ?? jsonData.page._TEXT;
+            const page = IH.getArray(jsonData.altpage)[0]?._TEXT ?? jsonData.page._TEXT;
             const source = jsonData.source._TEXT;
             system.description.source = `${source} ${page}`;
         }

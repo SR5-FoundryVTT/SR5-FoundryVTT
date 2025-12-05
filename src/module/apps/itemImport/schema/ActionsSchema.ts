@@ -27,8 +27,9 @@ export interface Action {
         limit?: { _TEXT: string; };
     };
     type: { _TEXT: "Complex" | "Extended" | "Free" | "Interrupt" | "No" | "Simple"; };
-    translate?: { _TEXT: string; };
-    altpage?: { _TEXT: string; };
+    translate?: OneOrMany<{ _TEXT: string; }>;
+    altpage?: OneOrMany<{ _TEXT: string; }>;
+    altnameonpage?: OneOrMany<Empty>;
 };
 
 export interface ActionsSchema {
