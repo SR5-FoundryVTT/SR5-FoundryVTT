@@ -2725,6 +2725,9 @@
                 "RollMode": "FoundryVTT chat message roll visibility",
                 "Threshold": "Calculated threshold value"
             },
+            "MatrixTest": {
+                "SameGridDisabled": "As active and target icon both use grids, this is automatically determined"
+            },
             "ToggleEditMode": "Toggle Edit Mode"
         },
         "Top": "Top",

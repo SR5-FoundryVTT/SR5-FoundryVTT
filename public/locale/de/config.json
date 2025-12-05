@@ -1628,14 +1628,18 @@
             "Test": {
                 "Extended": "Probe wird als ausgedehnte Probe geworfen, bis der Schwellenwert erreicht ist",
                 "Limit": "Vollständiger Limitwert",
-                "ManualGlitches": "Anzahl Glitches von manuell geworfenen Würfeln. Muss zusammen mit manuellen Erfolgen verwendet werden.",
-                "ManualHits": "Anzahl Erfolge von manuell geworfenen Würfeln. Überspringt FoundryVTT Würfelwurf.",
+                "ManualGlitches": "Anzahl Glitches von manuell geworfenen Würfeln. Muss zusammen mit manuellen Erfolgen verwendet werden",
+                "ManualHits": "Anzahl Erfolge von manuell geworfenen Würfeln. Überspringt FoundryVTT Würfelwurf",
                 "Modifier": "Summe aller auf den Pool angewendenten Modifikatoren",
                 "Pool": "Anzahl zu werfender Würfel",
                 "PushTheLimit": "Verwende Edge Regel 'Grenzen sprengen'",
                 "RollMode": "Sichtbarkeit der FoundryVTT-Chat-Nachricht",
                 "Threshold": "Vollständiger Schwellenwert"
-            }
+            },
+            "MatrixTest": {
+                "SameGridDisabled": "Da sowohl das aktive als auch anvisierte Icon Gitter verwenden, wird diese Konfiguration automatisch bestimmt"
+            },
+            "ToggleEditMode": "Umschalter Editiermodus"
         },
         "Top": "Aufmontiert",
         "Total": "Gesamt",
