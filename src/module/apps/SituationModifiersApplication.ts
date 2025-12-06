@@ -437,7 +437,7 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
         html: HTMLElement,
         // On fvtt-types this is still a stub
         context: foundry.applications.hud.TokenHUD.RenderContext & { _id?: string },
-        options: TokenHUD.RenderOptions
+        options: foundry.applications.hud.TokenHUD.RenderOptions
     ) {
         if (!context._id) return;
 
