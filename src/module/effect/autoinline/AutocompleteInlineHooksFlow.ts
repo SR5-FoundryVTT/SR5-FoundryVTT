@@ -57,11 +57,6 @@ export const AutocompleteInlineHooksFlow =  {
         // - See their GitHub issue #748
         // - Our GitHub issue #1684
         // Remove only 'core' configs, then prepend ours for higher priority.
-        // for (let i = packageConfig.length - 1; i >= 0; i--) {  
-        //     if (packageConfig[i].packageName === 'core') {  
-        //         packageConfig.splice(i, 1);  
-        //     }  
-        // }  
         const core = packageConfig.findIndex(fieldConfig => fieldConfig.packageName === 'core');
         if (core !== -1) packageConfig.splice(core, 1);
         packageConfig.unshift(config);  
