@@ -226,6 +226,8 @@ declare module "fvtt-types/configuration" {
             renderChatMessage: (args0: SR5ChatMessage, args1: any, arg2: any) => void;
             diceSoNiceReady: (dice3d: DiceSoNice) => void;
             dropItemSheetData: any;
+            // Hooks for Autocomplete Inline Properties integration
+            aipSetup: (packageConfig: {packageName: string}[]) => void;
         }
     }
 
