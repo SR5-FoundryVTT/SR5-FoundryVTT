@@ -26,8 +26,6 @@ export const AutocompleteInlineHooksFlow =  {
         // This is only for the case of any other code executing this hook.
         const aipModule = game.modules.get("autocomplete-inline-properties");
         if (!aipModule) return;
-        // @ts-expect-error AIP typing
-        if (!aipModule?.API?.CONST) return;
 
         console.debug('Shadowrun 5e | Registering support for autocomplete-inline-properties');
 
@@ -59,11 +57,13 @@ export const AutocompleteInlineHooksFlow =  {
         // - See their GitHub issue #748
         // - Our GitHub issue #1684
         // Remove only 'core' configs, then prepend ours for higher priority.
-        for (let i = packageConfig.length - 1; i >= 0; i--) {  
-            if (packageConfig[i].packageName === 'core') {  
-                packageConfig.splice(i, 1);  
-            }  
-        }  
+        // for (let i = packageConfig.length - 1; i >= 0; i--) {  
+        //     if (packageConfig[i].packageName === 'core') {  
+        //         packageConfig.splice(i, 1);  
+        //     }  
+        // }  
+        const core = packageConfig.findIndex(fieldConfig => fieldConfig.packageName === 'core');
+        if (core !== -1) packageConfig.splice(core, 1);
         packageConfig.unshift(config);  
 
         console.debug('Shadowrun 5e | Registered support for autocomplete-inline-properties', packageConfig);
