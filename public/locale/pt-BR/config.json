@@ -43,6 +43,8 @@
         "ShowSkillsWithDetailsDescription": "Quando selecionado, a exibição da lista de perícias espelhará o estilo do livro de regras básicas (itálico, atributos curtos)",
         "ShowTokenNameForChatOutputDescription": "O nome do token deve ser usado para a saída do cartão de rolagem em vez do nome do ator quando disponível",
         "ShowTokenNameForChatOutputName": "Usar Nome do Token para Cartão de Rolagem",
+        "TokenAutoRunning": "Detecção Automática de Movimento de Corrida",
+        "TokenAutoRunningDescription": "Alterna automaticamente o modo de movimento do token para corrida quando a distância medida excede a velocidade de caminhada",
         "TokenHealthBars": "Barras de saúde do token",
         "TokenHealthBarsDescription": "Um monitor de dano completa será mostrada como uma barra de saúde vazia em um Token em vez de espelhar",
         "TokenRulerColorRunning": "Cor de Movimento de Corrida do Token",

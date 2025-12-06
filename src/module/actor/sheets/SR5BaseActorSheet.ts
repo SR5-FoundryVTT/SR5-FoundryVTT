@@ -2208,8 +2208,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.preventDefault();
         event.stopPropagation();
 
-        const blitz = this.actor.system.initiative.edge;
-        await this.actor.update({system: { initiative: { edge: !blitz }}});
+        const blitz = this.actor.system.initiative.blitz;
+        await this.actor.update({system: { initiative: { blitz: !blitz }}});
     }
 
     static async #rollInitiative(this: SR5BaseActorSheet, event: Event) {
