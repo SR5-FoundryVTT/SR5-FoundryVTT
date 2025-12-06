@@ -432,11 +432,17 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
      * Add buttons to both show and open global modifiers currently applied to this token when showing the
      * tokenHUD.
      */
-    static onRenderTokenHUD(app: foundry.applications.hud.TokenHUD, html: JQuery, data: any) {
-        if (!data._id) return;
+    static onRenderTokenHUD(
+        app: foundry.applications.hud.TokenHUD,
+        html: HTMLElement,
+        // On fvtt-types this is still a stub
+        context: foundry.applications.hud.TokenHUD.RenderContext & { _id?: string },
+        options: TokenHUD.RenderOptions
+    ) {
+        if (!context._id) return;
 
         // Generate general structure for ModifierHandlers to connect to.
-        const token = Helpers.getToken(data._id);
+        const token = Helpers.getToken(context._id);
         if (!token) return;
 
         const actor = token.actor as SR5Actor;
@@ -453,7 +459,7 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
         $(html).find('.col.right').after(container);
 
         // Hand DOM element over and let ModifierHandlers add their TokenHUDElements.
-        SituationModifiersApplication._staticHandlers.forEach(handler => handler.addTokenHUDElements(column, data._id, actor, modifiers));
+        SituationModifiersApplication._staticHandlers.forEach(handler => handler.addTokenHUDElements(column, context._id!, actor, modifiers));
     }
 
     static openForCurrentScene() {

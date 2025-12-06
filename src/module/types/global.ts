@@ -206,7 +206,6 @@ declare module "fvtt-types/configuration" {
             sr5_beforePrepareTestDataWithAction: any;
             sr5_afterPrepareTestDataWithAction: any;
             sr5_afterDamageAppliedToActor: any;
-            deleteActor: any;
             sr5_testPrepareBaseValues: any;
             sr5_testProcessResults: any;
             sr5_afterTestComplete: any;
@@ -216,11 +215,6 @@ declare module "fvtt-types/configuration" {
             SR5_PreActorItemRoll: (arg0: SR5Actor, arg1: SR5Item) => void;
             getSceneControlButtons: (arg0: any) => void;
             getCombatTrackerEntryContext: (arg0: any, arg1: any) => void;
-            renderCompendiumDirectory: (arg0: foundry.appv1.api.Application, arg1: HTMLElement) => void;
-            renderActorDirectory: (arg0: foundry.appv1.api.Application, arg1: HTMLElement) => void;
-            renderTokenHUD: (arg0: foundry.applications.hud.TokenHUD, arg1: JQuery, arg2: any) => void;
-            updateItem: (args0: SR5Item, args1: SR5Item['system'], arg2: string) => void;
-            deleteItem: (args0: SR5Item, args1: SR5Item['system'], arg2: string) => void;
             getChatMessageContextOptions: (args0: any, args1: any) => void;
             quenchReady: (args0: Quench) => void;
             renderChatMessage: (args0: SR5ChatMessage, args1: any, arg2: any) => void;
