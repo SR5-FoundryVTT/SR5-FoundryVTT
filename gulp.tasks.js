@@ -10,7 +10,6 @@ const util = require('util');
 const gulp = require('gulp');
 var cp = require('child_process');
 const esbuild = require('esbuild');
-const {typecheckPlugin} = require("@jgoz/esbuild-plugin-typecheck");
 
 // Config
 const distName = 'dist';
@@ -75,10 +74,14 @@ async function watch() {
         sourcemap: true,
         format: 'esm',
         outfile: path.resolve(destFolder, jsBundle),
-        plugins: [typecheckPlugin({watch: true})],
+        plugins: [],
     })
 
     await context.watch();
+
+    cp.spawn('npx', ['tsgo', '--watch', '--incremental', '--noEmit', '-p', 'tsconfig.json'], { 
+        stdio: 'inherit', shell: true
+    });
 }
 
 /**
