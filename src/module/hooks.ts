@@ -149,6 +149,7 @@ export class HooksManager {
                 initDiceSoNice();
             }
         });
+
         Hooks.once('setup', AutocompleteInlineHooksFlow.setupHook);
 
         Hooks.on('ready', HooksManager.ready.bind(HooksManager));
