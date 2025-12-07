@@ -154,6 +154,7 @@ export const MatrixTestDataFlow = {
 
         // Assume decker and target reside on the same Grid
         data.sameGrid = data.sameGrid ?? true;
+        data.sameGridDisabled = data.sameGridDisabled ?? false;
         // Assume no direct connection
         data.directConnection = data.directConnection ?? false;
         data.personaUuid = data.personaUuid ?? undefined;
@@ -194,7 +195,6 @@ export const MatrixTestDataFlow = {
      * @param test The initial test to modify.
      */
     prepareTestModifiers(test: MatrixTest) {
-
         const modifiers = new PartsList<number>(test.data.modifiers.mod);
 
         // Check for grid modifiers.
@@ -215,12 +215,12 @@ export const MatrixTestDataFlow = {
     },
 
     /**
-     * Prepare base values for a mark placement test.
+     * Prepare test values for a mark placement test.
      *
      * @param test The test placing any mark.
      */
-    prepareBaseValues(test: MatrixTest) {
-        // Host devices always use direct connections. // TODO: add rule reference
+    prepareTestValues(test: MatrixTest) {
+        // Host devices always use direct connections. See SR5#233 'PANS and WANS'
         if (test.host) test.data.directConnection = true;
         // If a device has been pre-targeted before dialog, show this on the first render.
         if (test.icon instanceof SR5Item && !test.icon.isType('host')) test.data.targetMainIcon = false;
@@ -244,7 +244,10 @@ export const MatrixTestDataFlow = {
         const targetNetwork = targetActor.network;
         if (!targetNetwork?.isType('grid')) return;
 
+        // Auto set and fix the same grid. Disallow users from changing it.
+        // Currently this is reset on each test change, so user changes can't be made.
         test.data.sameGrid = sourceNetwork.uuid === targetNetwork.uuid;
+        test.data.sameGridDisabled = true;
     },
 
     /**
@@ -260,7 +263,10 @@ export const MatrixTestDataFlow = {
         const targetNetwork = targetActor.master;
         if (!targetNetwork?.isType('grid')) return;
 
+        // Auto set and fix the same grid. Disallow users from changing it.
+        // Currently this is reset on each test change, so user changes can't be made.
         test.data.sameGrid = sourceNetwork.uuid === targetNetwork.uuid;
+        test.data.sameGridDisabled = true;
     },
 
     /**

@@ -2,7 +2,7 @@
 
 import { BonusSchema } from './BonusSchema';
 import { ConditionsSchema } from './ConditionsSchema';
-import { Empty, Many, IntegerString } from './Types';
+import { Empty, Many, OneOrMany, IntegerString } from './Types';
 
 export interface Power {
     action: Empty | { _TEXT: "As ritual" | "Auto" | "Complex" | "Free" | "None" | "Simple" | "Special"; };
@@ -22,8 +22,9 @@ export interface Power {
     source?: { _TEXT: "AET" | "DTR" | "FA" | "HS" | "KC" | "RF" | "SG" | "SR5"; };
     toxic?: { _TEXT: "True"; };
     type: Empty | { _TEXT: string; };
-    translate?: { _TEXT: string; };
-    altpage?: { _TEXT: string; };
+    translate?: OneOrMany<{ _TEXT: string; }>;
+    altpage?: OneOrMany<{ _TEXT: string; }>;
+    altnameonpage?: OneOrMany<Empty>;
 };
 
 export interface CritterpowersSchema {
