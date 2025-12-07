@@ -222,7 +222,10 @@
     "relationships": [
         {
             "id": "autocomplete-inline-properties",
-            "type": "module"
+            "type": "module",
+            "compatibility": {
+                "verified": "3.1.0"
+            }
         }
     ],
     "socket": true,

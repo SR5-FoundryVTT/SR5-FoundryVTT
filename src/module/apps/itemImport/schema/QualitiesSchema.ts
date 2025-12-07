@@ -56,16 +56,18 @@ export interface Quality {
     required?: ConditionsSchema;
     source?: { _TEXT: string; };
     stagedpurchase?: { _TEXT: "True"; };
-    translate?: { _TEXT: string; };
-    altpage?: { _TEXT: string; };
+    translate?: OneOrMany<{ _TEXT: string; }>;
+    altpage?: OneOrMany<{ _TEXT: string; }>;
+    altnameonpage?: OneOrMany<Empty>;
 };
 
 export interface Query {
     display: { _TEXT: string; };
     id: { _TEXT: string; };
     xpath: { _TEXT: string; };
-    translate?: { _TEXT: string; };
-    altpage?: { _TEXT: string; };
+    translate?: OneOrMany<{ _TEXT: string; }>;
+    altpage?: OneOrMany<{ _TEXT: string; }>;
+    altnameonpage?: OneOrMany<Empty>;
 };
 
 export interface QualitiesSchema {
