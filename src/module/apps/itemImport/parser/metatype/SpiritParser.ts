@@ -14,17 +14,6 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
                 system.spiritType = jsonData.name._TEXT.split(/[ /]/)[0].toLowerCase() as any;
                 break;
 
-            case "Toxic Spirits": {
-                const specialMapping = new Map<string, string>([
-                    ['Noxious Spirit', 'toxic_air'], ['Abomination Spirit', 'toxic_beasts'],
-                    ['Barren Spirit', 'toxic_earth'], ['Nuclear Spirit', 'toxic_fire'],
-                    ['Plague Spirit', 'toxic_man'], ['Sludge Spirit', 'toxic_water']
-                ]);
-
-                system.spiritType = (specialMapping.get(jsonData.name._TEXT) ?? "") as any;
-                break;
-            }
-
             case "Ritual":
                 system.attributes.body.base = Number(jsonData.bodmin._TEXT) || 0;
                 system.attributes.agility.base = Number(jsonData.agimin._TEXT) || 0;
