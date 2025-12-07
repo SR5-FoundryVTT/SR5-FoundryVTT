@@ -43,7 +43,6 @@
         "ActiveSkills": "Compétence Active",
         "ActorTypes": {
             "Character": "Personnage",
-            "Critter": "Créature",
             "Spirit": "Esprit",
             "Sprite": "Sprite",
             "Vehicle": "Vehicule"

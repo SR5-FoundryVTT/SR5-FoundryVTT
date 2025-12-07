@@ -384,7 +384,7 @@ export const MatrixTestDataFlow = {
     _prepareActorDevices(test: MatrixTest) {
         test.devices = [];
         if (!test.persona) return;
-        if (!test.persona.isType('character', 'critter', 'vehicle')) return;
+        if (!test.persona.isType('character', 'vehicle')) return;
 
         // Collect network devices
         test.devices = test.persona.wirelessDevices();

@@ -172,7 +172,6 @@
         "ActiveSkills": "활성형 기술",
         "ActorTypes": {
             "Character": "캐릭터",
-            "Critter": "생명체",
             "IC": "IC",
             "Spirit": "영혼",
             "Sprite": "요정",
@@ -1840,7 +1839,6 @@
     "TYPES": {
         "Actor": {
             "character": "캐릭터",
-            "critter": "생명체 (삭제 예정)",
             "ic": "IC",
             "spirit": "영혼",
             "sprite": "요정",

@@ -1,7 +1,7 @@
 import { SR5 } from "../../../config";
 
 export class ConditionMonitorsPrep {
-    static prepareStun(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
+    static prepareStun(system: Actor.SystemOfType<'character' | 'spirit'>) {
         const { track, attributes, modifiers } = system;
 
         track.stun.base = 8 + Math.ceil(attributes.willpower.value / 2);
@@ -10,7 +10,7 @@ export class ConditionMonitorsPrep {
         track.stun.disabled = false;
     }
 
-    static preparePhysical(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
+    static preparePhysical(system: Actor.SystemOfType<'character' | 'spirit'>) {
         const { track, attributes, modifiers } = system;
 
         track.physical.base = 8 + Math.ceil(attributes.body.value / 2);
@@ -20,7 +20,7 @@ export class ConditionMonitorsPrep {
         track.physical.disabled = false;
     }
 
-    static prepareGrunt(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
+    static prepareGrunt(system: Actor.SystemOfType<'character' | 'spirit'>) {
         // Grunts use only one monitor, use physical to get overflow functionality.
         ConditionMonitorsPrep.prepareStun(system);
 

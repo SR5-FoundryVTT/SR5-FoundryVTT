@@ -184,7 +184,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             }
 
             if (parts.programs
-                && (!this.actor.isType('character', 'vehicle', 'critter')
+                && (!this.actor.isType('character', 'vehicle')
                     || (this.isPlayMode && this.hideEmptyCategories() && !this.actor.hasItemOfType('program')))
             ) {
                 parts.programs.hidden = true;
@@ -208,7 +208,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             }
 
             if (parts.spritePowers
-                && (!this.actor.isType('sprite', 'character', 'critter')
+                && (!this.actor.isType('sprite', 'character')
                     || (this.isPlayMode
                         && (this.hideEmptyCategories() || !this.actor.isType('sprite'))
                         && !this.actor.hasItemOfType('sprite_power')))) {

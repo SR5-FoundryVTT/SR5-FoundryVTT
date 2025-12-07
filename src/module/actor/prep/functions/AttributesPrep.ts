@@ -66,7 +66,7 @@ export class AttributesPrep {
      * @param system A system actor having an essence attribute
      * @param items The items that might cause an essence loss.
      */
-    static prepareEssence(system: Actor.SystemOfType<'character' | 'critter'>, items: SR5Item[]) {
+    static prepareEssence(system: Actor.SystemOfType<'character'>, items: SR5Item[]) {
         // The essence base is fixed. Changes should be made through the attribute.temp field.
         system.attributes.essence.base = SR.attributes.defaults.essence;
 

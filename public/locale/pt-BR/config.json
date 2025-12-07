@@ -134,7 +134,6 @@
         "ActiveSkills": "Perícias Ativas",
         "ActorTypes": {
             "Character": "Personagem",
-            "Critter": "Criatura",
             "IC": "GELO",
             "Spirit": "Espírito",
             "Sprite": "Sprite",
@@ -1614,7 +1613,6 @@
     "TYPES": {
         "Actor": {
             "character": "Personagem",
-            "critter": "Criatura (descontinuado)",
             "ic": "GELO",
             "spirit": "Espírito",
             "sprite": "Sprite",

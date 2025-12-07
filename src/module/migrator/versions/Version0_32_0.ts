@@ -1,12 +1,16 @@
 import { VersionMigration } from "../VersionMigration";
 
 /**
+ * Migrate critter actors to character actors.
  * Migrates skill names, spirit types, and vehicle modification categories to match official book conventions.
  */
 export class Version0_32_0 extends VersionMigration {
     readonly TargetVersion = "0.32.0";
 
     override migrateActor(_actor: any): void {
+        if (_actor.type === 'critter')
+            _actor.type = 'character';
+
         if (_actor.system?.skills?.active) {
             const active = _actor.system.skills.active;
 

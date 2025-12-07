@@ -387,7 +387,6 @@
         },
         "ActorTypes": {
             "Character": "Character",
-            "Critter": "Critter",
             "IC": "IC",
             "Spirit": "Spirit",
             "Sprite": "Sprite",
@@ -3049,7 +3048,6 @@
     "TYPES": {
         "Actor": {
             "character": "Character",
-            "critter": "Critter (deprecated)",
             "ic": "IC",
             "spirit": "Spirit",
             "sprite": "Sprite",
