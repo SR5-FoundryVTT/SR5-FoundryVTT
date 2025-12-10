@@ -33,6 +33,7 @@ export const preloadHandlebarsTemplates = async () => {
             'list-items/equip-icon',
             'list-items/favorite-icon',
             'list-items/header-add-icon',
+            'list-items/header-add-license-icon',
             'list-items/move-item-icon',
             'list-items/item-quantity-col',
             'list-items/item-name',
