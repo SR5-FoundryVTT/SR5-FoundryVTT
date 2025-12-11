@@ -718,10 +718,11 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
                 // Case: CREATE => Create new item.
             } else {
+                // @ts-expect-error "base" is allowed on Item.Source.type but not on Item.CreateData.type and parent as Item
                 // NOTE: It's important to deliver the item as the item parent document, even though this is meant for actor owners.
                 //       The legacy approach for embeddedItems (within another item) relies upon this.actor
                 //       returning an SR5Item instance to call .updateEmbeddedEntities, while Foundry expects an actor
-                return new SR5Item(item, { parent: this as unknown as SR5Actor });
+                return new SR5Item(item, { parent: this });
             }
         });
 
