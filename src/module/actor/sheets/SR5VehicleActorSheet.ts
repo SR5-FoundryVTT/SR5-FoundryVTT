@@ -13,6 +13,7 @@ interface VehicleSheetDataFields extends MatrixActorSheetData {
         driver: SR5Actor|undefined,
         master: SR5Item | undefined
     }
+    modifications: SR5Item<'modification'>[];
 }
 
 export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFields> {
@@ -71,7 +72,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
 
         // Vehicle actor type specific fields.
         data.vehicle = this._prepareVehicleFields();
-
+        data.modifications = this._prepareEquippedModifications();
         data.isVehicle = true;
 
         return data;
@@ -112,6 +113,13 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
             driver,
             master,
         };
+    }
+
+    /**
+     * Allow gear (vehicle) modification to ly around in inventory while still allowing calculations around equipped modifications.
+     */
+    _prepareEquippedModifications() {
+        return this.document.items.filter(item => item.isType('modification')).filter(item => item.isEquipped());
     }
 
     static override TABS = {
