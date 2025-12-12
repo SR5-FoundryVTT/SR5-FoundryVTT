@@ -4,11 +4,16 @@ import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5ChatMessage } from "../chatMessage/SR5ChatMessage";
 import { SR5Combat } from "../combat/SR5Combat";
+import { SR5Combatant } from "../combat/SR5Combatant";
 import { SR5ActiveEffect } from "../effect/SR5ActiveEffect";
 import { SR5Roll } from "../rolls/SR5Roll";
 import { SR5Token } from "../token/SR5Token";
+import { SR5TokenDocument } from "../token/SR5TokenDocument";
 
 import { Translation } from '../utils/strings';
+
+import { CombatDM } from "./combat/Combat";
+import { CombatantDM } from "./combat/Combatant";
 
 import { Character } from "./actor/Character";
 import { Critter } from "./actor/Critter";
@@ -58,14 +63,16 @@ declare module "fvtt-types/configuration" {
         ActiveEffect: typeof SR5ActiveEffect;
         Actor: typeof SR5Actor<Actor.ConfiguredSubType>;
         ChatMessage: typeof SR5ChatMessage;
-        Combat: typeof SR5Combat<Combat.SubType>;
+        Combat: typeof SR5Combat;
+        Combatant: typeof SR5Combatant;
         Item: typeof SR5Item<Item.ConfiguredSubType>;
         Roll: typeof SR5Roll;
-        Sheet: typeof FormApplication;
+        Sheet: typeof foundry.appv1.api.FormApplication;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interface ConfiguredCombat<SubType extends Combat.SubType> {
-        document: SR5Combat<SubType>;
+        document: SR5Combat;
     }
 
     interface ObjectClassConfig {
@@ -114,7 +121,10 @@ declare module "fvtt-types/configuration" {
             vehicle: typeof Vehicle;
         };
         Combat: {
-            base: typeof SR5Combat;
+            base: typeof CombatDM;
+        };
+        Combatant: {
+            base: typeof CombatantDM;
         };
         Item: {
             action: typeof Action;
@@ -148,7 +158,6 @@ declare module "fvtt-types/configuration" {
     interface FlagConfig {
         Actor: {
             shadowrun5e: {
-                turnsSinceLastAttack?: number;
                 overwatchScore?: number;
             }
         };
@@ -219,6 +228,7 @@ declare module "fvtt-types/configuration" {
             quenchReady: (args0: Quench) => void;
             renderChatMessage: (args0: SR5ChatMessage, args1: any, arg2: any) => void;
             diceSoNiceReady: (dice3d: DiceSoNice) => void;
+            moveToken: (...args: Parameters<typeof SR5TokenDocument.moveToken>) => void;
             dropItemSheetData: any;
             // Hooks for Autocomplete Inline Properties integration
             aipSetup: (packageConfig: {packageName: string}[]) => void;
@@ -263,6 +273,7 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.CompendiumBrowserBlacklist": string[];
         "shadowrun5e.ImporterCompendiumOrder": string[];
         "shadowrun5e.DieFaceLabels": string;
+        "shadowrun5e.TokenAutoRunning": boolean;
     }
 }
 
