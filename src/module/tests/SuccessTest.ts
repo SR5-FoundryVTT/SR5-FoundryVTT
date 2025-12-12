@@ -1448,14 +1448,15 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     async executeWithSecondChance(): Promise<this> {
         console.debug(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
 
-        if (!this.data.sourceActorUuid) {
-            ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', { localize: true });
-            return this;
-        }
         if (!this.canSecondChance) return this;
 
         // Fetch documents.
         await this.populateDocuments();
+
+        if (!this.actor) {
+            ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', { localize: true });
+            return this;
+        }
 
         //  Trigger edge consumption.
         this.data.secondChance = true;
@@ -1485,14 +1486,15 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     async executeWithPushTheLimit(): Promise<this> {
         console.debug(`Shadowrun 5e | ${this.constructor.name} will push the limit rules`);
 
-        if (!this.data.sourceActorUuid) {
-            ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', { localize: true });
-            return this;
-        }
         if (!this.canPushTheLimit) return this;
 
         // Fetch documents.
         await this.populateDocuments();
+
+        if (!this.actor) {
+            ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', { localize: true });
+            return this;
+        }
 
         this.data.pushTheLimit = true;
         this.applyPushTheLimit();
