@@ -118,8 +118,8 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
     /**
      * Allow gear (vehicle) modification to ly around in inventory while still allowing calculations around equipped modifications.
      */
-    _prepareEquippedModifications() {
-        return this.document.items.filter(item => item.isType('modification')).filter(item => item.isEquipped());
+    _prepareEquippedModifications()  {
+        return this.actor.itemsForType.get('modification')?.filter(item => item.isEquipped()) as SR5Item<'modification'>[] || [];
     }
 
     static override TABS = {
