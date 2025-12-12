@@ -198,33 +198,33 @@
                 {{#if system.isDrone}}
                     <label>
                         {{localize "SR5.ModPoints"}}&nbsp;
-                        {{calcModPointSlots items}}/{{calcModificationSlotsAvailable actor}}
+                        {{calcModPointSlots modifications}}/{{calcModificationSlotsAvailable actor}}
                     </label>
                 {{else}}
                     <div class="basic-row">
                         <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.body">
                             <i class="fas fa-truck"></i>
-                            {{calcModificationCategorySlots items "body"}}/{{calcModificationSlotsAvailable actor}}
+                            {{calcModificationCategorySlots modifications "body"}}/{{calcModificationSlotsAvailable actor}}
                         </label>
                         <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.cosmetic">
                             <i class="fas fa-image"></i>
-                            {{calcModificationCategorySlots items "cosmetic"}}/{{calcModificationSlotsAvailable actor}}
+                            {{calcModificationCategorySlots modifications "cosmetic"}}/{{calcModificationSlotsAvailable actor}}
                         </label>
                         <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.electromagnetic">
                             <i class="far fa-bolt"></i>
-                            {{calcModificationCategorySlots items "electromagnetic"}}/{{calcModificationSlotsAvailable actor}}
+                            {{calcModificationCategorySlots modifications "electromagnetic"}}/{{calcModificationSlotsAvailable actor}}
                         </label>
                         <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.power_train">
                             <i class="far fa-engine"></i>
-                            {{calcModificationCategorySlots items "power_train"}}/{{calcModificationSlotsAvailable actor}}
+                            {{calcModificationCategorySlots modifications "power_train"}}/{{calcModificationSlotsAvailable actor}}
                         </label>
                         <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.protection">
                             <i class="far fa-shield"></i>
-                            {{calcModificationCategorySlots items "protection"}}/{{calcModificationSlotsAvailable actor}}
+                            {{calcModificationCategorySlots modifications "protection"}}/{{calcModificationSlotsAvailable actor}}
                         </label>
                         <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.weapons">
                             <i class="far fa-gun"></i>
-                            {{calcModificationCategorySlots items "weapons"}}/{{calcModificationSlotsAvailable actor}}
+                            {{calcModificationCategorySlots modifications "weapons"}}/{{calcModificationSlotsAvailable actor}}
                         </label>
                     </div>
                 {{/if}}
