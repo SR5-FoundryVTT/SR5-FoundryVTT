@@ -27,7 +27,7 @@ export const registerActorHelpers = () => {
     /** 
     * Determine the amount of Modification Category slots in use by a Vehicle actor, for the given Modification Category
     * 
-    * @param items The items of type modification to be used for calculation.
+    * @param items The modification items to be considered.
     * @param modificationCategory The modification category 
     */
     Handlebars.registerHelper('calcModificationCategorySlots', (items: SR5Item<'modification'>[], modificationCategory: ModificationCategoryType): number => {
