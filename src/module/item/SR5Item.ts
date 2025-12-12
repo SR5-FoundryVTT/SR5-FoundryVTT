@@ -555,7 +555,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         // NOTE: This might be related to Foundry data serialization sometimes returning arrays as ordered HashMaps...
         const licenses = foundry.utils.getType(this.system.licenses) === 'Object' ?
             Object.values(this.system.licenses) :
-            this.system.licenses;
+            [...this.system.licenses];
 
         if (!licenses) return;
 
@@ -590,7 +590,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      */
     async removeLicense(index: number) {
         if (this.isType('sin')) {
-            const licenses = this.system.licenses.splice(index, 1);
+            const licenses = [...this.system.licenses];
+            licenses.splice(index, 1);
             await this.update({ system: { licenses } });
         }
     }
