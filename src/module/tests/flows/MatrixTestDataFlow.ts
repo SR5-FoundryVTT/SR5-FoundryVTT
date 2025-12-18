@@ -351,7 +351,7 @@ export const MatrixTestDataFlow = {
         // If a device icon is targeted, it might be part of another main icon (persona / network)
         // Make sure to display icon target as sub-icon of this main icon.
         if (test.icon instanceof SR5Item && !test.persona && !test.host && !test.grid) {
-            const persona = test.icon.persona;;
+            const persona = test.icon.persona;
             if (persona) {
                 // ... persona
                 test.data.personaUuid = persona.uuid;
