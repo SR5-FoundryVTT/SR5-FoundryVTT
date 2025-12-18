@@ -87,8 +87,9 @@ export class MatrixTest<T extends MatrixTestData = MatrixTestData> extends Succe
     }
 
     override async populateDocuments() {
-        await super.populateDocuments();
+        // Order of operation might be important to allow matrix flows to insert targets before those are populated.
         MatrixTestDataFlow.populateDocuments(this);
+        await super.populateDocuments();
     }
 
     override prepareTestModifiers() {
