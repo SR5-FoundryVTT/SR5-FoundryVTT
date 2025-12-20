@@ -245,18 +245,15 @@ export class Migrator {
         await this.updateDocuments(Item, deepClone(game.items._source));
 
         for (const item of game.items)
-            // @ts-expect-error Fvtt-types not supporting parent
             await this.updateDocuments(ActiveEffect, item.toObject().effects, item);
 
         /* Actors and its embedded documents */
         await this.updateDocuments(Actor, deepClone(game.actors._source));
 
         for (const actor of game.actors) {
-            // @ts-expect-error Fvtt-types not supporting parent
             await this.updateDocuments(Item, actor.toObject().items, actor);
-            // @ts-expect-error Fvtt-types not supporting parent
             await this.updateDocuments(ActiveEffect, actor.toObject().effects, actor);
-            
+
             for (const item of actor.items)
                 await this.updateDocuments(ActiveEffect, item.toObject().effects, item);
         }

@@ -9,7 +9,7 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 export namespace CompendiumBrowserTypes {
     export type DocType = "Actor" | "Item";
     export type Tabs = "Actor" | "Item" | "Settings";
-    export type Pack = CompendiumCollection<DocType>;
+    export type Pack = foundry.documents.collections.CompendiumCollection<DocType>;
     export type FilterEntry = { value: string; id: string; selected: boolean };
 
     export type PackNode = {
@@ -137,10 +137,10 @@ export class CompendiumBrowser extends BaseClass {
         const { queryName, types, packs } = filter;
 
         const activePacks = game.packs.filter(
-            (p): p is CompendiumCollection<DocType> =>
+            (p) =>
                 p.visible && p.metadata.type === docType &&
-                (!packs?.length || packs.includes(p.collection)),
-        );
+                (!packs?.length || packs.includes(p.collection))
+        ) as foundry.documents.collections.CompendiumCollection<DocType>[];
 
         const indexes = await Promise.all(activePacks.map(async (pack) => pack.getIndex()));
         let entries = indexes.flatMap((index, idx) => {
