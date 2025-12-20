@@ -227,7 +227,7 @@ declare module "fvtt-types/configuration" {
             sr5_afterTestComplete: any;
             sr5_processTagifyElements: any;
             "routinglib.ready": () => void;
-            SR5_CastItemAction: (arg0: any) => void;
+            SR5_CastItemAction: (arg0: SR5Item) => void;
             SR5_PreActorItemRoll: (arg0: SR5Actor, arg1: SR5Item) => void;
             getSceneControlButtons: (arg0: any) => void;
             getCombatTrackerEntryContext: (arg0: any, arg1: any) => void;
