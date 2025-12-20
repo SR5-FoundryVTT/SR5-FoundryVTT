@@ -41,7 +41,7 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
             // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
             assert.strictEqual(spirit.system.skills.active.assensing.base, 0);
 
-            await spirit.update({ system: { force: 6 } });
+            await spirit.update({ system: { attributes: { force: { value: 6 } } } });
 
             assert.strictEqual(spirit.system.attributes.body.base, 4);
             assert.strictEqual(spirit.system.attributes.agility.base, 9);
@@ -57,7 +57,7 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
 
         it('Spirit recoil compensation', async () => {
             // air => 7 -5 => strength 5
-            const spirit = await factory.createActor({ type: 'spirit', system: { spiritType: 'air', force: 7 } });
+            const spirit = await factory.createActor({ type: 'spirit', system: { spiritType: 'air', attributes: { force: { value: 7 } } } });
             if (!spirit) return assert.fail();
 
             assert.strictEqual(spirit.system.values.recoil_compensation.value, 3); // SR5#175: (strength) 5 / 3 = 1,6 (rounded up) = 2 => 2 + 1

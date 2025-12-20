@@ -35,7 +35,6 @@ const SpiritData = () => ({
     }),
     limits: new SchemaField({ ...Limits(), ...AwakendLimits() }),
     values: new SchemaField(PhysicalCombatValues()),
-    force: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
 
     // === Magic ===
     magic: new SchemaField(MagicData()),
