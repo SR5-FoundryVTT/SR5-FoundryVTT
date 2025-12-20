@@ -31,7 +31,7 @@ const SpiritData = () => ({
     // === Attributes & Limits ===
     attributes: new SchemaField({
         ...Attributes(),
-        force: new ModifiableField(AttributeField({ hidden: true })),
+        force: new ModifiableField(AttributeField()),
     }),
     limits: new SchemaField({ ...Limits(), ...AwakendLimits() }),
     values: new SchemaField(PhysicalCombatValues()),

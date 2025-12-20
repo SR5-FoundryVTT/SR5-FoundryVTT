@@ -17,7 +17,7 @@ export class Version0_31_5 extends VersionMigration {
 
         if (_actor.type === 'spirit' && force) {
             force.base = _actor.system.force || 0;
-            force.hidden = true;
+            force.hidden = false;
 
             delete _actor.system.force;
         }
