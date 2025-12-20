@@ -89,7 +89,6 @@ export default [
             "new-cap": "off",
             "one-var": "off",
             "spaced-comment": "off",
-            "no-mixed-operators": "off",
             "@typescript-eslint/space-before-function-paren": "off",
 
             // Style Preferences / Off
