@@ -13,14 +13,14 @@ export class Version0_31_5 extends VersionMigration {
     }
 
     override migrateActor(_actor: any) {
-        const force = _actor.system.attributes.force;
+        const force = _actor.system.attributes?.force;
 
         if (_actor.type === 'spirit' && force) {
-            force.base = _actor.system.force;
+            force.base = _actor.system.force || 0;
             force.hidden = false;
-        }
 
-        delete _actor.system.force;
+            delete _actor.system.force;
+        }
     }
 
     override handlesActiveEffect(effect: Readonly<any>) {
