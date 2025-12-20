@@ -1,9 +1,10 @@
 import { VersionMigration } from "../VersionMigration";
 
 /**
- * Migration to update spirit actor attributes to use 'attributes.force' with 'base' and 'hidden' properties,
- * moving the old 'system.force' value to 'attributes.force.base' and setting 'hidden' to false.
- */
+  * Migration: Update spirit actor to use 'system.attributes.force' with 'base' and 'hidden' properties.
+  * Moves 'system.force' to 'system.attributes.force.base' and sets 'system.attributes.force.hidden' to false.
+  * Also updates active effect keys from 'system.force' to 'system.attributes.force'.
+  */
 export class Version0_31_5 extends VersionMigration {
     readonly TargetVersion = "0.31.5";
 
