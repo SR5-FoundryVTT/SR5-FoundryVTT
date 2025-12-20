@@ -21,4 +21,16 @@ export class Version0_31_5 extends VersionMigration {
 
         delete _actor.system.force;
     }
+
+    override handlesActiveEffect(effect: Readonly<any>) {
+        return effect.changes.filter(change => change.key === 'system.force').length > 0;
+    }
+
+    override migrateActiveEffect(effect: any) {
+        for (const change of effect.changes) {
+            if (change.key === 'system.force') {
+                change.key = 'system.attributes.force';
+            }
+        }
+    }
 }
