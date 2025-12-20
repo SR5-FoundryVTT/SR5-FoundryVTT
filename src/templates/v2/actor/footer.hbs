@@ -105,9 +105,9 @@
             <div class="basic-row">
                 <label>{{localize "SR5.Spirit.Force"}}</label>
                 {{#if @root.isEditMode}}
-                    {{formInput systemFields.force value=source.system.force classes="short skinny" rootId=rootId}}
+                    {{formInput systemFields.force value=source.system.attributes.force.value classes="short skinny" rootId=rootId}}
                 {{else}}
-                    <label>{{#if isLimited}}?{{else}}{{system.force}}{{/if}}</label>
+                    <label>{{#if isLimited}}?{{else}}{{system.attributes.force.base}}{{/if}}</label>
                 {{/if}}
             </div>
             {{#if @root.isEditMode}}

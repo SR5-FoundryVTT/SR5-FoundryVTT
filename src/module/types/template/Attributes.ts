@@ -3,9 +3,11 @@ import { ModifiableValue } from "./Base";
 import { ModifiableField } from "../fields/ModifiableField";
 const { NumberField, BooleanField, StringField } = foundry.data.fields;
 
-export const AttributeField = (limit?: keyof typeof SR5.limits) => ({
+export const AttributeField = (
+    { limit, hidden = false }: { limit?: keyof typeof SR5.limits; hidden?: boolean; } = {}
+) => ({
     ...ModifiableValue(),
-    hidden: new BooleanField(),
+    hidden: new BooleanField({ initial: hidden }),
     label: new StringField({ required: true }),
     limit: new StringField({
         blank: true,
@@ -22,16 +24,16 @@ const EdgeAttributeField = () => ({
 });
 
 export const Attributes = () => ({
-    body: new ModifiableField(AttributeField("physical")),
-    agility: new ModifiableField(AttributeField("physical")),
-    reaction: new ModifiableField(AttributeField("physical")),
-    strength: new ModifiableField(AttributeField("physical")),
-    willpower: new ModifiableField(AttributeField("mental")),
-    logic: new ModifiableField(AttributeField("mental")),
-    intuition: new ModifiableField(AttributeField("mental")),
-    charisma: new ModifiableField(AttributeField("social")),
-    magic: new ModifiableField(AttributeField("mental")),
-    resonance: new ModifiableField(AttributeField("mental")),
+    body: new ModifiableField(AttributeField({ limit: "physical" })),
+    agility: new ModifiableField(AttributeField({ limit: "physical" })),
+    reaction: new ModifiableField(AttributeField({ limit: "physical" })),
+    strength: new ModifiableField(AttributeField({ limit: "physical" })),
+    willpower: new ModifiableField(AttributeField({ limit: "mental" })),
+    logic: new ModifiableField(AttributeField({ limit: "mental" })),
+    intuition: new ModifiableField(AttributeField({ limit: "mental" })),
+    charisma: new ModifiableField(AttributeField({ limit: "social" })),
+    magic: new ModifiableField(AttributeField({ limit: "mental" })),
+    resonance: new ModifiableField(AttributeField({ limit: "mental" })),
     essence: new ModifiableField(AttributeField()),
 
     edge: new ModifiableField(EdgeAttributeField()),
@@ -40,19 +42,19 @@ export const Attributes = () => ({
 // MatrixActorAttributes are all the attributes an actor should have to work in the matrix
 // this was going to be named MatrixAttributes but that's taken...
 export const MatrixActorAttributes = () => ({
-    attack: new ModifiableField(AttributeField("attack")),
-    sleaze: new ModifiableField(AttributeField("sleaze")),
-    data_processing: new ModifiableField(AttributeField("data_processing")),
-    firewall: new ModifiableField(AttributeField("firewall")),
+    attack: new ModifiableField(AttributeField({ limit: "attack" })),
+    sleaze: new ModifiableField(AttributeField({ limit: "sleaze" })),
+    data_processing: new ModifiableField(AttributeField({ limit: "data_processing" })),
+    firewall: new ModifiableField(AttributeField({ limit: "firewall" })),
 
     rating: new ModifiableField(AttributeField()),
 })
 
 export const TechnologyAttributes = () => ({
-    willpower: new ModifiableField(AttributeField("mental")),
-    logic: new ModifiableField(AttributeField("mental")),
-    intuition: new ModifiableField(AttributeField("mental")),
-    charisma: new ModifiableField(AttributeField("social")),
+    willpower: new ModifiableField(AttributeField({ limit: "mental" })),
+    logic: new ModifiableField(AttributeField({ limit: "mental" })),
+    intuition: new ModifiableField(AttributeField({ limit: "mental" })),
+    charisma: new ModifiableField(AttributeField({ limit: "social" })),
     ...MatrixActorAttributes(),
 });
 
