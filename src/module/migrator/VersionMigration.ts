@@ -1,4 +1,4 @@
-export type MigratableDocument = Actor.Implementation | Item.Implementation | ActiveEffect.Implementation;
+export type MigratableDocument = ActiveEffect.Implementation | Actor.Implementation | Combat.Implementation | Combatant.Implementation | Item.Implementation;
 export type MigratableDocumentName = MigratableDocument['documentName'];
 
 /**
@@ -30,6 +30,12 @@ export abstract class VersionMigration {
     migrateActor(_actor: any): void {}
     handlesActor(_actor: Readonly<any>) { return this.migrates.Actor; }
 
+    migrateCombat(_combat: any): void {}
+    handlesCombat(_combat: Readonly<any>) { return this.migrates.Combat; }
+
+    migrateCombatant(_combatant: any): void {}
+    handlesCombatant(_combatant: Readonly<any>) { return this.migrates.Combatant; }
+
     migrateItem(_item: any): void {}
     handlesItem(_item: Readonly<any>) { return this.migrates.Item; }
 
@@ -45,8 +51,10 @@ export abstract class VersionMigration {
         const proto = Object.getPrototypeOf(this);
         this.migrates = {
             Actor: proto.migrateActor !== VersionMigration.prototype.migrateActor,
+            ActiveEffect: proto.migrateActiveEffect !== VersionMigration.prototype.migrateActiveEffect,
+            Combat: proto.migrateCombat !== VersionMigration.prototype.migrateCombat,
+            Combatant: proto.migrateCombatant !== VersionMigration.prototype.migrateCombatant,
             Item: proto.migrateItem !== VersionMigration.prototype.migrateItem,
-            ActiveEffect: proto.migrateActiveEffect !== VersionMigration.prototype.migrateActiveEffect
         };
     }
 }

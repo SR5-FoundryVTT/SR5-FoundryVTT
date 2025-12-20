@@ -23,8 +23,13 @@ export class AttributesPrep {
         attributes.essence.hidden = true;
 
         // set the value for the attributes
-        for (const [name, attribute] of Object.entries(attributes))
-            AttributesPrep.prepareAttribute(name, attribute, ranges)
+        for (const [name, attribute] of Object.entries(attributes)) {
+            AttributesPrep.prepareAttribute(name, attribute, ranges);
+
+            if ('max' in attribute) {
+                attribute.max = attribute.value;
+            }
+        }
     }
 
     /**

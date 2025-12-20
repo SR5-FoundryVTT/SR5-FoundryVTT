@@ -1,6 +1,6 @@
 import { FLAGS, SYSTEM_NAME } from '../constants';
 import { RoutingLibIntegration } from '../integrations/routingLibIntegration';
-import { TrackType } from "../types/template/ConditionMonitors";
+import PrototypeTokenConfig = foundry.applications.sheets.PrototypeTokenConfig;
 
 export class SR5Token extends foundry.canvas.placeables.Token {
     override _drawBar(number: number, bar: PIXI.Graphics, data: NonNullable<TokenDocument.GetBarAttributeReturn>) {
@@ -10,9 +10,8 @@ export class SR5Token extends foundry.canvas.placeables.Token {
         // Shadowrun condition trackers count up from 0 to the maximum.
         // We flip the values from Shadowrun format to FoundryVTT format here
         // for drawing.
-        if (tokenHealthBars && data?.attribute.startsWith('track')) {
-            const track = data as unknown as TrackType;
-            track.value = track.max - track.value;
+        if (tokenHealthBars && data.type === 'bar' && data.attribute.startsWith('track')) {
+            data.value = data.max - data.value;
         }
         return super._drawBar(number, bar, data);
     }
@@ -23,15 +22,21 @@ export class SR5Token extends foundry.canvas.placeables.Token {
     ) {
         const movement = this.actor?.system.movement;
         const useRoutLib = this.document.getFlag(SYSTEM_NAME, FLAGS.TokenUseRoutingLib) ?? true;
-        if (RoutingLibIntegration.routingLibReady && movement && useRoutLib && !options?.skipRoutingLib && !options?.ignoreWalls) {
+        if (RoutingLibIntegration.ready && movement && useRoutLib && !options?.skipRoutingLib && !options?.ignoreWalls) {
             return RoutingLibIntegration.routinglibPathfinding(waypoints, this, movement);
         }
 
         return super.findMovementPath(waypoints, options);
     }
 
-    static tokenConfig(app, html, data, options) {
-        if (!RoutingLibIntegration.routingLibReady || !app.actor?.system?.movement) return;
+    static tokenConfig(
+        app: any, // TokenConfig | PrototypeTokenConfig, Stubs on FVTT-Types
+        html: HTMLElement,
+        data: TokenConfig.RenderContext | PrototypeTokenConfig.RenderContext,
+        options: TokenConfig.RenderOptions | PrototypeTokenConfig.RenderOptions
+    ) {
+        const actor = app.actor as Actor.Implementation | null | undefined;
+        if (!RoutingLibIntegration.ready || !actor?.system.movement) return;
 
         // Default it to true, so that it is enabled by default.
         const flagValue = app.token.getFlag(SYSTEM_NAME, FLAGS.TokenUseRoutingLib) ?? true;

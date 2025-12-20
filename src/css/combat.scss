@@ -1,0 +1,105 @@
+.combat-tracker .combatant {
+    position: relative;
+}
+
+/* Base style for ALL three icons */
+.combat-tracker .combatant-seize-icon,
+.combat-tracker .combatant-acted-icon,
+.combat-tracker .combatant-init-mode-icon {
+    position: absolute;
+    z-index: 5;
+    width: 20px;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- Positioning and Colors --- */
+.combat-tracker .combatant-init-mode-icon {
+    top: calc(50% - 30px);
+    left: 2px;
+    color: white;
+    pointer-events: none;
+}
+
+.combat-tracker .combatant-init-mode-icon.mode-astral i {
+    color: #a98aff;
+}
+.combat-tracker .combatant-init-mode-icon.mode-matrix i {
+    color: #8aff96;
+}
+.combat-tracker .combatant-init-mode-icon.mode-physical i {
+    color: #ff8a8a;
+}
+.combat-tracker .combatant-init-mode-icon.mode-unknown i {
+    color: #aaa;
+}
+
+.combat-tracker .token-initiative .combatant-seize-icon {
+    top: calc(50% - 28px);
+    right: 0;
+    color: #ffc400;
+    pointer-events: none;
+}
+
+.combat-tracker .token-initiative .combatant-acted-icon {
+    bottom: calc(50% - 28px);
+    right: 0;
+    color: #888;
+    transition: all 0.2s ease;
+}
+
+.combat-tracker .combatant-acted-icon[data-action="toggleActed"] {
+    cursor: pointer; 
+}
+.combat-tracker .combatant-acted-icon.active {
+    color: #5cb85c;
+}
+
+.combat-controls {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.combat-controls .combat-extra-menu {
+    position: absolute;
+    bottom: 100%;
+    transform: translateY(-4px);
+    background: rgba(25, 25, 25, 0.95);
+    border-radius: 6px;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    z-index: 10;
+}
+
+.combat-controls .combat-extra-menu[data-time="previous"] {
+    left: 0;
+}
+
+.combat-controls .combat-extra-menu[data-time="next"] {
+    right: 0;
+}
+
+.combat-controls .combat-extra-menu-previous button,
+.combat-controls .combat-extra-menu-next button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px;
+    font-size: 0.9rem;
+    text-align: left;
+}
+
+.combat-controls .combat-extra-menu-previous.hidden,
+.combat-controls .combat-extra-menu-next.hidden {
+    display: none;
+}

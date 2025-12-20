@@ -232,6 +232,15 @@ export const registerSystemSettings = () => {
         default: true
     });
 
+    game.settings.register(SYSTEM_NAME, FLAGS.TokenAutoRunning, {
+        name: 'SETTINGS.TokenAutoRunning',
+        hint: 'SETTINGS.TokenAutoRunningDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true,
+    });
+
     /**
      * TokenRuler color: Walking
      */

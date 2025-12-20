@@ -1533,7 +1533,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const iniAdjustment = CombatRules.initiativeScoreWoundAdjustment(woundsBefore, woundsAfter);
 
         // Only actors that can have a wound modifier, will have a delta.
-        if (iniAdjustment < 0 && game.combat) await game.combat.adjustActorInitiative(this, iniAdjustment);
+        if (iniAdjustment < 0 && game.combat)
+            await game.combat.adjustActorInitiative(this, iniAdjustment);
     }
 
     /**
@@ -1640,6 +1641,14 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     /**
+     * Get a set of all status effect IDs currently applied to this actor.
+     * This collects all unique status IDs from the actor's active effects.
+     */
+    getStatusEffectsId() {
+        return new Set([...(this.effects ?? [])].flatMap(e => [...e.statuses]));
+    }
+
+    /**
      * Depending on this actors defeated status, apply the correct effect and status.
      *
      * This will only work when the actor is connected to a token.
@@ -1660,9 +1669,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         // Apply the appropriate combatant status.
         if (defeated.unconscious || defeated.dying || defeated.dead) {
-            await this.combatant?.update({ defeated: true });
+            await Promise.all(this.combatants.map(async c => c.update({ defeated: true })));
         } else {
-            await this.combatant?.update({ defeated: false });
+            await Promise.all(this.combatants.map(async c => c.update({ defeated: false })));
             return;
         }
         const newStatus = defeated.dead ? 'dead' : 'unconscious';
@@ -1673,7 +1682,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             return;
 
         // Set effect as active, as we've already made sure it isn't.
-        await token.object?.toggleEffect(effect, { overlay: true, active: true });
+        await this.toggleStatusEffect(newStatus, { overlay: true, active: true });
     }
 
     /**
@@ -1736,7 +1745,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             ui.notifications?.warn('SR5.MissingRessource.Initiative', {localize: true});
         }
 
-        await combat.adjustInitiative(combatant, modifier);
+        await combatant.adjustInitiative(modifier);
     }
 
     /**
@@ -1746,13 +1755,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     get combatActive(): boolean {
         if (!game.combat) return false;
-        const combatant = game.combat.getActorCombatant(this);
-        return !!(combatant && typeof combatant.initiative === "number");
+        const combatants = game.combat.getCombatantsByActor(this);
+        return combatants.length > 0 && combatants.some(c => c.initiative != null);
     }
 
-    get combatant() {
-        if (!this.combatActive || !game.combat) return null;
-        return game.combat.getActorCombatant(this);
+    get combatants() {
+        if (!this.combatActive) return [];
+        return game.combat!.getCombatantsByActor(this);
     }
 
     /**
