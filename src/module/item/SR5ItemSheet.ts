@@ -909,7 +909,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         if (this.item._isNestedItem) {
             effect[0]['_id'] = foundry.utils.randomID();
-            const sr5Effect = new SR5ActiveEffect(effect[0], { parent: this.item });
+            const sr5Effect = new SR5ActiveEffect(effect[0], { parent: this.item }) as ActiveEffect.Stored;
             await this.item.createNestedActiveEffect(sr5Effect);
         } else {
             await this.item.createEmbeddedDocuments('ActiveEffect', effect);
