@@ -647,11 +647,11 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * Create an item in this item
      * @param effectData
      */
-    async createNestedActiveEffect(effectData: ActiveEffect.Implementation | ActiveEffect.Implementation[]) {
+    async createNestedActiveEffect(effectData: ActiveEffect.Stored | ActiveEffect.Stored[]) {
         if (!Array.isArray(effectData)) effectData = [effectData];
 
         for (const effect of effectData) {
-            this.effects.set(effect._id!, effect);
+            this.effects.set(effect._id, effect);
         }
 
         this.prepareNestedItems();

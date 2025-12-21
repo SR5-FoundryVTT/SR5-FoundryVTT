@@ -13,11 +13,6 @@ import SocketMessageData = Shadowrun.SocketMessageData;
  *       @PDF SR5#160 'Changing Initiative'
  */
 export class SR5Combat<SubType extends Combat.SubType = Combat.SubType> extends Combat<SubType> {
-    // Overwrite foundry-vtt-types v9 combatTrackerSettings type definitions.
-    override get settings() {
-        return super.settings as { resource: string, skipDefeated: boolean };
-    }
-
     get initiativePass(): number {
         return this.getFlag(SYSTEM_NAME, FLAGS.CombatInitiativePass) || SR.combat.INITIAL_INI_PASS;
     }
