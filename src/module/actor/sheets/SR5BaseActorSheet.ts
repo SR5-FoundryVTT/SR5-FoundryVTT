@@ -910,6 +910,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     _handleCreateCallInActionItem(event: PointerEvent, itemData: Item.CreateData) {
         const actorType = SheetFlow.closestAction(event.target)!.dataset.actorType;
+        if (!actorType) console.error(`Shadowrun 5e | Tried to create a Call In Action item without an actor-type context!`);
         itemData['system.actor_type'] = actorType;
     }
 

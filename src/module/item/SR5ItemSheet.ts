@@ -696,16 +696,16 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         } satisfies Item.CreateData;
 
         // Inject special case context based on item type
-        if (type === 'modification') this.addModificationItem(event, itemData);
+        if (type === 'modification') SR5ItemSheet.addModificationItem(event, itemData);
 
         const item = new SR5Item(itemData);
         await this.item.createNestedItem(item._source);
     }
 
     /**
-     * add system type to be a weapon when adding a weapon mod
+     * Add system type to be a weapon when adding a weapon mod
      */
-    addModificationItem(event: Event, itemData: Item.CreateData) {
+    static addModificationItem(event: Event, itemData: Item.CreateData) {
         itemData['system'] = { type: 'weapon' }
     }
 
