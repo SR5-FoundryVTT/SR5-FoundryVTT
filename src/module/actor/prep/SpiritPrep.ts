@@ -33,7 +33,6 @@ export class SpiritPrep {
 
         // Use spirit attribute range to avoid issues with attribute calculation causing unusable attributes.
         AttributesPrep.prepareAttributes(system, SR.attributes.rangesSpirit);
-        SpiritPrep.prepareAttributesWithForce(system);
         SkillsPrep.prepareSkills(system);
 
         LimitsPrep.prepareLimitBaseFromAttributes(system);
@@ -62,7 +61,8 @@ export class SpiritPrep {
         const overrides = this.getSpiritStatModifiers(system.spiritType);
 
         if (overrides) {
-            const { attributes, skills, initiative, force, modifiers } = system;
+            const { attributes, skills, initiative, modifiers } = system;
+            const force = Helpers.calcTotal(system.attributes.force);
 
             // set the base of attributes to the provided force
             for (const [attId, value] of Object.entries(overrides.attributes)) {
@@ -864,22 +864,5 @@ export class SpiritPrep {
         }
 
         return overrides;
-    }
-
-    /**
-     * The spirits force value is used for the force attribute value.
-     * 
-     * NOTE: This separation is mainly a legacy concern. Attributes are available as testable (and modifiable values)
-     *       flat values like force aren't. For this reason the flat value is transformed to an attribute.
-     * 
-     * @param system The spirit system data to prepare
-     */
-    static prepareAttributesWithForce(system: Actor.SystemOfType<'spirit'>) {
-        const { attributes, force } = system;
-
-        // Allow value to be understandable when displayed.
-        attributes.force.base = 0;
-        PartsList.AddUniquePart(attributes.force.mod, 'SR5.Force', force);
-        AttributesPrep.calculateAttribute('force', attributes.force);
     }
 }
