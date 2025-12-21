@@ -31,7 +31,9 @@
 
     {{#if @root.isEditMode}}
         <div class="list-item-icons">
-            {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type }}
+            {{log 'call_in_action header.hbs'}}
+            {{log type}}
+            {{> "systems/shadowrun5e/dist/templates/v2/list-items/header-add-icon.hbs" type=type data=(callInActionHeaderAddData actor_type) }}
         </div>
     {{/if}}
 </div>
