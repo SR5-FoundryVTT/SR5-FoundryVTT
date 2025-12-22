@@ -881,13 +881,17 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         if (!(event.target instanceof HTMLElement)) return;
         const type = SheetFlow.closestAction(event.target)!.dataset.itemType!;
 
-        // Unhide section it it was
+        // Unhide section new item will be in
         this._setInventoryTypeVisibility(type, true);
 
         const itemData = {
             type: type as Item.ConfiguredSubType,
             name: `${game.i18n.localize('SR5.New')} ${game.i18n.localize(SR5.itemTypes[type])}`
         } satisfies Item.CreateData;
+
+        // Inject special case context based on item type
+        if (type === 'call_in_action') this._handleCreateCallInActionItem(event, itemData);
+
         const items = await this.actor.createEmbeddedDocuments('Item', [itemData]);
         if (!items) return;
 
@@ -898,6 +902,16 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         for (const item of items) {
             await item.sheet?.render(true, { mode: 'edit' });
         }
+    }
+
+    /**
+     * Call In Actions need to prefill the actor type as it is used to filter the item when creating
+     * it directly from the sheet sections. If left empty, the created item will not be shown on sheet.
+     */
+    _handleCreateCallInActionItem(event: PointerEvent, itemData: Item.CreateData) {
+        const actorType = SheetFlow.closestAction(event.target)!.dataset.actorType;
+        if (!actorType) console.error(`Shadowrun 5e | Tried to create a Call In Action item without an actor-type context!`);
+        itemData['system.actor_type'] = actorType;
     }
 
     /**
