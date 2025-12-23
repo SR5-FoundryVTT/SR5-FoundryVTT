@@ -41,8 +41,20 @@ export class SR5SkillSheet<T extends SR5BaseItemSheetData = SR5SkillSheetData> e
         },
     }
 
+    static override TABS = {
+        primary: {
+            initial: 'description',
+            tabs: [
+                { id: 'description', label: 'SR5.Tabs.Item.Description', cssClass: '' },
+            ]
+        }
+    }
+
     override async _prepareContext(options: DeepPartial<SR5ApplicationMixinTypes.RenderOptions> & { isFirstRender: boolean }) {
         const context = await super._prepareContext(options) as T;
+
+        // TODO: Implement a SR5baseItemSheet to share stuff between SR5ItemSheet and more type specific sheets
+        context.primaryTabs = this._prepareTabs('primary');
 
         return context;
     }
