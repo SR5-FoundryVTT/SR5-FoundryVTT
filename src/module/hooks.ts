@@ -128,6 +128,7 @@ import { TagifyHooks } from '@/module/tagify/TagifyHooks';
 import { RiggingHooks } from '@/module/tests/hooks/RiggingHooks';
 import { SocketMessageFlow } from './flows/SocketMessageFlow';
 import { CompendiumBrowser } from './apps/compendiumBrowser/CompendiumBrowser';
+import { Skill } from './types/item/Skill';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -419,6 +420,7 @@ ___________________
         CONFIG.Item.dataModels["quality"] = Quality;
         CONFIG.Item.dataModels["ritual"] = Ritual;
         CONFIG.Item.dataModels["sin"] = Sin;
+        CONFIG.Item.dataModels["skill"] = Skill;
         CONFIG.Item.dataModels["spell"] = Spell;
         CONFIG.Item.dataModels["sprite_power"] = SpritePower;
         CONFIG.Item.dataModels["weapon"] = Weapon;

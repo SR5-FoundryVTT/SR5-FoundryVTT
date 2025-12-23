@@ -45,6 +45,7 @@ import { ActorArmorData } from "../types/template/Armor";
 import { CorrectionLog, Sanitizer } from "../sanitizer/Sanitizer";
 
 import DataSchema = foundry.data.fields.DataSchema;
+import { Skill } from "../types/item/Skill";
 const { SchemaField } = foundry.data.fields;
 
 const systemMap = {
@@ -77,6 +78,7 @@ const systemMap = {
     quality: Quality,
     ritual: Ritual,
     sin: Sin,
+    skill: Skill,
     spell: Spell,
     sprite_power: SpritePower,
     weapon: Weapon,

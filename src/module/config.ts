@@ -520,6 +520,12 @@ export const SR5 = {
         used: 'SR5.CyberwareGradeUsed',
     },
 
+    skillTypes: {
+        skill: 'SR5.Skill.Types.Skill',
+        group: 'SR5.Skill.Types.SkillGroup',
+        set: 'SR5.Skill.Types.SkillSet'
+    },
+
     knowledgeSkillCategories: {
         street: 'SR5.KnowledgeSkillStreet',
         academic: 'SR5.KnowledgeSkillAcademic',
