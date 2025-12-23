@@ -115,6 +115,9 @@
             "sin": {
                 "htmlField": ["description.value"]
             },
+            "skill": {
+                "htmlField": ["description.value"]
+            },
             "spell": {
                 "htmlField": ["description.value"]
             },
