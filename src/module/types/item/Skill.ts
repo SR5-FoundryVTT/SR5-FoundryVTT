@@ -29,6 +29,7 @@ const SkillSetTypeData = () => ({
 const SkillData = () => ({
     ...BaseItemData(),
 
+    // fields shared across all skill types.
     type: new StringField({ required: true, initial: 'skill', choices: SR5.skillTypes }),
     source: new StringField({ blank: true }),
     

@@ -129,6 +129,7 @@ import { RiggingHooks } from '@/module/tests/hooks/RiggingHooks';
 import { SocketMessageFlow } from './flows/SocketMessageFlow';
 import { CompendiumBrowser } from './apps/compendiumBrowser/CompendiumBrowser';
 import { Skill } from './types/item/Skill';
+import { SR5SkillSheet } from './item/sheets/SR5SkillSheet';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -474,6 +475,11 @@ ___________________
             label: "SR5.SheetItem",
             makeDefault: true,
             types: ['call_in_action']
+        });
+        foundry.documents.collections.Items.registerSheet(SYSTEM_NAME, SR5SkillSheet, {
+            label: "SR5.SheetItem",
+            makeDefault: true,
+            types: ['skill']
         });
 
         // Register configs for embedded documents.
