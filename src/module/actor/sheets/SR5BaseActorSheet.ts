@@ -921,8 +921,11 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     _handleCreateSkillItem(event: PointerEvent, itemData: Item.CreateData) {
         const skillCategory = SheetFlow.closestAction(event.target)!.dataset.skillCategory;
-        if (!skillCategory) console.error(`Shadowrun 5e | Tried to create a Skill item without a skill-category context!`);
+        const skillKnowledgeType = SheetFlow.closestAction(event.target)!.dataset.skillKnowledgeType;
+        
+        if (!skillCategory) console.error(`Shadowrun 5e | Tried to create a Skill item without a skill-category context!`);     
         itemData['system.skill.category'] = skillCategory;
+        if (skillKnowledgeType) itemData['system.skill.knowledgeType'] = skillKnowledgeType;
     }
 
     /**

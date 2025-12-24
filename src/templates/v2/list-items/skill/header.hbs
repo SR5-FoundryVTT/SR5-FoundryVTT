@@ -24,7 +24,7 @@
         {{#if @root.isEditMode}}
             {{#if addAction}}
                 {{> "systems/shadowrun5e/dist/templates/v2/list-items/add-icon.hbs" 
-                    action=addAction tooltip="SR5.Add" type='skill' data=(skillAddItemData category) }}
+                    action=addAction tooltip="SR5.Add" type='skill' data=(skillAddItemData category knowledgeType) }}
             {{/if}}
         {{/if}}
     </div>
