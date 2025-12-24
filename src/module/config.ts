@@ -532,6 +532,13 @@ export const SR5 = {
         language: 'SR5.Skill.Category.Language',
     },
 
+    skillKnowledgeTypes: {
+        academic: 'SR5.Skill.KnowledgeType.Academic',
+        professional: 'SR5.Skill.KnowledgeType.Professional',
+        interests: 'SR5.Skill.KnowledgeType.Interests',
+        street: 'SR5.Skill.KnowledgeType.Street',
+    },
+
     knowledgeSkillCategories: {
         street: 'SR5.KnowledgeSkillStreet',
         academic: 'SR5.KnowledgeSkillAcademic',

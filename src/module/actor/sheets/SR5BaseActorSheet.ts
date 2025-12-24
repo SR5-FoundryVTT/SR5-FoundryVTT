@@ -891,6 +891,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         // Inject special case context based on item type
         if (type === 'call_in_action') this._handleCreateCallInActionItem(event, itemData);
+        if (type === 'skill') this._handleCreateSkillItem(event, itemData);
 
         const items = await this.actor.createEmbeddedDocuments('Item', [itemData]);
         if (!items) return;
@@ -912,6 +913,16 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const actorType = SheetFlow.closestAction(event.target)!.dataset.actorType;
         if (!actorType) console.error(`Shadowrun 5e | Tried to create a Call In Action item without an actor-type context!`);
         itemData['system.actor_type'] = actorType;
+    }
+
+    /**
+     * Skill items need to prefill the skill category as it is used to filter the item when creating
+     * it directly from the sheet sections. If left empty, the created item will not be shown on sheet.
+     */
+    _handleCreateSkillItem(event: PointerEvent, itemData: Item.CreateData) {
+        const skillCategory = SheetFlow.closestAction(event.target)!.dataset.skillCategory;
+        if (!skillCategory) console.error(`Shadowrun 5e | Tried to create a Skill item without a skill-category context!`);
+        itemData['system.skill.category'] = skillCategory;
     }
 
     /**

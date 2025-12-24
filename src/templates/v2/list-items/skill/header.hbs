@@ -23,10 +23,8 @@
     <div class="list-item-icons{{#if @root.isPlayMode}} skinny-icons {{/if}}">
         {{#if @root.isEditMode}}
             {{#if addAction}}
-                <a data-action="{{addAction}}"
-                   data-skill-type="{{addSkillType}}">
-                    {{localize "SR5.Add"}}&nbsp;<i class="fas fa-plus"></i>
-                </a>
+                {{> "systems/shadowrun5e/dist/templates/v2/list-items/add-icon.hbs" 
+                    action=addAction tooltip="SR5.Add" type='skill' data=(skillAddItemData category) }}
             {{/if}}
         {{/if}}
     </div>

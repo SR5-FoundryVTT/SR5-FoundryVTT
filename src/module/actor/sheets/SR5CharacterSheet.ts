@@ -26,6 +26,7 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
             ...itemTypes,
             'program',
             'sin',
+            'skill',
             'lifestyle',
             'contact',
             'spell',
