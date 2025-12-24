@@ -1,7 +1,8 @@
 <div id="language-knowledge-skills-scrollable" class="scrollable">
     {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/header.hbs'
         label="SR5.Languages"
-        addAction="addLanguageSkill" }}
+        addAction="addItem" 
+        category='language' }}
     {{#each system.skills.language.value as |skill sid|}}
         {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/item.hbs'
             skillPath=(concat "system.skills.language.value." sid)
