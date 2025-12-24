@@ -22,6 +22,7 @@ export class SR5SkillSheet<T extends SR5BaseItemSheetData = SR5SkillSheetData> e
     // TODO: taMiF - any should be replaced by correct DEFAULT_OPTIONS declaration?
     //               are we using DEFAULT_OPTIONS inerhitance?
     static override DEFAULT_OPTIONS: any = {
+        // TODO: tamIf - What is the point of these classes?
         classes: ['item', 'named-sheet'],
         actions: {}
     }
@@ -51,7 +52,8 @@ export class SR5SkillSheet<T extends SR5BaseItemSheetData = SR5SkillSheetData> e
 
     static override TABS = {
         primary: {
-            initial: 'description',
+            // TODO: tamIf use description as default tab / whatever is default on other item sheets
+            initial: 'details',
             tabs: [
                 { id: 'description', label: 'SR5.Tabs.Item.Description', cssClass: '' },
                 { id: 'details', label: 'SR5.Tabs.Item.Details', cssClass: '' },

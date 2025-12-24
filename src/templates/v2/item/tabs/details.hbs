@@ -767,6 +767,11 @@
                 {{/if}}
             {{/if}}
             {{#if (isType item 'skill')}}
+                <div class="list-item list-item-header">
+                    <div class="list-item-start">
+                        <label>{{localize "SR5.General"}}</label>
+                    </div>
+                </div>
                 <div class="list-item">
                     <div class="list-item-start skinny">
                         <label data-tooltip="{{systemFields.type.hint}}">{{systemFields.type.label}}</label>
@@ -778,7 +783,24 @@
                 </div>
 
                 {{#if (eq system.type 'skill')}}
-                Skill
+                <div class="list-item list-item-header">
+                    <div class="list-item-start">
+                        <label>{{localize "SR5.Skill.Types.Skill"}}</label>
+                    </div>
+                </div>
+                <div class="scrollable">
+                    <div class="list-item">
+                        <div class="list-item-start skinny">
+                            <label data-tooltip="{{systemFields.skill.fields.rating.hints}}">{{systemFields.skill.fields.rating.label}}</label>
+                        </div>
+                        <div class="list-item-col">
+                            {{formInput systemFields.skill.fields.rating
+                                        value=system.skill.rating
+                                        classes="short" rootId=@root.rootId
+                                        disabled=@root.isPlayMode }}
+                        </div>
+                    </div>
+                </div>                    
                 {{else if (eq system.type 'group')}}
                 Group
                 {{else if (eq system.type 'set')}}

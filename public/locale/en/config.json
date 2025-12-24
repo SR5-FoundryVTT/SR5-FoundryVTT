@@ -2127,6 +2127,12 @@
                 "type": {
                     "label": "Type",
                     "hint": "Defines what kind of skill configurations are available"
+                },
+                "skill": {
+                    "rating": {
+                        "label": "Rating",
+                        "hint": "Rating of this entry"
+                    }
                 }
             },
             "Types": {
