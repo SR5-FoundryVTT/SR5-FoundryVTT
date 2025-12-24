@@ -5,6 +5,8 @@ import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from "@/module/handleba
 
 import ItemSheet = foundry.applications.sheets.ItemSheet;
 
+console.error('asd');
+
 interface SR5SkillSheetData extends SR5BaseItemSheetData {
 }
 
@@ -18,7 +20,9 @@ interface SR5SkillSheetData extends SR5BaseItemSheetData {
  */
 export class SR5SkillSheet<T extends SR5BaseItemSheetData = SR5SkillSheetData> extends SR5ApplicationMixin(ItemSheet)<T>{
     // TODO: taMiF - any should be replaced by correct DEFAULT_OPTIONS declaration?
+    //               are we using DEFAULT_OPTIONS inerhitance?
     static override DEFAULT_OPTIONS: any = {
+        classes: ['item', 'named-sheet'],
         actions: {}
     }
 
@@ -35,6 +39,10 @@ export class SR5SkillSheet<T extends SR5BaseItemSheetData = SR5SkillSheetData> e
             template: SheetFlow.templateBase('item/tabs/description'),
             scrollable: ['.scrollable']
         },
+        details: {
+            template: SheetFlow.templateBase('item/tabs/details'),
+            scrollable: ['.scrollable']
+        },
         footer: {
             template: SheetFlow.templateBase('item/footer'),
             scrollable: ['.scrollable']
@@ -46,12 +54,15 @@ export class SR5SkillSheet<T extends SR5BaseItemSheetData = SR5SkillSheetData> e
             initial: 'description',
             tabs: [
                 { id: 'description', label: 'SR5.Tabs.Item.Description', cssClass: '' },
+                { id: 'details', label: 'SR5.Tabs.Item.Details', cssClass: '' },
             ]
         }
     }
 
     override async _prepareContext(options: DeepPartial<SR5ApplicationMixinTypes.RenderOptions> & { isFirstRender: boolean }) {
         const context = await super._prepareContext(options) as T;
+        // TODO: this can be abstracted into a base item base sheet or better yet to context.document
+        context.item = this.document;
 
         // TODO: Implement a SR5baseItemSheet to share stuff between SR5ItemSheet and more type specific sheets
         context.primaryTabs = this._prepareTabs('primary');

@@ -458,7 +458,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         data.rollModes = CONFIG.Dice.rollModes;
 
-        data.primaryTabs = this._prepareTabs('primary');
         data.item = this.item;
 
         data.isNestedItem = this.item._isNestedItem;

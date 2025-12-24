@@ -148,6 +148,8 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
             context.isLimited = !game.user?.isGM && !!this.document?.limited;
             context.isEditable = !!this.isEditable;
 
+            context.primaryTabs = this._prepareTabs('primary');
+
             context.expandedUuids = {};
             for (const uuid of this.expandedUuids) {
                 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
