@@ -2123,6 +2123,17 @@
             "Total": "Result"
         },
         "Skill": {
+            "FIELDS": {
+                "type": {
+                    "label": "Type",
+                    "hint": "Defines what kind of skill configurations are available"
+                }
+            },
+            "Types": {
+                "Skill": "Skill",
+                "Group": "Skill Group",
+                "Set": "Skill Set"
+            },
             "abbr": {
                 "Native": "N"
             },

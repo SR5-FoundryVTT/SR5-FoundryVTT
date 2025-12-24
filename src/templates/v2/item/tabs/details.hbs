@@ -454,6 +454,7 @@
                         </div>
                     </div>
                 {{/if}}
+
             {{/if}}
             {{#if systemFields.action}}
                 <div class="list-item list-item-header">
@@ -764,6 +765,17 @@
                         </div>
                     </div>
                 {{/if}}
+            {{/if}}
+            {{#if (isType item 'skill')}}
+                <div class="list-item">
+                    <div class="list-item-start skinny">
+                        <label data-tooltip="{{systemFields.type.hint}}">{{systemFields.type.label}}</label>
+                    </div>
+                    <div class="list-item-col">
+                        {{formInput systemFields.type value=system.type
+                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </div>
+                </div>
             {{/if}}
         </div>
     </div>

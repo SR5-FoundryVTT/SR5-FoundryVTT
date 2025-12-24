@@ -3,6 +3,7 @@ import { BaseItemData, ItemBase } from "./ItemBase";
 const { ArrayField, BooleanField, NumberField, StringField, SchemaField } = foundry.data.fields;
 
 const SkillTypeData = () => ({ 
+    category: new StringField({ required: true, initial: 'active', choices: SR5.skillCategories }),
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     defaulting: new BooleanField({ required: true, nullable: false, initial: false }),
     attribute: new StringField({ required: true, blank: true, choices: SR5.attributes }),
@@ -16,8 +17,9 @@ const SkillGroupTypeData = () => ({
 });
 
 const SkillSetSkillData = () => ({
-    // Skill names
+    // will contain a single skill name.
     name: new StringField({ required: true }),
+    // will contain rating for that skill.
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
 });
 
@@ -31,7 +33,6 @@ const SkillData = () => ({
 
     // fields shared across all skill types.
     type: new StringField({ required: true, initial: 'skill', choices: SR5.skillTypes }),
-    source: new StringField({ blank: true }),
     
     // data depending on skill type.
     skill: new SchemaField(SkillTypeData()),

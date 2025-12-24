@@ -522,8 +522,14 @@ export const SR5 = {
 
     skillTypes: {
         skill: 'SR5.Skill.Types.Skill',
-        group: 'SR5.Skill.Types.SkillGroup',
-        set: 'SR5.Skill.Types.SkillSet'
+        group: 'SR5.Skill.Types.Group',
+        set: 'SR5.Skill.Types.Set'
+    },
+
+    skillCategories: {
+        active: 'SR5.Skill.Category.Active',
+        knowledge: 'SR5.Skill.Category.Knowledge',
+        language: 'SR5.Skill.Category.Language',
     },
 
     knowledgeSkillCategories: {
