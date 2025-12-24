@@ -776,6 +776,14 @@
                                     classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                     </div>
                 </div>
+
+                {{#if (eq system.type 'skill')}}
+                Skill
+                {{else if (eq system.type 'group')}}
+                Group
+                {{else if (eq system.type 'set')}}
+                Set
+                {{/if}}
             {{/if}}
         </div>
     </div>
