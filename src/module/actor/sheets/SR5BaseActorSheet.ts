@@ -969,9 +969,11 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     async _handleDeleteItem(item: SR5Item) {
         // remove from the inventory tracking system
-        return this.actor.inventory.removeItem(item).then(async () =>
-            this.actor.deleteEmbeddedDocuments('Item', [item.id!])
-        );
+        return this.actor.inventory.removeItem(item).then(async () => {
+            console.error('TODO: tamif - what is the need for this structure?')
+            // this.actor.deleteEmbeddedDocuments('Item', [item.id!])
+            item.delete()
+        });
     }
 
     static async #deleteItem(this: SR5BaseActorSheet, event: PointerEvent) {
