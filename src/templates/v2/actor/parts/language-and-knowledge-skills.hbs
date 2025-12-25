@@ -3,28 +3,26 @@
         label="SR5.Languages"
         addAction="addItem" 
         category='language' }}
-    {{#each system.skills.language.value as |skill sid|}}
+    {{#each skills.language as |skill translated|}}
         {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/item.hbs'
-            skillPath=(concat "system.skills.language.value." sid)
             skill=skill
             category='language'
-            id=sid }}
+            translated=translated }}
     {{/each}}
-    {{#each system.skills.knowledge as |cat cid|}}
+    {{#each skills.knowledge as |skills knowledgeType|}}
         {{!-- Skip over empty knowledge categories during play mode --}}
-        {{#if (or @root.isEditMode (not (empty cat.value)))}}
+        {{#if (or @root.isEditMode (not (empty skills)))}}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/header.hbs'
-                label=(localizeOb cid @root.config.knowledgeSkillCategories)
+                label=(localizeOb knowledgeType @root.config.knowledgeSkillCategories)
                 addAction="addItem"
                 category='knowledge'
-                knowledgeType=cid }}
-            {{#each cat.value as |skill sid|}}
+                knowledgeType=knowledgeType }}
+            {{#each skills as |skill translated|}}
                 {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/item.hbs'
-                    skillPath=(concat "system.skills.knowledge." cid ".value" sid)
                     skill=skill
                     category='knowledge'
-                    subcategory=cid
-                    id=sid }}
+                    subcategory=knowledgeType
+                    translated=translated}}
             {{/each}}
         {{/if}}
     {{/each}}

@@ -15,13 +15,12 @@
         />
     </div>
     <section id="active-skills-scroll" class="scrollable">
-        {{#each system.skills.active as |skill sid|}}
+        {{#each skills.active as |skill translated|}}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/item.hbs'
-                skillPath=(concat "system.skills.active." sid)
                 category='active'
                 skill=skill
                 removeAction="removeActiveSkill"
-                id=sid
+                translated=translated
             }}
         {{/each}}
     </section>

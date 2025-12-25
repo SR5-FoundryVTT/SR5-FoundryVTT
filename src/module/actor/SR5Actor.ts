@@ -97,6 +97,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     // Quick access for all items of a type.
     itemsForType = new Map<Item.ConfiguredSubType, SR5Item[]>();
 
+    // Quick access to all skill items based on their configuration.
+    skills = SkillFlow.getDefaultActorSkills();
+
     constructor(data: Actor.CreateData<SubType>, context?: Actor.ConstructionContext) {
         super(data, context);
 
@@ -133,6 +136,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     override prepareData() {
         super.prepareData();
         this.prepareItemsForType();
+        this.prepareSkills();
     }
 
     /**
@@ -282,6 +286,38 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             const items = this.itemsForType.get(item.type) as any[];
             items.push(item);
             this.itemsForType.set(item.type, items);
+        }
+    }
+
+    /**
+     * Prepare skill items for easy use and access.
+     */
+    prepareSkills() {
+        this.skills = SkillFlow.getDefaultActorSkills();
+        const skills = this.itemsForType.get('skill') as SR5Item<'skill'>[];
+        if (!skills) return;
+
+        // Sort skills into types.
+        for (const skill of skills) {
+            if(skill.system.type !== 'skill') continue;
+
+            const skillType = skill.system.skill.category as string;
+            // TODO: tamif - assert skillType to always exist.
+            if (!Object.hasOwn(this.skills, skillType)) continue;
+
+            // TODO: tamif - should SR5Actor already localize or should we outload this to the sheet class
+            //               as it is a display issue and not a data issue. Same with sorting.
+            this.skills.named.set(skill.name, skill);
+            this.skills.localized.set(SkillFlow.localizeSkillName(skill.name), skill);
+
+            if (skillType === 'knowledge') {
+                const skillKnowledgeType = skill.system.skill.knowledgeType
+                // TODO: tamif - assert no missing knowledge type
+                this.skills.knowledge[skillKnowledgeType as KnowledgeSkillCategory].push(skill);
+            } else {
+            // TODO: tamif - resolve linter error
+                this.skills[skillType]!.push(skill);
+            }
         }
     }
 

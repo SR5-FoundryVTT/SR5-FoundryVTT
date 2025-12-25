@@ -14,7 +14,8 @@
                         </div>
                     {{/if}}
                 </div>
-                {{#each skill.specs as |spec index|}}
+                {{!-- TODO: tamif - implement specialization display for new skill structure --}}
+                {{!-- {{#each skill.specs as |spec index|}}
                 <div class="list-item">
                     <div class="list-item-start">
                         {{formInput @root.skillFields.specs.element name=(concat @root.skill_name '.specs.' index) value=spec
@@ -28,7 +29,7 @@
                         </div>
                     {{/if}}
                 </div>
-                {{/each}}
+                {{/each}} --}}
                 {{!-- Hide Skill Bonus fields if none are set, we will migrate them eventually --}}
                 {{#if skill.bonus.length}}
                     <div class="list-item list-item-header">

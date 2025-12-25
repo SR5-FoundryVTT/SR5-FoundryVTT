@@ -24,6 +24,7 @@ import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/t
 import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
 import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
 import { SheetFlow } from '@/module/flows/SheetFlow';
+import { SkillFlow, Skills } from '@/module/actor/flows/SkillFlow';
 import { PackActionFlow } from '@/module/item/flows/PackActionFlow';
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import ActorSheetV2 = foundry.applications.sheets.ActorSheetV2;
@@ -59,10 +60,26 @@ export interface SR5SheetFilters {
     showUntrainedSkills: boolean
 }
 
+/**
+ * A sheet variant of the SR5Actor#skills data structure
+ * All keys are localized strings.
+ */
+interface SheetSkills {
+    active: Record<string, SR5Item<'skill'>>;
+    language: Record<string, SR5Item<'skill'>>;
+    knowledge: {
+        street: Record<string, SR5Item<'skill'>>;
+        academic: Record<string, SR5Item<'skill'>>;
+        professional: Record<string, SR5Item<'skill'>>;
+        interests: Record<string, SR5Item<'skill'>>;
+    }
+}
+
 export interface SR5ActorSheetData extends ActorSheetV2.RenderContext, SR5ApplicationMixinTypes.RenderContext {
     actor: SR5Actor;
     config: typeof SR5CONFIG;
     system: SR5Actor['system'];
+    skills: SheetSkills;
 
     // Sheet filters
     filters: SR5SheetFilters;
@@ -367,7 +384,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         // Valid data fields for all actor types.
         this._prepareActorTypeFields(data);
         this._prepareSpecialFields(data);
-        this._prepareSkillsWithFilters(data);
+        // TODO: tamif - implement this for new skill structure
+        // this._prepareSkillsWithFilters(data);
+
+        this._prepareSkills(data);
 
         data.itemType = this._prepareItemTypes();
         data.effects = prepareSortedEffects(this.actor.effects.contents);
@@ -922,8 +942,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     _handleCreateSkillItem(event: PointerEvent, itemData: Item.CreateData) {
         const skillCategory = SheetFlow.closestAction(event.target)!.dataset.skillCategory;
         const skillKnowledgeType = SheetFlow.closestAction(event.target)!.dataset.skillKnowledgeType;
-        
-        if (!skillCategory) console.error(`Shadowrun 5e | Tried to create a Skill item without a skill-category context!`);     
+
+        if (!skillCategory) console.error(`Shadowrun 5e | Tried to create a Skill item without a skill-category context!`);
         itemData['system.skill.category'] = skillCategory;
         if (skillKnowledgeType) itemData['system.skill.knowledgeType'] = skillKnowledgeType;
     }
@@ -1259,8 +1279,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     /**
      * Categorize and sort spells to display cleanly.
-     * 
-     * @param inventories 
+     *
+     * @param inventories
      */
     _prepareSortedCategorizedSpells(spellSheets: SR5Item[]) {
         const sortedSpells : Record<string, SR5Item[]> = {};
@@ -1391,10 +1411,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     /**
      * Count the currently active and max programs for sheet display in this style:
-     * 
+     *
      * Only personas using a device will show this count.
-     * 
-     * @param itemTypes 
+     *
+     * @param itemTypes
      * @returns (<active>/<max>) or ''
      */
     _prepareProgramCount(itemTypes: Record<string, SR5Item[]>): string {
@@ -1409,49 +1429,77 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
     /**
      * Prepare skills with sorting and filtering given by this sheet.
-     * 
+     *
      * @param sheetData What is to be displayed on sheet.
      */
     _prepareSkillsWithFilters(sheetData: SR5ActorSheetData) {
         this._filterActiveSkills(sheetData);
     }
 
-    _filterSkills(data: SR5ActorSheetData, skills: SkillsType = {}) : SkillsType {
+    /**
+     * Prepare skills with sorting and filtering given by this sheet.
+     *
+     * @param sheetData What is to be displayed on sheet.
+     */
+    _prepareSkills(sheetData: SR5ActorSheetData) {
+        sheetData.skills = {
+            active: {},
+            language: {},
+            knowledge: {
+                street: {},
+                academic: {},
+                professional: {},
+                interests: {}
+            }
+        };
+
+        sheetData.skills = this._sortSkills(sheetData, this.document.skills);
+    }
+
+    _sortSkills(sheetData: SR5ActorSheetData, skills: Skills) {
+        sheetData.skills.active = SkillFlow.sortSkills(skills.active);
+        sheetData.skills.language = SkillFlow.sortSkills(skills.language);
+        sheetData.skills.knowledge.street = SkillFlow.sortSkills(skills.knowledge.street);
+        sheetData.skills.knowledge.academic = SkillFlow.sortSkills(skills.knowledge.academic);
+        sheetData.skills.knowledge.professional = SkillFlow.sortSkills(skills.knowledge.professional);
+        sheetData.skills.knowledge.interests = SkillFlow.sortSkills(skills.knowledge.interests);
+
+        return sheetData.skills;
+    }
+
+    _filterSkills(sheetData: SR5ActorSheetData, skills: Record<string, SR5Item<'skill'>> = {}) {
         const filteredSkills = {};
         for (const [key, skill] of Object.entries(skills)) {
-            // Don't show hidden skills.
-            if (skill.hidden) {
-                continue;
-            }
             // Filter visible skills.
-            if (this._showSkill(key, skill, data)) {
+            if (this._showSkill(key, skill, sheetData)) {
                 filteredSkills[key] = skill;
             }
         }
 
-        return Helpers.sortSkills(filteredSkills);
+        // return Helpers.sortSkills(filteredSkills);
+        return filteredSkills;
     }
 
-    _showSkill(key: string, skill: SkillFieldType, data: SR5ActorSheetData) {
-        if (this._showMagicSkills(key, skill, data)) {
+    _showSkill(key: string, skill: SR5Item<'skill'>, sheetData: SR5ActorSheetData) {
+        if (this._showMagicSkills(key, skill, sheetData)) {
             return true;
         }
-        if (this._showResonanceSkills(key, skill, data)) {
+        if (this._showResonanceSkills(key, skill, sheetData)) {
             return true;
         }
 
         return this._showGeneralSkill(key, skill);
     }
 
-    _showGeneralSkill(skillId: string, skill: SkillFieldType) {
+    _showGeneralSkill(skillId: string, skill: SR5Item<'skill'>) {
         return !this._isSkillMagic(skillId, skill) && !this._isSkillResonance(skill);
     }
 
-    _showMagicSkills(skillId: string, skill: SkillFieldType, sheetData: SR5ActorSheetData) {
+    _showMagicSkills(skillId: string, skill: SR5Item<'skill'>, sheetData: SR5ActorSheetData) {
         return this._isSkillMagic(skillId, skill) && sheetData.system.special === 'magic';
     }
 
-    _showResonanceSkills(skillId: string, skill: SkillFieldType, sheetData: SR5ActorSheetData) {
+    _showResonanceSkills(skillId: string, skill: SR5Item<'skill'>, sheetData: SR5ActorSheetData) {
         return this._isSkillResonance(skill) && sheetData.system.special === 'resonance';
     }
 
@@ -1538,15 +1586,15 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     _filterActiveSkills(sheetData: SR5ActorSheetData) {
         // Handle active skills directly, as it doesn't use sub-categories.
-        sheetData.system.skills.active = this._filterSkills(sheetData, sheetData.system.skills.active);
+        sheetData.skills.active = this._filterSkills(sheetData, sheetData.skills.active);
     }
 
-    _isSkillMagic(id: string, skill: SkillFieldType) {
-        return skill.attribute === 'magic' || id === 'astral_combat' || id === 'assensing';
+    _isSkillMagic(id: string, skill: SR5Item<'skill'>) {
+        return skill.system.skill.attribute === 'magic' || id === 'astral_combat' || id === 'assensing';
     }
 
-    _isSkillResonance(skill: SkillFieldType) {
-        return skill.attribute === 'resonance';
+    _isSkillResonance(skill: SR5Item<'skill'>) {
+        return skill.system.skill.attribute === 'resonance';
     }
 
     private _closestSkillTarget(target: HTMLElement): HTMLElement | null {
@@ -1934,7 +1982,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     /**
-     * Prepare keybindings to be shown when hovering over a rolling icon 
+     * Prepare keybindings to be shown when hovering over a rolling icon
      * in any list item view that has rolls.
      */
     _prepareKeybindings() {
@@ -1948,8 +1996,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     /**
      * These effect apply to types are meant to be shown on the item effects section of the effects sheet.
-     * 
-     * They are limited to those effects directly affecting this actor. Effects affecting other actors, aren't shown 
+     *
+     * They are limited to those effects directly affecting this actor. Effects affecting other actors, aren't shown
      * on the actors own sheet.
      */
     get itemEffectApplyTos() {

@@ -50,14 +50,10 @@
         <div class="list-item-col {{#if @root.isPlayMode}} skinny-col {{/if}}">
             {{#if @root.isEditMode}}
                 {{!-- use the original method of setting data because skills are weird in data model, they'll be items eventually --}}
-                <input type="number" name="{{concat skillPath '.base'}}" class="short skinny" value="{{skill.base}}" data-skill="{{id}}" >
+                <input type="number" class="short skinny" value="{{skill.system.skill.rating}}" data-skill="{{skill.id}}" >
             {{else}}
-                <label data-skill-modifier-tooltip="{{id}}">
-                    {{#if skill.isNative}}
-                        {{localize "SR5.Skill.abbr.Native"}}
-                    {{else}}
-                        {{skill.value}}
-                    {{/if}}
+                <label data-skill-modifier-tooltip="{{skill.id}}">
+                    {{translated}}
                 </label>
             {{/if}}
         </div>

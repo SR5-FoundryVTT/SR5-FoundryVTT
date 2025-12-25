@@ -13,6 +13,7 @@ import { SkillFieldType, SkillsType } from "./types/template/Skills";
 import { ModifiedDamageType } from "./types/rolls/ActorRolls";
 import { RangeTemplateType } from "./types/template/Weapon";
 import { MatrixTestData, OpposedMatrixTestData } from './tests/MatrixTest';
+import { SkillFlow } from './actor/flows/SkillFlow';
 
 type OneOrMany<T> = T | T[];
 
@@ -761,41 +762,6 @@ export class Helpers {
         return {[path]: {[`-=${key}`]: null}};
     }
 
-    static localizeSkill(skill: SkillFieldType): string {
-        return skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
-    }
-
-    /**
-     * Alphabetically sort skills either by their translated label. Should a skill not have one, use the name as a
-     * fallback.
-     *
-     * Sorting should be aware of UTF-8, however please blame JavaScript if it's not. :)
-     *
-     * @param skills
-     * @param asc Set to true for ascending sorting order and to false for descending order.
-     * @return Sorted Skills given by the skills parameter
-     */
-    static sortSkills(skills: SkillsType, asc = true): SkillsType {
-        // Filter entries instead of values to have a store of ids for easy rebuild.
-        const sortedEntries = Object.entries(skills).sort(([aId, a], [bId, b]) => {
-            const comparatorA = Helpers.localizeSkill(a) || aId;
-            const comparatorB = Helpers.localizeSkill(b) || bId;
-            // Use String.localeCompare instead of the > Operator to support other alphabets.
-            if (asc)
-                return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
-            else
-                return comparatorA.localeCompare(comparatorB) === 1 ? -1 : 1;
-        });
-
-        // Rebuild the Skills type using the earlier entries.
-        const sortedAsObject = {};
-        for (const [id, skill] of sortedEntries) {
-            sortedAsObject[id] = skill;
-        }
-
-        return sortedAsObject;
-    }
-
     /**
      * Alphabetically sort any SR5 config object with a key to label structure.
      *
@@ -1046,7 +1012,7 @@ export class Helpers {
     /**
      * Slugify a name to match it's label counterpart in the i18n files.
      * For that it needs to be PascalCase and without spaces.
-     * 
+     *
      * This can happen when displaying a packs document name translated on
      * sheet, as the document name will be human readable and in English, while
      * on sheet it should be match the display language.
