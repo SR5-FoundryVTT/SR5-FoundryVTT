@@ -821,9 +821,9 @@ export class Helpers {
      * @param skill
      * @returns Either a translation or a name.
      */
-    static getSkillLabelOrName(skill: SkillFieldType): string {
-        // Custom skills don't have labels, use their name instead.
-        return skill.label ? game.i18n.localize(skill.label as Translation) : skill.name || '';
+    static getSkillLabelOrName(skill: SR5Item<'skill'>): string {
+        console.error('TODO: tamif - this needs to be combined with SkillFlow');
+        return SkillFlow.localizeSkillName(skill.name);
     }
 
     /**

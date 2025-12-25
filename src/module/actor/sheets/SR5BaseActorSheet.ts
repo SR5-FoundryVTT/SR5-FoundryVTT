@@ -280,12 +280,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             rollSkillSpecialization: SR5BaseActorSheet.#rollSkillSpec,
             openSkillDescription: SR5BaseActorSheet.#toggleSkillDescription,
             filterTrainedSkills: SR5BaseActorSheet.#filterUntrainedSkills,
-            addKnowledgeSkill: SR5BaseActorSheet.#createKnowledgeSkill,
-            addLanguageSkill: SR5BaseActorSheet.#createLanguageSkill,
-            addActiveSkill: SR5BaseActorSheet.#createActiveSkill,
-            removeKnowledgeSkill: SR5BaseActorSheet.#deleteKnowledgeSkill,
-            removeLanguageSkill: SR5BaseActorSheet.#deleteLanguageSkill,
-            removeActiveSkill: SR5BaseActorSheet.#deleteActiveSkill,
+            // TODO: tamif - remove skill actions from sheets.
+            // addKnowledgeSkill: SR5BaseActorSheet.#createKnowledgeSkill,
+            // addLanguageSkill: SR5BaseActorSheet.#createLanguageSkill,
+            // addActiveSkill: SR5BaseActorSheet.#createActiveSkill,
+            // removeKnowledgeSkill: SR5BaseActorSheet.#deleteKnowledgeSkill,
+            // removeLanguageSkill: SR5BaseActorSheet.#deleteLanguageSkill,
+            // removeActiveSkill: SR5BaseActorSheet.#deleteActiveSkill,
 
             resetActorRunData: SR5BaseActorSheet.#resetActorRunData,
 
@@ -416,7 +417,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         for (const id of this.expandedSkills) {
             const skill = this.actor.getSkill(id);
             if (skill) {
-                const html = await TextEditor.enrichHTML(skill.description, { secrets: this.actor.isOwner, });
+                const html = await TextEditor.enrichHTML(skill.system.description.value, { secrets: this.actor.isOwner, });
                 data.expandedSkills[id] = { html, }
             }
         }
@@ -1557,21 +1558,22 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             });
     }
 
-    _isSkillFiltered(skillId: string, skill: SkillFieldType) {
+    _isSkillFiltered(skillId: string, skill: SR5Item<'skill'>) {
         // a newly created skill shouldn't be filtered, no matter what.
         // Therefore disqualify empty skill labels/names from filtering and always show them.
         const isFilterable = this._getSkillLabelOrName(skill).length > 0;
         const isHiddenForText = !this._doesSkillContainText(skillId, skill, this._filters.skills);
-        const isHiddenForUntrained = !this._filters.showUntrainedSkills && skill.value === 0;
+        console.error('TODO: tamif - must use skill value instead of rating');
+        const isHiddenForUntrained = !this._filters.showUntrainedSkills && skill.system.skill.rating === 0;
 
         return !(isFilterable && (isHiddenForUntrained || isHiddenForText));
     }
 
-    _getSkillLabelOrName(skill: SkillFieldType) {
+    _getSkillLabelOrName(skill: SR5Item<'skill'>) {
         return Helpers.getSkillLabelOrName(skill);
     }
 
-    _doesSkillContainText(key: string, skill: SkillFieldType, text: string) {
+    _doesSkillContainText(key: string, skill: SR5Item<'skill'>, text: string) {
         if (!text) {
             return true;
         }
@@ -1579,8 +1581,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         // Search both english keys, localized labels and all specializations.
         const name = this._getSkillLabelOrName(skill);
         const searchKey = skill.name === undefined ? key : '';
-        // some "specs" were a string from old code I think
-        const specs = skill.specs !== undefined && Array.isArray(skill.specs) ? skill.specs.join(' ') : '';
+        const specs = skill.system.skill.specializations.join(' ');
         const searchString = `${searchKey} ${name} ${specs}`;
 
         return searchString.toLowerCase().search(text.toLowerCase()) > -1;
@@ -1608,21 +1609,28 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const skillId = closest?.dataset.skillId;
         const category = closest?.dataset.category;
 
-        if (skillId) {
-            if (!category || category === 'active') {
-                const app = new SkillEditSheet({document: this.actor}, skillId)
-                await app.render(true, {mode: 'edit'} as any);
-            } else if (category === 'knowledge') {
-                const subcategory = closest?.dataset.subcategory as KnowledgeSkillCategory;
-                if (subcategory) {
-                    const app = new KnowledgeSkillEditSheet({document: this.actor}, skillId, subcategory)
-                    await app.render(true, {mode: 'edit'} as any);
-                }
-            } else if (category === 'language') {
-                const app = new LanguageSkillEditSheet({document: this.actor}, skillId)
-                await app.render(true, {mode: 'edit'} as any);
-            }
-        }
+        if (!skillId) return;
+        if (!category) return;
+
+        console.error('TODO: tamif - implement skill edit sheets');
+        const skill = this.actor.items.get(skillId);
+        if (!skill) return;
+
+        await skill.sheet?.render(true, {mode: 'edit'});
+
+        // if (category === 'active') {
+        //     const app = new SkillEditSheet({document: this.actor}, skillId)
+        //     await app.render(true, {mode: 'edit'} as any);
+        // } else if (category === 'knowledge') {
+        //     const subcategory = closest?.dataset.subcategory as KnowledgeSkillCategory;
+        //     if (subcategory) {
+        //         const app = new KnowledgeSkillEditSheet({document: this.actor}, skillId, subcategory)
+        //         await app.render(true, {mode: 'edit'} as any);
+        //     }
+        // } else if (category === 'language') {
+        //     const app = new LanguageSkillEditSheet({document: this.actor}, skillId)
+        //     await app.render(true, {mode: 'edit'} as any);
+        // }
     }
 
     static async #editSkill(this: SR5BaseActorSheet, event: PointerEvent) {
@@ -1634,9 +1642,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.preventDefault();
         if (!(event.target instanceof HTMLElement)) return;
         const closest = this._closestSkillTarget(event.target);
-        const skillId = closest?.dataset.skillId;
-        if (skillId) {
-            await this.actor.rollSkill(skillId, { event });
+        const skillName = closest?.dataset.skillName;
+        if (skillName) {
+            await this.actor.rollSkill(skillName, { event });
         }
     }
 
@@ -1644,9 +1652,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.preventDefault();
         if (!(event.target instanceof HTMLElement)) return;
         const closest = this._closestSkillTarget(event.target);
-        const skillId = closest?.dataset.skillId;
-        if (skillId) {
-            await this.actor.rollSkill(skillId, { event, specialization: true });
+        const skillName = closest?.dataset.skillName;
+        if (skillName) {
+            await this.actor.rollSkill(skillName, { event, specialization: true });
         }
     }
 
@@ -1659,62 +1667,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
 
         await LinksHelpers.openSource(skill.link);
-    }
-
-    static async #createLanguageSkill(this: SR5BaseActorSheet, event: PointerEvent) {
-        event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
-        await this.actor.addLanguageSkill({ name: '' });
-    }
-
-    static async #deleteLanguageSkill(this: SR5BaseActorSheet, event: PointerEvent) {
-        event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
-
-        const userConsented = await Helpers.confirmDeletion();
-        if (!userConsented) return;
-
-        const skillId = $(event.target).closest('a').data().skill;
-        await this.actor.removeLanguageSkill(skillId);
-    }
-
-    static async #createKnowledgeSkill(this: SR5BaseActorSheet, event: PointerEvent) {
-        event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
-        const category = $(event.target).closest('a').data().skillType;
-        const skillId = await this.actor.addKnowledgeSkill(category);
-        if (!skillId) return;
-    }
-
-    static async #deleteKnowledgeSkill(this: SR5BaseActorSheet, event: PointerEvent) {
-        event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
-
-        const userConsented = await Helpers.confirmDeletion();
-        if (!userConsented) return;
-
-        const skillId = $(event.target).closest('a').data().skill;
-        const category = $(event.target).closest('a').data().category;
-        await this.actor.removeKnowledgeSkill(skillId, category);
-    }
-
-    /** Add an active skill and show the matching edit application afterwards.
-     *
-     * @param event The HTML event from which the action resulted.
-     */
-    static async #createActiveSkill(this: SR5BaseActorSheet) {
-        await this.actor.addActiveSkill();
-    }
-
-    static async #deleteActiveSkill(this: SR5BaseActorSheet, event: PointerEvent) {
-        event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
-
-        const userConsented = await Helpers.confirmDeletion();
-        if (!userConsented) return;
-
-        const skillId = event.target?.closest<HTMLElement>('[data-skill]')?.dataset?.skill ?? '';
-        await this.actor.removeActiveSkill(skillId);
     }
 
     static async #rollAttribute(this: SR5BaseActorSheet, event: PointerEvent) {
@@ -2056,7 +2008,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                     if (!path) return;
                     const skill = this.actor.getSkill(skillId)!;
                     const effectData = {
-                        name: `${game.i18n.localize(skill.label) ?? skill.name} ${game.i18n.localize('SR5.Effect')}`,
+                        name: `${SkillFlow.localizeSkillName(skill.name)} ${game.i18n.localize('SR5.Effect')}`,
                         system: {
                             applyTo: 'actor' as const,
                         },
@@ -2069,6 +2021,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                             }
                         ]
                     };
+                    console.error('TODO: tamif - implement skill effect creation with skill items');
                     await this.actor.createEmbeddedDocuments("ActiveEffect", [effectData], { renderSheet: true });
                 }
             },
@@ -2088,18 +2041,21 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
                     const skillTarget = this._closestSkillTarget(target)!;
                     const skillId = skillTarget.dataset.skillId!;
-                    const subCategory = skillTarget.dataset.subcategory!;
-                    switch (skillTarget.dataset.category) {
-                        case 'active':
-                            await this.actor.removeActiveSkill(skillId);
-                            break;
-                        case 'knowledge':
-                            await this.actor.removeKnowledgeSkill(skillId, subCategory as any);
-                            break;
-                        case 'language':
-                            await this.actor.removeLanguageSkill(skillId);
-                            break;
-                    }
+                    const skill = this.actor.items.get(skillId);
+                    if (skill) await skill.delete();
+                    console.error('TODO: tamif - remove this functionality and related functions?');
+                    // const subCategory = skillTarget.dataset.subcategory!;
+                    // switch (skillTarget.dataset.category) {
+                        // case 'active':
+                        //     await this.actor.removeActiveSkill(skillId);
+                        //     break;
+                        // case 'knowledge':
+                        //     await this.actor.removeKnowledgeSkill(skillId, subCategory as any);
+                        //     break;
+                        // case 'language':
+                        //     await this.actor.removeLanguageSkill(skillId);
+                        //     break;
+                    // }
                 }
             }
         ]
@@ -2368,7 +2324,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             event.target?.closest('.list-item-container')?.classList.add('expanded');
             const skill = this.actor.getSkill(id);
             if (skill) {
-                const html = await TextEditor.enrichHTML(skill.description, { secrets: this.actor.isOwner, });
+                const html = await TextEditor.enrichHTML(skill.system.description.value, { secrets: this.actor.isOwner, });
                 if (html) {
                     event.target.closest('.list-item-container')!.querySelector('.description-body')!.innerHTML = html;
                 }

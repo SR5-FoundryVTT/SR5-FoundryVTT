@@ -69,7 +69,7 @@ export function rollItemMacro(itemName) {
  * @param data A data object for skill macros.
  * @param slot The hotbar slot to use.
  */
-export async function createSkillMacro(data: {skillId: string, skill: SkillFieldType}, slot) {
+export async function createSkillMacro(data: {skillId: string, skill: SR5Item<'skill'>}, slot) {
     if (!game.macros || !game.user) return;
 
     const {skillId, skill} = data;

@@ -7,6 +7,7 @@ import { Helpers } from '@/module/helpers';
 import { DeepPartial } from "fvtt-types/utils";
 import { SkillFieldType } from "@/module/types/template/Skills";
 import DocumentSheetV2 = foundry.applications.api.DocumentSheetV2;
+import { SR5Item } from "@/module/item/SR5Item";
 
 const { FilePicker } = foundry.applications.apps;
 
@@ -18,7 +19,7 @@ interface SkillEditSheetData extends
     skillFields: any;
     system: Actor.Implementation['system'];
     skillId: string;
-    skill?: SkillFieldType;
+    skill?: SR5Item<'skill'>;
     skill_name: string;
     editable_name: boolean;
     editable_canDefault: boolean;
@@ -125,13 +126,15 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<Actor.I
     static async #addBonus(this: SkillEditSheet, event: PointerEvent) {
         event.preventDefault();
         if (!(event.target instanceof HTMLElement)) return;
-        const skill = this.document.getSkill(this.skillId);
-        if (skill) {
-            const bonus = skill.bonus.slice();
-            bonus.push({key: 'NewBonus', value: 0});
-            const key = `${this._updateString()}.bonus`
-            await this.document.update({ [key] : bonus });
-        }
+        console.error('TODO: tamif - Remove bonus not implemented yet');
+        
+        // const skill = this.document.getSkill(this.skillId);
+        // if (skill) {
+        //     const bonus = skill.bonus.slice();
+        //     bonus.push({key: 'NewBonus', value: 0});
+        //     const key = `${this._updateString()}.bonus`
+        //     await this.document.update({ [key] : bonus });
+        // }
     }
 
     static async #removeBonus(this: SkillEditSheet, event: PointerEvent) {
@@ -141,14 +144,15 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<Actor.I
         const canDelete = await Helpers.confirmDeletion();
         if (!canDelete) return;
 
-        const skill = this.document.getSkill(this.skillId);
-        const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
-        if (skill && index >= 0) {
-            const bonus = skill.bonus.slice();
-            bonus.splice(index, 1);
-            const key = `${this._updateString()}.bonus`
-            await this.document.update({ [key] : bonus });
-        }
+        console.error('TODO: tamif - Remove bonus not implemented yet');
+        // const skill = this.document.getSkill(this.skillId);
+        // const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
+        // if (skill && index >= 0) {
+        //     const bonus = skill.bonus.slice();
+        //     bonus.splice(index, 1);
+        //     const key = `${this._updateString()}.bonus`
+        //     await this.document.update({ [key] : bonus });
+        // }
     }
 
     static async #addSpecialization(this: SkillEditSheet, event: PointerEvent) {
@@ -156,7 +160,7 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<Actor.I
         if (!(event.target instanceof HTMLElement)) return;
         const skill = this.document.getSkill(this.skillId);
         if (skill) {
-            const specs = skill.specs.slice();
+            const specs = skill.system.skill.specializations.slice();
             specs.push(game.i18n.localize('SR5.NewSpecialization'));
             const key = `${this._updateString()}.specs`
             void this.document.update({ [key] : specs });
@@ -173,7 +177,7 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<Actor.I
         const skill = this.document.getSkill(this.skillId);
         const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
         if (skill && index >= 0) {
-            const specs = skill.specs.slice();
+            const specs = skill.system.skill.specializations.slice();
             specs.splice(index, 1);
             const key = `${this._updateString()}.specs`
             void this.document.update({ [key] : specs });
@@ -208,7 +212,7 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<Actor.I
     _allowSkillNameEditing(): boolean {
         const skill = this.document.getSkill(this.skillId);
         // Typescript sees string here? Double negate for boolean type cast...
-        return !!((!skill?.name && !skill?.label) || (skill?.name && !skill?.label));
+        return !!((!skill?.name) || (skill?.name));
     }
 
     _getSkillFields(systemFields) {

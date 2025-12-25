@@ -127,7 +127,7 @@ export class ActionFlow {
         const skills: Record<string, Translation> = {};
         for (const [id, skill] of Object.entries(activeSkills)) {
             const key = skill.name || id;
-            const label = skill.label || skill.name;
+            const label = skill.name;
             skills[key] = label as Translation;
         }
 

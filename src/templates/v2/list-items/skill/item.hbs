@@ -1,6 +1,7 @@
 <div class="list-item-container {{cssClass}} {{#if (hasKey @root.expandedSkills id)}} expanded {{/if}}">
     <div class="list-item {{skillClass skill}}"
-         data-skill-id="{{id}}"
+         data-skill-id="{{skill.id}}"
+         data-skill-name="{{skill.name}}"
          data-category="{{category}}"
          data-subcategory="{{subcategory}}">
         <div class="list-item-start">
@@ -62,14 +63,13 @@
                 </label>
             {{/if}}
         </div>
-        <div class="list-item-icons{{#if @root.isPlayMode}} skinny-icons {{/if}}">
+        <div class="list-item-icons{{#if @root.isPlayMode}} skinny-icons {{/if}}" data-item-id="{{skill.id}}">
             {{#if @root.isEditMode}}
-                <a data-action="editSkill"
+                <a data-action="editItem"
                    data-tooltip="SR5.Edit">
                     <i class="fas fa-pen-to-square"></i>
                 </a>
                 <a data-action="deleteItem"
-                   data-item-id="{{skill.id}}"
                    data-tooltip="SR5.DeleteSkill">
                     <i class="fas fa-trash"></i>
                 </a>

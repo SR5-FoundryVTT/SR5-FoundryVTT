@@ -410,17 +410,14 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     /**
      * Some actors have skills, some don't. While others don't have skills but derive skill values from their ratings.
      */
-    findActiveSkill(skillName?: string): SkillFieldType | undefined {
+    findActiveSkill(skillName?: string): SR5Item<'skill'> | undefined {
+        console.error('TODO: tamif - function doesnt do what documentation says it does');
         // Check for faulty to catch empty names as well as missing parameters.
         if (!skillName) return;
 
         // Handle legacy skills (name is id)
-        const skills = this.getActiveSkills();
-        const skill = skills[skillName];
-        if (skill) return skill;
-
-        // Handle custom skills (name is not id)
-        return Object.values(skills).find(skill => skill.name === skillName);
+        const skill = this.skills.named.get(skillName);
+        if (skill?.system.skill.category === 'active') return skill;
     }
 
     findAttribute(id?: string): AttributeFieldType | undefined {
@@ -679,7 +676,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         }
     }
 
-    getVehicleTypeSkill(): SkillFieldType | undefined {
+    getVehicleTypeSkill(): SR5Item<'skill'> | undefined {
         if (!this.isType('vehicle')) return;
 
         const name = this.getVehicleTypeSkillName();
@@ -690,12 +687,12 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return this.getSkills() !== undefined;
     }
 
-    getSkills(this: SR5Actor): SR5Actor['system']['skills'] {
-        return this.system.skills;
+    getSkills(this: SR5Actor): SR5Actor['skills']['named'] {
+        return this.skills.named;
     }
 
-    getActiveSkills(this: SR5Actor): SR5Actor['system']['skills']['active'] {
-        return this.system.skills.active;
+    getActiveSkills(this: SR5Actor): SR5Actor['skills']['active'] {
+        return this.skills.active;
     }
 
     getMasterUuid(): string | undefined {
@@ -856,15 +853,17 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *                The property byLabel will cause the param skillId to be interpreted as the shown i18n label.
      */
     getPool(skillId: string, options = { specialization: false, byLabel: false }): number {
+        console.error('TODO: tamif - Move this to SkillFlow?');
         const skill = options.byLabel ? this.getSkillByLabel(skillId) : this.getSkill(skillId);
-        if (!skill?.attribute) return 0;
+        if (!skill?.system.skill.attribute) return 0;
         if (!SkillFlow.allowRoll(skill)) return 0;
 
-        const attribute = this.getAttribute(skill.attribute);
+        const attribute = this.getAttribute(skill.system.skill.attribute);
 
         // An attribute can have a NaN value if no value has been set yet. Do the skill for consistency.
         const attributeValue = typeof attribute.value === 'number' ? attribute.value : 0;
-        const skillValue = typeof skill.value === 'number' ? skill.value : 0;
+        console.error('TODO: tamif - skill value instead of rating');
+        const skillValue = skill.system.skill.rating;
 
         if (SkillRules.mustDefaultToRoll(skill) && SkillRules.allowDefaultingRoll(skill)) {
             return SkillRules.defaultingModifier + attributeValue;
@@ -884,88 +883,33 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * NOTE: Normalizing skill mapping from active, language and knowledge to a single skills with a type property would
      *       clear this function up.
      *
-     * @param id Either the searched id, name or translated label of a skill
+     * @param name Either the name or translated label
      * @param options .byLabel when true search will try to match given skillId with the translated label
      */
-    getSkill(this: SR5Actor, id: string, options?: { byLabel?: boolean, rollData?: SR5Actor['system'] }): SkillFieldType | undefined {
+    getSkill(this: SR5Actor, name: string, options?: { byLabel?: boolean, rollData?: SR5Actor['system'] }): SR5Item<'skill'> | undefined {
         if (options?.byLabel)
-            return this.getSkillByLabel(id);
+            return this.getSkillByLabel(name);
 
+        console.error('TODO: tamif - Support for skill in getRollData');
         const rollData = options?.rollData ?? this.getRollData();
 
         const skills = rollData?.skills ?? this.getSkills();
 
-        // Find skill by direct id to key matching.
-        if (Object.hasOwn(skills.active, id)) {
-            return skills.active[id];
-        }
-        if (Object.hasOwn(skills.language.value, id)) {
-            return skills.language.value[id];
-        }
-        // Knowledge skills are de-normalized into categories (street, hobby, ...)
-        for (const categoryKey in skills.knowledge) {
-            if (Object.hasOwn(skills.knowledge, categoryKey)) {
-                const category = skills.knowledge[categoryKey];
-                if (Object.hasOwn(category.value, id)) {
-                    return category.value[id];
-                }
-            }
-        }
-
-        return this.getSkillByLabel(id);
+        return skills.get(name) ?? this.getSkillByLabel(name);
     }
 
     /**
      * Search all skills for a matching i18n translation label.
      * NOTE: You should use getSkill if you have the skillId ready. Only use this for ease of use!
      *
-     * @param searchedFor The translated output of either the skill label (after localize) or name of the skill in question.
+     * @param searched The translated output of either the skill label (after localize) or name of the skill in question.
      * @return The first skill found with a matching translation or name.
      */
-    getSkillByLabel(searchedFor: string): SkillFieldType | undefined {
-        if (!searchedFor) return;
+    getSkillByLabel(searched: string): SR5Item<'skill'> | undefined {
+        if (!searched) return;
 
-        const possibleMatch = (skill: SkillFieldType): string => skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
-
-        const skills = this.getSkills();
-
-        for (const [id, skill] of Object.entries(skills.language.value)) {
-            if (searchedFor === possibleMatch(skill))
-                return {...skill, id};
-        }
-
-        // Iterate over all different knowledge skill categories
-        for (const categoryKey in skills.knowledge) {
-            if (!Object.hasOwn(skills.knowledge, categoryKey)) continue;
-            // TODO: check this function Typescript can't follow the flow here...
-            const categorySkills = skills.knowledge[categoryKey].value as SkillFieldType[];
-            for (const [id, skill] of Object.entries(categorySkills)) {
-                if (searchedFor === possibleMatch(skill))
-                    return { ...skill, id };
-            }
-        }
-
-        for (const [id, skill] of Object.entries(skills.active)) {
-            if (searchedFor === possibleMatch(skill))
-                return { ...skill, id };
-        }
-        return undefined;
-    }
-
-    /**
-     * For the given skillId as it be would in the skill data structure for either
-     * active, knowledge or language skill.
-     *
-     * @param skillId Legacy / default skills have human-readable ids, while custom one have machine-readable.
-     * @returns The label (not yet translated) OR set custom name.
-     */
-    getSkillLabel(skillId: string): string {
-        const skill = this.getSkill(skillId);
-        if (!skill) {
-            return '';
-        }
-
-        return skill.label ?? skill.name ?? '';
+        console.error('TODO: tamif - Support for skill in getRollData');
+        return this.skills.localized.get(searched) ?? undefined;
     }
 
     /**
@@ -998,104 +942,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     /**
-     * Add a new active skill.
-     *
-     * @param skillData Partially define the SkillField properties needed. Omitted properties will be default.
-     * @returns The new active skill id.
-     */
-    async addActiveSkill(skillData: Partial<SkillFieldType> = { name: SKILL_DEFAULT_NAME }): Promise<string | undefined> {
-        const skill = DataDefaults.createData('skill_field', skillData);
-
-        const activeSkillsPath = 'system.skills.active';
-        const updateSkillDataResult = Helpers.getRandomIdSkillFieldDataEntry(activeSkillsPath, skill);
-
-        if (!updateSkillDataResult) return;
-
-        const { updateSkillData, id } = updateSkillDataResult;
-
-        await this.update(updateSkillData as object);
-
-        return id;
-    }
-
-    /**
-     * Remove a language skill by it's id.
-     * @param skillId What skill id to delete.
-     */
-    async removeLanguageSkill(skillId: string) {
-        const updateData = Helpers.getDeleteKeyUpdateData('system.skills.language.value', skillId);
-        await this.update(updateData);
-    }
-
-    /**
-     * Add a language skill.
-     *
-     * @param skill Partially define the SkillField properties needed. Omitted properties will be default.
-     * @returns The new language skill id.
-     */
-    async addLanguageSkill(skill): Promise<string> {
-        const defaultSkill = {
-            name: '',
-            specs: [],
-            base: 0,
-            value: 0,
-            // TODO: BUG ModifiableValue is ModList<number>[] and not number
-            mod: 0,
-        };
-        skill = {
-            ...defaultSkill,
-            ...skill,
-        };
-
-        const id = randomID(16);
-        const value = {};
-        value[id] = skill;
-        const fieldName = `system.skills.language.value`;
-        const updateData = {};
-        updateData[fieldName] = value;
-
-        await this.update(updateData);
-
-        return id;
-    }
-
-    /**
-     * Remove a knowledge skill
-     * @param skillId What skill id to delete.
-     * @param category The matching knowledge skill category for skillId
-     */
-    async removeKnowledgeSkill(skillId: string, category: KnowledgeSkillCategory) {
-        const updateData = Helpers.getDeleteKeyUpdateData(`system.skills.knowledge.${category}.value`, skillId);
-        await this.update(updateData);
-    }
-
-    /**
-     * Delete the given active skill by it's id. It doesn't
-     *
-     * @param skillId Either a random id for custom skills or the skills name used as an id.
-     */
-    async removeActiveSkill(skillId: string) {
-        const activeSkills = this.getActiveSkills();
-        if (!Object.hasOwn(activeSkills, skillId)) return;
-        const skill = this.getSkill(skillId);
-        if (!skill) return;
-
-        // Don't delete legacy skills to allow prepared items to use them, should the user delete by accident.
-        // New custom skills won't have a label set also.
-        if (skill.name === '' && skill.label !== undefined && skill.label !== '') {
-            await this.hideSkill(skillId);
-            // NOTE: For some reason unlinked token actors won't cause a render on update?
-            if (!this.prototypeToken.actorLink)
-                await this.sheet?.render();
-            return;
-        }
-
-        // Remove custom skills without mercy!
-        const updateData = Helpers.getDeleteKeyUpdateData('system.skills.active', skillId);
-        await this.update(updateData);
-    }
-
-    /**
      * Mark the given skill as hidden.
      *
      * NOTE: Hiding skills has
@@ -1103,13 +949,14 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param skillId The id of any type of skill.
      */
     async hideSkill(skillId: string) {
-        if (!skillId) return;
-        const skill = this.getSkill(skillId);
-        if (!skill) return;
+        console.error('TODO: tamif - remove hidden skill functionality.');
+        // if (!skillId) return;
+        // const skill = this.getSkill(skillId);
+        // if (!skill) return;
 
-        skill.hidden = true;
-        const updateData = Helpers.getUpdateDataEntry(`system.skills.active.${skillId}`, skill);
-        await this.update(updateData);
+        // skill.hidden = true;
+        // const updateData = Helpers.getUpdateDataEntry(`system.skills.active.${skillId}`, skill);
+        // await this.update(updateData);
     }
 
     /**
@@ -1118,13 +965,14 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param skillId The id of any type of skill.
      */
     async showSkill(skillId: string) {
-        if (!skillId) return;
-        const skill = this.getSkill(skillId);
-        if (!skill) return;
+        console.error('TODO: tamif - remove hidden skill functionality.');
+        // if (!skillId) return;
+        // const skill = this.getSkill(skillId);
+        // if (!skill) return;
 
-        skill.hidden = false;
-        const updateData = Helpers.getUpdateDataEntry(`system.skills.active.${skillId}`, skill);
-        await this.update(updateData);
+        // skill.hidden = false;
+        // const updateData = Helpers.getUpdateDataEntry(`system.skills.active.${skillId}`, skill);
+        // await this.update(updateData);
     }
 
     /**
@@ -1133,22 +981,23 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * For hiding/showing skill see SR5Actor#showSkill and SR5Actor#hideSkill.
      */
     async showHiddenSkills() {
-        const updateData = {};
+        console.error('TODO: tamif - remove hidden skill functionality.');
+        // const updateData = {};
 
-        const skills = this.getActiveSkills();
-        for (const [id, skill] of Object.entries(skills)) {
-            if (skill.hidden) {
-                skill.hidden = false;
-                updateData[`system.skills.active.${id}`] = skill;
-            }
-        }
+        // const skills = this.getActiveSkills();
+        // for (const [id, skill] of Object.entries(skills)) {
+        //     if (skill.hidden) {
+        //         skill.hidden = false;
+        //         updateData[`system.skills.active.${id}`] = skill;
+        //     }
+        // }
 
-        if (!updateData) return;
+        // if (!updateData) return;
 
-        await this.update(updateData);
-        // NOTE: For some reason unlinked token actors won't cause a render on update?
-        if (!this.prototypeToken.actorLink)
-            await this.sheet?.render();
+        // await this.update(updateData);
+        // // NOTE: For some reason unlinked token actors won't cause a render on update?
+        // if (!this.prototypeToken.actorLink)
+        //     await this.sheet?.render();
     }
 
     /**
@@ -1256,15 +1105,15 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Roll a skill test for a specific skill
-     * @param skillId The id or label for the skill. When using a label, the appropriate option must be set.
+     * @param name The skill name to be rolled
      * @param options Optional options to configure the roll.
      * @param options.byLabel true to search the skill by label as displayed on the sheet.
      * @param options.specialization true to configure the skill test to use a specialization.
      */
-    async rollSkill(skillId: string, options: SkillRollOptions={}) {
-        console.info(`Shadowrun5e | Rolling skill test for ${skillId}`);
+    async rollSkill(name: string, options: SkillRollOptions={}) {
+        console.info(`Shadowrun5e | Rolling skill test for ${name}`);
 
-        const action = this.skillActionData(skillId, options);
+        const action = this.skillActionData(name, options);
         if (!action) return;
         if(options.threshold) {
             action.threshold = options.threshold
@@ -1428,31 +1277,31 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     /**
      * Build an action for the given skill id based on it's configured values.
      *
-     * @param skillId Any skill, no matter if active, knowledge or language
+     * @param name Any skill, no matter if active, knowledge or language
      * @param options
      */
-    skillActionData(skillId: string, options: SkillRollOptions = {}): ActionRollType | undefined {
+    skillActionData(name: string, options: SkillRollOptions = {}): ActionRollType | undefined {
         const byLabel = options.byLabel || false;
-        const skill = this.getSkill(skillId, { byLabel });
+        const skill = this.getSkill(name, { byLabel });
         if (!skill) {
-            console.error(`Shadowrun 5e | Skill ${skillId} is not registered of actor ${this.id}`);
+            console.error(`Shadowrun 5e | Skill ${name} is not registered of actor ${this.id}`);
             return;
         }
 
         // When fetched by label, getSkillByLabel will inject the id into SkillField.
-        skillId = skill.id || skillId;
+        name = skill.id || name;
 
         // Derive limit from skill attribute.
-        const attribute = this.getAttribute(skill.attribute);
+        const attribute = this.getAttribute(skill.system.skill.attribute);
         // TODO: Typing. LimitData is incorrectly typed to ActorAttributes only but including limits.
         const limit = attribute.limit || '';
         // Should a specialization be used?
         const spec = options.specialization || false;
 
         return DataDefaults.createData('action_roll', {
-            skill: skillId,
+            skill: name,
             spec,
-            attribute: skill.attribute,
+            attribute: skill.system.skill.attribute,
             limit: {
                 attribute: limit,
                 base_formula_operator: 'add',

@@ -5,8 +5,6 @@ import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from "@/module/handleba
 
 import ItemSheet = foundry.applications.sheets.ItemSheet;
 
-console.error('asd');
-
 interface SR5SkillSheetData extends SR5BaseItemSheetData {
 }
 

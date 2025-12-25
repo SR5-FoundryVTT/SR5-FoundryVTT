@@ -3,8 +3,9 @@ import { SafeString } from "handlebars";
 import { SYSTEM_NAME } from "../constants";
 import { SR5Actor } from "../actor/SR5Actor";
 import { Translation } from '../utils/strings';
-import { SkillFieldType } from '../types/template/Skills';
 import { LinksHelpers } from '@/module/utils/links';
+import { SR5Item } from '../item/SR5Item';
+import { SkillFlow } from '../actor/flows/SkillFlow';
 
 export const registerBasicHelpers = () => {
     /**
@@ -24,15 +25,15 @@ export const registerBasicHelpers = () => {
         return game.i18n.localize(i18nTypeLabel as Translation);
     });
 
-    Handlebars.registerHelper('localizeSkill', function (skill: SkillFieldType | string, options): string {
+    Handlebars.registerHelper('localizeSkill', function (skill: SR5Item<'skill'> | string, options): string {
         if (typeof skill === 'string') {
             const actor = options.data.root.actor as SR5Actor;
             if (!actor) return skill;
-            const newSkill = actor.getSkill(skill) as SkillFieldType;
+            const newSkill = actor.getSkill(skill);
             if (!newSkill) return skill;
             skill = newSkill;
         }
-        return skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
+        return SkillFlow.localizeSkillName(skill.name);
     });
 
     Handlebars.registerHelper('concatStrings', function (...args) {

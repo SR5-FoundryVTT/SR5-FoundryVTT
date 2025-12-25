@@ -457,7 +457,7 @@ export const TestCreator = {
             // Custom skills don't have a label, but a name.
             // Legacy skill don't have a name, but have a label.
             // Your mind is like this water, my friend. When it is agitated, it becomes difficult to see. But if you allow it to settle, the answer becomes clear.
-            if (skill) pool.addUniquePart(skill.label || skill.name, SkillRules.level(skill));
+            if (skill) pool.addUniquePart(SkillFlow.localizeSkillName(skill.name), SkillRules.level(skill));
             // TODO: Check if this is actual skill specialization and for a +2 config for it instead of MagicValue.
             if (action.spec) pool.addUniquePart('SR5.Specialization', SkillRules.SpecializationModifier);
         }

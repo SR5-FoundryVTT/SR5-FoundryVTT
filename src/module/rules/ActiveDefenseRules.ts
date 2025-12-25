@@ -25,21 +25,22 @@ export const ActiveDefenseRules = {
 
         if (!weapon.isMeleeWeapon()) return activeDefenses;
 
+        console.error('TODO: tamif - use value instead of rating');
         // Melee weapon specific active defenses.
         activeDefenses['dodge'] = {
             label: 'SR5.Dodge',
-            value: actor.findActiveSkill('gymnastics')?.value,
+            value: actor.findActiveSkill('gymnastics')?.system.skill.rating,
             initMod: -5,
         };
         activeDefenses['block'] = {
             label: 'SR5.Block',
-            value: actor.findActiveSkill('unarmed_combat')?.value,
+            value: actor.findActiveSkill('unarmed_combat')?.system.skill.rating,
             initMod: -5,
         };
         activeDefenses['parry'] = {
             label: 'SR5.Parry',
             weapon: weapon.name || '',
-            value: actor.findActiveSkill(weapon.system.action.skill)?.value,
+            value: actor.findActiveSkill(weapon.system.action.skill)?.system.skill.rating,
             initMod: -5,
         };
 

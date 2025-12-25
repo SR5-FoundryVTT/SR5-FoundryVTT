@@ -28,7 +28,7 @@ export class SkillFlow {
     /**
      * Handle everything around how a skill should be defaulted
      */
-    static handleDefaulting(skill: SkillFieldType, parts: PartsList<number>) {
+    static handleDefaulting(skill: SR5Item<'skill'>, parts: PartsList<number>) {
         if (!SkillRules.mustDefaultToRoll(skill)) return;
 
         if (!SkillFlow.allowDefaultingRoll(skill)) {
@@ -43,7 +43,7 @@ export class SkillFlow {
      * Check if either the system settings or skill configuration allow for a skill to be defaulted.
      * @return true will allow a role on the skill that needs defaulting.
      */
-    static allowDefaultingRoll(skill: SkillFieldType): boolean {
+    static allowDefaultingRoll(skill: SR5Item<'skill'>): boolean {
         // Check if settings allow rolls of skills that otherwise would need to be defaulted.
         const allowUnimproviseable = !game.settings.get(SYSTEM_NAME, FLAGS.OnlyAllowRollOnDefaultableSkills);
         if (allowUnimproviseable)
@@ -52,7 +52,7 @@ export class SkillFlow {
         return SkillRules.allowDefaultingRoll(skill);
     }
 
-    static allowRoll(skill: SkillFieldType): boolean {
+    static allowRoll(skill: SR5Item<'skill'>): boolean {
         if (SkillRules.mustDefaultToRoll(skill) && SkillFlow.allowDefaultingRoll(skill)) {
             return true;
         }
