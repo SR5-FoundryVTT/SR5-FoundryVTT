@@ -53,7 +53,12 @@
                 <input type="number" class="short skinny" value="{{skill.system.skill.rating}}" data-skill="{{skill.id}}" >
             {{else}}
                 <label data-skill-modifier-tooltip="{{skill.id}}">
-                    {{translated}}
+                    {{#if skill.system.skill.language.isNative}}
+                        {{localize "SR5.Skill.abbr.Native"}}
+                    {{else}}
+                        {{!-- TODO: tamif - Show effect modified value --}}
+                        {{skill.system.skill.rating}}
+                    {{/if}}
                 </label>
             {{/if}}
         </div>

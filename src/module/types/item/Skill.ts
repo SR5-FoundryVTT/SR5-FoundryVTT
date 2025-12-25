@@ -2,6 +2,10 @@ import { SR5 } from "@/module/config";
 import { BaseItemData, ItemBase } from "./ItemBase";
 const { ArrayField, BooleanField, NumberField, StringField, SchemaField } = foundry.data.fields;
 
+const SkillLanguageData = () => ({
+    isNative: new BooleanField({ required: true, initial: false }),
+});
+
 const SkillTypeData = () => ({ 
     // TODO: taMiF - Use 'type' as in SR5#128 instead of category. better differentiate between system.type and system.skill.type
     category: new StringField({ required: true, initial: 'active', choices: SR5.skillCategories }),
@@ -11,6 +15,8 @@ const SkillTypeData = () => ({
     attribute: new StringField({ required: true, blank: true, choices: SR5.attributes }),
     // Will contain custom specialization names.
     specializations: new ArrayField(new StringField({ required: true })),
+
+    language: new SchemaField(SkillLanguageData()),
 });
 
 const SkillGroupTypeData = () => ({
