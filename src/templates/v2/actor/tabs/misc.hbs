@@ -105,12 +105,12 @@
                     {{#if system.is_npc }}
                         <div class="list-item">
                             <div class="list-item-start">
-                                <label data-tooltip="{{systemFields.is_grunt.hint}}">
-                                    {{systemFields.is_grunt.label}}
+                                <label data-tooltip="{{systemFields.npc.fields.is_grunt.hint}}">
+                                    {{systemFields.npc.fields.is_grunt.label}}
                                 </label>
                             </div>
                             <div class="list-item-col">
-                                {{formInput systemFields.is_grunt value=source.system.is_grunt
+                                {{formInput systemFields.npc.fields.is_grunt value=source.system.npc.is_grunt
                                             classes="short" rootId=rootId disabled=@root.isPlayMode }}
                             </div>
                         </div>

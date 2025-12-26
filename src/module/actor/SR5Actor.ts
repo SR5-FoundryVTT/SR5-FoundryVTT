@@ -95,7 +95,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     // Quick access for all items of a type.
     itemsForType = new Map<Item.ConfiguredSubType, SR5Item[]>();
 
-    constructor(data: Actor.CreateData, context?: Actor.ConstructionContext) {
+    constructor(data: Actor.CreateData<SubType>, context?: Actor.ConstructionContext) {
         super(data, context);
 
         this.inventory = new InventoryFlow(this);

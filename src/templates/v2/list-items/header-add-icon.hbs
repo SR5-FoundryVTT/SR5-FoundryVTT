@@ -1,7 +1,2 @@
-{{#if @root.isEditMode}}
-<a data-action="addItem"
-   data-tooltip="{{createItemHeaderLabel this}}"
-   data-item-type="{{this}}">
-    {{localize "SR5.Add"}}&nbsp;<i class="fas fa-plus"></i>
-</a>
-{{/if}}
+{{> "systems/shadowrun5e/dist/templates/v2/list-items/add-icon.hbs" 
+    action="addItem" tooltip=(createItemHeaderLabel type) type=type data=data }}

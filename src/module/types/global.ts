@@ -63,8 +63,24 @@ declare module "fvtt-types/configuration" {
         Sheet: typeof FormApplication;
     }
 
+    interface ConfiguredActiveEffect<SubType extends ActiveEffect.SubType> {
+        document: SR5ActiveEffect;
+    }
+    
+    interface ConfiguredActor<SubType extends Actor.SubType> {
+        document: SR5Actor<SubType & Actor.ConfiguredSubType>;
+    }
+
+    interface ConfiguredChatMessage<SubType extends ChatMessage.SubType> {
+        document: SR5ChatMessage;
+    }
+
     interface ConfiguredCombat<SubType extends Combat.SubType> {
         document: SR5Combat<SubType>;
+    }
+
+    interface ConfiguredItem<SubType extends Item.SubType> {
+        document: SR5Item<SubType & Item.ConfiguredSubType>;
     }
 
     interface ObjectClassConfig {
