@@ -1,7 +1,7 @@
 import { SkillRules } from "../../rules/SkillRules";
 import { PartsList } from "../../parts/PartsList";
 import { FLAGS, SYSTEM_NAME } from "../../constants";
-import { SkillFieldType } from "src/module/types/template/Skills";
+import { KnowledgeSkillCategory, SkillFieldType } from "src/module/types/template/Skills";
 import { SR5Item } from "@/module/item/SR5Item";
 import { Translation } from "@/module/utils/strings";
 
@@ -24,6 +24,7 @@ export interface Skills {
 /**
  * Handle functionality between actors and their skills.
  */
+// TODO: tamif - refactor into object style
 export class SkillFlow {
     /**
      * Handle everything around how a skill should be defaulted
@@ -65,6 +66,35 @@ export class SkillFlow {
 
     static isLegacySkill(skill: SkillFieldType): boolean {
         return !SkillFlow.isCustomSkill(skill);
+    }
+
+    static prepareActorSkills(items: SR5Item<'skill'>[]): Skills {
+        const skills = SkillFlow.getDefaultActorSkills();
+
+        // Sort skills into types.
+        for (const item of items) {
+            if(item.system.type !== 'skill') continue;
+
+            const skillType = item.system.skill.category as string;
+            // TODO: tamif - assert skillType to always exist.
+            if (!Object.hasOwn(skills, skillType)) continue;
+
+            // TODO: tamif - should SR5Actor already localize or should we outload this to the sheet class
+            //               as it is a display issue and not a data issue. Same with sorting.
+            skills.named.set(item.name, item);
+            skills.localized.set(SkillFlow.localizeSkillName(item.name), item);
+
+            if (skillType === 'knowledge') {
+                const skillKnowledgeType = item.system.skill.knowledgeType
+                // TODO: tamif - assert no missing knowledge type
+                skills.knowledge[skillKnowledgeType as KnowledgeSkillCategory].push(item);
+            } else {
+            // TODO: tamif - resolve linter error
+                skills[skillType]!.push(item);
+            }
+        }
+
+        return skills;
     }
 
     /**

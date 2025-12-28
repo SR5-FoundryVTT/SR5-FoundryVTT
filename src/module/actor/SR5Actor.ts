@@ -293,32 +293,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * Prepare skill items for easy use and access.
      */
     prepareSkills() {
-        this.skills = SkillFlow.getDefaultActorSkills();
         const skills = this.itemsForType.get('skill') as SR5Item<'skill'>[];
         if (!skills) return;
-
-        // Sort skills into types.
-        for (const skill of skills) {
-            if(skill.system.type !== 'skill') continue;
-
-            const skillType = skill.system.skill.category as string;
-            // TODO: tamif - assert skillType to always exist.
-            if (!Object.hasOwn(this.skills, skillType)) continue;
-
-            // TODO: tamif - should SR5Actor already localize or should we outload this to the sheet class
-            //               as it is a display issue and not a data issue. Same with sorting.
-            this.skills.named.set(skill.name, skill);
-            this.skills.localized.set(SkillFlow.localizeSkillName(skill.name), skill);
-
-            if (skillType === 'knowledge') {
-                const skillKnowledgeType = skill.system.skill.knowledgeType
-                // TODO: tamif - assert no missing knowledge type
-                this.skills.knowledge[skillKnowledgeType as KnowledgeSkillCategory].push(skill);
-            } else {
-            // TODO: tamif - resolve linter error
-                this.skills[skillType]!.push(skill);
-            }
-        }
+        this.skills = SkillFlow.prepareActorSkills(skills);
     }
 
     /**
@@ -688,10 +665,12 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     getSkills(this: SR5Actor): SR5Actor['skills']['named'] {
+        console.error('TODO: tamif - skills used to return a list of skills, this would break API');
         return this.skills.named;
     }
 
     getActiveSkills(this: SR5Actor): SR5Actor['skills']['active'] {
+        console.error('TODO: tamif - skills used to return a list of skills, this would break API');
         return this.skills.active;
     }
 
@@ -876,14 +855,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     /**
      * Find a skill either by id or label.
      *
-     * Skills are mapped by an id, which can be a either a lower case name (legacy skills) or a short uid (custom, language, knowledge).
-     * Legacy skills use their name as the id, while not having a name set on the SkillField.
-     * Custom skills use an id and have their name set, however no label. This goes for active, language and knowledge.
-     *
-     * NOTE: Normalizing skill mapping from active, language and knowledge to a single skills with a type property would
-     *       clear this function up.
-     *
-     * @param name Either the name or translated label
+     * @param name Either the name or translated label (not the SR5.<label>-string)
      * @param options .byLabel when true search will try to match given skillId with the translated label
      */
     getSkill(this: SR5Actor, name: string, options?: { byLabel?: boolean, rollData?: SR5Actor['system'] }): SR5Item<'skill'> | undefined {
@@ -891,11 +863,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             return this.getSkillByLabel(name);
 
         console.error('TODO: tamif - Support for skill in getRollData');
-        const rollData = options?.rollData ?? this.getRollData();
+        return this.skills.named.get(name);
+        // const rollData = options?.rollData ?? this.getRollData();
 
-        const skills = rollData?.skills ?? this.getSkills();
-
-        return skills.get(name) ?? this.getSkillByLabel(name);
+        // const skills = rollData?.skills ?? this.getSkills();
+        // return skills.get(name) ?? this.getSkillByLabel(name);
     }
 
     /**
