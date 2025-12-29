@@ -526,5 +526,17 @@
         }
     }
 
+    
+    /* Facilitate reszisable and scaling effect changes */
+    &.active-effect-config .tab.changes header, 
+    &.active-effect-config .tab.changes ol {
+        align-items: center;
+        display: grid;
+        gap: 0.25rem;
+        grid-template-columns: auto 7rem auto 4rem 1rem;
+        margin: 0;
+        padding: 2px;
+        position: relative;
+    }
     // end of new css for getting scroll working
 }
