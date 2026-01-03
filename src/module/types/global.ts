@@ -11,7 +11,6 @@ import { SR5Token } from "../token/SR5Token";
 import { Translation } from '../utils/strings';
 
 import { Character } from "./actor/Character";
-import { Critter } from "./actor/Critter";
 import { IC } from "./actor/IC";
 import { Spirit } from "./actor/Spirit";
 import { Sprite } from "./actor/Sprite";
@@ -123,7 +122,6 @@ declare module "fvtt-types/configuration" {
         };
         Actor: {
             character: typeof Character;
-            critter: typeof Critter;
             ic: typeof IC;
             spirit: typeof Spirit;
             sprite: typeof Sprite;

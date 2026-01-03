@@ -1368,7 +1368,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     _prepareActorTypeFields(sheetData: SR5ActorSheetData) {
         sheetData.isCharacter = this.actor.isType('character');
         sheetData.isSpirit = this.actor.isType('spirit');
-        sheetData.isCritter = this.actor.isType('critter');
         sheetData.isVehicle = this.actor.isType('vehicle');
         sheetData.hasSkills = this.actor.hasSkills;
         sheetData.canAlterSpecial = this.actor.canAlterSpecial;

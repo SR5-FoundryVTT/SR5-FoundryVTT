@@ -9,21 +9,7 @@ export class CritterParser extends MetatypeParserBase<'character'> {
     protected readonly parseType = 'character';
 
     private normalizeSkillName(rawName: string): string {
-        let name = rawName
-            .toLowerCase()
-            .trim()
-            .replace(/\s+/g, '_')
-            .replace(/-/g, '_');
-    
-        if (name.includes('exotic') && name.includes('_weapon'))
-            name = name.replace('_weapon', '');
-        if (name.includes('exotic') && name.includes('_ranged'))
-            name = name.replace('_ranged', '_range');
-
-        if (name === 'pilot_watercraft')
-            name = 'pilot_water_craft';
-    
-        return name;
+        return rawName.trim().toLowerCase().replace(/[\s-]/g, '_');
     }
 
     private setSkills(system: SystemType<'character'>, jsonData: Metatype): void {
@@ -147,7 +133,7 @@ export class CritterParser extends MetatypeParserBase<'character'> {
 
     protected override async getFolder(jsonData: Metatype, compendiumKey: CompendiumKey): Promise<Folder> {
         const category = jsonData.category ? jsonData.category._TEXT : "Other";
-        const rootFolder = game.i18n.localize("TYPES.Actor.critter");
+        const rootFolder = "Critter";
         const folderName = IH.getTranslatedCategory('metatypes', category);
 
         return IH.getFolder(compendiumKey, rootFolder, folderName);

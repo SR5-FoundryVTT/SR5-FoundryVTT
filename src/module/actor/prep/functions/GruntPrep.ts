@@ -8,7 +8,7 @@ export const GruntPrep = {
      * If an NPC Grunt is selected, prepare the grunt condition monitor according to SR5#378 'Grunts'.
      * @param system To be altered system data.
      */
-    prepareConditionMonitors: (system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) => {
+    prepareConditionMonitors: (system: Actor.SystemOfType<'character' | 'spirit'>) => {
         if (system.is_npc && system.npc.is_grunt) {
             ConditionMonitorsPrep.prepareGrunt(system);
         } else {

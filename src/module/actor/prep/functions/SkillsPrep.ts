@@ -14,7 +14,7 @@ export class SkillsPrep {
      * NOTE: Foundry also calls the prepareData multiple times with incomplete source data, causing some value properties to be missing.
      * @param system 
      */
-    static prepareSkillData(system: Actor.SystemOfType<'character' | 'critter' | 'ic' | 'spirit' | 'sprite' | 'vehicle'>) {
+    static prepareSkillData(system: Actor.SystemOfType<'character' | 'ic' | 'spirit' | 'sprite' | 'vehicle'>) {
         const { language, active, knowledge } = system.skills;
 
         // Active skills aren't grouped and can be prepared skill by skill.
@@ -35,7 +35,7 @@ export class SkillsPrep {
     /**
      * Prepare actor data for skills
      */
-    static prepareSkills(system: Actor.SystemOfType<'character' | 'critter' | 'ic' | 'spirit' | 'sprite' | 'vehicle'>) {
+    static prepareSkills(system: Actor.SystemOfType<'character' | 'ic' | 'spirit' | 'sprite' | 'vehicle'>) {
         const { language, active, knowledge } = system.skills;
         if (language) {
             language.attribute = 'intuition';

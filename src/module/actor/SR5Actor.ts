@@ -6,7 +6,6 @@ import { DataDefaults } from '../data/DataDefaults';
 import { SkillFlow } from "./flows/SkillFlow";
 import { SR5 } from "../config";
 import { CharacterPrep } from "./prep/CharacterPrep";
-import { CritterPrep } from "./prep/CritterPrep";
 import { SpiritPrep } from "./prep/SpiritPrep";
 import { SpritePrep } from "./prep/SpritePrep";
 import { VehiclePrep } from "./prep/VehiclePrep";
@@ -51,20 +50,19 @@ import { MatrixRules } from '@/module/rules/MatrixRules';
 import { StorageFlow } from '@/module/flows/StorageFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 import { LinksHelpers } from '@/module/utils/links';
-import ItemTypes = Actor.ItemTypes;
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
  *
- * To easily access ActorData without any typing issues us the SR5Actor.asCritter helpers.
+ * To easily access ActorData without any typing issues us the SR5Actor.asType("IC") helpers.
  * They are set up in a way that will handle both error management and type narrowing.
  * Example:
  * <pre><code>
  *     const actor = game.actors.get('randomId');
- *     const critter = actor.asCritter();
- *     if (!critter) return;
- *     // critter.type === 'critter'
- *     // critter.system as CritterData
+ *     const IC = actor.asType("IC");
+ *     if (!IC) return;
+ *     // IC.type === 'IC'
+ *     // IC.system as ICData
  * </code></pre>
  *
  */
@@ -147,8 +145,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         if (this.isType('character'))
             CharacterPrep.prepareBaseData(this.system);
-        else if (this.isType('critter'))
-            CritterPrep.prepareBaseData(this.system);
         else if (this.isType('spirit'))
             SpiritPrep.prepareBaseData(this.system);
         else if (this.isType('sprite'))
@@ -253,8 +249,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // General actor data preparation has been moved to derived data, as it depends on prepared item data.
         if (this.isType('character'))
             CharacterPrep.prepareDerivedData(this.system, items);
-        else if (this.isType('critter'))
-            CritterPrep.prepareDerivedData(this.system, items);
         else if (this.isType('spirit'))
             SpiritPrep.prepareDerivedData(this.system, items);
         else if (this.isType('sprite'))
@@ -621,7 +615,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @returns true in case of possible natural recovery.
      */
     get hasNaturalRecovery(): boolean {
-        return this.isType('character', 'critter');
+        return this.isType('character');
     }
 
     getVehicleTypeSkillName() {
@@ -633,7 +627,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             case 'ground':
                 return 'pilot_ground_craft';
             case 'water':
-                return 'pilot_water_craft';
+                return 'pilot_watercraft';
             case 'aerospace':
                 return 'pilot_aerospace';
             case 'walker':
@@ -776,21 +770,21 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * Determine if an actor can choose a special trait using the special field.
      */
     get hasSpecial(): boolean {
-        return ['character', 'sprite', 'spirit', 'critter'].includes(this.type);
+        return ['character', 'sprite', 'spirit'].includes(this.type);
     }
 
     /**
      * Determine if an actor can alter the special trait
      */
     get canAlterSpecial(): boolean {
-        return this.hasSpecial && ['character', 'critter'].includes(this.type);
+        return this.hasSpecial && ['character'].includes(this.type);
     }
 
     /**
      * Determine if an actor can choose a full defense attribute
      */
     get hasFullDefense(): boolean {
-        return ['character', 'vehicle', 'sprite', 'spirit', 'critter'].includes(this.type);
+        return ['character', 'vehicle', 'sprite', 'spirit'].includes(this.type);
     }
 
     /**
@@ -806,7 +800,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     isEmerged(this: SR5Actor): boolean {
         if (this.isType('sprite')) return true;
-        if (this.isType('character', 'critter') && this.system.special === 'resonance') return true;
+        if (this.isType('character') && this.system.special === 'resonance') return true;
 
         return false;
     }
@@ -2206,7 +2200,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @returns true, if the actor can interact with the physical plane
      */
     get hasPhysicalBody(): boolean {
-        return this.isType('character', 'critter', 'spirit', 'vehicle');
+        return this.isType('character', 'spirit', 'vehicle');
     }
 
     /**
@@ -2217,16 +2211,16 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         const updateData: Record<string, any> = {};
 
-        if (this.isType('character', 'critter', 'spirit', 'vehicle')) {
+        if (this.isType('character', 'spirit', 'vehicle')) {
             updateData['system.track.physical.value'] = 0;
             updateData['system.track.physical.overflow.value'] = 0;
         }
 
-        if (this.isType('character', 'critter', 'spirit')) {
+        if (this.isType('character', 'spirit')) {
             updateData['system.track.stun.value'] = 0;
         }
 
-        if (this.isType('character', 'critter')) {
+        if (this.isType('character')) {
             updateData['system.attributes.edge.uses'] = this.getEdge().value;
         }
 

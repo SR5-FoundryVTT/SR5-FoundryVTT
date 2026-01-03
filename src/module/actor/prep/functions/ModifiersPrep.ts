@@ -1,7 +1,7 @@
 import { SR5 } from "../../../config";
 
 export class ModifiersPrep {
-    static clearAttributeMods(system: Actor.SystemOfType<'character' | 'critter' | 'ic' | 'spirit' | 'sprite' | 'vehicle'>) {
+    static clearAttributeMods(system: Actor.SystemOfType<'character' | 'ic' | 'spirit' | 'sprite' | 'vehicle'>) {
         const { attributes } = system;
         for (const [name, attribute] of Object.entries(attributes)) {
             // Check for valid attributes. Active Effects can cause unexpected properties to appear.
@@ -11,13 +11,13 @@ export class ModifiersPrep {
         }
     }
 
-    static clearArmorMods(system:Actor.SystemOfType<'character' | 'critter' | 'spirit' | 'vehicle'>) {
+    static clearArmorMods(system:Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>) {
         const {armor} = system;
 
         armor.mod = [];
     }
 
-    static clearLimitMods(system: Actor.SystemOfType<'character' | 'critter' | 'spirit' | 'sprite' | 'vehicle'>) {
+    static clearLimitMods(system: Actor.SystemOfType<'character' | 'spirit' | 'sprite' | 'vehicle'>) {
         const {limits} = system;
         for (const [name, limit] of Object.entries(limits)) {
             if (!Object.hasOwn(SR5.limits, name) || !limit) return;
