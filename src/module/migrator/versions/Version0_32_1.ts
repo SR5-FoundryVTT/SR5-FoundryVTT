@@ -2,6 +2,7 @@ import { VersionMigration } from "../VersionMigration";
 
 /**
  * - Updates action skill references and vehicle modification categories to match official book conventions.
+ * - Converts range and duration fields in critter powers to lowercase.
  */
 export class Version0_32_1 extends VersionMigration {
     readonly TargetVersion = "0.32.1";
@@ -13,6 +14,10 @@ export class Version0_32_1 extends VersionMigration {
     } as const;
 
     override handlesItem(_item: any): boolean {
+        if (_item.type === 'critter_power' && _item.system) {
+            return true;
+        }
+
         const action = _item.system?.action;
 
         if (action) {
@@ -32,6 +37,25 @@ export class Version0_32_1 extends VersionMigration {
     }
 
     override migrateItem(_item: any): void {
+        if (_item.type === 'critter_power' && _item.system) {
+            const system = _item.system;
+
+            const range = system.range ?? '';
+            system.range = range === 'T'
+                ? 'touch'
+                : range.toLowerCase()
+                    .replace(/\s+/g, '_')
+                    .replace(/[()]/g, '') as any;
+
+            const duration = (system.duration ?? '').toLowerCase();
+            if (duration === 's')
+                system.duration = 'sustained';
+            else if (duration === 'i')
+                system.duration = 'instant';
+            else if (duration === 'p')
+                system.duration = 'permanent';
+        }
+
         const action = _item.system?.action;
 
         if (action) {
