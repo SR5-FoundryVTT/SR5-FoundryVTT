@@ -24,7 +24,7 @@ export class Version0_32_1 extends VersionMigration {
                 return true;
             else if (this.skillMap[action.opposed?.resist?.skill])
                 return true;
-        } else if (_item.system?.modification_categories === 'power_train') {
+        } else if (_item.system?.modification_category === 'power_train') {
             return true;
         }
 
@@ -52,8 +52,8 @@ export class Version0_32_1 extends VersionMigration {
             }
         }
 
-        if (_item.system?.modification_categories === 'power_train') {
-            _item.system.modification_categories = 'powertrain';
+        if (_item.system?.modification_category === 'power_train') {
+            _item.system.modification_category = 'powertrain';
         }
     }
 }
