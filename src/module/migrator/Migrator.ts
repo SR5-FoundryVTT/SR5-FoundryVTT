@@ -10,6 +10,7 @@ import { Version0_30_6 } from './versions/Version0_30_6';
 import { Version0_31_0 } from './versions/Version0_31_0';
 import { Version0_31_5 } from './versions/Version0_31_5';
 import { Version0_32_0 } from './versions/Version0_32_0';
+import { Version0_32_1 } from './versions/Version0_32_1';
 import { VersionMigration, MigratableDocument, MigratableDocumentName } from "./VersionMigration";
 const { deepClone } = foundry.utils;
 
@@ -46,6 +47,7 @@ export class Migrator {
         new Version0_31_0(),
         new Version0_31_5(),
         new Version0_32_0(),
+        new Version0_32_1(),
     ] as const;
 
     private static documentsToBeMigrated = 0;
