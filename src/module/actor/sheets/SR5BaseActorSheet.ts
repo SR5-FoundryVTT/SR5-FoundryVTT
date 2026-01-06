@@ -891,6 +891,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         // Inject special case context based on item type
         if (type === 'call_in_action') this._handleCreateCallInActionItem(event, itemData);
+        if (type === 'matrix_action') this._handleCreateMatrixActionItem(event, itemData);
 
         const items = await this.actor.createEmbeddedDocuments('Item', [itemData]);
         if (!items) return;
@@ -910,8 +911,33 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     _handleCreateCallInActionItem(event: PointerEvent, itemData: Item.CreateData) {
         const actorType = SheetFlow.closestAction(event.target)!.dataset.actorType;
-        if (!actorType) console.error(`Shadowrun 5e | Tried to create a Call In Action item without an actor-type context!`);
+        if (!actorType) console.error(`Shadowrun 5e | Tried to create a Call In Action item without an actor-type data attribute context!`);
         itemData['system.actor_type'] = actorType;
+    }
+
+    /**
+     * Matrix action items are created the same as normal action items, but need additional data injection when creating.
+     * Otherwise they will not show up on the appropriate matrix action sections on sheet.
+     * 
+     * On sheet 'matrix action' are using a wrong item type (matrix_action) to differentiate them during creation.
+     * NOTE: If further action categories need additional data injection, we should handle all within the same function, similar to this
+     *       and switch to an data attribute to differentiate between each instead of manipulating the create item type data attribute.
+     */
+    _handleCreateMatrixActionItem(event: PointerEvent, itemData: Item.CreateData) {
+        let actionCategories = [];
+        try {
+            const actionCategoriesJSON = SheetFlow.closestAction(event.target)!.dataset.actionCategories;
+            actionCategories = JSON.parse(actionCategoriesJSON ?? '');
+        } catch (error) {
+            console.error(`Shadowrun 5e | Error while creating Matrix Action item: ${error}`);
+            return;
+        }
+
+        if (!actionCategories) console.error(`Shadowrun 5e | Tried to create a Matrix Action item without action-categories data attribute context!`);
+
+        itemData['system.action.categories'] = actionCategories;
+        itemData['system.action.test'] = 'MatrixTest';
+        itemData['type'] = 'action';
     }
 
     /**

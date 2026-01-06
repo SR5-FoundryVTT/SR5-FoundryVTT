@@ -4,4 +4,4 @@
     Usage: {{> "systems/shadowrun5e/dist/templates/v2/common/generic-data-properties.hbs" data=data }} 
     where data is an object with key-value pairs to be converted to data attributes
  --}}
-{{#if data}}{{#each data}}data-{{@key}}="{{this}}"{{/each}}{{/if}}
+{{#if data}}{{#each data}}data-{{@key}}="{{this}}" {{/each}}{{/if}}
