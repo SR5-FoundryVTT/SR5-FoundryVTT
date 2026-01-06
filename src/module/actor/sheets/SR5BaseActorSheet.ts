@@ -933,7 +933,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             return;
         }
 
-        if (!actionCategories) console.error(`Shadowrun 5e | Tried to create a Matrix Action item without action-categories data attribute context!`);
+        if (!actionCategories || actionCategories.length === 0) console.error(`Shadowrun 5e | Tried to create a Matrix Action item without action-categories data attribute context!`);
 
         itemData['system.action.categories'] = actionCategories;
         itemData['system.action.test'] = 'MatrixTest';

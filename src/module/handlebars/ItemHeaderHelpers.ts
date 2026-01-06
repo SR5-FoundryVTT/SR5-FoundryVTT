@@ -14,7 +14,7 @@ export const registerItemHeaderHelpers = () => {
      */
     Handlebars.registerHelper('actionHeaderAddData', (actionType: string) => {
         if (actionType === 'matrix_action') {
-            return { 'action-categories': JSON.stringify(['matrix'])}
+            return { 'action-categories': JSON.stringify(['matrix']) };
         }
     });
 };

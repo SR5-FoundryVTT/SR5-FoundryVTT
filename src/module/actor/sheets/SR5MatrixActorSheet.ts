@@ -403,7 +403,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      *
      * If a marked document is selected, only actions with a mark requirement will show.
      *
-     * @returns Sorted list of objects containg a localized name and action item for sheet display.
+     * @returns Sorted list of objects containing a localized name and action item for sheet display.
      */
     async _prepareMatrixActions() {
         // Combine all sources for matrix actions.
