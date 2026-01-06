@@ -388,6 +388,15 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         return await PackActionFlow.getPackActions(matrixPackName);
     }
 
+    /**
+     * Get matrix actions otherwise available on this actor.
+     */
+    protected _getMatrixActorActions() {
+        const actions = this.document.itemsForType.get('action') as SR5Item<'action'>[];
+        if (!actions) return [];
+        return actions.filter(item => item.hasActionCategory('matrix'));
+    }
+
 
     /**
      * Retrieve all matrix actions from the corresponding pack to be displayed.
@@ -397,7 +406,11 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      * @returns Sorted list of objects containg a localized name and action item for sheet display.
      */
     async _prepareMatrixActions() {
-        let actions = await this._getMatrixPackActions();
+        // Combine all sources for matrix actions.
+        let actions = [
+            ...await this._getMatrixPackActions(), 
+            ...this._getMatrixActorActions()
+        ];
 
         actions = actions.filter(action => {
             if (MatrixRules.isSleazeAction(
