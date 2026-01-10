@@ -4,10 +4,12 @@ import { FLAGS, SYSTEM_NAME } from "../../constants";
 import { KnowledgeSkillCategory, SkillFieldType } from "src/module/types/template/Skills";
 import { SR5Item } from "@/module/item/SR5Item";
 import { Translation } from "@/module/utils/strings";
+import { DataDefaults } from "@/module/data/DataDefaults";
 
 // A skill storage structure for easier access to character skill items.
 export interface Skills {
     // quick access based on name and label.
+    // TODO: tamif - these must be removed, as name / locale isn't unquie across skill types.
     named: Map<string, SR5Item<'skill'>>
     localized: Map<string, SR5Item<'skill'>>
     // sorted lists for sheet display.
@@ -95,6 +97,52 @@ export class SkillFlow {
         }
 
         return skills;
+    }
+
+    /**
+     * Transform actor skill to system skill structure.
+     * 
+     * This system skill structure allows for effects to overwrite skill values and for getRollData to 
+     * be used for cross-document skill injection and retrieval.
+     *
+     * @param items Skill items to transform
+     */
+    static prepareSystemSkills(items: SR5Item<'skill'>[]) {
+        const systemSkills = { 
+            active: {},
+            language: {},
+            knowledge: {
+                academic: {},
+                professional: {},
+                street: {},
+                interests: {},
+            }
+        }
+
+        // TODO: tamif - This and prepareActorSkills have a lot of duplicate code. Refactor. Also this sucks.
+        for (const item of items) {
+            if(item.system.type !== 'skill') continue;
+
+            const skillType = item.system.skill.category;
+            if (!Object.hasOwn(systemSkills, skillType)) continue;
+            
+            let path = '';
+            if (skillType === 'active') {
+                path = `active.${item.name}`; 
+            }
+            else if (skillType === 'language') {
+                path = `language.${item.name}`;
+            }
+            else if (skillType === 'knowledge') {
+                const type = item.system.skill.knowledgeType;
+                path = `knowledge.${type}.${item.name}`;
+            }
+
+            foundry.utils.setProperty(systemSkills, path, DataDefaults.createData("skill_field", {base: item.system.skill.rating}));
+        }
+        
+
+        return systemSkills;
     }
 
     /**
