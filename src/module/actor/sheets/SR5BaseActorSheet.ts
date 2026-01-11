@@ -1514,7 +1514,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @param key search string fall back if skill is not provided.
      * @param skill skill to be searched through
      * @param text text to search for, can be an empty string.
-     * @returns true, if skill contains
+     * @returns true, if skill contains search text
      */
     _doesSkillContainText(key: string, skill: SkillFieldType, text: string) {
         if (!text) {
