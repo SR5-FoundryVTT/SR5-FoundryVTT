@@ -1652,7 +1652,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const skillId = $(event.target).closest('a').data().skill;
+        const skillId = event.target?.closest<HTMLElement>('[data-skill-id]')?.dataset?.skillId;
+        if (!skillId) return;
         await this.actor.removeLanguageSkill(skillId);
     }
 
@@ -1671,9 +1672,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const skillId = $(event.target).closest('a').data().skill;
-        const category = $(event.target).closest('a').data().category;
-        await this.actor.removeKnowledgeSkill(skillId, category);
+        const skillId = event.target?.closest<HTMLElement>('[data-skill-id]')?.dataset?.skillId;
+        const knowledgeSkillCategory = event.target?.closest<HTMLElement>('[data-category]')?.dataset?.subcategory as KnowledgeSkillCategory;
+        if (!skillId || !knowledgeSkillCategory) return;
+        await this.actor.removeKnowledgeSkill(skillId, knowledgeSkillCategory);
     }
 
     /** Add an active skill and show the matching edit application afterwards.
@@ -1691,7 +1693,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const skillId = event.target?.closest<HTMLElement>('[data-skill]')?.dataset?.skill ?? '';
+        const skillId = event.target?.closest<HTMLElement>('[data-skill-id]')?.dataset?.skillId;
+        if (!skillId) return;
         await this.actor.removeActiveSkill(skillId);
     }
 
