@@ -1532,6 +1532,16 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return Helpers.getSkillLabelOrName(skill);
     }
 
+    /**
+     * Determine if a given skill contains a given search text in any way.
+     * 
+     * Name and translation, specializations will be searched.
+     *
+     * @param key search string fall back if skill is not provided.
+     * @param skill skill to be searched through
+     * @param text text to search for, can be an empty string.
+     * @returns true, if skill contains search text
+     */
     _doesSkillContainText(key: string, skill: SkillFieldType, text: string) {
         if (!text) {
             return true;
@@ -1544,7 +1554,14 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const specs = skill.specs !== undefined && Array.isArray(skill.specs) ? skill.specs.join(' ') : '';
         const searchString = `${searchKey} ${name} ${specs}`;
 
-        return searchString.toLowerCase().search(text.toLowerCase()) > -1;
+        // Normalize strings for Unicode characters (Korean) and use Foundry umlaut (German) handling.
+        const normalizedSearch = foundry.applications.ux.SearchFilter.cleanQuery(searchString);
+        const normalizedText = foundry.applications.ux.SearchFilter.cleanQuery(text);
+
+        const searchLower = normalizedSearch.toLowerCase();
+        const textLower = normalizedText.toLowerCase();
+
+        return searchLower.includes(textLower);
     }
 
     _filterActiveSkills(sheetData: SR5ActorSheetData) {
