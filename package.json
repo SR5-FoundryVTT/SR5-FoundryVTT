@@ -22,11 +22,11 @@
         "gulp": "^5.0.1",
         "gulp-sass": "^6.0.1",
         "jszip": "^3.10.1",
-        "sass": "^1.97.1",
+        "sass": "^1.97.2",
         "stream": "^0.0.3",
         "timers": "^0.1.1",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.52.0",
+        "typescript-eslint": "^8.53.0",
         "xml2js": "^0.6.2",
         "yargs": "^18.0.0"
     },
