@@ -383,9 +383,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      * @protected
      */
     protected async _getMatrixPackActions() {
-        const matrixPackName = PackActionFlow.getMatrixActionsPackName();
-        // Collect all sources for matrix actions.
-        return await PackActionFlow.getPackActions(matrixPackName);
+        return await PackActionFlow.getMatrixPackActions();
     }
 
     /**
