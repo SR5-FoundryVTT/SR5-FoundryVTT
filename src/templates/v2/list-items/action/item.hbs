@@ -1,6 +1,6 @@
 {{!-- 
     list-item expects an SR5Item to be passed in as 'item' 
-    'name' is optional and will override item.name if provided. This can be used to display translations intstead of direct names.
+    'name' is optional and will override item.name if provided. This can be used to display translations instead of direct names.
 --}}
 {{#if (or @root.isEditMode (isVisible item))}}
 <div class="list-item-container {{#if (hasKey @root.expandedUuids item.uuid)}} expanded {{/if}}">
