@@ -163,4 +163,13 @@ export const SheetFlow = {
         const newQty = qty + change;
         await item.update({system: { technology: { quantity: Math.max(newQty, 0)}}})
     },
+
+    /**
+     * Change given items quantity.
+     */
+    async changeItemQuantity(item: SR5Item, quantity: number) {
+        // fail safely in case data model changes here.
+        if (item.system?.technology?.quantity === quantity) return;
+        await item.update({system: { technology: { quantity: Math.max(quantity, 0)}}})
+    }
 }
