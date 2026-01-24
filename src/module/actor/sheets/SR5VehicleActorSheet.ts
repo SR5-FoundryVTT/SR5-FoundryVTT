@@ -79,10 +79,8 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
     }
 
     protected override async _getMatrixPackActions() {
-        const matrixPackName = PackActionFlow.getMatrixActionsPackName();
-
         // filter out illegal actions from the matrix actions
-        return (await PackActionFlow.getPackActions(matrixPackName)).filter((action) => {
+        return (await PackActionFlow.getMatrixPackActions()).filter((action) => {
             return !MatrixRules.isIllegalAction(
                         action.getAction()?.attribute as any,
                         action.getAction()?.attribute2 as any,

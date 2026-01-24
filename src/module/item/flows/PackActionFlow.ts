@@ -168,6 +168,17 @@ export const PackActionFlow = {
         }
         return actions.filter((action: SR5Item) => action.hasActionCategory('matrix'));
     },
+
+    /**
+     * Retrieve matrix actions from the configured matrix actions pack.
+     *
+     * Only actions with the matrix category are returned to avoid showing unrelated actions.
+     */
+    async getMatrixPackActions(): Promise<SR5Item<'action'>[]> {
+        const matrixPackName = this.getMatrixActionsPackName();
+        const packActions = await this.getPackActions(matrixPackName);
+        return packActions.filter(action => action.hasActionCategory('matrix'));
+    },
     
     /**
      * Collect all matrix actions of an actor.
@@ -176,9 +187,7 @@ export const PackActionFlow = {
      * @returns Combined list of pack and actor matrix actions.
      */
     async getActorMatrixActions(actor: SR5Actor) {
-        const matrixPackName = this.getMatrixActionsPackName();
-        // Collect all sources for matrix actions.
-        const packActions = await this.getPackActions(matrixPackName);
+        const packActions = await this.getMatrixPackActions();
         const actorActions = this.getMatrixActions(actor);
         return [...packActions, ...actorActions];
     },
