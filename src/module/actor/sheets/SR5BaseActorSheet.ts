@@ -955,7 +955,12 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.preventDefault();
         if (!(event.target instanceof HTMLElement)) return;
         const id = SheetFlow.closestItemId(event.target);
-        const item = this.actor.items.get(id);
+        let item = this.actor.items.get(id);
+        if (!item) {
+            const uuid = SheetFlow.closestUuid(event.target);
+            // @ts-expect-error typing clashes between items.get and fromUuid
+            item = await fromUuid(uuid);
+        }
         if (item) await item.sheet?.render(true, { mode: 'edit' });
     }
 

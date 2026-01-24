@@ -70,7 +70,7 @@
                         {{else}}
                             {{#if network}}
                                 <label>{{localize "SR5.Labels.ActorSheet.ConnectedTo"}}:&nbsp;</label>
-                                <div class="basic-row">
+                                <div class="basic-row" data-uuid="{{network.uuid}}">
                                     {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" network }}
                                     <a data-action="openUuid" data-uuid="{{network.uuid}}">{{network.name}}</a>
                                 </div>
