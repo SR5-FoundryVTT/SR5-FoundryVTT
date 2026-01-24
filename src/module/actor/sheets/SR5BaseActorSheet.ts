@@ -562,9 +562,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     activateListeners_LEGACY(html: JQuery<HTMLElement>) {
         Helpers.setupCustomCheckbox(this, html);
 
-        // General item header/list actions...
-        html.find('.item-qty').on('change', this._onListItemChangeQuantity.bind(this));
-
         // Actor inventory handling....
         html.find('#select-inventory').on('change', this._onSelectInventory.bind(this));
 
@@ -579,6 +576,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         html.find('select[name="initiative-select"]').on('change', this._onInitiativePerceptionChange.bind(this));
 
         html.find('select.weapon-ammo-select').on('change', this._onWeaponAmmoSelect.bind(this));
+
+        html.find('input[data-system-action="changeItemQty"]').on('change', this._onListItemChangeQuantity.bind(this));
     }
 
     /**
@@ -1729,7 +1728,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             return;
         }
 
-        await item.update({ system: { technology: { quantity } } });
+        await SheetFlow.changeItemQuantity(item, quantity);
     }
 
     /**
