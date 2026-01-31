@@ -2650,6 +2650,7 @@
                 "PickControlledTokenAsSummoner": "Pick the currently Controlled Token Actor as the Summoner",
                 "PickControlledTokenAsTechnomancer": "Pick the currently Controlled Token Actor as the Compiler (Technomancer)",
                 "RebootPersonaAndClearAllMarks": "Reboot your Persona and clear all Marks you have placed",
+                "RemoveFavorite": "Remove this from your favorites bar",
                 "SetupPAN": "Add all Equipped Wireless Devices to this character's Persona"
             },
             "CallInAction": {
@@ -3032,7 +3033,9 @@
                 "Long": "Long",
                 "Medium": "Medium",
                 "Ranges": "Ranges",
-                "Short": "Short"
+                "Short": "Short",
+                "Modes": "Modes",
+                "Range": "Range"
             },
             "Reach": "Reach",
             "Reload": "Reload",
