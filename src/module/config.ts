@@ -72,6 +72,12 @@ export const SR5 = {
         rating: 'SR5.Rating',
     },
 
+    // All available attributes on items. These are available as testable attributes across all actor types
+    // while not technically being stored as system attributes.
+    itemAttributes: {
+        rating: "SR5.Rating",
+    },
+
     mentalAttributes: ['charisma', 'intuition', 'logic', 'willpower'],
     physicalAttributes: ['agility', 'body', 'reaction', 'strength'],
 

@@ -85,6 +85,11 @@ export const DamageData = () => ({
         required: true,
         choices: SR5.attributes
     }),
+    itemAttribute: new StringField({
+        blank: true,
+        required: true,
+        choices: SR5.itemAttributes
+    }),
     source: new SchemaField({
         actorId: new StringField({ required: true }),
         itemId: new StringField({ required: true }),

@@ -54,7 +54,10 @@ export const ModifiableValue = () => ({
 
 export const ModifiableValueLinked = () => ({
     ...ModifiableValue(),
+    // attributes from source documents.
     attribute: new StringField({ required: true }),
+    // additional attributes from item attributes when source document is an actor.
+    itemAttribute: new StringField({ required: true }),
     base_formula_operator: new StringField({
         required: false,
         initial: 'add',

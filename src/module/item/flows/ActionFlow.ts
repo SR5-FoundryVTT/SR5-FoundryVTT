@@ -27,18 +27,27 @@ export class ActionFlow {
         if (item)
             damage.source = ActionFlow._damageSource(actor, item);
 
-        this._applyModifiableValue(damage, actor);
+        this._applyModifiableValue(damage, actor, item);
         damage.value = Helpers.calcTotal(damage, { min: 0 });
 
-        this._applyModifiableValue(damage.ap, actor);
+        this._applyModifiableValue(damage.ap, actor, item);
         damage.ap.value = Helpers.calcTotal(damage.ap, { min: 0 });
 
         return damage;
     }
 
-    static _applyModifiableValue(value: ModifiableValueLinkedType, document: SR5Actor|SR5Item) {
+    /**
+     * Apply dynamic action properties to the given modifiable value.
+     *
+     * @param value The ModifiableValue field to modify.
+     * @param document The main source document to retrieve values from.
+     * @param item An optional item document to retrieve item specific values from, when document is an actor.
+     */
+    static _applyModifiableValue(value: ModifiableValueLinkedType, document: SR5Actor|SR5Item, item?: SR5Item) {
         const attribute = (document as SR5Actor).getAttribute(value.attribute);
+        const itemAttribute = item?.getAttribute(value.itemAttribute);
         if (!attribute) return;
+        if (!itemAttribute) return;
 
         if (!value.base_formula_operator) {
             console.error(`Unsupported formula operator: '${value.base_formula_operator}' used. Falling back to 'add'.`);
@@ -49,18 +58,21 @@ export class ActionFlow {
         switch (value.base_formula_operator) {
             case "add":
                 PartsList.AddUniquePart(value.mod, attribute.label, attribute.value);
+                if (itemAttribute) PartsList.AddUniquePart(value.mod, itemAttribute.label, itemAttribute.value);
                 break;
             case "subtract":
                 PartsList.AddUniquePart(value.mod, attribute.label, -attribute.value);
+                if (itemAttribute) PartsList.AddUniquePart(value.mod, itemAttribute.label, -itemAttribute.value);
                 break;
             case "multiply":
                 PartsList.AddUniquePart(value.mod, 'SR5.Value', (value.base * attribute.value) - value.base);
+                if (itemAttribute) PartsList.AddUniquePart(value.mod, 'SR5.Value', (value.base * itemAttribute.value) - value.base);
                 break;
             case "divide": {
                 // Remove base from value by modifying.
                 PartsList.AddUniquePart(value.mod, 'SR5.BaseValue', value.base * -1);
                 // Add division result as modifier on zero.
-                const denominator = attribute.value === 0 ? 1 : attribute.value;
+                const denominator = attribute.value === 0 ? 1 : attribute.value + itemAttribute?.value || 0;
                 PartsList.AddUniquePart(value.mod, 'SR5.Value', Math.floor(value.base / denominator));
                 break;
             }
