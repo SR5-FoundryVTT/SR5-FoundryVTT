@@ -177,7 +177,7 @@ function main() {
         console.log('-'.repeat(80));
         console.log(`Translation progress: ${translatedCount}/${totalKeys} (${completionPercent}%)`);
         console.log(`Missing properties: ${missing.length}`);
-        console.log(`Untranslated properties: ${untranslated.length}`);
+        console.log(`Identical properties: ${untranslated.length}`);
         console.log(`Extra properties (should be removed): ${extra.length}`);
         
         if (missing.length > 0) {
@@ -188,7 +188,7 @@ function main() {
         }
         
         if (untranslated.length > 0) {
-            console.log(`\n  🔤 Untranslated Properties (${untranslated.length}):`);
+            console.log(`\n  🔤 Identical Properties (${untranslated.length}):`);
             untranslated.forEach(({ key, value }) => {
                 const displayValue = value.length > 50 ? value.substring(0, 47) + '...' : value;
                 console.log(`    - ${key}: "${displayValue}"`);

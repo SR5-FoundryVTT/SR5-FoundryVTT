@@ -2,7 +2,7 @@
 
 ## Overview
 
-The `check-localization.mjs` script compares all localization files against the English base locale (`public/locale/en/config.json`) to identify missing and untranslated properties.
+The `check-localization.mjs` script compares all localization files against the English base locale (`public/locale/en/config.json`) to identify missing and identical properties.
 
 ## Usage
 
@@ -31,7 +31,7 @@ node utils/check-localization.mjs [locale]
 For each locale (de, fr, ko, pt-BR), the script identifies:
 
 1. **Missing Properties**: JSON keys that exist in the English locale but are completely absent from the target locale
-2. **Untranslated Properties**: JSON keys that exist but have the exact same value as the English version (indicating they haven't been translated)
+2. **Identical Properties**: JSON keys that exist but have the exact same value as the English version (indicating they haven't been translated)
 3. **Extra Properties**: JSON keys that exist in the target locale but are missing from the English base (these should be removed as they're obsolete)
 
 ## Output Format
@@ -39,7 +39,7 @@ For each locale (de, fr, ko, pt-BR), the script identifies:
 The script outputs:
 - A summary for each locale showing translation progress percentage
 - A list of all missing properties
-- A list of all untranslated properties with their English values
+- A list of all identical properties with their English values
 
 ### Example Output
 
@@ -48,7 +48,7 @@ The script outputs:
 --------------------------------------------------------------------------------
 Translation progress: 1353/2150 (62.9%)
 Missing properties: 623
-Untranslated properties: 174
+Identical properties: 174
 Extra properties (should be removed): 53
 
   ⚠️  Missing Properties (623):
@@ -56,7 +56,7 @@ Extra properties (should be removed): 53
     - SR5.Weapon.FIELDS.melee.reach.label
     ...
 
-  🔤 Untranslated Properties (174):
+  🔤 Identical Properties (174):
     - SR5.ActorTypes.Sprite: "Sprite"
     - SR5.HotSim: "Hot Sim"
     ...
