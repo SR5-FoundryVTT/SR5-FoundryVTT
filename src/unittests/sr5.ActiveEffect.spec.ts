@@ -788,5 +788,32 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             assert.strictEqual(test.pool.value, 0);
         });
-    })
+    });
+
+    /**
+     * These tests cover interaction between Effect change application and data preparation code.
+     */
+    describe("AdvancedEffects should hold true to data preparation expectations", () => {
+        it('Should apply armor element modifiers from effect changes and armor items correctly', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.armor.fire', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+                ]
+            }]);
+            await actor.createEmbeddedDocuments('Item', [{
+                name: 'Test Armor',
+                type: 'armor',
+                system: {
+                    technology: { equipped: true },
+                    armor: {
+                        fire: 2,}
+                    }
+            }]);
+
+            // effect change 3 + equipped armor item 2 = 5
+            assert.strictEqual(actor.system.armor.fire, 5);
+        });
+    });
 };
