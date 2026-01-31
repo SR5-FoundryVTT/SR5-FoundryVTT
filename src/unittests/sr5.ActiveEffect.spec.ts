@@ -209,7 +209,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.deepEqual(actor.system.skills.active.automatics.upgrade, { name: 'Test Effect', value: 3 });
         });
 
-        it('UPGRADE mode: uses the highest value for mulitple upgrade changes', async () => {
+        it('UPGRADE mode: uses the highest value for multiple upgrade changes', async () => {
             const actor = await factory.createActor({ type: 'character', system: { 
                 skills: { active: { automatics: { base: 2 } } } } 
             });
@@ -800,6 +800,10 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 name: 'Test Effect',
                 changes: [
                     { key: 'system.armor.fire', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+                    { key: 'system.armor.acid', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+                    { key: 'system.armor.cold', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+                    { key: 'system.armor.electricity', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+                    { key: 'system.armor.radiation', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
                 ]
             }]);
             await actor.createEmbeddedDocuments('Item', [{
@@ -808,12 +812,20 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 system: {
                     technology: { equipped: true },
                     armor: {
-                        fire: 2,}
+                        fire: 1,
+                        acid: 2,
+                        cold: 3,
+                        electricity: 4,
+                        radiation: 5
                     }
+                }
             }]);
 
-            // effect change 3 + equipped armor item 2 = 5
-            assert.strictEqual(actor.system.armor.fire, 5);
+            assert.strictEqual(actor.system.armor.fire, 4);
+            assert.strictEqual(actor.system.armor.acid, 5);
+            assert.strictEqual(actor.system.armor.cold, 6);
+            assert.strictEqual(actor.system.armor.electricity, 7);
+            assert.strictEqual(actor.system.armor.radiation, 8);
         });
     });
 };
