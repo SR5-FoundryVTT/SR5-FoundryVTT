@@ -35,7 +35,7 @@ export class CharacterPrep {
      * All derived data should depend on basic values like Attributes or Skills.
      *
      * ActiveEffect changes have applied before hand and only actor modifier values are 
-     * left to apply addtionaly.
+     * left to apply additionally.
      *
      * @param system
      * @param items
