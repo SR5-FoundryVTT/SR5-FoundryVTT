@@ -1144,7 +1144,7 @@
         "IC": {
             "FIELDS": {
                 "host": {
-                    "hint": "Type of IC",
+                    "hint": "On which host this IC is running",
                     "label": "Host",
                     "rating": {
                         "hint": "Rating of the Host we are running on",
@@ -2058,7 +2058,7 @@
         "Ritual": {
             "FIELDS": {
                 "descriptors": {
-                    "hint": "Descriptors for the Ritual ???",
+                    "hint": "Descriptors for the Ritual",
                     "label": "Descriptors"
                 },
                 "type": {

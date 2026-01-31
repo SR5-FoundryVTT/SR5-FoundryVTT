@@ -425,15 +425,96 @@
             }
         },
         "Agent": "Agent",
+        "Ammo": {
+            "FIELDS": {
+                "accuracy": {
+                    "hint": "Genauigkeitsmodifikator der Munition",
+                    "label": "Genauigkeit"
+                },
+                "ap": {
+                    "hint": "Durchschlagskraft der Munition. Diese Wert ergänzt oder ersetzt den DK-Wert der Waffe.",
+                    "label": "DK"
+                },
+                "blast": {
+                    "dropoff": {
+                        "hint": "Abnahme des Schadens mit Entfernung pro Meter",
+                        "label": "Sprengwirkung"
+                    },
+                    "radius": {
+                        "hint": "Radius der Sprengwirkung in Metern",
+                        "label": "Radius"
+                    }
+                },
+                "damage": {
+                    "hint": "Schadensmodifikator der Munition",
+                    "label": "Schaden"
+                },
+                "damageType": {
+                    "hint": "Art des Schadens der Munition",
+                    "label": "Schadensart"
+                },
+                "element": {
+                    "hint": "Elements des Schadens der Munition",
+                    "label": "Element"
+                },
+                "replaceAP": {
+                    "hint": "Ersetze Waffen DK-Wert",
+                    "label": "Ersetze"
+                },
+                "replaceDamage": {
+                    "hint": "Ersetze Waffen Schadenswerte",
+                    "label": "Ersetze"
+                }
+            },
+            "label": "Munition"
+        },
         "AmmoFull": "Vollgeladen",
         "AmmoGelRounds": "Gelmunition",
         "Aoe": "Flächeneffekt",
         "ApplyWounds": "Wunden anwenden",
-        "Armor": "Panzerung",
+        "Armor": {
+            "FIELDS": {
+                "armor": {
+                    "acid": {
+                        "hint": "Extra Panzerung gegen Säureschaden",
+                        "label": "Säureresistenz"
+                    },
+                    "cold": {
+                        "hint": "Extra Panzerung gegen Kälteschaden",
+                        "label": "Kälteresistenz"
+                    },
+                    "electricity": {
+                        "hint": "Extra Panzerung gegen Elektrizitätsschaden",
+                        "label": "Elektrizitätsresistenz"
+                    },
+                    "fire": {
+                        "hint": "Extra Panzerung gegen Feuerschaden",
+                        "label": "Feuerresistenz"
+                    },
+                    "hardened": {
+                        "hint": "Verstärkte Panzerung",
+                        "label": "Verstärkt"
+                    },
+                    "mod": {
+                        "hint": "Ist diese Panzerung nur Zubehör?",
+                        "label": "Zubehör"
+                    },
+                    "radiation": {
+                        "hint": "Extra Panzerung gegen Strahlenschaden",
+                        "label": "Strahlenresistenz"
+                    },
+                    "value": {
+                        "hint": "Panzerungswert",
+                        "label": "Panzerung"
+                    }
+                }
+            },
+            "label": "Panzerung"
+        },
         "ArmorHardened": "Verstärkt",
         "ArmorHardenedFull": "Verstärkte Panzerung",
         "ArmorValue": "Panzerungswert",
-        "Attack": "[MISSING]",
+        "Attack": "Angriff",
         "Attacker": "Angreifer",
         "AttackerHits": "Angreifer-Erfolge",
         "AttackerNetHits": "Angreifer-Netto-Erfolge",
@@ -460,7 +541,7 @@
         "BiofeedbackDamage": "Biofeedback Schaden",
         "Biography": "Biographie",
         "BlastRadius": "Sprengradius",
-        "Blitz": "[MISSING]",
+        "Blitz": "Blitz",
         "Block": "Blocken",
         "Bonus": "Bonus",
         "Bonuses": "Boni",
@@ -476,36 +557,36 @@
         "CallInAction": {
             "ActorType": "Akteur-Typ",
             "Compilation": "Kompilierung",
-            "Compile": "[MISSING]",
+            "Compile": "Kompilieren",
             "CreateCompilation": "Erstelle Kompilierungs-Aktion",
             "CreateSummoning": "Erstelle Beschwörungs-Aktion",
             "FIELDS": {
                 "actor_type": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Akteur-Typ auswählen",
+                    "label": "Akteur-Typ"
                 },
                 "spirit": {
                     "force": {
-                        "hint": "[MISSING]",
-                        "label": "[MISSING]"
+                        "hint": "Kraft des Geistes auswählen",
+                        "label": "Kraft"
                     },
                     "type": {
-                        "hint": "[MISSING]",
-                        "label": "[MISSING]"
+                        "hint": "Typ des Geistes auswählen",
+                        "label": "Typ"
                     }
                 },
                 "sprite": {
                     "level": {
-                        "hint": "[MISSING]",
-                        "label": "[MISSING]"
+                        "hint": "Kraft des Sprites auswählen",
+                        "label": "Kraft"
                     },
                     "type": {
-                        "hint": "[MISSING]",
-                        "label": "[MISSING]"
+                        "hint": "Typ des Sprites auswählen",
+                        "label": "Typ"
                     }
                 }
             },
-            "Summon": "[MISSING]",
+            "Summon": "Beschwören",
             "Summoning": "Beschwörung"
         },
         "CanDefault": "Improvisierbar",
@@ -522,56 +603,56 @@
         "Character": {
             "FIELDS": {
                 "is_critter": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Erlaubt die Nutzung von Critterkräften",
+                    "label": "Ist Critter"
                 },
                 "is_npc": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Nutze NPC-Funktionen für diesen Charakter",
+                    "label": "Ist NPC"
                 },
                 "karma": {
                     "max": {
-                        "hint": "[MISSING]",
-                        "label": "[MISSING]"
+                        "hint": "Insgesamt angesammeltes Karma",
+                        "label": "Gesamtkarma"
                     },
                     "value": {
-                        "hint": "[MISSING]",
-                        "label": "[MISSING]"
+                        "hint": "Derzeit verfügbares Karma",
+                        "label": "Karma"
                     }
                 },
                 "matrix_full_defense_attribute": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Nutze dieses Attribut wenn eine Volle Matrixverteidigung genutzt wird",
+                    "label": "Volle Matrixverteidigung Attribut"
                 },
                 "metatype": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Metatyp dieses Charakters. Ist der Charakter ein NPC werden dadurch die Attribute automatisch modifiziert.",
+                    "label": "Metatyp"
                 },
                 "notoriety": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Wie berüchtigt ist der Charakter",
+                    "label": "Berüchtigt"
                 },
                 "npc": {
                     "is_grunt": {
-                        "hint": "[MISSING]",
-                        "label": "[MISSING]"
+                        "hint": "Ist dieser NPC ein Scherge (Grunt)? Wendet Regeln für Schergen-NPCs an",
+                        "label": "Ist Scherge"
                     }
                 },
                 "nuyen": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Derzeit verfügbares Nuyen",
+                    "label": "Nuyen"
                 },
                 "public_awareness": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Wie bekannt ist der Charakter",
+                    "label": "Bekanntheit"
                 },
                 "street_cred": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Wie viel Straßenruf hat der Charakter",
+                    "label": "Straßenruf"
                 }
             },
             "Modifiers": {
-                "NPCMetatypeAttribute": "NSC-Metatyp-Attribute"
+                "NPCMetatypeAttribute": "NPC-Metatyp-Attribute"
             },
             "Types": {
                 "Dwarf": "Zwerg",
@@ -605,17 +686,17 @@
         },
         "CompendiumBrowser": {
             "Filters": {
-                "ClearSearch": "[MISSING]",
-                "SearchPlaceholder": "[MISSING]",
-                "System": "[MISSING]",
-                "World": "[MISSING]"
+                "ClearSearch": "Suche löschen",
+                "SearchPlaceholder": "Suche",
+                "System": "System",
+                "World": "Welt"
             },
             "Tabs": {
-                "Actors": "[MISSING]",
-                "Items": "[MISSING]",
-                "Settings": "[MISSING]"
+                "Actors": "Akteure",
+                "Items": "Gegenstände",
+                "Settings": "Einstellungen"
             },
-            "Title": "[MISSING]"
+            "Title": "Kompendium Browser"
         },
         "Compendiums": {
             "Folders": {
@@ -625,7 +706,7 @@
             "sr5drone": "Drohnen & Fahrzeuge",
             "sr5gear": "Rüstungen & Ausrüstungen",
             "sr5magic": "Zauber & Komplexe Formen",
-            "sr5misc": "[MISSING]",
+            "sr5misc": "Verschiedenes",
             "sr5modification": "Modifikationen",
             "sr5trait": "Qualitäten & Kräfte",
             "sr5ware": "Bioware & Cyberware",
@@ -636,11 +717,31 @@
             "FixedSprite": "Sprite vorb.",
             "SpriteType": "Sprite-Art"
         },
-        "ComplexForm": "Komplexe Form",
+        "ComplexForm": {
+            "Durations": {
+                "Immediate": "Sofort",
+                "Permanent": "Permanent",
+                "Sustained": "Aufrechterhalten"
+            },
+            "FIELDS": {
+                "duration": {
+                    "hint": "Sofort (es passiert sofort, ohne anhaltende Effekte), Aufrechterhalten (temporär), Permanent (Effekt wird permanent, wenn lang genug aufrechterhalten)",
+                    "label": "Dauer"
+                },
+                "fade": {
+                    "hint": "Der Schwundwert wird auf die Stufe angerechnet, um den widerstandenen Schaden zu berechnen.",
+                    "label": "Schwund"
+                },
+                "target": {
+                    "hint": "Valide Ziele der komplexen Form",
+                    "label": "Ziel"
+                }
+            }
+        },
         "ComplexForms": "Komplexe Formen",
         "Conceal": "Tarnbarkeit",
         "ConditionMonitor": "Zustandsmonitor",
-        "ConnectToNetwork": "[MISSING]",
+        "ConnectToNetwork": "Mit Netzwerk verbinden",
         "Connection": "Verbindung",
         "Contact": {
             "Blackmail": "Erpressung",
@@ -648,40 +749,40 @@
             "DropActor": "Drag&Drop' einen Akteur um ihn mit dieser Verbindung zu verbinden",
             "FIELDS": {
                 "blackmail": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Erpressung als Mittel zur Beeinflussung der Verbindung",
+                    "label": "Erpressung"
                 },
                 "connection": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Grad des sozialen Einflusses dieser Verbindung",
+                    "label": "Einfluss"
                 },
                 "family": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Familienbeziehungen der Verbindung",
+                    "label": "Familie"
                 },
                 "group": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Verbindung gehört zur gesamten Gruppe.",
+                    "label": "Gruppe"
                 },
                 "linkedActor": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Verknüpfter Akteur dieser Verbindung",
+                    "label": "Akteur"
                 },
                 "loyalty": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Grad der Loyalität dieser Verbindung",
+                    "label": "Loyalität"
                 },
                 "type": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Bestimmt Art der durch die Verbindung durchführbaren Dienste (Ausrüßtung, Jobs, Informationen, etc.)",
+                    "label": "Typ"
                 }
             },
             "Family": "Familie",
             "Group": "Gruppe",
             "LinkedActor": "Akteur",
             "Loyalty": "Loyalität",
-            "LoyaltyConnectionHelp": "[MISSING]",
-            "LoyaltyConnectionLabel": "[MISSING]",
+            "LoyaltyConnectionHelp": "Loyalität / Verbindung",
+            "LoyaltyConnectionLabel": "L / V",
             "Type": "Typ"
         },
         "ContactType": "Typ",
@@ -739,18 +840,18 @@
             }
         },
         "ContextOptions": {
-            "AddAttributeEffect": "[MISSING]",
-            "AddSkillEffect": "[MISSING]",
-            "DeleteEffect": "[MISSING]",
-            "DeleteItem": "[MISSING]",
-            "DeleteSkill": "[MISSING]",
-            "EditEffect": "[MISSING]",
-            "EditItem": "[MISSING]",
-            "EditSkill": "[MISSING]",
-            "MoveItem": "[MISSING]",
-            "Source": "[MISSING]",
-            "View": "[MISSING]",
-            "ViewItem": "[MISSING]"
+            "AddAttributeEffect": "Neuer Effekt für Attribut",
+            "AddSkillEffect": "Neuer Effekt für Fertigkeit",
+            "DeleteEffect": "Effekt löschen",
+            "DeleteItem": "Gegenstand löschen",
+            "DeleteSkill": "Fertigkeit löschen",
+            "EditEffect": "Effekt bearbeiten",
+            "EditItem": "Gegenstand bearbeiten",
+            "EditSkill": "Fertigkeit bearbeiten",
+            "MoveItem": "Gegenstand verschieben",
+            "Source": "Referenz öffnen",
+            "View": "Öffnen",
+            "ViewItem": "Gegenstand öffnen"
         },
         "Continue": "Fortsetzen",
         "ControlRig": "Riggerkontrolle",
@@ -780,24 +881,24 @@
             },
             "FIELDS": {
                 "duration": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Dauer der Critter Kraft",
+                    "label": "Dauer"
                 },
                 "karma": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Karma Kosten der Critter Kraft",
+                    "label": "Karma"
                 },
                 "optional": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Ist die Critter Kraft optional?",
+                    "label": "Optional"
                 },
                 "powerType": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Art der Critter Kraft",
+                    "label": "Art"
                 },
                 "range": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Reichweite der Critter Kraft",
+                    "label": "Reichweite"
                 }
             },
             "IsOptional": "Optional",
@@ -867,7 +968,15 @@
         "Descriptors": "Merkmale",
         "Details": "Details",
         "DetectionSpellExtended": "Erweitert",
-        "Device": "Gerät",
+        "Device": {
+            "FIELDS": {
+                "category": {
+                    "hint": "Kategorie des Geräts",
+                    "label": "Kategorie"
+                }
+            },
+            "label": "Gerät"
+        },
         "DeviceCatCommlink": "Kommlink",
         "DeviceCatCyberdeck": "Cyberdeck",
         "DeviceCatRCC": "Riggerkonsole",
@@ -1014,8 +1123,8 @@
         "Grid": {
             "FIELDS": {
                 "category": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Öffentliche Gitter wenden einen negativen Modifikator an, locale und globale Gitter nicht.",
+                    "label": "Kategorie"
                 }
             }
         },
@@ -1036,16 +1145,16 @@
         "IC": {
             "FIELDS": {
                 "host": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]",
+                    "hint": "Auf welchem Host läuft dieses IC?",
+                    "label": "Host",
                     "rating": {
-                        "hint": "[MISSING]",
-                        "label": "[MISSING]"
+                        "hint": "Stufe des Hosts",
+                        "label": "Stufe"
                     }
                 },
                 "icType": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Art des IC",
+                    "label": "Art"
                 }
             },
             "MissingHost": "Drag&Drop Host",
@@ -1075,13 +1184,13 @@
         },
         "Import": {
             "ActorImporter": {
-                "Title": "[MISSING]"
+                "Title": "Akteur Import"
             },
             "BulkImporter": {
-                "Title": "[MISSING]"
+                "Title": "Massen Import"
             },
             "ImporterSourcesConfig": {
-                "Title": "[MISSING]"
+                "Title": "Import Quell Konfiguration"
             },
             "Spirit": {
                 "SpiritTypeNotFound": "Die Geisterart wurde nicht gefunden. Bitte öffne ein GitHub-Issue mit deiner Chummer-Export-json."
@@ -1105,16 +1214,257 @@
         "Initiative": "Initiative",
         "Internal": "Intern",
         "InventoryRename": {
-            "Cancel": "[MISSING]",
-            "NewName": "[MISSING]",
-            "Submit": "[MISSING]",
-            "Title": "[MISSING]"
+            "Cancel": "Abbrechen",
+            "NewName": "Neuer Name",
+            "Submit": "Umbenennen",
+            "Title": "Inventar umbenennen"
         },
         "IsCritter": "Critter",
         "IsFreshImport": "Dieser Eintrag wurde aus Chummer importiert und benötigt eine manuelle Überprüfung.",
         "IsGrunt": "Scherge",
         "IsNPC": "NSC",
-        "Item": "Item",
+        "Item": {
+            "FIELDS": {
+                "action": {
+                    "armor": {
+                        "hint": "Soll Panzerung des Akteurs auf die Probe angerechnet werden?",
+                        "label": "Panzerung"
+                    },
+                    "attribute": {
+                        "hint": "Attribut für die Probe",
+                        "label": "Attribut"
+                    },
+                    "attribute2": {
+                        "hint": "Zweites Attribut für die Probe",
+                        "label": "Attribut (2)"
+                    },
+                    "categories": {
+                        "hint": "Kategorien für die Aktion. Diese können durch Effekte referenziert werden.",
+                        "label": "Kategorien"
+                    },
+                    "damage": {
+                        "ap": {
+                            "attribute": {
+                                "hint": "Attribut für die DK Berechnung",
+                                "label": "DK Attribut"
+                            },
+                            "base": {
+                                "hint": "Durschlagskraft des Schadens",
+                                "label": "DK"
+                            },
+                            "base_formula_operator": {
+                                "hint": "Wie soll der DK-Wert das Attribut beeinflussen?",
+                                "label": "Operator"
+                            }
+                        },
+                        "attribute": {
+                            "hint": "Attribut für die Schadenskalkulation",
+                            "label": "Schadensattribut"
+                        },
+                        "base": {
+                            "hint": "Basis Schaden dieser Aktion",
+                            "label": "Basis Schaden"
+                        },
+                        "base_formula_operator": {
+                            "hint": "Wie soll der Basis Schaden das Attribut beeinflussen?",
+                            "label": "Operator"
+                        },
+                        "biofeedback": {
+                            "hint": "Soll diese Aktion auch Biofeedback Schaden erzeugen?",
+                            "label": "Biofeedback"
+                        },
+                        "element": {
+                            "base": {
+                                "hint": "Element des Schadens. Leer für elementlos.",
+                                "label": "Element"
+                            }
+                        },
+                        "type": {
+                            "base": {
+                                "hint": "Art des Schadens dieser Aktion",
+                                "label": "Schadensart"
+                            }
+                        }
+                    },
+                    "extended": {
+                        "hint": "Ist diese Aktion Teil einer Ausgedehnten Probe?",
+                        "label": "Ausgedehnte Probe"
+                    },
+                    "limit": {
+                        "attribute": {
+                            "hint": "Attribut für das Limit dieser Aktion",
+                            "label": "Limit Attribut"
+                        },
+                        "base": {
+                            "hint": "Limitswert für diese Aktion. Wird angerechnet, wenn ein Limitattribut ausgewählt ist.",
+                            "label": "Limit"
+                        }
+                    },
+                    "mod": {
+                        "hint": "Modifikator für diese Aktion",
+                        "label": "Modifikator"
+                    },
+                    "modifiers": {
+                        "hint": "Modifikatoren die auf diese Aktion angewendet werden sollen",
+                        "label": "Modifikatoren"
+                    },
+                    "opposed": {
+                        "armor": {
+                            "hint": "Soll die Panzerung des Akteurs der Verteidigungsprobe darauf angerechnet werden?",
+                            "label": "Panzerung"
+                        },
+                        "attribute": {
+                            "hint": "Attribut für die Verteidigungsprobe",
+                            "label": "Attribut"
+                        },
+                        "attribute2": {
+                            "hint": "Zweite Attribut für die Verteidigungsprobe",
+                            "label": "Attribut (2)"
+                        },
+                        "mod": {
+                            "hint": "Modifikator für die Verteidigungsprobe",
+                            "label": "Modifikator"
+                        },
+                        "resist": {
+                            "armor": {
+                                "hint": "Soll die Panzerung des Akteurs auf die Widerstandsprobe angerechnet werden?",
+                                "label": "Panzerung"
+                            },
+                            "attribute": {
+                                "hint": "Attribut für die Widerstandsprobe",
+                                "label": "Attribut"
+                            },
+                            "attribute2": {
+                                "hint": "Zweite Attribut für die Widerstandsprobe",
+                                "label": "Attribut (2)"
+                            },
+                            "test": {
+                                "hint": "Zu verwendender Test um dem Schaden aus der Verteidigungsprobe zu widerstehen",
+                                "label": "Widerstandstest"
+                            }
+                        },
+                        "skill": {
+                            "hint": "Fertigkeit für die Verteidigungsprobe",
+                            "label": "Fertigkeit"
+                        },
+                        "test": {
+                            "hint": "Zu verwendender Test für die Verteidigungsprobe",
+                            "label": "Verteidigungstest"
+                        }
+                    },
+                    "roll_mode": {
+                        "hint": "Roll Modus für den Test. Lasse leer, um den im Chat ausgewählten Modus zu verwenden",
+                        "label": "Roll Modus"
+                    },
+                    "skill": {
+                        "hint": "Fertigkeit für die Aktion",
+                        "label": "Fertigkeit"
+                    },
+                    "spec": {
+                        "hint": "Ist die Fertigkeit dieser Aktion eine Spezialisierung?",
+                        "label": "Spezialisierung"
+                    },
+                    "test": {
+                        "hint": "Zu verwendender Test für diese Aktion",
+                        "label": "Test"
+                    },
+                    "threshold": {
+                        "base": {
+                            "hint": "Der Schwellenwert dieser Aktion",
+                            "label": "Schwellenwert"
+                        }
+                    },
+                    "type": {
+                        "hint": "Art der Handlung dieser Aktion",
+                        "label": "Handlung"
+                    }
+                },
+                "ammo": {
+                    "clip_type": {
+                        "hint": "Wie wird diese Waffe nachgeladen?",
+                        "label": "Nachladetyp"
+                    },
+                    "spare_clips": {
+                        "max": {
+                            "hint": "Maximale Anzahl an Ersatzmagazinen",
+                            "label": "Maximale Ersatzmagazine"
+                        },
+                        "value": {
+                            "hint": "Aktuelle Anzahl an Ersatzmagazinen",
+                            "label": "Ersatzmagazine"
+                        }
+                    }
+                },
+                "capacity": {
+                    "hint": "Kapazität der Cyberware/Bioware",
+                    "label": "Kapazität"
+                },
+                "description": {
+                    "base": {
+                        "hint": "Beschreibung",
+                        "label": "Beschreibung"
+                    },
+                    "source": {
+                        "hint": "Referenz als PDF#Page, URL oder Journal Eintrag ",
+                        "label": "Referenz"
+                    }
+                },
+                "essence": {
+                    "hint": "Essenzkosten der Cyberware/Bioware",
+                    "label": "Essenz"
+                },
+                "grade": {
+                    "hint": "Kategorie der Cyberware/Bioware",
+                    "label": "Kategorie"
+                },
+                "technology": {
+                    "availability": {
+                        "hint": "Verfügbarkeit des Gegenstands beim Einkauf",
+                        "label": "Verfügbarkeit"
+                    },
+                    "conceal": {
+                        "base": {
+                            "hint": "Tarnbarkeit des Gegenstands",
+                            "label": "Tarnbarkeit"
+                        }
+                    },
+                    "condition_monitor": {
+                        "value": {
+                            "hint": "Aktuelle auf den Zustandsmonitor angewendeter Schaden",
+                            "label": "Zustandsmonitor Schaden"
+                        }
+                    },
+                    "cost": {
+                        "hint": "Kosten des Gegenstands",
+                        "label": "Kosten"
+                    },
+                    "equipped": {
+                        "hint": "Ausgerüstet",
+                        "label": "Ausgerüstet"
+                    },
+                    "master": {
+                        "hint": "Master zu dem dieses Gerät als Teil eines PAN/WAN geslaved ist.",
+                        "label": "Master"
+                    },
+                    "quantity": {
+                        "hint": "Welche Anzahl dieses Gegenstands ist im Inventar?",
+                        "label": "Anzahl"
+                    },
+                    "rating": {
+                        "hint": "Stufe des Geräts",
+                        "label": "Stufe"
+                    },
+                    "show_quantity": {
+                        "hint": "Soll die Anzahl des Gegenstands im Inventar angezeigt werden?",
+                        "label": "Anzahl anzeigen"
+                    },
+                    "wireless": {
+                        "hint": "Kabelloser Zusstand des Geräts",
+                        "label": "Kabellos"
+                    }
+                }
+            }
+        },
         "ItemMod": "Item Mod",
         "ItemName": "Item Name",
         "ItemTypes": {
@@ -1130,10 +1480,10 @@
             "Device": "Gerät",
             "Echo": "Echo",
             "Equipment": "Ausrüstung",
-            "Gear": "[MISSING]",
+            "Gear": "Ausrüstung",
             "Grid": "Gitter",
             "Host": "Host",
-            "License": "[MISSING]",
+            "License": "Lizenz",
             "Lifestyle": "Lebensstil",
             "Metamagic": "Metamagic",
             "Modification": "Modifikation",
@@ -1147,24 +1497,24 @@
         },
         "Karma": "Karma",
         "KarmaManager": {
-            "Cancel": "[MISSING]",
-            "CareerKarma": "[MISSING]",
-            "CurrentKarma": "[MISSING]",
-            "FinalCareerKarma": "[MISSING]",
-            "FinalCurrentKarma": "[MISSING]",
-            "FinalKarma": "[MISSING]",
-            "StartingKarma": "[MISSING]",
-            "Submit": "[MISSING]",
-            "Title": "[MISSING]"
+            "Cancel": "Abbrechen",
+            "CareerKarma": "Gesamtes durch den Charakter angesammeltes Karma",
+            "CurrentKarma": "Aktuell verfügbares Karma",
+            "FinalCareerKarma": "Zukünftiges Gesamtkarma",
+            "FinalCurrentKarma": "Zukünftiges verfügbares Karma",
+            "FinalKarma": "Karma",
+            "StartingKarma": "Start Karma",
+            "Submit": "Bestätigen",
+            "Title": "Karma Manager"
         },
         "Keybinding": {
             "AddRemoveManyQty": {
-                "Hint": "[MISSING]",
-                "Label": "[MISSING]"
+                "Hint": "Füge zu/Enferne 20 Stück pro Klick",
+                "Label": "Füge zu/Entferne 20"
             },
             "AddRemoveSomeQty": {
-                "Hint": "[MISSING]",
-                "Label": "[MISSING]"
+                "Hint": "Füge zu/Enferne 5 Stück pro Klick",
+                "Label": "Füge zu/Entferne 5"
             },
             "HideTestDialog": {
                 "Hint": "Testdialoge werden einmalig übersprungen",
@@ -1198,7 +1548,7 @@
                 "Category": "Kategorie",
                 "DamageResistanceTest": "Schadenswiderstandsprobe",
                 "ForceReboot": "Erzwinge Neustart",
-                "MatrixAction": "[MISSING]",
+                "MatrixAction": "Matrixhandlung",
                 "Modifier": "Modifikator",
                 "Modifiers": "Modifikatoren",
                 "OpposedTest": "Vergleichende Probe",
@@ -1211,11 +1561,11 @@
             },
             "ActorSheet": {
                 "AddNetwork": "Netzwerk Verbinden",
-                "AddOneMark": "[MISSING]",
+                "AddOneMark": "Füge eine Marke zu",
                 "ColdSim": "Kaltes SIM",
                 "Compilations": "Kompilieren",
                 "ConnectToDriver": "Fahrer verbinden",
-                "ConnectedTo": "[MISSING]",
+                "ConnectedTo": "Verbunden mit",
                 "CreateInventory": "Erstelle Inventar-Ort",
                 "CritterPowers": "Critterkräfte",
                 "DeviceRating": "Gerätestufe",
@@ -1228,23 +1578,23 @@
                 "Hacking": "Hacken",
                 "ICConfiguration": "IC-Konfiguration",
                 "Icons": "Icons",
-                "ManageNetwork": "[MISSING]",
+                "ManageNetwork": "Netzwerk verwalten",
                 "MarkNetwork": "Markiere Netzwerk",
                 "MarkedIcons": "Markierte Icons",
                 "Matrix": "Matrix",
                 "MatrixActions": "Matrix Handlungen",
                 "Network": "Netzwerk",
-                "Networks": "[MISSING]",
+                "Networks": "Netzwerke",
                 "NoNetwork": "Kein Netzwerk",
-                "NotorietyShort": "[MISSING]",
+                "NotorietyShort": "B",
                 "Offline": "Offline",
-                "OpenSourceDocument": "[MISSING]",
+                "OpenSourceDocument": "Öffne Referenz",
                 "OwnedIcons": "Icons im Besitz",
                 "Persona": "Persona",
                 "PersonalInventory": "Am Körper",
-                "PhysicalTrack": "[MISSING]",
-                "PublicAwarenessShort": "[MISSING]",
-                "RemoveOneMark": "[MISSING]",
+                "PhysicalTrack": "Physischer Monitor",
+                "PublicAwarenessShort": "BR",
+                "RemoveOneMark": "Entferne eine Marke",
                 "ResetActorForNewRun": "Reset für neuen Run",
                 "Rituals": "Rituale",
                 "RollDroneInfiltration": "Heimlichkeit",
@@ -1256,8 +1606,8 @@
                 "SpiritConfiguration": "Geist-Konfiguration",
                 "SpriteConfiguration": "Sprite-Konfiguration",
                 "SpritePowers": "Spritekräfte",
-                "StreetCredShort": "[MISSING]",
-                "StunTrack": "[MISSING]",
+                "StreetCredShort": "SR",
+                "StunTrack": "Geistiger Monitor",
                 "TestKBoardModifiers": "{skip}: überspringe Dialog. {descr}: zeige nur Beschreibung.",
                 "VehicleConfiguration": "Fahrzeug-Konfiguration"
             },
@@ -1267,22 +1617,22 @@
                 "OpenInventory": "Inventar"
             },
             "Item": {
-                "AvailabilityAdjustment": "[MISSING]",
-                "CostAdjustment": "[MISSING]",
-                "EssenceAdjustment": "[MISSING]"
+                "AvailabilityAdjustment": "Skaliere Verfügbarkeit mit Stufe",
+                "CostAdjustment": "Skaliere Kosten mit Stufe",
+                "EssenceAdjustment": "Skaliere Essenz mit Stufe"
             },
             "MarkPlacement": {
                 "PlaceOnDevice": "Platziere auf Gerät",
                 "PlaceOnMainIcon": "Platziere auf Persona/Host"
             },
             "Matrix": {
-                "AttackShort": "[MISSING]",
-                "DataProcessingShort": "[MISSING]",
-                "FirewallShort": "[MISSING]",
+                "AttackShort": "A",
+                "DataProcessingShort": "D",
+                "FirewallShort": "F",
                 "Global": "Global",
                 "Local": "Lokal",
                 "Public": "Öffentlich",
-                "SleazeShort": "[MISSING]",
+                "SleazeShort": "S",
                 "TargetDevice": "Target Device",
                 "TargetMainIcon": "Target Main Icon"
             },
@@ -1299,7 +1649,7 @@
                 "ItemEffects": "Item-Effekte",
                 "MissingNetworkDevices": "Drag&Drop um ein Netzwerkgerät zuzufügen.",
                 "NetworkDevices": "Geräte im Netzwerk",
-                "NotVisible": "[MISSING]",
+                "NotVisible": "Schleichend",
                 "PAN": "PAN",
                 "RebootDevice": "Neustarten",
                 "SubtractOne": "Eine entfernen",
@@ -1318,7 +1668,39 @@
         "Level": "Stufe",
         "License": "Lizenz",
         "Licenses": "Lizenzen",
-        "Lifestyle": "Lebensstil",
+        "Lifestyle": {
+            "FIELDS": {
+                "comforts": {
+                    "hint": "Komfort des Lebensstils",
+                    "label": "Komfort"
+                },
+                "cost": {
+                    "hint": "Kosten des Lebensstils",
+                    "label": "Kosten"
+                },
+                "guests": {
+                    "hint": "Anzahl der Gäste als Teil des Lebensstils",
+                    "label": "Gäste"
+                },
+                "neighborhood": {
+                    "hint": "Nachbarschaftsart des Lebensstils",
+                    "label": "Nachbarschaft"
+                },
+                "permanent": {
+                    "hint": "Ist dieser Lebensstil permanent?",
+                    "label": "Permanent"
+                },
+                "security": {
+                    "hint": "Sicherheitsstufe des Lebensstils",
+                    "label": "Sicherheit"
+                },
+                "type": {
+                    "hint": "Art des Lebensstils",
+                    "label": "Art"
+                }
+            },
+            "label": "Lebensstil"
+        },
         "LifestyleComforts": "Komfort & Grundversorgung",
         "LifestyleGuests": "Gäste",
         "LifestyleHigh": "Oberschicht",
@@ -1414,7 +1796,42 @@
             "SomeAmmoMelee": "Nicht genug Munition übrig, um zu zuschlagen"
         },
         "ModPoints": "Upgradepunkte",
-        "Modification": "Modifikation",
+        "Modification": {
+            "FIELDS": {
+                "accuracy": {
+                    "hint": "Präzision/Limit der Modifikation",
+                    "label": "Präzision"
+                },
+                "conceal": {
+                    "hint": "Tarnbarkeitsmodifikator der Modifikation",
+                    "label": "Tarnbarkeit"
+                },
+                "dice_pool": {
+                    "hint": "Würfelpoolmodifikator der Modifikation",
+                    "label": "Würfelpool"
+                },
+                "modification_category": {
+                    "hint": "Kategorie der Modifikation",
+                    "label": "Kategorie"
+                },
+                "mount_point": {
+                    "hint": "Halterung der Modifikation an der Waffe",
+                    "label": "Halterung"
+                },
+                "rc": {
+                    "hint": "Rückstoßkompensationsmodifikator der Modifikation",
+                    "label": "RK"
+                },
+                "slots": {
+                    "hint": "Anzahl der Slots für Fahrzeuge oder Drohnen.",
+                    "label": "Slots"
+                },
+                "type": {
+                    "hint": "Art der Modifikation",
+                    "label": "Art"
+                }
+            }
+        },
         "ModificationCategories": "Modification Categories",
         "ModificationCategory": "Modification Category",
         "ModificationSlots": "Modification Slots",
@@ -1496,18 +1913,18 @@
         "NetHits": "Nettoerfolge",
         "Network": "Netzwerk",
         "NetworkManager": {
-            "AvailableNetworks": "[MISSING]",
-            "BruteForce": "[MISSING]",
-            "ConnectedTo": "[MISSING]",
-            "HackOnTheFly": "[MISSING]",
-            "InviteMark": "[MISSING]",
-            "NetworkType": "[MISSING]",
-            "NoNetwork": "[MISSING]",
-            "Title": "[MISSING]"
+            "AvailableNetworks": "Verfügbare Netzwerke",
+            "BruteForce": "Brute Force",
+            "ConnectedTo": "Verbunden mit",
+            "HackOnTheFly": "Hack on the Fly",
+            "InviteMark": "Marke einladen",
+            "NetworkType": "Netzwerktyp",
+            "NoNetwork": "Kein Netzwerk",
+            "Title": "Netzwerkmanager"
         },
         "Networks": "Netzwerke",
         "New": "Neu:",
-        "NewSpecialization": "[MISSING]",
+        "NewSpecialization": "Neue Spezialisierung",
         "NoCover": "Keine Deckung",
         "NoSelectableToken": "Charakter hat kein auswählbares Token auf der Karte",
         "None": "-",
@@ -1531,13 +1948,13 @@
         "Notoriety": "Schlechter Ruf",
         "Nuyen": "Nuyen",
         "NuyenManager": {
-            "Cancel": "[MISSING]",
-            "CurrentNuyen": "[MISSING]",
-            "FinalNuyen": "[MISSING]",
-            "Submit": "[MISSING]",
-            "Title": "[MISSING]"
+            "Cancel": "Abbrechen",
+            "CurrentNuyen": "Aktuell verfügbares Nuyen",
+            "FinalNuyen": "Zukünftiges verfügbares Nuyen",
+            "Submit": "Bestätigen",
+            "Title": "Nuyen Manager"
         },
-        "OpenNetworkManager": "[MISSING]",
+        "OpenNetworkManager": "Öffne Netzwerkmanager",
         "OpenOrigin": "Öffne Item",
         "OpenSource": "Öffne Quelle für Item als pdfpager PDF oder Website",
         "OpposedType": "Typ",
@@ -1573,14 +1990,38 @@
         "PowerPoints": "Kraftpunkte",
         "PowerType": "Typ",
         "Powers": "Kräfte",
-        "Program": "Programm",
+        "Program": {
+            "FIELDS": {
+                "type": {
+                    "hint": "Art des Programms",
+                    "label": "Art"
+                }
+            },
+            "label": "Program"
+        },
         "ProgramType": "Typ",
         "Programs": "Programme",
         "PublicAwareness": "Prominenz",
         "PublicGrid": "Öffentliches Gitter",
         "PushTheLimit": "Grenzen sprengen",
         "Qty": "Menge",
-        "Quality": "Vorteile/Nachteile",
+        "Quality": {
+            "FIELDS": {
+                "karma": {
+                    "hint": "Karma-Kosten der Qualität",
+                    "label": "Karma"
+                },
+                "rating": {
+                    "hint": "Stufe der Qualität",
+                    "label": "Stufe"
+                },
+                "type": {
+                    "hint": "Art der Qualität",
+                    "label": "Art"
+                }
+            },
+            "label": "Qualität"
+        },
         "QualityType": "Typ",
         "QualityTypeLifeModule": "Lebensmodul",
         "QualityTypeNegative": "Nachteil",
@@ -1608,9 +2049,9 @@
         "RemoveBonus": "Entferne Bonus",
         "RemoveSpecialization": "Entferne Spezialisierung",
         "ReputationManager": {
-            "Cancel": "[MISSING]",
-            "Submit": "[MISSING]",
-            "Title": "[MISSING]"
+            "Cancel": "Abbrechen",
+            "Submit": "Bestätigen",
+            "Title": "Rufmanager"
         },
         "Resist": "Widerstehen",
         "RestoreDefaultSkills": "Standardfertigkeiten wiederherstellen",
@@ -1618,12 +2059,12 @@
         "Ritual": {
             "FIELDS": {
                 "descriptors": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Beschreibung des Rituals",
+                    "label": "Beschreibung"
                 },
                 "type": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Art des Rituals",
+                    "label": "Art"
                 }
             }
         },
@@ -1731,7 +2172,7 @@
             "Locksmith": "Schlosser",
             "Longarms": "Gewehre",
             "Medicine": "Medizin",
-            "Native": "[MISSING]",
+            "Native": "Nativ",
             "NauticalMechanic": "Seefahrtmechanik",
             "Navigation": "Navigation",
             "Negotiation": "Verhandlung",
@@ -1749,13 +2190,13 @@
             "RitualSpellcasting": "Ritualzauberei",
             "Running": "Laufen",
             "Skill": "Fertigkeit",
-            "SkillGroup": "[MISSING]",
+            "SkillGroup": "Fertigkeitsgruppe",
             "Skills": "Fertigkeiten",
             "Sneaking": "Schleichen",
             "Software": "Software",
             "Spellcasting": "Spruchzauberei",
             "Summoning": "Herbeirufen",
-            "Survival": "Survival",
+            "Survival": "Überleben",
             "Swimming": "Schwimmen",
             "Teamwork": {
                 "Glitched": "Glitched",
@@ -1767,7 +2208,7 @@
             "Tracking": "Spurenlesen",
             "UnarmedCombat": "Waffenloser Kampf",
             "abbr": {
-                "Native": "[MISSING]"
+                "Native": "M"
             }
         },
         "Soak": "Widerstand",
@@ -1788,7 +2229,7 @@
             "CatHealth": "Heilung",
             "CatIllusion": "Illusion",
             "CatManipulation": "Manipulation",
-            "CatRitual": "[MISSING]",
+            "CatRitual": "Ritual",
             "Category": "Kategorie",
             "CombatDirect": "Direkt",
             "CombatIndirect": "Indirekt",
@@ -1800,78 +2241,78 @@
             "DetectionPsychic": "Übersinnlich",
             "FIELDS": {
                 "category": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Zauberkategorie",
+                    "label": "Kategorie"
                 },
                 "combat": {
                     "type": {
-                        "hint": "[MISSING]",
-                        "label": "[MISSING]"
+                        "hint": "Ist der Zauber Indirekt oder Direkt",
+                        "label": "Kamppfzauberart"
                     }
                 },
                 "detection": {
                     "extended": {
-                        "hint": "[MISSING]",
-                        "label": "[MISSING]"
+                        "hint": "Angehaltener Zauber",
+                        "label": "Angehalten"
                     },
                     "passive": {
-                        "hint": "[MISSING]",
-                        "label": "[MISSING]"
+                        "hint": "Passiver Zauber",
+                        "label": "Passiv"
                     },
                     "type": {
-                        "hint": "[MISSING]",
-                        "label": "[MISSING]"
+                        "hint": "Art des Wahrnehmungszaubers",
+                        "label": "Wahrnehmungszauberart"
                     }
                 },
                 "drain": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Entzugswert des Zaubers. Wird auf die Kraftstufe angerechnet, um dem Entzug zu widerstehen",
+                    "label": "Entzugswert"
                 },
                 "duration": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Dauer des Zaubers",
+                    "label": "Dauer"
                 },
                 "illusion": {
                     "sense": {
-                        "hint": "[MISSING]",
-                        "label": "[MISSING]"
+                        "hint": "Vom Zauber betroffener Sinn",
+                        "label": "Sinn"
                     },
                     "type": {
-                        "hint": "[MISSING]",
-                        "label": "[MISSING]"
+                        "hint": "Art des Illusionszaubers",
+                        "label": "Illusionszauberart"
                     }
                 },
                 "manipulation": {
                     "damaging": {
-                        "hint": "[MISSING]",
-                        "label": "[MISSING]"
+                        "hint": "Verursacht der Zauber Schaden?",
+                        "label": "Schadend"
                     },
                     "environmental": {
-                        "hint": "[MISSING]",
-                        "label": "[MISSING]"
+                        "hint": "Betrifft der Zauber kein spezifisches Ziel, sondern die Umgebung.",
+                        "label": "Umgebung"
                     },
                     "mental": {
-                        "hint": "[MISSING]",
-                        "label": "[MISSING]"
+                        "hint": "Beeinträchtigt der Zauber den Geist eines Ziels?",
+                        "label": "Mental"
                     },
                     "physical": {
-                        "hint": "[MISSING]",
-                        "label": "[MISSING]"
+                        "hint": "Beeinträchtigt der Zauber den physischen Körper eines Ziels?",
+                        "label": "Physisch"
                     }
                 },
                 "range": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Reichweite des Zaubers",
+                    "label": "Reichweite"
                 },
                 "ritual": {
                     "type": {
-                        "hint": "[MISSING]",
-                        "label": "[MISSING]"
+                        "hint": "Art des Rituals",
+                        "label": "Ritualart"
                     }
                 },
                 "type": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Ist es Mana oder Physischer Zauber",
+                    "label": "Zauberart"
                 }
             },
             "IllusionMultiSense": "Vollsensorisch",
@@ -1988,24 +2429,24 @@
         "Sprite": {
             "FIELDS": {
                 "level": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Stufe des Sprites",
+                    "label": "Stufe"
                 },
                 "registered": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Ob das Sprite registriert ist",
+                    "label": "Registriert"
                 },
                 "services": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Anzahl der verfügbaren Dienste gegenüber des Sprites",
+                    "label": "Dienste"
                 },
                 "spriteType": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Art des Sprites",
+                    "label": "Art"
                 },
                 "technomancerUuid": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Technomancer dieses Sprites",
+                    "label": "Technomancer"
                 }
             },
             "Level": "Stufe",
@@ -2026,20 +2467,20 @@
         },
         "SpritePower": {
             "Durations": {
-                "Always": "[MISSING]",
-                "Instant": "[MISSING]",
-                "Permanent": "[MISSING]",
-                "Special": "[MISSING]",
-                "Sustained": "[MISSING]"
+                "Always": "Immer",
+                "Instant": "Sofort",
+                "Permanent": "Permanent",
+                "Special": "Speziell",
+                "Sustained": "Aufrechterhalten"
             },
             "FIELDS": {
                 "duration": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Dauer der Kraft",
+                    "label": "Dauer"
                 },
                 "optional": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Ob die Kraft optional ist",
+                    "label": "Optional"
                 }
             },
             "IsOptional": "Optional",
@@ -2063,42 +2504,42 @@
         "Suppressing": "Sperrfeuer",
         "Tabs": {
             "Actor": {
-                "Actions": "[MISSING]",
-                "Ammo": "[MISSING]",
-                "Bio": "[MISSING]",
-                "Character": "[MISSING]",
-                "Compilations": "[MISSING]",
-                "ComplexForms": "[MISSING]",
-                "CritterPowers": "[MISSING]",
-                "Details": "[MISSING]",
-                "Effects": "[MISSING]",
-                "IC": "[MISSING]",
-                "Inventory": "[MISSING]",
-                "Licenses": "[MISSING]",
-                "Magic": "[MISSING]",
-                "MarkedIcons": "[MISSING]",
-                "Matrix": "[MISSING]",
-                "MatrixActions": "[MISSING]",
-                "Mods": "[MISSING]",
-                "Network": "[MISSING]",
-                "NetworkIcons": "[MISSING]",
-                "Networks": "[MISSING]",
-                "OwnedIcons": "[MISSING]",
-                "Social": "[MISSING]",
-                "Spirit": "[MISSING]",
-                "Sprite": "[MISSING]",
-                "SpritePowers": "[MISSING]",
-                "Vehicle": "[MISSING]"
+                "Actions": "Aktionen",
+                "Ammo": "Munition",
+                "Bio": "Biografie",
+                "Character": "Charakter",
+                "Compilations": "Kompilationen",
+                "ComplexForms": "Komplexe Formen",
+                "CritterPowers": "Critter Power",
+                "Details": "Details",
+                "Effects": "Effekte",
+                "IC": "IC",
+                "Inventory": "Inventar",
+                "Licenses": "Lizenzen",
+                "Magic": "Magie",
+                "MarkedIcons": "Markierte Icons",
+                "Matrix": "Matrix",
+                "MatrixActions": "Matrix Handlungen",
+                "Mods": "Modifikationen",
+                "Network": "Netzwerk",
+                "NetworkIcons": "Netzwerk-Icons",
+                "Networks": "Netzwerke",
+                "OwnedIcons": "Eigene Icons",
+                "Social": "Sozial",
+                "Spirit": "Geist",
+                "Sprite": "Sprite",
+                "SpritePowers": "Sprite-Kräfte",
+                "Vehicle": "Fahrzeug"
             },
             "Item": {
-                "Description": "[MISSING]",
-                "Details": "[MISSING]",
-                "Effects": "[MISSING]",
-                "Network": "[MISSING]",
-                "SinLicenses": "[MISSING]",
-                "SinNetworks": "[MISSING]",
-                "WeaponAmmo": "[MISSING]",
-                "WeaponMods": "[MISSING]"
+                "Description": "Beschreibung",
+                "Details": "Details",
+                "Effects": "Effekte",
+                "Network": "Netzwerk",
+                "SinLicenses": "Lizenzen",
+                "SinNetworks": "Netzwerke",
+                "WeaponAmmo": "Munition",
+                "WeaponMods": "Mods"
             }
         },
         "Target": "Ziel",
@@ -2183,38 +2624,38 @@
         "ToggleWireless": "Kabel(los)",
         "Tooltips": {
             "Actor": {
-                "AddOneService": "[MISSING]",
-                "Blitz": "[MISSING]",
+                "AddOneService": "Füge einen Dienst zum Sprite/Geist hinzu",
+                "Blitz": "Nutze einen Punkt Edge um das Maximum der mögliche Initativewürfel zu erhalten",
                 "ConnectNetwork": "Betrete Host / Gitter",
                 "Critter": "Ermöglicht die Nutzung von Critterkräften",
                 "DefaultCategoryVisibility": "Zeige Artikelkategorien an, auch wenn keine Artikel hinzugefügt wurden",
-                "Description": "[MISSING]",
+                "Description": "Beschreibung",
                 "DisconnectNetwork": "Verlasse Host/ Gitter",
                 "Grunt": "Nutze Schergen-Regeln für Akteur",
                 "MarkTarget": "Platziere Marken auf diesem Ziel",
                 "MatrixConnectionToggle": "Ändere den Matrix-Verbindung: Erweiterte Realität, Kalte Sim oder Heiße Sim",
                 "MatrixRunningSilentToggle": "Wechsle zwischen Schleichfahrt und Anzeige der Persona",
                 "Metatype": "Ein NSC-Akteur bekommt automatische Attributemodifikatoren abhängig vom Metatyp",
-                "MiscConfig": "[MISSING]",
+                "MiscConfig": "Verschiedene Einstellungen für den Akteur",
                 "MissingSummoner": "Drag&Drop Charakter oder nutze Beschwörungs-Aktion",
                 "MissingTechnomancer": "Drag&Drop Charakter oder nutze Kompilierungs-Aktion",
                 "NPC": "Makriere Akteur als NSC und ermöglicht weitere NSC-Funktionen",
-                "NetworksTab": "[MISSING]",
-                "NoCombatant": "[MISSING]",
+                "NetworksTab": "Gitter & Hosts",
+                "NoCombatant": "Initiative Wurf (Muss in einem Kampf sein)",
                 "PickControlledTokenAsDriver": "Wähle das aktuell kontrollierte Token als Fahrer aus",
-                "PickControlledTokenAsSummoner": "[MISSING]",
-                "PickControlledTokenAsTechnomancer": "[MISSING]",
+                "PickControlledTokenAsSummoner": "Wähle das aktuell kontrollierte Token als Beschwörender aus",
+                "PickControlledTokenAsTechnomancer": "Wähle das aktuell kontrollierte Token als Technomancer aus",
                 "PlaceMark": "Handlung zum Platzieren von Marken auf bereits markierten Zielen",
                 "RebootPersonaAndClearAllMarks": "Starte deine Persona neu und entferne alle von dir platzierten Marken",
-                "RemoveFavorite": "[MISSING]",
-                "RemoveOneService": "[MISSING]",
+                "RemoveFavorite": "Aus Favoriten entfernen",
+                "RemoveOneService": "Entferne einen Dienst",
                 "ResetActorForNewRun": "Setzte Schaden, Edge, usw. für neuen Run zurück",
-                "RollInitiative": "[MISSING]",
+                "RollInitiative": "Werfe Initiative",
                 "SetupPAN": "Füge alle ausgerüsteten Wireless-Geräte zum PAN dieses Charakters hinzu"
             },
             "CallInAction": {
                 "ActorType": "Herbeizurufender Akteurtyp",
-                "LinkActor": "[MISSING]"
+                "LinkActor": "Drag&Drop Akteuer als Vorlage"
             },
             "CompilationTest": {
                 "Level": "Stufe des kompilierten Sprites",
@@ -2227,10 +2668,10 @@
             "Effect": {
                 "AlterApplyToWithChanges": "Entferne Änderungen, bevor du änderst, worauf sich der Effekt bezieht.",
                 "ApplyTo": "Änderungen mit diesem Effekt gelten nur für dieses Ziel.",
-                "CreateEffect": "[MISSING]",
-                "DeleteEffect": "[MISSING]",
+                "CreateEffect": "Erstelle Effekt",
+                "DeleteEffect": "Lösche Effekt",
                 "DocumentEffects": "Auswirkungen direkt auf dieses Dokument.",
-                "EditEffect": "[MISSING]",
+                "EditEffect": "Bearbeite Effekt",
                 "ItemEffects": "Effekte, die von Items auf diesem Dokument gesammelt werden.",
                 "OnlyAllFilteredUsed": "Dieser Effekt gilt nur für Proben, die allen Auswahlen entsprechen.",
                 "OnlyFilteredUsed": "Dieser Effekt gilt nur für Proben, die mindestens einer Auswahl entsprechen.",
@@ -2242,15 +2683,15 @@
                 "ActionCategories": "Überschreibe alle Standardkategorien der Probe mit dieser Auswahl. Mit einem Active Effect können dadurch die Werte der Action modifiziert werden.",
                 "ActionModifier": "Überschreibe alle Standardmodifikatoren der Probe mit dieser Auswahl",
                 "ActionRollMode": "Standard Würfelmodus für diese Aktion. Überschreibt globale Chat Einstellung",
-                "AddQuantity": "[MISSING]",
+                "AddQuantity": "Füge zu 1. {qtySome}: Füge zu 5. {qtyMany}: Füge zu 20.",
                 "AmmoReplaceDamage": "Setzen um Waffenschaden zu ersetzen anstatt zu modifizieren",
                 "AvailabilityAdjustment": "Berechne Verfügbarkeit abhängig von der Stufe.",
                 "CostAdjustment": "Berechne die tatsächlichen Kosten basierend auf der Stufe",
                 "DisabledForPreparedActor": "Deaktiviert da ein vorbereiteter Akteur verwendet wird",
-                "EssenceAdjustment": "[MISSING]",
-                "RemoveQuantity": "[MISSING]",
-                "ToggleFavorite": "[MISSING]",
-                "ToggleVisibility": "[MISSING]"
+                "EssenceAdjustment": "Berechne die tatsächlichen Essenzkosten basierend auf der Stufe",
+                "RemoveQuantity": "Entferne 1. {qtySome}: Entferne 5. {qtyMany}: Entferne 20.",
+                "ToggleFavorite": "Favorit umschalten",
+                "ToggleVisibility": "Sichtbarkeit umschalten"
             },
             "MatrixTest": {
                 "SameGridDisabled": "Da sowohl das aktive als auch anvisierte Icon Gitter verwenden, wird diese Konfiguration automatisch bestimmt"
@@ -2360,16 +2801,16 @@
         "Value": "Wert",
         "Vehicle": {
             "Categories": {
-                "Anthro": "[MISSING]",
-                "Huge": "[MISSING]",
-                "Large": "[MISSING]",
-                "Medium": "[MISSING]",
-                "Micro": "[MISSING]",
-                "Mini": "[MISSING]",
-                "Missile": "[MISSING]",
-                "Small": "[MISSING]"
+                "Anthro": "Anthromorph",
+                "Huge": "Riesig",
+                "Large": "Groß",
+                "Medium": "Mittel",
+                "Micro": "Mikro",
+                "Mini": "Mini",
+                "Missile": "Rakete",
+                "Small": "Klein"
             },
-            "Category": "[MISSING]",
+            "Category": "Kategorie",
             "ChaseEnvironment": "Verfolgungsumgebung",
             "Clearsight": "Clearsight",
             "ControlMode": "Steuermodus",
@@ -2397,8 +2838,8 @@
                 "protection": "Protection",
                 "weapons": "Weapons"
             },
-            "OffRoad": "[MISSING]",
-            "OnRoad": "[MISSING]",
+            "OffRoad": "Off-Road",
+            "OnRoad": "Auf Straße",
             "Stats": {
                 "Acceleration": "Beschleunigung",
                 "Handling": "Handling",
@@ -2482,102 +2923,102 @@
             },
             "FIELDS": {
                 "category": {
-                    "hint": "[MISSING]",
-                    "label": "[MISSING]"
+                    "hint": "Art der Waffe. Beeinfluss angezeigte Konfigurationen.",
+                    "label": "Art"
                 },
                 "melee": {
                     "reach": {
-                        "hint": "[MISSING]",
-                        "label": "[MISSING]"
+                        "hint": "Reichweite der Waffe, dienst als Modifikator bei Nahkampfproben",
+                        "label": "Reichweite"
                     }
                 },
                 "range": {
                     "modes": {
                         "burst_fire": {
-                            "hint": "[MISSING]",
-                            "label": "[MISSING]"
+                            "hint": "Feuert die Waffe im Salvenmodus (SM)",
+                            "label": "SM"
                         },
                         "full_auto": {
-                            "hint": "[MISSING]",
-                            "label": "[MISSING]"
+                            "hint": "Feuert die Waffe im Vollautomatischen Modus(AM)",
+                            "label": "AM"
                         },
                         "semi_auto": {
-                            "hint": "[MISSING]",
-                            "label": "[MISSING]"
+                            "hint": "Feuert die Waffe im Halbautomatischen Modus (HM)",
+                            "label": "HM"
                         },
                         "single_shot": {
-                            "hint": "[MISSING]",
-                            "label": "[MISSING]"
+                            "hint": "Feuert die Waffe im Einzelschussmodus (EM)",
+                            "label": "EM"
                         }
                     },
                     "ranges": {
                         "attribute": {
-                            "hint": "[MISSING]",
-                            "label": "[MISSING]"
+                            "hint": "Attribut um das die Reichweite multipliziert wird",
+                            "label": "Reichweitenattribut"
                         },
                         "category": {
-                            "hint": "[MISSING]",
-                            "label": "[MISSING]"
+                            "hint": "Bestimmt Art der Reichweitenbestimmung. Nutze 'Manuell' um eigene Werte einzutagen",
+                            "label": "Art"
                         },
                         "extreme": {
-                            "hint": "[MISSING]",
-                            "label": "[MISSING]"
+                            "hint": "Maximale Reichweite in Metern",
+                            "label": "Maximal"
                         },
                         "long": {
-                            "hint": "[MISSING]",
-                            "label": "[MISSING]"
+                            "hint": "Lange Reichweite in Metern",
+                            "label": "Lang"
                         },
                         "medium": {
-                            "hint": "[MISSING]",
-                            "label": "[MISSING]"
+                            "hint": "Mittlere Reichweite in Metern",
+                            "label": "Mittel"
                         },
                         "short": {
-                            "hint": "[MISSING]",
-                            "label": "[MISSING]"
+                            "hint": "Kurze Reichweite in Metern",
+                            "label": "Kurz"
                         }
                     },
                     "rc": {
                         "base": {
-                            "hint": "[MISSING]",
-                            "label": "[MISSING]"
+                            "hint": "Rückstoßkompensation der Waffe",
+                            "label": "RK"
                         }
                     }
                 },
                 "thrown": {
                     "blast": {
                         "dropoff": {
-                            "hint": "[MISSING]",
-                            "label": "[MISSING]"
+                            "hint": "Schadensreduktion pro Meter Distanz zur Explosion",
+                            "label": "Reduktion (pro m)"
                         },
                         "radius": {
-                            "hint": "[MISSING]",
-                            "label": "[MISSING]"
+                            "hint": "Radius der Explosion in Metern",
+                            "label": "Radius (m)"
                         }
                     },
                     "ranges": {
                         "attribute": {
-                            "hint": "[MISSING]",
-                            "label": "[MISSING]"
+                            "hint": "Attribut um das die Reichweite multipliziert wird",
+                            "label": "Reichweitenattribut"
                         },
                         "category": {
-                            "hint": "[MISSING]",
-                            "label": "[MISSING]"
+                            "hint": "Bestimmt Art der Reichweitenbestimmung. Nutze 'Manuell' um eigene Werte einzutagen",
+                            "label": "Art"
                         },
                         "extreme": {
-                            "hint": "[MISSING]",
-                            "label": "[MISSING]"
+                            "hint": "Maximale Reichweite in Metern",
+                            "label": "Maximal"
                         },
                         "long": {
-                            "hint": "[MISSING]",
-                            "label": "[MISSING]"
+                            "hint": "Lange Reichweite in Metern",
+                            "label": "Lang"
                         },
                         "medium": {
-                            "hint": "[MISSING]",
-                            "label": "[MISSING]"
+                            "hint": "Mittlere Reichweite in Metern",
+                            "label": "Mittel"
                         },
                         "short": {
-                            "hint": "[MISSING]",
-                            "label": "[MISSING]"
+                            "hint": "Kurze Reichweite in Metern",
+                            "label": "Kurz"
                         }
                     }
                 }
@@ -2635,14 +3076,14 @@
                 "Extreme": "Weit",
                 "Long": "Lang",
                 "Medium": "Mittel",
-                "Modes": "[MISSING]",
-                "Range": "[MISSING]",
+                "Modes": "Modi",
+                "Range": "Reichweite",
                 "Ranges": "Reichweiten",
                 "Short": "Kurz"
             },
             "Reach": "Reichweite",
             "Reload": "Nachladen",
-            "SpareReloads": "[MISSING]",
+            "SpareReloads": "Verfügbares Nachladen",
             "Type": "Typ",
             "Weapon": "Waffen"
         },
