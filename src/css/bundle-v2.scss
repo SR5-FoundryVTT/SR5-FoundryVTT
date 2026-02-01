@@ -185,6 +185,10 @@
         }
     }
 
+    .clickable {
+        @include mixins.clickable;
+    }
+
     // remove padding from tooltips that are customized
     &#tooltip {
         padding: 0;

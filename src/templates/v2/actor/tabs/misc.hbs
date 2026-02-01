@@ -145,12 +145,12 @@
                 </div>
                 {{#each situationModifiers}}
                 {{#if (not this.hidden)}}
-                    <div class="list-item header-for-scrollable">
+                    <div class="list-item header-for-scrollable clickable" data-action="openSituationalModifiers">
                         <div class="list-item-start">
-                            <label>{{localize this.label}}</label>
+                            <label class="clickable">{{localize this.label}}</label>
                         </div>
                         <div class="list-item-col">
-                            <label>{{this.value}}</label>
+                            <label class="clickable">{{this.value}}</label>
                         </div>
                     </div>
                 {{/if}}

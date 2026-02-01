@@ -302,6 +302,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             modifyConditionMonitor: SR5BaseActorSheet.#modifyConditionMonitor,
             clearConditionMonitor: SR5BaseActorSheet.#clearConditionMonitor,
             rollConditionMonitor: SR5BaseActorSheet.#rollConditionMonitor,
+
+            openSituationalModifiers: SR5BaseActorSheet.#openSituationalModifiers
         },
         filters: [{ inputSelector: '#filter-active-skills', contentSelector: '', callback: SR5BaseActorSheet.#handleFilterActiveSkills }],
     }
@@ -569,9 +571,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         html.find('.show-hidden-skills').on('click', this._onShowHiddenSkills.bind(this));
 
         html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
-
-        // Situation modifiers application
-        html.find('.show-situation-modifiers-application').on('click', this._onShowSituationModifiersApplication.bind(this));
 
         html.find('select[name="initiative-select"]').on('change', this._onInitiativePerceptionChange.bind(this));
 
@@ -1935,8 +1934,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     /**
      * Show the situation modifiers application for this actor doucment
+     * @param this FoundryVTT binds 'this' to the instance, even though the method is staic.
      */
-    _onShowSituationModifiersApplication(event: Event) {
+    static #openSituationalModifiers(this: SR5BaseActorSheet) {
         new SituationModifiersApplication(this.actor).render(true);
     }
 
