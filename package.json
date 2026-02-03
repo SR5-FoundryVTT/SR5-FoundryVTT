@@ -18,7 +18,7 @@
         "events": "^3.3.0",
         "fs-extra": "^11.3.3",
         "fvtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main",
-        "globals": "^17.1.0",
+        "globals": "^17.3.0",
         "gulp": "^5.0.1",
         "gulp-sass": "^6.0.1",
         "jszip": "^3.10.1",
