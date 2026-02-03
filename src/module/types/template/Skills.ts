@@ -6,6 +6,7 @@ const { SchemaField, BooleanField, ArrayField, NumberField, StringField, TypedOb
 
 export type SkillCategories = 'active' | 'language' | 'knowledge';
 
+// TODO: tamif - remove unneeded fields
 export const SkillField = () => ({
     ...ModifiableValue(),
     name: new StringField({ required: true }),
@@ -133,6 +134,18 @@ export const Skills = () => new FixedTypeObjectField(
             pilot_water_craft: skill({ attribute: 'reaction', id: 'pilot_water_craft' }),
             pilot_exotic_vehicle: skill({ attribute: 'reaction', canDefault: false, id: 'pilot_exotic_vehicle' }), // how to deal with exotic vehicles?
         }
+    }
+);
+
+/**
+ * Derived Data structure build from an actors skill items.
+ * will use skill item id as key and derived ModifiableSkillField as value
+ */
+export const NewSkills = () => new FixedTypeObjectField(
+    new ModifiableField(SkillField()),
+    {
+        required: true,
+        initial: {}
     }
 );
 

@@ -70,31 +70,53 @@ export class SkillFlow {
         return !SkillFlow.isCustomSkill(skill);
     }
 
-    static prepareActorSkills(items: SR5Item<'skill'>[]): Skills {
-        const skills = SkillFlow.getDefaultActorSkills();
-
-        // Sort skills into types.
-        for (const item of items) {
-            if(item.system.type !== 'skill') continue;
-
-            const skillType = item.system.skill.category as string;
-            // TODO: tamif - assert skillType to always exist.
-            if (!Object.hasOwn(skills, skillType)) continue;
-
-            // TODO: tamif - should SR5Actor already localize or should we outload this to the sheet class
-            //               as it is a display issue and not a data issue. Same with sorting.
-            skills.named.set(item.name, item);
-            skills.localized.set(SkillFlow.localizeSkillName(item.name), item);
-
-            if (skillType === 'knowledge') {
-                const skillKnowledgeType = item.system.skill.knowledgeType
-                // TODO: tamif - assert no missing knowledge type
-                skills.knowledge[skillKnowledgeType as KnowledgeSkillCategory].push(item);
-            } else {
-            // TODO: tamif - resolve linter error
-                skills[skillType]!.push(item);
+    /**
+     * Derive actor skill data from their skill items.
+     * 
+     * @param items Skill items to transform. It must only be skill items.
+     * @returns 
+     */
+    static prepareActorSkills(items: SR5Item<'skill'>[]) {
+        const skills = {
+            active: {},
+            language: {},
+            knowledge: {
+                street: {},
+                academic: {},
+                professional: {},
+                interests: {},
             }
         }
+
+        const skillItems = items.filter(item => item.system.type === 'skill');
+
+        for (const item of skillItems) {
+            if (!item.isType('skill')) continue;
+
+            const skill = DataDefaults.createData("skill_field", {
+                id: item.id,
+                name: item.name,
+                // TODO: tamif - check for translation support
+                label: SkillFlow.localizeSkillName(item.name),
+                base: item.system.skill.rating,
+                description: item.system.description.value,
+                attribute: item.system.skill.attribute,
+                canDefault: item.system.skill.defaulting,
+            });
+
+            switch(item.system.skill.category) {
+                case 'active':
+                case 'language':
+                    skills.active[item.id!] = skill;
+                    break;
+                case 'knowledge':
+                    const knowledgeType = item.system.skill.knowledgeType as KnowledgeSkillCategory;
+                    skills.knowledge[knowledgeType][item.id!] = skill;
+                    break;
+            }
+        }
+        
+        // TODO: tamif - implement sorting again
 
         return skills;
     }

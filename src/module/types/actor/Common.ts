@@ -4,13 +4,27 @@ import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
 import { ModifiableField } from "../fields/ModifiableField";
 import { Limits, AwakendLimits, MatrixLimits } from "../template/Limits";
-import { KnowledgeSkillList, KnowledgeSkills, Skills } from "../template/Skills";
+import { KnowledgeSkillList, KnowledgeSkills, NewSkills, Skills } from "../template/Skills";
 const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField } = foundry.data.fields;
 
 export const CharacterSkills = () => ({
     active: Skills(),
     language: new SchemaField(KnowledgeSkillList('intuition')),
     knowledge: new SchemaField(KnowledgeSkills()),
+});
+
+/**
+ * Derived Data structure build from an actors skill items.
+ */
+export const ActorSkills = () => ({
+    active: NewSkills(),
+    language: NewSkills(),
+    knowledge: new SchemaField({
+        street: NewSkills(),
+        academic: NewSkills(),
+        professional: NewSkills(),
+        interests: NewSkills(),
+    })
 });
 
 export const MagicData = () => ({
@@ -63,6 +77,7 @@ export const CommonData = () => ({
     importFlags: new SchemaField(ImportFlagData(), { nullable: true }),
 
     skills: new SchemaField(CharacterSkills()),
+    _skills: new SchemaField(ActorSkills()),
 
     // favorites and hidden_items can be Local ID or UUID depending on if the item comes from a compendium or not
     favorites: new ArrayField(new StringField({ required: true })),

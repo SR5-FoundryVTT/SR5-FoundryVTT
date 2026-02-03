@@ -135,8 +135,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     override prepareData() {
         super.prepareData();
-        this.prepareItemsForType();
-        this.prepareSkills();
     }
 
     /**
@@ -148,6 +146,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     override prepareBaseData() {
         super.prepareBaseData();
+
+        this.prepareItemsForType();
+        this.prepareSkills();
 
         if (this.isType('character'))
             CharacterPrep.prepareBaseData(this.system);
@@ -295,7 +296,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     prepareSkills() {
         const skills = this.itemsForType.get('skill') as SR5Item<'skill'>[];
         if (!skills) return;
-        this.skills = SkillFlow.prepareActorSkills(skills);
+        this.skills = SkillFlow.getDefaultActorSkills();
+
+        this.system._skills = SkillFlow.prepareActorSkills(skills);
     }
 
     /**
