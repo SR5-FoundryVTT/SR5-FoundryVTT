@@ -112,7 +112,7 @@ export class ActorImporter extends BaseClass {
             armor: getCheckboxValue('input[data-field="armor"]'),
             contacts: getCheckboxValue('input[data-field="contacts"]'),
             cyberware: getCheckboxValue('input[data-field="cyberware"]'),
-            gear: getCheckboxValue('input[data-field="gear"]'),
+            equipment: getCheckboxValue('input[data-field="gear"]'),
             lifestyles: getCheckboxValue('input[data-field="lifestyles"]'),
             powers: getCheckboxValue('input[data-field="powers"]'),
             qualities: getCheckboxValue('input[data-field="qualities"]'),
