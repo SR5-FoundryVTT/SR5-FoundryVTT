@@ -7,14 +7,15 @@ export const registerSkillLineHelpers = () => {
     Handlebars.registerHelper('skillSpecializations', function (skill: SR5Item<'skill'>) {
         const span = document.createElement('span');
 
-        for (const spec of skill.system.skill.specializations) {
-            const specSpan = document.createElement('a');
-            specSpan.textContent = spec;
-            specSpan.className = 'skill-specialization';
-            specSpan.dataset.action = 'rollSkillSpecialization';
-            specSpan.dataset.skill = skill.id as string;
-            span.appendChild(specSpan);
-        }
+        console.error('TODO: tam - reuse older specialization rendering logic');
+        // for (const spec of skill.system.skill.specializations) {
+        //     const specSpan = document.createElement('a');
+        //     specSpan.textContent = spec;
+        //     specSpan.className = 'skill-specialization';
+        //     specSpan.dataset.action = 'rollSkillSpecialization';
+        //     specSpan.dataset.skill = skill.id as string;
+        //     span.appendChild(specSpan);
+        // }
 
         return new Handlebars.SafeString(span.outerHTML);
     })

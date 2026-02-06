@@ -36,6 +36,7 @@ export class SkillsPrep {
      * Prepare actor data for skills
      */
     static prepareSkills(system: Actor.SystemOfType<'character' | 'critter' | 'ic' | 'spirit' | 'sprite' | 'vehicle'>) {
+        console.error("TODO: tam - this should be reworked for new skill structure");
         const { language, active, knowledge } = system.skills;
         if (language) {
             language.attribute = 'intuition';

@@ -3,13 +3,14 @@
         label="SR5.Languages"
         addAction="addItem" 
         category='language' }}
-    {{#each skills.language as |skill translated|}}
+    {{log 'Knowledge'}}
+    {{#each system._skills.language as |skill translated|}}
         {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/item.hbs'
             skill=skill
             category='language'
             translated=translated }}
     {{/each}}
-    {{#each skills.knowledge as |skills knowledgeType|}}
+    {{#each system._skills.knowledge as |skills knowledgeType|}}
         {{!-- Skip over empty knowledge categories during play mode --}}
         {{#if (or @root.isEditMode (not (empty skills)))}}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/header.hbs'

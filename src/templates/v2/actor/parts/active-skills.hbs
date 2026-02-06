@@ -15,7 +15,7 @@
         />
     </div>
     <section id="active-skills-scroll" class="scrollable">
-        {{#each skills.active as |skill translated|}}
+       {{#each system._skills.active as |skill translated|}}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/item.hbs'
                 category='active'
                 skill=skill

@@ -41,7 +41,7 @@
                     {{/if}}
                 />
             </button>
-            <a data-action="openSkillDescription">{{localizeSkill skill}}</a>
+            <a data-action="openSkillDescription">{{skill.label}}</a>
         </div>
         {{#if @root.isPlayMode}}
         <div class="list-item-col">
@@ -49,16 +49,16 @@
         </div>
         {{/if}}
         <div class="list-item-col {{#if @root.isPlayMode}} skinny-col {{/if}}">
+            {{log skill}}
             {{#if @root.isEditMode}}
                 {{!-- use the original method of setting data because skills are weird in data model, they'll be items eventually --}}
-                <input type="number" class="short skinny" value="{{skill.system.skill.rating}}" data-skill="{{skill.id}}" >
+                <input type="number" class="short skinny" value="{{skill.base}}" data-skill="{{skill.id}}" >
             {{else}}
                 <label data-skill-modifier-tooltip="{{skill.id}}">
                     {{#if skill.system.skill.language.isNative}}
                         {{localize "SR5.Skill.abbr.Native"}}
                     {{else}}
-                        {{!-- TODO: tamif - Show effect modified value --}}
-                        {{skill.system.skill.rating}}
+                        {{skill.value}}
                     {{/if}}
                 </label>
             {{/if}}
