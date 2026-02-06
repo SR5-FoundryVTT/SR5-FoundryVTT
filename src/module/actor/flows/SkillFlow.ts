@@ -93,6 +93,8 @@ export class SkillFlow {
         for (const item of skillItems) {
             if (!item.isType('skill')) continue;
 
+            const key = item.name ?? item.id!;
+            
             const skill = DataDefaults.createData("skill_field", {
                 id: item.id,
                 name: item.name,
@@ -106,12 +108,14 @@ export class SkillFlow {
 
             switch(item.system.skill.category) {
                 case 'active':
+                    skills.active[key] = skill;
+                    break;
                 case 'language':
-                    skills.active[item.id!] = skill;
+                    skills.language[key] = skill;
                     break;
                 case 'knowledge':
                     const knowledgeType = item.system.skill.knowledgeType as KnowledgeSkillCategory;
-                    skills.knowledge[knowledgeType][item.id!] = skill;
+                    skills.knowledge[knowledgeType][key] = skill;
                     break;
             }
         }

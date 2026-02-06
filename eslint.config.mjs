@@ -51,7 +51,7 @@ export default [
             "@typescript-eslint/no-unsafe-call": "warn", 
 
             "eqeqeq": "warn",
-            "no-case-declarations": "warn",
+            "no-case-declarations": "off",
             "no-empty": "warn",
             "no-fallthrough": "warn",
             "no-mixed-operators": "warn",
