@@ -179,208 +179,208 @@
                 "attributes": {
                     "edge": {
                         "base": {
-                            "label": "Edge",
-                            "hint": "Edge is a character’s luck, the favor of the gods, that unexplainable factor that allows her to beat the odds."
+                            "hint": "Edge is a character’s luck, the favor of the gods, that unexplainable factor that allows her to beat the odds.",
+                            "label": "Edge"
                         }
-                    }
-                },
-                "modifiers": {
-                    "walk": {
-                        "label": "Walk",
-                        "hint": "Modifies walking distance by multiples of the agility attribute"
-                    },
-                    "run": {
-                        "label": "Run",
-                        "hint": "Modifies running distance by multiples of the agility attribute"
-                    },
-                    "physical_limit": {
-                        "label": "Physical Limit",
-                        "hint": "Modifies physical limit"
-                    },
-                    "astral_limit": {
-                        "label": "Astral Limit",
-                        "hint": "Modifies astral limit"
-                    },
-                    "social_limit": {
-                        "label": "Social Limit",
-                        "hint": "Modifies social limit"
-                    },
-                    "mental_limit": {
-                        "label": "Mental Limit",
-                        "hint": "Modifies mental limit"
-                    },
-                    "astral_initiative": {
-                        "label": "Astral Initiative",
-                        "hint": "Modifies astral initiative base"
-                    },
-                    "astral_initiative_dice": {
-                        "label": "Astral Initiative Dice",
-                        "hint": "Modifies astral initiative dice"
-                    },
-                    "matrix_initiative": {
-                        "label": "Matrix Initiative",
-                        "hint": "Modifies matrix initiative base"
-                    },
-                    "matrix_initiative_dice": {
-                        "label": "Matrix Initiative Dice",
-                        "hint": "Modifies matrix initiative dice"
-                    },
-                    "meat_initiative": {
-                        "label": "Meatspace Initiative",
-                        "hint": "Modifies physical initiative base"
-                    },
-                    "meat_initiative_dice": {
-                        "label": "Meatspace Initiative Dice",
-                        "hint": "Modifies physical initiative dice"
-                    },
-                    "stun_track": {
-                        "label": "Stun Track",
-                        "hint": "Modifies stun damage track"
-                    },
-                    "matrix_track": {
-                        "label": "Matrix Track",
-                        "hint": "Modifies matrix damage track"
-                    },
-                    "physical_track": {
-                        "label": "Physical Track",
-                        "hint": "Modifies physical damage track"
-                    },
-                    "physical_overflow_track": {
-                        "label": "Physical Overflow Track",
-                        "hint": "Modifies physical overflow damage track"
-                    },
-                    "wound_tolerance": {
-                        "label": "Wound Tolerance",
-                        "hint": "Modifies damage per wound modifier"
-                    },
-                    "pain_tolerance_stun": {
-                        "label": "Pain Tolerance (Stun)",
-                        "hint": "Modifies damage to be ignored before first wound modifier"
-                    },
-                    "pain_tolerance_physical": {
-                        "label": "Pain Tolerance (Physical)",
-                        "hint": "Modifies damage to be ignored before first wound modifier"
-                    },
-                    "armor": {
-                        "label": "Armor",
-                        "hint": "Modifies total armor value"
-                    },
-                    "multi_defense": {
-                        "label": "Multi-Defense",
-                        "hint": "Modifies defense tests pool for multiple defenses per combat turn"
-                    },
-                    "reach": {
-                        "label": "Reach",
-                        "hint": "Modifies reach of melee attacks"
-                    },
-                    "defense": {
-                        "label": "Defense",
-                        "hint": "Modifies defense tests pool"
-                    },
-                    "defense_dodge": {
-                        "label": "Defense (Dodge)",
-                        "hint": "Adds to the defense modifier for active dodging"
-                    },
-                    "defense_parry": {
-                        "label": "Defense (Parry)",
-                        "hint": "Adds to the defense modifier for active parrying"
-                    },
-                    "defense_block": {
-                        "label": "Defense (Block)",
-                        "hint": "Adds to the defense modifier for active blocking"
-                    },
-                    "defense_melee": {
-                        "label": "Defense (Melee)",
-                        "hint": "Adds to the defense modifier for melee defense"
-                    },
-                    "defense_ranged": {
-                        "label": "Defense (Ranged)",
-                        "hint": "Adds to the defense modifier for ranged attack"
-                    },
-                    "soak": {
-                        "label": "Soak",
-                        "hint": "Modifies physical damage resist tests pool"
-                    },
-                    "recoil": {
-                        "label": "Recoil",
-                        "hint": "Modifies recoil tests pool"
-                    },
-                    "drain": {
-                        "label": "Drain",
-                        "hint": "Modifies drain tests pool"
-                    },
-                    "fade": {
-                        "label": "Fade",
-                        "hint": "Modifies fade tests pool"
-                    },
-                    "essence": {
-                        "label": "Essence",
-                        "hint": "Modifies essence attribute"
-                    },
-                    "public_grid": {
-                        "label": "Public Grid",
-                        "hint": "Modifies the Public Grid modifier when connected to it"
-                    },
-                    "mark_damage": {
-                        "label": "Mark Damage",
-                        "hint": "Modifies the amount of damage taken per MARK done to you"
-                    },
-                    "place_two_marks": {
-                        "label": "Place Two Marks",
-                        "hint": "Modifies the modifier to place two marks at the same time"
-                    },
-                    "place_three_marks": {
-                        "label": "Place Three Marks",
-                        "hint": "Modifies the modifier to place three marks at the same time"
-                    },
-                    "composure": {
-                        "label": "Composure",
-                        "hint": "Modifies composure tests pool"
-                    },
-                    "lift_carry": {
-                        "label": "Lift/Carry",
-                        "hint": "Modifies lift&carry tests pool"
-                    },
-                    "judge_intentions": {
-                        "label": "Judge Intentions",
-                        "hint": "Modifies judge intentions tests pool"
-                    },
-                    "memory": {
-                        "label": "Memory",
-                        "hint": "Modifies memory tests pool"
-                    },
-                    "global": {
-                        "label": "Global",
-                        "hint": "Modifies all tests pool, excluding damage reducing tests"
                     }
                 },
                 "category_visibility": {
                     "default": {
-                        "label": "Show Empty Categories",
-                        "hint": "If empty Tabs and Inventory Categories should be visible"
+                        "hint": "If empty Tabs and Inventory Categories should be visible",
+                        "label": "Show Empty Categories"
                     }
                 },
                 "full_defense_attribute": {
-                    "label": "Full Defense Attribute",
-                    "hint": "Attribute to use when using the Full Defense interrupt action"
+                    "hint": "Attribute to use when using the Full Defense interrupt action",
+                    "label": "Full Defense Attribute"
                 },
                 "magic": {
-                    "label": "Magic",
                     "attribute": {
-                        "label": "Drain Attribute",
-                        "hint": "Attribute the Mage/Adept uses when resisting Drain"
-                    }
+                        "hint": "Attribute the Mage/Adept uses when resisting Drain",
+                        "label": "Drain Attribute"
+                    },
+                    "label": "Magic"
                 },
-                "technomancer": {
-                    "label": "Technomancer",
-                    "attribute": {
-                        "label": "Fade Attribute",
-                        "hint": "Attribute the Technomancer uses when resisting Fade"
+                "modifiers": {
+                    "armor": {
+                        "hint": "Modifies total armor value",
+                        "label": "Armor"
+                    },
+                    "astral_initiative": {
+                        "hint": "Modifies astral initiative base",
+                        "label": "Astral Initiative"
+                    },
+                    "astral_initiative_dice": {
+                        "hint": "Modifies astral initiative dice",
+                        "label": "Astral Initiative Dice"
+                    },
+                    "astral_limit": {
+                        "hint": "Modifies astral limit",
+                        "label": "Astral Limit"
+                    },
+                    "composure": {
+                        "hint": "Modifies composure tests pool",
+                        "label": "Composure"
+                    },
+                    "defense": {
+                        "hint": "Modifies defense tests pool",
+                        "label": "Defense"
+                    },
+                    "defense_block": {
+                        "hint": "Adds to the defense modifier for active blocking",
+                        "label": "Defense (Block)"
+                    },
+                    "defense_dodge": {
+                        "hint": "Adds to the defense modifier for active dodging",
+                        "label": "Defense (Dodge)"
+                    },
+                    "defense_melee": {
+                        "hint": "Adds to the defense modifier for melee defense",
+                        "label": "Defense (Melee)"
+                    },
+                    "defense_parry": {
+                        "hint": "Adds to the defense modifier for active parrying",
+                        "label": "Defense (Parry)"
+                    },
+                    "defense_ranged": {
+                        "hint": "Adds to the defense modifier for ranged attack",
+                        "label": "Defense (Ranged)"
+                    },
+                    "drain": {
+                        "hint": "Modifies drain tests pool",
+                        "label": "Drain"
+                    },
+                    "essence": {
+                        "hint": "Modifies essence attribute",
+                        "label": "Essence"
+                    },
+                    "fade": {
+                        "hint": "Modifies fade tests pool",
+                        "label": "Fade"
+                    },
+                    "global": {
+                        "hint": "Modifies all tests pool, excluding damage reducing tests",
+                        "label": "Global"
+                    },
+                    "judge_intentions": {
+                        "hint": "Modifies judge intentions tests pool",
+                        "label": "Judge Intentions"
+                    },
+                    "lift_carry": {
+                        "hint": "Modifies lift&carry tests pool",
+                        "label": "Lift/Carry"
+                    },
+                    "mark_damage": {
+                        "hint": "Modifies the amount of damage taken per MARK done to you",
+                        "label": "Mark Damage"
+                    },
+                    "matrix_initiative": {
+                        "hint": "Modifies matrix initiative base",
+                        "label": "Matrix Initiative"
+                    },
+                    "matrix_initiative_dice": {
+                        "hint": "Modifies matrix initiative dice",
+                        "label": "Matrix Initiative Dice"
+                    },
+                    "matrix_track": {
+                        "hint": "Modifies matrix damage track",
+                        "label": "Matrix Track"
+                    },
+                    "meat_initiative": {
+                        "hint": "Modifies physical initiative base",
+                        "label": "Meatspace Initiative"
+                    },
+                    "meat_initiative_dice": {
+                        "hint": "Modifies physical initiative dice",
+                        "label": "Meatspace Initiative Dice"
+                    },
+                    "memory": {
+                        "hint": "Modifies memory tests pool",
+                        "label": "Memory"
+                    },
+                    "mental_limit": {
+                        "hint": "Modifies mental limit",
+                        "label": "Mental Limit"
+                    },
+                    "multi_defense": {
+                        "hint": "Modifies defense tests pool for multiple defenses per combat turn",
+                        "label": "Multi-Defense"
+                    },
+                    "pain_tolerance_physical": {
+                        "hint": "Modifies damage to be ignored before first wound modifier",
+                        "label": "Pain Tolerance (Physical)"
+                    },
+                    "pain_tolerance_stun": {
+                        "hint": "Modifies damage to be ignored before first wound modifier",
+                        "label": "Pain Tolerance (Stun)"
+                    },
+                    "physical_limit": {
+                        "hint": "Modifies physical limit",
+                        "label": "Physical Limit"
+                    },
+                    "physical_overflow_track": {
+                        "hint": "Modifies physical overflow damage track",
+                        "label": "Physical Overflow Track"
+                    },
+                    "physical_track": {
+                        "hint": "Modifies physical damage track",
+                        "label": "Physical Track"
+                    },
+                    "place_three_marks": {
+                        "hint": "Modifies the modifier to place three marks at the same time",
+                        "label": "Place Three Marks"
+                    },
+                    "place_two_marks": {
+                        "hint": "Modifies the modifier to place two marks at the same time",
+                        "label": "Place Two Marks"
+                    },
+                    "public_grid": {
+                        "hint": "Modifies the Public Grid modifier when connected to it",
+                        "label": "Public Grid"
+                    },
+                    "reach": {
+                        "hint": "Modifies reach of melee attacks",
+                        "label": "Reach"
+                    },
+                    "recoil": {
+                        "hint": "Modifies recoil tests pool",
+                        "label": "Recoil"
+                    },
+                    "run": {
+                        "hint": "Modifies running distance by multiples of the agility attribute",
+                        "label": "Run"
+                    },
+                    "soak": {
+                        "hint": "Modifies physical damage resist tests pool",
+                        "label": "Soak"
+                    },
+                    "social_limit": {
+                        "hint": "Modifies social limit",
+                        "label": "Social Limit"
+                    },
+                    "stun_track": {
+                        "hint": "Modifies stun damage track",
+                        "label": "Stun Track"
+                    },
+                    "walk": {
+                        "hint": "Modifies walking distance by multiples of the agility attribute",
+                        "label": "Walk"
+                    },
+                    "wound_tolerance": {
+                        "hint": "Modifies damage per wound modifier",
+                        "label": "Wound Tolerance"
                     }
                 },
                 "special": {
-                    "label": "Awakened/Emerged",
-                    "hint": "Select if the character is Awakened (mage/adept) or Emerged (technomancer)"
+                    "hint": "Select if the character is Awakened (mage/adept) or Emerged (technomancer)",
+                    "label": "Awakened/Emerged"
+                },
+                "technomancer": {
+                    "attribute": {
+                        "hint": "Attribute the Technomancer uses when resisting Fade",
+                        "label": "Fade Attribute"
+                    },
+                    "label": "Technomancer"
                 }
             },
             "NoFavoritesSelected": "No favorites have been selected"
@@ -400,115 +400,115 @@
         "AddOneToOverwatch": "+1 to OS",
         "AddSkill": "Add Custom Skill",
         "AdeptPower": {
+            "FIELDS": {
+                "drain": {
+                    "hint": "If this Adept Power incurs Drain after use",
+                    "label": "Drain"
+                },
+                "level": {
+                    "hint": "Level of this Adept Power (if applicable)",
+                    "label": "Level"
+                },
+                "pp": {
+                    "hint": "Number of Power Points this Power Costs",
+                    "label": "Power Points"
+                },
+                "type": {
+                    "hint": "Type of Adept Power",
+                    "label": "Power Type"
+                }
+            },
             "Types": {
                 "Active": "Active",
                 "Passive": "Passive"
-            },
-            "FIELDS": {
-                "pp": {
-                    "label": "Power Points",
-                    "hint": "Number of Power Points this Power Costs"
-                },
-                "type": {
-                    "label": "Power Type",
-                    "hint": "Type of Adept Power"
-                },
-                "drain": {
-                    "label": "Drain",
-                    "hint": "If this Adept Power incurs Drain after use"
-                },
-                "level": {
-                    "label": "Level",
-                    "hint": "Level of this Adept Power (if applicable)"
-                }
             }
         },
         "Agent": "Agent",
         "Ammo": {
-            "label": "Ammo",
             "FIELDS": {
-                "damage": {
-                    "label": "Damage",
-                    "hint": "Damage dealt by this ammo. This may be added to the Weapon's Damage or replace it"
-                },
-                "damageType": {
-                    "label": "Damage type",
-                    "hint": "Type of damage dealt by this Ammo."
-                },
-                "element": {
-                    "label": "Element",
-                    "hint": "Element the damage of this Element does."
-                },
-                "replaceDamage": {
-                    "label": "Replace",
-                    "hint": "If this Ammo should replace the Damage of the weapon"
+                "accuracy": {
+                    "hint": "Accuracy modifier of this Ammo",
+                    "label": "Accuracy"
                 },
                 "ap": {
-                    "label": "AP",
-                    "hint": "Armor Penetration of this Ammo. This may be added to the Weapon's AP or replace it"
-                },
-                "replaceAP": {
-                    "label": "Replace",
-                    "hint": "If this Ammo should replace the AP of the Weapon"
-                },
-                "accuracy": {
-                    "label": "Accuracy",
-                    "hint": "Accuracy modifier of this Ammo"
+                    "hint": "Armor Penetration of this Ammo. This may be added to the Weapon's AP or replace it",
+                    "label": "AP"
                 },
                 "blast": {
-                    "radius": {
-                        "label": "Blast Radius",
-                        "hint": "Blast Radius of this Ammo, in Meters"
-                    },
                     "dropoff": {
-                        "label": "Blast Dropoff",
-                        "hint": "Blast Dropoff modifies the Damage per Meter"
+                        "hint": "Blast Dropoff modifies the Damage per Meter",
+                        "label": "Blast Dropoff"
+                    },
+                    "radius": {
+                        "hint": "Blast Radius of this Ammo, in Meters",
+                        "label": "Blast Radius"
                     }
+                },
+                "damage": {
+                    "hint": "Damage dealt by this ammo. This may be added to the Weapon's Damage or replace it",
+                    "label": "Damage"
+                },
+                "damageType": {
+                    "hint": "Type of damage dealt by this Ammo.",
+                    "label": "Damage type"
+                },
+                "element": {
+                    "hint": "Element the damage of this Element does.",
+                    "label": "Element"
+                },
+                "replaceAP": {
+                    "hint": "If this Ammo should replace the AP of the Weapon",
+                    "label": "Replace"
+                },
+                "replaceDamage": {
+                    "hint": "If this Ammo should replace the Damage of the weapon",
+                    "label": "Replace"
                 }
-            }
+            },
+            "label": "Ammo"
         },
         "AmmoFull": "Ammo Full",
         "AmmoGelRounds": "Gel Rounds",
         "Aoe": "AoE",
         "ApplyWounds": "Apply Wounds",
         "Armor": {
-            "label": "Armor",
             "FIELDS": {
                 "armor": {
-                    "value": {
-                        "label": "Armor Value",
-                        "hint": "Amount of Armor that this item provides"
-                    },
-                    "mod": {
-                        "label": "Accessory",
-                        "hint": "If this Armor is an Accessory (adds its value to the actor's base Armor)"
-                    },
-                    "hardened": {
-                        "label": "Hardened Armor",
-                        "hint": "If this Armor is Hardened"
-                    },
                     "acid": {
-                        "label": "Acid Resistance",
-                        "hint": "Extra Armor against attacks with Acid"
-                    },
-                    "electricity": {
-                        "label": "Nonconductivity",
-                        "hint": "Extra Armor against attacks with Electricity"
+                        "hint": "Extra Armor against attacks with Acid",
+                        "label": "Acid Resistance"
                     },
                     "cold": {
-                        "label": "Insulation",
-                        "hint": "Extra Armor against attacks with Cold"
+                        "hint": "Extra Armor against attacks with Cold",
+                        "label": "Insulation"
+                    },
+                    "electricity": {
+                        "hint": "Extra Armor against attacks with Electricity",
+                        "label": "Nonconductivity"
                     },
                     "fire": {
-                        "label": "Fire Resistance",
-                        "hint": "Extra Armor against attacks with Fire"
+                        "hint": "Extra Armor against attacks with Fire",
+                        "label": "Fire Resistance"
+                    },
+                    "hardened": {
+                        "hint": "If this Armor is Hardened",
+                        "label": "Hardened Armor"
+                    },
+                    "mod": {
+                        "hint": "If this Armor is an Accessory (adds its value to the actor's base Armor)",
+                        "label": "Accessory"
                     },
                     "radiation": {
-                        "label": "Radiation Resistance",
-                        "hint": "Extra Armor against attacks with Radiation"
+                        "hint": "Extra Armor against attacks with Radiation",
+                        "label": "Radiation Resistance"
+                    },
+                    "value": {
+                        "hint": "Amount of Armor that this item provides",
+                        "label": "Armor Value"
                     }
                 }
-            }
+            },
+            "label": "Armor"
         },
         "ArmorHardened": "Hardened",
         "ArmorHardenedFull": "Hardened Armor",
@@ -560,29 +560,29 @@
             "CreateCompilation": "Create compilation action",
             "CreateSummoning": "Create summoning action",
             "FIELDS": {
+                "actor_type": {
+                    "hint": "Type of Actor this action summons",
+                    "label": "Type"
+                },
                 "spirit": {
-                    "type": {
-                        "label": "Spirit Type",
-                        "hint": "Type of Spirit to Summon. Disabled if a Spirit Actor is set"
-                    },
                     "force": {
-                        "label": "Force",
-                        "hint": "Force of Spirit to Summon. Disabled if a Spirit Actor is set"
+                        "hint": "Force of Spirit to Summon. Disabled if a Spirit Actor is set",
+                        "label": "Force"
+                    },
+                    "type": {
+                        "hint": "Type of Spirit to Summon. Disabled if a Spirit Actor is set",
+                        "label": "Spirit Type"
                     }
                 },
                 "sprite": {
-                    "type": {
-                        "label": "Sprite Type",
-                        "hint": "Type of Sprite to Compile. Disabled if a Sprite Actor is set"
-                    },
                     "level": {
-                        "label": "Level",
-                        "hint": "Level of Sprite to Summon. Disabled if a Sprite Actor is set"
+                        "hint": "Level of Sprite to Summon. Disabled if a Sprite Actor is set",
+                        "label": "Level"
+                    },
+                    "type": {
+                        "hint": "Type of Sprite to Compile. Disabled if a Sprite Actor is set",
+                        "label": "Sprite Type"
                     }
-                },
-                "actor_type": {
-                    "label": "Type",
-                    "hint": "Type of Actor this action summons"
                 }
             },
             "Summon": "Summon",
@@ -601,53 +601,53 @@
         },
         "Character": {
             "FIELDS": {
-                "metatype": {
-                    "label": "Metatype",
-                    "hint": "Metatype of the Character. If an NPC, this will adjust attributes"
-                },
-                "nuyen": {
-                    "label": "Nuyen",
-                    "hint": "Amount of Nuyen this Character has"
-                },
-                "karma": {
-                    "value": {
-                        "label": "Current Karma",
-                        "hint": "Amount of Karma this Character has available"
-                    },
-                    "max": {
-                        "label": "Career Karma",
-                        "hint": "Amount of Karma this Character has accumulated"
-                    }
-                },
-                "notoriety": {
-                    "label": "Notoriety",
-                    "hint": "The negative side of the character’s reputation"
-                },
-                "public_awareness": {
-                    "label": "Public Awareness",
-                    "hint": "How well the character is known among the media, authorities, and public at large"
-                },
-                "street_cred": {
-                    "label": "Street Cred",
-                    "hint": "A character’s lifetime accomplishments"
-                },
-                "matrix_full_defense_attribute": {
-                    "label": "Matrix Full Defense Attribute",
-                    "hint": "Attribute to add when making a Matrix Full Defense Action"
-                },
                 "is_critter": {
-                    "label": "Is Critter",
-                    "hint": "Allow the use of critter powers"
+                    "hint": "Allow the use of critter powers",
+                    "label": "Is Critter"
                 },
                 "is_npc": {
-                    "label": "Is NPC",
-                    "hint": "Mark actor as NPC to get additional features"
+                    "hint": "Mark actor as NPC to get additional features",
+                    "label": "Is NPC"
+                },
+                "karma": {
+                    "max": {
+                        "hint": "Amount of Karma this Character has accumulated",
+                        "label": "Career Karma"
+                    },
+                    "value": {
+                        "hint": "Amount of Karma this Character has available",
+                        "label": "Current Karma"
+                    }
+                },
+                "matrix_full_defense_attribute": {
+                    "hint": "Attribute to add when making a Matrix Full Defense Action",
+                    "label": "Matrix Full Defense Attribute"
+                },
+                "metatype": {
+                    "hint": "Metatype of the Character. If an NPC, this will adjust attributes",
+                    "label": "Metatype"
+                },
+                "notoriety": {
+                    "hint": "The negative side of the character’s reputation",
+                    "label": "Notoriety"
                 },
                 "npc": {
                     "is_grunt": {
-                        "label": "Is Grunt",
-                        "hint": "Apply grunt rules to this actor"
+                        "hint": "Apply grunt rules to this actor",
+                        "label": "Is Grunt"
                     }
+                },
+                "nuyen": {
+                    "hint": "Amount of Nuyen this Character has",
+                    "label": "Nuyen"
+                },
+                "public_awareness": {
+                    "hint": "How well the character is known among the media, authorities, and public at large",
+                    "label": "Public Awareness"
+                },
+                "street_cred": {
+                    "hint": "A character’s lifetime accomplishments",
+                    "label": "Street Cred"
                 }
             },
             "Modifiers": {
@@ -723,65 +723,65 @@
                 "Sustained": "Sustained"
             },
             "FIELDS": {
-                "target": {
-                    "label": "Target",
-                    "hint": "Valid Target types for the Complex Form"
-                },
                 "duration": {
-                    "label": "Duration",
-                    "hint": "Immediate (it happens instantly with no lasting effects), Sustained (you can sustain it), or Permanent (if you sustain it for its Level in Combat Turns, its effects remain after you stop sustaining it)."
+                    "hint": "Immediate (it happens instantly with no lasting effects), Sustained (you can sustain it), or Permanent (if you sustain it for its Level in Combat Turns, its effects remain after you stop sustaining it).",
+                    "label": "Duration"
                 },
                 "fade": {
-                    "label": "Fade",
-                    "hint": "The Fading Value is added to the Level chosen when threading to determine the amount of damage to be resisted"
+                    "hint": "The Fading Value is added to the Level chosen when threading to determine the amount of damage to be resisted",
+                    "label": "Fade"
+                },
+                "target": {
+                    "hint": "Valid Target types for the Complex Form",
+                    "label": "Target"
                 }
             }
         },
         "ComplexForms": "Complex Forms",
         "Conceal": "Conceal",
         "ConditionMonitor": "Con. Mon.",
-        "Connection": "Connection",
         "ConnectToNetwork": "Connect to Network",
+        "Connection": "Connection",
         "Contact": {
-            "FIELDS": {
-                "type": {
-                    "label": "Type",
-                    "hint": "Contact Type determines what kind of access they have for gear, jobs, info, etc."
-                },
-                "connection": {
-                    "label": "Connection",
-                    "hint": "This measures the contact’s influence on a scale of 1 to 12. The higher the Connection Rating, the more juice the contact has."
-                },
-                "blackmail": {
-                    "label": "Blackmail",
-                    "hint": "You have something that can be held over the contact to get them to do business."
-                },
-                "loyalty": {
-                    "label": "Loyalty",
-                    "hint": "This shows you how much you can trust the contact, measured on a scale of 1 to 6. The higher the Loyalty Rating, the more the contact is willing to do for you"
-                },
-                "family": {
-                    "label": "Family",
-                    "hint": "Blood is always thicker than water, this is true for having family as contacts."
-                },
-                "group": {
-                    "label": "Group",
-                    "hint": "Contact is a Group; could be a gang, corp, or some nerds"
-                },
-                "linkedActor": {
-                    "label": "Actor",
-                    "hint": "Actor that this Contact represents"
-                }
-            },
             "Blackmail": "Blackmail",
             "Connection": "Connection",
             "DropActor": "Drag&Drop an actor to link it to this contact",
+            "FIELDS": {
+                "blackmail": {
+                    "hint": "You have something that can be held over the contact to get them to do business.",
+                    "label": "Blackmail"
+                },
+                "connection": {
+                    "hint": "This measures the contact’s influence on a scale of 1 to 12. The higher the Connection Rating, the more juice the contact has.",
+                    "label": "Connection"
+                },
+                "family": {
+                    "hint": "Blood is always thicker than water, this is true for having family as contacts.",
+                    "label": "Family"
+                },
+                "group": {
+                    "hint": "Contact is a Group; could be a gang, corp, or some nerds",
+                    "label": "Group"
+                },
+                "linkedActor": {
+                    "hint": "Actor that this Contact represents",
+                    "label": "Actor"
+                },
+                "loyalty": {
+                    "hint": "This shows you how much you can trust the contact, measured on a scale of 1 to 6. The higher the Loyalty Rating, the more the contact is willing to do for you",
+                    "label": "Loyalty"
+                },
+                "type": {
+                    "hint": "Contact Type determines what kind of access they have for gear, jobs, info, etc.",
+                    "label": "Type"
+                }
+            },
             "Family": "Family",
             "Group": "Group",
             "LinkedActor": "Actor",
             "Loyalty": "Loyalty",
-            "LoyaltyConnectionLabel": "L / C",
             "LoyaltyConnectionHelp": "Loyalty / Connection",
+            "LoyaltyConnectionLabel": "L / C",
             "Type": "Type"
         },
         "ContactType": "Type",
@@ -858,28 +858,6 @@
         "Cover": "Cover",
         "Create": "Create {type}",
         "CritterPower": {
-            "FIELDS": {
-                "optional": {
-                    "label": "Optional",
-                    "hint": "If the Critter Power is Optional"
-                },
-                "powerType": {
-                    "label": "Power Type",
-                    "hint": "The Type of Critter Power"
-                },
-                "duration": {
-                    "label": "Duration",
-                    "hint": "Duration of the Critter Power"
-                },
-                "range": {
-                    "label": "Range",
-                    "hint": "Range of the Critter Power"
-                },
-                "karma": {
-                    "label": "Karma",
-                    "hint": "Karma cost of the Critter Power"
-                }
-            },
             "Categories": {
                 "Drake": "Drake",
                 "Echoes": "Echoes",
@@ -899,6 +877,28 @@
                 "Permanent": "Permanent",
                 "Special": "Special",
                 "Sustained": "Sustained"
+            },
+            "FIELDS": {
+                "duration": {
+                    "hint": "Duration of the Critter Power",
+                    "label": "Duration"
+                },
+                "karma": {
+                    "hint": "Karma cost of the Critter Power",
+                    "label": "Karma"
+                },
+                "optional": {
+                    "hint": "If the Critter Power is Optional",
+                    "label": "Optional"
+                },
+                "powerType": {
+                    "hint": "The Type of Critter Power",
+                    "label": "Power Type"
+                },
+                "range": {
+                    "hint": "Range of the Critter Power",
+                    "label": "Range"
+                }
             },
             "IsOptional": "Optionality",
             "Karma": "Karma",
@@ -968,13 +968,13 @@
         "Details": "Details",
         "DetectionSpellExtended": "Extended",
         "Device": {
-            "label": "Device",
             "FIELDS": {
                 "category": {
-                    "label": "Device Type",
-                    "hint": "The type of Device"
+                    "hint": "The type of Device",
+                    "label": "Device Type"
                 }
-            }
+            },
+            "label": "Device"
         },
         "DeviceCatCommlink": "Commlink",
         "DeviceCatCyberdeck": "Cyberdeck",
@@ -1122,8 +1122,8 @@
         "Grid": {
             "FIELDS": {
                 "category": {
-                    "label": "Grid Type",
-                    "hint": "Public Grids apply a negative modifier while connected, Local and Global Grids have no modifiers"
+                    "hint": "Public Grids apply a negative modifier while connected, Local and Global Grids have no modifiers",
+                    "label": "Grid Type"
                 }
             }
         },
@@ -1143,17 +1143,17 @@
         "HotSim": "Hot Sim",
         "IC": {
             "FIELDS": {
-                "icType": {
-                    "label": "IC Type",
-                    "hint": "Type of IC"
-                },
                 "host": {
+                    "hint": "On which host this IC is running",
                     "label": "Host",
-                    "hint": "Type of IC",
                     "rating": {
-                        "label": "Rating",
-                        "hint": "Rating of the Host we are running on"
+                        "hint": "Rating of the Host we are running on",
+                        "label": "Rating"
                     }
+                },
+                "icType": {
+                    "hint": "Type of IC",
+                    "label": "IC Type"
                 }
             },
             "MissingHost": "Drag&Drop a host item",
@@ -1188,11 +1188,11 @@
             "BulkImporter": {
                 "Title": "Bulk Importer"
             },
-            "Spirit": {
-                "SpiritTypeNotFound": "The spirit type was not found. Please open a github issue with your chummer export json."
-            },
             "ImporterSourcesConfig": {
                 "Title": "Importer Sources Configuration"
+            },
+            "Spirit": {
+                "SpiritTypeNotFound": "The spirit type was not found. Please open a github issue with your chummer export json."
             }
         },
         "ImportCharacter": "Import Character",
@@ -1213,10 +1213,10 @@
         "Initiative": "Initiative",
         "Internal": "Internal",
         "InventoryRename": {
-            "Title": "Rename Inventory",
-            "Submit": "Submit",
             "Cancel": "Cancel",
-            "NewName": "New Name"
+            "NewName": "New Name",
+            "Submit": "Submit",
+            "Title": "Rename Inventory"
         },
         "IsCritter": "Critter",
         "IsFreshImport": "This item was imported from Chummer and needs manual review.",
@@ -1224,243 +1224,242 @@
         "IsNPC": "NPC",
         "Item": {
             "FIELDS": {
-                "description": {
-                    "base": {
-                        "label": "Description",
-                        "hint": "Description of the Item"
-                    },
-                    "source": {
-                        "label": "Source",
-                        "hint": "Source of the Item, this can be a PDF Page, URL, or Journal"
-                    }
-                },
-                "ammo": {
-                    "spare_clips": {
-                        "value": {
-                            "label": "Current Spare Reloads",
-                            "hint": "The number of Spare Clips the actor has left"
-                        },
-                        "max": {
-                            "label": "Maximum Spare Reloads",
-                            "hint": "The Maximum number of Spare Clips the actor holds for this Weapon"
-                        }
-                    },
-                    "clip_type": {
-                        "label": "Weapon Reload Type",
-                        "hint": "The type of Reloading mechanism that the weapon uses"
-
-                    }
-                },
                 "action": {
-                    "categories": {
-                        "label": "Categories",
-                        "hint": "Action Categories that this test incorporates. These actions can be targeted with Active Effects"
-                    },
-                    "modifiers": {
-                        "label": "Modifiers",
-                        "hint": "Action Modifiers that affect this test."
-                    },
-                    "test": {
-                        "label": "Test Type",
-                        "hint": "Specific type of test to use for this Action"
-                    },
-                    "type": {
-                        "label": "Action Type",
-                        "hint": "Type of action that this skill uses"
-                    },
-                    "extended": {
-                        "label": "Extended Test",
-                        "hint": "If this is an Extended Test"
-                    },
-                    "skill": {
-                        "label": "Skill",
-                        "hint": "Skill used by this action. Leave blank if no skill is used"
-                    },
-                    "spec": {
-                        "label": "Specialized",
-                        "hint": "If the skill specialization modifier (+2) should be applied to this test"
+                    "armor": {
+                        "hint": "If the actor's Armor should be added to the test",
+                        "label": "Armor"
                     },
                     "attribute": {
-                        "label": "Attribute",
-                        "hint": "The Attribute used by the test"
+                        "hint": "The Attribute used by the test",
+                        "label": "Attribute"
                     },
                     "attribute2": {
-                        "label": "Other Attribute",
-                        "hint": "The Other Attribute used by this test"
+                        "hint": "The Other Attribute used by this test",
+                        "label": "Other Attribute"
                     },
-                    "armor": {
-                        "label": "Armor",
-                        "hint": "If the actor's Armor should be added to the test"
-                    },
-                    "mod": {
-                        "label": "Modifier",
-                        "hint": "Any modifiers applied to the test"
+                    "categories": {
+                        "hint": "Action Categories that this test incorporates. These actions can be targeted with Active Effects",
+                        "label": "Categories"
                     },
                     "damage": {
-                        "type": {
+                        "ap": {
+                            "attribute": {
+                                "hint": "Attribute to use with the AP calculation",
+                                "label": "AP Attribute"
+                            },
                             "base": {
-                                "label": "Damage Type",
-                                "hint": "Type of Damage that this action does"
+                                "hint": "Armor Penetration of the Damage",
+                                "label": "AP"
+                            },
+                            "base_formula_operator": {
+                                "hint": "How the AP base value should affect the Attribute",
+                                "label": "Operator"
                             }
                         },
+                        "attribute": {
+                            "hint": "Attribute to use with the Damage calculation",
+                            "label": "Damage Attribute"
+                        },
                         "base": {
-                            "label": "Base Damage",
-                            "hint": "The base amount of Damage that this action does"
+                            "hint": "The base amount of Damage that this action does",
+                            "label": "Base Damage"
                         },
                         "base_formula_operator": {
-                            "label": "Operator",
-                            "hint": "How the Damage base value should affect the Attribute"
-                        },
-                        "attribute": {
-                            "label": "Damage Attribute",
-                            "hint": "Attribute to use with the Damage calculation"
+                            "hint": "How the Damage base value should affect the Attribute",
+                            "label": "Operator"
                         },
                         "biofeedback": {
-                            "label": "Biofeedback",
-                            "hint": "If this action deals Biofeedback damage as well. This can be targeted with Active Effects"
+                            "hint": "If this action deals Biofeedback damage as well. This can be targeted with Active Effects",
+                            "label": "Biofeedback"
                         },
                         "element": {
                             "base": {
-                                "label": "Element",
-                                "hint": "The Element the type of damage is. Leave blank for no element."
+                                "hint": "The Element the type of damage is. Leave blank for no element.",
+                                "label": "Element"
                             }
                         },
-                        "ap": {
+                        "type": {
                             "base": {
-                                "label": "AP",
-                                "hint": "Armor Penetration of the Damage"
-                            },
-                            "base_formula_operator": {
-                                "label": "Operator",
-                                "hint": "How the AP base value should affect the Attribute"
-                            },
-                            "attribute": {
-                                "label": "AP Attribute",
-                                "hint": "Attribute to use with the AP calculation"
+                                "hint": "Type of Damage that this action does",
+                                "label": "Damage Type"
                             }
                         }
+                    },
+                    "extended": {
+                        "hint": "If this is an Extended Test",
+                        "label": "Extended Test"
                     },
                     "limit": {
-                        "base": {
-                            "label": "Limit Value",
-                            "hint": "Limit value used for the test. This is added if a specific limit is selected"
-                        },
                         "attribute": {
-                            "label": "Limit",
-                            "hint": "The Specific Limit on the Actor used for the test."
+                            "hint": "The Specific Limit on the Actor used for the test.",
+                            "label": "Limit"
+                        },
+                        "base": {
+                            "hint": "Limit value used for the test. This is added if a specific limit is selected",
+                            "label": "Limit Value"
                         }
                     },
-                    "threshold": {
-                        "base": {
-                            "label": "Threshold Value",
-                            "hint": "The Threshold that the test needs to reach"
+                    "mod": {
+                        "hint": "Any modifiers applied to the test",
+                        "label": "Modifier"
+                    },
+                    "modifiers": {
+                        "hint": "Action Modifiers that affect this test.",
+                        "label": "Modifiers"
+                    },
+                    "opposed": {
+                        "armor": {
+                            "hint": "If the actor's Armor should be added to the Opposed Test",
+                            "label": "Armor"
+                        },
+                        "attribute": {
+                            "hint": "The Attribute used by the Opposed Test",
+                            "label": "Attribute"
+                        },
+                        "attribute2": {
+                            "hint": "The Other Attribute used by this Opposed Test",
+                            "label": "Other Attribute"
+                        },
+                        "mod": {
+                            "hint": "Any modifiers applied to the Opposed Test",
+                            "label": "Modifier"
+                        },
+                        "resist": {
+                            "armor": {
+                                "hint": "If the actor's Armor should be added to the Resist Test",
+                                "label": "Armor"
+                            },
+                            "attribute": {
+                                "hint": "The Attribute used by the Resist Test",
+                                "label": "Attribute"
+                            },
+                            "attribute2": {
+                                "hint": "The Other Attribute used by this Resist Test",
+                                "label": "Other Attribute"
+                            },
+                            "test": {
+                                "hint": "Test the target takes to resist damage after the Opposed Test",
+                                "label": "Resist Test"
+                            }
+                        },
+                        "skill": {
+                            "hint": "Skill used by Opposed Test. Leave blank if no skill is used",
+                            "label": "Skill"
+                        },
+                        "test": {
+                            "hint": "The Test that the target of the action needs to take",
+                            "label": "Opposed Test"
                         }
                     },
                     "roll_mode": {
-                        "label": "Roll Mode",
-                        "hint": "The Roll Mode of the test. Leave blank if it should use the user-selected Roll Mode"
+                        "hint": "The Roll Mode of the test. Leave blank if it should use the user-selected Roll Mode",
+                        "label": "Roll Mode"
                     },
-                    "opposed": {
-                        "test": {
-                            "label": "Opposed Test",
-                            "hint": "The Test that the target of the action needs to take"
+                    "skill": {
+                        "hint": "Skill used by this action. Leave blank if no skill is used",
+                        "label": "Skill"
+                    },
+                    "spec": {
+                        "hint": "If the skill specialization modifier (+2) should be applied to this test",
+                        "label": "Specialized"
+                    },
+                    "test": {
+                        "hint": "Specific type of test to use for this Action",
+                        "label": "Test Type"
+                    },
+                    "threshold": {
+                        "base": {
+                            "hint": "The Threshold that the test needs to reach",
+                            "label": "Threshold Value"
+                        }
+                    },
+                    "type": {
+                        "hint": "Type of action that this skill uses",
+                        "label": "Action Type"
+                    }
+                },
+                "ammo": {
+                    "clip_type": {
+                        "hint": "The type of Reloading mechanism that the weapon uses",
+                        "label": "Weapon Reload Type"
+                    },
+                    "spare_clips": {
+                        "max": {
+                            "hint": "The Maximum number of Spare Clips the actor holds for this Weapon",
+                            "label": "Maximum Spare Reloads"
                         },
-                        "skill": {
-                            "label": "Skill",
-                            "hint": "Skill used by Opposed Test. Leave blank if no skill is used"
-                        },
-                        "attribute": {
-                            "label": "Attribute",
-                            "hint": "The Attribute used by the Opposed Test"
-                        },
-                        "attribute2": {
-                            "label": "Other Attribute",
-                            "hint": "The Other Attribute used by this Opposed Test"
-                        },
-                        "armor": {
-                            "label": "Armor",
-                            "hint": "If the actor's Armor should be added to the Opposed Test"
-                        },
-                        "mod": {
-                            "label": "Modifier",
-                            "hint": "Any modifiers applied to the Opposed Test"
-                        },
-                        "resist": {
-                            "test": {
-                                "label": "Resist Test",
-                                "hint": "Test the target takes to resist damage after the Opposed Test"
-                            },
-                            "attribute": {
-                                "label": "Attribute",
-                                "hint": "The Attribute used by the Resist Test"
-                            },
-                            "attribute2": {
-                                "label": "Other Attribute",
-                                "hint": "The Other Attribute used by this Resist Test"
-                            },
-                            "armor": {
-                                "label": "Armor",
-                                "hint": "If the actor's Armor should be added to the Resist Test"
-                            }
+                        "value": {
+                            "hint": "The number of Spare Clips the actor has left",
+                            "label": "Current Spare Reloads"
                         }
                     }
                 },
-                "grade": {
-                    "label": "Grade",
-                    "hint": "Grade of the Cyberware/Bioware"
+                "capacity": {
+                    "hint": "Capacity of the Cyberware/Bioware",
+                    "label": "Capacity"
+                },
+                "description": {
+                    "base": {
+                        "hint": "Description of the Item",
+                        "label": "Description"
+                    },
+                    "source": {
+                        "hint": "Source of the Item, this can be a PDF Page, URL, or Journal",
+                        "label": "Source"
+                    }
                 },
                 "essence": {
-                    "label": "Essence",
-                    "hint": "Essence cost of the Cyberware/Bioware"
+                    "hint": "Essence cost of the Cyberware/Bioware",
+                    "label": "Essence"
                 },
-                "capacity": {
-                    "label": "Capacity",
-                    "hint": "Capacity of the Cyberware/Bioware"
+                "grade": {
+                    "hint": "Grade of the Cyberware/Bioware",
+                    "label": "Grade"
                 },
                 "technology": {
-                    "master": {
-                        "label": "Master Device",
-                        "hint": "Master Device that this Item is Slaved to, forming a PAN or WAN"
-                    },
-                    "cost": {
-                        "label": "Cost",
-                        "hint": "Amount of money this item costs"
-                    },
                     "availability": {
-                        "label": "Availability",
-                        "hint": "The Availability attribute of the Item, this determines how easy it is to get it"
+                        "hint": "The Availability attribute of the Item, this determines how easy it is to get it",
+                        "label": "Availability"
                     },
-                    "equipped": {
-                        "label": "Equipped",
-                        "hint": "If the Item is Equipped"
-                    },
-                    "wireless": {
-                        "label": "Wireless",
-                        "hint": "The Wireless state of the item"
+                    "conceal": {
+                        "base": {
+                            "hint": "How hidden this device is to other people",
+                            "label": "Conceal"
+                        }
                     },
                     "condition_monitor": {
                         "value": {
-                            "label": "Condition Monitor Damage",
-                            "hint": "Current Damage done to the Item's Condition Monitor"
+                            "hint": "Current Damage done to the Item's Condition Monitor",
+                            "label": "Condition Monitor Damage"
                         }
                     },
-                    "rating": {
-                        "label": "Rating",
-                        "hint": "The Device Rating of the item, this factors into matrix actions."
+                    "cost": {
+                        "hint": "Amount of money this item costs",
+                        "label": "Cost"
+                    },
+                    "equipped": {
+                        "hint": "If the Item is Equipped",
+                        "label": "Equipped"
+                    },
+                    "master": {
+                        "hint": "Master Device that this Item is Slaved to, forming a PAN or WAN",
+                        "label": "Master Device"
                     },
                     "quantity": {
-                        "label": "Quantity",
-                        "hint": "The amount of items this Item represents"
+                        "hint": "The amount of items this Item represents",
+                        "label": "Quantity"
+                    },
+                    "rating": {
+                        "hint": "The Device Rating of the item, this factors into matrix actions.",
+                        "label": "Rating"
                     },
                     "show_quantity": {
-                        "label": "Show Quantity",
-                        "hint": "If the Quantity of this Item should be shown on the Actor sheet and the header of the Item sheet"
+                        "hint": "If the Quantity of this Item should be shown on the Actor sheet and the header of the Item sheet",
+                        "label": "Show Quantity"
                     },
-                    "conceal": {
-                        "base" : {
-                            "label": "Conceal",
-                            "hint": "How hidden this device is to other people"
-                        }
+                    "wireless": {
+                        "hint": "The Wireless state of the item",
+                        "label": "Wireless"
                     }
                 }
             }
@@ -1497,17 +1496,25 @@
         },
         "Karma": "Karma",
         "KarmaManager": {
-            "Title": "Karma Manager",
-            "Submit": "Submit",
             "Cancel": "Cancel",
-            "StartingKarma": "Starting Karma",
-            "CurrentKarma": "Amount of Karma the Character currently has",
             "CareerKarma": "Amount of Career Karma the Character has accumulated",
-            "FinalKarma": "Final Karma",
+            "CurrentKarma": "Amount of Karma the Character currently has",
+            "FinalCareerKarma": "Career Karma the Character will have upon submitting",
             "FinalCurrentKarma": "Karma this Character will have upon submitting",
-            "FinalCareerKarma": "Career Karma the Character will have upon submitting"
+            "FinalKarma": "Final Karma",
+            "StartingKarma": "Starting Karma",
+            "Submit": "Submit",
+            "Title": "Karma Manager"
         },
         "Keybinding": {
+            "AddRemoveManyQty": {
+                "Hint": "Add/Remove 20 Qty at a time",
+                "Label": "Add/Remove 20"
+            },
+            "AddRemoveSomeQty": {
+                "Hint": "Add/Remove 5 Qty at a time",
+                "Label": "Add/Remove 5"
+            },
             "HideTestDialog": {
                 "Hint": "Skip dialog when rolling tests from any button",
                 "Label": "Hide Test Dialog"
@@ -1527,14 +1534,6 @@
             "SuccessTestPrompt": {
                 "Hint": "Prompt to make a standard Success Test",
                 "Label": "Prompt Success Test"
-            },
-            "AddRemoveSomeQty": {
-                "Hint": "Add/Remove 5 Qty at a time",
-                "Label": "Add/Remove 5"
-            },
-            "AddRemoveManyQty": {
-                "Hint": "Add/Remove 20 Qty at a time",
-                "Label": "Add/Remove 20"
             }
         },
         "KnockedDown": "Knocked Down",
@@ -1548,12 +1547,12 @@
                 "Category": "Category",
                 "DamageResistanceTest": "Damage Resistance Test",
                 "ForceReboot": "Force Reboot",
+                "MatrixAction": "Matrix Action",
                 "Modifier": "Modifier",
                 "Modifiers": "Modifiers",
                 "OpposedTest": "Opposed Test",
                 "SpiritType": "Spirit Type",
-                "SpriteType": "Sprite Type",
-                "MatrixAction": "Matrix Action"
+                "SpriteType": "Sprite Type"
             },
             "Actions": {
                 "BruteForce": "Brute Force",
@@ -1611,15 +1610,15 @@
                 "TestKBoardModifiers": "{skip}: skip dialog. {descr}: show only description.",
                 "VehicleConfiguration": "Vehicle Configuration"
             },
-            "Item": {
-                "AvailabilityAdjustment": "Scale Availability w/ Rating",
-                "CostAdjustment": "Scale Cost w/ Rating",
-                "EssenceAdjustment": "Scale Essence w/ Rating"
-            },
             "Inventory": {
                 "All": "All",
                 "Carried": "Carried",
                 "OpenInventory": "Inventory"
+            },
+            "Item": {
+                "AvailabilityAdjustment": "Scale Availability w/ Rating",
+                "CostAdjustment": "Scale Cost w/ Rating",
+                "EssenceAdjustment": "Scale Essence w/ Rating"
             },
             "MarkPlacement": {
                 "PlaceOnDevice": "Place on device",
@@ -1627,12 +1626,12 @@
             },
             "Matrix": {
                 "AttackShort": "A",
-                "SleazeShort": "S",
                 "DataProcessingShort": "D",
                 "FirewallShort": "F",
                 "Global": "Global",
                 "Local": "Local",
                 "Public": "Public",
+                "SleazeShort": "S",
                 "TargetDevice": "Target Device",
                 "TargetMainIcon": "Target Main Icon"
             },
@@ -1669,37 +1668,37 @@
         "License": "License",
         "Licenses": "Licenses",
         "Lifestyle": {
-            "label": "Lifestyle",
             "FIELDS": {
-                "type": {
-                    "label": "Lifestyle Type",
-                    "hint": "Type of Lifestyle"
+                "comforts": {
+                    "hint": "Comforts level of the Lifestyle",
+                    "label": "Comforts"
                 },
                 "cost": {
-                    "label": "Lifestyle Cost",
-                    "hint": "Cost of the Lifestyle per month"
-                },
-                "comforts": {
-                    "label": "Comforts",
-                    "hint": "Comforts level of the Lifestyle"
-                },
-                "security": {
-                    "label": "Security",
-                    "hint": "Security level of the Lifestyle"
-                },
-                "neighborhood": {
-                    "label": "Neighborhood",
-                    "hint": "Neighborhood level of the Lifestyle"
+                    "hint": "Cost of the Lifestyle per month",
+                    "label": "Lifestyle Cost"
                 },
                 "guests": {
-                    "label": "Guests",
-                    "hint": "Guests staying in the same Lifestyle"
+                    "hint": "Guests staying in the same Lifestyle",
+                    "label": "Guests"
+                },
+                "neighborhood": {
+                    "hint": "Neighborhood level of the Lifestyle",
+                    "label": "Neighborhood"
                 },
                 "permanent": {
-                    "label": "Permanent",
-                    "hint": "If this Lifestyle is a Permanent Lifestyle"
+                    "hint": "If this Lifestyle is a Permanent Lifestyle",
+                    "label": "Permanent"
+                },
+                "security": {
+                    "hint": "Security level of the Lifestyle",
+                    "label": "Security"
+                },
+                "type": {
+                    "hint": "Type of Lifestyle",
+                    "label": "Lifestyle Type"
                 }
-            }
+            },
+            "label": "Lifestyle"
         },
         "LifestyleComforts": "Comforts",
         "LifestyleGuests": "Guests",
@@ -1798,37 +1797,37 @@
         "ModPoints": "Mod Points",
         "Modification": {
             "FIELDS": {
-                "type": {
-                    "label": "Mod Type",
-                    "hint": "Type of Modification"
-                },
-                "mount_point": {
-                    "label": "Mount Point",
-                    "hint": "Mount Point on the weapon this attaches to"
-                },
-                "modification_category": {
-                    "label": "Modification Category",
-                    "hint": "Category this Modification belongs to"
-                },
-                "dice_pool": {
-                    "label": "Dice Pool",
-                    "hint": "Dice Pool Modifier to apply"
-                },
                 "accuracy": {
-                    "label": "Accuracy",
-                    "hint": "Accuracy/Limit Modifier to apply"
-                },
-                "rc": {
-                    "label": "Recoil Compensation",
-                    "hint": "Recoil Compensation Modifier to apply"
+                    "hint": "Accuracy/Limit Modifier to apply",
+                    "label": "Accuracy"
                 },
                 "conceal": {
-                    "label": "Concealability",
-                    "hint": "Concealability Modifier to apply"
+                    "hint": "Concealability Modifier to apply",
+                    "label": "Concealability"
+                },
+                "dice_pool": {
+                    "hint": "Dice Pool Modifier to apply",
+                    "label": "Dice Pool"
+                },
+                "modification_category": {
+                    "hint": "Category this Modification belongs to",
+                    "label": "Modification Category"
+                },
+                "mount_point": {
+                    "hint": "Mount Point on the weapon this attaches to",
+                    "label": "Mount Point"
+                },
+                "rc": {
+                    "hint": "Recoil Compensation Modifier to apply",
+                    "label": "Recoil Compensation"
                 },
                 "slots": {
-                    "label": "Slots",
-                    "hint": "Number of Slots (Vehicles) or Points (Drones) this takes up"
+                    "hint": "Number of Slots (Vehicles) or Points (Drones) this takes up",
+                    "label": "Slots"
+                },
+                "type": {
+                    "hint": "Type of Modification",
+                    "label": "Mod Type"
                 }
             }
         },
@@ -1948,11 +1947,11 @@
         "Notoriety": "Notoriety",
         "Nuyen": "Nuyen",
         "NuyenManager": {
-            "Title": "Nuyen Manager",
-            "Submit": "Submit",
             "Cancel": "Cancel",
             "CurrentNuyen": "Amount of Nuyen the Character currently has",
-            "FinalNuyen": "Final Amount of Nuyen upon Submitting"
+            "FinalNuyen": "Final Amount of Nuyen upon Submitting",
+            "Submit": "Submit",
+            "Title": "Nuyen Manager"
         },
         "OpenNetworkManager": "Open Network Manager",
         "OpenOrigin": "Open item",
@@ -1991,13 +1990,13 @@
         "PowerType": "Type",
         "Powers": "Powers",
         "Program": {
-            "label": "Program",
             "FIELDS": {
                 "type": {
-                    "label": "Program Type",
-                    "hint": "Type of Program, for visual organization only"
+                    "hint": "Type of Program, for visual organization only",
+                    "label": "Program Type"
                 }
-            }
+            },
+            "label": "Program"
         },
         "ProgramType": "Type",
         "Programs": "Programs",
@@ -2006,21 +2005,21 @@
         "PushTheLimit": "Push The Limit",
         "Qty": "Qty",
         "Quality": {
-            "label": "Quality",
             "FIELDS": {
-                "type": {
-                    "label": "Quality Type",
-                    "hint": "The Type of Quality this represents (Positive/Negative/Life Module)"
-                },
                 "karma": {
-                    "label": "Karma",
-                    "hint": "Amount of Karma this Quality is worth"
+                    "hint": "Amount of Karma this Quality is worth",
+                    "label": "Karma"
                 },
                 "rating": {
-                    "label": "Rating",
-                    "hint": "Rating of this Quality"
+                    "hint": "Rating of this Quality",
+                    "label": "Rating"
+                },
+                "type": {
+                    "hint": "The Type of Quality this represents (Positive/Negative/Life Module)",
+                    "label": "Quality Type"
                 }
-            }
+            },
+            "label": "Quality"
         },
         "QualityType": "Type",
         "QualityTypeLifeModule": "Life Module",
@@ -2049,23 +2048,22 @@
         "RemoveBonus": "Remove Bonus",
         "RemoveSpecialization": "Remove Specialization",
         "ReputationManager": {
-            "Title": "Reputation Manager",
+            "Cancel": "Cancel",
             "Submit": "Submit",
-            "Cancel": "Cancel"
+            "Title": "Reputation Manager"
         },
         "Resist": "Resist",
         "RestoreDefaultSkills": "Restore Default Skills",
         "RightClickToClear": "Right Click to Clear",
         "Ritual": {
             "FIELDS": {
-                "type": {
-                    "label": "Ritual Type",
-                    "hint": "Type of Ritual to Perform"
-                },
                 "descriptors": {
-                    "label": "Descriptors",
-                    "hint": "Descriptors for the Ritual ???"
-
+                    "hint": "Descriptors for the Ritual",
+                    "label": "Descriptors"
+                },
+                "type": {
+                    "hint": "Type of Ritual to Perform",
+                    "label": "Ritual Type"
                 }
             }
         },
@@ -2122,9 +2120,6 @@
             "Total": "Result"
         },
         "Skill": {
-            "abbr": {
-                "Native": "N"
-            },
             "AeronauticsMechanic": "Aeronautics Mechanic",
             "Alchemy": "Alchemy",
             "AnimalHandling": "Animal Handling",
@@ -2172,11 +2167,11 @@
             "IndustrialMechanic": "Industrial Mechanic",
             "Instruction": "Instruction",
             "Intimidation": "Intimidation",
-            "Native": "Native",
             "Leadership": "Leadership",
             "Locksmith": "Locksmith",
             "Longarms": "Longarms",
             "Medicine": "Medicine",
+            "Native": "Native",
             "NauticalMechanic": "Nautical Mechanic",
             "Navigation": "Navigation",
             "Negotiation": "Negotiation",
@@ -2210,7 +2205,10 @@
             },
             "ThrowingWeapons": "Throwing Weapons",
             "Tracking": "Tracking",
-            "UnarmedCombat": "Unarmed Combat"
+            "UnarmedCombat": "Unarmed Combat",
+            "abbr": {
+                "Native": "N"
+            }
         },
         "Soak": "Soak",
         "SoakTest": "Damage Resist Test",
@@ -2223,82 +2221,6 @@
         "Specialization": "Specialization",
         "Specializations": "Specializations",
         "Spell": {
-            "FIELDS": {
-                "type": {
-                    "label": "Spell Type",
-                    "hint": "If the Spell is Physical or Mana based"
-                },
-                "category": {
-                    "label": "Category",
-                    "hint": "Category that the Spell belongs to"
-                },
-                "drain": {
-                    "label": "Drain Value",
-                    "hint": "Drain Value of the spell, this is is added to the Force of the spell to Resist Drain"
-                },
-                "range": {
-                    "label": "Range",
-                    "hint": "Range of the Spell"
-                },
-                "duration": {
-                    "label": "Duration",
-                    "hint": "Duration of the Spell"
-                },
-                "combat": {
-                    "type": {
-                        "label": "Combat Spell Type",
-                        "hint": "If the Spell is Direct or Indirect"
-                    }
-                },
-                "detection": {
-                    "type": {
-                        "label": "Detection Spell Type",
-                        "hint": "How the Spell affects targets"
-                    },
-                    "passive": {
-                        "label": "Passive",
-                        "hint": "If the Spell is Passive"
-                    },
-                    "extended": {
-                        "label": "Extended",
-                        "hint": "If the Spell is Extended"
-                    }
-                },
-                "illusion": {
-                    "type": {
-                        "label": "Illusion Spell Type",
-                        "hint": "Type of Illusion Spell"
-                    },
-                    "sense": {
-                        "label": "Sense",
-                        "hint": "The Sense that the Spell affects"
-                    }
-                },
-                "manipulation": {
-                    "damaging": {
-                        "label": "Damaging",
-                        "hint": "If the Spell deals Damage"
-                    },
-                    "mental": {
-                        "label": "Mental",
-                        "hint": "If the Spell affects targets Mentally"
-                    },
-                    "physical": {
-                        "label": "Physical",
-                        "hint": "These spells affect physical forms and are usually defended against"
-                    },
-                    "environmental": {
-                        "label": "Environmental",
-                        "hint": "These spells don’t really have a target, and they don’t really affect targets directly. They just affect an area."
-                    }
-                },
-                "ritual": {
-                    "type": {
-                        "label": "Ritual Type",
-                        "hint": "Type of Ritual to perform"
-                    }
-                }
-            },
             "Attack": "Spell Attack",
             "Cast": "Spell Cast",
             "CatCombat": "Combat",
@@ -2316,6 +2238,82 @@
             "DetectionArea": "Area",
             "DetectionDirectional": "Directional",
             "DetectionPsychic": "Psychic",
+            "FIELDS": {
+                "category": {
+                    "hint": "Category that the Spell belongs to",
+                    "label": "Category"
+                },
+                "combat": {
+                    "type": {
+                        "hint": "If the Spell is Direct or Indirect",
+                        "label": "Combat Spell Type"
+                    }
+                },
+                "detection": {
+                    "extended": {
+                        "hint": "If the Spell is Extended",
+                        "label": "Extended"
+                    },
+                    "passive": {
+                        "hint": "If the Spell is Passive",
+                        "label": "Passive"
+                    },
+                    "type": {
+                        "hint": "How the Spell affects targets",
+                        "label": "Detection Spell Type"
+                    }
+                },
+                "drain": {
+                    "hint": "Drain Value of the spell, this is is added to the Force of the spell to Resist Drain",
+                    "label": "Drain Value"
+                },
+                "duration": {
+                    "hint": "Duration of the Spell",
+                    "label": "Duration"
+                },
+                "illusion": {
+                    "sense": {
+                        "hint": "The Sense that the Spell affects",
+                        "label": "Sense"
+                    },
+                    "type": {
+                        "hint": "Type of Illusion Spell",
+                        "label": "Illusion Spell Type"
+                    }
+                },
+                "manipulation": {
+                    "damaging": {
+                        "hint": "If the Spell deals Damage",
+                        "label": "Damaging"
+                    },
+                    "environmental": {
+                        "hint": "These spells don’t really have a target, and they don’t really affect targets directly. They just affect an area.",
+                        "label": "Environmental"
+                    },
+                    "mental": {
+                        "hint": "If the Spell affects targets Mentally",
+                        "label": "Mental"
+                    },
+                    "physical": {
+                        "hint": "These spells affect physical forms and are usually defended against",
+                        "label": "Physical"
+                    }
+                },
+                "range": {
+                    "hint": "Range of the Spell",
+                    "label": "Range"
+                },
+                "ritual": {
+                    "type": {
+                        "hint": "Type of Ritual to perform",
+                        "label": "Ritual Type"
+                    }
+                },
+                "type": {
+                    "hint": "If the Spell is Physical or Mana based",
+                    "label": "Spell Type"
+                }
+            },
             "IllusionMultiSense": "Multi-Sense",
             "IllusionObvious": "Obvious",
             "IllusionRealistic": "Realistic",
@@ -2401,8 +2399,8 @@
                 "Nymph": "Insect Nymph",
                 "Palefire": "Palefire",
                 "Phantom": "Phantom",
-                "Plant": "Plant",
                 "Plague": "Plague",
+                "Plant": "Plant",
                 "Preta": "Preta",
                 "Queen": "Insect Queen",
                 "Rot": "Rot",
@@ -2429,25 +2427,25 @@
         },
         "Sprite": {
             "FIELDS": {
-                "spriteType": {
-                    "label": "Sprite Type",
-                    "hint": "Type of the Sprite"
-                },
                 "level": {
-                    "label": "Level",
-                    "hint": "Level of the Sprite"
-                },
-                "services": {
-                    "label": "Services",
-                    "hint": "Number of Services the Sprite has"
+                    "hint": "Level of the Sprite",
+                    "label": "Level"
                 },
                 "registered": {
-                    "label": "Registered",
-                    "hint": "If the Sprite is Registered"
+                    "hint": "If the Sprite is Registered",
+                    "label": "Registered"
+                },
+                "services": {
+                    "hint": "Number of Services the Sprite has",
+                    "label": "Services"
+                },
+                "spriteType": {
+                    "hint": "Type of the Sprite",
+                    "label": "Sprite Type"
                 },
                 "technomancerUuid": {
-                    "label": "Technomancer",
-                    "hint": "Technomancer who compiled this Sprite"
+                    "hint": "Technomancer who compiled this Sprite",
+                    "label": "Technomancer"
                 }
             },
             "Level": "Level",
@@ -2475,13 +2473,13 @@
                 "Sustained": "Sustained"
             },
             "FIELDS": {
-                "optional": {
-                    "label": "Optional",
-                    "hint": "If the Sprite Power is Optional"
-                },
                 "duration": {
-                    "label": "Duration",
-                    "hint": "Duration of the Sprite Power"
+                    "hint": "Duration of the Sprite Power",
+                    "label": "Duration"
+                },
+                "optional": {
+                    "hint": "If the Sprite Power is Optional",
+                    "label": "Optional"
                 }
             },
             "IsOptional": "Optionality",
@@ -2513,16 +2511,16 @@
                 "ComplexForms": "Complex Forms",
                 "CritterPowers": "Powers",
                 "Details": "Details",
-                "Network": "Network",
                 "Effects": "Effects",
                 "IC": "IC",
                 "Inventory": "Inventory",
                 "Licenses": "Licenses",
                 "Magic": "Magic",
                 "MarkedIcons": "Marked",
-                "Mods": "Mods",
                 "Matrix": "Matrix",
                 "MatrixActions": "Actions",
+                "Mods": "Mods",
+                "Network": "Network",
                 "NetworkIcons": "Icons",
                 "Networks": "Networks",
                 "OwnedIcons": "Owned",
@@ -2639,18 +2637,18 @@
                 "MiscConfig": "Miscellaneous Settings & Modifiers",
                 "MissingSummoner": "Missing Summoner",
                 "MissingTechnomancer": "Missing Technomancer",
+                "NPC": "Mark actor as NPC to get additional features",
                 "NetworksTab": "Grids & Hosts",
                 "NoCombatant": "Initiative Roll (Must be in an Encounter)",
-                "NPC": "Mark actor as NPC to get additional features",
-                "PlaceMark": "Action to be used to place marks on already marked targets",
-                "RemoveOneService": "Remove One Service",
-                "ResetActorForNewRun": "Reset damage, edge, etc. for a new run",
-                "RollInitiative": "Roll Initiative",
                 "PickControlledTokenAsDriver": "Pick the currently Controlled Token Actor as the Driver",
                 "PickControlledTokenAsSummoner": "Pick the currently Controlled Token Actor as the Summoner",
                 "PickControlledTokenAsTechnomancer": "Pick the currently Controlled Token Actor as the Compiler (Technomancer)",
+                "PlaceMark": "Action to be used to place marks on already marked targets",
                 "RebootPersonaAndClearAllMarks": "Reboot your Persona and clear all Marks you have placed",
                 "RemoveFavorite": "Remove this from your favorites bar",
+                "RemoveOneService": "Remove One Service",
+                "ResetActorForNewRun": "Reset damage, edge, etc. for a new run",
+                "RollInitiative": "Roll Initiative",
                 "SetupPAN": "Add all Equipped Wireless Devices to this character's Persona"
             },
             "CallInAction": {
@@ -2690,8 +2688,11 @@
                 "DisabledForPreparedActor": "Disabled due to use of prepared actor",
                 "EssenceAdjustment": "Adjust actual essence cost based on the item rating",
                 "RemoveQuantity": "Remove 1 Qty. {qtySome}: Remove 5 Qty. {qtyMany}: Remove 20 Qty.",
-                "ToggleVisibility": "Toggle the Visibility of this during Play Mode",
-                "ToggleFavorite": "Favorite this and display it in the Favorites Bar"
+                "ToggleFavorite": "Favorite this and display it in the Favorites Bar",
+                "ToggleVisibility": "Toggle the Visibility of this during Play Mode"
+            },
+            "MatrixTest": {
+                "SameGridDisabled": "As active and target icon both use grids, this is automatically determined"
             },
             "RangedAttack": {
                 "Recoil": "Progressive Recoil",
@@ -2725,9 +2726,6 @@
                 "RollMode": "FoundryVTT chat message roll visibility",
                 "Threshold": "Calculated threshold value"
             },
-            "MatrixTest": {
-                "SameGridDisabled": "As active and target icon both use grids, this is automatically determined"
-            },
             "ToggleEditMode": "Toggle Edit Mode"
         },
         "Top": "Top",
@@ -2756,17 +2754,17 @@
         "UseEdgeForInitiativeRoll": "Use edge rule blitz for initiative",
         "Value": "Value",
         "Vehicle": {
-            "Category": "Category",
             "Categories": {
+                "Anthro": "Anthromorphic",
+                "Huge": "Huge",
+                "Large": "Large",
+                "Medium": "Medium",
                 "Micro": "Micro",
                 "Mini": "Mini",
-                "Small": "Small",
-                "Medium": "Medium",
-                "Large": "Large",
-                "Huge": "Huge",
-                "Anthro": "Anthromorphic",
-                "Missile": "Missile"
+                "Missile": "Missile",
+                "Small": "Small"
             },
+            "Category": "Category",
             "ChaseEnvironment": "Chase Environment",
             "Clearsight": "Clearsight",
             "ControlMode": "Control Mode",
@@ -2879,103 +2877,103 @@
             },
             "FIELDS": {
                 "category": {
-                    "label": "Weapon Type",
-                    "hint": "The type of Weapon this item represents. Different types require different configurations"
+                    "hint": "The type of Weapon this item represents. Different types require different configurations",
+                    "label": "Weapon Type"
+                },
+                "melee": {
+                    "reach": {
+                        "hint": "Reach of the Weapon, this is used as a modifier in combat",
+                        "label": "Reach"
+                    }
                 },
                 "range": {
                     "modes": {
-                        "single_shot": {
-                            "label": "Single Shot",
-                            "hint": "If the Weapon supports Single Shot (SS)"
-                        },
-                        "semi_auto": {
-                            "label": "Semi-Auto",
-                            "hint": "If the Weapon supports Semi-Automatic (SA)"
-                        },
                         "burst_fire": {
-                            "label": "Burst-Fire",
-                            "hint": "If the Weapon supports Burst-Fire (BF)"
+                            "hint": "If the Weapon supports Burst-Fire (BF)",
+                            "label": "Burst-Fire"
                         },
                         "full_auto": {
-                            "label": "Full-Auto",
-                            "hint": "If the Weapon supports Full-Auto (FA)"
+                            "hint": "If the Weapon supports Full-Auto (FA)",
+                            "label": "Full-Auto"
+                        },
+                        "semi_auto": {
+                            "hint": "If the Weapon supports Semi-Automatic (SA)",
+                            "label": "Semi-Auto"
+                        },
+                        "single_shot": {
+                            "hint": "If the Weapon supports Single Shot (SS)",
+                            "label": "Single Shot"
                         }
                     },
                     "ranges": {
+                        "attribute": {
+                            "hint": "Actor's Attribute to multiply the above Range's by",
+                            "label": "Range Attribute"
+                        },
                         "category": {
-                            "label": "Range Category",
-                            "hint": "Determine the Ranges of the Weapon based on its category. Select 'Manual' if the weapon uses custom values"
-                        },
-                        "short": {
-                            "label": "Short Range",
-                            "hint": "Short Range distance for the Weapon, in meters"
-                        },
-                        "medium": {
-                            "label": "Medium Range",
-                            "hint": "Medium Range distance for the Weapon, in meters"
-                        },
-                        "long": {
-                            "label": "Long Range",
-                            "hint": "Long Range distance for the Weapon, in meters"
+                            "hint": "Determine the Ranges of the Weapon based on its category. Select 'Manual' if the weapon uses custom values",
+                            "label": "Range Category"
                         },
                         "extreme": {
-                            "label": "Extreme Range",
-                            "hint": "Extreme Range distance for the Weapon, in meters"
+                            "hint": "Extreme Range distance for the Weapon, in meters",
+                            "label": "Extreme Range"
                         },
-                        "attribute": {
-                            "label": "Range Attribute",
-                            "hint": "Actor's Attribute to multiply the above Range's by"
+                        "long": {
+                            "hint": "Long Range distance for the Weapon, in meters",
+                            "label": "Long Range"
+                        },
+                        "medium": {
+                            "hint": "Medium Range distance for the Weapon, in meters",
+                            "label": "Medium Range"
+                        },
+                        "short": {
+                            "hint": "Short Range distance for the Weapon, in meters",
+                            "label": "Short Range"
                         }
                     },
                     "rc": {
                         "base": {
-                            "label": "Recoil Compensation",
-                            "hint": "Recoil Compensation of the Weapon"
+                            "hint": "Recoil Compensation of the Weapon",
+                            "label": "Recoil Compensation"
                         }
                     }
                 },
                 "thrown": {
-                    "ranges": {
-                        "category": {
-                            "label": "Range Category",
-                            "hint": "Determine the Ranges of the Weapon based on its category. Select 'Manual' if the weapon uses custom values"
+                    "blast": {
+                        "dropoff": {
+                            "hint": "The Damage Reduction per meter from the blast",
+                            "label": "Blast Dropoff (per m)"
                         },
-                        "short": {
-                            "label": "Short Range",
-                            "hint": "Short Range distance for the Weapon, in meters"
-                        },
-                        "medium": {
-                            "label": "Medium Range",
-                            "hint": "Medium Range distance for the Weapon, in meters"
-                        },
-                        "long": {
-                            "label": "Long Range",
-                            "hint": "Long Range distance for the Weapon, in meters"
-                        },
-                        "extreme": {
-                            "label": "Extreme Range",
-                            "hint": "Extreme Range distance for the Weapon, in meters"
-                        },
-                        "attribute": {
-                            "label": "Range Attribute",
-                            "hint": "Actor's Attribute to multiply the above Range's by"
+                        "radius": {
+                            "hint": "Radius of the Weapon's attack, in meters",
+                            "label": "Blast Radius (m)"
                         }
                     },
-                    "blast": {
-                        "radius": {
-                            "label": "Blast Radius (m)",
-                            "hint": "Radius of the Weapon's attack, in meters"
+                    "ranges": {
+                        "attribute": {
+                            "hint": "Actor's Attribute to multiply the above Range's by",
+                            "label": "Range Attribute"
                         },
-                        "dropoff": {
-                            "label": "Blast Dropoff (per m)",
-                            "hint": "The Damage Reduction per meter from the blast"
+                        "category": {
+                            "hint": "Determine the Ranges of the Weapon based on its category. Select 'Manual' if the weapon uses custom values",
+                            "label": "Range Category"
+                        },
+                        "extreme": {
+                            "hint": "Extreme Range distance for the Weapon, in meters",
+                            "label": "Extreme Range"
+                        },
+                        "long": {
+                            "hint": "Long Range distance for the Weapon, in meters",
+                            "label": "Long Range"
+                        },
+                        "medium": {
+                            "hint": "Medium Range distance for the Weapon, in meters",
+                            "label": "Medium Range"
+                        },
+                        "short": {
+                            "hint": "Short Range distance for the Weapon, in meters",
+                            "label": "Short Range"
                         }
-                    }
-                },
-                "melee": {
-                    "reach": {
-                        "label": "Reach",
-                        "hint": "Reach of the Weapon, this is used as a modifier in combat"
                     }
                 }
             },
@@ -3032,10 +3030,10 @@
                 "Extreme": "Extreme",
                 "Long": "Long",
                 "Medium": "Medium",
-                "Ranges": "Ranges",
-                "Short": "Short",
                 "Modes": "Modes",
-                "Range": "Range"
+                "Range": "Range",
+                "Ranges": "Ranges",
+                "Short": "Short"
             },
             "Reach": "Reach",
             "Reload": "Reload",
