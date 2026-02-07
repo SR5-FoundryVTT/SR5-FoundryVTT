@@ -1383,6 +1383,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
     /**
      * Can a user execute this test? This is used to check if the user has permissions to execute this test at all, before any preparation is done.
+     * 
+     * By default 'OBSERVER' is used as that allows users to see document ratings.
+     * 
      * @returns 
      */
     userCanExecute() {
