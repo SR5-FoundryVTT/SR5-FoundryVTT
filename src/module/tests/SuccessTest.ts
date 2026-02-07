@@ -1382,6 +1382,17 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
+     * Can a user execute this test? This is used to check if the user has permissions to execute this test at all, before any preparation is done.
+     * @returns 
+     */
+    userCanExecute() {
+        if (!this.source) return true;
+        if (this.source.permission! < CONST.DOCUMENT_OWNERSHIP_LEVELS.OBSERVER) return false;
+
+        return true;
+    }
+
+    /**
      * Prepare everything needed for test execution.
      * 
      * This is both necessary before a first execution or when re-calculation a test when execution has already
@@ -1420,6 +1431,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * NOTE: Currently none of these methods trigger Foundry hooks.
      */
     async execute(): Promise<this> {
+        if (!this.userCanExecute()) {
+            ui.notifications?.error(game.i18n.localize('SR5.Errors.CantExecuteTest'));
+            return this;
+        };
+
         await this._prepareExecution();
 
         // Allow user to change details.
@@ -2176,8 +2192,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             return;
         }
 
-        // filter out actors current user shouldn't be able to test with.
-        documents = documents.filter(document => document.isOwner);
         // Fallback to player character.
         if (documents.length === 0 && game.user?.character) {
             documents.push(game.user.character as SR5Actor);
