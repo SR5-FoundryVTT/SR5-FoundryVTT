@@ -184,6 +184,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     // Flows to handle different aspects of a Success Test that are not directly related to the test itself.
     public effects: SuccessTestEffectsFlow<this>;
 
+    public ignoreUserPermission: boolean;
+
     // Allow this.constructor to not reference Function.
     declare ['constructor']: typeof SuccessTest;
 
@@ -203,6 +205,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         this.data = this._prepareData(data, options);
 
         this.effects = new SuccessTestEffectsFlow<this>(this);
+        this.ignoreUserPermission = false;
 
         this.calculateBaseValues();
 
@@ -1382,6 +1385,15 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
+     * Allow users to execute this test, even when they don't have permissions to execute the source document.
+     * 
+     * This should be used per test instance to ignore user permissions between test instanciation and execution.
+     */
+    allowUserExecute() {
+        this.ignoreUserPermission = true;
+    }
+    
+    /**
      * Can a user execute this test? This is used to check if the user has permissions to execute this test at all, before any preparation is done.
      * 
      * By default 'OBSERVER' is used as that allows users to see document ratings.
@@ -1389,6 +1401,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @returns 
      */
     userCanExecute() {
+        if (this.ignoreUserPermission) return true;
         if (!this.source) return true;
         if (!this.source.testUserPermission(game.user, 'OBSERVER')) return false;
 
