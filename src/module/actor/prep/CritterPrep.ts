@@ -17,7 +17,6 @@ export class CritterPrep {
         ModifiersPrep.clearAttributeMods(system);
         ModifiersPrep.clearArmorMods(system);
         ModifiersPrep.clearLimitMods(system);
-        SkillsPrep.prepareSkillData(system);
     }
 
     static prepareDerivedData(system: Actor.SystemOfType<'critter'>, items: SR5Item[]) {

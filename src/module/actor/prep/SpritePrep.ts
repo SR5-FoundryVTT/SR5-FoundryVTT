@@ -16,7 +16,6 @@ import { SR5 } from '@/module/config';
 export class SpritePrep {
     static prepareBaseData(system: Actor.SystemOfType<'sprite'>) {
         SpritePrep.prepareSpriteSpecial(system);
-        SkillsPrep.prepareSkillData(system);
 
         ModifiersPrep.clearAttributeMods(system);
         ModifiersPrep.clearLimitMods(system);

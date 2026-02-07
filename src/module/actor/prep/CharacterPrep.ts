@@ -18,7 +18,6 @@ import { SR5Item } from 'src/module/item/SR5Item';
 export class CharacterPrep {
     static prepareBaseData(system: Actor.SystemOfType<'character'>) {
         CharacterPrep.addSpecialAttributes(system);
-        SkillsPrep.prepareSkillData(system);
 
         ModifiersPrep.clearAttributeMods(system);
         ModifiersPrep.clearArmorMods(system);

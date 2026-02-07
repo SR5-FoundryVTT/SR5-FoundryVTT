@@ -21,7 +21,6 @@ import { AttributesType } from 'src/module/types/template/Attributes';
 export class SpiritPrep {
     static prepareBaseData(system: Actor.SystemOfType<'spirit'>) {
         SpiritPrep.prepareSpiritSpecial(system);
-        SkillsPrep.prepareSkillData(system);
 
         ModifiersPrep.clearAttributeMods(system);
         ModifiersPrep.clearArmorMods(system);

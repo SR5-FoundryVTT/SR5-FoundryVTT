@@ -17,8 +17,6 @@ import { MatrixRules } from '@/module/rules/MatrixRules';
 
 export class VehiclePrep {
     static prepareBaseData(system: Actor.SystemOfType<'vehicle'>) {
-        SkillsPrep.prepareSkillData(system);
-
         ModifiersPrep.clearAttributeMods(system);
         ModifiersPrep.clearArmorMods(system);
         ModifiersPrep.clearLimitMods(system);

@@ -284,61 +284,63 @@ export class CharacterImporter {
         }
     }
 
+    // TODO: tamif - chummer - reimplement chummer import skill handling.
     private static handleLanguageSkills(system: BlankCharacter['system'], languageSkills: ActorSchema['skills']['skill']) {
-        system.skills.language.value = {};
-        for (const skill of languageSkills) {
-            const parsedSkill = DataDefaults.createData('skill_field');
-            const id = foundry.utils.randomID();
-            system.skills.language.value[id] = parsedSkill;
+        // system.skills.language.value = {};
+        // for (const skill of languageSkills) {
+        //     const parsedSkill = DataDefaults.createData('skill_field');
+        //     const id = foundry.utils.randomID();
+        //     system.skills.language.value[id] = parsedSkill;
 
-            // Transform native rating into max rating.
-            skill.rating = (skill.isnativelanguage === 'True') ? '12' : skill.rating;
+        //     // Transform native rating into max rating.
+        //     skill.rating = (skill.isnativelanguage === 'True') ? '12' : skill.rating;
 
-            if (skill.skillspecializations) {
-                parsedSkill.specs = IH.getArray(skill.skillspecializations.skillspecialization).map(spec => spec.name);
-            }
+        //     if (skill.skillspecializations) {
+        //         parsedSkill.specs = IH.getArray(skill.skillspecializations.skillspecialization).map(spec => spec.name);
+        //     }
 
-            parsedSkill.name = skill.name;
-            parsedSkill.base = Number(skill.rating) || 0;
-            if (skill.skillspecializations) {
-                parsedSkill.specs = IH.getArray(skill.skillspecializations.skillspecialization).map(spec => spec.name);
-            }
-        }
+        //     parsedSkill.name = skill.name;
+        //     parsedSkill.base = Number(skill.rating) || 0;
+        //     if (skill.skillspecializations) {
+        //         parsedSkill.specs = IH.getArray(skill.skillspecializations.skillspecialization).map(spec => spec.name);
+        //     }
+        // }
     }
 
+    // TODO: tamif - chummer - reimplement chummer import skill handling.
     private static handleKnowledgeSkills(system: BlankCharacter['system'], knowledgeSkills: ActorSchema['skills']['skill']) {
-        system.skills.knowledge.academic.value = {};
-        system.skills.knowledge.interests.value = {};
-        system.skills.knowledge.professional.value = {};
-        system.skills.knowledge.street.value = {};
+        // system.skills.knowledge.academic.value = {};
+        // system.skills.knowledge.interests.value = {};
+        // system.skills.knowledge.professional.value = {};
+        // system.skills.knowledge.street.value = {};
 
-        for (const skill of knowledgeSkills) {
-            const id = foundry.utils.randomID(16);
-            const parsedSkill = DataDefaults.createData('skill_field');
-            parsedSkill.name = skill.name;
-            parsedSkill.base = parseInt(skill.rating);
-            if (skill.skillspecializations) {
-                parsedSkill.specs = IH.getArray(skill.skillspecializations.skillspecialization).map(spec => spec.name);
-            }
+        // for (const skill of knowledgeSkills) {
+        //     const id = foundry.utils.randomID(16);
+        //     const parsedSkill = DataDefaults.createData('skill_field');
+        //     parsedSkill.name = skill.name;
+        //     parsedSkill.base = parseInt(skill.rating);
+        //     if (skill.skillspecializations) {
+        //         parsedSkill.specs = IH.getArray(skill.skillspecializations.skillspecialization).map(spec => spec.name);
+        //     }
 
-            let skillCategory: Record<string, SkillFieldType> | undefined;
-            if (skill.skillcategory_english) {
-                const cat = skill.skillcategory_english.toLowerCase();
-                switch (cat) {
-                    case 'street': skillCategory = system.skills.knowledge.street.value; break;
-                    case 'academic': skillCategory = system.skills.knowledge.academic.value; break;
-                    case 'professional': skillCategory = system.skills.knowledge.professional.value; break;
-                    case 'interest': skillCategory = system.skills.knowledge.interests.value; break;
-                }
-            } else {
-                // Fallback for older chummer versions
-                if (skill.attribute.toLowerCase() === 'int') skillCategory = system.skills.knowledge.street.value;
-                if (skill.attribute.toLowerCase() === 'log') skillCategory = system.skills.knowledge.professional.value;
-            }
+        //     let skillCategory: Record<string, SkillFieldType> | undefined;
+        //     if (skill.skillcategory_english) {
+        //         const cat = skill.skillcategory_english.toLowerCase();
+        //         switch (cat) {
+        //             case 'street': skillCategory = system.skills.knowledge.street.value; break;
+        //             case 'academic': skillCategory = system.skills.knowledge.academic.value; break;
+        //             case 'professional': skillCategory = system.skills.knowledge.professional.value; break;
+        //             case 'interest': skillCategory = system.skills.knowledge.interests.value; break;
+        //         }
+        //     } else {
+        //         // Fallback for older chummer versions
+        //         if (skill.attribute.toLowerCase() === 'int') skillCategory = system.skills.knowledge.street.value;
+        //         if (skill.attribute.toLowerCase() === 'log') skillCategory = system.skills.knowledge.professional.value;
+        //     }
 
-            if (skillCategory) {
-                skillCategory[id] = parsedSkill;
-            }
-        }
+        //     if (skillCategory) {
+        //         skillCategory[id] = parsedSkill;
+        //     }
+        // }
     }
 }

@@ -13,7 +13,6 @@ import { SR5Item } from "src/module/item/SR5Item";
 export class ICPrep {
     static prepareBaseData(system: Actor.SystemOfType<'ic'>) {
         ModifiersPrep.clearAttributeMods(system);
-        SkillsPrep.prepareSkillData(system);
 
         ICPrep.hideMeatAttributes(system);
         ICPrep.addHostAttributes(system);
