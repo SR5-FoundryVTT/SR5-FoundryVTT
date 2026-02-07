@@ -1398,7 +1398,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * 
      * By default 'OBSERVER' is used as that allows users to see document ratings.
      * 
-     * @returns 
+     * @returns true if the current user is allowed to execute this test, otherwise false.
      */
     userCanExecute() {
         if (this.ignoreUserPermission) return true;
