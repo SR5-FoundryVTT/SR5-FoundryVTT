@@ -14,10 +14,6 @@ export class ItemPrep {
         armor.base = 0;
         armor.value = 0;
 
-        for (const element of Object.keys(SR5.elementTypes)) {
-            armor[element] = 0;
-        }
-
         const armorModParts = new PartsList<number>(armor.mod);
         // NOTE: We retrieve different types of items, all containing armor data.
         const equippedArmor = items.filter((item) => item.hasArmor() && item.isEquipped()) as SR5Item<'armor'>[];
@@ -44,6 +40,19 @@ export class ItemPrep {
         if (system.modifiers['armor']) armorModParts.addUniquePart(game.i18n.localize('SR5.Bonus'), system.modifiers['armor']);
         // SET ARMOR
         armor.value = Helpers.calcTotal(armor);
+    }
+
+    /**
+     * Cleanup any lingering armor element values from _source
+     * 
+     * These values will be derived from:
+     * - ActiveEffect changes applied
+     * - equipped armor items and their elemental modifiers
+     */
+    static clearArmorElements(system: Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>) {
+        for (const element of Object.keys(SR5.elementTypes)) {
+            system.armor[element] = 0;
+        }
     }
     /**
      * Apply all changes to an actor by their 'ware items.

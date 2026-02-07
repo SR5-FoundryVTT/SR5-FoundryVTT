@@ -16,6 +16,9 @@ import { DataDefaults } from '../../data/DataDefaults';
 import { SR5Item } from 'src/module/item/SR5Item';
 
 export class CharacterPrep {
+    /**
+     * Prepare base values that should be done before applying ActiveEffect changes.
+     */
     static prepareBaseData(system: Actor.SystemOfType<'character'>) {
         CharacterPrep.addSpecialAttributes(system);
         SkillsPrep.prepareSkillData(system);
@@ -24,12 +27,15 @@ export class CharacterPrep {
         ModifiersPrep.clearArmorMods(system);
         ModifiersPrep.clearLimitMods(system);
         ModifiersPrep.clearValueMods(system);
+
+        ItemPrep.clearArmorElements(system);
     }
 
     /**
      * All derived data should depend on basic values like Attributes or Skills.
      *
-     * It shouldn't be modified by Active Effects, which instead should modify the global modifiers.
+     * ActiveEffect changes have applied before hand and only actor modifier values are 
+     * left to apply additionally.
      *
      * @param system
      * @param items
