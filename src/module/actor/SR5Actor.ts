@@ -298,7 +298,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         if (!skills) return;
         this.skills = SkillFlow.getDefaultActorSkills();
 
-        this.system._skills = SkillFlow.prepareActorSkills(skills);
+        this.system.skills = SkillFlow.prepareActorSkills(skills);
     }
 
     /**

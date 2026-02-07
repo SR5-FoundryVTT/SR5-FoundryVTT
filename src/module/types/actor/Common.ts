@@ -77,7 +77,6 @@ export const CommonData = () => ({
     importFlags: new SchemaField(ImportFlagData(), { nullable: true }),
 
     skills: new SchemaField(ActorSkills()),
-    _skills: new SchemaField(ActorSkills()),
 
     // favorites and hidden_items can be Local ID or UUID depending on if the item comes from a compendium or not
     favorites: new ArrayField(new StringField({ required: true })),
