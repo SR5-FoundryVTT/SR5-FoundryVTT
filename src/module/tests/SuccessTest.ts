@@ -1447,12 +1447,12 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * NOTE: Currently none of these methods trigger Foundry hooks.
      */
     async execute(): Promise<this> {
+        await this._prepareExecution();
+
         if (!this.userCanExecute()) {
             ui.notifications?.error(game.i18n.localize('SR5.Errors.CantExecuteTest'));
             return this;
         }
-
-        await this._prepareExecution();
 
         // Allow user to change details.
         const userConsented = await this.showDialog();
@@ -1484,6 +1484,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // Fetch documents.
         await this.populateDocuments();
+
+        if (!this.userCanExecute()) {
+            ui.notifications?.error(game.i18n.localize('SR5.Errors.CantExecuteTest'));
+            return this;
+        }
 
         if (!this.actor) {
             ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', { localize: true });
@@ -1522,6 +1527,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // Fetch documents.
         await this.populateDocuments();
+
+        if (!this.userCanExecute()) {
+            ui.notifications?.error(game.i18n.localize('SR5.Errors.CantExecuteTest'));
+            return this;
+        }
 
         if (!this.actor) {
             ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', { localize: true });
@@ -1686,6 +1696,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // Fetch original tests documents.
         await this.populateDocuments();
+
+        if (!this.userCanExecute()) {
+            ui.notifications?.error(game.i18n.localize('SR5.Errors.CantExecuteTest'));
+            return this;
+        }
 
         // Create a new test instance of the same type.
         const testCls = TestCreator._getTestClass(data.type);
