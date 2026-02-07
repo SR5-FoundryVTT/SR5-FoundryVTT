@@ -1450,7 +1450,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!this.userCanExecute()) {
             ui.notifications?.error(game.i18n.localize('SR5.Errors.CantExecuteTest'));
             return this;
-        };
+        }
 
         await this._prepareExecution();
 
