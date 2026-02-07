@@ -1387,7 +1387,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     userCanExecute() {
         if (!this.source) return true;
-        if (this.source.permission! < CONST.DOCUMENT_OWNERSHIP_LEVELS.OBSERVER) return false;
+        if (!this.source.testUserPermission(game.user, 'OBSERVER')) return false;
 
         return true;
     }
