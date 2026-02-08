@@ -29,6 +29,7 @@ import { PackActionFlow } from '@/module/item/flows/PackActionFlow';
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import ActorSheetV2 = foundry.applications.sheets.ActorSheetV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
+import { EffectCreationFlow } from '@/module/flows/EffectCreationFlow';
 
 const { TextEditor } = foundry.applications.ux;
 const { fromUuid, fromUuidSync } = foundry.utils;
@@ -1991,38 +1992,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 callback: async (target: HTMLElement) => {
                     const skillTarget = this._closestSkillTarget(target)!;
                     const skillId = skillTarget.dataset.skillId!;
-                    const subCategory = skillTarget.dataset.subcategory;
-                    let path = '';
-                    switch (skillTarget.dataset.category) {
-                        case 'knowledge':
-                            path = `system.skills.knowledge.${subCategory}.${skillId}`;
-                            break;
-                        case 'language':
-                            path = `system.skills.language.${skillId}`;
-                            break;
-                        case 'active':
-                        default:
-                            path = `system.skills.active.${skillId}`;
-                            break;
-                    }
-                    if (!path) return;
-                    const skill = this.actor.getSkill(skillId)!;
-                    const effectData = {
-                        name: `${SkillFlow.localizeSkillName(skill.name)} ${game.i18n.localize('SR5.Effect')}`,
-                        system: {
-                            applyTo: 'actor' as const,
-                        },
-                        changes: [
-                            {
-                                key: path,
-                                mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-                                priority: 0,
-                                value: '',
-                            }
-                        ]
-                    };
-                    console.error('TODO: tamif - implement skill effect creation with skill items');
-                    await this.actor.createEmbeddedDocuments("ActiveEffect", [effectData], { renderSheet: true });
+
+                    await EffectCreationFlow.skill(this.actor, skillId);
                 }
             },
             {

@@ -96,7 +96,7 @@ export class SkillFlow {
 
             // Name is user input but used for json storage here. It should match
             // overall naming scheme.
-            const key = item.name?.replace(' ', '_').toLowerCase() ?? item.id!;
+            const key = SkillFlow.nameToKey(item.name) || item.id!;
             
             const skill = DataDefaults.createData("skill_field", {
                 id: item.id,
@@ -171,6 +171,11 @@ export class SkillFlow {
         });
 
         return sortedSkillsObject;
+    }
+
+    static nameToKey(name: string) {
+        if (!name) return '';
+        return name.replace(' ', '_').toLowerCase();
     }
 
     /**
