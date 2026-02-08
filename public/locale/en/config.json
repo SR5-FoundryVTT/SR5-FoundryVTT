@@ -2873,6 +2873,7 @@
             "RitualInvalidForce": "Ritual force is invalid or greater then your lodges rating.",
             "RitualNotConcluded": "Ritual incomplete. Wait for ritual to oppose spellcasting to determine drain.",
             "RitualNotEnoughReagents": "Not enough reagents offered.",
+            "SkillAlreadyExists": "Skill {name} already exists on this actor. Make sure to only use a skill name once per skill category.",
             "SkillCantBeDefault": "This skill can't be rolled as it can't be defaulted",
             "SummoningNotConcluded": "Summoning incomplete. Wait for spirit to oppose summoning to determine drain.",
             "TokenSelectionNeeded": "One or more tokens need to be selected"

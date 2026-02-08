@@ -1743,7 +1743,7 @@
             "CantSecondChanceWithoutNoneHits": "Kann zweite Chance nicht anwenden. Keine Würfel ohne Erfolg übrig.",
             "CantSpendMulitplePointsOfEdge": "Es kann nur ein Punkt Edge für eine Probe oder Handlung gleichzeitig ausgegeben werden.",
             "CompilationNotConcluded": "Kompilieren unvollständig. Warte auf Gegenprobe des Sprites, um Schwund zu bestimmen",
-            "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge-Punkte können nicht auf Proben ohne Acteur angewendet werden.",
+            "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge-Punkte können nicht auf Proben ohne Akteur angewendet werden.",
             "HostItemOnlyAcceptIC": "Nur IC Akteure können einem Host zugefügt werden",
             "InvalidCompilationLevel": "Resonanz-Attribut zu niedrig für Sprite-Stufe",
             "InvalidMarksCount": "Du hast versucht, eine falsche Anzahl von Marken zu setzen",
@@ -1754,6 +1754,7 @@
             "RitualInvalidForce": "Ritual-Kraft ist zu klein oder größer als die des Refugiums",
             "RitualNotConcluded": "Ritual unvollständig. Warte auf Gegenprobe des Rituals, um Entzug zu bestimmen.",
             "RitualNotEnoughReagents": "nicht genug Reagenzien geopfert.",
+            "SkillAlreadyExists": "Fertigkeit {name} existiert bereits bei diesem Akteur. Stelle sicher, dass du einen Fertigkeitsnamen nur einmal pro Fertigkeitskategorie verwendest.",
             "SkillCantBeDefault": "Auf diese Fertigkeit kann keine Probe abgelegt werden, da sie nicht improvisiert werden kann",
             "SummoningNotConcluded": "Herbeirufung unvollständig. Warte auf Gegenprobe des Geists, um Entzug zu bestimmen.",
             "TokenSelectionNeeded": "Ein oder mehrere Tokens müssen ausgewählt sein"

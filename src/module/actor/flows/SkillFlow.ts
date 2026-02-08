@@ -5,7 +5,6 @@ import { KnowledgeSkillCategory, SkillFieldType } from "src/module/types/templat
 import { SR5Item } from "@/module/item/SR5Item";
 import { Translation } from "@/module/utils/strings";
 import { DataDefaults } from "@/module/data/DataDefaults";
-import { Helpers } from "@/module/helpers";
 
 // A skill storage structure for easier access to character skill items.
 export interface Skills {
@@ -94,7 +93,9 @@ export class SkillFlow {
         for (const item of skillItems) {
             if (!item.isType('skill')) continue;
 
-            const key = item.name ?? item.id!;
+            // Name is user input but used for json storage here. It should match
+            // overall naming scheme.
+            const key = item.name?.replace(' ', '_').toLowerCase() ?? item.id!;
             
             const skill = DataDefaults.createData("skill_field", {
                 id: item.id,
@@ -109,14 +110,15 @@ export class SkillFlow {
 
             switch(item.system.skill.category) {
                 case 'active':
-                    skills.active[key] = skill;
+                    SkillFlow.addSkill(skills.active, skill, key);
                     break;
                 case 'language':
-                    skills.language[key] = skill;
+                    SkillFlow.addSkill(skills.language, skill, key);
+                
                     break;
                 case 'knowledge':
                     const knowledgeType = item.system.skill.knowledgeType as KnowledgeSkillCategory;
-                    skills.knowledge[knowledgeType][key] = skill;
+                    SkillFlow.addSkill(skills.knowledge[knowledgeType], skill, key);
                     break;
             }
         }
@@ -127,49 +129,16 @@ export class SkillFlow {
     }
 
     /**
-     * Transform actor skill to system skill structure.
+     * Add a single skill to the list of skills within system.skills.
      * 
-     * This system skill structure allows for effects to overwrite skill values and for getRollData to 
-     * be used for cross-document skill injection and retrieval.
-     *
-     * @param items Skill items to transform
+     * We have to check for certain edge cases here, as we deal with user input.
      */
-    static prepareSystemSkills(items: SR5Item<'skill'>[]) {
-        const systemSkills = { 
-            active: {},
-            language: {},
-            knowledge: {
-                academic: {},
-                professional: {},
-                street: {},
-                interests: {},
-            }
+    private static addSkill(skills: Record<string, SkillFieldType>, skill: SkillFieldType, key: string) {
+        if (Object.hasOwn(skills, key)) {
+            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.SkillAlreadyExists'));
+            return;
         }
-
-        // TODO: tamif - This and prepareActorSkills have a lot of duplicate code. Refactor. Also this sucks.
-        for (const item of items) {
-            if(item.system.type !== 'skill') continue;
-
-            const skillType = item.system.skill.category;
-            if (!Object.hasOwn(systemSkills, skillType)) continue;
-            
-            let path = '';
-            if (skillType === 'active') {
-                path = `active.${item.name}`; 
-            }
-            else if (skillType === 'language') {
-                path = `language.${item.name}`;
-            }
-            else if (skillType === 'knowledge') {
-                const type = item.system.skill.knowledgeType;
-                path = `knowledge.${type}.${item.name}`;
-            }
-
-            foundry.utils.setProperty(systemSkills, path, DataDefaults.createData("skill_field", {base: item.system.skill.rating}));
-        }
-        
-
-        return systemSkills;
+        skills[key] = skill;
     }
 
     /**
