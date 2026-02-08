@@ -48,7 +48,7 @@
                     <div class="test-value"><span class="value">{{localize test.pool.label}}:</span> <span class="value-result">{{test.pool.value}}</span></div>
                     <div class="test-value">
                         <span class="value">{{localize test.hits.label}}:</span>
-                        <span class="value-result">{{test.displayHits}}{{#if test.usingManualRoll}}*{{/if}}{{#if test.appendedHits}} + {{test.appendedHits}}{{/if}}</span>
+                        <span class="value-result">{{test.displayHits}}{{#if test.appendedHits}} + {{test.appendedHits}}{{/if}}</span>
                         {{#if test.hitsIcon}}<img class="test-icon" src="{{test.hitsIcon.icon}}" data-tooltip="{{test.hitsIcon.tooltip}}" />{{/if}}
                     </div>
                     {{#if test.extended}}<div class="test-value"><span class="value">{{localize test.extendedHits.label}}:</span> <span class="value-result">{{test.extendedHits.value}}</span></div>{{/if}}
@@ -120,19 +120,12 @@
             
         </div>
     </div>
-    {{#if test.usingManualRoll}}
-    <div class="card-main-content">
-        <div class="card-content">* {{localize "SR5.ManualHits"}}</div>
-    </disv>
-    {{/if}}
     <div class="card-rolls {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
-        {{#if (not test.usingManualRoll)}}
-        {{#each test.rolls}}
-            {{> 'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.hbs'
-                roll=this
-            }}
-        {{/each}}
-        {{/if}}
+    {{#each test.rolls}}
+        {{> 'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.hbs'
+            roll=this
+        }}
+    {{/each}}
     </div>
     {{#if test.targets}}
     <div class="test-line">
