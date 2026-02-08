@@ -735,8 +735,6 @@
             "WarningTitle": "Alerta"
         },
         "Magic": "Magia",
-        "ManualGlitches": "Falhas Man.",
-        "ManualHits": "Acertos Man.",
         "ManualOverride": "Substituição Manual",
         "MarkImportedItemReviewed": "Marcar Item Importado Como Revisado",
         "MarkImportedItemTooltip": "Marca este item importado como tendo sido revisado.",
@@ -1396,7 +1394,6 @@
                 "Extended": "O teste será rolado como um teste estendido até que o limite seja alcançado",
                 "Limit": "Valor do limite calculado",
                 "ManualGlitches": "Quantidade de falhas a reserva de dados rolados manualmente. Deve ser usado junto com acertos manuais.",
-                "ManualHits": "Quantidade de acertos da reserva de dados rolados manualmente. Irá pular a jogada de dados do FoundryVTT.",
                 "Modifier": "Soma de todos os modificadores aplicados à reserva de dados",
                 "Pool": "Quantidade de dados para rolar",
                 "PushTheLimit": "Aplicar regras de vantagem ao limite",
