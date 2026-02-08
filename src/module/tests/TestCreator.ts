@@ -452,7 +452,7 @@ export const TestCreator = {
             const skill = actor.getSkill(action.skill, { rollData }) ?? actor.getSkill(action.skill, {byLabel: true, rollData });
 
             // Notify user about their sins.
-            if (skill && !SkillFlow.allowRoll(skill)) ui.notifications?.warn('SR5.Warnings.SkillCantBeDefault', {localize: true});
+            if (skill && !SkillRules.allowRoll(skill)) ui.notifications?.warn('SR5.Warnings.SkillCantBeDefault', {localize: true});
 
             // Custom skills don't have a label, but a name.
             // Legacy skill don't have a name, but have a label.

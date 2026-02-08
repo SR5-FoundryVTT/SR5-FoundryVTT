@@ -9,9 +9,6 @@ import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
 import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
 import { MoveInventoryDialog } from '../../apps/dialogs/MoveInventoryDialog';
 import { InventoryRenameApp } from '@/module/apps/actor/InventoryRenameApp';
-import { SkillEditSheet } from '@/module/apps/skills/SkillEditSheet';
-import { KnowledgeSkillEditSheet } from '@/module/apps/skills/KnowledgeSkillEditSheet';
-import { LanguageSkillEditSheet } from '@/module/apps/skills/LanguageSkillEditSheet';
 
 import { SituationModifier } from '../../rules/modifiers/SituationModifier';
 import { prepareSortedEffects, prepareSortedItemEffects } from '../../effects';
@@ -19,7 +16,6 @@ import { prepareSortedEffects, prepareSortedItemEffects } from '../../effects';
 import { LinksHelpers } from '../../utils/links';
 
 import { InventoryType } from 'src/module/types/actor/Common';
-import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
 
 import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
 import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
@@ -416,7 +412,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         data.expandedSkills = {};
         for (const id of this.expandedSkills) {
-            const skill = this.actor.getSkill(id);
+            const skill = this.actor.items.get(id) as SR5Item<'skill'> | undefined;
             if (skill) {
                 const html = await TextEditor.enrichHTML(skill.system.description.value, { secrets: this.actor.isOwner, });
                 data.expandedSkills[id] = { html, }
@@ -1539,7 +1535,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 if (!container) return;
                 const id = listItemElem.dataset.skillId;
                 if (!id) return;
-                const skill = this.actor.getSkill(id);
+                const skill = this.actor.items.get(id) as SR5Item<'skill'>;
                 if (!skill) return;
                 if (this._isSkillFiltered(id, skill)) {
                     container.classList.remove('hidden')
@@ -1613,25 +1609,11 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         if (!skillId) return;
         if (!category) return;
 
-        console.error('TODO: tamif - implement skill edit sheets');
+        console.error('TODO: tamif - implement all old skill edit sheet features');
         const skill = this.actor.items.get(skillId);
         if (!skill) return;
 
         await skill.sheet?.render(true, {mode: 'edit'});
-
-        // if (category === 'active') {
-        //     const app = new SkillEditSheet({document: this.actor}, skillId)
-        //     await app.render(true, {mode: 'edit'} as any);
-        // } else if (category === 'knowledge') {
-        //     const subcategory = closest?.dataset.subcategory as KnowledgeSkillCategory;
-        //     if (subcategory) {
-        //         const app = new KnowledgeSkillEditSheet({document: this.actor}, skillId, subcategory)
-        //         await app.render(true, {mode: 'edit'} as any);
-        //     }
-        // } else if (category === 'language') {
-        //     const app = new LanguageSkillEditSheet({document: this.actor}, skillId)
-        //     await app.render(true, {mode: 'edit'} as any);
-        // }
     }
 
     static async #editSkill(this: SR5BaseActorSheet, event: PointerEvent) {
@@ -1644,9 +1626,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         if (!(event.target instanceof HTMLElement)) return;
         const closest = this._closestSkillTarget(event.target);
         const skillName = closest?.dataset.skillName;
-        if (skillName) {
-            await this.actor.rollSkill(skillName, { event });
-        }
+        if (!skillName) return;
+
+        await this.actor.rollSkill(skillName, { event });
     }
 
     static async #rollSkillSpec(this: SR5BaseActorSheet, event: PointerEvent) {
@@ -2293,7 +2275,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         } else {
             this.expandedSkills.add(id);
             event.target?.closest('.list-item-container')?.classList.add('expanded');
-            const skill = this.actor.getSkill(id);
+            const skill = this.actor.items.get(id) as Item<'skill'>;
             if (skill) {
                 const html = await TextEditor.enrichHTML(skill.system.description.value, { secrets: this.actor.isOwner, });
                 if (html) {

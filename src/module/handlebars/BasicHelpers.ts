@@ -26,10 +26,11 @@ export const registerBasicHelpers = () => {
     });
 
     Handlebars.registerHelper('localizeSkill', function (skill: SR5Item<'skill'> | string, options): string {
+        console.error('TODO: tamif - what is this doing?');
         if (typeof skill === 'string') {
             const actor = options.data.root.actor as SR5Actor;
             if (!actor) return skill;
-            const newSkill = actor.getSkill(skill);
+            const newSkill = actor.items.get(skill) as SR5Item<'skill'> | undefined;
             if (!newSkill) return skill;
             skill = newSkill;
         }

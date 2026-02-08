@@ -45,7 +45,7 @@ export const UpdateActionFlow = {
             const skill = item.actor.getSkill(skillIdOrLabel) ?? item.actor.getSkillByLabel(skillIdOrLabel);
             if (skill === undefined) return;
     
-            changeData['system.action.attribute'] = skill.system.skill.attribute;
+            changeData['system.action.attribute'] = skill.attribute;
         }
     },
 

@@ -667,14 +667,12 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return this.getSkills() !== undefined;
     }
 
-    getSkills(this: SR5Actor): SR5Actor['skills']['named'] {
-        console.error('TODO: tamif - skills used to return a list of skills, this would break API');
-        return this.skills.named;
+    getSkills(this: SR5Actor) {
+        return this.system.skills;
     }
 
-    getActiveSkills(this: SR5Actor): SR5Actor['skills']['active'] {
-        console.error('TODO: tamif - skills used to return a list of skills, this would break API');
-        return this.skills.active;
+    getActiveSkills(this: SR5Actor) {
+        return this.system.skills.active;
     }
 
     getMasterUuid(): string | undefined {
@@ -828,26 +826,27 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Return the full pool of a skill including attribute and possible specialization bonus.
-     * @param skillId The ID of the skill. Note that this can differ from what is shown in the skill list. If you're
+     * @param name The name of the skill. Note that this can differ from what is shown in the skill list. If you're
      *                unsure about the id and want to search
      * @param options An object to change the behavior.
      *                The property specialization will trigger the pool value to be raised by a specialization modifier
      *                The property byLabel will cause the param skillId to be interpreted as the shown i18n label.
      */
-    getPool(skillId: string, options = { specialization: false, byLabel: false }): number {
+    getPool(name: string, options = { specialization: false, byLabel: false }): number {
         console.error('TODO: tamif - Move this to SkillFlow?');
-        const skill = options.byLabel ? this.getSkillByLabel(skillId) : this.getSkill(skillId);
-        if (!skill?.system.skill.attribute) return 0;
-        if (!SkillFlow.allowRoll(skill)) return 0;
+        const skillField = options.byLabel ? this.getSkillByLabel(name) : this.getSkill(name);
+        if (!skillField) return 0;
 
-        const attribute = this.getAttribute(skill.system.skill.attribute);
+        if (!skillField?.attribute) return 0;
+        if (!SkillRules.allowRoll(skillField)) return 0;
+
+        const attribute = this.getAttribute(skillField.attribute);
 
         // An attribute can have a NaN value if no value has been set yet. Do the skill for consistency.
-        const attributeValue = typeof attribute.value === 'number' ? attribute.value : 0;
-        console.error('TODO: tamif - skill value instead of rating');
-        const skillValue = skill.system.skill.rating;
+        const attributeValue = attribute.value;
+        const skillValue = skillField.value;
 
-        if (SkillRules.mustDefaultToRoll(skill) && SkillRules.allowDefaultingRoll(skill)) {
+        if (SkillRules.mustDefaultToRoll(skillField) && SkillRules.allowDefaultingRoll(skillField)) {
             return SkillRules.defaultingModifier + attributeValue;
         }
 
@@ -861,30 +860,65 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param name Either the name or translated label (not the SR5.<label>-string)
      * @param options .byLabel when true search will try to match given skillId with the translated label
      */
-    getSkill(this: SR5Actor, name: string, options?: { byLabel?: boolean, rollData?: SR5Actor['system'] }): SR5Item<'skill'> | undefined {
+    getSkill(this: SR5Actor, name: string, options?: { byLabel?: boolean, rollData?: SR5Actor['system'] }) {
         if (options?.byLabel)
             return this.getSkillByLabel(name);
 
-        console.error('TODO: tamif - Support for skill in getRollData');
-        return this.skills.named.get(name);
-        // const rollData = options?.rollData ?? this.getRollData();
+        // Retrieve skills from either roll or system data.
+        const rollData = options?.rollData ?? this.getRollData();
+        const skills = rollData?.skills ?? this.getSkills();
 
-        // const skills = rollData?.skills ?? this.getSkills();
-        // return skills.get(name) ?? this.getSkillByLabel(name);
+        return this.getSkillByName(name, skills) ?? this.getSkillByLabel(name);
+    }
+
+    /**
+     * Return the skill field matching given skill item id.
+     *
+     * @param name Item id of a skill on the actor, used to create a skill field.
+     */
+    getSkillByName(name: string, skills: SR5Actor['system']['skills']): SkillFieldType | undefined {
+        if (!name) return;
+
+        let skillField = Object.values(skills.active).find(skill => skill.name === name);
+        if (skillField) return skillField;
+        skillField = Object.values(skills.knowledge).flatMap(category => Object.values(category)).find(skill => skill.name === name);
+        if (skillField) return skillField;
+        skillField = Object.values(skills.language).find(skill => skill.name === name);
+        if (skillField) return skillField;
     }
 
     /**
      * Search all skills for a matching i18n translation label.
      * NOTE: You should use getSkill if you have the skillId ready. Only use this for ease of use!
      *
-     * @param searched The translated output of either the skill label (after localize) or name of the skill in question.
+     * @param label The translated output of either the skill label (after localize) or name of the skill in question.
      * @return The first skill found with a matching translation or name.
      */
-    getSkillByLabel(searched: string): SR5Item<'skill'> | undefined {
-        if (!searched) return;
+    getSkillByLabel(label: string) {
+        if (!label) return;
 
-        console.error('TODO: tamif - Support for skill in getRollData');
-        return this.skills.localized.get(searched) ?? undefined;
+        const possibleMatch = (skill: SkillFieldType): string => skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
+
+        const skills = this.getSkills();
+
+        for (const skill of Object.values(skills.language)) {
+            if (label === possibleMatch(skill))
+                return skill;
+        }
+
+        for (const categoryKey in skills.knowledge) {
+            const categorySkills = skills.knowledge[categoryKey] as SkillFieldType[];
+            for (const skill of Object.values(categorySkills)) {
+                if (label === possibleMatch(skill))
+                    return skill;
+            }
+        }
+
+        for (const skill of Object.values(skills.active)) {
+            if (label === possibleMatch(skill))
+                return skill;
+        }
+        return undefined;
     }
 
     /**
@@ -1251,9 +1285,12 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Build an action for the given skill id based on it's configured values.
+     * 
+     * All action values are derived from the SkillField instead of the skill item
+     * as field values can be modified by effect changes.
      *
      * @param name Any skill, no matter if active, knowledge or language
-     * @param options
+     * @param options Options on how to handle this action roll
      */
     skillActionData(name: string, options: SkillRollOptions = {}): ActionRollType | undefined {
         const byLabel = options.byLabel || false;
@@ -1263,20 +1300,15 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             return;
         }
 
-        // When fetched by label, getSkillByLabel will inject the id into SkillField.
-        name = skill.id || name;
-
-        // Derive limit from skill attribute.
-        const attribute = this.getAttribute(skill.system.skill.attribute);
-        // TODO: Typing. LimitData is incorrectly typed to ActorAttributes only but including limits.
-        const limit = attribute.limit || '';
+        const attribute = this.getAttribute(skill.attribute);
+        const limit = attribute?.limit || '';
         // Should a specialization be used?
         const spec = options.specialization || false;
 
         return DataDefaults.createData('action_roll', {
             skill: name,
             spec,
-            attribute: skill.system.skill.attribute,
+            attribute: skill.attribute,
             limit: {
                 attribute: limit,
                 base_formula_operator: 'add',
