@@ -192,9 +192,6 @@ export const PackActionFlow = {
      * @returns Sheet usable text, either translated or original name.
      */
     localizePackAction(name: string): string {
-        const slug = Helpers.transformToLabel(name);
-        const label = `SR5.Content.Actions.${slug}`;
-        const localized = game.i18n.localize(label);
-        return localized === label ? name : localized;
+        return Helpers.localizeName(name, 'SR5.Content.Actions');
     }
 };

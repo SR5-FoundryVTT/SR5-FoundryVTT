@@ -1032,4 +1032,20 @@ export class Helpers {
             .join('')
             .replace(/[^a-zA-Z0-9]/g, '');
     }
+
+    /**
+     * Localize any document name with using i18n.
+     * If no localization can be made, return the name as is.
+     * 
+     * @param name The name of the document.
+     * @param baseLabel The base label to use for localization.
+     */
+    static localizeName(name: string, baseLabel = 'SR5') {
+        if (!baseLabel) return name;
+        const slug = Helpers.transformToLabel(name);
+
+        const label = `${baseLabel}.${slug}` as Translation;
+        const translation = game.i18n.localize(label);
+        return translation === label ? name : translation;
+    }
 }

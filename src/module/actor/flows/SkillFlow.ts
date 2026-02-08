@@ -5,6 +5,7 @@ import { KnowledgeSkillCategory, SkillFieldType } from "src/module/types/templat
 import { SR5Item } from "@/module/item/SR5Item";
 import { Translation } from "@/module/utils/strings";
 import { DataDefaults } from "@/module/data/DataDefaults";
+import { Helpers } from "@/module/helpers";
 
 // A skill storage structure for easier access to character skill items.
 export interface Skills {
@@ -173,12 +174,10 @@ export class SkillFlow {
     }
 
     /**
-     * Translate the skill name into a localized version
+     * Translate the skill name into a localized version, if possible.
      */
     static localizeSkillName(name: string) {
-        // TODO: tamif - handle error cases (empty) and transform name to label strucutre. check action translate.
-        const label = `SR5.Skill.${name}` as Translation;
-        return game.i18n.localize(label);
+        return Helpers.localizeName(name, 'SR5.Skill');
     }
 
     /**
