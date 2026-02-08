@@ -172,4 +172,17 @@ export class SkillFlow {
             }
         };
     }
+
+    /**
+     * Add a new specialization to the given skill.
+     * @param skill A skill item to which the specialization should be added.
+     * @param specialization The specialization name to add.
+     */
+    static async addSpecialization(skill: SR5Item<'skill'>, specialization = '') {
+        if (!skill.isType('skill')) return;
+
+        const specializations = skill.system.skill.specializations;
+        specializations.push(specialization);
+        await skill.update({system: {skill: {specializations: specializations }}});
+    }
 }

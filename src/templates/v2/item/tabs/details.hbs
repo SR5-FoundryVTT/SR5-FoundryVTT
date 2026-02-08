@@ -766,6 +766,7 @@
                     </div>
                 {{/if}}
             {{/if}}
+
             {{#if (isType item 'skill')}}
                 <div class="list-item list-item-header">
                     <div class="list-item-start">
@@ -782,6 +783,7 @@
                     </div>
                 </div>
 
+                {{!-- SKILL TYPE --}}
                 {{#if (eq system.type 'skill')}}
                 <div class="list-item list-item-header">
                     <div class="list-item-start">
@@ -800,9 +802,31 @@
                                         disabled=@root.isPlayMode }}
                         </div>
                     </div>
+                    <div class="list-item">
+                        <div class="list-item-start skinny">
+                            <label data-tooltip="{{systemFields.skill.fields.specializations.hints}}">{{systemFields.skill.fields.specializations.label}}</label>
+                        </div>
+                        <div class="list-item-col">
+                            <header>
+                                <div class="key">{{systemFields.skill.fields.specializations.label}}</div>
+                                <div class="controls"><a data-action="addSpecialization"><i class="fa-regular fa-square-plus"></i></a></div>
+                            </header>
+                            <ol class="scrollable">
+                                {{#each system.skill.specializations as |specialization i|}}
+                                    {{log systemFields.skill.fields.specializations }}
+                                        <li data-index="{{i}}">
+                                            <div class="">
+                                                {{formInput systemFields.skill.fields.specializations name=(concat "system.skill.specializations." i) value=specialization}}
+                                            </div>
+                                        </li>
+                                {{/each}}
+                            </ol>
+                        </div>
+                    </div>
                 </div>                    
+                {{!-- SKILL GROUP TYPE --}}
                 {{else if (eq system.type 'group')}}
-                Group
+                {{!-- SKILL SET TYPE --}}
                 {{else if (eq system.type 'set')}}
                 Set
                 {{/if}}

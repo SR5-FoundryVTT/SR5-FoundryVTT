@@ -4,6 +4,8 @@ import { SR5BaseItemSheetData } from "../SR5ItemSheet";
 import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from "@/module/handlebars/SR5ApplicationMixin";
 
 import ItemSheet = foundry.applications.sheets.ItemSheet;
+import { SkillFlow } from "@/module/actor/flows/SkillFlow";
+import { SR5Item } from "../SR5Item";
 
 interface SR5SkillSheetData extends SR5BaseItemSheetData {
 }
@@ -17,12 +19,16 @@ interface SR5SkillSheetData extends SR5BaseItemSheetData {
  * - skill sets
  */
 export class SR5SkillSheet<T extends SR5BaseItemSheetData = SR5SkillSheetData> extends SR5ApplicationMixin(ItemSheet)<T>{
+    declare document: SR5Item<'skill'>;
+    
     // TODO: taMiF - any should be replaced by correct DEFAULT_OPTIONS declaration?
     //               are we using DEFAULT_OPTIONS inerhitance?
-    static override DEFAULT_OPTIONS: any = {
+    static override DEFAULT_OPTIONS = {
         // TODO: tamIf - What is the point of these classes?
         classes: ['item', 'named-sheet'],
-        actions: {}
+        actions: {
+            addSpecialization: this.#addSpecialization
+        }
     }
 
     static override PARTS = {
@@ -68,5 +74,13 @@ export class SR5SkillSheet<T extends SR5BaseItemSheetData = SR5SkillSheetData> e
         context.primaryTabs = this._prepareTabs('primary');
 
         return context;
+    }
+
+    /**
+     * Add a new entry to the skill specializations array.
+     * @param this 
+     */
+    static async #addSpecialization(this: SR5SkillSheet) {
+        await SkillFlow.addSpecialization(this.document);
     }
 };

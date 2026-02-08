@@ -2132,6 +2132,10 @@
                     "rating": {
                         "label": "Rating",
                         "hint": "Rating of this entry"
+                    },
+                    "specializations": {
+                        "label": "Specialization",
+                        "hint": "Specialization for this skill, if any"
                     }
                 }
             },
