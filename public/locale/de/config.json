@@ -1072,6 +1072,7 @@
             "CantConnectToPAN": "Das ausgewählte Dokument kann nicht zu einem PAN-Netzwerk hinzugefügt werden.",
             "CantConnectToWAN": "Das ausgewählte Dokument kann nicht zu einem WAN-Netzwerk hinzugefügt werden.",
             "CantEditAppliedItemEffects": "Aktive Effekte, die über Items zugefügt wurden, können nicht direkt editiert werden.",
+            "CantExecuteTest": "Du kannst diesen Test nicht ausführen. Dies könnte damit zusammenhängen, dass du ein Spieler bist oder nicht ausreichend Berechtigungen hast.",
             "DefaultInventoryCantBeRemoved": "Das Standardinventar kann nicht entfernt werden.",
             "InventoryAlreadyExists": "Es existiert bereits ein Inventar mit diesem Namen",
             "KeyNotModifyableByActiveEffect": "Aktiver Effekt Modus Modifizieren kann nur auf mod Felder angewendet werden.",
