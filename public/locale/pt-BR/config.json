@@ -26,8 +26,6 @@
         "HideGMOnlyChatContentDescription": "As mensagens de teste para o GM só mostrarão todas as informações para os jogadores que possuem o ator usado",
         "ImportIconFolderDescription": "A pasta onde o importador pode encontrar arquivos de ícone. Localização padrão: 'systems/shadowrun5e/dist/icons/importer/'",
         "ImportIconFolderName": "Pasta de Ícones do Importador",
-        "ManualRollOnSuccessTest": "Rolar dados manualmente em qualquer teste",
-        "ManualRollOnSuccessTestDescription": "Permitir que o usuário role dados manualmente em testes e reporte acertos",
         "MarkImportsDescription": "Demarcar itens recém-importados nas fichas de ator para destacar que eles devem ser revisados",
         "MarkImportsName": "Marcar Importações Recentes",
         "MustHaveRessourcesOnTest": "Parar Testes com recursos faltando",
@@ -1393,7 +1391,6 @@
             "Test": {
                 "Extended": "O teste será rolado como um teste estendido até que o limite seja alcançado",
                 "Limit": "Valor do limite calculado",
-                "ManualGlitches": "Quantidade de falhas a reserva de dados rolados manualmente. Deve ser usado junto com acertos manuais.",
                 "Modifier": "Soma de todos os modificadores aplicados à reserva de dados",
                 "Pool": "Quantidade de dados para rolar",
                 "PushTheLimit": "Aplicar regras de vantagem ao limite",
