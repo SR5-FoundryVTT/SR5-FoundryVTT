@@ -13,6 +13,7 @@ interface VehicleSheetDataFields extends MatrixActorSheetData {
         driver: SR5Actor|undefined,
         master: SR5Item | undefined
     }
+    modifications: SR5Item<'modification'>[];
 }
 
 export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFields> {
@@ -71,17 +72,15 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
 
         // Vehicle actor type specific fields.
         data.vehicle = this._prepareVehicleFields();
-
+        data.modifications = this._prepareEquippedModifications();
         data.isVehicle = true;
 
         return data;
     }
 
     protected override async _getMatrixPackActions() {
-        const matrixPackName = PackActionFlow.getMatrixActionsPackName();
-
         // filter out illegal actions from the matrix actions
-        return (await PackActionFlow.getPackActions(matrixPackName)).filter((action) => {
+        return (await PackActionFlow.getMatrixPackActions()).filter((action) => {
             return !MatrixRules.isIllegalAction(
                         action.getAction()?.attribute as any,
                         action.getAction()?.attribute2 as any,
@@ -112,6 +111,13 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
             driver,
             master,
         };
+    }
+
+    /**
+     * Allow gear (vehicle) modification to lie around in inventory while still allowing calculations around equipped modifications.
+     */
+    _prepareEquippedModifications() {
+        return this.actor.itemsForType.get('modification')?.filter(item => item.isEquipped()) as SR5Item<'modification'>[] || [];
     }
 
     static override TABS = {

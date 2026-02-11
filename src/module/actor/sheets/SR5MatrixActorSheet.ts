@@ -184,7 +184,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             }
 
             if (parts.programs
-                && (!this.actor.isType('character', 'vehicle', 'critter')
+                && (!this.actor.isType('character', 'vehicle')
                     || (this.isPlayMode && this.hideEmptyCategories() && !this.actor.hasItemOfType('program')))
             ) {
                 parts.programs.hidden = true;
@@ -208,7 +208,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             }
 
             if (parts.spritePowers
-                && (!this.actor.isType('sprite', 'character', 'critter')
+                && (!this.actor.isType('sprite', 'character')
                     || (this.isPlayMode
                         && (this.hideEmptyCategories() || !this.actor.isType('sprite'))
                         && !this.actor.hasItemOfType('sprite_power')))) {
@@ -383,9 +383,16 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      * @protected
      */
     protected async _getMatrixPackActions() {
-        const matrixPackName = PackActionFlow.getMatrixActionsPackName();
-        // Collect all sources for matrix actions.
-        return await PackActionFlow.getPackActions(matrixPackName);
+        return await PackActionFlow.getMatrixPackActions();
+    }
+
+    /**
+     * Get matrix actions otherwise available on this actor.
+     */
+    protected _getMatrixActorActions() {
+        const actions = this.document.itemsForType.get('action') as SR5Item<'action'>[];
+        if (!actions) return [];
+        return actions.filter(item => item.hasActionCategory('matrix'));
     }
 
 
@@ -394,10 +401,14 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      *
      * If a marked document is selected, only actions with a mark requirement will show.
      *
-     * @returns Sorted list of objects containg a localized name and action item for sheet display.
+     * @returns Sorted list of objects containing a localized name and action item for sheet display.
      */
     async _prepareMatrixActions() {
-        let actions = await this._getMatrixPackActions();
+        // Combine all sources for matrix actions.
+        let actions = [
+            ...await this._getMatrixPackActions(), 
+            ...this._getMatrixActorActions()
+        ];
 
         actions = actions.filter(action => {
             if (MatrixRules.isSleazeAction(

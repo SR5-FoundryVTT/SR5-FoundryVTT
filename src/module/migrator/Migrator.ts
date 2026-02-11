@@ -8,6 +8,10 @@ import { Version0_30_0 } from './versions/Version0_30_0';
 import { Version0_30_3 } from './versions/Version0_30_3';
 import { Version0_30_6 } from './versions/Version0_30_6';
 import { Version0_31_0 } from './versions/Version0_31_0';
+import { Version0_31_5 } from './versions/Version0_31_5';
+import { Version0_32_0 } from './versions/Version0_32_0';
+import { Version0_32_1 } from './versions/Version0_32_1';
+import { Version0_32_4 } from './versions/Version0_32_4';
 import { VersionMigration, MigratableDocument, MigratableDocumentName } from "./VersionMigration";
 const { deepClone } = foundry.utils;
 
@@ -42,6 +46,10 @@ export class Migrator {
         new Version0_30_3(),
         new Version0_30_6(),
         new Version0_31_0(),
+        new Version0_31_5(),
+        new Version0_32_0(),
+        new Version0_32_1(),
+        new Version0_32_4(),
     ] as const;
 
     private static documentsToBeMigrated = 0;
@@ -245,18 +253,15 @@ export class Migrator {
         await this.updateDocuments(Item, deepClone(game.items._source));
 
         for (const item of game.items)
-            // @ts-expect-error Fvtt-types not supporting parent
             await this.updateDocuments(ActiveEffect, item.toObject().effects, item);
 
         /* Actors and its embedded documents */
         await this.updateDocuments(Actor, deepClone(game.actors._source));
 
         for (const actor of game.actors) {
-            // @ts-expect-error Fvtt-types not supporting parent
             await this.updateDocuments(Item, actor.toObject().items, actor);
-            // @ts-expect-error Fvtt-types not supporting parent
             await this.updateDocuments(ActiveEffect, actor.toObject().effects, actor);
-            
+
             for (const item of actor.items)
                 await this.updateDocuments(ActiveEffect, item.toObject().effects, item);
         }

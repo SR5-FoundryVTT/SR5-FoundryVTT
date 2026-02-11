@@ -21,7 +21,7 @@
         }
     ],
     "url": "#{URL}#",
-    "version": "0.31.0",
+    "version": "0.32.4",
     "compatibility": {
         "minimum": "13",
         "verified": "13.351",
@@ -30,9 +30,6 @@
     "documentTypes": {
         "Actor": {
             "character": {
-                "htmlField": ["description.value"]
-            },
-            "critter": {
                 "htmlField": ["description.value"]
             },
             "ic": {
@@ -222,7 +219,10 @@
     "relationships": [
         {
             "id": "autocomplete-inline-properties",
-            "type": "module"
+            "type": "module",
+            "compatibility": {
+                "verified": "3.1.0"
+            }
         }
     ],
     "socket": true,

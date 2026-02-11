@@ -184,6 +184,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     // Flows to handle different aspects of a Success Test that are not directly related to the test itself.
     public effects: SuccessTestEffectsFlow<this>;
 
+    public ignoreUserPermission: boolean;
+
     // Allow this.constructor to not reference Function.
     declare ['constructor']: typeof SuccessTest;
 
@@ -203,6 +205,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         this.data = this._prepareData(data, options);
 
         this.effects = new SuccessTestEffectsFlow<this>(this);
+        this.ignoreUserPermission = false;
 
         this.calculateBaseValues();
 
@@ -1382,6 +1385,30 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
+     * Allow users to execute this test, even when they don't have permissions to execute the source document.
+     * 
+     * This should be used per test instance to ignore user permissions between test instanciation and execution.
+     */
+    allowUserExecute() {
+        this.ignoreUserPermission = true;
+    }
+    
+    /**
+     * Can a user execute this test? This is used to check if the user has permissions to execute this test at all, before any preparation is done.
+     * 
+     * By default 'OBSERVER' is used as that allows users to see document ratings.
+     * 
+     * @returns true if the current user is allowed to execute this test, otherwise false.
+     */
+    userCanExecute() {
+        if (this.ignoreUserPermission) return true;
+        if (!this.source) return true;
+        if (!this.source.testUserPermission(game.user, 'OBSERVER')) return false;
+
+        return true;
+    }
+
+    /**
      * Prepare everything needed for test execution.
      * 
      * This is both necessary before a first execution or when re-calculation a test when execution has already
@@ -1422,6 +1449,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     async execute(): Promise<this> {
         await this._prepareExecution();
 
+        if (!this.userCanExecute()) {
+            ui.notifications?.error(game.i18n.localize('SR5.Errors.CantExecuteTest'));
+            return this;
+        }
+
         // Allow user to change details.
         const userConsented = await this.showDialog();
         if (!userConsented) return this;
@@ -1448,14 +1480,20 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     async executeWithSecondChance(): Promise<this> {
         console.debug(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
 
-        if (!this.data.sourceActorUuid) {
-            ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', { localize: true });
-            return this;
-        }
         if (!this.canSecondChance) return this;
 
         // Fetch documents.
         await this.populateDocuments();
+
+        if (!this.userCanExecute()) {
+            ui.notifications?.error(game.i18n.localize('SR5.Errors.CantExecuteTest'));
+            return this;
+        }
+
+        if (!this.actor) {
+            ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', { localize: true });
+            return this;
+        }
 
         //  Trigger edge consumption.
         this.data.secondChance = true;
@@ -1485,14 +1523,20 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     async executeWithPushTheLimit(): Promise<this> {
         console.debug(`Shadowrun 5e | ${this.constructor.name} will push the limit rules`);
 
-        if (!this.data.sourceActorUuid) {
-            ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', { localize: true });
-            return this;
-        }
         if (!this.canPushTheLimit) return this;
 
         // Fetch documents.
         await this.populateDocuments();
+
+        if (!this.userCanExecute()) {
+            ui.notifications?.error(game.i18n.localize('SR5.Errors.CantExecuteTest'));
+            return this;
+        }
+
+        if (!this.actor) {
+            ui.notifications?.warn('SR5.Warnings.EdgeRulesCantBeAppliedOnTestsWithoutAnActor', { localize: true });
+            return this;
+        }
 
         this.data.pushTheLimit = true;
         this.applyPushTheLimit();
@@ -1652,6 +1696,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // Fetch original tests documents.
         await this.populateDocuments();
+
+        if (!this.userCanExecute()) {
+            ui.notifications?.error(game.i18n.localize('SR5.Errors.CantExecuteTest'));
+            return this;
+        }
 
         // Create a new test instance of the same type.
         const testCls = TestCreator._getTestClass(data.type);
@@ -2174,8 +2223,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             return;
         }
 
-        // filter out actors current user shouldn't be able to test with.
-        documents = documents.filter(document => document.isOwner);
         // Fallback to player character.
         if (documents.length === 0 && game.user?.character) {
             documents.push(game.user.character as SR5Actor);

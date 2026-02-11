@@ -154,6 +154,7 @@ export const MatrixTestDataFlow = {
 
         // Assume decker and target reside on the same Grid
         data.sameGrid = data.sameGrid ?? true;
+        data.sameGridDisabled = data.sameGridDisabled ?? false;
         // Assume no direct connection
         data.directConnection = data.directConnection ?? false;
         data.personaUuid = data.personaUuid ?? undefined;
@@ -194,7 +195,6 @@ export const MatrixTestDataFlow = {
      * @param test The initial test to modify.
      */
     prepareTestModifiers(test: MatrixTest) {
-
         const modifiers = new PartsList<number>(test.data.modifiers.mod);
 
         // Check for grid modifiers.
@@ -215,12 +215,12 @@ export const MatrixTestDataFlow = {
     },
 
     /**
-     * Prepare base values for a mark placement test.
+     * Prepare test values for a mark placement test.
      *
      * @param test The test placing any mark.
      */
-    prepareBaseValues(test: MatrixTest) {
-        // Host devices always use direct connections. // TODO: add rule reference
+    prepareTestValues(test: MatrixTest) {
+        // Host devices always use direct connections. See SR5#233 'PANS and WANS'
         if (test.host) test.data.directConnection = true;
         // If a device has been pre-targeted before dialog, show this on the first render.
         if (test.icon instanceof SR5Item && !test.icon.isType('host')) test.data.targetMainIcon = false;
@@ -244,7 +244,10 @@ export const MatrixTestDataFlow = {
         const targetNetwork = targetActor.network;
         if (!targetNetwork?.isType('grid')) return;
 
+        // Auto set and fix the same grid. Disallow users from changing it.
+        // Currently this is reset on each test change, so user changes can't be made.
         test.data.sameGrid = sourceNetwork.uuid === targetNetwork.uuid;
+        test.data.sameGridDisabled = true;
     },
 
     /**
@@ -260,7 +263,10 @@ export const MatrixTestDataFlow = {
         const targetNetwork = targetActor.master;
         if (!targetNetwork?.isType('grid')) return;
 
+        // Auto set and fix the same grid. Disallow users from changing it.
+        // Currently this is reset on each test change, so user changes can't be made.
         test.data.sameGrid = sourceNetwork.uuid === targetNetwork.uuid;
+        test.data.sameGridDisabled = true;
     },
 
     /**
@@ -278,6 +284,9 @@ export const MatrixTestDataFlow = {
 
         // Target is a host or a host device.
         MatrixTestDataFlow._prepareHostDevices(test);
+
+        // Target is a device on a network.
+        MatrixTestDataFlow._prepareNetworkDevice(test);
     },
 
     /**
@@ -339,11 +348,20 @@ export const MatrixTestDataFlow = {
         // When given a persona uuid, load it.
         if (test.data.personaUuid) test.persona = fromUuidSync(test.data.personaUuid) as SR5Actor;
 
-        // If a device icon is targeted, it will not have a persona or host.
-        // TODO: Maybe we should show the persona for visibility and to make it the same as when targeting the persona first and selecting the device
+        // If a device icon is targeted, it might be part of another main icon (persona / network)
+        // Make sure to display icon target as sub-icon of this main icon.
         if (test.icon instanceof SR5Item && !test.persona && !test.host && !test.grid) {
-            test.data.personaUuid = test.icon.persona?.uuid;
-            test.devices = [test.icon];
+            const persona = test.icon.persona;
+            if (persona) {
+                // ... persona
+                test.data.personaUuid = persona.uuid;
+            } else {
+                // ... network
+                const master = test.icon.master;
+                if (!master) return;
+                if (master.isType('host')) test.host = master;
+                if (master.isType('grid')) test.grid = master;
+            }
         }
     },
 
@@ -378,7 +396,7 @@ export const MatrixTestDataFlow = {
     _prepareActorDevices(test: MatrixTest) {
         test.devices = [];
         if (!test.persona) return;
-        if (!test.persona.isType('character', 'critter', 'vehicle')) return;
+        if (!test.persona.isType('character', 'vehicle')) return;
 
         // Collect network devices
         test.devices = test.persona.wirelessDevices();
@@ -394,6 +412,22 @@ export const MatrixTestDataFlow = {
 
         // Whatever is connected to a host, is always 'wireless'.
         test.devices = host.system.slaves.map(uuid => fromUuidSync(uuid) as SR5Item);
+    },
+
+    /**
+     * Prepare single device target on network.
+     * 
+     * Have the matrix dialog behave the same as when a persona or host is targeted and 
+     * is switched to non-main target icon.
+     */
+    _prepareNetworkDevice(test: MatrixTest) {
+        if (!(test.icon instanceof SR5Item)) return;
+        if (!test.icon.canBeSlave) return;
+
+        // As a single device was pre-targeted by matrix icon list,
+        // it's unlikely the user wants to select another device.
+        // Therefore, we limit the list to the target only.
+        test.devices = [test.icon];
     },
 
     /**

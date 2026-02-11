@@ -13,11 +13,6 @@ import SocketMessageData = Shadowrun.SocketMessageData;
  *       @PDF SR5#160 'Changing Initiative'
  */
 export class SR5Combat<SubType extends Combat.SubType = Combat.SubType> extends Combat<SubType> {
-    // Overwrite foundry-vtt-types v9 combatTrackerSettings type definitions.
-    override get settings() {
-        return super.settings as { resource: string, skipDefeated: boolean };
-    }
-
     get initiativePass(): number {
         return this.getFlag(SYSTEM_NAME, FLAGS.CombatInitiativePass) || SR.combat.INITIAL_INI_PASS;
     }
@@ -425,6 +420,16 @@ export class SR5Combat<SubType extends Combat.SubType = Combat.SubType> extends 
 
         // Reduce for initiative passes until zero.
         return SR5Combat._getSystemInitiativeFormula(this.initiativePass);
+    }
+
+    override async _onStartRound(context: Combat.RoundEventContext) {
+        // clear movement histories when a new round starts
+        return this.clearMovementHistories(this.combatants);
+    }
+
+    override async _clearMovementHistoryOnStartTurn(combatant: Combatant, context: Combat.TurnEventContext) {
+        // do not clear movement history on turn start
+        // movement history persists through the initiative passes of a single combat round
     }
 
     static _getSystemInitiativeBaseFormula() {

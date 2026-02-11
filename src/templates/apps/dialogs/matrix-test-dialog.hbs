@@ -12,7 +12,7 @@
             {{/if}}
             <div class="form-group">
                 <label>{{localize "SR5.SameGrid"}}</label>
-                <input type="checkbox" class="checkbox" name="test.data.sameGrid" {{checked test.data.sameGrid}}/>
+                <input type="checkbox" class="checkbox" name="test.data.sameGrid" {{checked test.data.sameGrid}} {{#if test.data.sameGridDisabled}}disabled data-tooltip="SR5.Tooltips.MatrixTest.SameGridDisabled"{{/if}}/>
             </div>
             <div class="form-group">
                 <label>{{localize "SR5.DirectConnection"}}</label>

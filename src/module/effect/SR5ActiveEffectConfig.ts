@@ -58,7 +58,10 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
             addChange: this.#onAddChange,
         },
         classes: ["active-effect-config", SR5_APPV2_CSS_CLASS, 'named-sheet'],
-        position: { width: 560 },
+        position: { width: 760 },
+        window: {
+            resizable: true
+        }
     }
 
     static override TABS = {

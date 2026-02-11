@@ -106,7 +106,7 @@ export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData>
                 spirit: {
                     uuid: spirit.uuid,
                     type: spirit.system.spiritType,
-                    force: spirit.system.force
+                    force: spirit.system.attributes.force.value
                 }
             }
         });

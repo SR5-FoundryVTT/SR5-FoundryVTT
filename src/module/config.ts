@@ -528,20 +528,24 @@ export const SR5 = {
     },
 
     activeSkills: {
+        // Combat Skills
         archery: 'SR5.Skill.Archery',
         automatics: 'SR5.Skill.Automatics',
         blades: 'SR5.Skill.Blades',
         clubs: 'SR5.Skill.Clubs',
-        exotic_melee: 'SR5.Skill.ExoticMelee',
-        exotic_range: 'SR5.Skill.ExoticRange',
+        exotic_melee_weapon: 'SR5.Skill.ExoticMeleeWeapon',
+        exotic_ranged_weapon: 'SR5.Skill.ExoticRangedWeapon',
         heavy_weapons: 'SR5.Skill.HeavyWeapons',
         longarms: 'SR5.Skill.Longarms',
         pistols: 'SR5.Skill.Pistols',
         throwing_weapons: 'SR5.Skill.ThrowingWeapons',
         unarmed_combat: 'SR5.Skill.UnarmedCombat',
+
+        // Physical Skills
         disguise: 'SR5.Skill.Disguise',
         diving: 'SR5.Skill.Diving',
         escape_artist: 'SR5.Skill.EscapeArtist',
+        flight: 'SR5.Skill.Flight',
         free_fall: 'SR5.Skill.FreeFall',
         gymnastics: 'SR5.Skill.Gymnastics',
         palming: 'SR5.Skill.Palming',
@@ -551,6 +555,8 @@ export const SR5 = {
         survival: 'SR5.Skill.Survival',
         swimming: 'SR5.Skill.Swimming',
         tracking: 'SR5.Skill.Tracking',
+
+        // Social Skills
         con: 'SR5.Skill.Con',
         etiquette: 'SR5.Skill.Etiquette',
         impersonation: 'SR5.Skill.Impersonation',
@@ -559,6 +565,8 @@ export const SR5 = {
         leadership: 'SR5.Skill.Leadership',
         negotiation: 'SR5.Skill.Negotiation',
         performance: 'SR5.Skill.Performance',
+
+        // Magic Skills
         alchemy: 'SR5.Skill.Alchemy',
         arcana: 'SR5.Skill.Arcana',
         artificing: 'SR5.Skill.Artificing',
@@ -571,9 +579,13 @@ export const SR5 = {
         ritual_spellcasting: 'SR5.Skill.RitualSpellcasting',
         spellcasting: 'SR5.Skill.Spellcasting',
         summoning: 'SR5.Skill.Summoning',
+
+        // Resonance Skills
         compiling: 'SR5.Skill.Compiling',
         decompiling: 'SR5.Skill.Decompiling',
         registering: 'SR5.Skill.Registering',
+
+        // Technical Skills
         aeronautics_mechanic: 'SR5.Skill.AeronauticsMechanic',
         automotive_mechanic: 'SR5.Skill.AutomotiveMechanic',
         industrial_mechanic: 'SR5.Skill.IndustrialMechanic',
@@ -596,14 +608,15 @@ export const SR5 = {
         medicine: 'SR5.Skill.Medicine',
         navigation: 'SR5.Skill.Navigation',
         software: 'SR5.Skill.Software',
+
+        // Vehicle Skills
         gunnery: 'SR5.Skill.Gunnery',
         pilot_aerospace: 'SR5.Skill.PilotAerospace',
         pilot_aircraft: 'SR5.Skill.PilotAircraft',
         pilot_walker: 'SR5.Skill.PilotWalker',
         pilot_ground_craft: 'SR5.Skill.PilotGroundCraft',
-        pilot_water_craft: 'SR5.Skill.PilotWaterCraft',
+        pilot_watercraft: 'SR5.Skill.PilotWatercraft',
         pilot_exotic_vehicle: 'SR5.Skill.PilotExoticVehicle',
-        flight: 'SR5.Skill.Flight'
     },
 
     /**
@@ -707,7 +720,7 @@ export const SR5 = {
         body: 'SR5.Vehicle.ModificationCategoryTypes.body',
         cosmetic: 'SR5.Vehicle.ModificationCategoryTypes.cosmetic',
         electromagnetic: 'SR5.Vehicle.ModificationCategoryTypes.electromagnetic',
-        power_train: 'SR5.Vehicle.ModificationCategoryTypes.power_train',
+        powertrain: 'SR5.Vehicle.ModificationCategoryTypes.powertrain',
         protection: 'SR5.Vehicle.ModificationCategoryTypes.protection',
         weapons: 'SR5.Vehicle.ModificationCategoryTypes.weapons',
     },
@@ -871,12 +884,12 @@ export const SR5 = {
         watcher: 'SR5.Spirit.Types.Watcher',
 
         // toxic types
-        toxic_air: 'SR5.Spirit.Types.ToxicAir',
-        toxic_beasts: 'SR5.Spirit.Types.ToxicBeasts',
-        toxic_earth: 'SR5.Spirit.Types.ToxicEarth',
-        toxic_fire: 'SR5.Spirit.Types.ToxicFire',
-        toxic_man: 'SR5.Spirit.Types.ToxicMan',
-        toxic_water: 'SR5.Spirit.Types.ToxicWater',
+        abomination: 'SR5.Spirit.Types.Abomination',
+        barren: 'SR5.Spirit.Types.Barren',
+        noxious: 'SR5.Spirit.Types.Noxious',
+        nuclear: 'SR5.Spirit.Types.Nuclear',
+        plague: 'SR5.Spirit.Types.Plague',
+        sludge: 'SR5.Spirit.Types.Sludge',
 
         // blood types
         blood: 'SR5.Spirit.Types.Blood',

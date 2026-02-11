@@ -79,8 +79,9 @@ export interface Gear {
         userange?: { _TEXT: "Holdouts" | "Light Pistols"; };
     };
     weight?: { _TEXT: IntegerString | "Rating"; };
-    translate?: { _TEXT: string; };
-    altpage?: { _TEXT: string; };
+    translate?: OneOrMany<{ _TEXT: string; }>;
+    altpage?: OneOrMany<{ _TEXT: string; }>;
+    altnameonpage?: OneOrMany<Empty>;
 };
 
 export interface GearSchema {

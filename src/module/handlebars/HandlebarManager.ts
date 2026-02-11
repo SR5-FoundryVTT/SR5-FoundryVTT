@@ -8,6 +8,7 @@ import { registerBasicHelpers } from "./BasicHelpers";
 import { registerActorHelpers } from './ActorHelpers';
 import { registerModifierHelpers } from './ModifierHelpers';
 import { registerLocalizationHelpers } from './LocalizationHelpers';
+import { registerItemHeaderHelpers } from './ItemHeaderHelpers';
 
 export class HandlebarManager {
     static async loadTemplates() {
@@ -17,6 +18,7 @@ export class HandlebarManager {
         registerBasicHelpers();
         registerRollAndLabelHelpers();
         registerItemLineHelpers();
+        registerItemHeaderHelpers();
         registerSkillLineHelpers();
         registerAppHelpers();
         registerActorHelpers();

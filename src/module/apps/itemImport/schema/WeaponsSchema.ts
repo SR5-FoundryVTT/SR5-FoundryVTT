@@ -46,8 +46,9 @@ export interface Accessory {
     required?: ConditionsSchema;
     source?: { _TEXT: IntegerString | "BTB" | "CF" | "GH3" | "HT" | "KK" | "RG" | "SAG" | "SL" | "SLG2" | "SOTG" | "SR5"; };
     specialmodification?: { _TEXT: "True"; };
-    translate?: { _TEXT: string; };
-    altpage?: { _TEXT: string; };
+    translate?: OneOrMany<{ _TEXT: string; }>;
+    altpage?: OneOrMany<{ _TEXT: string; }>;
+    altnameonpage?: OneOrMany<Empty>;
 };
 
 export interface Weapon {
@@ -118,8 +119,9 @@ export interface Weapon {
     wirelessweaponbonus?: {
         accuracy: { _TEXT: IntegerString; };
     };
-    translate?: { _TEXT: string; };
-    altpage?: { _TEXT: string; };
+    translate?: OneOrMany<{ _TEXT: string; }>;
+    altpage?: OneOrMany<{ _TEXT: string; }>;
+    altnameonpage?: OneOrMany<Empty>;
 };
 
 export interface WeaponsSchema {

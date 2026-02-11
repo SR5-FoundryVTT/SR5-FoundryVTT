@@ -7,6 +7,8 @@ import { MatrixTestDataFlow } from './flows/MatrixTestDataFlow';
 export interface MatrixTestData extends SuccessTestData {
     // If decker and target reside on different Grids
     sameGrid: boolean
+    // Disallow changing of the sameGrid checkbox in the dialog. Used when targeting defines this values.
+    sameGridDisabled: boolean
     // If decker has a direct connection to the target
     directConnection: boolean
     // The persona uuid. This would be the user main persona icon, not necessarily the device.
@@ -78,13 +80,16 @@ export class MatrixTest<T extends MatrixTestData = MatrixTestData> extends Succe
     }
 
     override prepareBaseValues() {
+        // Order of operations is important, as some modifiers need these test
+        MatrixTestDataFlow.prepareTestValues(this);
+
         super.prepareBaseValues();
-        MatrixTestDataFlow.prepareBaseValues(this);
     }
 
     override async populateDocuments() {
-        await super.populateDocuments();
+        // Order of operation might be important to allow matrix flows to insert targets before those are populated.
         MatrixTestDataFlow.populateDocuments(this);
+        await super.populateDocuments();
     }
 
     override prepareTestModifiers() {
