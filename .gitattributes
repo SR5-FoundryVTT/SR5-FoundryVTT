@@ -1,2 +1,5 @@
+# Normalize all text files to LF in repo
+* text=auto eol=lf
+
 # FoundryVTT packs are binary data and should be treated as such within git.
 packs/*/* binary

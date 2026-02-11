@@ -2,6 +2,7 @@ node_modules
 .github
 dist
 packs
-public
+public/assets
+public/icons
 gulp.tasks.js
 gulpfile.js

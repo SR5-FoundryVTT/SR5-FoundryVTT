@@ -22,6 +22,7 @@
         "gulp": "^5.0.1",
         "gulp-sass": "^6.0.1",
         "jszip": "^3.10.1",
+        "prettier": "^3.6.2",
         "sass": "^1.97.3",
         "stream": "^0.0.3",
         "timers": "^0.1.1",
@@ -42,6 +43,6 @@
         "lint:fix": "npx eslint . --fix",
         "lint:errors": "npx eslint . --quiet",
         "lint:errors:fix": "npx eslint . --quiet --fix",
-        "prettier": "npx prettier --write **/*.ts"
+        "format:all": "npx prettier --write \"**/*.{ts,js,mjs,cjs,json,scss,css,yml,md}\" --ignore-path .prettierignore"
     }
 }
