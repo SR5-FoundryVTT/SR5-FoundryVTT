@@ -40,6 +40,6 @@
         "lint:fix": "npx eslint . --fix",
         "lint:errors": "npx eslint . --quiet",
         "lint:errors:fix": "npx eslint . --quiet --fix",
-        "prettier": "npx prettier --write \"**/*.{ts,js,mjs,cjs,json,scss,css,yml,md}\" --ignore-path .prettierignore"
+        "format:all": "npx prettier --write \"**/*.{ts,js,mjs,cjs,json,scss,css,yml,md}\" --ignore-path .prettierignore"
     }
 }
