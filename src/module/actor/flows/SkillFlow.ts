@@ -30,6 +30,7 @@ export interface Skills {
  */
 // TODO: tamif - refactor into object style
 export class SkillFlow {
+
     static isCustomSkill(skill: SkillFieldType): boolean {
         return skill.name !== undefined && skill.name !== '';
     }
@@ -64,7 +65,7 @@ export class SkillFlow {
             // Name is user input but used for json storage here. It should match
             // overall naming scheme.
             const key = SkillFlow.nameToKey(item.name) || item.id!;
-            
+
             const skill = DataDefaults.createData("skill_field", {
                 id: item.id,
                 name: item.name,
@@ -76,13 +77,13 @@ export class SkillFlow {
                 canDefault: item.system.skill.defaulting,
             });
 
-            switch(item.system.skill.category) {
+            switch (item.system.skill.category) {
                 case 'active':
                     SkillFlow.addSkill(skills.active, skill, key);
                     break;
                 case 'language':
                     SkillFlow.addSkill(skills.language, skill, key);
-                
+
                     break;
                 case 'knowledge':
                     const knowledgeType = item.system.skill.knowledgeType as KnowledgeSkillCategory;
@@ -90,7 +91,7 @@ export class SkillFlow {
                     break;
             }
         }
-        
+
         // TODO: tamif - implement sorting again
 
         return skills;
@@ -182,7 +183,22 @@ export class SkillFlow {
         if (!skill.isType('skill')) return;
 
         const specializations = skill.system.skill.specializations;
-        specializations.push(specialization);
-        await skill.update({system: {skill: {specializations: specializations }}});
+        specializations.push({ name: specialization });
+        await skill.update({ system: { skill: { specializations } } });
+    }
+
+    /**
+     * Remove a specialization from the given skill.
+     * @param skill A skill item to remove the specialization from.
+     * @param index The specialization index to remove.
+     */
+    static async removeSpecialization(skill: SR5Item<'skill'>, index: number) {
+        if (!skill.isType('skill')) return;
+
+        const specializations = skill.system.skill.specializations;
+        if (index < 0 || index >= specializations.length) return;
+
+        specializations.splice(index, 1);
+        await skill.update({ system: { skill: { specializations } } });
     }
 }

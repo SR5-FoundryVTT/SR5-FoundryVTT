@@ -18,16 +18,17 @@ interface SR5SkillSheetData extends SR5BaseItemSheetData {
  * - skill groups
  * - skill sets
  */
-export class SR5SkillSheet<T extends SR5BaseItemSheetData = SR5SkillSheetData> extends SR5ApplicationMixin(ItemSheet)<T>{
+export class SR5SkillSheet<T extends SR5BaseItemSheetData = SR5SkillSheetData> extends SR5ApplicationMixin(ItemSheet)<T> {
     declare document: SR5Item<'skill'>;
-    
+
     // TODO: taMiF - any should be replaced by correct DEFAULT_OPTIONS declaration?
     //               are we using DEFAULT_OPTIONS inerhitance?
     static override DEFAULT_OPTIONS = {
         // TODO: tamIf - What is the point of these classes?
         classes: ['item', 'named-sheet'],
         actions: {
-            addSpecialization: this.#addSpecialization
+            addSpecialization: this.#addSpecialization,
+            removeSpecialization: this.#removeSpecialization
         }
     }
 
@@ -82,5 +83,17 @@ export class SR5SkillSheet<T extends SR5BaseItemSheetData = SR5SkillSheetData> e
      */
     static async #addSpecialization(this: SR5SkillSheet) {
         await SkillFlow.addSpecialization(this.document);
+    }
+
+    /**
+     * Remove an entry from the skill specializations array.
+     * @param this
+     * @param event
+     */
+    static async #removeSpecialization(this: SR5SkillSheet, event: Event) {
+        event.preventDefault();
+        const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
+        if (index === -1) return;
+        await SkillFlow.removeSpecialization(this.document, index);
     }
 };

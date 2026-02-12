@@ -6,6 +6,10 @@ const SkillLanguageData = () => ({
     isNative: new BooleanField({ required: true, initial: false }),
 });
 
+const SkillSpecializationData = () => ({
+    name: new StringField({ required: true, initial: '', blank: true }),
+});
+
 const SkillTypeData = () => ({ 
     // TODO: taMiF - Use 'type' as in SR5#128 instead of category. better differentiate between system.type and system.skill.type
     category: new StringField({ required: true, initial: 'active', choices: SR5.skillCategories }),
@@ -13,8 +17,8 @@ const SkillTypeData = () => ({
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     defaulting: new BooleanField({ required: true, nullable: false, initial: false }),
     attribute: new StringField({ required: true, blank: true, choices: SR5.attributes }),
-    // Will contain custom specialization names.
-    specializations: new ArrayField(new StringField({ required: true })),
+    // Will contain custom specialization entries.
+    specializations: new ArrayField(new SchemaField(SkillSpecializationData())),
 
     language: new SchemaField(SkillLanguageData()),
 });

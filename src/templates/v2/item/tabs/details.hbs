@@ -802,27 +802,39 @@
                                         disabled=@root.isPlayMode }}
                         </div>
                     </div>
-                    <div class="list-item">
-                        <div class="list-item-start skinny">
-                            <label data-tooltip="{{systemFields.skill.fields.specializations.hints}}">{{systemFields.skill.fields.specializations.label}}</label>
+                    <div class="list-item list-item-header">
+                        <div class="list-item-start">
+                            <label>{{systemFields.skill.fields.specializations.label}}</label>
                         </div>
-                        <div class="list-item-col">
-                            <header>
-                                <div class="key">{{systemFields.skill.fields.specializations.label}}</div>
-                                <div class="controls"><a data-action="addSpecialization"><i class="fa-regular fa-square-plus"></i></a></div>
-                            </header>
-                            <ol class="scrollable">
-                                {{#each system.skill.specializations as |specialization i|}}
-                                    {{log systemFields.skill.fields.specializations }}
-                                        <li data-index="{{i}}">
-                                            <div class="">
-                                                {{formInput systemFields.skill.fields.specializations name=(concat "system.skill.specializations." i) value=specialization}}
-                                            </div>
-                                        </li>
-                                {{/each}}
-                            </ol>
+                        <div class="list-item-icons">
+                            <label>{{localize "SR5.Actions"}}</label>
+                            {{#if @root.isEditMode}}
+                                <a data-action="addSpecialization" data-tooltip="SR5.Add">
+                                    <i class="fas fa-plus"></i>
+                                </a>
+                            {{/if}}
                         </div>
                     </div>
+                    {{#each system.skill.specializations as |specialization i|}}
+                        {{#with @root.systemFields.skill.fields.specializations.element.fields as |specializationFields|}}
+                            <div class="list-item" data-index="{{i}}">
+                                <div class="list-item-col select-col">
+                                    {{formInput specializationFields.name
+                                                name=(concat "system.skill.specializations." i ".name")
+                                                value=specialization.name
+                                                classes="short" rootId=@root.rootId
+                                                disabled=@root.isPlayMode}}
+                                </div>
+                                {{#if @root.isEditMode}}
+                                    <div class="list-item-icons">
+                                        <a data-action="removeSpecialization" data-index="{{i}}" data-tooltip="SR5.Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                {{/if}}
+                            </div>
+                        {{/with}}
+                    {{/each}}
                 </div>                    
                 {{!-- SKILL GROUP TYPE --}}
                 {{else if (eq system.type 'group')}}
