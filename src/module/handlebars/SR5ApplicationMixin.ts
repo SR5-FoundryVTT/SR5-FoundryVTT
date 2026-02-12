@@ -207,6 +207,17 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
         }
 
         /**
+         * Help enriching editor field values to HTML used to display editor values as read-only HTML in sheets.
+         *
+         * @param editorValue A editor field value like Item.system.description.value
+         * @param options TextEditor, enrichHTML.options passed through
+         * @returns Enriched HTML result
+         */
+        async enrichEditorFieldToHTML(editorValue: string, options?: TextEditor.EnrichmentOptions): Promise<string> {
+            return foundry.applications.ux.TextEditor.implementation.enrichHTML(editorValue, options);
+        }
+
+        /**
          * Show / hide the items description within a sheet item list.
          */
         static async #toggleListItemDescription(this: SR5ApplicationMixin, event: PointerEvent) {
@@ -295,7 +306,7 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
 
             if (this.editIcon && this.wrenchIcon) {
                 this.editIcon.className = this.isEditMode ? 'fas fa-toggle-large-off fa-stack-2x'
-                                                            : 'fas fa-toggle-large-on fa-stack-2x';
+                    : 'fas fa-toggle-large-on fa-stack-2x';
                 this.wrenchIcon.style.visibility = this.isEditMode ? 'hidden' : 'visible';
             }
         }
@@ -312,7 +323,7 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
                 this.editIcon = document.createElement('i');
                 button.appendChild(this.editIcon);
                 this.editIcon.className = this.isEditMode ? 'fas fa-toggle-large-off fa-stack-2x'
-                                                            : 'fas fa-toggle-large-on fa-stack-2x';
+                    : 'fas fa-toggle-large-on fa-stack-2x';
 
                 this.wrenchIcon = document.createElement('i');
                 button.appendChild(this.wrenchIcon);

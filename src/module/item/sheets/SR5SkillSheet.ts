@@ -26,6 +26,10 @@ export class SR5SkillSheet<T extends SR5BaseItemSheetData = SR5SkillSheetData> e
     static override DEFAULT_OPTIONS = {
         // TODO: tamIf - What is the point of these classes?
         classes: ['item', 'named-sheet'],
+        position: {
+            width: 600,
+            height: 500,
+        },
         actions: {
             addSpecialization: this.#addSpecialization,
             removeSpecialization: this.#removeSpecialization
@@ -70,6 +74,9 @@ export class SR5SkillSheet<T extends SR5BaseItemSheetData = SR5SkillSheetData> e
         const context = await super._prepareContext(options) as T;
         // TODO: this can be abstracted into a base item base sheet or better yet to context.document
         context.item = this.document;
+
+        if (this.item.system.description)
+            context.descriptionHTML = await this.enrichEditorFieldToHTML(this.item.system.description.value);
 
         // TODO: Implement a SR5baseItemSheet to share stuff between SR5ItemSheet and more type specific sheets
         context.primaryTabs = this._prepareTabs('primary');

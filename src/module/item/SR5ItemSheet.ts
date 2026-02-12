@@ -353,7 +353,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                     //@ts-expect-error fvtt-types doesn't know about non-required field.
                     action.limit = undefined;
                 if (action.damage) {
-                    if (action.damage.mod.length === 0) 
+                    if (action.damage.mod.length === 0)
                         //@ts-expect-error fvtt-types doesn't know about non-required field.
                         action.damage.mod = undefined;
                     if (action.damage.ap.mod.length === 0)
@@ -444,7 +444,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         data.sourceIsURL = this.item.sourceIsUrl;
         data.sourceIsPDF = this.item.sourceIsPDF;
         data.sourceIsUuid = this.item.sourceIsUuid
-        
+
         data.isUsingRangeCategory = false;
         if (this.item.isType('weapon')) {
             if (this.item.isRangedWeapon()) {
@@ -464,17 +464,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         data.bindings = this._prepareKeybindings();
 
         return data;
-    }
-
-    /**
-     * Help enriching editor field values to HTML used to display editor values as read-only HTML in sheets.
-     *
-     * @param editorValue A editor field value like Item.system.description.value
-     * @param options TextEditor, enrichHTML.options passed through
-     * @returns Enriched HTML result
-     */
-    async enrichEditorFieldToHTML(editorValue: string, options?: TextEditor.EnrichmentOptions): Promise<string> {
-        return foundry.applications.ux.TextEditor.implementation.enrichHTML(editorValue, options);
     }
 
     /**
@@ -721,7 +710,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     static async #resetSpareReloads(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         const spareClips = this.item.system.ammo?.spare_clips.max ?? 0;
-        await this.item.update({ system: { ammo: { spare_clips: { value: spareClips }}}});
+        await this.item.update({ system: { ammo: { spare_clips: { value: spareClips } } } });
     }
 
     _onAmmoSelect(event: Event) {
@@ -851,7 +840,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     static async #removeLinkedActor(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
 
-        await this.item.update({ system: { linkedActor: '' }});
+        await this.item.update({ system: { linkedActor: '' } });
     }
 
     /**
@@ -881,9 +870,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         } else {
             const equipped = this.item.isEquipped();
             if (this.item.isType('critter_power', 'sprite_power')) {
-                await this.item.update({system: { optional : equipped ? 'disabled_option' : 'enabled_option'}});
+                await this.item.update({ system: { optional: equipped ? 'disabled_option' : 'enabled_option' } });
             } else {
-                await this.item.update({system: { technology: { equipped: !equipped }}});
+                await this.item.update({ system: { technology: { equipped: !equipped } } });
             }
         }
     }
@@ -1067,28 +1056,28 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     static async #toggleActionSpecialization(this: SR5ItemSheet) {
         const action = this.item.getAction();
         if (action) {
-            await this.item.update({system: { action: { spec: !action.spec }}});
+            await this.item.update({ system: { action: { spec: !action.spec } } });
         }
     }
 
     static async #toggleActionArmor(this: SR5ItemSheet) {
         const action = this.item.getAction();
         if (action) {
-            await this.item.update({system: { action: { armor: !action.armor }}});
+            await this.item.update({ system: { action: { armor: !action.armor } } });
         }
     }
 
     static async #toggleOpposedArmor(this: SR5ItemSheet) {
         const action = this.item.getAction();
         if (action) {
-            await this.item.update({system: { action: { opposed: { armor: !action.opposed.armor }}}});
+            await this.item.update({ system: { action: { opposed: { armor: !action.opposed.armor } } } });
         }
     }
 
     static async #toggleResistArmor(this: SR5ItemSheet) {
         const action = this.item.getAction();
         if (action) {
-            await this.item.update({system: { action: { opposed: { resist: { armor: !action.opposed.resist.armor }}}}});
+            await this.item.update({ system: { action: { opposed: { resist: { armor: !action.opposed.resist.armor } } } } });
         }
     }
 
@@ -1136,7 +1125,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @param {DragEvent} event       The originating DragEvent
      * @protected
      */
-    protected _onDragOver(event: DragEvent) {}
+    protected _onDragOver(event: DragEvent) { }
 
     /* -------------------------------------------- */
 
@@ -1199,9 +1188,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @protected
      */
     async _onDropActiveEffect(event, effect) {
-        if ( !this.item.isOwner ) return null;
+        if (!this.item.isOwner) return null;
         const keepId = !this.item.effects.has(effect.id);
-        const result = await SR5ActiveEffect.create(effect.toObject(), {parent: this.item, keepId});
+        const result = await SR5ActiveEffect.create(effect.toObject(), { parent: this.item, keepId });
         return result ?? null;
     }
 

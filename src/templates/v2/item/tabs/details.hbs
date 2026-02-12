@@ -793,15 +793,69 @@
                 <div class="scrollable">
                     <div class="list-item">
                         <div class="list-item-start skinny">
-                            <label data-tooltip="{{systemFields.skill.fields.rating.hints}}">{{systemFields.skill.fields.rating.label}}</label>
+                            <label data-tooltip="{{systemFields.skill.fields.category.hint}}">{{systemFields.skill.fields.category.label}}</label>
+                        </div>
+                        <div class="list-item-col">
+                            {{formInput systemFields.skill.fields.category
+                                        value=system.skill.category localize=true
+                                        classes="short" rootId=@root.rootId
+                                        disabled=@root.isPlayMode }}
+                        </div>
+                    </div>
+                    {{#if (and (eq system.skill.category "knowledge") systemFields.skill.fields.knowledgeType)}}
+                        <div class="list-item">
+                            <div class="list-item-start skinny">
+                                <label data-tooltip="{{systemFields.skill.fields.knowledgeType.hint}}">{{systemFields.skill.fields.knowledgeType.label}}</label>
+                            </div>
+                            <div class="list-item-col">
+                                {{formInput systemFields.skill.fields.knowledgeType
+                                            value=system.skill.knowledgeType localize=true
+                                            classes="short" rootId=@root.rootId
+                                            disabled=@root.isPlayMode }}
+                            </div>
+                        </div>
+                    {{/if}}
+                    <div class="list-item">
+                        <div class="list-item-start skinny">
+                            <label data-tooltip="{{systemFields.skill.fields.attribute.hint}}">{{systemFields.skill.fields.attribute.label}}</label>
+                        </div>
+                        <div class="list-item-col">
+                            {{formInput systemFields.skill.fields.attribute
+                                            value=system.skill.attribute options=(config2Array config.attributes) localize=true
+                                        classes="short" rootId=@root.rootId
+                                        disabled=@root.isPlayMode }}
+                        </div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-start skinny">
+                                <label data-tooltip="{{systemFields.skill.fields.rating.hint}}">{{systemFields.skill.fields.rating.label}}</label>
                         </div>
                         <div class="list-item-col">
                             {{formInput systemFields.skill.fields.rating
                                         value=system.skill.rating
                                         classes="short" rootId=@root.rootId
                                         disabled=@root.isPlayMode }}
+                            <label style="margin-left: auto; text-wrap: nowrap" data-tooltip="{{systemFields.skill.fields.defaulting.hint}}">
+                                {{systemFields.skill.fields.defaulting.label}}&nbsp;
+                                {{formInput systemFields.skill.fields.defaulting value=system.skill.defaulting
+                                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                            </label>
                         </div>
                     </div>
+                    {{#if (and (eq system.skill.category "language") systemFields.skill.fields.language)}}
+                        <div class="list-item">
+                            <div class="list-item-start skinny">
+                                <label data-tooltip="{{systemFields.skill.fields.language.fields.isNative.hint}}">
+                                    {{systemFields.skill.fields.language.fields.isNative.label}}
+                                </label>
+                            </div>
+                            <div class="list-item-col">
+                                {{formInput systemFields.skill.fields.language.fields.isNative
+                                            value=system.skill.language.isNative
+                                            rootId=@root.rootId disabled=@root.isPlayMode}}
+                            </div>
+                        </div>
+                    {{/if}}
                     <div class="list-item list-item-header">
                         <div class="list-item-start">
                             <label>{{systemFields.skill.fields.specializations.label}}</label>

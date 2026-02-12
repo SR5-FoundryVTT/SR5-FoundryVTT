@@ -2129,13 +2129,35 @@
                     "hint": "Defines what kind of skill configurations are available"
                 },
                 "skill": {
+                    "category": {
+                        "label": "Category",
+                        "hint": "Category of this skill"
+                    },
+                    "knowledgeType": {
+                        "label": "Knowledge Type",
+                        "hint": "Type of knowledge skill"
+                    },
                     "rating": {
                         "label": "Rating",
                         "hint": "Rating of this entry"
                     },
+                    "defaulting": {
+                        "label": "Defaulting",
+                        "hint": "If this skill can be defaulted"
+                    },
+                    "attribute": {
+                        "label": "Attribute",
+                        "hint": "Attribute used by this skill"
+                    },
                     "specializations": {
                         "label": "Specialization",
                         "hint": "Specialization for this skill, if any"
+                    },
+                    "language": {
+                        "isNative": {
+                            "label": "Native",
+                            "hint": "Marks this language as native"
+                        }
                     }
                 }
             },
