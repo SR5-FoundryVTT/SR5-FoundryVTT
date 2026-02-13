@@ -10,7 +10,7 @@ const SkillSpecializationData = () => ({
     name: new StringField({ required: true, initial: '', blank: true }),
 });
 
-const SkillTypeData = () => ({ 
+const SkillTypeData = () => ({
     // TODO: taMiF - Use 'type' as in SR5#128 instead of category. better differentiate between system.type and system.skill.type
     category: new StringField({ required: true, initial: 'active', choices: SR5.skillCategories }),
     knowledgeType: new StringField({ required: false, nullable: true, choices: SR5.skillKnowledgeTypes }),
@@ -26,6 +26,7 @@ const SkillTypeData = () => ({
 const SkillGroupTypeData = () => ({
     // will contain skill names.
     skills: new ArrayField(new StringField({ required: true })),
+    rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
 });
 
 const SkillSetSkillData = () => ({
@@ -45,7 +46,7 @@ const SkillData = () => ({
 
     // fields shared across all skill types.
     type: new StringField({ required: true, initial: 'skill', choices: SR5.skillTypes }),
-    
+
     // data depending on skill type.
     skill: new SchemaField(SkillTypeData()),
     group: new SchemaField(SkillGroupTypeData()),

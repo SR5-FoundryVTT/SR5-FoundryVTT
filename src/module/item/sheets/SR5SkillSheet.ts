@@ -32,7 +32,13 @@ export class SR5SkillSheet<T extends SR5BaseItemSheetData = SR5SkillSheetData> e
         },
         actions: {
             addSpecialization: this.#addSpecialization,
-            removeSpecialization: this.#removeSpecialization
+            removeSpecialization: this.#removeSpecialization,
+            addGroupSkill: this.#addGroupSkill,
+            removeGroupSkill: this.#removeGroupSkill,
+            addSetSkill: this.#addSetSkill,
+            removeSetSkill: this.#removeSetSkill,
+            addSetGroup: this.#addSetGroup,
+            removeSetGroup: this.#removeSetGroup
         }
     }
 
@@ -102,5 +108,56 @@ export class SR5SkillSheet<T extends SR5BaseItemSheetData = SR5SkillSheetData> e
         const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
         if (index === -1) return;
         await SkillFlow.removeSpecialization(this.document, index);
+    }
+
+    /**
+     * Add a new skill entry to the skill group.
+     */
+    static async #addGroupSkill(this: SR5SkillSheet) {
+        await SkillFlow.addGroupSkill(this.document);
+    }
+
+    /**
+     * Remove a skill entry from the skill group.
+     */
+    static async #removeGroupSkill(this: SR5SkillSheet, event: Event) {
+        event.preventDefault();
+        const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
+        if (index === -1) return;
+        await SkillFlow.removeGroupSkill(this.document, index);
+    }
+
+    /**
+     * Add a new skill entry to the skill set.
+     */
+    static async #addSetSkill(this: SR5SkillSheet) {
+        await SkillFlow.addSetSkill(this.document);
+    }
+
+    /**
+     * Remove a skill entry from the skill set.
+     */
+    static async #removeSetSkill(this: SR5SkillSheet, event: Event) {
+        event.preventDefault();
+        const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
+        if (index === -1) return;
+        await SkillFlow.removeSetSkill(this.document, index);
+    }
+
+    /**
+     * Add a new group entry to the skill set.
+     */
+    static async #addSetGroup(this: SR5SkillSheet) {
+        await SkillFlow.addSetGroup(this.document);
+    }
+
+    /**
+     * Remove a group entry from the skill set.
+     */
+    static async #removeSetGroup(this: SR5SkillSheet, event: Event) {
+        event.preventDefault();
+        const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
+        if (index === -1) return;
+        await SkillFlow.removeSetGroup(this.document, index);
     }
 };

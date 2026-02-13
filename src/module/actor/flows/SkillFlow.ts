@@ -201,4 +201,88 @@ export class SkillFlow {
         specializations.splice(index, 1);
         await skill.update({ system: { skill: { specializations } } });
     }
+
+    /**
+     * Add a new skill entry to the skill group.
+     * @param skill A skill item of type 'group'.
+     * @param name The skill name to add.
+     */
+    static async addGroupSkill(skill: SR5Item<'skill'>, name = '') {
+        if (!skill.isType('skill')) return;
+
+        const skills = skill.system.group.skills;
+        skills.push(name);
+        await skill.update({ system: { group: { skills } } });
+    }
+
+    /**
+     * Remove a skill entry from the skill group.
+     * @param skill A skill item of type 'group'.
+     * @param index The index of the skill to remove.
+     */
+    static async removeGroupSkill(skill: SR5Item<'skill'>, index: number) {
+        if (!skill.isType('skill')) return;
+
+        const skills = skill.system.group.skills;
+        if (index < 0 || index >= skills.length) return;
+
+        skills.splice(index, 1);
+        await skill.update({ system: { group: { skills } } });
+    }
+
+    /**
+     * Add a new skill entry to the skill set.
+     * @param skill A skill item of type 'set'.
+     * @param name The skill name to add.
+     */
+    static async addSetSkill(skill: SR5Item<'skill'>, name = '') {
+        if (!skill.isType('skill')) return;
+
+        const skills = skill.system.set.skills;
+        skills.push({ name, rating: 0 });
+        await skill.update({ system: { set: { skills } } });
+    }
+
+    /**
+     * Remove a skill entry from the skill set.
+     * @param skill A skill item of type 'set'.
+     * @param index The index of the skill to remove.
+     */
+    static async removeSetSkill(skill: SR5Item<'skill'>, index: number) {
+        if (!skill.isType('skill')) return;
+
+        const skills = skill.system.set.skills;
+        if (index < 0 || index >= skills.length) return;
+
+        skills.splice(index, 1);
+        await skill.update({ system: { set: { skills } } });
+    }
+
+    /**
+     * Add a new group entry to the skill set.
+     * @param skill A skill item of type 'set'.
+     * @param name The group name to add.
+     */
+    static async addSetGroup(skill: SR5Item<'skill'>, name = '') {
+        if (!skill.isType('skill')) return;
+
+        const groups = skill.system.set.groups;
+        groups.push({ name, rating: 0 });
+        await skill.update({ system: { set: { groups } } });
+    }
+
+    /**
+     * Remove a group entry from the skill set.
+     * @param skill A skill item of type 'set'.
+     * @param index The index of the group to remove.
+     */
+    static async removeSetGroup(skill: SR5Item<'skill'>, index: number) {
+        if (!skill.isType('skill')) return;
+
+        const groups = skill.system.set.groups;
+        if (index < 0 || index >= groups.length) return;
+
+        groups.splice(index, 1);
+        await skill.update({ system: { set: { groups } } });
+    }
 }
