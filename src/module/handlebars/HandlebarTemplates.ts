@@ -7,7 +7,7 @@ export const preloadHandlebarsTemplates = async () => {
     }
 
     const templateListItem = (...parts: string[]) => {
-        return parts.reduce<string[]>(( items, p) => {
+        return parts.reduce<string[]>((items, p) => {
             items.push(templateBase(`list-items/${p}/header`));
             items.push(templateBase(`list-items/${p}/item`));
             return items;
@@ -27,6 +27,7 @@ export const preloadHandlebarsTemplates = async () => {
             'common/document-source-icon',
             'common/horizontal-cells',
             'common/import-flag',
+            'item/tabs/details/skill',
             'list-items/connect-network-icon',
             'list-items/connected-icons-toggle',
             'list-items/edit-delete-icons',

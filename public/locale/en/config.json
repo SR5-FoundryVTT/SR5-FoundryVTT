@@ -2206,6 +2206,17 @@
                 "Group": "Skill Group",
                 "Set": "Skill Set"
             },
+            "Category": {
+                "Active": "Active",
+                "Knowledge": "Knowledge",
+                "Language": "Language"
+            },
+            "KnowledgeType": {
+                "Academic": "Academic",
+                "Professional": "Professional",
+                "Interests": "Interests",
+                "Street": "Street"
+            },
             "abbr": {
                 "Native": "N"
             },

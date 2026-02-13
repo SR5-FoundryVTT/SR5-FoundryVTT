@@ -1,0 +1,281 @@
+{{!-- Skill item type details section --}}
+    <div class="list-item list-item-header">
+        <div class="list-item-start">
+            <label>{{localize "SR5.General"}}</label>
+        </div>
+    </div>
+    <div class="list-item">
+        <div class="list-item-start skinny">
+            <label data-tooltip="{{systemFields.type.hint}}">{{systemFields.type.label}}</label>
+        </div>
+        <div class="list-item-col">
+            {{formInput systemFields.type value=system.type localize=true
+                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+        </div>
+    </div>
+
+    {{!-- SKILL TYPE --}}
+    {{#if (eq system.type 'skill')}}
+    <div class="list-item list-item-header">
+        <div class="list-item-start">
+            <label>{{localize "SR5.Skill.Types.Skill"}}</label>
+        </div>
+    </div>
+    <div class="scrollable">
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label data-tooltip="{{systemFields.skill.fields.category.hint}}">{{systemFields.skill.fields.category.label}}</label>
+            </div>
+            <div class="list-item-col">
+                {{formInput systemFields.skill.fields.category
+                            value=system.skill.category localize=true
+                            classes="short" rootId=@root.rootId
+                            disabled=@root.isPlayMode }}
+            </div>
+        </div>
+        {{#if (and (eq system.skill.category "knowledge") systemFields.skill.fields.knowledgeType)}}
+            <div class="list-item">
+                <div class="list-item-start skinny">
+                    <label data-tooltip="{{systemFields.skill.fields.knowledgeType.hint}}">{{systemFields.skill.fields.knowledgeType.label}}</label>
+                </div>
+                <div class="list-item-col">
+                    {{formInput systemFields.skill.fields.knowledgeType
+                                value=system.skill.knowledgeType localize=true
+                                classes="short" rootId=@root.rootId
+                                disabled=@root.isPlayMode }}
+                </div>
+            </div>
+        {{/if}}
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label data-tooltip="{{systemFields.skill.fields.attribute.hint}}">{{systemFields.skill.fields.attribute.label}}</label>
+            </div>
+            <div class="list-item-col">
+                {{formInput systemFields.skill.fields.attribute
+                                value=system.skill.attribute options=(config2Array config.attributes) localize=true
+                            classes="short" rootId=@root.rootId
+                            disabled=@root.isPlayMode }}
+            </div>
+        </div>
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                    <label data-tooltip="{{systemFields.skill.fields.rating.hint}}">{{systemFields.skill.fields.rating.label}}</label>
+            </div>
+            <div class="list-item-col">
+                {{formInput systemFields.skill.fields.rating
+                            value=system.skill.rating
+                            classes="short" rootId=@root.rootId
+                            disabled=@root.isPlayMode }}
+                <label style="margin-left: auto; text-wrap: nowrap" data-tooltip="{{systemFields.skill.fields.defaulting.hint}}">
+                    {{systemFields.skill.fields.defaulting.label}}&nbsp;
+                    {{formInput systemFields.skill.fields.defaulting value=system.skill.defaulting
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                </label>
+            </div>
+        </div>
+        {{#if (and (eq system.skill.category "language") systemFields.skill.fields.language)}}
+            <div class="list-item">
+                <div class="list-item-start skinny">
+                    <label data-tooltip="{{systemFields.skill.fields.language.fields.isNative.hint}}">
+                        {{systemFields.skill.fields.language.fields.isNative.label}}
+                    </label>
+                </div>
+                <div class="list-item-col">
+                    {{formInput systemFields.skill.fields.language.fields.isNative
+                                value=system.skill.language.isNative
+                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                </div>
+            </div>
+        {{/if}}
+        <div class="list-item list-item-header">
+            <div class="list-item-start">
+                <label>{{systemFields.skill.fields.specializations.label}}</label>
+            </div>
+            <div class="list-item-icons">
+                <label>{{localize "SR5.Actions"}}</label>
+                {{#if @root.isEditMode}}
+                    <a data-action="addSpecialization" data-tooltip="SR5.Add">
+                        <i class="fas fa-plus"></i>
+                    </a>
+                {{/if}}
+            </div>
+        </div>
+        {{#each system.skill.specializations as |specialization i|}}
+            {{#with @root.systemFields.skill.fields.specializations.element.fields as |specializationFields|}}
+                <div class="list-item" data-index="{{i}}">
+                    <div class="list-item-col select-col">
+                        {{formInput specializationFields.name
+                                    name=(concat "system.skill.specializations." i ".name")
+                                    value=specialization.name
+                                    classes="short" rootId=@root.rootId
+                                    disabled=@root.isPlayMode}}
+                    </div>
+                    {{#if @root.isEditMode}}
+                        <div class="list-item-icons">
+                            <a data-action="removeSpecialization" data-index="{{i}}" data-tooltip="SR5.Delete">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    {{/if}}
+                </div>
+            {{/with}}
+        {{/each}}
+    </div>
+    {{!-- SKILL GROUP TYPE --}}
+    {{else if (eq system.type 'group')}}
+    <div class="list-item list-item-header">
+        <div class="list-item-start">
+            <label>{{localize "SR5.Skill.Types.Group"}}</label>
+        </div>
+    </div>
+    <div class="scrollable">
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label data-tooltip="{{systemFields.group.fields.rating.hint}}">{{systemFields.group.fields.rating.label}}</label>
+            </div>
+            <div class="list-item-col">
+                {{formInput systemFields.group.fields.rating
+                            value=system.group.rating
+                            classes="short" rootId=@root.rootId
+                            disabled=@root.isPlayMode}}
+            </div>
+        </div>
+        <div class="list-item list-item-header">
+            <div class="list-item-start">
+                <label>{{systemFields.group.fields.skills.label}}</label>
+            </div>
+            <div class="list-item-icons">
+                <label>{{localize "SR5.Actions"}}</label>
+                {{#if @root.isEditMode}}
+                    <a data-action="addGroupSkill" data-tooltip="SR5.Add">
+                        <i class="fas fa-plus"></i>
+                    </a>
+                {{/if}}
+            </div>
+        </div>
+        {{#each system.group.skills as |skillName i|}}
+            {{#with @root.systemFields.group.fields.skills.element as |skillField|}}
+                <div class="list-item" data-index="{{i}}">
+                    <div class="list-item-col select-col">
+                        {{formInput skillField
+                                    name=(concat "system.group.skills." i)
+                                    value=skillName
+                                    classes="short" rootId=@root.rootId
+                                    disabled=@root.isPlayMode}}
+                    </div>
+                    {{#if @root.isEditMode}}
+                        <div class="list-item-icons">
+                            <a data-action="removeGroupSkill" data-index="{{i}}" data-tooltip="SR5.Delete">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    {{/if}}
+                </div>
+            {{/with}}
+        {{/each}}
+    </div>
+    {{!-- SKILL SET TYPE --}}
+    {{else if (eq system.type 'set')}}
+    <div class="list-item list-item-header">
+        <div class="list-item-start">
+            <label>{{localize "SR5.Skill.Types.Set"}}</label>
+        </div>
+    </div>
+    <div class="scrollable">
+        {{!-- Skills section --}}
+        <div class="list-item list-item-header">
+            <div class="list-item-start">
+                <label>{{systemFields.set.fields.skills.label}}</label>
+            </div>
+            <div class="list-item-icons">
+                <label>{{localize "SR5.Actions"}}</label>
+                {{#if @root.isEditMode}}
+                    <a data-action="addSetSkill" data-tooltip="SR5.Add">
+                        <i class="fas fa-plus"></i>
+                    </a>
+                {{/if}}
+            </div>
+        </div>
+        {{#each system.set.skills as |skill i|}}
+            {{#with @root.systemFields.set.fields.skills.element.fields as |skillFields|}}
+                <div class="list-item" data-index="{{i}}">
+                    <div class="list-item-start skinny">
+                        <label>{{localize "SR5.Name"}}</label>
+                    </div>
+                    <div class="list-item-col select-col">
+                        {{formInput skillFields.name
+                                    name=(concat "system.set.skills." i ".name")
+                                    value=skill.name
+                                    classes="short" rootId=@root.rootId
+                                    disabled=@root.isPlayMode}}
+                    </div>
+                    <div class="list-item-start skinny">
+                        <label>{{localize "SR5.Rating"}}</label>
+                    </div>
+                    <div class="list-item-col select-col">
+                        {{formInput skillFields.rating
+                                    name=(concat "system.set.skills." i ".rating")
+                                    value=skill.rating
+                                    classes="short" rootId=@root.rootId
+                                    disabled=@root.isPlayMode}}
+                    </div>
+                    {{#if @root.isEditMode}}
+                        <div class="list-item-icons">
+                            <a data-action="removeSetSkill" data-index="{{i}}" data-tooltip="SR5.Delete">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    {{/if}}
+                </div>
+            {{/with}}
+        {{/each}}
+
+        {{!-- Groups section --}}
+        <div class="list-item list-item-header">
+            <div class="list-item-start">
+                <label>{{systemFields.set.fields.groups.label}}</label>
+            </div>
+            <div class="list-item-icons">
+                <label>{{localize "SR5.Actions"}}</label>
+                {{#if @root.isEditMode}}
+                    <a data-action="addSetGroup" data-tooltip="SR5.Add">
+                        <i class="fas fa-plus"></i>
+                    </a>
+                {{/if}}
+            </div>
+        </div>
+        {{#each system.set.groups as |group i|}}
+            {{#with @root.systemFields.set.fields.groups.element.fields as |groupFields|}}
+                <div class="list-item" data-index="{{i}}">
+                    <div class="list-item-start skinny">
+                        <label>{{localize "SR5.Name"}}</label>
+                    </div>
+                    <div class="list-item-col select-col">
+                        {{formInput groupFields.name
+                                    name=(concat "system.set.groups." i ".name")
+                                    value=group.name
+                                    classes="short" rootId=@root.rootId
+                                    disabled=@root.isPlayMode}}
+                    </div>
+                    <div class="list-item-start skinny">
+                        <label>{{localize "SR5.Rating"}}</label>
+                    </div>
+                    <div class="list-item-col select-col">
+                        {{formInput groupFields.rating
+                                    name=(concat "system.set.groups." i ".rating")
+                                    value=group.rating
+                                    classes="short" rootId=@root.rootId
+                                    disabled=@root.isPlayMode}}
+                    </div>
+                    {{#if @root.isEditMode}}
+                        <div class="list-item-icons">
+                            <a data-action="removeSetGroup" data-index="{{i}}" data-tooltip="SR5.Delete">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    {{/if}}
+                </div>
+            {{/with}}
+        {{/each}}
+    </div>
+    {{/if}}
