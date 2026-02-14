@@ -77,6 +77,11 @@ export interface SR5ActorSheetData extends ActorSheetV2.RenderContext, SR5Applic
     config: typeof SR5CONFIG;
     system: SR5Actor['system'];
     skills: SheetSkills;
+    skillset: {
+        name: string;
+        img: string;
+        uuid: string;
+    } | null;
 
     // Sheet filters
     filters: SR5SheetFilters;
@@ -387,6 +392,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         this._prepareSkills(data);
 
+        data.skillset = await this._prepareSkillset();
+
         data.itemType = this._prepareItemTypes();
         data.effects = prepareSortedEffects(this.actor.effects.contents);
         data.itemEffects = prepareSortedItemEffects(this.actor, { applyTo: this.itemEffectApplyTos });
@@ -420,6 +427,39 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
 
         return data;
+    }
+
+    /**
+     * Prepare used skill set for this actor.
+     * @returns Necessary skill set sheet data or null, if skill set doesn't exist in pack anymore.
+     */
+    protected async _prepareSkillset() {
+        const skillsetUuid = this.actor.system.skillset;
+        if (!skillsetUuid) return null;
+
+        const skillset = await fromUuid(skillsetUuid) as SR5Item<'skill'> | null;
+        if (!skillset) return null;
+        if (skillset.type !== 'skill' && skillset.system.type !== 'set') return null;
+
+        return {
+            name: skillset.name,
+            img: skillset.img as string,
+            uuid: skillset.uuid
+        };
+    }
+
+    private _getCompendiumDocumentId(uuid: string) {
+        const parts = uuid.split('.');
+        const compendiumIndex = parts.indexOf('Compendium');
+        if (compendiumIndex === -1 || parts.length < compendiumIndex + 4) return null;
+
+        const remainder = parts.slice(compendiumIndex + 3);
+        if (remainder[0] === 'Item' || remainder[0] === 'Actor') {
+            remainder.shift();
+        }
+
+        const documentId = remainder.join('.');
+        return documentId || null;
     }
 
     override async _preparePartContext(
