@@ -157,7 +157,6 @@
             {{#with @root.systemFields.group.fields.skills.element as |skillField|}}
                 <div class="list-item" data-index="{{i}}">
                     <div class="list-item-col select-col">
-                        {{log @root}}
                         {{formInput skillField
                                     name=(concat "system.group.skills." i)
                                     value=skillName
