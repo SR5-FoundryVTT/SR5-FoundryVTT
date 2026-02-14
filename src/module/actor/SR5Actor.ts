@@ -46,7 +46,7 @@ import { ActorRollDataFlow } from './flows/ActorRollDataFlow';
 import { MatrixICFlow } from './flows/MatrixICFlow';
 import { RollDataOptions } from '../item/Types';
 import { MatrixRebootFlow } from '../flows/MatrixRebootFlow';
-import { PackActionFlow } from '../item/flows/PackActionFlow';
+import { PackItemFlow } from '../item/flows/PackItemFlow';
 import { MatrixRules } from '@/module/rules/MatrixRules';
 import { StorageFlow } from '@/module/flows/StorageFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
@@ -118,6 +118,18 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     static override migrateData(source: any) {
         Migrator.migrate("Actor", source);
         return super.migrateData(source);
+    }
+
+    /**
+     * Lifecycle hook called before an actor document is created.     
+     *
+     * @param data The initial data object provided to the document creation request
+     * @param options Additional options which modify the creation request
+     * @param user The User requesting the document creation
+     */
+    override async _preCreate(data: Actor.CreateData, options: Actor.Database.PreCreateOptions, user: User.Implementation) {
+        await super._preCreate(data, options, user);
+        await SkillFlow.addSkillItems(this, data);
     }
 
     override async update(
@@ -1098,7 +1110,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options Success Test options
      */
     async rollGeneralAction(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
-        const generalPackName = PackActionFlow.getGeneralActionsPackName();
+        const generalPackName = PackItemFlow.getGeneralActionsPackName();
         return this.rollPackAction(generalPackName, actionName, options);
     }
 

@@ -21,7 +21,7 @@ import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handleba
 import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SkillFlow, Skills } from '@/module/actor/flows/SkillFlow';
-import { PackActionFlow } from '@/module/item/flows/PackActionFlow';
+import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import ActorSheetV2 = foundry.applications.sheets.ActorSheetV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
@@ -2176,13 +2176,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     async _prepareActions() {
-        const actions = await PackActionFlow.getActorSheetActions(this.actor);
+        const actions = await PackItemFlow.getActorSheetActions(this.actor);
 
         // Prepare sorting and display of a possibly translated document name.
         const sheetActions: sheetAction[] = [];
         for (const action of actions) {
             sheetActions.push({
-                name: PackActionFlow.localizePackAction(action.name),
+                name: PackItemFlow.localizePackAction(action.name),
                 description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(action.system.description.value),
                 action
             });

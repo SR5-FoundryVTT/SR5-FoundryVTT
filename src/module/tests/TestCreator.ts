@@ -19,7 +19,7 @@ import {SkillFlow} from "../actor/flows/SkillFlow";
 import {ActionFlow} from "../item/flows/ActionFlow";
 import { ActionRollType, DamageType, MinimalActionType } from "../types/item/Action";
 import { DeepPartial } from "fvtt-types/utils";
-import { PackActionFlow } from "../item/flows/PackActionFlow";
+import { PackItemFlow } from "../item/flows/PackItemFlow";
 
 /**
  * Any test implementation can either be created by calling it's constructor directly or by using the TestCreator.
@@ -128,7 +128,7 @@ export const TestCreator = {
      * @param options General TestOptions
      */
     fromPackAction: async function(packName: string, actionName: string, document: SR5Actor | SR5Item, options: TestOptions = {}): Promise<SuccessTest|undefined> {
-        const item = await PackActionFlow.getPackAction(packName, actionName);
+        const item = await PackItemFlow.getPackAction(packName, actionName);
         if (!item) {
             console.error(`Shadowrun5 | The pack ${packName} doesn't include an item ${actionName}`);
             return;

@@ -5,11 +5,11 @@ import { SR5 } from "@/module/config";
 import { Helpers } from "@/module/helpers";
 
 /**
- * Handle interaction with the system packs containing predefined actions.
+ * Handle interaction with the system packs for predefined items.
  * 
- * This includes packs like general and matrix actions.
+ * This includes all system item packs, including actions and skills.
  */
-export const PackActionFlow = {
+export const PackItemFlow = {
     /**
      * Return the matrix action pack name to use, when the matrix actions pack is referenced.
      */
@@ -32,6 +32,14 @@ export const PackActionFlow = {
     getICActionsPackName(): Shadowrun.PackName {
         const overrideMatrixPackName = game.settings.get(SYSTEM_NAME, FLAGS.ICActionsPack) as Shadowrun.PackName;
         return overrideMatrixPackName || SR5.packNames.ICActionsPack as Shadowrun.PackName;
+    },
+
+    /**
+     * Return the skills pack name to use, when the skills pack is referenced.
+     */
+    getSkillsPackName(): Shadowrun.PackName {
+        const overrideSkillsPackName = game.settings.get(SYSTEM_NAME, FLAGS.SkillsPack) as Shadowrun.PackName;
+        return overrideSkillsPackName || SR5.packNames.SkillsPack as Shadowrun.PackName;
     },
 
     /**
@@ -193,5 +201,29 @@ export const PackActionFlow = {
      */
     localizePackAction(name: string): string {
         return Helpers.localizeName(name, 'SR5.Content.Actions');
+    },
+
+    /**
+     * Retrieve all skill items from the configured skills pack.
+     *
+     * @returns Array of skill items from the pack.
+     */
+    async getPackSkills(): Promise<SR5Item<'skill'>[]> {
+        const packName = this.getSkillsPackName();
+        console.debug(`Shadowrun 5e | Trying to fetch all skills from pack ${packName}`);
+        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as CompendiumCollection<'Item'> | undefined;
+        if (!pack) return [];
+
+        const packEntries = pack.index.filter(data => data.type === 'skill');
+
+        const documents: SR5Item<'skill'>[] = [];
+        for (const packEntry of packEntries) {
+            const document = await pack.getDocument(packEntry._id) as unknown as SR5Item<'skill'>;
+            if (!document) continue;
+            documents.push(document);
+        }
+
+        console.debug(`Shadowrun5e | Fetched all skills from pack ${packName}`, documents);
+        return documents;
     }
 };

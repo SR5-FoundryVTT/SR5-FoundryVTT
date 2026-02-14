@@ -4,7 +4,7 @@ import { MatrixNetworkFlow } from "@/module/item/flows/MatrixNetworkFlow";
 import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
 import { Helpers } from '@/module/helpers';
 import { MatrixRules } from '@/module/rules/MatrixRules';
-import { PackActionFlow } from "@/module/item/flows/PackActionFlow";
+import { PackItemFlow } from "@/module/item/flows/PackItemFlow";
 import { SheetFlow } from '@/module/flows/SheetFlow';
 
 interface VehicleSheetDataFields extends MatrixActorSheetData {
@@ -79,10 +79,10 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
     }
 
     protected override async _getMatrixPackActions() {
-        const matrixPackName = PackActionFlow.getMatrixActionsPackName();
+        const matrixPackName = PackItemFlow.getMatrixActionsPackName();
 
         // filter out illegal actions from the matrix actions
-        return (await PackActionFlow.getPackActions(matrixPackName)).filter((action) => {
+        return (await PackItemFlow.getPackActions(matrixPackName)).filter((action) => {
             return !MatrixRules.isIllegalAction(
                         action.getAction()?.attribute as any,
                         action.getAction()?.attribute2 as any,
