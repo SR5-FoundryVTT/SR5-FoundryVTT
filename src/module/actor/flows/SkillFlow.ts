@@ -2,6 +2,9 @@ import { KnowledgeSkillCategory, SkillFieldType } from "src/module/types/templat
 import { SR5Item } from "@/module/item/SR5Item";
 import { DataDefaults } from "@/module/data/DataDefaults";
 import { Helpers } from "@/module/helpers";
+import { SR5Actor } from "../SR5Actor";
+import { PackItemFlow } from "@/module/item/flows/PackItemFlow";
+import { Translation } from "@/module/utils/strings";
 
 // A skill storage structure for easier access to character skill items.
 export interface Skills {
@@ -149,6 +152,20 @@ export class SkillFlow {
     }
 
     /**
+     * Translate the skill group name into a localized version, if possible.
+     */
+    static localizeSkillgroupName(name: string) {
+        return Helpers.localizeName(name, 'SR5.Skill.Groups');
+    }
+
+    /**
+     * Translate the skill set name into a localized version, if possible.
+     */
+    static localizeSkillsetName(name: string) {
+        return Helpers.localizeName(name, 'SR5.Skill.Sets');
+    }
+
+    /**
      * Prepare a default data structure for skill items that allows to
      * better retrieve them compared to a flat skill item list.
      */
@@ -279,5 +296,61 @@ export class SkillFlow {
 
         groups.splice(index, 1);
         await skill.update({ system: { set: { groups } } });
+    }
+
+    /**
+     * Collect skills for selection fields based on 
+     * - skills compendium and
+     * - optional local actor.
+     * 
+     * @param actor Optional actor to include owned skills into the selection.
+     * @returns Object with sorted list of skills, key = name, value = translated label
+     */
+    static async getSkillSelection(actor?: SR5Actor) {
+        const skills = await PackItemFlow.getPackSkills();
+
+        // Collect optional owned skills to include local only skills.
+        for (const ownedSkill of actor?.itemsForType.get('skill') ?? []) {
+            if (!skills.find(skill => skill.name === ownedSkill.name)) continue;
+            skills.push(ownedSkill as SR5Item<'skill'>);
+        }
+
+        // Build and sort config value style list
+        const sheetSkills: Record<string, Translation> = {};
+        for (const skill of skills) {
+            if (Object.hasOwn(sheetSkills, skill.name)) continue;
+            // NOTE: sortConfigValuesByTranslation relies on the value being the translation, but we have to localize already
+            //       as otherwise custom skills will stay with their base label path visible in the skill list.
+            sheetSkills[skill.name] = SkillFlow.localizeSkillName(skill.name) as Translation;
+        }
+        return Helpers.sortConfigValuesByTranslation(sheetSkills);
+    }
+
+    /**
+     * Collect skillgroups for selection fields based on
+     * - skillgroups compendium and
+     * - optional local actor.
+     * 
+     * @param actor Optional actor to include owned skillgroups into the selection.
+     * @returns Object with sorted list of skillgroups, key = name, value = translated label
+     */
+    static async getSkillgroupSelection(actor?: SR5Actor) {
+        const skillgroups = await PackItemFlow.getPackSkillgroups();
+
+        // Collect optional owned skillgroups to include local only skillgroups.
+        for (const ownedSkill of actor?.itemsForType.get('skill') ?? []) {
+            if (!skillgroups.find(skill => skill.name === ownedSkill.name)) continue;
+            skillgroups.push(ownedSkill as SR5Item<'skill'>);
+        }
+
+        // Build and sort config value style list
+        const sheetGroups: Record<string, Translation> = {};
+        for (const group of skillgroups) {
+            if (Object.hasOwn(sheetGroups, group.name)) continue;
+            // NOTE: sortConfigValuesByTranslation relies on the value being the translation, but we have to localize already
+            //       as otherwise custom skills will stay with their base label path visible in the skill list.
+            sheetGroups[group.name] = SkillFlow.localizeSkillName(group.name) as Translation;
+        }
+        return Helpers.sortConfigValuesByTranslation(sheetGroups);
     }
 }

@@ -70,7 +70,7 @@ export const PackItemFlow = {
      */
     async getPackActions(packName: string): Promise<SR5Item<'action'>[]> {
         console.debug(`Shadowrun 5e | Trying to fetch all actions from pack ${packName}`);
-        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName)as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
+        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
         if (!pack) return [];
 
         const packEntries = pack.index.filter(data => data.type === 'action');
@@ -192,7 +192,7 @@ export const PackItemFlow = {
         }
         return actions.filter((action: SR5Item) => action.hasActionCategory('matrix'));
     },
-    
+
     /**
      * Collect all matrix actions of an actor.
      * 
@@ -240,6 +240,30 @@ export const PackItemFlow = {
         }
 
         console.debug(`Shadowrun5e | Fetched all skills from pack ${packName}`, documents);
+        return documents;
+    },
+
+    /**
+     * Retrieve all skill items of type group from the configured skill groups pack.
+     *
+     * @returns Array of skill group items from the pack.
+     */
+    async getPackSkillgroups(): Promise<SR5Item<'skill'>[]> {
+        const packName = this.getSkillGroupsPackName();
+        console.debug(`Shadowrun 5e | Trying to fetch all skill groups from pack ${packName}`);
+        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
+        if (!pack) return [];
+
+        const packEntries = pack.index.filter(data => data.type === 'skill');
+
+        const documents: SR5Item<'skill'>[] = [];
+        for (const packEntry of packEntries) {
+            const document = await pack.getDocument(packEntry._id) as unknown as SR5Item<'skill'>;
+            if (!document || document.system.type !== 'group') continue;
+            documents.push(document);
+        }
+
+        console.debug(`Shadowrun5e | Fetched all skill groups from pack ${packName}`, documents);
         return documents;
     },
 

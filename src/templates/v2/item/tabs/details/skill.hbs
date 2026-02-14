@@ -157,9 +157,11 @@
             {{#with @root.systemFields.group.fields.skills.element as |skillField|}}
                 <div class="list-item" data-index="{{i}}">
                     <div class="list-item-col select-col">
+                        {{log @root}}
                         {{formInput skillField
                                     name=(concat "system.group.skills." i)
                                     value=skillName
+                                    options=(config2Array @root.skills)
                                     classes="short" rootId=@root.rootId
                                     disabled=@root.isPlayMode}}
                     </div>
@@ -206,6 +208,7 @@
                         {{formInput skillFields.name
                                     name=(concat "system.set.skills." i ".name")
                                     value=skill.name
+                                    options=(config2Array @root.skills)
                                     classes="short" rootId=@root.rootId
                                     disabled=@root.isPlayMode}}
                     </div>
@@ -254,6 +257,7 @@
                         {{formInput groupFields.name
                                     name=(concat "system.set.groups." i ".name")
                                     value=group.name
+                                    options=(config2Array @root.groups)
                                     classes="short" rootId=@root.rootId
                                     disabled=@root.isPlayMode}}
                     </div>

@@ -2234,6 +2234,11 @@
             "abbr": {
                 "Native": "N"
             },
+            "Groups": {
+            },
+            "Sets": {
+
+            },
             "AeronauticsMechanic": "Aeronautics Mechanic",
             "Alchemy": "Alchemy",
             "AnimalHandling": "Animal Handling",

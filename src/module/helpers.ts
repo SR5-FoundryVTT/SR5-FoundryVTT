@@ -87,7 +87,7 @@ export class Helpers {
      * @param value Number to round with.
      * @param decimals Amount of decimals after the decimal point.
      */
-    static roundTo(value: number, decimals=3): number {
+    static roundTo(value: number, decimals = 3): number {
         const multiplier = Math.pow(10, decimals);
         return Math.round(value * multiplier) / multiplier;
     }
@@ -356,8 +356,8 @@ export class Helpers {
         if (!tokenOrigin || !tokenDest) return 0;
 
         // 2d coordinates and distance
-        const origin2D = canvas.grid.getCenterPoint({x: tokenOrigin.x, y: tokenOrigin.y});
-        const dest2D = canvas.grid.getCenterPoint({x: tokenDest.x, y: tokenDest.y});
+        const origin2D = canvas.grid.getCenterPoint({ x: tokenOrigin.x, y: tokenOrigin.y });
+        const dest2D = canvas.grid.getCenterPoint({ x: tokenDest.x, y: tokenDest.y });
 
         // Use gridSpace to measure in grids instead of distance. This will give results parity to FoundryVTTs canvas ruler.
         const distanceInGridUnits2D = canvas.grid.measurePath([origin2D, dest2D], {});
@@ -559,7 +559,7 @@ export class Helpers {
 
     static createRangeDescription(label: Translation, distance: number, modifier: number): RangeTemplateType {
         const localizedLabel = game.i18n.localize(label);
-        return {label: localizedLabel, distance, modifier}
+        return { label: localizedLabel, distance, modifier }
     }
 
     /**
@@ -689,9 +689,9 @@ export class Helpers {
     static modifyDamageByHits(incoming: DamageType, hits: number, modificationLabel: string): ModifiedDamageType {
         const modified = foundry.utils.duplicate(incoming) as DamageType;
         modified.mod = PartsList.AddUniquePart(modified.mod, modificationLabel, hits);
-        modified.value = Helpers.calcTotal(modified, {min: 0});
+        modified.value = Helpers.calcTotal(modified, { min: 0 });
 
-        return {incoming, modified};
+        return { incoming, modified };
     }
 
     /** Reduces given damage value and returns both original and modified damage.
@@ -730,7 +730,7 @@ export class Helpers {
 
         const id = randomID(idLength);
         const updateSkillData = {
-            [skillDataPath]: {[id]: skillField}
+            [skillDataPath]: { [id]: skillField }
         };
 
         return { id, updateSkillData }
@@ -744,7 +744,7 @@ export class Helpers {
      *
      */
     static getUpdateDataEntry(path: string, value: any): Record<string, any> {
-        return {[path]: value};
+        return { [path]: value };
     }
 
     /**
@@ -759,7 +759,7 @@ export class Helpers {
     static getDeleteKeyUpdateData(path: string, key: string): Record<string, Record<string, null>> {
         // Entity.update utilizes the mergeObject function within Foundry.
         // That functions documentation allows property deletion using the -= prefix before property key.
-        return {[path]: {[`-=${key}`]: null}};
+        return { [path]: { [`-=${key}`]: null } };
     }
 
     /**
@@ -910,7 +910,7 @@ export class Helpers {
      * @param replace The characters to replaces prohibited characters with
      * @returns key without
      */
-    static sanitizeDataKey(key: string, replace=''): string {
+    static sanitizeDataKey(key: string, replace = ''): string {
         const spicyCharacters = ['.', '-='];
         spicyCharacters.forEach(character => key = key.replace(character, replace));
         return key;
@@ -924,21 +924,21 @@ export class Helpers {
      * @returns an actor
      */
     static async chooseFromAvailableActors() {
-        const availableActors = game.actors?.filter( e => e.isOwner && e.hasPlayerOwner) ?? [];
+        const availableActors = game.actors?.filter(e => e.isOwner && e.hasPlayerOwner) ?? [];
 
-        if(availableActors.length === 0) {
+        if (availableActors.length === 0) {
             return undefined;
         }
 
-        if(availableActors.length === 1) {
+        if (availableActors.length === 1) {
             return availableActors[0]
         } else {
             let allActors = ''
-            game.actors?.filter( e => e.isOwner && e.hasPlayerOwner).forEach(t => {
-                    allActors = allActors.concat(`
+            game.actors?.filter(e => e.isOwner && e.hasPlayerOwner).forEach(t => {
+                allActors = allActors.concat(`
                             <option value="${t.id}">${t.name}</option>`);
-                });
-            const  dialog_content = `
+            });
+            const dialog_content = `
                 <select name ="actor">
                 ${allActors}
                 </select>`;
@@ -969,7 +969,7 @@ export class Helpers {
      * @param skill
      * @returns translation
      */
-    static getSkillTranslation(skill: string) : string {
+    static getSkillTranslation(skill: string): string {
         return game.i18n.localize(`SR5.Skill.${this.capitalizeFirstLetter(skill)}` as Translation)
     }
 
@@ -978,7 +978,7 @@ export class Helpers {
      * @param attribute
      * @returns translation
      */
-    static getAttributeTranslation(attribute: string) : string {
+    static getAttributeTranslation(attribute: string): string {
         return game.i18n.localize(`SR5.Attr${this.capitalizeFirstLetter(attribute)}` as Translation)
     }
 
@@ -1003,7 +1003,7 @@ export class Helpers {
      * @param b Any type of document data
      * @returns
      */
-    static sortByName(a: {name: string}, b: {name: string}) {
+    static sortByName(a: { name: string }, b: { name: string }) {
         if (a.name > b.name) return 1;
         if (a.name < b.name) return -1;
         return 0;
@@ -1042,10 +1042,14 @@ export class Helpers {
      */
     static localizeName(name: string, baseLabel = 'SR5') {
         if (!baseLabel) return name;
-        const slug = Helpers.transformToLabel(name);
 
-        const label = `${baseLabel}.${slug}` as Translation;
+        const label = Helpers.buildLabel(baseLabel, name);
         const translation = game.i18n.localize(label);
         return translation === label ? name : translation;
+    }
+
+    static buildLabel(baseLabel: string, subLabel: string) {
+        const slug = Helpers.transformToLabel(subLabel);
+        return `${baseLabel}.${slug}` as Translation;
     }
 }

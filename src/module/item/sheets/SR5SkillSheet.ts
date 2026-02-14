@@ -8,6 +8,9 @@ import { SkillFlow } from "@/module/actor/flows/SkillFlow";
 import { SR5Item } from "../SR5Item";
 
 interface SR5SkillSheetData extends SR5BaseItemSheetData {
+    // config style name to translation mappings.
+    skills: Record<string, string>
+    groups: Record<string, string>
 }
 
 /**
@@ -18,7 +21,7 @@ interface SR5SkillSheetData extends SR5BaseItemSheetData {
  * - skill groups
  * - skill sets
  */
-export class SR5SkillSheet<T extends SR5BaseItemSheetData = SR5SkillSheetData> extends SR5ApplicationMixin(ItemSheet)<T> {
+export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> extends SR5ApplicationMixin(ItemSheet)<T> {
     declare document: SR5Item<'skill'>;
 
     // TODO: taMiF - any should be replaced by correct DEFAULT_OPTIONS declaration?
@@ -86,6 +89,10 @@ export class SR5SkillSheet<T extends SR5BaseItemSheetData = SR5SkillSheetData> e
 
         // TODO: Implement a SR5baseItemSheet to share stuff between SR5ItemSheet and more type specific sheets
         context.primaryTabs = this._prepareTabs('primary');
+
+        const actor = this.document.actor || undefined;
+        context.skills = await SkillFlow.getSkillSelection(actor);
+        context.groups = await SkillFlow.getSkillgroupSelection(actor);
 
         return context;
     }
