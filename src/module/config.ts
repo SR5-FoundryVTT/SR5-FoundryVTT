@@ -532,6 +532,11 @@ export const SR5 = {
         language: 'SR5.Skill.Category.Language',
     },
 
+    // Pack names to use during character creation to populate skill items with.
+    defaultSkillPacks: {
+        character: 'Character',
+    } as Record<Actor.SubType, string>,
+
     skillKnowledgeTypes: {
         academic: 'SR5.Skill.KnowledgeType.Academic',
         professional: 'SR5.Skill.KnowledgeType.Professional',

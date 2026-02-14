@@ -1,13 +1,7 @@
-import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
-import { SkillRules } from "../../rules/SkillRules";
-import { PartsList } from "../../parts/PartsList";
-import { FLAGS, SYSTEM_NAME } from "../../constants";
 import { KnowledgeSkillCategory, SkillFieldType } from "src/module/types/template/Skills";
 import { SR5Item } from "@/module/item/SR5Item";
 import { DataDefaults } from "@/module/data/DataDefaults";
 import { Helpers } from "@/module/helpers";
-import { SR5Actor } from "../SR5Actor";
-import { SkillRollOptions } from "@/module/types/rolls/ActorRolls";
 
 // A skill storage structure for easier access to character skill items.
 export interface Skills {
@@ -285,28 +279,5 @@ export class SkillFlow {
 
         groups.splice(index, 1);
         await skill.update({ system: { set: { groups } } });
-    }
-
-    /**
-     * Add default skill items to the given actor, based on their type.
-     * 
-     * This can be called anytime, however it's primarily used during actor creation.
-     * 
-     * @param actor Actor to add skill items to.
-     */
-    static async addSkillItems(actor: SR5Actor, data: Actor.CreateData) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        if (data.type !== 'character' && data.type !== 'critter') return;
-       
-        try {
-            const packSkills = await PackItemFlow.getPackSkills();
-            if (packSkills.length > 0) {
-                const allItems = packSkills.map(skill => skill.toObject());
-                actor.updateSource({ items: allItems });
-                console.log(`Shadowrun 5e | Added ${allItems.length} skills from pack to source data`);
-            }
-        } catch (error) {
-            console.error('Shadowrun 5e | Failed to add skills from pack:', error);
-        }
     }
 }
