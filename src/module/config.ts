@@ -834,6 +834,9 @@ export const SR5 = {
         'GeneralActionsPack': 'sr5e-general-actions',
         'MatrixActionsPack': 'sr5e-matrix-actions',
         'ICActionsPack': 'sr5e-ic-actions',
+        'SkillsPack': 'sr5e-skills',
+        'SkillGroupsPack': 'sr5e-skill-groups',
+        'SkillSetsPack': 'sr5e-skill-sets',
     },
 
     programTypes: {

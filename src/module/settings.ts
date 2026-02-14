@@ -342,6 +342,39 @@ export const registerSystemSettings = () => {
         type: String
     });
 
+    /**
+     * Override the default skills pack
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.SkillsPack, {
+        name: 'SR5.CompendiaSettings.SkillsPack.label',
+        hint: 'SR5.CompendiaSettings.SkillsPack.hint',
+        scope: 'world',
+        config: false,
+        type: String
+    });
+
+    /**
+     * Override the default skill groups pack
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.SkillGroupsPack, {
+        name: 'SR5.CompendiaSettings.SkillGroupsPack.label',
+        hint: 'SR5.CompendiaSettings.SkillGroupsPack.hint',
+        scope: 'world',
+        config: false,
+        type: String
+    });
+
+    /**
+     * Override the default skill sets pack
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.SkillSetsPack, {
+        name: 'SR5.CompendiaSettings.SkillSetsPack.label',
+        hint: 'SR5.CompendiaSettings.SkillSetsPack.hint',
+        scope: 'world',
+        config: false,
+        type: String
+    });
+
     game.settings.register(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder, {
         name: "Actor Importer Compendium Order",
         hint: "The ordered list of compendium packs to search when importing items to an actor.",

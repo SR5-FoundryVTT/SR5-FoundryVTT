@@ -682,6 +682,20 @@
                 "hint": "This compendium will be used for all matrix actions.",
                 "label": "Matrix Actions"
             },
+            "SkillsPacksSection": "Skills Compendiums",
+            "ActionsPacksSection": "Actions Compendiums",
+            "SkillsPack": {
+                "hint": "This compendium will be used for all skills.",
+                "label": "Skills"
+            },
+            "SkillGroupsPack": {
+                "hint": "This compendium will be used for skill groups.",
+                "label": "Skill Groups"
+            },
+            "SkillSetsPack": {
+                "hint": "This compendium will be used for skill sets.",
+                "label": "Skill Sets"
+            },
             "Title": "System compendiums"
         },
         "CompendiumBrowser": {

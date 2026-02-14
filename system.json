@@ -207,6 +207,42 @@
             },
             "type": "Macro",
             "system": "shadowrun5e"
+        },
+        {
+            "name": "sr5e-skills",
+            "label": "SR5e Skills",
+            "path": "packs/sr5e-skills",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "TRUSTED": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            },
+            "type": "Item",
+            "system": "shadowrun5e"
+        },
+        {
+            "name": "sr5e-skill-groups",
+            "label": "SR5e Skillgroups",
+            "path": "packs/sr5e-skill-groups",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "TRUSTED": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            },
+            "type": "Item",
+            "system": "shadowrun5e"
+        },
+        {
+            "name": "sr5e-skill-sets",
+            "label": "SR5e Skillsets",
+            "path": "packs/sr5e-skill-sets",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "TRUSTED": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            },
+            "type": "Item",
+            "system": "shadowrun5e"
         }
     ],
     "packFolders": [
