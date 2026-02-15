@@ -32,6 +32,8 @@ jobs:
                     echo "MANIFEST_JSON=$(jq -c . < system.json)" >> $GITHUB_ENV
 
             - name: Build and package release artifacts
+              env:
+                  SR5_INCLUDE_QUENCH: 'false'
               run: |
                   npm ci
                   gulp build
