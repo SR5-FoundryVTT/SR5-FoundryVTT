@@ -17,7 +17,7 @@ const distName = 'dist';
 const destFolder = path.resolve(process.cwd(), distName);
 const jsBundle = 'bundle.js';
 const entryPoint = "./src/module/main.ts";
-const includeQuench = process.env.SR5_INCLUDE_QUENCH !== 'false';
+const includeQuench = process.env.SR5_INCLUDE_QUENCH === 'true';
 const includeQuenchEnv = includeQuench ? 'true' : 'false';
 
 /**

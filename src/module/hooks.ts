@@ -166,7 +166,7 @@ export class HooksManager {
         Hooks.on("renderChatLog", HooksManager.chatLogListeners.bind(HooksManager));
         Hooks.on('preUpdateCombatant', SR5Combat.onPreUpdateCombatant.bind(SR5Combat));
 
-        if (process.env.SR5_INCLUDE_QUENCH) {
+        if (process.env.SR5_INCLUDE_QUENCH === 'true') {
             Hooks.on('quenchReady', (quench) => {
                 void import('../unittests/quench').then(({ quenchRegister }) => {
                     quenchRegister(quench);
