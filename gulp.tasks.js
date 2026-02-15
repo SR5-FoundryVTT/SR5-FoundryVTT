@@ -17,8 +17,8 @@ const distName = 'dist';
 const destFolder = path.resolve(process.cwd(), distName);
 const jsBundle = 'bundle.js';
 const entryPoint = "./src/module/main.ts";
-const quenchEntry = '../unittests/quench';
-const quenchNoopPath = path.resolve(process.cwd(), 'src/unittests/quench.noop.ts');
+const includeQuench = process.env.SR5_INCLUDE_QUENCH !== 'false';
+const includeQuenchEnv = includeQuench ? 'true' : 'false';
 
 /**
  * CLEAN
@@ -41,13 +41,11 @@ async function buildJS() {
         sourcemap: true,
         format: 'esm',
         outfile: path.resolve(destFolder, jsBundle),
+        define: {
+            'process.env.SR5_INCLUDE_QUENCH': JSON.stringify(includeQuenchEnv),
+        },
         // Don't typescheck on build. Instead typecheck on PR and push and assume releases to build.
-        plugins: [{
-            name: 'quench-noop-alias',
-            setup(build) {
-                build.onResolve({ filter: new RegExp(`^${quenchEntry}$`) }, () => ({ path: quenchNoopPath }));
-            }
-        }],
+        plugins: [],
     }).catch((err) => { console.error(err); });
 }
 
@@ -82,6 +80,9 @@ async function watch() {
         sourcemap: true,
         format: 'esm',
         outfile: path.resolve(destFolder, jsBundle),
+        define: {
+            'process.env.SR5_INCLUDE_QUENCH': JSON.stringify(includeQuenchEnv),
+        },
         plugins: [typecheckPlugin({watch: true})],
     })
 

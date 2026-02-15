@@ -62,7 +62,6 @@ import { BiofeedbackResistTest } from './tests/BiofeedbackResistTest';
 import { CheckOverwatchScoreTest } from '@/module/tests/CheckOverwatchScoreTest';
 import { OpposedCheckOverwatchScoreTest } from '@/module/tests/OpposedCheckOverwatchScoreTest';
 
-import { quenchRegister } from '../unittests/quench';
 import { createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro } from './macros';
 
 import { registerSystemKeybindings } from './keybindings';
@@ -167,8 +166,13 @@ export class HooksManager {
         Hooks.on("renderChatLog", HooksManager.chatLogListeners.bind(HooksManager));
         Hooks.on('preUpdateCombatant', SR5Combat.onPreUpdateCombatant.bind(SR5Combat));
 
-        // NOTE: quenchRegister is excluced on build time by a noop gulp plugin.
-        Hooks.on('quenchReady', quenchRegister);
+        if (process.env.SR5_INCLUDE_QUENCH) {
+            Hooks.on('quenchReady', (quench) => {
+                void import('../unittests/quench').then(({ quenchRegister }) => {
+                    quenchRegister(quench);
+                });
+            });
+        }
 
         MatrixHooks.registerHooks();
         RiggingHooks.registerHooks();
