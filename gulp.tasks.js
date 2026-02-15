@@ -17,6 +17,8 @@ const distName = 'dist';
 const destFolder = path.resolve(process.cwd(), distName);
 const jsBundle = 'bundle.js';
 const entryPoint = "./src/module/main.ts";
+const quenchEntry = '../unittests/quench';
+const quenchNoopPath = path.resolve(process.cwd(), 'src/unittests/quench.noop.ts');
 
 /**
  * CLEAN
@@ -40,7 +42,12 @@ async function buildJS() {
         format: 'esm',
         outfile: path.resolve(destFolder, jsBundle),
         // Don't typescheck on build. Instead typecheck on PR and push and assume releases to build.
-        plugins: [],
+        plugins: [{
+            name: 'quench-noop-alias',
+            setup(build) {
+                build.onResolve({ filter: new RegExp(`^${quenchEntry}$`) }, () => ({ path: quenchNoopPath }));
+            }
+        }],
     }).catch((err) => { console.error(err); });
 }
 
