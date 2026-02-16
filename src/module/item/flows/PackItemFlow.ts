@@ -293,22 +293,17 @@ export const PackItemFlow = {
     /**
      * Retrieve all skills defined in a skill set.
      * 
-     * @param name Skill set name to retrieve from the pack and get skills for.
+     * @param skillSet Skill set item to retrieve skills for.
      * @returns A list of skills or empty.
      */
-    async getSkillsForSkillSet(name: string) {
-        const skillset = await PackItemFlow.getPackSkillSet(name);
-        if (!skillset) {
-            console.error(`Shadowrun 5e | No skill set named ${name} found in pack ${this.getSkillSetsPackName()}`);
-            return [];
-        }
-        if (skillset.system.type !== 'set') {
-            console.error(`Shadowrun 5e | Document ${name} in pack ${this.getSkillSetsPackName()} is not of type set`, skillset);
+    async getSkillsForSkillSet(skillSet: SR5Item<'skill'>) {
+        if (skillSet.system.type !== 'set') {
+            console.error(`Shadowrun 5e | Document ${skillSet.name} in pack ${this.getSkillSetsPackName()} is not of type set`, skillSet);
             return [];
         }
 
         const skillRatings: Record<string, number> = {};
-        for (const skill of skillset.system.set.skills) {
+        for (const skill of skillSet.system.set.skills) {
             skillRatings[skill.name] = skill.rating;
         }
 
@@ -325,5 +320,37 @@ export const PackItemFlow = {
         }
 
         return skillData;
+    },
+
+    /**
+     * Retrieve all skill groups defined in a skill set.
+     *
+     * @param skillSet Skill set item to retrieve skill groups for.
+     * @returns A list of skill groups or empty.
+     */
+    async getSkillGroupsForSkillSet(skillSet: SR5Item<'skill'>) {
+        if (skillSet.system.type !== 'set') {
+            console.error(`Shadowrun 5e | Document ${skillSet.name} in pack ${this.getSkillSetsPackName()} is not of type set`, skillSet);
+            return [];
+        }
+
+        const skillGroupRatings: Record<string, number> = {};
+        for (const group of skillSet.system.set.groups) {
+            skillGroupRatings[group.name] = group.rating;
+        }
+
+        const skillGroups = await PackItemFlow.getPackSkillgroups();
+        if (!skillGroups) return [];
+
+        const skillGroupData = skillGroups
+            .filter(group => Object.hasOwn(skillGroupRatings, group.name))
+            .map(group => group.toObject());
+
+        for (const skillGroup of skillGroupData) {
+            const rating = skillGroupRatings[skillGroup.name];
+            skillGroup.system.group.rating = rating;
+        }
+
+        return skillGroupData;
     }
 };

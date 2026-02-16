@@ -372,7 +372,7 @@ export class SkillFlow {
             if (Object.hasOwn(sheetGroups, group.name)) continue;
             // NOTE: sortConfigValuesByTranslation relies on the value being the translation, but we have to localize already
             //       as otherwise custom skills will stay with their base label path visible in the skill list.
-            sheetGroups[group.name] = SkillFlow.localizeSkillName(group.name) as Translation;
+            sheetGroups[group.name] = SkillFlow.localizeSkillgroupName(group.name) as Translation;
         }
         return Helpers.sortConfigValuesByTranslation(sheetGroups);
     }

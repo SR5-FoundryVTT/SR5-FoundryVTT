@@ -26,6 +26,7 @@ import MatrixAttribute = Shadowrun.MatrixAttribute;
 import ActorSheetV2 = foundry.applications.sheets.ActorSheetV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 import { EffectCreationFlow } from '@/module/flows/EffectCreationFlow';
+import { ActorCreationFlow } from '../flows/ActorCreationFlow';
 
 const { TextEditor } = foundry.applications.ux;
 const { fromUuid, fromUuidSync } = foundry.utils;
@@ -825,6 +826,11 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     protected override async _onDropItem(event: DragEvent, item: SR5Item) {
+        if (item.isType('skill') && item.system.type === 'set') {
+            await ActorCreationFlow.applySkillSetToActor(this.actor, item);
+            return null;
+        }
+
         // Avoid adding item types to the actor, that aren't handled on the sheet anywhere.
         if (this.getHandledItemTypes().includes(item.type) || this.getInventoryItemTypes().includes(item.type)) {
             return super._onDropItem(event, item);
