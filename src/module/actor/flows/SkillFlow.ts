@@ -56,6 +56,27 @@ export class SkillFlow {
         }
 
         const skillItems = items.filter(item => item.system.type === 'skill');
+        const groupItems = items.filter(item => item.system.type === 'group');
+
+        const groupSkills = new Map<string, { groupName: string, rating: number }>();
+        for (const item of groupItems) {
+            if (!item.isType('skill')) continue;
+
+            for (const groupSkillName of item.system.group.skills) {
+                const groupSkillKey = SkillFlow.nameToKey(groupSkillName);
+                if (!groupSkillKey) continue;
+
+                if (groupSkills.has(groupSkillKey)) {
+                    ui.notifications?.warn(game.i18n.localize('SR5.Warnings.SkillAlreadyExists'));
+                    continue;
+                }
+
+                groupSkills.set(groupSkillKey, {
+                    groupName: item.name,
+                    rating: item.system.group.rating,
+                });
+            }
+        }
 
         for (const item of skillItems) {
             if (!item.isType('skill')) continue;
@@ -63,16 +84,18 @@ export class SkillFlow {
             // Name is user input but used for json storage here. It should match
             // overall naming scheme.
             const key = SkillFlow.nameToKey(item.name) || item.id!;
+            const groupedSkill = groupSkills.get(key);
 
             const skill = DataDefaults.createData("skill_field", {
                 id: item.id,
                 name: item.name,
                 // TODO: tamif - check for translation support
                 label: SkillFlow.localizeSkillName(item.name),
-                base: item.system.skill.rating,
+                base: groupedSkill?.rating ?? item.system.skill.rating,
                 description: item.system.description.value,
                 attribute: item.system.skill.attribute,
                 canDefault: item.system.skill.defaulting,
+                ...(groupedSkill ? { group: groupedSkill.groupName } : {}),
             });
 
             switch (item.system.skill.category) {

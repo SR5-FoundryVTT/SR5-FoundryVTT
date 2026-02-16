@@ -251,7 +251,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * @return An array of item types from the template.json Item section.
      */
-    getInventoryItemTypes():Item.ConfiguredSubType[] {
+    getInventoryItemTypes(): Item.ConfiguredSubType[] {
         return [];
     }
 
@@ -612,7 +612,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             const ft = favorites[targetIndex];
             favorites[targetIndex] = fs;
             favorites[sourceIndex] = ft;
-            void this.actor.update({system: { favorites }});
+            void this.actor.update({ system: { favorites } });
         }
     }
 
@@ -718,7 +718,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         } else {
             newFavorites.push(favoriteId);
         }
-        await this.actor.update({system: { favorites: newFavorites }});
+        await this.actor.update({ system: { favorites: newFavorites } });
     }
 
     /**
@@ -847,7 +847,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const itemData = {
             name: actor.name ?? `${game.i18n.localize('SR5.New')} ${game.i18n.localize(SR5.itemTypes['contact'])}`,
             type: 'contact' as Item.SubType,
-            system: {linkedActor: actor.uuid }
+            system: { linkedActor: actor.uuid }
         };
         await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
         return null;
@@ -910,13 +910,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const item = this.actor.effects.get(id);
         if (item) {
             const disabled = !item.disabled;
-            await item.update({disabled});
+            await item.update({ disabled });
         } else {
             const uuid = SheetFlow.closestUuid(event.target);
             const doc = await fromUuid(uuid);
             if (doc instanceof SR5ActiveEffect) {
                 const disabled = !doc.disabled;
-                await doc.update({disabled});
+                await doc.update({ disabled });
             }
         }
     }
@@ -1323,8 +1323,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @param inventories
      */
     _prepareSortedCategorizedSpells(spellSheets: SR5Item[]) {
-        const sortedSpells : Record<string, SR5Item[]> = {};
-        const spellTypes : string[] = ['combat', 'detection', 'health', 'illusion', 'manipulation', 'notfound'];
+        const sortedSpells: Record<string, SR5Item[]> = {};
+        const spellTypes: string[] = ['combat', 'detection', 'health', 'illusion', 'manipulation', 'notfound'];
 
         // Add all spell types in system.
         spellTypes.forEach(type => {
@@ -1338,7 +1338,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         });
 
         spellTypes.forEach(type => {
-            sortedSpells[type].sort((a, b) : number => {
+            sortedSpells[type].sort((a, b): number => {
                 return a.name.localeCompare(b.name);
             });
         });
@@ -1350,7 +1350,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * Used by the sheet to choose whether to show or hide hideable fields
      */
     _prepareContentVisibility(data) {
-        const contentVisibility : Record<string, boolean> = {}
+        const contentVisibility: Record<string, boolean> = {}
         const defaultVisibility = !this.hideEmptyCategories();
 
         // If prefix is empty uses the category as a prefix
@@ -1653,7 +1653,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const skill = this.actor.items.get(skillId);
         if (!skill) return;
 
-        await skill.sheet?.render(true, {mode: 'edit'});
+        await skill.sheet?.render(true, { mode: 'edit' });
     }
 
     static async #editSkill(this: SR5BaseActorSheet, event: PointerEvent) {
@@ -1750,7 +1750,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             } else {
                 hidden_items.push(hiddenId);
             }
-            await this.actor.update({system: { hidden_items }});
+            await this.actor.update({ system: { hidden_items } });
         }
     }
 
@@ -1780,7 +1780,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             if (item.isType('device')) {
                 await this.document.equipOnlyOneItemOfType(item);
             } else {
-                await item.update({ system: { technology: { equipped: !item.isEquipped() }}})
+                await item.update({ system: { technology: { equipped: !item.isEquipped() } } })
             }
             this.actor.render(false);
         }
@@ -1801,11 +1801,11 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         // iterate through the states of online -> silent -> offline
         const newState = event.shiftKey ? 'none'
-                                        : item.isWireless()
-                                            ? item.isRunningSilent()
-                                                ? 'offline'
-                                                : 'silent'
-                                            : 'online';
+            : item.isWireless()
+                ? item.isRunningSilent()
+                    ? 'offline'
+                    : 'silent'
+                : 'online';
 
         // update the embedded item with the new wireless state
         await item.update({ system: { technology: { wireless: newState } } });
@@ -2039,15 +2039,15 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                     console.error('TODO: tamif - remove this functionality and related functions?');
                     // const subCategory = skillTarget.dataset.subcategory!;
                     // switch (skillTarget.dataset.category) {
-                        // case 'active':
-                        //     await this.actor.removeActiveSkill(skillId);
-                        //     break;
-                        // case 'knowledge':
-                        //     await this.actor.removeKnowledgeSkill(skillId, subCategory as any);
-                        //     break;
-                        // case 'language':
-                        //     await this.actor.removeLanguageSkill(skillId);
-                        //     break;
+                    // case 'active':
+                    //     await this.actor.removeActiveSkill(skillId);
+                    //     break;
+                    // case 'knowledge':
+                    //     await this.actor.removeKnowledgeSkill(skillId, subCategory as any);
+                    //     break;
+                    // case 'language':
+                    //     await this.actor.removeLanguageSkill(skillId);
+                    //     break;
                     // }
                 }
             }
@@ -2236,7 +2236,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.stopPropagation();
 
         const blitz = this.actor.system.initiative.edge;
-        await this.actor.update({system: { initiative: { edge: !blitz }}});
+        await this.actor.update({ system: { initiative: { edge: !blitz } } });
     }
 
     static async #rollInitiative(this: SR5BaseActorSheet, event: Event) {
