@@ -19,7 +19,8 @@ export const ActorCreationFlow = {
 
         const skills = await PackItemFlow.getSkillsForSkillSet(skillSet);
         const groups = await PackItemFlow.getSkillGroupsForSkillSet(skillSet);
-        // TODO: tamif - why should the id be deleted?
+
+        // Remove pack ids and let Foundry assign new ones.
         const items = [...skills, ...groups].map(item => {
             const itemData = foundry.utils.deepClone(item) as Item.CreateData & { _id?: string };
             delete itemData._id;
