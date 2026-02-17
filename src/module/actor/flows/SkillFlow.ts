@@ -29,6 +29,48 @@ export interface Skills {
 // TODO: tamif - refactor into object style
 export class SkillFlow {
 
+    static async syncSkillItemGroups(actor: SR5Actor) {
+        const skillItems: SR5Item<'skill'>[] = [];
+        const groupItems: SR5Item<'skill'>[] = [];
+
+        for (const item of actor.itemsForType?.get('skill') ?? []) {
+            if (!item.isType('skill')) continue;
+
+            if (item.system.type === 'skill') skillItems.push(item);
+            if (item.system.type === 'group') groupItems.push(item);
+        }
+
+        const groupedSkills = new Map<string, string>();
+        for (const groupItem of groupItems) {
+            for (const groupedSkillName of groupItem.system.group.skills) {
+                const groupedSkillKey = SkillFlow.nameToKey(groupedSkillName);
+                if (!groupedSkillKey || groupedSkills.has(groupedSkillKey)) continue;
+
+                groupedSkills.set(groupedSkillKey, groupItem.name);
+            }
+        }
+
+        const updates: Item.UpdateData[] = [];
+        for (const skillItem of skillItems) {
+            const skillKey = SkillFlow.nameToKey(skillItem.name);
+            const group = groupedSkills.get(skillKey) ?? '';
+
+            if ((skillItem.system.skill.group ?? '') === group) continue;
+            updates.push({
+                _id: skillItem.id,
+                system: {
+                    skill: {
+                        group,
+                    },
+                },
+            });
+        }
+
+        if (updates.length > 0) {
+            await actor.updateEmbeddedDocuments('Item', updates);
+        }
+    }
+
     static isCustomSkill(skill: SkillFieldType): boolean {
         return skill.name !== undefined && skill.name !== '';
     }
@@ -56,27 +98,6 @@ export class SkillFlow {
         }
 
         const skillItems = items.filter(item => item.system.type === 'skill');
-        const groupItems = items.filter(item => item.system.type === 'group');
-
-        const groupSkills = new Map<string, { groupName: string, rating: number }>();
-        for (const item of groupItems) {
-            if (!item.isType('skill')) continue;
-
-            for (const groupSkillName of item.system.group.skills) {
-                const groupSkillKey = SkillFlow.nameToKey(groupSkillName);
-                if (!groupSkillKey) continue;
-
-                if (groupSkills.has(groupSkillKey)) {
-                    ui.notifications?.warn(game.i18n.localize('SR5.Warnings.SkillAlreadyExists'));
-                    continue;
-                }
-
-                groupSkills.set(groupSkillKey, {
-                    groupName: item.name,
-                    rating: item.system.group.rating,
-                });
-            }
-        }
 
         for (const item of skillItems) {
             if (!item.isType('skill')) continue;
@@ -84,18 +105,18 @@ export class SkillFlow {
             // Name is user input but used for json storage here. It should match
             // overall naming scheme.
             const key = SkillFlow.nameToKey(item.name) || item.id!;
-            const groupedSkill = groupSkills.get(key);
+            const group = item.system.skill.group;
 
             const skill = DataDefaults.createData("skill_field", {
                 id: item.id,
                 name: item.name,
                 // TODO: tamif - check for translation support
                 label: SkillFlow.localizeSkillName(item.name),
-                base: groupedSkill?.rating ?? item.system.skill.rating,
+                base: item.system.skill.rating,
                 description: item.system.description.value,
                 attribute: item.system.skill.attribute,
                 canDefault: item.system.skill.defaulting,
-                ...(groupedSkill ? { group: groupedSkill.groupName } : {}),
+                ...(group ? { group } : {}),
             });
 
             switch (item.system.skill.category) {
@@ -248,6 +269,7 @@ export class SkillFlow {
         const skills = skill.system.group.skills;
         skills.push(name);
         await skill.update({ system: { group: { skills } } });
+        if (skill.actor) await SkillFlow.syncSkillItemGroups(skill.actor);
     }
 
     /**
@@ -263,6 +285,7 @@ export class SkillFlow {
 
         skills.splice(index, 1);
         await skill.update({ system: { group: { skills } } });
+        if (skill.actor) await SkillFlow.syncSkillItemGroups(skill.actor);
     }
 
     /**

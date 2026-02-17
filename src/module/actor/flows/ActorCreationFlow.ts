@@ -2,6 +2,7 @@ import { PackItemFlow } from "@/module/item/flows/PackItemFlow";
 import { SR5Actor } from "../SR5Actor";
 import { SR5 } from "@/module/config";
 import { SR5Item } from "@/module/item/SR5Item";
+import { SkillFlow } from "./SkillFlow";
 
 /**
  * All behavior related to actor creation.
@@ -20,10 +21,31 @@ export const ActorCreationFlow = {
         const skills = await PackItemFlow.getSkillsForSkillSet(skillSet);
         const groups = await PackItemFlow.getSkillGroupsForSkillSet(skillSet);
 
+        const groupedSkillNames = new Map<string, string>();
+        for (const group of groups) {
+            if (group.type !== 'skill') continue;
+            if (group.system.type !== 'group') continue;
+
+            for (const groupedSkillName of group.system.group.skills) {
+                const groupedSkillKey = SkillFlow.nameToKey(groupedSkillName);
+                if (!groupedSkillKey || groupedSkillNames.has(groupedSkillKey)) continue;
+
+                groupedSkillNames.set(groupedSkillKey, group.name);
+            }
+        }
+
         // Remove pack ids and let Foundry assign new ones.
         const items = [...skills, ...groups].map(item => {
             const itemData = foundry.utils.deepClone(item) as Item.CreateData & { _id?: string };
             delete itemData._id;
+
+            const itemSystemType = foundry.utils.getProperty(itemData, 'system.type');
+            if (itemData.type === 'skill' && (itemData as any).system.type === 'skill') {
+                const skillKey = SkillFlow.nameToKey(itemData.name);
+                const skillGroup = groupedSkillNames.get(skillKey) ?? '';
+                foundry.utils.setProperty(itemData, 'system.skill.group', skillGroup);
+            }
+
             return itemData;
         });
 

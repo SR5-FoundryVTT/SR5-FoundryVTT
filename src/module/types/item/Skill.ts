@@ -14,6 +14,7 @@ const SkillTypeData = () => ({
     // TODO: taMiF - Use 'type' as in SR5#128 instead of category. better differentiate between system.type and system.skill.type
     category: new StringField({ required: true, initial: 'active', choices: SR5.skillCategories }),
     knowledgeType: new StringField({ required: false, nullable: true, choices: SR5.skillKnowledgeTypes }),
+    group: new StringField({ required: true, blank: true, initial: '' }),
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     defaulting: new BooleanField({ required: true, nullable: false, initial: false }),
     attribute: new StringField({ required: true, blank: true, choices: SR5.attributes }),
