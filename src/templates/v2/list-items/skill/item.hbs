@@ -51,7 +51,7 @@
         <div class="list-item-col {{#if @root.isPlayMode}} skinny-col {{/if}}">
             {{#if @root.isEditMode}}
                 {{!-- use the original method of setting data because skills are weird in data model, they'll be items eventually --}}
-                <input type="number" class="short skinny" value="{{skill.base}}" data-skill="{{skill.id}}" {{#if skill.group}}disabled{{/if}}>
+                <input type="number" data-system-action="changeSkillRating" class="short skinny" value="{{skill.base}}" data-skill="{{skill.id}}" {{#if skill.group}}disabled{{/if}}>
             {{else}}
                 <label data-skill-modifier-tooltip="{{skill.id}}">
                     {{#if skill.system.skill.language.isNative}}

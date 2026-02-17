@@ -376,4 +376,11 @@ export class SkillFlow {
         }
         return Helpers.sortConfigValuesByTranslation(sheetGroups);
     }
+
+    static async changeSkillRating(actor: SR5Actor, skillId: string, rating: number) {
+        const skill = actor.items.get(skillId);
+        if (!skill) return;
+
+        await skill.update({ system: { skill: { rating } } });
+    }
 }

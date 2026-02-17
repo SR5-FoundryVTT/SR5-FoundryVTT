@@ -638,6 +638,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         html.find('select[name="initiative-select"]').on('change', this._onInitiativePerceptionChange.bind(this));
 
         html.find('select.weapon-ammo-select').on('change', this._onWeaponAmmoSelect.bind(this));
+
+        html.find('input[data-system-action="changeSkillRating"]').on('change', this._onChangeSkillRating.bind(this));
     }
 
     /**
@@ -1883,6 +1885,18 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const changedSlot = currentTarget.value;
 
         return item.changeMatrixAttributeSlot(changedSlot, attribute);
+    }
+
+    async _onChangeSkillRating(event: Event) {
+        event.preventDefault();
+        if (!(event.target instanceof HTMLInputElement)) return;
+        const closest = this._closestSkillTarget(event.target);
+        const skillId = closest?.dataset.skillId;
+        if (!skillId) return;
+        const rating = Number(event.target.value);
+        if (isNaN(rating)) return;
+
+        await SkillFlow.changeSkillRating(this.actor, skillId, rating);
     }
 
     /**
