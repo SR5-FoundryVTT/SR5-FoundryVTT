@@ -3,7 +3,6 @@
         label="SR5.Languages"
         addAction="addItem" 
         category='language' }}
-    {{log 'Knowledge'}}
     {{#each system.skills.language as |skill translated|}}
         {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/item.hbs'
             skill=skill

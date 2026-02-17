@@ -49,7 +49,6 @@
         </div>
         {{/if}}
         <div class="list-item-col {{#if @root.isPlayMode}} skinny-col {{/if}}">
-            {{log skill}}
             {{#if @root.isEditMode}}
                 {{!-- use the original method of setting data because skills are weird in data model, they'll be items eventually --}}
                 <input type="number" class="short skinny" value="{{skill.base}}" data-skill="{{skill.id}}" {{#if skill.group}}disabled{{/if}}>
