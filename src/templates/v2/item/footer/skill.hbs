@@ -1,0 +1,6 @@
+{{#if (eq item.system.type 'skill')}}
+    <label>{{localize "SR5.Rtg"}}: {{item.system.skill.rating}}</label>
+    <label>{{localizeOb item.system.skill.attribute @root.config.attributes}}</label>
+    <label>{{localizeOb item.system.skill.category @root.config.skillCategories}}</label>
+    <label>{{item.system.skill.group}}</label>
+{{/if}}
