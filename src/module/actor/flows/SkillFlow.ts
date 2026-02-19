@@ -183,6 +183,10 @@ export class SkillFlow {
         return sortedSkillsObject;
     }
 
+    /**
+     * Turn a user entered skill name into something that looks like a object property / key.
+     * @param name Skill or document name
+     */
     static nameToKey(name: string) {
         if (!name) return '';
         return name.replace(' ', '_').toLowerCase();

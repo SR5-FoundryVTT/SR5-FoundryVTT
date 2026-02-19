@@ -833,6 +833,15 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             return null;
         }
 
+        if (item.isType('skill') && item.system.type === 'skill') {
+            const skillCategory = item.system.skill.category;
+            if (ActorCreationFlow.hasSkillWithSameNameAndCategory(this.actor, item.name, skillCategory)) {
+                ui.notifications?.warn(game.i18n.localize('SR5.Warnings.SkillAlreadyExists'));
+                return null;
+            }
+        }
+
+
         // Avoid adding item types to the actor, that aren't handled on the sheet anywhere.
         if (this.getHandledItemTypes().includes(item.type) || this.getInventoryItemTypes().includes(item.type)) {
             return super._onDropItem(event, item);

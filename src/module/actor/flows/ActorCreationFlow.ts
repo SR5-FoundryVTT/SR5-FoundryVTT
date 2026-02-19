@@ -5,9 +5,37 @@ import { SR5Item } from "@/module/item/SR5Item";
 import { SkillFlow } from "./SkillFlow";
 
 /**
- * All behavior related to actor creation.
+ * All behavior related to actor creation and updating.
  */
 export const ActorCreationFlow = {
+    skillNameByCategoryKey(name: string, category?: string) {
+        const skillKey = SkillFlow.nameToKey(name);
+        if (!skillKey) return '';
+
+        return `${skillKey}:${category ?? ''}`;
+    },
+
+    hasSkillWithSameNameAndCategory(actor: SR5Actor, name: string, category?: string) {
+        const skillKey = SkillFlow.nameToKey(name);
+        if (!skillKey || !category) return false;
+
+        if (category === 'active') {
+            return Object.hasOwn(actor.system.skills.active, skillKey);
+        }
+
+        if (category === 'language') {
+            return Object.hasOwn(actor.system.skills.language, skillKey);
+        }
+
+        if (category === 'knowledge') {
+            for (const knowledgeSkills of Object.values(actor.system.skills.knowledge)) {
+                if (Object.hasOwn(knowledgeSkills, skillKey)) return true;
+            }
+        }
+
+        return false;
+    },
+
     /**
      * Apply a skill set to an actor by adding all associated skills and groups.
      *
@@ -34,19 +62,31 @@ export const ActorCreationFlow = {
             }
         }
 
+        // track skills added to not double add a skill to the actor.
+        const newSkillKeys = new Set<string>();
         // Remove pack ids and let Foundry assign new ones.
-        const items = [...skills, ...groups].map(item => {
+        const items = [...skills, ...groups].flatMap(item => {
             const itemData = foundry.utils.deepClone(item) as Item.CreateData & { _id?: string };
             delete itemData._id;
 
-            const itemSystemType = foundry.utils.getProperty(itemData, 'system.type');
-            if (itemData.type === 'skill' && (itemData as any).system.type === 'skill') {
+            if (itemData.type === 'skill' && foundry.utils.getProperty(itemData, 'system.type') === 'skill') {
+                // Empty skill names shouldn't cause issues.
+                if (!itemData.name) return [];
+
+                // Avoid doubly adding the same skill.
+                const skillCategory = foundry.utils.getProperty(itemData, 'system.skill.category') as string | undefined;
+                const skillNameByCategoryKey = this.skillNameByCategoryKey(itemData.name, skillCategory);
+                if (this.hasSkillWithSameNameAndCategory(actor, itemData.name, skillCategory) || newSkillKeys.has(skillNameByCategoryKey)) {
+                    return [];
+                }
+                newSkillKeys.add(skillNameByCategoryKey);
+
                 const skillKey = SkillFlow.nameToKey(itemData.name);
                 const skillGroup = groupedSkillNames.get(skillKey) ?? '';
                 foundry.utils.setProperty(itemData, 'system.skill.group', skillGroup);
             }
 
-            return itemData;
+            return [itemData];
         });
 
         if (options.useSource) {
