@@ -8,6 +8,11 @@ import { SkillFlow } from "./SkillFlow";
  * All behavior related to actor creation and updating.
  */
 export const ActorCreationFlow = {
+    /**
+     * Create a unique 'key' to compare skills of different categories with.
+     * @param name Skill name.
+     * @param category Skill category.
+     */
     skillNameByCategoryKey(name: string, category?: string) {
         const skillKey = SkillFlow.nameToKey(name);
         if (!skillKey) return '';
@@ -15,6 +20,13 @@ export const ActorCreationFlow = {
         return `${skillKey}:${category ?? ''}`;
     },
 
+    /**
+     * Check if an actor already has a skill with the same name and category
+     * @param actor Actor to check for.
+     * @param name Skill name to check for.
+     * @param category Skill category to check for.
+     * @returns true, if a matching skill was found, false otherwise.
+     */
     hasSkillWithSameNameAndCategory(actor: SR5Actor, name: string, category?: string) {
         const skillKey = SkillFlow.nameToKey(name);
         if (!skillKey || !category) return false;
