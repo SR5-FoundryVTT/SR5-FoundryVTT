@@ -453,6 +453,7 @@ export const TestCreator = {
 
             // Notify user about their sins.
             if (skill && !SkillRules.allowRoll(skill)) ui.notifications?.warn('SR5.Warnings.SkillCantBeDefault', {localize: true});
+            if (skill && !SkillRules.hasRequirements(actor, skill)) ui.notifications?.warn('SR5.Warnings.ActorMissingRequirements', {localize: true});
 
             // Custom skills don't have a label, but a name.
             // Legacy skill don't have a name, but have a label.

@@ -1130,6 +1130,7 @@
             "Threshold": " with a threshold of "
         },
         "Gear": "Gear",
+        "General": "General",
         "Glitch": "Glitch!",
         "GlitchCritical": "Critical Glitch!",
         "Glitches": "Glitches:",
@@ -2172,6 +2173,10 @@
                             "label": "Native",
                             "hint": "Marks this language as native"
                         }
+                    },
+                    "requirement": {
+                        "label": "Requirement",
+                        "hint": "What the actor must be for this skill to be available"
                     }
                 },
                 "group": {
@@ -2943,6 +2948,7 @@
         "Walk": "Walk",
         "WalkingSpeed": "Walking",
         "Warnings": {
+            "ActorMissingRequirements": "Actor must match the skills awakened or emerged requirement",
             "AlreadyExistingInventory": "An inventory with this name already exists",
             "AlreadyJoinedNetwork": "{name} already joined this network",
             "BulkImportPerformanceWarning": "If you imported a large number of items, Foundry may run slowly until you refresh your browser. It is recommended to refresh now.",

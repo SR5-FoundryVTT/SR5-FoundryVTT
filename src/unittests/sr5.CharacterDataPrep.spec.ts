@@ -237,7 +237,6 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                         active: {
                             arcana: {
                                 base: 6,
-                                bonus: [{ key: 'Test', value: 1 }],
                                 specs: ['Test']
                             }
                         }

@@ -13,6 +13,17 @@
                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
         </div>
     </div>
+    <div class="list-item">
+        <div class="list-item-start skinny">
+            <label data-tooltip="{{systemFields.skill.fields.requirement.hint}}">{{systemFields.skill.fields.requirement.label}}</label>
+        </div>
+        <div class="list-item-col">
+            {{formInput systemFields.skill.fields.requirement
+                        value=system.skill.requirement localize=true
+                        classes="short" rootId=@root.rootId
+                        disabled=@root.isPlayMode }}
+        </div>
+    </div>
 
     {{!-- SKILL TYPE --}}
     {{#if (eq system.type 'skill')}}

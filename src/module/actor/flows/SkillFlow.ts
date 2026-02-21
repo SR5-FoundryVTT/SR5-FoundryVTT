@@ -116,6 +116,7 @@ export class SkillFlow {
                 description: item.system.description.value,
                 attribute: item.system.skill.attribute,
                 canDefault: item.system.skill.defaulting,
+                requirement: item.system.skill.requirement,
                 ...(group ? { group } : {}),
             });
 

@@ -12,24 +12,19 @@ export const SkillField = () => ({
     name: new StringField({ required: true }),
     img: new StringField({ required: true }),
     description: new HTMLField({ required: true }),
-    hidden: new BooleanField(),
     label: new StringField({ required: true }),
     attribute: new StringField({
         blank: true,
         required: true,
         choices: SR5.attributes
     }),
-    _delete: new BooleanField(), // Does it use it?
     specs: new ArrayField(new StringField({ required: true })),
     canDefault: new BooleanField({ initial: true }),
     isNative: new BooleanField({ initial: false }), // this only actually applies to language skills
     id: new StringField({ required: true }),
     link: new StringField({ required: true }),
     group: new StringField({ required: true }),
-    bonus: new ArrayField(new SchemaField({
-        key: new StringField({ required: true }),
-        value: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
-    })),
+    requirement: new StringField({ required: true, initial: 'mundane', choices: SR5.specialTypes })
 });
 
 function skill(createData: foundry.data.fields.SchemaField.CreateData<ReturnType<typeof SkillField>> = {}) {
@@ -61,7 +56,7 @@ export const Skills = () => new FixedTypeObjectField(
             disguise: skill({ attribute: 'intuition', group: 'Stealth', id: 'disguise' }),
             diving: skill({ attribute: 'body', id: 'diving' }),
             escape_artist: skill({ attribute: 'agility', id: 'escape_artist' }),
-            flight: skill({ attribute: 'agility', id: 'flight', canDefault: false, hidden: true }),
+            flight: skill({ attribute: 'agility', id: 'flight', canDefault: false }),
             free_fall: skill({ attribute: 'body', id: 'free_fall' }),
             gymnastics: skill({ attribute: 'agility', group: 'Athletics', id: 'gymnastics' }),
             palming: skill({ attribute: 'agility', group: 'Stealth', canDefault: false, id: 'palming' }),

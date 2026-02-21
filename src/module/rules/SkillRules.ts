@@ -1,3 +1,4 @@
+import { SR5 } from './../config';
 import {PartsList} from "../parts/PartsList";
 import {SR} from "../constants";
 import { SR5Actor } from '@/module/actor/SR5Actor';
@@ -36,6 +37,19 @@ export class SkillRules {
      */
     static allowRoll(skill: SkillFieldType): boolean {
         return !SkillRules.mustDefaultToRoll(skill) || SkillRules.allowDefaultingRoll(skill);
+    }
+
+    /**
+     * Does actor match skills special requirements
+     * @PDF SR5#130 TODO: tamif - check skill rules reference for this
+     * @param actor The actor to check against
+     * @param skill The derived skill data to use as reference
+     * @return true, actor matches skill requirements.
+     */
+    static hasRequirements(actor: SR5Actor, skill: SkillFieldType) {
+        if (skill.requirement === 'mundane') return true;
+        const special = actor.system.special;
+        return skill.requirement === special;
     }
 
     /**

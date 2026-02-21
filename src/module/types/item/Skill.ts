@@ -20,6 +20,7 @@ const SkillTypeData = () => ({
     attribute: new StringField({ required: true, blank: true, choices: SR5.attributes }),
     // Will contain custom specialization entries.
     specializations: new ArrayField(new SchemaField(SkillSpecializationData())),
+    requirement: new StringField({ required: true, initial: 'mundane', choices: SR5.specialTypes }),
 
     language: new SchemaField(SkillLanguageData()),
 });
