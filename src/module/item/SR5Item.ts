@@ -1532,7 +1532,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         if (options.diff && options.recursive) {
             // Change used action test implementation when necessary.
             UpdateActionFlow.injectActionTestsIntoChangeData(this.type, changed, changed, this);
-            UpdateActionFlow.onUpdateAlterActionData(changed, this);
+            await UpdateActionFlow.onUpdateAlterActionData(changed, this);
+            UpdateActionFlow.onSkillCategoryUpdateAlterAttribute(changed, this);
         }
 
         return super._preUpdate(changed, options, user);

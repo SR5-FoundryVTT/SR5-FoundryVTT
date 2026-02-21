@@ -531,6 +531,14 @@ export const SR5 = {
         knowledge: 'SR5.Skill.Category.Knowledge',
         language: 'SR5.Skill.Category.Language',
     },
+    
+    // Attributes used by knowledge skill types.
+    knowledgeAttributes: {
+        academic: 'logic',
+        interests: 'intuition',
+        professional: 'logic',
+        street: 'intuition'
+    },
 
     // Pack names to use during character creation to populate skill items with.
     defaultSkillPacks: {

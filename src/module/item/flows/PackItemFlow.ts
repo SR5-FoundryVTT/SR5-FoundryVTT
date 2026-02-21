@@ -1,3 +1,4 @@
+import { SkillFlow } from '@/module/actor/flows/SkillFlow';
 import { SR5Actor } from "@/module/actor/SR5Actor";
 import { SR5Item } from "../SR5Item";
 import { FLAGS, SYSTEM_NAME } from "@/module/constants";
@@ -352,5 +353,23 @@ export const PackItemFlow = {
         }
 
         return skillGroupData;
+    },
+
+    /**
+     * Retrieve a single skill from the skills pack.
+     * @param name The name of the skill to retrieve.
+     * @returns The skill item, or undefined if not found.
+     */
+    async getSkill(name: string) {
+        if (!name) return;
+        const packName = this.getSkillsPackName();
+        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
+        if (!pack) return;
+
+        // Catch users adding skill to the pack without a name.
+        const packEntry = pack.index.find(data => data.type === 'skill' && SkillFlow.nameToKey(data.name ?? '') === SkillFlow.nameToKey(name));
+        if (!packEntry) return;
+
+        return await pack.getDocument(packEntry._id) as unknown as SR5Item<'skill'>;
     }
 };

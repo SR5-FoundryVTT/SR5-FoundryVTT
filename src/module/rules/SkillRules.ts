@@ -86,6 +86,14 @@ export class SkillRules {
         return SR.skill.SPECIALIZATION_MODIFIER;
     }
 
+    static knowledgeSkillAttribute(category: keyof typeof SR5.knowledgeAttributes): keyof typeof SR5.attributes | undefined {
+        return SR5.knowledgeAttributes[category];
+    }
+
+    static languageSkillAttribute(): keyof typeof SR5.attributes {
+        return 'intuition';
+    }
+
     /**
      * Inject all attributes into testData that match the given attribute names list.
      *

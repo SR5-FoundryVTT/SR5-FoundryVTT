@@ -1,5 +1,7 @@
 import { SR5Item } from "../SR5Item";
 import { SR5 } from '../../config';
+import { PackItemFlow } from "./PackItemFlow";
+import { SkillRules } from "@/module/rules/SkillRules";
 
 /**
  * Handling of SR5Item.update changes around ActionRollData.
@@ -11,8 +13,8 @@ export const UpdateActionFlow = {
      * @param changeData The _update changes given by the event
      * @param item The item as context of what's being changed.
      */
-    onUpdateAlterActionData(changeData: Item.UpdateData, item: SR5Item) {
-        UpdateActionFlow.onSkillUpdateAlterAttribute(changeData, item);
+    async onUpdateAlterActionData(changeData: Item.UpdateData, item: SR5Item) {
+        await UpdateActionFlow.onSkillUpdateAlterAttribute(changeData, item);
         UpdateActionFlow.onSkillUpdateAlterAttribute2(changeData, item);
     },
 
@@ -24,26 +26,25 @@ export const UpdateActionFlow = {
      * @param changeData  The _update changes given by the event
      * @param item The item as context of what's being changed.
      */
-    onSkillUpdateAlterAttribute(changeData: Item.UpdateData, item: SR5Item) {
+    async onSkillUpdateAlterAttribute(changeData: Item.UpdateData, item: SR5Item) {
         // Only change to connected attribute when no attribute has already been chosen.
         if (!('action' in item.system) || item.system.action?.attribute !== '') return;
         const skillIdOrLabel = foundry.utils.getProperty(changeData, 'system.action.skill') as string;
-        if (!skillIdOrLabel) return;
+        if (!skillIdOrLabel) return;        
 
-        // CASE - Sidebar item not owned by actor.
+        // CASE - Sidebar item not owned by actor. => use pack skill
         if (item.actor === null) {
             // Attempt to safely access the skill data structure, fallback to undefined if not present
-            const skillsActive = (game as any)?.model?.Actor?.character?.skills?.active;
-            const skill = skillsActive ? skillsActive[skillIdOrLabel] : undefined;
-            if (skill === undefined) return;
+            const skill = await PackItemFlow.getSkill(skillIdOrLabel);
+            if (!skill) return;
+            if (!skill.system.skill.attribute) return;
 
-            changeData['system.action.attribute'] = skill.attribute;
-        
-        // CASE - Owned Item on actor.
+            changeData['system.action.attribute'] = skill.system.skill.attribute; 
+        // CASE - Owned Item on actor. => use derived skill data, in case of effect changes
         } else {
             // Support both legacy and custom skills.
             const skill = item.actor.getSkill(skillIdOrLabel) ?? item.actor.getSkillByLabel(skillIdOrLabel);
-            if (skill === undefined) return;
+            if (!skill) return;
     
             changeData['system.action.attribute'] = skill.attribute;
         }
@@ -60,6 +61,30 @@ export const UpdateActionFlow = {
         if (!foundry.utils.getProperty(changeData, 'system.action.skill')) return;
 
         changeData['system.action.attribute2'] = '';
+    },
+
+    /**
+     * When a skill category is changed, remove the second attribute, as it's not needed and might cause confusion 
+     * at different places.
+     * 
+     * @param changeData The _update changes given by the event
+     * @param item The item as context of what's being changed.
+     */
+    onSkillCategoryUpdateAlterAttribute(changeData: Item.UpdateData, item: SR5Item) {
+        if (!item.isType('skill')) return;
+        const category = foundry.utils.getProperty(changeData, 'system.skill.category');
+        if (!category || category === 'active') return;
+        const knowledgeType = foundry.utils.getProperty(changeData, 'system.skill.knowledgeType') as keyof typeof SR5.knowledgeAttributes;
+        if (!knowledgeType) return;
+
+        switch (category) {
+            case 'knowledge':
+                changeData['system.skill.attribute'] = SkillRules.knowledgeSkillAttribute(knowledgeType);
+                break;
+            case 'language':
+                changeData['system.skill.attribute'] = SkillRules.languageSkillAttribute();
+                break;
+        }
     },
 
     /**
