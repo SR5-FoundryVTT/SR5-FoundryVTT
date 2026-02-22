@@ -1,0 +1,43 @@
+{
+  "name": "Pilot Aircraft",
+  "type": "skill",
+  "img": "systems/shadowrun5e/public/icons/skills/vehicle-pilot_aircraft.svg",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": ""
+    },
+    "importFlags": null,
+    "type": "skill",
+    "skill": {
+      "category": "active",
+      "rating": 0,
+      "defaulting": false,
+      "attribute": "reaction",
+      "specializations": [],
+      "group": "",
+      "requirement": "mundane",
+      "language": {
+        "isNative": false
+      },
+      "knowledgeType": null
+    },
+    "group": {
+      "skills": [],
+      "rating": 0
+    },
+    "set": {
+      "skills": [],
+      "groups": []
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "KNo1YBMlG9oR8xAX",
+  "_key": "!items!KNo1YBMlG9oR8xAX"
+}

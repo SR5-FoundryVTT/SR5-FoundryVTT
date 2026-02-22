@@ -1,0 +1,43 @@
+{
+  "name": "Free Fall",
+  "type": "skill",
+  "img": "systems/shadowrun5e/public/icons/skills/physical-freefall.svg",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": ""
+    },
+    "importFlags": null,
+    "type": "skill",
+    "skill": {
+      "category": "active",
+      "rating": 0,
+      "defaulting": true,
+      "attribute": "body",
+      "specializations": [],
+      "group": "",
+      "requirement": "mundane",
+      "language": {
+        "isNative": false
+      },
+      "knowledgeType": null
+    },
+    "group": {
+      "skills": [],
+      "rating": 0
+    },
+    "set": {
+      "skills": [],
+      "groups": []
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "idg5QjYfgf0NCHe1",
+  "_key": "!items!idg5QjYfgf0NCHe1"
+}

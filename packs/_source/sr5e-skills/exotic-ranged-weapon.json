@@ -1,0 +1,43 @@
+{
+  "name": "Exotic Ranged Weapon",
+  "type": "skill",
+  "img": "systems/shadowrun5e/public/icons/skills/combat-exotic_ranged.svg",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": ""
+    },
+    "importFlags": null,
+    "type": "skill",
+    "skill": {
+      "category": "active",
+      "rating": 0,
+      "defaulting": false,
+      "attribute": "agility",
+      "specializations": [],
+      "group": "",
+      "requirement": "mundane",
+      "language": {
+        "isNative": false
+      },
+      "knowledgeType": null
+    },
+    "group": {
+      "skills": [],
+      "rating": 0
+    },
+    "set": {
+      "skills": [],
+      "groups": []
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "985aPE9eBA9A3aPs",
+  "_key": "!items!985aPE9eBA9A3aPs"
+}
