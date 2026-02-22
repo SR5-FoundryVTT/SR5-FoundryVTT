@@ -5,6 +5,7 @@ import { Helpers } from "@/module/helpers";
 import { SR5Actor } from "../SR5Actor";
 import { PackItemFlow } from "@/module/item/flows/PackItemFlow";
 import { Translation } from "@/module/utils/strings";
+import { SR5 } from '@/module/config';
 
 // A skill storage structure for easier access to character skill items.
 export interface Skills {
@@ -355,20 +356,22 @@ export class SkillFlow {
      * - optional local actor.
      * 
      * @param actor Optional actor to include owned skills into the selection.
+     * @param categories Optional skill categories to filter for.
      * @returns Object with sorted list of skills, key = name, value = translated label
      */
-    static async getSkillSelection(actor?: SR5Actor) {
+    static async getSkillSelection(actor?: SR5Actor, categories?: (keyof typeof SR5.skillCategories)[]) {
         const skills = await PackItemFlow.getPackSkills();
 
         // Collect optional owned skills to include local only skills.
         for (const ownedSkill of actor?.itemsForType.get('skill') ?? []) {
-            if (!skills.find(skill => skill.name === ownedSkill.name)) continue;
+            if (skills.find(skill => skill.name === ownedSkill.name)) continue;
             skills.push(ownedSkill as SR5Item<'skill'>);
         }
 
         // Build and sort config value style list
         const sheetSkills: Record<string, Translation> = {};
         for (const skill of skills) {
+            if (categories && !categories.includes(skill.system.skill.category)) continue;
             if (Object.hasOwn(sheetSkills, skill.name)) continue;
             // NOTE: sortConfigValuesByTranslation relies on the value being the translation, but we have to localize already
             //       as otherwise custom skills will stay with their base label path visible in the skill list.

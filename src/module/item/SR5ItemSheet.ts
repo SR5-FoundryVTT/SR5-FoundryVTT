@@ -21,6 +21,8 @@ import { AmmunitionType, RangeType } from '../types/item/Weapon';
 
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import ItemSheet = foundry.applications.sheets.ItemSheet;
+import { Translation } from '../utils/strings';
+import { SkillFlow } from '../actor/flows/SkillFlow';
 
 const { DragDrop } = foundry.applications.ux
 const { fromUuid, fromUuidSync } = foundry.utils;
@@ -403,7 +405,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         data['vehicleMods'] = sortByName((grouped.vehicle ?? []) as SR5Item<'modification'>[]);
         data['droneMods'] = sortByName((grouped.drone ?? []) as SR5Item<'modification'>[]);
 
-        data['activeSkills'] = this._getSortedActiveSkillsForSelect();
+        data['activeSkills'] = await this._getSortedActiveSkillsForSelect();
         data['attributes'] = this._getSortedAttributesForSelect();
         data['limits'] = this._getSortedLimitsForSelect();
 
@@ -483,12 +485,21 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     /**
      * Sorted (by translation) active skills either from the owning actor or general configuration.
      */
-    _getSortedActiveSkillsForSelect() {
-        // In case of custom skill used, inject it into the skill list.
-        const skill = this.document.system.action?.skill;
-        const skills = skill ? [skill] : undefined;
+    async _getSortedActiveSkillsForSelect() {
         // Instead of item.parent, use the actorOwner as NestedItems have an actor grand parent.
-        return ActionFlow.sortedActiveSkills(this.item.actorOwner, skills);
+        const activeSkills = await SkillFlow.getSkillSelection(this.item.actorOwner, ['active']);
+
+        // In case of custom skill used, inject it into the skill list.
+        // TODO: tamif - do we still need this? Likely not.
+        const selectedSkills = [this.document.system.action?.skill, this.document.system.action?.opposed?.skill]
+            .filter((selectedSkill): selectedSkill is string => !!selectedSkill);
+
+        for (const selectedSkill of selectedSkills) {
+            if (Object.hasOwn(activeSkills, selectedSkill)) continue;
+            activeSkills[selectedSkill] = SkillFlow.localizeSkillName(selectedSkill);
+        }
+
+        return Helpers.sortConfigValuesByTranslation(activeSkills as Record<string, Translation>);
     }
 
     /* -------------------------------------------- */
