@@ -107,10 +107,13 @@ export class SkillFlow {
             // overall naming scheme.
             const key = SkillFlow.nameToKey(item.name) || item.id!;
             const group = item.system.skill.group;
+            // Allows sheet to display custom image or a category icon.
+            const hasCustomImage = item.img && item.img !== 'icons/svg/item-bag.svg';
 
             const skill = DataDefaults.createData("skill_field", {
                 id: item.id,
                 name: item.name,
+                img: hasCustomImage ? item.img : '',
                 // TODO: tamif - check for translation support
                 label: SkillFlow.localizeSkillName(item.name),
                 base: item.system.skill.rating,
