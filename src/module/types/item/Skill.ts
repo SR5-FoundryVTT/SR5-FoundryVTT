@@ -1,5 +1,6 @@
 import { SR5 } from "@/module/config";
 import { BaseItemData, ItemBase } from "./ItemBase";
+import { OpposedActionRollData } from "./Action";
 const { ArrayField, BooleanField, NumberField, StringField, SchemaField } = foundry.data.fields;
 
 const SkillLanguageData = () => ({
@@ -21,6 +22,10 @@ const SkillTypeData = () => ({
     // Will contain custom specialization entries.
     specializations: new ArrayField(new SchemaField(SkillSpecializationData())),
     requirement: new StringField({ required: true, initial: 'mundane', choices: SR5.specialTypes }),
+    // Partial action data to allow skills to have a configured opposed test.
+    action: new SchemaField({
+        opposed: OpposedActionRollData({ opposedTest: 'OpposedTest' })
+    }),
 
     language: new SchemaField(SkillLanguageData()),
 });

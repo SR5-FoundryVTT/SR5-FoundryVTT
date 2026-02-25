@@ -484,10 +484,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
     /**
      * Sorted (by translation) active skills either from the owning actor or general configuration.
+     * TODO: tamif - is this doubled with SkillFlow.getSkillSelection ?
      */
     async _getSortedActiveSkillsForSelect() {
         // Instead of item.parent, use the actorOwner as NestedItems have an actor grand parent.
-        const activeSkills = await SkillFlow.getSkillSelection(this.item.actorOwner, ['active']);
+        const activeSkills = await SkillFlow.getSkillSelection(this.item.actorOwner, { categories: ['active'] });
 
         // In case of custom skill used, inject it into the skill list.
         // TODO: tamif - do we still need this? Likely not.

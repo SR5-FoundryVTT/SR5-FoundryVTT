@@ -365,7 +365,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             if (result !== null) overrides[change.key] = result;
         }
 
-        this.overrides = {...this.overrides, ...foundry.utils.expandObject(overrides)};
+        this.overrides = { ...this.overrides, ...foundry.utils.expandObject(overrides) };
     }
 
     /**
@@ -487,7 +487,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
                 PartsList.AddUniquePart(armor.mod, 'SR5.Element', armorForDamageElement);
         }
 
-        Helpers.calcTotal(armor, {min: 0});
+        Helpers.calcTotal(armor, { min: 0 });
 
         return armor;
     }
@@ -688,15 +688,15 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     getMasterUuid(): string | undefined {
-        if(!this.isType('vehicle')) return;
+        if (!this.isType('vehicle')) return;
 
         return this.system.master;
     }
 
     async setMasterUuid(masterLink: string | undefined): Promise<void> {
-        if(!this.isType('vehicle')) return;
+        if (!this.isType('vehicle')) return;
 
-        await this.update({ system: { master: masterLink }});
+        await this.update({ system: { master: masterLink } });
     }
 
     /**
@@ -947,7 +947,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         this: SR5Actor,
         category: KnowledgeSkillCategory,
         skill: Partial<SkillFieldType> = { name: SKILL_DEFAULT_NAME }
-    ): Promise<string|undefined> {
+    ): Promise<string | undefined> {
         if (!Object.hasOwn(this.system.skills.knowledge, category)) {
             console.error(`Shadowrun5e | Tried creating knowledge skill with unknown category ${category}`);
             return;
@@ -1064,7 +1064,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     async packActionTest(packName: Shadowrun.PackName, actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
         const showDialog = this.tests.shouldShowDialog(options?.event);
-        return this.tests.fromPackAction(packName, actionName, this, {showDialog});
+        return this.tests.fromPackAction(packName, actionName, this, { showDialog });
     }
 
     /**
@@ -1131,17 +1131,17 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options.byLabel true to search the skill by label as displayed on the sheet.
      * @param options.specialization true to configure the skill test to use a specialization.
      */
-    async rollSkill(name: string, options: SkillRollOptions={}) {
+    async rollSkill(name: string, options: SkillRollOptions = {}) {
         console.info(`Shadowrun5e | Rolling skill test for ${name}`);
 
         const action = this.skillActionData(name, options);
         if (!action) return;
-        if(options.threshold) {
+        if (options.threshold) {
             action.threshold = options.threshold
         }
 
         const showDialog = this.tests.shouldShowDialog(options.event);
-        const test = await this.tests.fromAction(action, this, {showDialog});
+        const test = await this.tests.fromAction(action, this, { showDialog });
         if (!test) return;
 
         return test.execute();
@@ -1157,7 +1157,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         console.info(`Shadowrun5e | Rolling attribute ${name} test from ${this.constructor.name}`);
 
         // Prepare test from action.
-        const action = DataDefaults.createData('action_roll', {attribute: name, test: AttributeOnlyTest.name});
+        const action = DataDefaults.createData('action_roll', { attribute: name, test: AttributeOnlyTest.name });
         const showDialog = this.tests.shouldShowDialog(options.event);
         const test = await this.tests.fromAction(action, this, { showDialog });
         if (!test) return;
@@ -1186,7 +1186,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     async testFromItem(item: SR5Item, options: Shadowrun.ActorRollOptions = {}) {
         const showDialog = this.tests.shouldShowDialog(options.event);
-        return this.tests.fromItem(item, this, { showDialog});
+        return this.tests.fromItem(item, this, { showDialog });
     }
 
     /**
@@ -1211,7 +1211,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         };
         const content = await renderTemplate('systems/shadowrun5e/dist/templates/rolls/teamwork-test-message.hbs', templateData);
         // Prepare the actual message.
-        const messageData =  {
+        const messageData = {
             user: game.user.id,
             speaker: {
                 actor: this.id!,
@@ -1223,7 +1223,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             // This test data is needed for all subsequent testing based on this chat messages.
             flags: {
                 // Add test data to message to allow ChatMessage hooks to access it.
-                [SYSTEM_NAME]: {[FLAGS.Test]: {skill: skillId}},
+                [SYSTEM_NAME]: { [FLAGS.Test]: { skill: skillId } },
                 'core.canPopout': true
             },
             sound: CONFIG.sounds.dice,
@@ -1255,7 +1255,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         action.dice_pool_mod.push({ name: "Teamwork", value: teamworkData.additionalDice })
 
         const showDialog = this.tests.shouldShowDialog(options.event);
-        const test = await this.tests.fromAction(action, this, {showDialog});
+        const test = await this.tests.fromAction(action, this, { showDialog });
         if (!test) return;
 
         return test.execute();
@@ -1314,8 +1314,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         const attribute = this.getAttribute(skill.attribute);
         const limit = attribute?.limit || '';
-        // Should a specialization be used?
         const spec = options.specialization || false;
+
+        const getOpposedAction = (id: string) => {
+            const item = this.items.get(id) as SR5Item<'skill'> | undefined;
+            if (!item?.isType('skill')) return;
+            return item.system.skill.action.opposed;
+        }
 
         return DataDefaults.createData('action_roll', {
             skill: name,
@@ -1325,6 +1330,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
                 attribute: limit,
                 base_formula_operator: 'add',
             },
+            opposed: getOpposedAction(skill.id),
 
             test: 'SkillTest'
         });
@@ -1406,7 +1412,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         condition = this.__addDamageToTrackValue(damage, condition);
 
         await device.update({ system: { technology: { condition_monitor: condition } } });
-        
+
     }
 
     /**
@@ -1474,7 +1480,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         if (!this.system?.track?.[track]) return;
         const current = Math.max(this.system.track[track].value - healing, 0);
 
-        await this.update({[`system.track.${track}.value`]: current});
+        await this.update({ [`system.track.${track}.value`]: current });
     }
 
     async healStunDamage(healing: number) {
@@ -1595,8 +1601,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // Remove out old defeated effects.
         if (removeStatus.length) {
             const existing = this.effects.reduce<string[]>((arr, e) => {
-                if ((e.statuses.size === 1) && e.statuses.some(status => removeStatus.includes(status)) ) arr.push(e.id as string);
-                    return arr;
+                if ((e.statuses.size === 1) && e.statuses.some(status => removeStatus.includes(status))) arr.push(e.id as string);
+                return arr;
             }, []);
 
             if (existing.length) await this.deleteEmbeddedDocuments('ActiveEffect', existing);
@@ -1637,7 +1643,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         // While not prohibiting, inform user about missing resource.
         if (combatant.initiative + modifier < 0) {
-            ui.notifications?.warn('SR5.MissingRessource.Initiative', {localize: true});
+            ui.notifications?.warn('SR5.MissingRessource.Initiative', { localize: true });
         }
 
         await combat.adjustInitiative(combatant, modifier);
@@ -1813,7 +1819,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     async addTechnomancer(actor: SR5Actor) {
         if (!this.isType('sprite') || !actor.isType('character')) return;
-            await this.update({ system: { technomancerUuid: actor.uuid } });
+        await this.update({ system: { technomancerUuid: actor.uuid } });
     }
 
     hasTechnomancer(this: SR5Actor) {
@@ -1825,7 +1831,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     async removeTechnomancer() {
         if (!this.isType('sprite')) return;
-            await this.update({ system: { technomancerUuid: '' } });
+        await this.update({ system: { technomancerUuid: '' } });
     }
 
     /**
@@ -1854,9 +1860,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return 'matrix' in this.system;
     }
 
-       /**
-     * Check if the current actor has a Matrix persona.
-     */
+    /**
+  * Check if the current actor has a Matrix persona.
+  */
     get hasPersona(): boolean {
         return this.hasActorPersona() || this.hasDevicePersona();
     }

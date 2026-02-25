@@ -139,6 +139,51 @@
                 </div>
             {{/with}}
         {{/each}}
+        
+        
+    <div class="list-item list-item-header">
+        <div class="list-item-start">
+            <label>{{localize "SR5.Labels.Action.OpposedTest"}}</label>
+        </div>
+    </div>
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label>{{localize "SR5.Roll"}}</label>
+            </div>
+            <div class="list-item-col">
+                {{!-- Hide this field the attribtue2 is set and the skill isn't set --}}
+                {{#unless (and system.skill.action.opposed.attribute2 (not system.skill.action.opposed.skill))}}
+                    {{formInput systemFields.skill.fields.action.fields.opposed.fields.skill value=source.system.skill.action.opposed.skill
+                                options=(config2Array activeSkills) localize=true
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    <label>+</label>
+                {{/unless}}
+                {{formInput systemFields.skill.fields.action.fields.opposed.fields.attribute
+                            value=source.system.skill.action.opposed.attribute
+                            options=(config2Array attributes) localize=true
+                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{#unless system.skill.action.opposed.skill}}
+                    <label>+</label>
+                    {{formInput systemFields.skill.fields.action.fields.opposed.fields.attribute2
+                                value=source.system.skill.action.opposed.attribute2
+                                options=(config2Array attributes) localize=true
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{/unless}}
+                <label>+</label>
+                {{formInput systemFields.skill.fields.action.fields.opposed.fields.mod value=source.system.skill.action.opposed.mod
+                            classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
+                <label>+</label>
+                <a style="font-size: 1.1rem" data-tooltip="{{systemFields.skill.fields.action.fields.opposed.fields.armor.label}}:&nbsp;{{systemFields.skill.fields.action.fields.opposed.fields.armor.hint}}"
+                    {{#if @root.isEditMode}} data-action="toggleOpposedArmor" {{else}} disabled {{/if}} >
+                    {{#if system.skill.action.opposed.armor}}
+                        <i class="fas fa-shield"></i>
+                    {{else}}
+                        <i class="far fa-shield"></i>
+                    {{/if}}
+                </a>
+            </div>
+        </div>
+
     </div>
     {{!-- SKILL GROUP TYPE --}}
     {{else if (eq system.type 'group')}}

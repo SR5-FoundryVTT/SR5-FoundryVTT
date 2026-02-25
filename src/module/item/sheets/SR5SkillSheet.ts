@@ -6,11 +6,16 @@ import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from "@/module/handleba
 import ItemSheet = foundry.applications.sheets.ItemSheet;
 import { SkillFlow } from "@/module/actor/flows/SkillFlow";
 import { SR5Item } from "../SR5Item";
+import { Helpers } from "@/module/helpers";
+import { SR5 } from "@/module/config";
 
 interface SR5SkillSheetData extends SR5BaseItemSheetData {
     // config style name to translation mappings.
     skills: Record<string, string>
+    activeSkills: Record<string, string>
     groups: Record<string, string>
+
+    attributes: Record<string, string>
 }
 
 /**
@@ -92,7 +97,9 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
 
         const actor = this.document.actor || undefined;
         context.skills = await SkillFlow.getSkillSelection(actor);
+        context.activeSkills = await SkillFlow.getSkillSelection(actor, { categories: ['active'] });
         context.groups = await SkillFlow.getSkillgroupSelection(actor);
+        context.attributes = Helpers.sortConfigValuesByTranslation(SR5.attributes);
 
         return context;
     }
