@@ -13,4 +13,4 @@ export const DevHooks = {
             quenchRegister(quench);
         });
     }
-}
+};
