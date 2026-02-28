@@ -17,7 +17,6 @@ const distName = 'dist';
 const destFolder = path.resolve(process.cwd(), distName);
 const jsBundle = 'bundle.js';
 const entryPoint = "./src/module/main.ts";
-const env = process.env.ENV || 'dev';
 
 /**
  * CLEAN
@@ -31,7 +30,7 @@ async function cleanDist() {
 /**
  * JS BUILD
  */
-async function buildJS() {
+async function buildJS(env = 'dev') {
     esbuild.build({
         entryPoints: [entryPoint],
         bundle: true,
@@ -48,6 +47,9 @@ async function buildJS() {
     }).catch((err) => { console.error(err); });
 }
 
+const buildJSProd = () => buildJS('prod');
+const buildJSDev = () => buildJS('dev');
+
 /**
  * COPY ASSETS
  */
@@ -60,7 +62,7 @@ async function copyAssets() {
 /**
  * WATCH
  */
-async function watch() {
+async function watch(env = 'dev') {
     function watchCopy(pattern, out) {
         gulp.watch(pattern).on('change', () => gulp.src(pattern).pipe(gulp.dest(path.resolve(destFolder, out))));
     }
@@ -87,6 +89,9 @@ async function watch() {
 
     await context.watch();
 }
+
+const watchProd = () => watch('prod');
+const watchDev = () => watch('dev');
 
 /**
  * SASS
@@ -122,5 +127,9 @@ exports.clean = cleanDist;
 exports.sass = buildSass;
 exports.assets = copyAssets;
 exports.build = gulp.series(copyAssets, buildSass, buildJS, buildPacks);
+exports.buildProd = gulp.series(copyAssets, buildSass, buildJSProd, buildPacks);
+exports.buildDev = gulp.series(copyAssets, buildSass, buildJSDev, buildPacks);
 exports.watch = gulp.series(copyAssets, buildSass, watch);
+exports.watchProd = gulp.series(copyAssets, buildSass, watchProd);
+exports.watchDev = gulp.series(copyAssets, buildSass, watchDev);
 exports.rebuild = gulp.series(cleanDist, exports.build);

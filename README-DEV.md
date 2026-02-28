@@ -19,8 +19,11 @@ Follow these steps using your terminal (cmd.exe on Windows):
 * Start developing (you might want to link your dev and local systems folder)
 
 There are multiple gulp tasks available to help development:
+* watch => rebuild the system after a change is detected (code and `/public` data), using implicit dev build
+* watch:prod => same as watch but using prod build
+* watch:dev => same as watch but explicitly using dev build
 * watch => rebuild the system after a change is detected (code and `/public` data)
-* build => rebuild the system once (dev build, includes unit tests)
+* build => rebuild the system once (dev build, includes unit tests), using implicit dev build
 * build:prod => build the system once as a explicit prod build
 * build:dev => build the system once as a explicit dev build
 * link => See section below
