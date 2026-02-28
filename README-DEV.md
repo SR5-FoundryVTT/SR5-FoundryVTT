@@ -22,7 +22,6 @@ There are multiple gulp tasks available to help development:
 * watch => rebuild the system after a change is detected (code and `/public` data), using implicit dev build
 * watch:prod => same as watch but using prod build
 * watch:dev => same as watch but explicitly using dev build
-* watch => rebuild the system after a change is detected (code and `/public` data)
 * build => rebuild the system once (dev build, includes unit tests), using implicit dev build
 * build:prod => build the system once as a explicit prod build
 * build:dev => build the system once as a explicit dev build
@@ -30,7 +29,7 @@ There are multiple gulp tasks available to help development:
 
 The resulting application used for FoundryVTT will only use contents in `/dist`.
 
-**Note:** By default, builds include the Quench unit test framework for testing during development. Production builds (created by GitHub Actions with `ENV=prod`) exclude unit tests.
+**Note:** By default, builds include the Quench unit test framework for testing during development. Production builds (created by GitHub Actions via `npm run build:prod`) exclude unit tests.
 
 ## Linking the dev and system folder
 It's helpful, but not strictly necessary, to place your development folder separate from the FoundryVTT system folder as a system update will overwrite your development folder otherwise. This can be done by linking the two. For this to work, the shadowrun5e system can't be installed in your local Foundry.
