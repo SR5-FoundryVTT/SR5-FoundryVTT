@@ -32,11 +32,9 @@ jobs:
                     echo "MANIFEST_JSON=$(jq -c . < system.json)" >> $GITHUB_ENV
 
             - name: Build and package release artifacts
-              env:
-                  SR5_INCLUDE_QUENCH: 'false'
               run: |
                   npm ci
-                  gulp build
+                  npm run build:prod
                   npm run build:db
                   zip -r ./shadowrun5e.zip system.json template.json LICENSE README.md README-DEV.md dist/ packs/ --exclude "packs/_source/*"
 

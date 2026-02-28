@@ -17,8 +17,7 @@ const distName = 'dist';
 const destFolder = path.resolve(process.cwd(), distName);
 const jsBundle = 'bundle.js';
 const entryPoint = "./src/module/main.ts";
-const includeQuench = process.env.SR5_INCLUDE_QUENCH === 'true';
-const includeQuenchEnv = includeQuench ? 'true' : 'false';
+const env = process.env.ENV || 'dev';
 
 /**
  * CLEAN
@@ -42,7 +41,7 @@ async function buildJS() {
         format: 'esm',
         outfile: path.resolve(destFolder, jsBundle),
         define: {
-            'process.env.SR5_INCLUDE_QUENCH': JSON.stringify(includeQuenchEnv),
+            'process.env.ENV': JSON.stringify(env),
         },
         // Don't typescheck on build. Instead typecheck on PR and push and assume releases to build.
         plugins: [],
@@ -81,7 +80,7 @@ async function watch() {
         format: 'esm',
         outfile: path.resolve(destFolder, jsBundle),
         define: {
-            'process.env.SR5_INCLUDE_QUENCH': JSON.stringify(includeQuenchEnv),
+            'process.env.ENV': JSON.stringify(env),
         },
         plugins: [typecheckPlugin({watch: true})],
     })
