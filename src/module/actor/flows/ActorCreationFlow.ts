@@ -3,6 +3,7 @@ import { SR5Actor } from "../SR5Actor";
 import { SR5 } from "@/module/config";
 import { SR5Item } from "@/module/item/SR5Item";
 import { SkillFlow } from "./SkillFlow";
+import { fromUuid } from "node_modules/fvtt-types/src/foundry/client/utils/helpers.mjs";
 
 /**
  * All behavior related to actor creation and updating.
@@ -46,6 +47,37 @@ export const ActorCreationFlow = {
         }
 
         return false;
+    },
+
+    /**
+     * Remove all skills associated with a skill set from an actor. 
+     * This is used when changing the skill set of an existing actor.
+     * @param actor Actor to remove skills and skillste from
+     * @param skillsetUuid Optional uuid of the skill set to remove. If not provided, the actor's current skill set will be used.
+     */
+    async removeSkillSet(actor: SR5Actor, skillsetUuid?: string) {
+        if (!actor.system.skillset) return;
+        if (!skillsetUuid) skillsetUuid = actor.system.skillset;
+
+        const skillset = await fromUuid(skillsetUuid) as Item.Implementation | null;
+        if (!skillset?.isType('skill') || skillset.system.type !== 'set') return;
+
+        // Avoid changing skillset data to prevent unexepected issues.
+        const setSkills = [...skillset.system.set.skills];
+
+        for (const group of skillset.system.set.groups) {
+            for (const groupSkillName of group.name) {
+                setSkills.push({ name: groupSkillName, rating: 0 });
+            }
+        }
+
+        const items: string[] = [];
+        for (const setSkill of skillset.system.set.skills) {
+            const item = actor.itemsForType.get('skill')?.find(skill => skill.name === setSkill.name);
+            if (item) items.push(item.id!);
+        }
+
+        await actor.deleteEmbeddedDocuments('Item', items);
     },
 
     /**
