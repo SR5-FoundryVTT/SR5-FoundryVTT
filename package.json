@@ -34,7 +34,7 @@
         "watch": "gulp watch",
         "watch:prod": "gulp watch:prod",
         "watch:dev": "gulp watch:dev",
-        "build": "gulp build",
+        "build": "gulp build:prod",
         "build:prod": "gulp build:prod",
         "build:dev": "gulp build:dev",
         "build:db": "node ./utils/packs.mjs package pack",

@@ -29,8 +29,9 @@ async function cleanDist() {
 
 /**
  * JS BUILD
+ * @param {string} env - 'prod' or 'dev' to set the environment variable for the build
  */
-async function buildJS(env = 'dev') {
+async function buildJS(env) {
     esbuild.build({
         entryPoints: [entryPoint],
         bundle: true,
@@ -61,8 +62,9 @@ async function copyAssets() {
 
 /**
  * WATCH
+ * @param {string} env - 'prod' or 'dev' to set the environment variable for the build
  */
-async function watch(env = 'dev') {
+async function watch(env) {
     function watchCopy(pattern, out) {
         gulp.watch(pattern).on('change', () => gulp.src(pattern).pipe(gulp.dest(path.resolve(destFolder, out))));
     }
@@ -126,10 +128,10 @@ async function buildPacks() {
 exports.clean = cleanDist;
 exports.sass = buildSass;
 exports.assets = copyAssets;
-exports.build = gulp.series(copyAssets, buildSass, buildJS, buildPacks);
+exports.build = gulp.series(copyAssets, buildSass, buildJSProd, buildPacks);
 exports.buildProd = gulp.series(copyAssets, buildSass, buildJSProd, buildPacks);
-exports.buildDev = gulp.series(copyAssets, buildSass, buildJSDev, buildPacks);
-exports.watch = gulp.series(copyAssets, buildSass, watch);
+exports.buildProd = gulp.series(copyAssets, buildSass, buildJSProd, buildPacks);
+exports.watch = gulp.series(copyAssets, buildSass, watchDev);
 exports.watchProd = gulp.series(copyAssets, buildSass, watchProd);
 exports.watchDev = gulp.series(copyAssets, buildSass, watchDev);
 exports.rebuild = gulp.series(cleanDist, exports.build);
