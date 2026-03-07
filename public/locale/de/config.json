@@ -1757,6 +1757,7 @@
             "RitualNotEnoughReagents": "nicht genug Reagenzien geopfert.",
             "SkillAlreadyExists": "Fertigkeit {name} existiert bereits bei diesem Akteur. Stelle sicher, dass du einen Fertigkeitsnamen nur einmal pro Fertigkeitskategorie verwendest.",
             "SkillCantBeDefault": "Auf diese Fertigkeit kann keine Probe abgelegt werden, da sie nicht improvisiert werden kann",
+            "SkillSetDefaultTypeOutsideCompendium": "Nur Skillsets im konfigurierten Skillset Kompendium beeinflussen neue Akteure.",
             "SummoningNotConcluded": "Herbeirufung unvollständig. Warte auf Gegenprobe des Geists, um Entzug zu bestimmen.",
             "TokenSelectionNeeded": "Ein oder mehrere Tokens müssen ausgewählt sein"
         },

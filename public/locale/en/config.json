@@ -2981,6 +2981,7 @@
             "RitualNotEnoughReagents": "Not enough reagents offered.",
             "SkillAlreadyExists": "Skill {name} already exists on this actor. Make sure to only use a skill name once per skill category.",
             "SkillCantBeDefault": "This skill can't be rolled as it can't be defaulted",
+            "SkillSetDefaultTypeOutsideCompendium": "Only skillsets in the configured skillset compendium will affect actor creation",
             "SummoningNotConcluded": "Summoning incomplete. Wait for spirit to oppose summoning to determine drain.",
             "TokenSelectionNeeded": "One or more tokens need to be selected"
         },

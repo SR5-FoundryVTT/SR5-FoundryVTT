@@ -249,6 +249,14 @@
     <div class="scrollable">
         {{!-- Default configuration for new actors --}}
         <div class="list-item">
+            {{#if @root.showCompendiumWarning}}
+            <div class="list-item-col">
+                <span class="list-item-warning" data-tooltip="SR5.Warnings.SkillSetDefaultTypeOutsideCompendium">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    {{localize "SR5.Warnings.SkillSetDefaultTypeOutsideCompendium"}}
+                </span>
+            </div>
+            {{else}}
             <div class="list-item-start skinny">  
                 <label>{{localize systemFields.set.fields.default.label}}</label>
             </div>
@@ -260,6 +268,7 @@
                             classes="short"
                             disabled=@root.isPlayMode}}
             </div>
+            {{/if}}
         </div>
         {{!-- Skills section --}}
         <div class="list-item list-item-header">
