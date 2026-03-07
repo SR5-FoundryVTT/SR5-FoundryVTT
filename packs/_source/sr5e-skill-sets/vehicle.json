@@ -1,0 +1,348 @@
+{
+  "name": "Vehicle",
+  "type": "skill",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": ""
+    },
+    "importFlags": null,
+    "type": "set",
+    "skill": {
+      "category": "active",
+      "rating": 0,
+      "defaulting": false,
+      "attribute": "",
+      "specializations": [],
+      "group": "",
+      "requirement": "mundane",
+      "language": {
+        "isNative": false
+      },
+      "knowledgeType": null
+    },
+    "group": {
+      "skills": [],
+      "rating": 0
+    },
+    "set": {
+      "skills": [
+        {
+          "name": "Aeronautics Mechanic",
+          "rating": 0
+        },
+        {
+          "name": "Alchemy",
+          "rating": 0
+        },
+        {
+          "name": "Animal Handling",
+          "rating": 0
+        },
+        {
+          "name": "Arcana",
+          "rating": 0
+        },
+        {
+          "name": "Archery",
+          "rating": 0
+        },
+        {
+          "name": "Armorer",
+          "rating": 0
+        },
+        {
+          "name": "Artificing",
+          "rating": 0
+        },
+        {
+          "name": "Artisan",
+          "rating": 0
+        },
+        {
+          "name": "Assensing",
+          "rating": 0
+        },
+        {
+          "name": "Astral Combat",
+          "rating": 0
+        },
+        {
+          "name": "Automatics",
+          "rating": 0
+        },
+        {
+          "name": "Automotive Mechanic",
+          "rating": 0
+        },
+        {
+          "name": "Banishing",
+          "rating": 0
+        },
+        {
+          "name": "Binding",
+          "rating": 0
+        },
+        {
+          "name": "Biotechnology",
+          "rating": 0
+        },
+        {
+          "name": "Blades",
+          "rating": 0
+        },
+        {
+          "name": "Chemistry",
+          "rating": 0
+        },
+        {
+          "name": "Clubs",
+          "rating": 0
+        },
+        {
+          "name": "Compiling",
+          "rating": 0
+        },
+        {
+          "name": "Computer",
+          "rating": 0
+        },
+        {
+          "name": "Con",
+          "rating": 0
+        },
+        {
+          "name": "Counterspelling",
+          "rating": 0
+        },
+        {
+          "name": "Cybercombat",
+          "rating": 0
+        },
+        {
+          "name": "Cybertechnology",
+          "rating": 0
+        },
+        {
+          "name": "Decompiling",
+          "rating": 0
+        },
+        {
+          "name": "Demolitions",
+          "rating": 0
+        },
+        {
+          "name": "Disenchanting",
+          "rating": 0
+        },
+        {
+          "name": "Disguise",
+          "rating": 0
+        },
+        {
+          "name": "Diving",
+          "rating": 0
+        },
+        {
+          "name": "Electronic Warfare",
+          "rating": 0
+        },
+        {
+          "name": "Escape Artist",
+          "rating": 0
+        },
+        {
+          "name": "Etiquette",
+          "rating": 0
+        },
+        {
+          "name": "Exotic Melee Weapon",
+          "rating": 0
+        },
+        {
+          "name": "Exotic Ranged Weapon",
+          "rating": 0
+        },
+        {
+          "name": "First Aid",
+          "rating": 0
+        },
+        {
+          "name": "Flight",
+          "rating": 0
+        },
+        {
+          "name": "Forgery",
+          "rating": 0
+        },
+        {
+          "name": "Free Fall",
+          "rating": 0
+        },
+        {
+          "name": "Gunnery",
+          "rating": 0
+        },
+        {
+          "name": "Gymnastics",
+          "rating": 0
+        },
+        {
+          "name": "Hacking",
+          "rating": 0
+        },
+        {
+          "name": "Hardware",
+          "rating": 0
+        },
+        {
+          "name": "Heavy Weapons",
+          "rating": 0
+        },
+        {
+          "name": "Impersonation",
+          "rating": 0
+        },
+        {
+          "name": "Industrial Mechanic",
+          "rating": 0
+        },
+        {
+          "name": "Instruction",
+          "rating": 0
+        },
+        {
+          "name": "Intimidation",
+          "rating": 0
+        },
+        {
+          "name": "Leadership",
+          "rating": 0
+        },
+        {
+          "name": "Locksmith",
+          "rating": 0
+        },
+        {
+          "name": "Longarms",
+          "rating": 0
+        },
+        {
+          "name": "Medicine",
+          "rating": 0
+        },
+        {
+          "name": "Nautical Mechanic",
+          "rating": 0
+        },
+        {
+          "name": "Navigation",
+          "rating": 0
+        },
+        {
+          "name": "Negotiation",
+          "rating": 0
+        },
+        {
+          "name": "Palming",
+          "rating": 0
+        },
+        {
+          "name": "Perception",
+          "rating": 0
+        },
+        {
+          "name": "Performance",
+          "rating": 0
+        },
+        {
+          "name": "Pilot Aerospace",
+          "rating": 0
+        },
+        {
+          "name": "Pilot Aircraft",
+          "rating": 0
+        },
+        {
+          "name": "Pilot Exotic Vehicle",
+          "rating": 0
+        },
+        {
+          "name": "Pilot Ground Craft",
+          "rating": 0
+        },
+        {
+          "name": "Pilot Walker",
+          "rating": 0
+        },
+        {
+          "name": "Pilot Watercraft",
+          "rating": 0
+        },
+        {
+          "name": "Pistols",
+          "rating": 0
+        },
+        {
+          "name": "Registering",
+          "rating": 0
+        },
+        {
+          "name": "Ritual Spellcasting",
+          "rating": 0
+        },
+        {
+          "name": "Running",
+          "rating": 0
+        },
+        {
+          "name": "Sneaking",
+          "rating": 0
+        },
+        {
+          "name": "Software",
+          "rating": 0
+        },
+        {
+          "name": "Spellcasting",
+          "rating": 0
+        },
+        {
+          "name": "Summoning",
+          "rating": 0
+        },
+        {
+          "name": "Survival",
+          "rating": 0
+        },
+        {
+          "name": "Swimming",
+          "rating": 0
+        },
+        {
+          "name": "Throwing Weapons",
+          "rating": 0
+        },
+        {
+          "name": "Tracking",
+          "rating": 0
+        },
+        {
+          "name": "Unarmed Combat",
+          "rating": 0
+        }
+      ],
+      "groups": []
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "yXtGE7KP6Apttmz5",
+  "_key": "!items!yXtGE7KP6Apttmz5"
+}

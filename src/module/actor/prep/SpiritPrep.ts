@@ -28,7 +28,7 @@ export class SpiritPrep {
     }
 
     static prepareDerivedData(system: Actor.SystemOfType<'spirit'>, items: SR5Item[]) {
-        SpiritPrep.prepareSpiritBaseData(system);
+        SpiritPrep.prepareSpiritValues(system);
 
         // Use spirit attribute range to avoid issues with attribute calculation causing unusable attributes.
         AttributesPrep.prepareAttributes(system, SR.attributes.rangesSpirit);
@@ -51,12 +51,13 @@ export class SpiritPrep {
         CharacterPrep.prepareRecoilCompensation(system);
     }
 
+    // TODO: tamif - check if this is used and remove if not
     static prepareSpiritSpecial(system: Actor.SystemOfType<'spirit'>) {
         // Spirits will always be awakened.
         // system.special = 'magic';
     }
 
-    static prepareSpiritBaseData(system: Actor.SystemOfType<'spirit'>) {
+    static prepareSpiritValues(system: Actor.SystemOfType<'spirit'>) {
         const overrides = this.getSpiritStatModifiers(system.spiritType);
 
         if (overrides) {
@@ -73,9 +74,12 @@ export class SpiritPrep {
             // set the base of skills to the provided force
             for (const skillId of overrides.skills) {
                 // Custom skills need to be created on the actor.
-                const skill = SpiritPrep.prepareActiveSkill(skillId, skills.active);
-                if (skill === undefined) continue;
-                if (SkillFlow.isCustomSkill(skill)) continue;
+                // const skill = SpiritPrep.prepareActiveSkill(skillId, skills.active);
+                const skill = skills.active[skillId];
+                if (!skill) {
+                    console.error(`Shadowrun 5e | Spirit Prep: Skill ${skillId} not found on spirit actor.`);
+                    continue;
+                }
 
                 skill.base = overrides.halfValueSkill ? Math.ceil(force / 2) : force;
                 skills.active[skillId] = skill;
@@ -100,6 +104,7 @@ export class SpiritPrep {
      * @param skills The list of active skills of the sprite.
      * @returns A prepared SkillField without levels.
      */
+    // TODO: tamif - remove once unused
     static prepareActiveSkill(skillId: string, skills: SkillsType): SkillFieldType {
         if (skills[skillId]) return skills[skillId];
 
@@ -131,7 +136,7 @@ export class SpiritPrep {
 
         const overrides = {
             // value of 0 for attribute makes it equal to the Force
-             
+
             attributes: {
                 body: 0,
                 agility: 0,
@@ -544,7 +549,7 @@ export class SpiritPrep {
                 overrides.attributes.logic = 1;
                 overrides.attributes.intuition = 1;
                 overrides.init = 5;
-                overrides.skills.push('assensing', 'astral_combat', 'con', 'counterspelling', 'gymnastics', 'leadership', 'negotiation', 'perception', 'spellcasting', 'unarmed_combat' );
+                overrides.skills.push('assensing', 'astral_combat', 'con', 'counterspelling', 'gymnastics', 'leadership', 'negotiation', 'perception', 'spellcasting', 'unarmed_combat');
                 break;
             case "carcass":
                 overrides.attributes.body = 3;
@@ -807,7 +812,7 @@ export class SpiritPrep {
                 overrides.astral_init = 6;
                 overrides.skills.push("assensing", "astral_combat", "perception", "running", "sneaking", "unarmed_combat");
                 break;
-                
+
             case "ghasts":
                 overrides.attributes.body = 2;
                 overrides.attributes.reaction = 2;

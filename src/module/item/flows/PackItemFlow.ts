@@ -283,12 +283,29 @@ export const PackItemFlow = {
         const packEntry = pack.index.find(data => data.type === 'skill' && data.name === name);
         if (!packEntry) return;
 
-        const document = await pack.getDocument(packEntry._id) as unknown as SR5Item<'skill'>;
-        if (!document.isType('skill')) {
-            console.error(`Shadowrun 5e | Document ${name} in pack ${packName} is not of type skill`, document);
-            return;
-        };
-        return document;
+        return await pack.getDocument(packEntry._id) as unknown as SR5Item<'skill'>;
+    },
+
+    /**
+     * Retrieve all skillsets from the configured pack.
+     */
+    async getAllPackSkillSets(): Promise<SR5Item<'skill'>[]> {
+        const packName = this.getSkillSetsPackName();
+        console.debug(`Shadowrun 5e | Trying to fetch all skill sets from pack ${packName}`);
+        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
+        if (!pack) return [];
+
+        const packEntries = pack.index.filter(data => data.type === 'skill');
+
+        const documents: SR5Item<'skill'>[] = [];
+        for (const packEntry of packEntries) {
+            const document = await pack.getDocument(packEntry._id) as unknown as SR5Item<'skill'>;
+            if (document?.system.type !== 'set') continue;
+            documents.push(document);
+        }
+
+        console.debug(`Shadowrun5e | Fetched all skill sets from pack ${packName}`, documents);
+        return documents;
     },
 
     /**

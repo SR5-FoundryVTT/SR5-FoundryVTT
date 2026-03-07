@@ -129,7 +129,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     override async _preCreate(data: Actor.CreateData, options: Actor.Database.PreCreateOptions, user: User.Implementation) {
         await super._preCreate(data, options, user);
-        await ActorCreationFlow.addActorSkillSetSkills(this, data);
+        await ActorCreationFlow.addDefaultActorSkillset(this, data);
     }
 
     override async update(

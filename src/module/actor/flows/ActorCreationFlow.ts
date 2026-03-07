@@ -3,7 +3,6 @@ import { SR5Actor } from "../SR5Actor";
 import { SR5 } from "@/module/config";
 import { SR5Item } from "@/module/item/SR5Item";
 import { SkillFlow } from "./SkillFlow";
-import { fromUuid } from "node_modules/fvtt-types/src/foundry/client/utils/helpers.mjs";
 
 /**
  * All behavior related to actor creation and updating.
@@ -148,14 +147,29 @@ export const ActorCreationFlow = {
      * @param actor Actor to add skill items to.
      * @param data Creation data containing the actor type, used to determine which skill items to add.
      */
-    async addActorSkillSetSkills(actor: SR5Actor, data: Actor.CreateData) {
-        const skillSetName = SR5.defaultSkillPacks[data.type] as string;
-        if (!skillSetName) return;
+    async addDefaultActorSkillset(actor: SR5Actor, data: Actor.CreateData) {
+        // Find first default skillset for this actor type.
+        const skillSets = await PackItemFlow.getAllPackSkillSets();
+        const skillSet = skillSets.find(skillSet => {
+            if (!skillSet.system.set.default.type) return false;
+            return skillSet.system.set.default.type.includes(data.type as string);
+        });
 
-        const skillSet = await PackItemFlow.getPackSkillSet(skillSetName);
-        if (!skillSet) return;
+        if (!skillSet) {
+            console.debug(`Shadowrun 5e | No default skill set found for actor type ${data.type}, skipping default skill set application`);
+            return;
+        }
 
         await this.applySkillSetToActor(actor, skillSet, { useSource: true });
-        console.log(`Shadowrun 5e | Added skill set ${skillSet.name} to actor source data`);
+
+        switch (actor.type) {
+            case 'spirit':
+                // TODO: tamif - implement spirit skill rating overrides, maybe split out item creation
+                break;
+            default:
+                break;
+        }
+
+        console.debug(`Shadowrun 5e | Added skill set ${skillSet.name} to actor source data`);
     }
 }

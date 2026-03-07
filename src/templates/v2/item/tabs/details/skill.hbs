@@ -247,6 +247,20 @@
         </div>
     </div>
     <div class="scrollable">
+        {{!-- Default configuration for new actors --}}
+        <div class="list-item">
+            <div class="list-item-start skinny">  
+                <label>{{localize systemFields.set.fields.default.label}}</label>
+            </div>
+            <div class="list-item-col select-col">
+                {{formInput systemFields.set.fields.default.fields.type
+                            name="system.set.default.type"
+                            value=system.set.default.type
+                            options=(config2Array config.actorTypes) localize=true
+                            classes="short"
+                            disabled=@root.isPlayMode}}
+            </div>
+        </div>
         {{!-- Skills section --}}
         <div class="list-item list-item-header">
             <div class="list-item-start">

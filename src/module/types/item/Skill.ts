@@ -10,6 +10,16 @@ const SkillLanguageData = () => ({
 const SkillSpecializationData = () => ({
     name: new StringField({ required: true, initial: '', blank: true }),
 });
+/**
+ * Skillsets can be configured to be automatic defaults for new actors of a certain type.
+ * 
+ * NOTE: This is a schema field to allow for additional fields in the future, such as actor type 
+ * specific sub types.
+ */
+const SkillSetDefaultData = () => ({
+    // TODO: tamif - maybe use TagifyAltField for multi select and allow a skillset default to multiples.
+    type: new StringField({ required: true, initial: '', blank: true, choices: SR5.actorTypes, multiple: true }),
+});
 
 const SkillTypeData = () => ({
     // TODO: taMiF - Use 'type' as in SR5#128 instead of category. better differentiate between system.type and system.skill.type
@@ -46,6 +56,8 @@ const SkillSetSkillData = () => ({
 const SkillSetTypeData = () => ({
     skills: new ArrayField(new SchemaField(SkillSetSkillData())),
     groups: new ArrayField(new SchemaField(SkillSetSkillData())),
+    // default actor skillset configuration
+    default: new SchemaField(SkillSetDefaultData()),
 });
 
 const SkillData = () => ({
@@ -64,7 +76,7 @@ const SkillData = () => ({
  * Skill items implement Shadowrun skill and skill related functionality for use
  * inside of actor classes.
  * 
- * Implementation supports normal skills and group and sets, which both reference
+ * Implementation supports normal skills, groups, and sets, which both reference
  * skills from the local collection or compendiums by name.
  */
 export class Skill extends ItemBase<ReturnType<typeof SkillData>> {

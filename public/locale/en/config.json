@@ -2194,6 +2194,10 @@
                 "set": {
                     "label": "Skill Set",
                     "hint": "Configuration for a skill set",
+                    "default": {
+                        "label": "Use On New Actors",
+                        "hint": "Add this skill set to newly created actors"
+                    },
                     "skills": {
                         "label": "Skills",
                         "hint": "Skills that are part of this set",

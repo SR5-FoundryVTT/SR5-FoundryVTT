@@ -72,10 +72,12 @@ export class SkillFlow {
         }
     }
 
+    // TODO: tamif - remove
     static isCustomSkill(skill: SkillFieldType): boolean {
         return skill.name !== undefined && skill.name !== '';
     }
 
+    // TODO: tamif - remove
     static isLegacySkill(skill: SkillFieldType): boolean {
         return !SkillFlow.isCustomSkill(skill);
     }
