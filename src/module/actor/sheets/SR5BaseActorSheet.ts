@@ -682,7 +682,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         this.element?.querySelectorAll('[data-skill-modifier-tooltip]').forEach((el) => {
             el.addEventListener('mouseenter', async (e: any) => {
                 const skillId = e.target.closest('[data-skill-modifier-tooltip]').dataset.skillModifierTooltip;
-                const skill = this.actor.getSkill(skillId);
+                const skill = this.actor.getSkillById(skillId);
                 if (skill) {
                     const html = await foundry.applications.handlebars.renderTemplate(
                         SheetFlow.templateBase('common/modifiers-tooltip'),
