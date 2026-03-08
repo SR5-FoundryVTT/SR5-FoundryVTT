@@ -94,6 +94,7 @@ export class SkillFlow {
                 attribute: item.system.skill.attribute,
                 canDefault: item.system.skill.defaulting,
                 requirement: item.system.skill.requirement,
+                specs: item.system.skill.specializations.map(spec => spec.name),
                 ...(group ? { group } : {}),
             });
 

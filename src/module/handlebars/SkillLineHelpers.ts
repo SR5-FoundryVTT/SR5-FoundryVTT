@@ -1,26 +1,25 @@
 import {SkillRules} from "../rules/SkillRules";
 import {FLAGS, SYSTEM_NAME} from "../constants";
-import { SR5Item } from "../item/SR5Item";
+import { SkillFieldType } from "../types/template/Skills";
 
 export const registerSkillLineHelpers = () => {
 
-    Handlebars.registerHelper('skillSpecializations', function (skill: SR5Item<'skill'>) {
+    Handlebars.registerHelper('skillSpecializations', function (skill: SkillFieldType) {
         const span = document.createElement('span');
 
-        console.error('TODO: tam - reuse older specialization rendering logic');
-        // for (const spec of skill.system.skill.specializations) {
-        //     const specSpan = document.createElement('a');
-        //     specSpan.textContent = spec;
-        //     specSpan.className = 'skill-specialization';
-        //     specSpan.dataset.action = 'rollSkillSpecialization';
-        //     specSpan.dataset.skill = skill.id as string;
-        //     span.appendChild(specSpan);
-        // }
+        for (const spec of skill.specs) {
+            const specSpan = document.createElement('a');
+            specSpan.textContent = spec;
+            specSpan.className = 'skill-specialization';
+            specSpan.dataset.action = 'rollSkillSpecialization';
+            specSpan.dataset.skill = skill.id;
+            span.appendChild(specSpan);
+        }
 
         return new Handlebars.SafeString(span.outerHTML);
     })
 
-    Handlebars.registerHelper('skillClass', function(skill: SR5Item<'skill'>) {
+    Handlebars.registerHelper('skillClass', function(skill: SkillFieldType) {
         const classes: string[] = [];
 
         // @PDF SR5#151 not defaultable skills should be shown as italic.
