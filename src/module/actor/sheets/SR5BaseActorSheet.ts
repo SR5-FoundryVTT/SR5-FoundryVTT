@@ -27,6 +27,7 @@ import ActorSheetV2 = foundry.applications.sheets.ActorSheetV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 import { EffectCreationFlow } from '@/module/flows/EffectCreationFlow';
 import { ActorCreationFlow } from '../flows/ActorCreationFlow';
+import { SkillFieldType } from '@/module/types/template/Skills';
 
 const { TextEditor } = foundry.applications.ux;
 const { fromUuid, fromUuidSync } = foundry.utils;
@@ -1592,7 +1593,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 if (!container) return;
                 const id = listItemElem.dataset.skillId;
                 if (!id) return;
-                const skill = this.actor.items.get(id) as SR5Item<'skill'>;
+                const skill = this.actor.getSkillById(id);
                 if (!skill) return;
                 if (this._isSkillFiltered(id, skill)) {
                     container.classList.remove('hidden')
@@ -1612,22 +1613,22 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             });
     }
 
-    _isSkillFiltered(skillId: string, skill: SR5Item<'skill'>) {
+    _isSkillFiltered(skillId: string, skill: SkillFieldType) {
         // a newly created skill shouldn't be filtered, no matter what.
         // Therefore disqualify empty skill labels/names from filtering and always show them.
         const isFilterable = this._getSkillLabelOrName(skill).length > 0;
         const isHiddenForText = !this._doesSkillContainText(skillId, skill, this._filters.skills);
         console.error('TODO: tamif - must use skill value instead of rating');
-        const isHiddenForUntrained = !this._filters.showUntrainedSkills && skill.system.skill.rating === 0;
+        const isHiddenForUntrained = !this._filters.showUntrainedSkills && skill.value === 0;
 
         return !(isFilterable && (isHiddenForUntrained || isHiddenForText));
     }
 
-    _getSkillLabelOrName(skill: SR5Item<'skill'>) {
+    _getSkillLabelOrName(skill: SkillFieldType) {
         return Helpers.getSkillLabelOrName(skill);
     }
 
-    _doesSkillContainText(key: string, skill: SR5Item<'skill'>, text: string) {
+    _doesSkillContainText(key: string, skill: SkillFieldType, text: string) {
         if (!text) {
             return true;
         }
@@ -1635,7 +1636,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         // Search both english keys, localized labels and all specializations.
         const name = this._getSkillLabelOrName(skill);
         const searchKey = skill.name === undefined ? key : '';
-        const specs = skill.system.skill.specializations.join(' ');
+        const specs = skill.specs.join(' ');
         const searchString = `${searchKey} ${name} ${specs}`;
 
         return searchString.toLowerCase().search(text.toLowerCase()) > -1;

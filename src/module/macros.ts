@@ -6,8 +6,8 @@ import { SR5Item } from './item/SR5Item';
  * @param {number} slot     The hotbar slot to use
  * @returns {Promise}
  */
-import {Helpers} from "./helpers";
-import {SR5Actor} from "./actor/SR5Actor";
+import { Helpers } from "./helpers";
+import { SR5Actor } from "./actor/SR5Actor";
 import { SuccessTest, SuccessTestData } from './tests/SuccessTest';
 import { SkillFieldType } from './types/template/Skills';
 
@@ -69,10 +69,10 @@ export function rollItemMacro(itemName) {
  * @param data A data object for skill macros.
  * @param slot The hotbar slot to use.
  */
-export async function createSkillMacro(data: {skillId: string, skill: SR5Item<'skill'>}, slot) {
+export async function createSkillMacro(data: { skillId: string, skill: SkillFieldType }, slot) {
     if (!game.macros || !game.user) return;
 
-    const {skillId, skill} = data;
+    const { skillId, skill } = data;
 
     // Abort when skill macro already exists. This is done for consistency with createItemMacro behavior.
     const name = Helpers.getSkillLabelOrName(skill);
@@ -95,16 +95,16 @@ export async function createSkillMacro(data: {skillId: string, skill: SR5Item<'s
  *
  * @param skillLabel Custom skill names must be supported and legacy skill names might be translated.
  */
-export async function rollSkillMacro(skillLabel): Promise<SuccessTest<SuccessTestData>| void> {
+export async function rollSkillMacro(skillLabel): Promise<SuccessTest<SuccessTestData> | void> {
     if (!game?.actors) return;
     if (!skillLabel) return;
 
     // Fetch the actor from the current users token or the actor collection.
     const speaker = ChatMessage.getSpeaker();
     if (!speaker) return;
-    const actor =  (game.actors.tokens[speaker.token as string] || game.actors.get(speaker.actor as string)) as SR5Actor
+    const actor = (game.actors.tokens[speaker.token as string] || game.actors.get(speaker.actor as string)) as SR5Actor
 
     if (!actor) return;
-    return actor.rollSkill(skillLabel, {byLabel: true});
+    return actor.rollSkill(skillLabel, { byLabel: true });
     // TODO: Macro for skills may need their own TestCreate.fromSkillMacro... as they need getSkill('Label', {byLabel: true});
 }

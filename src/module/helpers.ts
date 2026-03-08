@@ -821,7 +821,7 @@ export class Helpers {
      * @param skill
      * @returns Either a translation or a name.
      */
-    static getSkillLabelOrName(skill: SR5Item<'skill'>): string {
+    static getSkillLabelOrName(skill: SkillFieldType): string {
         console.error('TODO: tamif - this needs to be combined with SkillFlow');
         return SkillFlow.localizeSkillName(skill.name);
     }

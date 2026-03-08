@@ -870,21 +870,24 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * Find a skill either by id or label.
      *
      * @param name Either the name or translated label (not the SR5.<label>-string)
-     * @param options .byLabel when true search will try to match given skillId with the translated label
+     * @param options.byLabel when true search will try to match given skillId with the translated label
+     * @param options.byId when true search for an actual item id in the derived system skill data.
      */
-    getSkill(this: SR5Actor, name: string, options?: { byLabel?: boolean, rollData?: SR5Actor['system'] }) {
-        if (options?.byLabel)
-            return this.getSkillByLabel(name);
-
+    getSkill(this: SR5Actor, name: string, options?: { byLabel?: boolean, byId?: boolean, rollData?: SR5Actor['system'] }) {
         // Retrieve skills from either roll or system data.
         const rollData = options?.rollData ?? this.getRollData();
         const skills = rollData?.skills ?? this.getSkills();
+
+        if (options?.byLabel)
+            return this.getSkillByLabel(name, skills);
+        if (options?.byId)
+            return this.getSkillById(name, skills);
 
         return this.getSkillByName(name, skills) ?? this.getSkillByLabel(name);
     }
 
     /**
-     * Return the skill field matching given skill item id.
+     * Return the skill field matching given skill name.
      *
      * @param name Item id of a skill on the actor, used to create a skill field.
      */
@@ -900,18 +903,32 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     /**
+     * Return the skill field matching the given skill item id
+     * 
+     * @param id The skill item id to be looked for in the dervied system skill data.
+     */
+    getSkillById(id: string, skills: SR5Actor['system']['skills'] = this.getSkills()): SkillFieldType | undefined {
+        if (!id) return;
+
+        let skillField = Object.values(skills.active).find(skill => skill.id === id);
+        if (skillField) return skillField;
+        skillField = Object.values(skills.knowledge).flatMap(category => Object.values(category)).find(skill => skill.id === id);
+        if (skillField) return skillField;
+        skillField = Object.values(skills.language).find(skill => skill.id === id);
+        if (skillField) return skillField;
+    }
+
+    /**
      * Search all skills for a matching i18n translation label.
      * NOTE: You should use getSkill if you have the skillId ready. Only use this for ease of use!
      *
      * @param label The translated output of either the skill label (after localize) or name of the skill in question.
      * @return The first skill found with a matching translation or name.
      */
-    getSkillByLabel(label: string) {
+    getSkillByLabel(label: string, skills: SR5Actor['system']['skills'] = this.getSkills()): SkillFieldType | undefined {
         if (!label) return;
 
         const possibleMatch = (skill: SkillFieldType): string => skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
-
-        const skills = this.getSkills();
 
         for (const skill of Object.values(skills.language)) {
             if (label === possibleMatch(skill))

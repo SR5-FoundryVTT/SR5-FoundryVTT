@@ -534,6 +534,7 @@ ___________________
                 createItemMacro(dropData, slot);
                 return false;
             case 'Skill':
+                // TODO: tamif - test skill macros if they are still working.
                 createSkillMacro(dropData.data, slot);
                 return false;
         }
