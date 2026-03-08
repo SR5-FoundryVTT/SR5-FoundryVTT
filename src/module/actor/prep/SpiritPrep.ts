@@ -7,7 +7,6 @@ import { ModifiersPrep } from './functions/ModifiersPrep';
 import { InitiativePrep } from './functions/InitiativePrep';
 import { Helpers } from '../../helpers';
 import { PartsList } from "../../parts/PartsList";
-import { SkillFlow } from "../flows/SkillFlow";
 import { CharacterPrep } from './CharacterPrep';
 import { GruntPrep } from './functions/GruntPrep';
 import { DataDefaults } from '../../data/DataDefaults';
@@ -81,8 +80,12 @@ export class SpiritPrep {
                     continue;
                 }
 
-                skill.base = overrides.halfValueSkill ? Math.ceil(force / 2) : force;
-                skills.active[skillId] = skill;
+                // NOTE: We apply force as a modifier instead of base to make the caluclation transparent.
+                //       Also, adding force as the skill item rating, would make updating and creating spirits
+                //       more complex.
+                const modifier = overrides.halfValueSkill ? Math.ceil(force / 2) : force;
+                const label = SR5.spiritTypes[system.spiritType];
+                new PartsList(skill.mod).addUniquePart(label, modifier);
             }
 
             // prepare initiative data
