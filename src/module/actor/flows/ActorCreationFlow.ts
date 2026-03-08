@@ -162,14 +162,6 @@ export const ActorCreationFlow = {
 
         await this.applySkillSetToActor(actor, skillSet, { useSource: true });
 
-        switch (actor.type) {
-            case 'spirit':
-                // TODO: tamif - implement spirit skill rating overrides, maybe split out item creation
-                break;
-            default:
-                break;
-        }
-
         console.debug(`Shadowrun 5e | Added skill set ${skillSet.name} to actor source data`);
     }
 }

@@ -12,16 +12,16 @@
 @use 'modifiers';
 @use 'modifiers-container';
 @use 'foundry';
-@use "settings";
+@use 'settings';
 @use 'module';
 @use 'effect';
 @use 'list-item';
-@use "horixontal-cells";
-@use "situational-modifiers-app";
-@use "actor-apps";
-@use "bundle-v2";
-@use "config/mixins";
-@use "config/variables";
+@use 'horixontal-cells';
+@use 'situational-modifiers-app';
+@use 'actor-apps';
+@use 'bundle-v2';
+@use 'config/mixins';
+@use 'config/variables';
 
 // This explicitly loads the CSS content into this location
 @include meta.load-css('../../node_modules/@yaireo/tagify/dist/tagify');
@@ -219,7 +219,7 @@
     }
     span.selection-inventory {
         display: flex;
-        gap: .25rem;
+        gap: 0.25rem;
         margin: 0.2em;
     }
 }
@@ -1196,26 +1196,6 @@ input[type='text'].display {
         color: variables.$color;
         border-color: variables.$black;
         background: variables.$dark-sunken;
-        border-radius: 0.3em;
-        text-align: center;
-
-        &:hover {
-            cursor: pointer;
-        }
-
-        &.short {
-            line-height: 1.3em;
-        }
-
-        &.light {
-            color: variables.$black;
-            background: variables.$light;
-        }
-    }
-    button.display.show-hidden-skills {
-        color: variables.$color;
-        border-color: variables.$black;
-        background: rgb(70, 7, 7);
         border-radius: 0.3em;
         text-align: center;
 

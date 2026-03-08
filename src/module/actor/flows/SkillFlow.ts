@@ -12,7 +12,6 @@ import { SR5 } from '@/module/config';
  */
 // TODO: tamif - refactor into object style
 export class SkillFlow {
-
     static async syncSkillItemGroups(actor: SR5Actor) {
         const skillItems: SR5Item<'skill'>[] = [];
         const groupItems: SR5Item<'skill'>[] = [];
@@ -53,16 +52,6 @@ export class SkillFlow {
         if (updates.length > 0) {
             await actor.updateEmbeddedDocuments('Item', updates);
         }
-    }
-
-    // TODO: tamif - remove
-    static isCustomSkill(skill: SkillFieldType): boolean {
-        return skill.name !== undefined && skill.name !== '';
-    }
-
-    // TODO: tamif - remove
-    static isLegacySkill(skill: SkillFieldType): boolean {
-        return !SkillFlow.isCustomSkill(skill);
     }
 
     /**

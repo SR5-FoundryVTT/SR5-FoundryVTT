@@ -284,13 +284,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             rollSkillSpecialization: SR5BaseActorSheet.#rollSkillSpec,
             openSkillDescription: SR5BaseActorSheet.#toggleSkillDescription,
             filterTrainedSkills: SR5BaseActorSheet.#filterUntrainedSkills,
-            // TODO: tamif - remove skill actions from sheets.
-            // addKnowledgeSkill: SR5BaseActorSheet.#createKnowledgeSkill,
-            // addLanguageSkill: SR5BaseActorSheet.#createLanguageSkill,
-            // addActiveSkill: SR5BaseActorSheet.#createActiveSkill,
-            // removeKnowledgeSkill: SR5BaseActorSheet.#deleteKnowledgeSkill,
-            // removeLanguageSkill: SR5BaseActorSheet.#deleteLanguageSkill,
-            // removeActiveSkill: SR5BaseActorSheet.#deleteActiveSkill,
 
             resetActorRunData: SR5BaseActorSheet.#resetActorRunData,
 
@@ -389,8 +382,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         // Valid data fields for all actor types.
         this._prepareActorTypeFields(data);
         this._prepareSpecialFields(data);
-        // TODO: tamif - implement this for new skill structure
-        // this._prepareSkillsWithFilters(data);
 
         this._prepareSkills(data);
 
@@ -627,9 +618,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         // Actor inventory handling....
         html.find('#select-inventory').on('change', this._onSelectInventory.bind(this));
-
-        // Misc. actor actions...
-        html.find('.show-hidden-skills').on('click', this._onShowHiddenSkills.bind(this));
 
         html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
 
@@ -1026,9 +1014,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     async _handleDeleteItem(item: SR5Item) {
         // remove from the inventory tracking system
         return this.actor.inventory.removeItem(item).then(async () => {
-            console.error('TODO: tamif - what is the need for this structure?')
-            // this.actor.deleteEmbeddedDocuments('Item', [item.id!])
-            item.delete()
+            await item.delete()
         });
     }
 
@@ -1585,7 +1571,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         // Therefore disqualify empty skill labels/names from filtering and always show them.
         const isFilterable = this._getSkillLabelOrName(skill).length > 0;
         const isHiddenForText = !this._doesSkillContainText(skillId, skill, this._filters.skills);
-        console.error('TODO: tamif - must use skill value instead of rating');
         const isHiddenForUntrained = !this._filters.showUntrainedSkills && skill.value === 0;
 
         return !(isFilterable && (isHiddenForUntrained || isHiddenForText));
@@ -1629,7 +1614,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         if (!skillId) return;
         if (!category) return;
 
-        console.error('TODO: tamif - implement all old skill edit sheet features');
         const skill = this.actor.items.get(skillId);
         if (!skill) return;
 
@@ -1681,10 +1665,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         } else if (attribute) {
             await this.actor.rollAttribute(attribute, { event });
         }
-    }
-
-    async _onShowHiddenSkills() {
-        await this.actor.showHiddenSkills();
     }
 
     /**
@@ -2028,19 +2008,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                     const skillId = skillTarget.dataset.skillId!;
                     const skill = this.actor.items.get(skillId);
                     if (skill) await skill.delete();
-                    console.error('TODO: tamif - remove this functionality and related functions?');
-                    // const subCategory = skillTarget.dataset.subcategory!;
-                    // switch (skillTarget.dataset.category) {
-                    // case 'active':
-                    //     await this.actor.removeActiveSkill(skillId);
-                    //     break;
-                    // case 'knowledge':
-                    //     await this.actor.removeKnowledgeSkill(skillId, subCategory as any);
-                    //     break;
-                    // case 'language':
-                    //     await this.actor.removeLanguageSkill(skillId);
-                    //     break;
-                    // }
                 }
             }
         ]

@@ -76,8 +76,7 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
 
     static override TABS = {
         primary: {
-            // TODO: tamIf use description as default tab / whatever is default on other item sheets
-            initial: 'details',
+            initial: 'description',
             tabs: [
                 { id: 'description', label: 'SR5.Tabs.Item.Description', cssClass: '' },
                 { id: 'details', label: 'SR5.Tabs.Item.Details', cssClass: '' },

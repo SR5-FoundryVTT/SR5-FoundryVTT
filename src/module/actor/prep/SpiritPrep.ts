@@ -9,18 +9,14 @@ import { Helpers } from '../../helpers';
 import { PartsList } from "../../parts/PartsList";
 import { CharacterPrep } from './CharacterPrep';
 import { GruntPrep } from './functions/GruntPrep';
-import { DataDefaults } from '../../data/DataDefaults';
 import { SR5 } from '../../config';
 import { SR } from '../../constants';
-import { SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
 import { SR5Item } from 'src/module/item/SR5Item';
 import { AttributesType } from 'src/module/types/template/Attributes';
 
 
 export class SpiritPrep {
     static prepareBaseData(system: Actor.SystemOfType<'spirit'>) {
-        SpiritPrep.prepareSpiritSpecial(system);
-
         ModifiersPrep.clearAttributeMods(system);
         ModifiersPrep.clearArmorMods(system);
         ModifiersPrep.clearLimitMods(system);
@@ -48,12 +44,6 @@ export class SpiritPrep {
 
         CharacterPrep.prepareRecoil(system);
         CharacterPrep.prepareRecoilCompensation(system);
-    }
-
-    // TODO: tamif - check if this is used and remove if not
-    static prepareSpiritSpecial(system: Actor.SystemOfType<'spirit'>) {
-        // Spirits will always be awakened.
-        // system.special = 'magic';
     }
 
     static prepareSpiritValues(system: Actor.SystemOfType<'spirit'>) {
@@ -99,22 +89,6 @@ export class SpiritPrep {
             initiative.astral.dice.base = overrides.astral_init_dice;
             initiative.astral.dice.mod = PartsList.AddUniquePart(initiative.astral.dice.mod, "SR5.Bonus", Number(modifiers['astral_initiative_dice']));
         }
-    }
-
-    /**
-     * Spirits can have some none default skills. The must be created first and don't count as custom skills.
-     * @param skillId Whatever skill id should be used.
-     * @param skills The list of active skills of the sprite.
-     * @returns A prepared SkillField without levels.
-     */
-    // TODO: tamif - remove once unused
-    static prepareActiveSkill(skillId: string, skills: SkillsType): SkillFieldType {
-        if (skills[skillId]) return skills[skillId];
-
-        const label = SR5.activeSkills[skillId];
-        const attribute = SR5.activeSkillAttribute[skillId];
-
-        return DataDefaults.createData('skill_field', { label, attribute, canDefault: false })
     }
 
     /**

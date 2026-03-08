@@ -974,65 +974,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     /**
-     * Mark the given skill as hidden.
-     *
-     * NOTE: Hiding skills has
-     *
-     * @param skillId The id of any type of skill.
-     */
-    async hideSkill(skillId: string) {
-        console.error('TODO: tamif - remove hidden skill functionality.');
-        // if (!skillId) return;
-        // const skill = this.getSkill(skillId);
-        // if (!skill) return;
-
-        // skill.hidden = true;
-        // const updateData = Helpers.getUpdateDataEntry(`system.skills.active.${skillId}`, skill);
-        // await this.update(updateData);
-    }
-
-    /**
-     * mark the given skill as visible.
-     *
-     * @param skillId The id of any type of skill.
-     */
-    async showSkill(skillId: string) {
-        console.error('TODO: tamif - remove hidden skill functionality.');
-        // if (!skillId) return;
-        // const skill = this.getSkill(skillId);
-        // if (!skill) return;
-
-        // skill.hidden = false;
-        // const updateData = Helpers.getUpdateDataEntry(`system.skills.active.${skillId}`, skill);
-        // await this.update(updateData);
-    }
-
-    /**
-     * Show all hidden skills.
-     *
-     * For hiding/showing skill see SR5Actor#showSkill and SR5Actor#hideSkill.
-     */
-    async showHiddenSkills() {
-        console.error('TODO: tamif - remove hidden skill functionality.');
-        // const updateData = {};
-
-        // const skills = this.getActiveSkills();
-        // for (const [id, skill] of Object.entries(skills)) {
-        //     if (skill.hidden) {
-        //         skill.hidden = false;
-        //         updateData[`system.skills.active.${id}`] = skill;
-        //     }
-        // }
-
-        // if (!updateData) return;
-
-        // await this.update(updateData);
-        // // NOTE: For some reason unlinked token actors won't cause a render on update?
-        // if (!this.prototypeToken.actorLink)
-        //     await this.sheet?.render();
-    }
-
-    /**
      * Prompt the current user for a generic roll.
      */
     async promptRoll() {

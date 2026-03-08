@@ -4,8 +4,8 @@ import { SYSTEM_NAME } from "../constants";
 import { SR5Actor } from "../actor/SR5Actor";
 import { Translation } from '../utils/strings';
 import { LinksHelpers } from '@/module/utils/links';
-import { SR5Item } from '../item/SR5Item';
 import { SkillFlow } from '../actor/flows/SkillFlow';
+import { SkillFieldType } from '../types/template/Skills';
 
 export const registerBasicHelpers = () => {
     /**
@@ -18,19 +18,19 @@ export const registerBasicHelpers = () => {
         return game.i18n.localize(strId);
     });
 
-    Handlebars.registerHelper('localizeDocumentType', function (document) {  
+    Handlebars.registerHelper('localizeDocumentType', function (document) {
         if (document.type.length < 1) return '';
         const documentClass = document instanceof SR5Actor ? 'Actor' : 'Item';
         const i18nTypeLabel = `TYPES.${documentClass}.${document.type}`;
         return game.i18n.localize(i18nTypeLabel as Translation);
     });
 
-    Handlebars.registerHelper('localizeSkill', function (skill: SR5Item<'skill'> | string, options): string {
-        console.error('TODO: tamif - what is this doing?');
+    Handlebars.registerHelper('localizeSkill', function (skill: SkillFieldType | string, options): string {
+        console.error('TODO: tamif - why is it necessary to both check for skill and skill name?');
         if (typeof skill === 'string') {
             const actor = options.data.root.actor as SR5Actor;
             if (!actor) return skill;
-            const newSkill = actor.items.get(skill) as SR5Item<'skill'> | undefined;
+            const newSkill = actor.getSkill(skill) || undefined;
             if (!newSkill) return skill;
             skill = newSkill;
         }
@@ -143,14 +143,14 @@ export const registerBasicHelpers = () => {
     /**
      * Given an object return the value for a given key.
      */
-    Handlebars.registerHelper('objValue', function(obj: Record<string, unknown>, key: string) {
-        return obj[key] ||  '';
+    Handlebars.registerHelper('objValue', function (obj: Record<string, unknown>, key: string) {
+        return obj[key] || '';
     });
 
     /**
      * Creates an array from a spread set of objects ie. (toArray "foo" "bar") => ["foo", "bar"]
      */
-    Handlebars.registerHelper('toArray', function(...vals) {
+    Handlebars.registerHelper('toArray', function (...vals) {
         const copy = [...vals];
         copy.splice(-1); //Remove handlebars options object from last item in array
         return copy;
@@ -160,7 +160,7 @@ export const registerBasicHelpers = () => {
      * Checks if an element should be displayed based on the value of the MarkImports Setting
      * 'ANY' option returns true as long as the setting isn't set to 'NONE'
      */
-    Handlebars.registerHelper('itemMarking', function(element: string) {
+    Handlebars.registerHelper('itemMarking', function (element: string) {
         const mark = game.settings.get(SYSTEM_NAME, 'MarkImports');
         if (element === 'ANY' && mark !== 'NONE') {
             return true;
@@ -174,7 +174,7 @@ export const registerBasicHelpers = () => {
     /**
      * Check whether an actor has any items that are freshly imported
      */
-    Handlebars.registerHelper('hasAnyFreshImports', function(actor: SR5Actor) {
+    Handlebars.registerHelper('hasAnyFreshImports', function (actor: SR5Actor) {
         if (game.settings.get(SYSTEM_NAME, 'MarkImports') !== 'NONE') {
             const allItems = actor.items;
             for (const item of allItems) {
@@ -193,29 +193,29 @@ export const registerBasicHelpers = () => {
      * Allow using the first given value that's defined.
      * @params * A open list of parameters, from which the first defined value will be returned.
      */
-    Handlebars.registerHelper('firstDefined', function(...values) {
+    Handlebars.registerHelper('firstDefined', function (...values) {
         for (const value of values) {
             if (value !== undefined) return value;
         }
         return undefined;
     });
 
-    Handlebars.registerHelper('isURL', function(value: string) {
+    Handlebars.registerHelper('isURL', function (value: string) {
         return LinksHelpers.isURL(value);
     })
 
-    Handlebars.registerHelper('isPDF', function(value: string) {
+    Handlebars.registerHelper('isPDF', function (value: string) {
         return LinksHelpers.isPDF(value);
     })
 
-    Handlebars.registerHelper('isUuid', function(value: string) {
+    Handlebars.registerHelper('isUuid', function (value: string) {
         return LinksHelpers.isUuid(value);
     })
 
     /**
      * Expects a config object and turns it into an array of objects for FormGroup options
      */
-    Handlebars.registerHelper('config2Array', function(config: Record<string, string>) {
+    Handlebars.registerHelper('config2Array', function (config: Record<string, string>) {
         return Object.keys(config).map(category => ({
             label: config[category] ?? category,
             value: category
@@ -225,7 +225,7 @@ export const registerBasicHelpers = () => {
     /**
      * Expects a config object and turns it into an array of objects for FormGroup options
      */
-    Handlebars.registerHelper('tests2Array', function(config: Record<string, any>) {
+    Handlebars.registerHelper('tests2Array', function (config: Record<string, any>) {
         return Object.keys(config).map(test => ({
             label: test,
             value: test
@@ -235,11 +235,11 @@ export const registerBasicHelpers = () => {
     /**
      * Display the Nuyen value in a format using locale separators
      */
-    Handlebars.registerHelper('nuyenValue', function(nuyen: number) {
+    Handlebars.registerHelper('nuyenValue', function (nuyen: number) {
         return Number(nuyen).toLocaleString(game.i18n.lang);
     })
 
-    Handlebars.registerHelper('hasKey', function(obj: Record<string, unknown>, key: string) {
+    Handlebars.registerHelper('hasKey', function (obj: Record<string, unknown>, key: string) {
         if (!obj || typeof obj !== 'object') return false;
         return Object.hasOwn(obj, key);
     });
