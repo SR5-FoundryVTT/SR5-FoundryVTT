@@ -1,4 +1,4 @@
-import { KnowledgeSkillCategory, SkillFieldType } from "src/module/types/template/Skills";
+import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from "src/module/types/template/Skills";
 import { SR5Item } from "@/module/item/SR5Item";
 import { DataDefaults } from "@/module/data/DataDefaults";
 import { Helpers } from "@/module/helpers";
@@ -6,23 +6,6 @@ import { SR5Actor } from "../SR5Actor";
 import { PackItemFlow } from "@/module/item/flows/PackItemFlow";
 import { Translation } from "@/module/utils/strings";
 import { SR5 } from '@/module/config';
-
-// A skill storage structure for easier access to character skill items.
-export interface Skills {
-    // quick access based on name and label.
-    // TODO: tamif - these must be removed, as name / locale isn't unquie across skill types.
-    named: Map<string, SR5Item<'skill'>>
-    localized: Map<string, SR5Item<'skill'>>
-    // sorted lists for sheet display.
-    active: SR5Item<'skill'>[]
-    language: SR5Item<'skill'>[]
-    knowledge: {
-        academic: SR5Item<'skill'>[]
-        professional: SR5Item<'skill'>[]
-        street: SR5Item<'skill'>[]
-        interests: SR5Item<'skill'>[]
-    }
-};
 
 /**
  * Handle functionality between actors and their skills.
@@ -86,7 +69,6 @@ export class SkillFlow {
      * Derive actor skill data from their skill items.
      * 
      * @param items Skill items to transform. It must only be skill items.
-     * @returns 
      */
     static prepareActorSkills(items: SR5Item<'skill'>[]) {
         const skills = {
@@ -141,8 +123,6 @@ export class SkillFlow {
             }
         }
 
-        // TODO: tamif - implement sorting again
-
         return skills;
     }
 
@@ -169,11 +149,11 @@ export class SkillFlow {
      * @param asc Set to true for ascending sorting order and to false for descending order.
      * @return Sorted Skills given by the skills parameter
      */
-    static sortSkills(skills: SR5Item<'skill'>[], asc = true) {
+    static sortSkills(skills: SkillsType, asc = true) {
         // Filter entries instead of values to have a store of ids for easy rebuild.
-        const sortedSkills = skills.sort((a, b) => {
-            const comparatorA = SkillFlow.localizeSkillName(a.name);
-            const comparatorB = SkillFlow.localizeSkillName(b.name);
+        const sortedSkills = Object.values(skills).sort((a, b) => {
+            const comparatorA = a.label;
+            const comparatorB = b.label;
             // Use String.localeCompare instead of the > Operator to support other alphabets.
             if (asc)
                 return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
@@ -183,8 +163,8 @@ export class SkillFlow {
 
         const sortedSkillsObject = {};
         sortedSkills.forEach(skill => {
-            const translated = SkillFlow.localizeSkillName(skill.name);
-            sortedSkillsObject[translated] = skill;
+            const key = SkillFlow.nameToKey(skill.name);
+            sortedSkillsObject[key] = skill;
         });
 
         return sortedSkillsObject;
@@ -218,27 +198,6 @@ export class SkillFlow {
      */
     static localizeSkillsetName(name: string) {
         return Helpers.localizeName(name, 'SR5.Skill.Sets');
-    }
-
-    /**
-     * Prepare a default data structure for skill items that allows to
-     * better retrieve them compared to a flat skill item list.
-     */
-    static getDefaultActorSkills(): Skills {
-        return {
-            // quick access based on name and label.
-            named: new Map(),
-            localized: new Map(),
-            // sorted lists for sheet display.
-            active: [],
-            language: [],
-            knowledge: {
-                academic: [],
-                professional: [],
-                street: [],
-                interests: [],
-            }
-        };
     }
 
     /**

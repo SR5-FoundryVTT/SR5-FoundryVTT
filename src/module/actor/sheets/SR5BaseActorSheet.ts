@@ -20,7 +20,7 @@ import { InventoryType } from 'src/module/types/actor/Common';
 import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
 import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
 import { SheetFlow } from '@/module/flows/SheetFlow';
-import { SkillFlow, Skills } from '@/module/actor/flows/SkillFlow';
+import { SkillFlow } from '@/module/actor/flows/SkillFlow';
 import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import ActorSheetV2 = foundry.applications.sheets.ActorSheetV2;
@@ -64,13 +64,13 @@ export interface SR5SheetFilters {
  * All keys are localized strings.
  */
 interface SheetSkills {
-    active: Record<string, SR5Item<'skill'>>;
-    language: Record<string, SR5Item<'skill'>>;
+    active: Record<string, SkillFieldType>;
+    language: Record<string, SkillFieldType>;
     knowledge: {
-        street: Record<string, SR5Item<'skill'>>;
-        academic: Record<string, SR5Item<'skill'>>;
-        professional: Record<string, SR5Item<'skill'>>;
-        interests: Record<string, SR5Item<'skill'>>;
+        street: Record<string, SkillFieldType>;
+        academic: Record<string, SkillFieldType>;
+        professional: Record<string, SkillFieldType>;
+        interests: Record<string, SkillFieldType>;
     }
 }
 
@@ -1486,56 +1486,23 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return `(${active}/${max})`;
     }
     /**
-     * Prepare skills with sorting and filtering given by this sheet.
-     *
-     * @param sheetData What is to be displayed on sheet.
-     */
-    _prepareSkillsWithFilters(sheetData: SR5ActorSheetData) {
-        this._filterActiveSkills(sheetData);
-    }
-
-    /**
-     * Prepare skills with sorting and filtering given by this sheet.
+     * Prepare skills with sorting.
      *
      * @param sheetData What is to be displayed on sheet.
      */
     _prepareSkills(sheetData: SR5ActorSheetData) {
-        sheetData.skills = {
-            active: {},
-            language: {},
-            knowledge: {
-                street: {},
-                academic: {},
-                professional: {},
-                interests: {}
-            }
-        };
-
-        sheetData.skills = this._sortSkills(sheetData, this.document.skills);
+        sheetData.system.skills = this._sortSkills(sheetData, this.document.system.skills);
     }
 
-    _sortSkills(sheetData: SR5ActorSheetData, skills: Skills) {
-        sheetData.skills.active = SkillFlow.sortSkills(skills.active);
-        sheetData.skills.language = SkillFlow.sortSkills(skills.language);
-        sheetData.skills.knowledge.street = SkillFlow.sortSkills(skills.knowledge.street);
-        sheetData.skills.knowledge.academic = SkillFlow.sortSkills(skills.knowledge.academic);
-        sheetData.skills.knowledge.professional = SkillFlow.sortSkills(skills.knowledge.professional);
-        sheetData.skills.knowledge.interests = SkillFlow.sortSkills(skills.knowledge.interests);
+    _sortSkills(sheetData: SR5ActorSheetData, skills: SR5Actor['system']['skills']) {
+        sheetData.system.skills.active = SkillFlow.sortSkills(skills.active);
+        sheetData.system.skills.language = SkillFlow.sortSkills(skills.language);
+        sheetData.system.skills.knowledge.street = SkillFlow.sortSkills(skills.knowledge.street);
+        sheetData.system.skills.knowledge.academic = SkillFlow.sortSkills(skills.knowledge.academic);
+        sheetData.system.skills.knowledge.professional = SkillFlow.sortSkills(skills.knowledge.professional);
+        sheetData.system.skills.knowledge.interests = SkillFlow.sortSkills(skills.knowledge.interests);
 
-        return sheetData.skills;
-    }
-
-    _filterSkills(sheetData: SR5ActorSheetData, skills: Record<string, SR5Item<'skill'>> = {}) {
-        const filteredSkills = {};
-        for (const [key, skill] of Object.entries(skills)) {
-            // Filter visible skills.
-            if (this._showSkill(key, skill, sheetData)) {
-                filteredSkills[key] = skill;
-            }
-        }
-
-        // return Helpers.sortSkills(filteredSkills);
-        return filteredSkills;
+        return sheetData.system.skills;
     }
 
     _showSkill(key: string, skill: SR5Item<'skill'>, sheetData: SR5ActorSheetData) {
@@ -1640,11 +1607,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const searchString = `${searchKey} ${name} ${specs}`;
 
         return searchString.toLowerCase().search(text.toLowerCase()) > -1;
-    }
-
-    _filterActiveSkills(sheetData: SR5ActorSheetData) {
-        // Handle active skills directly, as it doesn't use sub-categories.
-        sheetData.skills.active = this._filterSkills(sheetData, sheetData.skills.active);
     }
 
     _isSkillMagic(id: string, skill: SR5Item<'skill'>) {

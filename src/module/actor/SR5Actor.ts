@@ -97,9 +97,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     // Quick access for all items of a type.
     itemsForType = new Map<Item.ConfiguredSubType, SR5Item[]>();
 
-    // Quick access to all skill items based on their configuration.
-    skills = SkillFlow.getDefaultActorSkills();
-
     constructor(data: Actor.CreateData<SubType>, context?: Actor.ConstructionContext) {
         super(data, context);
 
@@ -308,7 +305,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     prepareSkills() {
         const skills = this.itemsForType.get('skill') as SR5Item<'skill'>[];
         if (!skills) return;
-        this.skills = SkillFlow.getDefaultActorSkills();
 
         this.system.skills = SkillFlow.prepareActorSkills(skills);
     }
@@ -402,14 +398,12 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     /**
      * Some actors have skills, some don't. While others don't have skills but derive skill values from their ratings.
      */
-    findActiveSkill(skillName?: string): SR5Item<'skill'> | undefined {
-        console.error('TODO: tamif - function doesnt do what documentation says it does');
-        // Check for faulty to catch empty names as well as missing parameters.
+    findActiveSkill(skillName?: string): SkillFieldType | undefined {
         if (!skillName) return;
 
-        // Handle legacy skills (name is id)
-        const skill = this.skills.named.get(skillName);
-        if (skill?.system.skill.category === 'active') return skill;
+        const skills = this.getActiveSkills();
+        const skill = skills[skillName];
+        if (skill) return skill;
     }
 
     findAttribute(id?: string): AttributeFieldType | undefined {
@@ -668,7 +662,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         }
     }
 
-    getVehicleTypeSkill(): SR5Item<'skill'> | undefined {
+    getVehicleTypeSkill(): SkillFieldType | undefined {
         if (!this.isType('vehicle')) return;
 
         const name = this.getVehicleTypeSkillName();

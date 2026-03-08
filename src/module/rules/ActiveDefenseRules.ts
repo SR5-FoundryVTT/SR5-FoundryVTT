@@ -5,7 +5,7 @@ import { Translation } from "../utils/strings";
 /**
  * Everything around SR5#190 'Active Defenses'
  */
-export type ActiveDefenseData = Record<string, { label: Translation, value: number|undefined, initMod: number, weapon?: string, disabled?: boolean }>
+export type ActiveDefenseData = Record<string, { label: Translation, value: number | undefined, initMod: number, weapon?: string, disabled?: boolean }>
 
 export const ActiveDefenseRules = {
     /**
@@ -15,7 +15,7 @@ export const ActiveDefenseRules = {
      */
     availableActiveDefenses: (weapon: SR5Item<'weapon'>, actor: SR5Actor): ActiveDefenseData => {
         // General purpose active defenses. ()
-        const activeDefenses: ActiveDefenseData  = {
+        const activeDefenses: ActiveDefenseData = {
             full_defense: {
                 label: 'SR5.FullDefense',
                 value: actor.getFullDefenseAttribute()?.value,
@@ -25,22 +25,21 @@ export const ActiveDefenseRules = {
 
         if (!weapon.isMeleeWeapon()) return activeDefenses;
 
-        console.error('TODO: tamif - use value instead of rating');
         // Melee weapon specific active defenses.
         activeDefenses['dodge'] = {
             label: 'SR5.Dodge',
-            value: actor.findActiveSkill('gymnastics')?.system.skill.rating,
+            value: actor.findActiveSkill('gymnastics')?.value,
             initMod: -5,
         };
         activeDefenses['block'] = {
             label: 'SR5.Block',
-            value: actor.findActiveSkill('unarmed_combat')?.system.skill.rating,
+            value: actor.findActiveSkill('unarmed_combat')?.value,
             initMod: -5,
         };
         activeDefenses['parry'] = {
             label: 'SR5.Parry',
             weapon: weapon.name || '',
-            value: actor.findActiveSkill(weapon.system.action.skill)?.system.skill.rating,
+            value: actor.findActiveSkill(weapon.system.action.skill)?.value,
             initMod: -5,
         };
 
