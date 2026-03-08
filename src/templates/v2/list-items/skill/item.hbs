@@ -1,5 +1,5 @@
 <div class="list-item-container {{cssClass}} {{#if (hasKey @root.expandedSkills id)}} expanded {{/if}}">
-    <div class="list-item {{skillClass skill}}"
+    <div class="list-item"
          data-skill-id="{{skill.id}}"
          data-skill-name="{{skill.name}}"
          data-category="{{category}}"
@@ -41,7 +41,7 @@
                     {{/if}}
                 />
             </button>
-            <a data-action="openSkillDescription">{{skill.label}}</a>
+            <a class="{{skillClass skill}}" data-action="openSkillDescription">{{skill.label}}</a>
         </div>
         {{#if @root.isPlayMode}}
         <div class="list-item-col">

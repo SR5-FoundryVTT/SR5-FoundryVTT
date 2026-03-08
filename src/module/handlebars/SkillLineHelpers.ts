@@ -3,7 +3,9 @@ import {FLAGS, SYSTEM_NAME} from "../constants";
 import { SkillFieldType } from "../types/template/Skills";
 
 export const registerSkillLineHelpers = () => {
-
+    /**
+     * Handle rendering of skill specializations in the skill line of any skill list.
+     */
     Handlebars.registerHelper('skillSpecializations', function (skill: SkillFieldType) {
         const span = document.createElement('span');
 
@@ -19,14 +21,16 @@ export const registerSkillLineHelpers = () => {
         return new Handlebars.SafeString(span.outerHTML);
     })
 
+    /**
+     * Add css classes to a skill list HTML element to show skill defaulting.
+     */
     Handlebars.registerHelper('skillClass', function(skill: SkillFieldType) {
         const classes: string[] = [];
 
         // @PDF SR5#151 not defaultable skills should be shown as italic.
-        console.error("TODO: reimplement skillClass helper for new skill structure");
-        // if (game.settings.get(SYSTEM_NAME, FLAGS.ShowSkillsWithDetails) && !SkillRules.allowDefaultingRoll(skill)) {
-        //     classes.push('skill-roll-not-defaultable');
-        // }
+        if (game.settings.get(SYSTEM_NAME, FLAGS.ShowSkillsWithDetails) && !SkillRules.allowDefaultingRoll(skill)) {
+            classes.push('skill-roll-not-defaultable');
+        }
 
         return new Handlebars.SafeString(classes.join(" "));
     })
