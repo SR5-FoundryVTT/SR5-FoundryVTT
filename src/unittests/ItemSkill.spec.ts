@@ -51,7 +51,11 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             const originalGetSkillGroupsForSkillSet = PackItemFlow.getSkillGroupsForSkillSet;
 
             PackItemFlow.getSkillsForSkillSet = async () => [skillTemplate.toObject()];
-            PackItemFlow.getSkillGroupsForSkillSet = async () => [groupTemplate.toObject()];
+            PackItemFlow.getSkillGroupsForSkillSet = async () => {
+                const groupData = groupTemplate.toObject();
+                groupData.system.group.rating = 4;
+                return [groupData];
+            };
 
             try {
                 await ActorCreationFlow.applySkillSetToActor(actor, skillSet);
@@ -66,6 +70,11 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
 
             assert.exists(createdSkill);
             assert.strictEqual(createdSkill?.system.skill.group, 'Firearms');
+            assert.strictEqual(createdSkill?.system.skill.rating, 4);
+
+            const derivedSkill = actor.getSkill('Pistols');
+            assert.exists(derivedSkill);
+            assert.strictEqual(derivedSkill?.base, 4);
         });
 
         it('applies configured skill set specializations to created skill items', async () => {
@@ -145,6 +154,121 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             } finally {
                 PackItemFlow.getPackSkills = originalGetPackSkills;
             }
+        });
+    });
+
+    describe('SkillFlow.syncSkillItemGroups', () => {
+        it('applies group ratings to derived skill fields', async () => {
+            const actor = await factory.createActor({
+                type: 'character',
+                system: {
+                    attributes: {
+                        agility: { base: 3 },
+                    },
+                },
+            });
+
+            await actor.createEmbeddedDocuments('Item', [
+                {
+                    type: 'skill',
+                    name: 'Firearms',
+                    system: {
+                        type: 'group',
+                        group: {
+                            rating: 4,
+                            skills: ['Pistols'],
+                        },
+                    },
+                },
+                {
+                    type: 'skill',
+                    name: 'Pistols',
+                    system: {
+                        type: 'skill',
+                        skill: {
+                            category: 'active',
+                            attribute: 'agility',
+                            rating: 1,
+                        },
+                    },
+                },
+            ]);
+
+            await SkillFlow.syncSkillItemGroups(actor);
+
+            const skillItem = actor.items.find(item => {
+                return item.isType('skill') && item.system.type === 'skill' && item.name === 'Pistols';
+            }) as SR5Item<'skill'> | undefined;
+
+            assert.exists(skillItem);
+            assert.strictEqual(skillItem?.system.skill.group, 'Firearms');
+            assert.strictEqual(skillItem?.system.skill.rating, 4);
+
+            const derivedSkill = actor.getSkill('Pistols');
+            assert.exists(derivedSkill);
+            assert.strictEqual(derivedSkill?.base, 4);
+            assert.strictEqual(derivedSkill?.value, 4);
+            assert.strictEqual(actor.getPool('Pistols'), 7);
+        });
+
+        it('updates grouped skill item ratings when the group rating changes', async () => {
+            const actor = await factory.createActor({
+                type: 'character',
+                system: {
+                    attributes: {
+                        agility: { base: 3 },
+                    },
+                },
+            });
+
+            await actor.createEmbeddedDocuments('Item', [
+                {
+                    type: 'skill',
+                    name: 'Firearms',
+                    system: {
+                        type: 'group',
+                        group: {
+                            rating: 2,
+                            skills: ['Pistols'],
+                        },
+                    },
+                },
+                {
+                    type: 'skill',
+                    name: 'Pistols',
+                    system: {
+                        type: 'skill',
+                        skill: {
+                            category: 'active',
+                            attribute: 'agility',
+                            rating: 1,
+                        },
+                    },
+                },
+            ]);
+
+            await SkillFlow.syncSkillItemGroups(actor);
+
+            const groupItem = actor.items.find(item => {
+                return item.isType('skill') && item.system.type === 'group' && item.name === 'Firearms';
+            }) as SR5Item<'skill'> | undefined;
+
+            assert.exists(groupItem);
+            await groupItem?.update({ system: { group: { rating: 5 } } });
+            await SkillFlow.syncSkillItemGroups(actor);
+
+            const skillItem = actor.items.find(item => {
+                return item.isType('skill') && item.system.type === 'skill' && item.name === 'Pistols';
+            }) as SR5Item<'skill'> | undefined;
+
+            assert.exists(skillItem);
+            assert.strictEqual(skillItem?.system.skill.rating, 5);
+
+            const derivedSkill = actor.getSkill('Pistols');
+            assert.exists(derivedSkill);
+            assert.strictEqual(derivedSkill?.base, 5);
+            assert.strictEqual(derivedSkill?.value, 5);
+            assert.strictEqual(actor.getPool('Pistols'), 8);
         });
     });
 

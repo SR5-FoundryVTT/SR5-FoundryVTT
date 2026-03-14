@@ -93,7 +93,7 @@ export const ActorCreationFlow = {
         const groups = await PackItemFlow.getSkillGroupsForSkillSet(skillSet) as Item.CreateData[];
         const configuredSkillEntries = new Map(skillSet.system.set.skills.map(skill => [skill.name, skill]));
 
-        const groupedSkillNames = new Map<string, string>();
+        const groupedSkillNames = new Map<string, { name: string, rating: number }>();
         for (const group of groups) {
             const groupData = group as Item.CreateData & {
                 type: string;
@@ -101,6 +101,7 @@ export const ActorCreationFlow = {
                     type?: string;
                     group?: {
                         skills?: string[];
+                        rating?: number;
                     };
                 };
             };
@@ -111,7 +112,10 @@ export const ActorCreationFlow = {
                 const groupedSkillKey = SkillFlow.nameToKey(groupedSkillName);
                 if (!groupedSkillKey || groupedSkillNames.has(groupedSkillKey)) continue;
 
-                groupedSkillNames.set(groupedSkillKey, groupData.name);
+                groupedSkillNames.set(groupedSkillKey, {
+                    name: groupData.name,
+                    rating: groupData.system.group?.rating ?? 0,
+                });
             }
         }
 
@@ -135,9 +139,13 @@ export const ActorCreationFlow = {
                 newSkillKeys.add(skillNameByCategoryKey);
 
                 const skillKey = SkillFlow.nameToKey(itemData.name);
-                const skillGroup = groupedSkillNames.get(skillKey) ?? '';
+                const groupedSkill = groupedSkillNames.get(skillKey);
+                const skillGroup = groupedSkill?.name ?? '';
                 const configuredSkill = configuredSkillEntries.get(itemData.name);
                 foundry.utils.setProperty(itemData, 'system.skill.group', skillGroup);
+                if (groupedSkill) {
+                    foundry.utils.setProperty(itemData, 'system.skill.rating', groupedSkill.rating);
+                }
 
                 // TODO: tamif - Rework this code, maybe the whole method to clear up readability.
                 // Inject skill set skill specializations into new or existing skill item specializations.

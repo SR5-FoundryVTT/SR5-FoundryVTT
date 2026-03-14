@@ -165,9 +165,10 @@ export class HooksManager {
         Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD.bind(SituationModifiersApplication));
         Hooks.on('renderTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
         Hooks.on('renderPrototypeTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
-        Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem.bind(HooksManager));
-        Hooks.on('updateItem', HooksManager.syncSkillGroupMembership.bind(HooksManager));
-        Hooks.on('deleteItem', HooksManager.syncSkillGroupMembership.bind(HooksManager));
+        Hooks.on('createItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
+        Hooks.on('updateItem', (item, data, options, userId) => { void HooksManager.updateIcConnectedToHostItem(item, data, options, userId); });
+        Hooks.on('updateItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
+        Hooks.on('deleteItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('getChatMessageContextOptions', SuccessTest.chatMessageContextOptions.bind(SuccessTest));
 
         Hooks.on("renderChatLog", HooksManager.chatLogListeners.bind(HooksManager));
@@ -615,7 +616,7 @@ ___________________
     static async syncSkillGroupMembership(item: SR5Item) {
         if (!item.actor) return;
         if (!item.isType('skill')) return;
-        if (item.system.type !== 'group') return;
+        if (!['group', 'skill'].includes(item.system.type)) return;
 
         await SkillFlow.syncSkillItemGroups(item.actor);
     }

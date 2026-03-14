@@ -65,7 +65,7 @@
                 </div>
                 <div class="list-item-start">
                     {{formInput skillFields.base name=(concat skill_name '.base') value=skill.base
-                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                                rootId=@root.rootId disabled=(or @root.isPlayMode skill.group)}}
                 </div>
             </div>
         </div>

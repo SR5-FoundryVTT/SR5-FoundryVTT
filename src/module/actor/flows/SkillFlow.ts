@@ -12,6 +12,7 @@ import { SR5 } from '@/module/config';
  */
 // TODO: tamif - refactor into object style
 export class SkillFlow {
+    // TODO: tamif - cleanup this methods code for readbility.
     static async syncSkillItemGroups(actor: SR5Actor) {
         const skillItems: SR5Item<'skill'>[] = [];
         const groupItems: SR5Item<'skill'>[] = [];
@@ -23,30 +24,46 @@ export class SkillFlow {
             if (item.system.type === 'group') groupItems.push(item);
         }
 
-        const groupedSkills = new Map<string, string>();
+        const groupedSkills = new Map<string, { name: string, rating: number }>();
         for (const groupItem of groupItems) {
             for (const groupedSkillName of groupItem.system.group.skills) {
                 const groupedSkillKey = SkillFlow.nameToKey(groupedSkillName);
                 if (!groupedSkillKey || groupedSkills.has(groupedSkillKey)) continue;
 
-                groupedSkills.set(groupedSkillKey, groupItem.name);
+                groupedSkills.set(groupedSkillKey, {
+                    name: groupItem.name,
+                    rating: groupItem.system.group.rating,
+                });
             }
         }
 
         const updates: Item.UpdateData[] = [];
         for (const skillItem of skillItems) {
             const skillKey = SkillFlow.nameToKey(skillItem.name);
-            const group = groupedSkills.get(skillKey) ?? '';
+            const groupedSkill = groupedSkills.get(skillKey);
+            const group = groupedSkill?.name ?? '';
+            const groupRating = groupedSkill?.rating;
 
-            if ((skillItem.system.skill.group ?? '') === group) continue;
+            const skillUpdate: Record<string, unknown> = {};
+            let hasChanges = false;
+
+            if ((skillItem.system.skill.group ?? '') !== group) {
+                skillUpdate.group = group;
+                hasChanges = true;
+            }
+
+            if (groupRating !== undefined && skillItem.system.skill.rating !== groupRating) {
+                skillUpdate.rating = groupRating;
+                hasChanges = true;
+            }
+
+            if (!hasChanges) continue;
             updates.push({
                 _id: skillItem.id,
                 system: {
-                    skill: {
-                        group,
-                    },
+                    skill: skillUpdate,
                 },
-            });
+            } as Item.UpdateData);
         }
 
         if (updates.length > 0) {

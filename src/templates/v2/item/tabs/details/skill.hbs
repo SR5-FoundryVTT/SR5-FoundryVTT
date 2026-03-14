@@ -95,7 +95,7 @@
                 {{formInput systemFields.skill.fields.rating
                             value=system.skill.rating
                             classes="short" rootId=@root.rootId
-                            disabled=@root.isPlayMode }}
+                            disabled=(or @root.isPlayMode system.skill.group) }}
                 <label style="margin-left: auto; text-wrap: nowrap" data-tooltip="{{systemFields.skill.fields.defaulting.hint}}">
                     {{systemFields.skill.fields.defaulting.label}}&nbsp;
                     {{formInput systemFields.skill.fields.defaulting value=system.skill.defaulting
