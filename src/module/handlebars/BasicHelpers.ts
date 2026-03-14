@@ -29,9 +29,9 @@ export const registerBasicHelpers = () => {
         console.error('TODO: tamif - why is it necessary to both check for skill and skill name?');
         if (typeof skill === 'string') {
             const actor = options.data.root.actor as SR5Actor;
-            if (!actor) return skill;
+            if (!actor) return SkillFlow.localizeSkillName(skill);
             const newSkill = actor.getSkill(skill) || undefined;
-            if (!newSkill) return skill;
+            if (!newSkill) return SkillFlow.localizeSkillName(skill);
             skill = newSkill;
         }
         return SkillFlow.localizeSkillName(skill.name);

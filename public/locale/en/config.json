@@ -2164,6 +2164,12 @@
                         "label": "Attribute",
                         "hint": "Attribute used by this skill"
                     },
+                    "limit": {
+                        "attribute": {
+                            "label": "Limit",
+                            "hint": "Limit to use for this skill action. Leave empty to use default attribute limit."
+                        }
+                    },
                     "specializations": {
                         "label": "Specialization",
                         "hint": "Specialization for this skill, if any"

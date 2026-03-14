@@ -1265,7 +1265,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         }
 
         const attribute = this.getAttribute(skill.attribute);
-        const limit = attribute?.limit || '';
+        const limit = skill.limit || attribute?.limit || '';
         const spec = options.specialization || false;
 
         const getOpposedAction = (id: string) => {

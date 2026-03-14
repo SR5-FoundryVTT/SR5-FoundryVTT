@@ -92,6 +92,7 @@ export class SkillFlow {
                 base: item.system.skill.rating,
                 description: item.system.description.value,
                 attribute: item.system.skill.attribute,
+                limit: item.system.skill.limit.attribute,
                 canDefault: item.system.skill.defaulting,
                 requirement: item.system.skill.requirement,
                 specs: item.system.skill.specializations.map(spec => spec.name),
@@ -311,9 +312,13 @@ export class SkillFlow {
      * 
      * @param actor Optional actor to include owned skills into the selection.
      * @param options.categories Optional skill categories to filter for.
+     * @param options.selectedSkills Optional skill names to include even if missing from actor or pack skills.
      * @returns Object with sorted list of skills, key = name, value = translated label
      */
-    static async getSkillSelection(actor?: SR5Actor, options: { categories?: (keyof typeof SR5.skillCategories)[] } = {}) {
+    static async getSkillSelection(
+        actor?: SR5Actor,
+        options: { categories?: (keyof typeof SR5.skillCategories)[], selectedSkills?: string[] } = {}
+    ) {
         const skills = await PackItemFlow.getPackSkills();
 
         // Collect optional owned skills to include local only skills.
@@ -331,6 +336,13 @@ export class SkillFlow {
             //       as otherwise custom skills will stay with their base label path visible in the skill list.
             sheetSkills[skill.name] = SkillFlow.localizeSkillName(skill.name) as Translation;
         }
+
+        // Inject already selected skills that are missing from owned collection or pack.
+        for (const selectedSkill of options.selectedSkills ?? []) {
+            if (!selectedSkill || Object.hasOwn(sheetSkills, selectedSkill)) continue;
+            sheetSkills[selectedSkill] = SkillFlow.localizeSkillName(selectedSkill) as Translation;
+        }
+
         return Helpers.sortConfigValuesByTranslation(sheetSkills);
     }
 

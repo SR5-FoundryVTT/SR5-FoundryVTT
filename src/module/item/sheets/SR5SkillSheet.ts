@@ -16,6 +16,7 @@ interface SR5SkillSheetData extends SR5BaseItemSheetData {
     groups: Record<string, string>
 
     attributes: Record<string, string>
+    limits: Record<string, string>
     showCompendiumWarning: boolean
 }
 
@@ -97,9 +98,13 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
 
         const actor = this.document.actor || undefined;
         context.skills = await SkillFlow.getSkillSelection(actor);
-        context.activeSkills = await SkillFlow.getSkillSelection(actor, { categories: ['active'] });
+        context.activeSkills = await SkillFlow.getSkillSelection(actor, {
+            categories: ['active'],
+            selectedSkills: [this.document.system.skill.action.opposed.skill],
+        });
         context.groups = await SkillFlow.getSkillgroupSelection(actor);
         context.attributes = Helpers.sortConfigValuesByTranslation(SR5.attributes);
+        context.limits = Helpers.sortConfigValuesByTranslation(SR5.limits);
         // Default skill-set actor type is only meaningful for compendium-stored skill items.
         context.showCompendiumWarning = !this.document.pack;
 

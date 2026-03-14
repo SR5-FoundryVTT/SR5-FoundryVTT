@@ -103,4 +103,67 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             }
         });
     });
+
+    describe('Skill limits', () => {
+        it('derives configured skill limits instead of default attribute limit', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+
+            await actor.createEmbeddedDocuments('Item', [{
+                type: 'skill',
+                name: 'Pistols',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        attribute: 'agility',
+                        limit: {
+                            // agility is a physical attribute and should derive physical limit
+                            attribute: 'social',
+                        },
+                    },
+                },
+            }]);
+
+            const skill = actor.getSkill('Pistols');
+
+            assert.exists(skill);
+            assert.strictEqual(skill?.limit, 'social');
+        });
+
+        it('prefers a configured skill limit and otherwise falls back to the attribute limit', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+
+            await actor.createEmbeddedDocuments('Item', [
+                {
+                    type: 'skill',
+                    name: 'Pistols',
+                    system: {
+                        type: 'skill',
+                        skill: {
+                            attribute: 'agility',
+                            limit: {
+                                attribute: 'physical',
+                            },
+                        },
+                    },
+                },
+                {
+                    type: 'skill',
+                    name: 'Perception',
+                    system: {
+                        type: 'skill',
+                        skill: {
+                            attribute: 'intuition',
+                        },
+                    },
+                },
+            ]);
+
+            const pistolsAction = actor.skillActionData('Pistols');
+            const perceptionAction = actor.skillActionData('Perception');
+
+            assert.exists(pistolsAction);
+            assert.strictEqual(pistolsAction?.limit.attribute, 'physical');
+            assert.strictEqual(perceptionAction?.limit.attribute, 'mental');
+        });
+    });
 };

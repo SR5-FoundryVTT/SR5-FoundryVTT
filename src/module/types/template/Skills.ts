@@ -18,6 +18,11 @@ export const SkillField = () => ({
         required: true,
         choices: SR5.attributes
     }),
+    limit: new StringField({
+        blank: true,
+        required: true,
+        choices: SR5.limits
+    }),
     specs: new ArrayField(new StringField({ required: true })),
     canDefault: new BooleanField({ initial: true }),
     isNative: new BooleanField({ initial: false }), // this only actually applies to language skills

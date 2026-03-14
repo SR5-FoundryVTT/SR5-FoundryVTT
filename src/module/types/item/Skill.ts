@@ -10,6 +10,15 @@ const SkillLanguageData = () => ({
 const SkillSpecializationData = () => ({
     name: new StringField({ required: true, initial: '', blank: true }),
 });
+
+/**
+ * Mimic action limit field without the full ModifiableValue strucutre.
+ * But should that ever need to be applied, we can add in on top and still
+ * be flexible with the data structure as well.
+ */
+const SkillLimitData = () => ({
+    attribute: new StringField({ required: true, initial: '', blank: true, choices: SR5.limits }),
+});
 /**
  * Skillsets can be configured to be automatic defaults for new actors of a certain type.
  * 
@@ -29,6 +38,7 @@ const SkillTypeData = () => ({
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     defaulting: new BooleanField({ required: true, nullable: false, initial: false }),
     attribute: new StringField({ required: true, blank: true, choices: SR5.attributes }),
+    limit: new SchemaField(SkillLimitData()),
     // Will contain custom specialization entries.
     specializations: new ArrayField(new SchemaField(SkillSpecializationData())),
     requirement: new StringField({ required: true, initial: 'mundane', choices: SR5.specialTypes }),
