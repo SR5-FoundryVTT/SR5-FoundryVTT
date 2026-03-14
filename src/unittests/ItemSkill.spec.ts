@@ -1,6 +1,7 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 
 import { ActorCreationFlow } from '@/module/actor/flows/ActorCreationFlow';
+import { SkillFlow } from '@/module/actor/flows/SkillFlow';
 import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
 import { SR5Item } from '@/module/item/SR5Item';
 import { SR5TestFactory } from './utils';
@@ -65,6 +66,41 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
 
             assert.exists(createdSkill);
             assert.strictEqual(createdSkill?.system.skill.group, 'Firearms');
+        });
+    });
+
+    describe('SkillFlow.getSkillSelection', () => {
+        it('injects a selected missing skill for sidebar item sheets', async () => {
+            const originalGetPackSkills = PackItemFlow.getPackSkills;
+            PackItemFlow.getPackSkills = async () => [];
+
+            try {
+                const skills = await SkillFlow.getSkillSelection(undefined, {
+                    categories: ['active'],
+                    selectedSkills: ['Custom Missing Skill'],
+                });
+
+                assert.property(skills, 'Custom Missing Skill');
+            } finally {
+                PackItemFlow.getPackSkills = originalGetPackSkills;
+            }
+        });
+
+        it('injects a selected missing skill for owned item sheets', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const originalGetPackSkills = PackItemFlow.getPackSkills;
+            PackItemFlow.getPackSkills = async () => [];
+
+            try {
+                const skills = await SkillFlow.getSkillSelection(actor, {
+                    categories: ['active'],
+                    selectedSkills: ['Custom Missing Skill'],
+                });
+
+                assert.property(skills, 'Custom Missing Skill');
+            } finally {
+                PackItemFlow.getPackSkills = originalGetPackSkills;
+            }
         });
     });
 };
