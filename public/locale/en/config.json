@@ -2214,6 +2214,10 @@
                         "rating": {
                             "label": "Rating",
                             "hint": "Rating of this skill"
+                        },
+                        "specializations": {
+                            "label": "Specialization",
+                            "hint": "Specializations granted to this skill when the set is applied"
                         }
                     },
                     "groups": {

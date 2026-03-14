@@ -258,7 +258,7 @@ export class SkillFlow {
         if (!skill.isType('skill')) return;
 
         const skills = skill.system.set.skills;
-        skills.push({ name, rating: 0 });
+        skills.push({ name, rating: 0, specializations: [] });
         await skill.update({ system: { set: { skills } } });
     }
 
@@ -274,6 +274,41 @@ export class SkillFlow {
         if (index < 0 || index >= skills.length) return;
 
         skills.splice(index, 1);
+        await skill.update({ system: { set: { skills } } });
+    }
+
+    /**
+     * Add a specialization entry to a skill within a skill set.
+     * @param skill A skill item of type 'set'.
+     * @param skillIndex The index of the set skill entry.
+     * @param specialization The specialization name to add.
+     */
+    static async addSetSkillSpecialization(skill: SR5Item<'skill'>, skillIndex: number, specialization = '') {
+        if (!skill.isType('skill')) return;
+
+        const skills = skill.system.set.skills;
+        if (skillIndex < 0 || skillIndex >= skills.length) return;
+
+        skills[skillIndex].specializations.push({ name: specialization });
+        await skill.update({ system: { set: { skills } } });
+    }
+
+    /**
+     * Remove a specialization entry from a skill within a skill set.
+     * @param skill A skill item of type 'set'.
+     * @param skillIndex The index of the set skill entry.
+     * @param specializationIndex The index of the specialization to remove.
+     */
+    static async removeSetSkillSpecialization(skill: SR5Item<'skill'>, skillIndex: number, specializationIndex: number) {
+        if (!skill.isType('skill')) return;
+
+        const skills = skill.system.set.skills;
+        if (skillIndex < 0 || skillIndex >= skills.length) return;
+
+        const specializations = skills[skillIndex].specializations;
+        if (specializationIndex < 0 || specializationIndex >= specializations.length) return;
+
+        specializations.splice(specializationIndex, 1);
         await skill.update({ system: { set: { skills } } });
     }
 

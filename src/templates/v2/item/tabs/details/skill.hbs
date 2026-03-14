@@ -321,12 +321,38 @@
                     </div>
                     {{#if @root.isEditMode}}
                         <div class="list-item-icons">
+                            <a data-action="addSetSkillSpecialization" data-index="{{i}}" data-tooltip="SR5.Add">
+                                <i class="fas fa-plus"></i>
+                            </a>
                             <a data-action="removeSetSkill" data-index="{{i}}" data-tooltip="SR5.Delete">
                                 <i class="fas fa-trash"></i>
                             </a>
                         </div>
                     {{/if}}
                 </div>
+                {{#each skill.specializations as |specialization j|}}
+                    {{#with @root.systemFields.set.fields.skills.element.fields.specializations.element.fields as |specializationFields|}}
+                        <div class="list-item" data-index="{{i}}" style="padding-left: 2rem;">
+                            <div class="list-item-start skinny">
+                                <label>{{localize "SR5.Specialization"}}</label>
+                            </div>
+                            <div class="list-item-col select-col">
+                                {{formInput specializationFields.name
+                                            name=(concat "system.set.skills." i ".specializations." j ".name")
+                                            value=specialization.name
+                                            classes="short" rootId=@root.rootId
+                                            disabled=@root.isPlayMode}}
+                            </div>
+                            {{#if @root.isEditMode}}
+                                <div class="list-item-icons">
+                                    <a data-action="removeSetSkillSpecialization" data-index="{{i}}" data-specialization-index="{{j}}" data-tooltip="SR5.Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            {{/if}}
+                        </div>
+                    {{/with}}
+                {{/each}}
             {{/with}}
         {{/each}}
 

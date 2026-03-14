@@ -46,7 +46,9 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
             addGroupSkill: this.#addGroupSkill,
             removeGroupSkill: this.#removeGroupSkill,
             addSetSkill: this.#addSetSkill,
+            addSetSkillSpecialization: this.#addSetSkillSpecialization,
             removeSetSkill: this.#removeSetSkill,
+            removeSetSkillSpecialization: this.#removeSetSkillSpecialization,
             addSetGroup: this.#addSetGroup,
             removeSetGroup: this.#removeSetGroup
         }
@@ -163,6 +165,28 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
         const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
         if (index === -1) return;
         await SkillFlow.removeSetSkill(this.document, index);
+    }
+
+    /**
+     * Add a specialization entry to a skill within the skill set.
+     */
+    static async #addSetSkillSpecialization(this: SR5SkillSheet, event: Event) {
+        event.preventDefault();
+        const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
+        if (index === -1) return;
+        await SkillFlow.addSetSkillSpecialization(this.document, index);
+    }
+
+    /**
+     * Remove a specialization entry from a skill within the skill set.
+     */
+    static async #removeSetSkillSpecialization(this: SR5SkillSheet, event: Event) {
+        event.preventDefault();
+        const action = SheetFlow.closestAction(event.target);
+        const index = parseInt(action?.dataset.index ?? '-1');
+        const specializationIndex = parseInt(action?.dataset.specializationIndex ?? '-1');
+        if (index === -1 || specializationIndex === -1) return;
+        await SkillFlow.removeSetSkillSpecialization(this.document, index, specializationIndex);
     }
 
     /**

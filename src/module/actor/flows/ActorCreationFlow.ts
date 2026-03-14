@@ -1,6 +1,5 @@
 import { PackItemFlow } from "@/module/item/flows/PackItemFlow";
 import { SR5Actor } from "../SR5Actor";
-import { SR5 } from "@/module/config";
 import { SR5Item } from "@/module/item/SR5Item";
 import { SkillFlow } from "./SkillFlow";
 
@@ -58,7 +57,8 @@ export const ActorCreationFlow = {
         if (!actor.system.skillset) return;
         if (!skillsetUuid) skillsetUuid = actor.system.skillset;
 
-        const skillset = await fromUuid(skillsetUuid) as Item.Implementation | null;
+        const skillset = await fromUuid(skillsetUuid);
+        if (!(skillset instanceof SR5Item)) return;
         if (!skillset?.isType('skill') || skillset.system.type !== 'set') return;
 
         // Avoid changing skillset data to prevent unexepected issues.
@@ -66,7 +66,7 @@ export const ActorCreationFlow = {
 
         for (const group of skillset.system.set.groups) {
             for (const groupSkillName of group.name) {
-                setSkills.push({ name: groupSkillName, rating: 0 });
+                setSkills.push({ name: groupSkillName, rating: 0, specializations: [] });
             }
         }
 
@@ -90,18 +90,28 @@ export const ActorCreationFlow = {
         if (!skillSet.isType('skill') || skillSet.system.type !== 'set') return;
 
         const skills = await PackItemFlow.getSkillsForSkillSet(skillSet);
-        const groups = await PackItemFlow.getSkillGroupsForSkillSet(skillSet);
+        const groups = await PackItemFlow.getSkillGroupsForSkillSet(skillSet) as Item.CreateData[];
+        const configuredSkillEntries = new Map(skillSet.system.set.skills.map(skill => [skill.name, skill]));
 
         const groupedSkillNames = new Map<string, string>();
         for (const group of groups) {
-            if (group.type !== 'skill') continue;
-            if (group.system.type !== 'group') continue;
+            const groupData = group as Item.CreateData & {
+                type: string;
+                system?: {
+                    type?: string;
+                    group?: {
+                        skills?: string[];
+                    };
+                };
+            };
+            if (groupData.type !== 'skill') continue;
+            if (groupData.system?.type !== 'group') continue;
 
-            for (const groupedSkillName of group.system.group.skills) {
+            for (const groupedSkillName of groupData.system.group?.skills ?? []) {
                 const groupedSkillKey = SkillFlow.nameToKey(groupedSkillName);
                 if (!groupedSkillKey || groupedSkillNames.has(groupedSkillKey)) continue;
 
-                groupedSkillNames.set(groupedSkillKey, group.name);
+                groupedSkillNames.set(groupedSkillKey, groupData.name);
             }
         }
 
@@ -126,19 +136,34 @@ export const ActorCreationFlow = {
 
                 const skillKey = SkillFlow.nameToKey(itemData.name);
                 const skillGroup = groupedSkillNames.get(skillKey) ?? '';
+                const configuredSkill = configuredSkillEntries.get(itemData.name);
                 foundry.utils.setProperty(itemData, 'system.skill.group', skillGroup);
+
+                // TODO: tamif - Rework this code, maybe the whole method to clear up readability.
+                // Inject skill set skill specializations into new or existing skill item specializations.
+                if (configuredSkill) {
+                    const existingSpecializations = foundry.utils.getProperty(itemData, 'system.skill.specializations') as { name: string }[] | undefined;
+                    const mergedSpecializations = [...(existingSpecializations ?? [])];
+
+                    for (const specialization of configuredSkill.specializations) {
+                        if (mergedSpecializations.some(existing => existing.name === specialization.name)) continue;
+                        mergedSpecializations.push(foundry.utils.deepClone(specialization));
+                    }
+
+                    foundry.utils.setProperty(itemData, 'system.skill.specializations', mergedSpecializations);
+                }
             }
 
             return [itemData];
         });
 
         if (options.useSource) {
-            actor.updateSource({ items, system: { skillset: skillSet.uuid as string } });
+            actor.updateSource({ items, system: { skillset: skillSet.uuid } });
             return;
         }
 
         await actor.createEmbeddedDocuments('Item', items);
-        await actor.update({ system: { skillset: skillSet.uuid as string } });
+        await actor.update({ system: { skillset: skillSet.uuid } });
         console.log(`Shadowrun 5e | Added ${skills.length} skills and ${groups.length} skill groups from pack to actor ${actor.name}`);
     },
 

@@ -67,6 +67,50 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             assert.exists(createdSkill);
             assert.strictEqual(createdSkill?.system.skill.group, 'Firearms');
         });
+
+        it('applies configured skill set specializations to created skill items', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const skillSet = await factory.createItem({
+                type: 'skill',
+                name: 'Test Skill Set',
+                system: {
+                    type: 'set',
+                    set: {
+                        skills: [{
+                            name: 'Pistols',
+                            rating: 6,
+                            specializations: [{ name: 'Semi-Automatics' }, { name: 'Revolvers' }],
+                        }],
+                    },
+                },
+            });
+
+            const skillTemplate = await factory.createItem({
+                type: 'skill',
+                name: 'Pistols',
+                system: { type: 'skill' },
+            });
+
+            const originalGetSkillsForSkillSet = PackItemFlow.getSkillsForSkillSet;
+            const originalGetSkillGroupsForSkillSet = PackItemFlow.getSkillGroupsForSkillSet;
+
+            PackItemFlow.getSkillsForSkillSet = async () => [skillTemplate.toObject()];
+            PackItemFlow.getSkillGroupsForSkillSet = async () => [];
+
+            try {
+                await ActorCreationFlow.applySkillSetToActor(actor, skillSet);
+            } finally {
+                PackItemFlow.getSkillsForSkillSet = originalGetSkillsForSkillSet;
+                PackItemFlow.getSkillGroupsForSkillSet = originalGetSkillGroupsForSkillSet;
+            }
+
+            const createdSkill = actor.items.find(item => {
+                return item.isType('skill') && item.system.type === 'skill' && item.name === 'Pistols';
+            }) as SR5Item<'skill'> | undefined;
+
+            assert.exists(createdSkill);
+            assert.deepEqual(createdSkill?.system.skill.specializations.map(specialization => specialization.name), ['Semi-Automatics', 'Revolvers']);
+        });
     });
 
     describe('SkillFlow.getSkillSelection', () => {

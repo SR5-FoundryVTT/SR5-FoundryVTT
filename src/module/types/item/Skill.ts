@@ -61,11 +61,20 @@ const SkillSetSkillData = () => ({
     name: new StringField({ required: true }),
     // will contain rating for that skill.
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+    // will contain custom specialization entries for that skill.
+    specializations: new ArrayField(new SchemaField(SkillSpecializationData())),
+});
+
+const SkillSetGroupData = () => ({
+    // will contain a single skill group name.
+    name: new StringField({ required: true }),
+    // will contain rating for that group.
+    rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
 });
 
 const SkillSetTypeData = () => ({
     skills: new ArrayField(new SchemaField(SkillSetSkillData())),
-    groups: new ArrayField(new SchemaField(SkillSetSkillData())),
+    groups: new ArrayField(new SchemaField(SkillSetGroupData())),
     // default actor skillset configuration
     default: new SchemaField(SkillSetDefaultData()),
 });
