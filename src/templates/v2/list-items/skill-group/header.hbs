@@ -1,0 +1,26 @@
+<div class="list-item list-item-header {{cssClass}}"
+     {{#if headerAction}}
+     data-action="{{headerAction}}"
+     {{/if}}
+>
+    <div class="list-item-start">
+        <label>
+            {{#if label}}
+                {{localize label}}
+            {{else}}
+                {{localize "SR5.Skill.FIELDS.set.groups.label"}}
+            {{/if}}
+        </label>
+    </div>
+    <div class="list-item-col {{#if @root.isPlayMode}} skinny-col {{/if}}">
+        <label>{{localize "SR5.Rtg"}}</label>
+    </div>
+    <div class="list-item-icons{{#if @root.isPlayMode}} skinny-icons {{/if}}">
+        {{#if @root.isEditMode}}
+            {{#if addAction}}
+                {{> "systems/shadowrun5e/dist/templates/v2/list-items/add-icon.hbs"
+                    action=addAction tooltip="SR5.Add" type='skill' data=(skillAddItemData 'group') }}
+            {{/if}}
+        {{/if}}
+    </div>
+</div>

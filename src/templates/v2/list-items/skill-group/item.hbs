@@ -1,0 +1,48 @@
+<div class="list-item-container {{#if (hasKey @root.expandedSkills group.item.id)}} expanded {{/if}}">
+    <div class="list-item" data-skill-id="{{group.item.id}}" data-category="group">
+        <div class="list-item-start" data-item-id="{{group.item.id}}">
+            <button class="list-item-image-container icon sr5-icon"
+                    type="button"
+                    data-uuid="{{group.item.uuid}}"
+                    data-tooltip="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers' skip=@root.bindings.skip descr=@root.bindings.card}}"
+                    {{#if @root.isPlayMode}}
+                    data-action="rollItem"
+                    {{else}}
+                    data-action="editSkill"
+                    {{/if}}>
+                <img src="{{#if group.item.img}}{{group.item.img}}{{else}}systems/shadowrun5e/dist/icons/importer/action.svg{{/if}}"
+                     {{#if @root.isEditMode}}
+                         class="list-item-image-edit"
+                     {{else if (hasRoll group.item)}}
+                         class="list-item-image-roll"
+                     {{else}}
+                         class="list-item-image-info"
+                     {{/if}}
+                />
+            </button>
+            <a data-action="openSkillDescription">{{group.label}}</a>
+        </div>
+        <div class="list-item-col {{#if @root.isPlayMode}} skinny-col {{/if}}">
+            {{#if @root.isEditMode}}
+                <input type="number" data-system-action="changeSkillRating" class="short skinny" value="{{group.item.system.group.rating}}">
+            {{else}}
+                <label>{{group.item.system.group.rating}}</label>
+            {{/if}}
+        </div>
+        <div class="list-item-icons{{#if @root.isPlayMode}} skinny-icons {{/if}}" data-item-id="{{group.item.id}}">
+            {{#if @root.isEditMode}}
+                <a data-action="editSkill" data-tooltip="SR5.Edit">
+                    <i class="fas fa-pen-to-square"></i>
+                </a>
+                <a data-action="deleteItem" data-tooltip="SR5.DeleteSkill">
+                    <i class="fas fa-trash"></i>
+                </a>
+            {{/if}}
+        </div>
+    </div>
+    <div class="list-item-desc">
+        <div class="description-body">
+            {{{objValue (objValue @root.expandedSkills group.item.id) 'html'}}}
+        </div>
+    </div>
+</div>

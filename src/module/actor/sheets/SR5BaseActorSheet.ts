@@ -74,11 +74,17 @@ interface SheetSkills {
     }
 }
 
+interface SheetSkillGroup {
+    item: SR5Item<'skill'>;
+    label: string;
+}
+
 export interface SR5ActorSheetData extends ActorSheetV2.RenderContext, SR5ApplicationMixinTypes.RenderContext {
     actor: SR5Actor;
     config: typeof SR5CONFIG;
     system: SR5Actor['system'];
     skills: SheetSkills;
+    skillGroups: SheetSkillGroup[];
     skillset: {
         name: string;
         img: string;
@@ -384,6 +390,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         this._prepareSpecialFields(data);
 
         this._prepareSkills(data);
+        data.skillGroups = this._prepareSkillGroups();
 
         data.skillset = await this._prepareSkillset();
 
@@ -1489,6 +1496,16 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         sheetData.system.skills.knowledge.interests = SkillFlow.sortSkills(skills.knowledge.interests);
 
         return sheetData.system.skills;
+    }
+
+    _prepareSkillGroups(): SheetSkillGroup[] {
+        return (this.actor.itemsForType.get('skill') ?? [])
+            .filter((item): item is SR5Item<'skill'> => item.isType('skill') && item.system.type === 'group')
+            .map(item => ({
+                item,
+                label: SkillFlow.localizeSkillgroupName(item.name),
+            }))
+            .sort((left, right) => left.label.localeCompare(right.label, game.i18n.lang));
     }
 
     _showSkill(key: string, skill: SR5Item<'skill'>, sheetData: SR5ActorSheetData) {

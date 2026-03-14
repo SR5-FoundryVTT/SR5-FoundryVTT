@@ -411,8 +411,15 @@ export class SkillFlow {
 
     static async changeSkillRating(actor: SR5Actor, skillId: string, rating: number) {
         const skill = actor.items.get(skillId);
-        if (!skill) return;
+        if (!skill?.isType('skill')) return;
 
-        await skill.update({ system: { skill: { rating } } });
+        if (skill.system.type === 'skill') {
+            await skill.update({ system: { skill: { rating } } });
+            return;
+        }
+
+        if (skill.system.type === 'group') {
+            await skill.update({ system: { group: { rating } } });
+        }
     }
 }

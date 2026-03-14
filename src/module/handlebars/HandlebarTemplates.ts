@@ -45,6 +45,8 @@ export const preloadHandlebarsTemplates = async () => {
             'list-items/matrix-condition-monitor',
             'list-items/matrix-icon-image',
             'list-items/open-source-icon',
+            'list-items/skill-group/header',
+            'list-items/skill-group/item',
             'list-items/toggle-expand-icon',
             'list-items/toggle-visible-icon',
             'list-items/wireless-icon',

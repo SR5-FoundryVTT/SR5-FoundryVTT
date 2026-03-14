@@ -23,5 +23,11 @@
                 translated=translated
             }}
         {{/each}}
+        {{#if skillGroups}}
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill-group/header.hbs' }}
+            {{#each skillGroups as |group|}}
+                {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill-group/item.hbs' group=group }}
+            {{/each}}
+        {{/if}}
     </section>
 </div>
