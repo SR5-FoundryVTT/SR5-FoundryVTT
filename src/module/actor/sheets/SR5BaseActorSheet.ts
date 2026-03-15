@@ -991,8 +991,16 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * it directly from the sheet sections. If left empty, the created item will not be shown on sheet.
      */
     _handleCreateSkillItem(event: PointerEvent, itemData: Item.CreateData) {
-        const skillCategory = SheetFlow.closestAction(event.target)!.dataset.skillCategory;
-        const skillKnowledgeType = SheetFlow.closestAction(event.target)!.dataset.skillKnowledgeType;
+        const skillAction = SheetFlow.closestAction(event.target)!;
+        const skillType = skillAction.dataset.skillType || 'skill';
+        const skillCategory = skillAction.dataset.skillCategory;
+        const skillKnowledgeType = skillAction.dataset.skillKnowledgeType;
+
+        itemData['system.type'] = skillType;
+
+        if (skillType === 'group') {
+            return;
+        }
 
         if (!skillCategory) console.error(`Shadowrun 5e | Tried to create a Skill item without a skill-category context!`);
         itemData['system.skill.category'] = skillCategory;
