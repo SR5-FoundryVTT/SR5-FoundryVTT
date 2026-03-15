@@ -86,10 +86,10 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
 
             for (const skill of languageSkills) {
                 const skillName = skill.name;
-                // TODO: tamif - chummer - reimplement chummer import skill handling.
-                // const parsedSkill = Object.values(actor.system.skills.language.value).find(s => s.name === skillName)!;
-                // assert.strictEqual(parsedSkill.value, Number(skill.rating), `Error Language Skill ${skill.name_english}`);
-                // assert.lengthOf(parsedSkill.specs, IH.getArray(skill.skillspecializations).length);
+                const parsedSkill = Object.values(actor.system.skills.language).find(s => s.name === skillName)!;
+                const expectedRating = String(skill.isnativelanguage) === 'True' ? 12 : Number(skill.rating);
+                assert.strictEqual(parsedSkill.value, expectedRating, `Error Language Skill ${skill.name_english}`);
+                assert.lengthOf(parsedSkill.specs, IH.getArray(skill.skillspecializations).length);
             }
 
             for (const skill of knowledgeSkills) {
@@ -98,15 +98,27 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
                 const skillGroup = actor.system.skills.knowledge[skillGroupName];
                 if (!skillGroup) continue;
 
-                // TODO: tamif - chummer - reimplement chummer import skill handling.
-                // const parsedSkill = Object.values(skillGroup.value).find(s => s.name === skillName)!;
-                // assert.strictEqual(parsedSkill.value, Number(skill.rating), `Error Knowledge Skill ${skill.name_english}`);
-                // assert.lengthOf(parsedSkill.specs, IH.getArray(skill.skillspecializations).length);
+                const parsedSkill = Object.values(skillGroup).find(s => s.name === skillName)!;
+                assert.strictEqual(parsedSkill.value, Number(skill.rating), `Error Knowledge Skill ${skill.name_english}`);
+                assert.lengthOf(parsedSkill.specs, IH.getArray(skill.skillspecializations).length);
             }
         });
 
         it('Should have the correct item number', async () => {
             if (!actor) throw new Error('No actor created');
+            const skills = IH.getArray(character.skills.skill);
+            let importedSkillCount = 0;
+            for (const skill of skills) {
+                const rating = Number(skill.rating) || 0;
+                if (skill.islanguage === 'True') {
+                    importedSkillCount += 1;
+                } else if (skill.knowledge === 'True' && rating > 0) {
+                    importedSkillCount += 1;
+                } else if (rating > 0) {
+                    importedSkillCount += 1;
+                }
+            }
+
             const itemCount = IH.getArray(character.qualities.quality).length
                             + IH.getArray(character.contacts.contact).length
                             + IH.getArray(character.weapons.weapon).length
@@ -116,7 +128,8 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
                             + IH.getArray(character.spells.spell).length
                             + IH.getArray(character.powers.power).length
                             + IH.getArray(character.lifestyles.lifestyle).length
-                            + IH.getArray(character.complexforms.complexform).length;
+                            + IH.getArray(character.complexforms.complexform).length
+                            + importedSkillCount;
             
             assert.strictEqual(actor.items.size, itemCount, 'Item count');
         });
@@ -170,7 +183,8 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(vehicle.system.vehicle_stats.sensor.value, 1, 'Sensor');
             assert.strictEqual(vehicle.system.vehicle_stats.seats.value, 2, 'Seats');
 
-            assert.strictEqual(vehicle.items.size, 2, 'Item count');
+            const nonSkillItems = vehicle.items.filter(item => !item.isType('skill'));
+            assert.strictEqual(nonSkillItems.length, 2, 'Non-skill item count');
         });
     });
 };
