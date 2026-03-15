@@ -6,7 +6,6 @@ const { SchemaField, BooleanField, ArrayField, NumberField, StringField, TypedOb
 
 export type SkillCategories = 'active' | 'language' | 'knowledge';
 
-// TODO: tamif - remove unneeded fields
 export const SkillField = () => ({
     ...ModifiableValue(),
     name: new StringField({ required: true }),
