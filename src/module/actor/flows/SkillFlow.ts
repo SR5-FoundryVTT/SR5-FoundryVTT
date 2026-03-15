@@ -104,7 +104,6 @@ export class SkillFlow {
                 id: item.id,
                 name: item.name,
                 img: hasCustomImage ? item.img : '',
-                // TODO: tamif - check for translation support
                 label: SkillFlow.localizeSkillName(item.name),
                 base: item.system.skill.rating,
                 description: item.system.description.value,

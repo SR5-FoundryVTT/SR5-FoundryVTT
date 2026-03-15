@@ -1602,7 +1602,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     _getSkillLabelOrName(skill: SkillFieldType) {
-        return Helpers.getSkillLabelOrName(skill);
+        return SkillFlow.localizeSkillName(skill.name);
     }
 
     _doesSkillContainText(key: string, skill: SkillFieldType, text: string) {

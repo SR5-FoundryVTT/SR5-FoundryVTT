@@ -5,7 +5,6 @@ import { SR5Actor } from "../actor/SR5Actor";
 import { Translation } from '../utils/strings';
 import { LinksHelpers } from '@/module/utils/links';
 import { SkillFlow } from '../actor/flows/SkillFlow';
-import { SkillFieldType } from '../types/template/Skills';
 
 export const registerBasicHelpers = () => {
     /**
@@ -25,16 +24,14 @@ export const registerBasicHelpers = () => {
         return game.i18n.localize(i18nTypeLabel as Translation);
     });
 
-    Handlebars.registerHelper('localizeSkill', function (skill: SkillFieldType | string, options): string {
-        console.error('TODO: tamif - why is it necessary to both check for skill and skill name?');
-        if (typeof skill === 'string') {
-            const actor = options.data.root.actor as SR5Actor;
-            if (!actor) return SkillFlow.localizeSkillName(skill);
-            const newSkill = actor.getSkill(skill) || undefined;
-            if (!newSkill) return SkillFlow.localizeSkillName(skill);
-            skill = newSkill;
-        }
-        return SkillFlow.localizeSkillName(skill.name);
+    /**
+     * Transform a action skill id / SkillField name into a translation of its label.
+     * This can then be shown to the user.
+     * 
+     * Example: pilot_ground_craft => SR5.Skill.PilotGroundCraft => "Pilot Ground Craft" (EN)
+     */
+    Handlebars.registerHelper('localizeActionSkill', function (skill: string, options): string {
+        return SkillFlow.localizeSkillName(skill as string);
     });
 
     Handlebars.registerHelper('concatStrings', function (...args) {

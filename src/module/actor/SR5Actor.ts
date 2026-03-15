@@ -839,7 +839,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *                The property byLabel will cause the param skillId to be interpreted as the shown i18n label.
      */
     getPool(name: string, options = { specialization: false, byLabel: false }): number {
-        console.error('TODO: tamif - Move this to SkillFlow?');
         const skillField = options.byLabel ? this.getSkillByLabel(name) : this.getSkill(name);
         if (!skillField) return 0;
 

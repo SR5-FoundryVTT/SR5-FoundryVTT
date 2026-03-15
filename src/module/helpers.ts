@@ -816,17 +816,6 @@ export class Helpers {
     }
 
     /**
-     * Handle the special skill cases with id equals name and possible i18n
-     *
-     * @param skill
-     * @returns Either a translation or a name.
-     */
-    static getSkillLabelOrName(skill: SkillFieldType): string {
-        console.error('TODO: tamif - this needs to be combined with SkillFlow');
-        return SkillFlow.localizeSkillName(skill.name);
-    }
-
-    /**
      * Fetch entities from global or pack collections using data acquired by Foundry Drag&Drop process
      * @param data Foundry Drop Data
      */
@@ -1023,6 +1012,7 @@ export class Helpers {
             .trim()
             // Normalize string
             .toLowerCase()
+            .replace(/[_-]+/g, ' ')
             // PascalCase
             .split(' ')
             .map(word => {

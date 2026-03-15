@@ -6,10 +6,10 @@ import { SR5Item } from './item/SR5Item';
  * @param {number} slot     The hotbar slot to use
  * @returns {Promise}
  */
-import { Helpers } from "./helpers";
 import { SR5Actor } from "./actor/SR5Actor";
 import { SuccessTest, SuccessTestData } from './tests/SuccessTest';
 import { SkillFieldType } from './types/template/Skills';
+import { SkillFlow } from './actor/flows/SkillFlow';
 
 /**
  * Create a roll item action macro when an item is dropped from actor sheet onto the macro hotbar.
@@ -75,7 +75,7 @@ export async function createSkillMacro(data: { skillId: string, skill: SkillFiel
     const { skillId, skill } = data;
 
     // Abort when skill macro already exists. This is done for consistency with createItemMacro behavior.
-    const name = Helpers.getSkillLabelOrName(skill);
+    const name = SkillFlow.localizeSkillName(skill.name);
     const existingMacro = game.macros.contents.find(macro => macro.name === name);
     if (existingMacro) return;
 
