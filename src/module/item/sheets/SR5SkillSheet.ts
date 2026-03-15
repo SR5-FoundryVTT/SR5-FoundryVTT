@@ -31,10 +31,7 @@ interface SR5SkillSheetData extends SR5BaseItemSheetData {
 export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> extends SR5ApplicationMixin(ItemSheet)<T> {
     declare document: SR5Item<'skill'>;
 
-    // TODO: taMiF - any should be replaced by correct DEFAULT_OPTIONS declaration?
-    //               are we using DEFAULT_OPTIONS inerhitance?
     static override DEFAULT_OPTIONS = {
-        // TODO: tamIf - What is the point of these classes?
         classes: ['item', 'named-sheet'],
         position: {
             width: 600,
