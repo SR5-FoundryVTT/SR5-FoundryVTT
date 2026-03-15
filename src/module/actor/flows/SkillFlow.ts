@@ -10,10 +10,9 @@ import { SR5 } from '@/module/config';
 /**
  * Handle functionality between actors and their skills.
  */
-// TODO: tamif - refactor into object style
-export class SkillFlow {
+export const SkillFlow = {
     // TODO: tamif - cleanup this methods code for readbility.
-    static async syncSkillItemGroups(actor: SR5Actor) {
+    syncSkillItemGroups: async function (actor: SR5Actor) {
         const skillItems: SR5Item<'skill'>[] = [];
         const groupItems: SR5Item<'skill'>[] = [];
 
@@ -69,14 +68,14 @@ export class SkillFlow {
         if (updates.length > 0) {
             await actor.updateEmbeddedDocuments('Item', updates);
         }
-    }
+    },
 
     /**
      * Derive actor skill data from their skill items.
      * 
      * @param items Skill items to transform. It must only be skill items.
      */
-    static prepareActorSkills(items: SR5Item<'skill'>[]) {
+    prepareActorSkills: function (items: SR5Item<'skill'>[]) {
         const skills = {
             active: {},
             language: {},
@@ -131,20 +130,20 @@ export class SkillFlow {
         }
 
         return skills;
-    }
+    },
 
     /**
      * Add a single skill to the list of skills within system.skills.
      * 
      * We have to check for certain edge cases here, as we deal with user input.
      */
-    private static addSkill(skills: Record<string, SkillFieldType>, skill: SkillFieldType, key: string) {
+    addSkill: function (skills: Record<string, SkillFieldType>, skill: SkillFieldType, key: string) {
         if (Object.hasOwn(skills, key)) {
             ui.notifications?.warn(game.i18n.localize('SR5.Warnings.SkillAlreadyExists'));
             return;
         }
         skills[key] = skill;
-    }
+    },
 
     /**
      * Alphabetically sort skills either by their translated label. Should a skill not have one, use the name as a
@@ -156,7 +155,7 @@ export class SkillFlow {
      * @param asc Set to true for ascending sorting order and to false for descending order.
      * @return Sorted Skills given by the skills parameter
      */
-    static sortSkills(skills: SkillsType, asc = true) {
+    sortSkills: function (skills: SkillsType, asc = true) {
         // Filter entries instead of values to have a store of ids for easy rebuild.
         const sortedSkills = Object.values(skills).sort((a, b) => {
             const comparatorA = a.label;
@@ -175,57 +174,57 @@ export class SkillFlow {
         });
 
         return sortedSkillsObject;
-    }
+    },
 
     /**
      * Turn a user entered skill name into something that looks like a object property / key.
      * @param name Skill or document name
      */
-    static nameToKey(name: string) {
+    nameToKey: function (name: string) {
         if (!name) return '';
         return name.replace(' ', '_').toLowerCase();
-    }
+    },
 
     /**
      * Translate the skill name into a localized version, if possible.
      */
-    static localizeSkillName(name: string) {
+    localizeSkillName: function (name: string) {
         return Helpers.localizeName(name, 'SR5.Skill');
-    }
+    },
 
     /**
      * Translate the skill group name into a localized version, if possible.
      */
-    static localizeSkillgroupName(name: string) {
+    localizeSkillgroupName: function (name: string) {
         return Helpers.localizeName(name, 'SR5.Skill.Groups');
-    }
+    },
 
     /**
      * Translate the skill set name into a localized version, if possible.
      */
-    static localizeSkillsetName(name: string) {
+    localizeSkillsetName: function (name: string) {
         return Helpers.localizeName(name, 'SR5.Skill.Sets');
-    }
+    },
 
     /**
      * Add a new specialization to the given skill.
      * @param skill A skill item to which the specialization should be added.
      * @param specialization The specialization name to add.
      */
-    static async addSpecialization(skill: SR5Item<'skill'>, specialization = '') {
+    addSpecialization: async function (skill: SR5Item<'skill'>, specialization = '') {
         if (!skill.isType('skill')) return;
 
         const specializations = skill.system.skill.specializations;
         specializations.push({ name: specialization });
         await skill.update({ system: { skill: { specializations } } });
-    }
+    },
 
     /**
      * Remove a specialization from the given skill.
      * @param skill A skill item to remove the specialization from.
      * @param index The specialization index to remove.
      */
-    static async removeSpecialization(skill: SR5Item<'skill'>, index: number) {
+    removeSpecialization: async function (skill: SR5Item<'skill'>, index: number) {
         if (!skill.isType('skill')) return;
 
         const specializations = skill.system.skill.specializations;
@@ -233,28 +232,28 @@ export class SkillFlow {
 
         specializations.splice(index, 1);
         await skill.update({ system: { skill: { specializations } } });
-    }
+    },
 
     /**
      * Add a new skill entry to the skill group.
      * @param skill A skill item of type 'group'.
      * @param name The skill name to add.
      */
-    static async addGroupSkill(skill: SR5Item<'skill'>, name = '') {
+    addGroupSkill: async function (skill: SR5Item<'skill'>, name = '') {
         if (!skill.isType('skill')) return;
 
         const skills = skill.system.group.skills;
         skills.push(name);
         await skill.update({ system: { group: { skills } } });
         if (skill.actor) await SkillFlow.syncSkillItemGroups(skill.actor);
-    }
+    },
 
     /**
      * Remove a skill entry from the skill group.
      * @param skill A skill item of type 'group'.
      * @param index The index of the skill to remove.
      */
-    static async removeGroupSkill(skill: SR5Item<'skill'>, index: number) {
+    removeGroupSkill: async function (skill: SR5Item<'skill'>, index: number) {
         if (!skill.isType('skill')) return;
 
         const skills = skill.system.group.skills;
@@ -263,27 +262,27 @@ export class SkillFlow {
         skills.splice(index, 1);
         await skill.update({ system: { group: { skills } } });
         if (skill.actor) await SkillFlow.syncSkillItemGroups(skill.actor);
-    }
+    },
 
     /**
      * Add a new skill entry to the skill set.
      * @param skill A skill item of type 'set'.
      * @param name The skill name to add.
      */
-    static async addSetSkill(skill: SR5Item<'skill'>, name = '') {
+    addSetSkill: async function (skill: SR5Item<'skill'>, name = '') {
         if (!skill.isType('skill')) return;
 
         const skills = skill.system.set.skills;
         skills.push({ name, rating: 0, specializations: [] });
         await skill.update({ system: { set: { skills } } });
-    }
+    },
 
     /**
      * Remove a skill entry from the skill set.
      * @param skill A skill item of type 'set'.
      * @param index The index of the skill to remove.
      */
-    static async removeSetSkill(skill: SR5Item<'skill'>, index: number) {
+    removeSetSkill: async function (skill: SR5Item<'skill'>, index: number) {
         if (!skill.isType('skill')) return;
 
         const skills = skill.system.set.skills;
@@ -291,7 +290,7 @@ export class SkillFlow {
 
         skills.splice(index, 1);
         await skill.update({ system: { set: { skills } } });
-    }
+    },
 
     /**
      * Add a specialization entry to a skill within a skill set.
@@ -299,7 +298,7 @@ export class SkillFlow {
      * @param skillIndex The index of the set skill entry.
      * @param specialization The specialization name to add.
      */
-    static async addSetSkillSpecialization(skill: SR5Item<'skill'>, skillIndex: number, specialization = '') {
+    addSetSkillSpecialization: async function (skill: SR5Item<'skill'>, skillIndex: number, specialization = '') {
         if (!skill.isType('skill')) return;
 
         const skills = skill.system.set.skills;
@@ -307,7 +306,7 @@ export class SkillFlow {
 
         skills[skillIndex].specializations.push({ name: specialization });
         await skill.update({ system: { set: { skills } } });
-    }
+    },
 
     /**
      * Remove a specialization entry from a skill within a skill set.
@@ -315,7 +314,7 @@ export class SkillFlow {
      * @param skillIndex The index of the set skill entry.
      * @param specializationIndex The index of the specialization to remove.
      */
-    static async removeSetSkillSpecialization(skill: SR5Item<'skill'>, skillIndex: number, specializationIndex: number) {
+    removeSetSkillSpecialization: async function (skill: SR5Item<'skill'>, skillIndex: number, specializationIndex: number) {
         if (!skill.isType('skill')) return;
 
         const skills = skill.system.set.skills;
@@ -326,27 +325,27 @@ export class SkillFlow {
 
         specializations.splice(specializationIndex, 1);
         await skill.update({ system: { set: { skills } } });
-    }
+    },
 
     /**
      * Add a new group entry to the skill set.
      * @param skill A skill item of type 'set'.
      * @param name The group name to add.
      */
-    static async addSetGroup(skill: SR5Item<'skill'>, name = '') {
+    addSetGroup: async function (skill: SR5Item<'skill'>, name = '') {
         if (!skill.isType('skill')) return;
 
         const groups = skill.system.set.groups;
         groups.push({ name, rating: 0 });
         await skill.update({ system: { set: { groups } } });
-    }
+    },
 
     /**
      * Remove a group entry from the skill set.
      * @param skill A skill item of type 'set'.
      * @param index The index of the group to remove.
      */
-    static async removeSetGroup(skill: SR5Item<'skill'>, index: number) {
+    removeSetGroup: async function (skill: SR5Item<'skill'>, index: number) {
         if (!skill.isType('skill')) return;
 
         const groups = skill.system.set.groups;
@@ -354,7 +353,7 @@ export class SkillFlow {
 
         groups.splice(index, 1);
         await skill.update({ system: { set: { groups } } });
-    }
+    },
 
     /**
      * Collect skills for selection fields based on 
@@ -366,7 +365,7 @@ export class SkillFlow {
      * @param options.selectedSkills Optional skill names to include even if missing from actor or pack skills.
      * @returns Object with sorted list of skills, key = name, value = translated label
      */
-    static async getSkillSelection(
+    getSkillSelection: async function (
         actor?: SR5Actor,
         options: { categories?: (keyof typeof SR5.skillCategories)[], selectedSkills?: string[] } = {}
     ) {
@@ -395,7 +394,7 @@ export class SkillFlow {
         }
 
         return Helpers.sortConfigValuesByTranslation(sheetSkills);
-    }
+    },
 
     /**
      * Collect skillgroups for selection fields based on
@@ -405,7 +404,7 @@ export class SkillFlow {
      * @param actor Optional actor to include owned skillgroups into the selection.
      * @returns Object with sorted list of skillgroups, key = name, value = translated label
      */
-    static async getSkillgroupSelection(actor?: SR5Actor) {
+    getSkillgroupSelection: async function (actor?: SR5Actor) {
         const skillgroups = await PackItemFlow.getPackSkillgroups();
 
         // Collect optional owned skillgroups to include local only skillgroups.
@@ -423,9 +422,9 @@ export class SkillFlow {
             sheetGroups[group.name] = SkillFlow.localizeSkillgroupName(group.name) as Translation;
         }
         return Helpers.sortConfigValuesByTranslation(sheetGroups);
-    }
+    },
 
-    static async changeSkillRating(actor: SR5Actor, skillId: string, rating: number) {
+    changeSkillRating: async function (actor: SR5Actor, skillId: string, rating: number) {
         const skill = actor.items.get(skillId);
         if (!skill?.isType('skill')) return;
 
@@ -437,5 +436,5 @@ export class SkillFlow {
         if (skill.system.type === 'group') {
             await skill.update({ system: { group: { rating } } });
         }
-    }
-}
+    },
+};
