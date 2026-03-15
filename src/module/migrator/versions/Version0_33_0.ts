@@ -52,8 +52,8 @@ const LEGACY_KNOWLEDGE_ATTRIBUTES: Record<LegacyKnowledgeType, string> = {
 /**
  * Migrate actors from the pre-skill-item storage model where skills only lived in system.skills.
  */
-export class Version0_32_0 extends VersionMigration {
-    readonly TargetVersion = '0.32.0';
+export class Version0_33_0 extends VersionMigration {
+    readonly TargetVersion = '0.33.0';
 
     override handlesActor(actor: Readonly<unknown>) {
         return this.collectLegacySkills(actor as MigratingActorData).length > 0;
