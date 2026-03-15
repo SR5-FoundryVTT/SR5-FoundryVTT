@@ -121,7 +121,6 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             assert.deepEqual(createdSkill?.system.skill.specializations.map(specialization => specialization.name), ['Semi-Automatics', 'Revolvers']);
         });
     });
-
     describe('SkillFlow.getSkillSelection', () => {
         it('injects a selected missing skill for sidebar item sheets', async () => {
             const originalGetPackSkills = PackItemFlow.getPackSkills;

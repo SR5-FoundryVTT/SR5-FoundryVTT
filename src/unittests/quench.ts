@@ -1,3 +1,4 @@
+import { Migrators } from './Migrators.spec';
 import { shadowrunDamage } from './sr5.Damage.spec';
 import { shadowrunTestValueResolution } from './sr5.TestValueResolution.spec';
 import { shadowrunMarks } from './sr5.Marks.spec';
@@ -120,5 +121,8 @@ export const quenchRegister = (quench: Quench) => {
     });
     quench.registerBatch('shadowrun5e.item.skill', itemSkillTesting, {
         displayName: 'SHADOWRUN5e: Item Skill Flow Test',
+    });
+    quench.registerBatch('shadowrun5e.migrators', Migrators, {
+        displayName: 'SHADOWRUN5e: Migrators Test',
     });
 };
