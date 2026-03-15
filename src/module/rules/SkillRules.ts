@@ -41,7 +41,8 @@ export class SkillRules {
 
     /**
      * Does actor match skills special requirements
-     * @PDF SR5#130 TODO: tamif - check skill rules reference for this
+     * @PDF SR5#130 While no direct rule reference, in general magic skills need a awakened character, 
+     *              and resonance skills need a technomancer. This is what this function checks for.
      * @param actor The actor to check against
      * @param skill The derived skill data to use as reference
      * @return true, actor matches skill requirements.

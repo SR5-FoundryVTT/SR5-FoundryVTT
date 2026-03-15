@@ -26,7 +26,6 @@ const SkillLimitData = () => ({
  * specific sub types.
  */
 const SkillSetDefaultData = () => ({
-    // TODO: tamif - maybe use TagifyAltField for multi select and allow a skillset default to multiples.
     type: new StringField({ required: true, initial: '', blank: true, choices: SR5.actorTypes, multiple: true }),
 });
 
