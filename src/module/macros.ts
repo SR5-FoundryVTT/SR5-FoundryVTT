@@ -9,7 +9,7 @@ import { SR5Item } from './item/SR5Item';
 import { SR5Actor } from "./actor/SR5Actor";
 import { SuccessTest, SuccessTestData } from './tests/SuccessTest';
 import { SkillFieldType } from './types/template/Skills';
-import { SkillFlow } from './actor/flows/SkillFlow';
+import { SkillNamingFlow } from './flows/SkillNamingFlow';
 
 /**
  * Create a roll item action macro when an item is dropped from actor sheet onto the macro hotbar.
@@ -75,7 +75,7 @@ export async function createSkillMacro(data: { skillId: string, skill: SkillFiel
     const { skillId, skill } = data;
 
     // Abort when skill macro already exists. This is done for consistency with createItemMacro behavior.
-    const name = SkillFlow.localizeSkillName(skill.name);
+    const name = SkillNamingFlow.localizeSkillName(skill.name);
     const existingMacro = game.macros.contents.find(macro => macro.name === name);
     if (existingMacro) return;
 

@@ -4,7 +4,9 @@ import { SR5BaseItemSheetData } from "../SR5ItemSheet";
 import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from "@/module/handlebars/SR5ApplicationMixin";
 
 import ItemSheet = foundry.applications.sheets.ItemSheet;
-import { SkillFlow } from "@/module/actor/flows/SkillFlow";
+import { SkillGroupFlow } from '@/module/actor/flows/SkillGroupFlow';
+import { SkillSelectionFlow } from '@/module/actor/flows/SkillSelectionFlow';
+import { SkillItemFlow } from '../flows/SkillItemFlow';
 import { SR5Item } from "../SR5Item";
 import { Helpers } from "@/module/helpers";
 import { SR5 } from "@/module/config";
@@ -96,12 +98,12 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
         context.primaryTabs = this._prepareTabs('primary');
 
         const actor = this.document.actor || undefined;
-        context.skills = await SkillFlow.getSkillSelection(actor);
-        context.activeSkills = await SkillFlow.getSkillSelection(actor, {
+        context.skills = await SkillSelectionFlow.getSkillSelection(actor);
+        context.activeSkills = await SkillSelectionFlow.getSkillSelection(actor, {
             categories: ['active'],
             selectedSkills: [this.document.system.skill.action.opposed.skill],
         });
-        context.groups = await SkillFlow.getSkillgroupSelection(actor);
+        context.groups = await SkillSelectionFlow.getSkillgroupSelection(actor);
         context.attributes = Helpers.sortConfigValuesByTranslation(SR5.attributes);
         context.limits = Helpers.sortConfigValuesByTranslation(SR5.limits);
         // Default skill-set actor type is only meaningful for compendium-stored skill items.
@@ -115,7 +117,7 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
      * @param this 
      */
     static async #addSpecialization(this: SR5SkillSheet) {
-        await SkillFlow.addSpecialization(this.document);
+        await SkillItemFlow.addSpecialization(this.document);
     }
 
     /**
@@ -127,14 +129,14 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
         event.preventDefault();
         const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
         if (index === -1) return;
-        await SkillFlow.removeSpecialization(this.document, index);
+        await SkillItemFlow.removeSpecialization(this.document, index);
     }
 
     /**
      * Add a new skill entry to the skill group.
      */
     static async #addGroupSkill(this: SR5SkillSheet) {
-        await SkillFlow.addGroupSkill(this.document);
+        await SkillGroupFlow.addGroupSkill(this.document);
     }
 
     /**
@@ -144,14 +146,14 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
         event.preventDefault();
         const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
         if (index === -1) return;
-        await SkillFlow.removeGroupSkill(this.document, index);
+        await SkillGroupFlow.removeGroupSkill(this.document, index);
     }
 
     /**
      * Add a new skill entry to the skill set.
      */
     static async #addSetSkill(this: SR5SkillSheet) {
-        await SkillFlow.addSetSkill(this.document);
+        await SkillItemFlow.addSetSkill(this.document);
     }
 
     /**
@@ -161,7 +163,7 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
         event.preventDefault();
         const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
         if (index === -1) return;
-        await SkillFlow.removeSetSkill(this.document, index);
+        await SkillItemFlow.removeSetSkill(this.document, index);
     }
 
     /**
@@ -171,7 +173,7 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
         event.preventDefault();
         const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
         if (index === -1) return;
-        await SkillFlow.addSetSkillSpecialization(this.document, index);
+        await SkillItemFlow.addSetSkillSpecialization(this.document, index);
     }
 
     /**
@@ -183,14 +185,14 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
         const index = parseInt(action?.dataset.index ?? '-1');
         const specializationIndex = parseInt(action?.dataset.specializationIndex ?? '-1');
         if (index === -1 || specializationIndex === -1) return;
-        await SkillFlow.removeSetSkillSpecialization(this.document, index, specializationIndex);
+        await SkillItemFlow.removeSetSkillSpecialization(this.document, index, specializationIndex);
     }
 
     /**
      * Add a new group entry to the skill set.
      */
     static async #addSetGroup(this: SR5SkillSheet) {
-        await SkillFlow.addSetGroup(this.document);
+        await SkillItemFlow.addSetGroup(this.document);
     }
 
     /**
@@ -200,6 +202,6 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
         event.preventDefault();
         const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
         if (index === -1) return;
-        await SkillFlow.removeSetGroup(this.document, index);
+        await SkillItemFlow.removeSetGroup(this.document, index);
     }
 };

@@ -13,7 +13,6 @@ import { SkillFieldType, SkillsType } from "./types/template/Skills";
 import { ModifiedDamageType } from "./types/rolls/ActorRolls";
 import { RangeTemplateType } from "./types/template/Weapon";
 import { MatrixTestData, OpposedMatrixTestData } from './tests/MatrixTest';
-import { SkillFlow } from './actor/flows/SkillFlow';
 
 type OneOrMany<T> = T | T[];
 

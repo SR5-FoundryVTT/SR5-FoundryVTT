@@ -1,4 +1,4 @@
-import { SkillFlow } from '../actor/flows/SkillFlow';
+import { SkillNamingFlow } from './SkillNamingFlow';
 import { SR5Actor } from '../actor/SR5Actor';
 
 /**
@@ -17,7 +17,7 @@ export const EffectCreationFlow = {
         const skill = actor.items.get(skillId)!;
         if (!skill || !skill.isType('skill') || skill.system.type !== 'skill') return;
 
-        const key = SkillFlow.nameToKey(skill.name);
+        const key = SkillNamingFlow.nameToKey(skill.name);
         const category = skill.system.skill.category;
         const subCategory = skill.system.skill.knowledgeType;
 
@@ -36,7 +36,7 @@ export const EffectCreationFlow = {
         }
 
         const effectData = {
-            name: `${SkillFlow.localizeSkillName(skill.name)} ${game.i18n.localize('SR5.Effect')}`,
+            name: `${SkillNamingFlow.localizeSkillName(skill.name)} ${game.i18n.localize('SR5.Effect')}`,
             system: {
                 applyTo: 'actor' as const,
             },

@@ -1,4 +1,4 @@
-import { SkillFlow } from '@/module/actor/flows/SkillFlow';
+import { SkillNamingFlow } from '@/module/flows/SkillNamingFlow';
 import { SR5Actor } from "@/module/actor/SR5Actor";
 import { SR5Item } from "../SR5Item";
 import { FLAGS, SYSTEM_NAME } from "@/module/constants";
@@ -384,7 +384,7 @@ export const PackItemFlow = {
         if (!pack) return;
 
         // Catch users adding skill to the pack without a name.
-        const packEntry = pack.index.find(data => data.type === 'skill' && SkillFlow.nameToKey(data.name ?? '') === SkillFlow.nameToKey(name));
+        const packEntry = pack.index.find(data => data.type === 'skill' && SkillNamingFlow.nameToKey(data.name ?? '') === SkillNamingFlow.nameToKey(name));
         if (!packEntry) return;
 
         return await pack.getDocument(packEntry._id) as unknown as SR5Item<'skill'>;

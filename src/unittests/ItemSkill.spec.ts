@@ -1,7 +1,8 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 
-import { ActorCreationFlow } from '@/module/actor/flows/ActorCreationFlow';
-import { SkillFlow } from '@/module/actor/flows/SkillFlow';
+import { SkillGroupFlow } from '@/module/actor/flows/SkillGroupFlow';
+import { SkillSetFlow } from '@/module/actor/flows/SkillSetFlow';
+import { SkillSelectionFlow } from '@/module/actor/flows/SkillSelectionFlow';
 import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
 import { SR5Item } from '@/module/item/SR5Item';
 import { SR5TestFactory } from './utils';
@@ -15,7 +16,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
         await factory.destroy();
     });
 
-    describe('ActorCreationFlow.applySkillSetToActor', () => {
+    describe('SkillSetFlow.applySkillSetToActor', () => {
         it('applies skill group value to created skill items', async () => {
             const actor = await factory.createActor({ type: 'character' });
             const skillSet = await factory.createItem({
@@ -58,7 +59,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             };
 
             try {
-                await ActorCreationFlow.applySkillSetToActor(actor, skillSet);
+                await SkillSetFlow.applySkillSetToActor(actor, skillSet);
             } finally {
                 PackItemFlow.getSkillsForSkillSet = originalGetSkillsForSkillSet;
                 PackItemFlow.getSkillGroupsForSkillSet = originalGetSkillGroupsForSkillSet;
@@ -107,7 +108,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             PackItemFlow.getSkillGroupsForSkillSet = async () => [];
 
             try {
-                await ActorCreationFlow.applySkillSetToActor(actor, skillSet);
+                await SkillSetFlow.applySkillSetToActor(actor, skillSet);
             } finally {
                 PackItemFlow.getSkillsForSkillSet = originalGetSkillsForSkillSet;
                 PackItemFlow.getSkillGroupsForSkillSet = originalGetSkillGroupsForSkillSet;
@@ -121,13 +122,13 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             assert.deepEqual(createdSkill?.system.skill.specializations.map(specialization => specialization.name), ['Semi-Automatics', 'Revolvers']);
         });
     });
-    describe('SkillFlow.getSkillSelection', () => {
+    describe('SkillSelectionFlow.getSkillSelection', () => {
         it('injects a selected missing skill for sidebar item sheets', async () => {
             const originalGetPackSkills = PackItemFlow.getPackSkills;
             PackItemFlow.getPackSkills = async () => [];
 
             try {
-                const skills = await SkillFlow.getSkillSelection(undefined, {
+                const skills = await SkillSelectionFlow.getSkillSelection(undefined, {
                     categories: ['active'],
                     selectedSkills: ['Custom Missing Skill'],
                 });
@@ -144,7 +145,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             PackItemFlow.getPackSkills = async () => [];
 
             try {
-                const skills = await SkillFlow.getSkillSelection(actor, {
+                const skills = await SkillSelectionFlow.getSkillSelection(actor, {
                     categories: ['active'],
                     selectedSkills: ['Custom Missing Skill'],
                 });
@@ -156,7 +157,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
         });
     });
 
-    describe('SkillFlow.syncSkillItemGroups', () => {
+    describe('SkillGroupFlow.syncSkillItemGroups', () => {
         it('applies group ratings to derived skill fields', async () => {
             const actor = await factory.createActor({
                 type: 'character',
@@ -193,7 +194,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 },
             ]);
 
-            await SkillFlow.syncSkillItemGroups(actor);
+            await SkillGroupFlow.syncSkillItemGroups(actor);
 
             const skillItem = actor.items.find(item => {
                 return item.isType('skill') && item.system.type === 'skill' && item.name === 'Pistols';
@@ -246,7 +247,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 },
             ]);
 
-            await SkillFlow.syncSkillItemGroups(actor);
+            await SkillGroupFlow.syncSkillItemGroups(actor);
 
             const groupItem = actor.items.find(item => {
                 return item.isType('skill') && item.system.type === 'group' && item.name === 'Firearms';
@@ -254,7 +255,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
 
             assert.exists(groupItem);
             await groupItem?.update({ system: { group: { rating: 5 } } });
-            await SkillFlow.syncSkillItemGroups(actor);
+            await SkillGroupFlow.syncSkillItemGroups(actor);
 
             const skillItem = actor.items.find(item => {
                 return item.isType('skill') && item.system.type === 'skill' && item.name === 'Pistols';

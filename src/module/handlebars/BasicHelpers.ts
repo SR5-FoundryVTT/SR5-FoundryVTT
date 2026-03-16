@@ -4,7 +4,7 @@ import { SYSTEM_NAME } from "../constants";
 import { SR5Actor } from "../actor/SR5Actor";
 import { Translation } from '../utils/strings';
 import { LinksHelpers } from '@/module/utils/links';
-import { SkillFlow } from '../actor/flows/SkillFlow';
+import { SkillNamingFlow } from '../flows/SkillNamingFlow';
 
 export const registerBasicHelpers = () => {
     /**
@@ -31,7 +31,7 @@ export const registerBasicHelpers = () => {
      * Example: pilot_ground_craft => SR5.Skill.PilotGroundCraft => "Pilot Ground Craft" (EN)
      */
     Handlebars.registerHelper('localizeActionSkill', function (skill: string, options): string {
-        return SkillFlow.localizeSkillName(skill as string);
+        return SkillNamingFlow.localizeSkillName(skill as string);
     });
 
     Handlebars.registerHelper('concatStrings', function (...args) {

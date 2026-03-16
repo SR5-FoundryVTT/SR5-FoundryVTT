@@ -130,7 +130,7 @@ import { SocketMessageFlow } from './flows/SocketMessageFlow';
 import { CompendiumBrowser } from './apps/compendiumBrowser/CompendiumBrowser';
 import { Skill } from './types/item/Skill';
 import { SR5SkillSheet } from './item/sheets/SR5SkillSheet';
-import { SkillFlow } from './actor/flows/SkillFlow';
+import { SkillGroupFlow } from './actor/flows/SkillGroupFlow';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -618,7 +618,7 @@ ___________________
         if (!item.isType('skill')) return;
         if (!['group', 'skill'].includes(item.system.type)) return;
 
-        await SkillFlow.syncSkillItemGroups(item.actor);
+        await SkillGroupFlow.syncSkillItemGroups(item.actor);
     }
 
     /**

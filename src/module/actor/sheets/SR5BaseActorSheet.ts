@@ -20,13 +20,15 @@ import { InventoryType } from 'src/module/types/actor/Common';
 import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
 import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
 import { SheetFlow } from '@/module/flows/SheetFlow';
-import { SkillFlow } from '@/module/actor/flows/SkillFlow';
+import { SkillFieldFlow } from '@/module/actor/flows/SkillFieldFlow';
+import { SkillSetFlow } from '@/module/actor/flows/SkillSetFlow';
+import { SkillNamingFlow } from '@/module/flows/SkillNamingFlow';
+import { SkillItemFlow } from '@/module/item/flows/SkillItemFlow';
 import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import ActorSheetV2 = foundry.applications.sheets.ActorSheetV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 import { EffectCreationFlow } from '@/module/flows/EffectCreationFlow';
-import { ActorCreationFlow } from '../flows/ActorCreationFlow';
 import { SkillFieldType } from '@/module/types/template/Skills';
 
 const { TextEditor } = foundry.applications.ux;
@@ -825,13 +827,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     protected override async _onDropItem(event: DragEvent, item: SR5Item) {
         if (item.isType('skill') && item.system.type === 'set') {
-            await ActorCreationFlow.applySkillSetToActor(this.actor, item);
+            await SkillSetFlow.applySkillSetToActor(this.actor, item);
             return null;
         }
 
         if (item.isType('skill') && item.system.type === 'skill') {
             const skillCategory = item.system.skill.category;
-            if (ActorCreationFlow.hasSkillWithSameNameAndCategory(this.actor, item.name, skillCategory)) {
+            if (SkillSetFlow.hasSkillWithSameNameAndCategory(this.actor, item.name, skillCategory)) {
                 ui.notifications?.warn(game.i18n.localize('SR5.Warnings.SkillAlreadyExists'));
                 return null;
             }
@@ -1496,12 +1498,12 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     _sortSkills(sheetData: SR5ActorSheetData, skills: SR5Actor['system']['skills']) {
-        sheetData.system.skills.active = SkillFlow.sortSkills(skills.active);
-        sheetData.system.skills.language = SkillFlow.sortSkills(skills.language);
-        sheetData.system.skills.knowledge.street = SkillFlow.sortSkills(skills.knowledge.street);
-        sheetData.system.skills.knowledge.academic = SkillFlow.sortSkills(skills.knowledge.academic);
-        sheetData.system.skills.knowledge.professional = SkillFlow.sortSkills(skills.knowledge.professional);
-        sheetData.system.skills.knowledge.interests = SkillFlow.sortSkills(skills.knowledge.interests);
+        sheetData.system.skills.active = SkillFieldFlow.sortSkills(skills.active);
+        sheetData.system.skills.language = SkillFieldFlow.sortSkills(skills.language);
+        sheetData.system.skills.knowledge.street = SkillFieldFlow.sortSkills(skills.knowledge.street);
+        sheetData.system.skills.knowledge.academic = SkillFieldFlow.sortSkills(skills.knowledge.academic);
+        sheetData.system.skills.knowledge.professional = SkillFieldFlow.sortSkills(skills.knowledge.professional);
+        sheetData.system.skills.knowledge.interests = SkillFieldFlow.sortSkills(skills.knowledge.interests);
 
         return sheetData.system.skills;
     }
@@ -1511,7 +1513,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             .filter((item): item is SR5Item<'skill'> => item.isType('skill') && item.system.type === 'group')
             .map(item => ({
                 item,
-                label: SkillFlow.localizeSkillgroupName(item.name),
+                label: SkillNamingFlow.localizeSkillgroupName(item.name),
             }))
             .sort((left, right) => left.label.localeCompare(right.label, game.i18n.lang));
     }
@@ -1602,7 +1604,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     _getSkillLabelOrName(skill: SkillFieldType) {
-        return SkillFlow.localizeSkillName(skill.name);
+        return SkillNamingFlow.localizeSkillName(skill.name);
     }
 
     _doesSkillContainText(key: string, skill: SkillFieldType, text: string) {
@@ -1873,7 +1875,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const rating = Number(event.target.value);
         if (isNaN(rating)) return;
 
-        await SkillFlow.changeSkillRating(this.actor, skillId, rating);
+        await SkillItemFlow.changeSkillRating(this.actor, skillId, rating);
     }
 
     /**

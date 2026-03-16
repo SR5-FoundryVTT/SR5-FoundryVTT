@@ -22,7 +22,7 @@ import { AmmunitionType, RangeType } from '../types/item/Weapon';
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import ItemSheet = foundry.applications.sheets.ItemSheet;
 import { Translation } from '../utils/strings';
-import { SkillFlow } from '../actor/flows/SkillFlow';
+import { SkillSelectionFlow } from '../actor/flows/SkillSelectionFlow';
 
 const { DragDrop } = foundry.applications.ux
 const { fromUuid, fromUuidSync } = foundry.utils;
@@ -490,7 +490,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             .filter((selectedSkill): selectedSkill is string => !!selectedSkill);
 
         // Instead of item.parent, use the actorOwner as NestedItems have an actor grand parent.
-        return await SkillFlow.getSkillSelection(this.item.actorOwner, {
+        return await SkillSelectionFlow.getSkillSelection(this.item.actorOwner, {
             categories: ['active'],
             selectedSkills,
         }) as Record<string, Translation>;

@@ -2,7 +2,7 @@ import { DataDefaults } from '../data/DataDefaults';
 import { PartsList } from '../parts/PartsList';
 import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
 import { Translation } from '../utils/strings';
-import { SkillFlow } from '../actor/flows/SkillFlow';
+import { SkillNamingFlow } from '../flows/SkillNamingFlow';
 
 export interface SkillTestData extends SuccessTestData {
     attribute: Shadowrun.ActorAttribute
@@ -39,7 +39,7 @@ export class SkillTest extends SuccessTest<SkillTestData> {
      */
     override get title() {
         if (!this.actor) return super.title;
-        return `${SkillFlow.localizeSkillName(this.data.action.skill)} ${game.i18n.localize('SR5.Test')}`;
+        return `${SkillNamingFlow.localizeSkillName(this.data.action.skill)} ${game.i18n.localize('SR5.Test')}`;
     }
 
     /**
