@@ -1,3 +1,6 @@
+/**
+ * Actor creation flow helpers used while initializing newly created actors.
+ */
 import { PackItemFlow } from "@/module/item/flows/PackItemFlow";
 import { SR5Actor } from "../SR5Actor";
 import { SkillSetFlow } from './SkillSetFlow';

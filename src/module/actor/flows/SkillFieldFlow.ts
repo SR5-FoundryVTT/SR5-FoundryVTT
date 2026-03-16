@@ -3,6 +3,13 @@ import { SR5Item } from '@/module/item/SR5Item';
 import { DataDefaults } from '@/module/data/DataDefaults';
 import { SkillNamingFlow } from '../../flows/SkillNamingFlow';
 
+/**
+ * Builds and manages the actor-facing skill field structure derived from owned skill items.
+ *
+ * Use this flow when item-based skills need to be converted into the nested `actor.system.skills`
+ * shape consumed by actor preparation and sheets, including categorization, duplicate protection,
+ * and localized sorting for display.
+ */
 export const SkillFieldFlow = {
     prepareActorSkills(items: SR5Item<'skill'>[]) {
         const skills = {

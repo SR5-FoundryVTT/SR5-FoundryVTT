@@ -6,6 +6,9 @@ import { Translation } from '@/module/utils/strings';
 import { SR5 } from '@/module/config';
 import { SkillNamingFlow } from '../../flows/SkillNamingFlow';
 
+/**
+ * Provides selection-list data for skill and skill group pickers on any sheet.
+ */
 export const SkillSelectionFlow = {
     async getSkillSelection(
         actor?: SR5Actor,

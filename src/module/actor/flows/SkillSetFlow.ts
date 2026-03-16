@@ -4,6 +4,9 @@ import { SR5Item } from '@/module/item/SR5Item';
 import { SkillNamingFlow } from '../../flows/SkillNamingFlow';
 import { SkillGroupFlow } from './SkillGroupFlow';
 
+/**
+ * Provides actor specific skill set flow operations.
+ */
 export const SkillSetFlow = {
     skillNameByCategoryKey(name: string, category?: string) {
         const skillKey = SkillNamingFlow.nameToKey(name);

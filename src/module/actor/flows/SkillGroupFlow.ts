@@ -2,6 +2,9 @@ import { SR5Item } from '@/module/item/SR5Item';
 import { SR5Actor } from '../SR5Actor';
 import { SkillNamingFlow } from '../../flows/SkillNamingFlow';
 
+/**
+ * Coordinates skill group item behavior for actors.
+ */
 export const SkillGroupFlow = {
     buildGroupedSkillIndex(groupItems: Array<SR5Item<'skill'> | Item.CreateData>) {
         const groupedSkills = new Map<string, { name: string, rating: number }>();
