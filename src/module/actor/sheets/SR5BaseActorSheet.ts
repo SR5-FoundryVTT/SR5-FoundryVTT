@@ -161,6 +161,10 @@ const sortByName = (a: { name: string }, b: { name: string }) => {
     return a.name.localeCompare(b.name, game.i18n.lang);
 };
 
+const sortByLocalizedLabel = <T extends { label: string }>(a: T, b: T) => {
+    return a.label.localeCompare(b.label, game.i18n.lang);
+};
+
 /**
  * Sort a list of items by equipped and name in ascending alphabetical order.
  *
@@ -1515,7 +1519,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 item,
                 label: SkillNamingFlow.localizeSkillgroupName(item.name),
             }))
-            .sort((left, right) => left.label.localeCompare(right.label, game.i18n.lang));
+            .sort(sortByLocalizedLabel);
     }
 
     _showSkill(key: string, skill: SR5Item<'skill'>, sheetData: SR5ActorSheetData) {
@@ -1604,7 +1608,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     _getSkillLabelOrName(skill: SkillFieldType) {
-        return SkillNamingFlow.localizeSkillName(skill.name);
+        return skill.label || skill.name || '';
     }
 
     _doesSkillContainText(key: string, skill: SkillFieldType, text: string) {

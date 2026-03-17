@@ -1,5 +1,6 @@
 import { SkillNamingFlow } from './SkillNamingFlow';
 import { SR5Actor } from '../actor/SR5Actor';
+import { SR5Item } from '../item/SR5Item';
 
 /**
  * Handle everything around creating effects from different sources.
@@ -14,10 +15,11 @@ export const EffectCreationFlow = {
      * @returns 
      */
     skill: async (actor: SR5Actor, skillId: string) => {
-        const skill = actor.items.get(skillId)!;
-        if (!skill || !skill.isType('skill') || skill.system.type !== 'skill') return;
+        const skillField = actor.getSkillById(skillId);
+        const skill = actor.items.get(skillId)! as SR5Item<'skill'>;
+        if (!skillField || !skill) return;
 
-        const key = SkillNamingFlow.nameToKey(skill.name);
+        const key = SkillNamingFlow.nameToKey(skillField.name);
         const category = skill.system.skill.category;
         const subCategory = skill.system.skill.knowledgeType;
 
@@ -36,7 +38,7 @@ export const EffectCreationFlow = {
         }
 
         const effectData = {
-            name: `${SkillNamingFlow.localizeSkillName(skill.name)} ${game.i18n.localize('SR5.Effect')}`,
+            name: `${skillField.label} ${game.i18n.localize('SR5.Effect')}`,
             system: {
                 applyTo: 'actor' as const,
             },

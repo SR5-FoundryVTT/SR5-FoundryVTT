@@ -75,6 +75,7 @@ export async function createSkillMacro(data: { skillId: string, skill: SkillFiel
     const { skillId, skill } = data;
 
     // Abort when skill macro already exists. This is done for consistency with createItemMacro behavior.
+    // TODO: tamif - skill - use label here but fix drag and drop of skills first.
     const name = SkillNamingFlow.localizeSkillName(skill.name);
     const existingMacro = game.macros.contents.find(macro => macro.name === name);
     if (existingMacro) return;

@@ -912,16 +912,16 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     /**
-     * Search all skills for a matching i18n translation label.
+     * Search all skills for a matching already localized skill label.
      * NOTE: You should use getSkill if you have the skillId ready. Only use this for ease of use!
      *
-     * @param label The translated output of either the skill label (after localize) or name of the skill in question.
-     * @return The first skill found with a matching translation or name.
+     * @param label The translated output of the skill label or the name of the skill in question.
+     * @return The first skill found with a matching translated label or name.
      */
     getSkillByLabel(label: string, skills: SR5Actor['system']['skills'] = this.getSkills()): SkillFieldType | undefined {
         if (!label) return;
 
-        const possibleMatch = (skill: SkillFieldType): string => skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
+        const possibleMatch = (skill: SkillFieldType): string => skill.label || skill.name;
 
         for (const skill of Object.values(skills.language)) {
             if (label === possibleMatch(skill))
