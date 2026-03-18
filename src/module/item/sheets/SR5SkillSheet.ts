@@ -1,15 +1,14 @@
 import { DeepPartial } from "fvtt-types/utils";
 import { SheetFlow } from "@/module/flows/SheetFlow";
-import { SR5BaseItemSheetData } from "../SR5ItemSheet";
 import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from "@/module/handlebars/SR5ApplicationMixin";
-
-import ItemSheet = foundry.applications.sheets.ItemSheet;
+import { SR5BaseItemSheetData } from "../SR5ItemSheet";
 import { SkillGroupFlow } from '@/module/actor/flows/SkillGroupFlow';
 import { SkillSelectionFlow } from '@/module/actor/flows/SkillSelectionFlow';
 import { SkillItemFlow } from '../flows/SkillItemFlow';
 import { SR5Item } from "../SR5Item";
 import { Helpers } from "@/module/helpers";
 import { SR5 } from "@/module/config";
+import ItemSheet = foundry.applications.sheets.ItemSheet;
 
 interface SR5SkillSheetData extends SR5BaseItemSheetData {
     // config style name to translation mappings.
@@ -168,6 +167,10 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
      */
     static async #removeSpecialization(this: SR5SkillSheet, event: Event) {
         event.preventDefault();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
         const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
         if (index === -1) return;
         await SkillItemFlow.removeSpecialization(this.document, index);
@@ -222,6 +225,10 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
      */
     static async #removeSetSkillSpecialization(this: SR5SkillSheet, event: Event) {
         event.preventDefault();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
         const action = SheetFlow.closestAction(event.target);
         const index = parseInt(action?.dataset.index ?? '-1');
         const specializationIndex = parseInt(action?.dataset.specializationIndex ?? '-1');
