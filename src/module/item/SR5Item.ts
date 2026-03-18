@@ -15,6 +15,7 @@ import { RangePrep } from './prep/functions/RangePrep';
 import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
 
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
+import { UpdateSkillFlow } from './flows/UpdateSkillFlow';
 import { ActionResultType, ActionRollType, DamageType } from '../types/item/Action';
 import { ItemAvailabilityFlow } from './flows/ItemAvailabilityFlow';
 import { WarePrep } from './prep/WarePrep';
@@ -1533,7 +1534,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             // Change used action test implementation when necessary.
             UpdateActionFlow.injectActionTestsIntoChangeData(this.type, changed, changed, this);
             await UpdateActionFlow.onUpdateAlterActionData(changed, this);
-            UpdateActionFlow.onSkillCategoryUpdateAlterAttribute(changed, this);
+            UpdateSkillFlow.injectSkillCategoryDefaults(changed, this);
         }
 
         return super._preUpdate(changed, options, user);

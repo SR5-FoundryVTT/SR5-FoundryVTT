@@ -1,21 +1,25 @@
-/**
- * Actor creation flow helpers used while initializing newly created actors.
- */
-import { PackItemFlow } from "@/module/item/flows/PackItemFlow";
-import { SR5Actor } from "../SR5Actor";
+import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
+import { SR5Actor } from '../SR5Actor';
 import { SkillSetFlow } from './SkillSetFlow';
 
 /**
- * All behavior related to actor creation and updating.
+ * Handles actor initialization concerns that only apply during document creation.
+ *
+ * This flow is intentionally narrow: it prepares newly created actors with any
+ * default embedded data that should exist but can't be part of DataModel schema initials.
  */
-export const ActorCreationFlow = {
+export const CreateActorFlow = {
     /**
-     * Retrieve skill set skills based on actor type.
+     * Applies the first matching default skill set for the actor type being created.
+     *
+     * This runs during actor creation so the initial actor state already contains
+     * the configured baseline skills instead of relying on a later migration or
+     * manual setup step.
+     *
      * @param actor Actor to add skill items to.
-     * @param data Creation data containing the actor type, used to determine which skill items to add.
+     * @param data Creation data containing the actor type used for skill set selection.
      */
     async addDefaultActorSkillset(actor: SR5Actor, data: Actor.CreateData) {
-        // Find first default skillset for this actor type.
         const skillSets = await PackItemFlow.getAllPackSkillSets();
         const skillSet = skillSets.find(skillSet => {
             if (!skillSet.system.set.default.type) return false;
@@ -31,4 +35,4 @@ export const ActorCreationFlow = {
 
         console.debug(`Shadowrun 5e | Added skill set ${skillSet.name} to actor source data`);
     }
-}
+};

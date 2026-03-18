@@ -51,7 +51,7 @@ import { MatrixRules } from '@/module/rules/MatrixRules';
 import { StorageFlow } from '@/module/flows/StorageFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 import { LinksHelpers } from '@/module/utils/links';
-import { ActorCreationFlow } from './flows/ActorCreationFlow';
+import { CreateActorFlow } from './flows/CreateActorFlow';
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -126,7 +126,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     override async _preCreate(data: Actor.CreateData, options: Actor.Database.PreCreateOptions, user: User.Implementation) {
         await super._preCreate(data, options, user);
-        await ActorCreationFlow.addDefaultActorSkillset(this, data);
+        await CreateActorFlow.addDefaultActorSkillset(this, data);
     }
 
     override async update(

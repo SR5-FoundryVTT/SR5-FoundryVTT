@@ -1,7 +1,6 @@
 import { SR5Item } from "../SR5Item";
 import { SR5 } from '../../config';
 import { PackItemFlow } from "./PackItemFlow";
-import { SkillRules } from "@/module/rules/SkillRules";
 
 /**
  * Handling of SR5Item.update changes around ActionRollData.
@@ -61,29 +60,6 @@ export const UpdateActionFlow = {
         if (!foundry.utils.getProperty(changeData, 'system.action.skill')) return;
 
         changeData['system.action.attribute2'] = '';
-    },
-
-    /**
-     * When a skill category is changed, remove the second attribute, as it's not needed and might cause confusion 
-     * at different places.
-     * 
-     * @param changeData The _update changes given by the event
-     * @param item The item as context of what's being changed.
-     */
-    onSkillCategoryUpdateAlterAttribute(changeData: Item.UpdateData, item: SR5Item) {
-        if (!item.isType('skill')) return;
-        const category = foundry.utils.getProperty(changeData, 'system.skill.category') ?? item.system.skill.category;
-        if (!category || category === 'active') return;
-        const knowledgeType = (foundry.utils.getProperty(changeData, 'system.skill.knowledgeType') ?? item.system.skill.knowledgeType) as keyof typeof SR5.knowledgeAttributes | undefined;
-
-        switch (category) {
-            case 'knowledge':
-                changeData['system.skill.attribute'] = knowledgeType ? (SkillRules.knowledgeSkillAttribute(knowledgeType) ?? '') : '';
-                break;
-            case 'language':
-                changeData['system.skill.attribute'] = SkillRules.languageSkillAttribute();
-                break;
-        }
     },
 
     /**
