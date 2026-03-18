@@ -20,6 +20,9 @@ interface SR5SkillSheetData extends SR5BaseItemSheetData {
     attributes: Record<string, string>
     limits: Record<string, string>
     showCompendiumWarning: boolean
+    canEditSkillAttribute: boolean
+    canEditSkillDefaulting: boolean
+    canBeNative: boolean
 }
 
 /**
@@ -108,8 +111,29 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
         context.limits = Helpers.sortConfigValuesByTranslation(SR5.limits);
         // Default skill-set actor type is only meaningful for compendium-stored skill items.
         context.showCompendiumWarning = !this.document.pack;
+        context.canEditSkillAttribute = this.canEditSkillAttribute();
+        context.canEditSkillDefaulting = this.canEditSkillDefaulting();
+        context.canBeNative = this.canBeNative();
 
         return context;
+    }
+
+    static readonly lockedSkillCategories = new Set(['knowledge', 'language']);
+
+    canEditSkillAttribute() {
+        if (this.document.system.type !== 'skill') return true;
+
+        return !SR5SkillSheet.lockedSkillCategories.has(this.document.system.skill.category);
+    }
+
+    canEditSkillDefaulting() {
+        if (this.document.system.type !== 'skill') return true;
+
+        return !SR5SkillSheet.lockedSkillCategories.has(this.document.system.skill.category);
+    }
+
+    canBeNative() {
+        return this.document.system.type === 'skill' && this.document.system.skill.category === 'language';
     }
 
     /**

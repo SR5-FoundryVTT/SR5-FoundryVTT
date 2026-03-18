@@ -65,7 +65,7 @@
                 {{formInput systemFields.skill.fields.attribute
                                 value=system.skill.attribute options=(config2Array config.attributes) localize=true
                             classes="short" rootId=@root.rootId
-                            disabled=@root.isPlayMode }}
+                            disabled=(or @root.isPlayMode (not @root.canEditSkillAttribute)) }}
             </div>
         </div>
         <div class="list-item">
@@ -99,11 +99,11 @@
                 <label style="margin-left: auto; text-wrap: nowrap" data-tooltip="{{systemFields.skill.fields.defaulting.hint}}">
                     {{systemFields.skill.fields.defaulting.label}}&nbsp;
                     {{formInput systemFields.skill.fields.defaulting value=system.skill.defaulting
-                                rootId=@root.rootId disabled=@root.isPlayMode}}
+                                rootId=@root.rootId disabled=(or @root.isPlayMode (not @root.canEditSkillDefaulting))}}
                 </label>
             </div>
         </div>
-        {{#if (and (eq system.skill.category "language") systemFields.skill.fields.language)}}
+        {{#if (and @root.canBeNative systemFields.skill.fields.language)}}
             <div class="list-item">
                 <div class="list-item-start skinny">
                     <label data-tooltip="{{systemFields.skill.fields.language.fields.isNative.hint}}">
