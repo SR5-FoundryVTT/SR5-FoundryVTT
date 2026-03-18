@@ -23,6 +23,8 @@ interface SR5SkillSheetData extends SR5BaseItemSheetData {
     canEditSkillAttribute: boolean
     canEditSkillDefaulting: boolean
     canBeNative: boolean
+    // Taken directly from an owning actor to show the derived value.
+    skillValue?: number
 }
 
 /**
@@ -114,6 +116,7 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
         context.canEditSkillAttribute = this.canEditSkillAttribute();
         context.canEditSkillDefaulting = this.canEditSkillDefaulting();
         context.canBeNative = this.canBeNative();
+        context.skillValue = this.getActorSkillValue();
 
         return context;
     }
@@ -134,6 +137,20 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
 
     canBeNative() {
         return this.document.system.type === 'skill' && this.document.system.skill.category === 'language';
+    }
+
+    /**
+     * To allow showing the derived skill value of this skill on an owned actor,
+     * derive that value by taking the actors SkillField.
+     */
+    getActorSkillValue() {
+        if (this.document.system.type !== 'skill') return;
+        const actor = this.document.actor;
+        if (!actor) return;
+
+        const skill = actor.getSkillById(this.document.id!);
+        if (!skill) return;
+        return skill.value;
     }
 
     /**

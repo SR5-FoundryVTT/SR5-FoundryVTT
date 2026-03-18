@@ -90,6 +90,9 @@
         <div class="list-item">
             <div class="list-item-start skinny">
                     <label data-tooltip="{{systemFields.skill.fields.rating.hint}}">{{systemFields.skill.fields.rating.label}}</label>
+                {{#if @root.skillValue}}
+                    <label style="margin-left: 0.5rem; text-wrap: nowrap">({{@root.skillValue}})</label>
+                {{/if}}
             </div>
             <div class="list-item-col">
                 {{formInput systemFields.skill.fields.rating
