@@ -72,14 +72,13 @@ export const UpdateActionFlow = {
      */
     onSkillCategoryUpdateAlterAttribute(changeData: Item.UpdateData, item: SR5Item) {
         if (!item.isType('skill')) return;
-        const category = foundry.utils.getProperty(changeData, 'system.skill.category');
+        const category = foundry.utils.getProperty(changeData, 'system.skill.category') ?? item.system.skill.category;
         if (!category || category === 'active') return;
-        const knowledgeType = foundry.utils.getProperty(changeData, 'system.skill.knowledgeType') as keyof typeof SR5.knowledgeAttributes;
-        if (!knowledgeType) return;
+        const knowledgeType = (foundry.utils.getProperty(changeData, 'system.skill.knowledgeType') ?? item.system.skill.knowledgeType) as keyof typeof SR5.knowledgeAttributes | undefined;
 
         switch (category) {
             case 'knowledge':
-                changeData['system.skill.attribute'] = SkillRules.knowledgeSkillAttribute(knowledgeType);
+                changeData['system.skill.attribute'] = knowledgeType ? (SkillRules.knowledgeSkillAttribute(knowledgeType) ?? '') : '';
                 break;
             case 'language':
                 changeData['system.skill.attribute'] = SkillRules.languageSkillAttribute();
