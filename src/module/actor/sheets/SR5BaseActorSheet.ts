@@ -1639,15 +1639,12 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     async _editSkill(target: HTMLElement) {
         const closest = this._closestSkillTarget(target);
         const skillId = closest?.dataset.skillId;
-        const category = closest?.dataset.category;
-
         if (!skillId) return;
-        if (!category) return;
 
         const skill = this.actor.items.get(skillId);
         if (!skill) return;
 
-        await skill.sheet?.render(true, { mode: 'edit' });
+        await skill.sheet?.renderPopout({ mode: 'edit' });
     }
 
     static async #editSkill(this: SR5BaseActorSheet, event: PointerEvent) {
