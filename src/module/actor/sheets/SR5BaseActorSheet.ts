@@ -838,7 +838,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         if (item.isType('skill') && item.system.type === 'skill') {
             const skillCategory = item.system.skill.category;
             if (SkillSetFlow.hasSkillWithSameNameAndCategory(this.actor, item.name, skillCategory)) {
-                ui.notifications?.warn(game.i18n.localize('SR5.Warnings.SkillAlreadyExists'));
                 return null;
             }
         }

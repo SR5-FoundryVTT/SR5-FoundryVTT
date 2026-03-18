@@ -9,10 +9,10 @@ import { SR5Item } from './item/SR5Item';
 import { SR5Actor } from "./actor/SR5Actor";
 import { SuccessTest, SuccessTestData } from './tests/SuccessTest';
 import { SkillFieldType } from './types/template/Skills';
-import { SkillNamingFlow } from './flows/SkillNamingFlow';
+import { SkillFieldFlow } from './actor/flows/SkillFieldFlow';
 
 /**
- * Create a roll item action macro when an item is dropped from actor sheet onto the macro hotbar.
+ * Create a macros for different item based when a item document is dropped on the macro hotbar.
  * 
  * @param dropData Foundry DropData
  * @param slot The slot to be dropped into on the Macro bar
@@ -22,6 +22,8 @@ export async function createItemMacro(dropData, slot) {
 
     const item = await SR5Item.fromDropData(dropData);
     if (!(item instanceof SR5Item)) return console.error(`Shadowrun 5e | Macro Drop expected an item document but got a different document type`, item);
+
+    if (item.isType('skill')) return createSkillMacro({ skillId: item.id!, skill: SkillFieldFlow.createSkillField(item).skillField }, slot);
 
     const command = `game.shadowrun5e.rollItemMacro("${item.name}");`;
     let macro = game.macros.contents.find((m: Macro.Stored<"script" | "chat">) => m.name === item.name) as Macro;
@@ -64,7 +66,10 @@ export function rollItemMacro(itemName) {
 }
 
 /**
- * Create a macro from an skill drop.
+ * Create a macro from a skill field drop.
+ * 
+ * NOTE: There used to be special handling for drag&drop of SkillField, this is now handled by default item drag&drop
+ *       and createItemMacro.
  *
  * @param data A data object for skill macros.
  * @param slot The hotbar slot to use.
@@ -72,21 +77,19 @@ export function rollItemMacro(itemName) {
 export async function createSkillMacro(data: { skillId: string, skill: SkillFieldType }, slot) {
     if (!game.macros || !game.user) return;
 
-    const { skillId, skill } = data;
+    const { skill } = data;
 
     // Abort when skill macro already exists. This is done for consistency with createItemMacro behavior.
-    // TODO: tamif - skill - use label here but fix drag and drop of skills first.
-    const name = SkillNamingFlow.localizeSkillName(skill.name);
-    const existingMacro = game.macros.contents.find(macro => macro.name === name);
+    const existingMacro = game.macros.contents.find(macro => macro.name === skill.label);
     if (existingMacro) return;
 
     // Setup macro data.
-    const command = `game.shadowrun5e.rollSkillMacro("${name}");`;
+    const command = `game.shadowrun5e.rollSkillMacro("${skill.label}");`;
     const macro = await Macro.create({
-        name,
+        name: skill.label,
+        img: skill.img,
         type: 'script',
         command,
-        // TODO: Is flags needed here? See createItemMacro
     });
     if (macro) await game.user.assignHotbarMacro(macro, slot);
 }
@@ -107,5 +110,4 @@ export async function rollSkillMacro(skillLabel): Promise<SuccessTest<SuccessTes
 
     if (!actor) return;
     return actor.rollSkill(skillLabel, { byLabel: true });
-    // TODO: Macro for skills may need their own TestCreate.fromSkillMacro... as they need getSkill('Label', {byLabel: true});
 }

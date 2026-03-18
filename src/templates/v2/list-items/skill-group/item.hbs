@@ -1,5 +1,10 @@
 <div class="list-item-container {{#if (hasKey @root.expandedSkills group.item.id)}} expanded {{/if}}">
-    <div class="list-item" data-skill-id="{{group.item.id}}" data-category="group">
+    <div class="list-item {{#if (isOwner group.item owner=@root.actor)}} draggable {{/if}}"
+         data-source="{{group.item.system.description.source}}"
+         data-item-id="{{group.item.id}}"
+         data-uuid="{{group.item.uuid}}"
+         data-skill-id="{{group.item.id}}"
+         data-category="group">
         <div class="list-item-start" data-item-id="{{group.item.id}}">
             <button class="list-item-image-container icon sr5-icon"
                     type="button"

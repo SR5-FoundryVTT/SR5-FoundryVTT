@@ -24,40 +24,49 @@ export const SkillFieldFlow = {
         for (const item of skillItems) {
             if (!item.isType('skill')) continue;
 
-            const key = SkillNamingFlow.nameToKey(item.name) || item.id!;
-            const group = item.system.skill.group;
-            const hasCustomImage = item.img && item.img !== 'icons/svg/item-bag.svg';
-
-            const skill = DataDefaults.createData('skill_field', {
-                id: item.id,
-                name: item.name,
-                img: hasCustomImage ? item.img : '',
-                label: SkillNamingFlow.localizeSkillName(item.name),
-                base: item.system.skill.rating,
-                description: item.system.description.value,
-                attribute: item.system.skill.attribute,
-                limit: item.system.skill.limit.attribute,
-                canDefault: item.system.skill.defaulting,
-                requirement: item.system.skill.requirement,
-                specs: item.system.skill.specializations.map(spec => spec.name),
-                group
-            });
+            const { key, skillField } = SkillFieldFlow.createSkillField(item);
 
             switch (item.system.skill.category) {
                 case 'active':
-                    SkillFieldFlow.addSkill(skills.active, skill, key);
+                    SkillFieldFlow.addSkill(skills.active, skillField, key);
                     break;
                 case 'language':
-                    SkillFieldFlow.addSkill(skills.language, skill, key);
+                    SkillFieldFlow.addSkill(skills.language, skillField, key);
                     break;
                 case 'knowledge':
                     const knowledgeType = item.system.skill.knowledgeType as KnowledgeSkillCategory;
-                    SkillFieldFlow.addSkill(skills.knowledge[knowledgeType], skill, key);
+                    SkillFieldFlow.addSkill(skills.knowledge[knowledgeType], skillField, key);
                     break;
             }
         }
 
         return skills;
+    },
+
+    /**
+     * Transform skill item to a skill field entry.
+     */
+    createSkillField(skill: SR5Item<'skill'>) {
+            const key = SkillNamingFlow.nameToKey(skill.name) || skill.id!;
+            const group = skill.system.skill.group;
+            const hasCustomImage = skill.img && skill.img !== 'icons/svg/item-bag.svg';
+
+            const skillField = DataDefaults.createData('skill_field', {
+                id: skill.id,
+                name: skill.name,
+                img: hasCustomImage ? skill.img : '',
+                label: SkillNamingFlow.localizeSkillName(skill.name),
+                base: skill.system.skill.rating,
+                description: skill.system.description.value,
+                attribute: skill.system.skill.attribute,
+                limit: skill.system.skill.limit.attribute,
+                canDefault: skill.system.skill.defaulting,
+                requirement: skill.system.skill.requirement,
+                specs: skill.system.skill.specializations.map(spec => spec.name),
+                group
+            });
+
+            return { key, skillField };
     },
 
     addSkill(skills: Record<string, SkillFieldType>, skill: SkillFieldType, key: string) {
