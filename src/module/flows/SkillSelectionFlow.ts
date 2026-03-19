@@ -1,10 +1,10 @@
 import { SR5Item } from '@/module/item/SR5Item';
 import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
 import { Helpers } from '@/module/helpers';
-import { SR5Actor } from '../SR5Actor';
+import { SR5Actor } from '../actor/SR5Actor';
 import { Translation } from '@/module/utils/strings';
 import { SR5 } from '@/module/config';
-import { SkillNamingFlow } from '../../flows/SkillNamingFlow';
+import { SkillNamingFlow } from './SkillNamingFlow';
 
 /**
  * Provides selection-list data for skill and skill group pickers on any sheet.

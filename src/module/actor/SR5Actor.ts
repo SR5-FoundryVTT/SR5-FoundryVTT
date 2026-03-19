@@ -3,7 +3,7 @@ import { SR5Item } from '../item/SR5Item';
 import { FLAGS, SKILL_DEFAULT_NAME, SR, SYSTEM_NAME } from '../constants';
 import { PartsList } from '../parts/PartsList';
 import { DataDefaults } from '../data/DataDefaults';
-import { SkillFieldFlow } from './flows/SkillFieldFlow';
+import { SkillFieldPrep } from './prep/functions/SkillFieldPrep';
 import { SR5 } from "../config";
 import { CharacterPrep } from "./prep/CharacterPrep";
 import { CritterPrep } from "./prep/CritterPrep";
@@ -306,7 +306,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const skills = this.itemsForType.get('skill') as SR5Item<'skill'>[];
         if (!skills) return;
 
-        this.system.skills = SkillFieldFlow.prepareActorSkills(skills);
+        this.system.skills = SkillFieldPrep.prepareActorSkills(skills);
     }
 
     /**

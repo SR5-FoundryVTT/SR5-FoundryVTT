@@ -9,7 +9,7 @@ import { SR5Item } from './item/SR5Item';
 import { SR5Actor } from "./actor/SR5Actor";
 import { SuccessTest, SuccessTestData } from './tests/SuccessTest';
 import { SkillFieldType } from './types/template/Skills';
-import { SkillFieldFlow } from './actor/flows/SkillFieldFlow';
+import { SkillFieldPrep } from './actor/prep/functions/SkillFieldPrep';
 
 /**
  * Create a macros for different item based when a item document is dropped on the macro hotbar.
@@ -23,7 +23,7 @@ export async function createItemMacro(dropData, slot) {
     const item = await SR5Item.fromDropData(dropData);
     if (!(item instanceof SR5Item)) return console.error(`Shadowrun 5e | Macro Drop expected an item document but got a different document type`, item);
 
-    if (item.isType('skill')) return createSkillMacro({ skillId: item.id!, skill: SkillFieldFlow.createSkillField(item).skillField }, slot);
+    if (item.isType('skill')) return createSkillMacro({ skillId: item.id!, skill: SkillFieldPrep.createSkillField(item).skillField }, slot);
 
     const command = `game.shadowrun5e.rollItemMacro("${item.name}");`;
     let macro = game.macros.contents.find((m: Macro.Stored<"script" | "chat">) => m.name === item.name) as Macro;

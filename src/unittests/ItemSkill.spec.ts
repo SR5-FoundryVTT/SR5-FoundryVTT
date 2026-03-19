@@ -2,7 +2,7 @@ import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 
 import { SkillGroupFlow } from '@/module/actor/flows/SkillGroupFlow';
 import { SkillSetFlow } from '@/module/actor/flows/SkillSetFlow';
-import { SkillSelectionFlow } from '@/module/actor/flows/SkillSelectionFlow';
+import { SkillSelectionFlow } from '@/module/flows/SkillSelectionFlow';
 import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
 import { SR5Item } from '@/module/item/SR5Item';
 import { SR5TestFactory } from './utils';

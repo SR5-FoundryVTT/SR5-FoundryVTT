@@ -1,10 +1,10 @@
+import { Helpers } from '@/module/helpers';
+
 /**
  * Utility flow for converting skill, skill group, and skill set names into
  * stable keys and localized labels. Use this flow wherever skill-related data
  * needs a shared naming convention for storage, lookup, sorting, or UI display.
  */
-import { Helpers } from '@/module/helpers';
-
 export const SkillNamingFlow = {
     nameToKey(name: string) {
         if (!name) return '';

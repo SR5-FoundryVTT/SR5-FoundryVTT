@@ -1,12 +1,18 @@
 import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
 import { SR5Item } from '@/module/item/SR5Item';
 import { DataDefaults } from '@/module/data/DataDefaults';
-import { SkillNamingFlow } from '../../flows/SkillNamingFlow';
+import { SkillNamingFlow } from '../../../flows/SkillNamingFlow';
 
 /**
  * Builds and manages the actor-facing skill field structure derived from owned skill items.
  */
-export const SkillFieldFlow = {
+export const SkillFieldPrep = {
+    /**
+     * Prepare SkillField skills from Skill items. This is mainly intended for actor.system.skills storage
+     * 
+     * @param items Full list of skill items to transform.
+     * @returns The transformed skills, grouped by categories.
+     */
     prepareActorSkills(items: SR5Item<'skill'>[]) {
         const skills = {
             active: {},
@@ -24,18 +30,18 @@ export const SkillFieldFlow = {
         for (const item of skillItems) {
             if (!item.isType('skill')) continue;
 
-            const { key, skillField } = SkillFieldFlow.createSkillField(item);
+            const { key, skillField } = SkillFieldPrep.createSkillField(item);
 
             switch (item.system.skill.category) {
                 case 'active':
-                    SkillFieldFlow.addSkill(skills.active, skillField, key);
+                    SkillFieldPrep.addSkill(skills.active, skillField, key);
                     break;
                 case 'language':
-                    SkillFieldFlow.addSkill(skills.language, skillField, key);
+                    SkillFieldPrep.addSkill(skills.language, skillField, key);
                     break;
                 case 'knowledge':
                     const knowledgeType = item.system.skill.knowledgeType as KnowledgeSkillCategory;
-                    SkillFieldFlow.addSkill(skills.knowledge[knowledgeType], skillField, key);
+                    SkillFieldPrep.addSkill(skills.knowledge[knowledgeType], skillField, key);
                     break;
             }
         }

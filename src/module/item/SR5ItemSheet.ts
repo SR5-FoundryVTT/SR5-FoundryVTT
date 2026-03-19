@@ -22,7 +22,7 @@ import { AmmunitionType, RangeType } from '../types/item/Weapon';
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import ItemSheet = foundry.applications.sheets.ItemSheet;
 import { Translation } from '../utils/strings';
-import { SkillSelectionFlow } from '../actor/flows/SkillSelectionFlow';
+import { SkillSelectionFlow } from '../flows/SkillSelectionFlow';
 
 const { DragDrop } = foundry.applications.ux
 const { fromUuid, fromUuidSync } = foundry.utils;

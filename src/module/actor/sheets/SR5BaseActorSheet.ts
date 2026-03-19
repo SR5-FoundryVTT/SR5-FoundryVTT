@@ -20,7 +20,7 @@ import { InventoryType } from 'src/module/types/actor/Common';
 import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
 import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
 import { SheetFlow } from '@/module/flows/SheetFlow';
-import { SkillFieldFlow } from '@/module/actor/flows/SkillFieldFlow';
+import { SkillFieldPrep } from '@/module/actor/prep/functions/SkillFieldPrep';
 import { SkillSetFlow } from '@/module/actor/flows/SkillSetFlow';
 import { SkillNamingFlow } from '@/module/flows/SkillNamingFlow';
 import { SkillItemFlow } from '@/module/item/flows/SkillItemFlow';
@@ -1501,12 +1501,12 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     _sortSkills(sheetData: SR5ActorSheetData, skills: SR5Actor['system']['skills']) {
-        sheetData.system.skills.active = SkillFieldFlow.sortSkills(skills.active);
-        sheetData.system.skills.language = SkillFieldFlow.sortSkills(skills.language);
-        sheetData.system.skills.knowledge.street = SkillFieldFlow.sortSkills(skills.knowledge.street);
-        sheetData.system.skills.knowledge.academic = SkillFieldFlow.sortSkills(skills.knowledge.academic);
-        sheetData.system.skills.knowledge.professional = SkillFieldFlow.sortSkills(skills.knowledge.professional);
-        sheetData.system.skills.knowledge.interests = SkillFieldFlow.sortSkills(skills.knowledge.interests);
+        sheetData.system.skills.active = SkillFieldPrep.sortSkills(skills.active);
+        sheetData.system.skills.language = SkillFieldPrep.sortSkills(skills.language);
+        sheetData.system.skills.knowledge.street = SkillFieldPrep.sortSkills(skills.knowledge.street);
+        sheetData.system.skills.knowledge.academic = SkillFieldPrep.sortSkills(skills.knowledge.academic);
+        sheetData.system.skills.knowledge.professional = SkillFieldPrep.sortSkills(skills.knowledge.professional);
+        sheetData.system.skills.knowledge.interests = SkillFieldPrep.sortSkills(skills.knowledge.interests);
 
         return sheetData.system.skills;
     }

@@ -94,7 +94,6 @@ export class SkillRules {
     static languageSkillAttribute(): keyof typeof SR5.attributes {
         return 'intuition';
     }
-
     
     /**
      * These skill categories have predefined values like
