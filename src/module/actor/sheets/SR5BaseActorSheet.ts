@@ -1960,22 +1960,22 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     override async _onFirstRender(context, options) {
         await super._onFirstRender(context, options);
 
-        this._createContextMenu(this._getItemListContextOptions.bind(this), "[data-item-id]", {
+        this._createContextMenu(this._getItemListContextOptions.bind(this), "[data-item-id][data-context-menu='item']", {
             hookName: "getItemListContextOptions",
             jQuery: false,
             fixed: true,
         });
-        this._createContextMenu(this._getEffectListContextOptions.bind(this), "[data-effect-id]", {
+        this._createContextMenu(this._getEffectListContextOptions.bind(this), "[data-effect-id][data-context-menu='effect']", {
             hookName: "getEffectListContextOptions",
             jQuery: false,
             fixed: true,
         });
-        this._createContextMenu(this._getSkillListContextOptions.bind(this), "[data-skill-id]", {
+        this._createContextMenu(this._getSkillListContextOptions.bind(this), "[data-skill-id][data-context-menu='skill']", {
             hookName: "getSkillListContextOptions",
             jQuery: false,
             fixed: true,
         });
-        this._createContextMenu(this._getAttributeContextOptions.bind(this), "[data-attribute-id]", {
+        this._createContextMenu(this._getAttributeContextOptions.bind(this), "[data-attribute-id][data-context-menu='attribute']", {
             hookName: "getAttributeContextOptions",
             jQuery: false,
             fixed: true,
