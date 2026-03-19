@@ -95,6 +95,28 @@ export class SkillRules {
         return 'intuition';
     }
 
+    
+    /**
+     * These skill categories have predefined values like
+     * - attributes
+     * - defaulting
+     * 
+     * See SR5#xxx TODO: tamif - skill - skill reference
+     */
+    static readonly skillCategoriesWithFixedAttributes = new Set(['knowledge', 'language']);
+    static fixedCategoryValues(category: string) {
+        return SkillRules.skillCategoriesWithFixedAttributes.has(category);
+    }
+
+    /**
+     * Can a skill category be native?
+     * 
+     * See SR5#xxx TODO: tamif - skill - skill reference
+     */
+    static canBeNativeCategory(category: string) {
+        return category === 'language';
+    }
+
     /**
      * Inject all attributes into testData that match the given attribute names list.
      *

@@ -9,6 +9,7 @@ import { SR5Item } from "../SR5Item";
 import { Helpers } from "@/module/helpers";
 import { SR5 } from "@/module/config";
 import ItemSheet = foundry.applications.sheets.ItemSheet;
+import { SkillRules } from "@/module/rules/SkillRules";
 
 interface SR5SkillSheetData extends SR5BaseItemSheetData {
     // config style name to translation mappings.
@@ -120,22 +121,19 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
         return context;
     }
 
-    static readonly lockedSkillCategories = new Set(['knowledge', 'language']);
-
     canEditSkillAttribute() {
         if (this.document.system.type !== 'skill') return true;
-
-        return !SR5SkillSheet.lockedSkillCategories.has(this.document.system.skill.category);
+        return !SkillRules.fixedCategoryValues(this.document.system.skill.category);
     }
 
     canEditSkillDefaulting() {
         if (this.document.system.type !== 'skill') return true;
-
-        return !SR5SkillSheet.lockedSkillCategories.has(this.document.system.skill.category);
+        return !SkillRules.fixedCategoryValues(this.document.system.skill.category);
     }
 
     canBeNative() {
-        return this.document.system.type === 'skill' && this.document.system.skill.category === 'language';
+        if (this.document.system.type !== 'skill') return true;
+        return SkillRules.canBeNativeCategory(this.document.system.skill.category);
     }
 
     /**
