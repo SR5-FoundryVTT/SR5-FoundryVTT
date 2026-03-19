@@ -944,35 +944,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     /**
-     * Add a new knowledge skill for a specific category.
-     *
-     * Knowledge skills are stored separately from active and language skills and have
-     * some values pre-defined by their category (street, professional, ...)
-     *
-     * @param category Define the knowledge skill category
-     * @param skill  Partially define the SkillField properties needed. Omitted properties will be default.
-     * @returns The id of the created knowledge skill.
-     */
-    async addKnowledgeSkill(
-        this: SR5Actor,
-        category: KnowledgeSkillCategory,
-        skill: Partial<SkillFieldType> = { name: SKILL_DEFAULT_NAME }
-    ): Promise<string | undefined> {
-        if (!Object.hasOwn(this.system.skills.knowledge, category)) {
-            console.error(`Shadowrun5e | Tried creating knowledge skill with unknown category ${category}`);
-            return;
-        }
-
-        skill = DataDefaults.createData('skill_field', skill);
-        const id = randomID(16);
-        const value = {};
-        value[id] = skill;
-        await this.update({ system: { skills: { knowledge: { [category]: { value } } } } });
-
-        return id;
-    }
-
-    /**
      * Prompt the current user for a generic roll.
      */
     async promptRoll() {

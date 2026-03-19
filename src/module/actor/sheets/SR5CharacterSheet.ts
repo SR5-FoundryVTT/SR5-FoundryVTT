@@ -172,7 +172,6 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
         const partContext = await super._preparePartContext(partId, context, options) as CharacterSheetData;
 
         if (partId === 'skills') {
-            console.error('TODO: tam - move this into SkillSheetFlow or similar');
             // initialize the check by seeing if we have language skills to skill over the other check
             partContext.hasLanguageKnowledgeSkills = Object.keys(this.actor.system.skills.language).length > 0;
             if (!partContext.hasLanguageKnowledgeSkills) {

@@ -6,7 +6,6 @@ export class SkillsPrep {
      * Calculate skill ModifiableValue / SkillField totals.
      */
     static prepareSkills(system: Actor.SystemOfType<'character' | 'critter' | 'ic' | 'spirit' | 'sprite' | 'vehicle'>) {
-        console.error("TODO: tam - prepareSkills has been reworked. Check if anything is missing.");
         const { language, active, knowledge } = system.skills;
 
         // function that will set the total of a skill correctly
@@ -23,7 +22,7 @@ export class SkillsPrep {
         }
 
         for (const skills of Object.values(knowledge)) {
-            Object.values(skills).forEach(skill => prepareSkill(skill));
+            Object.values(skills).forEach(prepareSkill);
         }
     }
 }
