@@ -178,7 +178,7 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
      * Add a new skill entry to the skill group.
      */
     static async #addGroupSkill(this: SR5SkillSheet) {
-        await SkillGroupFlow.addGroupSkill(this.document);
+        await SkillItemFlow.addGroupSkill(this.document);
     }
 
     /**
@@ -188,7 +188,7 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
         event.preventDefault();
         const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
         if (index === -1) return;
-        await SkillGroupFlow.removeGroupSkill(this.document, index);
+        await SkillItemFlow.removeGroupSkill(this.document, index);
     }
 
     /**

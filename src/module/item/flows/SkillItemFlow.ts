@@ -90,7 +90,33 @@ export const SkillItemFlow = {
         }
 
         if (skill.system.type === 'group') {
-            await SkillGroupFlow.changeGroupRating(skill, rating);
+            await SkillItemFlow.changeGroupRating(skill, rating);
         }
+    },
+    
+    async addGroupSkill(skill: SR5Item<'skill'>, name = '') {
+        if (!skill.isType('skill')) return;
+
+        const skills = skill.system.group.skills;
+        skills.push(name);
+        await skill.update({ system: { group: { skills } } });
+        if (skill.actor) await SkillGroupFlow.syncSkillItemGroups(skill.actor);
+    },
+
+    async changeGroupRating(skill: SR5Item<'skill'>, rating: number) {
+        if (!skill.isType('skill') || skill.system.type !== 'group') return;
+
+        await skill.update({ system: { group: { rating } } });
+    },
+
+    async removeGroupSkill(skill: SR5Item<'skill'>, index: number) {
+        if (!skill.isType('skill')) return;
+
+        const skills = skill.system.group.skills;
+        if (index < 0 || index >= skills.length) return;
+
+        skills.splice(index, 1);
+        await skill.update({ system: { group: { skills } } });
+        if (skill.actor) await SkillGroupFlow.syncSkillItemGroups(skill.actor);
     },
 };
