@@ -1521,29 +1521,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             .sort(sortByLocalizedLabel);
     }
 
-    _showSkill(key: string, skill: SR5Item<'skill'>, sheetData: SR5ActorSheetData) {
-        if (this._showMagicSkills(key, skill, sheetData)) {
-            return true;
-        }
-        if (this._showResonanceSkills(key, skill, sheetData)) {
-            return true;
-        }
-
-        return this._showGeneralSkill(key, skill);
-    }
-
-    _showGeneralSkill(skillId: string, skill: SR5Item<'skill'>) {
-        return !this._isSkillMagic(skillId, skill) && !this._isSkillResonance(skill);
-    }
-
-    _showMagicSkills(skillId: string, skill: SR5Item<'skill'>, sheetData: SR5ActorSheetData) {
-        return this._isSkillMagic(skillId, skill) && sheetData.system.special === 'magic';
-    }
-
-    _showResonanceSkills(skillId: string, skill: SR5Item<'skill'>, sheetData: SR5ActorSheetData) {
-        return this._isSkillResonance(skill) && sheetData.system.special === 'resonance';
-    }
-
     hideEmptyCategories() {
         return !this.actor.system.category_visibility.default;
     }
