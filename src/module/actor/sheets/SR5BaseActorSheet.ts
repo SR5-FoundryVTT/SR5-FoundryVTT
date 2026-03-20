@@ -252,7 +252,12 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @return A string of item types from the template.json Item section.
      */
     getHandledItemTypes(): Item.ConfiguredSubType[] {
-        return ['action'];
+        return [
+            // actions are always handled on their own sheet tab, outside inventory.
+            'action', 
+            // skills are always handled through their derived skillfields, outside inventory.
+            'skill'
+        ];
     }
 
     /**
