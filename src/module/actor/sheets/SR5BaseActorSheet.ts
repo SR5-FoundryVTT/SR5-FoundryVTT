@@ -30,6 +30,7 @@ import ActorSheetV2 = foundry.applications.sheets.ActorSheetV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 import { EffectCreationFlow } from '@/module/flows/EffectCreationFlow';
 import { SkillFieldType } from '@/module/types/template/Skills';
+import { CreateItemFlow } from '@/module/item/flows/CreateItemFlow';
 
 const { TextEditor } = foundry.applications.ux;
 const { fromUuid, fromUuidSync } = foundry.utils;
@@ -1003,18 +1004,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     _handleCreateSkillItem(event: PointerEvent, itemData: Item.CreateData) {
         const skillAction = SheetFlow.closestAction(event.target)!;
         const skillType = skillAction.dataset.skillType || 'skill';
-        const skillCategory = skillAction.dataset.skillCategory;
-        const skillKnowledgeType = skillAction.dataset.skillKnowledgeType;
+        const skillCategory = skillAction.dataset.skillCategory as string;
+        const skillKnowledgeType = skillAction.dataset.skillKnowledgeType as string;
 
-        itemData['system.type'] = skillType;
-
-        if (skillType === 'group') {
-            return;
-        }
-
-        if (!skillCategory) console.error(`Shadowrun 5e | Tried to create a Skill item without a skill-category context!`);
-        itemData['system.skill.category'] = skillCategory;
-        if (skillKnowledgeType) itemData['system.skill.knowledgeType'] = skillKnowledgeType;
+        CreateItemFlow.injectMinimumSkillData(itemData, skillType, skillCategory, skillKnowledgeType);
     }
 
     /**
