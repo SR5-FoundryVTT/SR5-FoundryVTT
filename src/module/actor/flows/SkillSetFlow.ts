@@ -3,6 +3,7 @@ import { SR5Actor } from '../SR5Actor';
 import { SR5Item } from '@/module/item/SR5Item';
 import { SkillNamingFlow } from '../../flows/SkillNamingFlow';
 import { SkillGroupFlow } from './SkillGroupFlow';
+import { SkillItemFlow } from '@/module/item/flows/SkillItemFlow';
 
 /**
  * Provides actor specific skill set flow operations.
@@ -50,7 +51,6 @@ export const SkillSetFlow = {
 
         const newSkillKeys = new Set<string>();
         // TODO: tamif - skill - why mixing skill items and skill group items?
-        // TODO: tamif - skill - why flatMap? => To return 'nothing' with []
         const items = [...skills, ...groups].flatMap(item => {
             const itemData = foundry.utils.deepClone(item) as Item.CreateData & { _id?: string };
             delete itemData._id;

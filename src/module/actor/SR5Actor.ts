@@ -119,6 +119,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Lifecycle hook called before an actor document is created.     
+     * 
+     * NOTE: Hook is both called for creating and cloning / duplicating actor documents.
      *
      * @param data The initial data object provided to the document creation request
      * @param options Additional options which modify the creation request
@@ -126,6 +128,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     override async _preCreate(data: Actor.CreateData, options: Actor.Database.PreCreateOptions, user: User.Implementation) {
         await super._preCreate(data, options, user);
+        
+        // Abort skill creation data injection when duplicating
+        if (foundry.utils.getProperty(data, '_stats.duplicateSource')) return;
         await CreateActorFlow.addDefaultActorSkillset(this, data);
     }
 
