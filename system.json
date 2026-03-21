@@ -254,7 +254,10 @@
                 "sr5e-system-macros",
                 "sr5e-general-actions",
                 "sr5e-ic-actions",
-                "sr5e-matrix-actions"
+                "sr5e-matrix-actions",
+                "sr5e-skills",
+                "sr5e-skill-groups",
+                "sr5e-skill-sets"
             ]
         }
     ],
