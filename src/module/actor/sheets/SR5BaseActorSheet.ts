@@ -300,6 +300,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             rollItem: SR5BaseActorSheet.#rollItem,
             rollSkill: SR5BaseActorSheet.#rollSkill,
             editSkill: SR5BaseActorSheet.#editSkill,
+            removeSkillSet: SR5BaseActorSheet.#removeSkillSet,
             rollSkillSpecialization: SR5BaseActorSheet.#rollSkillSpec,
             openSkillDescription: SR5BaseActorSheet.#toggleSkillDescription,
             filterTrainedSkills: SR5BaseActorSheet.#filterUntrainedSkills,
@@ -2247,6 +2248,20 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         // Preselect default instead of none.
         this.selectedInventory = this.actor.defaultInventory.name;
         void this.render();
+    }
+
+    /**
+     * Allow users to remove the documents skillset manually.
+     */
+    static async #removeSkillSet(this: SR5BaseActorSheet, event: Event) {
+        event.preventDefault();
+
+        if (!this.actor.system.skillset) return;
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        await SkillSetFlow.removeSkillSet(this.actor);
     }
 
     async _moveItemToInventory(target: HTMLElement) {

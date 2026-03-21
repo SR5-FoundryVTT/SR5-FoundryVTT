@@ -1,7 +1,7 @@
 import { SR5 } from "@/module/config";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { OpposedActionRollData } from "./Action";
-const { ArrayField, BooleanField, NumberField, StringField, SchemaField } = foundry.data.fields;
+const { ArrayField, BooleanField, DocumentUUIDField, NumberField, StringField, SchemaField } = foundry.data.fields;
 
 const SkillLanguageData = () => ({
     isNative: new BooleanField({ required: true, initial: false }),
@@ -27,6 +27,14 @@ const SkillLimitData = () => ({
  */
 const SkillSetDefaultData = () => ({
     type: new StringField({ required: true, initial: '', blank: true, choices: SR5.actorTypes }),
+});
+
+/**
+ * Skills and groups can be sourced from a skillset.
+ * This is implemented as a schema field to allow future extension.
+ */
+const SkillSourceData = () => ({
+    uuid: new DocumentUUIDField({ required: true, blank: true }),
 });
 
 const SkillTypeData = () => ({
@@ -84,6 +92,8 @@ const SkillData = () => ({
 
     // fields shared across all skill types.
     type: new StringField({ required: true, initial: 'skill', choices: SR5.skillTypes }),
+    // source information of this skill item.
+    source: new SchemaField(SkillSourceData()),
 
     // data depending on skill type.
     skill: new SchemaField(SkillTypeData()),

@@ -364,6 +364,7 @@ export const PackItemFlow = {
             skillSource.system.skill.rating = setSkills.get(skillKey) ?? skillSource.system.skill.rating;
             skillSource.system.skill.group = skillGroup.get(skillKey) ?? '';
             skillSource.system.skill.specializations = skillSpecs.get(skillKey) ?? [];
+            skillSource.system.source.uuid = skillSet.uuid;
             return [skillSource];
         });
 
@@ -397,6 +398,7 @@ export const PackItemFlow = {
         for (const skillGroup of skillGroupData) {
             const rating = skillGroupRatings[skillGroup.name];
             skillGroup.system.group.rating = rating;
+            skillGroup.system.source.uuid = skillSet.uuid;
             
             // @ts-expect-error _id might be non-optional, though we do not want it. Instead of fully retyping, just lie.
             delete skillGroup._id;

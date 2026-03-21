@@ -2783,7 +2783,8 @@
                 "PickControlledTokenAsSummoner": "Pick the currently Controlled Token Actor as the Summoner",
                 "PickControlledTokenAsTechnomancer": "Pick the currently Controlled Token Actor as the Compiler (Technomancer)",
                 "RebootPersonaAndClearAllMarks": "Reboot your Persona and clear all Marks you have placed",
-                "SetupPAN": "Add all Equipped Wireless Devices to this character's Persona"
+                "SetupPAN": "Add all Equipped Wireless Devices to this character's Persona",
+                "RemoveSkillSet": "Remove the current skill set as well as all skills and skill groups sourced from it"
             },
             "CallInAction": {
                 "ActorType": "Type of actor to call in",

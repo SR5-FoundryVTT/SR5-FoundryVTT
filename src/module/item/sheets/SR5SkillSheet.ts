@@ -24,6 +24,11 @@ interface SR5SkillSheetData extends SR5BaseItemSheetData {
     canBeNative: boolean
     // Taken directly from an owning actor to show the derived value.
     skillValue?: number
+    sourceSkillSet?: {
+        name: string
+        img: string
+        uuid: string
+    } | null
 }
 
 /**
@@ -116,8 +121,24 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
         context.canEditSkillDefaulting = this.canEditSkillDefaulting();
         context.canBeNative = this.canBeNative();
         context.skillValue = this.getActorSkillValue();
+        context.sourceSkillSet = await this.getSourceSkillSet();
 
         return context;
+    }
+
+    async getSourceSkillSet(): Promise<SR5SkillSheetData['sourceSkillSet']> {
+        const sourceUuid = foundry.utils.getProperty(this.document, 'system.source.uuid') as string;
+        if (!sourceUuid) return null;
+
+        const sourceSkillSet = await fromUuid(sourceUuid);
+        if (!(sourceSkillSet instanceof SR5Item)) return null;
+        if (!sourceSkillSet.isType('skill') || sourceSkillSet.system.type !== 'set') return null;
+
+        return {
+            name: sourceSkillSet.name ?? '',
+            img: sourceSkillSet.img as string,
+            uuid: sourceSkillSet.uuid,
+        };
     }
 
     canEditSkillAttribute() {

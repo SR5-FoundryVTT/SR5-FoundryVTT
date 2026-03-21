@@ -132,6 +132,11 @@
                         <div class="basic-row">
                             {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" skillset }}
                             <a data-action="openUuid" data-uuid="{{skillset.uuid}}">{{skillset.name}}</a>
+                            {{#if @root.isEditMode}}
+                                <a data-action="removeSkillSet" data-tooltip="SR5.Tooltips.Actor.RemoveSkillSet">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            {{/if}}
                         </div>
                     </div>
                 </div>

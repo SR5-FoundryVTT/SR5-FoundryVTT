@@ -1,8 +1,6 @@
 import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
 import { SR5Actor } from '../SR5Actor';
 import { SR5Item } from '@/module/item/SR5Item';
-import { SkillNamingFlow } from '../../flows/SkillNamingFlow';
-import { SkillGroupFlow } from './SkillGroupFlow';
 import { SkillItemFlow } from '@/module/item/flows/SkillItemFlow';
 import { ActorSkillFlow } from './ActorSkillFlow';
 
@@ -23,13 +21,12 @@ export const SkillSetFlow = {
         if (!(skillset instanceof SR5Item)) return;
         if (!skillset?.isType('skill') || skillset.system.type !== 'set') return;
 
-        const items: string[] = [];
-        for (const setSkill of skillset.system.set.skills) {
-            const item = actor.itemsForType.get('skill')?.find(skill => skill.name === setSkill.name);
-            if (item) items.push(item.id!);
-        }
+        const items = (actor.itemsForType.get('skill') as SR5Item<'skill'>[])
+            ?.filter(item => item.system.source.uuid === skillset.uuid)
+            .map(item => item.id!) ?? [];
 
         await actor.deleteEmbeddedDocuments('Item', items);
+        await actor.update({ system: { skillset: '' } });
     },
 
     /**
