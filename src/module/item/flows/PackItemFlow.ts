@@ -309,33 +309,63 @@ export const PackItemFlow = {
     },
 
     /**
-     * Retrieve all skills defined in a skill set.
+     * Retrieve all skills as defined in a skill set.
+     * This includes also include skills as defined by groups mentioned in that skill set.
+     * All skills will also already have their ratings set.
      * 
      * @param skillSet Skill set item to retrieve skills for.
-     * @returns A list of skills or empty.
+     * @returns A list of skill data ready to be injected into an actor.
      */
-    async getSkillsForSkillSet(skillSet: SR5Item<'skill'>) {
+    async prepareSkillsForSkillSet(skillSet: SR5Item<'skill'>) {
         if (skillSet.system.type !== 'set') {
             console.error(`Shadowrun 5e | Document ${skillSet.name} in pack ${this.getSkillSetsPackName()} is not of type set`, skillSet);
             return [];
         }
 
-        const skillRatings: Record<string, number> = {};
+        // Collect data for skills.
+        const setSkills = new Map<string, number>();
+        const skillSpecs = new Map<string, string[]>();
         for (const skill of skillSet.system.set.skills) {
-            skillRatings[skill.name] = skill.rating;
+            const skillKey = SkillNamingFlow.nameToKey(skill.name);
+            if (!skillKey) continue;
+            setSkills.set(skillKey, skill.rating);
+            skillSpecs.set(skillKey, skill.specializations.map(spec => spec.name));
+        }
+
+        // Collect ratings for skills in groups.
+        // Apply group ratings last, as they will override skill ratings.
+        const skillGroups = await PackItemFlow.prepareSkillGroupsForSkillSet(skillSet);
+        const skillGroup = new Map<string, string>();
+        for (const group of skillGroups) {
+            const groupSkills = foundry.utils.getProperty(group, 'system.group.skills') as string[] ?? [];
+            const groupRating = foundry.utils.getProperty(group, 'system.group.rating') as number ?? 0;
+
+            for (const groupSkill of groupSkills) {
+                const skillKey = SkillNamingFlow.nameToKey(groupSkill);
+                if (!skillKey) continue;
+                setSkills.set(skillKey, groupRating);
+                skillGroup.set(skillKey, group.name);
+            }
         }
 
         // Reduce pack skills down to skill set skills.
-        const skills = await PackItemFlow.getPackSkills()
+        const skills = await PackItemFlow.getPackSkills();
         if (!skills) return [];
-        const skillData = skills.map(skill => skill.toObject());
+        
+        // Inject ratings as defined by set skills and groups.
+        const skillData = skills.flatMap(skill => {
+            const skillKey = SkillNamingFlow.nameToKey(skill.name);
+            if (!skillKey || !setSkills.has(skillKey)) return [];
 
-        for (const skill of skillData) {
-            if (!Object.hasOwn(skillRatings, skill.name)) continue;
+            const skillSource = skill.toObject();
+            // @ts-expect-error _id might be non-optional, though we do not want it. Instead of fully retyping, just lie.
+            delete skillSource._id;
 
-            const rating = skillRatings[skill.name];
-            skill.system.skill.rating = rating;
-        }
+            skillSource.system.skill.rating = setSkills.get(skillKey) ?? skillSource.system.skill.rating;
+            skillSource.system.skill.group = skillGroup.get(skillKey) ?? '';
+            skillSource.system.skill.specializations = skillSpecs.get(skillKey) ?? [];
+            return [skillSource];
+        });
 
         return skillData;
     },
@@ -346,7 +376,7 @@ export const PackItemFlow = {
      * @param skillSet Skill set item to retrieve skill groups for.
      * @returns A list of skill groups or empty.
      */
-    async getSkillGroupsForSkillSet(skillSet: SR5Item<'skill'>) {
+    async prepareSkillGroupsForSkillSet(skillSet: SR5Item<'skill'>) {
         if (skillSet.system.type !== 'set') {
             console.error(`Shadowrun 5e | Document ${skillSet.name} in pack ${this.getSkillSetsPackName()} is not of type set`, skillSet);
             return [];
@@ -367,6 +397,9 @@ export const PackItemFlow = {
         for (const skillGroup of skillGroupData) {
             const rating = skillGroupRatings[skillGroup.name];
             skillGroup.system.group.rating = rating;
+            
+            // @ts-expect-error _id might be non-optional, though we do not want it. Instead of fully retyping, just lie.
+            delete skillGroup._id;
         }
 
         return skillGroupData;

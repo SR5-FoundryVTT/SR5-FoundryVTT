@@ -49,11 +49,11 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 },
             });
 
-            const originalGetSkillsForSkillSet = PackItemFlow.getSkillsForSkillSet;
-            const originalGetSkillGroupsForSkillSet = PackItemFlow.getSkillGroupsForSkillSet;
+            const originalGetSkillsForSkillSet = PackItemFlow.prepareSkillsForSkillSet;
+            const originalGetSkillGroupsForSkillSet = PackItemFlow.prepareSkillGroupsForSkillSet;
 
-            PackItemFlow.getSkillsForSkillSet = async () => [skillTemplate.toObject()];
-            PackItemFlow.getSkillGroupsForSkillSet = async () => {
+            PackItemFlow.prepareSkillsForSkillSet = async () => [skillTemplate.toObject()];
+            PackItemFlow.prepareSkillGroupsForSkillSet = async () => {
                 const groupData = groupTemplate.toObject();
                 groupData.system.group.rating = 4;
                 return [groupData];
@@ -62,8 +62,8 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             try {
                 await SkillSetFlow.applySkillSetToActor(actor, skillSet);
             } finally {
-                PackItemFlow.getSkillsForSkillSet = originalGetSkillsForSkillSet;
-                PackItemFlow.getSkillGroupsForSkillSet = originalGetSkillGroupsForSkillSet;
+                PackItemFlow.prepareSkillsForSkillSet = originalGetSkillsForSkillSet;
+                PackItemFlow.prepareSkillGroupsForSkillSet = originalGetSkillGroupsForSkillSet;
             }
 
             const createdSkill = actor.items.find(item => {
@@ -77,6 +77,72 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             const derivedSkill = actor.getSkill('Pistols');
             assert.exists(derivedSkill);
             assert.strictEqual(derivedSkill?.base, 4);
+        });
+
+        it('adds skills contributed by configured skill groups even without direct skill entries', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const skillSet = await factory.createItem({
+                type: 'skill',
+                name: 'Grouped Skills Only',
+                system: {
+                    type: 'set',
+                    set: {
+                        skills: [],
+                        groups: [{ name: 'Firearms', rating: 4 }],
+                    },
+                },
+            });
+
+            const skillTemplate = await factory.createItem({
+                type: 'skill',
+                name: 'Pistols',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        category: 'active',
+                    },
+                },
+            });
+
+            const groupTemplate = await factory.createItem({
+                type: 'skill',
+                name: 'Firearms',
+                system: {
+                    type: 'group',
+                    group: {
+                        skills: ['Pistols'],
+                    },
+                },
+            });
+
+            const originalGetSkillsForSkillSet = PackItemFlow.prepareSkillsForSkillSet;
+            const originalGetSkillGroupsForSkillSet = PackItemFlow.prepareSkillGroupsForSkillSet;
+
+            PackItemFlow.prepareSkillsForSkillSet = originalGetSkillsForSkillSet;
+            PackItemFlow.prepareSkillGroupsForSkillSet = async () => {
+                const groupData = groupTemplate.toObject();
+                groupData.system.group.rating = 4;
+                return [groupData];
+            };
+
+            const originalGetPackSkills = PackItemFlow.getPackSkills;
+            PackItemFlow.getPackSkills = async () => [skillTemplate];
+
+            try {
+                await SkillSetFlow.applySkillSetToActor(actor, skillSet);
+            } finally {
+                PackItemFlow.getPackSkills = originalGetPackSkills;
+                PackItemFlow.prepareSkillsForSkillSet = originalGetSkillsForSkillSet;
+                PackItemFlow.prepareSkillGroupsForSkillSet = originalGetSkillGroupsForSkillSet;
+            }
+
+            const createdSkill = actor.items.find(item => {
+                return item.isType('skill') && item.system.type === 'skill' && item.name === 'Pistols';
+            }) as SR5Item<'skill'> | undefined;
+
+            assert.exists(createdSkill);
+            assert.strictEqual(createdSkill?.system.skill.group, 'Firearms');
+            assert.strictEqual(createdSkill?.system.skill.rating, 4);
         });
 
         it('applies configured skill set specializations to created skill items', async () => {
@@ -102,17 +168,17 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 system: { type: 'skill' },
             });
 
-            const originalGetSkillsForSkillSet = PackItemFlow.getSkillsForSkillSet;
-            const originalGetSkillGroupsForSkillSet = PackItemFlow.getSkillGroupsForSkillSet;
+            const originalGetSkillsForSkillSet = PackItemFlow.prepareSkillsForSkillSet;
+            const originalGetSkillGroupsForSkillSet = PackItemFlow.prepareSkillGroupsForSkillSet;
 
-            PackItemFlow.getSkillsForSkillSet = async () => [skillTemplate.toObject()];
-            PackItemFlow.getSkillGroupsForSkillSet = async () => [];
+            PackItemFlow.prepareSkillsForSkillSet = async () => [skillTemplate.toObject()];
+            PackItemFlow.prepareSkillGroupsForSkillSet = async () => [];
 
             try {
                 await SkillSetFlow.applySkillSetToActor(actor, skillSet);
             } finally {
-                PackItemFlow.getSkillsForSkillSet = originalGetSkillsForSkillSet;
-                PackItemFlow.getSkillGroupsForSkillSet = originalGetSkillGroupsForSkillSet;
+                PackItemFlow.prepareSkillsForSkillSet = originalGetSkillsForSkillSet;
+                PackItemFlow.prepareSkillGroupsForSkillSet = originalGetSkillGroupsForSkillSet;
             }
 
             const createdSkill = actor.items.find(item => {
@@ -151,12 +217,12 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             });
 
             const originalGetAllPackSkillSets = PackItemFlow.getAllPackSkillSets;
-            const originalGetSkillsForSkillSet = PackItemFlow.getSkillsForSkillSet;
-            const originalGetSkillGroupsForSkillSet = PackItemFlow.getSkillGroupsForSkillSet;
+            const originalGetSkillsForSkillSet = PackItemFlow.prepareSkillsForSkillSet;
+            const originalGetSkillGroupsForSkillSet = PackItemFlow.prepareSkillGroupsForSkillSet;
 
             PackItemFlow.getAllPackSkillSets = async () => [skillSet];
-            PackItemFlow.getSkillsForSkillSet = async () => [skillTemplate.toObject()];
-            PackItemFlow.getSkillGroupsForSkillSet = async () => [];
+            PackItemFlow.prepareSkillsForSkillSet = async () => [skillTemplate.toObject()];
+            PackItemFlow.prepareSkillGroupsForSkillSet = async () => [];
 
             try {
                 const actor = await factory.createActor({
@@ -181,8 +247,8 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 assert.exists(actor.getSkill('Pistols'));
             } finally {
                 PackItemFlow.getAllPackSkillSets = originalGetAllPackSkillSets;
-                PackItemFlow.getSkillsForSkillSet = originalGetSkillsForSkillSet;
-                PackItemFlow.getSkillGroupsForSkillSet = originalGetSkillGroupsForSkillSet;
+                PackItemFlow.prepareSkillsForSkillSet = originalGetSkillsForSkillSet;
+                PackItemFlow.prepareSkillGroupsForSkillSet = originalGetSkillGroupsForSkillSet;
             }
         });
 
@@ -214,12 +280,12 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             });
 
             const originalGetAllPackSkillSets = PackItemFlow.getAllPackSkillSets;
-            const originalGetSkillsForSkillSet = PackItemFlow.getSkillsForSkillSet;
-            const originalGetSkillGroupsForSkillSet = PackItemFlow.getSkillGroupsForSkillSet;
+            const originalGetSkillsForSkillSet = PackItemFlow.prepareSkillsForSkillSet;
+            const originalGetSkillGroupsForSkillSet = PackItemFlow.prepareSkillGroupsForSkillSet;
 
             PackItemFlow.getAllPackSkillSets = async () => [];
-            PackItemFlow.getSkillsForSkillSet = async () => [skillTemplate.toObject()];
-            PackItemFlow.getSkillGroupsForSkillSet = async () => [];
+            PackItemFlow.prepareSkillsForSkillSet = async () => [skillTemplate.toObject()];
+            PackItemFlow.prepareSkillGroupsForSkillSet = async () => [];
 
             try {
                 const actor = await factory.createActor({ type: 'character' });
@@ -245,8 +311,8 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 assert.lengthOf(pistolsItems, 0);
             } finally {
                 PackItemFlow.getAllPackSkillSets = originalGetAllPackSkillSets;
-                PackItemFlow.getSkillsForSkillSet = originalGetSkillsForSkillSet;
-                PackItemFlow.getSkillGroupsForSkillSet = originalGetSkillGroupsForSkillSet;
+                PackItemFlow.prepareSkillsForSkillSet = originalGetSkillsForSkillSet;
+                PackItemFlow.prepareSkillGroupsForSkillSet = originalGetSkillGroupsForSkillSet;
             }
         });
     });
