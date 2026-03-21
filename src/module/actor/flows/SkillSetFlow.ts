@@ -49,6 +49,8 @@ export const SkillSetFlow = {
         const groups = await PackItemFlow.prepareSkillGroupsForSkillSet(skillSet) as Item.CreateData[];
 
         const newSkillKeys = new Set<string>();
+        
+        // TODO: tamif - skill - collect existing skills to be deleted if skillsets also provide it.
         skills = skills.filter(item => {
             if (!item.name) return false;
 
