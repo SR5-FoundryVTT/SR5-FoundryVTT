@@ -30,8 +30,10 @@ const SkillSetDefaultData = () => ({
 });
 
 const SkillTypeData = () => ({
+    // Use default values instead of empty or null to avoid skills not showing up 
+    // in the skill list of actor sheets.
     category: new StringField({ required: true, initial: 'active', choices: SR5.skillCategories }),
-    knowledgeType: new StringField({ required: false, nullable: true, choices: SR5.skillKnowledgeTypes }),
+    knowledgeType: new StringField({ required: false, initial: 'academic', choices: SR5.skillKnowledgeTypes }),
     group: new StringField({ required: true, blank: true, initial: '' }),
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     defaulting: new BooleanField({ required: true, nullable: false, initial: false }),
