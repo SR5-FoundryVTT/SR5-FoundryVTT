@@ -31,6 +31,7 @@ import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicati
 import { EffectCreationFlow } from '@/module/flows/EffectCreationFlow';
 import { SkillFieldType } from '@/module/types/template/Skills';
 import { CreateItemFlow } from '@/module/item/flows/CreateItemFlow';
+import { ActorSkillFlow } from '../flows/ActorSkillFlow';
 
 const { TextEditor } = foundry.applications.ux;
 const { fromUuid, fromUuidSync } = foundry.utils;
@@ -842,10 +843,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
 
         if (item.isType('skill') && item.system.type === 'skill') {
-            const skillCategory = item.system.skill.category;
-            if (SkillSetFlow.hasSkillWithSameNameAndCategory(this.actor, item.name, skillCategory)) {
-                return null;
-            }
+            await ActorSkillFlow.addSkill(this.actor, item.toObject() as Item.CreateData<'skill'>, { warnOnDuplicate: true });
+            return null;
         }
 
 
@@ -975,7 +974,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         if (type === 'call_in_action') this._handleCreateCallInActionItem(event, itemData);
         if (type === 'skill') this._handleCreateSkillItem(event, itemData);
 
-        const items = await this.actor.createEmbeddedDocuments('Item', [itemData]);
+        const items = type === 'skill' && foundry.utils.getProperty(itemData, 'system.type') === 'skill'
+            ? await ActorSkillFlow.addSkill(this.actor, itemData as Item.CreateData<'skill'>, { defaultName: itemData.name, warnOnDuplicate: true })
+            : await this.actor.createEmbeddedDocuments('Item', [itemData]);
         if (!items) return;
 
         // Add the item to the selected inventory.

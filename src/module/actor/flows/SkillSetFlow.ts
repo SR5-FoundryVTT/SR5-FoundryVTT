@@ -8,34 +8,11 @@ import { SkillGroupFlow } from './SkillGroupFlow';
  * Provides actor specific skill set flow operations.
  */
 export const SkillSetFlow = {
-    skillNameByCategoryKey(name: string, category?: string) {
-        const skillKey = SkillNamingFlow.nameToKey(name);
-        if (!skillKey) return '';
-
-        return `${skillKey}:${category ?? ''}`;
-    },
-
-    hasSkillWithSameNameAndCategory(actor: SR5Actor, name: string, category?: string) {
-        const skillKey = SkillNamingFlow.nameToKey(name);
-        if (!skillKey || !category) return false;
-
-        if (category === 'active') {
-            return Object.hasOwn(actor.system.skills.active, skillKey);
-        }
-
-        if (category === 'language') {
-            return Object.hasOwn(actor.system.skills.language, skillKey);
-        }
-
-        if (category === 'knowledge') {
-            for (const knowledgeSkills of Object.values(actor.system.skills.knowledge)) {
-                if (Object.hasOwn(knowledgeSkills, skillKey)) return true;
-            }
-        }
-
-        return false;
-    },
-
+    /**
+     * Remove the given skillset and skills provided by it from the given actor.
+     * @param actor Actor to remove the skillset from
+     * @param skillsetUuid UUID of the skillset to remove. Use the actor's current skillset if not provided.
+     */
     async removeSkillSet(actor: SR5Actor, skillsetUuid?: string) {
         if (!actor.system.skillset) return;
         if (!skillsetUuid) skillsetUuid = actor.system.skillset;
@@ -53,6 +30,16 @@ export const SkillSetFlow = {
         await actor.deleteEmbeddedDocuments('Item', items);
     },
 
+    /**
+     * Apply a given skillset to the given actor, adding all skills provided by the skillset. If the skillset is already applied, this will do nothing.
+     * 
+     * NOTE: This method is both used for existing and newly created actors. Newly created actors don't have embedded collections, yet.
+     *       In that case use options.useSource.
+     * 
+     * @param actor Actor to apply the skillset to
+     * @param skillSet Skillset to apply onto actor
+     * @param options.useSource Define if the actor source data should be updated instead of actors item collection.
+     */
     async applySkillSetToActor(actor: SR5Actor, skillSet: SR5Item<'skill'>, options: { useSource?: boolean } = {}) {
         if (!skillSet.isType('skill') || skillSet.system.type !== 'set') return;
 
@@ -62,6 +49,8 @@ export const SkillSetFlow = {
         const groupedSkillNames = SkillGroupFlow.buildGroupedSkillIndex(groups);
 
         const newSkillKeys = new Set<string>();
+        // TODO: tamif - skill - why mixing skill items and skill group items?
+        // TODO: tamif - skill - why flatMap? => To return 'nothing' with []
         const items = [...skills, ...groups].flatMap(item => {
             const itemData = foundry.utils.deepClone(item) as Item.CreateData & { _id?: string };
             delete itemData._id;
@@ -70,8 +59,8 @@ export const SkillSetFlow = {
                 if (!itemData.name) return [];
 
                 const skillCategory = foundry.utils.getProperty(itemData, 'system.skill.category') as string | undefined;
-                const skillNameByCategoryKey = SkillSetFlow.skillNameByCategoryKey(itemData.name, skillCategory);
-                if (SkillSetFlow.hasSkillWithSameNameAndCategory(actor, itemData.name, skillCategory) || newSkillKeys.has(skillNameByCategoryKey)) {
+                const skillNameByCategoryKey = SkillItemFlow.skillNameByCategoryKey(itemData.name, skillCategory);
+                if (SkillItemFlow.hasSkillWithSameNameAndCategory(actor, itemData.name, skillCategory) || newSkillKeys.has(skillNameByCategoryKey)) {
                     return [];
                 }
                 newSkillKeys.add(skillNameByCategoryKey);

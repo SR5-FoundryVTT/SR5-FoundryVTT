@@ -26,7 +26,7 @@ const SkillLimitData = () => ({
  * specific sub types.
  */
 const SkillSetDefaultData = () => ({
-    type: new StringField({ required: true, initial: '', blank: true, choices: SR5.actorTypes, multiple: true }),
+    type: new StringField({ required: true, initial: '', blank: true, choices: SR5.actorTypes }),
 });
 
 const SkillTypeData = () => ({

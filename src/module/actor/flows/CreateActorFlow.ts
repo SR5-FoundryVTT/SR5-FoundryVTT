@@ -23,7 +23,7 @@ export const CreateActorFlow = {
         const skillSets = await PackItemFlow.getAllPackSkillSets();
         const skillSet = skillSets.find(skillSet => {
             if (!skillSet.system.set.default.type) return false;
-            return skillSet.system.set.default.type.includes(data.type as string);
+            return skillSet.system.set.default.type === data.type;
         });
 
         if (!skillSet) {
