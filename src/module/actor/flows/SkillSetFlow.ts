@@ -3,13 +3,32 @@ import { SR5Actor } from '../SR5Actor';
 import { SR5Item } from '@/module/item/SR5Item';
 import { SkillItemFlow } from '@/module/item/flows/SkillItemFlow';
 import { ActorSkillFlow } from './ActorSkillFlow';
+import { Helpers } from '@/module/helpers';
 
 /**
  * Provides actor specific skill set flow operations.
  */
 export const SkillSetFlow = {
     /**
+     * Replace the actor's current skillset with the given one.
+     * @param actor Actor to replace the skillset on
+     * @param skillSet Skillset to apply after removing any existing skillset
+     */
+    async replaceSkillSet(actor: SR5Actor, skillSet: SR5Item<'skill'>) {
+        if (!skillSet.isType('skill') || skillSet.system.type !== 'set') return;
+        
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        await this.removeSkillSet(actor);
+        await this.applySkillSetToActor(actor, skillSet);
+    },
+
+    /**
      * Remove the given skillset and skills provided by it from the given actor.
+     * 
+     * NOTE: We don't check for the existing source skillset, as the actor most function as a
+     *       stand alone local copy.
      * @param actor Actor to remove the skillset from
      * @param skillsetUuid UUID of the skillset to remove. Use the actor's current skillset if not provided.
      */
@@ -17,13 +36,9 @@ export const SkillSetFlow = {
         if (!actor.system.skillset) return;
         if (!skillsetUuid) skillsetUuid = actor.system.skillset;
 
-        const skillset = await fromUuid(skillsetUuid);
-        if (!(skillset instanceof SR5Item)) return;
-        if (!skillset?.isType('skill') || skillset.system.type !== 'set') return;
-
-        const items = (actor.itemsForType.get('skill') as SR5Item<'skill'>[])
-            ?.filter(item => item.system.source.uuid === skillset.uuid)
-            .map(item => item.id!) ?? [];
+        const items = actor.items.filter(item => item.type === 'skill')
+            .filter(item => item.system.source.uuid === skillsetUuid)
+            .map(item => item.id) ?? [];
 
         await actor.deleteEmbeddedDocuments('Item', items);
         await actor.update({ system: { skillset: '' } });

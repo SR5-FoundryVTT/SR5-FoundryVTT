@@ -829,7 +829,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     protected override async _onDropItem(event: DragEvent, item: SR5Item) {
         if (item.isType('skill') && item.system.type === 'set') {
-            await SkillSetFlow.applySkillSetToActor(this.actor, item);
+            await SkillSetFlow.replaceSkillSet(this.actor, item);
             return null;
         }
 
