@@ -15,7 +15,6 @@ import {FLAGS, SYSTEM_NAME} from "../constants";
 import {SR5Roll} from "../rolls/SR5Roll";
 import {OpposedTest, OpposedTestData} from "./OpposedTest";
 import {SR5} from "../config";
-import { SkillNamingFlow } from '../flows/SkillNamingFlow';
 import {ActionFlow} from "../item/flows/ActionFlow";
 import { ActionRollType, DamageType, MinimalActionType } from "../types/item/Action";
 import { DeepPartial } from "fvtt-types/utils";

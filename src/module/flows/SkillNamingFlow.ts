@@ -8,7 +8,7 @@ import { Helpers } from '@/module/helpers';
 export const SkillNamingFlow = {
     nameToKey(name: string) {
         if (!name) return '';
-        return name.replace(' ', '_').toLowerCase();
+        return name.trim().replace(/[\s-]+/g, '_').toLowerCase();
     },
 
     localizeSkillName(name: string) {

@@ -39,7 +39,9 @@ export class SkillTest extends SuccessTest<SkillTestData> {
      */
     override get title() {
         if (!this.actor) return super.title;
-        return `${SkillNamingFlow.localizeSkillName(this.data.action.skill)} ${game.i18n.localize('SR5.Test')}`;
+
+        const skillLabel = this.actor.getSkill(this.data.action.skill)?.label ?? SkillNamingFlow.localizeSkillName(this.data.action.skill);
+        return `${skillLabel} ${game.i18n.localize('SR5.Test')}`;
     }
 
     /**

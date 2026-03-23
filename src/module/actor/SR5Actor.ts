@@ -21,14 +21,12 @@ import { RecoveryRules } from "../rules/RecoveryRules";
 import { CombatRules } from '../rules/CombatRules';
 import { allApplicableDocumentEffects, allApplicableItemsEffects } from '../effects';
 import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
-import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import AEChangeData = ActiveEffect.ChangeData;
 import { ActionRollType, DamageType } from '../types/item/Action';
 import { AttributeFieldType, AttributesType, EdgeAttributeFieldType } from '../types/template/Attributes';
 import { LimitFieldType } from '../types/template/Limits';
-import { KnowledgeSkillCategory, SkillFieldType } from '../types/template/Skills';
 import { ConditionType } from '../types/template/Condition';
 import { OverflowTrackType, TrackType } from '../types/template/ConditionMonitors';
 import { ActorArmorType } from '../types/template/Armor';
@@ -52,6 +50,8 @@ import { StorageFlow } from '@/module/flows/StorageFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 import { LinksHelpers } from '@/module/utils/links';
 import { CreateActorFlow } from './flows/CreateActorFlow';
+import { SkillNamingFlow } from '@/module/flows/SkillNamingFlow';
+import { SkillFieldType } from '../types/template/Skills';
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -881,7 +881,27 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         if (options?.byId)
             return this.getSkillById(name, skills);
 
-        return this.getSkillByName(name, skills) ?? this.getSkillByLabel(name);
+        return this.getSkillByKey(name, skills) ?? this.getSkillByName(name, skills) ?? this.getSkillByLabel(name, skills);
+    }
+
+    /**
+     * Return the skill field matching the canonical skill key used in action data.
+     *
+     * For legacy skills this is typically the normalized compendium name, e.g.
+     * `heavy_weapons`, while custom skills also share the same normalization.
+     */
+    getSkillByKey(key: string, skills: SR5Actor['system']['skills'] = this.getSkills()): SkillFieldType | undefined {
+        if (!key) return;
+
+        const activeSkill = skills.active[key];
+        if (activeSkill) return activeSkill;
+
+        for (const category of Object.values(skills.knowledge)) {
+            const skill = category[key];
+            if (skill) return skill;
+        }
+
+        return skills.language[key];
     }
 
     /**
@@ -1242,6 +1262,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const attribute = this.getAttribute(skill.attribute);
         const limit = skill.limit || attribute?.limit || '';
         const spec = options.specialization || false;
+        const skillKey = SkillNamingFlow.nameToKey(skill.name) || name;
 
         const getOpposedAction = (id: string) => {
             const item = this.items.get(id) as SR5Item<'skill'> | undefined;
@@ -1250,7 +1271,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         }
 
         return DataDefaults.createData('action_roll', {
-            skill: name,
+            skill: skillKey,
             spec,
             attribute: skill.attribute,
             limit: {
