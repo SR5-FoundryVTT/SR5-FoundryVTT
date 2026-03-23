@@ -1,36 +1,4 @@
 {{!-- Skill item type details section --}}
-    {{#if (or (eq system.type 'skill') (eq system.type 'group'))}}
-    <div class="list-item">
-        <div class="list-item-start skinny">
-            <label>{{localize "SR5.Source"}}</label>
-        </div>
-        <div class="list-item-col">
-            {{#if @root.sourceSkillSet}}
-                <div class="basic-row">
-                    {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" @root.sourceSkillSet }}
-                    <a data-action="openUuid" data-uuid="{{@root.sourceSkillSet.uuid}}">{{@root.sourceSkillSet.name}}</a>
-                </div>
-            {{else}}
-                <input type="text" class="short" value="{{system.source.uuid}}" disabled>
-            {{/if}}
-        </div>
-    </div>
-    {{/if}}
-
-    <div class="list-item list-item-header">
-        <div class="list-item-start">
-            <label>{{localize "SR5.General"}}</label>
-        </div>
-    </div>
-    <div class="list-item">
-        <div class="list-item-start skinny">
-            <label data-tooltip="{{systemFields.type.hint}}">{{systemFields.type.label}}</label>
-        </div>
-        <div class="list-item-col">
-            {{formInput systemFields.type value=system.type localize=true
-                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-        </div>
-    </div>
     {{!-- SKILL TYPE --}}
     {{#if (eq system.type 'skill')}}
     <div class="list-item">
@@ -76,17 +44,6 @@
         {{/if}}
         <div class="list-item">
             <div class="list-item-start skinny">
-                <label data-tooltip="{{systemFields.skill.fields.attribute.hint}}">{{systemFields.skill.fields.attribute.label}}</label>
-            </div>
-            <div class="list-item-col">
-                {{formInput systemFields.skill.fields.attribute
-                                value=system.skill.attribute options=(config2Array config.attributes) localize=true
-                            classes="short" rootId=@root.rootId
-                            disabled=(or @root.isPlayMode (not @root.canEditSkillAttribute)) }}
-            </div>
-        </div>
-        <div class="list-item">
-            <div class="list-item-start skinny">
                 <label data-tooltip="{{systemFields.skill.fields.limit.fields.attribute.hint}}">{{systemFields.skill.fields.limit.fields.attribute.label}}</label>
             </div>
             <div class="list-item-col">
@@ -96,53 +53,11 @@
                             disabled=@root.isPlayMode }}
             </div>
         </div>
-        <div class="list-item">
-            <div class="list-item-start skinny">
-                <label>{{localize "SR5.Skill.SkillGroup"}}</label>
-            </div>
-            <div class="list-item-col">
-                <input type="text" class="short" value="{{system.skill.group}}" disabled>
-            </div>
-        </div>
-        <div class="list-item">
-            <div class="list-item-start skinny">
-                    <label data-tooltip="{{systemFields.skill.fields.rating.hint}}">{{systemFields.skill.fields.rating.label}}</label>
-                {{#if @root.skillValue}}
-                    <label style="margin-left: 0.5rem; text-wrap: nowrap">({{@root.skillValue}})</label>
-                {{/if}}
-            </div>
-            <div class="list-item-col">
-                {{formInput systemFields.skill.fields.rating
-                            value=system.skill.rating
-                            classes="short" rootId=@root.rootId
-                            disabled=(or @root.isPlayMode system.skill.group) }}
-                <label style="margin-left: auto; text-wrap: nowrap" data-tooltip="{{systemFields.skill.fields.defaulting.hint}}">
-                    {{systemFields.skill.fields.defaulting.label}}&nbsp;
-                    {{formInput systemFields.skill.fields.defaulting value=system.skill.defaulting
-                                rootId=@root.rootId disabled=(or @root.isPlayMode (not @root.canEditSkillDefaulting))}}
-                </label>
-            </div>
-        </div>
-        {{#if (and @root.canBeNative systemFields.skill.fields.language)}}
-            <div class="list-item">
-                <div class="list-item-start skinny">
-                    <label data-tooltip="{{systemFields.skill.fields.language.fields.isNative.hint}}">
-                        {{systemFields.skill.fields.language.fields.isNative.label}}
-                    </label>
-                </div>
-                <div class="list-item-col">
-                    {{formInput systemFields.skill.fields.language.fields.isNative
-                                value=system.skill.language.isNative
-                                rootId=@root.rootId disabled=@root.isPlayMode}}
-                </div>
-            </div>
-        {{/if}}
         <div class="list-item list-item-header">
             <div class="list-item-start">
                 <label>{{systemFields.skill.fields.specializations.label}}</label>
             </div>
             <div class="list-item-icons">
-                <label>{{localize "SR5.Actions"}}</label>
                 {{#if @root.isEditMode}}
                     <a data-action="addSpecialization" data-tooltip="SR5.Add">
                         <i class="fas fa-plus"></i>
@@ -170,8 +85,7 @@
                 </div>
             {{/with}}
         {{/each}}
-        
-        
+
     <div class="list-item list-item-header">
         <div class="list-item-start">
             <label>{{localize "SR5.Labels.Action.OpposedTest"}}</label>
@@ -224,17 +138,6 @@
         </div>
     </div>
     <div>
-        <div class="list-item">
-            <div class="list-item-start skinny">
-                <label data-tooltip="{{systemFields.group.fields.rating.hint}}">{{systemFields.group.fields.rating.label}}</label>
-            </div>
-            <div class="list-item-col">
-                {{formInput systemFields.group.fields.rating
-                            value=system.group.rating
-                            classes="short" rootId=@root.rootId
-                            disabled=@root.isPlayMode}}
-            </div>
-        </div>
         <div class="list-item list-item-header">
             <div class="list-item-start">
                 <label>{{systemFields.group.fields.skills.label}}</label>

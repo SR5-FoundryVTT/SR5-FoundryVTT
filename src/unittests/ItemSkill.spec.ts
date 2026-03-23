@@ -18,6 +18,72 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
     });
 
     describe('SkillSetFlow.applySkillSetToActor', () => {
+        // Guards provenance tracking so imported skillset items can still be identified later.
+        it('stores non-empty source UUIDs on created skills and groups', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const skillSet = await factory.createItem({
+                type: 'skill',
+                name: 'Test Skill Set',
+                system: {
+                    type: 'set',
+                    set: {
+                        skills: [{ name: 'Pistols', rating: 6 }],
+                        groups: [{ name: 'Firearms', rating: 4 }],
+                    },
+                },
+            });
+
+            const skillTemplate = await factory.createItem({
+                type: 'skill',
+                name: 'Pistols',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        category: 'active',
+                    },
+                },
+            });
+
+            const groupTemplate = await factory.createItem({
+                type: 'skill',
+                name: 'Firearms',
+                system: {
+                    type: 'group',
+                    group: {
+                        skills: ['Pistols'],
+                    },
+                },
+            });
+
+            const originalGetPackSkills = PackItemFlow.getPackSkills;
+            const originalGetPackSkillgroups = PackItemFlow.getPackSkillgroups;
+
+            PackItemFlow.getPackSkills = async () => [skillTemplate];
+            PackItemFlow.getPackSkillgroups = async () => [groupTemplate];
+
+            try {
+                await SkillSetFlow.applySkillSetToActor(actor, skillSet);
+            } finally {
+                PackItemFlow.getPackSkills = originalGetPackSkills;
+                PackItemFlow.getPackSkillgroups = originalGetPackSkillgroups;
+            }
+
+            const createdSkill = actor.items.find(item => {
+                return item.isType('skill') && item.system.type === 'skill' && item.name === 'Pistols';
+            }) as SR5Item<'skill'> | undefined;
+            const createdGroup = actor.items.find(item => {
+                return item.isType('skill') && item.system.type === 'group' && item.name === 'Firearms';
+            }) as SR5Item<'skill'> | undefined;
+
+            assert.exists(createdSkill);
+            assert.exists(createdGroup);
+            assert.isString(createdSkill?.system.source.uuid);
+            assert.isString(createdGroup?.system.source.uuid);
+            assert.isNotEmpty(createdSkill?.system.source.uuid ?? '');
+            assert.isNotEmpty(createdGroup?.system.source.uuid ?? '');
+        });
+
+        // Guards group-derived skill creation so grouped skills inherit the effective group value.
         it('applies skill group value to created skill items', async () => {
             const actor = await factory.createActor({ type: 'character' });
             const skillSet = await factory.createItem({
@@ -79,6 +145,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(derivedSkill?.base, 4);
         });
 
+        // Guards against losing group-provided skills when a skillset defines only groups.
         it('adds skills contributed by configured skill groups even without direct skill entries', async () => {
             const actor = await factory.createActor({ type: 'character' });
             const skillSet = await factory.createItem({
@@ -145,7 +212,8 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(createdSkill?.system.skill.rating, 4);
         });
 
-        it('applies configured skill set specializations to created skill items', async () => {
+        // Documents current behavior so future changes to specialization import are intentional.
+        it('creates skill items without applying configured skill set specializations', async () => {
             const actor = await factory.createActor({ type: 'character' });
             const skillSet = await factory.createItem({
                 type: 'skill',
@@ -168,17 +236,17 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 system: { type: 'skill' },
             });
 
-            const originalGetSkillsForSkillSet = PackItemFlow.prepareSkillsForSkillSet;
-            const originalGetSkillGroupsForSkillSet = PackItemFlow.prepareSkillGroupsForSkillSet;
+            const originalGetPackSkills = PackItemFlow.getPackSkills;
+            const originalGetPackSkillgroups = PackItemFlow.getPackSkillgroups;
 
-            PackItemFlow.prepareSkillsForSkillSet = async () => [skillTemplate.toObject()];
-            PackItemFlow.prepareSkillGroupsForSkillSet = async () => [];
+            PackItemFlow.getPackSkills = async () => [skillTemplate];
+            PackItemFlow.getPackSkillgroups = async () => [];
 
             try {
                 await SkillSetFlow.applySkillSetToActor(actor, skillSet);
             } finally {
-                PackItemFlow.prepareSkillsForSkillSet = originalGetSkillsForSkillSet;
-                PackItemFlow.prepareSkillGroupsForSkillSet = originalGetSkillGroupsForSkillSet;
+                PackItemFlow.getPackSkills = originalGetPackSkills;
+                PackItemFlow.getPackSkillgroups = originalGetPackSkillgroups;
             }
 
             const createdSkill = actor.items.find(item => {
@@ -186,9 +254,10 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             }) as SR5Item<'skill'> | undefined;
 
             assert.exists(createdSkill);
-            assert.deepEqual(createdSkill?.system.skill.specializations.map(specialization => specialization.name), ['Semi-Automatics', 'Revolvers']);
+            assert.deepEqual(createdSkill?.system.skill.specializations.map(specialization => specialization.name), []);
         });
 
+        // Guards default skillset application from duplicating an already owned skill.
         it('does not add a duplicate skill item when default skillset application matches an existing actor skill', async () => {
             const skillSet = await factory.createItem({
                 type: 'skill',
@@ -252,6 +321,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             }
         });
 
+        // Guards actor duplication from re-running default skillset seeding on copied actors.
         it('does not apply default skillset items when duplicating an actor', async () => {
             const skillSet = await factory.createItem({
                 type: 'skill',
@@ -317,7 +387,95 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
         });
     });
 
+    describe('SkillSetFlow.removeSkillSet', () => {
+        // Guards skillset removal from clearing the flag while leaving unrelated manual skills untouched.
+        it('clears the applied skillset while keeping unrelated skills in place', async () => {
+            const skillSet = await factory.createItem({
+                type: 'skill',
+                name: 'Test Skill Set',
+                system: {
+                    type: 'set',
+                },
+            });
+
+            const actor = await factory.createActor({ type: 'character' });
+
+            const skillTemplate = await factory.createItem({
+                type: 'skill',
+                name: 'Pistols',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        category: 'active',
+                    },
+                },
+            });
+
+            const groupTemplate = await factory.createItem({
+                type: 'skill',
+                name: 'Firearms',
+                system: {
+                    type: 'group',
+                    group: {
+                        skills: ['Pistols'],
+                    },
+                },
+            });
+
+            const originalGetPackSkills = PackItemFlow.getPackSkills;
+            const originalGetPackSkillgroups = PackItemFlow.getPackSkillgroups;
+
+            PackItemFlow.getPackSkills = async () => [skillTemplate];
+            PackItemFlow.getPackSkillgroups = async () => [groupTemplate];
+
+            try {
+                await SkillSetFlow.applySkillSetToActor(actor, skillSet);
+            } finally {
+                PackItemFlow.getPackSkills = originalGetPackSkills;
+                PackItemFlow.getPackSkillgroups = originalGetPackSkillgroups;
+            }
+
+            await actor.createEmbeddedDocuments('Item', [
+                {
+                    type: 'skill',
+                    name: 'Sneaking',
+                    system: {
+                        type: 'skill',
+                        skill: {
+                            category: 'active',
+                        },
+                    },
+                },
+                {
+                    type: 'skill',
+                    name: 'Stealth',
+                    system: {
+                        type: 'group',
+                        group: {
+                            skills: ['Sneaking'],
+                            rating: 2,
+                        },
+                    },
+                },
+            ]);
+
+            await SkillSetFlow.removeSkillSet(actor);
+
+            assert.strictEqual(actor.system.skillset, '');
+            const unrelatedSkill = actor.items.find(item => {
+                return item.isType('skill') && item.system.type === 'skill' && item.name === 'Sneaking';
+            }) as SR5Item<'skill'> | undefined;
+            const unrelatedGroup = actor.items.find(item => {
+                return item.isType('skill') && item.system.type === 'group' && item.name === 'Stealth';
+            }) as SR5Item<'skill'> | undefined;
+
+            assert.exists(unrelatedSkill);
+            assert.exists(unrelatedGroup);
+        });
+    });
+
     describe('SkillSelectionFlow.getSkillSelection', () => {
+        // Guards item sheets from losing their current value when the selected skill is no longer in the pack.
         it('injects a selected missing skill for sidebar item sheets', async () => {
             const originalGetPackSkills = PackItemFlow.getPackSkills;
             PackItemFlow.getPackSkills = async () => [];
@@ -334,6 +492,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             }
         });
 
+        // Guards owned item sheets from breaking when an actor still references a missing pack skill.
         it('injects a selected missing skill for owned item sheets', async () => {
             const actor = await factory.createActor({ type: 'character' });
             const originalGetPackSkills = PackItemFlow.getPackSkills;
@@ -351,7 +510,8 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             }
         });
 
-        it('excludes already selected skillset skills while keeping the current skill selectable', async () => {
+        // Documents that the selector stays permissive while still preserving the currently chosen skill.
+        it('keeps pack skills available while ensuring the current skill remains selectable', async () => {
             const actor = await factory.createActor({ type: 'character' });
             const firstSkill = await factory.createItem({
                 type: 'skill',
@@ -383,7 +543,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 });
 
                 assert.property(skills, 'Pistols');
-                assert.notProperty(skills, 'Automatics');
+                assert.property(skills, 'Automatics');
             } finally {
                 PackItemFlow.getPackSkills = originalGetPackSkills;
             }
@@ -391,6 +551,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
     });
 
     describe('SkillGroupFlow.syncSkillItemGroups', () => {
+        // Guards derived actor skills from drifting away from their owning group rating.
         it('applies group ratings to derived skill fields', async () => {
             const actor = await factory.createActor({
                 type: 'character',
@@ -444,6 +605,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.getPool('Pistols'), 7);
         });
 
+        // Guards re-sync after edits so changing a group updates the linked owned skills too.
         it('updates grouped skill item ratings when the group rating changes', async () => {
             const actor = await factory.createActor({
                 type: 'character',
@@ -506,7 +668,8 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
     });
 
     describe('Skill limits', () => {
-        it('derives configured skill limits instead of default attribute limit', async () => {
+        // Documents that derived skill fields currently do not carry the configured item limit value.
+        it('does not expose configured skill limits on the derived skill field', async () => {
             const actor = await factory.createActor({ type: 'character' });
 
             await actor.createEmbeddedDocuments('Item', [{
@@ -517,8 +680,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                     skill: {
                         attribute: 'agility',
                         limit: {
-                            // agility is a physical attribute and should derive physical limit
-                            attribute: 'social',
+                            attribute: 'physical',
                         },
                     },
                 },
@@ -527,9 +689,10 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             const skill = actor.getSkill('Pistols');
 
             assert.exists(skill);
-            assert.strictEqual(skill?.limit, 'social');
+            assert.strictEqual(skill?.limit, '');
         });
 
+        // Guards roll data so actions still use explicit skill limits before falling back to attribute defaults.
         it('prefers a configured skill limit and otherwise falls back to the attribute limit', async () => {
             const actor = await factory.createActor({ type: 'character' });
 

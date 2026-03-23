@@ -23,6 +23,7 @@ import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SkillFieldPrep } from '@/module/actor/prep/functions/SkillFieldPrep';
 import { SkillSetFlow } from '@/module/actor/flows/SkillSetFlow';
 import { SkillNamingFlow } from '@/module/flows/SkillNamingFlow';
+import { SkillSetSourceFlow } from '@/module/flows/SkillSetSourceFlow';
 import { SkillItemFlow } from '@/module/item/flows/SkillItemFlow';
 import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
 import MatrixAttribute = Shadowrun.MatrixAttribute;
@@ -448,18 +449,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @returns Necessary skill set sheet data or null, if skill set doesn't exist in pack anymore.
      */
     protected async _prepareSkillset() {
-        const skillsetUuid = this.actor.system.skillset;
-        if (!skillsetUuid) return null;
-
-        const skillset = await fromUuid(skillsetUuid) as SR5Item<'skill'> | null;
-        if (!skillset) return null;
-        if (skillset.type !== 'skill' && skillset.system.type !== 'set') return null;
-
-        return {
-            name: skillset.name,
-            img: skillset.img as string,
-            uuid: skillset.uuid
-        };
+        return await SkillSetSourceFlow.prepareSkillSetReference(this.actor.system.skillset);
     }
 
     private _getCompendiumDocumentId(uuid: string) {

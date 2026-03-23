@@ -27,6 +27,8 @@ export const preloadHandlebarsTemplates = async () => {
             'common/document-source-icon',
             'common/horizontal-cells',
             'common/import-flag',
+            'common/skill-source-indicator',
+            'item/header',
             'item/tabs/details/skill',
             'item/footer/skill',
             'list-items/connect-network-icon',

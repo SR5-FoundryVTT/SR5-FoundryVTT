@@ -129,15 +129,11 @@
                         <label>{{localize "SR5.Skill.Types.Set"}}</label>
                     </div>
                     <div class="list-item-col">
-                        <div class="basic-row">
-                            {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" skillset }}
-                            <a data-action="openUuid" data-uuid="{{skillset.uuid}}">{{skillset.name}}</a>
-                            {{#if @root.isEditMode}}
-                                <a data-action="removeSkillSet" data-tooltip="SR5.Tooltips.Actor.RemoveSkillSet">
-                                    <i class="fas fa-trash"></i>
-                                </a>
-                            {{/if}}
-                        </div>
+                        {{> "systems/shadowrun5e/dist/templates/v2/common/skill-source-indicator.hbs"
+                            source=skillset
+                            showRemove=@root.isEditMode
+                            removeAction="removeSkillSet"
+                            removeTooltip="SR5.Tooltips.Actor.RemoveSkillSet" }}
                     </div>
                 </div>
             {{/if}}

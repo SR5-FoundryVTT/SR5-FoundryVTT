@@ -7,6 +7,7 @@ import { SkillItemFlow } from '../flows/SkillItemFlow';
 import { SR5Item } from "../SR5Item";
 import { Helpers } from "@/module/helpers";
 import { SR5 } from "@/module/config";
+import { SkillSetReferenceData, SkillSetSourceFlow } from "@/module/flows/SkillSetSourceFlow";
 import ItemSheet = foundry.applications.sheets.ItemSheet;
 import { SkillRules } from "@/module/rules/SkillRules";
 
@@ -24,11 +25,8 @@ interface SR5SkillSheetData extends SR5BaseItemSheetData {
     canBeNative: boolean
     // Taken directly from an owning actor to show the derived value.
     skillValue?: number
-    sourceSkillSet?: {
-        name: string
-        img: string
-        uuid: string
-    } | null
+    hasSkillValue: boolean
+    sourceSkillSet?: SkillSetReferenceData | null
 }
 
 /**
@@ -64,7 +62,7 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
 
     static override PARTS = {
         header: {
-            template: SheetFlow.templateBase('item/header'),
+            template: SheetFlow.templateBase('item/header/skill'),
             scrollable: ['.scrollable']
         },
         tabs: {
@@ -121,6 +119,7 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
         context.canEditSkillDefaulting = this.canEditSkillDefaulting();
         context.canBeNative = this.canBeNative();
         context.skillValue = this.getActorSkillValue();
+        context.hasSkillValue = context.skillValue !== undefined;
         context.sourceSkillSet = await this.getSourceSkillSet();
 
         return context;
@@ -128,17 +127,7 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
 
     async getSourceSkillSet(): Promise<SR5SkillSheetData['sourceSkillSet']> {
         const sourceUuid = foundry.utils.getProperty(this.document, 'system.source.uuid') as string;
-        if (!sourceUuid) return null;
-
-        const sourceSkillSet = await fromUuid(sourceUuid);
-        if (!(sourceSkillSet instanceof SR5Item)) return null;
-        if (!sourceSkillSet.isType('skill') || sourceSkillSet.system.type !== 'set') return null;
-
-        return {
-            name: sourceSkillSet.name ?? '',
-            img: sourceSkillSet.img as string,
-            uuid: sourceSkillSet.uuid,
-        };
+        return await SkillSetSourceFlow.prepareSkillSetReference(sourceUuid);
     }
 
     canEditSkillAttribute() {
