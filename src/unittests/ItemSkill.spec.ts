@@ -212,8 +212,8 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(createdSkill?.system.skill.rating, 4);
         });
 
-        // Documents current behavior so future changes to specialization import are intentional.
-        it('creates skill items without applying configured skill set specializations', async () => {
+        // Guards skillset application so configured skill specializations survive into owned skills.
+        it('applies configured skill set specializations to created skill items', async () => {
             const actor = await factory.createActor({ type: 'character' });
             const skillSet = await factory.createItem({
                 type: 'skill',
@@ -254,7 +254,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             }) as SR5Item<'skill'> | undefined;
 
             assert.exists(createdSkill);
-            assert.deepEqual(createdSkill?.system.skill.specializations.map(specialization => specialization.name), []);
+            assert.deepEqual(createdSkill?.system.skill.specializations.map(specialization => specialization.name), ['Semi-Automatics', 'Revolvers']);
         });
 
         // Guards default skillset application from duplicating an already owned skill.

@@ -363,7 +363,7 @@ export const PackItemFlow = {
 
             skillSource.system.skill.rating = setSkills.get(skillKey) ?? skillSource.system.skill.rating;
             skillSource.system.skill.group = skillGroup.get(skillKey) ?? '';
-            skillSource.system.skill.specializations = skillSpecs.get(skillKey) ?? [];
+            skillSource.system.skill.specializations = skillSpecs.get(skillKey)?.map(name => ({ name })) ?? [];
             skillSource.system.source.uuid = skillSet.uuid;
             return [skillSource];
         });
