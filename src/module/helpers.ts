@@ -24,6 +24,10 @@ interface CalcTotalOptions {
     roundDecimals?: number
 }
 
+interface ConfirmDeletionOptions {
+    askForConfirmation?: boolean;
+}
+
 export class Helpers {
     /**
      * Calculate the total value for a ModifiableValue shape.
@@ -706,7 +710,12 @@ export class Helpers {
         return Helpers.modifyDamageByHits(incoming, -hits, modificationLabel);
     }
 
-    static async confirmDeletion(): Promise<boolean> {
+    /**
+     * Ask user for confirmation if something should be permanantly deleted.
+     * @param options.askForConfirmation Wheter not actually ask. This is a unittest switch.
+     */
+    static async confirmDeletion(options: ConfirmDeletionOptions = {askForConfirmation: true}): Promise<boolean> {
+        if (!options.askForConfirmation) return true;
         const dialog = new DeleteConfirmationDialog();
         await dialog.select();
         return !dialog.canceled && dialog.selectedButton === 'delete';

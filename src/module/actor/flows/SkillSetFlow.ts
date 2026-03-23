@@ -5,6 +5,10 @@ import { SkillItemFlow } from '@/module/item/flows/SkillItemFlow';
 import { ActorSkillFlow } from './ActorSkillFlow';
 import { Helpers } from '@/module/helpers';
 
+interface ReplaceSkillSetOptions {
+    askForConfirmation?: boolean;
+}
+
 /**
  * Provides actor specific skill set flow operations.
  */
@@ -13,11 +17,12 @@ export const SkillSetFlow = {
      * Replace the actor's current skillset with the given one.
      * @param actor Actor to replace the skillset on
      * @param skillSet Skillset to apply after removing any existing skillset
+     * @param options.askForConfirmation Whether to ask the user for confirmation before replacing the skillset
      */
-    async replaceSkillSet(actor: SR5Actor, skillSet: SR5Item<'skill'>) {
+    async replaceSkillSet(actor: SR5Actor, skillSet: SR5Item<'skill'>, options: ReplaceSkillSetOptions = {askForConfirmation: true}) {
         if (!skillSet.isType('skill') || skillSet.system.type !== 'set') return;
         
-        const userConsented = await Helpers.confirmDeletion();
+        const userConsented = await Helpers.confirmDeletion({askForConfirmation: options.askForConfirmation});
         if (!userConsented) return;
 
         await this.removeSkillSet(actor);
@@ -39,7 +44,6 @@ export const SkillSetFlow = {
         const items = actor.items.filter(item => item.type === 'skill')
             .filter(item => item.system.source.uuid === skillsetUuid)
             .map(item => item.id) ?? [];
-
         await actor.deleteEmbeddedDocuments('Item', items);
         await actor.update({ system: { skillset: '' } });
     },
