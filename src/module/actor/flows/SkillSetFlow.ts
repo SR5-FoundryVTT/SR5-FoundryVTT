@@ -53,6 +53,7 @@ export const SkillSetFlow = {
      * 
      * NOTE: This method is both used for existing and newly created actors. Newly created actors don't have embedded collections, yet.
      *       In that case use options.useSource.
+     * NOTE: When an existing actor is used, other skillset skills will've been removed before hand. However, there still might be local custom items interfering.
      * 
      * @param actor Actor to apply the skillset to
      * @param skillSet Skillset to apply onto actor
@@ -66,7 +67,6 @@ export const SkillSetFlow = {
 
         const newSkillKeys = new Set<string>();
         
-        // TODO: tamif - skill - collect existing skills to be deleted if skillsets also provide it.
         skills = skills.filter(item => {
             if (!item.name) return false;
 

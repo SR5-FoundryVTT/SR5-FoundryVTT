@@ -42,27 +42,8 @@ export const SkillItemFlow = {
     },
 
     /**
-     * Determine if actor already has the given skill for the given category.
-     * @param actor Actor to check for existing skill on
-     * @param name Skill name
-     * @param category Skill category
-     * @returns true, if actor already has a skill with the same name and category, false otherwise
-     */
-    hasSkillWithSameNameAndCategory(actor: SR5Actor, name: string, category?: string) {
-        const skillNameByCategoryKey = SkillItemFlow.skillNameByCategoryKey(name, category);
-        if (!skillNameByCategoryKey) return false;
-
-        // TODO: tamif - skill - find sollte reichen? warum some?
-        return SkillItemFlow.getOwnedSkillItems(actor).some(item => {
-            if (!item.name) return false;
-
-            return SkillItemFlow.skillNameByCategoryKey(item.name, SkillItemFlow.getSkillCategory(item)) === skillNameByCategoryKey;
-        });
-    },
-
-    /**
      * Return a base name for a newly created skill item.
-     * TODO: tamif - skill - this should be generalized, as it's not skill related.
+     *
      * @param item Item Data
      * @returns A localized base name for the skill.
      */
@@ -75,7 +56,7 @@ export const SkillItemFlow = {
 
     /**
      * Generate the next available name for a newly created skill item.
-     * TODO: tamif - skill - this function is horrible.
+     *
      * @param actor Actor to check for existing skill names
      * @param baseName Base name for the skill
      * @param pendingNames Names that are pending creation
@@ -100,7 +81,7 @@ export const SkillItemFlow = {
 
     /**
      * Generate the next available name for a newly created skill item based on the item data.
-     * TODO: tamif - skill - this should be generalized, as it's not skill related.
+     *
      * @param actor Actor to check for existing skill names
      * @param item Item data
      * @param pendingNames Names that are pending creation

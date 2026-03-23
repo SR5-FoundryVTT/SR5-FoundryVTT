@@ -100,7 +100,7 @@ export class SkillRules {
      * - attributes
      * - defaulting
      * 
-     * See SR5#xxx TODO: tamif - skill - skill reference
+     * See SR5#128 'Skill Types'
      */
     static readonly skillCategoriesWithFixedAttributes = new Set(['knowledge', 'language']);
     static fixedCategoryValues(category: string) {
@@ -110,7 +110,7 @@ export class SkillRules {
     /**
      * Can a skill category be native?
      * 
-     * See SR5#xxx TODO: tamif - skill - skill reference
+     * See SR5#89 'Knowledge and Language Skills'
      */
     static canBeNativeCategory(category: string) {
         return category === 'language';
