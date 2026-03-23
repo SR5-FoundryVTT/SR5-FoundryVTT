@@ -18,6 +18,26 @@
       "specializations": [],
       "group": "",
       "requirement": "mundane",
+      "action": {
+        "opposed": {
+          "type": "",
+          "test": "OpposedTest",
+          "description": "",
+          "mod": 0,
+          "skill": "negotiation",
+          "attribute": "charisma",
+          "attribute2": "",
+          "armor": false,
+          "resist": {
+            "test": "",
+            "skill": "",
+            "attribute": "",
+            "attribute2": "",
+            "armor": false,
+            "mod": 0
+          }
+        }
+      },
       "language": {
         "isNative": false
       },
