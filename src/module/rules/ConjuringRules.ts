@@ -4,7 +4,7 @@ import { DamageType } from "../types/item/Action";
 import { DrainRules } from "./DrainRules";
 
 /**
- * Rules implementing the Conjuring chapter in SR5.300
+ * Rules implementing the Conjuring chapter in SR5#300
  */
 export const ConjuringRules = {
     /**

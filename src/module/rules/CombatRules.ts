@@ -317,7 +317,7 @@ export class CombatRules {
     /**
      * Calculate the initiative score adjustment to be made for damage taken during active combat
      * 
-     * See SR5.160 'Changing Initiative'
+    * See SR5#160 'Changing Initiative'
      * 
      * @param woundsBefore Wound modifier (-2) before damage has been taken
      * @param woundsAfter Wound modifier (-3) after damage has been taken

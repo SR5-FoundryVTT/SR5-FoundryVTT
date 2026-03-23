@@ -141,7 +141,7 @@ export const registerSystemSettings = () => {
      * Control automation of creating the defense modification after mulitple attacks
      * on an actor unti their next action phase.
      *
-     * See SR5.189 'Defender has defended against previous attacks'
+    * See SR5#189 'Defender has defended against previous attacks'
      */
     game.settings.register(SYSTEM_NAME, FLAGS.AutomateMultiDefenseModifier, {
         name: 'SETTINGS.AutomateMultiDefenseModifier',
@@ -155,7 +155,7 @@ export const registerSystemSettings = () => {
     /**
      * Control automation of progressive recoil when continuously firing
      *
-     * See SR5.175 'Progressive Recoil'
+    * See SR5#175 'Progressive Recoil'
      */
     game.settings.register(SYSTEM_NAME, FLAGS.AutomateProgressiveRecoil, {
         name: 'SETTINGS.AutomateProgressiveRecoil',

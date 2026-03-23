@@ -116,7 +116,7 @@ export class MatrixRules {
 
 
     /**
-     * Return modifier for marks placed. See SR5#240 'Hack on the Fly' or SR5#238 'Brut Force'
+    * Return modifier for marks placed. See SR5#240 'Hack on the Fly' or SR5#238 'Brute Force'
      * @param marks Amount of marks to be placed
      */
     static getMarkPlacementModifier(marks: number): number {
@@ -236,7 +236,7 @@ export class MatrixRules {
     /**
      * Determine the damage value to convergence with.
      * 
-     * See SR5#229-230 'User Mode' Virtual Reality sections.
+    * See SR5#231-232 'Overwatch Score and Convergence'.
      */
     static convergenceDamage(): DamageType {
         return DataDefaults.createData('damage', { base: 12, value: 12, type: { base: 'matrix', value: 'matrix' } });
