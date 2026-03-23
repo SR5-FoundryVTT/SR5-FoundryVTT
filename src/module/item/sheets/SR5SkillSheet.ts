@@ -109,6 +109,7 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
         context.activeSkills = await SkillSelectionFlow.getSkillSelection(actor, {
             categories: ['active'],
             selectedSkills: [this.document.system.skill.action.opposed.skill],
+            valueType: 'key',
         });
         context.groups = await SkillSelectionFlow.getSkillgroupSelection(actor);
         context.attributes = Helpers.sortConfigValuesByTranslation(SR5.attributes);

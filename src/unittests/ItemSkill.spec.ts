@@ -492,6 +492,23 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             }
         });
 
+        it('injects a selected missing skill using canonical keys for action selectors', async () => {
+            const originalGetPackSkills = PackItemFlow.getPackSkills;
+            PackItemFlow.getPackSkills = async () => [];
+
+            try {
+                const skills = await SkillSelectionFlow.getSkillSelection(undefined, {
+                    categories: ['active'],
+                    selectedSkills: ['Custom Missing Skill'],
+                    valueType: 'key',
+                });
+
+                assert.property(skills, 'custom_missing_skill');
+            } finally {
+                PackItemFlow.getPackSkills = originalGetPackSkills;
+            }
+        });
+
         // Guards owned item sheets from breaking when an actor still references a missing pack skill.
         it('injects a selected missing skill for owned item sheets', async () => {
             const actor = await factory.createActor({ type: 'character' });
@@ -544,6 +561,47 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
 
                 assert.property(skills, 'Pistols');
                 assert.property(skills, 'Automatics');
+            } finally {
+                PackItemFlow.getPackSkills = originalGetPackSkills;
+            }
+        });
+
+        it('returns canonical skill keys for action selectors', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const firstSkill = await factory.createItem({
+                type: 'skill',
+                name: 'Heavy Weapons',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        category: 'active',
+                    },
+                },
+            });
+            const secondSkill = await factory.createItem({
+                type: 'skill',
+                name: 'Pilot Ground Craft',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        category: 'active',
+                    },
+                },
+            });
+
+            const originalGetPackSkills = PackItemFlow.getPackSkills;
+            PackItemFlow.getPackSkills = async () => [firstSkill, secondSkill];
+
+            try {
+                const skills = await SkillSelectionFlow.getSkillSelection(actor, {
+                    categories: ['active'],
+                    selectedSkills: ['Pilot Ground Craft'],
+                    valueType: 'key',
+                });
+
+                assert.property(skills, 'heavy_weapons');
+                assert.property(skills, 'pilot_ground_craft');
+                assert.notProperty(skills, 'Heavy Weapons');
             } finally {
                 PackItemFlow.getPackSkills = originalGetPackSkills;
             }
@@ -728,6 +786,33 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             assert.exists(pistolsAction);
             assert.strictEqual(pistolsAction?.limit.attribute, 'physical');
             assert.strictEqual(perceptionAction?.limit.attribute, 'mental');
+        });
+
+        // Guards skill action storage so runtime tests can use canonical skill keys without losing actor lookup.
+        it('stores canonical skill keys in action data and resolves them during actor lookup', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+
+            await actor.createEmbeddedDocuments('Item', [{
+                type: 'skill',
+                name: 'Heavy Weapons',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        attribute: 'agility',
+                    },
+                },
+            }]);
+
+            const skillByKey = actor.getSkill('heavy_weapons');
+            const actionByName = actor.skillActionData('Heavy Weapons');
+            const actionByKey = actor.skillActionData('heavy_weapons');
+
+            assert.exists(skillByKey);
+            assert.strictEqual(skillByKey?.name, 'Heavy Weapons');
+            assert.exists(actionByName);
+            assert.exists(actionByKey);
+            assert.strictEqual(actionByName?.skill, 'heavy_weapons');
+            assert.strictEqual(actionByKey?.skill, 'heavy_weapons');
         });
     });
 };

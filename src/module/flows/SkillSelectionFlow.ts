@@ -6,15 +6,34 @@ import { Translation } from '@/module/utils/strings';
 import { SR5 } from '@/module/config';
 import { SkillNamingFlow } from './SkillNamingFlow';
 
+interface GetSkillSelectionOptions {
+    categories?: (keyof typeof SR5.skillCategories)[];
+    selectedSkills?: string[];
+    valueType?: 'name' | 'key';
+}
+
 /**
  * Provides selection-list data for skill and skill group pickers on any sheet.
  */
 export const SkillSelectionFlow = {
+    /**
+     * Create a list for skill selection inputs.
+     * 
+     * NOTE: some selections need skill names (skill groups, skill sets) and other need keys (skillField based selections).
+     * @param actor The actor for which to generate the skill selection list.
+     * @param options Additional options for filtering and formatting the skill selection list.
+     * @param options.categories If provided, only skills belonging to the given categories will be included in the selection list.
+     * @param options.selectedSkills If provided, these skills will be included in the selection list even if they aren't included in pack or actor.
+     * @param options.valueType Define whether the selection values should be skill names or keys.
+     * @returns A sorted list of skills suitable for use in selection inputs.
+     */
     async getSkillSelection(
         actor?: SR5Actor,
-        options: { categories?: (keyof typeof SR5.skillCategories)[], selectedSkills?: string[] } = {}
+        options: GetSkillSelectionOptions = {}
     ) {
         const skills = await PackItemFlow.getPackSkills();
+        const getSelectionValue = (skillName: string) =>
+            options.valueType === 'key' ? SkillNamingFlow.nameToKey(skillName) : skillName;
 
         for (const ownedSkill of actor?.itemsForType.get('skill') ?? []) {
             if (skills.find(skill => skill.name === ownedSkill.name)) continue;
@@ -24,14 +43,21 @@ export const SkillSelectionFlow = {
         const sheetSkills: Record<string, Translation> = {};
         for (const skill of skills) {
             if (options.categories && !options.categories.includes(skill.system.skill.category)) continue;
-            if (Object.hasOwn(sheetSkills, skill.name)) continue;
+            const selectionValue = getSelectionValue(skill.name);
+            if (Object.hasOwn(sheetSkills, selectionValue)) continue;
 
-            sheetSkills[skill.name] = SkillNamingFlow.localizeSkillName(skill.name) as Translation;
+            sheetSkills[selectionValue] = SkillNamingFlow.localizeSkillName(skill.name) as Translation;
         }
 
         for (const selectedSkill of options.selectedSkills ?? []) {
-            if (!selectedSkill || Object.hasOwn(sheetSkills, selectedSkill)) continue;
-            sheetSkills[selectedSkill] = SkillNamingFlow.localizeSkillName(selectedSkill) as Translation;
+            const selectedSkillKey = getSelectionValue(selectedSkill);
+            if (!selectedSkillKey || Object.hasOwn(sheetSkills, selectedSkillKey) || Object.hasOwn(sheetSkills, selectedSkill)) continue;
+
+            const selectedSkillName = skills.find(skill => skill.name === selectedSkill || SkillNamingFlow.nameToKey(skill.name) === SkillNamingFlow.nameToKey(selectedSkill))?.name
+                ?? actor?.getSkill(selectedSkill)?.name
+                ?? selectedSkill;
+
+            sheetSkills[selectedSkillKey] = SkillNamingFlow.localizeSkillName(selectedSkillName) as Translation;
         }
 
         return Helpers.sortConfigValuesByTranslation(sheetSkills);

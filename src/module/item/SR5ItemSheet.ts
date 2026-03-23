@@ -493,6 +493,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         return await SkillSelectionFlow.getSkillSelection(this.item.actorOwner, {
             categories: ['active'],
             selectedSkills,
+            valueType: 'key',
         }) as Record<string, Translation>;
     }
 
