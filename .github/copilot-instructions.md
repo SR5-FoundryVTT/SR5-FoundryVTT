@@ -45,3 +45,11 @@ FoundryVTT Shadowrun 5e system implemented in TypeScript + SCSS + Handlebars tem
 - Active-effect and modifier behavior is centered around `DocumentSituationModifiers` and `SR5ActiveEffect` flows/rules.
 - Core mechanics to preserve when changing logic: modifiers, combat/initiative, magic/spirits, matrix/hacking, technomancer, and rigging flows.
 - Compendium source of truth is `packs/_source`; use pack scripts to persist GUI changes.
+
+## Rule book shorthands
+- Sourcebook citation infrastructure is owned by the sibling standalone project `mcp-sourcebook-citation`, not by this Foundry system repository.
+- Prefer the installed MCP server from `mcp-sourcebook-citation` for book-code, page, and heading resolution.
+- If MCP is unavailable, use `mcp-sourcebook-citation/data/indexes/book-index.json` for code-to-file resolution and `mcp-sourcebook-citation/data/indexes/page-index.json` for page-to-line lookup.
+- If the generated indexes are missing or stale, fall back to `mcp-sourcebook-citation/data/catalog/books.xml`, then `mcp-sourcebook-citation/data/sourcebooks/md/`.
+- Book-code overrides and preferred file mappings are maintained in `mcp-sourcebook-citation/config/book-overrides.json`.
+- Do not add new sourcebook corpus files, generated indexes, or MCP server code to this repository.
