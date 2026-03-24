@@ -15,19 +15,29 @@ import ItemSheet = foundry.applications.sheets.ItemSheet;
 interface SR5SkillSheetData extends SR5BaseItemSheetData {
     // config style name to translation mappings.
     skills: Record<string, string>
+    // active skills for skill selections.
     activeSkills: Record<string, string>
+    // groups for skill group selections.
     groups: Record<string, string>
-
+    // attributes for attribute selections.
     attributes: Record<string, string>
+    // limits for limit selections.
     limits: Record<string, string>
+    // Skill Set specific compendium warning around default actor type config.
     showCompendiumWarning: boolean
+    // Whether the skill attribute can be edited, based on the skill category.
     canEditSkillAttribute: boolean
+    // Whether the skill defaulting can be edited, based on the skill category.
     canEditSkillDefaulting: boolean
+    // Whether the skill can be native, based on the skill category.
     canBeNative: boolean
     // Taken directly from an owning actor to show the derived value.
     skillValue?: number
+    // Whether this skill has a derived value as an actor owned skill.
     hasSkillValue: boolean
+    // The source skill set reference.
     sourceSkillSet?: SkillSetReferenceData | null
+    // What to display as the skill name, depending on mode.
     displayName: string
 }
 
