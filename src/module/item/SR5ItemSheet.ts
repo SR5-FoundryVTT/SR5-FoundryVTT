@@ -123,8 +123,6 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
  * Extend the basic ItemSheet with some very simple modifications
  */
 export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> extends SR5ApplicationMixin(ItemSheet)<T> {
-    readonly #dragDrop: DragDrop[];
-
     static override DEFAULT_OPTIONS = {
         classes: ['item', 'named-sheet'],
         position: {
@@ -248,11 +246,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 { id: 'effects', label: 'SR5.Tabs.Item.Effects', cssClass: '' },
             ]
         }
-    }
-
-    constructor(...args: any) {
-        super(...args);
-        this.#dragDrop = this.#createDragDropHandlers();
     }
 
     /**
@@ -504,7 +497,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         options: DeepPartial<ApplicationV2.RenderOptions>
     ) {
         this.activateListeners_LEGACY($(this.element));
-        this.#dragDrop.forEach(d => d.bind(this.element));
         return super._onRender(context, options);
     }
 
@@ -1088,62 +1080,21 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     }
 
     /**
-     * Create drag-and-drop workflow handlers for this Application
-     * @returns {DragDrop[]}     An array of DragDrop handlers
-     * @private
-     */
-    #createDragDropHandlers(): DragDrop[] {
-        return this.options.dragDrop!.map((d) => {
-            d.permissions = {
-                dragstart: this._canDragStart.bind(this),
-                drop: this._canDragDrop.bind(this),
-            };
-            d.callbacks = {
-                dragstart: this._onDragStart.bind(this),
-                dragover: this._onDragOver.bind(this),
-                drop: this._onDrop.bind(this),
-            };
-            return new DragDrop(d);
-        });
-    }
-
-    /**
-     * Define whether a user is able to begin a dragstart workflow for a given drag selector
-     * @param {string} selector       The candidate HTML selector for dragging
-     * @returns {boolean}             Can the current user drag this selector?
-     */
-    protected _canDragStart(selector): boolean {
-        return this.isEditable;
-    }
-
-    /**
-     * Define whether a user is able to conclude a drag-and-drop workflow for a given drop selector
-     * @param {string} selector       The candidate HTML selector for the drop target
-     * @returns {boolean}             Can the current user drop on this selector?
-     */
-    protected _canDragDrop(selector): boolean {
-        return this.isEditable;
-    }
-
-
-    /**
-     * Callback actions which occur when a dragged element is over a drop target.
-     * @param {DragEvent} event       The originating DragEvent
-     * @protected
-     */
-    protected _onDragOver(event: DragEvent) { }
-
-    /* -------------------------------------------- */
-
-    /**
      * An event that occurs when data is dropped into a drop target.
      * @param {DragEvent} event
      * @returns {Promise<void>}
      * @protected
      */
-    async _onDrop(event: DragEvent) {
+    override async _onDrop(event: DragEvent) {
         const data = TextEditor.getDragEventData(event) as any;
         if (!data) return;
+
+        const targetElement = event.target as HTMLElement | null;
+        if (targetElement?.closest('[name="system.description.source"]') && data.uuid) {
+            await this.item.setSource(data.uuid);
+            return;
+        }
+
         const item = this.item;
         const allowed = Hooks.call("dropItemSheetData", item, this, data);
         if (!allowed) return;
@@ -1272,7 +1223,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @returns {Promise<void>}
      * @protected
      */
-    _onDragStart(event: DragEvent) {
+    override _onDragStart(event: DragEvent) {
         const target = event.currentTarget as HTMLElement;
         const targetElement = event.target as HTMLElement;
         if (targetElement?.dataset && 'link' in targetElement.dataset) return;

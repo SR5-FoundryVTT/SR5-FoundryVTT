@@ -12,6 +12,7 @@ import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicati
 
 const { TextEditor, SearchFilter } = foundry.applications.ux;
 const { fromUuid } = foundry.utils;
+type SR5DragDropHandler = InstanceType<typeof foundry.applications.ux.DragDrop.implementation>;
 
 export namespace SR5ApplicationMixinTypes {
     export interface RenderContext extends ApplicationV2.RenderContext, HandlebarsApplicationMixin.RenderContext {
@@ -68,6 +69,7 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
         declare document?: SR5Item | SR5Actor;
 
         readonly #filters: SearchFilter[];
+        readonly #dragDrop: SR5DragDropHandler[];
         private readonly expandedUuids = new Set<string>();
         private editIcon?: HTMLElement;
         private wrenchIcon?: HTMLElement;
@@ -93,12 +95,28 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
         constructor(...args: any[]) {
             super(...args);
             this.#filters = this.#createFilters();
+            this.#dragDrop = this.#createDragDropHandlers();
         }
 
         #createFilters() {
             return this.options?.filters?.map((s) => {
                 s.callback = s.callback?.bind(this);
                 return new SearchFilter(s);
+            }) ?? [];
+        }
+
+        #createDragDropHandlers() {
+            return this.options?.dragDrop?.map((dragDrop) => {
+                dragDrop.permissions = {
+                    dragstart: this._canDragStart.bind(this),
+                    drop: this._canDragDrop.bind(this),
+                };
+                dragDrop.callbacks = {
+                    dragstart: this._onDragStart.bind(this),
+                    dragover: this._onDragOver.bind(this),
+                    drop: this._onDrop.bind(this),
+                };
+                return new foundry.applications.ux.DragDrop.implementation(dragDrop);
             }) ?? [];
         }
 
@@ -125,6 +143,20 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
         get isPlayMode() {
             return this._mode === 'play';
         }
+
+        protected _canDragStart(selector?: string | null): boolean {
+            return !!this.isEditable;
+        }
+
+        protected _canDragDrop(selector?: string | null): boolean {
+            return !!this.isEditable;
+        }
+
+        protected _onDragStart(event: DragEvent) { }
+
+        protected _onDragOver(event: DragEvent) { }
+
+        protected async _onDrop(event: DragEvent) { }
 
         protected override async _prepareContext(
             options: Parameters<BaseType["_prepareContext"]>[0]
@@ -292,6 +324,7 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
 
         protected override async _onRender(...[context, options]: Parameters<BaseType["_onRender"]>) {
             this.#filters.forEach(d => d.bind(this.element));
+            this.#dragDrop.forEach(d => d.bind(this.element));
             return super._onRender(context, options);
         }
 

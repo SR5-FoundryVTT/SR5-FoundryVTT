@@ -8,8 +8,8 @@ import { SR5Item } from "../SR5Item";
 import { Helpers } from "@/module/helpers";
 import { SR5 } from "@/module/config";
 import { SkillSetReferenceData, SkillSetSourceFlow } from "@/module/flows/SkillSetSourceFlow";
-import ItemSheet = foundry.applications.sheets.ItemSheet;
 import { SkillRules } from "@/module/rules/SkillRules";
+import ItemSheet = foundry.applications.sheets.ItemSheet;
 
 interface SR5SkillSheetData extends SR5BaseItemSheetData {
     // config style name to translation mappings.
@@ -57,7 +57,8 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
             removeSetSkillSpecialization: this.#removeSetSkillSpecialization,
             addSetGroup: this.#addSetGroup,
             removeSetGroup: this.#removeSetGroup
-        }
+        },
+        dragDrop: [{ dragSelector: '.draggable', dropSelector: null }],
     }
 
     static override PARTS = {
@@ -124,6 +125,16 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
         context.sourceSkillSet = await this.getSourceSkillSet();
 
         return context;
+    }
+
+    protected override async _onDrop(event: DragEvent) {
+        const data = foundry.applications.ux.TextEditor.getDragEventData(event) as { uuid?: string } | null;
+        if (!data) return;
+
+        const targetElement = event.target as HTMLElement | null;
+        if (targetElement?.closest('[name="system.description.source"]') && data.uuid) {
+            await this.item.setSource(data.uuid);
+        }
     }
 
     async getSourceSkillSet(): Promise<SR5SkillSheetData['sourceSkillSet']> {
