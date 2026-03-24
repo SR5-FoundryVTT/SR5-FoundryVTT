@@ -9,6 +9,7 @@ import { Helpers } from "@/module/helpers";
 import { SR5 } from "@/module/config";
 import { SkillSetReferenceData, SkillSetSourceFlow } from "@/module/flows/SkillSetSourceFlow";
 import { SkillRules } from "@/module/rules/SkillRules";
+import { SkillNamingFlow } from '@/module/flows/SkillNamingFlow';
 import ItemSheet = foundry.applications.sheets.ItemSheet;
 
 interface SR5SkillSheetData extends SR5BaseItemSheetData {
@@ -27,6 +28,7 @@ interface SR5SkillSheetData extends SR5BaseItemSheetData {
     skillValue?: number
     hasSkillValue: boolean
     sourceSkillSet?: SkillSetReferenceData | null
+    displayName: string
 }
 
 /**
@@ -123,8 +125,25 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
         context.skillValue = this.getActorSkillValue();
         context.hasSkillValue = context.skillValue !== undefined;
         context.sourceSkillSet = await this.getSourceSkillSet();
+        context.displayName = this.getDisplayName();
 
         return context;
+    }
+
+    /**
+     * As skill items use their name as a i18n localization key segment, we need to show users the translated name
+     * and the actual name. The simplest approach is showing the translation in playmode and the actual name in edit mode.
+     */
+    getDisplayName() {
+        if (this.document.system.type === 'group') {
+            return SkillNamingFlow.localizeSkillgroupName(this.document.name);
+        }
+
+        if (this.document.system.type === 'set') {
+            return SkillNamingFlow.localizeSkillsetName(this.document.name);
+        }
+
+        return SkillNamingFlow.localizeSkillName(this.document.name);
     }
 
     protected override async _onDrop(event: DragEvent) {

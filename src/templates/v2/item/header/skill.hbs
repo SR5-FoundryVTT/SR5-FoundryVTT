@@ -1,6 +1,6 @@
 <div>
     <div class="sheet-header skill-sheet-header">
-        <img class="sheet-image" src="{{item.img}}" data-tooltip="{{#if @root.isEditMode}}{{item.img}}{{else}}{{item.name}}{{/if}}"
+        <img class="sheet-image" src="{{item.img}}" data-tooltip="{{#if @root.isEditMode}}{{item.img}}{{else}}{{displayName}}{{/if}}"
              {{#if @root.isEditMode}}
                  data-edit="img"
                  data-action="editImage"
@@ -24,8 +24,12 @@
                             {{/if}}
                         {{/unless}}
                         <span style="width: 100%">
-                            {{formInput fields.name value=item.name classes="sheet-name"
-                                        placeholder=(localize "SR5.Name") disabled=@root.isPlayMode rootId=rootId}}
+                            {{#if @root.isEditMode}}
+                                {{formInput fields.name value=item.name classes="sheet-name"
+                                            placeholder=(localize "SR5.Name") rootId=rootId}}
+                            {{else}}
+                                <input type="text" class="sheet-name" value="{{displayName}}" disabled>
+                            {{/if}}
                         </span>
                     </div>
                     <div class="sheet-header-source skill-sheet-header-source">
