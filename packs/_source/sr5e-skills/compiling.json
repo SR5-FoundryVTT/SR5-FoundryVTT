@@ -17,7 +17,7 @@
       "attribute": "resonance",
       "specializations": [],
       "group": "",
-      "requirement": "mundane",
+      "requirement": "resonance",
       "language": {
         "isNative": false
       },

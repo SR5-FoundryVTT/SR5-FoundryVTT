@@ -17,7 +17,7 @@
       "attribute": "willpower",
       "specializations": [],
       "group": "",
-      "requirement": "mundane",
+      "requirement": "awakened",
       "language": {
         "isNative": false
       },
