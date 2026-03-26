@@ -10,6 +10,15 @@ export const registerItemHeaderHelpers = () => {
     });
 
     /**
+     * Return a data object to be injected into the addItem action.
+     */
+    Handlebars.registerHelper('actionHeaderAddData', (actionType: string) => {
+        if (actionType === 'matrix_action') {
+            return { 'action-categories': JSON.stringify(['matrix']) };
+        }
+    });
+
+    /**
      * Return a data object to be injected into the addItem action for skills.
      */
     Handlebars.registerHelper('skillAddItemData', (skillCategory: string, skillKnowledgeType: string, skillTypeOrOptions: string | Handlebars.HelperOptions) => {

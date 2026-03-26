@@ -1,4 +1,4 @@
-import { Parser, SystemType } from '../Parser';
+import { Parser } from '../Parser';
 import { Mod } from '../../schema/VehiclesSchema';
 import { CompendiumKey } from '../../importer/Constants';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
@@ -10,13 +10,7 @@ export class VehicleModParser extends Parser<'modification'> {
         const system = this.getBaseSystem();
         system.type = 'vehicle';
 
-        const allowedCategories = ['body', 'cosmetic', 'electromagnetic', 'power_train', 'protection', 'weapons', ''];
-        const rawCategory = jsonData.category._TEXT?.toLowerCase() ?? '';
-        const category = rawCategory === 'powertrain' ? 'power_train' : rawCategory;
-
-        system.modification_category = (
-            allowedCategories.includes(category) ? category : ''
-        ) as SystemType<'modification'>['modification_category'];
+        system.modification_category = jsonData.category._TEXT?.toLowerCase() as any;
 
         const slots = jsonData.slots._TEXT.match(/[0-9]\.?[0-9]*/g);
         if (slots)

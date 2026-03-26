@@ -32,9 +32,6 @@
             "character": {
                 "htmlField": ["description.value"]
             },
-            "critter": {
-                "htmlField": ["description.value"]
-            },
             "ic": {
                 "htmlField": ["description.value"]
             },

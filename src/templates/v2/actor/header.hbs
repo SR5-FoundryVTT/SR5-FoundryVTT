@@ -32,6 +32,7 @@
         {{else if (not isLimited)}}
             <div>
 
+                {{!-- Some actors only have matrix tracks --}}
                 {{#if (or isIC isSprite)}}
                     {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
                         id='matrix'
@@ -39,7 +40,23 @@
                         tooltip=(localize "SR5.Labels.ActorSheet.Matrix")
                     }}
                 {{/if}}
-                {{#if (or isCharacter isSpirit)}}
+                {{!-- Characters are special as in they should display wound modifiers --}}
+                {{#if isCharacter}}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
+                        id='stun'
+                        track=system.track.stun
+                        tooltip=(localize "SR5.Labels.ActorSheet.StunTrack")
+                        tolerance=woundTolerance
+                    }}
+                    {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
+                        id='physical'
+                        track=system.track.physical
+                        tooltip=(localize "SR5.Labels.ActorSheet.PhysicalTrack")
+                        tolerance=woundTolerance
+                    }}
+                {{else}}
+                {{!-- Other actor types only need some tracks, not both, and no wound modifiers --}}
+                {{#if isSpirit}}
                     {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/condition-monitor.hbs'
                         id='stun'
                         track=system.track.stun
@@ -53,6 +70,7 @@
                         tooltip=(localize "SR5.Labels.ActorSheet.PhysicalTrack")
                     }}
                 {{/unless}}
+                {{/if}}
 
             </div>
         {{/if}}

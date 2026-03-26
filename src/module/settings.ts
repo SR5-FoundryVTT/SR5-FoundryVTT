@@ -167,18 +167,6 @@ export const registerSystemSettings = () => {
     });
 
     /**
-     * Control automatic or manual casting of dice in any success test.
-     */
-    game.settings.register(SYSTEM_NAME, FLAGS.ManualRollOnSuccessTest, {
-        name: 'SETTINGS.ManualRollOnSuccessTest',
-        hint: 'SETTINGS.ManualRollOnSuccessTestDescription',
-        scope: 'client',
-        config: true,
-        type: Boolean,
-        default: false
-    });
-
-    /**
      * Control default behavior for opposed test actors
      */
     game.settings.register(SYSTEM_NAME, FLAGS.DefaultOpposedTestActorSelection, {

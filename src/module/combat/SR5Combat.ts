@@ -422,6 +422,16 @@ export class SR5Combat<SubType extends Combat.SubType = Combat.SubType> extends 
         return SR5Combat._getSystemInitiativeFormula(this.initiativePass);
     }
 
+    override async _onStartRound(context: Combat.RoundEventContext) {
+        // clear movement histories when a new round starts
+        return this.clearMovementHistories(this.combatants);
+    }
+
+    override async _clearMovementHistoryOnStartTurn(combatant: Combatant, context: Combat.TurnEventContext) {
+        // do not clear movement history on turn start
+        // movement history persists through the initiative passes of a single combat round
+    }
+
     static _getSystemInitiativeBaseFormula() {
         return String(CONFIG.Combat.initiative.formula || game.system.initiative);
     }

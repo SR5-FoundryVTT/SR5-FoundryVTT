@@ -5,7 +5,7 @@ export class SkillsPrep {
     /**
      * Calculate skill ModifiableValue / SkillField totals.
      */
-    static prepareSkills(system: Actor.SystemOfType<'character' | 'critter' | 'ic' | 'spirit' | 'sprite' | 'vehicle'>) {
+    static prepareSkills(system: Actor.SystemOfType<'character' | 'ic' | 'spirit' | 'sprite' | 'vehicle'>) {
         const { language, active, knowledge } = system.skills;
 
         // function that will set the total of a skill correctly

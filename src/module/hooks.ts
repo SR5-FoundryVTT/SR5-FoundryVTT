@@ -62,7 +62,6 @@ import { BiofeedbackResistTest } from './tests/BiofeedbackResistTest';
 import { CheckOverwatchScoreTest } from '@/module/tests/CheckOverwatchScoreTest';
 import { OpposedCheckOverwatchScoreTest } from '@/module/tests/OpposedCheckOverwatchScoreTest';
 
-import { quenchRegister } from '../unittests/quench';
 import { createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro } from './macros';
 
 import { registerSystemKeybindings } from './keybindings';
@@ -87,7 +86,6 @@ import { SR5TokenDocument } from './token/SR5TokenDocument';
 import { SR5TokenRuler } from './token/SR5TokenRuler';
 
 import { Character } from './types/actor/Character';
-import { Critter } from './types/actor/Critter';
 import { IC } from './types/actor/IC';
 import { Spirit } from './types/actor/Spirit';
 import { Sprite } from './types/actor/Sprite';
@@ -174,13 +172,17 @@ export class HooksManager {
         Hooks.on("renderChatLog", HooksManager.chatLogListeners.bind(HooksManager));
         Hooks.on('preUpdateCombatant', SR5Combat.onPreUpdateCombatant.bind(SR5Combat));
 
-        Hooks.on('quenchReady', quenchRegister);
-
         MatrixHooks.registerHooks();
         RiggingHooks.registerHooks();
         TagifyHooks.registerHooks();
 
         RenderSettings.listen();
+
+        if (process.env.ENV === 'dev') {
+            void import('./hooks-dev').then(({ DevHooks }) => {
+                DevHooks.registerHooks();
+            });
+        }
     }
 
     static init() {
@@ -431,7 +433,6 @@ ___________________
         CONFIG.Item.dataModels["weapon"] = Weapon;
 
         CONFIG.Actor.dataModels["character"] = Character;
-        CONFIG.Actor.dataModels["critter"] = Critter;
         CONFIG.Actor.dataModels["ic"] = IC;
         CONFIG.Actor.dataModels["spirit"] = Spirit;
         CONFIG.Actor.dataModels["sprite"] = Sprite;
@@ -446,7 +447,7 @@ ___________________
         foundry.documents.collections.Actors.registerSheet(SYSTEM_NAME, SR5CharacterSheet, {
             label: "SR5.SheetActor",
             makeDefault: true,
-            types: ['critter', 'character']
+            types: ['character']
         });
         foundry.documents.collections.Actors.registerSheet(SYSTEM_NAME, SR5ICActorSheet, {
             label: "SR5.SheetActor",

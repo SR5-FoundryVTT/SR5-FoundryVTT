@@ -47,7 +47,6 @@ export const FLAGS = {
     AutomateMultiDefenseModifier: 'AutomateMultiDefenseModifier',
     AutomateProgressiveRecoil: 'AutomateProgressiveRecoil',
     TurnsSinceLastAttack: 'turnsSinceLastAttack',
-    ManualRollOnSuccessTest: 'ManualRollOnSuccessTest',
     MarkImports: 'MarkImports',
     ImportIconFolder: 'ImportIconFolder',
     UseImportIconOverrides: 'UseImportIconOverrides',

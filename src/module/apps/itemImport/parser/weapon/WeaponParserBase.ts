@@ -58,7 +58,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
                 return Constants.MAP_CATEGORY_TO_SKILL[category];
 
             const type = weaponJson.type._TEXT.toLowerCase();
-            return type === 'range' ? 'exotic_range' : 'exotic_melee';
+            return type === 'range' ? 'exotic_ranged_weapon' : 'exotic_melee_weapon';
         }
     }
 
