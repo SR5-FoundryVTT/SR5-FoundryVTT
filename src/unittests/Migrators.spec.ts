@@ -67,6 +67,7 @@ export const Migrators = (context: QuenchBatchContext) => {
                             name: 'Spanish',
                             base: 0,
                             value: 12,
+                            canDefault: true,
                             isNative: true,
                             img: 'icons/svg/book.svg',
                         }),
@@ -80,6 +81,7 @@ export const Migrators = (context: QuenchBatchContext) => {
                                 name: 'Gang Politics',
                                 base: 2,
                                 value: 2,
+                                canDefault: true,
                                 specs: ['Redmond'],
                                 description: 'Street knowledge',
                                 img: 'icons/svg/eye.svg',
@@ -103,7 +105,9 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.exists(pistols);
             assert.strictEqual(foundry.utils.getProperty(pistols, 'system.skill.category'), 'active');
             assert.strictEqual(foundry.utils.getProperty(pistols, 'system.skill.rating'), 4);
-            assert.strictEqual(foundry.utils.getProperty(pistols, 'system.skill.group'), 'Firearms');
+            assert.strictEqual(foundry.utils.getProperty(pistols, 'system.skill.defaulting'), true);
+            assert.strictEqual(foundry.utils.getProperty(pistols, 'system.skill.group'), '');
+            assert.deepEqual(foundry.utils.getProperty(pistols, 'system.skill.specializations'), [{ name: 'Revolvers' }]);
             assert.strictEqual(foundry.utils.getProperty(pistols, 'system.description.source'), 'SR5 Core 130');
             assert.strictEqual(pistols?.img, 'systems/shadowrun5e/public/icons/skills/combat-pistols.svg');
             assert.strictEqual(pistols?.name, 'Pistols');
@@ -117,6 +121,8 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.exists(languageSkill);
             assert.strictEqual(foundry.utils.getProperty(languageSkill, 'system.skill.category'), 'language');
             assert.strictEqual(foundry.utils.getProperty(languageSkill, 'system.skill.rating'), 12);
+            assert.strictEqual(foundry.utils.getProperty(languageSkill, 'system.skill.attribute'), 'intuition');
+            assert.strictEqual(foundry.utils.getProperty(languageSkill, 'system.skill.defaulting'), false);
             assert.strictEqual(foundry.utils.getProperty(languageSkill, 'system.skill.language.isNative'), true);
 
             const knowledgeSkill = source.items.find(item => item.type === 'skill' && item.name === 'Gang Politics') as Item.CreateData | undefined;
@@ -124,7 +130,9 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(foundry.utils.getProperty(knowledgeSkill, 'system.skill.category'), 'knowledge');
             assert.strictEqual(foundry.utils.getProperty(knowledgeSkill, 'system.skill.knowledgeType'), 'street');
             assert.strictEqual(foundry.utils.getProperty(knowledgeSkill, 'system.skill.attribute'), 'intuition');
+            assert.strictEqual(foundry.utils.getProperty(knowledgeSkill, 'system.skill.defaulting'), false);
             assert.strictEqual(knowledgeSkill?.img, 'icons/svg/eye.svg');
+            assert.deepEqual(foundry.utils.getProperty(source, 'system.skills'), {});
         });
 
         it('migrates missing language and knowledge skills without duplicating existing skill items', () => {
@@ -195,6 +203,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.exists(knowledge);
             assert.strictEqual(foundry.utils.getProperty(knowledge, 'system.skill.category'), 'knowledge');
             assert.strictEqual(foundry.utils.getProperty(knowledge, 'system.skill.knowledgeType'), 'street');
+            assert.deepEqual(foundry.utils.getProperty(source, 'system.skills'), {});
         });
     });
 

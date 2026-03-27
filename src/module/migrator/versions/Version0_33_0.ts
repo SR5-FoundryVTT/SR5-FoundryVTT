@@ -61,11 +61,18 @@ export class Version0_33_0 extends VersionMigration {
 
     override migrateActor(actor: unknown) {
         const migratingActor = actor as MigratingActorData;
+        const legacySkills = this.collectLegacySkills(migratingActor);
+
+        if (legacySkills.length === 0) return;
 
         migratingActor.items ??= [];
 
-        for (const entry of this.collectLegacySkills(migratingActor)) {
+        for (const entry of legacySkills) {
             migratingActor.items.push(this.createSkillItem(entry) as OwnedSkillItemData);
+        }
+
+        if (migratingActor.system) {
+            migratingActor.system.skills = {};
         }
     }
 
@@ -159,37 +166,33 @@ export class Version0_33_0 extends VersionMigration {
             throw new Error(`Shadowrun5e | Failed to migrate legacy ${entry.category} skill due to missing name`);
         }
 
-        const system = DataDefaults.baseSystemData('skill', {
-            type: 'skill',
-            description: {
-                value: this.readString(entry.skill.description),
-                source: this.readString(entry.skill.link),
-            },
-            skill: {
-                category: entry.category,
-                attribute: this.getSkillAttribute(entry),
-                defaulting: Boolean(entry.skill.canDefault),
-                knowledgeType: entry.category === 'knowledge' ? entry.knowledgeType ?? null : null,
-                group: this.readString(entry.skill.group),
-                limit: {
-                    attribute: this.getSkillLimit(entry.skill.limit),
-                },
-                requirement: this.getSkillRequirement(entry.skill.requirement),
-                language: {
-                    isNative: Boolean(entry.skill.isNative),
-                },
-            },
-        });
-
-        system.skill.rating = this.getSkillRating(entry.skill);
-        system.skill.specializations = this.getSpecializations(entry.skill.specs);
-
         return {
             _id: foundry.utils.randomID(16),
             name,
             type: 'skill',
             img: this.getSkillImage(entry.skill),
-            system,
+            system: DataDefaults.baseSystemData('skill', {
+                type: 'skill',
+                description: {
+                    value: this.readString(entry.skill.description),
+                    source: this.readString(entry.skill.link),
+                },
+                skill: {
+                    category: entry.category,
+                    attribute: this.getSkillAttribute(entry),
+                    defaulting: this.getSkillDefaulting(entry),
+                    rating: this.getSkillRating(entry.skill),
+                    ...(entry.category === 'knowledge' ? { knowledgeType: entry.knowledgeType ?? 'academic' } : {}),
+                    limit: {
+                        attribute: this.getSkillLimit(entry.skill.limit),
+                    },
+                    specializations: this.getSpecializations(entry.skill.specs),
+                    requirement: this.getSkillRequirement(entry.skill.requirement),
+                    language: {
+                        isNative: Boolean(entry.skill.isNative),
+                    },
+                },
+            }),
             effects: [],
         } as Item.CreateData;
     }
@@ -218,6 +221,12 @@ export class Version0_33_0 extends VersionMigration {
         if (knowledgeAttribute && this.isSkillAttribute(knowledgeAttribute)) return knowledgeAttribute;
 
         return '';
+    }
+
+    private getSkillDefaulting(entry: LegacySkillEntry) {
+        if (entry.category !== 'active') return false;
+
+        return Boolean(entry.skill.canDefault);
     }
 
     private getSkillRating(skill: LegacySkillData) {
