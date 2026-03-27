@@ -63,13 +63,12 @@ export const SkillSelectionFlow = {
         return Helpers.sortConfigValuesByTranslation(sheetSkills);
     },
 
-    async getSkillgroupSelection(actor?: SR5Actor) {
+    /**
+     * Create a list for skill group selection inputs.
+     * @returns A sorted list of skill groups suitable for use in selection inputs.
+     */
+    async getSkillgroupSelection() {
         const skillgroups = await PackItemFlow.getPackSkillgroups();
-
-        for (const ownedSkill of actor?.itemsForType.get('skill') ?? []) {
-            if (!skillgroups.find(skill => skill.name === ownedSkill.name)) continue;
-            skillgroups.push(ownedSkill as SR5Item<'skill'>);
-        }
 
         const sheetGroups: Record<string, Translation> = {};
         for (const group of skillgroups) {
