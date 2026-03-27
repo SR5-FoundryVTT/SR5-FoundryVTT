@@ -72,11 +72,9 @@ export class SkillRules {
             return SkillRules.defaultingModifier;
         }
 
-        // An attribute can have a NaN value if no value has been set yet. Do the skill for consistency.
-        const skillValue = skill.value;
         const specializationBonus = options.specialization ? SR.skill.SPECIALIZATION_MODIFIER : 0;
 
-        return skillValue + specializationBonus;
+        return skill.value + specializationBonus;
     }
 
     static get defaultingModifier(): number {

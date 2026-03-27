@@ -8,11 +8,8 @@ import { SR5Item } from '../item/SR5Item';
 export const EffectCreationFlow = {
     /**
      * Create A skill effect on an actor based on a skill item.
-     * @param actor 
-     * @param category 
-     * @param subCategory 
-     * @param skillId 
-     * @returns 
+     * @param actor Actor to create effect on
+     * @param skillId Skill item ID to create effect from
      */
     skill: async (actor: SR5Actor, skillId: string) => {
         const skillField = actor.getSkillById(skillId);

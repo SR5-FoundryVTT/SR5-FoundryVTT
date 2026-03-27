@@ -17,7 +17,7 @@
       "attribute": "magic",
       "specializations": [],
       "group": "",
-      "requirement": "awakened",
+      "requirement": "magic",
       "language": {
         "isNative": false
       },

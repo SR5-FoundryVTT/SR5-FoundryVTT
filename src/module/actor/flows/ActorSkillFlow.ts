@@ -17,7 +17,15 @@ export const ActorSkillFlow = {
     async addSkill(actor: SR5Actor, item: Item.CreateData<'skill'>, options: { defaultName?: string, warnOnDuplicate?: boolean } = {}) {
         const name = options.defaultName ?? item.name;
         const category = foundry.utils.getProperty(item, 'system.skill.category') as string;
-        if (ActorSkillFlow.hasSkillOfSameNameAndCategory(actor, name, category)) return;
+
+        if (ActorSkillFlow.hasSkillOfSameNameAndCategory(actor, name, category)) {
+            if (options.warnOnDuplicate) {
+                const message = game.i18n.format('SR5.Errors.SkillAlreadyExists', { name: item.name});
+                ui.notifications?.warn(message);
+            }
+            return;
+        };
+
         return await actor.createEmbeddedDocuments('Item', [item]) as SR5Item<'skill'>[];
     },
 
