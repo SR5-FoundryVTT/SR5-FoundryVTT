@@ -115,5 +115,3 @@ export class Skill extends ItemBase<ReturnType<typeof SkillData>> {
 
     static override LOCALIZATION_PREFIXES = ["SR5.Skill", "SR5.Item"];
 }
-
-console.log("SkillData", SkillData(), new Skill());
