@@ -70,6 +70,15 @@ export class MatrixRules {
     }
 
     /**
+     * Derive the base value of any skill an IC uses from its host rating.
+     *
+     * SR5#247 'Intrusion Countermeasures'     
+     */
+    static getICSkillBase(hostRating: number): number {
+        return hostRating;
+    }
+
+    /**
      * Determine if the count of marks (to be placed) is allowed within the rules. SR5#240 'Hack on the Fly'
      * @param marks
      */

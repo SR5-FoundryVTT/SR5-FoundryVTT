@@ -62,7 +62,22 @@
           "specializations": []
         },
         {
+          "name": "Cybercombat",
+          "rating": 0,
+          "specializations": []
+        },
+        {
           "name": "Electronic Warfare",
+          "rating": 0,
+          "specializations": []
+        },
+        {
+          "name": "Hacking",
+          "rating": 0,
+          "specializations": []
+        },
+        {
+          "name": "Software",
           "rating": 0,
           "specializations": []
         }
