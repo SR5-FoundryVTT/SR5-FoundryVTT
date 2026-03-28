@@ -1150,6 +1150,32 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return this.targets.length > 0;
     }
 
+    get targetRangeOptions(): { value: number, label: string }[] {
+        const data = this.data as T & {
+            targetRanges?: Array<{ name: string, distance: number, unit: string }>
+        };
+
+        if (!Array.isArray(data.targetRanges)) return [];
+
+        return data.targetRanges.map((target, index) => ({
+            value: index,
+            label: `${target.name} (${target.distance} ${target.unit})`
+        }));
+    }
+
+    get rangeOptions(): { value: number, label: string }[] {
+        const data = this.data as T & {
+            ranges?: Record<string, { modifier: number, label: string, distance: number }>
+        };
+
+        if (!data.ranges) return [];
+
+        return Object.values(data.ranges).map(range => ({
+            value: Number(range.modifier),
+            label: `${game.i18n.localize(range.label)} (${range.distance} m)`
+        }));
+    }
+
     /**
      * Has this test been derived from an action?
      *

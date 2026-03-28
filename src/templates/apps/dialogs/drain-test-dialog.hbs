@@ -10,11 +10,7 @@
             <div class="form-group">
                 <label>{{localize 'SR5.DamageType'}}</label>
                 <select name="test.data.incomingDrain.type.base">
-                    {{#select test.data.incomingDrain.type.base}}
-                    {{#each config.damageTypes as |val key|}}
-                    <option value="{{key}}">{{localize val}}</option>
-                    {{/each}}
-                    {{/select}}
+                    {{selectOptions config.damageTypes selected=test.data.incomingDrain.type.base localize=true}}
                 </select>
             </div>
         </div>

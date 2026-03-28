@@ -22,13 +22,7 @@
             <div class="form-group">
                 <label>{{localize 'SR5.FireMode'}}</label>
                 <select name="test.data.fireModeSelected">
-                    {{#select test.data.fireModeSelected}}
-                    {{#each test.data.fireModes}}
-                    <option value="{{@index}}">
-                        {{localize this.label}} ({{this.value}}) ({{localize (objValue ../config.actionTypes this.action)}})
-                    </option>
-                    {{/each}}
-                    {{/select}}
+                    {{selectOptions test.fireModeOptions selected=test.data.fireModeSelected}}
                 </select>
             </div>
             {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/attack-range-dialog-fragment.hbs'}}

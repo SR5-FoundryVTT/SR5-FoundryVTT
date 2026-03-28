@@ -108,4 +108,11 @@ export class MatrixTest<T extends MatrixTestData = MatrixTestData> extends Succe
         await super._cleanUpAfterDialog();
         await MatrixTestDataFlow.setIconUuidBasedOnPlacementSelection(this);
     }
+
+    get iconOptions(): { value: string, label: string }[] {
+        return this.devices.map(device => ({
+            value: device.uuid,
+            label: device.name
+        }));
+    }
 }

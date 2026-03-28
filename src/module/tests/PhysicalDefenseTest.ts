@@ -117,6 +117,14 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
         PartsList.AddUniquePart(this.data.modifiers.mod, 'SR5.Cover', this.data.cover);
     }
 
+    get coverOptions(): { value: number, label: string }[] {
+        return [
+            { value: 0, label: game.i18n.localize('SR5.NoCover') },
+            { value: 2, label: `(+2) ${game.i18n.localize('SR5.PartialCover')}` },
+            { value: 4, label: `(+4) ${game.i18n.localize('SR5.GoodCover')}` }
+        ];
+    }
+
     applyPoolActiveDefenseModifier() {
         const defense = this.data.activeDefenses[this.data.activeDefense] || {label: 'SR5.ActiveDefense', value: 0, init: 0};
 

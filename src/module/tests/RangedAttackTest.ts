@@ -75,6 +75,13 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         this.data.fireMode = this.data.fireModes[index];
     }
 
+    get fireModeOptions(): { value: number, label: string }[] {
+        return this.data.fireModes.map((fireMode, index) => ({
+            value: index,
+            label: `${game.i18n.localize(fireMode.label)} (${fireMode.value}) (${game.i18n.localize(SR5.actionTypes[fireMode.action])})`
+        }));
+    }
+
     /**
      * Weapon fire modes will affect recoil during test.
      * 

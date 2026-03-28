@@ -10,11 +10,7 @@
             <div class="form-group">
                 <label>{{localize 'SR5.DamageType'}}</label>
                 <select name="test.data.incomingDamage.type.value">
-                    {{#select test.data.incomingDamage.type.value}}
-                    {{#each config.damageTypes as |val key|}}
-                    <option value="{{key}}">{{localize val}}</option>
-                    {{/each}}
-                    {{/select}}
+                    {{selectOptions config.damageTypes selected=test.data.incomingDamage.type.value localize=true}}
                 </select>
             </div>
             <div class="form-group">
@@ -24,12 +20,7 @@
             <div class="form-group">
                 <label>{{localize 'SR5.Element'}}</label>
                 <select name="test.data.incomingDamage.element.value">
-                    {{#select test.data.incomingDamage.element.value}}
-                    <option value="">{{localize "SR5.None"}}</option>
-                    {{#each config.elementTypes as |val key|}}
-                    <option value="{{key}}">{{localize val}}</option>
-                    {{/each}}
-                    {{/select}}
+                    {{selectOptions config.elementTypes selected=test.data.incomingDamage.element.value localize=true blank='SR5.None'}}
                 </select>
             </div>
         </div>
