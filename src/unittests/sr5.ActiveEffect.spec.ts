@@ -4,9 +4,10 @@ import { SR5Item } from "../module/item/SR5Item";
 import { SkillTest } from "../module/tests/SkillTest";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { TestCreator } from "../module/tests/TestCreator";
-import { SuccessTest } from "../module/tests/SuccessTest";
+import { OpposedTest } from "../module/tests/OpposedTest";
 import { DataDefaults } from "../module/data/DataDefaults";
 import { SR5ActiveEffect } from "src/module/effect/SR5ActiveEffect";
+import { ActionRollType } from "src/module/types/item/Action";
 
 export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -101,43 +102,41 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('OVERRIDE mode: override all existing .mod values', async () => {
-            it('apply the custom override mode', async () => {
-                const actor = await factory.createActor({ type: 'character' });
-                await actor.createEmbeddedDocuments('ActiveEffect', [{
-                    origin: actor.uuid,
-                    disabled: false,
-                    name: 'Test Effect',
-                    changes: [
-                        { key: 'system.attributes.body', value: '5', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
-                        { key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE }
-                    ]
-                }]);
+            const actor = await factory.createActor({ type: 'character' });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.attributes.body', value: '5', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+                    { key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE }
+                ]
+            }]);
 
-                assert.strictEqual(actor.system.attributes.body.mod.length, 1);
-                assert.deepEqual(actor.system.attributes.body.override, { name: 'Test Effect', value: 3 });
-                assert.deepEqual(actor.system.attributes.body.mod, [{ name: 'Test Effect', value: 5 }]);
-                assert.strictEqual(actor.system.attributes.body.value, 3);
+            assert.strictEqual(actor.system.attributes.body.mod.length, 1);
+            assert.deepEqual(actor.system.attributes.body.override, { name: 'Test Effect', value: 3 });
+            assert.deepEqual(actor.system.attributes.body.mod, [{ name: 'Test Effect', value: 5 }]);
+            assert.strictEqual(actor.system.attributes.body.value, 3);
+        });
+
+        it('OVERRIDE mode: non ModifiableValue override should work without altering anything', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const effect = await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect'
+            }]);
+            await effect[0]?.update({
+                changes: [{
+                    key: 'system.modifiers.global',
+                    value: '3',
+                    mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE
+                }]
             });
 
-            it('apply custom override mode, none ModifiableValue should work without altering anything', async () => {
-                const actor = await factory.createActor({ type: 'character' });
-                const effect = await actor.createEmbeddedDocuments('ActiveEffect', [{
-                    origin: actor.uuid,
-                    disabled: false,
-                    name: 'Test Effect'
-                }]);
-                await effect[0]?.update({
-                    changes: [{
-                        key: 'system.modifiers.global',
-                        value: '3',
-                        mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE
-                    }]
-                });
-
-                assert.strictEqual(actor.system.modifiers.global, 3);
-                // assert.strictEqual(actor.system.modifiers.global.mod, undefined);
-                // assert.strictEqual(actor.system.modifiers.global.override, undefined);
-            });
+            assert.strictEqual(actor.system.modifiers.global, 3);
+            // assert.strictEqual(actor.system.modifiers.global.mod, undefined);
+            // assert.strictEqual(actor.system.modifiers.global.override, undefined);
         });
 
         it('ADD mode: adding to ModifiableField should cause MODIFY mode to be used', async () => {
@@ -300,6 +299,36 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.equal(actor.system.skills.active.automatics.override, undefined);
             assert.deepEqual(actor.system.skills.active.automatics.mod, []);
         });
+
+        it('V14 system.changes: apply explicit type and phase data', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                system: {
+                    changes: [
+                        { key: 'system.attributes.body', value: '2', type: 'custom', phase: 'initial' },
+                        { key: 'system.attributes.body', value: '3', type: 'custom', phase: 'final' },
+                        { key: 'token.name', value: 'Changed Token Name', type: 'override', phase: 'final' }
+                    ]
+                }
+            }]);
+
+            const effect = actor.effects.contents[0] as SR5ActiveEffect;
+            const actorState = actor as unknown as {
+                tokenActiveEffectChanges: Record<string, ActiveEffect.ChangeData[]>;
+            };
+
+            assert.strictEqual(effect.system.changes[0].type, 'custom');
+            assert.deepEqual(actor.system.attributes.body.mod, [
+                { name: 'Test Effect', value: 2 },
+                { name: 'Test Effect', value: 3 }
+            ]);
+            assert.strictEqual(actor.system.attributes.body.value, 5);
+            assert.lengthOf(actorState.tokenActiveEffectChanges.final, 1);
+            assert.strictEqual(actorState.tokenActiveEffectChanges.final[0].key, 'name');
+        });
     });
     /**
  * Tests around the systems 'advanced' effects on top of Foundry core active effects.
@@ -366,6 +395,40 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.lengthOf(actor.effects.contents, 5);
             assert.lengthOf(actor.system.attributes.body.mod, 2);
             assert.equal(actor.system.attributes.body.value, 6);
+        });
+
+        it('TARGETED_ACTOR apply-to: create copied effects with resolved values on the target actor', async () => {
+            const attacker = await factory.createActor({
+                type: 'character',
+                system: {
+                    attributes: { body: { base: 2 } },
+                    skills: { active: { automatics: { base: 3 } } }
+                }
+            });
+            const target = await factory.createActor({ type: 'character' });
+
+            const items = await attacker.createEmbeddedDocuments('Item', [{ type: 'action', name: 'Test Action' }]);
+            const item = items[0] as SR5Item;
+
+            await item.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Targeted Effect',
+                system: {
+                    applyTo: 'targeted_actor',
+                    changes: [{ key: 'system.attributes.body', value: '@data.pool.value', type: 'custom' }]
+                }
+            }]);
+
+            const test = (await TestCreator.fromItem(item, attacker, { showDialog: false, showMessage: false }))!;
+
+            await test.evaluate();
+            await test.effects.createTargetActorEffects(target);
+
+            const appliedEffect = target.effects.find(effect => effect.name === 'Targeted Effect') as SR5ActiveEffect | undefined;
+            if (!appliedEffect) throw new Error('Expected copied targeted actor effect to exist on target actor.');
+
+            assert.strictEqual(appliedEffect.system.appliedByTest, true);
+            assert.strictEqual(appliedEffect.system.changes[0].value, `${test.pool.value}`);
+            assert.strictEqual(target.system.attributes.body.value, test.pool.value);
         });
 
         it('TEST_ALL apply-to: Actor effect applies to test', async () => { 
@@ -511,6 +574,104 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.equal(test.pool.value, poolValue);
             assert.deepEqual(test.hits.mod, [{ name: 'Test Effect Correct Item', value: hitsValue }]);
             assert.isAtLeast(test.hits.value, hitsValue);
+        });
+
+        it('TEST_ALL apply-to: skip opposed tests without explicit test selection', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const items = await actor.createEmbeddedDocuments('Item', [{
+                type: 'action',
+                name: 'Opposed Action',
+                system: {
+                    action: {
+                        test: 'SuccessTest',
+                        type: 'simple',
+                        attribute: 'body',
+                        skill: 'automatics',
+                        limit: { attribute: 'physical' },
+                        opposed: {
+                            type: 'custom',
+                            test: 'OpposedTest',
+                            attribute: 'reaction',
+                            attribute2: 'intuition',
+                            skill: '',
+                            description: ''
+                        }
+                    }
+                }
+            }]);
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Unrestricted Effect',
+                system: { applyTo: 'test_all' },
+                changes: [{ key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+            }, {
+                name: 'Opposed Effect',
+                system: { applyTo: 'test_all', selection_tests: [{ value: 'Opposed Test', id: 'OpposedTest' }] },
+                changes: [{ key: 'data.pool', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+            }]);
+
+            const activeTest = (await TestCreator.fromItem(items[0] as SR5Item, actor, { showDialog: false, showMessage: false }))!;
+            const opposedData = await OpposedTest._getOpposedActionTestData(activeTest.data, actor, '');
+            if (!opposedData) throw new Error('Failed to create opposed test data.');
+
+            const opposedTest = new OpposedTest(opposedData, { actor });
+            opposedTest.effects.applyAllEffects();
+
+            assert.deepEqual(opposedTest.pool.mod, [{ name: 'Opposed Effect', value: 2 }]);
+        });
+
+        it('TEST_ALL apply-to: respect skill, attribute and limit selections', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const skillName = actor.getSkill('automatics')?.name ?? 'automatics';
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Selection Effect',
+                system: {
+                    applyTo: 'test_all',
+                    selection_skills: [{ value: skillName, id: skillName }],
+                    selection_attributes: [{ value: 'Body', id: 'body' }],
+                    selection_limits: [{ value: 'Physical', id: 'physical' }]
+                },
+                changes: [{ key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+            }]);
+
+            const assertPoolValue = async (actionData: ActionRollType, expected: number) => {
+                const test = await TestCreator.fromAction(actionData, actor, { showDialog: false, showMessage: false }) as SkillTest;
+                if (!test) throw new Error('Failed to create skill test.');
+
+                test.effects.applyAllEffects();
+                Helpers.calcTotal(test.pool);
+
+                assert.strictEqual(test.pool.value, expected);
+            };
+
+            await assertPoolValue(DataDefaults.createData('action_roll', {
+                test: SkillTest.name,
+                skill: 'automatics',
+                attribute: 'body',
+                limit: { attribute: 'physical' }
+            }), 3);
+
+            await assertPoolValue(DataDefaults.createData('action_roll', {
+                test: SkillTest.name,
+                skill: 'clubs',
+                attribute: 'body',
+                limit: { attribute: 'physical' }
+            }), 0);
+
+            await assertPoolValue(DataDefaults.createData('action_roll', {
+                test: SkillTest.name,
+                skill: 'automatics',
+                attribute: 'logic',
+                limit: { attribute: 'physical' }
+            }), 0);
+
+            await assertPoolValue(DataDefaults.createData('action_roll', {
+                test: SkillTest.name,
+                skill: 'automatics',
+                attribute: 'body',
+                limit: { attribute: 'mental' }
+            }), 0);
         });
     });
 
