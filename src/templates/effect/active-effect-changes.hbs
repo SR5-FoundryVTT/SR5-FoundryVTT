@@ -1,12 +1,19 @@
 <section class="tab changes{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <header>
-        <div class="key">{{localize "EFFECT.ChangeKey"}}</div>
+        <div class="key">{{localize "EFFECT.FIELDS.changes.element.key.label"}}</div>
         {{#ifne source.system.applyTo "modifier"}}
-        <div class="mode">{{localize "EFFECT.FIELDS.changes.element.type.label"}}</div>
-        <div class="value">{{localize "EFFECT.ChangeValue"}}</div>
-        <div class="priority">{{localize "EFFECT.ChangePriority"}}</div>
+        <div class="type">{{localize "EFFECT.FIELDS.changes.element.type.label"}}</div>
+        <div class="value">{{localize "EFFECT.FIELDS.changes.element.value.label"}}</div>
+        <div class="priority">{{localize "EFFECT.FIELDS.changes.element.priority.label"}}</div>
+        {{else}}
+        <div class="type"></div>
+        <div class="value"></div>
+        <div class="priority"></div>
         {{/ifne}}
-        <div class="controls"><a data-action="addChange"><i class="fa-regular fa-square-plus"></i></a></div>
+        <div class="phase">{{localize "EFFECT.FIELDS.changes.element.phase.label"}}</div>
+        <div class="controls">
+            <a class="inline-control icon" data-action="addChange"><i class="fa-regular fa-square-plus"></i></a>
+        </div>
     </header>
     <ol class="scrollable" data-changes>
         {{#each source.system.changes as |change i|}}
@@ -16,23 +23,35 @@
                         {{formInput changeFields.key name=(concat "system.changes." i ".key") value=change.key}}
                     </div>
                     {{#ifne @root.source.system.applyTo "modifier"}}
-                    <div class="mode">
+                    <div class="type">
                         {{formInput changeFields.type name=(concat "system.changes." i ".type") value=change.type choices=@root.changeTypes}}
                     </div>
                     <div class="value autocomplete-value-{{@root.source.system.applyTo}}">
+                        {{!-- Do not use formInput as that renders a giant textblock --}}
                         <input type="text" name="system.changes.{{i}}.value" value="{{change.value}}" />
                     </div>
                     <div class="priority">
                         {{formInput changeFields.priority name=(concat "system.changes." i ".priority") value=change.priority
                                     placeholder=(lookup @root.changeTypePriorities change.type) disabled=true}}
                     </div>
-                    <input type="hidden" name="system.changes.{{i}}.phase" value="{{change.phase}}" />
                     {{else}}
-                    <input type="hidden" name="system.changes.{{i}}.type" value="{{change.type}}" />
-                    <input type="hidden" name="system.changes.{{i}}.value" value="{{change.value}}" />
-                    <input type="hidden" name="system.changes.{{i}}.phase" value="{{change.phase}}" />
+                    <div class="type">
+                        <input type="hidden" name="system.changes.{{i}}.type" value="{{change.type}}" />
+                    </div>
+                    <div class="value">
+                        <input type="hidden" name="system.changes.{{i}}.value" value="{{change.value}}" />
+                    </div>
+                    <div class="priority">
+                        <input type="hidden" name="system.changes.{{i}}.priority" value="{{change.priority}}" />
+                    </div>
                     {{/ifne}}
-                    <div class="controls"><a data-action="deleteChange"><i class="fa-solid fa-trash"></i></a></div>
+                    <div class="phase">
+                        <input type="hidden" name="system.changes.{{i}}.phase" value="{{change.phase}}" />
+                        {{formInput changeFields.phase name=(concat "system.changes." i ".phase") value=change.phase disabled=true}}
+                    </div>
+                    <div class="controls">
+                        <a class="inline-control icon" data-action="deleteChange"><i class="fa-solid fa-trash"></i></a>
+                    </div>
                 </li>
             {{/with}}
         {{/each}}
