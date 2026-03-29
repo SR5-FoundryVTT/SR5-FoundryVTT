@@ -153,9 +153,9 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             }]);
 
             assert.strictEqual(actor.system.attributes.body.value, 3);
-            assert.deepEqual(actor.system.attributes.body.mod, [{ name: 'Test Effect', value: 3 }]);
+            assert.deepEqual(actor.system.attributes.body.changes, [ createTestChange('Test Effect', 3) ]);
             assert.strictEqual(actor.system.skills.active.automatics.value, 3);
-            assert.deepEqual(actor.system.skills.active.automatics.mod, [{ name: 'Test Effect', value: 3 }]);
+            assert.deepEqual(actor.system.skills.active.automatics.changes, [createTestChange('Test Effect', 3)]);
         });
         
         it('ADD mode: adding to ModifiableField property should cause MODIFY mode to be used', async () => {
@@ -175,9 +175,9 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             }]);
 
             assert.strictEqual(actor.system.attributes.body.value, 3);
-            assert.deepEqual(actor.system.attributes.body.mod, [{ name: 'Test Effect', value: 3 }]);
+            assert.deepEqual(actor.system.attributes.body.changes, [createTestChange('Test Effect', 3)]);
             assert.strictEqual(actor.system.skills.active.automatics.value, 3);
-            assert.deepEqual(actor.system.skills.active.automatics.mod, [{ name: 'Test Effect', value: 3 }]);
+            assert.deepEqual(actor.system.skills.active.automatics.changes, [createTestChange('Test Effect', 3)]);
         });
 
         it('UPGRADE mode: should raise the value to a max', async () => {
@@ -200,9 +200,11 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             }]);
 
             assert.strictEqual(actor.system.attributes.body.value, 3);
-            assert.deepEqual(actor.system.attributes.body.upgrade, { name: 'Test Effect', value: 3 });
+            assert.deepEqual(actor.system.attributes.body.changes, [
+                createTestChange('Test Effect', 3, CONST.ACTIVE_EFFECT_MODES.UPGRADE)
+            ]);
             assert.strictEqual(actor.system.skills.active.automatics.value, 3);
-            assert.deepEqual(actor.system.skills.active.automatics.upgrade, { name: 'Test Effect', value: 3 });
+            assert.deepEqual(actor.system.skills.active.automatics.changes, [createTestChange('Test Effect', 3, CONST.ACTIVE_EFFECT_MODES.UPGRADE)]);
         });
 
         it('UPGRADE mode: uses the highest value for multiple upgrade changes', async () => {
@@ -245,9 +247,11 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             }]);
 
             assert.strictEqual(actor.system.attributes.body.value, 3);
-            assert.deepEqual(actor.system.attributes.body.downgrade, { name: 'Test Effect', value: 3 });
+            assert.deepEqual(actor.system.attributes.body.changes,
+                [createTestChange('Test Effect', 3, CONST.ACTIVE_EFFECT_MODES.DOWNGRADE)]);
             assert.strictEqual(actor.system.skills.active.automatics.value, 3);
-            assert.deepEqual(actor.system.skills.active.automatics.downgrade, { name: 'Test Effect', value: 3 });
+            assert.deepEqual(actor.system.skills.active.automatics.changes,
+                [createTestChange('Test Effect', 3, CONST.ACTIVE_EFFECT_MODES.DOWNGRADE)]);
         });
 
         it('DOWNGRADE mode: uses the lowest value for multiple downgrade changes', async () => {
@@ -290,11 +294,9 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             }]);
 
             assert.strictEqual(actor.system.attributes.body.value, 5);
-            assert.equal(actor.system.attributes.body.override, undefined);
-            assert.deepEqual(actor.system.attributes.body.mod, []);
+            assert.deepEqual(actor.system.attributes.body.changes, []);
             assert.strictEqual(actor.system.skills.active.automatics.value, 5);
-            assert.equal(actor.system.skills.active.automatics.override, undefined);
-            assert.deepEqual(actor.system.skills.active.automatics.mod, []);
+            assert.deepEqual(actor.system.skills.active.automatics.changes, []);
         });
     });
     /**
