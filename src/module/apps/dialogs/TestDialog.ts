@@ -1,5 +1,4 @@
 import { SR5 } from "../../config";
-import { Helpers } from "../../helpers";
 import { Translation } from '../../utils/strings';
 import { ModifiableValueType } from "src/module/types/template/Base";
 import { SuccessTest, SuccessTestData } from "../../tests/SuccessTest";
@@ -8,6 +7,7 @@ import { FormDialog, FormDialogData, FormDialogOptions } from "./FormDialog";
 export interface TestDialogData extends FormDialogData {
     test: SuccessTest
     rollMode: string
+    // TODO: fvtt - v14 - Deprecated in v14, missing v14 types.
     rollModes: CONFIG.Dice.RollModes
     config: typeof SR5
 }

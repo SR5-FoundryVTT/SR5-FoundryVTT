@@ -173,7 +173,7 @@ export class FormDialog extends foundry.appv1.api.Dialog<FormDialogOptions> {
     override async _renderInner(data): Promise<JQuery<HTMLElement>> {
         const templatePath = data.templatePath || this.templateContent;
         if (templatePath)
-            data.content = await renderTemplate(data.templatePath || this.templateContent,
+            data.content = await foundry.applications.handlebars.renderTemplate(data.templatePath || this.templateContent,
                                                 data.templateData || data);
 
         const html = await super._renderInner(data);
