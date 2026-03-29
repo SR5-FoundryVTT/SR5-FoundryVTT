@@ -135,6 +135,167 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 assert.strictEqual(actor.system.modifiers.global, 3);
             });
         });
+
+        it('ADD mode: adding to ModifiableField should cause MODIFY mode to be used', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+
+            assert.strictEqual(actor.system.attributes.body.value, 0);
+            assert.strictEqual(actor.system.skills.active.automatics.value, 0);
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'system.skills.active.automatics', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }
+                ]
+            }]);
+
+            assert.strictEqual(actor.system.attributes.body.value, 3);
+            assert.deepEqual(actor.system.attributes.body.mod, [{ name: 'Test Effect', value: 3 }]);
+            assert.strictEqual(actor.system.skills.active.automatics.value, 3);
+            assert.deepEqual(actor.system.skills.active.automatics.mod, [{ name: 'Test Effect', value: 3 }]);
+        });
+        
+        it('ADD mode: adding to ModifiableField property should cause MODIFY mode to be used', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+
+            assert.strictEqual(actor.system.attributes.body.value, 0);
+            assert.strictEqual(actor.system.skills.active.automatics.value, 0);
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.attributes.body.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }
+                ]
+            }]);
+
+            assert.strictEqual(actor.system.attributes.body.value, 3);
+            assert.deepEqual(actor.system.attributes.body.mod, [{ name: 'Test Effect', value: 3 }]);
+            assert.strictEqual(actor.system.skills.active.automatics.value, 3);
+            assert.deepEqual(actor.system.skills.active.automatics.mod, [{ name: 'Test Effect', value: 3 }]);
+        });
+
+        it('UPGRADE mode: should raise the value to a max', async () => {
+            const actor = await factory.createActor({ type: 'character', system: { 
+                attributes: { body: { base: 2 } }, 
+                skills: { active: { automatics: { base: 2 } } } } 
+            });
+
+            assert.strictEqual(actor.system.attributes.body.base, 2);
+            assert.strictEqual(actor.system.skills.active.automatics.base, 2);
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.UPGRADE },
+                    { key: 'system.attributes.body.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.UPGRADE }
+                ]
+            }]);
+
+            assert.strictEqual(actor.system.attributes.body.value, 3);
+            assert.deepEqual(actor.system.attributes.body.upgrade, { name: 'Test Effect', value: 3 });
+            assert.strictEqual(actor.system.skills.active.automatics.value, 3);
+            assert.deepEqual(actor.system.skills.active.automatics.upgrade, { name: 'Test Effect', value: 3 });
+        });
+
+        it('UPGRADE mode: uses the highest value for multiple upgrade changes', async () => {
+            const actor = await factory.createActor({ type: 'character', system: { 
+                skills: { active: { automatics: { base: 2 } } } } 
+            });
+
+            assert.strictEqual(actor.system.skills.active.automatics.base, 2);
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.skills.active.automatics.value', value: '5', mode: CONST.ACTIVE_EFFECT_MODES.UPGRADE },
+                    { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.UPGRADE }
+                ]
+            }]);
+
+            assert.strictEqual(actor.system.skills.active.automatics.value, 5);
+        });
+
+        it('DOWNGRADE mode: should reduce the value to a min', async () => {
+            const actor = await factory.createActor({ type: 'character', system: { 
+                attributes: { body: { base: 5 } }, 
+                skills: { active: { automatics: { base: 5 } } } } 
+            });
+
+            assert.strictEqual(actor.system.attributes.body.base, 5);
+            assert.strictEqual(actor.system.skills.active.automatics.base, 5);
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE },
+                    { key: 'system.attributes.body.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE }
+                ]
+            }]);
+
+            assert.strictEqual(actor.system.attributes.body.value, 3);
+            assert.deepEqual(actor.system.attributes.body.downgrade, { name: 'Test Effect', value: 3 });
+            assert.strictEqual(actor.system.skills.active.automatics.value, 3);
+            assert.deepEqual(actor.system.skills.active.automatics.downgrade, { name: 'Test Effect', value: 3 });
+        });
+
+        it('DOWNGRADE mode: uses the lowest value for multiple downgrade changes', async () => {
+            const actor = await factory.createActor({ type: 'character', system: { 
+                skills: { active: { automatics: { base: 6 } } } } 
+            });
+
+            assert.strictEqual(actor.system.skills.active.automatics.base, 6);
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE },
+                    { key: 'system.skills.active.automatics.value', value: '5', mode: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE }
+                ]
+            }]);
+
+            assert.strictEqual(actor.system.skills.active.automatics.value, 3);
+        });
+
+        it('MULTIPLY mode: should do nothing successfully', async () => {
+            const actor = await factory.createActor({ type: 'character', system: { 
+                attributes: { body: { base: 5 } }, 
+                skills: { active: { automatics: { base: 5 } } } } 
+            });
+
+            assert.strictEqual(actor.system.attributes.body.base, 5);
+            assert.strictEqual(actor.system.skills.active.automatics.base, 5);
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.MULTIPLY },
+                    { key: 'system.attributes.body.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.MULTIPLY }
+                ]
+            }]);
+
+            assert.strictEqual(actor.system.attributes.body.value, 5);
+            assert.equal(actor.system.attributes.body.override, undefined);
+            assert.deepEqual(actor.system.attributes.body.mod, []);
+            assert.strictEqual(actor.system.skills.active.automatics.value, 5);
+            assert.equal(actor.system.skills.active.automatics.override, undefined);
+            assert.deepEqual(actor.system.skills.active.automatics.mod, []);
+        });
     });
     /**
      * Tests around the systems 'advanced' effects on top of Foundry core active effects.
@@ -629,5 +790,44 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             assert.strictEqual(test.pool.value, 0);
         });
-    })
+    });
+
+    /**
+     * These tests cover interaction between Effect change application and data preparation code.
+     */
+    describe("AdvancedEffects should hold true to data preparation expectations", () => {
+        it('Should apply armor element modifiers from effect changes and armor items correctly', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.armor.fire', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+                    { key: 'system.armor.acid', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+                    { key: 'system.armor.cold', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+                    { key: 'system.armor.electricity', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+                    { key: 'system.armor.radiation', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+                ]
+            }]);
+            await actor.createEmbeddedDocuments('Item', [{
+                name: 'Test Armor',
+                type: 'armor',
+                system: {
+                    technology: { equipped: true },
+                    armor: {
+                        fire: 1,
+                        acid: 2,
+                        cold: 3,
+                        electricity: 4,
+                        radiation: 5
+                    }
+                }
+            }]);
+
+            assert.strictEqual(actor.system.armor.fire, 4);
+            assert.strictEqual(actor.system.armor.acid, 5);
+            assert.strictEqual(actor.system.armor.cold, 6);
+            assert.strictEqual(actor.system.armor.electricity, 7);
+            assert.strictEqual(actor.system.armor.radiation, 8);
+        });
+    });
 };

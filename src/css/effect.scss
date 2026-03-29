@@ -94,3 +94,12 @@
         color: #000;
     }
 }
+
+.sr5v2 {
+    /* Facilitate resizable effect sheet and scaling effect changes to width */
+    &.active-effect-config .tab.changes header, 
+    &.active-effect-config .tab.changes ol {
+        // grid layout: key | mode | value | priority | controls
+        grid-template-columns: auto 7rem auto 4rem 1rem;
+    }
+}

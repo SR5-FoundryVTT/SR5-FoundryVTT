@@ -10,10 +10,20 @@ export class CritterPowerParser extends Parser<'critter_power'> {
             system.rating = parseFloat(itemData.extra_english);
 
         system.powerType = itemData.type_english === "P" ? 'physical' : 'mana';
-        if (itemData.range_english)
-            system.range = itemData.range_english as any;
 
-        if (itemData.duration_english)
-            system.duration = itemData.duration_english as any;
+        const range = itemData.range_english ?? itemData.range ?? '';
+        system.range = range === 'T'
+            ? 'touch'
+            : range.toLowerCase()
+                .replace(/\s+/g, '_')
+                .replace(/[()]/g, '') as any;
+
+        const duration = (itemData.duration_english ?? itemData.duration ?? '').toLowerCase();
+        if (duration === 's')
+            system.duration = 'sustained';
+        else if (duration === 'i')
+            system.duration = 'instant';
+        else if (duration === 'p')
+            system.duration = 'permanent';
     }
 }

@@ -2,7 +2,7 @@ import { PartsList } from '@/module/parts/PartsList';
 import { MonitorRules } from './../../../rules/MonitorRules';
 
 export class WoundsPrep {
-    static prepareWounds(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
+    static prepareWounds(system: Actor.SystemOfType<'character' | 'spirit'>) {
         const { modifiers, track } = system;
 
         // The actor overall has a wound tolerance.

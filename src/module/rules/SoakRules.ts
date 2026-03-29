@@ -42,11 +42,11 @@ export class SoakRules {
 
         if (damage.type.value === 'physical') {
             // Physical damage is only transformed for some actors
-            if (!['character', 'spirit', 'critter', 'vehicle'].includes(actor.type)) {
+            if (!['character', 'spirit', 'vehicle'].includes(actor.type)) {
                 return updatedDamage;
             }
 
-            const modifiedArmor = (actor as SR5Actor<'character' | 'critter' | 'spirit' | 'vehicle'>).getModifiedArmor(damage);
+            const modifiedArmor = (actor as SR5Actor<'character' | 'spirit' | 'vehicle'>).getModifiedArmor(damage);
             if (modifiedArmor) {
                 const armorWillChangeDamageType = modifiedArmor.value > damage.value;
 

@@ -16,15 +16,21 @@ import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
 import { PartsList } from '@/module/parts/PartsList';
 
 export class CharacterPrep {
+    /**
+     * Prepare base values that should be done before applying ActiveEffect changes.
+     */
     static prepareBaseData(system: Actor.SystemOfType<'character'>) {
         ModifiableFieldPrep.resetAllModifiers(system);
         CharacterPrep.addSpecialAttributes(system);
+
+        ItemPrep.clearArmorElements(system);
     }
 
     /**
      * All derived data should depend on basic values like Attributes or Skills.
      *
-     * It shouldn't be modified by Active Effects, which instead should modify the global modifiers.
+     * ActiveEffect changes have applied before hand and only actor modifier values are 
+     * left to apply additionally.
      *
      * @param system
      * @param items
@@ -76,7 +82,7 @@ export class CharacterPrep {
      * 
      * @param system Character system data
      */
-    static prepareRecoilCompensation(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
+    static prepareRecoilCompensation(system: Actor.SystemOfType<'character' | 'spirit'>) {
         const recoilCompensation = RangedWeaponRules.humanoidRecoilCompensationValue(system.attributes.strength.value);
         const baseRc = RangedWeaponRules.humanoidBaseRecoilCompensation();
         system.values.recoil_compensation.base = baseRc;
@@ -89,7 +95,7 @@ export class CharacterPrep {
     static addSpecialAttributes(system: Actor.SystemOfType<'character'>) {
         const { attributes } = system;
 
-        // This is necessary to support critter actor types.
+        // This is necessary to support critter actor types. Should we keep it?
         attributes.initiation = DataDefaults.createData('attribute_field', { base: system.magic.initiation, label: "SR5.Initiation", hidden: true });;
         attributes.submersion = DataDefaults.createData('attribute_field', { base: system.technomancer.submersion, label: "SR5.Submersion", hidden: true });;
     }

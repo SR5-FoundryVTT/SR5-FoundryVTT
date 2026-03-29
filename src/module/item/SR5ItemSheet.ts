@@ -694,12 +694,19 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             name: `${game.i18n.localize('SR5.New')} ${Helpers.label(game.i18n.localize(SR5.itemTypes[type]))}`,
             type,
         } satisfies Item.CreateData;
-        if (type === 'modification') {
-            // add system type to be a weapon when adding a weapon mod
-            itemData['system'] = { type: 'weapon' }
-        }
+
+        // Inject special case context based on item type
+        if (type === 'modification') SR5ItemSheet.addModificationItem(event, itemData);
+
         const item = new SR5Item(itemData);
         await this.item.createNestedItem(item._source);
+    }
+
+    /**
+     * Add system type to be a weapon when adding a weapon mod
+     */
+    static addModificationItem(event: Event, itemData: Item.CreateData) {
+        itemData['system'] = { type: 'weapon' }
     }
 
     static async #reloadAmmo(this: SR5ItemSheet, event: Event) {
@@ -909,7 +916,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         if (this.item._isNestedItem) {
             effect[0]['_id'] = foundry.utils.randomID();
-            const sr5Effect = new SR5ActiveEffect(effect[0], { parent: this.item });
+            const sr5Effect = new SR5ActiveEffect(effect[0], { parent: this.item }) as ActiveEffect.Stored;
             await this.item.createNestedActiveEffect(sr5Effect);
         } else {
             await this.item.createEmbeddedDocuments('ActiveEffect', effect);

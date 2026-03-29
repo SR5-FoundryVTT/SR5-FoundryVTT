@@ -18,14 +18,14 @@ export class RiggingRules {
         SkillRules.injectSkills(injectSkills, driver, rollData, { bigger: false });
     };
 
-    static PilotSkills = [
+    static readonly PilotSkills = [
         'pilot_aerospace',
         'pilot_aircraft',
         'pilot_exotic_vehicle',
         'pilot_ground_craft',
         'pilot_walker',
-        'pilot_water_craft'
-    ];
+        'pilot_watercraft'
+    ] as const;
 
     /**
      * Determine if the provided testData should be considered a matrix action when a Rigger is jumped in

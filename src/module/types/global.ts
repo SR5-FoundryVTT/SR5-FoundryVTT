@@ -11,7 +11,6 @@ import { SR5Token } from "../token/SR5Token";
 import { Translation } from '../utils/strings';
 
 import { Character } from "./actor/Character";
-import { Critter } from "./actor/Critter";
 import { IC } from "./actor/IC";
 import { Spirit } from "./actor/Spirit";
 import { Sprite } from "./actor/Sprite";
@@ -64,8 +63,24 @@ declare module "fvtt-types/configuration" {
         Sheet: typeof FormApplication;
     }
 
+    interface ConfiguredActiveEffect<SubType extends ActiveEffect.SubType> {
+        document: SR5ActiveEffect;
+    }
+    
+    interface ConfiguredActor<SubType extends Actor.SubType> {
+        document: SR5Actor<SubType & Actor.ConfiguredSubType>;
+    }
+
+    interface ConfiguredChatMessage<SubType extends ChatMessage.SubType> {
+        document: SR5ChatMessage;
+    }
+
     interface ConfiguredCombat<SubType extends Combat.SubType> {
         document: SR5Combat<SubType>;
+    }
+
+    interface ConfiguredItem<SubType extends Item.SubType> {
+        document: SR5Item<SubType & Item.ConfiguredSubType>;
     }
 
     interface ObjectClassConfig {
@@ -107,7 +122,6 @@ declare module "fvtt-types/configuration" {
         };
         Actor: {
             character: typeof Character;
-            critter: typeof Critter;
             ic: typeof IC;
             spirit: typeof Spirit;
             sprite: typeof Sprite;
@@ -206,7 +220,6 @@ declare module "fvtt-types/configuration" {
             sr5_beforePrepareTestDataWithAction: any;
             sr5_afterPrepareTestDataWithAction: any;
             sr5_afterDamageAppliedToActor: any;
-            deleteActor: any;
             sr5_testPrepareBaseValues: any;
             sr5_testProcessResults: any;
             sr5_afterTestComplete: any;
@@ -216,16 +229,13 @@ declare module "fvtt-types/configuration" {
             SR5_PreActorItemRoll: (arg0: SR5Actor, arg1: SR5Item) => void;
             getSceneControlButtons: (arg0: any) => void;
             getCombatTrackerEntryContext: (arg0: any, arg1: any) => void;
-            renderCompendiumDirectory: (arg0: foundry.appv1.api.Application, arg1: HTMLElement) => void;
-            renderActorDirectory: (arg0: foundry.appv1.api.Application, arg1: HTMLElement) => void;
-            renderTokenHUD: (arg0: foundry.applications.hud.TokenHUD, arg1: JQuery, arg2: any) => void;
-            updateItem: (args0: SR5Item, args1: SR5Item['system'], arg2: string) => void;
-            deleteItem: (args0: SR5Item, args1: SR5Item['system'], arg2: string) => void;
             getChatMessageContextOptions: (args0: any, args1: any) => void;
             quenchReady: (args0: Quench) => void;
             renderChatMessage: (args0: SR5ChatMessage, args1: any, arg2: any) => void;
             diceSoNiceReady: (dice3d: DiceSoNice) => void;
             dropItemSheetData: any;
+            // Hooks for Autocomplete Inline Properties integration
+            aipSetup: (packageConfig: {packageName: string}[]) => void;
         }
     }
 

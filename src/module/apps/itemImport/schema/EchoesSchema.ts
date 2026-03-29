@@ -1,7 +1,7 @@
 // AUTO‑GENERATED — DO NOT EDIT - Check utils/generate_schemas.py for more info
 
 import { BonusSchema } from './BonusSchema';
-import { Empty, Many, IntegerString } from './Types';
+import { Empty, Many, OneOrMany, IntegerString } from './Types';
 
 export interface Echo {
     bonus?: BonusSchema;
@@ -11,8 +11,9 @@ export interface Echo {
     name: { _TEXT: string; };
     page?: { _TEXT: IntegerString; };
     source?: { _TEXT: "DT" | "DTD" | "DTR" | "KC" | "SR5"; };
-    translate?: { _TEXT: string; };
-    altpage?: { _TEXT: string; };
+    translate?: OneOrMany<{ _TEXT: string; }>;
+    altpage?: OneOrMany<{ _TEXT: string; }>;
+    altnameonpage?: OneOrMany<Empty>;
 };
 
 export interface EchoesSchema {

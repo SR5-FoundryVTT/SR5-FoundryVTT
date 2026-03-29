@@ -7,6 +7,7 @@
             skillPath=(concat "system.skills.language.value." sid)
             skill=skill
             category='language'
+            removeAction="removeLanguageSkill"
             id=sid }}
     {{/each}}
     {{#each system.skills.knowledge as |cat cid|}}
@@ -21,6 +22,7 @@
                     skillPath=(concat "system.skills.knowledge." cid ".value" sid)
                     skill=skill
                     category='knowledge'
+                    removeAction="removeKnowledgeSkill"
                     subcategory=cid
                     id=sid }}
             {{/each}}

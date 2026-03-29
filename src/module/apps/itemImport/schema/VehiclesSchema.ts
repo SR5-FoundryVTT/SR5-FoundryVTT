@@ -31,8 +31,9 @@ export interface Mod {
         subsystem: Many<{ _TEXT: string; }>;
     };
     weaponmountcategories?: { _TEXT: string; };
-    translate?: { _TEXT: string; };
-    altpage?: { _TEXT: string; };
+    translate?: OneOrMany<{ _TEXT: string; }>;
+    altpage?: OneOrMany<{ _TEXT: string; }>;
+    altnameonpage?: OneOrMany<Empty>;
 };
 
 export interface Vehicle {
@@ -111,8 +112,9 @@ export interface Vehicle {
             name: { _TEXT: string; };
         }>;
     };
-    translate?: { _TEXT: string; };
-    altpage?: { _TEXT: string; };
+    translate?: OneOrMany<{ _TEXT: string; }>;
+    altpage?: OneOrMany<{ _TEXT: string; }>;
+    altnameonpage?: OneOrMany<Empty>;
 };
 
 export interface Weaponmount {
@@ -130,8 +132,9 @@ export interface Weaponmount {
     source?: { _TEXT: "R5" | "SR5"; };
     weaponcategories?: { _TEXT: string; };
     weaponfilter?: { _TEXT: "((type != \"Melee\") or (type = \"Melee\" and reach = \"0\"))"; };
-    translate?: { _TEXT: string; };
-    altpage?: { _TEXT: string; };
+    translate?: OneOrMany<{ _TEXT: string; }>;
+    altpage?: OneOrMany<{ _TEXT: string; }>;
+    altnameonpage?: OneOrMany<Empty>;
 };
 
 export interface VehiclesSchema {

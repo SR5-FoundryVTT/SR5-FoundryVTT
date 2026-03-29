@@ -28,7 +28,7 @@ export class InitiativePrep {
     /**
      * Physical initiative
      */
-    static prepareMeatspaceInit(system: Actor.SystemOfType<'character' | 'critter' | 'spirit' | 'vehicle'>) {
+    static prepareMeatspaceInit(system: Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>) {
         const { initiative, attributes, modifiers } = system;
 
         initiative.meatspace.base.base = attributes.intuition.value + attributes.reaction.value;
@@ -40,7 +40,7 @@ export class InitiativePrep {
         PartsList.calcTotal(initiative.meatspace.dice, {min: 0, max: 5});
     }
 
-    static prepareAstralInit(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
+    static prepareAstralInit(system: Actor.SystemOfType<'character' | 'spirit'>) {
         const { initiative, attributes, modifiers } = system;
 
         initiative.astral.base.base = attributes.intuition.value * 2;
@@ -52,7 +52,7 @@ export class InitiativePrep {
         PartsList.calcTotal(initiative.astral.dice, {min: 0, max: 5});
     }
 
-    static prepareMatrixInit(system: Actor.SystemOfType<'character' | 'critter' | 'vehicle'>) {
+    static prepareMatrixInit(system: Actor.SystemOfType<'character' | 'vehicle'>) {
         const { initiative, attributes, modifiers, matrix } = system;
         if (matrix) {
 

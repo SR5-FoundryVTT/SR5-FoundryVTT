@@ -2,7 +2,7 @@
 name: Layout change
 about: Visual issues, styling and structures
 title: "[LAYOUT]"
-labels: design
+labels: layout
 assignees: ''
 
 ---

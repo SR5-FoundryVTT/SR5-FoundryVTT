@@ -48,7 +48,7 @@ export class SkillsPrep {
     /**
      * Prepare actor data for skills
      */
-    static prepareSkills(system: Actor.SystemOfType<'character' | 'critter' | 'ic' | 'spirit' | 'sprite' | 'vehicle'>) {
+    static prepareSkills(system: Actor.SystemOfType<'character' | 'ic' | 'spirit' | 'sprite' | 'vehicle'>) {
         const { language, active, knowledge } = system.skills;
 
         this.prepareActiveSkills(active);

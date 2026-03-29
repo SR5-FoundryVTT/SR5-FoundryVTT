@@ -12,7 +12,6 @@ import { Track } from "../types/template/ConditionMonitors";
 import { RangeData, RangeWeaponData, Weapon } from "../types/item/Weapon";
 
 import { Character } from "../types/actor/Character";
-import { Critter } from "../types/actor/Critter";
 import { IC } from "../types/actor/IC";
 import { Spirit } from "../types/actor/Spirit";
 import { Sprite } from "../types/actor/Sprite";
@@ -49,7 +48,6 @@ const { SchemaField } = foundry.data.fields;
 
 const systemMap = {
     character: Character,
-    critter: Critter,
     ic: IC,
     spirit: Spirit,
     sprite: Sprite,

@@ -1,7 +1,7 @@
 import { PartsList } from "@/module/parts/PartsList";
 
 export class MovementPrep {
-    static prepareMovement(system: Actor.SystemOfType<'character' | 'critter' | 'spirit'>) {
+    static prepareMovement(system: Actor.SystemOfType<'character' | 'spirit'>) {
         const { attributes, modifiers } = system;
 
         const movement = system.movement;

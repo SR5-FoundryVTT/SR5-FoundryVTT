@@ -35,7 +35,7 @@ export class SpiritImporter {
         );
         spirit.system.attributes.edge.base = Number(edgeAttribute?.total) || 0;
         const magic = Number(chummerData.attributes[1]?.attribute.find(att => att.name_english.toLowerCase() === 'mag')!.total);
-        spirit.system.force = magic;
+        spirit.system.attributes.force.base = magic;
 
         const consoleLogs = Sanitizer.sanitize(CONFIG.Actor.dataModels.spirit.schema, spirit.system);
         if (consoleLogs) {

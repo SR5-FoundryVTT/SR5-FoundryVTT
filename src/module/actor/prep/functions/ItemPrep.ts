@@ -9,7 +9,7 @@ export class ItemPrep {
      * - will only allow one "Base" armor item to be used (automatically takes the best one if multiple are equipped)
      * - all "accessories" will be added to the armor
      */
-    static prepareArmor(system: Actor.SystemOfType<'character' | 'critter' | 'spirit' | 'vehicle'>, items: SR5Item[]) {
+    static prepareArmor(system: Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>, items: SR5Item[]) {
         const { armor } = system;
         armor.base = 0;
         armor.value = 0;
@@ -44,5 +44,18 @@ export class ItemPrep {
             PartsList.addUniquePart(armor, game.i18n.localize('SR5.Bonus'), system.modifiers.armor);
 
         PartsList.calcTotal(armor);
+    }
+
+    /**
+     * Cleanup any lingering armor element values from _source
+     * 
+     * These values will be derived from:
+     * - ActiveEffect changes applied
+     * - equipped armor items and their elemental modifiers
+     */
+    static clearArmorElements(system: Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>) {
+        for (const element of Object.keys(SR5.elementTypes)) {
+            system.armor[element] = 0;
+        }
     }
 }

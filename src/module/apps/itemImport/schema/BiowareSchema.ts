@@ -2,7 +2,7 @@
 
 import { BonusSchema } from './BonusSchema';
 import { ConditionsSchema } from './ConditionsSchema';
-import { Empty, Many, IntegerString } from './Types';
+import { Empty, Many, OneOrMany, IntegerString } from './Types';
 
 export interface Bioware {
     addtoparentess?: Empty;
@@ -49,8 +49,9 @@ export interface Bioware {
     requireparent?: Empty;
     selectside?: Empty;
     source?: { _TEXT: IntegerString | "CF" | "DTR" | "HT" | "KC" | "NF" | "SR5"; };
-    translate?: { _TEXT: string; };
-    altpage?: { _TEXT: string; };
+    translate?: OneOrMany<{ _TEXT: string; }>;
+    altpage?: OneOrMany<{ _TEXT: string; }>;
+    altnameonpage?: OneOrMany<Empty>;
 };
 
 export interface Grade {
@@ -62,8 +63,9 @@ export interface Grade {
     name: { _TEXT: string; };
     page?: { _TEXT: IntegerString; };
     source?: { _TEXT: "CF" | "SG" | "SR5"; };
-    translate?: { _TEXT: string; };
-    altpage?: { _TEXT: string; };
+    translate?: OneOrMany<{ _TEXT: string; }>;
+    altpage?: OneOrMany<{ _TEXT: string; }>;
+    altnameonpage?: OneOrMany<Empty>;
 };
 
 export interface BiowareSchema {
