@@ -41,14 +41,18 @@ export class SituationModifierEffectsFlow<T extends SituationModifier> {
             // Special case for modifier effects: Some only apply to tests of their parent item.
             if (effect.system.onlyForItemTest && (test === undefined || effect.parent !== test?.item)) continue;
 
-            changes.push(...effect.changes.map(change => {
+            const effectChanges = effect.system?.changes ?? effect.changes ?? [];
+            changes.push(...effectChanges.map(change => {
                 const c = foundry.utils.deepClone(change) as any;
                 c.effect = effect;
+                // TODO: fvtt - v14 - Issues with typing in v13 - need to cast to unknown first to avoid type errors.
+                SR5ActiveEffect.alterChange(this.modifier as unknown as foundry.abstract.DataModel.Any, c);
+                c.priority = SR5ActiveEffect.getChangePriority(c);
                 return c;
             }));
         }
 
-        changes.sort((a, b) => a.priority - b.priority);
+        changes.sort((a, b) => Number(a.priority ?? 0) - Number(b.priority ?? 0));
 
         console.debug('Shadowrun 5e | Applying Situation Modifier Effect changes', changes);
         for (const change of changes) {

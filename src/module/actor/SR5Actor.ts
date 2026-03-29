@@ -38,6 +38,7 @@ import { Migrator } from '../migrator/Migrator';
 import { OverwatchStorage } from '../storage/OverwatchStorage';
 import { SuccessTest } from '../tests/SuccessTest';
 import { DamageApplicationFlow } from './flows/DamageApplicationFlow';
+import { ModifiableField } from '../types/fields/ModifiableField';
 import { MatrixNetworkFlow } from '../item/flows/MatrixNetworkFlow';
 import { ActorMarksFlow } from './flows/ActorMarksFlow';
 import { SetMarksOptions } from '../storage/MarksStorage';
@@ -170,17 +171,100 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Should some ActiveEffects need to be excluded from the general application, do so here.
+     * @param {string} phase The application phase under which changes are to be applied.
      * @override
      */
-    override applyActiveEffects() {
+    override applyActiveEffects(phase?: string) {
         // Shadowrun uses prepareDerivedData to calculate lots of things that don't exist on the data model in full.
         // Errors during change application will stop that process and cause a broken sheet.
         try {
-            super.applyActiveEffects();
+            // TODO: tamif - v14 - this whole implementation 1. shouln't live here and 2. is horrible
+            const actorWithV14State = this as unknown as SR5Actor & {
+                _completedActiveEffectPhases: Set<string>;
+                tokenActiveEffectChanges: Record<string, ActiveEffect.ChangeData[]>;
+            };
+            const ActiveEffectImplementation = foundry.documents.ActiveEffect.implementation as any;
+
+            if (typeof phase !== 'string') {
+                phase = actorWithV14State._completedActiveEffectPhases.has('initial') ? 'final' : 'initial';
+                const message = 'Actor#applyActiveEffects must be called with a string phase identifier, with "initial" as the first phase.';
+                foundry.utils.logCompatibilityWarning(message, { since: 14, until: 16, once: true });
+            } else if (!(phase in ActiveEffectImplementation.CHANGE_PHASES)) {
+                const error = new Error(`"${phase}" is not a registered ActiveEffect application phase.`);
+                Hooks.onError('Actor#applyActiveEffects', error, { log: 'error' });
+            }
+
+            if (actorWithV14State._completedActiveEffectPhases.has(phase)) {
+                const error = new Error(`ActiveEffect application phase "${phase}" has already completed and cannot be run again in this Actor's data-preparation cycle.`);
+                Hooks.onError('Actor#applyActiveEffects', error, { log: 'error' });
+                return;
+            }
+
+            actorWithV14State._completedActiveEffectPhases.add(phase);
+
+            const changes: ActiveEffect.ChangeData[] = [];
+            const tokenChanges: ActiveEffect.ChangeData[] = [];
+
+            for (const effect of this.allApplicableEffects()) {
+                if (!effect.active) continue;
+
+                for (const change of effect.system.changes) {
+                    if ((change.key === '') || (change.phase !== phase)) continue;
+
+                    const copy = foundry.utils.deepClone(change) as unknown as ActiveEffect.ChangeData & { type?: string };
+                    copy.effect = effect;
+
+                    // TODO: tamif - v14 - shouldn't this be removed? What is the point?
+                    const source = CONFIG.ActiveEffect.legacyTransferral ? effect.source : effect.parent;
+
+                    SR5ActiveEffect.alterChange(this, copy);
+                    SR5ActiveEffect.resolveDynamicChangeValue(source, copy);
+
+                    // TODO: tamif - v14 - what is the point?
+                    copy.priority ??= ActiveEffectImplementation.CHANGE_TYPES[copy.type ?? 'custom']?.defaultPriority ?? 0;
+
+                    if (copy.key?.startsWith('token.')) {
+                        copy.key = copy.key.slice(6);
+                        tokenChanges.push(copy);
+                    } else {
+                        changes.push(copy);
+                    }
+                }
+
+                if (phase === 'initial') {
+                    for (const statusId of effect.statuses) this.statuses.add(statusId);
+                }
+            }
+
+            changes.sort((left, right) => Number(left.priority ?? 0) - Number(right.priority ?? 0));
+            ActiveEffectImplementation._shimChanges(changes);
+            actorWithV14State.tokenActiveEffectChanges[phase] = tokenChanges;
+
+            const overrides = {};
+            // TODO: tamif - v14 - getRollData here seems like a weird decision...
+            // const replacementData = this.getRollData();
+            // NOTE: SR5e copies system data for pre-test modification, so we can use the default Foundry beahvior, of simply returning system data.
+            const replacementData = this.system;
+            // TODO: fvtt - v14 - shim v14 actor methods. Should be moved to global actor types.
+            // TODO: fvtt - v13 - breaking change.
+            const actorFieldGetter = this as unknown as { getFieldForProperty: (path: string) => unknown };
+            const systemFieldGetter = this.system as unknown as { getFieldForProperty: (path: string) => unknown };
+            for (const change of changes) {
+                // Redirect change from Field to actor.
+                const field = change.key.startsWith('system.')
+                    ? systemFieldGetter.getFieldForProperty(change.key.slice(7))
+                    : actorFieldGetter.getFieldForProperty(change.key);
+                const modifyTarget = !(field instanceof ModifiableField);
+
+                const result = ActiveEffectImplementation.applyChange(this, change, { replacementData, modifyTarget });
+                if (modifyTarget && foundry.utils.getType(result) === 'Object') Object.assign(overrides, result);
+            }
+
+            foundry.utils.mergeObject(this.overrides, foundry.utils.expandObject(overrides));
         } catch (error) {
             console.error(`Shadowrun5e | Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.id})`);
             console.error(error);
-            ui.notifications?.error(`See browser console (F12): Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.id})`);
+            ui.notifications?.error(`See browser console (F12): Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.uuid})`);
         }
     }
 
@@ -277,92 +361,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             items.push(item);
             this.itemsForType.set(item.type, items);
         }
-    }
-
-    /**
-     * NOTE: This method is unused at the moment, keep it for future inspiration.
-     */
-    applyOverrideActiveEffects() {
-        const changes = this.effects.reduce((changes: AEChangeData[], effect) => {
-            if (effect.disabled) return changes;
-
-            // include changes partially matching given keys.
-            const overrideChanges = effect.changes
-                .filter(change => change.mode === CONST.ACTIVE_EFFECT_MODES.OVERRIDE)
-                .map(origChange => {
-                    const change: AEChangeData = {
-                        key: String(origChange.key),
-                        value: String(origChange.value),
-                        mode: Number(origChange.mode) as CONST.ACTIVE_EFFECT_MODES,
-                        priority: Number(origChange.priority ?? (Number(origChange.mode) * 10)),
-                        effect: effect,
-                    };
-                    return change;
-                });
-            return changes.concat(overrideChanges);
-        }, []);
-        // Sort changes according to priority, in case it's ever needed.
-        changes.sort((a, b) => a.priority! - b.priority!);
-
-        for (const change of changes) {
-            change.effect.apply(this, change);
-        }
-    }
-
-    /**
-     * A helper method to only apply a subset of keys instead of all.
-     * @param partialKeys Can either be complete keys or partial keys
-     */
-    _applySomeActiveEffects(partialKeys: string[]) {
-        const changes = this._reduceEffectChangesByKeys(partialKeys);
-        this._applyActiveEffectChanges(changes);
-    }
-
-
-    /**
-     * A helper method to apply a active effect changes collection (which might come from multiple active effects)
-     * @param changes
-     */
-    _applyActiveEffectChanges(changes: AEChangeData[]) {
-        const overrides = {};
-
-        for (const change of changes) {
-            const result = change.effect.apply(this, change);
-            if (result !== null) overrides[change.key] = result;
-        }
-
-        this.overrides = {...this.overrides, ...foundry.utils.expandObject(overrides)};
-    }
-
-    /**
-     * Reduce all changes across multiple active effects that match the given set of partial keys
-     * @param partialKeys Can either be complete keys or partial keys
-     */
-    _reduceEffectChangesByKeys(partialKeys: string[]): AEChangeData[] {
-        // Collect only those changes matching the given partial keys.
-        const changes = this.effects.reduce((changes: AEChangeData[], effect) => {
-            if (effect.disabled) return changes;
-
-            // include changes partially matching given keys.
-            const overrideChanges = effect.changes
-                .filter(change => partialKeys.some(partialKey => change.key.includes(partialKey)))
-                .map(origChange => {
-                    const change: AEChangeData = {
-                        key: String(origChange.key),
-                        value: String(origChange.value),
-                        mode: Number(origChange.mode) as CONST.ACTIVE_EFFECT_MODES,
-                        priority: Number(origChange.priority ?? (Number(origChange.mode) * 10)),
-                        effect: effect
-                    };
-                    return change;
-                });
-
-            return changes.concat(overrideChanges);
-        }, []);
-        // Sort changes according to priority, in case it's ever needed.
-        changes.sort((a, b) => a.priority! - b.priority!);
-
-        return changes;
     }
 
     /**

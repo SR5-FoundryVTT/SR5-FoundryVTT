@@ -3,7 +3,15 @@ import { TagifyField } from '@/module/types/fields/TagifyField';
 
 const { SchemaField, BooleanField, StringField } = foundry.data.fields;
 
-const ActiveEffectData = {
+type ActiveEffectChangeSchema = {
+    key: foundry.data.fields.StringField;
+    type: foundry.data.fields.StringField;
+    value: foundry.data.fields.AnyField;
+    phase: foundry.data.fields.StringField;
+    priority: foundry.data.fields.NumberField;
+};
+
+const SR5ActiveEffectData = {
     applyTo: new StringField({
         required: true,
         initial: 'actor',
@@ -47,9 +55,23 @@ const ActiveEffectData = {
     ),
 }
 
-export class ActiveEffectDM extends foundry.abstract.TypeDataModel<typeof ActiveEffectData, ActiveEffect.Implementation> {
-    static override defineSchema() {
-        return ActiveEffectData;
+// TODO: fvtt - v14 - Extend V14 datamodel with v13 types.
+type SR5ActiveEffectSchema = typeof SR5ActiveEffectData & {
+    changes: foundry.data.fields.ArrayField<foundry.data.fields.SchemaField<ActiveEffectChangeSchema>>;
+};
+const foundryRuntime = Reflect.get(globalThis as object, 'foundry') as { data: object };
+const FoundryActiveEffectTypeDataModel = Reflect.get(
+    foundryRuntime.data,
+    'ActiveEffectTypeDataModel'
+) as typeof foundry.abstract.TypeDataModel<SR5ActiveEffectSchema, never>;
+
+export class ActiveEffectDM extends FoundryActiveEffectTypeDataModel {
+    static override defineSchema(): SR5ActiveEffectSchema {
+        const baseSchema = FoundryActiveEffectTypeDataModel.defineSchema() as SR5ActiveEffectSchema;
+        return {
+            ...baseSchema,
+            ...SR5ActiveEffectData,
+        };
     }
 
     static override LOCALIZATION_PREFIXES = ["SR5.ActiveEffect"];

@@ -4,6 +4,15 @@ import { BonusSchema } from "../schema/BonusSchema";
 import { ImportHelper as IH } from "./ImportHelper";
 
 export class BonusHelper {
+    private static readonly modeToType = {
+        [CONST.ACTIVE_EFFECT_MODES.CUSTOM]: 'custom',
+        [CONST.ACTIVE_EFFECT_MODES.MULTIPLY]: 'multiply',
+        [CONST.ACTIVE_EFFECT_MODES.ADD]: 'add',
+        [CONST.ACTIVE_EFFECT_MODES.DOWNGRADE]: 'downgrade',
+        [CONST.ACTIVE_EFFECT_MODES.UPGRADE]: 'upgrade',
+        [CONST.ACTIVE_EFFECT_MODES.OVERRIDE]: 'override',
+    } as const;
+
     private static isTrue(value: "" | { _TEXT: string }): boolean {
         return value === "" || value._TEXT === "True";
     }
@@ -41,17 +50,28 @@ export class BonusHelper {
         sheet: BC.DocCreateData,
         effect: BC.AECreateData
     ): void {
-        const changes = IH.getArray(effect.changes);
-
-        for (const change of changes) {
+        const changes = IH.getArray(effect.changes).map(change => {
             change.value = this.normalizeValue(sheet, change.value);
-            if (!change.mode) change.mode = BC.MODIFY;
-        }
+
+            const mode = change.mode ?? BC.MODIFY;
+            change.type = this.modeToType[mode] ?? `custom.${mode}`;
+            delete change.mode;
+
+            return change;
+        });
+
+        const effectData = foundry.utils.deepClone(effect);
+        const effectSystem = (effectData.system ?? {}) as Record<string, unknown>;
+        effectData.system = {
+            ...effectSystem,
+            changes,
+        };
+        delete effectData.changes;
 
         sheet.effects!.push({
             name: sheet.name,
             img: sheet.img,
-            ...effect,
+            ...effectData,
         });
     }
 

@@ -44,6 +44,8 @@ type SR5ActiveEffectSheetData = ActiveEffectConfig.RenderContext & {
     selection_limit_options: TagifyValues;
 
     applyToOptions: ApplyToOptions;
+    changeTypePriorities: Record<string, number>;
+    changeTypes: Record<string, string>;
     isv11: boolean;
     system: ActiveEffectDM;
     systemFields: typeof ActiveEffectDM.schema.fields;
@@ -101,9 +103,29 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     override async _preparePartContext(partId, context, options) {
        const data = await super._preparePartContext(partId, context, options) as any;
 
-       // if the part is the "changes" tab, override the modes to use "Modify" instead of "Custom"
        if (partId === 'changes') {
-           data.modes = this.applyModifyLabelToCustomMode(data.modes);
+           const activeEffectChangeTypes = (ActiveEffect as any).CHANGE_TYPES as Record<string, { label: string, defaultPriority?: number }>;
+           const orderedTypes = ['custom', 'add', 'subtract', 'multiply', 'override', 'upgrade', 'downgrade'];
+           const changeTypes = Object.entries(activeEffectChangeTypes)
+               .map(([type, { label }]) => ({ type, label: game.i18n.localize(label) }))
+               .sort((left, right) => {
+                   const leftIndex = orderedTypes.indexOf(left.type);
+                   const rightIndex = orderedTypes.indexOf(right.type);
+                   const normalizedLeft = leftIndex === -1 ? Number.MAX_SAFE_INTEGER : leftIndex;
+                   const normalizedRight = rightIndex === -1 ? Number.MAX_SAFE_INTEGER : rightIndex;
+                   if (normalizedLeft !== normalizedRight) return normalizedLeft - normalizedRight;
+                   return left.label.localeCompare(right.label, game.i18n.lang);
+               })
+               .reduce((types, { type, label }) => {
+                   types[type] = label;
+                   return types;
+               }, {} as Record<string, string>);
+
+           data.changeTypes = this.applyModifyLabelToCustomMode(changeTypes);
+           data.changeTypePriorities = Object.entries(activeEffectChangeTypes).reduce((priorities, [type, config]) => {
+               priorities[type] = config.defaultPriority ?? 0;
+               return priorities;
+           }, {} as Record<string, number>);
        }
 
        return data;
@@ -169,8 +191,8 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         }
 
         // disable and set tooltips on the priority inputs since we don't currently support changing it
-        for (let i = 0; i < this.document.changes.length; i++) {
-            const input = this.element.querySelector<HTMLInputElement>(`input[name="changes.${i}.priority"]`);
+        for (let i = 0; i < this.document.system.changes.length; i++) {
+            const input = this.element.querySelector<HTMLInputElement>(`input[name="system.changes.${i}.priority"]`);
             if (input) {
                 input.setAttribute('disabled', 'true');
                 input.setAttribute('data-tooltip', 'SR5.Tooltips.Effect.PriorityFieldDisabled');
@@ -203,9 +225,12 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     static async #onAddChange(this: any, event: PointerEvent, target: HTMLElement) {
         if (this.form) {
             const submitData = this._processFormData(null, this.form, new FormDataExtended(this.form));
-            const changes = Object.values(submitData.changes ?? {});
-            changes.push({ mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM });
-            return this.submit({updateData: {changes}});
+            const changes = Object.values(submitData.system?.changes ?? {});
+            changes.push({
+                ...this.document.system.schema.fields.changes.element.getInitialValue(),
+                type: 'custom',
+            });
+            return this.submit({updateData: {system: {changes}}});
         }
     }
 
@@ -239,8 +264,8 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
      * @param modes A object prepared for display using Foundry select handlebarjs helper.
      * @returns Copy of the original modes and labels.
      */
-    applyModifyLabelToCustomMode(modes: Record<number, string>): Record<number, string> {
-        return { ...modes, 0: game.i18n.localize('SR5.ActiveEffect.Modes.Modify') };
+    applyModifyLabelToCustomMode(changeTypes: Record<string, string>): Record<string, string> {
+        return { ...changeTypes, custom: game.i18n.localize('SR5.ActiveEffect.Modes.Modify') };
     }
 
     /**
@@ -271,7 +296,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
      * @returns true if changes are present, false otherwise.
      */
     get hasChanges(): boolean {
-        return this.document.changes.length > 0;
+        return this.document.system.changes.length > 0;
     }
 
 

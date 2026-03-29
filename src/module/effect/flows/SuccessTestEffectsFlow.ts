@@ -44,19 +44,21 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
             if (this._skipEffectForTestLimitations(effect)) continue;
 
             // Collect all changes of effect left.
-            changes.push(...effect.changes.map(change => {
+            const effectChanges = effect.system?.changes ?? effect.changes ?? [];
+            changes.push(...effectChanges.map(change => {
                 const c = foundry.utils.deepClone(change) as any;
                 // Foundry changes data. references in changes to system. But tests use data.
-                c.key = c.key.replace('system.', 'data.');
+                c.key = c.key.replace(/^system\./, 'data.');
                 c.effect = effect;
-                c.priority = c.priority ?? (c.mode * 10);
+                SR5ActiveEffect.alterChange(this.test as unknown as foundry.abstract.DataModel.Any, c);
+                c.priority = SR5ActiveEffect.getChangePriority(c);
                 return c;
             }));
             // TODO: What's with the statuses?
             // for (const statusId of effect.statuses) this.statuses.add(statusId);
         }
 
-        changes.sort((a, b) => a.priority - b.priority);
+        changes.sort((a, b) => Number(a.priority ?? 0) - Number(b.priority ?? 0));
 
         // Apply all changes
         for (const change of changes) {
@@ -137,7 +139,9 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         // Inject a flag to mark the effect as applied by a test.
         // This is necessary so we can differentiate between effects created and applied.
         for (const effectData of effectsData) {
-            effectData['flags.shadowrun5e.appliedByTest'] = true;
+            const preparedEffectData = effectData as any;
+            preparedEffectData.system ??= {};
+            preparedEffectData.system.appliedByTest = true;
         }
 
         if (!game.user?.isGM) {
@@ -152,29 +156,29 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         if (actor === undefined || this.test.item === undefined) return;
 
-            const effectsData: SR5ActiveEffect[] = [];
-            for (const effect of allApplicableDocumentEffects(this.test.item, { applyTo: ['targeted_actor'] })) {
-                const effectData = effect.toObject() as unknown as SR5ActiveEffect;
-
-                // Transform all dynamic values to static values.
-                effectData.changes = effectData.changes.map(change => {
-                    SR5ActiveEffect.resolveDynamicChangeValue(this.test, change as ActiveEffect.ChangeData);
-                    return change;
-                });
-
-                effectsData.push(effectData);
-            }
-
-        for (const effect of allApplicableItemsEffects(this.test.item, { applyTo: ['targeted_actor'], nestedItems: false })) {
-            const effectData = effect.toObject() as unknown as SR5ActiveEffect;
+        const normalizeEffectData = (effect: SR5ActiveEffect) => {
+            const sourceData = effect.toObject() as any;
+            const { changes: _legacyChanges, ...effectData } = sourceData;
+            const changes = sourceData.system?.changes ?? sourceData.changes ?? [];
 
             // Transform all dynamic values to static values.
-            effectData.changes = effectData.changes.map(change => {
-                SR5ActiveEffect.resolveDynamicChangeValue(this.test, change as ActiveEffect.ChangeData);
-                return change;
+            effectData.system ??= {};
+            effectData.system.changes = changes.map(change => {
+                const preparedChange = foundry.utils.deepClone(change) as ActiveEffect.ChangeData;
+                SR5ActiveEffect.resolveDynamicChangeValue(this.test, preparedChange);
+                return preparedChange;
             });
 
-            effectsData.push(effectData);
+            return effectData;
+        };
+
+        const effectsData: any[] = [];
+        for (const effect of allApplicableDocumentEffects(this.test.item, { applyTo: ['targeted_actor'] })) {
+            effectsData.push(normalizeEffectData(effect));
+        }
+
+        for (const effect of allApplicableItemsEffects(this.test.item, { applyTo: ['targeted_actor'], nestedItems: false })) {
+            effectsData.push(normalizeEffectData(effect));
         }
 
         console.debug(`Shadowrun5e | To be created effects on target actor ${actor.name}`, effectsData);

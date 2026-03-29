@@ -24,14 +24,23 @@ export class Version0_31_5 extends VersionMigration {
     }
 
     override handlesActiveEffect(effect: Readonly<any>) {
-        return effect.changes.filter(change => change.key === 'system.force').length > 0;
+        const changes = effect.system?.changes ?? effect.changes ?? [];
+        return changes.filter(change => change.key === 'system.force').length > 0;
     }
 
     override migrateActiveEffect(effect: any) {
-        for (const change of effect.changes) {
+        const changes = effect.system?.changes ?? effect.changes ?? [];
+
+        for (const change of changes) {
             if (change.key === 'system.force') {
                 change.key = 'system.attributes.force';
             }
+        }
+
+        if (effect.system?.changes === undefined && changes.length > 0) {
+            effect.system ??= {};
+            effect.system.changes = changes;
+            delete effect.changes;
         }
     }
 }
