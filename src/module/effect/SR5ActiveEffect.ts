@@ -25,13 +25,15 @@ export class SR5ActiveEffect extends ActiveEffect<'base'> {
     // These change types should trigger a change key redirect to a ModifiableValue before applied.
     static readonly redirectTypes = ['custom', 'add', 'override', 'upgrade', 'downgrade'];
 
+    // TODO: tamif - v14 - check if these legacy mappings can be removed entirely.
+    // using mode integer to avoid deprecation warnings.
     static readonly legacyModeTypes: Record<number, string> = {
-        [CONST.ACTIVE_EFFECT_MODES.CUSTOM]: 'custom',
-        [CONST.ACTIVE_EFFECT_MODES.MULTIPLY]: 'multiply',
-        [CONST.ACTIVE_EFFECT_MODES.ADD]: 'add',
-        [CONST.ACTIVE_EFFECT_MODES.DOWNGRADE]: 'downgrade',
-        [CONST.ACTIVE_EFFECT_MODES.UPGRADE]: 'upgrade',
-        [CONST.ACTIVE_EFFECT_MODES.OVERRIDE]: 'override'
+        0: 'custom',
+        1: 'multiply',
+        2: 'add',
+        3: 'downgrade',
+        4: 'upgrade',
+        5: 'override'
     };
 
     static getChangeType(change: ActiveEffect.ChangeData): string {

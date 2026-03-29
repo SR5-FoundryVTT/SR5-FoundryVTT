@@ -4,15 +4,6 @@ import { BonusSchema } from "../schema/BonusSchema";
 import { ImportHelper as IH } from "./ImportHelper";
 
 export class BonusHelper {
-    private static readonly modeToType = {
-        [CONST.ACTIVE_EFFECT_MODES.CUSTOM]: 'custom',
-        [CONST.ACTIVE_EFFECT_MODES.MULTIPLY]: 'multiply',
-        [CONST.ACTIVE_EFFECT_MODES.ADD]: 'add',
-        [CONST.ACTIVE_EFFECT_MODES.DOWNGRADE]: 'downgrade',
-        [CONST.ACTIVE_EFFECT_MODES.UPGRADE]: 'upgrade',
-        [CONST.ACTIVE_EFFECT_MODES.OVERRIDE]: 'override',
-    } as const;
-
     private static isTrue(value: "" | { _TEXT: string }): boolean {
         return value === "" || value._TEXT === "True";
     }
@@ -52,10 +43,7 @@ export class BonusHelper {
     ): void {
         const changes = IH.getArray(effect.changes).map(change => {
             change.value = this.normalizeValue(sheet, change.value);
-
-            const mode = change.mode ?? BC.MODIFY;
-            change.type = this.modeToType[mode] ?? `custom.${mode}`;
-            delete change.mode;
+            change.type ??= BC.MODIFY;
 
             return change;
         });
@@ -98,7 +86,7 @@ export class BonusHelper {
             if (cm.overflow) {
                 this.createEffect(
                     sheet, {
-                        changes: [{ key: "system.modifiers.physical_overflow_track", value: cm.overflow._TEXT, mode: BC.OVERRIDE }]
+                        changes: [{ key: "system.modifiers.physical_overflow_track", value: cm.overflow._TEXT, type: BC.OVERRIDE }]
                     },
                 );
             }
@@ -106,7 +94,7 @@ export class BonusHelper {
             if (cm.physical) {
                 this.createEffect(
                     sheet, {
-                        changes: [{ key: "system.modifiers.physical_track", value: cm.physical._TEXT, mode: BC.OVERRIDE }]
+                        changes: [{ key: "system.modifiers.physical_track", value: cm.physical._TEXT, type: BC.OVERRIDE }]
                     },
                 );
             }
@@ -114,7 +102,7 @@ export class BonusHelper {
             if (cm.stun) {
                 this.createEffect(
                     sheet, {
-                        changes: [{ key: "system.modifiers.stun_track", value: cm.stun._TEXT, mode: BC.OVERRIDE }]
+                        changes: [{ key: "system.modifiers.stun_track", value: cm.stun._TEXT, type: BC.OVERRIDE }]
                     }
                 );
             }
