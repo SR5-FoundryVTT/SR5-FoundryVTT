@@ -41,7 +41,7 @@ export class TestDialog extends FormDialog {
 
         const hasModifierChanges = (changes) => {
             if (!Array.isArray(changes)) return false;
-            return changes.some(change => PartsList.isBaseChange(change));
+            return changes.some(change => !PartsList.isBaseChange(change));
         }
 
         if (hasModifierChanges(data?.test?.pool?.changes))

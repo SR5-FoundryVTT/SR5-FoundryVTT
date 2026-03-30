@@ -1,12 +1,23 @@
 <div
-    class="form-group modifiable-value {{#if (includes @root.expandedPaths path)}}expanded{{else}}{{/if}}"
+    class="form-group modifiable-value
+    {{#if (hasModifierChanges data.changes)}}has-modifiers{{/if}}
+    {{#if (includes @root.expandedPaths path)}}expanded{{else}}{{/if}}"
     data-path="{{path}}"
 >
     <label data-tooltip="{{tooltip}}">{{localize label}}</label>
 
     <div class="form-fields">
-        <input type="number" name="{{path}}" value="{{data.value}}" size="3" maxlength="3" data-dtype="Number"/>
+        {{#if (hasModifierChanges data.changes)}}
+        <span
+            class="modifier-summary {{modifierSummaryClass data}}"
+            data-tooltip="{{modifierSummaryTooltip data.changes}}"
+        >
+            <span class="summary-total">{{modifierNetTotal data}}</span>
+            <span class="summary-count">{{modifierActiveCount data.changes}}/{{modifierCount data.changes}}</span>
+        </span>
+        {{/if}}
 
+        <input type="number" name="{{path}}" value="{{data.value}}" size="3" maxlength="3" data-dtype="Number"/>
         <a class="toggle-breakdown {{#unless (hasModifierChanges data.changes)}}disabled{{/unless}}" title="{{localize 'SR5.ToggleBreakdown'}}">
             <i class="fas fa-chevron-up"></i>
         </a>

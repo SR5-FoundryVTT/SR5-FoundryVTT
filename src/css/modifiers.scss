@@ -94,6 +94,13 @@
     margin-bottom: 5px;
     position: relative;
 
+    &.has-modifiers {
+        padding-left: 6px;
+        border-left: 3px solid rgba(120, 120, 120, 0.45);
+        background: linear-gradient(90deg, rgba(120, 120, 120, 0.1), rgba(120, 120, 120, 0.02));
+        border-radius: 3px;
+    }
+
     > label {
         flex: 1 1 auto;
         font-weight: bold;
@@ -107,6 +114,48 @@
         display: flex;
         align-items: center;
         gap: 5px;
+
+        .modifier-summary {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 22px;
+            padding: 0 8px;
+            border-radius: 999px;
+            border: 1px solid #9b9b9b;
+            background: rgba(255, 255, 255, 0.72);
+            color: #444;
+            font-size: 0.78em;
+            font-weight: 700;
+
+            .summary-total {
+                min-width: 20px;
+                text-align: right;
+            }
+
+            .summary-count {
+                color: #666;
+                font-size: 0.92em;
+            }
+
+            &.positive {
+                border-color: #3a7e3f;
+                background: rgba(58, 126, 63, 0.16);
+                color: #1d5d22;
+            }
+
+            &.negative {
+                border-color: #8c3d3d;
+                background: rgba(140, 61, 61, 0.16);
+                color: #712727;
+            }
+
+            &.neutral {
+                border-color: #777;
+                background: rgba(120, 120, 120, 0.14);
+                color: #444;
+            }
+        }
 
         input[type="number"] {
             width: 50px;
@@ -155,9 +204,10 @@
         list-style: none;
         margin: 5px 0 0 0;
         padding: 8px;
-        border: 1px solid var(--color-border-light-tertiary, #ccc);
+        border: none;
         border-radius: 3px;
-        background: rgba(0,0,0,0.03);
+        background: rgba(0, 0, 0, 0.03);
+        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
         gap: 4px;
         flex-direction: column;
 
@@ -175,7 +225,7 @@
             align-items: center;
             gap: 5px;
             padding: 3px 0;
-            border-bottom: 1px dashed var(--color-border-light-tertiary, #ddd);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 
             &:last-child {
                 border-bottom: none;
