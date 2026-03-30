@@ -962,7 +962,7 @@ export class Helpers {
     }
 
     /**
-     * Translates a skillId
+     * Translates a skill name
      * @param skill
      * @returns translation
      */

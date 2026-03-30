@@ -79,8 +79,8 @@ export class SpritePrep {
 
         // apply skill levels
         // clear skills that we don't have
-        for (const [skillId, skill] of Object.entries(skills.active)) {
-            skill.base = overrides.skills.find((s) => s === skillId) ? level : 0;
+        for (const [key, skill] of Object.entries(skills.active)) {
+            skill.base = overrides.skills.find((overrideKey) => overrideKey === key) ? level : 0;
         }
     }
 

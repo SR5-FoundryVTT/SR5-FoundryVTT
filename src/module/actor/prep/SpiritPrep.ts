@@ -61,16 +61,14 @@ export class SpiritPrep {
             }
 
             // set the base of skills to the provided force
-            for (const skillId of overrides.skills) {
-                // Custom skills need to be created on the actor.
-                // const skill = SpiritPrep.prepareActiveSkill(skillId, skills.active);
-                const skill = skills.active[skillId];
+            for (const skillKey of overrides.skills) {
+                const skill = skills.active[skillKey];
                 if (!skill) {
-                    console.error(`Shadowrun 5e | Spirit Prep: Skill ${skillId} not found on spirit actor.`);
+                    console.error(`Shadowrun 5e | Spirit Prep: Skill ${skillKey} not found on spirit actor.`);
                     continue;
                 }
 
-                // NOTE: We apply force as a modifier instead of base to make the caluclation transparent.
+                // NOTE: We apply force as a modifier instead of base to make the calculation transparent.
                 //       Also, adding force as the skill item rating, would make updating and creating spirits
                 //       more complex.
                 const modifier = overrides.halfValueSkill ? Math.ceil(force / 2) : force;
