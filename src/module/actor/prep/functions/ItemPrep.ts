@@ -1,5 +1,4 @@
 import { SR5 } from "../../../config";
-import { Helpers } from '../../../helpers';
 import { SR5Item } from 'src/module/item/SR5Item';
 import { PartsList } from '@/module/parts/PartsList';
 
@@ -13,10 +12,6 @@ export class ItemPrep {
         const { armor } = system;
         armor.base = 0;
         armor.value = 0;
-
-        for (const element of Object.keys(SR5.elementTypes)) {
-            armor[element] = 0;
-        }
 
         // NOTE: We retrieve different types of items, all containing armor data.
         const equippedArmor = items.filter((item) => item.hasArmor() && item.isEquipped()) as SR5Item<'armor'>[];
