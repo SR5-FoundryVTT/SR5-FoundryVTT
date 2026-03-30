@@ -19,9 +19,9 @@
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/item.hbs'
                 category='active'
                 skill=skill
-                translated=translated
             }}
         {{/each}}
+
         {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill-group/header.hbs' addAction='addItem' }}
         {{#each skillGroups as |group|}}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill-group/item.hbs' group=group }}

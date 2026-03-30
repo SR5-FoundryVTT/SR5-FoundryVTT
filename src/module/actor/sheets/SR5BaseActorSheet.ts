@@ -408,7 +408,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         this._prepareSkills(data);
         data.skillGroups = this._prepareSkillGroups();
-
         data.skillset = await this._prepareSkillset();
 
         data.itemType = this._prepareItemTypes();

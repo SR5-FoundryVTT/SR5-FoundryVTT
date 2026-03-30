@@ -4,15 +4,8 @@ import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
 import { ModifiableField } from "../fields/ModifiableField";
 import { Limits, AwakendLimits, MatrixLimits } from "../template/Limits";
-import { KnowledgeSkillList, KnowledgeSkills, NewSkills, Skills } from "../template/Skills";
+import { NewSkills } from "../template/Skills";
 const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField, DocumentUUIDField } = foundry.data.fields;
-
-export const CharacterSkills = () => ({
-    active: Skills(),
-    language: new SchemaField(KnowledgeSkillList('intuition')),
-    knowledge: new SchemaField(KnowledgeSkills()),
-});
-
 /**
  * Derived Data structure build from an actors skill items.
  */

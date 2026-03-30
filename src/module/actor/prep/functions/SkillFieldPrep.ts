@@ -2,13 +2,14 @@ import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/t
 import { SR5Item } from '@/module/item/SR5Item';
 import { DataDefaults } from '@/module/data/DataDefaults';
 import { SkillNamingFlow } from '../../../flows/SkillNamingFlow';
+import { SR5Actor } from '../../SR5Actor';
 
 /**
  * Builds and manages the actor-facing skill field structure derived from owned skill items.
  */
 export const SkillFieldPrep = {
     /**
-     * Prepare SkillField skills from Skill items. This is mainly intended for actor.system.skills storage
+     * Prepare SkillField skills from Skill items. This is intended for actor.system.skills storage
      * 
      * @param items Full list of skill items to transform.
      * @returns The transformed skills, grouped by categories.
@@ -34,14 +35,14 @@ export const SkillFieldPrep = {
 
             switch (item.system.skill.category) {
                 case 'active':
-                    SkillFieldPrep.addSkill(skills.active, skillField, key);
+                    SkillFieldPrep.addSkillField(skills.active, skillField, key, item.parent!);
                     break;
                 case 'language':
-                    SkillFieldPrep.addSkill(skills.language, skillField, key);
+                    SkillFieldPrep.addSkillField(skills.language, skillField, key, item.parent!);
                     break;
                 case 'knowledge':
                     const knowledgeType = item.system.skill.knowledgeType as KnowledgeSkillCategory;
-                    SkillFieldPrep.addSkill(skills.knowledge[knowledgeType], skillField, key);
+                    SkillFieldPrep.addSkillField(skills.knowledge[knowledgeType], skillField, key, item.parent!);
                     break;
             }
         }
@@ -59,6 +60,7 @@ export const SkillFieldPrep = {
 
             const skillField = DataDefaults.createData('skill_field', {
                 id: skill.id,
+                key,
                 name: skill.name,
                 img: hasCustomImage ? skill.img : '',
                 label: SkillNamingFlow.localizeSkillName(skill.name),
@@ -75,10 +77,26 @@ export const SkillFieldPrep = {
             return { key, skillField };
     },
 
-    addSkill(skills: Record<string, SkillFieldType>, skill: SkillFieldType, key: string) {
+    /**
+     * Add a single skill field into its category skill list.
+     * @param skills A single category skill list
+     * @param skill The skill field to add
+     * @param key The key for the skill field
+     * @param actor The actor owning the original skill item
+     */
+    addSkillField(skills: Record<string, SkillFieldType>, skill: SkillFieldType, key: string, actor: SR5Actor) {
+        // Alter key for duplicate skill names to avoid skills not showing on sheet.
         if (Object.hasOwn(skills, key)) {
-            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.SkillAlreadyExists'));
-            return;
+            ui.notifications?.warn(game.i18n.format('SR5.Warnings.SkillAlreadyExists', { name: skill.name, actorName: actor.name, actorUuid: actor.uuid }));
+
+            let i = 2;
+            let newKey = `${key}_${i}`;
+            while (Object.hasOwn(skills, newKey)) {
+                i++;
+                newKey = `${key}_${i}`;
+            }
+            key = newKey;
+            skill.key = newKey;
         }
 
         skills[key] = skill;
@@ -97,8 +115,7 @@ export const SkillFieldPrep = {
 
         const sortedSkillsObject = {};
         sortedSkills.forEach(skill => {
-            const key = SkillNamingFlow.nameToKey(skill.name);
-            sortedSkillsObject[key] = skill;
+            sortedSkillsObject[skill.key] = skill;
         });
 
         return sortedSkillsObject;

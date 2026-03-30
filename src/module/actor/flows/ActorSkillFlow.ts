@@ -20,7 +20,7 @@ export const ActorSkillFlow = {
 
         if (ActorSkillFlow.hasSkillOfSameNameAndCategory(actor, name, category)) {
             if (options.warnOnDuplicate) {
-                const message = game.i18n.format('SR5.Errors.SkillAlreadyExists', { name: item.name});
+                const message = game.i18n.format('SR5.Errors.SkillAlreadyExists', { name: item.name, actorName: actor.name, actorUuid: actor.uuid });
                 ui.notifications?.warn(message);
             }
             return;
