@@ -16,6 +16,10 @@ export class PartsList<Field extends ModifiableValueType = ModifiableValueType> 
         this._field = field;
     }
 
+    static isBaseChange(change: ModifiableValueType['changes'][number]): boolean {
+        return change.priority === -Infinity;
+    }
+
     private _markPreviousChangesMasked(currentIndex: number): void {
         for (let i = 0; i < currentIndex; i++) {
             if (!this._field.changes[i].applied) continue;

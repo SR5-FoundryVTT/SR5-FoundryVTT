@@ -187,7 +187,10 @@ export class WeaponRangeTestBehavior {
         modifiers.environmental.setActive('range', Number(range));
         modifiers.environmental.apply({reapply: true, test});
 
-        poolMods.addUniquePart(SR5.modifierTypes.environmental, modifiers.environmental.total);
+        if (modifiers.environmental.total !== 0)
+            poolMods.addUniquePart(SR5.modifierTypes.environmental, modifiers.environmental.total);
+        else
+            poolMods.removePart(SR5.modifierTypes.environmental);
     }
 
     static async processResults(test: WeaponRangeTest) {

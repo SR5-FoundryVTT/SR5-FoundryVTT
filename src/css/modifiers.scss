@@ -143,6 +143,10 @@
                 color: #555;
             }
         }
+
+        .fa-chevron-up {
+            transform: rotate(-180deg);
+        }
     }
 
     .breakdown-list {
@@ -215,7 +219,7 @@
 
         .toggle-breakdown {
             .fa-chevron-up { 
-                transform: rotate(-180deg); 
+                transform: rotate(0deg); 
             }
         }
     }

@@ -1,3 +1,4 @@
+import { PartsList } from '../parts/PartsList';
 import { ModifiableValueType } from '../types/template/Base';
 type ChangeType = ModifiableValueType['changes'][number];
 
@@ -5,6 +6,14 @@ type ChangeType = ModifiableValueType['changes'][number];
  * Helpers around handling handlebar display of ModifiableValue fields.
  */
 export const registerModifierHelpers = () => {
+    Handlebars.registerHelper('isBaseChange', (change: ChangeType) => {
+        return PartsList.isBaseChange(change);
+    });
+
+    Handlebars.registerHelper('hasModifierChanges', (changes: ChangeType[]) => {
+        return Array.isArray(changes) && changes.some(change => !PartsList.isBaseChange(change));
+    });
+
     Handlebars.registerHelper('getChangeValue', (change: ChangeType) => {
         switch (change.mode) {
             case 0:

@@ -1,8 +1,8 @@
 import { SR5 } from "../../config";
 import { Translation } from '../../utils/strings';
+import { PartsList } from "@/module/parts/PartsList";
 import { SuccessTest, SuccessTestData } from "../../tests/SuccessTest";
 import { FormDialog, FormDialogData, FormDialogOptions } from "./FormDialog";
-import { PartsList } from "@/module/parts/PartsList";
 
 export interface TestDialogData extends FormDialogData {
     test: SuccessTest
@@ -38,6 +38,18 @@ export class TestDialog extends FormDialog {
 
         this.listeners = listeners;
         this._expandedList = new Set<string>();
+
+        const hasModifierChanges = (changes) => {
+            if (!Array.isArray(changes)) return false;
+            return changes.some(change => PartsList.isBaseChange(change));
+        }
+
+        if (hasModifierChanges(data?.test?.pool?.changes))
+            this._expandedList.add('test.data.pool');
+        if (hasModifierChanges(data?.test?.limit?.changes))
+            this._expandedList.add('test.data.limit');
+        if (hasModifierChanges(data?.test?.threshold?.changes))
+            this._expandedList.add('test.data.threshold');
     }
 
     static override get defaultOptions() {
