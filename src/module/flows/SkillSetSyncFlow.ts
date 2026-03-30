@@ -124,7 +124,13 @@ export const SkillSetSyncFlow = {
 
         // Extra line for visual separation in console.
         console.log(' ');
-        console.log(`Shadowrun 5e | Skillset differences for actor ${actor.name} (${actor.uuid}) and skillset ${skillSet.name}:`);
+        if (actor.isToken) {
+            const tokenName = actor.token?.name ?? actor.name;
+            const sceneName = actor.token?.parent?.name ?? 'Unknown Scene';
+            console.log(`Shadowrun 5e | Skillset differences for token actor ${actor.name} (${actor.uuid}) on token ${tokenName} in scene ${sceneName} and skillset ${skillSet.name}:`);
+        } else {
+            console.log(`Shadowrun 5e | Skillset differences for actor ${actor.name} (${actor.uuid}) and skillset ${skillSet.name}:`);
+        }
         if (differences.skills.missing.length > 0) console.log(`  Missing skills: ${differences.skills.missing.join(', ')}`);
         if (differences.skills.extra.length > 0) console.log(`  Extra skills: ${differences.skills.extra.join(', ')}`);
         if (differences.skills.different.length > 0) console.log(`  Different skills: ${differences.skills.different.join(', ')}`);
