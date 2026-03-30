@@ -415,6 +415,15 @@ export const PackItemFlow = {
 
         return skillGroupData;
     },
+    
+    /**
+     * Get all groups in a skill set as their items out of the skill groups pack.
+     * @param skillSet Retrieve groups for this skill set.
+     */
+    async getSkillGroupsForSkillSet(skillSet: SR5Item<'skill'>) {
+        const groups = await this.getPackSkillgroups();
+        return groups.filter(group => skillSet.system.set.groups.some(setGroup => setGroup.name === group.name));
+    },
 
     /**
      * Retrieve a single skill from the skills pack.

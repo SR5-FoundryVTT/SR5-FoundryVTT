@@ -11,6 +11,7 @@ import { SkillSetReferenceData, SkillSetSourceFlow } from "@/module/flows/SkillS
 import { SkillRules } from "@/module/rules/SkillRules";
 import { SkillNamingFlow } from '@/module/flows/SkillNamingFlow';
 import ItemSheet = foundry.applications.sheets.ItemSheet;
+import { SkillSetSyncFlow } from "@/module/flows/SkillSetSyncFlow";
 
 interface SR5SkillSheetData extends SR5BaseItemSheetData {
     // config style name to translation mappings.
@@ -68,7 +69,8 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
             removeSetSkill: this.#removeSetSkill,
             removeSetSkillSpecialization: this.#removeSetSkillSpecialization,
             addSetGroup: this.#addSetGroup,
-            removeSetGroup: this.#removeSetGroup
+            removeSetGroup: this.#removeSetGroup,
+            logSetDifferences: this.#logActorDifferences,
         },
         dragDrop: [{ dragSelector: '.draggable', dropSelector: null }],
     }
@@ -301,5 +303,17 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
         const index = parseInt(SheetFlow.closestAction(event.target)?.dataset.index ?? '-1');
         if (index === -1) return;
         await SkillItemFlow.removeSetGroup(this.document, index);
+    }
+
+    /**
+     * Console log differences between an actor skill set and an actual skill set.
+     */
+    static async #logActorDifferences(this: SR5SkillSheet, event: Event) {
+        event.preventDefault();
+        const skillSet = this.document;
+        if (!skillSet.isType('skill') || skillSet.system.type !== 'set') return;
+
+        ui.notifications.info('SR5.Skill.Set.DifferencesLoggedInConsole', { localize: true });
+        await SkillSetSyncFlow.logGlobalActorsDifferences(skillSet);
     }
 };
