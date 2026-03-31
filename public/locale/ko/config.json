@@ -15,6 +15,8 @@
         "AutomateProgressiveRecoilDescription": "초기화 전까지 캐릭터에게 점진적 반동이 누적됨",
         "CompendiumBrowserBlacklist": "컨펜디움 탐색기 블랙리스트",
         "CompendiumBrowserBlacklistDescription": "컨펜디움 탐색기에서 숨긴 컨펜디움 목록",
+        "CollapseModifyRollByDefault": "기본적으로 굴림 수정 접기",
+        "CollapseModifyRollByDefaultDescription": "활성화하면 테스트 대화창을 열 때 굴림 수정 섹션이 접힌 상태로 시작합니다.",
         "DefaultOpposedTestActorSelection": "경쟁 판정 토큰 선택 덮어쓰기",
         "DefaultOpposedTestActorSelectionDescription": "항상 선택한 토큰을 판정에 사용된 대상으로 덮어씀",
         "DiagonalMovementDescription": "격자판 사용 시 대각선 이동 처리 방식",

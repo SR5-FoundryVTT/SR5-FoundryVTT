@@ -1,6 +1,7 @@
 import { SR5 } from "../../config";
 import { Translation } from '../../utils/strings';
 import { PartsList } from "@/module/parts/PartsList";
+import { FLAGS, SYSTEM_NAME } from '../../constants';
 import { SuccessTest, SuccessTestData } from "../../tests/SuccessTest";
 import { FormDialog, FormDialogData, FormDialogOptions } from "./FormDialog";
 
@@ -51,7 +52,7 @@ export class TestDialog extends FormDialog {
         if (hasModifierChanges(data?.test?.threshold?.changes))
             this._expandedList.add('test.data.threshold');
 
-        if (data?.test?.hasBuyHits || data?.test?.hasPushTheLimit || data?.test?.extended)
+        if (!game.settings.get(SYSTEM_NAME, FLAGS.CollapseModifyRollByDefault))
             this._expandedList.add('modify-roll');
     }
 

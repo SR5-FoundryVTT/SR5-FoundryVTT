@@ -32,31 +32,6 @@
         }}
     </div>
 
-    {{#if test.allowResultOverride}}
-    <hr/>
-    <div class="result-override-section {{#if (includes expandedPaths 'result-override')}}expanded{{/if}}" data-section="result-override">
-        <div class="result-header">
-            <label class="result-title">{{localize "SR5.ResultOverride"}}</label>
-            <a class="toggle-result-override" title="{{localize 'SR5.ToggleSection'}}">
-                <i class="fas fa-chevron-up"></i>
-            </a>
-        </div>
-
-        <div class="result-content">
-            <div class="result-row">
-                <div class="form-group result-entry">
-                    <label data-tooltip="SR5.Tooltips.Test.ResultOverrideHits">{{localize "SR5.ResultOverrideHits"}}</label>
-                    <input type="number" name='test.data.resultOverrideHits' {{#if test.data.resultOverrideHits.changes.length}}value="{{test.data.resultOverrideHits.value}}"{{/if}} size="3" maxlength="3" data-dtype="Number" />
-                </div>
-                <div class="form-group result-entry">
-                    <label data-tooltip="SR5.Tooltips.Test.ResultOverrideGlitches">{{localize "SR5.ResultOverrideGlitches"}}</label>
-                    <input type="number" name='test.data.resultOverrideGlitches' {{#if test.data.resultOverrideGlitches.changes.length}}value="{{test.data.resultOverrideGlitches.value}}"{{/if}} size="3" maxlength="3" data-dtype="Number" />
-                </div>
-            </div>
-        </div>
-    </div>
-    {{/if}}
-
     <hr/>
     <div class="modify-roll-section {{#if (includes expandedPaths 'modify-roll')}}expanded{{/if}}" data-section="modify-roll">
         <div class="modify-roll-header">
@@ -97,4 +72,29 @@
             </div>
         </div>
     </div>
+
+    {{#if test.allowResultOverride}}
+    <hr/>
+    <div class="result-override-section {{#if (includes expandedPaths 'result-override')}}expanded{{/if}}" data-section="result-override">
+        <div class="result-header">
+            <label class="result-title">{{localize "SR5.ResultOverride"}}</label>
+            <a class="toggle-result-override" title="{{localize 'SR5.ToggleSection'}}">
+                <i class="fas fa-chevron-up"></i>
+            </a>
+        </div>
+
+        <div class="result-content">
+            <div class="result-row">
+                <div class="form-group result-entry">
+                    <label data-tooltip="SR5.Tooltips.Test.ResultOverrideHits">{{localize "SR5.ResultOverrideHits"}}</label>
+                    <input type="number" name='test.data.resultOverrideHits' {{#if test.data.resultOverrideHits.changes.length}}value="{{test.data.resultOverrideHits.value}}"{{/if}} size="3" maxlength="3" data-dtype="Number" />
+                </div>
+                <div class="form-group result-entry">
+                    <label data-tooltip="SR5.Tooltips.Test.ResultOverrideGlitches">{{localize "SR5.ResultOverrideGlitches"}}</label>
+                    <input type="number" name='test.data.resultOverrideGlitches' {{#if test.data.resultOverrideGlitches.changes.length}}value="{{test.data.resultOverrideGlitches.value}}"{{/if}} size="3" maxlength="3" data-dtype="Number" />
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/if}}
 </div>

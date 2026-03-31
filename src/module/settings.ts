@@ -179,6 +179,18 @@ export const registerSystemSettings = () => {
     });
 
     /**
+     * Control if the Modify Roll section starts collapsed by default in test dialogs.
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.CollapseModifyRollByDefault, {
+        name: 'SETTINGS.CollapseModifyRollByDefault',
+        hint: 'SETTINGS.CollapseModifyRollByDefaultDescription',
+        scope: 'client',
+        config: true,
+        type: Boolean,
+        default: false
+    });
+
+    /**
      * Control default behavior for opposed test actors
      */
     game.settings.register(SYSTEM_NAME, FLAGS.DefaultOpposedTestActorSelection, {

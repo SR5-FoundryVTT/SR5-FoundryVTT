@@ -8,6 +8,8 @@
     "SETTINGS": {
         "ApplyLimitsDescription": "Est-ce que des limites doivent être appliquées aux lancés",
         "ApplyLimitsName": "Appliquer des limites aux lancés",
+        "CollapseModifyRollByDefault": "Replier Modifier le lancer par defaut",
+        "CollapseModifyRollByDefaultDescription": "Si active, la section Modifier le lancer est repliee a l'ouverture d'une boite de dialogue de test.",
         "DiagonalMovementDescription": "Comment le mouvement en diagonal doit être pris en compte quand la grille est utilisée",
         "DiagonalMovementName": "Mouvement diagonal",
         "DisplayDefaultRollCardDescription": "Est-ce que la carte de lancé par défaut doit être affichée en même temps que la carte de lancé de Shadowrun",
