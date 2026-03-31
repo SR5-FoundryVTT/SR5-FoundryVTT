@@ -1795,6 +1795,7 @@
             "SomeAmmoMelee": "근거리 공격 수행을 위한 탄약이 충분하지 않음"
         },
         "ModPoints": "개조 점수",
+        "ModifyRoll": "굴림 수정",
         "Modification": {
             "FIELDS": {
                 "type": {

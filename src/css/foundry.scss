@@ -280,6 +280,11 @@ nav#context-menu, menu.controls-dropdown {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        cursor: pointer;
+
+        &:hover .toggle-result-override {
+            color: #fff;
+        }
 
         .toggle-result-override {
             flex: 0 0 20px;
@@ -307,12 +312,17 @@ nav#context-menu, menu.controls-dropdown {
     }
 
     &.expanded {
+        .result-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+            padding-bottom: 4px;
+        }
+
         .result-content {
             display: block;
         }
 
         .toggle-result-override .fa-chevron-up {
-            transform: rotate(-180deg);
+            transform: rotate(0deg);
         }
     }
 
@@ -334,5 +344,96 @@ nav#context-menu, menu.controls-dropdown {
     input[type="number"] {
         flex: 1 1 0;
         width: 55px;
+    }
+}
+
+.modify-roll-section {
+    display: flex;
+    flex-direction: column;
+    font-weight: bold;
+    margin-bottom: 4px;
+
+    .modify-roll-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+
+        &:hover .toggle-modify-roll {
+            color: #fff;
+        }
+
+        .toggle-modify-roll {
+            flex: 0 0 20px;
+            height: 24px;
+            font-size: 1em;
+            text-align: center;
+            line-height: 24px;
+            cursor: pointer;
+            color: #ccc;
+
+            &:hover {
+                color: #fff;
+            }
+
+            .fa-chevron-up {
+                transition: transform 0.2s ease-in-out;
+                transform: rotate(-180deg);
+            }
+        }
+    }
+
+    .modify-roll-content {
+        display: none;
+
+        .form-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            &.toggle-checkbox-row {
+                cursor: pointer;
+
+                &:hover {
+                    background: rgba(255, 255, 255, 0.06);
+                }
+
+                > label {
+                    cursor: pointer;
+                }
+            }
+
+            > label {
+                flex: 1 1 auto;
+                min-width: 0;
+            }
+
+            > input[type="checkbox"] {
+                margin-left: auto;
+                flex: 0 0 auto;
+            }
+
+            > select {
+                margin-left: auto;
+                flex: 0 0 150px;
+                width: 150px;
+                max-width: 150px;
+            }
+        }
+    }
+
+    &.expanded {
+        .modify-roll-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+            padding-bottom: 4px;
+        }
+
+        .modify-roll-content {
+            display: block;
+        }
+
+        .toggle-modify-roll .fa-chevron-up {
+            transform: rotate(0deg);
+        }
     }
 }

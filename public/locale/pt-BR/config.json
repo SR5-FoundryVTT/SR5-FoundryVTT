@@ -776,6 +776,7 @@
             "SomeAmmo": "Munição insuficiente para disparar no modo selecionado, os modificadores de modo serão reduzidos.",
             "SomeAmmoMelee": "Não há munição suficiente para fazer um ataque corpo a corpo"
         },
+        "ModifyRoll": "Modificar Rolagem",
         "ModPoints": "Pontos de Mod",
         "Modification": "Modificação",
         "ModificationCategories": "Categorias de Modificação",

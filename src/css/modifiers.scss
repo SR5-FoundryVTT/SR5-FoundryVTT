@@ -107,6 +107,7 @@
         padding-right: 10px;
         font-size: 1.1em;
         color: #191813;
+        cursor: pointer;
     }
 
     .form-fields {
@@ -127,6 +128,7 @@
             color: #444;
             font-size: 0.78em;
             font-weight: 700;
+            cursor: pointer;
 
             .summary-total {
                 min-width: 20px;
@@ -226,6 +228,11 @@
             gap: 5px;
             padding: 3px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            cursor: pointer;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.06);
+            }
 
             &:last-child {
                 border-bottom: none;

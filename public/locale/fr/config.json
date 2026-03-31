@@ -449,6 +449,7 @@
         "MigrationUpdateCompendiumUpdateMessage": "Chaque compendium pack du monde qui existe ont été mis à jour",
         "Miscellaneous": "Divers",
         "MissingItemForOpposedTest": "Le test opposé ne peut pas être lancé puisque l'objet concerné est manquant",
+        "ModifyRoll": "Modifier le lancer",
         "Modification": "Modification",
         "ModificationCategories": "Catégories de modifications",
         "ModificationCategory": "Catégorie de modifications",

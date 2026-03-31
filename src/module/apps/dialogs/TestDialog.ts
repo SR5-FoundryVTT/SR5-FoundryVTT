@@ -50,6 +50,9 @@ export class TestDialog extends FormDialog {
             this._expandedList.add('test.data.limit');
         if (hasModifierChanges(data?.test?.threshold?.changes))
             this._expandedList.add('test.data.threshold');
+
+        if (data?.test?.hasBuyHits || data?.test?.hasPushTheLimit || data?.test?.extended)
+            this._expandedList.add('modify-roll');
     }
 
     static override get defaultOptions() {
@@ -67,24 +70,49 @@ export class TestDialog extends FormDialog {
     override activateListeners(html: JQuery) {
         super.activateListeners(html);
 
+        const toggleModifiableValue = (element: HTMLElement | null) => {
+            const modValueDiv = element?.closest<HTMLDivElement>('.modifiable-value');
+            const path = modValueDiv?.dataset.path;
+            if (!modValueDiv || !path) return;
+
+            // Only allow expanding rows that actually contain modifier entries.
+            if (!modValueDiv.classList.contains('has-modifiers')) return;
+
+            const isExpanded = modValueDiv.classList.toggle('expanded');
+            if (isExpanded) this._expandedList.add(path);
+            else this._expandedList.delete(path);
+            void this.render();
+        };
+
         html.find('.modifiable-value .form-fields input[type="number"]').on('keydown', ev => {
             if (ev.key === 'Enter') { ev.preventDefault(); ev.currentTarget.blur(); }
         });
 
         html.find('.toggle-breakdown').on('click', event => {
             event.preventDefault();
-        
-            const modValueDiv = event.currentTarget.closest<HTMLDivElement>('.modifiable-value');
-            const path = modValueDiv?.dataset.path;
-            if (!path) return;
-
-            const isExpanded = modValueDiv.classList.toggle('expanded');
-            if (isExpanded) this._expandedList.add(path);
-            else this._expandedList.delete(path);
-            void this.render();
+            toggleModifiableValue(event.currentTarget);
         });
 
-        html.find('.toggle-result-override').on('click', event => {
+        html.find('.modifiable-value').on('click', event => {
+            const target = event.target;
+            // Keep native interactions intact for inputs, toggles, and breakdown list items.
+            if (target.closest('input, select, textarea, button, a, .breakdown-list')) return;
+            toggleModifiableValue(target);
+        });
+
+        html.find('.breakdown-entry').on('click', event => {
+            const target = event.target;
+            // Let the checkbox keep native behavior.
+            if (target.closest('input[type="checkbox"]')) return;
+
+            const checkbox = event.currentTarget.querySelector<HTMLInputElement>('input[type="checkbox"]');
+            if (!checkbox) return;
+
+            checkbox.checked = !checkbox.checked;
+            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        html.find('.result-header').on('click', event => {
             event.preventDefault();
             const sectionDiv = event.currentTarget.closest('.result-override-section');
             if (!sectionDiv) return;
@@ -93,6 +121,28 @@ export class TestDialog extends FormDialog {
             if (isExpanded) this._expandedList.add('result-override');
             else this._expandedList.delete('result-override');
             void this.render();
+        });
+
+        html.find('.modify-roll-header').on('click', event => {
+            event.preventDefault();
+            const sectionDiv = event.currentTarget.closest('.modify-roll-section');
+            if (!sectionDiv) return;
+
+            const isExpanded = sectionDiv.classList.toggle('expanded');
+            if (isExpanded) this._expandedList.add('modify-roll');
+            else this._expandedList.delete('modify-roll');
+            void this.render();
+        });
+
+        html.find('.modify-roll-content .toggle-checkbox-row').on('click', event => {
+            const target = event.target;
+            if (target.closest('input[type="checkbox"]')) return;
+
+            const checkbox = event.currentTarget.querySelector<HTMLInputElement>('input[type="checkbox"]');
+            if (!checkbox) return;
+
+            checkbox.checked = !checkbox.checked;
+            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
         });
 
         this._injectExternalActiveListeners(html);
@@ -187,10 +237,6 @@ export class TestDialog extends FormDialog {
             if (!PartsList.isModifiableValue(valueField)) {
                 foundry.utils.setProperty(this.data, key, value);
                 continue;
-            }
-
-            if (key === 'test.data.resultOverrideHits' || key === 'test.data.resultOverrideGlitches') {
-                const a = 1 + 2;
             }
 
             // Don't apply an unneeded override.

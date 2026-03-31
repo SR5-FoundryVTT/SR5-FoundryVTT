@@ -1795,6 +1795,7 @@
             "SomeAmmo": "Not enough ammunition to fire in selected mode, mode modifiers will be reduced.",
             "SomeAmmoMelee": "Not enough ammunition left to make a melee attack"
         },
+        "ModifyRoll": "Modify Roll",
         "ModPoints": "Mod Points",
         "Modification": {
             "FIELDS": {

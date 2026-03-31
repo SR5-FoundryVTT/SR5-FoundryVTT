@@ -1796,6 +1796,7 @@
             "SomeAmmo": "Nicht genug Munition für ausgewählten Feuermodus, Feuermodus-Modifikatoren werden reduziert",
             "SomeAmmoMelee": "Nicht genug Munition übrig, um zu zuschlagen"
         },
+        "ModifyRoll": "Wurf anpassen",
         "ModPoints": "Upgradepunkte",
         "Modification": {
             "FIELDS": {
