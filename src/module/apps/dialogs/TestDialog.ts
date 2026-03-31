@@ -146,6 +146,22 @@ export class TestDialog extends FormDialog {
             checkbox.dispatchEvent(new Event('change', { bubbles: true }));
         });
 
+        html.find('.roll-mode-button').on('click', event => {
+            event.preventDefault();
+
+            const button = event.currentTarget;
+            const rollMode = button.dataset.rollMode;
+            if (!rollMode) return;
+
+            if (this.data.test.data.options?.rollMode === rollMode) return;
+
+            foundry.utils.setProperty(this.data, 'test.data.options.rollMode', rollMode);
+            this.data.test.prepareBaseValues();
+            this.data.test.calculateBaseValues();
+            this.data.test.validateBaseValues();
+            void this.render();
+        });
+
         this._injectExternalActiveListeners(html);
     }
 
@@ -172,8 +188,7 @@ export class TestDialog extends FormDialog {
     override getData() {
         const data = super.getData() as unknown as TestDialogData;
 
-        //@ts-expect-error //TODO: default to general roll mode user setting
-        data.rollMode = data.test.data.options?.rollMode;
+        data.rollMode = data.test.data.options?.rollMode ?? game.settings.get('core', 'rollMode');
         data.rollModes = CONFIG.Dice.rollModes;
         data.default = 'roll'; // TODO: Where is this even used and what's it for again?
 

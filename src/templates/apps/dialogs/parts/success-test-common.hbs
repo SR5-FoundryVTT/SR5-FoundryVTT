@@ -64,11 +64,18 @@
 
             <div class="form-group">
                 <label data-tooltip="SR5.Tooltips.Test.RollMode">{{ localize "SR5.RollMode" }}</label>
-                <select style="color: white" name="test.data.options.rollMode">
-                    {{#select rollMode}} {{#each rollModes}}
-                    <option value="{{@key}}">{{localize this.label}}</option>
-                    {{/each}} {{/select}}
-                </select>
+                <div class="split-button roll-mode-controls" role="group" aria-label="{{localize 'SR5.RollMode'}}">
+                    {{#each rollModes}}
+                    <button
+                        type="button"
+                        class="ui-control icon roll-mode-button {{this.icon}}"
+                        data-roll-mode="{{@key}}"
+                        aria-label="{{localize this.label}}"
+                        data-tooltip="{{localize this.label}}"
+                        aria-pressed="{{#if (eq @key ../rollMode)}}true{{else}}false{{/if}}"
+                    ></button>
+                    {{/each}}
+                </div>
             </div>
         </div>
     </div>

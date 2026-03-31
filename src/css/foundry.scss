@@ -413,11 +413,24 @@ nav#context-menu, menu.controls-dropdown {
                 flex: 0 0 auto;
             }
 
-            > select {
+            > .roll-mode-controls {
                 margin-left: auto;
-                flex: 0 0 150px;
-                width: 150px;
-                max-width: 150px;
+                flex: 0 0 auto;
+                width: auto;
+                --button-size: 24px;
+
+                .roll-mode-button {
+                    min-width: var(--button-size);
+                    width: var(--button-size);
+                    height: var(--button-size);
+                    line-height: var(--button-size);
+                    padding: 0;
+
+                    &[aria-pressed='true'] {
+                        border-color: var(--control-active-border-color);
+                        z-index: 1;
+                    }
+                }
             }
         }
     }
