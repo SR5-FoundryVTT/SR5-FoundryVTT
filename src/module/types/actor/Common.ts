@@ -4,20 +4,15 @@ import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
 import { ModifiableField } from "../fields/ModifiableField";
 import { Limits, AwakendLimits, MatrixLimits } from "../template/Limits";
-import { NewSkills } from "../template/Skills";
+import { KnowledgeSkills, Skills } from "../template/Skills";
 const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField, DocumentUUIDField } = foundry.data.fields;
 /**
  * Derived Data structure build from an actors skill items.
  */
 export const ActorSkills = () => ({
-    active: NewSkills(),
-    language: NewSkills(),
-    knowledge: new SchemaField({
-        street: NewSkills(),
-        academic: NewSkills(),
-        professional: NewSkills(),
-        interests: NewSkills(),
-    })
+    active: Skills(),
+    language: Skills(),
+    knowledge: new SchemaField(KnowledgeSkills())
 });
 
 export const MagicData = () => ({

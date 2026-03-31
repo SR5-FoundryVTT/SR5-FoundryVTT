@@ -36,16 +36,13 @@ export const SkillField = () => ({
  * Derived Data structure build from an actors skill items.
  * will use skill item id as key and derived ModifiableSkillField as value
  */
-// TODO: tamif - skill - rename to Skills
-export const NewSkills = () => new FixedTypeObjectField(
+export const Skills = () => new FixedTypeObjectField(
     new ModifiableField(SkillField()),
     {
         required: true,
         initial: {}
     }
 );
-
-console.log(NewSkills().getInitialValue());
 
 export const KnowledgeSkillList = (initialAttribute: string) => ({
     attribute: new StringField({
@@ -57,15 +54,13 @@ export const KnowledgeSkillList = (initialAttribute: string) => ({
 });
 
 export const KnowledgeSkills = () => ({
-    street: new SchemaField(KnowledgeSkillList('intuition')),
-    academic: new SchemaField(KnowledgeSkillList('logic')),
-    professional: new SchemaField(KnowledgeSkillList('logic')),
-    interests: new SchemaField(KnowledgeSkillList('intuition')),
+    street: Skills(),
+    academic: Skills(),
+    professional: Skills(),
+    interests: Skills(),
 });
 
 // Not yet implemented in fvtt-types curently
 export type SkillsType = Record<string, SkillFieldType>;
 export type SkillFieldType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof SkillField>>;
-
-// TODO: tamif - skill - KnowledgeSkillCategory is code driven, but it's data driven. Maybe remove and replace.
 export type KnowledgeSkillCategory = keyof ReturnType<typeof KnowledgeSkills>;
