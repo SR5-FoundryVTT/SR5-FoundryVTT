@@ -270,18 +270,18 @@ nav#context-menu, menu.controls-dropdown {
     }
 }
 
-.manual-override-section {
+.result-override-section {
     display: flex;
     flex-direction: column;
     font-weight: bold;
     margin-bottom: 4px;
 
-    .manual-header {
+    .result-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
 
-        .toggle-manual-override {
+        .toggle-result-override {
             flex: 0 0 20px;
             height: 24px;
             font-size: 1em;
@@ -301,29 +301,29 @@ nav#context-menu, menu.controls-dropdown {
         }
     }
 
-    .manual-content {
+    .result-content {
         display: none;
         margin-top: 8px;
     }
 
     &.expanded {
-        .manual-content {
+        .result-content {
             display: block;
         }
 
-        .toggle-manual-override .fa-chevron-up {
+        .toggle-result-override .fa-chevron-up {
             transform: rotate(-180deg);
         }
     }
 
-    .manual-row {
+    .result-row {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         gap: 7px 1em;
     }
 
-    .manual-entry {
+    .result-entry {
         display: contents;
     }
 

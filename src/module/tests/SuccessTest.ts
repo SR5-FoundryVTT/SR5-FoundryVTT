@@ -61,9 +61,9 @@ export interface TestData {
     threshold: ValueFieldType
     limit: ValueFieldType
 
-    // Hits as reported by an external dice roll.
-    manualHits: ValueFieldType
-    manualGlitches: ValueFieldType
+    // Result values manually overridden by user input.
+    resultOverrideHits: ValueFieldType
+    resultOverrideGlitches: ValueFieldType
 
     hitsIcon?: IconWithTooltip
     autoSuccess?: boolean
@@ -259,9 +259,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         data.values.netHits = data.values.netHits || DataDefaults.createData('value_field', { label: "SR5.NetHits" });
         data.values.glitches = data.values.glitches || DataDefaults.createData('value_field', { label: "SR5.Glitches" });
 
-        // User reported manual hits.
-        data.manualHits = data.manualHits || DataDefaults.createData('value_field', { label: "SR5.ManualHits" });
-        data.manualGlitches = data.manualGlitches || DataDefaults.createData('value_field', { label: "SR5.ManualGlitches" });
+        // User provided result override values.
+        data.resultOverrideHits = data.resultOverrideHits || DataDefaults.createData('value_field', { label: 'SR5.ResultOverrideHits' });
+        data.resultOverrideGlitches = data.resultOverrideGlitches || DataDefaults.createData('value_field', { label: 'SR5.ResultOverrideGlitches' });
 
         data.opposed = data.opposed || undefined;
 
@@ -606,8 +606,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         PartsList.calcTotal(this.data.threshold, { min: 0 });
         PartsList.calcTotal(this.data.limit, { min: 0 });
 
-        PartsList.calcTotal(this.data.manualHits, { min: 0 });
-        PartsList.calcTotal(this.data.manualGlitches, { min: 0 });
+        PartsList.calcTotal(this.data.resultOverrideHits, { min: 0 });
+        PartsList.calcTotal(this.data.resultOverrideGlitches, { min: 0 });
 
         // Shows AP on incoming attacks
         PartsList.calcTotal(this.data.damage.ap);
@@ -624,7 +624,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Helper method to evaluate the internal SR5Roll and SuccessTest values.
      */
     async evaluate(): Promise<this> {
-        if (!this.usingManualRoll) {
+        if (!this.usingResultOverride) {
             // Evaluate all rolls.
             for (const roll of this.rolls) {
                 if (!roll.evaluated())
@@ -904,9 +904,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Helper to get the hits value for this success test with a possible limit.
      */
     calculateHits(): ValueFieldType {
-        // Use manual or automated roll for hits.
-        const rollHits = this.usingManualRoll ?
-            this.manualHits.value :
+        // Use result override or automated roll for hits.
+        const rollHits = this.usingResultOverride ?
+            this.resultOverrideHits.value :
             this.rolls.reduce((hits, roll) => hits + roll.hits, 0);
 
         // Sum of all rolls!
@@ -929,12 +929,12 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return this.data.values.extendedHits || DataDefaults.createData('value_field', { label: 'SR5.ExtendedHits' });
     }
 
-    get manualHits(): ValueFieldType {
-        return this.data.manualHits;
+    get resultOverrideHits(): ValueFieldType {
+        return this.data.resultOverrideHits;
     }
 
-    get manualGlitches(): ValueFieldType {
-        return this.data.manualGlitches;
+    get resultOverrideGlitches(): ValueFieldType {
+        return this.data.resultOverrideGlitches;
     }
 
     get hitsIcon(): IconWithTooltip | undefined {
@@ -956,26 +956,26 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
-     * Depending on system settings allow manual hits to skip automated roll.
+     * Depending on system settings allow result override values to skip automated roll.
      */
-    get allowManualHits(): boolean {
-        return game.settings.get(SYSTEM_NAME, FLAGS.ManualRollOnSuccessTest) as boolean;
+    get allowResultOverride(): boolean {
+        return game.settings.get(SYSTEM_NAME, FLAGS.ResultOverrideOnSuccessTest) as boolean;
     }
 
     /**
-     * Determine if this success test must automated roll or can use a manual roll given by user.
+     * Determine if this success test must automated roll or can use a result override given by user.
      */
-    get usingManualRoll(): boolean {
-        return this.allowManualHits && (Boolean(this.data.manualHits.value) || Boolean(this.data.manualGlitches.value))
+    get usingResultOverride(): boolean {
+        return this.allowResultOverride && (Boolean(this.data.resultOverrideHits.value) || Boolean(this.data.resultOverrideGlitches.value));
     }
 
     /**
      * Helper to get the glitches values for this success test.
      */
     calculateGlitches(): ValueFieldType {
-        // When using a manual roll, don't derive glitches from automated rolls.
-        const rollGlitches = this.usingManualRoll ?
-            this.manualGlitches.value :
+        // When using a result override, don't derive glitches from automated rolls.
+        const rollGlitches = this.usingResultOverride ?
+            this.resultOverrideGlitches.value :
             this.rolls.reduce((glitches, roll) => glitches + roll.glitches, 0);
 
         const glitches = DataDefaults.createData('value_field', {

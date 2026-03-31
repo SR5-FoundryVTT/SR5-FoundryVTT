@@ -167,11 +167,11 @@ export const registerSystemSettings = () => {
     });
 
     /**
-     * Control automatic or manual casting of dice in any success test.
+     * Control whether users can override result values in any success test.
      */
-    game.settings.register(SYSTEM_NAME, FLAGS.ManualRollOnSuccessTest, {
-        name: 'SETTINGS.ManualRollOnSuccessTest',
-        hint: 'SETTINGS.ManualRollOnSuccessTestDescription',
+    game.settings.register(SYSTEM_NAME, FLAGS.ResultOverrideOnSuccessTest, {
+        name: 'SETTINGS.ResultOverrideOnSuccessTest',
+        hint: 'SETTINGS.ResultOverrideOnSuccessTestDescription',
         scope: 'client',
         config: true,
         type: Boolean,

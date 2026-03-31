@@ -19,6 +19,8 @@
         "OnlyAllowRollOnDefaultableSkillsDescription": "Permettre de lancer toutes les compétences, même celles qui ne peuvent pas être selectionées par défaut",
         "OnlyAutoRollNPCInCombat": "Lancer seulement automatiquement l'initiative des PNJs",
         "OnlyAutoRollNPCInCombatDescription": "Les joueurs doivent lancer les dés manuellement leur initiative à chaque passe / tour",
+        "ResultOverrideOnSuccessTest": "Substitution du résultat pour les tests",
+        "ResultOverrideOnSuccessTestDescription": "Permet de remplacer les succès et glitches d'un test.",
         "ShowGlitchAnimationDescription": "Afficher l'animation comme faisant parti d'un bug textuel",
         "ShowGlitchAnimationName": "Afficher l'animation d'echec critique",
         "ShowSkillsWithDetails": "Afficher plus de détails sur la liste des compétences",
@@ -552,6 +554,9 @@
         "RecoilCompensation": "CR",
         "Resist": "Resister",
         "RestoreDefaultSkills": "Restaurer compétences par défaut",
+        "ResultOverrideGlitches": "Glitches",
+        "ResultOverrideHits": "Succès",
+        "ResultOverride": "Substitution du résultat",
         "RightClickToClear": "Click droit pour effacer",
         "Roll": "Lancer",
         "RollArmor": "Armure",
@@ -901,6 +906,12 @@
             "RitualNotEnoughReagents": "Pas assez de réactifs offerts.",
             "SkillCantBeDefault": "Cette compétence ne peut pas être lancée sans l'avoir apprise",
             "TokenSelectionNeeded": "Un ou plusieurs jetons doivent être selectionnés"
+        },
+        "Tooltips": {
+            "Test": {
+                "ResultOverrideGlitches": "Remplace les glitches pour ce résultat de test.",
+                "ResultOverrideHits": "Remplace les succès pour ce résultat de test."
+            }
         },
         "Weapon": {
             "AmmoCount": "Compteur munition",

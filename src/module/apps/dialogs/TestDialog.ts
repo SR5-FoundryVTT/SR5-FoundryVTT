@@ -84,14 +84,14 @@ export class TestDialog extends FormDialog {
             void this.render();
         });
 
-        html.find('.toggle-manual-override').on('click', event => {
+        html.find('.toggle-result-override').on('click', event => {
             event.preventDefault();
-            const sectionDiv = event.currentTarget.closest('.manual-override-section');
+            const sectionDiv = event.currentTarget.closest('.result-override-section');
             if (!sectionDiv) return;
 
             const isExpanded = sectionDiv.classList.toggle('expanded');
-            if (isExpanded) this._expandedList.add('manual');
-            else this._expandedList.delete('manual');
+            if (isExpanded) this._expandedList.add('result-override');
+            else this._expandedList.delete('result-override');
             void this.render();
         });
 
@@ -187,6 +187,10 @@ export class TestDialog extends FormDialog {
             if (!PartsList.isModifiableValue(valueField)) {
                 foundry.utils.setProperty(this.data, key, value);
                 continue;
+            }
+
+            if (key === 'test.data.resultOverrideHits' || key === 'test.data.resultOverrideGlitches') {
+                const a = 1 + 2;
             }
 
             // Don't apply an unneeded override.
