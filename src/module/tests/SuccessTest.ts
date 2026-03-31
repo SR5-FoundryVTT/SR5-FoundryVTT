@@ -65,6 +65,9 @@ export interface TestData {
     resultOverrideHits: ValueFieldType
     resultOverrideGlitches: ValueFieldType
 
+    // Use Shadowrun buy hits rule instead of rolling dice.
+    buyHits: boolean
+
     hitsIcon?: IconWithTooltip
     autoSuccess?: boolean
 
@@ -242,6 +245,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Keep previous evaluation state.
         data.evaluated = data.evaluated ?? false;
 
+        data.buyHits = data.buyHits !== undefined ? data.buyHits : false;
         data.pushTheLimit = data.pushTheLimit !== undefined ? data.pushTheLimit : false;
         data.secondChance = data.secondChance !== undefined ? data.secondChance : false;
 
@@ -904,10 +908,12 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Helper to get the hits value for this success test with a possible limit.
      */
     calculateHits(): ValueFieldType {
-        // Use result override or automated roll for hits.
-        const rollHits = this.usingResultOverride ?
-            this.resultOverrideHits.value :
-            this.rolls.reduce((hits, roll) => hits + roll.hits, 0);
+        // Use buy hits, result override or automated roll for hits.
+        const rollHits = this.usingResultOverride
+            ? this.resultOverrideHits.value
+            : this.hasBuyHits
+                ? this.boughtHits
+                : this.rolls.reduce((hits, roll) => hits + roll.hits, 0);
 
         // Sum of all rolls!
         this.hits.base = rollHits;
@@ -935,6 +941,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
     get resultOverrideGlitches(): ValueFieldType {
         return this.data.resultOverrideGlitches;
+    }
+
+    get hasBuyHits(): boolean {
+        return !this.usingResultOverride && this.data.buyHits;
+    }
+
+    get boughtHits(): number {
+        return Math.floor(this.pool.value / 4);
     }
 
     get hitsIcon(): IconWithTooltip | undefined {
@@ -973,15 +987,18 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Helper to get the glitches values for this success test.
      */
     calculateGlitches(): ValueFieldType {
-        // When using a result override, don't derive glitches from automated rolls.
-        const rollGlitches = this.usingResultOverride ?
-            this.resultOverrideGlitches.value :
-            this.rolls.reduce((glitches, roll) => glitches + roll.glitches, 0);
+        // Buy hits produces no glitches.
+        const rollGlitches = this.usingResultOverride
+            ? this.resultOverrideGlitches.value
+            : this.hasBuyHits
+                ? 0
+                : this.rolls.reduce((glitches, roll) => glitches + roll.glitches, 0);
 
         const glitches = DataDefaults.createData('value_field', {
             label: "SR5.Glitches",
             base: rollGlitches
-        })
+        });
+ 
         glitches.value = PartsList.calcTotal(glitches, { min: 0 });
 
         return glitches;
@@ -1176,6 +1193,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * SR5#56.
      */
     get canSecondChance(): boolean {
+        if (this.hasBuyHits) {
+            ui.notifications?.warn('SR5.Warnings.CantCombineBuyHitsWithEdge', { localize: true });
+            return false;
+        }
+
         if (!this.evaluated) {
             console.error('Shadowrun5e | Second chance edge rules should not be applicable on initial cast');
             return false;
@@ -1253,6 +1275,12 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!this.actor) return;
 
         const parts = new PartsList(this.pool);
+
+        if (this.hasBuyHits) {
+            this.data.secondChance = false;
+            parts.removePart('SR5.SecondChance');
+            return;
+        }
 
         // During test lifetime (dialog/recasting) the user might want to remove second chance again.
         if (!this.hasSecondChance) {

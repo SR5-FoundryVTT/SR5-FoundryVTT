@@ -549,6 +549,7 @@
         "Bullet": "Kugel",
         "BulletCount": "Kugeln",
         "Bullets": "Kugeln",
+        "BuyHits": "Erfolge kaufen",
         "COMBAT": {
             "ReduceInitByFive": "Initiative -5",
             "ReduceInitByOne": "Initiative -1",
@@ -1742,6 +1743,7 @@
         },
         "Magic": "Magie",
         "Manual": "Manuell",
+        "ManualOverride": "Ergebnis-Überschreibung",
         "MarkImportedItemReviewed": "Importiertes Item überprüft.",
         "MarkImportedItemTooltip": "Markiert dieses importierte Item als überprüft.",
         "MarkImportsReviewed": "Importe Überprüft",
@@ -2764,6 +2766,7 @@
                 "SpiritType": "Art des herbeizurufenden Geistes"
             },
             "Test": {
+                "BuyHits": "Würfelt keine Würfel. Kauft Erfolge mit ⌊Würfelpool / 4⌋.",
                 "Extended": "Probe wird als ausgedehnte Probe geworfen, bis der Schwellenwert erreicht ist",
                 "Limit": "Vollständiger Limitwert",
                 "Modifier": "Summe aller auf den Pool angewendenten Modifikatoren",
@@ -2890,6 +2893,7 @@
             "CantSecondChanceAGlitch": "Kann zweite Chance nicht anwenden. Testergebnis ist ein Patzer.",
             "CantSecondChanceWithoutNoneHits": "Kann zweite Chance nicht anwenden. Keine Würfel ohne Erfolg übrig.",
             "CantSpendMulitplePointsOfEdge": "Es kann nur ein Punkt Edge für eine Probe oder Handlung gleichzeitig ausgegeben werden.",
+            "CantCombineBuyHitsWithEdge": "Erfolge kaufen kann nicht mit zweiter Chance kombiniert werden.",
             "CompilationNotConcluded": "Kompilieren unvollständig. Warte auf Gegenprobe des Sprites, um Schwund zu bestimmen",
             "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge-Punkte können nicht auf Proben ohne Acteur angewendet werden.",
             "HostItemOnlyAcceptIC": "Nur IC Akteure können einem Host zugefügt werden",

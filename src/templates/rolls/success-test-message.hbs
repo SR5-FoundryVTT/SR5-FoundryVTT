@@ -89,6 +89,12 @@
                     <img class="test-icon" src="{{test.hitsIcon.icon}}" data-tooltip="{{test.hitsIcon.tooltip}}" />
                     {{/if}}
                 </div>
+                {{#if test.hasBuyHits}}
+                <div class="test-value">
+                    <span class="value">{{localize "SR5.BuyHits"}}:</span>
+                    <span class="value-result">{{test.boughtHits}}</span>
+                </div>
+                {{/if}}
                 {{#if test.extended}}
                 <div class="test-value">
                     <span class="value">{{localize test.extendedHits.label}}:</span>
@@ -177,8 +183,13 @@
         <div class="card-content">* {{localize "SR5.ResultOverride"}}</div>
     </div>
     {{/if}}
+    {{#if test.hasBuyHits}}
+    <div class="card-main-content">
+        <div class="card-content">{{localize "SR5.BuyHits"}}</div>
+    </div>
+    {{/if}}
     <div class="card-rolls {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
-        {{#if (not test.usingResultOverride)}}
+        {{#if (and (not test.usingResultOverride) (not test.hasBuyHits))}}
             {{#each test.rolls}}
                 {{> 'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.hbs'
                 roll=this

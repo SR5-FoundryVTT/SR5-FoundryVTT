@@ -99,6 +99,7 @@
         "Bullet": "Balle",
         "BulletCount": "Nombre de balles",
         "Bullets": "Balles",
+        "BuyHits": "Acheter des succès",
         "COMBAT": {
             "ReduceInitByFive": "Initiative -5",
             "ReduceInitByOne": "Initiative -1",
@@ -429,6 +430,7 @@
             "WarningTitle": "Alerte"
         },
         "Magic": "Magie",
+        "ManualOverride": "Substitution du résultat",
         "Matrix": "Matrice",
         "MatrixAttrAttack": "Attaque",
         "MatrixAttrDataProc": "Trait. Données",
@@ -900,6 +902,7 @@
         },
         "Walk": "Marcher",
         "Warnings": {
+            "CantCombineBuyHitsWithEdge": "Acheter des succès ne peut pas être combiné avec Seconde chance.",
             "MissingSkillOnActor": "Le personnage selectionné ne connait pas cette compétence",
             "NegativeLimitValue": "Les valeurs des limites doivent être supérieures à 0",
             "RitualNotConcluded": "Le Rituel a échoué. En attente du jeu du rituel pour déterminer le drain.",
@@ -909,6 +912,7 @@
         },
         "Tooltips": {
             "Test": {
+                "BuyHits": "Ne lance pas de dés. Achète des succès avec ⌊réserve de dés / 4⌋.",
                 "ResultOverrideGlitches": "Remplace les glitches pour ce résultat de test.",
                 "ResultOverrideHits": "Remplace les succès pour ce résultat de test."
             }

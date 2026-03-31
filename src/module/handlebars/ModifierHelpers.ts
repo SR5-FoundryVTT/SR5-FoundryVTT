@@ -12,7 +12,7 @@ export const registerModifierHelpers = () => {
     };
 
     const getActiveModifierChanges = (changes: ChangeType[] = []) => {
-        return getModifierChanges(changes).filter(change => change.applied && !change.masked);
+        return getModifierChanges(changes).filter(change => change.applied);
     };
 
     const getDiffValueChange = (modValue: ModifiableValueType) => {

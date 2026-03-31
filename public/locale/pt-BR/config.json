@@ -193,6 +193,7 @@
         "Bullet": "Projétil",
         "BulletCount": "Num. Disparos",
         "Bullets": "Projéteis",
+        "BuyHits": "Comprar Acertos",
         "COMBAT": {
             "ReduceInitByFive": "Iniciativa -5",
             "ReduceInitByOne": "Iniciativa -1",
@@ -736,6 +737,7 @@
         },
         "Magic": "Magia",
         "Manual":"Manual",
+        "ManualOverride": "Substituição de Resultado",
         "MarkImportedItemReviewed": "Marcar Item Importado Como Revisado",
         "MarkImportedItemTooltip": "Marca este item importado como tendo sido revisado.",
         "MarkImportsReviewed": "Marcar Importações Revisadas",
@@ -1394,6 +1396,7 @@
                 "SpiritType": "Tipo do espírito invocado"
             },
             "Test": {
+                "BuyHits": "Não rola dados. Compra acertos usando ⌊reserva de dados / 4⌋.",
                 "Extended": "O teste será rolado como um teste estendido até que o limite seja alcançado",
                 "Limit": "Valor do limite calculado",
                 "Modifier": "Soma de todos os modificadores aplicados à reserva de dados",
@@ -1516,6 +1519,7 @@
             "CantSecondChanceAGlitch": "Não pode ter uma segunda chance neste teste. O resultado do teste é falho.",
             "CantSecondChanceWithoutNoneHits": "Não pode ter uma segunda chance neste teste. Só restam dados de acerto.",
             "CantSpendMulitplePointsOfEdge": "Não pode gastar vários pontos de trunfo em um teste ou ação",
+            "CantCombineBuyHitsWithEdge": "Comprar Acertos não pode ser combinado com Segunda Chance.",
             "CompilationNotConcluded": "Compilação incompleta. Aguarde o sprite se opor à compilação para determinar o enfraquecimento.",
             "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Pontos de trunfo não podem ser gastos em testes sem atores",
             "HostItemOnlyAcceptIC": "Apenas atores GELOs podem ser adicionados aos hosts",

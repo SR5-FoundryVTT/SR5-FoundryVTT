@@ -548,6 +548,7 @@
         "Bullet": "Round",
         "BulletCount": "Bullet Count",
         "Bullets": "Rounds",
+        "BuyHits": "Buy Hits",
         "COMBAT": {
             "ReduceInitByFive": "Initiative -5",
             "ReduceInitByOne": "Initiative -1",
@@ -1741,6 +1742,7 @@
         },
         "Magic": "Magic",
         "Manual": "Manual",
+        "ManualOverride": "Result Override",
         "MarkImportedItemReviewed": "Mark Imported Item Reviewed",
         "MarkImportedItemTooltip": "Marks this imported item as having been reviewed.",
         "MarkImportsReviewed": "Mark Imports Reviewed",
@@ -2718,6 +2720,7 @@
                 "SpiritType": "Type of the summoned spirit"
             },
             "Test": {
+                "BuyHits": "Do not roll dice. Buy hits using ⌊dice pool / 4⌋.",
                 "Extended": "Test will be thrown as an extended test until threshold is reached",
                 "Limit": "Calculated limit value",
                 "Modifier": "Sum of all modifiers applied to dice pool",
@@ -2844,6 +2847,7 @@
             "CantSecondChanceAGlitch": "Can't second chance this test. Test result is glitched.",
             "CantSecondChanceWithoutNoneHits": "Can't second chance this test. Only hit-dice left.",
             "CantSpendMulitplePointsOfEdge": "Can't spend multiple points of edge on one test or action",
+            "CantCombineBuyHitsWithEdge": "Buy Hits can't be combined with Second Chance.",
             "CompilationNotConcluded": "Compilation incomplete. Wait for sprite to oppose compilation to determine fade.",
             "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge points can't be spent on tests without actors",
             "HostItemOnlyAcceptIC": "Only IC actors can be added to hosts",

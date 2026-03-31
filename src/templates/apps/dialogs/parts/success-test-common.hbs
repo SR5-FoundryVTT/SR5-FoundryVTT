@@ -56,6 +56,15 @@
         </div>
     </div>
     {{/if}}
+
+    <hr/>
+    <div>
+        <div class="form-group">
+            <label data-tooltip="SR5.Tooltips.Test.BuyHits">{{localize "SR5.BuyHits"}}</label>
+            <input type="checkbox" name="test.data.buyHits" {{#if test.hasBuyHits}}checked{{/if}} />
+        </div>
+    </div>
+
     {{#if test.actor}}
     <hr/>
     <div>

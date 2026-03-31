@@ -72,6 +72,26 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(test.pool.value, 10);
         });
 
+        it('buy hits uses floor(pool / 4) and has no glitches', async () => {
+            const test = TestCreator.fromPool({ pool: 10, limit: 2, threshold: 1 }, { showMessage: false, showDialog: false });
+            test.data.buyHits = true;
+
+            await test.evaluate();
+
+            assert.strictEqual(test.boughtHits, 2);
+            assert.strictEqual(test.hits.value, 2);
+            assert.strictEqual(test.glitches.value, 0);
+            assert.strictEqual(test.netHits.value, 1);
+        });
+
+        it('buy hits allows push the limit but blocks second chance', async () => {
+            const test = TestCreator.fromPool({ pool: 8 }, { showMessage: false, showDialog: false });
+            test.data.buyHits = true;
+
+            assert.strictEqual(test.canPushTheLimit, true);
+            assert.strictEqual(test.canSecondChance, false);
+        });
+
         it('evaluate an opposed roll from a opposed action', async () => {
             const action = await factory.createItem({
                 type: 'action',
