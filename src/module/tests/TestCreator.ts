@@ -359,7 +359,30 @@ export const TestCreator = {
             testCls._getDefaultTestAction()
         );
 
-        return TestCreator._prepareTestDataWithAction(action, actor, data);
+        const testData = TestCreator._prepareTestDataWithAction(action, actor, data);
+        TestCreator._mapItemSpecificLimitBase(item, action, testData);
+
+        return testData;
+    },
+
+    /**
+     * Replace generic numerical base limit values with item specific labels where possible.
+     *
+     * For weapons this maps the base limit value to an Accuracy part to improve code readability.
+     */
+    _mapItemSpecificLimitBase: function(item: SR5Item, action: ActionRollType, data: TestData) {
+        if (!item.isType('weapon')) return;
+
+        const accuracy = Number(action.limit.base);
+        if (!Number.isFinite(accuracy) || accuracy === 0) return;
+
+        const hasAccuracyBasePart = data.limit.changes.some(change =>
+            PartsList.isBaseChange(change) && change.name === 'SR5.Accuracy');
+
+        if (hasAccuracyBasePart) return;
+
+        data.limit.base = 0;
+        PartsList.addUniqueBasePart(data.limit, 'SR5.Accuracy', accuracy);
     },
 
     /**
@@ -495,8 +518,6 @@ export const TestCreator = {
 
         // Prepare limit values...
         if (action.limit.base) {
-            // TODO: For easier readability this could be mapped to an item specific limit value
-            //       For WeaponItem this would result in 'Precision' to be shown instead of a numerical literal.
             data.limit.base = Number(action.limit.base);
         }
 
