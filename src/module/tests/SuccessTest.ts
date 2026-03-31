@@ -11,7 +11,7 @@ import { PartsList } from "../parts/PartsList";
 import { DataDefaults } from "../data/DataDefaults";
 import { ActionFlow } from "../item/flows/ActionFlow";
 import { TestDialog, TestDialogListener } from "../apps/dialogs/TestDialog";
-import { CORE_NAME, FLAGS, SR, SYSTEM_NAME } from "../constants";
+import { CORE_NAME, FLAGS, SYSTEM_NAME } from "../constants";
 import { DamageApplicationFlow } from '../actor/flows/DamageApplicationFlow';
 
 import ModifierTypes = Shadowrun.ModifierTypes;
@@ -418,19 +418,20 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Automatics + Agility + 3 (3) [2 + Physical]
      */
     get code(): string {
-        // Helper to format a ValueFieldType for code display
-        const formatValueField = (field: ValueFieldType) => {
-            const parts = field.changes
-                .filter(change => change.priority === -Infinity && change.mode === CONST.ACTIVE_EFFECT_MODES.ADD)
-                .map(change => `${game.i18n.localize(change.name as Translation)}`)
+        // Helper to collect all base value parts.
+        const formatBaseField = (valueField: ValueFieldType) => {
+            const parts = valueField.changes
+                .filter(change => PartsList.isBaseChange(change))
+                .map(change => `${game.i18n.localize(change.name as Translation)} ${change.value}`);
 
-            if (field.base) parts.push(String(field.base));
+            if (valueField.base)
+                parts.push(String(valueField.base));
             return parts;
         };
 
-        const pool = formatValueField(this.pool);
-        const limit = formatValueField(this.limit);
-        const threshold = formatValueField(this.threshold);
+        const pool = formatBaseField(this.pool);
+        const limit = formatBaseField(this.limit);
+        const threshold = formatBaseField(this.threshold);
 
         // Pool portion can be dynamic or static.
         let code = pool.join(' + ').trim() || `${this.pool.value}`;
