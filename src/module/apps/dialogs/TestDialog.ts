@@ -87,7 +87,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
         classes: [SR5_APPV2_CSS_CLASS, 'sr5', 'form-dialog'],
         id: 'test-dialog-v2',
         position: {
-            width: 560,
+            width: 'auto' as const,
             height: 'auto' as const,
         },
         window: {

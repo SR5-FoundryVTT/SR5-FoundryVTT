@@ -35,11 +35,14 @@
 }
 
 .sr5v2.form-dialog#test-dialog-v2 {
+  max-width: calc(100vw - 2rem);
+
   .window-content {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
     min-height: 0;
+    container-type: inline-size;
   }
 
   [data-application-part='content'] {
@@ -55,5 +58,24 @@
 
   .sheet-footer {
     margin-top: 0;
+  }
+
+  // Make the top-level test dialog sections adapt between stacked and split layouts.
+  form > .dialog-content-common {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+
+    > * {
+      flex: 1 1 100%;
+      min-width: 0;
+    }
+  }
+
+  @container (min-width: 760px) {
+    form > .dialog-content-common > hr + div,
+    form > .dialog-content-common > hr + div + div {
+      flex: 1 1 calc(50% - 0.375rem);
+    }
   }
 }
