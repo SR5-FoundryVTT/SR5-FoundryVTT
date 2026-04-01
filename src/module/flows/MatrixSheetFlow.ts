@@ -1,5 +1,5 @@
 import { SR5Actor } from '../actor/SR5Actor';
-import { PromptDialogData, PromptDialog } from '@/module/apps/dialogs/FormDialog';
+import { PromptDialogData, PromptDialog } from '@/module/apps/dialogs/PromptDialog';
 import { NetworkManager } from '@/module/apps/NetworkManager';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 

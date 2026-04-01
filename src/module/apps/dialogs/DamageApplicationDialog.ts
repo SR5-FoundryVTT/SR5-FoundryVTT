@@ -1,4 +1,4 @@
-import { PromptDialogData, PromptDialog } from './FormDialog';
+import { PromptDialogData, PromptDialog } from './PromptDialog';
 import {SR5Actor} from "../../actor/SR5Actor";
 import { DamageType } from "src/module/types/item/Action";
 import { SR5Item } from "@/module/item/SR5Item";

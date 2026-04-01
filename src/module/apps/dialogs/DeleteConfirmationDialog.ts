@@ -1,4 +1,4 @@
-import { PromptDialogData, PromptDialog } from './FormDialog';
+import { PromptDialogData, PromptDialog } from './PromptDialog';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 
 export class DeleteConfirmationDialog extends PromptDialog {

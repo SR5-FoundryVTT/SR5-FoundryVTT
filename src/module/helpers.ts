@@ -1,7 +1,7 @@
 import { BiofeedbackDamageType, DamageType } from './types/item/Action';
 import { SR5Actor } from "./actor/SR5Actor";
 import { DeleteConfirmationDialog } from "./apps/dialogs/DeleteConfirmationDialog";
-import { PromptDialogData, PromptDialog } from './apps/dialogs/FormDialog';
+import { PromptDialogData, PromptDialog } from './apps/dialogs/PromptDialog';
 import { DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SYSTEM_NAME } from "./constants";
 import { DataDefaults } from "./data/DataDefaults";
 import { SR5Item } from './item/SR5Item';

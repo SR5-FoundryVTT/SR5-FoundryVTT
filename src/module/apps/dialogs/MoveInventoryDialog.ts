@@ -1,4 +1,4 @@
-import { PromptDialogData, PromptDialog } from './FormDialog';
+import { PromptDialogData, PromptDialog } from './PromptDialog';
 import { SR5Actor } from "../../actor/SR5Actor";
 import { SR5Item } from '../../item/SR5Item';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
