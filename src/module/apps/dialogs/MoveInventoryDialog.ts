@@ -1,4 +1,4 @@
-import { PromptDialogData, PromptDialogV2 } from './PromptDialogV2';
+import { PromptDialogData, PromptDialog } from './FormDialog';
 import { SR5Actor } from "../../actor/SR5Actor";
 import { SR5Item } from '../../item/SR5Item';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
@@ -8,7 +8,7 @@ import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
  *
  * @returns The inventory name selected.
  */
-export class MoveInventoryDialog extends PromptDialogV2 {
+export class MoveInventoryDialog extends PromptDialog {
     /**
      * @param actor Use this actor's inventories to select from.
      * @param item The item to be moved between inventories
@@ -22,7 +22,7 @@ export class MoveInventoryDialog extends PromptDialogV2 {
     }
 
     static override DEFAULT_OPTIONS = {
-        ...PromptDialogV2.DEFAULT_OPTIONS,
+        ...PromptDialog.DEFAULT_OPTIONS,
         id: 'move-inventory-application',
         classes: [SR5_APPV2_CSS_CLASS, 'sr5', 'form-dialog'],
         position: {

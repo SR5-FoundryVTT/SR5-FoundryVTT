@@ -1,14 +1,14 @@
-import { TestDialogLike } from '../apps/dialogs/TestDialogTypes';
-import {SuccessTest, SuccessTestData} from "./SuccessTest";
-import {DataDefaults} from "../data/DataDefaults";
-import {SR5} from "../config";
-import {FireModeRules} from "../rules/FireModeRules";
+import { SR5 } from "../config";
 import { SR5Item } from "../item/SR5Item";
 import { TestCreator } from './TestCreator';
-import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
 import { DamageType } from '../types/item/Action';
-import { RangesTemplateType, TargetRangeTemplateType } from '../types/template/Weapon';
+import { DataDefaults } from "../data/DataDefaults";
+import { FireModeRules } from "../rules/FireModeRules";
 import { FireModeType } from '../types/flags/ItemFlags';
+import { SuccessTest, SuccessTestData } from "./SuccessTest";
+import { TestDialogLike } from '../apps/dialogs/TestDialog';
+import { RangesTemplateType, TargetRangeTemplateType } from '../types/template/Weapon';
+import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
 
 export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDataFragment {
     damage: DamageType

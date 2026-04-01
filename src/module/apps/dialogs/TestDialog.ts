@@ -1,15 +1,28 @@
 import { SR5 } from '../../config';
 import { Translation } from '../../utils/strings';
 import { PartsList } from '@/module/parts/PartsList';
-import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 import { FLAGS, SYSTEM_NAME } from '../../constants';
+import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
+import { AnyMutableObject, DeepPartial } from 'fvtt-types/utils';
+import { ModifiableValueType } from '@/module/types/template/Base';
 import { SuccessTest, SuccessTestData } from '../../tests/SuccessTest';
-import { TestDialogListener } from './TestDialogTypes';
-import { DeepPartial } from 'fvtt-types/utils';
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
-interface TestDialogV2Context extends HandlebarsApplicationMixin.RenderContext {
+export interface TestDialogLike {
+    render: (...args: any[]) => unknown
+}
+
+/**
+ * A way of allowing tests to inject handlers without having to sub-class the whole dialog
+ */
+export interface TestDialogListener {
+    query: string
+    on: string
+    callback: (event: any, dialog: TestDialogLike) => void
+}
+
+interface TestDialogContext extends HandlebarsApplicationMixin.RenderContext {
     test: any;
     rollMode: string;
     rollModes: CONFIG.Dice.RollModes;
@@ -18,7 +31,7 @@ interface TestDialogV2Context extends HandlebarsApplicationMixin.RenderContext {
     dialogContent: string;
 }
 
-export class TestDialogV2 extends HandlebarsApplicationMixin(ApplicationV2)<TestDialogV2Context> {
+export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDialogContext> {
     test: SuccessTest;
     listeners: TestDialogListener[];
     _expandedList: Set<string>;
@@ -45,7 +58,7 @@ export class TestDialogV2 extends HandlebarsApplicationMixin(ApplicationV2)<Test
             this._selectionReject = reject;
         });
 
-        const hasModifierChanges = (changes) => {
+        const hasModifierChanges = (changes?: ModifiableValueType['changes']) => {
             if (!Array.isArray(changes)) return false;
             return changes.some(change => !PartsList.isBaseChange(change));
         }
@@ -85,8 +98,8 @@ export class TestDialogV2 extends HandlebarsApplicationMixin(ApplicationV2)<Test
             closeOnSubmit: false,
         },
         actions: {
-            roll: TestDialogV2.#roll,
-            cancel: TestDialogV2.#cancel,
+            roll: TestDialog.#roll,
+            cancel: TestDialog.#cancel,
         }
     }
 
@@ -99,7 +112,7 @@ export class TestDialogV2 extends HandlebarsApplicationMixin(ApplicationV2)<Test
     }
 
     async select(): Promise<SuccessTestData> {
-        await this.render(true);
+        await this.render({ force: true });
 
         if (this._selectionPromise === undefined || this.selection === undefined)
             return this._emptySelection();
@@ -122,13 +135,13 @@ export class TestDialogV2 extends HandlebarsApplicationMixin(ApplicationV2)<Test
         return closed;
     }
 
-    static async #roll(this: TestDialogV2, event: Event) {
+    static async #roll(this: TestDialog, event: Event) {
         event.preventDefault();
         this.selectedButton = 'roll';
 
         this.applyFormData();
 
-        this.selection = this.test.data as SuccessTestData;
+        this.selection = this.test.data;
         if (!this._selectionSettled) {
             this._selectionSettled = true;
             this._selectionResolve(this.selection);
@@ -137,7 +150,7 @@ export class TestDialogV2 extends HandlebarsApplicationMixin(ApplicationV2)<Test
         await this.close();
     }
 
-    static async #cancel(this: TestDialogV2, event: Event) {
+    static async #cancel(this: TestDialog, event: Event) {
         event.preventDefault();
         this.selectedButton = 'cancel';
         await this.close();
@@ -145,8 +158,8 @@ export class TestDialogV2 extends HandlebarsApplicationMixin(ApplicationV2)<Test
 
     protected override async _prepareContext(
         options: Parameters<ApplicationV2['_prepareContext']>[0]
-    ): Promise<TestDialogV2Context> {
-        const context = await super._prepareContext(options) as TestDialogV2Context;
+    ): Promise<TestDialogContext> {
+        const context = await super._prepareContext(options);
 
         context.test = this.test;
         context.rollMode = this.test.data.options?.rollMode ?? game.settings.get('core', 'rollMode');
@@ -159,7 +172,7 @@ export class TestDialogV2 extends HandlebarsApplicationMixin(ApplicationV2)<Test
     }
 
     protected override async _onRender(
-        context: DeepPartial<TestDialogV2Context>,
+        context: DeepPartial<TestDialogContext>,
         options: DeepPartial<ApplicationV2.RenderOptions>
     ) {
         await super._onRender(context, options);
@@ -266,21 +279,21 @@ export class TestDialogV2 extends HandlebarsApplicationMixin(ApplicationV2)<Test
 
     _injectExternalActiveListeners(html: JQuery) {
         for (const listener of this.listeners) {
-            html.find(listener.query).on(listener.on as any, (event: any) => listener.callback.bind(this.test)(event, this));
+            html.find(listener.query).on(listener.on, event => listener.callback.bind(this.test)(event, this));
         }
     }
 
     applyFormData() {
-        const form = this.element.querySelector('form') as HTMLFormElement | null;
+        const form = this.element.querySelector('form');
         if (!form) return;
 
-        const fd = new FormDataExtended(form, {editors: {}});
+        const fd = new foundry.applications.ux.FormDataExtended(form, {editors: {}});
         const data = fd.object;
 
         this._updateData(data);
     }
 
-    _updateData(data) {
+    _updateData(data: AnyMutableObject) {
         if (this.selectedButton === 'cancel') return;
 
         const entries = Object.entries(data);

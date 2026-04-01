@@ -1,5 +1,5 @@
 import { SR5Actor } from '../actor/SR5Actor';
-import { PromptDialogData, PromptDialogV2 } from '@/module/apps/dialogs/PromptDialogV2';
+import { PromptDialogData, PromptDialog } from '@/module/apps/dialogs/FormDialog';
 import { NetworkManager } from '@/module/apps/NetworkManager';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 
@@ -26,7 +26,7 @@ export const MatrixSheetFlow = {
             templateData: {},
             templatePath: 'systems/shadowrun5e/dist/templates/apps/dialogs/reboot-confirmation-dialog.hbs'
         }
-        const dialog = new PromptDialogV2(data, {
+        const dialog = new PromptDialog(data, {
             classes: [SR5_APPV2_CSS_CLASS, 'sr5', 'form-dialog'],
             position: {
                 width: 420,

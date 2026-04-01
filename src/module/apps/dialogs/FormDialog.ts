@@ -17,16 +17,16 @@ export interface PromptDialogData {
     onAfterClose?: (html: JQuery, selectedButton?: string) => Promise<object> | object
 }
 
-interface PromptDialogV2Context extends HandlebarsApplicationMixin.RenderContext {
+interface PromptDialogContext extends HandlebarsApplicationMixin.RenderContext {
     dialogContent: string
     buttons: Record<string, PromptDialogButton>
 }
 
-export interface PromptDialogV2Options extends Partial<ApplicationV2.Configuration> {
+export interface PromptDialogOptions extends Partial<ApplicationV2.Configuration> {
     applyFormChangesOnSubmit?: boolean | null
 }
 
-export class PromptDialogV2 extends HandlebarsApplicationMixin(ApplicationV2)<PromptDialogV2Context> {
+export class PromptDialog extends HandlebarsApplicationMixin(ApplicationV2)<PromptDialogContext> {
     dialogData: PromptDialogData;
 
     selection: object;
@@ -40,7 +40,7 @@ export class PromptDialogV2 extends HandlebarsApplicationMixin(ApplicationV2)<Pr
     _onAfterClose: (html: JQuery, selectedButton?: string) => Promise<object> | object;
     _applyFormChangesOnSubmit: boolean;
 
-    constructor(data: PromptDialogData, options: PromptDialogV2Options = {}) {
+    constructor(data: PromptDialogData, options: PromptDialogOptions = {}) {
         const { applyFormChangesOnSubmit = false, ...appOptions } = options;
         super(appOptions);
 
@@ -89,7 +89,7 @@ export class PromptDialogV2 extends HandlebarsApplicationMixin(ApplicationV2)<Pr
     }
 
     async select(): Promise<object> {
-        await this.render(true);
+        await this.render({ force: true });
 
         if (this._selectionPromise === undefined || this.selection === undefined)
             return this._emptySelection();
@@ -114,8 +114,8 @@ export class PromptDialogV2 extends HandlebarsApplicationMixin(ApplicationV2)<Pr
 
     protected override async _prepareContext(
         options: Parameters<ApplicationV2['_prepareContext']>[0]
-    ): Promise<PromptDialogV2Context> {
-        const context = await super._prepareContext(options) as PromptDialogV2Context;
+    ): Promise<PromptDialogContext> {
+        const context = await super._prepareContext(options);
 
         const templateData = this.dialogData.templateData || {};
         context.dialogContent = await foundry.applications.handlebars.renderTemplate(this.dialogData.templatePath, templateData as Record<string, unknown>);
@@ -125,7 +125,7 @@ export class PromptDialogV2 extends HandlebarsApplicationMixin(ApplicationV2)<Pr
     }
 
     protected override async _onRender(
-        context: DeepPartial<PromptDialogV2Context>,
+        context: DeepPartial<PromptDialogContext>,
         options: DeepPartial<ApplicationV2.RenderOptions>
     ) {
         await super._onRender(context, options);
@@ -134,7 +134,7 @@ export class PromptDialogV2 extends HandlebarsApplicationMixin(ApplicationV2)<Pr
 
         html.find("[data-application-part='footer'] button[data-action]").on('click', event => {
             event.preventDefault();
-            const button = event.currentTarget as HTMLElement;
+            const button = event.currentTarget;
             const action = button.dataset.action;
             if (!action) return;
             void this.submitButton(action);
@@ -167,10 +167,10 @@ export class PromptDialogV2 extends HandlebarsApplicationMixin(ApplicationV2)<Pr
     }
 
     applyFormData() {
-        const form = this.element.querySelector('form') as HTMLFormElement | null;
+        const form = this.element.querySelector('form');
         if (!form) return;
 
-        const fd = new FormDataExtended(form, {editors: {}});
+        const fd = new foundry.applications.ux.FormDataExtended(form, {editors: {}});
         const data = fd.object;
 
         this._updateData(data);

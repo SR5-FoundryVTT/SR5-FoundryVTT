@@ -1,10 +1,10 @@
-import { PromptDialogData, PromptDialogV2 } from './PromptDialogV2';
+import { PromptDialogData, PromptDialog } from './FormDialog';
 import {SR5Actor} from "../../actor/SR5Actor";
 import { DamageType } from "src/module/types/item/Action";
 import { SR5Item } from "@/module/item/SR5Item";
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 
-export class DamageApplicationDialog extends PromptDialogV2 {
+export class DamageApplicationDialog extends PromptDialog {
 
     constructor(targets: (SR5Actor | SR5Item)[], damage: DamageType, options?) {
         const dialogData = DamageApplicationDialog.getDialogData(targets, damage);
@@ -12,7 +12,7 @@ export class DamageApplicationDialog extends PromptDialogV2 {
     }
 
     static override DEFAULT_OPTIONS = {
-        ...PromptDialogV2.DEFAULT_OPTIONS,
+        ...PromptDialog.DEFAULT_OPTIONS,
         id: 'damage-application',
         classes: [SR5_APPV2_CSS_CLASS, 'sr5', 'form-dialog'],
         window: {
