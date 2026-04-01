@@ -248,7 +248,7 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         if (PartsList.isModifiableValue(target)) {
             target.changes.push({
-                applied: true,
+                applied: change.effect.active,
                 masked: false,
                 name: change.effect.name,
                 value: delta,
