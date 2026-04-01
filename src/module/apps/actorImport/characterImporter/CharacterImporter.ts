@@ -4,6 +4,7 @@ import { ImportHelper as IH } from "src/module/apps/itemImport/helper/ImportHelp
 import { DataDefaults } from "@/module/data/DataDefaults";
 import { PackItemFlow } from "@/module/item/flows/PackItemFlow";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
+import { SkillNamingFlow } from "@/module/flows/SkillNamingFlow";
 
 import { ActorSchema } from "../ActorSchema";
 import { ItemsParser } from "../itemImporter/ItemsParser";
@@ -325,6 +326,75 @@ export class CharacterImporter {
         this.handleLanguageSkills(actor.items, languageSkills);
         this.handleKnowledgeSkills(actor.items, knowledgeSkills);
         await this.handleActiveSkills(actor.items, activeSkills);
+
+        const skillsetUuid = await this.assignDefaultSkillset(actor);
+        await this.handleSkillGroups(actor.items, chummerChar);
+    }
+
+    /**
+     * Find and assign the default skillset for the character actor type.
+     * Links all already-imported skill items to the skillset via source.uuid.
+     *
+     * @param actor The blank character being built for import.
+     * @returns The UUID of the assigned skillset, or undefined if none found.
+     */
+    private static async assignDefaultSkillset(actor: BlankCharacter): Promise<string | undefined> {
+        const skillSets = await PackItemFlow.getAllPackSkillSets();
+        const skillSet = skillSets.find(s => s.system.set.default.type === actor.type);
+        if (!skillSet) {
+            console.debug(`Shadowrun 5e | No default skill set found for actor type ${actor.type}, skipping skillset assignment on import`);
+            return undefined;
+        }
+
+        actor.system.skillset = skillSet.uuid;
+
+        for (const item of actor.items) {
+            if (item.type !== 'skill') continue;
+            (item as Item.CreateData & { system: { source: { uuid: string } } }).system.source.uuid = skillSet.uuid;
+        }
+
+        console.debug(`Shadowrun 5e | Assigned skill set ${skillSet.name} (${skillSet.uuid}) to imported character`);
+        return skillSet.uuid;
+    }
+
+    /**
+     * Create skill group items from the Chummer XML skillgroup data.
+     * Only non-broken groups with a rating are created.
+     *
+     * @param items The items list being built for the actor.
+     * @param chummerChar The parsed Chummer character XML data.
+     */
+    private static async handleSkillGroups(
+        items: BlankCharacter['items'],
+        chummerChar: ActorSchema
+    ) {
+        const chummerGroups = IH.getArray(chummerChar.skills.skillgroup);
+        if (!chummerGroups.length) return;
+
+        const packGroups = await PackItemFlow.getPackSkillgroups();
+        const packGroupsByName = new Map(packGroups.map(g => [g.name.trim().toLowerCase(), g]));
+
+        for (const chummerGroup of chummerGroups) {
+            if (chummerGroup.isbroken === 'True') continue;
+
+            const rating = Number(chummerGroup.rating) || 0;
+            if (rating <= 0) continue;
+
+            const groupName = chummerGroup.name_english || chummerGroup.name;
+            const packGroup = packGroupsByName.get(groupName.trim().toLowerCase());
+            if (!packGroup) {
+                console.debug(`Shadowrun 5e | No pack skill group found for "${groupName}", skipping`);
+                continue;
+            }
+
+            const groupItem = packGroup.toObject() as Item.CreateData & {
+                system: { group: { rating: number }; source: { uuid: string } }
+            };
+            delete (groupItem as Item.CreateData & { _id?: string })._id;
+            groupItem.system.group.rating = rating;
+
+            items.push(groupItem);
+        }
     }
 
     private static async handleActiveSkills(items: BlankCharacter['items'], activeSkills: ActorSchema['skills']['skill']) {

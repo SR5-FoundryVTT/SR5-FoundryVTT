@@ -130,6 +130,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         
         // Abort skill creation data injection when duplicating
         if (foundry.utils.getProperty(data, '_stats.duplicateSource')) return;
+        // Abort if a skillset was already assigned (e.g. during Chummer import)
+        if (foundry.utils.getProperty(data, 'system.skillset')) return;
         await CreateActorFlow.addDefaultActorSkillset(this, data);
     }
 
