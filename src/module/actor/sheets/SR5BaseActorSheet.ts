@@ -2317,7 +2317,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         // Ask user about what inventory to move the item to.
         const dialog = new MoveInventoryDialog(this.actor, item, this.selectedInventory);
-        const inventory = await dialog.select();
+        const inventory = await dialog.select() as unknown as string;
         if (dialog.canceled) return;
 
         await this.actor.inventory.addItems(inventory, item);

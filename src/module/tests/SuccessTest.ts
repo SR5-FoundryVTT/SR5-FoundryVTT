@@ -10,7 +10,8 @@ import { TestRules } from "../rules/TestRules";
 import { PartsList } from "../parts/PartsList";
 import { DataDefaults } from "../data/DataDefaults";
 import { ActionFlow } from "../item/flows/ActionFlow";
-import { TestDialog, TestDialogListener } from "../apps/dialogs/TestDialog";
+import { TestDialogListener } from "../apps/dialogs/TestDialogTypes";
+import { TestDialogV2 } from "../apps/dialogs/TestDialogV2";
 import { CORE_NAME, FLAGS, SYSTEM_NAME } from "../constants";
 import { DamageApplicationFlow } from '../actor/flows/DamageApplicationFlow';
 
@@ -177,7 +178,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     public rolls: SR5Roll[];
     // Targets can be either actor/item or a token.
     public targets: (SR5Actor | SR5Item | TokenDocument)[];
-    public dialog: TestDialog | null;
+    public dialog: TestDialogV2 | null;
 
     // Flows to handle different aspects of a Success Test that are not directly related to the test itself.
     public effects: SuccessTestEffectsFlow<this>;
@@ -484,7 +485,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @override This method if you want to use a different TestDialog.
      */
     _createTestDialog() {
-        return new TestDialog({ test: this, templatePath: this._dialogTemplate }, undefined, this._testDialogListeners());
+        return new TestDialogV2(this, this._testDialogListeners());
     }
 
     /**
@@ -518,7 +519,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         }
 
         // Overwrite current test state with whatever the dialog gives.
-        this.data = data;
+        this.data = data as unknown as T;
 
         // Provide entry points with dialog data.
         await this._cleanUpAfterDialog();

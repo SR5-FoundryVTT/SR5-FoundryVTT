@@ -1,4 +1,4 @@
-import { TestDialog } from '../apps/dialogs/TestDialog';
+import { TestDialogLike } from '../apps/dialogs/TestDialogTypes';
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {DataDefaults} from "../data/DataDefaults";
 import {SR5} from "../config";
@@ -50,7 +50,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
     /**
      * User want's to manually reset progressive recoil before casting the attack test.
      */
-    async _handleResetProgressiveRecoil(event: JQuery<HTMLElement>, test: TestDialog) {
+    async _handleResetProgressiveRecoil(event: JQuery<HTMLElement>, test: TestDialogLike) {
         if (!this.actor) return;
         await this.actor.clearProgressiveRecoil();
 

@@ -1,13 +1,14 @@
-import {FormDialog, FormDialogData} from "./FormDialog";
+import { PromptDialogData, PromptDialogV2 } from './PromptDialogV2';
+import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 
-export class DeleteConfirmationDialog extends FormDialog {
+export class DeleteConfirmationDialog extends PromptDialogV2 {
     constructor(options?) {
-        const dialogData = DeleteConfirmationDialog.getDialogData() as unknown as FormDialogData;
+        const dialogData = DeleteConfirmationDialog.getDialogData();
 
         super(dialogData, options)
     }
 
-    static getDialogData() {
+    static getDialogData(): PromptDialogData {
         return {
             title: game.i18n.localize("SR5.DeleteConfirmationApplication.Title"),
             buttons: {
@@ -24,13 +25,16 @@ export class DeleteConfirmationDialog extends FormDialog {
         }
     }
 
-    static override get defaultOptions() {
-        const options = super.defaultOptions;
-        options.id = 'delete-confirmation-application';
-        // Class Dialog here is needed for dialog button styling.
-        options.classes = ['sr5', 'form-dialog'];
-        options.resizable = true;
-        options.height = 'auto';
-        return options;
+    static override DEFAULT_OPTIONS = {
+        ...PromptDialogV2.DEFAULT_OPTIONS,
+        id: 'delete-confirmation-application',
+        classes: [SR5_APPV2_CSS_CLASS, 'sr5', 'form-dialog'],
+        window: {
+            resizable: true,
+        },
+        position: {
+            width: 420,
+            height: 'auto' as const,
+        },
     }
 }

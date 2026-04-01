@@ -1,6 +1,7 @@
 import { BiofeedbackDamageType, DamageType } from './types/item/Action';
 import { SR5Actor } from "./actor/SR5Actor";
 import { DeleteConfirmationDialog } from "./apps/dialogs/DeleteConfirmationDialog";
+import { PromptDialogData, PromptDialogV2 } from './apps/dialogs/PromptDialogV2';
 import { DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SYSTEM_NAME } from "./constants";
 import { DataDefaults } from "./data/DataDefaults";
 import { SR5Item } from './item/SR5Item';
@@ -874,21 +875,37 @@ export class Helpers {
         if(availableActors.length === 1) {
             return availableActors[0]
         } else {
-            let allActors = ''
-            game.actors?.filter( e => e.isOwner && e.hasPlayerOwner).forEach(t => {
-                    allActors = allActors.concat(`
-                            <option value="${t.id}">${t.name}</option>`);
-                });
-            const  dialog_content = `
-                <select name ="actor">
-                ${allActors}
-                </select>`;
-
-            const choosenActor = await foundry.appv1.api.Dialog.prompt({
+            const data: PromptDialogData = {
                 title: game.i18n.localize('SR5.Skill.Teamwork.ParticipantActor'),
-                content: dialog_content,
-                callback: (html) => html.find('select').val()
-            }) as string;
+                templateData: { actors: availableActors },
+                templatePath: 'systems/shadowrun5e/dist/templates/apps/dialogs/choose-actor-dialog.hbs',
+                buttons: {
+                    confirm: {
+                        label: game.i18n.localize('SR5.Dialogs.Common.Ok')
+                    },
+                    cancel: {
+                        label: game.i18n.localize('SR5.Dialogs.Common.Cancel')
+                    }
+                },
+                default: 'confirm',
+                onAfterClose: async html => {
+                    const selected = html.find('select[name="actor"]').val();
+                    return { actorId: selected };
+                }
+            };
+
+            const dialog = new PromptDialogV2(data, {
+                position: {
+                    width: 420,
+                    height: 'auto',
+                }
+            });
+
+            const selection = await dialog.select() as { actorId?: unknown };
+            if (dialog.canceled || dialog.selectedButton !== 'confirm') return undefined;
+
+            const choosenActor = selection.actorId as string | undefined;
+            if (!choosenActor) return undefined;
 
             return game.actors?.get(choosenActor) as SR5Actor;
         }

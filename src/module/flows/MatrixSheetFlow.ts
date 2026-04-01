@@ -1,6 +1,7 @@
 import { SR5Actor } from '../actor/SR5Actor';
-import { FormDialog, FormDialogOptions } from '@/module/apps/dialogs/FormDialog';
+import { PromptDialogData, PromptDialogV2 } from '@/module/apps/dialogs/PromptDialogV2';
 import { NetworkManager } from '@/module/apps/NetworkManager';
+import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 
 /**
  * Handling of sheet presentation around matrix data.
@@ -11,7 +12,7 @@ export const MatrixSheetFlow = {
      * @param actor
      */
     async promptRebootPersonaDevice(actor: SR5Actor) {
-        const data = {
+        const data: PromptDialogData = {
             title: game.i18n.localize("SR5.RebootConfirmationDialog.Title"),
             buttons: {
                 confirm: {
@@ -21,15 +22,17 @@ export const MatrixSheetFlow = {
                     label: game.i18n.localize('SR5.RebootConfirmationDialog.Cancel')
                 }
             },
-            content: '',
             default: 'cancel',
             templateData: {},
             templatePath: 'systems/shadowrun5e/dist/templates/apps/dialogs/reboot-confirmation-dialog.hbs'
         }
-        const options = {
-            classes: ['sr5', 'form-dialog'],
-        } as FormDialogOptions;
-        const dialog = new FormDialog(data, options);
+        const dialog = new PromptDialogV2(data, {
+            classes: [SR5_APPV2_CSS_CLASS, 'sr5', 'form-dialog'],
+            position: {
+                width: 420,
+                height: 'auto',
+            }
+        });
         await dialog.select();
         if (dialog.canceled || dialog.selectedButton !== 'confirm') return;
 

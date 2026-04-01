@@ -33,3 +33,27 @@
     }
   }
 }
+
+.sr5v2.form-dialog#test-dialog-v2 {
+  .window-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-height: 0;
+  }
+
+  [data-application-part='content'] {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  [data-application-part='footer'] {
+    flex: 0 0 auto;
+  }
+
+  .sheet-footer {
+    margin-top: 0;
+  }
+}

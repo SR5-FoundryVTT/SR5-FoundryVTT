@@ -67,6 +67,10 @@ export const preloadHandlebarsTemplates = async () => {
             'item-properties/sprite_power',
             'item-properties/technology',
             'item-properties/weapon',
+            'dialogs/form-dialog/content',
+            'dialogs/form-dialog/footer',
+            'dialogs/test-dialog/content',
+            'dialogs/test-dialog/footer',
         ),
         ...v2AP(
             'attribute',
