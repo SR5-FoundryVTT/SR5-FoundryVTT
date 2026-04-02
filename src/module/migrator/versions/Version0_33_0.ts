@@ -188,10 +188,10 @@ export class Version0_33_0 extends VersionMigration {
                 },
                 skill: {
                     category: entry.category,
+                    knowledgeType: entry.knowledgeType ?? 'academic',
                     attribute: this.getSkillAttribute(entry),
                     defaulting: this.getSkillDefaulting(entry),
                     rating: this.getSkillRating(entry.skill),
-                    ...(entry.category === 'knowledge' ? { knowledgeType: entry.knowledgeType ?? 'academic' } : {}),
                     limit: {
                         attribute: this.getSkillLimit(entry.skill.limit),
                     },
