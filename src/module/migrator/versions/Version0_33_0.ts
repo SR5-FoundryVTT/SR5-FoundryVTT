@@ -57,6 +57,7 @@ const LEGACY_KNOWLEDGE_ATTRIBUTES: Record<LegacyKnowledgeType, string> = {
  */
 export class Version0_33_0 extends VersionMigration {
     readonly TargetVersion = '0.33.0';
+    private skillPackIcons?: ReadonlyMap<string, string>;
 
     /**
      * Only migrate if an actor actually has skills.
@@ -179,7 +180,7 @@ export class Version0_33_0 extends VersionMigration {
             _id: foundry.utils.randomID(16),
             name,
             type: 'skill',
-            img: this.getSkillImage(entry.skill),
+            img: this.getSkillImage(name, entry.skill),
             system: DataDefaults.baseSystemData('skill', {
                 type: 'skill',
                 description: {
@@ -271,8 +272,33 @@ export class Version0_33_0 extends VersionMigration {
         return this.isSkillRequirement(value) ? value : 'mundane';
     }
 
-    private getSkillImage(skill: LegacySkillData) {
-        return this.readString(skill.img) || 'icons/svg/item-bag.svg';
+    private getSkillImage(name: string, skill: LegacySkillData) {
+        const packIcon = this.getSkillPackIcons().get(this.readString(name));
+        return packIcon || this.readString(skill.img) || 'icons/svg/item-bag.svg';
+    }
+
+    private getSkillPackIcons(): ReadonlyMap<string, string> {
+        if (this.skillPackIcons) return this.skillPackIcons;
+
+        const packName = SR5.packNames.SkillsPack;
+        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
+        if (!pack) {
+            this.skillPackIcons = new Map();
+            return this.skillPackIcons;
+        }
+
+        this.skillPackIcons = new Map(
+            pack.index
+                .filter(data => data.type === 'skill')
+                .flatMap(data => {
+                    const name = this.readString(data.name);
+                    const img = this.readString(data.img);
+                    if (!name || !img) return [];
+                    return [[name, img] as const];
+                })
+        );
+
+        return this.skillPackIcons;
     }
 
     private buildSkillKey(name: string, category: LegacySkillCategory) {
