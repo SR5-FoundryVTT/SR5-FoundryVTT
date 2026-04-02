@@ -1,10 +1,9 @@
 import { SR5Actor } from "src/module/actor/SR5Actor";
 import { ImportHelper as IH } from "src/module/apps/itemImport/helper/ImportHelper";
 
+import { ActorSkillImport } from '../ActorSkillImport';
 import { DataDefaults } from "@/module/data/DataDefaults";
-import { PackItemFlow } from "@/module/item/flows/PackItemFlow";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
-import { SkillNamingFlow } from "@/module/flows/SkillNamingFlow";
 
 import { ActorSchema } from "../ActorSchema";
 import { ItemsParser } from "../itemImporter/ItemsParser";
@@ -40,27 +39,6 @@ export interface BlankCharacter extends Actor.CreateData {
  * Imports characters from other tools into an existing foundry actor.
  */
 export class CharacterImporter {
-    private static readonly ATTRIBUTE_MAP = {
-        bod: "body",
-        agi: "agility",
-        rea: "reaction",
-        str: "strength",
-        cha: "charisma",
-        int: "intuition",
-        log: "logic",
-        wil: "willpower",
-        edg: "edge",
-        mag: "magic",
-        res: "resonance"
-    } as const;
-
-    private static readonly KNOWLEDGE_ATTRIBUTE_MAP = {
-        academic: 'logic',
-        interests: 'intuition',
-        professional: 'logic',
-        street: 'intuition',
-    } as const;
-
     /**
      * Maps Chummer attribute abbreviations to SR5-Foundry attribute names.
      * @param attName The Chummer attribute abbreviation.
@@ -68,69 +46,12 @@ export class CharacterImporter {
      */
     static parseAttName(
         attName: string
-    ): typeof CharacterImporter.ATTRIBUTE_MAP[keyof typeof CharacterImporter.ATTRIBUTE_MAP] | "" {
-        const key = attName.trim().toLowerCase();
-        return this.ATTRIBUTE_MAP[key] ?? "";
+    ): ReturnType<typeof ActorSkillImport.parseAttName> {
+        return ActorSkillImport.parseAttName(attName);
     }
 
     static parseSkillName(skillName: string): string {
-        return skillName.trim().toLowerCase().replace(/[\s-]/g, '_');
-    }
-
-    private static parseKnowledgeType(skillCategory?: string): keyof typeof CharacterImporter.KNOWLEDGE_ATTRIBUTE_MAP | undefined {
-        const category = skillCategory?.trim().toLowerCase();
-        if (!category) return undefined;
-        if (category === 'interest') return 'interests';
-        if (category in this.KNOWLEDGE_ATTRIBUTE_MAP) {
-            return category as keyof typeof CharacterImporter.KNOWLEDGE_ATTRIBUTE_MAP;
-        }
-
-        return undefined;
-    }
-
-    private static createImportedSkillItem(skill: ActorSchema['skills']['skill'][number], options: {
-        name: string;
-        category: 'active' | 'language' | 'knowledge';
-        rating: number;
-        attribute?: ReturnType<typeof CharacterImporter['parseAttName']>;
-        defaulting?: boolean;
-        knowledgeType?: keyof typeof CharacterImporter.KNOWLEDGE_ATTRIBUTE_MAP;
-        isNative?: boolean;
-        group?: string;
-    }): Item.CreateData & {
-        name: string;
-        type: 'skill';
-        system: ReturnType<typeof DataDefaults.baseSystemData<'skill'>>;
-    } {
-        const skillItem: Item.CreateData & {
-            name: string;
-            type: 'skill';
-            system: ReturnType<typeof DataDefaults.baseSystemData<'skill'>>;
-        } = {
-            name: options.name,
-            type: 'skill',
-            system: DataDefaults.baseSystemData('skill', {
-                type: 'skill',
-                skill: {
-                    category: options.category,
-                    attribute: options.attribute ?? '',
-                    defaulting: options.defaulting ?? false,
-                    knowledgeType: options.knowledgeType ?? null,
-                    group: options.group ?? '',
-                    language: {
-                        isNative: options.isNative ?? false,
-                    },
-                },
-            }),
-            effects: [],
-        };
-
-        skillItem.system.skill.rating = options.rating;
-        skillItem.system.skill.specializations = IH.getArray(skill.skillspecializations?.skillspecialization).map(spec => ({
-            name: spec.name,
-        }));
-
-        return skillItem;
+        return ActorSkillImport.parseSkillName(skillName);
     }
 
     // --------------------------------------------------------------------------
@@ -192,7 +113,7 @@ export class CharacterImporter {
         await this.importBio(actor.system, chummerChar);
         this.importAttributes(actor.system, chummerChar);
         this.importInitiative(actor.system, chummerChar);
-        await this.importSkills(actor, chummerChar);
+        await ActorSkillImport.importSkills(actor, chummerChar);
 
         actor.system.is_critter = chummerChar.critter === 'True';
     }
@@ -302,174 +223,4 @@ export class CharacterImporter {
         system.modifiers.matrix_initiative_dice = (Number(chummerChar.matrixarinitdice) || 3) - 3;
     }
 
-    // --------------------------------------------------------------------------
-    // Private Skill Handling Methods
-    // --------------------------------------------------------------------------
-
-    private static async importSkills(actor: BlankCharacter, chummerChar: ActorSchema) {
-        const skills = IH.getArray(chummerChar.skills.skill);
-        const languageSkills: typeof skills = [];
-        const knowledgeSkills: typeof skills = [];
-        const activeSkills: typeof skills = [];
-
-        for (const skill of skills) {
-            const rating = Number(skill.rating) || 0;
-            if (skill.islanguage === 'True') {
-                languageSkills.push(skill);
-            } else if (skill.knowledge === 'True' && rating > 0) {
-                knowledgeSkills.push(skill);
-            } else if (rating > 0) {
-                activeSkills.push(skill);
-            }
-        }
-
-        this.handleLanguageSkills(actor.items, languageSkills);
-        this.handleKnowledgeSkills(actor.items, knowledgeSkills);
-        await this.handleActiveSkills(actor.items, activeSkills);
-
-        const skillsetUuid = await this.assignDefaultSkillset(actor);
-        await this.handleSkillGroups(actor.items, chummerChar);
-    }
-
-    /**
-     * Find and assign the default skillset for the character actor type.
-     * Links all already-imported skill items to the skillset via source.uuid.
-     *
-     * @param actor The blank character being built for import.
-     * @returns The UUID of the assigned skillset, or undefined if none found.
-     */
-    private static async assignDefaultSkillset(actor: BlankCharacter): Promise<string | undefined> {
-        const skillSets = await PackItemFlow.getAllPackSkillSets();
-        const skillSet = skillSets.find(s => s.system.set.default.type === actor.type);
-        if (!skillSet) {
-            console.debug(`Shadowrun 5e | No default skill set found for actor type ${actor.type}, skipping skillset assignment on import`);
-            return undefined;
-        }
-
-        actor.system.skillset = skillSet.uuid;
-
-        for (const item of actor.items) {
-            if (item.type !== 'skill') continue;
-            (item as Item.CreateData & { system: { source: { uuid: string } } }).system.source.uuid = skillSet.uuid;
-        }
-
-        console.debug(`Shadowrun 5e | Assigned skill set ${skillSet.name} (${skillSet.uuid}) to imported character`);
-        return skillSet.uuid;
-    }
-
-    /**
-     * Create skill group items from the Chummer XML skillgroup data.
-     * Only non-broken groups with a rating are created.
-     *
-     * @param items The items list being built for the actor.
-     * @param chummerChar The parsed Chummer character XML data.
-     */
-    private static async handleSkillGroups(
-        items: BlankCharacter['items'],
-        chummerChar: ActorSchema
-    ) {
-        const chummerGroups = IH.getArray(chummerChar.skills.skillgroup);
-        if (!chummerGroups.length) return;
-
-        const packGroups = await PackItemFlow.getPackSkillgroups();
-        const packGroupsByName = new Map(packGroups.map(g => [g.name.trim().toLowerCase(), g]));
-
-        for (const chummerGroup of chummerGroups) {
-            if (chummerGroup.isbroken === 'True') continue;
-
-            const rating = Number(chummerGroup.rating) || 0;
-            if (rating <= 0) continue;
-
-            const groupName = chummerGroup.name_english || chummerGroup.name;
-            const packGroup = packGroupsByName.get(groupName.trim().toLowerCase());
-            if (!packGroup) {
-                console.debug(`Shadowrun 5e | No pack skill group found for "${groupName}", skipping`);
-                continue;
-            }
-
-            const groupItem = packGroup.toObject() as Item.CreateData & {
-                system: { group: { rating: number }; source: { uuid: string } }
-            };
-            delete (groupItem as Item.CreateData & { _id?: string })._id;
-            groupItem.system.group.rating = rating;
-
-            items.push(groupItem);
-        }
-    }
-
-    private static async handleActiveSkills(items: BlankCharacter['items'], activeSkills: ActorSchema['skills']['skill']) {
-        const packSkills = await PackItemFlow.getPackSkills();
-        const packSkillsByName = new Map(packSkills.map(skill => [this.parseSkillName(skill.name), skill]));
-
-        for (const skill of activeSkills) {
-            const skillName = skill.name_english || skill.name;
-            const skillKey = this.parseSkillName(skillName);
-            const packSkill = packSkillsByName.get(skillKey);
-            const skillItem: Item.CreateData & {
-                name: string;
-                type: 'skill';
-                system: ReturnType<typeof DataDefaults.baseSystemData<'skill'>>;
-            } = packSkill
-                ? foundry.utils.deepClone(packSkill.toObject()) as Item.CreateData & {
-                    name: string;
-                    type: 'skill';
-                    system: ReturnType<typeof DataDefaults.baseSystemData<'skill'>>;
-                }
-                : {
-                    name: skillName,
-                    type: 'skill',
-                    system: DataDefaults.baseSystemData('skill', {
-                        type: 'skill',
-                        skill: {
-                            category: 'active',
-                            attribute: this.parseAttName(skill.attribute),
-                            defaulting: skill.default === 'True',
-                        },
-                    }),
-                    effects: [],
-                };
-
-            delete (skillItem as Item.CreateData & { _id?: string })._id;
-            skillItem.name = packSkill?.name ?? skillName;
-            skillItem.system.skill.rating = parseInt(skill.rating);
-            skillItem.system.skill.group = skill.skillgroup_english || '';
-            skillItem.system.skill.specializations = IH.getArray(skill.skillspecializations?.skillspecialization).map(spec => ({
-                name: spec.name,
-            }));
-
-            items.push(skillItem);
-        }
-    }
-
-    private static handleLanguageSkills(items: BlankCharacter['items'], languageSkills: ActorSchema['skills']['skill']) {
-        for (const skill of languageSkills) {
-            const isNative = skill.isnativelanguage === 'True';
-            const rating = isNative ? 12 : (Number(skill.rating) || 0);
-            const skillItem = this.createImportedSkillItem(skill, {
-                name: skill.name || skill.name_english,
-                category: 'language',
-                rating,
-                isNative,
-            });
-
-            items.push(skillItem);
-        }
-    }
-
-    private static handleKnowledgeSkills(items: BlankCharacter['items'], knowledgeSkills: ActorSchema['skills']['skill']) {
-        for (const skill of knowledgeSkills) {
-            const knowledgeType = this.parseKnowledgeType(skill.skillcategory_english);
-            const parsedAttribute = this.parseAttName(skill.attribute);
-            const attribute = parsedAttribute || (knowledgeType ? this.KNOWLEDGE_ATTRIBUTE_MAP[knowledgeType] : '');
-            const skillItem = this.createImportedSkillItem(skill, {
-                name: skill.name || skill.name_english,
-                category: 'knowledge',
-                rating: Number(skill.rating) || 0,
-                attribute,
-                knowledgeType,
-            });
-
-            items.push(skillItem);
-        }
-    }
 }
