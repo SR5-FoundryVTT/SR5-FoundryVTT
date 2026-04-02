@@ -159,7 +159,7 @@ export const SkillSetSyncFlow = {
         }
 
         for (const pack of game.packs) {
-            if (pack.metadata.system !== SYSTEM_NAME && pack.documentName !== 'Actor') continue;
+            if (pack.metadata.packageType !== 'system' || pack.metadata.system !== SYSTEM_NAME || pack.documentName !== 'Actor') continue;
             const entries = await pack.getIndex();
             for (const entry of entries) {
                 const actor = await pack.getDocument(entry._id) as SR5Actor | undefined;

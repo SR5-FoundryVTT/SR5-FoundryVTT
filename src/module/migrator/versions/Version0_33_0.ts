@@ -1,6 +1,7 @@
 import { SR5 } from '@/module/config';
 import { DataDefaults } from '@/module/data/DataDefaults';
 import { VersionMigration } from '../VersionMigration';
+import { SYSTEM_NAME } from '@/module/constants';
 
 type LegacySkillCategory = 'active' | 'language' | 'knowledge';
 type LegacyKnowledgeType = 'academic' | 'interests' | 'professional' | 'street';
@@ -12,7 +13,7 @@ type LegacySkillContainer = LegacySkillData | {
     attribute?: string;
     value?: Record<string, LegacySkillData>;
 };
-type OwnedSkillItemData = {
+type NecessaryOwnedSkillItemData = {
     type?: string;
     name?: string;
     system?: {
@@ -22,14 +23,16 @@ type OwnedSkillItemData = {
         };
     };
 };
-type MigratingActorData = {
-    items?: OwnedSkillItemData[];
-    system?: {
+type NecessaryActorData = {
+    type: string
+    items?: NecessaryOwnedSkillItemData[];
+    system: {
         skills?: {
             active?: Record<string, LegacySkillData>;
             language?: LegacySkillContainer;
             knowledge?: Partial<Record<LegacyKnowledgeType, LegacySkillContainer>> & Record<string, unknown>;
         };
+        skillset: string | undefined
     };
 };
 
@@ -55,28 +58,34 @@ const LEGACY_KNOWLEDGE_ATTRIBUTES: Record<LegacyKnowledgeType, string> = {
 export class Version0_33_0 extends VersionMigration {
     readonly TargetVersion = '0.33.0';
 
+    /**
+     * Only migrate if an actor actually has skills.
+     */
     override handlesActor(actor: Readonly<unknown>) {
-        return this.collectLegacySkills(actor as MigratingActorData).length > 0;
+        return this.collectLegacySkills(actor as NecessaryActorData).length > 0;
     }
 
     override migrateActor(actor: unknown) {
-        const migratingActor = actor as MigratingActorData;
+        const migratingActor = actor as NecessaryActorData;
         const legacySkills = this.collectLegacySkills(migratingActor);
 
         if (legacySkills.length === 0) return;
 
         migratingActor.items ??= [];
+        const skillSetUuid = this.defaultSkillSet(migratingActor.type);
+        migratingActor.system.skillset = skillSetUuid;
 
         for (const entry of legacySkills) {
-            migratingActor.items.push(this.createSkillItem(entry) as OwnedSkillItemData);
+            migratingActor.items.push(this.createSkillItem(entry, skillSetUuid) as NecessaryOwnedSkillItemData);
         }
 
         if (migratingActor.system) {
             migratingActor.system.skills = {};
         }
+
     }
 
-    private collectLegacySkills(actor: Readonly<MigratingActorData>): LegacySkillEntry[] {
+    private collectLegacySkills(actor: Readonly<NecessaryActorData>): LegacySkillEntry[] {
         const legacySkills: LegacySkillEntry[] = [];
         const skills = actor.system?.skills;
         if (!skills || typeof skills !== 'object') return legacySkills;
@@ -99,7 +108,7 @@ export class Version0_33_0 extends VersionMigration {
         return legacySkills;
     }
 
-    private collectOwnedSkillKeys(actor: Readonly<MigratingActorData>) {
+    private collectOwnedSkillKeys(actor: Readonly<NecessaryActorData>) {
         const keys = new Set<string>();
 
         for (const item of actor.items ?? []) {
@@ -160,7 +169,7 @@ export class Version0_33_0 extends VersionMigration {
         return (LEGACY_KNOWLEDGE_TYPES as readonly string[]).includes(value);
     }
 
-    private createSkillItem(entry: LegacySkillEntry): Item.CreateData {
+    private createSkillItem(entry: LegacySkillEntry, skillSetUuid: string|undefined): Item.CreateData {
         const name = this.getSkillName(entry);
         if (!name) {
             throw new Error(`Shadowrun5e | Failed to migrate legacy ${entry.category} skill due to missing name`);
@@ -192,6 +201,9 @@ export class Version0_33_0 extends VersionMigration {
                         isNative: Boolean(entry.skill.isNative),
                     },
                 },
+                source: {
+                    uuid: skillSetUuid,
+                }
             }),
             effects: [],
         } as Item.CreateData;
@@ -286,5 +298,31 @@ export class Version0_33_0 extends VersionMigration {
 
     private readString(value: unknown) {
         return typeof value === 'string' ? value.trim() : '';
+    }
+
+    /**
+     * Return the uuid of the default skillset connected to this actors type.
+     * NOTE: We can't retrieve the pack to actually check which is the default skillset, as the migration is synchronous and pulling
+     *       a pack document is asynchronous.
+     * @param type Actor type, used to determine the default skillset.  
+     */
+    private defaultSkillSet(type: string) {
+        const defaultIds: Record<string, string> = {
+            character: 'mp2xUdgp6v096fgT',
+            sprite: 'vnFEKFHgN1v4Mt94',
+            vehicle: 'yXtGE7KP6Apttmz5',
+            spirit: 'L6Hw1YI8nC4OSbkG',
+            ic: 'hQPdmc2dOU9ihDoN',
+        };
+        const defaultId = defaultIds[type];
+        if (!defaultId) return;
+        // NOTE: We don't use the setting as this will possibly fail in the future, if the user imports an actor.
+        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === 'sr5e-skill-sets') as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
+        if (!pack) return;
+        // NOTE: double assert assumption by using both fixed id and naming convetion.
+        const skillSetExists = pack.index.some(data => data.type === 'skill' && data._id === defaultId && data.name === type.charAt(0).toUpperCase() + type.slice(1));
+        if (!skillSetExists) return;
+
+        return `Compendium.shadowrun5e.sr5e-skill-sets.Item.${defaultId}`;
     }
 }
