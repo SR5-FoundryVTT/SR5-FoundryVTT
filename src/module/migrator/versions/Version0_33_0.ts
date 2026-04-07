@@ -3,8 +3,8 @@ import { VersionMigration } from "../VersionMigration";
 /**
  * Make sure that readonly fields are set to their correct values.
  */
-export class Version0_34_0 extends VersionMigration {
-    readonly TargetVersion = "0.34.0";
+export class Version0_33_0 extends VersionMigration {
+    readonly TargetVersion = "0.33.0";
 
     override handlesActiveEffect(_effect: Readonly<any>) {
         return _effect.changes.filter(change => change.mode === CONST.ACTIVE_EFFECT_MODES.CUSTOM).length > 0;
