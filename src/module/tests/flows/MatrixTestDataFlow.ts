@@ -193,22 +193,17 @@ export const MatrixTestDataFlow = {
     prepareTestModifiers(test: MatrixTest) {
 
         const pool = new ModifiableValue(test.data.pool);
+        const { sameGrid, directConnection } = test.data;
 
-        // Check for grid modifiers.
-        if (!test.data.sameGrid) {
+        // 1. Grid Penalty: Applies if NOT directly connected AND on a different grid
+        if (!directConnection && !sameGrid)
             pool.addUnique('SR5.ModifierTypes.DifferentGrid', MatrixRules.differentGridModifier());
-        } else {
-            pool.addUnique('SR5.ModifierTypes.DifferentGrid', 0);
-        }
+        else
+            pool.remove('SR5.ModifierTypes.DifferentGrid');
 
-        // Check for direct connection modifiers.
-        if (test.data.directConnection) {
-            // Grid modifiers don't apply when directly connected.
-            pool.addUnique('SR5.ModifierTypes.DifferentGrid', 0);
-            pool.addUnique('SR5.ModifierTypes.Noise', 0);
-        } else {
-            pool.addUnique('SR5.ModifierTypes.Noise', test.actor.modifiers.totalFor('noise'));
-        }
+        // 2. Noise Penalty: Applies if NOT directly connected
+        if (!directConnection)
+            pool.setUnique('SR5.ModifierTypes.Noise', test.actor.modifiers.totalFor('noise'));
     },
 
     /**

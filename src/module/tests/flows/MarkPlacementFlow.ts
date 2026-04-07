@@ -46,7 +46,7 @@ export const MarkPlacementFlow = {
         const pool = new ModifiableValue(test.data.pool);
 
         // Apply mark modifier
-        pool.addUnique('SR5.ModifierTypes.Marks', MarkPlacementFlow.getMarkPlacementModifier(test));
+        pool.setUnique('SR5.ModifierTypes.Marks', MarkPlacementFlow.getMarkPlacementModifier(test));
 
         MatrixTestDataFlow.prepareTestModifiers(test);
     },
@@ -70,7 +70,7 @@ export const MarkPlacementFlow = {
         const modifier = MatrixRules.gridMarkPlacementDefensePool(test.device);
         if (!modifier) return;
 
-        new ModifiableValue(test.pool).addUnique(modifier.name, modifier.value);
+        new ModifiableValue(test.pool).setUnique(modifier.name, modifier.value);
     },
 
     /**

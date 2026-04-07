@@ -576,7 +576,7 @@ export const TestCreator = {
             const label = SR5.modifierTypes[name];
             const options = {applicable};
             const value = actor.modifiers.totalFor(name, options);
-            ModifiableValue.addUnique(data.pool, label, value);
+            ModifiableValue.setUnique(data.pool, label, value);
         }
 
         // Mark test as extended.

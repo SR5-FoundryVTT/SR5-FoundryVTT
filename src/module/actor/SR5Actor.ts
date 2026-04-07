@@ -1048,7 +1048,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         pool.add('SR5.Labels.ActorSheet.DeviceRating', rating);
 
         // Build modifiers values.
-        ModifiableValue.addUnique(test.data.pool, 'SR5.ModifierTypes.Global', this.modifiers.totalFor('global'));
+        ModifiableValue.setUnique(test.data.pool, 'SR5.ModifierTypes.Global', this.modifiers.totalFor('global'));
 
         return test.execute();
     }

@@ -67,7 +67,7 @@ export const ActionPrep = {
 
         // Some ammunition want to replace the weapons damage, others modify it.
         if (ammoData.replaceDamage) {
-            ModifiableValue.addUnique(action.damage, equippedAmmo.name, Number(ammoData.damage), CONST.ACTIVE_EFFECT_MODES.OVERRIDE);
+            ModifiableValue.addUnique(action.damage, equippedAmmo.name, ammoData.damage, CONST.ACTIVE_EFFECT_MODES.OVERRIDE);
         } else {
             ModifiableValue.addUnique(action.damage, equippedAmmo.name, ammoData.damage);
         }
@@ -79,7 +79,7 @@ export const ActionPrep = {
             ModifiableValue.addUnique(action.damage.ap, equippedAmmo.name, ammoData.ap);
         }
 
-        if (ammoData.accuracy) limitParts.addUnique(equippedAmmo.name, ammoData.accuracy);
+        limitParts.setUnique(equippedAmmo.name, ammoData.accuracy);
 
         // override element
         if (ammoData.element) {
@@ -114,8 +114,8 @@ export const ActionPrep = {
             const modification = mod.asType('modification');
             if (!modification) continue;
 
-            if (modification.system.accuracy) limitParts.addUnique(mod.name, modification.system.accuracy);
-            if (modification.system.dice_pool) dpParts.addUnique(mod.name, modification.system.dice_pool);
+            limitParts.setUnique(mod.name, modification.system.accuracy);
+            dpParts.setUnique(mod.name, modification.system.dice_pool);
         }
 
         action.dice_pool_mod = dpParts.changes;

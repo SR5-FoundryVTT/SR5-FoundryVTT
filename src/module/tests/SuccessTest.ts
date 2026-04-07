@@ -783,7 +783,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         for (const type of this.testModifiers) {
             const { name, value } = this.prepareActorModifier(this.actor, type);
-            if (value) ModifiableValue.addUnique(this.data.pool, name, value);
+            ModifiableValue.setUnique(this.data.pool, name, value);
         }
     }
 

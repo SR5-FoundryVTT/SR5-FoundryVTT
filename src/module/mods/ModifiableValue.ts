@@ -91,6 +91,28 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
     }
 
     /**
+     * Add or remove a unique change based on the presence of a value.
+     * If `value` is provided, it adds/updates the change;
+     * if `value` is falsy, it removes the change with the given name.
+     * @param {string} name - The name of the change to add or remove.
+     * @param {number | undefined | null} value - The value to set for the change; if falsy, the change will be removed.
+     * @param {CONST.ACTIVE_EFFECT_MODES} [mode=CONST.ACTIVE_EFFECT_MODES.ADD] - The mode to use when adding the change.
+     * @param {number} [priority=10*mode] - The priority to use when adding the change.
+     */
+    setUnique(
+        name: string,
+        value: number | undefined | null,
+        mode: CONST.ACTIVE_EFFECT_MODES = CONST.ACTIVE_EFFECT_MODES.ADD,
+        priority: number = 10 * mode,
+    ): void {
+        if (value) {
+            this.addUnique(name, value, mode, priority);
+        } else {
+            this.remove(name);
+        }
+    }
+
+    /**
      * Remove all changes with the given name.
      * @param {string} name - Name of the part to remove from `changes`.
      */
@@ -274,6 +296,19 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
         list: F, ...args: Parameters<ModifiableValue<F>["remove"]>
     ): void {
         new ModifiableValue(list).remove(...args);
+    }
+
+    /**
+     * Static helper to add or remove a unique change based on the presence of a value.
+     * If `value` is provided, it adds/updates the change;
+     * if `value` is falsy, it removes the change with the given name.
+     * @param {F} list - The modifiable list object.
+     * @param {...any} args - Arguments forwarded to instance `addOrRemoveUnique` (name, value).
+     */
+    static setUnique<F extends ModifiableValueType>(
+        list: F, ...args: Parameters<ModifiableValue<F>["setUnique"]>
+    ): void {
+        new ModifiableValue(list).setUnique(...args);
     }
 
     /**
