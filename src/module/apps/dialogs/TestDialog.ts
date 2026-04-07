@@ -303,9 +303,9 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
         const context = { test: this.test };
 
         for (const [key, value] of [...appliedEntries, ...otherEntries]) {
-            const valueField = foundry.utils.getProperty(this.data, key);
+            const valueField = foundry.utils.getProperty(context, key);
             if (!ModifiableValue.isModifiableValue(valueField)) {
-                foundry.utils.setProperty(this.data, key, value);
+                foundry.utils.setProperty(context, key, value);
                 continue;
             }
 
