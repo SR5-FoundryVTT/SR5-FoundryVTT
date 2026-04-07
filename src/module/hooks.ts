@@ -170,8 +170,6 @@ export class HooksManager {
 
         Hooks.on("renderChatLog", HooksManager.chatLogListeners.bind(HooksManager));
 
-        Hooks.on('quenchReady', quenchRegister);
-
         MatrixHooks.registerHooks();
         RiggingHooks.registerHooks();
         TagifyHooks.registerHooks();
