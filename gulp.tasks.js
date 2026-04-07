@@ -29,8 +29,9 @@ async function cleanDist() {
 
 /**
  * JS BUILD
+ * @param {string} env - 'prod' or 'dev' to set the environment variable for the build
  */
-async function buildJS() {
+async function buildJS(env) {
     esbuild.build({
         entryPoints: [entryPoint],
         bundle: true,
@@ -39,10 +40,16 @@ async function buildJS() {
         sourcemap: true,
         format: 'esm',
         outfile: path.resolve(destFolder, jsBundle),
+        define: {
+            'process.env.ENV': JSON.stringify(env),
+        },
         // Don't typescheck on build. Instead typecheck on PR and push and assume releases to build.
         plugins: [],
     }).catch((err) => { console.error(err); });
 }
+
+const buildJSProd = () => buildJS('prod');
+const buildJSDev = () => buildJS('dev');
 
 /**
  * COPY ASSETS
@@ -55,8 +62,9 @@ async function copyAssets() {
 
 /**
  * WATCH
+ * @param {string} env - 'prod' or 'dev' to set the environment variable for the build
  */
-async function watch() {
+async function watch(env) {
     function watchCopy(pattern, out) {
         gulp.watch(pattern).on('change', () => gulp.src(pattern).pipe(gulp.dest(path.resolve(destFolder, out))));
     }
@@ -75,11 +83,17 @@ async function watch() {
         sourcemap: true,
         format: 'esm',
         outfile: path.resolve(destFolder, jsBundle),
+        define: {
+            'process.env.ENV': JSON.stringify(env),
+        },
         plugins: [typecheckPlugin({watch: true})],
     })
 
     await context.watch();
 }
+
+const watchProd = () => watch('prod');
+const watchDev = () => watch('dev');
 
 /**
  * SASS
@@ -114,6 +128,10 @@ async function buildPacks() {
 exports.clean = cleanDist;
 exports.sass = buildSass;
 exports.assets = copyAssets;
-exports.build = gulp.series(copyAssets, buildSass, buildJS, buildPacks);
-exports.watch = gulp.series(copyAssets, buildSass, watch);
+exports.build = gulp.series(copyAssets, buildSass, buildJSProd, buildPacks);
+exports.buildProd = gulp.series(copyAssets, buildSass, buildJSProd, buildPacks);
+exports.buildProd = gulp.series(copyAssets, buildSass, buildJSProd, buildPacks);
+exports.watch = gulp.series(copyAssets, buildSass, watchDev);
+exports.watchProd = gulp.series(copyAssets, buildSass, watchProd);
+exports.watchDev = gulp.series(copyAssets, buildSass, watchDev);
 exports.rebuild = gulp.series(cleanDist, exports.build);
