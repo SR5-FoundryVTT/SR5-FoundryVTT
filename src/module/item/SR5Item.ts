@@ -555,7 +555,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         // NOTE: This might be related to Foundry data serialization sometimes returning arrays as ordered HashMaps...
         const licenses = foundry.utils.getType(this.system.licenses) === 'Object' ?
             Object.values(this.system.licenses) :
-            this.system.licenses;
+            [...this.system.licenses];
 
         if (!licenses) return;
 
@@ -590,7 +590,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      */
     async removeLicense(index: number) {
         if (this.isType('sin')) {
-            const licenses = this.system.licenses.splice(index, 1);
+            const licenses = [...this.system.licenses];
+            licenses.splice(index, 1);
             await this.update({ system: { licenses } });
         }
     }
@@ -646,11 +647,11 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * Create an item in this item
      * @param effectData
      */
-    async createNestedActiveEffect(effectData: ActiveEffect.Implementation | ActiveEffect.Implementation[]) {
+    async createNestedActiveEffect(effectData: ActiveEffect.Stored | ActiveEffect.Stored[]) {
         if (!Array.isArray(effectData)) effectData = [effectData];
 
         for (const effect of effectData) {
-            this.effects.set(effect._id!, effect);
+            this.effects.set(effect._id, effect);
         }
 
         this.prepareNestedItems();
@@ -718,10 +719,11 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
                 // Case: CREATE => Create new item.
             } else {
+                // @ts-expect-error "base" is allowed on Item.Source.type but not on Item.CreateData.type and parent as Item
                 // NOTE: It's important to deliver the item as the item parent document, even though this is meant for actor owners.
                 //       The legacy approach for embeddedItems (within another item) relies upon this.actor
                 //       returning an SR5Item instance to call .updateEmbeddedEntities, while Foundry expects an actor
-                return new SR5Item(item, { parent: this as unknown as SR5Actor });
+                return new SR5Item(item, { parent: this });
             }
         });
 

@@ -1,4 +1,7 @@
-{{!-- list-item expects an SR5Item to be passed in as 'item' --}}
+{{!-- 
+    list-item expects an SR5Item to be passed in as 'item' 
+    'name' is optional and will override item.name if provided. This can be used to display translations instead of direct names.
+--}}
 {{#if (or @root.isEditMode (isVisible item))}}
 <div class="list-item-container {{#if (hasKey @root.expandedUuids item.uuid)}} expanded {{/if}}">
     <div class="list-item {{#if (isOwner item owner=@root.actor)}} draggable {{/if}}"
@@ -8,7 +11,7 @@
         <div class="list-item-start">
             {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" item }}
             {{> "systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs" item }}
-            {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
+            {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item name=name }}
         </div>
 
         <div class="list-item-col">

@@ -24,15 +24,12 @@
     "version": "0.34.0",
     "compatibility": {
         "minimum": "13",
-        "verified": "13.350",
+        "verified": "13.351",
         "maximum": "13"
     },
     "documentTypes": {
         "Actor": {
             "character": {
-                "htmlField": ["description.value"]
-            },
-            "critter": {
                 "htmlField": ["description.value"]
             },
             "ic": {
@@ -222,7 +219,10 @@
     "relationships": [
         {
             "id": "autocomplete-inline-properties",
-            "type": "module"
+            "type": "module",
+            "compatibility": {
+                "verified": "3.1.0"
+            }
         }
     ],
     "socket": true,

@@ -2,7 +2,7 @@
 
 import { BonusSchema } from './BonusSchema';
 import { ConditionsSchema } from './ConditionsSchema';
-import { Empty, Many, IntegerString } from './Types';
+import { Empty, Many, OneOrMany, IntegerString } from './Types';
 
 export interface Enhancement {
     bonus?: BonusSchema;
@@ -12,8 +12,9 @@ export interface Enhancement {
     power: Empty | { _TEXT: string; };
     required: ConditionsSchema;
     source?: { _TEXT: "SG"; };
-    translate?: { _TEXT: string; };
-    altpage?: { _TEXT: string; };
+    translate?: OneOrMany<{ _TEXT: string; }>;
+    altpage?: OneOrMany<{ _TEXT: string; }>;
+    altnameonpage?: OneOrMany<Empty>;
 };
 
 export interface Power {
@@ -40,8 +41,9 @@ export interface Power {
     points: { _TEXT: IntegerString; };
     required?: ConditionsSchema;
     source?: { _TEXT: "BB" | "BLB" | "BTB" | "CA" | "FA" | "HT" | "SG" | "SGE" | "SR5" | "SS" | "SSP"; };
-    translate?: { _TEXT: string; };
-    altpage?: { _TEXT: string; };
+    translate?: OneOrMany<{ _TEXT: string; }>;
+    altpage?: OneOrMany<{ _TEXT: string; }>;
+    altnameonpage?: OneOrMany<Empty>;
 };
 
 export interface PowersSchema {

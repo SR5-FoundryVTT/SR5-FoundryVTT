@@ -117,7 +117,7 @@ export class MatrixRules {
 
     /**
      * Return modifier for marks placed. See SR5#240 'Hack on the Fly' or SR5#238 'Brut Force'
-     * @param marks Mount of marks to be placed
+     * @param marks Amount of marks to be placed
      */
     static getMarkPlacementModifier(marks: number): number {
         marks = MatrixRules.getValidMarksPlacementCount(marks);
@@ -244,10 +244,20 @@ export class MatrixRules {
 
     /**
      * Determine the damage value dealt for failed Attack Actions
-     *
+     * 
+     * See SR5#231 'Illegal Actions'
+     * 
+     * @param netHits The net hits of the defending test. These should always be positive.
+     * @param biofeedback Biofeedback type of damage.
      */
-    static failedAttackDamage(biofeedback: BiofeedbackDamageType = ''): DamageType {
-        return DataDefaults.createData('damage', { base: 1, value: 1, type: { base: 'matrix', value: 'matrix' }, biofeedback });
+    static failedAttackDamage(netHits: number, biofeedback: BiofeedbackDamageType = ''): DamageType {
+        if (netHits <= 0) {
+            console.error(`Shadowrun 5e | MatrixRules.failedAttackDamage called with non-positive netHits. Defaulting to 0. Illegal Action rules expect postive net hits.`);
+            netHits = 0;
+        }
+        const damage = DataDefaults.createData('damage', { base: netHits, type: { base: 'matrix', value: 'matrix' }, biofeedback });
+        damage.value = Helpers.calcTotal(damage, { min: 0 });
+        return damage;
     }
 
     /**

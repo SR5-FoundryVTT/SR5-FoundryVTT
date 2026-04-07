@@ -2,7 +2,7 @@
 
 import { BonusSchema } from './BonusSchema';
 import { ConditionsSchema } from './ConditionsSchema';
-import { Empty, Many, IntegerString } from './Types';
+import { Empty, Many, OneOrMany, IntegerString } from './Types';
 
 export interface Spell {
     bonus?: BonusSchema;
@@ -19,8 +19,9 @@ export interface Spell {
     source?: { _TEXT: "BB" | "BTB" | "CA" | "FA" | "HT" | "PGG" | "SFCR" | "SG" | "SR5" | "SS" | "SSP"; };
     type: { _TEXT: "M" | "P"; };
     useskill?: { _TEXT: "Animal Handling"; };
-    translate?: { _TEXT: string; };
-    altpage?: { _TEXT: string; };
+    translate?: OneOrMany<{ _TEXT: string; }>;
+    altpage?: OneOrMany<{ _TEXT: string; }>;
+    altnameonpage?: OneOrMany<Empty>;
 };
 
 export interface SpellsSchema {

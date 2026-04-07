@@ -21,7 +21,7 @@ import { LinksHelpers } from '@/module/utils/links';
  * NOTE: FoundryVTT DataModel is used to apply changes as well. Check custom Field implementations for effect change mode
  * application.
  */
-export class SR5ActiveEffect extends ActiveEffect {
+export class SR5ActiveEffect extends ActiveEffect<'base'> {
     // These modes should trigger a change key redirect to a ModifiableValue before applied.
     static readonly redirectModes = [
         CONST.ACTIVE_EFFECT_MODES.CUSTOM, 

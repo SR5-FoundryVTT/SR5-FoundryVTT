@@ -13,10 +13,14 @@
         "AutomateMultiDefenseModifierDescription": "다중 공격에 대한 방어 수정치를 자동으로 적용함",
         "AutomateProgressiveRecoil": "자동 점진적 반동",
         "AutomateProgressiveRecoilDescription": "초기화 전까지 캐릭터에게 점진적 반동이 누적됨",
+        "CompendiumBrowserBlacklist": "컨펜디움 탐색기 블랙리스트",
+        "CompendiumBrowserBlacklistDescription": "컨펜디움 탐색기에서 숨긴 컨펜디움 목록",
         "DefaultOpposedTestActorSelection": "경쟁 판정 토큰 선택 덮어쓰기",
         "DefaultOpposedTestActorSelectionDescription": "항상 선택한 토큰을 판정에 사용된 대상으로 덮어씀",
         "DiagonalMovementDescription": "격자판 사용 시 대각선 이동 처리 방식",
         "DiagonalMovementName": "대각선 이동",
+        "DieFaceLabels": "판정 주사위 면 라벨",
+        "DieFaceLabelsDescription": "[Dice So Nice] 판정 주사위 면에 대한 6개의 라벨을 쉼표로 구분한 목록으로, 1번부터 시작한다.",
         "DisplayDefaultRollCardDescription": "기본 굴림 카드와 함께 섀도우런 굴림 카드 표시 여부",
         "DisplayDefaultRollCardName": "기본 굴림 카드 표시",
         "EstimateDiagonal": "대각선 이동 계산 (1-2-1)",
@@ -27,10 +31,10 @@
         "HideGMOnlyChatContent": "GM 판정에서 중요한 정보 숨기기",
         "HideGMOnlyChatContentDescription": "사용된 액터를 소유한 플레이어어만 GM 판정 메시지에서 모든 정보를 볼 수 있음",
         "IgnoreDiagonal": "대각선 이동 무시 (1-1-1)",
-        "ImportIconFolderDescription": "불러오기 도구가 있는 폴더에 아이콘 파일이 있습니다. 기본 위치: 'systems/shadowrun5e/dist/icons/importer/'",
+        "ImportIconFolderDescription": "불러오기 도구 폴더에서 아이콘 파일을 찾을 수 있음. 기본 위치: 'systems/shadowrun5e/dist/icons/importer/'",
         "ImportIconFolderName": "아이콘 폴더 불러오기 도구",
         "ManualRollOnSuccessTest": "모든 판정에서 수동 주사위 굴림",
-        "ManualRollOnSuccessTestDescription": "판정 시 사용자가 주사위를 수동으로 굴리고, 성공횟수를 보고하게 함",
+        "ManualRollOnSuccessTestDescription": "사용자가 판정 주사위를 수동으로 굴리고 성공 횟수를 직접 알리도록 허용",
         "MarkImportsDescription": "액터 시트에 새로 불러온 물품을 표시하여 검토해야 함을 강조",
         "MarkImportsName": "새로 불러온 물품 표시",
         "MustHaveRessourcesOnTest": "찾을 수 없는 자원을 사용하는 판정 중단",
@@ -89,7 +93,7 @@
             "Magic": "마법 행동",
             "Matrix": "매트릭스 행동",
             "Recovery": "회복 행동",
-            "RecoveryPhysical": "육체 회복",
+            "RecoveryPhysical": "물리 회복",
             "RecoveryStun": "정신 회복",
             "Resist": "저항 행동",
             "ResistBiofeedback": "생체반응 저항",
@@ -170,12 +174,222 @@
             "New": "새로운 효과"
         },
         "ActiveSkills": "활성형 기술",
+        "Actor": {
+            "FIELDS": {
+                "attributes": {
+                    "edge": {
+                        "base": {
+                            "label": "엣지",
+                            "hint": "엣지는 캐릭터의 운, 신의 가호, 불가능해 보이는 확률을 뚫고 역경을 극복하게 해주는 설명할 수 없는 요소를 의미한다."
+                        }
+                    }
+                },
+                "modifiers": {
+                    "walk": {
+                        "label": "걷기",
+                        "hint": "민첩 특성치 배수에 의한 걷기 범위 수정"
+                    },
+                    "run": {
+                        "label": "달리기",
+                        "hint": "민첩 특성치 배수에 의한 달리기 범위 수정"
+                    },
+                    "physical_limit": {
+                        "label": "물리 한계",
+                        "hint": "물리 한계 수정"
+                    },
+                    "astral_limit": {
+                        "label": "아스트랄 한계",
+                        "hint": "아스트랄 한계 수정"
+                    },
+                    "social_limit": {
+                        "label": "사교 한계",
+                        "hint": "사교 한계 수정"
+                    },
+                    "mental_limit": {
+                        "label": "정신 한계",
+                        "hint": "정신 한계 수정"
+                    },
+                    "astral_initiative": {
+                        "label": "아스트랄 우선권",
+                        "hint": "아스트랄 우선권 기본값 수정"
+                    },
+                    "astral_initiative_dice": {
+                        "label": "아스트랄 우선권 주사위",
+                        "hint": "아스트랄 우선권 주사위 수정"
+                    },
+                    "matrix_initiative": {
+                        "label": "매트릭스 우선권",
+                        "hint": "매트릭스 우선권 기본값 수정"
+                    },
+                    "matrix_initiative_dice": {
+                        "label": "매트릭스 우선권 주사위",
+                        "hint": "매트릭스 우선권 주사위 수정"
+                    },
+                    "meat_initiative": {
+                        "label": "현실 우선권",
+                        "hint": "현실 우선권 기본값 수정"
+                    },
+                    "meat_initiative_dice": {
+                        "label": "현실 우선권 주사위",
+                        "hint": "현실 우선권 주사위 수정"
+                    },
+                    "stun_track": {
+                        "label": "기절 추적기",
+                        "hint": "기절 피해 추적기 수정"
+                    },
+                    "matrix_track": {
+                        "label": "매트릭스 추적기",
+                        "hint": "매트릭스 피해 추적기 수정"
+                    },
+                    "physical_track": {
+                        "label": "물리 추적기",
+                        "hint": "물리 피해 추적기"
+                    },
+                    "physical_overflow_track": {
+                        "label": "치명상 추적기",
+                        "hint": "물리 치명상 피해 수정"
+                    },
+                    "wound_tolerance": {
+                        "label": "부상 내성",
+                        "hint": "부상당 피해 수치 수정"
+                    },
+                    "pain_tolerance_stun": {
+                        "label": "통증 내성 (기절)",
+                        "hint": "첫 번째 상처 수정치 적용 전에 무시될 피해를 수정"
+                    },
+                    "pain_tolerance_physical": {
+                        "label": "통증 내성 (물리)",
+                        "hint": "첫 번째 상처 수정치 적용 전에 무시될 피해를 수정"
+                    },
+                    "armor": {
+                        "label": "방어구",
+                        "hint": "총 방어구 수치 수정"
+                    },
+                    "multi_defense": {
+                        "label": "다중 방어",
+                        "hint": "전투 턴당 다중 방어에 대한 방어 판정 풀을 수정"
+                    },
+                    "reach": {
+                        "label": "길이",
+                        "hint": "근접 공격의 길이를 수정"
+                    },
+                    "defense": {
+                        "label": "방어",
+                        "hint": "방어 판중 풀 수정"
+                    },
+                    "defense_dodge": {
+                        "label": "방어 (회피)",
+                        "hint": "능동적 회피에 방어 수정치 추가"
+                    },
+                    "defense_parry": {
+                        "label": "방어 (쳐내기)",
+                        "hint": "능동적 쳐내기에 방어 수정치 추가"
+                    },
+                    "defense_block": {
+                        "label": "방어 (막기)",
+                        "hint": "능동적 방어에 방어 수정치 추가"
+                    },
+                    "defense_melee": {
+                        "label": "방어 (근접전)",
+                        "hint": "근접전 방어에 방어 수정치 추가"
+                    },
+                    "defense_ranged": {
+                        "label": "방어 (원거리전)",
+                        "hint": "원거리 공격에 대한 방어 수정치 추가"
+                    },
+                    "soak": {
+                        "label": "피해 저항",
+                        "hint": "물리 피해 저항 판정 풀 수정"
+                    },
+                    "recoil": {
+                        "label": "반동",
+                        "hint": "반동 판정 풀 수정"
+                    },
+                    "drain": {
+                        "label": "드레인",
+                        "hint": "드레인 판정 풀 수정"
+                    },
+                    "fade": {
+                        "label": "페이드",
+                        "hint": "페이드 판정 풀 수정"
+                    },
+                    "essence": {
+                        "label": "에센스",
+                        "hint": "에센스 특성치 수정"
+                    },
+                    "public_grid": {
+                        "label": "공공 그리드",
+                        "hint": "공공 그리드에 연결할 경우 수정치를 수정"
+                    },
+                    "mark_damage": {
+                        "label": "마크 피해",
+                        "hint": "자신에게 배치된 마크 당 피해량 수정"
+                    },
+                    "place_two_marks": {
+                        "label": "마크 2개 배치",
+                        "hint": "한 번에 마크 2개를 배치하려 할 때의 수정치 수정"
+                    },
+                    "place_three_marks": {
+                        "label": "마크 3개 배치",
+                        "hint": "한번에 마크 3개를 배치하려 할 때의 수정치 수정"
+                    },
+                    "composure": {
+                        "label": "평정심",
+                        "hint": "평정심 판정 풀 수정"
+                    },
+                    "lift_carry": {
+                        "label": "들기/운반",
+                        "hint": "들기&운반 판정 풀 수정"
+                    },
+                    "judge_intentions": {
+                        "label": "의심",
+                        "hint": "의심 판정 풀 수정"
+                    },
+                    "memory": {
+                        "label": "기억",
+                        "hint": "기억 판정 풀 수정"
+                    },
+                    "global": {
+                        "label": "전체",
+                        "hint": "피해 감소 판정을 제외한 모든 판정 풀 수정"
+                    }
+                },
+                "category_visibility": {
+                    "default": {
+                        "label": "빈 항목 보이기",
+                        "hint": "빈 탭과 소지품 항목을 표시"
+                    }
+                },
+                "full_defense_attribute": {
+                    "label": "전력 방어 특성치",
+                    "hint": "전력 방어 방해 행동에 사용되는 특성치"
+                },
+                "magic": {
+                    "label": "마법",
+                    "attribute": {
+                        "label": "드레인 특성치",
+                        "hint": "마법사/달인이 드레인 저항에 사용하는 특성치"
+                    }
+                },
+                "technomancer": {
+                    "label": "테크노맨서",
+                    "attribute": {
+                        "label": "페이드 특성치",
+                        "hint": "테크노맨서가 페이드 저항에 사용하는 특성치"
+                    }
+                },
+                "special": {
+                    "label": "각성자/공명자",
+                    "hint": "캐릭터가 각성자 (마법사/달인)이거나 공명자 (테크노맨서)일 경우 선택"
+                }
+            },
+            "NoFavoritesSelected": "선택된 즐겨찾기 항목 없음"
+        },
         "ActorTypes": {
             "Character": "캐릭터",
-            "Critter": "생명체",
             "IC": "IC",
             "Spirit": "영혼",
-            "Sprite": "요정",
+            "Sprite": "스프라이트",
             "Vehicle": "탑승물"
         },
         "Add": "추가",
@@ -189,18 +403,117 @@
             "Types": {
                 "Active": "활성형",
                 "Passive": "자동형"
+            },
+            "FIELDS": {
+                "pp": {
+                    "label": "능력 점수",
+                    "hint": "해당 능력에 소모되는 능력 점수"
+                },
+                "type": {
+                    "label": "능력 유형",
+                    "hint": "달인 능력 유형"
+                },
+                "drain": {
+                    "label": "드레인",
+                    "hint": "해당 달인 능력 사용 후 드레인이 유발됨"
+                },
+                "level": {
+                    "label": "단계",
+                    "hint": "해당 달인 능력의 단계 (해당되는 경우)"
+                }
             }
         },
         "Agent": "에이전트",
-        "Ammo": "탄약",
+        "Ammo": {
+            "label": "탄약",
+            "FIELDS": {
+                "damage": {
+                    "label": "피해량",
+                    "hint": "해당 탄약에 의해 가해지는 피해량이다. 이 피해량은 무기의 피해량에 더해지거나 대체될 수 있다."
+                },
+                "damageType": {
+                    "label": "피해 유형",
+                    "hint": "해당 탄약에 의해 가해지는 피해의 유형이다."
+                },
+                "element": {
+                    "label": "속성",
+                    "hint": "해당 속성이 입히는 피해이다."
+                },
+                "replaceDamage": {
+                    "label": "대체",
+                    "hint": "해당 탄약이 무기의 피해량을 대체"
+                },
+                "ap": {
+                    "label": "AP",
+                    "hint": "해당 탄약의 장갑 관통력을 나타낸다. 이 수치는 무기의 AP에 더해지거나 대체할 수 있다."
+                },
+                "replaceAP": {
+                    "label": "대체",
+                    "hint": "해당 탄약이 무기의 AP를 대체"
+                },
+                "accuracy": {
+                    "label": "정확도",
+                    "hint": "해당 탄약의 정확도 수정치"
+                },
+                "blast": {
+                    "radius": {
+                        "label": "폭발 반경",
+                        "hint": "해당 탄약의 폭발 반경, 미터로 표시됨"
+                    },
+                    "dropoff": {
+                        "label": "폭발 감소 반경",
+                        "hint": "폭발 반경 감소 미터 당 수정되는 피해량"
+                    }
+                }
+            }
+        },
         "AmmoFull": "탄약 가득 참",
         "AmmoGelRounds": "젤 탄약",
         "Aoe": "AoE",
         "ApplyWounds": "부상 적용",
-        "Armor": "방어구",
+        "Armor": {
+            "label": "방어구",
+            "FIELDS": {
+                "armor": {
+                    "value": {
+                        "label": "방어도 수치",
+                        "hint": "해당 물품이 제공하는 방어도"
+                    },
+                    "mod": {
+                        "label": "보조 방어구",
+                        "hint": "해당 방어구가 보조품일 경우 선택 (수치가 액터의 기본 방어도에 더해짐)"
+                    },
+                    "hardened": {
+                        "label": "강화 방어구",
+                        "hint": "해당 방어구는 강화됨"
+                    },
+                    "acid": {
+                        "label": "산성 저항",
+                        "hint": "산성 공격에 대한 추가 방어도 제공"
+                    },
+                    "electricity": {
+                        "label": "비전도체",
+                        "hint": "전기 공격에 대한 추가 방어도 제공"
+                    },
+                    "cold": {
+                        "label": "단열 처리",
+                        "hint": "냉기 공격에 대한 추가 방어도 제공"
+                    },
+                    "fire": {
+                        "label": "내화성 소재",
+                        "hint": "화염 공격에 대한 추가 방어도 제공"
+                    },
+                    "radiation": {
+                        "label": "방사선 차단",
+                        "hint": "방사선 공격에 대한 추가 방어도 제공"
+                    }
+                }
+            }
+        },
         "ArmorHardened": "단단함",
         "ArmorHardenedFull": "단단한 갑옷",
         "ArmorValue": "방어구 수치",
+        "Attack": "공격",
         "Attacker": "공격자",
         "AttackerHits": "공격자 성공횟수",
         "AttackerNetHits": "공격자 순 성공횟수",
@@ -227,6 +540,7 @@
         "BiofeedbackDamage": "생체반응 피해",
         "Biography": "인물 기록",
         "BlastRadius": "폭발 범위",
+        "Blitz": "블리츠",
         "Block": "막기",
         "Bonus": "보너스",
         "Bonuses": "보너스",
@@ -242,8 +556,36 @@
         "CallInAction": {
             "ActorType": "액터 유형",
             "Compilation": "컴파일",
+            "Compile": "컴파일",
             "CreateCompilation": "컴파일 행동 생성",
             "CreateSummoning": "소환 행동 생성",
+            "FIELDS": {
+                "spirit": {
+                    "type": {
+                        "label": "영혼 유형",
+                        "hint": "소환할 영혼의 유형. 영혼 액터가 설정된 경우 비활성화됨"
+                    },
+                    "force": {
+                        "label": "강도",
+                        "hint": "소환할 영혼의 강도. 영혼 액터가 설정된 경우 비활성화됨"
+                    }
+                },
+                "sprite": {
+                    "type": {
+                        "label": "스프라이트 유형",
+                        "hint": "소환할 스프라이트의 유형. 스프라이트 액터가 설정된 경우 비활성화됨"
+                    },
+                    "level": {
+                        "label": "레벨",
+                        "hint": "소환할 스프라이트의 레벨. 스프라이트 액터가 설정된 경우 비활성화됨"
+                    }
+                },
+                "actor_type": {
+                    "label": "유형",
+                    "hint": "해당 행동으로 소환할 액터의 유형"
+                }
+            },
+            "Summon": "소환",
             "Summoning": "소환"
         },
         "CanDefault": "무리한 시도 가능",
@@ -258,6 +600,56 @@
             "Title": "섀도우런5e 업데이트"
         },
         "Character": {
+            "FIELDS": {
+                "metatype": {
+                    "label": "메타인종",
+                    "hint": "캐릭터의 메타인종. NPC의 경우 설정에 따라 특성치가 조정된다."
+                },
+                "nuyen": {
+                    "label": "뉴엔",
+                    "hint": "해당 캐릭터가 보유한 뉴엔의 양"
+                },
+                "karma": {
+                    "value": {
+                        "label": "현재 카르마",
+                        "hint": "해당 캐릭터가 이용 가능한 카르마의 양"
+                    },
+                    "max": {
+                        "label": "카르마 이력",
+                        "hint": "해당 캐릭터가 지금까지 누적한 카르마의 양"
+                    }
+                },
+                "notoriety": {
+                    "label": "악명",
+                    "hint": "해당 캐릭터의 평판에서 부정적인 측면"
+                },
+                "public_awareness": {
+                    "label": "대중 인식도",
+                    "hint": "언론, 당국 및 일반 대중 사이에서 해당 캐릭터에 대한 인지도 수준"
+                },
+                "street_cred": {
+                    "label": "길거리 명성",
+                    "hint": "해당 캐릭터가 생애동안 이룩한 업적"
+                },
+                "matrix_full_defense_attribute": {
+                    "label": "매트릭스 전력 방어 특성치",
+                    "hint": "매트릭스 전력 방어 행동 사용 시 추가할 특성치"
+                },
+                "is_critter": {
+                    "label": "생명체",
+                    "hint": "생물 능력 사용 허용"
+                },
+                "is_npc": {
+                    "label": "NPC",
+                    "hint": "액터를 NPC로 표시하여 추가 기능 제공"
+                },
+                "npc": {
+                    "is_grunt": {
+                        "label": "하수인",
+                        "hint": "해당 액터에게 하수인 규칙 적용"
+                    }
+                }
+            },
             "Modifiers": {
                 "NPCMetatypeAttribute": "NPC 메타인종 특성치"
             },
@@ -291,30 +683,96 @@
             },
             "Title": "시스템 컨펜디움"
         },
+        "CompendiumBrowser": {
+            "Filters": {
+                "ClearSearch": "검색 초기화",
+                "SearchPlaceholder": "검색 결과...",
+                "System": "시스템",
+                "World": "월드"
+            },
+            "Tabs": {
+                "Actors": "액터",
+                "Items": "물품",
+                "Settings": "설정"
+            },
+            "Title": "컨펜디움 탐색기"
+        },
         "Compendiums": {
             "Folders": {
                 "Root": "SR5e 불러온 항목"
             },
-            "sr5critter": "생명체 & 영혼 & 요정",
+            "sr5critter": "생명체 & 영혼 & 스프라이트",
             "sr5drone": "드론 & 탑승물",
             "sr5gear": "방어구 & 장비",
             "sr5magic": "주문 & 컴플렉스 폼",
+            "sr5misc": "기타",
             "sr5modification": "부착물 추가",
             "sr5trait": "특징 & 능력",
             "sr5ware": "바이오웨어 & 사이버웨어",
             "sr5weapon": "무기"
         },
         "Compilation": {
-            "DropSprite": "요정 배치",
-            "FixedSprite": "준비된 요정",
-            "SpriteType": "요정 유형"
+            "DropSprite": "스프라이트 배치",
+            "FixedSprite": "준비된 스프라이트",
+            "SpriteType": "스프라이트 유형"
         },
-        "ComplexForm": "컴플렉스 폼",
+        "ComplexForm": {
+            "Durations": {
+                "Immediate": "즉각적",
+                "Permanent": "지속적",
+                "Sustained": "영구적"
+            },
+            "FIELDS": {
+                "target": {
+                    "label": "목표",
+                    "hint": "컴플렉스 폼에 대한 유효한 대상 유형"
+                },
+                "duration": {
+                    "label": "지속력",
+                    "hint": "즉각적 (지속 효과 없이 즉시 발생), 지속적 (지속 가능), 영구적 (전투 턴 수만큼 지속 시, 지속 중단 후에도 효과 유지)."
+                },
+                "fade": {
+                    "label": "페이드",
+                    "hint": "페이드 수치는 스레딩 시 선택한 레벨에 더해져 저항해야 할 피해량을 결정함"
+                }
+            }
+        },
         "ComplexForms": "컴플렉스 폼",
         "Conceal": "은폐도",
         "ConditionMonitor": "상태 측정기",
         "Connection": "연결",
+        "ConnectToNetwork": "네트워크에 연결",
         "Contact": {
+            "FIELDS": {
+                "type": {
+                    "label": "유형",
+                    "hint": "연줄 유형은 대상이 어떤 장비, 작업, 정보 등에 접근할 수 있는지 결정한다."
+                },
+                "connection": {
+                    "label": "영향력",
+                    "hint": "연줄의 영향력을 1부터 12까지의 척도로 측정한 수치이다. 영향력 등급이 높을수록 해당 연줄의 영향력도 커진다."
+                },
+                "blackmail": {
+                    "label": "협박",
+                    "hint": "상대방이 거래를 하도록 유도할 수 있는 무언가를 가지고 있다."
+                },
+                "loyalty": {
+                    "label": "신뢰도",
+                    "hint": "연줄을 얼마나 믿을 수 있는지 1부터 6까지의 척도로 측정한 수치이다. 신뢰도 등급이 높을수록 연락처가 해당 연줄은 당신을 위해 더 많은 일을 기꺼이 해줄 수 있다."
+                },
+                "family": {
+                    "label": "가족",
+                    "hint": "피는 언제나 물보다 진하며 가족을 연줄로 두는 경우라면 특히 더 그렇다."
+                },
+                "group": {
+                    "label": "집단",
+                    "hint": "연출은 갱, 기업, 특정 분야의 너드들 같은 그룹일 수도 있다."
+                },
+                "linkedActor": {
+                    "label": "액터",
+                    "hint": "이 연줄에 해당하는 액터"
+                }
+            },
             "Blackmail": "협박",
             "Connection": "영향력",
             "DropActor": "해당 연줄과 연결할 액터 끌어서 놓기",
@@ -322,6 +780,8 @@
             "Group": "그룹",
             "LinkedActor": "액터",
             "Loyalty": "친밀도",
+            "LoyaltyConnectionLabel": "L / C",
+            "LoyaltyConnectionHelp": "우호도 / 영향력",
             "Type": "유형"
         },
         "ContactType": "유형",
@@ -337,7 +797,7 @@
                 "Composure": "평정심",
                 "ControlDevice": "장치 조작",
                 "CrackFile": "파일 크랙",
-                "CrackProgramme": "프로그램 크랙",
+                "CrashProgram": "프로그램 충돌",
                 "DataSpike": "스파이크",
                 "DisarmDataBomb": "데이터 폭탄 해체",
                 "Drain": "드레인",
@@ -364,7 +824,7 @@
                 "MatrixDefenseTest": "매트릭스 방어 판정",
                 "MatrixPerception": "매트릭스 인식",
                 "MatrixSearch": "매트릭스 검색",
-                "Memory": "기억",
+                "Memory": "기억\n",
                 "NaturalRecoveryPhysical": "자연적 물리 회복",
                 "NaturalRecoveryStun": "자연적 기절 회복",
                 "PhysicalDamageResist": "물리적 피해 저항",
@@ -375,16 +835,51 @@
                 "Snoop": "스눕",
                 "SpoofCommand": "스푸프 명령",
                 "SwitchInterfaceMode": "인터페이스 모드 변경",
-                "TraceIcon": "아이콘 추적",
-								"CrashProgram": "프로그램 충돌"
+                "TraceIcon": "아이콘 추적"
             }
+        },
+        "ContextOptions": {
+            "AddAttributeEffect": "특성치에 대한 효과 추가",
+            "AddSkillEffect": "기술에 대한 효과 추가",
+            "DeleteEffect": "효과 삭제",
+            "DeleteItem": "물품 삭제",
+            "DeleteSkill": "기술 삭제",
+            "EditEffect": "효과 수정",
+            "EditItem": "물품 수정",
+            "EditSkill": "기술 수정",
+            "MoveItem": "물품 이동",
+            "Source": "참조 열기",
+            "View": "보기",
+            "ViewItem": "물품 보기"
         },
         "Continue": "계속",
         "ControlRig": "컨트롤 리그",
         "Cost": "비용",
         "Cover": "엄폐",
-        "Create": " {type} 생성",
+        "Create": "{type} 생성",
         "CritterPower": {
+            "FIELDS": {
+                "optional": {
+                    "label": "추가 능력",
+                    "hint": "해당 생명체 능력이 추가 능력일 경우 선택"
+                },
+                "powerType": {
+                    "label": "능력 유형",
+                    "hint": "생명체 능력 유형"
+                },
+                "duration": {
+                    "label": "지속력",
+                    "hint": "해당 생명체 능력의 지속력"
+                },
+                "range": {
+                    "label": "사거리",
+                    "hint": "해당 생명체 능력의 사거리"
+                },
+                "karma": {
+                    "label": "카르마",
+                    "hint": "해당 생명체 능력의 카르마 비용"
+                }
+            },
             "Categories": {
                 "Drake": "드레이크",
                 "Echoes": "에코",
@@ -397,13 +892,13 @@
                 "Weakness": "약점"
             },
             "Category": "범주",
-            "Duration": "지속 시간",
+            "Duration": "지속력",
             "Durations": {
-                "Always": "항상",
-                "Instant": "즉시",
-                "Permanent": "영구",
-                "Special": "특별",
-                "Sustained": "지속"
+                "Always": "항시적",
+                "Instant": "즉각적",
+                "Permanent": "영구적",
+                "Special": "특수",
+                "Sustained": "지속적"
             },
             "IsOptional": "능력 설정",
             "Karma": "카르마",
@@ -417,7 +912,7 @@
                 "LineOfSight": "시야 범위 내",
                 "LineOfSightArea": "시야 범위 내 (A)",
                 "Self": "시전자 적용",
-                "Special": "특별",
+                "Special": "특수",
                 "Touch": "접촉"
             },
             "Type": "유형",
@@ -472,7 +967,15 @@
         "Descriptors": "설명 대상",
         "Details": "세부사항",
         "DetectionSpellExtended": "연장",
-        "Device": "장치",
+        "Device": {
+            "label": "장치",
+            "FIELDS": {
+                "category": {
+                    "label": "장치 유형",
+                    "hint": "장치 유형"
+                }
+            }
+        },
         "DeviceCatCommlink": "컴링크",
         "DeviceCatCyberdeck": "사이버덱",
         "DeviceCatRCC": "리거 명령 콘솔",
@@ -498,10 +1001,10 @@
         "DrainValue": "드레인 수치",
         "Dropoff": "감소",
         "DuckOrCover": "숙이거나 엄폐하기",
-        "Duration": "지속 시간",
-        "DurationInstant": "즉시",
-        "DurationPermanent": "영구",
-        "DurationSustained": "지속",
+        "Duration": "지속력",
+        "DurationInstant": "즉각적",
+        "DurationPermanent": "영구적",
+        "DurationSustained": "지속적",
         "Echo": "에코",
         "Echoes": "에코",
         "EditAmmo": "탄약 수정",
@@ -578,8 +1081,8 @@
             "MasterDeviceIsMissing": "마스터 장치가 없습니다. 로컬 장치 값으로 대체됩니다.",
             "MissingSkill": "액터가 요구되는 기술을 가지고 있지 않습니다.",
             "NoAvailableActorFound": "해당 행동에 사용할 수 있는 액터를 찾을 수 없음",
-            "SkillWithoutAttribute": "이 기술은 특성치 설정이 없습니다.",
-            "TestExpectsVehicleOnly": "해당 테스트는 탑승물 유형의 액터만 사용할 수 있음",
+            "SkillWithoutAttribute": "해당 기술에 특성치 설정이 없습니다.",
+            "TestExpectsVehicleOnly": "해당 판정은 탑승물 유형의 액터만 사용 가능",
             "TooManyActionsWithCategory": "액터에 {category} 범주의 해동이 정확히 하나 있어야 함"
         },
         "EssenceCost": "에센스",
@@ -616,6 +1119,14 @@
         "GlitchCritical": "심각한 글리치!",
         "Glitches": "글리치:",
         "GoodCover": "완벽한 엄폐물",
+        "Grid": {
+            "FIELDS": {
+                "category": {
+                    "label": "그리드 유형",
+                    "hint": "퍼블릭 그리드에 연결되어 있는 동안에는 음수 수정치가 적용되고, 로컬과 글로벌 그리드에는 수정치가 없음"
+                }
+            }
+        },
         "Grids": "그리드",
         "HackingProgram": "해킹 프로그램",
         "Help": "도움",
@@ -631,6 +1142,20 @@
         "Hosts": "호스트",
         "HotSim": "핫 심",
         "IC": {
+            "FIELDS": {
+                "icType": {
+                    "label": "IC 유형",
+                    "hint": "IC 유형"
+                },
+                "host": {
+                    "label": "호스트",
+                    "hint": "IC 유형",
+                    "rating": {
+                        "label": "등급",
+                        "hint": "실행 중인 호스트의 등급"
+                    }
+                }
+            },
             "MissingHost": "호스트 물품 끌어서 놓기",
             "Type": "유형",
             "Types": {
@@ -657,8 +1182,17 @@
             }
         },
         "Import": {
+            "ActorImporter": {
+                "Title": "액터 불러오기"
+            },
+            "BulkImporter": {
+                "Title": "일괄 불러오기"
+            },
             "Spirit": {
                 "SpiritTypeNotFound": "해당 영혼 유형을 찾을 수 없습니다. chummer에서 내보낸 json으로 github 이슈를 열어주세요."
+            },
+            "ImporterSourcesConfig": {
+                "Title": "가져오기 출처 설정"
             }
         },
         "ImportCharacter": "캐릭터 불러오기",
@@ -678,11 +1212,258 @@
         "Initiation": "입회",
         "Initiative": "우선권",
         "Internal": "내부",
+        "InventoryRename": {
+            "Title": "소지품 위치 이름 재설정",
+            "Submit": "적용",
+            "Cancel": "취소",
+            "NewName": "새로운 이름"
+        },
         "IsCritter": "생명체",
         "IsFreshImport": "해당 물품은 처머에서 불러와졌기에 수동으로 살펴봐야 합니다.",
         "IsGrunt": "하수인",
         "IsNPC": "NPC",
-        "Item": "물품",
+        "Item": {
+            "FIELDS": {
+                "description": {
+                    "base": {
+                        "label": "설명",
+                        "hint": "물품에 대한 설명"
+                    },
+                    "source": {
+                        "label": "출처",
+                        "hint": "항목의 출처, 이는 PDF 페이지, URL 또는 저널일 수 있음"
+                    }
+                },
+                "ammo": {
+                    "spare_clips": {
+                        "value": {
+                            "label": "남은 여분 탄창",
+                            "hint": "액터가 가지고 있는 남은 여분 탄창 수"
+                        },
+                        "max": {
+                            "label": "최대 여분 탄창",
+                            "hint": "액터가 가지고 있는 해당 무기에 맞는 여분 탄창의 최대 수"
+                        }
+                    },
+                    "clip_type": {
+                        "label": "무기 재장전 방식",
+                        "hint": "해당 무기에 사용되는 재장전 방식의 유형"
+                    }
+                },
+                "action": {
+                    "categories": {
+                        "label": "범주",
+                        "hint": "해당 판정에 포함되는 행동 범주이다. 이 행동들은 활성 효과의 대상이 될 수 있다."
+                    },
+                    "modifiers": {
+                        "label": "수정치",
+                        "hint": "해당 판정에 영향을 주는 수정치이다."
+                    },
+                    "test": {
+                        "label": "판정 유형",
+                        "hint": "이 행동에 사용할 특정한 유형의 판정"
+                    },
+                    "type": {
+                        "label": "행동 유형",
+                        "hint": "해당 기술에 사용하는 행동 유형"
+                    },
+                    "extended": {
+                        "label": "연장 판정",
+                        "hint": "연장 판정일 경우 선택"
+                    },
+                    "skill": {
+                        "label": "기술",
+                        "hint": "해당 행동에 사용되는 기술. 사용되는 기술이 없는 경우 비워 두시오."
+                    },
+                    "spec": {
+                        "label": "전문화",
+                        "hint": "해당 판정에 기술 전문화 수정치(+2)를 적용할지 여부"
+                    },
+                    "attribute": {
+                        "label": "특성치",
+                        "hint": "해당 판정에 사용되는 특성치"
+                    },
+                    "attribute2": {
+                        "label": "기타 특성치",
+                        "hint": "해당 판정에 사용되는 다른 특성치"
+                    },
+                    "armor": {
+                        "label": "방어구",
+                        "hint": "해당 판정에 액터의 방어구를 적용할지 여부"
+                    },
+                    "mod": {
+                        "label": "수정치",
+                        "hint": "해당 판정에 적용되는 모든 수정치"
+                    },
+                    "damage": {
+                        "type": {
+                            "base": {
+                                "label": "피해 유형",
+                                "hint": "해당 행동이 가하는 피해의 유형"
+                            }
+                        },
+                        "base": {
+                            "label": "기본 피해량",
+                            "hint": "해당 행동이 가하는 기본 피해량"
+                        },
+                        "base_formula_operator": {
+                            "label": "Operator",
+                            "hint": "기본 피해량이 특성치에 영향을 주는 방식"
+                        },
+                        "attribute": {
+                            "label": "피해 특성치",
+                            "hint": "피해량 계산에 사용되는 특성치"
+                        },
+                        "biofeedback": {
+                            "label": "생체반응",
+                            "hint": "해당 행동이 생체반응 피해를 함께 입히는지 여부. 해당 항목은 활성 효과의 대상으로 지정될 수 있음"
+                        },
+                        "element": {
+                            "base": {
+                                "label": "속성",
+                                "hint": "피해의 속성 유형. 속성이 없을 경우 빈칸으로 설정."
+                            }
+                        },
+                        "ap": {
+                            "base": {
+                                "label": "AP",
+                                "hint": "피해의 장갑 관통력"
+                            },
+                            "base_formula_operator": {
+                                "label": "Operator",
+                                "hint": "기본 AP 수치가 특성치에 영향을 주는 방식"
+                            },
+                            "attribute": {
+                                "label": "AP 특성치",
+                                "hint": "AP 계산에 사용되는 특성치"
+                            }
+                        }
+                    },
+                    "limit": {
+                        "base": {
+                            "label": "한계치",
+                            "hint": "해당 판정에 사용되는 한계치. 특정 한계가 선택된 경우 이 수치가 합산됨"
+                        },
+                        "attribute": {
+                            "label": "한계",
+                            "hint": "해당 판정에서 액터에 적용되는 특정 한계."
+                        }
+                    },
+                    "threshold": {
+                        "base": {
+                            "label": "요구 성공횟수",
+                            "hint": "해당 판정에서 요구되는 성공횟수"
+                        }
+                    },
+                    "roll_mode": {
+                        "label": "굴림 방식",
+                        "hint": "해당 판정의 굴림 방식. 사용자가 선택한 방식을 사용하려면 빈칸으로 두어야함"
+                    },
+                    "opposed": {
+                        "test": {
+                            "label": "경쟁 판정",
+                            "hint": "행동의 목표가 수행해야 하는 판정"
+                        },
+                        "skill": {
+                            "label": "기술",
+                            "hint": "경쟁 판정에 사용되는 기술. 기술이 없을 경우 빈칸으로 두어야함"
+                        },
+                        "attribute": {
+                            "label": "특성치",
+                            "hint": "경쟁 판정에 사용되는 특성치"
+                        },
+                        "attribute2": {
+                            "label": "기타 특성치",
+                            "hint": "경장 판정에 사용되는 기타 특성치"
+                        },
+                        "armor": {
+                            "label": "방어구",
+                            "hint": "경쟁 판정에 액터의 방어구 수치 합산 여부"
+                        },
+                        "mod": {
+                            "label": "수정치",
+                            "hint": "해당 경쟁 판정에 합산되는 모든 수정치"
+                        },
+                        "resist": {
+                            "test": {
+                                "label": "저항 판정",
+                                "hint": "경쟁 판정 이후 목표가 피해 저항을 위해 수행하는 판정"
+                            },
+                            "attribute": {
+                                "label": "특성치",
+                                "hint": "해당 저항 판정에 사용되는 특성치"
+                            },
+                            "attribute2": {
+                                "label": "기타 특성치",
+                                "hint": "해당 저항 판정에 사용되는 다른 특성치"
+                            },
+                            "armor": {
+                                "label": "방어구",
+                                "hint": "저항 판정에 액터의 방어구 수치를 합산할지 여부"
+                            }
+                        }
+                    }
+                },
+                "grade": {
+                    "label": "등급",
+                    "hint": "사이버웨어/바이어웨어의 등급"
+                },
+                "essence": {
+                    "label": "에센스",
+                    "hint": "사이버웨어/바이오웨어의 에센스 비용"
+                },
+                "capacity": {
+                    "label": "수용량",
+                    "hint": "사이버웨어/바이오웨어의 수용량"
+                },
+                "technology": {
+                    "master": {
+                        "label": "마스터 장치",
+                        "hint": "해당 물품이 종속화되어 PAN 또는 WAN이 구성된 마스터 장치"
+                    },
+                    "cost": {
+                        "label": "가격",
+                        "hint": "해당 물품의 가격"
+                    },
+                    "availability": {
+                        "label": "희귀도",
+                        "hint": "해당 물품의 희귀도 특성치, 얼마나 구하기 쉬운지를 결정함"
+                    },
+                    "equipped": {
+                        "label": "장착됨",
+                        "hint": "물품의 장착 여부"
+                    },
+                    "wireless": {
+                        "label": "무선",
+                        "hint": "물품의 무선 상태"
+                    },
+                    "condition_monitor": {
+                        "value": {
+                            "label": "상태 감시창 피해량",
+                            "hint": "물품의 상태 감시창에 누적된 현재 피해량"
+                        }
+                    },
+                    "rating": {
+                        "label": "등급",
+                        "hint": "물품의 장치 등급, 매트릭스 행동에 반영됨."
+                    },
+                    "quantity": {
+                        "label": "수량",
+                        "hint": "물품의 보유 수량"
+                    },
+                    "show_quantity": {
+                        "label": "수량 보기",
+                        "hint": "캐릭터 및 물품 시트에 수량 표시 여부"
+                    },
+                    "conceal": {
+                        "base": {
+                            "label": "은폐도",
+                            "hint": "해당 장치가 다른 사람들에게 노출되는 정도"
+                        }
+                    }
+                }
+            }
+        },
         "ItemMod": "물품 부착물",
         "ItemName": "물품 이름",
         "ItemTypes": {
@@ -698,8 +1479,10 @@
             "Device": "장치",
             "Echo": "에코",
             "Equipment": "도구",
+            "Gear": "장비",
             "Grid": "그리드",
             "Host": "호스트",
+            "License": "면허증",
             "Lifestyle": "생활방식",
             "Metamagic": "메타마법",
             "Modification": "개조품",
@@ -708,10 +1491,21 @@
             "Ritual": "의식",
             "Sin": "SIN",
             "Spell": "주문",
-            "SpritePower": "요정 능력",
+            "SpritePower": "스프라이트 능력",
             "Weapon": "무기"
         },
         "Karma": "카르마",
+        "KarmaManager": {
+            "Title": "카르마 관리",
+            "Submit": "적용",
+            "Cancel": "취소",
+            "StartingKarma": "시작 카르마",
+            "CurrentKarma": "현재 캐릭터가 가지고 있는 카르마의 수량",
+            "CareerKarma": "캐릭터가 누적해온 경력 카르마의 수량",
+            "FinalKarma": "최종 카르마",
+            "FinalCurrentKarma": "적용 후 캐릭터가 보유하게 될 카르마",
+            "FinalCareerKarma": "적용 후 캐릭터가 보유하게 될 경력 카르마"
+        },
         "Keybinding": {
             "HideTestDialog": {
                 "Hint": "아무 버튼이나 눌러 판정 굴림 시 확인 상자 생략",
@@ -732,6 +1526,14 @@
             "SuccessTestPrompt": {
                 "Hint": "표준 성공 판정 수행 요청",
                 "Label": "성공 판정 요청"
+            },
+            "AddRemoveSomeQty": {
+                "Hint": "한번에 5개씩 추가/제거",
+                "Label": "5개 추가/제거"
+            },
+            "AddRemoveManyQty": {
+                "Hint": "한번에 20개씩 추가/제거",
+                "Label": "20개 추가/제거"
             }
         },
         "KnockedDown": "넘어짐",
@@ -749,7 +1551,8 @@
                 "Modifiers": "수정치",
                 "OpposedTest": "경쟁 판정",
                 "SpiritType": "영혼 유형",
-                "SpriteType": "요정 유형"
+                "SpriteType": "스프라이트 유형",
+                "MatrixAction": "매트릭스 연결"
             },
             "Actions": {
                 "BruteForce": "브루트 포스",
@@ -757,31 +1560,40 @@
             },
             "ActorSheet": {
                 "AddNetwork": "직접 연결 네트워크",
+                "AddOneMark": "마크 하나 추가",
                 "ColdSim": "콜드 심",
                 "Compilations": "컴파일 모음",
                 "ConnectToDriver": "조종자에게 연결",
+                "ConnectedTo": "다음 대상에게 연결",
                 "CreateInventory": "물품 보관 장소 생성",
                 "CritterPowers": "생명체 능력",
                 "DeviceRating": "장치 등급",
                 "DeviceSetup": "장치 설정",
                 "DisabledOptionCritterPowers": "추가 생명체 능력 - 사용 불가능",
-                "DisabledOptionSpritePowers": "추가 요정 능력 - 사용 불가능",
+                "DisabledOptionSpritePowers": "추가 스프라이트 능력 - 사용 불가능",
                 "DisplayingPersona": "페르소나 표시",
                 "EnabledOptionCritterPowers": "추가 생명체 능력 - 사용 가능",
-                "EnabledOptionSpritePowers": "추가 요정 능력 - 사용 가능",
+                "EnabledOptionSpritePowers": "추가 스프라이트 능력 - 사용 가능",
                 "Hacking": "해킹",
                 "ICConfiguration": "IC 배열",
                 "Icons": "아이콘",
+                "ManageNetwork": "네트워크 관리",
                 "MarkNetwork": "네트워크 마크",
                 "MarkedIcons": "마크된 아이콘",
                 "Matrix": "매트릭스",
                 "MatrixActions": "매트릭스 행동",
                 "Network": "네트워크 마크",
+                "Networks": "네트워크",
                 "NoNetwork": "네트워크 없음",
+                "NotorietyShort": "N",
                 "Offline": "오프라인",
+                "OpenSourceDocument": "출처 열기",
                 "OwnedIcons": "소유한 아이콘",
                 "Persona": "페르소나",
                 "PersonalInventory": "개인 소지 중",
+                "PhysicalTrack": "물리 추적기",
+                "PublicAwarenessShort": "PA",
+                "RemoveOneMark": "마크 하나 제거",
                 "ResetActorForNewRun": "신규 런을 위한 초기화",
                 "Rituals": "의식",
                 "RollDroneInfiltration": "드론 침투",
@@ -791,14 +1603,21 @@
                 "SetupPAN": "PAN에 장치 추가",
                 "Spells": "주문",
                 "SpiritConfiguration": "영혼 구성",
-                "SpriteConfiguration": "요정 구성",
-                "SpritePowers": "요정 능력",
-                "TestKBoardModifiers": "{skip}: 결과창 생략. {descr}: 설명만 보임.",
+                "SpriteConfiguration": "스프라이트 구성",
+                "SpritePowers": "스프라이트 능력",
+                "StreetCredShort": "SC",
+                "StunTrack": "기절 추적기",
+                "TestKBoardModifiers": "{skip}: 결과창 생략. {descr}: 설명만 표시.",
                 "VehicleConfiguration": "탑승물 설정"
+            },
+            "Item": {
+                "AvailabilityAdjustment": "등급별 희귀도 비례 적용",
+                "CostAdjustment": "등급별 가격 비례 적용",
+                "EssenceAdjustment": "등급별 에센스 비례 적용"
             },
             "Inventory": {
                 "All": "전체",
-                "Carried": "소지",
+                "Carried": "소지 중",
                 "OpenInventory": "소지품 위치"
             },
             "MarkPlacement": {
@@ -806,6 +1625,10 @@
                 "PlaceOnMainIcon": "페르소나/호스트에 배치"
             },
             "Matrix": {
+                "AttackShort": "A",
+                "SleazeShort": "S",
+                "DataProcessingShort": "D",
+                "FirewallShort": "F",
                 "Global": "글로벌",
                 "Local": "로컬",
                 "Public": "공공",
@@ -825,6 +1648,7 @@
                 "ItemEffects": "물품 효과",
                 "MissingNetworkDevices": "추가할 네트워크 장치를 끌어다 놓기",
                 "NetworkDevices": "네트워크화 된 장치",
+                "NotVisible": "숨김",
                 "PAN": "PAN",
                 "RebootDevice": "재부팅",
                 "SubtractOne": "제외",
@@ -843,7 +1667,39 @@
         "Level": "단계",
         "License": "면허증",
         "Licenses": "면허증",
-        "Lifestyle": "생활방식",
+        "Lifestyle": {
+            "label": "생활방식",
+            "FIELDS": {
+                "type": {
+                    "label": "생활방식 유형",
+                    "hint": "생활방식의 유형"
+                },
+                "cost": {
+                    "label": "생활방식 비용",
+                    "hint": "생활방식의 월간 유지 비용"
+                },
+                "comforts": {
+                    "label": "편안함",
+                    "hint": "생활방식의 편안함 수준"
+                },
+                "security": {
+                    "label": "보안",
+                    "hint": "생활방식의 보안 수준"
+                },
+                "neighborhood": {
+                    "label": "이웃",
+                    "hint": "생활방식의 이웃 수준"
+                },
+                "guests": {
+                    "label": "동거인",
+                    "hint": "같은 생활방식을 공유하는 인원"
+                },
+                "permanent": {
+                    "label": "영구 보유",
+                    "hint": "생활방식의 영구 보유 여부"
+                }
+            }
+        },
         "LifestyleComforts": "편의 시설",
         "LifestyleGuests": "투숙객",
         "LifestyleHigh": "상류층",
@@ -930,7 +1786,7 @@
             }
         },
         "Miscellaneous": "기타",
-        "MissingItemForOpposedTest": "현재 행동 물품이 누락되어 경쟁 테스트를 수행할 수 없음",
+        "MissingItemForOpposedTest": "행동 주체인 물품을 찾을 수 없어 대항 판정을 수행할 수 없음",
         "MissingRessource": {
             "Ammo": "사격을 위한 탄약이 충분하지 않음",
             "Edge": "소비 할 수 있는 엣지가 없음",
@@ -939,13 +1795,48 @@
             "SomeAmmoMelee": "근거리 공격 수행을 위한 탄약이 충분하지 않음"
         },
         "ModPoints": "개조 점수",
-        "Modification": "개조",
+        "Modification": {
+            "FIELDS": {
+                "type": {
+                    "label": "개조 유형",
+                    "hint": "개조의 유형"
+                },
+                "mount_point": {
+                    "label": "장착 위치",
+                    "hint": "해당 개조품의 무기 상 부착 위치"
+                },
+                "modification_category": {
+                    "label": "개조 범주",
+                    "hint": "해당 개조품이 속한 범주"
+                },
+                "dice_pool": {
+                    "label": "주사위 풀",
+                    "hint": "적용할 주사위 풀 수정치"
+                },
+                "accuracy": {
+                    "label": "정확도",
+                    "hint": "적용할 정확도/한계 수정치"
+                },
+                "rc": {
+                    "label": "반동 제어",
+                    "hint": "적용할 반동 제어 수정치"
+                },
+                "conceal": {
+                    "label": "은폐도",
+                    "hint": "적용할 은폐도 수정치"
+                },
+                "slots": {
+                    "label": "슬롯",
+                    "hint": "소모되는 슬롯(차량용) 또는 포인트(드론용) 수치"
+                }
+            }
+        },
         "ModificationCategories": "개조 범위",
         "ModificationCategory": "개조 범위",
-        "ModificationSlots": "개조 위치",
+        "ModificationSlots": "개조 슬롯",
         "Modified": "수정치",
-        "ModifiedArmor": "개조된 방어구",
-        "ModifiedDamage": "수정된 피해 수치",
+        "ModifiedArmor": "개조된 방어구 수치",
+        "ModifiedDamage": "수정된 피해량",
         "ModifiedDrain": "수정된 드레인 수치",
         "ModifiedFade": "수정된 페이드 수치",
         "Modifier": "수정치",
@@ -1020,8 +1911,19 @@
         "Name": "이름",
         "NetHits": "순 성공횟수",
         "Network": "네트워크",
+        "NetworkManager": {
+            "AvailableNetworks": "이용 가능한 네트워크",
+            "BruteForce": "브루트 포스",
+            "ConnectedTo": "다음 대상에게 연결",
+            "HackOnTheFly": "즉석 해킹",
+            "InviteMark": "마크 초대 요청",
+            "NetworkType": "유형",
+            "NoNetwork": "연결되지 않음",
+            "Title": "네트워크 관리자"
+        },
         "Networks": "네트워크",
         "New": "신규",
+        "NewSpecialization": "신규 전문화",
         "NoCover": "엄폐물 없음",
         "NoSelectableToken": "캔버스 위에 액터가 선택할 수 있는 토큰이 없음",
         "None": "없음",
@@ -1044,6 +1946,14 @@
         },
         "Notoriety": "악명",
         "Nuyen": "뉴엔",
+        "NuyenManager": {
+            "Title": "뉴엔 관리",
+            "Submit": "적용",
+            "Cancel": "취소",
+            "CurrentNuyen": "캐릭터가 현재 보유한 뉴엔의 수량",
+            "FinalNuyen": "적용 시 캐릭터가 보유하게 될 뉴엔의 수량"
+        },
+        "OpenNetworkManager": "네트워크 관리 열기",
         "OpenOrigin": "물품 열기",
         "OpenSource": "물품에 대한 pdfpager PDF 또는 웹페이지 열기",
         "OpposedType": "유형",
@@ -1079,14 +1989,38 @@
         "PowerPoints": "PP",
         "PowerType": "유형",
         "Powers": "능력",
-        "Program": "프로그램",
+        "Program": {
+            "label": "프로그램",
+            "FIELDS": {
+                "type": {
+                    "label": "프로그램 유형",
+                    "hint": "프로그램의 유형, 단순 정리용"
+                }
+            }
+        },
         "ProgramType": "유형",
         "Programs": "프로그램",
         "PublicAwareness": "대중 인식도",
         "PublicGrid": "공공 그리드",
         "PushTheLimit": "한계 돌파",
         "Qty": "수량",
-        "Quality": "특징",
+        "Quality": {
+            "label": "특징",
+            "FIELDS": {
+                "type": {
+                    "label": "특징 유형",
+                    "hint": "이 특징을 나타내는 유형 (긍정적/부정적/인생 모듈)"
+                },
+                "karma": {
+                    "label": "카르마",
+                    "hint": "해당 특징의 카르마 비용"
+                },
+                "rating": {
+                    "label": "등급",
+                    "hint": "해당 특징의 등급"
+                }
+            }
+        },
         "QualityType": "유형",
         "QualityTypeLifeModule": "인생 모듈",
         "QualityTypeNegative": "부정적",
@@ -1113,10 +2047,27 @@
         "Refresh": "새로고침",
         "RemoveBonus": "보너스 제거",
         "RemoveSpecialization": "전문화 제거",
+        "ReputationManager": {
+            "Title": "명성 관리",
+            "Submit": "적용",
+            "Cancel": "취소"
+        },
         "Resist": "저항",
         "RestoreDefaultSkills": "기본 기술 복구",
         "RightClickToClear": "비우려면 우클릭",
-        "Roll": "굴리기",
+        "Ritual": {
+            "FIELDS": {
+                "type": {
+                    "label": "의식 유형",
+                    "hint": "수행할 의식의 유형"
+                },
+                "descriptors": {
+                    "label": "핵심어",
+                    "hint": "해당 의식의 핵심어"
+                }
+            }
+        },
+        "Roll": "굴림",
         "RollArmor": "방어구",
         "RollComposure": "평정심",
         "RollCustom": "맞춤 설정",
@@ -1169,6 +2120,9 @@
             "Total": "결과"
         },
         "Skill": {
+            "abbr": {
+                "Native": "N"
+            },
             "AeronauticsMechanic": "항공정비",
             "Alchemy": "연금술",
             "AnimalHandling": "동물 조련",
@@ -1201,8 +2155,8 @@
             "ElectronicWarfare": "전자전",
             "EscapeArtist": "탈출의 대가",
             "Etiquette": "예법",
-            "ExoticMelee": "희귀 근거리 무기",
-            "ExoticRange": "희귀 원거리 무기",
+            "ExoticMeleeWeapon": "희귀 근거리 무기",
+            "ExoticRangedWeapon": "희귀 원거리 무기",
             "FirstAid": "응급 치료",
             "Flight": "비행",
             "Forgery": "위조",
@@ -1216,6 +2170,7 @@
             "IndustrialMechanic": "산업 정비",
             "Instruction": "교육",
             "Intimidation": "협박",
+            "Native": "모국어",
             "Leadership": "지도력",
             "Locksmith": "자물쇠 따기",
             "Longarms": "장총류",
@@ -1231,12 +2186,13 @@
             "PilotExoticVehicle": "희귀 탑승물 조종",
             "PilotGroundCraft": "지상 탑승물 조종",
             "PilotWalker": "워커 조종",
-            "PilotWaterCraft": "수상 탑승물 조종",
+            "PilotWatercraft": "수상 탑승물 조종",
             "Pistols": "권총류",
             "Registering": "레지스터링",
             "RitualSpellcasting": "의식 주문 시전",
             "Running": "달리기",
             "Skill": "기술",
+            "SkillGroup": "기술 묶음",
             "Skills": "기술",
             "Sneaking": "잠입",
             "Software": "소프트웨어",
@@ -1265,6 +2221,82 @@
         "Specialization": "전문화",
         "Specializations": "전문화",
         "Spell": {
+            "FIELDS": {
+                "type": {
+                    "label": "주문 유형",
+                    "hint": "주문의 유형(물리 또는 마나 기반) 여부"
+                },
+                "category": {
+                    "label": "범주",
+                    "hint": "주문이 속한 범주"
+                },
+                "drain": {
+                    "label": "드레인 수치",
+                    "hint": "해당 주문의 드레인 수치, 드레인 저항 시 주문의 강도에 합쳐짐"
+                },
+                "range": {
+                    "label": "거리",
+                    "hint": "주문의 거리"
+                },
+                "duration": {
+                    "label": "지속력",
+                    "hint": "주문의 지속력"
+                },
+                "combat": {
+                    "type": {
+                        "label": "전투 주문 유형",
+                        "hint": "주문의 직접 또는 간접 유형"
+                    }
+                },
+                "detection": {
+                    "type": {
+                        "label": "탐지 주문 유형",
+                        "hint": "주문이 목표에게 영향을 미치는 방식"
+                    },
+                    "passive": {
+                        "label": "수동형",
+                        "hint": "주문의 수동형 여부"
+                    },
+                    "extended": {
+                        "label": "연장",
+                        "hint": "주문의 연장 여부"
+                    }
+                },
+                "illusion": {
+                    "type": {
+                        "label": "환각 주문 유형",
+                        "hint": "환각 주문의 유형"
+                    },
+                    "sense": {
+                        "label": "감각",
+                        "hint": "주문이 영향을 미치는 감각"
+                    }
+                },
+                "manipulation": {
+                    "damaging": {
+                        "label": "손상",
+                        "hint": "주문의 피해 유무"
+                    },
+                    "mental": {
+                        "label": "정신",
+                        "hint": "주문이 목표의 정신에 영향을 미치는지 여부"
+                    },
+                    "physical": {
+                        "label": "물리",
+                        "hint": "이 주문들은 물리적 형태에 영향을 미치며, 보통 이에 대한 방어 판정을 수행"
+                    },
+                    "environmental": {
+                        "label": "환경",
+                        "hint": "해당 주문들은 특정 목표를 지정하지 않고 목표에게 직접적인 영향을 미치지 않음. 대신 일정 범위 전체에 영향을 줌."
+                    }
+                },
+                "ritual": {
+                    "type": {
+                        "label": "의식 유형",
+                        "hint": "수행할 의식의 유형"
+                    }
+                }
+            },
             "Attack": "주문 공격",
             "Cast": "주문 시전",
             "CatCombat": "전투",
@@ -1272,6 +2304,7 @@
             "CatHealth": "의료",
             "CatIllusion": "환영",
             "CatManipulation": "조작",
+            "CatRitual": "의식",
             "Category": "범주",
             "CombatDirect": "직접",
             "CombatIndirect": "간접",
@@ -1307,47 +2340,49 @@
             "Summoner": "소환자",
             "Type": "유형",
             "Types": {
+                "Abomination": "Abomination",
                 "Air": "공기",
                 "Aircraft": "항공기",
                 "Airwave": "전파",
-                "Ally": "동맹국",
+                "Ally": "협력하는 영혼",
                 "Anansi": "아난시",
                 "Anarch": "무질서",
                 "Arboreal": "수목",
                 "Automotive": "자동차",
+                "Barren": "Barren",
                 "Beasts": "짐승",
                 "Blackjack": "블랙잭",
-                "BladeSummoned": "블레이드 소환",
+                "BladeSummoned": "소환된 검",
                 "Blood": "혈액",
                 "BloodShade": "블러드 셰이드",
                 "Boggle": "혼란",
                 "Bone": "뼈",
                 "Bugul": "부굴",
-                "Carcass": "날고기",
+                "Carcass": "동물 시체",
                 "Caretaker": "곤충 경비병",
                 "Ceramic": "도자기",
                 "Chindi": "친디",
-                "CorpsCadavre": "군단 카다브르",
+                "CorpsCadavre": "콥스 카다브르",
                 "Corpse": "시체",
-                "Crawler": "크롤러(악마)",
+                "Crawler": "크롤러 (악마)",
                 "Croki": "크로키",
                 "Detritus": "폐기물",
-                "Duende": "악귀",
+                "Duende": "두엔데",
                 "Earth": "대지",
                 "Ejerian": "에제리안",
                 "Elvar": "엘발",
                 "Energy": "기운",
                 "Erinyes": "에리니에스",
                 "Fire": "화염",
-                "Ghasts": "가스트(악마)",
+                "Ghasts": "가스트 (악마)",
                 "GreenMan": "그린맨",
                 "Gremlin": "그렘린",
                 "Guardian": "수호자",
                 "Guidance": "안내자",
-                "GumToad": "검토드(악마)",
+                "GumToad": "굼 토드 (악마)",
                 "Homunculus": "호문쿨루스",
-                "Hopper": "홉 따는 기계",
-                "HorrorShow": "공포 쇼",
+                "Hopper": "호퍼",
+                "HorrorShow": "호러 쇼",
                 "Imp": "임프",
                 "Jarl": "야를",
                 "Kappa": "갓파",
@@ -1359,10 +2394,13 @@
                 "Muse": "뮤즈",
                 "Nightmare": "악몽",
                 "Nocnitsa": "노크니차",
+                "Noxious": "Noxious",
+                "Nuclear": "Nuclear",
                 "Nymph": "곤충 유충",
                 "Palefire": "창백한 불꽃",
                 "Phantom": "유령",
                 "Plant": "식물",
+                "Plague": "Plague",
                 "Preta": "망령",
                 "Queen": "곤충 여왕",
                 "Rot": "부패",
@@ -1370,34 +2408,51 @@
                 "Shade": "섀이드",
                 "Shedim": "쉐딤",
                 "Ship": "선박",
+                "Sludge": "Sludge",
                 "Soldier": "곤충 병사",
                 "Stabber": "암살자",
                 "Succubus": "서큐버스",
                 "Task": "태스크",
-                "ToxicAir": "유해물",
-                "ToxicBeasts": "혐오",
-                "ToxicEarth": "황무지",
-                "ToxicFire": "핵",
-                "ToxicMan": "전염병",
-                "ToxicWater": "폐기물",
                 "Train": "열차",
-                "TsuchigumoWarrior": "흙 거미 와리오 r",
-                "Tungak": "턴각",
+                "TsuchigumoWarrior": "전사 츠치구모",
+                "Tungak": "퉁각",
                 "Unbreakable": "깨지지 않는",
-                "Vrygoths": "브라이고스족",
+                "Vrygoths": "브리고스",
                 "VucubCaquix": "부쿱 카킥스",
-                "Watcher": "당직자",
+                "Watcher": "감시자",
                 "Water": "물",
                 "Worker": "곤충 일꾼",
                 "Wraith": "유령"
             }
         },
         "Sprite": {
+            "FIELDS": {
+                "spriteType": {
+                    "label": "스프라이트 유형",
+                    "hint": "스프라이트의 유형"
+                },
+                "level": {
+                    "label": "레벨",
+                    "hint": "스프라이트의 레벨"
+                },
+                "services": {
+                    "label": "봉사",
+                    "hint": "스프라이트의 남은 봉사 횟수"
+                },
+                "registered": {
+                    "label": "레지스트",
+                    "hint": "스프라이트의 레지스트 여부"
+                },
+                "technomancerUuid": {
+                    "label": "테크노맨서",
+                    "hint": "해당 영혼을 컴파일 한 테크노맨서"
+                }
+            },
             "Level": "단계",
-            "MissingTechnomancer": "유효한 테크노멘서 없음",
-            "Registered": "레지스터",
+            "MissingTechnomancer": "유효한 테크노맨서 없음",
+            "Registered": "레지스트",
             "Services": "봉사",
-            "Technomancer": "테크노멘서",
+            "Technomancer": "테크노맨서",
             "Type": "유형",
             "Types": {
                 "Companion": "컴패니언",
@@ -1410,6 +2465,23 @@
             }
         },
         "SpritePower": {
+            "Durations": {
+                "Always": "항시적",
+                "Instant": "즉각적",
+                "Permanent": "영구적",
+                "Special": "특수",
+                "Sustained": "지속적"
+            },
+            "FIELDS": {
+                "optional": {
+                    "label": "선택 사항",
+                    "hint": "해당 스프라이트 능력의 선택 사항 여부"
+                },
+                "duration": {
+                    "label": "지속력",
+                    "hint": "해당 스프라이트 능력의 지속력"
+                }
+            },
             "IsOptional": "능력 설정",
             "Optional": {
                 "DisabledOption": "추가 능력, 사용 불가능",
@@ -1429,13 +2501,53 @@
             "SpiritType": "영혼 유형"
         },
         "Suppressing": "제압 사격",
+        "Tabs": {
+            "Actor": {
+                "Actions": "행동",
+                "Ammo": "탄약",
+                "Bio": "인물 기록",
+                "Character": "캐릭터",
+                "Compilations": "컴파일 모음",
+                "ComplexForms": "컴플렉스 폼",
+                "CritterPowers": "능력",
+                "Details": "세부사항",
+                "Network": "네트워크",
+                "Effects": "효과",
+                "IC": "IC",
+                "Inventory": "소지품",
+                "Licenses": "면허증",
+                "Magic": "마법",
+                "MarkedIcons": "마크",
+                "Mods": "부착물",
+                "Matrix": "매트릭스",
+                "MatrixActions": "행동",
+                "NetworkIcons": "아이콘",
+                "Networks": "테트워크",
+                "OwnedIcons": "소유함",
+                "Social": "사교",
+                "Spirit": "영혼",
+                "Sprite": "스프라이트",
+                "SpritePowers": "능력",
+                "Vehicle": "탑승물"
+            },
+            "Item": {
+                "Description": "설명",
+                "Details": "세부사항",
+                "Effects": "효과",
+                "Network": "네트워크",
+                "SinLicenses": "면허증",
+                "SinNetworks": "네트워크",
+                "WeaponAmmo": "탄약",
+                "WeaponMods": "부착물"
+            }
+        },
         "Target": "목표",
         "TargetDevice": "장치",
         "TargetFile": "파일",
         "TargetOther": "기타",
         "TargetPersona": "페르소나",
         "TargetSelf": "시전자 적용",
-        "TargetSprite": "요정",
+        "TargetSprite": "스프라이트",
         "TargetingNeedsActorWithToken": "현재 액터가 작동하려면 목표에 연결된 토큰이 필요",
         "Temporary": "임시",
         "TemporaryModifiers": "임시 수정치",
@@ -1462,8 +2574,8 @@
             "SoakBlockedByHardenedArmor": "단단한 방어구에 의해 막힘",
             "SpiritSummonFailure": "영혼이 사라졌다!",
             "SpiritSummonSuccess": "영혼이 소환되었다!",
-            "SpriteCompilationFailure": "요정이 사라졌다!",
-            "SpriteCompilationSuccess": "요정이 소환되었다!",
+            "SpriteCompilationFailure": "스프라이트가 사라졌다!",
+            "SpriteCompilationSuccess": "스프라이트가 소환되었다!",
             "Success": "성공!"
         },
         "Tests": {
@@ -1472,7 +2584,7 @@
             "BruteForceTest": "브루트 포스",
             "CheckOverwatchScoreTest": "감시 점수 확인",
             "CombatSpellDefenseTest": "전투 주문 방어",
-            "CompileSpriteTest": "요정 컴파일",
+            "CompileSpriteTest": "스프라이트 컴파일",
             "ComplexFormTest": "컴플렉스 폼 쓰레딩",
             "DrainTest": "드레인 판정",
             "DroneInfiltrationTest": "드론 침투 판정",
@@ -1511,31 +2623,41 @@
         "ToggleWireless": "무선 전환",
         "Tooltips": {
             "Actor": {
+                "AddOneService": "봉사 횟수 1회 추가",
+                "Blitz": "엣지 1점을 사용하여 우선권 주사위를 최대치 (5개)로 굴림",
                 "ConnectNetwork": "해당 호스트/그리드 입장",
                 "Critter": "생명체 능력 사용 허용",
+                "DefaultCategoryVisibility": "범주에 물품이 없더라도 물품 범주 표시",
+                "Description": "해당 액터에 대한 설명",
                 "DisconnectNetwork": "해당 호스트/그리드 퇴장",
-                "Grunt": "액터에게 하수인 규칙 적용",
                 "MarkTarget": "해당 목표에 추가 마크 배치",
                 "MatrixConnectionToggle": "매트릭스 연결 상태 변경: 증강 현실, 콜드 심, 핫 심",
                 "MatrixRunningSilentToggle": "자신의 매트릭스 장치를 정숙 실행이나 페르소나 표시로 전환",
                 "Metatype": "NPC로서 메타인종은 특성치 빠른 수정치도 적용함",
+                "MiscConfig": "기타 설정 & 수정치",
                 "MissingSummoner": "캐릭터를 끌어서 놓거나 소환 행동 사용하기",
                 "MissingTechnomancer": "캐릭터를 끌어서 놓거나 컴파일 행동 사용하기",
+                "NetworksTab": "그리드 & 호스트",
+                "NoCombatant": "우선권 굴림 (인카운터 상황에서만 가능)",
                 "NPC": "액터를 NPC로 표시하여 추가 기능 사용",
-                "PickControlledTokenAsDriver": "현재 제어 중인 토큰 액터를 조종자로 선택",
                 "PlaceMark": "이미 마크된 목표에게 마크 배치 사용",
-                "RebootPersonaAndClearAllMarks": "페르소나를 재부팅하여 자신에게 배치된 모든 마커 제거",
+                "RemoveOneService": "봉사 횟수 1회 제외",
                 "ResetActorForNewRun": "신규 런을 위해 피해, 엣지 등을 초기화",
-                "SetupPAN": "해당 캐릭터의 페르소나에 모든 장착된 무선 장치들을 추가",
-                "DefaultCategoryVisibility": "범주에 물품이 없더라도 물품 범주 표시"
+                "RollInitiative": "우선권 굴림",
+                "PickControlledTokenAsDriver": "현재 제어 중인 토큰 액터를 조종자로 선택",
+                "PickControlledTokenAsSummoner": "현재 조작 중인 토큰 액터를 소환자로 선택",
+                "PickControlledTokenAsTechnomancer": "현재 조작 중인 토큰 액터를 컴파일러 (테크노맨서)로 선택",
+                "RebootPersonaAndClearAllMarks": "페르소나를 재부팅하여 자신에게 배치된 모든 마커 제거",
+                "SetupPAN": "해당 캐릭터의 페르소나에 모든 장착된 무선 장치들을 추가"
             },
             "CallInAction": {
-                "ActorType": "호출할 액터 유형"
+                "ActorType": "호출할 액터 유형",
+                "LinkActor": "호출할 액터를 끌어서 놓기"
             },
             "CompilationTest": {
-                "Level": "컴파일 된 요정의 단계",
-                "PreparedSprite": "신규 요정을 생성하는 대신 준비된 요정을 사용",
-                "SpriteType": "컴파일 된 요정의 유형"
+                "Level": "컴파일 된 스프라이트의 단계",
+                "PreparedSprite": "신규 스프라이트를 생성하는 대신 준비된 스프라이트를 사용",
+                "SpriteType": "컴파일 된 스프라이트의 유형"
             },
             "Contact": {
                 "LinkActor": "해당 연줄과 연결할 액터 끌어서 놓기"
@@ -1543,7 +2665,10 @@
             "Effect": {
                 "AlterApplyToWithChanges": "효과를 적용하는 대상을 변경하기 전에 변경 사항을 제거합니다.",
                 "ApplyTo": "해당 효과의 변경 사항은 이 대상에만 적용됨",
+                "CreateEffect": "효과 생성",
+                "DeleteEffect": "효과 삭제",
                 "DocumentEffects": "이 문서에 직접 적용",
+                "EditEffect": "효과 수정",
                 "ItemEffects": "이 문서의 항목에서 수집한 효과",
                 "OnlyAllFilteredUsed": "전체 선택 사항과 맞는 판정에만 효과가 적용됨",
                 "OnlyFilteredUsed": "최소 하나 이상의 선택 사항과 맞는 판정에만 효과가 적용됨",
@@ -1555,54 +2680,15 @@
                 "ActionCategories": "판정의 기본 범주 대신 사용할 행동 범주를 선택합니다. 액티브 이펙트를 사용하여 판정 수치를 수정하는데 범주를 사용 가능",
                 "ActionModifier": "판정의 기본 수정치 대신 선택한 풀 수정치가 사용됨",
                 "ActionRollMode": "이 행동을 시전 할 때 무리한 굴림 방식을 사용함. 전체 채팅 설정에 덮어 써짐.",
+                "AddQuantity": "1개 추가. {qtySome}: 5개 추가. {qtyMany}: 20개 추가.",
                 "AmmoReplaceDamage": "무기 피해를 수정하는 대신 대체하도록 설정",
                 "AvailabilityAdjustment": "물품 등급에 따라 현재 희귀도 조정",
                 "CostAdjustment": "물품 등급에 따라 현재 가격 조정",
-                "DisabledForPreparedActor": "준비된 액터를 사용하기에 비활성화됨"
-            },
-            "Modifiers": {
-                "armor": "총 방어구 수치 수정",
-                "astral_initiative": "기본 아스트랄 우선권 수정",
-                "astral_initiative_dice": "아스트랄 우선권 주사위 수정치",
-                "astral_limit": "아스트랄 한계 수정",
-                "composure": "평정심 판정 풀 수정",
-                "defense": "방어 판정 풀 수정",
-                "defense_block": "능동적 막기에 대한 방어 수정치 추가",
-                "defense_dodge": "능동적 회피에 대한 방어 수정치 추가",
-                "defense_melee": "근거리 방어에 대한 방어 수정치 추가",
-                "defense_parry": "능동적 쳐내기에 대한 방어 수정치 추가",
-                "defense_ranged": "원거리 공격에 대한 방어 수정치 추가",
-                "drain": "드레인 판정 풀 수정",
-                "essence": "에센스 특성 수정",
-                "fade": "페이드 판정 풀 수정",
-                "global": "피해 감소 판정을 제외한 모든 판정 풀 수정",
-                "judge_intentions": "의도 판단 판정 풀 수정치",
-                "lift_carry": "들기&운반 판정 풀 수정",
-                "mark_damage": "자신에게 부여된 각 마크당 받는 피해량 수정",
-                "matrix_initiative": "기본 매트릭스 우선권 수정",
-                "matrix_initiative_dice": "매트릭스 우선권 주사위 수정",
-                "matrix_track": "매트릭스 피해 추적기 수정",
-                "meat_initiative": "기본 물리 우선권 수정",
-                "meat_initiative_dice": "물리 우선권 주사위 수정",
-                "memory": "기적 판정 풀 수정",
-                "mental_limit": "정신 한계 수정",
-                "multi_defense": "매 전투 턴 다중 방어에 대한 방어 주사위 풀 수정",
-                "pain_tolerance_physical": "최초 부상 수정치 이전의 피해를 무시하도록 수정",
-                "pain_tolerance_stun": "최초 부상 수정치 이전의 피해를 무시하도록 수정",
-                "physical_limit": "물리 한계 수정치",
-                "physical_overflow_track": "물리 치명적 피해 추적기 수정치",
-                "physical_track": "물리 피해 추적기 수정치",
-                "place_three_marks": "한번에 마크 3개를 부여할 경우의 수정치",
-                "place_two_marks": "한번에 마크 2개를 부여할 경우의 수정치",
-                "public_grid": "공공 그리드에 연결 되어 있을 경우의 수정치",
-                "reach": "근거리 공격 길이 수정",
-                "recoil": "반동 판정 풀 수정",
-                "run": "민첩 특성치 배수만큼 달리기 거리 수정",
-                "soak": "물리 피해 저항 판정 풀 수정",
-                "social_limit": "사교 한계 수정",
-                "stun_track": "기절 피해 추적기 수정",
-                "walk": "민첩 특성치 배수만큼 걷기 거리 수정",
-                "wound_tolerance": "부상 수정치 당 피해량 수정"
+                "DisabledForPreparedActor": "준비된 액터를 사용 중이므로 비활성화됨",
+                "EssenceAdjustment": "해당 물품의 등급에 따라 실제 에센스 비용을 조절",
+                "RemoveQuantity": "1개 삭제. {qtySome}: 5개 삭제. {qtyMany}: 20개 삭제.",
+                "ToggleVisibility": "플레이 모드 중 표시 여부 전환",
+                "ToggleFavorite": "즐겨찾기에 추가 및 즐겨찾기 줄에 표시"
             },
             "RangedAttack": {
                 "Recoil": "점진적 반동",
@@ -1635,13 +2721,17 @@
                 "PushTheLimit": "한계 돌파 엣지 규칙 적용",
                 "RollMode": "FoundryVTT 채팅 메시지 굴림 가시성",
                 "Threshold": "계산된 요구 성공횟수 수치"
-            }
+            },
+            "MatrixTest": {
+                "SameGridDisabled": "활성 아이콘과 목표 아이콘 모두 그리드를 사용하므로 자동으로 결정됨"
+            },
+            "ToggleEditMode": "수정 모드 전환"
         },
         "Top": "상부",
         "Total": "합계",
         "Tours": {
             "CharacterImport": {
-                "Description": "다음은 chummer 캐릭터를 불러오는 방법에 대한 설명입니다. 세부 사항은 https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/wiki/Chummer-Character-Import 에서 확인 ",
+                "Description": "다음은 chummer 캐릭터를 불러오는 방법에 대한 설명입니다. 세부 사항은 https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/wiki/Chummer-Character-Import 에서 확인",
                 "GeneralContent": "캐릭터를 불러오기 위해서는 chummer 5e에서 json을 내보내야 합니다.",
                 "GeneralTitle": "캐릭터 불러오기",
                 "Title": "캐릭터 불러오기"
@@ -1663,6 +2753,17 @@
         "UseEdgeForInitiativeRoll": "우선권에 대한 블리츠 엣지 규칙 사용",
         "Value": "수치",
         "Vehicle": {
+            "Category": "범주",
+            "Categories": {
+                "Micro": "마이크로",
+                "Mini": "초소형",
+                "Small": "소형",
+                "Medium": "중형",
+                "Large": "대형",
+                "Huge": "초대형",
+                "Anthro": "인간형",
+                "Missile": "미사일"
+            },
             "ChaseEnvironment": "추적 환경",
             "Clearsight": "클리어 사이트",
             "ControlMode": "조작 방식",
@@ -1686,10 +2787,12 @@
                 "body": "몸체",
                 "cosmetic": "외장",
                 "electromagnetic": "전자기품",
-                "power_train": "동력 전달부",
+                "powertrain": "Powertrain",
                 "protection": "보호",
                 "weapons": "무기"
             },
+            "OffRoad": "비도로",
+            "OnRoad": "도로",
             "Stats": {
                 "Acceleration": "가속력",
                 "Handling": "조작력",
@@ -1729,7 +2832,7 @@
             "BulkImportPerformanceWarning": "한 번에 다수의 물품을 불러올 경우 브라우저를 새로고침 하기 전까지 Foundry가 느려질 수 있습니다. 즉시 새로고침 하는 것을 추천합니다.",
             "CantEditDefaultInventory": "기본 소지품 위치의 이름은 변경할 수 없음",
             "CantExtendTest": "연장 할 수 없는 판정 유형",
-            "CantExtendTestFurther": "주사위가 남거나 요구 성공횟수에 도달하면 테스트를 연장할 수 없음",
+            "CantExtendTestFurther": "주사위가 남거나 요구 성공횟수 도달 시 판정을 연장할 수 없음",
             "CantRecoverPhysicalWithStunDamage": "기절 피해가 남아있어 물리 피해를 회복할 수 없음",
             "CantReloadAtAllDueToAmmo": "남은 탄약이 없습니다!",
             "CantReloadFullyDueToAmmo": "탄약이 부족하여 완전히 재장전할 수 없습니다!",
@@ -1738,10 +2841,10 @@
             "CantSecondChanceAGlitch": "해당 판정에는 두 번째 기회가 없습니다. 판정 결과는 글리치입니다.",
             "CantSecondChanceWithoutNoneHits": "해당 판정에는 두 번째 기회가 없습니다.  성공 주사위만 남았습니다.",
             "CantSpendMulitplePointsOfEdge": "한 번의 판정 또는 행동에 엣지를 여러 번 소비할 수 없습니다.",
-            "CompilationNotConcluded": "컴파일이 완료되지 않았습니다. 페이드 결정을 위해 요정이 컴파일 경쟁 판정을 완료하길 기다려야 합니다.",
+            "CompilationNotConcluded": "컴파일이 완료되지 않았습니다. 페이드 결정을 위해 스프라이트가 컴파일 경쟁 판정을 완료하길 기다려야 합니다.",
             "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "액터 없이 판정에서 엣지 점수를 소비할 수 없습니다.",
             "HostItemOnlyAcceptIC": "호스트에는 IC 액터만 추가할 수 있음",
-            "InvalidCompilationLevel": "공명 특성치가 요정의 단계보다 낮음",
+            "InvalidCompilationLevel": "공명 특성치가 스프라이트의 단계보다 낮음",
             "InvalidMarksCount": "잘못된 수의 마커를 배치하려고 함",
             "InvalidSummoningForce": "선택한 강도의 수치가 규칙을 위반",
             "NegativeLimitValue": "한계치는 반드시 양수여야 함",
@@ -1770,6 +2873,108 @@
                 "InternalMagazin": "내장형 탄창",
                 "MuzzleLoader": "전장식 장전",
                 "RemovableClip": "분리식 탄창"
+            },
+            "FIELDS": {
+                "category": {
+                    "label": "무기 유형",
+                    "hint": "이 물품을 나타내는 무기 유형. 유형에 따라 설정 구성이 달라짐"
+                },
+                "range": {
+                    "modes": {
+                        "single_shot": {
+                            "label": "단발 사격",
+                            "hint": "해당 무기의 단발 사격 (SS) 지원 여부"
+                        },
+                        "semi_auto": {
+                            "label": "반자동 사격",
+                            "hint": "해당 무기의 반자동 사격 (SA) 지원 여부"
+                        },
+                        "burst_fire": {
+                            "label": "점사",
+                            "hint": "해당 무기의 점사 (BF) 지원 여부"
+                        },
+                        "full_auto": {
+                            "label": "자동 사격",
+                            "hint": "해당 무기의 자동 사격 (FA) 지원 여부"
+                        }
+                    },
+                    "ranges": {
+                        "category": {
+                            "label": "거리 범주",
+                            "hint": "범주에 따라 해당 무기의 사거리가 결정됨. 해당 무기에 사용자 지정 수치를 사용할 경우 '수동'을 선택"
+                        },
+                        "short": {
+                            "label": "단거리",
+                            "hint": "해당 무기의 단거리 판정 거리 (미터)"
+                        },
+                        "medium": {
+                            "label": "중거리",
+                            "hint": "해당 무기의 중거리 판정 거리 (미터)"
+                        },
+                        "long": {
+                            "label": "장거리",
+                            "hint": "해당 무기의 장거리 판정 거리 (미터)"
+                        },
+                        "extreme": {
+                            "label": "초장거리",
+                            "hint": "해당 무기의 초장거리 판정 거리 (미터)"
+                        },
+                        "attribute": {
+                            "label": "거리 특성치",
+                            "hint": "위 사거리에 곱해질 액터의 특성치"
+                        }
+                    },
+                    "rc": {
+                        "base": {
+                            "label": "반동 제어",
+                            "hint": "해당 무기의 반동 제어력"
+                        }
+                    }
+                },
+                "thrown": {
+                    "ranges": {
+                        "category": {
+                            "label": "거리 범주",
+                            "hint": "범주에 따라 해당 무기의 사거리가 결정됨. 해당 무기에 사용자 지정 수치를 사용할 경우 '수동'을 선택"
+                        },
+                        "short": {
+                            "label": "단거리",
+                            "hint": "해당 무기의 단거리 판정 거리 (미터)"
+                        },
+                        "medium": {
+                            "label": "중거리",
+                            "hint": "해당 무기의 중거리 판정 거리 (미터)"
+                        },
+                        "long": {
+                            "label": "장거리",
+                            "hint": "해당 무기의 장거리 판정 거리 (미터)"
+                        },
+                        "extreme": {
+                            "label": "초장거리",
+                            "hint": "해당 무기의 초장거리 판정 거리 (미터)"
+                        },
+                        "attribute": {
+                            "label": "사거리 특성치",
+                            "hint": "위 사거리에 곱해질 액터의 특성치"
+                        }
+                    },
+                    "blast": {
+                        "radius": {
+                            "label": "폭발 범위 (m)",
+                            "hint": "무기의 공격 범위 (미터)"
+                        },
+                        "dropoff": {
+                            "label": "폭발 위력 감소율 (m당)",
+                            "hint": "폭발 지점으로부터 미터당 적용되는 피해 감소량"
+                        }
+                    }
+                },
+                "melee": {
+                    "reach": {
+                        "label": "길이",
+                        "hint": "무기의 길이, 전투 시 수정치로 사용"
+                    }
+                }
             },
             "FullReload": "완전 장전",
             "Mod": "부착물",
@@ -1829,6 +3034,7 @@
             },
             "Reach": "길이",
             "Reload": "재장전",
+            "SpareReloads": "여분 탄창 재장전",
             "Type": "유형",
             "Weapon": "무기"
         },
@@ -1840,10 +3046,9 @@
     "TYPES": {
         "Actor": {
             "character": "캐릭터",
-            "critter": "생명체 (삭제 예정)",
             "ic": "IC",
             "spirit": "영혼",
-            "sprite": "요정",
+            "sprite": "스프라이트",
             "vehicle": "탑승물/드론"
         },
         "Item": {
@@ -1870,7 +3075,7 @@
             "ritual": "의식",
             "sin": "SIN",
             "spell": "주문",
-            "sprite_power": "요정 능력",
+            "sprite_power": "스프라이트 능력",
             "vehicle": "탑승물",
             "weapon": "무기"
         }

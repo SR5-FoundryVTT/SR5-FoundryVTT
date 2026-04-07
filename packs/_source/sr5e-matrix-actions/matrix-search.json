@@ -41,7 +41,7 @@
         "value": 0,
         "base": 0
       },
-      "extended": true,
+      "extended": false,
       "damage": {
         "type": {
           "value": "",

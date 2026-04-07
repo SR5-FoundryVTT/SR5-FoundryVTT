@@ -59,7 +59,7 @@ const VehicleData = () => ({
     modPoints: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     modificationCategories: new SchemaField({
         body: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
-        power_train: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+        powertrain: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
         protection: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
         electromagnetic: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
         cosmetic: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),

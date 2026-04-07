@@ -92,7 +92,6 @@ import { CombatDM } from './types/combat/Combat';
 import { CombatantDM } from './types/combat/Combatant';
 
 import { Character } from './types/actor/Character';
-import { Critter } from './types/actor/Critter';
 import { IC } from './types/actor/IC';
 import { Spirit } from './types/actor/Spirit';
 import { Sprite } from './types/actor/Sprite';
@@ -155,7 +154,7 @@ export class HooksManager {
                 initDiceSoNice();
             }
         });
-        Hooks.once('setup', AutocompleteInlineHooksFlow.setupHook);
+        Hooks.once('aipSetup', AutocompleteInlineHooksFlow.aipSetupHook);
 
         Hooks.on('ready', HooksManager.ready.bind(HooksManager));
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop.bind(HooksManager));
@@ -404,7 +403,6 @@ ___________________
         CONFIG.ActiveEffect.dataModels["base"] = ActiveEffectDM;
 
         CONFIG.Actor.dataModels["character"] = Character;
-        CONFIG.Actor.dataModels["critter"] = Critter;
         CONFIG.Actor.dataModels["ic"] = IC;
         CONFIG.Actor.dataModels["spirit"] = Spirit;
         CONFIG.Actor.dataModels["sprite"] = Sprite;
@@ -451,7 +449,7 @@ ___________________
         foundry.documents.collections.Actors.registerSheet(SYSTEM_NAME, SR5CharacterSheet, {
             label: "SR5.SheetActor",
             makeDefault: true,
-            types: ['critter', 'character']
+            types: ['character']
         });
         foundry.documents.collections.Actors.registerSheet(SYSTEM_NAME, SR5ICActorSheet, {
             label: "SR5.SheetActor",
@@ -577,7 +575,7 @@ ___________________
      * @param html HTML element of the app
      * @returns 
      */
-    static renderCompendiumDirectory(app: foundry.appv1.api.Application, html: HTMLElement) {
+    static renderCompendiumDirectory(app: foundry.applications.sidebar.tabs.CompendiumDirectory, html: HTMLElement) {
         const browser = $('<button class="sr5 import-button"><i class="fa-solid fa-book-open-reader"></i><span>Open Compendium Browser</span></button>');
         $(html).find('.header-actions').append(browser);
         browser.on('click', () => { void new CompendiumBrowser().render({ force: true }); });
@@ -590,7 +588,7 @@ ___________________
         button.on('click', () => { void new BulkImporter().render({ force: true }); });
     }
 
-    static renderActorDirectory(app: foundry.appv1.api.Application, html: HTMLElement) {
+    static renderActorDirectory(app: foundry.applications.sidebar.tabs.ActorDirectory, html: HTMLElement) {
         if(!game.user?.can("ACTOR_CREATE"))
             return;
 
@@ -607,7 +605,7 @@ ___________________
      * @param data The update data given.
      * @param id The items id.
      */
-    static async updateIcConnectedToHostItem(item: SR5Item, data: SR5Item['system'], id: string) {
+    static async updateIcConnectedToHostItem(item: SR5Item, data: Item.UpdateData, options: Item.Database.UpdateOptions, userId: string) {
         // Trigger type specific behaviour.
         if (item.isType('host'))
             await MatrixICFlow.handleUpdateItemHost(item);

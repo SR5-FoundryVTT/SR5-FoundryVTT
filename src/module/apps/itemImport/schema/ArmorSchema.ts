@@ -50,8 +50,9 @@ export interface Armor {
             name: { _TEXT: "Survival"; };
         };
     };
-    translate?: { _TEXT: string; };
-    altpage?: { _TEXT: string; };
+    translate?: OneOrMany<{ _TEXT: string; }>;
+    altpage?: OneOrMany<{ _TEXT: string; }>;
+    altnameonpage?: OneOrMany<Empty>;
 };
 
 export interface Mod {
@@ -77,8 +78,9 @@ export interface Mod {
             value: { _TEXT: IntegerString; };
         };
     };
-    translate?: { _TEXT: string; };
-    altpage?: { _TEXT: string; };
+    translate?: OneOrMany<{ _TEXT: string; }>;
+    altpage?: OneOrMany<{ _TEXT: string; }>;
+    altnameonpage?: OneOrMany<Empty>;
 };
 
 export interface ArmorSchema {

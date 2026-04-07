@@ -75,16 +75,9 @@ export class WeaponParser extends Parser<'weapon'> {
             action.skill = itemData.skill.toLowerCase().replace(/\s/g, '_');
         // Instead of direct skill, rely on a category mapping by the rules.
         } else if (itemData.category_english?.toLowerCase().includes('exotic')) {
-            action.skill = itemData.category_english
-                .toLowerCase()
-                .replace(' weapons', '')
-                .replace(/\s/g, '_');
+            action.skill = itemData.category_english.toLowerCase().replace(/\s/g, '_');
         } else if (itemData.category_english?.toLowerCase().includes('laser weapons')) {
-            action.skill = 'exotic_range';
-        }
-
-        if (action.skill.includes('exotic')) {
-            action.skill = action.skill.replace('_weapon', '');
+            action.skill = 'exotic_ranged_weapon';
         }
 
         action.attribute = 'agility';

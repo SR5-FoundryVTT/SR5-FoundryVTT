@@ -1,7 +1,7 @@
 import { Parser } from '../Parser';
 import { ImportHelper as IH, OneOrMany, RetrievedItem } from '../../helper/ImportHelper';
 
-export abstract class MetatypeParserBase<TResult extends ('character' | 'critter' | 'spirit' | 'sprite')> extends Parser<TResult> {
+export abstract class MetatypeParserBase<TResult extends ('character' | 'spirit' | 'sprite')> extends Parser<TResult> {
     getMetatypeItems(
         items: RetrievedItem[],
         itemsData: undefined | OneOrMany<{$?: { select?: string; rating?: string; removable?: string; }; _TEXT: string }>,
@@ -15,7 +15,7 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'critter
             const item = itemMap.get(name);
 
             if (!item) {
-                console.log(`[${msg_field.type} Missing]\nCritter: ${msg_field.critter}\n${msg_field.type}: ${name}`);
+                console.warn(`[${msg_field.type} Missing]\nCritter: ${msg_field.critter}\n${msg_field.type}: ${name}`);
                 continue;
             }
 

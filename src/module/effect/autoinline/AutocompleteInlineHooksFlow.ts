@@ -17,22 +17,25 @@ export const AutocompleteInlineHooksFlow =  {
      *
      * This is taken from: https://github.com/schultzcole/FVTT-Autocomplete-Inline-Properties/blob/master/CONTRIBUTING.md
      * It partially uses: https://github.com/schultzcole/FVTT-Autocomplete-Inline-Properties/blob/master/package-config.mjs#L141
+     *
+     * @param packageConfig - The configuration array for the autocomplete-inline-properties module. 
+     *     This array is mutated directly to replace its contents with the Shadowrun 5e system's configuration.  
      */
-    setupHook: () => {
-        // Module might not be installed.
-        const aipModule = game.modules.get("autocomplete-inline-properties") as any;
+    aipSetupHook: (packageConfig: {packageName: string}[]) => {
+        // These checks are more a precaution than necessary, as the event itself is module based.
+        // This is only for the case of any other code executing this hook.
+        const aipModule = game.modules.get("autocomplete-inline-properties");
         if (!aipModule) return;
-        // API might be missing.
-        const api = aipModule.API;
-        if (!api) return;
 
         console.debug('Shadowrun 5e | Registering support for autocomplete-inline-properties');
-        const DATA_MODE = api.CONST.DATA_MODE;
+
+        // @ts-expect-error AIP typing
+        const DATA_MODE = aipModule.API.CONST.DATA_MODE;
 
         const config = {
             packageName: "shadowrun5e",
             sheetClasses: [{
-                name: "SR5ActiveEffectConfig",
+                name: SR5ActiveEffectConfig.name,
                 fieldConfigs: [
                     { selector: `.tab[data-tab="changes"] .autocomplete-key-actor input[type="text"]`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
                     { selector: `.tab[data-tab="changes"] .autocomplete-key-targeted_actor input[type="text"]`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
@@ -48,7 +51,17 @@ export const AutocompleteInlineHooksFlow =  {
             }]
         };
 
-        api.PACKAGE_CONFIG.push(config);
+        // NOTE: AIP 3.1.0 has issues with 'core' fieldConfig overwriting custom fieldConfigs. Replace all configs with ours, works.
+        // Other fieldConfigs are 'core' and built-in systems, which we don't need, as we custom map all our fields for AIP.
+        // This shoud be revisited, however it also shouldn't matter, as we don't rely on the core fieldConfig anyway.
+        // - See their GitHub issue #748
+        // - Our GitHub issue #1684
+        // Remove only 'core' configs, then prepend ours for higher priority.
+        const core = packageConfig.findIndex(fieldConfig => fieldConfig.packageName === 'core');
+        if (core !== -1) packageConfig.splice(core, 1);
+        packageConfig.unshift(config);  
+
+        console.debug('Shadowrun 5e | Registered support for autocomplete-inline-properties', packageConfig);
     },
 
     /**

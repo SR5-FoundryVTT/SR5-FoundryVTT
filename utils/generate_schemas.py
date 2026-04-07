@@ -383,8 +383,9 @@ def build_type(
 
     # Optional translation fields
     if depth == 2 and addTranslate:
-        props.append(f"{ind}{ts_key('translate')}?: {{ _TEXT: string; }};")
-        props.append(f"{ind}{ts_key('altpage')}?: {{ _TEXT: string; }};")
+        props.append(f"{ind}{ts_key('translate')}?: OneOrMany<{{ _TEXT: string; }}>;")
+        props.append(f"{ind}{ts_key('altpage')}?: OneOrMany<{{ _TEXT: string; }}>;")
+        props.append(f"{ind}{ts_key('altnameonpage')}?: OneOrMany<Empty>;")
 
     if depth == 1:
         body = "{\n        " + f"\n        ".join(props) + "\n    }"
@@ -454,7 +455,7 @@ def generate_header(imports: list[str] = [], body_content: str = "") -> str:
         lines.append(f"import {{ {imp} }} from './{imp}';")
 
     types_to_check = ["Empty", "Many", "OneOrMany", "IntegerString"]
-    used_types = [t for t in types_to_check if t in body_content]
+    used_types = [t for t in types_to_check if re.search(rf"\b{t}\b", body_content)]
     if used_types:
         lines.append(f"import {{ {', '.join(used_types)} }} from './Types';")
 

@@ -302,6 +302,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             modifyConditionMonitor: SR5BaseActorSheet.#modifyConditionMonitor,
             clearConditionMonitor: SR5BaseActorSheet.#clearConditionMonitor,
             rollConditionMonitor: SR5BaseActorSheet.#rollConditionMonitor,
+
+            openSituationalModifiers: SR5BaseActorSheet.#openSituationalModifiers
         },
         filters: [{ inputSelector: '#filter-active-skills', contentSelector: '', callback: SR5BaseActorSheet.#handleFilterActiveSkills }],
     }
@@ -562,9 +564,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     activateListeners_LEGACY(html: JQuery<HTMLElement>) {
         Helpers.setupCustomCheckbox(this, html);
 
-        // General item header/list actions...
-        html.find('.item-qty').on('change', this._onListItemChangeQuantity.bind(this));
-
         // Actor inventory handling....
         html.find('#select-inventory').on('change', this._onSelectInventory.bind(this));
 
@@ -573,12 +572,11 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
 
-        // Situation modifiers application
-        html.find('.show-situation-modifiers-application').on('click', this._onShowSituationModifiersApplication.bind(this));
-
         html.find('select[name="initiative-select"]').on('change', this._onInitiativePerceptionChange.bind(this));
 
         html.find('select.weapon-ammo-select').on('change', this._onWeaponAmmoSelect.bind(this));
+
+        html.find('input[data-system-action="changeItemQty"]').on('change', this._onListItemChangeQuantity.bind(this));
     }
 
     /**
@@ -881,13 +879,18 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         if (!(event.target instanceof HTMLElement)) return;
         const type = SheetFlow.closestAction(event.target)!.dataset.itemType!;
 
-        // Unhide section it it was
+        // Unhide section new item will be in
         this._setInventoryTypeVisibility(type, true);
 
         const itemData = {
             type: type as Item.ConfiguredSubType,
             name: `${game.i18n.localize('SR5.New')} ${game.i18n.localize(SR5.itemTypes[type])}`
         } satisfies Item.CreateData;
+
+        // Inject special case context based on item type
+        if (type === 'call_in_action') this._handleCreateCallInActionItem(event, itemData);
+        if (type === 'matrix_action') this._handleCreateMatrixActionItem(event, itemData);
+
         const items = await this.actor.createEmbeddedDocuments('Item', [itemData]);
         if (!items) return;
 
@@ -898,6 +901,41 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         for (const item of items) {
             await item.sheet?.render(true, { mode: 'edit' });
         }
+    }
+
+    /**
+     * Call In Actions need to prefill the actor type as it is used to filter the item when creating
+     * it directly from the sheet sections. If left empty, the created item will not be shown on sheet.
+     */
+    _handleCreateCallInActionItem(event: PointerEvent, itemData: Item.CreateData) {
+        const actorType = SheetFlow.closestAction(event.target)!.dataset.actorType;
+        if (!actorType) console.error(`Shadowrun 5e | Tried to create a Call In Action item without an actor-type data attribute context!`);
+        itemData['system.actor_type'] = actorType;
+    }
+
+    /**
+     * Matrix action items are created the same as normal action items, but need additional data injection when creating.
+     * Otherwise they will not show up on the appropriate matrix action sections on sheet.
+     * 
+     * On sheet 'matrix action' are using a wrong item type (matrix_action) to differentiate them during creation.
+     * NOTE: If further action categories need additional data injection, we should handle all within the same function, similar to this
+     *       and switch to an data attribute to differentiate between each instead of manipulating the create item type data attribute.
+     */
+    _handleCreateMatrixActionItem(event: PointerEvent, itemData: Item.CreateData) {
+        let actionCategories = [];
+        try {
+            const actionCategoriesJSON = SheetFlow.closestAction(event.target)!.dataset.actionCategories;
+            actionCategories = JSON.parse(actionCategoriesJSON ?? '');
+        } catch (error) {
+            console.error(`Shadowrun 5e | Error while creating Matrix Action item: ${error}`);
+            return;
+        }
+
+        if (!actionCategories || actionCategories.length === 0) console.error(`Shadowrun 5e | Tried to create a Matrix Action item without action-categories data attribute context!`);
+
+        itemData['system.action.categories'] = actionCategories;
+        itemData['system.action.test'] = 'MatrixTest';
+        itemData['type'] = 'action';
     }
 
     /**
@@ -915,7 +953,12 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.preventDefault();
         if (!(event.target instanceof HTMLElement)) return;
         const id = SheetFlow.closestItemId(event.target);
-        const item = this.actor.items.get(id);
+        let item = this.actor.items.get(id);
+        if (!item) {
+            const uuid = SheetFlow.closestUuid(event.target);
+            // @ts-expect-error typing clashes between items.get and fromUuid
+            item = await fromUuid(uuid);
+        }
         if (item) await item.sheet?.render(true, { mode: 'edit' });
     }
 
@@ -1354,7 +1397,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     _prepareActorTypeFields(sheetData: SR5ActorSheetData) {
         sheetData.isCharacter = this.actor.isType('character');
         sheetData.isSpirit = this.actor.isType('spirit');
-        sheetData.isCritter = this.actor.isType('critter');
         sheetData.isVehicle = this.actor.isType('vehicle');
         sheetData.hasSkills = this.actor.hasSkills;
         sheetData.canAlterSpecial = this.actor.canAlterSpecial;
@@ -1493,6 +1535,16 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return Helpers.getSkillLabelOrName(skill);
     }
 
+    /**
+     * Determine if a given skill contains a given search text in any way.
+     * 
+     * Name and translation, specializations will be searched.
+     *
+     * @param key search string fall back if skill is not provided.
+     * @param skill skill to be searched through
+     * @param text text to search for, can be an empty string.
+     * @returns true, if skill contains search text
+     */
     _doesSkillContainText(key: string, skill: SkillFieldType, text: string) {
         if (!text) {
             return true;
@@ -1505,7 +1557,14 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const specs = skill.specs !== undefined && Array.isArray(skill.specs) ? skill.specs.join(' ') : '';
         const searchString = `${searchKey} ${name} ${specs}`;
 
-        return searchString.toLowerCase().search(text.toLowerCase()) > -1;
+        // Normalize strings for Unicode characters (Korean) and use Foundry umlaut (German) handling.
+        const normalizedSearch = foundry.applications.ux.SearchFilter.cleanQuery(searchString);
+        const normalizedText = foundry.applications.ux.SearchFilter.cleanQuery(text);
+
+        const searchLower = normalizedSearch.toLowerCase();
+        const textLower = normalizedText.toLowerCase();
+
+        return searchLower.includes(textLower);
     }
 
     _filterActiveSkills(sheetData: SR5ActorSheetData) {
@@ -1596,7 +1655,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const skillId = $(event.target).closest('a').data().skill;
+        const skillId = event.target?.closest<HTMLElement>('[data-skill-id]')?.dataset?.skillId;
+        if (!skillId) return;
         await this.actor.removeLanguageSkill(skillId);
     }
 
@@ -1615,9 +1675,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const skillId = $(event.target).closest('a').data().skill;
-        const category = $(event.target).closest('a').data().category;
-        await this.actor.removeKnowledgeSkill(skillId, category);
+        const skillId = event.target?.closest<HTMLElement>('[data-skill-id]')?.dataset?.skillId;
+        const knowledgeSkillCategory = event.target?.closest<HTMLElement>('[data-category]')?.dataset?.subcategory as KnowledgeSkillCategory;
+        if (!skillId || !knowledgeSkillCategory) return;
+        await this.actor.removeKnowledgeSkill(skillId, knowledgeSkillCategory);
     }
 
     /** Add an active skill and show the matching edit application afterwards.
@@ -1635,7 +1696,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        const skillId = event.target?.closest<HTMLElement>('[data-skill]')?.dataset?.skill ?? '';
+        const skillId = event.target?.closest<HTMLElement>('[data-skill-id]')?.dataset?.skillId;
+        if (!skillId) return;
         await this.actor.removeActiveSkill(skillId);
     }
 
@@ -1670,7 +1732,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             return;
         }
 
-        await item.update({ system: { technology: { quantity } } });
+        await SheetFlow.changeItemQuantity(item, quantity);
     }
 
     /**
@@ -1872,8 +1934,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     /**
      * Show the situation modifiers application for this actor doucment
+     * @param this FoundryVTT binds 'this' to the instance, even though the method is staic.
      */
-    _onShowSituationModifiersApplication(event: Event) {
+    static #openSituationalModifiers(this: SR5BaseActorSheet) {
         new SituationModifiersApplication(this.actor).render(true);
     }
 
