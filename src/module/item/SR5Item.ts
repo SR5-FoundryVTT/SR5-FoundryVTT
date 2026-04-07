@@ -4,7 +4,7 @@ import { createItemChatMessage } from '../chat';
 import { DEFAULT_ROLL_NAME, FLAGS, SYSTEM_NAME } from '../constants';
 import { DataDefaults } from '../data/DataDefaults';
 import { Helpers } from '../helpers';
-import { PartsList } from '../parts/PartsList';
+import { ModifiableValue } from '../mods/ModifiableValue';
 import { TestCreator } from '../tests/TestCreator';
 import { HostPrep } from './prep/HostPrep';
 import { LinksHelpers } from '../utils/links';
@@ -297,12 +297,12 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *
      * NOTE: This is a legacy method of applied modifiers to opposed tests but works fine for now.
      */
-    getOpposedTestMod(mod: ModifiableValueType): PartsList {
-        const parts = new PartsList(mod);
+    getOpposedTestMod(mod: ModifiableValueType): ModifiableValue {
+        const parts = new ModifiableValue(mod);
 
         if (this.hasOpposedTest()) {
             if (this.isAreaOfEffect()) {
-                parts.addUniquePart('SR5.Aoe', -2);
+                parts.addUnique('SR5.Aoe', -2);
             }
         }
 

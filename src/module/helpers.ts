@@ -5,7 +5,7 @@ import { PromptDialogData, PromptDialog } from './apps/dialogs/PromptDialog';
 import { DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SYSTEM_NAME } from "./constants";
 import { DataDefaults } from "./data/DataDefaults";
 import { SR5Item } from './item/SR5Item';
-import { PartsList } from './parts/PartsList';
+import { ModifiableValue } from './mods/ModifiableValue';
 import { SuccessTestData } from "./tests/SuccessTest";
 import { Translation } from './utils/strings';
 import { AttributeFieldType } from "./types/template/Attributes";
@@ -596,8 +596,8 @@ export class Helpers {
     static modifyDamageByHits(incoming: DamageType, hits: number, modificationLabel: string): ModifiedDamageType {
         const modified = foundry.utils.duplicate(incoming) as DamageType;
 
-        const mod = new PartsList(modified);
-        mod.addUniquePart(modificationLabel, hits);
+        const mod = new ModifiableValue(modified);
+        mod.addUnique(modificationLabel, hits);
         mod.calcTotal({ min: 0 });
 
         return { incoming, modified };

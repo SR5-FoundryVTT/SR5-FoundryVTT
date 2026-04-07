@@ -7,7 +7,7 @@ import { SR5Roll } from "../rolls/SR5Roll";
 import { TestCreator } from "./TestCreator";
 import { SR5Actor } from "../actor/SR5Actor";
 import { TestRules } from "../rules/TestRules";
-import { PartsList } from "../parts/PartsList";
+import { ModifiableValue } from "../mods/ModifiableValue";
 import { DataDefaults } from "../data/DataDefaults";
 import { ActionFlow } from "../item/flows/ActionFlow";
 import { CORE_NAME, FLAGS, SYSTEM_NAME } from "../constants";
@@ -391,7 +391,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * 
      */
     get formula(): string {
-        const pool = PartsList.calcTotal(this.data.pool, { min: 0 });
+        const pool = ModifiableValue.calcTotal(this.data.pool, { min: 0 });
         return this.buildFormula(pool, this.hasPushTheLimit);
     }
 
@@ -425,7 +425,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Helper to collect all base value parts.
         const formatBaseField = (valueField: ValueFieldType) => {
             const parts = valueField.changes
-                .filter(change => PartsList.isBaseChange(change))
+                .filter(change => ModifiableValue.isBaseChange(change))
                 .map(change => `${game.i18n.localize(change.name as Translation)} ${change.value}`);
 
             if (valueField.base)
@@ -572,10 +572,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      *       a modifier. Rather set it to zero, causing it to not be shown.
      */
     applyPoolModifiers() {
-        const pool = new PartsList(this.pool);
+        const pool = new ModifiableValue(this.pool);
 
         // Remove override modifier from pool.
-        pool.removePart('SR5.Labels.Action.Modifiers');
+        pool.remove('SR5.Labels.Action.Modifiers');
     }
 
     /**
@@ -606,15 +606,15 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     calculateBaseValues() {
         this.roundBaseValueParts();
 
-        PartsList.calcTotal(this.data.pool, { min: 0 });
-        PartsList.calcTotal(this.data.threshold, { min: 0 });
-        PartsList.calcTotal(this.data.limit, { min: 0 });
+        ModifiableValue.calcTotal(this.data.pool, { min: 0 });
+        ModifiableValue.calcTotal(this.data.threshold, { min: 0 });
+        ModifiableValue.calcTotal(this.data.limit, { min: 0 });
 
-        PartsList.calcTotal(this.data.resultOverrideHits, { min: 0 });
-        PartsList.calcTotal(this.data.resultOverrideGlitches, { min: 0 });
+        ModifiableValue.calcTotal(this.data.resultOverrideHits, { min: 0 });
+        ModifiableValue.calcTotal(this.data.resultOverrideGlitches, { min: 0 });
 
         // Shows AP on incoming attacks
-        PartsList.calcTotal(this.data.damage.ap);
+        ModifiableValue.calcTotal(this.data.damage.ap);
 
         console.debug(`Shadowrun 5e | Calculated base values for ${this.constructor.name}`, this.data);
     }
@@ -783,7 +783,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         for (const type of this.testModifiers) {
             const { name, value } = this.prepareActorModifier(this.actor, type);
-            if (value) PartsList.addUniquePart(this.data.pool, name, value);
+            ModifiableValue.setUnique(this.data.pool, name, value);
         }
     }
 
@@ -895,7 +895,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // Calculate a ValueField for standardization.
         const netHits = DataDefaults.createData('value_field', { label: "SR5.NetHits", base });
-        PartsList.calcTotal(netHits, { min: 0 });
+        ModifiableValue.calcTotal(netHits, { min: 0 });
 
         return netHits;
     }
@@ -919,7 +919,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         this.hits.base = rollHits;
 
         // First, calculate hits based on roll and modifiers.
-        PartsList.calcTotal(this.hits, { min: 0 });
+        ModifiableValue.calcTotal(this.hits, { min: 0 });
         // Second, reduce hits by limit.
         this.hits.value = this.hasLimit ? Math.min(this.limit.value, this.hits.value) : this.hits.value;
 
@@ -948,7 +948,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     get boughtHits(): number {
-        return Math.floor(this.pool.value / 4);
+        return TestRules.buyHits(this.data.pool.value);
     }
 
     get hitsIcon(): IconWithTooltip | undefined {
@@ -956,7 +956,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     get appendedHits(): number | undefined {
-        return new PartsList(this.hits).getPartValue('SR5.AppendedHits');
+        return new ModifiableValue(this.hits).get('SR5.AppendedHits');
     }
 
     // In the case we've added appended hits, we want to separately display the hits value and the appended hits (ie. "7 + 5" instead of "12")
@@ -999,7 +999,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             base: rollGlitches
         });
  
-        glitches.value = PartsList.calcTotal(glitches, { min: 0 });
+        glitches.value = ModifiableValue.calcTotal(glitches, { min: 0 });
 
         return glitches;
     }
@@ -1011,9 +1011,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!this.extended) return DataDefaults.createData('value_field', { label: 'SR5.ExtendedHits' });
 
         const extendedHits = this.extendedHits;
-        PartsList.addBasePart(extendedHits, 'SR5.Hits', this.hits.value);
+        ModifiableValue.addBase(extendedHits, 'SR5.Hits', this.hits.value);
 
-        PartsList.calcTotal(extendedHits, { min: 0 });
+        ModifiableValue.calcTotal(extendedHits, { min: 0 });
 
         return extendedHits;
     }
@@ -1243,18 +1243,18 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     applyPushTheLimit() {
         if (!this.actor) return;
 
-        const parts = new PartsList(this.pool);
+        const parts = new ModifiableValue(this.pool);
 
         // During the lifetime of a test (dialog/recasting) the user might want to remove push the limit again.
         if (!this.hasPushTheLimit) {
-            parts.removePart('SR5.PushTheLimit');
+            parts.remove('SR5.PushTheLimit');
             return;
         }
 
         // Edge will be applied differently for when the test has been already been cast or not.
         // Exploding dice will be handled during normal roll creation.
         const edge = this.actor.getEdge().value;
-        parts.addUniqueBasePart('SR5.PushTheLimit', edge);
+        parts.addUniqueBase('SR5.PushTheLimit', edge);
 
         // Before casting edge will be part of the whole dice pool and that pool will explode.
         if (!this.evaluated) return;
@@ -1274,17 +1274,17 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     applySecondChance() {
         if (!this.actor) return;
 
-        const parts = new PartsList(this.pool);
+        const parts = new ModifiableValue(this.pool);
 
         if (this.hasBuyHits) {
             this.data.secondChance = false;
-            parts.removePart('SR5.SecondChance');
+            parts.remove('SR5.SecondChance');
             return;
         }
 
         // During test lifetime (dialog/recasting) the user might want to remove second chance again.
         if (!this.hasSecondChance) {
-            parts.removePart('SR5.SecondChance');
+            parts.remove('SR5.SecondChance');
             return;
         }
 
@@ -1300,7 +1300,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // Apply second chance modifiers.
         // Overwrite existing, as only ONE edge per test is allowed, therefore stacking is not possible.
-        parts.addUniqueBasePart('SR5.SecondChance', dice);
+        parts.addUniqueBase('SR5.SecondChance', dice);
 
         // Add new dice as fully separate Roll.
         const formula = `${dice}ds`;
@@ -1652,15 +1652,15 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!data.type) return;
 
         // Apply the extended modifier according the current iteration
-        const pool = new PartsList(data.pool);
+        const pool = new ModifiableValue(data.pool);
 
-        const currentModifierValue = pool.getPartValue('SR5.ExtendedTest') || 0;
+        const currentModifierValue = pool.get('SR5.ExtendedTest') || 0;
         const nextModifierValue = TestRules.calcNextExtendedModifier(currentModifierValue);
 
         // A pool could be overwritten or not.
-        pool.addUniqueBasePart('SR5.ExtendedTest', nextModifierValue);
+        pool.addUniqueBase('SR5.ExtendedTest', nextModifierValue);
 
-        PartsList.calcTotal(data.pool, { min: 0 });
+        ModifiableValue.calcTotal(data.pool, { min: 0 });
 
         if (!TestRules.canExtendTest(data.pool.value, this.threshold.value, this.extendedHits.value)) {
             return ui.notifications?.warn('SR5.Warnings.CantExtendTestFurther', { localize: true });

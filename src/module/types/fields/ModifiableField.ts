@@ -1,4 +1,4 @@
-import { ModifiableValue, ModifiableValueType } from "../template/Base";
+import { ModifiableValueSchema, ModifiableValueType } from "../template/Base";
 import { AnyObject } from "fvtt-types/utils";
 
 import DataModel = foundry.abstract.DataModel;
@@ -22,7 +22,7 @@ import SchemaField = foundry.data.fields.SchemaField;
  * logic.
  */
 export class ModifiableField<
-    Fields extends ReturnType<typeof ModifiableValue>,
+    Fields extends ReturnType<typeof ModifiableValueSchema>,
     Options extends SchemaField.Options<Fields> = SchemaField.DefaultOptions,
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     AssignmentType = SchemaField.Internal.AssignmentType<Fields, Options>,
@@ -39,8 +39,8 @@ export class ModifiableField<
         const effectPriority = change.priority ?? 10 * effectMode;
 
         field.changes.push({
-            applied: true,
-            masked: false,
+            enabled: true,
+            invalidated: false,
             name: effectName,
             mode: effectMode,
             value: changeValue,

@@ -1,4 +1,4 @@
-import { PartsList } from "../parts/PartsList";
+import { ModifiableValue } from "../mods/ModifiableValue";
 import { DamageType } from "../types/item/Action";
 import { DataDefaults } from "../data/DataDefaults";
 
@@ -44,7 +44,7 @@ export const CompilationRules = {
         damage.base = CompilationRules.compilationFadeValue(spriteHits);
         damage.type.base = damage.type.value = CompilationRules.calcFadeDamageType(level, resonance);
 
-        PartsList.calcTotal(damage, {min: 0});
+        ModifiableValue.calcTotal(damage, {min: 0});
 
         return damage;
     },

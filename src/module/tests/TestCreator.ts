@@ -9,7 +9,7 @@ import {
     TestOptions
 } from "./SuccessTest";
 import {DataDefaults} from "../data/DataDefaults";
-import {PartsList} from "../parts/PartsList";
+import {ModifiableValue} from "../mods/ModifiableValue";
 import {SkillRules} from "../rules/SkillRules";
 import {FLAGS, SYSTEM_NAME} from "../constants";
 import {SR5Roll} from "../rolls/SR5Roll";
@@ -377,12 +377,12 @@ export const TestCreator = {
         if (!Number.isFinite(accuracy) || accuracy === 0) return;
 
         const hasAccuracyBasePart = data.limit.changes.some(change =>
-            PartsList.isBaseChange(change) && change.name === 'SR5.Accuracy');
+            ModifiableValue.isBaseChange(change) && change.name === 'SR5.Accuracy');
 
         if (hasAccuracyBasePart) return;
 
         data.limit.base = 0;
-        PartsList.addUniqueBasePart(data.limit, 'SR5.Accuracy', accuracy);
+        ModifiableValue.addUniqueBase(data.limit, 'SR5.Accuracy', accuracy);
     },
 
     /**
@@ -467,7 +467,7 @@ export const TestCreator = {
         // @ts-expect-error Both Success and Opposed Test data is used, though not typed here.
         const rollData = actor.getRollData({againstData: againstData ?? data.following?.against});
 
-        const pool = new PartsList(data.pool);
+        const pool = new ModifiableValue(data.pool);
 
         // Prepare pool values.
         if (action.skill) {
@@ -480,40 +480,40 @@ export const TestCreator = {
             // Custom skills don't have a label, but a name.
             // Legacy skill don't have a name, but have a label.
             // Your mind is like this water, my friend. When it is agitated, it becomes difficult to see. But if you allow it to settle, the answer becomes clear.
-            if (skill) pool.addUniquePart(skill.label || skill.name, SkillRules.level(skill), CONST.ACTIVE_EFFECT_MODES.ADD, -Infinity);
+            if (skill) pool.addUnique(skill.label || skill.name, SkillRules.level(skill), CONST.ACTIVE_EFFECT_MODES.ADD, -Infinity);
             // TODO: Check if this is actual skill specialization and for a +2 config for it instead of MagicValue.
-            if (action.spec) pool.addUniqueBasePart('SR5.Specialization', SkillRules.SpecializationModifier);
+            if (action.spec) pool.addUniqueBase('SR5.Specialization', SkillRules.SpecializationModifier);
         }
 
         // The first attribute is either used for skill or attribute only tests.
         if (action.attribute) {
             const attribute = actor.getAttribute(action.attribute, { rollData });
             // Don't use addUniquePart as one attribute might be used twice.
-            if (attribute) pool.addBasePart(attribute.label, attribute.value);
+            if (attribute) pool.addBase(attribute.label, attribute.value);
         }
 
         // The second attribute is only used for attribute only tests.
         if (!action.skill && action.attribute2) {
             const attribute = actor.getAttribute(action.attribute2, { rollData });
             // Don't use addUniquePart as one attribute might be used twice.
-            if (attribute) pool.addBasePart(attribute.label, attribute.value);
+            if (attribute) pool.addBase(attribute.label, attribute.value);
         }
 
         // Include pool modifiers for opposed and resist tests.
         if (action.mod) {
-            PartsList.addUniquePart(data.pool, 'SR5.DicePoolModifier', action.mod);
+            ModifiableValue.addUnique(data.pool, 'SR5.DicePoolModifier', action.mod);
         }
 
         // Include pool modifiers that have been collected on the action item.
         // These can come from nested items and more.
         if(action.dice_pool_mod) {
-            action.dice_pool_mod.forEach(mod => PartsList.addUniquePart(data.pool, mod.name, mod.value));
+            action.dice_pool_mod.forEach(mod => ModifiableValue.addUnique(data.pool, mod.name, mod.value));
         }
 
         // Add the armor value as a pool modifier, since 'armor' is part of the test description.
         if (action.armor) {
             const armor = actor.getArmor();
-            PartsList.addUniqueBasePart(data.pool, 'SR5.Armor.label', armor.value);
+            ModifiableValue.addUniqueBase(data.pool, 'SR5.Armor.label', armor.value);
         }
 
         // Prepare limit values...
@@ -523,7 +523,7 @@ export const TestCreator = {
 
         //...add limit modifiers
         if (action.limit.changes) {
-            action.limit.changes.forEach(change => PartsList.addUniquePart(data.limit, change.name, change.value, change.mode as any, change.priority));
+            action.limit.changes.forEach(change => ModifiableValue.addUnique(data.limit, change.name, change.value, change.mode as any, change.priority));
         }
 
         //...add limit attribute value based on actor.
@@ -531,7 +531,7 @@ export const TestCreator = {
             // Get the limit connected to the defined attribute.
             // NOTE: This might differ from the USED attribute...
             const limit = actor.getLimit(action.limit.attribute);
-            if (limit) PartsList.addUniqueBasePart(data.limit, limit.label, limit.value);
+            if (limit) ModifiableValue.addUniqueBase(data.limit, limit.label, limit.value);
         }
 
         // Prepare threshold values...
@@ -576,7 +576,7 @@ export const TestCreator = {
             const label = SR5.modifierTypes[name];
             const options = {applicable};
             const value = actor.modifiers.totalFor(name, options);
-            PartsList.addUniquePart(data.pool, label, value);
+            ModifiableValue.setUnique(data.pool, label, value);
         }
 
         // Mark test as extended.
@@ -598,16 +598,16 @@ export const TestCreator = {
         // @ts-expect-error Both Success and Opposed Test data is used, though not typed here.
         const rollData = item.getRollData({action, testData: data, againstData: againstData ?? data.following?.against});
 
-        const pool = new PartsList(data.pool);
+        const pool = new ModifiableValue(data.pool);
 
         if (action.attribute) {
             const attribute = item.getAttribute(action.attribute, {rollData});
-            if (attribute) pool.addUniqueBasePart(attribute.label, attribute.value);
+            if (attribute) pool.addUniqueBase(attribute.label, attribute.value);
         }
 
         if (action.attribute2) {
             const attribute = item.getAttribute(action.attribute2, {rollData});
-            if (attribute) pool.addUniqueBasePart(attribute.label, attribute.value);
+            if (attribute) pool.addUniqueBase(attribute.label, attribute.value);
         }
 
         return data;

@@ -1,5 +1,5 @@
 import {SR} from "../constants";
-import {PartsList} from "../parts/PartsList";
+import {ModifiableValue} from "../mods/ModifiableValue";
 import {Helpers} from "../helpers";
 import {SoakRules} from "./SoakRules";
 import {SR5Actor} from "../actor/SR5Actor";
@@ -111,10 +111,10 @@ export class CombatRules {
         if (defenderHits < 0) defenderHits = 0;
 
         // SR5#173  Step3: Defend B.
-        const mod = new PartsList(modified);
-        mod.addUniquePart('SR5.Attacker', attackerHits);
-        mod.addUniquePart('SR5.Defender', -defenderHits);
-        PartsList.calcTotal(modified, { min: 0 });
+        const mod = new ModifiableValue(modified);
+        mod.addUnique('SR5.Attacker', attackerHits);
+        mod.addUnique('SR5.Defender', -defenderHits);
+        ModifiableValue.calcTotal(modified, { min: 0 });
 
         // SR5#173 Step 3: Defend B.
         modified = CombatRules.modifyDamageTypeAfterHit(modified, defender);
@@ -201,10 +201,10 @@ export class CombatRules {
         const modifiedDamage = foundry.utils.duplicate(damage) as DamageType;
 
         // Keep base and modification intact, only overwriting the result.
-        PartsList.addPart(modifiedDamage, 'SR5.TestResults.Success', 0, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, Infinity);
-        PartsList.calcTotal(modifiedDamage, { min: 0 });
-        PartsList.addPart(modifiedDamage.ap, 'SR5.TestResults.Success', 0, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, Infinity);
-        PartsList.calcTotal(modifiedDamage.ap);
+        ModifiableValue.add(modifiedDamage, 'SR5.TestResults.Success', 0, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, Infinity);
+        ModifiableValue.calcTotal(modifiedDamage, { min: 0 });
+        ModifiableValue.add(modifiedDamage.ap, 'SR5.TestResults.Success', 0, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, Infinity);
+        ModifiableValue.calcTotal(modifiedDamage.ap);
         modifiedDamage.type.value = 'physical';
 
         // If attack hits but deals no damage, keep the element of the attack for any side effects.
@@ -227,7 +227,7 @@ export class CombatRules {
         if (hits < 0) hits = 0;
 
         const { modified } = SoakRules.reduceDamage(actor, damage, hits);
-        PartsList.calcTotal(modified, { min: 0 });
+        ModifiableValue.calcTotal(modified, { min: 0 });
 
         return modified;
     }
@@ -246,8 +246,8 @@ export class CombatRules {
         if (damage.ap.value <= 0) return modifiedArmor;
 
         console.error('Check if ap is a negative value or positive value during weapon item configuration');
-        PartsList.addUniquePart(modifiedArmor, 'SR5.AP', damage.ap.value);
-        modifiedArmor.value = PartsList.calcTotal(modifiedArmor, {min: 0});
+        ModifiableValue.addUnique(modifiedArmor, 'SR5.AP', damage.ap.value);
+        modifiedArmor.value = ModifiableValue.calcTotal(modifiedArmor, {min: 0});
 
         return modifiedArmor;
     }

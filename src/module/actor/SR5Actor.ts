@@ -1,7 +1,7 @@
 import { Helpers } from '../helpers';
 import { SR5Item } from '../item/SR5Item';
 import { FLAGS, SKILL_DEFAULT_NAME, SR, SYSTEM_NAME } from '../constants';
-import { PartsList } from '../parts/PartsList';
+import { ModifiableValue } from '../mods/ModifiableValue';
 import { DataDefaults } from '../data/DataDefaults';
 import { SkillFlow } from "./flows/SkillFlow";
 import { SR5 } from "../config";
@@ -355,21 +355,21 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // Prepare damage to apply to armor.
         damage = damage || DataDefaults.createData('damage');
 
-        PartsList.calcTotal(damage);
-        PartsList.calcTotal(damage.ap);
+        ModifiableValue.calcTotal(damage);
+        ModifiableValue.calcTotal(damage.ap);
 
         // Modify by penetration
         if (damage.ap.value !== 0)
-            PartsList.addUniquePart(armor, 'SR5.AP', damage.ap.value);
+            ModifiableValue.addUnique(armor, 'SR5.AP', damage.ap.value);
 
         // Modify by element
         if (damage.element.value !== '') {
             const armorForDamageElement = armor[damage.element.value] || 0;
             if (armorForDamageElement > 0)
-                PartsList.addUniquePart(armor, 'SR5.Element', armorForDamageElement);
+                ModifiableValue.addUnique(armor, 'SR5.Element', armorForDamageElement);
         }
 
-        PartsList.calcTotal(armor, {min: 0});
+        ModifiableValue.calcTotal(armor, {min: 0});
 
         return armor;
     }
@@ -1043,12 +1043,12 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const test = new testCls(TestCreator._minimalTestData(), { actor: this }, { showDialog });
 
         // Build pool values.
-        const pool = new PartsList(test.pool);
-        pool.addPart('SR5.Labels.ActorSheet.DeviceRating', rating);
-        pool.addPart('SR5.Labels.ActorSheet.DeviceRating', rating);
+        const pool = new ModifiableValue(test.pool);
+        pool.add('SR5.Labels.ActorSheet.DeviceRating', rating);
+        pool.add('SR5.Labels.ActorSheet.DeviceRating', rating);
 
         // Build modifiers values.
-        PartsList.addUniquePart(test.data.pool, 'SR5.ModifierTypes.Global', this.modifiers.totalFor('global'));
+        ModifiableValue.setUnique(test.data.pool, 'SR5.ModifierTypes.Global', this.modifiers.totalFor('global'));
 
         return test.execute();
     }
@@ -1248,14 +1248,14 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const action = this.skillActionData(skillId, options);
         if (!action) return;
         if (!teamworkData.criticalGlitch) {
-            PartsList.addBasePart(action.limit, 'TeamWork', teamworkData.additionalLimit);
+            ModifiableValue.addBase(action.limit, 'Teamwork', teamworkData.additionalLimit);
         }
 
         action.dice_pool_mod.push({
             name: "Teamwork", effectUuid: null,
             value: teamworkData.additionalDice,
             mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-            priority: 0, masked: false, applied: true,
+            priority: 0, enabled: true, invalidated: false,
         });
 
         const showDialog = this.tests.shouldShowDialog(options.event);
@@ -1279,14 +1279,14 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param parts The Value.mod field as a PartsList
      * @param atts The attributes used for the success test.
      */
-    _addMatrixParts(this: SR5Actor, parts: PartsList, atts: string | string[]) {
+    _addMatrixParts(this: SR5Actor, parts: ModifiableValue, atts: string | string[]) {
         if (Helpers.isMatrix(atts)) {
             if (!this.system.matrix) return;
 
             // Apply general matrix modifiers based on commlink/cyberdeck status.
             const matrix = this.system.matrix;
-            if (matrix.hot_sim) parts.addUniquePart('SR5.HotSim', 2);
-            if (matrix.running_silent) parts.addUniquePart('SR5.RunningSilent', -2);
+            if (matrix.hot_sim) parts.addUnique('SR5.HotSim', 2);
+            if (matrix.running_silent) parts.addUnique('SR5.RunningSilent', -2);
         }
     }
 
@@ -1295,8 +1295,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *
      * @param parts A Value.mod field as a PartsList
      */
-    _removeMatrixParts(parts: PartsList) {
-        ['SR5.HotSim', 'SR5.RunningSilent'].forEach(part => parts.removePart(part));
+    _removeMatrixParts(parts: ModifiableValue) {
+        ['SR5.HotSim', 'SR5.RunningSilent'].forEach(part => parts.remove(part));
     }
 
     /**
@@ -1616,8 +1616,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         const modified = foundry.utils.duplicate(this.getArmor()) as ActorArmorType;
         if (modified) {
-            const mod = new PartsList(modified);
-            mod.addUniquePart('SR5.DV', damage.ap.value);
+            const mod = new ModifiableValue(modified);
+            mod.addUnique('SR5.DV', damage.ap.value);
             mod.calcTotal({ min: 0 });
         }
 
@@ -1756,7 +1756,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     getControlRigRating(): number {
         if (!this.isType('character')) return 0;
-        return PartsList.calcTotal(this.system.values.control_rig_rating);
+        return ModifiableValue.calcTotal(this.system.values.control_rig_rating);
     }
 
     /**

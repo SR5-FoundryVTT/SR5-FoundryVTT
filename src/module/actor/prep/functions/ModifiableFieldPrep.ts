@@ -1,4 +1,4 @@
-import { PartsList } from "@/module/parts/PartsList";
+import { ModifiableValue } from "@/module/mods/ModifiableValue";
 import { ModifiableValueType } from "@/module/types/template/Base";
 import { ModifiableField } from "@/module/types/fields/ModifiableField";
 const { ArrayField, TypedObjectField, SchemaField } = foundry.data.fields;

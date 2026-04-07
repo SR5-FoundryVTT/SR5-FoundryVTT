@@ -1,4 +1,4 @@
-import { PartsList } from "@/module/parts/PartsList";
+import { ModifiableValue } from "@/module/mods/ModifiableValue";
 import { SR5 } from "../../../config";
 import { SkillFieldType } from 'src/module/types/template/Skills';
 
@@ -6,9 +6,9 @@ export class SkillsPrep {
 
     private static prepareSkill(skill: SkillFieldType) {
         for (const bonus of skill.bonus)
-            PartsList.addPart(skill, bonus.key, bonus.value);
+            ModifiableValue.add(skill, bonus.key, bonus.value);
 
-        PartsList.calcTotal(skill, { min: 0 });
+        ModifiableValue.calcTotal(skill, { min: 0 });
     }
 
     private static prepareActiveSkills(active: Actor['system']['skills']['active']) {

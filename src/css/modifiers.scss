@@ -213,11 +213,11 @@
         gap: 4px;
         flex-direction: column;
 
-        .mod-change-masked {
+        .mod-change-invalidated {
             color: #777;
         }
 
-        .mod-change-unapplied {
+        .mod-change-disabled {
             color: #777;
             text-decoration: line-through;
         }

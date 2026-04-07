@@ -1,7 +1,7 @@
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
-import { PartsList } from "../parts/PartsList";
+import { ModifiableValue } from "../mods/ModifiableValue";
 import { Migrator } from "../migrator/Migrator";
 import { LinksHelpers } from '@/module/utils/links';
 import { ModifiableValueType } from "../types/template/Base";
@@ -246,10 +246,10 @@ export class SR5ActiveEffect extends ActiveEffect {
             return;
         }
 
-        if (PartsList.isModifiableValue(target)) {
+        if (ModifiableValue.isModifiableValue(target)) {
             target.changes.push({
-                applied: change.effect.active,
-                masked: false,
+                enabled: change.effect.active,
+                invalidated: false,
                 name: change.effect.name,
                 value: delta,
                 mode: change.mode,

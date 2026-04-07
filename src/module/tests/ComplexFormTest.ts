@@ -1,7 +1,7 @@
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {DataDefaults} from "../data/DataDefaults";
 import {ComplexFormRules} from "../rules/ComplexFormRules";
-import {PartsList} from "../parts/PartsList";
+import {ModifiableValue} from "../mods/ModifiableValue";
 import {FadeRules} from "../rules/FadeRules";
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { DamageType, MinimalActionType } from "../types/item/Action";
@@ -91,7 +91,7 @@ export class ComplexFormTest extends SuccessTest<ComplexFormTestData> {
      */
     prepareLimitValue() {
         const level = Number(this.data.level);
-        PartsList.addUniqueBasePart(
+        ModifiableValue.addUniqueBase(
             this.data.limit, 'SR5.Level', ComplexFormRules.calculateLimit(level)
         );
     }

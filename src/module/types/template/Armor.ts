@@ -1,8 +1,8 @@
-import { ModifiableValue } from "./Base";
+import { ModifiableValueSchema } from "./Base";
 const { NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const ActorArmorData = () => ({
-    ...ModifiableValue(),
+    ...ModifiableValueSchema(),
     acid: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     cold: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     electricity: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),

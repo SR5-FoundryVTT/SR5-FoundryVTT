@@ -1,6 +1,6 @@
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {SpellcastingRules} from "../rules/SpellcastingRules";
-import {PartsList} from "../parts/PartsList";
+import {ModifiableValue} from "../mods/ModifiableValue";
 import {DataDefaults} from "../data/DataDefaults";
 import {DrainRules} from "../rules/DrainRules";
 import ModifierTypes = Shadowrun.ModifierTypes;
@@ -105,7 +105,7 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
 
     prepareLimitValue() {
         const force = Number(this.data.force);
-        PartsList.addUniqueBasePart(
+        ModifiableValue.addUniqueBase(
             this.data.limit, 'SR5.Force', SpellcastingRules.calculateLimit(force)
         );
     }

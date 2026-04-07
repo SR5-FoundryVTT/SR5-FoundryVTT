@@ -1,5 +1,5 @@
 import {SuccessTest, TestOptions} from "./SuccessTest";
-import {PartsList} from "../parts/PartsList";
+import {ModifiableValue} from "../mods/ModifiableValue";
 import {CombatRules} from "../rules/CombatRules";
 import {Helpers} from "../helpers";
 import {PhysicalDefenseTestData} from "./PhysicalDefenseTest";
@@ -88,7 +88,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         if (this.data.action.armor) {
             if (this.actor) {
                 const armor = this.actor.getArmor(this.data.incomingDamage);
-                PartsList.addUniqueBasePart(this.data.pool, 'SR5.Armor', armor.value);
+                ModifiableValue.addUniqueBase(this.data.pool, 'SR5.Armor', armor.value);
             }
         }
     }
@@ -153,8 +153,8 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         // Automatic hits from hardened armor (SR5#397)
         const armor = this.actor?.getArmor(this.data.modifiedDamage);
         if(armor?.hardened) {
-            const hits = new PartsList(this.hits);
-            hits.addUniqueBasePart('SR5.AppendedHits', Math.ceil(armor.value/2));
+            const hits = new ModifiableValue(this.hits);
+            hits.addUniqueBase('SR5.AppendedHits', Math.ceil(armor.value/2));
             hits.calcTotal();
         }
 

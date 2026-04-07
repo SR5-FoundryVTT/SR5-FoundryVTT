@@ -1,5 +1,5 @@
 import { DataDefaults } from '../data/DataDefaults';
-import { PartsList } from '../parts/PartsList';
+import { ModifiableValue } from '../mods/ModifiableValue';
 import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
 import { Translation } from '../utils/strings';
 
@@ -80,11 +80,11 @@ export class SkillTest extends SuccessTest<SkillTestData> {
 
         if (!usedAttribute || !lastUsedAttribute || usedAttribute.label === lastUsedAttribute.label) return;
 
-        const pool = new PartsList(this.pool);
+        const pool = new ModifiableValue(this.pool);
 
         // Replace previous attribute with new one, without changing other modifiers
-        pool.removePart(lastUsedAttribute.label);
-        pool.addBasePart(usedAttribute.label, usedAttribute.value);
+        pool.remove(lastUsedAttribute.label);
+        pool.addBase(usedAttribute.label, usedAttribute.value);
 
         this.lastUsedAttribute = selectedAttribute;
         this.data.action.attribute = selectedAttribute;
@@ -104,11 +104,11 @@ export class SkillTest extends SuccessTest<SkillTestData> {
 
         if (!usedLimit || !lastUsedLimit || usedLimit.label === lastUsedLimit.label) return;
 
-        const limit = new PartsList(this.limit);
+        const limit = new ModifiableValue(this.limit);
 
         // Replace previous limit with new one, without changing other modifiers.
-        limit.removePart(lastUsedLimit.label);
-        limit.addBasePart(usedLimit.label, usedLimit.value);
+        limit.remove(lastUsedLimit.label);
+        limit.addBase(usedLimit.label, usedLimit.value);
 
         this.lastUsedLimit = selectedLimit;
 

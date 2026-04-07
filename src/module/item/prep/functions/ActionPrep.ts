@@ -1,5 +1,5 @@
 import { SR5Item } from './../../SR5Item';
-import { PartsList } from '../../../parts/PartsList';
+import { ModifiableValue } from '../../../mods/ModifiableValue';
 import { ActionRollType } from 'src/module/types/item/Action';
 import { DataDefaults } from '@/module/data/DataDefaults';
 /**
@@ -63,23 +63,23 @@ export const ActionPrep = {
 
         // Collect weapon value modifications from used ammunition.
         const ammoData = equippedAmmo.system;
-        const limitParts = new PartsList(action.limit);
+        const limitParts = new ModifiableValue(action.limit);
 
         // Some ammunition want to replace the weapons damage, others modify it.
         if (ammoData.replaceDamage) {
-            PartsList.addUniquePart(action.damage, equippedAmmo.name, Number(ammoData.damage), CONST.ACTIVE_EFFECT_MODES.OVERRIDE);
+            ModifiableValue.addUnique(action.damage, equippedAmmo.name, ammoData.damage, CONST.ACTIVE_EFFECT_MODES.OVERRIDE);
         } else {
-            PartsList.addUniquePart(action.damage, equippedAmmo.name, ammoData.damage);
+            ModifiableValue.addUnique(action.damage, equippedAmmo.name, ammoData.damage);
         }
 
         // some ammunition wants to replace the weapons AP, others modify it
         if (ammoData.replaceAP) {
-            PartsList.addUniquePart(action.damage.ap, equippedAmmo.name, ammoData.ap, CONST.ACTIVE_EFFECT_MODES.OVERRIDE);
+            ModifiableValue.addUnique(action.damage.ap, equippedAmmo.name, ammoData.ap, CONST.ACTIVE_EFFECT_MODES.OVERRIDE);
         } else {
-            PartsList.addUniquePart(action.damage.ap, equippedAmmo.name, ammoData.ap);
+            ModifiableValue.addUnique(action.damage.ap, equippedAmmo.name, ammoData.ap);
         }
 
-        if (ammoData.accuracy) limitParts.addUniquePart(equippedAmmo.name, ammoData.accuracy);
+        limitParts.setUnique(equippedAmmo.name, ammoData.accuracy);
 
         // override element
         if (ammoData.element) {
@@ -107,15 +107,15 @@ export const ActionPrep = {
     prepareWithMods(action: ActionRollType, equippedMods: SR5Item[]) {
         // Collect weapon value modifications from modifications.
         const valueField = DataDefaults.createData('value_field', { changes: action.dice_pool_mod });
-        const limitParts = new PartsList(action.limit);
-        const dpParts = new PartsList(valueField);
+        const limitParts = new ModifiableValue(action.limit);
+        const dpParts = new ModifiableValue(valueField);
 
         for (const mod of equippedMods) {
             const modification = mod.asType('modification');
             if (!modification) continue;
 
-            if (modification.system.accuracy) limitParts.addUniquePart(mod.name, modification.system.accuracy);
-            if (modification.system.dice_pool) dpParts.addUniquePart(mod.name, modification.system.dice_pool);
+            limitParts.setUnique(mod.name, modification.system.accuracy);
+            dpParts.setUnique(mod.name, modification.system.dice_pool);
         }
 
         action.dice_pool_mod = dpParts.changes;
@@ -127,8 +127,8 @@ export const ActionPrep = {
      * @param action To be altered action data.
      */
     calculateValues(action: ActionRollType) {
-        PartsList.calcTotal(action.damage);
-        PartsList.calcTotal(action.damage.ap);
-        PartsList.calcTotal(action.limit);
+        ModifiableValue.calcTotal(action.damage);
+        ModifiableValue.calcTotal(action.damage.ap);
+        ModifiableValue.calcTotal(action.limit);
     }
 }

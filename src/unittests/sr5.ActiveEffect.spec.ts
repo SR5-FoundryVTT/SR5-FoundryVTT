@@ -1,6 +1,6 @@
 import { SR5TestFactory } from "./utils";
 import { SR5Item } from "../module/item/SR5Item";
-import { PartsList } from "@/module/parts/PartsList";
+import { ModifiableValue } from "@/module/mods/ModifiableValue";
 import { SkillTest } from "../module/tests/SkillTest";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { TestCreator } from "../module/tests/TestCreator";
@@ -30,8 +30,8 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             value: parseInt(change.value),
             mode: change.mode,
             priority: parseInt(String(change.priority || change.mode * 10)),
-            masked: false,
-            applied: true,
+            enabled: true,
+            invalidated: false,
             effectUuid: effect.uuid
         };
     };
@@ -770,7 +770,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             test.prepareTestCategories();
             test.effects.applyAllEffects();
 
-            PartsList.calcTotal(test.pool);
+            ModifiableValue.calcTotal(test.pool);
 
             assert.strictEqual(test.pool.value, 3);
 
@@ -783,7 +783,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             test.prepareTestCategories();
             test.effects.applyAllEffects();
 
-            PartsList.calcTotal(test.pool);
+            ModifiableValue.calcTotal(test.pool);
 
             assert.strictEqual(test.pool.value, 0);
 
@@ -796,7 +796,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             test.prepareTestCategories();
             test.effects.applyAllEffects();
 
-            PartsList.calcTotal(test.pool);
+            ModifiableValue.calcTotal(test.pool);
 
             assert.strictEqual(test.pool.value, 0);
         });

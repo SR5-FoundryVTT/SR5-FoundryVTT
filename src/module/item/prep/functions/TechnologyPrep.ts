@@ -1,7 +1,7 @@
 import { SR5 } from "@/module/config";
 import { SR5Item } from "../../SR5Item";
 import { Helpers } from "../../../helpers";
-import { PartsList } from "../../../parts/PartsList";
+import { ModifiableValue } from "../../../mods/ModifiableValue";
 import { ItemCostFlow } from "../../flows/ItemCostFlow";
 import { DataDefaults } from "@/module/data/DataDefaults";
 import { TechnologyType } from "src/module/types/template/Technology";
@@ -32,10 +32,9 @@ export const TechnologyPrep = {
      * @param equippedMods Those item mods that are equipped.
      */
     prepareConceal(technology: TechnologyType, equippedMods: SR5Item<'modification'>[]) {
-        const concealParts = new PartsList(technology.conceal);
+        const concealParts = new ModifiableValue(technology.conceal);
         for (const mod of equippedMods)
-            if (mod.system.conceal > 0)
-                concealParts.addUniquePart(mod.name, mod.system.conceal);
+            concealParts.setUnique(mod.name, mod.system.conceal);
 
         concealParts.calcTotal();
     },
@@ -85,8 +84,8 @@ export const TechnologyPrep = {
 
         // Add device rating as attribute to allow for rolls with it.
         const rating = Number(technology.rating ?? 0);
-        const parts = new PartsList(attributes.rating);
-        parts.addPart('SR5.Host.Rating', rating);
+        const parts = new ModifiableValue(attributes.rating);
+        parts.add('SR5.Host.Rating', rating);
     },
 
     /**

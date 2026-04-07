@@ -1,5 +1,5 @@
 import { SkillRules } from "../../rules/SkillRules";
-import { PartsList } from "../../parts/PartsList";
+import { ModifiableValue } from "../../mods/ModifiableValue";
 import { FLAGS, SYSTEM_NAME } from "../../constants";
 import { SkillFieldType } from "src/module/types/template/Skills";
 
@@ -9,7 +9,7 @@ export class SkillFlow {
      * @param skill
      * @param parts
      */
-    static handleDefaulting(skill: SkillFieldType, parts: PartsList) {
+    static handleDefaulting(skill: SkillFieldType, parts: ModifiableValue) {
         if (!SkillRules.mustDefaultToRoll(skill)) return;
 
         if (!SkillFlow.allowDefaultingRoll(skill)) {

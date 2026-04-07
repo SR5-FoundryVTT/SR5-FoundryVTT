@@ -1,7 +1,7 @@
 import {SkillRules} from "../rules/SkillRules";
 import {FLAGS, SYSTEM_NAME} from "../constants";
 import { SkillFieldType } from '../types/template/Skills';
-import { PartsList } from '../parts/PartsList';
+import { ModifiableValue } from '../mods/ModifiableValue';
 
 export const registerSkillLineHelpers = () => {
 

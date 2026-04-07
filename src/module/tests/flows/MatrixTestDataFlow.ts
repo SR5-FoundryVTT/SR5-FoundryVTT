@@ -2,7 +2,7 @@ import { SR5Actor } from "../../actor/SR5Actor";
 import { SR5 } from "../../config";
 import { Helpers } from "../../helpers";
 import { SR5Item } from "../../item/SR5Item";
-import { PartsList } from "../../parts/PartsList";
+import { ModifiableValue } from "../../mods/ModifiableValue";
 import { SuccessTest, TestOptions } from "../SuccessTest";
 import { MatrixTest, MatrixTestData, OpposedMatrixTestData } from "../MatrixTest";
 import { MatrixRules } from "../../rules/MatrixRules";
@@ -24,7 +24,7 @@ export const MatrixTestDataFlow = {
 
         MatrixTestDataFlow.removeMatrixModifiers(test);
 
-        const pool = new PartsList(test.data.pool);
+        const pool = new ModifiableValue(test.data.pool);
         const action = test.data.action;
         const actor = test.source;
 
@@ -57,25 +57,25 @@ export const MatrixTestDataFlow = {
      * @param test A Value.mod field as a PartsList
      */
     removeMatrixModifiers(test: SuccessTest) {
-        const pool = new PartsList(test.data.pool);
-        ['SR5.HotSim', 'SR5.RunningSilent', 'SR5.PublicGrid'].forEach(part => pool.removePart(part));
+        const pool = new ModifiableValue(test.data.pool);
+        ['SR5.HotSim', 'SR5.RunningSilent', 'SR5.PublicGrid'].forEach(part => pool.remove(part));
     },
 
     /**
      *
      * Will add modifiers based on actor data to test pool
      */
-    addMatrixModifiersToPool(actor: SR5Actor, pool: PartsList, atts: any, directConnection = false) {
+    addMatrixModifiersToPool(actor: SR5Actor, pool: ModifiableValue, atts: any, directConnection = false) {
         if (Helpers.isMatrix(atts)) {
             if (!("matrix" in actor.system)) return;
 
             // Apply general matrix modifiers based on commlink/cyberdeck status.
             const matrix = actor.system.matrix!;
-            if (matrix.hot_sim) pool.addUniquePart('SR5.HotSim', 2);
-            if (matrix.running_silent) pool.addUniquePart('SR5.RunningSilent', -2);
+            if (matrix.hot_sim) pool.addUnique('SR5.HotSim', 2);
+            if (matrix.running_silent) pool.addUnique('SR5.RunningSilent', -2);
 
             if (!directConnection && actor.network?.isPublicGrid()) {
-                pool.addUniquePart('SR5.PublicGrid', actor.getPublicGridModifier());
+                pool.addUnique('SR5.PublicGrid', actor.getPublicGridModifier());
             }
         }
     },
@@ -100,21 +100,21 @@ export const MatrixTestDataFlow = {
                 const marks = actor.getMarksPlaced(targetItem.uuid);
                 if (marks > 0) {
                     // add damage per mark on the target item
-                    PartsList.addUniquePart(
+                    ModifiableValue.addUnique(
                         test.data.damage, "SR5.Marks",
                         marks * (targetItem.actor?.getExtraMarkDamageModifier() ?? MatrixRules.getExtraMarkDamageModifier())
                     );
-                    test.data.damage.value = PartsList.calcTotal(test.data.damage, { min: 0 })
+                    test.data.damage.value = ModifiableValue.calcTotal(test.data.damage, { min: 0 })
                 }
                 // if there wasn't a matrix device, see if we have marks placed on the actor itself
             } else if (icon instanceof SR5Actor) {
                 const marks = actor.getMarksPlaced(icon.uuid);
                 if (marks > 0) {
                     // add damage per mark on the target item
-                    PartsList.addUniquePart(
+                    ModifiableValue.addUnique(
                         test.data.damage, "SR5.Marks", marks * icon.getExtraMarkDamageModifier()
                     );
-                    test.data.damage.value = PartsList.calcTotal(test.data.damage, { min: 0 })
+                    test.data.damage.value = ModifiableValue.calcTotal(test.data.damage, { min: 0 })
                 }
             }
         }
@@ -192,23 +192,18 @@ export const MatrixTestDataFlow = {
      */
     prepareTestModifiers(test: MatrixTest) {
 
-        const pool = new PartsList(test.data.pool);
+        const pool = new ModifiableValue(test.data.pool);
+        const { sameGrid, directConnection } = test.data;
 
-        // Check for grid modifiers.
-        if (!test.data.sameGrid) {
-            pool.addUniquePart('SR5.ModifierTypes.DifferentGrid', MatrixRules.differentGridModifier());
-        } else {
-            pool.addUniquePart('SR5.ModifierTypes.DifferentGrid', 0);
-        }
+        // 1. Grid Penalty: Applies if NOT directly connected AND on a different grid
+        if (!directConnection && !sameGrid)
+            pool.addUnique('SR5.ModifierTypes.DifferentGrid', MatrixRules.differentGridModifier());
+        else
+            pool.remove('SR5.ModifierTypes.DifferentGrid');
 
-        // Check for direct connection modifiers.
-        if (test.data.directConnection) {
-            // Grid modifiers don't apply when directly connected.
-            pool.addUniquePart('SR5.ModifierTypes.DifferentGrid', 0);
-            pool.addUniquePart('SR5.ModifierTypes.Noise', 0);
-        } else {
-            pool.addUniquePart('SR5.ModifierTypes.Noise', test.actor.modifiers.totalFor('noise'));
-        }
+        // 2. Noise Penalty: Applies if NOT directly connected
+        if (!directConnection)
+            pool.setUnique('SR5.ModifierTypes.Noise', test.actor.modifiers.totalFor('noise'));
     },
 
     /**

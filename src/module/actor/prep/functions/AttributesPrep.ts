@@ -3,7 +3,7 @@ import { SR } from '../../../constants';
 import { SR5Actor } from '../../SR5Actor';
 import { Helpers } from '../../../helpers';
 import { SR5Item } from 'src/module/item/SR5Item';
-import { PartsList } from '@/module/parts/PartsList';
+import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { AttributeFieldType } from 'src/module/types/template/Attributes';
 
 export class AttributesPrep {
@@ -56,7 +56,7 @@ export class AttributesPrep {
         // Each attribute can have a unique value range.
         // TODO:  Implement metatype attribute value ranges for character actors.
         const range = ranges ? ranges[name] : SR.attributes.ranges[name];
-        PartsList.calcTotal(attribute, range);
+        ModifiableValue.calcTotal(attribute, range);
     }
 
     /**
@@ -70,16 +70,16 @@ export class AttributesPrep {
         system.attributes.essence.base = SR.attributes.defaults.essence;
 
         // Modify essence by actor modifer
-        const parts = new PartsList(system.attributes.essence);
+        const parts = new ModifiableValue(system.attributes.essence);
 
         const essenceMod = system.modifiers.essence;
-        parts.addUniquePart('SR5.Bonus', essenceMod);
+        parts.addUnique('SR5.Bonus', essenceMod);
 
         for (const item of items) {
             if (item.isEquipped() && item.isType('bioware', 'cyberware'))
-                parts.addPart(item.name, -item.getEssenceLoss());
+                parts.add(item.name, -item.getEssenceLoss());
         }
 
-        PartsList.calcTotal(system.attributes.essence);
+        ModifiableValue.calcTotal(system.attributes.essence);
     }
 }

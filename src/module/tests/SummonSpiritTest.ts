@@ -1,7 +1,7 @@
 import { SR5 } from './../config';
 import { DataDefaults } from "../data/DataDefaults";
 import { SuccessTest, SuccessTestData } from "./SuccessTest";
-import { PartsList } from '../parts/PartsList';
+import { ModifiableValue } from '../mods/ModifiableValue';
 import { SpellcastingRules } from '../rules/SpellcastingRules';
 import { ConjuringRules } from '../rules/ConjuringRules';
 import { DamageType, MinimalActionType } from '../types/item/Action';
@@ -136,12 +136,12 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
 
         // Cleanup previous calculation and add new limit part.
         // NOTE: Instead of removing all parts, be specific in case of future additions to limit parts elsewhere.
-        const limitParts = new PartsList(this.data.limit);
+        const limitParts = new ModifiableValue(this.data.limit);
 
-        limitParts.removePart('SR5.Force');
-        limitParts.removePart('SR5.Reagent');
+        limitParts.remove('SR5.Force');
+        limitParts.remove('SR5.Reagent');
 
-        limitParts.addUniqueBasePart(label, limit);
+        limitParts.addUniqueBase(label, limit);
     }
 
     /**

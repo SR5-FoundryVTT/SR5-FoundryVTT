@@ -1,5 +1,5 @@
 import { AttributesPrep } from "./AttributesPrep";
-import { PartsList } from "@/module/parts/PartsList";
+import { ModifiableValue } from "@/module/mods/ModifiableValue";
 import { METATYPEMODIFIER, SR } from "../../../constants";
 
 export class NPCPrep {
@@ -24,7 +24,7 @@ export class NPCPrep {
             // Apply NPC modifiers
             const modifyBy = metatypeModifier.attributes?.[name] as number | undefined;
             if (modifyBy)
-                PartsList.addUniquePart(attribute, METATYPEMODIFIER, modifyBy);
+                ModifiableValue.addUnique(attribute, METATYPEMODIFIER, modifyBy);
 
             AttributesPrep.calculateAttribute(name, attribute);
         }
