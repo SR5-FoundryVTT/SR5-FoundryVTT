@@ -67,8 +67,8 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
         if (value != null) {
             const newPart = this._createChange(name, value, mode, priority);
             if (index !== -1) {
-                newPart.masked = this._field.changes[index].masked;
-                newPart.applied = this._field.changes[index].applied;
+                newPart.enabled = this._field.changes[index].enabled;
+                newPart.invalidated = this._field.changes[index].invalidated;
 
                 this._field.changes[index] = newPart;
             } else {
@@ -133,9 +133,9 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
         this._field.changes.sort((a, b) => a.priority - b.priority);
         for (let i = 0; i < this._field.changes.length; i++) {
             const change = this._field.changes[i];
-            change.masked = false;
+            change.invalidated = false;
 
-            if (!change.applied) continue;
+            if (!change.enabled) continue;
 
             switch (change.mode) {
                 case CONST.ACTIVE_EFFECT_MODES.ADD:
@@ -154,7 +154,7 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
                         this._field.value = change.value;
                         this._markPreviousChangesMasked(i);
                     } else {
-                        change.masked = true;
+                        change.invalidated = true;
                     }
                     break;
                 case CONST.ACTIVE_EFFECT_MODES.DOWNGRADE:
@@ -162,7 +162,7 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
                         this._field.value = change.value;
                         this._markPreviousChangesMasked(i);
                     } else {
-                        change.masked = true;
+                        change.invalidated = true;
                     }
                     break;
                 default:
@@ -205,7 +205,7 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
         mode: CONST.ACTIVE_EFFECT_MODES = CONST.ACTIVE_EFFECT_MODES.ADD,
         priority = 10 * mode,
     ): ModifiableValueType['changes'][number] {
-        return { name, value, mode, priority, masked: false, applied: true, effectUuid: null };
+        return { name, value, mode, priority, invalidated: false, enabled: true, effectUuid: null };
     }
 
     /**
@@ -214,8 +214,8 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
      */
     private _markPreviousChangesMasked(currentIndex: number): void {
         for (let i = 0; i < currentIndex; i++) {
-            if (!this._field.changes[i].applied) continue;
-            this._field.changes[i].masked = true;
+            if (!this._field.changes[i].enabled) continue;
+            this._field.changes[i].invalidated = true;
         }
     }
 

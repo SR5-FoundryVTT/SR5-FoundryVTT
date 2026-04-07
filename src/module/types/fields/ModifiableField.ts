@@ -39,8 +39,8 @@ export class ModifiableField<
         const effectPriority = change.priority ?? 10 * effectMode;
 
         field.changes.push({
-            applied: true,
-            masked: false,
+            enabled: true,
+            invalidated: false,
             name: effectName,
             mode: effectMode,
             value: changeValue,

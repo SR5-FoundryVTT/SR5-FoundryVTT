@@ -30,7 +30,7 @@
             <span class="mod-name" data-tooltip="{{getChangeDescription change}}">{{localize change.name}}</span>
             <span class="mod-value">{{getChangeValue change}}</span>
 
-            <input type="checkbox" name="{{../path}}.changes.{{index}}.applied" data-dtype="Boolean" {{checked change.applied}} />
+            <input type="checkbox" name="{{../path}}.changes.{{index}}.enabled" data-dtype="Boolean" {{checked change.enabled}} />
         </li>
         {{/unless}}
         {{/each}}

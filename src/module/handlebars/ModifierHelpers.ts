@@ -12,7 +12,7 @@ export const registerModifierHelpers = () => {
     };
 
     const getActiveModifierChanges = (changes: ChangeType[] = []) => {
-        return getModifierChanges(changes).filter(change => change.applied);
+        return getModifierChanges(changes).filter(change => change.enabled);
     };
 
     const getDiffValueChange = (modValue: ModifiableValueType) => {
@@ -72,10 +72,10 @@ export const registerModifierHelpers = () => {
     });
 
     Handlebars.registerHelper('getChangeCSS', (change: ChangeType) => {
-        if (!change.applied)
-            return 'mod-change-unapplied';
-        if (change.masked)
-            return 'mod-change-masked';
+        if (!change.enabled)
+            return 'mod-change-disabled';
+        if (change.invalidated)
+            return 'mod-change-invalidated';
         return '';
     });
 

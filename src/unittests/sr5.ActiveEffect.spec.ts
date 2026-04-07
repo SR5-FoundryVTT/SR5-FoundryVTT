@@ -30,8 +30,8 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             value: parseInt(change.value),
             mode: change.mode,
             priority: parseInt(String(change.priority || change.mode * 10)),
-            masked: false,
-            applied: true,
+            enabled: true,
+            invalidated: false,
             effectUuid: effect.uuid
         };
     };

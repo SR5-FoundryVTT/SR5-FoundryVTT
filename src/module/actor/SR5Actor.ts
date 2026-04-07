@@ -1255,7 +1255,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             name: "Teamwork", effectUuid: null,
             value: teamworkData.additionalDice,
             mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-            priority: 0, masked: false, applied: true,
+            priority: 0, enabled: true, invalidated: false,
         });
 
         const showDialog = this.tests.shouldShowDialog(options.event);

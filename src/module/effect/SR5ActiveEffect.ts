@@ -248,8 +248,8 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         if (ModifiableValue.isModifiableValue(target)) {
             target.changes.push({
-                applied: change.effect.active,
-                masked: false,
+                enabled: change.effect.active,
+                invalidated: false,
                 name: change.effect.name,
                 value: delta,
                 mode: change.mode,

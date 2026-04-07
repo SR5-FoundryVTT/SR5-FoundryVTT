@@ -35,12 +35,12 @@ export const ValueMaxPair = () => ({
  */
 const ChangeEntry = () => ({
     name: new StringField({ required: true }),
-    applied: new BooleanField({ initial: true }),
-    masked: new BooleanField({ initial: false }),
     mode: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     value: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     priority: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     effectUuid: new DocumentUUIDField({ required: true, nullable: true }),
+    enabled: new BooleanField({ initial: true }),
+    invalidated: new BooleanField({ initial: false }),
 });
 
 export const ChangeList = () => new ArrayField(new SchemaField(ChangeEntry()));
