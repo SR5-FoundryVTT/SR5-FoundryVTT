@@ -1,4 +1,4 @@
-import { PartsList } from '../parts/PartsList';
+import { ModifiableValue } from '../mods/ModifiableValue';
 import { ModifiableValueType } from '../types/template/Base';
 type ChangeType = ModifiableValueType['changes'][number];
 
@@ -8,7 +8,7 @@ type ChangeType = ModifiableValueType['changes'][number];
 export const registerModifierHelpers = () => {
     const getModifierChanges = (changes: ChangeType[] = []) => {
         if (!Array.isArray(changes)) return [];
-        return changes.filter(change => !PartsList.isBaseChange(change));
+        return changes.filter(change => !ModifiableValue.isBaseChange(change));
     };
 
     const getActiveModifierChanges = (changes: ChangeType[] = []) => {
@@ -22,11 +22,11 @@ export const registerModifierHelpers = () => {
     }
 
     Handlebars.registerHelper('isBaseChange', (change: ChangeType) => {
-        return PartsList.isBaseChange(change);
+        return ModifiableValue.isBaseChange(change);
     });
 
     Handlebars.registerHelper('hasModifierChanges', (changes: ChangeType[]) => {
-        return Array.isArray(changes) && changes.some(change => !PartsList.isBaseChange(change));
+        return Array.isArray(changes) && changes.some(change => !ModifiableValue.isBaseChange(change));
     });
 
     Handlebars.registerHelper('modifierCount', (changes: ChangeType[]) => {

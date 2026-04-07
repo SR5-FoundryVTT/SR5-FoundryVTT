@@ -1,4 +1,4 @@
-import { PartsList } from '../parts/PartsList';
+import { ModifiableValue } from '../mods/ModifiableValue';
 import { OpposedTest, OpposedTestData } from './OpposedTest';
 import { TestDocuments, TestOptions } from './SuccessTest';
 import { RitualSpellcastingTest } from './RitualSpellcastingTest';
@@ -45,9 +45,9 @@ export class OpposedRitualTest extends OpposedTest<OpposedRitualTestData> {
      */
     override applyPoolModifiers() {
         // NOTE: We don't have an actor, therefore don't need to call document modifiers.
-        const pool = new PartsList(this.data.pool);
-        pool.addUniqueBasePart('SR5.Force', this.against.data.force);
-        pool.addBasePart('SR5.Force', this.against.data.force);
+        const pool = new ModifiableValue(this.data.pool);
+        pool.addUniqueBase('SR5.Force', this.against.data.force);
+        pool.addBase('SR5.Force', this.against.data.force);
     }
 
     /**

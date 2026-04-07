@@ -1,5 +1,5 @@
 import { SR } from "../constants";
-import { PartsList } from "../parts/PartsList";
+import { ModifiableValue } from "../mods/ModifiableValue";
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SkillFieldType } from "../types/template/Skills";
 
@@ -43,8 +43,8 @@ export class SkillRules {
      * Add the defaulting modifier part to a parts list
      * @param parts Should be a PartsList involved with skills.
      */
-    static addDefaultingPart(parts: PartsList) {
-        parts.addUniquePart('SR5.Defaulting', SkillRules.defaultingModifier);
+    static addDefaultingPart(parts: ModifiableValue) {
+        parts.addUnique('SR5.Defaulting', SkillRules.defaultingModifier);
     }
 
     /**

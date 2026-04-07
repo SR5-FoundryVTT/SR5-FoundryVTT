@@ -1,21 +1,21 @@
 import { SR5 } from "../../../config";
-import { PartsList } from "@/module/parts/PartsList";
+import { ModifiableValue } from "@/module/mods/ModifiableValue";
 
 export class LimitsPrep {
     static prepareLimits(system: Actor.SystemOfType<'character' | 'spirit' | 'sprite' | 'vehicle'>) {
         const { limits, modifiers, special } = system;
 
         // Apply the actor local modifiers defined on the sheet.
-        PartsList.addUniquePart(limits.physical, 'SR5.Bonus', modifiers.physical_limit);
-        PartsList.addUniquePart(limits.mental, 'SR5.Bonus', modifiers.mental_limit);
-        PartsList.addUniquePart(limits.social, 'SR5.Bonus', modifiers.social_limit);
+        ModifiableValue.addUnique(limits.physical, 'SR5.Bonus', modifiers.physical_limit);
+        ModifiableValue.addUnique(limits.mental, 'SR5.Bonus', modifiers.mental_limit);
+        ModifiableValue.addUnique(limits.social, 'SR5.Bonus', modifiers.social_limit);
 
         // Determine if the astral limit is relevant.
         if ('astral' in limits)
             limits.astral.hidden = special !== 'magic';
 
         for (const [name, limit] of Object.entries(limits)) {
-            PartsList.calcTotal(limit);
+            ModifiableValue.calcTotal(limit);
             limit.label = SR5.limits[name];
         }
     }
@@ -39,20 +39,20 @@ export class LimitsPrep {
             // Astral limit SR5#278.
             limits.astral.label = SR5.limits.astral;
             limits.astral.base = Math.max(limits.mental.value, limits.social.value);
-            PartsList.addUniquePart(limits.astral, "SR5.Bonus", modifiers.astral_limit);
-            PartsList.calcTotal(limits.astral);
+            ModifiableValue.addUnique(limits.astral, "SR5.Bonus", modifiers.astral_limit);
+            ModifiableValue.calcTotal(limits.astral);
 
             // Magic attribute as limit, hidden as it's directly derived from an attribute.
             limits.magic.base = attributes.magic.value;
             limits.magic.label = SR5.limits.magic;
             limits.magic.hidden = true;
-            PartsList.calcTotal(limits.magic);
+            ModifiableValue.calcTotal(limits.magic);
         }
 
         // Derive the initiation limit of a character from its initiation rank.
         limits.initiation.label = SR5.limits.initiation;
         limits.initiation.base = system.magic.initiation;
         limits.initiation.hidden = true;
-        PartsList.calcTotal(limits.initiation, { min: 0 });
+        ModifiableValue.calcTotal(limits.initiation, { min: 0 });
     }
 }

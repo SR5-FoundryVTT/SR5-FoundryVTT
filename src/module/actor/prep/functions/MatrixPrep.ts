@@ -1,7 +1,7 @@
 import { SR5 } from "../../../config";
 import { AttributesPrep } from "./AttributesPrep";
 import { SR5Item } from 'src/module/item/SR5Item';
-import { PartsList } from '@/module/parts/PartsList';
+import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { DataDefaults } from '@/module/data/DataDefaults';
 import { MatrixAttributeFieldType } from '@/module/types/template/Matrix';
 
@@ -19,7 +19,7 @@ export class MatrixPrep {
         // clear matrix data to defaults
         for (const key of MatrixList) {
             matrix[key].base = 0;
-            PartsList.calcTotal(matrix[key]);
+            ModifiableValue.calcTotal(matrix[key]);
         }
 
         matrix.condition_monitor.max = 0;
@@ -55,11 +55,11 @@ export class MatrixPrep {
             }
         } // if we don't have a device, use living persona
         else if (system.special === 'resonance') {
-            matrix.firewall.base = PartsList.calcTotal(attributes.willpower);
-            matrix.data_processing.base = PartsList.calcTotal(attributes.logic);
-            matrix.rating = PartsList.calcTotal(attributes.resonance);
-            matrix.attack.base = PartsList.calcTotal(attributes.charisma);
-            matrix.sleaze.base = PartsList.calcTotal(attributes.intuition);
+            matrix.firewall.base = ModifiableValue.calcTotal(attributes.willpower);
+            matrix.data_processing.base = ModifiableValue.calcTotal(attributes.logic);
+            matrix.rating = ModifiableValue.calcTotal(attributes.resonance);
+            matrix.attack.base = ModifiableValue.calcTotal(attributes.charisma);
+            matrix.sleaze.base = ModifiableValue.calcTotal(attributes.intuition);
             // if we have a Living Persona device, we want to use some of its data to make the sheet sync up best
             if (device && device.isLivingPersona()) {
                 matrix.device = device._id!;
@@ -115,6 +115,6 @@ export class MatrixPrep {
         for (const attribute of matrixAttributes)
             matrix[attribute].base = rating;
         for (const attId of [...matrixAttributes, 'sleaze', 'attack'])
-            PartsList.calcTotal(matrix[attId]);
+            ModifiableValue.calcTotal(matrix[attId]);
     }
 }

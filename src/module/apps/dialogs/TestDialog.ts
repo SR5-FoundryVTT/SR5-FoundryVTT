@@ -1,6 +1,6 @@
 import { SR5 } from "../../config";
 import { Translation } from '../../utils/strings';
-import { PartsList } from "@/module/parts/PartsList";
+import { ModifiableValue } from "@/module/mods/ModifiableValue";
 import { FLAGS, SYSTEM_NAME } from '../../constants';
 import { SuccessTest, SuccessTestData } from "../../tests/SuccessTest";
 import { FormDialog, FormDialogData, FormDialogOptions } from "./FormDialog";
@@ -42,7 +42,7 @@ export class TestDialog extends FormDialog {
 
         const hasModifierChanges = (changes) => {
             if (!Array.isArray(changes)) return false;
-            return changes.some(change => !PartsList.isBaseChange(change));
+            return changes.some(change => !ModifiableValue.isBaseChange(change));
         }
 
         if (hasModifierChanges(data?.test?.pool?.changes))
@@ -250,14 +250,14 @@ export class TestDialog extends FormDialog {
         // First, apply changes to ValueField style values in a way that makes sense.
         for (const [key, value] of [...appliedEntries, ...otherEntries]) {
             const valueField = foundry.utils.getProperty(this.data, key);
-            if (!PartsList.isModifiableValue(valueField)) {
+            if (!ModifiableValue.isModifiableValue(valueField)) {
                 foundry.utils.setProperty(this.data, key, value);
                 continue;
             }
 
             // Don't apply an unneeded override.
             if (valueField.value !== value)
-                PartsList.addUniquePart(valueField, 'SR5.ManualOverride', value as number | null, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, Infinity);
+                ModifiableValue.addUnique(valueField, 'SR5.ManualOverride', value as number | null, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, Infinity);
         }
 
         // Give tests opportunity to change resulting values on the fly.

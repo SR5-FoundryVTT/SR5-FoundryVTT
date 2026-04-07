@@ -2,7 +2,7 @@ import { SuccessTest, SuccessTestData, SuccessTestValues, TestData, TestDocument
 import { DataDefaults } from "../data/DataDefaults";
 import { TestCreator } from "./TestCreator";
 import { SR5Item } from "../item/SR5Item";
-import { PartsList } from "../parts/PartsList";
+import { ModifiableValue } from "../mods/ModifiableValue";
 import { Helpers } from "../helpers";
 import { ValueFieldType } from "../types/template/Base";
 import { SR5Actor } from "../actor/SR5Actor";
@@ -77,7 +77,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
     calculateAgainstNetHits() {
         const base = Math.max(this.against.hits.value - this.hits.value, 0);
         const againstNetHits = DataDefaults.createData('value_field', {label: 'SR5.NetHits', base});
-        againstNetHits.value = PartsList.calcTotal(againstNetHits, {min: 0});
+        againstNetHits.value = ModifiableValue.calcTotal(againstNetHits, {min: 0});
         return againstNetHits;
     }
 
@@ -207,7 +207,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
 
         // Do not simply concat list to avoid double applying an otherwise unique test modifier.
         for (const modifier of opposedMod.changes) {
-            PartsList.addUniquePart(this.data.pool, modifier.name, modifier.value);
+            ModifiableValue.addUnique(this.data.pool, modifier.name, modifier.value);
         }
     }
 

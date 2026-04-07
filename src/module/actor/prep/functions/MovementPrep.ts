@@ -1,4 +1,4 @@
-import { PartsList } from "@/module/parts/PartsList";
+import { ModifiableValue } from "@/module/mods/ModifiableValue";
 
 export class MovementPrep {
     static prepareMovement(system: Actor.SystemOfType<'character' | 'spirit'>) {
@@ -9,7 +9,7 @@ export class MovementPrep {
         movement.walk.base = attributes.agility.value * (2 + modifiers.walk);
         movement.run.base = attributes.agility.value * (4 + modifiers.run);
 
-        PartsList.calcTotal(movement.walk, { min: 0 });
-        PartsList.calcTotal(movement.run, { min: 0 });
+        ModifiableValue.calcTotal(movement.walk, { min: 0 });
+        ModifiableValue.calcTotal(movement.run, { min: 0 });
     }
 }

@@ -1,5 +1,5 @@
 import { DrainRules } from "./DrainRules";
-import { PartsList } from "../parts/PartsList";
+import { ModifiableValue } from "../mods/ModifiableValue";
 import { DamageType } from "../types/item/Action";
 import { DataDefaults } from "../data/DataDefaults";
 
@@ -46,7 +46,7 @@ export const RitualRules = {
         const damage = DataDefaults.createData('damage');
         damage.base = drain;
         damage.type.base = damage.type.value = DrainRules.calcDrainDamageType(hits, magic);
-        PartsList.calcTotal(damage, { min: 0 });
+        ModifiableValue.calcTotal(damage, { min: 0 });
 
         return damage;
     },

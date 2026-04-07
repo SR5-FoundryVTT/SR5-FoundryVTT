@@ -1,6 +1,6 @@
 import {CombatRules} from "./CombatRules";
 import { SR5Actor } from "../actor/SR5Actor";
-import {PartsList} from "../parts/PartsList";
+import {ModifiableValue} from "../mods/ModifiableValue";
 import {DataDefaults} from "../data/DataDefaults";
 import { DamageType, MinimalActionType } from "../types/item/Action";
 
@@ -31,12 +31,12 @@ export class CombatSpellRules {
         damage = foundry.utils.duplicate(damage) as DamageType;
 
         const ap = -force;
-        PartsList.addUniquePart(damage.ap, 'SR5.Force', ap);
-        PartsList.addUniquePart(damage, 'SR5.Force', force);
+        ModifiableValue.addUnique(damage.ap, 'SR5.Force', ap);
+        ModifiableValue.addUnique(damage, 'SR5.Force', force);
 
         // Armor piercing can both be a negative and positive value.
-        PartsList.calcTotal(damage.ap);
-        PartsList.calcTotal(damage, { min: 0 });
+        ModifiableValue.calcTotal(damage.ap);
+        ModifiableValue.calcTotal(damage, { min: 0 });
 
         return damage;
     }

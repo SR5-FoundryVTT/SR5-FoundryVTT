@@ -1,4 +1,4 @@
-import {PartsList} from "../parts/PartsList";
+import {ModifiableValue} from "../mods/ModifiableValue";
 import {CombatRules} from "../rules/CombatRules";
 import {MeleeRules} from "../rules/MeleeRules";
 import {MeleeAttackData} from "./MeleeAttackTest";
@@ -114,20 +114,20 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
             this.data.cover;
 
         // Apply zero modifier also, to sync pool.mod and modifiers.mod
-        PartsList.addUniquePart(this.data.pool, 'SR5.Cover', this.data.cover);
+        ModifiableValue.addUnique(this.data.pool, 'SR5.Cover', this.data.cover);
     }
 
     applyPoolActiveDefenseModifier() {
         const defense = this.data.activeDefenses[this.data.activeDefense] || {label: 'SR5.ActiveDefense', value: 0, init: 0};
 
         // Apply zero modifier also, to sync pool.mod and modifiers.mod
-        PartsList.addUniquePart(this.data.pool, 'SR5.ActiveDefense', defense.value);
+        ModifiableValue.addUnique(this.data.pool, 'SR5.ActiveDefense', defense.value);
     }
 
     applyPoolMeleeReachModifier() {
         if (!this.data.isMeleeAttack) return;
 
-        PartsList.addUniquePart(this.data.pool, 'SR5.Weapon.Reach', this.data.defenseReach);
+        ModifiableValue.addUnique(this.data.pool, 'SR5.Weapon.Reach', this.data.defenseReach);
     }
 
     /**
@@ -141,7 +141,7 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
 
         if (!fireMode.defense) return;
 
-        PartsList.addUniquePart(this.data.pool, fireMode.label, Number(fireMode.defense));
+        ModifiableValue.addUnique(this.data.pool, fireMode.label, Number(fireMode.defense));
     }
 
     override get success() {

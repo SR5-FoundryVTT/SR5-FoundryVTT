@@ -13,7 +13,7 @@ import { GruntPrep } from './functions/GruntPrep';
 import { DataDefaults } from '../../data/DataDefaults';
 import { SR5Item } from 'src/module/item/SR5Item';
 import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
-import { PartsList } from '@/module/parts/PartsList';
+import { ModifiableValue } from '@/module/mods/ModifiableValue';
 
 export class CharacterPrep {
     /**
@@ -74,7 +74,7 @@ export class CharacterPrep {
      * @param system Physical humanoid system data.
      */
     static prepareRecoil(system: Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>) {
-        PartsList.calcTotal(system.values.recoil, { min: 0 });
+        ModifiableValue.calcTotal(system.values.recoil, { min: 0 });
     }
 
     /**
@@ -87,8 +87,8 @@ export class CharacterPrep {
         const baseRc = RangedWeaponRules.humanoidBaseRecoilCompensation();
         system.values.recoil_compensation.base = baseRc;
 
-        const mod = new PartsList(system.values.recoil_compensation);
-        mod.addUniquePart("SR5.RecoilCompensation", recoilCompensation);
+        const mod = new ModifiableValue(system.values.recoil_compensation);
+        mod.addUnique("SR5.RecoilCompensation", recoilCompensation);
         mod.calcTotal({ min: 0 });
     }
 

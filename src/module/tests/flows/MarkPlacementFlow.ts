@@ -1,4 +1,4 @@
-import { PartsList } from '../../parts/PartsList';
+import { ModifiableValue } from '../../mods/ModifiableValue';
 import { MatrixRules } from '../../rules/MatrixRules';
 import { HackOnTheFlyTest } from '../HackOnTheFlyTest';
 import { MatrixTestData } from '../MatrixTest';
@@ -43,10 +43,10 @@ export const MarkPlacementFlow = {
      */
     prepareTestModifiers(test: MarkPlacementTests) {
 
-        const pool = new PartsList(test.data.pool);
+        const pool = new ModifiableValue(test.data.pool);
 
         // Apply mark modifier
-        pool.addUniquePart('SR5.ModifierTypes.Marks', MarkPlacementFlow.getMarkPlacementModifier(test));
+        pool.addUnique('SR5.ModifierTypes.Marks', MarkPlacementFlow.getMarkPlacementModifier(test));
 
         MatrixTestDataFlow.prepareTestModifiers(test);
     },
@@ -70,7 +70,7 @@ export const MarkPlacementFlow = {
         const modifier = MatrixRules.gridMarkPlacementDefensePool(test.device);
         if (!modifier) return;
 
-        new PartsList(test.pool).addUniquePart(modifier.name, modifier.value);
+        new ModifiableValue(test.pool).addUnique(modifier.name, modifier.value);
     },
 
     /**

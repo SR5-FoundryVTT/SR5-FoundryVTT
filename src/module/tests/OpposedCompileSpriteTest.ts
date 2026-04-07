@@ -1,6 +1,6 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5 } from "../config";
-import { PartsList } from "../parts/PartsList";
+import { ModifiableValue } from "../mods/ModifiableValue";
 import { CompileSpriteTest } from "./CompileSpriteTest";
 import { OpposedTest, OpposedTestData } from "./OpposedTest";
 import { TestDocuments, TestOptions } from "./SuccessTest";
@@ -70,7 +70,7 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
      */
     override applyPoolModifiers() {
         // NOTE: We don't have an actor, therefore don't need to call document modifiers.
-        PartsList.addUniqueBasePart(this.data.pool, 'SR5.Level', this.against.data.level);
+        ModifiableValue.addUniqueBase(this.data.pool, 'SR5.Level', this.against.data.level);
     }
 
     /**

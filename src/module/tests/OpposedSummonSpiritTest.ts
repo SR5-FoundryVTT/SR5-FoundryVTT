@@ -1,6 +1,6 @@
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5 } from '../config';
-import { PartsList } from '../parts/PartsList';
+import { ModifiableValue } from '../mods/ModifiableValue';
 import { ConjuringRules } from '../rules/ConjuringRules';
 import { OpposedTest, OpposedTestData } from './OpposedTest';
 import { TestDocuments, TestOptions } from './SuccessTest';
@@ -75,7 +75,7 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
      */
     override applyPoolModifiers() {
         // NOTE: We don't have an actor, therefore don't need to call document modifiers.
-        PartsList.addUniquePart(this.data.pool, 'SR5.Force', this.against.data.force);
+        ModifiableValue.addUnique(this.data.pool, 'SR5.Force', this.against.data.force);
     }
 
     /**

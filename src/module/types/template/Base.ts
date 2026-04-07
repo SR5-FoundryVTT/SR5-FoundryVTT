@@ -28,7 +28,12 @@ export const ValueMaxPair = () => ({
     max: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
 });
 
-export const ModListEntry = () => ({
+/**
+ * Expansion of Foundry's ActiveEffect.ChangeData.
+ * The 'key' is implied by the field this is attached to, while 'mode'
+ * and 'priority' follow standard CONST.ACTIVE_EFFECT_MODES behavior.
+ */
+const ChangeEntry = () => ({
     name: new StringField({ required: true }),
     applied: new BooleanField({ initial: true }),
     masked: new BooleanField({ initial: false }),
@@ -38,15 +43,15 @@ export const ModListEntry = () => ({
     effectUuid: new DocumentUUIDField({ required: true, nullable: true }),
 });
 
-export const ModList = () => new ArrayField(new SchemaField(ModListEntry()));
+export const ChangeList = () => new ArrayField(new SchemaField(ChangeEntry()));
 
-export const ModifiableValue = () => ({
+export const ModifiableValueSchema = () => ({
     ...BaseValuePair(),
-    changes: new ArrayField(new SchemaField(ModListEntry())),
+    changes: new ArrayField(new SchemaField(ChangeEntry())),
 });
 
 export const ModifiableValueLinked = () => ({
-    ...ModifiableValue(),
+    ...ModifiableValueSchema(),
     attribute: new StringField({ required: true }),
     base_formula_operator: new StringField({
         required: false,
@@ -56,13 +61,12 @@ export const ModifiableValueLinked = () => ({
 });
 
 export const ValueField = () => ({
-    ...ModifiableValue(),
+    ...ModifiableValueSchema(),
     label: new StringField({ required: true }),
     manualMod: new StringField({ required: true }),
 });
 
 export type ValueFieldType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ValueField>>;
-export type ModListEntryType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ModListEntry>>;
 export type BaseValuePairType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof BaseValuePair>>;
-export type ModifiableValueType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ModifiableValue>>;
+export type ModifiableValueType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ModifiableValueSchema>>;
 export type ModifiableValueLinkedType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ModifiableValueLinked>>;

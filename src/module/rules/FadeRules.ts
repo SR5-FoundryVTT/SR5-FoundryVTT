@@ -1,4 +1,4 @@
-import {PartsList} from "../parts/PartsList";
+import {ModifiableValue} from "../mods/ModifiableValue";
 import {DataDefaults} from "../data/DataDefaults";
 import { DamageType, DamageTypeType } from "../types/item/Action";
 
@@ -17,7 +17,7 @@ export const FadeRules = {
 
         const damage = DataDefaults.createData('damage');
         damage.base = fade;
-        PartsList.calcTotal(damage, {min: 0});
+        ModifiableValue.calcTotal(damage, {min: 0});
 
         damage.type.base = damage.type.value = FadeRules.calcFadeDamageType(hits, resonance);
 
@@ -43,8 +43,8 @@ export const FadeRules = {
 
         fadeDamage = foundry.utils.duplicate(fadeDamage) as DamageType;
 
-        PartsList.addUniquePart(fadeDamage, 'SR5.Hits', -hits);
-        PartsList.calcTotal(fadeDamage, {min: 0});
+        ModifiableValue.addUnique(fadeDamage, 'SR5.Hits', -hits);
+        ModifiableValue.calcTotal(fadeDamage, {min: 0});
 
         return fadeDamage;
     }

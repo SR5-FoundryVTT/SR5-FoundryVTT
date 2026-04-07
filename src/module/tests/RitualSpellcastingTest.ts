@@ -1,6 +1,6 @@
 import { DataDefaults } from "../data/DataDefaults";
 import { SuccessTest, SuccessTestData } from "./SuccessTest";
-import { PartsList } from '../parts/PartsList';
+import { ModifiableValue } from '../mods/ModifiableValue';
 import { RitualRules } from '../rules/RitualRules';
 import { DamageType, MinimalActionType } from "../types/item/Action";
 import { DeepPartial } from "fvtt-types/utils";
@@ -139,7 +139,7 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
      * 
      */
     prepareLimitValue() {
-        PartsList.addUniqueBasePart(this.data.limit, 'SR5.Force', this.data.force);
+        ModifiableValue.addUniqueBase(this.data.limit, 'SR5.Force', this.data.force);
     }
 
     /**

@@ -1,5 +1,5 @@
 import { RangeWeaponType } from "src/module/types/item/Weapon";
-import { PartsList } from "../../../parts/PartsList";
+import { ModifiableValue } from "../../../mods/ModifiableValue";
 import { SR5Item } from "../../SR5Item";
 /**
  * Weapon item data preparation
@@ -20,13 +20,13 @@ export const RangePrep = {
      * @param equippedMods Those item mods that are equipped.
      */
     prepareRecoilCompensation(range: RangeWeaponType, equippedMods: SR5Item<'modification'>[]) {
-        const rangeParts = new PartsList(range.rc);
+        const rangeParts = new ModifiableValue(range.rc);
 
         // Apply ammo recoil compensation.
         for (const mod of equippedMods)
             if (mod.system.rc)
-                rangeParts.addPart(mod.name, mod.system.rc);
+                rangeParts.add(mod.name, mod.system.rc);
 
-        PartsList.calcTotal(range.rc);
+        ModifiableValue.calcTotal(range.rc);
     }
 }

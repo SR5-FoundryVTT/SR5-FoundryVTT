@@ -1,4 +1,4 @@
-import { PartsList } from '@/module/parts/PartsList';
+import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { MonitorRules } from './../../../rules/MonitorRules';
 
 export class WoundsPrep {
@@ -23,6 +23,6 @@ export class WoundsPrep {
 
         // The actor as a whole derives these wounds for wound modifier calculation
         system.wounds.base = stunWounds + physicalWounds;
-        PartsList.calcTotal(system.wounds);
+        ModifiableValue.calcTotal(system.wounds);
     }
 }

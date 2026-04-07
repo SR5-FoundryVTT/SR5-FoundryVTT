@@ -15,7 +15,7 @@ import { SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
 import { SR5Item } from 'src/module/item/SR5Item';
 import { AttributesType } from 'src/module/types/template/Attributes';
 import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
-import { PartsList } from '@/module/parts/PartsList';
+import { ModifiableValue } from '@/module/mods/ModifiableValue';
 
 export class SpiritPrep {
     static prepareBaseData(system: Actor.SystemOfType<'spirit'>) {
@@ -58,7 +58,7 @@ export class SpiritPrep {
 
         if (overrides) {
             const { attributes, skills, initiative, modifiers } = system;
-            const force = PartsList.calcTotal(system.attributes.force);
+            const force = ModifiableValue.calcTotal(system.attributes.force);
 
             // set the base of attributes to the provided force
             for (const [attId, value] of Object.entries(overrides.attributes)) {
@@ -80,14 +80,14 @@ export class SpiritPrep {
 
             // prepare initiative data
             initiative.meatspace.base.base = force * overrides.init_mult + overrides.init + modifiers.astral_initiative;
-            PartsList.addUniquePart(initiative.meatspace.base, "SR5.Bonus", modifiers.astral_initiative);
+            ModifiableValue.addUnique(initiative.meatspace.base, "SR5.Bonus", modifiers.astral_initiative);
             initiative.meatspace.dice.base = overrides.init_dice;
-            PartsList.addUniquePart(initiative.meatspace.dice, "SR5.Bonus", modifiers.meat_initiative_dice);
+            ModifiableValue.addUnique(initiative.meatspace.dice, "SR5.Bonus", modifiers.meat_initiative_dice);
 
             initiative.astral.base.base = force * overrides.astral_init_mult + overrides.astral_init + modifiers.astral_initiative_dice;
-            PartsList.addUniquePart(initiative.astral.base, "SR5.Bonus", modifiers.astral_initiative);
+            ModifiableValue.addUnique(initiative.astral.base, "SR5.Bonus", modifiers.astral_initiative);
             initiative.astral.dice.base = overrides.astral_init_dice;
-            PartsList.addUniquePart(initiative.astral.dice, "SR5.Bonus", modifiers.astral_initiative_dice);
+            ModifiableValue.addUnique(initiative.astral.dice, "SR5.Bonus", modifiers.astral_initiative_dice);
         }
     }
 
@@ -114,9 +114,9 @@ export class SpiritPrep {
 
         armor.base = attributes.essence.value * 2;
         if (system.modifiers.armor)
-            PartsList.addUniquePart(armor, game.i18n.localize('SR5.Bonus'), system.modifiers.armor);
+            ModifiableValue.addUnique(armor, game.i18n.localize('SR5.Bonus'), system.modifiers.armor);
 
-        PartsList.calcTotal(armor);
+        ModifiableValue.calcTotal(armor);
         armor.hardened = true;
     }
 

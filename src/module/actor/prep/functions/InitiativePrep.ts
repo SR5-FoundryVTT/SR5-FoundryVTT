@@ -1,5 +1,5 @@
 import { SR5Actor } from '../../SR5Actor';
-import { PartsList } from '@/module/parts/PartsList';
+import { ModifiableValue } from '@/module/mods/ModifiableValue';
 
 export class InitiativePrep {
     /**
@@ -17,10 +17,10 @@ export class InitiativePrep {
         }
 
         // Recalculate selected initiative to be sure.
-        PartsList.calcTotal(initiative.current.base);
+        ModifiableValue.calcTotal(initiative.current.base);
 
         // Apply edge ini rules.
-        PartsList.calcTotal(initiative.current.dice, {min: 0, max: 5});
+        ModifiableValue.calcTotal(initiative.current.dice, {min: 0, max: 5});
         if (initiative.edge) initiative.current.dice.value = 5;
         initiative.current.dice.text = `${initiative.current.dice.value}d6`;        
     }
@@ -32,24 +32,24 @@ export class InitiativePrep {
         const { initiative, attributes, modifiers } = system;
 
         initiative.meatspace.base.base = attributes.intuition.value + attributes.reaction.value;
-        PartsList.addUniquePart(initiative.meatspace.base, "SR5.Bonus", modifiers.meat_initiative);
-        PartsList.calcTotal(initiative.meatspace.base);
+        ModifiableValue.addUnique(initiative.meatspace.base, "SR5.Bonus", modifiers.meat_initiative);
+        ModifiableValue.calcTotal(initiative.meatspace.base);
 
         initiative.meatspace.dice.base = 1;
-        PartsList.addUniquePart(initiative.meatspace.dice, "SR5.Bonus", modifiers.meat_initiative_dice);
-        PartsList.calcTotal(initiative.meatspace.dice, {min: 0, max: 5});
+        ModifiableValue.addUnique(initiative.meatspace.dice, "SR5.Bonus", modifiers.meat_initiative_dice);
+        ModifiableValue.calcTotal(initiative.meatspace.dice, {min: 0, max: 5});
     }
 
     static prepareAstralInit(system: Actor.SystemOfType<'character' | 'spirit'>) {
         const { initiative, attributes, modifiers } = system;
 
         initiative.astral.base.base = attributes.intuition.value * 2;
-        PartsList.addUniquePart(initiative.astral.base, "SR5.Bonus", modifiers.astral_initiative);
-        PartsList.calcTotal(initiative.astral.base);
+        ModifiableValue.addUnique(initiative.astral.base, "SR5.Bonus", modifiers.astral_initiative);
+        ModifiableValue.calcTotal(initiative.astral.base);
 
         initiative.astral.dice.base = 2;
-        PartsList.addUniquePart(initiative.astral.dice, "SR5.Bonus", modifiers.astral_initiative_dice);
-        PartsList.calcTotal(initiative.astral.dice, {min: 0, max: 5});
+        ModifiableValue.addUnique(initiative.astral.dice, "SR5.Bonus", modifiers.astral_initiative_dice);
+        ModifiableValue.calcTotal(initiative.astral.dice, {min: 0, max: 5});
     }
 
     static prepareMatrixInit(system: Actor.SystemOfType<'character' | 'vehicle'>) {
@@ -57,12 +57,12 @@ export class InitiativePrep {
         if (matrix) {
 
             initiative.matrix.base.base = attributes.intuition.value + system.matrix.data_processing.value;
-            PartsList.addUniquePart(initiative.matrix.base, "SR5.Bonus", modifiers.matrix_initiative);
-            PartsList.calcTotal(initiative.matrix.base);
+            ModifiableValue.addUnique(initiative.matrix.base, "SR5.Bonus", modifiers.matrix_initiative);
+            ModifiableValue.calcTotal(initiative.matrix.base);
 
             initiative.matrix.dice.base = (matrix.hot_sim ? 4 : 3);
-            PartsList.addUniquePart(initiative.matrix.dice, "SR5.Bonus", modifiers.matrix_initiative_dice);
-            PartsList.calcTotal(initiative.matrix.dice, {min: 0, max: 5});
+            ModifiableValue.addUnique(initiative.matrix.dice, "SR5.Bonus", modifiers.matrix_initiative_dice);
+            ModifiableValue.calcTotal(initiative.matrix.dice, {min: 0, max: 5});
         }
     }
 }

@@ -1,5 +1,5 @@
 import { SR5 } from "@/module/config";
-import { ModifiableValue } from "../template/Base";
+import { ModifiableValueSchema } from "../template/Base";
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
 import { ModifiableField } from "../fields/ModifiableField";
@@ -24,8 +24,8 @@ export const MagicData = () => ({
 });
 
 export const PhysicalCombatValues = () => ({
-    recoil: new ModifiableField(ModifiableValue()),
-    recoil_compensation: new ModifiableField(ModifiableValue()),
+    recoil: new ModifiableField(ModifiableValueSchema()),
+    recoil_compensation: new ModifiableField(ModifiableValueSchema()),
 });
 
 /**
@@ -34,7 +34,7 @@ export const PhysicalCombatValues = () => ({
  */
 export const CharacterValues = () => ({
     ...PhysicalCombatValues(),
-    control_rig_rating: new ModifiableField(ModifiableValue()),
+    control_rig_rating: new ModifiableField(ModifiableValueSchema()),
 })
 
 export const CharacterLimits = () => ({

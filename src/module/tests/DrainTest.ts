@@ -8,7 +8,7 @@ import { DamageType, MinimalActionType } from "../types/item/Action";
 import { DeepPartial } from "fvtt-types/utils";
 import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
-import { PartsList } from "../parts/PartsList";
+import { ModifiableValue } from "../mods/ModifiableValue";
 
 export interface DrainTestData extends SuccessTestData {
     incomingDrain: DamageType
@@ -95,7 +95,7 @@ export class DrainTest extends SuccessTest<DrainTestData> {
 
         // Copy to get all values changed by user (override) but also remove all.
         this.data.modifiedDrain = foundry.utils.duplicate(this.data.incomingDrain) as DamageType;
-        this.data.modifiedDrain.base = PartsList.calcTotal(this.data.incomingDrain, { min: 0 });
+        this.data.modifiedDrain.base = ModifiableValue.calcTotal(this.data.incomingDrain, { min: 0 });
     }
 
     /**
