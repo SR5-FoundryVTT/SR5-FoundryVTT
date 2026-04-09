@@ -549,9 +549,26 @@
         "BulletCount": "Bullet Count",
         "Bullets": "Rounds",
         "COMBAT": {
+            "CannotSeizeAgain": "You cannot seize initiative again until the start of your next turn.",
+            "ModeAstral": "Astral",
+            "ModeMatrix": "Matrix",
+            "ModeMeatspace": "Meatspace",
+            "ModeTitle": "Mode: {mode}",
+            "ModeUnknown": "Unknown",
+            "NextPass": "Next Pass",
+            "NextPhase": "Next Phase",
+            "NextTurn": "Next Turn",
+            "NoHistoryAvailable": "No combat history snapshot is available.",
+            "PreviousPass": "Previous Pass",
+            "PreviousPhase": "Previous Phase",
+            "PreviousTurn": "Previous Turn",
             "ReduceInitByFive": "Initiative -5",
             "ReduceInitByOne": "Initiative -1",
-            "ReduceInitByTen": "Initiative -10"
+            "ReduceInitByTen": "Initiative -10",
+            "SeizeInitiative": "Seize Initiative",
+            "SeizedInitiative": "Seized Initiative",
+            "ToggleActedStatusGMOnly": "Toggle Acted Status (GM Only)",
+            "TrackerTitle": "Turn {round} (Pass {pass})"
         },
         "CallInAction": {
             "ActorType": "Actor Type",

@@ -6,6 +6,8 @@ import { CombatRules } from "../rules/CombatRules";
 import { FLAGS, SR, SYSTEM_NAME } from "../constants";
 import SocketMessageData = Shadowrun.SocketMessageData;
 
+const MAX_HISTORY_SIZE = 50;
+
 /**
  * Foundry combat implementation for Shadowrun 5th Edition rules.
  *
@@ -55,7 +57,9 @@ export class SR5Combat extends Combat<"base"> {
     static async _handleSocketMessage(message: SocketMessageData) {
         const { id, fnName } = message.data ?? {};
         if (typeof id !== 'string' || typeof fnName !== 'string') return;
-        if (fnName !== 'nextTurn' && fnName !== 'previousTurn') return;
+
+        const allowedFunctions = new Set(['nextTurn', 'previousTurn', 'nextPass', 'previousPass', 'nextRound', 'previousRound', 'reselectFirstCombatantToAct']);
+        if (!allowedFunctions.has(fnName)) return;
 
         const combat = game.combats.get(id);
         const method = combat?.[fnName];
@@ -82,11 +86,10 @@ export class SR5Combat extends Combat<"base"> {
             const matchingCombatants = (canvas.tokens?.controlled ?? [])
                 .filter(token => activeTokens.includes(token))
                 .map(token => token.combatant)
-                .filter(c => c?.id != null && c.id === this.id);
+                .filter(c => c?.combat?.id === this.id);
 
-            if (matchingCombatants.length === 1) {
-                return matchingCombatants[0] as SR5Combatant;
-            }
+            if (matchingCombatants.length === 1)
+                return matchingCombatants[0];
 
             ui.notifications.warn(
                 `SR5 | Actor '${actor.name}' has multiple combatants in Combat '${this.id}'. Please select one token.`
@@ -117,8 +120,55 @@ export class SR5Combat extends Combat<"base"> {
             return this;
         }
 
-        await this.combatant?.update({ system: { acted: false } });
-        return super.previousTurn();
+        const history = [...(this.system.history ?? [])];
+        const snapshot = history.pop();
+        if (!snapshot) {
+            ui.notifications?.warn(game.i18n.localize('SR5.COMBAT.NoHistoryAvailable'));
+            return this;
+        }
+
+        return this._restoreSnapshot(snapshot, history);
+    }
+    
+    async previousPass(): Promise<this> {
+        if (!game.user?.isGM) {
+            SocketMessage.emitForGM(FLAGS.DoCombatFunction, { id: this.id, fnName: 'previousPass' });
+            return this;
+        }
+
+        const history = [...(this.system.history ?? [])];
+        let snapshot = history.pop();
+        while (snapshot?.round === this.round && snapshot.initiativePass === this.initiativePass) {
+            snapshot = history.pop();
+        }
+
+        if (!snapshot) {
+            ui.notifications?.warn(game.i18n.localize('SR5.COMBAT.NoHistoryAvailable'));
+            return this;
+        }
+
+        return this._restoreSnapshot(snapshot, history);
+    }
+
+    override async previousRound(): Promise<this> {
+        if (!game.user?.isGM) {
+            SocketMessage.emitForGM(FLAGS.DoCombatFunction, { id: this.id, fnName: 'previousRound' });
+            return this;
+        }
+
+        const history = [...(this.system.history ?? [])];
+        let snapshot = history.pop();
+
+        while (snapshot?.round === this.round) {
+            snapshot = history.pop();
+        }
+
+        if (!snapshot) {
+            ui.notifications?.warn(game.i18n.localize('SR5.COMBAT.NoHistoryAvailable'));
+            return this;
+        }
+
+        return this._restoreSnapshot(snapshot, history);
     }
 
     /**
@@ -139,9 +189,9 @@ export class SR5Combat extends Combat<"base"> {
 
         // Step to next combatant in current pass
         if (nextTurn !== -1) {
-            const advanceTime = this.getTimeDelta(this.round, this.turn, this.round, nextTurn);
+            const history = this._nextHistory();
             const combatants = this.combatant ? [{ _id: this.combatant.id!, system: { acted: true } }] : [];
-            await this.update({ turn: nextTurn, combatants }, { direction: 1, worldTime: { delta: advanceTime } });
+            await this.update({ turn: nextTurn, combatants, system: { history } });
             return this;
         }
 
@@ -159,18 +209,17 @@ export class SR5Combat extends Combat<"base"> {
         // Determine if any combatant has enough initiative for another pass
         const nextTurn = this.turns.findIndex((c) => {
             if (this.settings.skipDefeated && c.isDefeated) return false;
-            return c.initiative != null && CombatRules.initAfterPass(c.initiative) > 0;
+            return c.initiative !== null && c.initiative !== undefined && CombatRules.initAfterPass(c.initiative) > 0;
         });
 
         // Start a new initiative pass
         if (nextTurn !== -1) {
             const initiativePass = this.initiativePass + 1;
+            const history = this._nextHistory();
             const combatants = this.combatants.map((c) => c.initPassUpdateData());
-            const advanceTime = this.getTimeDelta(this.round, this.turn, this.round, nextTurn);
-            await this.update(
-                { turn: nextTurn, combatants, system: { initiativePass } },
-                { diff: false, direction: 1, worldTime: { delta: advanceTime } }
-            );
+            await this.update({ turn: nextTurn, combatants, system: { initiativePass, history } });
+            // @ts-expect-error
+            Hooks.callAll("CombatTurn", this, { combat: this, combatant: this.combatant, initiativePass, round: this.round } as any, {} as any);
 
             // Trigger start-of-turn logic for the new combatant
             if (this.combatant) {
@@ -181,6 +230,19 @@ export class SR5Combat extends Combat<"base"> {
 
         // End of initiative pass
         return this.nextRound();
+    }
+
+    override async nextRound() {
+        if (!game.user?.isGM) {
+            SocketMessage.emitForGM(FLAGS.DoCombatFunction, { id: this.id, fnName: 'nextRound' });
+            return this;
+        }
+
+        return super.nextRound();
+    }
+
+    async createHistorySnapshot() {
+        return this.update({ system: { history: this._nextHistory() } });
     }
 
     /**
@@ -199,11 +261,13 @@ export class SR5Combat extends Combat<"base"> {
      */
     protected override async _onStartRound(context: Combat.RoundEventContext) {
         await this.update({ system: { initiativePass: SR.combat.INITIAL_INI_PASS } });
-        await this.resetAll();
-        await this.rollForActors({ updateTurn: false });
 
-        const firstTurn = this.settings.skipDefeated ? this.turns.findIndex(c => !c.isDefeated) : 0;
-        await this.update({ turn: firstTurn >= 0 ? firstTurn : null, combatants: this.combatants.map((c) => c.roundUpdateData()) });
+        if (this.combatants.size) {
+            await this.resetAll();
+            await this.rollForActors({ updateTurn: false });
+            const firstTurn = this.settings.skipDefeated ? this.turns.findIndex(c => !c.isDefeated) : 0;
+            await this.update({ turn: firstTurn >= 0 ? firstTurn : null, combatants: this.combatants.map((c) => c.roundUpdateData()) });
+        }
 
         return super._onStartRound(context);
     }
@@ -217,11 +281,14 @@ export class SR5Combat extends Combat<"base"> {
         return super._onStartTurn(combatant, context);
     }
 
+    protected override async _onEndTurn(combatant: Combatant.Implementation, context: Combat.TurnEventContext) {
+        return super._onEndTurn(combatant, context);
+    }
+
     /**
      * Compares two combatants to determine their sort order in the initiative tracker.
      */
     protected override _sortCombatants(a: Combatant.Implementation, b: Combatant.Implementation): number {
-
         // First check for seize the initiative status
         if (a.system.seize !== b.system.seize)
             return (b.system.seize ? 1 : 0) - (a.system.seize ? 1 : 0);
@@ -253,11 +320,11 @@ export class SR5Combat extends Combat<"base"> {
         for (const id of Array.isArray(ids) ? ids : [ids]) {
             const actor = this.combatants.get(id)?.actor;
             if (actor?.system.initiative.blitz) {
-                const edgeValue = actor.system.attributes.edge.uses;
+                const edge = actor.system.attributes.edge;
                 await actor.update({
                     system: {
                         initiative: { blitz: false },
-                        attributes: { edge: { uses: edgeValue + 1 } }
+                        attributes: { edge: { uses: Math.min(edge.uses + 1, edge.value) } }
                     }
                 });
             }
@@ -270,7 +337,7 @@ export class SR5Combat extends Combat<"base"> {
      * Shadowrun does not clear movement history on turn start.
      */
     protected override async _clearMovementHistoryOnStartTurn(
-        ..._args: Parameters<Combat["_clearMovementHistoryOnStartTurn"]>
+        ...args: Parameters<Combat["_clearMovementHistoryOnStartTurn"]>
     ) {}
 
     /**
@@ -279,5 +346,38 @@ export class SR5Combat extends Combat<"base"> {
     private async rollForActors(options?: Combat.InitiativeOptions) {
         const rollForAll = !game.settings.get(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat);
         return rollForAll ? this.rollAll(options) : this.rollNPC(options);
+    }
+
+    private _nextHistory(): SR5Combat['system']['history'] {
+        const history = [...(this.system.history ?? [])];
+        history.push({
+            turn: this.turn,
+            initiativePass: this.initiativePass,
+            round: this.round,
+            combatants: this.combatants.map((combatant) => ({
+                _id: combatant.id,
+                defeated: combatant.defeated,
+                initiative: combatant.initiative ?? null,
+                system: structuredClone(combatant.system),
+            }))
+        });
+        return history.slice(-MAX_HISTORY_SIZE);
+    }
+
+    private async _restoreSnapshot(
+        snapshot: SR5Combat['system']['history'][number],
+        history: SR5Combat['system']['history']
+    ): Promise<this> {
+        await this.update(
+            {
+                turn: snapshot.turn,
+                round: snapshot.round,
+                combatants: snapshot.combatants,
+                system: { initiativePass: snapshot.initiativePass, history }
+            },
+            { diff: false, direction: -1 }
+        );
+
+        return this;
     }
 }

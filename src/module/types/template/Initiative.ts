@@ -2,7 +2,7 @@ import { ModifiableField } from "../fields/ModifiableField";
 import { ModifiableValue } from "./Base";
 const { SchemaField, BooleanField, StringField } = foundry.data.fields;
 
-export const InitiativeType = () => ({
+const InitiativeSchema = () => ({
     base: new ModifiableField(ModifiableValue()),
     dice: new ModifiableField({
         ...ModifiableValue(),
@@ -13,7 +13,7 @@ export const InitiativeType = () => ({
 export const Initiative = <
     T extends Shadowrun.SpaceTypes[] = ['meatspace', 'astral', 'matrix']
 >(...types: T) => {
-    const initiativeField = () => new SchemaField(InitiativeType());
+    const initiativeField = () => new SchemaField(InitiativeSchema());
 
     const fields = {
         current: initiativeField(),
@@ -26,3 +26,5 @@ export const Initiative = <
         ...Object.fromEntries(types.map(type => [type, initiativeField()]))
     } as unknown as typeof fields & Record<T[number], ReturnType<typeof initiativeField>>;
 };
+
+export type InitiativeType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof InitiativeSchema>>;

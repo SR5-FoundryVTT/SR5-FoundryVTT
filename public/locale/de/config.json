@@ -548,9 +548,26 @@
         "BulletCount": "Kugeln",
         "Bullets": "Kugeln",
         "COMBAT": {
+            "CannotSeizeAgain": "Du kannst die Initiative erst zu Beginn deines naechsten Zuges erneut ergreifen.",
+            "ModeAstral": "Astral",
+            "ModeMatrix": "Matrix",
+            "ModeMeatspace": "Fleischraum",
+            "ModeTitle": "Modus: {mode}",
+            "ModeUnknown": "Unbekannt",
+            "NextPass": "Naechster Durchgang",
+            "NextPhase": "Naechste Phase",
+            "NextTurn": "Naechster Zug",
+            "NoHistoryAvailable": "Kein Kampfverlauf-Snapshot verfuegbar.",
+            "PreviousPass": "Vorheriger Durchgang",
+            "PreviousPhase": "Vorherige Phase",
+            "PreviousTurn": "Vorheriger Zug",
             "ReduceInitByFive": "Initiative -5",
             "ReduceInitByOne": "Initiative -1",
-            "ReduceInitByTen": "Initiative -10"
+            "ReduceInitByTen": "Initiative -10",
+            "SeizeInitiative": "Initiative ergreifen",
+            "SeizedInitiative": "Initiative ergriffen",
+            "ToggleActedStatusGMOnly": "Gehandelt-Status umschalten (nur SL)",
+            "TrackerTitle": "Zug {round} (Durchgang {pass})"
         },
         "CallInAction": {
             "ActorType": "Akteur-Typ",

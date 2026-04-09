@@ -28,6 +28,7 @@ import { PackActionFlow } from '@/module/item/flows/PackActionFlow';
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import ActorSheetV2 = foundry.applications.sheets.ActorSheetV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
+import { InitiativeType } from '@/module/types/template/Initiative';
 
 const { TextEditor } = foundry.applications.ux;
 const { fromUuid, fromUuidSync } = foundry.utils;
@@ -708,6 +709,11 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      */
     async _onInitiativePerceptionChange(event: Event) {
         const newValue = (event.currentTarget as HTMLSelectElement)?.value;
+        const previousPerception = this.actor.system.initiative.perception;
+        const previousInitiative = this.actor.system.initiative[previousPerception] as InitiativeType | undefined;
+        const previousBase = previousInitiative?.base.value ?? 0;
+        let nextPerception: typeof previousPerception | null = null;
+
         if (newValue === 'meatspace' || newValue === 'astral') {
             // meatspace and magic can be directly applied as the perception type
             // disable VR as well
@@ -717,6 +723,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                     matrix: { vr: false, hot_sim: false }
                 }
             });
+            nextPerception = newValue;
         } else if (newValue === 'hot_sim' || newValue === 'cold_sim') {
             // if we are hot sim or cold sim, we are in VR and using matrix init perception
             await this.actor.update({
@@ -725,7 +732,17 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                     matrix: { vr: true, hot_sim: newValue === 'hot_sim' }
                 }
             });
+            nextPerception = 'matrix';
         }
+
+        if (!nextPerception || !this.actor.combatActive) return;
+
+        const nextInitiative = this.actor.system.initiative[nextPerception] as InitiativeType | undefined;
+        const nextBase = nextInitiative?.base.value ?? 0;
+        const adjustment = nextBase - previousBase;
+
+        if (adjustment !== 0)
+            await this.actor.changeCombatInitiative(adjustment);
     }
 
     /**

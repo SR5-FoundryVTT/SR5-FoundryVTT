@@ -89,8 +89,7 @@
     right: 0;
 }
 
-.combat-controls .combat-extra-menu-previous button,
-.combat-controls .combat-extra-menu-next button {
+.combat-controls .combat-extra-menu button {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -99,7 +98,6 @@
     text-align: left;
 }
 
-.combat-controls .combat-extra-menu-previous.hidden,
-.combat-controls .combat-extra-menu-next.hidden {
+.combat-controls .combat-extra-menu.hidden {
     display: none;
 }

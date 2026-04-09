@@ -1,4 +1,5 @@
 import CombatTracker = foundry.applications.sidebar.tabs.CombatTracker;
+import { SR5Combatant } from '../combat/SR5Combatant';
 
 /**
  * Shadowrun 5e – Custom Combat Tracker Enhancements
@@ -19,7 +20,7 @@ export class SR5CombatTracker extends CombatTracker {
         const options = super._getEntryContextOptions();
 
         options.splice(1, 0, {
-            name: 'Seize Initiative',
+            name: game.i18n.localize('SR5.COMBAT.SeizeInitiative'),
             icon: '<i class="fa-solid fa-angles-up"></i>',
             condition: li => {
                 const combatant = this._getCombatantFromLi(li);
@@ -42,7 +43,6 @@ export class SR5CombatTracker extends CombatTracker {
         _context: CombatTracker.RenderContext,
         _options: CombatTracker.RenderOptions
     ): void {
-        console.log(app, html, _context, _options);
         const $html = $(html);
 
         if (app.viewed?.round) {
@@ -50,7 +50,7 @@ export class SR5CombatTracker extends CombatTracker {
 
             if ($title.length) {
                 const currentPass = app.viewed.system.initiativePass;
-                $title.text(`Turn ${app.viewed.round} (Pass ${currentPass})`);
+                $title.text(game.i18n.format('SR5.COMBAT.TrackerTitle', { round: app.viewed.round, pass: currentPass }));
             }
         }
 
@@ -64,7 +64,11 @@ export class SR5CombatTracker extends CombatTracker {
             this._addActedIndicator($li, combatant);
         });
 
-        $html.find('.combat-control[data-action="nextPhase"], .combat-control[data-action="previousPhase"]').on('contextmenu', (ev) => {
+        // Prevent duplicate bindings by tagging the container
+        if ($html.hasClass('sr5-bound')) return;
+        $html.addClass('sr5-bound');
+
+        $html.on('contextmenu', '.combat-control[data-action="nextPhase"], .combat-control[data-action="previousPhase"]', (ev) => {
             ev.preventDefault();
             ev.stopPropagation();
 
@@ -99,10 +103,6 @@ export class SR5CombatTracker extends CombatTracker {
                 $(document).off('mousedown.combatExtraMenu');
             }
         });
-        
-        // Prevent duplicate bindings by tagging the container
-        if ($html.hasClass("sr5-bound")) return;
-        $html.addClass("sr5-bound");
 
         // Prevent clicks inside the menu from closing it
         $html.on('click', '.combat-extra-menu', ev => ev.stopPropagation());
@@ -129,13 +129,13 @@ export class SR5CombatTracker extends CombatTracker {
             $(document).off('mousedown.combatExtraMenu');
 
             const action = $(ev.currentTarget).data('action') as string;
-            $html.find('.combat-time').addClass('hidden');
+            $html.find('.combat-extra-menu').addClass('hidden');
 
             try {
                 if (action === 'nextPass') void game.combat?.nextPass();
+                else if (action === 'previousPass') void game.combat?.previousPass();
                 else if (action === 'nextTurn') void game.combat?.nextRound();
                 else if (action === 'previousTurn') void game.combat?.previousRound();
-                // else if (action === 'previousPass') void game.combat?.previousPass();
             } catch (err) {
                 console.error('Combat extra action failed', action, err);
             }
@@ -153,13 +153,17 @@ export class SR5CombatTracker extends CombatTracker {
             if (!combatant) return;
 
             const hasActed = combatant.system.acted;
-            void combatant.update({ system: { acted: !hasActed } });
+            void (async () => {
+                const combat = app.viewed;
+                if (combat) await combat.createHistorySnapshot();
+                await combatant.update({ system: { acted: !hasActed } });
+            })();
         });
     }
 
     // ---- Private Helpers ----
 
-    private _onSeizeInitiative(li: HTMLElement): void {
+    private async _onSeizeInitiative(li: HTMLElement): Promise<void> {
         const combatant = this._getCombatantFromLi(li);
         if (!combatant?.actor) return;
 
@@ -167,27 +171,36 @@ export class SR5CombatTracker extends CombatTracker {
         const seized = combatant.system.seize ?? false;
 
         if (seized && !game.user.isGM) {
-            ui.notifications.warn("You cannot seize initiative again until the start of your next turn.");
+            ui.notifications.warn(game.i18n.localize('SR5.COMBAT.CannotSeizeAgain'));
             return;
         }
 
-        void combatant.update({ system: { seize: !seized } });
-        void combatant.actor.update({
+        const combat = this.viewed;
+        if (combat) await combat.createHistorySnapshot();
+
+        await combatant.update({ system: { seize: !seized } });
+
+        await combatant.actor.update({
             system: { attributes: { edge: { uses: edge.uses + (seized ? -1 : 1) } } }
         });
     }
 
-    private _getCombatantFromLi(li: HTMLElement): Combatant.Implementation {
+    private _getCombatantFromLi(li: HTMLElement) {
         const combatantId = $(li).data("combatant-id");
         return this.viewed!.combatants.get(combatantId)!;
     }
 
     // ---- UI Builders ----
-
-    private static _addInitiativeIcon($li: JQuery<HTMLElement>, combatant: Combatant.Implementation): void {
+    private static _addInitiativeIcon($li: JQuery<HTMLElement>, combatant: SR5Combatant): void {
         $li.find(".combatant-init-mode-icon").remove();
 
         const mode = combatant.actor?.system.initiative.perception ?? "undefined";
+        const modeLabel = {
+            meatspace: game.i18n.localize('SR5.COMBAT.ModeMeatspace'),
+            astral: game.i18n.localize('SR5.COMBAT.ModeAstral'),
+            matrix: game.i18n.localize('SR5.COMBAT.ModeMatrix'),
+            undefined: game.i18n.localize('SR5.COMBAT.ModeUnknown')
+        } as const;
         const modes = {
             meatspace: { cls: "mode-physical", icon: "fa-solid fa-person-running" },
             astral: { cls: "mode-astral", icon: "fa-solid fa-star" },
@@ -196,34 +209,35 @@ export class SR5CombatTracker extends CombatTracker {
         } as const;
 
         const { cls, icon } = modes[mode];
+        const localizedMode = modeLabel[mode];
 
         $li.find(".token-image").after(`
-            <div class="combatant-init-mode-icon ${cls}" title="Mode: ${mode}">
+            <div class="combatant-init-mode-icon ${cls}" title="${game.i18n.format('SR5.COMBAT.ModeTitle', { mode: localizedMode })}">
                 <i class="${icon}"></i>
             </div>
         `);
     }
 
-    private static _addSeizeIcon($li: JQuery<HTMLElement>, combatant: Combatant.Implementation): void {
+    private static _addSeizeIcon($li: JQuery<HTMLElement>, combatant: SR5Combatant): void {
         $li.find(".combatant-seize-icon").remove();
 
         if (combatant.system.seize) {
             $li.find(".token-initiative").prepend(`
-                <div class="combatant-seize-icon" title="Seized Initiative">
+                <div class="combatant-seize-icon" title="${game.i18n.localize('SR5.COMBAT.SeizedInitiative')}">
                     <i class="fa-solid fa-angles-up"></i>
                 </div>
             `);
         }
     }
 
-    private static _addActedIndicator($li: JQuery<HTMLElement>, combatant: Combatant.Implementation): void {
+    private static _addActedIndicator($li: JQuery<HTMLElement>, combatant: SR5Combatant): void {
         const hasActed = combatant.system.acted && combatant.combat?.combatant?.id !== combatant.id;
         $li.toggleClass("acted", hasActed);
 
         $li.find(".token-initiative").prepend(`
             <div class="combatant-acted-icon ${hasActed ? "active" : ""}"
                  data-action="toggleActed"
-                 title="Toggle Acted Status (GM Only)">
+                 title="${game.i18n.localize('SR5.COMBAT.ToggleActedStatusGMOnly')}">
                 <i class="fa-solid fa-circle-check"></i>
             </div>
         `);

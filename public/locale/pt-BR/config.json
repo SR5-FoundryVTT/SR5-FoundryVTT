@@ -194,9 +194,26 @@
         "BulletCount": "Num. Disparos",
         "Bullets": "Projéteis",
         "COMBAT": {
+            "CannotSeizeAgain": "Voce nao pode tomar a iniciativa novamente ate o inicio do seu proximo turno.",
+            "ModeAstral": "Astral",
+            "ModeMatrix": "Matrix",
+            "ModeMeatspace": "Mundo fisico",
+            "ModeTitle": "Modo: {mode}",
+            "ModeUnknown": "Desconhecido",
+            "NextPass": "Proxima Passagem",
+            "NextPhase": "Proxima Fase",
+            "NextTurn": "Proximo Turno",
+            "NoHistoryAvailable": "Nenhum snapshot de historico de combate esta disponivel.",
+            "PreviousPass": "Passagem Anterior",
+            "PreviousPhase": "Fase Anterior",
+            "PreviousTurn": "Turno Anterior",
             "ReduceInitByFive": "Iniciativa -5",
             "ReduceInitByOne": "Iniciativa -1",
-            "ReduceInitByTen": "Iniciativa -10"
+            "ReduceInitByTen": "Iniciativa -10",
+            "SeizeInitiative": "Tomar a Iniciativa",
+            "SeizedInitiative": "Iniciativa Tomada",
+            "ToggleActedStatusGMOnly": "Alternar status de Ja Agiu (Somente GM)",
+            "TrackerTitle": "Turno {round} (Passagem {pass})"
         },
         "CallInAction": {
             "ActorType": "Tipo de Ator",

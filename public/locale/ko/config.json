@@ -547,9 +547,26 @@
         "BulletCount": "잔탄 수",
         "Bullets": "발",
         "COMBAT": {
+            "CannotSeizeAgain": "다음 턴 시작 전까지 다시 선제권을 잡을 수 없습니다.",
+            "ModeAstral": "아스트랄",
+            "ModeMatrix": "매트릭스",
+            "ModeMeatspace": "현실",
+            "ModeTitle": "모드: {mode}",
+            "ModeUnknown": "알 수 없음",
+            "NextPass": "다음 패스",
+            "NextPhase": "다음 페이즈",
+            "NextTurn": "다음 턴",
+            "NoHistoryAvailable": "사용 가능한 전투 히스토리 스냅샷이 없습니다.",
+            "PreviousPass": "이전 패스",
+            "PreviousPhase": "이전 페이즈",
+            "PreviousTurn": "이전 턴",
             "ReduceInitByFive": "우선권 -5",
             "ReduceInitByOne": "우선권 -1",
-            "ReduceInitByTen": "우선권 -10"
+            "ReduceInitByTen": "우선권 -10",
+            "SeizeInitiative": "선제권 잡기",
+            "SeizedInitiative": "선제권 확보",
+            "ToggleActedStatusGMOnly": "행동 완료 상태 전환 (GM 전용)",
+            "TrackerTitle": "턴 {round} (패스 {pass})"
         },
         "CallInAction": {
             "ActorType": "액터 유형",
