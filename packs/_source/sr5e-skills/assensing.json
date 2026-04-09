@@ -1,7 +1,7 @@
 {
   "name": "Assensing",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/magical-assensing.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/magical-assensing.svg",
   "system": {
     "description": {
       "value": "",

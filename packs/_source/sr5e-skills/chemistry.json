@@ -1,7 +1,7 @@
 {
   "name": "Chemistry",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/technical-chemistry.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/technical-chemistry.svg",
   "system": {
     "description": {
       "value": "",

@@ -1,7 +1,7 @@
 {
   "name": "Swimming",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/physical-swimming.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/physical-swimming.svg",
   "system": {
     "description": {
       "value": "",

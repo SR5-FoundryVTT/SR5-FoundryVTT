@@ -1,7 +1,7 @@
 {
   "name": "Pilot Aerospace",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/vehicle-pilot_aerospace.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/vehicle-pilot_aerospace.svg",
   "system": {
     "description": {
       "value": "",

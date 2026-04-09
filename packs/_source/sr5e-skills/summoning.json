@@ -1,7 +1,7 @@
 {
   "name": "Summoning",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/magical-summoning.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/magical-summoning.svg",
   "system": {
     "description": {
       "value": "",

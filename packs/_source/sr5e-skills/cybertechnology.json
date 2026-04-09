@@ -1,7 +1,7 @@
 {
   "name": "Cybertechnology",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/technical-cybertechnology.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/technical-cybertechnology.svg",
   "system": {
     "description": {
       "value": "",

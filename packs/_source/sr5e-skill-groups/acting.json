@@ -1,7 +1,7 @@
 {
   "name": "Acting",
   "type": "skill",
-  "img": "icons/svg/item-bag.svg",
+  "img": "systems/shadowrun5e/dist/icons/groups/acting.svg",
   "system": {
     "description": {
       "value": "",

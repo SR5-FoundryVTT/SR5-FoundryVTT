@@ -1,7 +1,7 @@
 {
   "name": "Sorcery",
   "type": "skill",
-  "img": "icons/svg/item-bag.svg",
+  "img": "systems/shadowrun5e/dist/icons/groups/sorcery.svg",
   "system": {
     "description": {
       "value": "",

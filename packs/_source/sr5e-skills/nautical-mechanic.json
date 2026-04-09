@@ -1,7 +1,7 @@
 {
   "name": "Nautical Mechanic",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/technical-nautical_mechanic.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/technical-nautical_mechanic.svg",
   "system": {
     "description": {
       "value": "",

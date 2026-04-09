@@ -1,7 +1,7 @@
 {
   "name": "Gymnastics",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/physical-gymnastics.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/physical-gymnastics.svg",
   "system": {
     "description": {
       "value": "",

@@ -1,7 +1,7 @@
 {
   "name": "Tracking",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/physical-tracking.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/physical-tracking.svg",
   "system": {
     "description": {
       "value": "",

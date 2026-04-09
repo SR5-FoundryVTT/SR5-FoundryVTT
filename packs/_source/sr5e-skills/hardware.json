@@ -1,7 +1,7 @@
 {
   "name": "Hardware",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/technical-hardware.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/technical-hardware.svg",
   "system": {
     "description": {
       "value": "",

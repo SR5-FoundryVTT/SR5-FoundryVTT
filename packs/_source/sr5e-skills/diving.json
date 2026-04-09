@@ -1,7 +1,7 @@
 {
   "name": "Diving",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/physical-diving.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/physical-diving.svg",
   "system": {
     "description": {
       "value": "",

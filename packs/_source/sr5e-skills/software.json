@@ -1,7 +1,7 @@
 {
   "name": "Software",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/technical-software.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/technical-software.svg",
   "system": {
     "description": {
       "value": "",

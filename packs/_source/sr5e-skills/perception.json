@@ -1,7 +1,7 @@
 {
   "name": "Perception",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/physical-perception.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/physical-perception.svg",
   "system": {
     "description": {
       "value": "",

@@ -1,7 +1,7 @@
 {
   "name": "Demolitions",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/technical-demolitions.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/technical-demolitions.svg",
   "system": {
     "description": {
       "value": "",

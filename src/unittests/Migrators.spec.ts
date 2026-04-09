@@ -47,7 +47,7 @@ export const Migrators = (context: QuenchBatchContext) => {
                         group: 'Firearms',
                         specs: ['Revolvers'],
                         description: 'Legacy pistols description',
-                        img: 'systems/shadowrun5e/public/icons/skills/combat-pistols.svg',
+                        img: 'systems/shadowrun5e/dist/icons/skills/combat-pistols.svg',
                         link: 'SR5 Core 130',
                     }),
                     jd93k2_custom_skill: DataDefaults.createData('skill_field', {
@@ -109,7 +109,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(foundry.utils.getProperty(pistols, 'system.skill.group'), '');
             assert.deepEqual(foundry.utils.getProperty(pistols, 'system.skill.specializations'), [{ name: 'Revolvers' }]);
             assert.strictEqual(foundry.utils.getProperty(pistols, 'system.description.source'), 'SR5 Core 130');
-            assert.strictEqual(pistols?.img, 'systems/shadowrun5e/public/icons/skills/combat-pistols.svg');
+            assert.strictEqual(pistols?.img, 'systems/shadowrun5e/dist/icons/skills/combat-pistols.svg');
             assert.strictEqual(pistols?.name, 'Pistols');
 
             const customSkill = source.items.find(item => item.type === 'skill' && item.name === 'Freestyle Gunnery') as Item.CreateData | undefined;

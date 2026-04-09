@@ -1,7 +1,7 @@
 {
   "name": "Compiling",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/resonance-compiling.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/resonance-compiling.svg",
   "system": {
     "description": {
       "value": "",

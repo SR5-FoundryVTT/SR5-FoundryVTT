@@ -1,7 +1,7 @@
 {
   "name": "Leadership",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/social-leadership.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/social-leadership.svg",
   "system": {
     "description": {
       "value": "",

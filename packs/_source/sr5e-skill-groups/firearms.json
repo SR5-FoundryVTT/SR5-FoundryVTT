@@ -1,7 +1,7 @@
 {
   "name": "Firearms",
   "type": "skill",
-  "img": "icons/svg/item-bag.svg",
+  "img": "systems/shadowrun5e/dist/icons/groups/firearms.svg",
   "system": {
     "description": {
       "value": "",

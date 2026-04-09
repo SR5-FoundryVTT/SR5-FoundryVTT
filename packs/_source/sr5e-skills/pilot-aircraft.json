@@ -1,7 +1,7 @@
 {
   "name": "Pilot Aircraft",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/vehicle-pilot_aircraft.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/vehicle-pilot_aircraft.svg",
   "system": {
     "description": {
       "value": "",

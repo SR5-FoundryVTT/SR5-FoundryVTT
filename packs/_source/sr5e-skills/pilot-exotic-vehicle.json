@@ -1,7 +1,7 @@
 {
   "name": "Pilot Exotic Vehicle",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/vehicle-pilot_exotic_vehicle.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/vehicle-pilot_exotic_vehicle.svg",
   "system": {
     "description": {
       "value": "",

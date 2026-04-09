@@ -1,7 +1,7 @@
 {
   "name": "Disguise",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/physical-disguise.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/physical-disguise.svg",
   "system": {
     "description": {
       "value": "",

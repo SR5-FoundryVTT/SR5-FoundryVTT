@@ -1,7 +1,7 @@
 {
   "name": "Navigation",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/technical-navigation.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/technical-navigation.svg",
   "system": {
     "description": {
       "value": "",

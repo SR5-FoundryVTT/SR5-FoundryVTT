@@ -1,7 +1,7 @@
 {
   "name": "Pistols",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/combat-pistols.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/combat-pistols.svg",
   "system": {
     "description": {
       "value": "",

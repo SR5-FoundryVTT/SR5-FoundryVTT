@@ -1,7 +1,7 @@
 {
   "name": "Heavy Weapons",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/combat-heavy_weapons.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/combat-heavy_weapons.svg",
   "system": {
     "description": {
       "value": "",

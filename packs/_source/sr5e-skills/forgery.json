@@ -1,7 +1,7 @@
 {
   "name": "Forgery",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/technical-forgery.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/technical-forgery.svg",
   "system": {
     "description": {
       "value": "",

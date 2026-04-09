@@ -1,7 +1,7 @@
 {
   "name": "Gunnery",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/vehicle-gunnery.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/vehicle-gunnery.svg",
   "system": {
     "description": {
       "value": "",

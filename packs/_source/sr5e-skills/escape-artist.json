@@ -1,7 +1,7 @@
 {
   "name": "Escape Artist",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/physical-escape_artist.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/physical-escape_artist.svg",
   "system": {
     "description": {
       "value": "",

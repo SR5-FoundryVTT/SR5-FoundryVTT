@@ -1,7 +1,7 @@
 {
   "name": "Automatics",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/combat-automatics.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/combat-automatics.svg",
   "system": {
     "description": {
       "value": "",

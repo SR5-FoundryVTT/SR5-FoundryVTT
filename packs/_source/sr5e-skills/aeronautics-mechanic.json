@@ -1,7 +1,7 @@
 {
   "name": "Aeronautics Mechanic",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/technical-aeronautics_mechanic.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/technical-aeronautics_mechanic.svg",
   "system": {
     "description": {
       "value": "",

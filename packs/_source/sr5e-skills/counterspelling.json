@@ -1,7 +1,7 @@
 {
   "name": "Counterspelling",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/magical-counterspelling.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/magical-counterspelling.svg",
   "system": {
     "description": {
       "value": "",

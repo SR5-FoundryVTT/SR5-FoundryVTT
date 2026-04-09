@@ -1,7 +1,7 @@
 {
   "name": "Stealth",
   "type": "skill",
-  "img": "icons/svg/item-bag.svg",
+  "img": "systems/shadowrun5e/dist/icons/groups/stealth.svg",
   "system": {
     "description": {
       "value": "",

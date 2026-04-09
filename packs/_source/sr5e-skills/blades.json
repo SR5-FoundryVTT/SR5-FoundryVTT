@@ -1,7 +1,7 @@
 {
   "name": "Blades",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/combat-blades.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/combat-blades.svg",
   "system": {
     "description": {
       "value": "",

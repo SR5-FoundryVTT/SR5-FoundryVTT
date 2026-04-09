@@ -1,7 +1,7 @@
 {
   "name": "Industrial Mechanic",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/technical-industrial_mechanic.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/technical-industrial_mechanic.svg",
   "system": {
     "description": {
       "value": "",

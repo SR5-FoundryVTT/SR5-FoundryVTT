@@ -1,7 +1,7 @@
 {
   "name": "Alchemy",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/magical-alchemy.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/magical-alchemy.svg",
   "system": {
     "description": {
       "value": "",

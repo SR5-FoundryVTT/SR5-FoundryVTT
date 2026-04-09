@@ -1,7 +1,7 @@
 {
   "name": "Armorer",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/technical-armorer.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/technical-armorer.svg",
   "system": {
     "description": {
       "value": "",

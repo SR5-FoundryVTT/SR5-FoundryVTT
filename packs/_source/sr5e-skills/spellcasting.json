@@ -1,7 +1,7 @@
 {
   "name": "Spellcasting",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/magical-spellcasting.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/magical-spellcasting.svg",
   "system": {
     "description": {
       "value": "",

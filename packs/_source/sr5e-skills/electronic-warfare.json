@@ -1,7 +1,7 @@
 {
   "name": "Electronic Warfare",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/technical-electronic_warfare.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/technical-electronic_warfare.svg",
   "system": {
     "description": {
       "value": "",

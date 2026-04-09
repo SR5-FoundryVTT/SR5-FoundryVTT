@@ -1,7 +1,7 @@
 {
   "name": "Free Fall",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/physical-freefall.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/physical-freefall.svg",
   "system": {
     "description": {
       "value": "",

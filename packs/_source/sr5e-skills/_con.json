@@ -1,7 +1,7 @@
 {
   "name": "Con",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/social-con.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/social-con.svg",
   "system": {
     "description": {
       "value": "",

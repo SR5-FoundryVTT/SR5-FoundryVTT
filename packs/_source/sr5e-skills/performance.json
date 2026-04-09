@@ -1,7 +1,7 @@
 {
   "name": "Performance",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/social-performance.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/social-performance.svg",
   "system": {
     "description": {
       "value": "",

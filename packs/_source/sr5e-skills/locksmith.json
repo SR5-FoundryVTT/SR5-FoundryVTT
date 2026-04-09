@@ -1,7 +1,7 @@
 {
   "name": "Locksmith",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/technical-locksmith.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/technical-locksmith.svg",
   "system": {
     "description": {
       "value": "",

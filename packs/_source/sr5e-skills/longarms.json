@@ -1,7 +1,7 @@
 {
   "name": "Longarms",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/combat-longarms.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/combat-longarms.svg",
   "system": {
     "description": {
       "value": "",

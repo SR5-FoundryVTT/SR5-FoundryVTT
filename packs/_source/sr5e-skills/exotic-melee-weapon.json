@@ -1,7 +1,7 @@
 {
   "name": "Exotic Melee Weapon",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/combat-exotic_melee.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/combat-exotic_melee.svg",
   "system": {
     "description": {
       "value": "",

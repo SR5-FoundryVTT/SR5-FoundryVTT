@@ -1,7 +1,7 @@
 {
   "name": "Ritual Spellcasting",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/magical-ritual_spellcasting.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/magical-ritual_spellcasting.svg",
   "system": {
     "description": {
       "value": "",

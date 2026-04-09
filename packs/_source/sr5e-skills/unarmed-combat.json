@@ -1,7 +1,7 @@
 {
   "name": "Unarmed Combat",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/combat-unarmed_combat.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/combat-unarmed_combat.svg",
   "system": {
     "description": {
       "value": "",

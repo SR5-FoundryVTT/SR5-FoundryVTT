@@ -1,7 +1,7 @@
 {
   "name": "Impersonation",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/social-impersonation.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/social-impersonation.svg",
   "system": {
     "description": {
       "value": "",

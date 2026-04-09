@@ -1,7 +1,7 @@
 {
   "name": "Electronics",
   "type": "skill",
-  "img": "icons/svg/item-bag.svg",
+  "img": "systems/shadowrun5e/dist/icons/groups/electronics.svg",
   "system": {
     "description": {
       "value": "",

@@ -1,7 +1,7 @@
 {
   "name": "Etiquette",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/social-etiquette.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/social-etiquette.svg",
   "system": {
     "description": {
       "value": "",

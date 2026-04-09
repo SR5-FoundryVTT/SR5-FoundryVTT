@@ -1,7 +1,7 @@
 {
   "name": "Flight",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/special-flight.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/special-flight.svg",
   "system": {
     "description": {
       "value": "",

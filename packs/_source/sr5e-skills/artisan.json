@@ -1,7 +1,7 @@
 {
   "name": "Artisan",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/technical-artisan.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/technical-artisan.svg",
   "system": {
     "description": {
       "value": "",

@@ -1,7 +1,7 @@
 {
   "name": "Negotiation",
   "type": "skill",
-  "img": "systems/shadowrun5e/public/icons/skills/social-negotiation.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/social-negotiation.svg",
   "system": {
     "description": {
       "value": "",
