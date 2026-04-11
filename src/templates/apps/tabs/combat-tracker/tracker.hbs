@@ -1,0 +1,87 @@
+<ol class="combat-tracker plain">
+    {{#each turns}}
+    <li class="combatant {{ css }} {{#if acted}}acted{{/if}} {{#if pad}}hidden{{/if}}" data-combatant-id="{{ id }}" data-action="activateCombatant">
+        {{!-- TODO: Targets --}}
+
+        {{!-- Image --}}
+        <img class="token-image" src="{{ img }}" alt="{{ name }}" loading="lazy">
+
+        {{!-- Initiative Mode Icon --}}
+        <div class="combatant-init-mode-icon {{ modeClass }}" title="{{ modeTitle }}">
+            <i class="{{ modeIcon }}"></i>
+        </div>
+
+        {{!-- Name & Controls --}}
+        <div class="token-name">
+            <strong class="name">{{ name }}</strong>
+            <div class="combatant-controls">
+                {{#if @root.user.isGM}}
+                <button type="button" class="inline-control combatant-control icon fa-solid fa-eye-slash {{#if hidden}}active{{/if}}"
+                        data-action="toggleHidden" data-tooltip aria-label="{{ localize "COMBAT.ToggleVis" }}"></button>
+                <button type="button" class="inline-control combatant-control icon fa-solid fa-skull {{#if isDefeated}}active{{/if}}"
+                        data-action="toggleDefeated" data-tooltip
+                        aria-label="{{ localize "COMBAT.ToggleDead" }}"></button>
+                {{/if}}
+                {{#if canPing}}
+                <button type="button" class="inline-control combatant-control icon fa-solid fa-bullseye-arrow"
+                        data-action="pingCombatant" data-tooltip
+                        aria-label="{{ localize "COMBAT.PingCombatant" }}"></button>
+                {{/if}}
+                {{#unless @root.user.isGM}}
+                <button type="button" class="inline-control combatant-control icon fa-solid fa-arrows-to-eye"
+                        data-action="panToCombatant" data-tooltip
+                        aria-label="{{ localize "COMBAT.PanToCombatant" }}"></button>
+                {{/unless}}
+                {{!-- TODO: Target Control --}}
+                <div class="token-effects" data-tooltip-html="{{ effects.tooltip }}">
+                    {{#each effects.icons}}
+                    <img class="token-effect" src="{{ img }}" alt="{{ name }}">
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+
+        {{!-- Resource --}}
+        {{#if resource includeZero=true}}
+        <div class="token-resource">
+            <span class="resource">{{ resource }}</span>
+        </div>
+        {{/if}}
+
+        {{!-- Initiative --}}
+        <div class="token-initiative">
+            {{#if seize}}
+            <div class="combatant-seize-icon" title="{{ localize 'SR5.COMBAT.SeizedInitiative' }}">
+                <i class="fa-solid fa-angles-up"></i>
+            </div>
+            {{/if}}
+
+            <div class="combatant-acted-icon {{#if acted}}active{{/if}}"
+                 data-action="toggleActed"
+                 title="{{ localize 'SR5.COMBAT.ToggleActedStatusGMOnly' }}">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+
+            {{#if initiative includeZero=true}}
+
+            {{!-- Decimal Initiative --}}
+            {{#if @root.hasDecimals}}
+            <span>{{ initiative }}</span>
+
+            {{!-- Simple Initiative --}}
+            {{else}}
+            <input type="text" class="initiative-input" inputmode="numeric" pattern="^[+=\-]?\d*" value="{{initiative}}"
+                   aria-label="{{localize "COMBAT.InitiativeScore"}}" {{#unless @root.user.isGM}}readonly{{/unless}}>
+
+            {{/if}}
+
+            {{!-- Roll Initiative --}}
+            {{else if isOwner}}
+            <button type="button" class="combatant-control roll" data-action="rollInitiative" data-tooltip
+                    aria-label="{{ localize "COMBAT.InitiativeRoll" }}"
+                    style="--initiative-icon: url('{{ @root.initiativeIcon.icon }}'); --initiative-icon-hover: url('{{ @root.initiativeIcon.hover }}');"></button>
+            {{/if}}
+        </div>
+    </li>
+    {{/each}}
+</ol>

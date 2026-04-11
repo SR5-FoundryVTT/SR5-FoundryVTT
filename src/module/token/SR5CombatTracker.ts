@@ -1,4 +1,5 @@
 import CombatTracker = foundry.applications.sidebar.tabs.CombatTracker;
+import { SR5Combat } from '../combat/SR5Combat';
 import { SR5Combatant } from '../combat/SR5Combatant';
 
 /**
@@ -13,10 +14,21 @@ export class SR5CombatTracker extends CombatTracker {
 
     static override PARTS = {
         ...super.PARTS,
+        header: { template: 'systems/shadowrun5e/dist/templates/apps/tabs/combat-tracker/header.hbs' },
+        tracker: {
+            template: 'systems/shadowrun5e/dist/templates/apps/tabs/combat-tracker/tracker.hbs',
+            scrollable: ['']
+        },
         footer: { template: "systems/shadowrun5e/dist/templates/apps/tabs/combat-tracker/footer.hbs" }
-    } as const;
+    };
 
-    protected override _getEntryContextOptions(): ContextMenu.Entry<HTMLElement>[] {
+    protected override _attachFrameListeners() {
+        super._attachFrameListeners();
+        this.element.addEventListener('click', this._onSR5TrackerClick.bind(this), { passive: false });
+        this.element.addEventListener('pointerdown', this._onSR5TrackerContextMenu.bind(this), { passive: false, capture: true });
+    }
+
+    protected override _getEntryContextOptions() {
         const options = super._getEntryContextOptions();
 
         options.splice(1, 0, {
@@ -24,144 +36,157 @@ export class SR5CombatTracker extends CombatTracker {
             icon: '<i class="fa-solid fa-angles-up"></i>',
             condition: li => {
                 const combatant = this._getCombatantFromLi(li);
+                if (!combatant) return false;
 
                 const edge = combatant.actor?.system.attributes.edge;
-                return combatant.isOwner && edge != null && combatant.initiative != null;
+                return combatant.isOwner && edge !== null && edge !== undefined && combatant.initiative !== null && combatant.initiative !== undefined;
             },
-            callback: li => this._onSeizeInitiative(li)
+            callback: li => {
+                void this._onSeizeInitiative(li);
+            }
         });
 
         return options;
     }
 
-    /**
-     * Renders SR5-specific visual indicators for each combatant.
-     */
-    static renderCombatTracker(
-        app: CombatTracker,
-        html: HTMLElement,
-        _context: CombatTracker.RenderContext,
-        _options: CombatTracker.RenderOptions
-    ): void {
-        const $html = $(html);
+    protected override async _prepareTurnContext(
+        combat: Combat.Stored,
+        combatant: Combatant.Stored,
+        index: number
+    ): Promise<CombatTracker.TurnContext> {
+        type SR5TurnContext = CombatTracker.TurnContext & {
+            pad?: boolean;
+            modeClass?: string;
+            modeIcon?: string;
+            modeTitle?: string;
+            seize?: boolean;
+            acted?: boolean;
+        };
 
-        if (app.viewed?.round) {
-            const $title = $html.find(".encounter-title");
+        const turn = await super._prepareTurnContext(combat, combatant, index) as SR5TurnContext;
 
-            if ($title.length) {
-                const currentPass = app.viewed.system.initiativePass;
-                $title.text(game.i18n.format('SR5.COMBAT.TrackerTitle', { round: app.viewed.round, pass: currentPass }));
-            }
-        }
+        const mode = combatant.actor?.system.initiative.perception ?? 'undefined';
+        const modeLabel = {
+            meatspace: game.i18n.localize('SR5.COMBAT.ModeMeatspace'),
+            astral: game.i18n.localize('SR5.COMBAT.ModeAstral'),
+            matrix: game.i18n.localize('SR5.COMBAT.ModeMatrix'),
+            undefined: game.i18n.localize('SR5.COMBAT.ModeUnknown')
+        } as const;
+        const modes = {
+            meatspace: { cls: 'mode-physical', icon: 'fa-solid fa-person-running' },
+            astral: { cls: 'mode-astral', icon: 'fa-solid fa-star' },
+            matrix: { cls: 'mode-matrix', icon: 'fa-solid fa-laptop-code' },
+            undefined: { cls: 'mode-unknown', icon: 'fa-solid fa-question' }
+        } as const;
 
-        $html.find(".combatant").each((_, li) => {
-            const $li = $(li);
-            const combatant = app.viewed?.combatants.get($li.data("combatant-id"));
-            if (!combatant) return;
+        const modeConfig = modes[mode];
+        const localizedMode = modeLabel[mode];
 
-            this._addInitiativeIcon($li, combatant);
-            this._addSeizeIcon($li, combatant);
-            this._addActedIndicator($li, combatant);
-        });
+        turn.pad = combatant.system.pad;
+        turn.modeClass = modeConfig.cls;
+        turn.modeIcon = modeConfig.icon;
+        turn.modeTitle = game.i18n.format('SR5.COMBAT.ModeTitle', { mode: localizedMode });
+        turn.seize = combatant.system.seize;
+        turn.acted = combatant.system.acted && combatant.combat?.combatant?.id !== combatant.id;
 
-        // Prevent duplicate bindings by tagging the container
-        if ($html.hasClass('sr5-bound')) return;
-        $html.addClass('sr5-bound');
+        if (turn.initiative)
+            turn.initiative = Math.max(turn.initiative, 0);
 
-        $html.on('contextmenu', '.combat-control[data-action="nextPhase"], .combat-control[data-action="previousPhase"]', (ev) => {
-            ev.preventDefault();
-            ev.stopPropagation();
-
-            game.tooltip.deactivate();
-
-            const currentAction = $(ev.currentTarget).data('action') as string;
-            const isNext = currentAction.includes('next');
-
-            // Use attribute selectors to directly target the correct menus
-            const $menu = $html.find(`.combat-extra-menu[data-time="${isNext ? 'next' : 'previous'}"]`);
-            const $otherMenu = $html.find(`.combat-extra-menu[data-time="${isNext ? 'previous' : 'next'}"]`);
-
-            // Close the other menu
-            $otherMenu.addClass('hidden');
-
-            // Toggle the current menu
-            const wasHidden = $menu.hasClass('hidden');
-            $menu.toggleClass('hidden', !wasHidden);
-
-            // If the menu was just OPENED, add a one-time listener to close it
-            if (wasHidden) {
-                $(document).one('mousedown.combatExtraMenu', (event) => {
-                    // Check if the click was *inside* the menu
-                    // Do nothing if clicking inside
-                    if ($(event.target).closest('.combat-extra-menu').length)
-                        return;
-                    $menu.addClass('hidden');
-                    $otherMenu.addClass('hidden');
-                });
-            } else {
-                // If the menu was just CLOSED, remove any lingering listeners
-                $(document).off('mousedown.combatExtraMenu');
-            }
-        });
-
-        // Prevent clicks inside the menu from closing it
-        $html.on('click', '.combat-extra-menu', ev => ev.stopPropagation());
-
-        $html.on('click', '.combat-control[data-action="nextPhase"], .combat-control[data-action="previousPhase"]', (ev) => {
-            ev.preventDefault();
-            ev.stopPropagation();
-
-            const action = $(ev.currentTarget).data('action') as string;
-
-            try {
-                if (action === 'nextPhase') void game.combat?.nextTurn();
-                else if (action === 'previousPhase') void game.combat?.previousTurn();
-            } catch (err) {
-                console.error('Combat action failed', action, err);
-            }
-        });
-
-        // Delegate click inside menus
-        $html.on('click', '.combat-extra-menu [data-action]', (ev) => {
-            ev.stopPropagation();
-
-            // Clean up the global listener immediately
-            $(document).off('mousedown.combatExtraMenu');
-
-            const action = $(ev.currentTarget).data('action') as string;
-            $html.find('.combat-extra-menu').addClass('hidden');
-
-            try {
-                if (action === 'nextPass') void game.combat?.nextPass();
-                else if (action === 'previousPass') void game.combat?.previousPass();
-                else if (action === 'nextTurn') void game.combat?.nextRound();
-                else if (action === 'previousTurn') void game.combat?.previousRound();
-            } catch (err) {
-                console.error('Combat extra action failed', action, err);
-            }
-        });
-
-        // GM-only click handler for toggling "acted" status
-        $html.on("click", "[data-action='toggleActed']", (event: JQuery.ClickEvent) => {
-            event.preventDefault();
-            event.stopPropagation();
-
-            if (!game.user.isGM) return;
-
-            const $li = $(event.currentTarget).closest(".combatant");
-            const combatant = app.viewed?.combatants.get($li.data("combatant-id"));
-            if (!combatant) return;
-
-            const hasActed = combatant.system.acted;
-            void (async () => {
-                const combat = app.viewed;
-                if (combat) await combat.createHistorySnapshot();
-                await combatant.update({ system: { acted: !hasActed } });
-            })();
-        });
+        return turn;
     }
 
     // ---- Private Helpers ----
+
+    private _onSR5TrackerClick(event: MouseEvent): void {
+        if (event.button !== 0) return;
+
+        const target = event.target as HTMLElement | null;
+        if (!target) return;
+
+        const phaseControl = target.closest<HTMLElement>('.combat-control[data-action="nextPhase"], .combat-control[data-action="previousPhase"]');
+        if (!phaseControl) {
+            const clickedInsideMenu = Boolean(target.closest('.combat-extra-menu'));
+            if (!clickedInsideMenu) this._closeExtraMenus();
+        }
+
+        const toggleActedTarget = target.closest<HTMLElement>('[data-action="toggleActed"]');
+        if (!toggleActedTarget) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+        this._onToggleActed(toggleActedTarget);
+    }
+
+    private _onSR5TrackerContextMenu(event: MouseEvent): void {
+        // Ensure we are only reacting to right-clicks (button 2)
+        if (event.button !== 2) return;
+
+        const target = event.target as HTMLElement | null;
+        if (!target) return;
+
+        const phaseControl = target.closest<HTMLElement>('.combat-control[data-action="nextPhase"], .combat-control[data-action="previousPhase"]');
+        if (!phaseControl) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        game.tooltip.deactivate();
+
+        const action = phaseControl.dataset.action;
+        if (!action) return;
+
+        this._toggleExtraMenu(action === 'nextPhase' ? 'next' : 'previous');
+    }
+
+    protected override async _onClickAction(
+        event: PointerEvent,
+        target: Parameters<CombatTracker['_onClickAction']>[1]
+    ) {
+        const action = target.dataset.action;
+        if (!action) return super._onClickAction(event, target);
+
+        const combat = this.viewed as SR5Combat | null;
+        if (!combat) return;
+
+        const methodMap = {
+            nextPhase: 'nextTurn',
+            previousPhase: 'previousTurn',
+            nextPass: 'nextPass',
+            previousPass: 'previousPass',
+            nextTurn: 'nextRound',
+            previousTurn: 'previousRound',
+        } as const;
+
+        const methodName = methodMap[action] as typeof methodMap[keyof typeof methodMap] | undefined;
+        if (!methodName) return super._onClickAction(event, target);
+
+        if (event.button !== 0) return;
+
+        this._closeExtraMenus();
+
+        const control = target instanceof HTMLButtonElement ? target : null;
+        if (control) control.disabled = true;
+        try {
+            const method = combat[methodName];
+            if (typeof method === 'function') await method.call(combat);
+        } finally {
+            if (control) control.disabled = false;
+        }
+    }
+
+    private _onToggleActed(target: HTMLElement): void {
+        if (!game.user.isGM) return;
+
+        const combatant = this._getCombatantFromElement(target);
+        if (!combatant) return;
+
+        const hasActed = Boolean(combatant.system.acted);
+
+        void (async () => {
+            await this.viewed?.createHistorySnapshot();
+            await combatant.update({ system: { acted: !hasActed } });
+        })();
+    }
 
     private async _onSeizeInitiative(li: HTMLElement): Promise<void> {
         const combatant = this._getCombatantFromLi(li);
@@ -175,9 +200,7 @@ export class SR5CombatTracker extends CombatTracker {
             return;
         }
 
-        const combat = this.viewed;
-        if (combat) await combat.createHistorySnapshot();
-
+        await this.viewed?.createHistorySnapshot();
         await combatant.update({ system: { seize: !seized } });
 
         await combatant.actor.update({
@@ -185,61 +208,35 @@ export class SR5CombatTracker extends CombatTracker {
         });
     }
 
-    private _getCombatantFromLi(li: HTMLElement) {
-        const combatantId = $(li).data("combatant-id");
-        return this.viewed!.combatants.get(combatantId)!;
+    private _getCombatantFromLi(li: HTMLElement): SR5Combatant | null {
+        const combatantId = li.dataset.combatantId;
+        if (typeof combatantId !== 'string') return null;
+        return (this.viewed?.combatants.get(combatantId) as SR5Combatant | undefined) ?? null;
     }
 
-    // ---- UI Builders ----
-    private static _addInitiativeIcon($li: JQuery<HTMLElement>, combatant: SR5Combatant): void {
-        $li.find(".combatant-init-mode-icon").remove();
+    private _getCombatantFromElement(element: HTMLElement): SR5Combatant | null {
+        const combatantElement = element.closest<HTMLElement>('.combatant[data-combatant-id]');
+        if (!combatantElement) return null;
 
-        const mode = combatant.actor?.system.initiative.perception ?? "undefined";
-        const modeLabel = {
-            meatspace: game.i18n.localize('SR5.COMBAT.ModeMeatspace'),
-            astral: game.i18n.localize('SR5.COMBAT.ModeAstral'),
-            matrix: game.i18n.localize('SR5.COMBAT.ModeMatrix'),
-            undefined: game.i18n.localize('SR5.COMBAT.ModeUnknown')
-        } as const;
-        const modes = {
-            meatspace: { cls: "mode-physical", icon: "fa-solid fa-person-running" },
-            astral: { cls: "mode-astral", icon: "fa-solid fa-star" },
-            matrix: { cls: "mode-matrix", icon: "fa-solid fa-laptop-code" },
-            undefined: { cls: "mode-unknown", icon: "fa-solid fa-question" }
-        } as const;
+        const combatantId = combatantElement.dataset.combatantId;
+        if (!combatantId) return null;
 
-        const { cls, icon } = modes[mode];
-        const localizedMode = modeLabel[mode];
-
-        $li.find(".token-image").after(`
-            <div class="combatant-init-mode-icon ${cls}" title="${game.i18n.format('SR5.COMBAT.ModeTitle', { mode: localizedMode })}">
-                <i class="${icon}"></i>
-            </div>
-        `);
+        return (this.viewed?.combatants.get(combatantId) as SR5Combatant | undefined) ?? null;
     }
 
-    private static _addSeizeIcon($li: JQuery<HTMLElement>, combatant: SR5Combatant): void {
-        $li.find(".combatant-seize-icon").remove();
+    private _toggleExtraMenu(time: 'next' | 'previous'): void {
+        const menu = this.element.querySelector<HTMLElement>(`.combat-extra-menu[data-time="${time}"]`);
+        const otherTime = time === 'next' ? 'previous' : 'next';
+        const otherMenu = this.element.querySelector<HTMLElement>(`.combat-extra-menu[data-time="${otherTime}"]`);
 
-        if (combatant.system.seize) {
-            $li.find(".token-initiative").prepend(`
-                <div class="combatant-seize-icon" title="${game.i18n.localize('SR5.COMBAT.SeizedInitiative')}">
-                    <i class="fa-solid fa-angles-up"></i>
-                </div>
-            `);
-        }
+        if (!menu) return;
+        otherMenu?.classList.add('hidden');
+
+        const shouldHide = !menu.classList.contains('hidden');
+        menu.classList.toggle('hidden', shouldHide);
     }
 
-    private static _addActedIndicator($li: JQuery<HTMLElement>, combatant: SR5Combatant): void {
-        const hasActed = combatant.system.acted && combatant.combat?.combatant?.id !== combatant.id;
-        $li.toggleClass("acted", hasActed);
-
-        $li.find(".token-initiative").prepend(`
-            <div class="combatant-acted-icon ${hasActed ? "active" : ""}"
-                 data-action="toggleActed"
-                 title="${game.i18n.localize('SR5.COMBAT.ToggleActedStatusGMOnly')}">
-                <i class="fa-solid fa-circle-check"></i>
-            </div>
-        `);
+    private _closeExtraMenus(): void {
+        this.element.querySelectorAll<HTMLElement>('.combat-extra-menu').forEach(menu => menu.classList.add('hidden'));
     }
 }

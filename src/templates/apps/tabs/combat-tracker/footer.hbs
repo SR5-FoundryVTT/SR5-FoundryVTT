@@ -3,10 +3,10 @@
     {{#if user.isGM}}
     {{#if combat.round}}
     <div class="combat-extra-menu hidden" data-time="previous">
-        <button type="button" data-action="previousTurn">
+        <button type="button" class="combat-control" data-action="previousTurn">
             <i class="fa-solid fa-backward-fast"></i> {{ localize 'SR5.COMBAT.PreviousTurn' }}
         </button>
-        <button type="button" data-action="previousPass">
+        <button type="button" class="combat-control" data-action="previousPass">
             <i class="fa-solid fa-backward-step"></i> {{ localize 'SR5.COMBAT.PreviousPass' }}
         </button>
     </div>
@@ -23,10 +23,10 @@
         data-action="nextPhase" data-tooltip aria-label="{{ localize 'SR5.COMBAT.NextPhase' }}"></button>
 
     <div class="combat-extra-menu hidden" data-time="next">
-        <button type="button" data-action="nextTurn">
+        <button type="button" class="combat-control" data-action="nextTurn">
             <i class="fa-solid fa-forward-fast"></i> {{ localize 'SR5.COMBAT.NextTurn' }}
         </button>
-        <button type="button" data-action="nextPass">
+        <button type="button" class="combat-control" data-action="nextPass">
             <i class="fa-solid fa-forward-step"></i> {{ localize 'SR5.COMBAT.NextPass' }}
         </button>
     </div>
@@ -36,9 +36,10 @@
         <span>{{ localize 'COMBAT.Begin' }}</span>
     </button>
     {{/if}}
+
     {{else if control}}
     <button type="button" class="inline-control combat-control icon fa-solid fa-arrow-left"
-        data-action="previousTurn" data-tooltip aria-label="{{ localize 'COMBAT.TurnPrev' }}"></button>
+        data-action="previousPhase" data-tooltip aria-label="{{ localize 'SR5.COMBAT.PreviousPhase' }}"></button>
 
     <button type="button" class="combat-control combat-control-lg" data-action="nextTurn">
         <i class="fa-solid fa-check"></i>
@@ -46,7 +47,7 @@
     </button>
 
     <button type="button" class="inline-control combat-control icon fa-solid fa-arrow-right"
-        data-action="nextTurn" data-tooltip aria-label="{{ localize 'COMBAT.TurnNext' }}"></button>
+        data-action="nextPhase" data-tooltip aria-label="{{ localize 'SR5.COMBAT.NextPhase' }}"></button>
     {{/if}}
     {{/if}}
 </nav>

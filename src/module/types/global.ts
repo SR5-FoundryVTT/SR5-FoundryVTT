@@ -258,7 +258,7 @@ declare module "fvtt-types/configuration" {
             SR5_CastItemAction: (arg0: SR5Item) => void;
             SR5_PreActorItemRoll: (arg0: SR5Actor, arg1: SR5Item) => void;
             getSceneControlButtons: (arg0: any) => void;
-            getCombatTrackerEntryContext: (arg0: any, arg1: any) => void;
+            getCombatTrackerEntryContext: (arg0: HTMLElement, arg1: any[]) => void;
             getChatMessageContextOptions: (args0: any, args1: any) => void;
             quenchReady: (args0: Quench) => void;
             renderChatMessage: (args0: SR5ChatMessage, args1: any, arg2: any) => void;

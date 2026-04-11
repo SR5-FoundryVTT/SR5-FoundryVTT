@@ -1,12 +1,11 @@
 import { SR } from "@/module/constants";
 import { CombatantData } from "./Combatant";
 
-const { NumberField, BooleanField, StringField, ArrayField, SchemaField } = foundry.data.fields;
+const { NumberField, StringField, ArrayField, SchemaField } = foundry.data.fields;
 
 const CombatHistoryCombatantData = () => ({
     _id: new StringField({ required: true, nullable: false }),
     initiative: new NumberField({ integer: true, required: false, nullable: true, initial: null }),
-    defeated: new BooleanField({ required: true, nullable: false, initial: false }),
     system: new SchemaField(CombatantData()),
 });
 

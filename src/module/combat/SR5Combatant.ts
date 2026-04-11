@@ -1,6 +1,6 @@
 import { SR } from "../constants";
-import { CombatRules } from "../rules/CombatRules";
 import { Migrator } from "../migrator/Migrator";
+import { CombatRules } from "../rules/CombatRules";
 
 export class SR5Combatant extends Combatant<"base"> {
     protected override _getInitiativeFormula(): string {
@@ -22,7 +22,7 @@ export class SR5Combatant extends Combatant<"base"> {
         return super._preUpdate(changed, options, user);
     }
 
-    static override migrateData(source: any): any {
+    static override migrateData(source: any) {
         Migrator.migrate("Combatant", source);
         return super.migrateData(source);
     }
@@ -52,11 +52,10 @@ export class SR5Combatant extends Combatant<"base"> {
         await this.actor?.removeDefenseMultiModifier();
 
         // Manage progressive recoil based on whether they attacked last turn.
-        if (this.system.attackedLastTurn) {
+        if (this.system.attackedLastTurn)
             await this.actor?.clearProgressiveRecoil();
-        } else {
-            await this.update({ system: { attackedLastTurn: false } });
-        }
+
+        await this.update({ system: { attackedLastTurn: false } });
     }
 
     /** Prepares the data object for updating at the end of an initiative pass. */

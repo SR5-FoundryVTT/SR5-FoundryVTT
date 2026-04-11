@@ -26,6 +26,8 @@ export class SR5Combat extends Combat<"base"> {
         return super.migrateData(source);
     }
 
+    override get nextCombatant(): undefined { return undefined; }
+
     /**
      * Add ContextMenu options to CombatTracker Entries -- adds the basic Initiative Subtractions.
      */
@@ -41,7 +43,7 @@ export class SR5Combat extends Combat<"base"> {
                 icon,
                 name: game.i18n.localize(`SR5.COMBAT.ReduceInitBy${keySuffix}`),
                 callback: async (li: JQuery) => {
-                    const combatant = game.combat?.combatants.get(li.data("combatant-id"));
+                    const combatant = game.combat?.combatants.get(li.data("combatant-id") as string);
                     if (combatant)
                         await combatant.adjustInitiative(-value);
                 },
@@ -58,11 +60,11 @@ export class SR5Combat extends Combat<"base"> {
         const { id, fnName } = message.data ?? {};
         if (typeof id !== 'string' || typeof fnName !== 'string') return;
 
-        const allowedFunctions = new Set(['nextTurn', 'previousTurn', 'nextPass', 'previousPass', 'nextRound', 'previousRound', 'reselectFirstCombatantToAct']);
+        const allowedFunctions = new Set(['nextTurn', 'previousTurn', 'nextPass', 'previousPass', 'nextRound', 'previousRound']);
         if (!allowedFunctions.has(fnName)) return;
 
         const combat = game.combats.get(id);
-        const method = combat?.[fnName];
+        const method = combat?.[fnName] as unknown;
         if (typeof method !== 'function') return;
 
         return await method.call(combat);
@@ -174,29 +176,37 @@ export class SR5Combat extends Combat<"base"> {
     /**
      * After all combatants have had their action phase, handle Shadowrun rules for
      * initiative passes and combat turns.
+     * @param skipAct If true, the next combatant will be selected without marking the current one as having acted.
+     * Used when moving to the next initiative pass, since combatants get a new turn without necessarily having acted in the previous pass.
      */
-    override async nextTurn(): Promise<this> {
+    override async nextTurn(skipAct?: boolean): Promise<this> {
         if (!game.user?.isGM) {
             SocketMessage.emitForGM(FLAGS.DoCombatFunction, { id: this.id, fnName: 'nextTurn' });
             return this;
         }
 
         const nextTurn = this.turns.findIndex(combatant => {
-            if (this.settings.skipDefeated && combatant.isDefeated) return false;
+            if (combatant.isDefeated && this.settings.skipDefeated) return false;
             if (combatant.id === this.combatant?.id) return false;
             return combatant.canAct() && !combatant.acted();
         });
 
+        // End of Pass
+        if (nextTurn === -1)
+            return this.nextPass();
+
         // Step to next combatant in current pass
-        if (nextTurn !== -1) {
-            const history = this._nextHistory();
-            const combatants = this.combatant ? [{ _id: this.combatant.id!, system: { acted: true } }] : [];
-            await this.update({ turn: nextTurn, combatants, system: { history } });
+        if (skipAct) {
+            await this.update({ turn: nextTurn });
             return this;
         }
 
-        // End of Pass
-        return this.nextPass();
+        const history = this._nextHistory();
+        const combatants = this.combatant ? [{ _id: this.combatant.id!, system: { acted: true } }] : [];
+        
+        // 2. Include the history in the update payload
+        await this.update({ turn: nextTurn, combatants, system: { history } });
+        return this;
     }
 
     async nextPass(): Promise<this> {
@@ -209,27 +219,24 @@ export class SR5Combat extends Combat<"base"> {
         // Determine if any combatant has enough initiative for another pass
         const nextTurn = this.turns.findIndex((c) => {
             if (this.settings.skipDefeated && c.isDefeated) return false;
-            return c.initiative !== null && c.initiative !== undefined && CombatRules.initAfterPass(c.initiative) > 0;
+            return c.initiative != null && CombatRules.initAfterPass(c.initiative) > 0;
         });
 
-        // Start a new initiative pass
-        if (nextTurn !== -1) {
-            const initiativePass = this.initiativePass + 1;
-            const history = this._nextHistory();
-            const combatants = this.combatants.map((c) => c.initPassUpdateData());
-            await this.update({ turn: nextTurn, combatants, system: { initiativePass, history } });
-            // @ts-expect-error
-            Hooks.callAll("CombatTurn", this, { combat: this, combatant: this.combatant, initiativePass, round: this.round } as any, {} as any);
-
-            // Trigger start-of-turn logic for the new combatant
-            if (this.combatant) {
-                await this._onStartTurn(this.combatant, { turn: nextTurn, round: this.round, skipped: false });
-            }
-            return this;
+        // End of initiative pass
+        const history = this._nextHistory();
+        if (nextTurn === -1) {
+            await this.update({ system: { history } });
+            return this.nextRound();
         }
 
-        // End of initiative pass
-        return this.nextRound();
+        const initiativePass = this.initiativePass + 1;
+
+        const padData = this.turns.filter(c => !c.system.pad).map(() => ({ system: { pad: true } }));
+        await this.createEmbeddedDocuments("Combatant", padData);
+
+        const combatants = this.combatants.map((c) => c.initPassUpdateData());
+        await this.update({ combatants, system: { initiativePass, history } });
+        return this.nextTurn(true);
     }
 
     override async nextRound() {
@@ -237,6 +244,9 @@ export class SR5Combat extends Combat<"base"> {
             SocketMessage.emitForGM(FLAGS.DoCombatFunction, { id: this.id, fnName: 'nextRound' });
             return this;
         }
+
+        await this.createHistorySnapshot();
+        await this._clearCombatantPadding();
 
         return super.nextRound();
     }
@@ -289,6 +299,10 @@ export class SR5Combat extends Combat<"base"> {
      * Compares two combatants to determine their sort order in the initiative tracker.
      */
     protected override _sortCombatants(a: Combatant.Implementation, b: Combatant.Implementation): number {
+        // Pad are made for pushing turns down the initiative order, so they always go first.
+        if (a.system.pad || b.system.pad)
+            return (b.system.pad ? 1 : 0) - (a.system.pad ? 1 : 0);
+
         // First check for seize the initiative status
         if (a.system.seize !== b.system.seize)
             return (b.system.seize ? 1 : 0) - (a.system.seize ? 1 : 0);
@@ -368,6 +382,16 @@ export class SR5Combat extends Combat<"base"> {
         snapshot: SR5Combat['system']['history'][number],
         history: SR5Combat['system']['history']
     ): Promise<this> {
+        // Check if the current combat has more pads than the snapshot had
+        const currentPads = this.combatants.filter(c => c.system.pad).map(c => c.id);
+        const snapshotPads = snapshot.combatants.filter(c => c.system.pad).map(c => c._id);
+
+        // Find pads that exist now but didn't exist in the snapshot, and delete them
+        const padsToDelete = currentPads.filter(id => !snapshotPads.includes(id));
+        if (padsToDelete.length > 0)
+            await this.deleteEmbeddedDocuments("Combatant", padsToDelete);
+
+        // Now restore the state safely
         await this.update(
             {
                 turn: snapshot.turn,
@@ -379,5 +403,15 @@ export class SR5Combat extends Combat<"base"> {
         );
 
         return this;
+    }
+
+    private async _clearCombatantPadding(): Promise<void> {
+        const padCombatants = this.combatants
+            .filter(combatant => combatant.system.pad)
+            .map(combatant => combatant.id)
+            .filter((id): id is string => typeof id === 'string');
+
+        if (padCombatants.length === 0) return;
+        await this.deleteEmbeddedDocuments('Combatant', padCombatants);
     }
 }

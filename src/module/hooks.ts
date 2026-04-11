@@ -514,7 +514,6 @@ ___________________
                 new ChangelogApplication().render(true);
         }
 
-        Hooks.on('renderCombatTracker', SR5CombatTracker.renderCombatTracker.bind(SR5CombatTracker));
         Hooks.on('renderChatMessage', HooksManager.chatMessageListeners.bind(HooksManager));
         Hooks.on('renderJournalPageSheet', JournalEnrichers.setEnricherHooks.bind(JournalEnrichers));
         HooksManager.registerSocketListeners();
