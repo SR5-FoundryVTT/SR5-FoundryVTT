@@ -17,16 +17,17 @@ const MAX_HISTORY_SIZE = 50;
  * @see SR5 Core Rulebook, p. 160 'Changing Initiative'
  */
 export class SR5Combat extends Combat<"base"> {
-    get initiativePass(): number {
-        return this.system.initiativePass;
+    get pass(): number {
+        return this.system.pass;
     }
+
+    // Don't alert next player, because it can change easily
+    override get nextCombatant(): undefined { return undefined; }
 
     static override migrateData(source: any) {
         Migrator.migrate("Combat", source);
         return super.migrateData(source);
     }
-
-    override get nextCombatant(): undefined { return undefined; }
 
     /**
      * Add ContextMenu options to CombatTracker Entries -- adds the basic Initiative Subtractions.
@@ -60,6 +61,7 @@ export class SR5Combat extends Combat<"base"> {
         const { id, fnName } = message.data ?? {};
         if (typeof id !== 'string' || typeof fnName !== 'string') return;
 
+        // Unlike Foundry's direct UI actions, SR5 forwards non-GM combat controls via socket and whitelists callable methods.
         const allowedFunctions = new Set(['nextTurn', 'previousTurn', 'nextPass', 'previousPass', 'nextRound', 'previousRound']);
         if (!allowedFunctions.has(fnName)) return;
 
@@ -122,6 +124,7 @@ export class SR5Combat extends Combat<"base"> {
             return this;
         }
 
+        // Foundry's previous turn logic rewinds index/round state; SR5 restores a full snapshot to include pass, acted, and pad state.
         const history = [...(this.system.history ?? [])];
         const snapshot = history.pop();
         if (!snapshot) {
@@ -138,9 +141,10 @@ export class SR5Combat extends Combat<"base"> {
             return this;
         }
 
+        // Foundry has no initiative pass rewind; SR5 rewinds to the latest snapshot of a strictly earlier pass.
         const history = [...(this.system.history ?? [])];
         let snapshot = history.pop();
-        while (snapshot?.round === this.round && snapshot.initiativePass === this.initiativePass) {
+        while (snapshot?.round === this.round && snapshot.pass === this.pass) {
             snapshot = history.pop();
         }
 
@@ -158,6 +162,7 @@ export class SR5Combat extends Combat<"base"> {
             return this;
         }
 
+        // Foundry rewinds round numerically; SR5 restores the prior round snapshot to keep pass and per-combatant state consistent.
         const history = [...(this.system.history ?? [])];
         let snapshot = history.pop();
 
@@ -176,10 +181,10 @@ export class SR5Combat extends Combat<"base"> {
     /**
      * After all combatants have had their action phase, handle Shadowrun rules for
      * initiative passes and combat turns.
-     * @param skipAct If true, the next combatant will be selected without marking the current one as having acted.
+     * @param passedPass If true, the next combatant will be selected without marking the current one as having acted.
      * Used when moving to the next initiative pass, since combatants get a new turn without necessarily having acted in the previous pass.
      */
-    override async nextTurn(skipAct?: boolean): Promise<this> {
+    override async nextTurn(passedPass?: boolean): Promise<this> {
         if (!game.user?.isGM) {
             SocketMessage.emitForGM(FLAGS.DoCombatFunction, { id: this.id, fnName: 'nextTurn' });
             return this;
@@ -195,17 +200,26 @@ export class SR5Combat extends Combat<"base"> {
         if (nextTurn === -1)
             return this.nextPass();
 
-        // Step to next combatant in current pass
-        if (skipAct) {
-            await this.update({ turn: nextTurn });
-            return this;
+        const updateData = { round: this.round, turn: nextTurn } as Combat.UpdateData;
+        const advanceTime = this.getTimeDelta(this.round, this.turn, this.round, nextTurn);
+        const updateOptions = { direction: 1, worldTime: { delta: advanceTime }} as Combat.Database.UpdateOperation;
+
+        // Foundry advances turns without snapshotting per move; SR5 snapshots on regular turn progression for rewind support.
+        if (!passedPass) {
+            updateData.system = { history: this._nextHistory() };
+
+            if (this.combatant)
+                updateData.combatants = [{ _id: this.combatant.id!, system: { acted: true } }];
         }
 
-        const history = this._nextHistory();
-        const combatants = this.combatant ? [{ _id: this.combatant.id!, system: { acted: true } }] : [];
-        
-        // 2. Include the history in the update payload
-        await this.update({ turn: nextTurn, combatants, system: { history } });
+        // @ts-expect-error
+        Hooks.callAll("combatTurn", this, updateData, updateOptions);
+        await this.update(updateData, updateOptions);
+
+        // Handle start of turn updates for the new combatant
+        if (this.combatant)
+            await this.combatant.turnUpdate(this.pass);
+
         return this;
     }
 
@@ -215,6 +229,7 @@ export class SR5Combat extends Combat<"base"> {
             return this;
         }
 
+        // Foundry has no initiative pass concept; SR5 creates a pass transition and reduces initiatives for all combatants.
         // End of initiative pass: check if another pass is needed
         // Determine if any combatant has enough initiative for another pass
         const nextTurn = this.turns.findIndex((c) => {
@@ -223,19 +238,24 @@ export class SR5Combat extends Combat<"base"> {
         });
 
         // End of initiative pass
-        const history = this._nextHistory();
-        if (nextTurn === -1) {
-            await this.update({ system: { history } });
+        if (nextTurn === -1)
             return this.nextRound();
-        }
+        
+        const updateData = {
+            system: {
+                history: this._nextHistory(),
+                pass: this.pass + 1,
+            }
+        } as Combat.UpdateData;
 
-        const initiativePass = this.initiativePass + 1;
-
+        // Add padding combatants for the new pass.
+        // These will be sorted to the end of the initiative order and can be used to track pass
+        // changes in the UI and prevent issues with combatants being added mid-pass.
         const padData = this.turns.filter(c => !c.system.pad).map(() => ({ system: { pad: true } }));
         await this.createEmbeddedDocuments("Combatant", padData);
 
-        const combatants = this.combatants.map((c) => c.initPassUpdateData());
-        await this.update({ combatants, system: { initiativePass, history } });
+        updateData.combatants = this.combatants.map((c) => c.initPassUpdateData());
+        await this.update(updateData);
         return this.nextTurn(true);
     }
 
@@ -245,12 +265,44 @@ export class SR5Combat extends Combat<"base"> {
             return this;
         }
 
+        // Foundry nextRound mainly advances round/turn; SR5 also persists state, clears pass padding, and resets initiative pass.
         await this.createHistorySnapshot();
-        await this._clearCombatantPadding();
 
-        return super.nextRound();
+        const padCombatants = this.combatants
+            .filter(combatant => combatant.system.pad)
+            .map(combatant => combatant.id);
+
+        // If there are any pad combatants, remove them before starting the new round to clean up the initiative tracker.
+        if (padCombatants.length)
+            await this.deleteEmbeddedDocuments('Combatant', padCombatants);
+
+        const nextRound = this.round + 1;
+        const advanceTime = this.getTimeDelta(this.round, this.turn, nextRound, null);
+
+        // Update the document, passing data through a hook first
+        const updateData = {
+            turn: null,
+            round: nextRound,
+            system: { pass: SR.combat.INITIAL_INI_PASS },
+            combatants: this.combatants.map((c) => c.roundUpdateData()),
+        } as Combat.UpdateData;
+        const updateOptions = {direction: 1, worldTime: { delta: advanceTime }} as Combat.Database.UpdateOperation;
+
+        // @ts-expect-error
+        Hooks.callAll("combatRound", this, updateData, updateOptions);
+        await this.update(updateData, updateOptions);
+
+        if (this.combatants.size) {
+            await this.resetAll();
+            await this.rollForActors({ updateTurn: false });
+        }
+
+        return this;
     }
 
+    /**
+     * Forces the creation of a history snapshot without advancing the turn.
+     */
     async createHistorySnapshot() {
         return this.update({ system: { history: this._nextHistory() } });
     }
@@ -267,38 +319,10 @@ export class SR5Combat extends Combat<"base"> {
     }
 
     /**
-     * At the start of a new round, reset initiatives and roll for combatants.
-     */
-    protected override async _onStartRound(context: Combat.RoundEventContext) {
-        await this.update({ system: { initiativePass: SR.combat.INITIAL_INI_PASS } });
-
-        if (this.combatants.size) {
-            await this.resetAll();
-            await this.rollForActors({ updateTurn: false });
-            const firstTurn = this.settings.skipDefeated ? this.turns.findIndex(c => !c.isDefeated) : 0;
-            await this.update({ turn: firstTurn >= 0 ? firstTurn : null, combatants: this.combatants.map((c) => c.roundUpdateData()) });
-        }
-
-        return super._onStartRound(context);
-    }
-
-    /**
-     * When a combatant's turn starts, apply necessary changes.
-     */
-    protected override async _onStartTurn(combatant: Combatant.Implementation, context: Combat.TurnEventContext) {
-        if (!context.skipped) await combatant.turnUpdate(this.initiativePass);
-
-        return super._onStartTurn(combatant, context);
-    }
-
-    protected override async _onEndTurn(combatant: Combatant.Implementation, context: Combat.TurnEventContext) {
-        return super._onEndTurn(combatant, context);
-    }
-
-    /**
      * Compares two combatants to determine their sort order in the initiative tracker.
      */
     protected override _sortCombatants(a: Combatant.Implementation, b: Combatant.Implementation): number {
+        // Foundry defaults to initiative+id ordering; SR5 adds pad/seize/ERIC tie-break flow semantics.
         // Pad are made for pushing turns down the initiative order, so they always go first.
         if (a.system.pad || b.system.pad)
             return (b.system.pad ? 1 : 0) - (a.system.pad ? 1 : 0);
@@ -331,6 +355,7 @@ export class SR5Combat extends Combat<"base"> {
     override async rollInitiative(ids: string | string[], options?: Combat.InitiativeOptions) {
         await super.rollInitiative(ids, options);
 
+        // SR5-specific blitz cleanup: consume and reset blitz flag after Foundry resolves initiative rolls.
         for (const id of Array.isArray(ids) ? ids : [ids]) {
             const actor = this.combatants.get(id)?.actor;
             if (actor?.system.initiative.blitz) {
@@ -362,11 +387,16 @@ export class SR5Combat extends Combat<"base"> {
         return rollForAll ? this.rollAll(options) : this.rollNPC(options);
     }
 
+    /**
+     * Generates a snapshot of the current combat state to be stored in the history array.
+     * @returns {SR5Combat['system']['history']}
+     * @private
+     */
     private _nextHistory(): SR5Combat['system']['history'] {
         const history = [...(this.system.history ?? [])];
         history.push({
             turn: this.turn,
-            initiativePass: this.initiativePass,
+            pass: this.pass,
             round: this.round,
             combatants: this.combatants.map((combatant) => ({
                 _id: combatant.id,
@@ -378,6 +408,12 @@ export class SR5Combat extends Combat<"base"> {
         return history.slice(-MAX_HISTORY_SIZE);
     }
 
+    /**
+     * Restores the combat document to the state defined in the provided snapshot.
+     * @param snapshot - The historical state to restore.
+     * @param history - The remaining history array to persist.
+     * @private
+     */
     private async _restoreSnapshot(
         snapshot: SR5Combat['system']['history'][number],
         history: SR5Combat['system']['history']
@@ -391,27 +427,19 @@ export class SR5Combat extends Combat<"base"> {
         if (padsToDelete.length > 0)
             await this.deleteEmbeddedDocuments("Combatant", padsToDelete);
 
+        const advanceTime = this.getTimeDelta(this.round, this.turn, snapshot.round, snapshot.turn);
+
         // Now restore the state safely
         await this.update(
             {
                 turn: snapshot.turn,
                 round: snapshot.round,
                 combatants: snapshot.combatants,
-                system: { initiativePass: snapshot.initiativePass, history }
+                system: { pass: snapshot.pass, history }
             },
-            { diff: false, direction: -1 }
+            { diff: false, direction: -1, worldTime: { delta: advanceTime } }
         );
 
         return this;
-    }
-
-    private async _clearCombatantPadding(): Promise<void> {
-        const padCombatants = this.combatants
-            .filter(combatant => combatant.system.pad)
-            .map(combatant => combatant.id)
-            .filter((id): id is string => typeof id === 'string');
-
-        if (padCombatants.length === 0) return;
-        await this.deleteEmbeddedDocuments('Combatant', padCombatants);
     }
 }

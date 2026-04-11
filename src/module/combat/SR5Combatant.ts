@@ -6,7 +6,7 @@ export class SR5Combatant extends Combatant<"base"> {
     protected override _getInitiativeFormula(): string {
         const combat = this.parent;
         const baseFormula = super._getInitiativeFormula();
-        const initPassed = combat.initiativePass - SR.combat.INITIAL_INI_PASS;
+        const initPassed = combat.pass - SR.combat.INITIAL_INI_PASS;
         const ongoingIniPassModified = initPassed * -SR.combat.INI_RESULT_MOD_AFTER_INI_PASS;
 
         return `max(${baseFormula} - ${ongoingIniPassModified}[Pass], 0)`;
@@ -52,7 +52,7 @@ export class SR5Combatant extends Combatant<"base"> {
         await this.actor?.removeDefenseMultiModifier();
 
         // Manage progressive recoil based on whether they attacked last turn.
-        if (this.system.attackedLastTurn)
+        if (!this.system.attackedLastTurn)
             await this.actor?.clearProgressiveRecoil();
 
         await this.update({ system: { attackedLastTurn: false } });
