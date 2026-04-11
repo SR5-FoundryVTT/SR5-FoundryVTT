@@ -5,6 +5,7 @@ import { Migrator } from "../migrator/Migrator";
 import { CombatRules } from "../rules/CombatRules";
 import { FLAGS, SR, SYSTEM_NAME } from "../constants";
 import SocketMessageData = Shadowrun.SocketMessageData;
+import BaseCombat = foundry.documents.BaseCombat;
 
 const MAX_HISTORY_SIZE = 50;
 
@@ -310,12 +311,12 @@ export class SR5Combat extends Combat<"base"> {
     /**
      * Clean up combat-related effects when the combat is deleted.
      */
-    override async delete(...args: Parameters<Combat["delete"]>) {
+    override async delete(operation?: BaseCombat.Database.DeleteOperation) {
         // Remove all combat-related modifiers.
         for (const combatant of this.combatants) {
             await combatant.actor?.removeDefenseMultiModifier();
         }
-        return super.delete(...args);
+        return super.delete(operation);
     }
 
     /**
@@ -352,7 +353,7 @@ export class SR5Combat extends Combat<"base"> {
         return a.system.coinFlip - b.system.coinFlip;
     }
 
-    override async rollInitiative(ids: string | string[], options?: Combat.InitiativeOptions) {
+    override async rollInitiative(ids: string | string[], options?) {
         await super.rollInitiative(ids, options);
 
         // SR5-specific blitz cleanup: consume and reset blitz flag after Foundry resolves initiative rolls.
@@ -376,13 +377,14 @@ export class SR5Combat extends Combat<"base"> {
      * Shadowrun does not clear movement history on turn start.
      */
     protected override async _clearMovementHistoryOnStartTurn(
-        ...args: Parameters<Combat["_clearMovementHistoryOnStartTurn"]>
+        combatant: Combatant.Implementation,
+        context: Combat.TurnEventContext,
     ) {}
 
     /**
      * Rolls initiative for actors based on system settings.
      */
-    private async rollForActors(options?: Combat.InitiativeOptions) {
+    private async rollForActors(options?) {
         const rollForAll = !game.settings.get(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat);
         return rollForAll ? this.rollAll(options) : this.rollNPC(options);
     }

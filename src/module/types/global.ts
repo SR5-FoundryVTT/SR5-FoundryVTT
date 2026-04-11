@@ -77,10 +77,12 @@ declare module "fvtt-types/configuration" {
         document: SR5Actor<SubType & Actor.ConfiguredSubType>;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interface ConfiguredChatMessage<SubType extends ChatMessage.SubType> {
         document: SR5ChatMessage;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interface ConfiguredActiveEffect<SubType extends ActiveEffect.SubType> {
         document: SR5ActiveEffect;
     }
@@ -89,6 +91,7 @@ declare module "fvtt-types/configuration" {
         document: SR5Actor<SubType & Actor.ConfiguredSubType>;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interface ConfiguredChatMessage<SubType extends ChatMessage.SubType> {
         document: SR5ChatMessage;
     }
