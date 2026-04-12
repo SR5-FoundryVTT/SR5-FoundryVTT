@@ -183,7 +183,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     private readonly expandedSkills = new Set<string>();
 
-    constructor(...args: any) {
+    constructor(...args: ConstructorParameters<typeof ActorSheetV2>) {
         super(...args);
 
         // Preselect default inventory.
@@ -899,7 +899,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             await this.actor.inventory.addItems(this.selectedInventory, items as SR5Item[]);
         }
         for (const item of items) {
-            await item.sheet?.render(true, { mode: 'edit' });
+            await item.sheet?.render(true, { mode: 'edit' } as any);
         }
     }
 
@@ -959,7 +959,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             // @ts-expect-error typing clashes between items.get and fromUuid
             item = await fromUuid(uuid);
         }
-        if (item) await item.sheet?.render(true, { mode: 'edit' });
+        if (item) await item.sheet?.render(true, { mode: 'edit' } as any);
     }
 
     async _handleDeleteItem(item: SR5Item) {
@@ -2150,7 +2150,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                     const id = SheetFlow.closestItemId(target);
                     const item = this.actor.items.get(id);
                     if (item) {
-                        await item.sheet?.render(true, { mode: 'edit' })
+                        await item.sheet?.render(true, { mode: 'edit' } as any)
                     }
                 }
             },

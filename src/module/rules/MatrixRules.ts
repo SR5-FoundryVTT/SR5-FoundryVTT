@@ -116,7 +116,7 @@ export class MatrixRules {
 
 
     /**
-     * Return modifier for marks placed. See SR5#240 'Hack on the Fly' or SR5#238 'Brut Force'
+     * Return modifier for marks placed. See SR5#240 'Hack on the Fly' or SR5#238 'Brute Force'
      * @param marks Amount of marks to be placed
      */
     static getMarkPlacementModifier(marks: number): number {
@@ -166,7 +166,7 @@ export class MatrixRules {
      * @returns true, amount of slaves is valid.
      */
     static validPANSlaveCount(rating: number, slaves: number): boolean {
-        return this.maxPANSlaves(rating) <= slaves;
+        return this.maxPANSlaves(rating) >= slaves;
     }
 
     /**
