@@ -1215,7 +1215,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Edge will be applied differently for when the test has been already been cast or not.
         // Exploding dice will be handled during normal roll creation.
         const edge = this.actor.getEdge().value;
-        parts.addUniqueBase('SR5.PushTheLimit', edge);
+        parts.addUnique('SR5.PushTheLimit', edge);
 
         // Before casting edge will be part of the whole dice pool and that pool will explode.
         if (!this.evaluated) return;
