@@ -63,8 +63,7 @@ export class TestDialog extends FormDialog {
         options.classes = ['sr5', 'form-dialog'];
         options.resizable = true;
         options.height = 'auto';
-        // @ts-expect-error
-        options.width = 'auto';
+        options.width = 300;
         return options;
     }
 
