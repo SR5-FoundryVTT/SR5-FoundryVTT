@@ -175,46 +175,6 @@ body.theme-light .journal-sheet,
 .journal-sheet option {
     color: var(--sr5-journal-option-text);
 }
-
-/**
- * CHAT MESSAGE STYLING
- */
-// Public Roll
-.chat-message,
-.chat-message.emote {
-    color: variables.$white;
-    background:
-        linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.05)),
-        url('assets/page.webp') repeat;
-    border: 1px solid variables.$dark;
-}
-
-// Improve visibility non-default roll modes.
-// Private Roll
-// Self Roll
-.chat-message.whisper {
-    background:
-        linear-gradient(rgba(64, 64, 85, 0.5), rgba(0, 0, 0, 0.5)),
-        url('assets/page.webp') repeat;
-}
-
-// Blind Roll
-.chat-message.blind {
-    background:
-        linear-gradient(rgba(87, 51, 87, 0.25), rgba(0, 0, 0, 0.5)),
-        url('assets/page.webp') repeat;
-}
-
-.chat-message .message-header,
-.chat-message.blind .message-header,
-.chat-message.whisper .message-header {
-    color: variables.$light-2;
-}
-
-// Description for roll tables shown on chat messages for a rolled result drawn.
-.chat-message .table-draw .table-description {
-    color: variables.$light;
-}
 /**
  * Settings Sidebar
  */

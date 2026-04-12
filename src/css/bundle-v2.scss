@@ -4,12 +4,46 @@
 
 body,
 .sr5v2.theme-dark {
+    --sr5-theme-page-image: url('assets/page.webp');
+    --sr5-theme-content-bg: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), var(--sr5-theme-page-image) repeat;
+    --sr5-theme-text-primary: #f0ede4;
+    --sr5-theme-text-secondary: #d7d1c3;
+    --sr5-theme-text-muted: #b8b0a0;
+    --sr5-theme-label: #ebb531;
+    --sr5-theme-border: rgba(215, 209, 195, 0.28);
+    --sr5-theme-chat-bg: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.05)), var(--sr5-theme-page-image) repeat;
+    --sr5-theme-chat-whisper-bg: linear-gradient(rgba(64, 64, 85, 0.5), rgba(0, 0, 0, 0.5)), var(--sr5-theme-page-image) repeat;
+    --sr5-theme-chat-blind-bg: linear-gradient(rgba(87, 51, 87, 0.25), rgba(0, 0, 0, 0.5)), var(--sr5-theme-page-image) repeat;
+    --sr5-theme-chat-border: #4b4a44;
+    --sr5-theme-chat-card-bg: var(--sr5-theme-content-bg);
+    --sr5-theme-chat-divider: rgba(215, 209, 195, 0.28);
+    --sr5-theme-chat-hover-bg: #4b4a44;
+    --sr5-theme-chat-button-bg: rgba(255, 255, 255, 0.2);
+    --sr5-theme-chat-button-border: #000000;
+    --sr5-theme-chat-contrast-text: #000000;
     --sr5-theme-nameplate-bg: linear-gradient(90deg, #55101e 0%, rgba(85, 16, 30, 0.92) 36%, rgba(85, 16, 30, 0) 100%);
     --sr5-theme-nameplate-text: #f0ede4;
 }
 
 body.theme-light,
 .sr5v2.theme-light {
+    --sr5-theme-page-image: url('assets/light-page.webp');
+    --sr5-theme-content-bg: linear-gradient(rgba(245, 247, 250, 0.72), rgba(223, 228, 234, 0.88)), var(--sr5-theme-page-image) repeat;
+    --sr5-theme-text-primary: #232a33;
+    --sr5-theme-text-secondary: #3d4652;
+    --sr5-theme-text-muted: #657180;
+    --sr5-theme-label: #6a4e12;
+    --sr5-theme-border: rgba(80, 92, 109, 0.22);
+    --sr5-theme-chat-bg: linear-gradient(rgba(246, 248, 251, 0.92), rgba(225, 230, 236, 0.98)), var(--sr5-theme-page-image) repeat;
+    --sr5-theme-chat-whisper-bg: linear-gradient(rgba(223, 230, 242, 0.9), rgba(208, 216, 228, 0.96)), var(--sr5-theme-page-image) repeat;
+    --sr5-theme-chat-blind-bg: linear-gradient(rgba(235, 228, 241, 0.92), rgba(219, 210, 228, 0.98)), var(--sr5-theme-page-image) repeat;
+    --sr5-theme-chat-border: rgba(108, 31, 44, 0.24);
+    --sr5-theme-chat-card-bg: var(--sr5-theme-content-bg);
+    --sr5-theme-chat-divider: rgba(80, 92, 109, 0.22);
+    --sr5-theme-chat-hover-bg: rgba(108, 31, 44, 0.12);
+    --sr5-theme-chat-button-bg: rgba(250, 252, 254, 0.86);
+    --sr5-theme-chat-button-border: rgba(88, 101, 119, 0.28);
+    --sr5-theme-chat-contrast-text: #171d24;
     --sr5-theme-nameplate-bg: linear-gradient(90deg, #b58721 0%, #d0aa4b 22%, #e1d9c4 58%, rgba(225, 217, 196, 0.08) 100%);
     --sr5-theme-nameplate-text: #243041;
 }
