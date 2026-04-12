@@ -227,17 +227,17 @@ export class TestDialog extends FormDialog {
      *
      * @param data An object with keys in Foundry UpdateData style {'key.key.key': value}
      */
-    override _updateData(data) {
+    override _updateData(data: { [key: string]: unknown }) {
         // The user canceled their interaction by canceling, don't apply form changes.
         if (this.selectedButton === 'cancel') return;
 
         // Apply keys ending with '.applied' first to ensure overrides are processed before dependent values
         const entries = Object.entries(data);
-        const appliedEntries = entries.filter(([key]) => key.endsWith('.applied'));
-        const otherEntries = entries.filter(([key]) => !key.endsWith('.applied'));
+        const enabledEntries = entries.filter(([key]) => key.endsWith('.enabled'));
+        const otherEntries = entries.filter(([key]) => !key.endsWith('.enabled'));
         
         // First, apply changes to ValueField style values in a way that makes sense.
-        for (const [key, value] of [...appliedEntries, ...otherEntries]) {
+        for (const [key, value] of [...enabledEntries, ...otherEntries]) {
             const valueField = foundry.utils.getProperty(this.data, key);
             if (!ModifiableValue.isModifiableValue(valueField)) {
                 foundry.utils.setProperty(this.data, key, value);
