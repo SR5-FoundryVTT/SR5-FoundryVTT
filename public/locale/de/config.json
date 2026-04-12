@@ -44,8 +44,6 @@
         "OnlyAllowRollOnDefaultableSkillsDescription": "Wenn deaktiviert, können unbekannte Fertigkeiten auch getestet werden, wenn sie nicht improvisierbar sind.",
         "OnlyAutoRollNPCInCombat": "Auto-Initiative nur für NSCs",
         "OnlyAutoRollNPCInCombatDescription": "Initiative wird für NSCs und SCs automatisch gewürfelt.",
-        "ResultOverrideOnSuccessTest": "Ergebnis-Überschreibung bei Proben",
-        "ResultOverrideOnSuccessTestDescription": "Erlaubt Benutzern, Erfolge und Patzer einer Probe zu überschreiben.",
         "ShowGlitchAnimationDescription": "Soll die Patzeranimation als Teil des Textes der Würfelkarte angezeigt werden?",
         "ShowGlitchAnimationName": "Zeige Patzeranimation",
         "ShowSkillsWithDetails": "Fertigkeitenliste Zusatzdetails",

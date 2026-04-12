@@ -21,8 +21,6 @@
         "OnlyAllowRollOnDefaultableSkillsDescription": "Permettre de lancer toutes les compétences, même celles qui ne peuvent pas être selectionées par défaut",
         "OnlyAutoRollNPCInCombat": "Lancer seulement automatiquement l'initiative des PNJs",
         "OnlyAutoRollNPCInCombatDescription": "Les joueurs doivent lancer les dés manuellement leur initiative à chaque passe / tour",
-        "ResultOverrideOnSuccessTest": "Substitution du résultat pour les tests",
-        "ResultOverrideOnSuccessTestDescription": "Permet de remplacer les succès et glitches d'un test.",
         "ShowGlitchAnimationDescription": "Afficher l'animation comme faisant parti d'un bug textuel",
         "ShowGlitchAnimationName": "Afficher l'animation d'echec critique",
         "ShowSkillsWithDetails": "Afficher plus de détails sur la liste des compétences",

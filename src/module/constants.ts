@@ -48,7 +48,6 @@ export const FLAGS = {
     AutomateProgressiveRecoil: 'AutomateProgressiveRecoil',
     CollapseModifyRollByDefault: 'CollapseModifyRollByDefault',
     TurnsSinceLastAttack: 'turnsSinceLastAttack',
-    ResultOverrideOnSuccessTest: 'ManualRollOnSuccessTest',
     MarkImports: 'MarkImports',
     ImportIconFolder: 'ImportIconFolder',
     UseImportIconOverrides: 'UseImportIconOverrides',

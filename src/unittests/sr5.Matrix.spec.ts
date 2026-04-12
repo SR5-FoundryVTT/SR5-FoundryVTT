@@ -77,5 +77,21 @@ export const shadowrunMatrix = (context: QuenchBatchContext) => {
             assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(2), [2, 3, 4, 5]);
             assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(10), [10, 11, 12, 13]);
         });
+
+        it('calculate the maximum amount of PAN slaves from device rating', () => {
+            assert.strictEqual(MatrixRules.maxPANSlaves(0), 0);
+            assert.strictEqual(MatrixRules.maxPANSlaves(1), 3);
+            assert.strictEqual(MatrixRules.maxPANSlaves(2), 6);
+            assert.strictEqual(MatrixRules.maxPANSlaves(6), 18);
+        });
+
+        it('validate PAN slave counts against device rating', () => {
+            assert.isTrue(MatrixRules.validPANSlaveCount(0, 0));
+            assert.isTrue(MatrixRules.validPANSlaveCount(1, 3));
+            assert.isTrue(MatrixRules.validPANSlaveCount(2, 5));
+
+            assert.isFalse(MatrixRules.validPANSlaveCount(1, 4));
+            assert.isFalse(MatrixRules.validPANSlaveCount(2, 7));
+        });
     })
 };

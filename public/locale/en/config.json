@@ -44,8 +44,6 @@
         "OnlyAllowRollOnDefaultableSkillsDescription": "When unset unknown skills can be rolled, even if they can't be defaulted.",
         "OnlyAutoRollNPCInCombat": "Only auto roll NPC initiative",
         "OnlyAutoRollNPCInCombatDescription": "When unset players must manually roll their init on each new pass / round",
-        "ResultOverrideOnSuccessTest": "Result Override on any test",
-        "ResultOverrideOnSuccessTestDescription": "Allow users to override test hits and glitches.",
         "ShowGlitchAnimationDescription": "Should display the animation as part of the glitch text on the roll card",
         "ShowGlitchAnimationName": "Display Glitch Animation",
         "ShowSkillsWithDetails": "Show more detailed skill lists",

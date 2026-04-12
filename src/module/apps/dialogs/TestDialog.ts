@@ -87,7 +87,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
         classes: [SR5_APPV2_CSS_CLASS, 'sr5', 'form-dialog'],
         id: 'test-dialog-v2',
         position: {
-            width: 'auto' as const,
+            width: 300,
             height: 'auto' as const,
         },
         window: {
@@ -225,17 +225,6 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
             checkbox.dispatchEvent(new Event('change', { bubbles: true }));
         });
 
-        html.find('.result-header').on('click', event => {
-            event.preventDefault();
-            const sectionDiv = event.currentTarget.closest('.result-override-section');
-            if (!sectionDiv) return;
-
-            const isExpanded = sectionDiv.classList.toggle('expanded');
-            if (isExpanded) this._expandedList.add('result-override');
-            else this._expandedList.delete('result-override');
-            void this.render();
-        });
-
         html.find('.modify-roll-header').on('click', event => {
             event.preventDefault();
             const sectionDiv = event.currentTarget.closest('.modify-roll-section');
@@ -297,12 +286,12 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
         if (this.selectedButton === 'cancel') return;
 
         const entries = Object.entries(data);
-        const appliedEntries = entries.filter(([key]) => key.endsWith('.applied'));
-        const otherEntries = entries.filter(([key]) => !key.endsWith('.applied'));
+        const enabledEntries = entries.filter(([key]) => key.endsWith('.enabled'));
+        const otherEntries = entries.filter(([key]) => !key.endsWith('.enabled'));
 
         const context = { test: this.test };
 
-        for (const [key, value] of [...appliedEntries, ...otherEntries]) {
+        for (const [key, value] of [...enabledEntries, ...otherEntries]) {
             const valueField = foundry.utils.getProperty(context, key);
             if (!ModifiableValue.isModifiableValue(valueField)) {
                 foundry.utils.setProperty(context, key, value);

@@ -44,8 +44,6 @@
         "OnlyAllowRollOnDefaultableSkillsDescription": "알지 못하는 기술도 무리한 시도가 불가능하더라도 굴림 가능",
         "OnlyAutoRollNPCInCombat": "NPC만 우선권 주사위 자동 굴림",
         "OnlyAutoRollNPCInCombatDescription": "설정되지 않은 플레이어는 각 패스와 라운드에서 주사위를 수동으로 굴려야 함",
-        "ResultOverrideOnSuccessTest": "모든 판정에서 결과 오버라이드",
-        "ResultOverrideOnSuccessTestDescription": "사용자가 판정의 성공과 글리치를 직접 오버라이드하도록 허용",
         "ShowGlitchAnimationDescription": "굴림 카드에 글리치 텍스트의 일부로 항상 애니메이션을 표시함",
         "ShowGlitchAnimationName": "글리치 애니메이션 표시",
         "ShowSkillsWithDetails": "더 자세한 기술 목록 보기",
