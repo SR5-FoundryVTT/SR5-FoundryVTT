@@ -8,8 +8,8 @@
 
         &.expanded {
             // show 1px box shadow at the top and bottom to emulate a border
-            box-shadow: inset 0 1px 0 0 variables.$silver,
-            inset 0 -1px 0 0 variables.$silver;
+            box-shadow: inset 0 1px 0 0 var(--sr5v2-border),
+            inset 0 -1px 0 0 var(--sr5v2-border);
 
             .list-item-desc {
                 visibility: visible;
@@ -19,7 +19,7 @@
 
         &.list-item-subcategory {
             padding-left: .5rem;
-            border-left: 1px solid variables.$silver;
+            border-left: 1px solid var(--sr5v2-border);
         }
 
         .list-item {
@@ -30,10 +30,10 @@
             visibility: hidden;
             display: none;
             flex: 1;
-            border-top: 1px solid rgba(variables.$silver, 0.2);
-            background: rgba(variables.$black, 0.3);
+            border-top: 1px solid var(--sr5v2-border);
+            background: var(--sr5v2-bg-elevated);
             padding: .5rem;
-            color: variables.$light;
+            color: var(--sr5v2-text-primary);
 
             .list-item-properties {
                 display: flex;
@@ -69,7 +69,7 @@
         }
 
         &:not(.nobg):nth-of-type(even), &.forcebg {
-            background: rgba(variables.$white, 0.03);
+            background: var(--sr5v2-bg-subtle);
         }
     }
 
@@ -84,7 +84,7 @@
         padding: 2px;
 
         &.list-item-selected {
-            background: radial-gradient(rgba(variables.$matrix-green, 0.4), rgba(variables.$matrix-green, 0.01)) !important;
+            background: var(--sr5v2-list-selected-bg) !important;
         }
 
         .list-item-image-container {
@@ -108,13 +108,13 @@
             }
 
             &:not(:hover).favorite {
-                border-color: rgba(variables.$light, 0.3);
+                border-color: var(--sr5v2-border);
             }
 
             &:hover {
                 .list-item-image-roll {
                     content: url('assets/dice-solid.svg');
-                    filter: invert(1);
+                    filter: var(--sr5v2-icon-filter);
                 }
                 .list-item-image-info {
                     content: url('icons/files.svg');
@@ -135,18 +135,18 @@
         }
 
         &.list-item-header {
-            border-bottom: 1px solid variables.$yellow;
-            background: rgba(variables.$black, 0.7);
+            border-bottom: 1px solid var(--sr5v2-border-strong);
+            background: var(--sr5v2-bg-elevated-strong);
         }
 
         &.list-item-favorites {
-            background: linear-gradient(to top, rgba(variables.$black, 0.7), rgba(variables.$black, 0.1));
+            background: linear-gradient(to top, var(--sr5v2-bg-elevated-strong), transparent);
             margin-top: 2px;
         }
 
         &:not(.nobg):nth-of-type(even), &.forcebg {
             &:not(.list-item-header) {
-                background: rgba(variables.$white, 0.03);
+                background: var(--sr5v2-bg-subtle);
             }
         }
 

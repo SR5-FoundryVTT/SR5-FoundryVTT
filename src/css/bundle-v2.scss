@@ -3,33 +3,182 @@
 @use "config/variables";
 
 .sr5v2 {
-    box-shadow: 0 0 10px 5px rgba(variables.$yellow, 0.4);
-    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
+    --sr5v2-page-image: url('assets/page.webp');
+    --sr5v2-window-shadow: 0 0 10px 5px rgba(235, 181, 49, 0.4);
+    --sr5v2-surface-bg: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), var(--sr5v2-page-image) repeat;
+    --sr5v2-content-bg: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), var(--sr5v2-page-image) repeat;
+    --sr5v2-text-primary: #f0ede4;
+    --sr5v2-text-secondary: #d7d1c3;
+    --sr5v2-text-muted: #b8b0a0;
+    --sr5v2-text-inverse: #191813;
+    --sr5v2-link: #e7dbc0;
+    --sr5v2-link-hover: #ffffff;
+    --sr5v2-label: #ebb531;
+    --sr5v2-label-muted: #a47e28;
+    --sr5v2-border: rgba(215, 209, 195, 0.28);
+    --sr5v2-border-strong: #7d1d2f;
+    --sr5v2-bg-subtle: rgba(255, 255, 255, 0.03);
+    --sr5v2-bg-elevated: rgba(0, 0, 0, 0.32);
+    --sr5v2-bg-elevated-strong: rgba(0, 0, 0, 0.7);
+    --sr5v2-bg-hover: rgba(85, 16, 30, 0.72);
+    --sr5v2-control-bg: rgba(0, 0, 0, 0.18);
+    --sr5v2-control-bg-strong: rgba(0, 0, 0, 0.28);
+    --sr5v2-control-border: rgba(215, 209, 195, 0.32);
+    --sr5v2-control-border-hover: #f0ede4;
+    --sr5v2-control-text: #f0ede4;
+    --sr5v2-display-bg: rgba(255, 255, 255, 0.12);
+    --sr5v2-display-bg-alt: rgba(34, 34, 34, 0.3);
+    --sr5v2-display-text: #f0ede4;
+    --sr5v2-button-bg: rgba(255, 255, 255, 0.1);
+    --sr5v2-button-border: rgba(240, 237, 228, 0.5);
+    --sr5v2-button-text: #f0ede4;
+    --sr5v2-button-hover-bg: #55101e;
+    --sr5v2-button-hover-border: #f0ede4;
+    --sr5v2-button-hover-text: #ffffff;
+    --sr5v2-submit-bg: #227836;
+    --sr5v2-cancel-bg: #55101e;
+    --sr5v2-nameplate-bg: linear-gradient(90deg, #55101e 0%, rgba(85, 16, 30, 0.92) 36%, rgba(85, 16, 30, 0) 100%);
+    --sr5v2-nameplate-text: #f0ede4;
+    --sr5v2-tab-bg: rgba(85, 16, 30, 0.7);
+    --sr5v2-tab-text: #f0ede4;
+    --sr5v2-tab-active-bg: #b6b2a6;
+    --sr5v2-tab-active-text: #55101e;
+    --sr5v2-tab-active-shadow: 0 0 5px 5px rgba(255, 255, 255, 0.2);
+    --sr5v2-option-bg: rgba(0, 0, 0, 0.92);
+    --sr5v2-option-text: #ebb531;
+    --sr5v2-origin-bg: #dddddd;
+    --sr5v2-origin-border: #4b4a44;
+    --sr5v2-editor-bg: #939393;
+    --sr5v2-editor-menu-bg: #55101e;
+    --sr5v2-dropdown-bg: rgba(0, 0, 0, 0.05);
+    --sr5v2-dropdown-menu-bg: #444444;
+    --sr5v2-cell-bg: #000000;
+    --sr5v2-cell-border: rgba(215, 209, 195, 0.28);
+    --sr5v2-cell-hover-border: #f0ede4;
+    --sr5v2-cell-text: #b8b0a0;
+    --sr5v2-cell-filled-bg: #d7d1c3;
+    --sr5v2-cell-filled-border: #000000;
+    --sr5v2-cell-filled-text: #000000;
+    --sr5v2-positive: #079123;
+    --sr5v2-negative: #ff4d4d;
+    --sr5v2-list-selected-bg: radial-gradient(rgba(7, 145, 35, 0.4), rgba(7, 145, 35, 0.01));
+    --sr5v2-icon-filter: invert(1);
+    box-shadow: var(--sr5v2-window-shadow);
+    background: var(--sr5v2-surface-bg);
     background-repeat: repeat;
     background-size: 100% 20px auto;
+    color: var(--sr5v2-text-primary);
 
-    // color links as light and be white on hover
+    hr {
+        border-color: var(--sr5v2-border-strong);
+    }
+
     a {
-        color: variables.$light;
+        color: var(--sr5v2-link);
         &:hover {
-            color: variables.$white;
+            color: var(--sr5v2-link-hover);
         }
     }
-    // labels are all yellow to differentiate between links
+
     label {
-        color: variables.$yellow;
+        color: var(--sr5v2-label);
     }
-    // buttons use the link color for border and text color, on hover it fills in with a darkred background
-    button {
-        color: variables.$light;
-        border-color: variables.$light;
+
+    button,
+    button.display {
+        color: var(--sr5v2-button-text);
+        border-color: var(--sr5v2-button-border);
+        background: var(--sr5v2-button-bg);
+        border-radius: 0.3em;
+        text-align: center;
+
         &:not(:disabled):hover {
-            color: variables.$white;
-            background: variables.$darkred;
+            color: var(--sr5v2-button-hover-text);
+            background: var(--sr5v2-button-hover-bg);
+            border-color: var(--sr5v2-button-hover-border);
         }
+
         &:disabled {
-            color: variables.$yellow;
-            border-color: variables.$yellow;
+            color: var(--sr5v2-label);
+            border-color: var(--sr5v2-label);
+        }
+
+        &.short {
+            line-height: 1.3em;
+        }
+    }
+
+    button.display.import-character,
+    button.display.show-hidden-skills,
+    button.display.reset-actor-run-data {
+        background: var(--sr5v2-button-hover-bg);
+    }
+
+    input[type='checkbox'].display {
+        color: var(--sr5v2-text-primary);
+
+        &:hover {
+            background: transparent;
+            border: 1px solid var(--sr5v2-control-border-hover);
+        }
+    }
+
+    input[type='text'].disabled-for-display {
+        color: var(--sr5v2-text-secondary);
+        background-color: transparent;
+    }
+
+    input[type='text'].display {
+        text-shadow: none;
+        background: var(--sr5v2-display-bg);
+        color: var(--sr5v2-display-text);
+        border-radius: 0.3em;
+        border-color: var(--sr5v2-control-border);
+        text-align: center;
+        min-height: 1em;
+
+        &::placeholder {
+            color: var(--sr5v2-text-muted);
+        }
+
+        &.short {
+            font-size: 0.75em;
+        }
+
+        &.text {
+            background: var(--sr5v2-display-bg-alt);
+            border-radius: 0;
+        }
+
+        &.right {
+            text-align: right;
+        }
+
+        &.left {
+            text-align: left;
+        }
+
+        &:disabled {
+            color: var(--sr5v2-text-primary);
+            background: transparent;
+            border-color: transparent;
+            padding-left: 0;
+            padding-right: 0;
+            margin-left: 0;
+            margin-right: 0;
+        }
+    }
+
+    select.display,
+    select {
+        color: var(--sr5v2-control-text);
+        background: var(--sr5v2-control-bg);
+        border-radius: 0.3em;
+        border-color: var(--sr5v2-control-border);
+
+        > option {
+            color: var(--sr5v2-option-text);
+            background-color: var(--sr5v2-option-bg);
         }
     }
 
@@ -40,36 +189,36 @@
         height: 2rem;
         max-height: 2rem;
 
-        // change the edit mode wrench icon on the toggle switch
         .edit-wrench-icon {
-            color: black;
+            color: var(--sr5v2-text-inverse);
             vertical-align: middle;
             margin-left: 1px;
             width: auto;
-            text-shadow: 1px 1px 1px variables.$white,
-                        1px -1px 1px variables.$white,
-                        -1px -1px 1px variables.$white,
-                        -1px 1px 1px variables.$white;
+            text-shadow: 1px 1px 1px var(--sr5v2-link-hover),
+                        1px -1px 1px var(--sr5v2-link-hover),
+                        -1px -1px 1px var(--sr5v2-link-hover),
+                        -1px 1px 1px var(--sr5v2-link-hover);
         }
     }
 
-    // a named sheet is a sheet which shows its name elsewhere so we can hide most of the top bar and hide the name
     &.named-sheet {
         input.sheet-name {
             @include mixins.systemFonts;
             flex-shrink: 0;
-            background: variables.$nameplate-background;
+            background: var(--sr5v2-nameplate-bg);
             border: none;
             margin-bottom: 0;
             font-size: 1.5rem;
             height: 100%;
             padding: .5rem;
             vertical-align: center;
-            color: variables.$light; // always use light color for our custom name
+            color: var(--sr5v2-nameplate-text);
         }
+
         &:not(.minimized) {
             .window-header {
                 margin-bottom: 0;
+
                 .window-title {
                     font-size: 0;
                     height: 0;
@@ -80,10 +229,10 @@
 
     .window-content {
         padding: 0 .25rem .25rem .25rem;
-        // transparent doesn't seem to show the background from above so set it to the same thing with a slightly different gradient
-        background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url("assets/page.webp") repeat;
+        background: var(--sr5v2-content-bg);
         background-repeat: repeat;
         background-size: 100% 20px auto;
+        color: var(--sr5v2-text-primary);
 
         .sheet-image {
             flex: none;
@@ -136,47 +285,51 @@
             align-items: center;
             justify-content: start;
             margin-top: .25rem;
-            border-top: 1px solid variables.$yellow;
+            border-top: 1px solid var(--sr5v2-border-strong);
             flex-shrink: 0;
             vertical-align: bottom;
         }
 
         &.standard-form, .standard-form {
             gap: 0;
+
             .form-group {
                 padding: .5rem .25rem;
                 margin: 0;
+
                 label {
-                    color: variables.$yellow;
+                    color: var(--sr5v2-label);
                 }
+
                 p.hint {
-                    color: color.adjust(variables.$yellow, $lightness: -20%);
+                    color: var(--sr5v2-label-muted);
                 }
             }
         }
 
-        // modify tabs to have a darkred background and light text
-        // when selected, the tab inverts its colors to be a light background with darkred text
         .tabs {
             padding-inline: 1px;
             margin-top: .5rem;
             border-top: none;
-            border-bottom: 1px solid variables.$darkred;
+            border-bottom: 1px solid var(--sr5v2-border-strong);
+
             a {
-                color: variables.$light; // use light regardless of theme
+                color: var(--sr5v2-tab-text);
                 line-height: 1.5rem;
                 border-top-left-radius: .25rem;
                 border-top-right-radius: .25rem;
-                border: 1px solid variables.$darkred;
+                border: 1px solid var(--sr5v2-border-strong);
                 border-bottom: none;
-                background: rgba(variables.$darkred, 0.7);
+                background: var(--sr5v2-tab-bg);
                 width: 100%;
                 white-space: nowrap;
+
                 &.active {
-                    color: variables.$darkred;
-                    background: variables.$light-2;
-                    box-shadow: 0 0 5px 5px rgba(variables.$white, 0.2);
+                    color: var(--sr5v2-tab-active-text);
+                    background: var(--sr5v2-tab-active-bg);
+                    box-shadow: var(--sr5v2-tab-active-shadow);
                 }
+
                 &.skinny {
                     flex: 0 0 2rem;
                     padding: 0 0.5rem;
@@ -189,7 +342,6 @@
         @include mixins.clickable;
     }
 
-    // remove padding from tooltips that are customized
     &#tooltip {
         padding: 0;
     }
@@ -200,107 +352,126 @@
         padding: 0;
     }
 
-    // default all selects and inputs to light color until we have proper theme handling
-    input, select {
-        color: variables.$light;
+    input,
+    select {
+        color: var(--sr5v2-control-text);
 
         > option {
-            color: variables.$yellow;
+            color: var(--sr5v2-option-text);
         }
     }
+
     input.nuyen {
         width: 5rem;
     }
+
     input.availability {
         width: 3rem;
     }
+
     input.qty {
         width: 3rem;
         padding: 1px;
         text-align: center;
     }
+
     input.skinny {
         width: 2rem;
         padding: 1px;
         text-align: center;
     }
+
     select.skinny {
         width: 3rem;
     }
+
     input.midd {
         width: 3rem;
         padding: 1px;
         text-align: center;
     }
+
     input.thicc {
         width: 5rem;
     }
+
     input.center {
         text-align: center;
         vertical-align: center;
         horiz-align: center;
     }
+
     input.left {
         text-align: left;
         horiz-align: left;
     }
-    input.short, select.short {
+
+    input.short,
+    select.short {
         height: 1.5rem;
         min-height: 1.5rem;
         max-height: 1.5rem;
     }
+
     button.short {
         height: 1.5rem;
         min-height: 1.5rem;
         max-height: 1.5rem;
     }
+
     button.sr5-button {
         width: 100%;
+
         &.sr5-submit {
-            background: #227836;
-            color: variables.$light;
+            background: var(--sr5v2-submit-bg);
+            color: var(--sr5v2-link);
+
             &:hover {
-                color: variables.$white;
+                color: var(--sr5v2-link-hover);
             }
         }
+
         &.sr5-cancel {
-            background: variables.$darkred;
-            color: variables.$light;
+            background: var(--sr5v2-cancel-bg);
+            color: var(--sr5v2-link);
+
             &:hover {
-                color: variables.$white;
+                color: var(--sr5v2-link-hover);
             }
         }
     }
+
     select.sr5-select {
         height: 1.5rem;
         max-height: 1.5rem;
         background-color: transparent;
-        color: variables.$light;
+        color: var(--sr5v2-control-text);
         margin: 0;
         padding: 0;
         vertical-align: center;
 
         &:hover {
-            color: variables.$white;
+            color: var(--sr5v2-link-hover);
         }
 
         > option {
-            color: variables.$yellow;
-            background-color: rgba(variables.$black, 0.9);
+            color: var(--sr5v2-option-text);
+            background-color: var(--sr5v2-option-bg);
         }
     }
+
     button.sr5-icon {
         border-color: transparent;
         overflow: hidden;
         padding: 0 !important;
         margin: 0 !important;
+
         &:hover {
-            border-color: variables.$white;
+            border-color: var(--sr5v2-control-border-hover);
         }
     }
 
     .hover-show-button-container {
-        // hide "hover buttons" by default, show by growing the font-size
         .hover-show-button {
             font-size: 0.8rem;
             opacity: 0;
@@ -312,25 +483,18 @@
                 opacity: 1;
             }
         }
-
     }
 
-    /**
-     * Elements used for linkable documents / entities.
-     *
-     * This is also present in foundry.scss, but is overwritten by Monks Enhanced Journals module.
-     * Let's force it within the SR5 context, while leaving it everywhere else.
-     */
     .entity-link,
     .content-link,
     .inline-roll {
         border: 0;
         background: none;
-        color: variables.$white !important;
+        color: var(--sr5v2-link-hover) !important;
     }
 
     .entity-link.content-link {
-        color: variables.$white !important;
+        color: var(--sr5v2-link-hover) !important;
     }
 
     .basic-row {
@@ -338,7 +502,7 @@
         flex-flow: row nowrap;
         gap: 2px;
         align-items: center;
-        // disable labels from wrapping within basic rows
+
         > label {
             text-wrap: nowrap;
         }
@@ -349,15 +513,14 @@
         margin: .25rem;
     }
 
-    // An origin link is a uuid based entity link, without drag support.
     .origin-link {
-        background: #ddd;
+        background: var(--sr5v2-origin-bg);
         padding: 1px 4px;
-        border: 1px solid #4b4a44;
+        border: 1px solid var(--sr5v2-origin-border);
         border-radius: 2px;
         white-space: nowrap;
         word-break: break-all;
-        color: variables.$black;
+        color: var(--sr5v2-text-inverse);
     }
 
     .editor {
@@ -366,51 +529,47 @@
     }
 
     .editor .tox-edit-area {
-        background: variables.$mce-background;
+        background: var(--sr5v2-editor-bg);
     }
 
-    // Styling for any prosemirror editors within shadowrun applications.
     .editor.prosemirror {
-
         .editor-menu {
             padding: 2px 4px;
-            background: variables.$darkred;
+            background: var(--sr5v2-editor-menu-bg);
+
             li {
                 padding: 0;
+
                 > button {
                     padding: 2px;
                 }
             }
         }
-        // handles dropdown menus, not select based.
-        .pm-dropdown {
-            color: variables.$color;
-            background: rgba(variables.$black, 0.05);
-            border-radius: 0.3em;
-            border-color: variables.$dark;
 
-            // Icons like chevron and ticks.
+        .pm-dropdown {
+            color: var(--sr5v2-text-primary);
+            background: var(--sr5v2-dropdown-bg);
+            border-radius: 0.3em;
+            border-color: var(--sr5v2-control-border);
+
             i,
             i:hover {
-                color: variables.$color;
+                color: var(--sr5v2-text-primary);
             }
 
-            // ul will contain menus and sub-menus and can be nested.
             ul {
-                background-color: variables.$dark;
+                background-color: var(--sr5v2-dropdown-menu-bg);
             }
 
-            // li represents each menu entry in both menus and sub-menus
             ul > li:hover {
-                color: variables.$color;
-                border-color: rgba(variables.$white, 0.1);
-                background: rgba(variables.$black, 0.05);
+                color: var(--sr5v2-text-primary);
+                border-color: var(--sr5v2-border);
+                background: var(--sr5v2-dropdown-bg);
             }
         }
 
-        // HTML editing uses a class-less textarea
         textarea {
-            color: variables.$color;
+            color: var(--sr5v2-text-primary);
         }
     }
 
@@ -418,7 +577,7 @@
         height: 95%;
         min-height: 15em;
         width: 100%;
-        color: variables.$color;
+        color: var(--sr5v2-text-primary);
     }
 
     img {
@@ -429,7 +588,7 @@
     }
 
     .sheet .editor-content {
-        color: variables.$white;
+        color: var(--sr5v2-text-primary);
         height: 100%;
         overflow-y: auto;
         word-break: break-word;
@@ -450,7 +609,6 @@
             width: 100%;
         }
 
-        // Auto create grid style classes for a fixed max column grid
         @for $i from 1 through variables.$grid__cols {
             &__col-#{$i} {
                 flex-basis: calc(100 / (variables.$grid__cols / $i)) * 1%;
@@ -467,31 +625,28 @@
             padding: 4px;
         }
     }
-    ///////////////////////////////////////////////////////////////////////////////
 
     .no-shrink {
         flex-shrink: 0;
     }
-    // start css for getting scroll working
-    // override the default scrollable class so it doesn't hide the scrollbar
-    // the default foundry css seemed to add weird padding that would actually hide the scrollbar
+
     .scrollable {
         margin-right: 0;
         padding-right: 0;
         height: 100%;
     }
+
     .header-for-scrollable {
-        // TODO figure out how to make this use --scroll-margin
         padding-right: 0.75rem !important;
     }
+
     .tab {
-        // hide overflow of the tab, this should be provided to any tab that doesn't scroll
         &.hide-overflow {
             flex: 1;
             overflow: hidden;
         }
     }
-    // fill the available space so that children can scroll correctly
+
     .fill-container {
         display: flex;
         flex-flow: column nowrap;
@@ -499,7 +654,7 @@
         overflow: hidden;
         height: 100%;
     }
-    // split the available space into two side-by-side containers
+
     .split-container {
         display: flex;
         flex-flow: row nowrap;
@@ -507,28 +662,100 @@
         overflow: hidden;
         height: 100%;
 
-        // matrix tabs need to flex and hide overflow in order to have contents scroll
         .matrix-left-tab-content,
         .matrix-right-tab-content {
             flex: 1;
             overflow: hidden;
             display: flex;
         }
-        // children of the split container need to flex as a column, hide overflow to all scrolling within
+
         > * {
             display: flex;
             flex-flow: column nowrap;
             flex: 1;
             overflow: hidden;
         }
+
         > *:not(:first-child) {
             padding-left: 0.25rem;
-            border-left: variables.$groove;
+            border-left: 1px solid var(--sr5v2-border);
         }
+
         > *:not(:last-child) {
             padding-right: 0.25rem;
         }
     }
+}
 
-    // end of new css for getting scroll working
+body.theme-light .sr5v2:not(.theme-dark),
+.sr5v2.theme-light {
+    --sr5v2-page-image: url('assets/light-page.webp');
+    --sr5v2-window-shadow: 0 16px 38px rgba(26, 31, 40, 0.18);
+    --sr5v2-surface-bg: linear-gradient(rgba(246, 248, 251, 0.82), rgba(225, 230, 236, 0.95)), var(--sr5v2-page-image) repeat;
+    --sr5v2-content-bg: linear-gradient(rgba(245, 247, 250, 0.72), rgba(223, 228, 234, 0.88)), var(--sr5v2-page-image) repeat;
+    --sr5v2-text-primary: #232a33;
+    --sr5v2-text-secondary: #48515d;
+    --sr5v2-text-muted: #798290;
+    --sr5v2-text-inverse: #151a21;
+    --sr5v2-link: #3d4652;
+    --sr5v2-link-hover: #171d24;
+    --sr5v2-label: #6a4e12;
+    --sr5v2-label-muted: #8f6f2a;
+    --sr5v2-border: rgba(80, 92, 109, 0.22);
+    --sr5v2-border-strong: #6c1f2c;
+    --sr5v2-bg-subtle: rgba(99, 112, 128, 0.08);
+    --sr5v2-bg-elevated: rgba(255, 255, 255, 0.42);
+    --sr5v2-bg-elevated-strong: rgba(194, 201, 209, 0.45);
+    --sr5v2-bg-hover: rgba(108, 31, 44, 0.12);
+    --sr5v2-control-bg: rgba(251, 252, 253, 0.72);
+    --sr5v2-control-bg-strong: rgba(229, 233, 238, 0.86);
+    --sr5v2-control-border: rgba(88, 101, 119, 0.28);
+    --sr5v2-control-border-hover: #6c1f2c;
+    --sr5v2-control-text: #232a33;
+    --sr5v2-display-bg: rgba(255, 255, 255, 0.58);
+    --sr5v2-display-bg-alt: rgba(217, 223, 230, 0.76);
+    --sr5v2-display-text: #232a33;
+    --sr5v2-button-bg: rgba(242, 245, 248, 0.76);
+    --sr5v2-button-border: rgba(99, 112, 128, 0.34);
+    --sr5v2-button-text: #29313b;
+    --sr5v2-button-hover-bg: #6c1f2c;
+    --sr5v2-button-hover-border: #531720;
+    --sr5v2-button-hover-text: #fff9ef;
+    --sr5v2-submit-bg: #4a6f3d;
+    --sr5v2-cancel-bg: #6c1f2c;
+    --sr5v2-nameplate-bg: linear-gradient(90deg, #b58721 0%, #d0aa4b 22%, #e1d9c4 58%, rgba(225, 217, 196, 0.08) 100%);
+    --sr5v2-nameplate-text: #243041;
+    --sr5v2-tab-bg: linear-gradient(180deg, rgba(136, 145, 157, 0.95), rgba(108, 116, 128, 0.9));
+    --sr5v2-tab-text: #f2f4f7;
+    --sr5v2-tab-active-bg: rgba(241, 244, 247, 0.98);
+    --sr5v2-tab-active-text: #6c1f2c;
+    --sr5v2-tab-active-shadow: 0 0 0 1px rgba(108, 31, 44, 0.14), 0 3px 10px rgba(34, 42, 51, 0.12);
+    --sr5v2-option-bg: #edf1f5;
+    --sr5v2-option-text: #27303a;
+    --sr5v2-origin-bg: #eef2f6;
+    --sr5v2-origin-border: #9aa5b1;
+    --sr5v2-editor-bg: #e5eaf0;
+    --sr5v2-editor-menu-bg: #c5ccd5;
+    --sr5v2-dropdown-bg: rgba(250, 252, 254, 0.86);
+    --sr5v2-dropdown-menu-bg: #e6ebf1;
+    --sr5v2-cell-bg: #eef2f5;
+    --sr5v2-cell-border: rgba(91, 104, 121, 0.3);
+    --sr5v2-cell-hover-border: #6c1f2c;
+    --sr5v2-cell-text: #6f7b89;
+    --sr5v2-cell-filled-bg: #b7c7d5;
+    --sr5v2-cell-filled-border: #75889b;
+    --sr5v2-cell-filled-text: #1d2834;
+    --sr5v2-list-selected-bg: radial-gradient(rgba(7, 145, 35, 0.22), rgba(7, 145, 35, 0.03));
+    --sr5v2-icon-filter: none;
+}
+
+body.theme-light .sr5v2:not(.theme-dark) .toggle-fresh-import img[src$='.svg'],
+body.theme-light .sr5v2:not(.theme-dark) .no-shrink img[src$='.svg'],
+body.theme-light .sr5v2:not(.theme-dark) .list-item-image-container img[src$='.svg'],
+body.theme-light .sr5v2:not(.theme-dark) .list-item img[src*='/icons/'][src$='.svg'],
+.sr5v2.theme-light .toggle-fresh-import img[src$='.svg'],
+.sr5v2.theme-light .no-shrink img[src$='.svg'],
+.sr5v2.theme-light .list-item-image-container img[src$='.svg'],
+.sr5v2.theme-light .list-item img[src*='/icons/'][src$='.svg'] {
+    filter: brightness(0) saturate(100%) invert(13%) sepia(13%) saturate(756%) hue-rotate(176deg) brightness(93%) contrast(88%);
 }

@@ -5,8 +5,8 @@
     // change tagify input selection to match our theme better
     .tagify-selection {
         border-radius: 4px;
-        background: variables.$dark;
-        border: 1px solid variables.$light;
+        background: var(--sr5v2-control-bg-strong);
+        border: 1px solid var(--sr5v2-control-border);
         width: 100%;
     }
 }

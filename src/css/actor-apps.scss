@@ -14,12 +14,12 @@
         label.label {
             font-size: 1.25rem;
             &.positive {
-                color: variables.$matrix-green;
-                text-shadow: 0 0 2px 1px variables.$matrix-green;
+                color: var(--sr5v2-positive);
+                text-shadow: 0 0 4px var(--sr5v2-positive);
             }
             &.negative {
-                color: variables.$physical;
-                text-shadow: 0 0 2px 1px variables.$physical;
+                color: var(--sr5v2-negative);
+                text-shadow: 0 0 4px var(--sr5v2-negative);
             }
         }
         .mod-input {

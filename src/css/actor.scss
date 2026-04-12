@@ -78,10 +78,10 @@
             cursor: pointer;
         }
         &:hover {
-            background: radial-gradient(rgba(variables.$darkred, 0.7), rgba(variables.$darkred, 0.1));
-            color: variables.$white !important;
+            background: var(--sr5v2-bg-hover);
+            color: var(--sr5v2-link-hover) !important;
             label {
-                color: variables.$white !important;
+                color: var(--sr5v2-link-hover) !important;
             }
         }
     }
@@ -89,8 +89,8 @@
     #filter-active-skills {
         background: none;
         padding-left: 4px;
-        color: variables.$yellow;
-        border-bottom: variables.$groove;
+        color: var(--sr5v2-label);
+        border-bottom: 1px solid var(--sr5v2-border);
     }
 
     select#select-inventory {

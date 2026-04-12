@@ -1,53 +1,51 @@
-@use "sass:color";
-/* --- Shadowrun 5th Edition Compendium Browser (SCSS Version) --- */
+@use "config/variables";
 
-/* --- Variables --- */
-$bg-primary: #1a1a1a;
-$bg-secondary: #0d0d0d;
-$bg-tertiary: #252525;
-$bg-row-even: #1f1f1f;
-$bg-hover: #282828;
-
-$text-primary: #eee;
-$text-secondary: #ccc;
-$text-meta: #aaa;
-$text-placeholder: #888;
-
-$border-strong: #5a5a5a;
-$border-medium: #333;
-$border-subtle: #3a3a3a;
-
-$accent-gold: #ffd700;
-$accent-danger: #ff4d4d;
-
-$font-primary: "Signika", system-ui, -apple-system, sans-serif;
-
-/* --- Compendium Browser --- */
 #compendium-browser {
+    --sr5cb-bg-primary: #1a1a1a;
+    --sr5cb-bg-secondary: #0d0d0d;
+    --sr5cb-bg-tertiary: #252525;
+    --sr5cb-bg-row-even: #1f1f1f;
+    --sr5cb-bg-hover: #282828;
+    --sr5cb-text-primary: #eeeeee;
+    --sr5cb-text-secondary: #cccccc;
+    --sr5cb-text-meta: #aaaaaa;
+    --sr5cb-text-placeholder: #888888;
+    --sr5cb-border-strong: #5a5a5a;
+    --sr5cb-border-medium: #333333;
+    --sr5cb-border-subtle: #3a3a3a;
+    --sr5cb-accent: #ffd700;
+    --sr5cb-accent-danger: #ff4d4d;
+    --sr5cb-nav-text: #e7d1b1;
+    --sr5cb-focus-ring: rgba(255, 215, 0, 0.3);
+    --sr5cb-checkbox-bg: #353238;
+    --sr5cb-checkbox-border: #4a464f;
+    --sr5cb-checkbox-partial: #5d595f;
+    --sr5cb-checkbox-icon: #0d0d0d;
+    --sr5cb-checkbox-partial-icon: #ffffff;
+    --sr5cb-hover-overlay: rgba(255, 255, 255, 0.1);
     min-width: 600px;
+    font-family: variables.$systemFonts;
 
     .window-content {
         height: 100%;
         padding: 10px;
-        background: $bg-primary;
+        background: var(--sr5cb-bg-primary);
         border-radius: 6px;
         gap: 10px;
-        color: $text-primary;
-        font-family: $font-primary;
+        color: var(--sr5cb-text-primary);
         display: grid;
         grid-template-columns: 200px 1fr;
         grid-template-rows: auto 1fr;
 
-        /* --- Tabs --- */
         nav.tabs {
             grid-row: 1;
             grid-column: 1 / -1;
+
             a {
-                color: #e7d1b1;
+                color: var(--sr5cb-nav-text);
             }
         }
 
-        /* --- Filters Sidebar --- */
         .compendium-filters {
             display: flex;
             flex-direction: column;
@@ -62,26 +60,27 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                     left: 12px;
                     top: 50%;
                     transform: translateY(-50%);
-                    color: $text-placeholder;
+                    color: var(--sr5cb-text-placeholder);
                     pointer-events: none;
                 }
 
                 input {
                     width: 100%;
                     padding: 10px 30px 10px 35px;
-                    background: $bg-tertiary;
-                    border: 1px solid $border-strong;
+                    background: var(--sr5cb-bg-tertiary);
+                    border: 1px solid var(--sr5cb-border-strong);
                     border-radius: 3px;
-                    color: white;
+                    color: var(--sr5cb-text-primary);
                     font-size: 14px;
                     transition: all 0.2s ease-in-out;
 
                     &::placeholder {
-                        color: $text-placeholder;
+                        color: var(--sr5cb-text-placeholder);
                     }
+
                     &:focus {
-                        border-color: $accent-gold;
-                        box-shadow: 0 0 5px rgba($accent-gold, 0.3);
+                        border-color: var(--sr5cb-accent);
+                        box-shadow: 0 0 0 2px var(--sr5cb-focus-ring);
                         outline: none;
                     }
                 }
@@ -93,12 +92,13 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                     transform: translateY(-50%);
                     cursor: pointer;
                     opacity: 0.6;
-                    color: $text-meta;
+                    color: var(--sr5cb-text-meta);
                     font-weight: bold;
                     font-size: 18px;
+
                     &:hover {
                         opacity: 1;
-                        color: $accent-danger;
+                        color: var(--sr5cb-accent-danger);
                     }
                 }
             }
@@ -107,19 +107,26 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                 display: flex;
                 flex-direction: column;
                 padding: 10px 5px 5px 8px;
-                border-top: 1px solid $border-medium;
+                border-top: 1px solid var(--sr5cb-border-medium);
                 margin-top: 10px;
                 flex-grow: 1;
                 min-height: 0;
                 overflow-y: auto;
 
-                &::-webkit-scrollbar { width: 8px; }
-                &::-webkit-scrollbar-track { background: transparent; }
+                &::-webkit-scrollbar {
+                    width: 8px;
+                }
+
+                &::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+
                 &::-webkit-scrollbar-thumb {
-                    background: $border-strong;
+                    background: var(--sr5cb-border-strong);
                     border-radius: 4px;
+
                     &:hover {
-                        background: color.adjust($border-strong, $lightness: 10%);
+                        background: var(--sr5cb-accent);
                     }
                 }
             }
@@ -130,12 +137,12 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                 gap: 10px;
                 padding: 2px 0;
                 cursor: pointer;
-                color: $text-secondary;
+                color: var(--sr5cb-text-secondary);
                 font-size: 15px;
                 transition: color 0.2s ease;
 
                 &:hover {
-                    color: $text-primary;
+                    color: var(--sr5cb-text-primary);
                 }
 
                 input[type="checkbox"] {
@@ -148,14 +155,21 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                     cursor: pointer;
                     position: relative;
                     transition: all 0.2s ease;
-                    background-color: #353238;
-                    border: 1px solid #4a464f;
+                    background-color: var(--sr5cb-checkbox-bg);
+                    border: 1px solid var(--sr5cb-checkbox-border);
 
-                    &::before { content: none !important; }
-                    &:hover { border-color: $accent-gold; }
+                    &::before {
+                        content: none !important;
+                    }
+
+                    &:hover {
+                        border-color: var(--sr5cb-accent);
+                    }
+
                     &:checked {
-                        background-color: $accent-gold;
-                        border-color: $accent-gold;
+                        background-color: var(--sr5cb-accent);
+                        border-color: var(--sr5cb-accent);
+
                         &::after {
                             content: '\f00c';
                             font-weight: 900;
@@ -164,7 +178,7 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                             left: 50%;
                             transform: translate(-25%, -50%);
                             font-size: 12px;
-                            color: $bg-secondary;
+                            color: var(--sr5cb-checkbox-icon);
                         }
                     }
                 }
@@ -175,11 +189,10 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
             }
         }
 
-        /* --- Results Panel --- */
         .compendium-results {
-            background: $bg-secondary;
+            background: var(--sr5cb-bg-secondary);
             border-radius: 4px;
-            border: 1px solid $border-medium;
+            border: 1px solid var(--sr5cb-border-medium);
             display: flex;
             flex-direction: column;
             min-height: 0;
@@ -189,11 +202,11 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                 justify-content: space-between;
                 align-items: center;
                 padding: 8px 15px;
-                background: $bg-tertiary;
-                border-bottom: 2px solid $border-strong;
+                background: var(--sr5cb-bg-tertiary);
+                border-bottom: 2px solid var(--sr5cb-border-strong);
                 font-weight: bold;
                 font-size: 1.1em;
-                color: $accent-gold;
+                color: var(--sr5cb-accent);
                 text-transform: uppercase;
                 letter-spacing: 1px;
                 flex-shrink: 0;
@@ -201,9 +214,10 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                 h2 {
                     margin: 0;
                     font-size: 1.2em;
-                    text-shadow: 0 0 5px rgba($accent-gold, 0.4);
-                    color: rgb(247, 243, 232);
+                    text-shadow: 0 0 5px var(--sr5cb-focus-ring);
+                    color: var(--sr5cb-text-primary);
                 }
+
                 .header-source {
                     font-size: 0.9em;
                 }
@@ -212,13 +226,20 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
             .compendium-list {
                 overflow-y: auto;
 
-                &::-webkit-scrollbar { width: 8px; }
-                &::-webkit-scrollbar-track { background: $bg-primary; }
+                &::-webkit-scrollbar {
+                    width: 8px;
+                }
+
+                &::-webkit-scrollbar-track {
+                    background: var(--sr5cb-bg-primary);
+                }
+
                 &::-webkit-scrollbar-thumb {
-                    background: $border-strong;
+                    background: var(--sr5cb-border-strong);
                     border-radius: 4px;
+
                     &:hover {
-                        background: color.adjust($border-strong, $lightness: 5%);
+                        background: var(--sr5cb-accent);
                     }
                 }
             }
@@ -226,17 +247,22 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
             .compendium-entry {
                 display: flex;
                 align-items: center;
-                border-bottom: 1px solid $border-subtle;
-                background: $bg-primary;
+                border-bottom: 1px solid var(--sr5cb-border-subtle);
+                background: var(--sr5cb-bg-primary);
                 transition: background 0.15s ease;
                 min-height: 50px;
 
                 &:nth-child(even) {
-                    background: $bg-row-even;
+                    background: var(--sr5cb-bg-row-even);
                 }
 
-                &:hover { background: $bg-hover; }
-                &:last-child { border-bottom: none; }
+                &:hover {
+                    background: var(--sr5cb-bg-hover);
+                }
+
+                &:last-child {
+                    border-bottom: none;
+                }
 
                 .item-main {
                     display: flex;
@@ -251,6 +277,7 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                         height: 30px;
                         margin-right: 15px;
                         flex-shrink: 0;
+
                         img {
                             width: 100%;
                             height: 100%;
@@ -258,13 +285,15 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                             border: none;
                         }
                     }
+
                     .item-details {
                         flex-grow: 1;
                         min-width: 0;
+
                         h3 {
                             margin: 0;
                             font-size: 1em;
-                            color: white;
+                            color: var(--sr5cb-text-primary);
                             word-break: break-word;
                             font-weight: normal;
                         }
@@ -273,12 +302,12 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                         .item-pack {
                             display: inline-block;
                             font-size: 0.8em;
-                            color: $text-placeholder;
+                            color: var(--sr5cb-text-placeholder);
                             padding-top: 3px;
                         }
 
                         .item-type::after {
-                            content: "|";
+                            content: '|';
                             margin: 0 0.5em;
                             opacity: 0.5;
                         }
@@ -300,25 +329,18 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                 }
 
                 .item-source {
-                    color: $text-meta;
+                    color: var(--sr5cb-text-meta);
                     white-space: nowrap;
                 }
             }
 
-            .loading {
-                padding: 40px 20px;
-                text-align: center;
-                color: color.adjust($text-placeholder, $lightness: -5%);
-                font-style: italic;
-                background: $bg-primary;
-            }
-
+            .loading,
             .no-results {
                 padding: 40px 20px;
                 text-align: center;
-                color: color.adjust($text-placeholder, $lightness: -5%);
+                color: var(--sr5cb-text-placeholder);
                 font-style: italic;
-                background: $bg-primary;
+                background: var(--sr5cb-bg-primary);
             }
         }
 
@@ -327,7 +349,6 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
             gap: 25px;
             overflow-y: hidden;
 
-            /* Hide the settings panel by default unless managed by a listener */
             &.hidden {
                 display: none;
             }
@@ -335,8 +356,8 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
             .pack-group {
                 display: flex;
                 flex-direction: column;
-                background-color: $bg-secondary;
-                border: 1px solid $border-medium;
+                background-color: var(--sr5cb-bg-secondary);
+                border: 1px solid var(--sr5cb-border-medium);
                 border-radius: 5px;
                 padding: 15px;
                 overflow-y: hidden;
@@ -344,12 +365,12 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
 
             .group-title {
                 font-weight: bold;
-                color: $accent-gold;
+                color: var(--sr5cb-accent);
                 text-transform: uppercase;
                 letter-spacing: 1px;
                 padding-bottom: 8px;
                 margin: 0 0 10px 0;
-                border-bottom: 2px solid $border-strong;
+                border-bottom: 2px solid var(--sr5cb-border-strong);
                 font-size: 1.2em;
                 text-align: center;
             }
@@ -362,7 +383,7 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
             .pack-row {
                 display: flex;
                 flex-direction: column;
-                
+
                 > label {
                     display: flex;
                     align-items: center;
@@ -370,30 +391,26 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                     cursor: pointer;
                     padding-left: calc(var(--depth, 0) * 30px);
                     border-radius: 3px;
-                   
+
                     &:hover {
-                        background-color: rgba(255, 255, 255, 0.1);
+                        background-color: var(--sr5cb-hover-overlay);
                     }
 
                     input[type="checkbox"] {
-                        // Base styles (mostly from your provided code, with slight adjustments)
                         -webkit-appearance: none;
                         appearance: none;
                         width: 18px;
                         height: 18px;
-                        border-radius: 3px; // Slightly increase radius for a softer look
+                        border-radius: 3px;
                         cursor: pointer;
                         position: relative;
-                        display: inline-block; // Ensure proper sizing and text flow
-                        vertical-align: middle; // Align with surrounding text
-                        transition: all 0.2s ease; // Smooth transitions for all properties
-                        background-color: #353238;
-                        border: 1px solid #4a464f;
-                        flex-shrink: 0; // Prevent checkbox from shrinking in flex containers
+                        display: inline-block;
+                        vertical-align: middle;
+                        transition: all 0.2s ease;
+                        background-color: var(--sr5cb-checkbox-bg);
+                        border: 1px solid var(--sr5cb-checkbox-border);
+                        flex-shrink: 0;
 
-                        // We'll use ::after for both checkmark and indeterminate state
-                        // ::before is usually for an outer ring or different effect,
-                        // so we'll remove content: none !important for ::before and define ::after
                         &::after {
                             font-weight: 900;
                             position: absolute;
@@ -401,19 +418,18 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                             left: 50%;
                             transform: translate(-25%, -34%);
                             font-size: 12px;
-                            color: $bg-secondary; // Color of the icon
-                            transition: transform 0.2s ease, opacity 0.2s ease; // Smooth icon appearance
-                            line-height: 1; // Prevent extra spacing
+                            color: var(--sr5cb-checkbox-icon);
+                            transition: transform 0.2s ease, opacity 0.2s ease;
+                            line-height: 1;
                         }
 
                         &:hover {
-                            border-color: $accent-gold;
+                            border-color: var(--sr5cb-accent);
                         }
 
-                        // State when CHECKED (fully selected)
                         &:checked {
-                            background-color: $accent-gold;
-                            border-color: $accent-gold;
+                            background-color: var(--sr5cb-accent);
+                            border-color: var(--sr5cb-accent);
 
                             &::after {
                                 content: '\f00c';
@@ -422,23 +438,21 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                         }
 
                         &.indeterminate:checked {
-                            background-color: #5d595f;
-                            border-color: #5d595f;
-                            
+                            background-color: var(--sr5cb-checkbox-partial);
+                            border-color: var(--sr5cb-checkbox-partial);
+
                             &::after {
                                 content: '—';
-                                transform: translate(-32%, -34%); // Show dash
-                                color: #FFFFFF;
+                                transform: translate(-32%, -34%);
+                                color: var(--sr5cb-checkbox-partial-icon);
                             }
                         }
                     }
                 }
 
-                // Add this new rule for the container
                 .children-container {
                     overflow: hidden;
-                    // Default (expanded) state
-                    max-height: 1000px; /* A large value that the content will not exceed */
+                    max-height: 1000px;
                     transition: max-height 0.3s ease-out;
                 }
             }
@@ -448,11 +462,12 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
                     font-weight: bold;
                 }
             }
-            
+
             .collapse-toggle {
                 cursor: pointer;
                 width: 1em;
                 text-align: center;
+
                 i {
                     transition: transform 0.2s ease-in-out;
                 }
@@ -470,4 +485,30 @@ $font-primary: "Signika", system-ui, -apple-system, sans-serif;
             }
         }
     }
+}
+
+body.theme-light #compendium-browser:not(.theme-dark),
+#compendium-browser.theme-light {
+    --sr5cb-bg-primary: #edf1f5;
+    --sr5cb-bg-secondary: #f8fafc;
+    --sr5cb-bg-tertiary: #d6dde5;
+    --sr5cb-bg-row-even: #e5eaf0;
+    --sr5cb-bg-hover: #d8dee6;
+    --sr5cb-text-primary: #232a33;
+    --sr5cb-text-secondary: #495360;
+    --sr5cb-text-meta: #707b89;
+    --sr5cb-text-placeholder: #8c97a4;
+    --sr5cb-border-strong: #6c1f2c;
+    --sr5cb-border-medium: #c4ccd5;
+    --sr5cb-border-subtle: #d9e0e7;
+    --sr5cb-accent: #9b741c;
+    --sr5cb-accent-danger: #af3d31;
+    --sr5cb-nav-text: #6c1f2c;
+    --sr5cb-focus-ring: rgba(108, 31, 44, 0.16);
+    --sr5cb-checkbox-bg: #f7f9fb;
+    --sr5cb-checkbox-border: #98a5b2;
+    --sr5cb-checkbox-partial: #bec9d3;
+    --sr5cb-checkbox-icon: #232a33;
+    --sr5cb-checkbox-partial-icon: #232a33;
+    --sr5cb-hover-overlay: rgba(108, 31, 44, 0.08);
 }

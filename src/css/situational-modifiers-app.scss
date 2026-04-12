@@ -14,9 +14,8 @@
 
     .env-modifier-active {
         border-radius: 8px;
-        //box-shadow: $dark-sunken-box-shadow;
-        background-color: variables.$darkred; //$dark-sunken;
-        color: variables.$yellow;
+        background-color: var(--sr5v2-button-hover-bg);
+        color: var(--sr5v2-label);
     }
 
     .env-modifier-total {
