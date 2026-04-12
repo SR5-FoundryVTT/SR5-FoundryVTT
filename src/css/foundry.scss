@@ -39,36 +39,64 @@ input[type='text'].display {
 /**
  * JOURNAL ENTRY STYLING
  */
-// Journal Entry
-body:not(.theme-dark) {
-    .sheet.journal-entry .journal-entry-content,
-    // Journal Entry Page Editor
-    .journal-sheet.journal-entry-page .window-content {
-        background: url('assets/light-page.webp') repeat;
-    }
+.sheet.journal-entry,
+.journal-sheet {
+    --sr5-journal-page-bg: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url('assets/page.webp') repeat;
+    --sr5-journal-heading: #ebb531;
+    --sr5-journal-table-bg: linear-gradient(to bottom, rgba(25, 24, 19, 0.92), rgba(0, 0, 0, 0.98));
+    --sr5-journal-table-caption: #ebb531;
+    --sr5-journal-table-head-bg: rgba(0, 0, 0, 0.88);
+    --sr5-journal-table-text: #f0ede4;
+    --sr5-journal-table-row-even: rgba(255, 255, 255, 0.08);
+    --sr5-journal-table-border: rgba(235, 181, 49, 0.7);
+    --sr5-journal-title-bg: var(--sr5-theme-nameplate-bg), url('assets/page.webp') repeat;
+    --sr5-journal-title-text: var(--sr5-theme-nameplate-text);
+    --sr5-journal-select-text: #2c2b26;
+    --sr5-journal-option-text: #f0ede4;
+}
+
+body.theme-light .sheet.journal-entry,
+body.theme-light .journal-sheet,
+.sheet.journal-entry.theme-light,
+.journal-sheet.theme-light {
+    --sr5-journal-page-bg: linear-gradient(rgba(245, 247, 250, 0.9), rgba(223, 228, 234, 0.94)), url('assets/light-page.webp') repeat;
+    --sr5-journal-heading: #6c1f2c;
+    --sr5-journal-table-bg: linear-gradient(to bottom, rgba(214, 220, 228, 0.96), rgba(192, 200, 210, 0.98));
+    --sr5-journal-table-caption: #6c1f2c;
+    --sr5-journal-table-head-bg: rgba(35, 42, 51, 0.88);
+    --sr5-journal-table-text: #171d24;
+    --sr5-journal-table-row-even: rgba(99, 112, 128, 0.08);
+    --sr5-journal-table-border: rgba(108, 31, 44, 0.34);
+    --sr5-journal-title-bg: var(--sr5-theme-nameplate-bg), url('assets/light-page.webp') repeat;
+    --sr5-journal-title-text: var(--sr5-theme-nameplate-text);
+    --sr5-journal-select-text: #232a33;
+    --sr5-journal-option-text: #f7f8fb;
 }
 
 .sheet.journal-entry .journal-entry-content,
 // Journal Entry Page Editor
 .journal-sheet.journal-entry-page .window-content {
+    background: var(--sr5-journal-page-bg);
+
     // As we only change headers in journal-entires, avoid cross styling outside of it.
     // This clashed with Weather Control module and others.
     h1 {
-        color: variables.$darkred;
+        color: var(--sr5-journal-heading);
         font-size: 25px;
     }
 
     h2 {
-        color: variables.$darkred;
+        color: var(--sr5-journal-heading);
     }
 
     table {
-        background: linear-gradient(to bottom, #3d3c3f, #000000);
+        background: var(--sr5-journal-table-bg);
         font-size: 90%;
+
         caption {
             background: inherit;
             text-align: left;
-            color: variables.$yellow;
+            color: var(--sr5-journal-table-caption);
             font-size: medium;
             padding: 9px;
         }
@@ -76,33 +104,34 @@ body:not(.theme-dark) {
 
     th {
         padding: 9px;
-        background: black;
-        color: variables.$yellow;
+        background: var(--sr5-journal-table-head-bg);
+        color: var(--sr5-journal-table-caption);
         text-align: left;
     }
+
     td {
         text-align: left;
         padding: 9px;
     }
 
     tr {
-        color: white;
+        color: var(--sr5-journal-table-text);
     }
 
     tr:nth-child(even) {
-        background-color: #59595b;
+        background-color: var(--sr5-journal-table-row-even);
     }
 
     tr:first-child th {
-        border-top: 1px solid variables.$yellow;
+        border-top: 1px solid var(--sr5-journal-table-border);
     }
 
     tr:first-child th {
-        border-bottom: 1px solid variables.$yellow;
+        border-bottom: 1px solid var(--sr5-journal-table-border);
     }
 
     tr:last-child td {
-        border-bottom: 1px solid variables.$yellow;
+        border-bottom: 1px solid var(--sr5-journal-table-border);
     }
 
     table .content-link {
@@ -121,9 +150,7 @@ body:not(.theme-dark) {
     margin: auto;
 }
 .journal-sheet .journal-header .title {
-    background:
-        variables.$nameplate-background,
-        url('assets/page.webp') repeat;
+    background: var(--sr5-journal-title-bg);
     background-repeat: no-repeat, repeat;
     background-size:
         100% 41px,
@@ -132,21 +159,21 @@ body:not(.theme-dark) {
     border-radius: 0;
     text-align: left !important;
     text-indent: 5px;
-    color: white;
+    color: var(--sr5-journal-title-text);
     border-width: 0;
     height: 80px;
 }
 
 .journal-sheet h3 {
-    color: variables.$darkred;
+    color: var(--sr5-journal-heading);
 }
 
 .journal-sheet select {
-    color: variables.$dark;
+    color: var(--sr5-journal-select-text);
 }
 
 .journal-sheet option {
-    color: variables.$white;
+    color: var(--sr5-journal-option-text);
 }
 
 /**

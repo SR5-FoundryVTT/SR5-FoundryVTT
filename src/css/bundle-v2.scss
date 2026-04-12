@@ -2,6 +2,18 @@
 @use "config/mixins";
 @use "config/variables";
 
+body,
+.sr5v2.theme-dark {
+    --sr5-theme-nameplate-bg: linear-gradient(90deg, #55101e 0%, rgba(85, 16, 30, 0.92) 36%, rgba(85, 16, 30, 0) 100%);
+    --sr5-theme-nameplate-text: #f0ede4;
+}
+
+body.theme-light,
+.sr5v2.theme-light {
+    --sr5-theme-nameplate-bg: linear-gradient(90deg, #b58721 0%, #d0aa4b 22%, #e1d9c4 58%, rgba(225, 217, 196, 0.08) 100%);
+    --sr5-theme-nameplate-text: #243041;
+}
+
 .sr5v2 {
     --sr5v2-page-image: url('assets/page.webp');
     --sr5v2-window-shadow: 0 0 10px 5px rgba(235, 181, 49, 0.4);
@@ -37,8 +49,8 @@
     --sr5v2-button-hover-text: #ffffff;
     --sr5v2-submit-bg: #227836;
     --sr5v2-cancel-bg: #55101e;
-    --sr5v2-nameplate-bg: linear-gradient(90deg, #55101e 0%, rgba(85, 16, 30, 0.92) 36%, rgba(85, 16, 30, 0) 100%);
-    --sr5v2-nameplate-text: #f0ede4;
+    --sr5v2-nameplate-bg: var(--sr5-theme-nameplate-bg);
+    --sr5v2-nameplate-text: var(--sr5-theme-nameplate-text);
     --sr5v2-tab-bg: rgba(85, 16, 30, 0.7);
     --sr5v2-tab-text: #f0ede4;
     --sr5v2-tab-active-bg: #b6b2a6;
@@ -723,8 +735,6 @@ body.theme-light .sr5v2:not(.theme-dark),
     --sr5v2-button-hover-text: #fff9ef;
     --sr5v2-submit-bg: #4a6f3d;
     --sr5v2-cancel-bg: #6c1f2c;
-    --sr5v2-nameplate-bg: linear-gradient(90deg, #b58721 0%, #d0aa4b 22%, #e1d9c4 58%, rgba(225, 217, 196, 0.08) 100%);
-    --sr5v2-nameplate-text: #243041;
     --sr5v2-tab-bg: linear-gradient(180deg, rgba(136, 145, 157, 0.95), rgba(108, 116, 128, 0.9));
     --sr5v2-tab-text: #f2f4f7;
     --sr5v2-tab-active-bg: rgba(241, 244, 247, 0.98);
