@@ -11,7 +11,7 @@ export class Version0_34_0 extends VersionMigration {
     }
 
     override migrateCombat(combat: any) {
-        combat.system.initiativePass = combat.flags.shadowrun5e?.combatInitiativePass ?? 0;
+        combat.system.pass = combat.flags.shadowrun5e?.combatInitiativePass ?? 0;
     }
 
     override migrateCombatant(combatant: any): void {

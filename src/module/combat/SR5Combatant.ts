@@ -43,9 +43,9 @@ export class SR5Combatant extends Combatant<"base"> {
     }
 
     /** Handles updates at the start of a combatant's turn. */
-    async turnUpdate(initiativePass: number): Promise<void> {
+    async turnUpdate(pass: number): Promise<void> {
         // Clear movement history on the first initiative pass.
-        if (initiativePass === SR.combat.INITIAL_INI_PASS)
+        if (pass === SR.combat.INITIAL_INI_PASS)
             await this.clearMovementHistory();
 
         // Reset defense modifiers for the new action phase.
