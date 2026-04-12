@@ -167,18 +167,6 @@ export const registerSystemSettings = () => {
     });
 
     /**
-     * Control whether users can override result values in any success test.
-     */
-    game.settings.register(SYSTEM_NAME, FLAGS.ResultOverrideOnSuccessTest, {
-        name: 'SETTINGS.ResultOverrideOnSuccessTest',
-        hint: 'SETTINGS.ResultOverrideOnSuccessTestDescription',
-        scope: 'client',
-        config: true,
-        type: Boolean,
-        default: false
-    });
-
-    /**
      * Control if the Modify Roll section starts collapsed by default in test dialogs.
      */
     game.settings.register(SYSTEM_NAME, FLAGS.CollapseModifyRollByDefault, {

@@ -61,10 +61,6 @@ export interface TestData {
     threshold: ValueFieldType
     limit: ValueFieldType
 
-    // Result values manually overridden by user input.
-    resultOverrideHits: ValueFieldType
-    resultOverrideGlitches: ValueFieldType
-
     // Use Shadowrun buy hits rule instead of rolling dice.
     buyHits: boolean
 
@@ -262,10 +258,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         data.values.extendedHits = data.values.extendedHits || DataDefaults.createData('value_field', { label: "SR5.ExtendedHits" });
         data.values.netHits = data.values.netHits || DataDefaults.createData('value_field', { label: "SR5.NetHits" });
         data.values.glitches = data.values.glitches || DataDefaults.createData('value_field', { label: "SR5.Glitches" });
-
-        // User provided result override values.
-        data.resultOverrideHits = data.resultOverrideHits || DataDefaults.createData('value_field', { label: 'SR5.ResultOverrideHits' });
-        data.resultOverrideGlitches = data.resultOverrideGlitches || DataDefaults.createData('value_field', { label: 'SR5.ResultOverrideGlitches' });
 
         data.opposed = data.opposed || undefined;
 
@@ -610,9 +602,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         ModifiableValue.calcTotal(this.data.threshold, { min: 0 });
         ModifiableValue.calcTotal(this.data.limit, { min: 0 });
 
-        ModifiableValue.calcTotal(this.data.resultOverrideHits, { min: 0 });
-        ModifiableValue.calcTotal(this.data.resultOverrideGlitches, { min: 0 });
-
         // Shows AP on incoming attacks
         ModifiableValue.calcTotal(this.data.damage.ap);
 
@@ -628,7 +617,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Helper method to evaluate the internal SR5Roll and SuccessTest values.
      */
     async evaluate(): Promise<this> {
-        if (!this.usingResultOverride) {
+        if (!this.hasBuyHits) {
             // Evaluate all rolls.
             for (const roll of this.rolls) {
                 if (!roll.evaluated())
@@ -909,11 +898,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     calculateHits(): ValueFieldType {
         // Use buy hits, result override or automated roll for hits.
-        const rollHits = this.usingResultOverride
-            ? this.resultOverrideHits.value
-            : this.hasBuyHits
-                ? this.boughtHits
-                : this.rolls.reduce((hits, roll) => hits + roll.hits, 0);
+        const rollHits = this.hasBuyHits ? this.boughtHits
+            : this.rolls.reduce((hits, roll) => hits + roll.hits, 0);
 
         // Sum of all rolls!
         this.hits.base = rollHits;
@@ -935,16 +921,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return this.data.values.extendedHits || DataDefaults.createData('value_field', { label: 'SR5.ExtendedHits' });
     }
 
-    get resultOverrideHits(): ValueFieldType {
-        return this.data.resultOverrideHits;
-    }
-
-    get resultOverrideGlitches(): ValueFieldType {
-        return this.data.resultOverrideGlitches;
-    }
-
     get hasBuyHits(): boolean {
-        return !this.usingResultOverride && this.data.buyHits;
+        return this.data.buyHits;
     }
 
     get boughtHits(): number {
@@ -970,29 +948,12 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
-     * Depending on system settings allow result override values to skip automated roll.
-     */
-    get allowResultOverride(): boolean {
-        return game.settings.get(SYSTEM_NAME, FLAGS.ResultOverrideOnSuccessTest) as boolean;
-    }
-
-    /**
-     * Determine if this success test must automated roll or can use a result override given by user.
-     */
-    get usingResultOverride(): boolean {
-        return this.allowResultOverride && (Boolean(this.data.resultOverrideHits.value) || Boolean(this.data.resultOverrideGlitches.value));
-    }
-
-    /**
      * Helper to get the glitches values for this success test.
      */
     calculateGlitches(): ValueFieldType {
         // Buy hits produces no glitches.
-        const rollGlitches = this.usingResultOverride
-            ? this.resultOverrideGlitches.value
-            : this.hasBuyHits
-                ? 0
-                : this.rolls.reduce((glitches, roll) => glitches + roll.glitches, 0);
+        const rollGlitches = this.hasBuyHits ? 0
+            : this.rolls.reduce((glitches, roll) => glitches + roll.glitches, 0);
 
         const glitches = DataDefaults.createData('value_field', {
             label: "SR5.Glitches",

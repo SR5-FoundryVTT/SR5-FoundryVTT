@@ -37,8 +37,6 @@
         "OnlyAllowRollOnDefaultableSkillsDescription": "Quando desmarcado, perícias desconhecidas podem ser roladas, mesmo que não pudessem normalmente.",
         "OnlyAutoRollNPCInCombat": "Rolar apenas a iniciativa do NPC automaticamente",
         "OnlyAutoRollNPCInCombatDescription": "Quando desmarcado, os jogadores devem rolar manualmente sua iniciativa em cada rodada",
-        "ResultOverrideOnSuccessTest": "Substituição de resultado em qualquer teste",
-        "ResultOverrideOnSuccessTestDescription": "Permitir que o usuário substitua sucessos e falhas do teste.",
         "ShowGlitchAnimationDescription": "Deve exibir a animação como parte do texto de falha no cartão de rolagem",
         "ShowGlitchAnimationName": "Exibir Animação de Falha",
         "ShowSkillsWithDetails": "Mostrar listas de perícias mais detalhadas",
