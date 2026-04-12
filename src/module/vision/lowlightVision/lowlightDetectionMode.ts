@@ -1,7 +1,5 @@
-
-//todo: v10 foundry-vtt-types 
-
-import LowLightVisionFilter from "./lowlightFilter";
+import { resolveDetectionModeRange } from '../detectionRange';
+import LowLightVisionFilter from './lowlightFilter';
 
 export default class LowlightVisionDetectionMode extends foundry.canvas.perception.DetectionMode {
 
@@ -12,12 +10,18 @@ export default class LowlightVisionDetectionMode extends foundry.canvas.percepti
     override _canDetect(
         ...[visionSource, target]: Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>
     ) {
-        const tgt = target?.document instanceof TokenDocument ? target.document : null;
-        const targetIsVisible = !tgt?.actor?.statuses.has(CONFIG.specialStatusEffects.INVISIBLE);
+        if (!super._canDetect(visionSource, target)) return false;
 
-        const isAstralPerceiving = visionSource?.visionMode?.id === "astralPerception";
+        const isAstralPerceiving = visionSource?.visionMode?.id === 'astralPerception';
 
-        return targetIsVisible && !isAstralPerceiving;
+        return !isAstralPerceiving;
+    }
+
+    override _testRange(
+        ...[visionSource, mode, target, test]: Parameters<foundry.canvas.perception.DetectionMode['_testRange']>
+    ) {
+        const range = resolveDetectionModeRange(visionSource, mode);
+        return super._testRange(visionSource, { ...mode, range }, target, test);
     }
 }
   

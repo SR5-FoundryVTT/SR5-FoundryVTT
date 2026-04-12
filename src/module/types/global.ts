@@ -105,6 +105,9 @@ declare module "fvtt-types/configuration" {
 
         interface VisionModes {
             astralPerception: foundry.canvas.perception.VisionMode;
+            thermographic: foundry.canvas.perception.VisionMode;
+            lowlight: foundry.canvas.perception.VisionMode;
+            augmentedReality: foundry.canvas.perception.VisionMode;
         }
     }
 
