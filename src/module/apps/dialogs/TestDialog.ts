@@ -113,17 +113,6 @@ export class TestDialog extends FormDialog {
             checkbox.dispatchEvent(new Event('change', { bubbles: true }));
         });
 
-        html.find('.result-header').on('click', event => {
-            event.preventDefault();
-            const sectionDiv = event.currentTarget.closest('.result-override-section');
-            if (!sectionDiv) return;
-
-            const isExpanded = sectionDiv.classList.toggle('expanded');
-            if (isExpanded) this._expandedList.add('result-override');
-            else this._expandedList.delete('result-override');
-            void this.render();
-        });
-
         html.find('.modify-roll-header').on('click', event => {
             event.preventDefault();
             const sectionDiv = event.currentTarget.closest('.modify-roll-section');
