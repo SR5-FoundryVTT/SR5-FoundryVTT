@@ -113,11 +113,12 @@ export const SR = {
             }
         },
 
-        INI_RESULT_MOD_AFTER_INI_PASS: -10,
-        INITIAL_INI_PASS: 1,
-        INITIAL_INI_ROUND: 1,
+        FIRST_PASS: 1,
+        FIRST_ROUND: 1,
+        PASS_PENALTY: -10,
         ROUND_TIME_SECONDS: 3,
         TURN_TIME_SECONDS: 0,
+        MAX_HISTORY_SIZE: 50,
     },
     defense: {
         spell: {

@@ -410,6 +410,85 @@
                 }
             }
         }
+
+        &.initiative-summary-card {
+            .card-main-content {
+                padding: 0.3em 0.35em;
+            }
+
+            .initiative-summary-list {
+                display: flex;
+                flex-direction: column;
+                gap: 0.2em;
+            }
+
+            .initiative-summary-row {
+                display: grid;
+                grid-template-columns: 1.6em minmax(0, 1fr) auto;
+                align-items: center;
+                column-gap: 0.5em;
+                padding: 0.2em 0.15em;
+                line-height: 1.4;
+                border-bottom: variables.$groove;
+            }
+
+            .initiative-summary-row:last-child {
+                border-bottom: none;
+            }
+
+            .initiative-mode-icon {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                border: 1px solid #000;
+                background: rgba(0, 0, 0, 0.7);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                text-decoration: none;
+                color: variables.$white;
+
+                i {
+                    font-size: 0.75rem;
+                }
+
+                &.mode-astral i {
+                    color: #a98aff;
+                }
+
+                &.mode-matrix i {
+                    color: #8aff96;
+                }
+
+                &.mode-physical i {
+                    color: #ff8a8a;
+                }
+
+                &.mode-unknown i {
+                    color: #aaa;
+                }
+            }
+
+            .combatant-name {
+                min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .initiative-total {
+                width: 25px;
+                text-align: center;
+                font-weight: bold;
+                padding: 0.1em 0.4em;
+                border-radius: 0.25em;
+                background: rgba(variables.$light, 0.12);
+
+                &.is-blitz {
+                    box-shadow: 0 0 0 2px variables.$yellow;
+                }
+            }
+        }
     }
     &.item-card {
         .card-description {
@@ -419,5 +498,34 @@
     .chat-select-link img:hover {
         padding: 0;
         border: variables.$groove;
+    }
+}
+
+.initiative-total-tooltip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2em;
+    white-space: nowrap;
+
+    .dice-rolls {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.15em;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        .roll {
+            margin: 0;
+        }
+    }
+
+    .initiative-tooltip-paren,
+    .initiative-tooltip-base {
+        font-weight: bold;
+        display: inline-flex;
+        align-items: center;
+        height: 100%;
+        line-height: 0;
     }
 }

@@ -1,0 +1,29 @@
+<div class="sr5 chat-card roll-card initiative-summary-card">
+    <div class="card-main-content">
+        <div class="initiative-summary-list">
+            {{#each combatants}}
+            <div class="initiative-summary-row">
+                {{#if this.tokenId}}
+                <a class="chat-select-link initiative-mode-icon {{this.modeClass}}" data-token-id="{{this.tokenId}}" title="{{this.modeTitle}}" aria-label="{{this.modeTitle}}">
+                    <i class="{{this.modeIcon}}" aria-hidden="true"></i>
+                </a>
+                {{else}}
+                <span class="initiative-mode-icon {{this.modeClass}}" title="{{this.modeTitle}}" aria-label="{{this.modeTitle}}">
+                    <i class="{{this.modeIcon}}" aria-hidden="true"></i>
+                </span>
+                {{/if}}
+
+                {{#if this.documentUuid}}
+                <a class="chat-document-link combatant-name" data-uuid="{{this.documentUuid}}">
+                    {{#if this.document}}{{speakerName this.document}}{{else}}{{this.name}}{{/if}}
+                </a>
+                {{else}}
+                <span class="combatant-name">{{this.name}}</span>
+                {{/if}}
+
+                <span class="initiative-total {{#if this.isBlitz}}is-blitz{{/if}}" data-tooltip-html="{{this.totalTooltipHtml}}">{{this.initiative}}</span>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+</div>

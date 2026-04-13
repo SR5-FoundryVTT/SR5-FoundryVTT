@@ -16,7 +16,7 @@ export class CombatRules {
     static initAfterPass(score: number | null): number | null;
     static initAfterPass(score: number | null): number | null {
         if (score === null) return null;
-        return Math.max(score + SR.combat.INI_RESULT_MOD_AFTER_INI_PASS, 0);
+        return score + SR.combat.PASS_PENALTY;
     }
 
     /**

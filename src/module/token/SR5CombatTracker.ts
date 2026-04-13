@@ -89,9 +89,6 @@ export class SR5CombatTracker extends CombatTracker {
         turn.seize = combatant.system.seize;
         turn.acted = combatant.system.acted && combatant.combat?.combatant?.id !== combatant.id;
 
-        if (turn.initiative)
-            turn.initiative = Math.max(turn.initiative, 0);
-
         return turn;
     }
 

@@ -10,9 +10,9 @@ const CombatHistoryCombatantData = () => ({
 });
 
 const CombatHistorySnapshotData = () => ({
-    round: new NumberField({ integer: true, nullable: false, initial: SR.combat.INITIAL_INI_ROUND }),
+    round: new NumberField({ integer: true, nullable: false, initial: SR.combat.FIRST_ROUND }),
     turn: new NumberField({ integer: true, initial: null }),
-    pass: new NumberField({ integer: true, required: true, nullable: false, initial: SR.combat.INITIAL_INI_PASS }),
+    pass: new NumberField({ integer: true, required: true, nullable: false, initial: SR.combat.FIRST_PASS }),
     combatants: new ArrayField(new SchemaField(CombatHistoryCombatantData()), { initial: [] }),
 });
 
@@ -21,7 +21,7 @@ export const CombatData = () => ({
         integer: true,
         required: true,
         nullable: false,
-        initial: SR.combat.INITIAL_INI_PASS
+        initial: SR.combat.FIRST_PASS
     }),
     history: new ArrayField(new SchemaField(CombatHistorySnapshotData()), { initial: [] }),
 });
