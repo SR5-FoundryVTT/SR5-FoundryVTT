@@ -163,6 +163,11 @@ export class SR5Combat extends Combat<"base"> {
     // 4. TURN & ROUND PROGRESSION FLOW
     // =========================================================
 
+    override async startCombat() {
+        await this.rollForActors({ updateTurn: false });
+        return super.startCombat();
+    }
+
     override async nextRound() {
         if (!game.user?.isGM) {
             SocketMessage.emitForGM(FLAGS.DoCombatFunction, { id: this.id, fnName: 'nextRound' });
