@@ -37,11 +37,11 @@ export class SR5Combat extends Combat<"base"> {
     // 1. STATIC CONFIGURATION & METHODS
     // =========================================================
 
-    private static readonly INITIATIVE_MODE_CONFIG = {
-        meatspace: { modeClass: 'mode-physical', modeIcon: 'fa-solid fa-person-running', labelKey: 'SR5.COMBAT.ModeMeatspace' },
-        astral:    { modeClass: 'mode-astral',   modeIcon: 'fa-solid fa-star',           labelKey: 'SR5.COMBAT.ModeAstral' },
-        matrix:    { modeClass: 'mode-matrix',   modeIcon: 'fa-solid fa-laptop-code',    labelKey: 'SR5.COMBAT.ModeMatrix' },
-        unknown:   { modeClass: 'mode-unknown',  modeIcon: 'fa-solid fa-question',       labelKey: 'SR5.COMBAT.ModeUnknown' }
+    static readonly INITIATIVE_MODE_CONFIG = {
+        meatspace: { cls: 'mode-physical', icon: 'fa-solid fa-person-running', label: 'SR5.COMBAT.ModeMeatspace' },
+        astral:    { cls: 'mode-astral',   icon: 'fa-solid fa-star',           label: 'SR5.COMBAT.ModeAstral' },
+        matrix:    { cls: 'mode-matrix',   icon: 'fa-solid fa-laptop-code',    label: 'SR5.COMBAT.ModeMatrix' },
+        unknown:   { cls: 'mode-unknown',  icon: 'fa-solid fa-question',       label: 'SR5.COMBAT.ModeUnknown' }
     } as const;
 
     static override migrateData(source: any) {
@@ -609,10 +609,10 @@ export class SR5Combat extends Combat<"base"> {
             dieResults: roll.dice.flatMap(d => d.results.filter(r => r.active).map(r => r.result)),
 
             // UI & Presentation
-            modeClass: config.modeClass,
-            modeIcon: config.modeIcon,
+            modeClass: config.cls,
+            modeIcon: config.icon,
             modeTitle: game.i18n.format('SR5.COMBAT.ModeTitle', { 
-                mode: game.i18n.localize(config.labelKey) 
+                mode: game.i18n.localize(config.label)
             }),
             totalTooltipHtml: this._buildInitiativeTooltipHtml(token?.actor ?? actor, roll, base),
 

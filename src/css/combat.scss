@@ -2,6 +2,10 @@
     position: relative;
 }
 
+.combat-sidebar .combat-tracker .combatant.zero-initiative {
+    opacity: 0.6;
+}
+
 /* Base style for ALL three icons */
 .combat-tracker .combatant-seize-icon,
 .combat-tracker .combatant-acted-icon,
@@ -24,6 +28,15 @@
     left: 2px;
     color: white;
     pointer-events: none;
+}
+
+.combat-tracker .combatant-init-mode-icon.mode-actionable {
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+.combat-tracker .combatant-init-mode-icon.mode-actionable:hover {
+    filter: brightness(1.15);
 }
 
 .combat-tracker .combatant-init-mode-icon.mode-astral i {
@@ -58,6 +71,47 @@
 }
 .combat-tracker .combatant-acted-icon.active {
     color: #5cb85c;
+}
+
+.combat-tracker .combatant-acted-icon.zero-initiative-icon {
+    color: #ce0707;
+    pointer-events: none;
+}
+
+.combat-tracker .combatant-mode-menu {
+    position: absolute;
+    top: 4px;
+    left: 26px;
+    background: rgba(25, 25, 25, 0.95);
+    border-radius: 6px;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    z-index: 10;
+    min-width: 128px;
+}
+
+.combat-tracker .combatant-mode-menu.hidden {
+    display: none;
+}
+
+.combat-tracker .combatant-mode-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px;
+    font-size: 0.9rem;
+    text-align: left;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.combat-tracker .combatant-mode-option.active {
+    border-color: rgba(238, 155, 58, 0.8);
+    color: #ee9b3a;
 }
 
 .combat-controls {

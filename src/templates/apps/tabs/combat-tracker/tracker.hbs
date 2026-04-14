@@ -1,15 +1,25 @@
 <ol class="combat-tracker plain">
     {{#each turns}}
-    <li class="combatant {{ css }} {{#if acted}}acted{{/if}} {{#if pad}}hidden{{/if}}" data-combatant-id="{{ id }}" data-action="activateCombatant">
+    <li class="combatant {{ css }} {{#if acted}}acted{{/if}} {{#if pad}}hidden{{/if}} {{#if zeroInitiative}}zero-initiative{{/if}}" data-combatant-id="{{ id }}" data-action="activateCombatant">
         {{!-- TODO: Targets --}}
 
         {{!-- Image --}}
         <img class="token-image" src="{{ img }}" alt="{{ name }}" loading="lazy">
 
         {{!-- Initiative Mode Icon --}}
-        <div class="combatant-init-mode-icon {{ modeClass }}" title="{{ modeTitle }}">
+        <div class="combatant-init-mode-icon {{ modeClass }} {{#if canChangeMode}}mode-actionable{{/if}}" title="{{ modeTitle }}" {{#if canChangeMode}}data-action="toggleInitiativeModeMenu"{{/if}}>
             <i class="{{ modeIcon }}"></i>
         </div>
+        {{#if canChangeMode}}
+        <div class="combatant-mode-menu hidden">
+            {{#each modeOptions}}
+            <button type="button" class="combatant-mode-option {{#if selected}}active{{/if}}" data-action="setInitiativeMode" data-mode="{{ value }}">
+                <i class="{{ icon }}"></i>
+                <span>{{ label }}</span>
+            </button>
+            {{/each}}
+        </div>
+        {{/if}}
 
         {{!-- Name & Controls --}}
         <div class="token-name">
@@ -56,11 +66,17 @@
             </div>
             {{/if}}
 
+            {{#if zeroInitiative}}
+            <div class="combatant-acted-icon zero-initiative-icon">
+                <i class="fa-solid fa-circle-xmark"></i>
+            </div>
+            {{else}}
             <div class="combatant-acted-icon {{#if acted}}active{{/if}}"
                  data-action="toggleActed"
                  title="{{ localize 'SR5.COMBAT.ToggleActedStatusGMOnly' }}">
                 <i class="fa-solid fa-circle-check"></i>
             </div>
+            {{/if}}
 
             {{#if initiative includeZero=true}}
 
