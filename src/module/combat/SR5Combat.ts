@@ -22,6 +22,10 @@ type InitiativeSummaryRow = {
     tokenId: string | null;
     documentUuid: string | null;
     document: TokenDocument | SR5Actor | null;
+
+    // Dice So Nice animation support
+    roll: Roll;
+    combatant: SR5Combatant;
 };
 
 /**
@@ -550,12 +554,12 @@ export class SR5Combat extends Combat<"base"> {
     ) {
         let hasPlayedSound = false;
 
-        for (const [rollMode, combatants] of Object.entries(messageGroups)) {
-            if (!combatants?.length) continue;
+        for (const [rollMode, rows] of Object.entries(messageGroups)) {
+            if (!rows?.length) continue;
 
             const content = await foundry.applications.handlebars.renderTemplate(
                 'systems/shadowrun5e/dist/templates/chat/initiative-summary-message.hbs',
-                { combatants }
+                { rows }
             );
 
             const messageData = foundry.utils.mergeObject(
@@ -572,7 +576,11 @@ export class SR5Combat extends Combat<"base"> {
             );
 
             ChatMessage.applyRollMode(messageData, rollMode);
-            await foundry.documents.ChatMessage.implementation.create(messageData);
+            const message = await foundry.documents.ChatMessage.implementation.create(messageData);
+
+            if (message)
+                for (const { combatant, roll } of rows)
+                    void combatant.playDSNInitiativeAnimation(roll, rollMode, message);
 
             hasPlayedSound = true;
         }
@@ -605,6 +613,7 @@ export class SR5Combat extends Combat<"base"> {
 
         return {
             // Identity & References
+            combatant,
             document: token ?? actor,
             tokenId: token?.id ?? null,
             documentUuid: actor?.uuid ?? token?.uuid ?? null,
@@ -615,6 +624,7 @@ export class SR5Combat extends Combat<"base"> {
             base,
             initiative,
             dieResults,
+            roll,
 
             // UI & Presentation
             modeClass: config.cls,

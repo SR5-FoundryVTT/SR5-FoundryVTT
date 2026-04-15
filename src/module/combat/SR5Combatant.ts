@@ -1,5 +1,6 @@
 import { SR5Combat } from "./SR5Combat";
 import { SR5Die } from "../rolls/SR5Die";
+import { SR5Roll } from "../rolls/SR5Roll";
 import { Migrator } from "../migrator/Migrator";
 import { CombatRules } from "../rules/CombatRules";
 import { FLAGS, SR, SYSTEM_NAME } from "../constants";
@@ -15,6 +16,7 @@ export type ChangeModeMessageData = {
     totalAdjust: number;
     baseAdjust: number;
     diceCountAdjust: number;
+    diceRoll: SR5Roll | null;
     diceRolls: number[];
 };
 
@@ -100,7 +102,8 @@ export class SR5Combatant extends Combatant<"base"> {
         const diceCountAdjust = (blitz ? SR.initiatives.ranges.dice.max : nextInit.dice.value) - prevInit.dice.value;
         const baseAdjust = nextInit.base.value - prevInit.base.value;
 
-        const diceRolls = await this._rollD6(Math.abs(diceCountAdjust));
+        const diceRoll = await this._rollD6(Math.abs(diceCountAdjust));
+        const diceRolls = diceRoll?.diceResults ?? [];
         const rawSum = diceRolls.reduce((sum, value) => sum + value, 0);
         const totalAdjust = baseAdjust + (diceCountAdjust < 0 ? -rawSum : rawSum);
 
@@ -118,15 +121,17 @@ export class SR5Combatant extends Combatant<"base"> {
             totalAdjust,
             baseAdjust,
             diceCountAdjust,
+            diceRoll,
             diceRolls,
         });
     }
 
-    private async _rollD6(diceCount: number): Promise<number[]> {
-        if (diceCount <= 0) return [];
-        const roll = new Roll(`${diceCount}d6`);
+    private async _rollD6(diceCount: number): Promise<SR5Roll | null> {
+        if (diceCount <= 0) return null;
+
+        const roll = new SR5Roll(`${diceCount}d6`);
         await roll.evaluate();
-        return roll.dice.flatMap(d => d.results.filter(r => r.active).map(r => r.result));
+        return roll;
     }
 
     private async _postModeCard(data: ChangeModeMessageData): Promise<void> {
@@ -174,8 +179,39 @@ export class SR5Combatant extends Combatant<"base"> {
             sound: hasDiceRoll ? CONFIG.sounds.dice : undefined,
         } as ChatMessage.CreateData;
 
-        ChatMessage.applyRollMode(messageData, CONST.DICE_ROLL_MODES[this.hidden ? 'PRIVATE' : 'PUBLIC']);
-        await foundry.documents.ChatMessage.implementation.create(messageData);
+        const rollMode = CONST.DICE_ROLL_MODES[this.hidden ? 'PRIVATE' : 'PUBLIC'];
+        ChatMessage.applyRollMode(messageData, rollMode);
+
+        const message = await foundry.documents.ChatMessage.implementation.create(messageData);
+        if (message && hasDiceRoll && data.diceRoll)
+            void this.playDSNInitiativeAnimation(data.diceRoll, rollMode, message);
+    }
+
+    async playDSNInitiativeAnimation(
+        roll: Roll,
+        rollMode: foundry.dice.Roll.Mode,
+        message: Pick<ChatMessage, 'id' | 'speaker' | 'whisper'>,
+    ): Promise<boolean> {
+        if (!game.modules.get('dice-so-nice')?.active || !game.dice3d) return false;
+        // @ts-expect-error Accessing a setting from another module; no types available.
+        if (game.settings.get('dice-so-nice', 'disabledForInitiative') === true) return false;
+
+        const users = (message.whisper ?? []).filter((w): w is string => !!w);
+        const whisper = users.length > 0 ? users : null;
+        const synchronize = rollMode === CONST.DICE_ROLL_MODES.PUBLIC || !!whisper;
+        const blind = rollMode === CONST.DICE_ROLL_MODES.BLIND;
+        const activePlayers = this.players.find((user) => user.active);
+        const rollUser = activePlayers ?? this.players[0] ?? game.user;
+
+        return game.dice3d?.showForRoll(
+            roll,
+            rollUser,
+            synchronize,
+            whisper,
+            blind,
+            message.id,
+            message.speaker,
+        );
     }
 
     private _getModeConfig(mode: InitiativeModeOptions) {

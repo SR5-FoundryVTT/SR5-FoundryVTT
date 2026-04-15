@@ -1,7 +1,7 @@
 <div class="sr5 chat-card roll-card initiative-summary-card">
     <div class="card-main-content">
         <div class="initiative-summary-list">
-            {{#each combatants}}
+            {{#each rows}}
             <div class="initiative-summary-row">
                 {{#if this.tokenId}}
                 <a class="chat-select-link initiative-mode-icon {{this.modeClass}}" data-token-id="{{this.tokenId}}" title="{{this.modeTitle}}" aria-label="{{this.modeTitle}}">
