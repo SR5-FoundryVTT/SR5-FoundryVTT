@@ -275,6 +275,7 @@ export class SR5CombatTracker extends CombatTracker {
     private _prepareInitiativeModeOptions(combatant: SR5Combatant): InitiativeModeOption[] {
         const actor = combatant.actor;
         if (!actor?.isType('spirit', 'character')) return [];
+        if (!combatant.isOwner) return [];
 
         const { initiative, matrix, special } = actor.system;
         const perception = initiative.perception;
