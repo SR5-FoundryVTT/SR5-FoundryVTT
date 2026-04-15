@@ -69,10 +69,11 @@ declare module "fvtt-types/configuration" {
         Sheet: typeof foundry.appv1.api.FormApplication;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interface ConfiguredActiveEffect<SubType extends ActiveEffect.SubType> {
         document: SR5ActiveEffect;
     }
-    
+
     interface ConfiguredActor<SubType extends Actor.SubType> {
         document: SR5Actor<SubType & Actor.ConfiguredSubType>;
     }
@@ -104,10 +105,6 @@ declare module "fvtt-types/configuration" {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interface ConfiguredCombatant<SubType extends Combatant.SubType> {
         document: SR5Combatant;
-    }
-
-    interface ConfiguredItem<SubType extends Item.SubType> {
-        document: SR5Item<SubType & Item.ConfiguredSubType>;
     }
 
     interface ConfiguredItem<SubType extends Item.SubType> {
