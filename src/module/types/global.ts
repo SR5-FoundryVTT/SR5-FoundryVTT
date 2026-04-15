@@ -289,6 +289,7 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.onlyAllowRollOnDefaultableSkills": boolean;
         "shadowrun5e.showSkillsWithDetails": boolean;
         "shadowrun5e.onlyAutoRollNPCInCombat": boolean;
+        "shadowrun5e.InitiativeModeUpdateStrategy": 'delta_dice' | 'reroll';
         "shadowrun5e.tokenHealthBars": boolean;
         "shadowrun5e.HideGMOnlyChatContent": boolean;
         "shadowrun5e.MustConsumeRessourcesOnTest": boolean;
