@@ -2,7 +2,10 @@
     position: relative;
 }
 
-.combat-sidebar .combat-tracker .combatant.zero-initiative {
+.combat-sidebar .combat-tracker .combatant.zero-initiative .token-image,
+.combat-sidebar .combat-tracker .combatant.zero-initiative .token-name,
+.combat-sidebar .combat-tracker .combatant.zero-initiative .token-resource,
+.combat-sidebar .combat-tracker .combatant.zero-initiative .token-initiative {
     opacity: 0.6;
 }
 
@@ -100,6 +103,7 @@
 .combat-tracker .combatant-mode-option {
     display: flex;
     align-items: center;
+    justify-content: flex-start;
     gap: 6px;
     padding: 3px 8px;
     font-size: 0.9rem;
@@ -107,6 +111,7 @@
     border: 1px solid transparent;
     border-radius: 4px;
     cursor: pointer;
+    width: 100%;
 }
 
 .combat-tracker .combatant-mode-option.active {

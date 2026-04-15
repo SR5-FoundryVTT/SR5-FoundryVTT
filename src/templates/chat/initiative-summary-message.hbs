@@ -13,13 +13,29 @@
                 </span>
                 {{/if}}
 
-                {{#if this.documentUuid}}
-                <a class="chat-document-link combatant-name" data-uuid="{{this.documentUuid}}">
-                    {{#if this.document}}{{speakerName this.document}}{{else}}{{this.name}}{{/if}}
-                </a>
-                {{else}}
-                <span class="combatant-name">{{this.name}}</span>
-                {{/if}}
+                <div class="initiative-summary-combatant">
+                    {{#if this.combatantImage}}
+                        {{#if this.tokenId}}
+                        <a class="chat-select-link initiative-summary-combatant-image-link" data-token-id="{{this.tokenId}}">
+                            <img class="initiative-summary-combatant-image" src="{{this.combatantImage}}" alt="{{this.name}}" />
+                        </a>
+                        {{else if this.documentUuid}}
+                        <a class="chat-document-link initiative-summary-combatant-image-link" data-uuid="{{this.documentUuid}}">
+                            <img class="initiative-summary-combatant-image" src="{{this.combatantImage}}" alt="{{this.name}}" />
+                        </a>
+                        {{else}}
+                        <img class="initiative-summary-combatant-image" src="{{this.combatantImage}}" alt="{{this.name}}" />
+                        {{/if}}
+                    {{/if}}
+
+                    {{#if this.documentUuid}}
+                    <a class="chat-document-link combatant-name" data-uuid="{{this.documentUuid}}">
+                        {{#if this.document}}{{speakerName this.document}}{{else}}{{this.name}}{{/if}}
+                    </a>
+                    {{else}}
+                    <span class="combatant-name">{{this.name}}</span>
+                    {{/if}}
+                </div>
 
                 <span class="initiative-total {{#if this.isBlitz}}is-blitz{{/if}}" data-tooltip-html="{{this.totalTooltipHtml}}">{{this.initiative}}</span>
             </div>

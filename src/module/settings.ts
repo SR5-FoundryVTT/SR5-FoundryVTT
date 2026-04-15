@@ -87,6 +87,19 @@ export const registerSystemSettings = () => {
         default: true,
     });
 
+    game.settings.register(SYSTEM_NAME, FLAGS.InitiativeModeUpdateStrategy, {
+        name: 'SETTINGS.InitiativeModeUpdateStrategyName',
+        hint: 'SETTINGS.InitiativeModeUpdateStrategyDescription',
+        scope: 'world',
+        config: true,
+        type: String,
+        choices: {
+            delta_dice: 'SETTINGS.InitiativeModeUpdateStrategyDeltaDice',
+            reroll: 'SETTINGS.InitiativeModeUpdateStrategyReroll',
+        },
+        default: 'delta_dice',
+    });
+
     game.settings.register(SYSTEM_NAME, FLAGS.TokenHealthBars, {
         name: 'SETTINGS.TokenHealthBars',
         hint: 'SETTINGS.TokenHealthBarsDescription',

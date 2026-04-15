@@ -1,13 +1,10 @@
 import { ValueOf } from 'fvtt-types/utils';
 import { SR5Combat } from '../combat/SR5Combat';
-import { SR5Combatant } from '../combat/SR5Combatant';
-import { InitiativeType } from '../types/template/Initiative';
+import { InitiativeModeOptions, SR5Combatant } from '../combat/SR5Combatant';
 import CombatTracker = foundry.applications.sidebar.tabs.CombatTracker;
 
-type InitiativeModeOptionValue = 'meatspace' | 'astral' | 'cold_sim' | 'hot_sim';
-
 type InitiativeModeOption = {
-    value: InitiativeModeOptionValue;
+    value: InitiativeModeOptions;
     label: string;
     icon: string;
     selected: boolean;
@@ -104,7 +101,7 @@ export class SR5CombatTracker extends CombatTracker {
         turn.pad = combatant.system.pad;
         turn.modeClass = modeConfig.cls;
         turn.modeIcon = modeConfig.icon;
-        turn.modeTitle = game.i18n.format('SR5.COMBAT.ModeTitle', { mode: modeConfig.label });
+        turn.modeTitle = game.i18n.format('SR5.COMBAT.ModeTitle', { mode: game.i18n.localize(modeConfig.label) });
         turn.seize = combatant.system.seize;
         turn.acted = combatant.system.acted && combatant.combat?.combatant?.id !== combatant.id;
         turn.zeroInitiative = combatant.initiative !== null && combatant.initiative <= 0;
@@ -169,7 +166,7 @@ export class SR5CombatTracker extends CombatTracker {
 
         if (action === 'setInitiativeMode') {
             const combatant = this._getCombatant(actionTarget);
-            const mode = actionTarget.dataset.mode as InitiativeModeOptionValue | undefined;
+            const mode = actionTarget.dataset.mode as InitiativeModeOptions | undefined;
 
             if (combatant && mode) {
                 void this._onSetInitiativeMode(combatant, mode);
@@ -236,41 +233,14 @@ export class SR5CombatTracker extends CombatTracker {
         });
     }
 
-    private async _onSetInitiativeMode(combatant: SR5Combatant, mode: InitiativeModeOptionValue): Promise<void> {
+    private async _onSetInitiativeMode(combatant: SR5Combatant, mode: InitiativeModeOptions): Promise<void> {
         const actor = combatant.actor;
         if (!actor || !combatant.isOwner) return;
 
         const availableModes = this._prepareInitiativeModeOptions(combatant).map(option => option.value);
         if (!availableModes.includes(mode)) return;
 
-        const previousPerception = actor.system.initiative.perception;
-        const previousInitiative = actor.system.initiative[previousPerception] as InitiativeType | undefined;
-        const previousBase = previousInitiative?.base.value ?? 0;
-
-        let nextPerception: 'meatspace' | 'astral' | 'matrix' | null = null;
-
-        if (mode === 'meatspace' || mode === 'astral') {
-            await actor.update({ system: { initiative: { perception: mode } } });
-            nextPerception = mode;
-        } else if (mode === 'cold_sim' || mode === 'hot_sim') {
-            await actor.update({
-                system: {
-                    initiative: { perception: 'matrix' },
-                    matrix: { hot_sim: mode === 'hot_sim' }
-                }
-            });
-            nextPerception = 'matrix';
-        }
-
-        if (!nextPerception || !actor.combatActive) return;
-
-        const nextInitiative = actor.system.initiative[nextPerception] as InitiativeType | undefined;
-        const nextBase = nextInitiative?.base.value ?? 0;
-        const adjustment = nextBase - previousBase;
-
-        if (adjustment !== 0) {
-            await combatant.adjustInitiative(adjustment);
-        }
+        await actor.setInitiativeMode(mode);
     }
 
     // ==========================================
@@ -283,7 +253,7 @@ export class SR5CombatTracker extends CombatTracker {
         const combatantId = combatantElement?.dataset.combatantId;
         if (!combatantId) return null;
 
-        return (this.viewed?.combatants.get(combatantId) as SR5Combatant | undefined) ?? null;
+        return this.viewed?.combatants.get(combatantId) ?? null;
     }
 
     private _toggleCombatantModeMenu(trigger: HTMLElement): void {

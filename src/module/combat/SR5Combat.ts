@@ -13,6 +13,7 @@ type InitiativeSummaryRow = {
     initiative: number;
     base: number;
     dieResults: number[];
+    combatantImage: string | null;
     modeClass: string;
     modeIcon: string;
     modeTitle: string;
@@ -359,10 +360,12 @@ export class SR5Combat extends Combat<"base"> {
 
     override async rollInitiative(
         ids: string | string[],
-        { formula = null, updateTurn = true, messageOptions = {} }: Combat.InitiativeOptions = {},
+        options: Combat.InitiativeOptions & { hasBlitz?: boolean } = {},
     ) {
+        const { formula = null, updateTurn = true, hasBlitz = false, messageOptions = {} } = options;
+
         const combatantIds = Array.isArray(ids) ? ids : [ids];
-        const updates: Array<{ _id: string; initiative: number }> = [];
+        const updates: Combatant.UpdateData[] = [];
         const messageGroups = {
             [CONST.DICE_ROLL_MODES.PUBLIC]: [] as InitiativeSummaryRow[],
             [CONST.DICE_ROLL_MODES.PRIVATE]: [] as InitiativeSummaryRow[],
@@ -376,7 +379,10 @@ export class SR5Combat extends Combat<"base"> {
             await roll.evaluate();
 
             const initiative = roll.total ?? 0;
-            updates.push({ _id: id, initiative });
+            const blitz = combatant.actor?.system.initiative.blitz ?? hasBlitz;
+            const lastInitiative = foundry.utils.deepClone(combatant.actor?.system.initiative.current);
+
+            updates.push({ _id: id, initiative, system: { initiative: { blitz, last: lastInitiative } } });
 
             const rollMode = CONST.DICE_ROLL_MODES[combatant.hidden ? 'PRIVATE' : 'PUBLIC'];
             messageGroups[rollMode].push(this._buildInitiativeRow(combatant, initiative, roll));
@@ -595,6 +601,7 @@ export class SR5Combat extends Combat<"base"> {
         const mode = initiativeData?.perception;
         const safeMode = (mode && SR5Combat.INITIATIVE_MODE_CONFIG[mode]) ? mode : 'unknown';
         const config = SR5Combat.INITIATIVE_MODE_CONFIG[safeMode];
+        const dieResults = this._extractRollResults(roll);
 
         return {
             // Identity & References
@@ -602,11 +609,12 @@ export class SR5Combat extends Combat<"base"> {
             tokenId: token?.id ?? null,
             documentUuid: actor?.uuid ?? token?.uuid ?? null,
             name: name ?? game.i18n.localize('COMBAT.UnknownCombatant'),
+            combatantImage: token?.texture?.src ?? actor?.img ?? null,
 
             // Core Values
             base,
             initiative,
-            dieResults: roll.dice.flatMap(d => d.results.filter(r => r.active).map(r => r.result)),
+            dieResults,
 
             // UI & Presentation
             modeClass: config.cls,
@@ -619,6 +627,10 @@ export class SR5Combat extends Combat<"base"> {
             // Flags
             isBlitz: Boolean(initiativeData?.blitz),
         };
+    }
+
+    private _extractRollResults(roll: Roll): number[] {
+        return roll.dice.flatMap(d => d.results.filter(r => r.active).map(r => r.result));
     }
 
     /**
@@ -635,7 +647,7 @@ export class SR5Combat extends Combat<"base"> {
         const penalty = Math.abs((this.pass - SR.combat.FIRST_PASS) * SR.combat.PASS_PENALTY);
 
         const dieItems = roll.dice.flatMap(d => d.results.filter(r => r.active).map(r => {
-            const cssClasses = SR5Die.getResultCSS(r).filter(cssClass => cssClass).join(' ');
+            const cssClasses = SR5Die.getResultCSS(r).filter(Boolean).join(' ');
             return `<li class="roll ${cssClasses}">${r.result}</li>`;
         }));
 

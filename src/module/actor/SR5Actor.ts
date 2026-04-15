@@ -50,6 +50,7 @@ import { MatrixRules } from '@/module/rules/MatrixRules';
 import { StorageFlow } from '@/module/flows/StorageFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 import { LinksHelpers } from '@/module/utils/links';
+import type { InitiativeModeOptions } from '../combat/SR5Combatant';
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -1740,6 +1741,32 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         }
 
         await combatant.adjustInitiative(modifier);
+    }
+
+    async setInitiativeMode(mode: InitiativeModeOptions): Promise<void> {
+        if (!this.isType('character', 'spirit')) return;
+
+        const currentPerception = this.system.initiative.perception;
+        const fromMode = currentPerception !== 'matrix' ? currentPerception
+            : (this.system.matrix?.hot_sim ? 'hot_sim' : 'cold_sim');
+
+        if (fromMode === mode) return;
+
+        const isMatrixMode = mode === 'cold_sim' || mode === 'hot_sim';
+        const updateData = {
+            system: {
+                initiative: { perception: isMatrixMode ? 'matrix' : mode },
+                ...(isMatrixMode && { matrix: { hot_sim: mode === 'hot_sim' } }),
+            },
+        } as const;
+
+        await this.update(updateData);
+
+        if (!this.inCombat) return;
+
+        await Promise.all(
+            this.combatants.map(async combatant => await combatant.applyModeChange(fromMode, mode))
+        );
     }
 
     /**

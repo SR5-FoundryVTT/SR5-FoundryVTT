@@ -19,6 +19,7 @@ export const FLAGS = {
     OnlyAllowRollOnDefaultableSkills: 'onlyAllowRollOnDefaultableSkills',
     ShowSkillsWithDetails: 'showSkillsWithDetails',
     OnlyAutoRollNPCInCombat: 'onlyAutoRollNPCInCombat',
+    InitiativeModeUpdateStrategy: 'InitiativeModeUpdateStrategy',
     MessageCustomRoll: 'customRoll',
     ApplyLimits: 'applyLimits',
     LastRollPromptValue: 'lastRollPromptValue',
