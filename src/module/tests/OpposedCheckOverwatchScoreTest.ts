@@ -19,7 +19,9 @@ export class OpposedCheckOverwatchScoreTest extends OpposedMatrixTest {
         // Keep the existing pool object reference so dialog-time modifier state does not reset.
         const fixedPool = MatrixRules.checkOverwatchScoreOpposingDicePool();
         this.data.pool.base = fixedPool.base;
-        ModifiableValue.addUnique(this.data.pool, 'SR5.CheckOverwatchScore', fixedPool.base, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, Infinity);
+        ModifiableValue.addUnique(
+            this.data.pool, 'SR5.CheckOverwatchScore', fixedPool.base, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, ModifiableValue.TOP_PRIORITY
+        );
 
         // get the overwatch score at the start so it isn't affected by the roll
         this.overwatchScore = this.against?.actor?.getOverwatchScore();

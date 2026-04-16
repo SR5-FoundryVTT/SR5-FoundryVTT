@@ -3,6 +3,7 @@ import { SR5 } from '../config';
 import { ActionFlow } from '../item/flows/ActionFlow';
 import { Translation } from '../utils/strings';
 import { TagifyValues } from '@/module/utils/sheets';
+import { LinksHelpers } from '@/module/utils/links';
 
 import ActiveEffectConfig = foundry.applications.sheets.ActiveEffectConfig;
 import { ActiveEffectDM } from '@/module/types/effect/ActiveEffect';
@@ -50,12 +51,12 @@ type SR5ActiveEffectSheetData = ActiveEffectConfig.RenderContext & {
 }
 
 export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEffectConfig<SR5ActiveEffectSheetData> {
+    private static readonly HELP_PAGE_URL = 'http://sr5-foundryvtt.privateworks.com/index.php/Active_Effect';
 
     static override DEFAULT_OPTIONS = {
         ...super.DEFAULT_OPTIONS,
         actions: {
-            // override the onAdd so we can change the default mode to custom
-            addChange: this.#onAddChange,
+            openHelp: this.#onOpenHelp,
         },
         classes: ["active-effect-config", SR5_APPV2_CSS_CLASS, 'named-sheet'],
         position: { width: 760 },
@@ -72,7 +73,6 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
                 ...super.TABS.sheet.tabs.slice(0, 2),
                 { id: 'applyTo', group: 'sheet', cssClass: '', label: 'SR5.ActiveEffect.ApplyTo', icon: 'fas fa-filter' },
                 ...super.TABS.sheet.tabs.slice(2),
-                { id: 'help', group: 'sheet', cssClass: '', label: 'SR5.Help', icon: 'fas fa-book' },
             ],
             initial: 'details',
         }
@@ -101,7 +101,31 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         // override the details tab so we can include our extra settings
         details: {template: 'systems/shadowrun5e/dist/templates/effect/active-effect-details.hbs', scrollable: [""]},
         applyTo: {template: 'systems/shadowrun5e/dist/templates/effect/active-effect-apply-to.hbs'},
-        help: {template: 'systems/shadowrun5e/dist/templates/effect/active-effect-help.hbs'},
+    }
+
+    protected override async _renderFrame(...args: Parameters<ActiveEffectConfig['_renderFrame']>) {
+        const frame = await super._renderFrame(...args);
+
+        if (!this.hasFrame) return frame;
+
+        const helpLabel = game.i18n.localize('SR5.Help');
+        const helpButton = document.createElement('button');
+        helpButton.type = 'button';
+        helpButton.className = 'header-control fa-solid fa-circle-question icon';
+        helpButton.dataset.action = 'openHelp';
+        helpButton.dataset.tooltip = 'SR5.Tooltips.Effect.HelpLinkEnglishOnly';
+        helpButton.setAttribute('aria-label', helpLabel);
+
+        const copyUuidButton = frame.querySelector<HTMLButtonElement>('button[data-action="copyUuid"]');
+        const closeButton = frame.querySelector<HTMLButtonElement>('button[data-action="close"]');
+
+        if (copyUuidButton) {
+            copyUuidButton.insertAdjacentElement('beforebegin', helpButton);
+        } else if (closeButton) {
+            closeButton.insertAdjacentElement('beforebegin', helpButton);
+        }
+
+        return frame;
     }
 
     /**
@@ -167,21 +191,10 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         Hooks.call('sr5_processTagifyElements', this.element);
     }
 
-    /**
-     * Handle adding a new change to the changes array.
-     *
-     * This overrides the Foundry default behavior of using ADD as default.
-     * Shadowrun mostly uses MODIFY, so we use that as default.
-     *
-     * - this here is the SR5ActiveEffectConfig, however not all the types work correctly so I used any
-     */
-    static async #onAddChange(this: any, event: PointerEvent, target: HTMLElement) {
-        if (this.form) {
-            const submitData = this._processFormData(null, this.form, new FormDataExtended(this.form));
-            const changes = Object.values(submitData.changes ?? {});
-            changes.push({ mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM });
-            return this.submit({updateData: {changes}});
-        }
+    static #onOpenHelp(this: SR5ActiveEffectConfig, event: PointerEvent, target: HTMLElement) {
+        event.preventDefault();
+        event.stopPropagation();
+        LinksHelpers.openSourceURL(SR5ActiveEffectConfig.HELP_PAGE_URL);
     }
 
     /**

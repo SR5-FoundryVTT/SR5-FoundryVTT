@@ -1,29 +1,6 @@
 @use "config/variables";
 
 /**
- * Styles for the value modifier pop up container
- */
-#chat-popout {
-    .value-mod {
-        .value-modifiers-container.card-style {
-            right: 0;
-            width: Calc(100% - 2em);
-            margin: 1.4em 1em;
-        }
-    }
-}
-
-#chat {
-    .value-mod {
-        .value-modifiers-container.card-style {
-            right: 0;
-            width: Calc(100% - 3em);
-            margin: 1.4em 1em;
-        }
-    }
-}
-
-/**
  * Rules around the value modifier pop up that's shown for Value style data structures like Attributes, Skills, etc.
  */
 .value-mod {
@@ -76,6 +53,67 @@
     }
 }
 
+#tooltip.sr5-value-modifiers-tooltip {
+    padding: 0;
+    max-width: none;
+    border: none;
+    box-shadow: none;
+
+    .value-modifiers-container {
+        display: block;
+        visibility: visible;
+        opacity: 1;
+        position: static;
+        margin: 0;
+    }
+
+    .value-modifiers {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 2rem;
+        inline-size: 150px;
+        width: 150px;
+        max-width: 150px;
+        row-gap: 0.2rem;
+        column-gap: 0.35rem;
+        background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/page.webp") repeat;
+        border: none;
+        padding: 0.4rem 0.45rem;
+        font-weight: normal;
+        font-size: var(--font-size-11);
+
+        > .value-modifier-name {
+            min-width: 0;
+            font-weight: bold;
+            text-align: left;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        > .value-modifiers-base,
+        > .value-modifiers-modifier {
+            color: variables.$white;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        > .value-modifiers-base {
+            border-bottom: 1px solid variables.$yellow;
+        }
+
+        > .mod-change-disabled {
+            opacity: 0.6;
+        }
+
+        > .mod-change-invalidated,
+        > .value-modifiers-invalid-total {
+            color: rgba(255, 255, 255, 0.5);
+            opacity: 1;
+            text-decoration: line-through;
+        }
+    }
+}
+
 .sr5v2 {
     .value-modifiers {
         .list-item {
@@ -91,7 +129,6 @@
         .value-modifiers-base, .value-modifiers-modifier, .value-modifiers-total {
             flex-shrink: 0;
             min-width: 4rem;
-            horiz-align: right;
             text-align: right;
             padding-right: 0.5rem;
         }

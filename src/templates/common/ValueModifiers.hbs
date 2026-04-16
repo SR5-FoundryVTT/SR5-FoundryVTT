@@ -5,8 +5,10 @@
             <div class="value-modifiers-base">{{value.base}}</div>
         {{/if}}
         {{#each value.changes as |change|}}
-            <div class="value-modifier-name {{#if change.invalidated}}value-modifiers-invalid-total{{/if}}">{{localize change.name}}</div>
-            <div class="value-modifiers-modifier {{#if change.invalidated}}value-modifiers-invalid-total{{/if}}">{{getChangeValue change}}</div>
+            {{#if change.enabled}}
+                <div class="value-modifier-name {{getChangeCSS change}} {{#if change.invalidated}}value-modifiers-invalid-total{{/if}}">{{localize change.name}}</div>
+                <div class="value-modifiers-modifier {{getChangeCSS change}} {{#if change.invalidated}}value-modifiers-invalid-total{{/if}}">{{getChangeValue change}}</div>
+            {{/if}}
         {{/each}}
     </div>
 </div>

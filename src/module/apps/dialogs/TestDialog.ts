@@ -244,8 +244,15 @@ export class TestDialog extends FormDialog {
             }
 
             // Don't apply an unneeded override.
-            if (valueField.value !== value)
-                ModifiableValue.addUnique(valueField, 'SR5.ManualOverride', value as number | null, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, Infinity);
+            if (valueField.value !== value) {
+                ModifiableValue.addUnique(
+                    valueField,
+                    'SR5.ManualOverride',
+                    value as number | null,
+                    CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
+                    ModifiableValue.TOP_PRIORITY
+                );
+            }
         }
 
         // Give tests opportunity to change resulting values on the fly.

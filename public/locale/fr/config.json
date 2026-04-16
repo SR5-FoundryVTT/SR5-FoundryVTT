@@ -916,6 +916,9 @@
                 "BuyHits": "Ne lance pas de dés. Achète des succès avec ⌊réserve de dés / 4⌋.",
                 "ResultOverrideGlitches": "Remplace les glitches pour ce résultat de test.",
                 "ResultOverrideHits": "Remplace les succès pour ce résultat de test."
+            },
+            "Effect": {
+                "HelpLinkEnglishOnly": "Help (External link, English only)"
             }
         },
         "Weapon": {

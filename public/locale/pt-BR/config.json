@@ -1322,6 +1322,7 @@
                 "ApplyTo": "As alterações deste efeito se aplicarão apenas a este alvo",
                 "DocumentEffects": "Efeitos diretamente neste documento",
                 "ItemEffects": "Efeitos coletados de itens neste documento",
+                "HelpLinkEnglishOnly": "Help (External link, English only)",
                 "OnlyAllFilteredUsed": "Este efeito só se aplicará para testes que correspondam a todas as seleções",
                 "OnlyFilteredUsed": "Este efeito só se aplicará para testes que correspondam a pelo menos uma seleção",
                 "OnlyForItemTest": "Apenas afeta o teste do item pai",

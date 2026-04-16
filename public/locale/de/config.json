@@ -2678,6 +2678,7 @@
                 "DocumentEffects": "Auswirkungen direkt auf dieses Dokument.",
                 "EditEffect": "Bearbeite Effekt",
                 "ItemEffects": "Effekte, die von Items auf diesem Dokument gesammelt werden.",
+                "HelpLinkEnglishOnly": "Help (External link, English only)",
                 "OnlyAllFilteredUsed": "Dieser Effekt gilt nur für Proben, die allen Auswahlen entsprechen.",
                 "OnlyFilteredUsed": "Dieser Effekt gilt nur für Proben, die mindestens einer Auswahl entsprechen.",
                 "OnlyForItemTest": "Dieser Effekt gilt nur für Proben dieses Items.",
