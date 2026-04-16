@@ -6,6 +6,10 @@ import { ModifiableValueType } from "../types/template/Base";
  * as well as calculating the total of numerical parts.
  */
 export class ModifiableValue<Field extends ModifiableValueType = ModifiableValueType> {
+    // Use finite sentinels so priorities survive chat flag serialization.
+    static readonly LOWER_PRIORITY = Number.MIN_SAFE_INTEGER;
+    static readonly TOP_PRIORITY = Number.MAX_SAFE_INTEGER;
+
     private readonly _field: Field;
 
     get changes() {
@@ -41,12 +45,12 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
     }
 
     /**
-     * Add a base change (uses priority -Infinity).
+     * Add a base change (uses the lowest possible priority sentinel).
      * @param {string} name - The base change name.
      * @param {number} value - The base numeric value.
      */
     addBase(name: string, value: number): void {
-        return this.add(name, value, CONST.ACTIVE_EFFECT_MODES.ADD, -Infinity);
+        return this.add(name, value, CONST.ACTIVE_EFFECT_MODES.ADD, ModifiableValue.LOWER_PRIORITY);
     }
 
     /**
@@ -82,12 +86,12 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
     }
 
     /**
-     * Add a unique base change (priority -Infinity).
+     * Add a unique base change (lowest possible priority sentinel).
      * @param {string} name - Name of the base change.
      * @param {number | undefined | null} value - Base value to set; if `null`/`undefined`, the entry will be removed.
      */
     addUniqueBase(name: string, value: number | undefined | null): void {
-        return this.addUnique(name, value, CONST.ACTIVE_EFFECT_MODES.ADD, -Infinity);
+        return this.addUnique(name, value, CONST.ACTIVE_EFFECT_MODES.ADD, ModifiableValue.LOWER_PRIORITY);
     }
 
     /**
@@ -174,14 +178,14 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
         this.remove('SR5.EnforcedMaximum');
         if (options?.max != null && this._field.value > options.max) {
             this._markPreviousChangesMasked(this._field.changes.length);
-            this.addUnique('SR5.EnforcedMaximum', options.max, CONST.ACTIVE_EFFECT_MODES.DOWNGRADE, Infinity);
+            this.addUnique('SR5.EnforcedMaximum', options.max, CONST.ACTIVE_EFFECT_MODES.DOWNGRADE, ModifiableValue.TOP_PRIORITY);
             this._field.value = options.max;
         }
 
         this.remove('SR5.EnforcedMinimum');
         if (options?.min != null && this._field.value < options.min) {
             this._markPreviousChangesMasked(this._field.changes.length);
-            this.addUnique('SR5.EnforcedMinimum', options.min, CONST.ACTIVE_EFFECT_MODES.UPGRADE, Infinity);
+            this.addUnique('SR5.EnforcedMinimum', options.min, CONST.ACTIVE_EFFECT_MODES.UPGRADE, ModifiableValue.TOP_PRIORITY);
             this._field.value = options.min;
         }
 
@@ -230,12 +234,12 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
     }
 
     /**
-     * Returns true when a change is a base change (priority === -Infinity).
+     * Returns true when a change is a base change.
      * @param {ModifiableValueType['changes'][number]} change - The change object to inspect (an element of `changes`).
      * @returns {boolean} True if the change is the base change.
      */
     static isBaseChange(change: ModifiableValueType['changes'][number]): boolean {
-        return change.priority === -Infinity;
+        return change.priority === ModifiableValue.LOWER_PRIORITY;
     }
 
     /**

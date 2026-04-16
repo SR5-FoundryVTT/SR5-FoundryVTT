@@ -39,6 +39,8 @@ const ChangeEntry = () => ({
     value: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     priority: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     effectUuid: new DocumentUUIDField({ required: true, nullable: true }),
+
+    // For ease of use, we track whether a change is currently enabled or has been invalidated by another change.
     enabled: new BooleanField({ initial: true }),
     invalidated: new BooleanField({ initial: false }),
 });

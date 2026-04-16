@@ -1924,6 +1924,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * This listener needs to be registered to the 'renderChatMessage' FoundryVTT hook.
      */
     static async chatMessageListeners(message: ChatMessage, html, data) {
+        await this._hydrateValueModifierTooltips(message, html);
+
         $(html).find('.show-roll').on('click', this._chatToggleCardRolls.bind(this));
         $(html).find('.show-description').on('click', this._chatToggleCardDescription.bind(this));
         $(html).find('.chat-document-link').on('click', Helpers.renderEntityLinkSheet.bind(Helpers));
@@ -1935,6 +1937,45 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         DamageApplicationFlow.handleRenderChatMessage(message, html, data);
 
         await GmOnlyMessageContentFlow.chatMessageListeners(message, html, data);
+    }
+
+    static async _hydrateValueModifierTooltips(message: ChatMessage, html: HTMLElement | JQuery) {
+        if (!message.id) return;
+
+        const test = await TestCreator.fromMessage(message.id);
+        if (!test) return;
+
+        const tooltipsBySource = {
+            pool: await this._buildValueModifierTooltipHtml(test.pool),
+            limit: test.hasLimit ? await this._buildValueModifierTooltipHtml(test.limit) : undefined,
+            threshold: test.hasThreshold ? await this._buildValueModifierTooltipHtml(test.threshold) : undefined,
+        } as const;
+
+        const valueModifiers = $(html).find<HTMLElement>('.roll-card .test-value.value-mod[data-tooltip-source]').toArray();
+
+        for (const valueMod of valueModifiers) {
+            const source = valueMod.dataset.tooltipSource as keyof typeof tooltipsBySource | undefined;
+            if (!source) continue;
+
+            const tooltipHtml = tooltipsBySource[source];
+            if (!tooltipHtml) continue;
+
+            valueMod.dataset.tooltipHtml = tooltipHtml;
+            valueMod.dataset.tooltipClass = 'sr5-value-modifiers-tooltip';
+        }
+    }
+
+    static async _buildValueModifierTooltipHtml(value: ValueFieldType): Promise<string | undefined> {
+        const tooltipHtml = await foundry.applications.handlebars.renderTemplate(
+            'systems/shadowrun5e/dist/templates/common/ValueModifiers.hbs',
+            { card: true, value }
+        );
+
+        const content = tooltipHtml.trim();
+        if (!content.length) return undefined;
+        if (!content.includes('value-modifier-name')) return undefined;
+
+        return content;
     }
 
 

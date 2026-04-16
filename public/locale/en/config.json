@@ -2676,6 +2676,7 @@
                 "DocumentEffects": "Effects directly on this document",
                 "EditEffect": "Edit Effect",
                 "ItemEffects": "Effects collected from items on this document",
+                "HelpLinkEnglishOnly": "Help (External link, English only)",
                 "OnlyAllFilteredUsed": "This effect will only apply for tests matching all selections",
                 "OnlyFilteredUsed": "This effect will only apply for tests matching at least one selection",
                 "OnlyForItemTest": "Only affect test of parent item",

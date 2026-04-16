@@ -17,7 +17,7 @@ export const registerModifierHelpers = () => {
 
     const getDiffValueChange = (modValue: ModifiableValueType) => {
         return modValue.value - modValue.changes
-            .filter(change => change.priority === -Infinity)
+            .filter(change => ModifiableValue.isBaseChange(change))
             .reduce((base, change) => base + change.value, modValue.base);
     }
 
@@ -72,11 +72,10 @@ export const registerModifierHelpers = () => {
     });
 
     Handlebars.registerHelper('getChangeCSS', (change: ChangeType) => {
-        if (!change.enabled)
-            return 'mod-change-disabled';
-        if (change.invalidated)
-            return 'mod-change-invalidated';
-        return '';
+        const cssClasses: string[] = [];
+        if (!change.enabled) cssClasses.push('mod-change-disabled');
+        if (change.invalidated) cssClasses.push('mod-change-invalidated');
+        return cssClasses.join(' ');
     });
 
     Handlebars.registerHelper('getChangeDescription', (change: ChangeType) => {

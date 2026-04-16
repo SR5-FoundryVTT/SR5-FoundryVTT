@@ -298,8 +298,16 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
                 continue;
             }
 
-            if (valueField.value !== value)
-                ModifiableValue.addUnique(valueField, 'SR5.ManualOverride', value as number | null, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, Infinity);
+            // Don't apply an unneeded override.
+            if (valueField.value !== value) {
+                ModifiableValue.addUnique(
+                    valueField,
+                    'SR5.ManualOverride',
+                    value as number | null,
+                    CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
+                    ModifiableValue.TOP_PRIORITY
+                );
+            }
         }
 
         this.test.prepareBaseValues();

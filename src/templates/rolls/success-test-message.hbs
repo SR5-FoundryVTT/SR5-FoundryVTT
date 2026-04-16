@@ -54,17 +54,15 @@
                 </div>
                 {{/if}}
                 {{#if test.hasLimit}}
-                <div class="test-value value-mod">
+                <div class="test-value value-mod" data-tooltip-source="limit">
                     <span class="value">{{localize test.limit.label}}:</span>
                     <span class="value-result">{{test.limit.value}}</span>
-                    {{> "systems/shadowrun5e/dist/templates/common/ValueModifiers.hbs" card=true value=test.limit}}
                 </div>
                 {{/if}}
                 {{#if test.hasThreshold}}
-                <div class="test-value value-mod">
+                <div class="test-value value-mod" data-tooltip-source="threshold">
                     <span class="value">{{localize test.threshold.label}}:</span>
                     <span class="value-result">{{test.threshold.value}}</span>
-                    {{> "systems/shadowrun5e/dist/templates/common/ValueModifiers.hbs" card=true value=test.threshold}}
                 </div>
                 {{/if}}
                 {{#if test.opposing}}
@@ -75,10 +73,9 @@
                 {{/if}}
             </div>
             <div class="right-side">
-                <div class="test-value value-mod">
+                <div class="test-value value-mod" data-tooltip-source="pool">
                     <span class="value">{{localize test.pool.label}}:</span>
                     <span class="value-result">{{test.pool.value}}</span>
-                    {{> "systems/shadowrun5e/dist/templates/common/ValueModifiers.hbs" card=true value=test.pool}}
                 </div>
                 <div class="test-value">
                     <span class="value">{{localize test.hits.label}}:</span>
