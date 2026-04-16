@@ -27,6 +27,20 @@
         {{#each data.changes as |change index|}}
         {{#unless (isBaseChange change)}}
         <li class="breakdown-entry {{getChangeCSS change}}" data-index="{{index}}">
+            <button
+                type="button"
+                class="modifier-effect-button {{#if change.effectUuid}}has-effect{{else}}no-effect disabled{{/if}}"
+                data-effect-uuid="{{change.effectUuid}}"
+                {{#if change.effectUuid}}
+                data-tooltip="{{localize 'SR5.Tooltips.Effect.EditEffect'}}"
+                aria-label="{{localize 'SR5.Tooltips.Effect.EditEffect'}}"
+                {{/if}}
+                {{#unless change.effectUuid}}disabled{{/unless}}
+            >
+                {{#with (getChangeEffectImage change) as |effectImage|}}
+                <img src="{{effectImage}}" alt="" />
+                {{/with}}
+            </button>
             <span class="mod-name" data-tooltip="{{getChangeDescription change}}">{{localize change.name}}</span>
             <span class="mod-value">{{getChangeValue change}}</span>
 

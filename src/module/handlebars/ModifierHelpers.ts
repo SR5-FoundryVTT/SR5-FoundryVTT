@@ -21,6 +21,11 @@ export const registerModifierHelpers = () => {
             .reduce((base, change) => base + change.value, modValue.base);
     }
 
+    const getChangeEffect = (change: ChangeType) => {
+        if (!change?.effectUuid) return null;
+        return fromUuidSync(change.effectUuid) as ActiveEffect | null;
+    }
+
     Handlebars.registerHelper('isBaseChange', (change: ChangeType) => {
         return ModifiableValue.isBaseChange(change);
     });
@@ -78,8 +83,13 @@ export const registerModifierHelpers = () => {
         return cssClasses.join(' ');
     });
 
+    Handlebars.registerHelper('getChangeEffectImage', (change: ChangeType) => {
+        const effect = getChangeEffect(change);
+        return effect?.img ?? '';
+    });
+
     Handlebars.registerHelper('getChangeDescription', (change: ChangeType) => {
-        const effect = fromUuidSync(change.effectUuid ?? '') as ActiveEffect | null;
+        const effect = getChangeEffect(change);
         return effect?.description || '';
     });
 }

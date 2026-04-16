@@ -100,10 +100,24 @@ export class TestDialog extends FormDialog {
             toggleModifiableValue(target);
         });
 
+        html.find('.modifier-effect-button').on('click', async event => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const button = event.currentTarget as HTMLButtonElement;
+            const effectUuid = button.dataset.effectUuid;
+            if (!effectUuid) return;
+
+            const effect = await fromUuid(effectUuid);
+            if (!(effect instanceof ActiveEffect)) return;
+
+            await effect.sheet?.render(true);
+        });
+
         html.find('.breakdown-entry').on('click', event => {
             const target = event.target;
-            // Let the checkbox keep native behavior.
-            if (target.closest('input[type="checkbox"]')) return;
+            // Let the checkbox and effect icon keep native behavior.
+            if (target.closest('input[type="checkbox"], .modifier-effect-button')) return;
 
             const checkbox = event.currentTarget.querySelector<HTMLInputElement>('input[type="checkbox"]');
             if (!checkbox) return;

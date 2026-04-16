@@ -2623,6 +2623,7 @@
             "ThrownAttackTest": "Thrown Weapon Attack"
         },
         "Threshold": "Threshold",
+        "ToggleBreakdown": "Toggle Breakdown",
         "ToggleActive": "Toggle Active",
         "ToggleEquip": "Toggle Equipped",
         "ToggleWireless": "Toggle Wireless",
