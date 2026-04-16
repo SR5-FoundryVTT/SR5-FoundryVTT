@@ -47,7 +47,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
     }
 
     override get _chatMessageTemplate() {
-        return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.hbs';
+        return 'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs';
     }
 
     override get _dialogTemplate(): string {

@@ -2133,9 +2133,28 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         const currentTarget = event.currentTarget as HTMLElement;
         const card = $(currentTarget).closest('.chat-card');
-        const element = card.find('.dice-rolls');
-        if (element.is(':visible')) element.slideUp(200);
-        else element.css('display', 'flex').hide().slideDown(200);
+        const cardRolls = card.find('.card-rolls').first();
+
+        if (cardRolls.length > 0) {
+            const hasRollContent = cardRolls.find('.dice-rolls, .dice-roll-content').length > 0;
+            if (!hasRollContent) return;
+
+            if (cardRolls.is(':visible')) {
+                cardRolls.slideUp(200);
+            } else {
+                const diceRolls = cardRolls.find('.dice-rolls');
+                if (diceRolls.length > 0) {
+                    diceRolls.css('display', 'flex');
+                }
+                cardRolls.stop(true, true).hide().css('display', 'block').slideDown(200);
+            }
+
+            return;
+        }
+
+        const legacyRolls = card.find('.dice-rolls');
+        if (legacyRolls.is(':visible')) legacyRolls.slideUp(200);
+        else legacyRolls.css('display', 'flex').hide().slideDown(200);
     }
 
     /**

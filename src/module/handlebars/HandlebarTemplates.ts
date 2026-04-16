@@ -84,6 +84,7 @@ export const preloadHandlebarsTemplates = async () => {
 
         'systems/shadowrun5e/dist/templates/rolls/parts/parts-list.hbs',
         'systems/shadowrun5e/dist/templates/rolls/parts/Damage.hbs',
+        'systems/shadowrun5e/dist/templates/rolls/parts/DamagePair.hbs',
 
         // to wrap the bodies of tabs
         'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs',

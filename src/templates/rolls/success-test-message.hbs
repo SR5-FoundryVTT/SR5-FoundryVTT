@@ -1,8 +1,14 @@
-<div class="sr5 chat-card roll-card">
-    <div class="card-title card-header">
+<div class="sr5 chat-card roll-card sr5-roll-card-v2">
+    <div class="card-title card-header card-header--title">
         <span class="test-name">{{localize title}}</span>
+        {{#if showDescription}}
+        <span class="card-control clickable show-description">
+            <i class="fa-solid fa-file-lines"></i>
+        </span>
+        {{/if}}
     </div>
-    <div class="card-title card-header">
+    {{#if (or speaker.source item)}}
+    <div class="card-title card-header card-header--entities">
         <div class="container container--fluid">
             {{#if speaker.source}}
             <div class="container__row">
@@ -33,9 +39,10 @@
             {{/if}}
         </div>
     </div>
+    {{/if}}
     <div class="card-main-content">
         {{#if test.hasAction}}
-        <div class="card-content {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
+        <div class="card-content card-content--code {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
             <div class="test-line">
                 <span class="test-code">{{test.code}}</span>
                 {{#if test.hitsIcon}}
@@ -45,39 +52,39 @@
         </div>
         {{/if}}
         {{#unless test.autoSuccess}}
-        <div class="card-content {{#if showDescription}} show-description{{/if}} {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
+        <div class="card-content card-content--metrics {{#if showDescription}}show-description{{/if}} {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
             <div class="left-side">
                 {{#if test.opposing}}
-                <div class="test-value">
+                <div class="test-value metric-row">
                     <span class="value">{{localize "SR5.OpposingHits"}}:</span>
                     <span class="value-result">{{test.against.netHits.value}}</span>
                 </div>
                 {{/if}}
                 {{#if test.hasLimit}}
-                <div class="test-value value-mod" data-tooltip-source="limit">
+                <div class="test-value value-mod metric-row" data-tooltip-source="limit">
                     <span class="value">{{localize test.limit.label}}:</span>
                     <span class="value-result">{{test.limit.value}}</span>
                 </div>
                 {{/if}}
                 {{#if test.hasThreshold}}
-                <div class="test-value value-mod" data-tooltip-source="threshold">
+                <div class="test-value value-mod metric-row" data-tooltip-source="threshold">
                     <span class="value">{{localize test.threshold.label}}:</span>
                     <span class="value-result">{{test.threshold.value}}</span>
                 </div>
                 {{/if}}
                 {{#if test.opposing}}
-                <div class="test-value">
+                <div class="test-value metric-row">
                     <span class="value">{{localize "SR5.OpposingNetHits"}}:</span>
                     <span class="value-result">{{test.againstNetHits.value}}</span>
                 </div>
                 {{/if}}
             </div>
             <div class="right-side">
-                <div class="test-value value-mod" data-tooltip-source="pool">
+                <div class="test-value value-mod metric-row" data-tooltip-source="pool">
                     <span class="value">{{localize test.pool.label}}:</span>
                     <span class="value-result">{{test.pool.value}}</span>
                 </div>
-                <div class="test-value">
+                <div class="test-value metric-row">
                     <span class="value">{{localize test.hits.label}}:</span>
                     <span class="value-result">
                         {{test.displayHits}}{{#if test.appendedHits}} + {{test.appendedHits}}{{/if}}
@@ -87,25 +94,25 @@
                     {{/if}}
                 </div>
                 {{#if test.hasBuyHits}}
-                <div class="test-value">
+                <div class="test-value metric-row">
                     <span class="value">{{localize "SR5.BuyHits"}}:</span>
                     <span class="value-result">{{test.boughtHits}}</span>
                 </div>
                 {{/if}}
                 {{#if test.extended}}
-                <div class="test-value">
+                <div class="test-value metric-row">
                     <span class="value">{{localize test.extendedHits.label}}:</span>
                     <span class="value-result">{{test.extendedHits.value}}</span>
                 </div>
                 {{/if}}
                 {{#if (and (not test.opposing) test.hasThreshold)}}
-                <div class="test-value">
+                <div class="test-value metric-row">
                     <span class="value">{{localize test.netHits.label}}:</span>
                     <span class="value-result">{{test.netHits.value}}</span>
                 </div>
                 {{/if}}
                 {{#if previewTemplate}}
-                <div class="test-value">
+                <div class="test-value metric-row metric-row--template">
                     <span class="value" data-tooltip="SR5.PlaceTemplate">{{localize "SR5.PlaceTemplate"}}:</span>
                     <span class="value-result"><i class="fas fa-bullseye roll place-template"></i></span>
                 </div>
@@ -119,13 +126,92 @@
                 {{{description.description.value}}}
             </div>
             {{/if}}
-            {{#each description.properties}}
-            <span style="white-space: nowrap;">{{this}}</span>
-            {{/each}}
+            <div class="card-description-tags">
+                {{#each description.properties}}
+                <span>{{this}}</span>
+                {{/each}}
+            </div>
         </div>
         {{/if}}
         {{/unless}}
-        <div class="card-test-content">
+        {{#if (and test.data.incomingDamage test.data.modifiedDamage)}}
+        <div class="card-content card-content--damage">
+            <div class="left-side">
+                {{> 'systems/shadowrun5e/dist/templates/rolls/parts/DamagePair.hbs'
+                label=(localize "SR5.Damage")
+                incomingName=(localize "SR5.Incoming")
+                incomingDamage=test.data.incomingDamage
+                modifiedName=(localize "SR5.Modified")
+                modifiedDamage=test.data.modifiedDamage
+                showAP=false
+                }}
+            </div>
+        </div>
+        {{else if (and test.data.incomingDrain test.data.modifiedDrain)}}
+        <div class="card-content card-content--damage">
+            <div class="left-side">
+                {{> 'systems/shadowrun5e/dist/templates/rolls/parts/DamagePair.hbs'
+                label=(localize "SR5.Damage")
+                incomingName=(localize "SR5.IncomingDrain")
+                incomingDamage=test.data.incomingDrain
+                modifiedName=(localize "SR5.ModifiedDrain")
+                modifiedDamage=test.data.modifiedDrain
+                showAP=false
+                }}
+            </div>
+        </div>
+        {{else if (and test.data.incomingFade test.data.modifiedFade)}}
+        <div class="card-content card-content--damage">
+            <div class="left-side">
+                {{> 'systems/shadowrun5e/dist/templates/rolls/parts/DamagePair.hbs'
+                label=(localize "SR5.Damage")
+                incomingName=(localize "SR5.IncomingFade")
+                incomingDamage=test.data.incomingFade
+                modifiedName=(localize "SR5.ModifiedFade")
+                modifiedDamage=test.data.modifiedFade
+                showAP=false
+                }}
+            </div>
+        </div>
+        {{else if test.data.drainDamage}}
+        <div class="card-content card-content--damage">
+            <div class="left-side">
+                {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.hbs'
+                name=(localize "SR5.IncomingDrain")
+                tooltip=(localize "SR5.IncomingDrain")
+                damage=test.data.drainDamage
+                showAP=true
+                }}
+            </div>
+        </div>
+        {{else if test.data.fadeDamage}}
+        <div class="card-content card-content--damage">
+            <div class="left-side">
+                {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.hbs'
+                name=(localize "SR5.IncomingFade")
+                tooltip=(localize "SR5.IncomingFade")
+                damage=test.data.fadeDamage
+                showAP=true
+                }}
+            </div>
+        </div>
+        {{else}}
+            {{#if test.data.damage}}
+                {{#if test.hasDamage}}
+                <div class="card-content card-content--damage">
+                    <div class="left-side">
+                        {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.hbs'
+                        name=(localize "SR5.Damage")
+                        tooltip=(localize "SR5.Incoming")
+                        damage=test.data.damage
+                        showAP=true
+                        }}
+                    </div>
+                </div>
+                {{/if}}
+            {{/if}}
+        {{/if}}
+        <div class="card-test-content card-test-content--status">
             {{! Some tests will not determine an outcome, but a failure will always be a failure }}
             {{#unless test.showSuccessLabel}}
                 {{#unless test.failure}}
@@ -138,8 +224,8 @@
             {{! Some tests will determine an outcome and success state }}
             {{#if test.canSucceed}}
                 {{#if test.showSuccessLabel}}
-                <div class="glitch-content">
-                    <div class="glitch {{#unless test.autoSuccess}}clickable show-roll{{/unless}}">
+                <div class="glitch-content {{#unless test.autoSuccess}}clickable show-roll{{/unless}}">
+                    <div class="glitch">
                         {{localize test.successLabel}}
                     </div>
                 </div>
@@ -149,8 +235,8 @@
             {{! Some tests will determine a failure state }}
             {{#if test.canFail}}
                 {{#if test.failure}}
-                <div class="glitch-content">
-                    <div class="glitch {{#unless test.autoSuccess}}clickable show-roll{{/unless}}">
+                <div class="glitch-content {{#unless test.autoSuccess}}clickable show-roll{{/unless}}">
+                    <div class="glitch">
                         {{localize test.failureLabel}}
                     </div>
                 </div>
@@ -159,14 +245,14 @@
 
             {{! In any case inform about glitched state }}
             {{#if test.criticalGlitched}}
-            <div class="glitch-content">
+            <div class="glitch-content glitch-content--critical">
                 <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.GlitchCritical'}}" {{/if}}>
                     {{localize "SR5.GlitchCritical"}}
                 </div>
             </div>
             {{else}}
                 {{#if test.glitched}}
-                <div class="glitch-content">
+                <div class="glitch-content glitch-content--warning">
                     <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Glitch'}}" {{/if}}>
                         {{localize "SR5.Glitch"}}
                     </div>
@@ -174,28 +260,38 @@
                 {{/if}}
             {{/if}}
         </div>
+        <div class="card-rolls {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
+            {{#unless test.hasBuyHits}}
+                {{#each test.rolls}}
+                    {{> 'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.hbs'
+                    roll=this
+                    }}
+                {{/each}}
+            {{/unless}}
+        </div>
+        {{#if test.data.knockedDown}}
+        <div class="card-content card-content--knockdown">
+            <div class="left-side">
+                <div class="limit-line">
+                    <span class="key">{{localize "SR5.Target"}}: </span>
+                    <span class="value">{{localize "SR5.KnockedDown"}}</span>
+                </div>
+            </div>
+        </div>
+        {{/if}}
     </div>
     {{#if test.hasBuyHits}}
     <div class="card-main-content">
-        <div class="card-content">{{localize "SR5.BuyHits"}}</div>
+        <div class="card-content card-content--buyhits">{{localize "SR5.BuyHits"}}</div>
     </div>
     {{/if}}
-    <div class="card-rolls {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
-        {{#unless test.hasBuyHits}}
-            {{#each test.rolls}}
-                {{> 'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.hbs'
-                roll=this
-                }}
-            {{/each}}
-        {{/unless}}
-    </div>
     {{#if test.targets}}
-    <div class="test-line">
+    <div class="test-line test-line--targets">
         <span class="test-name {{#if roll}}test-roll{{/if}}">
             {{localize "SR5.SelectedTargets"}}
         </span>
     </div>
-    <div class="card-title card-header">
+    <div class="card-title card-header card-header--targets">
         <div class="container container--fluid">
             {{#each test.targets}}
             <div class="container__row">
@@ -215,7 +311,7 @@
     </div>
     {{/if}}
     {{#if test.opposed}}
-    <div class="card-buttons">
+    <div class="card-buttons card-buttons--actions">
         {{#each opposedActions}}
         <div class="button opposed-action" data-action="{{this.test}}">
             {{localize this.label}} {{#if ../test.data.opposed.mod}}{{../test.data.opposed.mod}}{{/if}}
@@ -224,7 +320,7 @@
     </div>
     {{/if}}
     {{#if followupActions}}
-    <div class="card-buttons">
+    <div class="card-buttons card-buttons--actions">
         {{#each followupActions}}
         <div class="button followup-action">
             {{localize this.label}}
@@ -233,7 +329,7 @@
     </div>
     {{/if}}
     {{#if resistActions}}
-    <div class="card-buttons">
+    <div class="card-buttons card-buttons--actions">
         {{#each resistActions}}
         <div class="button resist-action" data-action="{{this.test}}">
             {{localize this.label}}
@@ -242,11 +338,11 @@
     </div>
     {{/if}}
     {{#if resultActions}}
-    <div class="card-content">
+    <div class="card-content card-content--results">
         <div class="left-side">
             {{#each resultActions}}
-            <div class="test-value">
-                <span class="value">{{localize this.label}}: </span>
+            <div class="test-value metric-row">
+                <span class="value">{{localize this.label}}:</span>
                 <span class="value-result">
                     <span class="button result-action" data-action="{{this.action}}">{{this.value}}</span>
                 </span>
@@ -258,19 +354,3 @@
     {{/if}}
 </div>
 
-{{#if test.data.damage}}
-    {{#if test.hasDamage}}
-    <div class="sr5 chat-card roll-card">
-        <div class="card-content">
-            <div class="left-side">
-                {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.hbs'
-                name=(localize "SR5.Incoming")
-                damage=test.data.damage
-                showAP=true
-                }}
-            </div>
-            <div class="right-side"></div>
-        </div>
-    </div>
-    {{/if}}
-{{/if}}
