@@ -9,15 +9,15 @@
                     value="{{test.item.system.ammo.current.value}}/{{test.item.system.ammo.current.max}}"/>
             </div>
             <div class="form-group">
-                <label data-tooltip="SR5.Tooltips.RangedAttack.RecoilCompensation">{{localize 'SR5.RecoilCompensation'}}</label>
-                <input type="text" class="disabled-for-display" disabled
-                    value="{{test.item.totalRecoilCompensation}}"/>
-            </div>
-            <div class="form-group">
-                <label data-tooltip="SR5.Tooltips.RangedAttack.Recoil">{{localize 'SR5.Recoil'}}</label>
+                <label data-tooltip="SR5.Tooltips.RangedAttack.Recoil">
+                    {{localize 'SR5.Recoil'}}
+                    <span data-tooltip="SR5.Tooltips.RangedAttack.RecoilCompensation" style="font-weight: normal;"> (RC {{test.item.totalRecoilCompensation}})</span>
+                </label>
                 <div class="form-group-element-2">
-                    <span data-tooltip="SR5.Tooltips.RangedAttack.RecoilBeforeAttack">{{test.recoilBeforeAttack}}</span><span data-tooltip="SR5.Tooltips.RangedAttack.RecoilAfterAttack"> => {{test.recoilAfterAttack}}</span></div>
-                <div id="reset-progressive-recoil" class="form-group-element-1-right roll" data-tooltip="SR5.Tooltips.RangedAttack.ResetRecoil"><button type="button">Reset</button></div>
+                    <span data-tooltip="SR5.Tooltips.RangedAttack.RecoilBeforeAttack">{{test.recoilBeforeAttack}}</span>
+                    <span data-tooltip="SR5.Tooltips.RangedAttack.RecoilAfterAttack">→ {{test.recoilAfterAttack}}</span>
+                </div>
+                <div id="reset-progressive-recoil" class="form-group-element-1-right roll" data-tooltip="SR5.Tooltips.RangedAttack.ResetRecoil"><button type="button">↺</button></div>
             </div>
             <div class="form-group">
                 <label>{{localize 'SR5.FireMode'}}</label>

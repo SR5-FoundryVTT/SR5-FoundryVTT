@@ -532,3 +532,187 @@
 
     // end of new css for getting scroll working
 }
+
+.application.sr5v2.form-dialog {
+    hr {
+        margin: 0.3rem 0;
+    }
+
+    .dialog-content-common > div > .form-group:not(.modifiable-value):not(.toggle-checkbox-row) {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.35rem;
+        margin-bottom: 0.25rem;
+        min-width: 0;
+
+        > label {
+            flex: 1 1 auto;
+            min-width: 0;
+            margin: 0;
+        }
+
+        > input[type='text'],
+        > input[type='number'] {
+            flex: 0 0 3.4rem;
+            min-width: 3.4rem;
+            max-width: 3.4rem;
+            width: 3.4rem;
+            height: 24px;
+            text-align: center;
+        }
+
+        > select {
+            flex: 0 1 56%;
+            min-width: 6rem;
+            width: auto;
+            height: 24px;
+        }
+
+        > input[type='checkbox'] {
+            margin-left: auto;
+            flex: 0 0 auto;
+        }
+
+        > .form-group-element-2 {
+            flex: 1 1 auto;
+            min-width: 0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.2rem;
+            text-align: right;
+        }
+
+        > .form-group-element-1-right {
+            flex: 0 0 auto;
+            margin-left: 0.25rem;
+        }
+
+        > div:not(.form-group-element-2):not(.form-group-element-1-right) {
+            flex: 1 1 auto;
+            min-width: 0;
+            text-align: right;
+            margin-left: auto;
+        }
+    }
+
+    .modifiable-value {
+        border-radius: 0;
+
+        .breakdown-list {
+            padding: 2px 6px;
+            gap: 2px;
+            border-radius: 0;
+        }
+    }
+
+    .breakdown-entry {
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+        gap: 0.35rem;
+        margin-bottom: 0;
+        padding: 1px 0;
+        min-height: 18px;
+
+        .mod-name {
+            flex: 1;
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mod-value {
+            flex: 0 0 2.5rem;
+            text-align: right;
+        }
+
+        > input[type='checkbox'] {
+            flex: 0 0 auto;
+            margin-left: auto;
+        }
+
+        .modifier-effect-button {
+            flex: 0 0 18px;
+            width: 18px;
+            height: 18px;
+            border-radius: 0;
+
+            &.has-effect {
+                border-radius: 0;
+            }
+        }
+
+        .modifier-effect-button img {
+            width: 18px;
+            height: 18px;
+            object-fit: cover;
+            border-radius: 0;
+        }
+    }
+
+    .toggle-checkbox-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.25rem;
+
+        > label {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        > input[type='checkbox'] {
+            flex: 0 0 auto;
+            margin-left: auto;
+            margin-bottom: 0;
+        }
+    }
+
+    .sheet-footer {
+        display: flex;
+        gap: 0.5rem;
+        border-top: 1px solid var(--color-border-light-2);
+
+        .sr5-button {
+            flex: 1;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--color-border-dark-1, var(--color-border));
+            cursor: pointer;
+
+            transition: all 0.2s ease; 
+            
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+
+            &:hover,
+            &:focus,
+            &:focus-visible {
+                color: #ffffff;
+                border-color: color.adjust(variables.$darkred, $lightness: 10%); /* Changes the actual border to red */
+                background: color.adjust(variables.$darkred, $lightness: 10%);
+                
+                box-shadow: 
+                    0 0 4px rgba(255, 50, 50, 0.5), 
+                    0 0 8px rgba(255, 0, 0, 0.3),
+                    0 0 0 1px rgba(255, 50, 50, 0.3) inset;
+                
+                text-shadow: 
+                    0 0 3px rgba(255, 50, 50, 0.6), 
+                    0 0 6px rgba(255, 0, 0, 0.4);
+            }
+        }
+    }
+
+    .roll-mode-controls {
+        display: flex;
+        gap: 2px;
+
+        .ui-control {
+            border: 1px solid var(--color-border-dark-1, #555);
+            border-left: 1px solid var(--color-border-dark-1, #555);
+        }
+    }
+}

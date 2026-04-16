@@ -3,7 +3,7 @@
  */
 @use 'config';
 
-.sr5.form-dialog {
+.application.sr5v2.form-dialog {
   .dialog-title {
     font-weight: bold;
   }
@@ -25,16 +25,18 @@
 
 
   .dialog-content-common {
+    .document {
+      padding: 0.2rem 0.25rem;
+    }
+
     h2 {
       border: none;
       color: white;
       margin: 0;
-      text-underline: none;
+      text-decoration: none;
     }
   }
-}
 
-.sr5v2.form-dialog#test-dialog-v2 {
   max-width: calc(100vw - 2rem);
 
   .window-content {
@@ -61,10 +63,10 @@
   }
 
   // Make the top-level test dialog sections adapt between stacked and split layouts.
-  form > .dialog-content-common {
+  form > .dialog-content-common,
+  form > .dialog-content-common > div > .dialog-content-common {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
 
     > * {
       flex: 1 1 100%;
@@ -72,10 +74,14 @@
     }
   }
 
+  form > .dialog-content-common > hr + div {
+    padding: 0 0.15rem;
+  }
+
   @container (min-width: 760px) {
     form > .dialog-content-common > hr + div,
     form > .dialog-content-common > hr + div + div {
-      flex: 1 1 calc(50% - 0.375rem);
+      flex: 1 1 calc(50% - 0.125rem);
     }
   }
 }
