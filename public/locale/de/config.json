@@ -2624,6 +2624,7 @@
             "ThrownAttackTest": "Wurfwaffen-Angriff"
         },
         "Threshold": "Schwellenwert",
+        "ToggleBreakdown": "Aufschlüsselung umschalten",
         "ToggleActive": "De/aktivieren",
         "ToggleEquip": "Anlegen/Ablegen",
         "ToggleWireless": "Kabel(los)",

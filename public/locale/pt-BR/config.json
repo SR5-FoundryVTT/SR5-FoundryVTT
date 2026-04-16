@@ -1293,6 +1293,7 @@
             "ThrownAttackTest": "Ataque de Arma Lançada"
         },
         "Threshold": "Limiar",
+        "ToggleBreakdown": "Alternar detalhamento",
         "ToggleActive": "Alternar Ativo",
         "ToggleEquip": "Alternar Equipamento",
         "Tooltips": {

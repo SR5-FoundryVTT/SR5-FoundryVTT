@@ -2622,6 +2622,7 @@
             "ThrownAttackTest": "투척 무기 공격"
         },
         "Threshold": "요구 성공횟수",
+        "ToggleBreakdown": "세부 내역 전환",
         "ToggleActive": "활성 전환",
         "ToggleEquip": "장착 전환",
         "ToggleWireless": "무선 전환",
