@@ -1923,7 +1923,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @param this FoundryVTT binds 'this' to the instance, even though the method is staic.
      */
     static #openSituationalModifiers(this: SR5BaseActorSheet) {
-        new SituationModifiersApplication(this.actor).render(true);
+        void new SituationModifiersApplication(this.actor).render({ force: true });
     }
 
     /**

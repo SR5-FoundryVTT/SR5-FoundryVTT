@@ -1,0 +1,95 @@
+.sr5v2 {
+    &.overwatch-score-tracker {
+        .window-content {
+            overflow: hidden;
+        }
+
+        .overwatch-score-tracker-app,
+        .inventory {
+            min-height: 0;
+        }
+
+        .scroll-area {
+            overflow-x: hidden;
+        }
+
+        .list-item .list-item-content {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: center;
+            column-gap: 0.5rem;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .list-item .list-item-content .item-left {
+            min-width: 0;
+            width: 100%;
+            flex: 1 1 auto;
+        }
+
+        .list-item .list-item-content .item-left .item-text.item-name {
+            flex: 1 1 auto;
+            width: auto;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .list-item.item-section .list-item-content .item-right {
+            justify-self: end;
+            margin-left: auto;
+        }
+
+        .list-item.item-section .list-item-content .item-right .item-text {
+            width: auto;
+            flex: 0 0 auto;
+            padding-right: 0;
+        }
+
+        .list-item:not(.item-section) .list-item-content .item-right {
+            display: grid;
+            grid-template-columns: 3rem 0.5rem auto 0.5rem 2.5rem;
+            align-items: center;
+            justify-content: end;
+        }
+
+        .list-item:not(.item-section) .list-item-content .item-text.overwatch-score-input-wrapper,
+        .list-item:not(.item-section) .list-item-content .item-text.overwatch-score-actions,
+        .list-item:not(.item-section) .list-item-content .item-text.overwatch-score-item-icons {
+            width: auto;
+            flex: 0 0 auto;
+            align-content: center;
+            padding-right: 0;
+        }
+
+        .list-item:not(.item-section) .list-item-content .item-text.overwatch-score-input-wrapper {
+            width: 3rem;
+        }
+
+        .list-item:not(.item-section) .list-item-content .item-text.rtg {
+            width: 0.5rem;
+            min-width: 0.5rem;
+            padding-right: 0;
+            margin: 0;
+        }
+
+        .list-item:not(.item-section) .list-item-content .item-text.overwatch-score-item-icons {
+            padding-right: 10px;
+            width: 2.5rem;
+            min-width: 2.5rem;
+            justify-content: space-between;
+        }
+
+        .overwatch-score-input {
+            width: 100%;
+            text-align: center;
+        }
+
+        .overwatch-score-add-actor {
+            color: grey;
+            padding-right: 10px;
+        }
+    }
+}
