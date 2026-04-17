@@ -1,0 +1,14 @@
+<label class="icon-choice-option {{optionClass}}">
+    <input
+        class="icon-choice-input"
+        type="{{#if type}}{{type}}{{else}}radio{{/if}}"
+        name="{{name}}"
+        {{#ifne value undefined}}value="{{value}}"{{/ifne}}
+        {{#if dtype}}data-dtype="{{dtype}}"{{/if}}
+        {{#if checked}}checked{{/if}}
+        {{#if disabled}}disabled{{/if}}
+    />
+    <span class="icon-choice-face" data-tooltip="{{tooltip}}">
+        <img src="{{iconPath}}" alt="{{tooltip}}"/>
+    </span>
+</label>

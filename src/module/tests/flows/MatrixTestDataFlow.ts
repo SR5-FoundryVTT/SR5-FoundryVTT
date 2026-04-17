@@ -31,7 +31,7 @@ export const MatrixTestDataFlow = {
         if (!action) return;
         if (!actor) return;
 
-        const directConnection = (test.data as MatrixTestData).directConnection ?? false;
+        const directConnection = (test.data as MatrixTestData).connectionType === 'direct_connection';
 
         if (action.attribute && MatrixTestDataFlow.isMatrixAttribute(action.attribute))
             MatrixTestDataFlow.addMatrixModifiersToPool(actor, pool, true, directConnection);
@@ -127,7 +127,7 @@ export const MatrixTestDataFlow = {
      * @param options
      * @returns
      */
-    _prepareDataResist(data: MatrixResistTestData): any {
+    _prepareDataResist(data: MatrixResistTestData) {
         // Allow for token targeting to be used to target the main icon.
         if (!data.iconUuid) data.iconUuid = data.targetUuids.length === 1 ? data.targetUuids[0] : undefined;
 
@@ -144,19 +144,17 @@ export const MatrixTestDataFlow = {
      * @param options
      * @returns
      */
-    _prepareData(data: MatrixTestData): any {
+    _prepareData(data: MatrixTestData) {
         // Allow for token targeting to be used to target the main icon.
         if (!data.iconUuid) data.iconUuid = data.targetUuids.length === 1 ? data.targetUuids[0] : undefined;
 
-        // Assume decker and target reside on the same Grid
-        data.sameGrid = data.sameGrid ?? true;
-        data.sameGridDisabled = data.sameGridDisabled ?? false;
-        // Assume no direct connection
-        data.directConnection = data.directConnection ?? false;
-        data.personaUuid = data.personaUuid ?? undefined;
-        data.iconUuid = data.iconUuid ?? undefined;
+        // Assume user can control connection type unless targeting setup decides otherwise.
+        data.connectionType ??= 'same_grid';
+        data.isConnectionTypeLocked ??= false;
+        data.personaUuid ??= undefined;
+        data.iconUuid ??= undefined;
         // assume we are targeting the persona
-        data.targetMainIcon = data.targetMainIcon ?? true;
+        data.targetMainIcon ??= true;
 
         return data;
     },
@@ -166,11 +164,13 @@ export const MatrixTestDataFlow = {
      * @param data
      * @returns
      */
-    _prepareOpposedData(data: OpposedMatrixTestData): any {
-        data.personaUuid = data.personaUuid ?? data.against.personaUuid;
-        data.iconUuid = data.iconUuid ?? data.against.iconUuid;
-        data.targetMainIcon = data.targetMainIcon ?? data.against.targetMainIcon;
-        data.directConnection = data.directConnection ?? data.against.directConnection;
+    _prepareOpposedData(data: OpposedMatrixTestData) {
+        data.personaUuid ??= data.against.personaUuid!;
+        data.iconUuid ??= data.against.iconUuid!;
+        data.targetMainIcon ??= data.against.targetMainIcon;
+        data.isConnectionTypeLocked ??= data.against.isConnectionTypeLocked;
+        data.connectionType ??= data.against.connectionType;
+
         return data;
     },
 
@@ -179,9 +179,9 @@ export const MatrixTestDataFlow = {
      * @param data
      * @returns
      */
-    _prepareFollowingData(data: MatrixResistTestData): any {
-        data.personaUuid = data.personaUuid ?? data.following?.personaUuid;
-        data.iconUuid = data.iconUuid ?? data.following?.iconUuid;
+    _prepareFollowingData(data: MatrixResistTestData) {
+        data.personaUuid ??= data.following?.personaUuid;
+        data.iconUuid ??= data.following?.iconUuid;
         return data;
     },
 
@@ -191,18 +191,16 @@ export const MatrixTestDataFlow = {
      * @param test The initial test to modify.
      */
     prepareTestModifiers(test: MatrixTest) {
-
         const pool = new ModifiableValue(test.data.pool);
-        const { sameGrid, directConnection } = test.data;
 
         // 1. Grid Penalty: Applies if NOT directly connected AND on a different grid
-        if (!directConnection && !sameGrid)
+        if (test.data.connectionType === 'different_grid')
             pool.addUnique('SR5.ModifierTypes.DifferentGrid', MatrixRules.differentGridModifier());
         else
             pool.remove('SR5.ModifierTypes.DifferentGrid');
 
         // 2. Noise Penalty: Applies if NOT directly connected
-        if (!directConnection)
+        if (test.data.connectionType !== 'direct_connection')
             pool.setUnique('SR5.ModifierTypes.Noise', test.actor.modifiers.totalFor('noise'));
     },
 
@@ -213,7 +211,7 @@ export const MatrixTestDataFlow = {
      */
     prepareTestValues(test: MatrixTest) {
         // Host devices always use direct connections. See SR5#233 'PANS and WANS'
-        if (test.host) test.data.directConnection = true;
+        if (test.host) test.data.connectionType = 'direct_connection';
         // If a device has been pre-targeted before dialog, show this on the first render.
         if (test.icon instanceof SR5Item && !test.icon.isType('host')) test.data.targetMainIcon = false;
         // Grid items don´t show any devices for now.
@@ -238,8 +236,9 @@ export const MatrixTestDataFlow = {
 
         // Auto set and fix the same grid. Disallow users from changing it.
         // Currently this is reset on each test change, so user changes can't be made.
-        test.data.sameGrid = sourceNetwork.uuid === targetNetwork.uuid;
-        test.data.sameGridDisabled = true;
+        test.data.connectionType = sourceNetwork.uuid === targetNetwork.uuid ? 'same_grid' : 'different_grid';
+
+        test.data.isConnectionTypeLocked = true;
     },
 
     /**
@@ -257,8 +256,9 @@ export const MatrixTestDataFlow = {
 
         // Auto set and fix the same grid. Disallow users from changing it.
         // Currently this is reset on each test change, so user changes can't be made.
-        test.data.sameGrid = sourceNetwork.uuid === targetNetwork.uuid;
-        test.data.sameGridDisabled = true;
+        test.data.connectionType = sourceNetwork.uuid === targetNetwork.uuid ? 'same_grid' : 'different_grid';
+
+        test.data.isConnectionTypeLocked = true;
     },
 
     /**

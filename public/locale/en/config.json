@@ -853,6 +853,7 @@
             "View": "View",
             "ViewItem": "View Item"
         },
+        "ConnectionType": "Connection Type",
         "Continue": "Continue",
         "ControlRig": "Control Rig",
         "Cost": "Cost",
@@ -991,6 +992,7 @@
         },
         "DicePool": "Pool",
         "DicePoolModifier": "Dice Pool Mod",
+        "DifferentGrid": "Different Grid",
         "DirectConnection": "Direct Connection",
         "DmgTypeMatrix": "Matrix",
         "DmgTypePhysical": "Physical",

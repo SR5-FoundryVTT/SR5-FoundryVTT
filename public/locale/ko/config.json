@@ -853,6 +853,7 @@
             "View": "보기",
             "ViewItem": "물품 보기"
         },
+        "ConnectionType": "연결 유형",
         "Continue": "계속",
         "ControlRig": "컨트롤 리그",
         "Cost": "비용",
@@ -991,6 +992,7 @@
         },
         "DicePool": "주사위 풀",
         "DicePoolModifier": "주사위 풀 수정치",
+        "DifferentGrid": "다른 그리드",
         "DirectConnection": "직접 연결",
         "DmgTypeMatrix": "매트릭스",
         "DmgTypePhysical": "물리",
