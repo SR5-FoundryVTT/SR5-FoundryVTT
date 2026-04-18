@@ -52,7 +52,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             TechnologyPrep.prepareConceal(device.system.technology, mods);
 
             assert.equal(device.system.technology.conceal.value, 6);
-            assert.equal(device.system.technology.conceal.mod.length, 2);
+            assert.equal(device.system.technology.conceal.changes.length, 2);
         });
     });
 
@@ -104,7 +104,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             ActionPrep.prepareWithMods(weapon.system.action, mods);
             ActionPrep.calculateValues(weapon.system.action);
 
-            assert.strictEqual(weapon.system.action?.limit.mod.length, 2);
+            assert.strictEqual(weapon.system.action?.limit.changes.length, 2);
         });
 
         it('Check for ammo to apply its damage to the weapon', async () => {
@@ -154,12 +154,12 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             ActionPrep.prepareWithAmmo(weapon.system.action, ammo);
             ActionPrep.calculateValues(weapon.system.action);
 
-            assert.strictEqual(weapon.system.action?.damage.base, 3);
-            assert.strictEqual(weapon.system.action?.damage.value, 2);
-            assert.strictEqual(weapon.system.action?.damage.type.base, 'physical');
-            assert.strictEqual(weapon.system.action?.damage.type.value, 'stun');
-            assert.strictEqual(weapon.system.action?.damage.element.base, '');
-            assert.strictEqual(weapon.system.action?.damage.element.value, 'cold');
+            assert.strictEqual(weapon.system.action.damage.base, 3);
+            assert.strictEqual(weapon.system.action.damage.value, 2);
+            assert.strictEqual(weapon.system.action.damage.type.base, 'physical');
+            assert.strictEqual(weapon.system.action.damage.type.value, 'stun');
+            assert.strictEqual(weapon.system.action.damage.element.base, '');
+            assert.strictEqual(weapon.system.action.damage.element.value, 'cold');
         });
     });
 
@@ -172,7 +172,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             RangePrep.prepareRecoilCompensation(weapon.system.range, mods);
 
             assert.strictEqual(weapon.system.range.rc.base, 2);
-            assert.strictEqual(weapon.system.range.rc.mod.length, 1);
+            assert.strictEqual(weapon.system.range.rc.changes.length, 1);
             assert.strictEqual(weapon.system.range.rc.value, 4);
         });
     });

@@ -8,6 +8,8 @@
     "SETTINGS": {
         "ApplyLimitsDescription": "Est-ce que des limites doivent être appliquées aux lancés",
         "ApplyLimitsName": "Appliquer des limites aux lancés",
+        "CollapseModifyRollByDefault": "Replier Modifier le lancer par defaut",
+        "CollapseModifyRollByDefaultDescription": "Si active, la section Modifier le lancer est repliee a l'ouverture d'une boite de dialogue de test.",
         "DiagonalMovementDescription": "Comment le mouvement en diagonal doit être pris en compte quand la grille est utilisée",
         "DiagonalMovementName": "Mouvement diagonal",
         "DisplayDefaultRollCardDescription": "Est-ce que la carte de lancé par défaut doit être affichée en même temps que la carte de lancé de Shadowrun",
@@ -101,6 +103,7 @@
         "Bullet": "Balle",
         "BulletCount": "Nombre de balles",
         "Bullets": "Balles",
+        "BuyHits": "Acheter des succès",
         "COMBAT": {
             "CannotSeizeAgain": "Vous ne pouvez pas reprendre l'initiative avant le debut de votre prochain tour.",
             "ModeAstral": "Astral",
@@ -451,6 +454,7 @@
             "WarningTitle": "Alerte"
         },
         "Magic": "Magie",
+        "ManualOverride": "Substitution du résultat",
         "Matrix": "Matrice",
         "MatrixAttrAttack": "Attaque",
         "MatrixAttrDataProc": "Trait. Données",
@@ -469,6 +473,7 @@
         "MigrationUpdateCompendiumUpdateMessage": "Chaque compendium pack du monde qui existe ont été mis à jour",
         "Miscellaneous": "Divers",
         "MissingItemForOpposedTest": "Le test opposé ne peut pas être lancé puisque l'objet concerné est manquant",
+        "ModifyRoll": "Modifier le lancer",
         "Modification": "Modification",
         "ModificationCategories": "Catégories de modifications",
         "ModificationCategory": "Catégorie de modifications",
@@ -576,6 +581,9 @@
         "RecoilCompensation": "CR",
         "Resist": "Resister",
         "RestoreDefaultSkills": "Restaurer compétences par défaut",
+        "ResultOverrideGlitches": "Glitches",
+        "ResultOverrideHits": "Succès",
+        "ResultOverride": "Substitution du résultat",
         "RightClickToClear": "Click droit pour effacer",
         "Roll": "Lancer",
         "RollArmor": "Armure",
@@ -855,6 +863,7 @@
         "TemporaryModifiers": "Modificateurs temporaires",
         "Test": "Test",
         "TestResults": {},
+        "ToggleBreakdown": "Afficher/masquer le détail",
         "ToggleEquip": "(Des)équiper",
         "Top": "Coté",
         "Total": "Total",
@@ -919,12 +928,23 @@
         },
         "Walk": "Marcher",
         "Warnings": {
+            "CantCombineBuyHitsWithEdge": "Acheter des succès ne peut pas être combiné avec Seconde chance.",
             "MissingSkillOnActor": "Le personnage selectionné ne connait pas cette compétence",
             "NegativeLimitValue": "Les valeurs des limites doivent être supérieures à 0",
             "RitualNotConcluded": "Le Rituel a échoué. En attente du jeu du rituel pour déterminer le drain.",
             "RitualNotEnoughReagents": "Pas assez de réactifs offerts.",
             "SkillCantBeDefault": "Cette compétence ne peut pas être lancée sans l'avoir apprise",
             "TokenSelectionNeeded": "Un ou plusieurs jetons doivent être selectionnés"
+        },
+        "Tooltips": {
+            "Test": {
+                "BuyHits": "Ne lance pas de dés. Achète des succès avec ⌊réserve de dés / 4⌋.",
+                "ResultOverrideGlitches": "Remplace les glitches pour ce résultat de test.",
+                "ResultOverrideHits": "Remplace les succès pour ce résultat de test."
+            },
+            "Effect": {
+                "HelpLinkEnglishOnly": "Help (External link, English only)"
+            }
         },
         "Weapon": {
             "AmmoCount": "Compteur munition",

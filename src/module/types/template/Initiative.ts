@@ -1,11 +1,11 @@
 import { ModifiableField } from "../fields/ModifiableField";
-import { ModifiableValue } from "./Base";
+import { ModifiableValueSchema } from "./Base";
 const { SchemaField, BooleanField, StringField } = foundry.data.fields;
 
 export const InitiativeSchema = () => ({
-    base: new ModifiableField(ModifiableValue()),
+    base: new ModifiableField(ModifiableValueSchema()),
     dice: new ModifiableField({
-        ...ModifiableValue(),
+        ...ModifiableValueSchema(),
         text: new StringField({ required: true }),
     }),
 });

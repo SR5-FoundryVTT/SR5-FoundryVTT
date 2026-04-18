@@ -2,7 +2,7 @@ import { SR5TestFactory } from "./utils";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { TestCreator } from "../module/tests/TestCreator";
 import { DataDefaults } from "@/module/data/DataDefaults";
-import { Helpers } from "@/module/helpers";
+import { ModifiableValue } from "@/module/mods/ModifiableValue";
 
 export const shadowrunTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -31,7 +31,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                             value: 1,
                         },
                         damage: {
-                            ap: { value: 5, base: 5, mod: [] },
+                            ap: { value: 5, base: 5 },
                             base: 5,
                             type: { value: 'physical', base: 'physical' },
                             value: 5
@@ -70,6 +70,26 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             await test.evaluate();
 
             assert.strictEqual(test.pool.value, 10);
+        });
+
+        it('buy hits uses floor(pool / 4) and has no glitches', async () => {
+            const test = TestCreator.fromPool({ pool: 10, limit: 2, threshold: 1 }, { showMessage: false, showDialog: false });
+            test.data.buyHits = true;
+
+            await test.evaluate();
+
+            assert.strictEqual(test.boughtHits, 2);
+            assert.strictEqual(test.hits.value, 2);
+            assert.strictEqual(test.glitches.value, 0);
+            assert.strictEqual(test.netHits.value, 1);
+        });
+
+        it('buy hits allows push the limit but blocks second chance', async () => {
+            const test = TestCreator.fromPool({ pool: 8 }, { showMessage: false, showDialog: false });
+            test.data.buyHits = true;
+
+            assert.strictEqual(test.canPushTheLimit, true);
+            assert.strictEqual(test.canSecondChance, false);
         });
 
         it('evaluate an opposed roll from a opposed action', async () => {
@@ -128,7 +148,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             const action = DataDefaults.createData('action_roll', { attribute: 'willpower', attribute2: 'firewall' });
             const data = TestCreator._prepareTestDataWithActionForItem(action, item, TestCreator._minimalTestData());
 
-            Helpers.calcTotal(data.pool);
+            ModifiableValue.calcTotal(data.pool);
 
             assert.strictEqual(data.pool.value, 10);
         });

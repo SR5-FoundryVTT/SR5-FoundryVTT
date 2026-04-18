@@ -1,7 +1,7 @@
 import { SR5 } from "@/module/config";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { ModifiableField } from "../fields/ModifiableField";
-import { ModifiableValueLinked, BaseValuePair, ModList } from "../template/Base";
+import { ModifiableValueLinked, BaseValuePair, ChangeList } from "../template/Base";
 import { TagifyAltField } from '@/module/types/fields/TagifyAltField';
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
@@ -170,7 +170,7 @@ export const ActionRollData = (
         armor: new BooleanField(),
     }),
     alt_mod: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
-    dice_pool_mod: ModList(),
+    dice_pool_mod: ChangeList(),
     roll_mode: new StringField({
         blank: true,
         required: true,

@@ -1,4 +1,4 @@
-import { PartsList } from '../parts/PartsList';
+import { ModifiableValue } from '../mods/ModifiableValue';
 import { CombatRules } from '../rules/CombatRules';
 import { DefenseTest, DefenseTestData } from './DefenseTest';
 import { Translation } from '../utils/strings';
@@ -107,7 +107,7 @@ export class MatrixDefenseTest<T extends MatrixDefenseTestData = MatrixDefenseTe
         const defense = this.data.activeDefenses[this.data.activeDefense] || {label: 'SR5.MatrixDefense', value: 0, init: 0};
 
         // Apply zero modifier also, to sync pool.mod and modifiers.mod
-        PartsList.AddUniquePart(this.data.modifiers.mod, 'SR5.MatrixDefense', defense.value);
+        ModifiableValue.setUnique(this.data.pool, 'SR5.MatrixDefense', defense.value || 0);
     }
 
     override get success() {

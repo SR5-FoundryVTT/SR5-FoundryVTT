@@ -215,6 +215,10 @@ body:not(.theme-dark) {
     flex-wrap: wrap;
 }
 
+.form-dialog {
+    min-width: 250px;
+}
+
 .form-dialog .window-content .dialog-buttons > * {
     flex: 1;
 }
@@ -251,6 +255,7 @@ nav#context-menu, menu.controls-dropdown {
     margin-top: 4px;
     color: variables.$white;
     display: flex;
+    justify-content: center;
     .test-icon {
         width: 17px;
         height: 17px;

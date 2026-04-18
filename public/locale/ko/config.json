@@ -15,6 +15,8 @@
         "AutomateProgressiveRecoilDescription": "초기화 전까지 캐릭터에게 점진적 반동이 누적됨",
         "CompendiumBrowserBlacklist": "컨펜디움 탐색기 블랙리스트",
         "CompendiumBrowserBlacklistDescription": "컨펜디움 탐색기에서 숨긴 컨펜디움 목록",
+        "CollapseModifyRollByDefault": "기본적으로 굴림 수정 접기",
+        "CollapseModifyRollByDefaultDescription": "활성화하면 테스트 대화창을 열 때 굴림 수정 섹션이 접힌 상태로 시작합니다.",
         "DefaultOpposedTestActorSelection": "경쟁 판정 토큰 선택 덮어쓰기",
         "DefaultOpposedTestActorSelectionDescription": "항상 선택한 토큰을 판정에 사용된 대상으로 덮어씀",
         "DiagonalMovementDescription": "격자판 사용 시 대각선 이동 처리 방식",
@@ -550,6 +552,7 @@
         "Bullet": "발",
         "BulletCount": "잔탄 수",
         "Bullets": "발",
+        "BuyHits": "성공 구매",
         "COMBAT": {
             "CannotSeizeAgain": "다음 턴 시작 전까지 다시 선제권을 잡을 수 없습니다.",
             "ModeAstral": "아스트랄",
@@ -1761,7 +1764,8 @@
             "WarningTitle": "경고"
         },
         "Magic": "마법",
-        "ManualOverride": "수동 오버라이드",
+        "Manual":"수동 조종",
+        "ManualOverride": "결과 오버라이드",
         "MarkImportedItemReviewed": "불러온 항목 검토 완료 표시",
         "MarkImportedItemTooltip": "불러온 항목이 검토된 것으로 표시합니다.",
         "MarkImportsReviewed": "불러온 항목 검토 표시",
@@ -1815,6 +1819,7 @@
             "SomeAmmoMelee": "근거리 공격 수행을 위한 탄약이 충분하지 않음"
         },
         "ModPoints": "개조 점수",
+        "ModifyRoll": "굴림 수정",
         "Modification": {
             "FIELDS": {
                 "type": {
@@ -2074,6 +2079,9 @@
         },
         "Resist": "저항",
         "RestoreDefaultSkills": "기본 기술 복구",
+        "ResultOverrideGlitches": "글리치",
+        "ResultOverrideHits": "성공",
+        "ResultOverride": "결과 오버라이드",
         "RightClickToClear": "비우려면 우클릭",
         "Ritual": {
             "FIELDS": {
@@ -2638,6 +2646,7 @@
             "ThrownAttackTest": "투척 무기 공격"
         },
         "Threshold": "요구 성공횟수",
+        "ToggleBreakdown": "세부 내역 전환",
         "ToggleActive": "활성 전환",
         "ToggleEquip": "장착 전환",
         "ToggleWireless": "무선 전환",
@@ -2690,6 +2699,7 @@
                 "DocumentEffects": "이 문서에 직접 적용",
                 "EditEffect": "효과 수정",
                 "ItemEffects": "이 문서의 항목에서 수집한 효과",
+                "HelpLinkEnglishOnly": "Help (External link, English only)",
                 "OnlyAllFilteredUsed": "전체 선택 사항과 맞는 판정에만 효과가 적용됨",
                 "OnlyFilteredUsed": "최소 하나 이상의 선택 사항과 맞는 판정에만 효과가 적용됨",
                 "OnlyForItemTest": "상위 항목의 판정에만 영향",
@@ -2732,12 +2742,14 @@
                 "SpiritType": "소환될 영혼의 유형"
             },
             "Test": {
+                "BuyHits": "주사위를 굴리지 않습니다. ⌊주사위 풀 / 4⌋로 성공을 구매합니다.",
                 "Extended": "요구 성공횟수 도달 전까지 연장 판정으로 진행",
                 "Limit": "계산된 한계치",
-                "ManualGlitches": "수동 주사위 풀 굴림에서 나온 글리치 횟수. 수동 성공과 함께 사용되어야 함.",
                 "Modifier": "주사위 풀에 적용되는 모든 수정치의 합계",
                 "Pool": "굴릴 수 있는 주사위 개수",
                 "PushTheLimit": "한계 돌파 엣지 규칙 적용",
+                "ResultOverrideGlitches": "이 판정 결과의 글리치를 오버라이드합니다.",
+                "ResultOverrideHits": "이 판정 결과의 성공을 오버라이드합니다.",
                 "RollMode": "FoundryVTT 채팅 메시지 굴림 가시성",
                 "Threshold": "계산된 요구 성공횟수 수치"
             },
@@ -2860,6 +2872,7 @@
             "CantSecondChanceAGlitch": "해당 판정에는 두 번째 기회가 없습니다. 판정 결과는 글리치입니다.",
             "CantSecondChanceWithoutNoneHits": "해당 판정에는 두 번째 기회가 없습니다.  성공 주사위만 남았습니다.",
             "CantSpendMulitplePointsOfEdge": "한 번의 판정 또는 행동에 엣지를 여러 번 소비할 수 없습니다.",
+            "CantCombineBuyHitsWithEdge": "성공 구매는 두 번째 기회와 함께 사용할 수 없습니다.",
             "CompilationNotConcluded": "컴파일이 완료되지 않았습니다. 페이드 결정을 위해 스프라이트가 컴파일 경쟁 판정을 완료하길 기다려야 합니다.",
             "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "액터 없이 판정에서 엣지 점수를 소비할 수 없습니다.",
             "HostItemOnlyAcceptIC": "호스트에는 IC 액터만 추가할 수 있음",

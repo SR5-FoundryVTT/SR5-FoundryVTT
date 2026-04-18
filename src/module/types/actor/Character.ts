@@ -6,7 +6,7 @@ import { Initiative } from "../template/Initiative";
 import { Tracks } from "../template/ConditionMonitors";
 import { VisibilityChecks } from "../template/Visibility";
 import { ModifiableField } from "../fields/ModifiableField";
-import { ModifiableValue, ValueMaxPair } from "../template/Base";
+import { ModifiableValueSchema, ValueMaxPair } from "../template/Base";
 import { Attributes, AttributeField, MatrixActorAttributes } from '../template/Attributes';
 import { CommonData, CharacterLimits, CreateModifiers, MagicData, ActorBase, CharacterValues, } from "./Common";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
@@ -54,7 +54,7 @@ const CharacterData = () => ({
     armor: new ModifiableField(ActorArmorData()),
     initiative: new SchemaField(Initiative('meatspace', 'astral', 'matrix')),
     values: new SchemaField(CharacterValues()),
-    wounds: new ModifiableField(ModifiableValue()),
+    wounds: new ModifiableField(ModifiableValueSchema()),
 
     visibilityChecks: new SchemaField(VisibilityChecks('astral', 'matrix', 'meatspace')),
 
