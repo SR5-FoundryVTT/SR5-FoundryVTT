@@ -19,18 +19,25 @@
                 </div>
                 <div id="reset-progressive-recoil" class="form-group-element-1-right roll" data-tooltip="SR5.Tooltips.RangedAttack.ResetRecoil"><button type="button">↺</button></div>
             </div>
-            <div class="form-group">
-                <label>{{localize 'SR5.FireMode'}}</label>
-                <select name="test.data.fireModeSelected">
-                    {{#select test.data.fireModeSelected}}
-                    {{#each test.data.fireModes}}
-                    <option value="{{@index}}">
-                        {{localize this.label}} ({{this.value}}) ({{localize (objValue ../config.actionTypes this.action)}})
-                    </option>
-                    {{/each}}
-                    {{/select}}
-                </select>
-            </div>
+            {{#> "systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-group.hbs"
+                label=(localize 'SR5.FireMode')
+                rowClass='fire-mode-choice-row'
+                groupClass='fire-mode-choice-group'
+            }}
+                {{#each test.data.fireModes}}
+                    {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-option.hbs'
+                        type='radio'
+                        name='test.data.fireModeSelected'
+                        value=@index
+                        dtype='Number'
+                        checked=(eq @index ../test.data.fireModeSelected)
+                        disabled=this.disabled
+                        iconPath=(lookup @root.config.fireModeIcons this.label)
+                        tooltip=(localize this.label)
+                        cornerLabel=(lookup @root.config.fireModeAcronyms this.label)
+                    }}
+                {{/each}}
+            {{/"systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-group.hbs"}}
             {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/attack-range-dialog-fragment.hbs'}}
         </div>
         <div>

@@ -10,5 +10,8 @@
     />
     <span class="icon-choice-face" data-tooltip="{{tooltip}}">
         <img src="{{iconPath}}" alt="{{tooltip}}"/>
+        {{#if (isDefined cornerLabel)}}
+        <span class="icon-choice-corner-label">{{cornerLabel}}{{#if cornerSuffix}}{{cornerSuffix}}{{/if}}</span>
+        {{/if}}
     </span>
 </label>

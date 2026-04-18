@@ -7,16 +7,20 @@
                 <label>{{localize 'SR5.IncomingDamage'}}</label>
                 <input type="number" value="{{test.data.incomingDamage.value}}" name="test.data.incomingDamage"/>
             </div>
-            <div class="form-group">
-                <label>{{localize 'SR5.DamageType'}}</label>
-                <select name="test.data.incomingDamage.type.value">
-                    {{#select test.data.incomingDamage.type.value}}
-                    {{#each config.damageTypes as |val key|}}
-                    <option value="{{key}}">{{localize val}}</option>
-                    {{/each}}
-                    {{/select}}
-                </select>
-            </div>
+            {{#> "systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-group.hbs"
+                label=(localize 'SR5.DamageType')
+            }}
+                {{#each config.damageTypes as |val key|}}
+                    {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-option.hbs'
+                        type='radio'
+                        name='test.data.incomingDamage.type.value'
+                        value=key
+                        checked=(eq key ../test.data.incomingDamage.type.value)
+                        iconPath=(lookup @root.config.damageTypeIcons key)
+                        tooltip=(localize val)
+                    }}
+                {{/each}}
+            {{/"systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-group.hbs"}}
             <div class="form-group">
                 <label>{{localize 'SR5.AP'}}</label>
                 <input type="number" value="{{test.data.incomingDamage.ap.value}}" name="test.data.incomingDamage.ap" data-dtype="Number"/>
