@@ -3,71 +3,31 @@ import { ModifiableValueType } from "@/module/types/template/Base";
 
 // Flow for calculating combat roll modifiers for SR5Actor
 export const CombatModifierFlow = {
-    // Returns prone modifier if source or target is prone
-    getProneMeleeModifier: (source: SR5Actor, target?: SR5Actor): ModifiableValueType['changes'][number] | null => {
-        const srcProne = source.getStatusEffectsId().has('prone');
-        const tgtProne = target?.getStatusEffectsId().has('prone');
-        const proneDiff = Number(tgtProne) - Number(srcProne);
-        if (proneDiff) {
-            return {
-                name: `${proneDiff > 0 ? 'Target' : 'Attacker'} Prone`,
-                value: proneDiff,
-                mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-                priority: 20,
-                effectUuid: null,
-                enabled: true,
-                invalidated: false
-            };
-        }
-        return null;
-    },
-
-    getProneDefenseModifier: (source: SR5Actor, target?: SR5Actor): ModifiableValueType['changes'][number] | null => {
-        return null;
-    },
+    // Helper to create a modifier object
+    _createModifier: (name: string, value: number): ModifiableValueType['changes'][number] => ({
+        name, value,
+        mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+        priority: 20,
+        effectUuid: null,
+        enabled: true,
+        invalidated: false
+    }),
 
     // Returns charger modifier if actor is running or sprinting
     getChargerModifier: (actor: SR5Actor): ModifiableValueType['changes'][number] | null => {
         const statuses = actor.getStatusEffectsId();
-        if (statuses.has('sr5run') || statuses.has('sr5sprint')) {
-            return {
-                name: 'Charging',
-                value: 4,
-                mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-                priority: 20,
-                effectUuid: null,
-                enabled: true,
-                invalidated: false
-            };
-        }
+        if (statuses.has('sr5run') || statuses.has('sr5sprint'))
+            return CombatModifierFlow._createModifier('Charging', 4);
         return null;
     },
 
     // Returns target running/sprinting modifier if applicable
     getTargetRunningModifier: (target: SR5Actor): ModifiableValueType['changes'][number] | null => {
         const statuses = target.getStatusEffectsId();
-        if (statuses.has('sr5run')) {
-            return {
-                name: 'Target Running',
-                value: -2,
-                mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-                priority: 20,
-                effectUuid: null,
-                enabled: true,
-                invalidated: false
-            };
-        }
-        if (statuses.has('sr5sprint')) {
-            return {
-                name: 'Target Sprinting',
-                value: -4,
-                mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-                priority: 20,
-                effectUuid: null,
-                enabled: true,
-                invalidated: false
-            };
-        }
+        if (statuses.has('sr5run'))
+            return CombatModifierFlow._createModifier('Target Running', -2);
+        if (statuses.has('sr5sprint'))
+            return CombatModifierFlow._createModifier('Target Sprinting', -4);
         return null;
     }
 };
