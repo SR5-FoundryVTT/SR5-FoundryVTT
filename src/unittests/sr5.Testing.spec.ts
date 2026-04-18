@@ -132,14 +132,13 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             if (!traces) assert.fail('Expected code term traces to be present');
             if (!traces) return;
 
-            assert.isAtLeast(traces.pool.length, 3);
-            assert.isAtLeast(traces.limit.length, 1);
+            assert.isAtLeast(traces.length, 4);
 
-            assert.isTrue(traces.pool.every(trace => {
+            assert.isTrue(traces.every(trace => {
                 return typeof trace.tooltipSource === 'string'
+                    && trace.valueField
                     && trace.tooltipSource.length > 0
-                    && trace.breakdown != null
-                    && Array.isArray(trace.breakdown.changes);
+                    && Array.isArray(trace.valueField.changes);
             }));
 
             assert.isTrue(test.codeTerms.pool.every(term => {

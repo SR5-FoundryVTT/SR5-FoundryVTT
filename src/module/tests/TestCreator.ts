@@ -2,7 +2,6 @@ import {SR5Item} from "../item/SR5Item";
 import {SR5Actor} from "../actor/SR5Actor";
 import {
     SuccessTest,
-    SuccessTestCodeTermSection,
     SuccessTestMessageData,
     TestData,
     SuccessTestData,
@@ -443,7 +442,7 @@ export const TestCreator = {
         // this is done before preparing the test data to ensure Active Effects get applied through Test Resolution correctly
         Hooks.call('sr5_beforePrepareTestDataWithAction', action, document, againstData);
 
-        data.codeTermTraces = { pool: [], limit: [], threshold: [] };
+        data.codeTermTraces = [];
 
         // Store ActionRollData on TestData to allow for re-creation of the test during it's lifetime.
         data.action = action;
@@ -487,7 +486,7 @@ export const TestCreator = {
             if (skill) {
                 const skillName = skill.label || skill.name;
                 pool.addUniqueBase(skillName, SkillRules.level(skill));
-                TestCreator.addCodeTermTrace(data, 'pool', skillName, skill);
+                TestCreator.addCodeTermTrace(data, { ...skill, label: skillName });
             }
             // TODO: Check if this is actual skill specialization and for a +2 config for it instead of MagicValue.
             if (action.spec) pool.addUnique('SR5.Specialization', SkillRules.SpecializationModifier);
@@ -499,7 +498,7 @@ export const TestCreator = {
             // Don't use addUniquePart as one attribute might be used twice.
             if (attribute) {
                 pool.addBase(attribute.label, attribute.value);
-                TestCreator.addCodeTermTrace(data, 'pool', attribute.label, attribute);
+                TestCreator.addCodeTermTrace(data, attribute);
             }
         }
 
@@ -509,7 +508,7 @@ export const TestCreator = {
             // Don't use addUniquePart as one attribute might be used twice.
             if (attribute) {
                 pool.addBase(attribute.label, attribute.value);
-                TestCreator.addCodeTermTrace(data, 'pool', attribute.label, attribute);
+                TestCreator.addCodeTermTrace(data, attribute);
             }
         }
 
@@ -528,7 +527,7 @@ export const TestCreator = {
         if (action.armor) {
             const armor = actor.getArmor();
             ModifiableValue.addUniqueBase(data.pool, 'SR5.Armor.label', armor.value);
-            TestCreator.addCodeTermTrace(data, 'pool', 'SR5.Armor.label', armor);
+            TestCreator.addCodeTermTrace(data, { ...armor, label: 'SR5.Armor.label' });
         }
 
         // Prepare limit values...
@@ -548,7 +547,7 @@ export const TestCreator = {
             const limit = actor.getLimit(action.limit.attribute);
             if (limit) {
                 ModifiableValue.addUniqueBase(data.limit, limit.label, limit.value);
-                TestCreator.addCodeTermTrace(data, 'limit', limit.label, limit);
+                TestCreator.addCodeTermTrace(data, limit);
             }
         }
 
@@ -622,7 +621,7 @@ export const TestCreator = {
             const attribute = item.getAttribute(action.attribute, {rollData});
             if (attribute) {
                 pool.addUniqueBase(attribute.label, attribute.value);
-                TestCreator.addCodeTermTrace(data, 'pool', attribute.label, attribute);
+                TestCreator.addCodeTermTrace(data, attribute);
             }
         }
 
@@ -630,45 +629,19 @@ export const TestCreator = {
             const attribute = item.getAttribute(action.attribute2, {rollData});
             if (attribute) {
                 pool.addUniqueBase(attribute.label, attribute.value);
-                TestCreator.addCodeTermTrace(data, 'pool', attribute.label, attribute);
+                TestCreator.addCodeTermTrace(data, attribute);
             }
         }
 
         return data;
     },
 
-    addCodeTermTrace(
-        data: SuccessTestData,
-        source: SuccessTestCodeTermSection,
-        name: string,
-        value: ValueFieldType | number,
-    ) {
-        const traces = data.codeTermTraces = {
-            pool: [], limit: [], threshold: [],
-            ...(data.codeTermTraces || {})
-        };
+    addCodeTermTrace(data: SuccessTestData, valueField: ValueFieldType) {
+        const traces = (data.codeTermTraces ??= []);
 
-        const tooltipSource = `code-${source}-${traces[source].length}`;
-
-        const breakdown = DataDefaults.createData('value_field', {
-            ...(typeof value !== 'number' 
-                ? foundry.utils.deepClone(value) // Restore deep clone here for safety
-                : {
-                    value: value,
-                    changes: [{
-                        name, value, mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-                    }],
-                }
-            ),
-            label: name,
-        });
-
-        traces[source].push({
-            source,
-            name,
-            value: breakdown.value,
-            tooltipSource,
-            breakdown,
+        traces.push({ 
+            valueField: DataDefaults.createData('value_field', valueField), 
+            tooltipSource: `code-${traces.length}` 
         });
     },
 
@@ -677,7 +650,7 @@ export const TestCreator = {
      */
     _minimalTestData: function(): any {
         return {
-            codeTermTraces: { pool: [], limit: [], threshold: [] },
+            codeTermTraces: [],
             pool: DataDefaults.createData('value_field', {label: 'SR5.DicePool'}),
             limit: DataDefaults.createData('value_field', {label: 'SR5.Limit'}),
             threshold: DataDefaults.createData('value_field', {label: 'SR5.Threshold'}),

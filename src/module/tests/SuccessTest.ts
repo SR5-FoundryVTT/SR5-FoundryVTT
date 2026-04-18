@@ -47,24 +47,15 @@ export interface IconWithTooltip {
     tooltip: Translation;
 }
 
-export type SuccessTestCodeTermSection = 'pool' | 'limit' | 'threshold';
-
 export interface SuccessTestCodeTermTrace {
-    source: SuccessTestCodeTermSection;
-    name: string;
-    value: number;
+    valueField: ValueFieldType;
     tooltipSource: string;
-    breakdown: ValueFieldType;
 }
-
-export type SuccessTestCodeTermTraceData = Record<SuccessTestCodeTermSection, SuccessTestCodeTermTrace[]>;
 
 export interface SuccessTestCodeTerm {
     text: string;
     tooltipSource?: string;
 }
-
-export type SuccessTestCodeTerms = Record<SuccessTestCodeTermSection, SuccessTestCodeTerm[]>;
 
 /**
  * Contain all data necessary to handle an action based test.
@@ -119,7 +110,7 @@ export interface TestData {
     messageUuid?: string
 
     // Optional term-level provenance used for formula/code hover tooltips.
-    codeTermTraces?: SuccessTestCodeTermTraceData
+    codeTermTraces?: SuccessTestCodeTermTrace[]
 
     // Options the test was created with.
     options?: TestOptions
@@ -274,11 +265,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         data.values = data.values || {};
 
-        data.codeTermTraces = {
-            pool: data.codeTermTraces?.pool ?? [],
-            limit: data.codeTermTraces?.limit ?? [],
-            threshold: data.codeTermTraces?.threshold ?? [],
-        };
+        data.codeTermTraces ??= [];
 
         // Prepare basic value structure to allow an opposed tests to access derived values before execution with placeholder
         // active tests.
@@ -435,49 +422,43 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
-     * Give a representation of this success test in the common Shadowrun 5 description style.
-     * The code given is meant to provide information about value sources. Should a user overwrite
-     * these values during dialog review, keep those hidden.
-     *
-     * Automatics + Agility + 3 (3) [2 + Physical]
-     */
-    get code(): string {
-        const pool = this.codeTerms.pool.map(term => term.text);
-        const limit = this.codeTerms.limit.map(term => term.text);
-        const threshold = this.codeTerms.threshold.map(term => term.text);
-
-        // Pool portion can be dynamic or static.
-        let code = pool.join(' + ').trim() || `${this.pool.value}`;
-        if (limit.length > 0) code = `${code} [${limit.join(' + ').trim()}]`;
-        if (threshold.length > 0) code = `${code} (${threshold.join(' + ').trim()})`;
-
-        return code;
-    }
-
-    /**
      * Determine if this test can have a human-readable shadowrun test code representation.
      *
      * All parts of the test code can be dynamic, any will do.
      */
     get hasCode(): boolean {
-        return this.pool.changes.length > 0 || this.threshold.changes.length > 0 || this.limit.changes.length > 0;
+        const codeTerms = this.codeTerms;
+        return codeTerms.pool.length > 0 || codeTerms.limit.length > 0 || codeTerms.threshold.length > 0;
     }
 
-    get codeTerms(): SuccessTestCodeTerms {
+    /**
+     * Resolves the individual components and the human-readable representation of this success test.
+     * Provides the formatted UI terms for the test's pool, limit, and threshold. 
+     * Additionally, generates the common Shadowrun 5 description string (e.g., "Automatics + Agility + 3 (3) [2 + Physical]") 
+     * to provide information about value sources.
+     *
+     * @returns An object containing the term arrays (`pool`, `limit`, `threshold`), the formatted `description` string.
+     */
+    get codeTerms() {
         return {
-            pool: this._buildCodeTermsForField('pool', this.pool),
-            limit: this._buildCodeTermsForField('limit', this.limit),
-            threshold: this._buildCodeTermsForField('threshold', this.threshold),
+            pool: this._buildCodeTermsForField(this.pool),
+            limit: this._buildCodeTermsForField(this.limit),
+            threshold: this._buildCodeTermsForField(this.threshold),
         };
     }
 
-    private _buildCodeTermsForField(source: SuccessTestCodeTermSection, valueField: ValueFieldType): SuccessTestCodeTerm[] {
-        const traces = this.data.codeTermTraces?.[source] ?? [];
+    /**
+     * Constructs UI display terms for a success test field by pairing 
+     * base changes with historical trace tooltips and appending the base value.
+     */
+    private _buildCodeTermsForField(valueField: ValueFieldType): SuccessTestCodeTerm[] {
         const terms: SuccessTestCodeTerm[] = [];
+        const traces = this.data.codeTermTraces ?? [];
 
         for (const change of valueField.changes.filter(change => ModifiableValue.isBaseChange(change))) {
-            const traceIndex = traces.findIndex(trace =>
-                trace.name === change.name && trace.breakdown.value === change.value
+            // Last updated trace with matching name and value for this change.
+            const traceIndex = traces.findLastIndex(trace =>
+                trace.valueField.label === change.name && trace.valueField.value === change.value
             );
 
             terms.push({
@@ -2018,13 +1999,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             threshold: test.hasThreshold ? test.threshold : undefined,
         };
 
-        const sections = ['pool', 'limit', 'threshold'] as const;
-        for (const section of sections) {
-            const traces = test.data.codeTermTraces?.[section] ?? [];
-            for (const trace of traces) {
-                tooltipValues[trace.tooltipSource] = trace.breakdown;
-            }
-        }
+        const traces = test.data.codeTermTraces ?? [];
+        for (const trace of traces)
+            tooltipValues[trace.tooltipSource] = trace.valueField;
 
         const entries = await Promise.all(Object.entries(tooltipValues).map(async ([source, value]) => {
             return [source, value ? await this._buildValueModifierTooltipHtml(value) : undefined] as const;

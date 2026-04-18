@@ -89,7 +89,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
             if (this.actor) {
                 const armor = this.actor.getArmor(this.data.incomingDamage);
                 ModifiableValue.addUniqueBase(this.data.pool, 'SR5.Armor.label', armor.value);
-                TestCreator.addCodeTermTrace(this.data, 'pool', 'SR5.Armor.label', armor);
+                TestCreator.addCodeTermTrace(this.data, { ...armor, label: 'SR5.Armor.label' });
             }
         }
     }
