@@ -256,6 +256,17 @@ nav#context-menu, menu.controls-dropdown {
     color: variables.$white;
     display: flex;
     justify-content: center;
+
+    .test-code {
+        text-align: center;
+    }
+
+    .test-code-term.has-tooltip {
+        cursor: var(--cursor-pointer);
+        text-decoration: underline dotted rgba(variables.$yellow, 0.75);
+        text-underline-offset: 0.12rem;
+    }
+
     .test-icon {
         width: 17px;
         height: 17px;

@@ -320,6 +320,12 @@
                 font-size: var(--font-size-12);
                 color: var(--sr5-card-text);
                 letter-spacing: 0.02em;
+
+                .test-code-term.has-tooltip {
+                    cursor: var(--cursor-pointer);
+                    text-decoration: underline dotted rgba(variables.$yellow, 0.75);
+                    text-underline-offset: 0.12rem;
+                }
             }
 
             &.can-wrap {

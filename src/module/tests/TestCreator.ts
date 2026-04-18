@@ -2,6 +2,7 @@ import {SR5Item} from "../item/SR5Item";
 import {SR5Actor} from "../actor/SR5Actor";
 import {
     SuccessTest,
+    SuccessTestCodeTermSection,
     SuccessTestMessageData,
     TestData,
     SuccessTestData,
@@ -18,6 +19,7 @@ import {SR5} from "../config";
 import {SkillFlow} from "../actor/flows/SkillFlow";
 import {ActionFlow} from "../item/flows/ActionFlow";
 import { ActionRollType, DamageType, MinimalActionType } from "../types/item/Action";
+import { ValueFieldType } from "../types/template/Base";
 import { DeepPartial } from "fvtt-types/utils";
 import { PackActionFlow } from "../item/flows/PackActionFlow";
 
@@ -441,6 +443,8 @@ export const TestCreator = {
         // this is done before preparing the test data to ensure Active Effects get applied through Test Resolution correctly
         Hooks.call('sr5_beforePrepareTestDataWithAction', action, document, againstData);
 
+        data.codeTermTraces = { pool: [], limit: [], threshold: [] };
+
         // Store ActionRollData on TestData to allow for re-creation of the test during it's lifetime.
         data.action = action;
 
@@ -480,23 +484,33 @@ export const TestCreator = {
             // Custom skills don't have a label, but a name.
             // Legacy skill don't have a name, but have a label.
             // Your mind is like this water, my friend. When it is agitated, it becomes difficult to see. But if you allow it to settle, the answer becomes clear.
-            if (skill) pool.addUniqueBase(skill.label || skill.name, SkillRules.level(skill));
+            if (skill) {
+                const skillName = skill.label || skill.name;
+                pool.addUniqueBase(skillName, SkillRules.level(skill));
+                TestCreator.addCodeTermTrace(data, 'pool', skillName, skill);
+            }
             // TODO: Check if this is actual skill specialization and for a +2 config for it instead of MagicValue.
-            if (action.spec) pool.addUniqueBase('SR5.Specialization', SkillRules.SpecializationModifier);
+            if (action.spec) pool.addUnique('SR5.Specialization', SkillRules.SpecializationModifier);
         }
 
         // The first attribute is either used for skill or attribute only tests.
         if (action.attribute) {
             const attribute = actor.getAttribute(action.attribute, { rollData });
             // Don't use addUniquePart as one attribute might be used twice.
-            if (attribute) pool.addBase(attribute.label, attribute.value);
+            if (attribute) {
+                pool.addBase(attribute.label, attribute.value);
+                TestCreator.addCodeTermTrace(data, 'pool', attribute.label, attribute);
+            }
         }
 
         // The second attribute is only used for attribute only tests.
         if (!action.skill && action.attribute2) {
             const attribute = actor.getAttribute(action.attribute2, { rollData });
             // Don't use addUniquePart as one attribute might be used twice.
-            if (attribute) pool.addBase(attribute.label, attribute.value);
+            if (attribute) {
+                pool.addBase(attribute.label, attribute.value);
+                TestCreator.addCodeTermTrace(data, 'pool', attribute.label, attribute);
+            }
         }
 
         // Include pool modifiers for opposed and resist tests.
@@ -514,6 +528,7 @@ export const TestCreator = {
         if (action.armor) {
             const armor = actor.getArmor();
             ModifiableValue.addUniqueBase(data.pool, 'SR5.Armor.label', armor.value);
+            TestCreator.addCodeTermTrace(data, 'pool', 'SR5.Armor.label', armor);
         }
 
         // Prepare limit values...
@@ -531,7 +546,10 @@ export const TestCreator = {
             // Get the limit connected to the defined attribute.
             // NOTE: This might differ from the USED attribute...
             const limit = actor.getLimit(action.limit.attribute);
-            if (limit) ModifiableValue.addUniqueBase(data.limit, limit.label, limit.value);
+            if (limit) {
+                ModifiableValue.addUniqueBase(data.limit, limit.label, limit.value);
+                TestCreator.addCodeTermTrace(data, 'limit', limit.label, limit);
+            }
         }
 
         // Prepare threshold values...
@@ -602,15 +620,56 @@ export const TestCreator = {
 
         if (action.attribute) {
             const attribute = item.getAttribute(action.attribute, {rollData});
-            if (attribute) pool.addUniqueBase(attribute.label, attribute.value);
+            if (attribute) {
+                pool.addUniqueBase(attribute.label, attribute.value);
+                TestCreator.addCodeTermTrace(data, 'pool', attribute.label, attribute);
+            }
         }
 
         if (action.attribute2) {
             const attribute = item.getAttribute(action.attribute2, {rollData});
-            if (attribute) pool.addUniqueBase(attribute.label, attribute.value);
+            if (attribute) {
+                pool.addUniqueBase(attribute.label, attribute.value);
+                TestCreator.addCodeTermTrace(data, 'pool', attribute.label, attribute);
+            }
         }
 
         return data;
+    },
+
+    addCodeTermTrace(
+        data: SuccessTestData,
+        source: SuccessTestCodeTermSection,
+        name: string,
+        value: ValueFieldType | number,
+    ) {
+        const traces = data.codeTermTraces = {
+            pool: [], limit: [], threshold: [],
+            ...(data.codeTermTraces || {})
+        };
+
+        const tooltipSource = `code-${source}-${traces[source].length}`;
+
+        const breakdown = DataDefaults.createData('value_field', {
+            ...(typeof value !== 'number' 
+                ? foundry.utils.deepClone(value) // Restore deep clone here for safety
+                : {
+                    value: value,
+                    changes: [{
+                        name, value, mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+                    }],
+                }
+            ),
+            label: name,
+        });
+
+        traces[source].push({
+            source,
+            name,
+            value: breakdown.value,
+            tooltipSource,
+            breakdown,
+        });
     },
 
     /**
@@ -618,6 +677,7 @@ export const TestCreator = {
      */
     _minimalTestData: function(): any {
         return {
+            codeTermTraces: { pool: [], limit: [], threshold: [] },
             pool: DataDefaults.createData('value_field', {label: 'SR5.DicePool'}),
             limit: DataDefaults.createData('value_field', {label: 'SR5.Limit'}),
             threshold: DataDefaults.createData('value_field', {label: 'SR5.Threshold'}),

@@ -7,11 +7,11 @@ import {SoakFlow} from "../actor/flows/SoakFlow";
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { Translation } from '../utils/strings';
 import { ResistTestData, ResistTestDataFlow } from "./flows/ResistTestDataFlow";
-import { BiofeedbackResistTest } from "./BiofeedbackResistTest";
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
 import { MatrixResistTestData } from "./MatrixResistTest";
 import { MinimalActionType } from "../types/item/Action";
+import { TestCreator } from "./TestCreator";
 
 export interface PhysicalResistTestData extends ResistTestData<PhysicalDefenseTestData> {
     // Determine if an actor should be knockedDown after a defense.
@@ -89,6 +89,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
             if (this.actor) {
                 const armor = this.actor.getArmor(this.data.incomingDamage);
                 ModifiableValue.addUniqueBase(this.data.pool, 'SR5.Armor.label', armor.value);
+                TestCreator.addCodeTermTrace(this.data, 'pool', 'SR5.Armor.label', armor);
             }
         }
     }

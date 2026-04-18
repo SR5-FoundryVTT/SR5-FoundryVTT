@@ -35,7 +35,7 @@ export const ValueMaxPair = () => ({
  */
 const ChangeEntry = () => ({
     name: new StringField({ required: true }),
-    mode: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+    mode: new NumberField({ required: true, nullable: false, integer: true, initial: CONST.ACTIVE_EFFECT_MODES.ADD }),
     value: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     priority: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     effectUuid: new DocumentUUIDField({ required: true, nullable: true }),
@@ -65,7 +65,6 @@ export const ModifiableValueLinked = () => ({
 export const ValueField = () => ({
     ...ModifiableValueSchema(),
     label: new StringField({ required: true }),
-    manualMod: new StringField({ required: true }),
 });
 
 export type ValueFieldType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ValueField>>;

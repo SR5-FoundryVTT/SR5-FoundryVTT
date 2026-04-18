@@ -2,7 +2,21 @@
     {{#if test.hasCode}}
     <hr/>
     <div class="common-test">
-        {{test.code}}
+        <span class="test-code">
+            {{#if test.codeTerms.pool.length}}
+                {{#each test.codeTerms.pool as |term|}}
+                    <span class="test-code-term {{#if term.tooltipSource}}has-tooltip{{/if}}" {{#if term.tooltipSource}}data-tooltip-source="{{term.tooltipSource}}"{{/if}}>{{term.text}}</span>{{#unless @last}} + {{/unless}}
+                {{/each}}
+            {{else}}
+                <span class="test-code-term">{{test.pool.value}}</span>
+            {{/if}}
+            {{#if test.codeTerms.limit.length}}
+                [{{#each test.codeTerms.limit as |term|}}<span class="test-code-term {{#if term.tooltipSource}}has-tooltip{{/if}}" {{#if term.tooltipSource}}data-tooltip-source="{{term.tooltipSource}}"{{/if}}>{{term.text}}</span>{{#unless @last}} + {{/unless}}{{/each}}]
+            {{/if}}
+            {{#if test.codeTerms.threshold.length}}
+                ({{#each test.codeTerms.threshold as |term|}}<span class="test-code-term {{#if term.tooltipSource}}has-tooltip{{/if}}" {{#if term.tooltipSource}}data-tooltip-source="{{term.tooltipSource}}"{{/if}}>{{term.text}}</span>{{#unless @last}} + {{/unless}}{{/each}})
+            {{/if}}
+        </span>
         {{#if test.hitsIcon}}<img class="test-icon" src="{{test.hitsIcon.icon}}" data-tooltip="{{test.hitsIcon.tooltip}}" />{{/if}}
     </div>
     {{/if}}

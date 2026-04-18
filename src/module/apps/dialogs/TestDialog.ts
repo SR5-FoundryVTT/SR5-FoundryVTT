@@ -262,6 +262,8 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
             checkbox.dispatchEvent(new Event('change', { bubbles: true }));
         });
 
+        await SuccessTest.hydrateValueModifierTooltipsForTest(this.test, html);
+
         html.find('.roll-mode-button').on('click', event => {
             event.preventDefault();
 

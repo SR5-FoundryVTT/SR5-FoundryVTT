@@ -47,6 +47,25 @@ export interface IconWithTooltip {
     tooltip: Translation;
 }
 
+export type SuccessTestCodeTermSection = 'pool' | 'limit' | 'threshold';
+
+export interface SuccessTestCodeTermTrace {
+    source: SuccessTestCodeTermSection;
+    name: string;
+    value: number;
+    tooltipSource: string;
+    breakdown: ValueFieldType;
+}
+
+export type SuccessTestCodeTermTraceData = Record<SuccessTestCodeTermSection, SuccessTestCodeTermTrace[]>;
+
+export interface SuccessTestCodeTerm {
+    text: string;
+    tooltipSource?: string;
+}
+
+export type SuccessTestCodeTerms = Record<SuccessTestCodeTermSection, SuccessTestCodeTerm[]>;
+
 /**
  * Contain all data necessary to handle an action based test.
  */
@@ -98,6 +117,9 @@ export interface TestData {
 
     // Message the test has been represented with.
     messageUuid?: string
+
+    // Optional term-level provenance used for formula/code hover tooltips.
+    codeTermTraces?: SuccessTestCodeTermTraceData
 
     // Options the test was created with.
     options?: TestOptions
@@ -251,6 +273,12 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         data.limit = data.limit || DataDefaults.createData('value_field', { label: 'SR5.Limit' });
 
         data.values = data.values || {};
+
+        data.codeTermTraces = {
+            pool: data.codeTermTraces?.pool ?? [],
+            limit: data.codeTermTraces?.limit ?? [],
+            threshold: data.codeTermTraces?.threshold ?? [],
+        };
 
         // Prepare basic value structure to allow an opposed tests to access derived values before execution with placeholder
         // active tests.
@@ -414,20 +442,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Automatics + Agility + 3 (3) [2 + Physical]
      */
     get code(): string {
-        // Helper to collect all base value parts.
-        const formatBaseField = (valueField: ValueFieldType) => {
-            const parts = valueField.changes
-                .filter(change => ModifiableValue.isBaseChange(change))
-                .map(change => `${game.i18n.localize(change.name as Translation)} ${change.value}`);
-
-            if (valueField.base)
-                parts.push(String(valueField.base));
-            return parts;
-        };
-
-        const pool = formatBaseField(this.pool);
-        const limit = formatBaseField(this.limit);
-        const threshold = formatBaseField(this.threshold);
+        const pool = this.codeTerms.pool.map(term => term.text);
+        const limit = this.codeTerms.limit.map(term => term.text);
+        const threshold = this.codeTerms.threshold.map(term => term.text);
 
         // Pool portion can be dynamic or static.
         let code = pool.join(' + ').trim() || `${this.pool.value}`;
@@ -444,6 +461,35 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     get hasCode(): boolean {
         return this.pool.changes.length > 0 || this.threshold.changes.length > 0 || this.limit.changes.length > 0;
+    }
+
+    get codeTerms(): SuccessTestCodeTerms {
+        return {
+            pool: this._buildCodeTermsForField('pool', this.pool),
+            limit: this._buildCodeTermsForField('limit', this.limit),
+            threshold: this._buildCodeTermsForField('threshold', this.threshold),
+        };
+    }
+
+    private _buildCodeTermsForField(source: SuccessTestCodeTermSection, valueField: ValueFieldType): SuccessTestCodeTerm[] {
+        const traces = this.data.codeTermTraces?.[source] ?? [];
+        const terms: SuccessTestCodeTerm[] = [];
+
+        for (const change of valueField.changes.filter(change => ModifiableValue.isBaseChange(change))) {
+            const traceIndex = traces.findIndex(trace =>
+                trace.name === change.name && trace.breakdown.value === change.value
+            );
+
+            terms.push({
+                text: `${game.i18n.localize(change.name as Translation)} ${change.value}`,
+                tooltipSource: traceIndex >= 0 ? traces[traceIndex].tooltipSource : undefined,
+            });
+        }
+
+        if (valueField.base)
+            terms.push({ text: String(valueField.base) });
+
+        return terms;
     }
 
     /**
@@ -1945,16 +1991,16 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const test = await TestCreator.fromMessage(message.id);
         if (!test) return;
 
-        const tooltipsBySource = {
-            pool: await this._buildValueModifierTooltipHtml(test.pool),
-            limit: test.hasLimit ? await this._buildValueModifierTooltipHtml(test.limit) : undefined,
-            threshold: test.hasThreshold ? await this._buildValueModifierTooltipHtml(test.threshold) : undefined,
-        } as const;
+        await this.hydrateValueModifierTooltipsForTest(test, html);
+    }
 
-        const valueModifiers = $(html).find<HTMLElement>('.roll-card .test-value.value-mod[data-tooltip-source]').toArray();
+    static async hydrateValueModifierTooltipsForTest(test: SuccessTest, html: HTMLElement | JQuery) {
+        const tooltipsBySource = await this._buildValueModifierTooltipsBySource(test);
+
+        const valueModifiers = $(html).find<HTMLElement>('[data-tooltip-source]').toArray();
 
         for (const valueMod of valueModifiers) {
-            const source = valueMod.dataset.tooltipSource as keyof typeof tooltipsBySource | undefined;
+            const source = valueMod.dataset.tooltipSource;
             if (!source) continue;
 
             const tooltipHtml = tooltipsBySource[source];
@@ -1963,6 +2009,28 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             valueMod.dataset.tooltipHtml = tooltipHtml;
             valueMod.dataset.tooltipClass = 'sr5-value-modifiers-tooltip';
         }
+    }
+
+    private static async _buildValueModifierTooltipsBySource(test: SuccessTest): Promise<Record<string, string | undefined>> {
+        const tooltipValues: Record<string, ValueFieldType | undefined> = {
+            pool: test.pool,
+            limit: test.hasLimit ? test.limit : undefined,
+            threshold: test.hasThreshold ? test.threshold : undefined,
+        };
+
+        const sections = ['pool', 'limit', 'threshold'] as const;
+        for (const section of sections) {
+            const traces = test.data.codeTermTraces?.[section] ?? [];
+            for (const trace of traces) {
+                tooltipValues[trace.tooltipSource] = trace.breakdown;
+            }
+        }
+
+        const entries = await Promise.all(Object.entries(tooltipValues).map(async ([source, value]) => {
+            return [source, value ? await this._buildValueModifierTooltipHtml(value) : undefined] as const;
+        }));
+
+        return Object.fromEntries(entries);
     }
 
     static async _buildValueModifierTooltipHtml(value: ValueFieldType): Promise<string | undefined> {
@@ -1983,7 +2051,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Select a Token on the current scene based on the link id.
      * @params event Any user PointerEvent
     */
-    static async _selectSceneToken(event: Event) {
+    static _selectSceneToken(event: Event) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -1993,7 +2061,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const tokenId = selectLink.data('tokenId');
         const token = canvas.tokens?.get(tokenId);
 
-        if (token instanceof Token) {
+        if (token instanceof foundry.canvas.placeables.Token) {
             token.control();
         } else {
             ui.notifications?.warn(game.i18n.localize('SR5.NoSelectableToken'))
