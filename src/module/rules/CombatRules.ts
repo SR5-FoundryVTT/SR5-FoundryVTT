@@ -278,8 +278,4 @@ export class CombatRules {
     static initiativeScoreWoundAdjustment(woundsBefore: number, woundsAfter: number) {
         return woundsAfter - woundsBefore;
     }
-
-    static getProneModifier(actor: SR5Actor, target?: SR5Actor) {
-
-    }
 }

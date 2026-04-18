@@ -163,6 +163,21 @@ export class SR5Combat extends Combat<"base"> {
         context: Combat.TurnEventContext,
     ) {}
 
+    override async clearMovementHistories(combatants: Parameters<Combat['clearMovementHistories']>[0]) {
+        await super.clearMovementHistories(combatants);
+
+        // Remove running/sprinting status effects from all combatants
+        // TokenDocument is not triggered to clear movement history on this path.
+        if (combatants && game.settings.get(SYSTEM_NAME, FLAGS.TokenAutoRunning)) {
+            for (const combatant of combatants) {
+                // Concurrently remove running/sprinting status effects.
+                await Promise.all([
+                    combatant.actor?.toggleStatusEffect("sr5run", { active: false }),
+                    combatant.actor?.toggleStatusEffect("sr5sprint", { active: false }),
+                ]);
+            }
+        }
+    }
 
     // =========================================================
     // 4. TURN & ROUND PROGRESSION FLOW
