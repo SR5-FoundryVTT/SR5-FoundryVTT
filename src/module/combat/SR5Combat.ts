@@ -135,8 +135,8 @@ export class SR5Combat extends Combat<"base"> {
             return (b.system.seize ? 1 : 0) - (a.system.seize ? 1 : 0);
 
         // Primary comparison: Initiative score (higher acts first)
-        const initA = Number.isNumeric(a.initiative) ? a.initiative ?? 0 : -Infinity;
-        const initB = Number.isNumeric(b.initiative) ? b.initiative ?? 0 : -Infinity;
+        const initA = typeof a.initiative === 'number' ? a.initiative : -Infinity;
+        const initB = typeof b.initiative === 'number' ? b.initiative : -Infinity;
         if (initA !== initB || !a.actor || !b.actor) return initB - initA;
 
         // Tie-breaker comparisons: Edge, Reaction, Intuition (ERIC) (SR5 p. 159)
@@ -493,7 +493,6 @@ export class SR5Combat extends Combat<"base"> {
             round: this.round,
             combatants: this.combatants.map((combatant) => ({
                 _id: combatant.id,
-                defeated: combatant.defeated,
                 initiative: combatant.initiative ?? null,
                 system: structuredClone(combatant.system),
             }))

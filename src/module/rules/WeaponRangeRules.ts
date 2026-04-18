@@ -197,8 +197,6 @@ export class WeaponRangeTestBehavior {
     private static async markActionPhaseAsAttackUsed(test: WeaponRangeTest) {
         if (!test.actor?.combatActive) return;
 
-        if (!test.actor.combatActive) return;
-
         // Mark all combatants of the actor as having attacked this turn
         const combatants = test.actor.combatants;
         for (const combatant of combatants) {

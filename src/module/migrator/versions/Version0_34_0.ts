@@ -1,3 +1,4 @@
+import { SR } from "@/module/constants";
 import { VersionMigration } from "../VersionMigration";
 
 /**
@@ -11,7 +12,8 @@ export class Version0_34_0 extends VersionMigration {
     }
 
     override migrateCombat(combat: any) {
-        combat.system.pass = combat.flags.shadowrun5e?.combatInitiativePass ?? 0;
+        const initiativePass = combat.flags.shadowrun5e?.combatInitiativePass ?? SR.combat.FIRST_PASS;
+        combat.system.pass = Math.max(initiativePass, SR.combat.FIRST_PASS);
     }
 
     override migrateCombatant(combatant: any): void {

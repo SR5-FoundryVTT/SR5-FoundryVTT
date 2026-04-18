@@ -10,7 +10,7 @@ const CombatantInitiativeData = () => ({
 export const CombatantData = () => ({
     acted: new BooleanField({ initial: false }),
     attackedLastTurn: new BooleanField({ initial: false }),
-    coinFlip: new NumberField({ required: true, nullable: false, initial: Math.random() }),
+    coinFlip: new NumberField({ required: true, nullable: false, initial: () => Math.random() }),
     seize: new BooleanField({ initial: false }),
     pad: new BooleanField({ required: false, initial: false }),
     initiative: new SchemaField(CombatantInitiativeData()),

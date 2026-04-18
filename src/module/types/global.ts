@@ -84,20 +84,6 @@ declare module "fvtt-types/configuration" {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    interface ConfiguredActiveEffect<SubType extends ActiveEffect.SubType> {
-        document: SR5ActiveEffect;
-    }
-    
-    interface ConfiguredActor<SubType extends Actor.SubType> {
-        document: SR5Actor<SubType & Actor.ConfiguredSubType>;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    interface ConfiguredChatMessage<SubType extends ChatMessage.SubType> {
-        document: SR5ChatMessage;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interface ConfiguredCombat<SubType extends Combat.SubType> {
         document: SR5Combat;
     }

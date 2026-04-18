@@ -9,7 +9,7 @@ import { ValueFieldType } from "../types/template/Base";
 export class CombatRules {
     /**
      * Reduce the given initiative score according to @PDF SR5#159
-     * @param score This given score can't be reduced under zero.
+     * @param score The initiative score to be reduced
      */
     static initAfterPass(score: null): null;
     static initAfterPass(score: number): number;
