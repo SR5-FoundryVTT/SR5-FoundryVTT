@@ -1,5 +1,5 @@
 import {SuccessTest} from "./SuccessTest";
-import {PartsList} from "../parts/PartsList";
+import {ModifiableValue} from "../mods/ModifiableValue";
 
 export class NaturalRecoveryPhysicalTest extends SuccessTest {
     override async execute(): Promise<this> {
@@ -30,8 +30,7 @@ export class NaturalRecoveryPhysicalTest extends SuccessTest {
         const track = this.actor.getPhysicalTrack();
         const boxes = track?.value || 0;
 
-        const threshold = new PartsList(this.threshold.mod);
-        threshold.addUniquePart('SR5.PhysicalTrack', boxes)
+        ModifiableValue.addUniqueBase(this.threshold, 'SR5.PhysicalTrack', boxes)
     }
 
     /**

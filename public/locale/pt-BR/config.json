@@ -15,6 +15,8 @@
         "AutomateProgressiveRecoilDescription": "Personagens acumulam recuo progressivo até serem reiniciados",
         "CompendiumBrowserBlacklist": "Lista Negra do Navegador de Compêndio",
         "CompendiumBrowserBlacklistDescription": "Lista de compêndios a serem ocultados no navegador de compêndios",
+        "CollapseModifyRollByDefault": "Recolher Modificar Rolagem por padrão",
+        "CollapseModifyRollByDefaultDescription": "Se ativado, a secao Modificar Rolagem inicia recolhida ao abrir uma janela de teste.",
         "DefaultOpposedTestActorSelection": "Sobrescrever seleções de token de testes de oposição",
         "DefaultOpposedTestActorSelectionDescription": "Sempre sobrescrever tokens selecionados com alvos usados para testes",
         "DieFaceLabels": "Rótulos das Faces dos Dados",
@@ -191,6 +193,7 @@
         "Bullet": "Projétil",
         "BulletCount": "Num. Disparos",
         "Bullets": "Projéteis",
+        "BuyHits": "Comprar Acertos",
         "COMBAT": {
             "ReduceInitByFive": "Iniciativa -5",
             "ReduceInitByOne": "Iniciativa -1",
@@ -733,7 +736,8 @@
             "WarningTitle": "Alerta"
         },
         "Magic": "Magia",
-        "ManualOverride": "Substituição Manual",
+        "Manual":"Manual",
+        "ManualOverride": "Substituição de Resultado",
         "MarkImportedItemReviewed": "Marcar Item Importado Como Revisado",
         "MarkImportedItemTooltip": "Marca este item importado como tendo sido revisado.",
         "MarkImportsReviewed": "Marcar Importações Revisadas",
@@ -772,6 +776,7 @@
             "SomeAmmo": "Munição insuficiente para disparar no modo selecionado, os modificadores de modo serão reduzidos.",
             "SomeAmmoMelee": "Não há munição suficiente para fazer um ataque corpo a corpo"
         },
+        "ModifyRoll": "Modificar Rolagem",
         "ModPoints": "Pontos de Mod",
         "Modification": "Modificação",
         "ModificationCategories": "Categorias de Modificação",
@@ -918,6 +923,9 @@
         "RemoveSpecialization": "Remover Especialização",
         "Resist": "Resistir",
         "RestoreDefaultSkills": "Restaurar Perícias Padrão",
+        "ResultOverrideGlitches": "Falhas",
+        "ResultOverrideHits": "Acertos",
+        "ResultOverride": "Substituição de Resultado",
         "RightClickToClear": "Botão Direito para Limpar",
         "Roll": "Rolagem",
         "RollArmor": "Armadura",
@@ -1285,6 +1293,7 @@
             "ThrownAttackTest": "Ataque de Arma Lançada"
         },
         "Threshold": "Limiar",
+        "ToggleBreakdown": "Alternar detalhamento",
         "ToggleActive": "Alternar Ativo",
         "ToggleEquip": "Alternar Equipamento",
         "Tooltips": {
@@ -1314,6 +1323,7 @@
                 "ApplyTo": "As alterações deste efeito se aplicarão apenas a este alvo",
                 "DocumentEffects": "Efeitos diretamente neste documento",
                 "ItemEffects": "Efeitos coletados de itens neste documento",
+                "HelpLinkEnglishOnly": "Help (External link, English only)",
                 "OnlyAllFilteredUsed": "Este efeito só se aplicará para testes que correspondam a todas as seleções",
                 "OnlyFilteredUsed": "Este efeito só se aplicará para testes que correspondam a pelo menos uma seleção",
                 "OnlyForItemTest": "Apenas afeta o teste do item pai",
@@ -1389,11 +1399,14 @@
                 "SpiritType": "Tipo do espírito invocado"
             },
             "Test": {
+                "BuyHits": "Não rola dados. Compra acertos usando ⌊reserva de dados / 4⌋.",
                 "Extended": "O teste será rolado como um teste estendido até que o limite seja alcançado",
                 "Limit": "Valor do limite calculado",
                 "Modifier": "Soma de todos os modificadores aplicados à reserva de dados",
                 "Pool": "Quantidade de dados para rolar",
                 "PushTheLimit": "Aplicar regras de vantagem ao limite",
+                "ResultOverrideGlitches": "Substitui as falhas para este resultado de teste.",
+                "ResultOverrideHits": "Substitui os acertos para este resultado de teste.",
                 "RollMode": "Visibilidade da mensagem de rolagem do chat FoundryVTT",
                 "Threshold": "Valor do limite calculado"
             }
@@ -1509,6 +1522,7 @@
             "CantSecondChanceAGlitch": "Não pode ter uma segunda chance neste teste. O resultado do teste é falho.",
             "CantSecondChanceWithoutNoneHits": "Não pode ter uma segunda chance neste teste. Só restam dados de acerto.",
             "CantSpendMulitplePointsOfEdge": "Não pode gastar vários pontos de trunfo em um teste ou ação",
+            "CantCombineBuyHitsWithEdge": "Comprar Acertos não pode ser combinado com Segunda Chance.",
             "CompilationNotConcluded": "Compilação incompleta. Aguarde o sprite se opor à compilação para determinar o enfraquecimento.",
             "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Pontos de trunfo não podem ser gastos em testes sem atores",
             "HostItemOnlyAcceptIC": "Apenas atores GELOs podem ser adicionados aos hosts",

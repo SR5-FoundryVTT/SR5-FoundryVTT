@@ -1,5 +1,5 @@
 import { SR5 } from "@/module/config";
-import { ModifiableValue } from "./Base";
+import { ModifiableValueSchema } from "./Base";
 import { ModifiableField } from "../fields/ModifiableField";
 import { FixedTypeObjectField } from "../fields/FixedTypeObjectField";
 const { SchemaField, BooleanField, ArrayField, StringField, TypedObjectField, HTMLField } = foundry.data.fields;
@@ -7,7 +7,7 @@ const { SchemaField, BooleanField, ArrayField, StringField, TypedObjectField, HT
 export type SkillCategories = 'active' | 'language' | 'knowledge';
 
 export const SkillField = () => ({
-    ...ModifiableValue(),
+    ...ModifiableValueSchema(),
     name: new StringField({ required: true }),
     key: new StringField({ required: true }),
     img: new StringField({ required: true }),

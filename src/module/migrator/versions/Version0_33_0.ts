@@ -1,7 +1,8 @@
 import { SR5 } from '@/module/config';
 import { DataDefaults } from '@/module/data/DataDefaults';
-import { VersionMigration } from '../VersionMigration';
 import { SYSTEM_NAME } from '@/module/constants';
+import { VersionMigration } from "../VersionMigration";
+
 
 type LegacySkillCategory = 'active' | 'language' | 'knowledge';
 type LegacyKnowledgeType = 'academic' | 'interests' | 'professional' | 'street';
@@ -53,11 +54,22 @@ const LEGACY_KNOWLEDGE_ATTRIBUTES: Record<LegacyKnowledgeType, string> = {
 };
 
 /**
+ * Make sure that readonly fields are set to their correct values.
  * Migrate actors from the pre-skill-item storage model where skills only lived in system.skills.
  */
 export class Version0_33_0 extends VersionMigration {
-    readonly TargetVersion = '0.33.0';
-    private skillPackIcons?: ReadonlyMap<string, string>;
+    readonly TargetVersion = "0.33.0";
+
+    override handlesActiveEffect(_effect: Readonly<any>) {
+        return _effect.changes.filter(change => change.mode === CONST.ACTIVE_EFFECT_MODES.CUSTOM).length > 0;
+    }
+
+    override migrateActiveEffect(effect: any) {
+        for (const change of effect.changes)
+            if (change.mode === CONST.ACTIVE_EFFECT_MODES.CUSTOM)
+                change.mode = CONST.ACTIVE_EFFECT_MODES.ADD;
+    }
+
 
     /**
      * Only migrate if an actor actually has skills.
@@ -85,6 +97,9 @@ export class Version0_33_0 extends VersionMigration {
         }
 
     }
+
+    /** SKILL ITEM MIGRATION */
+    private skillPackIcons?: ReadonlyMap<string, string>;
 
     private collectLegacySkills(actor: Readonly<NecessaryActorData>): LegacySkillEntry[] {
         const legacySkills: LegacySkillEntry[] = [];

@@ -219,7 +219,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     private readonly expandedSkills = new Set<string>();
 
-    constructor(...args: any) {
+    constructor(...args: ConstructorParameters<typeof ActorSheetV2>) {
         super(...args);
 
         // Preselect default inventory.
@@ -972,7 +972,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             await this.actor.inventory.addItems(this.selectedInventory, items as SR5Item[]);
         }
         for (const item of items) {
-            await item.sheet?.render(true, { mode: 'edit' });
+            await item.sheet?.render(true, { mode: 'edit' } as any);
         }
     }
 
@@ -1045,7 +1045,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             // @ts-expect-error typing clashes between items.get and fromUuid
             item = await fromUuid(uuid);
         }
-        if (item) await item.sheet?.render(true, { mode: 'edit' });
+        if (item) await item.sheet?.render(true, { mode: 'edit' } as any);
     }
 
     async _handleDeleteItem(item: SR5Item) {
@@ -1239,20 +1239,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         sheetData.system.modifiers = sorted as typeof modifiers;
         sheetData.woundTolerance = 3 + ('wound_tolerance' in modifiers ? modifiers.wound_tolerance : 0);
-    }
-
-    _prepareMatrixAttributes(sheetData: SR5ActorSheetData) {
-        const { matrix } = sheetData.system;
-        if (matrix) {
-            const cleanupAttribute = (attribute: MatrixAttribute) => {
-                const att = matrix[attribute];
-                if (att) {
-                    if (!att.mod) att.mod = [];
-                }
-            };
-
-            (['firewall', 'data_processing', 'sleaze', 'attack'] as MatrixAttribute[]).forEach(att => { cleanupAttribute(att); });
-        }
     }
 
     /**
@@ -1654,6 +1640,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const skill = this.actor.items.get(skillId);
         if (!skill) return;
 
+        // @ts-expect-error TODO: tamif - skill-items resolve type error
         await skill.sheet?.render(true, { mode: 'edit' });
     }
 
@@ -2125,7 +2112,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                     const id = SheetFlow.closestItemId(target);
                     const item = this.actor.items.get(id);
                     if (item) {
-                        await item.sheet?.render(true, { mode: 'edit' })
+                        await item.sheet?.render(true, { mode: 'edit' } as any)
                     }
                 }
             },

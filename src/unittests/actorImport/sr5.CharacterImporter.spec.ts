@@ -48,6 +48,8 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.name, character.name, 'Name');
             assert.strictEqual(actor.system.limits.physical.value, Number(character.limitphysical), 'Physical Limit');
             assert.strictEqual(actor.system.limits.mental.value, Number(character.limitmental), 'Mental Limit');
+
+            // Must have Glamour data to have a social limit, otherwise it's not imported and defaults to 6.
             assert.strictEqual(actor.system.limits.social.value, Number(character.limitsocial), 'Social Limit');
             assert.strictEqual(actor.system.limits.astral.value, Number(character.limitastral), 'Astral Limit');
 

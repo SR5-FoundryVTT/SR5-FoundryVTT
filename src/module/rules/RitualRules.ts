@@ -1,7 +1,7 @@
-import { DataDefaults } from "../data/DataDefaults";
-import { Helpers } from "../helpers";
-import { DamageType } from "../types/item/Action";
 import { DrainRules } from "./DrainRules";
+import { ModifiableValue } from "../mods/ModifiableValue";
+import { DamageType } from "../types/item/Action";
+import { DataDefaults } from "../data/DataDefaults";
 
 /**
  * Rules implementing the ritual chapter in SR5#295f
@@ -46,7 +46,7 @@ export const RitualRules = {
         const damage = DataDefaults.createData('damage');
         damage.base = drain;
         damage.type.base = damage.type.value = DrainRules.calcDrainDamageType(hits, magic);
-        Helpers.calcTotal(damage, { min: 0 });
+        ModifiableValue.calcTotal(damage, { min: 0 });
 
         return damage;
     },

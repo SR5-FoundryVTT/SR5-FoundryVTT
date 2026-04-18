@@ -2,9 +2,8 @@ import { SR5Actor } from "../actor/SR5Actor";
 import { SR5 } from "../config";
 import { SR } from "../constants";
 import { DataDefaults } from "../data/DataDefaults";
-import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
-import { PartsList } from "../parts/PartsList";
+import { ModifiableValue } from "../mods/ModifiableValue";
 import { BiofeedbackDamageType, DamageType } from '../types/item/Action';
 
 export class MatrixRules {
@@ -125,7 +124,7 @@ export class MatrixRules {
 
 
     /**
-    * Return modifier for marks placed. See SR5#240 'Hack on the Fly' or SR5#238 'Brute Force'
+     * Return modifier for marks placed. See SR5#240 'Hack on the Fly' or SR5#238 'Brute Force'
      * @param marks Amount of marks to be placed
      */
     static getMarkPlacementModifier(marks: number): number {
@@ -175,7 +174,7 @@ export class MatrixRules {
      * @returns true, amount of slaves is valid.
      */
     static validPANSlaveCount(rating: number, slaves: number): boolean {
-        return this.maxPANSlaves(rating) <= slaves;
+        return this.maxPANSlaves(rating) >= slaves;
     }
 
     /**
@@ -265,7 +264,7 @@ export class MatrixRules {
             netHits = 0;
         }
         const damage = DataDefaults.createData('damage', { base: netHits, type: { base: 'matrix', value: 'matrix' }, biofeedback });
-        damage.value = Helpers.calcTotal(damage, { min: 0 });
+        ModifiableValue.calcTotal(damage, { min: 0 });
         return damage;
     }
 
@@ -323,10 +322,10 @@ export class MatrixRules {
         if (defenderHits < 0) defenderHits = 0;
 
         // add net hits as separate parts
-        PartsList.AddUniquePart(modified.mod, 'SR5.Attacker', attackerHits);
-        PartsList.AddUniquePart(modified.mod, 'SR5.Defender', -defenderHits);
-
-        modified.value = Helpers.calcTotal(modified, { min: 0 });
+        const mod = new ModifiableValue(modified);
+        mod.addUnique('SR5.Attacker',  attackerHits);
+        mod.addUnique('SR5.Defender', -defenderHits);
+        mod.calcTotal({ min: 0 });
 
         return modified;
     }

@@ -3,6 +3,7 @@ import { SR5 } from '../config';
 import { ActionFlow } from '../item/flows/ActionFlow';
 import { Translation } from '../utils/strings';
 import { TagifyValues } from '@/module/utils/sheets';
+import { LinksHelpers } from '@/module/utils/links';
 
 import ActiveEffectConfig = foundry.applications.sheets.ActiveEffectConfig;
 import { ActiveEffectDM } from '@/module/types/effect/ActiveEffect';
@@ -50,12 +51,12 @@ type SR5ActiveEffectSheetData = ActiveEffectConfig.RenderContext & {
 }
 
 export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEffectConfig<SR5ActiveEffectSheetData> {
+    private static readonly HELP_PAGE_URL = 'http://sr5-foundryvtt.privateworks.com/index.php/Active_Effect';
 
     static override DEFAULT_OPTIONS = {
         ...super.DEFAULT_OPTIONS,
         actions: {
-            // override the onAdd so we can change the default mode to custom
-            addChange: this.#onAddChange,
+            openHelp: this.#onOpenHelp,
         },
         classes: ["active-effect-config", SR5_APPV2_CSS_CLASS, 'named-sheet'],
         position: { width: 760 },
@@ -72,7 +73,6 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
                 ...super.TABS.sheet.tabs.slice(0, 2),
                 { id: 'applyTo', group: 'sheet', cssClass: '', label: 'SR5.ActiveEffect.ApplyTo', icon: 'fas fa-filter' },
                 ...super.TABS.sheet.tabs.slice(2),
-                { id: 'help', group: 'sheet', cssClass: '', label: 'SR5.Help', icon: 'fas fa-book' },
             ],
             initial: 'details',
         }
@@ -80,33 +80,14 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
 
     /**
      * Do any final preparations when rendering the sheet
-     * @param context
-     * @param options
      */
     protected override async _renderHTML(context, options) {
-        // push footer to the end of parts os it is rendered at the bottom
+        // push footer to the end of parts so it is rendered at the bottom
         if (options.parts.includes("footer")) {
             const index = options.parts.indexOf("footer");
             options.parts.push(options.parts.splice(index, 1)[0]);
         }
-        return await super._renderHTML(context, options);
-    }
-
-    /**
-     * Override preparingParts to prepare our own custom modes
-     * @param partId
-     * @param context
-     * @param options
-     */
-    override async _preparePartContext(partId, context, options) {
-       const data = await super._preparePartContext(partId, context, options) as any;
-
-       // if the part is the "changes" tab, override the modes to use "Modify" instead of "Custom"
-       if (partId === 'changes') {
-           data.modes = this.applyModifyLabelToCustomMode(data.modes);
-       }
-
-       return data;
+        return super._renderHTML(context, options);
     }
 
     /**
@@ -120,15 +101,39 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         // override the details tab so we can include our extra settings
         details: {template: 'systems/shadowrun5e/dist/templates/effect/active-effect-details.hbs', scrollable: [""]},
         applyTo: {template: 'systems/shadowrun5e/dist/templates/effect/active-effect-apply-to.hbs'},
-        help: {template: 'systems/shadowrun5e/dist/templates/effect/active-effect-help.hbs'},
+    }
+
+    protected override async _renderFrame(...args: Parameters<ActiveEffectConfig['_renderFrame']>) {
+        const frame = await super._renderFrame(...args);
+
+        if (!this.hasFrame) return frame;
+
+        const helpLabel = game.i18n.localize('SR5.Help');
+        const helpButton = document.createElement('button');
+        helpButton.type = 'button';
+        helpButton.className = 'header-control fa-solid fa-circle-question icon';
+        helpButton.dataset.action = 'openHelp';
+        helpButton.dataset.tooltip = 'SR5.Tooltips.Effect.HelpLinkEnglishOnly';
+        helpButton.setAttribute('aria-label', helpLabel);
+
+        const copyUuidButton = frame.querySelector<HTMLButtonElement>('button[data-action="copyUuid"]');
+        const closeButton = frame.querySelector<HTMLButtonElement>('button[data-action="close"]');
+
+        if (copyUuidButton) {
+            copyUuidButton.insertAdjacentElement('beforebegin', helpButton);
+        } else if (closeButton) {
+            closeButton.insertAdjacentElement('beforebegin', helpButton);
+        }
+
+        return frame;
     }
 
     /**
      * Prepare data for the templates to use
      * @param options
      */
-    override async _prepareContext(options) {
-        const data = await super._prepareContext(options);
+    override async _prepareContext(...args: Parameters<ActiveEffectConfig['_prepareContext']>) {
+        const data = await super._prepareContext(...args);
 
         // create the lists of options for each selection
         data.selection_test_options = this._getTestOptions();
@@ -150,15 +155,11 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
      * Called just before the window itself renders
      * - add event listeners as needed
      * - access "html" via $(this.element) to use JQuery stuff
-     * @param context
-     * @param options
      */
-    override async _onRender(context, options) {
+    override async _onRender(...args: Parameters<ActiveEffectConfig['_onRender']>) {
         const applyToSelect = this.element.querySelector<HTMLSelectElement>('select[name="system.applyTo"]')
         if (applyToSelect) {
-            applyToSelect.addEventListener('change', async (event) => {
-                await this.onApplyToChange(event, applyToSelect);
-            });
+            applyToSelect.addEventListener('change', (event) => { void this.onApplyToChange(event, applyToSelect); });
             // if we have changes, add a tooltip to the select to indicate it as disabled
             if (this.hasChanges) {
                 applyToSelect.setAttribute('data-tooltip', game.i18n.localize("SR5.Tooltips.Effect.AlterApplyToWithChanges"));
@@ -172,7 +173,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         for (let i = 0; i < this.document.changes.length; i++) {
             const input = this.element.querySelector<HTMLInputElement>(`input[name="changes.${i}.priority"]`);
             if (input) {
-                input.setAttribute('disabled', 'true');
+                input.removeAttribute('disabled');
                 input.setAttribute('data-tooltip', 'SR5.Tooltips.Effect.PriorityFieldDisabled');
             } else {
                 console.error(`Shadowrun5e | Could not find the 'priority' input field for ${i}.`);
@@ -183,30 +184,17 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     /**
      * Handle anything needed after the sheet has been rendered
      * - register tagify inputs
-     * @param context
-     * @param options
      */
-    override async _postRender(context, options) {
-        await super._postRender(context, options);
+    override async _postRender(...args: Parameters<ActiveEffectConfig['_postRender']>) {
+        await super._postRender(...args);
         // once we render, process the Tagify Elements to we rendered
         Hooks.call('sr5_processTagifyElements', this.element);
     }
 
-    /**
-     * Handle adding a new change to the changes array.
-     *
-     * This overrides the Foundry default behavior of using ADD as default.
-     * Shadowrun mostly uses MODIFY, so we use that as default.
-     *
-     * - this here is the SR5ActiveEffectConfig, however not all the types work correctly so I used any
-     */
-    static async #onAddChange(this: any, event: PointerEvent, target: HTMLElement) {
-        if (this.form) {
-            const submitData = this._processFormData(null, this.form, new FormDataExtended(this.form));
-            const changes = Object.values(submitData.changes ?? {});
-            changes.push({ mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM });
-            return this.submit({updateData: {changes}});
-        }
+    static #onOpenHelp(this: SR5ActiveEffectConfig, event: PointerEvent, target: HTMLElement) {
+        event.preventDefault();
+        event.stopPropagation();
+        LinksHelpers.openSourceURL(SR5ActiveEffectConfig.HELP_PAGE_URL);
     }
 
     /**
@@ -228,19 +216,6 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
             const updateData = { 'system.applyTo': select.value };
             await this.submit({ updateData, preventClose: true })
         }
-    }
-
-    /**
-     * Foundry provides a custom mode for systems to implement behavior with.
-     * 
-     * Shadowrun uses this mode to implement 'modify' mode, with complex behavior.
-     * To give users better information about the mode, inject a 'modify' label.
-     * 
-     * @param modes A object prepared for display using Foundry select handlebarjs helper.
-     * @returns Copy of the original modes and labels.
-     */
-    applyModifyLabelToCustomMode(modes: Record<number, string>): Record<number, string> {
-        return { ...modes, 0: game.i18n.localize('SR5.ActiveEffect.Modes.Modify') };
     }
 
     /**

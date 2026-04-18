@@ -1,4 +1,4 @@
-import { Helpers } from '../../../helpers';
+import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { SkillFieldType } from 'src/module/types/template/Skills';
 
 export class SkillsPrep {
@@ -9,9 +9,7 @@ export class SkillsPrep {
         const { language, active, knowledge } = system.skills;
 
         // function that will set the total of a skill correctly
-        const prepareSkill = (skill: SkillFieldType) => {
-            skill.value = Helpers.calcTotal(skill);
-        };
+        const prepareSkill = (skill: SkillFieldType) => ModifiableValue.calcTotal(skill);
 
         for (const skill of Object.values(active)) {
             prepareSkill(skill);

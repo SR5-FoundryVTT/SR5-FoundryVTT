@@ -1,12 +1,11 @@
 import { SkillsPrep } from './functions/SkillsPrep';
-import { ModifiersPrep } from './functions/ModifiersPrep';
 import { InitiativePrep } from './functions/InitiativePrep';
 import { AttributesPrep } from './functions/AttributesPrep';
 import { LimitsPrep } from './functions/LimitsPrep';
 import { MatrixPrep } from './functions/MatrixPrep';
-import { Helpers } from '../../helpers';
-import { PartsList } from '../../parts/PartsList';
 import { SR5Item } from 'src/module/item/SR5Item';
+import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
+import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { MatrixRules } from '@/module/rules/MatrixRules';
 import { SR5 } from '@/module/config';
 
@@ -15,10 +14,9 @@ import { SR5 } from '@/module/config';
  */
 export class SpritePrep {
     static prepareBaseData(system: Actor.SystemOfType<'sprite'>) {
-        SpritePrep.prepareSpriteSpecial(system);
+        ModifiableFieldPrep.resetAllModifiers(system);
 
-        ModifiersPrep.clearAttributeMods(system);
-        ModifiersPrep.clearLimitMods(system);
+        SpritePrep.prepareSpriteSpecial(system);
     }
 
     static prepareDerivedData(system: Actor.SystemOfType<'sprite'>, items: SR5Item[]) {
@@ -51,7 +49,7 @@ export class SpritePrep {
 
         // calculate resonance value
         attributes.resonance.base = level + overrides.resonance;
-        Helpers.calcTotal(attributes.resonance);
+        ModifiableValue.calcTotal(attributes.resonance);
     }
 
     static prepareSpriteMatrixAttributes(system: Actor.SystemOfType<'sprite'>) {
@@ -65,7 +63,7 @@ export class SpritePrep {
         matrixAtts.forEach((att) => {
             if (matrix[att] !== undefined) {
                 matrix[att].base = level + overrides[att];
-                matrix[att].value = Helpers.calcTotal(matrix[att]);
+                ModifiableValue.calcTotal(matrix[att]);
             }
         });
 
@@ -93,7 +91,7 @@ export class SpritePrep {
 
         // Prepare user visible matrix track values
         track.matrix.base = MatrixRules.getConditionMonitor(level);
-        track.matrix.mod = PartsList.AddUniquePart(track.matrix.mod, "SR5.Bonus", Number(modifiers['matrix_track']));
+        ModifiableValue.addUnique(track.matrix, "SR5.Bonus", modifiers['matrix_track']);
         track.matrix.max = matrix.condition_monitor.max;
         track.matrix.label = SR5.damageTypes.matrix;
     }
@@ -108,12 +106,12 @@ export class SpritePrep {
 
         // setup initiative from overrides
         initiative.matrix.base.base = level * 2 + overrides.init;
-        PartsList.AddUniquePart(initiative.matrix.base.mod, 'SR5.Bonus', modifiers['matrix_initiative']);
-        Helpers.calcTotal(initiative.matrix.base, {min: 0});
+        ModifiableValue.addUnique(initiative.matrix.base, "SR5.Bonus", modifiers.matrix_initiative);
+        ModifiableValue.calcTotal(initiative.matrix.base, {min: 0});
 
         initiative.matrix.dice.base = 4;
-        PartsList.AddUniquePart(initiative.matrix.dice.mod, 'SR5.Bonus', modifiers['matrix_initiative_dice']);
-        Helpers.calcTotal(initiative.matrix.dice, {min: 0});
+        ModifiableValue.addUnique(initiative.matrix.dice, "SR5.Bonus", modifiers.matrix_initiative_dice);
+        ModifiableValue.calcTotal(initiative.matrix.dice, {min: 0});
     }
 
     /**

@@ -1,5 +1,5 @@
 import {SuccessTest} from "./SuccessTest";
-import {PartsList} from "../parts/PartsList";
+import {ModifiableValue} from "../mods/ModifiableValue";
 
 export class NaturalRecoveryStunTest extends SuccessTest {
     override prepareBaseValues() {
@@ -20,8 +20,7 @@ export class NaturalRecoveryStunTest extends SuccessTest {
         const track = this.actor.getStunTrack();
         const boxes = track?.value || 0;
 
-        const threshold = new PartsList(this.threshold.mod);
-        threshold.addUniquePart('SR5.StunTrack', boxes)
+        ModifiableValue.addUniqueBase(this.threshold, 'SR5.StunTrack', boxes)
     }
 
     /**
