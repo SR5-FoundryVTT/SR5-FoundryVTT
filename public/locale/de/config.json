@@ -15,6 +15,8 @@
         "AutomateProgressiveRecoilDescription": "Kumulativer Rückstoß wird automatisch aufgerechnet.",
         "CompendiumBrowserBlacklist": "Kompendium Browser Blacklist",
         "CompendiumBrowserBlacklistDescription": "Im Kompendium Browser auszublendende Kompendien",
+        "CollapseModifyRollByDefault": "Wurf anpassen standardmaessig einklappen",
+        "CollapseModifyRollByDefaultDescription": "Wenn aktiviert, startet der Abschnitt 'Wurf anpassen' beim Oeffnen eines Testdialogs eingeklappt.",
         "DefaultOpposedTestActorSelection": "Nutze immer Ziele für Vergleichsproben",
         "DefaultOpposedTestActorSelectionDescription": "Überschreibe Tokenauswahl mit den Zielen der Probe.",
         "DiagonalMovementDescription": "Wie soll diagonale Bewegung auf dem Gitter gehandhabt werden?",
@@ -547,6 +549,7 @@
         "Bullet": "Kugel",
         "BulletCount": "Kugeln",
         "Bullets": "Kugeln",
+        "BuyHits": "Erfolge kaufen",
         "COMBAT": {
             "ReduceInitByFive": "Initiative -5",
             "ReduceInitByOne": "Initiative -1",
@@ -1739,7 +1742,8 @@
             "WarningTitle": "Alarm"
         },
         "Magic": "Magie",
-        "ManualOverride": "Manuelle Eingabe",
+        "Manual": "Manuell",
+        "ManualOverride": "Ergebnis-Überschreibung",
         "MarkImportedItemReviewed": "Importiertes Item überprüft.",
         "MarkImportedItemTooltip": "Markiert dieses importierte Item als überprüft.",
         "MarkImportsReviewed": "Importe Überprüft",
@@ -1792,6 +1796,7 @@
             "SomeAmmo": "Nicht genug Munition für ausgewählten Feuermodus, Feuermodus-Modifikatoren werden reduziert",
             "SomeAmmoMelee": "Nicht genug Munition übrig, um zu zuschlagen"
         },
+        "ModifyRoll": "Wurf anpassen",
         "ModPoints": "Upgradepunkte",
         "Modification": {
             "FIELDS": {
@@ -2052,6 +2057,9 @@
         },
         "Resist": "Widerstehen",
         "RestoreDefaultSkills": "Standardfertigkeiten wiederherstellen",
+        "ResultOverrideGlitches": "Patzer",
+        "ResultOverrideHits": "Erfolge",
+        "ResultOverride": "Ergebnis-Überschreibung",
         "RightClickToClear": "Rechtsklick zum Leeren",
         "Ritual": {
             "FIELDS": {
@@ -2616,6 +2624,7 @@
             "ThrownAttackTest": "Wurfwaffen-Angriff"
         },
         "Threshold": "Schwellenwert",
+        "ToggleBreakdown": "Aufschlüsselung umschalten",
         "ToggleActive": "De/aktivieren",
         "ToggleEquip": "Anlegen/Ablegen",
         "ToggleWireless": "Kabel(los)",
@@ -2670,6 +2679,7 @@
                 "DocumentEffects": "Auswirkungen direkt auf dieses Dokument.",
                 "EditEffect": "Bearbeite Effekt",
                 "ItemEffects": "Effekte, die von Items auf diesem Dokument gesammelt werden.",
+                "HelpLinkEnglishOnly": "Help (External link, English only)",
                 "OnlyAllFilteredUsed": "Dieser Effekt gilt nur für Proben, die allen Auswahlen entsprechen.",
                 "OnlyFilteredUsed": "Dieser Effekt gilt nur für Proben, die mindestens einer Auswahl entsprechen.",
                 "OnlyForItemTest": "Dieser Effekt gilt nur für Proben dieses Items.",
@@ -2759,12 +2769,14 @@
                 "SpiritType": "Art des herbeizurufenden Geistes"
             },
             "Test": {
+                "BuyHits": "Würfelt keine Würfel. Kauft Erfolge mit ⌊Würfelpool / 4⌋.",
                 "Extended": "Probe wird als ausgedehnte Probe geworfen, bis der Schwellenwert erreicht ist",
                 "Limit": "Vollständiger Limitwert",
-                "ManualGlitches": "Anzahl Glitches von manuell geworfenen Würfeln. Muss zusammen mit manuellen Erfolgen verwendet werden",
                 "Modifier": "Summe aller auf den Pool angewendenten Modifikatoren",
                 "Pool": "Anzahl zu werfender Würfel",
                 "PushTheLimit": "Verwende Edge Regel 'Grenzen sprengen'",
+                "ResultOverrideGlitches": "Überschreibt Patzer für dieses Probenergebnis.",
+                "ResultOverrideHits": "Überschreibt Erfolge für dieses Probenergebnis.",
                 "RollMode": "Sichtbarkeit der FoundryVTT-Chat-Nachricht",
                 "Threshold": "Vollständiger Schwellenwert"
             },
@@ -2884,6 +2896,7 @@
             "CantSecondChanceAGlitch": "Kann zweite Chance nicht anwenden. Testergebnis ist ein Patzer.",
             "CantSecondChanceWithoutNoneHits": "Kann zweite Chance nicht anwenden. Keine Würfel ohne Erfolg übrig.",
             "CantSpendMulitplePointsOfEdge": "Es kann nur ein Punkt Edge für eine Probe oder Handlung gleichzeitig ausgegeben werden.",
+            "CantCombineBuyHitsWithEdge": "Erfolge kaufen kann nicht mit zweiter Chance kombiniert werden.",
             "CompilationNotConcluded": "Kompilieren unvollständig. Warte auf Gegenprobe des Sprites, um Schwund zu bestimmen",
             "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge-Punkte können nicht auf Proben ohne Acteur angewendet werden.",
             "HostItemOnlyAcceptIC": "Nur IC Akteure können einem Host zugefügt werden",

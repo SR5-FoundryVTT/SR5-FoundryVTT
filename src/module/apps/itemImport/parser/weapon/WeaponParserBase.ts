@@ -141,7 +141,6 @@ export class WeaponParserBase extends Parser<'weapon'> {
             ap: {
                 base: damageAp,
                 value: damageAp,
-                mod: [],
             },
             element: {
                 base: damageElement,

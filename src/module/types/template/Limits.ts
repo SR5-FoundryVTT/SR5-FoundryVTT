@@ -1,10 +1,10 @@
 import { SR5 } from "@/module/config";
-import { ModifiableValue } from "./Base";
+import { ModifiableValueSchema } from "./Base";
 import { ModifiableField } from "../fields/ModifiableField";
 const { BooleanField, StringField } = foundry.data.fields;
 
 export const LimitField = () => ({
-    ...ModifiableValue(),
+    ...ModifiableValueSchema(),
     attribute: new StringField({
         blank: true,
         required: true,

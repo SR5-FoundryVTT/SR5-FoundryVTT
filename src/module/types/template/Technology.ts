@@ -1,5 +1,5 @@
 import { SR5 } from "@/module/config";
-import { ModifiableValue } from "./Base";
+import { ModifiableValueSchema } from "./Base";
 import { ConditionData } from "./Condition";
 import { MatrixMasterData } from "./MatrixNetwork";
 import { TechnologyAttributes } from "./Attributes";
@@ -15,7 +15,7 @@ export const TechnologyData = () => ({
     equipped: new BooleanField(),
 
     // === Condition & Concealment ===
-    conceal: new ModifiableField(ModifiableValue()),
+    conceal: new ModifiableField(ModifiableValueSchema()),
     condition_monitor: new SchemaField(ConditionData()),
 
     // === Wireless & Networking ===
