@@ -478,7 +478,7 @@ export const TestCreator = {
             if (skill && !SkillRules.hasRequirements(actor, skill)) ui.notifications?.warn('SR5.Warnings.ActorMissingRequirements', {localize: true});
             
             // Add skill values to pool.
-            if (skill) pool.addUnique(skill.label, SkillRules.level(skill));
+            if (skill) pool.addBase(skill.label, SkillRules.level(skill));
             if (action.spec) pool.addUnique('SR5.Specialization', SkillRules.SpecializationModifier);
         }
 
