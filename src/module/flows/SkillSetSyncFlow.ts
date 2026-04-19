@@ -52,7 +52,7 @@ export const SkillSetSyncFlow = {
         const setGroups = skillSet.system.set.groups;
         const setGroupItems = await PackItemFlow.getSkillGroupsForSkillSet(skillSet);
 
-        const actorItems: SR5Item<'skill'>[] = actor.itemsForType.get('skill')  as SR5Item<'skill'>[] ?? [];
+        const actorItems = actor.itemsForType.get('skill') ?? [];
         const actorSkills = actorItems.filter(item => item.system.type === 'skill');
         const actorGroups = actorItems.filter(item => item.system.type === 'group');
 

@@ -68,26 +68,23 @@ export const SkillGroupFlow = {
             const group = groupedSkill?.name ?? '';
             const groupRating = groupedSkill?.rating;
 
-            const skillUpdate: Record<string, unknown> = {};
-            let hasChanges = false;
+            const skillUpdate: { group?: string, rating?: number } = {};
 
             if ((skillItem.system.skill.group ?? '') !== group) {
                 skillUpdate.group = group;
-                hasChanges = true;
             }
 
             if (groupRating !== undefined && skillItem.system.skill.rating !== groupRating) {
                 skillUpdate.rating = groupRating;
-                hasChanges = true;
             }
 
-            if (!hasChanges) continue;
+            if (!Object.keys(skillUpdate).length) continue;
             updates.push({
                 _id: skillItem.id,
                 system: {
                     skill: skillUpdate,
                 },
-            } as Item.UpdateData);
+            });
         }
 
         if (updates.length > 0) {

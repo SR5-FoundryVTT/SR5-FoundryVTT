@@ -51,6 +51,11 @@ import { CreateActorFlow } from './flows/CreateActorFlow';
 import { SkillNamingFlow } from '@/module/flows/SkillNamingFlow';
 import { SkillFieldType } from '../types/template/Skills';
 
+interface TypedItemMap extends Omit<Map<Item.ConfiguredSubType, SR5Item[]>, 'get' | 'set'> {
+    get: <K extends Item.ConfiguredSubType>(key: K) => SR5Item<K>[] | undefined;
+    set: <K extends Item.ConfiguredSubType>(key: K, value: SR5Item<K>[]) => this;
+}
+
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
  *
@@ -93,7 +98,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     modifiers: ModifierFlow;
 
     // Quick access for all items of a type.
-    itemsForType = new Map<Item.ConfiguredSubType, SR5Item[]>();
+    itemsForType = new Map<Item.ConfiguredSubType, SR5Item[]>() as TypedItemMap;
 
     constructor(data: Actor.CreateData<SubType>, context?: Actor.ConstructionContext) {
         super(data, context);
@@ -294,7 +299,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         }
 
         for (const item of this.items) {
-            const items = this.itemsForType.get(item.type) as any[];
+            const items = this.itemsForType.get(item.type)!;
             items.push(item);
             this.itemsForType.set(item.type, items);
         }
@@ -304,7 +309,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * Prepare skill items for easy use and access.
      */
     prepareSkills() {
-        const skills = this.itemsForType.get('skill') as SR5Item<'skill'>[];
+        const skills = this.itemsForType.get('skill');
         if (!skills) return;
 
         this.system.skills = SkillFieldPrep.prepareActorSkills(skills);
@@ -762,16 +767,12 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         const attribute = this.getAttribute(skillField.attribute);
 
-        // An attribute can have a NaN value if no value has been set yet. Do the skill for consistency.
-        const attributeValue = attribute.value;
-        const skillValue = skillField.value;
-
         if (SkillRules.mustDefaultToRoll(skillField) && SkillRules.allowDefaultingRoll(skillField)) {
-            return SkillRules.defaultingModifier + attributeValue;
+            return SkillRules.defaultingModifier + attribute.value;
         }
 
         const specializationBonus = options.specialization ? SR.skill.SPECIALIZATION_MODIFIER : 0;
-        return skillValue + attributeValue + specializationBonus;
+        return skillField.value + attribute.value + specializationBonus;
     }
 
     /**
@@ -1338,10 +1339,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     async healDamage(this: SR5Actor, track: DamageType['type']['value'], healing: number) {
         console.log(`Shadowrun5e | Healing ${track} damage of ${healing} for actor`, this);
 
-        if (!this.system?.track?.[track]) return;
-        const current = Math.max(this.system.track[track].value - healing, 0);
+        const trackField = this.system?.track?.[track] as TrackType | undefined;
+        if (!trackField) return;
+        const current = Math.max(trackField.value - healing, 0);
 
-        await this.update({ [`system.track.${track}.value`]: current });
+        await this.update({ system: { track: { [track]: { value: current } } } });
     }
 
     async healStunDamage(healing: number) {

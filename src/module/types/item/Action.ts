@@ -136,12 +136,6 @@ export const ActionRollData = (
         resistTest = '',
         followedTest = '',
         type = ''
-    }: {
-        test?: string;
-        opposedTest?: string;
-        resistTest?: string;
-        followedTest?: string;
-        type?: string;
     } = {}
 ) => ({
     ...MinimalActionData(),

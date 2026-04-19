@@ -450,21 +450,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @returns Necessary skill set sheet data or null, if skill set doesn't exist in pack anymore.
      */
     protected async _prepareSkillset() {
-        return await SkillSetSourceFlow.prepareSkillSetReference(this.actor.system.skillset);
-    }
-
-    private _getCompendiumDocumentId(uuid: string) {
-        const parts = uuid.split('.');
-        const compendiumIndex = parts.indexOf('Compendium');
-        if (compendiumIndex === -1 || parts.length < compendiumIndex + 4) return null;
-
-        const remainder = parts.slice(compendiumIndex + 3);
-        if (remainder[0] === 'Item' || remainder[0] === 'Actor') {
-            remainder.shift();
-        }
-
-        const documentId = remainder.join('.');
-        return documentId || null;
+        return SkillSetSourceFlow.prepareSkillSetReference(this.actor.system.skillset);
     }
 
     override async _preparePartContext(
@@ -1515,7 +1501,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     _prepareSkillGroups(): SheetSkillGroup[] {
         return (this.actor.itemsForType.get('skill') ?? [])
-            .filter((item): item is SR5Item<'skill'> => item.isType('skill') && item.system.type === 'group')
+            .filter(item => item.isType('skill') && item.system.type === 'group')
             .map(item => ({
                 item,
                 label: SkillNamingFlow.localizeSkillgroupName(item.name),

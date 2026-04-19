@@ -390,7 +390,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      * Get matrix actions otherwise available on this actor.
      */
     protected _getMatrixActorActions() {
-        const actions = this.document.itemsForType.get('action') as SR5Item<'action'>[];
+        const actions = this.document.itemsForType.get('action');
         if (!actions) return [];
         return actions.filter(item => item.hasActionCategory('matrix'));
     }

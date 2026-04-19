@@ -37,7 +37,7 @@ export const SkillSelectionFlow = {
 
         for (const ownedSkill of actor?.itemsForType.get('skill') ?? []) {
             if (skills.find(skill => skill.name === ownedSkill.name)) continue;
-            skills.push(ownedSkill as SR5Item<'skill'>);
+            skills.push(ownedSkill);
         }
 
         const sheetSkills: Record<string, Translation> = {};

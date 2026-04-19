@@ -130,20 +130,6 @@ export const PackItemFlow = {
         console.debug(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, item);
         return item;
     },
-    /**
-     * Collect all actions of an actor.
-     *
-     * @param actor The actor to collect actions from.
-     * @return List of action items the actor has.
-     */
-    getActions(actor: SR5Actor): SR5Item<'action'>[] {
-        const actions = actor.itemsForType.get('action') as SR5Item<'action'>[];
-        // Normally all item types should exist, though during actor creation this might not be the case.
-        if (!actions) {
-            return [];
-        }
-        return actions;
-    },
 
     /**
      * Collect all actions of an actor for their sheet
@@ -175,7 +161,7 @@ export const PackItemFlow = {
             }
             return true;
         })
-        const actorActions = this.getActions(actor);
+        const actorActions = actor.itemsForType.get('action') ?? [];
         return [...filteredPackActions, ...actorActions];
     },
 
@@ -186,11 +172,7 @@ export const PackItemFlow = {
      * @return List of matrix action items the actor has.
      */
     getMatrixActions(actor: SR5Actor): SR5Item<'action'>[] {
-        const actions = actor.itemsForType.get('action') as SR5Item<'action'>[];
-        // Normally all item types should exist, though during actor creation this might not be the case.
-        if (!actions) {
-            return [];
-        }
+        const actions = actor.itemsForType.get('action') ?? [];
         return actions.filter((action: SR5Item) => action.hasActionCategory('matrix'));
     },
 
@@ -268,8 +250,8 @@ export const PackItemFlow = {
 
         const documents: SR5Item<'skill'>[] = [];
         for (const packEntry of packEntries) {
-            const document = await pack.getDocument(packEntry._id) as unknown as SR5Item<'skill'>;
-            if (!document || document.system.type !== 'group') continue;
+            const document = await pack.getDocument(packEntry._id) as unknown as SR5Item<'skill'> | undefined;
+            if (document?.system.type !== 'group') continue;
             documents.push(document);
         }
 
@@ -440,6 +422,6 @@ export const PackItemFlow = {
         const packEntry = pack.index.find(data => data.type === 'skill' && SkillNamingFlow.nameToKey(data.name ?? '') === SkillNamingFlow.nameToKey(name));
         if (!packEntry) return;
 
-        return await pack.getDocument(packEntry._id) as unknown as SR5Item<'skill'>;
+        return pack.getDocument(packEntry._id) as unknown as Promise<SR5Item<'skill'>>;
     }
 };
