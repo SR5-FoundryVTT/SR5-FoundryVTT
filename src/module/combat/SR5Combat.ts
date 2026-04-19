@@ -168,7 +168,8 @@ export class SR5Combat extends Combat<"base"> {
 
         // Remove running/sprinting status effects from all combatants
         // TokenDocument is not triggered to clear movement history on this path.
-        if (combatants && game.settings.get(SYSTEM_NAME, FLAGS.TokenAutoRunning)) {
+        combatants ??= this.combatants;
+        if (game.settings.get(SYSTEM_NAME, FLAGS.TokenAutoRunning)) {
             for (const combatant of combatants) {
                 // Concurrently remove running/sprinting status effects.
                 await Promise.all([

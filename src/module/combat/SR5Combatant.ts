@@ -176,6 +176,7 @@ export class SR5Combatant extends Combatant<"base"> {
             speaker: foundry.documents.ChatMessage.implementation.getSpeaker({
                 alias: game.i18n.localize('SR5.COMBAT.ModeChangedLabel'),
             }),
+            flags: { core: { initiativeRoll: true } },
             sound: hasDiceRoll ? CONFIG.sounds.dice : undefined,
         } as ChatMessage.CreateData;
 
