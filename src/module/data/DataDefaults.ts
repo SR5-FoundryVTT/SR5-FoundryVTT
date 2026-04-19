@@ -1,6 +1,6 @@
 import { Action, ActionRollData, DamageData, MinimalActionData } from "../types/item/Action";
 import { AttributeField } from "../types/template/Attributes";
-import { ValueField } from "../types/template/Base";
+import { ChangeEntry, ValueField } from "../types/template/Base";
 import { ConditionData } from "../types/template/Condition";
 import { DescriptionData } from "../types/template/Description";
 import { FireModeData } from "../types/flags/ItemFlags";
@@ -88,6 +88,7 @@ const schemaMap = {
     action_roll: ActionRollData,
     armor: ActorArmorData,
     attribute_field: AttributeField,
+    change_entry: ChangeEntry,
     condition_monitor: ConditionData,
     damage: DamageData,
     description: DescriptionData,

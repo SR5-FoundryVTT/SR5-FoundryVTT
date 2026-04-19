@@ -1,10 +1,11 @@
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
-import { ModifiableValue } from "../mods/ModifiableValue";
 import { Migrator } from "../migrator/Migrator";
 import { LinksHelpers } from '@/module/utils/links';
+import { DataDefaults } from "../data/DataDefaults";
 import { ModifiableValueType } from "../types/template/Base";
+import { ModifiableValue } from "../mods/ModifiableValue";
 import DataModel = foundry.abstract.DataModel;
 
 /**
@@ -247,15 +248,16 @@ export class SR5ActiveEffect extends ActiveEffect {
         }
 
         if (ModifiableValue.isModifiableValue(target)) {
-            target.changes.push({
-                enabled: change.effect.active,
-                invalidated: false,
-                name: change.effect.name,
-                value: delta,
-                mode: change.mode,
-                priority: change.priority ?? 10 * change.mode,
-                effectUuid: change.effect.uuid,
-            });
+            target.changes.push(
+                DataDefaults.createData('change_entry', {
+                    enabled: change.effect.active,
+                    name: change.effect.name,
+                    value: delta,
+                    mode: change.mode,
+                    priority: change.priority ?? 10 * change.mode,
+                    effectUuid: change.effect.uuid,
+                })
+            );
             return undefined;
         }
 

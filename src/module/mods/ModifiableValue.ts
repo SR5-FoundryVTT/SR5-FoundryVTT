@@ -1,3 +1,4 @@
+import { DataDefaults } from "../data/DataDefaults";
 import { ModifiableValueType } from "../types/template/Base";
 
 /**
@@ -31,6 +32,23 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
      */
     get(name: string) {
         return this._field.changes.find(part => part.name === name)?.value;
+    }
+
+    /**
+     * Create a change object.
+     * @param {string} name - The change name/key.
+     * @param {number} value - Numeric value for the change.
+     * @param {CONST.ACTIVE_EFFECT_MODES} [mode=CONST.ACTIVE_EFFECT_MODES.ADD] - Mode for applying the change.
+     * @param {number} [priority=10*mode] - Priority used to order changes.
+     * @returns {ModifiableValueType['changes'][number]} A newly created change object.
+     */
+    private _createChange(
+        name: string,
+        value: number,
+        mode: CONST.ACTIVE_EFFECT_MODES = CONST.ACTIVE_EFFECT_MODES.ADD,
+        priority = 10 * mode,
+    ): ModifiableValueType['changes'][number] {
+        return DataDefaults.createData('change_entry', { name, value, mode, priority });
     }
 
     /**
@@ -193,23 +211,6 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
         this._field.value = Math.ceil(this._field.value);
 
         return this._field.value;
-    }
-
-    /**
-     * Create a change object.
-     * @param {string} name - The change name/key.
-     * @param {number} value - Numeric value for the change.
-     * @param {CONST.ACTIVE_EFFECT_MODES} [mode=CONST.ACTIVE_EFFECT_MODES.ADD] - Mode for applying the change.
-     * @param {number} [priority=10*mode] - Priority used to order changes.
-     * @returns {ModifiableValueType['changes'][number]} A newly created change object.
-     */
-    private _createChange(
-        name: string,
-        value: number,
-        mode: CONST.ACTIVE_EFFECT_MODES = CONST.ACTIVE_EFFECT_MODES.ADD,
-        priority = 10 * mode,
-    ): ModifiableValueType['changes'][number] {
-        return { name, value, mode, priority, invalidated: false, enabled: true, effectUuid: null };
     }
 
     /**

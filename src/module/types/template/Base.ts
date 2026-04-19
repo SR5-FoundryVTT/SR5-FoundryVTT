@@ -33,11 +33,11 @@ export const ValueMaxPair = () => ({
  * The 'key' is implied by the field this is attached to, while 'mode'
  * and 'priority' follow standard CONST.ACTIVE_EFFECT_MODES behavior.
  */
-const ChangeEntry = () => ({
+export const ChangeEntry = () => ({
     name: new StringField({ required: true }),
     mode: new NumberField({ required: true, nullable: false, integer: true, initial: CONST.ACTIVE_EFFECT_MODES.ADD }),
     value: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
-    priority: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+    priority: new NumberField({ required: true, nullable: false, integer: true, initial: 20 /* Standard priority for ADD */ }),
     effectUuid: new DocumentUUIDField({ required: true, nullable: true }),
 
     // For ease of use, we track whether a change is currently enabled or has been invalidated by another change.
