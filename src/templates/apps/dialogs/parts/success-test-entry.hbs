@@ -27,7 +27,7 @@
         {{#each data.changes as |change index|}}
         {{#unless (isBaseChange change)}}
         <li class="breakdown-entry {{getChangeCSS change}}" data-index="{{index}}">
-            {{#if (isUuid change.source)}}
+            {{#if (getChangeEffectImage change)}}
             <button
                 type="button"
                 class="modifier-effect-button modifier-source-button has-effect"
