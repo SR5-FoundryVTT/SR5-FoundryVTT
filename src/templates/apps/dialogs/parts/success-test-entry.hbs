@@ -27,20 +27,44 @@
         {{#each data.changes as |change index|}}
         {{#unless (isBaseChange change)}}
         <li class="breakdown-entry {{getChangeCSS change}}" data-index="{{index}}">
+            {{#if (isUuid change.source)}}
             <button
                 type="button"
-                class="modifier-effect-button {{#if change.effectUuid}}has-effect{{else}}no-effect disabled{{/if}}"
-                data-effect-uuid="{{change.effectUuid}}"
-                {{#if change.effectUuid}}
+                class="modifier-effect-button modifier-source-button has-effect"
+                data-source="{{change.source}}"
                 data-tooltip="{{localize 'SR5.Tooltips.Effect.EditEffect'}}"
                 aria-label="{{localize 'SR5.Tooltips.Effect.EditEffect'}}"
-                {{/if}}
-                {{#unless change.effectUuid}}disabled{{/unless}}
             >
                 {{#with (getChangeEffectImage change) as |effectImage|}}
                 <img src="{{effectImage}}" alt="" />
                 {{/with}}
             </button>
+            {{else if change.source}}
+            <button
+                type="button"
+                class="modifier-effect-button modifier-source-button has-effect"
+                data-source="{{change.source}}"
+                data-tooltip="SR5.OpenSource"
+                aria-label="{{localize 'SR5.OpenSource'}}"
+            >
+                {{#if (isPDF change.source)}}
+                <i class="fas fa-file-pdf"></i>
+                {{else if (isURL change.source)}}
+                <i class="fas fa-link"></i>
+                {{else if (isUuid change.source)}}
+                <i class="fas fa-file"></i>
+                {{else}}
+                <i class="fas fa-question"></i>
+                {{/if}}
+            </button>
+            {{else}}
+            <button
+                type="button"
+                class="modifier-effect-button no-effect disabled"
+                disabled
+            >
+            </button>
+            {{/if}}
             <span class="mod-name" data-tooltip="{{getChangeDescription change}}">{{localize change.name}}</span>
             <span class="mod-value">{{getChangeValue change}}</span>
 

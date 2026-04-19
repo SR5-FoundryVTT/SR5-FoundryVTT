@@ -6,6 +6,7 @@ import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 import { AnyMutableObject, DeepPartial } from 'fvtt-types/utils';
 import { ModifiableValueType } from '@/module/types/template/Base';
 import { SuccessTest, SuccessTestData } from '../../tests/SuccessTest';
+import { LinksHelpers } from '@/module/utils/links';
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
@@ -214,18 +215,23 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
             toggleModifiableValue(target);
         });
 
-        html.find('.modifier-effect-button').on('click', async event => {
+        html.find('.modifier-source-button').on('click', async event => {
             event.preventDefault();
             event.stopPropagation();
 
             const button = event.currentTarget as HTMLButtonElement;
-            const effectUuid = button.dataset.effectUuid;
-            if (!effectUuid) return;
+            const source = button.dataset.source;
+            if (!source) return;
 
-            const effect = await fromUuid(effectUuid);
-            if (!(effect instanceof ActiveEffect)) return;
+            if (LinksHelpers.isUuid(source)) {
+                const effect = await fromUuid(source);
+                if (effect instanceof ActiveEffect) {
+                    await effect.sheet?.render(true);
+                    return;
+                }
+            }
 
-            await effect.sheet?.render(true);
+            await LinksHelpers.openSource(source);
         });
 
         html.find('.breakdown-entry').on('click', event => {
@@ -321,8 +327,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
                     valueField,
                     'SR5.ManualOverride',
                     value as number | null,
-                    CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
-                    ModifiableValue.TOP_PRIORITY
+                    { mode: 'OVERRIDE', priority: ModifiableValue.TOP_PRIORITY }
                 );
             }
         }

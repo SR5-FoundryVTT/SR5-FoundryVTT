@@ -202,11 +202,11 @@ export class CombatRules {
 
         // Keep base and modification intact, only overwriting the result.
         ModifiableValue.add(
-            modifiedDamage, 'SR5.TestResults.Success', 0, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, ModifiableValue.TOP_PRIORITY
+            modifiedDamage, 'SR5.TestResults.Success', 0, { mode: 'OVERRIDE', priority: ModifiableValue.TOP_PRIORITY }
         );
         ModifiableValue.calcTotal(modifiedDamage, { min: 0 });
         ModifiableValue.add(
-            modifiedDamage.ap, 'SR5.TestResults.Success', 0, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, ModifiableValue.TOP_PRIORITY
+            modifiedDamage.ap, 'SR5.TestResults.Success', 0, { mode: 'OVERRIDE', priority: ModifiableValue.TOP_PRIORITY }
         );
         ModifiableValue.calcTotal(modifiedDamage.ap);
         modifiedDamage.type.value = 'physical';

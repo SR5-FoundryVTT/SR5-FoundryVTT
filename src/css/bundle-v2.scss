@@ -613,7 +613,7 @@
         gap: 0.35rem;
         margin-bottom: 0;
         padding: 1px 0;
-        min-height: 18px;
+        min-height: 28px;
 
         .mod-name {
             flex: 1;
@@ -634,21 +634,25 @@
         }
 
         .modifier-effect-button {
-            flex: 0 0 18px;
-            width: 18px;
-            height: 18px;
+            flex: 0 0 28px;
+            width: 28px;
+            height: 28px;
             border-radius: 0;
 
             &.has-effect {
-                border-radius: 0;
+                border-radius: 4px;
             }
         }
 
         .modifier-effect-button img {
-            width: 18px;
-            height: 18px;
+            width: 28px;
+            height: 28px;
             object-fit: cover;
             border-radius: 0;
+        }
+
+        .modifier-effect-button i {
+            font-size: 1.2rem;
         }
     }
 

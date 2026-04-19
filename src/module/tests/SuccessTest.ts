@@ -799,7 +799,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         for (const type of this.testModifiers) {
             const { name, value } = this.prepareActorModifier(this.actor, type);
-            ModifiableValue.setUnique(this.data.pool, name, value);
+            ModifiableValue.setUnique(this.data.pool, name, value, { source: "SR5 10" });
         }
     }
 

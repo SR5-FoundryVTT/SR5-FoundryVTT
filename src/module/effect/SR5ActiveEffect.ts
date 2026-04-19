@@ -255,7 +255,7 @@ export class SR5ActiveEffect extends ActiveEffect {
                     value: delta,
                     mode: change.mode,
                     priority: change.priority ?? 10 * change.mode,
-                    effectUuid: change.effect.uuid,
+                    source: change.effect.uuid,
                 })
             );
             return undefined;
