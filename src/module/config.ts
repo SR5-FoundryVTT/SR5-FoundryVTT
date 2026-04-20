@@ -1248,14 +1248,14 @@ export const SR5 = {
     ],
 
     fireModeIcons: {
-        'SR5.Weapon.Mode.SingleShot': 'systems/shadowrun5e/dist/icons/redist/point.svg',
-        'SR5.Weapon.Mode.SemiAutoShort': 'systems/shadowrun5e/dist/icons/redist/target.svg',
-        'SR5.Weapon.Mode.SemiAutoBurst': 'systems/shadowrun5e/dist/icons/redist/waveform.svg',
-        'SR5.Weapon.Mode.BurstFire': 'systems/shadowrun5e/dist/icons/redist/blast.svg',
-        'SR5.Weapon.Mode.BurstFireLong': 'systems/shadowrun5e/dist/icons/redist/explode.svg',
-        'SR5.Weapon.Mode.FullAutoShort': 'systems/shadowrun5e/dist/icons/redist/run.svg',
-        'SR5.Weapon.Mode.FullAutoLong': 'systems/shadowrun5e/dist/icons/redist/redline.svg',
-        'SR5.Suppressing': 'systems/shadowrun5e/dist/icons/redist/shield.svg',
+        'SR5.Weapon.Mode.SingleShot': 'systems/shadowrun5e/dist/icons/test/one_bullet.svg',
+        'SR5.Weapon.Mode.SemiAutoShort': 'systems/shadowrun5e/dist/icons/test/one_bullet.svg',
+        'SR5.Weapon.Mode.SemiAutoBurst': 'systems/shadowrun5e/dist/icons/test/three_bullets.svg',
+        'SR5.Weapon.Mode.BurstFire': 'systems/shadowrun5e/dist/icons/test/three_bullets.svg',
+        'SR5.Weapon.Mode.BurstFireLong': 'systems/shadowrun5e/dist/icons/test/six_bullets.svg',
+        'SR5.Weapon.Mode.FullAutoShort': 'systems/shadowrun5e/dist/icons/test/six_bullets.svg',
+        'SR5.Weapon.Mode.FullAutoLong': 'systems/shadowrun5e/dist/icons/test/ten_bullets.svg',
+        'SR5.Suppressing': 'systems/shadowrun5e/dist/icons/test/twenty_bullets.svg',
     },
 
     fireModeAcronyms: {
