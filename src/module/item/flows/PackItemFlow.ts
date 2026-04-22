@@ -12,6 +12,34 @@ import { Helpers } from "@/module/helpers";
  */
 export const PackItemFlow = {
     /**
+     * A pack document retrieval helper for typed items.
+     * @param pack The pack to retrieve documents from.
+     * @param entryIds The list of ids to retrieve
+     * @returns A list of documents of the given type.
+     */
+    async getPackDocuments<T extends Item.ConfiguredSubType>(
+        pack: foundry.documents.collections.CompendiumCollection<'Item'>,
+        entryIds: string[]
+    ): Promise<SR5Item<T>[]> {
+        if (entryIds.length === 0) return [];
+
+        return await pack.getDocuments({ _id__in: entryIds }) as unknown as SR5Item<T>[];
+    },
+
+    /**
+     * A pack document retrieval helper for a single typed item.
+     * @param pack The pack to retrieve documents from.
+     * @param entryId The id of the document to retrieve
+     * @returns The document of the given type, or undefined if not found.
+     */
+    async getSinglePackDocument<T extends Item.ConfiguredSubType>(
+        pack: foundry.documents.collections.CompendiumCollection<'Item'>,
+        entryId: string
+    ) {
+        return await pack.getDocument(entryId) as unknown as SR5Item<T> | undefined;
+    },
+
+    /**
      * Return the matrix action pack name to use, when the matrix actions pack is referenced.
      */
     getMatrixActionsPackName(): Shadowrun.PackName {
@@ -74,14 +102,8 @@ export const PackItemFlow = {
         const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
         if (!pack) return [];
 
-        const packEntries = pack.index.filter(data => data.type === 'action');
-
-        const documents: SR5Item<'action'>[] = [];
-        for (const packEntry of packEntries) {
-            const document = await pack.getDocument(packEntry._id) as unknown as SR5Item<'action'>;
-            if (!document) continue;
-            documents.push(document);
-        }
+        const packEntryIds = pack.index.filter(data => data.type === 'action').map(data => data._id);
+        const documents = await this.getPackDocuments<'action'>(pack, packEntryIds);
 
         console.debug(`Shadowrun5e | Fetched all actions from pack ${packName}`, documents);
         return documents;
@@ -113,7 +135,7 @@ export const PackItemFlow = {
         console.debug(`Shadowrun 5e | Trying to fetch action ${actionName} from pack ${packName}`);
         const pack = game.packs.find(pack =>
             pack.metadata.system === SYSTEM_NAME &&
-            (pack.metadata.name === packName || pack.metadata.label === packName));
+            (pack.metadata.name === packName || pack.metadata.label === packName)) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
 
         if (!pack) return undefined;
 
@@ -124,7 +146,7 @@ export const PackItemFlow = {
         const packEntry = pack.index.find(data => this.packDocumentName(data.name) === actionName);
         if (!packEntry) return undefined;
 
-        const item = await pack.getDocument(packEntry._id) as unknown as SR5Item;
+        const item = await this.getSinglePackDocument<'action'>(pack, packEntry._id);
         if (item?.type !== 'action') return undefined;
 
         console.debug(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, item);
@@ -222,14 +244,8 @@ export const PackItemFlow = {
         const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
         if (!pack) return [];
 
-        const packEntries = pack.index.filter(data => data.type === 'skill');
-
-        const documents: SR5Item<'skill'>[] = [];
-        for (const packEntry of packEntries) {
-            const document = await pack.getDocument(packEntry._id) as unknown as SR5Item<'skill'>;
-            if (!document) continue;
-            documents.push(document);
-        }
+        const packEntryIds = pack.index.filter(data => data.type === 'skill').map(data => data._id);
+        const documents = await this.getPackDocuments<'skill'>(pack, packEntryIds);
 
         console.debug(`Shadowrun5e | Fetched all skills from pack ${packName}`, documents);
         return documents;
@@ -246,17 +262,12 @@ export const PackItemFlow = {
         const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
         if (!pack) return [];
 
-        const packEntries = pack.index.filter(data => data.type === 'skill');
+        const packEntryIds = pack.index.filter(data => data.type === 'skill').map(data => data._id);
+        const documents = await this.getPackDocuments<'skill'>(pack, packEntryIds);
+        const skillGroups = documents.filter(document => document.system.type === 'group');
 
-        const documents: SR5Item<'skill'>[] = [];
-        for (const packEntry of packEntries) {
-            const document = await pack.getDocument(packEntry._id) as unknown as SR5Item<'skill'> | undefined;
-            if (document?.system.type !== 'group') continue;
-            documents.push(document);
-        }
-
-        console.debug(`Shadowrun5e | Fetched all skill groups from pack ${packName}`, documents);
-        return documents;
+        console.debug(`Shadowrun5e | Fetched all skill groups from pack ${packName}`, skillGroups);
+        return skillGroups;
     },
 
     /**
@@ -274,7 +285,7 @@ export const PackItemFlow = {
         const packEntry = pack.index.find(data => data.type === 'skill' && data.name === name);
         if (!packEntry) return;
 
-        return await pack.getDocument(packEntry._id) as unknown as SR5Item<'skill'>;
+        return await this.getSinglePackDocument<'skill'>(pack, packEntry._id);
     },
 
     /**
@@ -286,17 +297,12 @@ export const PackItemFlow = {
         const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
         if (!pack) return [];
 
-        const packEntries = pack.index.filter(data => data.type === 'skill');
+        const packEntryIds = pack.index.filter(data => data.type === 'skill').map(data => data._id);
+        const documents = await this.getPackDocuments<'skill'>(pack, packEntryIds);
+        const skillSets = documents.filter(document => document.system.type === 'set');
 
-        const documents: SR5Item<'skill'>[] = [];
-        for (const packEntry of packEntries) {
-            const document = await pack.getDocument(packEntry._id) as unknown as SR5Item<'skill'>;
-            if (document?.system.type !== 'set') continue;
-            documents.push(document);
-        }
-
-        console.debug(`Shadowrun5e | Fetched all skill sets from pack ${packName}`, documents);
-        return documents;
+        console.debug(`Shadowrun5e | Fetched all skill sets from pack ${packName}`, skillSets);
+        return skillSets;
     },
 
     /**
@@ -422,6 +428,6 @@ export const PackItemFlow = {
         const packEntry = pack.index.find(data => data.type === 'skill' && SkillNamingFlow.nameToKey(data.name ?? '') === SkillNamingFlow.nameToKey(name));
         if (!packEntry) return;
 
-        return pack.getDocument(packEntry._id) as unknown as Promise<SR5Item<'skill'>>;
+        return this.getSinglePackDocument<'skill'>(pack, packEntry._id);
     }
 };
