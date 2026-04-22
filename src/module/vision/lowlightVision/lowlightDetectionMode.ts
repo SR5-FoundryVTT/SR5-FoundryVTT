@@ -1,6 +1,6 @@
 import { resolveDetectionModeRange } from '../detectionRange';
-import { isBlockedBySR5Templates, resolveVisionSourceOrigin } from '../losHelpers';
-import { isVisionSourceMode } from '../visionModeState';
+import { isBlockedBySR5Templates, isBlockedBySR5Walls, resolveVisionSourceOrigin } from '../losHelpers';
+import { hasTargetPresenceOnPlane, resolveVisionSourcePlane } from '../visionModeState';
 import LowLightVisionFilter from './lowlightFilter';
 
 export default class LowlightVisionDetectionMode extends foundry.canvas.perception.DetectionMode {
@@ -14,9 +14,12 @@ export default class LowlightVisionDetectionMode extends foundry.canvas.percepti
     ) {
         if (!super._canDetect(visionSource, target)) return false;
 
-        const isAstralPerceiving = isVisionSourceMode(visionSource, 'astralPerception');
+        const activePlane = resolveVisionSourcePlane(visionSource);
+        if (activePlane !== 'physical') {
+            return false;
+        }
 
-        return !isAstralPerceiving;
+        return hasTargetPresenceOnPlane(target, activePlane);
     }
 
     override _testRange(
@@ -29,11 +32,14 @@ export default class LowlightVisionDetectionMode extends foundry.canvas.percepti
     override _testLOS(
         ...[visionSource, mode, target, test]: Parameters<foundry.canvas.perception.DetectionMode['_testLOS']>
     ) {
-        if (!super._testLOS(visionSource, mode, target, test)) {
+        if (!this._testAngle(visionSource, mode, target, test)) {
             return false;
         }
 
         const origin = resolveVisionSourceOrigin(visionSource);
+        if (isBlockedBySR5Walls(origin, test.point, 'physical', 'physical')) {
+            return false;
+        }
 
         return !isBlockedBySR5Templates(origin, test.point, 'lowlight');
     }

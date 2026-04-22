@@ -1,7 +1,7 @@
 
 import { resolveDetectionModeRange } from '../detectionRange';
 import { isBlockedBySR5Walls, resolveVisionSourceOrigin } from '../losHelpers';
-import { isVisionSourceMode } from '../visionModeState';
+import { hasTargetPresenceOnPlane, resolveVisionSourcePlane } from '../visionModeState';
 import AstralVisionFilter from './astralPerceptionFilter';
 
 export default class AstralPerceptionDetectionMode extends foundry.canvas.perception.DetectionMode {
@@ -12,18 +12,14 @@ export default class AstralPerceptionDetectionMode extends foundry.canvas.percep
     override _canDetect(
         ...[visionSource, target]: Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>
     ) {
-        const tgt = target?.document instanceof TokenDocument ? target.document : null;
-        if (!tgt) return false;
+        if (!super._canDetect(visionSource, target)) return false;
 
-        const targetAstralActive = !!tgt?.actor?.system.visibilityChecks.astral.astralActive;
+        const activePlane = resolveVisionSourcePlane(visionSource);
+        if (activePlane !== 'astral') {
+            return false;
+        }
 
-        const targetHasAura = !!tgt?.actor?.system.visibilityChecks.astral.hasAura;
-
-        const targetAffectedBySpell = !!tgt?.actor?.system.visibilityChecks.astral.affectedBySpell;
-
-        const isAstralPerceiving = isVisionSourceMode(visionSource, 'astralPerception');
-
-        return (targetHasAura || targetAstralActive || targetAffectedBySpell) && isAstralPerceiving;
+        return hasTargetPresenceOnPlane(target, activePlane);
     }
 
     override _testRange(
@@ -36,13 +32,13 @@ export default class AstralPerceptionDetectionMode extends foundry.canvas.percep
     override _testLOS(
         ...[visionSource, mode, target, test]: Parameters<foundry.canvas.perception.DetectionMode['_testLOS']>
     ) {
-        if (!super._testLOS(visionSource, mode, target, test)) {
+        if (!this._testAngle(visionSource, mode, target, test)) {
             return false;
         }
 
         const origin = resolveVisionSourceOrigin(visionSource);
 
-        return !isBlockedBySR5Walls(origin, test.point, 'astral');
+        return !isBlockedBySR5Walls(origin, test.point, 'astral', 'astral');
     }
 }
   

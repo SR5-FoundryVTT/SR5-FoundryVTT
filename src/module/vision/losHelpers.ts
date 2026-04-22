@@ -1,4 +1,5 @@
 import { FLAGS, SYSTEM_NAME } from '../constants';
+import { ensureSR5PlaceablePlanes, SR5Plane } from '../environment/placeablePlanes';
 import { getSR5TemplateFlags } from '../environment/templateFlags';
 
 type PointLike = {
@@ -10,9 +11,19 @@ type VisionSourceLike = Parameters<foundry.canvas.perception.DetectionMode['_tes
 
 type WallLike = {
     document?: {
+        id?: string;
         c?: number[];
         flags?: Record<string, unknown>;
     };
+};
+
+type PlaceableDocumentLike = {
+    getFlag?(scope: string, key: string): unknown;
+    flags?: Record<string, unknown>;
+};
+
+type PlaneAwarePlaceableLike = {
+    document?: PlaceableDocumentLike;
 };
 
 type TemplateLike = {
@@ -23,8 +34,8 @@ type TemplateLike = {
     };
 };
 
-export type SR5WallSense = 'astral' | 'ultrasound' | 'matrix';
-export type SR5TemplateSense = 'lowlight' | 'thermographic' | 'ultrasound' | 'astral' | 'matrix';
+export type SR5WallSense = 'physical' | 'astral' | 'matrix';
+export type SR5TemplateSense = 'lowlight' | 'thermographic' | 'astral' | 'matrix';
 
 export type SR5WallType = 'standard' | 'window' | 'manaBarrier' | 'matrixBarrier';
 
@@ -45,12 +56,12 @@ const getWallType = (wall: WallLike): SR5WallType => {
 };
 
 const shouldBlockSense = (wallType: SR5WallType, sense: SR5WallSense) => {
-    if (sense === 'matrix') {
-        return wallType === 'matrixBarrier';
+    if (sense === 'physical') {
+        return wallType === 'standard' || wallType === 'window';
     }
 
-    if (sense === 'ultrasound') {
-        return wallType === 'standard' || wallType === 'window';
+    if (sense === 'matrix') {
+        return wallType === 'matrixBarrier';
     }
 
     return wallType === 'standard' || wallType === 'window' || wallType === 'manaBarrier';
@@ -83,17 +94,46 @@ const intersectsWall = (origin: PointLike, destination: PointLike, wall: WallLik
     return foundry.utils.lineSegmentIntersects(origin, destination, start, end);
 };
 
+const getSR5PlaceablePlanes = (document: PlaceableDocumentLike | undefined) => {
+    const rawPlanes = document?.getFlag?.(SYSTEM_NAME, FLAGS.PlaceablePlanes)
+        ?? (document?.flags?.[SYSTEM_NAME] as Record<string, unknown> | undefined)?.[FLAGS.PlaceablePlanes];
+    return ensureSR5PlaceablePlanes(rawPlanes);
+};
+
+export const isSR5PlaceableOnPlane = (
+    document: PlaceableDocumentLike | undefined,
+    plane: SR5Plane,
+) => getSR5PlaceablePlanes(document)[plane];
+
+export const filterSR5PlaceablesByPlane = <T extends PlaneAwarePlaceableLike>(
+    placeables: T[],
+    plane: SR5Plane,
+) => placeables.filter(placeable => isSR5PlaceableOnPlane(placeable.document, plane));
+
+export const getSR5PlaneAwareLights = (
+    plane: SR5Plane,
+    lights: PlaneAwarePlaceableLike[] = ((canvas?.lighting?.placeables ?? []) as PlaneAwarePlaceableLike[]),
+) => filterSR5PlaceablesByPlane(lights, plane);
+
+export const getSR5PlaneAwareTiles = (
+    plane: SR5Plane,
+    tiles: PlaneAwarePlaceableLike[] = ((canvas?.tiles?.placeables ?? []) as PlaneAwarePlaceableLike[]),
+) => filterSR5PlaceablesByPlane(tiles, plane);
+
 export const isBlockedBySR5Walls = (
     origin: PointLike,
     destination: PointLike,
     sense: SR5WallSense,
+    plane: SR5Plane,
     walls: WallLike[] = ((canvas?.walls?.placeables ?? []) as WallLike[]),
 ) => {
     if (!Number.isFinite(origin?.x) || !Number.isFinite(origin?.y) || !Number.isFinite(destination?.x) || !Number.isFinite(destination?.y)) {
         return false;
     }
 
-    for (const wall of walls) {
+    const planeAwareWalls = filterSR5PlaceablesByPlane(walls, plane);
+
+    for (const wall of planeAwareWalls) {
         const wallType = getWallType(wall);
         if (!shouldBlockSense(wallType, sense)) {
             continue;

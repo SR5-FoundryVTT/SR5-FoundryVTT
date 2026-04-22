@@ -264,3 +264,29 @@ nav#context-menu, menu.controls-dropdown {
         transform: rotate(45deg);
     }
 }
+
+#scene-controls {
+    [data-tool="sr5-plane-physical"] {
+        --sr5-plane-color: #c9c9c9;
+    }
+
+    [data-tool="sr5-plane-astral"] {
+        --sr5-plane-color: #9a6bff;
+    }
+
+    [data-tool="sr5-plane-matrix"] {
+        --sr5-plane-color: #45c66a;
+    }
+
+    [data-tool="sr5-plane-physical"],
+    [data-tool="sr5-plane-astral"],
+    [data-tool="sr5-plane-matrix"] {
+        i {
+            color: var(--sr5-plane-color);
+        }
+
+        &.active i {
+            text-shadow: 0 0 8px color-mix(in oklab, var(--sr5-plane-color) 75%, white 25%);
+        }
+    }
+}

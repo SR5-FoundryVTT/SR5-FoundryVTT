@@ -1,4 +1,5 @@
-import { FLAGS } from "../constants";
+import { FLAGS, SYSTEM_NAME } from "../constants";
+import { areSR5PlaceablePlanesEqual, ensureSR5PlaceablePlanes } from "../environment/placeablePlanes";
 import { Sanitizer } from "../sanitizer/Sanitizer";
 import { Version0_8_0 } from "./versions/Version0_8_0";
 import { Version0_18_0 } from './versions/Version0_18_0';
@@ -176,6 +177,99 @@ export class Migrator {
 
         // Persist the change without triggering diff logic
         return doc.update(doc.toObject() as any, { diff: false, recursive: false });
+    }
+
+    public static async migrateScenePlaceablePlanes() {
+        if (!game.user?.isGM) {
+            return;
+        }
+
+        for (const scene of game.scenes) {
+            const wallUpdates: Array<Record<string, unknown>> = [];
+            const lightUpdates: Array<Record<string, unknown>> = [];
+            const tileUpdates: Array<Record<string, unknown>> = [];
+
+            for (const wall of scene.walls) {
+                const rawPlanes = wall.getFlag(SYSTEM_NAME, FLAGS.PlaceablePlanes);
+                const nextPlanes = ensureSR5PlaceablePlanes(rawPlanes);
+                const sourcePlanes = ensureSR5PlaceablePlanes((rawPlanes ?? {}) as Record<string, unknown>);
+                if (areSR5PlaceablePlanesEqual(sourcePlanes, nextPlanes)
+                    && typeof rawPlanes === 'object'
+                    && rawPlanes !== null
+                    && FLAGS.PlanePhysical in (rawPlanes as Record<string, unknown>)
+                    && FLAGS.PlaneAstral in (rawPlanes as Record<string, unknown>)
+                    && FLAGS.PlaneMatrix in (rawPlanes as Record<string, unknown>)) {
+                    continue;
+                }
+
+                wallUpdates.push({
+                    _id: wall.id,
+                    flags: {
+                        [SYSTEM_NAME]: {
+                            [FLAGS.PlaceablePlanes]: nextPlanes,
+                        },
+                    },
+                });
+            }
+
+            for (const light of scene.lights) {
+                const rawPlanes = light.getFlag(SYSTEM_NAME, FLAGS.PlaceablePlanes);
+                const nextPlanes = ensureSR5PlaceablePlanes(rawPlanes);
+                const sourcePlanes = ensureSR5PlaceablePlanes((rawPlanes ?? {}) as Record<string, unknown>);
+                if (areSR5PlaceablePlanesEqual(sourcePlanes, nextPlanes)
+                    && typeof rawPlanes === 'object'
+                    && rawPlanes !== null
+                    && FLAGS.PlanePhysical in (rawPlanes as Record<string, unknown>)
+                    && FLAGS.PlaneAstral in (rawPlanes as Record<string, unknown>)
+                    && FLAGS.PlaneMatrix in (rawPlanes as Record<string, unknown>)) {
+                    continue;
+                }
+
+                lightUpdates.push({
+                    _id: light.id,
+                    flags: {
+                        [SYSTEM_NAME]: {
+                            [FLAGS.PlaceablePlanes]: nextPlanes,
+                        },
+                    },
+                });
+            }
+
+            for (const tile of scene.tiles) {
+                const rawPlanes = tile.getFlag(SYSTEM_NAME, FLAGS.PlaceablePlanes);
+                const nextPlanes = ensureSR5PlaceablePlanes(rawPlanes);
+                const sourcePlanes = ensureSR5PlaceablePlanes((rawPlanes ?? {}) as Record<string, unknown>);
+                if (areSR5PlaceablePlanesEqual(sourcePlanes, nextPlanes)
+                    && typeof rawPlanes === 'object'
+                    && rawPlanes !== null
+                    && FLAGS.PlanePhysical in (rawPlanes as Record<string, unknown>)
+                    && FLAGS.PlaneAstral in (rawPlanes as Record<string, unknown>)
+                    && FLAGS.PlaneMatrix in (rawPlanes as Record<string, unknown>)) {
+                    continue;
+                }
+
+                tileUpdates.push({
+                    _id: tile.id,
+                    flags: {
+                        [SYSTEM_NAME]: {
+                            [FLAGS.PlaceablePlanes]: nextPlanes,
+                        },
+                    },
+                });
+            }
+
+            if (wallUpdates.length > 0) {
+                await scene.updateEmbeddedDocuments('Wall', wallUpdates as any, { diff: false, recursive: false });
+            }
+
+            if (lightUpdates.length > 0) {
+                await scene.updateEmbeddedDocuments('AmbientLight', lightUpdates as any, { diff: false, recursive: false });
+            }
+
+            if (tileUpdates.length > 0) {
+                await scene.updateEmbeddedDocuments('Tile', tileUpdates as any, { diff: false, recursive: false });
+            }
+        }
     }
 
     public static async BeginMigration() {

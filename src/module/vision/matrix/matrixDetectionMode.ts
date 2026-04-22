@@ -1,32 +1,30 @@
 import { resolveDetectionModeRange } from '../detectionRange';
 import { isBlockedBySR5Walls, resolveVisionSourceOrigin } from '../losHelpers';
-import { isVisionSourceMode } from '../visionModeState';
-import UltrasoundVisionFilter from './ultrasoundFilter';
+import { hasTargetPresenceOnPlane, resolveVisionSourcePlane } from '../visionModeState';
+import MatrixVisionFilter from './matrixFilter';
 
-export default class UltrasoundDetectionMode extends foundry.canvas.perception.DetectionMode {
+export default class MatrixVisionDetectionMode extends foundry.canvas.perception.DetectionMode {
+
     static override getDetectionFilter() {
-        return (this._detectionFilter ??= UltrasoundVisionFilter.create());
+        return this._detectionFilter ??= MatrixVisionFilter.create();
     }
-
+  
     override _canDetect(
         ...[visionSource, target]: Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>
     ) {
         if (!super._canDetect(visionSource, target)) return false;
 
+        const activePlane = resolveVisionSourcePlane(visionSource);
+        if (activePlane !== 'matrix' || !hasTargetPresenceOnPlane(target, activePlane)) {
+            return false;
+        }
+
         const tgt = target?.document instanceof TokenDocument ? target.document : null;
-        if (!tgt || !tgt.actor) {
-            return false;
-        }
+        if (!tgt) return false;
 
-        const isAstralPerceiving = isVisionSourceMode(visionSource, 'astralPerception');
-        if (isAstralPerceiving) {
-            return false;
-        }
+        const targetIsNotRunningSilent = !tgt?.actor?.system.visibilityChecks.matrix.runningSilent;
 
-        const sourceDocument = (visionSource?.object as { document?: { hasStatusEffect?: (statusId: string) => boolean } } | undefined)?.document;
-        const sourceSilenced = sourceDocument?.hasStatusEffect?.('silenced') ?? false;
-        const targetSilenced = tgt.hasStatusEffect?.('silenced') ?? false;
-        return !sourceSilenced && !targetSilenced;
+        return targetIsNotRunningSilent;
     }
 
     override _testRange(
@@ -41,7 +39,7 @@ export default class UltrasoundDetectionMode extends foundry.canvas.perception.D
     ) {
         const origin = resolveVisionSourceOrigin(visionSource);
 
-        if (isBlockedBySR5Walls(origin, test.point, 'ultrasound')) {
+        if (isBlockedBySR5Walls(origin, test.point, 'matrix', 'matrix')) {
             return false;
         }
 

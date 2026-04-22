@@ -4,10 +4,8 @@ import ThermographicVisionDetectionMode from './thermographicVision/thermographi
 import ThermographicVisionBackgroundVisionShader from './thermographicVision/thermographicBackgroundShader';
 import LowlightVisionDetectionMode from './lowlightVision/lowlightDetectionMode';
 import LowLightBackgroundVisionShader from './lowlightVision/lowlightBackgroundShader';
-import AugmentedRealityVisionDetectionMode from './augmentedReality/arDetectionMode';
-import AugmentedRealityVisionBackgroundVisionShader from './augmentedReality/arBackgroundShader';
-import UltrasoundDetectionMode from './ultrasound/ultrasoundDetectionMode';
-import UltrasoundBackgroundVisionShader from './ultrasound/ultrasoundBackgroundShader';
+import MatrixVisionDetectionMode from './matrix/matrixDetectionMode';
+import MatrixVisionBackgroundVisionShader from './matrix/matrixBackgroundShader';
 
 export default class VisionConfigurator {
     static configureAstralPerception() {
@@ -101,56 +99,28 @@ export default class VisionConfigurator {
         });
     }
 
-    static configureAR() {
-        CONFIG.Canvas.detectionModes.augmentedReality = new AugmentedRealityVisionDetectionMode({
-            id: 'augmentedReality',
-            label: 'SR5.Vision.AugmentedReality',
+    static configureMatrix() {
+        CONFIG.Canvas.detectionModes.matrix = new MatrixVisionDetectionMode({
+            id: 'matrix',
+            label: 'SR5.Vision.Matrix',
             type: foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SIGHT,
         });
 
-        CONFIG.Canvas.visionModes.augmentedReality = new foundry.canvas.perception.VisionMode({
-            id: 'augmentedReality',
-            label: 'SR5.Vision.AugmentedReality',
+        CONFIG.Canvas.visionModes.matrix = new foundry.canvas.perception.VisionMode({
+            id: 'matrix',
+            label: 'SR5.Vision.Matrix',
             canvas: {
                 shader: foundry.canvas.rendering.shaders.ColorAdjustmentsSamplerShader,
                 uniforms: {
                     contrast: 0.1,
                     saturation: 0.2,
-                    tint: AugmentedRealityVisionBackgroundVisionShader.COLOR_TINT,
+                    tint: MatrixVisionBackgroundVisionShader.COLOR_TINT,
                 },
             },
             vision: {
                 darkness: { adaptive: false },
                 defaults: { attenuation: 0, contrast: 0.1, saturation: 0.2, brightness: 0.1 },
-                background: { shader: AugmentedRealityVisionBackgroundVisionShader },
-            },
-        });
-    }
-
-    static configureUltrasound() {
-        CONFIG.Canvas.detectionModes.ultrasound = new UltrasoundDetectionMode({
-            id: 'ultrasound',
-            label: 'SR5.Vision.Ultrasound',
-            type: foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SOUND,
-            walls: false,
-            angle: true,
-        });
-
-        CONFIG.Canvas.visionModes.ultrasound = new foundry.canvas.perception.VisionMode({
-            id: 'ultrasound',
-            label: 'SR5.Vision.Ultrasound',
-            canvas: {
-                shader: foundry.canvas.rendering.shaders.ColorAdjustmentsSamplerShader,
-                uniforms: {
-                    saturation: -0.8,
-                    contrast: 0.35,
-                    tint: UltrasoundBackgroundVisionShader.COLOR_TINT,
-                },
-            },
-            vision: {
-                darkness: { adaptive: false },
-                defaults: { attenuation: 0, contrast: 0.35, saturation: -0.8, brightness: 0.15 },
-                background: { shader: UltrasoundBackgroundVisionShader },
+                background: { shader: MatrixVisionBackgroundVisionShader },
             },
         });
     }

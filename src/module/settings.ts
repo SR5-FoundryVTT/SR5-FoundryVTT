@@ -2,6 +2,7 @@
 
 import { FLAGS, SYSTEM_NAME } from './constants';
 import SR5CompendiaSettings from './settings/SR5CompendiaSettings';
+import { SR5_DEFAULT_PLACEABLE_PLANES } from './environment/placeablePlanes';
 
 export const registerSystemSettings = () => {
     /**
@@ -188,6 +189,14 @@ export const registerSystemSettings = () => {
         config: true,
         type: Boolean,
         default: false
+    });
+
+    game.settings.register(SYSTEM_NAME, FLAGS.ScenePlaneBrushState, {
+        name: 'Scene Plane Brush State',
+        scope: 'client',
+        config: false,
+        type: Object,
+        default: SR5_DEFAULT_PLACEABLE_PLANES,
     });
 
     /**

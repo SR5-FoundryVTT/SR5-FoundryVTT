@@ -1,6 +1,6 @@
 import { resolveDetectionModeRange } from '../detectionRange';
-import { isBlockedBySR5Templates, resolveVisionSourceOrigin } from '../losHelpers';
-import { isVisionSourceMode } from '../visionModeState';
+import { isBlockedBySR5Templates, isBlockedBySR5Walls, resolveVisionSourceOrigin } from '../losHelpers';
+import { hasTargetPresenceOnPlane, resolveVisionSourcePlane } from '../visionModeState';
 import ThermographicVisionFilter from './thermographicFilter';
 
 export default class ThermographicVisionDetectionMode extends foundry.canvas.perception.DetectionMode {
@@ -13,14 +13,17 @@ export default class ThermographicVisionDetectionMode extends foundry.canvas.per
     ) {
         if (!super._canDetect(visionSource, target)) return false;
 
+        const activePlane = resolveVisionSourcePlane(visionSource);
+        if (activePlane !== 'physical' || !hasTargetPresenceOnPlane(target, activePlane)) {
+            return false;
+        }
+
         const tgt = target?.document instanceof TokenDocument ? target.document : null;
         if (!tgt) return false;
 
         const targetHasHeat = !!tgt?.actor?.system.visibilityChecks.meat.hasHeat;
 
-        const isAstralPerceiving = isVisionSourceMode(visionSource, 'astralPerception');
-
-        return targetHasHeat && !isAstralPerceiving;
+        return targetHasHeat;
     }
 
     override _testRange(
@@ -33,11 +36,14 @@ export default class ThermographicVisionDetectionMode extends foundry.canvas.per
     override _testLOS(
         ...[visionSource, mode, target, test]: Parameters<foundry.canvas.perception.DetectionMode['_testLOS']>
     ) {
-        if (!super._testLOS(visionSource, mode, target, test)) {
+        if (!this._testAngle(visionSource, mode, target, test)) {
             return false;
         }
 
         const origin = resolveVisionSourceOrigin(visionSource);
+        if (isBlockedBySR5Walls(origin, test.point, 'physical', 'physical')) {
+            return false;
+        }
 
         return !isBlockedBySR5Templates(origin, test.point, 'thermographic');
     }

@@ -46,14 +46,14 @@ import { ComplexFormLevelType, FireModeType, FireRangeType, SpellForceType } fro
 
 import { RoutingLib } from "../integrations/routingLibIntegration";
 import SR5CompendiaSettings from "../settings/SR5CompendiaSettings";
+import { SR5PlaceablePlanes } from "../environment/placeablePlanes";
 import AstralPerceptionDetectionMode from "../vision/astralPerception/astralPerceptionDetectionMode";
-import AugmentedRealityVisionDetectionMode from "../vision/augmentedReality/arDetectionMode";
+import MatrixVisionDetectionMode from "../vision/matrix/matrixDetectionMode";
 import LowlightVisionDetectionMode from "../vision/lowlightVision/lowlightDetectionMode";
 import ThermographicVisionDetectionMode from "../vision/thermographicVision/thermographicDetectionMode";
-import UltrasoundDetectionMode from '../vision/ultrasound/ultrasoundDetectionMode';
 import { DiceSoNice } from "../rolls/DiceSoNice";
 
-type VisionModeFlagValue = 'basic' | 'astralPerception' | 'thermographic' | 'lowlight' | 'augmentedReality' | 'ultrasound';
+type VisionModeFlagValue = 'basic' | 'astralPerception' | 'thermographic' | 'lowlight' | 'matrix';
 type VisionDetectionRangeOverrides = Partial<Record<VisionModeFlagValue, number>>;
 
 declare module "fvtt-types/configuration" {
@@ -104,16 +104,14 @@ declare module "fvtt-types/configuration" {
             astralPerception: AstralPerceptionDetectionMode;
             thermographic: ThermographicVisionDetectionMode;
             lowlight: LowlightVisionDetectionMode;
-            augmentedReality: AugmentedRealityVisionDetectionMode;
-            ultrasound: UltrasoundDetectionMode;
+            matrix: MatrixVisionDetectionMode;
         }
 
         interface VisionModes {
             astralPerception: foundry.canvas.perception.VisionMode;
             thermographic: foundry.canvas.perception.VisionMode;
             lowlight: foundry.canvas.perception.VisionMode;
-            augmentedReality: foundry.canvas.perception.VisionMode;
-            ultrasound: foundry.canvas.perception.VisionMode;
+            matrix: foundry.canvas.perception.VisionMode;
         }
     }
 
@@ -216,8 +214,19 @@ declare module "fvtt-types/configuration" {
         }
         Wall: {
             shadowrun5e: {
+                planes?: SR5PlaceablePlanes;
                 wallType?: 'standard' | 'window' | 'manaBarrier' | 'matrixBarrier';
                 matrixBlocked?: boolean;
+            };
+        }
+        AmbientLight: {
+            shadowrun5e: {
+                planes?: SR5PlaceablePlanes;
+            };
+        }
+        Tile: {
+            shadowrun5e: {
+                planes?: SR5PlaceablePlanes;
             };
         }
         MeasuredTemplate: {
@@ -288,6 +297,7 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.AutomateProgressiveRecoil": boolean;
         "shadowrun5e.ManualRollOnSuccessTest": boolean;
         "shadowrun5e.DefaultOpposedTestActorSelection": boolean;
+        "shadowrun5e.ScenePlaneBrushState": SR5PlaceablePlanes;
         "shadowrun5e.MarkImports": string;
         "shadowrun5e.ImportIconFolder": string;
         "shadowrun5e.UseImportIconOverrides": boolean;

@@ -85,6 +85,8 @@ import { RoutingLibIntegration } from './integrations/routingLibIntegration';
 import { initDiceSoNice } from './rolls/DiceSoNice';
 import { SR5TokenDocument } from './token/SR5TokenDocument';
 import { SR5TokenRuler } from './token/SR5TokenRuler';
+import { areSR5PlaceablePlanesEqual, ensureSR5PlaceablePlanes } from './environment/placeablePlanes';
+import { ScenePlaneBrushFlow } from './flows/ScenePlaneBrushFlow';
 
 import { Character } from './types/actor/Character';
 import { IC } from './types/actor/IC';
@@ -161,6 +163,9 @@ export class HooksManager {
         Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD.bind(SituationModifiersApplication));
         Hooks.on('renderTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
         Hooks.on('renderPrototypeTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
+        Hooks.on('preCreateWall', HooksManager.preCreateWall.bind(HooksManager));
+        Hooks.on('preCreateAmbientLight', HooksManager.preCreateAmbientLight.bind(HooksManager));
+        Hooks.on('preCreateTile', HooksManager.preCreateTile.bind(HooksManager));
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem.bind(HooksManager));
         Hooks.on('getChatMessageContextOptions', SuccessTest.chatMessageContextOptions.bind(SuccessTest));
 
@@ -493,6 +498,7 @@ ___________________
 
     static async ready() {
         if (game.user?.isGM) {
+            await Migrator.migrateScenePlaceablePlanes();
             await Migrator.BeginMigration();
 
             if (ChangelogApplication.showApplication)
@@ -541,6 +547,7 @@ ___________________
 
         const situationModifiersControl = SituationModifiersApplication.getControl();
         controls.tokens.tools[situationModifiersControl.name] = situationModifiersControl;
+        ScenePlaneBrushFlow.extendSceneControls(controls);
     }
 
     /**
@@ -596,6 +603,38 @@ ___________________
         // Trigger type specific behaviour.
         if (item.isType('host'))
             await MatrixICFlow.handleUpdateItemHost(item);
+    }
+
+    private static applyDefaultPlaceablePlanes(document: {
+        getFlag(scope: string, key: string): unknown;
+        updateSource(changes: Record<string, unknown>): unknown;
+    }) {
+        const rawPlanes = document.getFlag(SYSTEM_NAME, FLAGS.PlaceablePlanes);
+        const currentPlanes = ScenePlaneBrushFlow.resolvePlanesForCreatedPlaceable(rawPlanes);
+        const sourcePlanes = (rawPlanes ?? {}) as Record<string, unknown>;
+        const hasCompletePlaneSet = Object.prototype.hasOwnProperty.call(sourcePlanes, FLAGS.PlanePhysical)
+            && Object.prototype.hasOwnProperty.call(sourcePlanes, FLAGS.PlaneAstral)
+            && Object.prototype.hasOwnProperty.call(sourcePlanes, FLAGS.PlaneMatrix);
+
+        if (hasCompletePlaneSet && areSR5PlaceablePlanesEqual(currentPlanes, ensureSR5PlaceablePlanes(sourcePlanes))) {
+            return;
+        }
+
+        document.updateSource({
+            [`flags.${SYSTEM_NAME}.${FLAGS.PlaceablePlanes}`]: currentPlanes,
+        });
+    }
+
+    static preCreateWall(document: WallDocument) {
+        this.applyDefaultPlaceablePlanes(document);
+    }
+
+    static preCreateAmbientLight(document: AmbientLightDocument) {
+        this.applyDefaultPlaceablePlanes(document);
+    }
+
+    static preCreateTile(document: TileDocument) {
+        this.applyDefaultPlaceablePlanes(document);
     }
 
     /**
@@ -656,8 +695,7 @@ ___________________
         VisionConfigurator.configureAstralPerception()
         VisionConfigurator.configureThermographicVision()
         VisionConfigurator.configureLowlight()
-        VisionConfigurator.configureAR()
-        VisionConfigurator.configureUltrasound()
+        VisionConfigurator.configureMatrix()
     }
 
     static configureTextEnrichers() {

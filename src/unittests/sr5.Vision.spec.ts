@@ -2,7 +2,7 @@ import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { FLAGS } from '@/module/constants';
 import { TokenDocumentWithVisionFlags, TokenVisionFlow } from '@/module/token/flows/TokenVisionFlow';
 import VisionConfigurator from '@/module/vision/visionConfigurator';
-import { SR5VisionModeId } from '@/module/vision/visionModeState';
+import { hasTargetPresenceOnPlane, resolveVisionSourcePlane, SR5VisionModeId } from '@/module/vision/visionModeState';
 
 type VisibilityChecksData = {
     astral: {
@@ -26,6 +26,16 @@ type DetectionTargetType = Parameters<foundry.canvas.perception.DetectionMode['_
 type VisionSourceState = {
     tokenFlags?: Record<string, unknown>;
     actorFlags?: Record<string, unknown>;
+};
+
+type WallFlags = {
+    wallType?: 'standard' | 'window' | 'manaBarrier' | 'matrixBarrier';
+    matrixBlocked?: boolean;
+    planes?: {
+        physical?: boolean;
+        astral?: boolean;
+        matrix?: boolean;
+    };
 };
 
 const createMockTokenVisionDocument = (
@@ -80,6 +90,25 @@ const createModeConfig = (id: string, range: number | null): DetectionModeConfig
     enabled: true,
     range,
 } as DetectionModeConfig);
+
+const createMockWall = (coords: [number, number, number, number], flags: WallFlags = {}) => ({
+    document: {
+        getFlag: (_scope: string, key: string) => {
+            if (key !== FLAGS.PlaceablePlanes) {
+                return undefined;
+            }
+
+            return flags.planes;
+        },
+        c: coords,
+        flags: {
+            shadowrun5e: {
+                [FLAGS.WallType]: flags.wallType,
+                [FLAGS.WallMatrixBlocked]: flags.matrixBlocked,
+            },
+        },
+    },
+});
 
 const createMockVisionSource = (
     visionModeId: string,
@@ -158,8 +187,7 @@ const configureVisionModes = () => {
     VisionConfigurator.configureAstralPerception();
     VisionConfigurator.configureThermographicVision();
     VisionConfigurator.configureLowlight();
-    VisionConfigurator.configureAR();
-    VisionConfigurator.configureUltrasound();
+    VisionConfigurator.configureMatrix();
 };
 
 export const shadowrunVisionModes = (context: QuenchBatchContext) => {
@@ -173,14 +201,12 @@ export const shadowrunVisionModes = (context: QuenchBatchContext) => {
             assert.equal(CONFIG.Canvas.detectionModes.astralPerception.id, 'astralPerception');
             assert.equal(CONFIG.Canvas.detectionModes.thermographic.id, 'thermographic');
             assert.equal(CONFIG.Canvas.detectionModes.lowlight.id, 'lowlight');
-            assert.equal(CONFIG.Canvas.detectionModes.augmentedReality.id, 'augmentedReality');
-            assert.equal(CONFIG.Canvas.detectionModes.ultrasound.id, 'ultrasound');
+            assert.equal(CONFIG.Canvas.detectionModes.matrix.id, 'matrix');
 
             assert.equal(CONFIG.Canvas.visionModes.astralPerception.id, 'astralPerception');
             assert.equal(CONFIG.Canvas.visionModes.thermographic.id, 'thermographic');
             assert.equal(CONFIG.Canvas.visionModes.lowlight.id, 'lowlight');
-            assert.equal(CONFIG.Canvas.visionModes.augmentedReality.id, 'augmentedReality');
-            assert.equal(CONFIG.Canvas.visionModes.ultrasound.id, 'ultrasound');
+            assert.equal(CONFIG.Canvas.visionModes.matrix.id, 'matrix');
         });
 
         it('falls back to sight range for SR5 detection mode range checks', () => {
@@ -190,7 +216,7 @@ export const shadowrunVisionModes = (context: QuenchBatchContext) => {
             const target = createMockTokenTarget(createVisibilityChecks());
             const test = createRangeTest(10, 0);
 
-            const modeIds = ['astralPerception', 'thermographic', 'lowlight', 'augmentedReality', 'ultrasound'] as const;
+            const modeIds = ['astralPerception', 'thermographic', 'lowlight', 'matrix'] as const;
             for (const modeId of modeIds) {
                 const mode = CONFIG.Canvas.detectionModes[modeId];
                 const modeConfig = createModeConfig(modeId, 0);
@@ -274,6 +300,10 @@ export const shadowrunVisionModes = (context: QuenchBatchContext) => {
                 },
             });
             assert.isTrue(astralMode._canDetect(actorDefaultSource, astralTarget));
+
+            assert.equal(resolveVisionSourcePlane(tokenOverrideSource), 'astral');
+            assert.equal(resolveVisionSourcePlane(createMockVisionSource('matrix')), 'matrix');
+            assert.equal(resolveVisionSourcePlane(createMockVisionSource('lowlight')), 'physical');
         });
 
         it('cycles token HUD vision mode selection and falls back to actor default', async () => {
@@ -300,7 +330,7 @@ export const shadowrunVisionModes = (context: QuenchBatchContext) => {
             configureVisionModes();
 
             const tokenDocument = createMockTokenVisionDocument({
-                [FLAGS.TokenActiveVisionMode]: 'ultrasound',
+                [FLAGS.TokenActiveVisionMode]: 'matrix',
             }, {
                 [FLAGS.ActorDefaultVisionMode]: 'lowlight',
             });
@@ -317,8 +347,7 @@ export const shadowrunVisionModes = (context: QuenchBatchContext) => {
             const astralMode = CONFIG.Canvas.detectionModes.astralPerception;
             const thermographicMode = CONFIG.Canvas.detectionModes.thermographic;
             const lowlightMode = CONFIG.Canvas.detectionModes.lowlight;
-            const arMode = CONFIG.Canvas.detectionModes.augmentedReality;
-            const ultrasoundMode = CONFIG.Canvas.detectionModes.ultrasound;
+            const matrixMode = CONFIG.Canvas.detectionModes.matrix;
 
             const astralSource = createMockVisionSource('astralPerception');
             const mundaneSource = createMockVisionSource('basic');
@@ -347,24 +376,78 @@ export const shadowrunVisionModes = (context: QuenchBatchContext) => {
             );
             assert.isFalse(lowlightMode._canDetect(mundaneSource, invisibleTarget));
 
-            const arRunningSilentTarget = createMockTokenTarget(createVisibilityChecks({
+            const matrixRunningSilentTarget = createMockTokenTarget(createVisibilityChecks({
                 matrix: {
                     hasIcon: true,
                     runningSilent: true,
                 },
             }));
-            assert.isFalse(arMode._canDetect(mundaneSource, arRunningSilentTarget));
+            assert.isFalse(matrixMode._canDetect(mundaneSource, matrixRunningSilentTarget));
 
-            const arVisibleTarget = createMockTokenTarget(createVisibilityChecks({
+            const matrixVisibleTarget = createMockTokenTarget(createVisibilityChecks({
                 matrix: {
                     hasIcon: true,
                     runningSilent: false,
                 },
             }));
-            assert.isTrue(arMode._canDetect(mundaneSource, arVisibleTarget));
+            assert.isTrue(matrixMode._canDetect(mundaneSource, matrixVisibleTarget));
 
-            assert.isTrue(ultrasoundMode._canDetect(mundaneSource, thermographicTarget));
-            assert.isFalse(ultrasoundMode._canDetect(astralSource, thermographicTarget));
+            assert.isTrue(hasTargetPresenceOnPlane(thermographicTarget, 'physical'));
+            assert.isTrue(hasTargetPresenceOnPlane(astralTarget, 'astral'));
+            assert.isTrue(hasTargetPresenceOnPlane(matrixVisibleTarget, 'matrix'));
+            assert.isFalse(hasTargetPresenceOnPlane(thermographicTarget, 'matrix'));
+        });
+
+        it('applies plane flags in astral and physical detection LOS checks', () => {
+            configureVisionModes();
+
+            const astralMode = CONFIG.Canvas.detectionModes.astralPerception;
+            const lowlightMode = CONFIG.Canvas.detectionModes.lowlight;
+
+            const astralSource = createMockVisionSource('astralPerception');
+            const mundaneSource = createMockVisionSource('lowlight');
+            const target = createMockTokenTarget(createVisibilityChecks());
+            const modeConfig = createModeConfig('lowlight', null);
+            const test = createRangeTest(10, 0);
+
+            const previousWalls = canvas.walls.placeables;
+            const previousTemplates = canvas.templates.placeables;
+
+            const astralIgnoredWall = createMockWall([5, -5, 5, 5], {
+                wallType: 'window',
+                planes: { physical: true, astral: false, matrix: false },
+            });
+            const astralBlockingWall = createMockWall([5, -5, 5, 5], {
+                wallType: 'window',
+                planes: { physical: false, astral: true, matrix: false },
+            });
+            const physicalIgnoredWall = createMockWall([5, -5, 5, 5], {
+                wallType: 'standard',
+                planes: { physical: false, astral: true, matrix: false },
+            });
+            const physicalBlockingWall = createMockWall([5, -5, 5, 5], {
+                wallType: 'standard',
+                planes: { physical: true, astral: false, matrix: false },
+            });
+
+            try {
+                canvas.templates.placeables = [];
+
+                canvas.walls.placeables = [astralIgnoredWall] as any;
+                assert.isTrue(astralMode._testLOS(astralSource, modeConfig, target, test));
+
+                canvas.walls.placeables = [astralBlockingWall] as any;
+                assert.isFalse(astralMode._testLOS(astralSource, modeConfig, target, test));
+
+                canvas.walls.placeables = [physicalIgnoredWall] as any;
+                assert.isTrue(lowlightMode._testLOS(mundaneSource, modeConfig, target, test));
+
+                canvas.walls.placeables = [physicalBlockingWall] as any;
+                assert.isFalse(lowlightMode._testLOS(mundaneSource, modeConfig, target, test));
+            } finally {
+                canvas.walls.placeables = previousWalls;
+                canvas.templates.placeables = previousTemplates;
+            }
         });
     });
 };

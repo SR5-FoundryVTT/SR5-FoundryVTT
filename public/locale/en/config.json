@@ -2824,12 +2824,11 @@
         "Vision": {
             "ActorDefault": "Actor Default",
             "AstralPerception": "Astral Perception",
-            "AugmentedReality": "Augmented Reality",
+            "Matrix": "Matrix",
             "LowLight": "Low-Light Vision",
             "Mode": "Vision Mode",
             "Mundane": "Mundane Vision",
-            "ThermographicVision": "Thermographic Vision",
-            "Ultrasound": "Ultrasound"
+            "ThermographicVision": "Thermographic Vision"
         },
         "Walk": "Walk",
         "WalkingSpeed": "Walking",

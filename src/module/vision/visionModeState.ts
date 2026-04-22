@@ -5,16 +5,14 @@ export const SR5VisionModes = [
     'astralPerception',
     'thermographic',
     'lowlight',
-    'augmentedReality',
-    'ultrasound',
+    'matrix',
 ] as const;
 
 export const SR5VisionModePriority = [
     'astralPerception',
     'thermographic',
     'lowlight',
-    'augmentedReality',
-    'ultrasound',
+    'matrix',
     'basic',
 ] as const;
 
@@ -23,11 +21,11 @@ export const SR5VisionModeLabelKeys: Record<(typeof SR5VisionModes)[number], str
     astralPerception: 'SR5.Vision.AstralPerception',
     thermographic: 'SR5.Vision.ThermographicVision',
     lowlight: 'SR5.Vision.LowLight',
-    augmentedReality: 'SR5.Vision.AugmentedReality',
-    ultrasound: 'SR5.Vision.Ultrasound',
+    matrix: 'SR5.Vision.Matrix',
 };
 
 export type SR5VisionModeId = (typeof SR5VisionModes)[number];
+export type SR5PerceptionPlane = 'physical' | 'astral' | 'matrix';
 
 type DocumentWithFlags = {
     getFlag(scope: string, key: string): unknown;
@@ -79,3 +77,53 @@ export const isVisionSourceMode = (
     visionSource: Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>[0],
     modeId: SR5VisionModeId,
 ) => resolveVisionSourceMode(visionSource) === modeId;
+
+export const resolveVisionSourcePlane = (
+    visionSource: Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>[0],
+): SR5PerceptionPlane => {
+    const mode = resolveVisionSourceMode(visionSource);
+    if (mode === 'astralPerception') {
+        return 'astral';
+    }
+
+    if (mode === 'matrix') {
+        return 'matrix';
+    }
+
+    return 'physical';
+};
+
+type TokenVisibilityChecks = {
+    astral?: {
+        hasAura?: boolean;
+        astralActive?: boolean;
+        affectedBySpell?: boolean;
+    };
+    matrix?: {
+        hasIcon?: boolean;
+    };
+};
+
+export const hasTargetPresenceOnPlane = (
+    target: Parameters<foundry.canvas.perception.DetectionMode['_canDetect']>[1],
+    plane: SR5PerceptionPlane,
+) => {
+    const tokenDocument = target?.document instanceof TokenDocument ? target.document : null;
+    if (!tokenDocument) {
+        return false;
+    }
+
+    const visibilityChecks = tokenDocument.actor?.system?.visibilityChecks as TokenVisibilityChecks | undefined;
+
+    if (plane === 'astral') {
+        return !!visibilityChecks?.astral?.hasAura
+            || !!visibilityChecks?.astral?.astralActive
+            || !!visibilityChecks?.astral?.affectedBySpell;
+    }
+
+    if (plane === 'matrix') {
+        return !!visibilityChecks?.matrix?.hasIcon;
+    }
+
+    return true;
+};
