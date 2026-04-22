@@ -88,6 +88,19 @@ export const registerSystemSettings = () => {
         default: true,
     });
 
+    game.settings.register(SYSTEM_NAME, FLAGS.InitiativeModeUpdateStrategy, {
+        name: 'SETTINGS.InitiativeModeUpdateStrategyName',
+        hint: 'SETTINGS.InitiativeModeUpdateStrategyDescription',
+        scope: 'world',
+        config: true,
+        type: String,
+        choices: {
+            delta_dice: 'SETTINGS.InitiativeModeUpdateStrategyDeltaDice',
+            reroll: 'SETTINGS.InitiativeModeUpdateStrategyReroll',
+        },
+        default: 'delta_dice',
+    });
+
     game.settings.register(SYSTEM_NAME, FLAGS.TokenHealthBars, {
         name: 'SETTINGS.TokenHealthBars',
         hint: 'SETTINGS.TokenHealthBarsDescription',
@@ -168,11 +181,11 @@ export const registerSystemSettings = () => {
     });
 
     /**
-     * Control automatic or manual casting of dice in any success test.
+     * Control if the Modify Roll section starts collapsed by default in test dialogs.
      */
-    game.settings.register(SYSTEM_NAME, FLAGS.ManualRollOnSuccessTest, {
-        name: 'SETTINGS.ManualRollOnSuccessTest',
-        hint: 'SETTINGS.ManualRollOnSuccessTestDescription',
+    game.settings.register(SYSTEM_NAME, FLAGS.CollapseModifyRollByDefault, {
+        name: 'SETTINGS.CollapseModifyRollByDefault',
+        hint: 'SETTINGS.CollapseModifyRollByDefaultDescription',
         scope: 'client',
         config: true,
         type: Boolean,
@@ -239,6 +252,15 @@ export const registerSystemSettings = () => {
         config: true,
         type: Boolean,
         default: true
+    });
+
+    game.settings.register(SYSTEM_NAME, FLAGS.TokenAutoRunning, {
+        name: 'SETTINGS.TokenAutoRunning',
+        hint: 'SETTINGS.TokenAutoRunningDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true,
     });
 
     /**

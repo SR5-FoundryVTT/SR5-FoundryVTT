@@ -25,6 +25,7 @@ import { shadowrunDriver } from './sr5.Driver.spec';
 import { shadowrunNPC } from './sr5.NPC.spec';
 import { shadowrunVisionModes } from './sr5.Vision.spec';
 import { shadowrunVisionEnvironment } from './sr5.VisionEnvironment.spec';
+import { shadowrunCombatModifierFlow } from './sr5.CombatModifierFlow.spec';
 
 import { Quench } from '@ethaks/fvtt-quench';
 import { shadowrunRiggerTesting } from '@/unittests/sr5.RiggerTesting.spec';
@@ -93,6 +94,9 @@ export const quenchRegister = (quench: Quench) => {
     quench.registerBatch('shadowrun5e.flow.driver', shadowrunDriver, {
         displayName: 'SHADOWRUN5e: Driver Flow Test',
     })
+    quench.registerBatch('shadowrun5e.flow.combat_modifiers', shadowrunCombatModifierFlow, {
+        displayName: 'SHADOWRUN5e: CombatModifierFlow Test',
+    });
     quench.registerBatch('shadowrun5e.flow.rigger', shadowrunRiggerTesting, {
         displayName: 'SHADOWRUN5e: Rigger Flow Testing',
     })

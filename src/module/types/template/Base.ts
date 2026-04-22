@@ -1,6 +1,6 @@
 import { SR5 } from '@/module/config';
 
-const { SchemaField, NumberField, ArrayField, StringField } = foundry.data.fields;
+const { ArrayField, BooleanField, DocumentUUIDField, NumberField, SchemaField, StringField } = foundry.data.fields;
 
 export const PhysicalAttribute = new StringField({
     choices: SR5.physicalAttributes,
@@ -28,32 +28,32 @@ export const ValueMaxPair = () => ({
     max: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
 });
 
-export const ModListEntry = () => ({
+/**
+ * Expansion of Foundry's ActiveEffect.ChangeData.
+ * The 'key' is implied by the field this is attached to, while 'mode'
+ * and 'priority' follow standard CONST.ACTIVE_EFFECT_MODES behavior.
+ */
+const ChangeEntry = () => ({
     name: new StringField({ required: true }),
+    mode: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     value: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+    priority: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+    effectUuid: new DocumentUUIDField({ required: true, nullable: true }),
+
+    // For ease of use, we track whether a change is currently enabled or has been invalidated by another change.
+    enabled: new BooleanField({ initial: true }),
+    invalidated: new BooleanField({ initial: false }),
 });
 
-export const OverrideModEntry = () => ({
-    ...ModListEntry(),
-});
+export const ChangeList = () => new ArrayField(new SchemaField(ChangeEntry()));
 
-export const ModList = () => new ArrayField(new SchemaField(ModListEntry()));
-
-export const ModifiableValue = () => ({
+export const ModifiableValueSchema = () => ({
     ...BaseValuePair(),
-    mod: ModList(),
-    mode: new StringField({
-        required: true,
-        nullable: true,
-        choices: ['override', 'upgrade', 'downgrade']
-    }),
-    override: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
-    downgrade: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
-    upgrade: new SchemaField(OverrideModEntry(), { required: false, nullable: true, initial: null }),
+    changes: new ArrayField(new SchemaField(ChangeEntry())),
 });
 
 export const ModifiableValueLinked = () => ({
-    ...ModifiableValue(),
+    ...ModifiableValueSchema(),
     attribute: new StringField({ required: true }),
     base_formula_operator: new StringField({
         required: false,
@@ -63,12 +63,12 @@ export const ModifiableValueLinked = () => ({
 });
 
 export const ValueField = () => ({
-    ...ModifiableValue(),
+    ...ModifiableValueSchema(),
     label: new StringField({ required: true }),
     manualMod: new StringField({ required: true }),
 });
 
 export type ValueFieldType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ValueField>>;
 export type BaseValuePairType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof BaseValuePair>>;
-export type ModifiableValueType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ModifiableValue>>;
+export type ModifiableValueType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ModifiableValueSchema>>;
 export type ModifiableValueLinkedType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ModifiableValueLinked>>;

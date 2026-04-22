@@ -15,6 +15,8 @@
         "AutomateProgressiveRecoilDescription": "Characters accrue progressive recoil until reset",
         "CompendiumBrowserBlacklist": "Compendium Browser Blacklist",
         "CompendiumBrowserBlacklistDescription": "List of compendiums to hide from the compendium browser",
+        "CollapseModifyRollByDefault": "Collapse Modify Roll by default",
+        "CollapseModifyRollByDefaultDescription": "If enabled, the Modify Roll section starts collapsed when opening a test dialog.",
         "DefaultOpposedTestActorSelection": "Overwrite opposed test token selections",
         "DefaultOpposedTestActorSelectionDescription": "Always overwrite selected tokens with targets used for testing",
         "DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
@@ -30,11 +32,13 @@
         "FreshIcon": "Highlight with Icon Only",
         "HideGMOnlyChatContent": "Hide critical information on GM test",
         "HideGMOnlyChatContentDescription": "GM test messages will only show all information to players that own the used actor",
+        "InitiativeModeUpdateStrategyName": "Initiative Mode Update Strategy",
+        "InitiativeModeUpdateStrategyDescription": "How initiative is updated when switching initiative mode in combat",
+        "InitiativeModeUpdateStrategyDeltaDice": "Delta Dice (roll difference)",
+        "InitiativeModeUpdateStrategyReroll": "Full Reroll",
         "IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",
         "ImportIconFolderDescription": "The folder where the importer can find icon files. Default location: 'systems/shadowrun5e/dist/icons/importer/'",
         "ImportIconFolderName": "Importer Icon Folder",
-        "ManualRollOnSuccessTest": "Manual dice roll on any test",
-        "ManualRollOnSuccessTestDescription": "Allow user to manually roll dice on tests and report back hits",
         "MarkImportsDescription": "Denote freshly imported items on actor sheets to highlight that they should be reviewed",
         "MarkImportsName": "Mark Fresh Imports",
         "MustHaveRessourcesOnTest": "Stop Tests with missing resources",
@@ -50,6 +54,8 @@
         "ShowSkillsWithDetailsDescription": "When set skill list display will mirror core rulebook style (italics, short attributes)",
         "ShowTokenNameForChatOutputDescription": "Should the token name be used for roll card output instead of the actor name when available",
         "ShowTokenNameForChatOutputName": "Use Token Name for Roll Card",
+        "TokenAutoRunning": "Auto-Detect Running Movement",
+        "TokenAutoRunningDescription": "Automatically switch token movement mode to running when measured distance exceeds walking speed",
         "TokenHealthBars": "Token health bars",
         "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring",
         "TokenRulerColorRunning": "Token Movement Running Color",
@@ -549,10 +555,31 @@
         "Bullet": "Round",
         "BulletCount": "Bullet Count",
         "Bullets": "Rounds",
+        "BuyHits": "Buy Hits",
         "COMBAT": {
+            "CannotSeizeAgain": "You cannot seize initiative again until the start of your next turn.",
+            "ModeAstral": "Astral",
+            "ModeChangedLabel": "Initiative Mode Updated",
+            "ModeChangeNewInitiative": "New initiative",
+            "ModeChangePreviousInitiative": "Previous initiative",
+            "ModeMatrix": "Matrix",
+            "ModeMeatspace": "Meatspace",
+            "ModeTitle": "Mode: {mode}",
+            "ModeUnknown": "Unknown",
+            "NextPass": "Next Pass",
+            "NextPhase": "Next Phase",
+            "NextTurn": "Next Turn",
+            "NoHistoryAvailable": "No combat history snapshot is available.",
+            "PreviousPass": "Previous Pass",
+            "PreviousPhase": "Previous Phase",
+            "PreviousTurn": "Previous Turn",
             "ReduceInitByFive": "Initiative -5",
             "ReduceInitByOne": "Initiative -1",
-            "ReduceInitByTen": "Initiative -10"
+            "ReduceInitByTen": "Initiative -10",
+            "SeizeInitiative": "Seize Initiative",
+            "SeizedInitiative": "Seized Initiative",
+            "ToggleActedStatusGMOnly": "Toggle Acted Status (GM Only)",
+            "TrackerTitle": "Turn {round} (Pass {pass})"
         },
         "CallInAction": {
             "ActorType": "Actor Type",
@@ -1741,9 +1768,8 @@
             "WarningTitle": "Alert"
         },
         "Magic": "Magic",
-        "ManualGlitches": "Man. Glitches",
-        "ManualHits": "Man. Hits",
-        "ManualOverride": "Manual Override",
+        "Manual": "Manual",
+        "ManualOverride": "Result Override",
         "MarkImportedItemReviewed": "Mark Imported Item Reviewed",
         "MarkImportedItemTooltip": "Marks this imported item as having been reviewed.",
         "MarkImportsReviewed": "Mark Imports Reviewed",
@@ -1796,6 +1822,7 @@
             "SomeAmmo": "Not enough ammunition to fire in selected mode, mode modifiers will be reduced.",
             "SomeAmmoMelee": "Not enough ammunition left to make a melee attack"
         },
+        "ModifyRoll": "Modify Roll",
         "ModPoints": "Mod Points",
         "Modification": {
             "FIELDS": {
@@ -2056,6 +2083,9 @@
         },
         "Resist": "Resist",
         "RestoreDefaultSkills": "Restore Default Skills",
+        "ResultOverrideGlitches": "Glitches",
+        "ResultOverrideHits": "Hits",
+        "ResultOverride": "Result Override",
         "RightClickToClear": "Right Click to Clear",
         "Ritual": {
             "FIELDS": {
@@ -2492,6 +2522,10 @@
             },
             "Type": "Type"
         },
+        "StatusEffects": {
+            "Running": "Running",
+            "Sprinting": "Sprinting"
+        },
         "Stock": "Stock",
         "StreetCred": "Street Cred",
         "StunTrack": "Stun Track",
@@ -2620,6 +2654,7 @@
             "ThrownAttackTest": "Thrown Weapon Attack"
         },
         "Threshold": "Threshold",
+        "ToggleBreakdown": "Toggle Breakdown",
         "ToggleActive": "Toggle Active",
         "ToggleEquip": "Toggle Equipped",
         "ToggleWireless": "Toggle Wireless",
@@ -2673,6 +2708,7 @@
                 "DocumentEffects": "Effects directly on this document",
                 "EditEffect": "Edit Effect",
                 "ItemEffects": "Effects collected from items on this document",
+                "HelpLinkEnglishOnly": "Help (External link, English only)",
                 "OnlyAllFilteredUsed": "This effect will only apply for tests matching all selections",
                 "OnlyFilteredUsed": "This effect will only apply for tests matching at least one selection",
                 "OnlyForItemTest": "Only affect test of parent item",
@@ -2718,13 +2754,14 @@
                 "SpiritType": "Type of the summoned spirit"
             },
             "Test": {
+                "BuyHits": "Do not roll dice. Buy hits using ⌊dice pool / 4⌋.",
                 "Extended": "Test will be thrown as an extended test until threshold is reached",
                 "Limit": "Calculated limit value",
-                "ManualGlitches": "Amount of glitches from manually thrown dice pool. Must be used together with manual hits.",
-                "ManualHits": "Amount of hits from manually thrown dice pool. Will skip FoundryVTT dice throw.",
                 "Modifier": "Sum of all modifiers applied to dice pool",
                 "Pool": "Amount of dice to roll",
                 "PushTheLimit": "Apply push the limit edge rules",
+                "ResultOverrideGlitches": "Override glitches for this test result.",
+                "ResultOverrideHits": "Override hits for this test result.",
                 "RollMode": "FoundryVTT chat message roll visibility",
                 "Threshold": "Calculated threshold value"
             },
@@ -2847,6 +2884,7 @@
             "CantSecondChanceAGlitch": "Can't second chance this test. Test result is glitched.",
             "CantSecondChanceWithoutNoneHits": "Can't second chance this test. Only hit-dice left.",
             "CantSpendMulitplePointsOfEdge": "Can't spend multiple points of edge on one test or action",
+            "CantCombineBuyHitsWithEdge": "Buy Hits can't be combined with Second Chance.",
             "CompilationNotConcluded": "Compilation incomplete. Wait for sprite to oppose compilation to determine fade.",
             "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge points can't be spent on tests without actors",
             "HostItemOnlyAcceptIC": "Only IC actors can be added to hosts",

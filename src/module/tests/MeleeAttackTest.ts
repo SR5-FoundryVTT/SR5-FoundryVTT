@@ -1,6 +1,8 @@
 import { SuccessTest, SuccessTestData } from "./SuccessTest";
 import { DataDefaults } from "../data/DataDefaults";
 import { SR5Actor } from "../actor/SR5Actor";
+import { ModifiableValue } from "../mods/ModifiableValue";
+import { CombatModifierFlow } from "../actor/flows/CombatModifierFlow";
 import ModifierTypes = Shadowrun.ModifierTypes;
 
 export interface MeleeAttackData extends SuccessTestData {
@@ -68,6 +70,19 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
         const value = modifiers.environmental.total;
 
         return { name, value };
+    }
+
+    override prepareTestModifiers() {
+        super.prepareTestModifiers();
+
+        if (!this.actor) return;
+
+        ModifiableValue.remove(this.data.pool, 'Charging');
+
+        const modifier = CombatModifierFlow.getChargerModifier(this.actor);
+        if (!modifier) return;
+
+        ModifiableValue.setUnique(this.data.pool, modifier.name, modifier.value);
     }
 
     /**

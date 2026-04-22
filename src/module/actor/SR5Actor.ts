@@ -1,7 +1,7 @@
 import { Helpers } from '../helpers';
 import { SR5Item } from '../item/SR5Item';
 import { FLAGS, SKILL_DEFAULT_NAME, SR, SYSTEM_NAME } from '../constants';
-import { PartsList } from '../parts/PartsList';
+import { ModifiableValue } from '../mods/ModifiableValue';
 import { DataDefaults } from '../data/DataDefaults';
 import { SkillFlow } from "./flows/SkillFlow";
 import { SR5 } from "../config";
@@ -23,7 +23,6 @@ import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
 import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
-import AEChangeData = ActiveEffect.ChangeData;
 import { ActionRollType, DamageType } from '../types/item/Action';
 import { AttributeFieldType, AttributesType, EdgeAttributeFieldType } from '../types/template/Attributes';
 import { LimitFieldType } from '../types/template/Limits';
@@ -50,6 +49,7 @@ import { MatrixRules } from '@/module/rules/MatrixRules';
 import { StorageFlow } from '@/module/flows/StorageFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 import { LinksHelpers } from '@/module/utils/links';
+import type { InitiativeModeOptions } from '../combat/SR5Combatant';
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -280,92 +280,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     /**
-     * NOTE: This method is unused at the moment, keep it for future inspiration.
-     */
-    applyOverrideActiveEffects() {
-        const changes = this.effects.reduce((changes: AEChangeData[], effect) => {
-            if (effect.disabled) return changes;
-
-            // include changes partially matching given keys.
-            const overrideChanges = effect.changes
-                .filter(change => change.mode === CONST.ACTIVE_EFFECT_MODES.OVERRIDE)
-                .map(origChange => {
-                    const change: AEChangeData = {
-                        key: String(origChange.key),
-                        value: String(origChange.value),
-                        mode: Number(origChange.mode) as CONST.ACTIVE_EFFECT_MODES,
-                        priority: Number(origChange.priority ?? (Number(origChange.mode) * 10)),
-                        effect: effect,
-                    };
-                    return change;
-                });
-            return changes.concat(overrideChanges);
-        }, []);
-        // Sort changes according to priority, in case it's ever needed.
-        changes.sort((a, b) => a.priority! - b.priority!);
-
-        for (const change of changes) {
-            change.effect.apply(this, change);
-        }
-    }
-
-    /**
-     * A helper method to only apply a subset of keys instead of all.
-     * @param partialKeys Can either be complete keys or partial keys
-     */
-    _applySomeActiveEffects(partialKeys: string[]) {
-        const changes = this._reduceEffectChangesByKeys(partialKeys);
-        this._applyActiveEffectChanges(changes);
-    }
-
-
-    /**
-     * A helper method to apply a active effect changes collection (which might come from multiple active effects)
-     * @param changes
-     */
-    _applyActiveEffectChanges(changes: AEChangeData[]) {
-        const overrides = {};
-
-        for (const change of changes) {
-            const result = change.effect.apply(this, change);
-            if (result !== null) overrides[change.key] = result;
-        }
-
-        this.overrides = {...this.overrides, ...foundry.utils.expandObject(overrides)};
-    }
-
-    /**
-     * Reduce all changes across multiple active effects that match the given set of partial keys
-     * @param partialKeys Can either be complete keys or partial keys
-     */
-    _reduceEffectChangesByKeys(partialKeys: string[]): AEChangeData[] {
-        // Collect only those changes matching the given partial keys.
-        const changes = this.effects.reduce((changes: AEChangeData[], effect) => {
-            if (effect.disabled) return changes;
-
-            // include changes partially matching given keys.
-            const overrideChanges = effect.changes
-                .filter(change => partialKeys.some(partialKey => change.key.includes(partialKey)))
-                .map(origChange => {
-                    const change: AEChangeData = {
-                        key: String(origChange.key),
-                        value: String(origChange.value),
-                        mode: Number(origChange.mode) as CONST.ACTIVE_EFFECT_MODES,
-                        priority: Number(origChange.priority ?? (Number(origChange.mode) * 10)),
-                        effect: effect
-                    };
-                    return change;
-                });
-
-            return changes.concat(overrideChanges);
-        }, []);
-        // Sort changes according to priority, in case it's ever needed.
-        changes.sort((a, b) => a.priority! - b.priority!);
-
-        return changes;
-    }
-
-    /**
      * Some actors have skills, some don't. While others don't have skills but derive skill values from their ratings.
      */
     findActiveSkill(skillName?: string): SkillFieldType | undefined {
@@ -442,21 +356,21 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // Prepare damage to apply to armor.
         damage = damage || DataDefaults.createData('damage');
 
-        Helpers.calcTotal(damage);
-        Helpers.calcTotal(damage.ap);
+        ModifiableValue.calcTotal(damage);
+        ModifiableValue.calcTotal(damage.ap);
 
         // Modify by penetration
         if (damage.ap.value !== 0)
-            PartsList.AddUniquePart(armor.mod, 'SR5.AP', damage.ap.value);
+            ModifiableValue.addUnique(armor, 'SR5.AP', damage.ap.value);
 
         // Modify by element
         if (damage.element.value !== '') {
             const armorForDamageElement = armor[damage.element.value] || 0;
             if (armorForDamageElement > 0)
-                PartsList.AddUniquePart(armor.mod, 'SR5.Element', armorForDamageElement);
+                ModifiableValue.addUnique(armor, 'SR5.Element', armorForDamageElement);
         }
 
-        Helpers.calcTotal(armor, {min: 0});
+        ModifiableValue.calcTotal(armor, {min: 0});
 
         return armor;
     }
@@ -1130,14 +1044,12 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const test = new testCls(TestCreator._minimalTestData(), { actor: this }, { showDialog });
 
         // Build pool values.
-        const pool = new PartsList<number>(test.pool.mod);
-        pool.addPart('SR5.Labels.ActorSheet.DeviceRating', rating);
-        pool.addPart('SR5.Labels.ActorSheet.DeviceRating', rating);
-
+        const pool = new ModifiableValue(test.pool);
+        pool.add('SR5.Labels.ActorSheet.DeviceRating', rating);
+        pool.add('SR5.Labels.ActorSheet.DeviceRating', rating);
 
         // Build modifiers values.
-        const mods = new PartsList<number>(test.data.modifiers.mod);
-        mods.addUniquePart('SR5.ModifierTypes.Global', this.modifiers.totalFor('global'));
+        ModifiableValue.setUnique(test.data.pool, 'SR5.ModifierTypes.Global', this.modifiers.totalFor('global'));
 
         return test.execute();
     }
@@ -1337,10 +1249,15 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const action = this.skillActionData(skillId, options);
         if (!action) return;
         if (!teamworkData.criticalGlitch) {
-            action.limit.mod.push({ name: "Teamwork", value: teamworkData.additionalLimit })
+            ModifiableValue.addBase(action.limit, 'Teamwork', teamworkData.additionalLimit);
         }
 
-        action.dice_pool_mod.push({ name: "Teamwork", value: teamworkData.additionalDice })
+        action.dice_pool_mod.push({
+            name: "Teamwork", effectUuid: null,
+            value: teamworkData.additionalDice,
+            mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+            priority: 0, enabled: true, invalidated: false,
+        });
 
         const showDialog = this.tests.shouldShowDialog(options.event);
         const test = await this.tests.fromAction(action, this, {showDialog});
@@ -1363,14 +1280,14 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param parts The Value.mod field as a PartsList
      * @param atts The attributes used for the success test.
      */
-    _addMatrixParts(this: SR5Actor, parts: PartsList<number>, atts) {
+    _addMatrixParts(this: SR5Actor, parts: ModifiableValue, atts: string | string[]) {
         if (Helpers.isMatrix(atts)) {
             if (!this.system.matrix) return;
 
             // Apply general matrix modifiers based on commlink/cyberdeck status.
             const matrix = this.system.matrix;
-            if (matrix.hot_sim) parts.addUniquePart('SR5.HotSim', 2);
-            if (matrix.running_silent) parts.addUniquePart('SR5.RunningSilent', -2);
+            if (matrix.hot_sim) parts.addUnique('SR5.HotSim', 2);
+            if (matrix.running_silent) parts.addUnique('SR5.RunningSilent', -2);
         }
     }
 
@@ -1379,8 +1296,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *
      * @param parts A Value.mod field as a PartsList
      */
-    _removeMatrixParts(parts: PartsList<number>) {
-        ['SR5.HotSim', 'SR5.RunningSilent'].forEach(part => parts.removePart(part));
+    _removeMatrixParts(parts: ModifiableValue) {
+        ['SR5.HotSim', 'SR5.RunningSilent'].forEach(part => parts.remove(part));
     }
 
     /**
@@ -1527,7 +1444,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const iniAdjustment = CombatRules.initiativeScoreWoundAdjustment(woundsBefore, woundsAfter);
 
         // Only actors that can have a wound modifier, will have a delta.
-        if (iniAdjustment < 0 && game.combat) await game.combat.adjustActorInitiative(this, iniAdjustment);
+        if (iniAdjustment < 0 && game.combat)
+            await game.combat.adjustActorInitiative(this, iniAdjustment);
     }
 
     /**
@@ -1634,6 +1552,14 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     /**
+     * Get a set of all status effect IDs currently applied to this actor.
+     * This collects all unique status IDs from the actor's active effects.
+     */
+    getStatusEffectsId() {
+        return new Set([...(this.effects ?? [])].flatMap(e => [...e.statuses]));
+    }
+
+    /**
      * Depending on this actors defeated status, apply the correct effect and status.
      *
      * This will only work when the actor is connected to a token.
@@ -1654,9 +1580,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         // Apply the appropriate combatant status.
         if (defeated.unconscious || defeated.dying || defeated.dead) {
-            await this.combatant?.update({ defeated: true });
+            await Promise.all(this.combatants.map(async c => c.update({ defeated: true })));
         } else {
-            await this.combatant?.update({ defeated: false });
+            await Promise.all(this.combatants.map(async c => c.update({ defeated: false })));
             return;
         }
         const newStatus = defeated.dead ? 'dead' : 'unconscious';
@@ -1667,7 +1593,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             return;
 
         // Set effect as active, as we've already made sure it isn't.
-        await token.object?.toggleEffect(effect, { overlay: true, active: true });
+        await this.toggleStatusEffect(newStatus, { overlay: true, active: true });
     }
 
     /**
@@ -1700,8 +1626,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         const modified = foundry.utils.duplicate(this.getArmor()) as ActorArmorType;
         if (modified) {
-            modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.DV', damage.ap.value);
-            modified.value = Helpers.calcTotal(modified, { min: 0 });
+            const mod = new ModifiableValue(modified);
+            mod.addUnique('SR5.DV', damage.ap.value);
+            mod.calcTotal({ min: 0 });
         }
 
         return modified;
@@ -1730,7 +1657,33 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             ui.notifications?.warn('SR5.MissingRessource.Initiative', {localize: true});
         }
 
-        await combat.adjustInitiative(combatant, modifier);
+        await combatant.adjustInitiative(modifier);
+    }
+
+    async setInitiativeMode(mode: InitiativeModeOptions): Promise<void> {
+        if (!this.isType('character', 'spirit')) return;
+
+        const currentPerception = this.system.initiative.perception;
+        const fromMode = currentPerception !== 'matrix' ? currentPerception
+            : (this.system.matrix?.hot_sim ? 'hot_sim' : 'cold_sim');
+
+        if (fromMode === mode) return;
+
+        const isMatrixMode = mode === 'cold_sim' || mode === 'hot_sim';
+        const updateData = {
+            system: {
+                initiative: { perception: isMatrixMode ? 'matrix' : mode },
+                ...(isMatrixMode && { matrix: { hot_sim: mode === 'hot_sim' } }),
+            },
+        } as const;
+
+        await this.update(updateData);
+
+        if (!this.inCombat) return;
+
+        await Promise.all(
+            this.combatants.map(async combatant => await combatant.applyModeChange(fromMode, mode))
+        );
     }
 
     /**
@@ -1740,13 +1693,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     get combatActive(): boolean {
         if (!game.combat) return false;
-        const combatant = game.combat.getActorCombatant(this);
-        return !!(combatant && typeof combatant.initiative === "number");
+        const combatants = game.combat.getCombatantsByActor(this);
+        return combatants.length > 0 && combatants.some(c => c.initiative != null);
     }
 
-    get combatant() {
-        if (!this.combatActive || !game.combat) return null;
-        return game.combat.getActorCombatant(this);
+    get combatants() {
+        if (!this.combatActive) return [];
+        return game.combat!.getCombatantsByActor(this);
     }
 
     /**
@@ -1839,7 +1792,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     getControlRigRating(): number {
         if (!this.isType('character')) return 0;
-        return Helpers.calcTotal(this.system.values.control_rig_rating);
+        return ModifiableValue.calcTotal(this.system.values.control_rig_rating);
     }
 
     /**

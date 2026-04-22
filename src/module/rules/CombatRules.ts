@@ -1,5 +1,5 @@
 import {SR} from "../constants";
-import {PartsList} from "../parts/PartsList";
+import {ModifiableValue} from "../mods/ModifiableValue";
 import {Helpers} from "../helpers";
 import {SoakRules} from "./SoakRules";
 import {SR5Actor} from "../actor/SR5Actor";
@@ -7,52 +7,16 @@ import { DamageType } from "../types/item/Action";
 import { ValueFieldType } from "../types/template/Base";
 
 export class CombatRules {
-    static iniOrderCanDoAnotherPass(scores: number[]): boolean {
-        for (const score of scores) {
-            if (CombatRules.iniScoreCanDoAnotherPass(score)) return true;
-        }
-        return false;
-    }
-    /**
-     * Check if there is another initiative pass possible with the given score.
-     * @param score
-     * @return true means another initiative pass is possible
-     */
-    static iniScoreCanDoAnotherPass(score: number): boolean {
-        return CombatRules.reduceIniResultAfterPass(score) > 0;
-    }
     /**
      * Reduce the given initiative score according to @PDF SR5#159
-     * @param score This given score can't be reduced under zero.
+     * @param score The initiative score to be reduced
      */
-    static reduceIniResultAfterPass(score: number): number {
-        return Math.max(score + SR.combat.INI_RESULT_MOD_AFTER_INI_PASS, 0);
-    }
-
-    /**
-     * Reduce the initiative score according to the current initiative pass @PDF SR5#160.
-     * @param score
-     * @param pass The current initiative pass. Each combat round starts at the initiative pass of 1.
-     */
-    static reduceIniOnLateSpawn(score: number, pass: number): number {
-        // Assure valid score ranges.
-        // Shift initiative pass value range from min 1 to min 0 for multiplication.
-        pass = Math.max(pass - 1, 0);
-        score = Math.max(score, 0);
-
-        // Reduce the new score according to. NOTE: Modifier is negative
-        const reducedScore = score + pass * SR.combat.INI_RESULT_MOD_AFTER_INI_PASS;
-        return CombatRules.getValidInitiativeScore(reducedScore);
-    }
-
-    /**
-     * Return a valid initiative score on updates or score changes
-     *
-     * @param score The initiative score after it's been updated.
-     * @returns A valid initiative score
-     */
-    static getValidInitiativeScore(score: number): number {
-        return Math.max(score, 0);
+    static initAfterPass(score: null): null;
+    static initAfterPass(score: number): number;
+    static initAfterPass(score: number | null): number | null;
+    static initAfterPass(score: number | null): number | null {
+        if (score === null) return null;
+        return score + SR.combat.PASS_PENALTY;
     }
 
     /**
@@ -111,9 +75,10 @@ export class CombatRules {
         if (defenderHits < 0) defenderHits = 0;
 
         // SR5#173  Step3: Defend B.
-        PartsList.AddUniquePart(modified.mod, 'SR5.Attacker', attackerHits);
-        PartsList.AddUniquePart(modified.mod, 'SR5.Defender', -defenderHits);
-        modified.value = Helpers.calcTotal(modified, {min: 0});
+        const mod = new ModifiableValue(modified);
+        mod.addUnique('SR5.Attacker', attackerHits);
+        mod.addUnique('SR5.Defender', -defenderHits);
+        ModifiableValue.calcTotal(modified, { min: 0 });
 
         // SR5#173 Step 3: Defend B.
         modified = CombatRules.modifyDamageTypeAfterHit(modified, defender);
@@ -191,7 +156,7 @@ export class CombatRules {
     }
 
     /**
-     * Modify damage according to combat sequence (SR5#173 part defend. Missing attack.
+     * Modify damage according to combat sequence SR5#173 part defend. Missing attack.
      * @param damage Incoming damage to be modified
      * @param isHitWithNoDamage Optional parameter used for physical defense tests when attack hits but will deal no damage
      * @return A new damage object for modified damage.
@@ -200,10 +165,14 @@ export class CombatRules {
         const modifiedDamage = foundry.utils.duplicate(damage) as DamageType;
 
         // Keep base and modification intact, only overwriting the result.
-        modifiedDamage.override = {name: 'SR5.TestResults.Success', value: 0};
-        Helpers.calcTotal(modifiedDamage, {min: 0});
-        modifiedDamage.ap.override = {name: 'SR5.TestResults.Success', value: 0};
-        Helpers.calcTotal(modifiedDamage.ap);
+        ModifiableValue.add(
+            modifiedDamage, 'SR5.TestResults.Success', 0, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, ModifiableValue.TOP_PRIORITY
+        );
+        ModifiableValue.calcTotal(modifiedDamage, { min: 0 });
+        ModifiableValue.add(
+            modifiedDamage.ap, 'SR5.TestResults.Success', 0, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, ModifiableValue.TOP_PRIORITY
+        );
+        ModifiableValue.calcTotal(modifiedDamage.ap);
         modifiedDamage.type.value = 'physical';
 
         // If attack hits but deals no damage, keep the element of the attack for any side effects.
@@ -225,10 +194,8 @@ export class CombatRules {
     static modifyDamageAfterResist(actor: SR5Actor, damage: DamageType, hits: number): DamageType {
         if (hits < 0) hits = 0;
 
-        // modifiedDamage.mod = PartsList.AddUniquePart(modifiedDamage.mod, 'SR5.Resist', -hits);
         const { modified } = SoakRules.reduceDamage(actor, damage, hits);
-
-        Helpers.calcTotal(modified, {min: 0});
+        ModifiableValue.calcTotal(modified, { min: 0 });
 
         return modified;
     }
@@ -247,8 +214,8 @@ export class CombatRules {
         if (damage.ap.value <= 0) return modifiedArmor;
 
         console.error('Check if ap is a negative value or positive value during weapon item configuration');
-        PartsList.AddUniquePart(modifiedArmor.mod, 'SR5.AP', damage.ap.value);
-        modifiedArmor.value = Helpers.calcTotal(modifiedArmor, {min: 0});
+        ModifiableValue.addUnique(modifiedArmor, 'SR5.AP', damage.ap.value);
+        modifiedArmor.value = ModifiableValue.calcTotal(modifiedArmor, {min: 0});
 
         return modifiedArmor;
     }
@@ -275,20 +242,6 @@ export class CombatRules {
 
         updatedDamage = SoakRules.modifyPhysicalDamageForArmor(updatedDamage, actor);
         return SoakRules.modifyMatrixDamageForBiofeedback(updatedDamage, actor);
-    }
-
-    /**
-     * Determine the amount of initiative score modifier change.
-     * 
-     * According to SR5#170 'Wound Modifiers'.
-     * 
-     * @param woundModBefore A negative wound modifier, before taking latest damage.
-     * @param woundModAfter A negative wound modifier, after taking latest damage.
-     * @return An to be applied initiative score modifier
-     */
-    static combatInitiativeScoreModifierAfterDamage(woundModBefore: number, woundModAfter: number): number {
-        // Make sure no positive values are passed into.
-        return Math.min(woundModBefore, 0) - Math.min(woundModAfter, 0);
     }
 
     /**

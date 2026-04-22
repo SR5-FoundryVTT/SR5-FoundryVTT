@@ -410,8 +410,8 @@ export const shadowrunVisionModes = (context: QuenchBatchContext) => {
             const modeConfig = createModeConfig('lowlight', null);
             const test = createRangeTest(10, 0);
 
-            const previousWalls = canvas.walls.placeables;
-            const previousTemplates = canvas.templates.placeables;
+            const previousWalls = canvas.walls!.placeables;
+            const previousTemplates = canvas.templates!.placeables;
 
             const astralIgnoredWall = createMockWall([5, -5, 5, 5], {
                 wallType: 'window',
@@ -431,22 +431,29 @@ export const shadowrunVisionModes = (context: QuenchBatchContext) => {
             });
 
             try {
-                canvas.templates.placeables = [];
-
-                canvas.walls.placeables = [astralIgnoredWall] as any;
+                // @ts-expect-error - Need to set placeables for LOS checks
+                canvas.templates!.placeables = [];
+                
+                // @ts-expect-error - Need to set placeables for LOS checks
+                canvas.walls!.placeables = [astralIgnoredWall] as any;
                 assert.isTrue(astralMode._testLOS(astralSource, modeConfig, target, test));
-
-                canvas.walls.placeables = [astralBlockingWall] as any;
+                
+                // @ts-expect-error - Need to set placeables for LOS checks
+                canvas.walls!.placeables = [astralBlockingWall] as any;
                 assert.isFalse(astralMode._testLOS(astralSource, modeConfig, target, test));
-
-                canvas.walls.placeables = [physicalIgnoredWall] as any;
+                
+                // @ts-expect-error - Need to set placeables for LOS checks
+                canvas.walls!.placeables = [physicalIgnoredWall] as any;
                 assert.isTrue(lowlightMode._testLOS(mundaneSource, modeConfig, target, test));
-
-                canvas.walls.placeables = [physicalBlockingWall] as any;
+                
+                // @ts-expect-error - Need to set placeables for LOS checks
+                canvas.walls!.placeables = [physicalBlockingWall] as any;
                 assert.isFalse(lowlightMode._testLOS(mundaneSource, modeConfig, target, test));
             } finally {
-                canvas.walls.placeables = previousWalls;
-                canvas.templates.placeables = previousTemplates;
+                // @ts-expect-error - Need to set placeables for LOS checks
+                canvas.walls!.placeables = previousWalls;
+                // @ts-expect-error - Need to set placeables for LOS checks
+                canvas.templates!.placeables = previousTemplates;
             }
         });
     });

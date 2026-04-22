@@ -1,7 +1,7 @@
 import { DeepPartial } from "fvtt-types/utils";
 import { SR5 } from "../config";
 import { DataDefaults } from "../data/DataDefaults";
-import { PartsList } from "../parts/PartsList";
+import { ModifiableValue } from "../mods/ModifiableValue";
 import { CompilationRules } from "../rules/CompilationRules";
 import { DamageType, MinimalActionType } from "../types/item/Action";
 import { SuccessTest, SuccessTestData, TestOptions } from "./SuccessTest";
@@ -102,10 +102,8 @@ export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
      */
     prepareLimitValue() {
         const level = Number(this.data.level);
-        const label = 'SR5.Level';
-        
-        const limitParts = new PartsList<number>(this.data.limit.mod);
-        limitParts.addUniquePart(label, level);
+
+        ModifiableValue.addUniqueBase(this.data.limit, 'SR5.Level', level);
     }
 
     /**

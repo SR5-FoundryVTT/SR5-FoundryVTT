@@ -1,0 +1,52 @@
+<div
+    class="form-group modifiable-value
+    {{#if (hasModifierChanges data.changes)}}has-modifiers{{/if}}
+    {{#if (includes @root.expandedPaths path)}}expanded{{else}}{{/if}}"
+    data-path="{{path}}"
+>
+    <label data-tooltip="{{tooltip}}">{{localize label}}</label>
+
+    <div class="form-fields">
+        {{#if (hasModifierChanges data.changes)}}
+        <span
+            class="modifier-summary {{modifierSummaryClass data}}"
+            data-tooltip="{{modifierSummaryTooltip data.changes}}"
+        >
+            <span class="summary-total">{{modifierNetTotal data}}</span>
+            <span class="summary-count">{{modifierActiveCount data.changes}}/{{modifierCount data.changes}}</span>
+        </span>
+        {{/if}}
+
+        <input type="number" name="{{path}}" value="{{data.value}}" size="3" maxlength="3" data-dtype="Number"/>
+        <a class="toggle-breakdown {{#unless (hasModifierChanges data.changes)}}disabled{{/unless}}" title="{{localize 'SR5.ToggleBreakdown'}}">
+            <i class="fas fa-chevron-up"></i>
+        </a>
+    </div>
+
+    <ol class="breakdown-list">
+        {{#each data.changes as |change index|}}
+        {{#unless (isBaseChange change)}}
+        <li class="breakdown-entry {{getChangeCSS change}}" data-index="{{index}}">
+            <button
+                type="button"
+                class="modifier-effect-button {{#if change.effectUuid}}has-effect{{else}}no-effect disabled{{/if}}"
+                data-effect-uuid="{{change.effectUuid}}"
+                {{#if change.effectUuid}}
+                data-tooltip="{{localize 'SR5.Tooltips.Effect.EditEffect'}}"
+                aria-label="{{localize 'SR5.Tooltips.Effect.EditEffect'}}"
+                {{/if}}
+                {{#unless change.effectUuid}}disabled{{/unless}}
+            >
+                {{#with (getChangeEffectImage change) as |effectImage|}}
+                <img src="{{effectImage}}" alt="" />
+                {{/with}}
+            </button>
+            <span class="mod-name" data-tooltip="{{getChangeDescription change}}">{{localize change.name}}</span>
+            <span class="mod-value">{{getChangeValue change}}</span>
+
+            <input type="checkbox" name="{{../path}}.changes.{{index}}.enabled" data-dtype="Boolean" {{checked change.enabled}} />
+        </li>
+        {{/unless}}
+        {{/each}}
+    </ol>
+</div>

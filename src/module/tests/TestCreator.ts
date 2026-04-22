@@ -9,7 +9,7 @@ import {
     TestOptions
 } from "./SuccessTest";
 import {DataDefaults} from "../data/DataDefaults";
-import {PartsList} from "../parts/PartsList";
+import {ModifiableValue} from "../mods/ModifiableValue";
 import {SkillRules} from "../rules/SkillRules";
 import {FLAGS, SYSTEM_NAME} from "../constants";
 import {SR5Roll} from "../rolls/SR5Roll";
@@ -359,7 +359,30 @@ export const TestCreator = {
             testCls._getDefaultTestAction()
         );
 
-        return TestCreator._prepareTestDataWithAction(action, actor, data);
+        const testData = TestCreator._prepareTestDataWithAction(action, actor, data);
+        TestCreator._mapItemSpecificLimitBase(item, action, testData);
+
+        return testData;
+    },
+
+    /**
+     * Replace generic numerical base limit values with item specific labels where possible.
+     *
+     * For weapons this maps the base limit value to an Accuracy part to improve code readability.
+     */
+    _mapItemSpecificLimitBase: function(item: SR5Item, action: ActionRollType, data: TestData) {
+        if (!item.isType('weapon')) return;
+
+        const accuracy = Number(action.limit.base);
+        if (!Number.isFinite(accuracy) || accuracy === 0) return;
+
+        const hasAccuracyBasePart = data.limit.changes.some(change =>
+            ModifiableValue.isBaseChange(change) && change.name === 'SR5.Accuracy');
+
+        if (hasAccuracyBasePart) return;
+
+        data.limit.base = 0;
+        ModifiableValue.addUniqueBase(data.limit, 'SR5.Accuracy', accuracy);
     },
 
     /**
@@ -444,7 +467,7 @@ export const TestCreator = {
         // @ts-expect-error Both Success and Opposed Test data is used, though not typed here.
         const rollData = actor.getRollData({againstData: againstData ?? data.following?.against});
 
-        const pool = new PartsList<number>(data.pool.mod);
+        const pool = new ModifiableValue(data.pool);
 
         // Prepare pool values.
         if (action.skill) {
@@ -457,60 +480,58 @@ export const TestCreator = {
             // Custom skills don't have a label, but a name.
             // Legacy skill don't have a name, but have a label.
             // Your mind is like this water, my friend. When it is agitated, it becomes difficult to see. But if you allow it to settle, the answer becomes clear.
-            if (skill) pool.addUniquePart(skill.label || skill.name, SkillRules.level(skill));
+            if (skill) pool.addUniqueBase(skill.label || skill.name, SkillRules.level(skill));
             // TODO: Check if this is actual skill specialization and for a +2 config for it instead of MagicValue.
-            if (action.spec) pool.addUniquePart('SR5.Specialization', SkillRules.SpecializationModifier);
+            if (action.spec) pool.addUniqueBase('SR5.Specialization', SkillRules.SpecializationModifier);
         }
+
         // The first attribute is either used for skill or attribute only tests.
         if (action.attribute) {
             const attribute = actor.getAttribute(action.attribute, { rollData });
             // Don't use addUniquePart as one attribute might be used twice.
-            if (attribute) pool.addPart(attribute.label, attribute.value);
-            // Apply matrix modifiers, when applicable
-            // if (attribute && actor._isMatrixAttribute(action.attribute)) actor._addMatrixParts(pool, true);
+            if (attribute) pool.addBase(attribute.label, attribute.value);
         }
+
         // The second attribute is only used for attribute only tests.
         if (!action.skill && action.attribute2) {
             const attribute = actor.getAttribute(action.attribute2, { rollData });
             // Don't use addUniquePart as one attribute might be used twice.
-            if (attribute) pool.addPart(attribute.label, attribute.value);
-            // Apply matrix modifiers, when applicable
-            // if (attribute && actor._isMatrixAttribute(action.attribute2)) actor._addMatrixParts(pool, true);
+            if (attribute) pool.addBase(attribute.label, attribute.value);
         }
-        
+
         // Include pool modifiers for opposed and resist tests.
         if (action.mod) {
-            data.modifiers.mod = PartsList.AddUniquePart(data.modifiers.mod, 'SR5.DicePoolModifier', action.mod);
+            ModifiableValue.addUnique(data.pool, 'SR5.DicePoolModifier', action.mod);
         }
-        
+
         // Include pool modifiers that have been collected on the action item.
         // These can come from nested items and more.
         if(action.dice_pool_mod) {
-            action.dice_pool_mod.forEach(mod => PartsList.AddUniquePart(data.modifiers.mod, mod.name, mod.value));
+            action.dice_pool_mod.forEach(mod => ModifiableValue.addUnique(data.pool, mod.name, mod.value));
         }
-        
+
         // Add the armor value as a pool modifier, since 'armor' is part of the test description.
         if (action.armor) {
             const armor = actor.getArmor();
-            data.pool.mod = PartsList.AddUniquePart(data.pool.mod,'SR5.Armor.label', armor.value);
+            ModifiableValue.addUniqueBase(data.pool, 'SR5.Armor.label', armor.value);
         }
 
         // Prepare limit values...
         if (action.limit.base) {
-            // TODO: For easier readability this could be mapped to an item specific limit value
-            //       For WeaponItem this would result in 'Precision' to be shown instead of a numerical literal.
             data.limit.base = Number(action.limit.base);
         }
+
         //...add limit modifiers
-        if (action.limit.mod) {
-            action.limit.mod.forEach(mod => PartsList.AddUniquePart(data.limit.mod, mod.name, mod.value));
+        if (action.limit.changes) {
+            action.limit.changes.forEach(change => ModifiableValue.addUnique(data.limit, change.name, change.value, change.mode as any, change.priority));
         }
+
         //...add limit attribute value based on actor.
         if (action.limit.attribute) {
             // Get the limit connected to the defined attribute.
             // NOTE: This might differ from the USED attribute...
             const limit = actor.getLimit(action.limit.attribute);
-            if (limit) data.limit.mod = PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value);
+            if (limit) ModifiableValue.addUniqueBase(data.limit, limit.label, limit.value);
         }
 
         // Prepare threshold values...
@@ -529,7 +550,6 @@ export const TestCreator = {
             data.opposed = action.opposed;
         }
 
-        
         // Prepare test modifiers and possible applicable selections
         const modifiers: Partial<Record<Shadowrun.ModifierTypes, string[]>> = {};
         for (const modifier of data.action.modifiers) {
@@ -556,7 +576,7 @@ export const TestCreator = {
             const label = SR5.modifierTypes[name];
             const options = {applicable};
             const value = actor.modifiers.totalFor(name, options);
-            data.modifiers.mod = PartsList.AddUniquePart(data.modifiers.mod, label, value);
+            ModifiableValue.setUnique(data.pool, label, value);
         }
 
         // Mark test as extended.
@@ -578,16 +598,16 @@ export const TestCreator = {
         // @ts-expect-error Both Success and Opposed Test data is used, though not typed here.
         const rollData = item.getRollData({action, testData: data, againstData: againstData ?? data.following?.against});
 
-        const pool = new PartsList<number>(data.pool.mod);
+        const pool = new ModifiableValue(data.pool);
 
         if (action.attribute) {
             const attribute = item.getAttribute(action.attribute, {rollData});
-            if (attribute) pool.addUniquePart(attribute.label, attribute.value);
+            if (attribute) pool.addUniqueBase(attribute.label, attribute.value);
         }
 
         if (action.attribute2) {
             const attribute = item.getAttribute(action.attribute2, {rollData});
-            if (attribute) pool.addUniquePart(attribute.label, attribute.value);
+            if (attribute) pool.addUniqueBase(attribute.label, attribute.value);
         }
 
         return data;

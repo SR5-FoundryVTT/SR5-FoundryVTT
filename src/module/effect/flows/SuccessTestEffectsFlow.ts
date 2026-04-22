@@ -35,17 +35,14 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         if (this.test.extendedRoll) return;
 
         // Since we're extending EffectChangeData by a effect field only locally, I don't care enough to resolve the typing issue.
-        const changes: any[] = [];
+        const changes: (ActiveEffect.ChangeData & { effect: SR5ActiveEffect; priority: number })[] = [];
 
         for (const effect of this.allApplicableEffects()) {
-            // Organize non-disabled effects by their application priority            
-            if (!effect.active) continue;
-
             if (this._skipEffectForTestLimitations(effect)) continue;
 
             // Collect all changes of effect left.
             changes.push(...effect.changes.map(change => {
-                const c = foundry.utils.deepClone(change) as any;
+                const c = foundry.utils.deepClone(change) as typeof changes[number];
                 // Foundry changes data. references in changes to system. But tests use data.
                 c.key = c.key.replace('system.', 'data.');
                 c.effect = effect;
@@ -61,7 +58,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         // Apply all changes
         for (const change of changes) {
             if (!change.key) continue;
-            change.effect.apply(this.test, change);
+            change.effect.apply(this.test as any, change);
         }
     }
 
@@ -217,7 +214,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * @param effectsData The effects data to be applied;
      */
     async _sendCreateTargetedEffectsSocketMessage(actor: SR5Actor, effectsData: SR5ActiveEffect[]) {
-        await SocketMessage.emitForGM(FLAGS.CreateTargetedEffects, { actorUuid: actor.uuid, effectsData });
+        SocketMessage.emitForGM(FLAGS.CreateTargetedEffects, { actorUuid: actor.uuid, effectsData });
     }
 
     /**
@@ -227,10 +224,8 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * @returns 
      */
     static async _handleCreateTargetedEffectsSocketMessage(message: Shadowrun.SocketMessageData) {
-        if (!Object.hasOwn(message.data, 'actorUuid') && !Object.hasOwn(message.data, 'effectsData')) {
-            console.error(`Shadowrun 5e | ${this.name} Socket Message is missing necessary properties`, message);
-            return;
-        }
+        if (!Object.hasOwn(message.data, 'actorUuid') && !Object.hasOwn(message.data, 'effectsData'))
+            return console.error(`Shadowrun 5e | ${this.name} Socket Message is missing necessary properties`, message);
 
         if (!message.data.effectsData.length) return;
 

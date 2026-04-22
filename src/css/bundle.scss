@@ -2,6 +2,7 @@
 
 // import config first to get all the variables and mixins set
 @use 'config';
+@use 'combat';
 @use 'importer';
 @use 'compendium-browser';
 @use 'item';
@@ -411,11 +412,17 @@ input[type='text'].display {
     }
 }
 /**
-     * Special SR5 hr and select display
-     */
+ * Special SR5 hr and select display
+ */
 .sr5 {
     hr {
-        border-color: variables.$yellow;
+        border: none;
+        height: 0;
+        border-bottom: 1px solid variables.$yellow;
+        
+        margin-left: 0;
+        margin-right: 0;
+        width: 100%;
     }
 
     select.display,

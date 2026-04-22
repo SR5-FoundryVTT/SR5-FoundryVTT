@@ -11,7 +11,7 @@
  *
  */
 export const SYSTEM_NAME = 'shadowrun5e' as const;
-export const SYSTEM_SOCKET = `system.${SYSTEM_NAME}`;
+export const SYSTEM_SOCKET = `system.${SYSTEM_NAME}` as const;
 export const FLAGS = {
     KEY_DATA_VERSION: 'systemMigrationVersion',
     ShowGlitchAnimation: 'showGlitchAnimation',
@@ -19,6 +19,7 @@ export const FLAGS = {
     OnlyAllowRollOnDefaultableSkills: 'onlyAllowRollOnDefaultableSkills',
     ShowSkillsWithDetails: 'showSkillsWithDetails',
     OnlyAutoRollNPCInCombat: 'onlyAutoRollNPCInCombat',
+    InitiativeModeUpdateStrategy: 'InitiativeModeUpdateStrategy',
     MessageCustomRoll: 'customRoll',
     ApplyLimits: 'applyLimits',
     LastRollPromptValue: 'lastRollPromptValue',
@@ -35,9 +36,7 @@ export const FLAGS = {
     TargetsSceneTokenIds: 'targetsSceneTokenIds',
     ChangelogShownForVersion: 'changelogShownForVersion',
     Modifier: 'modifier',
-    DoInitPass: 'doInitPass',
-    DoNextRound: 'doNextRound',
-    DoNewActionPhase: 'doNewActionPhase',
+    DoCombatFunction: 'doCombatFunction',
     addNetworkController: 'addNetworkController',
     SetDataStorage: 'setDataStorage',
     TokenHealthBars: 'tokenHealthBars',
@@ -46,8 +45,8 @@ export const FLAGS = {
     MustHaveRessourcesOnTest: 'MustConsumeRessourcesOnTest',
     AutomateMultiDefenseModifier: 'AutomateMultiDefenseModifier',
     AutomateProgressiveRecoil: 'AutomateProgressiveRecoil',
+    CollapseModifyRollByDefault: 'CollapseModifyRollByDefault',
     TurnsSinceLastAttack: 'turnsSinceLastAttack',
-    ManualRollOnSuccessTest: 'ManualRollOnSuccessTest',
     MarkImports: 'MarkImports',
     ImportIconFolder: 'ImportIconFolder',
     UseImportIconOverrides: 'UseImportIconOverrides',
@@ -80,6 +79,7 @@ export const FLAGS = {
     UpdateDocumentsAsGM: 'UpdateDocumentsAsGM',
     MatrixNetworkMarkInvite: 'MatrixNetworkMarkInvite',
     CompendiaSettingsMenu: 'CompendiaSettingsMenu',
+    TokenAutoRunning: 'TokenAutoRunning',
     CompendiumBrowserBlacklist: 'CompendiumBrowserBlacklist',
     ImporterCompendiumOrder: 'ImporterCompendiumOrder',
     DieFaceLabels: "DieFaceLabels"
@@ -97,14 +97,14 @@ export const LENGTH_UNIT_TO_METERS_MULTIPLIERS = {
     'km': 1000,
     'kilometers': 1000,
     'kilometer': 1000,
-};
+} as const;
 
 export const DEFAULT_ROLL_NAME = 'Roll';
 export const LENGTH_UNIT = 'm';
 export const SKILL_DEFAULT_NAME = '';
 export const DEFAULT_ID_LENGTH = 16;
 
-export const SR5_APPV2_CSS_CLASS = "sr5v2" as const;
+export const SR5_APPV2_CSS_CLASS = "sr5v2";
 
 // Contain data regarding shadowrun rules, mostly whatever is stated in some table to be looked up in other places.
 export const SR = {
@@ -128,9 +128,12 @@ export const SR = {
             }
         },
 
-        INI_RESULT_MOD_AFTER_INI_PASS: -10,
-        INITIAL_INI_PASS: 1,
-        INITIAL_INI_ROUND: 1
+        FIRST_PASS: 1,
+        FIRST_ROUND: 1,
+        PASS_PENALTY: -10,
+        ROUND_TIME_SECONDS: 3,
+        TURN_TIME_SECONDS: 0,
+        MAX_HISTORY_SIZE: 50,
     },
     defense: {
         spell: {
@@ -272,3 +275,25 @@ export const SR = {
         used: { essence: 1.25, avail: -4, cost: 0.75 },
     }
 } as const;
+
+export const SRStatus = [
+    {
+        id: 'sr5run',
+        name: 'SR5.StatusEffects.Running',
+        img: 'systems/shadowrun5e/dist/icons/status-effects/run.svg',
+        system: { applyTo: 'test_all' },
+        changes: [
+            {key: "data.pool", mode: CONST.ACTIVE_EFFECT_MODES.ADD, value: "-2"},
+        ],
+    },
+    {
+        id: 'sr5sprint',
+        name: 'SR5.StatusEffects.Sprinting',
+        img: 'systems/shadowrun5e/dist/icons/status-effects/sprint.svg',
+        system: { applyTo: 'test_all' },
+        changes: [
+            {key: "data.pool", mode: CONST.ACTIVE_EFFECT_MODES.ADD, value: "-4"},
+        ],
+    },
+] as const satisfies CONFIG.StatusEffect[];
+

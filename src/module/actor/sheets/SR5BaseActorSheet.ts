@@ -25,6 +25,7 @@ import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handleba
 import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { PackActionFlow } from '@/module/item/flows/PackActionFlow';
+import type { InitiativeModeOptions } from '@/module/combat/SR5Combatant';
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import ActorSheetV2 = foundry.applications.sheets.ActorSheetV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
@@ -707,25 +708,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @param event
      */
     async _onInitiativePerceptionChange(event: Event) {
-        const newValue = (event.currentTarget as HTMLSelectElement)?.value;
-        if (newValue === 'meatspace' || newValue === 'astral') {
-            // meatspace and magic can be directly applied as the perception type
-            // disable VR as well
-            await this.actor.update({
-                system: {
-                    initiative: { perception: newValue, },
-                    matrix: { vr: false, hot_sim: false }
-                }
-            });
-        } else if (newValue === 'hot_sim' || newValue === 'cold_sim') {
-            // if we are hot sim or cold sim, we are in VR and using matrix init perception
-            await this.actor.update({
-                system: {
-                    initiative: { perception: 'matrix' },
-                    matrix: { vr: true, hot_sim: newValue === 'hot_sim' }
-                }
-            });
-        }
+        const newValue = (event.currentTarget as HTMLSelectElement)?.value as InitiativeModeOptions | undefined;
+        if (!newValue) return;
+
+        const supportedModes = ['meatspace', 'astral', 'cold_sim', 'hot_sim'] as const;
+        if (!supportedModes.includes(newValue)) return;
+
+        await this.actor.setInitiativeMode(newValue);
     }
 
     /**
@@ -1153,20 +1142,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         sheetData.system.modifiers = sorted as typeof modifiers;
         sheetData.woundTolerance = 3 + ('wound_tolerance' in modifiers ? modifiers.wound_tolerance : 0);
-    }
-
-    _prepareMatrixAttributes(sheetData: SR5ActorSheetData) {
-        const { matrix } = sheetData.system;
-        if (matrix) {
-            const cleanupAttribute = (attribute: MatrixAttribute) => {
-                const att = matrix[attribute];
-                if (att) {
-                    if (!att.mod) att.mod = [];
-                }
-            };
-
-            (['firewall', 'data_processing', 'sleaze', 'attack'] as MatrixAttribute[]).forEach(att => { cleanupAttribute(att); });
-        }
     }
 
     /**
@@ -2271,8 +2246,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.preventDefault();
         event.stopPropagation();
 
-        const blitz = this.actor.system.initiative.edge;
-        await this.actor.update({system: { initiative: { edge: !blitz }}});
+        const blitz = this.actor.system.initiative.blitz;
+        await this.actor.update({system: { initiative: { blitz: !blitz }}});
     }
 
     static async #rollInitiative(this: SR5BaseActorSheet, event: Event) {
