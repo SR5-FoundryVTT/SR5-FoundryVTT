@@ -50,7 +50,11 @@ import AstralPerceptionDetectionMode from "../vision/astralPerception/astralPerc
 import AugmentedRealityVisionDetectionMode from "../vision/augmentedReality/arDetectionMode";
 import LowlightVisionDetectionMode from "../vision/lowlightVision/lowlightDetectionMode";
 import ThermographicVisionDetectionMode from "../vision/thermographicVision/thermographicDetectionMode";
+import UltrasoundDetectionMode from '../vision/ultrasound/ultrasoundDetectionMode';
 import { DiceSoNice } from "../rolls/DiceSoNice";
+
+type VisionModeFlagValue = 'basic' | 'astralPerception' | 'thermographic' | 'lowlight' | 'augmentedReality' | 'ultrasound';
+type VisionDetectionRangeOverrides = Partial<Record<VisionModeFlagValue, number>>;
 
 declare module "fvtt-types/configuration" {
     interface DocumentClassConfig {
@@ -101,6 +105,7 @@ declare module "fvtt-types/configuration" {
             thermographic: ThermographicVisionDetectionMode;
             lowlight: LowlightVisionDetectionMode;
             augmentedReality: AugmentedRealityVisionDetectionMode;
+            ultrasound: UltrasoundDetectionMode;
         }
 
         interface VisionModes {
@@ -108,6 +113,7 @@ declare module "fvtt-types/configuration" {
             thermographic: foundry.canvas.perception.VisionMode;
             lowlight: foundry.canvas.perception.VisionMode;
             augmentedReality: foundry.canvas.perception.VisionMode;
+            ultrasound: foundry.canvas.perception.VisionMode;
         }
     }
 
@@ -167,6 +173,8 @@ declare module "fvtt-types/configuration" {
             shadowrun5e: {
                 turnsSinceLastAttack?: number;
                 overwatchScore?: number;
+                ActorDefaultVisionMode?: VisionModeFlagValue;
+                ActorDetectionRangeOverrides?: VisionDetectionRangeOverrides;
             }
         };
         ChatMessage: {
@@ -202,6 +210,20 @@ declare module "fvtt-types/configuration" {
         Token: {
             shadowrun5e: {
                 TokenUseRoutingLib?: boolean;
+                TokenActiveVisionMode?: VisionModeFlagValue;
+                TokenDetectionRangeOverrides?: VisionDetectionRangeOverrides;
+            };
+        }
+        Wall: {
+            shadowrun5e: {
+                wallType?: 'standard' | 'window' | 'manaBarrier' | 'matrixBarrier';
+                matrixBlocked?: boolean;
+            };
+        }
+        MeasuredTemplate: {
+            shadowrun5e: {
+                isVisualSmoke?: boolean;
+                isThermalSmoke?: boolean;
             };
         }
         User: {

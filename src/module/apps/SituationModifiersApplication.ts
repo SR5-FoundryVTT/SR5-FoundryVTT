@@ -1,10 +1,19 @@
 import { SR5Actor } from "../actor/SR5Actor";
-import { SYSTEM_NAME } from "../constants";
+import { FLAGS, SYSTEM_NAME } from "../constants";
 import { Helpers } from "../helpers";
 import { ModifiableDocumentTypes, DocumentSituationModifiers } from "../rules/DocumentSituationModifiers";
+import { TokenDocumentWithVisionFlags, TokenVisionFlow } from '../token/flows/TokenVisionFlow';
+import { SR5VisionModeId } from '../vision/visionModeState';
 
 import EnvironmentalModifierLevels = Shadowrun.EnvironmentalModifierLevels;
 import EnvironmentalModifierCategories = Shadowrun.EnvironmentalModifierCategories;
+
+const toTokenVisionDocument = (token: Token): TokenDocumentWithVisionFlags => ({
+    actor: token.document.actor,
+    getFlag: (scope: 'shadowrun5e', key: typeof FLAGS.TokenActiveVisionMode) => token.document.getFlag(scope, key),
+    setFlag: (scope: 'shadowrun5e', key: typeof FLAGS.TokenActiveVisionMode, value: SR5VisionModeId) => token.document.setFlag(scope, key, value),
+    unsetFlag: (scope: 'shadowrun5e', key: typeof FLAGS.TokenActiveVisionMode) => token.document.unsetFlag(scope, key),
+});
 
 
 interface SituationalModifiersTemplateData extends foundry.appv1.api.FormApplication.FormApplicationData<FormApplication.Options, Record<string, unknown>> {
@@ -227,6 +236,38 @@ class RecoilModifiersHandler extends ModifiersHandler {
     }
 }
 
+class VisionModifiersHandler extends ModifiersHandler {
+    override getData(options?: object) {
+        return {}
+    }
+
+    override activateListeners(html: JQuery<HTMLElement>) {
+    }
+
+    static override addTokenHUDElements(modifierColumn: JQuery<HTMLElement>, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
+        console.log(`${SYSTEM_NAME} | Vision modifier HUD on renderTokenHUD`);
+
+        const token = Helpers.getToken(tokenId);
+        if (!token) return;
+
+        const tokenDocument = toTokenVisionDocument(token);
+
+        const labelKey = TokenVisionFlow.getTokenVisionModeSelectionLabelKey(tokenDocument);
+
+        const modifier = $('<div class="modifier-row"></div>');
+        const modifierValue = $(`<div class="modifier-value modifier-value-vision">${game.i18n.localize(labelKey)}</div>`);
+        const modifierDescription = $(`<div class="modifier-description open-vision-modifier">${game.i18n.localize('SR5.Vision.Mode')}</div>`);
+
+        const cycleMode = SituationModifiersApplication.cycleTokenVisionModeForTokenHUD(tokenId);
+        modifierValue.on('click', cycleMode);
+        modifierDescription.on('click', cycleMode);
+
+        modifierColumn.append(modifier);
+        modifier.append(modifierValue);
+        modifier.append(modifierDescription);
+    }
+}
+
 /**
  * Give a GM and user access all situational modifiers.
  * 
@@ -239,6 +280,7 @@ class RecoilModifiersHandler extends ModifiersHandler {
 export class SituationModifiersApplication extends foundry.appv1.api.FormApplication {
     // Static Handlers contain the class references used for both static method calls and to setup the instance handlers.
     static _staticHandlers: typeof ModifiersHandler[] = [
+        VisionModifiersHandler,
         MatrixModifiersHandler, 
         MagicModifiersHandler,
         EnvironmentalModifiersHandler,
@@ -465,6 +507,22 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
     static openForCurrentScene() {
         if (!canvas || !canvas.ready || !canvas.scene) return;
         new SituationModifiersApplication(canvas.scene).render(true);
+    }
+
+    static cycleTokenVisionModeForTokenHUD(tokenId: string) {
+        return async (event: JQuery.ClickEvent) => {
+            event.preventDefault();
+
+            const token = Helpers.getToken(tokenId);
+            if (!token) return;
+
+            const nextMode = await TokenVisionFlow.cycleTokenVisionMode(toTokenVisionDocument(token));
+            const labelKey = TokenVisionFlow.getVisionModeLabelKey(nextMode);
+            $(event.currentTarget)
+                .closest('.modifier-row')
+                .find('.modifier-value-vision')
+                .text(game.i18n.localize(labelKey));
+        }
     }
 
     /** 

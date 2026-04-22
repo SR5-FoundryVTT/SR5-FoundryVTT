@@ -1,5 +1,7 @@
 
 import { resolveDetectionModeRange } from '../detectionRange';
+import { isBlockedBySR5Walls, resolveVisionSourceOrigin } from '../losHelpers';
+import { isVisionSourceMode } from '../visionModeState';
 import AstralVisionFilter from './astralPerceptionFilter';
 
 export default class AstralPerceptionDetectionMode extends foundry.canvas.perception.DetectionMode {
@@ -19,7 +21,7 @@ export default class AstralPerceptionDetectionMode extends foundry.canvas.percep
 
         const targetAffectedBySpell = !!tgt?.actor?.system.visibilityChecks.astral.affectedBySpell;
 
-        const isAstralPerceiving = visionSource?.visionMode?.id === 'astralPerception';
+        const isAstralPerceiving = isVisionSourceMode(visionSource, 'astralPerception');
 
         return (targetHasAura || targetAstralActive || targetAffectedBySpell) && isAstralPerceiving;
     }
@@ -29,6 +31,18 @@ export default class AstralPerceptionDetectionMode extends foundry.canvas.percep
     ) {
         const range = resolveDetectionModeRange(visionSource, mode);
         return super._testRange(visionSource, { ...mode, range }, target, test);
+    }
+
+    override _testLOS(
+        ...[visionSource, mode, target, test]: Parameters<foundry.canvas.perception.DetectionMode['_testLOS']>
+    ) {
+        if (!super._testLOS(visionSource, mode, target, test)) {
+            return false;
+        }
+
+        const origin = resolveVisionSourceOrigin(visionSource);
+
+        return !isBlockedBySR5Walls(origin, test.point, 'astral');
     }
 }
   

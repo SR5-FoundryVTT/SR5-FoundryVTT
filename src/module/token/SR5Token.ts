@@ -1,6 +1,7 @@
 import { FLAGS, SYSTEM_NAME } from '../constants';
 import { RoutingLibIntegration } from '../integrations/routingLibIntegration';
 import { TrackType } from "../types/template/ConditionMonitors";
+import { SR5VisionModeLabelKeys, SR5VisionModes, normalizeVisionModeId } from '../vision/visionModeState';
 
 export class SR5Token extends foundry.canvas.placeables.Token {
     override _drawBar(number: number, bar: PIXI.Graphics, data: NonNullable<TokenDocument.GetBarAttributeReturn>) {
@@ -31,24 +32,73 @@ export class SR5Token extends foundry.canvas.placeables.Token {
     }
 
     static tokenConfig(app, html, data, options) {
-        if (!RoutingLibIntegration.routingLibReady || !app.actor?.system?.movement) return;
+        const anchor = $(html).find('label[for$="-movementAction"]').closest('div.form-group');
 
-        // Default it to true, so that it is enabled by default.
-        const flagValue = app.token.getFlag(SYSTEM_NAME, FLAGS.TokenUseRoutingLib) ?? true;
-        const id = `${app.id}-${FLAGS.TokenUseRoutingLib}`;
+        if (RoutingLibIntegration.routingLibReady && app.actor?.system?.movement) {
+            const flagValue = app.token.getFlag(SYSTEM_NAME, FLAGS.TokenUseRoutingLib) ?? true;
+            const id = `${app.id}-${FLAGS.TokenUseRoutingLib}`;
 
-        const settingDiv = $(`
+            const settingDiv = $(`
+                <div class="form-group">
+                    <label for="${id}">${game.i18n.localize('SETTINGS.TokenUseRoutingLib')}</label>
+                    <div class="form-fields">
+                        <input type="checkbox"
+                            name="flags.${SYSTEM_NAME}.${FLAGS.TokenUseRoutingLib}"
+                            id="${id}"
+                            ${flagValue ? 'checked' : ''}>
+                    </div>
+                </div>
+            `);
+
+            if (anchor.length) {
+                anchor.after(settingDiv);
+            }
+        }
+
+        const modeAnchor = $(html).find(`input[name="flags.${SYSTEM_NAME}.${FLAGS.TokenUseRoutingLib}"]`).closest('div.form-group');
+        const currentMode = normalizeVisionModeId(app.token.getFlag(SYSTEM_NAME, FLAGS.TokenActiveVisionMode)) ?? '';
+        const modeOptions = [
+            { value: '', label: game.i18n.localize('SR5.Vision.ActorDefault') },
+            ...SR5VisionModes
+                .filter(mode => mode === 'basic' || Boolean(CONFIG.Canvas.visionModes[mode]))
+                .map(mode => ({
+                    value: mode,
+                    label: game.i18n.localize(SR5VisionModeLabelKeys[mode]),
+                })),
+        ];
+
+        const optionsHtml = modeOptions
+            .map(option => `<option value="${option.value}" ${option.value === currentMode ? 'selected' : ''}>${option.label}</option>`)
+            .join('');
+
+        const modeId = `${app.id}-${FLAGS.TokenActiveVisionMode}`;
+        const modeSettingDiv = $(`
             <div class="form-group">
-                <label for="${id}">${game.i18n.localize("SETTINGS.TokenUseRoutingLib")}</label>
+                <label for="${modeId}">${game.i18n.localize('SETTINGS.TokenActiveVisionMode')}</label>
                 <div class="form-fields">
-                    <input type="checkbox"
-                        name="flags.${SYSTEM_NAME}.${FLAGS.TokenUseRoutingLib}"
-                        id="${id}"
-                        ${flagValue ? 'checked' : ''}>
+                    <select name="flags.${SYSTEM_NAME}.${FLAGS.TokenActiveVisionMode}" id="${modeId}">
+                        ${optionsHtml}
+                    </select>
                 </div>
             </div>
         `);
 
-        $(html).find('label[for$="-movementAction"]').closest('div.form-group').after(settingDiv);
+        if (modeAnchor.length) {
+            modeAnchor.after(modeSettingDiv);
+            return;
+        }
+
+        if (anchor.length) {
+            anchor.after(modeSettingDiv);
+            return;
+        }
+
+        const sightAnchor = $(html).find('input[name="sight.range"]').closest('div.form-group');
+        if (sightAnchor.length) {
+            sightAnchor.after(modeSettingDiv);
+            return;
+        }
+
+        $(html).find('form').append(modeSettingDiv);
     }
 }

@@ -6,6 +6,8 @@ import LowlightVisionDetectionMode from './lowlightVision/lowlightDetectionMode'
 import LowLightBackgroundVisionShader from './lowlightVision/lowlightBackgroundShader';
 import AugmentedRealityVisionDetectionMode from './augmentedReality/arDetectionMode';
 import AugmentedRealityVisionBackgroundVisionShader from './augmentedReality/arBackgroundShader';
+import UltrasoundDetectionMode from './ultrasound/ultrasoundDetectionMode';
+import UltrasoundBackgroundVisionShader from './ultrasound/ultrasoundBackgroundShader';
 
 export default class VisionConfigurator {
     static configureAstralPerception() {
@@ -121,6 +123,34 @@ export default class VisionConfigurator {
                 darkness: { adaptive: false },
                 defaults: { attenuation: 0, contrast: 0.1, saturation: 0.2, brightness: 0.1 },
                 background: { shader: AugmentedRealityVisionBackgroundVisionShader },
+            },
+        });
+    }
+
+    static configureUltrasound() {
+        CONFIG.Canvas.detectionModes.ultrasound = new UltrasoundDetectionMode({
+            id: 'ultrasound',
+            label: 'SR5.Vision.Ultrasound',
+            type: foundry.canvas.perception.DetectionMode.DETECTION_TYPES.SOUND,
+            walls: false,
+            angle: true,
+        });
+
+        CONFIG.Canvas.visionModes.ultrasound = new foundry.canvas.perception.VisionMode({
+            id: 'ultrasound',
+            label: 'SR5.Vision.Ultrasound',
+            canvas: {
+                shader: foundry.canvas.rendering.shaders.ColorAdjustmentsSamplerShader,
+                uniforms: {
+                    saturation: -0.8,
+                    contrast: 0.35,
+                    tint: UltrasoundBackgroundVisionShader.COLOR_TINT,
+                },
+            },
+            vision: {
+                darkness: { adaptive: false },
+                defaults: { attenuation: 0, contrast: 0.35, saturation: -0.8, brightness: 0.15 },
+                background: { shader: UltrasoundBackgroundVisionShader },
             },
         });
     }

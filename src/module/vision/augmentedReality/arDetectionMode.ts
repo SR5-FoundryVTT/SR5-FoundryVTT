@@ -1,4 +1,6 @@
 import { resolveDetectionModeRange } from '../detectionRange';
+import { isBlockedBySR5Walls, resolveVisionSourceOrigin } from '../losHelpers';
+import { isVisionSourceMode } from '../visionModeState';
 import AugmentedRealityVisionFilter from './arFilter';
 
 export default class AugmentedRealityVisionDetectionMode extends foundry.canvas.perception.DetectionMode {
@@ -19,7 +21,7 @@ export default class AugmentedRealityVisionDetectionMode extends foundry.canvas.
 
         const targetIsNotRunningSilent = !tgt?.actor?.system.visibilityChecks.matrix.runningSilent;
 
-        const isAstralPerceiving = visionSource?.visionMode?.id === 'astralPerception';
+        const isAstralPerceiving = isVisionSourceMode(visionSource, 'astralPerception');
 
         return targetHasIcon && targetIsNotRunningSilent && !isAstralPerceiving;
     }
@@ -29,6 +31,18 @@ export default class AugmentedRealityVisionDetectionMode extends foundry.canvas.
     ) {
         const range = resolveDetectionModeRange(visionSource, mode);
         return super._testRange(visionSource, { ...mode, range }, target, test);
+    }
+
+    override _testLOS(
+        ...[visionSource, mode, target, test]: Parameters<foundry.canvas.perception.DetectionMode['_testLOS']>
+    ) {
+        const origin = resolveVisionSourceOrigin(visionSource);
+
+        if (isBlockedBySR5Walls(origin, test.point, 'matrix')) {
+            return false;
+        }
+
+        return this._testAngle(visionSource, mode, target, test);
     }
 }
   

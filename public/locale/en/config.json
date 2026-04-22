@@ -60,6 +60,7 @@
         "TokenRulerColorWalkingDescription": "The color for distance within walking rate.",
         "TokenRulerOpacity": "Token Movement Opacity",
         "TokenRulerOpacityDescription": "How opaque the token ruler measurements are displayed. (0 = fully transparent, 1 = fully opaque)",
+        "TokenActiveVisionMode": "Token Active Vision Mode",
         "TokenUseRoutingLib": "Use RoutingLib",
         "UseDamageConditionDescription": "System marks tokens according to their condition monitor",
         "UseDamageConditionName": "Use system handling for token status effects",
@@ -2821,10 +2822,14 @@
             "MissingPermission": "You are missing the permission to create actors"
         },
         "Vision": {
+            "ActorDefault": "Actor Default",
             "AstralPerception": "Astral Perception",
             "AugmentedReality": "Augmented Reality",
             "LowLight": "Low-Light Vision",
-            "ThermographicVision": "Thermographic Vision"
+            "Mode": "Vision Mode",
+            "Mundane": "Mundane Vision",
+            "ThermographicVision": "Thermographic Vision",
+            "Ultrasound": "Ultrasound"
         },
         "Walk": "Walk",
         "WalkingSpeed": "Walking",

@@ -657,6 +657,7 @@ ___________________
         VisionConfigurator.configureThermographicVision()
         VisionConfigurator.configureLowlight()
         VisionConfigurator.configureAR()
+        VisionConfigurator.configureUltrasound()
     }
 
     static configureTextEnrichers() {
