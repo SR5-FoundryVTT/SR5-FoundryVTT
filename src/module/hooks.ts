@@ -167,6 +167,13 @@ export class HooksManager {
         Hooks.on('moveToken', SR5TokenDocument.moveToken.bind(SR5Token));
         Hooks.on('renderTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
         Hooks.on('renderPrototypeTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
+        Hooks.on('renderWallConfig', HooksManager.renderWallConfig.bind(HooksManager));
+        Hooks.on('renderAmbientLightConfig', HooksManager.renderAmbientLightConfig.bind(HooksManager));
+        Hooks.on('renderTileConfig', HooksManager.renderTileConfig.bind(HooksManager));
+        Hooks.on('renderSceneControls', HooksManager.renderSceneControls.bind(HooksManager));
+        Hooks.on('canvasReady', HooksManager.canvasReady.bind(HooksManager));
+        Hooks.on('controlWall', HooksManager.controlWall.bind(HooksManager));
+        Hooks.on('controlAmbientLight', HooksManager.controlAmbientLight.bind(HooksManager));
         Hooks.on('preCreateWall', HooksManager.preCreateWall.bind(HooksManager));
         Hooks.on('preCreateAmbientLight', HooksManager.preCreateAmbientLight.bind(HooksManager));
         Hooks.on('preCreateTile', HooksManager.preCreateTile.bind(HooksManager));
@@ -565,6 +572,22 @@ ___________________
         ScenePlaneBrushFlow.extendSceneControls(controls);
     }
 
+    static renderSceneControls() {
+        ScenePlaneBrushFlow.refreshEditPlaneVisibility();
+    }
+
+    static canvasReady() {
+        ScenePlaneBrushFlow.refreshEditPlaneVisibility();
+    }
+
+    static controlWall() {
+        ScenePlaneBrushFlow.refreshEditPlaneVisibility();
+    }
+
+    static controlAmbientLight() {
+        ScenePlaneBrushFlow.refreshEditPlaneVisibility();
+    }
+
     /**
      * Register renderChatMessage Hooks using FoundryVTT Hooks.on for each registered test type.
      *
@@ -650,6 +673,81 @@ ___________________
 
     static preCreateTile(document: TileDocument) {
         this.applyDefaultPlaceablePlanes(document);
+    }
+
+    private static appendPlaneVisibilityConfig(
+        html: JQuery<HTMLElement> | HTMLElement,
+        rawPlanes: unknown
+    ) {
+        const container = $(html);
+        const form = container.is('form') ? container : container.find('form');
+        if (!form.length) {
+            return;
+        }
+
+        const tabTarget = form.find('.tab[data-tab="advanced"] .standard-form.scrollable').first();
+        const contentTarget = form.find('.window-content .standard-form.scrollable').first();
+        const scrollableTarget = form.find('.standard-form.scrollable').first();
+        const standardTarget = form.find('.standard-form').first();
+        const insertionTarget = tabTarget.length
+            ? tabTarget
+            : (contentTarget.length
+                ? contentTarget
+                : (scrollableTarget.length
+                    ? scrollableTarget
+                    : (standardTarget.length ? standardTarget : form)));
+
+        form.find('.sr5-placeable-plane-config').remove();
+
+        const planes = ensureSR5PlaceablePlanes(rawPlanes);
+
+        const group = $(
+            `<fieldset class="sr5-placeable-plane-config">
+                <legend>SR5 Plane Visibility</legend>
+                <div class="form-group">
+                    <label>${game.i18n.localize('SR5.COMBAT.ModeMeatspace')}</label>
+                    <div class="form-fields">
+                        <input type="checkbox" name="flags.${SYSTEM_NAME}.${FLAGS.PlaceablePlanes}.${FLAGS.PlanePhysical}" data-dtype="Boolean" ${planes.physical ? 'checked' : ''}/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>${game.i18n.localize('SR5.COMBAT.ModeAstral')}</label>
+                    <div class="form-fields">
+                        <input type="checkbox" name="flags.${SYSTEM_NAME}.${FLAGS.PlaceablePlanes}.${FLAGS.PlaneAstral}" data-dtype="Boolean" ${planes.astral ? 'checked' : ''}/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>${game.i18n.localize('SR5.COMBAT.ModeMatrix')}</label>
+                    <div class="form-fields">
+                        <input type="checkbox" name="flags.${SYSTEM_NAME}.${FLAGS.PlaceablePlanes}.${FLAGS.PlaneMatrix}" data-dtype="Boolean" ${planes.matrix ? 'checked' : ''}/>
+                    </div>
+                </div>
+                <p class="hint">Configure in which SR5 planes this placeable is visible.</p>
+            </fieldset>`
+        );
+
+        const existingFieldsets = insertionTarget.children('fieldset');
+        if (existingFieldsets.length >= 2) {
+            group.insertAfter(existingFieldsets.first());
+            return;
+        }
+
+        insertionTarget.append(group);
+    }
+
+    static renderWallConfig(_app: unknown, html: JQuery<HTMLElement> | HTMLElement) {
+        const document = ((_app as { document?: WallDocument }).document);
+        this.appendPlaneVisibilityConfig(html, document?.getFlag(SYSTEM_NAME, FLAGS.PlaceablePlanes));
+    }
+
+    static renderAmbientLightConfig(_app: unknown, html: JQuery<HTMLElement> | HTMLElement) {
+        const document = ((_app as { document?: AmbientLightDocument }).document);
+        this.appendPlaneVisibilityConfig(html, document?.getFlag(SYSTEM_NAME, FLAGS.PlaceablePlanes));
+    }
+
+    static renderTileConfig(_app: unknown, html: JQuery<HTMLElement> | HTMLElement) {
+        const document = ((_app as { document?: TileDocument }).document);
+        this.appendPlaneVisibilityConfig(html, document?.getFlag(SYSTEM_NAME, FLAGS.PlaceablePlanes));
     }
 
     /**

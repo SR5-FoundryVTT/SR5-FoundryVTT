@@ -30,19 +30,19 @@ const PLANE_TOOLS: PlaneToolConfig[] = [
         plane: 'physical',
         name: 'sr5-plane-physical',
         title: 'SR5 Plane Brush: Physical',
-        icon: 'fa-solid fa-circle',
+        icon: 'fa-solid fa-person-running',
     },
     {
         plane: 'astral',
         name: 'sr5-plane-astral',
         title: 'SR5 Plane Brush: Astral',
-        icon: 'fa-solid fa-circle',
+        icon: 'fa-solid fa-star',
     },
     {
         plane: 'matrix',
         name: 'sr5-plane-matrix',
         title: 'SR5 Plane Brush: Matrix',
-        icon: 'fa-solid fa-circle',
+        icon: 'fa-solid fa-laptop-code',
     },
 ];
 
@@ -98,6 +98,101 @@ export class ScenePlaneBrushFlow {
         };
     }
 
+    private static applyPlaceablePlaneVisualState(
+        placeable: {
+            alpha?: number;
+            eventMode?: string;
+            interactive?: boolean;
+        },
+        shouldFilter: boolean,
+        matchCount: number,
+        selectedPlaneCount: number
+    ) {
+        if (!shouldFilter) {
+            placeable.alpha = 1;
+            if (typeof placeable.eventMode === 'string') {
+                placeable.eventMode = 'static';
+            }
+            if (typeof placeable.interactive === 'boolean') {
+                placeable.interactive = true;
+            }
+            return;
+        }
+
+        if (matchCount === 0) {
+            placeable.alpha = 0.15;
+            if (typeof placeable.eventMode === 'string') {
+                placeable.eventMode = 'none';
+            }
+            if (typeof placeable.interactive === 'boolean') {
+                placeable.interactive = false;
+            }
+            return;
+        }
+
+        if (matchCount < selectedPlaneCount) {
+            placeable.alpha = 0.5;
+            if (typeof placeable.eventMode === 'string') {
+                placeable.eventMode = 'static';
+            }
+            if (typeof placeable.interactive === 'boolean') {
+                placeable.interactive = true;
+            }
+            return;
+        }
+
+        placeable.alpha = 1;
+        if (typeof placeable.eventMode === 'string') {
+            placeable.eventMode = 'static';
+        }
+        if (typeof placeable.interactive === 'boolean') {
+            placeable.interactive = true;
+        }
+    }
+
+    static refreshWallEditPlaneVisibility() {
+        const walls = canvas?.walls?.placeables;
+        if (!walls) {
+            return;
+        }
+
+        const controls = ui.controls as { activeControl?: string } | undefined;
+        const activeControl = controls?.activeControl;
+        const brushState = getBrushState();
+        const selectedPlanes = (['physical', 'astral', 'matrix'] as const).filter(plane => brushState[plane]);
+        const shouldFilterWalls = activeControl === 'walls' && selectedPlanes.length > 0;
+
+        for (const wall of walls) {
+            const planes = ensureSR5PlaceablePlanes(wall.document?.getFlag?.(SYSTEM_NAME, FLAGS.PlaceablePlanes));
+            const matchCount = selectedPlanes.filter(plane => planes[plane]).length;
+            this.applyPlaceablePlaneVisualState(wall, shouldFilterWalls, matchCount, selectedPlanes.length);
+        }
+    }
+
+    static refreshLightEditPlaneVisibility() {
+        const lights = canvas?.lighting?.placeables;
+        if (!lights) {
+            return;
+        }
+
+        const controls = ui.controls as { activeControl?: string } | undefined;
+        const activeControl = controls?.activeControl;
+        const brushState = getBrushState();
+        const selectedPlanes = (['physical', 'astral', 'matrix'] as const).filter(plane => brushState[plane]);
+        const shouldFilterLights = activeControl === 'lighting' && selectedPlanes.length > 0;
+
+        for (const light of lights) {
+            const planes = ensureSR5PlaceablePlanes(light.document?.getFlag?.(SYSTEM_NAME, FLAGS.PlaceablePlanes));
+            const matchCount = selectedPlanes.filter(plane => planes[plane]).length;
+            this.applyPlaceablePlaneVisualState(light, shouldFilterLights, matchCount, selectedPlanes.length);
+        }
+    }
+
+    static refreshEditPlaneVisibility() {
+        this.refreshWallEditPlaneVisibility();
+        this.refreshLightEditPlaneVisibility();
+    }
+
     static extendSceneControls(controls: SceneControlsLike) {
         if (!game.user?.isGM) {
             return;
@@ -129,6 +224,7 @@ export class ScenePlaneBrushFlow {
 
                         await game.settings.set(SYSTEM_NAME, FLAGS.ScenePlaneBrushState, nextState);
                         syncPlaneToolStateAcrossControls(toolConfig.plane, !!active);
+                        this.refreshEditPlaneVisibility();
                     },
                 };
                 nextOrder += 1;
@@ -146,8 +242,11 @@ export class ScenePlaneBrushFlow {
                     const resetState = { ...SR5_DEFAULT_PLACEABLE_PLANES };
                     await game.settings.set(SYSTEM_NAME, FLAGS.ScenePlaneBrushState, resetState);
                     syncAllPlaneToolStatesAcrossControls(resetState);
+                    this.refreshEditPlaneVisibility();
                 },
             };
         }
+
+        this.refreshEditPlaneVisibility();
     }
 }

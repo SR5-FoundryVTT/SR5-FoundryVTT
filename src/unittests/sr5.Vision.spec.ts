@@ -430,30 +430,28 @@ export const shadowrunVisionModes = (context: QuenchBatchContext) => {
                 planes: { physical: true, astral: false, matrix: false },
             });
 
+            const canvasState = canvas as unknown as {
+                walls: { placeables: unknown[] };
+                templates: { placeables: unknown[] };
+            };
+
             try {
-                // @ts-expect-error - Need to set placeables for LOS checks
-                canvas.templates!.placeables = [];
-                
-                // @ts-expect-error - Need to set placeables for LOS checks
-                canvas.walls!.placeables = [astralIgnoredWall] as any;
+                canvasState.templates.placeables = [];
+
+                canvasState.walls.placeables = [astralIgnoredWall];
                 assert.isTrue(astralMode._testLOS(astralSource, modeConfig, target, test));
-                
-                // @ts-expect-error - Need to set placeables for LOS checks
-                canvas.walls!.placeables = [astralBlockingWall] as any;
+
+                canvasState.walls.placeables = [astralBlockingWall];
                 assert.isFalse(astralMode._testLOS(astralSource, modeConfig, target, test));
-                
-                // @ts-expect-error - Need to set placeables for LOS checks
-                canvas.walls!.placeables = [physicalIgnoredWall] as any;
+
+                canvasState.walls.placeables = [physicalIgnoredWall];
                 assert.isTrue(lowlightMode._testLOS(mundaneSource, modeConfig, target, test));
-                
-                // @ts-expect-error - Need to set placeables for LOS checks
-                canvas.walls!.placeables = [physicalBlockingWall] as any;
+
+                canvasState.walls.placeables = [physicalBlockingWall];
                 assert.isFalse(lowlightMode._testLOS(mundaneSource, modeConfig, target, test));
             } finally {
-                // @ts-expect-error - Need to set placeables for LOS checks
-                canvas.walls!.placeables = previousWalls;
-                // @ts-expect-error - Need to set placeables for LOS checks
-                canvas.templates!.placeables = previousTemplates;
+                canvasState.walls.placeables = previousWalls;
+                canvasState.templates.placeables = previousTemplates;
             }
         });
     });
