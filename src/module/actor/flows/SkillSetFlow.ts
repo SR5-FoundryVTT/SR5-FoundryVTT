@@ -22,10 +22,12 @@ export const SkillSetFlow = {
     async replaceSkillSet(actor: SR5Actor, skillSet: SR5Item<'skill'>, options: ReplaceSkillSetOptions = {askForConfirmation: true}) {
         if (!skillSet.isType('skill') || skillSet.system.type !== 'set') return;
         
-        const userConsented = await Helpers.confirmDeletion({askForConfirmation: options.askForConfirmation});
-        if (!userConsented) return;
+        if (actor.system.skillset) {
+            const userConsented = await Helpers.confirmDeletion({askForConfirmation: options.askForConfirmation});
+            if (!userConsented) return;
+            await this.removeSkillSet(actor);
+        }
 
-        await this.removeSkillSet(actor);
         await this.applySkillSetToActor(actor, skillSet);
     },
 
