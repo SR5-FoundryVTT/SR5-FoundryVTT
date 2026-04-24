@@ -214,47 +214,50 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
 
         // Guards skillset application so configured skill specializations survive into owned skills.
         it('applies configured skill set specializations to created skill items', async () => {
-            const actor = await factory.createActor({ type: 'character' });
-            const skillSet = await factory.createItem({
-                type: 'skill',
-                name: 'Test Skill Set',
-                system: {
-                    type: 'set',
-                    set: {
-                        skills: [{
-                            name: 'Pistols',
-                            rating: 6,
-                            specializations: [{ name: 'Semi-Automatics' }, { name: 'Revolvers' }],
-                        }],
-                    },
-                },
-            });
-
-            const skillTemplate = await factory.createItem({
-                type: 'skill',
-                name: 'Pistols',
-                system: { type: 'skill' },
-            });
-
             const originalGetPackSkills = PackItemFlow.getPackSkills;
             const originalGetPackSkillgroups = PackItemFlow.getPackSkillgroups;
 
-            PackItemFlow.getPackSkills = async () => [skillTemplate];
-            PackItemFlow.getPackSkillgroups = async () => [];
-
             try {
+                // monkey patch pack flows to avoid default skillset application from interfering.
+                PackItemFlow.getPackSkills = async () => [];
+                PackItemFlow.getPackSkillgroups = async () => [];
+
+                const actor = await factory.createActor({ type: 'character' });
+                const skillSet = await factory.createItem({
+                    type: 'skill',
+                    name: 'Test Skill Set',
+                    system: {
+                        type: 'set',
+                        set: {
+                            skills: [{
+                                name: 'Pistols',
+                                rating: 6,
+                                specializations: [{ name: 'Semi-Automatics' }, { name: 'Revolvers' }],
+                            }],
+                        },
+                    },
+                });
+
+                const skillTemplate = await factory.createItem({
+                    type: 'skill',
+                    name: 'Pistols',
+                    system: { type: 'skill' },
+                });
+
+                PackItemFlow.getPackSkills = async () => [skillTemplate];
+
                 await SkillSetFlow.applySkillSetToActor(actor, skillSet);
+
+                const createdSkill = actor.items.find(item => {
+                    return item.isType('skill') && item.system.type === 'skill' && item.name === 'Pistols';
+                }) as SR5Item<'skill'> | undefined;
+
+                assert.exists(createdSkill);
+                assert.deepEqual(createdSkill?.system.skill.specializations.map(specialization => specialization.name), ['Semi-Automatics', 'Revolvers']);
             } finally {
                 PackItemFlow.getPackSkills = originalGetPackSkills;
                 PackItemFlow.getPackSkillgroups = originalGetPackSkillgroups;
             }
-
-            const createdSkill = actor.items.find(item => {
-                return item.isType('skill') && item.system.type === 'skill' && item.name === 'Pistols';
-            }) as SR5Item<'skill'> | undefined;
-
-            assert.exists(createdSkill);
-            assert.deepEqual(createdSkill?.system.skill.specializations.map(specialization => specialization.name), ['Semi-Automatics', 'Revolvers']);
         });
 
         // Guards default skillset application from duplicating an already owned skill.
