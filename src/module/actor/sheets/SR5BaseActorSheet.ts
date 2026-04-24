@@ -809,6 +809,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
     }
 
+    /**
+     * Override ApplicationMixin._onDrop shim to handle default Foundry onDrop behavior for all ActorSheets.
+     */
+    protected override async _onDrop(event: DragEvent) {
+        return await (ActorSheetV2.prototype as any)._onDrop.call(this, event);
+    }
+
     protected override async _onDropItem(event: DragEvent, item: SR5Item) {
         if (item.isType('skill') && item.system.type === 'set') {
             await SkillSetFlow.replaceSkillSet(this.actor, item);
