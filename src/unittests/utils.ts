@@ -10,6 +10,8 @@ export class SR5TestFactory {
         data: Omit<Actor.CreateData, "name"> & { name?: string, type: T },
         context?: Actor.ConstructionContext
     ): Promise<SR5Actor<T>> {
+        //@ts-expect-error asd
+        window.doNotPopulateDefaultSkills = true;
         const actor = await SR5Actor.create({ name: `#QUENCH`, ...data }, context) as SR5Actor<T>;
         this.actors.push(actor);
         return actor;
@@ -34,6 +36,8 @@ export class SR5TestFactory {
     }
 
     async destroy() {
+        //@ts-expect-error asd
+        delete window.doNotPopulateDefaultSkills;
         await Actor.deleteDocuments(this.actors.map(actor => actor.id!));
         await Item.deleteDocuments(this.items.map(item => item.id!));
         await Scene.deleteDocuments(this.scenes.map(scene => scene.id!));

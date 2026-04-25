@@ -20,6 +20,9 @@ export const CreateActorFlow = {
      * @param data Creation data containing the actor type used for skill set selection.
      */
     async addDefaultActorSkillset(actor: SR5Actor, data: Actor.CreateData) {
+        //@ts-expect-error asd
+        if (window.doNotPopulateDefaultSkills) return console.warn(`Shadowrun 5e | Skipping default skill set application for actor ${actor.name} due to doNotPopulateDefaultSkills flag`);
+
         const skillSets = await PackItemFlow.getAllPackSkillSets();
         const skillSet = skillSets.find(skillSet => {
             if (!skillSet.system.set.default.type) return false;

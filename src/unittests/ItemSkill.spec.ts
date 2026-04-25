@@ -733,10 +733,10 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
         it('does not expose configured skill limits on the derived skill field', async () => {
             const actor = await factory.createActor({ type: 'character' });
 
-            const limit = 'physical';
+            const limit = 'social';
             await actor.createEmbeddedDocuments('Item', [{
                 type: 'skill',
-                name: 'Pistols',
+                name: 'Test',
                 system: {
                     type: 'skill',
                     skill: {
@@ -748,7 +748,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 },
             }]);
 
-            const skill = actor.getSkill('Pistols');
+            const skill = actor.getSkill('Test');
 
             assert.exists(skill);
             assert.strictEqual(skill?.limit, limit);
