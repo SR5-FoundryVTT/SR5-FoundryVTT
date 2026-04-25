@@ -1,5 +1,9 @@
 <div class="standard-form">
 {{#each packs as |entry|}}
+    {{#if entry.separator}}
+        <hr class="settings-separator">
+        <h3 class="settings-section-header">{{localize entry.label}}</h3>
+    {{else}}
     <div class="form-group">
         <label for="{{entry.id}}">{{localize entry.field.label}}</label>
         <div class="form-fields">
@@ -9,5 +13,6 @@
         </div>
         <p class="hint">{{localize entry.field.hint}}</p>
     </div>
+    {{/if}}
 {{/each}}
 </div>

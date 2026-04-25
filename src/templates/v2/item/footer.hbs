@@ -42,6 +42,9 @@
                 {{> "systems/shadowrun5e/dist/templates/v2/item-properties/action.hbs" item=item }}
             {{/if}}
 
+        {{else if (isType item 'skill')}}
+            {{> "systems/shadowrun5e/dist/templates/v2/item/footer/skill.hbs" item=item }}
+
         {{else if (isType item 'call_in_action')}}
             {{#if @root.isEditMode}}
                 <div class="basic-row">

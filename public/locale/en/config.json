@@ -682,6 +682,20 @@
                 "hint": "This compendium will be used for all matrix actions.",
                 "label": "Matrix Actions"
             },
+            "SkillsPacksSection": "Skills Compendiums",
+            "ActionsPacksSection": "Actions Compendiums",
+            "SkillsPack": {
+                "hint": "This compendium will be used for all skills.",
+                "label": "Skills"
+            },
+            "SkillGroupsPack": {
+                "hint": "This compendium will be used for skill groups.",
+                "label": "Skill Groups"
+            },
+            "SkillSetsPack": {
+                "hint": "This compendium will be used for skill sets.",
+                "label": "Skill Sets"
+            },
             "Title": "System compendiums"
         },
         "CompendiumBrowser": {
@@ -1119,6 +1133,7 @@
             "Threshold": " with a threshold of "
         },
         "Gear": "Gear",
+        "General": "General",
         "Glitch": "Glitch!",
         "GlitchCritical": "Critical Glitch!",
         "Glitches": "Glitches:",
@@ -2127,6 +2142,127 @@
             "Total": "Result"
         },
         "Skill": {
+            "FIELDS": {
+                "type": {
+                    "label": "Type",
+                    "hint": "Defines what kind of skill configurations are available"
+                },
+                "skill": {
+                    "category": {
+                        "label": "Category",
+                        "hint": "Category of this skill"
+                    },
+                    "knowledgeType": {
+                        "label": "Knowledge Type",
+                        "hint": "Type of knowledge skill"
+                    },
+                    "rating": {
+                        "label": "Rating",
+                        "hint": "Rating of this entry"
+                    },
+                    "defaulting": {
+                        "label": "Defaulting",
+                        "hint": "If this skill can be defaulted"
+                    },
+                    "attribute": {
+                        "label": "Attribute",
+                        "hint": "Attribute used by this skill"
+                    },
+                    "limit": {
+                        "attribute": {
+                            "label": "Limit",
+                            "hint": "Limit to use for this skill action. Leave empty to use default attribute limit."
+                        }
+                    },
+                    "specializations": {
+                        "label": "Specialization",
+                        "hint": "Specialization for this skill, if any"
+                    },
+                    "language": {
+                        "isNative": {
+                            "label": "Native",
+                            "hint": "Marks this language as native"
+                        }
+                    },
+                    "requirement": {
+                        "label": "Requirement",
+                        "hint": "What the actor must be for this skill to be available"
+                    }
+                },
+                "group": {
+                    "label": "Skill Group",
+                    "hint": "Configuration for a skill group",
+                    "skills": {
+                        "label": "Skills",
+                        "hint": "Skills that are part of this group"
+                    },
+                    "rating": {
+                        "label": "Rating",
+                        "hint": "Rating of this skill group"
+                    }
+                },
+                "set": {
+                    "label": "Skill Set",
+                    "hint": "Configuration for a skill set",
+                    "default": {
+                        "label": "Use On New Actors",
+                        "hint": "Add this skill set to newly created actors"
+                    },
+                    "skills": {
+                        "label": "Skills",
+                        "hint": "Skills that are part of this set",
+                        "name": {
+                            "label": "Name",
+                            "hint": "Name of the skill"
+                        },
+                        "rating": {
+                            "label": "Rating",
+                            "hint": "Rating of this skill"
+                        },
+                        "specializations": {
+                            "label": "Specialization",
+                            "hint": "Specializations granted to this skill when the set is applied"
+                        }
+                    },
+                    "groups": {
+                        "label": "Skill Groups",
+                        "hint": "Skill groups that are part of this set",
+                        "name": {
+                            "label": "Name",
+                            "hint": "Name of the skill group"
+                        },
+                        "rating": {
+                            "label": "Rating",
+                            "hint": "Rating of this skill group"
+                        }
+                    }
+                }
+            },
+            "Types": {
+                "Skill": "Skill",
+                "Group": "Skill Group",
+                "Set": "Skill Set"
+            },
+            "Category": {
+                "Active": "Active",
+                "Knowledge": "Knowledge",
+                "Language": "Language"
+            },
+            "KnowledgeType": {
+                "Academic": "Academic",
+                "Professional": "Professional",
+                "Interests": "Interests",
+                "Street": "Street"
+            },
+            "Groups": {
+            },
+            "Sets": {
+
+            },
+            "Set": {
+                "LogActorDifferences": "Log Actor Differences",
+                "DifferencesLoggedInConsole": "Open your browser console to view differences"
+            },
             "AeronauticsMechanic": "Aeronautics Mechanic",
             "Alchemy": "Alchemy",
             "AnimalHandling": "Animal Handling",
@@ -2657,7 +2793,8 @@
                 "RemoveOneService": "Remove One Service",
                 "ResetActorForNewRun": "Reset damage, edge, etc. for a new run",
                 "RollInitiative": "Roll Initiative",
-                "SetupPAN": "Add all Equipped Wireless Devices to this character's Persona"
+                "SetupPAN": "Add all Equipped Wireless Devices to this character's Persona",
+                "RemoveSkillSet": "Remove the current skill set as well as all skills and skill groups sourced from it"
             },
             "CallInAction": {
                 "ActorType": "Type of actor to call in",
@@ -2838,6 +2975,7 @@
         "Walk": "Walk",
         "WalkingSpeed": "Walking",
         "Warnings": {
+            "ActorMissingRequirements": "Actor must match the skills awakened or emerged requirement",
             "AlreadyExistingInventory": "An inventory with this name already exists",
             "AlreadyJoinedNetwork": "{name} already joined this network",
             "BulkImportPerformanceWarning": "If you imported a large number of items, Foundry may run slowly until you refresh your browser. It is recommended to refresh now.",
@@ -2865,7 +3003,9 @@
             "RitualInvalidForce": "Ritual force is invalid or greater then your lodges rating.",
             "RitualNotConcluded": "Ritual incomplete. Wait for ritual to oppose spellcasting to determine drain.",
             "RitualNotEnoughReagents": "Not enough reagents offered.",
+            "SkillAlreadyExists": "Skill {name} already exists on actor {actorName} ({actorUuid}). Make sure to only use a skill name once per skill category.",
             "SkillCantBeDefault": "This skill can't be rolled as it can't be defaulted",
+            "SkillSetDefaultTypeOutsideCompendium": "Only skillsets in the configured skillset compendium will affect actor creation",
             "SummoningNotConcluded": "Summoning incomplete. Wait for spirit to oppose summoning to determine drain.",
             "TokenSelectionNeeded": "One or more tokens need to be selected"
         },
@@ -3088,6 +3228,7 @@
             "quality": "Quality",
             "ritual": "Ritual",
             "sin": "SIN",
+            "skill": "Skill",
             "spell": "Spell",
             "sprite_power": "Sprite Power",
             "vehicle": "Vehicle",

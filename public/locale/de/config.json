@@ -683,6 +683,20 @@
                 "hint": "Dieses Kompendium wird für alle Matrix-Handlungen verwendet.",
                 "label": "Matrix Handlungen"
             },
+            "SkillsPacksSection": "Fertigkeitskompendien",
+            "ActionsPacksSection": "Handlungskompendien",
+            "SkillsPack": {
+                "hint": "Dieses Kompendium wird für Fertigkeiten verwendet.",
+                "label": "Fertigkeiten"
+            },
+            "SkillGroupsPack": {
+                "hint": "Dieses Kompendium wird für Fertigkeitsgruppen verwendet.",
+                "label": "Fertigkeitsgruppen"
+            },
+            "SkillSetsPack": {
+                "hint": "Dieses Kompendium wird für Fertigkeitssets verwendet.",
+                "label": "Fertigkeitssets"
+            },
             "Title": "System Kompendien"
         },
         "CompendiumBrowser": {
@@ -1120,6 +1134,7 @@
             "Threshold": " with a threshold of "
         },
         "Gear": "Ausrüstung",
+        "General": "Allgemein",
         "Glitch": "Patzer!",
         "GlitchCritical": "Kritischer Patzer!",
         "Glitches": "Patzer:",
@@ -2128,6 +2143,127 @@
             "Total": "Ergebnis"
         },
         "Skill": {
+            "FIELDS": {
+                "type": {
+                    "label": "Typ",
+                    "hint": "Definiert, welche Art von Fertigkeitskonfigurationen verfügbar sind"
+                },
+                "skill": {
+                    "category": {
+                        "label": "Kategorie",
+                        "hint": "Kategorie dieser Fertigkeit"
+                    },
+                    "knowledgeType": {
+                        "label": "Wissensart",
+                        "hint": "Art dieser Wissensfertigkeit"
+                    },
+                    "rating": {
+                        "label": "Stufe",
+                        "hint": "Stufe dieses Eintrags"
+                    },
+                    "defaulting": {
+                        "label": "Improvisieren",
+                        "hint": "Ob für diese Fertigkeit improvisiert werden kann"
+                    },
+                    "attribute": {
+                        "label": "Attribut",
+                        "hint": "Attribut, das von dieser Fertigkeit verwendet wird"
+                    },
+                    "limit": {
+                        "attribute": {
+                            "label": "Limit",
+                            "hint": "Limit für diese Fertigkeitsaktion. Leer lassen, um das Standard-Attributslimit zu verwenden."
+                        }
+                    },
+                    "specializations": {
+                        "label": "Spezialisierung",
+                        "hint": "Spezialisierung für diese Fertigkeit, falls vorhanden"
+                    },
+                    "language": {
+                        "isNative": {
+                            "label": "Muttersprache",
+                            "hint": "Markiert diese Sprache als Muttersprache"
+                        }
+                    },
+                    "requirement": {
+                        "label": "Voraussetzung",
+                        "hint": "Was der Akteur sein muss, damit diese Fertigkeit verfügbar ist"
+                    }
+                },
+                "group": {
+                    "label": "Fertigkeitsgruppe",
+                    "hint": "Konfiguration für eine Fertigkeitsgruppe",
+                    "skills": {
+                        "label": "Fertigkeiten",
+                        "hint": "Fertigkeiten, die Teil dieser Gruppe sind"
+                    },
+                    "rating": {
+                        "label": "Stufe",
+                        "hint": "Stufe dieser Fertigkeitsgruppe"
+                    }
+                },
+                "set": {
+                    "label": "Fertigkeitsset",
+                    "hint": "Konfiguration für ein Fertigkeitsset",
+                    "default": {
+                        "label": "Bei neuen Akteuren verwenden",
+                        "hint": "Dieses Fertigkeitsset neu erstellten Akteuren hinzufügen"
+                    },
+                    "skills": {
+                        "label": "Fertigkeiten",
+                        "hint": "Fertigkeiten, die Teil dieses Sets sind",
+                        "name": {
+                            "label": "Name",
+                            "hint": "Name der Fertigkeit"
+                        },
+                        "rating": {
+                            "label": "Stufe",
+                            "hint": "Stufe dieser Fertigkeit"
+                        },
+                        "specializations": {
+                            "label": "Spezialisierungen",
+                            "hint": "Spezialisierungen, die dieser Fertigkeit beim Anwenden des Sets gewährt werden"
+                        }
+                    },
+                    "groups": {
+                        "label": "Fertigkeitsgruppen",
+                        "hint": "Fertigkeitsgruppen, die Teil dieses Sets sind",
+                        "name": {
+                            "label": "Name",
+                            "hint": "Name der Fertigkeitsgruppe"
+                        },
+                        "rating": {
+                            "label": "Stufe",
+                            "hint": "Stufe dieser Fertigkeitsgruppe"
+                        }
+                    }
+                }
+            },
+            "Types": {
+                "Skill": "Fertigkeit",
+                "Group": "Fertigkeitsgruppe",
+                "Set": "Fertigkeitsset"
+            },
+            "Category": {
+                "Active": "Aktiv",
+                "Knowledge": "Wissen",
+                "Language": "Sprache"
+            },
+            "KnowledgeType": {
+                "Academic": "Akademisches Wissen",
+                "Professional": "Berufswissen",
+                "Interests": "Hobbywissen",
+                "Street": "Straßenwissen"
+            },
+            "Groups": {
+            },
+            "Sets": {
+
+            },
+            "Set": {
+                "LogActorDifferences": "Akteur-Unterschiede protokollieren",
+                "DifferencesLoggedInConsole": "Öffne deine Browser-Konsole, um die Unterschiede anzuzeigen"
+            },
             "AeronauticsMechanic": "Luftfahrtmechanik",
             "Alchemy": "Alchemie",
             "AnimalHandling": "Tierführung",
@@ -2656,6 +2792,7 @@
                 "PlaceMark": "Handlung zum Platzieren von Marken auf bereits markierten Zielen",
                 "RebootPersonaAndClearAllMarks": "Starte deine Persona neu und entferne alle von dir platzierten Marken",
                 "RemoveFavorite": "Aus Favoriten entfernen",
+                "RemoveSkillSet": "Entferne das aktuelle Fertigkeitsset sowie alle daraus stammenden Fertigkeiten und Fertigkeitsgruppen",
                 "RemoveOneService": "Entferne einen Dienst",
                 "ResetActorForNewRun": "Setzte Schaden, Edge, usw. für neuen Run zurück",
                 "RollInitiative": "Werfe Initiative",
@@ -2884,6 +3021,7 @@
         "Walk": "Gehen",
         "WalkingSpeed": "Gehen",
         "Warnings": {
+            "ActorMissingRequirements": "Der Akteur muss die Voraussetzung der Fertigkeit erfüllen: erwacht oder emergiert",
             "AlreadyExistingInventory": "Ein Inventar mit diesem Namen existiert bereits",
             "AlreadyJoinedNetwork": "bereits mit dem Netzwerk {name} verbunden",
             "BulkImportPerformanceWarning": "Wenn du eine große Anzahl von Items importiert hast, kann Foundry langsam laufen, bis du deinen Browser aktualisierst. Es wird empfohlen, jetzt zu aktualisieren.",
@@ -2900,7 +3038,7 @@
             "CantSpendMulitplePointsOfEdge": "Es kann nur ein Punkt Edge für eine Probe oder Handlung gleichzeitig ausgegeben werden.",
             "CantCombineBuyHitsWithEdge": "Erfolge kaufen kann nicht mit zweiter Chance kombiniert werden.",
             "CompilationNotConcluded": "Kompilieren unvollständig. Warte auf Gegenprobe des Sprites, um Schwund zu bestimmen",
-            "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge-Punkte können nicht auf Proben ohne Acteur angewendet werden.",
+            "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge-Punkte können nicht auf Proben ohne Akteur angewendet werden.",
             "HostItemOnlyAcceptIC": "Nur IC Akteure können einem Host zugefügt werden",
             "InvalidCompilationLevel": "Resonanz-Attribut zu niedrig für Sprite-Stufe",
             "InvalidMarksCount": "Du hast versucht, eine falsche Anzahl von Marken zu setzen",
@@ -2911,7 +3049,9 @@
             "RitualInvalidForce": "Ritual-Kraft ist zu klein oder größer als die des Refugiums",
             "RitualNotConcluded": "Ritual unvollständig. Warte auf Gegenprobe des Rituals, um Entzug zu bestimmen.",
             "RitualNotEnoughReagents": "nicht genug Reagenzien geopfert.",
+            "SkillAlreadyExists": "Fertigkeit {name} existiert bereits beim Akteur {actorName} ({actorUuid}). Stelle sicher, dass du einen Fertigkeitsnamen nur einmal pro Fertigkeitskategorie verwendest.",
             "SkillCantBeDefault": "Auf diese Fertigkeit kann keine Probe abgelegt werden, da sie nicht improvisiert werden kann",
+            "SkillSetDefaultTypeOutsideCompendium": "Nur Skillsets im konfigurierten Skillset Kompendium beeinflussen neue Akteure.",
             "SummoningNotConcluded": "Herbeirufung unvollständig. Warte auf Gegenprobe des Geists, um Entzug zu bestimmen.",
             "TokenSelectionNeeded": "Ein oder mehrere Tokens müssen ausgewählt sein"
         },
@@ -3134,6 +3274,7 @@
             "quality": "Vor-/Nachteil",
             "ritual": "Ritual",
             "sin": "SIN",
+            "skill": "Fertigkeit",
             "spell": "Zauberspruch",
             "sprite_power": "Spritekraft",
             "vehicle": "Vehicle",

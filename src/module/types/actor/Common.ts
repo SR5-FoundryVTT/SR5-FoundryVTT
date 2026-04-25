@@ -4,13 +4,15 @@ import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
 import { ModifiableField } from "../fields/ModifiableField";
 import { Limits, AwakendLimits, MatrixLimits } from "../template/Limits";
-import { KnowledgeSkillList, KnowledgeSkills, Skills } from "../template/Skills";
-const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField } = foundry.data.fields;
-
-export const CharacterSkills = () => ({
+import { KnowledgeSkills, Skills } from "../template/Skills";
+const { SchemaField, NumberField, BooleanField, ObjectField, ArrayField, StringField, TypedObjectField, DocumentUUIDField } = foundry.data.fields;
+/**
+ * Derived Data structure build from an actors skill items.
+ */
+export const ActorSkills = () => ({
     active: Skills(),
-    language: new SchemaField(KnowledgeSkillList('intuition')),
-    knowledge: new SchemaField(KnowledgeSkills()),
+    language: Skills(),
+    knowledge: new SchemaField(KnowledgeSkills())
 });
 
 export const MagicData = () => ({
@@ -62,7 +64,10 @@ export const CommonData = () => ({
     description: new SchemaField(DescriptionData()),
     importFlags: new SchemaField(ImportFlagData(), { nullable: true }),
 
-    skills: new SchemaField(CharacterSkills()),
+    // skill set used to populate actor skill items.
+    skillset: new DocumentUUIDField({ required: true, blank: true }),
+    // derived skill data based on actor skill items.
+    skills: new SchemaField(ActorSkills()),
 
     // favorites and hidden_items can be Local ID or UUID depending on if the item comes from a compendium or not
     favorites: new ArrayField(new StringField({ required: true })),

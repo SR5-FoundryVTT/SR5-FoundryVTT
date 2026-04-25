@@ -13,6 +13,9 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
     describe('SuccessTest', () => {
         it('evaluate a roll from action data', async () => {
+            //@ts-expect-error Prohibit skill population.
+            window.doNotPopulateDefaultSkills = true;
+
             const action = await factory.createItem({
                 type: 'action',
                 system: {
@@ -44,9 +47,24 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                 type: 'character',
                 system: {
                     attributes: { body: { base: 5 }, strength: { base: 1 }, reaction: { base: 1 } },
-                    skills: { active: { automatics: { base: 45 } } }
                 }
             });
+            await actor.createEmbeddedDocuments('Item', [
+                {
+                    type: 'skill',
+                    name: 'Automatics',
+                    system: {
+                        type: 'skill',
+                        skill: {
+                            attribute: 'agility',
+                            rating: 45
+                        }
+                    }
+                }
+            ]);
+            
+            //@ts-expect-error Prohibit skill population.
+            delete window.doNotPopulateDefaultSkills;
 
             const test = await TestCreator.fromItem(action, actor, {showMessage: false, showDialog: false});
 

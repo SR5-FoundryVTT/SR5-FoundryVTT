@@ -16,6 +16,10 @@ import { MatrixTestData, OpposedMatrixTestData } from './tests/MatrixTest';
 
 type OneOrMany<T> = T | T[];
 
+interface ConfirmDeletionOptions {
+    askForConfirmation?: boolean;
+}
+
 export class Helpers {
     /**
      * Round a number to a given number of decimal places.
@@ -24,7 +28,7 @@ export class Helpers {
      * @param decimals The number of decimal places (default: 3).
      * @returns The rounded number.
      */
-    static roundTo(value: number, decimals=3): number {
+    static roundTo(value: number, decimals = 3): number {
         const multiplier = Math.pow(10, decimals);
         return Math.round(value * multiplier) / multiplier;
     }
@@ -263,8 +267,8 @@ export class Helpers {
         if (!tokenOrigin || !tokenDest) return 0;
 
         // 2d coordinates and distance
-        const origin2D = canvas.grid.getCenterPoint({x: tokenOrigin.x, y: tokenOrigin.y});
-        const dest2D = canvas.grid.getCenterPoint({x: tokenDest.x, y: tokenDest.y});
+        const origin2D = canvas.grid.getCenterPoint({ x: tokenOrigin.x, y: tokenOrigin.y });
+        const dest2D = canvas.grid.getCenterPoint({ x: tokenDest.x, y: tokenDest.y });
 
         // Use gridSpace to measure in grids instead of distance. This will give results parity to FoundryVTTs canvas ruler.
         const distanceInGridUnits2D = canvas.grid.measurePath([origin2D, dest2D], {});
@@ -466,7 +470,7 @@ export class Helpers {
 
     static createRangeDescription(label: Translation, distance: number, modifier: number): RangeTemplateType {
         const localizedLabel = game.i18n.localize(label);
-        return {label: localizedLabel, distance, modifier}
+        return { label: localizedLabel, distance, modifier }
     }
 
     /**
@@ -616,7 +620,12 @@ export class Helpers {
         return Helpers.modifyDamageByHits(incoming, -hits, modificationLabel);
     }
 
-    static async confirmDeletion(): Promise<boolean> {
+    /**
+     * Ask user for confirmation if something should be permanantly deleted.
+     * @param options.askForConfirmation Wheter not actually ask. This is a unittest switch.
+     */
+    static async confirmDeletion(options: ConfirmDeletionOptions = {askForConfirmation: true}): Promise<boolean> {
+        if (!options.askForConfirmation) return true;
         const dialog = new DeleteConfirmationDialog();
         await dialog.select();
         return !dialog.canceled && dialog.selectedButton === 'delete';
@@ -639,7 +648,7 @@ export class Helpers {
 
         const id = randomID(idLength);
         const updateSkillData = {
-            [skillDataPath]: {[id]: skillField}
+            [skillDataPath]: { [id]: skillField }
         };
 
         return { id, updateSkillData }
@@ -653,7 +662,7 @@ export class Helpers {
      *
      */
     static getUpdateDataEntry(path: string, value: any): Record<string, any> {
-        return {[path]: value};
+        return { [path]: value };
     }
 
     /**
@@ -668,42 +677,7 @@ export class Helpers {
     static getDeleteKeyUpdateData(path: string, key: string): Record<string, Record<string, null>> {
         // Entity.update utilizes the mergeObject function within Foundry.
         // That functions documentation allows property deletion using the -= prefix before property key.
-        return {[path]: {[`-=${key}`]: null}};
-    }
-
-    static localizeSkill(skill: SkillFieldType): string {
-        return skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
-    }
-
-    /**
-     * Alphabetically sort skills either by their translated label. Should a skill not have one, use the name as a
-     * fallback.
-     *
-     * Sorting should be aware of UTF-8, however please blame JavaScript if it's not. :)
-     *
-     * @param skills
-     * @param asc Set to true for ascending sorting order and to false for descending order.
-     * @return Sorted Skills given by the skills parameter
-     */
-    static sortSkills(skills: SkillsType, asc = true): SkillsType {
-        // Filter entries instead of values to have a store of ids for easy rebuild.
-        const sortedEntries = Object.entries(skills).sort(([aId, a], [bId, b]) => {
-            const comparatorA = Helpers.localizeSkill(a) || aId;
-            const comparatorB = Helpers.localizeSkill(b) || bId;
-            // Use String.localeCompare instead of the > Operator to support other alphabets.
-            if (asc)
-                return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
-            else
-                return comparatorA.localeCompare(comparatorB) === 1 ? -1 : 1;
-        });
-
-        // Rebuild the Skills type using the earlier entries.
-        const sortedAsObject = {};
-        for (const [id, skill] of sortedEntries) {
-            sortedAsObject[id] = skill;
-        }
-
-        return sortedAsObject;
+        return { [path]: { [`-=${key}`]: null } };
     }
 
     /**
@@ -757,17 +731,6 @@ export class Helpers {
 
             return true;
         });
-    }
-
-    /**
-     * Handle the special skill cases with id equals name and possible i18n
-     *
-     * @param skill
-     * @returns Either a translation or a name.
-     */
-    static getSkillLabelOrName(skill: SkillFieldType): string {
-        // Custom skills don't have labels, use their name instead.
-        return skill.label ? game.i18n.localize(skill.label as Translation) : skill.name || '';
     }
 
     /**
@@ -851,7 +814,7 @@ export class Helpers {
      * @param replace The characters to replaces prohibited characters with
      * @returns key without
      */
-    static sanitizeDataKey(key: string, replace=''): string {
+    static sanitizeDataKey(key: string, replace = ''): string {
         const spicyCharacters = ['.', '-='];
         for (const character of spicyCharacters)
             key = key.replace(character, replace);
@@ -866,13 +829,13 @@ export class Helpers {
      * @returns an actor
      */
     static async chooseFromAvailableActors() {
-        const availableActors = game.actors?.filter( e => e.isOwner && e.hasPlayerOwner) ?? [];
+        const availableActors = game.actors?.filter(e => e.isOwner && e.hasPlayerOwner) ?? [];
 
-        if(availableActors.length === 0) {
+        if (availableActors.length === 0) {
             return undefined;
         }
 
-        if(availableActors.length === 1) {
+        if (availableActors.length === 1) {
             return availableActors[0]
         } else {
             const data: PromptDialogData = {
@@ -923,11 +886,11 @@ export class Helpers {
     }
 
     /**
-     * Translates a skillId
+     * Translates a skill name
      * @param skill
      * @returns translation
      */
-    static getSkillTranslation(skill: string) : string {
+    static getSkillTranslation(skill: string): string {
         return game.i18n.localize(`SR5.Skill.${this.capitalizeFirstLetter(skill)}` as Translation)
     }
 
@@ -936,7 +899,7 @@ export class Helpers {
      * @param attribute
      * @returns translation
      */
-    static getAttributeTranslation(attribute: string) : string {
+    static getAttributeTranslation(attribute: string): string {
         return game.i18n.localize(`SR5.Attr${this.capitalizeFirstLetter(attribute)}` as Translation)
     }
 
@@ -961,7 +924,7 @@ export class Helpers {
      * @param b Any type of document data
      * @returns
      */
-    static sortByName(a: {name: string}, b: {name: string}) {
+    static sortByName(a: { name: string }, b: { name: string }) {
         if (a.name > b.name) return 1;
         if (a.name < b.name) return -1;
         return 0;
@@ -970,7 +933,7 @@ export class Helpers {
     /**
      * Slugify a name to match it's label counterpart in the i18n files.
      * For that it needs to be PascalCase and without spaces.
-     * 
+     *
      * This can happen when displaying a packs document name translated on
      * sheet, as the document name will be human readable and in English, while
      * on sheet it should be match the display language.
@@ -981,6 +944,7 @@ export class Helpers {
             .trim()
             // Normalize string
             .toLowerCase()
+            .replace(/[_-]+/g, ' ')
             // PascalCase
             .split(' ')
             .map(word => {
@@ -989,5 +953,25 @@ export class Helpers {
             // Return and remove all non-alphanumerics
             .join('')
             .replace(/[^a-zA-Z0-9]/g, '');
+    }
+
+    /**
+     * Localize any document name with using i18n.
+     * If no localization can be made, return the name as is.
+     * 
+     * @param name The name of the document.
+     * @param baseLabel The base label to use for localization.
+     */
+    static localizeName(name: string, baseLabel = 'SR5') {
+        if (!baseLabel) return name;
+
+        const label = Helpers.buildLabel(baseLabel, name);
+        const translation = game.i18n.localize(label);
+        return translation === label ? name : translation;
+    }
+
+    static buildLabel(baseLabel: string, subLabel: string) {
+        const slug = Helpers.transformToLabel(subLabel);
+        return `${baseLabel}.${slug}` as Translation;
     }
 }

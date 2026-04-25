@@ -1,0 +1,43 @@
+{
+  "name": "Summoning",
+  "type": "skill",
+  "img": "systems/shadowrun5e/dist/icons/skills/magical-summoning.svg",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": ""
+    },
+    "importFlags": null,
+    "type": "skill",
+    "skill": {
+      "category": "active",
+      "rating": 0,
+      "defaulting": false,
+      "attribute": "magic",
+      "specializations": [],
+      "group": "",
+      "requirement": "magic",
+      "language": {
+        "isNative": false
+      },
+      "knowledgeType": null
+    },
+    "group": {
+      "skills": [],
+      "rating": 0
+    },
+    "set": {
+      "skills": [],
+      "groups": []
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "96nKn0HwT81OPY5q",
+  "_key": "!items!96nKn0HwT81OPY5q"
+}

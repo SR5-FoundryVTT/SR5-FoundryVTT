@@ -1,0 +1,63 @@
+{
+  "name": "Performance",
+  "type": "skill",
+  "img": "systems/shadowrun5e/dist/icons/skills/social-performance.svg",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": ""
+    },
+    "importFlags": null,
+    "type": "skill",
+    "skill": {
+      "category": "active",
+      "rating": 0,
+      "defaulting": true,
+      "attribute": "charisma",
+      "specializations": [],
+      "group": "",
+      "requirement": "mundane",
+      "action": {
+        "opposed": {
+          "type": "",
+          "test": "OpposedTest",
+          "description": "",
+          "mod": 0,
+          "skill": "",
+          "attribute": "charisma",
+          "attribute2": "willpower",
+          "armor": false,
+          "resist": {
+            "test": "",
+            "skill": "",
+            "attribute": "",
+            "attribute2": "",
+            "armor": false,
+            "mod": 0
+          }
+        }
+      },
+      "language": {
+        "isNative": false
+      },
+      "knowledgeType": null
+    },
+    "group": {
+      "skills": [],
+      "rating": 0
+    },
+    "set": {
+      "skills": [],
+      "groups": []
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "XshcN2Tq5abadOLq",
+  "_key": "!items!XshcN2Tq5abadOLq"
+}
