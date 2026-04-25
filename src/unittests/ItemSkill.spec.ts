@@ -14,13 +14,11 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
     const assert: Chai.AssertStatic = context.assert;
 
     before(async () => {
-        //@ts-expect-error Prohibit skill population.
         window.doNotPopulateDefaultSkills = true;
     });
 
     after(async () => {
         await factory.destroy();
-        //@ts-expect-error Prohibit skill population.
         delete window.doNotPopulateDefaultSkills;
     });
 
