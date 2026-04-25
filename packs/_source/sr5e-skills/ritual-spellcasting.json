@@ -1,0 +1,43 @@
+{
+  "name": "Ritual Spellcasting",
+  "type": "skill",
+  "img": "systems/shadowrun5e/dist/icons/skills/magical-ritual_spellcasting.svg",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": ""
+    },
+    "importFlags": null,
+    "type": "skill",
+    "skill": {
+      "category": "active",
+      "rating": 0,
+      "defaulting": false,
+      "attribute": "magic",
+      "specializations": [],
+      "group": "",
+      "requirement": "magic",
+      "language": {
+        "isNative": false
+      },
+      "knowledgeType": null
+    },
+    "group": {
+      "skills": [],
+      "rating": 0
+    },
+    "set": {
+      "skills": [],
+      "groups": []
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "GvOTCvYt25KrMb8B",
+  "_key": "!items!GvOTCvYt25KrMb8B"
+}

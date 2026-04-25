@@ -112,6 +112,9 @@
             "sin": {
                 "htmlField": ["description.value"]
             },
+            "skill": {
+                "htmlField": ["description.value"]
+            },
             "spell": {
                 "htmlField": ["description.value"]
             },
@@ -201,6 +204,42 @@
             },
             "type": "Macro",
             "system": "shadowrun5e"
+        },
+        {
+            "name": "sr5e-skills",
+            "label": "SR5e Skills",
+            "path": "packs/sr5e-skills",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "TRUSTED": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            },
+            "type": "Item",
+            "system": "shadowrun5e"
+        },
+        {
+            "name": "sr5e-skill-groups",
+            "label": "SR5e Skillgroups",
+            "path": "packs/sr5e-skill-groups",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "TRUSTED": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            },
+            "type": "Item",
+            "system": "shadowrun5e"
+        },
+        {
+            "name": "sr5e-skill-sets",
+            "label": "SR5e Skillsets",
+            "path": "packs/sr5e-skill-sets",
+            "ownership": {
+                "PLAYER": "OBSERVER",
+                "TRUSTED": "OBSERVER",
+                "ASSISTANT": "OWNER"
+            },
+            "type": "Item",
+            "system": "shadowrun5e"
         }
     ],
     "packFolders": [
@@ -212,7 +251,10 @@
                 "sr5e-system-macros",
                 "sr5e-general-actions",
                 "sr5e-ic-actions",
-                "sr5e-matrix-actions"
+                "sr5e-matrix-actions",
+                "sr5e-skills",
+                "sr5e-skill-groups",
+                "sr5e-skill-sets"
             ]
         }
     ],

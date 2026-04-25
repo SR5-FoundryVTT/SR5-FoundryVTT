@@ -1,10 +1,10 @@
 import { SR } from "../constants";
 import { ModifiableValue } from "../mods/ModifiableValue";
-import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SkillFieldType } from "../types/template/Skills";
+import { SR5 } from "../config";
+import { SR5Actor } from "../actor/SR5Actor";
 
 export class SkillRules {
-
     /**
      * Determing if a skills value / level makes defaulting necessary.
      * 
@@ -40,6 +40,20 @@ export class SkillRules {
     }
 
     /**
+     * Does actor match skills special requirements
+     * @PDF SR5#130 While no direct rule reference, in general magic skills need a awakened character, 
+     *              and resonance skills need a technomancer. This is what this function checks for.
+     * @param actor The actor to check against
+     * @param skill The derived skill data to use as reference
+     * @return true, actor matches skill requirements.
+     */
+    static hasRequirements(actor: SR5Actor, skill: SkillFieldType) {
+        if (skill.requirement === 'mundane') return true;
+        const special = actor.system.special;
+        return skill.requirement === special;
+    }
+
+    /**
      * Add the defaulting modifier part to a parts list
      * @param parts Should be a PartsList involved with skills.
      */
@@ -49,12 +63,17 @@ export class SkillRules {
 
     /**
      * Get the level a specific skill without its attribute.
+     *  @param skill
+     * @param options
+     * @param options.specialization If true will add the default specialization bonus onto the level.
      */
-    static level(skill: SkillFieldType) {
+    static level(skill: SkillFieldType, options = {specialization: false}) {
         if (this.mustDefaultToRoll(skill))
             return SkillRules.defaultingModifier;
 
-        return skill.value;
+        const specializationBonus = options.specialization ? SR.skill.SPECIALIZATION_MODIFIER : 0;
+
+        return skill.value + specializationBonus;
     }
 
     static get defaultingModifier() {
@@ -63,6 +82,35 @@ export class SkillRules {
 
     static get SpecializationModifier() {
         return SR.skill.SPECIALIZATION_MODIFIER;
+    }
+
+    static knowledgeSkillAttribute(category: keyof typeof SR5.knowledgeAttributes): keyof typeof SR5.attributes | undefined {
+        return SR5.knowledgeAttributes[category];
+    }
+
+    static languageSkillAttribute(): keyof typeof SR5.attributes {
+        return 'intuition';
+    }
+    
+    /**
+     * These skill categories have predefined values like
+     * - attributes
+     * - defaulting
+     * 
+     * See SR5#128 'Skill Types'
+     */
+    static readonly skillCategoriesWithFixedAttributes = new Set(['knowledge', 'language']);
+    static fixedCategoryValues(category: string) {
+        return SkillRules.skillCategoriesWithFixedAttributes.has(category);
+    }
+
+    /**
+     * Can a skill category be native?
+     * 
+     * See SR5#89 'Knowledge and Language Skills'
+     */
+    static canBeNativeCategory(category: string) {
+        return category === 'language';
     }
 
     /**

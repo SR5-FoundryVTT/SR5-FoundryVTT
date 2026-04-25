@@ -3,7 +3,7 @@ import { SR5Item } from '../item/SR5Item';
 import { FLAGS, SKILL_DEFAULT_NAME, SR, SYSTEM_NAME } from '../constants';
 import { ModifiableValue } from '../mods/ModifiableValue';
 import { DataDefaults } from '../data/DataDefaults';
-import { SkillFlow } from "./flows/SkillFlow";
+import { SkillFieldPrep } from './prep/functions/SkillFieldPrep';
 import { SR5 } from "../config";
 import { CharacterPrep } from "./prep/CharacterPrep";
 import { SpiritPrep } from "./prep/SpiritPrep";
@@ -20,13 +20,11 @@ import { RecoveryRules } from "../rules/RecoveryRules";
 import { CombatRules } from '../rules/CombatRules';
 import { allApplicableDocumentEffects, allApplicableItemsEffects } from '../effects';
 import { ConditionRules, DefeatedStatus } from '../rules/ConditionRules';
-import { Translation } from '../utils/strings';
 import { TeamworkMessageData } from './flows/TeamworkFlow';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import { ActionRollType, DamageType } from '../types/item/Action';
 import { AttributeFieldType, AttributesType, EdgeAttributeFieldType } from '../types/template/Attributes';
 import { LimitFieldType } from '../types/template/Limits';
-import { KnowledgeSkillCategory, SkillFieldType } from '../types/template/Skills';
 import { ConditionType } from '../types/template/Condition';
 import { OverflowTrackType, TrackType } from '../types/template/ConditionMonitors';
 import { ActorArmorType } from '../types/template/Armor';
@@ -44,12 +42,20 @@ import { ActorRollDataFlow } from './flows/ActorRollDataFlow';
 import { MatrixICFlow } from './flows/MatrixICFlow';
 import { RollDataOptions } from '../item/Types';
 import { MatrixRebootFlow } from '../flows/MatrixRebootFlow';
-import { PackActionFlow } from '../item/flows/PackActionFlow';
+import { PackItemFlow } from '../item/flows/PackItemFlow';
 import { MatrixRules } from '@/module/rules/MatrixRules';
 import { StorageFlow } from '@/module/flows/StorageFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 import { LinksHelpers } from '@/module/utils/links';
 import type { InitiativeModeOptions } from '../combat/SR5Combatant';
+import { CreateActorFlow } from './flows/CreateActorFlow';
+import { SkillNamingFlow } from '@/module/flows/SkillNamingFlow';
+import { SkillFieldType } from '../types/template/Skills';
+
+interface TypedItemMap extends Omit<Map<Item.ConfiguredSubType, SR5Item[]>, 'get' | 'set'> {
+    get: <K extends Item.ConfiguredSubType>(key: K) => SR5Item<K>[] | undefined;
+    set: <K extends Item.ConfiguredSubType>(key: K, value: SR5Item<K>[]) => this;
+}
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -93,7 +99,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     modifiers: ModifierFlow;
 
     // Quick access for all items of a type.
-    itemsForType = new Map<Item.ConfiguredSubType, SR5Item[]>();
+    itemsForType = new Map<Item.ConfiguredSubType, SR5Item[]>() as TypedItemMap;
 
     constructor(data: Actor.CreateData<SubType>, context?: Actor.ConstructionContext) {
         super(data, context);
@@ -115,6 +121,25 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return super.migrateData(source);
     }
 
+    /**
+     * Lifecycle hook called before an actor document is created.     
+     * 
+     * NOTE: Hook is both called for creating and cloning / duplicating actor documents.
+     *
+     * @param data The initial data object provided to the document creation request
+     * @param options Additional options which modify the creation request
+     * @param user The User requesting the document creation
+     */
+    override async _preCreate(data: Actor.CreateData, options: Actor.Database.PreCreateOptions, user: User.Implementation) {
+        await super._preCreate(data, options, user);
+        
+        // Abort skill creation data injection when duplicating
+        if (foundry.utils.getProperty(data, '_stats.duplicateSource')) return;
+        // Abort if a skillset was already assigned (e.g. during Chummer import)
+        if (foundry.utils.getProperty(data, 'system.skillset')) return;
+        await CreateActorFlow.addDefaultActorSkillset(this, data);
+    }
+
     override async update(
         data: Actor.UpdateData | undefined,
         operation?: Actor.Database.UpdateOperation,
@@ -130,7 +155,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     override prepareData() {
         super.prepareData();
-        this.prepareItemsForType();
     }
 
     /**
@@ -142,6 +166,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     override prepareBaseData() {
         super.prepareBaseData();
+
+        this.prepareItemsForType();
+        this.prepareSkills();
 
         if (this.isType('character'))
             CharacterPrep.prepareBaseData(this.system);
@@ -273,26 +300,31 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         }
 
         for (const item of this.items) {
-            const items = this.itemsForType.get(item.type) as any[];
+            const items = this.itemsForType.get(item.type)!;
             items.push(item);
             this.itemsForType.set(item.type, items);
         }
     }
 
     /**
+     * Prepare skill items for easy use and access.
+     */
+    prepareSkills() {
+        const skills = this.itemsForType.get('skill');
+        if (!skills) return;
+
+        this.system.skills = SkillFieldPrep.prepareActorSkills(skills);
+    }
+    
+    /*
      * Some actors have skills, some don't. While others don't have skills but derive skill values from their ratings.
      */
     findActiveSkill(skillName?: string): SkillFieldType | undefined {
-        // Check for faulty to catch empty names as well as missing parameters.
         if (!skillName) return;
 
-        // Handle legacy skills (name is id)
         const skills = this.getActiveSkills();
         const skill = skills[skillName];
         if (skill) return skill;
-
-        // Handle custom skills (name is not id)
-        return Object.values(skills).find(skill => skill.name === skillName);
     }
 
     findAttribute(id?: string): AttributeFieldType | undefined {
@@ -562,24 +594,24 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return this.getSkills() !== undefined;
     }
 
-    getSkills(this: SR5Actor): SR5Actor['system']['skills'] {
+    getSkills(this: SR5Actor) {
         return this.system.skills;
     }
 
-    getActiveSkills(this: SR5Actor): SR5Actor['system']['skills']['active'] {
+    getActiveSkills(this: SR5Actor) {
         return this.system.skills.active;
     }
 
     getMasterUuid(): string | undefined {
-        if(!this.isType('vehicle')) return;
+        if (!this.isType('vehicle')) return;
 
         return this.system.master;
     }
 
     async setMasterUuid(masterLink: string | undefined): Promise<void> {
-        if(!this.isType('vehicle')) return;
+        if (!this.isType('vehicle')) return;
 
-        await this.update({ system: { master: masterLink }});
+        await this.update({ system: { master: masterLink } });
     }
 
     /**
@@ -721,306 +753,131 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Return the full pool of a skill including attribute and possible specialization bonus.
-     * @param skillId The ID of the skill. Note that this can differ from what is shown in the skill list. If you're
+     * @param name The name of the skill. Note that this can differ from what is shown in the skill list. If you're
      *                unsure about the id and want to search
      * @param options An object to change the behavior.
      *                The property specialization will trigger the pool value to be raised by a specialization modifier
      *                The property byLabel will cause the param skillId to be interpreted as the shown i18n label.
      */
-    getPool(skillId: string, options = { specialization: false, byLabel: false }): number {
-        const skill = options.byLabel ? this.getSkillByLabel(skillId) : this.getSkill(skillId);
-        if (!skill?.attribute) return 0;
-        if (!SkillFlow.allowRoll(skill)) return 0;
+    getPool(name: string, options = { specialization: false, byLabel: false }): number {
+        const skillField = options.byLabel ? this.getSkillByLabel(name) : this.getSkill(name);
+        if (!skillField) return 0;
 
-        const attribute = this.getAttribute(skill.attribute);
+        if (!skillField?.attribute) return 0;
+        if (!SkillRules.allowRoll(skillField)) return 0;
 
-        // An attribute can have a NaN value if no value has been set yet. Do the skill for consistency.
-        const attributeValue = typeof attribute.value === 'number' ? attribute.value : 0;
-        const skillValue = typeof skill.value === 'number' ? skill.value : 0;
+        const attribute = this.getAttribute(skillField.attribute);
 
-        if (SkillRules.mustDefaultToRoll(skill) && SkillRules.allowDefaultingRoll(skill)) {
-            return SkillRules.defaultingModifier + attributeValue;
+        if (SkillRules.mustDefaultToRoll(skillField) && SkillRules.allowDefaultingRoll(skillField)) {
+            return SkillRules.defaultingModifier + attribute.value;
         }
 
         const specializationBonus = options.specialization ? SR.skill.SPECIALIZATION_MODIFIER : 0;
-        return skillValue + attributeValue + specializationBonus;
+        return skillField.value + attribute.value + specializationBonus;
     }
 
     /**
      * Find a skill either by id or label.
      *
-     * Skills are mapped by an id, which can be a either a lower case name (legacy skills) or a short uid (custom, language, knowledge).
-     * Legacy skills use their name as the id, while not having a name set on the SkillField.
-     * Custom skills use an id and have their name set, however no label. This goes for active, language and knowledge.
-     *
-     * NOTE: Normalizing skill mapping from active, language and knowledge to a single skills with a type property would
-     *       clear this function up.
-     *
-     * @param id Either the searched id, name or translated label of a skill
-     * @param options .byLabel when true search will try to match given skillId with the translated label
+     * @param name Either the name or translated label (not the SR5.<label>-string)
+     * @param options.byLabel when true search will try to match given skillId with the translated label
+     * @param options.byId when true search for an actual item id in the derived system skill data.
      */
-    getSkill(this: SR5Actor, id: string, options?: { byLabel?: boolean, rollData?: SR5Actor['system'] }): SkillFieldType | undefined {
-        if (options?.byLabel)
-            return this.getSkillByLabel(id);
-
+    getSkill(this: SR5Actor, name: string, options?: { byLabel?: boolean, byId?: boolean, rollData?: SR5Actor['system'] }) {
+        // Retrieve skills from either roll or system data.
         const rollData = options?.rollData ?? this.getRollData();
-
         const skills = rollData?.skills ?? this.getSkills();
 
-        // Find skill by direct id to key matching.
-        if (Object.hasOwn(skills.active, id)) {
-            return skills.active[id];
-        }
-        if (Object.hasOwn(skills.language.value, id)) {
-            return skills.language.value[id];
-        }
-        // Knowledge skills are de-normalized into categories (street, hobby, ...)
-        for (const categoryKey in skills.knowledge) {
-            if (Object.hasOwn(skills.knowledge, categoryKey)) {
-                const category = skills.knowledge[categoryKey];
-                if (Object.hasOwn(category.value, id)) {
-                    return category.value[id];
-                }
-            }
-        }
+        if (options?.byLabel)
+            return this.getSkillByLabel(name, skills);
+        if (options?.byId)
+            return this.getSkillById(name, skills);
 
-        return this.getSkillByLabel(id);
+        return this.getSkillByKey(name, skills) ?? this.getSkillByName(name, skills) ?? this.getSkillByLabel(name, skills);
     }
 
     /**
-     * Search all skills for a matching i18n translation label.
+     * Return the skill field matching the canonical skill key used in action data.
+     *
+     * For legacy skills this is typically the normalized compendium name, e.g.
+     * `heavy_weapons`, while custom skills also share the same normalization.
+     */
+    getSkillByKey(key: string, skills: SR5Actor['system']['skills'] = this.getSkills()): SkillFieldType | undefined {
+        if (!key) return;
+
+        const activeSkill = skills.active[key];
+        if (activeSkill) return activeSkill;
+
+        for (const category of Object.values(skills.knowledge)) {
+            const skill = category[key];
+            if (skill) return skill;
+        }
+
+        return skills.language[key];
+    }
+
+    /**
+     * Return the skill field matching given skill name.
+     *
+     * @param name Item id of a skill on the actor, used to create a skill field.
+     */
+    getSkillByName(name: string, skills: SR5Actor['system']['skills']): SkillFieldType | undefined {
+        if (!name) return;
+
+        let skillField = Object.values(skills.active).find(skill => skill.name === name);
+        if (skillField) return skillField;
+        skillField = Object.values(skills.knowledge).flatMap(category => Object.values(category)).find(skill => skill.name === name);
+        if (skillField) return skillField;
+        skillField = Object.values(skills.language).find(skill => skill.name === name);
+        if (skillField) return skillField;
+    }
+
+    /**
+     * Return the skill field matching the given skill item id
+     * 
+     * @param id The skill item id to be looked for in the dervied system skill data.
+     */
+    getSkillById(id: string, skills: SR5Actor['system']['skills'] = this.getSkills()): SkillFieldType | undefined {
+        if (!id) return;
+
+        let skillField = Object.values(skills.active).find(skill => skill.id === id);
+        if (skillField) return skillField;
+        skillField = Object.values(skills.knowledge).flatMap(category => Object.values(category)).find(skill => skill.id === id);
+        if (skillField) return skillField;
+        skillField = Object.values(skills.language).find(skill => skill.id === id);
+        if (skillField) return skillField;
+    }
+
+    /**
+     * Search all skills for a matching already localized skill label.
      * NOTE: You should use getSkill if you have the skillId ready. Only use this for ease of use!
      *
-     * @param searchedFor The translated output of either the skill label (after localize) or name of the skill in question.
-     * @return The first skill found with a matching translation or name.
+     * @param label The translated output of the skill label or the name of the skill in question.
+     * @return The first skill found with a matching translated label or name.
      */
-    getSkillByLabel(searchedFor: string): SkillFieldType | undefined {
-        if (!searchedFor) return;
+    getSkillByLabel(label: string, skills: SR5Actor['system']['skills'] = this.getSkills()): SkillFieldType | undefined {
+        if (!label) return;
 
-        const possibleMatch = (skill: SkillFieldType): string => skill.label ? game.i18n.localize(skill.label as Translation) : skill.name;
+        const possibleMatch = (skill: SkillFieldType): string => skill.label || skill.name;
 
-        const skills = this.getSkills();
-
-        for (const [id, skill] of Object.entries(skills.language.value)) {
-            if (searchedFor === possibleMatch(skill))
-                return {...skill, id};
+        for (const skill of Object.values(skills.language)) {
+            if (label === possibleMatch(skill))
+                return skill;
         }
 
-        // Iterate over all different knowledge skill categories
         for (const categoryKey in skills.knowledge) {
-            if (!Object.hasOwn(skills.knowledge, categoryKey)) continue;
-            // TODO: check this function Typescript can't follow the flow here...
-            const categorySkills = skills.knowledge[categoryKey].value as SkillFieldType[];
-            for (const [id, skill] of Object.entries(categorySkills)) {
-                if (searchedFor === possibleMatch(skill))
-                    return { ...skill, id };
+            const categorySkills = skills.knowledge[categoryKey] as SkillFieldType[];
+            for (const skill of Object.values(categorySkills)) {
+                if (label === possibleMatch(skill))
+                    return skill;
             }
         }
 
-        for (const [id, skill] of Object.entries(skills.active)) {
-            if (searchedFor === possibleMatch(skill))
-                return { ...skill, id };
+        for (const skill of Object.values(skills.active)) {
+            if (label === possibleMatch(skill))
+                return skill;
         }
         return undefined;
-    }
-
-    /**
-     * For the given skillId as it be would in the skill data structure for either
-     * active, knowledge or language skill.
-     *
-     * @param skillId Legacy / default skills have human-readable ids, while custom one have machine-readable.
-     * @returns The label (not yet translated) OR set custom name.
-     */
-    getSkillLabel(skillId: string): string {
-        const skill = this.getSkill(skillId);
-        if (!skill) {
-            return '';
-        }
-
-        return skill.label ?? skill.name ?? '';
-    }
-
-    /**
-     * Add a new knowledge skill for a specific category.
-     *
-     * Knowledge skills are stored separately from active and language skills and have
-     * some values pre-defined by their category (street, professional, ...)
-     *
-     * @param category Define the knowledge skill category
-     * @param skill  Partially define the SkillField properties needed. Omitted properties will be default.
-     * @returns The id of the created knowledge skill.
-     */
-    async addKnowledgeSkill(
-        this: SR5Actor,
-        category: KnowledgeSkillCategory,
-        skill: Partial<SkillFieldType> = { name: SKILL_DEFAULT_NAME }
-    ): Promise<string|undefined> {
-        if (!Object.hasOwn(this.system.skills.knowledge, category)) {
-            console.error(`Shadowrun5e | Tried creating knowledge skill with unknown category ${category}`);
-            return;
-        }
-
-        skill = DataDefaults.createData('skill_field', skill);
-        const id = randomID(16);
-        const value = {};
-        value[id] = skill;
-        await this.update({ system: { skills: { knowledge: { [category]: { value } } } } });
-
-        return id;
-    }
-
-    /**
-     * Add a new active skill.
-     *
-     * @param skillData Partially define the SkillField properties needed. Omitted properties will be default.
-     * @returns The new active skill id.
-     */
-    async addActiveSkill(skillData: Partial<SkillFieldType> = { name: SKILL_DEFAULT_NAME }): Promise<string | undefined> {
-        const skill = DataDefaults.createData('skill_field', skillData);
-
-        const activeSkillsPath = 'system.skills.active';
-        const updateSkillDataResult = Helpers.getRandomIdSkillFieldDataEntry(activeSkillsPath, skill);
-
-        if (!updateSkillDataResult) return;
-
-        const { updateSkillData, id } = updateSkillDataResult;
-
-        await this.update(updateSkillData as object);
-
-        return id;
-    }
-
-    /**
-     * Remove a language skill by it's id.
-     * @param skillId What skill id to delete.
-     */
-    async removeLanguageSkill(skillId: string) {
-        const updateData = Helpers.getDeleteKeyUpdateData('system.skills.language.value', skillId);
-        await this.update(updateData);
-    }
-
-    /**
-     * Add a language skill.
-     *
-     * @param skill Partially define the SkillField properties needed. Omitted properties will be default.
-     * @returns The new language skill id.
-     */
-    async addLanguageSkill(skill): Promise<string> {
-        const defaultSkill = {
-            name: '',
-            specs: [],
-            base: 0,
-            value: 0,
-            // TODO: BUG ModifiableValue is ModList<number>[] and not number
-            mod: 0,
-        };
-        skill = {
-            ...defaultSkill,
-            ...skill,
-        };
-
-        const id = randomID(16);
-        const value = {};
-        value[id] = skill;
-        const fieldName = `system.skills.language.value`;
-        const updateData = {};
-        updateData[fieldName] = value;
-
-        await this.update(updateData);
-
-        return id;
-    }
-
-    /**
-     * Remove a knowledge skill
-     * @param skillId What skill id to delete.
-     * @param category The matching knowledge skill category for skillId
-     */
-    async removeKnowledgeSkill(skillId: string, category: KnowledgeSkillCategory) {
-        const updateData = Helpers.getDeleteKeyUpdateData(`system.skills.knowledge.${category}.value`, skillId);
-        await this.update(updateData);
-    }
-
-    /**
-     * Delete the given active skill by it's id. It doesn't
-     *
-     * @param skillId Either a random id for custom skills or the skills name used as an id.
-     */
-    async removeActiveSkill(skillId: string) {
-        const activeSkills = this.getActiveSkills();
-        if (!Object.hasOwn(activeSkills, skillId)) return;
-        const skill = this.getSkill(skillId);
-        if (!skill) return;
-
-        // Don't delete legacy skills to allow prepared items to use them, should the user delete by accident.
-        // New custom skills won't have a label set also.
-        if (skill.name === '' && skill.label !== undefined && skill.label !== '') {
-            await this.hideSkill(skillId);
-            // NOTE: For some reason unlinked token actors won't cause a render on update?
-            if (!this.prototypeToken.actorLink)
-                await this.sheet?.render();
-            return;
-        }
-
-        // Remove custom skills without mercy!
-        const updateData = Helpers.getDeleteKeyUpdateData('system.skills.active', skillId);
-        await this.update(updateData);
-    }
-
-    /**
-     * Mark the given skill as hidden.
-     *
-     * NOTE: Hiding skills has
-     *
-     * @param skillId The id of any type of skill.
-     */
-    async hideSkill(skillId: string) {
-        if (!skillId) return;
-        const skill = this.getSkill(skillId);
-        if (!skill) return;
-
-        skill.hidden = true;
-        const updateData = Helpers.getUpdateDataEntry(`system.skills.active.${skillId}`, skill);
-        await this.update(updateData);
-    }
-
-    /**
-     * mark the given skill as visible.
-     *
-     * @param skillId The id of any type of skill.
-     */
-    async showSkill(skillId: string) {
-        if (!skillId) return;
-        const skill = this.getSkill(skillId);
-        if (!skill) return;
-
-        skill.hidden = false;
-        const updateData = Helpers.getUpdateDataEntry(`system.skills.active.${skillId}`, skill);
-        await this.update(updateData);
-    }
-
-    /**
-     * Show all hidden skills.
-     *
-     * For hiding/showing skill see SR5Actor#showSkill and SR5Actor#hideSkill.
-     */
-    async showHiddenSkills() {
-        const updateData = {};
-
-        const skills = this.getActiveSkills();
-        for (const [id, skill] of Object.entries(skills)) {
-            if (skill.hidden) {
-                skill.hidden = false;
-                updateData[`system.skills.active.${id}`] = skill;
-            }
-        }
-
-        if (!updateData) return;
-
-        await this.update(updateData);
-        // NOTE: For some reason unlinked token actors won't cause a render on update?
-        if (!this.prototypeToken.actorLink)
-            await this.sheet?.render();
     }
 
     /**
@@ -1064,7 +921,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     async packActionTest(packName: Shadowrun.PackName, actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
         const showDialog = this.tests.shouldShowDialog(options?.event);
-        return this.tests.fromPackAction(packName, actionName, this, {showDialog});
+        return this.tests.fromPackAction(packName, actionName, this, { showDialog });
     }
 
     /**
@@ -1110,7 +967,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options Success Test options
      */
     async rollGeneralAction(actionName: Shadowrun.PackActionName, options?: Shadowrun.ActorRollOptions) {
-        const generalPackName = PackActionFlow.getGeneralActionsPackName();
+        const generalPackName = PackItemFlow.getGeneralActionsPackName();
         return this.rollPackAction(generalPackName, actionName, options);
     }
 
@@ -1126,22 +983,22 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Roll a skill test for a specific skill
-     * @param skillId The id or label for the skill. When using a label, the appropriate option must be set.
+     * @param name The skill name to be rolled
      * @param options Optional options to configure the roll.
      * @param options.byLabel true to search the skill by label as displayed on the sheet.
      * @param options.specialization true to configure the skill test to use a specialization.
      */
-    async rollSkill(skillId: string, options: SkillRollOptions={}) {
-        console.info(`Shadowrun5e | Rolling skill test for ${skillId}`);
+    async rollSkill(name: string, options: SkillRollOptions = {}) {
+        console.info(`Shadowrun5e | Rolling skill test for ${name}`);
 
-        const action = this.skillActionData(skillId, options);
+        const action = this.skillActionData(name, options);
         if (!action) return;
-        if(options.threshold) {
+        if (options.threshold) {
             action.threshold = options.threshold
         }
 
         const showDialog = this.tests.shouldShowDialog(options.event);
-        const test = await this.tests.fromAction(action, this, {showDialog});
+        const test = await this.tests.fromAction(action, this, { showDialog });
         if (!test) return;
 
         return test.execute();
@@ -1157,7 +1014,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         console.info(`Shadowrun5e | Rolling attribute ${name} test from ${this.constructor.name}`);
 
         // Prepare test from action.
-        const action = DataDefaults.createData('action_roll', {attribute: name, test: AttributeOnlyTest.name});
+        const action = DataDefaults.createData('action_roll', { attribute: name, test: AttributeOnlyTest.name });
         const showDialog = this.tests.shouldShowDialog(options.event);
         const test = await this.tests.fromAction(action, this, { showDialog });
         if (!test) return;
@@ -1186,7 +1043,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     async testFromItem(item: SR5Item, options: Shadowrun.ActorRollOptions = {}) {
         const showDialog = this.tests.shouldShowDialog(options.event);
-        return this.tests.fromItem(item, this, { showDialog});
+        return this.tests.fromItem(item, this, { showDialog });
     }
 
     /**
@@ -1211,7 +1068,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         };
         const content = await renderTemplate('systems/shadowrun5e/dist/templates/rolls/teamwork-test-message.hbs', templateData);
         // Prepare the actual message.
-        const messageData =  {
+        const messageData = {
             user: game.user.id,
             speaker: {
                 actor: this.id!,
@@ -1223,7 +1080,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             // This test data is needed for all subsequent testing based on this chat messages.
             flags: {
                 // Add test data to message to allow ChatMessage hooks to access it.
-                [SYSTEM_NAME]: {[FLAGS.Test]: {skill: skillId}},
+                [SYSTEM_NAME]: { [FLAGS.Test]: { skill: skillId } },
                 'core.canPopout': true
             },
             sound: CONFIG.sounds.dice,
@@ -1260,7 +1117,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         });
 
         const showDialog = this.tests.shouldShowDialog(options.event);
-        const test = await this.tests.fromAction(action, this, {showDialog});
+        const test = await this.tests.fromAction(action, this, { showDialog });
         if (!test) return;
 
         return test.execute();
@@ -1302,36 +1159,41 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Build an action for the given skill id based on it's configured values.
+     * 
+     * All action values are derived from the SkillField instead of the skill item
+     * as field values can be modified by effect changes.
      *
-     * @param skillId Any skill, no matter if active, knowledge or language
-     * @param options
+     * @param name Any skill, no matter if active, knowledge or language
+     * @param options Options on how to handle this action roll
      */
-    skillActionData(skillId: string, options: SkillRollOptions = {}): ActionRollType | undefined {
+    skillActionData(name: string, options: SkillRollOptions = {}): ActionRollType | undefined {
         const byLabel = options.byLabel || false;
-        const skill = this.getSkill(skillId, { byLabel });
+        const skill = this.getSkill(name, { byLabel });
         if (!skill) {
-            console.error(`Shadowrun 5e | Skill ${skillId} is not registered of actor ${this.id}`);
+            console.error(`Shadowrun 5e | Skill ${name} is not registered of actor ${this.id}`);
             return;
         }
 
-        // When fetched by label, getSkillByLabel will inject the id into SkillField.
-        skillId = skill.id || skillId;
-
-        // Derive limit from skill attribute.
         const attribute = this.getAttribute(skill.attribute);
-        // TODO: Typing. LimitData is incorrectly typed to ActorAttributes only but including limits.
-        const limit = attribute.limit || '';
-        // Should a specialization be used?
+        const limit = skill.limit || attribute?.limit || '';
         const spec = options.specialization || false;
+        const skillKey = SkillNamingFlow.nameToKey(skill.name) || name;
+
+        const getOpposedAction = (id: string) => {
+            const item = this.items.get(id) as SR5Item<'skill'> | undefined;
+            if (!item?.isType('skill')) return;
+            return item.system.skill.action.opposed;
+        }
 
         return DataDefaults.createData('action_roll', {
-            skill: skillId,
+            skill: skillKey,
             spec,
             attribute: skill.attribute,
             limit: {
                 attribute: limit,
                 base_formula_operator: 'add',
             },
+            opposed: getOpposedAction(skill.id),
 
             test: 'SkillTest'
         });
@@ -1413,7 +1275,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         condition = this.__addDamageToTrackValue(damage, condition);
 
         await device.update({ system: { technology: { condition_monitor: condition } } });
-        
+
     }
 
     /**
@@ -1479,10 +1341,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     async healDamage(this: SR5Actor, track: DamageType['type']['value'], healing: number) {
         console.log(`Shadowrun5e | Healing ${track} damage of ${healing} for actor`, this);
 
-        if (!this.system?.track?.[track]) return;
-        const current = Math.max(this.system.track[track].value - healing, 0);
+        const trackField = this.system?.track?.[track] as TrackType | undefined;
+        if (!trackField) return;
+        const current = Math.max(trackField.value - healing, 0);
 
-        await this.update({[`system.track.${track}.value`]: current});
+        await this.update({ system: { track: { [track]: { value: current } } } });
     }
 
     async healStunDamage(healing: number) {
@@ -1611,8 +1474,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // Remove out old defeated effects.
         if (removeStatus.length) {
             const existing = this.effects.reduce<string[]>((arr, e) => {
-                if ((e.statuses.size === 1) && e.statuses.some(status => removeStatus.includes(status)) ) arr.push(e.id as string);
-                    return arr;
+                if ((e.statuses.size === 1) && e.statuses.some(status => removeStatus.includes(status))) arr.push(e.id as string);
+                return arr;
             }, []);
 
             if (existing.length) await this.deleteEmbeddedDocuments('ActiveEffect', existing);
@@ -1654,7 +1517,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         // While not prohibiting, inform user about missing resource.
         if (combatant.initiative + modifier < 0) {
-            ui.notifications?.warn('SR5.MissingRessource.Initiative', {localize: true});
+            ui.notifications?.warn('SR5.MissingRessource.Initiative', { localize: true });
         }
 
         await combatant.adjustInitiative(modifier);
@@ -1856,7 +1719,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     async addTechnomancer(actor: SR5Actor) {
         if (!this.isType('sprite') || !actor.isType('character')) return;
-            await this.update({ system: { technomancerUuid: actor.uuid } });
+        await this.update({ system: { technomancerUuid: actor.uuid } });
     }
 
     hasTechnomancer(this: SR5Actor) {
@@ -1868,7 +1731,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     async removeTechnomancer() {
         if (!this.isType('sprite')) return;
-            await this.update({ system: { technomancerUuid: '' } });
+        await this.update({ system: { technomancerUuid: '' } });
     }
 
     /**
@@ -1897,9 +1760,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return 'matrix' in this.system;
     }
 
-       /**
-     * Check if the current actor has a Matrix persona.
-     */
+    /**
+  * Check if the current actor has a Matrix persona.
+  */
     get hasPersona(): boolean {
         return this.hasActorPersona() || this.hasDevicePersona();
     }

@@ -4,14 +4,10 @@ import { LimitsPrep } from './functions/LimitsPrep';
 import { MovementPrep } from './functions/MovementPrep';
 import { WoundsPrep } from './functions/WoundsPrep';
 import { InitiativePrep } from './functions/InitiativePrep';
-import { Helpers } from '../../helpers';
-import { SkillFlow } from "../flows/SkillFlow";
 import { CharacterPrep } from './CharacterPrep';
 import { GruntPrep } from './functions/GruntPrep';
-import { DataDefaults } from '../../data/DataDefaults';
 import { SR5 } from '../../config';
 import { SR } from '../../constants';
-import { SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
 import { SR5Item } from 'src/module/item/SR5Item';
 import { AttributesType } from 'src/module/types/template/Attributes';
 import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
@@ -20,12 +16,10 @@ import { ModifiableValue } from '@/module/mods/ModifiableValue';
 export class SpiritPrep {
     static prepareBaseData(system: Actor.SystemOfType<'spirit'>) {
         ModifiableFieldPrep.resetAllModifiers(system);
-
-        SpiritPrep.prepareSpiritSpecial(system);
     }
 
     static prepareDerivedData(system: Actor.SystemOfType<'spirit'>, items: SR5Item[]) {
-        SpiritPrep.prepareSpiritBaseData(system);
+        SpiritPrep.prepareSpiritValues(system);
 
         // Use spirit attribute range to avoid issues with attribute calculation causing unusable attributes.
         AttributesPrep.prepareAttributes(system, SR.attributes.rangesSpirit);
@@ -48,12 +42,7 @@ export class SpiritPrep {
         CharacterPrep.prepareRecoilCompensation(system);
     }
 
-    static prepareSpiritSpecial(system: Actor.SystemOfType<'spirit'>) {
-        // Spirits will always be awakened.
-        // system.special = 'magic';
-    }
-
-    static prepareSpiritBaseData(system: Actor.SystemOfType<'spirit'>) {
+    static prepareSpiritValues(system: Actor.SystemOfType<'spirit'>) {
         const overrides = this.getSpiritStatModifiers(system.spiritType);
 
         if (overrides) {
@@ -68,14 +57,19 @@ export class SpiritPrep {
             }
 
             // set the base of skills to the provided force
-            for (const skillId of overrides.skills) {
-                // Custom skills need to be created on the actor.
-                const skill = SpiritPrep.prepareActiveSkill(skillId, skills.active);
-                if (skill === undefined) continue;
-                if (SkillFlow.isCustomSkill(skill)) continue;
+            for (const skillKey of overrides.skills) {
+                const skill = skills.active[skillKey];
+                if (!skill) {
+                    console.error(`Shadowrun 5e | Spirit Prep: Skill ${skillKey} not found on spirit actor.`);
+                    continue;
+                }
 
-                skill.base = overrides.halfValueSkill ? Math.ceil(force / 2) : force;
-                skills.active[skillId] = skill;
+                // NOTE: We apply force as a modifier instead of base to make the calculation transparent.
+                //       Also, adding force as the skill item rating, would make updating and creating spirits
+                //       more complex.
+                const modifier = overrides.halfValueSkill ? Math.ceil(force / 2) : force;
+                const label = SR5.spiritTypes[system.spiritType];
+                new ModifiableValue(skill).addUnique(label, modifier);
             }
 
             // prepare initiative data
@@ -89,21 +83,6 @@ export class SpiritPrep {
             initiative.astral.dice.base = overrides.astral_init_dice;
             ModifiableValue.addUnique(initiative.astral.dice, "SR5.Bonus", modifiers.astral_initiative_dice);
         }
-    }
-
-    /**
-     * Spirits can have some none default skills. The must be created first and don't count as custom skills.
-     * @param skillId Whatever skill id should be used.
-     * @param skills The list of active skills of the sprite.
-     * @returns A prepared SkillField without levels.
-     */
-    static prepareActiveSkill(skillId: string, skills: SkillsType): SkillFieldType {
-        if (skills[skillId]) return skills[skillId];
-
-        const label = SR5.activeSkills[skillId];
-        const attribute = SR5.activeSkillAttribute[skillId];
-
-        return DataDefaults.createData('skill_field', { label, attribute, canDefault: false })
     }
 
     /**
@@ -128,7 +107,7 @@ export class SpiritPrep {
 
         const overrides = {
             // value of 0 for attribute makes it equal to the Force
-             
+
             attributes: {
                 body: 0,
                 agility: 0,
@@ -541,7 +520,7 @@ export class SpiritPrep {
                 overrides.attributes.logic = 1;
                 overrides.attributes.intuition = 1;
                 overrides.init = 5;
-                overrides.skills.push('assensing', 'astral_combat', 'con', 'counterspelling', 'gymnastics', 'leadership', 'negotiation', 'perception', 'spellcasting', 'unarmed_combat' );
+                overrides.skills.push('assensing', 'astral_combat', 'con', 'counterspelling', 'gymnastics', 'leadership', 'negotiation', 'perception', 'spellcasting', 'unarmed_combat');
                 break;
             case "carcass":
                 overrides.attributes.body = 3;
@@ -804,7 +783,7 @@ export class SpiritPrep {
                 overrides.astral_init = 6;
                 overrides.skills.push("assensing", "astral_combat", "perception", "running", "sneaking", "unarmed_combat");
                 break;
-                
+
             case "ghasts":
                 overrides.attributes.body = 2;
                 overrides.attributes.reaction = 2;

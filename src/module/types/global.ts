@@ -56,6 +56,7 @@ import AugmentedRealityVisionDetectionMode from "../vision/augmentedReality/arDe
 import LowlightVisionDetectionMode from "../vision/lowlightVision/lowlightDetectionMode";
 import ThermographicVisionDetectionMode from "../vision/thermographicVision/thermographicDetectionMode";
 import { DiceSoNice } from "../rolls/DiceSoNice";
+import { Skill } from "./item/Skill";
 
 declare module "fvtt-types/configuration" {
     interface DocumentClassConfig {
@@ -170,6 +171,7 @@ declare module "fvtt-types/configuration" {
             quality: typeof Quality;
             ritual: typeof Ritual;
             sin: typeof Sin;
+            skill: typeof Skill;
             spell: typeof Spell;
             sprite_power: typeof SpritePower;
             weapon: typeof Weapon;
@@ -292,6 +294,9 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.GeneralActionsPack": string;
         "shadowrun5e.MatrixActionsPack": string;
         "shadowrun5e.ICActionsPack": string;
+        "shadowrun5e.SkillsPack": string;
+        "shadowrun5e.SkillGroupsPack": string;
+        "shadowrun5e.SkillSetsPack": string;
         "shadowrun5e.CompendiumBrowserBlacklist": string[];
         "shadowrun5e.ImporterCompendiumOrder": string[];
         "shadowrun5e.DieFaceLabels": string;

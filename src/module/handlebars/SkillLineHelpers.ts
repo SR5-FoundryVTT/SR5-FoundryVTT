@@ -4,7 +4,9 @@ import { SkillFieldType } from '../types/template/Skills';
 import { ModifiableValue } from '../mods/ModifiableValue';
 
 export const registerSkillLineHelpers = () => {
-
+    /**
+     * Handle rendering of skill specializations in the skill line of any skill list.
+     */
     Handlebars.registerHelper('skillSpecializations', function (skill: SkillFieldType) {
         const span = document.createElement('span');
 
@@ -13,13 +15,16 @@ export const registerSkillLineHelpers = () => {
             specSpan.textContent = spec;
             specSpan.className = 'skill-specialization';
             specSpan.dataset.action = 'rollSkillSpecialization';
-            specSpan.dataset.skill = skill.id
+            specSpan.dataset.skill = skill.id;
             span.appendChild(specSpan);
         }
 
         return new Handlebars.SafeString(span.outerHTML);
     })
 
+    /**
+     * Add css classes to a skill list HTML element to show skill defaulting.
+     */
     Handlebars.registerHelper('skillClass', function(skill: SkillFieldType) {
         const classes: string[] = [];
 

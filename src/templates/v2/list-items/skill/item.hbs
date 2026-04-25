@@ -1,8 +1,12 @@
 <div class="list-item-container {{cssClass}} {{#if (hasKey @root.expandedSkills id)}} expanded {{/if}}">
-    <div class="list-item {{skillClass skill}}"
-         data-skill-id="{{id}}"
+    <div class="list-item draggable"
+         data-source="{{skill.system.description.source}}"
+         data-item-id="{{skill.id}}"
+         data-skill-id="{{skill.id}}"
+         data-skill-name="{{skill.name}}"
          data-category="{{category}}"
-         data-subcategory="{{subcategory}}">
+         data-subcategory="{{subcategory}}"
+         data-context-menu="skill">
         <div class="list-item-start">
             <button class="list-item-image-container icon sr5-icon"
                data-tooltip="{{localize 'SR5.Labels.ActorSheet.TestKBoardModifiers'
@@ -40,7 +44,7 @@
                     {{/if}}
                 />
             </button>
-            <a data-action="openSkillDescription">{{localizeSkill skill}}</a>
+            <a class="{{skillClass skill}}" data-action="openSkillDescription">{{skill.label}}</a>
         </div>
         {{#if @root.isPlayMode}}
         <div class="list-item-col">
@@ -49,11 +53,10 @@
         {{/if}}
         <div class="list-item-col {{#if @root.isPlayMode}} skinny-col {{/if}}">
             {{#if @root.isEditMode}}
-                {{!-- use the original method of setting data because skills are weird in data model, they'll be items eventually --}}
-                <input type="number" name="{{concat skillPath '.base'}}" class="short skinny" value="{{skill.base}}" data-skill="{{id}}" >
+                <input type="number" data-system-action="changeSkillRating" class="short skinny" value="{{skill.base}}" data-skill="{{skill.id}}" {{#if skill.group}}disabled{{/if}}>
             {{else}}
-                <label data-skill-modifier-tooltip="{{id}}">
-                    {{#if skill.isNative}}
+                <label data-skill-modifier-tooltip="{{skill.id}}">
+                    {{#if skill.system.skill.language.isNative}}
                         {{localize "SR5.Skill.abbr.Native"}}
                     {{else}}
                         {{skill.value}}
@@ -61,13 +64,13 @@
                 </label>
             {{/if}}
         </div>
-        <div class="list-item-icons{{#if @root.isPlayMode}} skinny-icons {{/if}}">
+        <div class="list-item-icons{{#if @root.isPlayMode}} skinny-icons {{/if}}" data-item-id="{{skill.id}}">
             {{#if @root.isEditMode}}
-                <a data-action="editSkill"
+                <a data-action="editItem"
                    data-tooltip="SR5.Edit">
                     <i class="fas fa-pen-to-square"></i>
                 </a>
-                <a data-action="{{removeAction}}"
+                <a data-action="deleteItem"
                    data-tooltip="SR5.DeleteSkill">
                     <i class="fas fa-trash"></i>
                 </a>

@@ -93,35 +93,10 @@ export const DamageData = () => ({
     }, { required: false }),
 });
 
-export const ActionRollData = (
-    {
-        test = 'SuccessTest',
-        opposedTest = '',
-        resistTest = '',
-        followedTest = '',
-        type = ''
-    }: {
-        test?: string;
-        opposedTest?: string;
-        resistTest?: string;
-        followedTest?: string;
-        type?: string;
-    } = {}
-) => ({
-    ...MinimalActionData(),
-    test: new StringField({ required: true, initial: test }),
-    type: new StringField({ required: true, initial: type, blank: true, choices: SR5.actionTypes }),
-    category: new SchemaField(ActionCategory()),
-    categories: new TagifyAltField(new StringField({ required: true })),
-    spec: new BooleanField(),
-    mod_description: new StringField({ required: true }),
-    threshold: new SchemaField(BaseValuePair()),
-    extended: new BooleanField({ initial: false }),
-    modifiers: new TagifyAltField(new StringField({ required: true })),
-    damage: new ModifiableField(DamageData()),
-    opposed: new SchemaField({
+export const OpposedActionRollData = ({ type = '', opposedTest = 'OpposedTest', resistTest = '' } = {}) =>
+    new SchemaField({
         test: new StringField({ required: true, initial: opposedTest }),
-        type: new StringField({ required: true }),
+        type: new StringField({ required: true, initial: type }),
         description: new StringField({ required: true }),
         mod: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
         skill: new StringField({ required: true }),
@@ -152,7 +127,29 @@ export const ActionRollData = (
             }),
             armor: new BooleanField(),
         }),
-    }),
+    });
+
+export const ActionRollData = (
+    {
+        test = 'SuccessTest',
+        opposedTest = '',
+        resistTest = '',
+        followedTest = '',
+        type = ''
+    } = {}
+) => ({
+    ...MinimalActionData(),
+    test: new StringField({ required: true, initial: test }),
+    type: new StringField({ required: true, initial: type, blank: true, choices: SR5.actionTypes }),
+    category: new SchemaField(ActionCategory()),
+    categories: new TagifyAltField(new StringField({ required: true })),
+    spec: new BooleanField(),
+    mod_description: new StringField({ required: true }),
+    threshold: new SchemaField(BaseValuePair()),
+    extended: new BooleanField({ initial: false }),
+    modifiers: new TagifyAltField(new StringField({ required: true })),
+    damage: new ModifiableField(DamageData()),
+    opposed: OpposedActionRollData({ opposedTest, resistTest }),
     followed: new SchemaField({
         test: new StringField({ required: true, initial: followedTest }),
         mod: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),

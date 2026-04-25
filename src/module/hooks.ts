@@ -131,6 +131,9 @@ import { TagifyHooks } from '@/module/tagify/TagifyHooks';
 import { RiggingHooks } from '@/module/tests/hooks/RiggingHooks';
 import { SocketMessageFlow } from './flows/SocketMessageFlow';
 import { CompendiumBrowser } from './apps/compendiumBrowser/CompendiumBrowser';
+import { Skill } from './types/item/Skill';
+import { SR5SkillSheet } from './item/sheets/SR5SkillSheet';
+import { SkillGroupFlow } from './actor/flows/SkillGroupFlow';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -165,7 +168,10 @@ export class HooksManager {
         Hooks.on('moveToken', SR5TokenDocument.moveToken.bind(SR5Token));
         Hooks.on('renderTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
         Hooks.on('renderPrototypeTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
-        Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem.bind(HooksManager));
+        Hooks.on('createItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
+        Hooks.on('updateItem', (item, data, options, userId) => { void HooksManager.updateIcConnectedToHostItem(item, data, options, userId); });
+        Hooks.on('updateItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
+        Hooks.on('deleteItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('getChatMessageContextOptions', SuccessTest.chatMessageContextOptions.bind(SuccessTest));
 
         Hooks.on("renderChatLog", HooksManager.chatLogListeners.bind(HooksManager));
@@ -436,6 +442,7 @@ ___________________
         CONFIG.Item.dataModels["quality"] = Quality;
         CONFIG.Item.dataModels["ritual"] = Ritual;
         CONFIG.Item.dataModels["sin"] = Sin;
+        CONFIG.Item.dataModels["skill"] = Skill;
         CONFIG.Item.dataModels["spell"] = Spell;
         CONFIG.Item.dataModels["sprite_power"] = SpritePower;
         CONFIG.Item.dataModels["weapon"] = Weapon;
@@ -486,6 +493,11 @@ ___________________
             makeDefault: true,
             types: ['call_in_action']
         });
+        foundry.documents.collections.Items.registerSheet(SYSTEM_NAME, SR5SkillSheet, {
+            label: "SR5.SheetItem",
+            makeDefault: true,
+            types: ['skill']
+        });
 
         // Register configs for embedded documents.
         foundry.applications.apps.DocumentSheetConfig.unregisterSheet(ActiveEffect, 'core', foundry.applications.sheets.ActiveEffectConfig);
@@ -534,9 +546,6 @@ ___________________
         switch (dropData.type) {
             case 'Item':
                 createItemMacro(dropData, slot);
-                return false;
-            case 'Skill':
-                createSkillMacro(dropData.data, slot);
                 return false;
         }
         return true;
@@ -611,6 +620,14 @@ ___________________
         // Trigger type specific behaviour.
         if (item.isType('host'))
             await MatrixICFlow.handleUpdateItemHost(item);
+    }
+
+    static async syncSkillGroupMembership(item: SR5Item) {
+        if (!item.actor) return;
+        if (!item.isType('skill')) return;
+        if (!['group', 'skill'].includes(item.system.type)) return;
+
+        await SkillGroupFlow.syncSkillItemGroups(item.actor);
     }
 
     /**

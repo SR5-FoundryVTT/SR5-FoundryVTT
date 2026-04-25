@@ -4,6 +4,7 @@ import {SR5} from "../../config";
 import {MatrixPrep} from "./functions/MatrixPrep";
 import {DataDefaults} from "../../data/DataDefaults";
 import {MatrixRules} from "../../rules/MatrixRules";
+import { ICSkillPrep } from '@/module/actor/prep/functions/ICSkillPrep';
 import {SkillsPrep} from "./functions/SkillsPrep";
 import { SR5Item } from "src/module/item/SR5Item";
 import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
@@ -21,6 +22,7 @@ export class ICPrep {
     static prepareDerivedData(system: Actor.SystemOfType<'ic'>, items: SR5Item[]) {
         ICPrep.prepareMatrixAttributes(system);
 
+        ICSkillPrep.prepareSkills(system);
         SkillsPrep.prepareSkills(system);
 
         ICPrep.prepareHostAttributes(system);
