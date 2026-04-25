@@ -26,7 +26,7 @@ export const MonitorRules = {
      * 
      * This is intended for stund an physical monitors and implements rules 
      * - SR5#169 'Wound Modifiers
-     * - SR#74 'High Pain Tolerance'
+    * - SR5#74 'High Pain Tolerance'
      * 
      * @param damageTaken Amount of damage boxes filled on the damage monitor
      * @param woundBoxesThreshold Amount of damage boxes per wound modifier

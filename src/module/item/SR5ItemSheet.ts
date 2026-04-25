@@ -11,7 +11,6 @@ import { RangedWeaponRules } from '../rules/RangedWeaponRules';
 
 import { prepareSortedEffects, prepareSortedItemEffects } from '../effects';
 
-import { ActionFlow } from './flows/ActionFlow';
 import { SINFlow } from './flows/SINFlow';
 import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 import { SheetFlow } from '@/module/flows/SheetFlow';
@@ -22,8 +21,9 @@ import { AmmunitionType, RangeType } from '../types/item/Weapon';
 
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import ItemSheet = foundry.applications.sheets.ItemSheet;
+import { Translation } from '../utils/strings';
+import { SkillSelectionFlow } from '../flows/SkillSelectionFlow';
 
-const { DragDrop } = foundry.applications.ux
 const { fromUuid, fromUuidSync } = foundry.utils;
 
 /**
@@ -122,8 +122,6 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
  * Extend the basic ItemSheet with some very simple modifications
  */
 export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> extends SR5ApplicationMixin(ItemSheet)<T> {
-    readonly #dragDrop: DragDrop[];
-
     static override DEFAULT_OPTIONS = {
         classes: ['item', 'named-sheet'],
         position: {
@@ -249,10 +247,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
     }
 
-    constructor(...args: ConstructorParameters<typeof ItemSheet>) {
-        super(...args);
-        this.#dragDrop = this.#createDragDropHandlers();
-    }
 
     /**
      * Prepare keybindings to be shown when hovering over a rolling icon
@@ -404,7 +398,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         data['vehicleMods'] = sortByName((grouped.vehicle ?? []) as SR5Item<'modification'>[]);
         data['droneMods'] = sortByName((grouped.drone ?? []) as SR5Item<'modification'>[]);
 
-        data['activeSkills'] = this._getSortedActiveSkillsForSelect();
+        data['activeSkills'] = await this._getSortedActiveSkillsForSelect();
         data['attributes'] = this._getSortedAttributesForSelect();
         data['limits'] = this._getSortedLimitsForSelect();
 
@@ -445,7 +439,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         data.sourceIsURL = this.item.sourceIsUrl;
         data.sourceIsPDF = this.item.sourceIsPDF;
         data.sourceIsUuid = this.item.sourceIsUuid
-        
+
         data.isUsingRangeCategory = false;
         if (this.item.isType('weapon')) {
             if (this.item.isRangedWeapon()) {
@@ -459,24 +453,12 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         data.rollModes = CONFIG.Dice.rollModes;
 
-        data.primaryTabs = this._prepareTabs('primary');
         data.item = this.item;
 
         data.isNestedItem = this.item._isNestedItem;
         data.bindings = this._prepareKeybindings();
 
         return data;
-    }
-
-    /**
-     * Help enriching editor field values to HTML used to display editor values as read-only HTML in sheets.
-     *
-     * @param editorValue A editor field value like Item.system.description.value
-     * @param options TextEditor, enrichHTML.options passed through
-     * @returns Enriched HTML result
-     */
-    async enrichEditorFieldToHTML(editorValue: string, options?: TextEditor.EnrichmentOptions): Promise<string> {
-        return foundry.applications.ux.TextEditor.implementation.enrichHTML(editorValue, options);
     }
 
     /**
@@ -496,12 +478,16 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     /**
      * Sorted (by translation) active skills either from the owning actor or general configuration.
      */
-    _getSortedActiveSkillsForSelect() {
-        // In case of custom skill used, inject it into the skill list.
-        const skill = this.document.system.action?.skill;
-        const skills = skill ? [skill] : undefined;
+    async _getSortedActiveSkillsForSelect() {
+        const selectedSkills = [this.document.system.action?.skill, this.document.system.action?.opposed?.skill]
+            .filter((selectedSkill): selectedSkill is string => !!selectedSkill);
+
         // Instead of item.parent, use the actorOwner as NestedItems have an actor grand parent.
-        return ActionFlow.sortedActiveSkills(this.item.actorOwner, skills);
+        return await SkillSelectionFlow.getSkillSelection(this.item.actorOwner, {
+            categories: ['active'],
+            selectedSkills,
+            valueType: 'key',
+        }) as Record<string, Translation>;
     }
 
     /* -------------------------------------------- */
@@ -511,7 +497,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         options: DeepPartial<ApplicationV2.RenderOptions>
     ) {
         this.activateListeners_LEGACY($(this.element));
-        this.#dragDrop.forEach(d => d.bind(this.element));
         return super._onRender(context, options);
     }
 
@@ -736,7 +721,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     static async #resetSpareReloads(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         const spareClips = this.item.system.ammo?.spare_clips.max ?? 0;
-        await this.item.update({ system: { ammo: { spare_clips: { value: spareClips }}}});
+        await this.item.update({ system: { ammo: { spare_clips: { value: spareClips } } } });
     }
 
     _onAmmoSelect(event: Event) {
@@ -866,7 +851,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     static async #removeLinkedActor(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
 
-        await this.item.update({ system: { linkedActor: '' }});
+        await this.item.update({ system: { linkedActor: '' } });
     }
 
     /**
@@ -896,9 +881,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         } else {
             const equipped = this.item.isEquipped();
             if (this.item.isType('critter_power', 'sprite_power')) {
-                await this.item.update({system: { optional : equipped ? 'disabled_option' : 'enabled_option'}});
+                await this.item.update({ system: { optional: equipped ? 'disabled_option' : 'enabled_option' } });
             } else {
-                await this.item.update({system: { technology: { equipped: !equipped }}});
+                await this.item.update({ system: { technology: { equipped: !equipped } } });
             }
         }
     }
@@ -1082,78 +1067,30 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     static async #toggleActionSpecialization(this: SR5ItemSheet) {
         const action = this.item.getAction();
         if (action) {
-            await this.item.update({system: { action: { spec: !action.spec }}});
+            await this.item.update({ system: { action: { spec: !action.spec } } });
         }
     }
 
     static async #toggleActionArmor(this: SR5ItemSheet) {
         const action = this.item.getAction();
         if (action) {
-            await this.item.update({system: { action: { armor: !action.armor }}});
+            await this.item.update({ system: { action: { armor: !action.armor } } });
         }
     }
 
     static async #toggleOpposedArmor(this: SR5ItemSheet) {
         const action = this.item.getAction();
         if (action) {
-            await this.item.update({system: { action: { opposed: { armor: !action.opposed.armor }}}});
+            await this.item.update({ system: { action: { opposed: { armor: !action.opposed.armor } } } });
         }
     }
 
     static async #toggleResistArmor(this: SR5ItemSheet) {
         const action = this.item.getAction();
         if (action) {
-            await this.item.update({system: { action: { opposed: { resist: { armor: !action.opposed.resist.armor }}}}});
+            await this.item.update({ system: { action: { opposed: { resist: { armor: !action.opposed.resist.armor } } } } });
         }
     }
-
-    /**
-     * Create drag-and-drop workflow handlers for this Application
-     * @returns {DragDrop[]}     An array of DragDrop handlers
-     * @private
-     */
-    #createDragDropHandlers(): DragDrop[] {
-        return this.options.dragDrop!.map((d) => {
-            d.permissions = {
-                dragstart: this._canDragStart.bind(this),
-                drop: this._canDragDrop.bind(this),
-            };
-            d.callbacks = {
-                dragstart: this._onDragStart.bind(this),
-                dragover: this._onDragOver.bind(this),
-                drop: this._onDrop.bind(this),
-            };
-            return new DragDrop(d);
-        });
-    }
-
-    /**
-     * Define whether a user is able to begin a dragstart workflow for a given drag selector
-     * @param {string} selector       The candidate HTML selector for dragging
-     * @returns {boolean}             Can the current user drag this selector?
-     */
-    protected _canDragStart(selector): boolean {
-        return this.isEditable;
-    }
-
-    /**
-     * Define whether a user is able to conclude a drag-and-drop workflow for a given drop selector
-     * @param {string} selector       The candidate HTML selector for the drop target
-     * @returns {boolean}             Can the current user drop on this selector?
-     */
-    protected _canDragDrop(selector): boolean {
-        return this.isEditable;
-    }
-
-
-    /**
-     * Callback actions which occur when a dragged element is over a drop target.
-     * @param {DragEvent} event       The originating DragEvent
-     * @protected
-     */
-    protected _onDragOver(event: DragEvent) {}
-
-    /* -------------------------------------------- */
 
     /**
      * An event that occurs when data is dropped into a drop target.
@@ -1161,9 +1098,16 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @returns {Promise<void>}
      * @protected
      */
-    async _onDrop(event: DragEvent) {
+    override async _onDrop(event: DragEvent) {
         const data = TextEditor.getDragEventData(event) as any;
         if (!data) return;
+
+        const targetElement = event.target as HTMLElement | null;
+        if (targetElement?.closest('[name="system.description.source"]') && data.uuid) {
+            await this.item.setSource(data.uuid);
+            return;
+        }
+
         const item = this.item;
         const allowed = Hooks.call("dropItemSheetData", item, this, data);
         if (!allowed) return;
@@ -1214,9 +1158,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @protected
      */
     async _onDropActiveEffect(event, effect) {
-        if ( !this.item.isOwner ) return null;
+        if (!this.item.isOwner) return null;
         const keepId = !this.item.effects.has(effect.id);
-        const result = await SR5ActiveEffect.create(effect.toObject(), {parent: this.item, keepId});
+        const result = await SR5ActiveEffect.create(effect.toObject(), { parent: this.item, keepId });
         return result ?? null;
     }
 
@@ -1292,7 +1236,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @returns {Promise<void>}
      * @protected
      */
-    _onDragStart(event: DragEvent) {
+    override _onDragStart(event: DragEvent) {
         const target = event.currentTarget as HTMLElement;
         const targetElement = event.target as HTMLElement;
         if (targetElement?.dataset && 'link' in targetElement.dataset) return;

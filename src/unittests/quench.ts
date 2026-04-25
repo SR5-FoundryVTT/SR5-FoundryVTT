@@ -1,3 +1,4 @@
+import { Migrators } from './Migrators.spec';
 import { shadowrunDamage } from './sr5.Damage.spec';
 import { shadowrunTestValueResolution } from './sr5.TestValueResolution.spec';
 import { shadowrunMarks } from './sr5.Marks.spec';
@@ -23,6 +24,7 @@ import { shadowrunSR5ItemDataPrep } from './sr5.ItemDataPrep.spec';
 import { shadowrunMatrixTesting } from './sr5.MatrixTesting.spec';
 import { shadowrunDriver } from './sr5.Driver.spec';
 import { shadowrunNPC } from './sr5.NPC.spec';
+import { itemSkillTesting } from './ItemSkill.spec';
 
 import { Quench } from '@ethaks/fvtt-quench';
 import { shadowrunRiggerTesting } from '@/unittests/sr5.RiggerTesting.spec';
@@ -112,5 +114,11 @@ export const quenchRegister = (quench: Quench) => {
     });
     quench.registerBatch('shadowrun5e.actor.npc', shadowrunNPC, {
         displayName: 'SHADOWRUN5e: NPC Character Test',
+    });
+    quench.registerBatch('shadowrun5e.item.skill', itemSkillTesting, {
+        displayName: 'SHADOWRUN5e: Item Skill Flow Test',
+    });
+    quench.registerBatch('shadowrun5e.migrators', Migrators, {
+        displayName: 'SHADOWRUN5e: Migrators Test',
     });
 };

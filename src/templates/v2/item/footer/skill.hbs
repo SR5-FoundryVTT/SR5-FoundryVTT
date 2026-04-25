@@ -1,0 +1,53 @@
+<div class="basic-row">
+    {{#if (eq item.system.type 'skill')}}
+        <label data-tooltip="{{systemFields.skill.fields.rating.hint}}">
+            {{systemFields.skill.fields.rating.label}}
+            {{#if @root.hasSkillValue}}
+                ({{@root.skillValue}})
+            {{/if}}
+        </label>
+        <span class="skill-rating-field">
+            {{formInput systemFields.skill.fields.rating
+                        value=source.system.skill.rating
+                        classes="short skill-rating-input" rootId=@root.rootId
+                        disabled=(or @root.isPlayMode system.skill.group) }}
+        </span>
+        <label data-tooltip="{{systemFields.skill.fields.attribute.hint}}">{{systemFields.skill.fields.attribute.label}}</label>
+        <span class="skill-attribute-field">
+            {{formInput systemFields.skill.fields.attribute
+                        value=source.system.skill.attribute options=(config2Array config.attributes) localize=true
+                        classes="short" rootId=@root.rootId
+                        disabled=(or @root.isPlayMode (not @root.canEditSkillAttribute)) }}
+        </span>
+        <label data-tooltip="{{systemFields.skill.fields.defaulting.hint}}">
+            {{localize "SR5.CanDefault"}}
+            {{formInput systemFields.skill.fields.defaulting value=source.system.skill.defaulting
+                        rootId=@root.rootId disabled=(or @root.isPlayMode (not @root.canEditSkillDefaulting))}}
+        </label>
+        {{#if (and @root.canBeNative systemFields.skill.fields.language)}}
+            <label data-tooltip="{{systemFields.skill.fields.language.fields.isNative.hint}}">
+                {{systemFields.skill.fields.language.fields.isNative.label}}
+                {{formInput systemFields.skill.fields.language.fields.isNative
+                            value=source.system.skill.language.isNative
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+            </label>
+        {{/if}}
+        {{#if @root.sourceSkillSet}}
+            {{> "systems/shadowrun5e/dist/templates/v2/common/skill-source-indicator.hbs" source=@root.sourceSkillSet }}
+        {{/if}}
+    {{else if (eq item.system.type 'group')}}
+        <label>
+            {{localize "SR5.Rating"}}
+        </label>
+        <span class="skill-rating-field">
+            {{#if @root.isEditMode}}
+                <input type="number" name="system.group.rating" value="{{source.system.group.rating}}" min="0" step="1" class="short skill-rating-input">
+            {{else}}
+                <input type="number" name="system.group.rating" value="{{system.group.rating}}" min="0" step="1" disabled class="short skill-rating-input">
+            {{/if}}
+        </span>
+        {{#if @root.sourceSkillSet}}
+            {{> "systems/shadowrun5e/dist/templates/v2/common/skill-source-indicator.hbs" source=@root.sourceSkillSet }}
+        {{/if}}
+    {{/if}}
+</div>

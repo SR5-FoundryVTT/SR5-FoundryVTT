@@ -1,9 +1,9 @@
 import { SR5Actor } from "src/module/actor/SR5Actor";
 import { ImportHelper as IH } from "src/module/apps/itemImport/helper/ImportHelper";
 
+import { ActorSkillImport } from '../ActorSkillImport';
 import { DataDefaults } from "@/module/data/DataDefaults";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
-import { SkillFieldType } from "@/module/types/template/Skills";
 
 import { ActorSchema } from "../ActorSchema";
 import { ItemsParser } from "../itemImporter/ItemsParser";
@@ -39,20 +39,6 @@ export interface BlankCharacter extends Actor.CreateData {
  * Imports characters from other tools into an existing foundry actor.
  */
 export class CharacterImporter {
-    private static readonly ATTRIBUTE_MAP = {
-        bod: "body",
-        agi: "agility",
-        rea: "reaction",
-        str: "strength",
-        cha: "charisma",
-        int: "intuition",
-        log: "logic",
-        wil: "willpower",
-        edg: "edge",
-        mag: "magic",
-        res: "resonance"
-    } as const;
-
     /**
      * Maps Chummer attribute abbreviations to SR5-Foundry attribute names.
      * @param attName The Chummer attribute abbreviation.
@@ -60,13 +46,12 @@ export class CharacterImporter {
      */
     static parseAttName(
         attName: string
-    ): typeof CharacterImporter.ATTRIBUTE_MAP[keyof typeof CharacterImporter.ATTRIBUTE_MAP] | "" {
-        const key = attName.trim().toLowerCase();
-        return this.ATTRIBUTE_MAP[key] ?? "";
+    ): ReturnType<typeof ActorSkillImport.parseAttName> {
+        return ActorSkillImport.parseAttName(attName);
     }
 
     static parseSkillName(skillName: string): string {
-        return skillName.trim().toLowerCase().replace(/[\s-]/g, '_');
+        return ActorSkillImport.parseSkillName(skillName);
     }
 
     // --------------------------------------------------------------------------
@@ -128,7 +113,7 @@ export class CharacterImporter {
         await this.importBio(actor.system, chummerChar);
         this.importAttributes(actor.system, chummerChar);
         this.importInitiative(actor.system, chummerChar);
-        this.importSkills(actor.system, chummerChar);
+        await ActorSkillImport.importSkills(actor, chummerChar);
 
         actor.system.is_critter = chummerChar.critter === 'True';
     }
@@ -238,102 +223,4 @@ export class CharacterImporter {
         system.modifiers.matrix_initiative_dice = (Number(chummerChar.matrixarinitdice) || 3) - 3;
     }
 
-    // --------------------------------------------------------------------------
-    // Private Skill Handling Methods
-    // --------------------------------------------------------------------------
-
-    private static importSkills(system: BlankCharacter['system'], chummerChar: ActorSchema) {
-        const skills = IH.getArray(chummerChar.skills.skill);
-        const languageSkills: typeof skills = [];
-        const knowledgeSkills: typeof skills = [];
-        const activeSkills: typeof skills = [];
-
-        for (const skill of skills) {
-            const rating = Number(skill.rating) || 0;
-            if (skill.islanguage === 'True') {
-                languageSkills.push(skill);
-            } else if (skill.knowledge === 'True' && rating > 0) {
-                knowledgeSkills.push(skill);
-            } else if (rating > 0) {
-                activeSkills.push(skill);
-            }
-        }
-
-        this.handleLanguageSkills(system, languageSkills);
-        this.handleKnowledgeSkills(system, knowledgeSkills);
-        this.handleActiveSkills(system, activeSkills);
-    }
-
-    private static handleActiveSkills(system: BlankCharacter['system'], activeSkills: ActorSchema['skills']['skill']) {
-        for (const skill of activeSkills) {
-            const skillName = this.parseSkillName(skill.name_english);
-
-            const parsedSkill = system.skills.active[skillName] ?? DataDefaults.createData('skill_field');
-            parsedSkill.base = parseInt(skill.rating);
-            if (skill.skillspecializations) {
-                parsedSkill.specs = IH.getArray(skill.skillspecializations.skillspecialization).map(spec => spec.name);
-            }
-
-            // Precaution to later only deal with complete SkillField data models.
-            system.skills.active[skillName] = DataDefaults.createData('skill_field', parsedSkill);
-        }
-    }
-
-    private static handleLanguageSkills(system: BlankCharacter['system'], languageSkills: ActorSchema['skills']['skill']) {
-        system.skills.language.value = {};
-        for (const skill of languageSkills) {
-            const parsedSkill = DataDefaults.createData('skill_field');
-            const id = foundry.utils.randomID();
-            system.skills.language.value[id] = parsedSkill;
-
-            // Transform native rating into max rating.
-            skill.rating = (skill.isnativelanguage === 'True') ? '12' : skill.rating;
-
-            if (skill.skillspecializations) {
-                parsedSkill.specs = IH.getArray(skill.skillspecializations.skillspecialization).map(spec => spec.name);
-            }
-
-            parsedSkill.name = skill.name;
-            parsedSkill.base = Number(skill.rating) || 0;
-            if (skill.skillspecializations) {
-                parsedSkill.specs = IH.getArray(skill.skillspecializations.skillspecialization).map(spec => spec.name);
-            }
-        }
-    }
-
-    private static handleKnowledgeSkills(system: BlankCharacter['system'], knowledgeSkills: ActorSchema['skills']['skill']) {
-        system.skills.knowledge.academic.value = {};
-        system.skills.knowledge.interests.value = {};
-        system.skills.knowledge.professional.value = {};
-        system.skills.knowledge.street.value = {};
-
-        for (const skill of knowledgeSkills) {
-            const id = foundry.utils.randomID(16);
-            const parsedSkill = DataDefaults.createData('skill_field');
-            parsedSkill.name = skill.name;
-            parsedSkill.base = parseInt(skill.rating);
-            if (skill.skillspecializations) {
-                parsedSkill.specs = IH.getArray(skill.skillspecializations.skillspecialization).map(spec => spec.name);
-            }
-
-            let skillCategory: Record<string, SkillFieldType> | undefined;
-            if (skill.skillcategory_english) {
-                const cat = skill.skillcategory_english.toLowerCase();
-                switch (cat) {
-                    case 'street': skillCategory = system.skills.knowledge.street.value; break;
-                    case 'academic': skillCategory = system.skills.knowledge.academic.value; break;
-                    case 'professional': skillCategory = system.skills.knowledge.professional.value; break;
-                    case 'interest': skillCategory = system.skills.knowledge.interests.value; break;
-                }
-            } else {
-                // Fallback for older chummer versions
-                if (skill.attribute.toLowerCase() === 'int') skillCategory = system.skills.knowledge.street.value;
-                if (skill.attribute.toLowerCase() === 'log') skillCategory = system.skills.knowledge.professional.value;
-            }
-
-            if (skillCategory) {
-                skillCategory[id] = parsedSkill;
-            }
-        }
-    }
 }

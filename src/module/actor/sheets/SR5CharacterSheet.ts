@@ -26,6 +26,7 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
             ...itemTypes,
             'program',
             'sin',
+            'skill',
             'lifestyle',
             'contact',
             'spell',
@@ -169,11 +170,11 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
 
         if (partId === 'skills') {
             // initialize the check by seeing if we have language skills to skill over the other check
-            partContext.hasLanguageKnowledgeSkills = Object.keys(this.actor.system.skills.language.value).length > 0;
+            partContext.hasLanguageKnowledgeSkills = Object.keys(this.actor.system.skills.language).length > 0;
             if (!partContext.hasLanguageKnowledgeSkills) {
                 // iterate over the knowledge skill object and check if we have anything
-                for (const value of Object.values(this.actor.system.skills.knowledge)) {
-                    if (Object.values(value.value).length > 0) {
+                for (const knowledgeType of Object.values(this.actor.system.skills.knowledge)) {
+                    if (Object.keys(knowledgeType).length > 0) {
                         partContext.hasLanguageKnowledgeSkills = true;
                     }
                 }

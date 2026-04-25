@@ -5,7 +5,7 @@ import { SR5Actor } from '../SR5Actor';
 import { ActorMarksFlow } from '../flows/ActorMarksFlow';
 import { MatrixTargetingFlow } from '@/module/flows/MatrixTargetingFlow';
 import { MatrixNetworkFlow } from '@/module/item/flows/MatrixNetworkFlow';
-import { PackActionFlow } from '@/module/item/flows/PackActionFlow';
+import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
 import { MatrixSheetFlow } from '@/module/flows/MatrixSheetFlow';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { MatrixRules } from '@/module/rules/MatrixRules';
@@ -383,14 +383,14 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      * @protected
      */
     protected async _getMatrixPackActions() {
-        return await PackActionFlow.getMatrixPackActions();
+        return await PackItemFlow.getMatrixPackActions();
     }
 
     /**
      * Get matrix actions otherwise available on this actor.
      */
     protected _getMatrixActorActions() {
-        const actions = this.document.itemsForType.get('action') as SR5Item<'action'>[];
+        const actions = this.document.itemsForType.get('action');
         if (!actions) return [];
         return actions.filter(item => item.hasActionCategory('matrix'));
     }
@@ -445,7 +445,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         const sheetActions: sheetAction[] = [];
         for (const action of actions) {
             sheetActions.push({
-                name: PackActionFlow.localizePackAction(action.name),
+                name: PackItemFlow.localizePackAction(action.name),
                 description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(action.system.description.value),
                 action,
             });
