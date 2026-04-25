@@ -36,7 +36,8 @@ import { ModifiableValueType } from '../types/template/Base';
 import Document = foundry.abstract.Document;
 import GetEmbeddedDocumentOptions = Document.GetEmbeddedDocumentOptions;
 
-const { fromUuid } = foundry.utils;
+type OneOrMany<T> = T | T[];
+const { fromUuid, mergeObject, expandObject } = foundry.utils;
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and nested).
@@ -708,7 +709,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         const tempItems = items.map((item) => {
             // Set user permissions to owner, to allow none-GM users to edit their own nested items.
             const data = game.user ? { ownership: { [game.user.id]: CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER } } : {};
-            item = foundry.utils.mergeObject(item, data) as Item.Source;
+            item = mergeObject(item, data) as Item.Source;
 
             // Case: MODIFY => Update existing item.
             if (item._id! in loaded) {
@@ -739,17 +740,17 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return items.find((item) => item.id === itemId);
     }
 
-    async updateNestedEffects(changes) {
+    async updateNestedEffects(changes: OneOrMany<ActiveEffect.UpdateData & { _id?: string }>) {
         if (!this._isNestedItem) return;
 
         changes = Array.isArray(changes) ? changes : [changes];
         if (!changes || changes.length === 0) return;
 
         for (const effectChanges of changes) {
-            const effect = this.effects.get(effectChanges._id);
+            const effect = this.effects.get(effectChanges._id!);
             if (!effect) continue;
             delete effectChanges._id;
-            foundry.utils.mergeObject(effect, expandObject(effectChanges), { inplace: true });
+            mergeObject(effect, expandObject(effectChanges), { inplace: true });
             effect.render(false);
         }
 
@@ -766,7 +767,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             const existing = items.find(i => i._id === change._id);
             if (!existing) continue;
             delete change._id;
-            foundry.utils.mergeObject(existing, expandObject(change));
+            mergeObject(existing, expandObject(change));
         }
 
         await this.setNestedItems(items);

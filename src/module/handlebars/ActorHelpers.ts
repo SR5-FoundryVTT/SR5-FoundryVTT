@@ -50,12 +50,12 @@ export const registerActorHelpers = () => {
     * 
     * @param actor The actor used to represent the vehicle
     */
-    Handlebars.registerHelper('calcModificationSlotsAvailable', (actor: SR5Actor): number => {
-        const body = actor.getAttribute("body");
-        if (body === undefined)
-            return 0;
-        else
-            return body.value;
+    Handlebars.registerHelper("calcModificationSlotsAvailable", (vehicle: SR5Actor<"vehicle">, category: string): number => {
+        const body = vehicle.getAttribute("body");
+        if (!body) return 0;
+
+        const modifier = (vehicle.system?.modificationCategories?.[category] as number | undefined) ?? 0;
+        return body.value + modifier;
     });
 
     /** 

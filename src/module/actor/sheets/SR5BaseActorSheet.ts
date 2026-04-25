@@ -26,6 +26,7 @@ import { SkillNamingFlow } from '@/module/flows/SkillNamingFlow';
 import { SkillSetSourceFlow } from '@/module/flows/SkillSetSourceFlow';
 import { SkillItemFlow } from '@/module/item/flows/SkillItemFlow';
 import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
+import { parseDropData } from '@/module/utils/sheets';
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import ActorSheetV2 = foundry.applications.sheets.ActorSheetV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
@@ -611,6 +612,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     activateListeners_LEGACY(html: JQuery<HTMLElement>) {
         Helpers.setupCustomCheckbox(this, html);
 
+        html.find('input[name="system.description.source"]').on('drop', (event) => void this._onSourceDrop(event.originalEvent));
+
         // Actor inventory handling....
         html.find('#select-inventory').on('change', this._onSelectInventory.bind(this));
 
@@ -622,6 +625,17 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         html.find('input[data-system-action="changeSkillRating"]').on('change', this._onChangeSkillRating.bind(this));
         html.find('input[data-system-action="changeItemQty"]').on('change', this._onListItemChangeQuantity.bind(this));
+    }
+
+    private async _onSourceDrop(event?: DragEvent) {
+        if (!event || !this.isEditable) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const data = parseDropData(event);
+        if (data && typeof data === 'object' && 'uuid' in data && typeof data.uuid === 'string')
+            await this.actor.update({ system: { description: { source: data.uuid } } });
     }
 
     /**
