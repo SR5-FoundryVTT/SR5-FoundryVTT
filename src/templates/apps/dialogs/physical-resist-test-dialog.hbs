@@ -7,6 +7,10 @@
                 <label>{{localize 'SR5.IncomingDamage'}}</label>
                 <input type="number" value="{{test.data.incomingDamage.value}}" name="test.data.incomingDamage"/>
             </div>
+            <div class="form-group">
+                <label>{{localize 'SR5.AP'}}</label>
+                <input type="number" value="{{test.data.incomingDamage.ap.value}}" name="test.data.incomingDamage.ap" data-dtype="Number"/>
+            </div>
             {{#> "systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-group.hbs"
                 label=(localize 'SR5.DamageType')
             }}
@@ -21,10 +25,6 @@
                     }}
                 {{/each}}
             {{/"systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-group.hbs"}}
-            <div class="form-group">
-                <label>{{localize 'SR5.AP'}}</label>
-                <input type="number" value="{{test.data.incomingDamage.ap.value}}" name="test.data.incomingDamage.ap" data-dtype="Number"/>
-            </div>
             <div class="form-group">
                 <label>{{localize 'SR5.Element'}}</label>
                 <select name="test.data.incomingDamage.element.value">
