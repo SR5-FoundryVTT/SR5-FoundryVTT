@@ -13,7 +13,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
     describe('SuccessTest', () => {
         it('evaluate a roll from action data', async () => {
-            //@ts-expect-error Prohibit skill population.
             window.doNotPopulateDefaultSkills = true;
 
             const action = await factory.createItem({
@@ -63,7 +62,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                 }
             ]);
             
-            //@ts-expect-error Prohibit skill population.
             delete window.doNotPopulateDefaultSkills;
 
             const test = await TestCreator.fromItem(action, actor, {showMessage: false, showDialog: false});
