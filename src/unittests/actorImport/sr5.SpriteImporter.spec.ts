@@ -1,4 +1,6 @@
 import { SR5Actor } from '@/module/actor/SR5Actor';
+import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
+import { SR5Item } from '@/module/item/SR5Item';
 import { SR5TestFactory } from 'src/unittests/utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { CompanionSprite } from './Examples/CompanionSprite';
@@ -40,7 +42,14 @@ export const spriteImporterTesting = (context: QuenchBatchContext) => {
 
         it('Should have the correct item number', async () => {
             if (!sprite) throw new Error('No sprite created');
-            assert.lengthOf(sprite.items, 3, 'Item count');
+            const skillSet = await fromUuid(sprite.system.skillset) as SR5Item<'skill'> | null;
+            if (!skillSet) throw new Error('No skillset assigned');
+
+            const skillItems = await PackItemFlow.prepareSkillsForSkillSet(skillSet);
+            const skillGroups = await PackItemFlow.prepareSkillGroupsForSkillSet(skillSet);
+            const nonSkillItems = sprite.items.filter(item => !item.isType('skill')).length;
+
+            assert.lengthOf(sprite.items, nonSkillItems + skillItems.length + skillGroups.length, 'Item count');
         });
     });
 };

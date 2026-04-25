@@ -1,5 +1,5 @@
 import { SYSTEM_NAME } from "../constants";
-import { PackSelectionConfig } from '@/module/settings/CompendiaSettingFlow';
+import { PackSelectionConfig, PackConfigOrSeparator } from '@/module/settings/CompendiaSettingFlow';
 
 const {ApplicationV2, HandlebarsApplicationMixin} = foundry.applications.api;
 
@@ -10,7 +10,7 @@ type ButtonType = {
 }
 
 export type CompendiaSettingsSheetData = {
-    packs: PackSelectionConfig[];
+    packs: PackConfigOrSeparator[];
     buttons: ButtonType[];
 }
 
@@ -41,7 +41,7 @@ export default abstract class AbstractCompendiaSettings extends HandlebarsApplic
     /**
      * Return an array filled with the pack options to use for each compendium
      */
-    abstract getPacks(): PackSelectionConfig[];
+    abstract getPacks(): PackConfigOrSeparator[];
 
     override get title() {
         return game.i18n.localize('SR5.CompendiaSettings.Title');
@@ -77,7 +77,10 @@ export default abstract class AbstractCompendiaSettings extends HandlebarsApplic
      * @param formData
      */
     static async #onSubmit(this: AbstractCompendiaSettings, event, form, formData) {
-        const validIds = Object.values(this.getPacks()).map(({ id }) => id);
+        // Filter out separators and get only valid pack IDs
+        const validIds = this.getPacks()
+            .filter((pack): pack is PackSelectionConfig => !('separator' in pack))
+            .map(({ id }) => id);
         // process the formData, update the flags
         const expanded = foundry.utils.expandObject(formData.object);
         // id is expected to be the "name" of the field

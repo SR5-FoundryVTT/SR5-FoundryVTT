@@ -4,7 +4,7 @@ import { MatrixNetworkFlow } from "@/module/item/flows/MatrixNetworkFlow";
 import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
 import { Helpers } from '@/module/helpers';
 import { MatrixRules } from '@/module/rules/MatrixRules';
-import { PackActionFlow } from "@/module/item/flows/PackActionFlow";
+import { PackItemFlow } from "@/module/item/flows/PackItemFlow";
 import { SheetFlow } from '@/module/flows/SheetFlow';
 
 interface VehicleSheetDataFields extends MatrixActorSheetData {
@@ -80,7 +80,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
 
     protected override async _getMatrixPackActions() {
         // filter out illegal actions from the matrix actions
-        return (await PackActionFlow.getMatrixPackActions()).filter((action) => {
+        return (await PackItemFlow.getMatrixPackActions()).filter((action) => {
             return !MatrixRules.isIllegalAction(
                         action.getAction()?.attribute as any,
                         action.getAction()?.attribute2 as any,
@@ -117,7 +117,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
      * Allow gear (vehicle) modification to lie around in inventory while still allowing calculations around equipped modifications.
      */
     _prepareEquippedModifications() {
-        return this.actor.itemsForType.get('modification')?.filter(item => item.isEquipped()) as SR5Item<'modification'>[] || [];
+        return this.actor.itemsForType.get('modification')?.filter(item => item.isEquipped()) || [];
     }
 
     static override TABS = {

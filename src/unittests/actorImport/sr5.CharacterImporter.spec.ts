@@ -1,6 +1,8 @@
 import { SR5Item } from '@/module/item/SR5Item';
 import { testActor } from './Examples/TestActor';
 import { SR5Actor } from '@/module/actor/SR5Actor';
+import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
+import { SkillItemFlow } from '@/module/item/flows/SkillItemFlow';
 import { SR5TestFactory } from 'src/unittests/utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { ImportHelper as IH } from '@/module/apps/itemImport/helper/ImportHelper';
@@ -69,12 +71,11 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             const activeSkills: typeof skills = [];
 
             for (const skill of skills) {
-                const rating = Number(skill.rating);
                 if (skill.islanguage === 'True') {
                     languageSkills.push(skill);
-                } else if (skill.knowledge === 'True' && rating) {
+                } else if (skill.knowledge === 'True') {
                     knowledgeSkills.push(skill);
-                } else if (rating) {
+                } else {
                     activeSkills.push(skill);
                 }
             }
@@ -88,8 +89,9 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
 
             for (const skill of languageSkills) {
                 const skillName = skill.name;
-                const parsedSkill = Object.values(actor.system.skills.language.value).find(s => s.name === skillName)!;
-                assert.strictEqual(parsedSkill.value, Number(skill.rating), `Error Language Skill ${skill.name_english}`);
+                const parsedSkill = Object.values(actor.system.skills.language).find(s => s.name === skillName)!;
+                const expectedRating = String(skill.isnativelanguage) === 'True' ? 12 : Number(skill.rating);
+                assert.strictEqual(parsedSkill.value, expectedRating, `Error Language Skill ${skill.name_english}`);
                 assert.lengthOf(parsedSkill.specs, IH.getArray(skill.skillspecializations).length);
             }
 
@@ -99,7 +101,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
                 const skillGroup = actor.system.skills.knowledge[skillGroupName];
                 if (!skillGroup) continue;
 
-                const parsedSkill = Object.values(skillGroup.value).find(s => s.name === skillName)!;
+                const parsedSkill = Object.values(skillGroup).find(s => s.name === skillName)!;
                 assert.strictEqual(parsedSkill.value, Number(skill.rating), `Error Knowledge Skill ${skill.name_english}`);
                 assert.lengthOf(parsedSkill.specs, IH.getArray(skill.skillspecializations).length);
             }
@@ -107,6 +109,59 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
 
         it('Should have the correct item number', async () => {
             if (!actor) throw new Error('No actor created');
+
+            const skills = IH.getArray(character.skills.skill);
+            const skillGroups = IH.getArray(character.skills.skillgroup).filter(group => String(group.isbroken) !== 'True');
+            const importedSkillSet = await fromUuid(actor.system.skillset) as SR5Item<'skill'> | null;
+
+            let seededSkillCount = 0;
+            let seededGroupCount = 0;
+            const seededSkillKeys = new Set<string>();
+            const seededGroupNames = new Set<string>();
+            if (importedSkillSet) {
+                const seededSkills = await PackItemFlow.prepareSkillsForSkillSet(importedSkillSet);
+                const seededGroups = await PackItemFlow.prepareSkillGroupsForSkillSet(importedSkillSet);
+
+                seededSkillCount = seededSkills.length;
+                seededGroupCount = seededGroups.length;
+
+                for (const seededSkill of seededSkills) {
+                    const seededCategory = foundry.utils.getProperty(seededSkill, 'system.skill.category') as string | undefined;
+                    const seededKey = SkillItemFlow.skillNameByCategoryKey(seededSkill.name ?? '', seededCategory);
+                    if (seededKey) seededSkillKeys.add(seededKey);
+                }
+
+                for (const seededGroup of seededGroups) {
+                    if (seededGroup.name) seededGroupNames.add(seededGroup.name.trim().toLowerCase());
+                }
+            }
+
+            const extraImportedSkills = (skills as Array<{
+                islanguage?: string;
+                knowledge?: string;
+                name?: string;
+                name_english?: string;
+            }>).filter(skill => {
+                let category: 'active' | 'language' | 'knowledge' = 'active';
+                let skillName = skill.name_english ?? skill.name ?? '';
+
+                if (skill.islanguage === 'True') {
+                    category = 'language';
+                    skillName = skill.name ?? skill.name_english ?? '';
+                } else if (skill.knowledge === 'True') {
+                    category = 'knowledge';
+                    skillName = skill.name ?? skill.name_english ?? '';
+                }
+
+                const skillKey = SkillItemFlow.skillNameByCategoryKey(skillName, category);
+                return !skillKey || !seededSkillKeys.has(skillKey);
+            }).length;
+
+            const extraImportedGroups = skillGroups.filter(group => {
+                const groupName = (group.name_english || group.name).trim().toLowerCase();
+                return !seededGroupNames.has(groupName);
+            }).length;
+
             const itemCount = IH.getArray(character.qualities.quality).length
                             + IH.getArray(character.contacts.contact).length
                             + IH.getArray(character.weapons.weapon).length
@@ -116,7 +171,11 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
                             + IH.getArray(character.spells.spell).length
                             + IH.getArray(character.powers.power).length
                             + IH.getArray(character.lifestyles.lifestyle).length
-                            + IH.getArray(character.complexforms.complexform).length;
+                            + IH.getArray(character.complexforms.complexform).length
+                            + seededGroupCount
+                            + seededSkillCount
+                            + extraImportedGroups
+                            + extraImportedSkills;
             
             assert.strictEqual(actor.items.size, itemCount, 'Item count');
         });
@@ -170,7 +229,8 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(vehicle.system.vehicle_stats.sensor.value, 1, 'Sensor');
             assert.strictEqual(vehicle.system.vehicle_stats.seats.value, 2, 'Seats');
 
-            assert.strictEqual(vehicle.items.size, 2, 'Item count');
+            const nonSkillItems = vehicle.items.filter(item => !item.isType('skill'));
+            assert.strictEqual(nonSkillItems.length, 2, 'Non-skill item count');
         });
     });
 };

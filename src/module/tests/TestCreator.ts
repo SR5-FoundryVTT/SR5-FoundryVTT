@@ -15,11 +15,10 @@ import {FLAGS, SYSTEM_NAME} from "../constants";
 import {SR5Roll} from "../rolls/SR5Roll";
 import {OpposedTest, OpposedTestData} from "./OpposedTest";
 import {SR5} from "../config";
-import {SkillFlow} from "../actor/flows/SkillFlow";
 import {ActionFlow} from "../item/flows/ActionFlow";
 import { ActionRollType, DamageType, MinimalActionType } from "../types/item/Action";
 import { DeepPartial } from "fvtt-types/utils";
-import { PackActionFlow } from "../item/flows/PackActionFlow";
+import { PackItemFlow } from "../item/flows/PackItemFlow";
 
 /**
  * Any test implementation can either be created by calling it's constructor directly or by using the TestCreator.
@@ -128,7 +127,7 @@ export const TestCreator = {
      * @param options General TestOptions
      */
     fromPackAction: async function(packName: string, actionName: string, document: SR5Actor | SR5Item, options: TestOptions = {}): Promise<SuccessTest|undefined> {
-        const item = await PackActionFlow.getPackAction(packName, actionName);
+        const item = await PackItemFlow.getPackAction(packName, actionName);
         if (!item) {
             console.error(`Shadowrun5 | The pack ${packName} doesn't include an item ${actionName}`);
             return;
@@ -475,14 +474,12 @@ export const TestCreator = {
             const skill = actor.getSkill(action.skill, { rollData }) ?? actor.getSkill(action.skill, {byLabel: true, rollData });
 
             // Notify user about their sins.
-            if (skill && !SkillFlow.allowRoll(skill)) ui.notifications?.warn('SR5.Warnings.SkillCantBeDefault', {localize: true});
-
-            // Custom skills don't have a label, but a name.
-            // Legacy skill don't have a name, but have a label.
-            // Your mind is like this water, my friend. When it is agitated, it becomes difficult to see. But if you allow it to settle, the answer becomes clear.
-            if (skill) pool.addUniqueBase(skill.label || skill.name, SkillRules.level(skill));
-            // TODO: Check if this is actual skill specialization and for a +2 config for it instead of MagicValue.
-            if (action.spec) pool.addUniqueBase('SR5.Specialization', SkillRules.SpecializationModifier);
+            if (skill && !SkillRules.allowRoll(skill)) ui.notifications?.warn('SR5.Warnings.SkillCantBeDefault', {localize: true});
+            if (skill && !SkillRules.hasRequirements(actor, skill)) ui.notifications?.warn('SR5.Warnings.ActorMissingRequirements', {localize: true});
+            
+            // Add skill values to pool.
+            if (skill) pool.addBase(skill.label, SkillRules.level(skill));
+            if (action.spec) pool.addUnique('SR5.Specialization', SkillRules.SpecializationModifier);
         }
 
         // The first attribute is either used for skill or attribute only tests.

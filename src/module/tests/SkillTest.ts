@@ -2,6 +2,7 @@ import { DataDefaults } from '../data/DataDefaults';
 import { ModifiableValue } from '../mods/ModifiableValue';
 import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
 import { Translation } from '../utils/strings';
+import { SkillNamingFlow } from '../flows/SkillNamingFlow';
 
 export interface SkillTestData extends SuccessTestData {
     attribute: Shadowrun.ActorAttribute
@@ -38,7 +39,9 @@ export class SkillTest extends SuccessTest<SkillTestData> {
      */
     override get title() {
         if (!this.actor) return super.title;
-        return `${game.i18n.localize(this.actor.getSkillLabel(this.data.action.skill) as Translation)} ${game.i18n.localize('SR5.Test')}`;
+
+        const skillLabel = this.actor.getSkill(this.data.action.skill)?.label ?? SkillNamingFlow.localizeSkillName(this.data.action.skill);
+        return `${skillLabel} ${game.i18n.localize('SR5.Test')}`;
     }
 
     /**

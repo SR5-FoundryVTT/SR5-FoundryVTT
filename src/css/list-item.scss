@@ -1,4 +1,4 @@
-@use "config/variables";
+@use 'config/variables';
 
 .sr5v2 {
     // list-item classes should be renamed to list-item when complete
@@ -8,8 +8,9 @@
 
         &.expanded {
             // show 1px box shadow at the top and bottom to emulate a border
-            box-shadow: inset 0 1px 0 0 variables.$silver,
-            inset 0 -1px 0 0 variables.$silver;
+            box-shadow:
+                inset 0 1px 0 0 variables.$silver,
+                inset 0 -1px 0 0 variables.$silver;
 
             .list-item-desc {
                 visibility: visible;
@@ -18,7 +19,7 @@
         }
 
         &.list-item-subcategory {
-            padding-left: .5rem;
+            padding-left: 0.5rem;
             border-left: 1px solid variables.$silver;
         }
 
@@ -32,7 +33,7 @@
             flex: 1;
             border-top: 1px solid rgba(variables.$silver, 0.2);
             background: rgba(variables.$black, 0.3);
-            padding: .5rem;
+            padding: 0.5rem;
             color: variables.$light;
 
             .list-item-properties {
@@ -50,7 +51,7 @@
 
                 > * {
                     font-size: 0.8rem;
-                    padding: 0 .25rem;
+                    padding: 0 0.25rem;
                     &:not(:last-child) {
                         border-right: variables.$groove;
                     }
@@ -68,7 +69,8 @@
             flex: 1;
         }
 
-        &:not(.nobg):nth-of-type(even), &.forcebg {
+        &:not(.nobg):nth-of-type(even),
+        &.forcebg {
             background: rgba(variables.$white, 0.03);
         }
     }
@@ -84,7 +86,10 @@
         padding: 2px;
 
         &.list-item-selected {
-            background: radial-gradient(rgba(variables.$matrix-green, 0.4), rgba(variables.$matrix-green, 0.01)) !important;
+            background: radial-gradient(
+                rgba(variables.$matrix-green, 0.4),
+                rgba(variables.$matrix-green, 0.01)
+            ) !important;
         }
 
         .list-item-image-container {
@@ -144,7 +149,8 @@
             margin-top: 2px;
         }
 
-        &:not(.nobg):nth-of-type(even), &.forcebg {
+        &:not(.nobg):nth-of-type(even),
+        &.forcebg {
             &:not(.list-item-header) {
                 background: rgba(variables.$white, 0.03);
             }
@@ -156,7 +162,7 @@
             align-items: center;
             justify-content: start;
             flex: 3;
-            gap: .25rem;
+            gap: 0.25rem;
 
             &.skinny {
                 flex: 1;
@@ -214,6 +220,16 @@
                 font-family: monospace;
             }
 
+            .list-item-warning {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.3rem;
+                margin-left: 0.5rem;
+                color: variables.$yellow;
+                font-size: 0.9rem;
+                text-wrap: nowrap;
+            }
+
             // attempt to left align the essence so that it centers on the decimal
             &.essence-calc-col {
                 justify-content: flex-end;
@@ -249,7 +265,8 @@
                 }
             }
 
-            &.mark-input-col, &.qty-input-col {
+            &.mark-input-col,
+            &.qty-input-col {
                 flex: 0 0 4rem;
                 gap: 0.25rem;
 

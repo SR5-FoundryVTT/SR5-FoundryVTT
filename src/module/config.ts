@@ -19,7 +19,15 @@ export const SR5 = {
         modification: 'SR5.Compendiums.Modification',
         weapon: 'SR5.Compendiums.Weapon',
     },
-    
+
+    actorTypes: {
+        character: 'SR5.ActorTypes.Character',
+        spirit: 'SR5.ActorTypes.Spirit',
+        sprite: 'SR5.ActorTypes.Sprite',
+        vehicle: 'SR5.ActorTypes.Vehicle',
+        ic: 'SR5.ActorTypes.IC',
+    },
+
     itemTypes: {
         action: 'SR5.ItemTypes.Action',
         adept_power: 'SR5.ItemTypes.AdeptPower',
@@ -473,13 +481,13 @@ export const SR5 = {
 
     weaponCliptypes: {
         removable_clip: 'SR5.Weapon.Cliptype.RemovableClip',
-        break_action:'SR5.Weapon.Cliptype.BreakAction',
-        belt_fed:'SR5.Weapon.Cliptype.BeltFed',
-        internal_magazin:'SR5.Weapon.Cliptype.InternalMagazin',
-        muzzle_loader:'SR5.Weapon.Cliptype.MuzzleLoader',
-        cylinder:'SR5.Weapon.Cliptype.Cylinder',
-        drum:'SR5.Weapon.Cliptype.Drum',
-        bow:'SR5.Weapon.Cliptype.Bow',
+        break_action: 'SR5.Weapon.Cliptype.BreakAction',
+        belt_fed: 'SR5.Weapon.Cliptype.BeltFed',
+        internal_magazin: 'SR5.Weapon.Cliptype.InternalMagazin',
+        muzzle_loader: 'SR5.Weapon.Cliptype.MuzzleLoader',
+        cylinder: 'SR5.Weapon.Cliptype.Cylinder',
+        drum: 'SR5.Weapon.Cliptype.Drum',
+        bow: 'SR5.Weapon.Cliptype.Bow',
     },
 
     weaponRanges: {
@@ -518,6 +526,33 @@ export const SR5 = {
         gamma: 'SR5.CyberwareGradeGamma',
         grey: 'SR5.CyberwareGradeGrey',
         used: 'SR5.CyberwareGradeUsed',
+    },
+
+    skillTypes: {
+        skill: 'SR5.Skill.Types.Skill',
+        group: 'SR5.Skill.Types.Group',
+        set: 'SR5.Skill.Types.Set'
+    },
+
+    skillCategories: {
+        active: 'SR5.Skill.Category.Active',
+        knowledge: 'SR5.Skill.Category.Knowledge',
+        language: 'SR5.Skill.Category.Language',
+    },
+
+    // Attributes used by knowledge skill types.
+    knowledgeAttributes: {
+        academic: 'logic',
+        interests: 'intuition',
+        professional: 'logic',
+        street: 'intuition'
+    },
+
+    skillKnowledgeTypes: {
+        academic: 'SR5.Skill.KnowledgeType.Academic',
+        professional: 'SR5.Skill.KnowledgeType.Professional',
+        interests: 'SR5.Skill.KnowledgeType.Interests',
+        street: 'SR5.Skill.KnowledgeType.Street',
     },
 
     knowledgeSkillCategories: {
@@ -651,7 +686,7 @@ export const SR5 = {
         'addiction': "SR5.ActionCategory.Addiction",
         'attack_matrix': "SR5.ActionCategory.AttackMatrix",
         'attack_melee': "SR5.ActionCategory.AttackMelee",
-        'attack_ranged': "SR5.ActionCategory.AttackRanged", 
+        'attack_ranged': "SR5.ActionCategory.AttackRanged",
         'attack_thrown': "SR5.ActionCategory.AttackThrown",
         'attack': "SR5.ActionCategory.Attack",
         'brute_force': "SR5.ActionCategory.BruteForce",
@@ -662,7 +697,7 @@ export const SR5 = {
         'defense_matrix': "SR5.ActionCategory.DefenseMatrix",
         'defense_suppression': "SR5.ActionCategory.DefenseSuppression",
         'drain': "SR5.ActionCategory.Drain",
-        'fade': "SR5.ActionCategory.Fade", 
+        'fade': "SR5.ActionCategory.Fade",
         'hack_on_the_fly': "SR5.ActionCategory.HackOnTheFly",
         'magic': "SR5.ActionCategory.Magic",
         'matrix': 'SR5.ActionCategory.Matrix',
@@ -680,7 +715,7 @@ export const SR5 = {
         'spell_combat': "SR5.ActionCategory.SpellCombat",
         'spell_detection': "SR5.ActionCategory.SpellDetection",
         'spell_healing': "SR5.ActionCategory.SpellHealing",
-        'spell_illusion': "SR5.ActionCategory.SpellIllusion", 
+        'spell_illusion': "SR5.ActionCategory.SpellIllusion",
         'spell_manipulation': "SR5.ActionCategory.SpellManipulation",
         'spell_ritual': "SR5.ActionCategory.SpellRitual",
         'summoning': "SR5.ActionCategory.Summoning",
@@ -828,6 +863,9 @@ export const SR5 = {
         'GeneralActionsPack': 'sr5e-general-actions',
         'MatrixActionsPack': 'sr5e-matrix-actions',
         'ICActionsPack': 'sr5e-ic-actions',
+        'SkillsPack': 'sr5e-skills',
+        'SkillGroupsPack': 'sr5e-skill-groups',
+        'SkillSetsPack': 'sr5e-skill-sets',
     },
 
     programTypes: {
@@ -1027,7 +1065,7 @@ export const SR5 = {
         fault: 'SR5.Sprite.Types.Fault',
         machine: 'SR5.Sprite.Types.Machine',
         companion: 'SR5.Sprite.Types.Companion',
-        generalist:'SR5.Sprite.Types.Generalist',
+        generalist: 'SR5.Sprite.Types.Generalist',
     },
 
     spritePower: {
@@ -1159,79 +1197,79 @@ export const SR5 = {
      * ranged weapon mode.
      */
     fireModes: [
-    {
-        label: "SR5.Weapon.Mode.SingleShot",
-        value: 1,
-        recoil: false,
-        defense: 0,
-        suppression: false,
-        action: 'simple',
-        mode: 'single_shot'
-    },
-    {
-        label: "SR5.Weapon.Mode.SemiAutoShort",
-        value: 1,
-        recoil: true,
-        defense: 0,
-        suppression: false,
-        action: 'simple',
-        mode: 'semi_auto'
-    },
-    {
-        label: "SR5.Weapon.Mode.SemiAutoBurst",
-        value: 3,
-        recoil: true,
-        defense: -2,
-        suppression: false,
-        action: 'complex',
-        mode: 'semi_auto'
-    },
+        {
+            label: "SR5.Weapon.Mode.SingleShot",
+            value: 1,
+            recoil: false,
+            defense: 0,
+            suppression: false,
+            action: 'simple',
+            mode: 'single_shot'
+        },
+        {
+            label: "SR5.Weapon.Mode.SemiAutoShort",
+            value: 1,
+            recoil: true,
+            defense: 0,
+            suppression: false,
+            action: 'simple',
+            mode: 'semi_auto'
+        },
+        {
+            label: "SR5.Weapon.Mode.SemiAutoBurst",
+            value: 3,
+            recoil: true,
+            defense: -2,
+            suppression: false,
+            action: 'complex',
+            mode: 'semi_auto'
+        },
 
-    {
-        label: "SR5.Weapon.Mode.BurstFire",
-        value: 3,
-        recoil: true,
-        defense: -2,
-        suppression: false,
-        action: 'simple',
-        mode: 'burst_fire'
-    },
-    {
-        label: "SR5.Weapon.Mode.BurstFireLong",
-        value: 6,
-        recoil: true,
-        defense: -5,
-        suppression: false,
-        action: 'complex',
-        mode: 'burst_fire',
-    },
-    {
-        label: "SR5.Weapon.Mode.FullAutoShort",
-        value: 6,
-        recoil: true,
-        defense: -5,
-        suppression: false,
-        action: 'simple',
-        mode: 'full_auto'
-    },
-    {
-        label: 'SR5.Weapon.Mode.FullAutoLong',
-        value: 10,
-        recoil: true,
-        defense: -9,
-        suppression: false,
-        action: 'complex',
-        mode: 'full_auto'
-    },
-    {
-        label: 'SR5.Suppressing',
-        value: 20,
-        recoil: false,
-        defense: 0,
-        suppression: true,
-        action: 'complex',
-        mode: 'full_auto'
-    }
+        {
+            label: "SR5.Weapon.Mode.BurstFire",
+            value: 3,
+            recoil: true,
+            defense: -2,
+            suppression: false,
+            action: 'simple',
+            mode: 'burst_fire'
+        },
+        {
+            label: "SR5.Weapon.Mode.BurstFireLong",
+            value: 6,
+            recoil: true,
+            defense: -5,
+            suppression: false,
+            action: 'complex',
+            mode: 'burst_fire',
+        },
+        {
+            label: "SR5.Weapon.Mode.FullAutoShort",
+            value: 6,
+            recoil: true,
+            defense: -5,
+            suppression: false,
+            action: 'simple',
+            mode: 'full_auto'
+        },
+        {
+            label: 'SR5.Weapon.Mode.FullAutoLong',
+            value: 10,
+            recoil: true,
+            defense: -9,
+            suppression: false,
+            action: 'complex',
+            mode: 'full_auto'
+        },
+        {
+            label: 'SR5.Suppressing',
+            value: 20,
+            recoil: false,
+            defense: 0,
+            suppression: true,
+            action: 'complex',
+            mode: 'full_auto'
+        }
     ],
 
     /**

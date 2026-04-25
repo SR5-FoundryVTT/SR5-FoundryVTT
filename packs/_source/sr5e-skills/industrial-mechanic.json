@@ -1,0 +1,43 @@
+{
+  "name": "Industrial Mechanic",
+  "type": "skill",
+  "img": "systems/shadowrun5e/dist/icons/skills/technical-industrial_mechanic.svg",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": ""
+    },
+    "importFlags": null,
+    "type": "skill",
+    "skill": {
+      "category": "active",
+      "rating": 0,
+      "defaulting": false,
+      "attribute": "logic",
+      "specializations": [],
+      "group": "",
+      "requirement": "mundane",
+      "language": {
+        "isNative": false
+      },
+      "knowledgeType": null
+    },
+    "group": {
+      "skills": [],
+      "rating": 0
+    },
+    "set": {
+      "skills": [],
+      "groups": []
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "cHEbkRYxQfeNMv0l",
+  "_key": "!items!cHEbkRYxQfeNMv0l"
+}

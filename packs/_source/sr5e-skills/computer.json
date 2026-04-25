@@ -1,0 +1,43 @@
+{
+  "name": "Computer",
+  "type": "skill",
+  "img": "systems/shadowrun5e/dist/icons/skills/technical-computer.svg",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": ""
+    },
+    "importFlags": null,
+    "type": "skill",
+    "skill": {
+      "category": "active",
+      "rating": 0,
+      "defaulting": true,
+      "attribute": "logic",
+      "specializations": [],
+      "group": "",
+      "requirement": "mundane",
+      "language": {
+        "isNative": false
+      },
+      "knowledgeType": null
+    },
+    "group": {
+      "skills": [],
+      "rating": 0
+    },
+    "set": {
+      "skills": [],
+      "groups": []
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "Da7WrsFEnAh0v4jw",
+  "_key": "!items!Da7WrsFEnAh0v4jw"
+}

@@ -4,7 +4,7 @@ import { DamageType } from "../types/item/Action";
 import { DataDefaults } from "../data/DataDefaults";
 
 /**
- * Rules implementing the ritual chapter in SR5.295f
+ * Rules implementing the ritual chapter in SR5#295f
  */
 export const RitualRules = {
 

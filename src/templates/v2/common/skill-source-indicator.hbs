@@ -1,0 +1,9 @@
+<span class="skill-footer-source-indicator basic-row" data-uuid="{{source.uuid}}">
+    {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" source }}
+    <a data-action="openUuid" data-uuid="{{source.uuid}}">{{source.name}}</a>
+    {{#if showRemove}}
+        <a data-action="{{removeAction}}" data-tooltip="{{removeTooltip}}">
+            <i class="fas fa-trash"></i>
+        </a>
+    {{/if}}
+</span>

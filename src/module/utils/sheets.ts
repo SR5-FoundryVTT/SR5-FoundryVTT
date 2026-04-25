@@ -86,20 +86,3 @@ export function createTagifyOnInput(element: HTMLInputElement, values: TagifyVal
 
     return tagify;
 }
-
-/**
- * Helper to parse FoundryVTT DropData directly from it's source event
- *
- * This is a legacy handler for earlier FoundryVTT versions, however it's good
- * practice to not trust faulty input and inform about.
- *
- * @param event
- * @returns undefined when an DropData couldn't be parsed from it's JSON.
- */
-export function parseDropData(event): any | undefined {
-    try {
-        return JSON.parse(event.dataTransfer.getData('text/plain'));
-    } catch (error) {
-        return console.log('Shadowrun 5e | Dropping a document onto an item sheet caused this error', error);
-    }
-}

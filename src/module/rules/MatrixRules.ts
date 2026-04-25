@@ -2,7 +2,6 @@ import { SR5Actor } from "../actor/SR5Actor";
 import { SR5 } from "../config";
 import { SR } from "../constants";
 import { DataDefaults } from "../data/DataDefaults";
-import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
 import { ModifiableValue } from "../mods/ModifiableValue";
 import { BiofeedbackDamageType, DamageType } from '../types/item/Action';
@@ -67,6 +66,15 @@ export class MatrixRules {
      */
     static getICMeatAttributeBase(hostRating: number): number {
         return Math.max(hostRating, SR.attributes.ranges.host_rating.min);
+    }
+
+    /**
+     * Derive the base value of any skill an IC uses from its host rating.
+     *
+     * SR5#247 'Intrusion Countermeasures'     
+     */
+    static getICSkillBase(hostRating: number): number {
+        return hostRating;
     }
 
     /**
@@ -236,7 +244,7 @@ export class MatrixRules {
     /**
      * Determine the damage value to convergence with.
      * 
-     * See SR5#229-230 'User Mode' Virtual Reality sections.
+    * See SR5#231-232 'Overwatch Score and Convergence'.
      */
     static convergenceDamage(): DamageType {
         return DataDefaults.createData('damage', { base: 12, value: 12, type: { base: 'matrix', value: 'matrix' } });
