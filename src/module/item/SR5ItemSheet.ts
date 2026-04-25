@@ -15,6 +15,7 @@ import { ActionFlow } from './flows/ActionFlow';
 import { SINFlow } from './flows/SINFlow';
 import { ActorMarksFlow } from '../actor/flows/ActorMarksFlow';
 import { SheetFlow } from '@/module/flows/SheetFlow';
+import { parseDropData } from '../utils/sheets';
 
 import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
 import { AmmunitionType, RangeType } from '../types/item/Weapon';
@@ -529,6 +530,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         /**
          * Weapon item specific
          */
+        html.find('input[name="system.description.source"]').on('drop', (event) => void this._onSourceDrop(event.originalEvent));
+
         html.find('select[name="change-ammo"]').on('change', this._onAmmoSelect.bind(this));
         html.find('select[name="change-clip-type"]').on('change', (event) => { void this._onClipSelect((event.target as HTMLSelectElement).value) });
 
@@ -556,6 +559,17 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
     async _onSelectThrownRangeCategory(event: Event) {
         await this._onSelectRangeCategory("system.thrown.ranges", event);
+    }
+
+    private async _onSourceDrop(event?: DragEvent) {
+        if (!event || !this.isEditable) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const data = parseDropData(event);
+        if (data && typeof data === 'object' && 'uuid' in data && typeof data.uuid === 'string')
+            await this.item.update({ system: { description: { source: data.uuid } } });
     }
 
     async _onSelectRangeCategory(key: string, event: Event) {

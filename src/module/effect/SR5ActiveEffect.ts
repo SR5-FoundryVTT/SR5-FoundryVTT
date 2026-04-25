@@ -290,7 +290,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         else change.value = value.toString();
     }
 
-    static override migrateData(data: any) {
+    static override migrateData(data: Parameters<typeof ActiveEffect['migrateData']>[0]) {
         Migrator.migrate("ActiveEffect", data);
 
         return super.migrateData(data);
@@ -301,8 +301,10 @@ export class SR5ActiveEffect extends ActiveEffect {
         operation?: ActiveEffect.Database.UpdateOperation,
     ) {
         if (this.parent instanceof SR5Item && this.parent._isNestedItem) {
-            if (data) data._id = this.id;
-            await this.parent.updateNestedEffects(data);
+            if (!data || !this.id) return this;
+
+            await this.parent.updateNestedEffects({ ...data, _id: this.id });
+            await this.render();
             return this;
         }
 
