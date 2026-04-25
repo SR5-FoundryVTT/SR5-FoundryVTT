@@ -194,9 +194,8 @@ export class SkillEditSheet extends SR5ApplicationMixin(DocumentSheetV2)<Actor.I
 
         // Parse drop data.
         const data = parseDropData(event);
-        if (!data) return;
-
-        await this.document.update({[`${this._updateString()}.link`]: data.uuid});
+        if (data && typeof data === 'object' && 'uuid' in data && typeof data.uuid === 'string')
+            await this.document.update({[`${this._updateString()}.link`]: data.uuid});
     }
 
     /** Enhance attribute selection by an empty option to allow newly created skills to have no attribute selected.
