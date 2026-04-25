@@ -21,6 +21,7 @@ import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handleba
 import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { SkillFieldPrep } from '@/module/actor/prep/functions/SkillFieldPrep';
+import { SkillSetFlow } from '@/module/actor/flows/SkillSetFlow';
 import { SkillNamingFlow } from '@/module/flows/SkillNamingFlow';
 import { SkillSetSourceFlow } from '@/module/flows/SkillSetSourceFlow';
 import { SkillItemFlow } from '@/module/item/flows/SkillItemFlow';
