@@ -230,22 +230,30 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('skill calculation', async () => {
+            //@ts-expect-error Prohibit skill population.
+            window.doNotPopulateDefaultSkills = true;
             const character = await factory.createActor({
-                type: 'character',
-                system: {
-                    skills: {
-                        active: {
-                            arcana: {
-                                base: 6,
-                                specs: ['Test']
-                            }
-                        }
-                    }
-                }
+                type: 'character'
             });
 
+            // create a skill item to trigger SkillField preparation.
+            await character.createEmbeddedDocuments('Item', [{
+                type: 'skill',
+                name: 'Test',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        attribute: 'agility',
+                        rating: 3
+                    }
+                },
+            }]);
+
+            //@ts-expect-error Prohibit skill population.
+            delete window.doNotPopulateDefaultSkills;
+
             // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-            assert.strictEqual(character.system.skills.active.arcana.value, 7);
+            assert.strictEqual(character.system.skills.active.test.value, 3);
         });
 
         it('damage application to wounds', async () => {
