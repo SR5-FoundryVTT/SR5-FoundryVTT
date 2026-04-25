@@ -166,6 +166,9 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
     calcTotal(options?: { min?: number; max?: number }): number {
         this._field.value = this._field.base;
 
+        this.remove('SR5.EnforcedMaximum');
+        this.remove('SR5.EnforcedMinimum');
+
         this._field.changes.sort((a, b) => a.priority - b.priority);
         for (let i = 0; i < this._field.changes.length; i++) {
             const change = this._field.changes[i];
@@ -207,14 +210,12 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
             }
         }
 
-        this.remove('SR5.EnforcedMaximum');
         if (options?.max != null && this._field.value > options.max) {
             this._markPreviousChangesMasked(this._field.changes.length);
             this.addUnique('SR5.EnforcedMaximum', options.max, { mode: 'DOWNGRADE', priority: ModifiableValue.TOP_PRIORITY });
             this._field.value = options.max;
         }
 
-        this.remove('SR5.EnforcedMinimum');
         if (options?.min != null && this._field.value < options.min) {
             this._markPreviousChangesMasked(this._field.changes.length);
             this.addUnique('SR5.EnforcedMinimum', options.min, { mode: 'UPGRADE', priority: ModifiableValue.TOP_PRIORITY });
