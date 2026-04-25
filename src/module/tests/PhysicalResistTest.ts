@@ -200,8 +200,8 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
      * This can be used to trigger resist tests.
      */
     static override async executeMessageAction(againstData: PhysicalDefenseTestData, messageId: string, options: TestOptions) {
-        // Determine documents to roll test with.
-        const documents = await Helpers.getTestTargetDocuments(againstData)
+        // Roll resist tests with the currently selected token actor(s).
+        const documents = Helpers.getSelectedActorsOrCharacter();
         await ResistTestDataFlow.executeMessageAction(this, againstData, messageId, documents, options);
     }
 }

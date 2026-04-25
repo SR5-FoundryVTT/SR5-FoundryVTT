@@ -230,8 +230,8 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('skill calculation', async () => {
-            //@ts-expect-error Prohibit skill population.
             window.doNotPopulateDefaultSkills = true;
+
             const character = await factory.createActor({
                 type: 'character'
             });
@@ -249,7 +249,6 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                 },
             }]);
 
-            //@ts-expect-error Prohibit skill population.
             delete window.doNotPopulateDefaultSkills;
 
             // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.

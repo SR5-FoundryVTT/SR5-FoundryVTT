@@ -4,7 +4,6 @@ import { ModifiableValue } from "@/module/mods/ModifiableValue";
 import { SkillTest } from "../module/tests/SkillTest";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { TestCreator } from "../module/tests/TestCreator";
-import { SuccessTest } from "../module/tests/SuccessTest";
 import { DataDefaults } from "../module/data/DataDefaults";
 import { SR5ActiveEffect } from "src/module/effect/SR5ActiveEffect";
 import { ModifiableValueType } from "@/module/types/template/Base";
@@ -183,10 +182,25 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('UPGRADE mode: should raise the value to a max', async () => {
+            window.doNotPopulateDefaultSkills = true;
+            
             const actor = await factory.createActor({ type: 'character', system: { 
-                attributes: { body: { base: 2 } }, 
-                skills: { active: { automatics: { base: 2 } } } } 
-            });
+                attributes: { body: { base: 2 } }
+            }});
+            delete window.doNotPopulateDefaultSkills;
+
+            await actor.createEmbeddedDocuments('Item', [{
+                type: 'skill',
+                name: 'Automatics',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        attribute: 'agility',
+                        rating: 2
+                    }
+                }
+            }]);
+
 
             assert.strictEqual(actor.system.attributes.body.base, 2);
             assert.strictEqual(actor.system.skills.active.automatics.base, 2);
@@ -210,13 +224,28 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('UPGRADE mode: uses the highest value for multiple upgrade changes', async () => {
-            const actor = await factory.createActor({ type: 'character', system: { 
-                skills: { active: { automatics: { base: 2 } } } } 
-            });
+            window.doNotPopulateDefaultSkills = true;
+
+            const actor = await factory.createActor({ type: 'character' });
+            //
+            delete window.doNotPopulateDefaultSkills;
+
+            await actor.createEmbeddedDocuments('Item', [{
+                type: 'skill',
+                name: 'Automatics',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        attribute: 'agility',
+                        rating: 2
+                    }
+                }
+            }]);
+
 
             assert.strictEqual(actor.system.skills.active.automatics.base, 2);
 
-            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
                 origin: actor.uuid,
                 disabled: false,
                 name: 'Test Effect',
@@ -230,10 +259,24 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('DOWNGRADE mode: should reduce the value to a min', async () => {
+            window.doNotPopulateDefaultSkills = true;
             const actor = await factory.createActor({ type: 'character', system: { 
-                attributes: { body: { base: 5 } }, 
-                skills: { active: { automatics: { base: 5 } } } } 
-            });
+                attributes: { body: { base: 5 } }
+            }});
+            delete window.doNotPopulateDefaultSkills;
+
+            await actor.createEmbeddedDocuments('Item', [{
+                type: 'skill',
+                name: 'Automatics',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        attribute: 'agility',
+                        rating: 5
+                    }
+                }
+            }]);
+
 
             assert.strictEqual(actor.system.attributes.body.base, 5);
             assert.strictEqual(actor.system.skills.active.automatics.base, 5);
@@ -257,11 +300,21 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('DOWNGRADE mode: uses the lowest value for multiple downgrade changes', async () => {
-            const actor = await factory.createActor({ type: 'character', system: { 
-                skills: { active: { automatics: { base: 6 } } } } 
-            });
+            window.doNotPopulateDefaultSkills = true;
+            const actor = await factory.createActor({ type: 'character' });
+            delete window.doNotPopulateDefaultSkills;
 
-            assert.strictEqual(actor.system.skills.active.automatics.base, 6);
+            await actor.createEmbeddedDocuments('Item', [{
+                type: 'skill',
+                name: 'Automatics',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        attribute: 'agility',
+                        rating: 6
+                    }
+                }
+            }]);
 
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 origin: actor.uuid,
@@ -277,10 +330,23 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('MULTIPLY mode: multiplies base values by the change value', async () => {
+            window.doNotPopulateDefaultSkills = true;
             const actor = await factory.createActor({ type: 'character', system: { 
                 attributes: { body: { base: 5 } }, 
-                skills: { active: { automatics: { base: 5 } } } } 
-            });
+            }});
+            delete window.doNotPopulateDefaultSkills;
+
+            await actor.createEmbeddedDocuments('Item', [{
+                type: 'skill',
+                name: 'Automatics',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        attribute: 'agility',
+                        rating: 5
+                    }
+                }
+            }]);
 
             assert.strictEqual(actor.system.attributes.body.base, 5);
             assert.strictEqual(actor.system.skills.active.automatics.base, 5);
