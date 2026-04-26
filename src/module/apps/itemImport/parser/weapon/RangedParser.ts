@@ -1,7 +1,5 @@
-import { ImportHelper } from '../../helper/ImportHelper';
-import { WeaponParserBase } from './WeaponParserBase';
-import { DataDefaults } from '../../../../data/DataDefaults';
 import { Weapon } from '../../schema/WeaponsSchema';
+import { WeaponParserBase } from './WeaponParserBase';
 
 export class RangedParser extends WeaponParserBase {
     protected GetAmmo(weaponJson: Weapon) {
@@ -18,7 +16,7 @@ export class RangedParser extends WeaponParserBase {
         system.range.rc.value = Number(jsonData?.rc?._TEXT) || 0;
 
         const rangeCategory = jsonData.range?._TEXT || jsonData.category._TEXT;
-        system.range.ranges = DataDefaults.createData('range', this.GetRangeDataFromImportedCategory(rangeCategory));
+        system.range.ranges = this.getRangeData(rangeCategory);
 
         system.ammo.current.value = this.GetAmmo(jsonData);
         system.ammo.current.max = this.GetAmmo(jsonData);

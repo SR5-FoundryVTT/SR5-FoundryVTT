@@ -3008,6 +3008,7 @@
                     "AssaultCannon": "돌격용 기관포",
                     "AssaultRifle": "돌격용 소총",
                     "Bow": "활",
+                    "Carbine": "카빈",
                     "Flamethrower": "화염방사기",
                     "GrenadeLauncher": "유탄 발사기",
                     "HarpoonGun": "작살총",
@@ -3030,6 +3031,7 @@
                     "Shuriken": "표창",
                     "SniperRifle": "저격총",
                     "SportingRifle": "스포츠용 소총",
+                    "SprayPen": "스프레이 펜",
                     "StandardThrownGrenade": "표준형 수류탄",
                     "Taser": "테이저",
                     "ThrownKnife": "투척용 나이프"

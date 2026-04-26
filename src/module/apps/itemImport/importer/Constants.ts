@@ -100,7 +100,7 @@ export class Constants {
         'Unarmed': 'unarmed_combat',
     } as const;
 
-    public static readonly MAP_IMPORT_RANGE_CATEGORY_TO_SYSTEM_RANGE_CATEGORY = {
+    public static readonly RANGE_CATEGORY_MAP = {
         'Tasers': 'taser',
         'Holdouts': 'holdOutPistol',
         'Light Pistols': 'lightPistol',
@@ -130,6 +130,8 @@ export class Constants {
         'Harpoon Gun': 'harpoonGun',
         'Harpoon Gun (Underwater)': 'harpoonGunUnderwater',
         'Flamethrowers': 'flamethrower',
+        'Spray Pen': 'sprayPen',
+        'Carbines': 'carbine',
     } as const satisfies Record<string, Exclude<keyof typeof SR5.weaponRangeCategories, "manual">> ;
 
     public static readonly attributeTable = {

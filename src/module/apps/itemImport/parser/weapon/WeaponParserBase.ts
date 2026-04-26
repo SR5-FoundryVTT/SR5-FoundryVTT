@@ -174,15 +174,18 @@ export class WeaponParserBase extends Parser<'weapon'> {
         }
     }
 
-    protected GetRangeDataFromImportedCategory(category: string): RangeType|undefined {
-        const systemRangeCategory: Exclude<keyof typeof SR5.weaponRangeCategories, "manual"> | undefined = Constants.MAP_IMPORT_RANGE_CATEGORY_TO_SYSTEM_RANGE_CATEGORY[category];
-        if(!systemRangeCategory) return;
+    protected getRangeData(category: string): RangeType {
+        if (!(category in Constants.RANGE_CATEGORY_MAP))
+            return DataDefaults.createData("range");
 
-        return {
-            ...SR5.weaponRangeCategories[systemRangeCategory].ranges,
-            category: systemRangeCategory,
-            attribute: 'agility',
-        };
+        const mappedCategory = Constants.RANGE_CATEGORY_MAP[
+            category as keyof typeof Constants.RANGE_CATEGORY_MAP
+        ];
+
+        return DataDefaults.createData("range", {
+            ...SR5.weaponRangeCategories[mappedCategory].ranges,
+            category: mappedCategory,
+        });
     }
 
     protected override setImporterFlags(entity: Item.CreateData, jsonData: Weapon): void {
