@@ -75,13 +75,13 @@
                 </div>
                 {{/if}}
                 {{#if test.hasLimit}}
-                <div class="test-value value-mod metric-row" data-tooltip-source="limit">
+                <div class="test-value metric-row" data-tooltip-source="limit">
                     <span class="value">{{localize test.limit.label}}:</span>
                     <span class="value-result">{{test.limit.value}}</span>
                 </div>
                 {{/if}}
                 {{#if test.hasThreshold}}
-                <div class="test-value value-mod metric-row" data-tooltip-source="threshold">
+                <div class="test-value metric-row" data-tooltip-source="threshold">
                     <span class="value">{{localize test.threshold.label}}:</span>
                     <span class="value-result">{{test.threshold.value}}</span>
                 </div>
@@ -94,7 +94,7 @@
                 {{/if}}
             </div>
             <div class="right-side">
-                <div class="test-value value-mod metric-row" data-tooltip-source="pool">
+                <div class="test-value metric-row" data-tooltip-source="pool">
                     <span class="value">{{localize test.pool.label}}:</span>
                     <span class="value-result">{{test.pool.value}}</span>
                 </div>
@@ -367,4 +367,3 @@
     </div>
     {{/if}}
 </div>
-

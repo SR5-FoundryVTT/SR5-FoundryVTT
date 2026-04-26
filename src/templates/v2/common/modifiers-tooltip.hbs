@@ -1,15 +1,15 @@
 <div class="value-modifiers-container {{#if card}}card-style{{/if}}">
     <div class="value-modifiers">
-        <div class="list-item">
-            {{#if (or (not card) value.base)}}
+        {{#if (or (not card) value.base)}}
+            <div class="list-item">
                 <div class="value-modifier-name">
                     <label>{{localize 'SR5.BaseValue'}}</label>
                 </div>
                 <div class="value-modifiers-base">
                     <label>{{value.base}}</label>
                 </div>
-            {{/if}}
-        </div>
+            </div>
+        {{/if}}
         {{#each value.changes as |change|}}
             <div class="list-item">
                 <div class="value-modifier-name {{#if change.invalidated}}value-modifiers-invalid-total{{/if}}">

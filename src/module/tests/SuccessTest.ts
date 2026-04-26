@@ -11,6 +11,7 @@ import { ModifiableValue } from "../mods/ModifiableValue";
 import { DataDefaults } from "../data/DataDefaults";
 import { ActionFlow } from "../item/flows/ActionFlow";
 import { CORE_NAME, FLAGS, SYSTEM_NAME } from "../constants";
+import { SheetFlow } from "../flows/SheetFlow";
 import { DamageApplicationFlow } from '../actor/flows/DamageApplicationFlow';
 import { TestDialog, TestDialogListener } from "../apps/dialogs/TestDialog";
 
@@ -55,6 +56,10 @@ export interface SuccessTestCodeTermTrace {
 export interface SuccessTestCodeTerm {
     text: string;
     tooltipSource?: string;
+}
+
+interface ValueModifierTooltipOptions {
+    card?: boolean;
 }
 
 /**
@@ -1972,11 +1977,15 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const test = await TestCreator.fromMessage(message.id);
         if (!test) return;
 
-        await this.hydrateValueModifierTooltipsForTest(test, html);
+        await this.hydrateValueModifierTooltipsForTest(test, html, { card: true });
     }
 
-    static async hydrateValueModifierTooltipsForTest(test: SuccessTest, html: HTMLElement | JQuery) {
-        const tooltipsBySource = await this._buildValueModifierTooltipsBySource(test);
+    static async hydrateValueModifierTooltipsForTest(
+        test: SuccessTest,
+        html: HTMLElement | JQuery,
+        options: ValueModifierTooltipOptions = {}
+    ) {
+        const tooltipsBySource = await this._buildValueModifierTooltipsBySource(test, options);
 
         const valueModifiers = $(html).find<HTMLElement>('[data-tooltip-source]').toArray();
 
@@ -1988,11 +1997,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             if (!tooltipHtml) continue;
 
             valueMod.dataset.tooltipHtml = tooltipHtml;
-            valueMod.dataset.tooltipClass = 'sr5-value-modifiers-tooltip';
+            valueMod.dataset.tooltipClass = 'sr5v2';
         }
     }
 
-    private static async _buildValueModifierTooltipsBySource(test: SuccessTest): Promise<Record<string, string | undefined>> {
+    private static async _buildValueModifierTooltipsBySource(
+        test: SuccessTest,
+        options: ValueModifierTooltipOptions = {}
+    ): Promise<Record<string, string | undefined>> {
         const tooltipValues: Record<string, ValueFieldType | undefined> = {
             pool: test.pool,
             limit: test.hasLimit ? test.limit : undefined,
@@ -2004,16 +2016,19 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             tooltipValues[trace.tooltipSource] = trace.valueField;
 
         const entries = await Promise.all(Object.entries(tooltipValues).map(async ([source, value]) => {
-            return [source, value ? await this._buildValueModifierTooltipHtml(value) : undefined] as const;
+            return [source, value ? await this._buildValueModifierTooltipHtml(value, options) : undefined] as const;
         }));
 
         return Object.fromEntries(entries);
     }
 
-    static async _buildValueModifierTooltipHtml(value: ValueFieldType): Promise<string | undefined> {
+    static async _buildValueModifierTooltipHtml(
+        value: ValueFieldType,
+        options: ValueModifierTooltipOptions = {}
+    ): Promise<string | undefined> {
         const tooltipHtml = await foundry.applications.handlebars.renderTemplate(
-            'systems/shadowrun5e/dist/templates/common/ValueModifiers.hbs',
-            { card: true, value }
+            SheetFlow.templateBase('common/modifiers-tooltip'),
+            { value, card: options.card }
         );
 
         const content = tooltipHtml.trim();
