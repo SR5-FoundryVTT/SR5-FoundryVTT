@@ -34,6 +34,7 @@ import { EffectCreationFlow } from '@/module/flows/EffectCreationFlow';
 import { SkillFieldType } from '@/module/types/template/Skills';
 import { CreateItemFlow } from '@/module/item/flows/CreateItemFlow';
 import { ActorSkillFlow } from '../flows/ActorSkillFlow';
+import { ModifiableValueType } from '@/module/types/template/Base';
 
 const { TextEditor } = foundry.applications.ux;
 const { fromUuid, fromUuidSync } = foundry.utils;
@@ -538,7 +539,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     ) {
         await super._onRender(context, options);
         this.activateListeners_LEGACY($(this.element));
-        this.prepareModifierTooltips();
+        await this.prepareModifierTooltips();
         this.#filterActiveSkillsElements();
 
         // drag and drop handling to change the positions of favorited items
@@ -639,47 +640,55 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     /**
+     * Populate modifier tooltips for elements matching a `[data-*]` selector.
+     * Derives the dataset key from the selector, resolves the value via `getValue`,
+     * renders the tooltip template, and assigns it to `dataset.tooltipHtml`.
+     */
+    private async _applyModifierTooltip(
+        selector: `[data-${string}]`,
+        getValue: (id: string) => ModifiableValueType | undefined
+    ): Promise<void> {
+        if (!this.element) return;
+
+        const elements = this.element.querySelectorAll<HTMLElement>(selector);
+        const [, kebabCaseKey] = /\[data-([^\]]+)\]/.exec(selector)!;
+        const datasetKey = kebabCaseKey.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
+
+        await Promise.all(
+            [...elements].map(async (element) => {
+                const id = element.dataset[datasetKey];
+                if (!id) return;
+
+                const value = getValue(id);
+                if (!value) return;
+
+                const content = (
+                    await foundry.applications.handlebars.renderTemplate(
+                        SheetFlow.templateBase("common/modifiers-tooltip"),
+                        { value }
+                    )
+                ).trim();
+
+                if (!content) return;
+
+                element.dataset.tooltipHtml = content;
+                element.dataset.tooltipClass = "sr5v2";
+            })
+        );
+    }
+
+    /**
      * Prepare Tooltips For Skills, Attributes, and Limits
      * - these tooltips display all the modifiers for the ModifiedValue
      */
-    prepareModifierTooltips(): void {
+    async prepareModifierTooltips() {
         if (!this.element) return;
 
-        const configs = [
-            ["[data-attribute-modifier-tooltip]", (id: string) => this.actor.getAttribute(id)],
-            ["[data-limit-modifier-tooltip]", (id: string) => this.actor.getLimit(id)],
-            ["[data-skill-modifier-tooltip]", (id: string) => this.actor.getSkillById(id)]
-        ] as const;
-
-        for (const [selector, getValue] of configs) {
-            const datasetKey = selector
-                .slice("[data-".length, -1)
-                .replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
-
-            this.element.querySelectorAll<HTMLElement>(selector).forEach((element) => {
-                element.addEventListener("mouseenter", (event: MouseEvent) => {
-                    void (async () => {
-                        const target = event.currentTarget as HTMLElement | null;
-                        const id = target?.dataset[datasetKey];
-                        if (!id) return;
-
-                        const value = getValue(id);
-                        if (!value) return;
-
-                        const html = await foundry.applications.handlebars.renderTemplate(
-                            SheetFlow.templateBase("common/modifiers-tooltip"),
-                            { value }
-                        );
-
-                        game.tooltip.activate(target, { html, cssClass: "sr5v2" });
-                    })();
-                });
-
-                element.addEventListener("mouseleave", () => {
-                    game.tooltip.deactivate();
-                });
-            });
-        }
+        await Promise.all([
+            this._applyModifierTooltip("[data-attribute-modifier-tooltip]", (id) => this.actor.getAttribute(id)),
+            this._applyModifierTooltip("[data-limit-modifier-tooltip]", (id) => this.actor.getLimit(id)),
+            this._applyModifierTooltip("[data-skill-modifier-tooltip]", (id) => this.actor.getSkillById(id))
+        ]);
     }
 
     protected override _getHeaderControls() {
