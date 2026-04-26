@@ -617,6 +617,11 @@
                 padding: 0.15rem 0.35rem;
             }
 
+            .value-result .button.incoming-damage {
+                background: linear-gradient(180deg, rgba(variables.$light, 0.12), rgba(variables.$dark, 0.52));
+                border: none;
+            }
+
             .value-result--damage-pair {
                 display: inline-flex;
                 align-items: center;

@@ -157,7 +157,7 @@
                 incomingDamage=test.data.incomingDamage
                 modifiedName=(localize "SR5.Modified")
                 modifiedDamage=test.data.modifiedDamage
-                showAP=false
+                showAP=(or (eq test.data.type 'PhysicalDefenseTest') (eq test.data.type 'SuppressionDefenseTest'))
                 }}
             </div>
         </div>

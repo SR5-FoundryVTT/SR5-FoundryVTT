@@ -1,3 +1,12 @@
+{{#if (and showAP damage.ap.value)}}
+<div class="test-value">
+        <span class="value">{{localize "SR5.AP"}}: </span>
+        <span class="value-result">
+            <span class="damage-indicator">{{damage.ap.value}}</span>
+        </span>
+</div>
+{{/if}}
+
 <div class="test-value">
         <span class="value">{{name}}: </span>
         <span class="value-result">
@@ -19,10 +28,6 @@
                     <i class="far fa-heart-circle-bolt icon"
                        data-tooltip="{{localize 'SR5.BiofeedbackDamage'}}"></i>
                 {{/if}}
-                {{#if damage.ap.value}} {{#if showAP}}
-                    <span class="key">{{localize "SR5.AP"}}</span>
-                    <span class="value">{{damage.ap.value}}</span>
-                {{/if}}{{/if}}
             </span>
         </span>
 </div>
