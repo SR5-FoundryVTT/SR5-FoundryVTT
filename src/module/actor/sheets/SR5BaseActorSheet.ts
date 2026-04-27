@@ -27,6 +27,7 @@ import { SkillSetSourceFlow } from '@/module/flows/SkillSetSourceFlow';
 import { SkillItemFlow } from '@/module/item/flows/SkillItemFlow';
 import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
 import { parseDropData } from '@/module/utils/sheets';
+import { getFuzzyMatches, matchesFuzzyQuery } from '@/module/utils/fuzzySearch';
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import ActorSheetV2 = foundry.applications.sheets.ActorSheetV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
@@ -1553,33 +1554,66 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     #filterActiveSkillsElements() {
-        let count = 0;
-        this.element.querySelector('#active-skills-scroll')
-            ?.querySelectorAll<HTMLDivElement>('[data-skill-id]')
-            .forEach((listItemElem) => {
+        const skillContainer = this.element.querySelector<HTMLElement>('#active-skills-scroll');
+        if (!skillContainer) return;
 
-                const container = listItemElem.parentElement;
-                if (!container) return;
-                const id = listItemElem.dataset.skillId;
-                if (!id) return;
-                const skill = this.actor.getSkillById(id);
-                if (!skill) return;
-                if (this._isSkillFiltered(id, skill)) {
-                    container.classList.remove('hidden')
-                    count++;
-                    if (count % 2) {
-                        container.classList.add('nobg')
-                        container.classList.remove('forcebg')
-                    } else {
-                        container.classList.add('forcebg')
-                        container.classList.remove('nobg')
-                    }
-                } else {
-                    container.classList.add('hidden');
-                    container.classList.remove('nobg')
-                    container.classList.remove('forcebg')
-                }
-            });
+        const activeSkillRows = Array.from(
+            skillContainer.querySelectorAll<HTMLDivElement>('[data-skill-id][data-category="active"]'),
+        ).map((listItemElem) => {
+            const container = listItemElem.parentElement;
+            if (!container) return null;
+
+            const skillId = listItemElem.dataset.skillId;
+            if (!skillId) return null;
+
+            const skill = this.actor.getSkillById(skillId);
+            if (!skill) return null;
+
+            return { container, skillId, skill };
+        }).filter((row): row is NonNullable<typeof row> => row !== null);
+
+        const scoreBySkillId = new Map<string, number>();
+        if (this._filters.skills) {
+            for (const match of getFuzzyMatches(
+                activeSkillRows,
+                this._filters.skills,
+                row => this._getSkillSearchString(row.skillId, row.skill),
+            )) {
+                scoreBySkillId.set(match.item.skillId, match.score);
+            }
+        }
+
+        const sortByLabel = (left: typeof activeSkillRows[number], right: typeof activeSkillRows[number]) => {
+            return this._getSkillLabelOrName(left.skill).localeCompare(this._getSkillLabelOrName(right.skill), game.i18n.lang);
+        };
+
+        activeSkillRows.sort((left, right) => {
+            const leftScore = scoreBySkillId.get(left.skillId);
+            const rightScore = scoreBySkillId.get(right.skillId);
+
+            if (leftScore !== undefined && rightScore !== undefined) {
+                if (leftScore !== rightScore) return rightScore - leftScore;
+                return sortByLabel(left, right);
+            }
+
+            if (leftScore !== undefined) return -1;
+            if (rightScore !== undefined) return 1;
+            return sortByLabel(left, right);
+        });
+
+        const firstNonActiveSkillRow = Array.from(skillContainer.children)
+            .find(child => !child.querySelector<HTMLElement>('[data-skill-id][data-category="active"]')) ?? null;
+
+        for (const row of activeSkillRows) {
+            skillContainer.insertBefore(row.container, firstNonActiveSkillRow);
+            row.container.classList.add('active-skill-row');
+
+            if (this._isSkillFiltered(row.skillId, row.skill)) {
+                row.container.classList.remove('hidden');
+            } else {
+                row.container.classList.add('hidden');
+            }
+        }
     }
 
     _isSkillFiltered(skillId: string, skill: SkillFieldType) {
@@ -1596,6 +1630,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return skill.label || skill.name || '';
     }
 
+    _getSkillSearchString(key: string, skill: SkillFieldType) {
+        const name = this._getSkillLabelOrName(skill);
+        const searchKey = skill.name === undefined ? key : '';
+        const specs = skill.specs.join(' ');
+        return `${searchKey} ${name} ${specs}`;
+    }
+
     /**
      * Determine if a given skill contains a given search text in any way.
      * 
@@ -1607,24 +1648,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @returns true, if skill contains search text
      */
     _doesSkillContainText(key: string, skill: SkillFieldType, text: string) {
-        if (!text) {
-            return true;
-        }
-
-        // Search both english keys, localized labels and all specializations.
-        const name = this._getSkillLabelOrName(skill);
-        const searchKey = skill.name === undefined ? key : '';
-        const specs = skill.specs.join(' ');
-        const searchString = `${searchKey} ${name} ${specs}`;
-
-        // Normalize strings for Unicode characters (Korean) and use Foundry umlaut (German) handling.
-        const normalizedSearch = foundry.applications.ux.SearchFilter.cleanQuery(searchString);
-        const normalizedText = foundry.applications.ux.SearchFilter.cleanQuery(text);
-
-        const searchLower = normalizedSearch.toLowerCase();
-        const textLower = normalizedText.toLowerCase();
-
-        return searchLower.includes(textLower);
+        return matchesFuzzyQuery(text, this._getSkillSearchString(key, skill));
     }
 
     _isSkillMagic(id: string, skill: SR5Item<'skill'>) {

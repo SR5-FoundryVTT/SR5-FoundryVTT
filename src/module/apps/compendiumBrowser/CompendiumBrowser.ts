@@ -1,4 +1,5 @@
 import { LinksHelpers } from "@/module/utils/links";
+import { getFuzzyMatches } from "@/module/utils/fuzzySearch";
 import { FLAGS, SYSTEM_NAME } from "@/module/constants";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
@@ -148,13 +149,16 @@ export class CompendiumBrowser extends BaseClass {
             return [...index.values()].map((entry) => ({ ...entry, sourcePack: packCollection }));
         });
 
-        if (queryName) {
-            const query = queryName.toLowerCase();
-            entries = entries.filter((i) => !("name" in i) || i.name?.toLowerCase().includes(query));
-        }
-
         if (types && types.length > 0)
             entries = entries.filter((e) => !("type" in e && typeof e.type === "string") || types.includes(e.type as any));
+
+        if (queryName) {
+            entries = getFuzzyMatches(
+                entries,
+                queryName,
+                entry => ("name" in entry && typeof entry.name === "string") ? entry.name : "",
+            ).map(match => match.item);
+        }
 
         return entries;
     }
@@ -417,7 +421,19 @@ export class CompendiumBrowser extends BaseClass {
         entries = entries.map(entry => ({
             ...entry, sourcePack: game.packs.get(entry.sourcePack)!.title,
             type: game.i18n.localize(`TYPES.${this.activeTab}.${entry.type}`),
-        })).sort((a, b) => a.name!.localeCompare(b.name!, game.i18n.lang));
+        }));
+
+        const hasSearchQuery = foundry.applications.ux.SearchFilter.cleanQuery(this._searchQuery).length > 0;
+        if (hasSearchQuery) {
+            entries = getFuzzyMatches(entries, this._searchQuery, entry => entry.name ?? "")
+                .sort((left, right) =>
+                    right.score - left.score ||
+                    (left.item.name ?? "").localeCompare(right.item.name ?? "", game.i18n.lang),
+                )
+                .map(match => match.item);
+        } else {
+            entries = entries.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "", game.i18n.lang));
+        }
 
         this.scrollState.entries = entries;
         this.scrollState.throttle = false;
@@ -544,9 +560,9 @@ export class CompendiumBrowser extends BaseClass {
 
         // Filter by search query
         if (this._searchQuery) {
-            packs = packs.filter(({ pack }) =>
-                pack.metadata.label.toLowerCase().includes(this._searchQuery.toLowerCase()),
-            );
+            const matches = getFuzzyMatches(packs, this._searchQuery, ({ pack }) => pack.metadata.label);
+            const matchingPacks = new Set(matches.map(match => match.item));
+            packs = packs.filter(pack => matchingPacks.has(pack));
         }
         return packs;
     }
