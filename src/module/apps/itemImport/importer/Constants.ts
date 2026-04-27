@@ -33,7 +33,7 @@ export class Constants {
         'Weapon':           { pack: 'sr5weapon',          type: 'Item', folder: null, subFolder: null }, // Weapons
 
         // Miscs
-        'Misc':             { pack: 'sr5misc',            type: 'Item', folder: null, subFolder: null }, // Actions
+        'Misc':             { pack: 'sr5misc',            type: 'Item', folder: null, subFolder: null }, // Actions and skills
     } as const satisfies Record<string, CompendiumConfig>;
 
     public static readonly MAP_COMPENDIUM_KEY = {
@@ -68,7 +68,8 @@ export class Constants {
         Weapon_Mod:     this.MAP_COMPENDIUM_CONFIG.Modification,
 
         // Misc
-        Action:         this.MAP_COMPENDIUM_CONFIG.Misc
+        Action:         this.MAP_COMPENDIUM_CONFIG.Misc,
+        Skill:          this.MAP_COMPENDIUM_CONFIG.Misc
     } as const satisfies Record<string, CompendiumConfig>;
 
     public static readonly MAP_CATEGORY_TO_SKILL = {
@@ -136,6 +137,6 @@ export class Constants {
         "BOD": "body", "AGI": "agility", "REA": "reaction",
         "STR": "strength", "WIL": "willpower","LOG": "logic",
         "INT": "intuition", "CHA": "charisma", "EDG": "edge",
-        "MAG": "magic", "RES": "ressonance", "ESS": "essence"
+        "MAG": "magic", "RES": "resonance", "ESS": "essence"
     } as const;
 }
