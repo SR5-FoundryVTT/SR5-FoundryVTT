@@ -45,7 +45,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
         return result;
     }
 
-    private GetSkill(weaponJson: Weapon): string {
+    private getSkill(weaponJson: Weapon): string {
         if (weaponJson.useskill?._TEXT) {
             const jsonSkill = weaponJson.useskill._TEXT;
             if (Constants.MAP_CATEGORY_TO_SKILL[jsonSkill])
@@ -62,7 +62,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
         }
     }
 
-    public static GetWeaponType(weaponJson: Weapon): SystemType<'weapon'>['category'] {
+    public static getWeaponType(weaponJson: Weapon): SystemType<'weapon'>['category'] {
         const type = weaponJson.type._TEXT;
         //melee is the least specific, all melee entries are accurate
         if (type === 'Melee') {
@@ -85,11 +85,11 @@ export class WeaponParserBase extends Parser<'weapon'> {
 
         const category = jsonData.category._TEXT;
 
-        system.category = WeaponParserBase.GetWeaponType(jsonData);
+        system.category = WeaponParserBase.getWeaponType(jsonData);
         system.subcategory = category.toLowerCase();
 
-        system.action.skill = this.GetSkill(jsonData);
-        system.action.damage = this.GetDamage(jsonData as any);
+        system.action.skill = this.getSkill(jsonData);
+        system.action.damage = this.getDamage(jsonData as any);
 
         if (jsonData.accuracy?._TEXT) {
             let accuracy: string = jsonData.accuracy._TEXT;
@@ -106,7 +106,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
         return system;
     }
     
-    protected GetDamage(jsonData: Weapon): DamageType {
+    protected getDamage(jsonData: Weapon): DamageType {
         const jsonDamage = jsonData.damage._TEXT;
         // ex. 15S(e)
         const simpleDamage = /^([0-9]+)([PSM])? ?(\([a-zA-Z]+\))?/g.exec(jsonDamage);
@@ -198,7 +198,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
 
     protected override async getFolder(jsonData: Weapon, compendiumKey: CompendiumKey): Promise<Folder> {
         const categoryData = jsonData.category._TEXT;
-        const root = WeaponParserBase.GetWeaponType(jsonData).capitalize() ?? "Other";
+        const root = WeaponParserBase.getWeaponType(jsonData).capitalize() ?? "Other";
         const folderName = IH.getTranslatedCategory('weapons', categoryData);
 
         return IH.getFolder(compendiumKey, root, root === 'Thrown' ? undefined : folderName);

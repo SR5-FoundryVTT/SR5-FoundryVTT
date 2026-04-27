@@ -1,8 +1,7 @@
 import { SR5 } from '@/module/config';
-import { DataDefaults } from '@/module/data/DataDefaults';
 import { SYSTEM_NAME } from '@/module/constants';
 import { VersionMigration } from "../VersionMigration";
-import { SR5Item } from '@/module/item/SR5Item';
+import { DataDefaults } from '@/module/data/DataDefaults';
 
 
 type LegacySkillCategory = 'active' | 'language' | 'knowledge';
@@ -72,10 +71,18 @@ export class Version0_33_0 extends VersionMigration {
     }
 
     override handlesItem(item: Readonly<any>): boolean {
-        return item.type === 'weapon'
-            && item.system?.range?.ranges
-            && item.system.range.ranges.category !== 'manual'
-            && item.system.range.ranges.attribute === 'agility';
+        if (item.type !== 'weapon') return false;
+
+        const rangeTargets = [
+            item.system?.range?.ranges,
+            item.system?.thrown?.ranges
+        ] as const;
+
+        return rangeTargets.some(ranges => 
+            ranges 
+            && ranges.category !== 'manual' 
+            && ranges.attribute === 'agility'
+        );
     }
 
     override migrateItem(item: any): void {
@@ -88,10 +95,15 @@ export class Version0_33_0 extends VersionMigration {
             "bow"
         ] as const);
 
-        const category = item.system.range.ranges.category;
-        const attribute = strengthSet.has(category) ? "strength" : "";
+        const rangeTargets = [
+            item.system?.range?.ranges,
+            item.system?.thrown?.ranges
+        ] as const;
 
-        item.system.range.ranges.attribute = attribute;
+        for (const ranges of rangeTargets) {
+            if (!ranges) continue;
+            ranges.attribute = strengthSet.has(ranges.category) ? "strength" : "";
+        }
     }
 
     /**
