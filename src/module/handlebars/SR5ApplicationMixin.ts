@@ -13,6 +13,7 @@ import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicati
 const { TextEditor, SearchFilter } = foundry.applications.ux;
 const { fromUuid } = foundry.utils;
 type SR5DragDropHandler = InstanceType<typeof foundry.applications.ux.DragDrop.implementation>;
+type TrackableField = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
 
 export namespace SR5ApplicationMixinTypes {
     export interface RenderContext extends ApplicationV2.RenderContext, HandlebarsApplicationMixin.RenderContext {
@@ -73,6 +74,8 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
         private readonly expandedUuids = new Set<string>();
         private editIcon?: HTMLElement;
         private wrenchIcon?: HTMLElement;
+        private formFocusAbortController?: AbortController;
+        private pendingFormFieldIndex?: number;
 
         static override DEFAULT_OPTIONS = {
             classes: [SR5_APPV2_CSS_CLASS] as string[],
@@ -96,6 +99,79 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
             super(...args);
             this.#filters = this.#createFilters();
             this.#dragDrop = this.#createDragDropHandlers();
+        }
+
+        #isTrackableFormField(t: EventTarget | null): t is TrackableField {
+            return t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement || t instanceof HTMLSelectElement;
+        }
+
+        #getFormFields() {
+            if (!this.element) return [];
+            return Array.from(
+                this.element.querySelectorAll<TrackableField>('input, textarea, select')
+            );
+        }
+
+        #captureFormFieldState(target: EventTarget | null) {
+            if (!this.#isTrackableFormField(target) || !this.element) return;
+            if (!this.element.contains(target)) return;
+            const index = this.#getFormFields().indexOf(target);
+            this.pendingFormFieldIndex = index >= 0 ? index : undefined;
+        }
+
+        #selectAllFieldText(target: HTMLInputElement | HTMLTextAreaElement) {
+            if (target.disabled || target.readOnly) return;
+            try {
+                target.select();
+            } catch { /* Some input types may not support select(). Ignore safely. */ }
+        }
+
+        #restoreFormFieldState() {
+            const index = this.pendingFormFieldIndex;
+            this.pendingFormFieldIndex = undefined;
+            if (index === undefined || !this.element) return;
+
+            const target = this.#getFormFields()[index];
+            if (!this.#isTrackableFormField(target)) return;
+
+            const focusAndSelect = () => {
+                if (!this.element?.contains(target)) return;
+                target.focus({ preventScroll: true });
+
+                if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return;
+                this.#selectAllFieldText(target);
+            };
+
+            // Apply immediately so rapid typing after Tab still replaces the full value.
+            focusAndSelect();
+            // Re-apply on next frame to survive browser/foundry focus side effects.
+            requestAnimationFrame(focusAndSelect);
+        }
+
+        #bindFormFocusTracking() {
+            if (!this.element) return;
+
+            this.formFocusAbortController?.abort();
+            const controller = new AbortController();
+            this.formFocusAbortController = controller;
+
+            const captureTarget = (event: Event) => {
+                this.#captureFormFieldState(event.target);
+
+                // Select as soon as focus changes so quick typing doesn't insert at caret start.
+                if (event.type === 'focusin') {
+                    const target = event.target;
+                    if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {
+                        queueMicrotask(() => {
+                            if (document.activeElement === target) {
+                                this.#selectAllFieldText(target);
+                            }
+                        });
+                    }
+                }
+            };
+
+            this.element.addEventListener('focusin', captureTarget, { capture: true, signal: controller.signal });
         }
 
         #createFilters() {
@@ -232,6 +308,7 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
         }
 
         protected override _configureRenderOptions(options: Parameters<BaseType["_configureRenderOptions"]>[0]) {
+            this.#captureFormFieldState(document.activeElement);
             super._configureRenderOptions(options);
             if (options.mode && this.isEditable) this._mode = options.mode;
             // New sheets should always start in edit mode
@@ -322,10 +399,12 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
             return super._renderHTML(context, options) as Promise<Record<string, HTMLElement>>;
         }
 
-        protected override async _onRender(...[context, options]: Parameters<BaseType["_onRender"]>) {
+        protected override async _onRender(...args: Parameters<BaseType["_onRender"]>): Promise<void> {
             this.#filters.forEach(d => d.bind(this.element));
             this.#dragDrop.forEach(d => d.bind(this.element));
-            return super._onRender(context, options);
+            this.#bindFormFocusTracking();
+            await super._onRender(...args);
+            this.#restoreFormFieldState();
         }
 
         /**
