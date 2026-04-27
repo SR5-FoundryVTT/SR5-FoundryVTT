@@ -101,7 +101,7 @@ export class Version0_33_0 extends VersionMigration {
         ] as const;
 
         for (const ranges of rangeTargets) {
-            if (!ranges) continue;
+            if (!ranges || ranges.category === 'manual') continue;
             ranges.attribute = strengthSet.has(ranges.category) ? "strength" : "";
         }
     }
