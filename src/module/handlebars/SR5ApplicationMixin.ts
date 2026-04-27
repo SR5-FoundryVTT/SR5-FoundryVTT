@@ -113,6 +113,7 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
         }
 
         #captureFormFieldState(target: EventTarget | null) {
+            this.pendingFormFieldIndex = undefined;
             if (!this.#isTrackableFormField(target) || !this.element) return;
             if (!this.element.contains(target)) return;
             const index = this.#getFormFields().indexOf(target);
@@ -308,6 +309,7 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
         }
 
         protected override _configureRenderOptions(options: Parameters<BaseType["_configureRenderOptions"]>[0]) {
+            this.pendingFormFieldIndex = undefined;
             this.#captureFormFieldState(document.activeElement);
             super._configureRenderOptions(options);
             if (options.mode && this.isEditable) this._mode = options.mode;
