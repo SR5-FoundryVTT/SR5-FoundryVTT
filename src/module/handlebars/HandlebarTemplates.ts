@@ -73,6 +73,10 @@ export const preloadHandlebarsTemplates = async () => {
             'item-properties/sprite_power',
             'item-properties/technology',
             'item-properties/weapon',
+            'dialogs/form-dialog/content',
+            'dialogs/form-dialog/footer',
+            'dialogs/test-dialog/content',
+            'dialogs/test-dialog/footer',
         ),
         ...v2AP(
             'attribute',
@@ -86,6 +90,7 @@ export const preloadHandlebarsTemplates = async () => {
 
         'systems/shadowrun5e/dist/templates/rolls/parts/parts-list.hbs',
         'systems/shadowrun5e/dist/templates/rolls/parts/Damage.hbs',
+        'systems/shadowrun5e/dist/templates/rolls/parts/DamagePair.hbs',
 
         // to wrap the bodies of tabs
         'systems/shadowrun5e/dist/templates/common/TabWrapper.hbs',
@@ -94,7 +99,6 @@ export const preloadHandlebarsTemplates = async () => {
         // Useful wrapper and implemented components
         'systems/shadowrun5e/dist/templates/common/ValueMaxAttribute.hbs',
         'systems/shadowrun5e/dist/templates/common/Attribute.hbs',
-        'systems/shadowrun5e/dist/templates/common/ValueModifiers.hbs',
 
         // useful select template for the common pattern
         'systems/shadowrun5e/dist/templates/common/Select.hbs',
@@ -117,6 +121,8 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-entry.hbs',
         'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.hbs',
         'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-documents.hbs',
+        'systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-group.hbs',
+        'systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-option.hbs',
         'systems/shadowrun5e/dist/templates/apps/dialogs/parts/attack-range-dialog-fragment.hbs',
 
         // Test chat messages and their parts

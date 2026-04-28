@@ -1,0 +1,53 @@
+{{#if (and showAP (or incomingDamage.ap.value modifiedDamage.ap.value))}}
+<div class="test-value test-value--damage-pair">
+    <span class="value">{{localize "SR5.AP"}}: </span>
+    <span class="value-result">
+        <span class="damage-indicator">{{#if incomingDamage.ap.value}}{{incomingDamage.ap.value}}{{else}}{{modifiedDamage.ap.value}}{{/if}}</span>
+    </span>
+</div>
+{{/if}}
+
+<div class="test-value test-value--damage-pair">
+    <span class="value">{{label}}: </span>
+    <span class="value-result value-result--damage-pair">
+            <span class="button apply-damage incoming-damage"
+              data-tooltip="{{incomingName}}"
+              data-damage-value="{{incomingDamage.value}}"
+              data-damage-type="{{incomingDamage.type.value}}"
+              data-damage-element="{{incomingDamage.element.value}}"
+              data-damage-ap="{{incomingDamage.ap.value}}"
+              data-damage-biofeedback="{{incomingDamage.biofeedback}}"
+              >
+            {{damageCode incomingDamage}}
+
+            {{#if incomingDamage.element.value}}
+            <i class="{{elementIcon incomingDamage.element.value}} icon"
+               data-tooltip="{{incomingDamage.element.value}}"></i>
+            {{/if}}
+            {{#if incomingDamage.biofeedback}}
+                <i class="far fa-heart-circle-bolt icon"
+                   data-tooltip="{{localize 'SR5.BiofeedbackDamage'}}"></i>
+            {{/if}}
+        </span>
+        <span class="damage-arrow" aria-hidden="true">→</span>
+        <span class="button apply-damage"
+              data-tooltip="{{modifiedName}}"
+              data-damage-value="{{modifiedDamage.value}}"
+              data-damage-type="{{modifiedDamage.type.value}}"
+              data-damage-element="{{modifiedDamage.element.value}}"
+              data-damage-ap="{{modifiedDamage.ap.value}}"
+              data-damage-biofeedback="{{modifiedDamage.biofeedback}}"
+              >
+            {{damageCode modifiedDamage}}
+
+            {{#if modifiedDamage.element.value}}
+            <i class="{{elementIcon modifiedDamage.element.value}} icon"
+               data-tooltip="{{modifiedDamage.element.value}}"></i>
+            {{/if}}
+            {{#if modifiedDamage.biofeedback}}
+                <i class="far fa-heart-circle-bolt icon"
+                   data-tooltip="{{localize 'SR5.BiofeedbackDamage'}}"></i>
+            {{/if}}
+        </span>
+    </span>
+</div>

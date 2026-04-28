@@ -1,0 +1,7 @@
+<footer class="sheet-footer">
+    {{#each buttons}}
+    <button type="button" class="sr5-button {{@key}}" data-action="{{@key}}">
+        {{#if this.icon}}{{{this.icon}}}{{/if}}{{this.label}}
+    </button>
+    {{/each}}
+</footer>

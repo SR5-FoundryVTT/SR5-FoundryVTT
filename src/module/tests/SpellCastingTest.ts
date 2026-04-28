@@ -41,7 +41,7 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
     }
 
     override get _chatMessageTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/rolls/spellcasting-test-message.hbs';
+        return 'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs';
     }
 
     /**

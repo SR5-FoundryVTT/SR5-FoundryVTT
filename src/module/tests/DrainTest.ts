@@ -47,7 +47,7 @@ export class DrainTest extends SuccessTest<DrainTestData> {
     }
 
     override get _chatMessageTemplate(): string {
-        return 'systems/shadowrun5e/dist/templates/rolls/drain-test-message.hbs';
+        return 'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs';
     }
 
     static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {

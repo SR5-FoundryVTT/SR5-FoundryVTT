@@ -3,7 +3,7 @@
  */
 @use 'config';
 
-.sr5.form-dialog {
+.application.sr5v2.form-dialog {
   .dialog-title {
     font-weight: bold;
   }
@@ -25,11 +25,63 @@
 
 
   .dialog-content-common {
+    .document {
+      padding: 0.2rem 0.25rem;
+    }
+
     h2 {
       border: none;
       color: white;
       margin: 0;
-      text-underline: none;
+      text-decoration: none;
+    }
+  }
+
+  max-width: calc(100vw - 2rem);
+
+  .window-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-height: 0;
+    container-type: inline-size;
+  }
+
+  [data-application-part='content'] {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  [data-application-part='footer'] {
+    flex: 0 0 auto;
+  }
+
+  .sheet-footer {
+    margin-top: 0;
+  }
+
+  // Make the top-level test dialog sections adapt between stacked and split layouts.
+  form > .dialog-content-common,
+  form > .dialog-content-common > div > .dialog-content-common {
+    display: flex;
+    flex-wrap: wrap;
+
+    > * {
+      flex: 1 1 100%;
+      min-width: 0;
+    }
+  }
+
+  form > .dialog-content-common > hr + div {
+    padding: 0 0.15rem;
+  }
+
+  @container (min-width: 760px) {
+    form > .dialog-content-common > hr + div,
+    form > .dialog-content-common > hr + div + div {
+      flex: 1 1 calc(50% - 0.125rem);
     }
   }
 }

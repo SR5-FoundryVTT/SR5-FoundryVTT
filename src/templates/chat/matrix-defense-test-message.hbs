@@ -1,29 +1,13 @@
 {{> 'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs'}}
+{{#if resistTest}}
 <div class="sr5 chat-card roll-card">
-    <div class="card-content can-wrap">
-        <div class="left-side">
-            {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.hbs'
-                name=(localize "SR5.Incoming")
-                damage=test.data.incomingDamage
-                showAP=false
-            }}
-        </div>
-        <div class="right-side">
-            {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.hbs'
-                name=(localize "SR5.Modified")
-                damage=test.data.modifiedDamage
-                showAP=false
-            }}
-        </div>
-    </div>
-    {{#if resistTest}}
     <div class="card-buttons">
         <div class="button resist-action" data-action="{{resistTest.test}}">
             {{localize resistTest.label}}
         </div>
     </div>
-    {{/if}}
 </div>
+{{/if}}
 {{#if test.icon}}
 <div class="sr5 chat-card roll-card">
     <div class="test-line">

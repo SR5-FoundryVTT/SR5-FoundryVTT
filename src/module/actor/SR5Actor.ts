@@ -1108,12 +1108,12 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             ModifiableValue.addBase(action.limit, 'Teamwork', teamworkData.additionalLimit);
         }
 
-        action.dice_pool_mod.push({
-            name: "Teamwork", effectUuid: null,
-            value: teamworkData.additionalDice,
-            mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-            priority: 0, enabled: true, invalidated: false,
-        });
+        action.dice_pool_mod.push(
+            DataDefaults.createData('change_entry', {
+                name: "Teamwork",
+                value: teamworkData.additionalDice,
+            })
+        );
 
         const showDialog = this.tests.shouldShowDialog(options.event);
         const test = await this.tests.fromAction(action, this, { showDialog });

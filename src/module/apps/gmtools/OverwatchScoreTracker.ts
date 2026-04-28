@@ -2,35 +2,84 @@
  * A GM-Tool to keep track of all players overwatch scores
  */
 import { Helpers } from "../../helpers";
+import { DeepPartial } from "fvtt-types/utils";
 import { SR5Actor } from "@/module/actor/SR5Actor";
+import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 import { OverwatchStorage } from "../../storage/OverwatchStorage";
 
-export class OverwatchScoreTracker extends foundry.appv1.api.Application {
+import ApplicationV2 = foundry.applications.api.ApplicationV2;
+import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
+
+interface OverwatchScoreTrackerContext extends HandlebarsApplicationMixin.RenderContext {
+    scores: {
+        score: number;
+        actor: SR5Actor;
+    }[];
+    isGM: boolean;
+}
+
+export class OverwatchScoreTracker extends HandlebarsApplicationMixin(ApplicationV2)<OverwatchScoreTrackerContext> {
     static MatrixOverwatchDiceCount = '2d6';
-    static override get defaultOptions() {
-        const options = super.defaultOptions;
-        options.id = 'overwatch-score-tracker';
-        options.classes = ['sr5'];
-        options.title = game.i18n.localize('SR5.OverwatchScoreTrackerTitle');
-        options.template = 'systems/shadowrun5e/dist/templates/apps/gmtools/overwatch-score-tracker.hbs';
-        options.width = 550;
-        options.height = 'auto';
-        options.resizable = true;
-        return options;
+
+    static override PARTS = {
+        main: {
+            template: 'systems/shadowrun5e/dist/templates/apps/gmtools/overwatch-score-tracker.hbs'
+        }
+    }
+
+    static override DEFAULT_OPTIONS = {
+        id: 'overwatch-score-tracker',
+        classes: [SR5_APPV2_CSS_CLASS, 'sr5', 'overwatch-score-tracker'],
+        form: {
+            submitOnChange: false,
+            closeOnSubmit: false,
+        },
+        position: {
+            width: 550,
+            height: 'auto' as const,
+        },
+        window: {
+            resizable: true,
+        },
+        actions: {
+            addActor: OverwatchScoreTracker.#onAddActor,
+            addOverwatchScore: OverwatchScoreTracker.#addOverwatchScore,
+            rollFor15Minutes: OverwatchScoreTracker.#rollFor15Minutes,
+            resetOverwatchScore: OverwatchScoreTracker.#resetOverwatchScore,
+            deleteTrackedActor: OverwatchScoreTracker.#onDeleteActor,
+        }
     }
 
     // Contains only non-user actors added manually by the GM.
     static addedActors: string[] = [];
     actors: SR5Actor[] = [];
 
-    override async getData(options) {
+    override get title() {
+        return game.i18n.localize('SR5.OverwatchScoreTrackerTitle');
+    }
+
+    override async _prepareContext(options: Parameters<ApplicationV2['_prepareContext']>[0]) {
+        const context = await super._prepareContext(options);
+
         await this._addMissingUserCharactersToStorage();
         this.actors = OverwatchStorage.trackedActors();
+        context.scores = this.actors.map(actor => ({ score: actor.getOverwatchScore(), actor }));
+        context.isGM = game.user.isGM;
 
-        return {
-            scores: this.actors.map(actor => ({score: actor.getOverwatchScore(), actor})),
-            isGM: game.user.isGM,
-        };
+        return context;
+    }
+
+    override async _onRender(
+        context: DeepPartial<OverwatchScoreTrackerContext>,
+        options: DeepPartial<ApplicationV2.RenderOptions>
+    ) {
+        this.element.querySelectorAll<HTMLInputElement>('.overwatch-score-input').forEach(input => {
+            input.addEventListener('change', event => {
+                void this._setOverwatchScore(event);
+            });
+        });
+
+        return super._onRender(context, options);
     }
 
     async _addMissingUserCharactersToStorage() {
@@ -45,24 +94,20 @@ export class OverwatchScoreTracker extends foundry.appv1.api.Application {
         }
     }
 
-    override activateListeners(html) {
-        html.find('.overwatch-score-reset').on('click', this._resetOverwatchScore.bind(this));
-        html.find('.overwatch-score-add').on('click', this._addOverwatchScore.bind(this));
-        html.find('.overwatch-score-input').on('change', this._setOverwatchScore.bind(this));
-        html.find('.overwatch-score-roll-15-minutes').on('click', this._rollFor15Minutes.bind(this));
-        html.find('.overwatch-score-add-actor').on('click', this._onAddActor.bind(this));
-        html.find('.overwatch-score-delete').on('click', this._onDeleteActor.bind(this));
-    }
-
     // returns the actor that this event is acting on
-    _getActorFromEvent(event: Event): SR5Actor | null {
-        const currentTarget = event.currentTarget as HTMLElement;
-        const uuid = $(currentTarget).closest<HTMLElement>('.list-item').data('uuid');
+    _getActorFromEvent(event: Event, target?: HTMLElement): SR5Actor | null {
+        const actionTarget = target ?? (event.target instanceof HTMLElement ? event.target : null);
+        if (!actionTarget) return null;
+
+        const uuid = actionTarget.closest<HTMLElement>('.list-item')?.dataset.uuid;
+        if (!uuid) return null;
+
         return fromUuidSync(uuid) as SR5Actor | null;
     }
 
-    _onAddActor(event: Event) {
+    static async #onAddActor(this: OverwatchScoreTracker, event: Event) {
         event.preventDefault();
+        event.stopPropagation();
 
         const tokens = Helpers.getControlledTokens();
         if (tokens.length === 0) {
@@ -77,56 +122,75 @@ export class OverwatchScoreTracker extends foundry.appv1.api.Application {
         }
 
         // Add linked token actors.
-        tokens.filter(token => token.document.actorLink).forEach(token => {
+        for (const token of tokens.filter(currentToken => currentToken.document.actorLink)) {
             // Double check that the actor actually lives in the actors collection.
             const actor = game.actors.get(token.document.actorId!);
-            if (!actor) return;
-            if (OverwatchStorage.isTrackedActor(actor as SR5Actor)) return;
-            void OverwatchStorage.trackActor(actor as SR5Actor);
-        });
+            if (!actor) continue;
+            if (OverwatchStorage.isTrackedActor(actor as SR5Actor)) continue;
 
-        this.render();
-    }
-
-    _setOverwatchScore(event: Event) {
-        const actor = this._getActorFromEvent(event);
-        const amount = parseInt((event.currentTarget as HTMLInputElement).value);
-        if (amount && actor) {
-            actor.setOverwatchScore(amount).then(() => this.render());
+            await OverwatchStorage.trackActor(actor as SR5Actor);
         }
+
+        await this.render();
     }
 
-    _addOverwatchScore(event: Event) {
-        const actor = this._getActorFromEvent(event);
-        const amount = parseInt((event.currentTarget as HTMLElement).dataset.amount ?? '0');
-        if (!actor) return
+    async _setOverwatchScore(event: Event) {
+        if (!(event.currentTarget instanceof HTMLInputElement)) return;
+
+        const actor = this._getActorFromEvent(event, event.currentTarget);
+        const amount = Number.parseInt(event.currentTarget.value, 10);
+        if (!actor || Number.isNaN(amount)) return;
+
+        await actor.setOverwatchScore(amount);
+        await this.render();
+    }
+
+    static async #addOverwatchScore(this: OverwatchScoreTracker, event: Event, target?: HTMLElement) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const actionTarget = target ?? (event.target instanceof HTMLElement ? event.target : null);
+        if (!actionTarget) return;
+
+        const actor = this._getActorFromEvent(event, actionTarget);
+        const amount = Number.parseInt(actionTarget.closest<HTMLElement>('[data-amount]')?.dataset.amount ?? '0', 10);
+        if (!actor || Number.isNaN(amount)) return;
 
         const os = actor.getOverwatchScore();
-        actor.setOverwatchScore(os + amount).then(() => this.render());
+        await actor.setOverwatchScore(os + amount);
+        await this.render();
     }
 
-    _resetOverwatchScore(event: Event) {
+    static async #resetOverwatchScore(this: OverwatchScoreTracker, event: Event, target?: HTMLElement) {
         event.preventDefault();
-        const actor = this._getActorFromEvent(event);
+        event.stopPropagation();
+
+        const actor = this._getActorFromEvent(event, target);
         if (!actor) return;
 
-        actor.setOverwatchScore(0).then(() => this.render());
+        await actor.setOverwatchScore(0);
+        await this.render();
     }
 
     /**
      * Remove the connected actor from the tracker.
      */
-    _onDeleteActor(event: Event) {
+    static async #onDeleteActor(this: OverwatchScoreTracker, event: Event, target?: HTMLElement) {
         event.preventDefault();
-        const actor = this._getActorFromEvent(event);
+        event.stopPropagation();
+
+        const actor = this._getActorFromEvent(event, target);
         if (!actor) return;
 
-        OverwatchStorage.untrackActor(actor).then(() => this.render());
+        await OverwatchStorage.untrackActor(actor);
+        await this.render();
     }
 
-    async _rollFor15Minutes(event: Event) {
+    static async #rollFor15Minutes(this: OverwatchScoreTracker, event: Event, target?: HTMLElement) {
         event.preventDefault();
-        const actor = this._getActorFromEvent(event);
+        event.stopPropagation();
+
+        const actor = this._getActorFromEvent(event, target);
         if (actor) {
             //  use static value so it can be modified in modules
             const roll = new Roll(OverwatchScoreTracker.MatrixOverwatchDiceCount);
@@ -134,7 +198,8 @@ export class OverwatchScoreTracker extends foundry.appv1.api.Application {
             if (!roll.total) return;
 
             const os = actor.getOverwatchScore();
-            actor.setOverwatchScore(os + roll.total).then(() => this.render());
+            await actor.setOverwatchScore(os + roll.total);
+            await this.render();
         }
     }
 }

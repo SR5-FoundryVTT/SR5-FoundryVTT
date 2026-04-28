@@ -208,7 +208,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         // Do not simply concat list to avoid double applying an otherwise unique test modifier.
         const pool = new ModifiableValue(this.data.pool);
         for (const modifier of opposedMod.changes) {
-            pool.addUnique(modifier.name, modifier.value, modifier.mode as CONST.ACTIVE_EFFECT_MODES, modifier.priority);
+            pool.addUnique(modifier.name, modifier.value, { mode: modifier.mode as CONST.ACTIVE_EFFECT_MODES, priority: modifier.priority });
         }
     }
 

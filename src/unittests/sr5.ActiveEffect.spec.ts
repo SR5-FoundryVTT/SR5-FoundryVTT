@@ -24,15 +24,13 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
      */
     const createTestChange = (effect: ActiveEffect, id: number): ModifiableValueType['changes'][number] => {
         const change = effect.changes[id];
-        return {
+        return DataDefaults.createData('change_entry', {
             name: effect.name,
             value: parseInt(change.value),
             mode: change.mode,
             priority: parseInt(String(change.priority || change.mode * 10)),
-            enabled: true,
-            invalidated: false,
-            effectUuid: effect.uuid
-        };
+            source: effect.uuid
+        });
     };
 
     describe('SR5ActiveEffect', () => {

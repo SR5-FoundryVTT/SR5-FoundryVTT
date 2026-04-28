@@ -1,16 +1,17 @@
-import { SR5 } from "../../config";
+import { SR5 } from '../../config';
 import { Translation } from '../../utils/strings';
 import { ModifiableValue } from "@/module/mods/ModifiableValue";
 import { FLAGS, SYSTEM_NAME } from '../../constants';
-import { SuccessTest, SuccessTestData } from "../../tests/SuccessTest";
-import { FormDialog, FormDialogData, FormDialogOptions } from "./FormDialog";
+import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
+import { AnyMutableObject, DeepPartial } from 'fvtt-types/utils';
+import { ModifiableValueType } from '@/module/types/template/Base';
+import { SuccessTest, SuccessTestData } from '../../tests/SuccessTest';
+import { LinksHelpers } from '@/module/utils/links';
+import ApplicationV2 = foundry.applications.api.ApplicationV2;
+import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
-export interface TestDialogData extends FormDialogData {
-    test: SuccessTest
-    rollMode: string
-    rollModes: CONFIG.Dice.RollModes
-    config: typeof SR5,
-    expandedPaths: string[]
+export interface TestDialogLike {
+    render: (...args: any[]) => unknown
 }
 
 /**
@@ -19,63 +20,176 @@ export interface TestDialogData extends FormDialogData {
 export interface TestDialogListener {
     query: string
     on: string
-    callback: (event: any, dialog: TestDialog) => void
+    callback: (event: any, dialog: TestDialogLike) => void
 }
 
-/**
- * TODO: Add TestDialog JSDoc
- */
-export class TestDialog extends FormDialog {
-    declare data: TestDialogData
-    // Listeners as given by the dialogs creator.
-    listeners: TestDialogListener[]
+interface TestDialogContext extends HandlebarsApplicationMixin.RenderContext {
+    test: any;
+    rollMode: string;
+    rollModes: CONFIG.Dice.RollModes;
+    config: typeof SR5;
+    expandedPaths: string[];
+    dialogContent: string;
+}
+
+export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDialogContext> {
+    test: SuccessTest;
+    listeners: TestDialogListener[];
     _expandedList: Set<string>;
 
-    // @ts-expect-error // TODO: default option value with all the values...
-    constructor(data, options: FormDialogOptions = {}, listeners: TestDialogListener[]=[]) {
-        // Allow for Sheet style form submit value handling.
-        options.applyFormChangesOnSubmit = true;
-        super(data, options);
+    selection: SuccessTestData;
+    selectedButton = '';
 
+    _selectionPromise: Promise<SuccessTestData>;
+    _selectionResolve!: (event: SuccessTestData) => void;
+    _selectionReject!: (event: unknown) => void;
+    _selectionSettled = false;
+
+    constructor(test: SuccessTest, listeners: TestDialogListener[] = [], options = {}) {
+        super(options);
+
+        this.test = test;
         this.listeners = listeners;
         this._expandedList = new Set<string>();
 
-        const hasModifierChanges = (changes) => {
+        this.selection = this._emptySelection();
+
+        this._selectionPromise = new Promise((resolve, reject) => {
+            this._selectionResolve = resolve;
+            this._selectionReject = reject;
+        });
+
+        const hasModifierChanges = (changes?: ModifiableValueType['changes']) => {
             if (!Array.isArray(changes)) return false;
             return changes.some(change => !ModifiableValue.isBaseChange(change));
         }
 
-        if (hasModifierChanges(data?.test?.pool?.changes))
+        if (hasModifierChanges(test?.pool?.changes))
             this._expandedList.add('test.data.pool');
-        if (hasModifierChanges(data?.test?.limit?.changes))
+        if (hasModifierChanges(test?.limit?.changes))
             this._expandedList.add('test.data.limit');
-        if (hasModifierChanges(data?.test?.threshold?.changes))
+        if (hasModifierChanges(test?.threshold?.changes))
             this._expandedList.add('test.data.threshold');
 
         if (!game.settings.get(SYSTEM_NAME, FLAGS.CollapseModifyRollByDefault))
             this._expandedList.add('modify-roll');
     }
 
-    static override get defaultOptions() {
-        const options = super.defaultOptions;
-        options.id = 'test-dialog';
-        // TODO: Class Dialog here is needed for dialog button styling.
-        options.classes = ['sr5', 'form-dialog'];
-        options.resizable = true;
-        options.height = 'auto';
-        options.width = 300;
-        return options;
+    static override PARTS = {
+        content: {
+            template: 'systems/shadowrun5e/dist/templates/v2/dialogs/test-dialog/content.hbs'
+        },
+        footer: {
+            template: 'systems/shadowrun5e/dist/templates/v2/dialogs/test-dialog/footer.hbs'
+        }
     }
 
-    override activateListeners(html: JQuery) {
-        super.activateListeners(html);
+    static override DEFAULT_OPTIONS = {
+        classes: [SR5_APPV2_CSS_CLASS, 'sr5', 'form-dialog'],
+        id: 'test-dialog-v2',
+        position: {
+            width: 300,
+            height: 'auto' as const,
+        },
+        window: {
+            resizable: true,
+        },
+        form: {
+            submitOnChange: false,
+            closeOnSubmit: false,
+        },
+        actions: {
+            roll: TestDialog.#roll,
+            cancel: TestDialog.#cancel,
+        }
+    }
+
+    override get title() {
+        return game.i18n.localize(this.test.title as Translation);
+    }
+
+    get canceled(): boolean {
+        return !this.selectedButton || this.selectedButton === 'cancel';
+    }
+
+    async select(): Promise<SuccessTestData> {
+        await this.render({ force: true });
+
+        if (this._selectionPromise === undefined || this.selection === undefined)
+            return this._emptySelection();
+
+        return this._selectionPromise;
+    }
+
+    _emptySelection(): SuccessTestData {
+        return this.test.data;
+    }
+
+    override async close(options?: ApplicationV2.ClosingOptions): Promise<this> {
+        const closed = await super.close(options);
+
+        if (this.canceled && !this._selectionSettled) {
+            this._selectionSettled = true;
+            this._selectionResolve(this.selection);
+        }
+
+        return closed;
+    }
+
+    static async #roll(this: TestDialog, event: Event) {
+        event.preventDefault();
+        this.selectedButton = 'roll';
+
+        this.applyFormData();
+
+        this.selection = this.test.data;
+        if (!this._selectionSettled) {
+            this._selectionSettled = true;
+            this._selectionResolve(this.selection);
+        }
+
+        await this.close();
+    }
+
+    static async #cancel(this: TestDialog, event: Event) {
+        event.preventDefault();
+        this.selectedButton = 'cancel';
+        await this.close();
+    }
+
+    protected override async _prepareContext(
+        options: Parameters<ApplicationV2['_prepareContext']>[0]
+    ): Promise<TestDialogContext> {
+        const context = await super._prepareContext(options);
+
+        context.test = this.test;
+        context.rollMode = this.test.data.options?.rollMode ?? game.settings.get('core', 'rollMode');
+        context.rollModes = CONFIG.Dice.rollModes;
+        context.config = SR5;
+        context.expandedPaths = Array.from(this._expandedList);
+        context.dialogContent = await foundry.applications.handlebars.renderTemplate(this.test._dialogTemplate, context as unknown as Record<string, unknown>);
+
+        return context;
+    }
+
+    protected override async _onRender(
+        context: DeepPartial<TestDialogContext>,
+        options: DeepPartial<ApplicationV2.RenderOptions>
+    ) {
+        await super._onRender(context, options);
+
+        const html = $(this.element);
+
+        const applyAndRender = () => {
+            this.applyFormData();
+            void this.render();
+        }
 
         const toggleModifiableValue = (element: HTMLElement | null) => {
             const modValueDiv = element?.closest<HTMLDivElement>('.modifiable-value');
             const path = modValueDiv?.dataset.path;
             if (!modValueDiv || !path) return;
 
-            // Only allow expanding rows that actually contain modifier entries.
             if (!modValueDiv.classList.contains('has-modifiers')) return;
 
             const isExpanded = modValueDiv.classList.toggle('expanded');
@@ -83,6 +197,8 @@ export class TestDialog extends FormDialog {
             else this._expandedList.delete(path);
             void this.render();
         };
+
+        html.find('input,select,textarea').on('change', () => applyAndRender());
 
         html.find('.modifiable-value .form-fields input[type="number"]').on('keydown', ev => {
             if (ev.key === 'Enter') { ev.preventDefault(); ev.currentTarget.blur(); }
@@ -95,23 +211,27 @@ export class TestDialog extends FormDialog {
 
         html.find('.modifiable-value').on('click', event => {
             const target = event.target;
-            // Keep native interactions intact for inputs, toggles, and breakdown list items.
             if (target.closest('input, select, textarea, button, a, .breakdown-list')) return;
             toggleModifiableValue(target);
         });
 
-        html.find('.modifier-effect-button').on('click', async event => {
+        html.find('.modifier-source-button').on('click', async event => {
             event.preventDefault();
             event.stopPropagation();
 
             const button = event.currentTarget as HTMLButtonElement;
-            const effectUuid = button.dataset.effectUuid;
-            if (!effectUuid) return;
+            const source = button.dataset.source;
+            if (!source) return;
 
-            const effect = await fromUuid(effectUuid);
-            if (!(effect instanceof ActiveEffect)) return;
+            if (LinksHelpers.isUuid(source)) {
+                const effect = await fromUuid(source);
+                if (effect instanceof ActiveEffect) {
+                    await effect.sheet?.render(true);
+                    return;
+                }
+            }
 
-            await effect.sheet?.render(true);
+            await LinksHelpers.openSource(source);
         });
 
         html.find('.breakdown-entry').on('click', event => {
@@ -148,6 +268,8 @@ export class TestDialog extends FormDialog {
             checkbox.dispatchEvent(new Event('change', { bubbles: true }));
         });
 
+        await SuccessTest.hydrateValueModifierTooltipsForTest(this.test, html);
+
         html.find('.roll-mode-button').on('click', event => {
             event.preventDefault();
 
@@ -155,105 +277,47 @@ export class TestDialog extends FormDialog {
             const rollMode = button.dataset.rollMode;
             if (!rollMode) return;
 
-            if (this.data.test.data.options?.rollMode === rollMode) return;
+            if (this.test.data.options?.rollMode === rollMode) return;
 
-            foundry.utils.setProperty(this.data, 'test.data.options.rollMode', rollMode);
-            this.data.test.prepareBaseValues();
-            this.data.test.calculateBaseValues();
-            this.data.test.validateBaseValues();
+            foundry.utils.setProperty(this.test, 'data.options.rollMode', rollMode);
+            this.test.prepareBaseValues();
+            this.test.calculateBaseValues();
+            this.test.validateBaseValues();
             void this.render();
         });
 
         this._injectExternalActiveListeners(html);
     }
 
-    /**
-     * Inject the listeners while binding local `this` to them.
-     */
     _injectExternalActiveListeners(html: JQuery) {
         for (const listener of this.listeners) {
-            //@ts-expect-error
-            html.find(listener.query).on(listener.on, (event: JQuery<HTMLElement>) => listener.callback.bind(this.data.test)(event, this));
+            html.find(listener.query).on(listener.on, event => listener.callback.bind(this.test)(event, this));
         }
     }
 
-    /**
-     * Overwrite this method to provide an alternative template for the dialog inner content.
-     *
-     * data.templatePath work's the same and can be used as well.
-     */
-    override get templateContent(): string {
-        return 'systems/shadowrun5e/dist/templates/apps/dialogs/success-test-dialog.hbs';
+    applyFormData() {
+        const form = this.element.querySelector('form');
+        if (!form) return;
+
+        const fd = new foundry.applications.ux.FormDataExtended(form, {editors: {}});
+        const data = fd.object;
+
+        this._updateData(data);
     }
 
-    //@ts-expect-error
-    override getData() {
-        const data = super.getData() as unknown as TestDialogData;
-
-        data.rollMode = data.test.data.options?.rollMode ?? game.settings.get('core', 'rollMode');
-        data.rollModes = CONFIG.Dice.rollModes;
-        data.default = 'roll'; // TODO: Where is this even used and what's it for again?
-
-        // Add in general SR5 config to allow access to general values.
-        data.config = SR5;
-
-        // Pass the Set of expanded paths to Handlebars as an Array.
-        data.expandedPaths = Array.from(this._expandedList);
-
-        return data;
-    }
-
-    /**
-     * Overwrite this method to provide the dialog application title.
-     */
-    override get title() {
-        const data = this.data as unknown as TestDialogData;
-        return game.i18n.localize(data.test.title as Translation);
-    }
-
-    /**
-     * Overwrite this method to provide dialog buttons.
-     */
-    override get buttons() {
-        return {
-            roll: {
-                label: game.i18n.localize('SR5.Roll'),
-                icon: '<i class="fas fa-dice-six"></i>'
-            },
-            cancel: {
-                label: game.i18n.localize('SR5.Dialogs.Common.Cancel')
-            }
-        };
-    }
-
-    /**
-     * Callback for after the dialog has closed.
-     * @param html
-     */
-    override async onAfterClose(html: JQuery<HTMLElement>, buttonSelected?: string): Promise<SuccessTestData> {
-        return Promise.resolve(this.data.test.data);
-    }
-
-    /**
-     * Update ValueField data used on the template and alter automatic calculation with manual override values, where
-     * necessary.
-     *
-     * @param data An object with keys in Foundry UpdateData style {'key.key.key': value}
-     */
-    override _updateData(data: { [key: string]: unknown }) {
-        // The user canceled their interaction by canceling, don't apply form changes.
+    _updateData(data: AnyMutableObject) {
         if (this.selectedButton === 'cancel') return;
 
-        // Apply keys ending with '.applied' first to ensure overrides are processed before dependent values
         const entries = Object.entries(data);
         const enabledEntries = entries.filter(([key]) => key.endsWith('.enabled'));
         const otherEntries = entries.filter(([key]) => !key.endsWith('.enabled'));
-        
-        // First, apply changes to ValueField style values in a way that makes sense.
+
+        const context = { test: this.test };
+
         for (const [key, value] of [...enabledEntries, ...otherEntries]) {
-            const valueField = foundry.utils.getProperty(this.data, key);
+            const valueField = foundry.utils.getProperty(context, key);
             if (!ModifiableValue.isModifiableValue(valueField)) {
-                foundry.utils.setProperty(this.data, key, value);
+                foundry.utils.setProperty(context, key, value);
                 continue;
             }
 
@@ -263,15 +327,13 @@ export class TestDialog extends FormDialog {
                     valueField,
                     'SR5.ManualOverride',
                     value as number | null,
-                    CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
-                    ModifiableValue.TOP_PRIORITY
+                    { mode: 'OVERRIDE', priority: ModifiableValue.TOP_PRIORITY }
                 );
             }
         }
 
-        // Give tests opportunity to change resulting values on the fly.
-        this.data.test.prepareBaseValues();
-        this.data.test.calculateBaseValues();
-        this.data.test.validateBaseValues();
+        this.test.prepareBaseValues();
+        this.test.calculateBaseValues();
+        this.test.validateBaseValues();
     }
 }

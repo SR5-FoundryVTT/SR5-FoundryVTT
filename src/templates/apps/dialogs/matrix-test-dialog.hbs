@@ -4,20 +4,69 @@
         <hr/>
         <div>
             {{#if test.data.marks}}
-            <div class="form-group">
-                <label>{{localize "SR5.Marks"}}</label>
-                <input name="test.data.marks" type="number" class="disabled-for-display"
-                       value="{{test.data.marks}}" min="1" max="3"/>
-            </div>
+            {{#> "systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-group.hbs"
+                label=(localize 'SR5.Marks')
+            }}
+                {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-option.hbs'
+                    type='radio'
+                    name='test.data.marks'
+                    value=1
+                    dtype='Number'
+                    checked=(eq test.data.marks 1)
+                    iconPath='systems/shadowrun5e/dist/icons/importer/sin.svg'
+                    tooltip='1'
+                }}
+                {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-option.hbs'
+                    type='radio'
+                    name='test.data.marks'
+                    value=2
+                    dtype='Number'
+                    checked=(eq test.data.marks 2)
+                    iconPath='systems/shadowrun5e/dist/icons/importer/sin.svg'
+                    tooltip='2'
+                }}
+                {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-option.hbs'
+                    type='radio'
+                    name='test.data.marks'
+                    value=3
+                    dtype='Number'
+                    checked=(eq test.data.marks 3)
+                    iconPath='systems/shadowrun5e/dist/icons/importer/sin.svg'
+                    tooltip='3'
+                }}
+            {{/"systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-group.hbs"}}
             {{/if}}
-            <div class="form-group">
-                <label>{{localize "SR5.SameGrid"}}</label>
-                <input type="checkbox" class="checkbox" name="test.data.sameGrid" {{checked test.data.sameGrid}} {{#if test.data.sameGridDisabled}}disabled data-tooltip="SR5.Tooltips.MatrixTest.SameGridDisabled"{{/if}}/>
-            </div>
-            <div class="form-group">
-                <label>{{localize "SR5.DirectConnection"}}</label>
-                <input type="checkbox" class="checkbox" name="test.data.directConnection" {{checked test.data.directConnection}}/>
-            </div>
+            {{#> "systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-group.hbs"
+                label=(localize 'SR5.ConnectionType')
+            }}
+                {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-option.hbs'
+                    type='radio'
+                    name='test.data.connectionType'
+                    value='same_grid'
+                    checked=(eq test.data.connectionType 'same_grid')
+                    disabled=test.data.isConnectionTypeLocked
+                    iconPath='systems/shadowrun5e/dist/icons/importer/sin.svg'
+                    tooltip=(localize 'SR5.SameGrid')
+                }}
+                {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-option.hbs'
+                    type='radio'
+                    name='test.data.connectionType'
+                    value='different_grid'
+                    checked=(eq test.data.connectionType 'different_grid')
+                    disabled=test.data.isConnectionTypeLocked
+                    iconPath='systems/shadowrun5e/dist/icons/importer/sin.svg'
+                    tooltip=(localize 'SR5.DifferentGrid')
+                }}
+                {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-option.hbs'
+                    type='radio'
+                    name='test.data.connectionType'
+                    value='direct_connection'
+                    checked=(eq test.data.connectionType 'direct_connection')
+                    disabled=test.data.isConnectionTypeLocked
+                    iconPath='systems/shadowrun5e/dist/icons/importer/sin.svg'
+                    tooltip=(localize 'SR5.DirectConnection')
+                }}
+            {{/"systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-group.hbs"}}
             {{#if test.controller}}
             <div class="document">
                 <img src="{{test.controller.img}}"/>

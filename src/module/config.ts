@@ -114,6 +114,12 @@ export const SR5 = {
         matrix: 'SR5.DmgTypeMatrix'
     },
 
+    damageTypeIcons: {
+        physical: 'systems/shadowrun5e/dist/icons/redist/fist.svg',
+        stun: 'systems/shadowrun5e/dist/icons/redist/brain.svg',
+        matrix: 'systems/shadowrun5e/dist/icons/importer/host.svg',
+    },
+
     biofeedbackOptions: {
         physical: 'SR5.DmgTypePhysical',
         stun: 'SR5.DmgTypeStun',
@@ -513,6 +519,13 @@ export const SR5 = {
         medium: 'SR5.Weapon.Range.Medium',
         long: 'SR5.Weapon.Range.Long',
         extreme: 'SR5.Weapon.Range.Extreme',
+    },
+
+    weaponRangeIcons: {
+        short: 'systems/shadowrun5e/dist/icons/redist/point.svg',
+        medium: 'systems/shadowrun5e/dist/icons/redist/target.svg',
+        long: 'systems/shadowrun5e/dist/icons/redist/radar.svg',
+        extreme: 'systems/shadowrun5e/dist/icons/redist/world.svg',
     },
 
     qualityTypes: {
@@ -1289,6 +1302,28 @@ export const SR5 = {
             mode: 'full_auto'
         }
     ],
+
+    fireModeIcons: {
+        'SR5.Weapon.Mode.SingleShot': 'systems/shadowrun5e/dist/icons/test/one_bullet.svg',
+        'SR5.Weapon.Mode.SemiAutoShort': 'systems/shadowrun5e/dist/icons/test/one_bullet.svg',
+        'SR5.Weapon.Mode.SemiAutoBurst': 'systems/shadowrun5e/dist/icons/test/three_bullets.svg',
+        'SR5.Weapon.Mode.BurstFire': 'systems/shadowrun5e/dist/icons/test/three_bullets.svg',
+        'SR5.Weapon.Mode.BurstFireLong': 'systems/shadowrun5e/dist/icons/test/six_bullets.svg',
+        'SR5.Weapon.Mode.FullAutoShort': 'systems/shadowrun5e/dist/icons/test/six_bullets.svg',
+        'SR5.Weapon.Mode.FullAutoLong': 'systems/shadowrun5e/dist/icons/test/ten_bullets.svg',
+        'SR5.Suppressing': 'systems/shadowrun5e/dist/icons/test/twenty_bullets.svg',
+    },
+
+    fireModeAcronyms: {
+        'SR5.Weapon.Mode.SingleShot': 'SS',
+        'SR5.Weapon.Mode.SemiAutoShort': 'SA',
+        'SR5.Weapon.Mode.SemiAutoBurst': 'SAB',
+        'SR5.Weapon.Mode.BurstFire': 'BF',
+        'SR5.Weapon.Mode.BurstFireLong': 'LBF',
+        'SR5.Weapon.Mode.FullAutoShort': 'FA',
+        'SR5.Weapon.Mode.FullAutoLong': 'LFA',
+        'SR5.Suppressing': 'SUP',
+    },
 
     /**
      * Active/AdvancedEffect apply To types and their labels.

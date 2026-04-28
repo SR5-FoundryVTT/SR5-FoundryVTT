@@ -108,6 +108,62 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(test.canSecondChance, false);
         });
 
+        it('stores code term traces for labeled pool and limit parts', async () => {
+            const actor = await factory.createActor({
+                type: 'character',
+                system: {
+                    attributes: {
+                        agility: { base: 3 },
+                        body: { base: 3 },
+                        strength: { base: 3 },
+                        reaction: { base: 3 }
+                    },
+                    skills: {
+                        active: {
+                            archery: { base: 4 }
+                        }
+                    }
+                }
+            });
+
+            const action = DataDefaults.createData('action_roll', {
+                test: 'SuccessTest',
+                skill: 'archery',
+                attribute: 'agility',
+                spec: true,
+                threshold: {
+                    base: 3,
+                    value: 3,
+                },
+                limit: {
+                    attribute: 'physical',
+                }
+            });
+
+            const test = await TestCreator.fromAction(action, actor, { showMessage: false, showDialog: false });
+            if (!test) assert.fail('Expected success test to be created');
+            if (!test) return;
+
+            const traces = test.data.codeTermTraces;
+            if (!traces) assert.fail('Expected code term traces to be present');
+            if (!traces) return;
+
+            assert.isAtLeast(traces.length, 4);
+
+            assert.isTrue(traces.every(trace => {
+                return typeof trace.tooltipSource === 'string'
+                    && trace.valueField
+                    && trace.tooltipSource.length > 0
+                    && Array.isArray(trace.valueField.changes);
+            }));
+
+            assert.isTrue(test.codeTerms.pool.every(term => {
+                return typeof term.tooltipSource === 'string' && term.tooltipSource.length > 0;
+            }));
+
+            assert.isTrue(test.codeTerms.threshold.every(term => !term.tooltipSource));
+        });
+
         it('evaluate an opposed roll from a opposed action', async () => {
             const action = await factory.createItem({
                 type: 'action',

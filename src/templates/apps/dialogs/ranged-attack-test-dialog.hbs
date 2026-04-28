@@ -9,28 +9,35 @@
                     value="{{test.item.system.ammo.current.value}}/{{test.item.system.ammo.current.max}}"/>
             </div>
             <div class="form-group">
-                <label data-tooltip="SR5.Tooltips.RangedAttack.RecoilCompensation">{{localize 'SR5.RecoilCompensation'}}</label>
-                <input type="text" class="disabled-for-display" disabled
-                    value="{{test.item.totalRecoilCompensation}}"/>
-            </div>
-            <div class="form-group">
-                <label data-tooltip="SR5.Tooltips.RangedAttack.Recoil">{{localize 'SR5.Recoil'}}</label>
+                <label data-tooltip="SR5.Tooltips.RangedAttack.Recoil">
+                    {{localize 'SR5.Recoil'}}
+                    <span data-tooltip="SR5.Tooltips.RangedAttack.RecoilCompensation" style="font-weight: normal;"> (RC {{test.item.totalRecoilCompensation}})</span>
+                </label>
                 <div class="form-group-element-2">
-                    <span data-tooltip="SR5.Tooltips.RangedAttack.RecoilBeforeAttack">{{test.recoilBeforeAttack}}</span><span data-tooltip="SR5.Tooltips.RangedAttack.RecoilAfterAttack"> => {{test.recoilAfterAttack}}</span></div>
-                <div id="reset-progressive-recoil" class="form-group-element-1-right roll" data-tooltip="SR5.Tooltips.RangedAttack.ResetRecoil"><button>Reset</button></div>
+                    <span data-tooltip="SR5.Tooltips.RangedAttack.RecoilBeforeAttack">{{test.recoilBeforeAttack}}</span>
+                    <span data-tooltip="SR5.Tooltips.RangedAttack.RecoilAfterAttack">→ {{test.recoilAfterAttack}}</span>
+                </div>
+                <div id="reset-progressive-recoil" class="form-group-element-1-right roll" data-tooltip="SR5.Tooltips.RangedAttack.ResetRecoil"><button type="button">↺</button></div>
             </div>
-            <div class="form-group">
-                <label>{{localize 'SR5.FireMode'}}</label>
-                <select name="test.data.fireModeSelected">
-                    {{#select test.data.fireModeSelected}}
-                    {{#each test.data.fireModes}}
-                    <option value="{{@index}}">
-                        {{localize this.label}} ({{this.value}}) ({{localize (objValue ../config.actionTypes this.action)}})
-                    </option>
-                    {{/each}}
-                    {{/select}}
-                </select>
-            </div>
+            {{#> "systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-group.hbs"
+                label=(localize 'SR5.FireMode')
+                rowClass='fire-mode-choice-row'
+                groupClass='fire-mode-choice-group'
+            }}
+                {{#each test.data.fireModes}}
+                    {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-option.hbs'
+                        type='radio'
+                        name='test.data.fireModeSelected'
+                        value=@index
+                        dtype='Number'
+                        checked=(eq @index ../test.data.fireModeSelected)
+                        disabled=this.disabled
+                        iconPath=(lookup @root.config.fireModeIcons this.label)
+                        tooltip='Long Burst<br/>(6 bullets, -5 Defense, Simple Action)'
+                        cornerLabel=(lookup @root.config.fireModeAcronyms this.label)
+                    }}
+                {{/each}}
+            {{/"systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-group.hbs"}}
             {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/attack-range-dialog-fragment.hbs'}}
         </div>
         <div>

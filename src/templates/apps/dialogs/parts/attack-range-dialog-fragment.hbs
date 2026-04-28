@@ -10,11 +10,22 @@
         </select>
     </div>
 {{/if}}
-<div class="form-group">
-    <label>{{localize 'SR5.Range'}}</label>
-    <select name="test.data.range" {{#if test.hasTargets}}disabled{{/if}}>
-        {{#select test.data.range}} {{#each test.data.ranges as |range key|}}
-        <option value="{{range.modifier}}">{{localize range.label}} ({{range.distance}} m)</option>
-        {{/each}} {{/select}}
-    </select>
-</div>
+{{#> "systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-group.hbs"
+    label=(localize 'SR5.Range')
+    rowClass='range-choice-row'
+    groupClass='range-choice-group'
+}}
+    {{#each test.data.ranges as |range key|}}
+        {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-option.hbs'
+            type='radio'
+            name='test.data.range'
+            value=range.modifier
+            dtype='Number'
+            checked=(eq ../test.data.range range.modifier)
+            disabled=../test.hasTargets
+            iconPath=(lookup @root.config.weaponRangeIcons key)
+            tooltip=range.label
+            cornerLabel=range.distance
+        }}
+    {{/each}}
+{{/"systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-group.hbs"}}

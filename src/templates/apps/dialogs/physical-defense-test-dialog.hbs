@@ -3,16 +3,37 @@
         {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-documents.hbs'}}
         <hr/>
         <div>
-            <div class="form-group">
-                <label>{{localize 'SR5.Cover'}}</label>
-                <select name="test.data.cover" data-dtype="Number">
-                    {{#select test.data.cover}}
-                    <option value="0">{{localize 'SR5.NoCover'}}</option>
-                    <option value="2">(+2) {{localize 'SR5.PartialCover'}}</option>
-                    <option value="4">(+4) {{localize 'SR5.GoodCover'}}</option>
-                    {{/select}}
-                </select>
-            </div>
+            {{#> "systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-group.hbs"
+                label=(localize 'SR5.Cover')
+            }}
+                {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-option.hbs'
+                    type='radio'
+                    name='test.data.cover'
+                    value=0
+                    dtype='Number'
+                    checked=(eq test.data.cover 0)
+                    iconPath='systems/shadowrun5e/dist/icons/importer/sin.svg'
+                    tooltip=(localize 'SR5.NoCover')
+                }}
+                {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-option.hbs'
+                    type='radio'
+                    name='test.data.cover'
+                    value=2
+                    dtype='Number'
+                    checked=(eq test.data.cover 2)
+                    iconPath='systems/shadowrun5e/dist/icons/importer/sin.svg'
+                    tooltip=(localize 'SR5.PartialCover')
+                }}
+                {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-option.hbs'
+                    type='radio'
+                    name='test.data.cover'
+                    value=4
+                    dtype='Number'
+                    checked=(eq test.data.cover 4)
+                    iconPath='systems/shadowrun5e/dist/icons/importer/sin.svg'
+                    tooltip=(localize 'SR5.GoodCover')
+                }}
+            {{/"systems/shadowrun5e/dist/templates/apps/dialogs/parts/icon-choice-group.hbs"}}
             <div class="form-group">
                 <label>{{localize 'SR5.ActiveDefense'}}</label>
                 <select name="test.data.activeDefense">

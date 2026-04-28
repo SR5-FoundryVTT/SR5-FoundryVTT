@@ -1,3 +1,4 @@
+import { LinksHelpers } from '../utils/links';
 import { ModifiableValue } from '../mods/ModifiableValue';
 import { ModifiableValueType } from '../types/template/Base';
 type ChangeType = ModifiableValueType['changes'][number];
@@ -22,8 +23,12 @@ export const registerModifierHelpers = () => {
     }
 
     const getChangeEffect = (change: ChangeType) => {
-        if (!change?.effectUuid) return null;
-        return fromUuidSync(change.effectUuid) as ActiveEffect | null;
+        if (!LinksHelpers.isUuid(change?.source)) return null;
+
+        const effect = fromUuidSync(change.source) as unknown;
+        if (!(effect instanceof ActiveEffect)) return null;
+
+        return effect;
     }
 
     Handlebars.registerHelper('isBaseChange', (change: ChangeType) => {
@@ -71,8 +76,10 @@ export const registerModifierHelpers = () => {
                 return `↓ ${change.value}`;
             case 4:
                 return `↑ ${change.value}`;
-            default:
+            case 5:
                 return `➝ ${change.value}`;
+            default:
+                return `? ${change.value}`;
         }
     });
 
@@ -90,6 +97,9 @@ export const registerModifierHelpers = () => {
 
     Handlebars.registerHelper('getChangeDescription', (change: ChangeType) => {
         const effect = getChangeEffect(change);
+        if (!effect && LinksHelpers.isPDF(change.source))
+            return change.source;
+
         return effect?.description || '';
     });
 }

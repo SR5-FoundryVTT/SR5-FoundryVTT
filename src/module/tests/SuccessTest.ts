@@ -10,9 +10,10 @@ import { TestRules } from "../rules/TestRules";
 import { ModifiableValue } from "../mods/ModifiableValue";
 import { DataDefaults } from "../data/DataDefaults";
 import { ActionFlow } from "../item/flows/ActionFlow";
-import { TestDialog, TestDialogListener } from "../apps/dialogs/TestDialog";
 import { CORE_NAME, FLAGS, SYSTEM_NAME } from "../constants";
+import { SheetFlow } from "../flows/SheetFlow";
 import { DamageApplicationFlow } from '../actor/flows/DamageApplicationFlow';
+import { TestDialog, TestDialogListener } from "../apps/dialogs/TestDialog";
 
 import ModifierTypes = Shadowrun.ModifierTypes;
 
@@ -45,6 +46,20 @@ export type SuccessTestValues = TestValues & {
 export interface IconWithTooltip {
     icon: string;
     tooltip: Translation;
+}
+
+export interface SuccessTestCodeTermTrace {
+    valueField: ValueFieldType;
+    tooltipSource: string;
+}
+
+export interface SuccessTestCodeTerm {
+    text: string;
+    tooltipSource?: string;
+}
+
+interface ValueModifierTooltipOptions {
+    card?: boolean;
 }
 
 /**
@@ -98,6 +113,9 @@ export interface TestData {
 
     // Message the test has been represented with.
     messageUuid?: string
+
+    // Optional term-level provenance used for formula/code hover tooltips.
+    codeTermTraces?: SuccessTestCodeTermTrace[]
 
     // Options the test was created with.
     options?: TestOptions
@@ -251,6 +269,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         data.limit = data.limit || DataDefaults.createData('value_field', { label: 'SR5.Limit' });
 
         data.values = data.values || {};
+
+        data.codeTermTraces ??= [];
 
         // Prepare basic value structure to allow an opposed tests to access derived values before execution with placeholder
         // active tests.
@@ -407,43 +427,55 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
-     * Give a representation of this success test in the common Shadowrun 5 description style.
-     * The code given is meant to provide information about value sources. Should a user overwrite
-     * these values during dialog review, keep those hidden.
-     *
-     * Automatics + Agility + 3 (3) [2 + Physical]
-     */
-    get code(): string {
-        // Helper to collect all base value parts.
-        const formatBaseField = (valueField: ValueFieldType) => {
-            const parts = valueField.changes
-                .filter(change => ModifiableValue.isBaseChange(change))
-                .map(change => `${game.i18n.localize(change.name as Translation)} ${change.value}`);
-
-            if (valueField.base)
-                parts.push(String(valueField.base));
-            return parts;
-        };
-
-        const pool = formatBaseField(this.pool);
-        const limit = formatBaseField(this.limit);
-        const threshold = formatBaseField(this.threshold);
-
-        // Pool portion can be dynamic or static.
-        let code = pool.join(' + ').trim() || `${this.pool.value}`;
-        if (limit.length > 0) code = `${code} [${limit.join(' + ').trim()}]`;
-        if (threshold.length > 0) code = `${code} (${threshold.join(' + ').trim()})`;
-
-        return code;
-    }
-
-    /**
      * Determine if this test can have a human-readable shadowrun test code representation.
      *
      * All parts of the test code can be dynamic, any will do.
      */
     get hasCode(): boolean {
-        return this.pool.changes.length > 0 || this.threshold.changes.length > 0 || this.limit.changes.length > 0;
+        const codeTerms = this.codeTerms;
+        return codeTerms.pool.length > 0 || codeTerms.limit.length > 0 || codeTerms.threshold.length > 0;
+    }
+
+    /**
+     * Resolves the individual components and the human-readable representation of this success test.
+     * Provides the formatted UI terms for the test's pool, limit, and threshold. 
+     * Additionally, generates the common Shadowrun 5 description string (e.g., "Automatics + Agility + 3 (3) [2 + Physical]") 
+     * to provide information about value sources.
+     *
+     * @returns An object containing the term arrays (`pool`, `limit`, `threshold`), the formatted `description` string.
+     */
+    get codeTerms() {
+        return {
+            pool: this._buildCodeTermsForField(this.pool),
+            limit: this._buildCodeTermsForField(this.limit),
+            threshold: this._buildCodeTermsForField(this.threshold),
+        };
+    }
+
+    /**
+     * Constructs UI display terms for a success test field by pairing 
+     * base changes with historical trace tooltips and appending the base value.
+     */
+    private _buildCodeTermsForField(valueField: ValueFieldType): SuccessTestCodeTerm[] {
+        const terms: SuccessTestCodeTerm[] = [];
+        const traces = this.data.codeTermTraces ?? [];
+
+        for (const change of valueField.changes.filter(change => ModifiableValue.isBaseChange(change))) {
+            // Last updated trace with matching name and value for this change.
+            const traceIndex = traces.findLastIndex(trace =>
+                trace.valueField.label === change.name && trace.valueField.value === change.value
+            );
+
+            terms.push({
+                text: `${game.i18n.localize(change.name as Translation)} ${change.value}`,
+                tooltipSource: traceIndex >= 0 ? traces[traceIndex].tooltipSource : undefined,
+            });
+        }
+
+        if (valueField.base)
+            terms.push({ text: String(valueField.base) });
+
+        return terms;
     }
 
     /**
@@ -476,7 +508,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @override This method if you want to use a different TestDialog.
      */
     _createTestDialog() {
-        return new TestDialog({ test: this, templatePath: this._dialogTemplate }, undefined, this._testDialogListeners());
+        return new TestDialog(this, this._testDialogListeners());
     }
 
     /**
@@ -510,7 +542,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         }
 
         // Overwrite current test state with whatever the dialog gives.
-        this.data = data;
+        this.data = data as unknown as T;
 
         // Provide entry points with dialog data.
         await this._cleanUpAfterDialog();
@@ -772,7 +804,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         for (const type of this.testModifiers) {
             const { name, value } = this.prepareActorModifier(this.actor, type);
-            ModifiableValue.setUnique(this.data.pool, name, value);
+            ModifiableValue.setUnique(this.data.pool, name, value, { source: "SR5 10" });
         }
     }
 
@@ -1945,30 +1977,58 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const test = await TestCreator.fromMessage(message.id);
         if (!test) return;
 
-        const tooltipsBySource = {
-            pool: await this._buildValueModifierTooltipHtml(test.pool),
-            limit: test.hasLimit ? await this._buildValueModifierTooltipHtml(test.limit) : undefined,
-            threshold: test.hasThreshold ? await this._buildValueModifierTooltipHtml(test.threshold) : undefined,
-        } as const;
+        await this.hydrateValueModifierTooltipsForTest(test, html, { card: true });
+    }
 
-        const valueModifiers = $(html).find<HTMLElement>('.roll-card .test-value.value-mod[data-tooltip-source]').toArray();
+    static async hydrateValueModifierTooltipsForTest(
+        test: SuccessTest,
+        html: HTMLElement | JQuery,
+        options: ValueModifierTooltipOptions = {}
+    ) {
+        const tooltipsBySource = await this._buildValueModifierTooltipsBySource(test, options);
+
+        const valueModifiers = $(html).find<HTMLElement>('[data-tooltip-source]').toArray();
 
         for (const valueMod of valueModifiers) {
-            const source = valueMod.dataset.tooltipSource as keyof typeof tooltipsBySource | undefined;
+            const source = valueMod.dataset.tooltipSource;
             if (!source) continue;
 
             const tooltipHtml = tooltipsBySource[source];
             if (!tooltipHtml) continue;
 
             valueMod.dataset.tooltipHtml = tooltipHtml;
-            valueMod.dataset.tooltipClass = 'sr5-value-modifiers-tooltip';
+            valueMod.dataset.tooltipClass = 'sr5v2';
         }
     }
 
-    static async _buildValueModifierTooltipHtml(value: ValueFieldType): Promise<string | undefined> {
+    private static async _buildValueModifierTooltipsBySource(
+        test: SuccessTest,
+        options: ValueModifierTooltipOptions = {}
+    ): Promise<Record<string, string | undefined>> {
+        const tooltipValues: Record<string, ValueFieldType | undefined> = {
+            pool: test.pool,
+            limit: test.hasLimit ? test.limit : undefined,
+            threshold: test.hasThreshold ? test.threshold : undefined,
+        };
+
+        const traces = test.data.codeTermTraces ?? [];
+        for (const trace of traces)
+            tooltipValues[trace.tooltipSource] = trace.valueField;
+
+        const entries = await Promise.all(Object.entries(tooltipValues).map(async ([source, value]) => {
+            return [source, value ? await this._buildValueModifierTooltipHtml(value, options) : undefined] as const;
+        }));
+
+        return Object.fromEntries(entries);
+    }
+
+    static async _buildValueModifierTooltipHtml(
+        value: ValueFieldType,
+        options: ValueModifierTooltipOptions = {}
+    ): Promise<string | undefined> {
         const tooltipHtml = await foundry.applications.handlebars.renderTemplate(
-            'systems/shadowrun5e/dist/templates/common/ValueModifiers.hbs',
-            { card: true, value }
+            SheetFlow.templateBase('common/modifiers-tooltip'),
+            { value, card: options.card }
         );
 
         const content = tooltipHtml.trim();
@@ -1983,7 +2043,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Select a Token on the current scene based on the link id.
      * @params event Any user PointerEvent
     */
-    static async _selectSceneToken(event: Event) {
+    static _selectSceneToken(event: Event) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -1993,7 +2053,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const tokenId = selectLink.data('tokenId');
         const token = canvas.tokens?.get(tokenId);
 
-        if (token instanceof Token) {
+        if (token instanceof foundry.canvas.placeables.Token) {
             token.control();
         } else {
             ui.notifications?.warn(game.i18n.localize('SR5.NoSelectableToken'))
@@ -2133,9 +2193,28 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         const currentTarget = event.currentTarget as HTMLElement;
         const card = $(currentTarget).closest('.chat-card');
-        const element = card.find('.dice-rolls');
-        if (element.is(':visible')) element.slideUp(200);
-        else element.css('display', 'flex').hide().slideDown(200);
+        const cardRolls = card.find('.card-rolls').first();
+
+        if (cardRolls.length > 0) {
+            const hasRollContent = cardRolls.find('.dice-rolls, .dice-roll-content').length > 0;
+            if (!hasRollContent) return;
+
+            if (cardRolls.is(':visible')) {
+                cardRolls.slideUp(200);
+            } else {
+                const diceRolls = cardRolls.find('.dice-rolls');
+                if (diceRolls.length > 0) {
+                    diceRolls.css('display', 'flex');
+                }
+                cardRolls.stop(true, true).hide().css('display', 'block').slideDown(200);
+            }
+
+            return;
+        }
+
+        const legacyRolls = card.find('.dice-rolls');
+        if (legacyRolls.is(':visible')) legacyRolls.slideUp(200);
+        else legacyRolls.css('display', 'flex').hide().slideDown(200);
     }
 
     /**

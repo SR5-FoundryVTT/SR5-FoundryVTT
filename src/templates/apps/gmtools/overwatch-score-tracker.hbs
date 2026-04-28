@@ -1,4 +1,4 @@
-<form class="{{cssClass}}" autocomplete="off">
+<div class="overwatch-score-tracker-app">
     {{#if isGM}}
     <div class="inventory">
         <div class="scroll-area">
@@ -11,7 +11,7 @@
                     </div>
                     <div class="item-right">
                         <div class="item-icons item-text">
-                            <a class="roll overwatch-score-add-actor" data-tooltip="SR5.OverwatchScoreTracker.AddSelect">
+                            <a class="roll overwatch-score-add-actor" data-action="addActor" data-tooltip="SR5.OverwatchScoreTracker.AddSelect">
                                 <i class="fas fa-plus"></i>
                                 {{localize "SR5.Add"}}
                             </a>
@@ -38,7 +38,7 @@
                         </div>
                     </div>
                     <div class="item-right">
-                        <div class="item-text">
+                        <div class="item-text overwatch-score-input-wrapper">
                             <input
                                 class="display overwatch-score-input"
                                 size="3"
@@ -49,19 +49,19 @@
                             />
                         </div>
                         <div class="item-text rtg"></div>
-                        <div class="item-text" style="white-space: nowrap">
-                            <span class="overwatch-score-add roll" data-tooltip="SR5.AddOneToOverwatch" data-amount="1">+1</span>
+                        <div class="item-text overwatch-score-actions" style="white-space: nowrap">
+                            <span class="overwatch-score-add roll" data-action="addOverwatchScore" data-tooltip="SR5.AddOneToOverwatch" data-amount="1">+1</span>
                             <span> / </span>
-                            <span class="overwatch-score-add roll" data-tooltip="SR5.AddFiveToOverwatch" data-amount="5">+5</span>
+                            <span class="overwatch-score-add roll" data-action="addOverwatchScore" data-tooltip="SR5.AddFiveToOverwatch" data-amount="5">+5</span>
                             <span> / </span>
-                            <span class="roll overwatch-score-roll-15-minutes" data-tooltip="SR5.AddFifteenMinutesToOverwatch">
+                            <span class="roll overwatch-score-roll-15-minutes" data-action="rollFor15Minutes" data-tooltip="SR5.AddFifteenMinutesToOverwatch">
                                 {{localize "SR5.PlusFifteenMinutes"}}
                             </span>
                         </div>
                         <div class="item-text rtg"></div>
-                        <div class="item-text item-icons">
-                            <i class="roll fas fa-power-off overwatch-score-reset" data-tooltip="SR5.OverwatchScoreTracker.ResetScore"></i>
-                            <i class="roll fas fa-trash overwatch-score-delete" data-tooltip="SR5.OverwatchScoreTracker.DeleteScore"></i>
+                        <div class="item-text item-icons overwatch-score-item-icons">
+                            <i class="roll fas fa-power-off overwatch-score-reset" data-action="resetOverwatchScore" data-tooltip="SR5.OverwatchScoreTracker.ResetScore"></i>
+                            <i class="roll fas fa-trash overwatch-score-delete" data-action="deleteTrackedActor" data-tooltip="SR5.OverwatchScoreTracker.DeleteScore"></i>
                         </div>
                     </div>
                 </div>
@@ -74,4 +74,4 @@
         <p>{{localize "SR5.OverwatchScoreTracker.GMOnly"}}</p>
     </div>
     {{/if}}
-</form>
+</div>

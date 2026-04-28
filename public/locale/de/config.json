@@ -868,6 +868,7 @@
             "View": "Öffnen",
             "ViewItem": "Gegenstand öffnen"
         },
+        "ConnectionType": "Verbindungsart",
         "Continue": "Fortsetzen",
         "ControlRig": "Riggerkontrolle",
         "Cost": "Kosten",
@@ -1006,6 +1007,7 @@
         },
         "DicePool": "Würfelpool",
         "DicePoolModifier": "Würfelpool-Modifikator",
+        "DifferentGrid": "Anderes Gitter",
         "DirectConnection": "Direkte Verbindung",
         "DmgTypeMatrix": "Matrix",
         "DmgTypePhysical": "Körperlich",
