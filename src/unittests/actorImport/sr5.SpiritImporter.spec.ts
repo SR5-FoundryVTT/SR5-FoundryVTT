@@ -5,7 +5,7 @@ import { FireSpirit } from './Examples/FireSpirit';
 import { SR5TestFactory } from 'src/unittests/utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { SpiritImporter } from '../../module/apps/actorImport/spiritImporter/SpiritImporter';
-import { CharacterImporter, importOptionsType } from '@/module/apps/actorImport/characterImporter/CharacterImporter';
+import { CharacterImporter, ImportOptionsType } from '@/module/apps/actorImport/characterImporter/CharacterImporter';
 
 export const spiritImporterTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -30,7 +30,7 @@ export const spiritImporterTesting = (context: QuenchBatchContext) => {
         spells: true,
         vehicles: true,
         weapons: true,
-    } satisfies importOptionsType;
+    } satisfies ImportOptionsType;
 
     describe('Chummer Spirit Importer', () => {
         it('Should import a chummer character', async () => {
