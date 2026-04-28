@@ -1579,6 +1579,7 @@
                     "AssaultCannon": "Canhão de Assalto",
                     "AssaultRifle": "Fuzil de Assalto",
                     "Bow": "Arco",
+                    "Carbine": "Carabina",
                     "Flamethrower": "Lança-chamas",
                     "GrenadeLauncher": "Lançador de Granadas",
                     "HarpoonGun": "Arpão",
@@ -1601,6 +1602,7 @@
                     "Shuriken": "Shuriken",
                     "SniperRifle": "Fuzil de Precisão",
                     "SportingRifle": "Fuzil Esportivo",
+                    "SprayPen": "Caneta Spray",
                     "StandardThrownGrenade": "Granada Padrão",
                     "Taser": "Taser",
                     "ThrownKnife": "Faca de Arremesso"

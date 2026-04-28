@@ -85,7 +85,7 @@ MERGE_GROUPS = [
 FILES = [
     'actions.xml', 'armor.xml', 'bioware.xml', 'complexforms.xml', 'critterpowers.xml',
     'critters.xml', 'cyberware.xml', 'echoes.xml', 'gear.xml', 'metatypes.xml',
-    'powers.xml', 'qualities.xml', 'spells.xml', 'vehicles.xml', 'weapons.xml',
+    'powers.xml', 'qualities.xml', 'skills.xml', 'spells.xml', 'vehicles.xml', 'weapons.xml',
 ]
 
 # -------------------------------------------------------------------

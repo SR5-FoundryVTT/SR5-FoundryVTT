@@ -1,7 +1,7 @@
 import { Parser } from "./Parser";
 import { SYSTEM_NAME, FLAGS } from "@/module/constants";
 import { IconAssign } from "@/module/apps/iconAssigner/iconAssign";
-import { importOptionsType } from "../characterImporter/CharacterImporter";
+import { ImportOptionsType } from "../characterImporter/CharacterImporter";
 import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
 
 import { ActorSchema } from "../ActorSchema";
@@ -48,7 +48,7 @@ export class ItemsParser {
      * @param {*} chummerChar The chummer char holding the items
      * @param {*} importOptions Additional import option that specify what items will be imported.
      */
-    async parse(chummerChar: ActorSchema, importOptions: importOptionsType) {
+    async parse(chummerChar: ActorSchema, importOptions: ImportOptionsType) {
         const items: Item.CreateData[] = [];
         Object.freeze(chummerChar);
 

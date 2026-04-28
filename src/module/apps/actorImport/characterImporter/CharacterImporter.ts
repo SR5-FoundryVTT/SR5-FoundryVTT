@@ -10,7 +10,7 @@ import { ItemsParser } from "../itemImporter/ItemsParser";
 import { VehicleParser } from "../itemImporter/vehicleImport/VehicleParser";
 
 // Type Definitions
-export type importOptionsType = Partial<{
+export type ImportOptionsType = Partial<{
     folderId: string | null;
     armor: boolean;
     contacts: boolean;
@@ -62,7 +62,7 @@ export class CharacterImporter {
      * @param chummerCharacter The complete chummer file as json object. The first character will be selected for import.
      * @param importOptions Additional import option that specify what parts of the chummer file will be imported.
      */
-    static async import(chummerCharacter: ActorSchema, importOptions: importOptionsType): Promise<[SR5Actor<'character'>, ...SR5Actor<'vehicle'>[]]> {
+    static async import(chummerCharacter: ActorSchema, importOptions: ImportOptionsType): Promise<[SR5Actor<'character'>, ...SR5Actor<'vehicle'>[]]> {
         const character: BlankCharacter = {
             effects: [],
             type: 'character',

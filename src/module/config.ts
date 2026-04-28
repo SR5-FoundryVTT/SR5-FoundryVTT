@@ -380,6 +380,24 @@ export const SR5 = {
                 long: -1,
                 extreme: -1,
             },
+        },
+        sprayPen: {
+            label: 'SR5.Weapon.Range.Category.SprayPen',
+            ranges: {
+                short: 2,
+                medium: -1,
+                long: -1,
+                extreme: -1,
+            },
+        },
+        carbine: {
+            label: 'SR5.Weapon.Range.Category.Carbine',
+            ranges: {
+                short: 10,
+                medium: 40,
+                long: 80,
+                extreme: 150,
+            },
         }
 
     },

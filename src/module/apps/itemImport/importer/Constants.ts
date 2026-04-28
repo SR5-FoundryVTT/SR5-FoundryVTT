@@ -33,7 +33,7 @@ export class Constants {
         'Weapon':           { pack: 'sr5weapon',          type: 'Item', folder: null, subFolder: null }, // Weapons
 
         // Miscs
-        'Misc':             { pack: 'sr5misc',            type: 'Item', folder: null, subFolder: null }, // Actions
+        'Misc':             { pack: 'sr5misc',            type: 'Item', folder: null, subFolder: null }, // Actions and skills
     } as const satisfies Record<string, CompendiumConfig>;
 
     public static readonly MAP_COMPENDIUM_KEY = {
@@ -68,7 +68,8 @@ export class Constants {
         Weapon_Mod:     this.MAP_COMPENDIUM_CONFIG.Modification,
 
         // Misc
-        Action:         this.MAP_COMPENDIUM_CONFIG.Misc
+        Action:         this.MAP_COMPENDIUM_CONFIG.Misc,
+        Skill:          this.MAP_COMPENDIUM_CONFIG.Misc
     } as const satisfies Record<string, CompendiumConfig>;
 
     public static readonly MAP_CATEGORY_TO_SKILL = {
@@ -100,7 +101,7 @@ export class Constants {
         'Unarmed': 'unarmed_combat',
     } as const;
 
-    public static readonly MAP_IMPORT_RANGE_CATEGORY_TO_SYSTEM_RANGE_CATEGORY = {
+    public static readonly RANGE_CATEGORY_MAP = {
         'Tasers': 'taser',
         'Holdouts': 'holdOutPistol',
         'Light Pistols': 'lightPistol',
@@ -130,12 +131,14 @@ export class Constants {
         'Harpoon Gun': 'harpoonGun',
         'Harpoon Gun (Underwater)': 'harpoonGunUnderwater',
         'Flamethrowers': 'flamethrower',
+        'Spray Pen': 'sprayPen',
+        'Carbines': 'carbine',
     } as const satisfies Record<string, Exclude<keyof typeof SR5.weaponRangeCategories, "manual">> ;
 
     public static readonly attributeTable = {
         "BOD": "body", "AGI": "agility", "REA": "reaction",
         "STR": "strength", "WIL": "willpower","LOG": "logic",
         "INT": "intuition", "CHA": "charisma", "EDG": "edge",
-        "MAG": "magic", "RES": "ressonance", "ESS": "essence"
+        "MAG": "magic", "RES": "resonance", "ESS": "essence"
     } as const;
 }
