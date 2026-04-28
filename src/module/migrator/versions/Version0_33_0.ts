@@ -1,7 +1,7 @@
 import { SR5 } from '@/module/config';
-import { DataDefaults } from '@/module/data/DataDefaults';
 import { SYSTEM_NAME } from '@/module/constants';
 import { VersionMigration } from "../VersionMigration";
+import { DataDefaults } from '@/module/data/DataDefaults';
 
 
 type LegacySkillCategory = 'active' | 'language' | 'knowledge';
@@ -70,6 +70,41 @@ export class Version0_33_0 extends VersionMigration {
                 change.mode = CONST.ACTIVE_EFFECT_MODES.ADD;
     }
 
+    override handlesItem(item: Readonly<any>): boolean {
+        if (item.type !== 'weapon') return false;
+
+        const rangeTargets = [
+            item.system?.range?.ranges,
+            item.system?.thrown?.ranges
+        ] as const;
+
+        return rangeTargets.some(ranges => 
+            ranges 
+            && ranges.category !== 'manual' 
+            && ranges.attribute === 'agility'
+        );
+    }
+
+    override migrateItem(item: any): void {
+        const strengthSet = new Set([
+            "thrownKnife",
+            "net",
+            "shuriken",
+            "standardThrownGrenade",
+            "aerodynamicThrownGrenade",
+            "bow"
+        ] as const);
+
+        const rangeTargets = [
+            item.system?.range?.ranges,
+            item.system?.thrown?.ranges
+        ] as const;
+
+        for (const ranges of rangeTargets) {
+            if (!ranges || ranges.category === 'manual') continue;
+            ranges.attribute = strengthSet.has(ranges.category) ? "strength" : "";
+        }
+    }
 
     /**
      * Only migrate if an actor actually has skills.

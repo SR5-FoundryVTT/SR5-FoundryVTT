@@ -568,13 +568,12 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 },
             });
         } else {
-            type RangesType = Omit<RangeType, 'category' | 'attribute'> & { attribute?: string };
-            const ranges: RangesType = SR5.weaponRangeCategories[selectedRangeCategory].ranges;
+            const ranges = SR5.weaponRangeCategories[selectedRangeCategory].ranges;
 
             await this.item.update({
                 [key]: {
                     ...ranges,
-                    attribute: ranges.attribute || null,
+                    attribute: 'attribute' in ranges ? ranges.attribute : '',
                     category: selectedRangeCategory,
                 },
             });

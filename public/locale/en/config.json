@@ -3150,6 +3150,7 @@
                     "AssaultCannon": "Assault Cannon",
                     "AssaultRifle": "Assault Rifle",
                     "Bow": "Bow",
+                    "Carbine": "Carbine",
                     "Flamethrower": "Flamethrower",
                     "GrenadeLauncher": "Grenade Launcher",
                     "HarpoonGun": "Harpoon Gun",
@@ -3172,6 +3173,7 @@
                     "Shuriken": "Shuriken",
                     "SniperRifle": "Sniper Rifle",
                     "SportingRifle": "Sporting Rifle",
+                    "SprayPen": "Spray Pen",
                     "StandardThrownGrenade": "Standard Grenade",
                     "Taser": "Taser",
                     "ThrownKnife": "Thrown Knife"
