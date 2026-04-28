@@ -56,6 +56,7 @@ export namespace CompendiumBrowserTypes {
     export type SearchResult<DocType extends CompendiumCollection.DocumentName> = 
         CompendiumCollection.IndexEntry<DocType> & {
             sourcePack: string;
+            score: number;
         };
 }
 
@@ -153,14 +154,14 @@ export class CompendiumBrowser extends BaseClass {
             entries = entries.filter((e) => !("type" in e && typeof e.type === "string") || types.includes(e.type as any));
 
         if (queryName) {
-            entries = getFuzzyMatches(
+            return getFuzzyMatches(
                 entries,
                 queryName,
                 entry => ("name" in entry && typeof entry.name === "string") ? entry.name : "",
-            ).map(match => match.item);
+            ).map(match => ({ ...match.item, score: match.score }));
         }
 
-        return entries;
+        return entries.map(entry => ({ ...entry, score: 0 }));
     }
 
     /**
@@ -419,21 +420,13 @@ export class CompendiumBrowser extends BaseClass {
         );
 
         entries = entries.map(entry => ({
-            ...entry, sourcePack: game.packs.get(entry.sourcePack)!.title,
+            ...entry,
+            sourcePack: game.packs.get(entry.sourcePack)!.title,
             type: game.i18n.localize(`TYPES.${this.activeTab}.${entry.type}`),
-        }));
-
-        const hasSearchQuery = foundry.applications.ux.SearchFilter.cleanQuery(this._searchQuery).length > 0;
-        if (hasSearchQuery) {
-            entries = getFuzzyMatches(entries, this._searchQuery, entry => entry.name ?? "")
-                .sort((left, right) =>
-                    right.score - left.score ||
-                    (left.item.name ?? "").localeCompare(right.item.name ?? "", game.i18n.lang),
-                )
-                .map(match => match.item);
-        } else {
-            entries = entries.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "", game.i18n.lang));
-        }
+        })).sort((left, right) =>
+            right.score - left.score ||
+            (left.name ?? "").localeCompare(right.name ?? "", game.i18n.lang),
+        );
 
         this.scrollState.entries = entries;
         this.scrollState.throttle = false;

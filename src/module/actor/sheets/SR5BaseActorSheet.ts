@@ -1573,7 +1573,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }).filter((row): row is NonNullable<typeof row> => row !== null);
 
         const scoreBySkillId = new Map<string, number>();
-        if (this._filters.skills) {
+        const hasTextQuery = foundry.applications.ux.SearchFilter.cleanQuery(this._filters.skills).length > 0;
+        if (hasTextQuery) {
             for (const match of getFuzzyMatches(
                 activeSkillRows,
                 this._filters.skills,
@@ -1608,7 +1609,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             skillContainer.insertBefore(row.container, firstNonActiveSkillRow);
             row.container.classList.add('active-skill-row');
 
-            if (this._isSkillFiltered(row.skillId, row.skill)) {
+            const hasTextMatch = !hasTextQuery || scoreBySkillId.has(row.skillId);
+            if (this._isSkillFiltered(row.skillId, row.skill, hasTextMatch)) {
                 row.container.classList.remove('hidden');
             } else {
                 row.container.classList.add('hidden');
@@ -1616,11 +1618,11 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
     }
 
-    _isSkillFiltered(skillId: string, skill: SkillFieldType) {
+    _isSkillFiltered(skillId: string, skill: SkillFieldType, hasTextMatch?: boolean) {
         // a newly created skill shouldn't be filtered, no matter what.
         // Therefore disqualify empty skill labels/names from filtering and always show them.
         const isFilterable = this._getSkillLabelOrName(skill).length > 0;
-        const isHiddenForText = !this._doesSkillContainText(skillId, skill, this._filters.skills);
+        const isHiddenForText = !(hasTextMatch ?? this._doesSkillContainText(skillId, skill, this._filters.skills));
         const isHiddenForUntrained = !this._filters.showUntrainedSkills && skill.value === 0;
 
         return !(isFilterable && (isHiddenForUntrained || isHiddenForText));
