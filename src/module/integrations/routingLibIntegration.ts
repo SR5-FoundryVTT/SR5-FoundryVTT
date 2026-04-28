@@ -33,17 +33,17 @@ export interface RoutingLib {
  *
  */
 export class RoutingLibIntegration {
-    static #routingLibReady = false;
+    static #ready = false;
 
     static #routinglib: RoutingLib | null = null;
 
-    static get routingLibReady() {
-        return this.#routingLibReady;
+    static get ready() {
+        return this.#ready;
     }
 
     static init() {
         Hooks.once('routinglib.ready', () => {
-            this.#routingLibReady = true;
+            this.#ready = true;
             this.#routinglib = routinglib;
         });
     }

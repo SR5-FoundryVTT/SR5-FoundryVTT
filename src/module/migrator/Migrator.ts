@@ -13,6 +13,7 @@ import { Version0_32_0 } from './versions/Version0_32_0';
 import { Version0_32_1 } from './versions/Version0_32_1';
 import { Version0_32_4 } from './versions/Version0_32_4';
 import { Version0_33_0 } from './versions/Version0_33_0';
+import { Version0_34_0 } from './versions/Version0_34_0';
 import { VersionMigration, MigratableDocument, MigratableDocumentName } from "./VersionMigration";
 const { deepClone } = foundry.utils;
 
@@ -52,6 +53,7 @@ export class Migrator {
         new Version0_32_1(),
         new Version0_32_4(),
         new Version0_33_0(),
+        new Version0_34_0(),
     ] as const;
 
     private static documentsToBeMigrated = 0;
@@ -64,8 +66,8 @@ export class Migrator {
     // Returns an array of migration functions applicable to the given document type and version.
     private static getMigrators(
         version: string | null,
-        type?: MigratableDocumentName,
-        data?: any
+        type: MigratableDocumentName,
+        data: any
     ): readonly VersionMigration[] {
         return this.s_Versions.filter(migrator =>
             (!type || migrator[`handles${type}`](data)) &&

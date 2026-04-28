@@ -32,6 +32,10 @@
         "FreshIcon": "Highlight with Icon Only",
         "HideGMOnlyChatContent": "Hide critical information on GM test",
         "HideGMOnlyChatContentDescription": "GM test messages will only show all information to players that own the used actor",
+        "InitiativeModeUpdateStrategyName": "Initiative Mode Update Strategy",
+        "InitiativeModeUpdateStrategyDescription": "How initiative is updated when switching initiative mode in combat",
+        "InitiativeModeUpdateStrategyDeltaDice": "Delta Dice (roll difference)",
+        "InitiativeModeUpdateStrategyReroll": "Full Reroll",
         "IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",
         "ImportIconFolderDescription": "The folder where the importer can find icon files. Default location: 'systems/shadowrun5e/dist/icons/importer/'",
         "ImportIconFolderName": "Importer Icon Folder",
@@ -50,6 +54,8 @@
         "ShowSkillsWithDetailsDescription": "When set skill list display will mirror core rulebook style (italics, short attributes)",
         "ShowTokenNameForChatOutputDescription": "Should the token name be used for roll card output instead of the actor name when available",
         "ShowTokenNameForChatOutputName": "Use Token Name for Roll Card",
+        "TokenAutoRunning": "Auto-Detect Running Movement",
+        "TokenAutoRunningDescription": "Automatically switch token movement mode to running when measured distance exceeds walking speed",
         "TokenHealthBars": "Token health bars",
         "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring",
         "TokenRulerColorRunning": "Token Movement Running Color",
@@ -550,9 +556,29 @@
         "Bullets": "Rounds",
         "BuyHits": "Buy Hits",
         "COMBAT": {
+            "CannotSeizeAgain": "You cannot seize initiative again until the start of your next turn.",
+            "ModeAstral": "Astral",
+            "ModeChangedLabel": "Initiative Mode Updated",
+            "ModeChangeNewInitiative": "New initiative",
+            "ModeChangePreviousInitiative": "Previous initiative",
+            "ModeMatrix": "Matrix",
+            "ModeMeatspace": "Meatspace",
+            "ModeTitle": "Mode: {mode}",
+            "ModeUnknown": "Unknown",
+            "NextPass": "Next Pass",
+            "NextPhase": "Next Phase",
+            "NextTurn": "Next Turn",
+            "NoHistoryAvailable": "No combat history snapshot is available.",
+            "PreviousPass": "Previous Pass",
+            "PreviousPhase": "Previous Phase",
+            "PreviousTurn": "Previous Turn",
             "ReduceInitByFive": "Initiative -5",
             "ReduceInitByOne": "Initiative -1",
-            "ReduceInitByTen": "Initiative -10"
+            "ReduceInitByTen": "Initiative -10",
+            "SeizeInitiative": "Seize Initiative",
+            "SeizedInitiative": "Seized Initiative",
+            "ToggleActedStatusGMOnly": "Toggle Acted Status (GM Only)",
+            "TrackerTitle": "Turn {round} (Pass {pass})"
         },
         "CallInAction": {
             "ActorType": "Actor Type",
@@ -2630,6 +2656,10 @@
                 "Standard": "By default"
             },
             "Type": "Type"
+        },
+        "StatusEffects": {
+            "Running": "Running",
+            "Sprinting": "Sprinting"
         },
         "Stock": "Stock",
         "StreetCred": "Street Cred",

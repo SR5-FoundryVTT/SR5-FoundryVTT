@@ -4,11 +4,16 @@ import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5ChatMessage } from "../chatMessage/SR5ChatMessage";
 import { SR5Combat } from "../combat/SR5Combat";
+import { SR5Combatant } from "../combat/SR5Combatant";
 import { SR5ActiveEffect } from "../effect/SR5ActiveEffect";
 import { SR5Roll } from "../rolls/SR5Roll";
 import { SR5Token } from "../token/SR5Token";
+import { SR5TokenDocument } from "../token/SR5TokenDocument";
 
 import { Translation } from '../utils/strings';
+
+import { CombatDM } from "./combat/Combat";
+import { CombatantDM } from "./combat/Combatant";
 
 import { Character } from "./actor/Character";
 import { IC } from "./actor/IC";
@@ -58,26 +63,35 @@ declare module "fvtt-types/configuration" {
         ActiveEffect: typeof SR5ActiveEffect;
         Actor: typeof SR5Actor<Actor.ConfiguredSubType>;
         ChatMessage: typeof SR5ChatMessage;
-        Combat: typeof SR5Combat<Combat.SubType>;
+        Combat: typeof SR5Combat;
+        Combatant: typeof SR5Combatant;
         Item: typeof SR5Item<Item.ConfiguredSubType>;
         Roll: typeof SR5Roll;
-        Sheet: typeof FormApplication;
+        Sheet: typeof foundry.appv1.api.FormApplication;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interface ConfiguredActiveEffect<SubType extends ActiveEffect.SubType> {
         document: SR5ActiveEffect;
     }
-    
+
     interface ConfiguredActor<SubType extends Actor.SubType> {
         document: SR5Actor<SubType & Actor.ConfiguredSubType>;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interface ConfiguredChatMessage<SubType extends ChatMessage.SubType> {
         document: SR5ChatMessage;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interface ConfiguredCombat<SubType extends Combat.SubType> {
-        document: SR5Combat<SubType>;
+        document: SR5Combat;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    interface ConfiguredCombatant<SubType extends Combatant.SubType> {
+        document: SR5Combatant;
     }
 
     interface ConfiguredItem<SubType extends Item.SubType> {
@@ -129,7 +143,10 @@ declare module "fvtt-types/configuration" {
             vehicle: typeof Vehicle;
         };
         Combat: {
-            base: typeof SR5Combat;
+            base: typeof CombatDM;
+        };
+        Combatant: {
+            base: typeof CombatantDM;
         };
         Item: {
             action: typeof Action;
@@ -164,7 +181,6 @@ declare module "fvtt-types/configuration" {
     interface FlagConfig {
         Actor: {
             shadowrun5e: {
-                turnsSinceLastAttack?: number;
                 overwatchScore?: number;
             }
         };
@@ -230,11 +246,12 @@ declare module "fvtt-types/configuration" {
             SR5_CastItemAction: (arg0: SR5Item) => void;
             SR5_PreActorItemRoll: (arg0: SR5Actor, arg1: SR5Item) => void;
             getSceneControlButtons: (arg0: any) => void;
-            getCombatTrackerEntryContext: (arg0: any, arg1: any) => void;
+            getCombatTrackerEntryContext: (arg0: HTMLElement, arg1: any[]) => void;
             getChatMessageContextOptions: (args0: any, args1: any) => void;
             quenchReady: (args0: Quench) => void;
             renderChatMessage: (args0: SR5ChatMessage, args1: any, arg2: any) => void;
             diceSoNiceReady: (dice3d: DiceSoNice) => void;
+            moveToken: (...args: Parameters<typeof SR5TokenDocument.moveToken>) => void;
             dropItemSheetData: any;
             // Hooks for Autocomplete Inline Properties integration
             aipSetup: (packageConfig: {packageName: string}[]) => void;
@@ -257,6 +274,7 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.onlyAllowRollOnDefaultableSkills": boolean;
         "shadowrun5e.showSkillsWithDetails": boolean;
         "shadowrun5e.onlyAutoRollNPCInCombat": boolean;
+        "shadowrun5e.InitiativeModeUpdateStrategy": 'delta_dice' | 'reroll';
         "shadowrun5e.tokenHealthBars": boolean;
         "shadowrun5e.HideGMOnlyChatContent": boolean;
         "shadowrun5e.MustConsumeRessourcesOnTest": boolean;
@@ -282,6 +300,7 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.CompendiumBrowserBlacklist": string[];
         "shadowrun5e.ImporterCompendiumOrder": string[];
         "shadowrun5e.DieFaceLabels": string;
+        "shadowrun5e.TokenAutoRunning": boolean;
     }
 }
 
