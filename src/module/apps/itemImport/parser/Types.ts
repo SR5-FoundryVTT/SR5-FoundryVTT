@@ -9,14 +9,15 @@ import { Gear, GearSchema } from "../schema/GearSchema";
 import { Metatype, MetatypeSchema } from "../schema/MetatypeSchema";
 import { Power, Enhancement, PowersSchema } from "../schema/PowersSchema";
 import { Quality, QualitiesSchema } from "../schema/QualitiesSchema";
+import { Skill, SkillsSchema } from "../schema/SkillsSchema";
 import { Spell, SpellsSchema } from "../schema/SpellsSchema";
 import { Vehicle, Mod as VehicleMod, Weaponmount, VehiclesSchema } from "../schema/VehiclesSchema";
 import { Accessory, Weapon, WeaponsSchema } from "../schema/WeaponsSchema";
 
 export type Schemas =
     ActionsSchema | ArmorSchema | BiowareSchema | CritterpowersSchema | CyberwareSchema | ComplexformsSchema | EchoesSchema |
-    GearSchema | MetatypeSchema | PowersSchema | QualitiesSchema | SpellsSchema | VehiclesSchema | WeaponsSchema;
+    GearSchema | MetatypeSchema | PowersSchema | QualitiesSchema | SkillsSchema | SpellsSchema | VehiclesSchema | WeaponsSchema;
 
 export type ParseData =
     Action | Armor | ArmorMod | Bioware | CritterPower | Cyberware | Complexform | Echo | Gear | Metatype |
-    Power | Enhancement | Quality | Spell | Vehicle | VehicleMod | Weaponmount | Weapon | Accessory;
+    Power | Enhancement | Quality | Skill | Spell | Vehicle | VehicleMod | Weaponmount | Weapon | Accessory;
