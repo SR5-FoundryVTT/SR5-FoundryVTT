@@ -1,6 +1,6 @@
 import { LinksHelpers } from "@/module/utils/links";
-import { getFuzzyMatches } from "@/module/utils/fuzzySearch";
 import { FLAGS, SYSTEM_NAME } from "@/module/constants";
+import { getFuzzyMatches, FuzzySearchOptions } from "@/module/utils/fuzzySearch";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -44,6 +44,8 @@ export namespace CompendiumBrowserTypes {
     export interface SearchFilters<DocType extends CompendiumCollection.DocumentName> {
         /** An optional string to filter by name. */
         queryName?: string;
+        /** Optional fuzzy matching options for queryName matching. */
+        fuzzyOptions?: FuzzySearchOptions;
         /** An optional array of document subtypes (e.g., ["weapon", "spell"]). */
         types?: (typeof foundry.documents)[DocType]["TYPES"][];
         /** An optional array of pack collections (e.g., ["shadowrun5e.core-items"]) to explicitly include. */
@@ -136,7 +138,7 @@ export class CompendiumBrowser extends BaseClass {
         docType: DocType,
         filter: CompendiumBrowserTypes.SearchFilters<DocType>,
     ): Promise<CompendiumBrowserTypes.SearchResult<DocType>[]> {
-        const { queryName, types, packs } = filter;
+        const { queryName, fuzzyOptions, types, packs } = filter;
 
         const activePacks = game.packs.filter(
             (p) =>
@@ -158,6 +160,7 @@ export class CompendiumBrowser extends BaseClass {
                 entries,
                 queryName,
                 entry => ("name" in entry && typeof entry.name === "string") ? entry.name : "",
+                fuzzyOptions,
             ).map(match => ({ ...match.item, score: match.score }));
         }
 

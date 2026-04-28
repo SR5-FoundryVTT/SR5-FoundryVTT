@@ -4,7 +4,7 @@ export const FUZZY_BALANCED_THRESHOLD = 0.35;
 
 const { SearchFilter } = foundry.applications.ux;
 
-interface FuzzySearchOptions {
+export interface FuzzySearchOptions {
     threshold?: number;
 }
 
