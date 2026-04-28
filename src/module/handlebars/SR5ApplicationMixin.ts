@@ -75,6 +75,15 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
         private editIcon?: HTMLElement;
         private wrenchIcon?: HTMLElement;
         private formFocusAbortController?: AbortController;
+
+        /**
+         * Rerender focus memory:
+         * Stores the index of the currently focused form field (input/textarea/select)
+         * right before a render caused by submitOnChange.
+         *
+         * We use a simple index instead of selector/caret state so unnamed fields
+         * (like list inputs) are still restorable across rerenders.
+         */
         private pendingFormFieldIndex?: number;
 
         static override DEFAULT_OPTIONS = {
@@ -112,6 +121,12 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
             );
         }
 
+        /**
+         * Capture the focused field before rerender.
+         *
+         * If focus is outside this application (or not a trackable field),
+         * the memory is cleared to avoid stale focus restoration.
+         */
         #captureFormFieldState(target: EventTarget | null) {
             this.pendingFormFieldIndex = undefined;
             if (!this.#isTrackableFormField(target) || !this.element) return;
@@ -127,6 +142,13 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
             } catch { /* Some input types may not support select(). Ignore safely. */ }
         }
 
+        /**
+         * Restore focus to the previously captured form field after rerender.
+         *
+         * Why immediate + requestAnimationFrame?
+         * - Immediate handles very fast typing right after Tab.
+         * - RAF handles post-render browser/foundry focus side-effects that can overwrite selection.
+         */
         #restoreFormFieldState() {
             const index = this.pendingFormFieldIndex;
             this.pendingFormFieldIndex = undefined;
@@ -149,6 +171,12 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
             requestAnimationFrame(focusAndSelect);
         }
 
+        /**
+         * Track field focus changes while the sheet is live.
+         *
+         * On `focusin`, we eagerly select text to prevent caret-at-start race conditions
+         * during quick tab-and-type interactions on rerendering forms.
+         */
         #bindFormFocusTracking() {
             if (!this.element) return;
 
@@ -310,6 +338,7 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
 
         protected override _configureRenderOptions(options: Parameters<BaseType["_configureRenderOptions"]>[0]) {
             this.pendingFormFieldIndex = undefined;
+            // Capture whichever field is currently active before render mutates the DOM.
             this.#captureFormFieldState(document.activeElement);
             super._configureRenderOptions(options);
             if (options.mode && this.isEditable) this._mode = options.mode;
