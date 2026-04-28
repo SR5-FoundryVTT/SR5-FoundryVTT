@@ -11,7 +11,6 @@ import { VehicleParser } from "../itemImporter/vehicleImport/VehicleParser";
 
 // Type Definitions
 export type importOptionsType = Partial<{
-    assignIcons: boolean;
     folderId: string | null;
     armor: boolean;
     contacts: boolean;

@@ -35,7 +35,7 @@ export class ActorImporter extends BaseClass {
                 void this.handleActorImport();
             },
             openConfig: function(this: ActorImporter) {
-                void new ImporterSourcesConfig().render(true);
+                void new ImporterSourcesConfig().render({ force: true });
             }
         }
     };
@@ -106,7 +106,6 @@ export class ActorImporter extends BaseClass {
             (document.querySelector(selector) as HTMLInputElement)?.value || null;
 
         const importOptions = {
-            assignIcons: getCheckboxValue('#assign-icons'),
             folderId: getInputValue('#chummer-folder-select'),
 
             armor: getCheckboxValue('input[data-field="armor"]'),
@@ -122,8 +121,8 @@ export class ActorImporter extends BaseClass {
         };
 
         // Log everything for now (replace with actual import logic)
-        console.log("Parsed Chummer Data:", actorData);
-        console.log("Import Options:", importOptions);
+        console.debug("Parsed Chummer Data:", actorData);
+        console.debug("Import Options:", importOptions);
 
         const spiritType = this.getSpiritType(actorData);
         if (spiritType)

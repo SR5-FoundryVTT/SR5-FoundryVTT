@@ -2,7 +2,7 @@ import JSZip from "jszip";
 import { Constants } from "../importer/Constants";
 import { ImportHelper } from "../helper/ImportHelper";
 import { SYSTEM_NAME, FLAGS } from "@/module/constants";
-import * as IconAssign from "../../iconAssigner/iconAssign";
+import { IconAssign } from "../../iconAssigner/iconAssign";
 
 import { ActionImporter } from "../importer/ActionImporter";
 import { AdeptPowerImporter } from "../importer/AdeptPowerImporter";

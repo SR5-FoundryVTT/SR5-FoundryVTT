@@ -1,6 +1,6 @@
 import { ActorSchema } from "../ActorSchema";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
-import * as IconAssign from "../../iconAssigner/iconAssign";
+import { IconAssign } from "../../iconAssigner/iconAssign";
 import { DataDefaults, SystemEntityType } from "src/module/data/DataDefaults";
 import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
 

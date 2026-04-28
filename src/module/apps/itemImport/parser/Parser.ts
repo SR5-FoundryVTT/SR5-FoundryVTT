@@ -3,7 +3,7 @@ import { CompendiumKey } from "../importer/Constants";
 import { DataImporter } from "../importer/DataImporter";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 import { BonusHelper as BH } from "../helper/BonusHelper";
-import * as IconAssign from "../../iconAssigner/iconAssign";
+import { IconAssign } from "../../iconAssigner/iconAssign";
 import { ImportHelper as IH } from "../helper/ImportHelper";
 import { TechnologyType } from "src/module/types/template/Technology";
 import { DataDefaults, SystemConstructorArgs, SystemEntityType } from "src/module/data/DataDefaults";
