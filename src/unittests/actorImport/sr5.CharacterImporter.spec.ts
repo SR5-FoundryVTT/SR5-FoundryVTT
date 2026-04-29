@@ -6,7 +6,7 @@ import { SkillItemFlow } from '@/module/item/flows/SkillItemFlow';
 import { SR5TestFactory } from 'src/unittests/utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { ImportHelper as IH } from '@/module/apps/itemImport/helper/ImportHelper';
-import { CharacterImporter as CI, importOptionsType } from '../../module/apps/actorImport/characterImporter/CharacterImporter';
+import { CharacterImporter as CI, ImportOptionsType } from '../../module/apps/actorImport/characterImporter/CharacterImporter';
 
 export const characterImporterTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -32,7 +32,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
         spells: true,
         vehicles: true,
         weapons: true,
-    } satisfies importOptionsType;
+    } satisfies ImportOptionsType;
 
     describe('Character Importer', () => {
         it('Should import a chummer character', async () => {

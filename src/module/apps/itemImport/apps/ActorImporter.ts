@@ -1,4 +1,4 @@
-import { CharacterImporter } from "../../actorImport/characterImporter/CharacterImporter";
+import { CharacterImporter, ImportOptionsType } from "../../actorImport/characterImporter/CharacterImporter";
 import { SpiritImporter } from "../../actorImport/spiritImporter/SpiritImporter";
 import { SpriteImporter } from "../../actorImport/spriteImporter/SpriteImporter";
 import { ActorFile, ActorSchema } from "../../actorImport/ActorSchema";
@@ -112,14 +112,14 @@ export class ActorImporter extends BaseClass {
             armor: getCheckboxValue('input[data-field="armor"]'),
             contacts: getCheckboxValue('input[data-field="contacts"]'),
             cyberware: getCheckboxValue('input[data-field="cyberware"]'),
-            gear: getCheckboxValue('input[data-field="gear"]'),
+            equipment: getCheckboxValue('input[data-field="equipment"]'),
             lifestyles: getCheckboxValue('input[data-field="lifestyles"]'),
             powers: getCheckboxValue('input[data-field="powers"]'),
             qualities: getCheckboxValue('input[data-field="qualities"]'),
             spells: getCheckboxValue('input[data-field="spells"]'),
             vehicles: getCheckboxValue('input[data-field="vehicles"]'),
             weapons: getCheckboxValue('input[data-field="weapons"]'),
-        };
+        } satisfies ImportOptionsType;
 
         // Log everything for now (replace with actual import logic)
         console.log("Parsed Chummer Data:", actorData);

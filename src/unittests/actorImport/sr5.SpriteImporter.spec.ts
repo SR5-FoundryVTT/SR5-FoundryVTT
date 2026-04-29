@@ -5,7 +5,7 @@ import { SR5TestFactory } from 'src/unittests/utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { CompanionSprite } from './Examples/CompanionSprite';
 import { SpriteImporter } from '../../module/apps/actorImport/spriteImporter/SpriteImporter';
-import { importOptionsType } from '@/module/apps/actorImport/characterImporter/CharacterImporter';
+import { ImportOptionsType } from '@/module/apps/actorImport/characterImporter/CharacterImporter';
 
 export const spriteImporterTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -30,7 +30,7 @@ export const spriteImporterTesting = (context: QuenchBatchContext) => {
         spells: true,
         vehicles: true,
         weapons: true,
-    } satisfies importOptionsType;
+    } satisfies ImportOptionsType;
 
     describe('Chummer Sprite Importer', () => {
         it('Should import a chummer character', async () => {

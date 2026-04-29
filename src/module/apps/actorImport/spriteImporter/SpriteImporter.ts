@@ -1,7 +1,7 @@
 import { ItemsParser } from "../itemImporter/ItemsParser";
 import { SR5Actor } from "src/module/actor/SR5Actor";
 import { ActorSchema } from "../ActorSchema";
-import { importOptionsType } from "../characterImporter/CharacterImporter";
+import { ImportOptionsType } from "../characterImporter/CharacterImporter";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 import { DataDefaults } from "@/module/data/DataDefaults";
 
@@ -23,7 +23,7 @@ export class SpriteImporter {
      */
     static async import(
         chummerData: ActorSchema,
-        importOptions: importOptionsType
+        importOptions: ImportOptionsType
     ) {
         const sprite = {
             effects: [],

@@ -30,6 +30,7 @@ export interface Mod {
     subsystems?: {
         subsystem: Many<{ _TEXT: string; }>;
     };
+    useownattributesforweapon?: { _TEXT: "True"; };
     weaponmountcategories?: { _TEXT: string; };
     translate?: OneOrMany<{ _TEXT: string; }>;
     altpage?: OneOrMany<{ _TEXT: string; }>;

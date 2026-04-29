@@ -3220,6 +3220,7 @@
                     "AssaultCannon": "Sturmkanone",
                     "AssaultRifle": "Sturmgewehr",
                     "Bow": "Bogen",
+                    "Carbine": "Karabiner",
                     "Flamethrower": "Flammenwerfer",
                     "GrenadeLauncher": "Granatwerfer",
                     "HarpoonGun": "Harpunengewehr",
@@ -3242,6 +3243,7 @@
                     "Shuriken": "Shuriken",
                     "SniperRifle": "Scharfschützengewehr",
                     "SportingRifle": "Sportgewehr",
+                    "SprayPen": "Sprühstift",
                     "StandardThrownGrenade": "Standard-Granate",
                     "Taser": "Taser",
                     "ThrownKnife": "Wurfmesser"
