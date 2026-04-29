@@ -272,17 +272,16 @@ export class BulkImporter extends BaseClass {
         }
 
         // Lock all compendiums and update compendium order
-        const compendiumList = game.settings.get(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder);
-        for (const compendium of Object.values(Constants.MAP_COMPENDIUM_CONFIG)) {
+        const compendiumList = new Set(game.settings.get(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder));
+        for (const { pack } of Object.values(Constants.MAP_COMPENDIUM_CONFIG)) {
             // Lock compendium
-            await game.packs.get('world.' + compendium.pack)?.configure({ locked: true });
+            await game.packs.get(`world.${pack}`)?.configure({ locked: true });
 
             // Add to compendium order if not present
-            if (!compendiumList.includes(compendium.pack))
-                compendiumList.push('world.' + compendium.pack);
+            compendiumList.add(`world.${pack}`);
         }
 
-        await game.settings.set(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder, compendiumList);
+        await game.settings.set(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder, Array.from(compendiumList));
 
         // Finalize and notify
         ui.notifications?.warn("SR5.Warnings.BulkImportPerformanceWarning", { localize: true });
