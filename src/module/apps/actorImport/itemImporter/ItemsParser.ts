@@ -30,7 +30,7 @@ export class ItemsParser {
      * Prepares the parser by setting up icon files and caching compendium indexes for item lookup.
      */
     private async prepareParser() {
-        Parser.iconSet = await IconAssign.getIconFiles();
+        Parser.iconSet = await IconAssign.getIconFiles(true);
         const compendiumList = game.settings.get(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder);
 
         Parser.compendiumCache.clear();

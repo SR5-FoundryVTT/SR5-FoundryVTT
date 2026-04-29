@@ -49,7 +49,7 @@ export class IconAssign {
     /**
      * Get cached icon files, optionally not forcing a cache refresh.
      */
-    static async getIconFiles(forceRefresh = true): Promise<Set<string>> {
+    static async getIconFiles(forceRefresh = false): Promise<Set<string>> {
         if (forceRefresh) {
             IconAssign.iconFilesCache = null;
             IconAssign.iconFilesPromise = null;

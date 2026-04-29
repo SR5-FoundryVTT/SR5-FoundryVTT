@@ -234,7 +234,7 @@ export class BulkImporter extends BaseClass {
 
         // Configure shared importer settings
         DataImporter.overrideDocuments = BulkImporter.overrideDocuments;
-        DataImporter.iconSet = await IconAssign.getIconFiles();
+        DataImporter.iconSet = await IconAssign.getIconFiles(true);
 
         // Set total progress count
         BulkImporter.progress.total = BulkImporter.Importers.length;

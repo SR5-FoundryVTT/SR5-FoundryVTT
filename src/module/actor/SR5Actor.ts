@@ -134,7 +134,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         await super._preCreate(data, options, user);
 
         if (!data.img) {
-            const iconSet = await IconAssign.getIconFiles();
+            const iconSet = await IconAssign.getIconFiles(true);
             const assignedImage = IconAssign.iconAssign(iconSet, this.toObject());
             if (assignedImage && assignedImage !== this.img) {
                 this.updateSource({ img: assignedImage });

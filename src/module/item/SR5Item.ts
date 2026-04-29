@@ -71,7 +71,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         await super._preCreate(data, options, user);
 
         if (!data.img) {
-            const iconSet = await IconAssign.getIconFiles();
+            const iconSet = await IconAssign.getIconFiles(true);
             const assignedImage = IconAssign.iconAssign(iconSet, this.toObject());
             if (assignedImage) {
                 this.updateSource({ img: assignedImage });
