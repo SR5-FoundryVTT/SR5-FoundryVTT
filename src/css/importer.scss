@@ -496,14 +496,26 @@
 #importer-config-app {
   min-width: 700px;
   min-height: 300px;
+  max-height: calc(100vh - 80px);
   background-color: variables.$dark2; // Consistent background
   color: variables.$light;
+
+  .window-content {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    max-height: calc(100vh - 120px);
+    overflow: hidden;
+  }
 }
 
 #importer-source-config-form {
   height: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 
   footer {
     flex-shrink: 0;
@@ -525,11 +537,13 @@
 .importer-config-container {
   display: flex;
   flex-grow: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
 .importer-config-container .pane {
   flex: 1;
+  min-height: 0;
   padding: 10px;
   overflow-y: auto;
   border-top: 1px solid variables.$groove-color;

@@ -50,6 +50,7 @@ import { LinksHelpers } from '@/module/utils/links';
 import { CreateActorFlow } from './flows/CreateActorFlow';
 import { SkillNamingFlow } from '@/module/flows/SkillNamingFlow';
 import { SkillFieldType } from '../types/template/Skills';
+import { IconAssign } from '@/module/apps/iconAssigner/iconAssign';
 
 interface TypedItemMap extends Omit<Map<Item.ConfiguredSubType, SR5Item[]>, 'get' | 'set'> {
     get: <K extends Item.ConfiguredSubType>(key: K) => SR5Item<K>[] | undefined;
@@ -131,7 +132,15 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     override async _preCreate(data: Actor.CreateData, options: Actor.Database.PreCreateOptions, user: User.Implementation) {
         await super._preCreate(data, options, user);
-        
+
+        if (!data.img) {
+            const iconSet = await IconAssign.getIconFiles(true);
+            const assignedImage = IconAssign.iconAssign(iconSet, this.toObject());
+            if (assignedImage && assignedImage !== this.img) {
+                this.updateSource({ img: assignedImage });
+            }
+        }
+
         // Abort skill creation data injection when duplicating
         if (foundry.utils.getProperty(data, '_stats.duplicateSource')) return;
         // Abort if a skillset was already assigned (e.g. during Chummer import)

@@ -2,7 +2,7 @@ import JSZip from "jszip";
 import { Constants } from "../importer/Constants";
 import { ImportHelper } from "../helper/ImportHelper";
 import { SYSTEM_NAME, FLAGS } from "@/module/constants";
-import * as IconAssign from "../../iconAssigner/iconAssign";
+import { IconAssign } from "../../iconAssigner/iconAssign";
 
 import { ActionImporter } from "../importer/ActionImporter";
 import { AdeptPowerImporter } from "../importer/AdeptPowerImporter";
@@ -104,7 +104,6 @@ export class BulkImporter extends BaseClass {
     /**
      * UI and import behavior flags.
      */
-    private static setIcons = true;
     private static overrideDocuments = true;
     private static deleteCompendiums = false;
     private static isImporting = false;
@@ -156,7 +155,6 @@ export class BulkImporter extends BaseClass {
             ...baseContext,
 
             // UI and import state
-            icons: BulkImporter.setIcons,
             progress: {
                 message: BulkImporter.progress.message,
                 pct: (BulkImporter.progress.idx / BulkImporter.progress.total * 100).toFixed(0),
@@ -236,7 +234,7 @@ export class BulkImporter extends BaseClass {
 
         // Configure shared importer settings
         DataImporter.overrideDocuments = BulkImporter.overrideDocuments;
-        DataImporter.iconSet = BulkImporter.setIcons ? await IconAssign.getIconFiles() : null;
+        DataImporter.iconSet = await IconAssign.getIconFiles(true);
 
         // Set total progress count
         BulkImporter.progress.total = BulkImporter.Importers.length;
@@ -274,17 +272,16 @@ export class BulkImporter extends BaseClass {
         }
 
         // Lock all compendiums and update compendium order
-        const compendiumList = game.settings.get(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder);
-        for (const compendium of Object.values(Constants.MAP_COMPENDIUM_CONFIG)) {
+        const compendiumList = new Set(game.settings.get(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder));
+        for (const { pack } of Object.values(Constants.MAP_COMPENDIUM_CONFIG)) {
             // Lock compendium
-            await game.packs.get('world.' + compendium.pack)?.configure({ locked: true });
+            await game.packs.get(`world.${pack}`)?.configure({ locked: true });
 
             // Add to compendium order if not present
-            if (!compendiumList.includes(compendium.pack))
-                compendiumList.push('world.' + compendium.pack);
+            compendiumList.add(`world.${pack}`);
         }
 
-        await game.settings.set(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder, compendiumList);
+        await game.settings.set(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder, Array.from(compendiumList));
 
         // Finalize and notify
         ui.notifications?.warn("SR5.Warnings.BulkImportPerformanceWarning", { localize: true });
@@ -311,9 +308,6 @@ export class BulkImporter extends BaseClass {
 
         // Checkbox: Assign icons
         const setIcon = this.element.querySelector<HTMLSelectElement>("#setIcon");
-        setIcon?.addEventListener("change", (event) => {
-            BulkImporter.setIcons = (event.currentTarget as HTMLInputElement).checked;
-        });
 
         // Checkbox: Delete compendiums before import
         const deleteCompendiums = this.element.querySelector<HTMLSelectElement>("#deleteCompendiums");
