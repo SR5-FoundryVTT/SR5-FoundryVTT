@@ -18,9 +18,9 @@ export const MatrixAttribute = new StringField({
     choices: SR5.matrixAttributes,
 });
 
-export const BaseValuePair = () => ({
-    value: new NumberField({required: true, nullable: false, integer: true, initial: 0}),
-    base: new NumberField({required: true, nullable: false, integer: true, initial: 0}),
+export const BaseValuePair = ({ integer = true } = {}) => ({
+    value: new NumberField({required: true, nullable: false, integer, initial: 0}),
+    base: new NumberField({required: true, nullable: false, integer, initial: 0}),
 });
 
 export const ValueMaxPair = () => ({
@@ -47,13 +47,13 @@ const ChangeEntry = () => ({
 
 export const ChangeList = () => new ArrayField(new SchemaField(ChangeEntry()));
 
-export const ModifiableValueSchema = () => ({
-    ...BaseValuePair(),
+export const ModifiableValueSchema = ({ integer = true } = {}) => ({
+    ...BaseValuePair({ integer }),
     changes: new ArrayField(new SchemaField(ChangeEntry())),
 });
 
 export const ModifiableValueLinked = () => ({
-    ...ModifiableValueSchema(),
+    ...ModifiableValueSchema({ integer: false }),
     attribute: new StringField({ required: true }),
     base_formula_operator: new StringField({
         required: false,
