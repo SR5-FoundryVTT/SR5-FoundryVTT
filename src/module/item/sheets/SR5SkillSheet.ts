@@ -28,8 +28,6 @@ interface SR5SkillSheetData extends SR5BaseItemSheetData {
     showCompendiumWarning: boolean
     // Whether the skill attribute can be edited, based on the skill category.
     canEditSkillAttribute: boolean
-    // Whether the skill defaulting can be edited, based on the skill category.
-    canEditSkillDefaulting: boolean
     // Whether the skill can be native, based on the skill category.
     canBeNative: boolean
     // Taken directly from an owning actor to show the derived value.
@@ -134,7 +132,6 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
         // Default skill-set actor type is only meaningful for compendium-stored skill items.
         context.showCompendiumWarning = !this.document.pack;
         context.canEditSkillAttribute = this.canEditSkillAttribute();
-        context.canEditSkillDefaulting = this.canEditSkillDefaulting();
         context.canBeNative = this.canBeNative();
         context.skillValue = this.getActorSkillValue();
         context.hasSkillValue = context.skillValue !== undefined;
@@ -176,11 +173,6 @@ export class SR5SkillSheet<T extends SR5SkillSheetData = SR5SkillSheetData> exte
     }
 
     canEditSkillAttribute() {
-        if (this.document.system.type !== 'skill') return true;
-        return !SkillRules.fixedCategoryValues(this.document.system.skill.category);
-    }
-
-    canEditSkillDefaulting() {
         if (this.document.system.type !== 'skill') return true;
         return !SkillRules.fixedCategoryValues(this.document.system.skill.category);
     }
