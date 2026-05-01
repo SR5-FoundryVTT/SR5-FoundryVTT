@@ -32,7 +32,5 @@ export const UpdateSkillFlow = {
                 changeData['system.skill.attribute'] = SkillRules.languageSkillAttribute();
                 break;
         }
-
-        changeData['system.skill.defaulting'] = false;
     },
 };

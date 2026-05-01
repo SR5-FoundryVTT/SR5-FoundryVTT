@@ -22,7 +22,7 @@
         <label data-tooltip="{{systemFields.skill.fields.defaulting.hint}}">
             {{localize "SR5.CanDefault"}}
             {{formInput systemFields.skill.fields.defaulting value=source.system.skill.defaulting
-                        rootId=@root.rootId disabled=(or @root.isPlayMode (not @root.canEditSkillDefaulting))}}
+                        rootId=@root.rootId disabled=@root.isPlayMode}}
         </label>
         {{#if (and @root.canBeNative systemFields.skill.fields.language)}}
             <label data-tooltip="{{systemFields.skill.fields.language.fields.isNative.hint}}">
