@@ -10,8 +10,7 @@ export const UpdateSkillFlow = {
      * Applies category-specific skill defaults before the document change is stored.
      *
      * Knowledge and language skills derive their attribute from category metadata
-     * and do not allow defaulting, so both values are enforced here for create and
-     * update lifecycles.
+     * so attribute is enforced here for create and update lifecycles.
      *
      * @param changeData The pending create or update payload.
      * @param item The skill item providing existing context for omitted fields.
