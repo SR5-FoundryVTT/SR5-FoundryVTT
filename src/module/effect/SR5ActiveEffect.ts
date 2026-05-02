@@ -259,7 +259,7 @@ export class SR5ActiveEffect extends ActiveEffect {
             return undefined;
         }
 
-        // In case of non-existant change.key targets, catch errors and log it, but still allow the overall process to continue.
+        // In case of non-existent change.key targets, catch errors and log it, but still allow the overall process to continue.
         // An example could be applying test effect changes, and a single misconfigured effect change shouldn't stop the test dialog 
         // from showing up.
         try {
