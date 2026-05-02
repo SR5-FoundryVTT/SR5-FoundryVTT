@@ -56,13 +56,12 @@ export const SkillFieldPrep = {
     createSkillField(skill: SR5Item<'skill'>) {
             const key = SkillNamingFlow.nameToKey(skill.name) || skill.id!;
             const group = skill.system.skill.group;
-            const hasCustomImage = skill.img && skill.img !== 'icons/svg/item-bag.svg';
 
             const skillField = DataDefaults.createData('skill_field', {
                 id: skill.id,
                 key,
                 name: skill.name,
-                img: hasCustomImage ? skill.img : '',
+                img: skill.img,
                 label: SkillNamingFlow.localizeSkillName(skill.name),
                 base: skill.system.skill.rating,
                 description: skill.system.description.value,

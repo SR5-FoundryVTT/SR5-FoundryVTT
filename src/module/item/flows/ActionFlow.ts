@@ -9,6 +9,7 @@ import { ModifiableValue } from "../../mods/ModifiableValue";
 import { Translation } from "../../utils/strings";
 import { DamageType } from "src/module/types/item/Action";
 import { ModifiableValueLinkedType } from "src/module/types/template/Base";
+import { SkillNamingFlow } from "@/module/flows/SkillNamingFlow";
 
 export class ActionFlow {
     /**
@@ -123,11 +124,12 @@ export class ActionFlow {
         //        the major use case is owned items, where the actor is available.
         const activeSkills = actor.getActiveSkills();
 
-        // Convert skill data to a value label mapping.
+        // Convert skill data to a canonical key -> label mapping so effect skill filters
+        // persist the same skill identifiers that tests use internally.
         const skills: Record<string, Translation> = {};
         for (const [id, skill] of Object.entries(activeSkills)) {
-            const key = skill.name || id;
-            const label = skill.name;
+            const key = id;
+            const label = skill.name || id;
             skills[key] = label as Translation;
         }
 
@@ -152,6 +154,7 @@ export class ActionFlow {
 
         const foundCustomSkill = Object.values(skills).some(name => name === skillName);
         if (foundCustomSkill) return;
-        if (skillName && !skills[skillName]) skills[skillName] = skillName as Translation;
+        const skillKey = SkillNamingFlow.nameToKey(skillName);
+        if (skillName && !skills[skillKey]) skills[skillKey] = skillName as Translation;
     }
 }

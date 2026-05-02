@@ -95,7 +95,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         const skills = effect.system.selection_skills.map(test => test.id);
         const skillId = this.test.data.action.skill;
         const skillName = this.test.actor?.getSkill(skillId)?.name || skillId;
-        if (skills.length > 0 && !skills.includes(skillName)) return true;
+        if (skills.length > 0 && !skills.includes(skillId) && !skills.includes(skillName)) return true;
 
         // Check for test attributes used.
         const attributes = effect.system.selection_attributes.map(test => test.id);
