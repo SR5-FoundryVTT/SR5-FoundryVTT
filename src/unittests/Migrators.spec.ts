@@ -247,6 +247,39 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.isFalse(migrator.handlesActiveEffect(effect));
         });
 
+        it('does not migrate non-ModifiableValue terminal .mod keys', () => {
+            const migrator = new Version0_33_1();
+            const effect = {
+                changes: [
+                    { key: 'data.action.mod' },
+                    { key: 'data.action.opposed.mod' },
+                    { key: 'data.action.opposed.resist.mod' },
+                    { key: 'data.action.followed.mod' },
+                    { key: 'system.action.mod' },
+                    { key: 'system.action.opposed.mod' },
+                    { key: 'system.action.opposed.resist.mod' },
+                    { key: 'system.action.followed.mod' },
+                    { key: 'system.armor.mod' },
+                ],
+            };
+
+            assert.isFalse(migrator.handlesActiveEffect(effect));
+
+            migrator.migrateActiveEffect(effect);
+
+            assert.deepEqual(effect.changes.map(change => change.key), [
+                'data.action.mod',
+                'data.action.opposed.mod',
+                'data.action.opposed.resist.mod',
+                'data.action.followed.mod',
+                'system.action.mod',
+                'system.action.opposed.mod',
+                'system.action.opposed.resist.mod',
+                'system.action.followed.mod',
+                'system.armor.mod',
+            ]);
+        });
+
         it('migrates legacy test data.modifiers keys to data.pool', () => {
             const migrator = new Version0_33_1();
             const effect = {
@@ -275,10 +308,18 @@ export const Migrators = (context: QuenchBatchContext) => {
                 system: { applyTo: 'actor' },
                 changes: [
                     { key: 'data.modifiers' },
+                    { key: 'data.modifiers.mod' },
                 ],
             };
 
             assert.isFalse(migrator.handlesActiveEffect(effect));
+
+            migrator.migrateActiveEffect(effect);
+
+            assert.deepEqual(effect.changes.map(change => change.key), [
+                'data.modifiers',
+                'data.modifiers.mod',
+            ]);
         });
     });
 
