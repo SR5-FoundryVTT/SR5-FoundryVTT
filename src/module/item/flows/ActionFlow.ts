@@ -123,11 +123,12 @@ export class ActionFlow {
         //        the major use case is owned items, where the actor is available.
         const activeSkills = actor.getActiveSkills();
 
-        // Convert skill data to a value label mapping.
+        // Convert skill data to a canonical key -> label mapping so effect skill filters
+        // persist the same skill identifiers that tests use internally.
         const skills: Record<string, Translation> = {};
         for (const [id, skill] of Object.entries(activeSkills)) {
-            const key = skill.name || id;
-            const label = skill.name;
+            const key = id;
+            const label = skill.name || id;
             skills[key] = label as Translation;
         }
 
