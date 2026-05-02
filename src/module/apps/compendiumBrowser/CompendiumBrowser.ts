@@ -1,5 +1,6 @@
 import { LinksHelpers } from "@/module/utils/links";
 import { FLAGS, SYSTEM_NAME } from "@/module/constants";
+import { getFuzzyMatches, FuzzySearchOptions } from "@/module/utils/fuzzySearch";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
@@ -43,6 +44,8 @@ export namespace CompendiumBrowserTypes {
     export interface SearchFilters<DocType extends CompendiumCollection.DocumentName> {
         /** An optional string to filter by name. */
         queryName?: string;
+        /** Optional fuzzy matching options for queryName matching. */
+        fuzzyOptions?: FuzzySearchOptions;
         /** An optional array of document subtypes (e.g., ["weapon", "spell"]). */
         types?: (typeof foundry.documents)[DocType]["TYPES"][];
         /** An optional array of pack collections (e.g., ["shadowrun5e.core-items"]) to explicitly include. */
@@ -55,6 +58,7 @@ export namespace CompendiumBrowserTypes {
     export type SearchResult<DocType extends CompendiumCollection.DocumentName> = 
         CompendiumCollection.IndexEntry<DocType> & {
             sourcePack: string;
+            score: number;
         };
 }
 
@@ -134,7 +138,7 @@ export class CompendiumBrowser extends BaseClass {
         docType: DocType,
         filter: CompendiumBrowserTypes.SearchFilters<DocType>,
     ): Promise<CompendiumBrowserTypes.SearchResult<DocType>[]> {
-        const { queryName, types, packs } = filter;
+        const { queryName, fuzzyOptions, types, packs } = filter;
 
         const activePacks = game.packs.filter(
             (p) =>
@@ -148,15 +152,19 @@ export class CompendiumBrowser extends BaseClass {
             return [...index.values()].map((entry) => ({ ...entry, sourcePack: packCollection }));
         });
 
-        if (queryName) {
-            const query = queryName.toLowerCase();
-            entries = entries.filter((i) => !("name" in i) || i.name?.toLowerCase().includes(query));
-        }
-
         if (types && types.length > 0)
             entries = entries.filter((e) => !("type" in e && typeof e.type === "string") || types.includes(e.type as any));
 
-        return entries;
+        if (queryName) {
+            return getFuzzyMatches(
+                entries,
+                queryName,
+                entry => ("name" in entry && typeof entry.name === "string") ? entry.name : "",
+                fuzzyOptions,
+            ).map(match => ({ ...match.item, score: match.score }));
+        }
+
+        return entries.map(entry => ({ ...entry, score: 0 }));
     }
 
     /**
@@ -415,9 +423,13 @@ export class CompendiumBrowser extends BaseClass {
         );
 
         entries = entries.map(entry => ({
-            ...entry, sourcePack: game.packs.get(entry.sourcePack)!.title,
+            ...entry,
+            sourcePack: game.packs.get(entry.sourcePack)!.title,
             type: game.i18n.localize(`TYPES.${this.activeTab}.${entry.type}`),
-        })).sort((a, b) => a.name!.localeCompare(b.name!, game.i18n.lang));
+        })).sort((left, right) =>
+            right.score - left.score ||
+            (left.name ?? "").localeCompare(right.name ?? "", game.i18n.lang),
+        );
 
         this.scrollState.entries = entries;
         this.scrollState.throttle = false;
@@ -544,9 +556,9 @@ export class CompendiumBrowser extends BaseClass {
 
         // Filter by search query
         if (this._searchQuery) {
-            packs = packs.filter(({ pack }) =>
-                pack.metadata.label.toLowerCase().includes(this._searchQuery.toLowerCase()),
-            );
+            const matches = getFuzzyMatches(packs, this._searchQuery, ({ pack }) => pack.metadata.label);
+            const matchingPacks = new Set(matches.map(match => match.item));
+            packs = packs.filter(pack => matchingPacks.has(pack));
         }
         return packs;
     }

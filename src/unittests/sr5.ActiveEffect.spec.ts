@@ -864,6 +864,30 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             assert.strictEqual(test.pool.value, 0);
         });
+
+        it('Should apply skill-filtered modifiers for canonical keys and legacy skill names', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            await actor.createEmbeddedDocuments('ActiveEffect', [
+                {
+                    name: 'Skill Effect',
+                    system: { applyTo: 'test_all', selection_skills: [{ value: 'Sneaking', id: 'sneaking' }] },
+                    changes: [{ key: 'data.pool', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+                }                
+            ]);
+
+            const action = DataDefaults.createData('action_roll', {
+                test: SkillTest.name,
+                skill: 'sneaking',
+                attribute: 'agility',
+            });
+            const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SkillTest;
+            if (!test) throw new Error('Failed to create test from action.');
+
+            test.effects.applyAllEffects();
+            ModifiableValue.calcTotal(test.pool);
+
+            assert.strictEqual(test.pool.value, 1); // 2 - 1 (defaulted skill)
+        });
     });
 
     /**

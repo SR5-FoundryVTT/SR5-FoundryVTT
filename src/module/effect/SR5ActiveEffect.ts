@@ -261,7 +261,15 @@ export class SR5ActiveEffect extends ActiveEffect {
             return undefined;
         }
 
-        return super.apply(object, change);
+        // In case of non-existent change.key targets, catch errors and log it, but still allow the overall process to continue.
+        // An example could be applying test effect changes, and a single misconfigured effect change shouldn't stop the test dialog 
+        // from showing up.
+        try {
+            return super.apply(object, change);
+        } catch (err) {
+            console.error(`Test [${object.constructor.name}] | Failed to apply active effect change for ${change.key}: "${change.value}"`, err);
+            return undefined;
+        }
     }
 
     /**
