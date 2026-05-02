@@ -2,6 +2,7 @@ import * as BC from "./BonusConstant";
 import { Constants } from "../importer/Constants";
 import { BonusSchema } from "../schema/BonusSchema";
 import { ImportHelper as IH } from "./ImportHelper";
+import { SkillNamingFlow } from "@/module/flows/SkillNamingFlow";
 
 export class BonusHelper {
     private static isTrue(value: "" | { _TEXT: string }): boolean {
@@ -34,7 +35,7 @@ export class BonusHelper {
     }
 
     private static normalizeSkillName(rawName: string): string {
-        return rawName.trim().toLowerCase().replace(/[\s-]/g, '_');
+        return SkillNamingFlow.nameToKey(rawName);
     }
 
     private static createEffect(
@@ -130,14 +131,14 @@ export class BonusHelper {
         if (bonus.limitmodifier) {
             for (const limitModifier of IH.getArray(bonus.limitmodifier)) {
                 const name = limitModifier.limit._TEXT;
-                const normalName = name.replace(' ', "_").toLowerCase();
+                const key = SkillNamingFlow.nameToKey(name);
                 const conditionTag = limitModifier.condition ? "*" : "";
 
                 this.createEffect(
                     sheet, {
                         name: sheet.name + conditionTag,
                         changes: [{ key: "data.limit", value: limitModifier.value._TEXT }],
-                        system: { applyTo: 'test_all', selection_limits: [{ value: name, id: normalName }] }
+                        system: { applyTo: 'test_all', selection_limits: [{ value: name, id: key }] }
                     }
                 );
             }
@@ -145,14 +146,14 @@ export class BonusHelper {
 
         if (bonus.skillattribute) {
             for (const skill of IH.getArray(bonus.skillattribute)) {
-                const name = Constants.attributeTable[skill.name._TEXT];
+                const key = Constants.attributeTable[skill.name._TEXT];
                 const conditionTag = skill.condition ? "*" : "";
 
                 this.createEffect(
                     sheet, {
                         name: sheet.name + conditionTag,
-                        changes: [{ key: "data.modifiers", value: skill.bonus._TEXT }],
-                        system: { applyTo: 'test_all', selection_attributes: [{ value: name.capitalize(), id: name }] }
+                        changes: [{ key: "data.pool", value: skill.bonus._TEXT }],
+                        system: { applyTo: 'test_all', selection_attributes: [{ value: key.capitalize(), id: key }] }
                     }
                 );
             }
@@ -174,7 +175,7 @@ export class BonusHelper {
                     this.createEffect(
                         sheet, {
                             name: sheet.name + conditionTag,
-                            changes: [{ key: "data.modifiers", value: skillCategory.bonus._TEXT }],
+                            changes: [{ key: "data.pool", value: skillCategory.bonus._TEXT }],
                             system: { applyTo: 'test_all', selection_skills: skills }
                         }
                     );
@@ -194,7 +195,7 @@ export class BonusHelper {
                 this.createEffect(
                     sheet, {
                         name: sheet.name + conditionTag,
-                        changes: [{ key: "data.modifiers", value: skillGroup.bonus._TEXT }],
+                        changes: [{ key: "data.pool", value: skillGroup.bonus._TEXT }],
                         system: { applyTo: 'test_all', selection_skills: skills }
                     }
                 );
@@ -220,14 +221,14 @@ export class BonusHelper {
         if (bonus.specificskill) {
             for (const skill of IH.getArray(bonus.specificskill)) {
                 const name = skill.name._TEXT;
-                const normalName = this.normalizeSkillName(name);
+                const key = this.normalizeSkillName(name);
                 const conditionTag = skill.condition ? "*" : "";
 
                 this.createEffect(
                     sheet, {
                         name: sheet.name + conditionTag,
-                        changes: [{ key: "data.modifiers", value: skill.bonus._TEXT }],
-                        system: { applyTo: 'test_all', selection_skills: [{ value: name, id: normalName }] }
+                        changes: [{ key: "data.pool", value: skill.bonus._TEXT }],
+                        system: { applyTo: 'test_all', selection_skills: [{ value: name, id: key }] }
                     }
                 );
             }

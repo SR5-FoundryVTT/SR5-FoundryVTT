@@ -4,6 +4,7 @@ import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SkillGroupFlow } from '@/module/actor/flows/SkillGroupFlow';
 import { SkillSetFlow } from '@/module/actor/flows/SkillSetFlow';
 import { SkillSelectionFlow } from '@/module/flows/SkillSelectionFlow';
+import { ActionFlow } from '@/module/item/flows/ActionFlow';
 import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
 import { SR5Item } from '@/module/item/SR5Item';
 import { SR5TestFactory } from './utils';
@@ -822,6 +823,27 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             assert.exists(actionByKey);
             assert.strictEqual(actionByName?.skill, 'heavy_weapons');
             assert.strictEqual(actionByKey?.skill, 'heavy_weapons');
+        });
+
+        it('returns canonical skill keys for active effect skill selectors', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+
+            await actor.createEmbeddedDocuments('Item', [{
+                type: 'skill',
+                name: 'Heavy Weapons',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        attribute: 'agility',
+                    },
+                },
+            }]);
+
+            const skills = ActionFlow.sortedActiveSkills(actor);
+
+            assert.property(skills, 'heavy_weapons');
+            assert.strictEqual(skills.heavy_weapons, 'Heavy Weapons');
+            assert.notProperty(skills, 'Heavy Weapons');
         });
     });
 };

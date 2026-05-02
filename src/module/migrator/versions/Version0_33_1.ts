@@ -39,7 +39,7 @@ export class Version0_33_1 extends VersionMigration {
     readonly TargetVersion = "0.33.1";
     override handlesActiveEffect(_effect: Readonly<unknown>): boolean {
         const effect = _effect as MigratingActiveEffect;
-        //
+
         // B) Some test effects referenced the legacy test modifier field.
         if (Version0_33_1.EffectUsesLegacyTestModifierKey(effect)) return true;
 
