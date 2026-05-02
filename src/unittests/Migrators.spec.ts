@@ -2,6 +2,7 @@ import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { SR5TestFactory } from './utils';
 import { DataDefaults } from '@/module/data/DataDefaults';
 import { Migrator } from '@/module/migrator/Migrator';
+import { Version0_33_1 } from '@/module/migrator/versions/Version0_33_1';
 
 export const Migrators = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -203,6 +204,81 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(foundry.utils.getProperty(knowledge, 'system.skill.category'), 'knowledge');
             assert.strictEqual(foundry.utils.getProperty(knowledge, 'system.skill.knowledgeType'), 'street');
             assert.deepEqual(foundry.utils.getProperty(source, 'system.skills'), {});
+        });
+    });
+
+    describe('Version0_33_1 active effect key migration', () => {
+        it('migrates terminal legacy .mod keys to .changes only', () => {
+            const migrator = new Version0_33_1();
+            const effect = {
+                changes: [
+                    { key: 'system.attributes.body.mod' },
+                    { key: 'system.attributes.body.mods' },
+                    { key: 'system.skills.active.pistols.mods' },
+                    { key: 'system.modifiers.global' },
+                    { key: 'system.foo.mod.bar' },
+                    { key: 'system.foo.mods.bar' },
+                ],
+            };
+
+            assert.isTrue(migrator.handlesActiveEffect(effect));
+
+            migrator.migrateActiveEffect(effect);
+
+            assert.deepEqual(effect.changes.map(change => change.key), [
+                'system.attributes.body.changes',
+                'system.attributes.body.mods',
+                'system.skills.active.pistols.mods',
+                'system.modifiers.global',
+                'system.foo.mod.bar',
+                'system.foo.mods.bar',
+            ]);
+        });
+
+        it('ignores keys where .mod is not the terminal segment', () => {
+            const migrator = new Version0_33_1();
+            const effect = {
+                changes: [
+                    { key: 'system.modifiers.value' },
+                    { key: 'system.foo.mod.bar' },
+                ],
+            };
+
+            assert.isFalse(migrator.handlesActiveEffect(effect));
+        });
+
+        it('migrates legacy test data.modifiers keys to data.pool', () => {
+            const migrator = new Version0_33_1();
+            const effect = {
+                system: { applyTo: 'test_all' },
+                changes: [
+                    { key: 'data.modifiers' },
+                    { key: 'data.modifiers.mod' },
+                    { key: 'data.threshold' },
+                ],
+            };
+
+            assert.isTrue(migrator.handlesActiveEffect(effect));
+
+            migrator.migrateActiveEffect(effect);
+
+            assert.deepEqual(effect.changes.map(change => change.key), [
+                'data.pool',
+                'data.pool',
+                'data.threshold',
+            ]);
+        });
+
+        it('does not migrate data.modifiers for non-test effects', () => {
+            const migrator = new Version0_33_1();
+            const effect = {
+                system: { applyTo: 'actor' },
+                changes: [
+                    { key: 'data.modifiers' },
+                ],
+            };
+
+            assert.isFalse(migrator.handlesActiveEffect(effect));
         });
     });
 
