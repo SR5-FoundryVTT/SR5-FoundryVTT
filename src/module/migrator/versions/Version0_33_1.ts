@@ -22,16 +22,29 @@ export class Version0_33_1 extends VersionMigration {
     private static readonly LegacyModifiableValueKeyPattern = /\.mod$/;
     private static readonly LegacyTestModifierKeyPattern = /^data\.modifiers(?:\.mod)?$/;
     private static readonly ModernTestPoolKey = 'data.pool';
+    private static readonly NonModifiableLegacyKeyPaths = new Set([
+        'data.action.mod',
+        'data.action.opposed.mod',
+        'data.action.opposed.resist.mod',
+        'data.action.followed.mod',
+        'data.modifiers.mod',
+        'system.action.mod',
+        'system.action.opposed.mod',
+        'system.action.opposed.resist.mod',
+        'system.action.followed.mod',
+        'system.armor.mod',
+        'data.modifiers.mod'
+    ]);
 
     readonly TargetVersion = "0.33.1";
     override handlesActiveEffect(_effect: Readonly<unknown>): boolean {
         const effect = _effect as MigratingActiveEffect;
 
-        // A) Some changes referenced a legacy ModifiableValue schema suffix.
-        if (effect.changes?.some(change => Version0_33_1.LegacyModifiableValueKeyPattern.test(change.key))) return true;
-
         // B) Some test effects referenced the legacy test modifier field.
         if (Version0_33_1.EffectUsesLegacyTestModifierKey(effect)) return true;
+
+        // A) Some changes referenced a legacy ModifiableValue schema suffix.
+        if (effect.changes?.some(change => Version0_33_1.IsLegacyModifiableValueKey(change.key))) return true;
 
         return false;
     }
@@ -51,7 +64,7 @@ export class Version0_33_1 extends VersionMigration {
         const migratingEffect = effect as MigratingActiveEffect;
 
         for (const change of migratingEffect.changes ?? []) {
-            if (Version0_33_1.LegacyModifiableValueKeyPattern.test(change.key)) {
+            if (Version0_33_1.IsLegacyModifiableValueKey(change.key)) {
                 change.key = change.key.replace(Version0_33_1.LegacyModifiableValueKeyPattern, '.changes');
             }
         }
@@ -77,6 +90,11 @@ export class Version0_33_1 extends VersionMigration {
         if (!Version0_33_1.isTestScopedEffect(effect)) return false;
 
         return effect.changes?.some(change => Version0_33_1.LegacyTestModifierKeyPattern.test(change.key)) ?? false;
+    }
+
+    private static IsLegacyModifiableValueKey(key: string): boolean {
+        return Version0_33_1.LegacyModifiableValueKeyPattern.test(key)
+            && !Version0_33_1.NonModifiableLegacyKeyPaths.has(key);
     }
 
     private static isTestScopedEffect(effect: MigratingActiveEffect): boolean {
