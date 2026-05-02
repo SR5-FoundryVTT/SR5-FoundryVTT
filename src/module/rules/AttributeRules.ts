@@ -19,7 +19,8 @@ export class AttributeRules {
         names: readonly string[],
         source: SR5Actor | SR5Item,
         rollData: SR5Actor['system'] | SR5Item['system'],
-        options: { bigger: boolean }) {
+        options: { bigger: boolean }
+    ) {
         const targetAttributes = rollData.attributes;
         if (targetAttributes) {
             for (const name of names) {
@@ -75,5 +76,5 @@ export class AttributeRules {
         'body': 'willpower',
         'reaction': 'intuition',
         'strength': 'charisma',
-    }
+    } as const;
 }

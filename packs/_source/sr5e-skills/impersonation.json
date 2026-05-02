@@ -1,0 +1,63 @@
+{
+  "name": "Impersonation",
+  "type": "skill",
+  "img": "systems/shadowrun5e/dist/icons/skills/social-impersonation.svg",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": ""
+    },
+    "importFlags": null,
+    "type": "skill",
+    "skill": {
+      "category": "active",
+      "rating": 0,
+      "defaulting": true,
+      "attribute": "charisma",
+      "specializations": [],
+      "group": "",
+      "requirement": "mundane",
+      "action": {
+        "opposed": {
+          "type": "",
+          "test": "OpposedTest",
+          "description": "",
+          "mod": 0,
+          "skill": "perception",
+          "attribute": "intuition",
+          "attribute2": "",
+          "armor": false,
+          "resist": {
+            "test": "",
+            "skill": "",
+            "attribute": "",
+            "attribute2": "",
+            "armor": false,
+            "mod": 0
+          }
+        }
+      },
+      "language": {
+        "isNative": false
+      },
+      "knowledgeType": null
+    },
+    "group": {
+      "skills": [],
+      "rating": 0
+    },
+    "set": {
+      "skills": [],
+      "groups": []
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "JMZYDkpk1IbuFyx0",
+  "_key": "!items!JMZYDkpk1IbuFyx0"
+}

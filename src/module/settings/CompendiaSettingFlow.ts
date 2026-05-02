@@ -2,7 +2,7 @@ import { SYSTEM_NAME } from '@/module/constants';
 import { SR5 } from '@/module/config';
 import { Translation } from '@/module/utils/strings';
 
-export type PackType = 'GeneralActionsPack' | 'MatrixActionsPack' | 'ICActionsPack';
+export type PackType = 'GeneralActionsPack' | 'MatrixActionsPack' | 'ICActionsPack' | 'SkillsPack' | 'SkillGroupsPack' | 'SkillSetsPack';
 
 export type PackSelectionConfig = {
     id: PackType;
@@ -11,8 +11,15 @@ export type PackSelectionConfig = {
         hint: Translation;
     }
     value: string;
-    choices: Record<string, any>;
+    choices: Record<string, string>;
 }
+
+export type PackSeparator = {
+    separator: true;
+    label: Translation;
+}
+
+export type PackConfigOrSeparator = PackSelectionConfig | PackSeparator;
 
 export const CompendiaSettingFlow = {
     /**
@@ -26,7 +33,8 @@ export const CompendiaSettingFlow = {
      */
     getPackSettingConfiguration(id: PackType): PackSelectionConfig {
         // get the active pack name
-        const packName = game.settings.get(SYSTEM_NAME, id) || SR5.packNames[id];
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const packName = (game.settings.get(SYSTEM_NAME, id) as string) || SR5.packNames[id];
 
         // Find all other compatible item packs
         const itemPacks = game.packs.filter(p => p.metadata.type === 'Item' && p.metadata.packageType !== 'system' && p.metadata.system === SYSTEM_NAME);
@@ -35,7 +43,7 @@ export const CompendiaSettingFlow = {
         const defaultPack = game.packs.find(p => p.metadata.name === SR5.packNames[id]);
 
         // Create an object for name/label pairs, starting empty.
-        const packChoices = {};
+        const packChoices: Record<string, string> = {};
 
         // If the default pack exists, add it to our choices.
         if (defaultPack) {
@@ -58,9 +66,10 @@ export const CompendiaSettingFlow = {
         return {
             id,
             field: {
-                label: `SR5.CompendiaSettings.${id}.label`,
-                hint: `SR5.CompendiaSettings.${id}.hint`,
+                label: `SR5.CompendiaSettings.${id}.label` as Translation,
+                hint: `SR5.CompendiaSettings.${id}.hint` as Translation,
             },
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             value: packName,
             choices: packChoices,
         }

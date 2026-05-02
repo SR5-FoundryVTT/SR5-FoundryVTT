@@ -36,7 +36,6 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         data.fireMode = {value: 0, defense: 0, label: ''};
         WeaponRangeTestBehavior.prepareData(this, data);
 
-
         return data;
     }
 

@@ -5,10 +5,11 @@ import { SR5 } from "../../config";
 import { SR5Item } from "../SR5Item";
 import { Helpers } from "../../helpers";
 import { SR5Actor } from "../../actor/SR5Actor";
-import { PartsList } from "../../parts/PartsList";
+import { ModifiableValue } from "../../mods/ModifiableValue";
 import { Translation } from "../../utils/strings";
 import { DamageType } from "src/module/types/item/Action";
 import { ModifiableValueLinkedType } from "src/module/types/template/Base";
+import { SkillNamingFlow } from "@/module/flows/SkillNamingFlow";
 
 export class ActionFlow {
     /**
@@ -28,10 +29,10 @@ export class ActionFlow {
             damage.source = ActionFlow._damageSource(actor, item);
 
         this._applyModifiableValue(damage, actor);
-        damage.value = Helpers.calcTotal(damage, { min: 0 });
+        damage.value = ModifiableValue.calcTotal(damage, { min: 0 });
 
         this._applyModifiableValue(damage.ap, actor);
-        damage.ap.value = Helpers.calcTotal(damage.ap, { min: 0 });
+        damage.ap.value = ModifiableValue.calcTotal(damage.ap, { min: 0 });
 
         return damage;
     }
@@ -48,20 +49,20 @@ export class ActionFlow {
         // Avoid altering base OR value fields and raising the resulting damage on multiple function calls.
         switch (value.base_formula_operator) {
             case "add":
-                PartsList.AddUniquePart(value.mod, attribute.label, attribute.value);
+                ModifiableValue.addUnique(value, attribute.label, attribute.value);
                 break;
             case "subtract":
-                PartsList.AddUniquePart(value.mod, attribute.label, -attribute.value);
+                ModifiableValue.addUnique(value, attribute.label, -attribute.value);
                 break;
             case "multiply":
-                PartsList.AddUniquePart(value.mod, 'SR5.Value', (value.base * attribute.value) - value.base);
+                ModifiableValue.addUnique(value, 'SR5.Value', (value.base * attribute.value) - value.base);
                 break;
             case "divide": {
                 // Remove base from value by modifying.
-                PartsList.AddUniquePart(value.mod, 'SR5.BaseValue', value.base * -1);
+                ModifiableValue.addUnique(value, 'SR5.BaseValue', value.base * -1);
                 // Add division result as modifier on zero.
                 const denominator = attribute.value === 0 ? 1 : attribute.value;
-                PartsList.AddUniquePart(value.mod, 'SR5.Value', Math.floor(value.base / denominator));
+                ModifiableValue.addUnique(value, 'SR5.Value', Math.floor(value.base / denominator));
                 break;
             }
         }
@@ -123,11 +124,12 @@ export class ActionFlow {
         //        the major use case is owned items, where the actor is available.
         const activeSkills = actor.getActiveSkills();
 
-        // Convert skill data to a value label mapping.
+        // Convert skill data to a canonical key -> label mapping so effect skill filters
+        // persist the same skill identifiers that tests use internally.
         const skills: Record<string, Translation> = {};
         for (const [id, skill] of Object.entries(activeSkills)) {
-            const key = skill.name || id;
-            const label = skill.label || skill.name;
+            const key = id;
+            const label = skill.name || id;
             skills[key] = label as Translation;
         }
 
@@ -152,6 +154,7 @@ export class ActionFlow {
 
         const foundCustomSkill = Object.values(skills).some(name => name === skillName);
         if (foundCustomSkill) return;
-        if (skillName && !skills[skillName]) skills[skillName] = skillName as Translation;
+        const skillKey = SkillNamingFlow.nameToKey(skillName);
+        if (skillName && !skills[skillKey]) skills[skillKey] = skillName as Translation;
     }
 }

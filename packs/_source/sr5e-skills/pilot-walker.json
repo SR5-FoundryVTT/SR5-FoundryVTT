@@ -1,0 +1,43 @@
+{
+  "name": "Pilot Walker",
+  "type": "skill",
+  "img": "systems/shadowrun5e/dist/icons/skills/vehicle-pilot_walker.svg",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": ""
+    },
+    "importFlags": null,
+    "type": "skill",
+    "skill": {
+      "category": "active",
+      "rating": 0,
+      "defaulting": false,
+      "attribute": "reaction",
+      "specializations": [],
+      "group": "",
+      "requirement": "mundane",
+      "language": {
+        "isNative": false
+      },
+      "knowledgeType": null
+    },
+    "group": {
+      "skills": [],
+      "rating": 0
+    },
+    "set": {
+      "skills": [],
+      "groups": []
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "ohmti5YH6n8Jq7AT",
+  "_key": "!items!ohmti5YH6n8Jq7AT"
+}

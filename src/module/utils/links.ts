@@ -107,7 +107,7 @@ export class LinksHelpers {
 
         try {
             if (document instanceof JournalEntryPage && document.parent)
-                await document.parent.sheet?.render(true, { anchor, pageId: document.id });
+                await document.parent.sheet?.render(true, { anchor, pageId: document.id } as any);
             else if ("sheet" in document && document.sheet)
                 await document.sheet.render(true);
             else

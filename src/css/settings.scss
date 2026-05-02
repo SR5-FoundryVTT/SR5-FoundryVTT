@@ -1,0 +1,17 @@
+/**
+ * SCSS for any settings related styles found in the FoundryVTT settings UI for the system.
+ */
+@use "config/variables";
+
+.settings-separator {
+    margin: 1.5em 0 1em 0;
+    border: none;
+    border-top: 2px solid variables.$light;
+}
+
+.settings-section-header {
+    margin: 0.5em 0 1em 0;
+    color: variables.$light;
+    font-weight: bold;
+    font-size: 1.1em;
+}

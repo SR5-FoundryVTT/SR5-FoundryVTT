@@ -96,10 +96,14 @@ export function createTagifyOnInput(element: HTMLInputElement, values: TagifyVal
  * @param event
  * @returns undefined when an DropData couldn't be parsed from it's JSON.
  */
-export function parseDropData(event): any | undefined {
+export function parseDropData<T = unknown>(event: DragEvent): T | undefined {
     try {
-        return JSON.parse(event.dataTransfer.getData('text/plain'));
+        const raw = event.dataTransfer?.getData("text/plain");
+        if (!raw) return undefined;
+
+        return JSON.parse(raw) as T;
     } catch (error) {
-        return console.log('Shadowrun 5e | Dropping a document onto an item sheet caused this error', error);
+        console.log('Shadowrun 5e | Dropping a document onto an item sheet caused this error', error);
+        return undefined;
     }
 }

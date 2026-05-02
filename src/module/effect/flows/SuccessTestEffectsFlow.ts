@@ -35,23 +35,24 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         if (this.test.extendedRoll) return;
 
         // Since we're extending EffectChangeData by a effect field only locally, I don't care enough to resolve the typing issue.
-        const changes: any[] = [];
+        const changes: (ActiveEffect.ChangeData & { effect: SR5ActiveEffect; priority: number })[] = [];
 
         for (const effect of this.allApplicableEffects()) {
-            // Organize non-disabled effects by their application priority            
-            if (!effect.active) continue;
-
             if (this._skipEffectForTestLimitations(effect)) continue;
 
             // Collect all changes of effect left.
             const effectChanges = effect.system?.changes ?? effect.changes ?? [];
             changes.push(...effectChanges.map(change => {
-                const c = foundry.utils.deepClone(change) as any;
+                // @ts-expect-error TODO: v14 - this typing was added in master, fix it.
+                const c = foundry.utils.deepClone(change) as typeof changes[number];
+                // const c = foundry.utils.deepClone(change) as typeof changes[number];
                 // Foundry changes data. references in changes to system. But tests use data.
                 c.key = c.key.replace(/^system\./, 'data.');
                 c.effect = effect;
                 SR5ActiveEffect.alterChange(this.test as unknown as foundry.abstract.DataModel.Any, c);
-                c.priority = SR5ActiveEffect.getChangePriority(c);
+                // TODO: v14 - check what is the issue here.
+                // c.priority = SR5ActiveEffect.getChangePriority(c);
+                c.priority = 0;
                 return c;
             }));
             // TODO: What's with the statuses?
@@ -63,7 +64,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         // Apply all changes
         for (const change of changes) {
             if (!change.key) continue;
-            change.effect.apply(this.test, change);
+            change.effect.apply(this.test as any, change);
         }
     }
 
@@ -100,7 +101,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         const skills = effect.system.selection_skills.map(test => test.id);
         const skillId = this.test.data.action.skill;
         const skillName = this.test.actor?.getSkill(skillId)?.name || skillId;
-        if (skills.length > 0 && !skills.includes(skillName)) return true;
+        if (skills.length > 0 && !skills.includes(skillId) && !skills.includes(skillName)) return true;
 
         // Check for test attributes used.
         const attributes = effect.system.selection_attributes.map(test => test.id);

@@ -1,0 +1,48 @@
+{
+  "name": "Engineering",
+  "type": "skill",
+  "img": "systems/shadowrun5e/dist/icons/groups/engineering.svg",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": ""
+    },
+    "importFlags": null,
+    "type": "group",
+    "skill": {
+      "category": "active",
+      "rating": 0,
+      "defaulting": false,
+      "attribute": "",
+      "specializations": [],
+      "group": "",
+      "requirement": "mundane",
+      "language": {
+        "isNative": false
+      },
+      "knowledgeType": null
+    },
+    "group": {
+      "skills": [
+        "Aeronautics Mechanic",
+        "Automotive Mechanic",
+        "Industrial Mechanic",
+        "Nautical Mechanic"
+      ],
+      "rating": 0
+    },
+    "set": {
+      "skills": [],
+      "groups": []
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "LkRgbYRIfevkvEJK",
+  "_key": "!items!LkRgbYRIfevkvEJK"
+}

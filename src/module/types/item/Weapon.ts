@@ -3,7 +3,7 @@ import { ActionPartData } from "./Action";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { TechnologyPartData } from "../template/Technology";
 import { ModifiableField } from "../fields/ModifiableField";
-import { ValueMaxPair, ModifiableValue } from "../template/Base";
+import { ValueMaxPair, ModifiableValueSchema } from "../template/Base";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const BlastData = () => ({
@@ -44,7 +44,7 @@ const FiringModeData = () => ({
 
 export const RangeWeaponData = () => ({
     ranges: new SchemaField(RangeData()),
-    rc: new ModifiableField(ModifiableValue()),
+    rc: new ModifiableField(ModifiableValueSchema()),
     modes: new SchemaField(FiringModeData()),
 });
 

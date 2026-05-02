@@ -1,5 +1,5 @@
 import { ModifiableField } from "../fields/ModifiableField";
-import { ValueMaxPair, ModifiableValue } from "./Base";
+import { ValueMaxPair, ModifiableValueSchema } from "./Base";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const Living = () => ({
@@ -9,7 +9,7 @@ const Living = () => ({
 
 export const Track = () => ({
     ...ValueMaxPair(),
-    ...ModifiableValue(),
+    ...ModifiableValueSchema(),
     label: new StringField({ required: true }),
     disabled: new BooleanField()
 });

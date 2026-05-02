@@ -62,7 +62,7 @@ export class JournalEnrichers {
                 threshold
             }
 
-            JournalEnrichers.createChatMessage(templateData);
+            void JournalEnrichers.createChatMessage(templateData);
         })
     }
 
@@ -79,7 +79,7 @@ export class JournalEnrichers {
 
         if(JournalEnrichers.attributeKeywords.includes(type)) {
             return Helpers.getAttributeTranslation(rollEntity)
-         }
+        }
 
         return rollEntity;
     }

@@ -118,7 +118,7 @@ export const RangedWeaponRules = {
     },
 
     /**
-     * The number of bullets when reloading during a complex action according to SR5#163 'Reloading Weapons'
+    * The number of bullets when reloading during a complex action according to SR5#167 'Reload Firearm'
      * @param clip The currently used clip
      * @param agi The owning actors agility value
      * @returns The number of bullets when reloading during a complex action or -1 if it can only be fully reloaded directly

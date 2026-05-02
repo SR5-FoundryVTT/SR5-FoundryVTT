@@ -1,7 +1,7 @@
 import { SR5 } from "@/module/config";
 import { Movement } from "../template/Movement";
 import { ActorArmorData } from "../template/Armor";
-import { ModifiableValue } from "../template/Base";
+import { ModifiableValueSchema } from "../template/Base";
 import { Initiative } from "../template/Initiative";
 import { Tracks } from "../template/ConditionMonitors";
 import { VisibilityChecks } from "../template/Visibility";
@@ -42,7 +42,7 @@ const SpiritData = () => ({
     // === Combat ===
     armor: new ModifiableField(ActorArmorData()),
     initiative: new SchemaField(Initiative('astral', 'meatspace')),
-    wounds: new ModifiableField(ModifiableValue()),
+    wounds: new ModifiableField(ModifiableValueSchema()),
 
     // === Condition & Movement ===
     track: new SchemaField(Tracks('physical', 'stun')),

@@ -17,6 +17,7 @@
         "eslint-config-prettier": "^10.1.8",
         "events": "^3.3.0",
         "fs-extra": "^11.3.3",
+        "fuse.js": "^7.3.0",
         "fvtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main",
         "globals": "^17.3.0",
         "gulp": "^5.0.1",
