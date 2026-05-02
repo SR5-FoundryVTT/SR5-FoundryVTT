@@ -2,7 +2,6 @@ import { SystemType } from '../Parser';
 import { Weapon } from '../../schema/WeaponsSchema';
 import { WeaponParserBase } from './WeaponParserBase';
 import { BlastType } from 'src/module/types/item/Weapon';
-import { DataDefaults } from '../../../../data/DataDefaults';
 
 export class ThrownParser extends WeaponParserBase {
     public GetBlast(system: SystemType<'weapon'>, jsonData: Weapon): BlastType {
@@ -34,7 +33,7 @@ export class ThrownParser extends WeaponParserBase {
         const system = super.getSystem(jsonData);
 
         const rangeCategory = jsonData.range?._TEXT || jsonData.category._TEXT;
-        system.thrown.ranges = DataDefaults.createData('range', this.GetRangeDataFromImportedCategory(rangeCategory));
+        system.thrown.ranges = this.getRangeData(rangeCategory);
 
         system.thrown.blast = this.GetBlast(system, jsonData);
 

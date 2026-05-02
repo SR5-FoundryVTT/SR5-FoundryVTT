@@ -17,6 +17,7 @@
         "eslint-config-prettier": "^10.1.8",
         "events": "^3.3.0",
         "fs-extra": "^11.3.3",
+        "fuse.js": "^7.3.0",
         "fvtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main",
         "globals": "^17.3.0",
         "gulp": "^5.0.1",
@@ -33,6 +34,11 @@
     },
     "scripts": {
         "watch": "gulp watch",
+        "watch:prod": "gulp watch:prod",
+        "watch:dev": "gulp watch:dev",
+        "build": "gulp build:prod",
+        "build:prod": "gulp build:prod",
+        "build:dev": "gulp build:dev",
         "build:db": "node ./utils/packs.mjs package pack",
         "unpack:db": "node ./utils/packs.mjs package unpack",
         "locale:check": "node ./utils/check-localization.mjs",
@@ -43,6 +49,6 @@
         "lint:fix": "npx eslint . --fix",
         "lint:errors": "npx eslint . --quiet",
         "lint:errors:fix": "npx eslint . --quiet --fix",
-        "prettier": "npx prettier --write **/*.ts"
+        "format:all": "npx prettier --write \"**/*.{ts,js,mjs,cjs,json,scss,css,yml,md}\" --ignore-path .prettierignore"
     }
 }

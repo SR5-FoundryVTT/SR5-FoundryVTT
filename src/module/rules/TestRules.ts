@@ -69,5 +69,14 @@ export const TestRules = {
      */
     criticalGlitched: (hits: number, glitched: boolean): boolean => {
         return hits === 0 && glitched;
+    },
+
+    /*
+     * Calculate the number of hits that can be bought with the given pool.
+     * @param pool The pool of the test.
+     * @returns The number of hits that can be bought.
+     */
+    buyHits: (pool: number): number => {
+        return Math.floor(pool / 4);
     }
 }

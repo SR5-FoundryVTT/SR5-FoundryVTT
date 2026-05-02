@@ -1,10 +1,10 @@
 import { DataDefaults } from "../data/DataDefaults";
-import { Helpers } from "../helpers";
+import { ModifiableValue } from "../mods/ModifiableValue";
 import { DamageType } from "../types/item/Action";
 import { DrainRules } from "./DrainRules";
 
 /**
- * Rules implementing the Conjuring chapter in SR5.300
+ * Rules implementing the Conjuring chapter in SR5#300
  */
 export const ConjuringRules = {
     /**
@@ -44,7 +44,7 @@ export const ConjuringRules = {
         const damage = DataDefaults.createData('damage');
         damage.base = ConjuringRules.summoningDrainValue(hitsSpirit);
         damage.type.base = damage.type.value = DrainRules.calcDrainDamageType(force, magic);
-        Helpers.calcTotal(damage, {min: 0});
+        ModifiableValue.calcTotal(damage, {min: 0});
         
         return damage;
     },

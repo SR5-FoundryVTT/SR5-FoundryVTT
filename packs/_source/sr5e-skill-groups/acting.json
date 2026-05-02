@@ -1,0 +1,47 @@
+{
+  "name": "Acting",
+  "type": "skill",
+  "img": "systems/shadowrun5e/dist/icons/groups/acting.svg",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": ""
+    },
+    "importFlags": null,
+    "type": "group",
+    "skill": {
+      "category": "active",
+      "rating": 0,
+      "defaulting": false,
+      "attribute": "",
+      "specializations": [],
+      "group": "",
+      "requirement": "mundane",
+      "language": {
+        "isNative": false
+      },
+      "knowledgeType": null
+    },
+    "group": {
+      "skills": [
+        "Con",
+        "Impersonation",
+        "Performance"
+      ],
+      "rating": 0
+    },
+    "set": {
+      "skills": [],
+      "groups": []
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "9QbWxurIxwDA381E",
+  "_key": "!items!9QbWxurIxwDA381E"
+}

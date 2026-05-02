@@ -6,7 +6,7 @@ import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handleba
 import { SR5Item } from '@/module/item/SR5Item';
 import { MatrixNetworkFlow } from '@/module/item/flows/MatrixNetworkFlow';
 import { Helpers } from '@/module/helpers';
-import { PackActionFlow } from '@/module/item/flows/PackActionFlow';
+import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
 import { SR5 } from '@/module/config';
 import { TestCreator } from '@/module/tests/TestCreator';
 
@@ -108,7 +108,7 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<NetworkMa
             return;
         }
 
-        const matrixActions = await PackActionFlow.getActorMatrixActions(this.actor);
+        const matrixActions = await PackItemFlow.getActorMatrixActions(this.actor);
         const actions = matrixActions.filter(action => action.system.action.categories.includes(category));
         if (actions.length !== 1) {
             ui.notifications?.error(game.i18n.format('SR5.Errors.TooManyActionsWithCategory', {category: game.i18n.localize(SR5.actionCategories[category]) }));

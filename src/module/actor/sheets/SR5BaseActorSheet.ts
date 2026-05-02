@@ -9,9 +9,6 @@ import { SR5ActiveEffect } from '../../effect/SR5ActiveEffect';
 import { SituationModifiersApplication } from '../../apps/SituationModifiersApplication';
 import { MoveInventoryDialog } from '../../apps/dialogs/MoveInventoryDialog';
 import { InventoryRenameApp } from '@/module/apps/actor/InventoryRenameApp';
-import { SkillEditSheet } from '@/module/apps/skills/SkillEditSheet';
-import { KnowledgeSkillEditSheet } from '@/module/apps/skills/KnowledgeSkillEditSheet';
-import { LanguageSkillEditSheet } from '@/module/apps/skills/LanguageSkillEditSheet';
 
 import { SituationModifier } from '../../rules/modifiers/SituationModifier';
 import { prepareSortedEffects, prepareSortedItemEffects } from '../../effects';
@@ -19,15 +16,25 @@ import { prepareSortedEffects, prepareSortedItemEffects } from '../../effects';
 import { LinksHelpers } from '../../utils/links';
 
 import { InventoryType } from 'src/module/types/actor/Common';
-import { KnowledgeSkillCategory, SkillFieldType, SkillsType } from 'src/module/types/template/Skills';
 
 import { SR5ApplicationMixin, SR5ApplicationMixinTypes } from '@/module/handlebars/SR5ApplicationMixin';
 import { SR5Tab } from '@/module/handlebars/Appv2Helpers';
 import { SheetFlow } from '@/module/flows/SheetFlow';
-import { PackActionFlow } from '@/module/item/flows/PackActionFlow';
+import { SkillFieldPrep } from '@/module/actor/prep/functions/SkillFieldPrep';
+import { SkillSetFlow } from '@/module/actor/flows/SkillSetFlow';
+import { SkillNamingFlow } from '@/module/flows/SkillNamingFlow';
+import { SkillSetSourceFlow } from '@/module/flows/SkillSetSourceFlow';
+import { SkillItemFlow } from '@/module/item/flows/SkillItemFlow';
+import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
+import { parseDropData } from '@/module/utils/sheets';
+import { getFuzzyMatches, matchesFuzzyQuery } from '@/module/utils/fuzzySearch';
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import ActorSheetV2 = foundry.applications.sheets.ActorSheetV2;
 import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
+import { EffectCreationFlow } from '@/module/flows/EffectCreationFlow';
+import { SkillFieldType } from '@/module/types/template/Skills';
+import { CreateItemFlow } from '@/module/item/flows/CreateItemFlow';
+import { ActorSkillFlow } from '../flows/ActorSkillFlow';
 
 const { TextEditor } = foundry.applications.ux;
 const { fromUuid, fromUuidSync } = foundry.utils;
@@ -59,10 +66,37 @@ export interface SR5SheetFilters {
     showUntrainedSkills: boolean
 }
 
+/**
+ * A sheet variant of the SR5Actor#skills data structure
+ * All keys are localized strings.
+ */
+interface SheetSkills {
+    active: Record<string, SkillFieldType>;
+    language: Record<string, SkillFieldType>;
+    knowledge: {
+        street: Record<string, SkillFieldType>;
+        academic: Record<string, SkillFieldType>;
+        professional: Record<string, SkillFieldType>;
+        interests: Record<string, SkillFieldType>;
+    }
+}
+
+interface SheetSkillGroup {
+    item: SR5Item<'skill'>;
+    label: string;
+}
+
 export interface SR5ActorSheetData extends ActorSheetV2.RenderContext, SR5ApplicationMixinTypes.RenderContext {
     actor: SR5Actor;
     config: typeof SR5CONFIG;
     system: SR5Actor['system'];
+    skills: SheetSkills;
+    skillGroups: SheetSkillGroup[];
+    skillset: {
+        name: string;
+        img: string;
+        uuid: string;
+    } | null;
 
     // Sheet filters
     filters: SR5SheetFilters;
@@ -130,6 +164,10 @@ export interface SR5ActorSheetData extends ActorSheetV2.RenderContext, SR5Applic
  */
 const sortByName = (a: { name: string }, b: { name: string }) => {
     return a.name.localeCompare(b.name, game.i18n.lang);
+};
+
+const sortByLocalizedLabel = <T extends { label: string }>(a: T, b: T) => {
+    return a.label.localeCompare(b.label, game.i18n.lang);
 };
 
 /**
@@ -219,7 +257,12 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @return A string of item types from the template.json Item section.
      */
     getHandledItemTypes(): Item.ConfiguredSubType[] {
-        return ['action'];
+        return [
+            // actions are always handled on their own sheet tab, outside inventory.
+            'action', 
+            // skills are always handled through their derived skillfields, outside inventory.
+            'skill'
+        ];
     }
 
     /**
@@ -232,7 +275,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *
      * @return An array of item types from the template.json Item section.
      */
-    getInventoryItemTypes():Item.ConfiguredSubType[] {
+    getInventoryItemTypes(): Item.ConfiguredSubType[] {
         return [];
     }
 
@@ -260,15 +303,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             rollItem: SR5BaseActorSheet.#rollItem,
             rollSkill: SR5BaseActorSheet.#rollSkill,
             editSkill: SR5BaseActorSheet.#editSkill,
+            removeSkillSet: SR5BaseActorSheet.#removeSkillSet,
             rollSkillSpecialization: SR5BaseActorSheet.#rollSkillSpec,
             openSkillDescription: SR5BaseActorSheet.#toggleSkillDescription,
             filterTrainedSkills: SR5BaseActorSheet.#filterUntrainedSkills,
-            addKnowledgeSkill: SR5BaseActorSheet.#createKnowledgeSkill,
-            addLanguageSkill: SR5BaseActorSheet.#createLanguageSkill,
-            addActiveSkill: SR5BaseActorSheet.#createActiveSkill,
-            removeKnowledgeSkill: SR5BaseActorSheet.#deleteKnowledgeSkill,
-            removeLanguageSkill: SR5BaseActorSheet.#deleteLanguageSkill,
-            removeActiveSkill: SR5BaseActorSheet.#deleteActiveSkill,
 
             resetActorRunData: SR5BaseActorSheet.#resetActorRunData,
 
@@ -369,7 +407,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         // Valid data fields for all actor types.
         this._prepareActorTypeFields(data);
         this._prepareSpecialFields(data);
-        this._prepareSkillsWithFilters(data);
+
+        this._prepareSkills(data);
+        data.skillGroups = this._prepareSkillGroups();
+        data.skillset = await this._prepareSkillset();
 
         data.itemType = this._prepareItemTypes();
         data.effects = prepareSortedEffects(this.actor.effects.contents);
@@ -396,14 +437,22 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         data.expandedSkills = {};
         for (const id of this.expandedSkills) {
-            const skill = this.actor.getSkill(id);
+            const skill = this.actor.items.get(id) as SR5Item<'skill'> | undefined;
             if (skill) {
-                const html = await TextEditor.enrichHTML(skill.description, { secrets: this.actor.isOwner, });
+                const html = await TextEditor.enrichHTML(skill.system.description.value, { secrets: this.actor.isOwner, });
                 data.expandedSkills[id] = { html, }
             }
         }
 
         return data;
+    }
+
+    /**
+     * Prepare used skill set for this actor.
+     * @returns Necessary skill set sheet data or null, if skill set doesn't exist in pack anymore.
+     */
+    protected async _prepareSkillset() {
+        return SkillSetSourceFlow.prepareSkillSetReference(this.actor.system.skillset);
     }
 
     override async _preparePartContext(
@@ -556,7 +605,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             const ft = favorites[targetIndex];
             favorites[targetIndex] = fs;
             favorites[sourceIndex] = ft;
-            void this.actor.update({system: { favorites }});
+            void this.actor.update({ system: { favorites } });
         }
     }
 
@@ -564,11 +613,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     activateListeners_LEGACY(html: JQuery<HTMLElement>) {
         Helpers.setupCustomCheckbox(this, html);
 
+        html.find('input[name="system.description.source"]').on('drop', (event) => void this._onSourceDrop(event.originalEvent));
+
         // Actor inventory handling....
         html.find('#select-inventory').on('change', this._onSelectInventory.bind(this));
-
-        // Misc. actor actions...
-        html.find('.show-hidden-skills').on('click', this._onShowHiddenSkills.bind(this));
 
         html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
 
@@ -576,7 +624,19 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         html.find('select.weapon-ammo-select').on('change', this._onWeaponAmmoSelect.bind(this));
 
+        html.find('input[data-system-action="changeSkillRating"]').on('change', this._onChangeSkillRating.bind(this));
         html.find('input[data-system-action="changeItemQty"]').on('change', this._onListItemChangeQuantity.bind(this));
+    }
+
+    private async _onSourceDrop(event?: DragEvent) {
+        if (!event || !this.isEditable) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        const data = parseDropData(event);
+        if (data && typeof data === 'object' && 'uuid' in data && typeof data.uuid === 'string')
+            await this.actor.update({ system: { description: { source: data.uuid } } });
     }
 
     /**
@@ -618,7 +678,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         this.element?.querySelectorAll('[data-skill-modifier-tooltip]').forEach((el) => {
             el.addEventListener('mouseenter', async (e: any) => {
                 const skillId = e.target.closest('[data-skill-modifier-tooltip]').dataset.skillModifierTooltip;
-                const skill = this.actor.getSkill(skillId);
+                const skill = this.actor.getSkillById(skillId);
                 if (skill) {
                     const html = await foundry.applications.handlebars.renderTemplate(
                         SheetFlow.templateBase('common/modifiers-tooltip'),
@@ -658,7 +718,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         } else {
             newFavorites.push(favoriteId);
         }
-        await this.actor.update({system: { favorites: newFavorites }});
+        await this.actor.update({ system: { favorites: newFavorites } });
     }
 
     /**
@@ -764,7 +824,25 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
     }
 
+    /**
+     * Override ApplicationMixin._onDrop shim to handle default Foundry onDrop behavior for all ActorSheets.
+     */
+    protected override async _onDrop(event: DragEvent) {
+        return await (ActorSheetV2.prototype as any)._onDrop.call(this, event);
+    }
+
     protected override async _onDropItem(event: DragEvent, item: SR5Item) {
+        if (item.isType('skill') && item.system.type === 'set') {
+            await SkillSetFlow.replaceSkillSet(this.actor, item);
+            return null;
+        }
+
+        if (item.isType('skill') && item.system.type === 'skill') {
+            await ActorSkillFlow.addSkill(this.actor, item.toObject() as Item.CreateData<'skill'>, { warnOnDuplicate: true });
+            return null;
+        }
+
+
         // Avoid adding item types to the actor, that aren't handled on the sheet anywhere.
         if (this.getHandledItemTypes().includes(item.type) || this.getInventoryItemTypes().includes(item.type)) {
             return super._onDropItem(event, item);
@@ -787,7 +865,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const itemData = {
             name: actor.name ?? `${game.i18n.localize('SR5.New')} ${game.i18n.localize(SR5.itemTypes['contact'])}`,
             type: 'contact' as Item.SubType,
-            system: {linkedActor: actor.uuid }
+            system: { linkedActor: actor.uuid }
         };
         await this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
         return null;
@@ -850,13 +928,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const item = this.actor.effects.get(id);
         if (item) {
             const disabled = !item.disabled;
-            await item.update({disabled});
+            await item.update({ disabled });
         } else {
             const uuid = SheetFlow.closestUuid(event.target);
             const doc = await fromUuid(uuid);
             if (doc instanceof SR5ActiveEffect) {
                 const disabled = !doc.disabled;
-                await doc.update({disabled});
+                await doc.update({ disabled });
             }
         }
     }
@@ -889,9 +967,12 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         // Inject special case context based on item type
         if (type === 'call_in_action') this._handleCreateCallInActionItem(event, itemData);
+        if (type === 'skill') this._handleCreateSkillItem(event, itemData);
         if (type === 'matrix_action') this._handleCreateMatrixActionItem(event, itemData);
 
-        const items = await this.actor.createEmbeddedDocuments('Item', [itemData]);
+        const items = type === 'skill' && foundry.utils.getProperty(itemData, 'system.type') === 'skill'
+            ? await ActorSkillFlow.addSkill(this.actor, itemData as Item.CreateData<'skill'>, { defaultName: itemData.name, warnOnDuplicate: true })
+            : await this.actor.createEmbeddedDocuments('Item', [itemData]);
         if (!items) return;
 
         // Add the item to the selected inventory.
@@ -911,6 +992,19 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const actorType = SheetFlow.closestAction(event.target)!.dataset.actorType;
         if (!actorType) console.error(`Shadowrun 5e | Tried to create a Call In Action item without an actor-type data attribute context!`);
         itemData['system.actor_type'] = actorType;
+    }
+
+    /**
+     * Skill items need to prefill the skill category as it is used to filter the item when creating
+     * it directly from the sheet sections. If left empty, the created item will not be shown on sheet.
+     */
+    _handleCreateSkillItem(event: PointerEvent, itemData: Item.CreateData) {
+        const skillAction = SheetFlow.closestAction(event.target)!;
+        const skillType = skillAction.dataset.skillType || 'skill';
+        const skillCategory = skillAction.dataset.skillCategory as string;
+        const skillKnowledgeType = skillAction.dataset.skillKnowledgeType as string;
+
+        CreateItemFlow.injectMinimumSkillData(itemData, skillType, skillCategory, skillKnowledgeType);
     }
 
     /**
@@ -964,9 +1058,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     async _handleDeleteItem(item: SR5Item) {
         // remove from the inventory tracking system
-        return this.actor.inventory.removeItem(item).then(async () =>
-            this.actor.deleteEmbeddedDocuments('Item', [item.id!])
-        );
+        return this.actor.inventory.removeItem(item).then(async () => {
+            await item.delete()
+        });
     }
 
     static async #deleteItem(this: SR5BaseActorSheet, event: PointerEvent) {
@@ -1155,20 +1249,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         sheetData.woundTolerance = 3 + ('wound_tolerance' in modifiers ? modifiers.wound_tolerance : 0);
     }
 
-    _prepareMatrixAttributes(sheetData: SR5ActorSheetData) {
-        const { matrix } = sheetData.system;
-        if (matrix) {
-            const cleanupAttribute = (attribute: MatrixAttribute) => {
-                const att = matrix[attribute];
-                if (att) {
-                    if (!att.mod) att.mod = [];
-                }
-            };
-
-            (['firewall', 'data_processing', 'sleaze', 'attack'] as MatrixAttribute[]).forEach(att => { cleanupAttribute(att); });
-        }
-    }
-
     /**
      * Prepare Actor Sheet Inventory display.
      *
@@ -1274,12 +1354,12 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     /**
      * Categorize and sort spells to display cleanly.
-     * 
-     * @param inventories 
+     *
+     * @param inventories
      */
     _prepareSortedCategorizedSpells(spellSheets: SR5Item[]) {
-        const sortedSpells : Record<string, SR5Item[]> = {};
-        const spellTypes : string[] = ['combat', 'detection', 'health', 'illusion', 'manipulation', 'notfound'];
+        const sortedSpells: Record<string, SR5Item[]> = {};
+        const spellTypes: string[] = ['combat', 'detection', 'health', 'illusion', 'manipulation', 'notfound'];
 
         // Add all spell types in system.
         spellTypes.forEach(type => {
@@ -1293,7 +1373,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         });
 
         spellTypes.forEach(type => {
-            sortedSpells[type].sort((a, b) : number => {
+            sortedSpells[type].sort((a, b): number => {
                 return a.name.localeCompare(b.name);
             });
         });
@@ -1305,7 +1385,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * Used by the sheet to choose whether to show or hide hideable fields
      */
     _prepareContentVisibility(data) {
-        const contentVisibility : Record<string, boolean> = {}
+        const contentVisibility: Record<string, boolean> = {}
         const defaultVisibility = !this.hideEmptyCategories();
 
         // If prefix is empty uses the category as a prefix
@@ -1405,10 +1485,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     /**
      * Count the currently active and max programs for sheet display in this style:
-     * 
+     *
      * Only personas using a device will show this count.
-     * 
-     * @param itemTypes 
+     *
+     * @param itemTypes
      * @returns (<active>/<max>) or ''
      */
     _prepareProgramCount(itemTypes: Record<string, SR5Item[]>): string {
@@ -1422,51 +1502,33 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return `(${active}/${max})`;
     }
     /**
-     * Prepare skills with sorting and filtering given by this sheet.
-     * 
+     * Prepare skills with sorting.
+     *
      * @param sheetData What is to be displayed on sheet.
      */
-    _prepareSkillsWithFilters(sheetData: SR5ActorSheetData) {
-        this._filterActiveSkills(sheetData);
+    _prepareSkills(sheetData: SR5ActorSheetData) {
+        sheetData.system.skills = this._sortSkills(sheetData, this.document.system.skills);
     }
 
-    _filterSkills(data: SR5ActorSheetData, skills: SkillsType = {}) : SkillsType {
-        const filteredSkills = {};
-        for (const [key, skill] of Object.entries(skills)) {
-            // Don't show hidden skills.
-            if (skill.hidden) {
-                continue;
-            }
-            // Filter visible skills.
-            if (this._showSkill(key, skill, data)) {
-                filteredSkills[key] = skill;
-            }
-        }
+    _sortSkills(sheetData: SR5ActorSheetData, skills: SR5Actor['system']['skills']) {
+        sheetData.system.skills.active = SkillFieldPrep.sortSkills(skills.active);
+        sheetData.system.skills.language = SkillFieldPrep.sortSkills(skills.language);
+        sheetData.system.skills.knowledge.street = SkillFieldPrep.sortSkills(skills.knowledge.street);
+        sheetData.system.skills.knowledge.academic = SkillFieldPrep.sortSkills(skills.knowledge.academic);
+        sheetData.system.skills.knowledge.professional = SkillFieldPrep.sortSkills(skills.knowledge.professional);
+        sheetData.system.skills.knowledge.interests = SkillFieldPrep.sortSkills(skills.knowledge.interests);
 
-        return Helpers.sortSkills(filteredSkills);
+        return sheetData.system.skills;
     }
 
-    _showSkill(key: string, skill: SkillFieldType, data: SR5ActorSheetData) {
-        if (this._showMagicSkills(key, skill, data)) {
-            return true;
-        }
-        if (this._showResonanceSkills(key, skill, data)) {
-            return true;
-        }
-
-        return this._showGeneralSkill(key, skill);
-    }
-
-    _showGeneralSkill(skillId: string, skill: SkillFieldType) {
-        return !this._isSkillMagic(skillId, skill) && !this._isSkillResonance(skill);
-    }
-
-    _showMagicSkills(skillId: string, skill: SkillFieldType, sheetData: SR5ActorSheetData) {
-        return this._isSkillMagic(skillId, skill) && sheetData.system.special === 'magic';
-    }
-
-    _showResonanceSkills(skillId: string, skill: SkillFieldType, sheetData: SR5ActorSheetData) {
-        return this._isSkillResonance(skill) && sheetData.system.special === 'resonance';
+    _prepareSkillGroups(): SheetSkillGroup[] {
+        return (this.actor.itemsForType.get('skill') ?? [])
+            .filter(item => item.isType('skill') && item.system.type === 'group')
+            .map(item => ({
+                item,
+                label: SkillNamingFlow.localizeSkillgroupName(item.name),
+            }))
+            .sort(sortByLocalizedLabel);
     }
 
     hideEmptyCategories() {
@@ -1492,47 +1554,89 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     #filterActiveSkillsElements() {
-        let count = 0;
-        this.element.querySelector('#active-skills-scroll')
-            ?.querySelectorAll<HTMLDivElement>('[data-skill-id]')
-            .forEach((listItemElem) => {
+        const skillContainer = this.element.querySelector<HTMLElement>('#active-skills-scroll');
+        if (!skillContainer) return;
 
-                const container = listItemElem.parentElement;
-                if (!container) return;
-                const id = listItemElem.dataset.skillId;
-                if (!id) return;
-                const skill = this.actor.getSkill(id);
-                if (!skill) return;
-                if (this._isSkillFiltered(id, skill)) {
-                    container.classList.remove('hidden')
-                    count++;
-                    if (count % 2) {
-                        container.classList.add('nobg')
-                        container.classList.remove('forcebg')
-                    } else {
-                        container.classList.add('forcebg')
-                        container.classList.remove('nobg')
-                    }
-                } else {
-                    container.classList.add('hidden');
-                    container.classList.remove('nobg')
-                    container.classList.remove('forcebg')
-                }
-            });
+        const activeSkillRows = Array.from(
+            skillContainer.querySelectorAll<HTMLDivElement>('[data-skill-id][data-category="active"]'),
+        ).map((listItemElem) => {
+            const container = listItemElem.parentElement;
+            if (!container) return null;
+
+            const skillId = listItemElem.dataset.skillId;
+            if (!skillId) return null;
+
+            const skill = this.actor.getSkillById(skillId);
+            if (!skill) return null;
+
+            return { container, skillId, skill };
+        }).filter((row): row is NonNullable<typeof row> => row !== null);
+
+        const scoreBySkillId = new Map<string, number>();
+        const hasTextQuery = foundry.applications.ux.SearchFilter.cleanQuery(this._filters.skills).length > 0;
+        if (hasTextQuery) {
+            for (const match of getFuzzyMatches(
+                activeSkillRows,
+                this._filters.skills,
+                row => this._getSkillSearchString(row.skillId, row.skill),
+            )) {
+                scoreBySkillId.set(match.item.skillId, match.score);
+            }
+        }
+
+        const sortByLabel = (left: typeof activeSkillRows[number], right: typeof activeSkillRows[number]) => {
+            return this._getSkillLabelOrName(left.skill).localeCompare(this._getSkillLabelOrName(right.skill), game.i18n.lang);
+        };
+
+        activeSkillRows.sort((left, right) => {
+            const leftScore = scoreBySkillId.get(left.skillId);
+            const rightScore = scoreBySkillId.get(right.skillId);
+
+            if (leftScore !== undefined && rightScore !== undefined) {
+                if (leftScore !== rightScore) return rightScore - leftScore;
+                return sortByLabel(left, right);
+            }
+
+            if (leftScore !== undefined) return -1;
+            if (rightScore !== undefined) return 1;
+            return sortByLabel(left, right);
+        });
+
+        const firstNonActiveSkillRow = Array.from(skillContainer.children)
+            .find(child => !child.querySelector<HTMLElement>('[data-skill-id][data-category="active"]')) ?? null;
+
+        for (const row of activeSkillRows) {
+            skillContainer.insertBefore(row.container, firstNonActiveSkillRow);
+            row.container.classList.add('active-skill-row');
+
+            const hasTextMatch = !hasTextQuery || scoreBySkillId.has(row.skillId);
+            if (this._isSkillFiltered(row.skillId, row.skill, hasTextMatch)) {
+                row.container.classList.remove('hidden');
+            } else {
+                row.container.classList.add('hidden');
+            }
+        }
     }
 
-    _isSkillFiltered(skillId: string, skill: SkillFieldType) {
+    _isSkillFiltered(skillId: string, skill: SkillFieldType, hasTextMatch?: boolean) {
         // a newly created skill shouldn't be filtered, no matter what.
         // Therefore disqualify empty skill labels/names from filtering and always show them.
         const isFilterable = this._getSkillLabelOrName(skill).length > 0;
-        const isHiddenForText = !this._doesSkillContainText(skillId, skill, this._filters.skills);
+        const isHiddenForText = !(hasTextMatch ?? this._doesSkillContainText(skillId, skill, this._filters.skills));
         const isHiddenForUntrained = !this._filters.showUntrainedSkills && skill.value === 0;
 
         return !(isFilterable && (isHiddenForUntrained || isHiddenForText));
     }
 
     _getSkillLabelOrName(skill: SkillFieldType) {
-        return Helpers.getSkillLabelOrName(skill);
+        return skill.label || skill.name || '';
+    }
+
+    _getSkillSearchString(key: string, skill: SkillFieldType) {
+        const name = this._getSkillLabelOrName(skill);
+        const searchKey = skill.name === undefined ? key : '';
+        const specs = skill.specs.join(' ');
+        return `${searchKey} ${name} ${specs}`;
     }
 
     /**
@@ -1546,38 +1650,15 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @returns true, if skill contains search text
      */
     _doesSkillContainText(key: string, skill: SkillFieldType, text: string) {
-        if (!text) {
-            return true;
-        }
-
-        // Search both english keys, localized labels and all specializations.
-        const name = this._getSkillLabelOrName(skill);
-        const searchKey = skill.name === undefined ? key : '';
-        // some "specs" were a string from old code I think
-        const specs = skill.specs !== undefined && Array.isArray(skill.specs) ? skill.specs.join(' ') : '';
-        const searchString = `${searchKey} ${name} ${specs}`;
-
-        // Normalize strings for Unicode characters (Korean) and use Foundry umlaut (German) handling.
-        const normalizedSearch = foundry.applications.ux.SearchFilter.cleanQuery(searchString);
-        const normalizedText = foundry.applications.ux.SearchFilter.cleanQuery(text);
-
-        const searchLower = normalizedSearch.toLowerCase();
-        const textLower = normalizedText.toLowerCase();
-
-        return searchLower.includes(textLower);
+        return matchesFuzzyQuery(text, this._getSkillSearchString(key, skill));
     }
 
-    _filterActiveSkills(sheetData: SR5ActorSheetData) {
-        // Handle active skills directly, as it doesn't use sub-categories.
-        sheetData.system.skills.active = this._filterSkills(sheetData, sheetData.system.skills.active);
+    _isSkillMagic(id: string, skill: SR5Item<'skill'>) {
+        return skill.system.skill.attribute === 'magic' || id === 'astral_combat' || id === 'assensing';
     }
 
-    _isSkillMagic(id: string, skill: SkillFieldType) {
-        return skill.attribute === 'magic' || id === 'astral_combat' || id === 'assensing';
-    }
-
-    _isSkillResonance(skill: SkillFieldType) {
-        return skill.attribute === 'resonance';
+    _isSkillResonance(skill: SR5Item<'skill'>) {
+        return skill.system.skill.attribute === 'resonance';
     }
 
     private _closestSkillTarget(target: HTMLElement): HTMLElement | null {
@@ -1587,23 +1668,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     async _editSkill(target: HTMLElement) {
         const closest = this._closestSkillTarget(target);
         const skillId = closest?.dataset.skillId;
-        const category = closest?.dataset.category;
+        if (!skillId) return;
 
-        if (skillId) {
-            if (!category || category === 'active') {
-                const app = new SkillEditSheet({document: this.actor}, skillId)
-                await app.render(true, {mode: 'edit'} as any);
-            } else if (category === 'knowledge') {
-                const subcategory = closest?.dataset.subcategory as KnowledgeSkillCategory;
-                if (subcategory) {
-                    const app = new KnowledgeSkillEditSheet({document: this.actor}, skillId, subcategory)
-                    await app.render(true, {mode: 'edit'} as any);
-                }
-            } else if (category === 'language') {
-                const app = new LanguageSkillEditSheet({document: this.actor}, skillId)
-                await app.render(true, {mode: 'edit'} as any);
-            }
-        }
+        const skill = this.actor.items.get(skillId);
+        if (!skill) return;
+
+        // @ts-expect-error TODO: tamif - skill-items resolve type error
+        await skill.sheet?.render(true, { mode: 'edit' });
     }
 
     static async #editSkill(this: SR5BaseActorSheet, event: PointerEvent) {
@@ -1615,19 +1686,19 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.preventDefault();
         if (!(event.target instanceof HTMLElement)) return;
         const closest = this._closestSkillTarget(event.target);
-        const skillId = closest?.dataset.skillId;
-        if (skillId) {
-            await this.actor.rollSkill(skillId, { event });
-        }
+        const skillName = closest?.dataset.skillName;
+        if (!skillName) return;
+
+        await this.actor.rollSkill(skillName, { event });
     }
 
     static async #rollSkillSpec(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
         if (!(event.target instanceof HTMLElement)) return;
         const closest = this._closestSkillTarget(event.target);
-        const skillId = closest?.dataset.skillId;
-        if (skillId) {
-            await this.actor.rollSkill(skillId, { event, specialization: true });
+        const skillName = closest?.dataset.skillName;
+        if (skillName) {
+            await this.actor.rollSkill(skillName, { event, specialization: true });
         }
     }
 
@@ -1642,65 +1713,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         await LinksHelpers.openSource(skill.link);
     }
 
-    static async #createLanguageSkill(this: SR5BaseActorSheet, event: PointerEvent) {
-        event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
-        await this.actor.addLanguageSkill({ name: '' });
-    }
-
-    static async #deleteLanguageSkill(this: SR5BaseActorSheet, event: PointerEvent) {
-        event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
-
-        const userConsented = await Helpers.confirmDeletion();
-        if (!userConsented) return;
-
-        const skillId = event.target?.closest<HTMLElement>('[data-skill-id]')?.dataset?.skillId;
-        if (!skillId) return;
-        await this.actor.removeLanguageSkill(skillId);
-    }
-
-    static async #createKnowledgeSkill(this: SR5BaseActorSheet, event: PointerEvent) {
-        event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
-        const category = $(event.target).closest('a').data().skillType;
-        const skillId = await this.actor.addKnowledgeSkill(category);
-        if (!skillId) return;
-    }
-
-    static async #deleteKnowledgeSkill(this: SR5BaseActorSheet, event: PointerEvent) {
-        event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
-
-        const userConsented = await Helpers.confirmDeletion();
-        if (!userConsented) return;
-
-        const skillId = event.target?.closest<HTMLElement>('[data-skill-id]')?.dataset?.skillId;
-        const knowledgeSkillCategory = event.target?.closest<HTMLElement>('[data-category]')?.dataset?.subcategory as KnowledgeSkillCategory;
-        if (!skillId || !knowledgeSkillCategory) return;
-        await this.actor.removeKnowledgeSkill(skillId, knowledgeSkillCategory);
-    }
-
-    /** Add an active skill and show the matching edit application afterwards.
-     *
-     * @param event The HTML event from which the action resulted.
-     */
-    static async #createActiveSkill(this: SR5BaseActorSheet) {
-        await this.actor.addActiveSkill();
-    }
-
-    static async #deleteActiveSkill(this: SR5BaseActorSheet, event: PointerEvent) {
-        event.preventDefault();
-        if (!(event.target instanceof HTMLElement)) return;
-
-        const userConsented = await Helpers.confirmDeletion();
-        if (!userConsented) return;
-
-        const skillId = event.target?.closest<HTMLElement>('[data-skill-id]')?.dataset?.skillId;
-        if (!skillId) return;
-        await this.actor.removeActiveSkill(skillId);
-    }
-
     static async #rollAttribute(this: SR5BaseActorSheet, event: PointerEvent) {
         event.preventDefault();
         if (!(event.target instanceof HTMLElement)) return;
@@ -1710,10 +1722,6 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         } else if (attribute) {
             await this.actor.rollAttribute(attribute, { event });
         }
-    }
-
-    async _onShowHiddenSkills() {
-        await this.actor.showHiddenSkills();
     }
 
     /**
@@ -1759,7 +1767,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             } else {
                 hidden_items.push(hiddenId);
             }
-            await this.actor.update({system: { hidden_items }});
+            await this.actor.update({ system: { hidden_items } });
         }
     }
 
@@ -1789,7 +1797,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             if (item.isType('device')) {
                 await this.document.equipOnlyOneItemOfType(item);
             } else {
-                await item.update({ system: { technology: { equipped: !item.isEquipped() }}})
+                await item.update({ system: { technology: { equipped: !item.isEquipped() } } })
             }
             this.actor.render(false);
         }
@@ -1810,11 +1818,11 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         // iterate through the states of online -> silent -> offline
         const newState = event.shiftKey ? 'none'
-                                        : item.isWireless()
-                                            ? item.isRunningSilent()
-                                                ? 'offline'
-                                                : 'silent'
-                                            : 'online';
+            : item.isWireless()
+                ? item.isRunningSilent()
+                    ? 'offline'
+                    : 'silent'
+                : 'online';
 
         // update the embedded item with the new wireless state
         await item.update({ system: { technology: { wireless: newState } } });
@@ -1886,6 +1894,18 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const changedSlot = currentTarget.value;
 
         return item.changeMatrixAttributeSlot(changedSlot, attribute);
+    }
+
+    async _onChangeSkillRating(event: Event) {
+        event.preventDefault();
+        if (!(event.target instanceof HTMLInputElement)) return;
+        const closest = this._closestSkillTarget(event.target);
+        const skillId = closest?.dataset.skillId;
+        if (!skillId) return;
+        const rating = Number(event.target.value);
+        if (isNaN(rating)) return;
+
+        await SkillItemFlow.changeSkillRating(this.actor, skillId, rating);
     }
 
     /**
@@ -1969,7 +1989,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     /**
-     * Prepare keybindings to be shown when hovering over a rolling icon 
+     * Prepare keybindings to be shown when hovering over a rolling icon
      * in any list item view that has rolls.
      */
     _prepareKeybindings() {
@@ -1983,8 +2003,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     /**
      * These effect apply to types are meant to be shown on the item effects section of the effects sheet.
-     * 
-     * They are limited to those effects directly affecting this actor. Effects affecting other actors, aren't shown 
+     *
+     * They are limited to those effects directly affecting this actor. Effects affecting other actors, aren't shown
      * on the actors own sheet.
      */
     get itemEffectApplyTos() {
@@ -1994,22 +2014,22 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     override async _onFirstRender(context, options) {
         await super._onFirstRender(context, options);
 
-        this._createContextMenu(this._getItemListContextOptions.bind(this), "[data-item-id]", {
+        this._createContextMenu(this._getItemListContextOptions.bind(this), "[data-item-id][data-context-menu='item']", {
             hookName: "getItemListContextOptions",
             jQuery: false,
             fixed: true,
         });
-        this._createContextMenu(this._getEffectListContextOptions.bind(this), "[data-effect-id]", {
+        this._createContextMenu(this._getEffectListContextOptions.bind(this), "[data-effect-id][data-context-menu='effect']", {
             hookName: "getEffectListContextOptions",
             jQuery: false,
             fixed: true,
         });
-        this._createContextMenu(this._getSkillListContextOptions.bind(this), "[data-skill-id]", {
+        this._createContextMenu(this._getSkillListContextOptions.bind(this), "[data-skill-id][data-context-menu='skill']", {
             hookName: "getSkillListContextOptions",
             jQuery: false,
             fixed: true,
         });
-        this._createContextMenu(this._getAttributeContextOptions.bind(this), "[data-attribute-id]", {
+        this._createContextMenu(this._getAttributeContextOptions.bind(this), "[data-attribute-id][data-context-menu='attribute']", {
             hookName: "getAttributeContextOptions",
             jQuery: false,
             fixed: true,
@@ -2024,37 +2044,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 callback: async (target: HTMLElement) => {
                     const skillTarget = this._closestSkillTarget(target)!;
                     const skillId = skillTarget.dataset.skillId!;
-                    const subCategory = skillTarget.dataset.subcategory;
-                    let path = '';
-                    switch (skillTarget.dataset.category) {
-                        case 'knowledge':
-                            path = `system.skills.knowledge.${subCategory}.${skillId}`;
-                            break;
-                        case 'language':
-                            path = `system.skills.language.${skillId}`;
-                            break;
-                        case 'active':
-                        default:
-                            path = `system.skills.active.${skillId}`;
-                            break;
-                    }
-                    if (!path) return;
-                    const skill = this.actor.getSkill(skillId)!;
-                    const effectData = {
-                        name: `${game.i18n.localize(skill.label) ?? skill.name} ${game.i18n.localize('SR5.Effect')}`,
-                        system: {
-                            applyTo: 'actor' as const,
-                        },
-                        changes: [
-                            {
-                                key: path,
-                                mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-                                priority: 0,
-                                value: '',
-                            }
-                        ]
-                    };
-                    await this.actor.createEmbeddedDocuments("ActiveEffect", [effectData], { renderSheet: true });
+
+                    await EffectCreationFlow.skill(this.actor, skillId);
                 }
             },
             {
@@ -2073,18 +2064,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
                     const skillTarget = this._closestSkillTarget(target)!;
                     const skillId = skillTarget.dataset.skillId!;
-                    const subCategory = skillTarget.dataset.subcategory!;
-                    switch (skillTarget.dataset.category) {
-                        case 'active':
-                            await this.actor.removeActiveSkill(skillId);
-                            break;
-                        case 'knowledge':
-                            await this.actor.removeKnowledgeSkill(skillId, subCategory as any);
-                            break;
-                        case 'language':
-                            await this.actor.removeLanguageSkill(skillId);
-                            break;
-                    }
+                    const skill = this.actor.items.get(skillId);
+                    if (skill) await skill.delete();
                 }
             }
         ]
@@ -2252,13 +2233,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     async _prepareActions() {
-        const actions = await PackActionFlow.getActorSheetActions(this.actor);
+        const actions = await PackItemFlow.getActorSheetActions(this.actor);
 
         // Prepare sorting and display of a possibly translated document name.
         const sheetActions: sheetAction[] = [];
         for (const action of actions) {
             sheetActions.push({
-                name: PackActionFlow.localizePackAction(action.name),
+                name: PackItemFlow.localizePackAction(action.name),
                 description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(action.system.description.value),
                 action
             });
@@ -2272,7 +2253,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.stopPropagation();
 
         const blitz = this.actor.system.initiative.edge;
-        await this.actor.update({system: { initiative: { edge: !blitz }}});
+        await this.actor.update({ system: { initiative: { edge: !blitz } } });
     }
 
     static async #rollInitiative(this: SR5BaseActorSheet, event: Event) {
@@ -2323,6 +2304,20 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         void this.render();
     }
 
+    /**
+     * Allow users to remove the documents skillset manually.
+     */
+    static async #removeSkillSet(this: SR5BaseActorSheet, event: Event) {
+        event.preventDefault();
+
+        if (!this.actor.system.skillset) return;
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        await SkillSetFlow.removeSkillSet(this.actor);
+    }
+
     async _moveItemToInventory(target: HTMLElement) {
 
         const id = SheetFlow.closestItemId(target);
@@ -2351,9 +2346,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         } else {
             this.expandedSkills.add(id);
             event.target?.closest('.list-item-container')?.classList.add('expanded');
-            const skill = this.actor.getSkill(id);
+            const skill = this.actor.items.get(id) as Item<'skill'>;
             if (skill) {
-                const html = await TextEditor.enrichHTML(skill.description, { secrets: this.actor.isOwner, });
+                const html = await TextEditor.enrichHTML(skill.system.description.value, { secrets: this.actor.isOwner, });
                 if (html) {
                     event.target.closest('.list-item-container')!.querySelector('.description-body')!.innerHTML = html;
                 }

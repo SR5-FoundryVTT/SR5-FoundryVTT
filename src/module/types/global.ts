@@ -51,6 +51,7 @@ import AugmentedRealityVisionDetectionMode from "../vision/augmentedReality/arDe
 import LowlightVisionDetectionMode from "../vision/lowlightVision/lowlightDetectionMode";
 import ThermographicVisionDetectionMode from "../vision/thermographicVision/thermographicDetectionMode";
 import { DiceSoNice } from "../rolls/DiceSoNice";
+import { Skill } from "./item/Skill";
 
 declare module "fvtt-types/configuration" {
     interface DocumentClassConfig {
@@ -153,6 +154,7 @@ declare module "fvtt-types/configuration" {
             quality: typeof Quality;
             ritual: typeof Ritual;
             sin: typeof Sin;
+            skill: typeof Skill;
             spell: typeof Spell;
             sprite_power: typeof SpritePower;
             weapon: typeof Weapon;
@@ -261,7 +263,7 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.UseDamageCondition": boolean;
         "shadowrun5e.AutomateMultiDefenseModifier": boolean;
         "shadowrun5e.AutomateProgressiveRecoil": boolean;
-        "shadowrun5e.ManualRollOnSuccessTest": boolean;
+        "shadowrun5e.CollapseModifyRollByDefault": boolean;
         "shadowrun5e.DefaultOpposedTestActorSelection": boolean;
         "shadowrun5e.MarkImports": string;
         "shadowrun5e.ImportIconFolder": string;
@@ -274,14 +276,20 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.GeneralActionsPack": string;
         "shadowrun5e.MatrixActionsPack": string;
         "shadowrun5e.ICActionsPack": string;
+        "shadowrun5e.SkillsPack": string;
+        "shadowrun5e.SkillGroupsPack": string;
+        "shadowrun5e.SkillSetsPack": string;
         "shadowrun5e.CompendiumBrowserBlacklist": string[];
         "shadowrun5e.ImporterCompendiumOrder": string[];
         "shadowrun5e.DieFaceLabels": string;
     }
 }
 
-// Helper type to convert 'never' to 'unknown' in Object.fromEntries
-type _NeverToUnknown<T> = [T] extends [never] ? unknown : T;
+// Helper type to ensure Object.fromEntries returns 'unknown' instead of 'never'
+type _NormalizeNever<T> = [T] extends [never] ? unknown : T;
+
+// Normalizes empty array entries in a type for Object.entries
+type _NormalizeEmptyEntries<T> = [T] extends [never[]] ? [string, unknown][] : T;
 
 declare global {
     var routinglib: RoutingLib | null;
@@ -313,10 +321,14 @@ declare global {
         entries<T extends object>(obj: T):
             T extends readonly unknown[]
                 ? Array<{ [K in keyof T]: [number extends K ? `${bigint}` : K, T[K]] }[number]>
-                : Array<{ [K in keyof T & string]: [K, T[K]] }[keyof T & string]>;
+                : _NormalizeEmptyEntries<Array<{ [K in keyof T & string]: [K, T[K]] }[keyof T & string]>>;
 
         fromEntries<E extends readonly [PropertyKey, unknown]>(obj: Array<E>):
-            { [K in E[0]]: _NeverToUnknown<Extract<E, readonly [K, unknown]>[1]> };
+            { [K in E[0]]: _NormalizeNever<Extract<E, readonly [K, unknown]>[1]> };
         fromEntries<K extends PropertyKey, V>(obj: Iterable<readonly [K, V]>): Record<K, V>;
     }
+
+    // IF set to true, will disable auto population of pack based skill items on actors.
+    // This is only necessary for qunech unit tests and shouldn't be used otherwise.
+    var doNotPopulateDefaultSkills: boolean | undefined;
 }

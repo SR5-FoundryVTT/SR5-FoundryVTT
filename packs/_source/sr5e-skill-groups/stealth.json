@@ -1,0 +1,47 @@
+{
+  "name": "Stealth",
+  "type": "skill",
+  "img": "systems/shadowrun5e/dist/icons/groups/stealth.svg",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": ""
+    },
+    "importFlags": null,
+    "type": "group",
+    "skill": {
+      "category": "active",
+      "rating": 0,
+      "defaulting": false,
+      "attribute": "",
+      "specializations": [],
+      "group": "",
+      "requirement": "mundane",
+      "language": {
+        "isNative": false
+      },
+      "knowledgeType": null
+    },
+    "group": {
+      "skills": [
+        "Disguise",
+        "Palming",
+        "Sneaking"
+      ],
+      "rating": 0
+    },
+    "set": {
+      "skills": [],
+      "groups": []
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "HeJcpklOvwnM1WrM",
+  "_key": "!items!HeJcpklOvwnM1WrM"
+}

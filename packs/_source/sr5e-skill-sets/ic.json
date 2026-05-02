@@ -1,0 +1,110 @@
+{
+  "name": "IC",
+  "type": "skill",
+  "_id": "hQPdmc2dOU9ihDoN",
+  "img": "icons/svg/item-bag.svg",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": ""
+    },
+    "importFlags": null,
+    "type": "set",
+    "source": {
+      "uuid": ""
+    },
+    "skill": {
+      "category": "active",
+      "knowledgeType": "academic",
+      "group": "",
+      "rating": 0,
+      "defaulting": false,
+      "attribute": "",
+      "limit": {
+        "attribute": ""
+      },
+      "specializations": [],
+      "requirement": "mundane",
+      "action": {
+        "opposed": {
+          "test": "OpposedTest",
+          "type": "",
+          "description": "",
+          "mod": 0,
+          "skill": "",
+          "attribute": "",
+          "attribute2": "",
+          "armor": false,
+          "resist": {
+            "test": "",
+            "skill": "",
+            "mod": 0,
+            "attribute": "",
+            "attribute2": "",
+            "armor": false
+          }
+        }
+      },
+      "language": {
+        "isNative": false
+      }
+    },
+    "group": {
+      "skills": [],
+      "rating": 0
+    },
+    "set": {
+      "skills": [
+        {
+          "name": "Computer",
+          "rating": 0,
+          "specializations": []
+        },
+        {
+          "name": "Cybercombat",
+          "rating": 0,
+          "specializations": []
+        },
+        {
+          "name": "Electronic Warfare",
+          "rating": 0,
+          "specializations": []
+        },
+        {
+          "name": "Hacking",
+          "rating": 0,
+          "specializations": []
+        },
+        {
+          "name": "Software",
+          "rating": 0,
+          "specializations": []
+        }
+      ],
+      "groups": [],
+      "default": {
+        "type": "ic"
+      }
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "sort": 0,
+  "ownership": {
+    "default": 0
+  },
+  "flags": {},
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "shadowrun5e",
+    "systemVersion": "0.33.0",
+    "createdTime": 1774604030335,
+    "modifiedTime": 1774604056790,
+    "lastModifiedBy": "sr5ebuilder"
+  },
+  "_key": "!items!hQPdmc2dOU9ihDoN"
+}

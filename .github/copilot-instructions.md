@@ -1,60 +1,55 @@
-# Copilot Instructions
+# AI Coding Agent Guide (SR5-FoundryVTT)
 
-This project is a web application implementing a FoundryVTT system allowing users to automate game rules of the Shadowrun 5th edition ttrpg. The application is built using TypeScript, SCSS and handlebarjs templates.
+FoundryVTT Shadowrun 5e system implemented in TypeScript + SCSS + Handlebars templates.
 
-## Coding Standards
+## Architecture: layers and boundaries
+- Keep the layer split strict: documents (`src/module/actor`, `src/module/item`, `src/module/combat`), sheets (`src/module/**/sheets`), flows (`src/module/**/flows`), rules (`src/module/rules`).
+- Documents are the main API surface for game behavior and should orchestrate calls; rules should stay Shadowrun-specific and minimize direct Foundry API usage.
+- Flows connect Foundry-facing behavior and rules; they may aggregate data, but avoid pushing Foundry details into rules.
+- Core document classes: `SR5Item`, `SR5Actor`, `SR5Combat`, `SR5Scene`, `SR5Message`.
+- System data lives on document instances under `.system` (example: `SR5Item.system.attributes.body.value`).
+- Main bootstrap path is `src/module/main.ts` -> `HooksManager.registerHooks()` and `HandlebarManager.registerHelpers()`.
 
-- Use cameClase for variable and functions names and JSON properties
-- Use PascalCase for class and component names
-- Use single quotes for strings
-- Use 4 spaces for identation
-- Use async/await for asynchronous code
-- Use template literals for strings that contain variables
+## Testing and key distinction
+- `SuccessTest` and subclasses in `src/module/tests` are gameplay test implementations, not unit tests.
+- Automated tests are registered through Quench in `src/unittests/quench.ts`, with spec files under `src/unittests/**/sr5.*.spec.ts`.
+- Test style is Mocha/Chai compatible via Quench; do not assume standalone Mocha CLI execution in this repo.
+- Test creation and value merge behavior is centered in `src/module/tests/TestCreator.ts`.
 
-## Unittesting
+## Data and socket flows
+- Shared cross-document state is centralized through `DataStorage` and exposed via `SRStorage` in `src/module/storage/storage.ts`.
+- Socket transport is wrapped by `SocketMessage` in `src/module/sockets.ts` (`emit` for broadcast, `emitForGM` for GM-targeted calls).
+- Socket handling is wired from hooks (`HooksManager` in `src/module/hooks.ts`) and flow handlers such as `src/module/flows/SocketMessageFlow.ts`.
+- Player write escalation pattern: `DataStorage.set` -> `_setAsPlayer` -> `SocketMessage.emitForGM` -> GM socket handler in hooks.
 
-Unittesting is done using Mocha and Chai.
-The individual unittests are connected and called in `src/unittests/quench.ts` with each stored in `src/unittests` in individual `sr5.<unitTest>.spec.ts` files.
+## Critical workflows (run these, don’t invent)
+- Watch/dev compile: `npm run watch`
+- Type-check gate: `npm test`
+- Lint: `npm run lint` (or `npm run lint:errors` for errors only)
+- Auto-fix lint: `npm run lint:fix` (or `npm run lint:errors:fix`)
+- Package compendiums: `npm run build:db`
+- Unpack compendiums: `npm run unpack:db`
+- Foundry runtime is usually launched via VS Code tasks (`FoundryVTT 12`, `FoundryVTT 13`).
+- CI gates are `npm test` and `npm run lint`; keep changes passing both.
 
-## Architecture
+## Project conventions
+- Use camelCase for variables/functions/JSON properties; PascalCase for classes/types.
+- Use single quotes, 4 spaces indentation, async/await for async flows, template literals when interpolating variables.
+- Keep edits surgical and local to the feature; preserve existing naming and folder patterns.
+- Prefer updating existing flows/rules/tests over adding parallel abstractions.
+- Keep esbuild output compatible with class-name based test registration (build uses non-minified output).
 
-The main components are within the `SR5Actor` and `SR5Item` document classes, connecting the main functionality. The system separates code between document classes, connecting everything, rule objects, handling the Shadowrun 5th edition rule system, and flow objects, connecting FoundryVTT and rule functionality.
+## Integration points to respect
+- Hook registration and global API wiring: `src/module/hooks.ts`.
+- Optional module integrations currently include `routinglib` and `dice-so-nice` (initialized in hooks).
+- Active-effect and modifier behavior is centered around `DocumentSituationModifiers` and `SR5ActiveEffect` flows/rules.
+- Core mechanics to preserve when changing logic: modifiers, combat/initiative, magic/spirits, matrix/hacking, technomancer, and rigging flows.
+- Compendium source of truth is `packs/_source`; use pack scripts to persist GUI changes.
 
-The system implements dice throws and rule checks of the Shadowrun 5th edition rules within the `SuccessTest` class. This class and it's sub-classes are not unittests!
-
-Data itself is stored in so called FoundryVTT document classes, which are:
-- `SR5Item`
-- `SR5Actor`
-- `SR5Combat`
-- `SR5Scene`
-- `SR5Message`
-
-All of these document classes contain FoundryVTT data, directly as properties on those classes object instances, and system related data stored in the `system` property directly on the objects. For example `SR5Item.system.attributes.body.value`.
-
-### Layers of functionality
-
-The system is designed in layers, with each layer responsible for a specific aspect of the functionality. This separation of concerns allows for easier maintenance and extensibility of the codebase.
-The main layers are:
-- documents
-- sheets
-- flows
-- rules
-
-Document classes provide the general API for all parts of the system to trigger functionality. These are FoundryVTT document classes that represent the various entities within the game world.
-Sheet classes wrap a document class and render its contents onto a web user interface using handlebarjs. These are FoundryVTT objects that extend the document classes and add additional functionality for the user interface.
-Flows wrap specific features or functions into a modularized file, either using objects or classes, allowing for better organization and reusability of code. Flows wrap both document and rule functionality. They can contain data manipulation and retrieval for other layers as well (documents, sheets); only rules shouldn't use flows.
-Rules wrap Shadowrun 5e specific rule implementations into a modularized file, either using objects or classes, allowing for better organization and reusability of code. Rules should contain as little FoundryVTT functionality as possible.
-
-Additionally there is a central data storage for inter document data exchange which is handled by the `DataStorage` class and `src/module/storage/storage.ts` combining multiple storage classes for data transfer.
-
-## Core Game Mechanics
-
-The Shadowrun 5th edition ttrpg has these core game mechanics:
-
-- modifiers change values and are handled within the `SituationModifiers` class and sub-classes and uses the FoundryVTT active effects implemented with the `SR5eActiveEffect` class
-- combat related rules, with ranged and melee combat
-- combat initiative handling within the `SR5Combat` class
-- magic related rules for spells and spirits
-- matrix related rules for hacking, managing networks and devices
-- technomancer related rules for matrix handling special to technomancers
-- rigging related rules for driving vehicles and rolling tests with vehicles
+## Rule book shorthands
+- Sourcebook citation infrastructure is owned by the sibling standalone project `mcp-sourcebook-citation`, not by this Foundry system repository.
+- Prefer the installed MCP server from `mcp-sourcebook-citation` for book-code, page, and heading resolution.
+- If MCP is unavailable, use `mcp-sourcebook-citation/data/indexes/book-index.json` for code-to-file resolution and `mcp-sourcebook-citation/data/indexes/page-index.json` for page-to-line lookup.
+- If the generated indexes are missing or stale, fall back to `mcp-sourcebook-citation/data/catalog/books.xml`, then `mcp-sourcebook-citation/data/sourcebooks/md/`.
+- Book-code overrides and preferred file mappings are maintained in `mcp-sourcebook-citation/config/book-overrides.json`.
+- Do not add new sourcebook corpus files, generated indexes, or MCP server code to this repository.

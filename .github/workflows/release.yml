@@ -34,7 +34,7 @@ jobs:
             - name: Build and package release artifacts
               run: |
                   npm ci
-                  gulp build
+                  npm run build:prod
                   npm run build:db
                   zip -r ./shadowrun5e.zip system.json template.json LICENSE README.md README-DEV.md dist/ packs/ --exclude "packs/_source/*"
 

@@ -1,0 +1,433 @@
+import { SkillNamingFlow } from '@/module/flows/SkillNamingFlow';
+import { SR5Actor } from "@/module/actor/SR5Actor";
+import { SR5Item } from "../SR5Item";
+import { FLAGS, SYSTEM_NAME } from "@/module/constants";
+import { SR5 } from "@/module/config";
+import { Helpers } from "@/module/helpers";
+
+/**
+ * Handle interaction with the system packs for predefined items.
+ * 
+ * This includes all system item packs, including actions and skills.
+ */
+export const PackItemFlow = {
+    /**
+     * A pack document retrieval helper for typed items.
+     * @param pack The pack to retrieve documents from.
+     * @param entryIds The list of ids to retrieve
+     * @returns A list of documents of the given type.
+     */
+    async getPackDocuments<T extends Item.ConfiguredSubType>(
+        pack: foundry.documents.collections.CompendiumCollection<'Item'>,
+        entryIds: string[]
+    ): Promise<SR5Item<T>[]> {
+        if (entryIds.length === 0) return [];
+
+        return await pack.getDocuments({ _id__in: entryIds }) as unknown as SR5Item<T>[];
+    },
+
+    /**
+     * A pack document retrieval helper for a single typed item.
+     * @param pack The pack to retrieve documents from.
+     * @param entryId The id of the document to retrieve
+     * @returns The document of the given type, or undefined if not found.
+     */
+    async getSinglePackDocument<T extends Item.ConfiguredSubType>(
+        pack: foundry.documents.collections.CompendiumCollection<'Item'>,
+        entryId: string
+    ) {
+        return await pack.getDocument(entryId) as unknown as SR5Item<T> | undefined;
+    },
+
+    /**
+     * Return the matrix action pack name to use, when the matrix actions pack is referenced.
+     */
+    getMatrixActionsPackName(): Shadowrun.PackName {
+        const overrideMatrixPackName = game.settings.get(SYSTEM_NAME, FLAGS.MatrixActionsPack) as Shadowrun.PackName;
+        return overrideMatrixPackName || SR5.packNames.MatrixActionsPack as Shadowrun.PackName;
+    },
+
+    /**
+     * Returns the general actions pack name to use, when the general actions pack is referenced.
+     */
+    getGeneralActionsPackName(): Shadowrun.PackName {
+        const overrideGeneralpackName = game.settings.get(SYSTEM_NAME, FLAGS.GeneralActionsPack) as Shadowrun.PackName;
+        return overrideGeneralpackName || SR5.packNames.GeneralActionsPack as Shadowrun.PackName;
+    },
+
+    /**
+     * Return the matrix action pack name to use, when the matrix actions pack is referenced.
+     */
+    getICActionsPackName(): Shadowrun.PackName {
+        const overrideMatrixPackName = game.settings.get(SYSTEM_NAME, FLAGS.ICActionsPack) as Shadowrun.PackName;
+        return overrideMatrixPackName || SR5.packNames.ICActionsPack as Shadowrun.PackName;
+    },
+
+    /**
+     * Return the skills pack name to use, when the skills pack is referenced.
+     */
+    getSkillsPackName(): Shadowrun.PackName {
+        const overrideSkillsPackName = game.settings.get(SYSTEM_NAME, FLAGS.SkillsPack) as Shadowrun.PackName;
+        return overrideSkillsPackName || SR5.packNames.SkillsPack as Shadowrun.PackName;
+    },
+
+    /**
+     * Return the skill sets pack name to use, when the skill sets pack is referenced.
+     */
+    getSkillSetsPackName(): Shadowrun.PackName {
+        const overrideSkillSetsPackName = game.settings.get(SYSTEM_NAME, FLAGS.SkillSetsPack) as Shadowrun.PackName;
+        return overrideSkillSetsPackName || SR5.packNames.SkillSetsPack as Shadowrun.PackName;
+    },
+
+    /**
+     * Return the skill groups pack name to use, when the skill groups pack is referenced.
+     */
+    getSkillGroupsPackName(): Shadowrun.PackName {
+        const overrideSkillGroupsPackName = game.settings.get(SYSTEM_NAME, FLAGS.SkillGroupsPack) as Shadowrun.PackName;
+        return overrideSkillGroupsPackName || SR5.packNames.SkillGroupsPack as Shadowrun.PackName;
+    },
+
+    /**
+     * Retrieve all actions from a given pack.
+     *
+     * Other item types in that pack will be ignored.
+     *
+     * TODO: Allow filtering by categories?
+     * TODO: Generalize this to search for items of a certain type?
+     *
+     * @param packName The item pack that contains actions.
+     */
+    async getPackActions(packName: string): Promise<SR5Item<'action'>[]> {
+        console.debug(`Shadowrun 5e | Trying to fetch all actions from pack ${packName}`);
+        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
+        if (!pack) return [];
+
+        const packEntryIds = pack.index.filter(data => data.type === 'action').map(data => data._id);
+        const documents = await this.getPackDocuments<'action'>(pack, packEntryIds);
+
+        console.debug(`Shadowrun5e | Fetched all actions from pack ${packName}`, documents);
+        return documents;
+    },
+
+    /**
+     * Pack document names don't necessarily match what is displayed in the UI.
+     *
+     * TODO: Why even do this? Does the ui actually not match to the pack document name?
+     * @param documentName A string to be transformed. Malformed values will result in empty strings.
+     * @returns
+     */
+    packDocumentName(documentName?: string) {
+        // Fail gracefully.
+        documentName ??= '';
+        // eslint-disable-next-line
+        return documentName.toLowerCase().replace(new RegExp(' ', 'g'), '_')
+    },
+
+    /**
+     * Check packs for a given action.
+     *
+     * TODO: Use pack and action ids to avoid polluted user namespaces
+     *
+     * @param packName The metadata name of the pack
+     * @param actionName The name of the action within that pack
+     */
+    async getPackAction(packName: string, actionName: string): Promise<SR5Item | undefined> {
+        console.debug(`Shadowrun 5e | Trying to fetch action ${actionName} from pack ${packName}`);
+        const pack = game.packs.find(pack =>
+            pack.metadata.system === SYSTEM_NAME &&
+            (pack.metadata.name === packName || pack.metadata.label === packName)) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
+
+        if (!pack) return undefined;
+
+        // TODO: Use predefined ids instead of names...
+        // TODO: use replaceAll instead, which needs an change to es2021 at least for the ts compiler
+        actionName = this.packDocumentName(actionName).toLocaleLowerCase();
+
+        const packEntry = pack.index.find(data => this.packDocumentName(data.name) === actionName);
+        if (!packEntry) return undefined;
+
+        const item = await this.getSinglePackDocument<'action'>(pack, packEntry._id);
+        if (item?.type !== 'action') return undefined;
+
+        console.debug(`Shadowrun5e | Fetched action ${actionName} from pack ${packName}`, item);
+        return item;
+    },
+
+    /**
+     * Collect all actions of an actor for their sheet
+     *
+     * @param actor The actor to collect actions from.
+     * @returns Combined list of pack and actor actions.
+     */
+    async getActorSheetActions(actor: SR5Actor) {
+        const packName = this.getGeneralActionsPackName();
+        // Collect all sources for matrix actions.
+        const packActions = await this.getPackActions(packName);
+        const filteredPackActions = packActions.filter(action => {
+            const testName = action.getAction()?.test ?? '';
+            if (['DronePerceptionTest', 'DroneInfiltrationTest', 'PilotVehicleTest'].includes(testName)) {
+                return actor.isType('vehicle');
+            }
+            if (testName === 'DrainTest') {
+                return actor.isAwakened();
+            }
+            if (testName === 'FadeTest') {
+                return actor.isEmerged();
+            }
+            if (['NaturalRecoveryPhysicalTest', 'NaturalRecoveryStunTest'].includes(testName)) {
+                return false;
+            }
+            // hide these rolls on some sheets
+            if (['Composure', 'Lift Carry', 'Memory', 'Judge Intentions'].includes(action.name)) {
+                return !actor.isType('vehicle', 'ic', 'sprite');
+            }
+            return true;
+        })
+        const actorActions = actor.itemsForType.get('action') ?? [];
+        return [...filteredPackActions, ...actorActions];
+    },
+
+    /**
+     * Collect all matrix actions of an actor.
+     *
+     * @param actor The actor to collect matrix actions from.
+     * @return List of matrix action items the actor has.
+     */
+    getMatrixActions(actor: SR5Actor): SR5Item<'action'>[] {
+        const actions = actor.itemsForType.get('action') ?? [];
+        return actions.filter((action: SR5Item) => action.hasActionCategory('matrix'));
+    },
+
+    /**
+     * Retrieve matrix actions from the configured matrix actions pack.
+     *
+     * Only actions with the matrix category are returned to avoid showing unrelated actions.
+     */
+    async getMatrixPackActions(): Promise<SR5Item<'action'>[]> {
+        const matrixPackName = this.getMatrixActionsPackName();
+        const packActions = await this.getPackActions(matrixPackName);
+        return packActions.filter(action => action.hasActionCategory('matrix'));
+    },
+
+    /**
+     * Collect all matrix actions of an actor.
+     * 
+     * @param actor The actor to collect matrix actions from.
+     * @returns Combined list of pack and actor matrix actions.
+     */
+    async getActorMatrixActions(actor: SR5Actor) {
+        const packActions = await this.getMatrixPackActions();
+        const actorActions = this.getMatrixActions(actor);
+        return [...packActions, ...actorActions];
+    },
+
+    /**
+     * Localizes a pack action name if a translation exists.
+     *
+     * Content tends to be the name on an item.
+     *
+     * @param name The content name to localize.
+     * @returns Sheet usable text, either translated or original name.
+     */
+    localizePackAction(name: string): string {
+        return Helpers.localizeName(name, 'SR5.Content.Actions');
+    },
+
+    /**
+     * Retrieve all skill items from the configured skills pack.
+     *
+     * @returns Array of skill items from the pack.
+     */
+    async getPackSkills(): Promise<SR5Item<'skill'>[]> {
+        const packName = this.getSkillsPackName();
+        console.debug(`Shadowrun 5e | Trying to fetch all skills from pack ${packName}`);
+        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
+        if (!pack) return [];
+
+        const packEntryIds = pack.index.filter(data => data.type === 'skill').map(data => data._id);
+        const documents = await this.getPackDocuments<'skill'>(pack, packEntryIds);
+
+        console.debug(`Shadowrun5e | Fetched all skills from pack ${packName}`, documents);
+        return documents;
+    },
+
+    /**
+     * Retrieve all skill items of type group from the configured skill groups pack.
+     *
+     * @returns Array of skill group items from the pack.
+     */
+    async getPackSkillgroups(): Promise<SR5Item<'skill'>[]> {
+        const packName = this.getSkillGroupsPackName();
+        console.debug(`Shadowrun 5e | Trying to fetch all skill groups from pack ${packName}`);
+        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
+        if (!pack) return [];
+
+        const packEntryIds = pack.index.filter(data => data.type === 'skill').map(data => data._id);
+        const documents = await this.getPackDocuments<'skill'>(pack, packEntryIds);
+        const skillGroups = documents.filter(document => document.system.type === 'group');
+
+        console.debug(`Shadowrun5e | Fetched all skill groups from pack ${packName}`, skillGroups);
+        return skillGroups;
+    },
+
+    /**
+     * Retrieve a single skill set item from the configured pack.
+     *
+     * @param name The name of the skill set to retrieve.
+     * @returns The skill set item, or undefined if not found.
+     */
+    async getPackSkillSet(name: string) {
+        if (!name) return;
+        const packName = this.getSkillSetsPackName();
+        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
+        if (!pack) return;
+
+        const packEntry = pack.index.find(data => data.type === 'skill' && data.name === name);
+        if (!packEntry) return;
+
+        return await this.getSinglePackDocument<'skill'>(pack, packEntry._id);
+    },
+
+    /**
+     * Retrieve all skillsets from the configured pack.
+     */
+    async getAllPackSkillSets(): Promise<SR5Item<'skill'>[]> {
+        const packName = this.getSkillSetsPackName();
+        console.debug(`Shadowrun 5e | Trying to fetch all skill sets from pack ${packName}`);
+        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
+        if (!pack) return [];
+
+        const packEntryIds = pack.index.filter(data => data.type === 'skill').map(data => data._id);
+        const documents = await this.getPackDocuments<'skill'>(pack, packEntryIds);
+        const skillSets = documents.filter(document => document.system.type === 'set');
+
+        console.debug(`Shadowrun5e | Fetched all skill sets from pack ${packName}`, skillSets);
+        return skillSets;
+    },
+
+    /**
+     * Retrieve all skills as defined in a skill set.
+     * This includes also include skills as defined by groups mentioned in that skill set.
+     * All skills will also already have their ratings set.
+     * 
+     * @param skillSet Skill set item to retrieve skills for.
+     * @returns A list of skill data ready to be injected into an actor.
+     */
+    async prepareSkillsForSkillSet(skillSet: SR5Item<'skill'>) {
+        if (skillSet.system.type !== 'set') {
+            console.error(`Shadowrun 5e | Document ${skillSet.name} in pack ${this.getSkillSetsPackName()} is not of type set`, skillSet);
+            return [];
+        }
+
+        // Collect data for skills.
+        const setSkills = new Map<string, number>();
+        const skillSpecs = new Map<string, string[]>();
+        for (const skill of skillSet.system.set.skills) {
+            const skillKey = SkillNamingFlow.nameToKey(skill.name);
+            if (!skillKey) continue;
+            setSkills.set(skillKey, skill.rating);
+            skillSpecs.set(skillKey, skill.specializations.map(spec => spec.name));
+        }
+
+        // Collect ratings for skills in groups.
+        // Apply group ratings last, as they will override skill ratings.
+        const skillGroups = await PackItemFlow.prepareSkillGroupsForSkillSet(skillSet);
+        const skillGroup = new Map<string, string>();
+        for (const group of skillGroups) {
+            const groupSkills = foundry.utils.getProperty(group, 'system.group.skills') as string[] ?? [];
+            const groupRating = foundry.utils.getProperty(group, 'system.group.rating') as number ?? 0;
+
+            for (const groupSkill of groupSkills) {
+                const skillKey = SkillNamingFlow.nameToKey(groupSkill);
+                if (!skillKey) continue;
+                setSkills.set(skillKey, groupRating);
+                skillGroup.set(skillKey, group.name);
+            }
+        }
+
+        // Reduce pack skills down to skill set skills.
+        const skills = await PackItemFlow.getPackSkills();
+        if (!skills) return [];
+        
+        // Inject ratings as defined by set skills and groups.
+        const skillData = skills.flatMap(skill => {
+            const skillKey = SkillNamingFlow.nameToKey(skill.name);
+            if (!skillKey || !setSkills.has(skillKey)) return [];
+
+            const skillSource = skill.toObject();
+            // @ts-expect-error _id might be non-optional, though we do not want it. Instead of fully retyping, just lie.
+            delete skillSource._id;
+
+            skillSource.system.skill.rating = setSkills.get(skillKey) ?? skillSource.system.skill.rating;
+            skillSource.system.skill.group = skillGroup.get(skillKey) ?? '';
+            skillSource.system.skill.specializations = skillSpecs.get(skillKey)?.map(name => ({ name })) ?? [];
+            skillSource.system.source.uuid = skillSet.uuid;
+            return [skillSource];
+        });
+
+        return skillData;
+    },
+
+    /**
+     * Retrieve all skill groups defined in a skill set.
+     *
+     * @param skillSet Skill set item to retrieve skill groups for.
+     * @returns A list of skill groups or empty.
+     */
+    async prepareSkillGroupsForSkillSet(skillSet: SR5Item<'skill'>) {
+        if (skillSet.system.type !== 'set') {
+            console.error(`Shadowrun 5e | Document ${skillSet.name} in pack ${this.getSkillSetsPackName()} is not of type set`, skillSet);
+            return [];
+        }
+
+        const skillGroupRatings: Record<string, number> = {};
+        for (const group of skillSet.system.set.groups) {
+            skillGroupRatings[group.name] = group.rating;
+        }
+
+        const skillGroups = await PackItemFlow.getPackSkillgroups();
+        if (!skillGroups) return [];
+
+        const skillGroupData = skillGroups
+            .filter(group => Object.hasOwn(skillGroupRatings, group.name))
+            .map(group => group.toObject());
+
+        for (const skillGroup of skillGroupData) {
+            const rating = skillGroupRatings[skillGroup.name];
+            skillGroup.system.group.rating = rating;
+            skillGroup.system.source.uuid = skillSet.uuid;
+            
+            // @ts-expect-error _id might be non-optional, though we do not want it. Instead of fully retyping, just lie.
+            delete skillGroup._id;
+        }
+
+        return skillGroupData;
+    },
+    
+    /**
+     * Get all groups in a skill set as their items out of the skill groups pack.
+     * @param skillSet Retrieve groups for this skill set.
+     */
+    async getSkillGroupsForSkillSet(skillSet: SR5Item<'skill'>) {
+        const groups = await this.getPackSkillgroups();
+        return groups.filter(group => skillSet.system.set.groups.some(setGroup => setGroup.name === group.name));
+    },
+
+    /**
+     * Retrieve a single skill from the skills pack.
+     * @param name The name of the skill to retrieve.
+     * @returns The skill item, or undefined if not found.
+     */
+    async getSkill(name: string) {
+        if (!name) return;
+        const packName = this.getSkillsPackName();
+        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
+        if (!pack) return;
+
+        // Catch users adding skill to the pack without a name.
+        const packEntry = pack.index.find(data => data.type === 'skill' && SkillNamingFlow.nameToKey(data.name ?? '') === SkillNamingFlow.nameToKey(name));
+        if (!packEntry) return;
+
+        return this.getSinglePackDocument<'skill'>(pack, packEntry._id);
+    }
+};

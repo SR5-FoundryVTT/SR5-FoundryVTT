@@ -51,7 +51,8 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
 
             assert.strictEqual(spirit.system.initiative.meatspace.base.base, 16);
 
-            assert.strictEqual(spirit.system.skills.active.assensing.base, 6);
+            const assensingRating = Object.values(spirit.system.skills.active.assensing.changes).reduce((acc, change) => acc + change.value, 0);
+            assert.strictEqual(assensingRating, 6);
             assert.strictEqual(spirit.system.skills.active.arcana.base, 0); // not for this spirit type.
         });
 

@@ -1,0 +1,48 @@
+{
+  "name": "Close Combat",
+  "type": "skill",
+  "img": "systems/shadowrun5e/dist/icons/groups/close_combat.svg",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": ""
+    },
+    "importFlags": null,
+    "type": "group",
+    "skill": {
+      "category": "active",
+      "rating": 0,
+      "defaulting": false,
+      "attribute": "",
+      "specializations": [],
+      "group": "",
+      "requirement": "mundane",
+      "language": {
+        "isNative": false
+      },
+      "knowledgeType": null
+    },
+    "group": {
+      "skills": [
+        "Blades",
+        "Clubs",
+        "Throwing Weapons",
+        "Unarmed Combat"
+      ],
+      "rating": 0
+    },
+    "set": {
+      "skills": [],
+      "groups": []
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "wZc3mbMJC9UlM7G7",
+  "_key": "!items!wZc3mbMJC9UlM7G7"
+}

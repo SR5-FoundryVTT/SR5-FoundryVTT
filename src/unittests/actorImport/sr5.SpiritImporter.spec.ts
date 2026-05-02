@@ -1,9 +1,11 @@
 import { SR5Actor } from '@/module/actor/SR5Actor';
+import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
+import { SR5Item } from '@/module/item/SR5Item';
 import { FireSpirit } from './Examples/FireSpirit';
 import { SR5TestFactory } from 'src/unittests/utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { SpiritImporter } from '../../module/apps/actorImport/spiritImporter/SpiritImporter';
-import { CharacterImporter, importOptionsType } from '@/module/apps/actorImport/characterImporter/CharacterImporter';
+import { CharacterImporter, ImportOptionsType } from '@/module/apps/actorImport/characterImporter/CharacterImporter';
 
 export const spiritImporterTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -28,7 +30,7 @@ export const spiritImporterTesting = (context: QuenchBatchContext) => {
         spells: true,
         vehicles: true,
         weapons: true,
-    } satisfies importOptionsType;
+    } satisfies ImportOptionsType;
 
     describe('Chummer Spirit Importer', () => {
         it('Should import a chummer character', async () => {
@@ -58,7 +60,14 @@ export const spiritImporterTesting = (context: QuenchBatchContext) => {
         
         it('Should have the correct item number', async () => {
             if (!spirit) throw new Error('No spirit created');
-            assert.lengthOf(spirit.items, 11, 'Item count');
+            const skillSet = await fromUuid(spirit.system.skillset) as SR5Item<'skill'> | null;
+            if (!skillSet) throw new Error('No skillset assigned');
+
+            const skillItems = await PackItemFlow.prepareSkillsForSkillSet(skillSet);
+            const skillGroups = await PackItemFlow.prepareSkillGroupsForSkillSet(skillSet);
+            const nonSkillItems = spirit.items.filter(item => !item.isType('skill')).length;
+
+            assert.lengthOf(spirit.items, nonSkillItems + skillItems.length + skillGroups.length, 'Item count');
         });
     });
 };

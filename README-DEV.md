@@ -19,11 +19,17 @@ Follow these steps using your terminal (cmd.exe on Windows):
 * Start developing (you might want to link your dev and local systems folder)
 
 There are multiple gulp tasks available to help development:
-* watch => rebuild the system after a change is detected (code and `/public` data)
-* build => rebuild the system once
+* watch => rebuild the system after a change is detected (code and `/public` data), using implicit dev build
+* watch:prod => same as watch but using prod build
+* watch:dev => same as watch but explicitly using dev build
+* build => rebuild the system once (dev build, includes unit tests), using implicit dev build
+* build:prod => build the system once as a explicit prod build
+* build:dev => build the system once as a explicit dev build
 * link => See section below
 
 The resulting application used for FoundryVTT will only use contents in `/dist`.
+
+**Note:** By default, builds include the Quench unit test framework for testing during development. Production builds (created by GitHub Actions via `npm run build:prod`) exclude unit tests.
 
 ## Linking the dev and system folder
 It's helpful, but not strictly necessary, to place your development folder separate from the FoundryVTT system folder as a system update will overwrite your development folder otherwise. This can be done by linking the two. For this to work, the shadowrun5e system can't be installed in your local Foundry.
@@ -46,6 +52,42 @@ The relevant commands are:
  * `npm run lint:errors`: Run the linter, outputting only errors
  * `npm run lint:errors:fix`: Run the linter, fixing all errors it can auto-fix and outputting the rest
  * `npm run prettier`: Run prettier, auto-formatting your changeset
+
+## Sourcebook citation tooling
+
+Sourcebook citation data and the MCP server now live in the sibling `mcp-sourcebook-citation` project. This repo consumes that tooling but does not vendor the citation corpus, generated indexes, or the MCP implementation.
+
+NOTE: this mcp server is currently available upon request from the system author team.
+
+Typical setup:
+ * Clone `mcp-sourcebook-citation` next to this repo.
+ * Run `npm install` in that project.
+ * Start the stdio MCP server with `npm run mcp:server` in that project, or register it as a VS Code MCP server.
+
+Example VS Code MCP configuration:
+
+```json
+{
+	"servers": {
+		"sourcebook-citation": {
+			"type": "stdio",
+			"command": "node",
+			"args": [
+				"../mcp-sourcebook-citation/src/index.mjs"
+			],
+			"cwd": "../mcp-sourcebook-citation"
+		}
+	},
+	"inputs": []
+}
+```
+
+When the sourcebook corpus changes, rebuild and validate indexes from the standalone project instead:
+ * `npm run build:indexes`
+ * `npm run validate:indexes`
+ * `npm run validate:mcp`
+
+The standalone project README is the source of truth for citation tooling setup and data layout.
 
 # System Architecture
 A broad overview of the different areas of the shadowrun5e system. For more explanations around system specific concepts see `System Concepts`.
@@ -227,6 +269,6 @@ Any item can contain the action template allowing it to cast it as a Shadowrun 5
 
 FoundryVTT uses nedb to implement their compendiums, internally called packs. These nedb's are build from scratch on each release and need source document json files to be built from.
 
-If changes are to be made on compendium items, you can either make those directly within their source file underneath `./packs/_source` or using Foundry GUI. To make these changes persistent, extract compendium content to their source using `node ./utils/packs.mjs package unpack`. Since source documents are stored using their name, be careful when changing that and compare their on disk name with expectations.
+If changes are to be made on compendium items, you can either make those directly within their source file underneath `./packs/_source` or using Foundry GUI. To make these changes persistent, extract compendium content to their source using `node ./utils/packs.mjs package unpack`. Since source documents are stored using their name, be careful when changing that and compare their on disk name with expectations. Reserved filesystem basenames are exported with a leading `_` for portability, while the internal Foundry document name in the JSON stays unchanged.
 
 Since nedb packs aren't stored in git, changing pack contents will trigger changes for system compendiums as soon as the next GitHub release workflow is triggered.

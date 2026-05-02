@@ -30,6 +30,6 @@ export class SpriteParser extends MetatypeParserBase<'sprite'> {
     protected override async getFolder(jsonData: Metatype, compendiumKey: CompendiumKey): Promise<Folder> {
         const folderName = game.i18n.localize('TYPES.Actor.sprite');
 
-        return  IH.getFolder(compendiumKey, folderName);
+        return IH.getFolder(compendiumKey, folderName);
     }
 }

@@ -1,30 +1,28 @@
 <div id="language-knowledge-skills-scrollable" class="scrollable">
     {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/header.hbs'
         label="SR5.Languages"
-        addAction="addLanguageSkill" }}
-    {{#each system.skills.language.value as |skill sid|}}
+        addAction="addItem" 
+        category='language' }}
+    {{#each system.skills.language as |skill translated|}}
         {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/item.hbs'
-            skillPath=(concat "system.skills.language.value." sid)
             skill=skill
             category='language'
-            removeAction="removeLanguageSkill"
-            id=sid }}
+            translated=translated }}
     {{/each}}
-    {{#each system.skills.knowledge as |cat cid|}}
+    {{#each system.skills.knowledge as |skills knowledgeType|}}
         {{!-- Skip over empty knowledge categories during play mode --}}
-        {{#if (or @root.isEditMode (not (empty cat.value)))}}
+        {{#if (or @root.isEditMode (not (empty skills)))}}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/header.hbs'
-                label=(localizeOb cid @root.config.knowledgeSkillCategories)
-                addSkillType=cid
-                addAction="addKnowledgeSkill" }}
-            {{#each cat.value as |skill sid|}}
+                label=(localizeOb knowledgeType @root.config.knowledgeSkillCategories)
+                addAction="addItem"
+                category='knowledge'
+                knowledgeType=knowledgeType }}
+            {{#each skills as |skill translated|}}
                 {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/item.hbs'
-                    skillPath=(concat "system.skills.knowledge." cid ".value" sid)
                     skill=skill
                     category='knowledge'
-                    removeAction="removeKnowledgeSkill"
-                    subcategory=cid
-                    id=sid }}
+                    subcategory=knowledgeType
+                    translated=translated}}
             {{/each}}
         {{/if}}
     {{/each}}

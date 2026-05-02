@@ -162,7 +162,6 @@ export const ActorMarksFlow = {
             const markId = uuid;
 
             // Default values for matrix targets.
-            // TODO: taMiF/marks why are these defaults?
             const token = null;
             const runningSilent = false;
 

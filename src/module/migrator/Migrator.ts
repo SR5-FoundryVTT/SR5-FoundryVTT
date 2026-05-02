@@ -12,6 +12,7 @@ import { Version0_31_5 } from './versions/Version0_31_5';
 import { Version0_32_0 } from './versions/Version0_32_0';
 import { Version0_32_1 } from './versions/Version0_32_1';
 import { Version0_32_4 } from './versions/Version0_32_4';
+import { Version0_33_0 } from './versions/Version0_33_0';
 import { VersionMigration, MigratableDocument, MigratableDocumentName } from "./VersionMigration";
 const { deepClone } = foundry.utils;
 
@@ -50,6 +51,7 @@ export class Migrator {
         new Version0_32_0(),
         new Version0_32_1(),
         new Version0_32_4(),
+        new Version0_33_0(),
     ] as const;
 
     private static documentsToBeMigrated = 0;
@@ -74,6 +76,29 @@ export class Migrator {
     private static normalizeArray(data: any): any[] {
         if (data == null) return [];
         return Array.isArray(data) ? data : Object.values(data); 
+    }
+
+    private static formatElapsedTime(milliseconds: number): string {
+        const totalSeconds = Math.round(milliseconds / 1000);
+        if (totalSeconds < 60) {
+            return this.formatElapsedUnit(totalSeconds, 'second');
+        }
+
+        const wholeMinutes = Math.floor(totalSeconds / 60);
+        const remainingSeconds = totalSeconds % 60;
+        if (wholeMinutes < 60) {
+            return `${this.formatElapsedUnit(wholeMinutes, 'minute')} ${this.formatElapsedUnit(remainingSeconds, 'second')}`;
+        }
+
+        const wholeHours = Math.floor(wholeMinutes / 60);
+        const remainingMinutes = wholeMinutes % 60;
+        return `${this.formatElapsedUnit(wholeHours, 'hour')} ${this.formatElapsedUnit(remainingMinutes, 'minute')}`;
+    }
+
+    private static formatElapsedUnit(value: number, unit: 'second' | 'minute' | 'hour'): string {
+        const roundedValue = value >= 10 ? Math.round(value) : Math.round(value * 10) / 10;
+        const label = roundedValue === 1 ? unit : `${unit}s`;
+        return `${roundedValue} ${label}`;
     }
 
     /**
@@ -282,7 +307,7 @@ export class Migrator {
             title: "Migration Complete",
             content: `
                 <h2 style="color: red; text-align: center">Migration Complete</h2>
-                <p style="text-align: center">It took ${(performance.now() - start).toFixed(2)} milliseconds.</p>
+                <p style="text-align: center">It took ${this.formatElapsedTime(performance.now() - start)}.</p>
             `,
             buttons: {
                 ok: {

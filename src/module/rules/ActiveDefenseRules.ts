@@ -5,7 +5,7 @@ import { Translation } from "../utils/strings";
 /**
  * Everything around SR5#190 'Active Defenses'
  */
-export type ActiveDefenseData = Record<string, { label: Translation, value: number|undefined, initMod: number, weapon?: string, disabled?: boolean }>
+export type ActiveDefenseData = Record<string, { label: Translation, value: number | undefined, initMod: number, weapon?: string, disabled?: boolean }>
 
 export const ActiveDefenseRules = {
     /**
@@ -15,7 +15,7 @@ export const ActiveDefenseRules = {
      */
     availableActiveDefenses: (weapon: SR5Item<'weapon'>, actor: SR5Actor): ActiveDefenseData => {
         // General purpose active defenses. ()
-        const activeDefenses: ActiveDefenseData  = {
+        const activeDefenses: ActiveDefenseData = {
             full_defense: {
                 label: 'SR5.FullDefense',
                 value: actor.getFullDefenseAttribute()?.value,

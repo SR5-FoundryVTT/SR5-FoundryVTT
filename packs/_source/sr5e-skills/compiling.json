@@ -1,0 +1,43 @@
+{
+  "name": "Compiling",
+  "type": "skill",
+  "img": "systems/shadowrun5e/dist/icons/skills/resonance-compiling.svg",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": ""
+    },
+    "importFlags": null,
+    "type": "skill",
+    "skill": {
+      "category": "active",
+      "rating": 0,
+      "defaulting": false,
+      "attribute": "resonance",
+      "specializations": [],
+      "group": "",
+      "requirement": "resonance",
+      "language": {
+        "isNative": false
+      },
+      "knowledgeType": null
+    },
+    "group": {
+      "skills": [],
+      "rating": 0
+    },
+    "set": {
+      "skills": [],
+      "groups": []
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "jq1MD8Z8r2bwZwrU",
+  "_key": "!items!jq1MD8Z8r2bwZwrU"
+}

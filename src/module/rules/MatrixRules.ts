@@ -2,9 +2,8 @@ import { SR5Actor } from "../actor/SR5Actor";
 import { SR5 } from "../config";
 import { SR } from "../constants";
 import { DataDefaults } from "../data/DataDefaults";
-import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
-import { PartsList } from "../parts/PartsList";
+import { ModifiableValue } from "../mods/ModifiableValue";
 import { BiofeedbackDamageType, DamageType } from '../types/item/Action';
 
 export class MatrixRules {
@@ -67,6 +66,15 @@ export class MatrixRules {
      */
     static getICMeatAttributeBase(hostRating: number): number {
         return Math.max(hostRating, SR.attributes.ranges.host_rating.min);
+    }
+
+    /**
+     * Derive the base value of any skill an IC uses from its host rating.
+     *
+     * SR5#247 'Intrusion Countermeasures'     
+     */
+    static getICSkillBase(hostRating: number): number {
+        return hostRating;
     }
 
     /**
@@ -236,7 +244,7 @@ export class MatrixRules {
     /**
      * Determine the damage value to convergence with.
      * 
-     * See SR5#229-230 'User Mode' Virtual Reality sections.
+    * See SR5#231-232 'Overwatch Score and Convergence'.
      */
     static convergenceDamage(): DamageType {
         return DataDefaults.createData('damage', { base: 12, value: 12, type: { base: 'matrix', value: 'matrix' } });
@@ -256,7 +264,7 @@ export class MatrixRules {
             netHits = 0;
         }
         const damage = DataDefaults.createData('damage', { base: netHits, type: { base: 'matrix', value: 'matrix' }, biofeedback });
-        damage.value = Helpers.calcTotal(damage, { min: 0 });
+        ModifiableValue.calcTotal(damage, { min: 0 });
         return damage;
     }
 
@@ -314,10 +322,10 @@ export class MatrixRules {
         if (defenderHits < 0) defenderHits = 0;
 
         // add net hits as separate parts
-        PartsList.AddUniquePart(modified.mod, 'SR5.Attacker', attackerHits);
-        PartsList.AddUniquePart(modified.mod, 'SR5.Defender', -defenderHits);
-
-        modified.value = Helpers.calcTotal(modified, { min: 0 });
+        const mod = new ModifiableValue(modified);
+        mod.addUnique('SR5.Attacker',  attackerHits);
+        mod.addUnique('SR5.Defender', -defenderHits);
+        mod.calcTotal({ min: 0 });
 
         return modified;
     }

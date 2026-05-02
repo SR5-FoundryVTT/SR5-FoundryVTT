@@ -1,0 +1,43 @@
+{
+  "name": "Counterspelling",
+  "type": "skill",
+  "img": "systems/shadowrun5e/dist/icons/skills/magical-counterspelling.svg",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": ""
+    },
+    "importFlags": null,
+    "type": "skill",
+    "skill": {
+      "category": "active",
+      "rating": 0,
+      "defaulting": false,
+      "attribute": "magic",
+      "specializations": [],
+      "group": "",
+      "requirement": "magic",
+      "language": {
+        "isNative": false
+      },
+      "knowledgeType": null
+    },
+    "group": {
+      "skills": [],
+      "rating": 0
+    },
+    "set": {
+      "skills": [],
+      "groups": []
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "nS5mla9cx41Q54Ba",
+  "_key": "!items!nS5mla9cx41Q54Ba"
+}

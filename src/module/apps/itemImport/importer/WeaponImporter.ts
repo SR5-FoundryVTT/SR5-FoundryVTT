@@ -17,7 +17,7 @@ export class WeaponImporter extends DataImporter {
         private readonly thrownParser = new ThrownParser();
 
         public async Parse(jsonData: Weapon, compendiumKey: CompendiumKey): Promise<Item.CreateData> {
-            const category = WeaponParserBase.GetWeaponType(jsonData);
+            const category = WeaponParserBase.getWeaponType(jsonData);
             const selectedParser = category === 'range' ? this.rangedParser
                                  : category === 'melee' ? this.meleeParser
                                                         : this.thrownParser;

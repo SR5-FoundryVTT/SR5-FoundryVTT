@@ -2,7 +2,7 @@ import { SuccessTest } from '@/module/tests/SuccessTest';
 import { Helpers } from '@/module/helpers';
 import { RiggingRules } from '@/module/rules/RiggingRules';
 import { MatrixTestDataFlow } from '@/module/tests/flows/MatrixTestDataFlow';
-import { PartsList } from '@/module/parts/PartsList';
+import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { AttributeRules } from '@/module/rules/AttributeRules';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SR5Item } from '@/module/item/SR5Item';
@@ -24,11 +24,11 @@ export const RiggingTestDataFlow = {
         // if the rating is greater than 0 and a limit is already in place, add the control rig
         if (rating > 0 && test.data.limit.value > 0) {
             // add the control rig rating as a limit bonus to tests
-            test.data.limit.mod.push({name: game.i18n.localize('SR5.ControlRig'), value: rating});
-            Helpers.calcTotal(test.data.limit);
+            ModifiableValue.addUnique(test.data.limit, game.i18n.localize('SR5.ControlRig'), rating);
+            ModifiableValue.calcTotal(test.data.limit);
             // SR5 pg 452 says you add the control rig rating to vehicle tests
-            test.data.pool.mod.push({name: game.i18n.localize('SR5.ControlRig'), value: rating});
-            Helpers.calcTotal(test.data.pool);
+            ModifiableValue.addUnique(test.data.pool, game.i18n.localize('SR5.ControlRig'), rating);
+            ModifiableValue.calcTotal(test.data.pool);
         }
     },
 
@@ -42,7 +42,7 @@ export const RiggingTestDataFlow = {
         const driver = vehicle.getVehicleDriver();
         if (!driver) return;
         if (RiggingRules.isConsideredMatrixAction(test.data)) {
-            MatrixTestDataFlow.addMatrixModifiersToPool(driver, new PartsList(test.data.pool.mod), true);
+            MatrixTestDataFlow.addMatrixModifiersToPool(driver, new ModifiableValue(test.data.pool), true);
         }
     },
 
