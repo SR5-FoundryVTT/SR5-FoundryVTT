@@ -151,7 +151,7 @@ export class BonusHelper {
                 this.createEffect(
                     sheet, {
                         name: sheet.name + conditionTag,
-                        changes: [{ key: "data.modifiers", value: skill.bonus._TEXT }],
+                        changes: [{ key: "data.pool", value: skill.bonus._TEXT }],
                         system: { applyTo: 'test_all', selection_attributes: [{ value: name.capitalize(), id: name }] }
                     }
                 );
@@ -174,7 +174,7 @@ export class BonusHelper {
                     this.createEffect(
                         sheet, {
                             name: sheet.name + conditionTag,
-                            changes: [{ key: "data.modifiers", value: skillCategory.bonus._TEXT }],
+                            changes: [{ key: "data.pool", value: skillCategory.bonus._TEXT }],
                             system: { applyTo: 'test_all', selection_skills: skills }
                         }
                     );
@@ -194,7 +194,7 @@ export class BonusHelper {
                 this.createEffect(
                     sheet, {
                         name: sheet.name + conditionTag,
-                        changes: [{ key: "data.modifiers", value: skillGroup.bonus._TEXT }],
+                        changes: [{ key: "data.pool", value: skillGroup.bonus._TEXT }],
                         system: { applyTo: 'test_all', selection_skills: skills }
                     }
                 );
@@ -226,7 +226,7 @@ export class BonusHelper {
                 this.createEffect(
                     sheet, {
                         name: sheet.name + conditionTag,
-                        changes: [{ key: "data.modifiers", value: skill.bonus._TEXT }],
+                        changes: [{ key: "data.pool", value: skill.bonus._TEXT }],
                         system: { applyTo: 'test_all', selection_skills: [{ value: name, id: normalName }] }
                     }
                 );
