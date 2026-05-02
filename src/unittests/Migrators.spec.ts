@@ -2,6 +2,7 @@ import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { SR5TestFactory } from './utils';
 import { DataDefaults } from '@/module/data/DataDefaults';
 import { Migrator } from '@/module/migrator/Migrator';
+import { Version0_33_1 } from '@/module/migrator/versions/Version0_33_1';
 
 export const Migrators = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -203,6 +204,45 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(foundry.utils.getProperty(knowledge, 'system.skill.category'), 'knowledge');
             assert.strictEqual(foundry.utils.getProperty(knowledge, 'system.skill.knowledgeType'), 'street');
             assert.deepEqual(foundry.utils.getProperty(source, 'system.skills'), {});
+        });
+    });
+
+    describe('Version0_33_1 active effect key migration', () => {
+        it('migrates terminal .mods suffixe to .changes only', () => {
+            const migrator = new Version0_33_1();
+            const effect = {
+                changes: [
+                    { key: 'system.attributes.body.mods' },
+                    { key: 'system.skills.active.pistols.mods' },
+                    { key: 'system.modifiers.global' },
+                    { key: 'system.foo.mod.bar' },
+                    { key: 'system.foo.mods.bar' },
+                ],
+            };
+
+            assert.isTrue(migrator.handlesActiveEffect(effect));
+
+            migrator.migrateActiveEffect(effect);
+
+            assert.deepEqual(effect.changes.map(change => change.key), [
+                'system.attributes.body.changes',
+                'system.skills.active.pistols.changes',
+                'system.modifiers.global',
+                'system.foo.mod.bar',
+                'system.foo.mods.bar',
+            ]);
+        });
+
+        it('ignores keys where .mod is not the terminal segment', () => {
+            const migrator = new Version0_33_1();
+            const effect = {
+                changes: [
+                    { key: 'system.modifiers.value' },
+                    { key: 'system.foo.mod.bar' },
+                ],
+            };
+
+            assert.isFalse(migrator.handlesActiveEffect(effect));
         });
     });
 
