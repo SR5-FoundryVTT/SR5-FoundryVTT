@@ -93,6 +93,16 @@
         border-bottom: variables.$groove;
     }
 
+    #active-skills-scroll {
+        > .list-item-container.active-skill-row {
+            background: none;
+        }
+
+        > .list-item-container.active-skill-row:not(.hidden):nth-child(even of .active-skill-row:not(.hidden)) {
+            background: rgba(variables.$white, 0.03);
+        }
+    }
+
     select#select-inventory {
         height: 1rem;
         max-height: 1rem;

@@ -4,19 +4,20 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-    
-    # Grouping logic to separate specific packages
+
     groups:
+      fvtt-types:
+        patterns:
+          - "fvtt-types"
+
       everything:
         patterns:
           - "*"
         exclude-patterns:
-          - "@league-of-foundry-developers/foundry-vtt-types"
+          - "fvtt-types"
 
-    # Global labels applied to all PRs (including the separated one)
     labels:
       - "dependencies"
 
-    # Packages to skip entirely
     ignore:
       - dependency-name: "@types/node"
