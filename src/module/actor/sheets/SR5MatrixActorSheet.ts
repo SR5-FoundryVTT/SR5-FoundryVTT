@@ -529,7 +529,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             const persona = target.document instanceof SR5Item ? target.document.persona : undefined;
 
             // Handle persona icons.
-            if (target.document instanceof SR5Item && target.document.isMatrixDevice && persona) {
+            if (target.document instanceof SR5Item && target.document.isMatrixDevice && persona?.uuid) {
                 // Attach device icon to their persona.
                 // Already in target list...
                 const personaTarget = targets.find(t => t.document.uuid === persona.uuid);
@@ -541,7 +541,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
                         name: Helpers.getChatSpeakerName(persona),
                         token: persona.getToken(),
                         network: ActorMarksFlow.getDocumentNetwork(persona),
-                        document: persona,
+                        document: persona as Actor.Stored,
                         icons: [target],
                         type: MatrixNetworkFlow.getDocumentType(persona),
                         marks: 0,

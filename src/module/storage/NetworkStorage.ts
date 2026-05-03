@@ -136,12 +136,12 @@ export const NetworkStorage = {
         const networks = NetworkStorage.getStorage();
         const masterUuid = Helpers.uuidForStorage(master.uuid);
         const slaveUuids = networks[masterUuid] ?? [];
-        const slaves: (SR5Actor | SR5Item)[] = [];
+        const slaves: (Actor.Stored | Item.Stored)[] = [];
         for (const uuid of slaveUuids) {
-            const item = fromUuidSync(Helpers.uuidFromStorage(uuid));
+            const item = fromUuidSync(Helpers.uuidFromStorage(uuid)) as Item.Stored | Actor.Stored | null;
             // in case we have a stale id in storage, only add valid items
             if (item) {
-                slaves.push(item as (SR5Actor | SR5Item));
+                slaves.push(item);
             } else {
                 console.warn(`Could not find item from id ${uuid}. Consider clearing all Networked Items for ${master?.name}`)
             }
@@ -155,20 +155,20 @@ export const NetworkStorage = {
      * @param slave Slave network icon document.
      * @returns The master network document or null if not found.
      */
-    getMaster(slave: SR5Actor | SR5Item): SR5Item | null {
+    getMaster(slave: SR5Actor | SR5Item): Item.Stored | null {
         if (!slave.uuid) return null;
         const networks = NetworkStorage.getStorage();
         const slaveUuid = Helpers.uuidForStorage(slave.uuid);
 
         for (const [uuid, slaves] of Object.entries(networks)) {
             if (slaves.includes(slaveUuid)) {
-                return fromUuidSync(Helpers.uuidFromStorage(uuid)) as SR5Item;
+                return fromUuidSync(Helpers.uuidFromStorage(uuid)) as Item.Stored | null;
             }
         }
 
         // if we did not find the master in the NetworkStorage, try to load it from the uuid we have stored
         const masterUuid = slave.getMasterUuid();
-        if (masterUuid) return fromUuidSync(masterUuid) as SR5Item | null;
+        if (masterUuid) return fromUuidSync(masterUuid) as Item.Stored | null;
 
         return null;
     },

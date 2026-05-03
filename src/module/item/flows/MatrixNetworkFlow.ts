@@ -181,7 +181,7 @@ export class MatrixNetworkFlow {
      * @param master The master device to retrieve slaves for.
      * @returns A list of network devices slaved to the master.
      */
-    static getSlaves(master: SR5Item): (SR5Actor | SR5Item)[] {
+    static getSlaves(master: SR5Item) {
         console.debug(`Shadowrun 5e | Getting slaves for master ${master.name}`, master);
 
         if (!master.canBeMaster) {

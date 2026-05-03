@@ -407,7 +407,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return armor;
     }
 
-    getMatrixDevice(this: SR5Actor): SR5Item | undefined {
+    getMatrixDevice(this: SR5Actor) {
         return this.system.matrix?.device ? this.items.get(this.system.matrix.device) : undefined;
     }
 

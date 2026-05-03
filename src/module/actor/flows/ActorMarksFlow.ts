@@ -146,7 +146,7 @@ export const ActorMarksFlow = {
         const documents: Shadowrun.MarkedDocument[] = [];
 
         for (const {uuid, name, marks} of matrixData) {
-            let document = fromUuidSync(uuid ?? '') as SR5Actor | SR5Item;
+            let document = fromUuidSync(uuid ?? '') as Actor.Stored | Item.Stored | null;
             if (!document) {
                 console.error(`Shadowrun 5e | ActorMarksFlow.getMarkedDocuments: Could not find document for uuid ${uuid}. Consider cleaning all marks.`);
                 continue;   
@@ -154,7 +154,7 @@ export const ActorMarksFlow = {
 
             // Replace marked persona device with persona itself.
             const persona = document instanceof SR5Item ? document.persona : null;
-            if (persona && persona.getMatrixDevice()?.uuid === uuid) document = persona;
+            if (persona?.uuid && persona.getMatrixDevice()?.uuid === uuid) document = persona as Actor.Stored;
 
             const network = ActorMarksFlow.getDocumentNetwork(document);
             const type = MatrixNetworkFlow.getDocumentType(document);
