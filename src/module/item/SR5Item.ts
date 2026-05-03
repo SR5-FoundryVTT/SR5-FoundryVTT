@@ -741,17 +741,17 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return items.find((item) => item.id === itemId);
     }
 
-    async updateNestedEffects(changes: OneOrMany<ActiveEffect.UpdateInput & { _id?: string }>) {
+    async updateNestedEffects(changes: OneOrMany<ActiveEffect.UpdateData>) {
         if (!this._isNestedItem) return;
 
         changes = Array.isArray(changes) ? changes : [changes];
         if (!changes || changes.length === 0) return;
 
-        for (const effectChanges of changes) {
-            const effect = this.effects.get(effectChanges._id!);
+        for (const change of changes) {
+            const effectId = typeof change._id === 'string' ? change._id : '';
+            const effect = this.effects.get(effectId);
             if (!effect) continue;
-            delete effectChanges._id;
-            mergeObject(effect, expandObject(effectChanges), { inplace: true });
+            mergeObject(effect, expandObject(change), { inplace: true });
             effect.render(false);
         }
 
