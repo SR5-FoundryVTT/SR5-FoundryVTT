@@ -21,10 +21,10 @@
         }
     ],
     "url": "#{URL}#",
-    "version": "0.33.1",
+    "version": "0.34.0",
     "compatibility": {
-        "minimum": "13",
-        "verified": "13.351",
+        "minimum": "14",
+        "verified": "14.359",
         "maximum": "14"
     },
     "documentTypes": {
