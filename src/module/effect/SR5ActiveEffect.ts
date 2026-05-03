@@ -311,8 +311,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (this.parent instanceof SR5Item && this.parent._isNestedItem) {
             if (!data || !this.id) return this;
 
-            const nestedEffectUpdate = data as ActiveEffect.UpdateData;
-            await this.parent.updateNestedEffects({ ...nestedEffectUpdate, _id: this.id });
+            await this.parent.updateNestedEffects({ ...data, _id: this.id });
             await this.render();
             return this;
         }
