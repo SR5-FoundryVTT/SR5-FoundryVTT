@@ -197,6 +197,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Should some ActiveEffects need to be excluded from the general application, do so here.
+     * TODO: v14 - improve this implementation. It's a mess.
      * @param {string} phase The application phase under which changes are to be applied.
      * @override
      */
