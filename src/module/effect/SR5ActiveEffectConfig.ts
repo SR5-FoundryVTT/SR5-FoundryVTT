@@ -200,26 +200,6 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     }
 
     /**
-     * Handle adding a new change to the changes array.
-     *
-     * This overrides the Foundry default behavior of using ADD as default.
-     * Shadowrun mostly uses MODIFY, so we use that as default.
-     *
-     * - this here is the SR5ActiveEffectConfig, however not all the types work correctly so I used any
-     */
-    static async #onAddChange(this: any, event: PointerEvent, target: HTMLElement) {
-        if (this.form) {
-            const submitData = this._processFormData(null, this.form, new FormDataExtended(this.form));
-            const changes = Object.values(submitData.system?.changes ?? {});
-            changes.push({
-                ...this.document.system.schema.fields.changes.element.getInitialValue(),
-                type: 'custom',
-            });
-            return this.submit({updateData: {system: {changes}}});
-        }
-    }
-
-    /**
      * Assure both no changes are present before changing the applyTo type
      * and re-render the sheet to refresh prepared change value options.
      * 
