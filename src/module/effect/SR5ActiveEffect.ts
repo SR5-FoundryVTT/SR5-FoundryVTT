@@ -196,7 +196,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * 
      * This can cause diffeing beahvior between these two for effect application.
      */
-    // TODO: tamif - v14 - super.applyChange ?
+    // TODO: tamif - v14 - super.applyChange ? Compare with SR5Actor.applyActiveEffects
     override apply(model: DataModel.Any, change: ActiveEffect.ChangeData) {
         // legacyTransferal has item effects created with their items as owner/source.
         // modern transferal has item effects directly on owned items.
