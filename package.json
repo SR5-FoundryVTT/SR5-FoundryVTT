@@ -44,7 +44,7 @@
         "locale:check": "node ./utils/check-localization.mjs",
         "locale:base-usage": "node ./utils/check-base-locale-usage.mjs",
         "locale:base-inject-missing": "node ./utils/inject-missing-locale.mjs",
-        "test": "tsgo -p tsconfig.json",
+        "test": "tsgo -p tsconfig.json --noEmit",
         "lint": "npx eslint .",
         "lint:fix": "npx eslint . --fix",
         "lint:errors": "npx eslint . --quiet",
