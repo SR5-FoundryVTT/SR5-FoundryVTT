@@ -8,6 +8,7 @@ import { LinksHelpers } from '@/module/utils/links';
 import ActiveEffectConfig = foundry.applications.sheets.ActiveEffectConfig;
 import { ActiveEffectDM } from '@/module/types/effect/ActiveEffect';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
+import { SR5ActiveEffect } from './SR5ActiveEffect';
 
 /**
  * Shadowrun system alters some behaviors of Active Effects, making a custom ActiveEffectConfig necessary.
@@ -145,6 +146,8 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         data.selection_limit_options = this._getLimitOptions();
 
         data.applyToOptions = this.prepareApplyToOptions();
+        data.changeTypes = this.prepareChangeTypes();
+
         data.isv11 = game.release.generation === 11;
 
         data.systemFields = this.document.system.schema.fields;
@@ -226,11 +229,30 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
      * Shadowrun uses this mode to implement 'modify' mode, with complex behavior.
      * To give users better information about the mode, inject a 'modify' label.
      * 
+     * TODO: v14 - is this function still necessary Modify having been removed?
+     * 
      * @param modes A object prepared for display using Foundry select handlebarjs helper.
      * @returns Copy of the original modes and labels.
      */
     applyModifyLabelToCustomMode(changeTypes: Record<string, string>): Record<string, string> {
         return { ...changeTypes, custom: game.i18n.localize('SR5.ActiveEffect.Modes.Modify') };
+    }
+
+    /**
+     * Prepare possible choice types. This is necessary as we override most effect templates and can't use
+     * default FoundryVTT effect code.
+     * NOTE: This is taken from FoundryVTT v14 preparePartsContext 'changes'
+     */
+    prepareChangeTypes() {
+        // @ts-ignore TODO: v14 - types missing
+        return Object.entries(SR5ActiveEffect.CHANGE_TYPES as unknown as any)
+          .map(([type, {label}]) => ({type, label: game.i18n.localize(label)}))
+          .sort((a, b) => a.label.localeCompare(b.label, game.i18n.lang))
+          .reduce((types, {type, label}) => {
+            types[type] = label;
+            return types;
+          }, {});
+
     }
 
     /**
