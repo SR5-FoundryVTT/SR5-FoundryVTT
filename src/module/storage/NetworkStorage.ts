@@ -23,6 +23,7 @@ export const NetworkStorage = {
      * @param removeFromOthers When true, the slave will be removed from all other networks.
      */
     async addSlave(master: SR5Item, slave: SR5Actor | SR5Item, removeFromOthers = false) {
+        if (!master.uuid || !slave.uuid) return;
         const networks = NetworkStorage.getStorage();
         const masterUuid = Helpers.uuidForStorage(master.uuid);
         const slaveUuid = Helpers.uuidForStorage(slave.uuid);
@@ -57,6 +58,7 @@ export const NetworkStorage = {
      * @param slave A network icon document.
      */
     async removeSlave(master: SR5Item, slave: SR5Actor | SR5Item) {
+        if (!master.uuid || !slave.uuid) return;
         const networks = NetworkStorage.getStorage();
         const masterUuid = Helpers.uuidForStorage(master.uuid);
         const slaveUuid = Helpers.uuidForStorage(slave.uuid);
@@ -75,6 +77,7 @@ export const NetworkStorage = {
      * @param slave A network icon document.
      */
     async removeFromNetworks(slave: SR5Actor | SR5Item) {
+        if (!slave.uuid) return;
         const networks = NetworkStorage.getStorage();
         const slaveUuid = Helpers.uuidForStorage(slave.uuid);
 
@@ -101,6 +104,7 @@ export const NetworkStorage = {
      * @returns true, when slave is part of a master network.
      */
     isSlave(master: SR5Item, slave: SR5Actor | SR5Item): boolean {
+        if (!master.uuid || !slave.uuid) return false;
         const networks = NetworkStorage.getStorage();
         const masterUuid = Helpers.uuidForStorage(master.uuid);
         const slaveUuid = Helpers.uuidForStorage(slave.uuid);
@@ -112,6 +116,7 @@ export const NetworkStorage = {
      * @param master The master network document.
      */
     async removeSlaves(master: SR5Item) {
+        if (!master.uuid) return;
         const networks = NetworkStorage.getStorage();
         const masterUuid = Helpers.uuidForStorage(master.uuid);
         delete networks[masterUuid];
@@ -127,6 +132,7 @@ export const NetworkStorage = {
      * @returns An array of network icon documents.
      */
     getSlaves(master: SR5Item) {
+        if (!master.uuid) return [];
         const networks = NetworkStorage.getStorage();
         const masterUuid = Helpers.uuidForStorage(master.uuid);
         const slaveUuids = networks[masterUuid] ?? [];
@@ -150,6 +156,7 @@ export const NetworkStorage = {
      * @returns The master network document or null if not found.
      */
     getMaster(slave: SR5Actor | SR5Item): SR5Item | null {
+        if (!slave.uuid) return null;
         const networks = NetworkStorage.getStorage();
         const slaveUuid = Helpers.uuidForStorage(slave.uuid);
 

@@ -8,15 +8,11 @@ export class SR5TokenDocument extends TokenDocument {
      */
     #movementInProgress = false;
 
-    override async _preUpdate(
-        changed: TokenDocument.UpdateData,
-        options: TokenDocument.Database.PreUpdateOptions,
-        user: User.Implementation
-    ) {
+    override async _preUpdate(...args: Parameters<TokenDocument['_preUpdate']>) {
         this.#movementInProgress = true;
-        let result: boolean | void;
+        let result: Awaited<ReturnType<TokenDocument['_preUpdate']>>;
         try {
-            result = await super._preUpdate(changed, options, user);
+            result = await super._preUpdate(...args);
         } finally {
             this.#movementInProgress = false;
         }

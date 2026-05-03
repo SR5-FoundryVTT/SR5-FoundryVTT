@@ -129,9 +129,10 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options Additional options which modify the creation request
      * @param user The User requesting the document creation
      */
-    override async _preCreate(data: Actor.CreateData, options: Actor.Database.PreCreateOptions, user: User.Implementation) {
-        await super._preCreate(data, options, user);
-        
+    override async _preCreate(...args: Parameters<Actor<SubType>['_preCreate']>) {
+        const [data] = args;
+        await super._preCreate(...args);
+
         // Abort skill creation data injection when duplicating
         if (foundry.utils.getProperty(data, '_stats.duplicateSource')) return;
         // Abort if a skillset was already assigned (e.g. during Chummer import)
@@ -140,7 +141,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     override async update(
-        data: Actor.UpdateData | undefined,
+        data: Actor.UpdateInput,
         operation?: Actor.Database.UpdateOperation,
     ) {
         await Migrator.updateMigratedDocument(this);

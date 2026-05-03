@@ -576,6 +576,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     async addNewNetwork(item: SR5Item) {
         const sin = this.asType('sin');
         if (!sin) return;
+        if (!item.uuid) return;
         if (!item.isNetwork()) return;
 
         sin.system.networks.push(item.uuid);
@@ -1239,7 +1240,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return this;
     }
 
-    override async update(data: Item.UpdateData | undefined, options?: Item.Database.UpdateOperation) {
+    override async update(data: Item.UpdateInput, options?: Item.Database.UpdateOperation) {
         // Item.item => Embedded item into another item!
         if (this._isNestedItem)
             return this.updateNestedItem(data);
@@ -1529,7 +1530,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *
      * This is preferred to altering data on the fly in the prepareData methods flow.
      */
-    override async _preUpdate(changed: Item.UpdateData, options: Item.Database.PreUpdateOptions, user: User) {
+    override async _preUpdate(...args: Parameters<Item['_preUpdate']>) {
+        const [changed, options] = args;
         // Some Foundry core updates will no diff and just replace everything. This doesn't match with the
         // differential approach of action test injection. (NOTE: Changing ownership of a document)
         if (options.diff && options.recursive) {
@@ -1539,7 +1541,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             UpdateSkillFlow.injectSkillCategoryDefaults(changed, this);
         }
 
-        return super._preUpdate(changed, options, user);
+        return super._preUpdate(...args);
     }
 
     /**

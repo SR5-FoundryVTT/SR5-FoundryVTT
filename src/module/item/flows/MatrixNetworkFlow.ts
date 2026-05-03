@@ -260,6 +260,7 @@ export class MatrixNetworkFlow {
      * @returns true, if the device is connected to a network.
      */
     static isSlave(slave: SR5Actor | SR5Item) {
+        if (!slave.uuid) return false;
         const networks = NetworkStorage.getStorage();
         const slaveUuid = Helpers.uuidForStorage(slave.uuid);
         for (const slaves of Object.values(networks)) {
@@ -398,8 +399,8 @@ export class MatrixNetworkFlow {
             if (master) await master.update(foundry.utils.duplicate(updateData));
         } else {
             const documentsData: {uuid: string, updateData: Actor.UpdateData | Item.UpdateData}[] = [];
-            if (slave) documentsData.push({uuid: slave.uuid, updateData});
-            if (master) documentsData.push({uuid: master.uuid, updateData});
+            if (slave?.uuid) documentsData.push({uuid: slave.uuid, updateData});
+            if (master?.uuid) documentsData.push({uuid: master.uuid, updateData});
             if (documentsData) this._triggerUpdatesAsGM(documentsData);
         }
     }
@@ -421,6 +422,11 @@ export class MatrixNetworkFlow {
     static async AskForNetworkMarkInvite(actor: SR5Actor, target: SR5Actor | SR5Item) {
         if (!actor || !target) {
             console.error('Shadowrun 5e | No actor or target given for network mark invite.');
+            return;
+        }
+
+        if (!actor.uuid || !target.uuid) {
+            console.error('Shadowrun 5e | Actor or target missing uuid for network mark invite.', actor, target);
             return;
         }
 
@@ -466,8 +472,8 @@ export class MatrixNetworkFlow {
 
         const {actorUuid, targetUuid} = message.getFlag(SYSTEM_NAME, FLAGS.MatrixNetworkMarkInvite);
 
-        const actor = await fromUuid(actorUuid) as SR5Actor | undefined;
-        const network = await fromUuid(targetUuid) as SR5Item | undefined;
+        const actor = await fromUuid(actorUuid) as Actor.Stored | undefined;
+        const network = await fromUuid(targetUuid) as Item.Stored | undefined;
 
         if (!actor || !network)
             return console.error('Shadowrun 5e | Could not resolve actor or network for mark invite', actorUuid, targetUuid);

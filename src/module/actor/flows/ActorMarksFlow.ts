@@ -80,7 +80,7 @@ export const ActorMarksFlow = {
 
         if (!matrixData) return;
         // TODO: Support marking a non-document target (using only a name)
-        if (!target) return;
+        if (!target?.uuid || !persona.uuid) return;
 
         const marksData = MarksStorage.setMarks(matrixData.marks, target, persona.getMarksPlaced(target.uuid), marks, options);
 

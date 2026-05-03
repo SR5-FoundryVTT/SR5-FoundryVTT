@@ -38,7 +38,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
         it('Should import a chummer character', async () => {
             [actor, ...vehicles] = await CI.import(character, importOptions);
             assert.notEqual(actor, null, 'Actor not created');
-            factory.actors.push(actor, ...vehicles);
+            factory.actors.push(actor as Actor.Stored<'character'>, ...vehicles as Actor.Stored<'vehicle'>[]);
             assert.lengthOf(vehicles, 1, 'Vehicle not created');
         });
 

@@ -53,7 +53,7 @@ export const registerItemLineHelpers = () => {
 
     Handlebars.registerHelper('isVisible', function (item: SR5Item | SR5ActiveEffect, options) {
         const actor = options?.data?.root?.actor;
-        if (actor && item && actor instanceof SR5Actor) {
+        if (actor && item?.uuid && actor instanceof SR5Actor) {
             return !(actor.hiddenItems().has(item.uuid) || actor.hiddenItems().has(item.id!));
         }
         return true;
@@ -61,7 +61,7 @@ export const registerItemLineHelpers = () => {
 
     Handlebars.registerHelper('isFavorite', function (item: SR5Item, options) {
         const actor = options?.data?.root?.actor;
-        if (actor && item && actor instanceof SR5Actor) {
+        if (actor && item?.uuid && actor instanceof SR5Actor) {
             return (actor.favorites().has(item.uuid) || actor.favorites().has(item.id!));
         }
         return false;
