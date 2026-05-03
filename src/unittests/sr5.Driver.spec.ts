@@ -25,9 +25,9 @@ export const shadowrunDriver = (context: QuenchBatchContext) => {
         });
 
         const gunnery = actor.items.get(actor.system.skills.active.gunnery?.id);
-        await gunnery?.update({ system: { rating: 5 } });
+        await gunnery?.update({ system: { skill: { rating: 5 }}});
         const pilot_ground_craft = actor.items.get(actor.system.skills.active.pilot_ground_craft?.id);
-        await pilot_ground_craft?.update({ system: { rating: 5 } });
+        await pilot_ground_craft?.update({ system: { skill: { rating: 5 }} });
 
         return actor;
     }
