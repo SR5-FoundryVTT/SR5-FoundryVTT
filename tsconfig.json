@@ -11,7 +11,6 @@
         "rootDir": "." /* Specify the root folder within your source files. */,
         "module": "ESNext" /* Allow dynamic import statements on runtime for prod / dev builds */,
         "moduleResolution": "bundler" /* Specify how TypeScript looks up a file from a given module specifier. */,
-        "baseUrl": "./" /* Specify the base directory to resolve non-relative module names. */,
         "types": [
             "fvtt-types",
             "@ethaks/fvtt-quench"
@@ -19,6 +18,7 @@
         "resolveJsonModule": true /* Enable importing .json files. */,
 
         "paths": {
+            "src/*": ["./src/*"],
             "@/*": ["./src/*"]
         },
 

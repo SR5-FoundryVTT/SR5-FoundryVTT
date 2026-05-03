@@ -10,13 +10,14 @@ const util = require('util');
 const gulp = require('gulp');
 var cp = require('child_process');
 const esbuild = require('esbuild');
-const {typecheckPlugin} = require("@jgoz/esbuild-plugin-typecheck");
 
 // Config
 const distName = 'dist';
 const destFolder = path.resolve(process.cwd(), distName);
 const jsBundle = 'bundle.js';
 const entryPoint = "./src/module/main.ts";
+const tsgoPackagePath = require.resolve('@typescript/native-preview/package.json');
+const tsgoScriptPath = path.join(path.dirname(tsgoPackagePath), 'bin', 'tsgo.js');
 
 /**
  * CLEAN
@@ -43,9 +44,28 @@ async function buildJS(env) {
         define: {
             'process.env.ENV': JSON.stringify(env),
         },
-        // Don't typescheck on build. Instead typecheck on PR and push and assume releases to build.
         plugins: [],
     }).catch((err) => { console.error(err); });
+}
+
+function startTsgoWatch() {
+    const tsgoArgs = ['-p', 'tsconfig.json', '--noEmit', '--watch', '--preserveWatchOutput'];
+    const tsgo = cp.spawn(process.execPath, [tsgoScriptPath, ...tsgoArgs], {
+        stdio: 'inherit',
+        windowsHide: true,
+    });
+
+    tsgo.on('error', (err) => {
+        console.error('Error running tsgo watch:', err);
+    });
+
+    tsgo.on('exit', (code) => {
+        if (code) console.error(`tsgo watch exited with code ${code}`);
+    });
+
+    process.once('exit', () => {
+        if (tsgo.exitCode === null && !tsgo.killed) tsgo.kill();
+    });
 }
 
 const buildJSProd = () => buildJS('prod');
@@ -86,9 +106,10 @@ async function watch(env) {
         define: {
             'process.env.ENV': JSON.stringify(env),
         },
-        plugins: [typecheckPlugin({watch: true})],
+        plugins: [],
     })
 
+    startTsgoWatch();
     await context.watch();
 }
 

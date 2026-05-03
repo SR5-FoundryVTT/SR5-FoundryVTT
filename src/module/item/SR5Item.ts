@@ -741,7 +741,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return items.find((item) => item.id === itemId);
     }
 
-    async updateNestedEffects(changes: OneOrMany<ActiveEffect.UpdateData>) {
+    async updateNestedEffects(changes: OneOrMany<ActiveEffect.UpdateInput>) {
         if (!this._isNestedItem) return;
 
         changes = Array.isArray(changes) ? changes : [changes];
