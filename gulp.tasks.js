@@ -55,16 +55,25 @@ function startTsgoWatch() {
         windowsHide: true,
     });
 
+    const stopTsgo = () => {
+        try {
+            if (process.platform === 'win32')
+                cp.execFileSync('taskkill', ['/pid', String(tsgo.pid), '/t', '/f'], { stdio: 'ignore' });
+            else
+                tsgo.kill('SIGTERM');
+        } catch (_err) { /* Ignore errors when killing the process, as it might have already exited */ }
+    };
+
+    process.once('exit', stopTsgo);
+    process.once('SIGINT', () => { stopTsgo(); process.exit(130); });
+    process.once('SIGTERM', () => { stopTsgo(); process.exit(143); });
+
     tsgo.on('error', (err) => {
         console.error('Error running tsgo watch:', err);
     });
 
     tsgo.on('exit', (code) => {
         if (code) console.error(`tsgo watch exited with code ${code}`);
-    });
-
-    process.once('exit', () => {
-        if (tsgo.exitCode === null && !tsgo.killed) tsgo.kill();
     });
 }
 
