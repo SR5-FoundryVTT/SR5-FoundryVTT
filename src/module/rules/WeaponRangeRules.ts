@@ -91,17 +91,19 @@ export class WeaponRangeTestBehavior {
         }
 
         // Build target ranges for template display.
-        test.data.targetRanges = test.targets.map(token => {
-            const distance = Helpers.measureTokenDistance(attacker, token as TokenDocument);
-            const range = RangedWeaponRules.getRangeForTargetDistance(distance, test.data.ranges);
-            return {
-                tokenUuid: token.uuid,
-                name: token.name || '',
-                unit: LENGTH_UNIT,
-                range,
-                distance,
-            };
-        });
+        test.data.targetRanges = test.targets
+            .map(token => {
+                const distance = Helpers.measureTokenDistance(attacker, token as TokenDocument);
+                const range = RangedWeaponRules.getRangeForTargetDistance(distance, test.data.ranges);
+                return {
+                    tokenUuid: token.uuid ?? '',
+                    name: token.name || '',
+                    unit: LENGTH_UNIT,
+                    range,
+                    distance,
+                } satisfies TargetRangeTemplateType;
+            })
+            .filter((target): target is TargetRangeTemplateType => !!target.tokenUuid);
 
         // Sort targets by ascending distance from attacker.
         test.data.targetRanges = test.data.targetRanges.sort((a, b) => {
@@ -159,6 +161,7 @@ export class WeaponRangeTestBehavior {
             const token = fromUuidSync(target.tokenUuid) as TokenDocument;
             if (!(token instanceof TokenDocument)) return console.error(`Shadowrun 5e | ${test.type} got a target that is no TokenDocument`, token);
             if (!token.actor) return console.error(`Shadowrun 5e | ${test.type} got a token that has no actor`, token);
+            if (!token.actor.uuid) return console.error(`Shadowrun 5e | ${test.type} got a token with an actor that has no uuid`, token);
             test.data.targetActorsUuid = [token.actor.uuid];
             test.targets = [token];
         }

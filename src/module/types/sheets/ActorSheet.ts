@@ -7,7 +7,7 @@ declare namespace Shadowrun {
         // Name of the document or manually entered by user.
         name: string
         // The Foundry Document marked.
-        document: Actor.Implementation | Item.Implementation
+        document: Actor.Stored | Item.Stored
         // Optional token for those documents having them.
         token: TokenDocument | null
     }

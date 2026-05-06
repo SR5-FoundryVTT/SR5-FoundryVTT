@@ -45,12 +45,12 @@ export const MarksStorage = {
      */
     setMarks(marksData: MatrixMarksType, target: SR5Actor | SR5Item | undefined, currentMarks: number, marks: number, options: SetMarksOptions = {}) {
         // TODO: Allow for no target
-        if (!target) return [];
+        if (!target?.uuid) return [];
 
         // Reset marks instead of added additional.
         currentMarks = options.overwrite ? 0 : currentMarks;
 
-        let mark = marksData.find(mark => mark.uuid === target?.uuid);
+        let mark = marksData.find(mark => mark.uuid === target.uuid);
 
         // Either alter the existing mark or create a new one.
         if (mark) {
@@ -60,7 +60,7 @@ export const MarksStorage = {
                 uuid: target.uuid,
                 name: target.name ?? '',
                 marks: MatrixRules.getValidMarksCount(currentMarks + marks)
-            }
+            };
             marksData.push(mark);
         }
 
@@ -115,6 +115,7 @@ export const MarksStorage = {
      * @returns The actors marks data
      */
     retrieveMarks(document: SR5Actor | SR5Item): string[] {
+        if (!document.uuid) return [];
         const storage = MarksStorage.getStorage();
         const uuid = Helpers.uuidForStorage(document.uuid);
         return storage[uuid] ?? [];
