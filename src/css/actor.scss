@@ -88,10 +88,6 @@
             }
 
             &.vehicle-environment-inactive {
-                > label {
-                    color: rgba(variables.$yellow, 0.55);
-                }
-
                 .attribute-value button {
                     opacity: 0.45;
                     filter: saturate(0.5);
