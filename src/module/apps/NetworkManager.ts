@@ -168,7 +168,7 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<NetworkMa
         const uuid = SheetFlow.closestUuid(event.target);
         if(!uuid) return;
 
-        const network = fromUuidSync(uuid) as SR5Item | null;
+        const network = fromUuidSync(uuid) as Item.Stored | null;
         if (!network) return;
 
         await MatrixNetworkFlow.AskForNetworkMarkInvite(this.actor, network);
@@ -184,7 +184,7 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<NetworkMa
         const uuid = SheetFlow.closestUuid(event.target);
         if(!uuid) return;
 
-        const network = fromUuidSync(uuid) as SR5Item | null;
+        const network = fromUuidSync(uuid) as Item.Stored | null;
         if (!network) return;
 
         await this.actor.connectNetwork(network);

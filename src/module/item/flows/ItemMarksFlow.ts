@@ -50,7 +50,7 @@ export const ItemMarksFlow = {
             return;
         }
 
-        if (!target) return;
+        if (!target?.uuid) return;
 
         if (target.hasMaster) {
             const master = target.master;
@@ -95,6 +95,7 @@ export const ItemMarksFlow = {
     async handleOnDeleteItem(item: SR5Item) {
         console.debug(`Shadowrun 5e | Checking for marks for a deleted item ${item.name}`, item);
 
+        if (!item.uuid) return;
         await MarksStorage.clearRelations(item.uuid);
     }
 }

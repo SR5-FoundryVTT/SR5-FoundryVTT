@@ -89,8 +89,9 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
     }
 
     override async _onDropActor(event: DragEvent, actor: SR5Actor) {
+        if (!actor.uuid) return null;
         await this.actor.addVehicleDriver(actor.uuid);
-        return null
+        return null;
     }
 
     override async _onDropItem(event: DragEvent, item: SR5Item) {
@@ -190,6 +191,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         if (actors.length > 0) {
             // pick the first controlled actor
             const actor = actors[0];
+            if (!actor.uuid) return;
             await this.actor.addVehicleDriver(actor.uuid);
             void this.render();
         }

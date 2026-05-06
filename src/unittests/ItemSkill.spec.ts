@@ -378,7 +378,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 }, {
                     save: true,
                     addSource: true,
-                }) as SR5Actor<'character'>;
+                });
 
                 factory.actors.push(duplicate);
 

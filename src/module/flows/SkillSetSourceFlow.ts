@@ -23,7 +23,7 @@ export const SkillSetSourceFlow = {
         return {
             name: skillset.name ?? '',
             img: skillset.img as string,
-            uuid: skillset.uuid,
+            uuid: skillset.uuid!,
         };
     },
 };

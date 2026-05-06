@@ -130,9 +130,10 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options Additional options which modify the creation request
      * @param user The User requesting the document creation
      */
-    override async _preCreate(data: Actor.CreateData, options: Actor.Database.PreCreateOptions, user: User.Implementation) {
-        await super._preCreate(data, options, user);
-        
+    override async _preCreate(...args: Parameters<Actor<SubType>['_preCreate']>) {
+        const [data] = args;
+        await super._preCreate(...args);
+
         // Abort skill creation data injection when duplicating
         if (foundry.utils.getProperty(data, '_stats.duplicateSource')) return;
         // Abort if a skillset was already assigned (e.g. during Chummer import)
@@ -141,7 +142,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     override async update(
-        data: Actor.UpdateData | undefined,
+        data: Actor.UpdateInput,
         operation?: Actor.Database.UpdateOperation,
     ) {
         await Migrator.updateMigratedDocument(this);
@@ -407,7 +408,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return armor;
     }
 
-    getMatrixDevice(this: SR5Actor): SR5Item | undefined {
+    getMatrixDevice(this: SR5Actor) {
         return this.system.matrix?.device ? this.items.get(this.system.matrix.device) : undefined;
     }
 
@@ -1179,13 +1180,15 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const spec = options.specialization || false;
         const skillKey = SkillNamingFlow.nameToKey(skill.name) || name;
 
+        // NOTE: Using id here might be an issue, as getSkill can inject other actors skills, causing neither
+        //       the skill id to not be found on this actor. This can happen for vehicle / driver relationships.
         const getOpposedAction = (id: string) => {
             const item = this.items.get(id) as SR5Item<'skill'> | undefined;
             if (!item?.isType('skill')) return;
             return item.system.skill.action.opposed;
         }
 
-        return DataDefaults.createData('action_roll', {
+        const action = DataDefaults.createData('action_roll', {
             skill: skillKey,
             spec,
             attribute: skill.attribute,
@@ -1193,10 +1196,15 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
                 attribute: limit,
                 base_formula_operator: 'add',
             },
-            opposed: getOpposedAction(skill.id),
 
             test: 'SkillTest'
         });
+
+        // Retrieve opposed from skill item, making sure not to break on missing skill id
+        const opposed = getOpposedAction(skill.id);
+        if (opposed) action.opposed = opposed;
+
+        return action;
     }
 
     /**

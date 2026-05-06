@@ -13,7 +13,7 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
     const testOptions = { showDialog: false, showMessage: false };
 
     const createDriver = async () => {
-        return await factory.createActor({ type: 'character',
+        const actor = await factory.createActor({ type: 'character',
             system: {
                 attributes: {
                     intuition: { base: 5, },
@@ -38,6 +38,15 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
                 }
             }
         });
+
+        const gunnery = actor.items.get(actor.system.skills.active.gunnery?.id);
+        await gunnery?.update({ system: { skill: { rating: 5 }}});
+        const pilot_ground_craft = actor.items.get(actor.system.skills.active.pilot_ground_craft?.id);
+        await pilot_ground_craft?.update({ system: { skill: { rating: 5 }} });
+        const perception = actor.items.get(actor.system.skills.active.perception?.id);
+        await perception?.update({ system: { skill: { rating: 4 }} });
+        
+        return actor;
     }
 
     const createVehicle = async () => {
@@ -54,7 +63,7 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
         });
     }
 
-    describe('Rigger Testing around Being jumped in and Control Rig', () => {
+    describe('Rigger Testing', () => {
         it('Jump into a Vehicle and Perform Driving Test', async () => {
             const vehicle = await createVehicle();
             const driver = await createDriver();
