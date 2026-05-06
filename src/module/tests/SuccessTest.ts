@@ -2236,9 +2236,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         }
 
         // Switch out source document.
-        this.data.sourceActorUuid = document instanceof SR5Actor ? document.uuid : undefined;
-        this.data.sourceItemUuid = document instanceof SR5Item ? document.uuid : undefined;
-        
+        this.data.sourceActorUuid = document instanceof SR5Actor ? document.uuid ?? undefined : undefined;
+        this.data.sourceItemUuid = document instanceof SR5Item ? document.uuid ?? undefined : undefined;
+
         this.data = TestCreator._prepareTestDataWithAction(action, document, this.data, this) as T;
         
         // If no dialog has been shown yet, execution hasn't been triggered.
@@ -2262,8 +2262,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @param document Any targetable FoundryVTT document
      */
     async addTarget(document: SR5Actor|SR5Item) {
+        if (!document.uuid) return;
         if (this.data.targetUuids.includes(document.uuid)) return;
-
         this.data.targetUuids.push(document.uuid);
         await this.populateTargetDocuments();
     }

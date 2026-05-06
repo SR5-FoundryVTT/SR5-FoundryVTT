@@ -576,6 +576,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     async addNewNetwork(item: SR5Item) {
         const sin = this.asType('sin');
         if (!sin) return;
+        if (!item.uuid) return;
         if (!item.isNetwork()) return;
 
         sin.system.networks.push(item.uuid);
@@ -740,17 +741,22 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return items.find((item) => item.id === itemId);
     }
 
-    async updateNestedEffects(changes: OneOrMany<ActiveEffect.UpdateData & { _id?: string }>) {
+    async updateNestedEffects(changes: OneOrMany<ActiveEffect.UpdateInput>) {
         if (!this._isNestedItem) return;
 
         changes = Array.isArray(changes) ? changes : [changes];
         if (!changes || changes.length === 0) return;
 
-        for (const effectChanges of changes) {
-            const effect = this.effects.get(effectChanges._id!);
+        for (const change of changes) {
+            const effectId = typeof change._id === 'string' ? change._id : '';
+            const effect = this.effects.get(effectId);
             if (!effect) continue;
-            delete effectChanges._id;
-            mergeObject(effect, expandObject(effectChanges), { inplace: true });
+
+            // We need to delete the _id from the change data, otherwise mergeObject
+            // will merge the _id into the existing effect and cause all kinds of issues.
+            delete change._id;
+
+            mergeObject(effect, expandObject(change), { inplace: true });
             effect.render(false);
         }
 
@@ -759,14 +765,18 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         this.render(false);
     }
 
-    async updateNestedItems(changes: Item.UpdateData | Item.UpdateData[]) {
+    async updateNestedItems(changes: OneOrMany<Item.UpdateInput>) {
         const items = foundry.utils.duplicate(this.getNestedItems()) as Item.Source[];
         const changesArray = Array.isArray(changes) ? changes : [changes];
 
         for (const change of changesArray) {
             const existing = items.find(i => i._id === change._id);
             if (!existing) continue;
+
+            // We need to delete the _id from the change data, otherwise mergeObject
+            // will merge the _id into the existing effect and cause all kinds of issues.
             delete change._id;
+
             mergeObject(existing, expandObject(change));
         }
 
@@ -1239,7 +1249,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return this;
     }
 
-    override async update(data: Item.UpdateData | undefined, options?: Item.Database.UpdateOperation) {
+    override async update(data: Item.UpdateInput, options?: Item.Database.UpdateOperation) {
         // Item.item => Embedded item into another item!
         if (this._isNestedItem)
             return this.updateNestedItem(data);
@@ -1529,7 +1539,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *
      * This is preferred to altering data on the fly in the prepareData methods flow.
      */
-    override async _preUpdate(changed: Item.UpdateData, options: Item.Database.PreUpdateOptions, user: User) {
+    override async _preUpdate(...args: Parameters<Item['_preUpdate']>) {
+        const [changed, options] = args;
         // Some Foundry core updates will no diff and just replace everything. This doesn't match with the
         // differential approach of action test injection. (NOTE: Changing ownership of a document)
         if (options.diff && options.recursive) {
@@ -1539,7 +1550,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             UpdateSkillFlow.injectSkillCategoryDefaults(changed, this);
         }
 
-        return super._preUpdate(changed, options, user);
+        return super._preUpdate(...args);
     }
 
     /**

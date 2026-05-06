@@ -1,0 +1,33 @@
+import { SR } from "@/module/constants";
+import { CombatantData } from "./Combatant";
+
+const { NumberField, StringField, ArrayField, SchemaField } = foundry.data.fields;
+
+const CombatHistoryCombatantData = () => ({
+    _id: new StringField({ required: true, nullable: false }),
+    initiative: new NumberField({ integer: true, required: false, nullable: true, initial: null }),
+    system: new SchemaField(CombatantData()),
+});
+
+const CombatHistorySnapshotData = () => ({
+    round: new NumberField({ integer: true, nullable: false, initial: SR.combat.FIRST_ROUND }),
+    turn: new NumberField({ integer: true, nullable: true, initial: null }),
+    pass: new NumberField({ integer: true, required: true, nullable: false, initial: SR.combat.FIRST_PASS }),
+    combatants: new ArrayField(new SchemaField(CombatHistoryCombatantData()), { initial: [] }),
+});
+
+export const CombatData = () => ({
+    pass: new NumberField({
+        integer: true,
+        required: true,
+        nullable: false,
+        initial: SR.combat.FIRST_PASS
+    }),
+    history: new ArrayField(new SchemaField(CombatHistorySnapshotData()), { initial: [] }),
+});
+
+export class CombatDM extends foundry.abstract.TypeDataModel<ReturnType<typeof CombatData>, Combat.Implementation> {
+    static override defineSchema() {
+        return CombatData();
+    }
+}
