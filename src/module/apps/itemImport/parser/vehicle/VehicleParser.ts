@@ -70,8 +70,10 @@ export class VehicleParser extends Parser<'vehicle'> {
         system.vehicle_stats.seats.base = Number(jsonData.seats?._TEXT) || 0;
         system.attributes.body.base = Number(jsonData.body._TEXT) || 0;
         system.armor.base = Number(jsonData.armor._TEXT) || 0;
+        system.availability = jsonData.avail?._TEXT || '';
+        system.cost = Number(jsonData.cost?._TEXT) || 0;
         system.isDrone = jsonData.category._TEXT.includes("Drone") || false;
-        
+
         if (system.isDrone)
             system.category = jsonData.category._TEXT.replace("Drones: ", "").toLowerCase() as typeof system.category;
 

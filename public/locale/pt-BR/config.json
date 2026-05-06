@@ -1502,6 +1502,8 @@
                 "protection": "Proteção",
                 "weapons": "Armas"
             },
+            "OffRoad": "Fora da Estrada",
+            "OnRoad": "Na Estrada",
             "Stats": {
                 "Acceleration": "Aceleração",
                 "Handling": "Manuseio",

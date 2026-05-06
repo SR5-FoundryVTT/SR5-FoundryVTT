@@ -229,6 +229,8 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(vehicle.system.armor.value, 9, 'Armor');
             assert.strictEqual(vehicle.system.vehicle_stats.sensor.value, 1, 'Sensor');
             assert.strictEqual(vehicle.system.vehicle_stats.seats.value, 2, 'Seats');
+            assert.strictEqual(vehicle.system.availability, '0', 'Availability');
+            assert.strictEqual(vehicle.system.cost, 10000, 'Cost');
 
             const nonSkillItems = vehicle.items.filter(item => !item.isType('skill'));
             assert.strictEqual(nonSkillItems.length, 2, 'Non-skill item count');

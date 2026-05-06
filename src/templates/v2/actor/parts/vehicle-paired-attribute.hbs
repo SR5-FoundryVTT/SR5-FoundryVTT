@@ -1,0 +1,28 @@
+<div class="attribute vehicle-paired-attribute{{#if cssClass}} {{cssClass}}{{/if}}" data-attribute-id="{{onRoadField.name}}" data-context-menu="attribute">
+    <label {{#if @root.isEditMode}}class="edit-mode"{{/if}}>
+        {{localize label}}
+    </label>
+    <div class="attribute-value">
+        <span class="road-mode-input {{ifThen isOffRoad 'road-mode-inactive' ''}}" data-tooltip="SR5.Vehicle.OnRoad">
+            {{#if @root.isEditMode}}
+                {{formInput onRoadField.fields.base value=onRoadAttribute.base
+                            classes="short skinny center" rootId=rootId }}
+            {{else}}
+                <button class="icon sr5-icon" type="button"
+                        data-action="rollAttribute"
+                        data-attribute-modifier-tooltip="{{onRoadField.name}}">{{onRoadAttribute.value}}</button>
+            {{/if}}
+        </span>
+        <span class="attribute-separator">/</span>
+        <span class="road-mode-input {{ifThen isOffRoad '' 'road-mode-inactive'}}" data-tooltip="SR5.Vehicle.OffRoad">
+            {{#if @root.isEditMode}}
+                {{formInput offRoadField.fields.base value=offRoadAttribute.base
+                            classes="short skinny center" rootId=rootId }}
+            {{else}}
+                <button class="icon sr5-icon" type="button"
+                        data-action="rollAttribute"
+                        data-attribute-modifier-tooltip="{{offRoadField.name}}">{{offRoadAttribute.value}}</button>
+            {{/if}}
+        </span>
+    </div>
+</div>

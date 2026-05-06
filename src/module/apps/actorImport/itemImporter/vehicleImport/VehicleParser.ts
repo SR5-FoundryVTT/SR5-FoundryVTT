@@ -65,6 +65,8 @@ export class VehicleParser {
 
             system.attributes.body.base = Number(vehicle.body) || 0;
             system.armor.base = Number(vehicle.armor) || 0;
+            system.availability = vehicle.avail || '';
+            system.cost = Number(vehicle.owncost) || Number(vehicle.cost) || 0;
 
             const consoleLogs = Sanitizer.sanitize(CONFIG.Actor.dataModels.vehicle.schema, system);
             if (consoleLogs) {
