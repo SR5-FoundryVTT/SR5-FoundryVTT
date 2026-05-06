@@ -2,6 +2,10 @@
  * Apply Shadowrun 5 rules to a FoundryVTT Roll.
  */
 export class SR5Roll extends Roll {
+    get diceResults(): number[] {
+        return this.dice.flatMap(d => d.results.filter(r => r.active).map(r => r.result));
+    }
+
     get results() {
         return this.dice[0]?.results ?? [];
     }
