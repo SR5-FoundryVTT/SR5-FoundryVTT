@@ -1179,13 +1179,15 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const spec = options.specialization || false;
         const skillKey = SkillNamingFlow.nameToKey(skill.name) || name;
 
+        // NOTE: Using id here might be an issue, as getSkill can inject other actors skills, causing neither
+        //       the skill id to not be found on this actor. This can happen for vehicle / driver relationships.
         const getOpposedAction = (id: string) => {
             const item = this.items.get(id) as SR5Item<'skill'> | undefined;
             if (!item?.isType('skill')) return;
             return item.system.skill.action.opposed;
         }
 
-        return DataDefaults.createData('action_roll', {
+        const action = DataDefaults.createData('action_roll', {
             skill: skillKey,
             spec,
             attribute: skill.attribute,
@@ -1193,10 +1195,15 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
                 attribute: limit,
                 base_formula_operator: 'add',
             },
-            opposed: getOpposedAction(skill.id),
 
             test: 'SkillTest'
         });
+
+        // Retrieve opposed from skill item, making sure not to break on missing skill id
+        const opposed = getOpposedAction(skill.id);
+        if (opposed) action.opposed = opposed;
+
+        return action;
     }
 
     /**
