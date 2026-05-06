@@ -1458,6 +1458,7 @@
                 "Rigger": "Rigger"
             },
             "Driver": "Motorista",
+            "DamagedVehicle": "Veículo Danificado",
             "Drone": "Drone",
             "Environments": {
                 "Handling": "Manuseio",
@@ -1478,6 +1479,7 @@
             "Stats": {
                 "Acceleration": "Aceleração",
                 "Handling": "Manuseio",
+                "OffRoadAcceleration": "Aceleração (Fora de Estrada)",
                 "OffRoadHandling": "Manuseio (Fora de Estrada)",
                 "OffRoadSpeed": "Velocidade (Fora de Estrada)",
                 "Pilot": "Piloto",

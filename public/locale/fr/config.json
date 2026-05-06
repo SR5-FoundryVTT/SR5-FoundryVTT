@@ -856,6 +856,7 @@
                 "Rigger": "Plongé"
             },
             "Driver": "Conducteur",
+            "DamagedVehicle": "Véhicule Endommagé",
             "Environments": {
                 "Handling": "Maniabilité",
                 "Speed": "Vitesse"
@@ -875,6 +876,7 @@
             "Stats": {
                 "Acceleration": "Accelération",
                 "Handling": "Maniabilité",
+                "OffRoadAcceleration": "Accélération (hors route)",
                 "OffRoadHandling": "Maniabilité (hors route)",
                 "OffRoadSpeed": "Vitesse (hors route)",
                 "Pilot": "Autopilote",

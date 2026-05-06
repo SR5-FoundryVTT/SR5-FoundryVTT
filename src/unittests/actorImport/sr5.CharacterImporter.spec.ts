@@ -224,6 +224,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(vehicle.system.vehicle_stats.speed.value, 2, 'Speed');
             assert.strictEqual(vehicle.system.vehicle_stats.off_road_speed.value, 3, 'Off-road Speed');
             assert.strictEqual(vehicle.system.vehicle_stats.acceleration.value, 1, 'Acceleration');
+            assert.strictEqual(vehicle.system.vehicle_stats.off_road_acceleration.value, 2, 'Off-road Acceleration');
             assert.strictEqual(vehicle.system.attributes.body.value, 7, 'Body');
             assert.strictEqual(vehicle.system.armor.value, 9, 'Armor');
             assert.strictEqual(vehicle.system.vehicle_stats.sensor.value, 1, 'Sensor');

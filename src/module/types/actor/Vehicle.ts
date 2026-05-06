@@ -18,6 +18,7 @@ const VehicleStats = () => ({
     speed: new ModifiableField(AttributeField()),
     off_road_speed: new ModifiableField(AttributeField()),
     acceleration: new ModifiableField(AttributeField()),
+    off_road_acceleration: new ModifiableField(AttributeField()),
     sensor: new ModifiableField(AttributeField()),
     seats: new ModifiableField(AttributeField()),
 });
