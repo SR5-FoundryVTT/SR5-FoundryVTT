@@ -23,9 +23,7 @@ export class Version0_34_0 extends VersionMigration {
 
     override migrateCombat(combat: any) {
         const initiativePass = combat.flags.shadowrun5e?.combatInitiativePass ?? SR.combat.FIRST_PASS;
-
-        if (hasProperty(combat, "system.pass"))
-            combat.system.pass = Math.max(initiativePass, SR.combat.FIRST_PASS);
+        setProperty(combat, "system.pass", Math.max(initiativePass, SR.combat.FIRST_PASS));
     }
 
     override migrateCombatant(combatant: any): void {

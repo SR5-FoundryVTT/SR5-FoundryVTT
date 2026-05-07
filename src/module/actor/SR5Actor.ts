@@ -1042,8 +1042,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Roll a vehicle pilot test using reaction + related pilot skill with a selected limit.
-     *
-     * Returns false if the action/test could not be prepared.
      */
     async rollVehiclePilotByLimit(limit: 'handling' | 'speed', options: Shadowrun.ActorRollOptions = {}) {
         const action = this.vehiclePilotActionData(limit);

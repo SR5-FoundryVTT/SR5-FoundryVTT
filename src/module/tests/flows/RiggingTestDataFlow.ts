@@ -61,10 +61,9 @@ export const RiggingTestDataFlow = {
 
         const woundBoxesThreshold = MonitorRules.woundModifierBoxesThreshold(modifiers.wound_tolerance);
         const wounds = MonitorRules.wounds(track.physical.value, woundBoxesThreshold, modifiers.pain_tolerance_physical);
-        const woundModifier = MonitorRules.woundModifier(wounds);
+        const woundModifier = Math.max(1 - test.data.limit.value, MonitorRules.woundModifier(wounds));
 
         ModifiableValue.setUnique(test.data.limit, 'SR5.Vehicle.DamagedVehicle', woundModifier);
-        ModifiableValue.calcTotal(test.data.limit, { min: 1 });
     },
 
     /**
