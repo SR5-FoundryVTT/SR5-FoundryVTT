@@ -479,20 +479,19 @@ export class Helpers {
      * This can be relevant for when GMs either manually or by module change the tokens name, while the actors name
      * is untouched and might even be detrimental to share with players.
      *
-     * @param document Any document that can be targeted by a Success Test
+     * @param doc Any document that can be targeted by a Success Test
      * @returns A string representing this documents name.
      */
-    static getChatSpeakerName(document: SR5Actor | SR5Item | TokenDocument): string {
-        if (!document) return '';
+    static getChatSpeakerName(doc: unknown): string {
+        if (!doc || typeof doc !== "object") return '';
 
-        if (document instanceof SR5Item) return document.name;
+        if (doc instanceof SR5Item) return doc.name;
 
         const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
-        const token = document instanceof TokenDocument ? document : document.getToken();
+        const token = doc instanceof TokenDocument ? doc : doc instanceof SR5Actor ? doc.getToken() : null;
 
         if (useTokenNameForChatOutput && token) return token.name;
-
-        return document.name;
+        return "name" in doc && typeof doc.name === "string" ? doc.name : "";
     }
 
     /**
@@ -500,19 +499,19 @@ export class Helpers {
      *
      * The use token name setting is also respected.
      *
-     * @param document Any document that can be targeted by a Success Test
+     * @param doc Any document that can be targeted by a Success Test
      * @returns A path pointing to an image.
      */
-    static getChatSpeakerImg(document: SR5Actor | SR5Item | TokenDocument): string {
-        if (!document) return '';
+    static getChatSpeakerImg(doc: unknown): string {
+        if (!doc || typeof doc !== "object") return '';
 
-        if (document instanceof SR5Item) return document.img!;
+        if (doc instanceof SR5Item) return doc.img!;
 
         const useTokenForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
-        const token = document instanceof TokenDocument ? document : document.getToken();
+        const token = doc instanceof TokenDocument ? doc : doc instanceof SR5Actor ? doc.getToken() : null;
 
         if (useTokenForChatOutput && token) return token.texture.src || '';
-        return 'img' in document ? document.img || '' : '';
+        return "img" in doc && typeof doc.img === "string" ? doc.img : "";
     }
 
     static createDamageData(

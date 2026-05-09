@@ -206,6 +206,24 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
         return this.data.preparedSpiritUuid !== '';
     }
 
+    get preparedSpiritIsCompendium(): boolean {
+        return this.data.preparedSpiritUuid?.startsWith('Compendium.') ?? false;
+    }
+
+    get preparedSpiritIsEditable(): boolean {
+        if (!this.preparedActorUsed) return false;
+        if (this.preparedSpiritIsCompendium) return true;
+
+        const preparedSpirit = this.preparedSpirit;
+        if (!preparedSpirit || !game.user) return false;
+
+        return preparedSpirit.testUserPermission(game.user, 'OWNER');
+    }
+
+    get preparedSpiritForceLocked(): boolean {
+        return this.preparedActorUsed && !this.preparedSpiritIsEditable;
+    }
+
     get preparedSpirit(): SR5Actor | null {
         if (!this.preparedActorUsed) return null;
         return fromUuidSync(this.data.preparedSpiritUuid) as SR5Actor | null;
