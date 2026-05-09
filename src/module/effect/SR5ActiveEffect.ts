@@ -23,6 +23,15 @@ import DataModel = foundry.abstract.DataModel;
  * application.
  */
 export class SR5ActiveEffect extends ActiveEffect {
+    private static readonly legacyModeByChangeType: Record<string, number> = {
+        custom: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+        multiply: CONST.ACTIVE_EFFECT_MODES.MULTIPLY,
+        add: CONST.ACTIVE_EFFECT_MODES.ADD,
+        downgrade: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE,
+        upgrade: CONST.ACTIVE_EFFECT_MODES.UPGRADE,
+        override: CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
+    };
+
     /**
      * Can be used to determine if the origin of the effect is a document owned by another document.
      *
@@ -149,6 +158,20 @@ export class SR5ActiveEffect extends ActiveEffect {
         return ['base', 'changes', 'value'] satisfies (keyof ModifiableValueType)[];
     }
 
+    /**
+     * Convert a v14 string-based change type into the legacy numeric mode value.
+     */
+    static getLegacyChangeMode(change: { mode?: number; type?: string | null }): number {
+        if (typeof change.mode === 'number') return change.mode;
+
+        const changeType = typeof change.type === 'string' ? change.type : '';
+        const mappedMode = this.legacyModeByChangeType[changeType];
+        if (mappedMode !== undefined) return mappedMode;
+
+        console.error(`Shadowrun5e | Unrecognized change type "${change.type}", defaulting to "add" mode.`);
+        return CONST.ACTIVE_EFFECT_MODES.ADD;
+    }
+
     override get isSuppressed(): boolean {
         if (!(this.parent instanceof SR5Item)) return false;
 
@@ -258,13 +281,14 @@ export class SR5ActiveEffect extends ActiveEffect {
         }
 
         if (ModifiableValue.isModifiableValue(target)) {
+            const mode = SR5ActiveEffect.getLegacyChangeMode(change);
             target.changes.push({
                 enabled: change.effect.active,
                 invalidated: false,
                 name: change.effect.name,
                 value: delta,
-                mode: change.mode,
-                priority: change.priority ?? 10 * change.mode,
+                mode,
+                priority: change.priority ?? 10 * mode,
                 effectUuid: change.effect.uuid,
             });
             return {};
