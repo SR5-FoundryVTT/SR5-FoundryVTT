@@ -45,10 +45,6 @@ export class SpiritPrep {
         CharacterPrep.prepareRecoilCompensation(system);
     }
 
-    static prepareSpiritValues(system: Actor.SystemOfType<'spirit'>) {
-  
-    }
-
     static prepareSpiritAttributes(system: Actor.SystemOfType<'spirit'>, force: number) {
         const { attributes, force_applies } = system;
 

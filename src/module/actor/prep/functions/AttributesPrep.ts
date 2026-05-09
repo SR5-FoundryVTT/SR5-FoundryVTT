@@ -1,7 +1,6 @@
 import { SR5 } from '../../../config';
 import { SR } from '../../../constants';
 import { SR5Actor } from '../../SR5Actor';
-import { Helpers } from '../../../helpers';
 import { SR5Item } from 'src/module/item/SR5Item';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { AttributeFieldType } from 'src/module/types/template/Attributes';
