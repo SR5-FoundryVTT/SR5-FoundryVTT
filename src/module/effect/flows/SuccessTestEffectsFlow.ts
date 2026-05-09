@@ -64,7 +64,9 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         // Apply all changes
         for (const change of changes) {
             if (!change.key) continue;
-            change.effect.apply(this.test as any, change);
+            // change.effect.apply(this.test as any, change);
+            const ActiveEffect = foundry.documents.ActiveEffect.implementation;
+            ActiveEffect.applyChange(this.test as any, change);
         }
     }
 
