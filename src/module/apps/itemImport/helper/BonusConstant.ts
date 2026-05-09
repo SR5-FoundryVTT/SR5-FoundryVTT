@@ -94,6 +94,7 @@ export class BonusConstant {
         matrixinitiativediceadd: { changes: [{ key: "system.modifiers.matrix_initiative_dice" }] },
         mentallimit: { changes: [{ key: "system.limits.mental" }] },
         memory: { changes: [{ key: "system.modifiers.memory" }] },
+        offroadaccel: { changes: [{ key: "system.vehicle_stats.off_road_acceleration" }] },
         offroadhandling: { changes: [{ key: "system.vehicle_stats.off_road_handling" }] },
         offroadspeed: { changes: [{ key: "system.vehicle_stats.off_road_speed" }] },
         pilot: { changes: [{ key: "system.vehicle_stats.pilot" }] },

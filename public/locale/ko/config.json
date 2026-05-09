@@ -2944,6 +2944,7 @@
                 "Rigger": "리거 조종"
             },
             "Driver": "조종자",
+            "DamagedVehicle": "손상된 탑승물",
             "Drone": "드론",
             "Environments": {
                 "Handling": "조작력",
@@ -2966,6 +2967,7 @@
             "Stats": {
                 "Acceleration": "가속력",
                 "Handling": "조작력",
+                "OffRoadAcceleration": "가속력 (비포장도로)",
                 "OffRoadHandling": "조작력 (비포장도로)",
                 "OffRoadSpeed": "속력 (비포장도로)",
                 "Pilot": "조종력",

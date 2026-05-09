@@ -82,6 +82,7 @@ export const preloadHandlebarsTemplates = async () => {
             'limits',
             'matrix-attribute',
             'special-attributes',
+            'vehicle-paired-attribute',
         ),
 
         'systems/shadowrun5e/dist/templates/rolls/parts/parts-list.hbs',
