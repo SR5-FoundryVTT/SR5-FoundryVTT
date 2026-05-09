@@ -62,7 +62,7 @@
                         {{localizeOb system.actor_type @root.config.callInActorTypes}}
                     {{else if (eq system.actor_type 'spirit')}}
                         {{localize "SR5.CallInAction.Summon"}}
-                        {{localizeOb system.spirit.type @root.config.spiritTypes}}
+                        {{system.spirit.type}}
                         {{localizeOb system.actor_type @root.config.callInActorTypes}}
                     {{/if}}
                 </label>

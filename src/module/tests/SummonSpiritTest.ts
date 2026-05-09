@@ -1,4 +1,3 @@
-import { SR5 } from './../config';
 import { DataDefaults } from "../data/DataDefaults";
 import { SuccessTest, SuccessTestData } from "./SuccessTest";
 import { ModifiableValue } from '../mods/ModifiableValue';
@@ -11,8 +10,6 @@ const { fromUuidSync } = foundry.utils;
 
 
 interface SummonSpiritTestData extends SuccessTestData {
-    spiritTypes: typeof SR5.spiritTypes
-    spiritTypeSelected: string
     optionalPowerCount: number
 
     // Force value as described on SR5#300
@@ -152,14 +149,6 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
     }
 
     /**
-     * TODO: Reduce all spirit types to those available to the Summoner according to tradition or validate against selection.
-     * @returns A subset of all spirit types
-     */
-    _prepareSpiritTypes() {
-        return SR5.spiritTypes;
-    }
-
-    /**
      * Take data from summoning item for test execution.
      * @param data Test data to be extended
      */
@@ -168,12 +157,9 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
         const summoning = this.item.asType('call_in_action');
         if (!summoning || !this.item.isSummoning) return;
 
-        data.spiritTypes = this._prepareSpiritTypes();
-
         // Lower from more to less explicit values being given.
         // Don't let force go below one.
         data.force = Math.max(data.force || summoning.system.spirit.force || 1, 1);
-        data.spiritTypeSelected = data.spiritTypeSelected || summoning.system.spirit.type;
         data.preparedSpiritUuid = data.preparedSpiritUuid || summoning.system.spirit.uuid;
         data.reagent = data.reagent || 0;
         data.optionalPowerCount = Math.floor(data.force / 3);
