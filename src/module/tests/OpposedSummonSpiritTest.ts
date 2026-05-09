@@ -65,7 +65,9 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
     override async populateDocuments() {
         await this.createSummonedSpirit();
 
-        this.data.sourceActorUuid = this.data.summonedSpiritUuid || this.against.data.preparedSpiritUuid;
+        const summonedSpiritUuid = this.data.summonedSpiritUuid || this.against.data.preparedSpiritUuid;
+        this.data.sourceActorUuid = summonedSpiritUuid;
+        this.data.sourceUuid = summonedSpiritUuid;
 
         await super.populateDocuments();
     }
@@ -75,7 +77,7 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
      */
     override applyPoolModifiers() {
         // NOTE: We don't have an actor, therefore don't need to call document modifiers.
-        ModifiableValue.addUnique(this.data.pool, 'SR5.Force', this.against.data.force);
+        ModifiableValue.addUniqueBase(this.data.pool, 'SR5.Force', this.against.data.force);
     }
 
     /**
@@ -178,10 +180,12 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
         } else {
             // Create a new spirit actor from scratch...
             const spiritType = this.against.data.spiritTypeSelected as any;
-            const spiritTypeLabel = game.i18n.localize(SR5.spiritTypes[spiritType]);
-            const name = `${summoner.name} ${spiritTypeLabel} ${game.i18n.localize('TYPES.Actor.spirit')}`;
+            const configuredSpiritType = SR5.spiritTypes[spiritType];
+            const spiritTypeLabel = configuredSpiritType ? game.i18n.localize(configuredSpiritType) : this.against.data.spiritTypeSelected;
+            const spiritLabel = game.i18n.localize('TYPES.Actor.spirit');
+            const name = `${spiritTypeLabel} ${spiritLabel}`;
             const force = this.against.data.force;
-            const system = { force, spiritType };
+            const system = { spiritType: spiritTypeLabel, attributes: { force: { base: force } } };
     
             const actor = await Actor.create({ name, type: 'spirit', system, prototypeToken: {actorLink: true} });
     

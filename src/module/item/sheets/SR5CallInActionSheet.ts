@@ -1,5 +1,6 @@
 import { SR5Actor } from '../../actor/SR5Actor';
 import { SR5BaseItemSheetData, SR5ItemSheet } from '../SR5ItemSheet';
+import { SR5 } from '../../config';
 
 const { fromUuidSync } = foundry.utils;
 
@@ -100,12 +101,20 @@ export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData>
      * @param spirit The prepared actor
      */
     async updatePreparedSpirit(spirit: SR5Actor<'spirit'>) {
+        const spiritType = spirit.system.spiritType;
+        const fallbackType = this.item.isType('call_in_action')
+            ? this.item.system.spirit.type
+            : 'air';
+        const type = Object.hasOwn(SR5.spiritTypes, spiritType)
+            ? spiritType as keyof typeof SR5.spiritTypes
+            : fallbackType;
+
         await this.item.update({
             system: {
                 actor_type: 'spirit',
                 spirit: {
                     uuid: spirit.uuid,
-                    type: spirit.system.spiritType,
+                    type,
                     force: spirit.system.attributes.force.value
                 }
             }

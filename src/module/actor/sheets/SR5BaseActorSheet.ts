@@ -113,6 +113,9 @@ export interface SR5ActorSheetData extends ActorSheetV2.RenderContext, SR5Applic
     hasSkills: boolean;
     hasFullDefense: boolean;
     woundTolerance: number;
+    optionalPowerCount: number;
+    optionalPowerSelected: number;
+    optionalPowerTotal: number;
 
     // Effects
     effects: SR5ActiveEffect[];
@@ -308,6 +311,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             rollSkillSpecialization: SR5BaseActorSheet.#rollSkillSpec,
             openSkillDescription: SR5BaseActorSheet.#toggleSkillDescription,
             filterTrainedSkills: SR5BaseActorSheet.#filterUntrainedSkills,
+            toggleSpiritForceAttribute: SR5BaseActorSheet.#toggleSpiritForceAttribute,
 
             resetActorRunData: SR5BaseActorSheet.#resetActorRunData,
 
@@ -414,6 +418,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         data.skillset = await this._prepareSkillset();
 
         data.itemType = this._prepareItemTypes();
+        this._prepareSpiritOptionalPowerCounts(data);
         data.effects = prepareSortedEffects(this.actor.effects.contents);
         data.itemEffects = prepareSortedItemEffects(this.actor, { applyTo: this.itemEffectApplyTos });
 
@@ -1520,6 +1525,23 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         return `(${active}/${max})`;
     }
+
+    _prepareSpiritOptionalPowerCounts(sheetData: SR5ActorSheetData) {
+        sheetData.optionalPowerCount = 0;
+        sheetData.optionalPowerSelected = 0;
+        sheetData.optionalPowerTotal = 0;
+
+        if (!sheetData.isSpirit) return;
+        const spirit = this.actor.asType('spirit');
+        if (!spirit) return;
+
+        const optionalPowers = (sheetData.itemType.critter_power ?? [])
+            .filter(item => item.isType('critter_power') && item.system.optional !== 'standard');
+
+        sheetData.optionalPowerCount = Math.floor(spirit.system.attributes.force.value / 3);
+        sheetData.optionalPowerSelected = optionalPowers.filter(item => item.system.optional === 'enabled_option').length;
+        sheetData.optionalPowerTotal = optionalPowers.length;
+    }
     /**
      * Prepare skills with sorting.
      *
@@ -1743,6 +1765,20 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
     }
 
+    static async #toggleSpiritForceAttribute(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!this.actor.isType('spirit')) return;
+        if (!(event.target instanceof HTMLElement)) return;
+
+        const attributeId = event.target.closest<HTMLElement>('[data-attribute-id]')?.dataset.attributeId;
+        if (!attributeId || attributeId === 'force') return;
+
+        const enabled = this.actor.system.force_applies[attributeId];
+        await this.actor.update({ system: { force_applies: { [attributeId]: !enabled } } });
+    }
+
     /**
      * Change the quantity on an item shown within a sheet item list.
      *
@@ -1921,7 +1957,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const closest = this._closestSkillTarget(event.target);
         const skillId = closest?.dataset.skillId;
         if (!skillId) return;
-        const rating = Number(event.target.value);
+        const rating = event.target.type === 'checkbox'
+            ? (event.target.checked ? 1 : 0)
+            : Number(event.target.value);
         if (isNaN(rating)) return;
 
         await SkillItemFlow.changeSkillRating(this.actor, skillId, rating);

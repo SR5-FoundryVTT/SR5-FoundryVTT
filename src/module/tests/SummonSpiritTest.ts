@@ -5,12 +5,15 @@ import { ModifiableValue } from '../mods/ModifiableValue';
 import { SpellcastingRules } from '../rules/SpellcastingRules';
 import { ConjuringRules } from '../rules/ConjuringRules';
 import { DamageType, MinimalActionType } from '../types/item/Action';
+import { SR5Actor } from '../actor/SR5Actor';
 import { DeepPartial } from 'fvtt-types/utils';
+const { fromUuidSync } = foundry.utils;
 
 
 interface SummonSpiritTestData extends SuccessTestData {
     spiritTypes: typeof SR5.spiritTypes
     spiritTypeSelected: string
+    optionalPowerCount: number
 
     // Force value as described on SR5#300
     force: number
@@ -41,6 +44,9 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
         data = super._prepareData(data, options);
 
         this._prepareSummoningData(data);
+
+        data.preparedSpiritUuid = data.preparedSpiritUuid || '';
+        data.optionalPowerCount = data.optionalPowerCount ?? Math.floor(Number(data.force || 0) / 3);
 
         data.drain = data.drain || 0;
         data.drainDamage = data.drainDamage || DataDefaults.createData('damage');
@@ -133,6 +139,7 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
         const label = SpellcastingRules.limitIsReagentInsteadOfForce(reagent) ? 
             'SR5.Reagent' : 'SR5.Force';
         const limit = SpellcastingRules.calculateLimit(force, reagent);
+        this.data.optionalPowerCount = Math.floor(force / 3);
 
         // Cleanup previous calculation and add new limit part.
         // NOTE: Instead of removing all parts, be specific in case of future additions to limit parts elsewhere.
@@ -169,6 +176,7 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
         data.spiritTypeSelected = data.spiritTypeSelected || summoning.system.spirit.type;
         data.preparedSpiritUuid = data.preparedSpiritUuid || summoning.system.spirit.uuid;
         data.reagent = data.reagent || 0;
+        data.optionalPowerCount = Math.floor(data.force / 3);
     }
 
     /**
@@ -196,5 +204,10 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
      */
     get preparedActorUsed(): boolean {
         return this.data.preparedSpiritUuid !== '';
+    }
+
+    get preparedSpirit(): SR5Actor | null {
+        if (!this.preparedActorUsed) return null;
+        return fromUuidSync(this.data.preparedSpiritUuid) as SR5Actor | null;
     }
 }

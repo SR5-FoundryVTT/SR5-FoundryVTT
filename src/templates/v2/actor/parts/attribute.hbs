@@ -8,6 +8,15 @@
     </label>
     <div class="attribute-value">
         {{#if @root.isEditMode}}
+            {{#if @root.isSpirit}}
+                {{#ifne attributeField.name 'force'}}
+                    <button type="button"
+                            class="attribute-button force-apply-toggle{{#unless (objValue @root.system.force_applies attributeField.name)}} downlight{{/unless}}"
+                            data-action="toggleSpiritForceAttribute"
+                            data-attribute-id="{{attributeField.name}}"
+                            data-tooltip="SR5.Spirit.ForceAppliesSettingHint">F +</button>
+                {{/ifne}}
+            {{/if}}
             {{formInput attributeField.fields.base value=attribute.base
                         classes="short skinny center" rootId=rootId }}
         {{else}}

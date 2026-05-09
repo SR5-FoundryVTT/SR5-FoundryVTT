@@ -61,6 +61,15 @@
                 }
             }
 
+            .force-apply-toggle {
+                padding: 0;
+            }
+
+            .force-apply-toggle.downlight {
+                opacity: 0.45;
+                filter: grayscale(0.5);
+            }
+
             .attribute-value {
                 display: flex;
                 flex-flow: row nowrap;

@@ -13,11 +13,7 @@ const CallInActionData = () => ({
         choices: SR5.callInActorTypes,
     }),
     spirit: new SchemaField({
-        type: new StringField({
-            blank: true,
-            required: true,
-            choices: SR5.spiritTypes,
-        }),
+        type: new StringField({ blank: true, required: true }),
         force: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
         uuid: new DocumentUUIDField({ blank: true, required: true }),
     }),
