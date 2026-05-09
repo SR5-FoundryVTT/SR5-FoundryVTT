@@ -197,101 +197,19 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Should some ActiveEffects need to be excluded from the general application, do so here.
-     * TODO: v14 - improve this implementation. It's a mess.
      * @param {string} phase The application phase under which changes are to be applied.
      * @override
      */
-    override applyActiveEffects(phase?: string) {
+    override applyActiveEffects(...args) {
         // Shadowrun uses prepareDerivedData to calculate lots of things that don't exist on the data model in full.
         // Errors during change application will stop that process and cause a broken sheet.
         try {
-            // TODO: tamif - v14 - this whole implementation 1. shouln't live here and 2. is horrible
-            const actorWithV14State = this as unknown as SR5Actor & {
-                _completedActiveEffectPhases: Set<string>;
-                tokenActiveEffectChanges: Record<string, ActiveEffect.ChangeData[]>;
-            };
-            const ActiveEffectImplementation = foundry.documents.ActiveEffect.implementation as any;
-
-            if (typeof phase !== 'string') {
-                phase = actorWithV14State._completedActiveEffectPhases.has('initial') ? 'final' : 'initial';
-                const message = 'Actor#applyActiveEffects must be called with a string phase identifier, with "initial" as the first phase.';
-                foundry.utils.logCompatibilityWarning(message, { since: 14, until: 16, once: true });
-            } else if (!(phase in ActiveEffectImplementation.CHANGE_PHASES)) {
-                const error = new Error(`"${phase}" is not a registered ActiveEffect application phase.`);
-                Hooks.onError('Actor#applyActiveEffects', error, { log: 'error' });
-            }
-
-            if (actorWithV14State._completedActiveEffectPhases.has(phase)) {
-                const error = new Error(`ActiveEffect application phase "${phase}" has already completed and cannot be run again in this Actor's data-preparation cycle.`);
-                Hooks.onError('Actor#applyActiveEffects', error, { log: 'error' });
-                return;
-            }
-
-            actorWithV14State._completedActiveEffectPhases.add(phase);
-
-            const changes: ActiveEffect.ChangeData[] = [];
-            const tokenChanges: ActiveEffect.ChangeData[] = [];
-
-            for (const effect of this.allApplicableEffects()) {
-                if (!effect.active) continue;
-
-                for (const change of effect.system.changes) {
-                    if ((change.key === '') || (change.phase !== phase)) continue;
-
-                    const copy = foundry.utils.deepClone(change) as unknown as ActiveEffect.ChangeData & { type?: string };
-                    copy.effect = effect;
-
-                    // TODO: tamif - v14 - shouldn't this be removed? What is the point?
-                    const source = CONFIG.ActiveEffect.legacyTransferral ? effect.source : effect.parent;
-
-                    SR5ActiveEffect.alterChange(this, copy);
-                    SR5ActiveEffect.resolveDynamicChangeValue(source, copy);
-
-                    // TODO: tamif - v14 - what is the point?
-                    copy.priority ??= ActiveEffectImplementation.CHANGE_TYPES[copy.type ?? 'custom']?.defaultPriority ?? 0;
-
-                    if (copy.key?.startsWith('token.')) {
-                        copy.key = copy.key.slice(6);
-                        tokenChanges.push(copy);
-                    } else {
-                        changes.push(copy);
-                    }
-                }
-
-                if (phase === 'initial') {
-                    for (const statusId of effect.statuses) this.statuses.add(statusId);
-                }
-            }
-
-            changes.sort((left, right) => Number(left.priority ?? 0) - Number(right.priority ?? 0));
-            ActiveEffectImplementation._shimChanges(changes);
-            actorWithV14State.tokenActiveEffectChanges[phase] = tokenChanges;
-
-            const overrides = {};
-            // TODO: tamif - v14 - getRollData here seems like a weird decision...
-            // const replacementData = this.getRollData();
-            // NOTE: SR5e copies system data for pre-test modification, so we can use the default Foundry beahvior, of simply returning system data.
-            const replacementData = this.system;
-            // TODO: fvtt - v14 - shim v14 actor methods. Should be moved to global actor types.
-            // TODO: fvtt - v13 - breaking change.
-            const actorFieldGetter = this as unknown as { getFieldForProperty: (path: string) => unknown };
-            const systemFieldGetter = this.system as unknown as { getFieldForProperty: (path: string) => unknown };
-            for (const change of changes) {
-                // Redirect change from Field to actor.
-                const field = change.key.startsWith('system.')
-                    ? systemFieldGetter.getFieldForProperty(change.key.slice(7))
-                    : actorFieldGetter.getFieldForProperty(change.key);
-                const modifyTarget = !(field instanceof ModifiableField);
-
-                const result = ActiveEffectImplementation.applyChange(this, change, { replacementData, modifyTarget });
-                if (modifyTarget && foundry.utils.getType(result) === 'Object') Object.assign(overrides, result);
-            }
-
-            foundry.utils.mergeObject(this.overrides, foundry.utils.expandObject(overrides));
+            // @ts-expect-error TODO: v14 - typing is missing
+            super.applyActiveEffects(...args);
         } catch (error) {
             console.error(`Shadowrun5e | Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.id})`);
             console.error(error);
-            ui.notifications?.error(`See browser console (F12): Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.uuid})`);
+            ui.notifications?.error(`See browser console (F12): Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.id})`);
         }
     }
 
@@ -605,8 +523,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @returns Note, this can return undefined. It is not typed that way, as it broke many things. :)
      */
     getAttribute(name: string, options?: { rollData?: SR5Actor['system'] }): AttributeFieldType {
-
-        const rollData = options?.rollData ?? this.getRollData();
+        const rollData = options?.rollData ?? this.getRollData({copySystem: true});
         // First check vehicle stats, as they don't always exist.
         const stats = rollData.vehicle_stats ?? this.getVehicleStats();
         if (stats?.[name]) return stats[name];
@@ -869,7 +786,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     getSkill(this: SR5Actor, name: string, options?: { byLabel?: boolean, byId?: boolean, rollData?: SR5Actor['system'] }) {
         // Retrieve skills from either roll or system data.
-        const rollData = options?.rollData ?? this.getRollData();
+        const rollData = options?.rollData ?? this.getRollData({copySystem: true});
         const skills = rollData?.skills ?? this.getSkills();
 
         if (options?.byLabel)
@@ -2139,7 +2056,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     override getRollData(options: RollDataOptions = {}) {
         // Create a system data copy to avoid cross-contamination
-        const rollData = this.system.toObject(false);
+        const rollData = options.copySystem ? this.system.toObject(false) : super.getRollData();
         return ActorRollDataFlow.getRollData(this, rollData, options);
     }
 
