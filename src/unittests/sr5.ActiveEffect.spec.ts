@@ -38,893 +38,867 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         };
     };
 
-    // describe('SR5ActiveEffect', () => {
-    //     it('MODIFY mode: apply system custom mode to main and sub value-keys', async () => {
-    //         const actor = await factory.createActor({ type: 'character' });
-    //         const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //             origin: actor.uuid,
-    //             disabled: false,
-    //             name: 'Test Effect',
-    //             changes: [
-    //                 { key: 'system.attributes.body.changes', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-    //                 { key: 'system.attributes.body', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-    //         }]);
+    describe('SR5ActiveEffect', () => {
+        it('MODIFY mode: apply system custom mode to main and sub value-keys', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.attributes.body.changes', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'system.attributes.body', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+            }]);
 
-    //         assert.deepEqual(actor.system.attributes.body.changes, [
-    //             createTestChange(effects[0], 0),
-    //             createTestChange(effects[0], 1),
-    //         ]);
-    //         assert.strictEqual(actor.system.attributes.body.value, 4);
-    //     });
+            assert.deepEqual(actor.system.attributes.body.changes, [
+                createTestChange(effects[0], 0),
+                createTestChange(effects[0], 1),
+            ]);
+            assert.strictEqual(actor.system.attributes.body.value, 4);
+        });
 
-    //     it('OVERRIDE mode: apply the system override mode', async () => {
-    //         const actor = await factory.createActor({ type: 'character' });
+        it('OVERRIDE mode: apply the system override mode', async () => {
+            const actor = await factory.createActor({ type: 'character' });
 
-    //         // Assert overriden default values.
-    //         assert.strictEqual(actor.system.skills.active.automatics.canDefault, true);
+            // Assert overriden default values.
+            assert.strictEqual(actor.system.skills.active.automatics.canDefault, true);
 
-    //         const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //             origin: actor.uuid,
-    //             disabled: false,
-    //             name: 'Test Effect',
-    //             changes: [
-    //                 { key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE },
-    //                 { key: 'system.attributes.agility.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE },
-    //                 { key: 'system.nuyen', value: '4', mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE },
-    //                 { key: 'system.skills.active.automatics.canDefault', value: 'false', mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE }
-    //             ]
-    //         }]);
+            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE },
+                    { key: 'system.attributes.agility.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE },
+                    { key: 'system.nuyen', value: '4', mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE },
+                    { key: 'system.skills.active.automatics.canDefault', value: 'false', mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE }
+                ]
+            }]);
 
-    //         // ModifiableValue should have a custom override value
-    //         // Case - Direct change key
-    //         assert.deepEqual(actor.system.attributes.body.changes,
-    //             [createTestChange(effects[0], 0)]
-    //         );
-    //         assert.strictEqual(actor.system.attributes.body.base, 0);
-    //         assert.strictEqual(actor.system.attributes.body.value, 3);
-    //         // Case - Indirect change key
-    //         assert.deepEqual(actor.system.attributes.agility.changes,
-    //             [createTestChange(effects[0], 1)]
-    //         );
-    //         assert.strictEqual(actor.system.attributes.agility.base, 0);
-    //         assert.strictEqual(actor.system.attributes.agility.value, 3);
+            // ModifiableValue should have a custom override value
+            // Case - Direct change key
+            assert.deepEqual(actor.system.attributes.body.changes,
+                [createTestChange(effects[0], 0)]
+            );
+            assert.strictEqual(actor.system.attributes.body.base, 0);
+            assert.strictEqual(actor.system.attributes.body.value, 3);
+            // Case - Indirect change key
+            assert.deepEqual(actor.system.attributes.agility.changes,
+                [createTestChange(effects[0], 1)]
+            );
+            assert.strictEqual(actor.system.attributes.agility.base, 0);
+            assert.strictEqual(actor.system.attributes.agility.value, 3);
 
-    //         // Case - ModifableValue with a direct key not part of value calculation (see SR5ActiveEffect.modifiableValueProperties)
-    //         // Skill automatics normally can default, which we overwrite here.
-    //         // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
-    //         const active = actor.system.skills.active;
-    //         assert.deepEqual(active.automatics.changes, []);
-    //         assert.strictEqual(active.automatics.canDefault, false);
+            // Case - ModifableValue with a direct key not part of value calculation (see SR5ActiveEffect.modifiableValueProperties)
+            // Skill automatics normally can default, which we overwrite here.
+            // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
+            const active = actor.system.skills.active;
+            assert.deepEqual(active.automatics.changes, []);
+            assert.strictEqual(active.automatics.canDefault, false);
 
-    //         // Default literal value change
-    //         assert.strictEqual(actor.system.nuyen, 4);
-    //     });
+            // Default literal value change
+            assert.strictEqual(actor.system.nuyen, 4);
+        });
 
-    //     it('OVERRIDE mode: override all existing .mod values', async () => {
-    //         it('apply the custom override mode', async () => {
-    //             const actor = await factory.createActor({ type: 'character' });
-    //             const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //                 origin: actor.uuid,
-    //                 disabled: false,
-    //                 name: 'Test Effect',
-    //                 changes: [
-    //                     { key: 'system.attributes.body', value: '5', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-    //                     { key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE }
-    //                 ]
-    //             }]);
+        it('OVERRIDE mode: override all existing .mod values', async () => {
+            it('apply the custom override mode', async () => {
+                const actor = await factory.createActor({ type: 'character' });
+                const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+                    origin: actor.uuid,
+                    disabled: false,
+                    name: 'Test Effect',
+                    changes: [
+                        { key: 'system.attributes.body', value: '5', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                        { key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE }
+                    ]
+                }]);
 
-    //             assert.strictEqual(actor.system.attributes.body.changes.length, 2);
-    //             assert.deepEqual(actor.system.attributes.body.changes,
-    //                 [
-    //                     createTestChange(effects[0], 0),
-    //                     createTestChange(effects[0], 1)
-    //                 ]
-    //             );
-    //             assert.strictEqual(actor.system.attributes.body.value, 3);
-    //         });
+                assert.strictEqual(actor.system.attributes.body.changes.length, 2);
+                assert.deepEqual(actor.system.attributes.body.changes,
+                    [
+                        createTestChange(effects[0], 0),
+                        createTestChange(effects[0], 1)
+                    ]
+                );
+                assert.strictEqual(actor.system.attributes.body.value, 3);
+            });
 
-    //         it('apply custom override mode, none ModifiableValue should work without altering anything', async () => {
-    //             const actor = await factory.createActor({ type: 'character' });
-    //             const effect = await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //                 origin: actor.uuid,
-    //                 disabled: false,
-    //                 name: 'Test Effect'
-    //             }]);
-    //             await effect[0]?.update({
-    //                 changes: [{
-    //                     key: 'system.modifiers.global',
-    //                     value: '3',
-    //                     mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE
-    //                 }]
-    //             });
+            it('apply custom override mode, none ModifiableValue should work without altering anything', async () => {
+                const actor = await factory.createActor({ type: 'character' });
+                const effect = await actor.createEmbeddedDocuments('ActiveEffect', [{
+                    origin: actor.uuid,
+                    disabled: false,
+                    name: 'Test Effect'
+                }]);
+                await effect[0]?.update({
+                    changes: [{
+                        key: 'system.modifiers.global',
+                        value: '3',
+                        mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE
+                    }]
+                });
 
-    //             assert.strictEqual(actor.system.modifiers.global, 3);
-    //         });
-    //     });
+                assert.strictEqual(actor.system.modifiers.global, 3);
+            });
+        });
 
-    //     it('ADD mode: adding to ModifiableField should cause MODIFY mode to be used', async () => {
-    //         const actor = await factory.createActor({ type: 'character' });
+        it('ADD mode: adding to ModifiableField should cause MODIFY mode to be used', async () => {
+            const actor = await factory.createActor({ type: 'character' });
 
-    //         assert.strictEqual(actor.system.attributes.body.value, 0);
-    //         assert.strictEqual(actor.system.skills.active.automatics.value, 0);
+            assert.strictEqual(actor.system.attributes.body.value, 0);
+            assert.strictEqual(actor.system.skills.active.automatics.value, 0);
 
-    //         const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //             origin: actor.uuid,
-    //             disabled: false,
-    //             name: 'Test Effect',
-    //             changes: [
-    //                 { key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-    //                 { key: 'system.skills.active.automatics', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }
-    //             ]
-    //         }]);
+            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'system.skills.active.automatics', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }
+                ]
+            }]);
 
-    //         assert.strictEqual(actor.system.attributes.body.value, 3);
-    //         assert.deepEqual(actor.system.attributes.body.changes, [ createTestChange(effects[0], 0) ]);
-    //         assert.strictEqual(actor.system.skills.active.automatics.value, 3);
-    //         assert.deepEqual(actor.system.skills.active.automatics.changes, [createTestChange(effects[0], 1)]);
-    //     });
+            assert.strictEqual(actor.system.attributes.body.value, 3);
+            assert.deepEqual(actor.system.attributes.body.changes, [ createTestChange(effects[0], 0) ]);
+            assert.strictEqual(actor.system.skills.active.automatics.value, 3);
+            assert.deepEqual(actor.system.skills.active.automatics.changes, [createTestChange(effects[0], 1)]);
+        });
         
-    //     it('ADD mode: adding to ModifiableField property should cause MODIFY mode to be used', async () => {
-    //         const actor = await factory.createActor({ type: 'character' });
+        it('ADD mode: adding to ModifiableField property should cause MODIFY mode to be used', async () => {
+            const actor = await factory.createActor({ type: 'character' });
 
-    //         assert.strictEqual(actor.system.attributes.body.value, 0);
-    //         assert.strictEqual(actor.system.skills.active.automatics.value, 0);
+            assert.strictEqual(actor.system.attributes.body.value, 0);
+            assert.strictEqual(actor.system.skills.active.automatics.value, 0);
 
-    //         const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //             origin: actor.uuid,
-    //             disabled: false,
-    //             name: 'Test Effect',
-    //             changes: [
-    //                 { key: 'system.attributes.body.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-    //                 { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }
-    //             ]
-    //         }]);
+            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.attributes.body.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }
+                ]
+            }]);
 
-    //         assert.strictEqual(actor.system.attributes.body.value, 3);
-    //         assert.deepEqual(actor.system.attributes.body.changes, [createTestChange(effects[0], 0)]);
-    //         assert.strictEqual(actor.system.skills.active.automatics.value, 3);
-    //         assert.deepEqual(actor.system.skills.active.automatics.changes, [createTestChange(effects[0], 1)]);
-    //     });
+            assert.strictEqual(actor.system.attributes.body.value, 3);
+            assert.deepEqual(actor.system.attributes.body.changes, [createTestChange(effects[0], 0)]);
+            assert.strictEqual(actor.system.skills.active.automatics.value, 3);
+            assert.deepEqual(actor.system.skills.active.automatics.changes, [createTestChange(effects[0], 1)]);
+        });
 
-    //     it('UPGRADE mode: should raise the value to a max', async () => {
-    //         window.doNotPopulateDefaultSkills = true;
+        it('UPGRADE mode: should raise the value to a max', async () => {
+            window.doNotPopulateDefaultSkills = true;
             
-    //         const actor = await factory.createActor({ type: 'character', system: { 
-    //             attributes: { body: { base: 2 } }
-    //         }});
-    //         delete window.doNotPopulateDefaultSkills;
-
-    //         await actor.createEmbeddedDocuments('Item', [{
-    //             type: 'skill',
-    //             name: 'Automatics',
-    //             system: {
-    //                 type: 'skill',
-    //                 skill: {
-    //                     attribute: 'agility',
-    //                     rating: 2
-    //                 }
-    //             }
-    //         }]);
-
-
-    //         assert.strictEqual(actor.system.attributes.body.base, 2);
-    //         assert.strictEqual(actor.system.skills.active.automatics.base, 2);
-
-    //         const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //             origin: actor.uuid,
-    //             disabled: false,
-    //             name: 'Test Effect',
-    //             changes: [
-    //                 { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.UPGRADE },
-    //                 { key: 'system.attributes.body.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.UPGRADE }
-    //             ]
-    //         }]);
-
-    //         assert.strictEqual(actor.system.attributes.body.value, 3);
-    //         assert.deepEqual(actor.system.attributes.body.changes, [
-    //             createTestChange(effects[0], 0)
-    //         ]);
-    //         assert.strictEqual(actor.system.skills.active.automatics.value, 3);
-    //         assert.deepEqual(actor.system.skills.active.automatics.changes, [createTestChange(effects[0], 1)]);
-    //     });
-
-    //     it('UPGRADE mode: uses the highest value for multiple upgrade changes', async () => {
-    //         window.doNotPopulateDefaultSkills = true;
-
-    //         const actor = await factory.createActor({ type: 'character' });
-    //         //
-    //         delete window.doNotPopulateDefaultSkills;
-
-    //         await actor.createEmbeddedDocuments('Item', [{
-    //             type: 'skill',
-    //             name: 'Automatics',
-    //             system: {
-    //                 type: 'skill',
-    //                 skill: {
-    //                     attribute: 'agility',
-    //                     rating: 2
-    //                 }
-    //             }
-    //         }]);
-
-
-    //         assert.strictEqual(actor.system.skills.active.automatics.base, 2);
-
-    //         await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //             origin: actor.uuid,
-    //             disabled: false,
-    //             name: 'Test Effect',
-    //             changes: [
-    //                 { key: 'system.skills.active.automatics.value', value: '5', mode: CONST.ACTIVE_EFFECT_MODES.UPGRADE },
-    //                 { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.UPGRADE }
-    //             ]
-    //         }]);
-
-    //         assert.strictEqual(actor.system.skills.active.automatics.value, 5);
-    //     });
-
-    //     it('DOWNGRADE mode: should reduce the value to a min', async () => {
-    //         window.doNotPopulateDefaultSkills = true;
-    //         const actor = await factory.createActor({ type: 'character', system: { 
-    //             attributes: { body: { base: 5 } }
-    //         }});
-    //         delete window.doNotPopulateDefaultSkills;
-
-    //         await actor.createEmbeddedDocuments('Item', [{
-    //             type: 'skill',
-    //             name: 'Automatics',
-    //             system: {
-    //                 type: 'skill',
-    //                 skill: {
-    //                     attribute: 'agility',
-    //                     rating: 5
-    //                 }
-    //             }
-    //         }]);
-
-
-    //         assert.strictEqual(actor.system.attributes.body.base, 5);
-    //         assert.strictEqual(actor.system.skills.active.automatics.base, 5);
-
-    //         const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //             origin: actor.uuid,
-    //             disabled: false,
-    //             name: 'Test Effect',
-    //             changes: [
-    //                 { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE },
-    //                 { key: 'system.attributes.body.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE }
-    //             ]
-    //         }]);
-
-    //         assert.strictEqual(actor.system.attributes.body.value, 3);
-    //         assert.deepEqual(actor.system.attributes.body.changes,
-    //             [createTestChange(effects[0], 0)]);
-    //         assert.strictEqual(actor.system.skills.active.automatics.value, 3);
-    //         assert.deepEqual(actor.system.skills.active.automatics.changes,
-    //             [createTestChange(effects[0], 1)]);
-    //     });
-
-    //     it('DOWNGRADE mode: uses the lowest value for multiple downgrade changes', async () => {
-    //         window.doNotPopulateDefaultSkills = true;
-    //         const actor = await factory.createActor({ type: 'character' });
-    //         delete window.doNotPopulateDefaultSkills;
-
-    //         await actor.createEmbeddedDocuments('Item', [{
-    //             type: 'skill',
-    //             name: 'Automatics',
-    //             system: {
-    //                 type: 'skill',
-    //                 skill: {
-    //                     attribute: 'agility',
-    //                     rating: 6
-    //                 }
-    //             }
-    //         }]);
-
-    //         await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //             origin: actor.uuid,
-    //             disabled: false,
-    //             name: 'Test Effect',
-    //             changes: [
-    //                 { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE },
-    //                 { key: 'system.skills.active.automatics.value', value: '5', mode: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE }
-    //             ]
-    //         }]);
-
-    //         assert.strictEqual(actor.system.skills.active.automatics.value, 3);
-    //     });
-
-    //     it('MULTIPLY mode: multiplies base values by the change value', async () => {
-    //         window.doNotPopulateDefaultSkills = true;
-    //         const actor = await factory.createActor({ type: 'character', system: { 
-    //             attributes: { body: { base: 5 } }, 
-    //         }});
-    //         delete window.doNotPopulateDefaultSkills;
-
-    //         await actor.createEmbeddedDocuments('Item', [{
-    //             type: 'skill',
-    //             name: 'Automatics',
-    //             system: {
-    //                 type: 'skill',
-    //                 skill: {
-    //                     attribute: 'agility',
-    //                     rating: 5
-    //                 }
-    //             }
-    //         }]);
-
-    //         assert.strictEqual(actor.system.attributes.body.base, 5);
-    //         assert.strictEqual(actor.system.skills.active.automatics.base, 5);
-
-    //         const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //             origin: actor.uuid,
-    //             disabled: false,
-    //             name: 'Test Effect',
-    //             changes: [
-    //                 { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.MULTIPLY },
-    //                 { key: 'system.attributes.body.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.MULTIPLY }
-    //             ]
-    //         }]);
-
-    //         assert.strictEqual(actor.system.attributes.body.value, 15);
-    //         assert.deepEqual(actor.system.attributes.body.changes, [
-    //             createTestChange(effects[0], 0)
-    //         ]);
-    //         assert.strictEqual(actor.system.skills.active.automatics.value, 15);
-    //         assert.deepEqual(actor.system.skills.active.automatics.changes, [
-    //             createTestChange(effects[0], 1)
-    //         ]);
-    //     });
-
-    //     it('V14 system.changes: apply explicit type and phase data', async () => {
-    //         const actor = await factory.createActor({ type: 'character' });
-    //         await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //             origin: actor.uuid,
-    //             disabled: false,
-    //             name: 'Test Effect',
-    //             system: {
-    //                 changes: [
-    //                     { key: 'system.attributes.body', value: '2', type: 'custom', phase: 'initial' },
-    //                     { key: 'system.attributes.body', value: '3', type: 'custom', phase: 'final' },
-    //                     { key: 'token.name', value: 'Changed Token Name', type: 'override', phase: 'final' }
-    //                 ]
-    //             }
-    //         }]);
-
-    //         const effect = actor.effects.contents[0] as SR5ActiveEffect;
-    //         const actorState = actor as unknown as {
-    //             tokenActiveEffectChanges: Record<string, ActiveEffect.ChangeData[]>;
-    //         };
-
-    //         assert.strictEqual(effect.system.changes[0].type, 'custom');
-    //         assert.deepEqual(actor.system.attributes.body.changes, [
-    //             // @ts-expect-error TODO: v14 - allow for easy testing...
-    //             { name: 'Test Effect', value: 2, type: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
-    //             // @ts-expect-error TODO: v14 - allow for easy testing...
-    //             { name: 'Test Effect', value: 3, type: CONST.ACTIVE_EFFECT_MODES.CUSTOM }
-    //         ]);
-    //         assert.strictEqual(actor.system.attributes.body.value, 5);
-    //         assert.lengthOf(actorState.tokenActiveEffectChanges.final, 1);
-    //         assert.strictEqual(actorState.tokenActiveEffectChanges.final[0].key, 'name');
-    //     });
-    // });
-    // /**
-    //  * Tests around the systems 'advanced' effects on top of Foundry core active effects.
-    //  */
-    // describe('SR5AdvancedEffect apply-to modes', () => {
-    //     it('A default active effect should adhere to apply-to actor rules', async () => {
-    //         const actor = await factory.createActor({ type: 'character' });
-    //         const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //             name: 'Test Effect',
-    //             changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-    //         }]) as SR5ActiveEffect[];
-
-    //         const effect = effects.pop()!;
-    //         assert.strictEqual(effect.system.applyTo, 'actor');
-    //     });
-
-    //     it('Create an item effect and assert its not created on actor as until FoundryVTT v10', async () => {
-    //         const actor = await factory.createActor({ type: 'character' });
-    //         const items = await actor.createEmbeddedDocuments('Item', [{
-    //             name: 'Test Item',
-    //             type: 'weapon',
-    //             system: {
-    //                 category: 'range'
-    //             }
-    //         }]);
-    //         const weapon = items[0];
-    //         const effects = await weapon.createEmbeddedDocuments('ActiveEffect', [{
-    //             origin: weapon.uuid,
-    //             name: 'Test Effect',
-    //             transfer: true, // Foundry uses transfer to find item effects that should be transferred. This is disabled by the system.
-    //             changes: [{ key: 'system.limit', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-    //         }]);
-
-    //         // Effects with a custom applyTo should not be applied to the actor.
-    //         assert.lengthOf(effects, 1);
-    //         assert.lengthOf(actor.effects.contents, 0);
-    //         assert.lengthOf(weapon.effects.contents, 1);
-    //     });
-
-    //     it('ACTOR apply-to: Only actor and targeted_actor effects should apply onto an actor', async () => {
-    //         const actor = await factory.createActor({ type: 'character' });
-    //         await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //             name: 'Actor Effect',
-    //             system: { applyTo: 'actor' },
-    //             changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-    //         }, {
-    //             name: 'Targeted Actor Effect',
-    //             system: { applyTo: 'targeted_actor' },
-    //             changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-    //         }, {
-    //             name: 'Test_All Effect',
-    //             system: { applyTo: 'test_all' },
-    //             changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-    //         }, {
-    //             name: 'Test_Item Effect',
-    //             system: { applyTo: 'test_item' },
-    //             changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-    //         }, {
-    //             name: 'Modifiers Effect',
-    //             system: { applyTo: 'modifier' },
-    //             changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-    //         }]);
-
-    //         assert.lengthOf(actor.effects.contents, 5);
-    //         assert.lengthOf(actor.system.attributes.body.changes, 2);
-    //         assert.equal(actor.system.attributes.body.value, 6);
-    //     });
-
-    //     it('TARGETED_ACTOR apply-to: create copied effects with resolved values on the target actor', async () => {
-    //         const attacker = await factory.createActor({
-    //             type: 'character',
-    //             system: {
-    //                 attributes: { body: { base: 2 } },
-    //                 skills: { active: { automatics: { base: 3 } } }
-    //             }
-    //         });
-    //         const target = await factory.createActor({ type: 'character' });
-
-    //         const items = await attacker.createEmbeddedDocuments('Item', [{ type: 'action', name: 'Test Action' }]);
-    //         const item = items[0] as SR5Item;
-
-    //         await item.createEmbeddedDocuments('ActiveEffect', [{
-    //             name: 'Targeted Effect',
-    //             system: {
-    //                 applyTo: 'targeted_actor',
-    //                 changes: [{ key: 'system.attributes.body', value: '@data.pool.value', type: 'custom' }]
-    //             }
-    //         }]);
-
-    //         const test = (await TestCreator.fromItem(item, attacker, { showDialog: false, showMessage: false }))!;
-
-    //         await test.evaluate();
-    //         await test.effects.createTargetActorEffects(target);
-
-    //         const appliedEffect = target.effects.find(effect => effect.name === 'Targeted Effect') as SR5ActiveEffect | undefined;
-    //         if (!appliedEffect) throw new Error('Expected copied targeted actor effect to exist on target actor.');
-
-    //         assert.strictEqual(appliedEffect.system.appliedByTest, true);
-    //         assert.strictEqual(appliedEffect.system.changes[0].value, `${test.pool.value}`);
-    //         assert.strictEqual(target.system.attributes.body.value, test.pool.value);
-    //     });
-
-    //     it('TEST_ALL apply-to: Actor effect applies to test', async () => { 
-    //         const limitValue = 3;
-    //         const poolValue = 3;
-    //         const hitsValue = 3;
-
-    //         const actor = await factory.createActor({ type: 'character' });
-    //         const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //             origin: actor.uuid,
-    //             name: 'Test Effect',
-    //             system: { applyTo: 'test_all' },
-    //             changes: [
-    //                 // NOTE: test doesn't use system.
-    //                 { key: 'data.limit', value: `${limitValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-    //                 { key: 'data.pool', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-    //                 { key: 'data.values.hits', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD }
-    //             ]
-    //         }]);
-
-    //         const action = DataDefaults.createData('action_roll', { test: 'SuccessTest' });
-
-    //         const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false });
-    //         if (!test) throw new Error('Failed to create test from action.');
-
-    //         await test.execute();
-
-    //         assert.deepEqual(test.limit.changes,
-    //             [createTestChange(effects[0], 0)]
-    //         );
-    //         assert.equal(test.limit.value, limitValue);
-    //         // SuccessTest will always include global and wounds modifier by default.
-    //         assert.deepEqual(test.pool.changes, [
-    //             createTestChange(effects[0], 1)
-    //         ]);
-    //         assert.equal(test.pool.value, poolValue);
-    //         assert.deepEqual(test.hits.changes,
-    //             [createTestChange(effects[0], 2)]
-    //         );
-    //         assert.isAtLeast(test.hits.value, hitsValue);
-    //     });
-
-    //     it('TEST_ALL apply-to: Item effect applies to test', async () => {
-    //         const limitValue = 3;
-    //         const poolValue = 3;
-    //         const hitsValue = 3;
-
-    //         const actor = await factory.createActor({ type: 'character' });
-    //         const items = await actor.createEmbeddedDocuments('Item', [{ type: 'action', name: 'Test Action' }]);
-
-    //         const item = items.pop()!;
-
-    //         const effects = await item.createEmbeddedDocuments('ActiveEffect', [{
-    //             name: 'Test Effect',
-    //             system: { applyTo: 'test_all' },
-    //             changes: [
-    //                 // NOTE: test doesn't use system.
-    //                 { key: 'data.limit', value: `${limitValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-    //                 { key: 'data.pool', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-    //                 { key: 'data.values.hits', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD }
-    //             ]
-    //         }]);
-
-    //         const test = (await TestCreator.fromItem(item as SR5Item, actor, { showDialog: false, showMessage: false }))!;
-
-    //         await test.execute();
-
-    //         assert.deepEqual(test.limit.changes,
-    //             [createTestChange(effects[0], 0)]
-    //         );
-    //         assert.equal(test.limit.value, limitValue);
-    //         // SuccessTest will always include global and wounds modifier by default.
-    //         assert.deepEqual(test.pool.changes, [
-    //             createTestChange(effects[0], 1)
-    //         ]);
-    //         assert.equal(test.pool.value, poolValue);
-    //         assert.deepEqual(test.hits.changes,
-    //             [createTestChange(effects[0], 2)]
-    //         );
-    //         assert.isAtLeast(test.hits.value, hitsValue);
-    //     });
-
-    //     it('TEST_ITEM apply-to: Item effect applies only when on test item', async () => { 
-    //         const limitValue = 3;
-    //         const poolValue = 3;
-    //         const hitsValue = 3;
-
-    //         const actor = await factory.createActor({ type: 'character' });
-
-    //         // Create a effect on actor that should NOT apply.
-    //         await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //             name: 'Test Effect Actor',
-    //             system: { applyTo: 'test_item' },
-    //             changes: [
-    //                 { key: 'data.limit', value: `${limitValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-    //                 { key: 'data.pool', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-    //                 { key: 'data.values.hits', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD }
-    //             ]
-    //         }]);
-
-    //         // Create one item that will carry the correct effect and one carries the wrong effect.
-    //         const items = await actor.createEmbeddedDocuments('Item', [
-    //             { type: 'action', name: 'Test Action' },
-    //             { type: 'action', name: 'Test Action 2' }
-    //         ]);
-
-    //         const item = items.pop()!;
-
-    //         // Create the correct effect on the correct item.
-    //         const itemEffects = await item.createEmbeddedDocuments('ActiveEffect', [{
-    //             name: 'Test Effect Correct Item',
-    //             system: { applyTo: 'test_item' },
-    //             changes: [
-    //                 { key: 'data.limit', value: `${limitValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-    //                 { key: 'data.pool', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-    //                 { key: 'data.values.hits', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD }
-    //             ]
-    //         }]);
-
-    //         const item2 = items.pop()!;
-
-    //         // Create the wrong effect on the wrong item.
-    //         const item2Effects = await item2.createEmbeddedDocuments('ActiveEffect', [{
-    //             name: 'Test Effect Wrong Item',
-    //             system: { applyTo: 'test_item' },
-    //             changes: [
-    //                 { key: 'data.limit', value: `${limitValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-    //                 { key: 'data.pool', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-    //                 { key: 'data.values.hits', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD }
-    //             ]
-    //         }]);
-
-
-    //         // Test is created using the correct item.
-    //         const test = (await TestCreator.fromItem(item as SR5Item, actor, { showDialog: false, showMessage: false }))!;
-
-    //         await test.execute();
-
-    //         assert.deepEqual(test.limit.changes,
-    //             [createTestChange(itemEffects[0], 0)]
-    //         );
-    //         assert.equal(test.limit.value, limitValue);
-    //         // SuccessTest will always include global and wounds modifier by default.
-    //         assert.deepEqual(test.pool.changes, [
-    //             createTestChange(itemEffects[0], 1)
-    //         ]);
-    //         assert.equal(test.pool.value, poolValue);
-    //         assert.deepEqual(test.hits.changes,
-    //             [createTestChange(itemEffects[0], 2)]
-    //         );
-    //         assert.isAtLeast(test.hits.value, hitsValue);
-    //     });
-
-    //     it('TEST_ALL apply-to: skip opposed tests without explicit test selection', async () => {
-    //         const actor = await factory.createActor({ type: 'character' });
-    //         const items = await actor.createEmbeddedDocuments('Item', [{
-    //             type: 'action',
-    //             name: 'Opposed Action',
-    //             system: {
-    //                 action: {
-    //                     test: 'SuccessTest',
-    //                     type: 'simple',
-    //                     attribute: 'body',
-    //                     skill: 'automatics',
-    //                     limit: { attribute: 'physical' },
-    //                     opposed: {
-    //                         type: 'custom',
-    //                         test: 'OpposedTest',
-    //                         attribute: 'reaction',
-    //                         attribute2: 'intuition',
-    //                         skill: '',
-    //                         description: ''
-    //                     }
-    //                 }
-    //             }
-    //         }]);
-
-    //         await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //             name: 'Unrestricted Effect',
-    //             system: { applyTo: 'test_all' },
-    //             changes: [{ key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
-    //         }, {
-    //             name: 'Opposed Effect',
-    //             system: { applyTo: 'test_all', selection_tests: [{ value: 'Opposed Test', id: 'OpposedTest' }] },
-    //             changes: [{ key: 'data.pool', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
-    //         }]);
-
-    //         const activeTest = (await TestCreator.fromItem(items[0] as SR5Item, actor, { showDialog: false, showMessage: false }))!;
-    //         const opposedData = await OpposedTest._getOpposedActionTestData(activeTest.data, actor, '');
-    //         if (!opposedData) throw new Error('Failed to create opposed test data.');
-
-    //         const opposedTest = new OpposedTest(opposedData, { actor });
-    //         opposedTest.effects.applyAllEffects();
-
-    //         // @ts-expect-error TODO: v14 - find a way to easily test modifier changes without needing to manually adding all the values.
-    //         assert.deepEqual(opposedTest.pool.changes, [{ name: 'Opposed Effect', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM, value: 2, priority: 0, enabled: true, invalidated: false }]);
-    //     });
-
-    //     it('TEST_ALL apply-to: respect skill, attribute and limit selections', async () => {
-    //         const actor = await factory.createActor({ type: 'character' });
-    //         const skillName = actor.getSkill('automatics')?.name ?? 'automatics';
-
-    //         await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //             name: 'Selection Effect',
-    //             system: {
-    //                 applyTo: 'test_all',
-    //                 selection_skills: [{ value: skillName, id: skillName }],
-    //                 selection_attributes: [{ value: 'Body', id: 'body' }],
-    //                 selection_limits: [{ value: 'Physical', id: 'physical' }]
-    //             },
-    //             changes: [{ key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
-    //         }]);
-
-    //         const assertPoolValue = async (actionData: ActionRollType, expected: number) => {
-    //             const test = await TestCreator.fromAction(actionData, actor, { showDialog: false, showMessage: false }) as SkillTest;
-    //             if (!test) throw new Error('Failed to create skill test.');
-
-    //             test.effects.applyAllEffects();
-    //             ModifiableValue.calcTotal(test.pool);
-
-    //             assert.strictEqual(test.pool.value, expected);
-    //         };
-
-    //         await assertPoolValue(DataDefaults.createData('action_roll', {
-    //             test: SkillTest.name,
-    //             skill: 'automatics',
-    //             attribute: 'body',
-    //             limit: { attribute: 'physical' }
-    //         }), 3);
-
-    //         await assertPoolValue(DataDefaults.createData('action_roll', {
-    //             test: SkillTest.name,
-    //             skill: 'clubs',
-    //             attribute: 'body',
-    //             limit: { attribute: 'physical' }
-    //         }), 0);
-
-    //         await assertPoolValue(DataDefaults.createData('action_roll', {
-    //             test: SkillTest.name,
-    //             skill: 'automatics',
-    //             attribute: 'logic',
-    //             limit: { attribute: 'physical' }
-    //         }), 0);
-
-    //         await assertPoolValue(DataDefaults.createData('action_roll', {
-    //             test: SkillTest.name,
-    //             skill: 'automatics',
-    //             attribute: 'body',
-    //             limit: { attribute: 'mental' }
-    //         }), 0);
-    //     });
-    // });
-
-    // describe('AdvancedEffects suppress application', () => {
-    //     it('A disabled effect should not apply', async () => {
-    //         const actor = await factory.createActor({ type: 'character' });
-    //         const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //             name: 'Test Effect',
-    //             disabled: true,
-    //             changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-    //         }]);
-
-    //         const effect = effects.pop()!;
-
-    //         assert.isTrue(effect.disabled);
-    //         assert.lengthOf(actor.effects.contents, 1);
-    //         assert.lengthOf(actor.system.attributes.body.changes, 0);
-    //     });
-
-    //     it('A wireless only effect should not apply for a wireless item', async () => {
-    //         const actor = await factory.createActor({ type: 'character' });
-    //         const items = await actor.createEmbeddedDocuments('Item', [
-    //             { type: 'cyberware', name: 'Wired Item', system: { technology: { wireless: 'none' } } },
-    //             { type: 'cyberware', name: 'Wireless Item', system: { technology: { wireless: 'online' } } }
-    //         ]);
-
-    //         let item = items.pop()!;
-    //         await item.createEmbeddedDocuments('ActiveEffect', [{
-    //             name: 'Test Effect',
-    //             system: { onlyForWireless: true },
-    //             changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-    //         }]);
-
-    //         item = items.pop()!;
-    //         await item.createEmbeddedDocuments('ActiveEffect', [{
-    //             name: 'Test Effect',
-    //             system: { onlyForWireless: true },
-    //             changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-    //         }]);
-
-    //         assert.lengthOf(actor.system.attributes.body.changes, 1);
-    //         assert.equal(actor.system.attributes.body.value, 3);
-    //     });
-
-    //     it('A equipped only effect should not apply for an  unequipped item', async () => {
-    //         const actor = await factory.createActor({ type: 'character' });
-    //         const items = await actor.createEmbeddedDocuments('Item', [
-    //             { type: 'cyberware', name: 'Equipped Item', system: { technology: { equipped: true } } },
-    //             { type: 'cyberware', name: 'Unequipped Item', system: { technology: { equipped: false } } }
-    //         ]);
-
-    //         let item = items.pop()!;
-    //         await item.createEmbeddedDocuments('ActiveEffect', [{
-    //             name: 'Test Effect',
-    //             system: { onlyForEquipped: true },
-    //             changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-    //         }]);
-
-    //         item = items.pop()!;
-    //         await item.createEmbeddedDocuments('ActiveEffect', [{
-    //             name: 'Test Effect',
-    //             system: { onlyForEquipped: true },
-    //             changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-    //         }]);
-
-    //         assert.lengthOf(actor.system.attributes.body.changes, 1);
-    //         assert.equal(actor.system.attributes.body.value, 3);
-    //     });
-
-    //     it('A wireless and equipped only effect should not apply for a wired and unequipped item', async () => {
-    //         const actor = await factory.createActor({ type: 'character' });
-    //         const items = await actor.createEmbeddedDocuments('Item', [
-    //             { type: 'cyberware', name: 'Wireless Equipped Item', system: { technology: { equipped: true, wireless: 'online' } } },
-    //             { type: 'cyberware', name: 'Wired Unequipped Item', system: { technology: { equipped: false, wireless: 'offline' } } }
-    //         ]);
-
-    //         let item = items.pop()!;
-    //         await item.createEmbeddedDocuments('ActiveEffect', [{
-    //             name: 'Test Effect',
-    //             system: { onlyForEquipped: true, onlyForWireless: true },
-    //             changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-    //         }]);
-
-    //         item = items.pop()!;
-    //         await item.createEmbeddedDocuments('ActiveEffect', [{
-    //             name: 'Test Effect',
-    //             system: { onlyForEquipped: true, onlyForWireless: false },
-    //             changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-    //         }]);
-
-    //         assert.lengthOf(actor.system.attributes.body.changes, 1);
-    //         assert.equal(actor.system.attributes.body.value, 3);
-    //     });
-
-    //     it('A wireless and equipped only effect should not apply if it the effect itself disabled', async () => {
-    //         const actor = await factory.createActor({ type: 'character' });
-    //         const items = await actor.createEmbeddedDocuments('Item', [
-    //             { type: 'cyberware', name: 'Wireless Equipped Item', system: { technology: { equipped: true, wireless: 'online' } } },
-    //         ]);
-
-    //         const item = items.pop()!;
-    //         await item.createEmbeddedDocuments('ActiveEffect', [{
-    //             name: 'Test Effect',
-    //             disabled: true,
-    //             system: { onlyForEquipped: true, onlyForWireless: true },
-    //             changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-    //         }]);
-
-    //         // The value will match the attribute min value (0) due to ValueField flow.
-    //         assert.lengthOf(actor.system.attributes.body.changes, 0);
-    //         assert.equal(actor.system.attributes.body.value, 0);
-    //     });
-
-    //     it('A extended test should not apply effects on extended rolls', async () => {
-    //         /**
-    //          * Sum all modifier values for the given name.
-    //          * 
-    //          * @param name The modifier name
-    //          * @returns the sum of all modifier values matching the name
-    //          */
-    //         const reduceModifiersByName = (name: string) => 
-    //             (acc: number, modifier: { name: string, value: number }) => 
-    //                 modifier.name === name ? acc + modifier.value : acc;
-
-    //         const actor = await factory.createActor({ type: 'character' });
-    //         let actions = await actor.createEmbeddedDocuments('Item', [{ name: 'Test Action', type: 'action' }]);
-    //         await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //             name: 'Test Effect',
-    //             system: { applyTo: 'test_all', selection_tests: [{ value: "Success Test", id: "SuccessTest" }] },
-    //             changes: [{ key: 'data.pool', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-    //         }]);
-
-    //         let test = (await TestCreator.fromItem(actions[0] as SR5Item, actor, { showDialog: false, showMessage: false }))!;
-    //         await test.execute();
-
-    //         // The first roll should have the effect applied
-    //         assert.equal(test.pool.changes.reduce(reduceModifiersByName('Test Effect'), 0), 2);
-
-    //         // Trigger the extended roll...
-    //         test = await test.executeAsExtended();
-    //         // ... assure effects aren't re applied but taken from the first roll.
-    //         assert.equal(test.pool.changes.reduce(reduceModifiersByName('Test Effect'), 0), 2);
-
-    //         actions = await actor.createEmbeddedDocuments('Item', [{ name: 'Test Action', type: 'action', system: { action: { extended : true  } } }]);
-    //         test = (await TestCreator.fromItem(actions[0] as SR5Item, actor, { showDialog: false, showMessage: false }))!;
-
-    //         // This will trigger the first and all extended rolls...
-    //         await test.execute();
-
-    //         /// ... the test reference is for the first roll and should have the effect applied.
-    //         assert.equal(test.pool.changes.reduce(reduceModifiersByName('Test Effect'), 0), 2);
-    //     });
-    // });
-
-    // describe('AdvancedEffects with dynamic values', () => {
-    //     it('ACTOR apply-to: Grab dynamic actor values', async () => {
-    //         const actor = await factory.createActor({ type: 'character', system: { modifiers: { global: 6 } } });
-    //         await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //             name: 'Actor Effect',
-    //             changes: [
-    //                 { key: 'system.attributes.body', value: '@system.modifiers.global', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-    //             ]
-    //         }]);
-
-    //         assert.lengthOf(actor.effects.contents, 1);
-    //         assert.equal(actor.system.attributes.body.value, 6);
-    //     });
-    // });
+            const actor = await factory.createActor({ type: 'character', system: { 
+                attributes: { body: { base: 2 } }
+            }});
+            delete window.doNotPopulateDefaultSkills;
+
+            await actor.createEmbeddedDocuments('Item', [{
+                type: 'skill',
+                name: 'Automatics',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        attribute: 'agility',
+                        rating: 2
+                    }
+                }
+            }]);
+
+
+            assert.strictEqual(actor.system.attributes.body.base, 2);
+            assert.strictEqual(actor.system.skills.active.automatics.base, 2);
+
+            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.UPGRADE },
+                    { key: 'system.attributes.body.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.UPGRADE }
+                ]
+            }]);
+
+            assert.strictEqual(actor.system.attributes.body.value, 3);
+            assert.deepEqual(actor.system.attributes.body.changes, [
+                createTestChange(effects[0], 0)
+            ]);
+            assert.strictEqual(actor.system.skills.active.automatics.value, 3);
+            assert.deepEqual(actor.system.skills.active.automatics.changes, [createTestChange(effects[0], 1)]);
+        });
+
+        it('UPGRADE mode: uses the highest value for multiple upgrade changes', async () => {
+            window.doNotPopulateDefaultSkills = true;
+
+            const actor = await factory.createActor({ type: 'character' });
+            //
+            delete window.doNotPopulateDefaultSkills;
+
+            await actor.createEmbeddedDocuments('Item', [{
+                type: 'skill',
+                name: 'Automatics',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        attribute: 'agility',
+                        rating: 2
+                    }
+                }
+            }]);
+
+
+            assert.strictEqual(actor.system.skills.active.automatics.base, 2);
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.skills.active.automatics.value', value: '5', mode: CONST.ACTIVE_EFFECT_MODES.UPGRADE },
+                    { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.UPGRADE }
+                ]
+            }]);
+
+            assert.strictEqual(actor.system.skills.active.automatics.value, 5);
+        });
+
+        it('DOWNGRADE mode: should reduce the value to a min', async () => {
+            window.doNotPopulateDefaultSkills = true;
+            const actor = await factory.createActor({ type: 'character', system: { 
+                attributes: { body: { base: 5 } }
+            }});
+            delete window.doNotPopulateDefaultSkills;
+
+            await actor.createEmbeddedDocuments('Item', [{
+                type: 'skill',
+                name: 'Automatics',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        attribute: 'agility',
+                        rating: 5
+                    }
+                }
+            }]);
+
+
+            assert.strictEqual(actor.system.attributes.body.base, 5);
+            assert.strictEqual(actor.system.skills.active.automatics.base, 5);
+
+            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE },
+                    { key: 'system.attributes.body.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE }
+                ]
+            }]);
+
+            assert.strictEqual(actor.system.attributes.body.value, 3);
+            assert.deepEqual(actor.system.attributes.body.changes,
+                [createTestChange(effects[0], 0)]);
+            assert.strictEqual(actor.system.skills.active.automatics.value, 3);
+            assert.deepEqual(actor.system.skills.active.automatics.changes,
+                [createTestChange(effects[0], 1)]);
+        });
+
+        it('DOWNGRADE mode: uses the lowest value for multiple downgrade changes', async () => {
+            window.doNotPopulateDefaultSkills = true;
+            const actor = await factory.createActor({ type: 'character' });
+            delete window.doNotPopulateDefaultSkills;
+
+            await actor.createEmbeddedDocuments('Item', [{
+                type: 'skill',
+                name: 'Automatics',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        attribute: 'agility',
+                        rating: 6
+                    }
+                }
+            }]);
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE },
+                    { key: 'system.skills.active.automatics.value', value: '5', mode: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE }
+                ]
+            }]);
+
+            assert.strictEqual(actor.system.skills.active.automatics.value, 3);
+        });
+
+        it('MULTIPLY mode: multiplies base values by the change value', async () => {
+            window.doNotPopulateDefaultSkills = true;
+            const actor = await factory.createActor({ type: 'character', system: { 
+                attributes: { body: { base: 5 } }, 
+            }});
+            delete window.doNotPopulateDefaultSkills;
+
+            await actor.createEmbeddedDocuments('Item', [{
+                type: 'skill',
+                name: 'Automatics',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        attribute: 'agility',
+                        rating: 5
+                    }
+                }
+            }]);
+
+            assert.strictEqual(actor.system.attributes.body.base, 5);
+            assert.strictEqual(actor.system.skills.active.automatics.base, 5);
+
+            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.MULTIPLY },
+                    { key: 'system.attributes.body.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.MULTIPLY }
+                ]
+            }]);
+
+            assert.strictEqual(actor.system.attributes.body.value, 15);
+            assert.deepEqual(actor.system.attributes.body.changes, [
+                createTestChange(effects[0], 0)
+            ]);
+            assert.strictEqual(actor.system.skills.active.automatics.value, 15);
+            assert.deepEqual(actor.system.skills.active.automatics.changes, [
+                createTestChange(effects[0], 1)
+            ]);
+        });
+    });
+    /**
+     * Tests around the systems 'advanced' effects on top of Foundry core active effects.
+     */
+    describe('SR5AdvancedEffect apply-to modes', () => {
+        it('A default active effect should adhere to apply-to actor rules', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+            }]) as SR5ActiveEffect[];
+
+            const effect = effects.pop()!;
+            assert.strictEqual(effect.system.applyTo, 'actor');
+        });
+
+        it('Create an item effect and assert its not created on actor as until FoundryVTT v10', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const items = await actor.createEmbeddedDocuments('Item', [{
+                name: 'Test Item',
+                type: 'weapon',
+                system: {
+                    category: 'range'
+                }
+            }]);
+            const weapon = items[0];
+            const effects = await weapon.createEmbeddedDocuments('ActiveEffect', [{
+                origin: weapon.uuid,
+                name: 'Test Effect',
+                transfer: true, // Foundry uses transfer to find item effects that should be transferred. This is disabled by the system.
+                changes: [{ key: 'system.limit', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+            }]);
+
+            // Effects with a custom applyTo should not be applied to the actor.
+            assert.lengthOf(effects, 1);
+            assert.lengthOf(actor.effects.contents, 0);
+            assert.lengthOf(weapon.effects.contents, 1);
+        });
+
+        it('ACTOR apply-to: Only actor and targeted_actor effects should apply onto an actor', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Actor Effect',
+                system: { applyTo: 'actor' },
+                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+            }, {
+                name: 'Targeted Actor Effect',
+                system: { applyTo: 'targeted_actor' },
+                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+            }, {
+                name: 'Test_All Effect',
+                system: { applyTo: 'test_all' },
+                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+            }, {
+                name: 'Test_Item Effect',
+                system: { applyTo: 'test_item' },
+                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+            }, {
+                name: 'Modifiers Effect',
+                system: { applyTo: 'modifier' },
+                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+            }]);
+
+            assert.lengthOf(actor.effects.contents, 5);
+            assert.lengthOf(actor.system.attributes.body.changes, 2);
+            assert.equal(actor.system.attributes.body.value, 6);
+        });
+
+        it('TARGETED_ACTOR apply-to: create copied effects with resolved values on the target actor', async () => {
+            const attacker = await factory.createActor({
+                type: 'character',
+                system: {
+                    attributes: { body: { base: 2 } },
+                    skills: { active: { automatics: { base: 3 } } }
+                }
+            });
+            const target = await factory.createActor({ type: 'character' });
+
+            const items = await attacker.createEmbeddedDocuments('Item', [{ type: 'action', name: 'Test Action' }]);
+            const item = items[0] as SR5Item;
+
+            await item.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Targeted Effect',
+                system: {
+                    applyTo: 'targeted_actor',
+                    changes: [{ key: 'system.attributes.body', value: '@data.pool.value', type: 'custom' }]
+                }
+            }]);
+
+            const test = (await TestCreator.fromItem(item, attacker, { showDialog: false, showMessage: false }))!;
+
+            await test.evaluate();
+            await test.effects.createTargetActorEffects(target);
+
+            const appliedEffect = target.effects.find(effect => effect.name === 'Targeted Effect') as SR5ActiveEffect | undefined;
+            if (!appliedEffect) throw new Error('Expected copied targeted actor effect to exist on target actor.');
+
+            assert.strictEqual(appliedEffect.system.appliedByTest, true);
+            assert.strictEqual(appliedEffect.system.changes[0].value, `${test.pool.value}`);
+            assert.strictEqual(target.system.attributes.body.value, test.pool.value);
+        });
+
+        it('TEST_ALL apply-to: Actor effect applies to test', async () => { 
+            const limitValue = 3;
+            const poolValue = 3;
+            const hitsValue = 3;
+
+            const actor = await factory.createActor({ type: 'character' });
+            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                name: 'Test Effect',
+                system: { applyTo: 'test_all' },
+                changes: [
+                    // NOTE: test doesn't use system.
+                    { key: 'data.limit', value: `${limitValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'data.pool', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'data.values.hits', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD }
+                ]
+            }]);
+
+            const action = DataDefaults.createData('action_roll', { test: 'SuccessTest' });
+
+            const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false });
+            if (!test) throw new Error('Failed to create test from action.');
+
+            await test.execute();
+
+            assert.deepEqual(test.limit.changes,
+                [createTestChange(effects[0], 0)]
+            );
+            assert.equal(test.limit.value, limitValue);
+            // SuccessTest will always include global and wounds modifier by default.
+            assert.deepEqual(test.pool.changes, [
+                createTestChange(effects[0], 1)
+            ]);
+            assert.equal(test.pool.value, poolValue);
+            assert.deepEqual(test.hits.changes,
+                [createTestChange(effects[0], 2)]
+            );
+            assert.isAtLeast(test.hits.value, hitsValue);
+        });
+
+        it('TEST_ALL apply-to: Item effect applies to test', async () => {
+            const limitValue = 3;
+            const poolValue = 3;
+            const hitsValue = 3;
+
+            const actor = await factory.createActor({ type: 'character' });
+            const items = await actor.createEmbeddedDocuments('Item', [{ type: 'action', name: 'Test Action' }]);
+
+            const item = items.pop()!;
+
+            const effects = await item.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                system: { applyTo: 'test_all' },
+                changes: [
+                    // NOTE: test doesn't use system.
+                    { key: 'data.limit', value: `${limitValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'data.pool', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'data.values.hits', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD }
+                ]
+            }]);
+
+            const test = (await TestCreator.fromItem(item as SR5Item, actor, { showDialog: false, showMessage: false }))!;
+
+            await test.execute();
+
+            assert.deepEqual(test.limit.changes,
+                [createTestChange(effects[0], 0)]
+            );
+            assert.equal(test.limit.value, limitValue);
+            // SuccessTest will always include global and wounds modifier by default.
+            assert.deepEqual(test.pool.changes, [
+                createTestChange(effects[0], 1)
+            ]);
+            assert.equal(test.pool.value, poolValue);
+            assert.deepEqual(test.hits.changes,
+                [createTestChange(effects[0], 2)]
+            );
+            assert.isAtLeast(test.hits.value, hitsValue);
+        });
+
+        it('TEST_ITEM apply-to: Item effect applies only when on test item', async () => { 
+            const limitValue = 3;
+            const poolValue = 3;
+            const hitsValue = 3;
+
+            const actor = await factory.createActor({ type: 'character' });
+
+            // Create a effect on actor that should NOT apply.
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect Actor',
+                system: { applyTo: 'test_item' },
+                changes: [
+                    { key: 'data.limit', value: `${limitValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'data.pool', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'data.values.hits', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD }
+                ]
+            }]);
+
+            // Create one item that will carry the correct effect and one carries the wrong effect.
+            const items = await actor.createEmbeddedDocuments('Item', [
+                { type: 'action', name: 'Test Action' },
+                { type: 'action', name: 'Test Action 2' }
+            ]);
+
+            const item = items.pop()!;
+
+            // Create the correct effect on the correct item.
+            const itemEffects = await item.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect Correct Item',
+                system: { applyTo: 'test_item' },
+                changes: [
+                    { key: 'data.limit', value: `${limitValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'data.pool', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'data.values.hits', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD }
+                ]
+            }]);
+
+            const item2 = items.pop()!;
+
+            // Create the wrong effect on the wrong item.
+            const item2Effects = await item2.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect Wrong Item',
+                system: { applyTo: 'test_item' },
+                changes: [
+                    { key: 'data.limit', value: `${limitValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'data.pool', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'data.values.hits', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD }
+                ]
+            }]);
+
+
+            // Test is created using the correct item.
+            const test = (await TestCreator.fromItem(item as SR5Item, actor, { showDialog: false, showMessage: false }))!;
+
+            await test.execute();
+
+            assert.deepEqual(test.limit.changes,
+                [createTestChange(itemEffects[0], 0)]
+            );
+            assert.equal(test.limit.value, limitValue);
+            // SuccessTest will always include global and wounds modifier by default.
+            assert.deepEqual(test.pool.changes, [
+                createTestChange(itemEffects[0], 1)
+            ]);
+            assert.equal(test.pool.value, poolValue);
+            assert.deepEqual(test.hits.changes,
+                [createTestChange(itemEffects[0], 2)]
+            );
+            assert.isAtLeast(test.hits.value, hitsValue);
+        });
+
+        it('TEST_ALL apply-to: skip opposed tests without explicit test selection', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const items = await actor.createEmbeddedDocuments('Item', [{
+                type: 'action',
+                name: 'Opposed Action',
+                system: {
+                    action: {
+                        test: 'SuccessTest',
+                        type: 'simple',
+                        attribute: 'body',
+                        skill: 'automatics',
+                        limit: { attribute: 'physical' },
+                        opposed: {
+                            type: 'custom',
+                            test: 'OpposedTest',
+                            attribute: 'reaction',
+                            attribute2: 'intuition',
+                            skill: '',
+                            description: ''
+                        }
+                    }
+                }
+            }]);
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Unrestricted Effect',
+                system: { applyTo: 'test_all' },
+                changes: [{ key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+            }, {
+                name: 'Opposed Effect',
+                system: { applyTo: 'test_all', selection_tests: [{ value: 'Opposed Test', id: 'OpposedTest' }] },
+                changes: [{ key: 'data.pool', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+            }]);
+
+            const activeTest = (await TestCreator.fromItem(items[0] as SR5Item, actor, { showDialog: false, showMessage: false }))!;
+            const opposedData = await OpposedTest._getOpposedActionTestData(activeTest.data, actor, '');
+            if (!opposedData) throw new Error('Failed to create opposed test data.');
+
+            const opposedTest = new OpposedTest(opposedData, { actor });
+            opposedTest.effects.applyAllEffects();
+
+            const opposedEffect = opposedTest.pool.changes.find(effect => effect.name === 'Opposed Effect') as any;
+            assert.isDefined(opposedEffect, 'Expected to find the opposed effect in the opposed test pool changes.');
+            assert.equal(opposedEffect.name, 'Opposed Effect');
+            assert.equal(opposedEffect.mode, CONST.ACTIVE_EFFECT_MODES.CUSTOM);
+            assert.equal(opposedEffect.value, 2);
+            assert.equal(opposedEffect.priority, 0);
+            assert.equal(opposedEffect.enabled, true);
+            assert.equal(opposedEffect.invalidated, false);
+        });
+
+        it('TEST_ALL apply-to: respect skill, attribute and limit selections', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const skillName = actor.getSkill('automatics')?.name ?? 'automatics';
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Selection Effect',
+                system: {
+                    applyTo: 'test_all',
+                    selection_skills: [{ value: skillName, id: skillName }],
+                    selection_attributes: [{ value: 'Body', id: 'body' }],
+                    selection_limits: [{ value: 'Physical', id: 'physical' }]
+                },
+                changes: [{ key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+            }]);
+
+            const assertPoolValue = async (actionData: ActionRollType, expected: number) => {
+                const test = await TestCreator.fromAction(actionData, actor, { showDialog: false, showMessage: false }) as SkillTest;
+                if (!test) throw new Error('Failed to create skill test.');
+
+                test.effects.applyAllEffects();
+                ModifiableValue.calcTotal(test.pool);
+
+                assert.strictEqual(test.pool.value, expected);
+            };
+
+            await assertPoolValue(DataDefaults.createData('action_roll', {
+                test: SkillTest.name,
+                skill: 'automatics',
+                attribute: 'body',
+                limit: { attribute: 'physical' }
+            }), 2); // skill defaulting 3 -1 => 2
+
+            await assertPoolValue(DataDefaults.createData('action_roll', {
+                test: SkillTest.name,
+                skill: 'clubs',
+                attribute: 'body',
+                limit: { attribute: 'physical' }
+            }), 0);
+
+            await assertPoolValue(DataDefaults.createData('action_roll', {
+                test: SkillTest.name,
+                skill: 'automatics',
+                attribute: 'logic',
+                limit: { attribute: 'physical' }
+            }), 0);
+
+            await assertPoolValue(DataDefaults.createData('action_roll', {
+                test: SkillTest.name,
+                skill: 'automatics',
+                attribute: 'body',
+                limit: { attribute: 'mental' }
+            }), 0);
+        });
+    });
+
+    describe('AdvancedEffects suppress application', () => {
+        it('A disabled effect should not apply', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                disabled: true,
+                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+            }]);
+
+            const effect = effects.pop()!;
+
+            assert.isTrue(effect.disabled);
+            assert.lengthOf(actor.effects.contents, 1);
+            assert.lengthOf(actor.system.attributes.body.changes, 0);
+        });
+
+        it('A wireless only effect should not apply for a wireless item', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const items = await actor.createEmbeddedDocuments('Item', [
+                { type: 'cyberware', name: 'Wired Item', system: { technology: { wireless: 'none' } } },
+                { type: 'cyberware', name: 'Wireless Item', system: { technology: { wireless: 'online' } } }
+            ]);
+
+            let item = items.pop()!;
+            await item.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                system: { onlyForWireless: true },
+                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+            }]);
+
+            item = items.pop()!;
+            await item.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                system: { onlyForWireless: true },
+                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+            }]);
+
+            assert.lengthOf(actor.system.attributes.body.changes, 1);
+            assert.equal(actor.system.attributes.body.value, 3);
+        });
+
+        it('A equipped only effect should not apply for an  unequipped item', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const items = await actor.createEmbeddedDocuments('Item', [
+                { type: 'cyberware', name: 'Equipped Item', system: { technology: { equipped: true } } },
+                { type: 'cyberware', name: 'Unequipped Item', system: { technology: { equipped: false } } }
+            ]);
+
+            let item = items.pop()!;
+            await item.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                system: { onlyForEquipped: true },
+                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+            }]);
+
+            item = items.pop()!;
+            await item.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                system: { onlyForEquipped: true },
+                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+            }]);
+
+            assert.lengthOf(actor.system.attributes.body.changes, 1);
+            assert.equal(actor.system.attributes.body.value, 3);
+        });
+
+        it('A wireless and equipped only effect should not apply for a wired and unequipped item', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const items = await actor.createEmbeddedDocuments('Item', [
+                { type: 'cyberware', name: 'Wireless Equipped Item', system: { technology: { equipped: true, wireless: 'online' } } },
+                { type: 'cyberware', name: 'Wired Unequipped Item', system: { technology: { equipped: false, wireless: 'offline' } } }
+            ]);
+
+            let item = items.pop()!;
+            await item.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                system: { onlyForEquipped: true, onlyForWireless: true },
+                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+            }]);
+
+            item = items.pop()!;
+            await item.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                system: { onlyForEquipped: true, onlyForWireless: false },
+                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+            }]);
+
+            assert.lengthOf(actor.system.attributes.body.changes, 1);
+            assert.equal(actor.system.attributes.body.value, 3);
+        });
+
+        it('A wireless and equipped only effect should not apply if it the effect itself disabled', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const items = await actor.createEmbeddedDocuments('Item', [
+                { type: 'cyberware', name: 'Wireless Equipped Item', system: { technology: { equipped: true, wireless: 'online' } } },
+            ]);
+
+            const item = items.pop()!;
+            await item.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                disabled: true,
+                system: { onlyForEquipped: true, onlyForWireless: true },
+                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+            }]);
+
+            // The value will match the attribute min value (0) due to ValueField flow.
+            assert.lengthOf(actor.system.attributes.body.changes, 0);
+            assert.equal(actor.system.attributes.body.value, 0);
+        });
+
+        it('A extended test should not apply effects on extended rolls', async () => {
+            /**
+             * Sum all modifier values for the given name.
+             * 
+             * @param name The modifier name
+             * @returns the sum of all modifier values matching the name
+             */
+            const reduceModifiersByName = (name: string) => 
+                (acc: number, modifier: { name: string, value: number }) => 
+                    modifier.name === name ? acc + modifier.value : acc;
+
+            const actor = await factory.createActor({ type: 'character' });
+            let actions = await actor.createEmbeddedDocuments('Item', [{ name: 'Test Action', type: 'action' }]);
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                system: { applyTo: 'test_all', selection_tests: [{ value: "Success Test", id: "SuccessTest" }] },
+                changes: [{ key: 'data.pool', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+            }]);
+
+            let test = (await TestCreator.fromItem(actions[0] as SR5Item, actor, { showDialog: false, showMessage: false }))!;
+            await test.execute();
+
+            // The first roll should have the effect applied
+            assert.equal(test.pool.changes.reduce(reduceModifiersByName('Test Effect'), 0), 2);
+
+            // Trigger the extended roll...
+            test = await test.executeAsExtended();
+            // ... assure effects aren't re applied but taken from the first roll.
+            assert.equal(test.pool.changes.reduce(reduceModifiersByName('Test Effect'), 0), 2);
+
+            actions = await actor.createEmbeddedDocuments('Item', [{ name: 'Test Action', type: 'action', system: { action: { extended : true  } } }]);
+            test = (await TestCreator.fromItem(actions[0] as SR5Item, actor, { showDialog: false, showMessage: false }))!;
+
+            // This will trigger the first and all extended rolls...
+            await test.execute();
+
+            /// ... the test reference is for the first roll and should have the effect applied.
+            assert.equal(test.pool.changes.reduce(reduceModifiersByName('Test Effect'), 0), 2);
+        });
+    });
+
+    describe('AdvancedEffects with dynamic values', () => {
+        it('ACTOR apply-to: Grab dynamic actor values', async () => {
+            const actor = await factory.createActor({ type: 'character', system: { modifiers: { global: 6 } } });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Actor Effect',
+                changes: [
+                    { key: 'system.attributes.body', value: '@system.modifiers.global', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                ]
+            }]);
+
+            assert.lengthOf(actor.effects.contents, 1);
+            assert.equal(actor.system.attributes.body.value, 6);
+        });
+    });
 
     /**
      * All these tests check for cases that caused issues in the past, due to specific implementation details
@@ -987,116 +961,116 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
     });
     
-    // describe('AdvanceEffects apply modification based on test categories', () => {
-    //     it('Should apply modifier to a single category only', async () => {
-    //         const actor = await factory.createActor({ type: 'character' });
-    //         await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //             name: 'Test Effect',
-    //             system: { applyTo: 'test_all', selection_categories: [{ value: "Social Actions", id: "social"}] },
-    //             changes: [{ key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-    //         }]);
+    describe('AdvanceEffects apply modification based on test categories', () => {
+        it('Should apply modifier to a single category only', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                system: { applyTo: 'test_all', selection_categories: [{ value: "Social Actions", id: "social"}] },
+                changes: [{ key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+            }]);
 
-    //         // CASE - Test uses the same category
-    //         let action = DataDefaults.createData('action_roll', { test: 'SkillTest', categories: ['social'] });
-    //         let test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false });
-    //         if (!test) throw new Error('Failed to create test from action.');
+            // CASE - Test uses the same category
+            let action = DataDefaults.createData('action_roll', { test: 'SkillTest', categories: ['social'] });
+            let test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false });
+            if (!test) throw new Error('Failed to create test from action.');
 
-    //         // Simulate relevant part of #execute
-    //         test.prepareTestCategories();
-    //         test.effects.applyAllEffects();
+            // Simulate relevant part of #execute
+            test.prepareTestCategories();
+            test.effects.applyAllEffects();
 
-    //         ModifiableValue.calcTotal(test.pool);
+            ModifiableValue.calcTotal(test.pool);
 
-    //         assert.strictEqual(test.pool.value, 3);
+            assert.strictEqual(test.pool.value, 3);
 
-    //         // CASE - Test uses different category
-    //         action = DataDefaults.createData('action_roll', { test: 'SkillTest', categories: ['matrix'] });
-    //         test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false });
-    //         if (!test) throw new Error('Failed to create test from action.');
+            // CASE - Test uses different category
+            action = DataDefaults.createData('action_roll', { test: 'SkillTest', categories: ['matrix'] });
+            test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false });
+            if (!test) throw new Error('Failed to create test from action.');
 
-    //         // Simulate relevant part of #execute
-    //         test.prepareTestCategories();
-    //         test.effects.applyAllEffects();
+            // Simulate relevant part of #execute
+            test.prepareTestCategories();
+            test.effects.applyAllEffects();
 
-    //         ModifiableValue.calcTotal(test.pool);
+            ModifiableValue.calcTotal(test.pool);
 
-    //         assert.strictEqual(test.pool.value, 0);
+            assert.strictEqual(test.pool.value, 0);
 
-    //         // CASE - Test uses no category
-    //         action = DataDefaults.createData('action_roll', { test: 'SkillTest', categories: [] });
-    //         test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false });
-    //         if (!test) throw new Error('Failed to create test from action.');
+            // CASE - Test uses no category
+            action = DataDefaults.createData('action_roll', { test: 'SkillTest', categories: [] });
+            test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false });
+            if (!test) throw new Error('Failed to create test from action.');
 
-    //         // Simulate relevant part of #execute
-    //         test.prepareTestCategories();
-    //         test.effects.applyAllEffects();
+            // Simulate relevant part of #execute
+            test.prepareTestCategories();
+            test.effects.applyAllEffects();
 
-    //         ModifiableValue.calcTotal(test.pool);
+            ModifiableValue.calcTotal(test.pool);
 
-    //         assert.strictEqual(test.pool.value, 0);
-    //     });
+            assert.strictEqual(test.pool.value, 0);
+        });
 
-    //     it('Should apply skill-filtered modifiers for canonical keys and legacy skill names', async () => {
-    //         const actor = await factory.createActor({ type: 'character' });
-    //         await actor.createEmbeddedDocuments('ActiveEffect', [
-    //             {
-    //                 name: 'Skill Effect',
-    //                 system: { applyTo: 'test_all', selection_skills: [{ value: 'Sneaking', id: 'sneaking' }] },
-    //                 changes: [{ key: 'data.pool', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-    //             }                
-    //         ]);
+        it('Should apply skill-filtered modifiers for canonical keys and legacy skill names', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            await actor.createEmbeddedDocuments('ActiveEffect', [
+                {
+                    name: 'Skill Effect',
+                    system: { applyTo: 'test_all', selection_skills: [{ value: 'Sneaking', id: 'sneaking' }] },
+                    changes: [{ key: 'data.pool', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+                }                
+            ]);
 
-    //         const action = DataDefaults.createData('action_roll', {
-    //             test: SkillTest.name,
-    //             skill: 'sneaking',
-    //             attribute: 'agility',
-    //         });
-    //         const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SkillTest;
-    //         if (!test) throw new Error('Failed to create test from action.');
+            const action = DataDefaults.createData('action_roll', {
+                test: SkillTest.name,
+                skill: 'sneaking',
+                attribute: 'agility',
+            });
+            const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SkillTest;
+            if (!test) throw new Error('Failed to create test from action.');
 
-    //         test.effects.applyAllEffects();
-    //         ModifiableValue.calcTotal(test.pool);
+            test.effects.applyAllEffects();
+            ModifiableValue.calcTotal(test.pool);
 
-    //         assert.strictEqual(test.pool.value, 1); // 2 - 1 (defaulted skill)
-    //     });
-    // });
+            assert.strictEqual(test.pool.value, 1); // 2 - 1 (defaulted skill)
+        });
+    });
 
     /**
      * These tests cover interaction between Effect change application and data preparation code.
      */
-    // describe("AdvancedEffects should hold true to data preparation expectations", () => {
-    //     it('Should apply armor element modifiers from effect changes and armor items correctly', async () => {
-    //         const actor = await factory.createActor({ type: 'character' });
-    //         await actor.createEmbeddedDocuments('ActiveEffect', [{
-    //             name: 'Test Effect',
-    //             changes: [
-    //                 { key: 'system.armor.fire', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-    //                 { key: 'system.armor.acid', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-    //                 { key: 'system.armor.cold', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-    //                 { key: 'system.armor.electricity', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-    //                 { key: 'system.armor.radiation', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-    //             ]
-    //         }]);
-    //         await actor.createEmbeddedDocuments('Item', [{
-    //             name: 'Test Armor',
-    //             type: 'armor',
-    //             system: {
-    //                 technology: { equipped: true },
-    //                 armor: {
-    //                     fire: 1,
-    //                     acid: 2,
-    //                     cold: 3,
-    //                     electricity: 4,
-    //                     radiation: 5
-    //                 }
-    //             }
-    //         }]);
+    describe("AdvancedEffects should hold true to data preparation expectations", () => {
+        it('Should apply armor element modifiers from effect changes and armor items correctly', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Effect',
+                changes: [
+                    { key: 'system.armor.fire', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'system.armor.acid', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'system.armor.cold', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'system.armor.electricity', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'system.armor.radiation', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                ]
+            }]);
+            await actor.createEmbeddedDocuments('Item', [{
+                name: 'Test Armor',
+                type: 'armor',
+                system: {
+                    technology: { equipped: true },
+                    armor: {
+                        fire: 1,
+                        acid: 2,
+                        cold: 3,
+                        electricity: 4,
+                        radiation: 5
+                    }
+                }
+            }]);
 
-    //         assert.strictEqual(actor.system.armor.fire, 4);
-    //         assert.strictEqual(actor.system.armor.acid, 5);
-    //         assert.strictEqual(actor.system.armor.cold, 6);
-    //         assert.strictEqual(actor.system.armor.electricity, 7);
-    //         assert.strictEqual(actor.system.armor.radiation, 8);
-    //     });
-    // });
+            assert.strictEqual(actor.system.armor.fire, 4);
+            assert.strictEqual(actor.system.armor.acid, 5);
+            assert.strictEqual(actor.system.armor.cold, 6);
+            assert.strictEqual(actor.system.armor.electricity, 7);
+            assert.strictEqual(actor.system.armor.radiation, 8);
+        });
+    });
 };
