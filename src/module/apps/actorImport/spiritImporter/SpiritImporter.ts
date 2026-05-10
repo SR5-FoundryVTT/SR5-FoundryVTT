@@ -6,6 +6,7 @@ import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 import { DataDefaults } from "@/module/data/DataDefaults";
 import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
 import { FLAGS, SYSTEM_NAME } from "@/module/constants";
+import { ActorSkillImport } from "../ActorSkillImport";
 import CompendiumCollection = foundry.documents.collections.CompendiumCollection;
 
 export interface BlankSpirit extends Actor.CreateData {
@@ -82,6 +83,9 @@ export class SpiritImporter {
         }
 
         spirit.system.spiritType = spiritTemplate.system.spiritType;
+        spirit.system.skillset = spiritTemplate.system.skillset;
+        spirit.system.half_value_skill = spiritTemplate.system.half_value_skill;
+        await ActorSkillImport.importSkills(spirit, chummerData);
 
         const edgeAttribute = chummerData.attributes[1]?.attribute.find(
             att => att.name_english.toLowerCase() === 'edg'
