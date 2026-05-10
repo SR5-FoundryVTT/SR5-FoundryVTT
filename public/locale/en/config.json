@@ -2876,6 +2876,7 @@
                 "Rigger": "Rigger"
             },
             "Driver": "Driver",
+            "DamagedVehicle": "Damaged Vehicle",
             "Drone": "Drone",
             "Environments": {
                 "Handling": "Handling",
@@ -2898,6 +2899,7 @@
             "Stats": {
                 "Acceleration": "Acceleration",
                 "Handling": "Handling",
+                "OffRoadAcceleration": "Acceleration (Off Road)",
                 "OffRoadHandling": "Handling (Off Road)",
                 "OffRoadSpeed": "Speed (Off Road)",
                 "Pilot": "Pilot",

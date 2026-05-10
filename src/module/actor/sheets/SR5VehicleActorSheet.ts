@@ -35,6 +35,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
 
     static override DEFAULT_OPTIONS = {
         actions: {
+            rollAttribute: SR5VehicleActorSheet.#rollVehicleAttribute,
             pickDriver: SR5VehicleActorSheet.#pickDriver,
             connectToDriver: SR5VehicleActorSheet.#connectToDriver,
             removeMaster: SR5VehicleActorSheet.#removeMaster,
@@ -153,7 +154,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         skills: {
             template: SheetFlow.templateBase('actor/tabs/vehicle-skills'),
             templates: [...SheetFlow.templateActorSystemParts(
-                'active-skills', 'vehicle-attributes'
+                'active-skills', 'vehicle-attributes', 'vehicle-paired-attribute'
             ), ...SheetFlow.templateListItem('skill')],
             scrollable: ['#active-skills-scroll']
         },
@@ -214,6 +215,24 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         event.preventDefault();
         const isOffRoad = !this.actor.system.isOffRoad;
         await this.actor.update({system: { isOffRoad }});
+    }
+
+    static async #rollVehicleAttribute(this: SR5VehicleActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
+
+        const attribute = event.target?.closest<HTMLElement>('[data-attribute-id]')?.dataset?.attributeId;
+        if (!attribute) return;
+
+        const limit = attribute.includes('speed') ? 'speed' :
+                      attribute.includes('handling') ? 'handling' : undefined;
+
+        if (limit) {
+            await this.actor.rollVehiclePilotByLimit(limit, { event });
+        } else {
+            // fallback to normal attribute roll if no limit could be found
+            await this.actor.rollAttribute(attribute, { event });
+        }
     }
 
     static async #removeMaster(this: SR5VehicleActorSheet, event: Event) {

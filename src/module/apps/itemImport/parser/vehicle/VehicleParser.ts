@@ -49,32 +49,33 @@ export class VehicleParser extends Parser<'vehicle'> {
 
     protected override getSystem(jsonData: Vehicle) {
         const system = this.getBaseSystem();
-    
+
         function parseSeparatedValues(value: string): { base: number; offRoad: number } {
-            const [base, offRoad] = value.split("/").map(v => +v || 0);
+            const [base, offRoad] = value.split("/").map(v => +v || 0) as [number, number | undefined];
             return { base, offRoad: offRoad ?? base };
         }
 
         const handlingValues = parseSeparatedValues(jsonData.handling._TEXT);
         const speedValues = parseSeparatedValues(jsonData.speed._TEXT);
+        const accelerationValues = parseSeparatedValues(jsonData.accel._TEXT);
 
         system.vehicle_stats.pilot.base = +jsonData.pilot._TEXT;
         system.vehicle_stats.handling.base = handlingValues.base;
         system.vehicle_stats.off_road_handling.base = handlingValues.offRoad;
         system.vehicle_stats.speed.base = speedValues.base;
         system.vehicle_stats.off_road_speed.base = speedValues.offRoad;
-        system.vehicle_stats.acceleration.base = Number(jsonData.accel._TEXT) || 0;
+        system.vehicle_stats.acceleration.base = accelerationValues.base;
+        system.vehicle_stats.off_road_acceleration.base = accelerationValues.offRoad;
         system.vehicle_stats.sensor.base = Number(jsonData.sensor._TEXT) || 0;
         system.vehicle_stats.seats.base = Number(jsonData.seats?._TEXT) || 0;
         system.attributes.body.base = Number(jsonData.body._TEXT) || 0;
         system.armor.base = Number(jsonData.armor._TEXT) || 0;
+        system.availability = jsonData.avail?._TEXT || '';
+        system.cost = Number(jsonData.cost?._TEXT) || 0;
         system.isDrone = jsonData.category._TEXT.includes("Drone") || false;
-        
+
         if (system.isDrone)
             system.category = jsonData.category._TEXT.replace("Drones: ", "").toLowerCase() as typeof system.category;
-
-        if (jsonData.accel._TEXT.includes('/'))
-            system.vehicle_stats.acceleration.base = Number(jsonData.accel._TEXT.split('/')[0]) || 0;
 
         const category = jsonData.category._TEXT.toLowerCase();
         system.vehicleType = /drone|hovercraft/.test(category) ? "exotic"    :

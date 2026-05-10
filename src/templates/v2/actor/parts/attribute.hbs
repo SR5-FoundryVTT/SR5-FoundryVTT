@@ -1,4 +1,4 @@
-<div class="attribute" data-attribute-id="{{attributeField.name}}" data-context-menu="attribute">
+<div class="attribute{{#if cssClass}} {{cssClass}}{{/if}}" data-attribute-id="{{attributeField.name}}" data-context-menu="attribute">
     <label {{#if @root.isEditMode}}class="edit-mode"{{/if}}>
         {{#if label}}
             {{localize label}}

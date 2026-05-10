@@ -1,8 +1,6 @@
 import { SR } from '@/module/constants';
 import { VersionMigration } from '../VersionMigration';
 
-const { setProperty, hasProperty } = foundry.utils;
-
 type SpiritAttributeId =
     | 'body'
     | 'agility'
@@ -703,15 +701,19 @@ const DEFAULT_FORCE_APPLIES: Record<SpiritAttributeId, boolean> = {
     essence: true,
 } as const;
 
+const { hasProperty, setProperty, getProperty } = foundry.utils;
+
 /**
- * Update attribute limits to their correct values.
+ * Migrate initiative to have a blitz field, and vehicle stats to have off-road acceleration.
+ * Also migrate combat flags for tracking initiative pass and if a combatant attacked last turn.
+ * Finally, migrate spirits to have force apply flags, and initiative formulae based on the legacy profile system.
  */
 export class Version0_34_0 extends VersionMigration {
     readonly TargetVersion = '0.34.0';
 
     override migrateCombat(combat: any) {
         const initiativePass = combat.flags.shadowrun5e?.combatInitiativePass ?? SR.combat.FIRST_PASS;
-        combat.system.pass = Math.max(initiativePass, SR.combat.FIRST_PASS);
+        setProperty(combat, "system.pass", Math.max(initiativePass, SR.combat.FIRST_PASS));
     }
 
     override migrateCombatant(combatant: any): void {
@@ -719,7 +721,14 @@ export class Version0_34_0 extends VersionMigration {
     }
 
     override migrateActor(actor: any): void {
-        actor.system.initiative.blitz = actor.system.initiative.edge;
+        const system = actor.system;
+        if (hasProperty(system as any, "initiative"))
+            system.initiative.blitz = system.initiative.edge;
+
+        if (actor.type === "vehicle" && hasProperty(system as any, "vehicle_stats")) {
+            const acceleration = getProperty(system, "vehicle_stats.acceleration.base");
+            setProperty(system, "vehicle_stats.off_road_acceleration.base", acceleration);
+        }
 
         if (actor.type === 'spirit')
             this.migrateSpirit(actor);

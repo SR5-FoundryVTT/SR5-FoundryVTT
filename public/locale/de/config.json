@@ -2912,6 +2912,7 @@
                 "Rigger": "Rigger"
             },
             "Driver": "Fahrer",
+            "DamagedVehicle": "Beschädigtes Fahrzeug",
             "Drone": "Drohne",
             "Environments": {
                 "Handling": "Handling",
@@ -2934,6 +2935,7 @@
             "Stats": {
                 "Acceleration": "Beschleunigung",
                 "Handling": "Handling",
+                "OffRoadAcceleration": "Beschleunigung (Gelände)",
                 "OffRoadHandling": "Handling (Gelände)",
                 "OffRoadSpeed": "Geschw. (Gelände)",
                 "Pilot": "Pilot",

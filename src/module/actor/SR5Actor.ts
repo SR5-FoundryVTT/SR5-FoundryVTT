@@ -1024,6 +1024,37 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     /**
+     * Build vehicle pilot action data for handling/speed click-roll behavior.
+     */
+    vehiclePilotActionData(limit: 'handling' | 'speed'): ActionRollType | undefined {
+        if (!this.isType('vehicle')) return;
+
+        const skillName = this.getVehicleTypeSkillName();
+        if (!skillName) return;
+
+        const action = this.skillActionData(skillName);
+        if (!action) return;
+
+        action.limit.attribute = limit;
+
+        return action;
+    }
+
+    /**
+     * Roll a vehicle pilot test using reaction + related pilot skill with a selected limit.
+     */
+    async rollVehiclePilotByLimit(limit: 'handling' | 'speed', options: Shadowrun.ActorRollOptions = {}) {
+        const action = this.vehiclePilotActionData(limit);
+        if (!action) return;
+
+        const showDialog = this.tests.shouldShowDialog(options.event);
+        const test = await this.tests.fromAction(action, this, { showDialog });
+        if (!test) return;
+
+        return test.execute();
+    }
+
+    /**
      * Roll an item action for this actor.
      * @param item The item action to roll
      * @param options General Roll options.
