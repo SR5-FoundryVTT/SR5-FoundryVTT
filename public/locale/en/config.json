@@ -1265,6 +1265,7 @@
         "IsCritter": "Critter",
         "IsFreshImport": "This item was imported from Chummer and needs manual review.",
         "IsGrunt": "Grunt",
+        "IsGruntHint": "Use grunt condition monitor rules (SR5 p.378).",
         "IsNPC": "NPC",
         "Item": {
             "FIELDS": {
@@ -2505,6 +2506,12 @@
             "Force": "Force",
             "ForceAppliesSetting": "Force Applies To",
             "ForceAppliesSettingHint": "Control which spirit attributes receive the Force bonus.",
+            "HalfValueSkill": "Half Value Skill",
+            "HalfValueSkillHint": "ON skills use ⌈Force/2⌉.",
+            "InitiativeFormulaAstral": "Astral Initiative Formula",
+            "InitiativeFormulaAstralHint": "Choose the terms for astral initiative.",
+            "InitiativeFormulaMeatspace": "Meatspace Initiative Formula",
+            "InitiativeFormulaMeatspaceHint": "Choose the terms for meatspace initiative.",
             "MissingSummoner": "Missing Summoner",
             "Services": "Services",
             "Summoner": "Summoner",

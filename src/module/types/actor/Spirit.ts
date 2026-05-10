@@ -11,6 +11,13 @@ import { AttributeField, Attributes } from '../template/Attributes';
 import { CommonData, PhysicalCombatValues, CreateModifiers, MagicData, ActorBase } from "./Common";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
+const InitiativeFormula = (defaults: { attributeA: string; attributeB: string; dice: number }) => ({
+    attribute_a: new StringField({ required: true, initial: defaults.attributeA, blank: true, choices: SR5.attributes }),
+    attribute_b: new StringField({ required: true, initial: defaults.attributeB, blank: true, choices: SR5.attributes }),
+    constant: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+    dice: new NumberField({ required: true, nullable: false, integer: true, initial: defaults.dice, min: 0, max: 5, step: 1 }),
+});
+
 const SpiritData = () => ({
     // === Core Identity ===
     ...CommonData(),
@@ -59,6 +66,13 @@ const SpiritData = () => ({
     track: new SchemaField(Tracks('physical', 'stun')),
     movement: new SchemaField(Movement()),
 
+    // === Formulae ===
+    initiative_formulae: new SchemaField({
+        meatspace: new SchemaField(InitiativeFormula({ attributeA: 'reaction', attributeB: 'intuition', dice: 2 })),
+        astral: new SchemaField(InitiativeFormula({ attributeA: 'intuition', attributeB: 'intuition', dice: 3 })),
+    }),
+    half_value_skill: new BooleanField({ initial: false }),
+
     // === Summoning ===
     summonerUuid: new StringField({ required: true }),
     services: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0, step: 1 }),
@@ -99,3 +113,5 @@ export class Spirit extends ActorBase<ReturnType<typeof SpiritData>> {
 }
 
 console.log("SpiritData", SpiritData(), new Spirit());
+
+export type InitiativeFormulaType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof InitiativeFormula>>;

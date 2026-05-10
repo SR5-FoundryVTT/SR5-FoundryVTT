@@ -1262,6 +1262,7 @@
         "IsCritter": "생명체",
         "IsFreshImport": "해당 물품은 처머에서 불러와졌기에 수동으로 살펴봐야 합니다.",
         "IsGrunt": "하수인",
+        "IsGruntHint": "하수인 상태 모니터 규칙(SR5 p.378)을 사용합니다.",
         "IsNPC": "NPC",
         "Item": {
             "FIELDS": {
@@ -2500,6 +2501,12 @@
         "Spirit": {
             "Bound": "속박",
             "Force": "강도",
+            "HalfValueSkill": "절반값 기술",
+            "HalfValueSkillHint": "활성화된 기술은 ⌈강도/2⌉를 사용합니다.",
+            "InitiativeFormulaAstral": "아스트랄 우선권 공식",
+            "InitiativeFormulaAstralHint": "아스트랄 우선권의 항목을 선택하세요.",
+            "InitiativeFormulaMeatspace": "현실 우선권 공식",
+            "InitiativeFormulaMeatspaceHint": "현실 우선권의 항목을 선택하세요.",
             "MissingSummoner": "유효한 소환자 없음",
             "Services": "봉사",
             "Summoner": "소환자",

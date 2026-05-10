@@ -183,4 +183,40 @@
             justify-content: end;
         }
     }
+
+    .list-item.spirit-initiative-formula-item {
+        flex-flow: column nowrap;
+        align-items: stretch;
+        align-content: stretch;
+        gap: 0.3rem;
+    }
+
+    .list-item.spirit-initiative-formula-item .list-item-start.spirit-initiative-formula-label {
+        width: 100%;
+        flex: 0 0 auto;
+    }
+
+    .list-item.spirit-initiative-formula-item .list-item-col.spirit-initiative-formula-col {
+        width: 100%;
+        flex: 0 0 auto;
+        justify-content: flex-start;
+        align-items: flex-start;
+        align-content: flex-start;
+    }
+
+    .list-item.spirit-initiative-formula-item .list-item-col.spirit-initiative-formula-col .spirit-initiative-formula-line {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 0.2rem;
+        width: 100%;
+        white-space: nowrap;
+    }
+
+    .list-item.spirit-initiative-formula-item .spirit-initiative-formula-line .spirit-initiative-attribute {
+        flex: 1 1 0;
+        min-width: 5rem;
+    }
+
 }

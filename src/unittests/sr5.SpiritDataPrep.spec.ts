@@ -52,7 +52,7 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(airSpirit.system.attributes.strength.value, 7);
             assert.strictEqual(airSpirit.system.attributes.logic.value, 7);
             assert.strictEqual(airSpirit.system.attributes.intuition.value, 5);
-            assert.strictEqual(airSpirit.system.initiative.meatspace.base.base, 12);
+            assert.strictEqual(airSpirit.system.initiative.meatspace.base.base, 11);
 
             assert.strictEqual(fireSpirit.system.attributes.body.value, airSpirit.system.attributes.body.value);
             assert.strictEqual(fireSpirit.system.attributes.agility.value, airSpirit.system.attributes.agility.value);
@@ -95,6 +95,79 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(spirit.system.attributes.reaction.value, 1);
             assert.strictEqual(spirit.system.attributes.strength.value, 4);
             assert.strictEqual(spirit.system.attributes.willpower.value, 7);
+        });
+
+        it('default spirit initiative formula uses reaction + intuition (meatspace) and intuition + intuition (astral)', async () => {
+            const spirit = await factory.createActor({
+                type: 'spirit',
+                system: {
+                    attributes: {
+                        force: { base: 5 },
+                        reaction: { base: 2 },
+                        intuition: { base: -1 }
+                    }
+                }
+            });
+
+            assert.strictEqual(spirit.system.attributes.reaction.value, 7);
+            assert.strictEqual(spirit.system.attributes.intuition.value, 4);
+            assert.strictEqual(spirit.system.initiative.meatspace.base.base, 11);
+            assert.strictEqual(spirit.system.initiative.astral.base.base, 8);
+            assert.strictEqual(spirit.system.initiative.meatspace.dice.base, 2);
+            assert.strictEqual(spirit.system.initiative.astral.dice.base, 3);
+        });
+
+        it('custom spirit initiative formula supports force attributes, constants, and blank attribute slots', async () => {
+            const spirit = await factory.createActor({
+                type: 'spirit',
+                system: {
+                    attributes: {
+                        force: { base: 6 },
+                        reaction: { base: 1 },
+                        intuition: { base: 1 }
+                    },
+                    initiative_formulae: {
+                        meatspace: {
+                            attribute_a: 'force',
+                            attribute_b: '',
+                            constant: 3,
+                            dice: 4
+                        },
+                        astral: {
+                            attribute_a: '',
+                            attribute_b: '',
+                            constant: 5,
+                            dice: 1
+                        }
+                    }
+                }
+            });
+
+            assert.strictEqual(spirit.system.initiative.meatspace.base.base, 9);
+            assert.strictEqual(spirit.system.initiative.astral.base.base, 5);
+            assert.strictEqual(spirit.system.initiative.meatspace.dice.base, 4);
+            assert.strictEqual(spirit.system.initiative.astral.dice.base, 1);
+        });
+
+        it('spirit initiative dice total is capped at 5', async () => {
+            const spirit = await factory.createActor({
+                type: 'spirit',
+                system: {
+                    initiative_formulae: {
+                        meatspace: { dice: 7 },
+                        astral: { dice: 4 }
+                    },
+                    modifiers: {
+                        meat_initiative_dice: 2,
+                        astral_initiative_dice: 3
+                    }
+                }
+            });
+
+            assert.strictEqual(spirit.system.initiative.meatspace.dice.base, 5);
+            assert.strictEqual(spirit.system.initiative.meatspace.dice.value, 5);
+            assert.strictEqual(spirit.system.initiative.astral.dice.base, 4);
+            assert.strictEqual(spirit.system.initiative.astral.dice.value, 5);
         });
 
         it('spirit skills are toggles where on equals force and off equals zero', async () => {
@@ -152,6 +225,52 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
 
             assert.strictEqual(spirit.system.skills.active.assensing.value, 6);
             assert.strictEqual(spirit.system.skills.active.perception.value, 6);
+            assert.strictEqual(spirit.system.skills.active.arcana.value, 0);
+        });
+
+        it('spirit half value skill mode applies ceil(force/2) to ON skills', async () => {
+            window.doNotPopulateDefaultSkills = true;
+
+            const spirit = await factory.createActor({
+                type: 'spirit',
+                system: {
+                    half_value_skill: true,
+                    attributes: {
+                        force: { base: 5 },
+                    }
+                }
+            });
+
+            await spirit.createEmbeddedDocuments('Item', [
+                {
+                    type: 'skill',
+                    name: 'Assensing',
+                    system: {
+                        type: 'skill',
+                        skill: {
+                            category: 'active',
+                            attribute: 'intuition',
+                            rating: 1
+                        }
+                    }
+                },
+                {
+                    type: 'skill',
+                    name: 'Arcana',
+                    system: {
+                        type: 'skill',
+                        skill: {
+                            category: 'active',
+                            attribute: 'logic',
+                            rating: 0
+                        }
+                    }
+                },
+            ]);
+
+            delete window.doNotPopulateDefaultSkills;
+
+            assert.strictEqual(spirit.system.skills.active.assensing.value, 3);
             assert.strictEqual(spirit.system.skills.active.arcana.value, 0);
         });
 

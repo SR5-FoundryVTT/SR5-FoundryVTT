@@ -11,6 +11,7 @@ import { SR5Item } from 'src/module/item/SR5Item';
 import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { SkillFieldType } from 'src/module/types/template/Skills';
+import { InitiativeFormulaType } from 'src/module/types/actor/Spirit';
 
 export class SpiritPrep {
     static prepareBaseData(system: Actor.SystemOfType<'spirit'>) {
@@ -18,11 +19,10 @@ export class SpiritPrep {
     }
 
     static prepareDerivedData(system: Actor.SystemOfType<'spirit'>, _items: SR5Item[]) {
-        const force = ModifiableValue.calcTotal(system.attributes.force);
+        const force = ModifiableValue.calcTotal(system.attributes.force, { min: 1 });
 
         SpiritPrep.prepareSpiritAttributes(system, force);
         SpiritPrep.prepareSpiritSkills(system, force);
-        SpiritPrep.prepareSpiritInitiative(system, force);
 
         // Use spirit attribute range to avoid issues with attribute calculation causing unusable attributes.
         AttributesPrep.prepareAttributes(system, SR.attributes.rangesSpirit);
@@ -39,6 +39,7 @@ export class SpiritPrep {
         MovementPrep.prepareMovement(system);
         WoundsPrep.prepareWounds(system);
 
+        SpiritPrep.prepareSpiritInitiative(system);
         InitiativePrep.prepareCurrentInitiative(system);
 
         CharacterPrep.prepareRecoil(system);
@@ -57,6 +58,7 @@ export class SpiritPrep {
     }
 
     static prepareSpiritSkills(system: Actor.SystemOfType<'spirit'>, force: number) {
+        const onSkillValue = system.half_value_skill ? Math.ceil(force / 2) : force;
         const skills: SkillFieldType[] = [];
         skills.push(...Object.values(system.skills.active));
         skills.push(...Object.values(system.skills.language));
@@ -67,26 +69,34 @@ export class SpiritPrep {
 
         for (const skill of skills) {
             if (skill.base > 0)
-                skill.base = force;
+                skill.base = onSkillValue;
         }
     }
 
-    static prepareSpiritInitiative(system: Actor.SystemOfType<'spirit'>, force: number) {
-        const { initiative, modifiers } = system;
+    static prepareSpiritInitiative(system: Actor.SystemOfType<'spirit'>) {
+        const { initiative, modifiers, attributes, initiative_formulae } = system;
 
-        initiative.meatspace.base.base = force * 2;
+        const getAttrValue = (attributeId: InitiativeFormulaType['attribute_a']): number => {
+            return attributes[attributeId]?.value ?? 0;
+        };
+
+        const resolveBase = (formula: InitiativeFormulaType) => {
+            return getAttrValue(formula.attribute_a) + getAttrValue(formula.attribute_b) + formula.constant;
+        };
+
+        initiative.meatspace.base.base = resolveBase(initiative_formulae.meatspace);
         ModifiableValue.addUnique(initiative.meatspace.base, 'SR5.Bonus', modifiers.meat_initiative);
         ModifiableValue.calcTotal(initiative.meatspace.base);
 
-        initiative.meatspace.dice.base = 2;
+        initiative.meatspace.dice.base = initiative_formulae.meatspace.dice;
         ModifiableValue.addUnique(initiative.meatspace.dice, 'SR5.Bonus', modifiers.meat_initiative_dice);
         ModifiableValue.calcTotal(initiative.meatspace.dice, { min: 0, max: 5 });
 
-        initiative.astral.base.base = force * 2;
+        initiative.astral.base.base = resolveBase(initiative_formulae.astral);
         ModifiableValue.addUnique(initiative.astral.base, 'SR5.Bonus', modifiers.astral_initiative);
         ModifiableValue.calcTotal(initiative.astral.base);
 
-        initiative.astral.dice.base = 3;
+        initiative.astral.dice.base = initiative_formulae.astral.dice;
         ModifiableValue.addUnique(initiative.astral.dice, 'SR5.Bonus', modifiers.astral_initiative_dice);
         ModifiableValue.calcTotal(initiative.astral.dice, { min: 0, max: 5 });
     }

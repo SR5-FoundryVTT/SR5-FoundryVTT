@@ -1,7 +1,7 @@
 import { SR } from '@/module/constants';
 import { VersionMigration } from '../VersionMigration';
 
-const { setProperty, getProperty, hasProperty } = foundry.utils;
+const { setProperty, hasProperty } = foundry.utils;
 
 type SpiritAttributeId =
     | 'body'
@@ -22,6 +22,13 @@ type LegacySpiritInitiativeProfile = {
     astral_init_mult: number;
     init_dice: number;
     astral_init_dice: number;
+};
+
+type SpiritInitiativeFormula = {
+    attribute_a: string;
+    attribute_b: string;
+    constant: number;
+    dice: number;
 };
 
 type LegacySpiritProfile = {
@@ -54,7 +61,7 @@ const LEGACY_INITIATIVE_DEFAULTS: LegacySpiritInitiativeProfile = {
     astral_init_dice: 3,
 };
 
-const LEGACY_SPIRIT_PROFILES = {
+const LEGACY_SPIRIT_PROFILES: Record<string, LegacySpiritProfile> = {
     abomination: {
         attributes: { body: 2, agility: 1, strength: 2 },
         skills: [
@@ -535,7 +542,7 @@ const LEGACY_SPIRIT_PROFILES = {
     plague: {
         attributes: { reaction: 2, strength: -2, intuition: 1 },
         initiative: { init: 2 },
-        skills: ['assensing', 'astral_combat', 'perception', 'spell_casting', 'unarmed_combat'],
+        skills: ['assensing', 'astral_combat', 'perception', 'spellcasting', 'unarmed_combat'],
     },
     plant: {
         attributes: { body: 2, agility: -1, strength: 1, logic: -1 },
@@ -681,7 +688,7 @@ const LEGACY_SPIRIT_PROFILES = {
         initiative: { init: 3 },
         skills: ['assensing', 'astral_combat', 'con', 'gymnastics', 'intimidation', 'perception', 'unarmed_combat'],
     },
-} as const satisfies Record<string, LegacySpiritProfile>;
+} as const;
 
 const DEFAULT_FORCE_APPLIES: Record<SpiritAttributeId, boolean> = {
     body: true,
@@ -694,20 +701,13 @@ const DEFAULT_FORCE_APPLIES: Record<SpiritAttributeId, boolean> = {
     charisma: true,
     magic: true,
     essence: true,
-};
+} as const;
 
 /**
  * Update attribute limits to their correct values.
  */
 export class Version0_34_0 extends VersionMigration {
     readonly TargetVersion = '0.34.0';
-
-    override migrateActor(actor: any): void {
-        actor.system.initiative.blitz = actor.system.initiative.edge;
-
-        if (actor.type === 'spirit')
-            this.migrateSpirit(actor);
-    }
 
     override migrateCombat(combat: any) {
         const initiativePass = combat.flags.shadowrun5e?.combatInitiativePass ?? SR.combat.FIRST_PASS;
@@ -718,33 +718,35 @@ export class Version0_34_0 extends VersionMigration {
         if (combatant.flags.shadowrun5e?.turnsSinceLastAttack) combatant.system.attackedLastTurn = true;
     }
 
+    override migrateActor(actor: any): void {
+        actor.system.initiative.blitz = actor.system.initiative.edge;
+
+        if (actor.type === 'spirit')
+            this.migrateSpirit(actor);
+    }
+
     private migrateSpirit(actor: any) {
         const system = actor.system;
         if (!system || typeof system !== 'object') return;
 
         const spiritType = typeof system.spiritType === 'string' ? system.spiritType : '';
-        const profile = LEGACY_SPIRIT_PROFILES[spiritType];
+        const profile = LEGACY_SPIRIT_PROFILES[spiritType as keyof typeof LEGACY_SPIRIT_PROFILES];
         if (!profile) return;
 
-        const forceApplies = this.buildForceApplies(profile.forceOff);
-
-        system.force_applies ??= {};
-        for (const attributeId of SPIRIT_ATTRIBUTE_IDS) system.force_applies[attributeId] = forceApplies[attributeId];
+        system.force_applies = this.buildForceApplies(profile.forceOff);
 
         const offsets = profile.attributes ?? {};
         for (const attributeId of SPIRIT_ATTRIBUTE_IDS) {
-            if (!forceApplies[attributeId]) continue;
+            if (!system.force_applies[attributeId]) continue;
 
-            const attribute = system.attributes?.[attributeId];
-            if (!attribute || typeof attribute !== 'object') continue;
-
-            attribute.base = Number(offsets[attributeId] ?? 0);
+            setProperty(system, `attributes.${attributeId}.base`, offsets[attributeId] ?? 0);
         }
 
         if (hasProperty(system, 'attributes.force.base'))
             system.attributes.force.base = Math.max(Number(system.attributes.force.base ?? 0),  1);
 
-        this.migrateInitiativeBonuses(system, profile.initiative);
+        system.half_value_skill = profile.halfValueSkill ?? false;
+        this.migrateSpiritInitiative(system, profile.initiative);
         this.migrateSpiritSkills(actor, profile.skills ?? []);
     }
 
@@ -757,23 +759,22 @@ export class Version0_34_0 extends VersionMigration {
         return forceApplies;
     }
 
-    private migrateInitiativeBonuses(system: any, initiative: Partial<LegacySpiritInitiativeProfile> | undefined) {
+    private migrateSpiritInitiative(system: any, initiative: Partial<LegacySpiritInitiativeProfile> | undefined) {
         const profile: LegacySpiritInitiativeProfile = { ...LEGACY_INITIATIVE_DEFAULTS, ...initiative };
-        const force = Number(system.attributes?.force?.base ?? 0);
-        const safeForce = Number.isFinite(force) ? force : 0;
 
-        const meatInitiativeDelta = safeForce * (profile.init_mult - 2) + profile.init;
-        const meatInitiativeDiceDelta = profile.init_dice - 2;
-        const astralInitiativeDelta = safeForce * (profile.astral_init_mult - 2) + profile.astral_init;
-        const astralInitiativeDiceDelta = profile.astral_init_dice - 3;
+        system.initiative_formulae ??= {};
+        system.initiative_formulae.meatspace = this.initFormulaBuild(profile.init_mult, profile.init, profile.init_dice);
+        system.initiative_formulae.astral = this.initFormulaBuild(profile.astral_init_mult, profile.astral_init, profile.astral_init_dice);
+    }
 
-        system.modifiers ??= {};
-        system.modifiers.meat_initiative = Number(system.modifiers.meat_initiative ?? 0) + meatInitiativeDelta;
-        system.modifiers.meat_initiative_dice =
-            Number(system.modifiers.meat_initiative_dice ?? 0) + meatInitiativeDiceDelta;
-        system.modifiers.astral_initiative = Number(system.modifiers.astral_initiative ?? 0) + astralInitiativeDelta;
-        system.modifiers.astral_initiative_dice =
-            Number(system.modifiers.astral_initiative_dice ?? 0) + astralInitiativeDiceDelta;
+    private initFormulaBuild(multiplier: number, constant: number, dice: number): SpiritInitiativeFormula {
+        if (multiplier >= 2) {
+            return { attribute_a: 'force', attribute_b: 'force', constant, dice };
+        } else if (multiplier === 1) {
+            return { attribute_a: '', attribute_b: 'force', constant, dice };
+        } else {
+            return { attribute_a: '', attribute_b: '', constant, dice };
+        }
     }
 
     private migrateSpiritSkills(actor: any, legacySkills: string[]) {

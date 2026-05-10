@@ -1263,6 +1263,7 @@
         "IsCritter": "Critter",
         "IsFreshImport": "Dieser Eintrag wurde aus Chummer importiert und benötigt eine manuelle Überprüfung.",
         "IsGrunt": "Scherge",
+        "IsGruntHint": "Verwendet Schergen-Zustandsmonitor-Regeln (SR5 S.378).",
         "IsNPC": "NSC",
         "Item": {
             "FIELDS": {
@@ -2501,6 +2502,12 @@
         "Spirit": {
             "Bound": "Gebunden",
             "Force": "Kraft",
+            "HalfValueSkill": "Halber Fertigkeitswert",
+            "HalfValueSkillHint": "Aktive Fertigkeiten auf EIN nutzen ⌈Kraft/2⌉.",
+            "InitiativeFormulaAstral": "Astrale Initiativformel",
+            "InitiativeFormulaAstralHint": "Wähle die Terme der astralen Initiative.",
+            "InitiativeFormulaMeatspace": "Fleischwelt-Initiativformel",
+            "InitiativeFormulaMeatspaceHint": "Wähle die Terme der Fleischwelt-Initiative.",
             "MissingSummoner": "Kein aktiver Beschwörer",
             "Services": "Dienste",
             "Summoner": "Beschwörer",

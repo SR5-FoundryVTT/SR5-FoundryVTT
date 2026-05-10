@@ -362,6 +362,7 @@
         "Internal": "Interne",
         "IsCritter": "Créature",
         "IsGrunt": "Brute",
+        "IsGruntHint": "Utilise les règles de moniteur de condition des brutes (SR5 p.378).",
         "IsNPC": "PNJ",
         "Item": "Objet",
         "ItemMod": "Mod. objet",
@@ -738,6 +739,12 @@
         "Spirit": {
             "Bound": "Lié",
             "Force": "Force",
+            "HalfValueSkill": "Compétence à demi-valeur",
+            "HalfValueSkillHint": "Les compétences actives activées utilisent ⌈Force/2⌉.",
+            "InitiativeFormulaAstral": "Formule d'initiative astrale",
+            "InitiativeFormulaAstralHint": "Choisissez les termes de l'initiative astrale.",
+            "InitiativeFormulaMeatspace": "Formule d'initiative terrestre",
+            "InitiativeFormulaMeatspaceHint": "Choisissez les termes de l'initiative terrestre.",
             "Services": "Services",
             "Type": "Type"
         },

@@ -3,6 +3,7 @@ import { SR5TestFactory } from './utils';
 import { DataDefaults } from '@/module/data/DataDefaults';
 import { Migrator } from '@/module/migrator/Migrator';
 import { Version0_33_1 } from '@/module/migrator/versions/Version0_33_1';
+import { Version0_34_0 } from '@/module/migrator/versions/Version0_34_0';
 
 export const Migrators = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -320,6 +321,124 @@ export const Migrators = (context: QuenchBatchContext) => {
                 'data.modifiers',
                 'data.modifiers.mod',
             ]);
+        });
+    });
+
+    describe('Version0_34_0 spirit legacy migration', () => {
+        const createSkillItem = (name: string, rating = 0): any => ({
+            _id: foundry.utils.randomID(16),
+            name,
+            type: 'skill',
+            system: DataDefaults.baseSystemData('skill', {
+                type: 'skill',
+                skill: {
+                    category: 'active',
+                    attribute: 'intuition',
+                    rating,
+                },
+            }),
+        });
+
+        const createSpirit = (spiritType: string, force = 6): any => ({
+            _id: foundry.utils.randomID(16),
+            _stats: { systemVersion: '0.33.9' },
+            name: 'Legacy Spirit',
+            type: 'spirit',
+            items: [] as any[],
+            effects: [],
+            system: DataDefaults.baseSystemData('spirit', {
+                spiritType,
+                attributes: { force: { base: force } },
+            }),
+        });
+
+        it('migrates known spirit profiles to offsets, force applicability, formulae, and skill toggles', () => {
+            const migrator = new Version0_34_0();
+            const actor = createSpirit('air', 6);
+            actor.items.push(createSkillItem('Assensing', 0), createSkillItem('Arcana', 4));
+
+            migrator.migrateActor(actor);
+
+            assert.strictEqual(actor.system.attributes.body.base, -2);
+            assert.strictEqual(actor.system.attributes.agility.base, 3);
+            assert.strictEqual(actor.system.attributes.reaction.base, 4);
+            assert.strictEqual(actor.system.attributes.strength.base, -3);
+
+            assert.strictEqual(actor.system.force_applies.body, true);
+            assert.strictEqual(actor.system.force_applies.intuition, true);
+
+            assert.strictEqual(actor.system.half_value_skill, false);
+            assert.strictEqual(actor.system.initiative_formulae.meatspace.attribute_a, 'force');
+            assert.strictEqual(actor.system.initiative_formulae.meatspace.attribute_b, 'force');
+            assert.strictEqual(actor.system.initiative_formulae.meatspace.constant, 4);
+            assert.strictEqual(actor.system.initiative_formulae.meatspace.dice, 2);
+            assert.strictEqual(actor.system.initiative_formulae.astral.attribute_a, 'force');
+            assert.strictEqual(actor.system.initiative_formulae.astral.attribute_b, 'force');
+            assert.strictEqual(actor.system.initiative_formulae.astral.constant, 0);
+            assert.strictEqual(actor.system.initiative_formulae.astral.dice, 3);
+
+            const assensing = actor.items.find((item: any) => item.name === 'Assensing');
+            const arcana = actor.items.find((item: any) => item.name === 'Arcana');
+            assert.strictEqual(foundry.utils.getProperty(assensing, 'system.skill.rating'), 1);
+            assert.strictEqual(foundry.utils.getProperty(arcana, 'system.skill.rating'), 0);
+        });
+
+        it('migrates watcher half-value profile, force off attributes, and initiative dice variations', () => {
+            const migrator = new Version0_34_0();
+            const actor = createSpirit('watcher', 6);
+            actor.items.push(createSkillItem('Assensing', 0), createSkillItem('Unarmed Combat', 2));
+
+            migrator.migrateActor(actor);
+
+            assert.strictEqual(actor.system.half_value_skill, true);
+            assert.strictEqual(actor.system.force_applies.body, false);
+            assert.strictEqual(actor.system.force_applies.agility, false);
+            assert.strictEqual(actor.system.force_applies.reaction, false);
+            assert.strictEqual(actor.system.force_applies.strength, false);
+            assert.strictEqual(actor.system.force_applies.logic, true);
+
+            assert.strictEqual(actor.system.attributes.willpower.base, -2);
+            assert.strictEqual(actor.system.attributes.logic.base, -2);
+            assert.strictEqual(actor.system.attributes.intuition.base, -2);
+            assert.strictEqual(actor.system.attributes.charisma.base, -2);
+
+            assert.strictEqual(actor.system.initiative_formulae.meatspace.attribute_a, '');
+            assert.strictEqual(actor.system.initiative_formulae.meatspace.attribute_b, '');
+            assert.strictEqual(actor.system.initiative_formulae.meatspace.constant, 0);
+            assert.strictEqual(actor.system.initiative_formulae.meatspace.dice, 0);
+            assert.strictEqual(actor.system.initiative_formulae.astral.attribute_a, 'force');
+            assert.strictEqual(actor.system.initiative_formulae.astral.attribute_b, 'force');
+            assert.strictEqual(actor.system.initiative_formulae.astral.constant, 0);
+            assert.strictEqual(actor.system.initiative_formulae.astral.dice, 1);
+
+            const assensing = actor.items.find((item: any) => item.name === 'Assensing');
+            const unarmedCombat = actor.items.find((item: any) => item.name === 'Unarmed Combat');
+            assert.strictEqual(foundry.utils.getProperty(assensing, 'system.skill.rating'), 1);
+            assert.strictEqual(foundry.utils.getProperty(unarmedCombat, 'system.skill.rating'), 0);
+        });
+
+        it('skips unknown spirit types', () => {
+            const migrator = new Version0_34_0();
+            const actor = createSpirit('custom_unknown_type', 4);
+            actor.system.half_value_skill = true;
+            actor.system.force_applies.body = false;
+            actor.system.attributes.body.base = 7;
+            actor.items.push(createSkillItem('Assensing', 3));
+
+            migrator.migrateActor(actor);
+
+            assert.strictEqual(actor.system.half_value_skill, true);
+            assert.strictEqual(actor.system.force_applies.body, false);
+            assert.strictEqual(actor.system.attributes.body.base, 7);
+            assert.strictEqual(actor.system.initiative_formulae.meatspace.attribute_a, 'reaction');
+            assert.strictEqual(actor.system.initiative_formulae.meatspace.attribute_b, 'intuition');
+            assert.strictEqual(actor.system.initiative_formulae.meatspace.dice, 2);
+            assert.strictEqual(actor.system.initiative_formulae.astral.attribute_a, 'intuition');
+            assert.strictEqual(actor.system.initiative_formulae.astral.attribute_b, 'intuition');
+            assert.strictEqual(actor.system.initiative_formulae.astral.dice, 3);
+
+            const assensing = actor.items.find((item: any) => item.name === 'Assensing');
+            assert.strictEqual(foundry.utils.getProperty(assensing, 'system.skill.rating'), 3);
         });
     });
 
