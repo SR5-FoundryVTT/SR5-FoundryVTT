@@ -122,8 +122,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     /**
-     * Lifecycle hook called before an actor document is created.     
-     * 
+     * Lifecycle hook called before an actor document is created.
+     *
      * NOTE: Hook is both called for creating and cloning / duplicating actor documents.
      *
      * @param data The initial data object provided to the document creation request
@@ -132,7 +132,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     override async _preCreate(data: Actor.CreateData, options: Actor.Database.PreCreateOptions, user: User.Implementation) {
         await super._preCreate(data, options, user);
-        
+
         // Abort skill creation data injection when duplicating
         if (foundry.utils.getProperty(data, '_stats.duplicateSource')) return;
         // Abort if a skillset was already assigned (e.g. during Chummer import)
@@ -201,7 +201,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @override
      */
     override applyActiveEffects(...args) {
-        // Shadowrun uses prepareDerivedData to calculate lots of things that don't exist on the data model in full.
         // Errors during change application will stop that process and cause a broken sheet.
         try {
             // @ts-expect-error TODO: v14 - typing is missing
@@ -317,7 +316,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         this.system.skills = SkillFieldPrep.prepareActorSkills(skills);
     }
-    
+
     /*
      * Some actors have skills, some don't. While others don't have skills but derive skill values from their ratings.
      */
@@ -835,7 +834,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Return the skill field matching the given skill item id
-     * 
+     *
      * @param id The skill item id to be looked for in the dervied system skill data.
      */
     getSkillById(id: string, skills: SR5Actor['system']['skills'] = this.getSkills()): SkillFieldType | undefined {
@@ -1160,7 +1159,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Build an action for the given skill id based on it's configured values.
-     * 
+     *
      * All action values are derived from the SkillField instead of the skill item
      * as field values can be modified by effect changes.
      *
