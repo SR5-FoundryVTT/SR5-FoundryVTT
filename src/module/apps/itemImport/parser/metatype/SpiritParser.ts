@@ -3,39 +3,43 @@ import { CompendiumKey } from "../../importer/Constants";
 import { MetatypeParserBase } from './MetatypeParserBase';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 
+const FORCE_OFFSET_ATTRIBUTE_MAP = {
+    body: 'bodmin',
+    agility: 'agimin',
+    reaction: 'reamin',
+    strength: 'strmin',
+    willpower: 'wilmin',
+    logic: 'logmin',
+    intuition: 'intmin',
+    charisma: 'chamin',
+    magic: 'magmin',
+    essence: 'essmin',
+} as const;
+
 export class SpiritParser extends MetatypeParserBase<'spirit'> {
     protected readonly parseType = 'spirit';
 
     protected override getSystem(jsonData: Metatype) {
         const system = this.getBaseSystem();
 
-        switch (jsonData.category?._TEXT) {
-            case "Insect Spirits":
-                system.spiritType = jsonData.name._TEXT.split(/[ /]/)[0].toLowerCase() as any;
-                break;
+        const category = jsonData.category?._TEXT;
+        const name = jsonData.name?._TEXT || "";
 
-            case "Ritual":
-                system.attributes.body.base = Number(jsonData.bodmin._TEXT) || 0;
-                system.attributes.agility.base = Number(jsonData.agimin._TEXT) || 0;
-                system.attributes.reaction.base = Number(jsonData.reamin._TEXT) || 0;
-                system.attributes.strength.base = Number(jsonData.strmin._TEXT) || 0;
-                system.attributes.charisma.base = Number(jsonData.chamin._TEXT) || 0;
-                system.attributes.intuition.base = Number(jsonData.intmin._TEXT) || 0;
-                system.attributes.logic.base = Number(jsonData.logmin._TEXT) || 0;
-                system.attributes.willpower.base = Number(jsonData.wilmin._TEXT) || 0;
-                system.attributes.edge.base = Number(jsonData.edgmin._TEXT) || 0;
-                system.attributes.magic.base = Number(jsonData.magmin?._TEXT) || 0;
-                system.attributes.resonance.base = Number(jsonData.resmin?._TEXT) || 0;
-
-                system.spiritType = ["Watcher", "Corps Cadavre"].includes(jsonData.name._TEXT)
-                    ? (jsonData.name._TEXT.replace(" ", "_").toLowerCase() as any) : "homunculus";
-                break;
-            default:
-                system.spiritType = jsonData.name._TEXT
-                    .replace(" Spirit", "").replace("Spirit of ", "")
-                    .replace(" (Demon)", "").replace(/[\s\-]/g, "_")
-                    .split("/")[0].toLowerCase() as any;
+        if (category === "Insect Spirits") {
+            system.spiritType = name.split(/[ /]/)[0];
+        }  else if (category === "Ritual") {
+            system.attributes.edge.base = Number(jsonData.edgmin?._TEXT) || 0;
+            system.spiritType = ["Watcher", "Corps Cadavre"].includes(name) ? name : "Homunculus";
+        }  else {
+            system.spiritType = name
+                .replace(" Spirit", "")
+                .replace("Spirit of ", "")
+                .replace(" (Demon)", "")
+                .replace(/[\s-]/g, "_")
+                .split("/")[0];
         }
+
+        this.applyForceOffsetAttributes(system, jsonData);
 
         if (jsonData.walk)
             system.movement.walk.base = Number(jsonData.walk._TEXT.split('/')[0] ?? 0);
@@ -46,6 +50,33 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
         system.movement.sprint = Number(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
 
         return system;
+    }
+
+    private applyForceOffsetAttributes(system: ReturnType<typeof this.getBaseSystem>, jsonData: Metatype) {
+        for (const [attributeId, metatypeAttributeId] of Object.entries(FORCE_OFFSET_ATTRIBUTE_MAP)) {
+            const value = (jsonData[metatypeAttributeId] as { _TEXT?: string } | undefined)?._TEXT ?? '';
+            const parsed = this.parseForceOffsetValue(value);
+
+            system.force_applies[attributeId] = parsed.forceApplies;
+            system.attributes[attributeId].base = parsed.base;
+        }
+    }
+
+    private parseForceOffsetValue(raw: string): { forceApplies: boolean, base: number } {
+        const value = (raw ?? '').trim();
+        if (!value) return { forceApplies: false, base: 0 };
+
+        if (/^F$/i.test(value))
+            return { forceApplies: true, base: 0 };
+
+        const forceOffsetMatch = /^F\s*([+-])\s*(\d+)$/i.exec(value);
+        if (forceOffsetMatch) {
+            const sign = forceOffsetMatch[1] === '-' ? -1 : 1;
+            const amount = Number(forceOffsetMatch[2]) || 0;
+            return { forceApplies: true, base: sign * amount };
+        }
+
+        return { forceApplies: false, base: Number(value) || 0 };
     }
 
     protected override async getItems(jsonData: Metatype): Promise<Item.Source[]> {

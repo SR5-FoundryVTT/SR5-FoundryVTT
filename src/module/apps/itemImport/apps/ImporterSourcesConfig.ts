@@ -67,7 +67,7 @@ export class ImporterSourcesConfig extends BaseClass {
         const context = await super._prepareContext(...args);
 
         const allPacks = game.packs
-            .filter((pack) => pack.metadata.type === "Item")
+            .filter((pack) => pack.metadata.type === "Item" || pack.metadata.type === "Actor")
             .map((pack) => ({id: pack.collection, label: pack.metadata.label}));
 
         context.selectedPacks = this.selectedIds
@@ -154,8 +154,8 @@ export class ImporterSourcesConfig extends BaseClass {
      * Handle the save button click.
      */
     private async _onSave() {
-        await game.settings.set(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder, this.selectedIds);
+        await game.settings.set(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder, [...new Set(this.selectedIds)]);
         ui.notifications.info("Actor Importer configuration saved!");
-        void this.close();
+        return this.close();
     }
 }

@@ -34,10 +34,41 @@ export const spiritImporterTesting = (context: QuenchBatchContext) => {
 
     describe('Chummer Spirit Importer', () => {
         it('Should import a chummer character', async () => {
-            spirit = await SpiritImporter.import(character, 'fire', importOptions);
+            const template = await factory.createActor({
+                type: 'spirit',
+                system: {
+                    spiritType: 'fire_template',
+                    force_applies: {
+                        body: true,
+                        agility: true,
+                        reaction: true,
+                        strength: true,
+                        willpower: true,
+                        logic: true,
+                        intuition: true,
+                        charisma: true,
+                        magic: true,
+                        essence: true,
+                    },
+                    attributes: {
+                        body: { base: 1 },
+                        agility: { base: 2 },
+                        reaction: { base: 3 },
+                        strength: { base: -2 },
+                        willpower: { base: 0 },
+                        logic: { base: 0 },
+                        intuition: { base: 1 },
+                        charisma: { base: 0 },
+                        magic: { base: 0 },
+                        essence: { base: -2 },
+                    }
+                }
+            });
+
+            spirit = await SpiritImporter.import(character, template, importOptions);
             assert.notEqual(spirit, null, 'Spirit not created');
             factory.actors.push(spirit as Actor.Stored<'spirit'>);
-            assert.strictEqual(spirit!.system.spiritType, 'fire');
+            assert.strictEqual(spirit!.system.spiritType, 'fire_template');
         });
 
         it('Should have the correct attributes and limits', async () => {

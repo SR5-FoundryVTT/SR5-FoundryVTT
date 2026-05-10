@@ -125,55 +125,14 @@ export class ActorImporter extends BaseClass {
         console.log("Parsed Chummer Data:", actorData);
         console.log("Import Options:", importOptions);
 
-        const spiritType = this.getSpiritType(actorData);
-        if (spiritType)
-            await SpiritImporter.import(actorData, spiritType, importOptions);
+        const spiritTemplate = await SpiritImporter.findSpiritByGuid(actorData.metatype_guid);
+        if (spiritTemplate)
+            await SpiritImporter.import(actorData, spiritTemplate, importOptions);
         else if (actorData.metatype_english?.toLowerCase().includes('sprite'))
             await SpriteImporter.import(actorData, importOptions);
         else
             await CharacterImporter.import(actorData, importOptions);
 
         await this.close();
-    }
-
-    private getSpiritType(chummerChar: ActorSchema) {
-        const spiritTypes = [
-            'air', 'aircraft', 'airwave', 'ally', 'automotive', 'beasts', 'ceramic', 'earth', 'energy',
-            'fire', 'guardian', 'guidance', 'homunculus', 'man', 'metal','plant', 'ship', 'task', 'train',
-            'water', 'watcher', 'blood', 'muse', 'nightmare', 'shade', 'succubus', 'wraith',
-
-            //shedim
-            'shedim', 'hopper', 'blade_summoned', 'horror_show', 'unbreakable', 'master_shedim',
-
-            // insect
-            'caretaker', 'nymph', 'scout', 'soldier', 'worker', 'queen',
-
-            "carcass", "corpse", "rot", "palefile", "detritus",
-
-            // Howling Shadow
-            "anarch", "arboreal", "blackjack", "boggle", "bugul", "chindi", "corpselight", "croki",
-            "duende", "ejerian", "elvar", "erinyes", "green_man", "imp", "jarl", "kappa", "kokopelli",
-            "morbi", "nocnitsa", "phantom", "preta", "stabber", "tungak", "vucub_caquix",
-            
-            // Aetherology
-            'gum_toad', 'crawler', 'ghasts', 'vryghots', 'gremlin', 'anansi', 'tsuchigumo_warrior',
-
-            // Horror Terrors
-            'corps_cadavre',
-
-            // Toxic
-            'abomination', 'barren', 'noxious', 'nuclear', 'plague', 'sludge'
-        ] as const;
-
-        // Normalize the metatype string to a spirit type key
-        const chummerType = chummerChar.metatype_english
-            .replace(/\s*\(.*?\)\s*/g, '')
-            .replace(/^Spirit of /, '')
-            .replace(/ Spirit$/, '')
-            .replace(/[\s-]/g, '_')
-            .toLowerCase()
-            .trim();
-
-        return spiritTypes.find(v => RegExp(`\\b${v}\\b`, "i").test(chummerType));
     }
 }
