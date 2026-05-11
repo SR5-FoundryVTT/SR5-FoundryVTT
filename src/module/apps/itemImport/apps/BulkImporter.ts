@@ -134,12 +134,12 @@ export class BulkImporter extends BaseClass {
         new WareImporter(),
         new QualityImporter(),
         new CritterPowerImporter(),
+        new SkillImporter(),
         new CritterImporter(),
         new EchoesImporter(),
         new AdeptPowerImporter(),
         new ArmorImporter(),
         new ActionImporter(),
-        new SkillImporter(),
     ] as const satisfies readonly DataImporter[];
 
     /**

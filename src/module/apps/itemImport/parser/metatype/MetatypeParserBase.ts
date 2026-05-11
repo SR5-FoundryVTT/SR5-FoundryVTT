@@ -4,7 +4,7 @@ import { ImportHelper as IH, OneOrMany, RetrievedItem } from '../../helper/Impor
 export abstract class MetatypeParserBase<TResult extends ('character' | 'spirit' | 'sprite')> extends Parser<TResult> {
     getMetatypeItems(
         items: RetrievedItem[],
-        itemsData: undefined | OneOrMany<{$?: { select?: string; rating?: string; removable?: string; }; _TEXT: string }>,
+        itemsData: undefined | OneOrMany<{$?: { select?: string; rating?: string; removable?: string; spec?: string }; _TEXT: string }>,
         msg_field: {type: string; critter: string},
     ): Item.Source[] {
         const itemMap = new Map(items.map(({name_english, ...i}) => [name_english, i]));
@@ -29,12 +29,15 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'spirit'
                 system.optional = 'disabled_option';
 
             if (itemData.$?.rating) {
-                //todo this could be 'F'
                 const rating = Number(itemData.$.rating) || 0;
                 if ('rating' in system)
                     system.rating = rating;
-                else if ('technology' in system && system.technology)
+                else if ('technology' in system)
                     system.technology.rating = rating;
+                else if ('skill' in system) {
+                    system.skill.rating = itemData.$.rating.includes('F') ? 1 : rating;
+                    if (itemData.$.spec) system.skill.specializations.push({ name: itemData.$.spec });
+                }
             }
 
             result.push(item);

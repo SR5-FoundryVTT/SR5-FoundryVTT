@@ -48,6 +48,7 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
             system.movement.run.base = Number(jsonData.run._TEXT.split('/')[0] ?? 0);
 
         system.movement.sprint = Number(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
+        system.half_value_skill = jsonData.skills?.skill?.some(s => ['F', 'F/2'].includes(s.$.rating)) ?? false;
 
         return system;
     }
@@ -83,6 +84,7 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
         const { name, powers } = jsonData;
         const qualities = jsonData.qualities || undefined;
         const optionalpowers = jsonData.optionalpowers || jsonData.bonus?.optionalpowers;
+        const skills = jsonData.skills;
 
         const powerList = [...IH.getArray(powers?.power), ...IH.getArray(optionalpowers?.optionalpower)].map(i => i._TEXT);
         const qualityList = [
@@ -90,11 +92,15 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
             ...IH.getArray(qualities?.negative?.quality),
         ].map(i => i._TEXT);
 
+        const skillList = IH.getArray(skills?.skill).map(s => s._TEXT);
+
         const allPowers = await IH.findItems('Critter_Power', powerList);
         const allQualities = await IH.findItems('Quality', qualityList);
+        const allSkills = await IH.findItems('Skill', skillList);
         const spiritName = name._TEXT;
 
         return [
+            ...this.getMetatypeItems(allSkills, skills?.skill, { type: 'Skill', critter: spiritName }),
             ...this.getMetatypeItems(allPowers, powers?.power, { type: 'Power', critter: spiritName }),
             ...this.getMetatypeItems(allQualities, qualities?.positive?.quality, { type: 'Power', critter: spiritName }),
             ...this.getMetatypeItems(allQualities, qualities?.negative?.quality, { type: 'Power', critter: spiritName }),

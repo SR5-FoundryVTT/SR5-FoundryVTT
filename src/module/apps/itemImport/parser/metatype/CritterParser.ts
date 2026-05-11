@@ -112,17 +112,20 @@ export class CritterParser extends MetatypeParserBase<'character'> {
             ...IH.getArray(qualities?.positive?.quality),
             ...IH.getArray(qualities?.negative?.quality)
         ].map(v => v._TEXT);
+        const skills = IH.getArray(jsonData.skills?.skill).map(v => v._TEXT);
 
         const allComplexForm = await IH.findItems('Complex_Form', complex);
         const allSpells = await IH.findItems('Spell', spells);
         const allPowers = await IH.findItems('Critter_Power', power);
         const allQualities = await IH.findItems('Quality', [...quality, ...bioware]);
         const allBiowares = await IH.findItems('Ware', bioware);
+        const allSkills = await IH.findItems('Skill', skills);
 
         const name = jsonData.name._TEXT;
         return [
             ...this.getMetatypeItems(allSpells, spellsData, { type: 'Spell', critter: name }),
             ...this.getMetatypeItems(allPowers, jsonData.powers?.power, { type: 'Power', critter: name }),
+            ...this.getMetatypeItems(allSkills, jsonData.skills?.skill, { type: 'Skill', critter: name }),
             ...this.getMetatypeItems(allBiowares, jsonData.biowares?.bioware, { type: 'Bioware', critter: name }),
             ...this.getMetatypeItems(allPowers, optionalpowers?.optionalpower, { type: 'Power', critter: name }),
             ...this.getMetatypeItems(allQualities, qualities?.positive?.quality, { type: 'Quality', critter: name }),
