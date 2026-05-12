@@ -217,7 +217,7 @@ export class ActorSkillImport {
             return undefined;
         }
 
-        actor.system.skillset = skillSet.uuid;
+        actor.system.skillset = skillSet.uuid!;
         console.debug(`Shadowrun 5e | Assigned skill set ${skillSet.name} (${skillSet.uuid}) to imported ${actor.type}`);
         return skillSet;
     }
@@ -242,7 +242,7 @@ export class ActorSkillImport {
             if (existingGroup) {
                 existingGroup.system.group.rating = rating;
                 if (skillSet && this.isSkillGroupInSkillSet(skillSet, existingGroup.name ?? groupName)) {
-                    existingGroup.system.source.uuid = skillSet.uuid;
+                    existingGroup.system.source.uuid = skillSet.uuid!;
                 }
                 continue;
             }
@@ -258,7 +258,7 @@ export class ActorSkillImport {
             };
             delete (groupItem as Item.CreateData & { _id?: string })._id;
             groupItem.system.group.rating = rating;
-            if (skillSet && this.isSkillGroupInSkillSet(skillSet, packGroup.name)) {
+            if (skillSet?.uuid && this.isSkillGroupInSkillSet(skillSet, packGroup.name)) {
                 groupItem.system.source.uuid = skillSet.uuid;
             }
 
@@ -276,7 +276,7 @@ export class ActorSkillImport {
             const skillName = skill.name_english || skill.name;
             const normalizedSkillName = skillName.trim().toLowerCase();
             const packSkill = packSkillsByName.get(normalizedSkillName);
-            const sourceUuid = skillSet && this.isSkillInSkillSet(skillSet, packSkill?.name ?? skillName) ? skillSet.uuid : undefined;
+            const sourceUuid = skillSet?.uuid && this.isSkillInSkillSet(skillSet, packSkill?.name ?? skillName) ? skillSet.uuid : undefined;
             const existingSkill = this.findSkillItem(items, packSkill?.name ?? skillName, 'active');
             if (existingSkill) {
                 this.applyImportedSkillData(existingSkill, skill, {
@@ -318,7 +318,7 @@ export class ActorSkillImport {
             const rating = isNative ? 12 : (Number(skill.rating) || 0);
             const skillName = skill.name || skill.name_english;
             const packSkill = packSkillsByName.get(skillName.trim().toLowerCase());
-            const sourceUuid = skillSet && this.isSkillInSkillSet(skillSet, packSkill?.name ?? skillName) ? skillSet.uuid : undefined;
+            const sourceUuid = skillSet?.uuid && this.isSkillInSkillSet(skillSet, packSkill?.name ?? skillName) ? skillSet.uuid : undefined;
             const existingSkill = this.findSkillItem(items, packSkill?.name ?? skillName, 'language');
             if (existingSkill) {
                 this.applyImportedSkillData(existingSkill, skill, {
@@ -357,7 +357,7 @@ export class ActorSkillImport {
             const attribute = parsedAttribute || (knowledgeType ? KNOWLEDGE_ATTRIBUTE_MAP[knowledgeType] : '');
             const skillName = skill.name || skill.name_english;
             const packSkill = packSkillsByName.get(skillName.trim().toLowerCase());
-            const sourceUuid = skillSet && this.isSkillInSkillSet(skillSet, packSkill?.name ?? skillName) ? skillSet.uuid : undefined;
+            const sourceUuid = skillSet?.uuid && this.isSkillInSkillSet(skillSet, packSkill?.name ?? skillName) ? skillSet.uuid : undefined;
             const existingSkill = this.findSkillItem(items, packSkill?.name ?? skillName, 'knowledge');
             if (existingSkill) {
                 this.applyImportedSkillData(existingSkill, skill, {

@@ -13,22 +13,23 @@ export const shadowrunDriver = (context: QuenchBatchContext) => {
     const testOptions = { showDialog: false, showMessage: false };
 
     const createDriver = async () => {
-        return await factory.createActor({ type: 'character',
+        const actor = await factory.createActor({ type: 'character',
             system: {
                 attributes: {
                     intuition: { base: 5, },
                     reaction: { base: 3, },
                     agility: { base: 3, },
                     logic: { base: 5, }
-                },
-                skills: {
-                    active: {
-                        gunnery: { base: 5, attribute: 'agility' },
-                        pilot_ground_craft: { base: 5, attribute: 'reaction' }
-                    }
                 }
             }
         });
+
+        const gunnery = actor.items.get(actor.system.skills.active.gunnery?.id);
+        await gunnery?.update({ system: { skill: { rating: 5 }}});
+        const pilot_ground_craft = actor.items.get(actor.system.skills.active.pilot_ground_craft?.id);
+        await pilot_ground_craft?.update({ system: { skill: { rating: 5 }} });
+
+        return actor;
     }
 
     const createVehicle = async () => {
