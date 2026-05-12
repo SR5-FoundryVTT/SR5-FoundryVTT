@@ -2,24 +2,40 @@ import { SR5 } from "../../config";
 import { FLAGS, SYSTEM_NAME } from './../../constants';
 import { ImportHelper as IH } from "../itemImport/helper/ImportHelper";
 
+const FilePicker = foundry.applications.apps.FilePicker.implementation;
+
 export class IconAssign {
+    private static readonly MAX_BROWSE_DEPTH = 5;
     private static readonly IMG_EXTENSIONS = ['.svg', '.webp', '.png', '.jpg', '.jpeg', '.avif'];
 
     private static iconFilesCache: Set<string> | null = null;
     private static iconFilesPromise: Promise<Set<string>> | null = null;
 
     /**
+     * Get the base folder for icons from settings, or use default if not set.
+     */
+    private static getIconFolder(): string {
+        return game.settings.get(SYSTEM_NAME, FLAGS.ImportIconFolder) || "systems/shadowrun5e/dist/icons/importer/";
+    }
+
+    /**
      * Helper function to recursively browse a directory and all its sub-directories.
      * @param path The full data path to browse.
+     * @param depth Current recursion depth.
      * @returns A promise that resolves to an array of file paths.
      */
-    private static async browseRecursively(path: string): Promise<string[]> {
+    private static async browseRecursively(path: string, depth = 0): Promise<string[]> {
+        if (depth >= IconAssign.MAX_BROWSE_DEPTH) {
+            console.warn(`[SR5] Maximum icon browse depth reached at ${path}`);
+            return [];
+        }
+
         try {
-            const picker = await foundry.applications.apps.FilePicker.implementation.browse("data", path);
+            const picker = await FilePicker.browse("data", path);
 
             const files = picker.files;
 
-            const promises = picker.dirs.map(async dir => IconAssign.browseRecursively(dir));
+            const promises = picker.dirs.map(async (dir) => IconAssign.browseRecursively(dir, depth + 1));
             const filesFromSubDirs = await Promise.all(promises);
 
             files.push(...filesFromSubDirs.flat());
@@ -39,10 +55,7 @@ export class IconAssign {
             return new Set();
         }
 
-        const imgFolder = game.settings.get(SYSTEM_NAME, FLAGS.ImportIconFolder)
-            || "systems/shadowrun5e/dist/icons/importer/";
-
-        const allFiles = await IconAssign.browseRecursively(imgFolder);
+        const allFiles = await IconAssign.browseRecursively(IconAssign.getIconFolder());
         return new Set(allFiles);
     }
 
@@ -85,12 +98,11 @@ export class IconAssign {
         const importFlags = system?.importFlags;
         const fallbackCategory = system && 'category' in system ? system.category ?? "" : "";
 
-        const imgName = IH.formatAsSlug(importFlags?.name || doc.name || '');
         const imgType = doc.type;
+        const imgFolder = IconAssign.getIconFolder();
+        const imgName = IH.formatAsSlug(importFlags?.name || doc.name || '');
         const imgCategory = IH.formatAsSlug(importFlags?.category || fallbackCategory);
         const useOverrides = game.settings.get(SYSTEM_NAME, FLAGS.UseImportIconOverrides);
-        const imgFolder = game.settings.get(SYSTEM_NAME, FLAGS.ImportIconFolder)
-            || "systems/shadowrun5e/dist/icons/importer/";
 
         let override = '';
         if (useOverrides) {
