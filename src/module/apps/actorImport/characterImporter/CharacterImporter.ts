@@ -6,6 +6,7 @@ import { DataDefaults } from "@/module/data/DataDefaults";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 
 import { ActorSchema } from "../ActorSchema";
+import { MugshotImport } from "../MugshotImport";
 import { ItemsParser } from "../itemImporter/ItemsParser";
 import { VehicleParser } from "../itemImporter/vehicleImport/VehicleParser";
 
@@ -24,6 +25,7 @@ export type ImportOptionsType = Partial<{
     spells: boolean;
     vehicles: boolean;
     weapons: boolean;
+    mugshots: boolean;
 }>;
 
 export interface BlankCharacter extends Actor.CreateData {
@@ -71,6 +73,12 @@ export class CharacterImporter {
             items: await new ItemsParser().parse(chummerCharacter, importOptions),
             name: chummerCharacter.alias ?? chummerCharacter.name ?? '[Name not found]',
         };
+
+        if (importOptions.mugshots) {
+            const mugshotPaths = await MugshotImport.importImages(chummerCharacter, character.name);
+            if (mugshotPaths.length > 0)
+                character.img = mugshotPaths[0];
+        }
 
         await this.update(character, chummerCharacter);
 
