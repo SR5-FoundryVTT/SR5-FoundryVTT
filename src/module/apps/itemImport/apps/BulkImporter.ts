@@ -2,7 +2,6 @@ import JSZip from "jszip";
 import { Constants } from "../importer/Constants";
 import { ImportHelper } from "../helper/ImportHelper";
 import { SYSTEM_NAME, FLAGS } from "@/module/constants";
-import { IconAssign } from "../../iconAssigner/iconAssign";
 
 import { ActionImporter } from "../importer/ActionImporter";
 import { AdeptPowerImporter } from "../importer/AdeptPowerImporter";
@@ -234,7 +233,6 @@ export class BulkImporter extends BaseClass {
 
         // Configure shared importer settings
         DataImporter.overrideDocuments = BulkImporter.overrideDocuments;
-        DataImporter.iconSet = await IconAssign.getIconFiles(true);
 
         // Set total progress count
         BulkImporter.progress.total = BulkImporter.Importers.length;

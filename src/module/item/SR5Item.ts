@@ -67,17 +67,14 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     // Item Sheet labels for quick info on an item dropdown.
     declare labels: { roll?: string; opposedRoll?: string };
 
-    override async _preCreate(...args: Parameters<Item<SubType>['_preCreate']>) {
-        const [data] = args;
-        await super._preCreate(...args);
+    static override getDefaultArtwork(itemData?: Item.CreateData): Item.GetDefaultArtworkReturn {
+        const fallback = super.getDefaultArtwork(itemData);
+        if (!itemData || itemData.img) return fallback;
 
-        if (!data.img) {
-            const iconSet = await IconAssign.getIconFiles(true);
-            const assignedImage = IconAssign.iconAssign(iconSet, this.toObject());
-            if (assignedImage) {
-                this.updateSource({ img: assignedImage });
-            }
-        }
+        const assignedImage = IconAssign.iconAssign(itemData);
+        if (!assignedImage) return fallback;
+
+        return { img: assignedImage };
     }
 
 

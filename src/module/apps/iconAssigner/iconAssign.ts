@@ -47,15 +47,16 @@ export class IconAssign {
     }
 
     /**
-     * Get cached icon files, optionally not forcing a cache refresh.
+     * Read icon files from cache synchronously.
      */
-    static async getIconFiles(forceRefresh = false): Promise<Set<string>> {
-        if (forceRefresh) {
-            IconAssign.iconFilesCache = null;
-            IconAssign.iconFilesPromise = null;
-        }
+    static getIconFiles(): Set<string> | null {
+        return IconAssign.iconFilesCache;
+    }
 
-        if (IconAssign.iconFilesCache) return IconAssign.iconFilesCache;
+    /**
+     * Force refresh of icon files cache.
+     */
+    static async refreshIconFiles(): Promise<Set<string>> {
         if (!IconAssign.iconFilesPromise) {
             IconAssign.iconFilesPromise = IconAssign.loadIconFiles()
                 .then((iconSet) => {
@@ -72,16 +73,13 @@ export class IconAssign {
 
     /**
      * Assigns an icon to an Actor or Item document based on import flags.
-     * @param iconSet - A Set of available icon paths for fast lookups.
      * @param doc - The Actor or Item create data.
      */
-    static iconAssign(
-        iconSet: Set<string>,
-        doc: Actor.CreateData | Item.CreateData,
-    ): string | null {
+    static iconAssign(doc: Actor.CreateData | Item.CreateData): string | null {
+        const iconSet = IconAssign.getIconFiles();
         const system = doc.system;
 
-        if (iconSet.size === 0)
+        if (!iconSet?.size)
             return doc.img ?? null;
 
         const importFlags = system?.importFlags;

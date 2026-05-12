@@ -1,6 +1,5 @@
 import { Parser } from "./Parser";
 import { SYSTEM_NAME, FLAGS } from "@/module/constants";
-import { IconAssign } from "@/module/apps/iconAssigner/iconAssign";
 import { ImportOptionsType } from "../characterImporter/CharacterImporter";
 import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
 
@@ -27,10 +26,9 @@ export type Unwrap<T> = T extends Array<infer U> ? U : T;
  */
 export class ItemsParser {
     /**
-     * Prepares the parser by setting up icon files and caching compendium indexes for item lookup.
+     * Prepares the parser by caching compendium indexes for item lookup.
      */
     private async prepareParser() {
-        Parser.iconSet = await IconAssign.getIconFiles(true);
         const compendiumList = game.settings.get(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder);
 
         Parser.compendiumCache.clear();

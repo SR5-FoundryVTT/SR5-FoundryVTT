@@ -122,6 +122,16 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return super.migrateData(source);
     }
 
+    static override getDefaultArtwork(actorData?: Actor.CreateData): Actor.GetDefaultArtworkReturn {
+        const fallback = super.getDefaultArtwork(actorData);
+        if (!actorData || actorData.img) return fallback;
+
+        const assignedImage = IconAssign.iconAssign(actorData);
+        if (!assignedImage) return fallback;
+
+        return { img: assignedImage, texture: { src: assignedImage } };
+    }
+
     /**
      * Lifecycle hook called before an actor document is created.     
      * 
@@ -134,14 +144,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     override async _preCreate(...args: Parameters<Actor<SubType>['_preCreate']>) {
         const [data] = args;
         await super._preCreate(...args);
-
-        if (!data.img) {
-            const iconSet = await IconAssign.getIconFiles(true);
-            const assignedImage = IconAssign.iconAssign(iconSet, this.toObject());
-            if (assignedImage && assignedImage !== this.img) {
-                this.updateSource({ img: assignedImage });
-            }
-        }
 
         // Abort skill creation data injection when duplicating
         if (foundry.utils.getProperty(data, '_stats.duplicateSource')) return;

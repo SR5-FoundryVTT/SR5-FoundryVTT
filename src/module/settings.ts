@@ -1,6 +1,7 @@
 // game settings for shadowrun 5e
 
 import { FLAGS, SYSTEM_NAME } from './constants';
+import { IconAssign } from './apps/iconAssigner/iconAssign';
 import SR5CompendiaSettings from './settings/SR5CompendiaSettings';
 
 export const registerSystemSettings = () => {
@@ -230,7 +231,8 @@ export const registerSystemSettings = () => {
         scope: 'world',
         config: true,
         type: String,
-        default: 'systems/shadowrun5e/dist/icons/importer/'
+        default: 'systems/shadowrun5e/dist/icons/importer/',
+        onChange: () => { void IconAssign.refreshIconFiles(); },
     });
 
     /**

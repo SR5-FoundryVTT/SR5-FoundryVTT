@@ -40,7 +40,6 @@ type CacheType = Awaited<ReturnType<CompendiumCollection<'Item'>['getIndex']>>;
 export abstract class Parser<T extends ItemSystems> {
     protected abstract readonly parseType: T;
     static readonly DEFAULT_NAME = "Unnamed";
-    static iconSet: Set<string> | null = null;
     static compendiumCache = new Map<string, CacheType>();
 
     protected createItem(itemData: BaseType) {
@@ -146,8 +145,8 @@ export abstract class Parser<T extends ItemSystems> {
 
                 item.flags.shadowrun5e.embeddedItems = await this.getEmbeddedItems(itemData);
 
-                if (Parser.iconSet && !item.img)
-                    item.img = IconAssign.iconAssign(Parser.iconSet, item);
+                if (!item.img)
+                    item.img = IconAssign.iconAssign(item);
 
                 const schema = CONFIG["Item"].dataModels[item.type].schema;
                 const correctionLogs = Sanitizer.sanitize(schema, item.system);
