@@ -49,7 +49,7 @@ export class IconAssign {
     /**
      * Read icon files from cache synchronously.
      */
-    static getIconFiles(): Set<string> | null {
+    static getIconFiles(): ReadonlySet<string> | null {
         return IconAssign.iconFilesCache;
     }
 
