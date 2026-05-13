@@ -1,7 +1,7 @@
 {
   "name": "Biotechnology",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/skills/technical-biotechnology.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/technical-biotechnology.webp",
   "system": {
     "description": {
       "value": "",

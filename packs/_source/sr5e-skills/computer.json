@@ -1,7 +1,7 @@
 {
   "name": "Computer",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/skills/technical-computer.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/technical-computer.webp",
   "system": {
     "description": {
       "value": "",
