@@ -1,7 +1,7 @@
 {
   "name": "Tasking",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/groups/tasking.svg",
+  "img": "systems/shadowrun5e/dist/icons/groups/tasking.webp",
   "system": {
     "description": {
       "value": "",

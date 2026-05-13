@@ -1,7 +1,7 @@
 {
   "name": "Athletics",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/groups/athletics.svg",
+  "img": "systems/shadowrun5e/dist/icons/groups/athletics.webp",
   "system": {
     "description": {
       "value": "",
