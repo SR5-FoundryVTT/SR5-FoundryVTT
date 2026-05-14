@@ -334,4 +334,19 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     _getLimitOptions() {
         return Object.entries(SR5.limits).map(([limit, label]) => ({ label, id: limit }));
     }
+
+    override _onChangeForm(formConfig, event) {
+        super._onChangeForm(formConfig, event);
+    
+        // Update the priority value to match the type selection
+        // Use FoundryVTT default approach of changing priority based on type changes using _onChangeForm
+        // @ts-expect-error TODO: fvtt - v14 - missing type foundry.utils.isElementInstanceOf
+        if (foundry.utils.isElementInstanceOf(event.target, "select") && event.target.name.endsWith(".type")) {
+            const typeSelect = event.target;
+            const selector = `input[name="${typeSelect.name.replace(/\.type$/, ".priority")}"]`;
+            const priorityInput = typeSelect.closest("li").querySelector(selector);
+            // @ts-expect-error TODO: fvtt - v14 - missing type ActiveEffect.CHANGE_TYPES
+            priorityInput.value = ActiveEffect.CHANGE_TYPES[typeSelect.value]?.defaultPriority ?? "";
+        }
+      }
 }

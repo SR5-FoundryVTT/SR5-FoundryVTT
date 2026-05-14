@@ -422,4 +422,15 @@ export class SR5ActiveEffect extends ActiveEffect {
             return raw;
         }
     }
+
+    override prepareBaseData() {
+        super.prepareBaseData();
+        
+        // Overwrite foundry priority handling, as they provide a defaultPriority in CHANGE_TYPES but use
+        // priority in their ActiveEffect#prepareBaseData implementation.
+        for ( const change of this.system.changes ) {
+        // @ts-expect-error TODO: fvtt - v14 - missing CHANGE_TYPES typing
+          change.priority = change.priority === 0 ? ActiveEffect.CHANGE_TYPES[change.type]?.defaultPriority : change.priority;
+        }
+    }
 }
