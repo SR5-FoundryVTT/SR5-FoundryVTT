@@ -8,8 +8,7 @@ import { FormDialog, FormDialogData, FormDialogOptions } from "./FormDialog";
 export interface TestDialogData extends FormDialogData {
     test: SuccessTest
     rollMode: string
-    // TODO: fvtt - v14 - Deprecated in v14, missing v14 types.
-    rollModes: CONFIG.Dice.RollModes
+    rollModes: CONFIG.ChatMessage.modes
     config: typeof SR5,
     expandedPaths: string[]
 }
@@ -191,8 +190,10 @@ export class TestDialog extends FormDialog {
     override getData() {
         const data = super.getData() as unknown as TestDialogData;
 
-        data.rollMode = data.test.data.options?.rollMode ?? game.settings.get('core', 'rollMode');
-        data.rollModes = CONFIG.Dice.rollModes;
+        // @ts-expect-error TODO: fvtt - v14 - missing messageMode setting
+        data.rollMode = data.test.data.options?.rollMode ?? game.settings.get('core', 'messageMode');
+        // TODO: fvtt - v14 - missing types for ChatMessage.modes
+        data.rollModes = (CONFIG.ChatMessage as unknown as { modes: typeof CONFIG.Dice.rollModes }).modes;
         data.default = 'roll'; // TODO: Where is this even used and what's it for again?
 
         // Add in general SR5 config to allow access to general values.
