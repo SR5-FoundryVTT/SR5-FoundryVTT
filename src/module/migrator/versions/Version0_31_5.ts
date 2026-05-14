@@ -36,11 +36,5 @@ export class Version0_31_5 extends VersionMigration {
                 change.key = 'system.attributes.force';
             }
         }
-
-        if (effect.system?.changes === undefined && changes.length > 0) {
-            effect.system ??= {};
-            effect.system.changes = changes;
-            delete effect.changes;
-        }
     }
 }

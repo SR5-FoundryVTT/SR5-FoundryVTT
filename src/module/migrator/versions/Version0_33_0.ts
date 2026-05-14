@@ -61,13 +61,19 @@ export class Version0_33_0 extends VersionMigration {
     readonly TargetVersion = "0.33.0";
 
     override handlesActiveEffect(_effect: Readonly<any>) {
-        return _effect.changes.filter(change => change.mode === CONST.ACTIVE_EFFECT_MODES.CUSTOM).length > 0;
+        // effect change modes are either legacy mode or v14+ style type already migrated by Foundry
+        return  _effect.system.changes.filter(change => change.mode === CONST.ACTIVE_EFFECT_MODES.CUSTOM).length > 0 || 
+                _effect.system.changes.filter(change => change.type === 'custom');
     }
 
     override migrateActiveEffect(effect: any) {
-        for (const change of effect.changes)
+        for (const change of effect.system.changes) {
             if (change.mode === CONST.ACTIVE_EFFECT_MODES.CUSTOM)
                 change.mode = CONST.ACTIVE_EFFECT_MODES.ADD;
+
+            if (change.type === 'custom')
+                change.type = 'add';
+        }
     }
 
     override handlesItem(item: Readonly<any>): boolean {
