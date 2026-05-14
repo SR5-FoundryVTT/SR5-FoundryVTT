@@ -24,7 +24,7 @@
     "version": "0.34.0",
     "compatibility": {
         "minimum": "14",
-        "verified": "14.359",
+        "verified": "14.361",
         "maximum": "14"
     },
     "documentTypes": {
