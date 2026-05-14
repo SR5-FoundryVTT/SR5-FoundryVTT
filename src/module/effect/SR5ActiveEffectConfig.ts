@@ -224,34 +224,21 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     }
 
     /**
-     * Foundry provides a custom mode for systems to implement behavior with.
-     * 
-     * Shadowrun uses this mode to implement 'modify' mode, with complex behavior.
-     * To give users better information about the mode, inject a 'modify' label.
-     * 
-     * TODO: v14 - is this function still necessary Modify having been removed?
-     * 
-     * @param modes A object prepared for display using Foundry select handlebarjs helper.
-     * @returns Copy of the original modes and labels.
-     */
-    applyModifyLabelToCustomMode(changeTypes: Record<string, string>): Record<string, string> {
-        return { ...changeTypes, custom: game.i18n.localize('SR5.ActiveEffect.Modes.Modify') };
-    }
-
-    /**
      * Prepare possible choice types. This is necessary as we override most effect templates and can't use
      * default FoundryVTT effect code.
      * NOTE: This is taken from FoundryVTT v14 preparePartsContext 'changes'
      */
     prepareChangeTypes() {
-        // @ts-ignore TODO: v14 - types missing
+        // @ts-ignore TODO: fvtt- v14 - types missing
         return Object.entries(SR5ActiveEffect.CHANGE_TYPES as unknown as any)
-          .map(([type, {label}]) => ({type, label: game.i18n.localize(label)}))
-          .sort((a, b) => a.label.localeCompare(b.label, game.i18n.lang))
-          .reduce((types, {type, label}) => {
-            types[type] = label;
-            return types;
-          }, {});
+            // TODO: fvtt - v14 - Remove subtract type until typings to cleanly change ModifiableValue implemenation to use type instead of mode
+            .filter(([type]) => type !== 'subtract')
+            .map(([type, { label }]) => ({ type, label: game.i18n.localize(label) }))
+            .sort((a, b) => a.label.localeCompare(b.label, game.i18n.lang))
+            .reduce((types, { type, label }) => {
+                types[type] = label;
+                return types;
+            }, {});
 
     }
 
