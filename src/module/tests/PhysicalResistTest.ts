@@ -36,7 +36,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         data = ResistTestDataFlow._prepareData(data);
 
         const armor = this.actor?.getArmor();
-        if(armor?.hardened){
+        if(armor && armor.hardened.value > 0){
             data.hitsIcon = {
                 icon: "systems/shadowrun5e/dist/icons/bell-shield.svg",
                 tooltip: "SR5.ArmorHardenedFull",
@@ -89,6 +89,11 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
             if (this.actor) {
                 const armor = this.actor.getArmor(this.data.incomingDamage);
                 ModifiableValue.addUniqueBase(this.data.pool, 'SR5.Armor.label', armor.rating.value);
+
+                const immunityRating = CombatRules.immunityRating(this.actor, this.data.incomingDamage);
+                if (immunityRating > 0) {
+                    ModifiableValue.addUniqueBase(this.data.pool, 'SR5.Immunity', immunityRating);
+                }
             }
         }
     }
@@ -115,8 +120,15 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
 
     private readonly successConditions: PhysicalResistSuccessCondition[] = [
         {
-            test: () => this.actor !== undefined && CombatRules.isBlockedByHardenedArmor(this.data.incomingDamage, 0, 0, this.actor),
+            test: () => !!this.actor && CombatRules.isBlockedByHardenedArmor(this.data.incomingDamage, 0, 0, this.actor),
             label: "SR5.TestResults.SoakBlockedByHardenedArmor",
+            effect: () => {
+                this.data.autoSuccess = true;
+            }
+        },
+        {
+            test: () => !!this.actor && CombatRules.isBlockedByImmunity(this.data.incomingDamage, 0, 0, this.actor),
+            label: "SR5.TestResults.SoakBlockedByImmunity",
             effect: () => {
                 this.data.autoSuccess = true;
             }
@@ -150,11 +162,17 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
     override async evaluate(): Promise<this> {
         await super.evaluate();
 
-        // Automatic hits from hardened armor (SR5#397)
-        const armor = this.actor?.getArmor(this.data.modifiedDamage);
-        if(armor?.hardened) {
+        if (this.actor) {
             const hits = new ModifiableValue(this.hits);
-            hits.addUniqueBase('SR5.AppendedHits', Math.ceil(armor.rating.value/2));
+            const hardenedHits = CombatRules.hardenedAutoHits(this.actor, this.data.modifiedDamage);
+            const immunityHits = CombatRules.immunityAutoHits(this.actor, this.data.modifiedDamage);
+
+            if (hardenedHits > 0) {
+                hits.addUniqueBase('SR5.HardenedArmor', hardenedHits);
+            }
+            if (immunityHits > 0) {
+                hits.addUniqueBase('SR5.Immunity', immunityHits);
+            }
             hits.calcTotal();
         }
 

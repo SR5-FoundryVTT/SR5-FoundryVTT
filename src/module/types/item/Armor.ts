@@ -6,7 +6,6 @@ const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fie
 export const ArmorValueData = () => ({
     mod: new BooleanField(),
     hardened: new BooleanField(),
-    hardened_mystic: new BooleanField(),
     base: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     value: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     elements: new SchemaField({

@@ -87,7 +87,7 @@ export class CombatRules {
     }
 
     /**
-     * Check if vehicle wouldn't take any damage due to vehicle armor rules (SR5#199)
+     * Check if vehicle wouldn't take any damage due to vehicle armor rules (SR5#205)
      * @param incomingDamage The incoming damage
      * @param attackerHits The attackers hits. Should be a positive number.
      * @param defenderHits The attackers hits. Should be a positive number.
@@ -98,7 +98,10 @@ export class CombatRules {
             return false;
         }
 
-        return CombatRules.isDamageLessThanArmor(incomingDamage, attackerHits, defenderHits, actor);
+        const modifiedAv = actor.getArmor(incomingDamage).rating.value;
+        const modifiedDv = CombatRules.modifyDamageAfterHit(actor, attackerHits, defenderHits, incomingDamage).value;
+
+        return modifiedDv < modifiedAv;
     }
 
     /**
@@ -110,29 +113,54 @@ export class CombatRules {
      */
     static isBlockedByHardenedArmor(incomingDamage: DamageType, attackerHits = 0, defenderHits = 0, actor: SR5Actor): boolean {
         const armor = actor.getArmor(incomingDamage);
+        const hardenedRating = armor.hardened?.value ?? 0;
 
-        if(!armor.hardened) {
+        if(hardenedRating <= 0) {
             return false;
         }
 
-        return CombatRules.isDamageLessThanArmor(incomingDamage, attackerHits, defenderHits, actor);
+        const modifiedDv = CombatRules.modifyDamageAfterHit(actor, attackerHits, defenderHits, incomingDamage).value;
+        return modifiedDv <= hardenedRating;
     }
 
     /**
-     * Check if incoming damage (modified by net hits) is less than the actor's armor (modified by AP).
-     * Used for vehicle armor, hardened armor, and physical -> stun damage logic
-     * @param incomingDamage The incoming damage
-     * @param attackerHits The attackers hits. Should be a positive number.
-     * @param defenderHits The attackers hits. Should be a positive number.
-     * @param actor The active defender
+     * Resolve all immunity tags matching incoming damage and return the highest matching immunity rating.
      */
-    static isDamageLessThanArmor(incomingDamage: DamageType, attackerHits: number, defenderHits: number, actor: SR5Actor): boolean {
-        const modifiedDamage = CombatRules.modifyDamageAfterHit(actor, attackerHits, defenderHits, incomingDamage);
+    static immunityRating(actor: SR5Actor, damage: DamageType): number {
+        const armor = actor.getArmor(damage);
+        const element = damage.element.value;
+        let highestImmunity = 0;
 
-        const modifiedAv = actor.getArmor(incomingDamage).rating.value;
-        const modifiedDv = modifiedDamage.value;
+        if (damage.normal_weapon && armor.immunities.normal_weapons.value) {
+            highestImmunity = Math.max(highestImmunity, armor.immunities.normal_weapons.value);
+        }
 
-        return modifiedDv < modifiedAv;
+        if (element && armor.immunities[element].value) {
+            highestImmunity = Math.max(highestImmunity, armor.immunities[element].value);
+        }
+
+        return highestImmunity;
+    }
+
+    /**
+     * Check if incoming damage is blocked by any matching immunity.
+     */
+    static isBlockedByImmunity(incomingDamage: DamageType, attackerHits: number, defenderHits: number, actor: SR5Actor): boolean {
+        const immunityRating = CombatRules.immunityRating(actor, incomingDamage);
+        if (immunityRating <= 0) return false;
+
+        const modifiedDv = CombatRules.modifyDamageAfterHit(actor, attackerHits, defenderHits, incomingDamage).value;
+        return modifiedDv <= immunityRating;
+    }
+
+    static hardenedAutoHits(actor: SR5Actor, damage: DamageType): number {
+        const hardenedRating = actor.getArmor(damage).hardened.value;
+        return hardenedRating > 0 ? Math.ceil(hardenedRating / 2) : 0;
+    }
+
+    static immunityAutoHits(actor: SR5Actor, damage: DamageType): number {
+        const rating = CombatRules.immunityRating(actor, damage);
+        return rating > 0 ? Math.ceil(rating / 2) : 0;
     }
 
     /**

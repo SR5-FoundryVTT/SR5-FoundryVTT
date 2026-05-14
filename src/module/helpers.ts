@@ -521,6 +521,7 @@ export class Helpers {
         ap = 0,
         element: DamageType['element']['value'] = '',
         biofeedback: BiofeedbackDamageType = '',
+        normalWeapon = false,
         sourceItem?: SR5Item
     ): DamageType {
         const damage = DataDefaults.createData('damage');
@@ -533,6 +534,7 @@ export class Helpers {
         damage.element.base = element;
         damage.element.value = element;
         damage.biofeedback = biofeedback;
+        damage.normal_weapon = normalWeapon;
 
         if (sourceItem?.actor) {
             damage.source = {

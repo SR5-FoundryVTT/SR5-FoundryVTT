@@ -387,23 +387,33 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             DataDefaults.createData('armor') :
             (foundry.utils.duplicate(this.system.armor) as ActorArmorType);
         // Prepare damage to apply to armor.
-        damage = damage || DataDefaults.createData('damage');
+        damage ??= DataDefaults.createData('damage');
 
         ModifiableValue.calcTotal(damage);
         ModifiableValue.calcTotal(damage.ap);
 
-        // Modify by penetration
-        if (damage.ap.value !== 0)
+        // Modify by penetration.
+        if (damage.ap.value !== 0) {
             ModifiableValue.addUnique(armor.rating, 'SR5.AP', damage.ap.value);
+            ModifiableValue.addUnique(armor.hardened, 'SR5.AP', damage.ap.value);
+
+            for (const immunity of Object.values(armor.immunities)) {
+                ModifiableValue.addUnique(immunity, 'SR5.AP', damage.ap.value);
+            }
+        }
 
         // Modify by element
-        if (damage.element.value !== '') {
-            const armorForDamageElement = armor[damage.element.value] || 0;
+        if (damage.element.value) {
+            const armorForDamageElement = armor.elements[damage.element.value].value;
             if (armorForDamageElement > 0)
-                ModifiableValue.addUnique(armor.rating, 'SR5.Element', armorForDamageElement);
+                ModifiableValue.addUnique(armor.rating, 'SR5.Element.Label', armorForDamageElement);
         }
-        
+
         ModifiableValue.calcTotal(armor.rating, {min: 0});
+        ModifiableValue.calcTotal(armor.hardened, {min: 0});
+        for (const immunity of Object.values(armor.immunities)) {
+            ModifiableValue.calcTotal(immunity, {min: 0});
+        }
 
         return armor;
     }

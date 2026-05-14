@@ -12,6 +12,7 @@ import { SR5Item } from 'src/module/item/SR5Item';
 import { AttributesType } from 'src/module/types/template/Attributes';
 import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
+import { ItemPrep } from './functions/ItemPrep';
 
 export class SpiritPrep {
     static prepareBaseData(system: Actor.SystemOfType<'spirit'>) {
@@ -29,6 +30,7 @@ export class SpiritPrep {
         LimitsPrep.prepareLimits(system);
         LimitsPrep.prepareDerivedLimits(system);
 
+        ItemPrep.prepareArmor(system, items);
         SpiritPrep.prepareSpiritArmor(system);
 
         GruntPrep.prepareConditionMonitors(system);
@@ -91,12 +93,13 @@ export class SpiritPrep {
     static prepareSpiritArmor(system: Actor.SystemOfType<'spirit'>) {
         const { armor, attributes } = system;
 
-        armor.rating.base = attributes.essence.value * 2;
+        ModifiableValue.addUnique(armor.immunities.normal_weapons, 'SR5.Armor', attributes.essence.value * 2);
+
         if (system.modifiers.armor)
             ModifiableValue.addUnique(armor.rating, game.i18n.localize('SR5.Bonus'), system.modifiers.armor);
 
         ModifiableValue.calcTotal(armor.rating);
-        // armor.hardened = true;
+        ModifiableValue.calcTotal(armor.immunities.normal_weapons);
     }
 
     /**

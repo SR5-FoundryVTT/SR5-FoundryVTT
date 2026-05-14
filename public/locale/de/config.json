@@ -499,9 +499,17 @@
                         "hint": "Verstärkte Panzerung",
                         "label": "Verstärkt"
                     },
+                    "immunities": {
+                        "hint": "Damage sources this armor grants Immunity against",
+                        "label": "Immunities"
+                    },
                     "mod": {
                         "hint": "Ist diese Panzerung nur Zubehör?",
                         "label": "Zubehör"
+                    },
+                    "pollutant": {
+                        "hint": "Extra Armor against attacks with Pollutant",
+                        "label": "Chemical Protection"
                     },
                     "radiation": {
                         "hint": "Extra Panzerung gegen Strahlenschaden",
@@ -510,10 +518,17 @@
                     "value": {
                         "hint": "Panzerungswert",
                         "label": "Panzerung"
+                    },
+                    "water": {
+                        "hint": "Extra Armor against attacks with Water",
+                        "label": "Water Protection"
                     }
                 }
             },
-            "label": "Panzerung"
+            "label": "Panzerung",
+            "Immunity": {
+                "NormalWeapons": "Normal Weapons"
+            }
         },
         "ArmorHardened": "Verstärkt",
         "ArmorHardenedFull": "Verstärkte Panzerung",
@@ -1053,12 +1068,16 @@
         "EditSkill": "Fertigkeit anpassen",
         "Effect": "Effekt",
         "Effects": "Effekte",
-        "Element": "Element",
-        "ElementAcid": "Säure",
-        "ElementCold": "Kälte",
-        "ElementElectricity": "Elektrizität",
-        "ElementFire": "Feuer",
-        "ElementRadiation": "Strahlung",
+        "Element": {
+            "Acid": "Säure",
+            "Cold": "Kälte",
+            "Electricity": "Elektrizität",
+            "Fire": "Feuer",
+            "Pollutant": "Pollutant",
+            "Radiation": "Strahlung",
+            "Water": "Water",
+            "Label": "Element"
+        },
         "Emerged": "Resonanz",
         "EnvModifiersApplication": {
             "ClearModifiers": "Entferne eigene Modifikatoren",
@@ -1319,6 +1338,10 @@
                                 "hint": "Element des Schadens. Leer für elementlos.",
                                 "label": "Element"
                             }
+                        },
+                        "normal_weapon": {
+                            "hint": "If this damage is considered a normal (non-magical) weapon attack",
+                            "label": "Normal Weapon"
                         },
                         "type": {
                             "base": {
@@ -2277,11 +2300,8 @@
                 "Interests": "Hobbywissen",
                 "Street": "Straßenwissen"
             },
-            "Groups": {
-            },
-            "Sets": {
-
-            },
+            "Groups": {},
+            "Sets": {},
             "Set": {
                 "LogActorDifferences": "Akteur-Unterschiede protokollieren",
                 "DifferencesLoggedInConsole": "Öffne deine Browser-Konsole, um die Unterschiede anzuzeigen"
@@ -2720,6 +2740,8 @@
         "Test": "Probe",
         "TestResults": {
             "AttackBlockedByHardenedArmor": "Angriff trifft, wird aber von verstärkter Panzerung abgewehrt",
+            "AttackBlockedByImmunity": "Attack Hits But Is Blocked By Immunity",
+            "AttackBlockedByNormalWeaponsImmunity": "Attack Hits But Is Blocked By Immunity To Normal Weapons",
             "AttackBlockedByVehicleArmor": "Angriff trifft, wird aber von Fahrzeugpanzerung abgewehrt",
             "AttackDodged": "Ausgewichen",
             "AttackDoesNoPhysicalDamageToVehicle": "Angriff trifft, verursacht aber keinen körperlichen Schaden am Fahrzeug",
@@ -2738,6 +2760,8 @@
             "RitualFailure": "Das Ritual war zu stark für dich",
             "RitualSuccess": "Das Ritual ist besiegelt",
             "SoakBlockedByHardenedArmor": "Durch verstärkte Rüstung abgewehrt",
+            "SoakBlockedByImmunity": "Blocked By Immunity",
+            "SoakBlockedByNormalWeaponsImmunity": "Blocked By Immunity To Normal Weapons",
             "SpiritSummonFailure": "Geist entkommen!",
             "SpiritSummonSuccess": "Geist beschworen!",
             "SpriteCompilationFailure": "Sprite entkommen!",
@@ -3267,7 +3291,9 @@
         "Wireless": "WiFi",
         "WirelessOffline": "Offline",
         "WirelessOnline": "Online",
-        "WirelessUnavailable": "Kabel"
+        "WirelessUnavailable": "Kabel",
+        "Immunity": "Immunity",
+        "ImmunityToNormalWeapons": "Immunity To Normal Weapons"
     },
     "TYPES": {
         "Actor": {

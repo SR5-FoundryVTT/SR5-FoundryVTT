@@ -164,7 +164,27 @@
         "AmmoGelRounds": "Munição de Gel",
         "Aoe": "AoE",
         "ApplyWounds": "Aplicar Ferimentos",
-        "Armor": "Armadura",
+        "Armor": {
+            "FIELDS": {
+                "armor": {
+                    "immunities": {
+                        "hint": "Damage sources this armor grants Immunity against",
+                        "label": "Immunities"
+                    },
+                    "pollutant": {
+                        "hint": "Extra Armor against attacks with Pollutant",
+                        "label": "Chemical Protection"
+                    },
+                    "water": {
+                        "hint": "Extra Armor against attacks with Water",
+                        "label": "Water Protection"
+                    }
+                }
+            },
+            "Immunity": {
+                "NormalWeapons": "Normal Weapons"
+            }
+        },
         "ArmorHardened": "Endurecido",
         "ArmorHardenedFull": "Armadura Endurecida",
         "ArmorValue": "Valor da Armadura",
@@ -436,12 +456,16 @@
         "EditSkill": "Editar Perícia",
         "Effect": "Efeito",
         "Effects": "Efeitos",
-        "Element": "Elemento",
-        "ElementAcid": "Ácido",
-        "ElementCold": "Frio",
-        "ElementElectricity": "Elétrico",
-        "ElementFire": "Fogo",
-        "ElementRadiation": "Radiação",
+        "Element": {
+            "Acid": "Ácido",
+            "Cold": "Frio",
+            "Electricity": "Elétrico",
+            "Fire": "Fogo",
+            "Pollutant": "Pollutant",
+            "Radiation": "Radiação",
+            "Water": "Water",
+            "Label": "Elemento"
+        },
         "Emerged": "Emergido",
         "EnvModifiersApplication": {
             "ClearModifiers": "Limpar modificadores pessoais",
@@ -606,7 +630,18 @@
         "IsFreshImport": "Este item foi importado do Chummer e precisa de revisão manual.",
         "IsGrunt": "Soldado",
         "IsNPC": "NPC",
-        "Item": "Item",
+        "Item": {
+            "FIELDS": {
+                "action": {
+                    "damage": {
+                        "normal_weapon": {
+                            "hint": "If this damage is considered a normal (non-magical) weapon attack",
+                            "label": "Normal Weapon"
+                        }
+                    }
+                }
+            }
+        },
         "ItemMod": "Modificação de Item",
         "ItemName": "Nome do Item",
         "ItemTypes": {
@@ -762,7 +797,7 @@
             "WarningTitle": "Alerta"
         },
         "Magic": "Magia",
-        "Manual":"Manual",
+        "Manual": "Manual",
         "ManualOverride": "Substituição de Resultado",
         "MarkImportedItemReviewed": "Marcar Item Importado Como Revisado",
         "MarkImportedItemTooltip": "Marca este item importado como tendo sido revisado.",
@@ -1272,6 +1307,8 @@
         "Test": "Teste",
         "TestResults": {
             "AttackBlockedByHardenedArmor": "Ataque Acerta Mas É Bloqueado Por Armadura Endurecida",
+            "AttackBlockedByImmunity": "Attack Hits But Is Blocked By Immunity",
+            "AttackBlockedByNormalWeaponsImmunity": "Attack Hits But Is Blocked By Immunity To Normal Weapons",
             "AttackBlockedByVehicleArmor": "Ataque Acerta Mas É Bloqueado Por Armadura de Veículo",
             "AttackDodged": "Ataque Esquivado",
             "AttackDoesNoPhysicalDamageToVehicle": "Ataque Acerta Mas Não Causa Dano Físico Ao Veículo",
@@ -1283,6 +1320,8 @@
             "RitualFailure": "O ritual foi forte demais para você",
             "RitualSuccess": "O ritual está selado",
             "SoakBlockedByHardenedArmor": "Bloqueado Por Armadura Endurecida",
+            "SoakBlockedByImmunity": "Blocked By Immunity",
+            "SoakBlockedByNormalWeaponsImmunity": "Blocked By Immunity To Normal Weapons",
             "SpiritSummonFailure": "Espírito fugiu!",
             "SpiritSummonSuccess": "Espírito invocado!",
             "SpriteCompilationFailure": "Sprite fugiu!",
@@ -1648,7 +1687,9 @@
             "Type": "Tipo",
             "Weapon": "Arma"
         },
-        "Wireless": "Conexão Sem Fio"
+        "Wireless": "Conexão Sem Fio",
+        "Immunity": "Immunity",
+        "ImmunityToNormalWeapons": "Immunity To Normal Weapons"
     },
     "TYPES": {
         "Actor": {

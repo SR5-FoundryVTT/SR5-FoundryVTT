@@ -31,22 +31,32 @@
                         </span>
                     </div>
                 </div>
-
-                {{!-- Iterate over damage types provided from config to display the fields --}}
-                {{#each config.elementTypes as |_ignored element_id|}}
+                {{!-- Iterate over armor element types from config to display armor-specific labels and hints --}}
+                {{#each config.armorElementTypes as |elementLabel element_id|}}
                     <div class="list-item">
                         <div class="list-item-start skinny">
-                            <label data-tooltip="{{objValue (objValue @root.systemFields.armor.fields element_id) 'hint'}}">
-                                {{objValue (objValue @root.systemFields.armor.fields element_id) 'label'}}
+                            <label data-tooltip="{{localize (objValue @root.config.armorElementHints element_id)}}">
+                                {{localize elementLabel}}
                             </label>
                         </div>
                         <div class="list-item-col">
-                            {{formInput (objValue @root.systemFields.armor.fields element_id)
-                                        value=(objValue @root.system.armor element_id)
+                            {{formInput (objValue @root.systemFields.armor.fields.elements.fields element_id)
+                                        value=(objValue @root.system.armor.elements element_id)
                                             classes="short" rootId=@root.rootId disabled=@root.isPlayMode }}
                         </div>
                     </div>
                 {{/each}}
+                <div class="list-item">
+                    <div class="list-item-start skinny">
+                        <label data-tooltip="{{systemFields.armor.fields.immunities.hint}}">
+                            {{systemFields.armor.fields.immunities.label}}
+                        </label>
+                    </div>
+                    <div class="list-item-col">
+                        {{formInput systemFields.armor.fields.immunities value=source.system.armor.immunities options=config.armorImmunityTypes
+                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    </div>
+                </div>
             {{/if}}
 
             {{#if (eq item.type 'ammo')}}
@@ -659,6 +669,18 @@
                                     {{formInput systemFields.action.fields.damage.fields.ap.fields.attribute
                                                 value=source.system.action.damage.ap.attribute
                                                 options=(config2Array attributes) localize=true
+                                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                                </div>
+                            </div>
+                            <div class="list-item">
+                                <div class="list-item-start skinny">
+                                    <label data-tooltip="{{systemFields.action.fields.damage.fields.normal_weapon.hint}}">
+                                        {{systemFields.action.fields.damage.fields.normal_weapon.label}}
+                                    </label>
+                                </div>
+                                <div class="list-item-col">
+                                    {{formInput systemFields.action.fields.damage.fields.normal_weapon
+                                                value=source.system.action.damage.normal_weapon
                                                 classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                                 </div>
                             </div>

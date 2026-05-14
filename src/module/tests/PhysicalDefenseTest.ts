@@ -156,15 +156,19 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
     // Order is important in this array to determine which label is shown, determined by the first test whose function returns a truthy value
     private readonly noDamageConditions: PhysicalDefenseNoDamageCondition[] = [
         {
-            test: () => this.actor !== undefined && CombatRules.doesNoPhysicalDamageToVehicle(this.data.incomingDamage, this.actor),
+            test: () => !!this.actor && CombatRules.doesNoPhysicalDamageToVehicle(this.data.incomingDamage, this.actor),
             label: "SR5.TestResults.AttackDoesNoPhysicalDamageToVehicle",
         },
         {
-            test: () => this.actor !== undefined && CombatRules.isBlockedByVehicleArmor(this.data.incomingDamage, this.against.hits.value, this.hits.value, this.actor),
+            test: () => !!this.actor && CombatRules.isBlockedByVehicleArmor(this.data.incomingDamage, this.against.hits.value, this.hits.value, this.actor),
             label: "SR5.TestResults.AttackBlockedByVehicleArmor",
         },
         {
-            test: () => this.actor !== undefined && CombatRules.isBlockedByHardenedArmor(this.data.incomingDamage, this.against.hits.value, this.hits.value, this.actor),
+            test: () => !!this.actor && CombatRules.isBlockedByImmunity(this.data.incomingDamage, this.against.hits.value, this.hits.value, this.actor),
+            label: "SR5.TestResults.AttackBlockedByImmunity",
+        },
+        {
+            test: () => !!this.actor && CombatRules.isBlockedByHardenedArmor(this.data.incomingDamage, this.against.hits.value, this.hits.value, this.actor),
             label: "SR5.TestResults.AttackBlockedByHardenedArmor",
         }
     ];

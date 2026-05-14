@@ -5,7 +5,6 @@ const { SchemaField, StringField } = foundry.data.fields;
 export const ActorArmorData = () => ({
     rating: new ModifiableField(ModifiableValueSchema()),
     hardened: new ModifiableField(ModifiableValueSchema()),
-    hardened_mystic: new ModifiableField(ModifiableValueSchema()),
     elements: new SchemaField({
         acid: new ModifiableField(ModifiableValueSchema()),
         cold: new ModifiableField(ModifiableValueSchema()),
