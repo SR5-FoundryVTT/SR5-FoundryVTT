@@ -86,7 +86,7 @@ export class FormDialog extends foundry.appv1.api.Dialog<FormDialogOptions> {
         if (!this.options.applyFormChangesOnSubmit) return;
 
         if ( !this.form ) throw new Error(`The FormApplication subclass has no registered form element`);
-        const fd = new FormDataExtended(this.form, {editors: {}});
+        const fd = new foundry.applications.ux.FormDataExtended(this.form, {editors: {}});
         const data = fd.object;
 
         this._updateData(data);
