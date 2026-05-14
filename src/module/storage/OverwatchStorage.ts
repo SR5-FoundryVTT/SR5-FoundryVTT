@@ -14,6 +14,7 @@ export const OverwatchStorage = {
      */
     async setOverwatchScore(actor: SR5Actor, score: number) {
         if (isNaN(score)) return;
+        if (!actor.uuid) return;
         const uuid = Helpers.uuidForStorage(actor.uuid);
         const ow = OverwatchStorage.getStorage();
         ow[uuid] = { score };
@@ -24,6 +25,7 @@ export const OverwatchStorage = {
      * Retrieve the overwatch score for a given actor.
      */
     getOverwatchScore(actor: SR5Actor): number {
+        if (!actor.uuid) return 0;
         const uuid = Helpers.uuidForStorage(actor.uuid);
         const ow = OverwatchStorage.getStorage();
         return ow[uuid]?.score ?? 0;
@@ -33,6 +35,7 @@ export const OverwatchStorage = {
      * Track an actor for overwatch score.
      */
     async trackActor(actor: SR5Actor) {
+        if (!actor.uuid) return;
         const uuid = Helpers.uuidForStorage(actor.uuid);
         const ow = OverwatchStorage.getStorage();
         ow[uuid] = { score: 0 };
@@ -43,6 +46,7 @@ export const OverwatchStorage = {
      * Untrack an actor for overwatch score.
      */
     async untrackActor(actor: SR5Actor) {
+        if (!actor.uuid) return;
         const uuid = Helpers.uuidForStorage(actor.uuid);
         const ow = OverwatchStorage.getStorage();
         delete ow[uuid];
@@ -75,6 +79,7 @@ export const OverwatchStorage = {
      * Determine if the given actor is tracked for overwatch score.
      */
     isTrackedActor(actor: SR5Actor) {
+        if (!actor.uuid) return false;
         const uuid = Helpers.uuidForStorage(actor.uuid);
         const ow = OverwatchStorage.getStorage();
         return ow[uuid] !== undefined;

@@ -2,15 +2,15 @@ import { SR5Actor } from "src/module/actor/SR5Actor";
 import { SR5Item } from "src/module/item/SR5Item";
 
 export class SR5TestFactory {
-    readonly actors: SR5Actor[] = [];
-    readonly items: SR5Item[] = [];
+    readonly actors: Actor.Stored[] = [];
+    readonly items: Item.Stored[] = [];
     readonly scenes: Scene[] = [];
 
     async createActor<T extends Actor.ConfiguredSubType>(
         data: Omit<Actor.CreateData, "name"> & { name?: string, type: T },
         context?: Actor.ConstructionContext
-    ): Promise<SR5Actor<T>> {
-        const actor = await SR5Actor.create({ name: `#QUENCH`, ...data }, context) as SR5Actor<T>;
+    ) {
+        const actor = await SR5Actor.create({ name: `#QUENCH`, ...data }, context) as Actor.Stored<T>;
         this.actors.push(actor);
         return actor;
     }
@@ -18,8 +18,8 @@ export class SR5TestFactory {
     async createItem<T extends Item.ConfiguredSubType>(
         data: Omit<Item.CreateData, "name"> & { name?: string, type: T },
         context?: Item.ConstructionContext
-    ): Promise<SR5Item<T>> {
-        const item = await SR5Item.create({ name: `#QUENCH`, ...data }, context) as SR5Item<T>;
+    ) {
+        const item = await SR5Item.create({ name: `#QUENCH`, ...data }, context) as Item.Stored<T>;
         this.items.push(item);
         return item;
     }

@@ -278,8 +278,9 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
 
     _prepareSelectedMatrixTargets(targets: MatrixTargetDocument[]) {
         for (const target of targets) {
+            const targetUuid = target.document.uuid;
             // Collect connected icons, if user wants to see them.
-            if (this._connectedIconsOpenClose[target.document.uuid]) {
+            if (targetUuid && this._connectedIconsOpenClose[targetUuid]) {
                 target.icons = MatrixTargetingFlow.getWirelessMatrixIconTargets(target.document as SR5Actor);
 
                 for (const icon of target.icons) {
@@ -528,7 +529,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             const persona = target.document instanceof SR5Item ? target.document.persona : undefined;
 
             // Handle persona icons.
-            if (target.document instanceof SR5Item && target.document.isMatrixDevice && persona) {
+            if (target.document instanceof SR5Item && target.document.isMatrixDevice && persona?.uuid) {
                 // Attach device icon to their persona.
                 // Already in target list...
                 const personaTarget = targets.find(t => t.document.uuid === persona.uuid);
@@ -540,7 +541,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
                         name: Helpers.getChatSpeakerName(persona),
                         token: persona.getToken(),
                         network: ActorMarksFlow.getDocumentNetwork(persona),
-                        document: persona,
+                        document: persona as Actor.Stored,
                         icons: [target],
                         type: MatrixNetworkFlow.getDocumentType(persona),
                         marks: 0,
@@ -555,7 +556,8 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
 
         // Add additional sub-icons based on user wanting to see them.
         for (const target of targets) {
-            if (this._connectedIconsOpenClose[target.document.uuid]) {
+            const targetUuid = target.document.uuid;
+            if (targetUuid && this._connectedIconsOpenClose[targetUuid]) {
                 const oldIcons = target.icons;
                 // An already marked icon will again show up when all icons are collected.
                 // So we can simply overwrite all icons here without any filtering.

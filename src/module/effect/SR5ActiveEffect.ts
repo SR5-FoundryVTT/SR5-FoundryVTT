@@ -349,13 +349,13 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     override async update(
-        data: ActiveEffect.UpdateData | undefined,
+        data: ActiveEffect.UpdateInput,
         operation?: ActiveEffect.Database.UpdateOperation,
     ) {
         if (this.parent instanceof SR5Item && this.parent._isNestedItem) {
             if (!data || !this.id) return this;
 
-            await this.parent.updateNestedEffects({ ...data, _id: this.id });
+            await this.parent.updateNestedEffects({ ...data, _id: this.id } as ActiveEffect.UpdateInput);
             await this.render();
             return this;
         }

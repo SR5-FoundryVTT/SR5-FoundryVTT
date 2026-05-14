@@ -1,507 +1,698 @@
-import { SR5Actor } from "../actor/SR5Actor";
-import { FLAGS, SR, SYSTEM_NAME } from "../constants";
-import { CombatRules } from "../rules/CombatRules";
 import { SocketMessage } from "../sockets";
+import { SR5Actor } from "../actor/SR5Actor";
+import { SR5Combatant } from "./SR5Combatant";
+import { Migrator } from "../migrator/Migrator";
+import { CombatRules } from "../rules/CombatRules";
+import { FLAGS, SR, SYSTEM_NAME } from "../constants";
+import { SR5Die } from "../rolls/SR5Die";
 import SocketMessageData = Shadowrun.SocketMessageData;
+import BaseCombat = foundry.documents.BaseCombat;
+
+type InitiativeSummaryRow = {
+    name: string;
+    initiative: number;
+    base: number;
+    dieResults: number[];
+    combatantImage: string | null;
+    modeClass: string;
+    modeIcon: string;
+    modeTitle: string;
+    totalTooltipHtml: string;
+    isBlitz: boolean;
+    tokenId: string | null;
+    documentUuid: string | null;
+    document: TokenDocument | SR5Actor | null;
+
+    // Dice So Nice animation support
+    roll: Roll;
+    combatant: SR5Combatant;
+};
 
 /**
- * Foundry combat implementation for Shadowrun5 rules.
+ * Foundry combat implementation for Shadowrun 5th Edition rules.
  *
  * TODO: Store what combatants already acted and with what initiative base and dice they did. This can be used to alter
- *       initiative score without fully rerolling and maintain proper turn order after an actor raised they ini while
- *       stepping over other actors that already had their action phase in the current initiative pass.
- *       @PDF SR5#160 'Changing Initiative'
+ * initiative score without fully rerolling and maintain proper turn order after an actor raised their ini while
+ * stepping over other actors that already had their action phase in the current initiative pass.
+ * @see SR5 Core Rulebook, p. 160 'Changing Initiative'
  */
-export class SR5Combat<SubType extends Combat.SubType = Combat.SubType> extends Combat<SubType> {
-    get initiativePass(): number {
-        return this.getFlag(SYSTEM_NAME, FLAGS.CombatInitiativePass) || SR.combat.INITIAL_INI_PASS;
-    }
+export class SR5Combat extends Combat<"base"> {
 
-    static async setInitiativePass(combat: SR5Combat, pass: number) {
-        await combat.unsetFlag(SYSTEM_NAME, FLAGS.CombatInitiativePass);
-        await combat.setFlag(SYSTEM_NAME, FLAGS.CombatInitiativePass, pass);
+    // =========================================================
+    // 1. STATIC CONFIGURATION & METHODS
+    // =========================================================
+
+    static readonly INITIATIVE_MODE_CONFIG = {
+        meatspace: { cls: 'mode-physical', icon: 'fa-solid fa-person-running', label: 'SR5.COMBAT.ModeMeatspace' },
+        astral:    { cls: 'mode-astral',   icon: 'fa-solid fa-star',           label: 'SR5.COMBAT.ModeAstral' },
+        matrix:    { cls: 'mode-matrix',   icon: 'fa-solid fa-laptop-code',    label: 'SR5.COMBAT.ModeMatrix' },
+        unknown:   { cls: 'mode-unknown',  icon: 'fa-solid fa-question',       label: 'SR5.COMBAT.ModeUnknown' }
+    } as const;
+
+    static override migrateData(source: any) {
+        Migrator.migrate("Combat", source);
+        return super.migrateData(source);
     }
 
     /**
-     * Use the given actors token to get the combatant.
-     * NOTE: The token must be used, instead of just the actor, as unlinked tokens will all use the same actor id.
+     * Add ContextMenu options to CombatTracker Entries -- adds the basic Initiative Subtractions.
      */
-    getActorCombatant(actor: SR5Actor) {
-        const token = actor.getToken();
-        if (!token) return null;
-        return this.getCombatantByToken(token.id!);
-    }
+    static addCombatTrackerContextOptions(html: HTMLElement, options: any[]) {
+        const mapping = [
+            { value: 1, keySuffix: "One", icon: '<i class="fas fa-caret-down"></i>' },
+            { value: 5, keySuffix: "Five", icon: '<i class="fas fa-angle-down"></i>' },
+            { value: 10, keySuffix: "Ten", icon: '<i class="fas fa-angle-double-down"></i>' },
+        ] as const satisfies { value: number; keySuffix: string; icon: string }[];
 
-    /**
-     * Add ContextMenu options to CombatTracker Entries -- adds the basic Initiative Subtractions
-     * @param html
-     * @param options
-     */
-    static addCombatTrackerContextOptions(html, options: any[]) {
-        options.push(
-            {
-                name: game.i18n.localize('SR5.COMBAT.ReduceInitByOne'),
-                icon: '<i class="fas fa-caret-down"></i>',
-                callback: async (li) => {
-                    const combatant = game.combat?.combatants.get(li.data('combatant-id'));
-                    if (combatant)
-                        await game.combat?.adjustInitiative(combatant, -1);
+        for (const { value, keySuffix, icon } of mapping) {
+            options.push({
+                icon,
+                name: game.i18n.localize(`SR5.COMBAT.ReduceInitBy${keySuffix}`),
+                callback: async (li: JQuery) => {
+                    const combatant = game.combat?.combatants.get(li.data("combatant-id") as string);
+                    await combatant?.adjustInitiative(-value);
                 },
-            },
-            {
-                name: game.i18n.localize('SR5.COMBAT.ReduceInitByFive'),
-                icon: '<i class="fas fa-angle-down"></i>',
-                callback: async (li) => {
-                    const combatant = game.combat?.combatants.get(li.data('combatant-id'));
-                    if (combatant)
-                        await game.combat?.adjustInitiative(combatant, -5);
-                },
-            },
-            {
-                name: game.i18n.localize('SR5.COMBAT.ReduceInitByTen'),
-                icon: '<i class="fas fa-angle-double-down"></i>',
-                callback: async (li) => {
-                    const combatant = game.combat?.combatants.get(li.data('combatant-id'));
-                    if (combatant)
-                        await game.combat?.adjustInitiative(combatant, -10);
-                },
-            },
-        );
+            });
+        }
+
         return options;
     }
 
     /**
-     * Helper method to adjust an actors combatants initiative.
-     * 
-     * @param actor The actor that should have their ini score adjusted.
-     * @param adjustment The delta to adjust the ini score with.
+     * Handles socket messages to trigger combat functions remotely.
      */
-    async adjustActorInitiative(actor: SR5Actor, adjustment: number) {
-        const combatant = this.getActorCombatant(actor);
-        if (!combatant) return;
+    static async _handleSocketMessage(message: SocketMessageData) {
+        const { id, fnName } = message.data ?? {};
+        if (typeof id !== 'string' || typeof fnName !== 'string') return;
 
-        await this.adjustInitiative(combatant, adjustment);
+        // Unlike Foundry's direct UI actions, SR5 forwards non-GM combat controls via socket and whitelists callable methods.
+        const allowedFunctions = new Set(['nextTurn', 'previousTurn', 'nextPass', 'previousPass', 'nextRound', 'previousRound']);
+        if (!allowedFunctions.has(fnName)) return;
+
+        const combat = game.combats.get(id);
+        const method = combat?.[fnName] as unknown;
+        if (typeof method !== 'function') return;
+
+        return await method.call(combat);
+    }
+
+    // =========================================================
+    // 2. GETTERS & PROPERTIES
+    // =========================================================
+
+    get pass(): number {
+        return this.system.pass;
+    }
+
+    // Don't alert next player, because it can change easily
+    override get nextCombatant(): undefined { return undefined; }
+
+
+    // =========================================================
+    // 3. LIFECYCLE & CORE OVERRIDES
+    // =========================================================
+
+    /**
+     * Clean up combat-related effects when the combat is deleted.
+     */
+    override async delete(operation?: BaseCombat.Database.DeleteOperation) {
+        // Remove all combat-related modifiers.
+        await Promise.all(this.combatants.map(async combatant => combatant.deleteFlow()));
+        return super.delete(operation);
     }
 
     /**
-     * Adjust a combatants initiative score in combat.
-     * 
-     * @param combatant Combatant to adjust
-     * @param adjustment The adjustment that's to be added onto the current ini score.
+     * Compares two combatants to determine their sort order in the initiative tracker.
      */
-    async adjustInitiative(combatant: string | any, adjustment: number) {
-        combatant = typeof combatant === 'string' ? this.combatants.find((c) => c.id === combatant) : combatant;
-        if (!combatant || typeof combatant === 'string') {
-            console.error('Could not find combatant with id ', combatant);
-            return;
-        }
-        await combatant.update({
-            initiative: Number(combatant.initiative) + adjustment,
-        });
-    }
+    protected override _sortCombatants(a: Combatant.Implementation, b: Combatant.Implementation): number {
+        // Foundry defaults to initiative+id ordering; SR5 adds pad/seize/ERIC tie-break flow semantics.
+        // Pad are made for pushing turns down the initiative order, so they always go first.
+        if (a.system.pad || b.system.pad)
+            return (b.system.pad ? 1 : 0) - (a.system.pad ? 1 : 0);
 
-    /**
-     * Handle the change of an initiative pass. This needs owner permissions on the combat document.
-     * @param combatId
-     */
-    static async handleIniPass(combatId: string) {
-        const combat = game.combats?.get(combatId);
-        if (!combat) return;
+        // First check for seize the initiative status
+        if (a.system.seize !== b.system.seize)
+            return (b.system.seize ? 1 : 0) - (a.system.seize ? 1 : 0);
 
-        const initiativePass = combat.initiativePass + 1;
-        // Start at the top!
-        const turn = 0;
+        // Primary comparison: Initiative score (higher acts first)
+        const initA = typeof a.initiative === 'number' ? a.initiative : -Infinity;
+        const initB = typeof b.initiative === 'number' ? b.initiative : -Infinity;
+        if (initA !== initB || !a.actor || !b.actor) return initB - initA;
 
-        // Collect all combatants ini changes for singular update.
-        const combatants: { _id: string | null, initiative: number }[] = [];
-        for (const combatant of combat.combatants) {
-            const initiative = CombatRules.reduceIniResultAfterPass(Number(combatant.initiative));
-
-            combatants.push({
-                _id: combatant.id,
-                initiative
-            });
-        }
-
-        await combat.update({
-            turn,
-            combatants,
-            [`flags.${SYSTEM_NAME}.${FLAGS.CombatInitiativePass}`]: initiativePass
-        });
-
-        await combat.handleActionPhase();
-    }
-
-    /**
-     * Handle the change of a initiative round. This needs owner permission on the combat document.
-     * @param combatId
-     */
-    static async handleNextRound(combatId: string) {
-        const combat = game.combats?.get(combatId);
-        if (!combat) return;
-        await combat.resetAll();
-        await SR5Combat.setInitiativePass(combat, SR.combat.INITIAL_INI_PASS);
-
-        if (game.settings.get(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat)) {
-            await combat.rollNPC();
-        } else {
-            await combat.rollAll();
-        }
-
-        const turn = 0;
-        await combat.update({ turn });
-        await combat.handleActionPhase();
-    }
-
-    /**
-     * New action phase might need changes on the actor that only the GM can reliable make.
-     */
-    async handleActionPhase() {
-        if (!game.user?.isGM)
-            await this._createNewActionPhaseSocketMessage();
-        else
-            await SR5Combat.handleActionPhase(this.id!);
-    }
-
-    /**
-     * When combat enters a new combat phase, apply necessary changes.
-     * 
-     * This action phase change can occur through phase/turn/round changes.
-     * 
-     * @param combatId Combat with the current combatant entering it's next action phase.
-     */
-    static async handleActionPhase(combatId: string) {
-        const combat = game.combats?.get(combatId);
-        if (!combat) return;
-
-        const combatant = combat.combatant;
-        if (!combatant) return;
-
-        // Defense modifiers reset on a new action phase.
-        await combatant.actor?.removeDefenseMultiModifier();
-
-        const turnsSinceLastAttackSetting = combatant.getFlag(SYSTEM_NAME, FLAGS.TurnsSinceLastAttack);
-        if (foundry.utils.getType(turnsSinceLastAttackSetting) !== 'number')
-            return combatant.actor?.clearProgressiveRecoil();
-
-        const turnsSinceLastAttack = Number(turnsSinceLastAttackSetting);
-        if (turnsSinceLastAttack > 0)
-            await combatant.actor?.clearProgressiveRecoil();
-        else
-            await combatant.setFlag(SYSTEM_NAME, FLAGS.TurnsSinceLastAttack, 1);
-    }
-
-    /**
-     * Make sure Shadowrun initiative order is applied.
-     */
-    override setupTurns(): any[] {
-        const turns = super.setupTurns();
-        return turns.sort(SR5Combat.sortByRERIC.bind(SR5Combat));
-    }
-
-    /**
-     * Sort combatants by Shadowrun5e attribute order of
-     *  - initiative score
-     *  - edge 
-     *  - reaction
-     *  - intuition
-     *  - coin toss
-     * 
-     * @param left A combatant in order
-     * @param right A combatant in order
-     * @returns A Array.sort result determining sort order: -1, 1, 0
-     */
-    static sortByRERIC(left: Combatant, right: Combatant): number {
-        // Sanitize missing actors by not re-ordering
-        if (!left.actor) return 0;
-        if (!right.actor) return 0;
-
-        // First sort by initiative value if different
-        const leftInit = Number(left.initiative);
-        const rightInit = Number(right.initiative);
-        if (isNaN(leftInit)) return 1;
-        if (isNaN(rightInit)) return -1;
-        if (leftInit > rightInit) return -1;
-        if (leftInit < rightInit) return 1;
-
-        // now we sort by ERIC
-        const genData = (actor: SR5Actor): number[] => {
-            // There are broken scenes out there, which will try setting up a combat without valid actors.
-            if (!actor) return [0, 0, 0, 0];
-            // edge, reaction, intuition, coin flip
-            return [
-                Number(actor.getEdge().value),
-                Number(actor.findAttribute('reaction')?.value),
-                Number(actor.findAttribute('intuition')?.value),
-                Math.floor(Math.random() * 2)
-            ];
+        // Tie-breaker comparisons: Edge, Reaction, Intuition (ERIC) (SR5 p. 159)
+        const getAttr = (actor: SR5Actor, attribute: string): number => {
+            return actor.findAttribute(attribute)?.value ?? 0;
         };
 
-        const leftData = genData(left.actor);
-        const rightData = genData(right.actor);
-        // if we find a difference that isn't 0, return it
-        for (let index = 0; index < leftData.length; index++) {
-            const diff = rightData[index] - leftData[index];
+        const attributesToCompare = ["edge", "reaction", "intuition"] as const;
+
+        for (const attr of attributesToCompare) {
+            const diff = getAttr(b.actor, attr) - getAttr(a.actor, attr);
             if (diff !== 0) return diff;
         }
 
-        return 0;
+        // Final tie-breaker: a random coin flip value set at the start of the round.
+        return a.system.coinFlip - b.system.coinFlip;
     }
 
     /**
-     * Return the position in the current ini pass of the next undefeated combatant.
+     * Shadowrun does not clear movement history on turn start.
      */
-    get nextUndefeatedTurnPosition(): number {
-        for (const [turnInPass, combatant] of this.turns.entries()) {
-            // Skipping is only interesting when moving forward.
-            if (this.turn !== null && turnInPass <= this.turn) continue;
-            if (!combatant.defeated && combatant.initiative && combatant.initiative > 0) {
-                return turnInPass;
+    protected override async _clearMovementHistoryOnStartTurn(
+        combatant: Combatant.Implementation,
+        context: Combat.TurnEventContext,
+    ) {}
+
+    override async clearMovementHistories(combatants: Parameters<Combat['clearMovementHistories']>[0]) {
+        await super.clearMovementHistories(combatants);
+
+        // Remove running/sprinting status effects from all combatants
+        // TokenDocument is not triggered to clear movement history on this path.
+        combatants ??= this.combatants;
+        if (game.settings.get(SYSTEM_NAME, FLAGS.TokenAutoRunning)) {
+            for (const combatant of combatants) {
+                // Concurrently remove running/sprinting status effects.
+                await Promise.all([
+                    combatant.actor?.toggleStatusEffect("sr5run", { active: false }),
+                    combatant.actor?.toggleStatusEffect("sr5sprint", { active: false }),
+                ]);
             }
         }
-        // The current turn is the last undefeated combatant. So go to the end and beyond.
-        return this.turns.length;
     }
 
-    /**
-     * Return the position in the current ini pass of the next combatant that has an action phase left.
-     */
-    get nextViableTurnPosition(): number {
-        // Start at the next position after the current one.
-        for (const [turnInPass, combatant] of this.turns.entries()) {
-            // Skipping is only interesting when moving forward.
-            if (this.turn !== null && turnInPass <= this.turn) continue;
-            if (combatant.initiative && combatant.initiative > 0) {
-                return turnInPass;
-            }
-        }
-        // The current turn is the last undefeated combatant. So go to the end and beyond.
-        return this.turns.length;
-    }
-
-    /**
-     * Determine whether the current combat situation (current turn order) needs and can have an initiative pass applied.
-     * @return true means that an initiative pass must be applied
-     */
-    doIniPass(nextTurn: number): boolean {
-        // We're currently only stepping from combatant to combatant.
-        if (nextTurn < this.turns.length) return false;
-        // Prepare another possible initiative order.
-        const currentScores = this.combatants.map(combatant => Number(combatant.initiative));
-
-        return CombatRules.iniOrderCanDoAnotherPass(currentScores);
-    }
-
-    /**
-     * After all combatants have had their action phase (click on next 'turn') handle shadowrun rules for
-     * initiative pass and combat turn.
-     *
-     * As long as a combatant still has a positive initiative score left, go to the next pass.
-     *  Raise the Foundry turn and don't raise the Foundry round.
-     * As soon as all combatants have no initiative score left, go to the next combat round.
-     *  Reset the Foundry pass and don't raise the Foundry turn.
-     *
-     * Retrigger Initiative Rolls on each new Foundry round.
-     */
-    override async nextTurn(): Promise<this> {
-        // Maybe advance to the next round/init pass
-        const nextRound = this.round;
-        const initiativePass = this.initiativePass;
-        // Get the next viable turn position.
-        const nextTurn = this.settings?.skipDefeated ?
-            this.nextUndefeatedTurnPosition :
-            this.nextViableTurnPosition;
-
-        // Start of the combat Handling
-        if (nextRound === 0 && initiativePass === 0) {
-            await this.startCombat();
-            return this;
-        }
-
-        // Just step from one combatant to the next!
-        if (nextTurn < this.turns.length) {
-            await this.update({ turn: nextTurn });
-            await this.handleActionPhase();
-            return this;
-        }
-
-        // Initiative Pass Handling. Owner permissions are needed to change the initiative pass.
-        if (!game.user?.isGM && this.doIniPass(nextTurn)) {
-            await this._createDoIniPassSocketMessage();
-            return this;
-        }
-
-        if (game.user?.isGM && this.doIniPass(nextTurn)) {
-            await SR5Combat.handleIniPass(this.id as string);
-            return this;
-        }
-
-
-        // Initiative Round Handling.
-        // NOTE: It's not checked if the next is needed. This should result in the user noticing the turn going up, when it
-        //       maybe shouldn't and reporting a unhandled combat phase flow case.
-        return this.nextRound();
-    }
+    // =========================================================
+    // 4. TURN & ROUND PROGRESSION FLOW
+    // =========================================================
 
     override async startCombat() {
-        // Roll initiative for all combatants.
-        // Disable Foundry behavior of keeping the 'current' combatants turn.
-        // Shadowrun 5 starts at the top of the ini order, this avoids an .update
-        if (game.settings.get(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat)) {
-            await this.rollNPC({ updateTurn: false });
-        } else {
-            await this.rollAll({ updateTurn: false });
+        await this.rollForActors({ updateTurn: false });
+        return super.startCombat();
+    }
+
+    override async nextRound() {
+        if (!game.user?.isGM) {
+            SocketMessage.emitForGM(FLAGS.DoCombatFunction, { id: this.id, fnName: 'nextRound' });
+            return this;
         }
 
-        // Start at top of the ini order.
-        const turn = 0;
-        const round = SR.combat.INITIAL_INI_ROUND;
-        const initiativePass = SR.combat.INITIAL_INI_PASS;
+        // Foundry nextRound mainly advances round/turn; SR5 also persists state, clears pass padding, and resets initiative pass.
+        await this.createHistorySnapshot();
 
+        const padCombatants = this.combatants
+            .filter(combatant => combatant.system.pad)
+            .map(combatant => combatant.id);
+
+        // If there are any pad combatants, remove them before starting the new round to clean up the initiative tracker.
+        if (padCombatants.length)
+            await this.deleteEmbeddedDocuments('Combatant', padCombatants);
+
+        const nextRound = this.round + 1;
+        const advanceTime = this.getTimeDelta(this.round, this.turn, nextRound, null);
+
+        // Update the document, passing data through a hook first
         const updateData = {
-            turn,
-            round,
-            [`flags.${SYSTEM_NAME}.${FLAGS.CombatInitiativePass}`]: initiativePass
+            turn: null,
+            round: nextRound,
+            system: { pass: SR.combat.FIRST_PASS },
+            combatants: this.combatants.map((c) => c.roundUpdateData()),
+        } as Combat.UpdateData;
+        const updateOptions = {direction: 1, worldTime: { delta: advanceTime }} as Combat.Database.UpdateOperation;
+
+        // @ts-expect-error
+        Hooks.callAll("combatRound", this, updateData, updateOptions);
+        await this.update(updateData, updateOptions);
+
+        if (this.combatants.size) {
+            await this.resetAll();
+            await this.rollForActors({ updateTurn: false });
         }
-        await this.update(updateData);
-
-        // Implement super.startCombat behavior.
-        this._playCombatSound("startEncounter");
-        Hooks.callAll("combatStart", this, updateData);
-
-        // After starting combat immediately go to the first action phase.
-        await this.handleActionPhase();
 
         return this;
     }
 
-    override _playCombatSound(name: "startEncounter" | "nextUp" | "yourTurn") {
-        super._playCombatSound(name)
-    }
-
-    override async nextRound(): Promise<any> {
-        // Let Foundry handle time and some other things.
-        await super.nextRound();
-
-        // Owner permissions are needed to change the shadowrun initiative round.
+    async nextPass(): Promise<this> {
         if (!game.user?.isGM) {
-            await this._createDoNextRoundSocketMessage();
-        } else {
-            await SR5Combat.handleNextRound(this.id as string);
+            SocketMessage.emitForGM(FLAGS.DoCombatFunction, { id: this.id, fnName: 'nextPass' });
+            return this;
+        }
+
+        // Foundry has no initiative pass concept; SR5 creates a pass transition and reduces initiatives for all combatants.
+        // Determine if any combatant has enough initiative for another pass
+        const nextTurn = this.turns.findIndex((c) => {
+            if (this.settings.skipDefeated && c.isDefeated) return false;
+            return c.initiative != null && CombatRules.initAfterPass(c.initiative) > 0;
+        });
+
+        // End of initiative pass
+        if (nextTurn === -1)
+            return this.nextRound();
+        
+        const updateData = {
+            system: {
+                history: this._nextHistory(),
+                pass: this.pass + 1,
+            }
+        } as Combat.UpdateData;
+
+        // Add padding combatants for the new pass.
+        // These will be sorted to the end of the initiative order and can be used to track pass
+        // changes in the UI and prevent issues with combatants being added mid-pass.
+        const padData = this.turns.filter(c => !c.system.pad).map(() => ({ system: { pad: true } }));
+        await this.createEmbeddedDocuments("Combatant", padData);
+
+        updateData.combatants = this.combatants.map((c) => c.initPassUpdateData());
+        await this.update(updateData);
+        return this.nextTurn(true);
+    }
+
+    /**
+     * After all combatants have had their action phase, handle Shadowrun rules for
+     * initiative passes and combat turns.
+     * @param passedPass If true, the next combatant will be selected without marking the current one as having acted.
+     * Used when moving to the next initiative pass, since combatants get a new turn without necessarily having acted in the previous pass.
+     */
+    override async nextTurn(passedPass?: boolean): Promise<this> {
+        if (!game.user?.isGM) {
+            SocketMessage.emitForGM(FLAGS.DoCombatFunction, { id: this.id, fnName: 'nextTurn' });
+            return this;
+        }
+
+        const nextTurn = this.turns.findIndex(combatant => {
+            if (this.settings.skipDefeated && combatant.isDefeated) return false;
+            if (!passedPass && combatant.id === this.combatant?.id) return false;
+            return combatant.canAct() && !combatant.acted();
+        });
+
+        // End of Pass
+        if (nextTurn === -1)
+            return this.nextPass();
+
+        const updateData = { round: this.round, turn: nextTurn } as Combat.UpdateData;
+        const advanceTime = this.getTimeDelta(this.round, this.turn, this.round, nextTurn);
+        const updateOptions = { direction: 1, worldTime: { delta: advanceTime }} as Combat.Database.UpdateOperation;
+
+        // Foundry advances turns without snapshotting per move; SR5 snapshots on regular turn progression for rewind support.
+        if (!passedPass) {
+            updateData.system = { history: this._nextHistory() };
+
+            if (this.combatant)
+                updateData.combatants = [{ _id: this.combatant.id!, system: { acted: true } }];
+        }
+
+        // @ts-expect-error
+        Hooks.callAll("combatTurn", this, updateData, updateOptions);
+        await this.update(updateData, updateOptions);
+
+        // Handle start of turn updates for the new combatant
+        if (this.combatant)
+            await this.combatant.turnUpdate(this.pass);
+
+        return this;
+    }
+
+    override async previousRound(): Promise<this> {
+        if (!game.user?.isGM) {
+            SocketMessage.emitForGM(FLAGS.DoCombatFunction, { id: this.id, fnName: 'previousRound' });
+            return this;
+        }
+
+        // Foundry rewinds round numerically; SR5 restores the prior round snapshot to keep pass and per-combatant state consistent.
+        const history = [...(this.system.history ?? [])];
+        let snapshot = history.pop();
+
+        while (snapshot?.round === this.round) {
+            snapshot = history.pop();
+        }
+
+        if (!snapshot) {
+            ui.notifications?.warn(game.i18n.localize('SR5.COMBAT.NoHistoryAvailable'));
+            return this;
+        }
+
+        return this._restoreSnapshot(snapshot, history);
+    }
+    
+    async previousPass(): Promise<this> {
+        if (!game.user?.isGM) {
+            SocketMessage.emitForGM(FLAGS.DoCombatFunction, { id: this.id, fnName: 'previousPass' });
+            return this;
+        }
+
+        // Foundry has no initiative pass rewind; SR5 rewinds to the latest snapshot of a strictly earlier pass.
+        const history = [...(this.system.history ?? [])];
+        let snapshot = history.pop();
+        while (snapshot?.round === this.round && snapshot.pass === this.pass) {
+            snapshot = history.pop();
+        }
+
+        if (!snapshot) {
+            ui.notifications?.warn(game.i18n.localize('SR5.COMBAT.NoHistoryAvailable'));
+            return this;
+        }
+
+        return this._restoreSnapshot(snapshot, history);
+    }
+
+    /**
+     * Move to the previous turn in the combat.
+     */
+    override async previousTurn(): Promise<this> {
+        if (!game.user?.isGM) {
+            SocketMessage.emitForGM(FLAGS.DoCombatFunction, { id: this.id, fnName: 'previousTurn' });
+            return this;
+        }
+
+        // Foundry's previous turn logic rewinds index/round state; SR5 restores a full snapshot to include pass, acted, and pad state.
+        const history = [...(this.system.history ?? [])];
+        const snapshot = history.pop();
+        if (!snapshot) {
+            ui.notifications?.warn(game.i18n.localize('SR5.COMBAT.NoHistoryAvailable'));
+            return this;
+        }
+
+        return this._restoreSnapshot(snapshot, history);
+    }
+
+
+    // =========================================================
+    // 5. INITIATIVE & COMBATANT MANAGEMENT
+    // =========================================================
+
+    override async rollInitiative(
+        ids: string | string[],
+        options: Combat.InitiativeOptions & { hasBlitz?: boolean } = {},
+    ) {
+        const { formula = null, updateTurn = true, hasBlitz = false, messageOptions = {} } = options;
+
+        const combatantIds = Array.isArray(ids) ? ids : [ids];
+        const updates: Combatant.UpdateData[] = [];
+        const messageGroups = {
+            [CONST.DICE_ROLL_MODES.PUBLIC]: [] as InitiativeSummaryRow[],
+            [CONST.DICE_ROLL_MODES.PRIVATE]: [] as InitiativeSummaryRow[],
+        } satisfies Partial<Record<foundry.dice.Roll.Mode, InitiativeSummaryRow[]>>;
+
+        for (const id of combatantIds) {
+            const combatant = this.combatants.get(id) as SR5Combatant | undefined;
+            if (!combatant || !combatant.isOwner || combatant.system.pad) continue;
+
+            const roll = combatant.getInitiativeRoll(formula ?? undefined);
+            await roll.evaluate();
+
+            const initiative = roll.total ?? 0;
+            const blitz = combatant.actor?.system.initiative.blitz ?? hasBlitz;
+            const lastInitiative = foundry.utils.deepClone(combatant.actor?.system.initiative.current);
+
+            updates.push({ _id: id, initiative, system: { initiative: { blitz, last: lastInitiative } } });
+
+            const rollMode = CONST.DICE_ROLL_MODES[combatant.hidden ? 'PRIVATE' : 'PUBLIC'];
+            messageGroups[rollMode].push(this._buildInitiativeRow(combatant, initiative, roll));
+        }
+
+        if (!updates.length) return this;
+
+        const updateOptions = { turnEvents: false } as Combatant.Database.UpdateOperation;
+        if (!updateTurn && this.turn !== null) updateOptions.combatTurn = this.turn;
+        await this.updateEmbeddedDocuments('Combatant', updates, updateOptions);
+
+        await this._createInitiativeMessages(messageGroups, messageOptions);
+
+        // SR5-specific blitz cleanup: consume and reset blitz flag after Foundry resolves initiative rolls.
+        for (const id of combatantIds) {
+            const actor = this.combatants.get(id)?.actor;
+            if (actor?.system.initiative.blitz) {
+                const edge = actor.system.attributes.edge;
+                await actor.update({
+                    system: {
+                        initiative: { blitz: false },
+                        attributes: { edge: { uses: Math.min(edge.uses + 1, edge.value) } }
+                    }
+                });
+            }
+        }
+
+        return this;
+    }
+
+    /**
+     * Rolls initiative for actors based on system settings.
+     */
+    private async rollForActors(options?: Combat.InitiativeOptions) {
+        const rollForAll = !game.settings.get(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat);
+        return rollForAll ? this.rollAll(options) : this.rollNPC(options);
+    }
+
+    /**
+     * Helper method to adjust an actor's combatant's initiative.
+     * @param actor      The actor that should have their initiative score adjusted.
+     * @param adjustment The delta to adjust the initiative score with.
+     */
+    async adjustActorInitiative(actor: SR5Actor, adjustment: number) {
+        for (const combatant of this.getCombatantsByActor(actor))
+            await combatant.adjustInitiative(adjustment);
+    }
+
+    /**
+     * Helper method to get a combatant for a specific actor.
+     * If multiple combatants exist, tries to resolve by controlled tokens.
+     */
+    getActorCombatant(actor: SR5Actor): SR5Combatant | null {
+        const combatants = this.getCombatantsByActor(actor);
+
+        // If only one combatant, return it directly
+        if (combatants.length === 1) {
+            return combatants[0];
+        }
+
+        // If multiple combatants, try to resolve by controlled tokens
+        if (combatants.length > 1) {
+            const activeTokens = actor.getActiveTokens();
+            const matchingCombatants = (canvas.tokens?.controlled ?? [])
+                .filter(token => activeTokens.includes(token))
+                .map(token => token.combatant)
+                .filter(c => c?.combat?.id === this.id);
+
+            if (matchingCombatants.length === 1)
+                return matchingCombatants[0];
+
+            ui.notifications.warn(
+                `SR5 | Actor '${actor.name}' has multiple combatants in Combat '${this.id}'. Please select one token.`
+            );
+            throw new Error('Multiple combatants found for actor.');
+        }
+
+        // No combatant found
+        return null;
+    }
+
+
+    // =========================================================
+    // 6. HISTORY & STATE SNAPSHOTS
+    // =========================================================
+
+    /**
+     * Forces the creation of a history snapshot without advancing the turn.
+     */
+    async createHistorySnapshot() {
+        return this.update({ system: { history: this._nextHistory() } });
+    }
+
+    /**
+     * Generates a snapshot of the current combat state to be stored in the history array.
+     * @returns {SR5Combat['system']['history']}
+     * @private
+     */
+    private _nextHistory(): SR5Combat['system']['history'] {
+        const history = [...(this.system.history ?? [])];
+        history.push({
+            turn: this.turn,
+            pass: this.pass,
+            round: this.round,
+            combatants: this.combatants.map((combatant) => ({
+                _id: combatant.id,
+                initiative: combatant.initiative ?? null,
+                system: structuredClone(combatant.system),
+            }))
+        });
+        return history.slice(-SR.combat.MAX_HISTORY_SIZE);
+    }
+
+    /**
+     * Restores the combat document to the state defined in the provided snapshot.
+     * @param snapshot - The historical state to restore.
+     * @param history - The remaining history array to persist.
+     * @private
+     */
+    private async _restoreSnapshot(
+        snapshot: SR5Combat['system']['history'][number],
+        history: SR5Combat['system']['history']
+    ): Promise<this> {
+        // Check if the current combat has more pads than the snapshot had
+        const currentPads = this.combatants.filter(c => c.system.pad).map(c => c.id);
+        const snapshotPads = snapshot.combatants.filter(c => c.system.pad).map(c => c._id);
+
+        // Find pads that exist now but didn't exist in the snapshot, and delete them
+        const padsToDelete = currentPads.filter(id => !snapshotPads.includes(id));
+        if (padsToDelete.length > 0)
+            await this.deleteEmbeddedDocuments("Combatant", padsToDelete);
+
+        const advanceTime = this.getTimeDelta(this.round, this.turn, snapshot.round, snapshot.turn);
+
+        // Now restore the state safely
+        await this.update(
+            {
+                turn: snapshot.turn,
+                round: snapshot.round,
+                combatants: snapshot.combatants,
+                system: { pass: snapshot.pass, history }
+            },
+            { diff: false, direction: -1, worldTime: { delta: advanceTime } }
+        );
+
+        return this;
+    }
+
+
+    // =========================================================
+    // 7. UI & PRESENTATION HELPERS
+    // =========================================================
+
+    /**
+     * Renders and posts grouped initiative summary chat messages to the Foundry chat log.
+     * Groups are separated by roll mode (e.g., Public vs. Private) to ensure hidden NPCs 
+     * are not revealed to players. Ensures the dice rolling sound is only triggered once.
+     * @param messageGroups - A record mapping Foundry roll modes to arrays of initiative row data.
+     * @param messageOptions - Base configuration options for the created ChatMessage documents.
+     */
+    private async _createInitiativeMessages(
+        messageGroups: Partial<Record<foundry.dice.Roll.Mode, InitiativeSummaryRow[]>>,
+        messageOptions: ChatMessage.CreateData,
+    ) {
+        let hasPlayedSound = false;
+
+        for (const [rollMode, rows] of Object.entries(messageGroups)) {
+            if (!rows?.length) continue;
+
+            const content = await foundry.applications.handlebars.renderTemplate(
+                'systems/shadowrun5e/dist/templates/chat/initiative-summary-message.hbs',
+                { rows }
+            );
+
+            const messageData = foundry.utils.mergeObject(
+                {
+                    user: game.user.id,
+                    speaker: foundry.documents.ChatMessage.implementation.getSpeaker({
+                        alias: game.i18n.localize('SR5.Initiative'),
+                    }),
+                    content,
+                    flags: { core: { initiativeRoll: true } },
+                    sound: hasPlayedSound ? null : CONFIG.sounds.dice,
+                },
+                messageOptions,
+            );
+
+            ChatMessage.applyRollMode(messageData, rollMode);
+            const message = await foundry.documents.ChatMessage.implementation.create(messageData);
+
+            if (message)
+                for (const { combatant, roll } of rows)
+                    void combatant.playDSNInitiativeAnimation(roll, rollMode, message);
+
+            hasPlayedSound = true;
         }
     }
 
     /**
-     * This handler handles FoundryVTT hook preUpdateCombatant
-     *
-     * @param combatant The Combatant to update
-     * @param changed The changedData (tends to a diff)
-     * @param options
-     * @param id
+     * Constructs the data payload required to render a single combatant's row 
+     * inside the initiative summary chat message. Normalizes actor references, 
+     * extracts die results, and resolves UI presentation settings (icons, tooltips).
+     * @param combatant - The SR5Combatant instance rolling initiative.
+     * @param initiative - The final calculated initiative total.
+     * @param roll - The evaluated Foundry Roll object.
+     * @returns The formatted InitiativeSummaryRow object used by the Handlebars template.
      */
-    static onPreUpdateCombatant(combatant: Combatant, changed, options, id) {
-        console.log('Shadowrun5e | Handle preUpdateCombatant to apply system rules', combatant, changed);
+    private _buildInitiativeRow(
+        combatant: SR5Combatant,
+        initiative: number,
+        roll: Roll,
+    ): InitiativeSummaryRow {
+        const { actor, token, name } = combatant;
+        const initiativeData = actor?.system?.initiative;
 
-        // Disallow invalid ini scores to be applied by any source.
-        if (changed.initiative) changed.initiative = CombatRules.getValidInitiativeScore(changed.initiative);
+        const base = Number(initiativeData?.current?.base?.value ?? 0);
+
+        // Fallback to 'unknown' if mode is undefined or an invalid string at runtime
+        const mode = initiativeData?.perception;
+        const safeMode = (mode && SR5Combat.INITIATIVE_MODE_CONFIG[mode]) ? mode : 'unknown';
+        const config = SR5Combat.INITIATIVE_MODE_CONFIG[safeMode];
+        const dieResults = this._extractRollResults(roll);
+
+        return {
+            // Identity & References
+            combatant,
+            document: token ?? actor,
+            tokenId: token?.id ?? null,
+            documentUuid: actor?.uuid ?? token?.uuid ?? null,
+            name: name ?? game.i18n.localize('COMBAT.UnknownCombatant'),
+            combatantImage: token?.texture?.src ?? actor?.img ?? null,
+
+            // Core Values
+            base,
+            initiative,
+            dieResults,
+            roll,
+
+            // UI & Presentation
+            modeClass: config.cls,
+            modeIcon: config.icon,
+            modeTitle: game.i18n.format('SR5.COMBAT.ModeTitle', { 
+                mode: game.i18n.localize(config.label)
+            }),
+            totalTooltipHtml: this._buildInitiativeTooltipHtml(token?.actor ?? actor, roll, base),
+
+            // Flags
+            isBlitz: Boolean(initiativeData?.blitz),
+        };
+    }
+
+    private _extractRollResults(roll: Roll): number[] {
+        return roll.dice.flatMap(d => d.results.filter(r => r.active).map(r => r.result));
     }
 
     /**
-     * Alter initiative formula to include initiative pass reduction.
-     *
-     * NOTE: Should this here fail or be buggy, there always is SR5Combat.updateNewCombatants which can be uncommented in SR5Combat.rollInitiative
-     * @deprecated since Foundry 0.8. Kept for possible Foundry 0.7 support. Might just be not needed anymore during 0.8 lifecycle.
-     * @param combatant
+     * Generates the detailed HTML string for the initiative roll's hover tooltip.
+     * Displays individual die results alongside a breakdown of modifiers, 
+     * such as base initiative, wound penalties, and cumulative pass penalties.
+     * @param actor - The SR5Actor rolling initiative (used to check for wound penalties).
+     * @param roll - The evaluated Foundry Roll object containing the dice results.
+     * @param base - The combatant's base initiative score.
+     * @returns A formatted HTML string representing the tooltip.
      */
-    _getInitiativeFormula(combatant: Combatant) {
-        if (this.initiativePass === SR.combat.INITIAL_INI_PASS) { // @ts-expect-error
-            return super._getInitiativeFormula(combatant);
+    private _buildInitiativeTooltipHtml(actor: SR5Actor | null, roll: Roll, base: number): string {
+        const wounds = actor?.system.wounds?.value;
+        const penalty = Math.abs((this.pass - SR.combat.FIRST_PASS) * SR.combat.PASS_PENALTY);
+
+        const dieItems = roll.dice.flatMap(d => d.results.filter(r => r.active).map(r => {
+            const cssClasses = SR5Die.getResultCSS(r).filter(Boolean).join(' ');
+            return `<li class="roll ${cssClasses}">${r.result}</li>`;
+        }));
+
+        if (!dieItems.length) {
+            dieItems.push('<li class="roll">-</li>');
         }
 
-        // Reduce for initiative passes until zero.
-        return SR5Combat._getSystemInitiativeFormula(this.initiativePass);
+        const modifiers = [`+ ${base}`];
+        if (wounds) modifiers.push(`- ${wounds}[Wounds]`);
+        if (penalty) modifiers.push(`- ${penalty}[Pass]`);
+
+        return `
+            <div class="dice-tooltip initiative-total-tooltip">
+                <span class="initiative-tooltip-paren">(</span>
+                <ol class="dice-rolls">
+                    ${dieItems.join('')}
+                </ol>
+                <span class="initiative-tooltip-paren">)</span>
+                <span class="initiative-tooltip-base">${modifiers.join(' ')}</span>
+            </div>
+        `;
     }
-
-    override async _onStartRound(context: Combat.RoundEventContext) {
-        // clear movement histories when a new round starts
-        return this.clearMovementHistories(this.combatants);
-    }
-
-    override async _clearMovementHistoryOnStartTurn(combatant: Combatant, context: Combat.TurnEventContext) {
-        // do not clear movement history on turn start
-        // movement history persists through the initiative passes of a single combat round
-    }
-
-    static _getSystemInitiativeBaseFormula() {
-        return String(CONFIG.Combat.initiative.formula || game.system.initiative);
-    }
-
-    static _getSystemInitiativeFormula(initiativePass: number): string {
-        initiativePass = initiativePass > 1 ? initiativePass : 1;
-        const baseFormula = SR5Combat._getSystemInitiativeBaseFormula();
-        const ongoingIniPassModified = (initiativePass - 1) * -SR.combat.INI_RESULT_MOD_AFTER_INI_PASS;
-        return `max(${baseFormula} - ${ongoingIniPassModified}[Pass], 0)`;
-    }
-
-    static async _handleDoNextRoundSocketMessage(message: SocketMessageData) {
-        if (!Object.hasOwn(message.data, 'id') && typeof message.data.id !== 'string') {
-            console.error(`SR5Combat Socket Message ${FLAGS.DoNextRound} data.id must be a string (combat id) but is ${typeof message.data} (${message.data})!`);
-            return;
-        }
-
-        return SR5Combat.handleNextRound(message.data.id);
-    }
-
-    static async _handleDoInitPassSocketMessage(message: SocketMessageData) {
-        if (!Object.hasOwn(message.data, 'id') && typeof message.data.id !== 'string') {
-            console.error(`SR5Combat Socket Message ${FLAGS.DoInitPass} data.id must be a string (combat id) but is ${typeof message.data} (${message.data})!`);
-            return;
-        }
-
-        return SR5Combat.handleIniPass(message.data.id);
-    }
-
-    /**
-     * Apply changes on the given combat for new action phase
-     * @param message 
-     */
-    static async _handleDoNewActionPhaseSocketMessage(message: SocketMessageData) {
-        if (!Object.hasOwn(message.data, 'id') && typeof message.data.id !== 'string') {
-            console.error(`SR5Combat Socket Message ${FLAGS.DoNewActionPhase} data.id must be a string (combat id) but is ${typeof message.data} (${message.data})!`);
-            return;
-        }
-
-        return SR5Combat.handleActionPhase(message.data.id);
-    }
-
-    async _createDoNextRoundSocketMessage() {
-        await SocketMessage.emitForGM(FLAGS.DoNextRound, { id: this.id });
-    }
-
-    async _createDoIniPassSocketMessage() {
-        await SocketMessage.emitForGM(FLAGS.DoInitPass, { id: this.id });
-    }
-
-    async _createNewActionPhaseSocketMessage() {
-        await SocketMessage.emitForGM(FLAGS.DoNewActionPhase, { id: this.id });
-    }
-
-    override async delete(...args): Promise<this | undefined> {
-        // Remove all combat related modifiers.
-        for (const combatant of this.combatants)
-            await combatant.actor?.removeDefenseMultiModifier();
-        return super.delete(...args);
-    }
-}
-
-/**
- * Since Foundry 0.8 Combat._getInitiativeFormula has been moved to Combatant._getInitiativeFormula.
- *
- *  This method enhances Combatant#_getInitiativeFormula. Check hooks.ts#init for when it comes into play.
- *
- *  During initiative roll modify the initiative result depending on the current combats initiative pass.
- */
-export function _combatantGetInitiativeFormula(this: any) {
-    const combat = this.parent;
-    return SR5Combat._getSystemInitiativeFormula(combat.initiativePass);
 }

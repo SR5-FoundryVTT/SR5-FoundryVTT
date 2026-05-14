@@ -24,7 +24,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
      * @param priority The priority for the change (default: mode * 10).
      * @returns The change object.
      */
-    const createTestChange = (effect: ActiveEffect, id: number): ModifiableValueType['changes'][number] => {
+    const createTestChange = (effect: SR5ActiveEffect, id: number): ModifiableValueType['changes'][number] => {
         const change = effect.changes[id];
         return {
             name: effect.name,

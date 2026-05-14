@@ -74,12 +74,14 @@ export const MatrixTargetingFlow = {
     prepareOwnIcons(actor: SR5Actor): MatrixTargetDocument[] {
         const targets: MatrixTargetDocument[] = [];
 
+        if (!actor.uuid) return [];
+
         // gather all actors and find the actors that we have ownership of (shadowrun character ownership, not Foundry Player ownership)
-        const actors: SR5Actor[] =  game.actors.filter((a) => {
+        const actors = game.actors.filter((a) => {
             // we don't want to include our own persona in this list
             if (a === actor) return false;
             return a instanceof SR5Actor && ActorOwnershipFlow._isOwnerOfActor(actor, a) && !a.getToken();
-        }) as SR5Actor[];
+        });
 
         for (const slave of actors) {
             const type = MatrixNetworkFlow.getDocumentType(slave);
@@ -97,14 +99,14 @@ export const MatrixTargetingFlow = {
         if (canvas.scene?.tokens) {
             // go through the canvas tokens and see if we own any of them
             for (const token of canvas.scene.tokens) {
-                if (!token.actor) continue;
+                if (!token.actor?.uuid) continue;
                 // again don't add ourselves, we do that later
                 if (token.actor.uuid === actor.uuid) continue;
                 if (token.actor instanceof SR5Actor && ActorOwnershipFlow._isOwnerOfActor(actor, token.actor)) {
                     const type = MatrixNetworkFlow.getDocumentType(token.actor);
                     targets.push({
                         name: token.name,
-                        document: token.actor,
+                        document: token.actor as Actor.Stored,
                         token,
                         runningSilent: token.actor.isRunningSilent(),
                         network: this._getNetworkName(token.actor.network),
@@ -118,14 +120,13 @@ export const MatrixTargetingFlow = {
         const type = MatrixNetworkFlow.getDocumentType(actor);
         targets.unshift({
             name: actor.getToken()?.name ?? actor.name,
-            document: actor,
+            document: actor as Actor.Stored,
             token: actor.getToken(),
             runningSilent: actor.isRunningSilent(),
             network: this._getNetworkName(actor.network),
             type,
             icons: []
-
-        })
+        });
 
         return targets;
     },
@@ -163,7 +164,7 @@ export const MatrixTargetingFlow = {
             // Collect all scene tokens.
             for (const token of canvas.scene.tokens) {
                 // Throw away unneeded tokens.
-                if (!token.actor) continue;
+                if (!token.actor?.uuid) continue;
                 const target = token.actor;
                 /// Remove the actor itself from the list of targets.
                 if (target.uuid === actor.uuid) continue;
@@ -181,7 +182,7 @@ export const MatrixTargetingFlow = {
                 const type = MatrixNetworkFlow.getDocumentType(target);
                 targets.push({
                     name: token.name,
-                    document: token.actor,
+                    document: token.actor as Actor.Stored,
                     token,
                     runningSilent: token.actor.isRunningSilent(),
                     network: token.actor.network?.name ?? '',
@@ -224,7 +225,7 @@ export const MatrixTargetingFlow = {
         const personaDevice = document.getMatrixDevice();
         for (const device of document.wirelessDevices()) {
             // Persona devices don't have their own device icon.
-            if (personaDevice && device.uuid === personaDevice.uuid) continue;
+            if (device.uuid === personaDevice?.uuid) continue;
             if (device.isRunningSilent()) continue;
 
             connectedIcons.push({

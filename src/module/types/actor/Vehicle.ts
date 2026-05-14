@@ -18,6 +18,7 @@ const VehicleStats = () => ({
     speed: new ModifiableField(AttributeField()),
     off_road_speed: new ModifiableField(AttributeField()),
     acceleration: new ModifiableField(AttributeField()),
+    off_road_acceleration: new ModifiableField(AttributeField()),
     sensor: new ModifiableField(AttributeField()),
     seats: new ModifiableField(AttributeField()),
 });
@@ -48,6 +49,8 @@ const VehicleData = () => ({
         initial: "medium",
         choices: SR5.vehicle.categories,
     }),
+    availability: new StringField({ required: true }),
+    cost: new NumberField({ required: true, nullable: false, initial: 0 }),
     isDrone: new BooleanField(),
     isOffRoad: new BooleanField(),
 
