@@ -1,7 +1,7 @@
 {
   "name": "Banishing",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/skills/magical-banishing.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/magical-banishing.webp",
   "system": {
     "description": {
       "value": "",

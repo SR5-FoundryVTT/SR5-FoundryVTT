@@ -1,7 +1,7 @@
 {
   "name": "Hacking",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/skills/technical-hacking.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/technical-hacking.webp",
   "system": {
     "description": {
       "value": "",

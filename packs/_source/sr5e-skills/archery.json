@@ -1,7 +1,7 @@
 {
   "name": "Archery",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/skills/combat-archery.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/combat-archery.webp",
   "system": {
     "description": {
       "value": "",
