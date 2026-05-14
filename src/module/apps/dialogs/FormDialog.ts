@@ -97,7 +97,7 @@ export class FormDialog extends foundry.appv1.api.Dialog<FormDialogOptions> {
         foundry.utils.mergeObject(this.data.templateData, data);
     }
 
-    override getData() {
+    override getData(): object {
         // Dialog.getData expects buttons to be set.
         this.data.buttons = this.data.buttons || this.buttons;
         this._amendButtonsWithName(this.data.buttons);

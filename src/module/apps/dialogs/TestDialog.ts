@@ -186,8 +186,7 @@ export class TestDialog extends FormDialog {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/success-test-dialog.hbs';
     }
 
-    //@ts-expect-error
-    override getData() {
+    override getData(): TestDialogData {
         const data = super.getData() as unknown as TestDialogData;
 
         // @ts-expect-error TODO: fvtt - v14 - missing messageMode setting
