@@ -45,14 +45,9 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
             changes.push(...effectChanges.map(change => {
                 // @ts-expect-error TODO: v14 - this typing was added in master, fix it.
                 const c = foundry.utils.deepClone(change) as typeof changes[number];
-                // const c = foundry.utils.deepClone(change) as typeof changes[number];
-                // Foundry changes data. references in changes to system. But tests use data.
+                // TODO: v15 - Foundry used to change data. references in changes to system. But tests use data. 
                 c.key = c.key.replace(/^system\./, 'data.');
                 c.effect = effect;
-                SR5ActiveEffect.alterChange(this.test as unknown as foundry.abstract.DataModel.Any, c);
-                // TODO: v14 - check what is the issue here.
-                // c.priority = SR5ActiveEffect.getChangePriority(c);
-                c.priority = 0;
                 return c;
             }));
             // TODO: What's with the statuses?
@@ -64,7 +59,6 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         // Apply all changes
         for (const change of changes) {
             if (!change.key) continue;
-            // change.effect.apply(this.test as any, change);
             const ActiveEffect = foundry.documents.ActiveEffect.implementation;
             ActiveEffect.applyChange(this.test as any, change);
         }
@@ -159,29 +153,29 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         if (actor === undefined || this.test.item === undefined) return;
 
-        const normalizeEffectData = (effect: SR5ActiveEffect) => {
-            const sourceData = effect.toObject() as any;
-            const { changes: _legacyChanges, ...effectData } = sourceData;
-            const changes = sourceData.system?.changes ?? sourceData.changes ?? [];
-
-            // Transform all dynamic values to static values.
-            effectData.system ??= {};
-            effectData.system.changes = changes.map(change => {
-                const preparedChange = foundry.utils.deepClone(change) as ActiveEffect.ChangeData;
-                SR5ActiveEffect.resolveDynamicChangeValue(this.test, preparedChange);
-                return preparedChange;
-            });
-
-            return effectData;
-        };
-
         const effectsData: any[] = [];
         for (const effect of allApplicableDocumentEffects(this.test.item, { applyTo: ['targeted_actor'] })) {
-            effectsData.push(normalizeEffectData(effect));
+            const effectData = effect.toObject() as unknown as SR5ActiveEffect;
+
+            // Transform all dynamic values to static values.
+            effectData.system.changes = effectData.system.changes.map(change => {
+                SR5ActiveEffect.resolveDynamicChangeValue(this.test, change as unknown as ActiveEffect.ChangeData);
+                return change;
+            });
+
+            effectsData.push(effectData);
         }
 
         for (const effect of allApplicableItemsEffects(this.test.item, { applyTo: ['targeted_actor'], nestedItems: false })) {
-            effectsData.push(normalizeEffectData(effect));
+            const effectData = effect.toObject() as unknown as SR5ActiveEffect;
+
+            // Transform all dynamic values to static values.
+            effectData.system.changes = effectData.system.changes.map(change => {
+                SR5ActiveEffect.resolveDynamicChangeValue(this.test, change as unknown as ActiveEffect.ChangeData);
+                return change;
+            });
+
+            effectsData.push(effectData);
         }
 
         console.debug(`Shadowrun5e | To be created effects on target actor ${actor.name}`, effectsData);
