@@ -1139,6 +1139,7 @@ export const SR5 = {
             speed: 'SR5.Vehicle.Stats.Speed',
             off_road_speed: 'SR5.Vehicle.Stats.OffRoadSpeed',
             acceleration: 'SR5.Vehicle.Stats.Acceleration',
+            off_road_acceleration: 'SR5.Vehicle.Stats.OffRoadAcceleration',
             pilot: 'SR5.Vehicle.Stats.Pilot',
             sensor: 'SR5.Vehicle.Stats.Sensor',
             seats: 'SR5.Vehicle.Stats.Seats'

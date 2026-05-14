@@ -97,6 +97,7 @@ export const MatrixTestDataFlow = {
                 ? icon : icon instanceof SR5Actor ? icon.hasPersona
                     ? icon.getMatrixDevice() : undefined : undefined;
             if (targetItem) {
+                if (!targetItem.uuid) return;
                 const marks = actor.getMarksPlaced(targetItem.uuid);
                 if (marks > 0) {
                     // add damage per mark on the target item
@@ -108,6 +109,7 @@ export const MatrixTestDataFlow = {
                 }
                 // if there wasn't a matrix device, see if we have marks placed on the actor itself
             } else if (icon instanceof SR5Actor) {
+                if (!icon.uuid) return;
                 const marks = actor.getMarksPlaced(icon.uuid);
                 if (marks > 0) {
                     // add damage per mark on the target item
@@ -330,7 +332,7 @@ export const MatrixTestDataFlow = {
 
         // Depending on icon type, categorize targets for display and device selection.
         if (test.icon instanceof SR5Actor) {
-            test.data.personaUuid = test.icon.uuid;
+            test.data.personaUuid = test.icon.uuid ?? undefined;
         }
 
         // Store network type icons for easy access.
@@ -346,7 +348,7 @@ export const MatrixTestDataFlow = {
             const persona = test.icon.persona;
             if (persona) {
                 // ... persona
-                test.data.personaUuid = persona.uuid;
+                test.data.personaUuid = persona.uuid ?? undefined;
             } else {
                 // ... network
                 const master = test.icon.master;
@@ -378,8 +380,8 @@ export const MatrixTestDataFlow = {
             actor.getMatrixDevice() as SR5Item :
             actor;
 
-        test.data.iconUuid = test.icon.uuid;
-        test.data.personaUuid = test.persona.uuid;
+        test.data.iconUuid = test.icon.uuid ?? undefined;
+        test.data.personaUuid = test.persona.uuid ?? undefined;
     },
 
     /**
@@ -456,10 +458,10 @@ export const MatrixTestDataFlow = {
     /**
      * Based on targeted main icon type, return the uuid of the main icon.
      */
-    _getMainIconUuid(test: MatrixTest): string|undefined {
-        if (test.persona) return test.persona.uuid;
-        if (test.host) return test.host.uuid;
-        if (test.grid) return test.grid.uuid;
+    _getMainIconUuid(test: MatrixTest): string | undefined {
+        if (test.persona) return test.persona.uuid ?? undefined;
+        if (test.host) return test.host.uuid ?? undefined;
+        if (test.grid) return test.grid.uuid ?? undefined;
         return undefined;
     },
 
@@ -474,6 +476,8 @@ export const MatrixTestDataFlow = {
             console.error(`Shadowrun 5e | ${this.constructor.name} only supports a single target`);
             return;
         }
+
+        if (!document.uuid) return;
 
         test.data.iconUuid = document.uuid;
         await test.populateDocuments();
@@ -497,11 +501,11 @@ export const MatrixTestDataFlow = {
         if (!document) {
             const actor = Helpers.getSelectedActorsOrCharacter()[0];
             document = actor;
-            againstData.iconUuid = actor.uuid;
+            againstData.iconUuid = actor?.uuid ?? undefined;
         }
         if (!document) {
             document = game.user?.character;
-            againstData.iconUuid = game.user?.character?.uuid;
+            againstData.iconUuid = game.user?.character?.uuid ?? undefined;
         }
         if (!document) return;
 

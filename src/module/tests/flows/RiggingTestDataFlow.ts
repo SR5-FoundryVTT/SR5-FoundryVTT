@@ -1,5 +1,4 @@
 import { SuccessTest } from '@/module/tests/SuccessTest';
-import { Helpers } from '@/module/helpers';
 import { RiggingRules } from '@/module/rules/RiggingRules';
 import { MatrixTestDataFlow } from '@/module/tests/flows/MatrixTestDataFlow';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
@@ -7,6 +6,7 @@ import { AttributeRules } from '@/module/rules/AttributeRules';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SR5Item } from '@/module/item/SR5Item';
 import { ActionRollType } from '@/module/types/item/Action';
+import { MonitorRules } from '@/module/rules/MonitorRules';
 
 export const RiggingTestDataFlow = {
 
@@ -44,6 +44,26 @@ export const RiggingTestDataFlow = {
         if (RiggingRules.isConsideredMatrixAction(test.data)) {
             MatrixTestDataFlow.addMatrixModifiersToPool(driver, new ModifiableValue(test.data.pool), true);
         }
+    },
+
+    /**
+     * Apply vehicle damage penalties to handling-based limits on roll data only.
+     */
+    addVehicleHandlingDamageModifier: (test: SuccessTest) => {
+        const vehicle = test.actor?.asType('vehicle');
+        if (!vehicle) return;
+        if (test.data.action.limit.attribute !== 'handling') return;
+        if (test.data.limit.value <= 0) return;
+
+        const { modifiers, track } = vehicle.system;
+
+        if (track.physical.disabled) return;
+
+        const woundBoxesThreshold = MonitorRules.woundModifierBoxesThreshold(modifiers.wound_tolerance);
+        const wounds = MonitorRules.wounds(track.physical.value, woundBoxesThreshold, modifiers.pain_tolerance_physical);
+        const woundModifier = Math.max(1 - test.data.limit.value, MonitorRules.woundModifier(wounds));
+
+        ModifiableValue.setUnique(test.data.limit, 'SR5.Vehicle.DamagedVehicle', woundModifier);
     },
 
     /**

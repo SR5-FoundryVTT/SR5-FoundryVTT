@@ -1,7 +1,7 @@
 {
   "name": "Close Combat",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/groups/close_combat.svg",
+  "img": "systems/shadowrun5e/dist/icons/groups/close_combat.webp",
   "system": {
     "description": {
       "value": "",
@@ -27,7 +27,6 @@
       "skills": [
         "Blades",
         "Clubs",
-        "Throwing Weapons",
         "Unarmed Combat"
       ],
       "rating": 0

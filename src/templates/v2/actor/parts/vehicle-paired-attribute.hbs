@@ -1,0 +1,48 @@
+<div class="attribute vehicle-paired-attribute{{#if cssClass}} {{cssClass}}{{/if}}" data-attribute-id="{{onRoadField.name}}" data-context-menu="attribute">
+    <label {{#if @root.isEditMode}}class="edit-mode"{{/if}}>
+        {{localize label}}
+    </label>
+    <div class="attribute-value">
+        {{#if @root.isEditMode}}
+            <span class="road-mode-input" data-tooltip="SR5.Vehicle.OnRoad">
+                {{formInput onRoadField.fields.base value=onRoadAttribute.base
+                            classes="short skinny center" rootId=rootId }}
+            </span>
+            <span class="attribute-separator">/</span>
+            <span class="road-mode-input" data-tooltip="SR5.Vehicle.OffRoad">
+                {{formInput offRoadField.fields.base value=offRoadAttribute.base
+                            classes="short skinny center" rootId=rootId }}
+            </span>
+        {{else if (eq onRoadAttribute.value offRoadAttribute.value)}}
+            {{#if isOffRoad}}
+                <span class="road-mode-input">
+                    <button class="icon sr5-icon" type="button"
+                            data-action="rollAttribute"
+                            data-attribute-id="{{offRoadField.name}}"
+                            data-attribute-modifier-tooltip="{{offRoadField.name}}">{{offRoadAttribute.value}}</button>
+                </span>
+            {{else}}
+                <span class="road-mode-input">
+                    <button class="icon sr5-icon" type="button"
+                            data-action="rollAttribute"
+                            data-attribute-id="{{onRoadField.name}}"
+                            data-attribute-modifier-tooltip="{{onRoadField.name}}">{{onRoadAttribute.value}}</button>
+                </span>
+            {{/if}}
+        {{else}}
+            <span class="road-mode-input {{ifThen isOffRoad 'road-mode-inactive' ''}}">
+                <button class="icon sr5-icon" type="button"
+                        data-action="rollAttribute"
+                        data-attribute-id="{{onRoadField.name}}"
+                        data-attribute-modifier-tooltip="{{onRoadField.name}}">{{onRoadAttribute.value}}</button>
+            </span>
+            <span class="attribute-separator">/</span>
+            <span class="road-mode-input {{ifThen isOffRoad '' 'road-mode-inactive'}}">
+                <button class="icon sr5-icon" type="button"
+                        data-action="rollAttribute"
+                        data-attribute-id="{{offRoadField.name}}"
+                        data-attribute-modifier-tooltip="{{offRoadField.name}}">{{offRoadAttribute.value}}</button>
+            </span>
+        {{/if}}
+    </div>
+</div>

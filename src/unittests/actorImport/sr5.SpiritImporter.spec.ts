@@ -36,7 +36,7 @@ export const spiritImporterTesting = (context: QuenchBatchContext) => {
         it('Should import a chummer character', async () => {
             spirit = await SpiritImporter.import(character, 'fire', importOptions);
             assert.notEqual(spirit, null, 'Spirit not created');
-            factory.actors.push(spirit!);
+            factory.actors.push(spirit as Actor.Stored<'spirit'>);
             assert.strictEqual(spirit!.system.spiritType, 'fire');
         });
 

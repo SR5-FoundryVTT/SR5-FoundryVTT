@@ -36,7 +36,7 @@ export const spriteImporterTesting = (context: QuenchBatchContext) => {
         it('Should import a chummer character', async () => {
             sprite = await SpriteImporter.import(character, importOptions);
             assert.notEqual(sprite, null, 'sprite not created');
-            factory.actors.push(sprite!);
+            factory.actors.push(sprite as Actor.Stored<'sprite'>);
             assert.strictEqual(sprite!.system.spriteType, 'companion');
         });
 

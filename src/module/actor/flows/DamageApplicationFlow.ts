@@ -331,7 +331,8 @@ export class DamageApplicationFlow {
         const iniAdjustment = CombatRules.initiativeScoreWoundAdjustment(woundsBefore, woundsAfter);
 
         // Only actors that can have a wound modifier, will have a delta.
-        if (iniAdjustment < 0 && game.combat) game.combat.adjustActorInitiative(actor, iniAdjustment);
+        if (iniAdjustment < 0 && game.combat)
+            await game.combat.adjustActorInitiative(actor, iniAdjustment);
     }
 
     /**

@@ -26,6 +26,7 @@ import { SkillNamingFlow } from '@/module/flows/SkillNamingFlow';
 import { SkillSetSourceFlow } from '@/module/flows/SkillSetSourceFlow';
 import { SkillItemFlow } from '@/module/item/flows/SkillItemFlow';
 import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
+import type { InitiativeModeOptions } from '@/module/combat/SR5Combatant';
 import { parseDropData } from '@/module/utils/sheets';
 import { getFuzzyMatches, matchesFuzzyQuery } from '@/module/utils/fuzzySearch';
 import MatrixAttribute = Shadowrun.MatrixAttribute;
@@ -767,25 +768,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @param event
      */
     async _onInitiativePerceptionChange(event: Event) {
-        const newValue = (event.currentTarget as HTMLSelectElement)?.value;
-        if (newValue === 'meatspace' || newValue === 'astral') {
-            // meatspace and magic can be directly applied as the perception type
-            // disable VR as well
-            await this.actor.update({
-                system: {
-                    initiative: { perception: newValue, },
-                    matrix: { vr: false, hot_sim: false }
-                }
-            });
-        } else if (newValue === 'hot_sim' || newValue === 'cold_sim') {
-            // if we are hot sim or cold sim, we are in VR and using matrix init perception
-            await this.actor.update({
-                system: {
-                    initiative: { perception: 'matrix' },
-                    matrix: { vr: true, hot_sim: newValue === 'hot_sim' }
-                }
-            });
-        }
+        const newValue = (event.currentTarget as HTMLSelectElement)?.value as InitiativeModeOptions | undefined;
+        if (!newValue) return;
+
+        const supportedModes = ['meatspace', 'astral', 'cold_sim', 'hot_sim'] as const;
+        if (!supportedModes.includes(newValue)) return;
+
+        await this.actor.setInitiativeMode(newValue);
     }
 
     /**
@@ -826,9 +815,39 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     /**
      * Override ApplicationMixin._onDrop shim to handle default Foundry onDrop behavior for all ActorSheets.
+     * NOTE: The current drag&drop implementation is borked and needs cleanup across: SR5ApplicationMixin as base for actor and item sheets.
      */
     protected override async _onDrop(event: DragEvent) {
         return await (ActorSheetV2.prototype as any)._onDrop.call(this, event);
+    }
+
+    /**
+     * Guard against non-HTMLElement drag sources and keep actor item/effect drag payload creation stable.
+     * NOTE: The current drag&drop implementation is borked and needs cleanup across: SR5ApplicationMixin as base for actor and item sheets.
+     */
+    protected override async _onDragStart(event: DragEvent) {
+        const target = event.currentTarget as HTMLElement | null;
+        const targetElement = event.target as HTMLElement | null;
+        if (targetElement?.dataset && 'link' in targetElement.dataset) return;
+
+        let dragData;
+
+        if (target?.dataset.itemId) {
+            const item = this.actor.items.get(target.dataset.itemId);
+            if (item) {
+                dragData = item.toDragData();
+            }
+        }
+
+        if (target?.dataset.effectId) {
+            const effect = this.actor.effects.get(target.dataset.effectId);
+            if (effect) {
+                dragData = effect.toDragData();
+            }
+        }
+
+        if (!dragData) return;
+        event.dataTransfer?.setData('text/plain', JSON.stringify(dragData));
     }
 
     protected override async _onDropItem(event: DragEvent, item: SR5Item) {
@@ -2252,8 +2271,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.preventDefault();
         event.stopPropagation();
 
-        const blitz = this.actor.system.initiative.edge;
-        await this.actor.update({ system: { initiative: { edge: !blitz } } });
+        const blitz = this.actor.system.initiative.blitz;
+        await this.actor.update({system: { initiative: { blitz: !blitz }}});
     }
 
     static async #rollInitiative(this: SR5BaseActorSheet, event: Event) {

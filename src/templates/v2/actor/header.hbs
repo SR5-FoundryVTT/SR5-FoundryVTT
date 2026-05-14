@@ -68,6 +68,7 @@
                         id='physical'
                         track=system.track.physical
                         tooltip=(localize "SR5.Labels.ActorSheet.PhysicalTrack")
+                        tolerance=(ifThen isVehicle woundTolerance undefined)
                     }}
                 {{/unless}}
                 {{/if}}

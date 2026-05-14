@@ -27,6 +27,8 @@ export const MatrixRebootFlow = {
             return;
         }
 
+        if (!actor.uuid) return;
+
         // Only reset overwatch score if the device rebooted is the persona device.
         const device = actor.getMatrixDevice();
 

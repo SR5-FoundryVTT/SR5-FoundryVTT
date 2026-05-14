@@ -1,7 +1,7 @@
 {
   "name": "Palming",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/skills/physical-palming.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/physical-palming.webp",
   "system": {
     "description": {
       "value": "",

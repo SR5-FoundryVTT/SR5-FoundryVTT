@@ -89,8 +89,8 @@ export class OverwatchScoreTracker extends HandlebarsApplicationMixin(Applicatio
             if (user.isGM || !user.character) continue;
 
             const actor = user.character;
-            if (OverwatchStorage.isTrackedActor(actor as SR5Actor)) continue;
-            await OverwatchStorage.trackActor(actor as SR5Actor);
+            if (OverwatchStorage.isTrackedActor(actor)) continue;
+            await OverwatchStorage.trackActor(actor);
         }
     }
 
