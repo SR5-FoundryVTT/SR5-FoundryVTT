@@ -14,6 +14,7 @@ import { DataImporter } from "../importer/DataImporter";
 import { EchoesImporter } from "../importer/EchoesImporter";
 import { GearImporter } from "../importer/GearImporter";
 import { QualityImporter } from "../importer/QualityImporter";
+import { SkillImporter } from "../importer/SkillImporter";
 import { SpellImporter } from "../importer/SpellImporter";
 import { VehicleImporter } from "../importer/VehicleImporter";
 import { VehicleModImporter } from "../importer/VehicleModImporter";
@@ -138,6 +139,7 @@ export class BulkImporter extends BaseClass {
         new AdeptPowerImporter(),
         new ArmorImporter(),
         new ActionImporter(),
+        new SkillImporter(),
     ] as const satisfies readonly DataImporter[];
 
     /**

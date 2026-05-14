@@ -731,6 +731,10 @@ body.theme-light,
             padding-right: 0.25rem;
         }
     }
+
+    .skill-roll-not-defaultable {
+        font-style: italic;
+    }
 }
 
 body.theme-light .sr5v2:not(.theme-dark),

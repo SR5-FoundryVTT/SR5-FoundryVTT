@@ -13,7 +13,7 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
     const testOptions = { showDialog: false, showMessage: false };
 
     const createDriver = async () => {
-        return await factory.createActor({ type: 'character',
+        const actor = await factory.createActor({ type: 'character',
             system: {
                 attributes: {
                     intuition: { base: 5, },
@@ -38,6 +38,15 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
                 }
             }
         });
+
+        const gunnery = actor.items.get(actor.system.skills.active.gunnery?.id);
+        await gunnery?.update({ system: { skill: { rating: 5 }}});
+        const pilot_ground_craft = actor.items.get(actor.system.skills.active.pilot_ground_craft?.id);
+        await pilot_ground_craft?.update({ system: { skill: { rating: 5 }} });
+        const perception = actor.items.get(actor.system.skills.active.perception?.id);
+        await perception?.update({ system: { skill: { rating: 4 }} });
+        
+        return actor;
     }
 
     const createVehicle = async () => {
@@ -54,7 +63,47 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
         });
     }
 
-    describe('Rigger Testing around Being jumped in and Control Rig', () => {
+    describe('Rigger Testing', () => {
+        it('Builds handling click-roll action as Reaction + related Pilot with handling limit', async () => {
+            const vehicle = await createVehicle();
+            const driver = await createDriver();
+            await vehicle.addVehicleDriver(driver.uuid);
+
+            const action = vehicle.vehiclePilotActionData('handling');
+            assert.notEqual(action, undefined);
+            assert.equal(action!.attribute, 'reaction');
+            assert.equal(action!.skill, vehicle.getVehicleTypeSkillName());
+            assert.equal(action!.limit.attribute, 'handling');
+
+            const test = await TestCreator.fromAction(action!, vehicle, testOptions);
+            assert.notEqual(test, undefined);
+            await test!.execute();
+
+            // Pool should include mental substitution + pilot + hot sim + control rig.
+            assert.equal(test!.pool.value, 15);
+            // handling limit + control rig
+            assert.equal(test!.limit.value, 6);
+        });
+
+        it('Builds speed click-roll action as Reaction + related Pilot with speed limit', async () => {
+            const vehicle = await createVehicle();
+            const driver = await createDriver();
+            await vehicle.addVehicleDriver(driver.uuid);
+
+            const action = vehicle.vehiclePilotActionData('speed');
+            assert.notEqual(action, undefined);
+            assert.equal(action!.attribute, 'reaction');
+            assert.equal(action!.skill, vehicle.getVehicleTypeSkillName());
+            assert.equal(action!.limit.attribute, 'speed');
+
+            const test = await TestCreator.fromAction(action!, vehicle, testOptions);
+            assert.notEqual(test, undefined);
+            await test!.execute();
+
+            // speed limit + control rig
+            assert.equal(test!.limit.value, 6);
+        });
+
         it('Jump into a Vehicle and Perform Driving Test', async () => {
             const vehicle = await createVehicle();
             const driver = await createDriver();
@@ -82,6 +131,64 @@ export const shadowrunRiggerTesting = (context: QuenchBatchContext) => {
             assert.equal(test!.pool.value, 14);
             // limit should be Sensor + Control Rig
             assert.equal(test!.limit.value, 7);
+        });
+
+        it('Applies vehicle hurt penalty to handling limits during rolls only', async () => {
+            const vehicle = await createVehicle();
+            const driver = await createDriver();
+            await vehicle.addVehicleDriver(driver.uuid);
+
+            await vehicle.update({
+                system: {
+                    environment: 'handling',
+                    track: { physical: { value: 3 } }
+                }
+            });
+
+            // Sheet values remain unchanged.
+            assert.equal(vehicle.system.vehicle_stats.handling.value, 3);
+
+            const test = await TestCreator.fromPackAction(SR5.packNames.GeneralActionsPack, 'drone_pilot_vehicle', vehicle, testOptions);
+            assert.notEqual(test, undefined);
+            await test!.execute();
+
+            // pool should not receive vehicle hurt directly
+            assert.equal(test!.pool.value, 15);
+            // handling limit (3) + control rig (3) + hurt (-1)
+            assert.equal(test!.limit.value, 5);
+        });
+
+        it('Does not apply vehicle hurt penalty to non-handling limits', async () => {
+            const vehicle = await createVehicle();
+            const driver = await createDriver();
+            await vehicle.addVehicleDriver(driver.uuid);
+
+            await vehicle.update({ system: { track: { physical: { value: 6 } } } });
+
+            const test = await TestCreator.fromPackAction(SR5.packNames.GeneralActionsPack, 'drone_perception', vehicle, testOptions);
+            assert.notEqual(test, undefined);
+            await test!.execute();
+
+            // sensor limit + control rig, unaffected by hurt
+            assert.equal(test!.limit.value, 7);
+        });
+
+        it('Does not apply damaged-vehicle penalty to speed-based pilot click rolls', async () => {
+            const vehicle = await createVehicle();
+            const driver = await createDriver();
+            await vehicle.addVehicleDriver(driver.uuid);
+
+            await vehicle.update({ system: { track: { physical: { value: 6 } } } });
+
+            const action = vehicle.vehiclePilotActionData('speed');
+            assert.notEqual(action, undefined);
+
+            const test = await TestCreator.fromAction(action!, vehicle, testOptions);
+            assert.notEqual(test, undefined);
+            await test!.execute();
+
+            // speed limit + control rig, unaffected by vehicle damaged handling penalty
+            assert.equal(test!.limit.value, 6);
         });
     });
 };

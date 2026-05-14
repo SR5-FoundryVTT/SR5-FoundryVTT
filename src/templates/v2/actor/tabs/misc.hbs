@@ -4,13 +4,6 @@
         {{#if @root.isEditMode}}
             <div>
                 <section class="scrollable standard-form">
-                    {{#if hasSkills}}
-                        <div class="form-group">
-                            <button type="button" class="display show-hidden-skills">
-                                {{localize "SR5.RestoreDefaultSkills"}}
-                            </button>
-                        </div>
-                    {{/if}}
                     {{#if canAlterSpecial }}
                         <div class="list-item">
                             <div class="list-item-start">
@@ -130,6 +123,20 @@
             </div>
         {{/if}}
         <div {{#if @root.isPlayMode}}class="fill-container"{{/if}}>
+            {{#if skillset}}
+                <div class="list-item" data-uuid="{{skillset.uuid}}">
+                    <div class="list-item-start">
+                        <label>{{localize "SR5.Skill.Types.Set"}}</label>
+                    </div>
+                    <div class="list-item-col">
+                        {{> "systems/shadowrun5e/dist/templates/v2/common/skill-source-indicator.hbs"
+                            source=skillset
+                            showRemove=@root.isEditMode
+                            removeAction="removeSkillSet"
+                            removeTooltip="SR5.Tooltips.Actor.RemoveSkillSet" }}
+                    </div>
+                </div>
+            {{/if}}
             <!-- Situational Modifiers Section -->
             {{#if situationModifiers}}
             <div>

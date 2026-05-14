@@ -5,7 +5,7 @@ import { SR5Actor } from '../SR5Actor';
 import { ActorMarksFlow } from '../flows/ActorMarksFlow';
 import { MatrixTargetingFlow } from '@/module/flows/MatrixTargetingFlow';
 import { MatrixNetworkFlow } from '@/module/item/flows/MatrixNetworkFlow';
-import { PackActionFlow } from '@/module/item/flows/PackActionFlow';
+import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
 import { MatrixSheetFlow } from '@/module/flows/MatrixSheetFlow';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { MatrixRules } from '@/module/rules/MatrixRules';
@@ -278,8 +278,9 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
 
     _prepareSelectedMatrixTargets(targets: MatrixTargetDocument[]) {
         for (const target of targets) {
+            const targetUuid = target.document.uuid;
             // Collect connected icons, if user wants to see them.
-            if (this._connectedIconsOpenClose[target.document.uuid]) {
+            if (targetUuid && this._connectedIconsOpenClose[targetUuid]) {
                 target.icons = MatrixTargetingFlow.getWirelessMatrixIconTargets(target.document as SR5Actor);
 
                 for (const icon of target.icons) {
@@ -383,14 +384,14 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      * @protected
      */
     protected async _getMatrixPackActions() {
-        return await PackActionFlow.getMatrixPackActions();
+        return await PackItemFlow.getMatrixPackActions();
     }
 
     /**
      * Get matrix actions otherwise available on this actor.
      */
     protected _getMatrixActorActions() {
-        const actions = this.document.itemsForType.get('action') as SR5Item<'action'>[];
+        const actions = this.document.itemsForType.get('action');
         if (!actions) return [];
         return actions.filter(item => item.hasActionCategory('matrix'));
     }
@@ -445,7 +446,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         const sheetActions: sheetAction[] = [];
         for (const action of actions) {
             sheetActions.push({
-                name: PackActionFlow.localizePackAction(action.name),
+                name: PackItemFlow.localizePackAction(action.name),
                 description: await foundry.applications.ux.TextEditor.implementation.enrichHTML(action.system.description.value),
                 action,
             });
@@ -528,7 +529,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             const persona = target.document instanceof SR5Item ? target.document.persona : undefined;
 
             // Handle persona icons.
-            if (target.document instanceof SR5Item && target.document.isMatrixDevice && persona) {
+            if (target.document instanceof SR5Item && target.document.isMatrixDevice && persona?.uuid) {
                 // Attach device icon to their persona.
                 // Already in target list...
                 const personaTarget = targets.find(t => t.document.uuid === persona.uuid);
@@ -540,7 +541,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
                         name: Helpers.getChatSpeakerName(persona),
                         token: persona.getToken(),
                         network: ActorMarksFlow.getDocumentNetwork(persona),
-                        document: persona,
+                        document: persona as Actor.Stored,
                         icons: [target],
                         type: MatrixNetworkFlow.getDocumentType(persona),
                         marks: 0,
@@ -555,7 +556,8 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
 
         // Add additional sub-icons based on user wanting to see them.
         for (const target of targets) {
-            if (this._connectedIconsOpenClose[target.document.uuid]) {
+            const targetUuid = target.document.uuid;
+            if (targetUuid && this._connectedIconsOpenClose[targetUuid]) {
                 const oldIcons = target.icons;
                 // An already marked icon will again show up when all icons are collected.
                 // So we can simply overwrite all icons here without any filtering.

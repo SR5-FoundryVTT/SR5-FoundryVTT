@@ -454,6 +454,7 @@
                         </div>
                     </div>
                 {{/if}}
+
             {{/if}}
             {{#if systemFields.action}}
                 <div class="list-item list-item-header">
@@ -765,6 +766,10 @@
                     </div>
                 {{/if}}
             {{/if}}
+
+{{#if (isType item 'skill')}}
+            {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/skill.hbs"}}
+{{/if}}
         </div>
     </div>
 </section>

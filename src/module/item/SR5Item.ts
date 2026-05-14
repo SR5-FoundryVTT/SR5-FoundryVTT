@@ -4,7 +4,7 @@ import { createItemChatMessage } from '../chat';
 import { DEFAULT_ROLL_NAME, FLAGS, SYSTEM_NAME } from '../constants';
 import { DataDefaults } from '../data/DataDefaults';
 import { Helpers } from '../helpers';
-import { PartsList } from '../parts/PartsList';
+import { ModifiableValue } from '../mods/ModifiableValue';
 import { TestCreator } from '../tests/TestCreator';
 import { HostPrep } from './prep/HostPrep';
 import { LinksHelpers } from '../utils/links';
@@ -15,6 +15,7 @@ import { RangePrep } from './prep/functions/RangePrep';
 import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
 
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
+import { UpdateSkillFlow } from './flows/UpdateSkillFlow';
 import { ActionResultType, ActionRollType, DamageType } from '../types/item/Action';
 import { ItemAvailabilityFlow } from './flows/ItemAvailabilityFlow';
 import { WarePrep } from './prep/WarePrep';
@@ -30,11 +31,13 @@ import { RollDataOptions } from './Types';
 import { SetMarksOptions } from '../storage/MarksStorage';
 import { MatrixDeviceFlow } from './flows/MatrixDeviceFlow';
 import { StorageFlow } from '@/module/flows/StorageFlow';
+import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
+import { ModifiableValueType } from '../types/template/Base';
 import Document = foundry.abstract.Document;
 import GetEmbeddedDocumentOptions = Document.GetEmbeddedDocumentOptions;
-import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
 
-const { fromUuid } = foundry.utils;
+type OneOrMany<T> = T | T[];
+const { fromUuid, mergeObject, expandObject } = foundry.utils;
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and nested).
@@ -296,12 +299,12 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *
      * NOTE: This is a legacy method of applied modifiers to opposed tests but works fine for now.
      */
-    getOpposedTestMod(): PartsList<number> {
-        const parts = new PartsList<number>();
+    getOpposedTestMod(mod: ModifiableValueType): ModifiableValue {
+        const parts = new ModifiableValue(mod);
 
         if (this.hasOpposedTest()) {
             if (this.isAreaOfEffect()) {
-                parts.addUniquePart('SR5.Aoe', -2);
+                parts.addUnique('SR5.Aoe', -2);
             }
         }
 
@@ -573,6 +576,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     async addNewNetwork(item: SR5Item) {
         const sin = this.asType('sin');
         if (!sin) return;
+        if (!item.uuid) return;
         if (!item.isNetwork()) return;
 
         sin.system.networks.push(item.uuid);
@@ -706,7 +710,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         const tempItems = items.map((item) => {
             // Set user permissions to owner, to allow none-GM users to edit their own nested items.
             const data = game.user ? { ownership: { [game.user.id]: CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER } } : {};
-            item = foundry.utils.mergeObject(item, data) as Item.Source;
+            item = mergeObject(item, data) as Item.Source;
 
             // Case: MODIFY => Update existing item.
             if (item._id! in loaded) {
@@ -737,17 +741,22 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return items.find((item) => item.id === itemId);
     }
 
-    async updateNestedEffects(changes) {
+    async updateNestedEffects(changes: OneOrMany<ActiveEffect.UpdateInput>) {
         if (!this._isNestedItem) return;
 
         changes = Array.isArray(changes) ? changes : [changes];
         if (!changes || changes.length === 0) return;
 
-        for (const effectChanges of changes) {
-            const effect = this.effects.get(effectChanges._id);
+        for (const change of changes) {
+            const effectId = typeof change._id === 'string' ? change._id : '';
+            const effect = this.effects.get(effectId);
             if (!effect) continue;
-            delete effectChanges._id;
-            foundry.utils.mergeObject(effect, expandObject(effectChanges), { inplace: true });
+
+            // We need to delete the _id from the change data, otherwise mergeObject
+            // will merge the _id into the existing effect and cause all kinds of issues.
+            delete change._id;
+
+            mergeObject(effect, expandObject(change), { inplace: true });
             effect.render(false);
         }
 
@@ -756,15 +765,19 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         this.render(false);
     }
 
-    async updateNestedItems(changes: Item.UpdateData | Item.UpdateData[]) {
+    async updateNestedItems(changes: OneOrMany<Item.UpdateInput>) {
         const items = foundry.utils.duplicate(this.getNestedItems()) as Item.Source[];
         const changesArray = Array.isArray(changes) ? changes : [changes];
 
         for (const change of changesArray) {
             const existing = items.find(i => i._id === change._id);
             if (!existing) continue;
+
+            // We need to delete the _id from the change data, otherwise mergeObject
+            // will merge the _id into the existing effect and cause all kinds of issues.
             delete change._id;
-            foundry.utils.mergeObject(existing, expandObject(change));
+
+            mergeObject(existing, expandObject(change));
         }
 
         await this.setNestedItems(items);
@@ -1236,7 +1249,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return this;
     }
 
-    override async update(data: Item.UpdateData | undefined, options?: Item.Database.UpdateOperation) {
+    override async update(data: Item.UpdateInput, options?: Item.Database.UpdateOperation) {
         // Item.item => Embedded item into another item!
         if (this._isNestedItem)
             return this.updateNestedItem(data);
@@ -1526,16 +1539,18 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *
      * This is preferred to altering data on the fly in the prepareData methods flow.
      */
-    override async _preUpdate(changed: Item.UpdateData, options: Item.Database.PreUpdateOptions, user: User) {
+    override async _preUpdate(...args: Parameters<Item['_preUpdate']>) {
+        const [changed, options] = args;
         // Some Foundry core updates will no diff and just replace everything. This doesn't match with the
         // differential approach of action test injection. (NOTE: Changing ownership of a document)
         if (options.diff && options.recursive) {
             // Change used action test implementation when necessary.
             UpdateActionFlow.injectActionTestsIntoChangeData(this.type, changed, changed, this);
-            UpdateActionFlow.onUpdateAlterActionData(changed, this);
+            await UpdateActionFlow.onUpdateAlterActionData(changed, this);
+            UpdateSkillFlow.injectSkillCategoryDefaults(changed, this);
         }
 
-        return super._preUpdate(changed, options, user);
+        return super._preUpdate(...args);
     }
 
     /**

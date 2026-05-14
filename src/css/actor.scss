@@ -69,6 +69,30 @@
                 gap: 0.25rem;
                 max-width: 8rem;
             }
+
+            &.vehicle-paired-attribute .attribute-value {
+                gap: 0.1rem;
+            }
+
+            &.vehicle-paired-attribute .attribute-separator {
+                line-height: 1;
+            }
+
+            &.vehicle-paired-attribute .road-mode-input {
+                display: inline-flex;
+            }
+
+            &.vehicle-paired-attribute .road-mode-input.road-mode-inactive > button {
+                opacity: 0.45;
+                filter: saturate(0.5);
+            }
+
+            &.vehicle-environment-inactive {
+                .attribute-value button {
+                    opacity: 0.45;
+                    filter: saturate(0.5);
+                }
+            }
         }
     }
 
@@ -91,6 +115,16 @@
         padding-left: 4px;
         color: var(--sr5v2-label);
         border-bottom: 1px solid var(--sr5v2-border);
+    }
+
+    #active-skills-scroll {
+        > .list-item-container.active-skill-row {
+            background: none;
+        }
+
+        > .list-item-container.active-skill-row:not(.hidden):nth-child(even of .active-skill-row:not(.hidden)) {
+            background: rgba(variables.$white, 0.03);
+        }
     }
 
     select#select-inventory {

@@ -15,6 +15,8 @@
         "AutomateProgressiveRecoilDescription": "Characters accrue progressive recoil until reset",
         "CompendiumBrowserBlacklist": "Compendium Browser Blacklist",
         "CompendiumBrowserBlacklistDescription": "List of compendiums to hide from the compendium browser",
+        "CollapseModifyRollByDefault": "Collapse Modify Roll by default",
+        "CollapseModifyRollByDefaultDescription": "If enabled, the Modify Roll section starts collapsed when opening a test dialog.",
         "DefaultOpposedTestActorSelection": "Overwrite opposed test token selections",
         "DefaultOpposedTestActorSelectionDescription": "Always overwrite selected tokens with targets used for testing",
         "DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
@@ -30,6 +32,10 @@
         "FreshIcon": "Highlight with Icon Only",
         "HideGMOnlyChatContent": "Hide critical information on GM test",
         "HideGMOnlyChatContentDescription": "GM test messages will only show all information to players that own the used actor",
+        "InitiativeModeUpdateStrategyName": "Initiative Mode Update Strategy",
+        "InitiativeModeUpdateStrategyDescription": "How initiative is updated when switching initiative mode in combat",
+        "InitiativeModeUpdateStrategyDeltaDice": "Delta Dice (roll difference)",
+        "InitiativeModeUpdateStrategyReroll": "Full Reroll",
         "IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",
         "ImportIconFolderDescription": "The folder where the importer can find icon files. Default location: 'systems/shadowrun5e/dist/icons/importer/'",
         "ImportIconFolderName": "Importer Icon Folder",
@@ -48,6 +54,8 @@
         "ShowSkillsWithDetailsDescription": "When set skill list display will mirror core rulebook style (italics, short attributes)",
         "ShowTokenNameForChatOutputDescription": "Should the token name be used for roll card output instead of the actor name when available",
         "ShowTokenNameForChatOutputName": "Use Token Name for Roll Card",
+        "TokenAutoRunning": "Auto-Detect Running Movement",
+        "TokenAutoRunningDescription": "Automatically switch token movement mode to running when measured distance exceeds walking speed",
         "TokenHealthBars": "Token health bars",
         "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring",
         "TokenRulerColorRunning": "Token Movement Running Color",
@@ -546,10 +554,31 @@
         "Bullet": "Round",
         "BulletCount": "Bullet Count",
         "Bullets": "Rounds",
+        "BuyHits": "Buy Hits",
         "COMBAT": {
+            "CannotSeizeAgain": "You cannot seize initiative again until the start of your next turn.",
+            "ModeAstral": "Astral",
+            "ModeChangedLabel": "Initiative Mode Updated",
+            "ModeChangeNewInitiative": "New initiative",
+            "ModeChangePreviousInitiative": "Previous initiative",
+            "ModeMatrix": "Matrix",
+            "ModeMeatspace": "Meatspace",
+            "ModeTitle": "Mode: {mode}",
+            "ModeUnknown": "Unknown",
+            "NextPass": "Next Pass",
+            "NextPhase": "Next Phase",
+            "NextTurn": "Next Turn",
+            "NoHistoryAvailable": "No combat history snapshot is available.",
+            "PreviousPass": "Previous Pass",
+            "PreviousPhase": "Previous Phase",
+            "PreviousTurn": "Previous Turn",
             "ReduceInitByFive": "Initiative -5",
             "ReduceInitByOne": "Initiative -1",
-            "ReduceInitByTen": "Initiative -10"
+            "ReduceInitByTen": "Initiative -10",
+            "SeizeInitiative": "Seize Initiative",
+            "SeizedInitiative": "Seized Initiative",
+            "ToggleActedStatusGMOnly": "Toggle Acted Status (GM Only)",
+            "TrackerTitle": "Turn {round} (Pass {pass})"
         },
         "CallInAction": {
             "ActorType": "Actor Type",
@@ -678,6 +707,20 @@
             "MatrixActionsPack": {
                 "hint": "This compendium will be used for all matrix actions.",
                 "label": "Matrix Actions"
+            },
+            "SkillsPacksSection": "Skills Compendiums",
+            "ActionsPacksSection": "Actions Compendiums",
+            "SkillsPack": {
+                "hint": "This compendium will be used for all skills.",
+                "label": "Skills"
+            },
+            "SkillGroupsPack": {
+                "hint": "This compendium will be used for skill groups.",
+                "label": "Skill Groups"
+            },
+            "SkillSetsPack": {
+                "hint": "This compendium will be used for skill sets.",
+                "label": "Skill Sets"
             },
             "Title": "System compendiums"
         },
@@ -1114,6 +1157,7 @@
             "Threshold": " with a threshold of "
         },
         "Gear": "Gear",
+        "General": "General",
         "Glitch": "Glitch!",
         "GlitchCritical": "Critical Glitch!",
         "Glitches": "Glitches:",
@@ -1738,7 +1782,8 @@
             "WarningTitle": "Alert"
         },
         "Magic": "Magic",
-        "ManualOverride": "Manual Override",
+        "Manual": "Manual",
+        "ManualOverride": "Result Override",
         "MarkImportedItemReviewed": "Mark Imported Item Reviewed",
         "MarkImportedItemTooltip": "Marks this imported item as having been reviewed.",
         "MarkImportsReviewed": "Mark Imports Reviewed",
@@ -1791,6 +1836,7 @@
             "SomeAmmo": "Not enough ammunition to fire in selected mode, mode modifiers will be reduced.",
             "SomeAmmoMelee": "Not enough ammunition left to make a melee attack"
         },
+        "ModifyRoll": "Modify Roll",
         "ModPoints": "Mod Points",
         "Modification": {
             "FIELDS": {
@@ -2051,6 +2097,9 @@
         },
         "Resist": "Resist",
         "RestoreDefaultSkills": "Restore Default Skills",
+        "ResultOverrideGlitches": "Glitches",
+        "ResultOverrideHits": "Hits",
+        "ResultOverride": "Result Override",
         "RightClickToClear": "Right Click to Clear",
         "Ritual": {
             "FIELDS": {
@@ -2117,6 +2166,127 @@
             "Total": "Result"
         },
         "Skill": {
+            "FIELDS": {
+                "type": {
+                    "label": "Type",
+                    "hint": "Defines what kind of skill configurations are available"
+                },
+                "skill": {
+                    "category": {
+                        "label": "Category",
+                        "hint": "Category of this skill"
+                    },
+                    "knowledgeType": {
+                        "label": "Knowledge Type",
+                        "hint": "Type of knowledge skill"
+                    },
+                    "rating": {
+                        "label": "Rating",
+                        "hint": "Rating of this entry"
+                    },
+                    "defaulting": {
+                        "label": "Defaulting",
+                        "hint": "If this skill can be defaulted"
+                    },
+                    "attribute": {
+                        "label": "Attribute",
+                        "hint": "Attribute used by this skill"
+                    },
+                    "limit": {
+                        "attribute": {
+                            "label": "Limit",
+                            "hint": "Limit to use for this skill action. Leave empty to use default attribute limit."
+                        }
+                    },
+                    "specializations": {
+                        "label": "Specialization",
+                        "hint": "Specialization for this skill, if any"
+                    },
+                    "language": {
+                        "isNative": {
+                            "label": "Native",
+                            "hint": "Marks this language as native"
+                        }
+                    },
+                    "requirement": {
+                        "label": "Requirement",
+                        "hint": "What the actor must be for this skill to be available"
+                    }
+                },
+                "group": {
+                    "label": "Skill Group",
+                    "hint": "Configuration for a skill group",
+                    "skills": {
+                        "label": "Skills",
+                        "hint": "Skills that are part of this group"
+                    },
+                    "rating": {
+                        "label": "Rating",
+                        "hint": "Rating of this skill group"
+                    }
+                },
+                "set": {
+                    "label": "Skill Set",
+                    "hint": "Configuration for a skill set",
+                    "default": {
+                        "label": "Use On New Actors",
+                        "hint": "Add this skill set to newly created actors"
+                    },
+                    "skills": {
+                        "label": "Skills",
+                        "hint": "Skills that are part of this set",
+                        "name": {
+                            "label": "Name",
+                            "hint": "Name of the skill"
+                        },
+                        "rating": {
+                            "label": "Rating",
+                            "hint": "Rating of this skill"
+                        },
+                        "specializations": {
+                            "label": "Specialization",
+                            "hint": "Specializations granted to this skill when the set is applied"
+                        }
+                    },
+                    "groups": {
+                        "label": "Skill Groups",
+                        "hint": "Skill groups that are part of this set",
+                        "name": {
+                            "label": "Name",
+                            "hint": "Name of the skill group"
+                        },
+                        "rating": {
+                            "label": "Rating",
+                            "hint": "Rating of this skill group"
+                        }
+                    }
+                }
+            },
+            "Types": {
+                "Skill": "Skill",
+                "Group": "Skill Group",
+                "Set": "Skill Set"
+            },
+            "Category": {
+                "Active": "Active",
+                "Knowledge": "Knowledge",
+                "Language": "Language"
+            },
+            "KnowledgeType": {
+                "Academic": "Academic",
+                "Professional": "Professional",
+                "Interests": "Interests",
+                "Street": "Street"
+            },
+            "Groups": {
+            },
+            "Sets": {
+
+            },
+            "Set": {
+                "LogActorDifferences": "Log Actor Differences",
+                "DifferencesLoggedInConsole": "Open your browser console to view differences"
+            },
             "AeronauticsMechanic": "Aeronautics Mechanic",
             "Alchemy": "Alchemy",
             "AnimalHandling": "Animal Handling",
@@ -2487,6 +2657,10 @@
             },
             "Type": "Type"
         },
+        "StatusEffects": {
+            "Running": "Running",
+            "Sprinting": "Sprinting"
+        },
         "Stock": "Stock",
         "StreetCred": "Street Cred",
         "StunTrack": "Stun Track",
@@ -2615,6 +2789,7 @@
             "ThrownAttackTest": "Thrown Weapon Attack"
         },
         "Threshold": "Threshold",
+        "ToggleBreakdown": "Toggle Breakdown",
         "ToggleActive": "Toggle Active",
         "ToggleEquip": "Toggle Equipped",
         "ToggleWireless": "Toggle Wireless",
@@ -2646,7 +2821,8 @@
                 "RemoveOneService": "Remove One Service",
                 "ResetActorForNewRun": "Reset damage, edge, etc. for a new run",
                 "RollInitiative": "Roll Initiative",
-                "SetupPAN": "Add all Equipped Wireless Devices to this character's Persona"
+                "SetupPAN": "Add all Equipped Wireless Devices to this character's Persona",
+                "RemoveSkillSet": "Remove the current skill set as well as all skills and skill groups sourced from it"
             },
             "CallInAction": {
                 "ActorType": "Type of actor to call in",
@@ -2668,6 +2844,7 @@
                 "DocumentEffects": "Effects directly on this document",
                 "EditEffect": "Edit Effect",
                 "ItemEffects": "Effects collected from items on this document",
+                "HelpLinkEnglishOnly": "Help (External link, English only)",
                 "OnlyAllFilteredUsed": "This effect will only apply for tests matching all selections",
                 "OnlyFilteredUsed": "This effect will only apply for tests matching at least one selection",
                 "OnlyForItemTest": "Only affect test of parent item",
@@ -2713,12 +2890,14 @@
                 "SpiritType": "Type of the summoned spirit"
             },
             "Test": {
+                "BuyHits": "Do not roll dice. Buy hits using ⌊dice pool / 4⌋.",
                 "Extended": "Test will be thrown as an extended test until threshold is reached",
                 "Limit": "Calculated limit value",
-                "ManualGlitches": "Amount of glitches from manually thrown dice pool. Must be used together with manual hits.",
                 "Modifier": "Sum of all modifiers applied to dice pool",
                 "Pool": "Amount of dice to roll",
                 "PushTheLimit": "Apply push the limit edge rules",
+                "ResultOverrideGlitches": "Override glitches for this test result.",
+                "ResultOverrideHits": "Override hits for this test result.",
                 "RollMode": "FoundryVTT chat message roll visibility",
                 "Threshold": "Calculated threshold value"
             },
@@ -2771,6 +2950,7 @@
                 "Rigger": "Rigger"
             },
             "Driver": "Driver",
+            "DamagedVehicle": "Damaged Vehicle",
             "Drone": "Drone",
             "Environments": {
                 "Handling": "Handling",
@@ -2793,6 +2973,7 @@
             "Stats": {
                 "Acceleration": "Acceleration",
                 "Handling": "Handling",
+                "OffRoadAcceleration": "Acceleration (Off Road)",
                 "OffRoadHandling": "Handling (Off Road)",
                 "OffRoadSpeed": "Speed (Off Road)",
                 "Pilot": "Pilot",
@@ -2824,6 +3005,7 @@
         "Walk": "Walk",
         "WalkingSpeed": "Walking",
         "Warnings": {
+            "ActorMissingRequirements": "Actor must match the skills awakened or emerged requirement",
             "AlreadyExistingInventory": "An inventory with this name already exists",
             "AlreadyJoinedNetwork": "{name} already joined this network",
             "BulkImportPerformanceWarning": "If you imported a large number of items, Foundry may run slowly until you refresh your browser. It is recommended to refresh now.",
@@ -2838,6 +3020,7 @@
             "CantSecondChanceAGlitch": "Can't second chance this test. Test result is glitched.",
             "CantSecondChanceWithoutNoneHits": "Can't second chance this test. Only hit-dice left.",
             "CantSpendMulitplePointsOfEdge": "Can't spend multiple points of edge on one test or action",
+            "CantCombineBuyHitsWithEdge": "Buy Hits can't be combined with Second Chance.",
             "CompilationNotConcluded": "Compilation incomplete. Wait for sprite to oppose compilation to determine fade.",
             "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge points can't be spent on tests without actors",
             "HostItemOnlyAcceptIC": "Only IC actors can be added to hosts",
@@ -2850,7 +3033,9 @@
             "RitualInvalidForce": "Ritual force is invalid or greater then your lodges rating.",
             "RitualNotConcluded": "Ritual incomplete. Wait for ritual to oppose spellcasting to determine drain.",
             "RitualNotEnoughReagents": "Not enough reagents offered.",
+            "SkillAlreadyExists": "Skill {name} already exists on actor {actorName} ({actorUuid}). Make sure to only use a skill name once per skill category.",
             "SkillCantBeDefault": "This skill can't be rolled as it can't be defaulted",
+            "SkillSetDefaultTypeOutsideCompendium": "Only skillsets in the configured skillset compendium will affect actor creation",
             "SummoningNotConcluded": "Summoning incomplete. Wait for spirit to oppose summoning to determine drain.",
             "TokenSelectionNeeded": "One or more tokens need to be selected"
         },
@@ -2997,6 +3182,7 @@
                     "AssaultCannon": "Assault Cannon",
                     "AssaultRifle": "Assault Rifle",
                     "Bow": "Bow",
+                    "Carbine": "Carbine",
                     "Flamethrower": "Flamethrower",
                     "GrenadeLauncher": "Grenade Launcher",
                     "HarpoonGun": "Harpoon Gun",
@@ -3019,6 +3205,7 @@
                     "Shuriken": "Shuriken",
                     "SniperRifle": "Sniper Rifle",
                     "SportingRifle": "Sporting Rifle",
+                    "SprayPen": "Spray Pen",
                     "StandardThrownGrenade": "Standard Grenade",
                     "Taser": "Taser",
                     "ThrownKnife": "Thrown Knife"
@@ -3073,6 +3260,7 @@
             "quality": "Quality",
             "ritual": "Ritual",
             "sin": "SIN",
+            "skill": "Skill",
             "spell": "Spell",
             "sprite_power": "Sprite Power",
             "vehicle": "Vehicle",

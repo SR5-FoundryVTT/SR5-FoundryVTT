@@ -1,11 +1,10 @@
-import { Helpers } from '../../../helpers';
-import {SR} from "../../../constants";
-import {SR5} from "../../../config";
-import { PartsList } from '../../../parts/PartsList';
-import { ItemPrep } from './ItemPrep';
+import { SR5 } from '../../../config';
+import { SR } from '../../../constants';
 import { SR5Actor } from '../../SR5Actor';
-import { AttributeFieldType } from 'src/module/types/template/Attributes';
+import { Helpers } from '../../../helpers';
 import { SR5Item } from 'src/module/item/SR5Item';
+import { ModifiableValue } from '@/module/mods/ModifiableValue';
+import { AttributeFieldType } from 'src/module/types/template/Attributes';
 
 export class AttributesPrep {
     /**
@@ -23,8 +22,13 @@ export class AttributesPrep {
         attributes.essence.hidden = true;
 
         // set the value for the attributes
-        for (const [name, attribute] of Object.entries(attributes))
-            AttributesPrep.prepareAttribute(name, attribute, ranges)
+        for (const [name, attribute] of Object.entries(attributes)) {
+            AttributesPrep.prepareAttribute(name, attribute, ranges);
+
+            if ('max' in attribute) {
+                attribute.max = attribute.value;
+            }
+        }
     }
 
     /**
@@ -57,7 +61,7 @@ export class AttributesPrep {
         // Each attribute can have a unique value range.
         // TODO:  Implement metatype attribute value ranges for character actors.
         const range = ranges ? ranges[name] : SR.attributes.ranges[name];
-        Helpers.calcTotal(attribute, range);
+        ModifiableValue.calcTotal(attribute, range);
     }
 
     /**
@@ -71,17 +75,16 @@ export class AttributesPrep {
         system.attributes.essence.base = SR.attributes.defaults.essence;
 
         // Modify essence by actor modifer
-        const parts = new PartsList<number>(system.attributes.essence.mod);
+        const parts = new ModifiableValue(system.attributes.essence);
 
-        const essenceMod = system.modifiers['essence'];
-        if (essenceMod && !Number.isNaN(essenceMod)) {
-            parts.addUniquePart('SR5.Bonus', Number(essenceMod));
+        const essenceMod = system.modifiers.essence;
+        parts.addUnique('SR5.Bonus', essenceMod);
+
+        for (const item of items) {
+            if (item.isEquipped() && item.isType('bioware', 'cyberware'))
+                parts.add(item.name, -item.getEssenceLoss());
         }
 
-        system.attributes.essence.mod = parts.list;
-
-        ItemPrep.prepareWareEssenceLoss(system, items);
-
-        system.attributes.essence.value = Helpers.calcTotal(system.attributes.essence);
+        ModifiableValue.calcTotal(system.attributes.essence);
     }
 }

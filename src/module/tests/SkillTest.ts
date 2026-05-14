@@ -1,7 +1,8 @@
 import { DataDefaults } from '../data/DataDefaults';
-import { PartsList } from '../parts/PartsList';
+import { ModifiableValue } from '../mods/ModifiableValue';
 import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
 import { Translation } from '../utils/strings';
+import { SkillNamingFlow } from '../flows/SkillNamingFlow';
 
 export interface SkillTestData extends SuccessTestData {
     attribute: Shadowrun.ActorAttribute
@@ -38,7 +39,9 @@ export class SkillTest extends SuccessTest<SkillTestData> {
      */
     override get title() {
         if (!this.actor) return super.title;
-        return `${game.i18n.localize(this.actor.getSkillLabel(this.data.action.skill) as Translation)} ${game.i18n.localize('SR5.Test')}`;
+
+        const skillLabel = this.actor.getSkill(this.data.action.skill)?.label ?? SkillNamingFlow.localizeSkillName(this.data.action.skill);
+        return `${skillLabel} ${game.i18n.localize('SR5.Test')}`;
     }
 
     /**
@@ -78,13 +81,13 @@ export class SkillTest extends SuccessTest<SkillTestData> {
         const usedAttribute = this.actor.getAttribute(selectedAttribute);
         const lastUsedAttribute = this.actor.getAttribute(this.lastUsedAttribute);
 
-        if (!usedAttribute || !lastUsedAttribute) return; 
+        if (!usedAttribute || !lastUsedAttribute || usedAttribute.label === lastUsedAttribute.label) return;
 
-        const pool = new PartsList<number>(this.pool.mod);
+        const pool = new ModifiableValue(this.pool);
 
         // Replace previous attribute with new one, without changing other modifiers
-        pool.removePart(lastUsedAttribute.label);
-        pool.addPart(usedAttribute.label, usedAttribute.value);
+        pool.remove(lastUsedAttribute.label);
+        pool.addBase(usedAttribute.label, usedAttribute.value);
 
         this.lastUsedAttribute = selectedAttribute;
         this.data.action.attribute = selectedAttribute;
@@ -102,13 +105,13 @@ export class SkillTest extends SuccessTest<SkillTestData> {
         const usedLimit = this.actor.getLimit(selectedLimit);
         const lastUsedLimit = this.actor.getLimit(this.lastUsedLimit);
 
-        if (!usedLimit || !lastUsedLimit) return;
+        if (!usedLimit || !lastUsedLimit || usedLimit.label === lastUsedLimit.label) return;
 
-        const limit = new PartsList<number>(this.limit.mod);
+        const limit = new ModifiableValue(this.limit);
 
         // Replace previous limit with new one, without changing other modifiers.
-        limit.removePart(lastUsedLimit.label);
-        limit.addPart(usedLimit.label, usedLimit.value);
+        limit.remove(lastUsedLimit.label);
+        limit.addBase(usedLimit.label, usedLimit.value);
 
         this.lastUsedLimit = selectedLimit;
 

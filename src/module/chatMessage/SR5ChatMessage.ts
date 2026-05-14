@@ -7,7 +7,7 @@ import { TestCreator } from "../tests/TestCreator";
  * 
  * If you need to add chat related features, events and listeners you should do so here.
  */
-export class SR5ChatMessage extends ChatMessage {
+export class SR5ChatMessage extends ChatMessage<'base'> {
     get _testData(): any {
         return this.getFlag(SYSTEM_NAME, FLAGS.Test);
     }

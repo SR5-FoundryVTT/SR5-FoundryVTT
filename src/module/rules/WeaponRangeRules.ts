@@ -3,7 +3,7 @@ import { Helpers } from '../helpers';
 import { SR5 } from '../config';
 import { RangedWeaponRules } from './RangedWeaponRules';
 import { DataDefaults } from '../data/DataDefaults';
-import { PartsList } from '../parts/PartsList';
+import { ModifiableValue } from '../mods/ModifiableValue';
 import { DocumentSituationModifiers } from './DocumentSituationModifiers';
 import { SuccessTest, SuccessTestData } from '../tests/SuccessTest';
 import { SR5Item } from '../item/SR5Item';
@@ -91,17 +91,19 @@ export class WeaponRangeTestBehavior {
         }
 
         // Build target ranges for template display.
-        test.data.targetRanges = test.targets.map(token => {
-            const distance = Helpers.measureTokenDistance(attacker, token as TokenDocument);
-            const range = RangedWeaponRules.getRangeForTargetDistance(distance, test.data.ranges);
-            return {
-                tokenUuid: token.uuid,
-                name: token.name || '',
-                unit: LENGTH_UNIT,
-                range,
-                distance,
-            };
-        });
+        test.data.targetRanges = test.targets
+            .map(token => {
+                const distance = Helpers.measureTokenDistance(attacker, token as TokenDocument);
+                const range = RangedWeaponRules.getRangeForTargetDistance(distance, test.data.ranges);
+                return {
+                    tokenUuid: token.uuid ?? '',
+                    name: token.name || '',
+                    unit: LENGTH_UNIT,
+                    range,
+                    distance,
+                } satisfies TargetRangeTemplateType;
+            })
+            .filter((target): target is TargetRangeTemplateType => !!target.tokenUuid);
 
         // Sort targets by ascending distance from attacker.
         test.data.targetRanges = test.data.targetRanges.sort((a, b) => {
@@ -159,6 +161,7 @@ export class WeaponRangeTestBehavior {
             const token = fromUuidSync(target.tokenUuid) as TokenDocument;
             if (!(token instanceof TokenDocument)) return console.error(`Shadowrun 5e | ${test.type} got a target that is no TokenDocument`, token);
             if (!token.actor) return console.error(`Shadowrun 5e | ${test.type} got a token that has no actor`, token);
+            if (!token.actor.uuid) return console.error(`Shadowrun 5e | ${test.type} got a token with an actor that has no uuid`, token);
             test.data.targetActorsUuid = [token.actor.uuid];
             test.targets = [token];
         }
@@ -177,7 +180,7 @@ export class WeaponRangeTestBehavior {
     private static prepareEnvironmentalModifier(test: WeaponRangeTest) {
         if (!test.actor) return;
 
-        const poolMods = new PartsList(test.data.modifiers.mod);
+        const poolMods = new ModifiableValue(test.data.pool);
 
         // Apply altered environmental modifiers
         const range = test.hasTargets ? test.data.targetRanges[test.data.targetRangesSelected].range.modifier : test.data.range;
@@ -187,7 +190,7 @@ export class WeaponRangeTestBehavior {
         modifiers.environmental.setActive('range', Number(range));
         modifiers.environmental.apply({reapply: true, test});
 
-        poolMods.addUniquePart(SR5.modifierTypes.environmental, modifiers.environmental.total);
+        poolMods.setUnique(SR5.modifierTypes.environmental, modifiers.environmental.total);
     }
 
     static async processResults(test: WeaponRangeTest) {
@@ -197,9 +200,10 @@ export class WeaponRangeTestBehavior {
     private static async markActionPhaseAsAttackUsed(test: WeaponRangeTest) {
         if (!test.actor?.combatActive) return;
 
-        const combatant = test.actor.combatant;
-        if (!combatant) return;
-
-        await combatant.setFlag(SYSTEM_NAME, 'turnsSinceLastAttack', 0);
+        // Mark all combatants of the actor as having attacked this turn
+        const combatants = test.actor.combatants;
+        for (const combatant of combatants) {
+            await combatant.update({ system: { attackedLastTurn: true } });
+        }
     }
 }

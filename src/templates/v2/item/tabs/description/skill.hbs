@@ -1,0 +1,53 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        {{#if (eq item.system.type 'skill')}}
+            <div class="list-item list-item-header">
+                <div class="list-item-start">
+                    <label>{{systemFields.skill.fields.specializations.label}}</label>
+                </div>
+                <div class="list-item-icons">
+                    {{#if @root.isEditMode}}
+                        <a data-action="addSpecialization" data-tooltip="SR5.Add">
+                            <i class="fas fa-plus"></i>
+                        </a>
+                    {{/if}}
+                </div>
+            </div>
+            <div class="scrollable">
+                {{#each system.skill.specializations as |specialization i|}}
+                    {{#with @root.systemFields.skill.fields.specializations.element.fields as |specializationFields|}}
+                        <div class="list-item" data-index="{{i}}">
+                            <div class="list-item-col select-col">
+                                {{formInput specializationFields.name
+                                            name=(concat "system.skill.specializations." i ".name")
+                                            value=specialization.name
+                                            classes="short" rootId=@root.rootId
+                                            disabled=@root.isPlayMode}}
+                            </div>
+                            {{#if @root.isEditMode}}
+                                <div class="list-item-icons">
+                                    <a data-action="removeSpecialization" data-index="{{i}}" data-tooltip="SR5.Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            {{/if}}
+                        </div>
+                    {{/with}}
+                {{/each}}
+            </div>
+        {{else}}
+            <div class="list-item list-item-header">
+                <div class="list-item-start">
+                    <label>{{localize "SR5.Description"}}</label>
+                </div>
+            </div>
+            <div class="scrollable">
+                {{#if @root.isEditMode}}
+                    {{formInput systemFields.description.fields.value value=source.system.description.value rootId=@root.rootId}}
+                {{else}}
+                    {{{descriptionHTML}}}
+                {{/if}}
+            </div>
+        {{/if}}
+    </div>
+</section>

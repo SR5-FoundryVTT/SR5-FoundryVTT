@@ -4,7 +4,7 @@ import { MatrixNetworkFlow } from "@/module/item/flows/MatrixNetworkFlow";
 import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
 import { Helpers } from '@/module/helpers';
 import { MatrixRules } from '@/module/rules/MatrixRules';
-import { PackActionFlow } from "@/module/item/flows/PackActionFlow";
+import { PackItemFlow } from "@/module/item/flows/PackItemFlow";
 import { SheetFlow } from '@/module/flows/SheetFlow';
 
 interface VehicleSheetDataFields extends MatrixActorSheetData {
@@ -35,6 +35,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
 
     static override DEFAULT_OPTIONS = {
         actions: {
+            rollAttribute: SR5VehicleActorSheet.#rollVehicleAttribute,
             pickDriver: SR5VehicleActorSheet.#pickDriver,
             connectToDriver: SR5VehicleActorSheet.#connectToDriver,
             removeMaster: SR5VehicleActorSheet.#removeMaster,
@@ -80,7 +81,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
 
     protected override async _getMatrixPackActions() {
         // filter out illegal actions from the matrix actions
-        return (await PackActionFlow.getMatrixPackActions()).filter((action) => {
+        return (await PackItemFlow.getMatrixPackActions()).filter((action) => {
             return !MatrixRules.isIllegalAction(
                         action.getAction()?.attribute as any,
                         action.getAction()?.attribute2 as any,
@@ -89,8 +90,9 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
     }
 
     override async _onDropActor(event: DragEvent, actor: SR5Actor) {
+        if (!actor.uuid) return null;
         await this.actor.addVehicleDriver(actor.uuid);
-        return null
+        return null;
     }
 
     override async _onDropItem(event: DragEvent, item: SR5Item) {
@@ -117,7 +119,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
      * Allow gear (vehicle) modification to lie around in inventory while still allowing calculations around equipped modifications.
      */
     _prepareEquippedModifications() {
-        return this.actor.itemsForType.get('modification')?.filter(item => item.isEquipped()) as SR5Item<'modification'>[] || [];
+        return this.actor.itemsForType.get('modification')?.filter(item => item.isEquipped()) || [];
     }
 
     static override TABS = {
@@ -152,7 +154,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         skills: {
             template: SheetFlow.templateBase('actor/tabs/vehicle-skills'),
             templates: [...SheetFlow.templateActorSystemParts(
-                'active-skills', 'vehicle-attributes'
+                'active-skills', 'vehicle-attributes', 'vehicle-paired-attribute'
             ), ...SheetFlow.templateListItem('skill')],
             scrollable: ['#active-skills-scroll']
         },
@@ -190,6 +192,7 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         if (actors.length > 0) {
             // pick the first controlled actor
             const actor = actors[0];
+            if (!actor.uuid) return;
             await this.actor.addVehicleDriver(actor.uuid);
             void this.render();
         }
@@ -212,6 +215,24 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         event.preventDefault();
         const isOffRoad = !this.actor.system.isOffRoad;
         await this.actor.update({system: { isOffRoad }});
+    }
+
+    static async #rollVehicleAttribute(this: SR5VehicleActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
+
+        const attribute = event.target?.closest<HTMLElement>('[data-attribute-id]')?.dataset?.attributeId;
+        if (!attribute) return;
+
+        const limit = attribute.includes('speed') ? 'speed' :
+                      attribute.includes('handling') ? 'handling' : undefined;
+
+        if (limit) {
+            await this.actor.rollVehiclePilotByLimit(limit, { event });
+        } else {
+            // fallback to normal attribute roll if no limit could be found
+            await this.actor.rollAttribute(attribute, { event });
+        }
     }
 
     static async #removeMaster(this: SR5VehicleActorSheet, event: Event) {

@@ -2,7 +2,7 @@
     {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/header.hbs'
         label="SR5.ActiveSkills"
         headerAction="filterTrainedSkills"
-        addAction="addActiveSkill"
+        addAction="addItem"
         category='active'
         cssClass="active-skills-header header-for-scrollable"
     }}
@@ -15,14 +15,16 @@
         />
     </div>
     <section id="active-skills-scroll" class="scrollable">
-        {{#each system.skills.active as |skill sid|}}
+       {{#each system.skills.active as |skill translated|}}
             {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill/item.hbs'
-                skillPath=(concat "system.skills.active." sid)
                 category='active'
                 skill=skill
-                removeAction="removeActiveSkill"
-                id=sid
             }}
+        {{/each}}
+
+        {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill-group/header.hbs' addAction='addItem' }}
+        {{#each skillGroups as |group|}}
+            {{> 'systems/shadowrun5e/dist/templates/v2/list-items/skill-group/item.hbs' group=group }}
         {{/each}}
     </section>
 </div>

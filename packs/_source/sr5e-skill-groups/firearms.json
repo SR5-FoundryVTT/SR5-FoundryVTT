@@ -1,0 +1,47 @@
+{
+  "name": "Firearms",
+  "type": "skill",
+  "img": "systems/shadowrun5e/dist/icons/groups/firearms.webp",
+  "system": {
+    "description": {
+      "value": "",
+      "chat": "",
+      "source": ""
+    },
+    "importFlags": null,
+    "type": "group",
+    "skill": {
+      "category": "active",
+      "rating": 0,
+      "defaulting": false,
+      "attribute": "",
+      "specializations": [],
+      "group": "",
+      "requirement": "mundane",
+      "language": {
+        "isNative": false
+      },
+      "knowledgeType": null
+    },
+    "group": {
+      "skills": [
+        "Automatics",
+        "Longarms",
+        "Pistols"
+      ],
+      "rating": 0
+    },
+    "set": {
+      "skills": [],
+      "groups": []
+    }
+  },
+  "effects": [],
+  "folder": null,
+  "flags": {},
+  "ownership": {
+    "default": 0
+  },
+  "_id": "5ojufCVabY9e7A38",
+  "_key": "!items!5ojufCVabY9e7A38"
+}

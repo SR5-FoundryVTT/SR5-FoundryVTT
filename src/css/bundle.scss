@@ -2,9 +2,11 @@
 
 // import config first to get all the variables and mixins set
 @use 'config';
+@use 'combat';
 @use 'importer';
 @use 'compendium-browser';
 @use 'item';
+@use 'items/skill';
 @use 'actor';
 @use 'foundry-chat-message';
 @use 'test';
@@ -13,15 +15,16 @@
 @use 'modifiers-container';
 @use 'context-menu';
 @use 'foundry';
+@use 'settings';
 @use 'module';
 @use 'effect';
 @use 'list-item';
-@use "horixontal-cells";
-@use "situational-modifiers-app";
-@use "actor-apps";
-@use "bundle-v2";
-@use "config/mixins";
-@use "config/variables";
+@use 'horixontal-cells';
+@use 'situational-modifiers-app';
+@use 'actor-apps';
+@use 'bundle-v2';
+@use 'config/mixins';
+@use 'config/variables';
 
 // This explicitly loads the CSS content into this location
 @include meta.load-css('../../node_modules/@yaireo/tagify/dist/tagify');
@@ -219,7 +222,7 @@
     }
     span.selection-inventory {
         display: flex;
-        gap: .25rem;
+        gap: 0.25rem;
         margin: 0.2em;
     }
 }
@@ -412,11 +415,17 @@ input[type='text'].display {
     }
 }
 /**
-     * Special SR5 hr and select display
-     */
+ * Special SR5 hr and select display
+ */
 .sr5 {
     hr {
-        border-color: variables.$yellow;
+        border: none;
+        height: 0;
+        border-bottom: 1px solid variables.$yellow;
+        
+        margin-left: 0;
+        margin-right: 0;
+        width: 100%;
     }
 
     select.display,
@@ -1212,26 +1221,6 @@ input[type='text'].display {
             background: variables.$light;
         }
     }
-    button.display.show-hidden-skills {
-        color: variables.$color;
-        border-color: variables.$black;
-        background: rgb(70, 7, 7);
-        border-radius: 0.3em;
-        text-align: center;
-
-        &:hover {
-            cursor: pointer;
-        }
-
-        &.short {
-            line-height: 1.3em;
-        }
-
-        &.light {
-            color: variables.$black;
-            background: variables.$light;
-        }
-    }
 
     button.display.reset-actor-run-data {
         color: variables.$color;
@@ -1278,10 +1267,6 @@ input[type='text'].display {
 
     td.env-modifier-level {
         padding-right: 6px;
-    }
-
-    .skill-roll-not-defaultable {
-        font-style: italic;
     }
 
     /** Input element for inventory name editing */

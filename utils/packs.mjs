@@ -34,6 +34,39 @@ const PACK_DEST = 'packs';
  */
 const PACK_SRC = 'packs/_source';
 
+/**
+ * Reserved path segment names that are not portable across supported filesystems.
+ * Slugification already strips separators and trailing punctuation, so these are the
+ * remaining basename collisions we need to guard against explicitly.
+ * @type {Set<string>}
+ */
+const RESERVED_FILE_BASENAMES = new Set([
+    '.',
+    '..',
+    'con',
+    'prn',
+    'aux',
+    'nul',
+    'com1',
+    'com2',
+    'com3',
+    'com4',
+    'com5',
+    'com6',
+    'com7',
+    'com8',
+    'com9',
+    'lpt1',
+    'lpt2',
+    'lpt3',
+    'lpt4',
+    'lpt5',
+    'lpt6',
+    'lpt7',
+    'lpt8',
+    'lpt9',
+]);
+
 // -------------------------------------------------------------------------
 //  EXECUTION
 // -------------------------------------------------------------------------
@@ -154,10 +187,10 @@ async function extractPacks(packName, entryName) {
             log: false,
             transformEntry: (e) => {
                 if (e._key.startsWith('!folders')) {
-                    folders[e._id] = { name: slugify(e.name), folder: e.folder };
+                    folders[e._id] = { name: toPortablePathSegment(e.name), folder: e.folder };
                 } else if (e.type === 'container') {
                     containers[e._id] = {
-                        name: slugify(e.name),
+                        name: toPortablePathSegment(e.name),
                         container: e.system?.container,
                         folder: e.folder,
                     };
@@ -194,7 +227,7 @@ async function extractPacks(packName, entryName) {
                 if (entry._id in folders) return path.join(folders[entry._id].path, '_folder.json');
                 if (entry._id in containers) return path.join(containers[entry._id].path, '_container.json');
                 
-                const outputName = slugify(entry.name);
+                const outputName = toPortablePathSegment(entry.name);
                 const parent = containers[entry.system?.container] ?? folders[entry.folder];
                 
                 return path.join(parent?.path ?? '', `${outputName}.json`);
@@ -286,6 +319,17 @@ function slugify(name) {
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')     // replace all non-alphanumerics with -
         .replace(/^-+|-+$/g, '');        // trim hyphens
+}
+
+/**
+ * Convert an entry name into a filesystem-safe path segment while keeping the
+ * readable slug and leaving the Foundry document name untouched inside the JSON.
+ * @param {string} name
+ * @returns {string}
+ */
+function toPortablePathSegment(name) {
+    const slug = slugify(name);
+    return RESERVED_FILE_BASENAMES.has(slug) ? `_${slug}` : slug;
 }
 
 /**

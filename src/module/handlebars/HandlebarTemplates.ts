@@ -7,7 +7,7 @@ export const preloadHandlebarsTemplates = async () => {
     }
 
     const templateListItem = (...parts: string[]) => {
-        return parts.reduce<string[]>(( items, p) => {
+        return parts.reduce<string[]>((items, p) => {
             items.push(templateBase(`list-items/${p}/header`));
             items.push(templateBase(`list-items/${p}/item`));
             return items;
@@ -27,6 +27,10 @@ export const preloadHandlebarsTemplates = async () => {
             'common/document-source-icon',
             'common/horizontal-cells',
             'common/import-flag',
+            'common/skill-source-indicator',
+            'item/header',
+            'item/tabs/details/skill',
+            'item/footer/skill',
             'common/generic-data-properties',
             'list-items/connect-network-icon',
             'list-items/connected-icons-toggle',
@@ -44,6 +48,8 @@ export const preloadHandlebarsTemplates = async () => {
             'list-items/matrix-condition-monitor',
             'list-items/matrix-icon-image',
             'list-items/open-source-icon',
+            'list-items/skill-group/header',
+            'list-items/skill-group/item',
             'list-items/toggle-expand-icon',
             'list-items/toggle-visible-icon',
             'list-items/wireless-icon',
@@ -76,6 +82,7 @@ export const preloadHandlebarsTemplates = async () => {
             'limits',
             'matrix-attribute',
             'special-attributes',
+            'vehicle-paired-attribute',
         ),
 
         'systems/shadowrun5e/dist/templates/rolls/parts/parts-list.hbs',
@@ -108,6 +115,7 @@ export const preloadHandlebarsTemplates = async () => {
 
         // dialogs
         'systems/shadowrun5e/dist/templates/apps/dialogs/damage-application.hbs',
+        'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-entry.hbs',
         'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.hbs',
         'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-documents.hbs',
         'systems/shadowrun5e/dist/templates/apps/dialogs/parts/attack-range-dialog-fragment.hbs',

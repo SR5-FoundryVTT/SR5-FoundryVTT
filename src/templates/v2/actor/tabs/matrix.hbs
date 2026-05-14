@@ -2,7 +2,7 @@
     <div class="fill-container">
         <div class="list-item list-item-header">
             {{#if matrixDevice}}
-                <div class="basic-row" data-item-id="{{matrixDevice.id}}" data-uuid="{{matrixDevice.uuid}}">
+                <div class="basic-row" data-item-id="{{matrixDevice.id}}" data-context-menu="item" data-uuid="{{matrixDevice.uuid}}">
                     {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-roll-image.hbs" matrixDevice }}
                     <a data-action="editItem">
                         {{matrixDevice.name}}

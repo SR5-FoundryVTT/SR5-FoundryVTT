@@ -1,7 +1,7 @@
 import { SR5 } from "../../config";
-import { Helpers } from "../../helpers";
 import { Translation } from '../../utils/strings';
-import { ModifiableValueType } from "src/module/types/template/Base";
+import { ModifiableValue } from "@/module/mods/ModifiableValue";
+import { FLAGS, SYSTEM_NAME } from '../../constants';
 import { SuccessTest, SuccessTestData } from "../../tests/SuccessTest";
 import { FormDialog, FormDialogData, FormDialogOptions } from "./FormDialog";
 
@@ -9,7 +9,8 @@ export interface TestDialogData extends FormDialogData {
     test: SuccessTest
     rollMode: string
     rollModes: CONFIG.Dice.RollModes
-    config: typeof SR5
+    config: typeof SR5,
+    expandedPaths: string[]
 }
 
 /**
@@ -28,6 +29,7 @@ export class TestDialog extends FormDialog {
     declare data: TestDialogData
     // Listeners as given by the dialogs creator.
     listeners: TestDialogListener[]
+    _expandedList: Set<string>;
 
     // @ts-expect-error // TODO: default option value with all the values...
     constructor(data, options: FormDialogOptions = {}, listeners: TestDialogListener[]=[]) {
@@ -36,6 +38,22 @@ export class TestDialog extends FormDialog {
         super(data, options);
 
         this.listeners = listeners;
+        this._expandedList = new Set<string>();
+
+        const hasModifierChanges = (changes) => {
+            if (!Array.isArray(changes)) return false;
+            return changes.some(change => !ModifiableValue.isBaseChange(change));
+        }
+
+        if (hasModifierChanges(data?.test?.pool?.changes))
+            this._expandedList.add('test.data.pool');
+        if (hasModifierChanges(data?.test?.limit?.changes))
+            this._expandedList.add('test.data.limit');
+        if (hasModifierChanges(data?.test?.threshold?.changes))
+            this._expandedList.add('test.data.threshold');
+
+        if (!game.settings.get(SYSTEM_NAME, FLAGS.CollapseModifyRollByDefault))
+            this._expandedList.add('modify-roll');
     }
 
     static override get defaultOptions() {
@@ -45,13 +63,106 @@ export class TestDialog extends FormDialog {
         options.classes = ['sr5', 'form-dialog'];
         options.resizable = true;
         options.height = 'auto';
-        // @ts-expect-error
-        options.width = 'auto';
+        options.width = 300;
         return options;
     }
 
     override activateListeners(html: JQuery) {
         super.activateListeners(html);
+
+        const toggleModifiableValue = (element: HTMLElement | null) => {
+            const modValueDiv = element?.closest<HTMLDivElement>('.modifiable-value');
+            const path = modValueDiv?.dataset.path;
+            if (!modValueDiv || !path) return;
+
+            // Only allow expanding rows that actually contain modifier entries.
+            if (!modValueDiv.classList.contains('has-modifiers')) return;
+
+            const isExpanded = modValueDiv.classList.toggle('expanded');
+            if (isExpanded) this._expandedList.add(path);
+            else this._expandedList.delete(path);
+            void this.render();
+        };
+
+        html.find('.modifiable-value .form-fields input[type="number"]').on('keydown', ev => {
+            if (ev.key === 'Enter') { ev.preventDefault(); ev.currentTarget.blur(); }
+        });
+
+        html.find('.toggle-breakdown').on('click', event => {
+            event.preventDefault();
+            toggleModifiableValue(event.currentTarget);
+        });
+
+        html.find('.modifiable-value').on('click', event => {
+            const target = event.target;
+            // Keep native interactions intact for inputs, toggles, and breakdown list items.
+            if (target.closest('input, select, textarea, button, a, .breakdown-list')) return;
+            toggleModifiableValue(target);
+        });
+
+        html.find('.modifier-effect-button').on('click', async event => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const button = event.currentTarget as HTMLButtonElement;
+            const effectUuid = button.dataset.effectUuid;
+            if (!effectUuid) return;
+
+            const effect = await fromUuid(effectUuid);
+            if (!(effect instanceof ActiveEffect)) return;
+
+            await effect.sheet?.render(true);
+        });
+
+        html.find('.breakdown-entry').on('click', event => {
+            const target = event.target;
+            // Let the checkbox and effect icon keep native behavior.
+            if (target.closest('input[type="checkbox"], .modifier-effect-button')) return;
+
+            const checkbox = event.currentTarget.querySelector<HTMLInputElement>('input[type="checkbox"]');
+            if (!checkbox) return;
+
+            checkbox.checked = !checkbox.checked;
+            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        html.find('.modify-roll-header').on('click', event => {
+            event.preventDefault();
+            const sectionDiv = event.currentTarget.closest('.modify-roll-section');
+            if (!sectionDiv) return;
+
+            const isExpanded = sectionDiv.classList.toggle('expanded');
+            if (isExpanded) this._expandedList.add('modify-roll');
+            else this._expandedList.delete('modify-roll');
+            void this.render();
+        });
+
+        html.find('.modify-roll-content .toggle-checkbox-row').on('click', event => {
+            const target = event.target;
+            if (target.closest('input[type="checkbox"]')) return;
+
+            const checkbox = event.currentTarget.querySelector<HTMLInputElement>('input[type="checkbox"]');
+            if (!checkbox) return;
+
+            checkbox.checked = !checkbox.checked;
+            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        html.find('.roll-mode-button').on('click', event => {
+            event.preventDefault();
+
+            const button = event.currentTarget;
+            const rollMode = button.dataset.rollMode;
+            if (!rollMode) return;
+
+            if (this.data.test.data.options?.rollMode === rollMode) return;
+
+            foundry.utils.setProperty(this.data, 'test.data.options.rollMode', rollMode);
+            this.data.test.prepareBaseValues();
+            this.data.test.calculateBaseValues();
+            this.data.test.validateBaseValues();
+            void this.render();
+        });
 
         this._injectExternalActiveListeners(html);
     }
@@ -76,16 +187,18 @@ export class TestDialog extends FormDialog {
     }
 
     //@ts-expect-error
-    getData() {
+    override getData() {
         const data = super.getData() as unknown as TestDialogData;
 
-        //@ts-expect-error //TODO: default to general roll mode user setting
-        data.rollMode = data.test.data.options?.rollMode;
+        data.rollMode = data.test.data.options?.rollMode ?? game.settings.get('core', 'rollMode');
         data.rollModes = CONFIG.Dice.rollModes;
         data.default = 'roll'; // TODO: Where is this even used and what's it for again?
 
         // Add in general SR5 config to allow access to general values.
         data.config = SR5;
+
+        // Pass the Set of expanded paths to Handlebars as an Array.
+        data.expandedPaths = Array.from(this._expandedList);
 
         return data;
     }
@@ -127,30 +240,34 @@ export class TestDialog extends FormDialog {
      *
      * @param data An object with keys in Foundry UpdateData style {'key.key.key': value}
      */
-    override _updateData(data) {
+    override _updateData(data: { [key: string]: unknown }) {
         // The user canceled their interaction by canceling, don't apply form changes.
         if (this.selectedButton === 'cancel') return;
 
+        // Apply keys ending with '.applied' first to ensure overrides are processed before dependent values
+        const entries = Object.entries(data);
+        const enabledEntries = entries.filter(([key]) => key.endsWith('.enabled'));
+        const otherEntries = entries.filter(([key]) => !key.endsWith('.enabled'));
+        
         // First, apply changes to ValueField style values in a way that makes sense.
-        Object.entries(data).forEach(([key, value]) => {
-            // key is expected to be relative from TestDialog.data and begin with 'test'
-            const valueField = foundry.utils.getProperty(this.data, key) as ModifiableValueType | undefined | null;
-            if (!valueField || foundry.utils.getType(valueField) !== 'Object' || !Object.hasOwn(valueField, 'mod')) return;
-
-            // Remove from further automatic data merging.
-            delete data[key];
+        for (const [key, value] of [...enabledEntries, ...otherEntries]) {
+            const valueField = foundry.utils.getProperty(this.data, key);
+            if (!ModifiableValue.isModifiableValue(valueField)) {
+                foundry.utils.setProperty(this.data, key, value);
+                continue;
+            }
 
             // Don't apply an unneeded override.
-            if (valueField.value === value) return;
-
-            if (value === null || value === '')
-                valueField.override = null;
-            else
-                valueField.override = { name: 'SR5.ManualOverride', value: Number(value) };
-        });
-
-        // Second, apply generic values.
-        foundry.utils.mergeObject(this.data, data);
+            if (valueField.value !== value) {
+                ModifiableValue.addUnique(
+                    valueField,
+                    'SR5.ManualOverride',
+                    value as number | null,
+                    CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
+                    ModifiableValue.TOP_PRIORITY
+                );
+            }
+        }
 
         // Give tests opportunity to change resulting values on the fly.
         this.data.test.prepareBaseValues();

@@ -3,10 +3,11 @@
 /**
  * Rules around the value modifier pop up that's shown for Value style data structures like Attributes, Skills, etc.
  */
-.sr5 .value {
-    >.value-modifiers-container {
+.value-mod {
+    .value-modifiers-container {
         display: none;
         visibility: hidden;
+        pointer-events: none;
 
         position: absolute;
         /* We WILL be on top! */
@@ -28,29 +29,86 @@
         background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/page.webp") repeat;
         border: 1px solid variables.$dark;
         padding: 0.5em 0.5em 0.5em 0.5em;
-        text-align: left;
         font-weight: normal;
 
         >.value-modifier-name {
             font-weight: bold;
+            text-align: left;
         }
 
         >.value-modifiers-base {
             border-bottom: 1px solid variables.$yellow;
             color: variables.$white;
+            text-align: right;
         }
 
         >.value-modifiers-modifier {
             color: variables.$white;
-        }
-
-        >.value-modifiers-total {
-            font-weight: bold;
-            border-top: 1px double variables.$yellow;
-            color: variables.$white;
+            text-align: right;
         }
 
         >.value-modifiers-invalid-total {
+            text-decoration: line-through;
+        }
+    }
+}
+
+#tooltip.sr5-value-modifiers-tooltip {
+    padding: 0;
+    max-width: none;
+    border: none;
+    box-shadow: none;
+
+    .value-modifiers-container {
+        display: block;
+        visibility: visible;
+        opacity: 1;
+        position: static;
+        margin: 0;
+    }
+
+    .value-modifiers {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 2rem;
+        inline-size: 150px;
+        width: 150px;
+        max-width: 150px;
+        row-gap: 0.2rem;
+        column-gap: 0.35rem;
+        background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/page.webp") repeat;
+        border: none;
+        padding: 0.4rem 0.45rem;
+        font-weight: normal;
+        font-size: var(--font-size-11);
+
+        > .value-modifier-name {
+            min-width: 0;
+            font-weight: bold;
+            text-align: left;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        > .value-modifiers-base,
+        > .value-modifiers-modifier {
+            color: variables.$white;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        > .value-modifiers-base {
+            border-bottom: 1px solid variables.$yellow;
+        }
+
+        > .mod-change-disabled {
+            opacity: 0.6;
+        }
+
+        > .mod-change-invalidated,
+        > .value-modifiers-invalid-total {
+            color: rgba(255, 255, 255, 0.5);
+            opacity: 1;
             text-decoration: line-through;
         }
     }
@@ -71,7 +129,6 @@
         .value-modifiers-base, .value-modifiers-modifier, .value-modifiers-total {
             flex-shrink: 0;
             min-width: 4rem;
-            horiz-align: right;
             text-align: right;
             padding-right: 0.5rem;
         }

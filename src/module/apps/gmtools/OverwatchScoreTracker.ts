@@ -40,8 +40,8 @@ export class OverwatchScoreTracker extends foundry.appv1.api.Application {
             if (user.isGM || !user.character) continue;
 
             const actor = user.character;
-            if (OverwatchStorage.isTrackedActor(actor as SR5Actor)) continue;
-            await OverwatchStorage.trackActor(actor as SR5Actor);
+            if (OverwatchStorage.isTrackedActor(actor)) continue;
+            await OverwatchStorage.trackActor(actor);
         }
     }
 
@@ -81,8 +81,8 @@ export class OverwatchScoreTracker extends foundry.appv1.api.Application {
             // Double check that the actor actually lives in the actors collection.
             const actor = game.actors.get(token.document.actorId!);
             if (!actor) return;
-            if (OverwatchStorage.isTrackedActor(actor as SR5Actor)) return;
-            void OverwatchStorage.trackActor(actor as SR5Actor);
+            if (OverwatchStorage.isTrackedActor(actor)) return;
+            void OverwatchStorage.trackActor(actor);
         });
 
         this.render();

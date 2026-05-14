@@ -44,5 +44,17 @@ export const shadowrunSR5ICDataPrep = (context: QuenchBatchContext) => {
             const ic = await factory.createActor({ type: 'ic', system: { host: { rating: 5 } } });
             assert.strictEqual(ic.system.attributes.rating.value, 5);
         });
+
+        it('derives matrix action skills from the host rating', async () => {
+            const ic = await factory.createActor({ type: 'ic', system: { host: { rating: 5 } } });
+
+            for (const skillId of ['computer', 'cybercombat', 'electronic_warfare', 'hacking', 'software']) {
+                const skill = ic.getSkill(skillId);
+
+                assert.exists(skill, skillId);
+                assert.strictEqual(skill?.base, 5, skillId);
+                assert.strictEqual(skill?.value, 5, skillId);
+            }
+        });
     });
 };

@@ -1,4 +1,4 @@
-@use "config/variables";
+@use 'config/variables';
 
 .sr5v2 {
     // list-item classes should be renamed to list-item when complete
@@ -18,7 +18,7 @@
         }
 
         &.list-item-subcategory {
-            padding-left: .5rem;
+            padding-left: 0.5rem;
             border-left: 1px solid var(--sr5v2-border);
         }
 
@@ -32,7 +32,7 @@
             flex: 1;
             border-top: 1px solid var(--sr5v2-border);
             background: var(--sr5v2-bg-elevated);
-            padding: .5rem;
+            padding: 0.5rem;
             color: var(--sr5v2-text-primary);
 
             .list-item-properties {
@@ -50,7 +50,7 @@
 
                 > * {
                     font-size: 0.8rem;
-                    padding: 0 .25rem;
+                    padding: 0 0.25rem;
                     &:not(:last-child) {
                         border-right: variables.$groove;
                     }
@@ -156,7 +156,7 @@
             align-items: center;
             justify-content: start;
             flex: 3;
-            gap: .25rem;
+            gap: 0.25rem;
 
             &.skinny {
                 flex: 1;
@@ -167,6 +167,17 @@
                 flex-flow: row;
                 justify-content: start;
                 align-items: center;
+            }
+
+            .item-name-link {
+                display: flex;
+                flex: 1 1 auto;
+                align-self: stretch;
+                align-items: center;
+                justify-content: flex-start;
+                min-width: 0;
+                width: 100%;
+                cursor: pointer;
             }
         }
 
@@ -214,6 +225,16 @@
                 font-family: monospace;
             }
 
+            .list-item-warning {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.3rem;
+                margin-left: 0.5rem;
+                color: variables.$yellow;
+                font-size: 0.9rem;
+                text-wrap: nowrap;
+            }
+
             // attempt to left align the essence so that it centers on the decimal
             &.essence-calc-col {
                 justify-content: flex-end;
@@ -249,7 +270,8 @@
                 }
             }
 
-            &.mark-input-col, &.qty-input-col {
+            &.mark-input-col,
+            &.qty-input-col {
                 flex: 0 0 4rem;
                 gap: 0.25rem;
 

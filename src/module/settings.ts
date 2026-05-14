@@ -87,6 +87,19 @@ export const registerSystemSettings = () => {
         default: true,
     });
 
+    game.settings.register(SYSTEM_NAME, FLAGS.InitiativeModeUpdateStrategy, {
+        name: 'SETTINGS.InitiativeModeUpdateStrategyName',
+        hint: 'SETTINGS.InitiativeModeUpdateStrategyDescription',
+        scope: 'world',
+        config: true,
+        type: String,
+        choices: {
+            delta_dice: 'SETTINGS.InitiativeModeUpdateStrategyDeltaDice',
+            reroll: 'SETTINGS.InitiativeModeUpdateStrategyReroll',
+        },
+        default: 'delta_dice',
+    });
+
     game.settings.register(SYSTEM_NAME, FLAGS.TokenHealthBars, {
         name: 'SETTINGS.TokenHealthBars',
         hint: 'SETTINGS.TokenHealthBarsDescription',
@@ -141,7 +154,7 @@ export const registerSystemSettings = () => {
      * Control automation of creating the defense modification after mulitple attacks
      * on an actor unti their next action phase.
      *
-     * See SR5.189 'Defender has defended against previous attacks'
+    * See SR5#189 'Defender has defended against previous attacks'
      */
     game.settings.register(SYSTEM_NAME, FLAGS.AutomateMultiDefenseModifier, {
         name: 'SETTINGS.AutomateMultiDefenseModifier',
@@ -155,7 +168,7 @@ export const registerSystemSettings = () => {
     /**
      * Control automation of progressive recoil when continuously firing
      *
-     * See SR5.175 'Progressive Recoil'
+    * See SR5#175 'Progressive Recoil'
      */
     game.settings.register(SYSTEM_NAME, FLAGS.AutomateProgressiveRecoil, {
         name: 'SETTINGS.AutomateProgressiveRecoil',
@@ -164,6 +177,18 @@ export const registerSystemSettings = () => {
         config: true,
         type: Boolean,
         default: true
+    });
+
+    /**
+     * Control if the Modify Roll section starts collapsed by default in test dialogs.
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.CollapseModifyRollByDefault, {
+        name: 'SETTINGS.CollapseModifyRollByDefault',
+        hint: 'SETTINGS.CollapseModifyRollByDefaultDescription',
+        scope: 'client',
+        config: true,
+        type: Boolean,
+        default: false
     });
 
     /**
@@ -218,6 +243,15 @@ export const registerSystemSettings = () => {
         config: true,
         type: Boolean,
         default: true
+    });
+
+    game.settings.register(SYSTEM_NAME, FLAGS.TokenAutoRunning, {
+        name: 'SETTINGS.TokenAutoRunning',
+        hint: 'SETTINGS.TokenAutoRunningDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true,
     });
 
     /**
@@ -325,6 +359,39 @@ export const registerSystemSettings = () => {
     game.settings.register(SYSTEM_NAME, FLAGS.ICActionsPack, {
         name: 'SR5.CompendiaSettings.ICActionsPack.label',
         hint: 'SR5.CompendiaSettings.ICActionsPack.hint',
+        scope: 'world',
+        config: false,
+        type: String
+    });
+
+    /**
+     * Override the default skills pack
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.SkillsPack, {
+        name: 'SR5.CompendiaSettings.SkillsPack.label',
+        hint: 'SR5.CompendiaSettings.SkillsPack.hint',
+        scope: 'world',
+        config: false,
+        type: String
+    });
+
+    /**
+     * Override the default skill groups pack
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.SkillGroupsPack, {
+        name: 'SR5.CompendiaSettings.SkillGroupsPack.label',
+        hint: 'SR5.CompendiaSettings.SkillGroupsPack.hint',
+        scope: 'world',
+        config: false,
+        type: String
+    });
+
+    /**
+     * Override the default skill sets pack
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.SkillSetsPack, {
+        name: 'SR5.CompendiaSettings.SkillSetsPack.label',
+        hint: 'SR5.CompendiaSettings.SkillSetsPack.hint',
         scope: 'world',
         config: false,
         type: String

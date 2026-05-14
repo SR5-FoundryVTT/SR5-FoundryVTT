@@ -3,6 +3,7 @@
     <div class="list-item {{#if (isOwner item owner=@root.actor)}} draggable {{/if}}"
          data-source="{{item.system.description.source}}"
          data-item-id="{{item.id}}"
+         data-context-menu="item"
          data-uuid="{{item.uuid}}">
 
         <div class="list-item-start">

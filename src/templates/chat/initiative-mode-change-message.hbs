@@ -1,0 +1,64 @@
+<div class="sr5 chat-card roll-card initiative-summary-card initiative-mode-change-card">
+    <div class="card-main-content">
+        <div class="initiative-mode-change-row initiative-mode-change-row-primary">
+            <div class="initiative-mode-combatant">
+                {{#if combatantImage}}
+                    {{#if tokenId}}
+                    <a class="chat-select-link initiative-mode-combatant-image-link" data-token-id="{{tokenId}}">
+                        <img class="initiative-mode-combatant-image" src="{{combatantImage}}" alt="{{name}}" />
+                    </a>
+                    {{else if documentUuid}}
+                    <a class="chat-document-link initiative-mode-combatant-image-link" data-uuid="{{documentUuid}}">
+                        <img class="initiative-mode-combatant-image" src="{{combatantImage}}" alt="{{name}}" />
+                    </a>
+                    {{else}}
+                    <img class="initiative-mode-combatant-image" src="{{combatantImage}}" alt="{{name}}" />
+                    {{/if}}
+                {{/if}}
+
+                {{#if documentUuid}}
+                <a class="chat-document-link combatant-name" data-uuid="{{documentUuid}}">{{name}}</a>
+                {{else}}
+                <span class="combatant-name">{{name}}</span>
+                {{/if}}
+            </div>
+
+            <div class="initiative-mode-transition" aria-label="{{previousModeTitle}} to {{currentModeTitle}}">
+                {{#if tokenId}}
+                <a class="chat-select-link initiative-mode-icon {{previousModeClass}}" data-token-id="{{tokenId}}" title="{{previousModeTitle}}" aria-label="{{previousModeTitle}}">
+                    <i class="{{previousModeIcon}}" aria-hidden="true"></i>
+                </a>
+                {{else}}
+                <span class="initiative-mode-icon {{previousModeClass}}" title="{{previousModeTitle}}" aria-label="{{previousModeTitle}}">
+                    <i class="{{previousModeIcon}}" aria-hidden="true"></i>
+                </span>
+                {{/if}}
+
+                <span class="initiative-mode-arrow" aria-hidden="true">-></span>
+
+                {{#if tokenId}}
+                <a class="chat-select-link initiative-mode-icon {{currentModeClass}}" data-token-id="{{tokenId}}" title="{{currentModeTitle}}" aria-label="{{currentModeTitle}}">
+                    <i class="{{currentModeIcon}}" aria-hidden="true"></i>
+                </a>
+                {{else}}
+                <span class="initiative-mode-icon {{currentModeClass}}" title="{{currentModeTitle}}" aria-label="{{currentModeTitle}}">
+                    <i class="{{currentModeIcon}}" aria-hidden="true"></i>
+                </span>
+                {{/if}}
+            </div>
+        </div>
+
+        <div class="initiative-mode-change-row initiative-mode-change-row-secondary">
+            <div class="initiative-mode-equation">
+                <span class="initiative-total" title="{{previousInitiativeTitle}}">{{previousInitiative}}</span>
+                <span class="initiative-equation-operator" aria-hidden="true">+</span>
+
+                <span class="initiative-total adjustment {{adjustmentClass}} {{#if showAdjustTooltip}}has-tooltip{{/if}}" {{#if showAdjustTooltip}}data-tooltip-html="{{rollTooltip}}"{{/if}}>{{adjustment}}</span>
+
+                <span class="initiative-equation-operator" aria-hidden="true">=</span>
+
+                <span class="initiative-total final-total" title="{{currentInitiativeTitle}}">{{currentInitiative}}</span>
+            </div>
+        </div>
+    </div>
+</div>

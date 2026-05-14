@@ -171,6 +171,22 @@
 
             {{#if @root.isEditMode}}
                 <div class="basic-row">
+                    <label>{{localize "SR5.Availability"}}</label>
+                    {{formInput systemFields.availability value=source.system.availability
+                                classes="short availability" rootId=rootId }}
+                </div>
+                <div class="basic-row">
+                    <label data-tooltip="{{localize 'SR5.Cost'}}"><i class="fas fa-yen-sign"></i></label>
+                    {{formInput systemFields.cost value=source.system.cost
+                                classes="short nuyen" rootId=rootId }}
+                </div>
+            {{else}}
+                <label>{{localize "SR5.Availability"}}&nbsp;{{system.availability}}</label>
+                <label data-tooltip="{{localize 'SR5.Cost'}}"><i class="fas fa-yen-sign"></i>&nbsp;{{nuyenValue system.cost}}</label>
+            {{/if}}
+
+            {{#if @root.isEditMode}}
+                <div class="basic-row">
                     <label style="text-wrap: nowrap;">{{localize "SR5.Vehicle.Drone"}}&nbsp;{{formInput systemFields.isDrone value=source.system.isDrone rootId=rootId }}
                     </label>
                 </div>
@@ -196,27 +212,27 @@
                     <div class="basic-row">
                         <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.body">
                             <i class="fas fa-truck"></i>
-                            {{calcModificationCategorySlots modifications "body"}}/{{calcModificationSlotsAvailable actor}}
+                            {{calcModificationCategorySlots modifications "body"}}/{{calcModificationSlotsAvailable actor "body"}}
                         </label>
                         <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.cosmetic">
                             <i class="fas fa-image"></i>
-                            {{calcModificationCategorySlots modifications "cosmetic"}}/{{calcModificationSlotsAvailable actor}}
+                            {{calcModificationCategorySlots modifications "cosmetic"}}/{{calcModificationSlotsAvailable actor "cosmetic"}}
                         </label>
                         <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.electromagnetic">
                             <i class="far fa-bolt"></i>
-                            {{calcModificationCategorySlots modifications "electromagnetic"}}/{{calcModificationSlotsAvailable actor}}
+                            {{calcModificationCategorySlots modifications "electromagnetic"}}/{{calcModificationSlotsAvailable actor "electromagnetic"}}
                         </label>
                         <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.powertrain">
                             <i class="far fa-engine"></i>
-                            {{calcModificationCategorySlots modifications "powertrain"}}/{{calcModificationSlotsAvailable actor}}
+                            {{calcModificationCategorySlots modifications "powertrain"}}/{{calcModificationSlotsAvailable actor "powertrain"}}
                         </label>
                         <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.protection">
                             <i class="far fa-shield"></i>
-                            {{calcModificationCategorySlots modifications "protection"}}/{{calcModificationSlotsAvailable actor}}
+                            {{calcModificationCategorySlots modifications "protection"}}/{{calcModificationSlotsAvailable actor "protection"}}
                         </label>
                         <label data-tooltip="SR5.Vehicle.ModificationCategoryTypes.weapons">
                             <i class="far fa-gun"></i>
-                            {{calcModificationCategorySlots modifications "weapons"}}/{{calcModificationSlotsAvailable actor}}
+                            {{calcModificationCategorySlots modifications "weapons"}}/{{calcModificationSlotsAvailable actor "weapons"}}
                         </label>
                     </div>
                 {{/if}}

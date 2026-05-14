@@ -53,6 +53,42 @@ The relevant commands are:
  * `npm run lint:errors:fix`: Run the linter, fixing all errors it can auto-fix and outputting the rest
  * `npm run prettier`: Run prettier, auto-formatting your changeset
 
+## Sourcebook citation tooling
+
+Sourcebook citation data and the MCP server now live in the sibling `mcp-sourcebook-citation` project. This repo consumes that tooling but does not vendor the citation corpus, generated indexes, or the MCP implementation.
+
+NOTE: this mcp server is currently available upon request from the system author team.
+
+Typical setup:
+ * Clone `mcp-sourcebook-citation` next to this repo.
+ * Run `npm install` in that project.
+ * Start the stdio MCP server with `npm run mcp:server` in that project, or register it as a VS Code MCP server.
+
+Example VS Code MCP configuration:
+
+```json
+{
+	"servers": {
+		"sourcebook-citation": {
+			"type": "stdio",
+			"command": "node",
+			"args": [
+				"../mcp-sourcebook-citation/src/index.mjs"
+			],
+			"cwd": "../mcp-sourcebook-citation"
+		}
+	},
+	"inputs": []
+}
+```
+
+When the sourcebook corpus changes, rebuild and validate indexes from the standalone project instead:
+ * `npm run build:indexes`
+ * `npm run validate:indexes`
+ * `npm run validate:mcp`
+
+The standalone project README is the source of truth for citation tooling setup and data layout.
+
 # System Architecture
 A broad overview of the different areas of the shadowrun5e system. For more explanations around system specific concepts see `System Concepts`.
 ## Folder structure
@@ -233,6 +269,6 @@ Any item can contain the action template allowing it to cast it as a Shadowrun 5
 
 FoundryVTT uses nedb to implement their compendiums, internally called packs. These nedb's are build from scratch on each release and need source document json files to be built from.
 
-If changes are to be made on compendium items, you can either make those directly within their source file underneath `./packs/_source` or using Foundry GUI. To make these changes persistent, extract compendium content to their source using `node ./utils/packs.mjs package unpack`. Since source documents are stored using their name, be careful when changing that and compare their on disk name with expectations.
+If changes are to be made on compendium items, you can either make those directly within their source file underneath `./packs/_source` or using Foundry GUI. To make these changes persistent, extract compendium content to their source using `node ./utils/packs.mjs package unpack`. Since source documents are stored using their name, be careful when changing that and compare their on disk name with expectations. Reserved filesystem basenames are exported with a leading `_` for portability, while the internal Foundry document name in the JSON stays unchanged.
 
 Since nedb packs aren't stored in git, changing pack contents will trigger changes for system compendiums as soon as the next GitHub release workflow is triggered.
