@@ -16,9 +16,6 @@
         </div>
     </header>
     <ol class="scrollable" data-changes>
-        {{log @root.system}}
-        {{log system.changes}}
-        {{log system}}
         {{#each system.changes as |change i|}}        
             {{#with @root.systemFields.changes.element.fields as |changeFields|}}
                 <li data-index="{{i}}">
