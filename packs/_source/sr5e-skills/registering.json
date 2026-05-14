@@ -1,7 +1,7 @@
 {
   "name": "Registering",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/skills/resonance-registering.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/resonance-registering.webp",
   "system": {
     "description": {
       "value": "",

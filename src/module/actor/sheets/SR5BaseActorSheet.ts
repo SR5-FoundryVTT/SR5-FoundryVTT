@@ -826,9 +826,39 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     /**
      * Override ApplicationMixin._onDrop shim to handle default Foundry onDrop behavior for all ActorSheets.
+     * NOTE: The current drag&drop implementation is borked and needs cleanup across: SR5ApplicationMixin as base for actor and item sheets.
      */
     protected override async _onDrop(event: DragEvent) {
         return await (ActorSheetV2.prototype as any)._onDrop.call(this, event);
+    }
+
+    /**
+     * Guard against non-HTMLElement drag sources and keep actor item/effect drag payload creation stable.
+     * NOTE: The current drag&drop implementation is borked and needs cleanup across: SR5ApplicationMixin as base for actor and item sheets.
+     */
+    protected override async _onDragStart(event: DragEvent) {
+        const target = event.currentTarget as HTMLElement | null;
+        const targetElement = event.target as HTMLElement | null;
+        if (targetElement?.dataset && 'link' in targetElement.dataset) return;
+
+        let dragData;
+
+        if (target?.dataset.itemId) {
+            const item = this.actor.items.get(target.dataset.itemId);
+            if (item) {
+                dragData = item.toDragData();
+            }
+        }
+
+        if (target?.dataset.effectId) {
+            const effect = this.actor.effects.get(target.dataset.effectId);
+            if (effect) {
+                dragData = effect.toDragData();
+            }
+        }
+
+        if (!dragData) return;
+        event.dataTransfer?.setData('text/plain', JSON.stringify(dragData));
     }
 
     protected override async _onDropItem(event: DragEvent, item: SR5Item) {

@@ -1,7 +1,7 @@
 {
   "name": "Outdoors",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/groups/outdoors.svg",
+  "img": "systems/shadowrun5e/dist/icons/groups/outdoors.webp",
   "system": {
     "description": {
       "value": "",

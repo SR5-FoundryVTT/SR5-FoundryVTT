@@ -1,7 +1,7 @@
 {
   "name": "Intimidation",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/skills/social-intimidation.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/social-intimidation.webp",
   "system": {
     "description": {
       "value": "",

@@ -1,7 +1,7 @@
 {
   "name": "Firearms",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/groups/firearms.svg",
+  "img": "systems/shadowrun5e/dist/icons/groups/firearms.webp",
   "system": {
     "description": {
       "value": "",
@@ -26,7 +26,6 @@
     "group": {
       "skills": [
         "Automatics",
-        "Heavy Weapons",
         "Longarms",
         "Pistols"
       ],
