@@ -41,10 +41,9 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
             if (this._skipEffectForTestLimitations(effect)) continue;
 
             // Collect all changes of effect left.
-            const effectChanges = effect.system?.changes ?? effect.changes ?? [];
+            const effectChanges = effect.system?.changes ?? [];
             changes.push(...effectChanges.map(change => {
-                // @ts-expect-error TODO: v14 - this typing was added in master, fix it.
-                const c = foundry.utils.deepClone(change) as typeof changes[number];
+                const c = foundry.utils.deepClone<typeof changes[number]>(change as any);
                 // TODO: v15 - Foundry used to change data. references in changes to system. But tests use data. 
                 c.key = c.key.replace(/^system\./, 'data.');
                 c.effect = effect;
@@ -54,7 +53,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
             // for (const statusId of effect.statuses) this.statuses.add(statusId);
         }
 
-        changes.sort((a, b) => Number(a.priority ?? 0) - Number(b.priority ?? 0));
+        changes.sort((a, b) => a.priority - b.priority);
 
         // Apply all changes
         for (const change of changes) {

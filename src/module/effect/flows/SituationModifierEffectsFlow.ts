@@ -35,21 +35,22 @@ export class SituationModifierEffectsFlow<T extends SituationModifier> {
      */
     applyAllEffects(test?: SuccessTest) {
         console.debug('Shadowrun 5e | Applying Situation Modifier Effects', this);
-        const changes: any[] = [];
+        // const changes: ActiveEffect.ChangeData[] = [];
+        const changes: (ActiveEffect.ChangeData & { effect: SR5ActiveEffect; priority: number })[] = [];
         for (const effect of this.allApplicableEffects()) {
             if (!effect.active) continue;
             // Special case for modifier effects: Some only apply to tests of their parent item.
             if (effect.system.onlyForItemTest && (test === undefined || effect.parent !== test?.item)) continue;
 
-            const effectChanges = effect.system?.changes ?? effect.changes ?? [];
+            const effectChanges = effect.system?.changes ?? [];
             changes.push(...effectChanges.map(change => {
-                const c = foundry.utils.deepClone(change) as any;
+                const c = foundry.utils.deepClone<typeof changes[number]>(change as any);
                 c.effect = effect;
                 return c;
             }));
         }
 
-        changes.sort((a, b) => Number(a.priority ?? 0) - Number(b.priority ?? 0));
+        changes.sort((a, b) => a.priority - b.priority);
 
         console.debug('Shadowrun 5e | Applying Situation Modifier Effect changes', changes);
         for (const change of changes) {

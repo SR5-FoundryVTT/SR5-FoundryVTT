@@ -205,7 +205,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     override applyActiveEffects(...args) {
         // Errors during change application will stop that process and cause a broken sheet.
         try {
-            // @ts-expect-error TODO: v14 - typing is missing
+            // @ts-expect-error TODO: fvtt - v14 - typing is missing
             super.applyActiveEffects(...args);
         } catch (error) {
             console.error(`Shadowrun5e | Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.id})`);
