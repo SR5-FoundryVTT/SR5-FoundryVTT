@@ -394,16 +394,16 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         // Modify by penetration
         if (damage.ap.value !== 0)
-            ModifiableValue.addUnique(armor, 'SR5.AP', damage.ap.value);
+            ModifiableValue.addUnique(armor.rating, 'SR5.AP', damage.ap.value);
 
         // Modify by element
         if (damage.element.value !== '') {
             const armorForDamageElement = armor[damage.element.value] || 0;
             if (armorForDamageElement > 0)
-                ModifiableValue.addUnique(armor, 'SR5.Element', armorForDamageElement);
+                ModifiableValue.addUnique(armor.rating, 'SR5.Element', armorForDamageElement);
         }
-
-        ModifiableValue.calcTotal(armor, {min: 0});
+        
+        ModifiableValue.calcTotal(armor.rating, {min: 0});
 
         return armor;
     }
@@ -1528,7 +1528,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         const modified = foundry.utils.duplicate(this.getArmor()) as ActorArmorType;
         if (modified) {
-            const mod = new ModifiableValue(modified);
+            const mod = new ModifiableValue(modified.rating);
             mod.addUnique('SR5.DV', damage.ap.value);
             mod.calcTotal({ min: 0 });
         }

@@ -1,17 +1,24 @@
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { TechnologyPartData } from "../template/Technology";
-const { SchemaField, NumberField, BooleanField } = foundry.data.fields;
+import { TagifyAltField } from "../fields/TagifyAltField";
+const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 export const ArmorValueData = () => ({
-    base: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     mod: new BooleanField(),
-    value: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
-    acid: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
-    cold: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
-    fire: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
-    electricity: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
-    radiation: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     hardened: new BooleanField(),
+    hardened_mystic: new BooleanField(),
+    base: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+    value: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+    elements: new SchemaField({
+        acid: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+        cold: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+        fire: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+        electricity: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+        radiation: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+        water: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+        pollutant: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+    }),
+    immunities: new TagifyAltField(new StringField({ required: true })),
 });
 
 export const ArmorPartData = () => ({
@@ -32,6 +39,5 @@ export class Armor extends ItemBase<ReturnType<typeof ArmorData>> {
 }
 
 export type ArmorType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ArmorData>>;
-export type ArmorValueType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ArmorValueData>>;
 
 console.log("ArmorData", ArmorData(), new Armor());

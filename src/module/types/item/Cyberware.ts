@@ -7,7 +7,7 @@ const { NumberField, StringField } = foundry.data.fields;
 
 const CyberwareData = () => ({
     ...BaseItemData(),
-    ...ActionPartData(),
+    ...ActionPartData({ natural_weapon: true }),
     ...ArmorPartData(),
     ...TechnologyPartData(),
 

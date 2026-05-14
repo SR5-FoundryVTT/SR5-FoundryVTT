@@ -88,7 +88,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         if (this.data.action.armor) {
             if (this.actor) {
                 const armor = this.actor.getArmor(this.data.incomingDamage);
-                ModifiableValue.addUniqueBase(this.data.pool, 'SR5.Armor.label', armor.value);
+                ModifiableValue.addUniqueBase(this.data.pool, 'SR5.Armor.label', armor.rating.value);
             }
         }
     }
@@ -154,7 +154,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         const armor = this.actor?.getArmor(this.data.modifiedDamage);
         if(armor?.hardened) {
             const hits = new ModifiableValue(this.hits);
-            hits.addUniqueBase('SR5.AppendedHits', Math.ceil(armor.value/2));
+            hits.addUniqueBase('SR5.AppendedHits', Math.ceil(armor.rating.value/2));
             hits.calcTotal();
         }
 

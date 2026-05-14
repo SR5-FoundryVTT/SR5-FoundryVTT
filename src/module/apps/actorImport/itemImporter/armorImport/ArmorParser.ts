@@ -12,24 +12,26 @@ export class ArmorParser extends Parser<'armor'> {
         armor.value = parseInt(itemData.armor);
 
         if (itemData.armormods?.armormod) {
-            armor.fire = 0;
-            armor.electricity = 0;
-            armor.cold = 0;
-            armor.acid = 0;
-            armor.radiation = 0;
+            armor.elements.fire = 0;
+            armor.elements.electricity = 0;
+            armor.elements.cold = 0;
+            armor.elements.acid = 0;
+            armor.elements.radiation = 0;
+            armor.elements.water = 0;
+            armor.elements.pollutant = 0;
 
             const mods = IH.getArray(itemData.armormods.armormod);
             for (const mod of mods) {
                 const name = mod.name_english.toLowerCase();
 
                 if (name.includes('fire resistance'))
-                    armor.fire += parseInt(mod.rating);
+                    armor.elements.fire += parseInt(mod.rating);
                 else if (name.includes('nonconductivity'))
-                    armor.electricity += parseInt(mod.rating);
+                    armor.elements.electricity += parseInt(mod.rating);
                 else if (name.includes('insulation'))
-                    armor.cold += parseInt(mod.rating);
+                    armor.elements.cold += parseInt(mod.rating);
                 else if (name.includes('radiation shielding'))
-                    armor.radiation += parseInt(mod.rating);
+                    armor.elements.radiation += parseInt(mod.rating);
             }
         }
     }

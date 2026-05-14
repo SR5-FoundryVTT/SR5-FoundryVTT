@@ -510,7 +510,7 @@ export const TestCreator = {
         // Add the armor value as a pool modifier, since 'armor' is part of the test description.
         if (action.armor) {
             const armor = actor.getArmor();
-            ModifiableValue.addUniqueBase(data.pool, 'SR5.Armor.label', armor.value);
+            ModifiableValue.addUniqueBase(data.pool, 'SR5.Armor.label', armor.rating.value);
         }
 
         // Prepare limit values...

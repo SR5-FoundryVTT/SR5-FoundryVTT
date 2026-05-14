@@ -24,6 +24,7 @@ export const AmmoData = () => ({
     replaceAP: new BooleanField(),
     blast: new SchemaField(BlastData()),
     accuracy: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+    natural_weapon: new BooleanField({ initial: true })
 });
 
 export class Ammo extends ItemBase<ReturnType<typeof AmmoData>> {

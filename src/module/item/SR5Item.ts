@@ -1103,7 +1103,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     getArmorElements(this: SR5Item<'armor'>): Record<string, number> {
-        const { fire, electricity, cold, acid, radiation } = this.system.armor;
+        const { fire, electricity, cold, acid, radiation } = this.system.armor.elements;
         return {
             fire: fire ?? 0,
             electricity: electricity ?? 0,

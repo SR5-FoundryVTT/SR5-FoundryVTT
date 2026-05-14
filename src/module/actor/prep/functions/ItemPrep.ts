@@ -10,8 +10,8 @@ export class ItemPrep {
      */
     static prepareArmor(system: Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>, items: SR5Item[]) {
         const { armor } = system;
-        armor.base = 0;
-        armor.value = 0;
+        armor.rating.base = 0;
+        armor.rating.value = 0;
 
         // NOTE: We retrieve different types of items, all containing armor data.
         const equippedArmor = items.filter((item) => item.hasArmor() && item.isEquipped()) as SR5Item<'armor'>[];
@@ -21,24 +21,24 @@ export class ItemPrep {
             if (armorValue > 0) {
                 // We allow only one base armor but multiple armor accessories
                 if (item.system.armor.mod) {
-                    ModifiableValue.addUnique(armor, item.name, item.system.armor.value);
-                } else if (armorValue > armor.base) {
-                    armor.base = armorValue;
+                    ModifiableValue.addUnique(armor.rating, item.name, item.system.armor.value);
+                } else if (armorValue > armor.rating.base) {
+                    armor.rating.base = armorValue;
                     armor.label = item.name;
-                    armor.hardened = item.system.armor.hardened;
+                    // armor.hardened = item.system.armor.hardened;
                 }
             }
 
             // Apply elemental modifiers of all worn armor and clothing SR5#169.
             for (const element of Object.keys(SR5.elementTypes)) {
-                armor[element] += item.getArmorElements()[element];
+                armor[element] += item.system.armor.elements[element];
             }
         }
 
         if (system.modifiers.armor)
-            ModifiableValue.addUnique(armor, game.i18n.localize('SR5.Bonus'), system.modifiers.armor);
+            ModifiableValue.addUnique(armor.rating, game.i18n.localize('SR5.Bonus'), system.modifiers.armor);
 
-        ModifiableValue.calcTotal(armor);
+        ModifiableValue.calcTotal(armor.rating);
     }
 
     /**

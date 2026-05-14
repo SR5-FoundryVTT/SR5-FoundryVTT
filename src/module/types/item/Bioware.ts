@@ -7,7 +7,7 @@ const { NumberField, StringField } = foundry.data.fields;
 
 const BiowareData = () => ({
     ...BaseItemData(),
-    ...ActionPartData(),
+    ...ActionPartData({ natural_weapon: true }),
     ...TechnologyPartData(),
     ...ArmorPartData(),
 

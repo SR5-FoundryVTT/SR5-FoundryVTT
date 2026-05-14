@@ -91,12 +91,12 @@ export class SpiritPrep {
     static prepareSpiritArmor(system: Actor.SystemOfType<'spirit'>) {
         const { armor, attributes } = system;
 
-        armor.base = attributes.essence.value * 2;
+        armor.rating.base = attributes.essence.value * 2;
         if (system.modifiers.armor)
-            ModifiableValue.addUnique(armor, game.i18n.localize('SR5.Bonus'), system.modifiers.armor);
+            ModifiableValue.addUnique(armor.rating, game.i18n.localize('SR5.Bonus'), system.modifiers.armor);
 
-        ModifiableValue.calcTotal(armor);
-        armor.hardened = true;
+        ModifiableValue.calcTotal(armor.rating);
+        // armor.hardened = true;
     }
 
     /**

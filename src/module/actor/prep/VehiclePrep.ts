@@ -193,9 +193,9 @@ export class VehiclePrep {
     static prepareArmor(system: Actor.SystemOfType<'vehicle'>) {
         const { armor, modifiers } = system;
 
-        ModifiableValue.addUnique(armor, 'SR5.Bonus', modifiers.armor);
+        ModifiableValue.addUnique(armor.rating, 'SR5.Bonus', modifiers.armor);
 
-        ModifiableValue.calcTotal(armor);
+        ModifiableValue.calcTotal(armor.rating);
     }
     /**
      * Prepare the base actor recoil compensation without item influence.
