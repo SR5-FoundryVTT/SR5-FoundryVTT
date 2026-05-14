@@ -60,7 +60,7 @@ const ThrownWeaponData = () => ({
 const WeaponData = () => ({
     ...BaseItemData(),
     ...ActionPartData({
-        natural_weapon: true,
+        normal_weapon: true,
         resistTest: "PhysicalDefenseTest",
         opposedTest: "PhysicalDefenseTest",
     }),

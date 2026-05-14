@@ -23,7 +23,7 @@ export const ActorArmorData = () => ({
         pollutant: new ModifiableField(ModifiableValueSchema()),
         radiation: new ModifiableField(ModifiableValueSchema()),
         water: new ModifiableField(ModifiableValueSchema()),
-        natural_weapons: new ModifiableField(ModifiableValueSchema()),
+        normal_weapons: new ModifiableField(ModifiableValueSchema()),
     }),
     label: new StringField({ required: true }),
 });

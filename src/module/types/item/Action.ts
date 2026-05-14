@@ -48,7 +48,7 @@ export const ActionCategory = () => ({
     }),
 });
 
-export const DamageData = ({ natural_weapon = false } = {}) => ({
+export const DamageData = ({ normal_weapon = false } = {}) => ({
     ...ModifiableValueLinked(),
     type: new SchemaField({
         base: new StringField({
@@ -91,7 +91,7 @@ export const DamageData = ({ natural_weapon = false } = {}) => ({
         itemName: new StringField({ required: true }),
         itemType: new StringField({ required: true }),
     }, { required: false }),
-    natural_weapon: new BooleanField({ initial: natural_weapon }),
+    normal_weapon: new BooleanField({ initial: normal_weapon }),
 });
 
 export const OpposedActionRollData = ({ type = '', opposedTest = 'OpposedTest', resistTest = '' } = {}) =>
@@ -137,7 +137,7 @@ export const ActionRollData = (
         resistTest = '',
         followedTest = '',
         type = '',
-        natural_weapon = false,
+        normal_weapon = false,
     } = {}
 ) => ({
     ...MinimalActionData(),
@@ -150,7 +150,7 @@ export const ActionRollData = (
     threshold: new SchemaField(BaseValuePair()),
     extended: new BooleanField({ initial: false }),
     modifiers: new TagifyAltField(new StringField({ required: true })),
-    damage: new ModifiableField(DamageData({ natural_weapon })),
+    damage: new ModifiableField(DamageData({ normal_weapon })),
     opposed: OpposedActionRollData({ opposedTest, resistTest }),
     followed: new SchemaField({
         test: new StringField({ required: true, initial: followedTest }),
@@ -183,7 +183,7 @@ export const ActionPartData = (args: {
     resistTest?: string;
     followedTest?: string;
     type?: string;
-    natural_weapon?: boolean;
+    normal_weapon?: boolean;
 } = {}) => ({
     action: new SchemaField(ActionRollData(args)),
 });
