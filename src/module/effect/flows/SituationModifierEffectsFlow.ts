@@ -45,11 +45,6 @@ export class SituationModifierEffectsFlow<T extends SituationModifier> {
             changes.push(...effectChanges.map(change => {
                 const c = foundry.utils.deepClone(change) as any;
                 c.effect = effect;
-                // TODO: fvtt - v14 - Issues with typing in v13 - need to cast to unknown first to avoid type errors.
-                SR5ActiveEffect.alterChange(this.modifier as unknown as foundry.abstract.DataModel.Any, c);
-                // TODO: v14 - check what is the issue here.
-                // c.priority = SR5ActiveEffect.getChangePriority(c);
-                c.priority = 0;
                 return c;
             }));
         }
