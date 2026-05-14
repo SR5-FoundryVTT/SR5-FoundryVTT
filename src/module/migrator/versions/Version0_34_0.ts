@@ -10,6 +10,43 @@ const { hasProperty, setProperty, getProperty } = foundry.utils;
 export class Version0_34_0 extends VersionMigration {
     readonly TargetVersion = "0.34.0";
 
+    override handlesItem(item: Readonly<any>): boolean {
+        return item.system.armor !== undefined;
+    }
+
+    override migrateItem(item: any): void {
+        const armor = item.system.armor!;
+        const elements = ['acid', 'cold', 'electricity', 'fire', 'radiation']; 
+
+        for (const el of elements) {
+            if (armor[el] !== undefined) {
+                setProperty(armor, `elements.${el}`, armor[el] || 0);
+                delete armor[el];
+            }
+        }
+    }
+
+    override handlesActiveEffect(effect: Readonly<any>) {
+        return (effect.changes as any[]).some(change => (change.key as string).includes('system.armor'));
+    }
+
+    override migrateActiveEffect(effect: { changes: { key: string }[] }): void {
+        const armorKeyMap: Record<string, string> = {
+            'system.armor': 'system.armor.rating',
+            'system.armor.base': 'system.armor.rating',
+            'system.armor.value': 'system.armor.rating',
+            'system.armor.acid': 'system.armor.elements.acid',
+            'system.armor.cold': 'system.armor.elements.cold',
+            'system.armor.electricity': 'system.armor.elements.electricity',
+            'system.armor.fire': 'system.armor.elements.fire',
+            'system.armor.radiation': 'system.armor.elements.radiation',
+        };
+
+        for (const change of effect.changes) {
+            change.key = armorKeyMap[change.key] ?? change.key;
+        }
+    }
+
     override migrateActor(actor: any): void {
         const system = actor.system;
         if (hasProperty(system as any, "initiative"))

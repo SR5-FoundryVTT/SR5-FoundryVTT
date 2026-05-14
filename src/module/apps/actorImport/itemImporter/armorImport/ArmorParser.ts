@@ -12,13 +12,13 @@ export class ArmorParser extends Parser<'armor'> {
         armor.value = parseInt(itemData.armor);
 
         if (itemData.armormods?.armormod) {
-            armor.elements.fire = 0;
-            armor.elements.electricity = 0;
-            armor.elements.cold = 0;
             armor.elements.acid = 0;
+            armor.elements.cold = 0;
+            armor.elements.electricity = 0;
+            armor.elements.fire = 0;
+            armor.elements.pollutant = 0;
             armor.elements.radiation = 0;
             armor.elements.water = 0;
-            armor.elements.pollutant = 0;
 
             const mods = IH.getArray(itemData.armormods.armormod);
             for (const mod of mods) {
