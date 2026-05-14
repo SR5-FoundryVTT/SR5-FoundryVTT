@@ -25,11 +25,12 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
      * @returns The change object.
      */
     const createTestChange = (effect: SR5ActiveEffect, id: number): ModifiableValueType['changes'][number] => {
-        const change = effect.changes[id];
+        const change = effect.system.changes[id];
         return {
             name: effect.name,
-            value: parseInt(change.value),
-            mode: change.mode,
+            value: parseInt(change.value as string),
+            // @ts-expect-error TODO: fvtt - v14 - missing type properties on ActiveEffectChangeData
+            type: change.type,
             // priority: parseInt(String(change.priority || change.mode * 10)),
             priority: parseInt(String(change.priority)),
             enabled: true,
@@ -45,9 +46,12 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 origin: actor.uuid,
                 disabled: false,
                 name: 'Test Effect',
-                changes: [
-                    { key: 'system.attributes.body.changes', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'system.attributes.body', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+                system: {
+                    changes: [
+                        { key: 'system.attributes.body.changes', value: '2', type: 'add' },
+                        { key: 'system.attributes.body', value: '2', type: 'add' }
+                    ]
+                }
             }]);
 
             assert.deepEqual(actor.system.attributes.body.changes, [

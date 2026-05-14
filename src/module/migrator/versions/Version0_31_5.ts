@@ -24,12 +24,12 @@ export class Version0_31_5 extends VersionMigration {
     }
 
     override handlesActiveEffect(effect: Readonly<any>) {
-        const changes = effect.system?.changes ?? effect.changes ?? [];
+        const changes = effect.system?.changes ?? [];
         return changes.filter(change => change.key === 'system.force').length > 0;
     }
 
     override migrateActiveEffect(effect: any) {
-        const changes = effect.system?.changes ?? effect.changes ?? [];
+        const changes = effect.system?.changes ?? [];
 
         for (const change of changes) {
             if (change.key === 'system.force') {
