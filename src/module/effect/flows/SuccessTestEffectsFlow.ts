@@ -136,9 +136,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         // Inject a flag to mark the effect as applied by a test.
         // This is necessary so we can differentiate between effects created and applied.
         for (const effectData of effectsData) {
-            const preparedEffectData = effectData as any;
-            preparedEffectData.system ??= {};
-            preparedEffectData.system.appliedByTest = true;
+            effectData['flags.shadowrun5e.appliedByTest'] = true;
         }
 
         if (!game.user?.isGM) {
@@ -153,7 +151,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         if (actor === undefined || this.test.item === undefined) return;
 
-        const effectsData: any[] = [];
+        const effectsData: SR5ActiveEffect[] = [];
         for (const effect of allApplicableDocumentEffects(this.test.item, { applyTo: ['targeted_actor'] })) {
             const effectData = effect.toObject() as unknown as SR5ActiveEffect;
 
