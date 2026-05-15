@@ -225,6 +225,15 @@ body.theme-light .journal-sheet,
     color: variables.$white;
     display: flex;
     justify-content: center;
+
+    .test-code {
+        text-align: center;
+    }
+
+    .test-code-term.has-tooltip {
+        cursor: var(--cursor-pointer);
+    }
+
     .test-icon {
         width: 17px;
         height: 17px;

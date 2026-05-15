@@ -180,15 +180,15 @@ export const registerSystemSettings = () => {
     });
 
     /**
-     * Control if the Modify Roll section starts collapsed by default in test dialogs.
+     * Remember whether the Modify Roll section was expanded last time.
      */
-    game.settings.register(SYSTEM_NAME, FLAGS.CollapseModifyRollByDefault, {
-        name: 'SETTINGS.CollapseModifyRollByDefault',
-        hint: 'SETTINGS.CollapseModifyRollByDefaultDescription',
+    game.settings.register(SYSTEM_NAME, FLAGS.CollapseModifyRoll, {
+        name: 'SETTINGS.CollapseModifyRoll',
+        hint: 'SETTINGS.CollapseModifyRollDescription',
         scope: 'client',
-        config: true,
+        config: false,
         type: Boolean,
-        default: false
+        default: true
     });
 
     /**

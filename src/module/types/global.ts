@@ -281,7 +281,7 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.UseDamageCondition": boolean;
         "shadowrun5e.AutomateMultiDefenseModifier": boolean;
         "shadowrun5e.AutomateProgressiveRecoil": boolean;
-        "shadowrun5e.CollapseModifyRollByDefault": boolean;
+        "shadowrun5e.CollapseModifyRoll": boolean;
         "shadowrun5e.DefaultOpposedTestActorSelection": boolean;
         "shadowrun5e.MarkImports": string;
         "shadowrun5e.ImportIconFolder": string;

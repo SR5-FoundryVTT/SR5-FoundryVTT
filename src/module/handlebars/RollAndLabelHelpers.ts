@@ -39,7 +39,7 @@ export const registerRollAndLabelHelpers = () => {
     });
 
     Handlebars.registerHelper('signedValue', function (value: number) {
-        return value > 0 ?  `+${value}`: `${value}`;
+        return value >= 0 ?  `+${value}`: `${value}`;
     });
 
     Handlebars.registerHelper('speakerName', Helpers.getChatSpeakerName.bind(Helpers));

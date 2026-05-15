@@ -67,14 +67,14 @@ export const ActionPrep = {
 
         // Some ammunition want to replace the weapons damage, others modify it.
         if (ammoData.replaceDamage) {
-            ModifiableValue.addUnique(action.damage, equippedAmmo.name, ammoData.damage, CONST.ACTIVE_EFFECT_MODES.OVERRIDE);
+            ModifiableValue.addUnique(action.damage, equippedAmmo.name, ammoData.damage, { mode: 'OVERRIDE' });
         } else {
             ModifiableValue.addUnique(action.damage, equippedAmmo.name, ammoData.damage);
         }
 
         // some ammunition wants to replace the weapons AP, others modify it
         if (ammoData.replaceAP) {
-            ModifiableValue.addUnique(action.damage.ap, equippedAmmo.name, ammoData.ap, CONST.ACTIVE_EFFECT_MODES.OVERRIDE);
+            ModifiableValue.addUnique(action.damage.ap, equippedAmmo.name, ammoData.ap, { mode: 'OVERRIDE' });
         } else {
             ModifiableValue.addUnique(action.damage.ap, equippedAmmo.name, ammoData.ap);
         }

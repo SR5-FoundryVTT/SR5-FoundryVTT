@@ -21,6 +21,7 @@
 @use 'list-item';
 @use 'horixontal-cells';
 @use 'situational-modifiers-app';
+@use 'overwatch-score-tracker-app';
 @use 'actor-apps';
 @use 'bundle-v2';
 @use 'config/mixins';
@@ -577,10 +578,6 @@ input[type='text'].display {
 
             .value {
                 font-weight: bold;
-            }
-
-            &.underline {
-                text-decoration: underline;
             }
         }
 

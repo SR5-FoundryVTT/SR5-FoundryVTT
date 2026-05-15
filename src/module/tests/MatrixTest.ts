@@ -4,13 +4,13 @@ import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
 import { OpposedTestData } from './OpposedTest';
 import { MatrixTestDataFlow } from './flows/MatrixTestDataFlow';
 
+export type MatrixConnectionType = 'same_grid' | 'different_grid' | 'direct_connection'
+
 export interface MatrixTestData extends SuccessTestData {
-    // If decker and target reside on different Grids
-    sameGrid: boolean
-    // Disallow changing of the sameGrid checkbox in the dialog. Used when targeting defines this values.
-    sameGridDisabled: boolean
-    // If decker has a direct connection to the target
-    directConnection: boolean
+    // Normalized UI selection for matrix connection handling.
+    connectionType: MatrixConnectionType
+    // Disallow changing of the connection type in the dialog. Used when targeting defines this values.
+    isConnectionTypeLocked: boolean
     // The persona uuid. This would be the user main persona icon, not necessarily the device.
     personaUuid: string | undefined
     // The icon uuid. This would be the actual mark placement target. Can be a device, a persona device, a host or actor.
@@ -24,7 +24,8 @@ export interface OpposedMatrixTestData extends OpposedTestData {
     personaUuid: string
     iconUuid: string
     targetMainIcon: boolean
-    directConnection: boolean
+    isConnectionTypeLocked: boolean
+    connectionType: MatrixConnectionType
 }
 
 /**

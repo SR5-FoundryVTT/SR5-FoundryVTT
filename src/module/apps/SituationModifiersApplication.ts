@@ -1,19 +1,22 @@
-import { SR5Actor } from "../actor/SR5Actor";
-import { SYSTEM_NAME } from "../constants";
 import { Helpers } from "../helpers";
+import { SR5Actor } from "../actor/SR5Actor";
+import { DeepPartial } from 'fvtt-types/utils';
+import { SR5_APPV2_CSS_CLASS, SYSTEM_NAME } from "../constants";
 import { ModifiableDocumentTypes, DocumentSituationModifiers } from "../rules/DocumentSituationModifiers";
+
+import ApplicationV2 = foundry.applications.api.ApplicationV2;
+import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicationMixin;
 
 import EnvironmentalModifierLevels = Shadowrun.EnvironmentalModifierLevels;
 import EnvironmentalModifierCategories = Shadowrun.EnvironmentalModifierCategories;
 
 
-interface SituationalModifiersTemplateData extends foundry.appv1.api.FormApplication.FormApplicationData<FormApplication.Options, Record<string, unknown>> {
+interface SituationalModifiersTemplateData extends HandlebarsApplicationMixin.RenderContext {
     targetType: string
     targetName: string
-    modifiers: DocumentSituationModifiers
+    modifiers: Record<string, unknown>
     environmentalLevels: EnvironmentalModifierLevels
 }
-
 
 /**
  * General abstract handler for sheet actions for a specific situational modifier category.
@@ -26,22 +29,12 @@ class ModifiersHandler {
     }
 
     /**
-     * Provide template data fields necessary for the extending modifier type to be added to a
-     * general template data object.
-     */
-    getData(options?: object) {
-        return {}
-    };
-    /**
-     * Define what event listeners to register for the extending modifier type.
-     */
-    activateListeners(html: JQuery<HTMLElement>) {};
-    /**
      * Define what token hud buttons to register for the extending modifier type.
      * 
      * NOTE: TypeScript doesn't support abstract static method definitions as of yet.
      */
-    static addTokenHUDElements(modifierColumn: JQuery<HTMLElement>, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    static addTokenHUDElements(modifierColumn: HTMLElement, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
         console.error(`Shadowrun5e | Class ${this.constructor.name} must implement static method onRenderTokenHUD`);
     };
 }
@@ -51,34 +44,43 @@ class ModifiersHandler {
  */
 class EnvironmentalModifiersHandler extends ModifiersHandler {
 
-    override activateListeners(html: JQuery<HTMLElement>) {
-        console.log(`Shadowrun5e | Registering modifier handler ${this.constructor.name} listeners`);
-        $(html).find('button.env-modifier').on('click', this._handleModifierChange.bind(this));
-    }
-
-    static override addTokenHUDElements(modifierColumn: JQuery<HTMLElement>, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
+    static override addTokenHUDElements(modifierColumn: HTMLElement, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
         console.log(`${SYSTEM_NAME} | Environmental modifier HUD on renderTokenHUD`);
 
         // Setup and connect tokenHUD elements.
-        const modifier = $('<div class="modifier-row"></div>');
-        const modifierValue = $(`<div class="modifier-value modifier-value-matrix">${modifiers.environmental.applied.total}</div>`);
-        const modifierDescription = $(`<div class="modifier-description open-matrix-modifier">${game.i18n.localize("SR5.ModifierTypes.Environmental")}</div>`);
-        modifierDescription.on('click', SituationModifiersApplication.openForTokenHUD(tokenId, 'environmental'));
+        const modifier = document.createElement('div');
+        modifier.className = 'modifier-row';
 
+        const modifierValue = document.createElement('div');
+        modifierValue.className = 'modifier-value modifier-value-matrix';
+        modifierValue.innerText = String(modifiers.environmental.applied.total);
+
+        const modifierDescription = document.createElement('div');
+        modifierDescription.className = 'modifier-description open-matrix-modifier';
+        modifierDescription.innerText = game.i18n.localize('SR5.ModifierTypes.Environmental');
+        modifierDescription.addEventListener('click', event => {
+            void SituationModifiersApplication.openForTokenHUD(tokenId)(event);
+        });
+
+        modifier.append(modifierValue, modifierDescription);
         modifierColumn.append(modifier);
-        modifier.append(modifierValue);
-        modifier.append(modifierDescription);
     }
 
-    async _handleModifierChange(event: Event) {
+    async _handleModifierChange(event: Event, target?: HTMLElement) {
         event.preventDefault();
+        event.stopPropagation();
 
         // Retrieve data from HTML datasets.
-        const element = event.currentTarget as HTMLElement;
-        if (!element.dataset.category || !element.dataset.value) return;
+        const element = target?.closest<HTMLElement>('button.env-modifier[data-category][data-value]')
+            ?? (event.target instanceof HTMLElement ? event.target.closest<HTMLElement>('button.env-modifier[data-category][data-value]') : null);
+        if (!element) return;
 
-        const category = element.dataset.category as keyof EnvironmentalModifierCategories;
-        const value = Number(element.dataset.value);
+        const categoryData = element.dataset.category;
+        const valueData = element.dataset.value;
+        if (!categoryData || !valueData) return;
+
+        const category = categoryData as keyof EnvironmentalModifierCategories;
+        const value = Number(valueData);
 
         this.app.modifiers.environmental.toggleSelection(category, value);
         await this.app.modifiers.updateDocument();
@@ -104,59 +106,60 @@ class EnvironmentalModifiersHandler extends ModifiersHandler {
 
 
 class MatrixModifiersHandler extends ModifiersHandler {
-    override getData(options?: object) {
-        return {}
-    }
-
-    override activateListeners(html: JQuery<HTMLElement>) {
-    }
-
-    static override addTokenHUDElements(modifierColumn: JQuery<HTMLElement>, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
+    static override addTokenHUDElements(modifierColumn: HTMLElement, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
         console.log(`${SYSTEM_NAME} | Matrix modifier HUD on renderTokenHUD`);
 
         // Setup and connect tokenHUD elements.
-        const modifier = $('<div class="modifier-row"></div>');
-        const modifierValue = $(`<div class="modifier-value modifier-value-matrix">${modifiers.noise.applied.total}</div>`);
-        const modifierDescription = $(`<div class="modifier-description open-matrix-modifier">${game.i18n.localize("SR5.ModifierTypes.Noise")}</div>`);
-        modifierDescription.on('click', SituationModifiersApplication.openForTokenHUD(tokenId, 'matrix'));
+        const modifier = document.createElement('div');
+        modifier.className = 'modifier-row';
 
+        const modifierValue = document.createElement('div');
+        modifierValue.className = 'modifier-value modifier-value-matrix';
+        modifierValue.innerText = String(modifiers.noise.applied.total);
+
+        const modifierDescription = document.createElement('div');
+        modifierDescription.className = 'modifier-description open-matrix-modifier';
+        modifierDescription.innerText = game.i18n.localize('SR5.ModifierTypes.Noise');
+        modifierDescription.addEventListener('click', event => {
+            void SituationModifiersApplication.openForTokenHUD(tokenId)(event);
+        });
+
+        modifier.append(modifierValue, modifierDescription);
         modifierColumn.append(modifier);
-        modifier.append(modifierValue);
-        modifier.append(modifierDescription);
     }
 }
 
 class MagicModifiersHandler extends ModifiersHandler {
-    override getData(options?: object) {
-        return {}
-    }
-
-    override activateListeners(html: JQuery<HTMLElement>) {
-        html.find('.remove-magical-from-target').on('click', this.handleClearMagicModifiers.bind(this));
-    }
-
-    static override addTokenHUDElements(modifierColumn: JQuery<HTMLElement>, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
+    static override addTokenHUDElements(modifierColumn: HTMLElement, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
         console.log(`${SYSTEM_NAME} | Magic modifier HUD on renderTokenHUD`);
 
         // Don't add awakened modifiers to token hud for mundane actors.
         if (!actor.isAwakened()) return;
 
         // Setup and connect tokenHUD elements.
-        const modifier = $('<div class="modifier-row"></div>');
-        const modifierValue = $(`<div class="modifier-value modifier-value-magic">${modifiers.background_count.applied.total}</div>`);
-        const modifierDescription = $(`<div class="modifier-description open-magic-modifier">${game.i18n.localize("SR5.ModifierTypes.BackgroundCount")}</div>`);
-        modifierDescription.on('click', SituationModifiersApplication.openForTokenHUD(tokenId, 'magic'));
+        const modifier = document.createElement('div');
+        modifier.className = 'modifier-row';
 
+        const modifierValue = document.createElement('div');
+        modifierValue.className = 'modifier-value modifier-value-magic';
+        modifierValue.innerText = String(modifiers.background_count.applied.total);
+
+        const modifierDescription = document.createElement('div');
+        modifierDescription.className = 'modifier-description open-magic-modifier';
+        modifierDescription.innerText = game.i18n.localize('SR5.ModifierTypes.BackgroundCount');
+        modifierDescription.addEventListener('click', event => {
+            void SituationModifiersApplication.openForTokenHUD(tokenId)(event);
+        });
+
+        modifier.append(modifierValue, modifierDescription);
         modifierColumn.append(modifier);
-        modifier.append(modifierValue);
-        modifier.append(modifierDescription);
     }
 
     async handleClearMagicModifiers(event: Event) {
         event.preventDefault();
 
         this.app.modifiers = await DocumentSituationModifiers.clearTypeOn(this.app.target, 'background_count');
-        this.app.render();
+        await this.app.render();
     }
 }
 
@@ -166,22 +169,6 @@ class MagicModifiersHandler extends ModifiersHandler {
  * 
  */
 class RecoilModifiersHandler extends ModifiersHandler {
-    override getData(options?: object) {
-        return {}
-    }
-
-    override activateListeners(html: JQuery<HTMLElement>): void {
-        html.find('.recoil-delta button').on('click', this.applyRecoilDelta.bind(this));
-        html.find('button#modifiers-recoil-total').on('click', async event => {
-            if (this.app.modifiers.documentIsScene) return;
-            const actor = this.app.modifiers.document as SR5Actor;
-            await actor.clearProgressiveRecoil();
-            ui.notifications?.info('SR5.Infos.ResetProgressiveRecoil', {localize: true});
-
-            this.app.render();
-        })
-    }
-
     /**
      * Apply actor system recoil data back to the actor.
      * 
@@ -189,8 +176,9 @@ class RecoilModifiersHandler extends ModifiersHandler {
      * 
      * This method is related to SituationModifierApplication#applyModifierDelta
      */
-    async applyRecoilDelta(event: Event) {
+    async applyRecoilDelta(event: Event, target?: HTMLElement) {
         event.preventDefault();
+        event.stopPropagation();
 
         if (!this.app.modifiers.documentIsActor) return;
 
@@ -198,8 +186,9 @@ class RecoilModifiersHandler extends ModifiersHandler {
 
         // Expect the element group to siblings.
         // Triggering DOMElement should contain the delta...
-        const triggerElement = event.target as HTMLElement;
-        if (!Object.hasOwn(triggerElement?.dataset, 'delta')) 
+        const triggerElement = target?.closest<HTMLElement>('[data-delta]')
+            ?? (event.target instanceof HTMLElement ? event.target.closest<HTMLElement>('[data-delta]') : null);
+        if (!triggerElement || !Object.hasOwn(triggerElement.dataset, 'delta'))
             return console.error('Shadowrun5e | Expected a DOMElement with a different structure');
 
         const delta = Number(triggerElement.dataset['delta']);
@@ -209,21 +198,29 @@ class RecoilModifiersHandler extends ModifiersHandler {
         await actor.addRecoil(delta);
 
         this.app.modifiers.applyAll();
-        this.app.render();
+        await this.app.render();
     }
 
-    static override addTokenHUDElements(modifierColumn: JQuery<HTMLElement>, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
+    static override addTokenHUDElements(modifierColumn: HTMLElement, tokenId: string, actor: SR5Actor, modifiers: DocumentSituationModifiers): void {
         console.log(`${SYSTEM_NAME} | Recoil modifier HUD on renderTokenHUD`);
 
         // Setup and connect tokenHUD elements.
-        const modifier = $('<div class="modifier-row"></div>');
-        const modifierValue = $(`<div class="modifier-value modifier-value-recoil">${modifiers.recoil.applied.total}</div>`);
-        const modifierDescription = $(`<div class="modifier-description open-recoil-modifier">${game.i18n.localize("SR5.ModifierTypes.Recoil")}</div>`);
-        modifierDescription.on('click', SituationModifiersApplication.openForTokenHUD(tokenId, 'recoil'));
+        const modifier = document.createElement('div');
+        modifier.className = 'modifier-row';
 
+        const modifierValue = document.createElement('div');
+        modifierValue.className = 'modifier-value modifier-value-recoil';
+        modifierValue.innerText = String(modifiers.recoil.applied.total);
+
+        const modifierDescription = document.createElement('div');
+        modifierDescription.className = 'modifier-description open-recoil-modifier';
+        modifierDescription.innerText = game.i18n.localize('SR5.ModifierTypes.Recoil');
+        modifierDescription.addEventListener('click', event => {
+            void SituationModifiersApplication.openForTokenHUD(tokenId)(event);
+        });
+
+        modifier.append(modifierValue, modifierDescription);
         modifierColumn.append(modifier);
-        modifier.append(modifierValue);
-        modifier.append(modifierDescription);
     }
 }
 
@@ -236,7 +233,7 @@ class RecoilModifiersHandler extends ModifiersHandler {
  * - environmental
  * - ...
  */
-export class SituationModifiersApplication extends foundry.appv1.api.FormApplication {
+export class SituationModifiersApplication extends HandlebarsApplicationMixin(ApplicationV2)<SituationalModifiersTemplateData> {
     // Static Handlers contain the class references used for both static method calls and to setup the instance handlers.
     static _staticHandlers: typeof ModifiersHandler[] = [
         MatrixModifiersHandler, 
@@ -246,6 +243,56 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
     ];
     // The default sheet tab to open.
     static _defaultTabId = 'physical';
+
+    static override PARTS = {
+        main: {
+            template: 'systems/shadowrun5e/dist/templates/apps/situational-modifiers.hbs'
+        }
+    }
+
+    static override DEFAULT_OPTIONS = {
+        id: 'situational-modifiers-application',
+        classes: [SR5_APPV2_CSS_CLASS, 'sr5', 'situational-modifiers-application'],
+        form: {
+            submitOnChange: false,
+            closeOnSubmit: false,
+        },
+        position: {
+            height: 'auto' as const,
+        },
+        window: {
+            resizable: false,
+        },
+        actions: {
+            applyModifierDelta(this: SituationModifiersApplication, event: Event, target: HTMLElement) {
+                void this.applyModifierDelta(event, target);
+            },
+            applyRecoilDelta(this: SituationModifiersApplication, event: Event, target: HTMLElement) {
+                const handler = this._getHandler(RecoilModifiersHandler);
+                if (!handler) return;
+
+                void handler.applyRecoilDelta(event, target);
+            },
+            clearModifierData(this: SituationModifiersApplication, event: Event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                void this.clearModifierData();
+            },
+            clearTokenModifiersData(this: SituationModifiersApplication, event: Event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                void this.clearTokenModifiersData();
+            },
+            toggleEnvironmentalModifier(this: SituationModifiersApplication, event: Event, target: HTMLElement) {
+                const handler = this._getHandler(EnvironmentalModifiersHandler);
+                if (!handler) return;
+
+                void handler._handleModifierChange(event, target);
+            },
+        }
+    }
     
     // Manage modifiers stored on this target document. This might not be the document meant for those modifiers to be applied to.
     // While a scene can store modifiers, actors have them applied
@@ -255,12 +302,16 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
     // Instance handlers contain all functionality for modifier categories as not to clutter the general application.
     handlers: ModifiersHandler[]
 
-    constructor(target: ModifiableDocumentTypes) {
-        super(target);
+    constructor(target: ModifiableDocumentTypes, options = {}) {
+        super(options);
         
         this.target = target;
         this.modifiers = this._getModifiers();
         this.handlers = this._prepareHandlers();
+    }
+
+    override get title() {
+        return game.i18n.localize('SR5.SituationalModifiersApplication.Title');
     }
 
     /**
@@ -270,86 +321,87 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
         return SituationModifiersApplication._staticHandlers.map(staticHandler => new staticHandler(this));
     }
 
-    override get template() {
-        return 'systems/shadowrun5e/dist/templates/apps/situational-modifiers.hbs';
+    _getHandler<T extends ModifiersHandler>(handlerType: new (app: SituationModifiersApplication) => T): T | undefined {
+        return this.handlers.find(handler => handler instanceof handlerType) as T | undefined;
     }
 
-    static override get defaultOptions() {
-        const options = super.defaultOptions;
-
-        options.classes = ['sr5'];
-        options.id = 'situational-modifiers-application';
-        options.title = game.i18n.localize('SR5.SituationalModifiersApplication.Title');
-
-        //@ts-expect-error
-        options.width = 'auto';
-        options.height = 'auto';
-        options.resizable = false;
-
-        options.tabs = [
-            {
-                navSelector: '.tabs',
-                contentSelector: '.sheetbody',
-                initial: SituationModifiersApplication._defaultTabId
-            },
-        ];
-
-        options.submitOnChange = true;
-        options.closeOnSubmit = false;
-
-        return options;
-    }
-
-    override async getData(options?: any): Promise<SituationalModifiersTemplateData> {
+    override async _prepareContext(options: Parameters<ApplicationV2['_prepareContext']>[0]): Promise<SituationalModifiersTemplateData> {
         // Update all modifiers before displaying.
         this.modifiers.applyAll();
 
-        const baseData = await super.getData(options);
+        const baseData = await super._prepareContext(options);
 
-        // please help
         return {
-            ...(baseData as foundry.appv1.api.FormApplication.FormApplicationData<FormApplication.Options, {}>),
+            ...(baseData as HandlebarsApplicationMixin.RenderContext),
 
             targetType: this._targetTypeLabel,
             targetName: this.target.name || 'Unknown target',
 
-            modifiers: this.modifiers,
+            modifiers: this.modifiers as unknown as Record<string, unknown>,
             environmentalLevels: this.modifiers.environmental.levels
         };
     }
 
-    override activateListeners(html: JQuery<HTMLElement>): void {
-        super.activateListeners(html);
+    override async _onRender(
+        context: DeepPartial<SituationalModifiersTemplateData>,
+        options: DeepPartial<ApplicationV2.RenderOptions>
+    ) {
+        this.element.querySelectorAll<HTMLInputElement>('input[name^="modifiers.source."]').forEach(input => {
+            input.addEventListener('change', event => {
+                void this._handleSourceInputChange(event);
+            });
+        });
 
-        this.handlers.forEach(handler => handler.activateListeners(html));
+        return super._onRender(context, options);
+    }
 
-        html.find('.modifier-delta button').on('click', this.applyModifierDelta.bind(this));
-        html.find('.remove-modifiers-from-target').on('click', this.clearModifierData.bind(this));
-        html.find('.remove-token-modifiers-from-scene').on('click', this.clearTokenModifiersData.bind(this));
+    async _handleSourceInputChange(event: Event) {
+        event.preventDefault();
+
+        if (!(event.currentTarget instanceof HTMLInputElement)) return;
+
+        const sourceKey = event.currentTarget.name;
+        if (!sourceKey) {
+            return console.error('Shadowrun5e | Expected a DOMElement with a name attribute');
+        }
+
+        const currentValue = Number(event.currentTarget.value);
+        if (isNaN(currentValue)) {
+            return console.error('Shadowrun5e | Expected input value to be a number', sourceKey, event.currentTarget.value);
+        }
+
+        await this._applyFormData({ [sourceKey]: currentValue });
+
+        this.modifiers.applyAll();
+        await this.render();
     }
 
     /**
      * Apply a formData change based on a custom numerical input element.
      */
-    async applyModifierDelta(event: Event) {
+    async applyModifierDelta(event: Event, target?: HTMLElement) {
         event.preventDefault();
+        event.stopPropagation();
 
         // Expect the element group to siblings.
         // Triggering DOMElement should contain the delta...
-        const triggerElement = event.target as HTMLElement;
-        if (!Object.hasOwn(triggerElement?.dataset, 'delta')) 
+        const triggerElement = target?.closest<HTMLElement>('[data-delta]')
+            ?? (event.target instanceof HTMLElement ? event.target.closest<HTMLElement>('[data-delta]') : null);
+        if (!triggerElement || !Object.hasOwn(triggerElement.dataset, 'delta'))
             return console.error('Shadowrun5e | Expected a DOMElement with a different structure');
 
         const delta = Number(triggerElement.dataset['delta']);
         if (delta === 0) return;
 
         // Value DOMElement should contain the data key...
-        const valueElement = $(triggerElement).siblings().closest('input');
-        if (!valueElement?.attr('name')) 
+        const valueElement = triggerElement
+            .closest<HTMLElement>('.modifier-delta, .recoil-delta')
+            ?.querySelector<HTMLInputElement>('input[name]');
+        if (!valueElement?.name) 
             return console.error('Shadowrun5e | Expected a DOMElement with a name attribute');
 
         // Extract value from data using value DOMElement data key...
-        const sourceKey = valueElement.attr('name') as string;
+        const sourceKey = valueElement.name;
         const appliedKey = sourceKey.includes('source') ? sourceKey.replace('source', 'applied') : sourceKey;
 
         const currentValue = foundry.utils.getProperty(this, appliedKey) as number ?? 0;
@@ -361,10 +413,10 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
         }
 
         // Update source data and update display information.
-        await this._updateObject(event, formData);
+        await this._applyFormData(formData);
         this.modifiers.applyAll();
 
-        this.render();
+        await this.render();
     }
 
     /**
@@ -372,7 +424,7 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
      */
     async clearModifierData() {
         await this.modifiers.clearAll();
-        this.render(true);
+        await this.render();
     }
 
     /**
@@ -380,26 +432,18 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
      */
     async clearTokenModifiersData() {
         await this.modifiers.clearAllTokensOnScene();
-        this.render(true);
+        await this.render();
     }
 
-    async _updateObject(event: Event, formData?: Record<string, unknown>): Promise<void> {
-            if (!formData) return;
+    async _applyFormData(formData?: Record<string, unknown>): Promise<void> {
+        if (!formData) return;
 
-            for (const [key, value] of Object.entries(formData)) {
-                foundry.utils.setProperty(this, key, value);
-            }
+        for (const [key, value] of Object.entries(formData)) {
+            foundry.utils.setProperty(this, key, value);
+        }
 
-            // Save source selection
-            await DocumentSituationModifiers.setDocumentModifiers(this.target, this.modifiers.source);
-    }
-
-    /**
-     * Override _onChangeInput to include a render on changing modifier values.
-     */
-    override async _onChangeInput(event: JQuery.ChangeEvent) {
-        await super._onChangeInput(event);
-        this.render(true);
+        // Save source selection
+        await DocumentSituationModifiers.setDocumentModifiers(this.target, this.modifiers.source);
     }
 
     _getModifiers(): DocumentSituationModifiers {
@@ -433,11 +477,11 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
      * tokenHUD.
      */
     static onRenderTokenHUD(
-        app: foundry.applications.hud.TokenHUD,
+        _app: foundry.applications.hud.TokenHUD,
         html: HTMLElement,
         // On fvtt-types this is still a stub
         context: foundry.applications.hud.TokenHUD.RenderContext & { _id?: string },
-        options: foundry.applications.hud.TokenHUD.RenderOptions
+        _options: foundry.applications.hud.TokenHUD.RenderOptions
     ) {
         if (!context._id) return;
 
@@ -450,13 +494,17 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
         modifiers.applyAll();
 
         // Setup and connect tokenHUD elements.
-        const container = $('<div class="col far-right sr-modifier-container"></div>');
-        const column = $('<div class="col modifier-column"></div>');
+        const container = document.createElement('div');
+        container.className = 'col far-right sr-modifier-container';
 
+        const column = document.createElement('div');
+        column.className = 'col modifier-column';
         container.append(column);
 
         // Connect SR-FoundryVTT tokenHUD elements to FoundryVTT tokenHUD column structure.
-        $(html).find('.col.right').after(container);
+        const rightColumn = html.querySelector<HTMLElement>('.col.right');
+        if (!rightColumn) return;
+        rightColumn.after(container);
 
         // Hand DOM element over and let ModifierHandlers add their TokenHUDElements.
         SituationModifiersApplication._staticHandlers.forEach(handler => handler.addTokenHUDElements(column, context._id!, actor, modifiers));
@@ -464,26 +512,24 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
 
     static openForCurrentScene() {
         if (!canvas || !canvas.ready || !canvas.scene) return;
-        new SituationModifiersApplication(canvas.scene).render(true);
+        void new SituationModifiersApplication(canvas.scene).render({ force: true });
     }
 
     /** 
      * Part of the tokenHUD workflow makes it necessary to have the token id piped in
      * @param tokenId
      */
-    static openForTokenHUD(tokenId: string, tab?: string) {
+    static openForTokenHUD(tokenId: string) {
         const token = Helpers.getToken(tokenId);
 
         // When the token hud control is activated, this inline handler will be called with it.
-        return async (event) => {
+        return async (event: Event) => {
             event.preventDefault();
 
             if (!token?.actor) return;
             const app = new SituationModifiersApplication(token.actor);
-            // Use async render as activateTab needs tabs to bind to rendered result.
-            await app._render(true);
-            // if (tab) app.activateTab(tab);
-        }   
+            await app.render({ force: true });
+        }
     }
 
     /**
@@ -516,6 +562,6 @@ export class SituationModifiersApplication extends foundry.appv1.api.FormApplica
 
         const app = new SituationModifiersApplication(document);
         // Force, as it may already be open.
-        app.render(true);
+        void app.render({ force: true });
     }
 }

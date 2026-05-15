@@ -17,6 +17,7 @@ import {OpposedTest, OpposedTestData} from "./OpposedTest";
 import {SR5} from "../config";
 import {ActionFlow} from "../item/flows/ActionFlow";
 import { ActionRollType, DamageType, MinimalActionType } from "../types/item/Action";
+import { ValueFieldType } from "../types/template/Base";
 import { DeepPartial } from "fvtt-types/utils";
 import { PackItemFlow } from "../item/flows/PackItemFlow";
 
@@ -440,6 +441,8 @@ export const TestCreator = {
         // this is done before preparing the test data to ensure Active Effects get applied through Test Resolution correctly
         Hooks.call('sr5_beforePrepareTestDataWithAction', action, document, againstData);
 
+        data.codeTermTraces = [];
+
         // Store ActionRollData on TestData to allow for re-creation of the test during it's lifetime.
         data.action = action;
 
@@ -476,9 +479,12 @@ export const TestCreator = {
             // Notify user about their sins.
             if (skill && !SkillRules.allowRoll(skill)) ui.notifications?.warn('SR5.Warnings.SkillCantBeDefault', {localize: true});
             if (skill && !SkillRules.hasRequirements(actor, skill)) ui.notifications?.warn('SR5.Warnings.ActorMissingRequirements', {localize: true});
-            
+
             // Add skill values to pool.
-            if (skill) pool.addBase(skill.label, SkillRules.level(skill));
+            if (skill) {
+                pool.addBase(skill.label, SkillRules.level(skill));
+                TestCreator.addCodeTermTrace(data, skill);
+            }
             if (action.spec) pool.addUnique('SR5.Specialization', SkillRules.SpecializationModifier);
         }
 
@@ -486,14 +492,20 @@ export const TestCreator = {
         if (action.attribute) {
             const attribute = actor.getAttribute(action.attribute, { rollData });
             // Don't use addUniquePart as one attribute might be used twice.
-            if (attribute) pool.addBase(attribute.label, attribute.value);
+            if (attribute) {
+                pool.addBase(attribute.label, attribute.value);
+                TestCreator.addCodeTermTrace(data, attribute);
+            }
         }
 
         // The second attribute is only used for attribute only tests.
         if (!action.skill && action.attribute2) {
             const attribute = actor.getAttribute(action.attribute2, { rollData });
             // Don't use addUniquePart as one attribute might be used twice.
-            if (attribute) pool.addBase(attribute.label, attribute.value);
+            if (attribute) {
+                pool.addBase(attribute.label, attribute.value);
+                TestCreator.addCodeTermTrace(data, attribute);
+            }
         }
 
         // Include pool modifiers for opposed and resist tests.
@@ -511,6 +523,7 @@ export const TestCreator = {
         if (action.armor) {
             const armor = actor.getArmor();
             ModifiableValue.addUniqueBase(data.pool, 'SR5.Armor.label', armor.value);
+            TestCreator.addCodeTermTrace(data, { ...armor, label: 'SR5.Armor.label' });
         }
 
         // Prepare limit values...
@@ -520,7 +533,9 @@ export const TestCreator = {
 
         //...add limit modifiers
         if (action.limit.changes) {
-            action.limit.changes.forEach(change => ModifiableValue.addUnique(data.limit, change.name, change.value, change.mode as any, change.priority));
+            action.limit.changes.forEach(change =>
+                ModifiableValue.addUnique(data.limit, change.name, change.value, { mode: change.mode as any, priority: change.priority })
+            );
         }
 
         //...add limit attribute value based on actor.
@@ -528,7 +543,10 @@ export const TestCreator = {
             // Get the limit connected to the defined attribute.
             // NOTE: This might differ from the USED attribute...
             const limit = actor.getLimit(action.limit.attribute);
-            if (limit) ModifiableValue.addUniqueBase(data.limit, limit.label, limit.value);
+            if (limit) {
+                ModifiableValue.addUniqueBase(data.limit, limit.label, limit.value);
+                TestCreator.addCodeTermTrace(data, limit);
+            }
         }
 
         // Prepare threshold values...
@@ -599,15 +617,30 @@ export const TestCreator = {
 
         if (action.attribute) {
             const attribute = item.getAttribute(action.attribute, {rollData});
-            if (attribute) pool.addUniqueBase(attribute.label, attribute.value);
+            if (attribute) {
+                pool.addUniqueBase(attribute.label, attribute.value);
+                TestCreator.addCodeTermTrace(data, attribute);
+            }
         }
 
         if (action.attribute2) {
             const attribute = item.getAttribute(action.attribute2, {rollData});
-            if (attribute) pool.addUniqueBase(attribute.label, attribute.value);
+            if (attribute) {
+                pool.addUniqueBase(attribute.label, attribute.value);
+                TestCreator.addCodeTermTrace(data, attribute);
+            }
         }
 
         return data;
+    },
+
+    addCodeTermTrace(data: SuccessTestData, valueField: ValueFieldType) {
+        const traces = (data.codeTermTraces ??= []);
+
+        traces.push({ 
+            valueField: DataDefaults.createData('value_field', valueField), 
+            tooltipSource: `code-${traces.length}` 
+        });
     },
 
     /**
@@ -615,6 +648,7 @@ export const TestCreator = {
      */
     _minimalTestData: function(): any {
         return {
+            codeTermTraces: [],
             pool: DataDefaults.createData('value_field', {label: 'SR5.DicePool'}),
             limit: DataDefaults.createData('value_field', {label: 'SR5.Limit'}),
             threshold: DataDefaults.createData('value_field', {label: 'SR5.Threshold'}),

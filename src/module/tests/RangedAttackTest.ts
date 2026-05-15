@@ -1,18 +1,18 @@
-import { TestDialog } from '../apps/dialogs/TestDialog';
-import {SuccessTest, SuccessTestData} from "./SuccessTest";
-import {DataDefaults} from "../data/DataDefaults";
-import {SR5} from "../config";
-import {FireModeRules} from "../rules/FireModeRules";
+import { SR5 } from "../config";
 import { SR5Item } from "../item/SR5Item";
 import { TestCreator } from './TestCreator';
-import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
 import { DamageType } from '../types/item/Action';
-import { RangesTemplateType, TargetRangeTemplateType } from '../types/template/Weapon';
+import { DataDefaults } from "../data/DataDefaults";
+import { FireModeRules } from "../rules/FireModeRules";
 import { FireModeType } from '../types/flags/ItemFlags';
+import { SuccessTest, SuccessTestData } from "./SuccessTest";
+import { TestDialogLike } from '../apps/dialogs/TestDialog';
+import { RangesTemplateType, TargetRangeTemplateType } from '../types/template/Weapon';
+import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
 
 export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDataFragment {
     damage: DamageType
-    fireModes: FireModeType[]
+    fireModes: FireModeDialogOption[]
     fireMode: FireModeType
     // index of selected fireMode in fireModes
     fireModeSelected: number
@@ -23,6 +23,10 @@ export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDa
     targetRangesSelected: number
     // Distance to target in meters.
     distance: number
+}
+
+export interface FireModeDialogOption extends FireModeType {
+    disabled: boolean
 }
 
 
@@ -50,7 +54,10 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
     /**
      * User want's to manually reset progressive recoil before casting the attack test.
      */
-    async _handleResetProgressiveRecoil(event: JQuery<HTMLElement>, test: TestDialog) {
+    async _handleResetProgressiveRecoil(event: JQuery.Event, test: TestDialogLike) {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (!this.actor) return;
         await this.actor.clearProgressiveRecoil();
 
@@ -71,7 +78,29 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
     }
 
     _selectFireMode(index: number) {
-        this.data.fireMode = this.data.fireModes[index];
+        const requestedIndex = Number(index);
+        const candidate = this.data.fireModes[requestedIndex];
+
+        if (!candidate || candidate.disabled) {
+            const firstEnabledIndex = this._firstEnabledFireModeIndex();
+            if (firstEnabledIndex < 0) return;
+
+            this.data.fireModeSelected = firstEnabledIndex;
+            this.data.fireMode = this._dialogOptionToFireMode(this.data.fireModes[firstEnabledIndex]);
+            return;
+        }
+
+        this.data.fireModeSelected = requestedIndex;
+        this.data.fireMode = this._dialogOptionToFireMode(candidate);
+    }
+
+    _dialogOptionToFireMode(option: FireModeDialogOption): FireModeType {
+        const {disabled, ...mode} = option;
+        return foundry.utils.deepClone(mode);
+    }
+
+    _firstEnabledFireModeIndex(): number {
+        return this.data.fireModes.findIndex(mode => !mode.disabled);
     }
 
     /**
@@ -85,18 +114,28 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         const weapon = this.item.asType('weapon');
         if (!weapon) return;
 
-        this.data.fireModes = FireModeRules.availableFireModes(weapon.system.range.modes);
+        const availableFireModes = FireModeRules.availableFireModes(weapon.system.range.modes);
 
         // To avoid problems when no firemode is configured on the weapon, add at least one to what's available
-        if (this.data.fireModes.length === 0) {
-            this.data.fireModes.push(SR5.fireModes[0]);
+        if (availableFireModes.length === 0) {
+            availableFireModes.push(SR5.fireModes[0]);
             ui.notifications?.warn('SR5.Warnings.NoFireModeConfigured', {localize: true});
         }
+
+        const availableLabels = new Set(availableFireModes.map(mode => mode.label));
+        this.data.fireModes = SR5.fireModes.map(mode => {
+            const fireMode = foundry.utils.deepClone(mode);
+            return {
+                ...fireMode,
+                disabled: !availableLabels.has(mode.label)
+            };
+        });
 
         // Current firemode selected
         const lastFireMode = this.item.getLastFireMode() || DataDefaults.createData('fire_mode');
         // Try pre-selection based on last fire mode.
-        this.data.fireModeSelected = this.data.fireModes.findIndex(available => lastFireMode.label === available.label);
+        this.data.fireModeSelected = this.data.fireModes.findIndex(mode => !mode.disabled && lastFireMode.label === mode.label);
+        if (this.data.fireModeSelected === -1) this.data.fireModeSelected = this._firstEnabledFireModeIndex();
         if (this.data.fireModeSelected === -1) this.data.fireModeSelected = 0;
         this._selectFireMode(this.data.fireModeSelected);
     }
