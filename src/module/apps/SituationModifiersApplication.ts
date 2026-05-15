@@ -293,6 +293,16 @@ export class SituationModifiersApplication extends HandlebarsApplicationMixin(Ap
             },
         }
     }
+
+    static open() {
+        const target = this._getDefaultTarget();
+        if (!target) {
+            ui.notifications?.warn('Select a token, assign a character, or create a scene first.');
+            return;
+        }
+
+        void new SituationModifiersApplication(target).render({ force: true });
+    }
     
     // Manage modifiers stored on this target document. This might not be the document meant for those modifiers to be applied to.
     // While a scene can store modifiers, actors have them applied
@@ -466,7 +476,10 @@ export class SituationModifiersApplication extends HandlebarsApplicationMixin(Ap
             name: 'situational-modifiers-application',
             title: 'CONTROLS.SR5.SituationalModifiers',
             icon: 'fas fa-list',
-            onClick: SituationModifiersApplication.openForCurrentScene.bind(SituationModifiersApplication),
+            onChange: (_event: Event, active: boolean) => {
+                if (!active) return;
+                SituationModifiersApplication.open();
+            },
             button: true
         }
     }
@@ -511,8 +524,7 @@ export class SituationModifiersApplication extends HandlebarsApplicationMixin(Ap
     }
 
     static openForCurrentScene() {
-        if (!canvas || !canvas.ready || !canvas.scene) return;
-        void new SituationModifiersApplication(canvas.scene).render({ force: true });
+        SituationModifiersApplication.open();
     }
 
     /** 
@@ -539,29 +551,22 @@ export class SituationModifiersApplication extends HandlebarsApplicationMixin(Ap
      * If the user is a gm => open selection or scene
      */
     static openForKeybinding() {
-        console.debug(`Shadowrun 5e | Trying to open ${this.name}`);
+        SituationModifiersApplication.open();
+    }
 
-        let document: ModifiableDocumentTypes|null = null;
-
+    static _getDefaultTarget(): ModifiableDocumentTypes | null {
         const controlledActors = Helpers.getControlledTokenActors();
-        // Only open on selection for a single token.
-        if (controlledActors.length === 1) document = controlledActors[0];
-        
-        // For GMs try scene for no selection.
-        if (!document && game.user?.isGM) {
-            document = canvas.scene;
-        } 
+        if (controlledActors.length === 1) return controlledActors[0];
 
-        // Try user character as last fallback.
-        if (!document) {
-            document = game.user?.character as SR5Actor;
+        if (game.user?.isGM && canvas?.ready && canvas.scene) {
+            return canvas.scene;
         }
 
-        if (!document) return console.debug(`Shadowrun 5e | ...aborting, as no suitable document could be found`);
-        console.debug(`Shadowrun 5e | ...opening with document ${document.uuid}`, document);
+        if (game.user?.character instanceof SR5Actor) {
+            return game.user.character;
+        }
 
-        const app = new SituationModifiersApplication(document);
-        // Force, as it may already be open.
-        void app.render({ force: true });
+        const firstActor = game.actors?.contents.find(actor => actor instanceof SR5Actor);
+        return (firstActor as SR5Actor | undefined) ?? null;
     }
 }

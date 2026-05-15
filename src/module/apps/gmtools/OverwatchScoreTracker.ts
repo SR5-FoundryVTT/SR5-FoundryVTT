@@ -21,6 +21,10 @@ interface OverwatchScoreTrackerContext extends HandlebarsApplicationMixin.Render
 export class OverwatchScoreTracker extends HandlebarsApplicationMixin(ApplicationV2)<OverwatchScoreTrackerContext> {
     static MatrixOverwatchDiceCount = '2d6';
 
+    static open() {
+        void new OverwatchScoreTracker().render({ force: true });
+    }
+
     static override PARTS = {
         main: {
             template: 'systems/shadowrun5e/dist/templates/apps/gmtools/overwatch-score-tracker.hbs'
