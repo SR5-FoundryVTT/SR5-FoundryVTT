@@ -2,14 +2,64 @@
 
 .sr5v2 {
     &.situational-modifiers-application {
+        .window-header {
+            color: var(--sr5v2-text-primary);
+
+            .window-title,
+            .header-control {
+                color: var(--sr5v2-text-primary);
+                text-shadow: none;
+            }
+        }
+
+        &#situational-modifiers-application {
+            .window-header {
+                .window-title,
+                .header-control {
+                    color: var(--sr5v2-text-primary) !important;
+                }
+            }
+
+            h1,
+            h2 {
+                color: var(--sr5v2-label);
+            }
+
+            h1 {
+                border-bottom-color: var(--sr5v2-border-strong);
+            }
+        }
+
+        .window-content {
+            background: var(--sr5v2-content-bg);
+            color: var(--sr5v2-text-primary);
+            border-color: var(--sr5v2-border);
+            text-shadow: none;
+        }
+
         .situational-modifiers-app {
             display: flex;
             flex-direction: column;
             height: 100%;
+            gap: 0.35rem;
+            background: var(--sr5v2-content-bg);
+            color: var(--sr5v2-text-primary);
+
+            label,
+            th,
+            td,
+            p {
+                color: var(--sr5v2-text-primary);
+                text-shadow: none;
+            }
         }
 
         h1 {
+            margin: 0;
+            border-bottom: 1px solid var(--sr5v2-border-strong);
+            color: var(--sr5v2-label);
             font-family: var(--font-sans);
+            font-weight: 700;
         }
 
         h2 {
@@ -17,6 +67,8 @@
 
             font-size: 21px;
             font-family: var(--font-primary);
+            color: var(--sr5v2-label);
+            border-bottom: none;
         }
 
         .form-group {
@@ -32,16 +84,60 @@
             margin: 0;
             flex: 0 0 300px;
             font-family: var(--font-sans);
+            color: var(--sr5v2-text-primary);
+            font-weight: 600;
         }
 
         .form-group .form-group-element-numerical {
             flex: 0 0 auto;
+            display: flex;
+            flex-direction: row;
+
+            button,
+            input {
+                width: 25px;
+                height: 25px;
+                line-height: inherit;
+                vertical-align: middle;
+                text-align: center;
+                color: var(--sr5v2-control-text);
+                background: var(--sr5v2-control-bg);
+                border: 1px solid var(--sr5v2-control-border);
+                text-shadow: none;
+            }
+
+            button:hover {
+                color: var(--sr5v2-button-hover-text);
+                border-color: var(--sr5v2-button-hover-border);
+                background: var(--sr5v2-button-hover-bg);
+            }
+
+            input {
+                background: var(--sr5v2-control-bg-strong);
+            }
+
+            input:disabled {
+                color: var(--sr5v2-text-secondary);
+            }
         }
 
         table {
             margin: 0.5rem 0;
-            border-top: 1px solid var(--color-border-light-tertiary);
-            border-bottom: 1px solid var(--color-border-light-tertiary);
+            border-top: 1px solid var(--sr5v2-border);
+            border-bottom: 1px solid var(--sr5v2-border);
+            background: var(--sr5v2-bg-subtle);
+
+            th,
+            td {
+                color: var(--sr5v2-text-primary);
+                border-color: var(--sr5v2-border);
+                text-shadow: none;
+            }
+
+            th {
+                color: var(--sr5v2-label);
+                background: var(--sr5v2-bg-elevated-strong);
+            }
         }
 
         /** CSS for the Environmental Modifier Application Window */
@@ -53,13 +149,31 @@
             padding-bottom: 5px;
             width: 100%;
             display: block;
+            color: var(--sr5v2-control-text);
+            background: var(--sr5v2-control-bg);
+            border: 1px solid var(--sr5v2-control-border);
+            text-shadow: none;
         }
 
-    .env-modifier-active {
-        border-radius: 4px;
-        background-color: var(--sr5v2-button-hover-bg);
-        color: var(--sr5v2-label);
-    }
+        button.env-modifier:hover {
+            color: var(--sr5v2-button-hover-text);
+            border-color: var(--sr5v2-button-hover-border);
+            background: var(--sr5v2-button-hover-bg);
+        }
+
+        button.env-modifier.env-modifier-active {
+            border-radius: 4px;
+            border-color: var(--sr5v2-button-hover-border);
+            background-color: var(--sr5v2-bg-elevated-strong);
+            color: var(--sr5v2-label);
+            box-shadow: 0 0 0 1px var(--sr5v2-button-hover-border) inset;
+            font-weight: 600;
+        }
+
+        button.env-modifier.env-modifier-active:hover {
+            color: var(--sr5v2-label);
+            background-color: var(--sr5v2-bg-elevated-strong);
+        }
 
         .env-modifier-total {
             font-weight: bold;
@@ -81,6 +195,17 @@
             display: block;
             width: 100%;
             margin: 0;
+            color: var(--sr5v2-button-text);
+            border: 1px solid var(--sr5v2-button-border);
+            background: var(--sr5v2-button-bg);
+            box-shadow: 0 0 0 1px var(--sr5v2-border) inset;
+            text-shadow: none;
+        }
+
+        .dialog-buttons > .dialog-button:hover {
+            color: var(--sr5v2-button-hover-text);
+            border-color: var(--sr5v2-button-hover-border);
+            background: var(--sr5v2-button-hover-bg);
         }
     }
 }
