@@ -41,36 +41,18 @@ input[type='text'].display {
  */
 .sheet.journal-entry,
 .journal-sheet {
-    --sr5-journal-page-bg: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url('assets/page.webp') repeat;
-    --sr5-journal-heading: #ebb531;
-    --sr5-journal-table-bg: linear-gradient(to bottom, rgba(25, 24, 19, 0.92), rgba(0, 0, 0, 0.98));
-    --sr5-journal-table-caption: #ebb531;
-    --sr5-journal-table-head-bg: rgba(0, 0, 0, 0.88);
-    --sr5-journal-table-text: #f0ede4;
-    --sr5-journal-table-row-even: rgba(255, 255, 255, 0.08);
-    --sr5-journal-table-border: rgba(235, 181, 49, 0.7);
-    --sr5-journal-title-bg: var(--sr5-theme-nameplate-bg), url('assets/page.webp') repeat;
+    --sr5-journal-page-bg: var(--sr5-theme-content-bg);
+    --sr5-journal-heading: var(--sr5-theme-label);
+    --sr5-journal-table-bg: var(--sr5-theme-chat-bg);
+    --sr5-journal-table-caption: var(--sr5-theme-label);
+    --sr5-journal-table-head-bg: var(--sr5-theme-table-head-bg);
+    --sr5-journal-table-text: var(--sr5-theme-text-primary);
+    --sr5-journal-table-row-even: var(--sr5-theme-row-even);
+    --sr5-journal-table-border: var(--sr5-theme-chat-border);
+    --sr5-journal-title-bg: var(--sr5-theme-nameplate-bg), var(--sr5-theme-page-image) repeat;
     --sr5-journal-title-text: var(--sr5-theme-nameplate-text);
-    --sr5-journal-select-text: #2c2b26;
-    --sr5-journal-option-text: #f0ede4;
-}
-
-body.theme-light .sheet.journal-entry,
-body.theme-light .journal-sheet,
-.sheet.journal-entry.theme-light,
-.journal-sheet.theme-light {
-    --sr5-journal-page-bg: linear-gradient(rgba(245, 247, 250, 0.9), rgba(223, 228, 234, 0.94)), url('assets/light-page.webp') repeat;
-    --sr5-journal-heading: #6c1f2c;
-    --sr5-journal-table-bg: linear-gradient(to bottom, rgba(214, 220, 228, 0.96), rgba(192, 200, 210, 0.98));
-    --sr5-journal-table-caption: #6c1f2c;
-    --sr5-journal-table-head-bg: rgba(35, 42, 51, 0.88);
-    --sr5-journal-table-text: #171d24;
-    --sr5-journal-table-row-even: rgba(99, 112, 128, 0.08);
-    --sr5-journal-table-border: rgba(108, 31, 44, 0.34);
-    --sr5-journal-title-bg: var(--sr5-theme-nameplate-bg), url('assets/light-page.webp') repeat;
-    --sr5-journal-title-text: var(--sr5-theme-nameplate-text);
-    --sr5-journal-select-text: #232a33;
-    --sr5-journal-option-text: #f7f8fb;
+    --sr5-journal-select-text: var(--sr5-theme-chat-contrast-text);
+    --sr5-journal-option-text: var(--sr5-theme-text-primary);
 }
 
 .sheet.journal-entry .journal-entry-content,
