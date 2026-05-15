@@ -113,14 +113,14 @@ export class CombatRules {
      */
     static isBlockedByHardenedArmor(incomingDamage: DamageType, attackerHits = 0, defenderHits = 0, actor: SR5Actor): boolean {
         const armor = actor.getArmor(incomingDamage);
-        const hardenedRating = armor.hardened?.value ?? 0;
+        const hardenedRating = armor.hardened.value;
 
         if(hardenedRating <= 0) {
             return false;
         }
 
         const modifiedDv = CombatRules.modifyDamageAfterHit(actor, attackerHits, defenderHits, incomingDamage).value;
-        return modifiedDv <= hardenedRating;
+        return modifiedDv < hardenedRating;
     }
 
     /**
@@ -150,7 +150,7 @@ export class CombatRules {
         if (immunityRating <= 0) return false;
 
         const modifiedDv = CombatRules.modifyDamageAfterHit(actor, attackerHits, defenderHits, incomingDamage).value;
-        return modifiedDv <= immunityRating;
+        return modifiedDv < immunityRating;
     }
 
     static hardenedAutoHits(actor: SR5Actor, damage: DamageType): number {

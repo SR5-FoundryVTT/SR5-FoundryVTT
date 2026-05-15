@@ -190,7 +190,17 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
 
         const getDamage = (
             damageValue: number,
-            { type = "physical", ap = 0, element }: { type?: DamageTypeType, ap?: number, element?: DamageElementType} = {}
+            {
+                type = "physical",
+                ap = 0,
+                element,
+                normal_weapon = false
+            }: {
+                type?: DamageTypeType,
+                ap?: number,
+                element?: DamageElementType,
+                normal_weapon?: boolean
+            } = {}
         ): DamageType => {
             return DataDefaults.createData('damage', {
                 type: {
@@ -199,6 +209,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
                 },
                 value: damageValue,
                 base: damageValue,
+                normal_weapon,
                 ...(ap && {
                     ap: {
                         base: ap,
@@ -212,6 +223,30 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
                     }
                 }),
             });
+        }
+
+        const getCharacterWithImmunities = async (
+            armorValue: number,
+            immunities: string[]
+        ): Promise<SR5Actor> => {
+            const characterActor = await factory.createActor({ type: 'character' });
+            const armor = await factory.createItem({
+                type: 'armor',
+                system: {
+                    armor: {
+                        base: armorValue,
+                        value: armorValue,
+                        hardened: false,
+                        mod: null,
+                        immunities,
+                    },
+                    technology: {
+                        equipped: true,
+                    }
+                }
+            });
+            await characterActor.createEmbeddedDocuments('Item', [armor]);
+            return characterActor;
         }
 
         describe("isBlockedByVehicleArmor", () => {
@@ -334,6 +369,88 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
                 const result = CombatRules.doesNoPhysicalDamageToVehicle(damage, vehicle);
 
                 assert.isFalse(result);
+            });
+        });
+
+        describe("immunity rules", () => {
+            it("immunityRating returns 0 when no matching immunity exists", async () => {
+                const actor = await getCharacterWithImmunities(0, ['normal_weapons']);
+                const damage = getDamage(4, { normal_weapon: false, element: 'cold' });
+
+                const rating = CombatRules.immunityRating(actor, damage);
+
+                assert.strictEqual(rating, 0);
+            });
+
+            it("immunityRating returns normal_weapons rating only when normal_weapon is true", async () => {
+                const actor = await getCharacterWithImmunities(0, ['normal_weapons']);
+                const normalDamage = getDamage(4, { normal_weapon: true });
+                const nonNormalDamage = getDamage(4, { normal_weapon: false });
+
+                const normalRating = CombatRules.immunityRating(actor, normalDamage);
+                const nonNormalRating = CombatRules.immunityRating(actor, nonNormalDamage);
+
+                assert.isAbove(normalRating, 0);
+                assert.strictEqual(nonNormalRating, 0);
+            });
+
+            it("immunityRating returns elemental immunity when element matches", async () => {
+                const actor = await getCharacterWithImmunities(0, ['electricity', 'fire', 'water', 'pollutant']);
+                const fireDamage = getDamage(4, { element: 'fire' });
+                const coldDamage = getDamage(4, { element: 'cold' });
+
+                const fireRating = CombatRules.immunityRating(actor, fireDamage);
+                const coldRating = CombatRules.immunityRating(actor, coldDamage);
+
+                assert.isAbove(fireRating, 0);
+                assert.strictEqual(coldRating, 0);
+            });
+
+            it("immunityRating uses the highest matching source when normal and elemental both match", async () => {
+                const actor = await getCharacterWithImmunities(0, ['normal_weapons', 'fire']);
+                const damage = getDamage(4, { normal_weapon: true, element: 'fire' });
+
+                const rating = CombatRules.immunityRating(actor, damage);
+                const normalOnly = CombatRules.immunityRating(actor, getDamage(4, { normal_weapon: true }));
+                const elementalOnly = CombatRules.immunityRating(actor, getDamage(4, { element: 'fire' }));
+
+                assert.strictEqual(rating, Math.max(normalOnly, elementalOnly));
+            });
+
+            it("isBlockedByImmunity takes net hits into account", async () => {
+                const actor = await getCharacterWithImmunities(0, ['normal_weapons']);
+                const damage = getDamage(10, { normal_weapon: true });
+
+                const blocked = CombatRules.isBlockedByImmunity(damage, 3, 2, actor);
+                const notBlocked = CombatRules.isBlockedByImmunity(damage, 4, 2, actor);
+
+                assert.isTrue(blocked);
+                assert.isFalse(notBlocked);
+            });
+
+            it("isBlockedByImmunity takes AP into account", async () => {
+                const actor = await getCharacterWithImmunities(0, ['normal_weapons']);
+                const lowApDamage = getDamage(8, { normal_weapon: true, ap: 0 });
+                const highApDamage = getDamage(8, { normal_weapon: true, ap: -5 });
+
+                const blocked = CombatRules.isBlockedByImmunity(lowApDamage, 0, 0, actor);
+                const notBlocked = CombatRules.isBlockedByImmunity(highApDamage, 0, 0, actor);
+
+                assert.isTrue(blocked);
+                assert.isFalse(notBlocked);
+            });
+
+            it("immunityAutoHits returns ceil(immunityRating / 2) and 0 without matching immunity", async () => {
+                const actor = await getCharacterWithImmunities(0, ['normal_weapons']);
+                const normalDamage = getDamage(4, { normal_weapon: true });
+                const nonMatchingDamage = getDamage(4, { normal_weapon: false, element: 'cold' });
+
+                const rating = CombatRules.immunityRating(actor, normalDamage);
+                const autoHits = CombatRules.immunityAutoHits(actor, normalDamage);
+                const noAutoHits = CombatRules.immunityAutoHits(actor, nonMatchingDamage);
+
+                assert.strictEqual(autoHits, Math.ceil(rating / 2));
+                assert.strictEqual(noAutoHits, 0);
             });
         });
     });
