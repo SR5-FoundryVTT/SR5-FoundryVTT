@@ -1,7 +1,21 @@
 .sr5v2 {
     &.overwatch-score-tracker {
+        .window-header {
+            color: var(--sr5v2-text-primary);
+
+            .window-title,
+            .header-control {
+                color: var(--sr5v2-text-primary);
+                text-shadow: none;
+            }
+        }
+
         .window-content {
             overflow: hidden;
+            background: var(--sr5v2-content-bg);
+            color: var(--sr5v2-text-primary);
+            border-color: var(--sr5v2-border);
+            text-shadow: none;
         }
 
         .overwatch-score-tracker-app,
@@ -11,6 +25,43 @@
 
         .scroll-area {
             overflow-x: hidden;
+        }
+
+        .overwatch-score-tracker-app {
+            color: var(--sr5v2-text-primary);
+
+            .inventory {
+                background: transparent;
+                color: inherit;
+            }
+
+            .list-item {
+                color: var(--sr5v2-text-primary);
+
+                .item-text,
+                .item-name,
+                .roll,
+                i {
+                    color: inherit;
+                    text-shadow: none;
+                }
+
+                &:not(.item-section):nth-of-type(even) {
+                    background: var(--sr5v2-bg-subtle);
+                }
+            }
+
+            .list-item.item-section {
+                border-bottom: 1px solid var(--sr5v2-border-strong);
+                background: var(--sr5v2-bg-elevated-strong);
+                color: var(--sr5v2-label);
+
+                .item-text,
+                .roll,
+                i {
+                    color: inherit;
+                }
+            }
         }
 
         .list-item .list-item-content {
@@ -85,11 +136,36 @@
         .overwatch-score-input {
             width: 100%;
             text-align: center;
+            color: var(--sr5v2-control-text);
+            background: var(--sr5v2-control-bg);
+            border: 1px solid var(--sr5v2-control-border);
+            text-shadow: none;
         }
 
         .overwatch-score-add-actor {
-            color: grey;
             padding-right: 10px;
+        }
+
+        .overwatch-score-add-actor,
+        .overwatch-score-add,
+        .overwatch-score-roll-15-minutes,
+        .overwatch-score-reset,
+        .overwatch-score-delete {
+            color: var(--sr5v2-text-primary);
+            text-shadow: none;
+        }
+
+        .overwatch-score-add-actor:hover,
+        .overwatch-score-add:hover,
+        .overwatch-score-roll-15-minutes:hover,
+        .overwatch-score-reset:hover,
+        .overwatch-score-delete:hover {
+            color: var(--sr5v2-link-hover);
+        }
+
+        .item-img img {
+            border: 1px solid var(--sr5v2-border);
+            border-radius: 2px;
         }
     }
 }
