@@ -12,6 +12,16 @@ $icon-face-size: 35px;
     font-weight: bold;
   }
 
+  .window-header {
+    color: var(--sr5v2-text-primary);
+
+    .window-title,
+    .header-control {
+      color: var(--sr5v2-text-primary);
+      text-shadow: none;
+    }
+  }
+
   .form-group {
     /**
      * Lazy hack to allow for a two segment elemnt style, with the right ones text 
@@ -31,11 +41,25 @@ $icon-face-size: 35px;
   .dialog-content-common {
     .document {
       padding: 0.2rem 0.25rem;
+      color: var(--sr5v2-text-primary);
+
+      a,
+      a:visited,
+      a:hover,
+      .content-link,
+      .content-link:visited,
+      .content-link:hover,
+      .entity-link,
+      .entity-link:visited,
+      .entity-link:hover {
+        color: var(--sr5v2-text-primary) !important;
+        text-shadow: none;
+      }
     }
 
     h2 {
       border: none;
-      color: white;
+      color: var(--sr5v2-text-primary);
       margin: 0;
       text-decoration: none;
     }
@@ -49,6 +73,35 @@ $icon-face-size: 35px;
     gap: 0.25rem;
     min-height: 0;
     container-type: inline-size;
+    background: var(--sr5v2-content-bg);
+    color: var(--sr5v2-text-primary);
+    border-color: var(--sr5v2-border);
+
+    label,
+    .form-group > label,
+    .toggle-checkbox-row > label,
+    .form-group-element-1-right,
+    .form-group-element-2,
+    .ui-control {
+      color: var(--sr5v2-text-primary);
+      text-shadow: none;
+    }
+
+    input[type='text'],
+    input[type='number'],
+    select {
+      color: var(--sr5v2-control-text);
+      background: var(--sr5v2-control-bg);
+      border-color: var(--sr5v2-control-border);
+      text-shadow: none;
+    }
+
+    input:disabled,
+    select:disabled,
+    textarea:disabled {
+      color: var(--sr5v2-text-secondary);
+      background: var(--sr5v2-control-bg-strong);
+    }
   }
 
   [data-application-part='content'] {
@@ -156,6 +209,10 @@ $icon-face-size: 35px;
         height: $icon-face-size;
         padding: 0;
         line-height: 1;
+        color: var(--sr5v2-control-text);
+        background: var(--sr5v2-control-bg);
+        border: 1px solid var(--sr5v2-control-border);
+        text-shadow: none;
       }
     }
 
@@ -298,15 +355,17 @@ $icon-face-size: 35px;
       width: $icon-face-size;
       height: $icon-face-size;
       border-radius: 4px;
-      border: 1px solid var(--color-border-dark-1, #555);
-      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--sr5v2-control-border);
+      background: var(--sr5v2-control-bg-strong);
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25) inset;
+      box-shadow: 0 0 0 1px var(--sr5v2-border) inset;
       transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+      color: var(--sr5v2-text-primary);
+      text-shadow: none;
     }
 
     .icon-choice-corner-label {
@@ -319,8 +378,8 @@ $icon-face-size: 35px;
       line-height: 10px;
       font-size: 13px;
       font-weight: normal;
-      color: #f4f4f4;
-      background: rgba(0, 0, 0, 0.85);
+      color: var(--sr5v2-text-primary);
+      background: var(--sr5v2-bg-elevated-strong);
       text-transform: uppercase;
       letter-spacing: 0.02em;
       white-space: nowrap;
@@ -333,21 +392,26 @@ $icon-face-size: 35px;
       object-fit: contain;
     }
 
+    body.theme-light & .icon-choice-input:not(:checked) + .icon-choice-face > img,
+    .sr5v2.theme-light & .icon-choice-input:not(:checked) + .icon-choice-face > img {
+      filter: brightness(0) saturate(100%);
+    }
+
     .icon-choice-input:checked + .icon-choice-face {
-      border-color: color.adjust(variables.$darkred, $lightness: 10%);
-      background: color.adjust(variables.$darkred, $lightness: 6%);
+      border-color: var(--sr5v2-button-hover-border);
+      background: var(--sr5v2-button-hover-bg);
       box-shadow:
-        0 0 4px rgba(255, 50, 50, 0.45),
-        0 0 0 1px rgba(255, 50, 50, 0.25) inset;
+        0 0 8px var(--sr5-theme-accent-glow),
+        0 0 0 1px var(--sr5-theme-accent-glow) inset;
     }
 
     .icon-choice-input:checked + .icon-choice-face .icon-choice-corner-label {
-      border-color: rgba(255, 138, 138, 0.45);
-      background: rgba(100, 16, 16, 0.82);
+      border-color: var(--sr5v2-button-hover-border);
+      background: var(--sr5v2-bg-elevated-strong);
     }
 
     .icon-choice-input:focus-visible + .icon-choice-face {
-      outline: 1px solid color.adjust(variables.$darkred, $lightness: 14%);
+      outline: 1px solid var(--sr5v2-control-border-hover);
       outline-offset: 1px;
     }
 
@@ -361,31 +425,28 @@ $icon-face-size: 35px;
   .sheet-footer {
     display: flex;
     gap: 0.5rem;
-    border-top: 1px solid var(--color-border-light-2);
+    border-top: 1px solid var(--sr5v2-border);
 
     .sr5-button {
       flex: 1;
-      color: #fff;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-      border: 1px solid var(--color-border-dark-1, var(--color-border));
+      color: var(--sr5v2-button-text);
+      text-shadow: none;
+      border: 1px solid var(--sr5v2-button-border);
       cursor: pointer;
       transition: all 0.2s ease;
-      background: rgba(255, 255, 255, 0.1);
-      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+      background: var(--sr5v2-button-bg);
+      box-shadow: 0 0 0 1px var(--sr5v2-border) inset;
 
       &:hover,
       &:focus,
       &:focus-visible {
-        color: #fff;
-        border-color: color.adjust(variables.$darkred, $lightness: 10%);
-        background: color.adjust(variables.$darkred, $lightness: 10%);
+        color: var(--sr5v2-button-hover-text);
+        border-color: var(--sr5v2-button-hover-border);
+        background: var(--sr5v2-button-hover-bg);
         box-shadow:
-          0 0 4px rgba(255, 50, 50, 0.5),
-          0 0 8px rgba(255, 0, 0, 0.3),
-          0 0 0 1px rgba(255, 50, 50, 0.3) inset;
-        text-shadow:
-          0 0 3px rgba(255, 50, 50, 0.6),
-          0 0 6px rgba(255, 0, 0, 0.4);
+          0 0 8px var(--sr5-theme-accent-glow),
+          0 0 0 1px var(--sr5-theme-accent-glow) inset;
+        text-shadow: none;
       }
     }
   }
@@ -395,8 +456,15 @@ $icon-face-size: 35px;
     gap: 2px;
 
     .ui-control {
-      border: 1px solid var(--color-border-dark-1, #555);
-      border-left: 1px solid var(--color-border-dark-1, #555);
+      border: 1px solid var(--sr5v2-control-border);
+      border-left: 1px solid var(--sr5v2-control-border);
     }
+  }
+
+  .common-test,
+  .common-test .test-code,
+  .common-test .test-code-term {
+    color: var(--sr5v2-text-primary);
+    text-shadow: none;
   }
 }
