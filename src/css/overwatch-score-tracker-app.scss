@@ -28,11 +28,20 @@
         }
 
         .overwatch-score-tracker-app {
+            font-size: var(--font-size-14);
             color: var(--sr5v2-text-primary);
 
             .inventory {
                 background: transparent;
                 color: inherit;
+            }
+
+            .list-item .item-text,
+            .list-item .item-name,
+            .overwatch-score-add,
+            .overwatch-score-roll-15-minutes,
+            .overwatch-score-add-actor {
+                font-size: var(--font-size-14);
             }
 
             .list-item {
