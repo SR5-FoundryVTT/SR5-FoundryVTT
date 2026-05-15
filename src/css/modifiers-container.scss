@@ -6,16 +6,20 @@
 .sr5v2 {
     .value-modifiers-container {
         padding: 0.25rem;
+        color: var(--sr5-theme-text-primary);
+        background: var(--sr5-theme-surface-elevated);
+        border: 1px solid var(--sr5-theme-border);
+        border-radius: 4px;
     }
 
     .value-modifiers {
-        color: variables.$white;
+        color: var(--sr5-theme-text-primary);
 
         .list-item {
             gap: .5rem;
             &.total {
                 font-weight: bold;
-                border-top: 1px double variables.$yellow;
+                border-top: 1px double var(--sr5-theme-label);
             }
             &.invalid-total {
                 text-decoration: line-through;
@@ -31,7 +35,7 @@
         .value-modifier-name,
         .value-modifiers-base,
         .value-modifiers-modifier {
-            color: variables.$white;
+            color: var(--sr5-theme-text-primary);
 
             > label {
                 color: inherit;
@@ -40,7 +44,7 @@
 
         .mod-change-invalidated,
         .value-modifiers-invalid-total {
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--sr5-theme-text-muted);
             text-decoration: line-through;
             text-decoration-thickness: from-font;
         }
