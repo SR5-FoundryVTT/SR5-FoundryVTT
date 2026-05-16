@@ -10,6 +10,11 @@
                 color: var(--sr5v2-text-primary);
                 text-shadow: none;
             }
+
+            .window-title {
+                font-size: var(--font-size-13);
+                line-height: 36px;
+            }
         }
 
         &#situational-modifiers-application {
@@ -73,10 +78,15 @@
             font-weight: 700;
         }
 
+        .situational-modifiers-app > div:first-child > h1 {
+            font-size: var(--font-size-28);
+            line-height: 1.1;
+        }
+
         h2 {
             margin: 0 0 8px 0;
 
-            font-size: 21px;
+            font-size: 18px;
             font-family: var(--font-primary);
             color: var(--sr5v2-label);
             border-bottom: none;
