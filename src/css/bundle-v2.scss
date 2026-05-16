@@ -20,6 +20,7 @@ body,
     --sr5-theme-chat-whisper-bg: linear-gradient(rgba(64, 64, 85, 0.5), rgba(0, 0, 0, 0.5)), var(--sr5-theme-page-image) repeat;
     --sr5-theme-chat-blind-bg: linear-gradient(rgba(87, 51, 87, 0.25), rgba(0, 0, 0, 0.5)), var(--sr5-theme-page-image) repeat;
     --sr5-theme-chat-border: #4b4a44;
+    --sr5-theme-chat-card-border: var(--sr5-theme-chat-border);
     --sr5-theme-chat-card-bg: var(--sr5-theme-content-bg);
     --sr5-theme-chat-divider: rgba(215, 209, 195, 0.28);
     --sr5-theme-chat-hover-bg: #4b4a44;
@@ -66,6 +67,7 @@ body.theme-light,
     --sr5-theme-chat-whisper-bg: linear-gradient(rgba(223, 230, 242, 0.9), rgba(208, 216, 228, 0.96)), var(--sr5-theme-page-image) repeat;
     --sr5-theme-chat-blind-bg: linear-gradient(rgba(235, 228, 241, 0.92), rgba(219, 210, 228, 0.98)), var(--sr5-theme-page-image) repeat;
     --sr5-theme-chat-border: rgba(108, 31, 44, 0.24);
+    --sr5-theme-chat-card-border: rgba(108, 31, 44, 0.3);
     --sr5-theme-chat-card-bg: var(--sr5-theme-content-bg);
     --sr5-theme-chat-divider: rgba(80, 92, 109, 0.22);
     --sr5-theme-chat-hover-bg: rgba(108, 31, 44, 0.12);
@@ -88,6 +90,8 @@ body.theme-light,
     --sr5v2-window-shadow: 0 0 10px 5px rgba(235, 181, 49, 0.4);
     --sr5v2-surface-bg: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), var(--sr5v2-page-image) repeat;
     --sr5v2-content-bg: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), var(--sr5v2-page-image) repeat;
+    --sr5v2-app-header-bg: linear-gradient(rgba(18, 21, 27, 0.58), rgba(18, 21, 27, 0.58)), var(--sr5v2-page-image) repeat, linear-gradient(rgb(18, 21, 27), rgb(18, 21, 27));
+    --sr5v2-app-body-bg: linear-gradient(rgb(8, 10, 14), rgb(8, 10, 14));
     --sr5v2-text-primary: #f0ede4;
     --sr5v2-text-secondary: #d7d1c3;
     --sr5v2-text-muted: #b8b0a0;
@@ -654,6 +658,36 @@ body.theme-light,
         }
     }
 
+    &.actor,
+    &.item,
+    &.overwatch-score-tracker,
+    &.situational-modifiers-application {
+        background: var(--sr5v2-app-body-bg);
+
+        .window-header {
+            background: var(--sr5v2-app-header-bg);
+            background-repeat: repeat;
+            background-size: 100% 20px auto;
+        }
+    }
+
+    &.actor,
+    &.item {
+        .window-content {
+            background: var(--sr5v2-app-body-bg);
+            background-image: none;
+        }
+
+        .sheet-header {
+            width: calc(100% + .5rem);
+            margin: 0 -.25rem .25rem -.25rem;
+            padding: .25rem .25rem 0 .25rem;
+            background: var(--sr5v2-app-header-bg);
+            background-repeat: repeat;
+            background-size: 100% 20px auto;
+        }
+    }
+
     .description > .editor {
         height: 95%;
         min-height: 15em;
@@ -798,6 +832,8 @@ body.theme-light .sr5v2:not(.theme-dark),
     --sr5v2-window-shadow: 0 16px 38px rgba(26, 31, 40, 0.18);
     --sr5v2-surface-bg: linear-gradient(rgba(246, 248, 251, 0.82), rgba(225, 230, 236, 0.95)), var(--sr5v2-page-image) repeat;
     --sr5v2-content-bg: linear-gradient(rgba(245, 247, 250, 0.72), rgba(223, 228, 234, 0.88)), var(--sr5v2-page-image) repeat;
+    --sr5v2-app-header-bg: var(--sr5v2-content-bg);
+    --sr5v2-app-body-bg: var(--sr5v2-content-bg);
     --sr5v2-text-primary: #232a33;
     --sr5v2-text-secondary: #48515d;
     --sr5v2-text-muted: #798290;

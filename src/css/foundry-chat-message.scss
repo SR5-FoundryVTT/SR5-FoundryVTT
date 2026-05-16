@@ -2,6 +2,22 @@
 @use 'config/mixins';
 @use 'config/variables';
 
+.chat-message {
+    background: var(--sr5-theme-surface-elevated);
+    border: 1px solid var(--sr5-theme-chat-border);
+    color: var(--sr5-theme-text-primary);
+    box-shadow: none;
+
+    .message-header {
+        color: var(--sr5-theme-text-secondary);
+        border-bottom: 1px solid var(--sr5-theme-chat-border);
+    }
+
+    .message-content {
+        color: var(--sr5-theme-text-primary);
+    }
+}
+
 
 .sr5 {
     &.chat-card {
@@ -11,7 +27,7 @@
         color: var(--sr5-theme-text-primary);
         font-style: normal;
         font-size: 1rem;
-        border: 1px solid rgba(variables.$yellow, 0.35);
+        border: 1px solid var(--sr5-theme-chat-card-border);
         border-radius: 6px;
         overflow: hidden;
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
@@ -49,7 +65,7 @@
         }
         .card-header:first-of-type {
             color: var(--sr5-theme-label);
-            border-color: var(--sr5-theme-label);
+            border-color: var(--sr5-theme-chat-card-border);
         }
 
         .button {
@@ -89,7 +105,7 @@
     &.roll-card {
         --sr5-card-surface: var(--sr5-theme-surface-elevated);
         --sr5-card-surface-soft: var(--sr5-theme-surface-subtle);
-        --sr5-card-border: var(--sr5-theme-label);
+        --sr5-card-border: var(--sr5-theme-chat-card-border);
         --sr5-card-border-soft: var(--sr5-theme-border);
         --sr5-card-text: var(--sr5-theme-text-primary);
         --sr5-card-text-soft: var(--sr5-theme-text-secondary);
@@ -136,7 +152,7 @@
                     width: 30px;
                     height: 30px;
                     margin: 0;
-                    border: 1px solid rgba(variables.$yellow, 0.35);
+                    border: 1px solid var(--sr5-theme-chat-card-border);
                     border-radius: 5px;
                     object-fit: cover;
                     background: rgba(0, 0, 0, 0.35);
@@ -918,8 +934,8 @@
     }
 
     .chat-select-link img:hover {
-        border: 1px solid rgba(variables.$yellow, 0.75);
-        box-shadow: 0 0 6px rgba(variables.$yellow, 0.4);
+        border: 1px solid var(--sr5-theme-chat-card-border);
+        box-shadow: 0 0 6px color-mix(in srgb, var(--sr5-theme-chat-card-border) 55%, transparent);
     }
 }
 

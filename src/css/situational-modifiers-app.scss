@@ -31,7 +31,8 @@
         }
 
         .window-content {
-            background: var(--sr5v2-content-bg);
+            background: var(--sr5v2-app-body-bg);
+            background-image: none;
             color: var(--sr5v2-text-primary);
             border-color: var(--sr5v2-border);
             text-shadow: none;
@@ -43,7 +44,8 @@
             height: 100%;
             gap: 0.35rem;
             font-size: var(--font-size-14);
-            background: var(--sr5v2-content-bg);
+            background: var(--sr5v2-app-body-bg);
+            background-image: none;
             color: var(--sr5v2-text-primary);
 
             label,
@@ -53,6 +55,14 @@
                 color: var(--sr5v2-text-primary);
                 text-shadow: none;
             }
+        }
+
+        .situational-modifiers-app > div:first-child {
+            margin: 0 -.25rem 0 -.25rem;
+            padding: .25rem .25rem 0 .25rem;
+            background: var(--sr5v2-app-header-bg);
+            background-repeat: repeat;
+            background-size: 100% 20px auto;
         }
 
         h1 {

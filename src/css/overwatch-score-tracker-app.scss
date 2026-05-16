@@ -12,7 +12,8 @@
 
         .window-content {
             overflow: hidden;
-            background: var(--sr5v2-content-bg);
+            background: var(--sr5v2-app-body-bg);
+            background-image: none;
             color: var(--sr5v2-text-primary);
             border-color: var(--sr5v2-border);
             text-shadow: none;
@@ -61,8 +62,14 @@
             }
 
             .list-item.item-section {
+                width: calc(100% + .5rem + 2px);
+                margin: 0 -.25rem 0 -.25rem;
+                padding-left: calc(3px + .25rem);
+                padding-right: calc(3px + .25rem);
                 border-bottom: 1px solid var(--sr5v2-border-strong);
-                background: var(--sr5v2-bg-elevated-strong);
+                background: var(--sr5v2-app-header-bg);
+                background-repeat: repeat;
+                background-size: 100% 20px auto;
                 color: var(--sr5v2-label);
 
                 .item-text,

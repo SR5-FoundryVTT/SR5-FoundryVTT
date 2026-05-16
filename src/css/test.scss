@@ -8,11 +8,16 @@
 $icon-face-size: 35px;
 
 .application.sr5v2.form-dialog {
+  background: var(--sr5v2-app-body-bg);
+
   .dialog-title {
     font-weight: bold;
   }
 
   .window-header {
+    background: var(--sr5v2-app-header-bg);
+    background-repeat: repeat;
+    background-size: 100% 20px auto;
     color: var(--sr5v2-text-primary);
 
     .window-title,
@@ -41,6 +46,9 @@ $icon-face-size: 35px;
   .dialog-content-common {
     .document {
       padding: 0.2rem 0.25rem;
+      background: var(--sr5v2-app-header-bg);
+      background-repeat: repeat;
+      background-size: 100% 20px auto;
       color: var(--sr5v2-text-primary);
 
       a,
@@ -73,7 +81,8 @@ $icon-face-size: 35px;
     gap: 0.25rem;
     min-height: 0;
     container-type: inline-size;
-    background: var(--sr5v2-content-bg);
+    background: var(--sr5v2-app-body-bg);
+    background-image: none;
     color: var(--sr5v2-text-primary);
     border-color: var(--sr5v2-border);
 
