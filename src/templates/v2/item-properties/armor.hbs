@@ -16,16 +16,22 @@
         {{item.system.armor.elements.cold}}
     </label>
 {{/if}}
+{{#if item.system.armor.elements.electricity}}
+    <label>
+        <i data-tooltip="SR5.Element.Electricity" class="{{elementIcon 'electricity'}}"></i>
+        {{item.system.armor.elements.electricity}}
+    </label>
+{{/if}}
 {{#if item.system.armor.elements.fire}}
     <label>
         <i data-tooltip="SR5.Element.Fire" class="{{elementIcon 'fire'}}"></i>
         {{item.system.armor.elements.fire}}
     </label>
 {{/if}}
-{{#if item.system.armor.elements.electricity}}
+{{#if item.system.armor.elements.pollutant}}
     <label>
-        <i data-tooltip="SR5.Element.Electricity" class="{{elementIcon 'electricity'}}"></i>
-        {{item.system.armor.elements.electricity}}
+        <i data-tooltip="SR5.Element.Pollutant" class="{{elementIcon 'pollutant'}}"></i>
+        {{item.system.armor.elements.pollutant}}
     </label>
 {{/if}}
 {{#if item.system.armor.elements.radiation}}
@@ -34,3 +40,15 @@
         {{item.system.armor.elements.radiation}}
     </label>
 {{/if}}
+{{#if item.system.armor.elements.water}}
+    <label>
+        <i data-tooltip="SR5.Element.Water" class="{{elementIcon 'water'}}"></i>
+        {{item.system.armor.elements.water}}
+    </label>
+{{/if}}
+{{#each item.system.armor.immunities as |immunity|}}
+    <label data-tooltip="{{localize 'SR5.Immunity'}}: {{localize (objValue @root.config.armorImmunityTypes immunity)}}">
+        <i class="fas fa-shield-virus"></i>
+        {{localize (objValue @root.config.armorImmunityTypes immunity)}}
+    </label>
+{{/each}}
