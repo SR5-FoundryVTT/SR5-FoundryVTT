@@ -127,6 +127,15 @@
                 text-shadow: none;
             }
 
+            input {
+                width: 34px;
+                min-width: 34px;
+                height: 28px;
+                min-height: 28px;
+                padding: 0 2px;
+                box-sizing: border-box;
+            }
+
             button:hover {
                 color: var(--sr5v2-button-hover-text);
                 border-color: var(--sr5v2-button-hover-border);
