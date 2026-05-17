@@ -1,58 +1,43 @@
-import { SystemType } from "../Parser";
+import { Constants } from '../../importer/Constants';
 import { Metatype } from "../../schema/MetatypeSchema";
 import { CompendiumKey } from "../../importer/Constants";
+import { DataDefaults } from '@/module/data/DataDefaults';
 import { MetatypeParserBase } from './MetatypeParserBase';
-import { DataDefaults } from "src/module/data/DataDefaults";
 import { ImportHelper as IH } from '../../helper/ImportHelper';
+import { KnowledgeSkillCategory } from "src/module/types/template/Skills";
 
 export class CritterParser extends MetatypeParserBase<'character'> {
     protected readonly parseType = 'character';
 
-    private normalizeSkillName(rawName: string): string {
-        return rawName.trim().toLowerCase().replace(/[\s-]/g, '_');
-    }
+    private createKnowledgeSkillItems(jsonData: Metatype): Item.Source[] {
+        const result: Item.Source[] = [];
 
-    private setSkills(system: SystemType<'character'>, jsonData: Metatype): void {
-        const skills = jsonData.skills;
-        if (!skills) return;
+        for (const skill of IH.getArray(jsonData.skills?.knowledge)) {
+            const name = skill._TEXT.trim();
+            const category = skill.$.category.toLowerCase() as KnowledgeSkillCategory | 'interest';
+            const knowledgeType = category === 'interest' ? 'interests' : category;
 
-        for (const skill of skills.skill) {
-            const name = this.normalizeSkillName(skill._TEXT);
-            const skillValue = +(skill.$?.rating ?? 0);
-    
-            const parsedSkill = system.skills.active[name];
-            if (parsedSkill) {
-                parsedSkill.base = skillValue;
-                if (skill?.$?.spec) parsedSkill.specs.push(skill.$.spec);
-            } else if (name === 'flight') {
-                system.skills.active[name] = DataDefaults.createData('skill_field', { attribute: "agility", base: skillValue });
-            } else {
-                console.warn(`[Skill Missing] Actor: ${jsonData.name._TEXT}\nSkill: ${name}`);
-            }
-        };
+            const item: Item.CreateData<'skill'> = {
+                _id: foundry.utils.randomID(),
+                name: name,
+                type: 'skill',
+                img: `systems/shadowrun5e/dist/icons/skills/knowledge-${knowledgeType}.svg`,
+                system: DataDefaults.baseSystemData('skill', {
+                    type: 'skill',
+                    skill: {
+                        category: 'knowledge',
+                        knowledgeType,
+                        attribute: Constants.attributeTable[skill.$.attribute],
+                        rating: Number(skill.$.rating ?? 0) || 0,
+                    }
+                }),
+                effects: [],
+            };
 
-        if (skills.group) {
-            const groups = IH.getArray(skills.group).reduce<Record<string, number>>((acc, item) => {
-                acc[item._TEXT] = +(item.$?.rating ?? 0);
-                return acc;
-            }, {});
-
-            Object.entries(system.skills.active).forEach(([_, skill]) => {
-                if (Object.keys(groups).includes(skill.group)) {
-                    skill.base = (skill.base ?? 0) + groups[skill.group];
-                }
-            });
+            result.push(item as unknown as Item.Source);
         }
 
-        if (skills.knowledge) {
-            IH.getArray(skills.knowledge).forEach((skill) => {
-                const name = this.normalizeSkillName(skill._TEXT);
-                const skillValue = Number(skill.$.rating) || 0;
-                const skillCategory = skill.$.category.toLowerCase();
-
-                system.skills.knowledge[skillCategory].value[name] = DataDefaults.createData('skill_field', { name: skill._TEXT, base: skillValue });
-            });
-        }
+        return result;
     }
 
     protected override getSystem(jsonData: Metatype) {
@@ -84,8 +69,6 @@ export class CritterParser extends MetatypeParserBase<'character'> {
             system.movement.run.base = Number(jsonData.run._TEXT.split('/')[0] ?? 0);
 
         system.movement.sprint = Number(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
-
-        this.setSkills(system, jsonData);
 
         system.is_npc = true;
         system.is_critter = true;
@@ -120,9 +103,11 @@ export class CritterParser extends MetatypeParserBase<'character'> {
         const allQualities = await IH.findItems('Quality', [...quality, ...bioware]);
         const allBiowares = await IH.findItems('Ware', bioware);
         const allSkills = await IH.findItems('Skill', skills);
+        const knowledgeSkillItems = this.createKnowledgeSkillItems(jsonData);
 
         const name = jsonData.name._TEXT;
         return [
+            ...knowledgeSkillItems,
             ...this.getMetatypeItems(allSpells, spellsData, { type: 'Spell', critter: name }),
             ...this.getMetatypeItems(allPowers, jsonData.powers?.power, { type: 'Power', critter: name }),
             ...this.getMetatypeItems(allSkills, jsonData.skills?.skill, { type: 'Skill', critter: name }),
