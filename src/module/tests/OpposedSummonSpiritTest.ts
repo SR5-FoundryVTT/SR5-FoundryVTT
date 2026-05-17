@@ -1,8 +1,9 @@
 import { SR5Actor } from '../actor/SR5Actor';
+import { SR5Item } from '../item/SR5Item';
 import { ModifiableValue } from '../mods/ModifiableValue';
 import { ConjuringRules } from '../rules/ConjuringRules';
 import { OpposedTest, OpposedTestData } from './OpposedTest';
-import { TestDocuments, TestOptions } from './SuccessTest';
+import { SuccessTestData, TestDocuments, TestOptions } from './SuccessTest';
 import { SummonSpiritTest } from './SummonSpiritTest';
 import { Translation } from '../utils/strings';
 
@@ -21,6 +22,40 @@ interface OpposedSummonSpiritTestData extends OpposedTestData {
  */
 export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTestData> {
     declare against: SummonSpiritTest;
+
+    static async _resolveOpposedBootstrapDocument(
+        againstData: SuccessTestData
+    ): Promise<SR5Actor | SR5Item | null> {
+        const sourceUuid = againstData.sourceActorUuid || againstData.sourceUuid || '';
+
+        let document: unknown = sourceUuid ? await fromUuid(sourceUuid) : null;
+        if (document instanceof TokenDocument)
+            document = document.actor ?? null;
+
+        if (document instanceof SR5Actor || document instanceof SR5Item)
+            return document;
+
+        return null;
+    }
+
+    static override async executeMessageAction(
+        againstData: SuccessTestData,
+        messageId: string,
+        options: TestOptions
+    ): Promise<void> {
+        const bootstrapDocument = await this._resolveOpposedBootstrapDocument(againstData);
+        if (!bootstrapDocument) {
+            ui.notifications?.error('SR5.Errors.NoAvailableActorFound', { localize: true });
+            return;
+        }
+
+        const data = await this._getOpposedActionTestData(againstData, bootstrapDocument, messageId);
+        if (!data) return;
+
+        const documents = { source: bootstrapDocument };
+        const test = new this(data, documents, options);
+        await test.execute();
+    }
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
         // Due to summoning, the active actor for this test will be created during execution.
@@ -172,28 +207,34 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
         if (!this.against) return;
         if (!this.against.actor) return;
 
-        if (this.against.data.preparedSpiritUuid) {
-            const preparedActor = await this.getPreparedSpiritActor();
-            if (!preparedActor) return console.error('Shadowrun 5e | Could not find prepared spirit actor');
-            if (this.against.preparedSpiritIsCompendium) {
-                if (!game.user.can('ACTOR_CREATE'))
-                    return ui.notifications.warn('SR5.Warnings.NoActorCreatePermission', { localize: true });
+        if (!this.against.data.preparedSpiritUuid) return;
 
-                const summonedName = `Summoned ${preparedActor.name}`;
-                const preparedSource = game.actors.fromCompendium(preparedActor);
+        const preparedActor = await this.getPreparedSpiritActor();
+        if (!preparedActor) return console.error('Shadowrun 5e | Could not find prepared spirit actor');
 
-                preparedSource.name = summonedName;
-                setProperty(preparedSource, 'prototypeToken.actorLink', true);
+        if (this.against.preparedSpiritIsCompendium) {
+            if (!game.user.can('ACTOR_CREATE'))
+                return ui.notifications.warn('SR5.Warnings.NoActorCreatePermission', { localize: true });
 
-                const actor = await Actor.create(preparedSource);
-                if (!actor) return console.error('Shadowrun 5e | Could not create the summoned spirit actor');
+            const summonedName = `Summoned ${preparedActor.name}`;
+            const preparedSource = game.actors.fromCompendium(preparedActor);
 
-                this.data.summonedSpiritUuid = actor.uuid;
-                this.data.sourceActorUuid = actor.uuid;
-                this.data.sourceUuid = actor.uuid;
-                this.actor = actor;
-            }
+            preparedSource.name = summonedName;
+            setProperty(preparedSource, 'prototypeToken.actorLink', true);
+
+            const actor = await Actor.create(preparedSource);
+            if (!actor) return console.error('Shadowrun 5e | Could not create the summoned spirit actor');
+
+            this.data.summonedSpiritUuid = actor.uuid;
+            this.data.sourceActorUuid = actor.uuid;
+            this.data.sourceUuid = actor.uuid;
+            this.actor = actor;
+            return;
         }
+
+        this.data.sourceActorUuid = preparedActor.uuid || '';
+        this.data.sourceUuid = preparedActor.uuid || '';
+        this.actor = preparedActor;
     }
 
     /**
