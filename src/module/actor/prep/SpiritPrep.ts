@@ -62,10 +62,7 @@ export class SpiritPrep {
         const skills: SkillFieldType[] = [];
         skills.push(...Object.values(system.skills.active));
         skills.push(...Object.values(system.skills.language));
-
-        for (const category of Object.values(system.skills.knowledge)) {
-            skills.push(...Object.values(category));
-        }
+        skills.push(...Object.values(system.skills.knowledge).flatMap(category => Object.values(category)));
 
         for (const skill of skills) {
             if (skill.base > 0)

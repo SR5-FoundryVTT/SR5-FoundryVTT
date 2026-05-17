@@ -85,6 +85,7 @@ interface SheetSkills {
 interface SheetSkillGroup {
     item: SR5Item<'skill'>;
     label: string;
+    displayRating: number;
 }
 
 export interface SR5ActorSheetData extends ActorSheetV2.RenderContext, SR5ApplicationMixinTypes.RenderContext {
@@ -1563,11 +1564,22 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     _prepareSkillGroups(): SheetSkillGroup[] {
+        const getDisplayRating = (item: SR5Item<'skill'>): number => {
+            const rawRating = item.system.group.rating;
+            
+            if (!this.actor.isType('spirit')) return rawRating;
+            if (rawRating <= 0) return 0;
+
+            const force = this.actor.system.attributes.force.value;
+            return this.actor.system.half_value_skill ? Math.ceil(force / 2) : force;
+        };
+
         return (this.actor.itemsForType.get('skill') ?? [])
             .filter(item => item.isType('skill') && item.system.type === 'group')
             .map(item => ({
                 item,
                 label: SkillNamingFlow.localizeSkillgroupName(item.name),
+                displayRating: getDisplayRating(item),
             }))
             .sort(sortByLocalizedLabel);
     }
