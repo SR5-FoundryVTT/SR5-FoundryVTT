@@ -192,7 +192,7 @@ def qname(el: etree._Element) -> str:
 def add_custom_fields(struct: Structure) -> None:
     """Adds synthetic fields like 'translate' to specific elements."""
     for path, info in struct.items():
-        if path.endswith("/categories/category") or path.endswith("/modcategories/category"):
+        if path.endswith("/categories/category") or path.endswith("/skillgroups/name") or path.endswith("/modcategories/category"):
             if 'translate' not in info.attrs:
                 info.attrs['translate'] = (0, [])  # (count, samples)
 

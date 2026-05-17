@@ -92,7 +92,10 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
             ...IH.getArray(qualities?.negative?.quality),
         ].map(i => i._TEXT);
 
-        const skillList = IH.getArray(skills?.skill).map(s => s._TEXT);
+        const skillList = [
+            ...IH.getArray(skills?.skill).map(s => s._TEXT),
+            ...IH.getArray(skills?.group).map(g => g._TEXT),
+        ];
 
         const allPowers = await IH.findItems('Critter_Power', powerList);
         const allQualities = await IH.findItems('Quality', qualityList);
@@ -101,9 +104,10 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
 
         return [
             ...this.getMetatypeItems(allSkills, skills?.skill, { type: 'Skill', critter: spiritName }),
+            ...this.getMetatypeItems(allSkills, skills?.group, { type: 'Skill Group', critter: spiritName }),
             ...this.getMetatypeItems(allPowers, powers?.power, { type: 'Power', critter: spiritName }),
-            ...this.getMetatypeItems(allQualities, qualities?.positive?.quality, { type: 'Power', critter: spiritName }),
-            ...this.getMetatypeItems(allQualities, qualities?.negative?.quality, { type: 'Power', critter: spiritName }),
+            ...this.getMetatypeItems(allQualities, qualities?.positive?.quality, { type: 'Quality', critter: spiritName }),
+            ...this.getMetatypeItems(allQualities, qualities?.negative?.quality, { type: 'Quality', critter: spiritName }),
             ...this.getMetatypeItems(allPowers, optionalpowers?.optionalpower, { type: 'Optional Power', critter: spiritName }),
         ];
     }

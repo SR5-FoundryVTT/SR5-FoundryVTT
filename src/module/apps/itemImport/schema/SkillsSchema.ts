@@ -32,7 +32,7 @@ export interface SkillsSchema {
         skill: Many<Skill>;
     };
     skillgroups: {
-        name: Many<{ _TEXT: string; }>;
+        name: Many<{ _TEXT: string; $?: { translate: string; }; }>;
     };
     skills: {
         skill: Many<Skill>;

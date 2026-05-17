@@ -35,6 +35,7 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'spirit'
                 else if ('technology' in system)
                     system.technology.rating = rating;
                 else if ('skill' in system) {
+                    system.group.rating = itemData.$.rating.includes('F') ? 1 : rating;
                     system.skill.rating = itemData.$.rating.includes('F') ? 1 : rating;
                     if (itemData.$.spec) system.skill.specializations.push({ name: itemData.$.spec });
                 }
