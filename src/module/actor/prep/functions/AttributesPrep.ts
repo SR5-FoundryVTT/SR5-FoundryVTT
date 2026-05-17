@@ -85,6 +85,6 @@ export class AttributesPrep {
                 parts.add(item.name, -item.getEssenceLoss());
         }
 
-        ModifiableValue.calcTotal(system.attributes.essence);
+        ModifiableValue.calcTotal(system.attributes.essence, { integer: false });
     }
 }
