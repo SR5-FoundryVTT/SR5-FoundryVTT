@@ -479,6 +479,10 @@
         "Armor": {
             "FIELDS": {
                 "armor": {
+                    "accessory": {
+                        "hint": "Ist diese Panzerung nur Zubehör?",
+                        "label": "Zubehör"
+                    },
                     "acid": {
                         "hint": "Extra Panzerung gegen Säureschaden",
                         "label": "Säureresistenz"
@@ -499,13 +503,13 @@
                         "hint": "Verstärkte Panzerung",
                         "label": "Verstärkt"
                     },
+                    "is_hardened": {
+                        "hint": "Wenn diese Panzerung verstärkten Schutz gewährt",
+                        "label": "Verstärkt Aktiv"
+                    },
                     "immunities": {
                         "hint": "Damage sources this armor grants Immunity against",
                         "label": "Immunities"
-                    },
-                    "mod": {
-                        "hint": "Ist diese Panzerung nur Zubehör?",
-                        "label": "Zubehör"
                     },
                     "pollutant": {
                         "hint": "Extra Armor against attacks with Pollutant",
@@ -525,13 +529,15 @@
                     }
                 }
             },
-            "label": "Panzerung",
             "Immunity": {
                 "NormalWeapons": "Normal Weapons"
-            }
+            },
+            "Resistances": "Resistenzen",
+            "label": "Panzerung"
         },
         "ArmorHardened": "Verstärkt",
         "ArmorHardenedFull": "Verstärkte Panzerung",
+        "HardenedArmor": "Verstärkte Panzerung",
         "ArmorValue": "Panzerungswert",
         "Attack": "Angriff",
         "Attacker": "Angreifer",
@@ -1242,6 +1248,8 @@
                 "Track": "Aufspüren"
             }
         },
+        "Immunity": "Immunität",
+        "ImmunityToNormalWeapons": "Immunität gegen normale Waffen",
         "Import": {
             "ActorImporter": {
                 "Title": "Akteur Import"
@@ -2717,6 +2725,7 @@
                 "Vehicle": "Fahrzeug"
             },
             "Item": {
+                "ArmorMods": "Rüstungsmods",
                 "Description": "Beschreibung",
                 "Details": "Details",
                 "Effects": "Effekte",
@@ -3291,9 +3300,7 @@
         "Wireless": "WiFi",
         "WirelessOffline": "Offline",
         "WirelessOnline": "Online",
-        "WirelessUnavailable": "Kabel",
-        "Immunity": "Immunity",
-        "ImmunityToNormalWeapons": "Immunity To Normal Weapons"
+        "WirelessUnavailable": "Kabel"
     },
     "TYPES": {
         "Actor": {

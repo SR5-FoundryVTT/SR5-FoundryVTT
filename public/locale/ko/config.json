@@ -478,6 +478,10 @@
         "Armor": {
             "FIELDS": {
                 "armor": {
+                    "accessory": {
+                        "hint": "해당 방어구가 보조품일 경우 선택 (수치가 액터의 기본 방어도에 더해짐)",
+                        "label": "보조 방어구"
+                    },
                     "acid": {
                         "hint": "산성 공격에 대한 추가 방어도 제공",
                         "label": "산성 저항"
@@ -498,13 +502,13 @@
                         "hint": "해당 방어구는 강화됨",
                         "label": "강화 방어구"
                     },
+                    "is_hardened": {
+                        "hint": "이 방어구가 강화 방어를 제공하는지 여부",
+                        "label": "강화 적용"
+                    },
                     "immunities": {
                         "hint": "Damage sources this armor grants Immunity against",
                         "label": "Immunities"
-                    },
-                    "mod": {
-                        "hint": "해당 방어구가 보조품일 경우 선택 (수치가 액터의 기본 방어도에 더해짐)",
-                        "label": "보조 방어구"
                     },
                     "pollutant": {
                         "hint": "Extra Armor against attacks with Pollutant",
@@ -524,13 +528,15 @@
                     }
                 }
             },
-            "label": "방어구",
             "Immunity": {
                 "NormalWeapons": "Normal Weapons"
-            }
+            },
+            "Resistances": "저항",
+            "label": "방어구"
         },
         "ArmorHardened": "단단함",
         "ArmorHardenedFull": "단단한 갑옷",
+        "HardenedArmor": "단단한 갑옷",
         "ArmorValue": "방어구 수치",
         "Attack": "공격",
         "Attacker": "공격자",
@@ -1241,6 +1247,8 @@
                 "Track": "트랙"
             }
         },
+        "Immunity": "면역",
+        "ImmunityToNormalWeapons": "일반 무기에 대한 면역",
         "Import": {
             "ActorImporter": {
                 "Title": "액터 불러오기"
@@ -2716,6 +2724,7 @@
                 "Vehicle": "탑승물"
             },
             "Item": {
+                "ArmorMods": "방어구 개조",
                 "Description": "설명",
                 "Details": "세부사항",
                 "Effects": "효과",
@@ -3245,9 +3254,7 @@
         "Wireless": "무선",
         "WirelessOffline": "오프라인",
         "WirelessOnline": "온라인",
-        "WirelessUnavailable": "이용 불가능",
-        "Immunity": "Immunity",
-        "ImmunityToNormalWeapons": "Immunity To Normal Weapons"
+        "WirelessUnavailable": "이용 불가능"
     },
     "TYPES": {
         "Actor": {

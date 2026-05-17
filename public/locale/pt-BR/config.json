@@ -167,6 +167,18 @@
         "Armor": {
             "FIELDS": {
                 "armor": {
+                    "accessory": {
+                        "hint": "If this Armor is an Accessory (adds its value to the actor's base Armor)",
+                        "label": "Accessory"
+                    },
+                    "hardened": {
+                        "hint": "Se esta armadura e endurecida",
+                        "label": "Armadura Endurecida"
+                    },
+                    "is_hardened": {
+                        "hint": "Se esta armadura concede protecao endurecida",
+                        "label": "Endurecida Ativa"
+                    },
                     "immunities": {
                         "hint": "Damage sources this armor grants Immunity against",
                         "label": "Immunities"
@@ -183,10 +195,12 @@
             },
             "Immunity": {
                 "NormalWeapons": "Normal Weapons"
-            }
+            },
+            "Resistances": "Resistências"
         },
         "ArmorHardened": "Endurecido",
         "ArmorHardenedFull": "Armadura Endurecida",
+        "HardenedArmor": "Armadura Endurecida",
         "ArmorValue": "Valor da Armadura",
         "Attacker": "Atacante",
         "AttackerHits": "Acertos do Atacante",
@@ -598,6 +612,8 @@
                 "Track": "Rastreador"
             }
         },
+        "Immunity": "Imunidade",
+        "ImmunityToNormalWeapons": "Imunidade a armas normais",
         "Import": {
             "ActorImporter": {
                 "Title": "Importador de Ator"
@@ -1687,9 +1703,12 @@
             "Type": "Tipo",
             "Weapon": "Arma"
         },
-        "Wireless": "Conexão Sem Fio",
-        "Immunity": "Immunity",
-        "ImmunityToNormalWeapons": "Immunity To Normal Weapons"
+        "Tabs": {
+            "Item": {
+                "ArmorMods": "Mods de Armadura"
+            }
+        },
+        "Wireless": "Conexão Sem Fio"
     },
     "TYPES": {
         "Actor": {

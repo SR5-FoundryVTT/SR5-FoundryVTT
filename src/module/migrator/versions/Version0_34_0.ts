@@ -16,11 +16,21 @@ export class Version0_34_0 extends VersionMigration {
 
     override migrateItem(item: any): void {
         const armor = item.system.armor!;
-        const elements = ['acid', 'cold', 'electricity', 'fire', 'radiation']; 
+        const elements = ['acid', 'cold', 'electricity', 'fire', 'radiation'];
+
+        if (armor.mod !== undefined) {
+            armor.accessory = armor.mod;
+            delete armor.mod;
+        }
+
+        if (armor.hardened !== undefined) {
+            armor.is_hardened = Boolean(armor.hardened);
+            delete armor.hardened;
+        }
 
         for (const el of elements) {
             if (armor[el] !== undefined) {
-                setProperty(armor, `elements.${el}`, armor[el] || 0);
+                setProperty(armor, `elements.${el}`, armor[el] ?? 0);
                 delete armor[el];
             }
         }
@@ -35,6 +45,7 @@ export class Version0_34_0 extends VersionMigration {
             'system.armor': 'system.armor.rating',
             'system.armor.base': 'system.armor.rating',
             'system.armor.value': 'system.armor.rating',
+            'system.armor.mod': 'system.armor.accessory',
             'system.armor.acid': 'system.armor.elements.acid',
             'system.armor.cold': 'system.armor.elements.cold',
             'system.armor.electricity': 'system.armor.elements.electricity',

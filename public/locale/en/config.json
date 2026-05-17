@@ -480,6 +480,10 @@
         "Armor": {
             "FIELDS": {
                 "armor": {
+                    "accessory": {
+                        "hint": "If this Armor is an Accessory (adds its value to the actor's base Armor)",
+                        "label": "Accessory"
+                    },
                     "acid": {
                         "hint": "Extra Armor against attacks with Acid",
                         "label": "Acid Resistance"
@@ -500,13 +504,13 @@
                         "hint": "If this Armor is Hardened",
                         "label": "Hardened Armor"
                     },
+                    "is_hardened": {
+                        "hint": "If this Armor grants hardened protection",
+                        "label": "Hardened Active"
+                    },
                     "immunities": {
                         "hint": "Damage sources this armor grants Immunity against",
                         "label": "Immunities"
-                    },
-                    "mod": {
-                        "hint": "If this Armor is an Accessory (adds its value to the actor's base Armor)",
-                        "label": "Accessory"
                     },
                     "pollutant": {
                         "hint": "Extra Armor against attacks with Pollutant",
@@ -529,12 +533,11 @@
             "Immunity": {
                 "NormalWeapons": "Normal Weapons"
             },
+            "Resistances": "Resistances",
             "label": "Armor"
         },
         "ArmorHardened": "Hardened",
         "ArmorHardenedFull": "Hardened Armor",
-        "Immunity": "Immunity",
-        "ImmunityToNormalWeapons": "Immunity To Normal Weapons",
         "ArmorValue": "Armor Value",
         "Attack": "Attack",
         "Attacker": "Attacker",
@@ -1193,6 +1196,7 @@
         },
         "Grids": "Grids",
         "HackingProgram": "Hacking Program",
+        "HardenedArmor": "Hardened Armor",
         "Help": "Help",
         "Hits": "Hits",
         "Host": {
@@ -1245,6 +1249,8 @@
                 "Track": "Track"
             }
         },
+        "Immunity": "Immunity",
+        "ImmunityToNormalWeapons": "Immunity To Normal Weapons",
         "Import": {
             "ActorImporter": {
                 "Title": "Actor Importer"
@@ -2724,6 +2730,7 @@
                 "Vehicle": "Vehicle"
             },
             "Item": {
+                "ArmorMods": "Armor Mods",
                 "Description": "Description",
                 "Details": "Details",
                 "Effects": "Effects",

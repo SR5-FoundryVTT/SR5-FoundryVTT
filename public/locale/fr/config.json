@@ -72,6 +72,18 @@
         "Armor": {
             "FIELDS": {
                 "armor": {
+                    "accessory": {
+                        "hint": "If this Armor is an Accessory (adds its value to the actor's base Armor)",
+                        "label": "Accessory"
+                    },
+                    "hardened": {
+                        "hint": "Si cette armure est renforcee",
+                        "label": "Armure renforcee"
+                    },
+                    "is_hardened": {
+                        "hint": "Si cette armure accorde une protection renforcee",
+                        "label": "Renforcee active"
+                    },
                     "immunities": {
                         "hint": "Damage sources this armor grants Immunity against",
                         "label": "Immunities"
@@ -88,9 +100,12 @@
             },
             "Immunity": {
                 "NormalWeapons": "Normal Weapons"
-            }
+            },
+            "Resistances": "Résistances"
         },
         "ArmorHardened": "Hardened",
+        "ArmorHardenedFull": "Armure renforcee",
+        "HardenedArmor": "Armure renforcee",
         "ArmorValue": "Valeur Blindage",
         "AstralDice": "Dés init. Astral",
         "AstralInit": "Init. Astral",
@@ -421,6 +436,8 @@
             "SpritePower": "Pouvoir de Sprite",
             "Weapon": "Arme"
         },
+        "Immunity": "Immunité",
+        "ImmunityToNormalWeapons": "Immunité aux armes normales",
         "Karma": "Karma",
         "KnockedDown": "Projeté au sol",
         "KnowledgeSkillAcademic": "Connaissances académiques",
@@ -1024,11 +1041,14 @@
             "Type": "Type",
             "Weapon": "Arme"
         },
+        "Tabs": {
+            "Item": {
+                "ArmorMods": "Mods d'armure"
+            }
+        },
         "Wireless": "Sans fil",
         "WoundModifier": "Mod. de blessures",
         "WoundTolerance": "Tolérance blessures",
-        "Wounds": "Blessures",
-        "Immunity": "Immunity",
-        "ImmunityToNormalWeapons": "Immunity To Normal Weapons"
+        "Wounds": "Blessures"
     }
 }

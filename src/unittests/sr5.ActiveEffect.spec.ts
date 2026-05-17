@@ -915,11 +915,11 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                     technology: { equipped: true },
                     armor: {
                         elements: {
-                            fire: 1,
-                            acid: 2,
-                            cold: 3,
-                            electricity: 4,
-                            radiation: 5
+                            fire: { base: 1},
+                            acid: { base: 2},
+                            cold: { base: 3},
+                            electricity: { base: 4},
+                            radiation: { base: 5}
                         }
                     }
                 }

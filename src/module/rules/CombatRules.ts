@@ -123,44 +123,9 @@ export class CombatRules {
         return modifiedDv < hardenedRating;
     }
 
-    /**
-     * Resolve all immunity tags matching incoming damage and return the highest matching immunity rating.
-     */
-    static immunityRating(actor: SR5Actor, damage: DamageType): number {
-        const armor = actor.getArmor(damage);
-        const element = damage.element.value;
-        let highestImmunity = 0;
-
-        if (damage.normal_weapon && armor.immunities.normal_weapons.value) {
-            highestImmunity = Math.max(highestImmunity, armor.immunities.normal_weapons.value);
-        }
-
-        if (element && armor.immunities[element].value) {
-            highestImmunity = Math.max(highestImmunity, armor.immunities[element].value);
-        }
-
-        return highestImmunity;
-    }
-
-    /**
-     * Check if incoming damage is blocked by any matching immunity.
-     */
-    static isBlockedByImmunity(incomingDamage: DamageType, attackerHits: number, defenderHits: number, actor: SR5Actor): boolean {
-        const immunityRating = CombatRules.immunityRating(actor, incomingDamage);
-        if (immunityRating <= 0) return false;
-
-        const modifiedDv = CombatRules.modifyDamageAfterHit(actor, attackerHits, defenderHits, incomingDamage).value;
-        return modifiedDv < immunityRating;
-    }
-
     static hardenedAutoHits(actor: SR5Actor, damage: DamageType): number {
         const hardenedRating = actor.getArmor(damage).hardened.value;
         return hardenedRating > 0 ? Math.ceil(hardenedRating / 2) : 0;
-    }
-
-    static immunityAutoHits(actor: SR5Actor, damage: DamageType): number {
-        const rating = CombatRules.immunityRating(actor, damage);
-        return rating > 0 ? Math.ceil(rating / 2) : 0;
     }
 
     /**

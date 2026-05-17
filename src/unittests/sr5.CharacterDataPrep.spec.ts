@@ -1,6 +1,7 @@
 import { SR5TestFactory } from "./utils";
 import { SR } from "../module/constants";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
+import { SR5Item } from "../module/item/SR5Item";
 
 export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -42,6 +43,100 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(character.system.visibilityChecks.meat.hasHeat, true);
             assert.strictEqual(character.system.visibilityChecks.matrix.hasIcon, true);
             assert.strictEqual(character.system.visibilityChecks.matrix.runningSilent, false);
+        });
+
+        it('applies nested armor modifications to character armor value', async () => {
+            const character = await factory.createActor({ type: 'character' });
+            const armors = await character.createEmbeddedDocuments('Item', [{
+                type: 'armor',
+                name: 'Armor Jacket',
+                system: {
+                    armor: {
+                        base: 6,
+                        value: 6,
+                        accessory: false,
+                    },
+                    technology: {
+                        equipped: true,
+                    }
+                }
+            }]);
+            const armor = armors[0] as SR5Item<'armor'>;
+
+            const modification = await factory.createItem({
+                type: 'modification',
+                name: 'Armor Mod',
+                system: {
+                    type: 'armor',
+                    mod_armor: {
+                        value: 2,
+                    },
+                    technology: {
+                        equipped: true,
+                    }
+                }
+            });
+            await armor.createNestedItem(modification.toObject());
+
+            assert.strictEqual(armor.system.armor.value, 8);
+            assert.strictEqual(character.system.armor.rating.value, 8);
+        });
+
+        it('applies nested hardened armor modifications only to hardened actor armor', async () => {
+            const character = await factory.createActor({ type: 'character' });
+            const armors = await character.createEmbeddedDocuments('Item', [{
+                type: 'armor',
+                name: 'Armor Jacket',
+                system: {
+                    armor: {
+                        base: 6,
+                        is_hardened: true,
+                        accessory: false,
+                    },
+                    technology: {
+                        equipped: true,
+                    }
+                }
+            }]);
+            const armor = armors[0] as SR5Item<'armor'>;
+
+            const normalModification = await factory.createItem({
+                type: 'modification',
+                name: 'Normal Armor Mod',
+                system: {
+                    type: 'armor',
+                    mod_armor: {
+                        value: 2,
+                        is_hardened: false,
+                    },
+                    technology: {
+                        equipped: true,
+                    }
+                }
+            });
+
+            const hardenedModification = await factory.createItem({
+                type: 'modification',
+                name: 'Hardened Armor Mod',
+                system: {
+                    type: 'armor',
+                    mod_armor: {
+                        value: 3,
+                        is_hardened: true,
+                    },
+                    technology: {
+                        equipped: true,
+                    }
+                }
+            });
+
+            await armor.createNestedItem(normalModification.toObject());
+            await armor.createNestedItem(hardenedModification.toObject());
+
+            assert.strictEqual(armor.system.armor.value, 2);
+            assert.strictEqual(armor.system.armor.hardened, 9);
+            assert.strictEqual(character.system.armor.rating.value, 2);
+            assert.strictEqual(character.system.armor.hardened.value, 9);
         });
 
         it('monitor calculation', async () => {

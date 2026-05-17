@@ -382,38 +382,72 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @returns Armor or modified armor.
      */
     getArmor(damage?: DamageType): ActorArmorType {
-        // Prepare base armor data.
-        const armor = !("armor" in this.system) ?
-            DataDefaults.createData('armor') :
-            (foundry.utils.duplicate(this.system.armor) as ActorArmorType);
-        // Prepare damage to apply to armor.
+        // 1. Prepare base armor and damage data
+        const armor = ("armor" in this.system) 
+            ? (foundry.utils.duplicate(this.system.armor) as ActorArmorType)
+            : DataDefaults.createData('armor');
+            
         damage ??= DataDefaults.createData('damage');
 
         ModifiableValue.calcTotal(damage);
         ModifiableValue.calcTotal(damage.ap);
 
-        // Modify by penetration.
-        if (damage.ap.value !== 0) {
-            ModifiableValue.addUnique(armor.rating, 'SR5.AP', damage.ap.value);
-            ModifiableValue.addUnique(armor.hardened, 'SR5.AP', damage.ap.value);
-
-            for (const immunity of Object.values(armor.immunities)) {
-                ModifiableValue.addUnique(immunity, 'SR5.AP', damage.ap.value);
+        // 2. Modify by element
+        const element = damage.element?.value;
+        if (element) {
+            const elArmor = armor.elements[element];
+            ModifiableValue.calcTotal(elArmor, { min: 0 });
+            if (elArmor.value > 0) {
+                ModifiableValue.addUnique(armor.rating, 'SR5.Element.Label', elArmor.value);
             }
         }
 
-        // Modify by element
-        if (damage.element.value) {
-            const armorForDamageElement = armor.elements[damage.element.value].value;
-            if (armorForDamageElement > 0)
-                ModifiableValue.addUnique(armor.rating, 'SR5.Element.Label', armorForDamageElement);
+        // 3. Merge strongest matching immunity into hardened armor
+        if (element || damage.normal_weapon) {
+            let immunityArmor = 0;
+
+            if (damage.normal_weapon) {
+                ModifiableValue.calcTotal(armor.immunities.normal_weapons);
+                immunityArmor = Math.max(immunityArmor, armor.immunities.normal_weapons.value);
+            }
+
+            if (element) {
+                ModifiableValue.calcTotal(armor.immunities[element]);
+                immunityArmor = Math.max(immunityArmor, armor.immunities[element].value);
+            }
+
+            if (immunityArmor > 0) {
+                ModifiableValue.addUnique(armor.hardened, 'SR5.Immunity', immunityArmor);
+            }
         }
 
-        ModifiableValue.calcTotal(armor.rating, {min: 0});
-        ModifiableValue.calcTotal(armor.hardened, {min: 0});
-        for (const immunity of Object.values(armor.immunities)) {
-            ModifiableValue.calcTotal(immunity, {min: 0});
+        // 4. Modify by penetration (AP)
+        // Calculate current rating & hardened values before applying AP reduction
+        ModifiableValue.calcTotal(armor.rating, { min: 0 });
+        ModifiableValue.calcTotal(armor.hardened, { min: 0 });
+
+        const ap = damage.ap.value;
+        if (ap > 0) {
+            // Positive AP increases normal armor only
+            ModifiableValue.addUnique(armor.rating, 'SR5.AP', ap);
+        } else if (ap < 0) {
+            let apRemaining = Math.abs(ap);
+
+            const applyReduction = (field: ActorArmorType['rating']) => {
+                if (apRemaining <= 0 || field.value <= 0) return;
+                const reduction = Math.min(field.value, apRemaining);
+                ModifiableValue.addUnique(field, 'SR5.AP', -reduction);
+                apRemaining -= reduction;
+            };
+
+            // Apply reduction in priority order
+            applyReduction(armor.hardened);
+            applyReduction(armor.rating);
         }
+
+        // 5. Final calculation of modified fields
+        ModifiableValue.calcTotal(armor.rating, { min: 0 });
+        ModifiableValue.calcTotal(armor.hardened, { min: 0 });
 
         return armor;
     }
@@ -1529,21 +1563,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
             if (existing.length) await this.deleteEmbeddedDocuments('ActiveEffect', existing);
         }
-    }
-
-    getModifiedArmor(damage: DamageType): ActorArmorType {
-        if (!damage.ap?.value) {
-            return this.getArmor();
-        }
-
-        const modified = foundry.utils.duplicate(this.getArmor()) as ActorArmorType;
-        if (modified) {
-            const mod = new ModifiableValue(modified.rating);
-            mod.addUnique('SR5.DV', damage.ap.value);
-            mod.calcTotal({ min: 0 });
-        }
-
-        return modified;
     }
 
     /** Reduce the initiative of the actor in the currently open / selected combat.

@@ -17,6 +17,8 @@ import { ItemPrep } from './functions/ItemPrep';
 export class SpiritPrep {
     static prepareBaseData(system: Actor.SystemOfType<'spirit'>) {
         ModifiableFieldPrep.resetAllModifiers(system);
+
+        ItemPrep.clearArmorElements(system);
     }
 
     static prepareDerivedData(system: Actor.SystemOfType<'spirit'>, items: SR5Item[]) {
@@ -30,8 +32,8 @@ export class SpiritPrep {
         LimitsPrep.prepareLimits(system);
         LimitsPrep.prepareDerivedLimits(system);
 
-        ItemPrep.prepareArmor(system, items);
         SpiritPrep.prepareSpiritArmor(system);
+        ItemPrep.prepareArmor(system, items);
 
         GruntPrep.prepareConditionMonitors(system);
 
@@ -93,13 +95,10 @@ export class SpiritPrep {
     static prepareSpiritArmor(system: Actor.SystemOfType<'spirit'>) {
         const { armor, attributes } = system;
 
-        ModifiableValue.addUnique(armor.immunities.normal_weapons, 'SR5.Armor', attributes.essence.value * 2);
+        ModifiableValue.addUnique(armor.immunities.normal_weapons, 'SR5.Immunity', attributes.essence.value * 2);
 
         if (system.modifiers.armor)
             ModifiableValue.addUnique(armor.rating, game.i18n.localize('SR5.Bonus'), system.modifiers.armor);
-
-        ModifiableValue.calcTotal(armor.rating);
-        ModifiableValue.calcTotal(armor.immunities.normal_weapons);
     }
 
     /**

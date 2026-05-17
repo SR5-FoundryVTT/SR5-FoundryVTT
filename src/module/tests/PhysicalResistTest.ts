@@ -34,15 +34,6 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
     override _prepareData(data: PhysicalResistTestData, options): any {
         data = super._prepareData(data, options);
         data = ResistTestDataFlow._prepareData(data);
-
-        const armor = this.actor?.getArmor();
-        if(armor && armor.hardened.value > 0){
-            data.hitsIcon = {
-                icon: "systems/shadowrun5e/dist/icons/bell-shield.svg",
-                tooltip: "SR5.ArmorHardenedFull",
-            };
-        }
-
         return data;
     }
 
@@ -82,19 +73,21 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
     }
 
     /**
-     * Resisting against damage on the physical plane includes the modified armor value.
+     * Resisting against damage on the physical plane includes modified normal and hardened armor values.
      */
     applyArmorPoolModifier() {
-        if (this.data.action.armor) {
-            if (this.actor) {
-                const armor = this.actor.getArmor(this.data.incomingDamage);
-                ModifiableValue.addUniqueBase(this.data.pool, 'SR5.Armor.label', armor.rating.value);
+        ModifiableValue.remove(this.data.pool, 'SR5.Armor.label');
+        ModifiableValue.remove(this.data.pool, 'SR5.HardenedArmor');
 
-                const immunityRating = CombatRules.immunityRating(this.actor, this.data.incomingDamage);
-                if (immunityRating > 0) {
-                    ModifiableValue.addUniqueBase(this.data.pool, 'SR5.Immunity', immunityRating);
-                }
-            }
+        if (!this.data.action.armor || !this.actor) return;
+
+        const armor = this.actor.getArmor(this.data.incomingDamage);
+        if (armor.rating.value > 0) {
+            ModifiableValue.addUniqueBase(this.data.pool, 'SR5.Armor.label', armor.rating.value);
+        }
+
+        if (armor.hardened.value > 0) {
+            ModifiableValue.addUniqueBase(this.data.pool, 'SR5.HardenedArmor', armor.hardened.value);
         }
     }
 
@@ -122,13 +115,6 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         {
             test: () => !!this.actor && CombatRules.isBlockedByHardenedArmor(this.data.incomingDamage, 0, 0, this.actor),
             label: "SR5.TestResults.SoakBlockedByHardenedArmor",
-            effect: () => {
-                this.data.autoSuccess = true;
-            }
-        },
-        {
-            test: () => !!this.actor && CombatRules.isBlockedByImmunity(this.data.incomingDamage, 0, 0, this.actor),
-            label: "SR5.TestResults.SoakBlockedByImmunity",
             effect: () => {
                 this.data.autoSuccess = true;
             }
@@ -165,13 +151,9 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         if (this.actor) {
             const hits = new ModifiableValue(this.hits);
             const hardenedHits = CombatRules.hardenedAutoHits(this.actor, this.data.modifiedDamage);
-            const immunityHits = CombatRules.immunityAutoHits(this.actor, this.data.modifiedDamage);
 
             if (hardenedHits > 0) {
                 hits.addUniqueBase('SR5.HardenedArmor', hardenedHits);
-            }
-            if (immunityHits > 0) {
-                hits.addUniqueBase('SR5.Immunity', immunityHits);
             }
             hits.calcTotal();
         }

@@ -8,7 +8,6 @@ import { MovementPrep } from './functions/MovementPrep';
 import { WoundsPrep } from './functions/WoundsPrep';
 import { AttributesPrep } from './functions/AttributesPrep';
 import { NPCPrep } from './functions/NPCPrep';
-import { Helpers } from '../../helpers';
 import { GruntPrep } from './functions/GruntPrep';
 import { DataDefaults } from '../../data/DataDefaults';
 import { SR5Item } from 'src/module/item/SR5Item';

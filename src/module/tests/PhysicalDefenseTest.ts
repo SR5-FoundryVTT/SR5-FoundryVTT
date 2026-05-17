@@ -164,10 +164,6 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
             label: "SR5.TestResults.AttackBlockedByVehicleArmor",
         },
         {
-            test: () => !!this.actor && CombatRules.isBlockedByImmunity(this.data.incomingDamage, this.against.hits.value, this.hits.value, this.actor),
-            label: "SR5.TestResults.AttackBlockedByImmunity",
-        },
-        {
             test: () => !!this.actor && CombatRules.isBlockedByHardenedArmor(this.data.incomingDamage, this.against.hits.value, this.hits.value, this.actor),
             label: "SR5.TestResults.AttackBlockedByHardenedArmor",
         }

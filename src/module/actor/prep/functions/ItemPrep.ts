@@ -1,6 +1,6 @@
 import { SR5Item } from 'src/module/item/SR5Item';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
-
+ 
 export class ItemPrep {
     /**
      * Prepare the armor data for the Item
@@ -9,53 +9,46 @@ export class ItemPrep {
      */
     static prepareArmor(system: Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>, items: SR5Item[]) {
         const { armor } = system;
-        armor.rating.base = 0;
-        armor.rating.value = 0;
-        armor.hardened.base = 0;
-        armor.hardened.value = 0;
-
-        for (const element of Object.keys(armor.elements)) {
-            armor.elements[element].base = 0;
-            armor.elements[element].value = 0;
-        }
-        for (const immunity of Object.keys(armor.immunities)) {
-            armor.immunities[immunity].base = 0;
-            armor.immunities[immunity].value = 0;
-        }
 
         // NOTE: We retrieve different types of items, all containing armor data.
         const equippedArmor = items.filter((item) => item.hasArmor() && item.isEquipped()) as SR5Item<'armor'>[];
         const immunityRating = Math.max(system.attributes.essence.value * 2, 0);
 
         for (const item of equippedArmor) {
-            const armorValue = item.system.armor.value;
-            // Don't spam armor values with clothing or armor like items without any actual armor.
-            if (armorValue > 0) {
-                // We allow only one base armor but multiple armor accessories
-                if (item.system.armor.mod) {
-                    ModifiableValue.addUnique(armor.rating, item.name, item.system.armor.value);
-                    if (item.system.armor.hardened) {
-                        ModifiableValue.addUnique(armor.hardened, item.name, item.system.armor.value);
-                    }
-                } else if (armorValue > armor.rating.base) {
-                    armor.rating.base = armorValue;
-                    armor.label = item.name;
-                }
+            const normalArmor = item.system.armor.value;
+            const hardenedArmor = item.system.armor.hardened;
 
-                if (!item.system.armor.mod) {
-                    if (item.system.armor.hardened && armorValue > armor.hardened.base) {
-                        armor.hardened.base = armorValue;
-                    }
+            // Don't spam armor values with clothing or armor like items without any actual armor.
+            if (normalArmor) {
+                // We allow only one base armor but multiple armor accessories
+                if (item.system.armor.accessory) {
+                    ModifiableValue.addUnique(armor.rating, item.name, normalArmor);
+                } else {
+                    ModifiableValue.addUnique(
+                        armor.rating, item.name, normalArmor,
+                        CONST.ACTIVE_EFFECT_MODES.UPGRADE, ModifiableValue.LOWER_PRIORITY
+                    );
+                }
+            }
+
+            if (hardenedArmor) {
+                if (item.system.armor.accessory) {
+                    ModifiableValue.addUnique(armor.hardened, item.name, hardenedArmor);
+                } else {
+                    ModifiableValue.addUnique(
+                        armor.hardened, item.name, hardenedArmor,
+                        CONST.ACTIVE_EFFECT_MODES.UPGRADE, ModifiableValue.LOWER_PRIORITY
+                    );
                 }
             }
 
             // Apply elemental modifiers of all worn armor and clothing SR5#169.
-            for (const element of Object.keys(item.system.armor.elements ?? {})) {
+            for (const element of Object.keys(item.system.armor.elements)) {
                 if (!armor.elements[element]) continue;
-                ModifiableValue.addUnique(armor.elements[element], item.name, item.system.armor.elements[element]);
+                ModifiableValue.addUnique(armor.elements[element], item.name, item.system.armor.elements[element].value);
             }
 
-            for (const immunity of item.system.armor.immunities ?? []) {
+            for (const immunity of item.system.armor.immunities.value) {
                 if (!armor.immunities[immunity]) continue;
                 // Immunity rating is trait-like: apply once per immunity type, not per item piece.
                 ModifiableValue.addUnique(armor.immunities[immunity], `SR5.Armor.Immunity.${immunity}`, immunityRating);

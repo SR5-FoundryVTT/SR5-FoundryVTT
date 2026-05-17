@@ -42,10 +42,6 @@ export type SuccessTestValues = TestValues & {
     glitches: ValueFieldType
     extendedHits: ValueFieldType
 }
-export interface IconWithTooltip {
-    icon: string;
-    tooltip: Translation;
-}
 
 /**
  * Contain all data necessary to handle an action based test.
@@ -64,7 +60,6 @@ export interface TestData {
     // Use Shadowrun buy hits rule instead of rolling dice.
     buyHits: boolean
 
-    hitsIcon?: IconWithTooltip
     autoSuccess?: boolean
 
     // Internal test values.
@@ -927,10 +922,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
     get boughtHits(): number {
         return TestRules.buyHits(this.data.pool.value);
-    }
-
-    get hitsIcon(): IconWithTooltip | undefined {
-        return this.data.hitsIcon;
     }
 
     get appendedHits(): number | undefined {

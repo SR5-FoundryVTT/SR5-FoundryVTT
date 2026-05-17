@@ -46,7 +46,7 @@ export class SoakRules {
                 return updatedDamage;
             }
 
-            const modifiedArmor = (actor as SR5Actor<'character' | 'spirit' | 'vehicle'>).getModifiedArmor(damage);
+            const modifiedArmor = (actor as SR5Actor<'character' | 'spirit' | 'vehicle'>).getArmor(damage);
             if (modifiedArmor) {
                 const armorWillChangeDamageType = modifiedArmor.rating.value > damage.value;
 
