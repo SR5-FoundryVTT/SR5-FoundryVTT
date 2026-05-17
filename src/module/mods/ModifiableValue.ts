@@ -193,8 +193,6 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
         // SR5#78 - All values are rounded up
         if (options?.integer ?? true) {
             this._field.value = Math.ceil(this._field.value);
-        } else {
-            this._field.value = +this._field.value.toFixed(2);
         }
 
         return this._field.value;
