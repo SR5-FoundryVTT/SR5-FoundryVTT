@@ -437,6 +437,15 @@
                 {{else if (eq system.type 'armor')}}
                     <div class="list-item">
                         <div class="list-item-start skinny">
+                            <label data-tooltip="{{systemFields.slots.hint}}">{{systemFields.slots.label}}</label>
+                        </div>
+                        <div class="list-item-col">
+                            {{formInput systemFields.slots value=source.system.slots
+                                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                        </div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-start skinny">
                             <label>{{localize "SR5.Armor.label"}}</label>
                         </div>
                         <div class="list-item-col mod-armor-col">
@@ -450,15 +459,6 @@
                                 {{formInput systemFields.mod_armor.fields.value value=source.system.mod_armor.value
                                             classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                             </span>
-                        </div>
-                    </div>
-                    <div class="list-item">
-                        <div class="list-item-start skinny">
-                            <label data-tooltip="{{systemFields.slots.hint}}">{{systemFields.slots.label}}</label>
-                        </div>
-                        <div class="list-item-col">
-                            {{formInput systemFields.slots value=source.system.slots
-                                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </div>
                     </div>
                     <div class="list-item">
