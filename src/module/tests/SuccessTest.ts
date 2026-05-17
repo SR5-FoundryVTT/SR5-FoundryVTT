@@ -924,13 +924,15 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return TestRules.buyHits(this.data.pool.value);
     }
 
-    get appendedHits(): number | undefined {
-        return new ModifiableValue(this.hits).get('SR5.AppendedHits');
-    }
+    get hitsBreakdown(): string {
+        const modifierHits = this.hits.changes
+            .filter(change => !ModifiableValue.isBaseChange(change))
+            .reduce((total, change) => total + change.value, 0);
 
-    // In the case we've added appended hits, we want to separately display the hits value and the appended hits (ie. "7 + 5" instead of "12")
-    get displayHits(): number | undefined {
-        return this.hits.value - (this.appendedHits || 0);
+        if (modifierHits === 0) return `${this.hits.value}`;
+
+        const baseHits = this.hits.value - modifierHits;
+        return `[${baseHits}]+[${modifierHits}]`;
     }
 
     // Hide dice pool and roll results as they are not relevant to the success of the test

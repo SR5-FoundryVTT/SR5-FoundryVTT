@@ -31,7 +31,7 @@ export class Version0_34_0 extends VersionMigration {
 
             for (const el of elements) {
                 if (armor[el] !== undefined) {
-                    setProperty(armor, `elements.${el}`, armor[el] ?? 0);
+                    setProperty(armor, `elements.${el}.base`, armor[el] ?? 0);
                     delete armor[el];
                 }
             }

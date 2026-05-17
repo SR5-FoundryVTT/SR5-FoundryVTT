@@ -44,7 +44,7 @@ export class ArmorParser extends Parser<'armor'> {
         system.armor.base = armorValue;
         system.armor.value = armorValue;
         system.armor.accessory = jsonData.armor._TEXT.includes('+');
-        system.capacity.total = Number(jsonData.armorcapacity._TEXT);
+        system.capacity.total = Number(jsonData.armorcapacity._TEXT) || 0;
 
         if (jsonData.name._TEXT.includes("Hardened")) {
             system.armor.is_hardened = true;

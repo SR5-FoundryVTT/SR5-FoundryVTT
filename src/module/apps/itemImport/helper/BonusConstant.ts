@@ -51,7 +51,7 @@ export class BonusConstant {
         accel: { changes: [{ key: "system.vehicle_stats.acceleration" }] },
         armor: {
             name: "Add Armor",
-            changes: [{ key: "system.armor" }]
+            changes: [{ key: "system.armor.rating" }]
         },
         body: { changes: [{ key: "system.attributes.body" }] },
         coldarmor: { changes: [{ key: "system.armor.elements.cold" }] },
