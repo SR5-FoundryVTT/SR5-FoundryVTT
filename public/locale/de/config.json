@@ -1235,6 +1235,9 @@
             },
             "Spirit": {
                 "SpiritTypeNotFound": "Die Geisterart wurde nicht gefunden. Bitte öffne ein GitHub-Issue mit deiner Chummer-Export-json."
+            },
+            "Sprite": {
+                "SpriteTypeNotFound": "Der Sprite-Typ wurde nicht gefunden. Bitte öffne ein GitHub-Issue mit deiner Chummer-Export-json."
             }
         },
         "ImportCharacter": "Charakter importieren",
@@ -2537,6 +2540,7 @@
                 }
             },
             "Level": "Stufe",
+            "LevelAppliesSettingHint": "Steuert, welche Sprite-Attribute den Stufenbonus erhalten.",
             "MissingTechnomancer": "Kein aktiver Technomancer",
             "Registered": "Registriert",
             "Services": "Aufgaben",

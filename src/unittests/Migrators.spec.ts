@@ -442,4 +442,126 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
     });
 
+    describe('Version0_34_0 sprite legacy migration', () => {
+        const createSkillItem = (name: string, rating = 0, category: 'active' | 'knowledge' | 'language' = 'active'): any => ({
+            _id: foundry.utils.randomID(16),
+            name,
+            type: 'skill',
+            system: DataDefaults.baseSystemData('skill', {
+                type: 'skill',
+                skill: {
+                    category,
+                    attribute: 'logic',
+                    rating,
+                },
+            }),
+        });
+
+        const createSprite = (spriteType: string, level = 6): any => ({
+            _id: foundry.utils.randomID(16),
+            _stats: { systemVersion: '0.34.0' },
+            name: 'Legacy Sprite',
+            type: 'sprite',
+            items: [] as any[],
+            effects: [],
+            system: DataDefaults.baseSystemData('sprite', {
+                spriteType,
+                level,
+                attributes: {
+                    resonance: { base: 0 },
+                },
+                matrix: {
+                    attack: { base: 0 },
+                    sleaze: { base: 0 },
+                    data_processing: { base: 0 },
+                    firewall: { base: 0 },
+                },
+            }),
+        });
+
+        it('migrates known legacy sprite type into offsets, level toggles, initiative bonus, and skill toggles', () => {
+            const migrator = new Version0_34_0();
+            const actor = createSprite('courier', 6);
+            actor.items.push(
+                createSkillItem('Computer', 0),
+                createSkillItem('Hacking', 3),
+                createSkillItem('Hardware', 2),
+                createSkillItem('Hacking', 4),
+            );
+
+            migrator.migrateActor(actor);
+
+            assert.strictEqual(actor.system.level_applies.resonance, true);
+            assert.strictEqual(actor.system.level_applies.attack, true);
+            assert.strictEqual(actor.system.level_applies.sleaze, true);
+            assert.strictEqual(actor.system.level_applies.data_processing, true);
+            assert.strictEqual(actor.system.level_applies.firewall, true);
+
+            assert.strictEqual(actor.system.attributes.resonance.base, 0);
+            assert.strictEqual(actor.system.matrix.attack.base, 0);
+            assert.strictEqual(actor.system.matrix.sleaze.base, 3);
+            assert.strictEqual(actor.system.matrix.data_processing.base, 1);
+            assert.strictEqual(actor.system.matrix.firewall.base, 2);
+
+            assert.strictEqual(actor.system.modifiers.matrix_initiative, 1);
+
+            const computer = actor.items.find((item: any) => item.name === 'Computer');
+            const hacking = actor.items.find((item: any) => item.name === 'Hacking');
+            const hardware = actor.items.find((item: any) => item.name === 'Hardware');
+            assert.strictEqual(foundry.utils.getProperty(computer, 'system.skill.rating'), 1);
+            assert.strictEqual(foundry.utils.getProperty(hacking, 'system.skill.rating'), 1);
+            assert.strictEqual(foundry.utils.getProperty(hardware, 'system.skill.rating'), 0);
+
+            const oldSleazeTotal = actor.system.level + 3;
+            const newSleazeTotal = actor.system.level + actor.system.matrix.sleaze.base;
+            assert.strictEqual(newSleazeTotal, oldSleazeTotal);
+
+            const oldInitBase = actor.system.level * 2 + 1;
+            const newInitBase = actor.system.level * 2 + actor.system.modifiers.matrix_initiative;
+            assert.strictEqual(newInitBase, oldInitBase);
+        });
+
+        it('migrates another known profile with negative offsets and multiple enabled skills', () => {
+            const migrator = new Version0_34_0();
+            const actor = createSprite('data', 5);
+            actor.items.push(
+                createSkillItem('Computer', 0),
+                createSkillItem('Electronic Warfare', 0),
+                createSkillItem('Cybercombat', 4),
+            );
+
+            migrator.migrateActor(actor);
+
+            assert.strictEqual(actor.system.matrix.attack.base, -1);
+            assert.strictEqual(actor.system.matrix.data_processing.base, 4);
+            assert.strictEqual(actor.system.matrix.firewall.base, 1);
+            assert.strictEqual(actor.system.modifiers.matrix_initiative, 4);
+
+            const computer = actor.items.find((item: any) => item.name === 'Computer');
+            const electronicWarfare = actor.items.find((item: any) => item.name === 'Electronic Warfare');
+            const cybercombat = actor.items.find((item: any) => item.name === 'Cybercombat');
+            assert.strictEqual(foundry.utils.getProperty(computer, 'system.skill.rating'), 1);
+            assert.strictEqual(foundry.utils.getProperty(electronicWarfare, 'system.skill.rating'), 1);
+            assert.strictEqual(foundry.utils.getProperty(cybercombat, 'system.skill.rating'), 0);
+        });
+
+        it('skips unknown sprite types', () => {
+            const migrator = new Version0_34_0();
+            const actor = createSprite('custom_unknown_type', 4);
+            actor.system.level_applies.attack = false;
+            actor.system.matrix.attack.base = 7;
+            actor.system.modifiers.matrix_initiative = 2;
+            actor.items.push(createSkillItem('Computer', 3));
+
+            migrator.migrateActor(actor);
+
+            assert.strictEqual(actor.system.level_applies.attack, false);
+            assert.strictEqual(actor.system.matrix.attack.base, 7);
+            assert.strictEqual(actor.system.modifiers.matrix_initiative, 2);
+
+            const computer = actor.items.find((item: any) => item.name === 'Computer');
+            assert.strictEqual(foundry.utils.getProperty(computer, 'system.skill.rating'), 3);
+        });
+    });
+
 };

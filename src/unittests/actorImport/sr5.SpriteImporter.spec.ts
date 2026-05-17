@@ -34,10 +34,37 @@ export const spriteImporterTesting = (context: QuenchBatchContext) => {
 
     describe('Chummer Sprite Importer', () => {
         it('Should import a chummer character', async () => {
-            sprite = await SpriteImporter.import(character, importOptions);
+            const template = await factory.createActor({
+                type: 'sprite',
+                system: {
+                    spriteType: 'companion_template',
+                    level_applies: {
+                        resonance: true,
+                        attack: true,
+                        sleaze: true,
+                        data_processing: true,
+                        firewall: true,
+                    },
+                    attributes: {
+                        resonance: { base: 1 },
+                    },
+                    matrix: {
+                        attack: { base: -1 },
+                        sleaze: { base: 2 },
+                        data_processing: { base: 1 },
+                        firewall: { base: 0 },
+                    }
+                }
+            });
+
+            sprite = await SpriteImporter.import(character, template, importOptions);
             assert.notEqual(sprite, null, 'sprite not created');
             factory.actors.push(sprite as Actor.Stored<'sprite'>);
-            assert.strictEqual(sprite!.system.spriteType, 'companion');
+            assert.strictEqual(sprite!.system.spriteType, 'companion_template');
+            assert.strictEqual(sprite!.system.level, 2);
+            assert.strictEqual(sprite!.system.attributes.edge.base, 1);
+            assert.strictEqual(sprite!.system.level_applies.sleaze, true);
+            assert.strictEqual(sprite!.system.matrix.sleaze.base, 2);
         });
 
         it('Should have the correct item number', async () => {

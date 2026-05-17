@@ -58,7 +58,7 @@
                 <label>
                     {{#if (eq system.actor_type 'sprite')}}
                         {{localize "SR5.CallInAction.Compile"}}
-                        {{localizeOb system.sprite.type @root.config.spriteTypes}}
+                        {{system.sprite.type}}
                         {{localizeOb system.actor_type @root.config.callInActorTypes}}
                     {{else if (eq system.actor_type 'spirit')}}
                         {{localize "SR5.CallInAction.Summon"}}
@@ -275,7 +275,7 @@
                         <div class="basic-row">
                             <label data-tooltip="{{systemFields.sprite.fields.type.hint}}">{{systemFields.sprite.fields.type.label}}</label>
                             <span>
-                                {{formInput systemFields.sprite.fields.type value=source.system.sprite.type localize=true
+                                {{formInput systemFields.sprite.fields.type value=source.system.sprite.type
                                             classes="short" rootId=@root.rootId disabled=(isDefined sprite)}}
                             </span>
                         </div>

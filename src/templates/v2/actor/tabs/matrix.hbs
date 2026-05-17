@@ -48,12 +48,13 @@
                 {{else}}
                     <div class="attributes">
                         {{#each config.matrixAttributes as |label key|}}
-                            {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/matrix-attribute.hbs"
+                            {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/matrix-attribute-matrix.hbs"
                                 matrixAtt=(lookup ../system.matrix key)
                                 attributeField=(objValue @root.systemFields.matrix.fields key)
                                 isCyberdeck=../system.matrix.is_cyberdeck
                                 key=key
                                 label=label
+                                rootId=@root.rootId
                                 matrixAttributes=../config/matrixAttributes
                                 item=../system.matrix.item }}
                         {{/each}}

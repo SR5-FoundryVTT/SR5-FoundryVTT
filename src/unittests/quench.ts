@@ -26,6 +26,8 @@ import { shadowrunDriver } from './sr5.Driver.spec';
 import { shadowrunNPC } from './sr5.NPC.spec';
 import { shadowrunCombatModifierFlow } from './sr5.CombatModifierFlow.spec';
 import { itemSkillTesting } from './ItemSkill.spec';
+import { shadowrunOpposedCompileSpriteTesting } from './sr5.OpposedCompileSprite.spec';
+import { shadowrunOpposedCallInMessageActionTesting } from './sr5.OpposedCallInMessageAction.spec';
 
 import { Quench } from '@ethaks/fvtt-quench';
 import { shadowrunRiggerTesting } from '@/unittests/sr5.RiggerTesting.spec';
@@ -121,6 +123,12 @@ export const quenchRegister = (quench: Quench) => {
     });
     quench.registerBatch('shadowrun5e.item.skill', itemSkillTesting, {
         displayName: 'SHADOWRUN5e: Item Skill Flow Test',
+    });
+    quench.registerBatch('shadowrun5e.opposed.compile_sprite', shadowrunOpposedCompileSpriteTesting, {
+        displayName: 'SHADOWRUN5e: Opposed Compile Sprite Flow',
+    });
+    quench.registerBatch('shadowrun5e.opposed.call_in_message_action', shadowrunOpposedCallInMessageActionTesting, {
+        displayName: 'SHADOWRUN5e: Opposed Call-In Message Action Flow',
     });
     quench.registerBatch('shadowrun5e.migrators', Migrators, {
         displayName: 'SHADOWRUN5e: Migrators Test',

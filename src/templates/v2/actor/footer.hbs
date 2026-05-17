@@ -120,10 +120,10 @@
             {{#if @root.isEditMode}}
                 <span>
                     {{formInput systemFields.spriteType value=source.system.spriteType
-                                localize=true classes="short" rootId=rootId }}
+                                classes="short" rootId=rootId }}
                 </span>
             {{else}}
-                <label>{{localizeOb  system.spriteType config.spriteTypes}}&nbsp;{{localize (concat 'TYPES.Actor.' actor.type)}}</label>
+                <label>{{#if system.spriteType}}{{system.spriteType}}&nbsp;{{/if}}{{localize (concat 'TYPES.Actor.' actor.type)}}</label>
             {{/if}}
             <div class="basic-row">
                 <label>{{localize "SR5.Sprite.Level"}}</label>

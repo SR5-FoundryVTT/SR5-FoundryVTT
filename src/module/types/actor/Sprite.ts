@@ -15,7 +15,13 @@ const SpriteData = () => ({
     spriteType: new StringField({
         required: true,
         initial: 'data',
-        choices: SR5.spriteTypes,
+    }),
+    level_applies: new SchemaField({
+        resonance: new BooleanField({ initial: true }),
+        attack: new BooleanField({ initial: true }),
+        sleaze: new BooleanField({ initial: true }),
+        data_processing: new BooleanField({ initial: true }),
+        firewall: new BooleanField({ initial: true }),
     }),
     special: new StringField({ required: true, initial: "resonance", choices: ["resonance"], readonly: true }),
 
@@ -63,5 +69,3 @@ export class Sprite extends ActorBase<ReturnType<typeof SpriteData>> {
     }
     static override LOCALIZATION_PREFIXES = ["SR5.Sprite", "SR5.Actor"];
 }
-
-console.log("SpriteData", SpriteData(), new Sprite());

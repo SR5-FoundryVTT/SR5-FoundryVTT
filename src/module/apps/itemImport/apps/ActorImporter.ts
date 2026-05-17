@@ -15,6 +15,26 @@ const BaseClass = HandlebarsApplicationMixin(ApplicationV2<ImporterContext>);
 type BaseClassType = InstanceType<typeof BaseClass>;
 
 export class ActorImporter extends BaseClass {
+    static async importActorData(
+        actorData: ActorSchema,
+        importOptions: ImportOptionsType,
+    ) {
+        const spiritTemplate = await SpiritImporter.findSpiritByGuid(actorData.metatype_guid);
+        if (spiritTemplate)
+            return SpiritImporter.import(actorData, spiritTemplate, importOptions);
+
+        const spriteTemplate = await SpriteImporter.findSpriteByGuid(actorData.metatype_guid);
+        if (spriteTemplate)
+            return SpriteImporter.import(actorData, spriteTemplate, importOptions);
+
+        if (actorData.metatype_english?.toLowerCase().includes('sprite')) {
+            ui.notifications?.error(game.i18n.localize('SR5.Import.Sprite.SpriteTypeNotFound'));
+            return null;
+        }
+
+        return CharacterImporter.import(actorData, importOptions);
+    }
+
     /**
      * Default options for the application window.
      */
@@ -125,13 +145,7 @@ export class ActorImporter extends BaseClass {
         console.log("Parsed Chummer Data:", actorData);
         console.log("Import Options:", importOptions);
 
-        const spiritTemplate = await SpiritImporter.findSpiritByGuid(actorData.metatype_guid);
-        if (spiritTemplate)
-            await SpiritImporter.import(actorData, spiritTemplate, importOptions);
-        else if (actorData.metatype_english?.toLowerCase().includes('sprite'))
-            await SpriteImporter.import(actorData, importOptions);
-        else
-            await CharacterImporter.import(actorData, importOptions);
+        await ActorImporter.importActorData(actorData, importOptions);
 
         await this.close();
     }

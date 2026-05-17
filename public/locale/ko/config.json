@@ -1234,6 +1234,9 @@
             },
             "Spirit": {
                 "SpiritTypeNotFound": "해당 영혼 유형을 찾을 수 없습니다. chummer에서 내보낸 json으로 github 이슈를 열어주세요."
+            },
+            "Sprite": {
+                "SpriteTypeNotFound": "해당 스프라이트 유형을 찾을 수 없습니다. chummer에서 내보낸 json으로 github 이슈를 열어주세요."
             }
         },
         "ImportCharacter": "캐릭터 불러오기",
@@ -2536,6 +2539,7 @@
                 }
             },
             "Level": "단계",
+            "LevelAppliesSettingHint": "어떤 스프라이트 속성에 레벨 보너스를 적용할지 설정합니다.",
             "MissingTechnomancer": "유효한 테크노맨서 없음",
             "Registered": "레지스트",
             "Services": "봉사",

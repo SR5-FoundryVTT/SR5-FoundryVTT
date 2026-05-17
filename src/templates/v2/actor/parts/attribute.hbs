@@ -1,4 +1,4 @@
-<div class="attribute{{#if cssClass}} {{cssClass}}{{/if}}" data-attribute-id="{{attributeField.name}}" data-context-menu="attribute">
+<div class="attribute{{#if cssClass}} {{cssClass}}{{/if}}" data-attribute-id="{{ifThen attributeId attributeId attributeField.name}}" data-context-menu="attribute">
     <label {{#if @root.isEditMode}}class="edit-mode"{{/if}}>
         {{#if label}}
             {{localize label}}
@@ -11,18 +11,26 @@
             {{#if @root.isSpirit}}
                 {{#ifne attributeField.name 'force'}}
                     <button type="button"
-                            class="attribute-button force-apply-toggle{{#unless (objValue @root.system.force_applies attributeField.name)}} downlight{{/unless}}"
+                            class="attribute-button force-apply-toggle{{#unless (objValue @root.system.force_applies (ifThen attributeId attributeId attributeField.name))}} downlight{{/unless}}"
                             data-action="toggleSpiritForceAttribute"
-                            data-attribute-id="{{attributeField.name}}"
+                            data-attribute-id="{{ifThen attributeId attributeId attributeField.name}}"
                             data-tooltip="SR5.Spirit.ForceAppliesSettingHint">F +</button>
                 {{/ifne}}
+            {{else if @root.isSprite}}
+                {{#if (eq (ifThen attributeId attributeId attributeField.name) 'resonance')}}
+                    <button type="button"
+                            class="attribute-button force-apply-toggle{{#unless (objValue @root.system.level_applies (ifThen attributeId attributeId attributeField.name))}} downlight{{/unless}}"
+                            data-action="toggleSpriteLevelAttribute"
+                            data-attribute-id="{{ifThen attributeId attributeId attributeField.name}}"
+                            data-tooltip="SR5.Sprite.LevelAppliesSettingHint">L +</button>
+                {{/if}}
             {{/if}}
             {{formInput attributeField.fields.base value=attribute.base
                         classes="short skinny center" rootId=rootId }}
         {{else}}
             <button class="icon sr5-icon" type="button"
                     data-action="rollAttribute"
-                    data-attribute-modifier-tooltip="{{attributeField.name}}">{{attribute.value}}</button>
+                    data-attribute-modifier-tooltip="{{ifThen attributeId attributeId attributeField.name}}">{{attribute.value}}</button>
         {{/if}}
     </div>
 </div>

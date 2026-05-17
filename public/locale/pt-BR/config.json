@@ -583,6 +583,9 @@
             },
             "Spirit": {
                 "SpiritTypeNotFound": "O tipo de espírito não foi encontrado. Por favor, abra uma questão no github com seu json de exportação chummer."
+            },
+            "Sprite": {
+                "SpriteTypeNotFound": "O tipo de sprite não foi encontrado. Por favor, abra uma questão no github com seu json de exportação chummer."
             }
         },
         "ImportCharacter": "Importar Personagem",
@@ -1146,6 +1149,7 @@
         },
         "Sprite": {
             "Level": "Nível",
+            "LevelAppliesSettingHint": "Controla quais atributos de sprite recebem o bônus de Nível.",
             "MissingTechnomancer": "Sem tecnomante ativo",
             "Registered": "Registrada",
             "Services": "Serviços",

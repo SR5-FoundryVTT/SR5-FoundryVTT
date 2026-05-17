@@ -37,6 +37,15 @@ type LegacySpiritProfile = {
     halfValueSkill?: boolean;
 };
 
+type SpriteAttributeId = 'resonance' | 'attack' | 'sleaze' | 'data_processing' | 'firewall';
+
+type LegacySpriteProfile = {
+    offsets?: Partial<Record<SpriteAttributeId, number>>;
+    init?: number;
+    skills?: string[];
+    levelOff?: SpriteAttributeId[];
+};
+
 const SPIRIT_ATTRIBUTE_IDS: SpiritAttributeId[] = [
     'body',
     'agility',
@@ -62,15 +71,7 @@ const LEGACY_INITIATIVE_DEFAULTS: LegacySpiritInitiativeProfile = {
 const LEGACY_SPIRIT_PROFILES: Record<string, LegacySpiritProfile> = {
     abomination: {
         attributes: { body: 2, agility: 1, strength: 2 },
-        skills: [
-            'assensing',
-            'astral_combat',
-            'exotic_ranged_weapon',
-            'gymnastics',
-            'perception',
-            'running',
-            'unarmed_combat',
-        ],
+        skills: ['assensing', 'astral_combat', 'exotic_ranged_weapon', 'gymnastics', 'perception', 'running', 'unarmed_combat'],
     },
     air: {
         attributes: { body: -2, agility: 3, reaction: 4, strength: -3 },
@@ -84,15 +85,7 @@ const LEGACY_SPIRIT_PROFILES: Record<string, LegacySpiritProfile> = {
     airwave: {
         attributes: { body: 2, agility: 3, reaction: 4, strength: -3 },
         initiative: { init: 4 },
-        skills: [
-            'assensing',
-            'astral_combat',
-            'exotic_ranged_weapon',
-            'impersonation',
-            'perception',
-            'running',
-            'unarmed_combat',
-        ],
+        skills: ['assensing', 'astral_combat', 'exotic_ranged_weapon', 'impersonation', 'perception', 'running', 'unarmed_combat'],
     },
     ally: { skills: ['assensing', 'astral_combat', 'perception', 'unarmed_combat'] },
     anansi: {
@@ -103,37 +96,11 @@ const LEGACY_SPIRIT_PROFILES: Record<string, LegacySpiritProfile> = {
     anarch: {
         attributes: { body: -1, agility: -1, reaction: 1, strength: -1 },
         initiative: { init: 1 },
-        skills: [
-            'assensing',
-            'automatics',
-            'blades',
-            'clubs',
-            'con',
-            'demolitions',
-            'disguise',
-            'forgery',
-            'gymnastics',
-            'impersonation',
-            'locksmith',
-            'palming',
-            'perception',
-            'pistols',
-            'sneaking',
-            'throwing_weapons',
-            'unarmed_combat',
-        ],
+        skills: ['assensing', 'automatics', 'blades', 'clubs', 'con', 'demolitions', 'disguise', 'forgery', 'gymnastics', 'impersonation', 'locksmith', 'palming', 'perception', 'pistols', 'sneaking', 'throwing_weapons', 'unarmed_combat'],
     },
     arboreal: {
         attributes: { body: 2, strength: 1, essence: -2 },
-        skills: [
-            'assensing',
-            'astral_combat',
-            'blade',
-            'clubs',
-            'unarmed_combat',
-            'exotic_ranged_weapon',
-            'perception',
-        ],
+        skills: ['assensing', 'astral_combat', 'blade', 'clubs', 'unarmed_combat', 'exotic_ranged_weapon', 'perception'],
     },
     automotive: {
         attributes: { body: 1, agility: 2, reaction: 1, logic: -2 },
@@ -152,39 +119,12 @@ const LEGACY_SPIRIT_PROFILES: Record<string, LegacySpiritProfile> = {
     blackjack: {
         attributes: { body: 2, agility: 1, reaction: 1 },
         initiative: { init: 1 },
-        skills: [
-            'assensing',
-            'automatics',
-            'blades',
-            'clubs',
-            'computer',
-            'first_aid',
-            'gymnastics',
-            'intimidation',
-            'locksmith',
-            'longarms',
-            'perception',
-            'pilot_ground_craft',
-            'pistols',
-            'sneaking',
-            'throwing_weapons',
-            'unarmed_combat',
-        ],
+        skills: ['assensing', 'automatics', 'blades', 'clubs', 'computer', 'first_aid', 'gymnastics', 'intimidation', 'locksmith', 'longarms', 'perception', 'pilot_ground_craft', 'pistols', 'sneaking', 'throwing_weapons', 'unarmed_combat'],
     },
     blade_summoned: {
         attributes: { body: 1, agility: 3, reaction: 2, strength: 1 },
         initiative: { init: 2, init_dice: 1 },
-        skills: [
-            'assensing',
-            'astral_combat',
-            'blades',
-            'gymnastics',
-            'perception',
-            'running',
-            'sneaking',
-            'throwing_weapons',
-            'unarmed_combat',
-        ],
+        skills: ['assensing', 'astral_combat', 'blades', 'gymnastics', 'perception', 'running', 'sneaking', 'throwing_weapons', 'unarmed_combat'],
     },
     blood: {
         attributes: { body: 2, agility: 2, strength: 2, logic: -1 },
@@ -206,18 +146,7 @@ const LEGACY_SPIRIT_PROFILES: Record<string, LegacySpiritProfile> = {
     },
     bugul: {
         attributes: { agility: -1, reaction: -1, strength: -2, willpower: 1, logic: 2 },
-        skills: [
-            'artisan',
-            'assensing',
-            'astral_combat',
-            'con',
-            'counterspelling',
-            'disenchanting',
-            'gymnastics',
-            'negotiation',
-            'perception',
-            'unarmed_combat',
-        ],
+        skills: ['artisan', 'assensing', 'astral_combat', 'con', 'counterspelling', 'disenchanting', 'gymnastics', 'negotiation', 'perception', 'unarmed_combat'],
     },
     carcass: {
         attributes: { body: 3, strength: 2, charisma: -1 },
@@ -236,18 +165,7 @@ const LEGACY_SPIRIT_PROFILES: Record<string, LegacySpiritProfile> = {
     chindi: {
         attributes: { body: 2, agility: 1, reaction: 2, strength: 1 },
         initiative: { init: 2 },
-        skills: [
-            'archery',
-            'blades',
-            'clubs',
-            'first_aid',
-            'gymnastics',
-            'intimidation',
-            'perception',
-            'sneaking',
-            'throwing_weapons',
-            'unarmed_combat',
-        ],
+        skills: ['archery', 'blades', 'clubs', 'first_aid', 'gymnastics', 'intimidation', 'perception', 'sneaking', 'throwing_weapons', 'unarmed_combat'],
     },
     corps_cadavre: {
         attributes: { body: 2, agility: -2, reaction: -2 },
@@ -269,15 +187,7 @@ const LEGACY_SPIRIT_PROFILES: Record<string, LegacySpiritProfile> = {
     croki: {
         attributes: { reaction: 2, strength: 2 },
         initiative: { init: 2 },
-        skills: [
-            'artificing',
-            'assensing',
-            'astral_combat',
-            'gymnastics',
-            'perception',
-            'ritual_spellcasting',
-            'spellcasting',
-        ],
+        skills: ['artificing', 'assensing', 'astral_combat', 'gymnastics', 'perception', 'ritual_spellcasting', 'spellcasting'],
     },
     detritus: {
         attributes: { body: 5, agility: -3, reaction: -1, strength: 4, logic: -1, charisma: -1 },
@@ -295,39 +205,12 @@ const LEGACY_SPIRIT_PROFILES: Record<string, LegacySpiritProfile> = {
         skills: ['assensing', 'astral_combat', 'exotic_ranged_weapon', 'perception', 'unarmed_combat'],
     },
     ejerian: {
-        skills: [
-            'assensing',
-            'astral_combat',
-            'automatics',
-            'blades',
-            'clubs',
-            'computer',
-            'first_aid',
-            'gymnastics',
-            'intimidation',
-            'locksmith',
-            'longarms',
-            'perception',
-            'pilot_ground_craft',
-            'pistols',
-            'sneaking',
-            'throwing_weapons',
-            'unarmed_combat',
-        ],
+        skills: ['assensing', 'astral_combat', 'automatics', 'blades', 'clubs', 'computer', 'first_aid', 'gymnastics', 'intimidation', 'locksmith', 'longarms', 'perception', 'pilot_ground_craft', 'pistols', 'sneaking', 'throwing_weapons', 'unarmed_combat'],
     },
     elvar: {
         attributes: { reaction: 2, strength: 2 },
         initiative: { init: 2 },
-        skills: [
-            'assensing',
-            'astral_combat',
-            'con',
-            'counterspelling',
-            'disenchanting',
-            'gymnastics',
-            'perception',
-            'spellcasting',
-        ],
+        skills: ['assensing', 'astral_combat', 'con', 'counterspelling', 'disenchanting', 'gymnastics', 'perception', 'spellcasting'],
     },
     energy: {
         attributes: { body: 1, agility: 2, reaction: 3, strength: -2, intuition: 1 },
@@ -352,43 +235,17 @@ const LEGACY_SPIRIT_PROFILES: Record<string, LegacySpiritProfile> = {
     green_man: {
         attributes: { body: 3, agility: -1, reaction: 2, strength: 4 },
         initiative: { init: 2 },
-        skills: [
-            'assensing',
-            'astral_combat',
-            'counterspelling',
-            'gymnastics',
-            'leadership',
-            'perception',
-            'unarmed_combat',
-        ],
+        skills: ['assensing', 'astral_combat', 'counterspelling', 'gymnastics', 'leadership', 'perception', 'unarmed_combat'],
     },
     gremlin: {
         attributes: { reaction: 3 },
         initiative: { init: 3 },
-        skills: [
-            'assensing',
-            'astral_combat',
-            'con',
-            'counterspelling',
-            'intimidation',
-            'perception',
-            'spellcasting',
-            'unarmed_combat',
-        ],
+        skills: ['assensing', 'astral_combat', 'con', 'counterspelling', 'intimidation', 'perception', 'spellcasting', 'unarmed_combat'],
     },
     guardian: {
         attributes: { body: 1, agility: 2, reaction: 3, strength: 2 },
         initiative: { init: 1 },
-        skills: [
-            'assensing',
-            'astral_combat',
-            'blades',
-            'clubs',
-            'counterspelling',
-            'exotic_ranged_weapon',
-            'perception',
-            'unarmed_combat',
-        ],
+        skills: ['assensing', 'astral_combat', 'blades', 'clubs', 'counterspelling', 'exotic_ranged_weapon', 'perception', 'unarmed_combat'],
     },
     guidance: {
         attributes: { body: 3, agility: -1, reaction: 2, strength: 1 },
@@ -408,64 +265,22 @@ const LEGACY_SPIRIT_PROFILES: Record<string, LegacySpiritProfile> = {
     hopper: {
         attributes: { reaction: 4, intuition: 1 },
         initiative: { init: 6, init_dice: 1 },
-        skills: [
-            'assensing',
-            'astral_combat',
-            'blades',
-            'gymnastics',
-            'perception',
-            'running',
-            'sneaking',
-            'throwing_weapons',
-            'unarmed_combat',
-        ],
+        skills: ['assensing', 'astral_combat', 'blades', 'gymnastics', 'perception', 'running', 'sneaking', 'throwing_weapons', 'unarmed_combat'],
     },
     horror_show: {
         attributes: { body: 1, agility: 3, reaction: 2, strength: 1 },
         initiative: { init: 2, init_dice: 1 },
-        skills: [
-            'assensing',
-            'astral_combat',
-            'blades',
-            'con',
-            'disguise',
-            'gymnastics',
-            'impersonation',
-            'perception',
-            'running',
-            'sneaking',
-            'unarmed_combat',
-        ],
+        skills: ['assensing', 'astral_combat', 'blades', 'con', 'disguise', 'gymnastics', 'impersonation', 'perception', 'running', 'sneaking', 'unarmed_combat'],
     },
     imp: {
         attributes: { reaction: 3 },
         initiative: { init: 3 },
-        skills: [
-            'alchemy',
-            'assensing',
-            'astral_combat',
-            'con',
-            'counterspelling',
-            'disenchanting',
-            'gymnastics',
-            'intimidation',
-            'perception',
-            'spellcasting',
-            'unarmed_combat',
-        ],
+        skills: ['alchemy', 'assensing', 'astral_combat', 'con', 'counterspelling', 'disenchanting', 'gymnastics', 'intimidation', 'perception', 'spellcasting', 'unarmed_combat'],
     },
     jarl: {
         attributes: { body: 2, agility: -2, reaction: 3, strength: 2 },
         initiative: { init: 4 },
-        skills: [
-            'assensing',
-            'astral_combat',
-            'counterspelling',
-            'gymnastics',
-            'leadership',
-            'perception',
-            'unarmed_combat',
-        ],
+        skills: ['assensing', 'astral_combat', 'counterspelling', 'gymnastics', 'leadership', 'perception', 'unarmed_combat'],
     },
     kappa: {
         attributes: { body: 5, reaction: -1, strength: 1, essence: -2 },
@@ -549,42 +364,16 @@ const LEGACY_SPIRIT_PROFILES: Record<string, LegacySpiritProfile> = {
     preta: {
         attributes: { body: -1, agility: 1, reaction: 2, strength: -1 },
         initiative: { init: 2 },
-        skills: [
-            'assensing',
-            'astral_combat',
-            'intimidation',
-            'negotiation',
-            'perception',
-            'sneaking',
-            'unarmed_combat',
-        ],
+        skills: ['assensing', 'astral_combat', 'intimidation', 'negotiation', 'perception', 'sneaking', 'unarmed_combat'],
     },
     queen: {
         attributes: { body: 5, agility: 3, reaction: 4, strength: 5, willpower: 1, logic: 1, intuition: 1 },
         initiative: { init: 5 },
-        skills: [
-            'assensing',
-            'astral_combat',
-            'con',
-            'counterspelling',
-            'gymnastics',
-            'leadership',
-            'negotiation',
-            'perception',
-            'spellcasting',
-            'unarmed_combat',
-        ],
+        skills: ['assensing', 'astral_combat', 'con', 'counterspelling', 'gymnastics', 'leadership', 'negotiation', 'perception', 'spellcasting', 'unarmed_combat'],
     },
     rot: {
         attributes: { body: 3, agility: -2, strength: 1, logic: -1, charisma: -1 },
-        skills: [
-            'assensing',
-            'astral_combat',
-            'counterspelling',
-            'exotic_ranged_weapon',
-            'perception',
-            'unarmed_combat',
-        ],
+        skills: ['assensing', 'astral_combat', 'counterspelling', 'exotic_ranged_weapon', 'perception', 'unarmed_combat'],
     },
     scout: {
         attributes: { agility: 2, reaction: 2 },
@@ -614,15 +403,7 @@ const LEGACY_SPIRIT_PROFILES: Record<string, LegacySpiritProfile> = {
     soldier: {
         attributes: { body: 3, agility: 1, reaction: 1, strength: 3 },
         initiative: { init: 1 },
-        skills: [
-            'assensing',
-            'astral_combat',
-            'counterspelling',
-            'exotic_ranged_weapon',
-            'gymnastics',
-            'perception',
-            'unarmed_combat',
-        ],
+        skills: ['assensing', 'astral_combat', 'counterspelling', 'exotic_ranged_weapon', 'gymnastics', 'perception', 'unarmed_combat'],
     },
     stabber: {
         attributes: { body: 1, agility: 4, reaction: 2, strength: 4 },
@@ -701,6 +482,53 @@ const DEFAULT_FORCE_APPLIES: Record<SpiritAttributeId, boolean> = {
     essence: true,
 } as const;
 
+const LEGACY_SPRITE_PROFILES: Record<string, LegacySpriteProfile> = {
+    courier: {
+        offsets: { sleaze: 3, data_processing: 1, firewall: 2 },
+        init: 1,
+        skills: ['computer', 'hacking'],
+    },
+    crack: {
+        offsets: { sleaze: 3, data_processing: 2, firewall: 1 },
+        init: 2,
+        skills: ['computer', 'hacking', 'electronic_warfare'],
+    },
+    data: {
+        offsets: { attack: -1, data_processing: 4, firewall: 1 },
+        init: 4,
+        skills: ['computer', 'electronic_warfare'],
+    },
+    fault: {
+        offsets: { attack: 3, data_processing: 1, firewall: 2 },
+        init: 1,
+        skills: ['computer', 'cybercombat', 'hacking'],
+    },
+    machine: {
+        offsets: { attack: 1, data_processing: 3, firewall: 2 },
+        init: 3,
+        skills: ['computer', 'electronic_warfare', 'hardware'],
+    },
+    companion: {
+        offsets: { attack: -1, sleaze: 1, firewall: 4 },
+        skills: ['computer', 'electronic_warfare'],
+    },
+    generalist: {
+        offsets: { attack: 1, sleaze: 1, data_processing: 1, firewall: 1 },
+        init: 1,
+        skills: ['computer', 'hacking', 'electronic_warfare'],
+    },
+};
+
+const DEFAULT_LEVEL_APPLIES: Record<SpriteAttributeId, boolean> = {
+    resonance: true,
+    attack: true,
+    sleaze: true,
+    data_processing: true,
+    firewall: true,
+};
+
+const SPRITE_MATRIX_ATTRIBUTE_IDS = ['attack', 'sleaze', 'data_processing', 'firewall'] as const;
+
 const { hasProperty, setProperty, getProperty } = foundry.utils;
 
 /**
@@ -732,17 +560,21 @@ export class Version0_34_0 extends VersionMigration {
 
         if (actor.type === 'spirit')
             this.migrateSpirit(actor);
+        else if (actor.type === 'sprite')
+            this.migrateSprite(actor);
     }
 
     private migrateSpirit(actor: any) {
         const system = actor.system;
         if (!system || typeof system !== 'object') return;
 
-        const spiritType = typeof system.spiritType === 'string' ? system.spiritType : '';
+        const spiritType = typeof system.spiritType === 'string' ? system.spiritType.trim().toLowerCase() : '';
         const profile = LEGACY_SPIRIT_PROFILES[spiritType as keyof typeof LEGACY_SPIRIT_PROFILES];
         if (!profile) return;
+        system.spiritType = spiritType.replace(/_/g, ' ').split(' ').filter(Boolean)
+                        .map(word => word[0].toUpperCase() + word.slice(1)).join(' ');
 
-        system.force_applies = this.buildForceApplies(profile.forceOff);
+        system.force_applies = this.buildToggleMap(DEFAULT_FORCE_APPLIES, profile.forceOff);
 
         const offsets = profile.attributes ?? {};
         for (const attributeId of SPIRIT_ATTRIBUTE_IDS) {
@@ -756,16 +588,17 @@ export class Version0_34_0 extends VersionMigration {
 
         system.half_value_skill = profile.halfValueSkill ?? false;
         this.migrateSpiritInitiative(system, profile.initiative);
-        this.migrateSpiritSkills(actor, profile.skills ?? []);
+        this.migrateSkillToggles(actor, profile.skills ?? []);
     }
 
-    private buildForceApplies(forceOff: SpiritAttributeId[] | undefined): Record<SpiritAttributeId, boolean> {
-        const forceApplies = { ...DEFAULT_FORCE_APPLIES };
-        if (!forceOff) return forceApplies;
-
-        for (const attributeId of forceOff) forceApplies[attributeId] = false;
-
-        return forceApplies;
+    private buildToggleMap<T extends string>(
+        defaults: Readonly<Record<T, boolean>>,
+        disabled: readonly T[] | undefined,
+    ): Record<T, boolean> {
+        const toggles: Record<T, boolean> = { ...defaults };
+        for (const key of disabled ?? [])
+            toggles[key] = false;
+        return toggles;
     }
 
     private migrateSpiritInitiative(system: any, initiative: Partial<LegacySpiritInitiativeProfile> | undefined) {
@@ -777,19 +610,45 @@ export class Version0_34_0 extends VersionMigration {
     }
 
     private initFormulaBuild(multiplier: number, constant: number, dice: number): SpiritInitiativeFormula {
-        if (multiplier >= 2) {
-            return { attribute_a: 'force', attribute_b: 'force', constant, dice };
-        } else if (multiplier === 1) {
-            return { attribute_a: '', attribute_b: 'force', constant, dice };
-        } else {
-            return { attribute_a: '', attribute_b: '', constant, dice };
+        const [attribute_a, attribute_b] = multiplier >= 2 ? ['force', 'force'] : multiplier === 1 ? ['', 'force'] : ['', ''];
+        return { attribute_a, attribute_b, constant, dice };
+    }
+
+    private migrateSprite(actor: any): void {
+        const system = actor.system;
+        if (!system || typeof system !== 'object') return;
+
+        const spriteType = typeof system.spriteType === 'string' ? system.spriteType.trim().toLowerCase() : '';
+        const profile = LEGACY_SPRITE_PROFILES[spriteType];
+        if (!profile) return;
+        system.spriteType = spriteType.replace(/_/g, ' ').split(' ').filter(Boolean)
+                        .map(word => word[0].toUpperCase() + word.slice(1)).join(' ');
+
+        this.migrateSpriteLevelApplies(system, profile.levelOff);
+        this.migrateSpriteAttributeOffsets(system, profile.offsets ?? {});
+        this.migrateSpriteInitiativeModifier(system, profile.init ?? 0);
+        this.migrateSkillToggles(actor, profile.skills ?? ['computer']);
+    }
+
+    private migrateSpriteLevelApplies(system: any, levelOff: SpriteAttributeId[] | undefined) {
+        setProperty(system, 'level_applies', this.buildToggleMap(DEFAULT_LEVEL_APPLIES, levelOff));
+    }
+
+    private migrateSpriteAttributeOffsets(system: any, offsets: Partial<Record<SpriteAttributeId, number>>) {
+        setProperty(system, 'attributes.resonance.base', offsets.resonance ?? 0);
+
+        for (const attributeId of SPRITE_MATRIX_ATTRIBUTE_IDS) {
+            setProperty(system, `matrix.${attributeId}.base`, offsets[attributeId] ?? 0);
         }
     }
 
-    private migrateSpiritSkills(actor: any, legacySkills: string[]) {
-        const legacySkillKeys = new Set(
-            legacySkills.map((skill) => this.normalizeSkillKey(skill)),
-        );
+    private migrateSpriteInitiativeModifier(system: any, legacyInitConstant: number) {
+        const currentModifier = Number(getProperty(system, 'modifiers.matrix_initiative') ?? 0);
+        setProperty(system, 'modifiers.matrix_initiative', currentModifier + legacyInitConstant);
+    }
+
+    private migrateSkillToggles(actor: any, legacySkills: string[]) {
+        const legacySkillKeys = new Set(legacySkills.map(skill => this.normalizeSkillKey(skill)));
         if (legacySkillKeys.size === 0) return;
 
         const items = Array.isArray(actor.items) ? actor.items : [];

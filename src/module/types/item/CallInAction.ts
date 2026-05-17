@@ -18,11 +18,7 @@ const CallInActionData = () => ({
         uuid: new DocumentUUIDField({ blank: true, required: true }),
     }),
     sprite: new SchemaField({
-        type: new StringField({
-            blank: true,
-            required: true,
-            choices: SR5.spriteTypes,
-        }),
+        type: new StringField({ blank: true, required: true }),
         level: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
         uuid: new DocumentUUIDField({ blank: true, required: true }),
     }),
@@ -34,5 +30,3 @@ export class CallInAction extends ItemBase<ReturnType<typeof CallInActionData>> 
     }
     static override LOCALIZATION_PREFIXES = ["SR5.Item", "SR5.CallInAction"];
 }
-
-console.log("CallInActionData", CallInActionData(), new CallInAction());

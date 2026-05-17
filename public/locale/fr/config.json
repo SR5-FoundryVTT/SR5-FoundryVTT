@@ -750,6 +750,7 @@
         },
         "Sprite": {
             "Level": "Niveau",
+            "LevelAppliesSettingHint": "Contrôle quels attributs de sprite reçoivent le bonus de Niveau.",
             "Registered": "Inscrit",
             "Services": "Tâches",
             "Type": "Type",

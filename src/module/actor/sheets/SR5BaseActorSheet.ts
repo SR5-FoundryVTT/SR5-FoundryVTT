@@ -313,6 +313,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             openSkillDescription: SR5BaseActorSheet.#toggleSkillDescription,
             filterTrainedSkills: SR5BaseActorSheet.#filterUntrainedSkills,
             toggleSpiritForceAttribute: SR5BaseActorSheet.#toggleSpiritForceAttribute,
+            toggleSpriteLevelAttribute: SR5BaseActorSheet.#toggleSpriteLevelAttribute,
 
             resetActorRunData: SR5BaseActorSheet.#resetActorRunData,
 
@@ -1789,6 +1790,23 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         const enabled = this.actor.system.force_applies[attributeId];
         await this.actor.update({ system: { force_applies: { [attributeId]: !enabled } } });
+    }
+
+    static async #toggleSpriteLevelAttribute(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!this.actor.isType('sprite')) return;
+        if (!(event.target instanceof HTMLElement)) return;
+
+        const attributeId = event.target.closest<HTMLElement>('[data-attribute-id]')?.dataset.attributeId;
+        if (!attributeId) return;
+
+        const isSpriteLevelAttribute = ['resonance', 'attack', 'sleaze', 'data_processing', 'firewall'].includes(attributeId);
+        if (!isSpriteLevelAttribute) return;
+
+        const enabled = this.actor.system.level_applies[attributeId];
+        await this.actor.update({ system: { level_applies: { [attributeId]: !enabled } } });
     }
 
     /**

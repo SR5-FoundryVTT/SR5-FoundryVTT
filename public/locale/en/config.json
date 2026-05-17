@@ -1237,6 +1237,9 @@
             },
             "Spirit": {
                 "SpiritTypeNotFound": "The spirit type was not found. Please open a github issue with your chummer export json."
+            },
+            "Sprite": {
+                "SpriteTypeNotFound": "The sprite type was not found. Please open a github issue with your chummer export json."
             }
         },
         "ImportCharacter": "Import Character",
@@ -2541,6 +2544,7 @@
                 }
             },
             "Level": "Level",
+            "LevelAppliesSettingHint": "Control which sprite attributes receive the Level bonus.",
             "MissingTechnomancer": "Missing Technomancer",
             "Registered": "Registered",
             "Services": "Services",

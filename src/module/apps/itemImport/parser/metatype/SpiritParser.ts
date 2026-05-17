@@ -55,7 +55,7 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
 
     private applyForceOffsetAttributes(system: ReturnType<typeof this.getBaseSystem>, jsonData: Metatype) {
         for (const [attributeId, metatypeAttributeId] of Object.entries(FORCE_OFFSET_ATTRIBUTE_MAP)) {
-            const value = (jsonData[metatypeAttributeId] as { _TEXT?: string } | undefined)?._TEXT ?? '';
+            const value = jsonData[metatypeAttributeId]._TEXT;
             const parsed = this.parseForceOffsetValue(value);
 
             system.force_applies[attributeId] = parsed.forceApplies;
@@ -82,20 +82,30 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
 
     protected override async getItems(jsonData: Metatype): Promise<Item.Source[]> {
         const { name, powers } = jsonData;
-        const qualities = jsonData.qualities || undefined;
-        const optionalpowers = jsonData.optionalpowers || jsonData.bonus?.optionalpowers;
         const skills = jsonData.skills;
+        const qualities = jsonData.qualities;
 
-        const powerList = [...IH.getArray(powers?.power), ...IH.getArray(optionalpowers?.optionalpower)].map(i => i._TEXT);
+        const optionalpowers = {
+            optionalpower: [
+                jsonData.optionalpowers?.optionalpower,
+                jsonData.bonus?.optionalpowers?.optionalpower
+            ].flat().filter(obj => !!obj)
+        };
+
+        const powerList = [
+            ...IH.getArray(powers?.power),
+            ...IH.getArray(optionalpowers?.optionalpower)
+        ].map(i => i._TEXT);
+
         const qualityList = [
             ...IH.getArray(qualities?.positive?.quality),
             ...IH.getArray(qualities?.negative?.quality),
         ].map(i => i._TEXT);
 
         const skillList = [
-            ...IH.getArray(skills?.skill).map(s => s._TEXT),
-            ...IH.getArray(skills?.group).map(g => g._TEXT),
-        ];
+            ...IH.getArray(skills?.skill),
+            ...IH.getArray(skills?.group),
+        ].map(i => i._TEXT);
 
         const allPowers = await IH.findItems('Critter_Power', powerList);
         const allQualities = await IH.findItems('Quality', qualityList);

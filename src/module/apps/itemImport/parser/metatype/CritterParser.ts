@@ -77,8 +77,14 @@ export class CritterParser extends MetatypeParserBase<'character'> {
     }
 
     protected override async getItems(jsonData: Metatype): Promise<Item.Source[]> {
-        const optionalpowers = jsonData.optionalpowers || undefined;
         const qualities = jsonData.qualities || undefined;
+
+        const optionalpowers = {
+            optionalpower: [
+                jsonData.optionalpowers?.optionalpower,
+                jsonData.bonus?.optionalpowers?.optionalpower
+            ].flat().filter(obj => !!obj)
+        };
 
         const spellsData = IH.getArray(jsonData.powers?.power)
             .filter(s => s._TEXT === "Innate Spell" && s.$?.select)

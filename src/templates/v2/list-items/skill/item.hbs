@@ -30,7 +30,7 @@
         {{/if}}
         <div class="list-item-col {{#if @root.isPlayMode}} skinny-col {{/if}}">
             {{#if @root.isEditMode}}
-                {{#if @root.isSpirit}}
+                {{#if (or @root.isSpirit @root.isSprite)}}
                     <input type="checkbox"
                            data-system-action="changeSkillRating"
                            class="checkbox"
