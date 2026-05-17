@@ -13,20 +13,22 @@ const ModificationData = () => ({
         required: true,
         choices: SR5.modificationTypes,
     }),
-    mount_point: new StringField({
-        blank: true,
-        required: true,
-        choices: SR5.mountPoints,
-    }),
     modification_category: new StringField({
         blank: true,
         required: true,
         choices: SR5.modificationCategories,
     }),
-    dice_pool: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
-    accuracy: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
-    rc: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
-    conceal: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+    mod_weapon: new SchemaField({
+        mount_point: new StringField({
+            blank: true,
+            required: true,
+            choices: SR5.mountPoints,
+        }),
+        dice_pool: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+        accuracy: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+        rc: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+        conceal: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+    }),
     mod_armor: new SchemaField({
         value: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
         is_hardened: new BooleanField({ required: true, nullable: false, initial: false }),

@@ -11,27 +11,47 @@ export class Version0_34_0 extends VersionMigration {
     readonly TargetVersion = "0.34.0";
 
     override handlesItem(item: Readonly<any>): boolean {
-        return item.system.armor !== undefined;
+        return item.system?.armor !== undefined || item.type === 'modification';
     }
 
     override migrateItem(item: any): void {
-        const armor = item.system.armor!;
-        const elements = ['acid', 'cold', 'electricity', 'fire', 'radiation'];
+        if (item.system?.armor !== undefined) {
+            const armor = item.system.armor;
+            const elements = ['acid', 'cold', 'electricity', 'fire', 'radiation'];
 
-        if (armor.mod !== undefined) {
-            armor.accessory = armor.mod;
-            delete armor.mod;
+            if (armor.mod !== undefined) {
+                armor.accessory = armor.mod;
+                delete armor.mod;
+            }
+
+            if (armor.hardened !== undefined) {
+                armor.is_hardened = Boolean(armor.hardened);
+                delete armor.hardened;
+            }
+
+            for (const el of elements) {
+                if (armor[el] !== undefined) {
+                    setProperty(armor, `elements.${el}`, armor[el] ?? 0);
+                    delete armor[el];
+                }
+            }
         }
 
-        if (armor.hardened !== undefined) {
-            armor.is_hardened = Boolean(armor.hardened);
-            delete armor.hardened;
-        }
+        if (item.type === 'modification' && item.system !== undefined) {
+            const legacyToNew: Array<[string, string]> = [
+                ['mount_point', 'mod_weapon.mount_point'],
+                ['dice_pool', 'mod_weapon.dice_pool'],
+                ['accuracy', 'mod_weapon.accuracy'],
+                ['rc', 'mod_weapon.rc'],
+                ['conceal', 'mod_weapon.conceal'],
+            ];
 
-        for (const el of elements) {
-            if (armor[el] !== undefined) {
-                setProperty(armor, `elements.${el}`, armor[el] ?? 0);
-                delete armor[el];
+            for (const [legacyKey, newKey] of legacyToNew) {
+                const oldValue = getProperty(item.system, legacyKey);
+                if (oldValue !== undefined) {
+                    setProperty(item.system, newKey, oldValue);
+                    delete item.system[legacyKey];
+                }
             }
         }
     }

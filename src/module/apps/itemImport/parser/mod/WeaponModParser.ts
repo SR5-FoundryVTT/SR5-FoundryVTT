@@ -11,12 +11,12 @@ export class WeaponModParser extends Parser<'modification'> {
         
         if (jsonData.mount) {
             const mount = jsonData.mount._TEXT.toLowerCase().split('/')[0] || '';
-            system.mount_point = mount as SystemType<'modification'>['mount_point'];
+            system.mod_weapon.mount_point = mount as SystemType<'modification'>['mod_weapon']['mount_point'];
         }
         
         system.type = 'weapon';
-        system.rc = Number(jsonData.rc?._TEXT) || 0;
-        system.accuracy = Number(jsonData.accuracy?._TEXT) || 0;
+        system.mod_weapon.rc = Number(jsonData.rc?._TEXT) || 0;
+        system.mod_weapon.accuracy = Number(jsonData.accuracy?._TEXT) || 0;
 
         return system;
     }

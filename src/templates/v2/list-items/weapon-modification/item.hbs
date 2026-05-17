@@ -13,26 +13,26 @@
         </div>
 
         <div class="list-item-col thicc-col">
-            <label>{{localizeOb item.system.mount_point @root.config.mountPoints}}</label>
+            <label>{{localizeOb item.system.mod_weapon.mount_point @root.config.mountPoints}}</label>
         </div>
         <div class="list-item-col skinny-col">
             <label>
-                {{#if item.system.dice_pool}}
-                    {{numberFormat item.system.dice_pool sign=true}}
+                {{#if item.system.mod_weapon.dice_pool}}
+                    {{numberFormat item.system.mod_weapon.dice_pool sign=true}}
                 {{/if}}
             </label>
         </div>
         <div class="list-item-col skinny-col">
             <label>
-                {{#if item.system.accuracy}}
-                    {{numberFormat item.system.accuracy sign=true}}
+                {{#if item.system.mod_weapon.accuracy}}
+                    {{numberFormat item.system.mod_weapon.accuracy sign=true}}
                 {{/if}}
             </label>
         </div>
         <div class="list-item-col skinny-col">
             <label>
-                {{#if item.system.rc}}
-                    {{numberFormat item.system.rc sign=true}}
+                {{#if item.system.mod_weapon.rc}}
+                    {{numberFormat item.system.mod_weapon.rc sign=true}}
                 {{/if}}
             </label>
         </div>

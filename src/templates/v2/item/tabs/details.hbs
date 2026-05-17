@@ -389,46 +389,46 @@
                 {{#if (eq system.type 'weapon')}}
                     <div class="list-item">
                         <div class="list-item-start skinny">
-                            <label data-tooltip="{{systemFields.mount_point.hint}}">{{systemFields.mount_point.label}}</label>
+                            <label data-tooltip="{{localize 'SR5.Modification.FIELDS.mount_point.hint'}}">{{localize 'SR5.Modification.FIELDS.mount_point.label'}}</label>
                         </div>
                         <div class="list-item-col">
-                            {{formInput systemFields.mount_point value=source.system.mount_point localize=true
+                            {{formInput systemFields.mod_weapon.fields.mount_point value=source.system.mod_weapon.mount_point localize=true
                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </div>
                     </div>
                     <div class="list-item">
                         <div class="list-item-start skinny">
-                            <label data-tooltip="{{systemFields.dice_pool.hint}}">{{systemFields.dice_pool.label}}</label>
+                            <label data-tooltip="{{localize 'SR5.Modification.FIELDS.dice_pool.hint'}}">{{localize 'SR5.Modification.FIELDS.dice_pool.label'}}</label>
                         </div>
                         <div class="list-item-col">
-                            {{formInput systemFields.dice_pool value=source.system.dice_pool
+                            {{formInput systemFields.mod_weapon.fields.dice_pool value=source.system.mod_weapon.dice_pool
                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </div>
                     </div>
                     <div class="list-item">
                         <div class="list-item-start skinny">
-                            <label data-tooltip="{{systemFields.accuracy.hint}}">{{systemFields.accuracy.label}}</label>
+                            <label data-tooltip="{{localize 'SR5.Modification.FIELDS.accuracy.hint'}}">{{localize 'SR5.Modification.FIELDS.accuracy.label'}}</label>
                         </div>
                         <div class="list-item-col">
-                            {{formInput systemFields.accuracy value=source.system.accuracy
+                            {{formInput systemFields.mod_weapon.fields.accuracy value=source.system.mod_weapon.accuracy
                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </div>
                     </div>
                     <div class="list-item">
                         <div class="list-item-start skinny">
-                            <label data-tooltip="{{systemFields.rc.hint}}">{{systemFields.rc.label}}</label>
+                            <label data-tooltip="{{localize 'SR5.Modification.FIELDS.rc.hint'}}">{{localize 'SR5.Modification.FIELDS.rc.label'}}</label>
                         </div>
                         <div class="list-item-col">
-                            {{formInput systemFields.rc value=source.system.rc
+                            {{formInput systemFields.mod_weapon.fields.rc value=source.system.mod_weapon.rc
                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </div>
                     </div>
                     <div class="list-item">
                         <div class="list-item-start skinny">
-                            <label data-tooltip="{{systemFields.conceal.hint}}">{{systemFields.conceal.label}}</label>
+                            <label data-tooltip="{{localize 'SR5.Modification.FIELDS.conceal.hint'}}">{{localize 'SR5.Modification.FIELDS.conceal.label'}}</label>
                         </div>
                         <div class="list-item-col">
-                            {{formInput systemFields.conceal value=source.system.conceal
+                            {{formInput systemFields.mod_weapon.fields.conceal value=source.system.mod_weapon.conceal
                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </div>
                     </div>

@@ -34,7 +34,7 @@ export const TechnologyPrep = {
     prepareConceal(technology: TechnologyType, equippedMods: SR5Item<'modification'>[]) {
         const concealParts = new ModifiableValue(technology.conceal);
         for (const mod of equippedMods)
-            concealParts.setUnique(mod.name, mod.system.conceal);
+            concealParts.setUnique(mod.name, mod.system.mod_weapon.conceal);
 
         concealParts.calcTotal();
     },
