@@ -5,10 +5,6 @@ import { ImportHelper as IH } from "./ImportHelper";
 import { SkillNamingFlow } from "@/module/flows/SkillNamingFlow";
 
 export class BonusHelper {
-    private static isTrue(value: "" | { _TEXT: string }): boolean {
-        return value === "" || value._TEXT === "True";
-    }
-
     private static normalizeValue(sheet: BC.DocCreateData, value: string | number): string {
         if (typeof value === 'number')
             return value.toString();
@@ -38,15 +34,12 @@ export class BonusHelper {
         return SkillNamingFlow.nameToKey(rawName);
     }
 
-    private static createEffect(
-        sheet: BC.DocCreateData,
-        effect: BC.AECreateData
-    ): void {
+    private static createEffect(sheet: BC.DocCreateData, effect: BC.AECreateData) {
         const changes = IH.getArray(effect.changes);
 
         for (const change of changes) {
             change.value = this.normalizeValue(sheet, change.value);
-            if (!change.mode) change.mode = BC.MODIFY;
+            if (!change.mode) change.mode = BC.ADD;
         }
 
         sheet.effects!.push({
@@ -56,11 +49,11 @@ export class BonusHelper {
         });
     }
 
-    public static async addBonus(sheet: BC.DocCreateData, bonus: BonusSchema) : Promise<void> {
-        await this.addEffects(sheet, bonus);
+    public static addBonus(sheet: BC.DocCreateData, bonus: BonusSchema) {
+        this.addEffects(sheet, bonus);
     }
 
-    private static async addEffects(sheet: BC.DocCreateData, bonus: BonusSchema) : Promise<void> {
+    private static addEffects(sheet: BC.DocCreateData, bonus: BonusSchema) {
         sheet.effects ??= [];
 
         for (const [key, data] of Object.entries(bonus)) {
@@ -132,11 +125,10 @@ export class BonusHelper {
             for (const limitModifier of IH.getArray(bonus.limitmodifier)) {
                 const name = limitModifier.limit._TEXT;
                 const key = SkillNamingFlow.nameToKey(name);
-                const conditionTag = limitModifier.condition ? "*" : "";
 
                 this.createEffect(
                     sheet, {
-                        name: sheet.name + conditionTag,
+                        disabled: !!limitModifier.condition,
                         changes: [{ key: "data.limit", value: limitModifier.value._TEXT }],
                         system: { applyTo: 'test_all', selection_limits: [{ value: name, id: key }] }
                     }
@@ -147,11 +139,10 @@ export class BonusHelper {
         if (bonus.skillattribute) {
             for (const skill of IH.getArray(bonus.skillattribute)) {
                 const key = Constants.attributeTable[skill.name._TEXT];
-                const conditionTag = skill.condition ? "*" : "";
 
                 this.createEffect(
                     sheet, {
-                        name: sheet.name + conditionTag,
+                        disabled: !!skill.condition,
                         changes: [{ key: "data.pool", value: skill.bonus._TEXT }],
                         system: { applyTo: 'test_all', selection_attributes: [{ value: key.capitalize(), id: key }] }
                     }
@@ -161,7 +152,6 @@ export class BonusHelper {
 
         if (bonus.skillcategory) {
             for (const skillCategory of IH.getArray(bonus.skillcategory)) {
-                const conditionTag = skillCategory.condition ? "*" : "";
                 const excludedSkill = this.normalizeSkillName(skillCategory.exclude?._TEXT ?? "");
 
                 type Keys = keyof typeof BC.BonusConstant.skillCategoryTable;
@@ -174,7 +164,7 @@ export class BonusHelper {
                 else
                     this.createEffect(
                         sheet, {
-                            name: sheet.name + conditionTag,
+                            disabled: !!skillCategory.condition,
                             changes: [{ key: "data.pool", value: skillCategory.bonus._TEXT }],
                             system: { applyTo: 'test_all', selection_skills: skills }
                         }
@@ -184,7 +174,6 @@ export class BonusHelper {
 
         if (bonus.skillgroup) {
             for (const skillGroup of IH.getArray(bonus.skillgroup)) {
-                const conditionTag = skillGroup.condition ? "*" : "";
                 const excludedSkill = this.normalizeSkillName(skillGroup.exclude?._TEXT ?? "");
 
                 type Keys = keyof typeof BC.BonusConstant.skillGroupTable;
@@ -194,7 +183,7 @@ export class BonusHelper {
 
                 this.createEffect(
                     sheet, {
-                        name: sheet.name + conditionTag,
+                        disabled: !!skillGroup.condition,
                         changes: [{ key: "data.pool", value: skillGroup.bonus._TEXT }],
                         system: { applyTo: 'test_all', selection_skills: skills }
                     }
@@ -211,7 +200,6 @@ export class BonusHelper {
 
                 this.createEffect(
                     sheet, {
-                        name: sheet.name,
                         changes: [{ key: `system.attributes.${normalName}`, value: attribute.val._TEXT }],
                     }
                 );
@@ -222,11 +210,10 @@ export class BonusHelper {
             for (const skill of IH.getArray(bonus.specificskill)) {
                 const name = skill.name._TEXT;
                 const key = this.normalizeSkillName(name);
-                const conditionTag = skill.condition ? "*" : "";
 
                 this.createEffect(
                     sheet, {
-                        name: sheet.name + conditionTag,
+                        disabled: !!skill.condition,
                         changes: [{ key: "data.pool", value: skill.bonus._TEXT }],
                         system: { applyTo: 'test_all', selection_skills: [{ value: name, id: key }] }
                     }
