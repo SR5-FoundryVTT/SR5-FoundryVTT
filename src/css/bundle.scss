@@ -8,11 +8,13 @@
 @use 'item';
 @use 'items/skill';
 @use 'actor';
-@use 'chat';
+@use 'foundry-chat-message';
 @use 'test';
 @use 'tagify';
 @use 'modifiers';
 @use 'modifiers-container';
+@use 'context-menu';
+@use 'dialogs';
 @use 'foundry';
 @use 'settings';
 @use 'module';

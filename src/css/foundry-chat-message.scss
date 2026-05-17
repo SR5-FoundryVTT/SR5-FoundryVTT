@@ -2,12 +2,32 @@
 @use 'config/mixins';
 @use 'config/variables';
 
+.chat-message {
+    background: var(--sr5-theme-surface-elevated);
+    border: 1px solid var(--sr5-theme-chat-border);
+    color: var(--sr5-theme-text-primary);
+    box-shadow: none;
+
+    .message-header {
+        color: var(--sr5-theme-text-secondary);
+        border-bottom: 1px solid var(--sr5-theme-chat-border);
+    }
+
+    .message-content {
+        color: var(--sr5-theme-text-primary);
+    }
+}
+
+
 .sr5 {
     &.chat-card {
-        @include mixins.sheet;
+        background: var(--sr5-theme-chat-card-bg);
+        background-repeat: repeat;
+        background-size: 100% 20px auto;
+        color: var(--sr5-theme-text-primary);
         font-style: normal;
         font-size: 1rem;
-        border: 1px solid rgba(variables.$yellow, 0.35);
+        border: 1px solid var(--sr5-theme-chat-card-border);
         border-radius: 6px;
         overflow: hidden;
         box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
@@ -18,19 +38,40 @@
 
         .clickable:hover {
             cursor: pointer;
-            color: variables.$white;
-            background: rgba(variables.$yellow, 0.16);
+            background: var(--sr5-theme-chat-hover-bg);
+            color: var(--sr5-theme-text-primary);
         }
 
         .card-header {
-            border-bottom: 1px solid rgba(variables.$yellow, 0.18);
+            border-bottom: 1px solid var(--sr5-theme-chat-divider);            
             padding: 0.35rem 0.45rem;
+
+            img {
+                flex: 0 0;
+                margin-right: 0.5em;
+                padding: 1px 1px 1px 1px;
+                border: 0;
+                height: 28px;
+                width: 28px;
+            }
+
+            h3 {
+                font-weight: bold;
+                align-self: center;
+                flex: 1;
+                margin: 0;
+                font-size: var(--font-size-12);
+            }
+        }
+        .card-header:first-of-type {
+            color: var(--sr5-theme-label);
+            border-color: var(--sr5-theme-chat-card-border);
         }
 
         .button {
-            color: variables.$white;
-            border: 1px solid rgba(variables.$yellow, 0.55);
-            background: linear-gradient(180deg, rgba(variables.$light, 0.20), rgba(variables.$dark, 0.65));
+            color: var(--sr5-theme-text-primary);
+            border-color: var(--sr5-theme-chat-button-border);
+            background: var(--sr5-theme-chat-button-bg);
             border-radius: 6px;
             text-align: center;
             padding: 0.2rem 0.65rem;
@@ -41,8 +82,8 @@
 
             &:hover {
                 cursor: pointer;
-                border-color: rgba(variables.$yellow, 0.85);
-                box-shadow: 0 0 8px rgba(variables.$yellow, 0.45);
+                border-color: var(--sr5-theme-label);
+                box-shadow: 0 0 8px var(--sr5-theme-accent-glow);
                 transform: translateY(-1px);
             }
         }
@@ -62,21 +103,22 @@
     }
 
     &.roll-card {
-        --sr5-card-surface: rgba(8, 10, 14, 0.62);
-        --sr5-card-surface-soft: rgba(255, 255, 255, 0.07);
-        --sr5-card-border: rgba(235, 181, 49, 0.42);
-        --sr5-card-border-soft: rgba(255, 255, 255, 0.15);
-        --sr5-card-text: #{variables.$white};
-        --sr5-card-text-soft: #{variables.$light-2};
-        --sr5-card-text-subtle: #a7a7a7;
-        --sr5-card-accent: #{variables.$yellow};
-        --sr5-card-success: #7ff0a4;
-        --sr5-card-failure: #ff9d9d;
-        --sr5-card-glitch-a: #cf4cff;
-        --sr5-card-glitch-b: #4ccfcf;
+        --sr5-card-surface: var(--sr5-theme-surface-elevated);
+        --sr5-card-surface-soft: var(--sr5-theme-surface-subtle);
+        --sr5-card-border: var(--sr5-theme-chat-card-border);
+        --sr5-card-border-soft: var(--sr5-theme-border);
+        --sr5-card-text: var(--sr5-theme-text-primary);
+        --sr5-card-text-soft: var(--sr5-theme-text-secondary);
+        --sr5-card-text-subtle: var(--sr5-theme-text-muted);
+        --sr5-card-accent: var(--sr5-theme-label);
+        --sr5-card-success: var(--sr5-theme-success);
+        --sr5-card-failure: var(--sr5-theme-failure);
+        --sr5-card-glitch-a: var(--sr5-theme-glitch-a);
+        --sr5-card-glitch-b: var(--sr5-theme-glitch-b);
 
         margin: 0.2rem 0.1rem;
         font-size: 12px;
+        color: var(--sr5-theme-text-primary);
         color: var(--sr5-card-text);
         border-color: var(--sr5-card-border);
 
@@ -110,7 +152,7 @@
                     width: 30px;
                     height: 30px;
                     margin: 0;
-                    border: 1px solid rgba(variables.$yellow, 0.35);
+                    border: 1px solid var(--sr5-theme-chat-card-border);
                     border-radius: 5px;
                     object-fit: cover;
                     background: rgba(0, 0, 0, 0.35);
@@ -127,11 +169,11 @@
                 font-size: var(--font-size-14);
 
                 a {
-                    color: var(--sr5-card-text);
+                    color: var(--sr5-theme-text-primary);
                 }
 
                 &:hover {
-                    text-shadow: 0 0 8px rgba(variables.$yellow, 0.45);
+                    text-shadow: 0 0 8px var(--sr5-theme-accent-glow);
                 }
             }
 
@@ -171,13 +213,13 @@
                 border: 1px solid var(--sr5-card-border-soft);
                 border-radius: 5px;
                 color: var(--sr5-card-text-soft);
-                background: rgba(0, 0, 0, 0.3);
+                background: var(--sr5-theme-surface-elevated-strong);
                 transition: border-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
 
                 &:hover {
                     color: var(--sr5-card-accent);
                     border-color: var(--sr5-card-accent);
-                    box-shadow: 0 0 8px rgba(variables.$yellow, 0.3);
+                    box-shadow: 0 0 8px var(--sr5-theme-accent-glow);
                 }
             }
         }
@@ -188,17 +230,20 @@
                 border-top: 1px dashed var(--sr5-card-border-soft);
             }
         }
-
-        .card-main-content {
-            background: var(--sr5-card-surface);
+        .card-description {
+            padding: 0.25em;
+            border-bottom: 1px solid var(--sr5-theme-chat-divider);
+            display: none;
         }
 
         .card-content {
-            margin: 0.35rem 0.45rem;
-            padding: 0.35rem 0.45rem;
+            border-bottom: 1px solid var(--sr5-theme-chat-divider);
             border: 1px solid var(--sr5-card-border-soft);
             border-radius: 7px;
-            background: rgba(0, 0, 0, 0.2);
+            background: var(--sr5-card-surface);
+
+            margin: 0.35rem 0.45rem;
+            padding: 0.35rem 0.45rem;
             display: flex;
             flex-flow: row nowrap;
             justify-content: center;
@@ -546,6 +591,9 @@
                 text-align: center;
                 width: 24px;
                 line-height: 24px;
+                color: var(--sr5-theme-chat-contrast-text);
+
+                // Consistent margin on top, if missing result boxes will clip.
                 margin-top: 5px;
 
                 &.red {
@@ -886,8 +934,8 @@
     }
 
     .chat-select-link img:hover {
-        border: 1px solid rgba(variables.$yellow, 0.75);
-        box-shadow: 0 0 6px rgba(variables.$yellow, 0.4);
+        border: 1px solid var(--sr5-theme-chat-card-border);
+        box-shadow: 0 0 6px color-mix(in srgb, var(--sr5-theme-chat-card-border) 55%, transparent);
     }
 }
 
@@ -928,22 +976,5 @@
 
     .initiative-tooltip-note {
         opacity: 0.9;
-    }
-}
-
-body:not(.theme-dark) {
-    .sr5.chat-card.roll-card {
-        --sr5-card-surface: rgba(243, 236, 223, 0.92);
-        --sr5-card-surface-soft: rgba(255, 255, 255, 0.72);
-        --sr5-card-border: rgba(83, 62, 46, 0.5);
-        --sr5-card-border-soft: rgba(83, 62, 46, 0.28);
-        --sr5-card-text: #241f1a;
-        --sr5-card-text-soft: #3d332a;
-        --sr5-card-text-subtle: #6a5a4d;
-        --sr5-card-accent: #7d4f16;
-        --sr5-card-success: #166b38;
-        --sr5-card-failure: #952a2a;
-        --sr5-card-glitch-a: #7f2db8;
-        --sr5-card-glitch-b: #0f7f7f;
     }
 }

@@ -2,21 +2,94 @@
 
 .sr5v2 {
     &.situational-modifiers-application {
+        .window-header {
+            color: var(--sr5v2-text-primary);
+
+            .window-title,
+            .header-control {
+                color: var(--sr5v2-text-primary);
+                text-shadow: none;
+            }
+
+            .window-title {
+                font-size: var(--font-size-13);
+                line-height: 36px;
+            }
+        }
+
+        &#situational-modifiers-application {
+            .window-header {
+                .window-title,
+                .header-control {
+                    color: var(--sr5v2-text-primary) !important;
+                }
+            }
+
+            h1,
+            h2 {
+                color: var(--sr5v2-label);
+            }
+
+            h1 {
+                border-bottom-color: var(--sr5v2-border-strong);
+            }
+        }
+
+        .window-content {
+            background: var(--sr5v2-app-body-bg);
+            background-image: none;
+            color: var(--sr5v2-text-primary);
+            border-color: var(--sr5v2-border);
+            text-shadow: none;
+        }
+
         .situational-modifiers-app {
             display: flex;
             flex-direction: column;
             height: 100%;
+            gap: 0.35rem;
+            font-size: var(--font-size-14);
+            background: var(--sr5v2-app-body-bg);
+            background-image: none;
+            color: var(--sr5v2-text-primary);
+
+            label,
+            th,
+            td,
+            p {
+                color: var(--sr5v2-text-primary);
+                text-shadow: none;
+            }
+        }
+
+        .situational-modifiers-app > div:first-child {
+            margin: 0 -.25rem 0 -.25rem;
+            padding: .25rem .25rem 0 .25rem;
+            background: var(--sr5v2-app-header-bg);
+            background-repeat: repeat;
+            background-size: 100% 20px auto;
         }
 
         h1 {
+            margin: 0;
+            border-bottom: 1px solid var(--sr5v2-border-strong);
+            color: var(--sr5v2-label);
             font-family: var(--font-sans);
+            font-weight: 700;
+        }
+
+        .situational-modifiers-app > div:first-child > h1 {
+            font-size: var(--font-size-28);
+            line-height: 1.1;
         }
 
         h2 {
             margin: 0 0 8px 0;
 
-            font-size: 21px;
+            font-size: 18px;
             font-family: var(--font-primary);
+            color: var(--sr5v2-label);
+            border-bottom: none;
         }
 
         .form-group {
@@ -32,16 +105,69 @@
             margin: 0;
             flex: 0 0 300px;
             font-family: var(--font-sans);
+            color: var(--sr5v2-text-primary);
+            font-weight: 600;
         }
 
         .form-group .form-group-element-numerical {
             flex: 0 0 auto;
+            display: flex;
+            flex-direction: row;
+
+            button,
+            input {
+                width: 25px;
+                height: 25px;
+                line-height: inherit;
+                vertical-align: middle;
+                text-align: center;
+                color: var(--sr5v2-control-text);
+                background: var(--sr5v2-control-bg);
+                border: 1px solid var(--sr5v2-control-border);
+                text-shadow: none;
+            }
+
+            input {
+                width: 34px;
+                min-width: 34px;
+                height: 28px;
+                min-height: 28px;
+                padding: 0 2px;
+                box-sizing: border-box;
+            }
+
+            button:hover {
+                color: var(--sr5v2-button-hover-text);
+                border-color: var(--sr5v2-button-hover-border);
+                background: var(--sr5v2-button-hover-bg);
+            }
+
+            input {
+                background: var(--sr5v2-control-bg-strong);
+            }
+
+            input:disabled {
+                color: var(--sr5v2-text-secondary);
+            }
         }
 
         table {
             margin: 0.5rem 0;
-            border-top: 1px solid var(--color-border-light-tertiary);
-            border-bottom: 1px solid var(--color-border-light-tertiary);
+            border-top: 1px solid var(--sr5v2-border);
+            border-bottom: 1px solid var(--sr5v2-border);
+            background: var(--sr5v2-bg-subtle);
+
+            th,
+            td {
+                color: var(--sr5v2-text-primary);
+                border-color: var(--sr5v2-border);
+                text-shadow: none;
+            }
+
+            th {
+                color: var(--sr5v2-label);
+                background: var(--sr5v2-bg-elevated-strong);
+            }
         }
 
         /** CSS for the Environmental Modifier Application Window */
@@ -53,12 +179,30 @@
             padding-bottom: 5px;
             width: 100%;
             display: block;
+            color: var(--sr5v2-control-text);
+            background: var(--sr5v2-control-bg);
+            border: 1px solid var(--sr5v2-control-border);
+            text-shadow: none;
         }
 
-        .env-modifier-active {
+        button.env-modifier:hover {
+            color: var(--sr5v2-button-hover-text);
+            border-color: var(--sr5v2-button-hover-border);
+            background: var(--sr5v2-button-hover-bg);
+        }
+
+        button.env-modifier.env-modifier-active {
             border-radius: 4px;
-            background-color: variables.$darkred;
-            color: variables.$yellow;
+            border-color: var(--sr5v2-button-hover-border);
+            background-color: var(--sr5v2-bg-elevated-strong);
+            color: var(--sr5v2-label);
+            box-shadow: 0 0 0 1px var(--sr5v2-button-hover-border) inset;
+            font-weight: 600;
+        }
+
+        button.env-modifier.env-modifier-active:hover {
+            color: var(--sr5v2-label);
+            background-color: var(--sr5v2-bg-elevated-strong);
         }
 
         .env-modifier-total {
@@ -81,6 +225,17 @@
             display: block;
             width: 100%;
             margin: 0;
+            color: var(--sr5v2-button-text);
+            border: 1px solid var(--sr5v2-button-border);
+            background: var(--sr5v2-button-bg);
+            box-shadow: 0 0 0 1px var(--sr5v2-border) inset;
+            text-shadow: none;
+        }
+
+        .dialog-buttons > .dialog-button:hover {
+            color: var(--sr5v2-button-hover-text);
+            border-color: var(--sr5v2-button-hover-border);
+            background: var(--sr5v2-button-hover-bg);
         }
     }
 }
