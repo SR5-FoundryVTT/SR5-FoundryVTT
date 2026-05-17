@@ -1,7 +1,7 @@
 {
   "name": "Close Combat",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/groups/close_combat.svg",
+  "img": "systems/shadowrun5e/dist/icons/groups/close_combat.webp",
   "system": {
     "description": {
       "value": "",

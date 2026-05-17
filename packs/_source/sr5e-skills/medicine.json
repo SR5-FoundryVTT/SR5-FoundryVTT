@@ -1,7 +1,7 @@
 {
   "name": "Medicine",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/skills/technical-medicine.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/technical-medicine.webp",
   "system": {
     "description": {
       "value": "",
