@@ -1,64 +1,58 @@
-import { ItemsParser } from "../itemImporter/ItemsParser";
 import { SR5Actor } from "src/module/actor/SR5Actor";
 import { ActorSchema } from "../ActorSchema";
 import { ImportOptionsType } from "../characterImporter/CharacterImporter";
-import { Sanitizer } from "@/module/sanitizer/Sanitizer";
-import { DataDefaults } from "@/module/data/DataDefaults";
-import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper";
-import { FLAGS, SYSTEM_NAME } from "@/module/constants";
 import { ActorSkillImport } from "../ActorSkillImport";
-import CompendiumCollection = foundry.documents.collections.CompendiumCollection;
+import { ActorImportUtil, type BlankImportedActor } from "../ActorImportUtil";
+import {
+    DEFAULT_FORCE_APPLIES,
+    PRESET_INITIATIVE_DEFAULTS,
+    PRESET_SPIRIT_PROFILES,
+    SPIRIT_ATTRIBUTE_IDS,
+    type SpiritProfileInitiative,
+    humanizePresetTypeKey,
+    normalizeSpiritTypeForPreset,
+} from "@/module/data/SpiritSpritePresetProfiles";
+import { InitiativeFormulaType } from "@/module/types/actor/Spirit";
 
-export interface BlankSpirit extends Actor.CreateData {
-    type: 'spirit',
-    name: string,
-    items: Item.CreateData[],
-    effects: ActiveEffect.CreateData[],
-    system: ReturnType<typeof DataDefaults.baseSystemData<'spirit'>>,
-};
+export type BlankSpirit = BlankImportedActor<'spirit'>;
 
 export class SpiritImporter {
-    private static async _findTemplateIdInPack(
-        pack: CompendiumCollection<'Actor'>,
-        mappedId: string,
-        metatypeGuid: string,
-    ): Promise<string | null> {
-        const index = await pack.getIndex({ fields: ['type', 'system.importFlags.sourceid'] });
-        const entries = Array.from(index.values());
+    private static initFormulaBuild(multiplier: number, constant: number, dice: number): InitiativeFormulaType {
+        const [attribute_a, attribute_b] = multiplier >= 2 ? ['force', 'force'] : multiplier === 1 ? ['', 'force'] : ['', ''];
+        return { attribute_a, attribute_b, constant, dice } as InitiativeFormulaType;
+    }
 
-        const byId = entries.find((entry) => entry.type === 'spirit' && entry._id === mappedId);
-        if (byId) return byId._id;
+    private static applyProfileInitiativeFormulae(
+        spirit: BlankSpirit,
+        initiative: Partial<SpiritProfileInitiative> | undefined,
+    ) {
+        const profile: SpiritProfileInitiative = { ...PRESET_INITIATIVE_DEFAULTS, ...initiative };
 
-        const bySourceId = entries.find((entry) => {
-            if (entry.type !== 'spirit') return false;
-            const sourceId = foundry.utils.getProperty(entry, 'system.importFlags.sourceid');
-            return typeof sourceId === 'string' && sourceId.toLowerCase() === metatypeGuid.toLowerCase();
-        });
+        spirit.system.initiative_formulae.meatspace = this.initFormulaBuild(profile.init_mult, profile.init, profile.init_dice);
+        spirit.system.initiative_formulae.astral = this.initFormulaBuild(profile.astral_init_mult, profile.astral_init, profile.astral_init_dice);
+    }
 
-        return bySourceId?._id ?? null;
+    private static setRuntimeValues(spirit: BlankSpirit, chummerData: ActorSchema) {
+        spirit.system.attributes.edge.base = ActorImportUtil.getChummerAttributeTotal(chummerData, 'edg') ?? 0;
+        spirit.system.attributes.force.base = ActorImportUtil.getChummerAttributeTotal(chummerData, 'mag') ?? 1;
+    }
+
+    private static async importFromSeed(
+        chummerData: ActorSchema,
+        importOptions: ImportOptionsType,
+        applySeed: (spirit: BlankSpirit) => void,
+    ): Promise<SR5Actor<'spirit'> | null> {
+        const spirit = await ActorImportUtil.createBaseActor('spirit', chummerData, importOptions);
+        applySeed(spirit);
+
+        await ActorSkillImport.importSkills(spirit, chummerData);
+        this.setRuntimeValues(spirit, chummerData);
+
+        return ActorImportUtil.sanitizeAndCreateActor(spirit, CONFIG.Actor.dataModels.spirit.schema, chummerData);
     }
 
     static async findSpiritByGuid(metatypeGuid: string) {
-        const guid = (metatypeGuid || '').trim();
-        if (!guid) return null;
-
-        const mappedId = IH.guidToId(guid);
-
-        const compendiumList = game.settings.get(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder);
-        for (const packId of compendiumList) {
-            const pack = game.packs.get(packId) as CompendiumCollection<"Actor"> | undefined;
-            if (pack?.metadata.type !== "Actor") continue;
-
-            const templateId = await this._findTemplateIdInPack(pack, mappedId, guid);
-            if (!templateId) continue;
-
-            const doc = await pack.getDocument(templateId);
-            if (doc?.type !== 'spirit') continue;
-
-            return doc;
-        }
-
-        return null;
+        return ActorImportUtil.findActorTemplateByGuid(metatypeGuid, 'spirit');
     }
 
     static async import(
@@ -66,40 +60,41 @@ export class SpiritImporter {
         spiritTemplate: Actor.Stored<'spirit'>,
         importOptions: ImportOptionsType,
     ): Promise<SR5Actor<'spirit'> | null> {
-        const spirit = {
-            effects: [],
-            type: 'spirit',
-            folder: importOptions.folderId ?? null,
-            system: DataDefaults.baseSystemData('spirit'),
-            items: await new ItemsParser().parse(chummerData, importOptions),
-            name: chummerData.alias ?? chummerData.name ?? '[Name not found]',
-        } satisfies BlankSpirit;
-
-        for (const attributeId of Object.keys(spiritTemplate.system.attributes)) {
-            spirit.system.attributes[attributeId].base = spiritTemplate.system.attributes[attributeId].base;
-            if (attributeId in spiritTemplate.system.force_applies) {
-                spirit.system.force_applies[attributeId] = !!spiritTemplate.system.force_applies[attributeId];
+        return this.importFromSeed(chummerData, importOptions, (spirit) => {
+            for (const attributeId of Object.keys(spiritTemplate.system.attributes)) {
+                spirit.system.attributes[attributeId].base = spiritTemplate.system.attributes[attributeId].base;
+                if (attributeId in spiritTemplate.system.force_applies)
+                    spirit.system.force_applies[attributeId] = !!spiritTemplate.system.force_applies[attributeId];
             }
-        }
 
-        spirit.system.spiritType = spiritTemplate.system.spiritType;
-        spirit.system.skillset = spiritTemplate.system.skillset;
-        spirit.system.half_value_skill = spiritTemplate.system.half_value_skill;
-        await ActorSkillImport.importSkills(spirit, chummerData);
+            spirit.system.spiritType = spiritTemplate.system.spiritType;
+            spirit.system.skillset = spiritTemplate.system.skillset;
+            spirit.system.half_value_skill = spiritTemplate.system.half_value_skill;
+            spirit.system.initiative_formulae = foundry.utils.deepClone(spiritTemplate.system.initiative_formulae);
+        });
+    }
 
-        const edgeAttribute = chummerData.attributes[1]?.attribute.find(
-            att => att.name_english.toLowerCase() === 'edg'
-        );
-        spirit.system.attributes.edge.base = Number(edgeAttribute?.total) || 0;
-        const magic = Number(chummerData.attributes[1]?.attribute.find(att => att.name_english.toLowerCase() === 'mag')?.total) || 1;
-        spirit.system.attributes.force.base = magic;
+    static async importFromPresetProfile(
+        chummerData: ActorSchema,
+        importOptions: ImportOptionsType,
+    ): Promise<SR5Actor<'spirit'> | null> {
+        const spiritTypeKey = normalizeSpiritTypeForPreset(chummerData.metatype_english ?? '');
+        const profile = PRESET_SPIRIT_PROFILES[spiritTypeKey];
+        if (!profile)
+            return null;
 
-        const consoleLogs = Sanitizer.sanitize(CONFIG.Actor.dataModels.spirit.schema, spirit.system);
-        if (consoleLogs) {
-            console.warn(`Document Sanitized on Import; Name: ${chummerData.name}\n`);
-            console.table(consoleLogs);
-        }
+        return this.importFromSeed(chummerData, importOptions, (spirit) => {
+            spirit.system.spiritType = humanizePresetTypeKey(spiritTypeKey);
+            spirit.system.force_applies = ActorImportUtil.buildToggleMap(DEFAULT_FORCE_APPLIES, profile.forceOff);
 
-        return SR5Actor.create(spirit) as Promise<SR5Actor<'spirit'> | null>;
+            const offsets = profile.attributes ?? {};
+            for (const attributeId of SPIRIT_ATTRIBUTE_IDS) {
+                if (!spirit.system.force_applies[attributeId]) continue;
+                spirit.system.attributes[attributeId].base = offsets[attributeId] ?? 0;
+            }
+
+            spirit.system.half_value_skill = profile.halfValueSkill ?? false;
+            this.applyProfileInitiativeFormulae(spirit, profile.initiative);
+        });
     }
 }

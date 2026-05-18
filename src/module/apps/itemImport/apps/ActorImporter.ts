@@ -27,10 +27,13 @@ export class ActorImporter extends BaseClass {
         if (spriteTemplate)
             return SpriteImporter.import(actorData, spriteTemplate, importOptions);
 
-        if (actorData.metatype_english?.toLowerCase().includes('sprite')) {
-            ui.notifications?.error(game.i18n.localize('SR5.Import.Sprite.SpriteTypeNotFound'));
-            return null;
-        }
+        const importedSpiritByProfile = await SpiritImporter.importFromPresetProfile(actorData, importOptions);
+        if (importedSpiritByProfile)
+            return importedSpiritByProfile;
+
+        const importedSpriteByProfile = await SpriteImporter.importFromPresetProfile(actorData, importOptions);
+        if (importedSpriteByProfile)
+            return importedSpriteByProfile;
 
         return CharacterImporter.import(actorData, importOptions);
     }
@@ -150,3 +153,5 @@ export class ActorImporter extends BaseClass {
         await this.close();
     }
 }
+
+

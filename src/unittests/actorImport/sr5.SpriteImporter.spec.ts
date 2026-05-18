@@ -67,6 +67,27 @@ export const spriteImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(sprite!.system.matrix.sleaze.base, 2);
         });
 
+        it('imports a sprite using preset profile fallback without template', async () => {
+            const fallbackSprite = await SpriteImporter.importFromPresetProfile(character, importOptions);
+            assert.notEqual(fallbackSprite, null, 'Sprite fallback import failed');
+            factory.actors.push(fallbackSprite as Actor.Stored<'sprite'>);
+
+            assert.strictEqual(fallbackSprite!.system.spriteType, 'Companion');
+            assert.strictEqual(fallbackSprite!.system.level_applies.resonance, true);
+            assert.strictEqual(fallbackSprite!.system.level_applies.attack, true);
+            assert.strictEqual(fallbackSprite!.system.level_applies.sleaze, true);
+            assert.strictEqual(fallbackSprite!.system.level_applies.data_processing, true);
+            assert.strictEqual(fallbackSprite!.system.level_applies.firewall, true);
+            assert.strictEqual(fallbackSprite!.system.attributes.resonance.base, 0);
+            assert.strictEqual(fallbackSprite!.system.matrix.attack.base, -1);
+            assert.strictEqual(fallbackSprite!.system.matrix.sleaze.base, 1);
+            assert.strictEqual(fallbackSprite!.system.matrix.data_processing.base, 0);
+            assert.strictEqual(fallbackSprite!.system.matrix.firewall.base, 4);
+            assert.strictEqual(fallbackSprite!.system.modifiers.matrix_initiative, 0);
+            assert.strictEqual(fallbackSprite!.system.level, 3);
+            assert.strictEqual(fallbackSprite!.system.attributes.edge.base, 1);
+        });
+
         it('Should have the correct item number', async () => {
             if (!sprite) throw new Error('No sprite created');
             const skillSet = await fromUuid(sprite.system.skillset) as SR5Item<'skill'> | null;
@@ -80,3 +101,5 @@ export const spriteImporterTesting = (context: QuenchBatchContext) => {
         });
     });
 };
+
+

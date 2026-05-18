@@ -71,6 +71,33 @@ export const spiritImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(spirit!.system.spiritType, 'fire_template');
         });
 
+        it('imports a spirit using preset profile fallback without template', async () => {
+            const fallbackSpirit = await SpiritImporter.importFromPresetProfile(character, importOptions);
+            assert.notEqual(fallbackSpirit, null, 'Spirit fallback import failed');
+            factory.actors.push(fallbackSpirit as Actor.Stored<'spirit'>);
+
+            assert.strictEqual(fallbackSpirit!.system.spiritType, 'Fire');
+            assert.strictEqual(fallbackSpirit!.system.half_value_skill, false);
+            assert.strictEqual(fallbackSpirit!.system.force_applies.body, true);
+            assert.strictEqual(fallbackSpirit!.system.force_applies.magic, true);
+            assert.strictEqual(fallbackSpirit!.system.attributes.body.base, 1);
+            assert.strictEqual(fallbackSpirit!.system.attributes.agility.base, 2);
+            assert.strictEqual(fallbackSpirit!.system.attributes.reaction.base, 3);
+            assert.strictEqual(fallbackSpirit!.system.attributes.strength.base, -2);
+            assert.strictEqual(fallbackSpirit!.system.attributes.intuition.base, 1);
+            assert.strictEqual(fallbackSpirit!.system.initiative_formulae.meatspace.attribute_a, 'force');
+            assert.strictEqual(fallbackSpirit!.system.initiative_formulae.meatspace.attribute_b, 'force');
+            assert.strictEqual(fallbackSpirit!.system.initiative_formulae.meatspace.constant, 3);
+            assert.strictEqual(fallbackSpirit!.system.initiative_formulae.meatspace.dice, 2);
+            assert.strictEqual(fallbackSpirit!.system.initiative_formulae.astral.attribute_a, 'force');
+            assert.strictEqual(fallbackSpirit!.system.initiative_formulae.astral.attribute_b, 'force');
+            assert.strictEqual(fallbackSpirit!.system.initiative_formulae.astral.constant, 0);
+            assert.strictEqual(fallbackSpirit!.system.initiative_formulae.astral.dice, 3);
+            assert.strictEqual(fallbackSpirit!.system.attributes.force.base, 3);
+            assert.strictEqual(fallbackSpirit!.system.attributes.edge.base, 2);
+            assert.strictEqual(fallbackSpirit!.system.attributes.essence.value, 3);
+        });
+
         it('Should have the correct attributes and limits', async () => {
             if (!spirit) throw new Error('No spirit created');
 
@@ -102,3 +129,5 @@ export const spiritImporterTesting = (context: QuenchBatchContext) => {
         });
     });
 };
+
+
