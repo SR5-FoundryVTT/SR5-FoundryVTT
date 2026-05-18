@@ -156,7 +156,8 @@ export const SR = {
             firewall: { min: 0 },
             host_rating: { min: 0, max: 12 },
             pilot: { min: 0 },
-            force: {min: 0}
+            force: {min: 1},
+            level: {min: 1}
         },
         /**
          * Spirits on creation can have calculated attributes that would lower them to 0 or lower, but still have to have a min value of
@@ -286,4 +287,3 @@ export const SRStatus = [
         ],
     },
 ] as const satisfies CONFIG.StatusEffect[];
-

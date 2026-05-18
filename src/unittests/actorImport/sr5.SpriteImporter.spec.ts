@@ -61,7 +61,8 @@ export const spriteImporterTesting = (context: QuenchBatchContext) => {
             assert.notEqual(sprite, null, 'sprite not created');
             factory.actors.push(sprite as Actor.Stored<'sprite'>);
             assert.strictEqual(sprite!.system.spriteType, 'companion_template');
-            assert.strictEqual(sprite!.system.level, 2);
+            assert.strictEqual(sprite!.system.attributes.level.base, 2);
+            assert.strictEqual(sprite!.system.attributes.level.value, 2);
             assert.strictEqual(sprite!.system.attributes.edge.base, 1);
             assert.strictEqual(sprite!.system.level_applies.sleaze, true);
             assert.strictEqual(sprite!.system.matrix.sleaze.base, 2);
@@ -84,7 +85,8 @@ export const spriteImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(fallbackSprite!.system.matrix.data_processing.base, 0);
             assert.strictEqual(fallbackSprite!.system.matrix.firewall.base, 4);
             assert.strictEqual(fallbackSprite!.system.modifiers.matrix_initiative, 0);
-            assert.strictEqual(fallbackSprite!.system.level, 3);
+            assert.strictEqual(fallbackSprite!.system.attributes.level.base, 3);
+            assert.strictEqual(fallbackSprite!.system.attributes.level.value, 3);
             assert.strictEqual(fallbackSprite!.system.attributes.edge.base, 1);
         });
 

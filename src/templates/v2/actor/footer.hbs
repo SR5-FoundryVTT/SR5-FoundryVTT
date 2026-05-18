@@ -128,9 +128,9 @@
             <div class="basic-row">
                 <label>{{localize "SR5.Sprite.Level"}}</label>
                 {{#if @root.isEditMode}}
-                    {{formInput systemFields.level value=source.system.level classes="short skinny" rootId=rootId}}
+                    {{formInput systemFields.attributes.fields.level.fields.base value=source.system.attributes.level.base classes="short skinny" rootId=rootId}}
                 {{else}}
-                    <label>{{#if isLimited}}?{{else}}{{system.level}}{{/if}}</label>
+                    <label>{{#if isLimited}}?{{else}}{{system.attributes.level.value}}{{/if}}</label>
                 {{/if}}
             </div>
             {{#if @root.isEditMode}}

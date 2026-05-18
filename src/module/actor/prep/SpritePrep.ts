@@ -20,9 +20,11 @@ export class SpritePrep {
     }
 
     static prepareDerivedData(system: Actor.SystemOfType<'sprite'>, items: SR5Item[]) {
-        SpritePrep.prepareSpriteMatrixAttributes(system);
-        SpritePrep.prepareSpriteAttributes(system);
-        SpritePrep.prepareSpriteSkills(system);
+        const level = SpritePrep.getSpriteLevel(system);
+
+        SpritePrep.prepareSpriteMatrixAttributes(system, level);
+        SpritePrep.prepareSpriteAttributes(system, level);
+        SpritePrep.prepareSpriteSkills(system, level);
 
         AttributesPrep.prepareAttributes(system);
         SkillsPrep.prepareSkills(system);
@@ -31,8 +33,8 @@ export class SpritePrep {
 
         MatrixPrep.prepareMatrixToLimitsAndAttributes(system);
 
-        SpritePrep.prepareMatrixTrack(system);
-        SpritePrep.prepareSpriteInitiative(system);
+        SpritePrep.prepareMatrixTrack(system, level);
+        SpritePrep.prepareSpriteInitiative(system, level);
 
         InitiativePrep.prepareCurrentInitiative(system);
     }
@@ -42,15 +44,19 @@ export class SpritePrep {
         // system.special = 'resonance';
     }
 
-    static prepareSpriteAttributes(system: Actor.SystemOfType<'sprite'>) {
-        const { attributes, level, level_applies } = system;
+    static getSpriteLevel(system: Actor.SystemOfType<'sprite'>): number {
+        return ModifiableValue.calcTotal(system.attributes.level, { min: 1 });
+    }
+
+    static prepareSpriteAttributes(system: Actor.SystemOfType<'sprite'>, level: number) {
+        const { attributes, level_applies } = system;
         if (level_applies.resonance)
             ModifiableValue.addUniqueBase(attributes.resonance, 'SR5.Level', level);
         ModifiableValue.calcTotal(attributes.resonance);
     }
 
-    static prepareSpriteMatrixAttributes(system: Actor.SystemOfType<'sprite'>) {
-        const { level, matrix, level_applies } = system;
+    static prepareSpriteMatrixAttributes(system: Actor.SystemOfType<'sprite'>, level: number) {
+        const { matrix, level_applies } = system;
 
         const matrixAtts = ['attack', 'sleaze', 'data_processing', 'firewall'] as const;
 
@@ -64,8 +70,8 @@ export class SpritePrep {
         matrix.rating = level;
     }
 
-    static prepareSpriteSkills(system: Actor.SystemOfType<'sprite'>) {
-        const { skills, level } = system;
+    static prepareSpriteSkills(system: Actor.SystemOfType<'sprite'>, level: number) {
+        const { skills } = system;
         const allSkills = [
             ...Object.values(skills.active),
             ...Object.values(skills.language),
@@ -77,8 +83,8 @@ export class SpritePrep {
         }
     }
 
-    static prepareMatrixTrack(system: Actor.SystemOfType<'sprite'>) {
-        const { modifiers, track, matrix, level } = system;
+    static prepareMatrixTrack(system: Actor.SystemOfType<'sprite'>, level: number) {
+        const { modifiers, track, matrix } = system;
 
         // Prepare internal matrix condition monitor values
         // LEGACY: matrix.condition_monitor is no TrackType. It will only be used as a info, should ever be needed anywhere
@@ -91,8 +97,8 @@ export class SpritePrep {
         track.matrix.label = SR5.damageTypes.matrix;
     }
 
-    static prepareSpriteInitiative(system: Actor.SystemOfType<'sprite'>) {
-        const {initiative, level, modifiers} = system;
+    static prepareSpriteInitiative(system: Actor.SystemOfType<'sprite'>, level: number) {
+        const {initiative, modifiers} = system;
 
         // always in matrix perception
         initiative.perception = 'matrix';

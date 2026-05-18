@@ -22,11 +22,11 @@ export class SpriteImporter {
         const sleazeBase = Number(sprite.system.matrix.sleaze.base) || 0;
         const level = sprite.system.level_applies.sleaze ? (intTotal ?? 0) - sleazeBase : (intTotal ?? 0);
 
-        return Math.max(0, level);
+        return Math.max(1, level);
     }
 
     private static setRuntimeValues(sprite: BlankSprite, chummerData: ActorSchema) {
-        sprite.system.level = this.inferLevel(chummerData, sprite);
+        sprite.system.attributes.level.base = this.inferLevel(chummerData, sprite);
         sprite.system.attributes.edge.base = ActorImportUtil.getChummerAttributeTotal(chummerData, 'edg') ?? 0;
     }
 
@@ -89,4 +89,3 @@ export class SpriteImporter {
         });
     }
 }
-

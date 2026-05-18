@@ -26,8 +26,7 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
 
         it('sprite type is metadata only and does not change prepared values', async () => {
             const baseSystem = {
-                level: 6,
-                attributes: { resonance: { base: 2 } },
+                attributes: { level: { base: 6 }, resonance: { base: 2 } },
                 matrix: {
                     attack: { base: 1 },
                     sleaze: { base: 2 },
@@ -58,8 +57,7 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
             const sprite = await factory.createActor({
                 type: 'sprite',
                 system: {
-                    level: 6,
-                    attributes: { resonance: { base: 2 } },
+                    attributes: { level: { base: 6 }, resonance: { base: 2 } },
                     matrix: {
                         attack: { base: 1 },
                         sleaze: { base: 3 },
@@ -99,7 +97,7 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
             const sprite = await factory.createActor({
                 type: 'sprite',
                 system: {
-                    level: 7,
+                    attributes: { level: { base: 7 } },
                 }
             });
 
@@ -151,10 +149,10 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
 
         it('Matrix condition monitor track calculation with modifiers', async () => {
             const sprite = await factory.createActor({ type: 'sprite' });
-            assert.equal(sprite.system.matrix.condition_monitor.max, 8);
+            assert.equal(sprite.system.matrix.condition_monitor.max, 9);
 
             await sprite.update({ system: { modifiers: { matrix_track: 1 } } });
-            assert.equal(sprite.system.matrix.condition_monitor.max, 9);
+            assert.equal(sprite.system.matrix.condition_monitor.max, 10);
         });
     });
 };

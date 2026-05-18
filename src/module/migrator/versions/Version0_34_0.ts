@@ -48,6 +48,13 @@ export class Version0_34_0 extends VersionMigration {
             this.migrateSprite(actor);
     }
 
+    override migrateActiveEffect(effect: any): void {
+        for (const change of effect.changes ?? []) {
+            if (change.key === 'system.level')
+                change.key = 'system.attributes.level';
+        }
+    }
+
     private migrateSpirit(actor: any) {
         const system = actor.system;
         if (!system || typeof system !== 'object') return;
@@ -100,6 +107,8 @@ export class Version0_34_0 extends VersionMigration {
     private migrateSprite(actor: any): void {
         const system = actor.system;
         if (!system || typeof system !== 'object') return;
+        setProperty(system, 'attributes.level.base', getProperty(system, 'level'));
+        delete system.level;
 
         const spriteType = typeof system.spriteType === 'string' ? system.spriteType.trim().toLowerCase() : '';
         const profile = PRESET_SPRITE_PROFILES[spriteType];

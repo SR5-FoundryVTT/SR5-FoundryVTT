@@ -14,12 +14,12 @@ const CallInActionData = () => ({
     }),
     spirit: new SchemaField({
         type: new StringField({ blank: true, required: true }),
-        force: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
+        force: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 1 }),
         uuid: new DocumentUUIDField({ blank: true, required: true }),
     }),
     sprite: new SchemaField({
         type: new StringField({ blank: true, required: true }),
-        level: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
+        level: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 1 }),
         uuid: new DocumentUUIDField({ blank: true, required: true }),
     }),
 });

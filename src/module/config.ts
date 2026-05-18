@@ -75,6 +75,7 @@ export const SR5 = {
         willpower: 'SR5.AttrWillpower',
         pilot: 'SR5.Vehicle.Stats.Pilot',
         force: 'SR5.Force',
+        level: 'SR5.Level',
         initiation: 'SR5.Initiation',
         submersion: 'SR5.Submersion',
         rating: 'SR5.Rating',

@@ -127,7 +127,7 @@ export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData>
                 sprite: {
                     uuid: sprite.uuid,
                     type: sprite.system.spriteType,
-                    level: sprite.system.level
+                    level: sprite.system.attributes.level.value
                 }
             }
         });

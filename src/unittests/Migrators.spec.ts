@@ -466,8 +466,8 @@ export const Migrators = (context: QuenchBatchContext) => {
             effects: [],
             system: DataDefaults.baseSystemData('sprite', {
                 spriteType,
-                level,
                 attributes: {
+                    level: { base: level },
                     resonance: { base: 0 },
                 },
                 matrix: {
@@ -482,6 +482,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         it('migrates known legacy sprite type into offsets, level toggles, initiative bonus, and skill toggles', () => {
             const migrator = new Version0_34_0();
             const actor = createSprite('courier', 6);
+            actor.system.level = 6;
             actor.items.push(
                 createSkillItem('Computer', 0),
                 createSkillItem('Hacking', 3),
@@ -504,6 +505,8 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.matrix.firewall.base, 2);
 
             assert.strictEqual(actor.system.modifiers.matrix_initiative, 1);
+            assert.strictEqual(actor.system.attributes.level.base, 6);
+            assert.isUndefined(actor.system.level);
 
             const computer = actor.items.find((item: any) => item.name === 'Computer');
             const hacking = actor.items.find((item: any) => item.name === 'Hacking');
@@ -512,18 +515,19 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(foundry.utils.getProperty(hacking, 'system.skill.rating'), 1);
             assert.strictEqual(foundry.utils.getProperty(hardware, 'system.skill.rating'), 0);
 
-            const oldSleazeTotal = actor.system.level + 3;
-            const newSleazeTotal = actor.system.level + actor.system.matrix.sleaze.base;
+            const oldSleazeTotal = 6 + 3;
+            const newSleazeTotal = actor.system.attributes.level.base + actor.system.matrix.sleaze.base;
             assert.strictEqual(newSleazeTotal, oldSleazeTotal);
 
-            const oldInitBase = actor.system.level * 2 + 1;
-            const newInitBase = actor.system.level * 2 + actor.system.modifiers.matrix_initiative;
+            const oldInitBase = 6 * 2 + 1;
+            const newInitBase = actor.system.attributes.level.base * 2 + actor.system.modifiers.matrix_initiative;
             assert.strictEqual(newInitBase, oldInitBase);
         });
 
         it('migrates another known profile with negative offsets and multiple enabled skills', () => {
             const migrator = new Version0_34_0();
             const actor = createSprite('data', 5);
+            actor.system.level = 5;
             actor.items.push(
                 createSkillItem('Computer', 0),
                 createSkillItem('Electronic Warfare', 0),
@@ -548,6 +552,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         it('skips unknown sprite types', () => {
             const migrator = new Version0_34_0();
             const actor = createSprite('custom_unknown_type', 4);
+            actor.system.level = 4;
             actor.system.level_applies.attack = false;
             actor.system.matrix.attack.base = 7;
             actor.system.modifiers.matrix_initiative = 2;
@@ -561,6 +566,27 @@ export const Migrators = (context: QuenchBatchContext) => {
 
             const computer = actor.items.find((item: any) => item.name === 'Computer');
             assert.strictEqual(foundry.utils.getProperty(computer, 'system.skill.rating'), 3);
+        });
+
+        it('migrates legacy sprite level field and active effect change keys', () => {
+            const migrator = new Version0_34_0();
+            const actor = createSprite('unknown', 7);
+            actor.system.level = 7;
+
+            migrator.migrateActor(actor);
+            assert.strictEqual(actor.system.attributes.level.base, 7);
+            assert.isUndefined(actor.system.level);
+
+            const effect = {
+                changes: [
+                    { key: 'system.level', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'system.attributes.reaction', value: 1, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                ],
+            };
+            migrator.migrateActiveEffect(effect);
+
+            assert.strictEqual(effect.changes[0].key, 'system.attributes.level');
+            assert.strictEqual(effect.changes[1].key, 'system.attributes.reaction');
         });
     });
 
