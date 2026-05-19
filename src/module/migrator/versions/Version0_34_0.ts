@@ -59,14 +59,11 @@ export class Version0_34_0 extends VersionMigration {
             'system.modifiers.astral_initiative_dice': 'system.initiative.astral.formula.dice',
             'system.modifiers.matrix_initiative': 'system.initiative.matrix.formula.constant',
             'system.modifiers.matrix_initiative_dice': 'system.initiative.matrix.formula.dice',
-        } as const;
 
-        for (const change of effect.changes ?? []) {
-            if (change.key === 'system.level')
-                change.key = 'system.attributes.level';
-            if (change.key in keyMap)
-                change.key = keyMap[change.key as keyof typeof keyMap];
-        }
+            // legacy migration key, because we didn't update change.value before
+            'system.force': 'system.attributes.force',
+        } as const;
+        this.migrateEffectChanges(effect, keyMap);
     }
 
     private migrateInitiativeModifierFields(actorType: string, system: any) {

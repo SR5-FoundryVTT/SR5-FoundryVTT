@@ -2,6 +2,7 @@ import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { SR5TestFactory } from './utils';
 import { DataDefaults } from '@/module/data/DataDefaults';
 import { Migrator } from '@/module/migrator/Migrator';
+import { VersionMigration } from '@/module/migrator/VersionMigration';
 import { Version0_33_1 } from '@/module/migrator/versions/Version0_33_1';
 import { Version0_34_0 } from '@/module/migrator/versions/Version0_34_0';
 
@@ -17,6 +18,17 @@ export const Migrators = (context: QuenchBatchContext) => {
         language: LegacySkillContainerTestData;
         knowledge: Record<string, LegacySkillContainerTestData>;
     };
+
+    class TestMigration extends VersionMigration {
+        readonly TargetVersion = '0.0.0' as const;
+
+        remap(
+            effect: unknown,
+            keyMap: Readonly<Record<string, string>>,
+        ) {
+            this.migrateEffectChanges(effect, keyMap);
+        }
+    }
 
     after(async () => {
         await factory.destroy();
@@ -321,6 +333,60 @@ export const Migrators = (context: QuenchBatchContext) => {
                 'data.modifiers',
                 'data.modifiers.mod',
             ]);
+        });
+    });
+
+    describe('VersionMigration active effect remap helper', () => {
+        it('rewrites mapped keys and formula string value paths without evaluating math', () => {
+            const migrator = new TestMigration();
+            const keyMap = {
+                'system.level': 'system.attributes.level',
+                'system.modifiers.matrix_initiative': 'system.initiative.matrix.formula.constant',
+                'system.modifiers.matrix_initiative_dice': 'system.initiative.matrix.formula.dice',
+            };
+
+            const effect = {
+                changes: [
+                    {
+                        key: 'system.modifiers.matrix_initiative',
+                        value: '(@system.modifiers.matrix_initiative + @system.level + @system.modifiers.matrix_initiative_dice)',
+                        mode: CONST.ACTIVE_EFFECT_MODES.ADD
+                    },
+                    {
+                        key: 'system.attributes.reaction',
+                        value: '@system.attributes.reaction + @system.unknown.path',
+                        mode: CONST.ACTIVE_EFFECT_MODES.ADD
+                    },
+                    {
+                        key: 'system.modifiers.matrix_initiative_dice',
+                        value: 2,
+                        mode: CONST.ACTIVE_EFFECT_MODES.ADD
+                    },
+                    {
+                        key: 'system.attributes.body',
+                        value: 5,
+                        mode: CONST.ACTIVE_EFFECT_MODES.ADD
+                    },
+                ],
+            };
+
+            migrator.remap(effect, keyMap);
+
+            assert.strictEqual(effect.changes[0].key, 'system.initiative.matrix.formula.constant');
+            assert.strictEqual(
+                effect.changes[0].value,
+                '(@system.initiative.matrix.formula.constant + @system.attributes.level + @system.initiative.matrix.formula.dice)'
+            );
+            assert.strictEqual(typeof effect.changes[0].value, 'string');
+
+            assert.strictEqual(effect.changes[1].key, 'system.attributes.reaction');
+            assert.strictEqual(effect.changes[1].value, '@system.attributes.reaction + @system.unknown.path');
+
+            assert.strictEqual(effect.changes[2].key, 'system.initiative.matrix.formula.dice');
+            assert.strictEqual(effect.changes[2].value, 2);
+
+            assert.strictEqual(effect.changes[3].key, 'system.attributes.body');
+            assert.strictEqual(effect.changes[3].value, 5);
         });
     });
 
@@ -631,6 +697,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(effect.changes[2].key, 'system.initiative.matrix.formula.dice');
             assert.strictEqual(effect.changes[3].key, 'system.attributes.reaction');
         });
+
     });
 
 };
