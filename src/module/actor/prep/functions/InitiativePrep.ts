@@ -81,10 +81,6 @@ export class InitiativePrep {
             this.prepareFormulaMode(system, 'matrix');
         }
 
-        if ('matrix' in system.initiative && !('matrix' in system)) {
-            console.log(system);
-        }
-
         this.prepareCurrentInitiative(system);
     }
 }
