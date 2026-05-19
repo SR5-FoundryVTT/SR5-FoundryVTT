@@ -58,7 +58,7 @@ export class Version0_34_0 extends VersionMigration {
             'system.modifiers.matrix_initiative': 'system.initiative.matrix.formula.constant',
             'system.modifiers.matrix_initiative_dice': 'system.initiative.matrix.formula.dice',
 
-            // legacy migration key, because we didn't update change.value before
+            // legacy migration key, because we didn't update change.value before (0.31.5)
             'system.force': 'system.attributes.force',
         } as const;
         this.migrateEffectChanges(effect, keyMap);

@@ -46,24 +46,11 @@ export class VehiclePrep {
     }
 
     static prepareVehicleStats(system: Actor.SystemOfType<'vehicle'>) {
-        const { vehicle_stats, isOffRoad, isDrone } = system;
+        const { vehicle_stats, isDrone } = system;
 
         for (const [key, stat] of Object.entries(vehicle_stats)) {
             ModifiableValue.calcTotal(stat);
             stat.label = SR5.vehicle.stats[key];
-        }
-
-        // hide certain stats depending on if we're offroad
-        if (isOffRoad) {
-            vehicle_stats.off_road_speed.hidden = false;
-            vehicle_stats.off_road_handling.hidden = false;
-            vehicle_stats.speed.hidden = true;
-            vehicle_stats.handling.hidden = true;
-        } else {
-            vehicle_stats.off_road_speed.hidden = true;
-            vehicle_stats.off_road_handling.hidden = true;
-            vehicle_stats.speed.hidden = false;
-            vehicle_stats.handling.hidden = false;
         }
 
         // Hide vehicle seats for drones

@@ -47,6 +47,7 @@ export class SpiritPrep {
     static prepareSpiritAttributes(system: Actor.SystemOfType<'spirit'>, force: number) {
         const { attributes } = system;
 
+        attributes.force.hidden = true;
         for (const attribute of Object.values(attributes)) {
             if (!attribute?.applies_special) continue;
 

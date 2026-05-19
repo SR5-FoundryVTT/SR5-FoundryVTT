@@ -9,13 +9,11 @@
     <div class="attribute-value">
         {{#if @root.isEditMode}}
             {{#if @root.isSpirit}}
-                {{#ifne attributeField.name 'force'}}
-                    <button type="button"
-                            class="attribute-button force-apply-toggle{{#unless attribute.applies_special}} downlight{{/unless}}"
-                            data-action="toggleSpiritForceAttribute"
-                            data-attribute-id="{{ifThen attributeId attributeId attributeField.name}}"
-                            data-tooltip="SR5.Spirit.ForceAppliesSettingHint">F +</button>
-                {{/ifne}}
+                <button type="button"
+                        class="attribute-button force-apply-toggle{{#unless attribute.applies_special}} downlight{{/unless}}"
+                        data-action="toggleSpiritForceAttribute"
+                        data-attribute-id="{{ifThen attributeId attributeId attributeField.name}}"
+                        data-tooltip="SR5.Spirit.ForceAppliesSettingHint">F +</button>
             {{else if @root.isSprite}}
                 {{#if (eq (ifThen attributeId attributeId attributeField.name) 'resonance')}}
                     <button type="button"
