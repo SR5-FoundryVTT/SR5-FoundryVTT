@@ -42,17 +42,15 @@ export class SoakRules {
 
         if (damage.type.value === 'physical') {
             // Physical damage is only transformed for some actors
-            if (!['character', 'spirit', 'vehicle'].includes(actor.type)) {
+            if (!actor.isType('character', 'spirit', 'vehicle')) {
                 return updatedDamage;
             }
 
-            const modifiedArmor = (actor as SR5Actor<'character' | 'spirit' | 'vehicle'>).getArmor(damage);
-            if (modifiedArmor) {
-                const armorWillChangeDamageType = modifiedArmor.rating.value > damage.value;
+            const modArmor = actor.getArmor(damage);
+            const changeDamageType = modArmor.rating.value + modArmor.hardened.value > damage.value;
 
-                if (armorWillChangeDamageType) {
-                    updatedDamage.type.value = 'stun';
-                }
+            if (changeDamageType) {
+                updatedDamage.type.value = 'stun';
             }
         }
 
@@ -69,19 +67,16 @@ export class SoakRules {
         const updatedDamage = foundry.utils.duplicate(damage) as DamageType;
 
         if (damage.type.value === 'matrix') {
-            const actorData = actor.system as Actor.SystemOfType<'character'>;
-
             // Only characters can receive biofeedback damage at the moment.
             // TODO Technomancer and Sprites special rules?
             if (!actor.isType('character')) {
                 return updatedDamage;
             }
 
-            if (actorData.initiative.perception === 'matrix') {
-                if (actorData.matrix.hot_sim) {
+            if (actor.system.initiative.perception === 'matrix') {
+                if (actor.system.matrix.hot_sim) {
                     updatedDamage.type.value = 'physical';
-                }
-                else {
+                } else {
                     updatedDamage.type.value = 'stun';
                 }
             }
