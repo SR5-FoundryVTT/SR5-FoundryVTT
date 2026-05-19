@@ -52,6 +52,7 @@ export class Version0_34_0 extends VersionMigration {
 
     override migrateActiveEffect(effect: any): void {
         const keyMap = {
+            'system.level': 'system.attributes.level',
             'system.modifiers.meat_initiative': 'system.initiative.meatspace.formula.constant',
             'system.modifiers.meat_initiative_dice': 'system.initiative.meatspace.formula.dice',
             'system.modifiers.astral_initiative': 'system.initiative.astral.formula.constant',
