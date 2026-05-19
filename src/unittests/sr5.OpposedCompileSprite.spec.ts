@@ -12,7 +12,6 @@ async function createOpposedCompileSpriteTest(
     const againstData: any = TestCreator._minimalTestData();
     againstData.type = 'CompileSpriteTest';
     againstData.level = 4;
-    againstData.spriteTypeSelected = 'Courier';
     againstData.preparedSpriteUuid = preparedSpriteUuid;
     againstData.fade = 0;
     againstData.fadeDamage = DataDefaults.createData('damage');

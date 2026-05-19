@@ -10,8 +10,6 @@ const { fromUuidSync } = foundry.utils;
 
 
 interface CompileSpriteTestData extends SuccessTestData {
-    spriteTypeSelected: string
-
     // Testing values as described on SR5#254
     level: number
     fade: number
@@ -49,8 +47,6 @@ export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
 
         // Choose the most explicit value given, making sure it's still usable.
         data.level = Math.max(data.level || compilation.system.sprite.level || 1, 1);
-
-        data.spriteTypeSelected = data.spriteTypeSelected || compilation.system.sprite.type;
 
         data.preparedSpriteUuid = data.preparedSpriteUuid || compilation.system.sprite.uuid;
     }

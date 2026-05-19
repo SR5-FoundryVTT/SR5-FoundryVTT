@@ -1154,16 +1154,7 @@
             "Registered": "Registrada",
             "Services": "Serviços",
             "Technomancer": "Tecnomante",
-            "Type": "Tipo",
-            "Types": {
-                "Companion": "Companheiro",
-                "Courier": "Mensageiro",
-                "Crack": "Invasor",
-                "Data": "Dados",
-                "Fault": "Defeito",
-                "Generalist": "Generalista",
-                "Machine": "Máquina"
-            }
+            "Type": "Tipo"
         },
         "SpritePower": {
             "IsOptional": "Opcionalidade",

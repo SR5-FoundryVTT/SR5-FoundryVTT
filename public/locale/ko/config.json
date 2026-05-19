@@ -2544,16 +2544,7 @@
             "Registered": "레지스트",
             "Services": "봉사",
             "Technomancer": "테크노맨서",
-            "Type": "유형",
-            "Types": {
-                "Companion": "컴패니언",
-                "Courier": "쿠리어",
-                "Crack": "크랙",
-                "Data": "데이터",
-                "Fault": "폴트",
-                "Generalist": "제네럴리스트",
-                "Machine": "머신"
-            }
+            "Type": "유형"
         },
         "SpritePower": {
             "Durations": {

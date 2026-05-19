@@ -2549,16 +2549,7 @@
             "Registered": "Registered",
             "Services": "Services",
             "Technomancer": "Technomancer",
-            "Type": "Type",
-            "Types": {
-                "Companion": "Companion",
-                "Courier": "Courier",
-                "Crack": "Crack",
-                "Data": "Data",
-                "Fault": "Fault",
-                "Generalist": "Generalist",
-                "Machine": "Machine"
-            }
+            "Type": "Type"
         },
         "SpritePower": {
             "Durations": {

@@ -2545,16 +2545,7 @@
             "Registered": "Registriert",
             "Services": "Aufgaben",
             "Technomancer": "Technomancer",
-            "Type": "Art",
-            "Types": {
-                "Companion": "Begleiter",
-                "Courier": "Kurier",
-                "Crack": "Infiltrator",
-                "Data": "Daten",
-                "Fault": "Stör",
-                "Generalist": "Generalist",
-                "Machine": "Maschinen"
-            }
+            "Type": "Art"
         },
         "SpritePower": {
             "Durations": {

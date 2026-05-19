@@ -970,16 +970,6 @@ export const SR5 = {
         }
     },
 
-    spriteTypes: {
-        courier: 'SR5.Sprite.Types.Courier',
-        crack: 'SR5.Sprite.Types.Crack',
-        data: 'SR5.Sprite.Types.Data',
-        fault: 'SR5.Sprite.Types.Fault',
-        machine: 'SR5.Sprite.Types.Machine',
-        companion: 'SR5.Sprite.Types.Companion',
-        generalist: 'SR5.Sprite.Types.Generalist',
-    },
-
     spritePower: {
         durations: {
             always: 'SR5.SpritePower.Durations.Always',
