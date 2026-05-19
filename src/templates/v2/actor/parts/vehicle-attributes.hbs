@@ -59,8 +59,8 @@
     }}
     {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
         label="SR5.Armor.label"
-        attribute=system.armor
-        attributeField=systemFields.armor
+        attribute=system.armor.rating
+        attributeField=systemFields.armor.fields.rating
     }}
     {{#unless system.vehicle_stats.pilot.hidden}}
         {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
