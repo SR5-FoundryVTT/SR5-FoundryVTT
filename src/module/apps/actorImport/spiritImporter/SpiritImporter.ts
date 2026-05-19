@@ -4,7 +4,6 @@ import { ImportOptionsType } from "../characterImporter/CharacterImporter";
 import { ActorSkillImport } from "../ActorSkillImport";
 import { ActorImportUtil, type BlankImportedActor } from "../ActorImportUtil";
 import {
-    DEFAULT_FORCE_APPLIES,
     PRESET_INITIATIVE_DEFAULTS,
     PRESET_SPIRIT_PROFILES,
     SPIRIT_ATTRIBUTE_IDS,
@@ -66,8 +65,7 @@ export class SpiritImporter {
         return this.importFromSeed(chummerData, importOptions, (spirit) => {
             for (const attributeId of Object.keys(spiritTemplate.system.attributes)) {
                 spirit.system.attributes[attributeId].base = spiritTemplate.system.attributes[attributeId].base;
-                if (attributeId in spiritTemplate.system.force_applies)
-                    spirit.system.force_applies[attributeId] = !!spiritTemplate.system.force_applies[attributeId];
+                spirit.system.attributes[attributeId].applies_special = !!spiritTemplate.system.attributes[attributeId].applies_special;
             }
 
             spirit.system.skillset = spiritTemplate.system.skillset;
@@ -89,11 +87,12 @@ export class SpiritImporter {
 
         return this.importFromSeed(chummerData, importOptions, (spirit) => {
             spirit.system.spiritType = humanizePresetTypeKey(spiritTypeKey);
-            spirit.system.force_applies = ActorImportUtil.buildToggleMap(DEFAULT_FORCE_APPLIES, profile.forceOff);
+            const forceOff = new Set(profile.forceOff ?? []);
 
             const offsets = profile.attributes ?? {};
             for (const attributeId of SPIRIT_ATTRIBUTE_IDS) {
-                if (!spirit.system.force_applies[attributeId]) continue;
+                spirit.system.attributes[attributeId].applies_special = !forceOff.has(attributeId);
+                if (!spirit.system.attributes[attributeId].applies_special) continue;
                 spirit.system.attributes[attributeId].base = offsets[attributeId] ?? 0;
             }
 

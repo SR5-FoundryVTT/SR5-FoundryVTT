@@ -430,8 +430,8 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.attributes.reaction.base, 4);
             assert.strictEqual(actor.system.attributes.strength.base, -3);
 
-            assert.strictEqual(actor.system.force_applies.body, true);
-            assert.strictEqual(actor.system.force_applies.intuition, true);
+            assert.strictEqual(actor.system.attributes.body.applies_special, true);
+            assert.strictEqual(actor.system.attributes.intuition.applies_special, true);
 
             assert.strictEqual(actor.system.half_value_skill, false);
             assert.strictEqual(actor.system.initiative.meatspace.formula.attribute_a, 'force');
@@ -457,11 +457,11 @@ export const Migrators = (context: QuenchBatchContext) => {
             migrator.migrateActor(actor);
 
             assert.strictEqual(actor.system.half_value_skill, true);
-            assert.strictEqual(actor.system.force_applies.body, false);
-            assert.strictEqual(actor.system.force_applies.agility, false);
-            assert.strictEqual(actor.system.force_applies.reaction, false);
-            assert.strictEqual(actor.system.force_applies.strength, false);
-            assert.strictEqual(actor.system.force_applies.logic, true);
+            assert.strictEqual(actor.system.attributes.body.applies_special, false);
+            assert.strictEqual(actor.system.attributes.agility.applies_special, false);
+            assert.strictEqual(actor.system.attributes.reaction.applies_special, false);
+            assert.strictEqual(actor.system.attributes.strength.applies_special, false);
+            assert.strictEqual(actor.system.attributes.logic.applies_special, true);
 
             assert.strictEqual(actor.system.attributes.willpower.base, -2);
             assert.strictEqual(actor.system.attributes.logic.base, -2);
@@ -487,14 +487,14 @@ export const Migrators = (context: QuenchBatchContext) => {
             const migrator = new Version0_34_0();
             const actor = createSpirit('custom_unknown_type', 4);
             actor.system.half_value_skill = true;
-            actor.system.force_applies.body = false;
+            actor.system.attributes.body.applies_special = false;
             actor.system.attributes.body.base = 7;
             actor.items.push(createSkillItem('Assensing', 3));
 
             migrator.migrateActor(actor);
 
             assert.strictEqual(actor.system.half_value_skill, true);
-            assert.strictEqual(actor.system.force_applies.body, false);
+            assert.strictEqual(actor.system.attributes.body.applies_special, false);
             assert.strictEqual(actor.system.attributes.body.base, 7);
             assert.strictEqual(actor.system.initiative.meatspace.formula.attribute_a, 'reaction');
             assert.strictEqual(actor.system.initiative.meatspace.formula.attribute_b, 'intuition');
@@ -597,11 +597,11 @@ export const Migrators = (context: QuenchBatchContext) => {
 
             migrator.migrateActor(actor);
 
-            assert.strictEqual(actor.system.level_applies.resonance, true);
-            assert.strictEqual(actor.system.level_applies.attack, true);
-            assert.strictEqual(actor.system.level_applies.sleaze, true);
-            assert.strictEqual(actor.system.level_applies.data_processing, true);
-            assert.strictEqual(actor.system.level_applies.firewall, true);
+            assert.strictEqual(actor.system.attributes.resonance.applies_special, true);
+            assert.strictEqual(actor.system.matrix.attack.applies_special, true);
+            assert.strictEqual(actor.system.matrix.sleaze.applies_special, true);
+            assert.strictEqual(actor.system.matrix.data_processing.applies_special, true);
+            assert.strictEqual(actor.system.matrix.firewall.applies_special, true);
 
             assert.strictEqual(actor.system.attributes.resonance.base, 0);
             assert.strictEqual(actor.system.matrix.attack.base, 0);
@@ -658,14 +658,14 @@ export const Migrators = (context: QuenchBatchContext) => {
             const migrator = new Version0_34_0();
             const actor = createSprite('custom_unknown_type', 4);
             actor.system.level = 4;
-            actor.system.level_applies.attack = false;
+            actor.system.matrix.attack.applies_special = false;
             actor.system.matrix.attack.base = 7;
             actor.system.modifiers.matrix_initiative = 2;
             actor.items.push(createSkillItem('Computer', 3));
 
             migrator.migrateActor(actor);
 
-            assert.strictEqual(actor.system.level_applies.attack, false);
+            assert.strictEqual(actor.system.matrix.attack.applies_special, false);
             assert.strictEqual(actor.system.matrix.attack.base, 7);
             assert.strictEqual(actor.system.initiative.matrix.formula.constant, 2);
 

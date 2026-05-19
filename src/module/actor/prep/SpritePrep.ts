@@ -15,8 +15,6 @@ import { SR5 } from '@/module/config';
 export class SpritePrep {
     static prepareBaseData(system: Actor.SystemOfType<'sprite'>) {
         ModifiableFieldPrep.resetAllModifiers(system);
-
-        SpritePrep.prepareSpriteSpecial(system);
     }
 
     static prepareDerivedData(system: Actor.SystemOfType<'sprite'>, items: SR5Item[]) {
@@ -38,30 +36,25 @@ export class SpritePrep {
         InitiativePrep.prepareInit('sprite', system);
     }
 
-    static prepareSpriteSpecial(system: Actor.SystemOfType<'sprite'>) {
-        // Sprites are always awakened
-        // system.special = 'resonance';
-    }
-
     static getSpriteLevel(system: Actor.SystemOfType<'sprite'>): number {
         return ModifiableValue.calcTotal(system.attributes.level, { min: 1 });
     }
 
     static prepareSpriteAttributes(system: Actor.SystemOfType<'sprite'>, level: number) {
-        const { attributes, level_applies } = system;
-        if (level_applies.resonance)
+        const { attributes } = system;
+        if (attributes.resonance.applies_special)
             ModifiableValue.addUniqueBase(attributes.resonance, 'SR5.Level', level);
         ModifiableValue.calcTotal(attributes.resonance);
     }
 
     static prepareSpriteMatrixAttributes(system: Actor.SystemOfType<'sprite'>, level: number) {
-        const { matrix, level_applies } = system;
+        const { matrix } = system;
 
         const matrixAtts = ['attack', 'sleaze', 'data_processing', 'firewall'] as const;
 
         matrixAtts.forEach((att) => {
             if (!matrix[att]) return;
-            if (level_applies[att])
+            if (matrix[att].applies_special)
                 ModifiableValue.addUniqueBase(matrix[att], 'SR5.Level', level);
             ModifiableValue.calcTotal(matrix[att]);
         });

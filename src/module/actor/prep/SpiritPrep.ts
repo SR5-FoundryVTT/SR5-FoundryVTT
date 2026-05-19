@@ -45,11 +45,10 @@ export class SpiritPrep {
     }
 
     static prepareSpiritAttributes(system: Actor.SystemOfType<'spirit'>, force: number) {
-        const { attributes, force_applies } = system;
+        const { attributes } = system;
 
-        for (const [attributeId, attribute] of Object.entries(attributes)) {
-            if (!force_applies[attributeId]) continue;
-            if (!attribute) continue;
+        for (const attribute of Object.values(attributes)) {
+            if (!attribute?.applies_special) continue;
 
             ModifiableValue.addUniqueBase(attribute, 'SR5.Force', force);
         }

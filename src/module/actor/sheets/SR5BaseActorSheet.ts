@@ -1800,8 +1800,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const attributeId = event.target.closest<HTMLElement>('[data-attribute-id]')?.dataset.attributeId;
         if (!attributeId || attributeId === 'force') return;
 
-        const enabled = this.actor.system.force_applies[attributeId];
-        await this.actor.update({ system: { force_applies: { [attributeId]: !enabled } } });
+        const enabled = !!this.actor.system.attributes[attributeId]?.applies_special;
+        await this.actor.update({ system: { attributes: { [attributeId]: { applies_special: !enabled } } } });
     }
 
     static async #toggleSpriteLevelAttribute(this: SR5BaseActorSheet, event: PointerEvent) {
@@ -1817,8 +1817,14 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const isSpriteLevelAttribute = ['resonance', 'attack', 'sleaze', 'data_processing', 'firewall'].includes(attributeId);
         if (!isSpriteLevelAttribute) return;
 
-        const enabled = this.actor.system.level_applies[attributeId];
-        await this.actor.update({ system: { level_applies: { [attributeId]: !enabled } } });
+        if (attributeId === 'resonance') {
+            const enabled = !!this.actor.system.attributes.resonance.applies_special;
+            await this.actor.update({ system: { attributes: { resonance: { applies_special: !enabled } } } });
+            return;
+        }
+
+        const enabled = !!this.actor.system.matrix[attributeId]?.applies_special;
+        await this.actor.update({ system: { matrix: { [attributeId]: { applies_special: !enabled } } } });
     }
 
     /**

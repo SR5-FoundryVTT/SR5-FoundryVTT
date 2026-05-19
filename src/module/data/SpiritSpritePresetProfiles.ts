@@ -467,19 +467,6 @@ export const PRESET_SPIRIT_PROFILES: Record<string, SpiritProfileData> = {
     },
 } as const;
 
-export const DEFAULT_FORCE_APPLIES: Record<SpiritAttributeId, boolean> = {
-    body: true,
-    agility: true,
-    reaction: true,
-    strength: true,
-    willpower: true,
-    logic: true,
-    intuition: true,
-    charisma: true,
-    magic: true,
-    essence: true,
-} as const;
-
 export const PRESET_SPRITE_PROFILES: Record<string, SpriteProfileData> = {
     courier: {
         offsets: { sleaze: 3, data_processing: 1, firewall: 2 },
@@ -517,16 +504,7 @@ export const PRESET_SPRITE_PROFILES: Record<string, SpriteProfileData> = {
     },
 };
 
-export const DEFAULT_LEVEL_APPLIES: Record<SpriteAttributeId, boolean> = {
-    resonance: true,
-    attack: true,
-    sleaze: true,
-    data_processing: true,
-    firewall: true,
-};
-
 export const SPRITE_MATRIX_ATTRIBUTE_IDS = ['attack', 'sleaze', 'data_processing', 'firewall'] as const;
-
 
 const normalizeMetatypeProfileKey = (value: string): string => value
     .toLowerCase()

@@ -67,25 +67,13 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
             const spirit = await factory.createActor({
                 type: 'spirit',
                 system: {
-                    force_applies: {
-                        body: false,
-                        agility: false,
-                        reaction: false,
-                        strength: false,
-                        willpower: true,
-                        logic: true,
-                        intuition: true,
-                        charisma: true,
-                        magic: true,
-                        essence: true
-                    },
                     attributes: {
                         force: { base: 6 },
-                        body: { base: 3 },
-                        agility: { base: 2 },
-                        reaction: { base: 1 },
-                        strength: { base: 4 },
-                        willpower: { base: 1 }
+                        body: { base: 3, applies_special: false },
+                        agility: { base: 2, applies_special: false },
+                        reaction: { base: 1, applies_special: false },
+                        strength: { base: 4, applies_special: false },
+                        willpower: { base: 1, applies_special: true }
                     }
                 }
             });

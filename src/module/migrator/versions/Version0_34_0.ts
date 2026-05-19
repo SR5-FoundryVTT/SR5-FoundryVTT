@@ -1,8 +1,6 @@
 import { SR } from '@/module/constants';
 import { VersionMigration } from '../VersionMigration';
 import {
-    DEFAULT_FORCE_APPLIES,
-    DEFAULT_LEVEL_APPLIES,
     PRESET_INITIATIVE_DEFAULTS,
     PRESET_SPIRIT_PROFILES,
     PRESET_SPRITE_PROFILES,
@@ -112,11 +110,13 @@ export class Version0_34_0 extends VersionMigration {
         if (!profile) return;
         system.spiritType = humanizePresetTypeKey(spiritType);
 
-        system.force_applies = this.buildToggleMap(DEFAULT_FORCE_APPLIES, profile.forceOff);
+        const forceOff = new Set(profile.forceOff ?? []);
 
         const offsets = profile.attributes ?? {};
         for (const attributeId of SPIRIT_ATTRIBUTE_IDS) {
-            if (!system.force_applies[attributeId]) continue;
+            const appliesSpecial = !forceOff.has(attributeId);
+            setProperty(system, `attributes.${attributeId}.applies_special`, appliesSpecial);
+            if (!appliesSpecial) continue;
 
             setProperty(system, `attributes.${attributeId}.base`, offsets[attributeId] ?? 0);
         }
@@ -127,16 +127,6 @@ export class Version0_34_0 extends VersionMigration {
         system.half_value_skill = profile.halfValueSkill ?? false;
         this.migrateSpiritInitiative(system, profile.initiative);
         this.migrateSkillToggles(actor, profile.skills ?? []);
-    }
-
-    private buildToggleMap<T extends string>(
-        defaults: Readonly<Record<T, boolean>>,
-        disabled: readonly T[] | undefined,
-    ): Record<T, boolean> {
-        const toggles: Record<T, boolean> = { ...defaults };
-        for (const key of disabled ?? [])
-            toggles[key] = false;
-        return toggles;
     }
 
     private migrateSpiritInitiative(system: any, initiative: Partial<SpiritProfileInitiative> | undefined) {
@@ -163,22 +153,24 @@ export class Version0_34_0 extends VersionMigration {
         system.spriteType = humanizePresetTypeKey(spriteType);
 
         this.migrateSkillToggles(actor, profile.skills);
-        this.migrateSpriteLevelApplies(system, profile.levelOff);
-        this.migrateSpriteAttributeOffsets(system, profile.offsets ?? {});
+        this.migrateSpriteAttributeOffsets(system, profile.offsets ?? {}, profile.levelOff);
 
         setProperty(system, 'initiative.matrix.formula.attribute_a', 'level');
         setProperty(system, 'initiative.matrix.formula.attribute_b', 'level');
         setProperty(system, 'initiative.matrix.formula.constant', profile.init ?? 0);
     }
 
-    private migrateSpriteLevelApplies(system: any, levelOff: SpriteAttributeId[] | undefined) {
-        setProperty(system, 'level_applies', this.buildToggleMap(DEFAULT_LEVEL_APPLIES, levelOff));
-    }
-
-    private migrateSpriteAttributeOffsets(system: any, offsets: Partial<Record<SpriteAttributeId, number>>) {
+    private migrateSpriteAttributeOffsets(
+        system: any,
+        offsets: Partial<Record<SpriteAttributeId, number>>,
+        levelOff: SpriteAttributeId[] | undefined = [],
+    ) {
+        const levelOffSet = new Set(levelOff);
+        setProperty(system, 'attributes.resonance.applies_special', !levelOffSet.has('resonance'));
         setProperty(system, 'attributes.resonance.base', offsets.resonance ?? 0);
 
         for (const attributeId of SPRITE_MATRIX_ATTRIBUTE_IDS) {
+            setProperty(system, `matrix.${attributeId}.applies_special`, !levelOffSet.has(attributeId));
             setProperty(system, `matrix.${attributeId}.base`, offsets[attributeId] ?? 0);
         }
     }

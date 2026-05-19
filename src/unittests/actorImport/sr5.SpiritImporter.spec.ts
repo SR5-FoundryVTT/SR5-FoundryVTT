@@ -38,29 +38,17 @@ export const spiritImporterTesting = (context: QuenchBatchContext) => {
                 type: 'spirit',
                 system: {
                     spiritType: 'fire_template',
-                    force_applies: {
-                        body: true,
-                        agility: true,
-                        reaction: true,
-                        strength: true,
-                        willpower: true,
-                        logic: true,
-                        intuition: true,
-                        charisma: true,
-                        magic: true,
-                        essence: true,
-                    },
                     attributes: {
-                        body: { base: 1 },
-                        agility: { base: 2 },
-                        reaction: { base: 3 },
-                        strength: { base: -2 },
-                        willpower: { base: 0 },
-                        logic: { base: 0 },
-                        intuition: { base: 1 },
-                        charisma: { base: 0 },
-                        magic: { base: 0 },
-                        essence: { base: -2 },
+                        body: { base: 1, applies_special: true },
+                        agility: { base: 2, applies_special: true },
+                        reaction: { base: 3, applies_special: true },
+                        strength: { base: -2, applies_special: true },
+                        willpower: { base: 0, applies_special: true },
+                        logic: { base: 0, applies_special: true },
+                        intuition: { base: 1, applies_special: true },
+                        charisma: { base: 0, applies_special: true },
+                        magic: { base: 0, applies_special: true },
+                        essence: { base: -2, applies_special: true },
                     }
                 }
             });
@@ -78,8 +66,8 @@ export const spiritImporterTesting = (context: QuenchBatchContext) => {
 
             assert.strictEqual(fallbackSpirit!.system.spiritType, 'Fire');
             assert.strictEqual(fallbackSpirit!.system.half_value_skill, false);
-            assert.strictEqual(fallbackSpirit!.system.force_applies.body, true);
-            assert.strictEqual(fallbackSpirit!.system.force_applies.magic, true);
+            assert.strictEqual(fallbackSpirit!.system.attributes.body.applies_special, true);
+            assert.strictEqual(fallbackSpirit!.system.attributes.magic.applies_special, true);
             assert.strictEqual(fallbackSpirit!.system.attributes.body.base, 1);
             assert.strictEqual(fallbackSpirit!.system.attributes.agility.base, 2);
             assert.strictEqual(fallbackSpirit!.system.attributes.reaction.base, 3);
@@ -129,4 +117,3 @@ export const spiritImporterTesting = (context: QuenchBatchContext) => {
         });
     });
 };
-

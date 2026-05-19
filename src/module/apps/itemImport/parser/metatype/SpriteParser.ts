@@ -28,7 +28,11 @@ export class SpriteParser extends MetatypeParserBase<'sprite'> {
             const value = jsonData[metatypeAttributeId]._TEXT;
             const parsed = this.parseLevelOffsetValue(value);
 
-            system.level_applies[attributeId] = parsed.levelApplies;
+            if (attributeId === 'resonance')
+                system.attributes.resonance.applies_special = parsed.levelApplies;
+            else
+                system.matrix[attributeId].applies_special = parsed.levelApplies;
+
             if (attributeId === 'resonance')
                 system.attributes.resonance.base = parsed.base;
             else

@@ -38,21 +38,14 @@ export const spriteImporterTesting = (context: QuenchBatchContext) => {
                 type: 'sprite',
                 system: {
                     spriteType: 'companion_template',
-                    level_applies: {
-                        resonance: true,
-                        attack: true,
-                        sleaze: true,
-                        data_processing: true,
-                        firewall: true,
-                    },
                     attributes: {
-                        resonance: { base: 1 },
+                        resonance: { base: 1, applies_special: true },
                     },
                     matrix: {
-                        attack: { base: -1 },
-                        sleaze: { base: 2 },
-                        data_processing: { base: 1 },
-                        firewall: { base: 0 },
+                        attack: { base: -1, applies_special: true },
+                        sleaze: { base: 2, applies_special: true },
+                        data_processing: { base: 1, applies_special: true },
+                        firewall: { base: 0, applies_special: true },
                     }
                 }
             });
@@ -64,7 +57,7 @@ export const spriteImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(sprite!.system.attributes.level.base, 2);
             assert.strictEqual(sprite!.system.attributes.level.value, 2);
             assert.strictEqual(sprite!.system.attributes.edge.base, 1);
-            assert.strictEqual(sprite!.system.level_applies.sleaze, true);
+            assert.strictEqual(sprite!.system.matrix.sleaze.applies_special, true);
             assert.strictEqual(sprite!.system.matrix.sleaze.base, 2);
         });
 
@@ -74,11 +67,11 @@ export const spriteImporterTesting = (context: QuenchBatchContext) => {
             factory.actors.push(fallbackSprite as Actor.Stored<'sprite'>);
 
             assert.strictEqual(fallbackSprite!.system.spriteType, 'Companion');
-            assert.strictEqual(fallbackSprite!.system.level_applies.resonance, true);
-            assert.strictEqual(fallbackSprite!.system.level_applies.attack, true);
-            assert.strictEqual(fallbackSprite!.system.level_applies.sleaze, true);
-            assert.strictEqual(fallbackSprite!.system.level_applies.data_processing, true);
-            assert.strictEqual(fallbackSprite!.system.level_applies.firewall, true);
+            assert.strictEqual(fallbackSprite!.system.attributes.resonance.applies_special, true);
+            assert.strictEqual(fallbackSprite!.system.matrix.attack.applies_special, true);
+            assert.strictEqual(fallbackSprite!.system.matrix.sleaze.applies_special, true);
+            assert.strictEqual(fallbackSprite!.system.matrix.data_processing.applies_special, true);
+            assert.strictEqual(fallbackSprite!.system.matrix.firewall.applies_special, true);
             assert.strictEqual(fallbackSprite!.system.attributes.resonance.base, 0);
             assert.strictEqual(fallbackSprite!.system.matrix.attack.base, -1);
             assert.strictEqual(fallbackSprite!.system.matrix.sleaze.base, 1);
@@ -103,5 +96,4 @@ export const spriteImporterTesting = (context: QuenchBatchContext) => {
         });
     });
 };
-
 

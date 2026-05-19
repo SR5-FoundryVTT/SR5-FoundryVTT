@@ -4,7 +4,6 @@ import { ImportOptionsType } from "../characterImporter/CharacterImporter";
 import { ActorSkillImport } from "../ActorSkillImport";
 import { ActorImportUtil, type BlankImportedActor } from "../ActorImportUtil";
 import {
-    DEFAULT_LEVEL_APPLIES,
     PRESET_SPRITE_PROFILES,
     SPRITE_MATRIX_ATTRIBUTE_IDS,
     humanizePresetTypeKey,
@@ -20,7 +19,7 @@ export class SpriteImporter {
     private static inferLevel(chummerData: ActorSchema, sprite: BlankSprite): number {
         const intTotal = ActorImportUtil.getChummerAttributeTotal(chummerData, 'int');
         const sleazeBase = Number(sprite.system.matrix.sleaze.base) || 0;
-        const level = sprite.system.level_applies.sleaze ? (intTotal ?? 0) - sleazeBase : (intTotal ?? 0);
+        const level = sprite.system.matrix.sleaze.applies_special ? (intTotal ?? 0) - sleazeBase : (intTotal ?? 0);
 
         return Math.max(1, level);
     }
@@ -59,12 +58,16 @@ export class SpriteImporter {
         return this.importFromSeed(chummerData, importOptions, (sprite) => {
             sprite.system.spriteType = spriteTemplate.system.spriteType;
             sprite.system.skillset = spriteTemplate.system.skillset;
-            sprite.system.level_applies = foundry.utils.deepClone(spriteTemplate.system.level_applies);
+            sprite.system.attributes.resonance.applies_special = !!spriteTemplate.system.attributes.resonance.applies_special;
             sprite.system.attributes.resonance.base = Number(spriteTemplate.system.attributes.resonance.base) || 0;
             sprite.system.matrix.attack.base = Number(spriteTemplate.system.matrix.attack.base) || 0;
             sprite.system.matrix.sleaze.base = Number(spriteTemplate.system.matrix.sleaze.base) || 0;
             sprite.system.matrix.data_processing.base = Number(spriteTemplate.system.matrix.data_processing.base) || 0;
             sprite.system.matrix.firewall.base = Number(spriteTemplate.system.matrix.firewall.base) || 0;
+            sprite.system.matrix.attack.applies_special = !!spriteTemplate.system.matrix.attack.applies_special;
+            sprite.system.matrix.sleaze.applies_special = !!spriteTemplate.system.matrix.sleaze.applies_special;
+            sprite.system.matrix.data_processing.applies_special = !!spriteTemplate.system.matrix.data_processing.applies_special;
+            sprite.system.matrix.firewall.applies_special = !!spriteTemplate.system.matrix.firewall.applies_special;
             sprite.system.initiative.matrix.formula = foundry.utils.deepClone(spriteTemplate.system.initiative.matrix.formula);
         });
     }
@@ -80,11 +83,14 @@ export class SpriteImporter {
 
         return this.importFromSeed(chummerData, importOptions, (sprite) => {
             sprite.system.spriteType = humanizePresetTypeKey(spriteTypeKey);
-            sprite.system.level_applies = ActorImportUtil.buildToggleMap(DEFAULT_LEVEL_APPLIES, profile.levelOff);
+            const levelOff = new Set(profile.levelOff ?? []);
+            sprite.system.attributes.resonance.applies_special = !levelOff.has('resonance');
             sprite.system.attributes.resonance.base = profile.offsets?.resonance ?? 0;
 
-            for (const attributeId of SPRITE_MATRIX_ATTRIBUTE_IDS)
+            for (const attributeId of SPRITE_MATRIX_ATTRIBUTE_IDS) {
+                sprite.system.matrix[attributeId].applies_special = !levelOff.has(attributeId);
                 sprite.system.matrix[attributeId].base = profile.offsets?.[attributeId] ?? 0;
+            }
 
             sprite.system.initiative.matrix.formula.constant += profile.init ?? 0;
         });

@@ -26,20 +26,8 @@ const SpiritData = () => ({
 
     // === Attributes & Limits ===
     attributes: new SchemaField({
-        ...Attributes(),
+        ...Attributes({ isSpirit: true }),
         force: new ModifiableField(AttributeField()),
-    }),
-    force_applies: new SchemaField({
-        body: new BooleanField({ initial: true }),
-        agility: new BooleanField({ initial: true }),
-        reaction: new BooleanField({ initial: true }),
-        strength: new BooleanField({ initial: true }),
-        willpower: new BooleanField({ initial: true }),
-        logic: new BooleanField({ initial: true }),
-        intuition: new BooleanField({ initial: true }),
-        charisma: new BooleanField({ initial: true }),
-        magic: new BooleanField({ initial: true }),
-        essence: new BooleanField({ initial: true }),
     }),
     limits: new SchemaField({ ...Limits(), ...AwakendLimits() }),
     values: new SchemaField(PhysicalCombatValues()),

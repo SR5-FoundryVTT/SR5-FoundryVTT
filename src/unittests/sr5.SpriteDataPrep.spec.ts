@@ -59,17 +59,10 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
                 system: {
                     attributes: { level: { base: 6 }, resonance: { base: 2 } },
                     matrix: {
-                        attack: { base: 1 },
-                        sleaze: { base: 3 },
-                        data_processing: { base: -1 },
-                        firewall: { base: 0 },
-                    },
-                    level_applies: {
-                        resonance: true,
-                        attack: false,
-                        sleaze: true,
-                        data_processing: true,
-                        firewall: false,
+                        attack: { base: 1, applies_special: false },
+                        sleaze: { base: 3, applies_special: true },
+                        data_processing: { base: -1, applies_special: true },
+                        firewall: { base: 0, applies_special: false },
                     }
                 }
             });

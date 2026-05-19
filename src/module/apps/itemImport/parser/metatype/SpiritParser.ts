@@ -58,7 +58,7 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
             const value = jsonData[metatypeAttributeId]._TEXT;
             const parsed = this.parseForceOffsetValue(value);
 
-            system.force_applies[attributeId] = parsed.forceApplies;
+            system.attributes[attributeId].applies_special = parsed.forceApplies;
             system.attributes[attributeId].base = parsed.base;
         }
     }

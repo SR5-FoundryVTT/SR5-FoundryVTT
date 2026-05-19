@@ -14,20 +14,14 @@ const SpriteData = () => ({
     attributes: new SchemaField({
         ...Attributes(),
         ...MatrixActorAttributes(),
+        resonance: new ModifiableField(AttributeField({ limit: "mental", appliesSpecial: true })),
         level: new ModifiableField(AttributeField()),
     }),
     spriteType: new StringField({ required: true }),
-    level_applies: new SchemaField({
-        resonance: new BooleanField({ initial: true }),
-        attack: new BooleanField({ initial: true }),
-        sleaze: new BooleanField({ initial: true }),
-        data_processing: new BooleanField({ initial: true }),
-        firewall: new BooleanField({ initial: true }),
-    }),
     special: new StringField({ required: true, initial: "resonance", choices: ["resonance"], readonly: true }),
 
     // === Matrix & Host ===
-    matrix: new SchemaField(MatrixData()),
+    matrix: new SchemaField(MatrixData({ isSprite: true })),
 
     // === Summoning & Binding ===
     services: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
