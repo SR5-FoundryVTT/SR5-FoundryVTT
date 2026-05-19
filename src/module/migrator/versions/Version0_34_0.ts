@@ -61,10 +61,6 @@ export class Version0_34_0 extends VersionMigration {
         }
     }
 
-    override handlesActiveEffect(effect: Readonly<any>) {
-        return (effect.changes as any[]).some(change => (change.key as string).includes('system.armor'));
-    }
-
     override migrateActiveEffect(effect: { changes: { key: string }[] }): void {
         const armorKeyMap: Record<string, string> = {
             'system.armor': 'system.armor.rating',
@@ -76,11 +72,12 @@ export class Version0_34_0 extends VersionMigration {
             'system.armor.electricity': 'system.armor.elements.electricity',
             'system.armor.fire': 'system.armor.elements.fire',
             'system.armor.radiation': 'system.armor.elements.radiation',
+
+            // legacy migration key, because we didn't update change.value before (0.31.5)
+            'system.force': 'system.attributes.force',
         };
 
-        for (const change of effect.changes) {
-            change.key = armorKeyMap[change.key] ?? change.key;
-        }
+        this.migrateEffectChanges(effect, armorKeyMap);
     }
 
     override migrateActor(actor: any): void {
