@@ -212,9 +212,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
         // Switch item data preparation between types...
         // ... this is ongoing work to clean up SR5item.prepareData
-        if (this.isType('armor')) {
+        if ('armor' in this.system)
             ArmorPrep.prepareData(this, equippedMods);
-        } else if (this.isType('host'))
+
+        if (this.isType('host'))
             HostPrep.prepareBaseData(this.system);
         else if (this.isType('adept_power'))
             AdeptPowerPrep.prepareBaseData(this.system);

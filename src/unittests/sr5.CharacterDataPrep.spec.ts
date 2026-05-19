@@ -139,6 +139,43 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(character.system.armor.hardened.value, 9);
         });
 
+        it('uses armor base fields from non-armor equipped items when value fields are not prepared', async () => {
+            const character = await factory.createActor({ type: 'character' });
+            await character.createEmbeddedDocuments('Item', [{
+                type: 'cyberware',
+                name: 'Dermal Plating',
+                system: {
+                    armor: {
+                        base: 2,
+                        value: 0,
+                        is_hardened: false,
+                        hardened: 0,
+                        accessory: true,
+                        elements: {
+                            acid: { base: 0, value: 0 },
+                            cold: { base: 0, value: 0 },
+                            electricity: { base: 0, value: 0 },
+                            fire: { base: 3, value: 0 },
+                            pollutant: { base: 0, value: 0 },
+                            radiation: { base: 0, value: 0 },
+                            water: { base: 0, value: 0 },
+                        },
+                        immunities: {
+                            base: ['fire'],
+                            value: [],
+                        },
+                    },
+                    technology: {
+                        equipped: true,
+                    },
+                }
+            }]);
+
+            assert.strictEqual(character.system.armor.rating.value, 2);
+            assert.strictEqual(character.system.armor.elements.fire.value, 3);
+            assert.strictEqual(character.system.armor.immunities.fire.value, 12);
+        });
+
         it('monitor calculation', async () => {
             const character = await factory.createActor({
                 type: 'character',

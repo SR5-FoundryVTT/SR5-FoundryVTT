@@ -811,38 +811,20 @@
             {{/if}}
 
             {{#if systemFields.capacity}}
-                {{#if (isType item 'armor')}}
-                    {{#if @root.isEditMode}}
-                        <span class="basic-row">
-                            <label data-tooltip="{{systemFields.capacity.label}}">
-                                <i class="fas fa-toolbox"></i>
-                            </label>
-                            <span>
-                                {{formInput systemFields.capacity.fields.total value=source.system.capacity.total
-                                            classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
-                            </span>
-                        </span>
-                    {{else}}
+                {{#if @root.isEditMode}}
+                    <span class="basic-row">
                         <label data-tooltip="{{systemFields.capacity.label}}">
-                            <i class="fas fa-toolbox"></i>&nbsp;{{system.capacity.used}} / {{system.capacity.total}}
+                            <i class="fas fa-toolbox"></i>
                         </label>
-                    {{/if}}
-                {{else}}
-                    {{#if @root.isEditMode}}
-                        <span class="basic-row" data-tooltip="{{systemFields.capacity.label}}:&nbsp;{{systemFields.capacity.hint}}">
-                            <label>
-                                <i class="fas fa-toolbox"></i>
-                            </label>
-                            <span>
-                                {{formInput systemFields.capacity value=source.system.capacity
-                                            classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
-                            </span>
+                        <span>
+                            {{formInput systemFields.capacity.fields.total value=source.system.capacity.total
+                                        classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </span>
-                    {{else if system.capacity}}
-                        <label data-tooltip="{{systemFields.capacity.label}}:&nbsp;{{systemFields.capacity.hint}}">
-                            <i class="fas fa-toolbox"></i>&nbsp;{{system.capacity}}
-                        </label>
-                    {{/if}}
+                    </span>
+                {{else}}
+                    <label data-tooltip="{{systemFields.capacity.label}}">
+                        <i class="fas fa-toolbox"></i>&nbsp;{{system.capacity.used}} / {{system.capacity.total}}
+                    </label>
                 {{/if}}
             {{/if}}
         {{/unless}}

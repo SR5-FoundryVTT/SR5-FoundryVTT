@@ -12,7 +12,7 @@ export class Version0_34_0 extends VersionMigration {
     readonly TargetVersion = "0.34.0";
 
     override handlesItem(item: Readonly<any>): boolean {
-        return item.system?.armor !== undefined || item.type === 'modification' || item.type === 'skill';
+        return item.system?.armor !== undefined || item.type === 'modification' || item.type === 'skill' || item.type === 'bioware' || item.type === 'cyberware';
     }
 
     override migrateItem(item: any): void {
@@ -58,6 +58,15 @@ export class Version0_34_0 extends VersionMigration {
                     delete item.system[legacyKey];
                 }
             }
+        }
+
+        if ((item.type === 'bioware' || item.type === 'cyberware') && item.system !== undefined) {
+            const oldCapacity = getProperty(item.system, 'capacity');
+
+            // Remove the legacy numeric "capacity" before setting the new object structure,
+            // otherwise code that checks `in` will fail on a number.
+            delete item.system.capacity;
+            setProperty(item.system, 'capacity.total', oldCapacity);
         }
     }
 
