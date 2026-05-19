@@ -16,10 +16,7 @@ const SpriteData = () => ({
         ...MatrixActorAttributes(),
         level: new ModifiableField(AttributeField()),
     }),
-    spriteType: new StringField({
-        required: true,
-        initial: 'data',
-    }),
+    spriteType: new StringField({ required: true }),
     level_applies: new SchemaField({
         resonance: new BooleanField({ initial: true }),
         attack: new BooleanField({ initial: true }),

@@ -14,10 +14,7 @@ const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fie
 const SpiritData = () => ({
     // === Core Identity ===
     ...CommonData(),
-    spiritType: new StringField({
-        required: true,
-        initial: 'air',
-    }),
+    spiritType: new StringField({ required: true }),
     full_defense_attribute: new StringField({
         required: true,
         initial: "willpower",
