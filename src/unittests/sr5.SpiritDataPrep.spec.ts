@@ -126,18 +126,22 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
                         reaction: { base: 1 },
                         intuition: { base: 1 }
                     },
-                    initiative_formulae: {
+                    initiative: {
                         meatspace: {
-                            attribute_a: 'force',
-                            attribute_b: '',
-                            constant: 3,
-                            dice: 4
+                            formula: {
+                                attribute_a: 'force',
+                                attribute_b: '',
+                                constant: 3,
+                                dice: 4
+                            }
                         },
                         astral: {
-                            attribute_a: '',
-                            attribute_b: '',
-                            constant: 5,
-                            dice: 1
+                            formula: {
+                                attribute_a: '',
+                                attribute_b: '',
+                                constant: 5,
+                                dice: 1
+                            }
                         }
                     }
                 }
@@ -153,20 +157,16 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
             const spirit = await factory.createActor({
                 type: 'spirit',
                 system: {
-                    initiative_formulae: {
-                        meatspace: { dice: 7 },
-                        astral: { dice: 4 }
-                    },
-                    modifiers: {
-                        meat_initiative_dice: 2,
-                        astral_initiative_dice: 3
+                    initiative: {
+                        meatspace: { formula: { dice: 7 } },
+                        astral: { formula: { dice: 6 } }
                     }
                 }
             });
 
             assert.strictEqual(spirit.system.initiative.meatspace.dice.base, 5);
             assert.strictEqual(spirit.system.initiative.meatspace.dice.value, 5);
-            assert.strictEqual(spirit.system.initiative.astral.dice.base, 4);
+            assert.strictEqual(spirit.system.initiative.astral.dice.base, 5);
             assert.strictEqual(spirit.system.initiative.astral.dice.value, 5);
         });
 

@@ -70,10 +70,6 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
                         sleaze: true,
                         data_processing: true,
                         firewall: false,
-                    },
-                    modifiers: {
-                        matrix_initiative: 2,
-                        matrix_initiative_dice: 1,
                     }
                 }
             });
@@ -86,9 +82,9 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(sprite.system.matrix.rating, 6);
 
             assert.strictEqual(sprite.system.initiative.matrix.base.base, 12);
-            assert.strictEqual(sprite.system.initiative.matrix.base.value, 14);
+            assert.strictEqual(sprite.system.initiative.matrix.base.value, 12);
             assert.strictEqual(sprite.system.initiative.matrix.dice.base, 4);
-            assert.strictEqual(sprite.system.initiative.matrix.dice.value, 5);
+            assert.strictEqual(sprite.system.initiative.matrix.dice.value, 4);
         });
 
         it('sprite skill toggles apply to active, language, and knowledge skills', async () => {
@@ -145,6 +141,30 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(sprite.system.skills.active.hacking.value, 0);
             assert.strictEqual(languageSkill?.value, 7);
             assert.strictEqual(knowledgeSkill?.value, 7);
+        });
+
+        it('custom matrix initiative formula is honored for sprites', async () => {
+            const sprite = await factory.createActor({
+                type: 'sprite',
+                system: {
+                    attributes: {
+                        level: { base: 6 },
+                    },
+                    initiative: {
+                        matrix: {
+                            formula: {
+                                attribute_a: 'level',
+                                attribute_b: '',
+                                constant: 2,
+                                dice: 1,
+                            },
+                        },
+                    },
+                },
+            });
+
+            assert.strictEqual(sprite.system.initiative.matrix.base.base, 8);
+            assert.strictEqual(sprite.system.initiative.matrix.dice.base, 1);
         });
 
         it('Matrix condition monitor track calculation with modifiers', async () => {

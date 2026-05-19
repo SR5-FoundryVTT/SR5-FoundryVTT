@@ -71,7 +71,10 @@ const VehicleData = () => ({
 
     // === Matrix & Initiative ===
     matrix: new SchemaField(MatrixData()),
-    initiative: new SchemaField(Initiative('meatspace', 'matrix')),
+    initiative: new SchemaField(Initiative({
+        meatspace: { attributeA: 'pilot', attributeB: 'pilot', constant: 0, dice: 4 },
+        matrix: { attributeA: 'intuition', attributeB: 'data_processing', constant: 0, dice: 3 },
+    })),
     full_defense_attribute: new StringField({
         required: true,
         initial: "willpower",
@@ -94,10 +97,6 @@ const VehicleData = () => ({
     modifiers: new SchemaField(CreateModifiers(
         // Limits
         "physical_limit", "astral_limit", "social_limit", "mental_limit",
-        // Initiative
-        "astral_initiative", "astral_initiative_dice",
-        "matrix_initiative", "matrix_initiative_dice",
-        "meat_initiative", "meat_initiative_dice",
         // Tracks
         "stun_track", "matrix_track", "physical_track", "physical_overflow_track",
         // Movement

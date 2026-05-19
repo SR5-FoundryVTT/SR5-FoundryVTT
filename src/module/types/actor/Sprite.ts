@@ -39,7 +39,9 @@ const SpriteData = () => ({
 
     // === Condition & Monitoring ===
     track: new SchemaField(Tracks('matrix')),
-    initiative: new SchemaField(Initiative('matrix')),
+    initiative: new SchemaField(Initiative({
+        matrix: { attributeA: 'level', attributeB: 'level', constant: 0, dice: 4 },
+    })),
     limits: new SchemaField({ ...Limits(), ...MatrixLimits() }),
 
     // === Visibility ===
@@ -49,9 +51,6 @@ const SpriteData = () => ({
     modifiers: new SchemaField(CreateModifiers(
         // Limits
         "physical_limit", "social_limit", "mental_limit",
-        // Initiative
-        "matrix_initiative", "matrix_initiative_dice",
-        "meat_initiative", "meat_initiative_dice",
         // Tracks
         "stun_track", "matrix_track", "physical_track", "physical_overflow_track",
         // Tolerance

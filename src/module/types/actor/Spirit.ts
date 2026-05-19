@@ -11,13 +11,6 @@ import { AttributeField, Attributes } from '../template/Attributes';
 import { CommonData, PhysicalCombatValues, CreateModifiers, MagicData, ActorBase } from "./Common";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
-const InitiativeFormula = (defaults: { attributeA: string; attributeB: string; dice: number }) => ({
-    attribute_a: new StringField({ required: true, initial: defaults.attributeA, blank: true, choices: SR5.attributes }),
-    attribute_b: new StringField({ required: true, initial: defaults.attributeB, blank: true, choices: SR5.attributes }),
-    constant: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
-    dice: new NumberField({ required: true, nullable: false, integer: true, initial: defaults.dice, min: 0, max: 5, step: 1 }),
-});
-
 const SpiritData = () => ({
     // === Core Identity ===
     ...CommonData(),
@@ -59,18 +52,16 @@ const SpiritData = () => ({
 
     // === Combat ===
     armor: new ModifiableField(ActorArmorData()),
-    initiative: new SchemaField(Initiative('astral', 'meatspace')),
+    initiative: new SchemaField(Initiative({
+        astral: { attributeA: 'intuition', attributeB: 'intuition', constant: 0, dice: 3 },
+        meatspace: { attributeA: 'reaction', attributeB: 'intuition', constant: 0, dice: 2 },
+    })),
     wounds: new ModifiableField(ModifiableValueSchema()),
 
     // === Condition & Movement ===
     track: new SchemaField(Tracks('physical', 'stun')),
     movement: new SchemaField(Movement()),
 
-    // === Formulae ===
-    initiative_formulae: new SchemaField({
-        meatspace: new SchemaField(InitiativeFormula({ attributeA: 'reaction', attributeB: 'intuition', dice: 2 })),
-        astral: new SchemaField(InitiativeFormula({ attributeA: 'intuition', attributeB: 'intuition', dice: 3 })),
-    }),
     half_value_skill: new BooleanField({ initial: false }),
 
     // === Summoning ===
@@ -85,10 +76,6 @@ const SpiritData = () => ({
     modifiers: new SchemaField(CreateModifiers(
         // Limits
         "physical_limit", "astral_limit", "social_limit", "mental_limit",
-        // Initiative
-        "astral_initiative", "astral_initiative_dice",
-        "matrix_initiative", "matrix_initiative_dice",
-        "meat_initiative", "meat_initiative_dice",
         // Tracks
         "stun_track", "matrix_track", "physical_track", "physical_overflow_track",
         // Movement
@@ -113,5 +100,3 @@ export class Spirit extends ActorBase<ReturnType<typeof SpiritData>> {
 }
 
 console.log("SpiritData", SpiritData(), new Spirit());
-
-export type InitiativeFormulaType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof InitiativeFormula>>;

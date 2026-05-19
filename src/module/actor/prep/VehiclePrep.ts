@@ -38,9 +38,7 @@ export class VehiclePrep {
 
         VehiclePrep.prepareMovement(system);
 
-        VehiclePrep.prepareMeatspaceInit(system);
-        InitiativePrep.prepareMatrixInit(system);
-        InitiativePrep.prepareCurrentInitiative(system);
+        InitiativePrep.prepareInit('vehicle', system);
 
         VehiclePrep.prepareArmor(system);
         CharacterPrep.prepareRecoil(system);
@@ -174,20 +172,6 @@ export class VehiclePrep {
 
         movement.run.base = 10 * Math.pow(2, speedTotal - 1);
         movement.run.value = ModifiableValue.calcTotal(movement.run as ModifiableValueType, {min: 0});
-    }
-
-    static prepareMeatspaceInit(system: Actor.SystemOfType<'vehicle'>) {
-        const { vehicle_stats, initiative, modifiers } = system;
-
-        const pilot = ModifiableValue.calcTotal(vehicle_stats.pilot);
-
-        initiative.meatspace.base.base = pilot * 2;
-        ModifiableValue.addUnique(initiative.meatspace.base, "SR5.Bonus", modifiers.meat_initiative);
-        initiative.meatspace.dice.base = 4;
-        ModifiableValue.addUnique(initiative.meatspace.dice, "SR5.Bonus", modifiers.meat_initiative_dice);
-
-        ModifiableValue.calcTotal(initiative.meatspace.base);
-        ModifiableValue.calcTotal(initiative.meatspace.dice);
     }
 
     static prepareArmor(system: Actor.SystemOfType<'vehicle'>) {

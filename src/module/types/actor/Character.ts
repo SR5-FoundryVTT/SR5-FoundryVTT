@@ -52,7 +52,11 @@ const CharacterData = () => ({
 
     // === Combat ===
     armor: new ModifiableField(ActorArmorData()),
-    initiative: new SchemaField(Initiative('meatspace', 'astral', 'matrix')),
+    initiative: new SchemaField(Initiative({
+        meatspace: { attributeA: 'reaction', attributeB: 'intuition', constant: 0, dice: 1 },
+        astral: { attributeA: 'intuition', attributeB: 'intuition', constant: 0, dice: 2 },
+        matrix: { attributeA: 'intuition', attributeB: 'data_processing', constant: 0, dice: 3 },
+    })),
     values: new SchemaField(CharacterValues()),
     wounds: new ModifiableField(ModifiableValueSchema()),
 
@@ -85,10 +89,6 @@ const CharacterData = () => ({
     modifiers: new SchemaField(CreateModifiers(
         // Limits
         "physical_limit", "astral_limit", "social_limit", "mental_limit",
-        // Initiative
-        "astral_initiative", "astral_initiative_dice",
-        "matrix_initiative", "matrix_initiative_dice",
-        "meat_initiative", "meat_initiative_dice",
         // Tracks
         "stun_track", "matrix_track", "physical_track", "physical_overflow_track",
         // Movement

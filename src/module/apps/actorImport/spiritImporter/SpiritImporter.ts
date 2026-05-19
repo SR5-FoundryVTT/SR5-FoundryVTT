@@ -12,14 +12,17 @@ import {
     humanizePresetTypeKey,
     normalizeSpiritTypeForPreset,
 } from "@/module/data/SpiritSpritePresetProfiles";
-import { InitiativeFormulaType } from "@/module/types/actor/Spirit";
 
 export type BlankSpirit = BlankImportedActor<'spirit'>;
 
 export class SpiritImporter {
-    private static initFormulaBuild(multiplier: number, constant: number, dice: number): InitiativeFormulaType {
-        const [attribute_a, attribute_b] = multiplier >= 2 ? ['force', 'force'] : multiplier === 1 ? ['', 'force'] : ['', ''];
-        return { attribute_a, attribute_b, constant, dice } as InitiativeFormulaType;
+    private static initFormulaBuild(multiplier: number, constant: number, dice: number) {
+        return {
+            attribute_a: multiplier >= 2 ? 'force' : '',
+            attribute_b: multiplier >= 1 ? 'force' : '',
+            constant,
+            dice
+        } as const;
     }
 
     private static applyProfileInitiativeFormulae(
@@ -28,8 +31,8 @@ export class SpiritImporter {
     ) {
         const profile: SpiritProfileInitiative = { ...PRESET_INITIATIVE_DEFAULTS, ...initiative };
 
-        spirit.system.initiative_formulae.meatspace = this.initFormulaBuild(profile.init_mult, profile.init, profile.init_dice);
-        spirit.system.initiative_formulae.astral = this.initFormulaBuild(profile.astral_init_mult, profile.astral_init, profile.astral_init_dice);
+        spirit.system.initiative.meatspace.formula = this.initFormulaBuild(profile.init_mult, profile.init, profile.init_dice);
+        spirit.system.initiative.astral.formula = this.initFormulaBuild(profile.astral_init_mult, profile.astral_init, profile.astral_init_dice);
     }
 
     private static setRuntimeValues(spirit: BlankSpirit, chummerData: ActorSchema) {
@@ -67,10 +70,11 @@ export class SpiritImporter {
                     spirit.system.force_applies[attributeId] = !!spiritTemplate.system.force_applies[attributeId];
             }
 
-            spirit.system.spiritType = spiritTemplate.system.spiritType;
             spirit.system.skillset = spiritTemplate.system.skillset;
+            spirit.system.spiritType = spiritTemplate.system.spiritType;
             spirit.system.half_value_skill = spiritTemplate.system.half_value_skill;
-            spirit.system.initiative_formulae = foundry.utils.deepClone(spiritTemplate.system.initiative_formulae);
+            spirit.system.initiative.astral.formula = foundry.utils.deepClone(spiritTemplate.system.initiative.astral.formula);
+            spirit.system.initiative.meatspace.formula = foundry.utils.deepClone(spiritTemplate.system.initiative.meatspace.formula);
         });
     }
 

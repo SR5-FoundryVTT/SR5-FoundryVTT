@@ -11,7 +11,6 @@ import { SR5Item } from 'src/module/item/SR5Item';
 import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { SkillFieldType } from 'src/module/types/template/Skills';
-import { InitiativeFormulaType } from 'src/module/types/actor/Spirit';
 
 export class SpiritPrep {
     static prepareBaseData(system: Actor.SystemOfType<'spirit'>) {
@@ -39,8 +38,7 @@ export class SpiritPrep {
         MovementPrep.prepareMovement(system);
         WoundsPrep.prepareWounds(system);
 
-        SpiritPrep.prepareSpiritInitiative(system);
-        InitiativePrep.prepareCurrentInitiative(system);
+        InitiativePrep.prepareInit('spirit', system);
 
         CharacterPrep.prepareRecoil(system);
         CharacterPrep.prepareRecoilCompensation(system);
@@ -68,34 +66,6 @@ export class SpiritPrep {
             if (skill.base > 0)
                 skill.base = onSkillValue;
         }
-    }
-
-    static prepareSpiritInitiative(system: Actor.SystemOfType<'spirit'>) {
-        const { initiative, modifiers, attributes, initiative_formulae } = system;
-
-        const getAttrValue = (attributeId: InitiativeFormulaType['attribute_a']): number => {
-            return attributes[attributeId]?.value ?? 0;
-        };
-
-        const resolveBase = (formula: InitiativeFormulaType) => {
-            return getAttrValue(formula.attribute_a) + getAttrValue(formula.attribute_b) + formula.constant;
-        };
-
-        initiative.meatspace.base.base = resolveBase(initiative_formulae.meatspace);
-        ModifiableValue.addUnique(initiative.meatspace.base, 'SR5.Bonus', modifiers.meat_initiative);
-        ModifiableValue.calcTotal(initiative.meatspace.base);
-
-        initiative.meatspace.dice.base = initiative_formulae.meatspace.dice;
-        ModifiableValue.addUnique(initiative.meatspace.dice, 'SR5.Bonus', modifiers.meat_initiative_dice);
-        ModifiableValue.calcTotal(initiative.meatspace.dice, { min: 0, max: 5 });
-
-        initiative.astral.base.base = resolveBase(initiative_formulae.astral);
-        ModifiableValue.addUnique(initiative.astral.base, 'SR5.Bonus', modifiers.astral_initiative);
-        ModifiableValue.calcTotal(initiative.astral.base);
-
-        initiative.astral.dice.base = initiative_formulae.astral.dice;
-        ModifiableValue.addUnique(initiative.astral.dice, 'SR5.Bonus', modifiers.astral_initiative_dice);
-        ModifiableValue.calcTotal(initiative.astral.dice, { min: 0, max: 5 });
     }
 
     /**

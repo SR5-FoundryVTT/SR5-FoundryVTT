@@ -62,5 +62,23 @@ export const shadowrunSR5VehicleDataPrep = (context: QuenchBatchContext) => {
             // Strength should be body (when using a drone arm, Rigger50#125), we default to that...
             assert.strictEqual(vehicle.system.attributes.strength.value, 5);
         });
+
+        it('custom initiative formulae apply for vehicle meatspace/matrix', async () => {
+            const vehicle = await factory.createActor({
+                type: 'vehicle',
+                system: {
+                    vehicle_stats: { pilot: { base: 3 } },
+                    initiative: {
+                        meatspace: { formula: { attribute_a: 'pilot', attribute_b: 'pilot', constant: 1, dice: 2 } },
+                        matrix: { formula: { attribute_a: 'reaction', attribute_b: 'intuition', constant: 1, dice: 2 } },
+                    },
+                },
+            });
+
+            assert.strictEqual(vehicle.system.initiative.meatspace.base.base, 7);
+            assert.strictEqual(vehicle.system.initiative.meatspace.dice.base, 2);
+            assert.strictEqual(vehicle.system.initiative.matrix.base.base, 7);
+            assert.strictEqual(vehicle.system.initiative.matrix.dice.base, 2);
+        });
     });
 };

@@ -368,14 +368,14 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.force_applies.intuition, true);
 
             assert.strictEqual(actor.system.half_value_skill, false);
-            assert.strictEqual(actor.system.initiative_formulae.meatspace.attribute_a, 'force');
-            assert.strictEqual(actor.system.initiative_formulae.meatspace.attribute_b, 'force');
-            assert.strictEqual(actor.system.initiative_formulae.meatspace.constant, 4);
-            assert.strictEqual(actor.system.initiative_formulae.meatspace.dice, 2);
-            assert.strictEqual(actor.system.initiative_formulae.astral.attribute_a, 'force');
-            assert.strictEqual(actor.system.initiative_formulae.astral.attribute_b, 'force');
-            assert.strictEqual(actor.system.initiative_formulae.astral.constant, 0);
-            assert.strictEqual(actor.system.initiative_formulae.astral.dice, 3);
+            assert.strictEqual(actor.system.initiative.meatspace.formula.attribute_a, 'force');
+            assert.strictEqual(actor.system.initiative.meatspace.formula.attribute_b, 'force');
+            assert.strictEqual(actor.system.initiative.meatspace.formula.constant, 4);
+            assert.strictEqual(actor.system.initiative.meatspace.formula.dice, 2);
+            assert.strictEqual(actor.system.initiative.astral.formula.attribute_a, 'force');
+            assert.strictEqual(actor.system.initiative.astral.formula.attribute_b, 'force');
+            assert.strictEqual(actor.system.initiative.astral.formula.constant, 0);
+            assert.strictEqual(actor.system.initiative.astral.formula.dice, 3);
 
             const assensing = actor.items.find((item: any) => item.name === 'Assensing');
             const arcana = actor.items.find((item: any) => item.name === 'Arcana');
@@ -402,14 +402,14 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.attributes.intuition.base, -2);
             assert.strictEqual(actor.system.attributes.charisma.base, -2);
 
-            assert.strictEqual(actor.system.initiative_formulae.meatspace.attribute_a, '');
-            assert.strictEqual(actor.system.initiative_formulae.meatspace.attribute_b, '');
-            assert.strictEqual(actor.system.initiative_formulae.meatspace.constant, 0);
-            assert.strictEqual(actor.system.initiative_formulae.meatspace.dice, 0);
-            assert.strictEqual(actor.system.initiative_formulae.astral.attribute_a, 'force');
-            assert.strictEqual(actor.system.initiative_formulae.astral.attribute_b, 'force');
-            assert.strictEqual(actor.system.initiative_formulae.astral.constant, 0);
-            assert.strictEqual(actor.system.initiative_formulae.astral.dice, 1);
+            assert.strictEqual(actor.system.initiative.meatspace.formula.attribute_a, '');
+            assert.strictEqual(actor.system.initiative.meatspace.formula.attribute_b, '');
+            assert.strictEqual(actor.system.initiative.meatspace.formula.constant, 0);
+            assert.strictEqual(actor.system.initiative.meatspace.formula.dice, 0);
+            assert.strictEqual(actor.system.initiative.astral.formula.attribute_a, 'force');
+            assert.strictEqual(actor.system.initiative.astral.formula.attribute_b, 'force');
+            assert.strictEqual(actor.system.initiative.astral.formula.constant, 0);
+            assert.strictEqual(actor.system.initiative.astral.formula.dice, 1);
 
             const assensing = actor.items.find((item: any) => item.name === 'Assensing');
             const unarmedCombat = actor.items.find((item: any) => item.name === 'Unarmed Combat');
@@ -430,15 +430,54 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.half_value_skill, true);
             assert.strictEqual(actor.system.force_applies.body, false);
             assert.strictEqual(actor.system.attributes.body.base, 7);
-            assert.strictEqual(actor.system.initiative_formulae.meatspace.attribute_a, 'reaction');
-            assert.strictEqual(actor.system.initiative_formulae.meatspace.attribute_b, 'intuition');
-            assert.strictEqual(actor.system.initiative_formulae.meatspace.dice, 2);
-            assert.strictEqual(actor.system.initiative_formulae.astral.attribute_a, 'intuition');
-            assert.strictEqual(actor.system.initiative_formulae.astral.attribute_b, 'intuition');
-            assert.strictEqual(actor.system.initiative_formulae.astral.dice, 3);
+            assert.strictEqual(actor.system.initiative.meatspace.formula.attribute_a, 'reaction');
+            assert.strictEqual(actor.system.initiative.meatspace.formula.attribute_b, 'intuition');
+            assert.strictEqual(actor.system.initiative.meatspace.formula.dice, 2);
+            assert.strictEqual(actor.system.initiative.astral.formula.attribute_a, 'intuition');
+            assert.strictEqual(actor.system.initiative.astral.formula.attribute_b, 'intuition');
+            assert.strictEqual(actor.system.initiative.astral.formula.dice, 3);
 
             const assensing = actor.items.find((item: any) => item.name === 'Assensing');
             assert.strictEqual(foundry.utils.getProperty(assensing, 'system.skill.rating'), 3);
+        });
+
+    });
+
+    describe('Version0_34_0 initiative modifier migration', () => {
+        it('moves legacy initiative modifiers into initiative formula and removes modifier fields', () => {
+            const migrator = new Version0_34_0();
+            const actor = {
+                _id: foundry.utils.randomID(16),
+                _stats: { systemVersion: '0.33.9' },
+                name: 'Legacy Character',
+                type: 'character',
+                items: [],
+                effects: [],
+                system: DataDefaults.baseSystemData('character'),
+            } as any;
+
+            actor.system.modifiers.meat_initiative = 2;
+            actor.system.modifiers.meat_initiative_dice = 1;
+            actor.system.modifiers.astral_initiative = -1;
+            actor.system.modifiers.astral_initiative_dice = 2;
+            actor.system.modifiers.matrix_initiative = 3;
+            actor.system.modifiers.matrix_initiative_dice = 1;
+
+            migrator.migrateActor(actor);
+
+            assert.strictEqual(actor.system.initiative.meatspace.formula.constant, 2);
+            assert.strictEqual(actor.system.initiative.meatspace.formula.dice, 2);
+            assert.strictEqual(actor.system.initiative.astral.formula.constant, -1);
+            assert.strictEqual(actor.system.initiative.astral.formula.dice, 4);
+            assert.strictEqual(actor.system.initiative.matrix.formula.constant, 3);
+            assert.strictEqual(actor.system.initiative.matrix.formula.dice, 4);
+
+            assert.isUndefined(actor.system.modifiers.meat_initiative);
+            assert.isUndefined(actor.system.modifiers.meat_initiative_dice);
+            assert.isUndefined(actor.system.modifiers.astral_initiative);
+            assert.isUndefined(actor.system.modifiers.astral_initiative_dice);
+            assert.isUndefined(actor.system.modifiers.matrix_initiative);
+            assert.isUndefined(actor.system.modifiers.matrix_initiative_dice);
         });
     });
 
@@ -479,7 +518,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             }),
         });
 
-        it('migrates known legacy sprite type into offsets, level toggles, initiative bonus, and skill toggles', () => {
+        it('migrates known legacy sprite type into offsets, level toggles, initiative formula constant, and skill toggles', () => {
             const migrator = new Version0_34_0();
             const actor = createSprite('courier', 6);
             actor.system.level = 6;
@@ -504,7 +543,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.matrix.data_processing.base, 1);
             assert.strictEqual(actor.system.matrix.firewall.base, 2);
 
-            assert.strictEqual(actor.system.modifiers.matrix_initiative, 1);
+            assert.strictEqual(actor.system.initiative.matrix.formula.constant, 1);
             assert.strictEqual(actor.system.attributes.level.base, 6);
             assert.isUndefined(actor.system.level);
 
@@ -520,7 +559,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(newSleazeTotal, oldSleazeTotal);
 
             const oldInitBase = 6 * 2 + 1;
-            const newInitBase = actor.system.attributes.level.base * 2 + actor.system.modifiers.matrix_initiative;
+            const newInitBase = actor.system.attributes.level.base * 2 + actor.system.initiative.matrix.formula.constant;
             assert.strictEqual(newInitBase, oldInitBase);
         });
 
@@ -539,7 +578,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.matrix.attack.base, -1);
             assert.strictEqual(actor.system.matrix.data_processing.base, 4);
             assert.strictEqual(actor.system.matrix.firewall.base, 1);
-            assert.strictEqual(actor.system.modifiers.matrix_initiative, 4);
+            assert.strictEqual(actor.system.initiative.matrix.formula.constant, 4);
 
             const computer = actor.items.find((item: any) => item.name === 'Computer');
             const electronicWarfare = actor.items.find((item: any) => item.name === 'Electronic Warfare');
@@ -562,7 +601,7 @@ export const Migrators = (context: QuenchBatchContext) => {
 
             assert.strictEqual(actor.system.level_applies.attack, false);
             assert.strictEqual(actor.system.matrix.attack.base, 7);
-            assert.strictEqual(actor.system.modifiers.matrix_initiative, 2);
+            assert.strictEqual(actor.system.initiative.matrix.formula.constant, 2);
 
             const computer = actor.items.find((item: any) => item.name === 'Computer');
             assert.strictEqual(foundry.utils.getProperty(computer, 'system.skill.rating'), 3);
@@ -580,13 +619,17 @@ export const Migrators = (context: QuenchBatchContext) => {
             const effect = {
                 changes: [
                     { key: 'system.level', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'system.modifiers.matrix_initiative', value: 1, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'system.modifiers.matrix_initiative_dice', value: 1, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
                     { key: 'system.attributes.reaction', value: 1, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
                 ],
             };
             migrator.migrateActiveEffect(effect);
 
             assert.strictEqual(effect.changes[0].key, 'system.attributes.level');
-            assert.strictEqual(effect.changes[1].key, 'system.attributes.reaction');
+            assert.strictEqual(effect.changes[1].key, 'system.initiative.matrix.formula.constant');
+            assert.strictEqual(effect.changes[2].key, 'system.initiative.matrix.formula.dice');
+            assert.strictEqual(effect.changes[3].key, 'system.attributes.reaction');
         });
     });
 

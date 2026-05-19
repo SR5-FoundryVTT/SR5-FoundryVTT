@@ -85,14 +85,14 @@ export const spiritImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(fallbackSpirit!.system.attributes.reaction.base, 3);
             assert.strictEqual(fallbackSpirit!.system.attributes.strength.base, -2);
             assert.strictEqual(fallbackSpirit!.system.attributes.intuition.base, 1);
-            assert.strictEqual(fallbackSpirit!.system.initiative_formulae.meatspace.attribute_a, 'force');
-            assert.strictEqual(fallbackSpirit!.system.initiative_formulae.meatspace.attribute_b, 'force');
-            assert.strictEqual(fallbackSpirit!.system.initiative_formulae.meatspace.constant, 3);
-            assert.strictEqual(fallbackSpirit!.system.initiative_formulae.meatspace.dice, 2);
-            assert.strictEqual(fallbackSpirit!.system.initiative_formulae.astral.attribute_a, 'force');
-            assert.strictEqual(fallbackSpirit!.system.initiative_formulae.astral.attribute_b, 'force');
-            assert.strictEqual(fallbackSpirit!.system.initiative_formulae.astral.constant, 0);
-            assert.strictEqual(fallbackSpirit!.system.initiative_formulae.astral.dice, 3);
+            assert.strictEqual(fallbackSpirit!.system.initiative.meatspace.formula.attribute_a, 'force');
+            assert.strictEqual(fallbackSpirit!.system.initiative.meatspace.formula.attribute_b, 'force');
+            assert.strictEqual(fallbackSpirit!.system.initiative.meatspace.formula.constant, 3);
+            assert.strictEqual(fallbackSpirit!.system.initiative.meatspace.formula.dice, 2);
+            assert.strictEqual(fallbackSpirit!.system.initiative.astral.formula.attribute_a, 'force');
+            assert.strictEqual(fallbackSpirit!.system.initiative.astral.formula.attribute_b, 'force');
+            assert.strictEqual(fallbackSpirit!.system.initiative.astral.formula.constant, 0);
+            assert.strictEqual(fallbackSpirit!.system.initiative.astral.formula.dice, 3);
             assert.strictEqual(fallbackSpirit!.system.attributes.force.base, 3);
             assert.strictEqual(fallbackSpirit!.system.attributes.edge.base, 2);
             assert.strictEqual(fallbackSpirit!.system.attributes.essence.value, 3);
@@ -129,5 +129,4 @@ export const spiritImporterTesting = (context: QuenchBatchContext) => {
         });
     });
 };
-
 

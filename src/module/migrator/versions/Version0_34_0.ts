@@ -42,6 +42,8 @@ export class Version0_34_0 extends VersionMigration {
             setProperty(system, "vehicle_stats.off_road_acceleration.base", acceleration);
         }
 
+        this.migrateInitiativeModifierFields(actor.type, system);
+
         if (actor.type === 'spirit')
             this.migrateSpirit(actor);
         else if (actor.type === 'sprite')
@@ -49,9 +51,57 @@ export class Version0_34_0 extends VersionMigration {
     }
 
     override migrateActiveEffect(effect: any): void {
+        const keyMap = {
+            'system.modifiers.meat_initiative': 'system.initiative.meatspace.formula.constant',
+            'system.modifiers.meat_initiative_dice': 'system.initiative.meatspace.formula.dice',
+            'system.modifiers.astral_initiative': 'system.initiative.astral.formula.constant',
+            'system.modifiers.astral_initiative_dice': 'system.initiative.astral.formula.dice',
+            'system.modifiers.matrix_initiative': 'system.initiative.matrix.formula.constant',
+            'system.modifiers.matrix_initiative_dice': 'system.initiative.matrix.formula.dice',
+        } as const;
+
         for (const change of effect.changes ?? []) {
             if (change.key === 'system.level')
                 change.key = 'system.attributes.level';
+            if (change.key in keyMap)
+                change.key = keyMap[change.key as keyof typeof keyMap];
+        }
+    }
+
+    private migrateInitiativeModifierFields(actorType: string, system: any) {
+        if (!system || typeof system !== 'object') return;
+
+        const defaultDiceByType = {
+            character: { meatspace: 1, astral: 2, matrix: 3 },
+            ic: { matrix: 4 },
+            spirit: { meatspace: 2, astral: 3 },
+            sprite: { matrix: 4 },
+            vehicle: { meatspace: 4, matrix: 3 },
+        } as const;
+
+        const modes = [
+            { mode: 'meatspace', constantKey: 'meat_initiative', diceKey: 'meat_initiative_dice' },
+            { mode: 'astral', constantKey: 'astral_initiative', diceKey: 'astral_initiative_dice' },
+            { mode: 'matrix', constantKey: 'matrix_initiative', diceKey: 'matrix_initiative_dice' },
+        ] as const;
+
+        for (const { mode, constantKey, diceKey } of modes) {
+            const modePath = `initiative.${mode}`;
+            const formulaPath = `${modePath}.formula`;
+            const baseDice = getProperty(defaultDiceByType, `${actorType}.${mode}`) as number | undefined;
+
+            if (baseDice == null) continue;
+
+            const diceModifier = Number(getProperty(system, `modifiers.${diceKey}`) ?? 0);
+            const constantModifier = Number(getProperty(system, `modifiers.${constantKey}`) ?? 0);
+
+            setProperty(system, `${formulaPath}.constant`, constantModifier);
+            setProperty(system, `${formulaPath}.dice`, baseDice + diceModifier);
+
+            if (system.modifiers && typeof system.modifiers === 'object' && constantKey in system.modifiers)
+                delete system.modifiers[constantKey];
+            if (system.modifiers && typeof system.modifiers === 'object' && diceKey in system.modifiers)
+                delete system.modifiers[diceKey];
         }
     }
 
@@ -94,9 +144,8 @@ export class Version0_34_0 extends VersionMigration {
     private migrateSpiritInitiative(system: any, initiative: Partial<SpiritProfileInitiative> | undefined) {
         const profile: SpiritProfileInitiative = { ...PRESET_INITIATIVE_DEFAULTS, ...initiative };
 
-        system.initiative_formulae ??= {};
-        system.initiative_formulae.meatspace = this.initFormulaBuild(profile.init_mult, profile.init, profile.init_dice);
-        system.initiative_formulae.astral = this.initFormulaBuild(profile.astral_init_mult, profile.astral_init, profile.astral_init_dice);
+        setProperty(system, 'initiative.meatspace.formula', this.initFormulaBuild(profile.init_mult, profile.init, profile.init_dice));
+        setProperty(system, 'initiative.astral.formula', this.initFormulaBuild(profile.astral_init_mult, profile.astral_init, profile.astral_init_dice));
     }
 
     private initFormulaBuild(multiplier: number, constant: number, dice: number): SpiritInitiativeFormula {
@@ -115,10 +164,13 @@ export class Version0_34_0 extends VersionMigration {
         if (!profile) return;
         system.spriteType = humanizePresetTypeKey(spriteType);
 
+        this.migrateSkillToggles(actor, profile.skills);
         this.migrateSpriteLevelApplies(system, profile.levelOff);
         this.migrateSpriteAttributeOffsets(system, profile.offsets ?? {});
-        this.migrateSpriteInitiativeModifier(system, profile.init ?? 0);
-        this.migrateSkillToggles(actor, profile.skills ?? ['computer']);
+
+        setProperty(system, 'initiative.matrix.formula.attribute_a', 'level');
+        setProperty(system, 'initiative.matrix.formula.attribute_b', 'level');
+        setProperty(system, 'initiative.matrix.formula.constant', profile.init ?? 0);
     }
 
     private migrateSpriteLevelApplies(system: any, levelOff: SpriteAttributeId[] | undefined) {
@@ -131,11 +183,6 @@ export class Version0_34_0 extends VersionMigration {
         for (const attributeId of SPRITE_MATRIX_ATTRIBUTE_IDS) {
             setProperty(system, `matrix.${attributeId}.base`, offsets[attributeId] ?? 0);
         }
-    }
-
-    private migrateSpriteInitiativeModifier(system: any, profileInitConstant: number) {
-        const currentModifier = Number(getProperty(system, 'modifiers.matrix_initiative') ?? 0);
-        setProperty(system, 'modifiers.matrix_initiative', currentModifier + profileInitConstant);
     }
 
     private migrateSkillToggles(actor: any, profileSkills: string[]) {
@@ -161,7 +208,3 @@ export class Version0_34_0 extends VersionMigration {
         return name.trim().replace(/[\s-]+/g, '_').toLowerCase();
     }
 }
-
-
-
-

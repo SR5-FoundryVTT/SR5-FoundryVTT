@@ -38,9 +38,9 @@ type SpiritProfileData = {
 export type SpriteAttributeId = 'resonance' | 'attack' | 'sleaze' | 'data_processing' | 'firewall';
 
 type SpriteProfileData = {
-    offsets?: Partial<Record<SpriteAttributeId, number>>;
+    offsets: Partial<Record<SpriteAttributeId, number>>;
     init?: number;
-    skills?: string[];
+    skills: string[];
     levelOff?: SpriteAttributeId[];
 };
 

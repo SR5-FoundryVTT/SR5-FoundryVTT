@@ -84,7 +84,7 @@ export const spriteImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(fallbackSprite!.system.matrix.sleaze.base, 1);
             assert.strictEqual(fallbackSprite!.system.matrix.data_processing.base, 0);
             assert.strictEqual(fallbackSprite!.system.matrix.firewall.base, 4);
-            assert.strictEqual(fallbackSprite!.system.modifiers.matrix_initiative, 0);
+            assert.strictEqual(fallbackSprite!.system.initiative.matrix.formula.constant, 0);
             assert.strictEqual(fallbackSprite!.system.attributes.level.base, 3);
             assert.strictEqual(fallbackSprite!.system.attributes.level.value, 3);
             assert.strictEqual(fallbackSprite!.system.attributes.edge.base, 1);

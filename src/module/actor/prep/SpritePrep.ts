@@ -34,9 +34,8 @@ export class SpritePrep {
         MatrixPrep.prepareMatrixToLimitsAndAttributes(system);
 
         SpritePrep.prepareMatrixTrack(system, level);
-        SpritePrep.prepareSpriteInitiative(system, level);
 
-        InitiativePrep.prepareCurrentInitiative(system);
+        InitiativePrep.prepareInit('sprite', system);
     }
 
     static prepareSpriteSpecial(system: Actor.SystemOfType<'sprite'>) {
@@ -97,19 +96,4 @@ export class SpritePrep {
         track.matrix.label = SR5.damageTypes.matrix;
     }
 
-    static prepareSpriteInitiative(system: Actor.SystemOfType<'sprite'>, level: number) {
-        const {initiative, modifiers} = system;
-
-        // always in matrix perception
-        initiative.perception = 'matrix';
-
-        // setup initiative from level
-        initiative.matrix.base.base = level * 2;
-        ModifiableValue.addUnique(initiative.matrix.base, "SR5.Bonus", modifiers.matrix_initiative);
-        ModifiableValue.calcTotal(initiative.matrix.base, {min: 0});
-
-        initiative.matrix.dice.base = 4;
-        ModifiableValue.addUnique(initiative.matrix.dice, "SR5.Bonus", modifiers.matrix_initiative_dice);
-        ModifiableValue.calcTotal(initiative.matrix.dice, {min: 0});
-    }
 }

@@ -119,13 +119,10 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                         reaction: { base: 6 },
                         intuition: { base: 6 }
                     },
-                    modifiers: {
-                        meat_initiative: 2,
-                        meat_initiative_dice: 1,
-                        astral_initiative: 2,
-                        astral_initiative_dice: 1,
-                        matrix_initiative: 2,
-                        matrix_initiative_dice: 1
+                    initiative: {
+                        meatspace: { formula: { constant: 2, dice: 2 } },
+                        astral: { formula: { constant: 2, dice: 3 } },
+                        matrix: { formula: { constant: 2, dice: 4 } },
                     }
                 }
             });
@@ -156,10 +153,10 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             // Check for ini dice upper limits
             await character.update({
                 system: {
-                    modifiers: {
-                        meat_initiative_dice: 6,
-                        astral_initiative_dice: 6,
-                        matrix_initiative_dice: 6
+                    initiative: {
+                        meatspace: { formula: { dice: 8 } },
+                        astral: { formula: { dice: 8 } },
+                        matrix: { formula: { dice: 8 } },
                     }
                 }
             });
@@ -167,6 +164,35 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(character.system.initiative.meatspace.dice.value, 5);
             assert.strictEqual(character.system.initiative.matrix.dice.value, 5);
             assert.strictEqual(character.system.initiative.astral.dice.value, 5);
+        });
+
+        it('custom initiative formulae apply to all modes and matrix hot-sim keeps +1d6', async () => {
+            const character = await factory.createActor({
+                type: 'character',
+                system: {
+                    attributes: {
+                        reaction: { base: 5 },
+                        intuition: { base: 4 },
+                        logic: { base: 3 },
+                        charisma: { base: 2 },
+                    },
+                    initiative: {
+                        meatspace: { formula: { attribute_a: 'charisma', attribute_b: 'logic', constant: 1, dice: 4 } },
+                        astral: { formula: { attribute_a: 'reaction', attribute_b: 'intuition', constant: 2, dice: 1 } },
+                        matrix: { formula: { attribute_a: 'reaction', attribute_b: 'intuition', constant: 0, dice: 2 } },
+                    },
+                    matrix: {
+                        hot_sim: true,
+                    },
+                }
+            });
+
+            assert.strictEqual(character.system.initiative.meatspace.base.value, 6);
+            assert.strictEqual(character.system.initiative.meatspace.dice.value, 4);
+            assert.strictEqual(character.system.initiative.astral.base.value, 11);
+            assert.strictEqual(character.system.initiative.astral.dice.value, 1);
+            assert.strictEqual(character.system.initiative.matrix.base.value, 9);
+            assert.strictEqual(character.system.initiative.matrix.dice.value, 3);
         });
 
         it('limit calculation', async () => {

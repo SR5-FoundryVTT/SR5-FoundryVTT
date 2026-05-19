@@ -59,10 +59,7 @@ export class CharacterPrep {
         MovementPrep.prepareMovement(system);
         WoundsPrep.prepareWounds(system);
 
-        InitiativePrep.prepareMeatspaceInit(system);
-        InitiativePrep.prepareAstralInit(system);
-        InitiativePrep.prepareMatrixInit(system);
-        InitiativePrep.prepareCurrentInitiative(system);
+        InitiativePrep.prepareInit('character', system);
 
         CharacterPrep.prepareRecoil(system);
         CharacterPrep.prepareRecoilCompensation(system);

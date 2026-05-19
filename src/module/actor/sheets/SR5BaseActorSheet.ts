@@ -149,6 +149,7 @@ export interface SR5ActorSheetData extends ActorSheetV2.RenderContext, SR5Applic
         value: string;
         options: { label: string; value: string }[];
     };
+    initiativeFormulaModes: { id: Shadowrun.SpaceTypes; label: string; }[];
 
     // Situation Modifiers
     situationModifiers: {
@@ -438,6 +439,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         data.bindings = this._prepareKeybindings();
 
         data.initiativePerception = this._prepareInitiativePresence();
+        data.initiativeFormulaModes = this._prepareInitiativeFormulaModes();
 
         data.primaryTabs = this._prepareTabs('primary');
 
@@ -766,6 +768,16 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
 
         return { options, value };
+    }
+
+    _prepareInitiativeFormulaModes() {
+        const modes = [
+            { id: 'meatspace' as const, label: 'SR5.InitCatMeatspace' },
+            { id: 'astral' as const, label: 'SR5.InitCatAstral' },
+            { id: 'matrix' as const, label: 'SR5.Labels.ActorSheet.Matrix' },
+        ];
+
+        return modes.filter(mode => this.actor.system.initiative?.[mode.id]);
     }
 
     /**
