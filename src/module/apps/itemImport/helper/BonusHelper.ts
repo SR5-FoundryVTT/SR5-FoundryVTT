@@ -46,7 +46,7 @@ export class BonusHelper {
 
         for (const change of changes) {
             change.value = this.normalizeValue(sheet, change.value);
-            if (!change.mode) change.mode = BC.MODIFY;
+            if (!change.mode) change.mode = BC.ADD;
         }
 
         sheet.effects!.push({

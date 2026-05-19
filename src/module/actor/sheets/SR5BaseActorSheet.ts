@@ -2194,7 +2194,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                         changes: [
                             {
                                 key: path,
-                                mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+                                mode: CONST.ACTIVE_EFFECT_MODES.ADD,
                                 priority: 0,
                                 value: '',
                             }
