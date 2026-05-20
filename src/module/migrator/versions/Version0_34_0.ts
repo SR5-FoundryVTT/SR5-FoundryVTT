@@ -24,21 +24,15 @@ export class Version0_34_0 extends VersionMigration {
             const armor = item.system.armor;
             const elements = ['acid', 'cold', 'electricity', 'fire', 'radiation'];
 
-            if (armor.mod !== undefined) {
+            if (armor.mod !== undefined)
                 armor.accessory = armor.mod;
-                delete armor.mod;
-            }
 
-            if (armor.hardened !== undefined) {
+            if (armor.hardened !== undefined)
                 armor.is_hardened = Boolean(armor.hardened);
-                delete armor.hardened;
-            }
 
             for (const el of elements) {
-                if (armor[el] !== undefined) {
+                if (armor[el] !== undefined)
                     setProperty(armor, `elements.${el}.base`, armor[el] ?? 0);
-                    delete armor[el];
-                }
             }
         }
 
@@ -53,10 +47,8 @@ export class Version0_34_0 extends VersionMigration {
 
             for (const [legacyKey, newKey] of legacyToNew) {
                 const oldValue = getProperty(item.system, legacyKey);
-                if (oldValue !== undefined) {
+                if (oldValue !== undefined)
                     setProperty(item.system, newKey, oldValue);
-                    delete item.system[legacyKey];
-                }
             }
         }
 
@@ -97,6 +89,29 @@ export class Version0_34_0 extends VersionMigration {
         if (actor.type === "vehicle" && hasProperty(system as any, "vehicle_stats")) {
             const acceleration = getProperty(system, "vehicle_stats.acceleration.base");
             setProperty(system, "vehicle_stats.off_road_acceleration.base", acceleration);
+        }
+
+        if ('armor' in system)
+            this.migrateActorArmor(system);
+    }
+
+    private migrateActorArmor(system: any): void {
+        const armor = system?.armor;
+        if (!armor || typeof armor !== 'object') return;
+
+        const legacyRating = getProperty(armor, 'base');
+        if (legacyRating) setProperty(armor, 'rating.base', legacyRating);
+
+        if (armor.mod !== undefined)
+            armor.accessory = armor.mod;
+
+        if (armor.hardened !== undefined)
+            armor.is_hardened = Boolean(armor.hardened);
+
+        const elements = ['acid', 'cold', 'electricity', 'fire', 'radiation'];
+        for (const el of elements) {
+            if (armor[el] !== undefined)
+                setProperty(armor, `elements.${el}.base`, armor[el] ?? 0);
         }
     }
 
