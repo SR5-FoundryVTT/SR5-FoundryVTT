@@ -932,7 +932,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (modifierHits === 0) return `${this.hits.value}`;
 
         const baseHits = this.hits.value - modifierHits;
-        return `[${baseHits}]+[${modifierHits}]`;
+        return `${baseHits} + ${modifierHits}`;
     }
 
     // Hide dice pool and roll results as they are not relevant to the success of the test

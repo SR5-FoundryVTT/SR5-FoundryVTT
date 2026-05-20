@@ -153,7 +153,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
             const hardenedHits = CombatRules.hardenedAutoHits(this.actor, this.data.modifiedDamage);
 
             if (hardenedHits > 0) {
-                hits.addUniqueBase('SR5.HardenedArmor', hardenedHits);
+                hits.addUnique('SR5.HardenedArmor', hardenedHits);
             }
             hits.calcTotal();
         }
