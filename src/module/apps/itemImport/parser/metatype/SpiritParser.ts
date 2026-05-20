@@ -39,16 +39,10 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
                 .split("/")[0];
         }
 
+        system.half_value_skill = jsonData.skills?.skill?.some(s => s.$.rating === "F/2") ?? false;
         this.applyForceOffsetAttributes(system, jsonData);
-
-        if (jsonData.walk)
-            system.movement.walk.base = Number(jsonData.walk._TEXT.split('/')[0] ?? 0);
-
-        if (jsonData.run)
-            system.movement.run.base = Number(jsonData.run._TEXT.split('/')[0] ?? 0);
-
-        system.movement.sprint = Number(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
-        system.half_value_skill = jsonData.skills?.skill?.some(s => ['F', 'F/2'].includes(s.$.rating)) ?? false;
+        this.applyMovement(system, jsonData);
+        this.parseInitiative(system, jsonData, { mode: 'meatspace', specialAttr: 'force' });
 
         return system;
     }
@@ -56,69 +50,40 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
     private applyForceOffsetAttributes(system: ReturnType<typeof this.getBaseSystem>, jsonData: Metatype) {
         for (const [attributeId, metatypeAttributeId] of Object.entries(FORCE_OFFSET_ATTRIBUTE_MAP)) {
             const value = jsonData[metatypeAttributeId]._TEXT;
-            const parsed = this.parseForceOffsetValue(value);
+            const parsed = this.parseSpecialOffset(value);
 
-            system.attributes[attributeId].applies_special = parsed.forceApplies;
+            system.attributes[attributeId].applies_special = parsed.appliesSpecial;
             system.attributes[attributeId].base = parsed.base;
         }
     }
 
-    private parseForceOffsetValue(raw: string): { forceApplies: boolean, base: number } {
-        const value = (raw ?? '').trim();
-        if (!value) return { forceApplies: false, base: 0 };
-
-        if (/^F$/i.test(value))
-            return { forceApplies: true, base: 0 };
-
-        const forceOffsetMatch = /^F\s*([+-])\s*(\d+)$/i.exec(value);
-        if (forceOffsetMatch) {
-            const sign = forceOffsetMatch[1] === '-' ? -1 : 1;
-            const amount = Number(forceOffsetMatch[2]) || 0;
-            return { forceApplies: true, base: sign * amount };
-        }
-
-        return { forceApplies: false, base: Number(value) || 0 };
-    }
-
     protected override async getItems(jsonData: Metatype): Promise<Item.Source[]> {
-        const { name, powers } = jsonData;
-        const skills = jsonData.skills;
-        const qualities = jsonData.qualities;
+        const { name, powers, skills } = jsonData;
 
-        const optionalpowers = {
-            optionalpower: [
-                jsonData.optionalpowers?.optionalpower,
-                jsonData.bonus?.optionalpowers?.optionalpower
-            ].flat().filter(obj => !!obj)
-        };
+        const qualities = this.mergeLists(
+            jsonData.qualities?.positive?.quality,
+            jsonData.qualities?.negative?.quality
+        );
+        const optionalPowers = this.mergeLists(
+            jsonData.optionalpowers?.optionalpower,
+            jsonData.bonus?.optionalpowers?.optionalpower
+        );
 
-        const powerList = [
-            ...IH.getArray(powers?.power),
-            ...IH.getArray(optionalpowers?.optionalpower)
-        ].map(i => i._TEXT);
+        const qualityList = this.getNamedList(qualities);
+        const skillList = this.getNamedList(skills?.skill, skills?.group);
+        const powerList = this.getNamedList(powers?.power, optionalPowers);
 
-        const qualityList = [
-            ...IH.getArray(qualities?.positive?.quality),
-            ...IH.getArray(qualities?.negative?.quality),
-        ].map(i => i._TEXT);
-
-        const skillList = [
-            ...IH.getArray(skills?.skill),
-            ...IH.getArray(skills?.group),
-        ].map(i => i._TEXT);
-
-        const allPowers = await IH.findItems('Critter_Power', powerList);
-        const allQualities = await IH.findItems('Quality', qualityList);
         const allSkills = await IH.findItems('Skill', skillList);
-        const spiritName = name._TEXT;
+        const allQualities = await IH.findItems('Quality', qualityList);
+        const allPowers = await IH.findItems('Critter_Power', powerList);
 
+        const spiritName = name._TEXT;
         return [
             ...this.getMetatypeItems(allSkills, skills?.skill, { type: 'Skill', critter: spiritName }),
-            ...this.getMetatypeItems(allSkills, skills?.group, { type: 'Skill Group', critter: spiritName }),
             ...this.getMetatypeItems(allPowers, powers?.power, { type: 'Power', critter: spiritName }),
-            ...this.getMetatypeItems(allQualities, qualities?.positive?.quality, { type: 'Quality', critter: spiritName }),
-            ...this.getMetatypeItems(allQualities, qualities?.negative?.quality, { type: 'Quality', critter: spiritName }),
-            ...this.getMetatypeItems(allPowers, optionalpowers?.optionalpower, { type: 'Optional Power', critter: spiritName }),
+            ...this.getMetatypeItems(allQualities, qualities, { type: 'Quality', critter: spiritName }),
+            ...this.getMetatypeItems(allSkills, skills?.group, { type: 'Skill Group', critter: spiritName }),
+            ...this.getMetatypeItems(allPowers, optionalPowers, { type: 'Optional Power', critter: spiritName }),
         ];
     }
 

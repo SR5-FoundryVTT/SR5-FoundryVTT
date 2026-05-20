@@ -38,7 +38,7 @@ const SpiritData = () => ({
     // === Combat ===
     armor: new ModifiableField(ActorArmorData()),
     initiative: new SchemaField(Initiative({
-        astral: { attributeA: 'intuition', attributeB: 'intuition', constant: 0, dice: 3 },
+        astral: { attributeA: 'force', attributeB: 'force', constant: 0, dice: 3 },
         meatspace: { attributeA: 'reaction', attributeB: 'intuition', constant: 0, dice: 2 },
     })),
     wounds: new ModifiableField(ModifiableValueSchema()),

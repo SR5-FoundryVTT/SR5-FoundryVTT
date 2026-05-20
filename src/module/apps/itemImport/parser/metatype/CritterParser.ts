@@ -9,10 +9,10 @@ import { KnowledgeSkillCategory } from "src/module/types/template/Skills";
 export class CritterParser extends MetatypeParserBase<'character'> {
     protected readonly parseType = 'character';
 
-    private createKnowledgeSkillItems(jsonData: Metatype): Item.Source[] {
+    private createKnowledgeSkillItems(knowledgeList: NonNullable<Metatype['skills']>['knowledge']): Item.Source[] {
         const result: Item.Source[] = [];
 
-        for (const skill of IH.getArray(jsonData.skills?.knowledge)) {
+        for (const skill of IH.getArray(knowledgeList)) {
             const name = skill._TEXT.trim();
             const category = skill.$.category.toLowerCase() as KnowledgeSkillCategory | 'interest';
             const knowledgeType = category === 'interest' ? 'interests' : category;
@@ -34,7 +34,7 @@ export class CritterParser extends MetatypeParserBase<'character'> {
                 effects: [],
             };
 
-            result.push(item as unknown as Item.Source);
+            result.push(item as Item.Source);
         }
 
         return result;
@@ -61,14 +61,8 @@ export class CritterParser extends MetatypeParserBase<'character'> {
             system.special = 'resonance';
 
         system.karma.value = Number(jsonData.karma?._TEXT || 0);
-
-        if (jsonData.walk)
-            system.movement.walk.base = Number(jsonData.walk._TEXT.split('/')[0] ?? 0);
-
-        if (jsonData.run)
-            system.movement.run.base = Number(jsonData.run._TEXT.split('/')[0] ?? 0);
-
-        system.movement.sprint = Number(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
+        this.applyMovement(system, jsonData);
+        this.parseInitiative(system, jsonData, { mode: 'meatspace' });
 
         system.is_npc = true;
         system.is_critter = true;
@@ -77,55 +71,47 @@ export class CritterParser extends MetatypeParserBase<'character'> {
     }
 
     protected override async getItems(jsonData: Metatype): Promise<Item.Source[]> {
-        const qualities = jsonData.qualities || undefined;
+        const { name, powers, skills, biowares, complexforms } = jsonData;
 
-        const optionalpowers = {
-            optionalpower: [
-                jsonData.optionalpowers?.optionalpower,
-                jsonData.bonus?.optionalpowers?.optionalpower
-            ].flat().filter(obj => !!obj)
-        };
+        const qualities = this.mergeLists(
+            jsonData.qualities?.positive?.quality,
+            jsonData.qualities?.negative?.quality
+        );
+        const optionalPowers = this.mergeLists(
+            jsonData.optionalpowers?.optionalpower,
+            jsonData.bonus?.optionalpowers?.optionalpower
+        );
 
         const spellsData = IH.getArray(jsonData.powers?.power)
             .filter(s => s._TEXT === "Innate Spell" && s.$?.select)
             .map(s => ({ _TEXT: s.$?.select })) as { _TEXT: string }[];
 
-        const bioware = IH.getArray(jsonData.biowares?.bioware).map(v => v._TEXT);
-        const complex = IH.getArray(jsonData.complexforms?.complexform).map(v => v._TEXT);
-        const spells = spellsData.map(v => v._TEXT);
-        const power = [
-            ...IH.getArray(jsonData.powers?.power),
-            ...IH.getArray(optionalpowers?.optionalpower)
-        ].map(v => v._TEXT);
-        const quality = [
-            ...IH.getArray(qualities?.positive?.quality),
-            ...IH.getArray(qualities?.negative?.quality)
-        ].map(v => v._TEXT);
-        const skills = [
-            ...IH.getArray(jsonData.skills?.skill).map(v => v._TEXT),
-            ...IH.getArray(jsonData.skills?.group).map(v => v._TEXT)
-        ];
+        const spellList = this.getNamedList(spellsData);
+        const qualitiesList = this.getNamedList(qualities);
+        const biowareList = this.getNamedList(biowares?.bioware);
+        const complexList = this.getNamedList(complexforms?.complexform);
+        const powerList = this.getNamedList(powers?.power, optionalPowers);
+        const skillList = this.getNamedList(skills?.skill, skills?.group);
 
-        const allComplexForm = await IH.findItems('Complex_Form', complex);
-        const allSpells = await IH.findItems('Spell', spells);
-        const allPowers = await IH.findItems('Critter_Power', power);
-        const allQualities = await IH.findItems('Quality', [...quality, ...bioware]);
-        const allBiowares = await IH.findItems('Ware', bioware);
-        const allSkills = await IH.findItems('Skill', skills);
-        const knowledgeSkillItems = this.createKnowledgeSkillItems(jsonData);
+        const allSpells = await IH.findItems('Spell', spellList);
+        const allSkills = await IH.findItems('Skill', skillList);
+        const allBiowares = await IH.findItems('Ware', biowareList);
+        const allPowers = await IH.findItems('Critter_Power', powerList);
+        const allComplexForm = await IH.findItems('Complex_Form', complexList);
+        const knowledgeSkillItems = this.createKnowledgeSkillItems(skills?.knowledge);
+        const allQualities = await IH.findItems('Quality', [...qualitiesList, ...biowareList]);
 
-        const name = jsonData.name._TEXT;
+        const critterName = name._TEXT;
         return [
             ...knowledgeSkillItems,
-            ...this.getMetatypeItems(allSpells, spellsData, { type: 'Spell', critter: name }),
-            ...this.getMetatypeItems(allPowers, jsonData.powers?.power, { type: 'Power', critter: name }),
-            ...this.getMetatypeItems(allSkills, jsonData.skills?.skill, { type: 'Skill', critter: name }),
-            ...this.getMetatypeItems(allSkills, jsonData.skills?.group, { type: 'Skill Group', critter: name }),
-            ...this.getMetatypeItems(allBiowares, jsonData.biowares?.bioware, { type: 'Bioware', critter: name }),
-            ...this.getMetatypeItems(allPowers, optionalpowers?.optionalpower, { type: 'Power', critter: name }),
-            ...this.getMetatypeItems(allQualities, qualities?.positive?.quality, { type: 'Quality', critter: name }),
-            ...this.getMetatypeItems(allQualities, qualities?.negative?.quality, { type: 'Quality', critter: name }),
-            ...this.getMetatypeItems(allComplexForm, jsonData.complexforms?.complexform, { type: 'Complex Form', critter: name }),
+            ...this.getMetatypeItems(allSpells, spellsData, { type: 'Spell', critter: critterName }),
+            ...this.getMetatypeItems(allPowers, optionalPowers, { type: 'Power', critter: critterName }),
+            ...this.getMetatypeItems(allQualities, qualities, { type: 'Quality', critter: critterName }),
+            ...this.getMetatypeItems(allPowers, powers?.power, { type: 'Power', critter: critterName }),
+            ...this.getMetatypeItems(allSkills, skills?.skill, { type: 'Skill', critter: critterName }),
+            ...this.getMetatypeItems(allSkills, skills?.group, { type: 'Skill Group', critter: critterName }),
+            ...this.getMetatypeItems(allBiowares, biowares?.bioware, { type: 'Bioware', critter: critterName }),
+            ...this.getMetatypeItems(allComplexForm, complexforms?.complexform, { type: 'Complex Form', critter: critterName }),
         ];
     }
 

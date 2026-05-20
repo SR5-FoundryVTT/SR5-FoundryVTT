@@ -19,6 +19,7 @@ export class SpriteParser extends MetatypeParserBase<'sprite'> {
 
         system.spriteType = jsonData.name._TEXT.split(" ")[0];
         this.applyLevelOffsetAttributes(system, jsonData);
+        this.parseInitiative(system, jsonData, { mode: 'matrix', specialAttr: 'level' });
 
         return system;
     }
@@ -26,12 +27,12 @@ export class SpriteParser extends MetatypeParserBase<'sprite'> {
     private applyLevelOffsetAttributes(system: ReturnType<typeof this.getBaseSystem>, jsonData: Metatype) {
         for (const [attributeId, metatypeAttributeId] of Object.entries(LEVEL_OFFSET_ATTRIBUTE_MAP)) {
             const value = jsonData[metatypeAttributeId]._TEXT;
-            const parsed = this.parseLevelOffsetValue(value);
+            const parsed = this.parseSpecialOffset(value);
 
             if (attributeId === 'resonance')
-                system.attributes.resonance.applies_special = parsed.levelApplies;
+                system.attributes.resonance.applies_special = parsed.appliesSpecial;
             else
-                system.matrix[attributeId].applies_special = parsed.levelApplies;
+                system.matrix[attributeId].applies_special = parsed.appliesSpecial;
 
             if (attributeId === 'resonance')
                 system.attributes.resonance.base = parsed.base;
@@ -40,52 +41,25 @@ export class SpriteParser extends MetatypeParserBase<'sprite'> {
         }
     }
 
-    private parseLevelOffsetValue(raw: string): { levelApplies: boolean, base: number } {
-        const value = (raw ?? '').trim();
-        if (!value) return { levelApplies: false, base: 0 };
-
-        if (/^F$/i.test(value))
-            return { levelApplies: true, base: 0 };
-
-        const levelOffsetMatch = /^F\s*([+-])\s*(\d+)$/i.exec(value);
-        if (levelOffsetMatch) {
-            const sign = levelOffsetMatch[1] === '-' ? -1 : 1;
-            const amount = Number(levelOffsetMatch[2]) || 0;
-            return { levelApplies: true, base: sign * amount };
-        }
-
-        return { levelApplies: false, base: Number(value) || 0 };
-    }
-
     protected override async getItems(jsonData: Metatype): Promise<Item.Source[]> {
-        const skills = jsonData.skills;
+        const { skills, name, powers } = jsonData;
+        const optionalPowers = this.mergeLists(
+            jsonData.optionalpowers?.optionalpower,
+            jsonData.bonus?.optionalpowers?.optionalpower
+        );
 
-        const optionalpowers = {
-            optionalpower: [
-                jsonData.optionalpowers?.optionalpower,
-                jsonData.bonus?.optionalpowers?.optionalpower
-            ].flat().filter(obj => !!obj)
-        };
+        const powerList = this.getNamedList(powers?.power, optionalPowers);
+        const skillList = this.getNamedList(skills?.skill, skills?.group);
 
-        const powerList = [
-            ...IH.getArray(jsonData.powers?.power),
-            ...IH.getArray(optionalpowers?.optionalpower)
-        ].map(i => i._TEXT);
-
-        const skillList = [
-            ...IH.getArray(skills?.skill),
-            ...IH.getArray(skills?.group),
-        ].map(s => s._TEXT);
-
-        const allPowers = await IH.findItems('Critter_Power', powerList);
         const allSkills = await IH.findItems('Skill', skillList);
-        const name = jsonData.name._TEXT;
+        const allPowers = await IH.findItems('Critter_Power', powerList);
 
+        const spriteName = name._TEXT;
         return [
-            ...this.getMetatypeItems(allSkills, skills?.skill, { type: 'Skill', critter: name }),
-            ...this.getMetatypeItems(allSkills, skills?.group, { type: 'Skill Group', critter: name }),
-            ...this.getMetatypeItems(allPowers, jsonData.powers?.power, { type: 'Power', critter: name }),
-            ...this.getMetatypeItems(allPowers, optionalpowers?.optionalpower, { type: 'Optional Power', critter: name }),
+            ...this.getMetatypeItems(allSkills, skills?.skill, { type: 'Skill', critter: spriteName }),
+            ...this.getMetatypeItems(allPowers, powers?.power, { type: 'Power', critter: spriteName }),
+            ...this.getMetatypeItems(allSkills, skills?.group, { type: 'Skill Group', critter: spriteName }),
+            ...this.getMetatypeItems(allPowers, optionalPowers, { type: 'Optional Power', critter: spriteName }),
         ];
     }
 

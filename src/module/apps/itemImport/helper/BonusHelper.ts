@@ -56,11 +56,12 @@ export class BonusHelper {
         });
     }
 
-    public static async addBonus(sheet: BC.DocCreateData, bonus: BonusSchema) : Promise<void> {
-        await this.addEffects(sheet, bonus);
+    public static addBonus(sheet: BC.DocCreateData, bonus?: BonusSchema): void {
+        if (!bonus) return;
+        this.addEffects(sheet, bonus);
     }
 
-    private static async addEffects(sheet: BC.DocCreateData, bonus: BonusSchema) : Promise<void> {
+    private static addEffects(sheet: BC.DocCreateData, bonus: BonusSchema): void {
         sheet.effects ??= [];
 
         for (const [key, data] of Object.entries(bonus)) {
