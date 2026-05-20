@@ -66,12 +66,13 @@ export abstract class VersionMigration {
     protected migrateEffectChanges(
         effect: any,
         keyMap: Readonly<Record<string, string>>,
+        valueMap: Readonly<Record<string, string>> = keyMap,
     ): void {
         const changes = effect.changes;
         if (!Array.isArray(changes) || changes.length === 0) return;
 
         // Sort by length descending so longer/more specific paths are replaced first
-        const mapEntries = Object.entries(keyMap).sort((a, b) => b[0].length - a[0].length);
+        const mapEntries = Object.entries(valueMap).sort((a, b) => b[0].length - a[0].length);
 
         for (const change of changes as { key?: unknown; value?: unknown }[]) {
             if (!change) continue;

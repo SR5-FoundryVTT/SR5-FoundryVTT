@@ -1,7 +1,7 @@
 {{#if item.system.armor.value}}
     <label>
         <i data-tooltip="SR5.Armor.label" class="fas fa-shield-halved"></i>
-        {{#if item.system.armor.accessory}}+{{/if}}{{item.system.armor.value}}
+        {{#if (and item.system.armor.accessory (not (lt item.system.armor.value 0)))}}+{{/if}}{{item.system.armor.value}}
     </label>
 {{/if}}
 {{#if item.system.armor.hardened}}

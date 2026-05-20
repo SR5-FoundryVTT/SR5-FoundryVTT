@@ -80,7 +80,21 @@ export class Version0_34_0 extends VersionMigration {
             'system.force': 'system.attributes.force',
         };
 
-        this.migrateEffectChanges(effect, armorKeyMap);
+        const armorValueMap: Record<string, string> = {
+            'system.armor': 'system.armor.rating.value',
+            'system.armor.base': 'system.armor.rating.base',
+            'system.armor.value': 'system.armor.rating.value',
+            'system.armor.acid': 'system.armor.elements.acid.value',
+            'system.armor.cold': 'system.armor.elements.cold.value',
+            'system.armor.electricity': 'system.armor.elements.electricity.value',
+            'system.armor.fire': 'system.armor.elements.fire.value',
+            'system.armor.radiation': 'system.armor.elements.radiation.value',
+
+            // legacy migration key, because we didn't update change.value before (0.31.5)
+            'system.force': 'system.attributes.force',
+        };
+
+        this.migrateEffectChanges(effect, armorKeyMap, armorValueMap);
     }
 
     override migrateActor(actor: any): void {

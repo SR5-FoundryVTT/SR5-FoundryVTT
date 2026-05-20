@@ -22,7 +22,7 @@ export class CharacterPrep {
         ModifiableFieldPrep.resetAllModifiers(system);
         CharacterPrep.addSpecialAttributes(system);
 
-        ItemPrep.clearArmorElements(system);
+        ItemPrep.resetDerivedArmor(system);
     }
 
     /**

@@ -7,7 +7,7 @@ export class ItemPrep {
      * - will only allow one "Base" armor item to be used (automatically takes the best one if multiple are equipped)
      * - all "accessories" will be added to the armor
      */
-    static prepareArmor(system: Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>, items: SR5Item[]) {
+    static prepareArmor(system: Actor.SystemOfType<'character' | 'spirit'>, items: SR5Item[]) {
         const { armor } = system;
 
         // NOTE: We retrieve different types of items, all containing armor data.
@@ -69,13 +69,18 @@ export class ItemPrep {
     }
 
     /**
-     * Cleanup any lingering armor element values from _source
-     * 
-     * These values will be derived from:
-     * - ActiveEffect changes applied
-     * - equipped armor items and their elemental modifiers
+     * Reset derived actor armor fields before rebuilding armor from effects and equipped items.
+     *
+     * This clears runtime/derived armor state so prep can deterministically recalculate:
+     * - rating
+     * - hardened
+     * - elemental armor
+     * - immunities
      */
-    static clearArmorElements(system: Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>) {
+    static resetDerivedArmor(system: Actor.SystemOfType<'character' | 'spirit'>) {
+        system.armor.rating.base = 0;
+        system.armor.rating.value = 0;
+
         system.armor.hardened.base = 0;
         system.armor.hardened.value = 0;
 
