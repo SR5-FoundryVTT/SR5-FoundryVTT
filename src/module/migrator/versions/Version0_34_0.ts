@@ -24,6 +24,8 @@ export class Version0_34_0 extends VersionMigration {
             const armor = item.system.armor;
             const elements = ['acid', 'cold', 'electricity', 'fire', 'radiation'];
 
+            setProperty(armor, 'base', getProperty(armor, 'value'));
+
             if (armor.mod !== undefined)
                 armor.accessory = armor.mod;
 
