@@ -15,14 +15,14 @@ export class InitiativePrep {
         if (attribute === 'rating' && 'host' in system)
             return system.host?.rating ?? 0;
 
+        if (attribute !== 'rating' && 'matrix' in system && system.matrix && isKeyOf(system.matrix, attribute))
+            return system.matrix[attribute].value;
+
         if ('attributes' in system && system.attributes && isKeyOf(system.attributes, attribute))
             return system.attributes[attribute].value;
 
         if ('vehicle_stats' in system && system.vehicle_stats && isKeyOf(system.vehicle_stats, attribute))
             return system.vehicle_stats[attribute].value;
-
-        if (attribute !== 'rating' && 'matrix' in system && system.matrix && isKeyOf(system.matrix, attribute))
-            return system.matrix[attribute].value;
 
         return 0;
     }
