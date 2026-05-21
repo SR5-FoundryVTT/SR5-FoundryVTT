@@ -182,9 +182,9 @@ export const registerSystemSettings = () => {
     /**
      * Remember whether the Modify Roll section was expanded last time.
      */
-    game.settings.register(SYSTEM_NAME, FLAGS.CollapseModifyRoll, {
-        name: 'SETTINGS.CollapseModifyRoll',
-        hint: 'SETTINGS.CollapseModifyRollDescription',
+    game.settings.register(SYSTEM_NAME, FLAGS.ModifyRollExpanded, {
+        name: 'SETTINGS.ModifyRollExpanded',
+        hint: 'SETTINGS.ModifyRollExpandedDescription',
         scope: 'client',
         config: false,
         type: Boolean,

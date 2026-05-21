@@ -71,7 +71,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
         if (hasModifierChanges(test?.threshold?.changes))
             this._expandedList.add('test.data.threshold');
 
-        if (game.settings.get(SYSTEM_NAME, FLAGS.CollapseModifyRoll))
+        if (game.settings.get(SYSTEM_NAME, FLAGS.ModifyRollExpanded))
             this._expandedList.add('modify-roll');
     }
 
@@ -254,7 +254,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
             const isExpanded = sectionDiv.classList.toggle('expanded');
             if (isExpanded) this._expandedList.add('modify-roll');
             else this._expandedList.delete('modify-roll');
-            void game.settings.set(SYSTEM_NAME, FLAGS.CollapseModifyRoll, isExpanded);
+            void game.settings.set(SYSTEM_NAME, FLAGS.ModifyRollExpanded, isExpanded);
             void this.render();
         });
 

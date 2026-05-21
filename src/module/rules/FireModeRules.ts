@@ -60,7 +60,7 @@ export const FireModeRules = {
      * Calculate the amount of additional recoil possible depending on recoil of the firemode and
      * ammunition left.
      * 
-     * @param fireMode Choosen fire mode to attack with
+     * @param fireMode Chosen fire mode to attack with
      * @param ammoLeft Ammunition left in the weapon
      * @returns A positive number or zero, if no additional recoil will be caused.
      */

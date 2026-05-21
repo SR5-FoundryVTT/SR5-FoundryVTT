@@ -45,7 +45,7 @@ export const FLAGS = {
     MustHaveRessourcesOnTest: 'MustConsumeRessourcesOnTest',
     AutomateMultiDefenseModifier: 'AutomateMultiDefenseModifier',
     AutomateProgressiveRecoil: 'AutomateProgressiveRecoil',
-    CollapseModifyRoll: 'CollapseModifyRoll',
+    ModifyRollExpanded: 'ModifyRollExpanded',
     TurnsSinceLastAttack: 'turnsSinceLastAttack',
     MarkImports: 'MarkImports',
     ImportIconFolder: 'ImportIconFolder',
