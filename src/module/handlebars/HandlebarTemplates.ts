@@ -80,7 +80,7 @@ export const preloadHandlebarsTemplates = async () => {
             'fake-attribute',
             'language-and-knowledge-skills',
             'limits',
-            'matrix-attribute-matrix',
+            'matrix-attribute',
             'matrix-attribute-sprite',
             'special-attributes',
             'vehicle-paired-attribute',
