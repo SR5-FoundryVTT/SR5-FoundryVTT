@@ -10,6 +10,51 @@ export const shadowrunSR5VehicleDataPrep = (context: QuenchBatchContext) => {
 
     
     describe('VehicleDataPrep', () => {
+        it('armor rating calculation with modifiers', async () => {
+            const vehicle = await factory.createActor({
+                type: 'vehicle',
+                system: {
+                    armor: {
+                        rating: { base: 9 },
+                    },
+                    modifiers: {
+                        armor: 2,
+                    }
+                }
+            });
+
+            assert.strictEqual(vehicle.system.armor.rating.base, 9);
+            assert.strictEqual(vehicle.system.armor.rating.value, 11);
+        });
+
+        it('applies equipped armor item values to vehicle armor rating', async () => {
+            const vehicle = await factory.createActor({
+                type: 'vehicle',
+                system: {
+                    armor: {
+                        rating: { base: 9 },
+                    },
+                }
+            });
+
+            await vehicle.createEmbeddedDocuments('Item', [{
+                type: 'armor',
+                name: 'Vehicle Armor Accessory',
+                system: {
+                    armor: {
+                        base: 2,
+                        accessory: true,
+                    },
+                    technology: {
+                        equipped: true,
+                    },
+                },
+            }]);
+
+            assert.strictEqual(vehicle.system.armor.rating.base, 9);
+            assert.strictEqual(vehicle.system.armor.rating.value, 11);
+        });
+
         it('Matrix condition monitor track calculation with modifiers', async () => {
             const vehicle = await factory.createActor({ type: 'vehicle' });
             assert.equal(vehicle.system.matrix.condition_monitor.max, 8);

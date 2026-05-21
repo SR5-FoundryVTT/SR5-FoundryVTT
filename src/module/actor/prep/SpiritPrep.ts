@@ -11,13 +11,14 @@ import { SR5Item } from 'src/module/item/SR5Item';
 import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { SkillFieldType } from 'src/module/types/template/Skills';
+import { ItemPrep } from './functions/ItemPrep';
 
 export class SpiritPrep {
     static prepareBaseData(system: Actor.SystemOfType<'spirit'>) {
         ModifiableFieldPrep.resetAllModifiers(system);
     }
 
-    static prepareDerivedData(system: Actor.SystemOfType<'spirit'>, _items: SR5Item[]) {
+    static prepareDerivedData(system: Actor.SystemOfType<'spirit'>, items: SR5Item[]) {
         const force = ModifiableValue.calcTotal(system.attributes.force, { min: 1 });
 
         SpiritPrep.prepareSpiritAttributes(system, force);
@@ -32,6 +33,7 @@ export class SpiritPrep {
         LimitsPrep.prepareDerivedLimits(system);
 
         SpiritPrep.prepareSpiritArmor(system);
+        ItemPrep.prepareArmor(system, items);
 
         GruntPrep.prepareConditionMonitors(system);
 
@@ -72,13 +74,12 @@ export class SpiritPrep {
      * Prepare armor values for spirit rules. These have some additional caveats in comparison to characters.
      */
     static prepareSpiritArmor(system: Actor.SystemOfType<'spirit'>) {
-        const { armor, attributes } = system;
+        const { armor, attributes, modifiers } = system;
 
-        armor.base = attributes.essence.value * 2;
-        if (system.modifiers.armor)
-            ModifiableValue.addUnique(armor, game.i18n.localize('SR5.Bonus'), system.modifiers.armor);
+        const immunityRating = Math.max(attributes.essence.value * 2, 0);
+        ModifiableValue.addUnique(armor.immunities.normal_weapons, 'SR5.armorImmunityTypes.normal_weapons', immunityRating);
 
-        ModifiableValue.calcTotal(armor);
-        armor.hardened = true;
+        if (modifiers.armor)
+            ModifiableValue.addUnique(armor.rating, game.i18n.localize('SR5.Bonus'), modifiers.armor);
     }
 }

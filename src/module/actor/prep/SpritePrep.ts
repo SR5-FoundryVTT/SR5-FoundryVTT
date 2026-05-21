@@ -52,12 +52,12 @@ export class SpritePrep {
 
         const matrixAtts = ['attack', 'sleaze', 'data_processing', 'firewall'] as const;
 
-        matrixAtts.forEach((att) => {
-            if (!matrix[att]) return;
+        for (const att of matrixAtts) {
+            if (!matrix[att]) continue;
             if (matrix[att].applies_special)
                 ModifiableValue.addUniqueBase(matrix[att], 'SR5.Level', level);
             ModifiableValue.calcTotal(matrix[att]);
-        });
+        }
 
         matrix.rating = level;
     }
@@ -88,5 +88,4 @@ export class SpritePrep {
         track.matrix.max = matrix.condition_monitor.max;
         track.matrix.label = SR5.damageTypes.matrix;
     }
-
 }

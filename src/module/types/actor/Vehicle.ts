@@ -91,7 +91,7 @@ const VehicleData = () => ({
     movement: new SchemaField(Movement()),
 
     // === Protection ===
-    armor: new ModifiableField(ActorArmorData()),
+    armor: new SchemaField(ActorArmorData()),
 
     // === Modifiers ===
     modifiers: new SchemaField(CreateModifiers(

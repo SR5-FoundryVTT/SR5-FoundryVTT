@@ -12,7 +12,10 @@
         </div>
 
         <div class="list-item-col armor-col">
-            <label>{{#if item.system.armor.mod}}+{{/if}}{{item.system.armor.value}}</label>
+            <label>
+                {{#if (and item.system.armor.accessory (not (lt item.system.armor.value 0)))}}+{{/if}}{{item.system.armor.value}}
+                {{#if item.system.armor.hardened}}/ {{item.system.armor.hardened}}H{{/if}}
+            </label>
         </div>
 
         {{> 'systems/shadowrun5e/dist/templates/v2/list-items/item-rating-col.hbs' item }}

@@ -50,7 +50,6 @@ export class Constants {
         // --- Vehicles ---
         Drone:          this.MAP_COMPENDIUM_CONFIG.Drone,
         Vehicle:        this.MAP_COMPENDIUM_CONFIG.Drone,
-        Vehicle_Mod:    this.MAP_COMPENDIUM_CONFIG.Modification,
 
         // --- Magic ---
         Adept_Power:    this.MAP_COMPENDIUM_CONFIG.Trait,
@@ -65,6 +64,10 @@ export class Constants {
         Program:        this.MAP_COMPENDIUM_CONFIG.Gear,
         Gear:           this.MAP_COMPENDIUM_CONFIG.Gear,
         Weapon:         this.MAP_COMPENDIUM_CONFIG.Weapon,
+
+        // --- Modifications ---
+        Armor_Mod:      this.MAP_COMPENDIUM_CONFIG.Modification,
+        Vehicle_Mod:    this.MAP_COMPENDIUM_CONFIG.Modification,
         Weapon_Mod:     this.MAP_COMPENDIUM_CONFIG.Modification,
 
         // Misc
@@ -139,6 +142,7 @@ export class Constants {
         "BOD": "body", "AGI": "agility", "REA": "reaction",
         "STR": "strength", "WIL": "willpower","LOG": "logic",
         "INT": "intuition", "CHA": "charisma", "EDG": "edge",
-        "MAG": "magic", "RES": "resonance", "ESS": "essence"
+        "MAG": "magic", "RES": "resonance", "ESS": "essence",
+        "DEP": "depth"
     } as const;
 }

@@ -36,12 +36,12 @@ const SpiritData = () => ({
     magic: new SchemaField(MagicData()),
 
     // === Combat ===
-    armor: new ModifiableField(ActorArmorData()),
+    armor: new SchemaField(ActorArmorData()),
+    wounds: new ModifiableField(ModifiableValueSchema()),
     initiative: new SchemaField(Initiative({
         astral: { attributeA: 'force', attributeB: 'force', constant: 0, dice: 3 },
         meatspace: { attributeA: 'reaction', attributeB: 'intuition', constant: 0, dice: 2 },
     })),
-    wounds: new ModifiableField(ModifiableValueSchema()),
 
     // === Condition & Movement ===
     track: new SchemaField(Tracks('physical', 'stun')),

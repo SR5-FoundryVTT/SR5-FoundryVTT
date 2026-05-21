@@ -51,9 +51,10 @@ export class BonusConstant {
         accel: { changes: [{ key: "system.vehicle_stats.acceleration" }] },
         armor: {
             name: "Add Armor",
-            changes: [{ key: "system.armor" }]
+            changes: [{ key: "system.armor.rating" }]
         },
         body: { changes: [{ key: "system.attributes.body" }] },
+        coldarmor: { changes: [{ key: "system.armor.elements.cold" }] },
         composure: { changes: [{ key: "system.modifiers.composure" }] },
         damageresistance: {
             name: "Add Damage Resistance",
@@ -79,6 +80,7 @@ export class BonusConstant {
             changes: [{ key: "data.pool" }],
             system: { applyTo: 'test_all', selection_tests: [{ id: "DrainTest" }] },
         },
+        electricityarmor: { changes: [{ key: "system.armor.elements.electricity" }] },
         essencemax: { changes: [{ key: "system.attributes.essence.base" }] },
         essencepenalty: { changes: [{ key: "system.attributes.essence" }] },
         fadingresist: {
@@ -86,6 +88,7 @@ export class BonusConstant {
             changes: [{ key: "data.pool" }],
             system: { applyTo: 'test_all', selection_tests: [{ id: "FadeTest" }] },
         },
+        firearmor: { changes: [{ key: "system.armor.elements.fire" }] },
         handling: { changes: [{ key: "system.vehicle_stats.handling" }] },
         initiative: { changes: [{ key: "system.initiative.meatspace.constant" }] },
         initiativedice: { changes: [{ key: "system.initiative.meatspace.dice" }] },

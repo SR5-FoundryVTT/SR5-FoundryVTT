@@ -28,6 +28,7 @@ import { shadowrunCombatModifierFlow } from './sr5.CombatModifierFlow.spec';
 import { itemSkillTesting } from './ItemSkill.spec';
 import { shadowrunOpposedCompileSpriteTesting } from './sr5.OpposedCompileSprite.spec';
 import { shadowrunOpposedCallInMessageActionTesting } from './sr5.OpposedCallInMessageAction.spec';
+import { actorArmorFlowTesting } from './sr5.ActorArmorFlow.spec';
 
 import { Quench } from '@ethaks/fvtt-quench';
 import { shadowrunRiggerTesting } from '@/unittests/sr5.RiggerTesting.spec';
@@ -129,6 +130,9 @@ export const quenchRegister = (quench: Quench) => {
     });
     quench.registerBatch('shadowrun5e.opposed.call_in_message_action', shadowrunOpposedCallInMessageActionTesting, {
         displayName: 'SHADOWRUN5e: Opposed Call-In Message Action Flow',
+    });
+    quench.registerBatch('shadowrun5e.actor.armor_flow', actorArmorFlowTesting, {
+        displayName: 'SHADOWRUN5e: Actor Armor Flow Test',
     });
     quench.registerBatch('shadowrun5e.migrators', Migrators, {
         displayName: 'SHADOWRUN5e: Migrators Test',

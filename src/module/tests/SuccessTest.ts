@@ -42,10 +42,6 @@ export type SuccessTestValues = TestValues & {
     glitches: ValueFieldType
     extendedHits: ValueFieldType
 }
-export interface IconWithTooltip {
-    icon: string;
-    tooltip: Translation;
-}
 
 /**
  * Contain all data necessary to handle an action based test.
@@ -64,7 +60,6 @@ export interface TestData {
     // Use Shadowrun buy hits rule instead of rolling dice.
     buyHits: boolean
 
-    hitsIcon?: IconWithTooltip
     autoSuccess?: boolean
 
     // Internal test values.
@@ -929,17 +924,15 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return TestRules.buyHits(this.data.pool.value);
     }
 
-    get hitsIcon(): IconWithTooltip | undefined {
-        return this.data.hitsIcon;
-    }
+    get hitsBreakdown(): string {
+        const modifierHits = this.hits.changes
+            .filter(change => !ModifiableValue.isBaseChange(change))
+            .reduce((total, change) => total + change.value, 0);
 
-    get appendedHits(): number | undefined {
-        return new ModifiableValue(this.hits).get('SR5.AppendedHits');
-    }
+        if (modifierHits === 0) return `${this.hits.value}`;
 
-    // In the case we've added appended hits, we want to separately display the hits value and the appended hits (ie. "7 + 5" instead of "12")
-    get displayHits(): number | undefined {
-        return this.hits.value - (this.appendedHits || 0);
+        const baseHits = this.hits.value - modifierHits;
+        return `${baseHits} + ${modifierHits}`;
     }
 
     // Hide dice pool and roll results as they are not relevant to the success of the test

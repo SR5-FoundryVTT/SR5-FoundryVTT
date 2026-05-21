@@ -51,14 +51,14 @@ const CharacterData = () => ({
     limits: new SchemaField(CharacterLimits()),
 
     // === Combat ===
-    armor: new ModifiableField(ActorArmorData()),
+    armor: new SchemaField(ActorArmorData()),
+    values: new SchemaField(CharacterValues()),
+    wounds: new ModifiableField(ModifiableValueSchema()),
     initiative: new SchemaField(Initiative({
         meatspace: { attributeA: 'reaction', attributeB: 'intuition', constant: 0, dice: 1 },
         astral: { attributeA: 'intuition', attributeB: 'intuition', constant: 0, dice: 2 },
         matrix: { attributeA: 'intuition', attributeB: 'data_processing', constant: 0, dice: 3 },
     })),
-    values: new SchemaField(CharacterValues()),
-    wounds: new ModifiableField(ModifiableValueSchema()),
 
     visibilityChecks: new SchemaField(VisibilityChecks('astral', 'matrix', 'meatspace')),
 

@@ -24,7 +24,7 @@ export class WareParser extends Parser<'bioware' | 'cyberware'> {
 
         const capacity = (jsonData.capacity._TEXT || '0').match(/[0-9]+/g);
         if (capacity)
-            system.capacity = parseInt(capacity[0]);
+            system.capacity.total = parseInt(capacity[0]);
 
         return system;
     }

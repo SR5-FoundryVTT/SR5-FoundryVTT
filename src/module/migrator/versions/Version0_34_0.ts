@@ -32,12 +32,57 @@ export class Version0_34_0 extends VersionMigration {
     }
 
     override handlesItem(item: Readonly<any>): boolean {
-        return item.type === "skill";
+        return item.system?.armor !== undefined || item.type === 'modification' || item.type === 'skill' || item.type === 'bioware' || item.type === 'cyberware';
     }
 
     override migrateItem(item: any): void {
         if (item.type === 'skill' && !getProperty(item, "system.skill.knowledgeType")) {
             setProperty(item, "system.skill.knowledgeType", "academic");
+        }
+
+        if (item.system?.armor !== undefined) {
+            const armor = item.system.armor;
+            const elements = ['acid', 'cold', 'electricity', 'fire', 'radiation'];
+
+            setProperty(armor, 'base', getProperty(armor, 'value'));
+
+            if (armor.mod !== undefined)
+                armor.accessory = armor.mod;
+
+            if (armor.hardened !== undefined) {
+                armor.is_hardened = Boolean(armor.hardened);
+                delete armor.hardened;
+            }
+
+            for (const el of elements) {
+                if (armor[el] !== undefined)
+                    setProperty(armor, `elements.${el}.base`, armor[el] ?? 0);
+            }
+        }
+
+        if (item.type === 'modification' && item.system !== undefined) {
+            const legacyToNew: Array<[string, string]> = [
+                ['mount_point', 'mod_weapon.mount_point'],
+                ['dice_pool', 'mod_weapon.dice_pool'],
+                ['accuracy', 'mod_weapon.accuracy'],
+                ['rc', 'mod_weapon.rc'],
+                ['conceal', 'mod_weapon.conceal'],
+            ];
+
+            for (const [legacyKey, newKey] of legacyToNew) {
+                const oldValue = getProperty(item.system, legacyKey);
+                if (oldValue !== undefined)
+                    setProperty(item.system, newKey, oldValue);
+            }
+        }
+
+        if ((item.type === 'bioware' || item.type === 'cyberware') && item.system !== undefined) {
+            const oldCapacity = getProperty(item.system, 'capacity');
+
+            // Remove the legacy numeric "capacity" before setting the new object structure,
+            // otherwise code that checks `in` will fail on a number.
+            delete item.system.capacity;
+            setProperty(item.system, 'capacity.total', oldCapacity);
         }
     }
 
@@ -57,31 +102,23 @@ export class Version0_34_0 extends VersionMigration {
             this.migrateSpirit(actor);
         else if (actor.type === 'sprite')
             this.migrateSprite(actor);
+
+        if ('armor' in system)
+            this.migrateActorArmor(system);
     }
 
-    override migrateActiveEffect(effect: any): void {
-        const keyMap = {
-            'system.level': 'system.attributes.level',
-            'system.initiative.meatspace.base': 'system.initiative.meatspace.constant',
-            'system.initiative.meatspace.base.base': 'system.initiative.meatspace.constant.base',
-            'system.initiative.meatspace.base.value': 'system.initiative.meatspace.constant.value',
-            'system.initiative.astral.base': 'system.initiative.astral.constant',
-            'system.initiative.astral.base.base': 'system.initiative.astral.constant.base',
-            'system.initiative.astral.base.value': 'system.initiative.astral.constant.value',
-            'system.initiative.matrix.base': 'system.initiative.matrix.constant',
-            'system.initiative.matrix.base.base': 'system.initiative.matrix.constant.base',
-            'system.initiative.matrix.base.value': 'system.initiative.matrix.constant.value',
-            'system.modifiers.meat_initiative': 'system.initiative.meatspace.constant.base',
-            'system.modifiers.meat_initiative_dice': 'system.initiative.meatspace.dice.base',
-            'system.modifiers.astral_initiative': 'system.initiative.astral.constant.base',
-            'system.modifiers.astral_initiative_dice': 'system.initiative.astral.dice.base',
-            'system.modifiers.matrix_initiative': 'system.initiative.matrix.constant.base',
-            'system.modifiers.matrix_initiative_dice': 'system.initiative.matrix.dice.base',
+    private migrateActorArmor(system: any): void {
+        const armor = system?.armor;
+        if (!armor || typeof armor !== 'object') return;
 
-            // legacy migration key, because we didn't update change.value before (0.31.5)
-            'system.force': 'system.attributes.force',
-        } as const;
-        this.migrateEffectChanges(effect, keyMap);
+        const legacyRating = getProperty(armor, 'base');
+        if (legacyRating) setProperty(armor, 'rating.base', legacyRating);
+
+        const elements = ['acid', 'cold', 'electricity', 'fire', 'radiation'];
+        for (const el of elements) {
+            if (armor[el] !== undefined)
+                setProperty(armor, `elements.${el}.base`, armor[el] ?? 0);
+        }
     }
 
     private migrateInitiativeModifierFields(actorType: string, system: any) {
@@ -224,5 +261,76 @@ export class Version0_34_0 extends VersionMigration {
     private normalizeSkillKey(name: string) {
         if (typeof name !== 'string') return '';
         return name.trim().replace(/[\s-]+/g, '_').toLowerCase();
+    }
+
+    
+    override migrateActiveEffect(effect: { changes: { key: string }[] }): void {
+        const keyMap: Record<string, string> = {
+            'system.armor': 'system.armor.rating',
+            'system.armor.base': 'system.armor.rating',
+            'system.armor.value': 'system.armor.rating',
+            'system.armor.mod': 'system.armor.accessory',
+            'system.armor.acid': 'system.armor.elements.acid',
+            'system.armor.cold': 'system.armor.elements.cold',
+            'system.armor.electricity': 'system.armor.elements.electricity',
+            'system.armor.fire': 'system.armor.elements.fire',
+            'system.armor.radiation': 'system.armor.elements.radiation',
+            'system.level': 'system.attributes.level',
+            'system.initiative.meatspace.base': 'system.initiative.meatspace.constant',
+            'system.initiative.meatspace.base.base': 'system.initiative.meatspace.constant.base',
+            'system.initiative.meatspace.base.value': 'system.initiative.meatspace.constant.value',
+            'system.initiative.astral.base': 'system.initiative.astral.constant',
+            'system.initiative.astral.base.base': 'system.initiative.astral.constant.base',
+            'system.initiative.astral.base.value': 'system.initiative.astral.constant.value',
+            'system.initiative.matrix.base': 'system.initiative.matrix.constant',
+            'system.initiative.matrix.base.base': 'system.initiative.matrix.constant.base',
+            'system.initiative.matrix.base.value': 'system.initiative.matrix.constant.value',
+            'system.modifiers.meat_initiative': 'system.initiative.meatspace.constant.base',
+            'system.modifiers.meat_initiative_dice': 'system.initiative.meatspace.dice.base',
+            'system.modifiers.astral_initiative': 'system.initiative.astral.constant.base',
+            'system.modifiers.astral_initiative_dice': 'system.initiative.astral.dice.base',
+            'system.modifiers.matrix_initiative': 'system.initiative.matrix.constant.base',
+            'system.modifiers.matrix_initiative_dice': 'system.initiative.matrix.dice.base',
+
+            // legacy migration key, because we didn't update change.value before (0.31.5)
+            'system.force': 'system.attributes.force',
+        };
+
+        const valueMap: Record<string, string> = {
+            'system.armor': 'system.armor.rating.value',
+            'system.armor.base': 'system.armor.rating.base',
+            'system.armor.value': 'system.armor.rating.value',
+            'system.armor.acid': 'system.armor.elements.acid.value',
+            'system.armor.cold': 'system.armor.elements.cold.value',
+            'system.armor.electricity': 'system.armor.elements.electricity.value',
+            'system.armor.fire': 'system.armor.elements.fire.value',
+            'system.armor.radiation': 'system.armor.elements.radiation.value',
+            'system.accuracy': 'system.mod_weapon.accuracy',
+            'system.dice_pool': 'system.mod_weapon.dice_pool',
+            'system.rc': 'system.mod_weapon.rc',
+            'system.conceal': 'system.mod_weapon.conceal',
+            'system.mount_point': 'system.mod_weapon.mount_point',
+            'system.level': 'system.attributes.level.value',
+            'system.initiative.meatspace.base': 'system.initiative.meatspace.constant',
+            'system.initiative.meatspace.base.base': 'system.initiative.meatspace.constant.base',
+            'system.initiative.meatspace.base.value': 'system.initiative.meatspace.constant.value',
+            'system.initiative.astral.base': 'system.initiative.astral.constant',
+            'system.initiative.astral.base.base': 'system.initiative.astral.constant.base',
+            'system.initiative.astral.base.value': 'system.initiative.astral.constant.value',
+            'system.initiative.matrix.base': 'system.initiative.matrix.constant',
+            'system.initiative.matrix.base.base': 'system.initiative.matrix.constant.base',
+            'system.initiative.matrix.base.value': 'system.initiative.matrix.constant.value',
+            'system.modifiers.meat_initiative': 'system.initiative.meatspace.constant.base',
+            'system.modifiers.meat_initiative_dice': 'system.initiative.meatspace.dice.base',
+            'system.modifiers.astral_initiative': 'system.initiative.astral.constant.base',
+            'system.modifiers.astral_initiative_dice': 'system.initiative.astral.dice.base',
+            'system.modifiers.matrix_initiative': 'system.initiative.matrix.constant.base',
+            'system.modifiers.matrix_initiative_dice': 'system.initiative.matrix.dice.base',
+
+            // legacy migration key, because we didn't update change.value before (0.31.5)
+            'system.force': 'system.attributes.force.value',
+        };
+
+        this.migrateEffectChanges(effect, keyMap, valueMap);
     }
 }
