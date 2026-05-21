@@ -65,7 +65,7 @@ export class Version0_34_0 extends VersionMigration {
     }
 
     override migrateActiveEffect(effect: { changes: { key: string }[] }): void {
-        const armorKeyMap: Record<string, string> = {
+        const keyMap: Record<string, string> = {
             'system.armor': 'system.armor.rating',
             'system.armor.base': 'system.armor.rating',
             'system.armor.value': 'system.armor.rating',
@@ -80,7 +80,7 @@ export class Version0_34_0 extends VersionMigration {
             'system.force': 'system.attributes.force',
         };
 
-        const armorValueMap: Record<string, string> = {
+        const valueMap: Record<string, string> = {
             'system.armor': 'system.armor.rating.value',
             'system.armor.base': 'system.armor.rating.base',
             'system.armor.value': 'system.armor.rating.value',
@@ -89,12 +89,17 @@ export class Version0_34_0 extends VersionMigration {
             'system.armor.electricity': 'system.armor.elements.electricity.value',
             'system.armor.fire': 'system.armor.elements.fire.value',
             'system.armor.radiation': 'system.armor.elements.radiation.value',
+            'system.accuracy': 'system.mod_weapon.accuracy',
+            'system.dice_pool': 'system.mod_weapon.dice_pool',
+            'system.rc': 'system.mod_weapon.rc',
+            'system.conceal': 'system.mod_weapon.conceal',
+            'system.mount_point': 'system.mod_weapon.mount_point',
 
             // legacy migration key, because we didn't update change.value before (0.31.5)
             'system.force': 'system.attributes.force',
         };
 
-        this.migrateEffectChanges(effect, armorKeyMap, armorValueMap);
+        this.migrateEffectChanges(effect, keyMap, valueMap);
     }
 
     override migrateActor(actor: any): void {
