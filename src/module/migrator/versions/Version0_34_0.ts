@@ -6,9 +6,20 @@ const { hasProperty, setProperty, getProperty } = foundry.utils;
 /**
  * Migrate initiative to have a blitz field, and vehicle stats to have off-road acceleration.
  * Also migrate combat flags for tracking initiative pass and if a combatant attacked last turn.
+ * Also add knowledge type to skills if not present.
  */
 export class Version0_34_0 extends VersionMigration {
     readonly TargetVersion = "0.34.0";
+
+    override handlesItem(item: Readonly<any>): boolean {
+        return item.type === "skill";
+    }
+
+    override migrateItem(item: any): void {
+        if (item.type === 'skill' && !getProperty(item, "system.skill.knowledgeType")) {
+            setProperty(item, "system.skill.knowledgeType", "academic");
+        }
+    }
 
     override migrateActor(actor: any): void {
         const system = actor.system;
