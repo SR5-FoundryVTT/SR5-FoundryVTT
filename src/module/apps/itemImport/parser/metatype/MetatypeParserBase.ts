@@ -229,7 +229,7 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'spirit'
             }
 
             const typeStr = dvMatch[2]?.toUpperCase();
-            const damageType = typeStr === 'S' ? 'stun' : typeStr === 'M' ? 'matrix' : 'physical';
+            const damageType = typeStr === 'S' ? 'stun' : 'physical';
 
             // 3. Extract AP segment anywhere in the string (Optional)
             const apMatch = /\bAP\s+([-A-Z0-9+]+)\b/i.exec(select);
