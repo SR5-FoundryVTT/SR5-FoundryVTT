@@ -197,11 +197,15 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'spirit'
             if (!select) continue;
 
             // 1. Extract optional Name (e.g., "Bite:" or "Claws (DV...")
-            let name = 'Natural Weapon';
+            let rawName = 'Natural Weapon';
             const nameMatch = /^([^:(]+?)[:(]/.exec(select);
             if (nameMatch && !/^DV\b/i.test(nameMatch[1].trim())) {
-                name = nameMatch[1].trim();
+                rawName = nameMatch[1].trim();
             }
+
+            // Split the name by '/' (e.g., "Bite / Claws" -> ["Bite", "Claws"])
+            const names = rawName.split('/').map(n => n.trim()).filter(Boolean);
+            if (names.length === 0) names.push('Natural Weapon');
 
             // 2. Extract DV segment anywhere in the string
             const dvMatch = /\bDV\s+(\(?[A-Z0-9+-]+\)?)\s*([PSM])?\b/i.exec(select);
@@ -258,8 +262,7 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'spirit'
             system.technology.equipped = true;
             system.subcategory = 'natural_weapon';
             system.category = isRanged ? 'range' : 'melee';
-            
-            // Note: You may want to change the skill for ranged natural weapons (e.g., to 'exotic_ranged_weapon')
+
             system.action.skill = isRanged ? 'exotic_ranged_weapon' : 'unarmed_combat';
             
             system.action.damage = DataDefaults.createData('damage', {
@@ -275,14 +278,18 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'spirit'
                 ...(damageAttribute && { attribute: damageAttribute }),
             });
 
-            // --- Push Item ---
-            items.push({
-                _id: foundry.utils.randomID(),
-                name,
-                type: 'weapon' as const,
-                img: 'systems/shadowrun5e/dist/icons/importer/critter_power/critter_power.svg',
-                system,
-            } satisfies Item.CreateData<'weapon'> as unknown as Item.Source);
+            // --- Push Items ---
+            // Loop through all parsed names and create a unique item for each one
+            for (const itemName of names) {
+                items.push({
+                    _id: foundry.utils.randomID(),
+                    name: itemName,
+                    type: 'weapon' as const,
+                    img: 'systems/shadowrun5e/dist/icons/importer/critter_power/critter_power.svg',
+                    // Deep clone prevents multiple items from sharing the exact same memory reference
+                    system: foundry.utils.deepClone(system), 
+                } satisfies Item.CreateData<'weapon'> as unknown as Item.Source);
+            }
         }
 
         return items;
