@@ -166,7 +166,18 @@
             align-self: center;
         }
 
-        // animate a color change for when blitz is active to make sure people uncheck it if needed
+        .initiative-blitz-toggle {
+            color: variables.$white;
+
+            &:hover {
+                color: var(--sr5v2-link-hover);
+            }
+
+            i {
+                color: inherit;
+            }
+        }
+
         .blitz-active {
             animation: blitzShine 3s linear infinite;
         }
