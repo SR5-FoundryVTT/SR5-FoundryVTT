@@ -4,7 +4,7 @@ import { TechnologyPartData } from "../template/Technology";
 
 const EquipmentData = () => ({
     ...BaseItemData(),
-    ...ActionPartData(),
+    ...ActionPartData({ normal_weapon: true }),
     ...TechnologyPartData(),
 });
 

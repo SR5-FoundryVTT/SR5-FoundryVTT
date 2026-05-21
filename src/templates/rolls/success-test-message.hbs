@@ -38,9 +38,6 @@
         <div class="card-content {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
             <div class="test-line">
                 <span class="test-code">{{test.code}}</span>
-                {{#if test.hitsIcon}}
-                <img class="test-icon" src="{{test.hitsIcon.icon}}" data-tooltip="{{test.hitsIcon.tooltip}}" />
-                {{/if}}
             </div>
         </div>
         {{/if}}
@@ -80,11 +77,8 @@
                 <div class="test-value">
                     <span class="value">{{localize test.hits.label}}:</span>
                     <span class="value-result">
-                        {{test.displayHits}}{{#if test.appendedHits}} + {{test.appendedHits}}{{/if}}
+                        {{test.hitsBreakdown}}
                     </span>
-                    {{#if test.hitsIcon}}
-                    <img class="test-icon" src="{{test.hitsIcon.icon}}" data-tooltip="{{test.hitsIcon.tooltip}}" />
-                    {{/if}}
                 </div>
                 {{#if test.hasBuyHits}}
                 <div class="test-value">

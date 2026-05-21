@@ -1,7 +1,6 @@
-import { SR5 } from "../../../config";
 import { SR5Item } from 'src/module/item/SR5Item';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
-
+ 
 export class ItemPrep {
     /**
      * Prepare the armor data for the Item
@@ -10,47 +9,63 @@ export class ItemPrep {
      */
     static prepareArmor(system: Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>, items: SR5Item[]) {
         const { armor } = system;
-        armor.base = 0;
-        armor.value = 0;
 
         // NOTE: We retrieve different types of items, all containing armor data.
         const equippedArmor = items.filter((item) => item.hasArmor() && item.isEquipped()) as SR5Item<'armor'>[];
+        const immunityRating = Math.max(system.attributes.essence.value * 2, 0);
+
         for (const item of equippedArmor) {
-            const armorValue = item.system.armor.value;
+            const normalArmor = item.system.armor.value;
+            const hardenedArmor = item.system.armor.hardened;
+
             // Don't spam armor values with clothing or armor like items without any actual armor.
-            if (armorValue > 0) {
+            if (normalArmor) {
                 // We allow only one base armor but multiple armor accessories
-                if (item.system.armor.mod) {
-                    ModifiableValue.addUnique(armor, item.name, item.system.armor.value);
-                } else if (armorValue > armor.base) {
-                    armor.base = armorValue;
-                    armor.label = item.name;
-                    armor.hardened = item.system.armor.hardened;
+                if (item.system.armor.accessory) {
+                    ModifiableValue.addUnique(armor.rating, item.name, normalArmor);
+                } else {
+                    ModifiableValue.addUnique(
+                        armor.rating, item.name, normalArmor,
+                        CONST.ACTIVE_EFFECT_MODES.UPGRADE, ModifiableValue.LOWER_PRIORITY
+                    );
+                }
+            }
+
+            if (hardenedArmor) {
+                if (item.system.armor.accessory) {
+                    ModifiableValue.addUnique(armor.hardened, item.name, hardenedArmor);
+                } else {
+                    ModifiableValue.addUnique(
+                        armor.hardened, item.name, hardenedArmor,
+                        CONST.ACTIVE_EFFECT_MODES.UPGRADE, ModifiableValue.LOWER_PRIORITY
+                    );
                 }
             }
 
             // Apply elemental modifiers of all worn armor and clothing SR5#169.
-            for (const element of Object.keys(SR5.elementTypes)) {
-                armor[element] += item.getArmorElements()[element];
+            for (const element of Object.keys(item.system.armor.elements)) {
+                if (!armor.elements[element]) continue;
+                ModifiableValue.addUnique(armor.elements[element], item.name, item.system.armor.elements[element].value);
+            }
+
+            for (const immunity of item.system.armor.immunities.value) {
+                if (!armor.immunities[immunity]) continue;
+                // Immunity rating is trait-like: apply once per immunity type, not per item piece.
+                ModifiableValue.addUnique(armor.immunities[immunity], `SR5.armorImmunityTypes.${immunity}`, immunityRating);
             }
         }
 
         if (system.modifiers.armor)
-            ModifiableValue.addUnique(armor, game.i18n.localize('SR5.Bonus'), system.modifiers.armor);
+            ModifiableValue.addUnique(armor.rating, game.i18n.localize('SR5.Bonus'), system.modifiers.armor);
 
-        ModifiableValue.calcTotal(armor);
-    }
+        ModifiableValue.calcTotal(armor.rating);
+        ModifiableValue.calcTotal(armor.hardened);
+        for (const element of Object.values(armor.elements)) {
+            ModifiableValue.calcTotal(element);
+        }
 
-    /**
-     * Cleanup any lingering armor element values from _source
-     * 
-     * These values will be derived from:
-     * - ActiveEffect changes applied
-     * - equipped armor items and their elemental modifiers
-     */
-    static clearArmorElements(system: Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>) {
-        for (const element of Object.keys(SR5.elementTypes)) {
-            system.armor[element] = 0;
+        for (const immunity of Object.values(armor.immunities)) {
+            ModifiableValue.calcTotal(immunity);
         }
     }
 }

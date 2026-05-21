@@ -5,7 +5,7 @@
     <label>{{localize "SR5.DamageValue"}}&nbsp;{{numberFormat item.system.damage sign=true}}</label>
 {{/if}}
 {{#if item.system.element}}
-    <label data-tooltip="SR5.Element">
+    <label data-tooltip="SR5.Element.Label">
         <i class="{{elementIcon item.system.element}}"></i>
         {{localizeOb item.system.element @root.elementTypes}}
     </label>

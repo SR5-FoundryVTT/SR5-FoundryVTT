@@ -5,6 +5,7 @@ import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { CombatRules } from '../module/rules/CombatRules';
 import { DataDefaults } from '../module/data/DataDefaults';
 import { FireModeRules } from '../module/rules/FireModeRules';
+import { TestCreator } from '../module/tests/TestCreator';
 import { DamageType, DamageTypeType } from 'src/module/types/item/Action';
 type DamageElementType = DamageType['element']['base'];
 
@@ -170,9 +171,8 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
                 system: {
                     armor: {
                         base: armorValue,
-                        value: armorValue,
-                        hardened,
-                        mod: null, // Without this, the system defaults to an empty array for mod and thinks this is an armor accessory, therefore not applying hardened armor rules
+                        is_hardened: hardened,
+                        accessory: false,
                     },
                     technology: {
                         equipped: true,
@@ -184,13 +184,23 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
         }
 
         const getVehicleWithArmor = async (armorValue: number): Promise<SR5Actor> => {
-            const armor = DataDefaults.createData('armor', { value: armorValue, base: armorValue });
+            const armor = DataDefaults.createData('armor', { rating: { value: armorValue, base: armorValue } });
             return factory.createActor({ type: 'vehicle', system: { armor } });
         }
 
         const getDamage = (
             damageValue: number,
-            { type = "physical", ap = 0, element }: { type?: DamageTypeType, ap?: number, element?: DamageElementType} = {}
+            {
+                type = "physical",
+                ap = 0,
+                element,
+                normal_weapon = false
+            }: {
+                type?: DamageTypeType,
+                ap?: number,
+                element?: DamageElementType,
+                normal_weapon?: boolean
+            } = {}
         ): DamageType => {
             return DataDefaults.createData('damage', {
                 type: {
@@ -199,6 +209,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
                 },
                 value: damageValue,
                 base: damageValue,
+                normal_weapon,
                 ...(ap && {
                     ap: {
                         base: ap,
@@ -212,6 +223,72 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
                     }
                 }),
             });
+        }
+
+        const getCharacterWithImmunities = async (
+            armorValue: number,
+            immunities: (keyof typeof SR5.armorImmunityTypes)[]
+        ): Promise<SR5Actor> => {
+            const characterActor = await factory.createActor({ type: 'character' });
+            const armor = await factory.createItem({
+                type: 'armor',
+                system: {
+                    armor: {
+                        base: armorValue,
+                        is_hardened: false,
+                        accessory: false,
+                        immunities: {
+                            base: immunities,
+                            value: immunities,
+                        },
+                    },
+                    technology: {
+                        equipped: true,
+                    }
+                }
+            });
+            await characterActor.createEmbeddedDocuments('Item', [armor]);
+            return characterActor;
+        }
+
+        const getCharacterWithSplitArmorAndImmunity = async (): Promise<SR5Actor> => {
+            const characterActor = await factory.createActor({ type: 'character' });
+            await characterActor.createEmbeddedDocuments('Item', [
+                {
+                    type: 'armor',
+                    name: 'Base Armor',
+                    system: {
+                        armor: {
+                            base: 6,
+                            is_hardened: false,
+                            accessory: false,
+                            immunities: {
+                                base: ['normal_weapons'],
+                                value: ['normal_weapons'],
+                            },
+                        },
+                        technology: {
+                            equipped: true,
+                        }
+                    }
+                },
+                {
+                    type: 'armor',
+                    name: 'Hardened Accessory',
+                    system: {
+                        armor: {
+                            base: 4,
+                            is_hardened: true,
+                            accessory: true,
+                        },
+                        technology: {
+                            equipped: true,
+                        }
+                    }
+                }
+            ]);
+
+            return characterActor;
         }
 
         describe("isBlockedByVehicleArmor", () => {
@@ -293,19 +370,6 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
                 assert.isTrue(blockedResult);
                 assert.isFalse(notBlockedResult);
             });
-
-            it("takes AP into account", async () => {
-                const actor = await getCharacterWithArmor(6, { hardened: true });
-                // This is "high" AP but a negative number, just go with it
-                const highApDamage = getDamage(4, { ap: -5 });
-                const lowApDamage = getDamage(4, { ap: 5 });
-
-                const blockedResult = CombatRules.isBlockedByHardenedArmor(lowApDamage, 5, 3, actor);
-                const notBlockedResult = CombatRules.isBlockedByHardenedArmor(highApDamage, 5, 3, actor);
-
-                assert.isTrue(blockedResult);
-                assert.isFalse(notBlockedResult);
-            });
         });
 
         describe("doesNoPhysicalDamageToVehicle", () => {
@@ -334,6 +398,98 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
                 const result = CombatRules.doesNoPhysicalDamageToVehicle(damage, vehicle);
 
                 assert.isFalse(result);
+            });
+        });
+
+        describe("AP cascade behavior", () => {
+            it("merges the highest matching immunity into hardened armor", async () => {
+                const actor = await getCharacterWithImmunities(0, ['normal_weapons', 'fire']);
+                const damage = getDamage(4, { normal_weapon: true, element: 'fire' });
+
+                const armor = actor.getArmor(damage);
+                const normalWeaponImmunity = armor.immunities.normal_weapons.value;
+                const fireImmunity = armor.immunities.fire.value;
+
+                assert.strictEqual(armor.hardened.value, Math.max(normalWeaponImmunity, fireImmunity));
+            });
+
+            it("applies positive AP to normal armor only", async () => {
+                const actor = await getCharacterWithSplitArmorAndImmunity();
+                const damage = getDamage(4, { normal_weapon: true, ap: 2 });
+
+                const armor = actor.getArmor(damage);
+
+                assert.strictEqual(armor.rating.value, 8);
+                assert.strictEqual(armor.hardened.value, 16);
+                assert.strictEqual(armor.immunities.normal_weapons.value, 12);
+            });
+
+            it("cascades negative AP from matching immunity to hardened then normal armor", async () => {
+                const actor = await getCharacterWithSplitArmorAndImmunity();
+                const damage = getDamage(4, { normal_weapon: true, ap: -14 });
+
+                const armor = actor.getArmor(damage);
+
+                assert.strictEqual(armor.immunities.normal_weapons.value, 12);
+                assert.strictEqual(armor.hardened.value, 2);
+                assert.strictEqual(armor.rating.value, 6);
+            });
+
+            it("clamps cascaded AP results at zero", async () => {
+                const actor = await getCharacterWithSplitArmorAndImmunity();
+                const damage = getDamage(4, { normal_weapon: true, ap: -30 });
+
+                const armor = actor.getArmor(damage);
+
+                assert.strictEqual(armor.immunities.normal_weapons.value, 12);
+                assert.strictEqual(armor.hardened.value, 0);
+                assert.strictEqual(armor.rating.value, 0);
+            });
+        });
+
+        describe("Physical resist armor pool", () => {
+            it("adds normal and hardened armor as separate pool contributors when non-zero", async () => {
+                const actor = await getCharacterWithSplitArmorAndImmunity();
+                const action = DataDefaults.createData('action_roll', {
+                    test: 'PhysicalResistTest',
+                    armor: true,
+                    attribute: 'body',
+                });
+
+                const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false });
+                if (!test) return assert.fail('Failed to create PhysicalResistTest');
+
+                // Immunity is merged into hardened only when it matches incoming damage context.
+                (test as any).data.incomingDamage.normal_weapon = true;
+                test.prepareBaseValues();
+                test.calculateBaseValues();
+
+                const normalArmor = test.pool.changes.find(change => change.name === 'SR5.Armor.label');
+                const hardenedArmor = test.pool.changes.find(change => change.name === 'SR5.HardenedArmor');
+
+                assert.strictEqual(normalArmor?.value, 6);
+                assert.strictEqual(hardenedArmor?.value, 16);
+            });
+
+            it("does not add zero-value normal or hardened pool contributors", async () => {
+                const actor = await factory.createActor({ type: 'character' });
+                const action = DataDefaults.createData('action_roll', {
+                    test: 'PhysicalResistTest',
+                    armor: true,
+                    attribute: 'body',
+                });
+
+                const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false });
+                if (!test) return assert.fail('Failed to create PhysicalResistTest');
+
+                test.prepareBaseValues();
+                test.calculateBaseValues();
+
+                const normalArmor = test.pool.changes.find(change => change.name === 'SR5.Armor.label');
+                const hardenedArmor = test.pool.changes.find(change => change.name === 'SR5.HardenedArmor');
+
+                assert.isUndefined(normalArmor);
+                assert.isUndefined(hardenedArmor);
             });
         });
     });

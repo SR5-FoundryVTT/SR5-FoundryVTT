@@ -12,34 +12,19 @@
             {{> "systems/shadowrun5e/dist/templates/v2/list-items/item-name.hbs" item }}
         </div>
 
-        <div class="list-item-col thicc-col">
-            <label>{{localizeOb item.system.mod_weapon.mount_point @root.config.mountPoints}}</label>
-        </div>
-        <div class="list-item-col skinny-col">
+        <div class="list-item-col armor-col">
             <label>
-                {{#if item.system.mod_weapon.dice_pool}}
-                    {{numberFormat item.system.mod_weapon.dice_pool sign=true}}
+                {{#if item.system.mod_armor.value}}
+                    {{numberFormat item.system.mod_armor.value sign=true}}
                 {{/if}}
             </label>
         </div>
-        <div class="list-item-col skinny-col">
+        <div class="list-item-col slots-col">
             <label>
-                {{#if item.system.mod_weapon.accuracy}}
-                    {{numberFormat item.system.mod_weapon.accuracy sign=true}}
-                {{/if}}
-            </label>
-        </div>
-        <div class="list-item-col skinny-col">
-            <label>
-                {{#if item.system.mod_weapon.rc}}
-                    {{numberFormat item.system.mod_weapon.rc sign=true}}
-                {{/if}}
-            </label>
-        </div>
-        <div class="list-item-col skinny-col">
-            <label>
-                {{#if item.system.technology.conceal.value}}
-                    {{numberFormat item.system.technology.conceal.value sign=true}}
+                {{#if item.system.slots}}
+                    {{numberFormat item.system.slots sign=true}}
+                {{else}}
+                    0
                 {{/if}}
             </label>
         </div>

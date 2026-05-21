@@ -15,8 +15,6 @@ import { SR5 } from '@/module/config';
 export class SpritePrep {
     static prepareBaseData(system: Actor.SystemOfType<'sprite'>) {
         ModifiableFieldPrep.resetAllModifiers(system);
-
-        SpritePrep.prepareSpriteSpecial(system);
     }
 
     static prepareDerivedData(system: Actor.SystemOfType<'sprite'>, items: SR5Item[]) {
@@ -35,11 +33,6 @@ export class SpritePrep {
         SpritePrep.prepareSpriteInitiative(system);
 
         InitiativePrep.prepareCurrentInitiative(system);
-    }
-
-    static prepareSpriteSpecial(system: Actor.SystemOfType<'sprite'>) {
-        // Sprites are always awakened
-        // system.special = 'resonance';
     }
 
     static prepareSpriteAttributes(system: Actor.SystemOfType<'sprite'>) {
