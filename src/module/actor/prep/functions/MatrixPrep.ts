@@ -48,7 +48,7 @@ export class MatrixPrep {
             for (const [key, value] of Object.entries(deviceAtts)) {
                 if (!value) continue;
                 // create a new attribute field from the current one, this also works if the matrix[key] field doesn't exist
-                const att = DataDefaults.createData('attribute_field', matrix[key]) as MatrixAttributeFieldType;
+                const att = DataDefaults.createData('matrix_attribute_field', matrix[key]);
                 att.base = value.value;
                 att.device_att = value.device_att;
                 matrix[key] = att;
@@ -61,7 +61,7 @@ export class MatrixPrep {
             matrix.attack.base = ModifiableValue.calcTotal(attributes.charisma);
             matrix.sleaze.base = ModifiableValue.calcTotal(attributes.intuition);
             // if we have a Living Persona device, we want to use some of its data to make the sheet sync up best
-            if (device && device.isLivingPersona()) {
+            if (device?.isLivingPersona()) {
                 matrix.device = device._id!;
                 // use the living persona item to determine if we are running silent
                 matrix.running_silent = device.isRunningSilent();

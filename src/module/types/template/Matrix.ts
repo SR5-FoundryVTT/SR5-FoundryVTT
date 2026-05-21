@@ -25,7 +25,7 @@ export const MatrixAttributes = (editable: boolean) => ({
 
 export const MatrixAttributeField = (options: AttributeFieldOptions = {}) => ({
     ...AttributeField(options),
-    device_att: new StringField({ required: true }),
+    device_att: new StringField({ required: true, blank: true, choices: ['att1', 'att2', 'att3', 'att4'] }),
 });
 
 export const MatrixMarksTarget = () => (

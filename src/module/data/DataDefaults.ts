@@ -6,6 +6,7 @@ import { DescriptionData } from "../types/template/Description";
 import { FireModeData } from "../types/flags/ItemFlags";
 import { Host, SourceEntityField } from "../types/item/Host";
 import { LimitField } from "../types/template/Limits";
+import { MatrixAttributeField } from "../types/template/Matrix";
 import { SkillField } from "../types/template/Skills";
 import { TechnologyData } from "../types/template/Technology";
 import { Track } from "../types/template/ConditionMonitors";
@@ -96,6 +97,7 @@ const schemaMap = {
     fire_mode: FireModeData,
     license: LicenseData,
     limit_field: LimitField,
+    matrix_attribute_field: MatrixAttributeField,
     minimal_action: MinimalActionData,
     range: RangeData,
     range_weapon: RangeWeaponData,
