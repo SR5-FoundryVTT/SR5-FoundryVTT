@@ -100,7 +100,7 @@ export class SR5Combatant extends Combatant<"base"> {
 
         // Calculate adjustments inline
         const diceCountAdjust = (blitz ? SR.initiatives.ranges.dice.max : nextInit.dice.value) - prevInit.dice.value;
-        const baseAdjust = nextInit.base.value - prevInit.base.value;
+        const baseAdjust = nextInit.constant.value - prevInit.constant.value;
 
         const diceRoll = await this._rollD6(Math.abs(diceCountAdjust));
         const diceRolls = diceRoll?.diceResults ?? [];

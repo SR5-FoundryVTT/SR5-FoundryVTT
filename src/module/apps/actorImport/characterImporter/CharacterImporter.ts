@@ -214,11 +214,10 @@ export class CharacterImporter {
     }
 
     private static importInitiative(system: BlankCharacter['system'], chummerChar: ActorSchema) {
-        // Chummer fields store final initiative constants/dice, so import directly into formula fields.
-        system.initiative.meatspace.formula.constant = Number(chummerChar.initbonus) || 0;
-        system.initiative.meatspace.formula.dice = Number(chummerChar.initdice) || 1;
-        system.initiative.astral.formula.dice = Number(chummerChar.astralinitdice) || 2;
-        system.initiative.matrix.formula.dice = Number(chummerChar.matrixarinitdice) || 3;
+        // Chummer fields store final initiative constants/dice, so import directly into initiative config fields.
+        system.initiative.meatspace.dice.base = Number(chummerChar.initdice) || 1;
+        system.initiative.astral.dice.base = Number(chummerChar.astralinitdice) || 2;
+        system.initiative.matrix.dice.base = Number(chummerChar.matrixarinitdice) || 3;
+        system.initiative.meatspace.constant.base = Number(chummerChar.initbonus) || 0;
     }
-
 }

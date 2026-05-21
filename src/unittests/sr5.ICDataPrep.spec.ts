@@ -64,19 +64,17 @@ export const shadowrunSR5ICDataPrep = (context: QuenchBatchContext) => {
                     host: { rating: 5 },
                     initiative: {
                         matrix: {
-                            formula: {
-                                attribute_a: 'rating',
-                                attribute_b: '',
-                                constant: 1,
-                                dice: 2,
-                            },
+                            attribute_a: 'rating',
+                            attribute_b: '',
+                            constant: { base: 1 },
+                            dice: { base: 2 },
                         },
                     },
                 },
             });
 
-            assert.strictEqual(ic.system.initiative.matrix.base.base, 6);
-            assert.strictEqual(ic.system.initiative.matrix.dice.base, 2);
+            assert.strictEqual(ic.system.initiative.matrix.constant.value, 6);
+            assert.strictEqual(ic.system.initiative.matrix.dice.value, 2);
         });
     });
 };

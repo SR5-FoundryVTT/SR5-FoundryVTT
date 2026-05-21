@@ -43,14 +43,14 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(courier.system.matrix.sleaze.value, 8);
             assert.strictEqual(courier.system.matrix.data_processing.value, 5);
             assert.strictEqual(courier.system.matrix.firewall.value, 6);
-            assert.strictEqual(courier.system.initiative.matrix.base.base, 12);
+            assert.strictEqual(courier.system.initiative.matrix.constant.value, 12);
 
             assert.strictEqual(fault.system.attributes.resonance.value, courier.system.attributes.resonance.value);
             assert.strictEqual(fault.system.matrix.attack.value, courier.system.matrix.attack.value);
             assert.strictEqual(fault.system.matrix.sleaze.value, courier.system.matrix.sleaze.value);
             assert.strictEqual(fault.system.matrix.data_processing.value, courier.system.matrix.data_processing.value);
             assert.strictEqual(fault.system.matrix.firewall.value, courier.system.matrix.firewall.value);
-            assert.strictEqual(fault.system.initiative.matrix.base.base, courier.system.initiative.matrix.base.base);
+            assert.strictEqual(fault.system.initiative.matrix.constant.value, courier.system.initiative.matrix.constant.value);
         });
 
         it('level applies toggles control resonance and matrix attribute level contribution', async () => {
@@ -74,9 +74,8 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(sprite.system.matrix.firewall.value, 0);
             assert.strictEqual(sprite.system.matrix.rating, 6);
 
-            assert.strictEqual(sprite.system.initiative.matrix.base.base, 12);
-            assert.strictEqual(sprite.system.initiative.matrix.base.value, 12);
-            assert.strictEqual(sprite.system.initiative.matrix.dice.base, 4);
+            assert.strictEqual(sprite.system.initiative.matrix.constant.value, 12);
+            assert.strictEqual(sprite.system.initiative.matrix.dice.value, 4);
             assert.strictEqual(sprite.system.initiative.matrix.dice.value, 4);
         });
 
@@ -145,19 +144,17 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
                     },
                     initiative: {
                         matrix: {
-                            formula: {
-                                attribute_a: 'level',
-                                attribute_b: '',
-                                constant: 2,
-                                dice: 1,
-                            },
+                            attribute_a: 'level',
+                            attribute_b: '',
+                            constant: { base: 2 },
+                            dice: { base: 1 },
                         },
                     },
                 },
             });
 
-            assert.strictEqual(sprite.system.initiative.matrix.base.base, 8);
-            assert.strictEqual(sprite.system.initiative.matrix.dice.base, 1);
+            assert.strictEqual(sprite.system.initiative.matrix.constant.value, 8);
+            assert.strictEqual(sprite.system.initiative.matrix.dice.value, 1);
         });
 
         it('Matrix condition monitor track calculation with modifiers', async () => {

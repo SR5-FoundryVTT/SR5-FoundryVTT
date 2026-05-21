@@ -62,12 +62,21 @@ export class Version0_34_0 extends VersionMigration {
     override migrateActiveEffect(effect: any): void {
         const keyMap = {
             'system.level': 'system.attributes.level',
-            'system.modifiers.meat_initiative': 'system.initiative.meatspace.formula.constant',
-            'system.modifiers.meat_initiative_dice': 'system.initiative.meatspace.formula.dice',
-            'system.modifiers.astral_initiative': 'system.initiative.astral.formula.constant',
-            'system.modifiers.astral_initiative_dice': 'system.initiative.astral.formula.dice',
-            'system.modifiers.matrix_initiative': 'system.initiative.matrix.formula.constant',
-            'system.modifiers.matrix_initiative_dice': 'system.initiative.matrix.formula.dice',
+            'system.initiative.meatspace.base': 'system.initiative.meatspace.constant',
+            'system.initiative.meatspace.base.base': 'system.initiative.meatspace.constant.base',
+            'system.initiative.meatspace.base.value': 'system.initiative.meatspace.constant.value',
+            'system.initiative.astral.base': 'system.initiative.astral.constant',
+            'system.initiative.astral.base.base': 'system.initiative.astral.constant.base',
+            'system.initiative.astral.base.value': 'system.initiative.astral.constant.value',
+            'system.initiative.matrix.base': 'system.initiative.matrix.constant',
+            'system.initiative.matrix.base.base': 'system.initiative.matrix.constant.base',
+            'system.initiative.matrix.base.value': 'system.initiative.matrix.constant.value',
+            'system.modifiers.meat_initiative': 'system.initiative.meatspace.constant.base',
+            'system.modifiers.meat_initiative_dice': 'system.initiative.meatspace.dice.base',
+            'system.modifiers.astral_initiative': 'system.initiative.astral.constant.base',
+            'system.modifiers.astral_initiative_dice': 'system.initiative.astral.dice.base',
+            'system.modifiers.matrix_initiative': 'system.initiative.matrix.constant.base',
+            'system.modifiers.matrix_initiative_dice': 'system.initiative.matrix.dice.base',
 
             // legacy migration key, because we didn't update change.value before (0.31.5)
             'system.force': 'system.attributes.force',
@@ -94,7 +103,6 @@ export class Version0_34_0 extends VersionMigration {
 
         for (const { mode, constantKey, diceKey } of modes) {
             const modePath = `initiative.${mode}`;
-            const formulaPath = `${modePath}.formula`;
             const baseDice = getProperty(defaultDiceByType, `${actorType}.${mode}`) as number | undefined;
 
             if (baseDice == null) continue;
@@ -102,8 +110,8 @@ export class Version0_34_0 extends VersionMigration {
             const diceModifier = Number(getProperty(system, `modifiers.${diceKey}`) ?? 0);
             const constantModifier = Number(getProperty(system, `modifiers.${constantKey}`) ?? 0);
 
-            setProperty(system, `${formulaPath}.constant`, constantModifier);
-            setProperty(system, `${formulaPath}.dice`, baseDice + diceModifier);
+            setProperty(system, `${modePath}.constant.base`, constantModifier);
+            setProperty(system, `${modePath}.dice.base`, baseDice + diceModifier);
 
             if (system.modifiers && typeof system.modifiers === 'object' && constantKey in system.modifiers)
                 delete system.modifiers[constantKey];
@@ -143,8 +151,17 @@ export class Version0_34_0 extends VersionMigration {
     private migrateSpiritInitiative(system: any, initiative: Partial<SpiritProfileInitiative> | undefined) {
         const profile: SpiritProfileInitiative = { ...PRESET_INITIATIVE_DEFAULTS, ...initiative };
 
-        setProperty(system, 'initiative.meatspace.formula', this.initFormulaBuild(profile.init_mult, profile.init, profile.init_dice));
-        setProperty(system, 'initiative.astral.formula', this.initFormulaBuild(profile.astral_init_mult, profile.astral_init, profile.astral_init_dice));
+        const meatspace = this.initFormulaBuild(profile.init_mult, profile.init, profile.init_dice);
+        setProperty(system, 'initiative.meatspace.attribute_a', meatspace.attribute_a);
+        setProperty(system, 'initiative.meatspace.attribute_b', meatspace.attribute_b);
+        setProperty(system, 'initiative.meatspace.constant.base', meatspace.constant);
+        setProperty(system, 'initiative.meatspace.dice.base', meatspace.dice);
+
+        const astral = this.initFormulaBuild(profile.astral_init_mult, profile.astral_init, profile.astral_init_dice);
+        setProperty(system, 'initiative.astral.attribute_a', astral.attribute_a);
+        setProperty(system, 'initiative.astral.attribute_b', astral.attribute_b);
+        setProperty(system, 'initiative.astral.constant.base', astral.constant);
+        setProperty(system, 'initiative.astral.dice.base', astral.dice);
     }
 
     private initFormulaBuild(multiplier: number, constant: number, dice: number): SpiritInitiativeFormula {
@@ -166,9 +183,9 @@ export class Version0_34_0 extends VersionMigration {
         this.migrateSkillToggles(actor, profile.skills);
         this.migrateSpriteAttributeOffsets(system, profile.offsets ?? {}, profile.levelOff);
 
-        setProperty(system, 'initiative.matrix.formula.attribute_a', 'level');
-        setProperty(system, 'initiative.matrix.formula.attribute_b', 'level');
-        setProperty(system, 'initiative.matrix.formula.constant', profile.init ?? 0);
+        setProperty(system, 'initiative.matrix.attribute_a', 'level');
+        setProperty(system, 'initiative.matrix.attribute_b', 'level');
+        setProperty(system, 'initiative.matrix.constant.base', profile.init ?? 0);
     }
 
     private migrateSpriteAttributeOffsets(

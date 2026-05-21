@@ -68,7 +68,7 @@ export class SpriteImporter {
             sprite.system.matrix.sleaze.applies_special = !!spriteTemplate.system.matrix.sleaze.applies_special;
             sprite.system.matrix.data_processing.applies_special = !!spriteTemplate.system.matrix.data_processing.applies_special;
             sprite.system.matrix.firewall.applies_special = !!spriteTemplate.system.matrix.firewall.applies_special;
-            sprite.system.initiative.matrix.formula = foundry.utils.deepClone(spriteTemplate.system.initiative.matrix.formula);
+            sprite.system.initiative = foundry.utils.deepClone(spriteTemplate.system.initiative);
         });
     }
 
@@ -92,7 +92,7 @@ export class SpriteImporter {
                 sprite.system.matrix[attributeId].base = profile.offsets?.[attributeId] ?? 0;
             }
 
-            sprite.system.initiative.matrix.formula.constant += profile.init ?? 0;
+            sprite.system.initiative.matrix.constant.base += profile.init ?? 0;
         });
     }
 }

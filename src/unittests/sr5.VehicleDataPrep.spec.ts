@@ -69,16 +69,19 @@ export const shadowrunSR5VehicleDataPrep = (context: QuenchBatchContext) => {
                 system: {
                     vehicle_stats: { pilot: { base: 3 } },
                     initiative: {
-                        meatspace: { formula: { attribute_a: 'pilot', attribute_b: 'pilot', constant: 1, dice: 2 } },
-                        matrix: { formula: { attribute_a: 'reaction', attribute_b: 'intuition', constant: 1, dice: 2 } },
+                        meatspace: { attribute_a: 'pilot', attribute_b: 'pilot', constant: { base: 1 }, dice: { base: 2 } },
+                        matrix: { attribute_a: 'reaction', attribute_b: 'intuition', constant: { base: 1 }, dice: { base: 2 } },
                     },
                 },
             });
 
-            assert.strictEqual(vehicle.system.initiative.meatspace.base.base, 7);
-            assert.strictEqual(vehicle.system.initiative.meatspace.dice.base, 2);
-            assert.strictEqual(vehicle.system.initiative.matrix.base.base, 7);
-            assert.strictEqual(vehicle.system.initiative.matrix.dice.base, 2);
+            assert.strictEqual(vehicle.system.initiative.meatspace.constant.value, 7);
+            assert.strictEqual(vehicle.system.initiative.meatspace.dice.value, 2);
+            assert.strictEqual(vehicle.system.initiative.matrix.constant.value, 7);
+            assert.strictEqual(vehicle.system.initiative.matrix.dice.value, 2);
         });
     });
 };
+
+
+

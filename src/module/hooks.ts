@@ -392,7 +392,7 @@ ___________________
         };
 
         // Register initiative directly (outside of system.json) as DnD5e does it.
-        CONFIG.Combat.initiative.formula = "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
+        CONFIG.Combat.initiative.formula = "@initiative.current.constant.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
 
         // Register general SR5Roll for JSON serialization support.
         CONFIG.Dice.terms[SR5Die.DENOMINATION] = SR5Die;

@@ -1,7 +1,7 @@
 import { SR5 } from "@/module/config";
 import { ModifiableField } from "../fields/ModifiableField";
 import { ModifiableValueSchema } from "./Base";
-const { SchemaField, BooleanField, StringField, NumberField } = foundry.data.fields;
+const { SchemaField, BooleanField, StringField } = foundry.data.fields;
 
 type InitiativeFormulaDefaults = {
     attributeA: string;
@@ -10,20 +10,16 @@ type InitiativeFormulaDefaults = {
     dice: number;
 };
 
-const InitiativeFormulaSchema = (defaults: InitiativeFormulaDefaults) => ({
+export const InitiativeSchema = (defaults: InitiativeFormulaDefaults) => ({
+    constant: new ModifiableField({
+        ...ModifiableValueSchema({ baseValue: defaults.constant }),
+    }),
+    dice: new ModifiableField({
+        ...ModifiableValueSchema({ baseValue: defaults.dice }),
+        text: new StringField({ required: true, initial: `${defaults.dice}d6` }),
+    }),
     attribute_a: new StringField({ required: true, initial: defaults.attributeA, blank: true, choices: SR5.attributes }),
     attribute_b: new StringField({ required: true, initial: defaults.attributeB, blank: true, choices: SR5.attributes }),
-    constant: new NumberField({ required: true, nullable: false, integer: true, initial: defaults.constant }),
-    dice: new NumberField({ required: true, nullable: false, integer: true, initial: defaults.dice, min: 0, max: 5, step: 1 }),
-});
-
-export const InitiativeSchema = (defaults: InitiativeFormulaDefaults) => ({
-    base: new ModifiableField(ModifiableValueSchema()),
-    dice: new ModifiableField({
-        ...ModifiableValueSchema(),
-        text: new StringField({ required: true }),
-    }),
-    formula: new SchemaField(InitiativeFormulaSchema(defaults)),
 });
 
 export const Initiative = <

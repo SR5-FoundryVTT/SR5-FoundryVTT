@@ -52,7 +52,7 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(airSpirit.system.attributes.strength.value, 7);
             assert.strictEqual(airSpirit.system.attributes.logic.value, 7);
             assert.strictEqual(airSpirit.system.attributes.intuition.value, 5);
-            assert.strictEqual(airSpirit.system.initiative.meatspace.base.base, 11);
+            assert.strictEqual(airSpirit.system.initiative.meatspace.constant.value, 11);
 
             assert.strictEqual(fireSpirit.system.attributes.body.value, airSpirit.system.attributes.body.value);
             assert.strictEqual(fireSpirit.system.attributes.agility.value, airSpirit.system.attributes.agility.value);
@@ -60,7 +60,7 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(fireSpirit.system.attributes.strength.value, airSpirit.system.attributes.strength.value);
             assert.strictEqual(fireSpirit.system.attributes.logic.value, airSpirit.system.attributes.logic.value);
             assert.strictEqual(fireSpirit.system.attributes.intuition.value, airSpirit.system.attributes.intuition.value);
-            assert.strictEqual(fireSpirit.system.initiative.meatspace.base.base, airSpirit.system.initiative.meatspace.base.base);
+            assert.strictEqual(fireSpirit.system.initiative.meatspace.constant.value, airSpirit.system.initiative.meatspace.constant.value);
         });
 
         it('force applies only to enabled attributes', async () => {
@@ -99,10 +99,10 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
 
             assert.strictEqual(spirit.system.attributes.reaction.value, 7);
             assert.strictEqual(spirit.system.attributes.intuition.value, 4);
-            assert.strictEqual(spirit.system.initiative.meatspace.base.base, 11);
-            assert.strictEqual(spirit.system.initiative.astral.base.base, 8);
-            assert.strictEqual(spirit.system.initiative.meatspace.dice.base, 2);
-            assert.strictEqual(spirit.system.initiative.astral.dice.base, 3);
+            assert.strictEqual(spirit.system.initiative.meatspace.constant.value, 11);
+            assert.strictEqual(spirit.system.initiative.astral.constant.value, 10);
+            assert.strictEqual(spirit.system.initiative.meatspace.dice.value, 2);
+            assert.strictEqual(spirit.system.initiative.astral.dice.value, 3);
         });
 
         it('custom spirit initiative formula supports force attributes, constants, and blank attribute slots', async () => {
@@ -116,29 +116,25 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
                     },
                     initiative: {
                         meatspace: {
-                            formula: {
-                                attribute_a: 'force',
-                                attribute_b: '',
-                                constant: 3,
-                                dice: 4
-                            }
+                            attribute_a: 'force',
+                            attribute_b: '',
+                            constant: { base: 3 },
+                            dice: { base: 4 },
                         },
                         astral: {
-                            formula: {
-                                attribute_a: '',
-                                attribute_b: '',
-                                constant: 5,
-                                dice: 1
-                            }
+                            attribute_a: '',
+                            attribute_b: '',
+                            constant: { base: 5 },
+                            dice: { base: 1 },
                         }
                     }
                 }
             });
 
-            assert.strictEqual(spirit.system.initiative.meatspace.base.base, 9);
-            assert.strictEqual(spirit.system.initiative.astral.base.base, 5);
-            assert.strictEqual(spirit.system.initiative.meatspace.dice.base, 4);
-            assert.strictEqual(spirit.system.initiative.astral.dice.base, 1);
+            assert.strictEqual(spirit.system.initiative.meatspace.constant.value, 9);
+            assert.strictEqual(spirit.system.initiative.astral.constant.value, 5);
+            assert.strictEqual(spirit.system.initiative.meatspace.dice.value, 4);
+            assert.strictEqual(spirit.system.initiative.astral.dice.value, 1);
         });
 
         it('spirit initiative dice total is capped at 5', async () => {
@@ -146,15 +142,15 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
                 type: 'spirit',
                 system: {
                     initiative: {
-                        meatspace: { formula: { dice: 7 } },
-                        astral: { formula: { dice: 6 } }
+                        meatspace: { dice: { base: 7 } },
+                        astral: { dice: { base: 6 } }
                     }
                 }
             });
 
-            assert.strictEqual(spirit.system.initiative.meatspace.dice.base, 5);
+            assert.strictEqual(spirit.system.initiative.meatspace.dice.base, 7);
             assert.strictEqual(spirit.system.initiative.meatspace.dice.value, 5);
-            assert.strictEqual(spirit.system.initiative.astral.dice.base, 5);
+            assert.strictEqual(spirit.system.initiative.astral.dice.base, 6);
             assert.strictEqual(spirit.system.initiative.astral.dice.value, 5);
         });
 

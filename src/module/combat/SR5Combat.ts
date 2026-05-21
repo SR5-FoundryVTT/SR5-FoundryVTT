@@ -618,7 +618,7 @@ export class SR5Combat extends Combat<"base"> {
         const { actor, token, name } = combatant;
         const initiativeData = actor?.system?.initiative;
 
-        const base = Number(initiativeData?.current?.base?.value ?? 0);
+        const base = Number(initiativeData?.current?.constant?.value ?? 0);
 
         // Fallback to 'unknown' if mode is undefined or an invalid string at runtime
         const mode = initiativeData?.perception;

@@ -5,10 +5,9 @@ import { InitiativeType } from '@/module/types/template/Initiative';
 const isKeyOf = <T extends object>(obj: T, key: PropertyKey): key is keyof T => key in obj;
 
 export class InitiativePrep {
-
     private static getAttributeValue(
         system: SR5Actor['system'],
-        attribute: InitiativeType['formula']['attribute_a']
+        attribute: InitiativeType['attribute_a']
     ): number {
         if (!attribute) return 0;
 
@@ -28,18 +27,22 @@ export class InitiativePrep {
     }
 
     private static prepareFormulaMode(system: SR5Actor['system'], mode: Shadowrun.SpaceTypes) {
-        const modeInitiative = system.initiative[mode] as InitiativeType | undefined;
-        if (!modeInitiative?.formula) return;
+        const modeInit = system.initiative[mode] as InitiativeType | undefined;
+        if (!modeInit) return;
 
-        const formula = modeInitiative.formula;
-        const attributeA = this.getAttributeValue(system, formula.attribute_a);
-        const attributeB = this.getAttributeValue(system, formula.attribute_b);
+        const constMod = new ModifiableValue(modeInit.constant);
+        if (modeInit.attribute_a) {
+            const attributeA = this.getAttributeValue(system, modeInit.attribute_a);
+            constMod.addBase(`SR5.attributes.${modeInit.attribute_a}`, attributeA);
+        }
 
-        modeInitiative.base.base = attributeA + attributeB + formula.constant;
-        ModifiableValue.calcTotal(modeInitiative.base);
+        if (modeInit.attribute_b) {
+            const attributeB = this.getAttributeValue(system, modeInit.attribute_b);
+            constMod.addBase(`SR5.attributes.${modeInit.attribute_b}`, attributeB);
+        }
 
-        modeInitiative.dice.base = formula.dice;
-        ModifiableValue.calcTotal(modeInitiative.dice, { min: 0, max: 5 });
+        constMod.calcTotal();
+        ModifiableValue.calcTotal(modeInit.dice, { min: 0, max: 5 });
     }
 
     /**
@@ -52,7 +55,7 @@ export class InitiativePrep {
         initiative.current = initiative[initiative.perception] as InitiativeType;
 
         // Recalculate selected initiative to be sure.
-        ModifiableValue.calcTotal(initiative.current.base);
+        ModifiableValue.calcTotal(initiative.current.constant);
 
         // Disable blitz if edge is depleted.
         if (attributes.edge.uses >= attributes.edge.value)
@@ -63,7 +66,7 @@ export class InitiativePrep {
             ModifiableValue.addUnique(initiative.current.dice, "SR5.Blitz", 5, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, ModifiableValue.TOP_PRIORITY);
         ModifiableValue.calcTotal(initiative.current.dice, {min: 0, max: 5});
 
-        initiative.current.dice.text = `${initiative.current.dice.value}d6`;        
+        (initiative.current.dice as any).text = `${initiative.current.dice.value}d6`;
     }
 
     /**

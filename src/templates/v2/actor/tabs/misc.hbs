@@ -141,29 +141,29 @@
                                 <div class="list-item-col spirit-initiative-formula-col">
                                     <div class="spirit-initiative-formula-line">
                                         <select class="short spirit-initiative-attribute"
-                                                name="system.initiative.{{mode.id}}.formula.attribute_a"
+                                                name="system.initiative.{{mode.id}}.attribute_a"
                                                 {{#if @root.isPlayMode}}disabled{{/if}}>
                                             <option value=""></option>
-                                            {{selectOptions @root.config.attributes selected=modeInitiative.formula.attribute_a localize=true}}
+                                            {{selectOptions @root.config.attributes selected=modeInitiative.attribute_a localize=true}}
                                         </select>
                                         <span>+</span>
                                         <select class="short spirit-initiative-attribute"
-                                                name="system.initiative.{{mode.id}}.formula.attribute_b"
+                                                name="system.initiative.{{mode.id}}.attribute_b"
                                                 {{#if @root.isPlayMode}}disabled{{/if}}>
                                             <option value=""></option>
-                                            {{selectOptions @root.config.attributes selected=modeInitiative.formula.attribute_b localize=true}}
+                                            {{selectOptions @root.config.attributes selected=modeInitiative.attribute_b localize=true}}
                                         </select>
                                         <span>+</span>
                                         <input type="number"
                                                class="short skinny center"
-                                               name="system.initiative.{{mode.id}}.formula.constant"
-                                               value="{{modeInitiative.formula.constant}}"
+                                               name="system.initiative.{{mode.id}}.constant.base"
+                                               value="{{modeInitiative.constant.base}}"
                                                {{#if @root.isPlayMode}}disabled{{/if}}>
                                         <span>+</span>
                                         <input type="number"
                                                class="short skinny center"
-                                               name="system.initiative.{{mode.id}}.formula.dice"
-                                               value="{{modeInitiative.formula.dice}}"
+                                               name="system.initiative.{{mode.id}}.dice.base"
+                                               value="{{modeInitiative.dice.base}}"
                                                min="0"
                                                max="5"
                                                step="1"
@@ -264,3 +264,4 @@
         </div>
     </div>
 </section>
+

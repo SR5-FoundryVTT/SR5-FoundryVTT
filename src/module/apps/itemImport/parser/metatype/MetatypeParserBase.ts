@@ -116,20 +116,18 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'spirit'
             const parsedFormula = this.parseInitFormula(inimin._TEXT, options.specialAttr);
 
             if (parsedFormula) {
-                initiative.formula.attribute_a = parsedFormula.attributeA;
-                initiative.formula.attribute_b = parsedFormula.attributeB;
-                initiative.formula.constant = parsedFormula.constant;
+                initiative.attribute_a = parsedFormula.attributeA;
+                initiative.attribute_b = parsedFormula.attributeB;
+                initiative.constant.base = parsedFormula.constant;
             }
         }
 
-        if (options.mode === 'meatspace' && bonus) {
-            const deltaDice = Number(bonus.initiativedice?._TEXT) || Number(bonus.initiativepass?._TEXT) || 0;
-            if (deltaDice)
-                initiative.formula.dice = 1 + deltaDice;
+        if (options.mode === 'meatspace') {
+            const deltaConstant = Number(bonus?.initiative?._TEXT) || 0;
+            const deltaDice = Number(bonus?.initiativedice?._TEXT) || Number(bonus?.initiativepass?._TEXT) || 0;
 
-            const deltaConstant = Number(bonus.initiative?._TEXT) || 0;
-            if (deltaConstant)
-                initiative.formula.constant += deltaConstant;
+            initiative.dice.base = 1 + deltaDice;
+            initiative.constant.base += deltaConstant;
         }
     }
 

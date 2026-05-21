@@ -87,7 +87,7 @@ export class BonusConstant {
             system: { applyTo: 'test_all', selection_tests: [{ id: "FadeTest" }] },
         },
         handling: { changes: [{ key: "system.vehicle_stats.handling" }] },
-        initiative: { changes: [{ key: "system.initiative.meatspace.base" }] },
+        initiative: { changes: [{ key: "system.initiative.meatspace.constant" }] },
         initiativedice: { changes: [{ key: "system.initiative.meatspace.dice" }] },
         initiativepass: { changes: [{ key: "system.initiative.meatspace.dice" }] },
         judgeintentions: { changes: [{ key: "system.modifiers.judge_intentions"}] },

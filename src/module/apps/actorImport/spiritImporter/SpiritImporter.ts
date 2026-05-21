@@ -3,6 +3,7 @@ import { ActorSchema } from "../ActorSchema";
 import { ImportOptionsType } from "../characterImporter/CharacterImporter";
 import { ActorSkillImport } from "../ActorSkillImport";
 import { ActorImportUtil, type BlankImportedActor } from "../ActorImportUtil";
+import { InitiativeType } from "src/module/types/template/Initiative";
 import {
     PRESET_INITIATIVE_DEFAULTS,
     PRESET_SPIRIT_PROFILES,
@@ -15,23 +16,23 @@ import {
 export type BlankSpirit = BlankImportedActor<'spirit'>;
 
 export class SpiritImporter {
-    private static initFormulaBuild(multiplier: number, constant: number, dice: number) {
-        return {
-            attribute_a: multiplier >= 2 ? 'force' : '',
-            attribute_b: multiplier >= 1 ? 'force' : '',
-            constant,
-            dice
-        } as const;
-    }
 
     private static applyProfileInitiativeFormulae(
         spirit: BlankSpirit,
         initiative: Partial<SpiritProfileInitiative> | undefined,
     ) {
+        const { meatspace, astral } = spirit.system.initiative;
         const profile: SpiritProfileInitiative = { ...PRESET_INITIATIVE_DEFAULTS, ...initiative };
 
-        spirit.system.initiative.meatspace.formula = this.initFormulaBuild(profile.init_mult, profile.init, profile.init_dice);
-        spirit.system.initiative.astral.formula = this.initFormulaBuild(profile.astral_init_mult, profile.astral_init, profile.astral_init_dice);
+        meatspace.constant.base = profile.init;
+        meatspace.dice.base = profile.init_dice;
+        meatspace.attribute_a = profile.init_mult >= 2 ? 'force' : '';
+        meatspace.attribute_b = profile.init_mult >= 1 ? 'force' : '';
+
+        astral.constant.base = profile.astral_init;
+        astral.dice.base = profile.astral_init_dice;
+        astral.attribute_a = profile.astral_init_mult >= 2 ? 'force' : '';
+        astral.attribute_b = profile.astral_init_mult >= 1 ? 'force' : '';
     }
 
     private static setRuntimeValues(spirit: BlankSpirit, chummerData: ActorSchema) {
@@ -71,8 +72,7 @@ export class SpiritImporter {
             spirit.system.skillset = spiritTemplate.system.skillset;
             spirit.system.spiritType = spiritTemplate.system.spiritType;
             spirit.system.half_value_skill = spiritTemplate.system.half_value_skill;
-            spirit.system.initiative.astral.formula = foundry.utils.deepClone(spiritTemplate.system.initiative.astral.formula);
-            spirit.system.initiative.meatspace.formula = foundry.utils.deepClone(spiritTemplate.system.initiative.meatspace.formula);
+            spirit.system.initiative = foundry.utils.deepClone(spiritTemplate.system.initiative);
         });
     }
 
