@@ -29,8 +29,10 @@ export class Version0_34_0 extends VersionMigration {
             if (armor.mod !== undefined)
                 armor.accessory = armor.mod;
 
-            if (armor.hardened !== undefined)
+            if (armor.hardened !== undefined) {
                 armor.is_hardened = Boolean(armor.hardened);
+                delete armor.hardened;
+            }
 
             for (const el of elements) {
                 if (armor[el] !== undefined)
