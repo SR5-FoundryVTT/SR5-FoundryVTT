@@ -1,6 +1,7 @@
 import { Parser } from '../Parser';
 import { Metatype } from '../../schema/MetatypeSchema';
 import { BonusSchema } from '../../schema/BonusSchema';
+import { DataDefaults } from 'src/module/data/DataDefaults';
 import { InitiativeType } from 'src/module/types/template/Initiative';
 import { ImportHelper as IH, OneOrMany, RetrievedItem } from '../../helper/ImportHelper';
 
@@ -178,5 +179,112 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'spirit'
         }
 
         return result;
-    }    
+    }
+
+    /**
+     * Builds weapon items from all natural-weapon power entries while keeping power import intact.
+     */
+    protected getNaturalWeapons(
+        powers: { _TEXT: string; $?: { select?: string; }; }[],
+        options: { actorName: string; },
+    ): Item.Source[] {
+        const items: Item.Source[] = [];
+
+        for (const entry of powers) {
+            if (entry._TEXT.trim().toLowerCase() !== 'natural weapon') continue;
+
+            const select = (entry.$?.select ?? '').trim();
+            if (!select) continue;
+
+            // 1. Extract optional Name (e.g., "Bite:" or "Claws (DV...")
+            let name = 'Natural Weapon';
+            const nameMatch = /^([^:(]+?)[:(]/.exec(select);
+            if (nameMatch && !/^DV\b/i.test(nameMatch[1].trim())) {
+                name = nameMatch[1].trim();
+            }
+
+            // 2. Extract DV segment anywhere in the string
+            const dvMatch = /\bDV\s+(\(?[A-Z0-9+-]+\)?)\s*([PSM])?\b/i.exec(select);
+            if (!dvMatch) {
+                console.warn(`[Natural Weapon Parse]\nCritter: ${options.actorName}\nSelect: ${select}`);
+                continue;
+            }
+
+            const dvFormula = dvMatch[1].toUpperCase().replace(/[()\s]/g, '');
+            let damageBase = 0;
+            let damageAttribute: 'strength' | 'force' | undefined;
+
+            if (dvFormula.includes('STR')) {
+                damageAttribute = 'strength';
+                damageBase = Number(/[+-]\d+/.exec(dvFormula)?.[0]) || 0;
+            } else if (dvFormula.includes('F')) {
+                damageAttribute = 'force';
+                damageBase = Number(/[+-]\d+/.exec(dvFormula)?.[0]) || 0;
+            } else {
+                damageBase = Number(dvFormula) || 0;
+            }
+
+            const typeStr = dvMatch[2]?.toUpperCase();
+            const damageType = typeStr === 'S' ? 'stun' : typeStr === 'M' ? 'matrix' : 'physical';
+
+            // 3. Extract AP segment anywhere in the string (Optional)
+            const apMatch = /\bAP\s+([-A-Z0-9+]+)\b/i.exec(select);
+            let apBase = 0;
+            let apAttribute: 'force' | undefined;
+            let apOperator: 'add' | 'subtract' | undefined;
+
+            if (apMatch) {
+                const apRaw = apMatch[1].toUpperCase().replace(/\s+/g, '');
+                if (apRaw.includes('F')) {
+                    apAttribute = 'force';
+                    apOperator = apRaw.includes('-') ? 'subtract' : 'add';
+                    apBase = Number(/[+-]\d+/.exec(apRaw)?.[0]) || 0;
+                } else {
+                    apBase = Number(apRaw) || 0;
+                }
+            }
+
+            // 4. Extract Reach (Optional)
+            const reachMatch = /\bREACH\s+([-+]?\d+)\b/i.exec(select);
+            const reach = reachMatch ? Number(reachMatch[1]) || 0 : undefined;
+
+            // 5. Detect if the weapon is Ranged
+            const isRanged = /\bRANGED?\b/i.test(select);
+
+            // --- Build Item System Data ---
+            const system = DataDefaults.baseSystemData('weapon');
+            system.action.type = 'varies';
+            system.melee.reach = reach || 0;
+            system.technology.equipped = true;
+            system.subcategory = 'natural_weapon';
+            system.category = isRanged ? 'range' : 'melee';
+            
+            // Note: You may want to change the skill for ranged natural weapons (e.g., to 'exotic_ranged_weapon')
+            system.action.skill = isRanged ? 'exotic_ranged_weapon' : 'unarmed_combat';
+            
+            system.action.damage = DataDefaults.createData('damage', {
+                base: damageBase,
+                type: { base: damageType },
+                ap: { 
+                    base: apBase,
+                    ...(apAttribute && { 
+                        attribute: apAttribute,
+                        base_formula_operator: apOperator 
+                    })
+                },
+                ...(damageAttribute && { attribute: damageAttribute }),
+            });
+
+            // --- Push Item ---
+            items.push({
+                _id: foundry.utils.randomID(),
+                name,
+                type: 'weapon' as const,
+                img: 'systems/shadowrun5e/dist/icons/importer/critter_power/critter_power.svg',
+                system,
+            } satisfies Item.CreateData<'weapon'> as unknown as Item.Source);
+        }
+
+        return items;
+    }
 }

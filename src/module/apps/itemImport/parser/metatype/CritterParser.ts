@@ -102,7 +102,12 @@ export class CritterParser extends MetatypeParserBase<'character'> {
         const allQualities = await IH.findItems('Quality', [...qualitiesList, ...biowareList]);
 
         const critterName = name._TEXT;
+        const naturalWeapons = this.getNaturalWeapons(
+            this.mergeLists(powers?.power, optionalPowers), { actorName: critterName }
+        );
+
         return [
+            ...naturalWeapons,
             ...knowledgeSkillItems,
             ...this.getMetatypeItems(allSpells, spellsData, { type: 'Spell', critter: critterName }),
             ...this.getMetatypeItems(allPowers, optionalPowers, { type: 'Power', critter: critterName }),
