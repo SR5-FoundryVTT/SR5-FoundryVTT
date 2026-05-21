@@ -63,27 +63,9 @@ export class ItemPrep {
         for (const element of Object.values(armor.elements)) {
             ModifiableValue.calcTotal(element);
         }
+
         for (const immunity of Object.values(armor.immunities)) {
             ModifiableValue.calcTotal(immunity);
-        }
-    }
-
-    /**
-     * Reset derived actor armor fields before rebuilding armor from effects and equipped items.
-     *
-     * This clears runtime/derived armor state so prep can deterministically recalculate:
-     * - elemental armor
-     * - immunities
-     */
-    static resetElementalArmor(system: Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>) {
-        for (const element of Object.keys(system.armor.elements)) {
-            system.armor.elements[element].base = 0;
-            system.armor.elements[element].value = 0;
-        }
-
-        for (const immunity of Object.keys(system.armor.immunities)) {
-            system.armor.immunities[immunity].base = 0;
-            system.armor.immunities[immunity].value = 0;
         }
     }
 }

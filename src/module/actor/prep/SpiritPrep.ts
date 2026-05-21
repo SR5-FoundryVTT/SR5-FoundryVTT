@@ -17,8 +17,6 @@ import { ItemPrep } from './functions/ItemPrep';
 export class SpiritPrep {
     static prepareBaseData(system: Actor.SystemOfType<'spirit'>) {
         ModifiableFieldPrep.resetAllModifiers(system);
-
-        ItemPrep.resetElementalArmor(system);
     }
 
     static prepareDerivedData(system: Actor.SystemOfType<'spirit'>, items: SR5Item[]) {

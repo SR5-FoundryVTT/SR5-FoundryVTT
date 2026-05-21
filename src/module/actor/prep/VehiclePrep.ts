@@ -17,7 +17,6 @@ import { ItemPrep } from './functions/ItemPrep';
 export class VehiclePrep {
     static prepareBaseData(system: Actor.SystemOfType<'vehicle'>) {
         ModifiableFieldPrep.resetAllModifiers(system);
-        ItemPrep.resetElementalArmor(system);
     }
 
     static prepareDerivedData(system: Actor.SystemOfType<'vehicle'>, items: SR5Item[]) {

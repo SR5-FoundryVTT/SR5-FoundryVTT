@@ -21,8 +21,6 @@ export class CharacterPrep {
     static prepareBaseData(system: Actor.SystemOfType<'character'>) {
         ModifiableFieldPrep.resetAllModifiers(system);
         CharacterPrep.addSpecialAttributes(system);
-
-        ItemPrep.resetElementalArmor(system);
     }
 
     /**
