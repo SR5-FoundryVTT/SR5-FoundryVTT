@@ -1,11 +1,8 @@
 /**
  * CSS for Success Test Dialog styling.
  */
-@use 'sass:color';
 @use 'config';
 @use 'config/variables';
-
-$icon-face-size: 35px;
 
 .application.sr5v2.form-dialog {
   background: var(--sr5v2-app-body-bg);
@@ -203,26 +200,6 @@ $icon-face-size: 35px;
     > .form-group-element-1-right {
       flex: 0 0 auto;
       margin-left: 0.25rem;
-    }
-
-    > #reset-progressive-recoil {
-      flex: 0 0 $icon-face-size;
-      width: $icon-face-size;
-      height: $icon-face-size;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      > button {
-        width: $icon-face-size;
-        height: $icon-face-size;
-        padding: 0;
-        line-height: 1;
-        color: var(--sr5v2-control-text);
-        background: var(--sr5v2-control-bg);
-        border: 1px solid var(--sr5v2-control-border);
-        text-shadow: none;
-      }
     }
 
     > div:not(.form-group-element-2):not(.form-group-element-1-right) {
