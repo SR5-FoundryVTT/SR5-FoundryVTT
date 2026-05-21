@@ -85,7 +85,7 @@ export const ItemRollDataFlow = {
                 return rollData;
             }
             
-            const directConnection = testData?.directConnection ?? false;
+            const directConnection = testData?.connectionType === 'direct_connection';
             ItemRollDataFlow.injectMasterAttributesForPAN(master, actor, rollData, directConnection)
         }
 
