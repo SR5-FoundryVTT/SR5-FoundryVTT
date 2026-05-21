@@ -40,7 +40,7 @@ const SpiritData = () => ({
     magic: new SchemaField(MagicData()),
 
     // === Combat ===
-    armor: new ModifiableField(ActorArmorData()),
+    armor: new SchemaField(ActorArmorData()),
     initiative: new SchemaField(Initiative('astral', 'meatspace')),
     wounds: new ModifiableField(ModifiableValueSchema()),
 

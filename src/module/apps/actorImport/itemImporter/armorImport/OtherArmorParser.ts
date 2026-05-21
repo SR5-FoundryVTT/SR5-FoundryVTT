@@ -14,8 +14,8 @@ export class OtherArmorParser extends Parser<'armor'> {
         const system = item.system;
         const armor = system.armor;
 
-        armor.mod = itemData.armor.includes('+');
-        armor.value = Number(itemData.armor) || 0;
+        armor.accessory = itemData.armor.includes('+');
+        armor.base = Number(itemData.armor) || 0;
         system.technology.equipped = true;
     }
 

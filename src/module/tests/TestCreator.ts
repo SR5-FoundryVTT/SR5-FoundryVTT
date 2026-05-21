@@ -522,8 +522,12 @@ export const TestCreator = {
         // Add the armor value as a pool modifier, since 'armor' is part of the test description.
         if (action.armor) {
             const armor = actor.getArmor();
-            ModifiableValue.addUniqueBase(data.pool, 'SR5.Armor.label', armor.value);
-            TestCreator.addCodeTermTrace(data, { ...armor, label: 'SR5.Armor.label' });
+            ModifiableValue.addUniqueBase(data.pool, 'SR5.Armor.label', armor.rating.value);
+            TestCreator.addCodeTermTrace(data, { ...armor.rating, label: 'SR5.Armor.label' });
+            if (armor.hardened.value) {
+                ModifiableValue.addUniqueBase(data.pool, 'SR5.HardenedArmor', armor.hardened.value);
+                TestCreator.addCodeTermTrace(data, { ...armor.hardened, label: 'SR5.HardenedArmor' });
+            }
         }
 
         // Prepare limit values...

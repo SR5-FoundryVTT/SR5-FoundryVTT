@@ -5,7 +5,7 @@ const { NumberField, StringField } = foundry.data.fields;
 
 const QualityData = () => ({
     ...BaseItemData(),
-    ...ActionPartData(),
+    ...ActionPartData({ normal_weapon: true }),
 
     type: new StringField({
         required: true,

@@ -283,6 +283,46 @@
             &.thicc-col {
                 flex: 0 0 6rem;
             }
+
+            &.mod-armor-col {
+                justify-content: flex-start;
+                gap: 0.4rem;
+
+                .mod-armor-hardened {
+                    flex: 0 0 auto;
+                }
+
+                .mod-armor-value {
+                    flex: 1 1 auto;
+                    min-width: 0;
+
+                    input,
+                    select {
+                        width: 100%;
+                    }
+                }
+            }
+
+        }
+
+        .armor-resistance-row {
+            display: flex;
+            width: 100%;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .armor-resistance-field {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.2rem;
+            flex: 1 0 auto;
+            max-width: 100%;
+            text-align: center;
+            text-wrap: nowrap;
         }
 
         .list-item-icons {

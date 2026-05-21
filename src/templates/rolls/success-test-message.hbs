@@ -59,9 +59,6 @@
                         ({{#each test.codeTerms.threshold as |term|}}<span class="test-code-term {{#if term.tooltipSource}}has-tooltip{{/if}}" {{#if term.tooltipSource}}data-tooltip-source="{{term.tooltipSource}}"{{/if}}>{{term.text}}</span>{{#unless @last}} + {{/unless}}{{/each}})
                     {{/if}}
                 </span>
-                {{#if test.hitsIcon}}
-                <img class="test-icon" src="{{test.hitsIcon.icon}}" data-tooltip="{{test.hitsIcon.tooltip}}" />
-                {{/if}}
             </div>
         </div>
         {{/if}}
@@ -101,11 +98,8 @@
                 <div class="test-value metric-row">
                     <span class="value">{{localize test.hits.label}}:</span>
                     <span class="value-result">
-                        {{test.displayHits}}{{#if test.appendedHits}} + {{test.appendedHits}}{{/if}}
+                        {{test.hitsBreakdown}}
                     </span>
-                    {{#if test.hitsIcon}}
-                    <img class="test-icon" src="{{test.hitsIcon.icon}}" data-tooltip="{{test.hitsIcon.tooltip}}" />
-                    {{/if}}
                 </div>
                 {{#if test.hasBuyHits}}
                 <div class="test-value metric-row">

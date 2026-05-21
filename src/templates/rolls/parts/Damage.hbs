@@ -11,13 +11,14 @@
         <span class="value">{{name}}: </span>
         <span class="value-result">
             <span class="button apply-damage"
-                data-tooltip="{{tooltip}}"
-                data-damage-value="{{damage.value}}"
-                data-damage-type="{{damage.type.value}}"
-                data-damage-element="{{damage.element.value}}"
-                data-damage-ap="{{damage.ap.value}}"
-                data-damage-biofeedback="{{damage.biofeedback}}"
-            >
+              data-tooltip="{{tooltip}}"
+              data-damage-value="{{damage.value}}"
+              data-damage-type="{{damage.type.value}}"
+              data-damage-element="{{damage.element.value}}"
+              data-damage-ap="{{damage.ap.value}}"
+              data-damage-biofeedback="{{damage.biofeedback}}"
+              data-damage-normal-weapon="{{damage.normal_weapon}}"
+              >
                 {{damageCode damage}}
 
                 {{#if damage.element.value}}
