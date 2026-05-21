@@ -99,20 +99,20 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             await master.addSlave(slave);
 
             // Assert initial wireless connection.
-            test.data.connectionType = 'different_grid';
+            test.data.directConnection = false;
 
             let rollData = slave.getRollData({ testData: test.data });
 
             // Master rating is used for firewall.
-            assert.equal(rollData.attributes.firewall.value, 5, "1");
+            assert.equal(rollData.attributes.firewall.value, 5);
 
             // Assert direct connection.
-            test.data.connectionType = 'direct_connection';
+            test.data.directConnection = true;
 
             rollData = slave.getRollData({ testData: test.data });
 
             // Slave rating is used for firewall.
-            assert.equal(rollData.attributes.firewall.value, 3, "2");
+            assert.equal(rollData.attributes.firewall.value, 3);
         });
 
         it('Device in WAN using own attributes due to direct connection', async () => {
@@ -120,7 +120,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             const device = await factory.createItem({ type: 'equipment', system: { technology: { rating: 3, master: host.uuid } } });
 
             const action = DataDefaults.createData('action_roll', { categories: ['matrix'] });
-            const testData = { connectionType: 'direct_connection', action };
+            const testData = { directConnection: true, action };
             
             const rollData = device.getRollData({ testData });
 
