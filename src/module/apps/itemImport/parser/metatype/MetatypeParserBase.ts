@@ -263,6 +263,7 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'spirit'
             system.subcategory = 'natural_weapon';
             system.category = isRanged ? 'range' : 'melee';
 
+            system.action.attribute = 'agility';
             system.action.skill = isRanged ? 'exotic_ranged_weapon' : 'unarmed_combat';
             
             system.action.damage = DataDefaults.createData('damage', {
