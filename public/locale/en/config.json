@@ -2754,8 +2754,6 @@
         "Test": "Test",
         "TestResults": {
             "AttackBlockedByHardenedArmor": "Attack Hits But Is Blocked By Hardened Armor",
-            "AttackBlockedByImmunity": "Attack Hits But Is Blocked By Immunity",
-            "AttackBlockedByNormalWeaponsImmunity": "Attack Hits But Is Blocked By Immunity To Normal Weapons",
             "AttackBlockedByVehicleArmor": "Attack Hits But Is Blocked By Vehicle Armor",
             "AttackDodged": "Attack Dodged",
             "AttackDoesNoPhysicalDamageToVehicle": "Attack Hits But Does No Physical Damage To Vehicle",
@@ -2774,8 +2772,6 @@
             "RitualFailure": "The ritual was to strong for you",
             "RitualSuccess": "The ritual is sealed",
             "SoakBlockedByHardenedArmor": "Blocked By Hardened Armor",
-            "SoakBlockedByImmunity": "Blocked By Immunity",
-            "SoakBlockedByNormalWeaponsImmunity": "Blocked By Immunity To Normal Weapons",
             "SpiritSummonFailure": "Spirit fled!",
             "SpiritSummonSuccess": "Spirit summoned!",
             "SpriteCompilationFailure": "Sprite fled!",

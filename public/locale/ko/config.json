@@ -2748,8 +2748,6 @@
         "Test": "판정",
         "TestResults": {
             "AttackBlockedByHardenedArmor": "공격은 명중했으나 단단한 방어구에 의해 막힘",
-            "AttackBlockedByImmunity": "Attack Hits But Is Blocked By Immunity",
-            "AttackBlockedByNormalWeaponsImmunity": "Attack Hits But Is Blocked By Immunity To Normal Weapons",
             "AttackBlockedByVehicleArmor": "공격은 명중했으나 차량 장갑에 의해 막힘",
             "AttackDodged": "공격 회피",
             "AttackDoesNoPhysicalDamageToVehicle": "공격이 명중했으나 탑승물에 물리적 피해를 가하지 못함",
@@ -2768,8 +2766,6 @@
             "RitualFailure": "의식이 시전자보다 강함",
             "RitualSuccess": "의식이 봉인됨",
             "SoakBlockedByHardenedArmor": "단단한 방어구에 의해 막힘",
-            "SoakBlockedByImmunity": "Blocked By Immunity",
-            "SoakBlockedByNormalWeaponsImmunity": "Blocked By Immunity To Normal Weapons",
             "SpiritSummonFailure": "영혼이 사라졌다!",
             "SpiritSummonSuccess": "영혼이 소환되었다!",
             "SpriteCompilationFailure": "스프라이트가 사라졌다!",

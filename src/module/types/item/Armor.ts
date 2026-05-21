@@ -1,3 +1,4 @@
+import { SR5 } from "@/module/config";
 import { BaseValuePair } from "../template/Base";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { TagifyAltField } from "../fields/TagifyAltField";
@@ -20,8 +21,8 @@ export const ArmorValueData = () => ({
         pollutant: new SchemaField(BaseValuePair()),
     }),
     immunities: new SchemaField({
-        base: new TagifyAltField(new StringField({ required: true })),
-        value: new TagifyAltField(new StringField({ required: true })),
+        base: new TagifyAltField(new StringField({ required: true, choices: SR5.armorImmunityTypes })),
+        value: new TagifyAltField(new StringField({ required: true, choices: SR5.armorImmunityTypes })),
     }),
 });
 

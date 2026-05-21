@@ -118,12 +118,6 @@ export class Version0_34_0 extends VersionMigration {
         const legacyRating = getProperty(armor, 'base');
         if (legacyRating) setProperty(armor, 'rating.base', legacyRating);
 
-        if (armor.mod !== undefined)
-            armor.accessory = armor.mod;
-
-        if (armor.hardened !== undefined)
-            armor.is_hardened = Boolean(armor.hardened);
-
         const elements = ['acid', 'cold', 'electricity', 'fire', 'radiation'];
         for (const el of elements) {
             if (armor[el] !== undefined)

@@ -18,7 +18,7 @@ export class SpiritPrep {
     static prepareBaseData(system: Actor.SystemOfType<'spirit'>) {
         ModifiableFieldPrep.resetAllModifiers(system);
 
-        ItemPrep.resetDerivedArmor(system);
+        ItemPrep.resetElementalArmor(system);
     }
 
     static prepareDerivedData(system: Actor.SystemOfType<'spirit'>, items: SR5Item[]) {
@@ -93,12 +93,13 @@ export class SpiritPrep {
      * Prepare armor values for spirit rules. These have some additional caveats in comparison to characters.
      */
     static prepareSpiritArmor(system: Actor.SystemOfType<'spirit'>) {
-        const { armor, attributes } = system;
+        const { armor, attributes, modifiers } = system;
 
-        ModifiableValue.addUnique(armor.immunities.normal_weapons, 'SR5.Immunity', attributes.essence.value * 2);
+        const immunityRating = Math.max(attributes.essence.value * 2, 0);
+        ModifiableValue.addUnique(armor.immunities.normal_weapons, 'SR5.armorImmunityTypes.normal_weapons', immunityRating);
 
-        if (system.modifiers.armor)
-            ModifiableValue.addUnique(armor.rating, game.i18n.localize('SR5.Bonus'), system.modifiers.armor);
+        if (modifiers.armor)
+            ModifiableValue.addUnique(armor.rating, game.i18n.localize('SR5.Bonus'), modifiers.armor);
     }
 
     /**

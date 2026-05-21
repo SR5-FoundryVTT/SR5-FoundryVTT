@@ -41,7 +41,7 @@ const ModificationData = () => ({
             water: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
             pollutant: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
         }),
-        immunities: new TagifyAltField(new StringField({ required: true })),
+        immunities: new TagifyAltField(new StringField({ required: true, choices: SR5.armorImmunityTypes })),
     }),
     slots: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
 });

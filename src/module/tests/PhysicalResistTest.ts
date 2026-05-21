@@ -7,7 +7,6 @@ import {SoakFlow} from "../actor/flows/SoakFlow";
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { Translation } from '../utils/strings';
 import { ResistTestData, ResistTestDataFlow } from "./flows/ResistTestDataFlow";
-import { BiofeedbackResistTest } from "./BiofeedbackResistTest";
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
 import { MatrixResistTestData } from "./MatrixResistTest";

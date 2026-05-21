@@ -227,7 +227,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
 
         const getCharacterWithImmunities = async (
             armorValue: number,
-            immunities: string[]
+            immunities: (keyof typeof SR5.armorImmunityTypes)[]
         ): Promise<SR5Actor> => {
             const characterActor = await factory.createActor({ type: 'character' });
             const armor = await factory.createItem({

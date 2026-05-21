@@ -98,7 +98,8 @@ export class CombatRules {
             return false;
         }
 
-        const modifiedAv = actor.getArmor(incomingDamage).rating.value;
+        const armor = actor.getArmor(incomingDamage);
+        const modifiedAv = armor.rating.value + armor.hardened.value;
         const modifiedDv = CombatRules.modifyDamageAfterHit(actor, attackerHits, defenderHits, incomingDamage).value;
 
         return modifiedDv < modifiedAv;

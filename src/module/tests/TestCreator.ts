@@ -511,7 +511,8 @@ export const TestCreator = {
         if (action.armor) {
             const armor = actor.getArmor();
             ModifiableValue.addUniqueBase(data.pool, 'SR5.Armor.label', armor.rating.value);
-            ModifiableValue.addUniqueBase(data.pool, 'SR5.HardenedArmor', armor.hardened.value);
+            if (armor.hardened.value)
+                ModifiableValue.addUniqueBase(data.pool, 'SR5.HardenedArmor', armor.hardened.value);
         }
 
         // Prepare limit values...

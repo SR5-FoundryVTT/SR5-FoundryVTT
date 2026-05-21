@@ -7,7 +7,7 @@ export class ItemPrep {
      * - will only allow one "Base" armor item to be used (automatically takes the best one if multiple are equipped)
      * - all "accessories" will be added to the armor
      */
-    static prepareArmor(system: Actor.SystemOfType<'character' | 'spirit'>, items: SR5Item[]) {
+    static prepareArmor(system: Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>, items: SR5Item[]) {
         const { armor } = system;
 
         // NOTE: We retrieve different types of items, all containing armor data.
@@ -51,7 +51,7 @@ export class ItemPrep {
             for (const immunity of item.system.armor.immunities.value) {
                 if (!armor.immunities[immunity]) continue;
                 // Immunity rating is trait-like: apply once per immunity type, not per item piece.
-                ModifiableValue.addUnique(armor.immunities[immunity], `SR5.Armor.Immunity.${immunity}`, immunityRating);
+                ModifiableValue.addUnique(armor.immunities[immunity], `SR5.armorImmunityTypes.${immunity}`, immunityRating);
             }
         }
 
@@ -72,18 +72,10 @@ export class ItemPrep {
      * Reset derived actor armor fields before rebuilding armor from effects and equipped items.
      *
      * This clears runtime/derived armor state so prep can deterministically recalculate:
-     * - rating
-     * - hardened
      * - elemental armor
      * - immunities
      */
-    static resetDerivedArmor(system: Actor.SystemOfType<'character' | 'spirit'>) {
-        system.armor.rating.base = 0;
-        system.armor.rating.value = 0;
-
-        system.armor.hardened.base = 0;
-        system.armor.hardened.value = 0;
-
+    static resetElementalArmor(system: Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>) {
         for (const element of Object.keys(system.armor.elements)) {
             system.armor.elements[element].base = 0;
             system.armor.elements[element].value = 0;

@@ -1323,8 +1323,6 @@
         "Test": "Teste",
         "TestResults": {
             "AttackBlockedByHardenedArmor": "Ataque Acerta Mas É Bloqueado Por Armadura Endurecida",
-            "AttackBlockedByImmunity": "Attack Hits But Is Blocked By Immunity",
-            "AttackBlockedByNormalWeaponsImmunity": "Attack Hits But Is Blocked By Immunity To Normal Weapons",
             "AttackBlockedByVehicleArmor": "Ataque Acerta Mas É Bloqueado Por Armadura de Veículo",
             "AttackDodged": "Ataque Esquivado",
             "AttackDoesNoPhysicalDamageToVehicle": "Ataque Acerta Mas Não Causa Dano Físico Ao Veículo",
@@ -1336,8 +1334,6 @@
             "RitualFailure": "O ritual foi forte demais para você",
             "RitualSuccess": "O ritual está selado",
             "SoakBlockedByHardenedArmor": "Bloqueado Por Armadura Endurecida",
-            "SoakBlockedByImmunity": "Blocked By Immunity",
-            "SoakBlockedByNormalWeaponsImmunity": "Blocked By Immunity To Normal Weapons",
             "SpiritSummonFailure": "Espírito fugiu!",
             "SpiritSummonSuccess": "Espírito invocado!",
             "SpriteCompilationFailure": "Sprite fugiu!",

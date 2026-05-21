@@ -2749,8 +2749,6 @@
         "Test": "Probe",
         "TestResults": {
             "AttackBlockedByHardenedArmor": "Angriff trifft, wird aber von verstärkter Panzerung abgewehrt",
-            "AttackBlockedByImmunity": "Attack Hits But Is Blocked By Immunity",
-            "AttackBlockedByNormalWeaponsImmunity": "Attack Hits But Is Blocked By Immunity To Normal Weapons",
             "AttackBlockedByVehicleArmor": "Angriff trifft, wird aber von Fahrzeugpanzerung abgewehrt",
             "AttackDodged": "Ausgewichen",
             "AttackDoesNoPhysicalDamageToVehicle": "Angriff trifft, verursacht aber keinen körperlichen Schaden am Fahrzeug",
@@ -2769,8 +2767,6 @@
             "RitualFailure": "Das Ritual war zu stark für dich",
             "RitualSuccess": "Das Ritual ist besiegelt",
             "SoakBlockedByHardenedArmor": "Durch verstärkte Rüstung abgewehrt",
-            "SoakBlockedByImmunity": "Blocked By Immunity",
-            "SoakBlockedByNormalWeaponsImmunity": "Blocked By Immunity To Normal Weapons",
             "SpiritSummonFailure": "Geist entkommen!",
             "SpiritSummonSuccess": "Geist beschworen!",
             "SpriteCompilationFailure": "Sprite entkommen!",

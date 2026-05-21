@@ -914,12 +914,6 @@
         "Temporary": "Temporaire",
         "TemporaryModifiers": "Modificateurs temporaires",
         "Test": "Test",
-        "TestResults": {
-            "AttackBlockedByImmunity": "Attack Hits But Is Blocked By Immunity",
-            "AttackBlockedByNormalWeaponsImmunity": "Attack Hits But Is Blocked By Immunity To Normal Weapons",
-            "SoakBlockedByImmunity": "Blocked By Immunity",
-            "SoakBlockedByNormalWeaponsImmunity": "Blocked By Immunity To Normal Weapons"
-        },
         "ToggleBreakdown": "Afficher/masquer le détail",
         "ToggleEquip": "(Des)équiper",
         "Top": "Coté",

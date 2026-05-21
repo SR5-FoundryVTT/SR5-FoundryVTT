@@ -176,22 +176,6 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(character.system.armor.immunities.fire.value, 12);
         });
 
-        it('clears stale actor armor base when no equipped armor contributes', async () => {
-            const character = await factory.createActor({
-                type: 'character',
-                system: {
-                    armor: {
-                        rating: {
-                            base: 7,
-                            value: 7,
-                        },
-                    },
-                },
-            });
-
-            assert.strictEqual(character.system.armor.rating.value, 0);
-        });
-
         it('monitor calculation', async () => {
             const character = await factory.createActor({
                 type: 'character',
