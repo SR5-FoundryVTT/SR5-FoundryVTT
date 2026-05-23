@@ -1,8 +1,8 @@
 import { FLAGS } from "../constants";
 import { Sanitizer } from "../sanitizer/Sanitizer";
 import { Version0_8_0 } from "./versions/Version0_8_0";
-import { Version0_18_0 } from './versions/Version0_18_0';
 import { Version0_16_0 } from './versions/Version0_16_0';
+import { Version0_18_0 } from './versions/Version0_18_0';
 import { Version0_27_0 } from './versions/Version0_27_0';
 import { Version0_30_0 } from './versions/Version0_30_0';
 import { Version0_30_3 } from './versions/Version0_30_3';
@@ -15,9 +15,11 @@ import { Version0_32_4 } from './versions/Version0_32_4';
 import { Version0_33_0 } from './versions/Version0_33_0';
 import { Version0_33_1 } from './versions/Version0_33_1';
 import { Version0_34_0 } from './versions/Version0_34_0';
+import { Version0_34_1 } from './versions/Version0_34_1';
 import { VersionMigration, MigratableDocument, MigratableDocumentName, MigratableDocumentType } from "./VersionMigration";
 
 const { deepClone, setProperty } = foundry.utils;
+
 
 /**
  * Seamless data migrator for the SR5 system.
@@ -43,8 +45,8 @@ export class Migrator {
     // ⚠️ Keep this list sorted in ascending order by version number (oldest → newest).
     private static readonly s_Versions = [
         new Version0_8_0(),
-        new Version0_18_0(),
         new Version0_16_0(),
+        new Version0_18_0(),
         new Version0_27_0(),
         new Version0_30_0(),
         new Version0_30_3(),
@@ -57,6 +59,7 @@ export class Migrator {
         new Version0_33_0(),
         new Version0_33_1(),
         new Version0_34_0(),
+        new Version0_34_1(),
     ] as const;
 
     private static documentsToBeMigrated = 0;
