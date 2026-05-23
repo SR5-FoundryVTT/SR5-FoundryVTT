@@ -1,6 +1,7 @@
 // game settings for shadowrun 5e
 
 import { FLAGS, SYSTEM_NAME } from './constants';
+import { PackItemFlow } from './item/flows/PackItemFlow';
 import SR5CompendiaSettings from './settings/SR5CompendiaSettings';
 
 export const registerSystemSettings = () => {
@@ -372,7 +373,10 @@ export const registerSystemSettings = () => {
         hint: 'SR5.CompendiaSettings.SkillsPack.hint',
         scope: 'world',
         config: false,
-        type: String
+        type: String,
+        onChange: () => {
+            PackItemFlow.refreshSkillCachesForConfiguredPacks();
+        }
     });
 
     /**
@@ -383,7 +387,10 @@ export const registerSystemSettings = () => {
         hint: 'SR5.CompendiaSettings.SkillGroupsPack.hint',
         scope: 'world',
         config: false,
-        type: String
+        type: String,
+        onChange: () => {
+            PackItemFlow.refreshSkillCachesForConfiguredPacks();
+        }
     });
 
     /**
@@ -394,7 +401,10 @@ export const registerSystemSettings = () => {
         hint: 'SR5.CompendiaSettings.SkillSetsPack.hint',
         scope: 'world',
         config: false,
-        type: String
+        type: String,
+        onChange: () => {
+            PackItemFlow.refreshSkillCachesForConfiguredPacks();
+        }
     });
 
     game.settings.register(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder, {

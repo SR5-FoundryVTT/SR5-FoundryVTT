@@ -45,8 +45,7 @@ export const spriteImporterTesting = (context: QuenchBatchContext) => {
             const skillSet = await fromUuid(sprite.system.skillset) as SR5Item<'skill'> | null;
             if (!skillSet) throw new Error('No skillset assigned');
 
-            const skillItems = await PackItemFlow.prepareSkillsForSkillSet(skillSet);
-            const skillGroups = await PackItemFlow.prepareSkillGroupsForSkillSet(skillSet);
+            const { skills: skillItems, groups: skillGroups } = await PackItemFlow.prepareSkillSetItems(skillSet);
             const nonSkillItems = sprite.items.filter(item => !item.isType('skill')).length;
 
             assert.lengthOf(sprite.items, nonSkillItems + skillItems.length + skillGroups.length, 'Item count');

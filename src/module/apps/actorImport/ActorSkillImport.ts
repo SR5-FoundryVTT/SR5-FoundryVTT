@@ -71,8 +71,9 @@ export class ActorSkillImport {
 
         const skillSet = await this.assignDefaultSkillset(actor);
         if (skillSet) {
-            actor.items.push(...await PackItemFlow.prepareSkillsForSkillSet(skillSet));
-            actor.items.push(...await PackItemFlow.prepareSkillGroupsForSkillSet(skillSet) as Item.CreateData[]);
+            const { skills: seededSkills, groups: seededGroups } = await PackItemFlow.prepareSkillSetItems(skillSet);
+            actor.items.push(...seededSkills);
+            actor.items.push(...seededGroups);
         }
 
         const packSkillsByName = this.buildNameMap(await PackItemFlow.getPackSkills());

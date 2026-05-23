@@ -119,8 +119,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             const seededSkillKeys = new Set<string>();
             const seededGroupNames = new Set<string>();
             if (importedSkillSet) {
-                const seededSkills = await PackItemFlow.prepareSkillsForSkillSet(importedSkillSet);
-                const seededGroups = await PackItemFlow.prepareSkillGroupsForSkillSet(importedSkillSet);
+                const { skills: seededSkills, groups: seededGroups } = await PackItemFlow.prepareSkillSetItems(importedSkillSet);
 
                 seededSkillCount = seededSkills.length;
                 seededGroupCount = seededGroups.length;

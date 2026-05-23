@@ -64,8 +64,9 @@ export const SkillSetFlow = {
     async applySkillSetToActor(actor: SR5Actor, skillSet: SR5Item<'skill'>, options: { useSource?: boolean } = {}) {
         if (!skillSet.isType('skill') || skillSet.system.type !== 'set') return;
 
-        let skills = await PackItemFlow.prepareSkillsForSkillSet(skillSet);
-        const groups = await PackItemFlow.prepareSkillGroupsForSkillSet(skillSet) as Item.CreateData[];
+        const prepared = await PackItemFlow.prepareSkillSetItems(skillSet);
+        let skills = prepared.skills;
+        const groups = prepared.groups;
 
         const newSkillKeys = new Set<string>();
         

@@ -134,6 +134,7 @@ import { CompendiumBrowser } from './apps/compendiumBrowser/CompendiumBrowser';
 import { Skill } from './types/item/Skill';
 import { SR5SkillSheet } from './item/sheets/SR5SkillSheet';
 import { SkillGroupFlow } from './actor/flows/SkillGroupFlow';
+import { PackItemFlow } from './item/flows/PackItemFlow';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -168,10 +169,10 @@ export class HooksManager {
         Hooks.on('moveToken', SR5TokenDocument.moveToken.bind(SR5Token));
         Hooks.on('renderTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
         Hooks.on('renderPrototypeTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
-        Hooks.on('createItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
+        Hooks.on('createItem', (item) => { void HooksManager.handleSkillItemMutation(item); });
         Hooks.on('updateItem', (item, data, options, userId) => { void HooksManager.updateIcConnectedToHostItem(item, data, options, userId); });
-        Hooks.on('updateItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
-        Hooks.on('deleteItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
+        Hooks.on('updateItem', (item) => { void HooksManager.handleSkillItemMutation(item); });
+        Hooks.on('deleteItem', (item) => { void HooksManager.handleSkillItemMutation(item); });
         Hooks.on('getChatMessageContextOptions', SuccessTest.chatMessageContextOptions.bind(SuccessTest));
 
         Hooks.on("renderChatLog", HooksManager.chatLogListeners.bind(HooksManager));
@@ -526,6 +527,8 @@ ___________________
                 new ChangelogApplication().render(true);
         }
 
+        void PackItemFlow.warmSkillCaches();
+
         Hooks.on('renderChatMessage', HooksManager.chatMessageListeners.bind(HooksManager));
         Hooks.on('renderJournalPageSheet', JournalEnrichers.setEnricherHooks.bind(JournalEnrichers));
         HooksManager.registerSocketListeners();
@@ -622,11 +625,12 @@ ___________________
             await MatrixICFlow.handleUpdateItemHost(item);
     }
 
-    static async syncSkillGroupMembership(item: SR5Item) {
-        if (!item.actor) return;
+    static async handleSkillItemMutation(item: SR5Item) {
         if (!item.isType('skill')) return;
-        if (!['group', 'skill'].includes(item.system.type)) return;
+        PackItemFlow.handleCompendiumSkillItemMutation(item);
 
+        if (!item.actor) return;
+        if (!['group', 'skill'].includes(item.system.type)) return;
         await SkillGroupFlow.syncSkillItemGroups(item.actor);
     }
 
