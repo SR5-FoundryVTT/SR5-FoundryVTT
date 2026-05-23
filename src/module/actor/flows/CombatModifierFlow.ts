@@ -1,17 +1,12 @@
 import { SR5Actor } from "../SR5Actor";
+import { DataDefaults } from "src/module/data/DataDefaults";
 import { ModifiableValueType } from "@/module/types/template/Base";
 
 // Flow for calculating combat roll modifiers for SR5Actor
 export const CombatModifierFlow = {
     // Helper to create a modifier object
-    _createModifier: (name: string, value: number): ModifiableValueType['changes'][number] => ({
-        name, value,
-        mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-        priority: 20,
-        effectUuid: null,
-        enabled: true,
-        invalidated: false
-    }),
+    _createModifier: (name: string, value: number): ModifiableValueType['changes'][number] =>
+        DataDefaults.createData('change_entry', { name, value }),
 
     // Returns charger modifier if actor is running or sprinting
     getChargerModifier: (actor: SR5Actor): ModifiableValueType['changes'][number] | null => {

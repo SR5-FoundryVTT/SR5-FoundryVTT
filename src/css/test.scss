@@ -2,10 +2,26 @@
  * CSS for Success Test Dialog styling.
  */
 @use 'config';
+@use 'config/variables';
 
-.sr5.form-dialog {
+.application.sr5v2.form-dialog {
+  background: var(--sr5v2-app-body-bg);
+
   .dialog-title {
     font-weight: bold;
+  }
+
+  .window-header {
+    background: var(--sr5v2-app-header-bg);
+    background-repeat: repeat;
+    background-size: 100% 20px auto;
+    color: var(--sr5v2-text-primary);
+
+    .window-title,
+    .header-control {
+      color: var(--sr5v2-text-primary);
+      text-shadow: none;
+    }
   }
 
   .form-group {
@@ -25,11 +41,296 @@
 
 
   .dialog-content-common {
+    .document {
+      padding: 0.2rem 0.25rem;
+      background: var(--sr5v2-app-header-bg);
+      background-repeat: repeat;
+      background-size: 100% 20px auto;
+      color: var(--sr5v2-text-primary);
+
+      a,
+      a:visited,
+      a:hover,
+      .content-link,
+      .content-link:visited,
+      .content-link:hover,
+      .entity-link,
+      .entity-link:visited,
+      .entity-link:hover {
+        color: var(--sr5v2-text-primary) !important;
+        text-shadow: none;
+      }
+    }
+
     h2 {
       border: none;
-      color: white;
+      color: var(--sr5v2-text-primary);
       margin: 0;
-      text-underline: none;
+      text-decoration: none;
     }
+  }
+
+  max-width: calc(100vw - 2rem);
+
+  .window-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-height: 0;
+    container-type: inline-size;
+    background: var(--sr5v2-app-body-bg);
+    background-image: none;
+    color: var(--sr5v2-text-primary);
+    border-color: var(--sr5v2-border);
+
+    label,
+    .form-group > label,
+    .toggle-checkbox-row > label,
+    .form-group-element-1-right,
+    .form-group-element-2,
+    .ui-control {
+      color: var(--sr5v2-text-primary);
+      text-shadow: none;
+    }
+
+    input[type='text'],
+    input[type='number'],
+    select {
+      color: var(--sr5v2-control-text);
+      background: var(--sr5v2-control-bg);
+      border-color: var(--sr5v2-control-border);
+      text-shadow: none;
+    }
+
+    input:disabled,
+    select:disabled,
+    textarea:disabled {
+      color: var(--sr5v2-text-secondary);
+      background: var(--sr5v2-control-bg-strong);
+    }
+  }
+
+  [data-application-part='content'] {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  [data-application-part='footer'] {
+    flex: 0 0 auto;
+  }
+
+  .sheet-footer {
+    margin-top: 0;
+  }
+
+  // Make the top-level test dialog sections adapt between stacked and split layouts.
+  form > .dialog-content-common,
+  form > .dialog-content-common > div > .dialog-content-common {
+    display: flex;
+    flex-wrap: wrap;
+
+    > * {
+      flex: 1 1 100%;
+      min-width: 0;
+    }
+  }
+
+  form > .dialog-content-common > hr + div {
+    padding: 0 0.15rem;
+  }
+
+  @container (min-width: 760px) {
+    form > .dialog-content-common > hr + div,
+    form > .dialog-content-common > hr + div + div {
+      flex: 1 1 calc(50% - 0.125rem);
+    }
+  }
+
+  hr {
+    margin: 0.3rem 0;
+  }
+
+  .dialog-content-common > div > .form-group:not(.modifiable-value):not(.toggle-checkbox-row) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.35rem;
+    margin-bottom: 0.25rem;
+    min-width: 0;
+
+    > label {
+      flex: 1 1 auto;
+      min-width: 0;
+      margin: 0;
+    }
+
+    > input[type='text'],
+    > input[type='number'] {
+      flex: 0 0 3.4rem;
+      min-width: 3.4rem;
+      max-width: 3.4rem;
+      width: 3.4rem;
+      height: 24px;
+      text-align: center;
+    }
+
+    > select {
+      flex: 0 1 56%;
+      min-width: 6rem;
+      width: auto;
+      height: 24px;
+    }
+
+    > input[type='checkbox'] {
+      margin-left: auto;
+      flex: 0 0 auto;
+    }
+
+    > .form-group-element-2 {
+      flex: 1 1 auto;
+      min-width: 0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.2rem;
+      text-align: right;
+    }
+
+    > .form-group-element-1-right {
+      flex: 0 0 auto;
+      margin-left: 0.25rem;
+    }
+
+    > div:not(.form-group-element-2):not(.form-group-element-1-right) {
+      flex: 1 1 auto;
+      min-width: 0;
+      text-align: right;
+      margin-left: auto;
+    }
+  }
+
+  .modifiable-value {
+    border-radius: 0;
+
+    .breakdown-list {
+      padding: 2px 6px;
+      gap: 2px;
+      border-radius: 0;
+    }
+  }
+
+  .breakdown-entry {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.35rem;
+    margin-bottom: 0;
+    padding: 1px 0;
+    min-height: 28px;
+
+    .mod-name {
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .mod-value {
+      flex: 0 0 2.5rem;
+      text-align: right;
+    }
+
+    > input[type='checkbox'] {
+      flex: 0 0 auto;
+      margin-left: auto;
+    }
+
+    .modifier-effect-button {
+      flex: 0 0 28px;
+      width: 28px;
+      height: 28px;
+      border-radius: 0;
+
+      &.has-effect {
+        border-radius: 4px;
+      }
+    }
+
+    .modifier-effect-button img {
+      width: 28px;
+      height: 28px;
+      object-fit: cover;
+      border-radius: 0;
+    }
+
+    .modifier-effect-button i {
+      font-size: 1.2rem;
+    }
+  }
+
+  .toggle-checkbox-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.25rem;
+
+    > label {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    > input[type='checkbox'] {
+      flex: 0 0 auto;
+      margin-left: auto;
+      margin-bottom: 0;
+    }
+  }
+
+  .sheet-footer {
+    display: flex;
+    gap: 0.5rem;
+    border-top: 1px solid var(--sr5v2-border);
+
+    .sr5-button {
+      flex: 1;
+      color: var(--sr5v2-button-text);
+      text-shadow: none;
+      border: 1px solid var(--sr5v2-button-border);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--sr5v2-button-bg);
+      box-shadow: 0 0 0 1px var(--sr5v2-border) inset;
+
+      &:hover,
+      &:focus,
+      &:focus-visible {
+        color: var(--sr5v2-button-hover-text);
+        border-color: var(--sr5v2-button-hover-border);
+        background: var(--sr5v2-button-hover-bg);
+        box-shadow:
+          0 0 8px var(--sr5-theme-accent-glow),
+          0 0 0 1px var(--sr5-theme-accent-glow) inset;
+        text-shadow: none;
+      }
+    }
+  }
+
+  .roll-mode-controls {
+    display: flex;
+    gap: 2px;
+
+    .ui-control {
+      border: 1px solid var(--sr5v2-control-border);
+      border-left: 1px solid var(--sr5v2-control-border);
+    }
+  }
+
+  .common-test,
+  .common-test .test-code,
+  .common-test .test-code-term {
+    color: var(--sr5v2-text-primary);
+    text-shadow: none;
   }
 }

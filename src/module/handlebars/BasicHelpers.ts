@@ -248,6 +248,16 @@ export const registerBasicHelpers = () => {
         return Number(nuyen).toLocaleString(game.i18n.lang);
     })
 
+    /**
+     * Display decimal values with a capped number of fractional digits.
+     */
+    Handlebars.registerHelper('floatValue', function (value: number, maxDecimals = 2) {
+        return Number(value).toLocaleString(game.i18n.lang, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: Number(maxDecimals),
+        });
+    })
+
     Handlebars.registerHelper('hasKey', function (obj: Record<string, unknown>, key: string) {
         if (!obj || typeof obj !== 'object') return false;
         return Object.hasOwn(obj, key);

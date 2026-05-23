@@ -190,7 +190,7 @@
                         </div>
                     {{else if system.technology.calculated.essence.value}}
                         <label data-tooltip="SR5.EssenceCost">
-                            <i class="far fa-brain-circuit"></i>&nbsp;{{system.technology.calculated.essence.value}}
+                            <i class="far fa-brain-circuit"></i>&nbsp;{{floatValue system.technology.calculated.essence.value 2}}
                         </label>
                     {{/if}}
                 {{/if}}

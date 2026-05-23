@@ -558,7 +558,10 @@ ___________________
                 title: 'CONTROLS.SR5.OverwatchScoreTracker',
                 icon: 'fas fa-network-wired',
                 button: true,
-                onClick: () => new OverwatchScoreTracker().render(true)
+                onChange: (_event: Event, active: boolean) => {
+                    if (!active) return;
+                    OverwatchScoreTracker.open();
+                }
             };
             controls.tokens.tools[overwatchScoreTrackControl.name] = overwatchScoreTrackControl;
         }
