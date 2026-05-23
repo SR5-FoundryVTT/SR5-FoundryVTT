@@ -68,7 +68,7 @@ export abstract class VersionMigration {
         keyMap: Readonly<Record<string, string>>,
         valueMap: Readonly<Record<string, string>> = keyMap,
     ): void {
-        const changes = effect.changes;
+        const changes = effect.system.changes;
         if (!Array.isArray(changes) || changes.length === 0) return;
 
         // Sort by length descending so longer/more specific paths are replaced first
