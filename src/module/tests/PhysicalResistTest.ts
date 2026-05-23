@@ -7,11 +7,11 @@ import {SoakFlow} from "../actor/flows/SoakFlow";
 import ModifierTypes = Shadowrun.ModifierTypes;
 import { Translation } from '../utils/strings';
 import { ResistTestData, ResistTestDataFlow } from "./flows/ResistTestDataFlow";
-import { BiofeedbackResistTest } from "./BiofeedbackResistTest";
 import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
 import { MatrixResistTestData } from "./MatrixResistTest";
 import { MinimalActionType } from "../types/item/Action";
+import { TestCreator } from "./TestCreator";
 
 export interface PhysicalResistTestData extends ResistTestData<PhysicalDefenseTestData> {
     // Determine if an actor should be knockedDown after a defense.
@@ -34,20 +34,11 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
     override _prepareData(data: PhysicalResistTestData, options): any {
         data = super._prepareData(data, options);
         data = ResistTestDataFlow._prepareData(data);
-
-        const armor = this.actor?.getArmor();
-        if(armor?.hardened){
-            data.hitsIcon = {
-                icon: "systems/shadowrun5e/dist/icons/bell-shield.svg",
-                tooltip: "SR5.ArmorHardenedFull",
-            };
-        }
-
         return data;
     }
 
     override get _chatMessageTemplate() {
-        return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.hbs';
+        return 'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs';
     }
 
     override get _dialogTemplate(): string {
@@ -82,17 +73,28 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
     }
 
     /**
-     * Resisting against damage on the physical plane includes the modified armor value.
+     * Resisting against damage on the physical plane includes modified normal and hardened armor values.
      */
     applyArmorPoolModifier() {
-        if (this.data.action.armor) {
-            if (this.actor) {
-                const armor = this.actor.getArmor(this.data.incomingDamage);
-                ModifiableValue.addUniqueBase(this.data.pool, 'SR5.Armor.label', armor.value);
-            }
+        ModifiableValue.remove(this.data.pool, 'SR5.Armor.label');
+        ModifiableValue.remove(this.data.pool, 'SR5.HardenedArmor');
+
+        if (!this.data.action.armor || !this.actor) return;
+
+        const armor = this.actor.getArmor(this.data.incomingDamage);
+        const addHardenedArmor = armor.hardened.base !== 0 || armor.hardened.changes.length !== 0;
+        const addArmor = armor.rating.base !== 0 || armor.rating.changes.length !== 0 || !addHardenedArmor;
+
+        if (addArmor) {
+            ModifiableValue.addUniqueBase(this.data.pool, 'SR5.Armor.label', armor.rating.value);
+            TestCreator.addCodeTermTrace(this.data, { ...armor.rating, label: 'SR5.Armor.label' });
+        }
+
+        if (addHardenedArmor) {
+            ModifiableValue.addUniqueBase(this.data.pool, 'SR5.HardenedArmor', armor.hardened.value);
+            TestCreator.addCodeTermTrace(this.data, { ...armor.hardened, label: 'SR5.HardenedArmor' });
         }
     }
-
     override calculateBaseValues() {
         super.calculateBaseValues();
         ResistTestDataFlow.calculateBaseValues(this.data);
@@ -115,7 +117,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
 
     private readonly successConditions: PhysicalResistSuccessCondition[] = [
         {
-            test: () => this.actor !== undefined && CombatRules.isBlockedByHardenedArmor(this.data.incomingDamage, 0, 0, this.actor),
+            test: () => !!this.actor && CombatRules.isBlockedByHardenedArmor(this.data.incomingDamage, 0, 0, this.actor),
             label: "SR5.TestResults.SoakBlockedByHardenedArmor",
             effect: () => {
                 this.data.autoSuccess = true;
@@ -150,11 +152,13 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
     override async evaluate(): Promise<this> {
         await super.evaluate();
 
-        // Automatic hits from hardened armor (SR5#397)
-        const armor = this.actor?.getArmor(this.data.modifiedDamage);
-        if(armor?.hardened) {
+        if (this.actor) {
             const hits = new ModifiableValue(this.hits);
-            hits.addUniqueBase('SR5.AppendedHits', Math.ceil(armor.value/2));
+            const hardenedHits = CombatRules.hardenedAutoHits(this.actor, this.data.modifiedDamage);
+
+            if (hardenedHits > 0) {
+                hits.addUnique('SR5.HardenedArmor', hardenedHits);
+            }
             hits.calcTotal();
         }
 

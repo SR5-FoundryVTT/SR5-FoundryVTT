@@ -8,8 +8,8 @@
     "SETTINGS": {
         "ApplyLimitsDescription": "Est-ce que des limites doivent être appliquées aux lancés",
         "ApplyLimitsName": "Appliquer des limites aux lancés",
-        "CollapseModifyRollByDefault": "Replier Modifier le lancer par defaut",
-        "CollapseModifyRollByDefaultDescription": "Si active, la section Modifier le lancer est repliee a l'ouverture d'une boite de dialogue de test.",
+        "ModifyRollExpanded": "Mémoriser l'état de Modifier le lancer",
+        "ModifyRollExpandedDescription": "Enregistre si la section Modifier le lancer était déployée la dernière fois et restaure cet état lors de la prochaine boîte de dialogue de test.",
         "DiagonalMovementDescription": "Comment le mouvement en diagonal doit être pris en compte quand la grille est utilisée",
         "DiagonalMovementName": "Mouvement diagonal",
         "DisplayDefaultRollCardDescription": "Est-ce que la carte de lancé par défaut doit être affichée en même temps que la carte de lancé de Shadowrun",
@@ -17,6 +17,10 @@
         "EstimateDiagonal": "Estimer les mouvements en diagonal (1-2-1)",
         "Euclidean": "Euclidien",
         "IgnoreDiagonal": "Ignorer les mouvements en diagonal (1-1-1)",
+        "InitiativeModeUpdateStrategyName": "Strategie de mise a jour du mode d'initiative",
+        "InitiativeModeUpdateStrategyDescription": "Comment l'initiative est mise a jour lors du changement de mode en combat",
+        "InitiativeModeUpdateStrategyDeltaDice": "Difference de des",
+        "InitiativeModeUpdateStrategyReroll": "Relance complete",
         "OnlyAllowRollOnDefaultableSkills": "Permettre de lancer les compétences qui ne sont pas par défaut",
         "OnlyAllowRollOnDefaultableSkillsDescription": "Permettre de lancer toutes les compétences, même celles qui ne peuvent pas être selectionées par défaut",
         "OnlyAutoRollNPCInCombat": "Lancer seulement automatiquement l'initiative des PNJs",
@@ -65,8 +69,43 @@
         "AmmoGelRounds": "Cartouches gel",
         "Aoe": "Z",
         "ApplyWounds": "Appliquer les blessures",
-        "Armor": "Blindage",
+        "Armor": {
+            "FIELDS": {
+                "armor": {
+                    "accessory": {
+                        "hint": "If this Armor is an Accessory (adds its value to the actor's base Armor)",
+                        "label": "Accessory"
+                    },
+                    "hardened": {
+                        "hint": "Si cette armure est renforcee",
+                        "label": "Armure renforcee"
+                    },
+                    "is_hardened": {
+                        "hint": "Si cette armure accorde une protection renforcee",
+                        "label": "Renforcee active"
+                    },
+                    "immunities": {
+                        "hint": "Damage sources this armor grants Immunity against",
+                        "label": "Immunities"
+                    },
+                    "pollutant": {
+                        "hint": "Extra Armor against attacks with Pollutant",
+                        "label": "Chemical Protection"
+                    },
+                    "water": {
+                        "hint": "Extra Armor against attacks with Water",
+                        "label": "Water Protection"
+                    }
+                }
+            },
+            "Immunity": {
+                "NormalWeapons": "Normal Weapons"
+            },
+            "Resistances": "Résistances"
+        },
         "ArmorHardened": "Hardened",
+        "ArmorHardenedFull": "Armure renforcee",
+        "HardenedArmor": "Armure renforcee",
         "ArmorValue": "Valeur Blindage",
         "AstralDice": "Dés init. Astral",
         "AstralInit": "Init. Astral",
@@ -101,9 +140,29 @@
         "Bullets": "Balles",
         "BuyHits": "Acheter des succès",
         "COMBAT": {
+            "CannotSeizeAgain": "Vous ne pouvez pas reprendre l'initiative avant le debut de votre prochain tour.",
+            "ModeAstral": "Astral",
+            "ModeChangedLabel": "Mode d'initiative modifie",
+            "ModeChangeNewInitiative": "Nouvelle initiative",
+            "ModeChangePreviousInitiative": "Initiative precedente",
+            "ModeMatrix": "Matrice",
+            "ModeMeatspace": "Monde reel",
+            "ModeTitle": "Mode : {mode}",
+            "ModeUnknown": "Inconnu",
+            "NextPass": "Passe suivante",
+            "NextPhase": "Phase suivante",
+            "NextTurn": "Tour suivant",
+            "NoHistoryAvailable": "Aucun instantane d'historique de combat n'est disponible.",
+            "PreviousPass": "Passe precedente",
+            "PreviousPhase": "Phase precedente",
+            "PreviousTurn": "Tour precedent",
             "ReduceInitByFive": "Initiative -5",
             "ReduceInitByOne": "Initiative -1",
-            "ReduceInitByTen": "Initiative -10"
+            "ReduceInitByTen": "Initiative -10",
+            "SeizeInitiative": "Saisir l'initiative",
+            "SeizedInitiative": "Initiative saisie",
+            "ToggleActedStatusGMOnly": "Basculer le statut a agi (MJ uniquement)",
+            "TrackerTitle": "Tour {round} (Passe {pass})"
         },
         "CanDefault": "Par défaut",
         "Capacity": "Capacité",
@@ -251,12 +310,16 @@
         "DurationPermanent": "Permanent",
         "DurationSustained": "Maintenu",
         "EditSkill": "Editer comp.",
-        "Element": "Élément",
-        "ElementAcid": "Acide",
-        "ElementCold": "Froid",
-        "ElementElectricity": "Électrique",
-        "ElementFire": "Feu",
-        "ElementRadiation": "Radioactif",
+        "Element": {
+            "Acid": "Acide",
+            "Cold": "Froid",
+            "Electricity": "Électrique",
+            "Fire": "Feu",
+            "Pollutant": "Pollutant",
+            "Radiation": "Radioactif",
+            "Water": "Water",
+            "Label": "Élément"
+        },
         "Emerged": "Émergé",
         "EnvModifiersApplication": {
             "ClearModifiers": "Effacer les modificateurs personnels",
@@ -339,7 +402,18 @@
         "IsCritter": "Créature",
         "IsGrunt": "Brute",
         "IsNPC": "PNJ",
-        "Item": "Objet",
+        "Item": {
+            "FIELDS": {
+                "action": {
+                    "damage": {
+                        "normal_weapon": {
+                            "hint": "If this damage is considered a normal (non-magical) weapon attack",
+                            "label": "Normal Weapon"
+                        }
+                    }
+                }
+            }
+        },
         "ItemMod": "Mod. objet",
         "ItemName": "Nom objet",
         "ItemTypes": {
@@ -362,6 +436,8 @@
             "SpritePower": "Pouvoir de Sprite",
             "Weapon": "Arme"
         },
+        "Immunity": "Immunité",
+        "ImmunityToNormalWeapons": "Immunité aux armes normales",
         "Karma": "Karma",
         "KnockedDown": "Projeté au sol",
         "KnowledgeSkillAcademic": "Connaissances académiques",
@@ -838,7 +914,6 @@
         "Temporary": "Temporaire",
         "TemporaryModifiers": "Modificateurs temporaires",
         "Test": "Test",
-        "TestResults": {},
         "ToggleBreakdown": "Afficher/masquer le détail",
         "ToggleEquip": "(Des)équiper",
         "Top": "Coté",
@@ -856,6 +931,7 @@
                 "Rigger": "Plongé"
             },
             "Driver": "Conducteur",
+            "DamagedVehicle": "Véhicule Endommagé",
             "Environments": {
                 "Handling": "Maniabilité",
                 "Speed": "Vitesse"
@@ -872,9 +948,12 @@
                 "protection": "Blindage",
                 "weapons": "Armes"
             },
+            "OffRoad": "Hors route",
+            "OnRoad": "Route",
             "Stats": {
                 "Acceleration": "Accelération",
                 "Handling": "Maniabilité",
+                "OffRoadAcceleration": "Accélération (hors route)",
                 "OffRoadHandling": "Maniabilité (hors route)",
                 "OffRoadSpeed": "Vitesse (hors route)",
                 "Pilot": "Autopilote",
@@ -955,6 +1034,11 @@
             "Reload": "Recharger",
             "Type": "Type",
             "Weapon": "Arme"
+        },
+        "Tabs": {
+            "Item": {
+                "ArmorMods": "Mods d'armure"
+            }
         },
         "Wireless": "Sans fil",
         "WoundModifier": "Mod. de blessures",

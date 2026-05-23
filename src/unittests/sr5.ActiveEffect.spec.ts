@@ -22,17 +22,15 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
      * @param priority The priority for the change (default: mode * 10).
      * @returns The change object.
      */
-    const createTestChange = (effect: ActiveEffect, id: number): ModifiableValueType['changes'][number] => {
+    const createTestChange = (effect: SR5ActiveEffect, id: number): ModifiableValueType['changes'][number] => {
         const change = effect.changes[id];
-        return {
+        return DataDefaults.createData('change_entry', {
             name: effect.name,
             value: parseInt(change.value),
             mode: change.mode,
             priority: parseInt(String(change.priority || change.mode * 10)),
-            enabled: true,
-            invalidated: false,
-            effectUuid: effect.uuid
-        };
+            source: effect.uuid
+        });
     };
 
     describe('SR5ActiveEffect', () => {
@@ -901,11 +899,11 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
                 changes: [
-                    { key: 'system.armor.fire', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'system.armor.acid', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'system.armor.cold', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'system.armor.electricity', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'system.armor.radiation', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'system.armor.elements.fire', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'system.armor.elements.acid', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'system.armor.elements.cold', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'system.armor.elements.electricity', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'system.armor.elements.radiation', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
                 ]
             }]);
             await actor.createEmbeddedDocuments('Item', [{
@@ -914,20 +912,22 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 system: {
                     technology: { equipped: true },
                     armor: {
-                        fire: 1,
-                        acid: 2,
-                        cold: 3,
-                        electricity: 4,
-                        radiation: 5
+                        elements: {
+                            fire: { base: 1},
+                            acid: { base: 2},
+                            cold: { base: 3},
+                            electricity: { base: 4},
+                            radiation: { base: 5}
+                        }
                     }
                 }
             }]);
 
-            assert.strictEqual(actor.system.armor.fire, 4);
-            assert.strictEqual(actor.system.armor.acid, 5);
-            assert.strictEqual(actor.system.armor.cold, 6);
-            assert.strictEqual(actor.system.armor.electricity, 7);
-            assert.strictEqual(actor.system.armor.radiation, 8);
+            assert.strictEqual(actor.system.armor.elements.fire.value, 4);
+            assert.strictEqual(actor.system.armor.elements.acid.value, 5);
+            assert.strictEqual(actor.system.armor.elements.cold.value, 6);
+            assert.strictEqual(actor.system.armor.elements.electricity.value, 7);
+            assert.strictEqual(actor.system.armor.elements.radiation.value, 8);
         });
     });
 };

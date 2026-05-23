@@ -20,7 +20,7 @@ export class OpposedCheckOverwatchScoreTest extends OpposedMatrixTest {
         const fixedPool = MatrixRules.checkOverwatchScoreOpposingDicePool();
         this.data.pool.base = fixedPool.base;
         ModifiableValue.addUnique(
-            this.data.pool, 'SR5.CheckOverwatchScore', fixedPool.base, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, ModifiableValue.TOP_PRIORITY
+            this.data.pool, 'SR5.CheckOverwatchScore', fixedPool.base, { mode: 'OVERRIDE', priority: ModifiableValue.TOP_PRIORITY }
         );
 
         // get the overwatch score at the start so it isn't affected by the roll

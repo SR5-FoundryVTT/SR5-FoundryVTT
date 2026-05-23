@@ -115,7 +115,7 @@ export class CombatSpellDefenseTest extends DefenseTest<CombatSpellDefenseTestDa
         const spell = this.item?.asType('spell');
         if (!spell) return;
 
-        // Only allow a defense test for in
+        // Only allow a defense test for indirect combat spells.
         if (CombatSpellRules.allowDamageResist(spell.system.combat.type)) {
             const test = await TestCreator.fromOpposedTestResistTest(this, this.data.options);
             if (!test) return;

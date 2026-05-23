@@ -40,6 +40,7 @@ import { ActorMarksFlow } from './flows/ActorMarksFlow';
 import { SetMarksOptions } from '../storage/MarksStorage';
 import { ActorRollDataFlow } from './flows/ActorRollDataFlow';
 import { MatrixICFlow } from './flows/MatrixICFlow';
+import { ActorArmorFlow } from './flows/ActorArmorFlow';
 import { RollDataOptions } from '../item/Types';
 import { MatrixRebootFlow } from '../flows/MatrixRebootFlow';
 import { PackItemFlow } from '../item/flows/PackItemFlow';
@@ -47,9 +48,11 @@ import { MatrixRules } from '@/module/rules/MatrixRules';
 import { StorageFlow } from '@/module/flows/StorageFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 import { LinksHelpers } from '@/module/utils/links';
+import type { InitiativeModeOptions } from '../combat/SR5Combatant';
 import { CreateActorFlow } from './flows/CreateActorFlow';
 import { SkillNamingFlow } from '@/module/flows/SkillNamingFlow';
 import { SkillFieldType } from '../types/template/Skills';
+import { IconAssign } from 'src/module/apps/iconAssigner/IconAssign';
 
 interface TypedItemMap extends Omit<Map<Item.ConfiguredSubType, SR5Item[]>, 'get' | 'set'> {
     get: <K extends Item.ConfiguredSubType>(key: K) => SR5Item<K>[] | undefined;
@@ -120,6 +123,16 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return super.migrateData(source);
     }
 
+    static override getDefaultArtwork(actorData?: Actor.CreateData): Actor.GetDefaultArtworkReturn {
+        const fallback = super.getDefaultArtwork(actorData);
+        if (!actorData || actorData.img) return fallback;
+
+        const assignedImage = IconAssign.iconAssign(actorData);
+        if (!assignedImage) return fallback;
+
+        return { img: assignedImage, texture: { src: assignedImage } };
+    }
+
     /**
      * Lifecycle hook called before an actor document is created.     
      * 
@@ -129,9 +142,10 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param options Additional options which modify the creation request
      * @param user The User requesting the document creation
      */
-    override async _preCreate(data: Actor.CreateData, options: Actor.Database.PreCreateOptions, user: User.Implementation) {
-        await super._preCreate(data, options, user);
-        
+    override async _preCreate(...args: Parameters<Actor<SubType>['_preCreate']>) {
+        const [data] = args;
+        await super._preCreate(...args);
+
         // Abort skill creation data injection when duplicating
         if (foundry.utils.getProperty(data, '_stats.duplicateSource')) return;
         // Abort if a skillset was already assigned (e.g. during Chummer import)
@@ -140,7 +154,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     override async update(
-        data: Actor.UpdateData | undefined,
+        data: Actor.UpdateInput,
         operation?: Actor.Database.UpdateOperation,
     ) {
         await Migrator.updateMigratedDocument(this);
@@ -380,33 +394,11 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @returns Armor or modified armor.
      */
     getArmor(damage?: DamageType): ActorArmorType {
-        // Prepare base armor data.
-        const armor = !("armor" in this.system) ?
-            DataDefaults.createData('armor') :
-            (foundry.utils.duplicate(this.system.armor) as ActorArmorType);
-        // Prepare damage to apply to armor.
-        damage = damage || DataDefaults.createData('damage');
-
-        ModifiableValue.calcTotal(damage);
-        ModifiableValue.calcTotal(damage.ap);
-
-        // Modify by penetration
-        if (damage.ap.value !== 0)
-            ModifiableValue.addUnique(armor, 'SR5.AP', damage.ap.value);
-
-        // Modify by element
-        if (damage.element.value !== '') {
-            const armorForDamageElement = armor[damage.element.value] || 0;
-            if (armorForDamageElement > 0)
-                ModifiableValue.addUnique(armor, 'SR5.Element', armorForDamageElement);
-        }
-
-        ModifiableValue.calcTotal(armor, {min: 0});
-
-        return armor;
+        const armor = ("armor" in this.system) ? this.system.armor : undefined;
+        return ActorArmorFlow.getArmor(armor, damage);
     }
 
-    getMatrixDevice(this: SR5Actor): SR5Item | undefined {
+    getMatrixDevice(this: SR5Actor) {
         return this.system.matrix?.device ? this.items.get(this.system.matrix.device) : undefined;
     }
 
@@ -1022,6 +1014,37 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     /**
+     * Build vehicle pilot action data for handling/speed click-roll behavior.
+     */
+    vehiclePilotActionData(limit: 'handling' | 'speed'): ActionRollType | undefined {
+        if (!this.isType('vehicle')) return;
+
+        const skillName = this.getVehicleTypeSkillName();
+        if (!skillName) return;
+
+        const action = this.skillActionData(skillName);
+        if (!action) return;
+
+        action.limit.attribute = limit;
+
+        return action;
+    }
+
+    /**
+     * Roll a vehicle pilot test using reaction + related pilot skill with a selected limit.
+     */
+    async rollVehiclePilotByLimit(limit: 'handling' | 'speed', options: Shadowrun.ActorRollOptions = {}) {
+        const action = this.vehiclePilotActionData(limit);
+        if (!action) return;
+
+        const showDialog = this.tests.shouldShowDialog(options.event);
+        const test = await this.tests.fromAction(action, this, { showDialog });
+        if (!test) return;
+
+        return test.execute();
+    }
+
+    /**
      * Roll an item action for this actor.
      * @param item The item action to roll
      * @param options General Roll options.
@@ -1108,12 +1131,12 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             ModifiableValue.addBase(action.limit, 'Teamwork', teamworkData.additionalLimit);
         }
 
-        action.dice_pool_mod.push({
-            name: "Teamwork", effectUuid: null,
-            value: teamworkData.additionalDice,
-            mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-            priority: 0, enabled: true, invalidated: false,
-        });
+        action.dice_pool_mod.push(
+            DataDefaults.createData('change_entry', {
+                name: "Teamwork",
+                value: teamworkData.additionalDice,
+            })
+        );
 
         const showDialog = this.tests.shouldShowDialog(options.event);
         const test = await this.tests.fromAction(action, this, { showDialog });
@@ -1312,7 +1335,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const iniAdjustment = CombatRules.initiativeScoreWoundAdjustment(woundsBefore, woundsAfter);
 
         // Only actors that can have a wound modifier, will have a delta.
-        if (iniAdjustment < 0 && game.combat) await game.combat.adjustActorInitiative(this, iniAdjustment);
+        if (iniAdjustment < 0 && game.combat)
+            await game.combat.adjustActorInitiative(this, iniAdjustment);
     }
 
     /**
@@ -1420,6 +1444,14 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     }
 
     /**
+     * Get a set of all status effect IDs currently applied to this actor.
+     * This collects all unique status IDs from the actor's active effects.
+     */
+    getStatusEffectsId() {
+        return new Set([...(this.effects ?? [])].flatMap(e => [...e.statuses]));
+    }
+
+    /**
      * Depending on this actors defeated status, apply the correct effect and status.
      *
      * This will only work when the actor is connected to a token.
@@ -1440,9 +1472,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         // Apply the appropriate combatant status.
         if (defeated.unconscious || defeated.dying || defeated.dead) {
-            await this.combatant?.update({ defeated: true });
+            await Promise.all(this.combatants.map(async c => c.update({ defeated: true })));
         } else {
-            await this.combatant?.update({ defeated: false });
+            await Promise.all(this.combatants.map(async c => c.update({ defeated: false })));
             return;
         }
         const newStatus = defeated.dead ? 'dead' : 'unconscious';
@@ -1453,7 +1485,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             return;
 
         // Set effect as active, as we've already made sure it isn't.
-        await token.object?.toggleEffect(effect, { overlay: true, active: true });
+        await this.toggleStatusEffect(newStatus, { overlay: true, active: true });
     }
 
     /**
@@ -1479,21 +1511,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         }
     }
 
-    getModifiedArmor(damage: DamageType): ActorArmorType {
-        if (!damage.ap?.value) {
-            return this.getArmor();
-        }
-
-        const modified = foundry.utils.duplicate(this.getArmor()) as ActorArmorType;
-        if (modified) {
-            const mod = new ModifiableValue(modified);
-            mod.addUnique('SR5.DV', damage.ap.value);
-            mod.calcTotal({ min: 0 });
-        }
-
-        return modified;
-    }
-
     /** Reduce the initiative of the actor in the currently open / selected combat.
      * Should a tokens actor be in multiple combats it will also only affect the currently open combat,
      * since that is what's set in game.combat
@@ -1517,7 +1534,33 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             ui.notifications?.warn('SR5.MissingRessource.Initiative', { localize: true });
         }
 
-        await combat.adjustInitiative(combatant, modifier);
+        await combatant.adjustInitiative(modifier);
+    }
+
+    async setInitiativeMode(mode: InitiativeModeOptions): Promise<void> {
+        if (!this.isType('character', 'spirit')) return;
+
+        const currentPerception = this.system.initiative.perception;
+        const fromMode = currentPerception !== 'matrix' ? currentPerception
+            : (this.system.matrix?.hot_sim ? 'hot_sim' : 'cold_sim');
+
+        if (fromMode === mode) return;
+
+        const isMatrixMode = mode === 'cold_sim' || mode === 'hot_sim';
+        const updateData = {
+            system: {
+                initiative: { perception: isMatrixMode ? 'matrix' : mode },
+                ...(isMatrixMode && { matrix: { hot_sim: mode === 'hot_sim' } }),
+            },
+        } as const;
+
+        await this.update(updateData);
+
+        if (!this.inCombat) return;
+
+        await Promise.all(
+            this.combatants.map(async combatant => await combatant.applyModeChange(fromMode, mode))
+        );
     }
 
     /**
@@ -1527,13 +1570,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     get combatActive(): boolean {
         if (!game.combat) return false;
-        const combatant = game.combat.getActorCombatant(this);
-        return !!(combatant && typeof combatant.initiative === "number");
+        const combatants = game.combat.getCombatantsByActor(this);
+        return combatants.length > 0 && combatants.some(c => c.initiative != null);
     }
 
-    get combatant() {
-        if (!this.combatActive || !game.combat) return null;
-        return game.combat.getActorCombatant(this);
+    get combatants() {
+        if (!this.combatActive) return [];
+        return game.combat!.getCombatantsByActor(this);
     }
 
     /**

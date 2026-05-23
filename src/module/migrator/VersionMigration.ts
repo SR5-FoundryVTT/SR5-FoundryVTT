@@ -1,4 +1,4 @@
-export type MigratableDocument = Actor.Implementation | Item.Implementation | ActiveEffect.Implementation;
+export type MigratableDocument = ActiveEffect.Implementation | Actor.Implementation | Combat.Implementation | Combatant.Implementation | Item.Implementation;
 export type MigratableDocumentName = MigratableDocument['documentName'];
 
 /**
@@ -30,6 +30,12 @@ export abstract class VersionMigration {
     migrateActor(_actor: any): void {}
     handlesActor(_actor: Readonly<any>) { return this.migrates.Actor; }
 
+    migrateCombat(_combat: any): void {}
+    handlesCombat(_combat: Readonly<any>) { return this.migrates.Combat; }
+
+    migrateCombatant(_combatant: any): void {}
+    handlesCombatant(_combatant: Readonly<any>) { return this.migrates.Combatant; }
+
     migrateItem(_item: any): void {}
     handlesItem(_item: Readonly<any>) { return this.migrates.Item; }
 
@@ -45,8 +51,51 @@ export abstract class VersionMigration {
         const proto = Object.getPrototypeOf(this);
         this.migrates = {
             Actor: proto.migrateActor !== VersionMigration.prototype.migrateActor,
+            ActiveEffect: proto.migrateActiveEffect !== VersionMigration.prototype.migrateActiveEffect,
+            Combat: proto.migrateCombat !== VersionMigration.prototype.migrateCombat,
+            Combatant: proto.migrateCombatant !== VersionMigration.prototype.migrateCombatant,
             Item: proto.migrateItem !== VersionMigration.prototype.migrateItem,
-            ActiveEffect: proto.migrateActiveEffect !== VersionMigration.prototype.migrateActiveEffect
         };
+    }
+
+    /**
+     * Migrate active effect change keys and string value path references.
+     *
+     * This supports migration of key identifiers and formula strings that reference legacy paths.
+     */
+    protected migrateEffectChanges(
+        effect: any,
+        keyMap: Readonly<Record<string, string>>,
+        valueMap: Readonly<Record<string, string>> = keyMap,
+    ): void {
+        const changes = effect.changes;
+        if (!Array.isArray(changes) || changes.length === 0) return;
+
+        // Sort by length descending so longer/more specific paths are replaced first
+        const mapEntries = Object.entries(valueMap).sort((a, b) => b[0].length - a[0].length);
+
+        for (const change of changes as { key?: unknown; value?: unknown }[]) {
+            if (!change) continue;
+
+            if (typeof change.key === 'string' && keyMap[change.key]) {
+                change.key = keyMap[change.key];
+            }
+
+            if (typeof change.value === 'string') {
+                change.value = mapEntries.reduce(
+                    (currentValue, [fromKey, toKey]) => this.replaceExactToken(currentValue, fromKey, toKey),
+                    change.value
+                );
+            }
+        }
+    }
+
+    private replaceExactToken(value: string, fromKey: string, toKey: string): string {
+        if (!value || fromKey === toKey) return value;
+
+        const escapedKey = fromKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const boundaryRegex = new RegExp(`(^|[^A-Za-z0-9_.])(${escapedKey})(?=$|[^A-Za-z0-9_.])`, 'g');
+        
+        return value.replace(boundaryRegex, `$1${toKey}`);
     }
 }

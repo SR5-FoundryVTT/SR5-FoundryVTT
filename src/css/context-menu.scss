@@ -1,0 +1,33 @@
+nav#context-menu,
+menu.controls-dropdown {
+    --sr5-context-shadow: var(--sr5-theme-shadow);
+    --sr5-context-bg: var(--sr5-theme-content-bg);
+    --sr5-context-text: var(--sr5-theme-text-primary);
+    --sr5-context-row: var(--sr5-theme-surface-subtle);
+    --sr5-context-hover-bg: var(--sr5-theme-chat-hover-bg);
+    --sr5-context-hover-text: var(--sr5-theme-chat-hover-text);
+    box-shadow: var(--sr5-context-shadow);
+    background: var(--sr5-context-bg);
+    background-repeat: repeat;
+    background-size: 100% 20px auto;
+
+    li,
+    a {
+        color: var(--sr5-context-text);
+    }
+
+    li {
+        &:not(:hover):nth-of-type(even) {
+            background: var(--sr5-context-row);
+        }
+
+        &:hover {
+            color: var(--sr5-context-hover-text);
+            background: var(--sr5-context-hover-bg);
+        }
+
+        &:hover > a {
+            color: var(--sr5-context-hover-text);
+        }
+    }
+}

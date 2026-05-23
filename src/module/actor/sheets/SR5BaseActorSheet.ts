@@ -26,6 +26,7 @@ import { SkillNamingFlow } from '@/module/flows/SkillNamingFlow';
 import { SkillSetSourceFlow } from '@/module/flows/SkillSetSourceFlow';
 import { SkillItemFlow } from '@/module/item/flows/SkillItemFlow';
 import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
+import type { InitiativeModeOptions } from '@/module/combat/SR5Combatant';
 import { parseDropData } from '@/module/utils/sheets';
 import { getFuzzyMatches, matchesFuzzyQuery } from '@/module/utils/fuzzySearch';
 import MatrixAttribute = Shadowrun.MatrixAttribute;
@@ -35,6 +36,7 @@ import { EffectCreationFlow } from '@/module/flows/EffectCreationFlow';
 import { SkillFieldType } from '@/module/types/template/Skills';
 import { CreateItemFlow } from '@/module/item/flows/CreateItemFlow';
 import { ActorSkillFlow } from '../flows/ActorSkillFlow';
+import { ModifiableValueType } from '@/module/types/template/Base';
 
 const { TextEditor } = foundry.applications.ux;
 const { fromUuid, fromUuidSync } = foundry.utils;
@@ -539,7 +541,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     ) {
         await super._onRender(context, options);
         this.activateListeners_LEGACY($(this.element));
-        this.prepareModifierTooltips();
+        await this.prepareModifierTooltips();
         this.#filterActiveSkillsElements();
 
         // drag and drop handling to change the positions of favorited items
@@ -640,56 +642,58 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     /**
+     * Populate modifier tooltips for elements matching a `[data-*]` selector.
+     * Derives the dataset key from the selector, resolves the value via `getValue`,
+     * renders the tooltip template, and assigns it to `dataset.tooltipHtml`.
+     */
+    private async _applyModifierTooltip(
+        selector: `[data-${string}]`,
+        getValue: (id: string) => ModifiableValueType | undefined
+    ): Promise<void> {
+        if (!this.element) return;
+
+        const elements = this.element.querySelectorAll<HTMLElement>(selector);
+        const [, kebabCaseKey] = /\[data-([^\]]+)\]/.exec(selector)!;
+        const datasetKey = kebabCaseKey.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
+
+        await Promise.all(
+            [...elements].map(async (element) => {
+                const id = element.dataset[datasetKey];
+                if (!id) return;
+
+                const value = getValue(id);
+                if (!value) return;
+
+                const content = (
+                    await foundry.applications.handlebars.renderTemplate(
+                        SheetFlow.templateBase("common/modifiers-tooltip"),
+                        { value }
+                    )
+                ).trim();
+
+                if (!content) return;
+
+                element.dataset.tooltipHtml = content;
+                element.dataset.tooltipClass = "sr5v2";
+            })
+        );
+    }
+
+    /**
      * Prepare Tooltips For Skills, Attributes, and Limits
      * - these tooltips display all the modifiers for the ModifiedValue
      */
-    prepareModifierTooltips() {
-        this.element?.querySelectorAll('[data-attribute-modifier-tooltip]').forEach((el) => {
-            el.addEventListener('mouseenter', async (e: any) => {
-                const attributeId = e.target.closest('[data-attribute-modifier-tooltip]').dataset.attributeModifierTooltip;
-                const attribute = this.actor.getAttribute(attributeId);
-                if (attribute) {
-                    const html = await foundry.applications.handlebars.renderTemplate(
-                        SheetFlow.templateBase('common/modifiers-tooltip'),
-                        {
-                            value: attribute,
-                            isEssence: attributeId === 'essence'
-                        });
-                    game.tooltip.activate(e.target, { html, cssClass: 'sr5v2' });
-                }
-            })
-            el.addEventListener('mouseleave', () => { game.tooltip.deactivate(); });
-        })
-        this.element?.querySelectorAll('[data-limit-modifier-tooltip]').forEach((el) => {
-            el.addEventListener('mouseenter', async (e: any) => {
-                const limitId = e.target.closest('[data-limit-modifier-tooltip]').dataset.limitModifierTooltip;
-                const limit = this.actor.getLimit(limitId);
-                if (limit) {
-                    const html = await foundry.applications.handlebars.renderTemplate(
-                        SheetFlow.templateBase('common/modifiers-tooltip'),
-                        {
-                            value: limit,
-                        });
-                    game.tooltip.activate(e.target, { html, cssClass: 'sr5v2' });
-                }
-            })
-            el.addEventListener('mouseleave', () => { game.tooltip.deactivate(); });
-        })
-        this.element?.querySelectorAll('[data-skill-modifier-tooltip]').forEach((el) => {
-            el.addEventListener('mouseenter', async (e: any) => {
-                const skillId = e.target.closest('[data-skill-modifier-tooltip]').dataset.skillModifierTooltip;
-                const skill = this.actor.getSkillById(skillId);
-                if (skill) {
-                    const html = await foundry.applications.handlebars.renderTemplate(
-                        SheetFlow.templateBase('common/modifiers-tooltip'),
-                        {
-                            value: skill,
-                        });
-                    game.tooltip.activate(e.target, { html, cssClass: 'sr5v2' });
-                }
-            })
-            el.addEventListener('mouseleave', () => { game.tooltip.deactivate(); });
-        })
+    async prepareModifierTooltips() {
+        if (!this.element) return;
+
+        await Promise.all([
+            this._applyModifierTooltip("[data-attribute-modifier-tooltip]", (id) => this.actor.getAttribute(id)),
+            this._applyModifierTooltip("[data-limit-modifier-tooltip]", (id) => this.actor.getLimit(id)),
+            this._applyModifierTooltip("[data-skill-modifier-tooltip]", (id) => this.actor.getSkillById(id)),
+            this._applyModifierTooltip("[data-modifier-tooltip-path]", (path) =>
+                foundry.utils.getProperty(this.actor.system, path) as ModifiableValueType | undefined
+            ),
+        ]);
     }
 
     protected override _getHeaderControls() {
@@ -767,25 +771,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @param event
      */
     async _onInitiativePerceptionChange(event: Event) {
-        const newValue = (event.currentTarget as HTMLSelectElement)?.value;
-        if (newValue === 'meatspace' || newValue === 'astral') {
-            // meatspace and magic can be directly applied as the perception type
-            // disable VR as well
-            await this.actor.update({
-                system: {
-                    initiative: { perception: newValue, },
-                    matrix: { vr: false, hot_sim: false }
-                }
-            });
-        } else if (newValue === 'hot_sim' || newValue === 'cold_sim') {
-            // if we are hot sim or cold sim, we are in VR and using matrix init perception
-            await this.actor.update({
-                system: {
-                    initiative: { perception: 'matrix' },
-                    matrix: { vr: true, hot_sim: newValue === 'hot_sim' }
-                }
-            });
-        }
+        const newValue = (event.currentTarget as HTMLSelectElement)?.value as InitiativeModeOptions | undefined;
+        if (!newValue) return;
+
+        const supportedModes = ['meatspace', 'astral', 'cold_sim', 'hot_sim'] as const;
+        if (!supportedModes.includes(newValue)) return;
+
+        await this.actor.setInitiativeMode(newValue);
     }
 
     /**
@@ -1987,7 +1979,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * @param this FoundryVTT binds 'this' to the instance, even though the method is staic.
      */
     static #openSituationalModifiers(this: SR5BaseActorSheet) {
-        new SituationModifiersApplication(this.actor).render(true);
+        void new SituationModifiersApplication(this.actor).render({ force: true });
     }
 
     /**
@@ -2282,8 +2274,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         event.preventDefault();
         event.stopPropagation();
 
-        const blitz = this.actor.system.initiative.edge;
-        await this.actor.update({ system: { initiative: { edge: !blitz } } });
+        const blitz = this.actor.system.initiative.blitz;
+        await this.actor.update({system: { initiative: { blitz: !blitz }}});
     }
 
     static async #rollInitiative(this: SR5BaseActorSheet, event: Event) {
@@ -2356,7 +2348,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         // Ask user about what inventory to move the item to.
         const dialog = new MoveInventoryDialog(this.actor, item, this.selectedInventory);
-        const inventory = await dialog.select();
+        const inventory = await dialog.select() as unknown as string;
         if (dialog.canceled) return;
 
         await this.actor.inventory.addItems(inventory, item);

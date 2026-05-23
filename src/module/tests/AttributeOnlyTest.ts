@@ -1,5 +1,6 @@
 import {SuccessTest, SuccessTestData} from "./SuccessTest";
 import {ModifiableValue} from "../mods/ModifiableValue";
+import { TestCreator } from "./TestCreator";
 
 export interface AttributeOnlyTestData extends SuccessTestData {
     // Selection for attributes used. attribute1 will be preselected.
@@ -57,8 +58,14 @@ export class AttributeOnlyTest extends SuccessTest {
         const attribute2 = this.actor.getAttribute(this.data.attribute2);
 
         // Rebuild base pool values first. Other modifiers will be added within prepareBaseValues.
-        if (attribute1) pool.addBase(attribute1.label, attribute1.value);
-        if (attribute2) pool.addBase(attribute2.label, attribute2.value);
+        if (attribute1) {
+            pool.addBase(attribute1.label, attribute1.value);
+            TestCreator.addCodeTermTrace(this.data, attribute1);
+        }
+        if (attribute2) {
+            pool.addBase(attribute2.label, attribute2.value);
+            TestCreator.addCodeTermTrace(this.data, attribute2);
+        }
 
         // Rebuild attribute specific modifiers previously added in TestCreate#_prepareTestDataWithAction.
         this.data.action.attribute = this.data.attribute1;

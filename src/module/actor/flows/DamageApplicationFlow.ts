@@ -84,7 +84,8 @@ export class DamageApplicationFlow {
         const ap = Number(applyDamage.data('damageAp'));
         const element = String(applyDamage.data('damageElement')) as DamageElement;
         const biofeedback = String(applyDamage.data('damageBiofeedback')) as BiofeedbackDamageType;
-        const damage = Helpers.createDamageData(value, type, ap, element, biofeedback);
+        const normalWeapon = String(applyDamage.data('damageNormalWeapon')) === 'true';
+        const damage = Helpers.createDamageData(value, type, ap, element, biofeedback, normalWeapon);
 
         const targets: (SR5Item | SR5Actor)[] = Helpers.getSelectedActorsOrCharacter();
 
@@ -331,7 +332,8 @@ export class DamageApplicationFlow {
         const iniAdjustment = CombatRules.initiativeScoreWoundAdjustment(woundsBefore, woundsAfter);
 
         // Only actors that can have a wound modifier, will have a delta.
-        if (iniAdjustment < 0 && game.combat) game.combat.adjustActorInitiative(actor, iniAdjustment);
+        if (iniAdjustment < 0 && game.combat)
+            await game.combat.adjustActorInitiative(actor, iniAdjustment);
     }
 
     /**

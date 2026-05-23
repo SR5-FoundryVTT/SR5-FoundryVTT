@@ -1,0 +1,187 @@
+.sr5v2 {
+    &.overwatch-score-tracker {
+        .window-header {
+            color: var(--sr5v2-text-primary);
+
+            .window-title,
+            .header-control {
+                color: var(--sr5v2-text-primary);
+                text-shadow: none;
+            }
+        }
+
+        .window-content {
+            overflow: hidden;
+            background: var(--sr5v2-app-body-bg);
+            background-image: none;
+            color: var(--sr5v2-text-primary);
+            border-color: var(--sr5v2-border);
+            text-shadow: none;
+        }
+
+        .overwatch-score-tracker-app,
+        .inventory {
+            min-height: 0;
+        }
+
+        .scroll-area {
+            overflow-x: hidden;
+        }
+
+        .overwatch-score-tracker-app {
+            font-size: var(--font-size-14);
+            color: var(--sr5v2-text-primary);
+
+            .inventory {
+                background: transparent;
+                color: inherit;
+            }
+
+            .list-item .item-text,
+            .list-item .item-name,
+            .overwatch-score-add,
+            .overwatch-score-roll-15-minutes,
+            .overwatch-score-add-actor {
+                font-size: var(--font-size-14);
+            }
+
+            .list-item {
+                color: var(--sr5v2-text-primary);
+
+                .item-text,
+                .item-name,
+                .roll,
+                i {
+                    color: inherit;
+                    text-shadow: none;
+                }
+
+                &:not(.item-section):nth-of-type(even) {
+                    background: var(--sr5v2-bg-subtle);
+                }
+            }
+
+            .list-item.item-section {
+                width: calc(100% + .5rem + 2px);
+                margin: 0 -.25rem 0 -.25rem;
+                padding-left: calc(3px + .25rem);
+                padding-right: calc(3px + .25rem);
+                border-bottom: 1px solid var(--sr5v2-border-strong);
+                background: var(--sr5v2-app-header-bg);
+                background-repeat: repeat;
+                background-size: 100% 20px auto;
+                color: var(--sr5v2-label);
+
+                .item-text,
+                .roll,
+                i {
+                    color: inherit;
+                }
+            }
+        }
+
+        .list-item .list-item-content {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: center;
+            column-gap: 0.5rem;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .list-item .list-item-content .item-left {
+            min-width: 0;
+            width: 100%;
+            flex: 1 1 auto;
+        }
+
+        .list-item .list-item-content .item-left .item-text.item-name {
+            flex: 1 1 auto;
+            width: auto;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .list-item.item-section .list-item-content .item-right {
+            justify-self: end;
+            margin-left: auto;
+        }
+
+        .list-item.item-section .list-item-content .item-right .item-text {
+            width: auto;
+            flex: 0 0 auto;
+            padding-right: 0;
+        }
+
+        .list-item:not(.item-section) .list-item-content .item-right {
+            display: grid;
+            grid-template-columns: 3rem 0.5rem auto 0.5rem 2.5rem;
+            align-items: center;
+            justify-content: end;
+        }
+
+        .list-item:not(.item-section) .list-item-content .item-text.overwatch-score-input-wrapper,
+        .list-item:not(.item-section) .list-item-content .item-text.overwatch-score-actions,
+        .list-item:not(.item-section) .list-item-content .item-text.overwatch-score-item-icons {
+            width: auto;
+            flex: 0 0 auto;
+            align-content: center;
+            padding-right: 0;
+        }
+
+        .list-item:not(.item-section) .list-item-content .item-text.overwatch-score-input-wrapper {
+            width: 3rem;
+        }
+
+        .list-item:not(.item-section) .list-item-content .item-text.rtg {
+            width: 0.5rem;
+            min-width: 0.5rem;
+            padding-right: 0;
+            margin: 0;
+        }
+
+        .list-item:not(.item-section) .list-item-content .item-text.overwatch-score-item-icons {
+            padding-right: 10px;
+            width: 2.5rem;
+            min-width: 2.5rem;
+            justify-content: space-between;
+        }
+
+        .overwatch-score-input {
+            width: 100%;
+            text-align: center;
+            color: var(--sr5v2-control-text);
+            background: var(--sr5v2-control-bg);
+            border: 1px solid var(--sr5v2-control-border);
+            text-shadow: none;
+        }
+
+        .overwatch-score-add-actor {
+            padding-right: 10px;
+        }
+
+        .overwatch-score-add-actor,
+        .overwatch-score-add,
+        .overwatch-score-roll-15-minutes,
+        .overwatch-score-reset,
+        .overwatch-score-delete {
+            color: var(--sr5v2-text-primary);
+            text-shadow: none;
+        }
+
+        .overwatch-score-add-actor:hover,
+        .overwatch-score-add:hover,
+        .overwatch-score-roll-15-minutes:hover,
+        .overwatch-score-reset:hover,
+        .overwatch-score-delete:hover {
+            color: var(--sr5v2-link-hover);
+        }
+
+        .item-img img {
+            border: 1px solid var(--sr5v2-border);
+            border-radius: 2px;
+        }
+    }
+}

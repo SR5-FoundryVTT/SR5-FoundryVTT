@@ -7,52 +7,16 @@ import { DamageType } from "../types/item/Action";
 import { ValueFieldType } from "../types/template/Base";
 
 export class CombatRules {
-    static iniOrderCanDoAnotherPass(scores: number[]): boolean {
-        for (const score of scores) {
-            if (CombatRules.iniScoreCanDoAnotherPass(score)) return true;
-        }
-        return false;
-    }
-    /**
-     * Check if there is another initiative pass possible with the given score.
-     * @param score
-     * @return true means another initiative pass is possible
-     */
-    static iniScoreCanDoAnotherPass(score: number): boolean {
-        return CombatRules.reduceIniResultAfterPass(score) > 0;
-    }
     /**
      * Reduce the given initiative score according to @PDF SR5#159
-     * @param score This given score can't be reduced under zero.
+     * @param score The initiative score to be reduced
      */
-    static reduceIniResultAfterPass(score: number): number {
-        return Math.max(score + SR.combat.INI_RESULT_MOD_AFTER_INI_PASS, 0);
-    }
-
-    /**
-     * Reduce the initiative score according to the current initiative pass @PDF SR5#160.
-     * @param score
-     * @param pass The current initiative pass. Each combat round starts at the initiative pass of 1.
-     */
-    static reduceIniOnLateSpawn(score: number, pass: number): number {
-        // Assure valid score ranges.
-        // Shift initiative pass value range from min 1 to min 0 for multiplication.
-        pass = Math.max(pass - 1, 0);
-        score = Math.max(score, 0);
-
-        // Reduce the new score according to. NOTE: Modifier is negative
-        const reducedScore = score + pass * SR.combat.INI_RESULT_MOD_AFTER_INI_PASS;
-        return CombatRules.getValidInitiativeScore(reducedScore);
-    }
-
-    /**
-     * Return a valid initiative score on updates or score changes
-     *
-     * @param score The initiative score after it's been updated.
-     * @returns A valid initiative score
-     */
-    static getValidInitiativeScore(score: number): number {
-        return Math.max(score, 0);
+    static initAfterPass(score: null): null;
+    static initAfterPass(score: number): number;
+    static initAfterPass(score: number | null): number | null;
+    static initAfterPass(score: number | null): number | null {
+        if (score === null) return null;
+        return score + SR.combat.PASS_PENALTY;
     }
 
     /**
@@ -123,7 +87,7 @@ export class CombatRules {
     }
 
     /**
-     * Check if vehicle wouldn't take any damage due to vehicle armor rules (SR5#199)
+     * Check if vehicle wouldn't take any damage due to vehicle armor rules (SR5#205)
      * @param incomingDamage The incoming damage
      * @param attackerHits The attackers hits. Should be a positive number.
      * @param defenderHits The attackers hits. Should be a positive number.
@@ -134,7 +98,11 @@ export class CombatRules {
             return false;
         }
 
-        return CombatRules.isDamageLessThanArmor(incomingDamage, attackerHits, defenderHits, actor);
+        const armor = actor.getArmor(incomingDamage);
+        const modifiedAv = armor.rating.value + armor.hardened.value;
+        const modifiedDv = CombatRules.modifyDamageAfterHit(actor, attackerHits, defenderHits, incomingDamage).value;
+
+        return modifiedDv < modifiedAv;
     }
 
     /**
@@ -146,29 +114,19 @@ export class CombatRules {
      */
     static isBlockedByHardenedArmor(incomingDamage: DamageType, attackerHits = 0, defenderHits = 0, actor: SR5Actor): boolean {
         const armor = actor.getArmor(incomingDamage);
+        const hardenedRating = armor.hardened.value;
 
-        if(!armor.hardened) {
+        if(hardenedRating <= 0) {
             return false;
         }
 
-        return CombatRules.isDamageLessThanArmor(incomingDamage, attackerHits, defenderHits, actor);
+        const modifiedDv = CombatRules.modifyDamageAfterHit(actor, attackerHits, defenderHits, incomingDamage).value;
+        return modifiedDv < hardenedRating;
     }
 
-    /**
-     * Check if incoming damage (modified by net hits) is less than the actor's armor (modified by AP).
-     * Used for vehicle armor, hardened armor, and physical -> stun damage logic
-     * @param incomingDamage The incoming damage
-     * @param attackerHits The attackers hits. Should be a positive number.
-     * @param defenderHits The attackers hits. Should be a positive number.
-     * @param actor The active defender
-     */
-    static isDamageLessThanArmor(incomingDamage: DamageType, attackerHits: number, defenderHits: number, actor: SR5Actor): boolean {
-        const modifiedDamage = CombatRules.modifyDamageAfterHit(actor, attackerHits, defenderHits, incomingDamage);
-
-        const modifiedAv = actor.getArmor(incomingDamage).value;
-        const modifiedDv = modifiedDamage.value;
-
-        return modifiedDv < modifiedAv;
+    static hardenedAutoHits(actor: SR5Actor, damage: DamageType): number {
+        const hardenedRating = actor.getArmor(damage).hardened.value;
+        return hardenedRating > 0 ? Math.ceil(hardenedRating / 2) : 0;
     }
 
     /**
@@ -202,11 +160,11 @@ export class CombatRules {
 
         // Keep base and modification intact, only overwriting the result.
         ModifiableValue.add(
-            modifiedDamage, 'SR5.TestResults.Success', 0, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, ModifiableValue.TOP_PRIORITY
+            modifiedDamage, 'SR5.TestResults.Success', 0, { mode: 'OVERRIDE', priority: ModifiableValue.TOP_PRIORITY }
         );
         ModifiableValue.calcTotal(modifiedDamage, { min: 0 });
         ModifiableValue.add(
-            modifiedDamage.ap, 'SR5.TestResults.Success', 0, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, ModifiableValue.TOP_PRIORITY
+            modifiedDamage.ap, 'SR5.TestResults.Success', 0, { mode: 'OVERRIDE', priority: ModifiableValue.TOP_PRIORITY }
         );
         ModifiableValue.calcTotal(modifiedDamage.ap);
         modifiedDamage.type.value = 'physical';
@@ -278,20 +236,6 @@ export class CombatRules {
 
         updatedDamage = SoakRules.modifyPhysicalDamageForArmor(updatedDamage, actor);
         return SoakRules.modifyMatrixDamageForBiofeedback(updatedDamage, actor);
-    }
-
-    /**
-     * Determine the amount of initiative score modifier change.
-     * 
-     * According to SR5#170 'Wound Modifiers'.
-     * 
-     * @param woundModBefore A negative wound modifier, before taking latest damage.
-     * @param woundModAfter A negative wound modifier, after taking latest damage.
-     * @return An to be applied initiative score modifier
-     */
-    static combatInitiativeScoreModifierAfterDamage(woundModBefore: number, woundModAfter: number): number {
-        // Make sure no positive values are passed into.
-        return Math.min(woundModBefore, 0) - Math.min(woundModAfter, 0);
     }
 
     /**

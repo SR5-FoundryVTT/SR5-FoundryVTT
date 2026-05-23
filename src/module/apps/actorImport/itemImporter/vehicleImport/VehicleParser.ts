@@ -44,24 +44,29 @@ export class VehicleParser {
                 ...await new VehicleModsParser().parseItems(vehicle.mods?.mod)
             ];
 
-            const [handling, off_road_handling] = vehicle.handling?.split('/') ?? [vehicle.handling, vehicle.handling];
-            const [speed, off_road_speed] = vehicle.speed?.split('/') ?? [vehicle.speed, vehicle.speed];
+            function parseSeparatedValues(value: string): { base: number; offRoad: number } {
+                const [base, offRoad] = value.split("/").map(v => +v || 0) as [number, number | undefined];
+                return { base, offRoad: offRoad ?? base };
+            }
+
+            const handlingValues = parseSeparatedValues(vehicle.handling);
+            const speedValues = parseSeparatedValues(vehicle.speed);
+            const accelerationValues = parseSeparatedValues(vehicle.accel);
 
             system.vehicle_stats.pilot.base = Number(vehicle.pilot) || 0;
-            system.vehicle_stats.handling.base = Number(handling) || 0;
-            system.vehicle_stats.off_road_handling.base = Number(off_road_handling) || 0;
-            system.vehicle_stats.speed.base = Number(speed) || 0;
-            system.vehicle_stats.off_road_speed.base = Number(off_road_speed) || 0;
-            system.vehicle_stats.acceleration.base = Number(vehicle.accel) || 0;
+            system.vehicle_stats.handling.base = handlingValues.base;
+            system.vehicle_stats.off_road_handling.base = handlingValues.offRoad;
+            system.vehicle_stats.speed.base = speedValues.base;
+            system.vehicle_stats.off_road_speed.base = speedValues.offRoad;
+            system.vehicle_stats.acceleration.base = accelerationValues.base;
+            system.vehicle_stats.off_road_acceleration.base = accelerationValues.offRoad;
             system.vehicle_stats.sensor.base = Number(vehicle.sensor) || 0;
             system.vehicle_stats.seats.base = Number(vehicle.seats) || 0;
 
-            if (vehicle.accel.includes('/')) {
-                system.vehicle_stats.acceleration.base = Number(vehicle.accel.split('/')[0]) || 0;
-            }
-
+            system.cost = Number(vehicle.owncost?.replace(/[^\d.-]/g, "")) || 0;
             system.attributes.body.base = Number(vehicle.body) || 0;
-            system.armor.base = Number(vehicle.armor) || 0;
+            system.armor.rating.base = Number(vehicle.armor) || 0;
+            system.availability = vehicle.avail || '';
 
             const consoleLogs = Sanitizer.sanitize(CONFIG.Actor.dataModels.vehicle.schema, system);
             if (consoleLogs) {

@@ -1,6 +1,7 @@
 // game settings for shadowrun 5e
 
 import { FLAGS, SYSTEM_NAME } from './constants';
+import { IconAssign } from './apps/iconAssigner/IconAssign';
 import SR5CompendiaSettings from './settings/SR5CompendiaSettings';
 
 export const registerSystemSettings = () => {
@@ -87,6 +88,19 @@ export const registerSystemSettings = () => {
         default: true,
     });
 
+    game.settings.register(SYSTEM_NAME, FLAGS.InitiativeModeUpdateStrategy, {
+        name: 'SETTINGS.InitiativeModeUpdateStrategyName',
+        hint: 'SETTINGS.InitiativeModeUpdateStrategyDescription',
+        scope: 'world',
+        config: true,
+        type: String,
+        choices: {
+            delta_dice: 'SETTINGS.InitiativeModeUpdateStrategyDeltaDice',
+            reroll: 'SETTINGS.InitiativeModeUpdateStrategyReroll',
+        },
+        default: 'delta_dice',
+    });
+
     game.settings.register(SYSTEM_NAME, FLAGS.TokenHealthBars, {
         name: 'SETTINGS.TokenHealthBars',
         hint: 'SETTINGS.TokenHealthBarsDescription',
@@ -167,15 +181,15 @@ export const registerSystemSettings = () => {
     });
 
     /**
-     * Control if the Modify Roll section starts collapsed by default in test dialogs.
+     * Remember whether the Modify Roll section was expanded last time.
      */
-    game.settings.register(SYSTEM_NAME, FLAGS.CollapseModifyRollByDefault, {
-        name: 'SETTINGS.CollapseModifyRollByDefault',
-        hint: 'SETTINGS.CollapseModifyRollByDefaultDescription',
+    game.settings.register(SYSTEM_NAME, FLAGS.ModifyRollExpanded, {
+        name: 'SETTINGS.ModifyRollExpanded',
+        hint: 'SETTINGS.ModifyRollExpandedDescription',
         scope: 'client',
-        config: true,
+        config: false,
         type: Boolean,
-        default: false
+        default: true
     });
 
     /**
@@ -217,7 +231,8 @@ export const registerSystemSettings = () => {
         scope: 'world',
         config: true,
         type: String,
-        default: 'systems/shadowrun5e/dist/icons/importer/'
+        default: 'systems/shadowrun5e/dist/icons/importer/',
+        onChange: () => { void IconAssign.refreshIconFiles(); },
     });
 
     /**
@@ -230,6 +245,15 @@ export const registerSystemSettings = () => {
         config: true,
         type: Boolean,
         default: true
+    });
+
+    game.settings.register(SYSTEM_NAME, FLAGS.TokenAutoRunning, {
+        name: 'SETTINGS.TokenAutoRunning',
+        hint: 'SETTINGS.TokenAutoRunningDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true,
     });
 
     /**

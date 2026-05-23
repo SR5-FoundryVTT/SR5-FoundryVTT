@@ -89,7 +89,7 @@
                     <label style="text-wrap: nowrap;">
                         <i class="far fa-brain-circuit"
                            data-tooltip="SR5.AttrEssence"></i>
-                        <span data-attribute-modifier-tooltip="essence">{{system.attributes.essence.value}}</span>
+                        <span data-attribute-modifier-tooltip="essence">{{floatValue system.attributes.essence.value 2}}</span>
                     </label>
                 {{/if}}
             {{/unless}}
@@ -167,6 +167,22 @@
                 </span>
             {{else}}
                 <label>{{#if system.isDrone}}{{localizeOb system.category config.vehicle.categories}}&nbsp;{{/if}}{{localizeOb system.vehicleType config.vehicle.types}}</label>
+            {{/if}}
+
+            {{#if @root.isEditMode}}
+                <div class="basic-row">
+                    <label>{{localize "SR5.Availability"}}</label>
+                    {{formInput systemFields.availability value=source.system.availability
+                                classes="short availability" rootId=rootId }}
+                </div>
+                <div class="basic-row">
+                    <label data-tooltip="{{localize 'SR5.Cost'}}"><i class="fas fa-yen-sign"></i></label>
+                    {{formInput systemFields.cost value=source.system.cost
+                                classes="short nuyen" rootId=rootId }}
+                </div>
+            {{else}}
+                <label>{{localize "SR5.Availability"}}&nbsp;{{system.availability}}</label>
+                <label data-tooltip="{{localize 'SR5.Cost'}}"><i class="fas fa-yen-sign"></i>&nbsp;{{nuyenValue system.cost}}</label>
             {{/if}}
 
             {{#if @root.isEditMode}}

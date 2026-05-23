@@ -1,4 +1,4 @@
-<div class="attribute" data-attribute-id="{{attributeField.name}}" data-context-menu="attribute">
+<div class="attribute{{#if cssClass}} {{cssClass}}{{/if}}" data-attribute-id="{{attributeField.name}}" data-context-menu="attribute">
     <label {{#if @root.isEditMode}}class="edit-mode"{{/if}}>
         {{#if label}}
             {{localize label}}
@@ -13,7 +13,10 @@
         {{else}}
             <button class="icon sr5-icon" type="button"
                     data-action="rollAttribute"
-                    data-attribute-modifier-tooltip="{{attributeField.name}}">{{attribute.value}}</button>
+                    data-attribute-modifier-tooltip="{{attributeField.name}}"
+                    {{#if modifierTooltipPath}}data-modifier-tooltip-path="{{modifierTooltipPath}}"{{/if}}>
+                        {{attribute.value}}
+                    </button>
         {{/if}}
     </div>
 </div>

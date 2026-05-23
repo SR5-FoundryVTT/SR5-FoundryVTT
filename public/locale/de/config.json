@@ -15,8 +15,8 @@
         "AutomateProgressiveRecoilDescription": "Kumulativer Rückstoß wird automatisch aufgerechnet.",
         "CompendiumBrowserBlacklist": "Kompendium Browser Blacklist",
         "CompendiumBrowserBlacklistDescription": "Im Kompendium Browser auszublendende Kompendien",
-        "CollapseModifyRollByDefault": "Wurf anpassen standardmaessig einklappen",
-        "CollapseModifyRollByDefaultDescription": "Wenn aktiviert, startet der Abschnitt 'Wurf anpassen' beim Oeffnen eines Testdialogs eingeklappt.",
+        "ModifyRollExpanded": "Zustand von Wurf anpassen merken",
+        "ModifyRollExpandedDescription": "Speichert, ob der Abschnitt Wurf anpassen beim letzten Mal geöffnet war, und stellt diesen Zustand im nächsten Testdialog wieder her.",
         "DefaultOpposedTestActorSelection": "Nutze immer Ziele für Vergleichsproben",
         "DefaultOpposedTestActorSelectionDescription": "Überschreibe Tokenauswahl mit den Zielen der Probe.",
         "DiagonalMovementDescription": "Wie soll diagonale Bewegung auf dem Gitter gehandhabt werden?",
@@ -32,6 +32,10 @@
         "FreshIcon": "Hervorheben nur mit Icon",
         "HideGMOnlyChatContent": "Verstecke kritische Informationen bei SL-Proben",
         "HideGMOnlyChatContentDescription": "Nachrichten durch SL-Proben zeigen kritische Informationen nur Spielern mit Besitzer-Rechten für den genutzten Akteur.",
+        "InitiativeModeUpdateStrategyName": "Initiativemodus-Aktualisierung",
+        "InitiativeModeUpdateStrategyDescription": "Wie Initiative bei einem Moduswechsel im Kampf aktualisiert wird",
+        "InitiativeModeUpdateStrategyDeltaDice": "Würfeldifferenz",
+        "InitiativeModeUpdateStrategyReroll": "Vollständiger Neu-Wurf",
         "IgnoreDiagonal": "Ignoriere diagonale Bewegung (1-1-1)",
         "ImportIconFolderDescription": "Der Ordner, in dem der Importer die Icon-Dateien finden kann. Standard-Ort: 'systems/shadowrun5e/dist/icons/importer/'",
         "ImportIconFolderName": "Importer Icon-Ordner",
@@ -475,6 +479,10 @@
         "Armor": {
             "FIELDS": {
                 "armor": {
+                    "accessory": {
+                        "hint": "Ist diese Panzerung nur Zubehör?",
+                        "label": "Zubehör"
+                    },
                     "acid": {
                         "hint": "Extra Panzerung gegen Säureschaden",
                         "label": "Säureresistenz"
@@ -495,9 +503,17 @@
                         "hint": "Verstärkte Panzerung",
                         "label": "Verstärkt"
                     },
-                    "mod": {
-                        "hint": "Ist diese Panzerung nur Zubehör?",
-                        "label": "Zubehör"
+                    "is_hardened": {
+                        "hint": "Wenn diese Panzerung verstärkten Schutz gewährt",
+                        "label": "Verstärkt Aktiv"
+                    },
+                    "immunities": {
+                        "hint": "Damage sources this armor grants Immunity against",
+                        "label": "Immunities"
+                    },
+                    "pollutant": {
+                        "hint": "Extra Armor against attacks with Pollutant",
+                        "label": "Chemical Protection"
                     },
                     "radiation": {
                         "hint": "Extra Panzerung gegen Strahlenschaden",
@@ -506,13 +522,22 @@
                     "value": {
                         "hint": "Panzerungswert",
                         "label": "Panzerung"
+                    },
+                    "water": {
+                        "hint": "Extra Armor against attacks with Water",
+                        "label": "Water Protection"
                     }
                 }
             },
+            "Immunity": {
+                "NormalWeapons": "Normal Weapons"
+            },
+            "Resistances": "Resistenzen",
             "label": "Panzerung"
         },
         "ArmorHardened": "Verstärkt",
         "ArmorHardenedFull": "Verstärkte Panzerung",
+        "HardenedArmor": "Verstärkte Panzerung",
         "ArmorValue": "Panzerungswert",
         "Attack": "Angriff",
         "Attacker": "Angreifer",
@@ -551,9 +576,29 @@
         "Bullets": "Kugeln",
         "BuyHits": "Erfolge kaufen",
         "COMBAT": {
+            "CannotSeizeAgain": "Du kannst die Initiative erst zu Beginn deines naechsten Zuges erneut ergreifen.",
+            "ModeAstral": "Astral",
+            "ModeChangedLabel": "Initiativemodus geaendert",
+            "ModeChangeNewInitiative": "Neue Initiative",
+            "ModeChangePreviousInitiative": "Vorherige Initiative",
+            "ModeMatrix": "Matrix",
+            "ModeMeatspace": "Fleischraum",
+            "ModeTitle": "Modus: {mode}",
+            "ModeUnknown": "Unbekannt",
+            "NextPass": "Naechster Durchgang",
+            "NextPhase": "Naechste Phase",
+            "NextTurn": "Naechster Zug",
+            "NoHistoryAvailable": "Kein Kampfverlauf-Snapshot verfuegbar.",
+            "PreviousPass": "Vorheriger Durchgang",
+            "PreviousPhase": "Vorherige Phase",
+            "PreviousTurn": "Vorheriger Zug",
             "ReduceInitByFive": "Initiative -5",
             "ReduceInitByOne": "Initiative -1",
-            "ReduceInitByTen": "Initiative -10"
+            "ReduceInitByTen": "Initiative -10",
+            "SeizeInitiative": "Initiative ergreifen",
+            "SeizedInitiative": "Initiative ergriffen",
+            "ToggleActedStatusGMOnly": "Gehandelt-Status umschalten (nur SL)",
+            "TrackerTitle": "Zug {round} (Durchgang {pass})"
         },
         "CallInAction": {
             "ActorType": "Akteur-Typ",
@@ -1029,12 +1074,16 @@
         "EditSkill": "Fertigkeit anpassen",
         "Effect": "Effekt",
         "Effects": "Effekte",
-        "Element": "Element",
-        "ElementAcid": "Säure",
-        "ElementCold": "Kälte",
-        "ElementElectricity": "Elektrizität",
-        "ElementFire": "Feuer",
-        "ElementRadiation": "Strahlung",
+        "Element": {
+            "Acid": "Säure",
+            "Cold": "Kälte",
+            "Electricity": "Elektrizität",
+            "Fire": "Feuer",
+            "Pollutant": "Pollutant",
+            "Radiation": "Strahlung",
+            "Water": "Water",
+            "Label": "Element"
+        },
         "Emerged": "Resonanz",
         "EnvModifiersApplication": {
             "ClearModifiers": "Entferne eigene Modifikatoren",
@@ -1199,6 +1248,8 @@
                 "Track": "Aufspüren"
             }
         },
+        "Immunity": "Immunität",
+        "ImmunityToNormalWeapons": "Immunität gegen normale Waffen",
         "Import": {
             "ActorImporter": {
                 "Title": "Akteur Import"
@@ -1295,6 +1346,10 @@
                                 "hint": "Element des Schadens. Leer für elementlos.",
                                 "label": "Element"
                             }
+                        },
+                        "normal_weapon": {
+                            "hint": "If this damage is considered a normal (non-magical) weapon attack",
+                            "label": "Normal Weapon"
                         },
                         "type": {
                             "base": {
@@ -2253,11 +2308,8 @@
                 "Interests": "Hobbywissen",
                 "Street": "Straßenwissen"
             },
-            "Groups": {
-            },
-            "Sets": {
-
-            },
+            "Groups": {},
+            "Sets": {},
             "Set": {
                 "LogActorDifferences": "Akteur-Unterschiede protokollieren",
                 "DifferencesLoggedInConsole": "Öffne deine Browser-Konsole, um die Unterschiede anzuzeigen"
@@ -2673,6 +2725,7 @@
                 "Vehicle": "Fahrzeug"
             },
             "Item": {
+                "ArmorMods": "Rüstungsmods",
                 "Description": "Beschreibung",
                 "Details": "Details",
                 "Effects": "Effekte",
@@ -2966,6 +3019,7 @@
                 "Rigger": "Rigger"
             },
             "Driver": "Fahrer",
+            "DamagedVehicle": "Beschädigtes Fahrzeug",
             "Drone": "Drohne",
             "Environments": {
                 "Handling": "Handling",
@@ -2988,6 +3042,7 @@
             "Stats": {
                 "Acceleration": "Beschleunigung",
                 "Handling": "Handling",
+                "OffRoadAcceleration": "Beschleunigung (Gelände)",
                 "OffRoadHandling": "Handling (Gelände)",
                 "OffRoadSpeed": "Geschw. (Gelände)",
                 "Pilot": "Pilot",

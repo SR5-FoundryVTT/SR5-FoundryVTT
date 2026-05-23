@@ -3,7 +3,6 @@ The icons and their authors are listed below as required by CC by Attribution 3.
 
 Icon - Author - Source
 
-
 Action
 action.svg - Lorc - https://game-icons.net/1x1/lorc/slap.html
 
@@ -47,6 +46,9 @@ bioware/phenotype-adjustment.svg -
 bioware/symbionts.svg -
 bioware/transgenic-alteration.svg -
 bioware/transgenics.svg - Lorc - https://game-icons.net/1x1/lorc/dna1.html
+
+Call In Action
+call_in_action.svg - Lorc - https://game-icons.net/1x1/lorc/magic-portal.html
 
 Commlink
 commlink.svg -
@@ -159,14 +161,20 @@ equipment/toxins.svg - Lorc - https://game-icons.net/1x1/lorc/poison-bottle.html
 equipment/vision-devices.svg - Delapouite - https://game-icons.net/1x1/delapouite/binoculars.html
 equipment/vision-enhancements.svg - Delapouite - https://game-icons.net/1x1/delapouite/vr-headset.html
 
+Grid
+grid.svg - Delapouite - https://game-icons.net/1x1/delapouite/wireframe-globe.html
+
 Host
 host.svg - Delapouite - https://game-icons.net/1x1/delapouite/server-rack.html
+
+IC
+ic.svg - Lorc - https://game-icons.net/1x1/lorc/eye-shield.html
 
 Lifestyle
 lifestyle.svg - Delapouite - https://game-icons.net/1x1/delapouite/family-house.html
 
 Metamagic
-metamagic.svg - Lorc - https://game-icons.net/1x1/lorc/magic-portal.html
+metamagic.svg - Lorc - https://game-icons.net/1x1/lorc/magic-swirl.html
 
 Modification
 modification/modification.svg - Lorc - https://game-icons.net/1x1/lorc/tinker.html
@@ -193,6 +201,9 @@ rcc.svg - Delapouite - https://game-icons.net/1x1/delapouite/gps.html
 SIN
 sin.svg - Lord Berandas - https://game-icons.net/1x1/lord-berandas/computing.html
 
+Skill
+skill.svg - Delapouite - https://game-icons.net/1x1/delapouite/skills.html
+
 Spell
 spell/spell.svg - Delapouite - https://game-icons.net/1x1/delapouite/spell-book.html
  spell/combat.svg -
@@ -203,8 +214,14 @@ spell/spell.svg - Delapouite - https://game-icons.net/1x1/delapouite/spell-book.
  spell/manipulation.svg -
  spell/rituals.svg -
 
+Spirit
+spirit.svg - Bella Carvalho - https://www.behance.net/bellcarvalho (CC BY-SA 4.0; see critter/LICENSE.txt)
+
 Sprite Power
 sprite_power.svg - Lorc - https://game-icons.net/1x1/lorc/processor.html
+
+Vehicle
+vehicle.svg - Skoll - https://game-icons.net/1x1/skoll/jeep.html
 
 Weapon
 weapon/weapon.svg - Delapouite - https://game-icons.net/1x1/delapouite/saber-and-pistol.html

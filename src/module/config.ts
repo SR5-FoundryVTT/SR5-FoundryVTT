@@ -403,11 +403,44 @@ export const SR5 = {
     },
 
     elementTypes: {
-        fire: 'SR5.ElementFire',
-        cold: 'SR5.ElementCold',
-        acid: 'SR5.ElementAcid',
-        electricity: 'SR5.ElementElectricity',
-        radiation: 'SR5.ElementRadiation',
+        fire: 'SR5.Element.Fire',
+        cold: 'SR5.Element.Cold',
+        acid: 'SR5.Element.Acid',
+        electricity: 'SR5.Element.Electricity',
+        pollutant: 'SR5.Element.Pollutant',
+        radiation: 'SR5.Element.Radiation',
+        water: 'SR5.Element.Water',
+    },
+
+    armorElementTypes: {
+        acid: 'SR5.Armor.FIELDS.armor.acid.label',
+        cold: 'SR5.Armor.FIELDS.armor.cold.label',
+        electricity: 'SR5.Armor.FIELDS.armor.electricity.label',
+        fire: 'SR5.Armor.FIELDS.armor.fire.label',
+        pollutant: 'SR5.Armor.FIELDS.armor.pollutant.label',
+        radiation: 'SR5.Armor.FIELDS.armor.radiation.label',
+        water: 'SR5.Armor.FIELDS.armor.water.label',
+    },
+
+    armorElementHints: {
+        acid: 'SR5.Armor.FIELDS.armor.acid.hint',
+        cold: 'SR5.Armor.FIELDS.armor.cold.hint',
+        electricity: 'SR5.Armor.FIELDS.armor.electricity.hint',
+        fire: 'SR5.Armor.FIELDS.armor.fire.hint',
+        pollutant: 'SR5.Armor.FIELDS.armor.pollutant.hint',
+        radiation: 'SR5.Armor.FIELDS.armor.radiation.hint',
+        water: 'SR5.Armor.FIELDS.armor.water.hint',
+    },
+
+    armorImmunityTypes: {
+        normal_weapons: 'SR5.Armor.Immunity.NormalWeapons',
+        acid: 'SR5.Element.Acid',
+        cold: 'SR5.Element.Cold',
+        electricity: 'SR5.Element.Electricity',
+        fire: 'SR5.Element.Fire',
+        pollutant: 'SR5.Element.Pollutant',
+        radiation: 'SR5.Element.Radiation',
+        water: 'SR5.Element.Water',
     },
 
     spellCategories: {
@@ -1126,6 +1159,7 @@ export const SR5 = {
             speed: 'SR5.Vehicle.Stats.Speed',
             off_road_speed: 'SR5.Vehicle.Stats.OffRoadSpeed',
             acceleration: 'SR5.Vehicle.Stats.Acceleration',
+            off_road_acceleration: 'SR5.Vehicle.Stats.OffRoadAcceleration',
             pilot: 'SR5.Vehicle.Stats.Pilot',
             sensor: 'SR5.Vehicle.Stats.Sensor',
             seats: 'SR5.Vehicle.Stats.Seats'

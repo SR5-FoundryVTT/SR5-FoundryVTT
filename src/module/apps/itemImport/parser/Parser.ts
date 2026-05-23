@@ -1,9 +1,8 @@
 import { ParseData } from "./Types";
 import { CompendiumKey } from "../importer/Constants";
-import { DataImporter } from "../importer/DataImporter";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 import { BonusHelper as BH } from "../helper/BonusHelper";
-import * as IconAssign from "../../iconAssigner/iconAssign";
+import { IconAssign } from "../../iconAssigner/IconAssign";
 import { ImportHelper as IH } from "../helper/ImportHelper";
 import { TechnologyType } from "src/module/types/template/Technology";
 import { DataDefaults, SystemConstructorArgs, SystemEntityType } from "src/module/data/DataDefaults";
@@ -40,7 +39,6 @@ export abstract class Parser<SubType extends SystemEntityType> {
 
     public async Parse(jsonData: ParseData, compendiumKey: CompendiumKey): Promise<Actor.CreateData | Item.CreateData> {
         const itemPromise = this.getItems(jsonData);
-        let bonusPromise: Promise<void> | undefined;
 
         const entity = {
             img: undefined as string | undefined | null,
@@ -58,11 +56,10 @@ export abstract class Parser<SubType extends SystemEntityType> {
 
         this.setImporterFlags(entity, jsonData);
 
-        if (DataImporter.iconSet)
-            entity.img = IconAssign.iconAssign(DataImporter.iconSet, entity);
+        entity.img = IconAssign.iconAssign(entity);
 
         if ('bonus' in jsonData && jsonData.bonus)
-            bonusPromise = BH.addBonus(entity as any, jsonData.bonus);
+            BH.addBonus(entity as any, jsonData.bonus);
 
         if (jsonData.page && jsonData.source) {
             const page = IH.getArray(jsonData.altpage)[0]?._TEXT ?? jsonData.page._TEXT;
@@ -75,8 +72,6 @@ export abstract class Parser<SubType extends SystemEntityType> {
             (entity as Actor.CreateData).items = await itemPromise;
         else
             (entity as Item.CreateData).flags = { shadowrun5e: { embeddedItems: await itemPromise } };
-
-        await bonusPromise;
 
         return entity;
     }

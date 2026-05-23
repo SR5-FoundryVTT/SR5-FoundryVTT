@@ -3,6 +3,7 @@ import { AnyObject } from "fvtt-types/utils";
 
 import DataModel = foundry.abstract.DataModel;
 import SchemaField = foundry.data.fields.SchemaField;
+import { DataDefaults } from "@/module/data/DataDefaults";
 
 /**
  * A ModifiableSchemaField is a SchemaField that represents a ModifiableValue type, which 
@@ -38,15 +39,15 @@ export class ModifiableField<
         const effectMode = change.mode;
         const effectPriority = change.priority ?? 10 * effectMode;
 
-        field.changes.push({
-            enabled: true,
-            invalidated: false,
-            name: effectName,
-            mode: effectMode,
-            value: changeValue,
-            priority: effectPriority,
-            effectUuid: change.effect.uuid,
-        });
+        field.changes.push(
+            DataDefaults.createData('change_entry', {
+                name: effectName,
+                mode: effectMode,
+                value: changeValue,
+                priority: effectPriority,
+                source: change.effect.uuid,
+            })
+        );
 
         return undefined;
     }

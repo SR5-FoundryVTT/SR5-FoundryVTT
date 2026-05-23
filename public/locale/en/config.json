@@ -15,8 +15,8 @@
         "AutomateProgressiveRecoilDescription": "Characters accrue progressive recoil until reset",
         "CompendiumBrowserBlacklist": "Compendium Browser Blacklist",
         "CompendiumBrowserBlacklistDescription": "List of compendiums to hide from the compendium browser",
-        "CollapseModifyRollByDefault": "Collapse Modify Roll by default",
-        "CollapseModifyRollByDefaultDescription": "If enabled, the Modify Roll section starts collapsed when opening a test dialog.",
+        "ModifyRollExpanded": "Remember Modify Roll section state",
+        "ModifyRollExpandedDescription": "Stores whether the Modify Roll section was expanded last time and restores that state in the next test dialog.",
         "DefaultOpposedTestActorSelection": "Overwrite opposed test token selections",
         "DefaultOpposedTestActorSelectionDescription": "Always overwrite selected tokens with targets used for testing",
         "DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
@@ -32,6 +32,10 @@
         "FreshIcon": "Highlight with Icon Only",
         "HideGMOnlyChatContent": "Hide critical information on GM test",
         "HideGMOnlyChatContentDescription": "GM test messages will only show all information to players that own the used actor",
+        "InitiativeModeUpdateStrategyName": "Initiative Mode Update Strategy",
+        "InitiativeModeUpdateStrategyDescription": "How initiative is updated when switching initiative mode in combat",
+        "InitiativeModeUpdateStrategyDeltaDice": "Delta Dice (roll difference)",
+        "InitiativeModeUpdateStrategyReroll": "Full Reroll",
         "IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",
         "ImportIconFolderDescription": "The folder where the importer can find icon files. Default location: 'systems/shadowrun5e/dist/icons/importer/'",
         "ImportIconFolderName": "Importer Icon Folder",
@@ -50,6 +54,8 @@
         "ShowSkillsWithDetailsDescription": "When set skill list display will mirror core rulebook style (italics, short attributes)",
         "ShowTokenNameForChatOutputDescription": "Should the token name be used for roll card output instead of the actor name when available",
         "ShowTokenNameForChatOutputName": "Use Token Name for Roll Card",
+        "TokenAutoRunning": "Auto-Detect Running Movement",
+        "TokenAutoRunningDescription": "Automatically switch token movement mode to running when measured distance exceeds walking speed",
         "TokenHealthBars": "Token health bars",
         "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring",
         "TokenRulerColorRunning": "Token Movement Running Color",
@@ -474,6 +480,10 @@
         "Armor": {
             "FIELDS": {
                 "armor": {
+                    "accessory": {
+                        "hint": "If this Armor is an Accessory (adds its value to the actor's base Armor)",
+                        "label": "Accessory"
+                    },
                     "acid": {
                         "hint": "Extra Armor against attacks with Acid",
                         "label": "Acid Resistance"
@@ -494,9 +504,17 @@
                         "hint": "If this Armor is Hardened",
                         "label": "Hardened Armor"
                     },
-                    "mod": {
-                        "hint": "If this Armor is an Accessory (adds its value to the actor's base Armor)",
-                        "label": "Accessory"
+                    "is_hardened": {
+                        "hint": "If this Armor grants hardened protection",
+                        "label": "Hardened Active"
+                    },
+                    "immunities": {
+                        "hint": "Damage sources this armor grants Immunity against",
+                        "label": "Immunities"
+                    },
+                    "pollutant": {
+                        "hint": "Extra Armor against attacks with Pollutant",
+                        "label": "Chemical Protection"
                     },
                     "radiation": {
                         "hint": "Extra Armor against attacks with Radiation",
@@ -505,9 +523,17 @@
                     "value": {
                         "hint": "Amount of Armor that this item provides",
                         "label": "Armor Value"
+                    },
+                    "water": {
+                        "hint": "Extra Armor against attacks with Water",
+                        "label": "Water Protection"
                     }
                 }
             },
+            "Immunity": {
+                "NormalWeapons": "Normal Weapons"
+            },
+            "Resistances": "Resistances",
             "label": "Armor"
         },
         "ArmorHardened": "Hardened",
@@ -550,9 +576,29 @@
         "Bullets": "Rounds",
         "BuyHits": "Buy Hits",
         "COMBAT": {
+            "CannotSeizeAgain": "You cannot seize initiative again until the start of your next turn.",
+            "ModeAstral": "Astral",
+            "ModeChangedLabel": "Initiative Mode Updated",
+            "ModeChangeNewInitiative": "New initiative",
+            "ModeChangePreviousInitiative": "Previous initiative",
+            "ModeMatrix": "Matrix",
+            "ModeMeatspace": "Meatspace",
+            "ModeTitle": "Mode: {mode}",
+            "ModeUnknown": "Unknown",
+            "NextPass": "Next Pass",
+            "NextPhase": "Next Phase",
+            "NextTurn": "Next Turn",
+            "NoHistoryAvailable": "No combat history snapshot is available.",
+            "PreviousPass": "Previous Pass",
+            "PreviousPhase": "Previous Phase",
+            "PreviousTurn": "Previous Turn",
             "ReduceInitByFive": "Initiative -5",
             "ReduceInitByOne": "Initiative -1",
-            "ReduceInitByTen": "Initiative -10"
+            "ReduceInitByTen": "Initiative -10",
+            "SeizeInitiative": "Seize Initiative",
+            "SeizedInitiative": "Seized Initiative",
+            "ToggleActedStatusGMOnly": "Toggle Acted Status (GM Only)",
+            "TrackerTitle": "Turn {round} (Pass {pass})"
         },
         "CallInAction": {
             "ActorType": "Actor Type",
@@ -1028,12 +1074,16 @@
         "EditSkill": "Edit Skill",
         "Effect": "Effect",
         "Effects": "Effects",
-        "Element": "Element",
-        "ElementAcid": "Acid",
-        "ElementCold": "Cold",
-        "ElementElectricity": "Electricity",
-        "ElementFire": "Fire",
-        "ElementRadiation": "Radiation",
+        "Element": {
+            "Acid": "Acid",
+            "Cold": "Cold",
+            "Electricity": "Electricity",
+            "Fire": "Fire",
+            "Pollutant": "Pollutant",
+            "Radiation": "Radiation",
+            "Water": "Water",
+            "Label": "Element"
+        },
         "Emerged": "Emerged",
         "EnvModifiersApplication": {
             "ClearModifiers": "Clear personal modifiers",
@@ -1146,6 +1196,7 @@
         },
         "Grids": "Grids",
         "HackingProgram": "Hacking Program",
+        "HardenedArmor": "Hardened Armor",
         "Help": "Help",
         "Hits": "Hits",
         "Host": {
@@ -1198,6 +1249,8 @@
                 "Track": "Track"
             }
         },
+        "Immunity": "Immunity",
+        "ImmunityToNormalWeapons": "Immunity To Normal Weapons",
         "Import": {
             "ActorImporter": {
                 "Title": "Actor Importer"
@@ -1294,6 +1347,10 @@
                                 "hint": "The Element the type of damage is. Leave blank for no element.",
                                 "label": "Element"
                             }
+                        },
+                        "normal_weapon": {
+                            "hint": "If this damage is considered a normal (non-magical) weapon attack",
+                            "label": "Normal Weapon"
                         },
                         "type": {
                             "base": {
@@ -2252,11 +2309,8 @@
                 "Interests": "Interests",
                 "Street": "Street"
             },
-            "Groups": {
-            },
-            "Sets": {
-
-            },
+            "Groups": {},
+            "Sets": {},
             "Set": {
                 "LogActorDifferences": "Log Actor Differences",
                 "DifferencesLoggedInConsole": "Open your browser console to view differences"
@@ -2631,6 +2685,10 @@
             },
             "Type": "Type"
         },
+        "StatusEffects": {
+            "Running": "Running",
+            "Sprinting": "Sprinting"
+        },
         "Stock": "Stock",
         "StreetCred": "Street Cred",
         "StunTrack": "Stun Track",
@@ -2672,6 +2730,7 @@
                 "Vehicle": "Vehicle"
             },
             "Item": {
+                "ArmorMods": "Armor Mods",
                 "Description": "Description",
                 "Details": "Details",
                 "Effects": "Effects",
@@ -2920,6 +2979,7 @@
                 "Rigger": "Rigger"
             },
             "Driver": "Driver",
+            "DamagedVehicle": "Damaged Vehicle",
             "Drone": "Drone",
             "Environments": {
                 "Handling": "Handling",
@@ -2942,6 +3002,7 @@
             "Stats": {
                 "Acceleration": "Acceleration",
                 "Handling": "Handling",
+                "OffRoadAcceleration": "Acceleration (Off Road)",
                 "OffRoadHandling": "Handling (Off Road)",
                 "OffRoadSpeed": "Speed (Off Road)",
                 "Pilot": "Pilot",

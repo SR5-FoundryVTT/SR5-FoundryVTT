@@ -24,7 +24,9 @@ import { shadowrunSR5ItemDataPrep } from './sr5.ItemDataPrep.spec';
 import { shadowrunMatrixTesting } from './sr5.MatrixTesting.spec';
 import { shadowrunDriver } from './sr5.Driver.spec';
 import { shadowrunNPC } from './sr5.NPC.spec';
+import { shadowrunCombatModifierFlow } from './sr5.CombatModifierFlow.spec';
 import { itemSkillTesting } from './ItemSkill.spec';
+import { actorArmorFlowTesting } from './sr5.ActorArmorFlow.spec';
 
 import { Quench } from '@ethaks/fvtt-quench';
 import { shadowrunRiggerTesting } from '@/unittests/sr5.RiggerTesting.spec';
@@ -93,6 +95,9 @@ export const quenchRegister = (quench: Quench) => {
     quench.registerBatch('shadowrun5e.flow.driver', shadowrunDriver, {
         displayName: 'SHADOWRUN5e: Driver Flow Test',
     })
+    quench.registerBatch('shadowrun5e.flow.combat_modifiers', shadowrunCombatModifierFlow, {
+        displayName: 'SHADOWRUN5e: CombatModifierFlow Test',
+    });
     quench.registerBatch('shadowrun5e.flow.rigger', shadowrunRiggerTesting, {
         displayName: 'SHADOWRUN5e: Rigger Flow Testing',
     })
@@ -117,6 +122,9 @@ export const quenchRegister = (quench: Quench) => {
     });
     quench.registerBatch('shadowrun5e.item.skill', itemSkillTesting, {
         displayName: 'SHADOWRUN5e: Item Skill Flow Test',
+    });
+    quench.registerBatch('shadowrun5e.actor.armor_flow', actorArmorFlowTesting, {
+        displayName: 'SHADOWRUN5e: Actor Armor Flow Test',
     });
     quench.registerBatch('shadowrun5e.migrators', Migrators, {
         displayName: 'SHADOWRUN5e: Migrators Test',

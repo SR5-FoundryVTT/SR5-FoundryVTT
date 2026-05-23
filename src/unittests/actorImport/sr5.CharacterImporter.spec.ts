@@ -38,7 +38,7 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
         it('Should import a chummer character', async () => {
             [actor, ...vehicles] = await CI.import(character, importOptions);
             assert.notEqual(actor, null, 'Actor not created');
-            factory.actors.push(actor, ...vehicles);
+            factory.actors.push(actor as Actor.Stored<'character'>, ...vehicles as Actor.Stored<'vehicle'>[]);
             assert.lengthOf(vehicles, 1, 'Vehicle not created');
         });
 
@@ -224,10 +224,13 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(vehicle.system.vehicle_stats.speed.value, 2, 'Speed');
             assert.strictEqual(vehicle.system.vehicle_stats.off_road_speed.value, 3, 'Off-road Speed');
             assert.strictEqual(vehicle.system.vehicle_stats.acceleration.value, 1, 'Acceleration');
+            assert.strictEqual(vehicle.system.vehicle_stats.off_road_acceleration.value, 2, 'Off-road Acceleration');
             assert.strictEqual(vehicle.system.attributes.body.value, 7, 'Body');
-            assert.strictEqual(vehicle.system.armor.value, 9, 'Armor');
+            assert.strictEqual(vehicle.system.armor.rating.value, 9, 'Armor');
             assert.strictEqual(vehicle.system.vehicle_stats.sensor.value, 1, 'Sensor');
             assert.strictEqual(vehicle.system.vehicle_stats.seats.value, 2, 'Seats');
+            assert.strictEqual(vehicle.system.availability, '0', 'Availability');
+            assert.strictEqual(vehicle.system.cost, 10000, 'Cost');
 
             const nonSkillItems = vehicle.items.filter(item => !item.isType('skill'));
             assert.strictEqual(nonSkillItems.length, 2, 'Non-skill item count');

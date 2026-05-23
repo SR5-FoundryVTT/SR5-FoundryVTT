@@ -190,7 +190,7 @@
                         </div>
                     {{else if system.technology.calculated.essence.value}}
                         <label data-tooltip="SR5.EssenceCost">
-                            <i class="far fa-brain-circuit"></i>&nbsp;{{system.technology.calculated.essence.value}}
+                            <i class="far fa-brain-circuit"></i>&nbsp;{{floatValue system.technology.calculated.essence.value 2}}
                         </label>
                     {{/if}}
                 {{/if}}
@@ -812,18 +812,18 @@
 
             {{#if systemFields.capacity}}
                 {{#if @root.isEditMode}}
-                    <span class="basic-row" data-tooltip="{{systemFields.capacity.label}}:&nbsp;{{systemFields.capacity.hint}}">
-                        <label>
+                    <span class="basic-row">
+                        <label data-tooltip="{{systemFields.capacity.label}}">
                             <i class="fas fa-toolbox"></i>
                         </label>
                         <span>
-                            {{formInput systemFields.capacity value=source.system.capacity
+                            {{formInput systemFields.capacity.fields.total value=source.system.capacity.total
                                         classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
                         </span>
                     </span>
-                {{else if system.capacity}}
-                    <label data-tooltip="{{systemFields.capacity.label}}:&nbsp;{{systemFields.capacity.hint}}">
-                        <i class="fas fa-toolbox"></i>&nbsp;{{system.capacity}}
+                {{else}}
+                    <label data-tooltip="{{systemFields.capacity.label}}">
+                        <i class="fas fa-toolbox"></i>&nbsp;{{system.capacity.used}} / {{system.capacity.total}}
                     </label>
                 {{/if}}
             {{/if}}

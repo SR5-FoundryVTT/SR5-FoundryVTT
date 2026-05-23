@@ -13,6 +13,7 @@ import { SinPrep } from './prep/SinPrep';
 import { ActionPrep } from './prep/functions/ActionPrep';
 import { RangePrep } from './prep/functions/RangePrep';
 import { AdeptPowerPrep } from './prep/AdeptPowerPrep';
+import { ArmorPrep } from './prep/functions/ArmorPrep';
 
 import { UpdateActionFlow } from './flows/UpdateActionFlow';
 import { UpdateSkillFlow } from './flows/UpdateSkillFlow';
@@ -33,6 +34,7 @@ import { MatrixDeviceFlow } from './flows/MatrixDeviceFlow';
 import { StorageFlow } from '@/module/flows/StorageFlow';
 import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
 import { ModifiableValueType } from '../types/template/Base';
+import { IconAssign } from 'src/module/apps/iconAssigner/IconAssign';
 import Document = foundry.abstract.Document;
 import GetEmbeddedDocumentOptions = Document.GetEmbeddedDocumentOptions;
 
@@ -65,6 +67,17 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     declare descriptionHTML: string | undefined;
     // Item Sheet labels for quick info on an item dropdown.
     declare labels: { roll?: string; opposedRoll?: string };
+
+    static override getDefaultArtwork(itemData?: Item.CreateData): Item.GetDefaultArtworkReturn {
+        const fallback = super.getDefaultArtwork(itemData);
+        if (!itemData || itemData.img) return fallback;
+
+        const assignedImage = IconAssign.iconAssign(itemData);
+        if (!assignedImage) return fallback;
+
+        return { img: assignedImage };
+    }
+
 
     /**
      * Helper property to get an actual actor for an owned or embedded item. You'll need this for when you work with
@@ -211,6 +224,9 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
         // Switch item data preparation between types...
         // ... this is ongoing work to clean up SR5item.prepareData
+        if ('armor' in this.system)
+            ArmorPrep.prepareData(this, equippedMods);
+
         if (this.isType('host'))
             HostPrep.prepareBaseData(this.system);
         else if (this.isType('adept_power'))
@@ -352,9 +368,14 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return equippedAmmos[0];
     }
 
-    // a bit misleading, need to check
     getEquippedMods(): SR5Item<'modification'>[] {
-        return this.items.filter((item) => item.isWeaponModification() && item.isEquipped()) as SR5Item<'modification'>[];
+        const type = this.modificationType();
+        if (!type) return [];
+        return this.items.filter((item) =>
+            item.isType('modification') &&
+            item.system.type === type &&
+            item.isEquipped()
+        ) as SR5Item<'modification'>[];
     }
 
     get hasExplosiveAmmo(): boolean {
@@ -365,10 +386,19 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     /**
      * Toggle equipment state of a single Modification item.
-     * @param iid Modification item id to be equip toggled
+     * @param id Modification item id to be equip toggled
      */
-    async equipWeaponMod(iid: string | null) {
-        await this.equipNestedItem(iid, 'modification', { unequipOthers: false, toggle: true });
+    async equipModification(id: string | null, expectedType: Item.SystemOfType<'modification'>['type'] | null = null) {
+        if (!id) return;
+
+        const type = expectedType ?? this.modificationType();
+        if (!type) return;
+
+        const nestedItem = this.getOwnedItem(id);
+        if (!nestedItem?.isType('modification')) return;
+        if (nestedItem.system.type !== type) return;
+
+        await this.equipNestedItem(id, 'modification', { unequipOthers: false, toggle: true });
     }
 
     /**
@@ -576,14 +606,17 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     async addNewNetwork(item: SR5Item) {
         const sin = this.asType('sin');
         if (!sin) return;
+        if (!item.uuid) return;
         if (!item.isNetwork()) return;
 
         sin.system.networks.push(item.uuid);
         await this.update({ system: { networks: sin.system.networks } });
     }
 
-    isWeaponModification(): this is SR5Item<'modification'> & { system: { type: 'weapon' } } {
-        return this.isType('modification') && this.system.type === 'weapon';
+    modificationType(): Item.SystemOfType<'modification'>['type'] | null {
+        if (this.isType('weapon')) return 'weapon';
+        if (this.isType('armor')) return 'armor';
+        return null;
     }
 
     /**
@@ -609,7 +642,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         if (!game?.scenes || !game.ready || !canvas || !canvas.ready || !canvas.scene) return;
 
         const card = html.find('.chat-card');
-        let actor;
+        let actor: Actor.Implementation | undefined | null;
         const sceneTokenId = card.data('tokenId');
         if (sceneTokenId) actor = Helpers.getSceneTokenActor(sceneTokenId);
         else actor = game.actors?.get(card.data('actorId'));
@@ -670,14 +703,14 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      */
     async createNestedItem(itemData: Item.Source | Item.Source[]) {
         if (!Array.isArray(itemData)) itemData = [itemData];
-        // weapons accept items
-        if (this.type === 'weapon') {
+        // weapons and armor accept nested items
+        if (this.type === 'weapon' || this.type === 'armor') {
             const currentItems = foundry.utils.duplicate(this.getNestedItems()) as Item.Source[];
 
             for (const ogItem of itemData) {
                 const item = foundry.utils.duplicate(ogItem) as Item.Source;
                 item._id = foundry.utils.randomID();
-                if (item.type === 'ammo' || item.type === 'modification')
+                if (item.type === 'modification' || (this.type === 'weapon' && item.type === 'ammo'))
                     currentItems.push(item);
             }
 
@@ -740,17 +773,22 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return items.find((item) => item.id === itemId);
     }
 
-    async updateNestedEffects(changes: OneOrMany<ActiveEffect.UpdateData & { _id?: string }>) {
+    async updateNestedEffects(changes: OneOrMany<ActiveEffect.UpdateInput>) {
         if (!this._isNestedItem) return;
 
         changes = Array.isArray(changes) ? changes : [changes];
         if (!changes || changes.length === 0) return;
 
-        for (const effectChanges of changes) {
-            const effect = this.effects.get(effectChanges._id!);
+        for (const change of changes) {
+            const effectId = typeof change._id === 'string' ? change._id : '';
+            const effect = this.effects.get(effectId);
             if (!effect) continue;
-            delete effectChanges._id;
-            mergeObject(effect, expandObject(effectChanges), { inplace: true });
+
+            // We need to delete the _id from the change data, otherwise mergeObject
+            // will merge the _id into the existing effect and cause all kinds of issues.
+            delete change._id;
+
+            mergeObject(effect, expandObject(change), { inplace: true });
             effect.render(false);
         }
 
@@ -759,14 +797,18 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         this.render(false);
     }
 
-    async updateNestedItems(changes: Item.UpdateData | Item.UpdateData[]) {
+    async updateNestedItems(changes: OneOrMany<Item.UpdateInput>) {
         const items = foundry.utils.duplicate(this.getNestedItems()) as Item.Source[];
         const changesArray = Array.isArray(changes) ? changes : [changes];
 
         for (const change of changesArray) {
             const existing = items.find(i => i._id === change._id);
             if (!existing) continue;
+
+            // We need to delete the _id from the change data, otherwise mergeObject
+            // will merge the _id into the existing effect and cause all kinds of issues.
             delete change._id;
+
             mergeObject(existing, expandObject(change));
         }
 
@@ -777,27 +819,15 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     /**
-     * This method hooks into the Foundry Item.update approach and is called using this<Item>.actor.updateEmbeddedEntity.
-     *
-     * @param embeddedName
-     * @param data
-     * @param options
-     */
-    async updateEmbeddedEntity(embeddedName, data, options?): Promise<any> {
-        await this.updateNestedItems(data);
-        return this;
-    }
-
-    /**
      * Remove an owned item
      * @param deleted
      * @returns {Promise<boolean>}
      */
-    async deleteOwnedItem(deleted) {
+    async deleteOwnedItem(deleted: string): Promise<boolean> {
         const items = foundry.utils.duplicate(this.getNestedItems()) as Item.Source[];
-        if (!items) return;
+        if (!items) return false;
 
-        const idx = items.findIndex((i) => i._id === deleted || Number(i._id) === deleted);
+        const idx = items.findIndex((i) => i._id === deleted);
         if (idx === -1) throw new Error(`Shadowrun5e | Couldn't find owned item ${deleted}`);
         items.splice(idx, 1);
         // we need to clear the items when one is deleted or it won't actually be deleted
@@ -1053,7 +1083,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
                 for (const [key, att] of Object.entries(atts)) {
                     // only apply the atts if the value is over zero
                     // this was causing the previous values to always be overwritten
-                    if (att.value <= 0) continue;
+                    if (att.value <= 0 || !att.att) continue;
                     matrix[att.att].value = att.value;
                     matrix[att.att].device_att = key;
                 }
@@ -1090,17 +1120,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     getRating(this: SR5Item): number {
         return this.system.technology?.rating || 0;
-    }
-
-    getArmorElements(this: SR5Item<'armor'>): Record<string, number> {
-        const { fire, electricity, cold, acid, radiation } = this.system.armor;
-        return {
-            fire: fire ?? 0,
-            electricity: electricity ?? 0,
-            cold: cold ?? 0,
-            acid: acid ?? 0,
-            radiation: radiation ?? 0,
-        };
     }
 
     /**
@@ -1222,7 +1241,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *
      * @param data changes made to the SR5ItemData
      */
-    async updateNestedItem(data): Promise<this> {
+    async updateNestedItem(data: Item.UpdateInput): Promise<this> {
         if (!this.parent || this.parent instanceof SR5Actor) return this;
         // Inform the parent item about changes to one of it's embedded items.
         // TODO: updateOwnedItem needs the id of the update item. hand the item itself over, to the hack within updateOwnedItem for this.
@@ -1239,7 +1258,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return this;
     }
 
-    override async update(data: Item.UpdateData | undefined, options?: Item.Database.UpdateOperation) {
+    override async update(data: Item.UpdateInput, options?: Item.Database.UpdateOperation) {
         // Item.item => Embedded item into another item!
         if (this._isNestedItem)
             return this.updateNestedItem(data);
@@ -1502,7 +1521,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * NOTE: Since getRollData is sync by default, we can't retrieve compendium documents here, resulting in fromUuidSync calls down
      *       the line.
      */
-    override getRollData(options: RollDataOptions = {}): any {
+    override getRollData(options: RollDataOptions = {}) {
         // Create a system data copy to avoid cross-contamination
         const rollData = this.system.toObject(false);
         return ItemRollDataFlow.getRollData(this, rollData, options);
@@ -1529,7 +1548,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *
      * This is preferred to altering data on the fly in the prepareData methods flow.
      */
-    override async _preUpdate(changed: Item.UpdateData, options: Item.Database.PreUpdateOptions, user: User) {
+    override async _preUpdate(...args: Parameters<Item['_preUpdate']>) {
+        const [changed, options] = args;
         // Some Foundry core updates will no diff and just replace everything. This doesn't match with the
         // differential approach of action test injection. (NOTE: Changing ownership of a document)
         if (options.diff && options.recursive) {
@@ -1539,7 +1559,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             UpdateSkillFlow.injectSkillCategoryDefaults(changed, this);
         }
 
-        return super._preUpdate(changed, options, user);
+        return super._preUpdate(...args);
     }
 
     /**
