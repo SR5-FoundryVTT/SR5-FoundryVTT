@@ -42,6 +42,15 @@ export class ImportHelper {
             .replace(/^-+|-+$/g, '');        // trim hyphens
     }
 
+    /**
+     * Convert Chummer GUID text to stable Foundry `_id`.
+     * Steps: strip `-`, parse hex as BigInt, encode base62, normalize to 16 chars.
+     * Used by `DataImporter.ParseItems` for all imports, including generated
+     * skill-group GUIDs from `SkillImporter.generateGroupGuid`.
+     * Deterministic input GUID means deterministic Foundry `_id`.
+     * If upstream GUID generation inputs change (e.g. renamed skill group), `_id`
+     * also changes and import matching will treat it as a different document.
+     */
     public static guidToId(guid: string): string {
         const cleanGuid = guid.replace(/-/g, '');
         const big = BigInt('0x' + cleanGuid);
