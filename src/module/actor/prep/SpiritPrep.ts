@@ -46,7 +46,6 @@ export class SpiritPrep {
 
     static prepareSpiritValues(system: Actor.SystemOfType<'spirit'>) {
         const overrides = this.getSpiritStatModifiers(system.spiritType);
-        // if (!system.skills?.active) return;
 
         if (overrides) {
             const { attributes, skills, initiative, modifiers } = system;
