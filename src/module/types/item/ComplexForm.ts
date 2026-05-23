@@ -6,7 +6,11 @@ const { SchemaField, NumberField, StringField, ArrayField } = foundry.data.field
 const ComplexFormData = () => ({
     ...BaseItemData(),
     action: new SchemaField({
-        ...ActionRollData({test: 'ComplexFormTest', opposedTest: 'OpposedTest', followedTest: 'FadeTest'}),
+        ...ActionRollData({
+            test: 'ComplexFormTest',
+            followedTest: 'FadeTest',
+            opposedTest: 'OpposedTest',
+        }),
         categories: new ArrayField(new StringField({ required: true }), { initial: ['complex_form'] }),
     }),
 

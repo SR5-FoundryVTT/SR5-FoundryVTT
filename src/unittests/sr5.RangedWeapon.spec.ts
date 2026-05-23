@@ -30,7 +30,7 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
     describe('Handle recoil, recoil compensation and recoil modifier', () => {
         it('Item recoil compensation', async () => {
             const weapon = await factory.createItem({type: 'weapon', system: {category: 'range' }});
-            const modification = await factory.createItem({type: 'modification', system: {type: 'weapon', rc: 2, technology: {equipped: true}}});
+            const modification = await factory.createItem({type: 'modification', system: {type: 'weapon', mod_weapon: {rc: 2}, technology: {equipped: true}}});
             await weapon.createNestedItem(modification.toObject());
 
             assert.strictEqual(weapon.system.range.rc.value, 2);

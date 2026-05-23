@@ -1,7 +1,7 @@
 {
   "name": "Industrial Mechanic",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/skills/technical-industrial_mechanic.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/technical-industrial_mechanic.webp",
   "system": {
     "description": {
       "value": "",
@@ -21,7 +21,7 @@
       "language": {
         "isNative": false
       },
-      "knowledgeType": null
+      "knowledgeType": "academic"
     },
     "group": {
       "skills": [],

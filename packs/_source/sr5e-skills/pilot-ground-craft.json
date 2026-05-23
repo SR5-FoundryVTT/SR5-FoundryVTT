@@ -1,7 +1,7 @@
 {
   "name": "Pilot Ground Craft",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/skills/vehicle-pilot_ground_craft.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/vehicle-pilot_ground_craft.webp",
   "system": {
     "description": {
       "value": "",
@@ -21,7 +21,7 @@
       "language": {
         "isNative": false
       },
-      "knowledgeType": null
+      "knowledgeType": "academic"
     },
     "group": {
       "skills": [],

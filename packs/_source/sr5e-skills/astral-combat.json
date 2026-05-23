@@ -1,7 +1,7 @@
 {
   "name": "Astral Combat",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/skills/magical-astral_combat.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/magical-astral_combat.webp",
   "system": {
     "description": {
       "value": "",
@@ -21,7 +21,7 @@
       "language": {
         "isNative": false
       },
-      "knowledgeType": null
+      "knowledgeType": "academic"
     },
     "group": {
       "skills": [],

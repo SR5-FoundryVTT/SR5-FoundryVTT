@@ -1,7 +1,7 @@
 {
   "name": "Pilot Watercraft",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/skills/vehicle-pilot_watercraft.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/vehicle-pilot_watercraft.webp",
   "system": {
     "description": {
       "value": "",
@@ -21,7 +21,7 @@
       "language": {
         "isNative": false
       },
-      "knowledgeType": null
+      "knowledgeType": "academic"
     },
     "group": {
       "skills": [],

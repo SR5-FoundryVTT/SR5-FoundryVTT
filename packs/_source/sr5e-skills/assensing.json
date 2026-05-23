@@ -1,7 +1,7 @@
 {
   "name": "Assensing",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/skills/magical-assensing.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/magical-assensing.webp",
   "system": {
     "description": {
       "value": "",
@@ -21,7 +21,7 @@
       "language": {
         "isNative": false
       },
-      "knowledgeType": null
+      "knowledgeType": "academic"
     },
     "group": {
       "skills": [],

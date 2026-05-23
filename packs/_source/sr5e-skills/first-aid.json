@@ -1,7 +1,7 @@
 {
   "name": "First Aid",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/skills/technical-first_aid.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/technical-first_aid.webp",
   "system": {
     "description": {
       "value": "",
@@ -21,7 +21,7 @@
       "language": {
         "isNative": false
       },
-      "knowledgeType": null
+      "knowledgeType": "academic"
     },
     "group": {
       "skills": [],

@@ -1,7 +1,7 @@
 {
   "name": "Automatics",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/skills/combat-automatics.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/combat-automatics.webp",
   "system": {
     "description": {
       "value": "",
@@ -21,7 +21,7 @@
       "language": {
         "isNative": false
       },
-      "knowledgeType": null
+      "knowledgeType": "academic"
     },
     "group": {
       "skills": [],

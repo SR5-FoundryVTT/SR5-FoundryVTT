@@ -6,6 +6,7 @@ import { SYSTEM_NAME, FLAGS } from "@/module/constants";
 import { ActionImporter } from "../importer/ActionImporter";
 import { AdeptPowerImporter } from "../importer/AdeptPowerImporter";
 import { ArmorImporter } from "../importer/ArmorImporter";
+import { ArmorModImporter } from "../importer/ArmorModImporter";
 import { ComplexFormImporter } from "../importer/ComplexFormImporter";
 import { CritterImporter } from "../importer/CritterImporter";
 import { CritterPowerImporter } from "../importer/CritterPowerImporter";
@@ -135,6 +136,7 @@ export class BulkImporter extends BaseClass {
         new CritterImporter(),
         new EchoesImporter(),
         new AdeptPowerImporter(),
+        new ArmorModImporter(),
         new ArmorImporter(),
         new ActionImporter(),
         new SkillImporter(),

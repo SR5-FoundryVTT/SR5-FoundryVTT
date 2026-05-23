@@ -1,7 +1,7 @@
 {
   "name": "Enchanting",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/groups/enchanting.svg",
+  "img": "systems/shadowrun5e/dist/icons/groups/enchanting.webp",
   "system": {
     "description": {
       "value": "",
@@ -21,7 +21,7 @@
       "language": {
         "isNative": false
       },
-      "knowledgeType": null
+      "knowledgeType": "academic"
     },
     "group": {
       "skills": [

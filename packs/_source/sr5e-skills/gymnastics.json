@@ -1,7 +1,7 @@
 {
   "name": "Gymnastics",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/skills/physical-gymnastics.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/physical-gymnastics.webp",
   "system": {
     "description": {
       "value": "",
@@ -21,7 +21,7 @@
       "language": {
         "isNative": false
       },
-      "knowledgeType": null
+      "knowledgeType": "academic"
     },
     "group": {
       "skills": [],

@@ -1,7 +1,7 @@
 {
   "name": "Engineering",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/groups/engineering.svg",
+  "img": "systems/shadowrun5e/dist/icons/groups/engineering.webp",
   "system": {
     "description": {
       "value": "",
@@ -21,7 +21,7 @@
       "language": {
         "isNative": false
       },
-      "knowledgeType": null
+      "knowledgeType": "academic"
     },
     "group": {
       "skills": [

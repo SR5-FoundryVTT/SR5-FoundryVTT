@@ -1,7 +1,7 @@
 {
   "name": "Performance",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/skills/social-performance.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/social-performance.webp",
   "system": {
     "description": {
       "value": "",
@@ -41,7 +41,7 @@
       "language": {
         "isNative": false
       },
-      "knowledgeType": null
+      "knowledgeType": "academic"
     },
     "group": {
       "skills": [],

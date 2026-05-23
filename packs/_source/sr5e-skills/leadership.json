@@ -1,7 +1,7 @@
 {
   "name": "Leadership",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/skills/social-leadership.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/social-leadership.webp",
   "system": {
     "description": {
       "value": "",
@@ -41,7 +41,7 @@
       "language": {
         "isNative": false
       },
-      "knowledgeType": null
+      "knowledgeType": "academic"
     },
     "group": {
       "skills": [],

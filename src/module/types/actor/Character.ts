@@ -51,7 +51,7 @@ const CharacterData = () => ({
     limits: new SchemaField(CharacterLimits()),
 
     // === Combat ===
-    armor: new ModifiableField(ActorArmorData()),
+    armor: new SchemaField(ActorArmorData()),
     initiative: new SchemaField(Initiative('meatspace', 'astral', 'matrix')),
     values: new SchemaField(CharacterValues()),
     wounds: new ModifiableField(ModifiableValueSchema()),

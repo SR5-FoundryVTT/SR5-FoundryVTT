@@ -1,7 +1,7 @@
 {
   "name": "Alchemy",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/skills/magical-alchemy.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/magical-alchemy.webp",
   "system": {
     "description": {
       "value": "",
@@ -21,7 +21,7 @@
       "language": {
         "isNative": false
       },
-      "knowledgeType": null
+      "knowledgeType": "academic"
     },
     "group": {
       "skills": [],

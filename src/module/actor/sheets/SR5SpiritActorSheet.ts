@@ -25,6 +25,24 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet<SpiritActorSheetData>
         ];
     }
 
+    /**
+     * Spirit actors will handle these item types specifically.
+     *
+     * @returns An array of item types from the template.json Item section.
+     */
+    override getInventoryItemTypes(): Item.ConfiguredSubType[] {
+        const itemTypes = super.getInventoryItemTypes();
+
+        return [
+            ...itemTypes,
+            'weapon',
+            'ammo',
+            'armor',
+            'equipment',
+            'modification',
+        ];
+    }
+
     static override DEFAULT_OPTIONS = {
         actions: {
             pickSummoner: SR5SpiritActorSheet.#pickSummoner,
@@ -38,6 +56,7 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet<SpiritActorSheetData>
             tabs: [
                 { id: 'actions', label: 'SR5.Tabs.Actor.Actions', cssClass: '' },
                 { id: 'skills', label: 'SR5.Tabs.Actor.Spirit', cssClass: '' },
+                { id: 'inventory', label: 'SR5.Tabs.Actor.Inventory', cssClass: '' },
                 { id: 'critterPowers', label: 'SR5.Tabs.Actor.CritterPowers', cssClass: '' },
                 { id: 'magic', label: 'SR5.Tabs.Actor.Magic', cssClass: '' },
                 { id: 'bio', label: 'SR5.Tabs.Actor.Bio', cssClass: '' },
@@ -65,6 +84,10 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet<SpiritActorSheetData>
         },
         critterPowers: {
             template: SheetFlow.templateBase('actor/tabs/critter-powers'),
+            scrollable: ['.scrollable']
+        },
+        inventory: {
+            template: SheetFlow.templateBase('actor/tabs/inventory'),
             scrollable: ['.scrollable']
         },
         bio: {

@@ -114,8 +114,8 @@ export const ActionPrep = {
             const modification = mod.asType('modification');
             if (!modification) continue;
 
-            limitParts.setUnique(mod.name, modification.system.accuracy);
-            dpParts.setUnique(mod.name, modification.system.dice_pool);
+            limitParts.setUnique(mod.name, modification.system.mod_weapon.accuracy);
+            dpParts.setUnique(mod.name, modification.system.mod_weapon.dice_pool);
         }
 
         action.dice_pool_mod = dpParts.changes;

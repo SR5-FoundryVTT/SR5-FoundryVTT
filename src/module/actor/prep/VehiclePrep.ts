@@ -12,6 +12,7 @@ import { SR5Item } from 'src/module/item/SR5Item';
 import { MatrixRules } from '@/module/rules/MatrixRules';
 import { ModifiableFieldPrep } from './functions/ModifiableFieldPrep';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
+import { ItemPrep } from './functions/ItemPrep';
 
 export class VehiclePrep {
     static prepareBaseData(system: Actor.SystemOfType<'vehicle'>) {
@@ -42,7 +43,7 @@ export class VehiclePrep {
         InitiativePrep.prepareMatrixInit(system);
         InitiativePrep.prepareCurrentInitiative(system);
 
-        VehiclePrep.prepareArmor(system);
+        ItemPrep.prepareArmor(system, items);
         CharacterPrep.prepareRecoil(system);
         VehiclePrep.prepareRecoilCompensation(system);
     }
@@ -190,13 +191,6 @@ export class VehiclePrep {
         ModifiableValue.calcTotal(initiative.meatspace.dice);
     }
 
-    static prepareArmor(system: Actor.SystemOfType<'vehicle'>) {
-        const { armor, modifiers } = system;
-
-        ModifiableValue.addUnique(armor, 'SR5.Bonus', modifiers.armor);
-
-        ModifiableValue.calcTotal(armor);
-    }
     /**
      * Prepare the base actor recoil compensation without item influence.
      */

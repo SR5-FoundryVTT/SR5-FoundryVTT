@@ -1,7 +1,7 @@
 {
   "name": "Diving",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/skills/physical-diving.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/physical-diving.webp",
   "system": {
     "description": {
       "value": "",
@@ -21,7 +21,7 @@
       "language": {
         "isNative": false
       },
-      "knowledgeType": null
+      "knowledgeType": "academic"
     },
     "group": {
       "skills": [],

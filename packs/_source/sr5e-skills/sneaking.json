@@ -1,7 +1,7 @@
 {
   "name": "Sneaking",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/skills/physical-sneaking.svg",
+  "img": "systems/shadowrun5e/dist/icons/skills/physical-sneaking.webp",
   "system": {
     "description": {
       "value": "",
@@ -21,7 +21,7 @@
       "language": {
         "isNative": false
       },
-      "knowledgeType": null
+      "knowledgeType": "academic"
     },
     "group": {
       "skills": [],

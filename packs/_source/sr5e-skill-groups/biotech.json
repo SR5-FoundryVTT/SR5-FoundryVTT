@@ -1,7 +1,7 @@
 {
   "name": "Biotech",
   "type": "skill",
-  "img": "systems/shadowrun5e/dist/icons/groups/biotech.svg",
+  "img": "systems/shadowrun5e/dist/icons/groups/biotech.webp",
   "system": {
     "description": {
       "value": "",
@@ -21,7 +21,7 @@
       "language": {
         "isNative": false
       },
-      "knowledgeType": null
+      "knowledgeType": "academic"
     },
     "group": {
       "skills": [
