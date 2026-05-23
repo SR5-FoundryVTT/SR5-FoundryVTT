@@ -18,126 +18,6 @@ export const PackItemFlow = {
     _packSkillGroupsCache: new Map<string, Promise<SR5Item<'skill'>[]>>(),
     _packSkillSetsCache: new Map<string, Promise<SR5Item<'skill'>[]>>(),
 
-    async getCachedPackDocuments<T>(
-        cache: Map<string, Promise<T>>,
-        key: string,
-        loader: () => Promise<T>
-    ): Promise<T> {
-        const cached = cache.get(key);
-        if (cached) return cached;
-
-        const loading = loader().catch(error => { cache.delete(key); throw error; });
-        cache.set(key, loading);
-        return loading;
-    },
-
-    getActiveSkillPackNames() {
-        return {
-            skills: this.getSkillsPackName(),
-            skillgroups: this.getSkillGroupsPackName(),
-            skillsets: this.getSkillSetsPackName(),
-        } as const;
-    },
-
-    invalidateSkillCacheByTypeAndPack(type: 'skills' | 'skillgroups' | 'skillsets', packName: string) {
-        if (!packName) return;
-        const cacheKey = `${type}:${packName}`;
-
-        if (type === 'skills') this._packSkillsCache.delete(cacheKey);
-        else if (type === 'skillgroups') this._packSkillGroupsCache.delete(cacheKey);
-        else this._packSkillSetsCache.delete(cacheKey);
-    },
-
-    invalidateSkillCachesForPack(packName: string) {
-        if (!packName) return;
-        this.invalidateSkillCacheByTypeAndPack('skills', packName);
-        this.invalidateSkillCacheByTypeAndPack('skillgroups', packName);
-        this.invalidateSkillCacheByTypeAndPack('skillsets', packName);
-    },
-
-    invalidateAllSkillCaches() {
-        this._packSkillsCache.clear();
-        this._packSkillGroupsCache.clear();
-        this._packSkillSetsCache.clear();
-    },
-
-    async warmSkillCaches() {
-        try {
-            await Promise.all([
-                this.getPackSkills(),
-                this.getPackSkillgroups(),
-                this.getAllPackSkillSets(),
-            ]);
-        } catch (error) {
-            console.warn('Shadowrun 5e | Failed warming skill pack caches. Falling back to lazy loading.', error);
-        }
-    },
-
-    refreshSkillCachesForConfiguredPacks() {
-        this.invalidateAllSkillCaches();
-        void this.warmSkillCaches();
-    },
-
-    handleCompendiumSkillItemMutation(item: SR5Item) {
-        if (!item.isType('skill')) return;
-        if (!item.pack) return;
-
-        const packName = item.pack.split('.').pop() ?? '';
-        if (!packName) return;
-
-        let affected = false;
-        if (this.getSkillsPackName() === packName) {
-            this.invalidateSkillCacheByTypeAndPack('skills', packName);
-            affected = true;
-        }
-        if (this.getSkillGroupsPackName() === packName) {
-            this.invalidateSkillCacheByTypeAndPack('skillgroups', packName);
-            affected = true;
-        }
-        if (this.getSkillSetsPackName() === packName) {
-            this.invalidateSkillCacheByTypeAndPack('skillsets', packName);
-            affected = true;
-        }
-
-        if (affected) void this.warmSkillCaches();
-    },
-
-    getItemPack(packName: string): CompendiumCollection<'Item'> | undefined {
-        return game.packs.find(
-            pack => pack.metadata.system === SYSTEM_NAME
-            && pack.metadata.name === packName
-            && pack.documentName === 'Item'
-        ) as CompendiumCollection<'Item'> | undefined;
-    },
-
-    /**
-     * A pack document retrieval helper for typed items.
-     * @param pack The pack to retrieve documents from.
-     * @param entryIds The list of ids to retrieve
-     * @returns A list of documents of the given type.
-     */
-    async getPackDocuments<T extends Item.ConfiguredSubType>(
-        pack: CompendiumCollection<'Item'>,
-        entryIds: string[]
-    ): Promise<SR5Item<T>[]> {
-        if (entryIds.length === 0) return [];
-
-        return pack.getDocuments({ _id__in: entryIds }) as unknown as SR5Item<T>[];
-    },
-
-    /**
-     * A pack document retrieval helper for a single typed item.
-     * @param pack The pack to retrieve documents from.
-     * @param entryId The id of the document to retrieve
-     * @returns The document of the given type, or undefined if not found.
-     */
-    async getSinglePackDocument<T extends Item.ConfiguredSubType>(
-        pack: CompendiumCollection<'Item'>,
-        entryId: string
-    ) {
-        return await pack.getDocument(entryId) as unknown as SR5Item<T> | undefined;
-    },
-
     /**
      * Return the matrix action pack name to use, when the matrix actions pack is referenced.
      */
@@ -187,6 +67,145 @@ export const PackItemFlow = {
     },
 
     /**
+     * Resolve a configured SR5 item compendium pack by metadata name.
+     */
+    getItemPack(packName: string): CompendiumCollection<'Item'> | undefined {
+        return game.packs.find(
+            pack => pack.metadata.system === SYSTEM_NAME
+            && pack.metadata.name === packName
+            && pack.documentName === 'Item'
+        ) as CompendiumCollection<'Item'> | undefined;
+    },
+
+    /**
+     * A pack document retrieval helper for typed items.
+     * @param pack The pack to retrieve documents from.
+     * @param entryIds The list of ids to retrieve
+     * @returns A list of documents of the given type.
+     */
+    async getPackDocuments<T extends Item.ConfiguredSubType>(
+        pack: CompendiumCollection<'Item'>,
+        entryIds: string[]
+    ): Promise<SR5Item<T>[]> {
+        if (entryIds.length === 0) return [];
+
+        return pack.getDocuments({ _id__in: entryIds }) as unknown as SR5Item<T>[];
+    },
+
+    /**
+     * A pack document retrieval helper for a single typed item.
+     * @param pack The pack to retrieve documents from.
+     * @param entryId The id of the document to retrieve
+     * @returns The document of the given type, or undefined if not found.
+     */
+    async getSinglePackDocument<T extends Item.ConfiguredSubType>(
+        pack: CompendiumCollection<'Item'>,
+        entryId: string
+    ) {
+        return await pack.getDocument(entryId) as unknown as SR5Item<T> | undefined;
+    },
+
+    /**
+     * Pack document names don't necessarily match what is displayed in the UI.
+     *
+     * TODO: Why even do this? Does the ui actually not match to the pack document name?
+     * @param documentName A string to be transformed. Malformed values will result in empty strings.
+     * @returns
+     */
+    packDocumentName(documentName?: string) {
+        // Fail gracefully.
+        documentName ??= '';
+        return documentName.toLowerCase().replace(new RegExp(' ', 'g'), '_')
+    },
+
+    /**
+     * Memoize pack-document loading by key, including in-flight promises.
+     */
+    async getCachedPackDocuments<T>(
+        cache: Map<string, Promise<T>>,
+        key: string,
+        loader: () => Promise<T>
+    ): Promise<T> {
+        const cached = cache.get(key);
+        if (cached) return cached;
+
+        const loading = loader().catch(error => { cache.delete(key); throw error; });
+        cache.set(key, loading);
+        return loading;
+    },
+
+    /**
+     * Remove a single skill cache bucket by logical type and configured pack name.
+     */
+    invalidateSkillCacheByTypeAndPack(type: 'skills' | 'skillgroups' | 'skillsets', packName: string) {
+        if (!packName) return;
+        const cacheKey = `${type}:${packName}`;
+
+        if (type === 'skills') this._packSkillsCache.delete(cacheKey);
+        else if (type === 'skillgroups') this._packSkillGroupsCache.delete(cacheKey);
+        else this._packSkillSetsCache.delete(cacheKey);
+    },
+
+    /**
+     * Remove all skill-related cache buckets.
+     */
+    invalidateAllSkillCaches() {
+        this._packSkillsCache.clear();
+        this._packSkillGroupsCache.clear();
+        this._packSkillSetsCache.clear();
+    },
+
+    /**
+     * Prime configured skill caches once to reduce first-use latency.
+     */
+    async warmSkillCaches() {
+        try {
+            await Promise.all([
+                this.getPackSkills(),
+                this.getPackSkillgroups(),
+                this.getAllPackSkillSets(),
+            ]);
+        } catch (error) {
+            console.warn('Shadowrun 5e | Failed warming skill pack caches. Falling back to lazy loading.', error);
+        }
+    },
+
+    /**
+     * Reset and warm all skill caches after settings changes.
+     */
+    refreshSkillCachesForConfiguredPacks() {
+        this.invalidateAllSkillCaches();
+        void this.warmSkillCaches();
+    },
+
+    /**
+     * React to compendium skill mutations by invalidating matching skill caches.
+     */
+    handleCompendiumSkillItemMutation(item: SR5Item) {
+        if (!item.isType('skill')) return;
+        if (!item.pack) return;
+
+        const packName = item.pack.split('.').pop() ?? '';
+        if (!packName) return;
+
+        let affected = false;
+        if (this.getSkillsPackName() === packName) {
+            this.invalidateSkillCacheByTypeAndPack('skills', packName);
+            affected = true;
+        }
+        if (this.getSkillGroupsPackName() === packName) {
+            this.invalidateSkillCacheByTypeAndPack('skillgroups', packName);
+            affected = true;
+        }
+        if (this.getSkillSetsPackName() === packName) {
+            this.invalidateSkillCacheByTypeAndPack('skillsets', packName);
+            affected = true;
+        }
+
+        if (affected) void this.warmSkillCaches();
+    },
+
+    /**
      * Retrieve all actions from a given pack.
      *
      * Other item types in that pack will be ignored.
@@ -206,20 +225,6 @@ export const PackItemFlow = {
 
         console.debug(`Shadowrun5e | Fetched all actions from pack ${packName}`, documents);
         return documents;
-    },
-
-    /**
-     * Pack document names don't necessarily match what is displayed in the UI.
-     *
-     * TODO: Why even do this? Does the ui actually not match to the pack document name?
-     * @param documentName A string to be transformed. Malformed values will result in empty strings.
-     * @returns
-     */
-    packDocumentName(documentName?: string) {
-        // Fail gracefully.
-        documentName ??= '';
-        // eslint-disable-next-line
-        return documentName.toLowerCase().replace(new RegExp(' ', 'g'), '_')
     },
 
     /**

@@ -474,13 +474,15 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(calls, 2);
         });
 
-        it('invalidates all skill cache buckets for a specific pack', async () => {
+        it('invalidates an individual skill cache bucket by type and pack', async () => {
             const packName = 'sr5e-skills';
             PackItemFlow._packSkillsCache.set(`skills:${packName}`, Promise.resolve([]));
             PackItemFlow._packSkillGroupsCache.set(`skillgroups:${packName}`, Promise.resolve([]));
             PackItemFlow._packSkillSetsCache.set(`skillsets:${packName}`, Promise.resolve([]));
 
-            PackItemFlow.invalidateSkillCachesForPack(packName);
+            PackItemFlow.invalidateSkillCacheByTypeAndPack('skills', packName);
+            PackItemFlow.invalidateSkillCacheByTypeAndPack('skillgroups', packName);
+            PackItemFlow.invalidateSkillCacheByTypeAndPack('skillsets', packName);
 
             assert.isFalse(PackItemFlow._packSkillsCache.has(`skills:${packName}`));
             assert.isFalse(PackItemFlow._packSkillGroupsCache.has(`skillgroups:${packName}`));
@@ -500,18 +502,18 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
         });
 
         it('invalidates and rewarms cache when a relevant compendium skill item changes', async () => {
-            const originalGetActiveSkillPackNames = PackItemFlow.getActiveSkillPackNames;
+            const originalGetSkillsPackName = PackItemFlow.getSkillsPackName;
+            const originalGetSkillGroupsPackName = PackItemFlow.getSkillGroupsPackName;
+            const originalGetSkillSetsPackName = PackItemFlow.getSkillSetsPackName;
             const originalWarmSkillCaches = PackItemFlow.warmSkillCaches;
 
             const skillPackName = 'sr5e-skills';
             PackItemFlow._packSkillsCache.set(`skills:${skillPackName}`, Promise.resolve([]));
 
             let warmCalls = 0;
-            PackItemFlow.getActiveSkillPackNames = () => ({
-                skills: skillPackName as Shadowrun.PackName,
-                skillgroups: 'sr5e-skill-groups' as Shadowrun.PackName,
-                skillsets: 'sr5e-skill-sets' as Shadowrun.PackName,
-            });
+            PackItemFlow.getSkillsPackName = () => skillPackName as Shadowrun.PackName;
+            PackItemFlow.getSkillGroupsPackName = () => 'sr5e-skill-groups' as Shadowrun.PackName;
+            PackItemFlow.getSkillSetsPackName = () => 'sr5e-skill-sets' as Shadowrun.PackName;
             PackItemFlow.warmSkillCaches = async () => {
                 warmCalls += 1;
             };
@@ -528,7 +530,9 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 assert.isFalse(PackItemFlow._packSkillsCache.has(`skills:${skillPackName}`));
                 assert.strictEqual(warmCalls, 1);
             } finally {
-                PackItemFlow.getActiveSkillPackNames = originalGetActiveSkillPackNames;
+                PackItemFlow.getSkillsPackName = originalGetSkillsPackName;
+                PackItemFlow.getSkillGroupsPackName = originalGetSkillGroupsPackName;
+                PackItemFlow.getSkillSetsPackName = originalGetSkillSetsPackName;
                 PackItemFlow.warmSkillCaches = originalWarmSkillCaches;
             }
         });
