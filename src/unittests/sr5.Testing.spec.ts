@@ -132,25 +132,12 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                         skill: {
                             attribute: 'agility',
                             rating: 4
-                }
-            });
-
-            await actor.createEmbeddedDocuments('Item', [
-                {
-                    type: 'skill',
-                    name: 'Archery',
-                    system: {
-                        type: 'skill',
-                        skill: {
-                            attribute: 'agility',
-                            rating: 4
                         }
                     }
                 }
             ]);
             
             delete window.doNotPopulateDefaultSkills;
-
 
             const action = DataDefaults.createData('action_roll', {
                 test: 'SuccessTest',
@@ -174,7 +161,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             if (!traces) assert.fail('Expected code term traces to be present');
             if (!traces) return;
 
-            assert.isAtLeast(traces.length, 3);
             assert.isAtLeast(traces.length, 3);
 
             assert.isTrue(traces.every(trace => {

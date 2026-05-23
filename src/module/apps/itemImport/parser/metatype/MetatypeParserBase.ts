@@ -10,11 +10,6 @@ type MetatypeItemData = {
     $?: { select?: string; rating?: string; spec?: string };
 };
 
-type MetatypeItemData = {
-    _TEXT: string;
-    $?: { select?: string; rating?: string; spec?: string };
-};
-
 export abstract class MetatypeParserBase<TResult extends ('character' | 'spirit' | 'sprite')> extends Parser<TResult> {
     /**
      * Returns metatype bonus data stripped of initiative keys to avoid duplicate initiative application.

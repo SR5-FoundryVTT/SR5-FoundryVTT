@@ -77,7 +77,6 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
         const allQualities = await IH.findItems('Quality', qualityList);
         const allPowers = await IH.findItems('Critter_Power', powerList);
 
-
         const spiritName = name._TEXT;
         const naturalWeapons = this.getNaturalWeapons(
             this.mergeLists(powers?.power, optionalPowers), { actorName: spiritName }
