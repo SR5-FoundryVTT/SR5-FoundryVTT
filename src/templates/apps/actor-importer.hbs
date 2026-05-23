@@ -28,7 +28,7 @@
 • Select all text (CTRL+A) and copy (CTRL+C).
 • Paste the copied text into this box.
 • Or drag-and-drop the exported .json file into this area."
-        ></textarea>
+        >{{pastedJsonText}}</textarea>
         <button type="button" data-action="selectJsonFile" class="select-json-button" {{#if isImporting}}disabled{{/if}}>Select json</button>
       </div>
     {{/if}}

@@ -4,7 +4,6 @@ import { ImportOptionsType } from "../characterImporter/CharacterImporter";
 import { MugshotImport } from "../MugshotImport";
 import { ActorSkillImport } from "../ActorSkillImport";
 import { ActorImportUtil, type BlankImportedActor } from "../ActorImportUtil";
-import { InitiativeType } from "src/module/types/template/Initiative";
 import {
     PRESET_INITIATIVE_DEFAULTS,
     PRESET_SPIRIT_PROFILES,

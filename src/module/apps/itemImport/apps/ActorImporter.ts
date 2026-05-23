@@ -37,14 +37,16 @@ interface ImporterContext extends foundry.applications.api.ApplicationV2.RenderC
     selectedFileSize: string | null
     isImporting: boolean
     importSelections: ImportSelections
+    pastedJsonText: string
 };
 
 const BaseClass = HandlebarsApplicationMixin(ApplicationV2<ImporterContext>);
 type BaseClassType = InstanceType<typeof BaseClass>;
 
 export class ActorImporter extends BaseClass {
-    private selectedJsonFile: File | null = null;
+    private pastedJsonText = '';
     private isImporting = false;
+    private selectedJsonFile: File | null = null;
     private selectedFolderId: string | null = null;
     private importSelections: ImportSelections = { ...DEFAULT_IMPORT_SELECTIONS };
 
@@ -124,9 +126,10 @@ export class ActorImporter extends BaseClass {
 
         return {
             ...baseContext,
-            folders: this.prepareFolderContext(),
-            isImporting: this.isImporting,
             canUploadFiles,
+            isImporting: this.isImporting,
+            pastedJsonText: this.pastedJsonText,
+            folders: this.prepareFolderContext(),
             hasSelectedFile: this.selectedJsonFile !== null,
             selectedFileName: this.selectedJsonFile?.name ?? null,
             selectedFileSize: this.selectedJsonFile ? this.formatFileSize(this.selectedJsonFile.size) : null,
@@ -171,8 +174,6 @@ export class ActorImporter extends BaseClass {
         if (this.isImporting) return;
 
         this.syncFormStateFromDom();
-        this.isImporting = true;
-        await this.render();
 
         let jsonText = "";
         if (this.selectedJsonFile) {
@@ -197,23 +198,33 @@ export class ActorImporter extends BaseClass {
             }
         }
 
-        if (!jsonText) return;
-
         const actorData = this.parseActorData(jsonText);
         if (!actorData) return;
 
-        const canUploadFiles = Boolean(game.user?.can("FILES_UPLOAD"));
-        const importOptions = {
-            folderId: this.selectedFolderId,
-            ...this.importSelections,
-            mugshots: this.importSelections.mugshots && canUploadFiles,
-        } satisfies ImportOptionsType;
-        console.debug("Parsed Chummer Data:", actorData);
-        console.debug("Import Options:", importOptions);
+        this.isImporting = true;
+        await this.render();
 
-        await ActorImporter.importActorData(actorData, importOptions);
+        try {
+            const canUploadFiles = Boolean(game.user?.can("FILES_UPLOAD"));
+            const importOptions = {
+                folderId: this.selectedFolderId,
+                ...this.importSelections,
+                mugshots: this.importSelections.mugshots && canUploadFiles,
+            } satisfies ImportOptionsType;
+            console.debug("Parsed Chummer Data:", actorData);
+            console.debug("Import Options:", importOptions);
 
-        await this.close();
+            await ActorImporter.importActorData(actorData, importOptions);
+            await this.close();
+        } catch (error) {
+            console.error("Actor import failed:", error);
+            ui.notifications?.error("Actor import failed. See console for details.");
+        } finally {
+            this.isImporting = false;
+            if (this.rendered) {
+                await this.render();
+            }
+        }
     }
 
     private prepareFolderContext(): FolderContext[] {
@@ -223,7 +234,7 @@ export class ActorImporter extends BaseClass {
             .map(folder => ({
                 id: folder.id,
                 name: `${'─'.repeat(folder.ancestors.length) + ' '}${folder.name}`.trim(),
-                sortKey: [...folder.ancestors].map(ancestor => ancestor.name).concat(folder.name)
+                sortKey: [...folder.ancestors].reverse().map(ancestor => ancestor.name).concat(folder.name)
             }))
             .sort((a, b) => {
                 const len = Math.min(a.sortKey.length, b.sortKey.length);
@@ -340,6 +351,7 @@ export class ActorImporter extends BaseClass {
             return;
         }
 
+        this.pastedJsonText = '';
         this.selectedJsonFile = file;
         const textarea = this.element?.querySelector<HTMLTextAreaElement>("#chummer-input");
         if (textarea) {
@@ -362,6 +374,9 @@ export class ActorImporter extends BaseClass {
             if (!input) continue;
             this.importSelections[field] = input.checked;
         }
+
+        const textarea = this.element.querySelector<HTMLTextAreaElement>("#chummer-input");
+        if (textarea) this.pastedJsonText = textarea.value;
     }
 
     private setFileDropActive(dropZone: HTMLElement, active: boolean) {
