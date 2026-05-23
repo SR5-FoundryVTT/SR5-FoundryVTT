@@ -49,10 +49,6 @@ export class VehicleParser {
                 return { base, offRoad: offRoad ?? base };
             }
 
-            function parseNumber(value: string | undefined): number {
-                return Number(value?.toString().replace(/,/g, '')) || 0;
-            }
-
             const handlingValues = parseSeparatedValues(vehicle.handling);
             const speedValues = parseSeparatedValues(vehicle.speed);
             const accelerationValues = parseSeparatedValues(vehicle.accel);
@@ -67,10 +63,10 @@ export class VehicleParser {
             system.vehicle_stats.sensor.base = Number(vehicle.sensor) || 0;
             system.vehicle_stats.seats.base = Number(vehicle.seats) || 0;
 
+            system.cost = Number(vehicle.owncost?.replace(/[^\d.-]/g, "")) || 0;
             system.attributes.body.base = Number(vehicle.body) || 0;
             system.armor.rating.base = Number(vehicle.armor) || 0;
             system.availability = vehicle.avail || '';
-            system.cost = parseNumber(vehicle.owncost) || parseNumber(vehicle.cost);
 
             const consoleLogs = Sanitizer.sanitize(CONFIG.Actor.dataModels.vehicle.schema, system);
             if (consoleLogs) {
