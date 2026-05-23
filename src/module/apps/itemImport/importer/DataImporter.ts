@@ -11,11 +11,6 @@ import CompendiumCollection = foundry.documents.collections.CompendiumCollection
  */
 export abstract class DataImporter {
     /**
-     * Set of icon paths to use for imported items.
-     */
-    public static iconSet: Set<string> | null = null;
-
-    /**
      * Whether to override existing documents in the compendium.
      */
     public static overrideDocuments = true;

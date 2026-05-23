@@ -82,6 +82,7 @@ import registerSR5Tours from './tours/tours';
 import { SuccessTestEffectsFlow } from './effect/flows/SuccessTestEffectsFlow';
 import { JournalEnrichers } from './journal/enricher';
 import { DataStorage } from './data/DataStorage';
+import { IconAssign } from './apps/iconAssigner/IconAssign';
 import { RoutingLibIntegration } from './integrations/routingLibIntegration';
 import { initDiceSoNice } from './rolls/DiceSoNice';
 import { SR5TokenDocument } from './token/SR5TokenDocument';
@@ -519,6 +520,8 @@ ___________________
     }
 
     static async ready() {
+        await IconAssign.refreshIconFiles();
+
         if (game.user?.isGM) {
             await Migrator.BeginMigration();
 
