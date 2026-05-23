@@ -46,6 +46,7 @@ export class SpiritPrep {
 
     static prepareSpiritValues(system: Actor.SystemOfType<'spirit'>) {
         const overrides = this.getSpiritStatModifiers(system.spiritType);
+        // if (!system.skills?.active) return;
 
         if (overrides) {
             const { attributes, skills, initiative, modifiers } = system;
@@ -61,10 +62,10 @@ export class SpiritPrep {
             // set the base of skills to the provided force
             for (const skillKey of overrides.skills) {
                 const skill = skills.active[skillKey];
-                if (!skill) {
-                    console.error(`Shadowrun 5e | Spirit Prep: Skill ${skillKey} not found on spirit actor.`);
-                    continue;
-                }
+                // Foundry calls prepareData multiple times:
+                // - before _preCreate, causing skills to be missing
+                // - after _preCreate, causing this data prep to work correctly
+                if (!skill) continue;                
 
                 // NOTE: We apply force as a modifier instead of base to make the calculation transparent.
                 //       Also, adding force as the skill item rating, would make updating and creating spirits
