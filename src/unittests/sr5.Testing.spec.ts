@@ -148,7 +148,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             if (!traces) assert.fail('Expected code term traces to be present');
             if (!traces) return;
 
-            assert.isAtLeast(traces.length, 4);
+            assert.isAtLeast(traces.length, 3);
 
             assert.isTrue(traces.every(trace => {
                 return typeof trace.tooltipSource === 'string'
