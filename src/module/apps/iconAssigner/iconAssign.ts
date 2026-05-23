@@ -135,13 +135,9 @@ export class IconAssign {
         ];
 
         switch (imgType) {
-            case 'armor':
-                // TODO: Add separation by if it's an accessory
-                break;
-
             case 'weapon': {
                 const weaponSystem = system as Item.SystemOfType<'weapon'>;
-                if (weaponSystem.category) {
+                if (weaponSystem?.category) {
                     // Insert the weapon-specific category paths at index 3
                     fileNamePriority.splice(3, 0,
                         // Weapon Type/Category/name
