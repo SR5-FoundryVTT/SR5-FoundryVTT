@@ -3,6 +3,20 @@
 .sr5v2.item {
     font-size: var(--font-size-14);
 
+    .tab .list-item:not(.list-item-header) {
+        color: var(--sr5v2-text-primary);
+
+        label,
+        a,
+        span,
+        .item-name-link,
+        .list-item-icons,
+        .list-item-icons a,
+        .list-item-icons i {
+            color: inherit;
+        }
+    }
+
     .window-content,
     .editor-content,
     .list-item .item-text,
