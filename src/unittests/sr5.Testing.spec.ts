@@ -109,6 +109,8 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
         });
 
         it('stores code term traces for labeled pool and limit parts', async () => {
+            window.doNotPopulateDefaultSkills = true;
+
             const actor = await factory.createActor({
                 type: 'character',
                 system: {
@@ -118,13 +120,22 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                         strength: { base: 3 },
                         reaction: { base: 3 }
                     },
-                    skills: {
-                        active: {
-                            archery: { base: 4 }
+                }
+            });
+
+            await actor.createEmbeddedDocuments('Item', [
+                {
+                    type: 'skill',
+                    name: 'Archery',
+                    system: {
+                        type: 'skill',
+                        skill: {
+                            attribute: 'agility',
+                            rating: 4
                         }
                     }
                 }
-            });
+            ]);
 
             const action = DataDefaults.createData('action_roll', {
                 test: 'SuccessTest',
@@ -139,6 +150,8 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                     attribute: 'physical',
                 }
             });
+
+            delete window.doNotPopulateDefaultSkills;
 
             const test = await TestCreator.fromAction(action, actor, { showMessage: false, showDialog: false });
             if (!test) assert.fail('Expected success test to be created');
