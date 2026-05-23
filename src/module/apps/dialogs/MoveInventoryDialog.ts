@@ -1,13 +1,14 @@
-import { FormDialog, FormDialogData } from "./FormDialog";
+import { PromptDialogData, PromptDialog } from './PromptDialog';
 import { SR5Actor } from "../../actor/SR5Actor";
 import { SR5Item } from '../../item/SR5Item';
+import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 
 /**
  * Show a list of the SR5Actor inventories to the user and let them choose one.
  *
  * @returns The inventory name selected.
  */
-export class MoveInventoryDialog extends FormDialog {
+export class MoveInventoryDialog extends PromptDialog {
     /**
      * @param actor Use this actor's inventories to select from.
      * @param item The item to be moved between inventories
@@ -15,20 +16,22 @@ export class MoveInventoryDialog extends FormDialog {
      * @param options
      */
     constructor(actor: SR5Actor, item: SR5Item, sourceInventory: string, options?) {
-        const dialogData = MoveInventoryDialog.getDialogData(actor, item, sourceInventory) as unknown as FormDialogData;
+        const dialogData = MoveInventoryDialog.getDialogData(actor, item, sourceInventory);
 
         super(dialogData, options);
     }
 
-    static override get defaultOptions() {
-        const options = super.defaultOptions;
-        options.id = 'move-inventory-application';
-        options.classes = ['sr5', 'form-dialog'];
-        options.height = 'auto';
-        return options;
+    static override DEFAULT_OPTIONS = {
+        ...PromptDialog.DEFAULT_OPTIONS,
+        id: 'move-inventory-application',
+        classes: [SR5_APPV2_CSS_CLASS, 'sr5', 'form-dialog'],
+        position: {
+            width: 420,
+            height: 'auto' as const,
+        },
     }
 
-    static getDialogData(actor: SR5Actor, item: SR5Item, sourceInventory: string) {
+    static getDialogData(actor: SR5Actor, item: SR5Item, sourceInventory: string): PromptDialogData {
         const inventories = MoveInventoryDialog.selectableInventories(actor, item, sourceInventory);
 
         return {

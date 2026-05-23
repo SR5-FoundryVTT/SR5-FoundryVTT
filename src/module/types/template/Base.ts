@@ -1,6 +1,6 @@
 import { SR5 } from '@/module/config';
 
-const { ArrayField, BooleanField, DocumentUUIDField, NumberField, SchemaField, StringField } = foundry.data.fields;
+const { ArrayField, BooleanField, NumberField, SchemaField, StringField } = foundry.data.fields;
 
 export const PhysicalAttribute = new StringField({
     choices: SR5.physicalAttributes,
@@ -33,15 +33,18 @@ export const ValueMaxPair = () => ({
  * The 'key' is implied by the field this is attached to, while 'mode'
  * and 'priority' follow standard CONST.ACTIVE_EFFECT_MODES behavior.
  */
-const ChangeEntry = () => ({
+export const ChangeEntry = () => ({
+    // Default values for the change entry on Active Effects.
     name: new StringField({ required: true }),
-    mode: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
+    mode: new NumberField({ required: true, nullable: false, integer: true, initial: CONST.ACTIVE_EFFECT_MODES.ADD }),
     value: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
-    priority: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
-    effectUuid: new DocumentUUIDField({ required: true, nullable: true }),
+    priority: new NumberField({ required: true, nullable: false, integer: true, initial: 20 /* Standard priority for ADD */ }),
 
-    // For ease of use, we track whether a change is currently enabled or has been invalidated by another change.
+    // Can contain an ActiveEffect UUID, PDFPager source (e.g. "SR5 123"), URL or other linkable source.
+    source: new StringField({ required: true, initial: '' }),
+    // This field indicates whether the change is currently enabled.
     enabled: new BooleanField({ initial: true }),
+    // This field can be used to mark changes that are not applied due to operation order.
     invalidated: new BooleanField({ initial: false }),
 });
 
@@ -65,10 +68,10 @@ export const ModifiableValueLinked = () => ({
 export const ValueField = () => ({
     ...ModifiableValueSchema(),
     label: new StringField({ required: true }),
-    manualMod: new StringField({ required: true }),
 });
 
 export type ValueFieldType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ValueField>>;
+export type ChangeEntryType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ChangeEntry>>;
 export type BaseValuePairType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof BaseValuePair>>;
 export type ModifiableValueType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ModifiableValueSchema>>;
 export type ModifiableValueLinkedType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ModifiableValueLinked>>;

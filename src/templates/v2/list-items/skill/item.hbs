@@ -41,13 +41,13 @@
                     <input type="number" data-system-action="changeSkillRating" class="short skinny" value="{{skill.base}}" data-skill="{{skill.id}}" {{#if skill.group}}disabled{{/if}}>
                 {{/if}}
             {{else}}
-                <label data-skill-modifier-tooltip="{{skill.id}}">
+                <span data-skill-modifier-tooltip="{{skill.id}}">
                     {{#if skill.system.skill.language.isNative}}
                         {{localize "SR5.Skill.abbr.Native"}}
                     {{else}}
                         {{skill.value}}
                     {{/if}}
-                </label>
+                </span>
             {{/if}}
         </div>
         <div class="list-item-icons{{#if @root.isPlayMode}} skinny-icons {{/if}}" data-item-id="{{skill.id}}">

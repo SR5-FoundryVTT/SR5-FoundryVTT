@@ -1,6 +1,7 @@
 import { SR5Actor } from "src/module/actor/SR5Actor";
 import { ActorSchema } from "../ActorSchema";
 import { ImportOptionsType } from "../characterImporter/CharacterImporter";
+import { MugshotImport } from "../MugshotImport";
 import { ActorSkillImport } from "../ActorSkillImport";
 import { ActorImportUtil, type BlankImportedActor } from "../ActorImportUtil";
 import {
@@ -36,6 +37,12 @@ export class SpriteImporter {
     ): Promise<SR5Actor<'sprite'> | null> {
         const sprite = await ActorImportUtil.createBaseActor('sprite', chummerData, importOptions);
         applySeed(sprite);
+
+        if (importOptions.mugshots) {
+            const mugshotPaths = await MugshotImport.importImages(chummerData, sprite.name);
+            if (mugshotPaths.length > 0)
+                sprite.img = mugshotPaths[0];
+        }
 
         await ActorSkillImport.importSkills(sprite, chummerData);
         this.setRuntimeValues(sprite, chummerData);

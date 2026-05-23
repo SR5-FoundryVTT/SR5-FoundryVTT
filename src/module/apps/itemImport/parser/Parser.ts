@@ -1,9 +1,8 @@
 import { ParseData } from "./Types";
 import { CompendiumKey } from "../importer/Constants";
-import { DataImporter } from "../importer/DataImporter";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 import { BonusHelper as BH } from "../helper/BonusHelper";
-import * as IconAssign from "../../iconAssigner/iconAssign";
+import { IconAssign } from "../../iconAssigner/IconAssign";
 import { ImportHelper as IH } from "../helper/ImportHelper";
 import { TechnologyType } from "src/module/types/template/Technology";
 import { DataDefaults, SystemConstructorArgs, SystemEntityType } from "src/module/data/DataDefaults";
@@ -58,8 +57,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
 
         this.setImporterFlags(entity, jsonData);
 
-        if (DataImporter.iconSet)
-            entity.img = IconAssign.iconAssign(DataImporter.iconSet, entity);
+        entity.img = IconAssign.iconAssign(entity);
 
         BH.addBonus(entity, this.getBonus(jsonData));
 

@@ -16,7 +16,8 @@
         </div>
         <div class="initiative-col">
             <div class="initiative-end">
-                <a data-action="toggleInitiativeBlitz" {{#if system.initiative.blitz}}class="blitz-active"{{/if}}
+                     <a data-action="toggleInitiativeBlitz"
+                         class="initiative-blitz-toggle {{#if system.initiative.blitz}}blitz-active{{/if}}"
                    data-tooltip="SR5.Tooltips.Actor.Blitz">
                     {{localize "SR5.Blitz"}}&nbsp;
                     {{#if system.initiative.blitz}}

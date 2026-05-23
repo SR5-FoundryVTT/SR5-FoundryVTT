@@ -2,6 +2,7 @@ import { DataDefaults } from '../data/DataDefaults';
 import { ModifiableValue } from '../mods/ModifiableValue';
 import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
 import { Translation } from '../utils/strings';
+import { TestCreator } from './TestCreator';
 import { SkillNamingFlow } from '../flows/SkillNamingFlow';
 
 export interface SkillTestData extends SuccessTestData {
@@ -88,6 +89,7 @@ export class SkillTest extends SuccessTest<SkillTestData> {
         // Replace previous attribute with new one, without changing other modifiers
         pool.remove(lastUsedAttribute.label);
         pool.addBase(usedAttribute.label, usedAttribute.value);
+        TestCreator.addCodeTermTrace(this.data, usedAttribute);
 
         this.lastUsedAttribute = selectedAttribute;
         this.data.action.attribute = selectedAttribute;
@@ -112,9 +114,9 @@ export class SkillTest extends SuccessTest<SkillTestData> {
         // Replace previous limit with new one, without changing other modifiers.
         limit.remove(lastUsedLimit.label);
         limit.addBase(usedLimit.label, usedLimit.value);
+        TestCreator.addCodeTermTrace(this.data, usedLimit);
 
         this.lastUsedLimit = selectedLimit;
-
         this.data.action.limit.attribute = selectedLimit as Shadowrun.ActorAttribute;
     }
 }

@@ -34,6 +34,7 @@ import { MatrixDeviceFlow } from './flows/MatrixDeviceFlow';
 import { StorageFlow } from '@/module/flows/StorageFlow';
 import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
 import { ModifiableValueType } from '../types/template/Base';
+import { IconAssign } from 'src/module/apps/iconAssigner/IconAssign';
 import Document = foundry.abstract.Document;
 import GetEmbeddedDocumentOptions = Document.GetEmbeddedDocumentOptions;
 
@@ -66,6 +67,17 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     declare descriptionHTML: string | undefined;
     // Item Sheet labels for quick info on an item dropdown.
     declare labels: { roll?: string; opposedRoll?: string };
+
+    static override getDefaultArtwork(itemData?: Item.CreateData): Item.GetDefaultArtworkReturn {
+        const fallback = super.getDefaultArtwork(itemData);
+        if (!itemData || itemData.img) return fallback;
+
+        const assignedImage = IconAssign.iconAssign(itemData);
+        if (!assignedImage) return fallback;
+
+        return { img: assignedImage };
+    }
+
 
     /**
      * Helper property to get an actual actor for an owned or embedded item. You'll need this for when you work with

@@ -62,8 +62,11 @@ export class InitiativePrep {
             initiative.blitz = false;
 
         // Apply blitz ini rules.
-        if (initiative.blitz)
-            ModifiableValue.addUnique(initiative.current.dice, "SR5.Blitz", 5, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, ModifiableValue.TOP_PRIORITY);
+        if (initiative.blitz) {
+            ModifiableValue.addUnique(initiative.current.dice, "SR5.Blitz", 5,
+                { mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE, priority: ModifiableValue.TOP_PRIORITY }
+            );
+        }
         ModifiableValue.calcTotal(initiative.current.dice, {min: 0, max: 5});
 
         (initiative.current.dice as any).text = `${initiative.current.dice.value}d6`;

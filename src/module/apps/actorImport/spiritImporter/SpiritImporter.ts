@@ -1,6 +1,7 @@
 import { SR5Actor } from "src/module/actor/SR5Actor";
 import { ActorSchema } from "../ActorSchema";
 import { ImportOptionsType } from "../characterImporter/CharacterImporter";
+import { MugshotImport } from "../MugshotImport";
 import { ActorSkillImport } from "../ActorSkillImport";
 import { ActorImportUtil, type BlankImportedActor } from "../ActorImportUtil";
 import { InitiativeType } from "src/module/types/template/Initiative";
@@ -47,6 +48,12 @@ export class SpiritImporter {
     ): Promise<SR5Actor<'spirit'> | null> {
         const spirit = await ActorImportUtil.createBaseActor('spirit', chummerData, importOptions);
         applySeed(spirit);
+
+        if (importOptions.mugshots) {
+            const mugshotPaths = await MugshotImport.importImages(chummerData, spirit.name);
+            if (mugshotPaths.length > 0)
+                spirit.img = mugshotPaths[0];
+        }
 
         await ActorSkillImport.importSkills(spirit, chummerData);
         this.setRuntimeValues(spirit, chummerData);

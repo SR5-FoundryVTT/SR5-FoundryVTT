@@ -1,5 +1,5 @@
 import { SR5 } from "@/module/config";
-import { ModifiableValueSchema } from "./Base";
+import { ValueField } from "./Base";
 import { ModifiableField } from "../fields/ModifiableField";
 const { NumberField, BooleanField, StringField } = foundry.data.fields;
 
@@ -11,7 +11,7 @@ export type AttributeFieldOptions = {
 export const AttributeField = (
     { appliesSpecial = false, limit }: AttributeFieldOptions = {},
 ) => ({
-    ...ModifiableValueSchema(),
+    ...ValueField(),
     hidden: new BooleanField(),
     applies_special: new BooleanField({ initial: appliesSpecial }),
     label: new StringField({ required: true }),
