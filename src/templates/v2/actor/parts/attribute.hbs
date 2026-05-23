@@ -28,7 +28,8 @@
         {{else}}
             <button class="icon sr5-icon" type="button"
                     data-action="rollAttribute"
-                    data-attribute-modifier-tooltip="{{ifThen attributeId attributeId attributeField.name}}">{{attribute.value}}</button>
+                    data-attribute-modifier-tooltip="{{attributeField.name}}"
+                    data-modifier-tooltip-path="{{modifierTooltipPath}}">{{attribute.value}}</button>
         {{/if}}
     </div>
 </div>
