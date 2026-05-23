@@ -11,8 +11,8 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'spirit'
     /**
      * Merges many optional one-or-many arrays into a single non-null list.
      */
-    protected mergeLists<T>(...lists: Array<OneOrMany<T | undefined>>): Array<NonNullable<T>> {
-        return lists.flatMap(list => IH.getArray(list)).filter((v): v is NonNullable<T> => v != null);
+    protected mergeLists<T>(...lists: Array<OneOrMany<T> | undefined>): Array<T> {
+        return lists.flatMap(list => IH.getArray(list)).filter(v => v != null);
     }
 
     /**

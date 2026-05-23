@@ -1,3 +1,4 @@
+import { OneOrMany } from "../schema/Types";
 import { ActionsSchema, Action } from "../schema/ActionsSchema";
 import { ArmorSchema, Armor, Mod as ArmorMod } from "../schema/ArmorSchema";
 import { Bioware, BiowareSchema } from "../schema/BiowareSchema";
@@ -14,10 +15,18 @@ import { Spell, SpellsSchema } from "../schema/SpellsSchema";
 import { Vehicle, Mod as VehicleMod, Weaponmount, VehiclesSchema } from "../schema/VehiclesSchema";
 import { Accessory, Weapon, WeaponsSchema } from "../schema/WeaponsSchema";
 
+export type SkillGroup = {
+    id: { _TEXT: string; };
+    name: { _TEXT: string; };
+    translate?: OneOrMany<{ _TEXT: string; }>;
+    page?: undefined;
+    source?: undefined;
+};
+
 export type Schemas =
     ActionsSchema | ArmorSchema | BiowareSchema | CritterpowersSchema | CyberwareSchema | ComplexformsSchema | EchoesSchema |
     GearSchema | MetatypeSchema | PowersSchema | QualitiesSchema | SkillsSchema | SpellsSchema | VehiclesSchema | WeaponsSchema;
 
 export type ParseData =
     Action | Armor | ArmorMod | Bioware | CritterPower | Cyberware | Complexform | Echo | Gear | Metatype |
-    Power | Enhancement | Quality | Skill | Spell | Vehicle | VehicleMod | Weaponmount | Weapon | Accessory;
+    Power | Enhancement | Quality | Skill | SkillGroup | Spell | Vehicle | VehicleMod | Weaponmount | Weapon | Accessory;
