@@ -13,7 +13,7 @@
 
         <div class="list-item-col essence-col essence-calc-col">
             {{#if item.system.technology.calculated.essence.value}}
-                <label>{{item.system.technology.calculated.essence.value}}</label>
+                <label>{{floatValue item.system.technology.calculated.essence.value 2}}</label>
             {{/if}}
         </div>
 

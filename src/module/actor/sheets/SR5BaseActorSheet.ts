@@ -689,7 +689,10 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         await Promise.all([
             this._applyModifierTooltip("[data-attribute-modifier-tooltip]", (id) => this.actor.getAttribute(id)),
             this._applyModifierTooltip("[data-limit-modifier-tooltip]", (id) => this.actor.getLimit(id)),
-            this._applyModifierTooltip("[data-skill-modifier-tooltip]", (id) => this.actor.getSkillById(id))
+            this._applyModifierTooltip("[data-skill-modifier-tooltip]", (id) => this.actor.getSkillById(id)),
+            this._applyModifierTooltip("[data-modifier-tooltip-path]", (path) =>
+                foundry.utils.getProperty(this.actor.system, path) as ModifiableValueType | undefined
+            ),
         ]);
     }
 

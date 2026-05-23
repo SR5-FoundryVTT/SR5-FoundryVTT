@@ -1,6 +1,7 @@
 // game settings for shadowrun 5e
 
 import { FLAGS, SYSTEM_NAME } from './constants';
+import { IconAssign } from './apps/iconAssigner/IconAssign';
 import SR5CompendiaSettings from './settings/SR5CompendiaSettings';
 
 export const registerSystemSettings = () => {
@@ -182,9 +183,9 @@ export const registerSystemSettings = () => {
     /**
      * Remember whether the Modify Roll section was expanded last time.
      */
-    game.settings.register(SYSTEM_NAME, FLAGS.CollapseModifyRoll, {
-        name: 'SETTINGS.CollapseModifyRoll',
-        hint: 'SETTINGS.CollapseModifyRollDescription',
+    game.settings.register(SYSTEM_NAME, FLAGS.ModifyRollExpanded, {
+        name: 'SETTINGS.ModifyRollExpanded',
+        hint: 'SETTINGS.ModifyRollExpandedDescription',
         scope: 'client',
         config: false,
         type: Boolean,
@@ -230,7 +231,8 @@ export const registerSystemSettings = () => {
         scope: 'world',
         config: true,
         type: String,
-        default: 'systems/shadowrun5e/dist/icons/importer/'
+        default: 'systems/shadowrun5e/dist/icons/importer/',
+        onChange: () => { void IconAssign.refreshIconFiles(); },
     });
 
     /**

@@ -869,10 +869,10 @@ export class Helpers {
             const selection = await dialog.select() as { actorId?: unknown };
             if (dialog.canceled || dialog.selectedButton !== 'confirm') return undefined;
 
-            const choosenActor = selection.actorId as string | undefined;
-            if (!choosenActor) return undefined;
+            const chosenActor = selection.actorId as string | undefined;
+            if (!chosenActor) return undefined;
 
-            return game.actors?.get(choosenActor) as SR5Actor;
+            return game.actors.get(chosenActor);
         }
     }
 

@@ -4,6 +4,7 @@ import { ActorSchema } from "../ActorSchema";
 import { ImportOptionsType } from "../characterImporter/CharacterImporter";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 import { DataDefaults } from "@/module/data/DataDefaults";
+import { MugshotImport } from "../MugshotImport";
 
 export interface BlankSpirit extends Actor.CreateData {
     type: 'spirit',
@@ -19,14 +20,20 @@ export class SpiritImporter {
         type: string,
         importOptions: ImportOptionsType
     ): Promise<SR5Actor<'spirit'> | null> {
-        const spirit = {
+        const spirit: BlankSpirit = {
             effects: [],
             type: 'spirit',
             folder: importOptions.folderId ?? null,
             system: DataDefaults.baseSystemData('spirit'),
             items: await new ItemsParser().parse(chummerData, importOptions),
             name: chummerData.alias ?? chummerData.name ?? '[Name not found]',
-        } satisfies BlankSpirit;
+        };
+
+        if (importOptions.mugshots) {
+            const mugshotPaths = await MugshotImport.importImages(chummerData, spirit.name);
+            if (mugshotPaths.length > 0)
+                spirit.img = mugshotPaths[0];
+        }
 
         spirit.system.spiritType = type as any;
 

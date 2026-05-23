@@ -22,9 +22,9 @@ export class ItemPrep {
             if (normalArmor) {
                 // We allow only one base armor but multiple armor accessories
                 if (item.system.armor.accessory) {
-                    ModifiableValue.addUnique(armor.rating, item.name, normalArmor);
+                    ModifiableValue.add(armor.rating, item.name, normalArmor);
                 } else {
-                    ModifiableValue.addUnique(
+                    ModifiableValue.add(
                         armor.rating, item.name, normalArmor,
                         { mode: 'UPGRADE', priority: ModifiableValue.BASE_PRIORITY }
                     );
@@ -33,9 +33,9 @@ export class ItemPrep {
 
             if (hardenedArmor) {
                 if (item.system.armor.accessory) {
-                    ModifiableValue.addUnique(armor.hardened, item.name, hardenedArmor);
+                    ModifiableValue.add(armor.hardened, item.name, hardenedArmor);
                 } else {
-                    ModifiableValue.addUnique(
+                    ModifiableValue.add(
                         armor.hardened, item.name, hardenedArmor,
                         { mode: 'UPGRADE', priority: ModifiableValue.BASE_PRIORITY }
                     );
@@ -45,7 +45,7 @@ export class ItemPrep {
             // Apply elemental modifiers of all worn armor and clothing SR5#169.
             for (const element of Object.keys(item.system.armor.elements)) {
                 if (!armor.elements[element]) continue;
-                ModifiableValue.addUnique(armor.elements[element], item.name, item.system.armor.elements[element].value);
+                ModifiableValue.add(armor.elements[element], item.name, item.system.armor.elements[element].value);
             }
 
             for (const immunity of item.system.armor.immunities.value) {
