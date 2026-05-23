@@ -87,7 +87,7 @@ export class CombatRules {
     }
 
     /**
-     * Check if vehicle wouldn't take any damage due to vehicle armor rules (SR5#199)
+     * Check if vehicle wouldn't take any damage due to vehicle armor rules (SR5#205)
      * @param incomingDamage The incoming damage
      * @param attackerHits The attackers hits. Should be a positive number.
      * @param defenderHits The attackers hits. Should be a positive number.
@@ -98,7 +98,11 @@ export class CombatRules {
             return false;
         }
 
-        return CombatRules.isDamageLessThanArmor(incomingDamage, attackerHits, defenderHits, actor);
+        const armor = actor.getArmor(incomingDamage);
+        const modifiedAv = armor.rating.value + armor.hardened.value;
+        const modifiedDv = CombatRules.modifyDamageAfterHit(actor, attackerHits, defenderHits, incomingDamage).value;
+
+        return modifiedDv < modifiedAv;
     }
 
     /**
@@ -110,29 +114,19 @@ export class CombatRules {
      */
     static isBlockedByHardenedArmor(incomingDamage: DamageType, attackerHits = 0, defenderHits = 0, actor: SR5Actor): boolean {
         const armor = actor.getArmor(incomingDamage);
+        const hardenedRating = armor.hardened.value;
 
-        if(!armor.hardened) {
+        if(hardenedRating <= 0) {
             return false;
         }
 
-        return CombatRules.isDamageLessThanArmor(incomingDamage, attackerHits, defenderHits, actor);
+        const modifiedDv = CombatRules.modifyDamageAfterHit(actor, attackerHits, defenderHits, incomingDamage).value;
+        return modifiedDv < hardenedRating;
     }
 
-    /**
-     * Check if incoming damage (modified by net hits) is less than the actor's armor (modified by AP).
-     * Used for vehicle armor, hardened armor, and physical -> stun damage logic
-     * @param incomingDamage The incoming damage
-     * @param attackerHits The attackers hits. Should be a positive number.
-     * @param defenderHits The attackers hits. Should be a positive number.
-     * @param actor The active defender
-     */
-    static isDamageLessThanArmor(incomingDamage: DamageType, attackerHits: number, defenderHits: number, actor: SR5Actor): boolean {
-        const modifiedDamage = CombatRules.modifyDamageAfterHit(actor, attackerHits, defenderHits, incomingDamage);
-
-        const modifiedAv = actor.getArmor(incomingDamage).value;
-        const modifiedDv = modifiedDamage.value;
-
-        return modifiedDv < modifiedAv;
+    static hardenedAutoHits(actor: SR5Actor, damage: DamageType): number {
+        const hardenedRating = actor.getArmor(damage).hardened.value;
+        return hardenedRating > 0 ? Math.ceil(hardenedRating / 2) : 0;
     }
 
     /**
@@ -166,11 +160,11 @@ export class CombatRules {
 
         // Keep base and modification intact, only overwriting the result.
         ModifiableValue.add(
-            modifiedDamage, 'SR5.TestResults.Success', 0, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, ModifiableValue.TOP_PRIORITY
+            modifiedDamage, 'SR5.TestResults.Success', 0, { mode: 'OVERRIDE', priority: ModifiableValue.TOP_PRIORITY }
         );
         ModifiableValue.calcTotal(modifiedDamage, { min: 0 });
         ModifiableValue.add(
-            modifiedDamage.ap, 'SR5.TestResults.Success', 0, CONST.ACTIVE_EFFECT_MODES.OVERRIDE, ModifiableValue.TOP_PRIORITY
+            modifiedDamage.ap, 'SR5.TestResults.Success', 0, { mode: 'OVERRIDE', priority: ModifiableValue.TOP_PRIORITY }
         );
         ModifiableValue.calcTotal(modifiedDamage.ap);
         modifiedDamage.type.value = 'physical';

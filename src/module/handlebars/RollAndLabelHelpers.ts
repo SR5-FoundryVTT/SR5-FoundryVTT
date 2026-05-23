@@ -24,22 +24,26 @@ export const registerRollAndLabelHelpers = () => {
 
     Handlebars.registerHelper('elementIcon', function (element) {
         let icon = '';
-        if (element === 'electricity') {
-            icon = 'fas fa-bolt';
-        } else if (element === 'radiation') {
-            icon = 'fas fa-radiation-alt';
-        } else if (element === 'fire') {
-            icon = 'fas fa-fire';
-        } else if (element === 'acid') {
+        if (element === 'acid') {
             icon = 'fas fa-vials';
         } else if (element === 'cold') {
             icon = 'fas fa-snowflake';
+        } else if (element === 'electricity') {
+            icon = 'fas fa-bolt';
+        } else if (element === 'fire') {
+            icon = 'fas fa-fire';
+        } else if (element === 'pollutant') {
+            icon = 'fas fa-smog';
+        } else if (element === 'radiation') {
+            icon = 'fas fa-radiation-alt';
+        } else if (element === 'water') {
+            icon = 'fas fa-droplet';
         }
         return icon;
     });
 
     Handlebars.registerHelper('signedValue', function (value: number) {
-        return value > 0 ?  `+${value}`: `${value}`;
+        return value >= 0 ?  `+${value}`: `${value}`;
     });
 
     Handlebars.registerHelper('speakerName', Helpers.getChatSpeakerName.bind(Helpers));

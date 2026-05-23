@@ -220,6 +220,11 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             templates: SheetFlow.templateListItem('weapon-modification'),
             scrollable: ['.scrollable']
         },
+        armorModifications: {
+            template: SheetFlow.templateBase('item/tabs/armor-modifications'),
+            templates: SheetFlow.templateListItem('armor-modification'),
+            scrollable: ['.scrollable']
+        },
         effects: {
             template: SheetFlow.templateBase('item/tabs/effects'),
             templates: SheetFlow.templateListItem('effect'),
@@ -241,6 +246,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 { id: 'sinNetworks', label: 'SR5.Tabs.Item.SinNetworks', cssClass: '' },
                 { id: 'weaponAmmo', label: 'SR5.Tabs.Item.WeaponAmmo', cssClass: '' },
                 { id: 'weaponModifications', label: 'SR5.Tabs.Item.WeaponMods', cssClass: '' },
+                { id: 'armorModifications', label: 'SR5.Tabs.Item.ArmorMods', cssClass: '' },
                 { id: 'licenses', label: 'SR5.Tabs.Item.SinLicenses', cssClass: '' },
                 { id: 'effects', label: 'SR5.Tabs.Item.Effects', cssClass: '' },
             ]
@@ -313,6 +319,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (!item.isType('weapon')) {
             delete parts.weaponModifications;
             delete parts.weaponAmmo;
+        }
+        if (!item.isType('armor')) {
+            delete parts.armorModifications;
         }
         if (!item.isType('sin')) {
             delete parts.licenses;
@@ -657,7 +666,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         const item = this.item.getOwnedItem(id);
         if (id && item) {
             if (item.type === 'modification') {
-                await this.item.equipWeaponMod(id);
+                await this.item.equipModification(id);
             } else if (item.type === 'ammo') {
                 await this.item.equipAmmo(id);
             }
@@ -695,17 +704,19 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         } satisfies Item.CreateData;
 
         // Inject special case context based on item type
-        if (type === 'modification') SR5ItemSheet.addModificationItem(event, itemData);
+        if (type === 'modification')
+            SR5ItemSheet.addModificationItem(this.item, itemData as Item.CreateData<'modification'>);
 
         const item = new SR5Item(itemData);
         await this.item.createNestedItem(item._source);
     }
 
     /**
-     * Add system type to be a weapon when adding a weapon mod
+     * Set nested modification type to match the parent item.
      */
-    static addModificationItem(event: Event, itemData: Item.CreateData) {
-        itemData['system'] = { type: 'weapon' }
+    static addModificationItem(parentItem: SR5Item, itemData: Item.CreateData<'modification'>) {
+        const type = parentItem.modificationType();
+        itemData['system'] = { type };
     }
 
     static async #reloadAmmo(this: SR5ItemSheet, event: Event) {
@@ -876,7 +887,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             await (this.item.parent as SR5Item).equipAmmo(this.item.id!);
             void this.render();
         } else if (this.item.isType('modification') && this.item.parent instanceof SR5Item) {
-            await (this.item.parent as SR5Item).equipWeaponMod(this.item.id);
+            await (this.item.parent as SR5Item).equipModification(this.item.id, this.item.system.type);
             void this.render();
         } else {
             const equipped = this.item.isEquipped();
@@ -1000,7 +1011,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                     if (!userConsented) return;
                     const id = SheetFlow.closestItemId(target);
                     const item = this.item.getOwnedItem(id);
-                    if (item) {
+                    if (item?.id) {
                         await this.item.deleteOwnedItem(item.id);
                     }
                 }
@@ -1195,9 +1206,18 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @protected
      */
     protected async _onDropItem(event: DragEvent, item: SR5Item) {
-        // dropped ammo and mods to weapons get added as a nested item
+        // dropped ammo and matching mods get added as nested items for compatible parents
         if (this.item.isType('weapon') && item.isType('ammo', 'modification')) {
-            return this.item.createNestedItem(item.toObject());
+            const nested = item.toObject();
+            if (item.isType('modification')) {
+                foundry.utils.setProperty(nested, 'system.type', 'weapon');
+            }
+            return this.item.createNestedItem(nested);
+        }
+        if (this.item.isType('armor') && item.isType('modification')) {
+            const nested = item.toObject();
+            foundry.utils.setProperty(nested, 'system.type', 'armor');
+            return this.item.createNestedItem(nested);
         }
         // dropped Grid and Hosts on SIN allows for adding the SIN as a network option
         if (this.item.isType('sin') && item.isNetwork()) {

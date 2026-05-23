@@ -1,10 +1,11 @@
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
-import { ModifiableValue } from "../mods/ModifiableValue";
 import { Migrator } from "../migrator/Migrator";
 import { LinksHelpers } from '@/module/utils/links';
+import { DataDefaults } from "../data/DataDefaults";
 import { ModifiableValueType } from "../types/template/Base";
+import { ModifiableValue } from "../mods/ModifiableValue";
 import DataModel = foundry.abstract.DataModel;
 
 /**
@@ -282,16 +283,18 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         if (ModifiableValue.isModifiableValue(target)) {
             const mode = SR5ActiveEffect.getLegacyChangeMode(change);
-            target.changes.push({
-                enabled: change.effect.active,
-                invalidated: false,
-                name: change.effect.name,
-                value: delta,
-                mode,
-                priority: change.priority ?? 10 * mode,
-                effectUuid: change.effect.uuid,
-            });
-            return {};
+            target.changes.push(
+                DataDefaults.createData('change_entry', {
+                    enabled: change.effect.active,
+                    invalidated: false,
+                    name: change.effect.name,
+                    value: delta,
+                    mode: mode,
+                    priority: change.priority ?? 10 * mode,
+                    source: change.effect.uuid,
+                })
+            );
+            return undefined;
         }
 
         // In case of non-existent change.key targets, catch errors and log it, but still allow the overall process to continue.

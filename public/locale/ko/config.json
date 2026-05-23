@@ -15,8 +15,8 @@
         "AutomateProgressiveRecoilDescription": "초기화 전까지 캐릭터에게 점진적 반동이 누적됨",
         "CompendiumBrowserBlacklist": "컨펜디움 탐색기 블랙리스트",
         "CompendiumBrowserBlacklistDescription": "컨펜디움 탐색기에서 숨긴 컨펜디움 목록",
-        "CollapseModifyRollByDefault": "기본적으로 굴림 수정 접기",
-        "CollapseModifyRollByDefaultDescription": "활성화하면 테스트 대화창을 열 때 굴림 수정 섹션이 접힌 상태로 시작합니다.",
+        "ModifyRollExpanded": "굴림 수정 섹션 상태 기억",
+        "ModifyRollExpandedDescription": "마지막에 굴림 수정 섹션이 펼쳐져 있었는지 저장하고 다음 테스트 대화창에서 그 상태를 복원합니다.",
         "DefaultOpposedTestActorSelection": "경쟁 판정 토큰 선택 덮어쓰기",
         "DefaultOpposedTestActorSelectionDescription": "항상 선택한 토큰을 판정에 사용된 대상으로 덮어씀",
         "DiagonalMovementDescription": "격자판 사용 시 대각선 이동 처리 방식",
@@ -478,6 +478,10 @@
         "Armor": {
             "FIELDS": {
                 "armor": {
+                    "accessory": {
+                        "hint": "해당 방어구가 보조품일 경우 선택 (수치가 액터의 기본 방어도에 더해짐)",
+                        "label": "보조 방어구"
+                    },
                     "acid": {
                         "hint": "산성 공격에 대한 추가 방어도 제공",
                         "label": "산성 저항"
@@ -498,9 +502,17 @@
                         "hint": "해당 방어구는 강화됨",
                         "label": "강화 방어구"
                     },
-                    "mod": {
-                        "hint": "해당 방어구가 보조품일 경우 선택 (수치가 액터의 기본 방어도에 더해짐)",
-                        "label": "보조 방어구"
+                    "is_hardened": {
+                        "hint": "이 방어구가 강화 방어를 제공하는지 여부",
+                        "label": "강화 적용"
+                    },
+                    "immunities": {
+                        "hint": "Damage sources this armor grants Immunity against",
+                        "label": "Immunities"
+                    },
+                    "pollutant": {
+                        "hint": "Extra Armor against attacks with Pollutant",
+                        "label": "Chemical Protection"
                     },
                     "radiation": {
                         "hint": "방사선 공격에 대한 추가 방어도 제공",
@@ -509,13 +521,22 @@
                     "value": {
                         "hint": "해당 물품이 제공하는 방어도",
                         "label": "방어도 수치"
+                    },
+                    "water": {
+                        "hint": "Extra Armor against attacks with Water",
+                        "label": "Water Protection"
                     }
                 }
             },
+            "Immunity": {
+                "NormalWeapons": "Normal Weapons"
+            },
+            "Resistances": "저항",
             "label": "방어구"
         },
         "ArmorHardened": "단단함",
         "ArmorHardenedFull": "단단한 갑옷",
+        "HardenedArmor": "단단한 갑옷",
         "ArmorValue": "방어구 수치",
         "Attack": "공격",
         "Attacker": "공격자",
@@ -1052,12 +1073,16 @@
         "EditSkill": "기술 수정",
         "Effect": "효과",
         "Effects": "효과",
-        "Element": "속성",
-        "ElementAcid": "산성",
-        "ElementCold": "냉기",
-        "ElementElectricity": "전기",
-        "ElementFire": "화염",
-        "ElementRadiation": "방사능",
+        "Element": {
+            "Acid": "산성",
+            "Cold": "냉기",
+            "Electricity": "전기",
+            "Fire": "화염",
+            "Pollutant": "Pollutant",
+            "Radiation": "방사능",
+            "Water": "Water",
+            "Label": "속성"
+        },
         "Emerged": "공명자",
         "EnvModifiersApplication": {
             "ClearModifiers": "개인 수정치 초기화",
@@ -1222,6 +1247,8 @@
                 "Track": "트랙"
             }
         },
+        "Immunity": "면역",
+        "ImmunityToNormalWeapons": "일반 무기에 대한 면역",
         "Import": {
             "ActorImporter": {
                 "Title": "액터 불러오기"
@@ -1318,6 +1345,10 @@
                                 "hint": "피해의 속성 유형. 속성이 없을 경우 빈칸으로 설정.",
                                 "label": "속성"
                             }
+                        },
+                        "normal_weapon": {
+                            "hint": "If this damage is considered a normal (non-magical) weapon attack",
+                            "label": "Normal Weapon"
                         },
                         "type": {
                             "base": {
@@ -2276,11 +2307,8 @@
                 "Interests": "흥미",
                 "Street": "길거리"
             },
-            "Groups": {
-            },
-            "Sets": {
-
-            },
+            "Groups": {},
+            "Sets": {},
             "Set": {
                 "LogActorDifferences": "액터간 차이 기록",
                 "DifferencesLoggedInConsole": "차이점을 보기 위해 사용자의 브라우저 콘솔 열기"
@@ -2696,6 +2724,7 @@
                 "Vehicle": "탑승물"
             },
             "Item": {
+                "ArmorMods": "방어구 개조",
                 "Description": "설명",
                 "Details": "세부사항",
                 "Effects": "효과",

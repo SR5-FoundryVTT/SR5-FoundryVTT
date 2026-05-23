@@ -17,7 +17,7 @@
         flex-flow: column nowrap;
         justify-content: center;
         align-items: center;
-        font-size: 1rem;
+        font-size: var(--font-size-14);
         height: 100%;
         padding: 0.5rem;
     }
@@ -73,12 +73,14 @@
     .skill-header-meta-row > label {
         flex: 0 0 6.75rem;
         text-wrap: nowrap;
+        font-size: var(--font-size-14);
     }
 
     .skill-header-meta-row > span,
     .skill-header-meta-row > input {
         flex: 1 1 auto;
         min-width: 0;
+        font-size: var(--font-size-14);
     }
 
     .skill-sheet-header-source > label {

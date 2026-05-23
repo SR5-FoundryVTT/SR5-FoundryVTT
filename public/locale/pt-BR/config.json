@@ -15,8 +15,8 @@
         "AutomateProgressiveRecoilDescription": "Personagens acumulam recuo progressivo até serem reiniciados",
         "CompendiumBrowserBlacklist": "Lista Negra do Navegador de Compêndio",
         "CompendiumBrowserBlacklistDescription": "Lista de compêndios a serem ocultados no navegador de compêndios",
-        "CollapseModifyRollByDefault": "Recolher Modificar Rolagem por padrão",
-        "CollapseModifyRollByDefaultDescription": "Se ativado, a secao Modificar Rolagem inicia recolhida ao abrir uma janela de teste.",
+        "ModifyRollExpanded": "Lembrar estado da seção Modificar Rolagem",
+        "ModifyRollExpandedDescription": "Salva se a seção Modificar Rolagem estava expandida na última vez e restaura esse estado na próxima janela de teste.",
         "DefaultOpposedTestActorSelection": "Sobrescrever seleções de token de testes de oposição",
         "DefaultOpposedTestActorSelectionDescription": "Sempre sobrescrever tokens selecionados com alvos usados para testes",
         "DieFaceLabels": "Rótulos das Faces dos Dados",
@@ -164,9 +164,43 @@
         "AmmoGelRounds": "Munição de Gel",
         "Aoe": "AoE",
         "ApplyWounds": "Aplicar Ferimentos",
-        "Armor": "Armadura",
+        "Armor": {
+            "FIELDS": {
+                "armor": {
+                    "accessory": {
+                        "hint": "If this Armor is an Accessory (adds its value to the actor's base Armor)",
+                        "label": "Accessory"
+                    },
+                    "hardened": {
+                        "hint": "Se esta armadura e endurecida",
+                        "label": "Armadura Endurecida"
+                    },
+                    "is_hardened": {
+                        "hint": "Se esta armadura concede protecao endurecida",
+                        "label": "Endurecida Ativa"
+                    },
+                    "immunities": {
+                        "hint": "Damage sources this armor grants Immunity against",
+                        "label": "Immunities"
+                    },
+                    "pollutant": {
+                        "hint": "Extra Armor against attacks with Pollutant",
+                        "label": "Chemical Protection"
+                    },
+                    "water": {
+                        "hint": "Extra Armor against attacks with Water",
+                        "label": "Water Protection"
+                    }
+                }
+            },
+            "Immunity": {
+                "NormalWeapons": "Normal Weapons"
+            },
+            "Resistances": "Resistências"
+        },
         "ArmorHardened": "Endurecido",
         "ArmorHardenedFull": "Armadura Endurecida",
+        "HardenedArmor": "Armadura Endurecida",
         "ArmorValue": "Valor da Armadura",
         "Attacker": "Atacante",
         "AttackerHits": "Acertos do Atacante",
@@ -436,12 +470,16 @@
         "EditSkill": "Editar Perícia",
         "Effect": "Efeito",
         "Effects": "Efeitos",
-        "Element": "Elemento",
-        "ElementAcid": "Ácido",
-        "ElementCold": "Frio",
-        "ElementElectricity": "Elétrico",
-        "ElementFire": "Fogo",
-        "ElementRadiation": "Radiação",
+        "Element": {
+            "Acid": "Ácido",
+            "Cold": "Frio",
+            "Electricity": "Elétrico",
+            "Fire": "Fogo",
+            "Pollutant": "Pollutant",
+            "Radiation": "Radiação",
+            "Water": "Water",
+            "Label": "Elemento"
+        },
         "Emerged": "Emergido",
         "EnvModifiersApplication": {
             "ClearModifiers": "Limpar modificadores pessoais",
@@ -574,6 +612,8 @@
                 "Track": "Rastreador"
             }
         },
+        "Immunity": "Imunidade",
+        "ImmunityToNormalWeapons": "Imunidade a armas normais",
         "Import": {
             "ActorImporter": {
                 "Title": "Importador de Ator"
@@ -606,7 +646,18 @@
         "IsFreshImport": "Este item foi importado do Chummer e precisa de revisão manual.",
         "IsGrunt": "Soldado",
         "IsNPC": "NPC",
-        "Item": "Item",
+        "Item": {
+            "FIELDS": {
+                "action": {
+                    "damage": {
+                        "normal_weapon": {
+                            "hint": "If this damage is considered a normal (non-magical) weapon attack",
+                            "label": "Normal Weapon"
+                        }
+                    }
+                }
+            }
+        },
         "ItemMod": "Modificação de Item",
         "ItemName": "Nome do Item",
         "ItemTypes": {
@@ -762,7 +813,7 @@
             "WarningTitle": "Alerta"
         },
         "Magic": "Magia",
-        "Manual":"Manual",
+        "Manual": "Manual",
         "ManualOverride": "Substituição de Resultado",
         "MarkImportedItemReviewed": "Marcar Item Importado Como Revisado",
         "MarkImportedItemTooltip": "Marca este item importado como tendo sido revisado.",
@@ -1647,6 +1698,11 @@
             "Reload": "Recarregar",
             "Type": "Tipo",
             "Weapon": "Arma"
+        },
+        "Tabs": {
+            "Item": {
+                "ArmorMods": "Mods de Armadura"
+            }
         },
         "Wireless": "Conexão Sem Fio"
     },

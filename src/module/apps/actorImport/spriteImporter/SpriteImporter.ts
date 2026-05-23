@@ -4,6 +4,7 @@ import { ActorSchema } from "../ActorSchema";
 import { ImportOptionsType } from "../characterImporter/CharacterImporter";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 import { DataDefaults } from "@/module/data/DataDefaults";
+import { MugshotImport } from "../MugshotImport";
 
 export interface BlankSprite extends Actor.CreateData {
     type: 'sprite',
@@ -25,14 +26,20 @@ export class SpriteImporter {
         chummerData: ActorSchema,
         importOptions: ImportOptionsType
     ) {
-        const sprite = {
+        const sprite: BlankSprite = {
             effects: [],
             type: 'sprite',
             folder: importOptions.folderId ?? null,
             system: DataDefaults.baseSystemData('sprite'),
             items: await new ItemsParser().parse(chummerData, importOptions),
             name: chummerData.alias ?? chummerData.name ?? '[Name not found]',
-        } satisfies BlankSprite;
+        };
+
+        if (importOptions.mugshots) {
+            const mugshotPaths = await MugshotImport.importImages(chummerData, sprite.name);
+            if (mugshotPaths.length > 0)
+                sprite.img = mugshotPaths[0];
+        }
 
         sprite.system.spriteType = chummerData.metatype_english.split(" ")[0].toLowerCase() as any;
 

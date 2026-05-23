@@ -84,7 +84,8 @@ export class DamageApplicationFlow {
         const ap = Number(applyDamage.data('damageAp'));
         const element = String(applyDamage.data('damageElement')) as DamageElement;
         const biofeedback = String(applyDamage.data('damageBiofeedback')) as BiofeedbackDamageType;
-        const damage = Helpers.createDamageData(value, type, ap, element, biofeedback);
+        const normalWeapon = String(applyDamage.data('damageNormalWeapon')) === 'true';
+        const damage = Helpers.createDamageData(value, type, ap, element, biofeedback, normalWeapon);
 
         const targets: (SR5Item | SR5Actor)[] = Helpers.getSelectedActorsOrCharacter();
 

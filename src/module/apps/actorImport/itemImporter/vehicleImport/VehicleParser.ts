@@ -63,10 +63,10 @@ export class VehicleParser {
             system.vehicle_stats.sensor.base = Number(vehicle.sensor) || 0;
             system.vehicle_stats.seats.base = Number(vehicle.seats) || 0;
 
+            system.cost = Number(vehicle.owncost?.replace(/[^\d.-]/g, "")) || 0;
             system.attributes.body.base = Number(vehicle.body) || 0;
-            system.armor.base = Number(vehicle.armor) || 0;
+            system.armor.rating.base = Number(vehicle.armor) || 0;
             system.availability = vehicle.avail || '';
-            system.cost = Number(vehicle.owncost) || Number(vehicle.cost) || 0;
 
             const consoleLogs = Sanitizer.sanitize(CONFIG.Actor.dataModels.vehicle.schema, system);
             if (consoleLogs) {

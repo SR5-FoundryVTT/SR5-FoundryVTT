@@ -1,0 +1,21 @@
+/**
+ * Styles related to general dialogs for the system.
+ */
+.application.sr5v2.form-dialog .delete-confirmation-dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-top: 0.25rem;
+
+    h3 {
+        margin: 0;
+        font-size: var(--font-size-18);
+        line-height: 1.2;
+    }
+
+    p {
+        margin: 0;
+        font-size: var(--font-size-14);
+        line-height: 1.4;
+    }
+}

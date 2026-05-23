@@ -41,6 +41,7 @@ import { ActorMarksFlow } from './flows/ActorMarksFlow';
 import { SetMarksOptions } from '../storage/MarksStorage';
 import { ActorRollDataFlow } from './flows/ActorRollDataFlow';
 import { MatrixICFlow } from './flows/MatrixICFlow';
+import { ActorArmorFlow } from './flows/ActorArmorFlow';
 import { RollDataOptions } from '../item/Types';
 import { MatrixRebootFlow } from '../flows/MatrixRebootFlow';
 import { PackItemFlow } from '../item/flows/PackItemFlow';
@@ -52,6 +53,7 @@ import type { InitiativeModeOptions } from '../combat/SR5Combatant';
 import { CreateActorFlow } from './flows/CreateActorFlow';
 import { SkillNamingFlow } from '@/module/flows/SkillNamingFlow';
 import { SkillFieldType } from '../types/template/Skills';
+import { IconAssign } from 'src/module/apps/iconAssigner/IconAssign';
 
 interface TypedItemMap extends Omit<Map<Item.ConfiguredSubType, SR5Item[]>, 'get' | 'set'> {
     get: <K extends Item.ConfiguredSubType>(key: K) => SR5Item<K>[] | undefined;
@@ -120,6 +122,16 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     static override migrateData(source: any) {
         Migrator.migrate("Actor", source);
         return super.migrateData(source);
+    }
+
+    static override getDefaultArtwork(actorData?: Actor.CreateData): Actor.GetDefaultArtworkReturn {
+        const fallback = super.getDefaultArtwork(actorData);
+        if (!actorData || actorData.img) return fallback;
+
+        const assignedImage = IconAssign.iconAssign(actorData);
+        if (!assignedImage) return fallback;
+
+        return { img: assignedImage, texture: { src: assignedImage } };
     }
 
     /**
@@ -384,30 +396,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @returns Armor or modified armor.
      */
     getArmor(damage?: DamageType): ActorArmorType {
-        // Prepare base armor data.
-        const armor = !("armor" in this.system) ?
-            DataDefaults.createData('armor') :
-            (foundry.utils.duplicate(this.system.armor) as ActorArmorType);
-        // Prepare damage to apply to armor.
-        damage = damage || DataDefaults.createData('damage');
-
-        ModifiableValue.calcTotal(damage);
-        ModifiableValue.calcTotal(damage.ap);
-
-        // Modify by penetration
-        if (damage.ap.value !== 0)
-            ModifiableValue.addUnique(armor, 'SR5.AP', damage.ap.value);
-
-        // Modify by element
-        if (damage.element.value !== '') {
-            const armorForDamageElement = armor[damage.element.value] || 0;
-            if (armorForDamageElement > 0)
-                ModifiableValue.addUnique(armor, 'SR5.Element', armorForDamageElement);
-        }
-
-        ModifiableValue.calcTotal(armor, {min: 0});
-
-        return armor;
+        const armor = ("armor" in this.system) ? this.system.armor : undefined;
+        return ActorArmorFlow.getArmor(armor, damage);
     }
 
     getMatrixDevice(this: SR5Actor) {
@@ -1142,12 +1132,12 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             ModifiableValue.addBase(action.limit, 'Teamwork', teamworkData.additionalLimit);
         }
 
-        action.dice_pool_mod.push({
-            name: "Teamwork", effectUuid: null,
-            value: teamworkData.additionalDice,
-            mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-            priority: 0, enabled: true, invalidated: false,
-        });
+        action.dice_pool_mod.push(
+            DataDefaults.createData('change_entry', {
+                name: "Teamwork",
+                value: teamworkData.additionalDice,
+            })
+        );
 
         const showDialog = this.tests.shouldShowDialog(options.event);
         const test = await this.tests.fromAction(action, this, { showDialog });
@@ -1520,21 +1510,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
             if (existing.length) await this.deleteEmbeddedDocuments('ActiveEffect', existing);
         }
-    }
-
-    getModifiedArmor(damage: DamageType): ActorArmorType {
-        if (!damage.ap?.value) {
-            return this.getArmor();
-        }
-
-        const modified = foundry.utils.duplicate(this.getArmor()) as ActorArmorType;
-        if (modified) {
-            const mod = new ModifiableValue(modified);
-            mod.addUnique('SR5.DV', damage.ap.value);
-            mod.calcTotal({ min: 0 });
-        }
-
-        return modified;
     }
 
     /** Reduce the initiative of the actor in the currently open / selected combat.

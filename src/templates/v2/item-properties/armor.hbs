@@ -1,36 +1,60 @@
 {{#if item.system.armor.value}}
     <label>
         <i data-tooltip="SR5.Armor.label" class="fas fa-shield-halved"></i>
-        {{#if item.system.armor.mod}}+{{/if}}{{item.system.armor.value}}
+        {{#if (and item.system.armor.accessory (not (lt item.system.armor.value 0)))}}+{{/if}}{{item.system.armor.value}}
     </label>
 {{/if}}
-{{#if item.system.armor.acid}}
+{{#if item.system.armor.hardened}}
     <label>
-        <i data-tooltip="SR5.ElementAcid" class="{{elementIcon 'acid'}}"></i>
-        {{item.system.armor.acid}}
+        <i data-tooltip="SR5.ArmorHardenedFull" class="fas fa-shield"></i>
+        {{item.system.armor.hardened}}
     </label>
 {{/if}}
-{{#if item.system.armor.cold}}
+{{#if item.system.armor.elements.acid.value}}
     <label>
-        <i data-tooltip="SR5.ElementCold" class="{{elementIcon 'cold'}}"></i>
-        {{item.system.armor.cold}}
+        <i data-tooltip="SR5.Element.Acid" class="{{elementIcon 'acid'}}"></i>
+        {{item.system.armor.elements.acid.value}}
     </label>
 {{/if}}
-{{#if item.system.armor.fire}}
+{{#if item.system.armor.elements.cold.value}}
     <label>
-        <i data-tooltip="SR5.ElementFire" class="{{elementIcon 'fire'}}"></i>
-        {{item.system.armor.fire}}
+        <i data-tooltip="SR5.Element.Cold" class="{{elementIcon 'cold'}}"></i>
+        {{item.system.armor.elements.cold.value}}
     </label>
 {{/if}}
-{{#if item.system.armor.electricity}}
+{{#if item.system.armor.elements.electricity.value}}
     <label>
-        <i data-tooltip="SR5.ElementElectricity" class="{{elementIcon 'electricity'}}"></i>
-        {{item.system.armor.electricity}}
+        <i data-tooltip="SR5.Element.Electricity" class="{{elementIcon 'electricity'}}"></i>
+        {{item.system.armor.elements.electricity.value}}
     </label>
 {{/if}}
-{{#if item.system.armor.radiation}}
+{{#if item.system.armor.elements.fire.value}}
     <label>
-        <i data-tooltip="SR5.ElementRadiation" class="{{elementIcon 'radiation'}}"></i>
-        {{item.system.armor.radiation}}
+        <i data-tooltip="SR5.Element.Fire" class="{{elementIcon 'fire'}}"></i>
+        {{item.system.armor.elements.fire.value}}
     </label>
 {{/if}}
+{{#if item.system.armor.elements.pollutant.value}}
+    <label>
+        <i data-tooltip="SR5.Element.Pollutant" class="{{elementIcon 'pollutant'}}"></i>
+        {{item.system.armor.elements.pollutant.value}}
+    </label>
+{{/if}}
+{{#if item.system.armor.elements.radiation.value}}
+    <label>
+        <i data-tooltip="SR5.Element.Radiation" class="{{elementIcon 'radiation'}}"></i>
+        {{item.system.armor.elements.radiation.value}}
+    </label>
+{{/if}}
+{{#if item.system.armor.elements.water.value}}
+    <label>
+        <i data-tooltip="SR5.Element.Water" class="{{elementIcon 'water'}}"></i>
+        {{item.system.armor.elements.water.value}}
+    </label>
+{{/if}}
+{{#each item.system.armor.immunities.value as |immunity|}}
+    <label data-tooltip="{{localize 'SR5.Immunity'}}: {{localize (objValue @root.config.armorImmunityTypes immunity)}}">
+        <i class="fas fa-shield-virus"></i>
+        {{localize (objValue @root.config.armorImmunityTypes immunity)}}
+    </label>
+{{/each}}

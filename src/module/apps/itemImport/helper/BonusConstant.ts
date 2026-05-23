@@ -6,13 +6,17 @@ export type DocCreateData = (
 
 export type AECreateData = Omit<ActiveEffect.CreateData, "name"> & { name?: string, changes?: any[] };
 
-export const MODIFY = 'custom';
-export const MULTIPLY = 'multiply';
-export const ADD = 'add';
-export const SUBTRACT = 'subtract';
-export const DOWNGRADE = 'downgrade';
-export const UPGRADE = 'upgrade';
-export const OVERRIDE = 'override';
+// TODO: tamif - v14 - check how these were used
+// export const MODIFY = 'custom';
+// export const MULTIPLY = 'multiply';
+// export const ADD = 'add';
+// export const SUBTRACT = 'subtract';
+// export const DOWNGRADE = 'downgrade';
+// export const UPGRADE = 'upgrade';
+// export const OVERRIDE = 'override';
+export type ActiveEffectMode = typeof CONST.ACTIVE_EFFECT_MODES[keyof typeof CONST.ACTIVE_EFFECT_MODES];
+export const { MULTIPLY, ADD, DOWNGRADE, UPGRADE, OVERRIDE } = CONST.ACTIVE_EFFECT_MODES;
+export type EffectChangeParameter = { key: string; value: string | number; mode?: number; priority?: ActiveEffectMode; };
 
 export class BonusConstant {
     public static readonly skillGroupTable = {
@@ -55,9 +59,10 @@ export class BonusConstant {
         accel: { changes: [{ key: "system.vehicle_stats.acceleration" }] },
         armor: {
             name: "Add Armor",
-            changes: [{ key: "system.armor" }]
+            changes: [{ key: "system.armor.rating" }]
         },
         body: { changes: [{ key: "system.attributes.body" }] },
+        coldarmor: { changes: [{ key: "system.armor.elements.cold" }] },
         composure: { changes: [{ key: "system.modifiers.composure" }] },
         damageresistance: {
             name: "Add Damage Resistance",
@@ -83,6 +88,7 @@ export class BonusConstant {
             changes: [{ key: "data.pool" }],
             system: { applyTo: 'test_all', selection_tests: [{ id: "DrainTest" }] },
         },
+        electricityarmor: { changes: [{ key: "system.armor.elements.electricity" }] },
         essencemax: { changes: [{ key: "system.attributes.essence.base" }] },
         essencepenalty: { changes: [{ key: "system.attributes.essence" }] },
         fadingresist: {
@@ -90,6 +96,7 @@ export class BonusConstant {
             changes: [{ key: "data.pool" }],
             system: { applyTo: 'test_all', selection_tests: [{ id: "FadeTest" }] },
         },
+        firearmor: { changes: [{ key: "system.armor.elements.fire" }] },
         handling: { changes: [{ key: "system.vehicle_stats.handling" }] },
         initiative: { changes: [{ key: "system.modifiers.meat_initiative" }] },
         initiativedice: { changes: [{ key: "system.modifiers.meat_initiative_dice" }] },
