@@ -1,4 +1,4 @@
- { SR5TestFactory } from "./utils";
+import { SR5TestFactory } from "./utils";
 import { SR5Item } from "../module/item/SR5Item";
 import { ModifiableValue } from "@/module/mods/ModifiableValue";
 import { SkillTest } from "../module/tests/SkillTest";
