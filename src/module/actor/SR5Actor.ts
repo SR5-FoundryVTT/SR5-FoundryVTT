@@ -593,6 +593,10 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return this.system.skills.active;
     }
 
+    getSkillGroups(this: SR5Actor) {
+        return this.items.filter(item => item.isType('skill') && item.system.type === 'group') as SR5Item<'skill'>[];
+    }
+
     getMasterUuid(): string | undefined {
         if (!this.isType('vehicle')) return;
 
