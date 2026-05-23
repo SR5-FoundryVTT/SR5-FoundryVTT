@@ -1590,8 +1590,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             return this.actor.system.half_value_skill ? Math.ceil(force / 2) : force;
         };
 
-        return (this.actor.itemsForType.get('skill') ?? [])
-            .filter(item => item.isType('skill') && item.system.type === 'group')
+        // NOTE: SR5Actor.itemsForType seems to not be loaded on actors when they're opened from a pack or copied over from it.
+        return this.actor.getSkillGroups()
             .map(item => ({
                 item,
                 label: SkillNamingFlow.localizeSkillgroupName(item.name),

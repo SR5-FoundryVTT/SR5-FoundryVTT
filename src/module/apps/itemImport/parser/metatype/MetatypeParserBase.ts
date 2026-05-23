@@ -10,6 +10,11 @@ type MetatypeItemData = {
     $?: { select?: string; rating?: string; spec?: string };
 };
 
+type MetatypeItemData = {
+    _TEXT: string;
+    $?: { select?: string; rating?: string; spec?: string };
+};
+
 export abstract class MetatypeParserBase<TResult extends ('character' | 'spirit' | 'sprite')> extends Parser<TResult> {
     /**
      * Returns metatype bonus data stripped of initiative keys to avoid duplicate initiative application.
@@ -28,8 +33,8 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'spirit'
     /**
      * Merges many optional one-or-many arrays into a single non-null list.
      */
-    protected mergeLists<T>(...lists: Array<OneOrMany<T | undefined>>): Array<NonNullable<T>> {
-        return lists.flatMap(list => IH.getArray(list)).filter((v): v is NonNullable<T> => v != null);
+    protected mergeLists<T>(...lists: Array<OneOrMany<T> | undefined>): Array<NonNullable<T>> {
+        return lists.flatMap(list => IH.getArray(list)).filter(v => v != null);
     }
 
     /**
@@ -136,7 +141,7 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'spirit'
      */
     getMetatypeItems(
         items: RetrievedItem[],
-        itemsData: undefined | OneOrMany<MetatypeItemData>,
+        itemsData: OneOrMany<MetatypeItemData> | undefined,
         msg_field: {type: string; critter: string},
     ): Item.Source[] {
         const itemMap = new Map(items.map(({name_english, ...i}) => [name_english, i]));
