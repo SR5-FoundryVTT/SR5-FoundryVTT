@@ -334,3 +334,16 @@
     text-shadow: none;
   }
 }
+
+body.theme-light .application.sr5v2.form-dialog:not(.theme-dark),
+.application.sr5v2.form-dialog.theme-light {
+  .window-content select {
+    color-scheme: light;
+
+    option,
+    optgroup {
+      color: var(--sr5v2-option-text) !important;
+      background-color: var(--sr5v2-option-bg) !important;
+    }
+  }
+}
