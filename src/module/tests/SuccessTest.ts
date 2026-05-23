@@ -292,7 +292,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     _prepareRollMode(data, options: TestOptions): foundry.dice.Roll.Mode {
         if (options.rollMode != null) return options.rollMode;
         if (data?.action?.roll_mode) return data.action.roll_mode;
-        else return game.settings.get(CORE_NAME, 'rollMode') as foundry.dice.Roll.Mode;
+        // @ts-expect-error TODO: fvtt - v14 - missing settings typing
+        else return game.settings.get(CORE_NAME, 'messageMode') as foundry.dice.Roll.Mode;
     }
 
     /**
@@ -1909,7 +1910,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * What ChatMessage rollMode is this test supposed to use?
      */
     get _rollMode(): string {
-        return this.data.options?.rollMode as string ?? game.settings.get('core', 'rollMode');
+        // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
+        return this.data.options?.rollMode as string ?? game.settings.get('core', 'messageMode');
     }
 
     /**
@@ -1952,7 +1954,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         }
 
         // Instead of manually applying whisper ids, let Foundry do it.
-        ChatMessage.applyRollMode(messageData, game.settings.get("core", "rollMode"));
+        // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
+        ChatMessage.applyMode(messageData, game.settings.get("core", "messageMode"));
 
         return messageData;
     }
