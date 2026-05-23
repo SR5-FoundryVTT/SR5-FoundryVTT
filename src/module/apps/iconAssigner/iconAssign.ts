@@ -1,5 +1,5 @@
 import { SR5 } from "../../config";
-import { FLAGS, SYSTEM_NAME } from './../../constants';
+import { FLAGS, SYSTEM_NAME } from '../../constants';
 import { ImportHelper as IH } from "../itemImport/helper/ImportHelper";
 
 const FilePicker = foundry.applications.apps.FilePicker.implementation;

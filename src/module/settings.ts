@@ -1,7 +1,7 @@
 // game settings for shadowrun 5e
 
 import { FLAGS, SYSTEM_NAME } from './constants';
-import { IconAssign } from './apps/iconAssigner/iconAssign';
+import { IconAssign } from './apps/iconAssigner/IconAssign';
 import SR5CompendiaSettings from './settings/SR5CompendiaSettings';
 
 export const registerSystemSettings = () => {

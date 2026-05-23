@@ -34,7 +34,7 @@ import { MatrixDeviceFlow } from './flows/MatrixDeviceFlow';
 import { StorageFlow } from '@/module/flows/StorageFlow';
 import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
 import { ModifiableValueType } from '../types/template/Base';
-import { IconAssign } from '@/module/apps/iconAssigner/iconAssign';
+import { IconAssign } from 'src/module/apps/iconAssigner/IconAssign';
 import Document = foundry.abstract.Document;
 import GetEmbeddedDocumentOptions = Document.GetEmbeddedDocumentOptions;
 

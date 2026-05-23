@@ -2,7 +2,7 @@ import { ParseData } from "./Types";
 import { CompendiumKey } from "../importer/Constants";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 import { BonusHelper as BH } from "../helper/BonusHelper";
-import { IconAssign } from "../../iconAssigner/iconAssign";
+import { IconAssign } from "../../iconAssigner/IconAssign";
 import { ImportHelper as IH } from "../helper/ImportHelper";
 import { TechnologyType } from "src/module/types/template/Technology";
 import { DataDefaults, SystemConstructorArgs, SystemEntityType } from "src/module/data/DataDefaults";

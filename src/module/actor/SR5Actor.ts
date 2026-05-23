@@ -52,7 +52,7 @@ import type { InitiativeModeOptions } from '../combat/SR5Combatant';
 import { CreateActorFlow } from './flows/CreateActorFlow';
 import { SkillNamingFlow } from '@/module/flows/SkillNamingFlow';
 import { SkillFieldType } from '../types/template/Skills';
-import { IconAssign } from '@/module/apps/iconAssigner/iconAssign';
+import { IconAssign } from 'src/module/apps/iconAssigner/IconAssign';
 
 interface TypedItemMap extends Omit<Map<Item.ConfiguredSubType, SR5Item[]>, 'get' | 'set'> {
     get: <K extends Item.ConfiguredSubType>(key: K) => SR5Item<K>[] | undefined;
