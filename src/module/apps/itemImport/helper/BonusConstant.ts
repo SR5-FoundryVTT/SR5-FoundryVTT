@@ -6,14 +6,6 @@ export type DocCreateData = (
 
 export type AECreateData = Omit<ActiveEffect.CreateData, "name"> & { name?: string, changes?: any[] };
 
-// TODO: tamif - v14 - check how these were used
-// export const MODIFY = 'custom';
-// export const MULTIPLY = 'multiply';
-// export const ADD = 'add';
-// export const SUBTRACT = 'subtract';
-// export const DOWNGRADE = 'downgrade';
-// export const UPGRADE = 'upgrade';
-// export const OVERRIDE = 'override';
 export type ActiveEffectMode = typeof CONST.ACTIVE_EFFECT_MODES[keyof typeof CONST.ACTIVE_EFFECT_MODES];
 export const { MULTIPLY, ADD, DOWNGRADE, UPGRADE, OVERRIDE } = CONST.ACTIVE_EFFECT_MODES;
 export type EffectChangeParameter = { key: string; value: string | number; mode?: number; priority?: ActiveEffectMode; };

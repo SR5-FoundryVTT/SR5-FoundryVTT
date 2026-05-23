@@ -39,7 +39,7 @@ export class BonusHelper {
 
         for (const change of changes) {
             change.value = this.normalizeValue(sheet, change.value);
-            // TODO: tamif - v14 - replace by constant
+            // SimpleEffect doesn't contain change type, so explicitly add a default to not rely on foundry defaults.
             if (!change.type) change.type = 'add';
         }
 
