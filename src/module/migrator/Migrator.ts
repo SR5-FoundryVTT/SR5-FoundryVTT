@@ -277,8 +277,7 @@ export class Migrator {
             1 + game.items.size +                         // Items + their effects
             1 + game.actors.size * 2 +                    // Actor + their items + their effects
             [...game.actors].reduce((sum, actor) => sum + actor.items.size, 0) +  // Actor item effects
-            1 + game.combats.size +                       // Combats
-            [...game.combats].reduce((sum, combat) => sum + combat.combatants.size, 0) +  // Combatants
+            1 + game.combats.size +                       // Combats + their combatants
             game.scenes.size;                             // Non-actor tokens
 
         /* Items and its embedded Effects */
