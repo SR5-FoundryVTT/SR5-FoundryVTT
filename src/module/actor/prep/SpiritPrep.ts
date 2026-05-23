@@ -46,7 +46,6 @@ export class SpiritPrep {
 
     static prepareSpiritValues(system: Actor.SystemOfType<'spirit'>) {
         const overrides = this.getSpiritStatModifiers(system.spiritType);
-        // if (!system.skills?.active) return;
 
         if (overrides) {
             const { attributes, skills, initiative, modifiers } = system;
@@ -361,7 +360,7 @@ export class SpiritPrep {
                 overrides.attributes.strength = -2;
                 overrides.attributes.intuition = 1;
                 overrides.init = 2;
-                overrides.skills.push('assensing', 'astral_combat', 'perception', 'spell_casting', 'unarmed_combat');
+                overrides.skills.push('assensing', 'astral_combat', 'perception', 'spellcasting', 'unarmed_combat');
                 break;
             case 'sludge':
                 overrides.attributes.body = 1;
@@ -583,7 +582,7 @@ export class SpiritPrep {
                 overrides.attributes.body = +2;
                 overrides.attributes.strength = 1;
                 overrides.attributes.essence = -2;
-                overrides.skills.push("assensing", "astral_combat", "blade", "clubs", "unarmed_combat", "exotic_ranged_weapon", "perception");
+                overrides.skills.push("assensing", "astral_combat", "blades", "clubs", "unarmed_combat", "exotic_ranged_weapon", "perception");
                 break;
 
             case "blackjack":
