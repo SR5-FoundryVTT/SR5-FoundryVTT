@@ -21,7 +21,7 @@
         }
     ],
     "url": "#{URL}#",
-    "version": "0.34.0",
+    "version": "0.35.0",
     "compatibility": {
         "minimum": "14",
         "verified": "14.361",
