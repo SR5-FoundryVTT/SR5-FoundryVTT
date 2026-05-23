@@ -4,7 +4,7 @@ import { DataDefaults } from '@/module/data/DataDefaults';
 import { Migrator } from '@/module/migrator/Migrator';
 import { VersionMigration } from '@/module/migrator/VersionMigration';
 import { Version0_33_1 } from '@/module/migrator/versions/Version0_33_1';
-import { Version0_34_0 } from '@/module/migrator/versions/Version0_34_0';
+import { Version0_35_0 } from '@/module/migrator/versions/Version0_35_0';
 
 export const Migrators = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -390,7 +390,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
     });
 
-    describe('Version0_34_0 spirit legacy migration', () => {
+    describe('Version0_35_0 spirit legacy migration', () => {
         const createSkillItem = (name: string, rating = 0): any => ({
             _id: foundry.utils.randomID(16),
             name,
@@ -419,7 +419,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
 
         it('migrates known spirit profiles to offsets, force applicability, formulae, and skill toggles', () => {
-            const migrator = new Version0_34_0();
+            const migrator = new Version0_35_0();
             const actor = createSpirit('air', 6);
             actor.items.push(createSkillItem('Assensing', 0), createSkillItem('Arcana', 4));
 
@@ -450,7 +450,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
 
         it('migrates watcher half-value profile, force off attributes, and initiative dice variations', () => {
-            const migrator = new Version0_34_0();
+            const migrator = new Version0_35_0();
             const actor = createSpirit('watcher', 6);
             actor.items.push(createSkillItem('Assensing', 0), createSkillItem('Unarmed Combat', 2));
 
@@ -484,7 +484,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
 
         it('skips unknown spirit types', () => {
-            const migrator = new Version0_34_0();
+            const migrator = new Version0_35_0();
             const actor = createSpirit('custom_unknown_type', 4);
             actor.system.half_value_skill = true;
             actor.system.attributes.body.applies_special = false;
@@ -509,9 +509,9 @@ export const Migrators = (context: QuenchBatchContext) => {
 
     });
 
-    describe('Version0_34_0 initiative modifier migration', () => {
+    describe('Version0_35_0 initiative modifier migration', () => {
         it('moves legacy initiative modifiers into initiative formula and removes modifier fields', () => {
-            const migrator = new Version0_34_0();
+            const migrator = new Version0_35_0();
             const actor = {
                 _id: foundry.utils.randomID(16),
                 _stats: { systemVersion: '0.33.9' },
@@ -547,7 +547,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
     });
 
-    describe('Version0_34_0 sprite legacy migration', () => {
+    describe('Version0_35_0 sprite legacy migration', () => {
         const createSkillItem = (name: string, rating = 0, category: 'active' | 'knowledge' | 'language' = 'active'): any => ({
             _id: foundry.utils.randomID(16),
             name,
@@ -585,7 +585,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
 
         it('migrates known legacy sprite type into offsets, level toggles, initiative formula constant, and skill toggles', () => {
-            const migrator = new Version0_34_0();
+            const migrator = new Version0_35_0();
             const actor = createSprite('courier', 6);
             actor.system.level = 6;
             actor.items.push(
@@ -630,7 +630,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
 
         it('migrates another known profile with negative offsets and multiple enabled skills', () => {
-            const migrator = new Version0_34_0();
+            const migrator = new Version0_35_0();
             const actor = createSprite('data', 5);
             actor.system.level = 5;
             actor.items.push(
@@ -655,7 +655,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
 
         it('skips unknown sprite types', () => {
-            const migrator = new Version0_34_0();
+            const migrator = new Version0_35_0();
             const actor = createSprite('custom_unknown_type', 4);
             actor.system.level = 4;
             actor.system.matrix.attack.applies_special = false;
@@ -674,7 +674,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
 
         it('migrates legacy sprite level field and active effect change keys', () => {
-            const migrator = new Version0_34_0();
+            const migrator = new Version0_35_0();
             const actor = createSprite('unknown', 7);
             actor.system.level = 7;
 

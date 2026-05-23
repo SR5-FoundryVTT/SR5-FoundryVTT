@@ -98,7 +98,7 @@ export const PRESET_SPIRIT_PROFILES: Record<string, SpiritProfileData> = {
     },
     arboreal: {
         attributes: { body: 2, strength: 1, essence: -2 },
-        skills: ['assensing', 'astral_combat', 'blade', 'clubs', 'unarmed_combat', 'exotic_ranged_weapon', 'perception'],
+        skills: ['assensing', 'astral_combat', 'blades', 'clubs', 'unarmed_combat', 'exotic_ranged_weapon', 'perception'],
     },
     automotive: {
         attributes: { body: 1, agility: 2, reaction: 1, logic: -2 },
