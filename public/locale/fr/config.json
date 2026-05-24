@@ -506,6 +506,8 @@
             "WarningTitle": "Alerte"
         },
         "Magic": "Magie",
+        "ManualModifier": "Modificateur manuel",
+        "ManualModifierValue": "Valeur du modificateur manuel",
         "ManualOverride": "Substitution du résultat",
         "Matrix": "Matrice",
         "MatrixAttrAttack": "Attaque",

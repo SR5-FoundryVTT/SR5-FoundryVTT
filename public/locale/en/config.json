@@ -1814,6 +1814,8 @@
         },
         "Magic": "Magic",
         "Manual": "Manual",
+        "ManualModifier": "Manual Modifier",
+        "ManualModifierValue": "Manual Modifier Value",
         "ManualOverride": "Result Override",
         "MarkImportedItemReviewed": "Mark Imported Item Reviewed",
         "MarkImportedItemTooltip": "Marks this imported item as having been reviewed.",

@@ -1812,6 +1812,8 @@
         },
         "Magic": "마법",
         "Manual": "수동 조종",
+        "ManualModifier": "수동 수정치",
+        "ManualModifierValue": "수동 수정치 값",
         "ManualOverride": "결과 오버라이드",
         "MarkImportedItemReviewed": "불러온 항목 검토 완료 표시",
         "MarkImportedItemTooltip": "불러온 항목이 검토된 것으로 표시합니다.",

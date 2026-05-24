@@ -214,6 +214,9 @@
     border-radius: 0;
 
     .form-fields {
+      padding-top: 1px;
+      padding-bottom: 1px;
+
       .modifier-summary,
       .base-summary {
         display: inline-flex;
@@ -256,6 +259,10 @@
           display: none;
         }
       }
+
+      .toggle-breakdown {
+        margin-right: 4px;
+      }
     }
 
     .breakdown-list {
@@ -282,14 +289,64 @@
       text-overflow: ellipsis;
     }
 
-    .mod-value {
-      flex: 0 0 2.5rem;
+    .mod-value,
+    .modifier-value-input,
+    .manual-modifier-value {
+      width: 50px;
+      min-width: 50px;
+      max-width: 50px;
+      flex-basis: 50px;
       text-align: right;
+    }
+
+    .modifier-value-input,
+    .manual-modifier-value {
+      height: 25px;
+      margin: 0;
+      padding: 3px;
+      box-sizing: border-box;
+      text-align: center;
+      font-size: 1.1em;
+      font-weight: 400;
+      background: var(--sr5v2-control-bg);
+      border: 1px solid var(--sr5v2-control-border);
+      color: var(--sr5v2-control-text);
+    }
+
+    &.manual-modifier-entry {
+      .manual-modifier-name {
+        flex: 1 1 auto;
+        min-width: 0;
+        height: 24px;
+      }
+
+      .manual-modifier-create {
+        flex: 0 0 auto;
+        margin-left: auto;
+        width: 18px;
+        height: 18px;
+        padding: 0;
+        border: 1px solid var(--sr5v2-control-border);
+        border-radius: 2px;
+        background: var(--sr5v2-control-bg-strong);
+        color: var(--sr5v2-text-primary);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 0.625rem;
+
+        &:hover {
+          border-color: var(--sr5v2-control-border-hover);
+        }
+      }
     }
 
     > input[type='checkbox'] {
       flex: 0 0 auto;
       margin-left: auto;
+      width: 18px;
+      height: 18px;
     }
 
     .modifier-effect-button {
