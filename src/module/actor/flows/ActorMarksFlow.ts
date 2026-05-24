@@ -154,6 +154,9 @@ export const ActorMarksFlow = {
             // Replace marked persona device with persona itself.
             const persona = document instanceof SR5Item ? document.persona : null;
             if (persona?.uuid && persona.getMatrixDevice()?.uuid === uuid) document = persona as Actor.Stored;
+            // In case of marked persona device, replace the display name of the marked document.
+            let displayName = name;
+            if (persona && persona.uuid !== uuid) displayName = persona.name;
 
             const network = ActorMarksFlow.getDocumentNetwork(document);
             const type = MatrixNetworkFlow.getDocumentType(document);
@@ -164,7 +167,7 @@ export const ActorMarksFlow = {
             const token = null;
             const runningSilent = false;
 
-            documents.push({document, token, marks, markId, name, type, network, runningSilent, icons: []});
+            documents.push({document, token, marks, markId, name: displayName, type, network, runningSilent, icons: []});
         }
 
         return documents;
