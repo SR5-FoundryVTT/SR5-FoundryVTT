@@ -198,6 +198,7 @@ export const MatrixTargetingFlow = {
             }
         }
 
+        this._dedupeTargetsByDocumentUuid(targets);
 
         // Sort all targets by grid name first and target name second.
         targets.sort((a, b) => {
@@ -248,6 +249,29 @@ export const MatrixTargetingFlow = {
         }
 
         return connectedIcons;
+    },
+
+    /**
+     * Dedpulicate targets entry as the same document can be added mulitple times by different means.
+     * 
+     * One case would be a linked actor having three tokens on scene.
+     * 
+     * @param targets A list of matrix targets to deduplicate. The list is modified in place.
+     */
+    _dedupeTargetsByDocumentUuid(targets: MatrixTargetDocument[]) {
+        const seenDocumentUuids = new Set<string>();
+
+        // Iterate classicly for index.
+        for (let index = targets.length - 1; index >= 0; index -= 1) {
+            const documentUuid = targets[index].document.uuid;
+
+            if (seenDocumentUuids.has(documentUuid)) {
+                targets.splice(index, 1);
+                continue;
+            }
+
+            seenDocumentUuids.add(documentUuid);
+        }
     },
 
     /**
