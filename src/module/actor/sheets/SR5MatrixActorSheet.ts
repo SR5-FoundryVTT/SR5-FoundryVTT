@@ -430,17 +430,8 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             }
             return true;
         });
-        // Reduce actions to those matching the marks on the selected target.
-        if (this.selectedMatrixTarget) {
-            const ownedItem = this.actor.isOwnerOf(this.selectedMatrixTarget);
-            const marksPlaced = this.actor.getMarksPlaced(this.selectedMatrixTarget);
-            actions = actions.filter(action => {
-                const { marks, owner } = action.system.action.category.matrix;
-                if (owner) return ownedItem;
-                // you can do actions that require marks on your own devices
-                return ownedItem || marks <= marksPlaced;
-            });
-        }
+
+        actions = this.filterActionsByMarksPlaced(actions);
 
         // Prepare sorting and display of a possibly translated document name.
         const sheetActions: sheetAction[] = [];
@@ -453,6 +444,32 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         }
 
         return sheetActions.sort(Helpers.sortByName.bind(Helpers));
+    }
+
+    /**
+     * Reduce actions to those matching the marks on the selected target.
+     * @param actions A list of matrix actions as the input
+     * @return A list of matrix actions containing only those matching mark placed requirements
+     */
+    filterActionsByMarksPlaced(actions: SR5Item<'action'>[]) {
+        if (!this.selectedMatrixTarget) return actions;
+
+        // Selected Target can be an actor using a matrix device.
+        // As we display actors on sheet, we have to make sure that we return their used
+        // matrix device, where marks are actually placed on.
+        let target = fromUuidSync(this.selectedMatrixTarget) as SR5Actor | SR5Item | null | undefined;
+        if (target && target instanceof SR5Actor && target.hasDevicePersona()) target = target.getMatrixDevice();
+        if (!target) return actions;
+
+        const ownedItem = this.actor.isOwnerOf(target.uuid!);
+        const marksPlaced = this.actor.getMarksPlaced(target.uuid!);
+
+        return actions.filter(action => {
+            const { marks, owner } = action.system.action.category.matrix;
+            if (owner) return ownedItem;
+            // you can do actions that require marks on your own devices
+            return ownedItem || marks <= marksPlaced;
+        });
     }
 
     /**
