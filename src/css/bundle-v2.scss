@@ -146,6 +146,10 @@ body.theme-light,
     --sr5v2-cell-filled-text: #000000;
     --sr5v2-positive: #079123;
     --sr5v2-negative: #ff4d4d;
+    --sr5v2-positive-border: #3a7e3f;
+    --sr5v2-positive-bg: rgba(58, 126, 63, 0.16);
+    --sr5v2-negative-border: #8c3d3d;
+    --sr5v2-negative-bg: rgba(140, 61, 61, 0.16);
     --sr5v2-list-selected-bg: radial-gradient(rgba(7, 145, 35, 0.4), rgba(7, 145, 35, 0.01));
     --sr5v2-icon-filter: invert(1);
     box-shadow: var(--sr5v2-window-shadow);
@@ -884,6 +888,10 @@ body.theme-light .sr5v2:not(.theme-dark),
     --sr5v2-cell-filled-bg: #b7c7d5;
     --sr5v2-cell-filled-border: #75889b;
     --sr5v2-cell-filled-text: #1d2834;
+    --sr5v2-positive-border: #3a7e3f;
+    --sr5v2-positive-bg: rgba(58, 126, 63, 0.16);
+    --sr5v2-negative-border: #8c3d3d;
+    --sr5v2-negative-bg: rgba(140, 61, 61, 0.16);
     --sr5v2-list-selected-bg: radial-gradient(rgba(7, 145, 35, 0.22), rgba(7, 145, 35, 0.03));
     --sr5v2-icon-filter: none;
 }

@@ -8,6 +8,10 @@
 
     <div class="form-fields">
         {{#if (hasModifierChanges data.changes)}}
+        <span class="base-summary">
+            <span class="summary-base">{{modifierBaseTotal data}}</span>
+        </span>
+
         <span
             class="modifier-summary {{modifierSummaryClass data}}"
             data-tooltip="{{modifierSummaryTooltip data.changes}}"

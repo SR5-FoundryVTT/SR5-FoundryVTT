@@ -16,6 +16,12 @@ export const registerModifierHelpers = () => {
         return getModifierChanges(changes).filter(change => change.enabled);
     };
 
+    const getBaseValueTotal = (modValue: ModifiableValueType) => {
+        return modValue.base + modValue.changes
+            .filter(change => ModifiableValue.isBaseChange(change) && change.enabled)
+            .reduce((total, change) => total + change.value, 0);
+    };
+
     const getDiffValueChange = (modValue: ModifiableValueType) => {
         return modValue.value - modValue.changes
             .filter(change => ModifiableValue.isBaseChange(change))
@@ -45,6 +51,10 @@ export const registerModifierHelpers = () => {
 
     Handlebars.registerHelper('modifierActiveCount', (changes: ChangeType[]) => {
         return getActiveModifierChanges(changes).length;
+    });
+
+    Handlebars.registerHelper('modifierBaseTotal', (modValue: ModifiableValueType) => {
+        return getBaseValueTotal(modValue);
     });
 
     Handlebars.registerHelper('modifierNetTotal', (modValue: ModifiableValueType) => {

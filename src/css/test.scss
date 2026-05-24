@@ -213,6 +213,51 @@
   .modifiable-value {
     border-radius: 0;
 
+    .form-fields {
+      .modifier-summary,
+      .base-summary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 22px;
+        padding: 0 8px;
+        border-radius: 999px;
+        border: 1px solid var(--sr5v2-control-border);
+        background: var(--sr5v2-control-bg-strong);
+        color: var(--sr5v2-text-primary);
+        font-size: 0.78em;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+
+        .summary-count {
+          color: var(--sr5v2-text-secondary);
+        }
+
+        &.positive {
+          border-color: var(--sr5v2-positive-border);
+          background: var(--sr5v2-positive-bg);
+          color: var(--sr5v2-text-primary);
+        }
+
+        &.negative {
+          border-color: var(--sr5v2-negative-border);
+          background: var(--sr5v2-negative-bg);
+          color: var(--sr5v2-text-primary);
+        }
+
+        &.neutral {
+          border-color: var(--sr5v2-control-border);
+          background: var(--sr5v2-control-bg-strong);
+          color: var(--sr5v2-text-primary);
+        }
+
+        &.base-summary .summary-count {
+          display: none;
+        }
+      }
+    }
+
     .breakdown-list {
       padding: 2px 6px;
       gap: 2px;
