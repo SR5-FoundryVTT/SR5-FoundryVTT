@@ -1465,6 +1465,18 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     /**
+     * Determine if this device is used as the owning actors active persona device to connect to the matrix.
+     * @returns true, if this device is used as the active persona device.
+     */
+    isActivePersonaDevice() {
+        const actor = this.actorOwner;
+        if (!actor) return false;
+        const personaDevice = actor.getMatrixDevice() as SR5Item | undefined;
+        if (!personaDevice) return false;
+        return personaDevice.id === this.id;
+    }
+
+    /**
      * Is this matrix device part of an active network?
      */
     get hasMaster(): boolean {

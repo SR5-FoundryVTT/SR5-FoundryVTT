@@ -151,12 +151,13 @@ export const ActorMarksFlow = {
                 continue;   
             }
 
-            // Replace marked persona device with persona itself.
-            const persona = document instanceof SR5Item ? document.persona : null;
-            if (persona?.uuid && persona.getMatrixDevice()?.uuid === uuid) document = persona as Actor.Stored;
             // In case of marked persona device, replace the display name of the marked document.
-            let displayName = name;
-            if (persona && persona.uuid !== uuid) displayName = persona.name;
+            // NOTE: We directly check against used persona device to avoid replacing
+            let displayName = name;            
+            if (document instanceof SR5Item && document.isActivePersonaDevice()) {
+                document = document.persona as Actor.Stored;
+                displayName = document!.name;
+            }
 
             const network = ActorMarksFlow.getDocumentNetwork(document);
             const type = MatrixNetworkFlow.getDocumentType(document);
