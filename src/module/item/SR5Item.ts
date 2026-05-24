@@ -32,11 +32,9 @@ import { RollDataOptions } from './Types';
 import { SetMarksOptions } from '../storage/MarksStorage';
 import { MatrixDeviceFlow } from './flows/MatrixDeviceFlow';
 import { StorageFlow } from '@/module/flows/StorageFlow';
-import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
 import { ModifiableValueType } from '../types/template/Base';
 import { IconAssign } from 'src/module/apps/iconAssigner/IconAssign';
-import Document = foundry.abstract.Document;
-import GetEmbeddedDocumentOptions = Document.GetEmbeddedDocumentOptions;
+import GetEmbeddedDocumentOptions = foundry.abstract.Document.GetEmbeddedDocumentOptions;
 
 type OneOrMany<T> = T | T[];
 const { fromUuid, mergeObject, expandObject } = foundry.utils;
@@ -1258,7 +1256,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return this;
     }
 
-    override async update(data: Item.UpdateInput, options?: Item.Database.UpdateOperation) {
+    override async update(data: Item.UpdateInput, options?: Item.Database.UpdateOneDocumentOperation) {
         // Item.item => Embedded item into another item!
         if (this._isNestedItem)
             return this.updateNestedItem(data);
@@ -1580,20 +1578,27 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      */
     override async _preDelete(...args: Parameters<Item['_preDelete']>) {
         await StorageFlow.deleteStorageReferences(this);
-        return await super._preDelete(...args);
+        return super._preDelete(...args);
     }
 
     /**
      * Override getEmbeddedDocument to support Nested Items
-     * @param embeddedName
-     * @param id
-     * @param options
      */
-    // provide typescript overrides dependent on the embedded name -- this was to fix an issue with overriding this value from Item
-    override getEmbeddedDocument(embeddedName: 'ActiveEffect' | 'effects', id: string, options?: GetEmbeddedDocumentOptions): SR5ActiveEffect | undefined;
-    override getEmbeddedDocument(embeddedName: 'Item' | 'items', id: string, options?: GetEmbeddedDocumentOptions): SR5Item | undefined;
-    override getEmbeddedDocument<EmbeddedName extends 'ActiveEffect' | 'effects' | 'Item' | 'items'>(
-            embeddedName: EmbeddedName, id: string, options: GetEmbeddedDocumentOptions = {}) {
+    override getEmbeddedDocument(
+        embeddedName: 'Item' | 'items',
+        id: string,
+        options?: GetEmbeddedDocumentOptions
+    ): Item.Implementation | undefined;
+    override getEmbeddedDocument(
+        embeddedName: 'ActiveEffect' | 'effects',
+        id: string,
+        options?: GetEmbeddedDocumentOptions
+    ): ReturnType<Item['getEmbeddedCollection']>;
+    override getEmbeddedDocument(
+        embeddedName: 'ActiveEffect' | 'effects' | 'Item' | 'items',
+        id: string,
+        options?: GetEmbeddedDocumentOptions
+    ) {
         if (embeddedName === 'Item' || embeddedName === 'items') {
             return this.getOwnedItem(id);
         }
