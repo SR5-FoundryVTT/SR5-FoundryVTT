@@ -84,6 +84,9 @@ export const MatrixTargetingFlow = {
         });
 
         for (const slave of actors) {
+            // Filter out the actor itself.
+            if (slave.uuid === actor.uuid) continue;
+
             const type = MatrixNetworkFlow.getDocumentType(slave);
             const name = slave.getToken()?.name ?? slave.name;
             targets.push({
@@ -142,6 +145,9 @@ export const MatrixTargetingFlow = {
         // Scene Tokens will be collected separately.
         for (const grid of MatrixNetworkFlow.getGrids({ players: true })) {
             for (const slave of grid.slaves) {
+                // Filter out the actor itself.
+                if (slave.uuid === actor.uuid) continue;
+
                 // Skip actor tokens as they're collected separately.
                 if (slave instanceof SR5Actor && slave.getToken()) continue;
 
