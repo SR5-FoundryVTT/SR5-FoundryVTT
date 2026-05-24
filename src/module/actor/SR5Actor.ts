@@ -155,7 +155,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     override async update(
         data: Actor.UpdateInput,
-        operation?: Actor.Database.UpdateOperation,
+        operation?: Actor.Database.UpdateOneDocumentOperation,
     ) {
         await Migrator.updateMigratedDocument(this);
         return super.update(data, operation);

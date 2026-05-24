@@ -79,7 +79,6 @@ export const ActorMarksFlow = {
         const matrixData = persona.matrixData();
 
         if (!matrixData) return;
-        // TODO: Support marking a non-document target (using only a name)
         if (!target?.uuid || !persona.uuid) return;
 
         const marksData = MarksStorage.setMarks(matrixData.marks, target, persona.getMarksPlaced(target.uuid), marks, options);
@@ -152,9 +151,13 @@ export const ActorMarksFlow = {
                 continue;   
             }
 
-            // Replace marked persona device with persona itself.
-            const persona = document instanceof SR5Item ? document.persona : null;
-            if (persona?.uuid && persona.getMatrixDevice()?.uuid === uuid) document = persona as Actor.Stored;
+            // In case of marked persona device, replace the display name of the marked document.
+            // NOTE: We directly check against used persona device to avoid replacing
+            let displayName = name;            
+            if (document instanceof SR5Item && document.isActivePersonaDevice()) {
+                document = document.persona as Actor.Stored;
+                displayName = document!.name;
+            }
 
             const network = ActorMarksFlow.getDocumentNetwork(document);
             const type = MatrixNetworkFlow.getDocumentType(document);
@@ -165,7 +168,7 @@ export const ActorMarksFlow = {
             const token = null;
             const runningSilent = false;
 
-            documents.push({document, token, marks, markId, name, type, network, runningSilent, icons: []});
+            documents.push({document, token, marks, markId, name: displayName, type, network, runningSilent, icons: []});
         }
 
         return documents;

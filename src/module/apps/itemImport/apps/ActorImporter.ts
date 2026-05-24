@@ -175,7 +175,7 @@ export class ActorImporter extends BaseClass {
 
         this.syncFormStateFromDom();
 
-        let jsonText = "";
+        let jsonText: string;
         if (this.selectedJsonFile) {
             try {
                 jsonText = (await this.selectedJsonFile.text()).trim();

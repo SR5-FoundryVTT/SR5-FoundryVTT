@@ -20,18 +20,13 @@ export const EffectCreationFlow = {
         const category = skill.system.skill.category;
         const subCategory = skill.system.skill.knowledgeType;
 
-        let path = '';
-        switch (category) {
-            case 'knowledge':
-                path = `system.skills.knowledge.${subCategory}.${key}`;
-                break;
-            case 'language':
-                path = `system.skills.language.${key}`;
-                break;
-            case 'active':
-            default:
-                path = `system.skills.active.${key}`;
-                break;
+        let path: string;
+        if (category === 'knowledge') {
+            path = `system.skills.knowledge.${subCategory}.${key}`;
+        } else if (category === 'language') {
+            path = `system.skills.language.${key}`;
+        } else {
+            path = `system.skills.active.${key}`;
         }
 
         const effectData = {
