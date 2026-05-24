@@ -60,6 +60,7 @@ export default [
             "no-unneeded-ternary": "warn",
             "no-unreachable-loop": "error", // Likely a bug
             "no-useless-computed-key": "warn",
+            "no-useless-assignment": "warn",
             "no-useless-escape": "warn",
             "no-useless-return": "warn",
             "prefer-const": "warn",
