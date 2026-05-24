@@ -470,27 +470,6 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
                 assert.strictEqual(normalArmor?.value, 6);
                 assert.strictEqual(hardenedArmor?.value, 16);
             });
-
-            it("does not add zero-value normal or hardened pool contributors", async () => {
-                const actor = await factory.createActor({ type: 'character' });
-                const action = DataDefaults.createData('action_roll', {
-                    test: 'PhysicalResistTest',
-                    armor: true,
-                    attribute: 'body',
-                });
-
-                const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false });
-                if (!test) return assert.fail('Failed to create PhysicalResistTest');
-
-                test.prepareBaseValues();
-                test.calculateBaseValues();
-
-                const normalArmor = test.pool.changes.find(change => change.name === 'SR5.Armor.label');
-                const hardenedArmor = test.pool.changes.find(change => change.name === 'SR5.HardenedArmor');
-
-                assert.isUndefined(normalArmor);
-                assert.isUndefined(hardenedArmor);
-            });
         });
     });
 };

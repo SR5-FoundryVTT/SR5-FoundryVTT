@@ -61,10 +61,10 @@ export class SpiritPrep {
             // set the base of skills to the provided force
             for (const skillKey of overrides.skills) {
                 const skill = skills.active[skillKey];
-                if (!skill) {
-                    console.error(`Shadowrun 5e | Spirit Prep: Skill ${skillKey} not found on spirit actor.`);
-                    continue;
-                }
+                // Foundry calls prepareData multiple times:
+                // - before _preCreate, causing skills to be missing
+                // - after _preCreate, causing this data prep to work correctly
+                if (!skill) continue;                
 
                 // NOTE: We apply force as a modifier instead of base to make the calculation transparent.
                 //       Also, adding force as the skill item rating, would make updating and creating spirits
@@ -360,7 +360,7 @@ export class SpiritPrep {
                 overrides.attributes.strength = -2;
                 overrides.attributes.intuition = 1;
                 overrides.init = 2;
-                overrides.skills.push('assensing', 'astral_combat', 'perception', 'spell_casting', 'unarmed_combat');
+                overrides.skills.push('assensing', 'astral_combat', 'perception', 'spellcasting', 'unarmed_combat');
                 break;
             case 'sludge':
                 overrides.attributes.body = 1;
@@ -582,7 +582,7 @@ export class SpiritPrep {
                 overrides.attributes.body = +2;
                 overrides.attributes.strength = 1;
                 overrides.attributes.essence = -2;
-                overrides.skills.push("assensing", "astral_combat", "blade", "clubs", "unarmed_combat", "exotic_ranged_weapon", "perception");
+                overrides.skills.push("assensing", "astral_combat", "blades", "clubs", "unarmed_combat", "exotic_ranged_weapon", "perception");
                 break;
 
             case "blackjack":

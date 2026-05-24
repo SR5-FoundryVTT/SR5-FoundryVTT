@@ -1,5 +1,6 @@
 export type MigratableDocument = ActiveEffect.Implementation | Actor.Implementation | Combat.Implementation | Combatant.Implementation | Item.Implementation;
 export type MigratableDocumentName = MigratableDocument['documentName'];
+export type MigratableDocumentType = typeof ActiveEffect | typeof Actor | typeof Item | typeof Combat | typeof Combatant;
 
 /**
  * Base class for version migrations that convert game data from an older version to a newer one.

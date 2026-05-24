@@ -19,7 +19,7 @@ from io import BytesIO
 # Repository details for fetching XML files if no local path is provided
 OWNER = "chummer5a"
 REPO = "chummer5a"
-BRANCH = "3e0520c06b8e393b500cfac8c951e8be28a24046"  # v5.255.1049
+BRANCH = "0c354ec2b81da5ccd2c93648f93ec8f6831c030e"  # v5.256.0
 
 # String length threshold for inline union literals
 STRING_LIMIT = 100
@@ -192,7 +192,7 @@ def qname(el: etree._Element) -> str:
 def add_custom_fields(struct: Structure) -> None:
     """Adds synthetic fields like 'translate' to specific elements."""
     for path, info in struct.items():
-        if path.endswith("/categories/category") or path.endswith("/modcategories/category"):
+        if path.endswith("/categories/category") or path.endswith("/skillgroups/name") or path.endswith("/modcategories/category"):
             if 'translate' not in info.attrs:
                 info.attrs['translate'] = (0, [])  # (count, samples)
 

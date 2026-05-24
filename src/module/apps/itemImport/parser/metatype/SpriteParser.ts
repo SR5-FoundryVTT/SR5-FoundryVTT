@@ -15,15 +15,24 @@ export class SpriteParser extends MetatypeParserBase<'sprite'> {
     }
 
     protected override async getItems(jsonData: Metatype): Promise<Item.Source[]> {
-        const optionalpowers = jsonData.bonus?.optionalpowers;
-        const powers = [...IH.getArray(jsonData.powers?.power), ...IH.getArray(optionalpowers?.optionalpower)].map(i => i._TEXT);
+        const { skills, name, powers } = jsonData;
+        const optionalPowers = this.mergeLists(
+            jsonData.optionalpowers?.optionalpower,
+            jsonData.bonus?.optionalpowers?.optionalpower
+        );
 
-        const allPowers = await IH.findItems('Critter_Power', powers);
-        const name = jsonData.name._TEXT;
+        const powerList = this.getNamedList(powers?.power, optionalPowers);
+        const skillList = this.getNamedList(skills?.skill, skills?.group);
 
+        const allSkills = await IH.findItems('Skill', skillList);
+        const allPowers = await IH.findItems('Critter_Power', powerList);
+
+        const spriteName = name._TEXT;
         return [
-            ...this.getMetatypeItems(allPowers, jsonData.powers?.power, { type: 'Power', critter: name }),
-            ...this.getMetatypeItems(allPowers, optionalpowers?.optionalpower, { type: 'Optional Power', critter: name }),
+            ...this.getMetatypeItems(allSkills, skills?.skill, { type: 'Skill', critter: spriteName }),
+            ...this.getMetatypeItems(allPowers, powers?.power, { type: 'Power', critter: spriteName }),
+            ...this.getMetatypeItems(allSkills, skills?.group, { type: 'Skill Group', critter: spriteName }),
+            ...this.getMetatypeItems(allPowers, optionalPowers, { type: 'Optional Power', critter: spriteName }),
         ];
     }
 
