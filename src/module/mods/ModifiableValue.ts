@@ -14,7 +14,7 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
     // Use finite sentinels so priorities survive chat flag serialization.
     static readonly BASE_PRIORITY = Number.MIN_SAFE_INTEGER;
     static readonly TOP_PRIORITY = Number.MAX_SAFE_INTEGER;
-    // Manual modifiers should appear before override, upgrade, downgrade, but after other effect changes.
+    // Manual modifiers should appear last, only before override.
     static readonly MANUAL_PRIORITY = Number.MAX_SAFE_INTEGER - 10;
 
     private readonly _field: Field;

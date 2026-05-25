@@ -285,6 +285,8 @@
     .mod-name {
       flex: 1;
       min-width: 0;
+      padding-left: 7px;
+      font-size: 1em;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -307,7 +309,7 @@
       padding: 3px;
       box-sizing: border-box;
       text-align: center;
-      font-size: 1.1em;
+      font-size: 14px;
       font-weight: 400;
       background: var(--sr5v2-control-bg);
       border: 1px solid var(--sr5v2-control-border);
@@ -319,6 +321,11 @@
         flex: 1 1 auto;
         min-width: 0;
         height: 24px;
+        font-size: 1em;
+      }
+
+      .manual-modifier-value {
+        font-size: 1em;
       }
 
       .manual-modifier-create {
