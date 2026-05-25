@@ -14,6 +14,8 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
     // Use finite sentinels so priorities survive chat flag serialization.
     static readonly BASE_PRIORITY = Number.MIN_SAFE_INTEGER;
     static readonly TOP_PRIORITY = Number.MAX_SAFE_INTEGER;
+    // Manual modifiers should appear before override, upgrade, downgrade, but after other effect changes.
+    static readonly MANUAL_PRIORITY = Number.MAX_SAFE_INTEGER - 10;
 
     private readonly _field: Field;
 
@@ -259,6 +261,15 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
      */
     static isBaseChange(change: ModifiableValueType['changes'][number]): boolean {
         return change.priority === ModifiableValue.BASE_PRIORITY;
+    }
+
+    /**
+     * Returns true when a change was created as a manual dialog modifier.
+     * @param {ModifiableValueType['changes'][number]} change - The change object to inspect.
+     * @returns {boolean} True if the change should expose manual editing controls in the test dialog.
+     */
+    static isManualChange(change: ModifiableValueType['changes'][number]): boolean {
+        return change.priority === ModifiableValue.MANUAL_PRIORITY;
     }
 
     /**

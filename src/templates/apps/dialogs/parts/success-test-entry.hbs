@@ -71,6 +71,7 @@
             </button>
             {{/if}}
             <span class="mod-name" data-tooltip="{{getChangeDescription change}}">{{localize change.name}}</span>
+            {{#if (isManualChange change)}}
             <input
                 type="number"
                 class="modifier-value-input"
@@ -78,6 +79,9 @@
                 value="{{change.value}}"
                 data-dtype="Number"
             />
+            {{else}}
+            <span class="modifier-value-input">{{getChangeValue change}}</span>
+            {{/if}}
 
             <input type="checkbox" name="{{../path}}.changes.{{index}}.enabled" data-dtype="Boolean" {{checked change.enabled}} />
         </li>

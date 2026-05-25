@@ -41,6 +41,10 @@ export const registerModifierHelpers = () => {
         return ModifiableValue.isBaseChange(change);
     });
 
+    Handlebars.registerHelper('isManualChange', (change: ChangeType) => {
+        return ModifiableValue.isManualChange(change);
+    });
+
     Handlebars.registerHelper('hasModifierChanges', (changes: ChangeType[]) => {
         return Array.isArray(changes) && changes.some(change => !ModifiableValue.isBaseChange(change));
     });

@@ -357,6 +357,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
         ModifiableValue.add(valueField, name, safeValue, {
             mode: 'ADD',
             enabled: true,
+            priority: ModifiableValue.MANUAL_PRIORITY,
         });
 
         this.test.prepareBaseValues();
@@ -372,11 +373,12 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
         const entries = Object.entries(data);
         const enabledEntries = entries.filter(([key]) => key.endsWith('.enabled'));
         const otherEntries = entries.filter(([key]) => !key.endsWith('.enabled'));
+        const changePathPattern = /^test\.data\.(pool|limit|threshold)\.changes\.(\d+)\./;
 
         const context = { test: this.test };
 
         for (const [key, value] of [...enabledEntries, ...otherEntries]) {
-            const changeMatch = key.match(/^test\.data\.(pool|limit|threshold)\.changes\.(\d+)\./);
+            const changeMatch = changePathPattern.exec(key);
             if (changeMatch) {
                 const path = `test.data.${changeMatch[1]}`;
                 const modValue = foundry.utils.getProperty(context, path);
