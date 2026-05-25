@@ -10,6 +10,7 @@ import { MatrixDefenseTest } from "../MatrixDefenseTest";
 import { MatrixResistTest, MatrixResistTestData } from "../MatrixResistTest";
 import { BiofeedbackResistTest } from "../BiofeedbackResistTest";
 import { OpposedMatrixTest } from '@/module/tests/OpposedMatrixTest';
+import { MatrixOpposedTargetFlow } from '@/module/tests/flows/MatrixOpposedTargetFlow';
 import Document = foundry.abstract.Document;
 
 /**
@@ -494,8 +495,18 @@ export const MatrixTestDataFlow = {
      */
     async executeMessageAction(testCls: any, againstData: MatrixTestData, messageId: string, options: TestOptions): Promise<void> {
         let document: Document.Any | null = null;
+        const caster = againstData.sourceActorUuid
+            ? await fromUuid<SR5Actor>(againstData.sourceActorUuid)
+            : null;
         if (againstData.iconUuid) {
             document = await fromUuid(againstData.iconUuid)
+        }
+
+        if (!document && !againstData.iconUuid) {
+            document = await MatrixOpposedTargetFlow.resolveOpposedDocument(document, caster ?? undefined);
+            if (document instanceof SR5Item) {
+                againstData.iconUuid = document.uuid ?? undefined;
+            }
         }
 
         if (!document) {

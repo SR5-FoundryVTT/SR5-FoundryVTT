@@ -1,0 +1,26 @@
+<form class="sr5-form">
+    <div class="form-group">
+        <label for="matrix-opposed-device-name">Name</label>
+        {{formInput fields.name value=data.name name="data.name" rootId=rootId autofocus=true}}
+    </div>
+
+    <div class="form-group">
+        <label for="matrix-opposed-device-category">Category</label>
+        {{formInput fields.category value=data.category name="data.category" localize=true rootId=rootId}}
+    </div>
+
+    <div class="form-group">
+        <label for="matrix-opposed-device-rating">Rating</label>
+        {{formInput fields.rating value=data.rating name="data.rating" rootId=rootId}}
+    </div>
+
+    <div class="form-group">
+        <label for="matrix-opposed-device-network">Network</label>
+        {{formInput fields.networkUuid value=data.networkUuid name="data.networkUuid" rootId=rootId}}
+    </div>
+
+    <div class="form-group">
+        <label for="matrix-opposed-device-description">Description</label>
+        {{formInput fields.description value=data.description name="data.description" rootId=rootId}}
+    </div>
+</form>
