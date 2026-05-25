@@ -401,14 +401,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
                     value as number | null,
                     { mode: 'OVERRIDE', priority: ModifiableValue.TOP_PRIORITY }
                 );
-            } else {
-                ModifiableValue.addUnique(
-                    valueField,
-                    'SR5.ManualOverride',
-                    null,
-                    { mode: 'OVERRIDE', priority: ModifiableValue.TOP_PRIORITY }
-                );
-            }
+            } 
         }
 
         this.test.prepareBaseValues();
