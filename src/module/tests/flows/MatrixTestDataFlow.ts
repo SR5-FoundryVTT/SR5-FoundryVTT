@@ -507,6 +507,8 @@ export const MatrixTestDataFlow = {
             if (document instanceof SR5Item) {
                 againstData.iconUuid = document.uuid ?? undefined;
             }
+
+            if (!document && !game.user?.isGM) return;
         }
 
         if (!document) {
