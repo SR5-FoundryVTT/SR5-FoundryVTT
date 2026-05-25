@@ -7,6 +7,10 @@ import { MatrixNetworkFlow } from '@/module/item/flows/MatrixNetworkFlow';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 
 export const MatrixOpposedTargetFlow = {
+    defaultDeviceName(): string {
+        return game.i18n.localize(SR5.itemTypes.device);
+    },
+
     async resolveOpposedDocument(document: foundry.abstract.Document.Any | null | undefined, caster?: SR5Actor): Promise<foundry.abstract.Document.Any | null> {
         if (document) return document;
         if (!game.user?.isGM) return null;
@@ -46,16 +50,21 @@ export const MatrixOpposedTargetFlow = {
 
         const selection = await dialog.select() as MatrixOpposedDeviceDialogSelection;
         if (dialog.canceled || dialog.selectedButton !== 'confirm') return null;
-        if (!selection.name || !selection.category) return null;
+
+        const name = selection.name.trim() || this.defaultDeviceName();
+        if (!selection.category) return null;
 
         return {
             ...selection,
+            name,
             rating: Math.max(1, Math.floor(selection.rating || 1)),
         };
     },
 
     async createTemporaryDevice(selection: MatrixOpposedDeviceDialogSelection): Promise<SR5Item<'device'> | null> {
         if (!game.user?.isGM) return null;
+
+        const name = selection.name.trim() || this.defaultDeviceName();
 
         const system = DataDefaults.baseSystemData('device', {
             category: selection.category,
@@ -77,7 +86,7 @@ export const MatrixOpposedTargetFlow = {
                 source: game.i18n.localize(SR5.deviceCategories[selection.category]),
             },
             importFlags: {
-                name: selection.name,
+                name,
                 category: selection.category,
                 sourceid: 'matrix-opposed-temp-device',
             }
@@ -85,7 +94,7 @@ export const MatrixOpposedTargetFlow = {
 
         const item = await SR5Item.create({
             img: selection.img || DEFAULT_DEVICE_IMAGE,
-            name: selection.name,
+            name,
             type: 'device',
             system,
         }) as SR5Item<'device'> | null;
