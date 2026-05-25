@@ -3,9 +3,15 @@ import { SR5 } from '@/module/config';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 import { SR5Item } from '@/module/item/SR5Item';
 import { DevicePartData } from '@/module/types/item/Device';
+import { DeepPartial } from 'fvtt-types/utils';
+import ApplicationV2 = foundry.applications.api.ApplicationV2;
 const { StringField, NumberField, HTMLField } = foundry.data.fields;
+const FilePicker = foundry.applications.apps.FilePicker.implementation;
+
+const DEFAULT_DEVICE_IMAGE = 'systems/shadowrun5e/dist/icons/importer/device.svg';
 
 export interface MatrixOpposedDeviceDialogSelection {
+    img: string
     name: string
     category: keyof typeof SR5.deviceCategories
     rating: number
@@ -27,6 +33,7 @@ const createNetworkUuidField = (choices: Record<string, string>, initial: string
 type MatrixOpposedDeviceDialogTemplateData = {
     data: MatrixOpposedDeviceDialogSelection
     namePlaceholder: string
+    imageAlt: string
     fields: {
         name: InstanceType<typeof StringField>
         category: ReturnType<typeof DevicePartData>['category']
@@ -51,6 +58,7 @@ export class MatrixOpposedDeviceDialog extends PromptDialog {
         const templateData: MatrixOpposedDeviceDialogTemplateData = {
             data: selection,
             namePlaceholder: game.i18n.localize(SR5.itemTypes.device),
+            imageAlt: game.i18n.localize(SR5.itemTypes.device),
             fields: {
                 ...matrixOpposedDeviceDialogFields,
                 networkUuid: createNetworkUuidField(networkChoices, selection.networkUuid)
@@ -76,11 +84,49 @@ export class MatrixOpposedDeviceDialog extends PromptDialog {
         };
 
         super(data, {
-            classes: [SR5_APPV2_CSS_CLASS, 'sr5', 'form-dialog'],
+            classes: [SR5_APPV2_CSS_CLASS, 'sr5', 'form-dialog', 'matrix-opposed-device-dialog'],
             position: {
                 width: 420,
                 height: 'auto',
             }
         });
     }
+
+    protected override async _onRender(
+        context: DeepPartial<foundry.applications.api.HandlebarsApplicationMixin.RenderContext>,
+        options: DeepPartial<ApplicationV2.RenderOptions>
+    ) {
+        await super._onRender(context, options);
+
+        const image = this.element.querySelector<HTMLImageElement>('.matrix-opposed-device-header__image');
+        if (!image) return;
+
+        image.addEventListener('click', event => {
+            event.preventDefault();
+            void this.#editImage(image);
+        });
+    }
+
+    async #editImage(target: HTMLImageElement) {
+        const templateData = this.dialogData.templateData as MatrixOpposedDeviceDialogTemplateData | undefined;
+        if (!templateData) return;
+
+        const current = templateData.data.img || DEFAULT_DEVICE_IMAGE;
+        const fp = new FilePicker({
+            current,
+            type: 'image',
+            callback: (path: string) => {
+                target.src = path;
+                templateData.data.img = path;
+            },
+            position: {
+                top: (this.position.top ?? 0) + 40,
+                left: (this.position.left ?? 0) + 10,
+            }
+        });
+
+        await fp.browse();
+    }
 }
+
+export { DEFAULT_DEVICE_IMAGE };

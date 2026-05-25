@@ -1,4 +1,4 @@
-import { MatrixOpposedDeviceDialog, MatrixOpposedDeviceDialogSelection } from '@/module/apps/dialogs/MatrixOpposedDeviceDialog';
+import { DEFAULT_DEVICE_IMAGE, MatrixOpposedDeviceDialog, MatrixOpposedDeviceDialogSelection } from '@/module/apps/dialogs/MatrixOpposedDeviceDialog';
 import { SR5 } from '@/module/config';
 import { DataDefaults } from '@/module/data/DataDefaults';
 import { Helpers } from '@/module/helpers';
@@ -34,6 +34,7 @@ export const MatrixOpposedTargetFlow = {
             : networks[0]?.uuid ?? '';
 
         const dialog = new MatrixOpposedDeviceDialog({
+            img: DEFAULT_DEVICE_IMAGE,
             name: '',
             category: 'device',
             rating: 1,
@@ -83,6 +84,7 @@ export const MatrixOpposedTargetFlow = {
         });
 
         const item = await SR5Item.create({
+            img: selection.img || DEFAULT_DEVICE_IMAGE,
             name: selection.name,
             type: 'device',
             system,
