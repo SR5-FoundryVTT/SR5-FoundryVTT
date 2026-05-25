@@ -17,7 +17,7 @@ export const MatrixOpposedTargetFlow = {
         return this.createTemporaryDevice(selection);
     },
 
-    availableNetworks(caster?: SR5Actor): SR5Item[] {
+    availableNetworks(): SR5Item[] {
         if (!game.user?.isGM) return [];
 
         const networks = MatrixNetworkFlow.getNetworks()
@@ -27,7 +27,7 @@ export const MatrixOpposedTargetFlow = {
     async promptTemporaryDeviceDetails(caster?: SR5Actor): Promise<MatrixOpposedDeviceDialogSelection | null> {
         if (!game.user?.isGM) return null;
 
-        const networks = this.availableNetworks(caster);
+        const networks = this.availableNetworks();
         const connectedNetworkUuid = caster?.network?.uuid ?? '';
         const selectedNetworkUuid = networks.some(network => network.uuid === connectedNetworkUuid)
             ? connectedNetworkUuid
@@ -58,6 +58,11 @@ export const MatrixOpposedTargetFlow = {
 
         const system = DataDefaults.baseSystemData('device', {
             category: selection.category,
+            managed: {
+                onScene: canvas.scene?.uuid ?? '',
+                byUser: game.user?.uuid ?? '',
+                createAt: new Date().toISOString(),
+            },
             technology: {
                 rating: selection.rating,
                 wireless: 'online',

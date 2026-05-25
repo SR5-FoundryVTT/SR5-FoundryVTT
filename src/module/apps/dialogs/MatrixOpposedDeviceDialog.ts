@@ -26,6 +26,7 @@ const createNetworkUuidField = (choices: Record<string, string>, initial: string
 
 type MatrixOpposedDeviceDialogTemplateData = {
     data: MatrixOpposedDeviceDialogSelection
+    namePlaceholder: string
     fields: {
         name: InstanceType<typeof StringField>
         category: ReturnType<typeof DevicePartData>['category']
@@ -49,6 +50,7 @@ export class MatrixOpposedDeviceDialog extends PromptDialog {
         const networkChoices = Object.fromEntries(options.networks.map(network => [network.uuid ?? '', network.name]));
         const templateData: MatrixOpposedDeviceDialogTemplateData = {
             data: selection,
+            namePlaceholder: game.i18n.localize(SR5.itemTypes.device),
             fields: {
                 ...matrixOpposedDeviceDialogFields,
                 networkUuid: createNetworkUuidField(networkChoices, selection.networkUuid)

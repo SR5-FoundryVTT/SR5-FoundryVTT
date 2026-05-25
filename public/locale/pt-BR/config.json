@@ -440,7 +440,8 @@
         "DeviceType": "Tipo",
         "Dialogs": {
             "Common": {
-                "Cancel": "Cancelar"
+                "Cancel": "Cancelar",
+                "Ok": "OK"
             },
             "RangedWeaponTest": {
                 "EnvironmentalOverwriteSet": "Os modificadores ambientais foram definidos manualmente para um valor fixo!"

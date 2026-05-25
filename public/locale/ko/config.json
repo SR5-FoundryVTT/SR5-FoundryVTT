@@ -1042,7 +1042,8 @@
         "DeviceType": "유형",
         "Dialogs": {
             "Common": {
-                "Cancel": "취소"
+                "Cancel": "취소",
+                "Ok": "확인"
             },
             "RangedWeaponTest": {
                 "EnvironmentalOverwriteSet": "환경 수정치가 수동으로 고정 값으로 설정되었습니다!"

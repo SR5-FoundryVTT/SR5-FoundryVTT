@@ -508,7 +508,7 @@ export const MatrixTestDataFlow = {
                 againstData.iconUuid = document.uuid ?? undefined;
             }
 
-            if (!document && !game.user?.isGM) return;
+            if (!document) return;
         }
 
         if (!document) {

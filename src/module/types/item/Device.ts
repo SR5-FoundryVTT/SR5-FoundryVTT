@@ -4,12 +4,19 @@ import { MatrixAttributes } from "../template/Matrix";
 import { TechnologyPartData } from "../template/Technology";
 const { SchemaField, ArrayField, StringField, DocumentUUIDField, NumberField } = foundry.data.fields;
 
+export const ManagedDeviceData = () => ({
+    onScene: new DocumentUUIDField({ required: true, blank: true }),
+    byUser: new DocumentUUIDField({ required: true, blank: true }),
+    createAt: new StringField({ required: true, blank: false, initial: '' }),
+});
+
 export const DevicePartData = () => ({
     category: new StringField({
         required: true,
         initial: 'commlink',
         choices: SR5.deviceCategories,
     }),
+    managed: new SchemaField(ManagedDeviceData(), { nullable: true, initial: null }),
     atts: new SchemaField(MatrixAttributes(true)),
     slaves: new ArrayField(new DocumentUUIDField({ blank: true, required: true, nullable: false })),
 });

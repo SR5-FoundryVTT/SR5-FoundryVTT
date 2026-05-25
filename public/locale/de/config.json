@@ -1043,7 +1043,8 @@
         "DeviceType": "Typ",
         "Dialogs": {
             "Common": {
-                "Cancel": "Cancel"
+                "Cancel": "Cancel",
+                "Ok": "OK"
             },
             "RangedWeaponTest": {
                 "EnvironmentalOverwriteSet": "Umgebungsmodifikatoren wurden manuell auf einen fixen Wert gesetzt!"
@@ -1724,6 +1725,7 @@
                 "NotVisible": "Schleichend",
                 "PAN": "PAN",
                 "RebootDevice": "Neustarten",
+                "RemoveImprovisedDevices": "Improvisierte Geräte entfernen",
                 "SubtractOne": "Eine entfernen",
                 "Type": "Typ",
                 "Visible": "Sichtbar",

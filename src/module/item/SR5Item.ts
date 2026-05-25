@@ -1549,8 +1549,20 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     /**
      * Reset everything that needs to be reset between two runs.
      */
-    async restRunData() {
+    async resetRunData() {
+        if (this.isNetwork()) {
+            await this.removeImprovisedDevices();
+        }
+
         return this.clearMarks();
+    }
+
+    /**
+     * Delete all improvised devices connected to this host or grid.
+     */
+    async removeImprovisedDevices() {
+        if (!this.isNetwork()) return 0;
+        return MatrixNetworkFlow.removeImprovisedDevices(this);
     }
 
     /**
