@@ -90,14 +90,41 @@ export const MatrixOpposedTargetFlow = {
             system,
         }) as SR5Item<'device'> | null;
 
+        let connectedNetwork: SR5Item | null = null;
+
         if (item && selection.networkUuid) {
             const networkUuid = String(selection.networkUuid);
             const network = await fromUuid<SR5Item>(networkUuid);
             if (network?.isNetwork()) {
                 await MatrixNetworkFlow.addSlave(network, item);
+                connectedNetwork = network;
             }
         }
 
+        if (item) {
+            await this.sendTemporaryDeviceMessage(item, connectedNetwork);
+        }
+
         return item;
-    }
+    },
+
+    async sendTemporaryDeviceMessage(device: SR5Item<'device'>, network: SR5Item | null): Promise<ChatMessage | null> {
+        const content = await foundry.applications.handlebars.renderTemplate(
+            'systems/shadowrun5e/dist/templates/chat/matrix-opposed-device-created-message.hbs',
+            {
+                device,
+                network,
+            }
+        );
+
+        const whisper = ChatMessage.getWhisperRecipients('GM').map(user => user.id);
+        return (await ChatMessage.create({
+            user: game.user?.id,
+            speaker: {
+                alias: game.user?.name,
+            },
+            content,
+            whisper,
+        })) ?? null;
+    },
 };
