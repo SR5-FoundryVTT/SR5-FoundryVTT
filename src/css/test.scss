@@ -228,13 +228,14 @@
         border: 1px solid var(--sr5v2-control-border);
         background: var(--sr5v2-control-bg-strong);
         color: var(--sr5v2-text-primary);
-        font-size: 0.78em;
+        font-size: 1em;
         font-weight: 700;
         font-variant-numeric: tabular-nums;
         white-space: nowrap;
 
         .summary-count {
           color: var(--sr5v2-text-secondary);
+          font-size: 0.78em;
         }
 
         &.positive {
