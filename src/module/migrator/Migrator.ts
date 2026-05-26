@@ -264,7 +264,7 @@ export class Migrator {
     ) {
         this.updateProgressbar();
         try {
-            return cls.implementation.updateDocuments(
+            return await cls.implementation.updateDocuments(
                 docs.filter(d => d._stats?.systemVersion === this._migrationMark) as any,
                 { diff: false, recursive: false, parent: parent as any }
             );
