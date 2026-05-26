@@ -270,7 +270,6 @@ export class Migrator {
             );
         } catch (error) {
             console.error(`Failed migration update for ${cls.documentName} documents (parent: ${parent?.uuid ?? 'none'}).`, error);
-            return [];
         }
     }
 
