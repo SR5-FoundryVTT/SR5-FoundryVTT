@@ -1210,7 +1210,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const getOpposedAction = (id: string) => {
             const item = this.items.get(id) as SR5Item<'skill'> | undefined;
             if (!item?.isType('skill')) return;
-            return item.system.skill.action.opposed;
+            // Copy to avoid any downstream changes causing skill data changes.
+            return foundry.utils.deepClone(item.system.skill.action.opposed);
         }
 
         const action = DataDefaults.createData('action_roll', {
