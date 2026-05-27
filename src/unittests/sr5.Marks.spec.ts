@@ -71,5 +71,20 @@ export const shadowrunMarks = (context: QuenchBatchContext) => {
             correctMarks = decker.getMarksPlaced(device.uuid);
             assert.equal(correctMarks, 2);
         });
+
+        it('Should NOT mark the grid as well when placing marks on grid connected devices', async () => {
+            const decker = await factory.createActor({ type: 'character' });
+            const target = await factory.createItem({ type: 'equipment' });
+            const grid = await factory.createItem({ type: 'grid' });
+
+            await grid.addSlave(target);
+            await decker.setMarks(target, 2);
+
+            let correctMarks = decker.getMarksPlaced(target.uuid);
+            assert.equal(correctMarks, 2);
+
+            correctMarks = decker.getMarksPlaced(grid.uuid);
+            assert.equal(correctMarks, 0);
+        });
     });
 };

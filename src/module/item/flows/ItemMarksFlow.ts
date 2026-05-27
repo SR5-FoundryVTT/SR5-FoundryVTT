@@ -52,7 +52,7 @@ export const ItemMarksFlow = {
 
         if (!target?.uuid) return;
 
-        if (target.hasMaster) {
+        if (target.hasMaster && !target.master?.isType('grid')) {
             const master = target.master;
             if (master) await host.setMarks(master, marks, options);
         }
