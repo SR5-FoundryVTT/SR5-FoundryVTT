@@ -1038,7 +1038,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      *       and switch to an data attribute to differentiate between each instead of manipulating the create item type data attribute.
      */
     _handleCreateMatrixActionItem(event: PointerEvent, itemData: Item.CreateData) {
-        let actionCategories = [];
+        let actionCategories: string[];
         try {
             const actionCategoriesJSON = SheetFlow.closestAction(event.target)!.dataset.actionCategories;
             actionCategories = JSON.parse(actionCategoriesJSON ?? '');

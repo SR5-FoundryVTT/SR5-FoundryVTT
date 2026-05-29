@@ -89,12 +89,10 @@ export class NetworkManager extends SR5ApplicationMixin(ApplicationV2)<NetworkMa
      * Load a sorted list of matrix networks.
      */
     static selectableNetworks(character: SR5Actor) {
-        let networks: SR5Item[] = [];
-        if (game.user?.isGM) {
-            networks = MatrixNetworkFlow.getNetworks();
-        } else {
-            networks = MatrixNetworkFlow.getNetworksForCharacter(character);
-        }
+        const networks = game.user?.isGM
+            ? MatrixNetworkFlow.getNetworks()
+            : MatrixNetworkFlow.getNetworksForCharacter(character);
+
         return networks.sort(Helpers.sortByName.bind(this));
     }
 

@@ -353,7 +353,7 @@ export class SR5ActiveEffect extends ActiveEffect {
 
     override async update(
         data: ActiveEffect.UpdateInput,
-        operation?: ActiveEffect.Database.UpdateOperation,
+        operation?: ActiveEffect.Database.UpdateOneDocumentOperation,
     ) {
         if (this.parent instanceof SR5Item && this.parent._isNestedItem) {
             if (!data || !this.id) return this;

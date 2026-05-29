@@ -131,11 +131,10 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
     calcDrainDamage() {
         if (!this.actor) return DataDefaults.createData('damage');
 
-        const force = Number(this.data.force);
         const drain = Number(this.data.drain);
         const magic = this.actor.getAttribute('magic').value;
 
-        this.data.drainDamage = DrainRules.calcDrainDamage(drain, force, magic, this.hits.value);
+        this.data.drainDamage = DrainRules.calcDrainDamage(drain, magic, this.hits.value);
     }
 
     override async processResults() {

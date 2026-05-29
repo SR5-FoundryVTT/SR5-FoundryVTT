@@ -84,6 +84,9 @@ export const MatrixTargetingFlow = {
         });
 
         for (const slave of actors) {
+            // Filter out the actor itself.
+            if (slave.uuid === actor.uuid) continue;
+
             const type = MatrixNetworkFlow.getDocumentType(slave);
             const name = slave.getToken()?.name ?? slave.name;
             targets.push({
@@ -142,6 +145,9 @@ export const MatrixTargetingFlow = {
         // Scene Tokens will be collected separately.
         for (const grid of MatrixNetworkFlow.getGrids({ players: true })) {
             for (const slave of grid.slaves) {
+                // Filter out the actor itself.
+                if (slave.uuid === actor.uuid) continue;
+
                 // Skip actor tokens as they're collected separately.
                 if (slave instanceof SR5Actor && slave.getToken()) continue;
 
@@ -192,6 +198,7 @@ export const MatrixTargetingFlow = {
             }
         }
 
+        this._dedupeTargetsByDocumentUuid(targets);
 
         // Sort all targets by grid name first and target name second.
         targets.sort((a, b) => {
@@ -242,6 +249,29 @@ export const MatrixTargetingFlow = {
         }
 
         return connectedIcons;
+    },
+
+    /**
+     * Dedpulicate targets entry as the same document can be added mulitple times by different means.
+     * 
+     * One case would be a linked actor having three tokens on scene.
+     * 
+     * @param targets A list of matrix targets to deduplicate. The list is modified in place.
+     */
+    _dedupeTargetsByDocumentUuid(targets: MatrixTargetDocument[]) {
+        const seenDocumentUuids = new Set<string>();
+
+        // Iterate classicly for index.
+        for (let index = targets.length - 1; index >= 0; index -= 1) {
+            const documentUuid = targets[index].document.uuid;
+
+            if (seenDocumentUuids.has(documentUuid)) {
+                targets.splice(index, 1);
+                continue;
+            }
+
+            seenDocumentUuids.add(documentUuid);
+        }
     },
 
     /**
