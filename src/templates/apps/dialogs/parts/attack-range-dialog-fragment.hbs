@@ -2,19 +2,13 @@
     <div class="form-group">
         <label>{{localize 'SR5.Target'}}</label>
         <select name="test.data.targetRangesSelected">
-            {{#select test.data.targetRangesSelected}}
-            {{#each test.data.targetRanges as |target|}}
-            <option value="{{@index}}">{{target.name}} ({{target.distance}} {{target.unit}})</option>
-            {{/each}}
-            {{/select}}
+            {{selectOptions test.targetRangeOptions selected=test.data.targetRangesSelected}}
         </select>
     </div>
 {{/if}}
 <div class="form-group">
     <label>{{localize 'SR5.Range'}}</label>
     <select name="test.data.range" {{#if test.hasTargets}}disabled{{/if}}>
-        {{#select test.data.range}} {{#each test.data.ranges as |range key|}}
-        <option value="{{range.modifier}}">{{localize range.label}} ({{range.distance}} m)</option>
-        {{/each}} {{/select}}
+        {{selectOptions test.rangeOptions selected=test.data.range}}
     </select>
 </div>

@@ -292,7 +292,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     _prepareRollMode(data, options: TestOptions): foundry.dice.Roll.Mode {
         if (options.rollMode != null) return options.rollMode;
         if (data?.action?.roll_mode) return data.action.roll_mode;
-        else return game.settings.get(CORE_NAME, 'rollMode') as foundry.dice.Roll.Mode;
+        // @ts-expect-error TODO: fvtt - v14 - missing settings typing
+        else return game.settings.get(CORE_NAME, 'messageMode') as foundry.dice.Roll.Mode;
     }
 
     /**
@@ -1143,6 +1144,32 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return this.targets.length > 0;
     }
 
+    get targetRangeOptions(): { value: number, label: string }[] {
+        const data = this.data as T & {
+            targetRanges?: Array<{ name: string, distance: number, unit: string }>
+        };
+
+        if (!Array.isArray(data.targetRanges)) return [];
+
+        return data.targetRanges.map((target, index) => ({
+            value: index,
+            label: `${target.name} (${target.distance} ${target.unit})`
+        }));
+    }
+
+    get rangeOptions(): { value: number, label: string }[] {
+        const data = this.data as T & {
+            ranges?: Record<string, { modifier: number, label: string, distance: number }>
+        };
+
+        if (!data.ranges) return [];
+
+        return Object.values(data.ranges).map(range => ({
+            value: Number(range.modifier),
+            label: `${game.i18n.localize(range.label)} (${range.distance} m)`
+        }));
+    }
+
     /**
      * Has this test been derived from an action?
      *
@@ -1883,7 +1910,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * What ChatMessage rollMode is this test supposed to use?
      */
     get _rollMode(): string {
-        return this.data.options?.rollMode as string ?? game.settings.get('core', 'rollMode');
+        // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
+        return this.data.options?.rollMode as string ?? game.settings.get('core', 'messageMode');
     }
 
     /**
@@ -1926,7 +1954,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         }
 
         // Instead of manually applying whisper ids, let Foundry do it.
-        ChatMessage.applyRollMode(messageData, game.settings.get("core", "rollMode"));
+        // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
+        ChatMessage.applyMode(messageData, game.settings.get("core", "messageMode"));
 
         return messageData;
     }

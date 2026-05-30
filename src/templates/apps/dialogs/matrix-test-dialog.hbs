@@ -52,11 +52,7 @@
             <div class="form-group">
                 <label>{{localize "SR5.Labels.Matrix.TargetDevice"}}</label>
                 <select name="test.data.iconUuid" class="display">
-                    {{#select test.data.iconUuid}}
-                    {{#each test.devices}}
-                    <option value="{{this.uuid}}">{{this.name}}</option>
-                    {{/each}}
-                    {{/select}}
+                    {{selectOptions test.iconOptions selected=test.data.iconUuid}}
                 </select>
             </div>
             {{/ife}}

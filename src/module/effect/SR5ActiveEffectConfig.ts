@@ -8,6 +8,7 @@ import { LinksHelpers } from '@/module/utils/links';
 import ActiveEffectConfig = foundry.applications.sheets.ActiveEffectConfig;
 import { ActiveEffectDM } from '@/module/types/effect/ActiveEffect';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
+import { SR5ActiveEffect } from './SR5ActiveEffect';
 
 /**
  * Shadowrun system alters some behaviors of Active Effects, making a custom ActiveEffectConfig necessary.
@@ -45,6 +46,7 @@ type SR5ActiveEffectSheetData = ActiveEffectConfig.RenderContext & {
     selection_limit_options: TagifyValues;
 
     applyToOptions: ApplyToOptions;
+    changeTypes: Record<string, string>;
     isv11: boolean;
     system: ActiveEffectDM;
     systemFields: typeof ActiveEffectDM.schema.fields;
@@ -143,6 +145,8 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         data.selection_limit_options = this._getLimitOptions();
 
         data.applyToOptions = this.prepareApplyToOptions();
+        data.changeTypes = this.prepareChangeTypes();
+
         data.isv11 = game.release.generation === 11;
 
         data.systemFields = this.document.system.schema.fields;
@@ -170,8 +174,8 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         }
 
         // disable and set tooltips on the priority inputs since we don't currently support changing it
-        for (let i = 0; i < this.document.changes.length; i++) {
-            const input = this.element.querySelector<HTMLInputElement>(`input[name="changes.${i}.priority"]`);
+        for (let i = 0; i < this.document.system.changes.length; i++) {
+            const input = this.element.querySelector<HTMLInputElement>(`input[name="system.changes.${i}.priority"]`);
             if (input) {
                 input.removeAttribute('disabled');
                 input.setAttribute('data-tooltip', 'SR5.Tooltips.Effect.PriorityFieldDisabled');
@@ -219,6 +223,25 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     }
 
     /**
+     * Prepare possible choice types. This is necessary as we override most effect templates and can't use
+     * default FoundryVTT effect code.
+     * NOTE: This is taken from FoundryVTT v14 preparePartsContext 'changes'
+     */
+    prepareChangeTypes() {
+        // @ts-ignore TODO: fvtt- v14 - types missing
+        return Object.entries(SR5ActiveEffect.CHANGE_TYPES as unknown as any)
+            // TODO: fvtt - v14 - Remove subtract type until typings to cleanly change ModifiableValue implemenation to use type instead of mode
+            .filter(([type]) => type !== 'subtract')
+            .map(([type, { label }]) => ({ type, label: game.i18n.localize(label) }))
+            .sort((a, b) => a.label.localeCompare(b.label, game.i18n.lang))
+            .reduce((types, { type, label }) => {
+                types[type] = label;
+                return types;
+            }, {});
+
+    }
+
+    /**
      * Depending on this effects source document being actor or item, some effect apply to
      * should not be available.
      */
@@ -246,7 +269,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
      * @returns true if changes are present, false otherwise.
      */
     get hasChanges(): boolean {
-        return this.document.changes.length > 0;
+        return this.document.system.changes.length > 0;
     }
 
 
@@ -297,4 +320,19 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     _getLimitOptions() {
         return Object.entries(SR5.limits).map(([limit, label]) => ({ label, id: limit }));
     }
+
+    override _onChangeForm(formConfig, event) {
+        super._onChangeForm(formConfig, event);
+    
+        // Update the priority value to match the type selection
+        // Use FoundryVTT default approach of changing priority based on type changes using _onChangeForm
+        // @ts-expect-error TODO: fvtt - v14 - missing type foundry.utils.isElementInstanceOf
+        if (foundry.utils.isElementInstanceOf(event.target, "select") && event.target.name.endsWith(".type")) {
+            const typeSelect = event.target;
+            const selector = `input[name="${typeSelect.name.replace(/\.type$/, ".priority")}"]`;
+            const priorityInput = typeSelect.closest("li").querySelector(selector);
+            // @ts-expect-error TODO: fvtt - v14 - missing type ActiveEffect.CHANGE_TYPES
+            priorityInput.value = ActiveEffect.CHANGE_TYPES[typeSelect.value]?.defaultPriority ?? "";
+        }
+      }
 }
