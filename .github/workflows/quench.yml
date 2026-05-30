@@ -1,0 +1,101 @@
+---
+name: quench
+
+# Requires these secrets in the `quench-ci` environment (never echoed):
+#   FOUNDRY_USERNAME, FOUNDRY_PASSWORD  - foundryvtt.com account (felddy downloads the build)
+#   FOUNDRY_LICENSE_KEY                 - license to activate
+on:  # yamllint disable-line rule:truthy
+  workflow_dispatch:
+  workflow_run:
+    workflows: [test]
+    types: [completed]
+
+permissions:
+  contents: read
+
+env:
+  node_version: 26
+
+concurrency:
+  group: quench-${{ github.event.workflow_run.head_sha || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quench:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: quench-ci
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.head_repository.full_name == github.repository
+      )
+    env:
+      FOUNDRY_PORT: 30000
+      FOUNDRY_URL: http://localhost:30000
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.node_version }}
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build dev bundle (includes Quench registration)
+        run: npm run build:dev
+
+      - name: Assemble Foundry data tree
+        run: npm run ci:prepare-foundry
+
+      - name: Start Foundry (felddy)
+        env:
+          FOUNDRY_USERNAME: ${{ secrets.FOUNDRY_USERNAME }}
+          FOUNDRY_PASSWORD: ${{ secrets.FOUNDRY_PASSWORD }}
+          FOUNDRY_LICENSE_KEY: ${{ secrets.FOUNDRY_LICENSE_KEY }}
+        run: |
+          docker run -d --name foundry \
+            -p ${FOUNDRY_PORT}:30000 \
+            -v "${{ github.workspace }}/.tmp/foundry:/data" \
+            -e FOUNDRY_USERNAME \
+            -e FOUNDRY_PASSWORD \
+            -e FOUNDRY_LICENSE_KEY \
+            -e FOUNDRY_ADMIN_KEY= \
+            -e FOUNDRY_VERSION=14.363 \
+            -e FOUNDRY_WORLD=sr5-quench \
+            -e CONTAINER_CACHE=/data/container_cache \
+            felddy/foundryvtt:14
+
+      - name: Wait for Foundry
+        run: npm run ci:wait-foundry
+
+      - name: Install Playwright (Chromium only)
+        run: npx playwright install chromium --with-deps
+
+      - name: Run Quench
+        run: npm run ci:run-quench
+
+      - name: Collect Foundry logs
+        if: always()
+        run: |
+          mkdir -p .tmp/foundry-logs
+          docker logs foundry > .tmp/foundry-logs/foundry.log 2>&1 || true
+          cp -r .tmp/foundry/Data/logs .tmp/foundry-logs/data-logs 2>/dev/null || true
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quench-logs
+          path: |
+            .tmp/foundry-logs/**
+            .tmp/quench-results/**
+          if-no-files-found: ignore
+
+      - name: Stop Foundry
+        if: always()
+        run: docker rm -f foundry || true

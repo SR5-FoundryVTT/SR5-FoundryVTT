@@ -1,0 +1,11 @@
+{
+    "id": "sr5-quench",
+    "title": "SR5 Quench",
+    "description": "Throwaway world used by the Quench CI workflow. Do not add persistent data here.",
+    "system": "shadowrun5e",
+    "coreVersion": "14",
+    "systemVersion": "0.35.0",
+    "background": "",
+    "nextSession": null,
+    "playtime": 0
+}

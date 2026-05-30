@@ -18,6 +18,10 @@ dist
 # Foundry
 foundryconfig.json
 
+# Quench CI scratch + local secrets
+.tmp
+.env.local
+
 # Packs: ignore all built packs but keep source
 packs/*
 !packs/_source

@@ -135,6 +135,41 @@ Afterwards open a terminal (cmd.exe on Windows) with administrative permissions 
 
 You should see a success message and a little arrow symbol on the shadowrun5e folder within the FoundryVTT _Data/systems_ directory. Now you can use the Gulp watch-Task as described above. This needs to be repeated after each Shadowrun5eVTT system update.
 
+### Running Quench in CI
+
+The `quench` GitHub Actions workflow (`.github/workflows/quench.yml`) runs the full Quench suite
+headlessly after the `test` workflow succeeds. It builds a **dev** bundle, boots an ephemeral licensed
+Foundry via `felddy/foundryvtt`, loads the system and Quench module into a throwaway world, and fails the
+job on any failed Quench test.
+
+It can also be started manually with `workflow_dispatch`. It needs a protected `quench-ci` environment
+with these secrets:
+
+* `FOUNDRY_USERNAME` / `FOUNDRY_PASSWORD` - foundryvtt.com account used to download the build
+* `FOUNDRY_LICENSE_KEY` - license to activate
+
+**Setup:** create the environment under **repo Settings → Environments → New environment** named
+`quench-ci`, then add the three secrets to it (optionally restrict it to the `master`/`release/**`
+branches). Until that environment exists, your editor's GitHub Actions extension will flag
+`environment: quench-ci` as "not valid" - that warning is just the extension checking against existing
+environments and clears once it's created. The workflow ignores upstream runs from forks so fork PRs never
+receive these secrets.
+
+Never commit these or echo them in logs.
+
+The workflow explicitly leaves `FOUNDRY_ADMIN_KEY` empty. The world is throwaway and auto-launched with
+`FOUNDRY_WORLD=sr5-quench`; setting an admin key adds an extra `/auth` gate that is unnecessary for this
+CI path.
+
+### Running Quench locally without Foundry's UI
+
+With a licensed Foundry running locally (system linked via `gulp watch`, the Quench module installed, and
+a world using the shadowrun5e system), you can drive the suite headlessly too:
+
+* Create a gitignored `.env.local` with at least `FOUNDRY_URL=http://localhost:30000`.
+* `npm run test:quench` (add `--headed` to watch the browser, e.g.
+  `node scripts/local/run-quench-local.mjs --headed`).
+
 
 ## Linux and docker workflow changes
 > **NOTE:** This approach is considered legacy and not actively used anymore. @taMiF left it here for your consideration.
