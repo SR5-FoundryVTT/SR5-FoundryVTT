@@ -308,12 +308,6 @@ export class SR5ActiveEffect extends ActiveEffect {
             console.error(`Test [${object.constructor.name}] | Failed to apply active effect change for ${change.key}: "${change.value}"`, err);
             return {};
         }
-        // try {
-        //     return super.apply(object, change);
-        // } catch (err) {
-        //     console.error(`Test [${object.constructor.name}] | Failed to apply active effect change for ${change.key}: "${change.value}"`, err);
-        //     return undefined;
-        // }
     }
 
     /**
@@ -346,12 +340,11 @@ export class SR5ActiveEffect extends ActiveEffect {
 
     static override migrateData(data: Parameters<typeof ActiveEffect['migrateData']>[0]) {
         // Execute Foundry migration first, as their v14 effect.changes => effect.system.changes influences system migrations.
-        const mutableObject = super.migrateData(data);
+        data = super.migrateData(data);
 
         Migrator.migrate("ActiveEffect", data);
 
-        // return super.migrateData, as it returns mutated source after migration, while Migrator.migrate only returns a boolean.
-        return mutableObject;
+        return data;
     }
 
     override async update(

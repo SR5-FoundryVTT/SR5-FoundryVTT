@@ -30,8 +30,7 @@
                         {{formInput changeFields.value name=(concat "system.changes." i ".value") value=change.value elementType="input"}}
                     </div>
                     <div class="priority">
-                        {{formInput changeFields.priority name=(concat "system.changes." i ".priority") value=change.priority
-                                    placeholder=(lookup @root.changeTypePriorities change.type) disabled=true}}
+                        {{formInput changeFields.priority name=(concat "system.changes." i ".priority") value=change.priority disabled=true}}
                     </div>
                     <div class="phase">
                         {{formInput changeFields.phase name=(concat "system.changes." i ".phase") value=change.phase disabled=true}}

@@ -46,7 +46,6 @@ type SR5ActiveEffectSheetData = ActiveEffectConfig.RenderContext & {
     selection_limit_options: TagifyValues;
 
     applyToOptions: ApplyToOptions;
-    changeTypePriorities: Record<string, number>;
     changeTypes: Record<string, string>;
     isv11: boolean;
     system: ActiveEffectDM;
