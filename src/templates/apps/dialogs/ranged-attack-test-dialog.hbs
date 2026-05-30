@@ -3,21 +3,36 @@
         {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-documents.hbs'}}
         <hr/>
         <div>
-            <div class="form-group">
-                <label>{{localize "TYPES.Item.ammo"}}</label>
-                <input type="text" class="disabled-for-display" disabled
-                    value="{{test.item.system.ammo.current.value}}/{{test.item.system.ammo.current.max}}"/>
-            </div>
-            <div class="form-group">
-                <label data-tooltip="SR5.Tooltips.RangedAttack.Recoil">
-                    {{localize 'SR5.Recoil'}}
-                    <span data-tooltip="SR5.Tooltips.RangedAttack.RecoilCompensation" style="font-weight: normal;"> (RC {{test.item.totalRecoilCompensation}})</span>
-                </label>
-                <div class="form-group-element-2">
-                    <span data-tooltip="SR5.Tooltips.RangedAttack.RecoilBeforeAttack">{{test.recoilBeforeAttack}}</span>
-                    <span data-tooltip="SR5.Tooltips.RangedAttack.RecoilAfterAttack">→ {{test.recoilAfterAttack}}</span>
+            <div class="fire-mode-summary">
+                <div class="fire-mode-summary-row">
+                    <div class="fire-mode-summary-cell">
+                        <span>{{localize "TYPES.Item.ammo"}}</span>
+                        <strong>{{test.fireModeSummary.ammo}}</strong>
+                    </div>
+                    <div class="fire-mode-summary-cell has-reset">
+                        <span data-tooltip="SR5.Tooltips.RangedAttack.Recoil">{{localize 'SR5.Recoil'}}</span>
+                        <strong data-tooltip="SR5.Tooltips.RangedAttack.RecoilBeforeAttack">{{test.fireModeSummary.recoil}}</strong>
+                        <button id="reset-progressive-recoil" class="fire-mode-summary-reset roll" type="button" data-tooltip="SR5.Tooltips.RangedAttack.ResetRecoil">↺</button>
+                    </div>
+                    <div class="fire-mode-summary-cell">
+                        <span data-tooltip="SR5.Tooltips.RangedAttack.RecoilCompensation">RC</span>
+                        <strong>{{test.fireModeSummary.rc}}</strong>
+                    </div>
                 </div>
-                <div id="reset-progressive-recoil" class="form-group-element-1-right roll" data-tooltip="SR5.Tooltips.RangedAttack.ResetRecoil"><button type="button">↺</button></div>
+                <div class="fire-mode-summary-row">
+                    <div class="fire-mode-summary-cell">
+                        <span>{{localize 'SR5.Defense'}}</span>
+                        <strong>{{test.fireModeSummary.defense}}</strong>
+                    </div>
+                    <div class="fire-mode-summary-cell">
+                        <span>{{localize 'SR5.Bullets'}}</span>
+                        <strong>{{test.fireModeSummary.rounds}}</strong>
+                    </div>
+                    <div class="fire-mode-summary-cell">
+                        <span>{{localize 'SR5.Action'}}</span>
+                        <strong>{{test.fireModeSummary.action}}</strong>
+                    </div>
+                </div>
             </div>
             <div class="form-group">
                 <label>{{localize 'SR5.FireMode'}}</label>

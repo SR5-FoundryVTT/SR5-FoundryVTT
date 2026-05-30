@@ -80,8 +80,23 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
     get fireModeOptions(): { value: number, label: string }[] {
         return this.data.fireModes.map((fireMode, index) => ({
             value: index,
-            label: `${game.i18n.localize(fireMode.label)} (${fireMode.value}) (${game.i18n.localize(SR5.actionTypes[fireMode.action])})`
+            label: game.i18n.localize(fireMode.label)
         }));
+    }
+
+    get fireModeSummary(): { ammo: string, recoil: string, rc: number, defense: number, rounds: number, action: string } {
+        const ammoLeft = this.item?.ammoLeft() ?? 0;
+        const ammo = this.item.system.ammo?.current;
+        const fireMode = this.data.fireMode;
+
+        return {
+            ammo: `${ammo?.value ?? 0}/${ammo?.max ?? 0}`,
+            recoil: `${this.recoilBeforeAttack} → ${this.recoilAfterAttack}`,
+            rc: this.item.totalRecoilCompensation,
+            defense: FireModeRules.fireModeDefenseModifier(fireMode, ammoLeft),
+            rounds: fireMode.value,
+            action: game.i18n.localize(SR5.actionTypes[fireMode.action])
+        };
     }
 
     /**
