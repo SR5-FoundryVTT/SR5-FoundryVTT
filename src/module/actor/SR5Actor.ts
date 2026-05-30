@@ -694,7 +694,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * Is this technology item any kind of offline?
      */
     isOfflineIcon(): boolean {
-        // TODO: tamif - 1903 - vehicles, ic, technomancers, sprites
+        if (this.isMatrixActor) return false;
+
         const matrixDevice = this.getMatrixDevice();
         if (!matrixDevice) return true;
         return matrixDevice.isOfflineIcon();

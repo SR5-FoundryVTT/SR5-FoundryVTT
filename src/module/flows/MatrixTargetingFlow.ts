@@ -198,8 +198,8 @@ export const MatrixTargetingFlow = {
             }
         }
 
-        this._removeInvisibleIcons(targets);
         this._dedupeTargetsByDocumentUuid(targets);
+        this._removeInvisibleIcons(targets);
 
         // Sort all targets by grid name first and target name second.
         targets.sort((a, b) => {
