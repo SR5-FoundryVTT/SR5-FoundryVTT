@@ -4,6 +4,8 @@ import { ModifiableValue } from "@/module/mods/ModifiableValue";
 import { SkillTest } from "../module/tests/SkillTest";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { TestCreator } from "../module/tests/TestCreator";
+import { OpposedTest } from "../module/tests/OpposedTest";
+import { ActionRollType } from "src/module/types/item/Action";
 import { DataDefaults } from "../module/data/DataDefaults";
 import { SR5ActiveEffect } from "src/module/effect/SR5ActiveEffect";
 import { ModifiableValueType } from "@/module/types/template/Base";
@@ -27,8 +29,9 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         return DataDefaults.createData('change_entry', {
             name: effect.name,
             value: parseInt(change.value),
-            mode: change.mode,
-            priority: parseInt(String(change.priority || change.mode * 10)),
+            // @ts-expect-error TODO: fvtt - v14 - missing type properties on ActiveEffectChangeData
+            type: change.type,
+            priority: parseInt(String(change.priority)),
             source: effect.uuid
         });
     };
@@ -40,9 +43,12 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 origin: actor.uuid,
                 disabled: false,
                 name: 'Test Effect',
-                changes: [
-                    { key: 'system.attributes.body.changes', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'system.attributes.body', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+                system: {
+                    changes: [
+                        { key: 'system.attributes.body.changes', value: '2', type: 'add' },
+                        { key: 'system.attributes.body', value: '2', type: 'add' }
+                    ]
+                }
             }]);
 
             assert.deepEqual(actor.system.attributes.body.changes, [
@@ -438,6 +444,40 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.equal(actor.system.attributes.body.value, 6);
         });
 
+        it('TARGETED_ACTOR apply-to: create copied effects with resolved values on the target actor', async () => {
+            const attacker = await factory.createActor({
+                type: 'character',
+                system: {
+                    attributes: { body: { base: 2 } },
+                    skills: { active: { automatics: { base: 3 } } }
+                }
+            });
+            const target = await factory.createActor({ type: 'character' });
+
+            const items = await attacker.createEmbeddedDocuments('Item', [{ type: 'action', name: 'Test Action' }]);
+            const item = items[0] as SR5Item;
+
+            await item.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Targeted Effect',
+                system: {
+                    applyTo: 'targeted_actor',
+                    changes: [{ key: 'system.attributes.body', value: '@data.pool.value', type: 'custom' }]
+                }
+            }]);
+
+            const test = (await TestCreator.fromItem(item, attacker, { showDialog: false, showMessage: false }))!;
+
+            await test.evaluate();
+            await test.effects.createTargetActorEffects(target);
+
+            const appliedEffect = target.effects.find(effect => effect.name === 'Targeted Effect') as SR5ActiveEffect | undefined;
+            if (!appliedEffect) throw new Error('Expected copied targeted actor effect to exist on target actor.');
+
+            assert.strictEqual(appliedEffect.system.appliedByTest, true);
+            assert.strictEqual(appliedEffect.system.changes[0].value, `${test.pool.value}`);
+            assert.strictEqual(target.system.attributes.body.value, test.pool.value);
+        });
+
         it('TEST_ALL apply-to: Actor effect applies to test', async () => { 
             const limitValue = 3;
             const poolValue = 3;
@@ -587,6 +627,111 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 [createTestChange(itemEffects[0], 2)]
             );
             assert.isAtLeast(test.hits.value, hitsValue);
+        });
+
+        it('TEST_ALL apply-to: skip opposed tests without explicit test selection', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const items = await actor.createEmbeddedDocuments('Item', [{
+                type: 'action',
+                name: 'Opposed Action',
+                system: {
+                    action: {
+                        test: 'SuccessTest',
+                        type: 'simple',
+                        attribute: 'body',
+                        skill: 'automatics',
+                        limit: { attribute: 'physical' },
+                        opposed: {
+                            type: 'custom',
+                            test: 'OpposedTest',
+                            attribute: 'reaction',
+                            attribute2: 'intuition',
+                            skill: '',
+                            description: ''
+                        }
+                    }
+                }
+            }]);
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Unrestricted Effect',
+                system: { applyTo: 'test_all' },
+                changes: [{ key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+            }, {
+                name: 'Opposed Effect',
+                system: { applyTo: 'test_all', selection_tests: [{ value: 'Opposed Test', id: 'OpposedTest' }] },
+                changes: [{ key: 'data.pool', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+            }]);
+
+            const activeTest = (await TestCreator.fromItem(items[0] as SR5Item, actor, { showDialog: false, showMessage: false }))!;
+            const opposedData = await OpposedTest._getOpposedActionTestData(activeTest.data, actor, '');
+            if (!opposedData) throw new Error('Failed to create opposed test data.');
+
+            const opposedTest = new OpposedTest(opposedData, { actor });
+            opposedTest.effects.applyAllEffects();
+
+            const opposedEffect = opposedTest.pool.changes.find(effect => effect.name === 'Opposed Effect') as any;
+            assert.isDefined(opposedEffect, 'Expected to find the opposed effect in the opposed test pool changes.');
+            assert.equal(opposedEffect.name, 'Opposed Effect');
+            assert.equal(opposedEffect.mode, CONST.ACTIVE_EFFECT_MODES.CUSTOM);
+            assert.equal(opposedEffect.value, 2);
+            assert.equal(opposedEffect.priority, 0);
+            assert.equal(opposedEffect.enabled, true);
+            assert.equal(opposedEffect.invalidated, false);
+        });
+
+        it('TEST_ALL apply-to: respect skill, attribute and limit selections', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const skillName = actor.getSkill('automatics')?.name ?? 'automatics';
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Selection Effect',
+                system: {
+                    applyTo: 'test_all',
+                    selection_skills: [{ value: skillName, id: skillName }],
+                    selection_attributes: [{ value: 'Body', id: 'body' }],
+                    selection_limits: [{ value: 'Physical', id: 'physical' }]
+                },
+                changes: [{ key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+            }]);
+
+            const assertPoolValue = async (actionData: ActionRollType, expected: number) => {
+                const test = await TestCreator.fromAction(actionData, actor, { showDialog: false, showMessage: false }) as SkillTest;
+                if (!test) throw new Error('Failed to create skill test.');
+
+                test.effects.applyAllEffects();
+                ModifiableValue.calcTotal(test.pool);
+
+                assert.strictEqual(test.pool.value, expected);
+            };
+
+            await assertPoolValue(DataDefaults.createData('action_roll', {
+                test: SkillTest.name,
+                skill: 'automatics',
+                attribute: 'body',
+                limit: { attribute: 'physical' }
+            }), 2); // skill defaulting 3 -1 => 2
+
+            await assertPoolValue(DataDefaults.createData('action_roll', {
+                test: SkillTest.name,
+                skill: 'clubs',
+                attribute: 'body',
+                limit: { attribute: 'physical' }
+            }), 0);
+
+            await assertPoolValue(DataDefaults.createData('action_roll', {
+                test: SkillTest.name,
+                skill: 'automatics',
+                attribute: 'logic',
+                limit: { attribute: 'physical' }
+            }), 0);
+
+            await assertPoolValue(DataDefaults.createData('action_roll', {
+                test: SkillTest.name,
+                skill: 'automatics',
+                attribute: 'body',
+                limit: { attribute: 'mental' }
+            }), 0);
         });
     });
 
@@ -773,6 +918,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             const test = (await TestCreator.fromItem(weapon, actor, { showDialog: false, showMessage: false }))!;
 
             await test.execute();
+            ModifiableValue.calcTotal(test.data.damage);
 
             assert.equal(test.data.damage.value, 3);
         });

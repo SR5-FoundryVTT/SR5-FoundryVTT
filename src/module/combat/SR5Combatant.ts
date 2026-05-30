@@ -181,7 +181,8 @@ export class SR5Combatant extends Combatant<"base"> {
         } as ChatMessage.CreateData;
 
         const rollMode = CONST.DICE_ROLL_MODES[this.hidden ? 'PRIVATE' : 'PUBLIC'];
-        ChatMessage.applyRollMode(messageData, rollMode);
+        // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
+        ChatMessage.applyMode(messageData, rollMode);
 
         const message = await foundry.documents.ChatMessage.implementation.create(messageData);
         if (message && hasDiceRoll && data.diceRoll)

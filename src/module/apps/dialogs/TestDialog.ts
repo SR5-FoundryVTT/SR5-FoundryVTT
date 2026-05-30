@@ -163,8 +163,10 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
         const context = await super._prepareContext(options);
 
         context.test = this.test;
-        context.rollMode = this.test.data.options?.rollMode ?? game.settings.get('core', 'rollMode');
-        context.rollModes = CONFIG.Dice.rollModes;
+        // @ts-expect-error TODO: fvtt - v14 - missing messageMode setting
+        context.rollMode = this.test.data.options?.rollMode ?? game.settings.get('core', 'messageMode');
+        // TODO: fvtt - v14 - missing types for ChatMessage.modes
+        context.rollModes = (CONFIG.ChatMessage as unknown as { modes: typeof CONFIG.Dice.rollModes }).modes;
         context.config = SR5;
         context.expandedPaths = Array.from(this._expandedList);
         context.dialogContent = await foundry.applications.handlebars.renderTemplate(this.test._dialogTemplate, context as unknown as Record<string, unknown>);

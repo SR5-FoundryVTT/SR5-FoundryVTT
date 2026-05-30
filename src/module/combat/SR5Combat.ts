@@ -590,7 +590,8 @@ export class SR5Combat extends Combat<"base"> {
                 messageOptions,
             );
 
-            ChatMessage.applyRollMode(messageData, rollMode);
+            // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
+            ChatMessage.applyMode(messageData, rollMode);
             const message = await foundry.documents.ChatMessage.implementation.create(messageData);
 
             if (message)

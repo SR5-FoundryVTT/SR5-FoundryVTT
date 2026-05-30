@@ -68,7 +68,8 @@ export const ActorMarksFlow = {
         // CASES - TARGET IS AN ITEM
 
         // If the targeted devices is within a WAN, place mark on the host as well.
-        if (target instanceof SR5Item && target.isSlave) {
+        // See SR5#233 'PANS and WANS'
+        if (target instanceof SR5Item && target.isSlave && !target.master?.isType('grid')) {
             const host = target.master;
             // taM Check this
             await persona.setMarks(host!, marks, options);
