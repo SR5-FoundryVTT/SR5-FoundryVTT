@@ -432,7 +432,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const targetToken = persona.getToken();
         // No decker token, means sidebar actor is looking. Should see all token targets...
         if (!deckerToken) return true;
-        // No target token, means somethig is broken, as we expect token personas here.
+        // No target token, means something is broken, as we expect token personas here.
         if (!targetToken) {
             console.error(`Shadowrun5e | Persona ${persona.name} has no token, but is being checked for token visibility. This should not happen, as the persona parameter is expected to be taken from a token actor.`);
             return false;

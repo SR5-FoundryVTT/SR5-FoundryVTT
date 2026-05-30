@@ -231,7 +231,7 @@ export const MatrixTargetingFlow = {
 
     /**
      * Given any icon, check if this icon is generally visible.
-     * @params icon The icon to check the visibility for.
+     * @param icon The icon to check the visibility for.
      */
     isIconVisible(icon: SR5Actor|SR5Item) {
         if (icon.isOfflineIcon()) return false;
