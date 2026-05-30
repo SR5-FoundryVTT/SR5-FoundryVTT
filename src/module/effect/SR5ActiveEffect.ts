@@ -286,7 +286,6 @@ export class SR5ActiveEffect extends ActiveEffect {
             target.changes.push(
                 DataDefaults.createData('change_entry', {
                     enabled: change.effect.active,
-                    invalidated: false,
                     name: change.effect.name,
                     value: delta,
                     mode: mode,
@@ -346,9 +345,13 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     static override migrateData(data: Parameters<typeof ActiveEffect['migrateData']>[0]) {
+        // Execute Foundry migration first, as their v14 effect.changes => effect.system.changes influences system migrations.
+        const mutableObject = super.migrateData(data);
+
         Migrator.migrate("ActiveEffect", data);
 
-        return super.migrateData(data);
+        // return super.migrateData, as it returns mutated source after migration, while Migrator.migrate only returns a boolean.
+        return mutableObject;
     }
 
     override async update(
