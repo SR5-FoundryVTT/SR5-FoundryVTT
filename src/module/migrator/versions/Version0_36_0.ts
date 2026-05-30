@@ -18,8 +18,8 @@ const { hasProperty, setProperty, getProperty } = foundry.utils;
  * move legacy initiative modifier fields into formula fields,
  * and remap related active effect keys and formula paths.
  */
-export class Version0_35_0 extends VersionMigration {
-    readonly TargetVersion = '0.35.0';
+export class Version0_36_0 extends VersionMigration {
+    readonly TargetVersion = '0.36.0';
 
     override migrateActor(actor: any): void {
         const system = actor.system;
