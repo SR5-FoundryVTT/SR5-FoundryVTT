@@ -1,7 +1,7 @@
 export type MigratableDocument = ActiveEffect.Implementation | Actor.Implementation | Combat.Implementation | Combatant.Implementation | Item.Implementation;
 export type MigratableDocumentName = MigratableDocument['documentName'];
 export type MigratableDocumentType = typeof ActiveEffect | typeof Actor | typeof Item | typeof Combat | typeof Combatant;
-
+const { getProperty } = foundry.utils;
 /**
  * Base class for version migrations that convert game data from an older version to a newer one.
  * 
@@ -69,7 +69,7 @@ export abstract class VersionMigration {
         keyMap: Readonly<Record<string, string>>,
         valueMap: Readonly<Record<string, string>> = keyMap,
     ): void {
-        const changes = effect.system.changes;
+        const changes = getProperty(effect, "system.changes");
         if (!Array.isArray(changes) || changes.length === 0) return;
 
         // Sort by length descending so longer/more specific paths are replaced first

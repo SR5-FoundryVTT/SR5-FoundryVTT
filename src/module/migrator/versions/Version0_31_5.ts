@@ -1,4 +1,5 @@
 import { VersionMigration } from "../VersionMigration";
+const { getProperty } = foundry.utils;
 
 /**
   * Migration: Update spirit actor to use 'system.attributes.force' with 'base' and 'hidden' properties.
@@ -24,7 +25,8 @@ export class Version0_31_5 extends VersionMigration {
     }
 
     override handlesActiveEffect(effect: Readonly<any>) {
-        const changes = effect.system?.changes ?? [];
+        const changes = getProperty(effect, "system.changes") ?? [];
+        if (!Array.isArray(changes) || changes.length === 0) return false;
         return changes.filter(change => change.key === 'system.force').length > 0;
     }
 
