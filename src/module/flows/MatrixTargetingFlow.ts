@@ -198,6 +198,7 @@ export const MatrixTargetingFlow = {
             }
         }
 
+        this._removeInvisibleIcons(targets);
         this._dedupeTargetsByDocumentUuid(targets);
 
         // Sort all targets by grid name first and target name second.
@@ -215,6 +216,28 @@ export const MatrixTargetingFlow = {
         });
 
         return targets;
+    },
+
+    /**
+     * Currently we show silent icons, whenever a persona has other online devices visible.
+     * @param targets List of any kind of icon targets.
+     */
+    _removeInvisibleIcons(targets: MatrixTargetDocument[]) {
+        for (let index = targets.length - 1; index >= 0; index -= 1) {
+            const target = targets[index].document;
+            if (!MatrixTargetingFlow.isIconVisible(target)) targets.splice(index, 1);
+        }
+    },
+
+    /**
+     * Given any icon, check if this icon is generally visible.
+     * @params icon The icon to check the visibility for.
+     */
+    isIconVisible(icon: SR5Actor|SR5Item) {
+        if (icon.isOfflineIcon()) return false;
+        if (icon instanceof SR5Actor && icon.isRunningSilent() && !icon.hasNonPersonaWirelessDevices()) return false;
+        if (icon instanceof SR5Item && icon.isRunningSilent()) return false;
+        return true;
     },
 
     /**

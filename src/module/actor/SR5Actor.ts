@@ -430,7 +430,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // Assume each actor only has the one token.
         const deckerToken = this.getToken();
         const targetToken = persona.getToken();
-        if (!deckerToken || !targetToken) return false;
+        // No decker token, means sidebar actor is looking. Should see all token targets...
+        if (!deckerToken) return true;
+        // No target token, means somethig is broken, as we expect token personas here.
+        if (!targetToken) {
+            console.error(`Shadowrun5e | Persona ${persona.name} has no token, but is being checked for token visibility. This should not happen, as the persona parameter is expected to be taken from a token actor.`);
+            return false;
+        }
 
         // Compare host networks.
         if (persona.network?.isType('host') && persona.network.id !== this.network?.id) return false;
@@ -439,11 +445,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const distance = Helpers.measureTokenDistance(deckerToken, targetToken);
         if (distance > 100) return false;
 
-        // TODO: Compare running silent with tokens that have been percieved through a matrix perception
-        // TODO: Compare running silent with tokens that have been found to have placed marks on this actor
-        return !targetMatrixData.running_silent;
+        return !persona.isRunningSilent();
     }
-
     getFullDefenseAttribute(this: SR5Actor): AttributeFieldType | undefined {
         if (this.isType('vehicle')) {
             return this.findVehicleStat('pilot');
@@ -685,6 +688,16 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const matrixData = this.matrixData();
         if (!matrixData) return false;
         return matrixData.running_silent;
+    }
+
+    /**
+     * Is this technology item any kind of offline?
+     */
+    isOfflineIcon(): boolean {
+        // TODO: tamif - 1903 - vehicles, ic, technomancers, sprites
+        const matrixDevice = this.getMatrixDevice();
+        if (!matrixDevice) return true;
+        return matrixDevice.isOfflineIcon();
     }
 
     /**
@@ -1824,6 +1837,18 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     hasWirelessDevices() {
         return this.wirelessDevices().length > 0;
+    }
+
+    /**
+     * Check if this persona has any other wireless devices outside of the main persona device.
+     */
+    hasNonPersonaWirelessDevices() {
+        const wirelessDevices = this.wirelessDevices();
+        if (!this.hasPersona) return false;
+        if (this.hasLivingPersona()) return wirelessDevices.length > 0;
+
+        const personaDevice = this.getMatrixDevice();
+        return wirelessDevices.some(device => device.id !== personaDevice?.id);
     }
 
     matrixData(this: SR5Actor) {
