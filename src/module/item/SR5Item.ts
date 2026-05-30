@@ -1291,6 +1291,12 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return this.isType('host', 'grid');
     }
 
+    isOfflineIcon(): boolean {
+        const technologyData = this.getTechnologyData();
+        if (!technologyData) return false;
+        return technologyData.wireless === 'none' || technologyData.wireless === 'offline';
+    }
+
     /**
      * Determine if an item has taken Matrix Damage
      */
