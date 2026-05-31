@@ -45,7 +45,7 @@ export const FLAGS = {
     MustHaveRessourcesOnTest: 'MustConsumeRessourcesOnTest',
     AutomateMultiDefenseModifier: 'AutomateMultiDefenseModifier',
     AutomateProgressiveRecoil: 'AutomateProgressiveRecoil',
-    CollapseModifyRollByDefault: 'CollapseModifyRollByDefault',
+    ModifyRollExpanded: 'ModifyRollExpanded',
     TurnsSinceLastAttack: 'turnsSinceLastAttack',
     MarkImports: 'MarkImports',
     ImportIconFolder: 'ImportIconFolder',
@@ -75,9 +75,6 @@ export const FLAGS = {
     DieFaceLabels: "DieFaceLabels"
 } as const;
 export const CORE_NAME = 'core';
-export const CORE_FLAGS = {
-    RollMode: 'rollMode'
-} as const;
 export const METATYPEMODIFIER = 'SR5.Character.Modifiers.NPCMetatypeAttribute';
 
 export const LENGTH_UNIT_TO_METERS_MULTIPLIERS = {

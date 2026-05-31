@@ -37,37 +37,37 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
                     .split("/")[0].toLowerCase() as any;
         }
 
-        if (jsonData.walk)
-            system.movement.walk.base = Number(jsonData.walk._TEXT.split('/')[0] ?? 0);
-
-        if (jsonData.run)
-            system.movement.run.base = Number(jsonData.run._TEXT.split('/')[0] ?? 0);
-
-        system.movement.sprint = Number(jsonData.sprint?._TEXT.split('/')[0] ?? 0);
+        this.applyMovement(system, jsonData);
 
         return system;
     }
 
     protected override async getItems(jsonData: Metatype): Promise<Item.Source[]> {
-        const { name, powers } = jsonData;
-        const qualities = jsonData.qualities || undefined;
-        const optionalpowers = jsonData.optionalpowers || jsonData.bonus?.optionalpowers;
+        const { name, powers, skills } = jsonData;
+        const qualities = this.mergeLists(
+            jsonData.qualities?.positive?.quality,
+            jsonData.qualities?.negative?.quality
+        );
+        const optionalPowers = this.mergeLists(
+            jsonData.optionalpowers?.optionalpower,
+            jsonData.bonus?.optionalpowers?.optionalpower
+        );
 
-        const powerList = [...IH.getArray(powers?.power), ...IH.getArray(optionalpowers?.optionalpower)].map(i => i._TEXT);
-        const qualityList = [
-            ...IH.getArray(qualities?.positive?.quality),
-            ...IH.getArray(qualities?.negative?.quality),
-        ].map(i => i._TEXT);
+        const qualityList = this.getNamedList(qualities);
+        const skillList = this.getNamedList(skills?.skill, skills?.group);
+        const powerList = this.getNamedList(powers?.power, optionalPowers);
 
-        const allPowers = await IH.findItems('Critter_Power', powerList);
+        const allSkills = await IH.findItems('Skill', skillList);
         const allQualities = await IH.findItems('Quality', qualityList);
-        const spiritName = name._TEXT;
+        const allPowers = await IH.findItems('Critter_Power', powerList);
 
+        const spiritName = name._TEXT;
         return [
+            ...this.getMetatypeItems(allSkills, skills?.skill, { type: 'Skill', critter: spiritName }),
             ...this.getMetatypeItems(allPowers, powers?.power, { type: 'Power', critter: spiritName }),
-            ...this.getMetatypeItems(allQualities, qualities?.positive?.quality, { type: 'Power', critter: spiritName }),
-            ...this.getMetatypeItems(allQualities, qualities?.negative?.quality, { type: 'Power', critter: spiritName }),
-            ...this.getMetatypeItems(allPowers, optionalpowers?.optionalpower, { type: 'Optional Power', critter: spiritName }),
+            ...this.getMetatypeItems(allQualities, qualities, { type: 'Quality', critter: spiritName }),
+            ...this.getMetatypeItems(allSkills, skills?.group, { type: 'Skill Group', critter: spiritName }),
+            ...this.getMetatypeItems(allPowers, optionalPowers, { type: 'Optional Power', critter: spiritName }),
         ];
     }
 

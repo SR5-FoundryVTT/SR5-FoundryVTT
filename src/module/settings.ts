@@ -2,6 +2,7 @@
 
 import { FLAGS, SYSTEM_NAME } from './constants';
 import { PackItemFlow } from './item/flows/PackItemFlow';
+import { IconAssign } from './apps/iconAssigner/IconAssign';
 import SR5CompendiaSettings from './settings/SR5CompendiaSettings';
 
 export const registerSystemSettings = () => {
@@ -181,15 +182,15 @@ export const registerSystemSettings = () => {
     });
 
     /**
-     * Control if the Modify Roll section starts collapsed by default in test dialogs.
+     * Remember whether the Modify Roll section was expanded last time.
      */
-    game.settings.register(SYSTEM_NAME, FLAGS.CollapseModifyRollByDefault, {
-        name: 'SETTINGS.CollapseModifyRollByDefault',
-        hint: 'SETTINGS.CollapseModifyRollByDefaultDescription',
+    game.settings.register(SYSTEM_NAME, FLAGS.ModifyRollExpanded, {
+        name: 'SETTINGS.ModifyRollExpanded',
+        hint: 'SETTINGS.ModifyRollExpandedDescription',
         scope: 'client',
-        config: true,
+        config: false,
         type: Boolean,
-        default: false
+        default: true
     });
 
     /**
@@ -231,7 +232,8 @@ export const registerSystemSettings = () => {
         scope: 'world',
         config: true,
         type: String,
-        default: 'systems/shadowrun5e/dist/icons/importer/'
+        default: 'systems/shadowrun5e/dist/icons/importer/',
+        onChange: () => { void IconAssign.refreshIconFiles(); },
     });
 
     /**

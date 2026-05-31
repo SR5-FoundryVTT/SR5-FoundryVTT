@@ -1,8 +1,8 @@
 import { FLAGS } from "../constants";
 import { Sanitizer } from "../sanitizer/Sanitizer";
 import { Version0_8_0 } from "./versions/Version0_8_0";
-import { Version0_18_0 } from './versions/Version0_18_0';
 import { Version0_16_0 } from './versions/Version0_16_0';
+import { Version0_18_0 } from './versions/Version0_18_0';
 import { Version0_27_0 } from './versions/Version0_27_0';
 import { Version0_30_0 } from './versions/Version0_30_0';
 import { Version0_30_3 } from './versions/Version0_30_3';
@@ -15,8 +15,11 @@ import { Version0_32_4 } from './versions/Version0_32_4';
 import { Version0_33_0 } from './versions/Version0_33_0';
 import { Version0_33_1 } from './versions/Version0_33_1';
 import { Version0_34_0 } from './versions/Version0_34_0';
-import { VersionMigration, MigratableDocument, MigratableDocumentName } from "./VersionMigration";
-const { deepClone } = foundry.utils;
+import { Version0_34_1 } from './versions/Version0_34_1';
+import { VersionMigration, MigratableDocument, MigratableDocumentName, MigratableDocumentType } from "./VersionMigration";
+
+const { deepClone, setProperty } = foundry.utils;
+
 
 /**
  * Seamless data migrator for the SR5 system.
@@ -42,8 +45,8 @@ export class Migrator {
     // ⚠️ Keep this list sorted in ascending order by version number (oldest → newest).
     private static readonly s_Versions = [
         new Version0_8_0(),
-        new Version0_18_0(),
         new Version0_16_0(),
+        new Version0_18_0(),
         new Version0_27_0(),
         new Version0_30_0(),
         new Version0_30_3(),
@@ -56,6 +59,7 @@ export class Migrator {
         new Version0_33_0(),
         new Version0_33_1(),
         new Version0_34_0(),
+        new Version0_34_1(),
     ] as const;
 
     private static documentsToBeMigrated = 0;
@@ -135,7 +139,7 @@ export class Migrator {
                 const nestedMigrated = this.migrate("Item", nestedItems, true, path);
                 migrated = migrated || nestedMigrated;
             }
-            foundry.utils.setProperty(data, 'flags.shadowrun5e.embeddedItems', items);
+            setProperty(data, 'flags.shadowrun5e.embeddedItems', items);
 
             if (nested) {
                 const effects = this.normalizeArray(data.effects);
@@ -143,7 +147,7 @@ export class Migrator {
                     const nestedMigrated = this.migrate("ActiveEffect", nestedEffect, true, path);
                     migrated = migrated || nestedMigrated;
                 }
-                foundry.utils.setProperty(data, 'effects', effects);
+                setProperty(data, 'effects', effects);
             }
         }
 
@@ -238,7 +242,7 @@ export class Migrator {
     // Track migration progress
     private static totalMigrations = 0;
     private static completedMigrations = 0;
-    private static progressbar: Notifications.Notification | null = null;
+    private static progressbar: foundry.applications.ui.Notifications.Notification | null = null;
     private static updateProgressbar() {
         if (!this.progressbar)
             this.progressbar = ui.notifications.info("Migrating Documents...", { progress: true });
@@ -253,16 +257,20 @@ export class Migrator {
     /**
      * Update documents of a specific type.
      */
-    private static async updateDocuments<Doc extends typeof Actor | typeof Item | typeof ActiveEffect>(
+    private static async updateDocuments<Doc extends MigratableDocumentType>(
         cls: Doc,
         docs: NonNullable<Parameters<Doc['implementation']['updateDocuments']>[0]>,
         parent: NonNullable<Parameters<Doc['implementation']['updateDocuments']>[1]>['parent'] = null
     ) {
         this.updateProgressbar();
-        return cls.implementation.updateDocuments(
-            docs.filter(d => d._stats?.systemVersion === this._migrationMark) as any,
-            { diff: false, recursive: false, parent: parent as any }
-        );
+        try {
+            return await cls.implementation.updateDocuments(
+                docs.filter(d => d._stats?.systemVersion === this._migrationMark) as any,
+                { diff: false, recursive: false, parent: parent as any }
+            );
+        } catch (error) {
+            console.error(`Failed migration update for ${cls.documentName} documents (parent: ${parent?.uuid ?? 'none'}).`, error);
+        }
     }
 
     /**
@@ -276,6 +284,7 @@ export class Migrator {
             1 + game.items.size +                         // Items + their effects
             1 + game.actors.size * 2 +                    // Actor + their items + their effects
             [...game.actors].reduce((sum, actor) => sum + actor.items.size, 0) +  // Actor item effects
+            1 + game.combats.size +                       // Combats + their combatants
             game.scenes.size;                             // Non-actor tokens
 
         /* Items and its embedded Effects */
@@ -295,13 +304,23 @@ export class Migrator {
                 await this.updateDocuments(ActiveEffect, item.toObject().effects, item);
         }
 
+        /* Combats and its embedded combatants */
+        await this.updateDocuments(Combat, deepClone(game.combats._source));
+
+        for (const combat of game.combats)
+            await this.updateDocuments(Combatant, combat.toObject().combatants ?? [], combat);
+
         /* Tokens */
         for (const scene of game.scenes) {
             this.updateProgressbar();
-            await TokenDocument.implementation.updateDocuments(
-                scene.tokens.map(t => t.toObject()),
-                { diff: false, recursive: false, parent: scene }
-            );
+            try {
+                await TokenDocument.implementation.updateDocuments(
+                    scene.tokens.map(t => t.toObject()),
+                    { diff: false, recursive: false, parent: scene }
+                );
+            } catch (error) {
+                console.error(`Failed migration update for Token documents in ${scene.uuid}.`, error);
+            }
         }
 
         /* Finalize Migration */

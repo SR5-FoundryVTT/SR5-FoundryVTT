@@ -9,18 +9,10 @@
                 </div>
                 <div class="inputs">
                     <select name="test.data.attribute1">
-                        {{#select test.data.attribute1}}
-                        <option value=""></option>
-                        {{#each config.attributes as |name type|}}
-                        <option value="{{type}}">{{localize name}}</option>
-                        {{/each}} {{/select}}
+                        {{selectOptions config.attributes selected=test.data.attribute1 localize=true sort=true blank=''}}
                     </select>
                     <select name="test.data.attribute2">
-                        {{#select test.data.attribute2}}
-                        <option value=""></option>
-                        {{#each config.attributes as |name type|}}
-                        <option value="{{type}}">{{localize name}}</option>
-                        {{/each}} {{/select}}
+                        {{selectOptions config.attributes selected=test.data.attribute2 localize=true sort=true blank=''}}
                     </select>
                 </div>
             </div>

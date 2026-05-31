@@ -1,13 +1,38 @@
 <div class="chummer-import">
   <label for="chummer-input">Chummer Export Data (JSON)</label>
-  <textarea
-    id="chummer-input"
-    rows="8"
-    placeholder="HOW TO IMPORT:
+  <div class="json-input-container">
+    <input type="file" id="chummer-file-input" accept=".json,application/json" />
+    {{#if hasSelectedFile}}
+      <div class="json-file-selected">
+        <div id="chummer-file-dropzone" class="json-dropzone file-selected">
+          <label for="chummer-file-input" class="file-input-label">
+            <span class="file-input-content">
+              <i class="fa-solid fa-file-code"></i>
+              <strong>{{selectedFileName}}</strong>
+              <span class="file-meta">{{selectedFileSize}} • Click to change or drag-and-drop another file</span>
+            </span>
+          </label>
+        </div>
+        <button type="button" data-action="clearSelectedFile" class="clear-file-button" {{#if isImporting}}disabled{{/if}}>
+          <i class="fa-solid fa-xmark"></i> Clear File
+        </button>
+      </div>
+    {{else}}
+      <div id="chummer-file-dropzone" class="json-dropzone">
+        <textarea
+          id="chummer-input"
+          class="json-textarea"
+          rows="8"
+          placeholder="HOW TO IMPORT:
 • In Chummer, go to File > Export, choose JSON format.
 • Select all text (CTRL+A) and copy (CTRL+C).
-• Paste the copied text into this box."
-  ></textarea>
+• Paste the copied text into this box.
+• Or drag-and-drop the exported .json file into this area."
+        >{{pastedJsonText}}</textarea>
+        <button type="button" data-action="selectJsonFile" class="select-json-button" {{#if isImporting}}disabled{{/if}}>Select json</button>
+      </div>
+    {{/if}}
+  </div>
 
   <div id="chummer-issues" style="display: none;"></div>
 
@@ -15,27 +40,33 @@
     <legend>Import Options</legend>
     <p>Select the data you wish to import from the file.</p>
     <div class="options-grid">
-        <label><input type="checkbox" data-field="armor" checked /> Armors</label>
-        <label><input type="checkbox" data-field="contacts" checked /> Contacts</label>
-        <label><input type="checkbox" data-field="cyberware" checked /> Cyberware</label>
-        <label><input type="checkbox" data-field="equipment" checked /> Equipment</label>
-        <label><input type="checkbox" data-field="lifestyles" checked /> Lifestyles</label>
-        <label><input type="checkbox" data-field="powers" checked /> Powers</label>
-        <label><input type="checkbox" data-field="qualities" checked /> Qualities</label>
-        <label><input type="checkbox" data-field="spells" checked /> Spells</label>
-        <label><input type="checkbox" data-field="vehicles" checked /> Vehicles</label>
-        <label><input type="checkbox" data-field="weapons" checked /> Weapons</label>
+        <label><input type="checkbox" data-field="armor" {{checked importSelections.armor}} {{#if isImporting}}disabled{{/if}} /> Armors</label>
+        <label><input type="checkbox" data-field="contacts" {{checked importSelections.contacts}} {{#if isImporting}}disabled{{/if}} /> Contacts</label>
+        <label><input type="checkbox" data-field="cyberware" {{checked importSelections.cyberware}} {{#if isImporting}}disabled{{/if}} /> Cyberware</label>
+        <label><input type="checkbox" data-field="equipment" {{checked importSelections.equipment}} {{#if isImporting}}disabled{{/if}} /> Equipment</label>
+        <label><input type="checkbox" data-field="lifestyles" {{checked importSelections.lifestyles}} {{#if isImporting}}disabled{{/if}} /> Lifestyles</label>
+        <label><input type="checkbox" data-field="powers" {{checked importSelections.powers}} {{#if isImporting}}disabled{{/if}} /> Powers</label>
+        <label><input type="checkbox" data-field="qualities" {{checked importSelections.qualities}} {{#if isImporting}}disabled{{/if}} /> Qualities</label>
+        <label><input type="checkbox" data-field="spells" {{checked importSelections.spells}} {{#if isImporting}}disabled{{/if}} /> Spells</label>
+        <label><input type="checkbox" data-field="vehicles" {{checked importSelections.vehicles}} {{#if isImporting}}disabled{{/if}} /> Vehicles</label>
+        <label><input type="checkbox" data-field="weapons" {{checked importSelections.weapons}} {{#if isImporting}}disabled{{/if}} /> Weapons</label>
     </div>
   </fieldset>
 
   <fieldset>
     <legend>Settings</legend>
     <div class="import-settings">
-      <div class="options-grid">
-        <label><input type="checkbox" id="assign-icons" checked /> Automatically assign icons</label>
-      </div>
-
-      <button type="button" data-action="openConfig" class="configure-button">
+      <label {{#unless canUploadFiles}}data-tooltip="User cannot upload files"{{/unless}}>
+        <input
+          type="checkbox"
+          data-field="mugshots"
+          {{checked importSelections.mugshots}}
+          {{#if isImporting}}disabled{{/if}}
+          {{#unless canUploadFiles}}disabled{{/unless}}
+        />
+        Upload Mugshots
+      </label>
+      <button type="button" data-action="openConfig" class="configure-button" {{#if isImporting}}disabled{{/if}}>
         <i class="fas fa-cogs"></i> Configure Compendium Sources
       </button>
     </div>
@@ -43,12 +74,18 @@
 
   <div class="import-actions">
     <label for="chummer-folder-select">Import to folder:</label>
-    <select id="chummer-folder-select">
+    <select id="chummer-folder-select" {{#if isImporting}}disabled{{/if}}>
         <option value=""></option>
         {{#each folders as |folder|}}
-            <option value="{{folder.id}}">{{folder.name}}</option>
+            <option value="{{folder.id}}" {{#if folder.selected}}selected{{/if}}>{{folder.name}}</option>
         {{/each}}
     </select>
-    <button type="button" data-action="import">Import Character</button>
+    <button type="button" data-action="import" {{#if isImporting}}disabled aria-busy="true"{{/if}}>
+      {{#if isImporting}}
+        <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Importing Actor...
+      {{else}}
+        Import Character
+      {{/if}}
+    </button>
   </div>
 </div>

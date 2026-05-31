@@ -154,8 +154,8 @@ export class ImporterSourcesConfig extends BaseClass {
      * Handle the save button click.
      */
     private async _onSave() {
-        await game.settings.set(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder, this.selectedIds);
+        await game.settings.set(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder, [...new Set(this.selectedIds)]);
         ui.notifications.info("Actor Importer configuration saved!");
-        void this.close();
+        return this.close();
     }
 }

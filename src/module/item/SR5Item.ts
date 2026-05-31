@@ -32,10 +32,9 @@ import { RollDataOptions } from './Types';
 import { SetMarksOptions } from '../storage/MarksStorage';
 import { MatrixDeviceFlow } from './flows/MatrixDeviceFlow';
 import { StorageFlow } from '@/module/flows/StorageFlow';
-import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
 import { ModifiableValueType } from '../types/template/Base';
-import Document = foundry.abstract.Document;
-import GetEmbeddedDocumentOptions = Document.GetEmbeddedDocumentOptions;
+import { IconAssign } from 'src/module/apps/iconAssigner/IconAssign';
+import GetEmbeddedDocumentOptions = foundry.abstract.Document.GetEmbeddedDocumentOptions;
 
 type OneOrMany<T> = T | T[];
 const { fromUuid, mergeObject, expandObject } = foundry.utils;
@@ -66,6 +65,17 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     declare descriptionHTML: string | undefined;
     // Item Sheet labels for quick info on an item dropdown.
     declare labels: { roll?: string; opposedRoll?: string };
+
+    static override getDefaultArtwork(itemData?: Item.CreateData): Item.GetDefaultArtworkReturn {
+        const fallback = super.getDefaultArtwork(itemData);
+        if (!itemData || itemData.img) return fallback;
+
+        const assignedImage = IconAssign.iconAssign(itemData);
+        if (!assignedImage) return fallback;
+
+        return { img: assignedImage };
+    }
+
 
     /**
      * Helper property to get an actual actor for an owned or embedded item. You'll need this for when you work with
@@ -1246,7 +1256,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return this;
     }
 
-    override async update(data: Item.UpdateInput, options?: Item.Database.UpdateOperation) {
+    override async update(data: Item.UpdateInput, options?: Item.Database.UpdateOneDocumentOperation) {
         // Item.item => Embedded item into another item!
         if (this._isNestedItem)
             return this.updateNestedItem(data);
@@ -1279,6 +1289,12 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     isNetwork(this: SR5Item): this is SR5Item<'grid' | 'host'> {
         return this.isType('host', 'grid');
+    }
+
+    isOfflineIcon(): boolean {
+        const technologyData = this.getTechnologyData();
+        if (!technologyData) return false;
+        return technologyData.wireless === 'none' || technologyData.wireless === 'offline';
     }
 
     /**
@@ -1453,6 +1469,18 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     /**
+     * Determine if this device is used as the owning actors active persona device to connect to the matrix.
+     * @returns true, if this device is used as the active persona device.
+     */
+    isActivePersonaDevice() {
+        const actor = this.actorOwner;
+        if (!actor) return false;
+        const personaDevice = actor.getMatrixDevice() as SR5Item | undefined;
+        if (!personaDevice) return false;
+        return personaDevice.id === this.id;
+    }
+
+    /**
      * Is this matrix device part of an active network?
      */
     get hasMaster(): boolean {
@@ -1511,7 +1539,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      */
     override getRollData(options: RollDataOptions = {}) {
         // Create a system data copy to avoid cross-contamination
-        const rollData = this.system.toObject(false);
+        const rollData = options.copySystem ? this.system.toObject(false) : super.getRollData();
         return ItemRollDataFlow.getRollData(this, rollData, options);
     }
 
@@ -1556,20 +1584,27 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      */
     override async _preDelete(...args: Parameters<Item['_preDelete']>) {
         await StorageFlow.deleteStorageReferences(this);
-        return await super._preDelete(...args);
+        return super._preDelete(...args);
     }
 
     /**
      * Override getEmbeddedDocument to support Nested Items
-     * @param embeddedName
-     * @param id
-     * @param options
      */
-    // provide typescript overrides dependent on the embedded name -- this was to fix an issue with overriding this value from Item
-    override getEmbeddedDocument(embeddedName: 'ActiveEffect' | 'effects', id: string, options?: GetEmbeddedDocumentOptions): SR5ActiveEffect | undefined;
-    override getEmbeddedDocument(embeddedName: 'Item' | 'items', id: string, options?: GetEmbeddedDocumentOptions): SR5Item | undefined;
-    override getEmbeddedDocument<EmbeddedName extends 'ActiveEffect' | 'effects' | 'Item' | 'items'>(
-            embeddedName: EmbeddedName, id: string, options: GetEmbeddedDocumentOptions = {}) {
+    override getEmbeddedDocument(
+        embeddedName: 'Item' | 'items',
+        id: string,
+        options?: GetEmbeddedDocumentOptions
+    ): Item.Implementation | undefined;
+    override getEmbeddedDocument(
+        embeddedName: 'ActiveEffect' | 'effects',
+        id: string,
+        options?: GetEmbeddedDocumentOptions
+    ): ReturnType<Item['getEmbeddedCollection']>;
+    override getEmbeddedDocument(
+        embeddedName: 'ActiveEffect' | 'effects' | 'Item' | 'items',
+        id: string,
+        options?: GetEmbeddedDocumentOptions
+    ) {
         if (embeddedName === 'Item' || embeddedName === 'items') {
             return this.getOwnedItem(id);
         }

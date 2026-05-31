@@ -369,6 +369,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                     save: true,
                     addSource: true,
                 });
+                if (!duplicate) throw new Error('Actor clone failed during skill set duplicate test');
 
                 factory.actors.push(duplicate);
 

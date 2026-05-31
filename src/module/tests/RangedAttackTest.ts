@@ -1,14 +1,14 @@
-import { TestDialog } from '../apps/dialogs/TestDialog';
-import {SuccessTest, SuccessTestData} from "./SuccessTest";
-import {DataDefaults} from "../data/DataDefaults";
-import {SR5} from "../config";
-import {FireModeRules} from "../rules/FireModeRules";
+import { SR5 } from "../config";
 import { SR5Item } from "../item/SR5Item";
 import { TestCreator } from './TestCreator';
-import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
 import { DamageType } from '../types/item/Action';
-import { RangesTemplateType, TargetRangeTemplateType } from '../types/template/Weapon';
+import { DataDefaults } from "../data/DataDefaults";
+import { FireModeRules } from "../rules/FireModeRules";
 import { FireModeType } from '../types/flags/ItemFlags';
+import { SuccessTest, SuccessTestData } from "./SuccessTest";
+import { TestDialogLike } from '../apps/dialogs/TestDialog';
+import { RangesTemplateType, TargetRangeTemplateType } from '../types/template/Weapon';
+import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
 
 export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDataFragment {
     damage: DamageType
@@ -50,7 +50,10 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
     /**
      * User want's to manually reset progressive recoil before casting the attack test.
      */
-    async _handleResetProgressiveRecoil(event: JQuery<HTMLElement>, test: TestDialog) {
+    async _handleResetProgressiveRecoil(event: JQuery.Event, test: TestDialogLike) {
+        event.preventDefault();
+        event.stopPropagation();
+
         if (!this.actor) return;
         await this.actor.clearProgressiveRecoil();
 
@@ -72,6 +75,13 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
 
     _selectFireMode(index: number) {
         this.data.fireMode = this.data.fireModes[index];
+    }
+
+    get fireModeOptions(): { value: number, label: string }[] {
+        return this.data.fireModes.map((fireMode, index) => ({
+            value: index,
+            label: `${game.i18n.localize(fireMode.label)} (${fireMode.value}) (${game.i18n.localize(SR5.actionTypes[fireMode.action])})`
+        }));
     }
 
     /**

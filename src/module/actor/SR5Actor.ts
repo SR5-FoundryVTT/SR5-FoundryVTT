@@ -35,6 +35,7 @@ import { Migrator } from '../migrator/Migrator';
 import { OverwatchStorage } from '../storage/OverwatchStorage';
 import { SuccessTest } from '../tests/SuccessTest';
 import { DamageApplicationFlow } from './flows/DamageApplicationFlow';
+import { ModifiableField } from '../types/fields/ModifiableField';
 import { MatrixNetworkFlow } from '../item/flows/MatrixNetworkFlow';
 import { ActorMarksFlow } from './flows/ActorMarksFlow';
 import { SetMarksOptions } from '../storage/MarksStorage';
@@ -52,6 +53,7 @@ import type { InitiativeModeOptions } from '../combat/SR5Combatant';
 import { CreateActorFlow } from './flows/CreateActorFlow';
 import { SkillNamingFlow } from '@/module/flows/SkillNamingFlow';
 import { SkillFieldType } from '../types/template/Skills';
+import { IconAssign } from 'src/module/apps/iconAssigner/IconAssign';
 
 interface TypedItemMap extends Omit<Map<Item.ConfiguredSubType, SR5Item[]>, 'get' | 'set'> {
     get: <K extends Item.ConfiguredSubType>(key: K) => SR5Item<K>[] | undefined;
@@ -122,9 +124,19 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return super.migrateData(source);
     }
 
+    static override getDefaultArtwork(actorData?: Actor.CreateData): Actor.GetDefaultArtworkReturn {
+        const fallback = super.getDefaultArtwork(actorData);
+        if (!actorData || actorData.img) return fallback;
+
+        const assignedImage = IconAssign.iconAssign(actorData);
+        if (!assignedImage) return fallback;
+
+        return { img: assignedImage, texture: { src: assignedImage } };
+    }
+
     /**
-     * Lifecycle hook called before an actor document is created.     
-     * 
+     * Lifecycle hook called before an actor document is created.
+     *
      * NOTE: Hook is both called for creating and cloning / duplicating actor documents.
      *
      * @param data The initial data object provided to the document creation request
@@ -144,7 +156,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     override async update(
         data: Actor.UpdateInput,
-        operation?: Actor.Database.UpdateOperation,
+        operation?: Actor.Database.UpdateOneDocumentOperation,
     ) {
         await Migrator.updateMigratedDocument(this);
         return super.update(data, operation);
@@ -199,13 +211,14 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Should some ActiveEffects need to be excluded from the general application, do so here.
+     * @param {string} phase The application phase under which changes are to be applied.
      * @override
      */
-    override applyActiveEffects() {
-        // Shadowrun uses prepareDerivedData to calculate lots of things that don't exist on the data model in full.
+    override applyActiveEffects(...args) {
         // Errors during change application will stop that process and cause a broken sheet.
         try {
-            super.applyActiveEffects();
+            // @ts-expect-error TODO: fvtt - v14 - typing is missing
+            super.applyActiveEffects(...args);
         } catch (error) {
             console.error(`Shadowrun5e | Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.id})`);
             console.error(error);
@@ -317,7 +330,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         this.system.skills = SkillFieldPrep.prepareActorSkills(skills);
     }
-    
+
     /*
      * Some actors have skills, some don't. While others don't have skills but derive skill values from their ratings.
      */
@@ -419,7 +432,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // Assume each actor only has the one token.
         const deckerToken = this.getToken();
         const targetToken = persona.getToken();
-        if (!deckerToken || !targetToken) return false;
+        // No decker token, means sidebar actor is looking. Should see all token targets...
+        if (!deckerToken) return true;
+        // No target token, means something is broken, as we expect token personas here.
+        if (!targetToken) {
+            console.error(`Shadowrun5e | Persona ${persona.name} has no token, but is being checked for token visibility. This should not happen, as the persona parameter is expected to be taken from a token actor.`);
+            return false;
+        }
 
         // Compare host networks.
         if (persona.network?.isType('host') && persona.network.id !== this.network?.id) return false;
@@ -428,11 +447,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const distance = Helpers.measureTokenDistance(deckerToken, targetToken);
         if (distance > 100) return false;
 
-        // TODO: Compare running silent with tokens that have been percieved through a matrix perception
-        // TODO: Compare running silent with tokens that have been found to have placed marks on this actor
-        return !targetMatrixData.running_silent;
+        return !persona.isRunningSilent();
     }
-
     getFullDefenseAttribute(this: SR5Actor): AttributeFieldType | undefined {
         if (this.isType('vehicle')) {
             return this.findVehicleStat('pilot');
@@ -501,8 +517,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @returns Note, this can return undefined. It is not typed that way, as it broke many things. :)
      */
     getAttribute(name: string, options?: { rollData?: SR5Actor['system'] }): AttributeFieldType {
-
-        const rollData = options?.rollData ?? this.getRollData();
+        const rollData = options?.rollData ?? this.getRollData({copySystem: true});
         // First check vehicle stats, as they don't always exist.
         const stats = rollData.vehicle_stats ?? this.getVehicleStats();
         if (stats?.[name]) return stats[name];
@@ -580,6 +595,10 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     getActiveSkills(this: SR5Actor) {
         return this.system.skills.active;
+    }
+
+    getSkillGroups(this: SR5Actor) {
+        return this.items.filter(item => item.isType('skill') && item.system.type === 'group') as SR5Item<'skill'>[];
     }
 
     getMasterUuid(): string | undefined {
@@ -670,6 +689,17 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const matrixData = this.matrixData();
         if (!matrixData) return false;
         return matrixData.running_silent;
+    }
+
+    /**
+     * Is this technology item any kind of offline?
+     */
+    isOfflineIcon(): boolean {
+        if (this.isMatrixActor) return false;
+
+        const matrixDevice = this.getMatrixDevice();
+        if (!matrixDevice) return true;
+        return matrixDevice.isOfflineIcon();
     }
 
     /**
@@ -765,7 +795,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     getSkill(this: SR5Actor, name: string, options?: { byLabel?: boolean, byId?: boolean, rollData?: SR5Actor['system'] }) {
         // Retrieve skills from either roll or system data.
-        const rollData = options?.rollData ?? this.getRollData();
+        const rollData = options?.rollData ?? this.getRollData({copySystem: true});
         const skills = rollData?.skills ?? this.getSkills();
 
         if (options?.byLabel)
@@ -814,7 +844,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Return the skill field matching the given skill item id
-     * 
+     *
      * @param id The skill item id to be looked for in the dervied system skill data.
      */
     getSkillById(id: string, skills: SR5Actor['system']['skills'] = this.getSkills()): SkillFieldType | undefined {
@@ -1120,12 +1150,12 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
             ModifiableValue.addBase(action.limit, 'Teamwork', teamworkData.additionalLimit);
         }
 
-        action.dice_pool_mod.push({
-            name: "Teamwork", effectUuid: null,
-            value: teamworkData.additionalDice,
-            mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-            priority: 0, enabled: true, invalidated: false,
-        });
+        action.dice_pool_mod.push(
+            DataDefaults.createData('change_entry', {
+                name: "Teamwork",
+                value: teamworkData.additionalDice,
+            })
+        );
 
         const showDialog = this.tests.shouldShowDialog(options.event);
         const test = await this.tests.fromAction(action, this, { showDialog });
@@ -1170,7 +1200,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     /**
      * Build an action for the given skill id based on it's configured values.
-     * 
+     *
      * All action values are derived from the SkillField instead of the skill item
      * as field values can be modified by effect changes.
      *
@@ -1195,7 +1225,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const getOpposedAction = (id: string) => {
             const item = this.items.get(id) as SR5Item<'skill'> | undefined;
             if (!item?.isType('skill')) return;
-            return item.system.skill.action.opposed;
+            // Copy to avoid any downstream changes causing skill data changes.
+            return foundry.utils.deepClone(item.system.skill.action.opposed);
         }
 
         const action = DataDefaults.createData('action_roll', {
@@ -1810,6 +1841,18 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return this.wirelessDevices().length > 0;
     }
 
+    /**
+     * Check if this persona has any other wireless devices outside of the main persona device.
+     */
+    hasNonPersonaWirelessDevices() {
+        const wirelessDevices = this.wirelessDevices();
+        if (!this.hasPersona) return false;
+        if (this.hasLivingPersona()) return wirelessDevices.length > 0;
+
+        const personaDevice = this.getMatrixDevice();
+        return wirelessDevices.some(device => device.id !== personaDevice?.id);
+    }
+
     matrixData(this: SR5Actor) {
         return this.system.matrix;
     }
@@ -2093,7 +2136,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     override getRollData(options: RollDataOptions = {}) {
         // Create a system data copy to avoid cross-contamination
-        const rollData = this.system.toObject(false);
+        const rollData = options.copySystem ? this.system.toObject(false) : super.getRollData();
         return ActorRollDataFlow.getRollData(this, rollData, options);
     }
 

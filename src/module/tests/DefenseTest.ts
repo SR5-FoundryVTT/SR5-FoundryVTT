@@ -41,7 +41,7 @@ export class DefenseTest<T extends DefenseTestData = DefenseTestData> extends Op
     }
 
     override get _chatMessageTemplate() {
-        return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.hbs'
+        return 'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs'
     }
 
     override get successLabel(): Translation {
@@ -106,6 +106,18 @@ export class DefenseTest<T extends DefenseTestData = DefenseTestData> extends Op
         Object.values(this.data.activeDefenses).forEach(mode =>
             { mode.disabled = CombatRules.canUseActiveDefense(iniScore, mode.initMod) }
         )
+    }
+
+    get activeDefenseOptions(): { value: string, label: string, disabled: boolean }[] {
+        return Object.entries(this.data.activeDefenses).map(([value, mode]) => {
+            const label = `(+${mode.value ?? 0}) ${game.i18n.localize(mode.label)}${mode.weapon ? ` - ${mode.weapon}` : ''}`;
+
+            return {
+                value,
+                label,
+                disabled: !!mode.disabled
+            };
+        });
     }
 
     /**

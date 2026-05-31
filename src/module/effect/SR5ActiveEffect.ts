@@ -1,10 +1,11 @@
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
-import { ModifiableValue } from "../mods/ModifiableValue";
 import { Migrator } from "../migrator/Migrator";
 import { LinksHelpers } from '@/module/utils/links';
+import { DataDefaults } from "../data/DataDefaults";
 import { ModifiableValueType } from "../types/template/Base";
+import { ModifiableValue } from "../mods/ModifiableValue";
 import DataModel = foundry.abstract.DataModel;
 
 /**
@@ -23,6 +24,15 @@ import DataModel = foundry.abstract.DataModel;
  * application.
  */
 export class SR5ActiveEffect extends ActiveEffect {
+    private static readonly legacyModeByChangeType: Record<string, number> = {
+        custom: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+        multiply: CONST.ACTIVE_EFFECT_MODES.MULTIPLY,
+        add: CONST.ACTIVE_EFFECT_MODES.ADD,
+        downgrade: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE,
+        upgrade: CONST.ACTIVE_EFFECT_MODES.UPGRADE,
+        override: CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
+    };
+
     /**
      * Can be used to determine if the origin of the effect is a document owned by another document.
      *
@@ -149,6 +159,20 @@ export class SR5ActiveEffect extends ActiveEffect {
         return ['base', 'changes', 'value'] satisfies (keyof ModifiableValueType)[];
     }
 
+    /**
+     * Convert a v14 string-based change type into the legacy numeric mode value.
+     */
+    static getLegacyChangeMode(change: { mode?: number; type?: string | null }): number {
+        if (typeof change.mode === 'number') return change.mode;
+
+        const changeType = typeof change.type === 'string' ? change.type : '';
+        const mappedMode = this.legacyModeByChangeType[changeType];
+        if (mappedMode !== undefined) return mappedMode;
+
+        console.error(`Shadowrun5e | Unrecognized change type "${change.type}", defaulting to "add" mode.`);
+        return CONST.ACTIVE_EFFECT_MODES.ADD;
+    }
+
     override get isSuppressed(): boolean {
         if (!(this.parent instanceof SR5Item)) return false;
 
@@ -182,6 +206,18 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
+     * < v14 used #apply instead of applyChange.
+     */
+    override apply(model: DataModel.Any, change: ActiveEffect.ChangeData) {
+        // @ts-expect-error TODO: v14 remove once v14 implementation is stable
+        return super.apply(model, change);
+        // return Object.fromEntries(
+        //     // @ts-expect-error TODO: tamif - v14 - what is this for?
+        //     Object.entries(super.apply(model, change)).filter(([, v]) => v != null)
+        // );
+    }
+
+    /**
      * Inject features into default FoundryVTT ActiveEffect implementation.
      *
      * - dynamic source properties as change values
@@ -195,41 +231,40 @@ export class SR5ActiveEffect extends ActiveEffect {
      * The objects are handled by SR5ActiveEffect legacy _applyToObject and _apply methods.
      * 
      * This can cause diffeing beahvior between these two for effect application.
+     *
+     * @param targetDoc The targeted document or object...
+     * @param change The effect change being applied
+     * @param options Additional FoundryVTT options.
      */
-    override apply(model: DataModel.Any, change: ActiveEffect.ChangeData) {
-        // legacyTransferal has item effects created with their items as owner/source.
-        // modern transferal has item effects directly on owned items.
-        const source = CONFIG.ActiveEffect.legacyTransferral ? this.source : this.parent;
-
-        SR5ActiveEffect.alterChange(model, change);
-        SR5ActiveEffect.resolveDynamicChangeValue(source, change);
-
-        // Add item error case, as FoundryVTT ActiveEffect.apply() is not meant to be used on items.
-        if (model instanceof SR5Item) throw new Error("SR5ActiveEffect.apply() cannot be used on SR5Item objects.");
-
-        // Other cases should be directly applied to the data, without actor / schema handling.
-        // This is used when applying effects to non-Actor objects, like tests.
-        if (!(model instanceof SR5Actor)) {
-            this._applyToObject(model, change);
-            return {};
-        }
-
+    // @ts-expect-error v14 - missing types
+    override static applyChange(targetDoc: DataModel.Any, change: ActiveEffect.ChangeData, {replacementData = {}, modifyTarget = true} = {}) {
         // Skip applying this change if the target key does not exist on the model.
         // TypedObjectField will otherwise create the missing property as a string,
         // which breaks data integrity and can result in errors like "undefined[object Object]".
         // For example, a change targeting "firstaid" instead of "first_aid" would trigger this case.
-        if (!foundry.utils.hasProperty(model, change.key))
+        if (!foundry.utils.hasProperty(targetDoc, change.key))
             return {};
+        
+        // Resolve dynamic value references in change.
+        const source = change.effect.parent;
+        SR5ActiveEffect.alterChange(targetDoc, change);
+        SR5ActiveEffect.resolveDynamicChangeValue(source, change);
+        
+        // Other cases should be directly applied to the data, without actor / schema handling.
+        // This is used when applying effects to non-Actor objects, like tests.
+        // TODO: v14 - double check TokenDocument.
+        if (!(targetDoc instanceof SR5Actor) && !(targetDoc instanceof SR5Item) && !(targetDoc instanceof TokenDocument)) {
+            return SR5ActiveEffect._applyToObject(targetDoc, change);
+        }
 
-        return Object.fromEntries(
-            Object.entries(super.apply(model, change)).filter(([, v]) => v != null)
-        );
+        // @ts-expect-error TODO: fvtt - v14 - missing types
+        return super.applyChange(targetDoc, change, {replacementData, modifyTarget});
     }
 
     /**
-     * Handle application for none-Document objects
+     * Handle application for none-Document objects. This is typically used for SuccessTest instances.
      */
-    private _applyToObject(object: any, change: ActiveEffect.ChangeData) {
+    private static _applyToObject(object: any, change: ActiveEffect.ChangeData) {
         const target = foundry.utils.getProperty(object, change.key);
         const targetType = foundry.utils.getType(target);
 
@@ -238,35 +273,40 @@ export class SR5ActiveEffect extends ActiveEffect {
         try {
             if (Array.isArray(target)) {
                 const innerType = target.length ? foundry.utils.getType(target[0]) : "string";
-                delta = this.__castArray(change.value, innerType);
+                delta = SR5ActiveEffect.__castArray(change.value, innerType);
             }
-            else delta = this.__castDelta(change.value, targetType);
+            else delta = SR5ActiveEffect.__castDelta(change.value, targetType);
         } catch (err) {
             console.warn(`Test [${object.constructor.name}] | Unable to parse active effect change for ${change.key}: "${change.value}"`);
-            return;
+            return {};
         }
 
         if (ModifiableValue.isModifiableValue(target)) {
-            target.changes.push({
-                enabled: change.effect.active,
-                invalidated: false,
-                name: change.effect.name,
-                value: delta,
-                mode: change.mode,
-                priority: change.priority ?? 10 * change.mode,
-                effectUuid: change.effect.uuid,
-            });
+            const mode = SR5ActiveEffect.getLegacyChangeMode(change);
+            target.changes.push(
+                DataDefaults.createData('change_entry', {
+                    enabled: change.effect.active,
+                    name: change.effect.name,
+                    value: delta,
+                    mode: mode,
+                    priority: change.priority ?? 10 * mode,
+                    source: change.effect.uuid,
+                })
+            );
             return undefined;
         }
 
         // In case of non-existent change.key targets, catch errors and log it, but still allow the overall process to continue.
         // An example could be applying test effect changes, and a single misconfigured effect change shouldn't stop the test dialog 
         // from showing up.
+        // TODO: v14 - check if the commented out code is still needed
         try {
-            return super.apply(object, change);
+            const changes = {};
+            // @ts-expect-error TODO: fvtt - v14 - missing types
+            return SR5ActiveEffect._applyChangeUnguided(object, change, changes);
         } catch (err) {
             console.error(`Test [${object.constructor.name}] | Failed to apply active effect change for ${change.key}: "${change.value}"`, err);
-            return undefined;
+            return {};
         }
     }
 
@@ -299,14 +339,17 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     static override migrateData(data: Parameters<typeof ActiveEffect['migrateData']>[0]) {
+        // Execute Foundry migration first, as their v14 effect.changes => effect.system.changes influences system migrations.
+        data = super.migrateData(data);
+
         Migrator.migrate("ActiveEffect", data);
 
-        return super.migrateData(data);
+        return data;
     }
 
     override async update(
         data: ActiveEffect.UpdateInput,
-        operation?: ActiveEffect.Database.UpdateOperation,
+        operation?: ActiveEffect.Database.UpdateOneDocumentOperation,
     ) {
         if (this.parent instanceof SR5Item && this.parent._isNestedItem) {
             if (!data || !this.id) return this;
@@ -328,7 +371,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param {string} type     The target data type of inner array elements
      * @returns {Array<*>}      The parsed delta cast as a typed array
      */
-    private __castArray(raw: string, type: foundry.utils.DataType) {
+    private static __castArray(raw: string, type: foundry.utils.DataType) {
         let delta: any[];
         try {
             delta = this.__parseOrString(raw);
@@ -346,11 +389,11 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param {string} type     The target data type that the raw value should be cast to match
      * @returns {*}             The parsed delta cast to the target data type
      */
-    private __castDelta(raw: string, type: foundry.utils.DataType) {
+    private static __castDelta(raw: string, type: foundry.utils.DataType) {
         let delta;
         switch (type) {
             case "boolean":
-                delta = Boolean(this.__parseOrString(raw));
+                delta = Boolean(SR5ActiveEffect.__parseOrString(raw));
                 break;
             case "number":
                 delta = Number.fromString(raw);
@@ -360,7 +403,7 @@ export class SR5ActiveEffect extends ActiveEffect {
                 delta = String(raw);
                 break;
             default:
-                delta = this.__parseOrString(raw);
+                delta = SR5ActiveEffect.__parseOrString(raw);
         }
         return delta;
     }
@@ -371,11 +414,22 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param {string} raw      A raw serialized string
      * @returns {*}             The parsed value, or the original value if parsing failed
      */
-    private __parseOrString(raw: string) {
+    private static __parseOrString(raw: string) {
         try {
             return JSON.parse(raw);
         } catch (err) {
             return raw;
+        }
+    }
+
+    override prepareBaseData() {
+        super.prepareBaseData();
+        
+        // Overwrite foundry priority handling, as they provide a defaultPriority in CHANGE_TYPES but use
+        // priority in their ActiveEffect#prepareBaseData implementation.
+        for ( const change of this.system.changes ) {
+        // @ts-expect-error TODO: fvtt - v14 - missing CHANGE_TYPES typing
+          change.priority = change.priority === 0 ? ActiveEffect.CHANGE_TYPES[change.type]?.defaultPriority : change.priority;
         }
     }
 }

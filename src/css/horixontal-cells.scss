@@ -56,6 +56,11 @@
             margin: 0 .25rem;
             font-size: 1.1rem;
             width: 1.1rem;
+
+            a,
+            i {
+                color: var(--sr5v2-text-primary);
+            }
         }
 
         .cell-container {
@@ -67,22 +72,22 @@
                 cursor: pointer;
                 text-align: center;
                 font-size: 80%;
-                border: variables.$groove;
-                color: variables.$light-2;
+                border: 1px solid var(--sr5v2-cell-border);
+                color: var(--sr5v2-cell-text);
                 border-radius: 4px;
-                background: variables.$black;
+                background: var(--sr5v2-cell-bg);
                 width: 24px;
                 height: 18px;
                 margin: 2px;
 
                 &.filled {
-                    background: variables.$light-2;
-                    border-color: variables.$black;
-                    color: variables.$black;
+                    background: var(--sr5v2-cell-filled-bg);
+                    border-color: var(--sr5v2-cell-filled-border);
+                    color: var(--sr5v2-cell-filled-text);
                 }
 
                 &:hover {
-                    border-color: variables.$light;
+                    border-color: var(--sr5v2-cell-hover-border);
                 }
             }
         }

@@ -59,6 +59,13 @@ import { DiceSoNice } from "../rolls/DiceSoNice";
 import { Skill } from "./item/Skill";
 
 declare module "fvtt-types/configuration" {
+    namespace CONFIG {
+        // TODO: fvtt - v14 - missing types for ChatMessage.modes
+        namespace ChatMessage {
+            type modes = CONFIG.Dice.RollModes;
+        }
+    }
+
     interface DocumentClassConfig {
         ActiveEffect: typeof SR5ActiveEffect;
         Actor: typeof SR5Actor<Actor.ConfiguredSubType>;
@@ -281,7 +288,7 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.UseDamageCondition": boolean;
         "shadowrun5e.AutomateMultiDefenseModifier": boolean;
         "shadowrun5e.AutomateProgressiveRecoil": boolean;
-        "shadowrun5e.CollapseModifyRollByDefault": boolean;
+        "shadowrun5e.ModifyRollExpanded": boolean;
         "shadowrun5e.DefaultOpposedTestActorSelection": boolean;
         "shadowrun5e.MarkImports": string;
         "shadowrun5e.ImportIconFolder": string;

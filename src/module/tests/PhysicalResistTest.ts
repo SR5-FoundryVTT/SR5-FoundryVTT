@@ -11,6 +11,7 @@ import { SR5Actor } from "../actor/SR5Actor";
 import { SR5Item } from "../item/SR5Item";
 import { MatrixResistTestData } from "./MatrixResistTest";
 import { MinimalActionType } from "../types/item/Action";
+import { TestCreator } from "./TestCreator";
 
 export interface PhysicalResistTestData extends ResistTestData<PhysicalDefenseTestData> {
     // Determine if an actor should be knockedDown after a defense.
@@ -37,7 +38,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
     }
 
     override get _chatMessageTemplate() {
-        return 'systems/shadowrun5e/dist/templates/rolls/defense-test-message.hbs';
+        return 'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs';
     }
 
     override get _dialogTemplate(): string {
@@ -81,15 +82,19 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         if (!this.data.action.armor || !this.actor) return;
 
         const armor = this.actor.getArmor(this.data.incomingDamage);
-        if (armor.rating.value > 0) {
+        const addHardenedArmor = armor.hardened.base !== 0 || armor.hardened.changes.length !== 0;
+        const addArmor = armor.rating.base !== 0 || armor.rating.changes.length !== 0 || !addHardenedArmor;
+
+        if (addArmor) {
             ModifiableValue.addUniqueBase(this.data.pool, 'SR5.Armor.label', armor.rating.value);
+            TestCreator.addCodeTermTrace(this.data, { ...armor.rating, label: 'SR5.Armor.label' });
         }
 
-        if (armor.hardened.value > 0) {
+        if (addHardenedArmor) {
             ModifiableValue.addUniqueBase(this.data.pool, 'SR5.HardenedArmor', armor.hardened.value);
+            TestCreator.addCodeTermTrace(this.data, { ...armor.hardened, label: 'SR5.HardenedArmor' });
         }
     }
-
     override calculateBaseValues() {
         super.calculateBaseValues();
         ResistTestDataFlow.calculateBaseValues(this.data);

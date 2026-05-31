@@ -4,6 +4,20 @@
 
 
 .sr5v2.actor {
+    .tab .list-item:not(.list-item-header) {
+        color: var(--sr5v2-text-primary);
+
+        label,
+        a,
+        span,
+        .item-name-link,
+        .list-item-icons,
+        .list-item-icons a,
+        .list-item-icons i {
+            color: inherit;
+        }
+    }
+
     .limit {
         @include mixins.systemFonts;
         padding: 0 0.1em;
@@ -102,10 +116,10 @@
             cursor: pointer;
         }
         &:hover {
-            background: radial-gradient(rgba(variables.$darkred, 0.7), rgba(variables.$darkred, 0.1));
-            color: variables.$white !important;
+            background: var(--sr5v2-bg-hover);
+            color: var(--sr5v2-link-hover) !important;
             label {
-                color: variables.$white !important;
+                color: var(--sr5v2-link-hover) !important;
             }
         }
     }
@@ -113,8 +127,8 @@
     #filter-active-skills {
         background: none;
         padding-left: 4px;
-        color: variables.$yellow;
-        border-bottom: variables.$groove;
+        color: var(--sr5v2-label);
+        border-bottom: 1px solid var(--sr5v2-border);
     }
 
     #active-skills-scroll {
@@ -166,7 +180,19 @@
             align-self: center;
         }
 
-        // animate a color change for when blitz is active to make sure people uncheck it if needed
+        .initiative-blitz-toggle {
+            color: variables.$white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85), 0 0 1px rgba(0, 0, 0, 0.85);
+
+            &:hover {
+                color: variables.$white;
+            }
+
+            i {
+                color: inherit;
+            }
+        }
+
         .blitz-active {
             animation: blitzShine 3s linear infinite;
         }
@@ -175,6 +201,12 @@
             0% { color: variables.$white; }
             50% { color: variables.$edge; }
             100% { color: variables.$white; }
+        }
+
+        @keyframes blitzShineLight {
+            0% { color: var(--sr5v2-text-primary); }
+            50% { color: var(--sr5v2-label); }
+            100% { color: var(--sr5v2-text-primary); }
         }
 
         .initiative-col {
@@ -196,6 +228,24 @@
             display: flex;
             flex-flow: row nowrap;
             justify-content: end;
+        }
+    }
+}
+
+body.theme-light .sr5v2.actor:not(.theme-dark),
+.sr5v2.actor.theme-light {
+    .initiative-container {
+        .initiative-blitz-toggle {
+            color: var(--sr5v2-text-primary);
+            text-shadow: none;
+
+            &:hover {
+                color: var(--sr5v2-text-primary);
+            }
+        }
+
+        .initiative-blitz-toggle.blitz-active {
+            animation-name: blitzShineLight;
         }
     }
 }
