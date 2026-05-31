@@ -211,21 +211,23 @@ export const Migrators = (context: QuenchBatchContext) => {
         it('migrates terminal legacy .mod keys to .changes only', () => {
             const migrator = new Version0_33_1();
             const effect = {
-                changes: [
-                    { key: 'system.attributes.body.mod' },
-                    { key: 'system.attributes.body.mods' },
-                    { key: 'system.skills.active.pistols.mods' },
-                    { key: 'system.modifiers.global' },
-                    { key: 'system.foo.mod.bar' },
-                    { key: 'system.foo.mods.bar' },
-                ],
+                system: {
+                    changes: [
+                        { key: 'system.attributes.body.mod' },
+                        { key: 'system.attributes.body.mods' },
+                        { key: 'system.skills.active.pistols.mods' },
+                        { key: 'system.modifiers.global' },
+                        { key: 'system.foo.mod.bar' },
+                        { key: 'system.foo.mods.bar' },
+                    ],
+                }
             };
 
             assert.isTrue(migrator.handlesActiveEffect(effect));
 
             migrator.migrateActiveEffect(effect);
 
-            assert.deepEqual(effect.changes.map(change => change.key), [
+            assert.deepEqual(effect.system.changes.map(change => change.key), [
                 'system.attributes.body.changes',
                 'system.attributes.body.mods',
                 'system.skills.active.pistols.mods',
@@ -238,10 +240,12 @@ export const Migrators = (context: QuenchBatchContext) => {
         it('ignores keys where .mod is not the terminal segment', () => {
             const migrator = new Version0_33_1();
             const effect = {
-                changes: [
-                    { key: 'system.modifiers.value' },
-                    { key: 'system.foo.mod.bar' },
-                ],
+                system: {
+                    changes: [
+                        { key: 'system.modifiers.value' },
+                        { key: 'system.foo.mod.bar' },
+                    ],
+                }
             };
 
             assert.isFalse(migrator.handlesActiveEffect(effect));
@@ -250,24 +254,26 @@ export const Migrators = (context: QuenchBatchContext) => {
         it('does not migrate non-ModifiableValue terminal .mod keys', () => {
             const migrator = new Version0_33_1();
             const effect = {
-                changes: [
-                    { key: 'data.action.mod' },
-                    { key: 'data.action.opposed.mod' },
-                    { key: 'data.action.opposed.resist.mod' },
-                    { key: 'data.action.followed.mod' },
-                    { key: 'system.action.mod' },
-                    { key: 'system.action.opposed.mod' },
-                    { key: 'system.action.opposed.resist.mod' },
-                    { key: 'system.action.followed.mod' },
-                    { key: 'system.armor.mod' },
-                ],
+                system: {
+                    changes: [
+                        { key: 'data.action.mod' },
+                        { key: 'data.action.opposed.mod' },
+                        { key: 'data.action.opposed.resist.mod' },
+                        { key: 'data.action.followed.mod' },
+                        { key: 'system.action.mod' },
+                        { key: 'system.action.opposed.mod' },
+                        { key: 'system.action.opposed.resist.mod' },
+                        { key: 'system.action.followed.mod' },
+                        { key: 'system.armor.mod' },
+                    ],
+                },
             };
 
             assert.isFalse(migrator.handlesActiveEffect(effect));
 
             migrator.migrateActiveEffect(effect);
 
-            assert.deepEqual(effect.changes.map(change => change.key), [
+            assert.deepEqual(effect.system.changes.map(change => change.key), [
                 'data.action.mod',
                 'data.action.opposed.mod',
                 'data.action.opposed.resist.mod',
@@ -283,19 +289,21 @@ export const Migrators = (context: QuenchBatchContext) => {
         it('migrates legacy test data.modifiers keys to data.pool', () => {
             const migrator = new Version0_33_1();
             const effect = {
-                system: { applyTo: 'test_all' },
-                changes: [
-                    { key: 'data.modifiers' },
-                    { key: 'data.modifiers.mod' },
-                    { key: 'data.threshold' },
-                ],
+                system: {
+                    applyTo: 'test_all',
+                    changes: [
+                        { key: 'data.modifiers' },
+                        { key: 'data.modifiers.mod' },
+                        { key: 'data.threshold' },
+                    ],
+                },
             };
 
             assert.isTrue(migrator.handlesActiveEffect(effect));
 
             migrator.migrateActiveEffect(effect);
 
-            assert.deepEqual(effect.changes.map(change => change.key), [
+            assert.deepEqual(effect.system.changes.map(change => change.key), [
                 'data.pool',
                 'data.pool',
                 'data.threshold',
@@ -305,18 +313,20 @@ export const Migrators = (context: QuenchBatchContext) => {
         it('does not migrate data.modifiers for non-test effects', () => {
             const migrator = new Version0_33_1();
             const effect = {
-                system: { applyTo: 'actor' },
-                changes: [
-                    { key: 'data.modifiers' },
-                    { key: 'data.modifiers.mod' },
-                ],
+                system: {
+                    applyTo: 'actor',
+                    changes: [
+                        { key: 'data.modifiers' },
+                        { key: 'data.modifiers.mod' },
+                    ],
+                },
             };
 
             assert.isFalse(migrator.handlesActiveEffect(effect));
 
             migrator.migrateActiveEffect(effect);
 
-            assert.deepEqual(effect.changes.map(change => change.key), [
+            assert.deepEqual(effect.system.changes.map(change => change.key), [
                 'data.modifiers',
                 'data.modifiers.mod',
             ]);
