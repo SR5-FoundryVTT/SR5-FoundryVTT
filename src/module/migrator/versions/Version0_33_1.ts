@@ -1,15 +1,17 @@
 import { VersionMigration } from "../VersionMigration";
 
+const { getProperty } = foundry.utils;
+
 type MigratingActiveEffectChange = {
     key: string;
 };
 
 type MigratingActiveEffectSystem = {
     applyTo?: string;
+    changes?: MigratingActiveEffectChange[];
 };
 
 type MigratingActiveEffect = {
-    changes?: MigratingActiveEffectChange[];
     system?: MigratingActiveEffectSystem;
 };
 
@@ -44,7 +46,8 @@ export class Version0_33_1 extends VersionMigration {
         if (Version0_33_1.EffectUsesLegacyTestModifierKey(effect)) return true;
 
         // A) Some changes referenced a legacy ModifiableValue schema suffix.
-        if (effect.changes?.some(change => Version0_33_1.IsLegacyModifiableValueKey(change.key))) return true;
+        const changes = getProperty(effect, "system.changes");
+        if (Array.isArray(changes) && changes.some(change => Version0_33_1.IsLegacyModifiableValueKey(change.key))) return true;
 
         return false;
     }
@@ -63,7 +66,7 @@ export class Version0_33_1 extends VersionMigration {
     static MigrateEffectKeysFromModToChanges(effect: unknown): void {
         const migratingEffect = effect as MigratingActiveEffect;
 
-        for (const change of migratingEffect.changes ?? []) {
+        for (const change of migratingEffect.system?.changes ?? []) {
             if (Version0_33_1.IsLegacyModifiableValueKey(change.key)) {
                 change.key = change.key.replace(Version0_33_1.LegacyModifiableValueKeyPattern, '.changes');
             }
@@ -79,7 +82,7 @@ export class Version0_33_1 extends VersionMigration {
 
         if (!Version0_33_1.isTestScopedEffect(migratingEffect)) return;
 
-        for (const change of migratingEffect.changes ?? []) {
+        for (const change of migratingEffect.system?.changes ?? []) {
             if (Version0_33_1.LegacyTestModifierKeyPattern.test(change.key)) {
                 change.key = Version0_33_1.ModernTestPoolKey;
             }
@@ -89,7 +92,7 @@ export class Version0_33_1 extends VersionMigration {
     private static EffectUsesLegacyTestModifierKey(effect: MigratingActiveEffect): boolean {
         if (!Version0_33_1.isTestScopedEffect(effect)) return false;
 
-        return effect.changes?.some(change => Version0_33_1.LegacyTestModifierKeyPattern.test(change.key)) ?? false;
+        return effect.system?.changes?.some(change => Version0_33_1.LegacyTestModifierKeyPattern.test(change.key)) ?? false;
     }
 
     private static IsLegacyModifiableValueKey(key: string): boolean {

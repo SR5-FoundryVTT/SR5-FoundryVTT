@@ -108,6 +108,18 @@ export class DefenseTest<T extends DefenseTestData = DefenseTestData> extends Op
         )
     }
 
+    get activeDefenseOptions(): { value: string, label: string, disabled: boolean }[] {
+        return Object.entries(this.data.activeDefenses).map(([value, mode]) => {
+            const label = `(+${mode.value ?? 0}) ${game.i18n.localize(mode.label)}${mode.weapon ? ` - ${mode.weapon}` : ''}`;
+
+            return {
+                value,
+                label,
+                disabled: !!mode.disabled
+            };
+        });
+    }
+
     /**
      * Should an active defense be selected apply the initiative modifier to the defenders combat initiative.
      */

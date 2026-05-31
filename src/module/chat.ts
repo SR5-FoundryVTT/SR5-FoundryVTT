@@ -1,4 +1,4 @@
-import {CORE_FLAGS, CORE_NAME} from './constants';
+import { CORE_NAME } from './constants';
 
 /**
  * The legacy chat message approach of the system uses a generic chat message to display roll and item information.
@@ -31,10 +31,12 @@ const createChatData = async (template: string, templateData) => {
         },
         item: templateData.item,
         content: html,
-        rollMode: game.settings.get(CORE_NAME, 'rollMode')
+        // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
+        rollMode: game.settings.get(CORE_NAME, 'messageMode'),
     };
 
-    ChatMessage.applyRollMode(chatData, chatData.rollMode);
+    // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
+    ChatMessage.applyMode(chatData, chatData.rollMode);
 
     return chatData;
 };

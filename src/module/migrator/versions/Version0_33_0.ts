@@ -2,7 +2,7 @@ import { SR5 } from '@/module/config';
 import { SYSTEM_NAME } from '@/module/constants';
 import { VersionMigration } from "../VersionMigration";
 import { DataDefaults } from '@/module/data/DataDefaults';
-
+const { getProperty } = foundry.utils;
 
 type LegacySkillCategory = 'active' | 'language' | 'knowledge';
 type LegacyKnowledgeType = 'academic' | 'interests' | 'professional' | 'street';
@@ -61,13 +61,21 @@ export class Version0_33_0 extends VersionMigration {
     readonly TargetVersion = "0.33.0";
 
     override handlesActiveEffect(_effect: Readonly<any>) {
-        return _effect.changes.filter(change => change.mode === CONST.ACTIVE_EFFECT_MODES.CUSTOM).length > 0;
+        // effect change modes are either legacy mode or v14+ style type already migrated by Foundry
+        const changes = getProperty(_effect, "system.changes");
+        if (!Array.isArray(changes) || changes.length === 0) return false;
+        return changes.filter(change => change.mode === CONST.ACTIVE_EFFECT_MODES.CUSTOM).length > 0 || 
+               changes.filter(change => change.type === 'custom').length > 0;
     }
 
     override migrateActiveEffect(effect: any) {
-        for (const change of effect.changes)
+        for (const change of effect.system.changes) {
             if (change.mode === CONST.ACTIVE_EFFECT_MODES.CUSTOM)
                 change.mode = CONST.ACTIVE_EFFECT_MODES.ADD;
+
+            if (change.type === 'custom')
+                change.type = 'add';
+        }
     }
 
     override handlesItem(item: Readonly<any>): boolean {
