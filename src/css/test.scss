@@ -210,6 +210,12 @@
     }
   }
 
+  .dialog-content-common > div > .form-group.fire-mode-select-row:not(.modifiable-value):not(.toggle-checkbox-row) > select,
+  .dialog-content-common > div > .form-group.range-select-row:not(.modifiable-value):not(.toggle-checkbox-row) > select {
+    flex: 0 1 65%;
+    min-width: 8.75rem;
+  }
+
   .modifiable-value {
     border-radius: 0;
 

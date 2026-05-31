@@ -6,7 +6,7 @@
         </select>
     </div>
 {{/if}}
-<div class="form-group">
+<div class="form-group range-select-row">
     <label>{{localize 'SR5.Range'}}</label>
     <select name="test.data.range" {{#if test.hasTargets}}disabled{{/if}}>
         {{selectOptions test.rangeOptions selected=test.data.range}}
