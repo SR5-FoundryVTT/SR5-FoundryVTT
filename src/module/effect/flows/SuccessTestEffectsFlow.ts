@@ -135,7 +135,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         // Inject a flag to mark the effect as applied by a test.
         // This is necessary so we can differentiate between effects created and applied.
         for (const effectData of effectsData) {
-            effectData['flags.shadowrun5e.appliedByTest'] = true;
+            effectData['system.appliedByTest'] = true;
         }
 
         if (!game.user?.isGM) {
