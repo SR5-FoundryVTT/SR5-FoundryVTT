@@ -1656,9 +1656,9 @@
                 "Full": {
                     "BurstFire": "Rajada",
                     "BurstFireLong": "Rajada Longa",
-                    "FullAuto": "Automático Completo",
-                    "FullAutoLong": "Automático Completo (Complexa)",
-                    "FullAutoShort": "Automático Completo (Simples)",
+                    "FullAuto": "Automático",
+                    "FullAutoLong": "Automático (Complexa)",
+                    "FullAutoShort": "Automático (Simples)",
                     "SemiAuto": "Semiautomático",
                     "SemiAutoBurst": "Rajada Semiautomática",
                     "SemiAutoShort": "Semiautomático",

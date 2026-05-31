@@ -74,7 +74,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
     }
 
     _selectFireMode(index: number) {
-        this.data.fireMode = this.data.fireModes[index];
+        this.data.fireMode = foundry.utils.deepClone(this.data.fireModes[index]);
     }
 
     get fireModeOptions(): { value: number, label: string }[] {
@@ -85,7 +85,6 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
     }
 
     get fireModeSummary(): { ammo: string, recoil: string, rc: number, defense: number, rounds: number, action: string } {
-        const ammoLeft = this.item?.ammoLeft() ?? 0;
         const ammo = this.item.system.ammo?.current;
         const fireMode = this.data.fireMode;
 
@@ -93,7 +92,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
             ammo: `${ammo?.value ?? 0}/${ammo?.max ?? 0}`,
             recoil: `${this.recoilBeforeAttack} → ${this.recoilAfterAttack}`,
             rc: this.item.totalRecoilCompensation,
-            defense: FireModeRules.fireModeDefenseModifier(fireMode, ammoLeft),
+            defense: fireMode.defense,
             rounds: fireMode.value,
             action: game.i18n.localize(SR5.actionTypes[fireMode.action])
         };
@@ -179,6 +178,14 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         
         // Alter fire mode by ammunition constraints.
         this.data.fireMode.defense = FireModeRules.fireModeDefenseModifier(this.data.fireMode, this.item.ammoLeft());
+
+        const ammoLeft = this.item.ammoLeft();
+        const bulletsFired = Math.min(this.data.fireMode.value, ammoLeft);
+
+        // If not enough ammo left, reduce fire mode to what can actually be fired.
+        // This will affect recoil and defense modifiers.
+        if (bulletsFired)
+            this.data.fireMode.value = bulletsFired;
 
         WeaponRangeTestBehavior.prepareBaseValues(this);
 

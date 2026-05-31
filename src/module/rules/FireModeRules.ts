@@ -23,7 +23,7 @@ export const FireModeRules = {
         // Zero modifier can't be further reduced by missing ammunition.
         if (modifier === 0) return 0;
 
-        // Reduce modifier by avaiable ammunition.
+        // Reduce modifier by available ammunition.
         if (ammoLeft <= 0) ammoLeft = rounds;
         if (ammoLeft >= rounds) return modifier;
 
