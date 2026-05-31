@@ -66,7 +66,7 @@ export class Version0_34_0 extends VersionMigration {
         }
     }
 
-    override migrateActiveEffect(effect: { changes: { key: string }[] }): void {
+    override migrateActiveEffect(effect: { system: { changes: { key: string }[] }}): void {
         const keyMap: Record<string, string> = {
             'system.armor': 'system.armor.rating',
             'system.armor.base': 'system.armor.rating',

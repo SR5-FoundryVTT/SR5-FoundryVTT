@@ -1539,7 +1539,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      */
     override getRollData(options: RollDataOptions = {}) {
         // Create a system data copy to avoid cross-contamination
-        const rollData = this.system.toObject(false);
+        const rollData = options.copySystem ? this.system.toObject(false) : super.getRollData();
         return ItemRollDataFlow.getRollData(this, rollData, options);
     }
 

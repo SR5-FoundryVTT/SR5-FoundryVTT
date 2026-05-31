@@ -48,7 +48,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             assert.equal(device.system.attributes.firewall.value, 3);
 
             const action = DataDefaults.createData('action_roll', { categories: ['matrix'] });
-            const rollData = device.getRollData({action});
+            const rollData = device.getRollData({ action, copySystem: true });
 
             assert.equal(rollData.technology.rating, 3);
             assert.equal(rollData.attributes.willpower.value, 3);
@@ -66,7 +66,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             assert.equal(device.system.attributes.willpower.value, 3);
 
             const action = DataDefaults.createData('action_roll', { categories: ['matrix'] });
-            const rollData = device.getRollData({action});
+            const rollData = device.getRollData({ action, copySystem: true });
 
             assert.equal(rollData.technology.rating, 3);
             assert.equal(rollData.attributes.willpower.value, 5);
@@ -81,7 +81,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             await master.addSlave(slave);
 
             const action = DataDefaults.createData('action_roll', { categories: ['matrix'] });
-            const rollData = slave.getRollData({action});
+            const rollData = slave.getRollData({ action, copySystem: true });
 
             assert.equal(rollData.attributes.rating.value, 5);
             assert.equal(rollData.attributes.firewall.value, 5);
@@ -101,7 +101,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             // Assert initial wireless connection.
             test.data.directConnection = false;
 
-            let rollData = slave.getRollData({ testData: test.data });
+            let rollData = slave.getRollData({ testData: test.data, copySystem: true });
 
             // Master rating is used for firewall.
             assert.equal(rollData.attributes.firewall.value, 5);
@@ -109,7 +109,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             // Assert direct connection.
             test.data.directConnection = true;
 
-            rollData = slave.getRollData({ testData: test.data });
+            rollData = slave.getRollData({ testData: test.data, copySystem: true });
 
             // Slave rating is used for firewall.
             assert.equal(rollData.attributes.firewall.value, 3);
@@ -122,7 +122,7 @@ export const shadowrunTestValueResolution = (context: QuenchBatchContext) => {
             const action = DataDefaults.createData('action_roll', { categories: ['matrix'] });
             const testData = { directConnection: true, action };
             
-            const rollData = device.getRollData({ testData });
+            const rollData = device.getRollData({ testData, copySystem: true });
 
             assert.equal(rollData.attributes.firewall.value, 3);
         });

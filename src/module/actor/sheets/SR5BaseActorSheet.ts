@@ -2114,16 +2114,16 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                     }
                     const effectData = {
                         name: `${game.i18n.localize(attribute.label)} ${game.i18n.localize('SR5.Effect')}`,
-                        changes: [
-                            {
-                                key: path,
-                                mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-                                priority: 0,
-                                value: '',
-                            }
-                        ],
                         system: {
                             applyTo: 'actor' as const,
+                            changes: [
+                                {
+                                    key: path,
+                                    type: 'custom',
+                                    priority: 0,
+                                    value: '',
+                                }
+                            ],
                         }
                     };
                     await this.actor.createEmbeddedDocuments("ActiveEffect", [effectData], { renderSheet: true });
