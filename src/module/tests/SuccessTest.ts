@@ -358,8 +358,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return {};
     }
 
-    static _prepareActionTestData(action: ActionRollType, document: SR5Actor | SR5Item, data: DeepPartial<SuccessTestData>, againstData?: SuccessTestData) {
-        return TestCreator._prepareTestDataWithAction(action, document, data as SuccessTestData, againstData);
+    static _prepareActionTestData(action: ActionRollType, document: SR5Actor | SR5Item, data: SuccessTestData, againstData?: SuccessTestData) {
+        return TestCreator._prepareTestDataWithAction(action, document, data, againstData);
     }
 
     /**
@@ -1650,7 +1650,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     async executeAsExtended() {
         if (!this.canBeExtended) return;
 
-        const data = foundry.utils.duplicate(this.data);
+        const data = foundry.utils.deepClone(this.data);
 
         // No extension possible, if test type / class is unknown.
         if (!data.type) return;
@@ -1667,7 +1667,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         ModifiableValue.calcTotal(data.pool, { min: 0 });
 
         if (!TestRules.canExtendTest(data.pool.value, this.threshold.value, this.extendedHits.value)) {
-            return ui.notifications?.warn('SR5.Warnings.CantExtendTestFurther', { localize: true });
+            ui.notifications?.warn('SR5.Warnings.CantExtendTestFurther', { localize: true });
+            return this;
         }
 
         // Fetch original tests documents.
@@ -1683,7 +1684,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!testCls) return;
         // The new test will be incomplete.
         data.evaluated = false;
-        const test = new testCls(data, { actor: this.actor, item: this.item }, this.data.options);
+        const test = new testCls(data as DeepPartial<T>, { actor: this.actor, item: this.item }, this.data.options);
 
         // Remove previous edge usage.
         test.data.pushTheLimit = false;
@@ -1828,7 +1829,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * This class should be used for the opposing test implementation.
      */
-    get _opposedTestClass(): any | undefined {
+    get _opposedTestClass() {
         if (!this.data?.opposed?.test) return;
         return TestCreator._getTestClass(this.data.opposed.test);
     }
@@ -2302,49 +2303,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             // Await test chain resolution for each actor, to avoid dialog spam.
             await test.execute();
         }
-    }
-
-    /**
-     * Update a test instance in place while switching out it's documents.
-     * 
-     * This is done by removing action specific information from test data, while keeping data related
-     * to this individual test, including data that might have been altered by the user using the test dialog.
-     * 
-     * Use this method whenever you have an active test instance and want to re-use it with different documents.
-     * 
-     * TODO: I'm unsure if this method was designed to be shown during dialog or allow for both before and during dialog to be used.
-     * 
-     * @param document The new main source document use.
-     */
-    async _updateTestData(document: SR5Actor|SR5Item) {
-        const action = this.item?.getAction();
-        if (!action) return;
-        
-        // Remove values from the previous source document.
-        const minimalData = TestCreator._minimalTestData();
-        for (const [key, value] of Object.entries(minimalData)) {
-            this.data[key] = value;
-        }
-
-        // Switch out source document.
-        this.data.sourceActorUuid = document instanceof SR5Actor ? document.uuid ?? undefined : undefined;
-        this.data.sourceItemUuid = document instanceof SR5Item ? document.uuid ?? undefined : undefined;
-
-        this.data = TestCreator._prepareTestDataWithAction(action, document, this.data, this) as T;
-        
-        // If no dialog has been shown yet, execution hasn't been triggered.
-        // Wait for the next execution.
-        if (!this.dialog) return;
-
-        // Re-prepare data to add missing base information.
-        const options = this.data.options;
-        this._prepareData(this.data as DeepPartial<T>, options);
-
-        // Re-prepare execution data to add missing modifiers / effects and so forth.
-        await this._prepareExecution();
-
-        // During .execute this would now show the dialog, therefore rerender and we're at the same state.
-        this.dialog.render(true);
     }
 
     /**
