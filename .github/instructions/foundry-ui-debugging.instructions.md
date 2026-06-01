@@ -20,7 +20,7 @@ await page.waitForLoadState('networkidle');
 
 1. **Reproduce** — navigate to the relevant sheet or panel in the browser session and take a screenshot to document the broken state
 2. **Fix** — edit the Handlebars template (`src/templates/`) or SCSS (`src/css/`) in the source
-3. **Rebuild** — the `gulp: watch` task rebuilds automatically on file save; wait for it to finish
+3. **Rebuild** — the `gulp: watch` is always running in the background. Do not execute it or wait for it to finish. Simply use the reload workflow after making any change to system files.
 4. **Reload** — navigate the browser to `/join` and log back in to reload the bundle
 5. **Verify** — open the affected sheet/panel and take a screenshot to confirm the fix
 

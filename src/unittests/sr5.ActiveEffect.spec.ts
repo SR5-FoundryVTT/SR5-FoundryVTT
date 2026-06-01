@@ -29,8 +29,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         return DataDefaults.createData('change_entry', {
             name: effect.name,
             value: parseInt(change.value),
-            // @ts-expect-error TODO: fvtt - v14 - missing type properties on ActiveEffectChangeData
-            type: change.type,
+            mode: change.mode,
             priority: parseInt(String(change.priority)),
             source: effect.uuid
         });
@@ -474,7 +473,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             if (!appliedEffect) throw new Error('Expected copied targeted actor effect to exist on target actor.');
 
             assert.strictEqual(appliedEffect.system.appliedByTest, true);
-            assert.strictEqual(appliedEffect.system.changes[0].value, `${test.pool.value}`);
+            assert.strictEqual(appliedEffect.system.changes[0].value, test.pool.value);
             assert.strictEqual(target.system.attributes.body.value, test.pool.value);
         });
 
@@ -656,11 +655,11 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Unrestricted Effect',
                 system: { applyTo: 'test_all' },
-                changes: [{ key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+                changes: [{ key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
             }, {
                 name: 'Opposed Effect',
                 system: { applyTo: 'test_all', selection_tests: [{ value: 'Opposed Test', id: 'OpposedTest' }] },
-                changes: [{ key: 'data.pool', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+                changes: [{ key: 'data.pool', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
             }]);
 
             const activeTest = (await TestCreator.fromItem(items[0] as SR5Item, actor, { showDialog: false, showMessage: false }))!;
@@ -673,9 +672,9 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             const opposedEffect = opposedTest.pool.changes.find(effect => effect.name === 'Opposed Effect') as any;
             assert.isDefined(opposedEffect, 'Expected to find the opposed effect in the opposed test pool changes.');
             assert.equal(opposedEffect.name, 'Opposed Effect');
-            assert.equal(opposedEffect.mode, CONST.ACTIVE_EFFECT_MODES.CUSTOM);
+            assert.equal(opposedEffect.mode, CONST.ACTIVE_EFFECT_MODES.ADD);
             assert.equal(opposedEffect.value, 2);
-            assert.equal(opposedEffect.priority, 0);
+            assert.equal(opposedEffect.priority, 20);
             assert.equal(opposedEffect.enabled, true);
             assert.equal(opposedEffect.invalidated, false);
         });
@@ -692,7 +691,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                     selection_attributes: [{ value: 'Body', id: 'body' }],
                     selection_limits: [{ value: 'Physical', id: 'physical' }]
                 },
-                changes: [{ key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+                changes: [{ key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
             }]);
 
             const assertPoolValue = async (actionData: ActionRollType, expected: number) => {
@@ -717,21 +716,21 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 skill: 'clubs',
                 attribute: 'body',
                 limit: { attribute: 'physical' }
-            }), 0);
+            }), -1);
 
             await assertPoolValue(DataDefaults.createData('action_roll', {
                 test: SkillTest.name,
                 skill: 'automatics',
                 attribute: 'logic',
                 limit: { attribute: 'physical' }
-            }), 0);
+            }), -1);
 
             await assertPoolValue(DataDefaults.createData('action_roll', {
                 test: SkillTest.name,
                 skill: 'automatics',
                 attribute: 'body',
                 limit: { attribute: 'mental' }
-            }), 0);
+            }), -1);
         });
     });
 
