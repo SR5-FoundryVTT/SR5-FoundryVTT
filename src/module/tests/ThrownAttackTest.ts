@@ -1,6 +1,5 @@
 import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
 import { DeepPartial } from "fvtt-types/utils";
-import { RangedAttackTestData } from './RangedAttackTest';
 import { SR5Item } from '../item/SR5Item';
 import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
 

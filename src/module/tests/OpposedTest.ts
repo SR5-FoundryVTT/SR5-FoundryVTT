@@ -4,7 +4,6 @@ import { DataDefaults } from "../data/DataDefaults";
 import { TestCreator } from "./TestCreator";
 import { SR5Item } from "../item/SR5Item";
 import { ModifiableValue } from "../mods/ModifiableValue";
-import { Helpers } from "../helpers";
 import { ValueFieldType } from "../types/template/Base";
 import { SR5Actor } from "../actor/SR5Actor";
 
