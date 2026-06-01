@@ -8,7 +8,7 @@ import { MatrixTest } from './MatrixTest';
  * See MarkPlacementFlow for more details on the test flow.
  */
 export class BruteForceTest extends MatrixTest<MatrixPlacementData> {
-    override _prepareData(data: MatrixPlacementData, options: TestOptions = {}): any {
+    override _prepareData(data: MatrixPlacementData, options: Partial<TestOptions> = {}): MatrixPlacementData {
         data = super._prepareData(data, options);
         return MarkPlacementFlow._prepareData(data);
     }

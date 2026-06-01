@@ -7,13 +7,16 @@ import { TestCreator } from '../TestCreator';
 import { SR5Item } from '../../item/SR5Item';
 import { ActionRollType, DamageType } from '@/module/types/item/Action';
 
-// Resist Test Data will have incoming and modified damage
-export type ResistTestData<T = any> = SuccessTestData & {
+
+type BaseResistTestData = SuccessTestData & {
     // Damage value of the attack
-    incomingDamage: DamageType
+    incomingDamage: DamageType;
     // Modified damage value of the attack after this defense (success or failure)
-    modifiedDamage: DamageType
-    // any following tests - these generally occur if the resist test is part of a Flow
+    modifiedDamage: DamageType;
+};
+
+// Resist Test Data will have incoming and modified damage
+export type ResistTestData<T extends BaseResistTestData = BaseResistTestData> = BaseResistTestData & {
     following?: T
 }
 
@@ -27,7 +30,6 @@ export const ResistTestDataFlow = {
 
     /**
      * Calculate the new modified damage and ap base values
-     * @param data
      */
     calculateBaseValues(data: ResistTestData) {
         // Calculate damage values in case of user dialog interaction.
@@ -47,17 +49,16 @@ export const ResistTestDataFlow = {
 
     /**
      * Update the Incoming and Modified damage objects based on the data provided
-     * @param data
      */
-    _prepareData(data: ResistTestData): any {
+    _prepareData<D extends ResistTestData>(data: D): D {
         // Is this test part of a followup test chain? defense => resist
         if (data.following) {
-            data.incomingDamage = foundry.utils.duplicate(data.following?.modifiedDamage || DataDefaults.createData('damage'));
-            data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage) as DamageType;
+            data.incomingDamage = foundry.utils.deepClone(data.following?.modifiedDamage) || DataDefaults.createData('damage');
+            data.modifiedDamage = foundry.utils.deepClone(data.incomingDamage);
             // This test is part of either a standalone resist or created with its own data (i.e. edge reroll).
         } else {
             data.incomingDamage = data.incomingDamage ?? DataDefaults.createData('damage');
-            data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage) as DamageType;
+            data.modifiedDamage = foundry.utils.deepClone(data.incomingDamage);
         }
         return data;
     },
@@ -65,9 +66,6 @@ export const ResistTestDataFlow = {
     /**
      * Get the base Resist Test Data based on the DefenseTestData
      * - inheriting classes can add to this data for any extra information it needs to provide for the test
-     * @param opposedData
-     * @param title
-     * @param previousMessageId
      */
     _getResistTestData(opposedData: DefenseTestData | ResistTestData, title: Translation, previousMessageId: string): ResistTestData {
         return {
@@ -97,9 +95,6 @@ export const ResistTestDataFlow = {
 
     /**
      * Create ActionData for a Rest Test, based on the provided DefenseTestData
-     * @param testCls
-     * @param opposedData
-     * @param test
      */
     // TODO use a better type for 'test'
     async _getResistActionData(testCls: any, opposedData: DefenseTestData, test: string): Promise<ActionRollType> {
@@ -127,7 +122,7 @@ export const ResistTestDataFlow = {
         return action;
     },
 
-    async executeMessageAction(testCls: any, againstData: DefenseTestData | ResistTestData, messageId: string, documents: any[], options: TestOptions) {
+    async executeMessageAction(testCls: any, againstData: DefenseTestData | ResistTestData, messageId: string, documents: any[], options: Partial<TestOptions>) {
         // Inform user about tokens with deleted sidebar actors.
         // This can both happen for linked tokens immediately and unlinked tokens after reloading.
         // TODO: Check when this error is relevant.
@@ -160,9 +155,6 @@ export const ResistTestDataFlow = {
     /**
      * Create ActionData for another Resist Test, based on the provided ResistTestData
      * - this happens from biofeedback damage
-     * @param testCls
-     * @param opposedData
-     * @param test
      */
     async _getResistAgainActionData(testCls: any, opposedData: ResistTestData, test: string): Promise<ActionRollType> {
         // The original action doesn't contain a complete set of ActionData.

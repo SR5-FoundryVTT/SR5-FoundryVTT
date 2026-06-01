@@ -1,4 +1,4 @@
-import {SuccessTest, SuccessTestData} from "./SuccessTest";
+import {SuccessTest, SuccessTestData, TestOptions} from "./SuccessTest";
 import {SpellCastingTestData} from "./SpellCastingTest";
 import {DrainRules} from "../rules/DrainRules";
 import ModifierTypes = Shadowrun.ModifierTypes;
@@ -26,7 +26,7 @@ export interface DrainTestData extends SuccessTestData {
  */
 export class DrainTest extends SuccessTest<DrainTestData> {
 
-    override _prepareData(data, options): any {
+    override _prepareData(data: DeepPartial<DrainTestData>, options: Partial<TestOptions>): DrainTestData {
         data = super._prepareData(data, options);
 
         // Is this test part of a followup test chain? spell => drain
@@ -39,7 +39,7 @@ export class DrainTest extends SuccessTest<DrainTestData> {
             data.modifiedDrain = foundry.utils.duplicate(data.incomingDrain);
         }
 
-        return data;
+        return data as DrainTestData;
     }
 
     override get _dialogTemplate(): string {

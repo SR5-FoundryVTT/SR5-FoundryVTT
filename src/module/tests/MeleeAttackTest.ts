@@ -1,4 +1,5 @@
-import { SuccessTest, SuccessTestData } from "./SuccessTest";
+import { SuccessTest, SuccessTestData, TestOptions } from "./SuccessTest";
+import { DeepPartial } from "fvtt-types/utils";
 import { DataDefaults } from "../data/DataDefaults";
 import { SR5Actor } from "../actor/SR5Actor";
 import { ModifiableValue } from "../mods/ModifiableValue";
@@ -11,12 +12,12 @@ export interface MeleeAttackData extends SuccessTestData {
 
 export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
 
-    override _prepareData(data, options): any {
+    override _prepareData(data: DeepPartial<MeleeAttackData>, options: Partial<TestOptions>): MeleeAttackData {
         data = super._prepareData(data, options);
 
-        data.damage = data.damage || DataDefaults.createData('damage');
+        data.damage ||= DataDefaults.createData('damage');
 
-        return data;
+        return data as MeleeAttackData;
     }
 
     /**
@@ -55,9 +56,6 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
      * Remove unneeded environmental modifier categories for melee tests.
      * 
      * See SR5#187 'Environmental Modifiers'
-     * 
-     * @param actor 
-     * @param type 
      */
     override prepareActorModifier(actor: SR5Actor, type: ModifierTypes): { name: string; value: number; } {
         if (type !== 'environmental') return super.prepareActorModifier(actor, type);

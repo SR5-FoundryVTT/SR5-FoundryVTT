@@ -1,4 +1,5 @@
-import { SuccessTest, SuccessTestData } from './SuccessTest';
+import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
+import { DeepPartial } from "fvtt-types/utils";
 import { RangedAttackTestData } from './RangedAttackTest';
 import { SR5Item } from '../item/SR5Item';
 import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
@@ -12,12 +13,12 @@ export interface ThrownAttackTestData extends SuccessTestData, WeaponRangeTestDa
 export class ThrownAttackTest extends SuccessTest<ThrownAttackTestData> {
     declare item: SR5Item;
 
-    override _prepareData(data, options): RangedAttackTestData {
+    override _prepareData(data: DeepPartial<ThrownAttackTestData>, options: Partial<TestOptions>): ThrownAttackTestData {
         data = super._prepareData(data, options);
 
         WeaponRangeTestBehavior.prepareData(this, data);
 
-        return data;
+        return data as ThrownAttackTestData;
     }
 
     override get canBeExtended() {
@@ -47,7 +48,6 @@ export class ThrownAttackTest extends SuccessTest<ThrownAttackTestData> {
 
     /**
      * Save selections made back to documents.
-     * @returns
      */
     override async saveUserSelectionAfterDialog() {
         await WeaponRangeTestBehavior.saveUserSelectionAfterDialog(this);
@@ -55,7 +55,6 @@ export class ThrownAttackTest extends SuccessTest<ThrownAttackTestData> {
 
     /**
      * Apply test selections made by user in dialog.
-     * @returns
      */
     override prepareBaseValues() {
         WeaponRangeTestBehavior.prepareBaseValues(this);

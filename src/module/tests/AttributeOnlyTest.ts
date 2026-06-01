@@ -1,11 +1,12 @@
-import {SuccessTest, SuccessTestData} from "./SuccessTest";
+import {SuccessTest, SuccessTestData, TestOptions} from "./SuccessTest";
 import {ModifiableValue} from "../mods/ModifiableValue";
 import { TestCreator } from "./TestCreator";
+import { DeepPartial } from "fvtt-types/utils";
 
 export interface AttributeOnlyTestData extends SuccessTestData {
     // Selection for attributes used. attribute1 will be preselected.
-    attribute1: Shadowrun.ActorAttribute
-    attribute2: Shadowrun.ActorAttribute
+    attribute1: SuccessTestData['action']['attribute'];
+    attribute2: SuccessTestData['action']['attribute2'];
 }
 
 
@@ -15,20 +16,19 @@ export interface AttributeOnlyTestData extends SuccessTestData {
  * Attribute-Only Tests don't alter default SuccessTests rule wise but only Foundry behavior wise.
  * Main difference is the user ability to change attributes before rolling dice.
  */
-export class AttributeOnlyTest extends SuccessTest {
-    declare data: AttributeOnlyTestData;
-
+export class AttributeOnlyTest extends SuccessTest<AttributeOnlyTestData> {
     override get _dialogTemplate() {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/attribute-only-test-dialog.hbs';
     }
-    override _prepareData(data, options): any {
-        data = super._prepareData(data, options);
+
+    override _prepareData(data: DeepPartial<AttributeOnlyTestData>, options: Partial<TestOptions>): AttributeOnlyTestData {
+        const prepared = super._prepareData(data, options);
 
         // Preset attribute selection with action attributes.
-        data.attribute1 = data.action.attribute;
-        data.attribute2 = data.action.attribute2;
+        prepared.attribute1 = prepared.action.attribute;
+        prepared.attribute2 = prepared.action.attribute2;
 
-        return data;
+        return prepared;
     }
 
     override prepareBaseValues() {

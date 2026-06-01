@@ -1,6 +1,6 @@
 import { SR5 } from './../config';
 import { DataDefaults } from "../data/DataDefaults";
-import { SuccessTest, SuccessTestData } from "./SuccessTest";
+import { SuccessTest, SuccessTestData, TestOptions } from "./SuccessTest";
 import { ModifiableValue } from '../mods/ModifiableValue';
 import { SpellcastingRules } from '../rules/SpellcastingRules';
 import { ConjuringRules } from '../rules/ConjuringRules';
@@ -37,15 +37,15 @@ interface SummonSpiritTestData extends SuccessTestData {
  */
 export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
 
-    override _prepareData(data: any, options: any) {
+    override _prepareData(data: DeepPartial<SummonSpiritTestData>, options: Partial<TestOptions>): SummonSpiritTestData {
         data = super._prepareData(data, options);
 
-        this._prepareSummoningData(data);
+        this._prepareSummoningData(data as SummonSpiritTestData);
 
-        data.drain = data.drain || 0;
-        data.drainDamage = data.drainDamage || DataDefaults.createData('damage');
+        data.drain ||= 0;
+        data.drainDamage ||= DataDefaults.createData('damage');
 
-        return data;
+        return data as SummonSpiritTestData;
     }
 
     override get _dialogTemplate() {
@@ -166,9 +166,9 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
         // Lower from more to less explicit values being given.
         // Don't let force go below one.
         data.force = Math.max(data.force || summoning.system.spirit.force || 1, 1);
-        data.spiritTypeSelected = data.spiritTypeSelected || summoning.system.spirit.type;
-        data.preparedSpiritUuid = data.preparedSpiritUuid || summoning.system.spirit.uuid;
-        data.reagent = data.reagent || 0;
+        data.spiritTypeSelected ||= summoning.system.spirit.type;
+        data.preparedSpiritUuid ||= summoning.system.spirit.uuid;
+        data.reagent ||= 0;
     }
 
     /**

@@ -31,15 +31,15 @@ interface CompileSpriteTestData extends SuccessTestData {
  */
 export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
 
-    override _prepareData(data: any, options: TestOptions) {
+    override _prepareData(data: DeepPartial<CompileSpriteTestData>, options: Partial<TestOptions>): CompileSpriteTestData {
         data = super._prepareData(data, options);
 
         this._prepareCompilationData(data);
 
-        data.fade = data.fade || 0;
-        data.fadeDamage = data.fadeDamage || DataDefaults.createData('damage');
+        data.fade ||= 0;
+        data.fadeDamage ||= DataDefaults.createData('damage');
 
-        return data;
+        return data as CompileSpriteTestData;
     }
 
     _prepareCompilationData(data) {
@@ -51,9 +51,9 @@ export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
         data.level = Math.max(data.level || compilation.system.sprite.level || 1, 1);
 
         data.spriteTypes = this._prepareSpriteTypes();
-        data.spriteTypeSelected = data.spriteTypeSelected || compilation.system.sprite.type;
+        data.spriteTypeSelected ||= compilation.system.sprite.type;
 
-        data.preparedSpriteUuid = data.preparedSpriteUuid || compilation.system.sprite.uuid;
+        data.preparedSpriteUuid ||= compilation.system.sprite.uuid;
     }
 
     _prepareSpriteTypes() {

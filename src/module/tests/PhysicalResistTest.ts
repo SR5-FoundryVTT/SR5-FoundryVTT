@@ -31,7 +31,7 @@ export type PhysicalResistSuccessCondition = {
  */
 export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
 
-    override _prepareData(data: PhysicalResistTestData, options): any {
+    override _prepareData(data: PhysicalResistTestData, options: Partial<TestOptions>): PhysicalResistTestData {
         data = super._prepareData(data, options);
         data = ResistTestDataFlow._prepareData(data);
         return data;
@@ -180,7 +180,6 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
 
     /**
      * Prepare any ResistTest from given test data. This should come from a MatrixDefenseTest
-     *
      */
     static override async _getResistActionTestData(opposedData: PhysicalDefenseTestData, document: SR5Actor|SR5Item, previousMessageId: string): Promise<MatrixResistTestData | undefined> {
         if (!opposedData.against?.opposed.resist) {
@@ -202,7 +201,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
      *
      * This can be used to trigger resist tests.
      */
-    static override async executeMessageAction(againstData: PhysicalDefenseTestData, messageId: string, options: TestOptions) {
+    static override async executeMessageAction(againstData: PhysicalDefenseTestData, messageId: string, options: Partial<TestOptions>) {
         // Roll resist tests with the currently selected token actor(s).
         const documents = Helpers.getSelectedActorsOrCharacter();
         await ResistTestDataFlow.executeMessageAction(this, againstData, messageId, documents, options);

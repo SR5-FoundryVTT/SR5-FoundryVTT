@@ -8,6 +8,7 @@ import { SR5Item } from '../item/SR5Item';
 import { SR5Actor } from '../actor/SR5Actor';
 import { MatrixTestDataFlow } from './flows/MatrixTestDataFlow';
 import { TestOptions } from './SuccessTest';
+import { DeepPartial } from "fvtt-types/utils";
 import { MatrixResistTest } from './MatrixResistTest';
 import { TestCreator } from './TestCreator';
 import ModifierTypes = Shadowrun.ModifierTypes;
@@ -35,18 +36,18 @@ export class MatrixDefenseTest<T extends MatrixDefenseTestData = MatrixDefenseTe
     // The target icon, if it's representing a persona.
     declare persona: SR5Actor;
 
-    override _prepareData(data, options?): any {
-        data = super._prepareData(data, options);
-        if (data.against) {
-            data = MatrixTestDataFlow._prepareOpposedData(data);
+    override _prepareData(data: DeepPartial<T>, options?: Partial<TestOptions>): T {
+        let prepared = super._prepareData(data, options);
+        if (prepared.against) {
+            prepared = MatrixTestDataFlow._prepareOpposedData(prepared);
         } else {
-            data = MatrixTestDataFlow._prepareData(data);
+            prepared = MatrixTestDataFlow._prepareData(prepared as T & MatrixTestData);
         }
 
-        data.activeDefense = '';
-        data.activeDefenses = {};
+        prepared.activeDefense = '';
+        prepared.activeDefenses = {};
 
-        return data;
+        return prepared;
     }
 
     override get _chatMessageTemplate(): string {
@@ -144,7 +145,7 @@ export class MatrixDefenseTest<T extends MatrixDefenseTestData = MatrixDefenseTe
         await MatrixTestDataFlow.populateOpposedDocuments(this);
     }
 
-    static override async executeMessageAction(againstData: MatrixTestData, messageId: string, options: TestOptions): Promise<void> {
+    static override async executeMessageAction(againstData: MatrixTestData, messageId: string, options: Partial<TestOptions>): Promise<void> {
         await MatrixTestDataFlow.executeMessageAction(this, againstData, messageId, options);
     }
 }

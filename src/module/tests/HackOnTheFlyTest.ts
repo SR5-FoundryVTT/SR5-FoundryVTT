@@ -1,5 +1,6 @@
 import { SR5Actor } from "../actor/SR5Actor";
 import { MatrixTest } from "./MatrixTest";
+import { TestOptions } from "./SuccessTest";
 import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlow";
 
 /**
@@ -10,7 +11,7 @@ import { MarkPlacementFlow, MatrixPlacementData } from "./flows/MarkPlacementFlo
 export class HackOnTheFlyTest extends MatrixTest<MatrixPlacementData> {
     declare actor: SR5Actor;
 
-    override _prepareData(data: MatrixPlacementData, options): any {
+    override _prepareData(data: MatrixPlacementData, options: Partial<TestOptions>): MatrixPlacementData {
         data = super._prepareData(data, options);
         return MarkPlacementFlow._prepareData(data);
     }

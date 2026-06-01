@@ -1,4 +1,6 @@
 import {OpposedTest, OpposedTestData} from "./OpposedTest";
+import { DeepPartial } from "fvtt-types/utils";
+import { TestOptions } from "./SuccessTest";
 import {DataDefaults} from "../data/DataDefaults";
 import { Translation } from '../utils/strings';
 import { DamageType } from "../types/item/Action";
@@ -29,15 +31,15 @@ export interface DefenseTestData extends OpposedTestData {
  */
 export class DefenseTest<T extends DefenseTestData = DefenseTestData> extends OpposedTest<T> {
 
-    override _prepareData(data, options?) {
-        data = super._prepareData(data, options);
+    override _prepareData(data: DeepPartial<T>, options?: Partial<TestOptions>): T {
+        const prepared = super._prepareData(data, options);
 
-        const damage = data.against ? data.against.damage : DataDefaults.createData('damage');
+        const damage = prepared.against ? prepared.against.damage : DataDefaults.createData('damage');
 
-        data.incomingDamage = foundry.utils.duplicate(damage);
-        data.modifiedDamage = foundry.utils.duplicate(damage);
+        prepared.incomingDamage = foundry.utils.duplicate(damage) as DamageType;
+        prepared.modifiedDamage = foundry.utils.duplicate(damage) as DamageType;
 
-        return data;
+        return prepared;
     }
 
     override get _chatMessageTemplate() {

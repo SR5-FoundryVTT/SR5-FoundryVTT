@@ -32,7 +32,7 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
     // The target icon, if it's representing a persona.
     declare persona: SR5Actor;
 
-    override _prepareData(data: BiofeedbackResistTestData, options: any): any {
+    override _prepareData(data: BiofeedbackResistTestData, options: Partial<TestOptions>): BiofeedbackResistTestData {
         data = super._prepareData(data, options);
         data = ResistTestDataFlow._prepareData(data);
 
@@ -125,7 +125,6 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
 
     /**
      * Prepare any ResistTest from given test data. This should come from a Resist Test
-     *
      */
     static override async _getResistActionTestData(opposedData: ResistTestData, document: SR5Actor|SR5Item, previousMessageId: string): Promise<BiofeedbackResistTestData | undefined> {
         if (!document) {
@@ -158,7 +157,7 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
      *
      * This can be used to trigger resist tests.
      */
-    static override async executeMessageAction(againstData: ResistTestData, messageId: string, options: TestOptions) {
+    static override async executeMessageAction(againstData: ResistTestData, messageId: string, options: Partial<TestOptions>) {
         // Determine documents to roll test with.
         const documents = againstData.action.test === 'MatrixResistTest'
                                             ? await Helpers.getMatrixTestTargetDocuments(againstData as any)

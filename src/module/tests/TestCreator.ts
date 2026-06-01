@@ -42,7 +42,7 @@ export const TestCreator = {
      * @param values The values to use for the test.
      * @param options See TestOptions documentation.
      */
-    fromPool: function(values: { pool: number, limit?: number, threshold?: number }={pool: 0, limit: 0, threshold: 0}, options: TestOptions = {}): SuccessTest {
+    fromPool: function(values: { pool: number, limit?: number, threshold?: number }={pool: 0, limit: 0, threshold: 0}, options: Partial<TestOptions> = {}): SuccessTest {
         const data = TestCreator._minimalTestData();
         data.pool.base = values.pool;
         data.threshold.base = values.threshold || 0;
@@ -63,7 +63,7 @@ export const TestCreator = {
      *
      * @returns Tries to create a SuccessTest from given action item or undefined if it failed.
      */
-    fromItem: async function(item: SR5Item, document?: SR5Actor|SR5Item|null, options?: TestOptions): Promise<SuccessTest | undefined> {
+    fromItem: async function(item: SR5Item, document?: SR5Actor|SR5Item|null, options?: Partial<TestOptions>): Promise<SuccessTest | undefined> {
         if (!document) document = item.parent;
         if (!(document instanceof SR5Actor)) {
             console.error("Shadowrun 5e | A SuccessTest can only be created with an explicit Actor or Item with an actor parent.")
@@ -99,7 +99,7 @@ export const TestCreator = {
      * @param document The document to use for retrieving source values defined within the action.
      * @param options See TestOptions documentation.
      */
-    fromAction: async function(action: ActionRollType, document: SR5Actor | SR5Item, options: TestOptions = {}): Promise<SuccessTest | undefined> {
+    fromAction: async function(action: ActionRollType, document: SR5Actor | SR5Item, options: Partial<TestOptions> = {}): Promise<SuccessTest | undefined> {
         if (!action.test) {
             action.test = 'SuccessTest';
             console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
@@ -127,7 +127,7 @@ export const TestCreator = {
      * @param document The document used to roll the test with
      * @param options General TestOptions
      */
-    fromPackAction: async function(packName: string, actionName: string, document: SR5Actor | SR5Item, options: TestOptions = {}): Promise<SuccessTest|undefined> {
+    fromPackAction: async function(packName: string, actionName: string, document: SR5Actor | SR5Item, options: Partial<TestOptions> = {}): Promise<SuccessTest|undefined> {
         const item = await PackItemFlow.getPackAction(packName, actionName);
         if (!item) {
             console.error(`Shadowrun5 | The pack ${packName} doesn't include an item ${actionName}`);
@@ -142,7 +142,7 @@ export const TestCreator = {
      * 
      * @param id The message id to retrieve test data from.
      */
-    fromMessage: async function(id: string, options: TestOptions = {}): Promise<SuccessTest | undefined> {
+    fromMessage: async function(id: string, options: Partial<TestOptions> = {}): Promise<SuccessTest | undefined> {
         const flagData = TestCreator.getTestDataFromMessage(id);
         if (flagData)
             return this._fromMessageTestData(flagData, options);
@@ -174,10 +174,8 @@ export const TestCreator = {
     
     /**
      * Create a test implementation directly from a message flags test data.
-     * @param testData 
-     * @returns 
      */
-    _fromMessageTestData: function(testData, options: TestOptions = {}) {
+    _fromMessageTestData: function(testData, options: Partial<TestOptions> = {}) {
         // Use test data to create the original test from it.
         testData = foundry.utils.duplicate(testData) as SuccessTestMessageData;
         if (!testData?.rolls) return;
@@ -199,7 +197,7 @@ export const TestCreator = {
      * @param testClsName The test class name to be used with the message test data.
      * @param options See TestOptions documentation.
      */
-    fromMessageAction: async function(id: string, testClsName: string, options: TestOptions={}): Promise<SuccessTest | undefined> {
+    fromMessageAction: async function(id: string, testClsName: string, options: Partial<TestOptions>={}): Promise<SuccessTest | undefined> {
         if (!game.user) return;
         
         const message = game.messages?.get(id);
@@ -234,7 +232,7 @@ export const TestCreator = {
      *                  won't be used for retrieving source values.
      * @param options Optional test options.
      */
-    fromTestData: function(data: TestData, documents?: TestDocuments, options: TestOptions = {}): SuccessTest {
+    fromTestData: function(data: TestData, documents?: TestDocuments, options: Partial<TestOptions> = {}): SuccessTest {
         const type = data.type || 'SuccessTest';
         const cls = TestCreator._getTestClass(type);
         return new cls(data, documents, options);
@@ -254,7 +252,7 @@ export const TestCreator = {
      * @param opposed The opposed test to create a resist test with.
      * @param options See TestOptions documentation.
      */
-    fromOpposedTestResistTest: async function(opposed: OpposedTest, options: TestOptions = {}): Promise<SuccessTest | void> {
+    fromOpposedTestResistTest: async function(opposed: OpposedTest, options: Partial<TestOptions> = {}): Promise<SuccessTest | void> {
         // Don't change the data's source.
         const opposedData = foundry.utils.duplicate(opposed.data) as OpposedTestData;
 
@@ -279,7 +277,7 @@ export const TestCreator = {
      * @param test Any test implementation with an action providing a follow up test.
      * @param options See TestOptions documentation.
      */
-    fromFollowupTest: async function(test: SuccessTest, options: TestOptions = {}): Promise<SuccessTest | void> {
+    fromFollowupTest: async function(test: SuccessTest, options: Partial<TestOptions> = {}): Promise<SuccessTest | void> {
         if (!test?.data?.action?.followed?.test) return;
         if (!test.item) return console.error(`Shadowrun 5e | Test doesn't have a populated item document`);
         if (!test.actor) return console.error(`Shadowrun 5e | Test doesn't have a populated actor document`);
@@ -340,8 +338,6 @@ export const TestCreator = {
      * Return test data based on an items action.
      *
      * @param testCls A test class implementation to use for retrieving action data.
-     * @param item
-     * @param actor
      */
     _getTestDataFromItemAction: async function(testCls, item: SR5Item, actor: SR5Actor): Promise<TestData> {
         // Prepare general data structure with labeling.

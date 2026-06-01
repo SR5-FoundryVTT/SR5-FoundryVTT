@@ -113,7 +113,7 @@ export interface TestData {
     codeTermTraces?: SuccessTestCodeTermTrace[]
 
     // Options the test was created with.
-    options?: TestOptions
+    options: TestOptions
 
     // Has this test been cast before
     evaluated: boolean
@@ -128,9 +128,9 @@ export interface SuccessTestData extends TestData {
 }
 
 export interface TestOptions {
-    showDialog?: boolean // Show dialog when defined as true.
-    showMessage?: boolean // Show message when defined as true.
-    rollMode?: foundry.dice.Roll.Mode
+    showDialog: boolean
+    showMessage: boolean
+    rollMode: foundry.dice.Roll.Mode
 }
 
 export interface SuccessTestMessageData {
@@ -196,7 +196,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     // Allow this.constructor to not reference Function.
     declare ['constructor']: typeof SuccessTest;
 
-    constructor(data, documents?: TestDocuments, options?: TestOptions) {
+    constructor(data: DeepPartial<T>, documents?: TestDocuments, options: Partial<TestOptions> = {}) {
         // Store given documents to avoid later fetching.
         this.actor = documents?.actor;
         this.item = documents?.item;
@@ -206,8 +206,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // User selected targets of this test.
         this.targets = [];
-
-        options = options || {}
 
         this.data = this._prepareData(data, options);
 
@@ -225,73 +223,70 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Make sure a test has a complete data structure, even if supplied data doesn't fully provide that.
      *
      * Any Test should be usable simply by instantiating it with empty TestData
-     *
-     * @param data
-     * @param options
      */
-    _prepareData(data, options: TestOptions) {
-        data.type = data.type || this.type;
+    _prepareData(data: DeepPartial<T>, options: Partial<TestOptions>): T {
+        data.type ||= this.type;
 
         // Store the current users targeted token ids for later use.
         // TODO: remove this.
         // data.targetActorsUuid = data.targetActorsUuid || Helpers.getUserTargets().map(token => token.actor?.uuid).filter(uuid => !!uuid);
-        data.targetUuids = data.targetUuids || Helpers.getUserTargets().map(token => token.actor?.uuid).filter(uuid => !!uuid);
+        data.targetUuids ||= Helpers.getUserTargets().map(token => token.actor?.uuid).filter((uuid): uuid is string => !!uuid);
 
         // Store given document uuids to be fetched during evaluation.
-        data.sourceActorUuid = data.sourceActorUuid || this.actor?.uuid;
-        data.sourceItemUuid = data.sourceItemUuid || this.item?.uuid;
-        data.sourceUuid = data.sourceUuid || this.source?.uuid;
+        data.sourceActorUuid ||= this.actor?.uuid ?? undefined;
+        data.sourceItemUuid ||= this.item?.uuid ?? undefined;
+        data.sourceUuid ||= this.source?.uuid ?? undefined;
 
-        data.title = data.title || this.constructor.label;
-
-        options.rollMode = this._prepareRollMode(data, options);
-        options.showDialog = options.showDialog !== undefined ? options.showDialog : true;
-        options.showMessage = options.showMessage !== undefined ? options.showMessage : true;
+        data.title ||= this.constructor.label;
 
         // Options will be used when a test is reused further on.
-        data.options = options;
+        data.options = {
+            rollMode: this._prepareRollMode(data, options),
+            showDialog: options.showDialog ?? true,
+            showMessage: options.showMessage ?? true,
+        };
 
         // Keep previous evaluation state.
         data.evaluated = data.evaluated ?? false;
 
-        data.buyHits = data.buyHits !== undefined ? data.buyHits : false;
-        data.pushTheLimit = data.pushTheLimit !== undefined ? data.pushTheLimit : false;
-        data.secondChance = data.secondChance !== undefined ? data.secondChance : false;
+        data.buyHits ??= false;
+        data.pushTheLimit ??= false;
+        data.secondChance ??= false;
 
         // Set possible missing values.
-        data.pool = data.pool || DataDefaults.createData('value_field', { label: 'SR5.DicePool' });
-        data.threshold = data.threshold || DataDefaults.createData('value_field', { label: 'SR5.Threshold' });
-        data.limit = data.limit || DataDefaults.createData('value_field', { label: 'SR5.Limit' });
+        data.pool ||= DataDefaults.createData('value_field', { label: 'SR5.DicePool' });
+        data.threshold ||= DataDefaults.createData('value_field', { label: 'SR5.Threshold' });
+        data.limit ||= DataDefaults.createData('value_field', { label: 'SR5.Limit' });
 
-        data.values = data.values || {};
+        data.values ||= {};
 
         data.codeTermTraces ??= [];
 
         // Prepare basic value structure to allow an opposed tests to access derived values before execution with placeholder
         // active tests.
-        data.values.hits = data.values.hits || DataDefaults.createData('value_field', { label: "SR5.Hits" });
-        data.values.extendedHits = data.values.extendedHits || DataDefaults.createData('value_field', { label: "SR5.ExtendedHits" });
-        data.values.netHits = data.values.netHits || DataDefaults.createData('value_field', { label: "SR5.NetHits" });
-        data.values.glitches = data.values.glitches || DataDefaults.createData('value_field', { label: "SR5.Glitches" });
+        data.values.hits ||= DataDefaults.createData('value_field', { label: "SR5.Hits" });
+        data.values.extendedHits ||= DataDefaults.createData('value_field', { label: "SR5.ExtendedHits" });
+        data.values.netHits ||= DataDefaults.createData('value_field', { label: "SR5.NetHits" });
+        data.values.glitches ||= DataDefaults.createData('value_field', { label: "SR5.Glitches" });
 
-        data.opposed = data.opposed || undefined;
+        data.opposed ||= undefined;
 
-        data.damage = data.damage || DataDefaults.createData('damage');
+        data.damage ||= DataDefaults.createData('damage');
 
-        data.extendedRoll = data.extendedRoll || false;
+        data.extendedRoll ||= false;
 
         console.debug('Shadowrun 5e | Prepared test data', data);
 
-        return data;
+        return data as T;
     }
 
     /**
      * The tests roll mode can be given by specific option, action setting or global configuration.
      * @param options The test options for the whole test
      */
-    _prepareRollMode(data, options: TestOptions): foundry.dice.Roll.Mode {
+    _prepareRollMode(data: DeepPartial<T>, options: Partial<TestOptions>): foundry.dice.Roll.Mode {
         if (options.rollMode != null) return options.rollMode;
-        if (data?.action?.roll_mode) return data.action.roll_mode;
+        if (data?.action?.roll_mode) return data.action.roll_mode as foundry.dice.Roll.Mode;
         // @ts-expect-error TODO: fvtt - v14 - missing settings typing
         else return game.settings.get(CORE_NAME, 'messageMode') as foundry.dice.Roll.Mode;
     }
@@ -334,7 +329,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * 
      * Foundry expects Roll data to serialize into rolls.
      * The system expects Test data to serialize into data.
-     * @returns 
      */
     toJSON() {
         return {
@@ -364,8 +358,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return {};
     }
 
-    static _prepareActionTestData(action: ActionRollType, document: SR5Actor | SR5Item, data: any, againstData?: any) {
-        return TestCreator._prepareTestDataWithAction(action, document, data, againstData);
+    static _prepareActionTestData(action: ActionRollType, document: SR5Actor | SR5Item, data: DeepPartial<SuccessTestData>, againstData?: SuccessTestData) {
+        return TestCreator._prepareTestDataWithAction(action, document, data as SuccessTestData, againstData);
     }
 
     /**
@@ -381,12 +375,12 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * @param actor The actor for this opposing test.
      * @param previousMessageId The id this message action is sourced from.
      */
-    static async _getOpposedActionTestData(testData, actor: SR5Actor|SR5Item, previousMessageId: string): Promise<SuccessTestData | undefined> {
+    static async _getOpposedActionTestData(testData: DeepPartial<SuccessTestData>, actor: SR5Actor|SR5Item, previousMessageId: string): Promise<SuccessTestData | undefined> {
         console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support opposed message actions`);
         return undefined;
     }
 
-    static async _getResistActionTestData(testData, actor: SR5Actor|SR5Item, previousMessageId: string): Promise<SuccessTestData | undefined> {
+    static async _getResistActionTestData(testData: DeepPartial<SuccessTestData>, actor: SR5Actor|SR5Item, previousMessageId: string): Promise<SuccessTestData | undefined> {
         console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support resist message actions`);
         return undefined;
     }
@@ -396,7 +390,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      *
      * FoundryVTT documentation:
      * Shadowrun5e: SR5#44
-     * 
      */
     get formula(): string {
         const pool = ModifiableValue.calcTotal(this.data.pool, { min: 0 });
@@ -519,7 +512,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Suppress dialog during execution
      */
     hideDialog() {
-        if (!this.data.options) this.data.options = {};
         this.data.options.showDialog = false;
     }
 
@@ -527,7 +519,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Show the dialog class for this test type and alter test according to user selection.
      */
     async showDialog(): Promise<boolean> {
-        if (!this.data.options?.showDialog) return true;
+        if (!this.data.options.showDialog) return true;
 
         this.dialog = this._createTestDialog();
 
@@ -672,7 +664,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Populate the actor document.
         if (!this.actor && this.data.sourceActorUuid) {
             // SR5Actor.uuid will return an actor id for linked actors but its token id for unlinked actors
-            const document = await fromUuid(this.data.sourceActorUuid as any) || undefined;
+            const document = await fromUuid(this.data.sourceActorUuid) || undefined;
             this.actor = document instanceof TokenDocument ?
                 (document.actor ?? undefined) :
                 (document as SR5Actor);
@@ -1181,7 +1173,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
     /**
      * TODO: This method results in an ugly description.
-     *
      */
     get description(): string {
         const poolPart = this.pool.value;
@@ -1962,7 +1953,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
     /**
      * Save this test to the given message uuid
-     * @param uuid 
      */
     async saveToMessage(uuid: string | undefined = this.data.messageUuid) {
         if (!uuid) return;
@@ -2277,7 +2267,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * 
      * This can be used to trigger opposing tests.
      */
-    static async executeMessageAction(againstData: SuccessTestData, messageId: string, options: TestOptions) {
+    static async executeMessageAction(againstData: SuccessTestData, messageId: string, options: Partial<TestOptions>) {
         // Determine actors to roll test with.
         // build documents based on the category, matrix can target individual icons
         let documents = await Helpers.getOpposedTestTargets(againstData);
@@ -2347,8 +2337,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (!this.dialog) return;
 
         // Re-prepare data to add missing base information.
-        const options = this.data.options ?? {};
-        this._prepareData(this.data, options);
+        const options = this.data.options;
+        this._prepareData(this.data as DeepPartial<T>, options);
 
         // Re-prepare execution data to add missing modifiers / effects and so forth.
         await this._prepareExecution();

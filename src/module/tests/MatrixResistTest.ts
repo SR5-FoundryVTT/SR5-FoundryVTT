@@ -31,7 +31,7 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
     // The target icon, if it's representing a persona.
     declare persona: SR5Actor;
 
-    override _prepareData(data: MatrixResistTestData, options: any): any {
+    override _prepareData(data: MatrixResistTestData, options: Partial<TestOptions>): MatrixResistTestData {
         data = super._prepareData(data, options);
         if (data.following) {
             data = MatrixTestDataFlow._prepareFollowingData(data);
@@ -98,7 +98,6 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
 
     /**
      * Prepare any ResistTest from given test data. This should come from a MatrixDefenseTest
-     *
      */
     static override async _getResistActionTestData(opposedData: MatrixDefenseTestData, document: SR5Actor|SR5Item, previousMessageId: string): Promise<MatrixResistTestData | undefined> {
         if (!opposedData.against?.opposed.resist) {
@@ -133,7 +132,7 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
      *
      * This can be used to trigger resist tests.
      */
-    static override async executeMessageAction(againstData: MatrixDefenseTestData, messageId: string, options: TestOptions) {
+    static override async executeMessageAction(againstData: MatrixDefenseTestData, messageId: string, options: Partial<TestOptions>) {
         // Determine documents to roll test with.
         const documents = await Helpers.getMatrixTestTargetDocuments(againstData)
         await ResistTestDataFlow.executeMessageAction(this, againstData, messageId, documents, options);

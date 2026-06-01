@@ -1,4 +1,4 @@
-import {SuccessTest, SuccessTestData} from "./SuccessTest";
+import {SuccessTest, SuccessTestData, TestOptions} from "./SuccessTest";
 import {DataDefaults} from "../data/DataDefaults";
 import {ComplexFormRules} from "../rules/ComplexFormRules";
 import {ModifiableValue} from "../mods/ModifiableValue";
@@ -18,15 +18,15 @@ export interface ComplexFormTestData extends SuccessTestData {
  */
 export class ComplexFormTest extends SuccessTest<ComplexFormTestData> {
 
-    override _prepareData(data, options): any {
+    override _prepareData(data: DeepPartial<ComplexFormTestData>, options: Partial<TestOptions>): ComplexFormTestData {
         data = super._prepareData(data, options);
 
         // Restore previous values or set defaults.
-        data.level =  data.level || 0;
-        data.fade = data.face || 0;
-        data.fadeDamage = data.fadeDamage || DataDefaults.createData('damage');
+        data.level ||= 0;
+        data.fade ||= 0;
+        data.fadeDamage ||= DataDefaults.createData('damage');
 
-        return data;
+        return data as ComplexFormTestData;
     }
 
     override get _dialogTemplate()  {

@@ -23,12 +23,8 @@ type MarkPlacementDefenseTest = OpposedBruteForceTest | OpposedHackOnTheFlyTest;
 export const MarkPlacementFlow = {
     /**
      * Prepare data for the initial mark placement test.
-     * 
-     * @param data 
-     * @param options 
-     * @returns 
      */
-    _prepareData(data: MatrixPlacementData): any {
+    _prepareData<D extends MatrixPlacementData>(data: D): D {
         MatrixTestDataFlow._prepareData(data);
         // Place a single mark as default
         data.marks = data.marks ?? 1;

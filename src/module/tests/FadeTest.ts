@@ -1,4 +1,4 @@
-import { SuccessTest, SuccessTestData } from "./SuccessTest";
+import { SuccessTest, SuccessTestData, TestOptions } from "./SuccessTest";
 import { ComplexFormTest, ComplexFormTestData } from "./ComplexFormTest";
 import { FadeRules } from "../rules/FadeRules";
 import ModifierTypes = Shadowrun.ModifierTypes;
@@ -20,7 +20,7 @@ export interface FadeTestData extends SuccessTestData {
 export class FadeTest extends SuccessTest<FadeTestData> {
     declare against: ComplexFormTest;
 
-    override _prepareData(data, options): any {
+    override _prepareData(data: DeepPartial<FadeTestData>, options: Partial<TestOptions>): FadeTestData {
         data = super._prepareData(data, options);
 
         // Is this test part of a followup test chain? complex form => fade
@@ -33,7 +33,7 @@ export class FadeTest extends SuccessTest<FadeTestData> {
             data.modifiedFade = foundry.utils.duplicate(data.incomingFade);
         }
 
-        return data;
+        return data as FadeTestData;
     }
 
     override get _dialogTemplate() {

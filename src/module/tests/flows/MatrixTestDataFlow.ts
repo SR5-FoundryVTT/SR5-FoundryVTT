@@ -45,7 +45,6 @@ export const MatrixTestDataFlow = {
 
     /**
      * Is the given attribute id a matrix attribute
-     * @param attribute
      */
     isMatrixAttribute(attribute: string): boolean {
         return Object.hasOwn(SR5.matrixAttributes, attribute);
@@ -124,12 +123,8 @@ export const MatrixTestDataFlow = {
 
     /**
      * Prepare data for Resisting matrix damage
-     *
-     * @param data
-     * @param options
-     * @returns
      */
-    _prepareDataResist(data: MatrixResistTestData): any {
+    _prepareDataResist<D extends MatrixResistTestData>(data: D): D {
         // Allow for token targeting to be used to target the main icon.
         if (!data.iconUuid) data.iconUuid = data.targetUuids.length === 1 ? data.targetUuids[0] : undefined;
 
@@ -141,12 +136,8 @@ export const MatrixTestDataFlow = {
 
     /**
      * Prepare data for the initial mark placement test.
-     *
-     * @param data
-     * @param options
-     * @returns
      */
-    _prepareData(data: MatrixTestData): any {
+    _prepareData<D extends MatrixTestData>(data: D): D {
         // Allow for token targeting to be used to target the main icon.
         if (!data.iconUuid) data.iconUuid = data.targetUuids.length === 1 ? data.targetUuids[0] : undefined;
 
@@ -165,10 +156,8 @@ export const MatrixTestDataFlow = {
 
     /**
      * Prepare data for the opposing mark placement test.
-     * @param data
-     * @returns
      */
-    _prepareOpposedData(data: OpposedMatrixTestData): any {
+    _prepareOpposedData<D extends OpposedMatrixTestData>(data: D): D {
         data.personaUuid = data.personaUuid ?? data.against.personaUuid;
         data.iconUuid = data.iconUuid ?? data.against.iconUuid;
         data.targetMainIcon = data.targetMainIcon ?? data.against.targetMainIcon;
@@ -178,10 +167,8 @@ export const MatrixTestDataFlow = {
 
     /**
      * Prepare data for matrix resist data from following test data
-     * @param data
-     * @returns
      */
-    _prepareFollowingData(data: MatrixResistTestData): any {
+    _prepareFollowingData<D extends MatrixResistTestData>(data: D): D {
         data.personaUuid = data.personaUuid ?? data.following?.personaUuid;
         data.iconUuid = data.iconUuid ?? data.following?.iconUuid;
         return data;
@@ -265,8 +252,6 @@ export const MatrixTestDataFlow = {
 
     /**
      * Prepare icon and persona based on given uuid or user selection.
-     *
-     * @param test
      */
     populateDocuments(test: MatrixTest) {
         // Handle icons around targeting.
@@ -323,7 +308,6 @@ export const MatrixTestDataFlow = {
 
     /**
      * Prepare Icon and Persona for this test based on data.
-     *
      */
     _prepareIcon(test: MatrixTest) {
         // When given an icon uuid, load it.
@@ -445,8 +429,6 @@ export const MatrixTestDataFlow = {
      * - Then select a device to place the mark on
      * - Reverse and place mark on main icon again
      * - iconUuid is still set to the device, as the render flow of the TestDialog doesn't clean up the data set by the
-     *
-     * @param test
      */
     async setIconUuidBasedOnPlacementSelection(test: MatrixTest) {
         // Assure main icon selection is set as the target icon.
@@ -467,9 +449,6 @@ export const MatrixTestDataFlow = {
 
     /**
      * Provide easy way to set a target for mark placement tests.
-     *
-     * @param test
-     * @param document
      */
     async addTarget(test: MatrixTest, document: SR5Actor | SR5Item) {
         if (test.targets.length > 1) {
@@ -487,12 +466,8 @@ export const MatrixTestDataFlow = {
      * Handle target selection flow for matrix mark placement actions.
      *
      * NOTE: This method is bound to the calling class and should be called after .bind(s.this) by the caller.
-     *
-     * @param againstData
-     * @param messageId
-     * @param options
      */
-    async executeMessageAction(testCls: any, againstData: MatrixTestData, messageId: string, options: TestOptions): Promise<void> {
+    async executeMessageAction(testCls: any, againstData: MatrixTestData, messageId: string, options: Partial<TestOptions>): Promise<void> {
         let document: Document.Any | null = null;
         if (againstData.iconUuid) {
             document = await fromUuid(againstData.iconUuid)
