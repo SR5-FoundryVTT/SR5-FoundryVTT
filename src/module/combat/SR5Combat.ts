@@ -5,6 +5,7 @@ import { Migrator } from "../migrator/Migrator";
 import { CombatRules } from "../rules/CombatRules";
 import { FLAGS, SR, SYSTEM_NAME } from "../constants";
 import { SR5Die } from "../rolls/SR5Die";
+import { ChatMessageMode } from "../types/global";
 import SocketMessageData = Shadowrun.SocketMessageData;
 import BaseCombat = foundry.documents.BaseCombat;
 
@@ -387,9 +388,9 @@ export class SR5Combat extends Combat<"base"> {
         const combatantIds = Array.isArray(ids) ? ids : [ids];
         const updates: Combatant.UpdateData[] = [];
         const messageGroups = {
-            [CONST.DICE_ROLL_MODES.PUBLIC]: [] as InitiativeSummaryRow[],
-            [CONST.DICE_ROLL_MODES.PRIVATE]: [] as InitiativeSummaryRow[],
-        } satisfies Partial<Record<foundry.dice.Roll.Mode, InitiativeSummaryRow[]>>;
+            public: [] as InitiativeSummaryRow[],
+            gm: [] as InitiativeSummaryRow[],
+        } satisfies Partial<Record<ChatMessageMode, InitiativeSummaryRow[]>>;
 
         for (const id of combatantIds) {
             const combatant = this.combatants.get(id) as SR5Combatant | undefined;
@@ -404,7 +405,7 @@ export class SR5Combat extends Combat<"base"> {
 
             updates.push({ _id: id, initiative, system: { initiative: { blitz, last: lastInitiative } } });
 
-            const rollMode = CONST.DICE_ROLL_MODES[combatant.hidden ? 'PRIVATE' : 'PUBLIC'];
+            const rollMode: ChatMessageMode = combatant.hidden ? 'gm' : 'public';
             messageGroups[rollMode].push(this._buildInitiativeRow(combatant, initiative, roll));
         }
 
@@ -564,7 +565,7 @@ export class SR5Combat extends Combat<"base"> {
      * @param messageOptions - Base configuration options for the created ChatMessage documents.
      */
     private async _createInitiativeMessages(
-        messageGroups: Partial<Record<foundry.dice.Roll.Mode, InitiativeSummaryRow[]>>,
+        messageGroups: Partial<Record<ChatMessageMode, InitiativeSummaryRow[]>>,
         messageOptions: ChatMessage.CreateData,
     ) {
         let hasPlayedSound = false;
