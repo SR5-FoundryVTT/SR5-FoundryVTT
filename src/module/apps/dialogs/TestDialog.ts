@@ -26,7 +26,7 @@ export interface TestDialogListener {
 interface TestDialogContext extends HandlebarsApplicationMixin.RenderContext {
     test: any;
     rollMode: string;
-    rollModes: CONFIG.Dice.RollModes;
+    rollModes: CONFIG.ChatMessage.modes;
     config: typeof SR5;
     expandedPaths: string[];
     dialogContent: string;
@@ -165,8 +165,8 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
         context.test = this.test;
         // @ts-expect-error TODO: fvtt - v14 - missing messageMode setting
         context.rollMode = this.test.data.options?.rollMode ?? game.settings.get('core', 'messageMode');
-        // TODO: fvtt - v14 - missing types for ChatMessage.modes
-        context.rollModes = (CONFIG.ChatMessage as unknown as { modes: typeof CONFIG.Dice.rollModes }).modes;
+        // TODO: fvtt-types - type CONFIG.ChatMessage.modes upstream once available
+        context.rollModes = (CONFIG.ChatMessage as unknown as { modes: CONFIG.ChatMessage.modes }).modes;
         context.config = SR5;
         context.expandedPaths = Array.from(this._expandedList);
         context.dialogContent = await foundry.applications.handlebars.renderTemplate(this.test._dialogTemplate, context as unknown as Record<string, unknown>);
