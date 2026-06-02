@@ -115,12 +115,15 @@
             "SpellRitual": "주문시전 의식",
             "Summoning": "소환 행동"
         },
-        "ActionType": "유형",
-        "ActionTypeComplex": "복잡",
-        "ActionTypeFree": "자유",
-        "ActionTypeNone": "없음",
-        "ActionTypeSimple": "단순",
-        "ActionTypeVaries": "다양",
+        "ActionType": {
+            "Label": "유형",
+            "Complex": "복잡",
+            "Free": "자유",
+            "Interrupt": "Interrupt",
+            "None": "없음",
+            "Simple": "단순",
+            "Varies": "다양"
+        },
         "Actions": "행동",
         "Active": "활성형",
         "ActiveDefense": "능동 방어",
@@ -1279,6 +1282,7 @@
         "InitCatMeatspace": "현실",
         "Initiation": "입회",
         "Initiative": "우선권",
+        "InitiativeMod": "우선권 수정치",
         "Internal": "내부",
         "InventoryRename": {
             "Cancel": "취소",
@@ -1360,6 +1364,10 @@
                     "extended": {
                         "hint": "연장 판정일 경우 선택",
                         "label": "연장 판정"
+                    },
+                    "initiative_mod": {
+                        "hint": "이 행동을 수행할 때 적용되는 우선권 수정치",
+                        "label": "우선권 수정치"
                     },
                     "limit": {
                         "attribute": {

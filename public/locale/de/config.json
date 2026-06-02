@@ -115,12 +115,15 @@
             "SpellRitual": "Spruchzauberei Ritual",
             "Summoning": "BeschwörungsHandlungen"
         },
-        "ActionType": "Handlung",
-        "ActionTypeComplex": "Komplexe",
-        "ActionTypeFree": "Freie",
-        "ActionTypeNone": "Keine",
-        "ActionTypeSimple": "Einfache",
-        "ActionTypeVaries": "Variiert",
+        "ActionType": {
+            "Label": "Handlung",
+            "Complex": "Komplexe",
+            "Free": "Freie",
+            "Interrupt": "Interrupt",
+            "None": "Keine",
+            "Simple": "Einfache",
+            "Varies": "Variiert"
+        },
         "Actions": "Aktionen",
         "Active": "Aktiv",
         "ActiveDefense": "Unterbrechungsh.",
@@ -1280,6 +1283,7 @@
         "InitCatMeatspace": "Fleischwelt-Initiative",
         "Initiation": "Initiation",
         "Initiative": "Initiative",
+        "InitiativeMod": "Initiativmodifikator",
         "Internal": "Intern",
         "InventoryRename": {
             "Cancel": "Abbrechen",
@@ -1361,6 +1365,10 @@
                     "extended": {
                         "hint": "Ist diese Aktion Teil einer Ausgedehnten Probe?",
                         "label": "Ausgedehnte Probe"
+                    },
+                    "initiative_mod": {
+                        "hint": "Initiativmodifikator, der beim Ausführen dieser Aktion angewendet wird",
+                        "label": "Initiativmodifikator"
                     },
                     "limit": {
                         "attribute": {
