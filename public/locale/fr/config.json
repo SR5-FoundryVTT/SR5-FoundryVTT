@@ -935,17 +935,31 @@
             },
             "Mod": "Mod",
             "Mode": {
-                "BurstFire": "TR",
-                "BurstFireLong": "RL",
-                "BurstFireShort": "TR",
-                "FullAuto": "FA",
-                "FullAutoShort": "TA",
-                "Modes": "Modes",
-                "SemiAuto": "SA",
-                "SemiAutoBurst": "SR",
-                "SemiAutoShort": "SA",
-                "SingleShot": "CC",
-                "SingleShotShort": "CC"
+                "Mode": "Modes",
+                "Short": {
+                    "BurstFire": "TR",
+                    "BurstFireLong": "RL",
+                    "BurstFireShort": "TR",
+                    "FullAuto": "FA",
+                    "FullAutoShort": "TA",
+                    "SemiAuto": "SA",
+                    "SemiAutoBurst": "SR",
+                    "SemiAutoShort": "SA",
+                    "SingleShot": "CC",
+                    "SingleShotShort": "CC"
+                },
+                "Full": {
+                    "BurstFire": "Tir en rafale",
+                    "BurstFireLong": "Rafale longue",
+                    "FullAuto": "Tir automatique",
+                    "FullAutoLong": "Tir automatique (complexe)",
+                    "FullAutoShort": "Tir automatique (simple)",
+                    "SemiAuto": "Semi-automatique",
+                    "SemiAutoBurst": "Rafale semi-automatique",
+                    "SemiAutoShort": "Semi-automatique",
+                    "SingleShot": "Coup par coup",
+                    "Suppressing": "Tir de suppression"
+                }
             },
             "Mods": "Modes",
             "Range": {

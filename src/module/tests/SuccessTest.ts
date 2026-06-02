@@ -24,6 +24,7 @@ import { Translation } from '../utils/strings';
 import { GmOnlyMessageContentFlow } from '../actor/flows/GmOnlyMessageContentFlow';
 import { ActionResultType, ActionRollType, DamageType, MinimalActionType, OpposedTestType, ResultActionType } from '../types/item/Action';
 import { ValueFieldType } from '../types/template/Base';
+import { ChatMessageMode } from '../types/global';
 import { DeepPartial } from "fvtt-types/utils";
 export interface TestDocuments {
     // Legacy field that used be the source document.
@@ -130,7 +131,7 @@ export interface SuccessTestData extends TestData {
 export interface TestOptions {
     showDialog?: boolean // Show dialog when defined as true.
     showMessage?: boolean // Show message when defined as true.
-    rollMode?: foundry.dice.Roll.Mode
+    rollMode?: ChatMessageMode
 }
 
 export interface SuccessTestMessageData {
@@ -289,11 +290,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * The tests roll mode can be given by specific option, action setting or global configuration.
      * @param options The test options for the whole test
      */
-    _prepareRollMode(data, options: TestOptions): foundry.dice.Roll.Mode {
+    _prepareRollMode(data, options: TestOptions): ChatMessageMode {
         if (options.rollMode != null) return options.rollMode;
-        if (data?.action?.roll_mode) return data.action.roll_mode;
+        if (data?.action?.roll_mode) return data.action.roll_mode as ChatMessageMode;
         // @ts-expect-error TODO: fvtt - v14 - missing settings typing
-        else return game.settings.get(CORE_NAME, 'messageMode') as foundry.dice.Roll.Mode;
+        else return game.settings.get(CORE_NAME, 'messageMode') as ChatMessageMode;
     }
 
     /**
@@ -1738,14 +1739,16 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             whisper = game.users.filter(user => this.actor?.testUserPermission(user, 'OWNER') === true);
         }
 
+        const rollMode = this.data.options?.rollMode;
+
         // ...for rollMode include GM when GM roll
-        if (this.data.options?.rollMode === 'gmroll' || this.data.options?.rollMode === "blindroll") {
+        if (rollMode === 'gm' || rollMode === "blind") {
             whisper = [...game.users.filter(user => user.isGM), ...(whisper || [])];
         }
 
         // Don't show dice to a user casting blind.
-        const blind = this.data.options?.rollMode === 'blindroll';
-        const synchronize = this.data.options?.rollMode === 'publicroll';
+        const blind = rollMode === 'blind';
+        const synchronize = rollMode === 'public' || rollMode === 'ic';
 
         void dice3d.showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
     }
@@ -1909,9 +1912,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * What ChatMessage rollMode is this test supposed to use?
      */
-    get _rollMode(): string {
+    get _rollMode(): ChatMessageMode {
         // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
-        return this.data.options?.rollMode as string ?? game.settings.get('core', 'messageMode');
+        return this.data.options?.rollMode ?? game.settings.get('core', 'messageMode') as ChatMessageMode;
     }
 
     /**

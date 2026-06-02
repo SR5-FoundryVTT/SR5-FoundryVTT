@@ -460,8 +460,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             }
         }
 
-        // TODO: fvtt - v14 - missing types for ChatMessage.modes
-        data.rollModes = (CONFIG.ChatMessage as unknown as { modes: typeof CONFIG.Dice.rollModes }).modes;
+        // TODO: fvtt-types - type CONFIG.ChatMessage.modes upstream once available
+        data.rollModes = (CONFIG.ChatMessage as unknown as { modes: CONFIG.ChatMessage.modes }).modes;
 
         data.item = this.item;
 

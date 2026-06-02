@@ -1113,10 +1113,10 @@ export const SR5 = {
     ],
 
     rangeWeaponModeLabel: {
-        'single_shot': 'SR5.Weapon.Mode.SingleShot',
-        'semi_auto': 'SR5.Weapon.Mode.SemiAuto',
-        'burst_file': 'SR5.Weapon.Mode.BurstFire',
-        'full_auto': 'SR5.Weapon.Mode.FullAuto'
+        'single_shot': 'SR5.Weapon.Mode.Short.SingleShot',
+        'semi_auto': 'SR5.Weapon.Mode.Short.SemiAuto',
+        'burst_file': 'SR5.Weapon.Mode.Short.BurstFire',
+        'full_auto': 'SR5.Weapon.Mode.Short.FullAuto'
     },
 
     wirelessModes: {
@@ -1134,7 +1134,7 @@ export const SR5 = {
      */
     fireModes: [
         {
-            label: "SR5.Weapon.Mode.SingleShot",
+            label: "SR5.Weapon.Mode.Full.SingleShot",
             value: 1,
             recoil: false,
             defense: 0,
@@ -1143,7 +1143,7 @@ export const SR5 = {
             mode: 'single_shot'
         },
         {
-            label: "SR5.Weapon.Mode.SemiAutoShort",
+            label: "SR5.Weapon.Mode.Full.SemiAutoShort",
             value: 1,
             recoil: true,
             defense: 0,
@@ -1152,7 +1152,7 @@ export const SR5 = {
             mode: 'semi_auto'
         },
         {
-            label: "SR5.Weapon.Mode.SemiAutoBurst",
+            label: "SR5.Weapon.Mode.Full.SemiAutoBurst",
             value: 3,
             recoil: true,
             defense: -2,
@@ -1162,7 +1162,7 @@ export const SR5 = {
         },
 
         {
-            label: "SR5.Weapon.Mode.BurstFire",
+            label: "SR5.Weapon.Mode.Full.BurstFire",
             value: 3,
             recoil: true,
             defense: -2,
@@ -1171,7 +1171,7 @@ export const SR5 = {
             mode: 'burst_fire'
         },
         {
-            label: "SR5.Weapon.Mode.BurstFireLong",
+            label: "SR5.Weapon.Mode.Full.BurstFireLong",
             value: 6,
             recoil: true,
             defense: -5,
@@ -1180,7 +1180,7 @@ export const SR5 = {
             mode: 'burst_fire',
         },
         {
-            label: "SR5.Weapon.Mode.FullAutoShort",
+            label: "SR5.Weapon.Mode.Full.FullAutoShort",
             value: 6,
             recoil: true,
             defense: -5,
@@ -1189,7 +1189,7 @@ export const SR5 = {
             mode: 'full_auto'
         },
         {
-            label: 'SR5.Weapon.Mode.FullAutoLong',
+            label: 'SR5.Weapon.Mode.Full.FullAutoLong',
             value: 10,
             recoil: true,
             defense: -9,
@@ -1198,7 +1198,7 @@ export const SR5 = {
             mode: 'full_auto'
         },
         {
-            label: 'SR5.Suppressing',
+            label: 'SR5.Weapon.Mode.Full.Suppressing',
             value: 20,
             recoil: false,
             defense: 0,
