@@ -1748,7 +1748,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // Don't show dice to a user casting blind.
         const blind = rollMode === 'blind';
-        const synchronize = rollMode === 'public';
+        const synchronize = rollMode === 'public' || rollMode === 'ic';
 
         void dice3d.showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
     }

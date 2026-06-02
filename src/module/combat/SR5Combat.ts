@@ -405,7 +405,7 @@ export class SR5Combat extends Combat<"base"> {
 
             updates.push({ _id: id, initiative, system: { initiative: { blitz, last: lastInitiative } } });
 
-            const rollMode: ChatMessageMode = combatant.hidden ? 'gm' : 'public';
+            const rollMode = combatant.hidden ? 'gm' : 'public';
             messageGroups[rollMode].push(this._buildInitiativeRow(combatant, initiative, roll));
         }
 

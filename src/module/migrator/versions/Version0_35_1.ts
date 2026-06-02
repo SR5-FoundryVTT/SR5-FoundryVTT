@@ -27,7 +27,7 @@ export class Version0_35_1 extends VersionMigration {
         const rollMode = getProperty(item, 'system.action.roll_mode') as string;
 
         if (rollMode in LEGACY_ROLL_MODE_MAP) {
-            setProperty(item, 'system.action.roll_mode', LEGACY_ROLL_MODE_MAP[rollMode] || '');
+            setProperty(item, 'system.action.roll_mode', LEGACY_ROLL_MODE_MAP[rollMode]);
         }
     }
 }
