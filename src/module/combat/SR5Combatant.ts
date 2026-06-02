@@ -181,7 +181,7 @@ export class SR5Combatant extends Combatant<"base"> {
             sound: hasDiceRoll ? CONFIG.sounds.dice : undefined,
         } as ChatMessage.CreateData;
 
-        const rollMode: ChatMessageMode = this.hidden ? 'gm' : 'public';
+        const rollMode = this.hidden ? 'gm' : 'public';
         // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
         ChatMessage.applyMode(messageData, rollMode);
 
