@@ -1,8 +1,7 @@
 import { SR5 } from "@/module/config";
 import { ModifiableValueSchema } from "./Base";
 import { ModifiableField } from "../fields/ModifiableField";
-import { FixedTypeObjectField } from "../fields/FixedTypeObjectField";
-const { SchemaField, BooleanField, ArrayField, StringField, TypedObjectField, HTMLField } = foundry.data.fields;
+const {  BooleanField, ArrayField, StringField, TypedObjectField, HTMLField } = foundry.data.fields;
 
 export type SkillCategories = 'active' | 'language' | 'knowledge';
 
@@ -36,13 +35,7 @@ export const SkillField = () => ({
  * Derived Data structure build from an actors skill items.
  * will use skill item id as key and derived ModifiableSkillField as value
  */
-export const Skills = () => new FixedTypeObjectField(
-    new ModifiableField(SkillField()),
-    {
-        required: true,
-        initial: {}
-    }
-);
+export const Skills = () => new TypedObjectField(new ModifiableField(SkillField()));
 
 export const KnowledgeSkillList = (initialAttribute: string) => ({
     attribute: new StringField({
@@ -50,7 +43,7 @@ export const KnowledgeSkillList = (initialAttribute: string) => ({
         initial: initialAttribute,
         choices: ["willpower", "logic", "intuition", "charisma"]
     }),
-    value: new TypedObjectField(new ModifiableField(SkillField()), {required: true, initial: {}}),
+    value: new TypedObjectField(new ModifiableField(SkillField())),
 });
 
 export const KnowledgeSkills = () => ({
