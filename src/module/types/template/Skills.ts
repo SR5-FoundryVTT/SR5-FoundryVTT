@@ -1,7 +1,7 @@
 import { SR5 } from "@/module/config";
 import { ModifiableValueSchema } from "./Base";
 import { ModifiableField } from "../fields/ModifiableField";
-const {  BooleanField, ArrayField, StringField, TypedObjectField, HTMLField } = foundry.data.fields;
+const { BooleanField, ArrayField, StringField, TypedObjectField, HTMLField } = foundry.data.fields;
 
 export type SkillCategories = 'active' | 'language' | 'knowledge';
 
@@ -43,7 +43,7 @@ export const KnowledgeSkillList = (initialAttribute: string) => ({
         initial: initialAttribute,
         choices: ["willpower", "logic", "intuition", "charisma"]
     }),
-    value: new TypedObjectField(new ModifiableField(SkillField())),
+    value: Skills(),
 });
 
 export const KnowledgeSkills = () => ({
