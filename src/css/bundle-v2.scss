@@ -341,6 +341,40 @@ body.theme-light,
                 align-items: center;
                 flex-flow: column nowrap;
                 gap: .25rem;
+
+                .sheet-header-resource-container {
+                    box-sizing: border-box;
+                    width: 100%;
+                    min-width: 9.25rem;
+                    padding-left: .5rem;
+                }
+
+                .sheet-header-resource {
+                    gap: .5rem;
+                    min-height: 1.75rem;
+
+                    .sheet-header-resource-label {
+                        flex: 0 0 4.5rem;
+                        justify-content: flex-start;
+                    }
+
+                    .sheet-header-resource-value {
+                        flex: 0 0 4rem;
+                        justify-content: center;
+                    }
+
+                    input.short,
+                    select.short {
+                        width: 100%;
+                        text-align: center;
+                    }
+
+                    .sheet-header-service-value {
+                        min-width: 1.5rem;
+                        font-size: 1.1rem;
+                        text-align: center;
+                    }
+                }
             }
 
             .sheet-header-labels {

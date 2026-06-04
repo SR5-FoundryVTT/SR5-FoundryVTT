@@ -98,8 +98,8 @@
                     {{#if system.is_npc }}
                         <div class="list-item">
                             <div class="list-item-start">
-                                <label data-tooltip="{{systemFields.npc.fields.is_grunt.hint}}">
-                                    {{systemFields.npc.fields.is_grunt.label}}
+                                <label data-tooltip="{{localize 'SR5.IsGruntHint'}}">
+                                    {{localize "SR5.IsGrunt"}}
                                 </label>
                             </div>
                             <div class="list-item-col">
@@ -119,6 +119,61 @@
                                         rootId=rootId disabled=@root.isPlayMode }}
                         </div>
                     </div>
+                    {{#if @root.isSpirit}}
+                        <div class="list-item">
+                            <div class="list-item-start">
+                                <label data-tooltip="{{localize 'SR5.Spirit.HalfValueSkillHint'}}">
+                                    {{localize "SR5.Spirit.HalfValueSkill"}}
+                                </label>
+                            </div>
+                            <div class="list-item-col">
+                                {{formInput systemFields.half_value_skill value=source.system.half_value_skill
+                                            classes="short" rootId=rootId disabled=@root.isPlayMode }}
+                            </div>
+                        </div>
+                    {{/if}}
+                    {{#each @root.initiativeFormulaModes as |mode|}}
+                        {{#with (objValue @root.source.system.initiative mode.id) as |modeInitiative|}}
+                            <div class="list-item spirit-initiative-formula-item">
+                                <div class="list-item-start spirit-initiative-formula-label">
+                                    <label>{{localize mode.label}} {{localize "SR5.Initiative"}}</label>
+                                </div>
+                                <div class="list-item-col spirit-initiative-formula-col">
+                                    <div class="spirit-initiative-formula-line">
+                                        <select class="short spirit-initiative-attribute"
+                                                name="system.initiative.{{mode.id}}.attribute_a"
+                                                {{#if @root.isPlayMode}}disabled{{/if}}>
+                                            <option value=""></option>
+                                            {{selectOptions @root.config.attributes selected=modeInitiative.attribute_a localize=true}}
+                                        </select>
+                                        <span>+</span>
+                                        <select class="short spirit-initiative-attribute"
+                                                name="system.initiative.{{mode.id}}.attribute_b"
+                                                {{#if @root.isPlayMode}}disabled{{/if}}>
+                                            <option value=""></option>
+                                            {{selectOptions @root.config.attributes selected=modeInitiative.attribute_b localize=true}}
+                                        </select>
+                                        <span>+</span>
+                                        <input type="number"
+                                               class="short skinny center"
+                                               name="system.initiative.{{mode.id}}.constant.base"
+                                               value="{{modeInitiative.constant.base}}"
+                                               {{#if @root.isPlayMode}}disabled{{/if}}>
+                                        <span>+</span>
+                                        <input type="number"
+                                               class="short skinny center"
+                                               name="system.initiative.{{mode.id}}.dice.base"
+                                               value="{{modeInitiative.dice.base}}"
+                                               min="0"
+                                               max="5"
+                                               step="1"
+                                               {{#if @root.isPlayMode}}disabled{{/if}}>
+                                        <span>d6</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {{/with}}
+                    {{/each}}
                 </section>
             </div>
         {{/if}}
@@ -209,3 +264,4 @@
         </div>
     </div>
 </section>
+

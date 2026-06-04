@@ -30,9 +30,16 @@
         </div>
         <div class="list-item-col {{#if @root.isPlayMode}} skinny-col {{/if}}">
             {{#if @root.isEditMode}}
-                <input type="number" data-system-action="changeSkillRating" class="short skinny" value="{{group.item.system.group.rating}}">
+                {{#if @root.isSpirit}}
+                    <input type="checkbox"
+                           data-system-action="changeSkillRating"
+                           class="checkbox"
+                           {{checked (gt group.item.system.group.rating 0)}}>
+                {{else}}
+                    <input type="number" data-system-action="changeSkillRating" class="short skinny" value="{{group.item.system.group.rating}}">
+                {{/if}}
             {{else}}
-                <label>{{group.item.system.group.rating}}</label>
+                <label>{{group.displayRating}}</label>
             {{/if}}
         </div>
         <div class="list-item-icons{{#if @root.isPlayMode}} skinny-icons {{/if}}" data-item-id="{{group.item.id}}">

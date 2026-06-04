@@ -7,7 +7,7 @@ import { ImportHelper as IH } from '../../helper/ImportHelper';
 export class SkillParser extends Parser<'skill'> {
     protected readonly parseType = 'skill';
 
-    constructor(private existingItems: Item.Stored<'skill'>[]) {
+    constructor(private readonly existingItems: Item.Stored<'skill'>[]) {
         super();
     }
 

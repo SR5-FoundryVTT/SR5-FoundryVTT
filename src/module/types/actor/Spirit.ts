@@ -14,11 +14,7 @@ const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fie
 const SpiritData = () => ({
     // === Core Identity ===
     ...CommonData(),
-    spiritType: new StringField({
-        required: true,
-        initial: 'air',
-        choices: SR5.spiritTypes
-    }),
+    spiritType: new StringField({ required: true }),
     full_defense_attribute: new StringField({
         required: true,
         initial: "willpower",
@@ -30,7 +26,7 @@ const SpiritData = () => ({
 
     // === Attributes & Limits ===
     attributes: new SchemaField({
-        ...Attributes(),
+        ...Attributes({ isSpirit: true }),
         force: new ModifiableField(AttributeField()),
     }),
     limits: new SchemaField({ ...Limits(), ...AwakendLimits() }),
@@ -41,12 +37,17 @@ const SpiritData = () => ({
 
     // === Combat ===
     armor: new SchemaField(ActorArmorData()),
-    initiative: new SchemaField(Initiative('astral', 'meatspace')),
     wounds: new ModifiableField(ModifiableValueSchema()),
+    initiative: new SchemaField(Initiative({
+        astral: { attributeA: 'force', attributeB: 'force', constant: 0, dice: 3 },
+        meatspace: { attributeA: 'reaction', attributeB: 'intuition', constant: 0, dice: 2 },
+    })),
 
     // === Condition & Movement ===
     track: new SchemaField(Tracks('physical', 'stun')),
     movement: new SchemaField(Movement()),
+
+    half_value_skill: new BooleanField({ initial: false }),
 
     // === Summoning ===
     summonerUuid: new StringField({ required: true }),
@@ -60,10 +61,6 @@ const SpiritData = () => ({
     modifiers: new SchemaField(CreateModifiers(
         // Limits
         "physical_limit", "astral_limit", "social_limit", "mental_limit",
-        // Initiative
-        "astral_initiative", "astral_initiative_dice",
-        "matrix_initiative", "matrix_initiative_dice",
-        "meat_initiative", "meat_initiative_dice",
         // Tracks
         "stun_track", "matrix_track", "physical_track", "physical_overflow_track",
         // Movement
