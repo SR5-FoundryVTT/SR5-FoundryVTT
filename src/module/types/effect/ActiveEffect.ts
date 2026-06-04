@@ -1,7 +1,7 @@
 import { SR5 } from '@/module/config';
 import { TagifyField } from '@/module/types/fields/TagifyField';
 
-const { SchemaField, BooleanField, StringField } = foundry.data.fields;
+const { BooleanField, StringField } = foundry.data.fields;
 
 type ActiveEffectChangeSchema = {
     key: foundry.data.fields.StringField;
@@ -23,36 +23,11 @@ const SR5ActiveEffectData = {
     onlyForWireless: new BooleanField(),
     onlyForItemTest: new BooleanField(),
 
-    selection_attributes: new TagifyField(
-        new SchemaField({
-            value: new StringField({ required: true, nullable: false }),
-            id: new StringField({ required: true, nullable: false }),
-        })
-    ),
-    selection_categories: new TagifyField(
-        new SchemaField({
-            value: new StringField({ required: true, nullable: false }),
-            id: new StringField({ required: true, nullable: false }),
-        })
-    ),
-    selection_limits: new TagifyField(
-        new SchemaField({
-            value: new StringField({ required: true, nullable: false }),
-            id: new StringField({ required: true, nullable: false }),
-        })
-    ),
-    selection_skills: new TagifyField(
-        new SchemaField({
-            value: new StringField({ required: true, nullable: false }),
-            id: new StringField({ required: true, nullable: false }),
-        })
-    ),
-    selection_tests: new TagifyField(
-        new SchemaField({
-            value: new StringField({ required: true, nullable: false }),
-            id: new StringField({ required: true, nullable: false }),
-        })
-    ),
+    selection_attributes: new TagifyField(),
+    selection_categories: new TagifyField(),
+    selection_limits: new TagifyField(),
+    selection_skills: new TagifyField(),
+    selection_tests: new TagifyField(),
 }
 
 // TODO: fvtt - v14 - Extend V14 datamodel with v13 fvtt types providing some v14 typing.

@@ -2,7 +2,9 @@ import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { SR5TestFactory } from './utils';
 import { DataDefaults } from '@/module/data/DataDefaults';
 import { Migrator } from '@/module/migrator/Migrator';
+import { Version0_32_0 } from '@/module/migrator/versions/Version0_32_0';
 import { Version0_33_1 } from '@/module/migrator/versions/Version0_33_1';
+import { Version0_36_0 } from '@/module/migrator/versions/Version0_36_0';
 
 export const Migrators = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -333,4 +335,45 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
     });
 
+    describe('Version0_36_0 active effect selection migration', () => {
+        it('migrates legacy object selections to string id arrays', () => {
+            const migrator = new Version0_36_0();
+            const effect: any = {
+                system: {
+                    selection_attributes: [{ id: 'body', value: 'Body' }],
+                    selection_categories: [{ id: 'social', value: 'Social' }],
+                    selection_limits: [{ id: 'physical', value: 'Physical' }],
+                    selection_skills: [{ id: 'automatics', value: 'Automatics' }],
+                    selection_tests: [{ id: 'SuccessTest', value: 'Success Test' }],
+                },
+            };
+
+            assert.isTrue(migrator.handlesActiveEffect(effect));
+
+            migrator.migrateActiveEffect(effect);
+
+            assert.deepEqual(effect.system.selection_attributes, ['body']);
+            assert.deepEqual(effect.system.selection_categories, ['social']);
+            assert.deepEqual(effect.system.selection_limits, ['physical']);
+            assert.deepEqual(effect.system.selection_skills, ['automatics']);
+            assert.deepEqual(effect.system.selection_tests, ['SuccessTest']);
+        });
+
+        it('keeps string selections unchanged and drops invalid entries', () => {
+            const migrator = new Version0_36_0();
+            const effect: any = {
+                system: {
+                    selection_attributes: ['body', null, { nope: true }],
+                    selection_skills: ['automatics'],
+                },
+            };
+
+            assert.isTrue(migrator.handlesActiveEffect(effect));
+
+            migrator.migrateActiveEffect(effect);
+
+            assert.deepEqual(effect.system.selection_attributes, ['body']);
+            assert.deepEqual(effect.system.selection_skills, ['automatics']);
+        });
+    });
 };

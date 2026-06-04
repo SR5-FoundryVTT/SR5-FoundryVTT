@@ -34,6 +34,15 @@ export const registerBasicHelpers = () => {
         return SkillNamingFlow.localizeSkillName(skill as string);
     });
 
+    /**
+     * Transform a test id (e.g. 'SuccessTest') into its localized test label.
+     * Falls back to the raw id when the test isn't registered.
+     */
+    Handlebars.registerHelper('localizeTest', function (testId: string): string {
+        const test = game.shadowrun5e?.tests?.[testId];
+        return test ? game.i18n.localize(test.label) : testId;
+    });
+
     Handlebars.registerHelper('concatStrings', function (...args) {
         return args.filter(a => typeof a === 'string').join('');
     });

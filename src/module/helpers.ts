@@ -691,24 +691,18 @@ export class Helpers {
      * @param asc Set to true for ascending sorting order and to false for descending order.
      * @return Sorted config values given by the configValues parameter
      */
-    static sortConfigValuesByTranslation(configValues: Record<string, Translation>, asc = true): Record<string, string> {
+    static sortConfigValuesByTranslation(configValues: Record<string, Translation>, asc = true) {
         // Filter entries instead of values to have a store of ids for easy rebuild.
-        const sortedEntries = Object.entries(configValues).sort(([aId, a], [bId, b]) => {
+        const sortedEntries = Object.entries(configValues).sort(([, a], [, b]) => {
             const comparatorA = game.i18n.localize(a);
             const comparatorB = game.i18n.localize(b);
-            // Use String.localeCompare instead of the > Operator to support other alphabets.
-            if (asc)
-                return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
-            else
-                return comparatorA.localeCompare(comparatorB) === 1 ? -1 : 1;
+            const comparison = comparatorA.localeCompare(comparatorB);
+
+            // Multiply by -1 to instantly invert the sort direction
+            return asc ? comparison : -comparison;
         });
 
-        // Rebuild the skills type using the earlier entries.
-        const sortedAsObject = {};
-        for (const [key, translated] of sortedEntries) {
-            sortedAsObject[key] = translated;
-        }
-        return sortedAsObject;
+        return Object.fromEntries(sortedEntries);
     }
 
     /**

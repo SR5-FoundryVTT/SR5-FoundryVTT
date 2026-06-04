@@ -1,7 +1,7 @@
 import { SR5 } from "@/module/config";
 import { BaseValuePair } from "../template/Base";
 import { BaseItemData, ItemBase } from "./ItemBase";
-import { TagifyAltField } from "../fields/TagifyAltField";
+import { TagifyField } from "../fields/TagifyField";
 import { TechnologyPartData } from "../template/Technology";
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
@@ -21,8 +21,8 @@ export const ArmorValueData = () => ({
         pollutant: new SchemaField(BaseValuePair()),
     }),
     immunities: new SchemaField({
-        base: new TagifyAltField(new StringField({ required: true, choices: SR5.armorImmunityTypes })),
-        value: new TagifyAltField(new StringField({ required: true, choices: SR5.armorImmunityTypes })),
+        base: new TagifyField(SR5.armorImmunityTypes),
+        value: new TagifyField(SR5.armorImmunityTypes),
     }),
 });
 

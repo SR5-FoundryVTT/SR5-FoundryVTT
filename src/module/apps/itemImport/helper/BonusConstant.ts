@@ -59,26 +59,20 @@ export class BonusConstant {
         damageresistance: {
             name: "Add Damage Resistance",
             changes: [{ key: "data.pool" }],
-            system: { applyTo: 'test_all', selection_tests: [{ id: "PhysicalResistTest" }] },
+            system: { applyTo: 'test_all', selection_tests: ["PhysicalResistTest"] },
         },
         defensetest: {
             changes: [{ key: "data.pool" }],
-            system: { applyTo: 'test_all', selection_tests: [
-                { value: "Physical Defense", id: "PhysicalDefenseTest" },
-                { value: "Suppression Defense", id: "SuppressionDefenseTest" }
-            ]},
+            system: { applyTo: 'test_all', selection_tests: ["PhysicalDefenseTest", "SuppressionDefenseTest"]},
         },
         dodge: {
             changes: [{ key: "data.pool" }],
-            system: { applyTo: 'test_all', selection_tests: [
-                { value: "Physical Defense", id: "PhysicalDefenseTest" },
-                { value: "Suppression Defense", id: "SuppressionDefenseTest" }
-            ]},
+            system: { applyTo: 'test_all', selection_tests: ["PhysicalDefenseTest", "SuppressionDefenseTest"]},
         },
         drainresist: {
             name: "Add Drain Resistance",
             changes: [{ key: "data.pool" }],
-            system: { applyTo: 'test_all', selection_tests: [{ id: "DrainTest" }] },
+            system: { applyTo: 'test_all', selection_tests: ["DrainTest"] },
         },
         electricityarmor: { changes: [{ key: "system.armor.elements.electricity" }] },
         essencemax: { changes: [{ key: "system.attributes.essence.base" }] },
@@ -86,7 +80,7 @@ export class BonusConstant {
         fadingresist: {
             name: "Add Fading Resistance",
             changes: [{ key: "data.pool" }],
-            system: { applyTo: 'test_all', selection_tests: [{ id: "FadeTest" }] },
+            system: { applyTo: 'test_all', selection_tests: ["FadeTest"] },
         },
         firearmor: { changes: [{ key: "system.armor.elements.fire" }] },
         handling: { changes: [{ key: "system.vehicle_stats.handling" }] },
@@ -104,7 +98,7 @@ export class BonusConstant {
         physicalcmrecovery: {
             name: "Natural Recovery Physical",
             changes: [{ key: "data.pool" }],
-            system: { applyTo: 'test_all', selection_tests: [{ id: "NaturalRecoveryPhysicalTest" }] }
+            system: { applyTo: 'test_all', selection_tests: ["NaturalRecoveryPhysicalTest"] }
         },
         physicallimit: { changes: [{ key: "system.limits.physical" }] },
         reach: { changes: [{ key: "system.modifiers.reach" }] },
@@ -115,12 +109,12 @@ export class BonusConstant {
         spellresistance: {
             name: "Add Spell Resistance",
             changes: [{ key: "data.pool" } ],
-            system: { applyTo: 'test_all', selection_tests: [{ id: "CombatSpellDefenseTest" }] }
+            system: { applyTo: 'test_all', selection_tests: ["CombatSpellDefenseTest"] }
         },
         stuncmrecovery: {
             name: "Natural Recovery Stun",
             changes: [{ key: "data.pool" }],
-            system: { applyTo: 'test_all', selection_tests: [{ id: "NaturalRecoveryStunTest" }] }
+            system: { applyTo: 'test_all', selection_tests: ["NaturalRecoveryStunTest"] }
         }
     } as const satisfies Partial< Record< keyof BonusSchema, AECreateData > >;
 }
