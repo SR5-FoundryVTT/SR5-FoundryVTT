@@ -217,6 +217,21 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
             void this.render();
         });
 
+        html.find('.manual-modifier-create').on('click', event => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const button = event.currentTarget as HTMLButtonElement;
+            const row = button.closest<HTMLLIElement>('.manual-modifier-entry');
+            if (!row) return;
+
+            if (!this._createManualModifierFromRow(row)) return;
+
+            const path = row.dataset.path;
+            if (path) this._expandedList.add(path);
+            void this.render();
+        });
+
         html.find('.modifiable-value .form-fields input[type="number"]').on('keydown', ev => {
             if (ev.key === 'Enter') { ev.preventDefault(); ev.currentTarget.blur(); }
         });
@@ -261,21 +276,6 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
 
             checkbox.checked = !checkbox.checked;
             checkbox.dispatchEvent(new Event('change', { bubbles: true }));
-        });
-
-        html.find('.manual-modifier-create').on('click', event => {
-            event.preventDefault();
-            event.stopPropagation();
-
-            const button = event.currentTarget as HTMLButtonElement;
-            const row = button.closest<HTMLLIElement>('.manual-modifier-entry');
-            if (!row) return;
-
-            if (!this._createManualModifierFromRow(row)) return;
-
-            const path = row.dataset.path;
-            if (path) this._expandedList.add(path);
-            void this.render();
         });
 
         html.find('.modify-roll-header').on('click', event => {
