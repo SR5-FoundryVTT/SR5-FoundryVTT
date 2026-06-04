@@ -396,6 +396,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
                 continue;
             }
 
+            // Don't apply an unneeded override.
             if (valueField.value !== value) {
                 ModifiableValue.addUnique(
                     valueField,
