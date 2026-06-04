@@ -4,7 +4,7 @@ import { DataDefaults } from '@/module/data/DataDefaults';
 import { Migrator } from '@/module/migrator/Migrator';
 import { Version0_32_0 } from '@/module/migrator/versions/Version0_32_0';
 import { Version0_33_1 } from '@/module/migrator/versions/Version0_33_1';
-import { Version0_36_0 } from '@/module/migrator/versions/Version0_36_0';
+import { Version0_36_0 } from 'src/module/migrator/versions/Version0_36_1';
 
 export const Migrators = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
