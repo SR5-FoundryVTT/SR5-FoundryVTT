@@ -1,33 +1,44 @@
 <section class="tab changes{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <header>
-        <div class="key">{{localize "EFFECT.ChangeKey"}}</div>
-        {{#ifne source.system.applyTo "modifier"}}
-        <div class="mode">{{localize "EFFECT.ChangeMode"}}</div>
-        <div class="value">{{localize "EFFECT.ChangeValue"}}</div>
-        <div class="priority">{{localize "EFFECT.ChangePriority"}}</div>
+        <div class="key">{{localize "EFFECT.FIELDS.changes.element.key.label"}}</div>
+        {{#ifne system.applyTo "modifier"}}
+        <div class="type">{{localize "EFFECT.FIELDS.changes.element.type.label"}}</div>
+        <div class="value">{{localize "EFFECT.FIELDS.changes.element.value.label"}}</div>
+        <div class="priority">{{localize "EFFECT.FIELDS.changes.element.priority.label"}}</div>
+        <div class="phase">{{localize "EFFECT.FIELDS.changes.element.phase.label"}}</div>
         {{/ifne}}
-        <div class="controls"><a data-action="addChange"><i class="fa-regular fa-square-plus"></i></a></div>
+        <div class="controls">
+            <a class="inline-control icon" data-action="addChange"><i class="fa-regular fa-square-plus"></i></a>
+        </div>
     </header>
     <ol class="scrollable" data-changes>
-        {{#each source.changes as |change i|}}
-            {{#with @root.fields.changes.element.fields as |changeFields|}}
+        {{#each system.changes as |change i|}}        
+            {{#with @root.systemFields.changes.element.fields as |changeFields|}}
                 <li data-index="{{i}}">
+                    {{!-- FIELDS FOR ALL APPLY TO EFFECTS --}}
                     <div class="key autocomplete-key-{{@root.source.system.applyTo}}">
-                        {{formInput changeFields.key name=(concat "changes." i ".key") value=change.key}}
+                        {{formInput changeFields.key name=(concat "system.changes." i ".key") value=change.key}}
                     </div>
+                    {{!-- FIELDS FOR NON APPLY TO MODIFIER EFFECTS --}}
                     {{#ifne @root.source.system.applyTo "modifier"}}
-                    <div class="mode">
-                        {{formInput changeFields.mode name=(concat "changes." i ".mode") value=change.mode choices=@root.modes}}
+                    <div class="type">
+                        {{formInput changeFields.type name=(concat "system.changes." i ".type") value=change.type choices=@root.changeTypes}}
                     </div>
                     <div class="value autocomplete-value-{{@root.source.system.applyTo}}">
-                        {{formInput changeFields.value name=(concat "changes." i ".value") value=change.value}}
+                        {{!-- Do not use formInput as that renders a giant textblock --}}
+                        {{!-- <input type="text" name="system.changes.{{i}}.value" value="{{change.value}}" /> --}}
+                        {{formInput changeFields.value name=(concat "system.changes." i ".value") value=change.value elementType="input"}}
                     </div>
                     <div class="priority">
-                        {{formInput changeFields.priority name=(concat "changes." i ".priority") value=change.priority
-                                    placeholder=(lookup @root.priorities change.mode) disabled=true}}
+                        {{formInput changeFields.priority name=(concat "system.changes." i ".priority") value=change.priority disabled=true}}
+                    </div>
+                    <div class="phase">
+                        {{formInput changeFields.phase name=(concat "system.changes." i ".phase") value=change.phase disabled=true}}
                     </div>
                     {{/ifne}}
-                    <div class="controls"><a data-action="deleteChange"><i class="fa-solid fa-trash"></i></a></div>
+                    <div class="controls">
+                        <a class="inline-control icon" data-action="deleteChange"><i class="fa-solid fa-trash"></i></a>
+                    </div>
                 </li>
             {{/with}}
         {{/each}}

@@ -173,7 +173,8 @@ export const ActionRollData = (
     roll_mode: new StringField({
         blank: true,
         required: true,
-        choices: CONFIG.Dice.rollModes,
+        // TODO: fvtt-types - type CONFIG.ChatMessage.modes upstream once available
+        choices: (CONFIG.ChatMessage as unknown as { modes: CONFIG.ChatMessage.modes }).modes,
     }),
 });
 

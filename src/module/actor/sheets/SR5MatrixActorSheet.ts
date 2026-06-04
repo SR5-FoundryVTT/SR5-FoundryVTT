@@ -568,7 +568,12 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
                         selected: this.selectedMatrixTarget === persona.uuid,
                     });
                 }
+
+                continue;
             }
+
+            // Keep standalone marked icons visible even when they also add a network mark.
+            targets.push(target);
         }
 
         // Add additional sub-icons based on user wanting to see them.

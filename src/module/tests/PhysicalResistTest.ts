@@ -81,6 +81,10 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
 
         if (!this.data.action.armor || !this.actor) return;
 
+        // Always display at least one armor entry in the breakdown for transparency.
+        // Include Hardened Armor if active, since its auto-hits apply independently.
+        // Include Standard Armor if active, or as a zero-value fallback to confirm 
+        // to the player that armor was checked.
         const armor = this.actor.getArmor(this.data.incomingDamage);
         const addHardenedArmor = armor.hardened.base !== 0 || armor.hardened.changes.length !== 0;
         const addArmor = armor.rating.base !== 0 || armor.rating.changes.length !== 0 || !addHardenedArmor;
@@ -95,6 +99,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
             TestCreator.addCodeTermTrace(this.data, { ...armor.hardened, label: 'SR5.HardenedArmor' });
         }
     }
+
     override calculateBaseValues() {
         super.calculateBaseValues();
         ResistTestDataFlow.calculateBaseValues(this.data);

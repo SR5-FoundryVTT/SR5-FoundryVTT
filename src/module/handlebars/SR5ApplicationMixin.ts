@@ -274,7 +274,7 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
                     if (this.isEditMode) {
                         context.system = this.document.toObject(false).system;
                     } else {
-                        context.system = this.document.getRollData();
+                        context.system = this.document.getRollData({copySystem: true});
                     }
                 }
                 context.systemFields = this.document.system.schema.fields;
@@ -295,7 +295,7 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
                     if (document instanceof SR5Item || document instanceof SR5Actor) {
                         const html = await TextEditor.enrichHTML(document.system.description.value, {
                             secrets: document.isOwner,
-                            rollData: document.getRollData(),
+                            rollData: document.getRollData({copySystem: true}),
                         });
 
                         context.expandedUuids[uuid] = { html };
@@ -376,7 +376,7 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
                 if (document instanceof SR5Item || document instanceof SR5Actor) {
                     html = await TextEditor.enrichHTML((document as any).system.description.value, {
                         secrets: document.isOwner,
-                        rollData: document.getRollData(),
+                        rollData: document.getRollData({copySystem: true}),
                     });
                 } else if (document instanceof SR5ActiveEffect) {
                     html = await TextEditor.enrichHTML(document.description, {

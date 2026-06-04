@@ -129,6 +129,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
         it('stores code term traces for labeled pool and limit parts', async () => {
             window.doNotPopulateDefaultSkills = true;
+
             const actor = await factory.createActor({
                 type: 'character',
                 system: {
@@ -156,7 +157,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             ]);
             
             delete window.doNotPopulateDefaultSkills;
-
 
             const action = DataDefaults.createData('action_roll', {
                 test: 'SuccessTest',

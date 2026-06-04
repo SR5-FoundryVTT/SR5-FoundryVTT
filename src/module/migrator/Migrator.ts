@@ -16,6 +16,8 @@ import { Version0_33_0 } from './versions/Version0_33_0';
 import { Version0_33_1 } from './versions/Version0_33_1';
 import { Version0_34_0 } from './versions/Version0_34_0';
 import { Version0_34_1 } from './versions/Version0_34_1';
+import { Version0_35_1 } from './versions/Version0_35_1';
+import { Version0_36_0 } from './versions/Version0_36_0';
 import { VersionMigration, MigratableDocument, MigratableDocumentName, MigratableDocumentType } from "./VersionMigration";
 
 const { deepClone, setProperty } = foundry.utils;
@@ -60,6 +62,8 @@ export class Migrator {
         new Version0_33_1(),
         new Version0_34_0(),
         new Version0_34_1(),
+        new Version0_35_1(),
+        new Version0_36_0(),
     ] as const;
 
     private static documentsToBeMigrated = 0;
@@ -263,10 +267,14 @@ export class Migrator {
         parent: NonNullable<Parameters<Doc['implementation']['updateDocuments']>[1]>['parent'] = null
     ) {
         this.updateProgressbar();
-        return cls.implementation.updateDocuments(
-            docs.filter(d => d._stats?.systemVersion === this._migrationMark) as any,
-            { diff: false, recursive: false, parent: parent as any }
-        );
+        try {
+            return await cls.implementation.updateDocuments(
+                docs.filter(d => d._stats?.systemVersion === this._migrationMark) as any,
+                { diff: false, recursive: false, parent: parent as any }
+            );
+        } catch (error) {
+            console.error(`Failed migration update for ${cls.documentName} documents (parent: ${parent?.uuid ?? 'none'}).`, error);
+        }
     }
 
     /**
@@ -309,10 +317,14 @@ export class Migrator {
         /* Tokens */
         for (const scene of game.scenes) {
             this.updateProgressbar();
-            await TokenDocument.implementation.updateDocuments(
-                scene.tokens.map(t => t.toObject()),
-                { diff: false, recursive: false, parent: scene }
-            );
+            try {
+                await TokenDocument.implementation.updateDocuments(
+                    scene.tokens.map(t => t.toObject()),
+                    { diff: false, recursive: false, parent: scene }
+                );
+            } catch (error) {
+                console.error(`Failed migration update for Token documents in ${scene.uuid}.`, error);
+            }
         }
 
         /* Finalize Migration */

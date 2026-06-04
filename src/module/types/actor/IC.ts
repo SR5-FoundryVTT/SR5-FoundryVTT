@@ -35,7 +35,9 @@ const ICData = () => ({
 
     // === Condition & Monitoring ===
     track: new SchemaField(Tracks('matrix')),
-    initiative: new SchemaField(Initiative('matrix')),
+    initiative: new SchemaField(Initiative({
+        matrix: { attributeA: 'rating', attributeB: 'rating', constant: 0, dice: 4 },
+    })),
     visibilityChecks: new SchemaField(VisibilityChecks('matrix')),
 
     // === Modifiers ===
@@ -47,8 +49,6 @@ const ICData = () => ({
         "defense_melee",
         "defense_ranged",
         "soak",
-        "matrix_initiative",
-        "matrix_initiative_dice",
         "matrix_track",
         'mark_damage',
         "global"

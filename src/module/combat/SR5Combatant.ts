@@ -4,6 +4,7 @@ import { SR5Roll } from "../rolls/SR5Roll";
 import { Migrator } from "../migrator/Migrator";
 import { CombatRules } from "../rules/CombatRules";
 import { FLAGS, SR, SYSTEM_NAME } from "../constants";
+import { ChatMessageMode } from "../types/global";
 
 export type InitiativeModeOptions = 'meatspace' | 'astral' | 'cold_sim' | 'hot_sim';
 
@@ -100,7 +101,7 @@ export class SR5Combatant extends Combatant<"base"> {
 
         // Calculate adjustments inline
         const diceCountAdjust = (blitz ? SR.initiatives.ranges.dice.max : nextInit.dice.value) - prevInit.dice.value;
-        const baseAdjust = nextInit.base.value - prevInit.base.value;
+        const baseAdjust = nextInit.constant.value - prevInit.constant.value;
 
         const diceRoll = await this._rollD6(Math.abs(diceCountAdjust));
         const diceRolls = diceRoll?.diceResults ?? [];
@@ -180,8 +181,9 @@ export class SR5Combatant extends Combatant<"base"> {
             sound: hasDiceRoll ? CONFIG.sounds.dice : undefined,
         } as ChatMessage.CreateData;
 
-        const rollMode = CONST.DICE_ROLL_MODES[this.hidden ? 'PRIVATE' : 'PUBLIC'];
-        ChatMessage.applyRollMode(messageData, rollMode);
+        const rollMode = this.hidden ? 'gm' : 'public';
+        // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
+        ChatMessage.applyMode(messageData, rollMode);
 
         const message = await foundry.documents.ChatMessage.implementation.create(messageData);
         if (message && hasDiceRoll && data.diceRoll)
@@ -190,7 +192,7 @@ export class SR5Combatant extends Combatant<"base"> {
 
     async playDSNInitiativeAnimation(
         roll: Roll,
-        rollMode: foundry.dice.Roll.Mode,
+        rollMode: ChatMessageMode,
         message: Pick<ChatMessage, 'id' | 'speaker' | 'whisper'>,
     ): Promise<boolean> {
         if (!game.modules.get('dice-so-nice')?.active || !game.dice3d) return false;
@@ -199,8 +201,8 @@ export class SR5Combatant extends Combatant<"base"> {
 
         const users = (message.whisper ?? []).filter((w): w is string => !!w);
         const whisper = users.length > 0 ? users : null;
-        const synchronize = rollMode === CONST.DICE_ROLL_MODES.PUBLIC || !!whisper;
-        const blind = rollMode === CONST.DICE_ROLL_MODES.BLIND;
+        const synchronize = rollMode === 'public' || !!whisper;
+        const blind = rollMode === 'blind';
         const activePlayers = this.players.find((user) => user.active);
         const rollUser = activePlayers ?? this.players[0] ?? game.user;
 

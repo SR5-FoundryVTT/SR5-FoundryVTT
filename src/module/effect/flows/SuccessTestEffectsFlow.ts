@@ -41,12 +41,12 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
             if (this._skipEffectForTestLimitations(effect)) continue;
 
             // Collect all changes of effect left.
-            changes.push(...effect.changes.map(change => {
-                const c = foundry.utils.deepClone(change) as typeof changes[number];
-                // Foundry changes data. references in changes to system. But tests use data.
-                c.key = c.key.replace('system.', 'data.');
+            const effectChanges = effect.system?.changes ?? [];
+            changes.push(...effectChanges.map(change => {
+                const c = foundry.utils.deepClone<typeof changes[number]>(change as any);
+                // TODO: v15 - Foundry used to change data. references in changes to system. But tests use data. 
+                c.key = c.key.replace(/^system\./, 'data.');
                 c.effect = effect;
-                c.priority = c.priority ?? (c.mode * 10);
                 return c;
             }));
             // TODO: What's with the statuses?
@@ -58,7 +58,8 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         // Apply all changes
         for (const change of changes) {
             if (!change.key) continue;
-            change.effect.apply(this.test as any, change);
+            const ActiveEffect = foundry.documents.ActiveEffect.implementation;
+            ActiveEffect.applyChange(this.test as any, change);
         }
     }
 
@@ -134,7 +135,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         // Inject a flag to mark the effect as applied by a test.
         // This is necessary so we can differentiate between effects created and applied.
         for (const effectData of effectsData) {
-            effectData['flags.shadowrun5e.appliedByTest'] = true;
+            effectData['system.appliedByTest'] = true;
         }
 
         if (!game.user?.isGM) {
@@ -149,25 +150,25 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
 
         if (actor === undefined || this.test.item === undefined) return;
 
-            const effectsData: SR5ActiveEffect[] = [];
-            for (const effect of allApplicableDocumentEffects(this.test.item, { applyTo: ['targeted_actor'] })) {
-                const effectData = effect.toObject() as unknown as SR5ActiveEffect;
+        const effectsData: SR5ActiveEffect[] = [];
+        for (const effect of allApplicableDocumentEffects(this.test.item, { applyTo: ['targeted_actor'] })) {
+            const effectData = effect.toObject() as unknown as SR5ActiveEffect;
 
-                // Transform all dynamic values to static values.
-                effectData.changes = effectData.changes.map(change => {
-                    SR5ActiveEffect.resolveDynamicChangeValue(this.test, change as ActiveEffect.ChangeData);
-                    return change;
-                });
+            // Transform all dynamic values to static values.
+            effectData.system.changes = effectData.system.changes.map(change => {
+                SR5ActiveEffect.resolveDynamicChangeValue(this.test, change as unknown as ActiveEffect.ChangeData);
+                return change;
+            });
 
-                effectsData.push(effectData);
-            }
+            effectsData.push(effectData);
+        }
 
         for (const effect of allApplicableItemsEffects(this.test.item, { applyTo: ['targeted_actor'], nestedItems: false })) {
             const effectData = effect.toObject() as unknown as SR5ActiveEffect;
 
             // Transform all dynamic values to static values.
-            effectData.changes = effectData.changes.map(change => {
-                SR5ActiveEffect.resolveDynamicChangeValue(this.test, change as ActiveEffect.ChangeData);
+            effectData.system.changes = effectData.system.changes.map(change => {
+                SR5ActiveEffect.resolveDynamicChangeValue(this.test, change as unknown as ActiveEffect.ChangeData);
                 return change;
             });
 
