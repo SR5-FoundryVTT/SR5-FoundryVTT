@@ -56,5 +56,25 @@ export const shadowrunSR5ICDataPrep = (context: QuenchBatchContext) => {
                 assert.strictEqual(skill?.value, 5, skillId);
             }
         });
+
+        it('custom matrix initiative formula is honored for IC', async () => {
+            const ic = await factory.createActor({
+                type: 'ic',
+                system: {
+                    host: { rating: 5 },
+                    initiative: {
+                        matrix: {
+                            attribute_a: 'rating',
+                            attribute_b: '',
+                            constant: { base: 1 },
+                            dice: { base: 2 },
+                        },
+                    },
+                },
+            });
+
+            assert.strictEqual(ic.system.initiative.matrix.constant.value, 6);
+            assert.strictEqual(ic.system.initiative.matrix.dice.value, 2);
+        });
     });
 };

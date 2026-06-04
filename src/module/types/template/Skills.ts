@@ -2,7 +2,7 @@ import { SR5 } from "@/module/config";
 import { ModifiableValueSchema } from "./Base";
 import { ModifiableField } from "../fields/ModifiableField";
 import { FixedTypeObjectField } from "../fields/FixedTypeObjectField";
-const { SchemaField, BooleanField, ArrayField, StringField, TypedObjectField, HTMLField } = foundry.data.fields;
+const { BooleanField, ArrayField, StringField, TypedObjectField, HTMLField } = foundry.data.fields;
 
 export type SkillCategories = 'active' | 'language' | 'knowledge';
 

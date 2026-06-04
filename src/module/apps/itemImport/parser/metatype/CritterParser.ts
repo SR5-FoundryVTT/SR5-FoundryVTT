@@ -1,8 +1,8 @@
 import { Constants } from '../../importer/Constants';
 import { Metatype } from "../../schema/MetatypeSchema";
 import { CompendiumKey } from "../../importer/Constants";
+import { DataDefaults } from '@/module/data/DataDefaults';
 import { MetatypeParserBase } from './MetatypeParserBase';
-import { DataDefaults } from 'src/module/data/DataDefaults';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { KnowledgeSkillCategory } from "src/module/types/template/Skills";
 
@@ -31,6 +31,7 @@ export class CritterParser extends MetatypeParserBase<'character'> {
                         rating: Number(skill.$.rating ?? 0) || 0,
                     }
                 }),
+                effects: [],
             };
 
             result.push(item as Item.Source);
@@ -60,8 +61,8 @@ export class CritterParser extends MetatypeParserBase<'character'> {
             system.special = 'resonance';
 
         system.karma.value = Number(jsonData.karma?._TEXT || 0);
-
         this.applyMovement(system, jsonData);
+        this.parseInitiative(system, jsonData, { mode: 'meatspace' });
 
         system.is_npc = true;
         system.is_critter = true;
@@ -101,7 +102,12 @@ export class CritterParser extends MetatypeParserBase<'character'> {
         const allQualities = await IH.findItems('Quality', [...qualitiesList, ...biowareList]);
 
         const critterName = name._TEXT;
+        const naturalWeapons = this.getNaturalWeapons(
+            this.mergeLists(powers?.power, optionalPowers), { actorName: critterName }
+        );
+
         return [
+            ...naturalWeapons,
             ...knowledgeSkillItems,
             ...this.getMetatypeItems(allSpells, spellsData, { type: 'Spell', critter: critterName }),
             ...this.getMetatypeItems(allPowers, optionalPowers, { type: 'Power', critter: critterName }),

@@ -80,14 +80,14 @@
         <div class="sheet-header-col">
             {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/initiative.hbs' }}
             {{#if @root.isEditMode}}
-                <div>
-                    <div class="list-item">
-                        <div class="list-item-start">
+                <div class="sheet-header-resource-container">
+                    <div class="list-item sheet-header-resource">
+                        <div class="list-item-start sheet-header-resource-label">
                             <label data-tooltip="{{systemFields.attributes.fields.edge.fields.base.hint}}">
                                 {{systemFields.attributes.fields.edge.fields.base.label}}
                             </label>
                         </div>
-                        <div class="list-item-col">
+                        <div class="list-item-col sheet-header-resource-value">
                             {{formInput systemFields.attributes.fields.edge.fields.base value=source.system.attributes.edge.base
                                         rootId=rootId class="short"}}
                         </div>
@@ -116,12 +116,12 @@
                 </div>
             {{/if}}
             {{#if (or isSpirit isSprite)}}
-                <div>
-                    <div class="list-item">
-                        <div class="list-item-start">
+                <div class="sheet-header-resource-container">
+                    <div class="list-item sheet-header-resource">
+                        <div class="list-item-start sheet-header-resource-label">
                             <label>{{localize "SR5.Sprite.Services"}}</label>
                         </div>
-                        <div class="list-item-col qty-input-col hover-show-button-container"
+                        <div class="list-item-col sheet-header-resource-value qty-input-col hover-show-button-container"
                              data-tooltip="{{#if isSpirit}}SR5.Spirit.Services{{else}}SR5.Sprite.Services{{/if}}">
                             {{#if @root.isEditMode}}
                                 {{formInput systemFields.services value=source.system.services rootId=rootId class="short"}}
@@ -131,7 +131,7 @@
                                    data-tooltip="SR5.Tooltips.Actor.RemoveOneService">
                                     <i class="fas fa-minus-square"></i>
                                 </a>
-                                <label style="font-size: 1.1rem">{{system.services}}</label>
+                                <label class="sheet-header-service-value">{{system.services}}</label>
                                 <a class="hover-show-button"
                                    data-action="addOneService"
                                    data-tooltip="SR5.Tooltips.Actor.AddOneService">

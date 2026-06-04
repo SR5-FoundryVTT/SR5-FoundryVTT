@@ -50,11 +50,12 @@ export class BonusHelper {
         });
     }
 
-    public static addBonus(sheet: BC.DocCreateData, bonus: BonusSchema) {
+    public static addBonus(sheet: BC.DocCreateData, bonus?: BonusSchema): void {
+        if (!bonus) return;
         this.addEffects(sheet, bonus);
     }
 
-    private static addEffects(sheet: BC.DocCreateData, bonus: BonusSchema) {
+    private static addEffects(sheet: BC.DocCreateData, bonus: BonusSchema): void {
         sheet.effects ??= [];
 
         for (const [key, data] of Object.entries(bonus)) {
