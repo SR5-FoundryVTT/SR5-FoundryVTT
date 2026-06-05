@@ -5,6 +5,7 @@ import { SR5Actor } from "../actor/SR5Actor";
 import { Translation } from '../utils/strings';
 import { LinksHelpers } from '@/module/utils/links';
 import { SkillNamingFlow } from '../flows/SkillNamingFlow';
+import { humanizePresetTypeKey } from '../data/SpiritSpritePresetProfiles';
 
 export const registerBasicHelpers = () => {
     /**
@@ -15,6 +16,18 @@ export const registerBasicHelpers = () => {
     Handlebars.registerHelper('localizeOb', function (strId, obj) {
         if (obj) strId = obj[strId];
         return game.i18n.localize(strId);
+    });
+
+    /**
+     * Localize a stable type key using a config map (e.g. config.spiritTypes).
+     * Falls back to a humanized form of the key for unknown/custom values.
+     * Used in play mode for spiritType and spriteType display.
+     */
+    Handlebars.registerHelper('localizeTypeOr', function (key: string, configMap: Record<string, string>) {
+        if (!key) return '';
+        const i18nKey = configMap?.[key];
+        if (i18nKey) return game.i18n.localize(i18nKey as Translation);
+        return humanizePresetTypeKey(key);
     });
 
     Handlebars.registerHelper('localizeDocumentType', function (document) {

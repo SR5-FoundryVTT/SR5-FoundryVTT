@@ -64,7 +64,7 @@ export const spiritImporterTesting = (context: QuenchBatchContext) => {
             assert.notEqual(fallbackSpirit, null, 'Spirit fallback import failed');
             factory.actors.push(fallbackSpirit as Actor.Stored<'spirit'>);
 
-            assert.strictEqual(fallbackSpirit!.system.spiritType, 'Fire');
+            assert.strictEqual(fallbackSpirit!.system.spiritType, 'fire');
             assert.strictEqual(fallbackSpirit!.system.half_value_skill, false);
             assert.strictEqual(fallbackSpirit!.system.attributes.body.applies_special, true);
             assert.strictEqual(fallbackSpirit!.system.attributes.magic.applies_special, true);

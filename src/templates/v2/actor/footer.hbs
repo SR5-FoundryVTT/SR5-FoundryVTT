@@ -97,10 +97,10 @@
         {{#if (eq actor.type 'spirit')}}
             {{#if @root.isEditMode}}
                 <span>
-                    {{formInput systemFields.spiritType value=source.system.spiritType classes="short" rootId=rootId }}
+                    {{formInput systemFields.spiritType value=source.system.spiritType options=config.spiritTypes classes="short" rootId=rootId }}
                 </span>
             {{else}}
-                <label>{{#if system.spiritType}}{{system.spiritType}}&nbsp;{{/if}}{{localize (concat 'TYPES.Actor.' actor.type)}}</label>
+                <label>{{#if system.spiritType}}{{localizeTypeOr system.spiritType config.spiritTypes}}&nbsp;{{/if}}{{localize (concat 'TYPES.Actor.' actor.type)}}</label>
             {{/if}}
             <div class="basic-row">
                 <label>{{localize "SR5.Force"}}</label>
@@ -127,11 +127,10 @@
         {{#if (eq actor.type 'sprite')}}
             {{#if @root.isEditMode}}
                 <span>
-                    {{formInput systemFields.spriteType value=source.system.spriteType
-                                classes="short" rootId=rootId }}
+                    {{formInput systemFields.spriteType value=source.system.spriteType options=config.spriteTypes classes="short" rootId=rootId }}
                 </span>
             {{else}}
-                <label>{{#if system.spriteType}}{{system.spriteType}}&nbsp;{{/if}}{{localize (concat 'TYPES.Actor.' actor.type)}}</label>
+                <label>{{#if system.spriteType}}{{localizeTypeOr system.spriteType config.spriteTypes}}&nbsp;{{/if}}{{localize (concat 'TYPES.Actor.' actor.type)}}</label>
             {{/if}}
             <div class="basic-row">
                 <label>{{localize "SR5.Sprite.Level"}}</label>

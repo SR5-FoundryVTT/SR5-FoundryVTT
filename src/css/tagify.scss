@@ -9,4 +9,37 @@
         border: 1px solid var(--sr5v2-control-border);
         width: 100%;
     }
+
+    // single-value tagify select (spirit/sprite type picker)
+    .tagify-select {
+        // theme colours
+        --tag-text-color: var(--sr5v2-control-text);
+        --tag-text-color--edit: var(--sr5v2-control-text);
+        --input-color: var(--sr5v2-control-text);
+        --placeholder-color: rgba(240, 237, 228, 0.4);
+        --tags-border-color: var(--sr5v2-control-border);
+        --tags-hover-border-color: var(--sr5v2-control-border-hover);
+        --tags-focus-border-color: var(--sr5v2-control-border-hover);
+
+        // make the selected tag blend into the control background, not a chip
+        --tag-bg: transparent;
+        --tag-hover: transparent;
+        --tag-pad: 0.15em 0.3em;
+
+        background: var(--sr5v2-control-bg-strong);
+        border-radius: 4px;
+        min-width: 14em;
+
+        // tighten vertical size
+        &.tagify--select .tagify__tag {
+            margin-block: 0;
+            padding-block: 2px;
+        }
+
+        .tagify__input {
+            min-height: unset;
+            margin: 2px 4px;
+            padding: 1px 3px;
+        }
+    }
 }

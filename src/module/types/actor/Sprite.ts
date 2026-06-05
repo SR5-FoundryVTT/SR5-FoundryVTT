@@ -6,6 +6,7 @@ import { ModifiableField } from '../fields/ModifiableField';
 import { ActorBase, CommonData, CreateModifiers } from "./Common";
 import { Tracks } from '@/module/types/template/ConditionMonitors';
 import { AttributeField, Attributes, MatrixActorAttributes } from '../template/Attributes';
+import { TagifySelectField } from '../fields/TagifySelectField';
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const SpriteData = () => ({
@@ -17,7 +18,7 @@ const SpriteData = () => ({
         resonance: new ModifiableField(AttributeField({ limit: "mental", appliesSpecial: true })),
         level: new ModifiableField(AttributeField()),
     }),
-    spriteType: new StringField({ required: true }),
+    spriteType: new TagifySelectField(),
     special: new StringField({ required: true, initial: "resonance", choices: ["resonance"], readonly: true }),
 
     // === Matrix & Host ===

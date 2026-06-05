@@ -2,6 +2,7 @@ import { Metatype } from "../../schema/MetatypeSchema";
 import { CompendiumKey } from "../../importer/Constants";
 import { MetatypeParserBase } from './MetatypeParserBase';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
+import { normalizeSpiritTypeForPreset } from "@/module/data/SpiritSpritePresetProfiles";
 
 const FORCE_OFFSET_ATTRIBUTE_MAP = {
     body: 'bodmin',
@@ -25,19 +26,10 @@ export class SpiritParser extends MetatypeParserBase<'spirit'> {
         const category = jsonData.category?._TEXT;
         const name = jsonData.name?._TEXT || "";
 
-        if (category === "Insect Spirits") {
-            system.spiritType = name.split(/[ /]/)[0];
-        }  else if (category === "Ritual") {
+        if (category === "Ritual") {
             system.attributes.edge.base = Number(jsonData.edgmin?._TEXT) || 0;
-            system.spiritType = ["Watcher", "Corps Cadavre"].includes(name) ? name : "Homunculus";
-        }  else {
-            system.spiritType = name
-                .replace(" Spirit", "")
-                .replace("Spirit of ", "")
-                .replace(" (Demon)", "")
-                .replace(/[\s-]/g, "_")
-                .split("/")[0];
         }
+        system.spiritType = normalizeSpiritTypeForPreset(name);
 
         system.half_value_skill = jsonData.skills?.skill?.some(s => s.$.rating === "F/2") ?? false;
         this.applyForceOffsetAttributes(system, jsonData);

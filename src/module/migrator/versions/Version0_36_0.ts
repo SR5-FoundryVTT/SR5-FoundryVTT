@@ -8,7 +8,6 @@ import {
     type SpiritProfileInitiative,
     type SpiritInitiativeFormula,
     type SpriteAttributeId,
-    humanizePresetTypeKey,
 } from '@/module/data/SpiritSpritePresetProfiles';
 
 const { hasProperty, setProperty, getProperty } = foundry.utils;
@@ -72,10 +71,9 @@ export class Version0_36_0 extends VersionMigration {
         const system = actor.system;
         if (!system || typeof system !== 'object') return;
 
-        const spiritType = typeof system.spiritType === 'string' ? system.spiritType.trim().toLowerCase() : '';
+        const spiritType = typeof system.spiritType === 'string' ? system.spiritType : '';
         const profile = PRESET_SPIRIT_PROFILES[spiritType as keyof typeof PRESET_SPIRIT_PROFILES];
         if (!profile) return;
-        system.spiritType = humanizePresetTypeKey(spiritType);
 
         const forceOff = new Set(profile.forceOff ?? []);
 
@@ -127,10 +125,9 @@ export class Version0_36_0 extends VersionMigration {
         setProperty(system, 'attributes.level.base', getProperty(system, 'level'));
         delete system.level;
 
-        const spriteType = typeof system.spriteType === 'string' ? system.spriteType.trim().toLowerCase() : '';
+        const spriteType = typeof system.spriteType === 'string' ? system.spriteType : '';
         const profile = PRESET_SPRITE_PROFILES[spriteType];
         if (!profile) return;
-        system.spriteType = humanizePresetTypeKey(spriteType);
 
         this.migrateSkillToggles(actor, profile.skills);
         this.migrateSpriteAttributeOffsets(system, profile.offsets ?? {}, profile.levelOff);

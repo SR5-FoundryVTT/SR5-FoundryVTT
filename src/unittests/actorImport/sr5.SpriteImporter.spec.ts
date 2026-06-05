@@ -66,7 +66,7 @@ export const spriteImporterTesting = (context: QuenchBatchContext) => {
             assert.notEqual(fallbackSprite, null, 'Sprite fallback import failed');
             factory.actors.push(fallbackSprite as Actor.Stored<'sprite'>);
 
-            assert.strictEqual(fallbackSprite!.system.spriteType, 'Companion');
+            assert.strictEqual(fallbackSprite!.system.spriteType, 'companion');
             assert.strictEqual(fallbackSprite!.system.attributes.resonance.applies_special, true);
             assert.strictEqual(fallbackSprite!.system.matrix.attack.applies_special, true);
             assert.strictEqual(fallbackSprite!.system.matrix.sleaze.applies_special, true);

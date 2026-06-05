@@ -9,12 +9,13 @@ import { AwakendLimits, Limits } from "../template/Limits";
 import { ModifiableField } from "../fields/ModifiableField";
 import { AttributeField, Attributes } from '../template/Attributes';
 import { CommonData, PhysicalCombatValues, CreateModifiers, MagicData, ActorBase } from "./Common";
+import { TagifySelectField } from '../fields/TagifySelectField';
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const SpiritData = () => ({
     // === Core Identity ===
     ...CommonData(),
-    spiritType: new StringField({ required: true }),
+    spiritType: new TagifySelectField(),
     full_defense_attribute: new StringField({
         required: true,
         initial: "willpower",
