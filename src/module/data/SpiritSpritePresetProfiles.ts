@@ -514,13 +514,6 @@ const normalizeMetatypeProfileKey = (value: string): string => value
     .replace(/^_+|_+$/g, '')
     .replace(/_+/g, '_');
 
-export const humanizePresetTypeKey = (key: string): string => key
-    .replace(/_/g, ' ')
-    .split(' ')
-    .filter(Boolean)
-    .map(word => word[0].toUpperCase() + word.slice(1))
-    .join(' ');
-
 export const normalizeSpiritTypeForPreset = (metatypeEnglish: string): string => normalizeMetatypeProfileKey(metatypeEnglish)
     .replace(/^spirit_of_/, '')
     .replace(/^spirit_/, '')
