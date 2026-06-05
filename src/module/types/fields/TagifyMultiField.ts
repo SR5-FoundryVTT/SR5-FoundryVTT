@@ -20,7 +20,7 @@ type TagifyInitialized<Choices extends StringField.Choices | undefined> =
  * Create an ArrayField that can be used with the Tagify system
  * - the field stores selected tag ids as a string array
  */
-export class TagifyField<
+export class TagifyMultiField<
     const Choices extends StringField.Choices | undefined = undefined,
 > extends ArrayField<TagifyElement<Choices>> {
     constructor(choices?: Choices) {

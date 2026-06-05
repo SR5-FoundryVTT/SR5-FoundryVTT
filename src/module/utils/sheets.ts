@@ -30,18 +30,16 @@ function localizeWhitelist(whitelist: TagifyValues) {
  * @param element   The input element to attach Tagify to.
  * @param whitelist Option sources — each entry has a stable id and an i18n label key.
  * @param selected  Tags to pre-select — each entry has a stable id and a localized value.
- * @param onChangeCallback  Optional change event handler.
  */
-export function createTagifyOnInput(
+export function createTagifyMulti(
     element: HTMLInputElement,
     whitelist: TagifyValues,
     selected: TagifyTags,
-    onChangeCallback?: (event: Event) => void,
-): Tagify {
+): Tagify<TagifyTag> {
     const tagifyWhitelist = localizeWhitelist(whitelist);
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-    const tagify = new Tagify(element, {
+    const tagify = new Tagify<TagifyTag>(element, {
         enforceWhitelist: true,
         editTags: false,
         skipInvalid: true,
@@ -50,8 +48,6 @@ export function createTagifyOnInput(
 
     tagify.whitelist = tagifyWhitelist;
     tagify.addTags(selected);
-
-    if (onChangeCallback) element.addEventListener('change', onChangeCallback);
 
     return tagify;
 }
@@ -66,21 +62,21 @@ export function createTagifyOnInput(
  * @param whitelist     Option sources — each entry has a stable id and an i18n label key.
  * @param currentValue  The currently stored value (stable key or free-form text).
  */
-export function createSingleSelectTagifyOnInput(
+export function createTagifySelect(
     element: HTMLInputElement,
     whitelist: TagifyValues,
     currentValue: string,
-): Tagify {
+): Tagify<TagifyTag> {
     const tagifyWhitelist = localizeWhitelist(whitelist);
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-    const tagify = new Tagify(element, {
+    const tagify = new Tagify<TagifyTag>(element, {
         mode: 'select',
         enforceWhitelist: false,
         editTags: 1,
         addTagOnBlur: true,
         skipInvalid: false,
-        originalInputValueFormat: (vals: Tagify.TagData[]) => {
+        originalInputValueFormat: (vals) => {
             const tag = vals[0];
             if (!tag) return '';
             return tagifyWhitelist.find(w => w.value === tag.value)?.id ?? tag.value ?? '';

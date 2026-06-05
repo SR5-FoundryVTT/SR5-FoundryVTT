@@ -1,4 +1,4 @@
-import { createTagifyOnInput, createSingleSelectTagifyOnInput, TagifyTags, TagifyValues } from '@/module/utils/sheets';
+import { createTagifyMulti, createTagifySelect, TagifyTags, TagifyValues } from '@/module/utils/sheets';
 
 export const TagifyHooks = {
     registerHooks: () => {
@@ -9,7 +9,8 @@ export const TagifyHooks = {
                 const values = JSON.parse(element.getAttribute('value') ?? '[]') as TagifyTags;
                 const options = JSON.parse(element.getAttribute('options') ?? '[]') as TagifyValues;
 
-                createTagifyOnInput(element, options, values, (event) => {
+                createTagifyMulti(element, options, values);
+                element.addEventListener('change', (event) => {
                     if (event.currentTarget) {
                         const target = event.currentTarget as HTMLInputElement & { tagifyValue: string };
                         target.setAttribute('value', target.tagifyValue);
@@ -22,7 +23,7 @@ export const TagifyHooks = {
             for (const element of selectElements) {
                 const currentValue = element.getAttribute('value') ?? '';
                 const options = JSON.parse(element.getAttribute('options') ?? '[]') as TagifyValues;
-                createSingleSelectTagifyOnInput(element, options, currentValue);
+                createTagifySelect(element, options, currentValue);
             }
         })
     }

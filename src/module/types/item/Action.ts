@@ -2,7 +2,7 @@ import { SR5 } from "@/module/config";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { ModifiableField } from "../fields/ModifiableField";
 import { ModifiableValueLinked, BaseValuePair, ChangeList } from "../template/Base";
-import { TagifyField } from '@/module/types/fields/TagifyField';
+import { TagifyMultiField } from '@/module/types/fields/TagifyMultiField';
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const ResultActionData = () => ({
@@ -144,12 +144,12 @@ export const ActionRollData = (
     test: new StringField({ required: true, initial: test }),
     type: new StringField({ required: true, initial: type, blank: true, choices: SR5.actionTypes }),
     category: new SchemaField(ActionCategory()),
-    categories: new TagifyField(),
+    categories: new TagifyMultiField(),
     spec: new BooleanField(),
     mod_description: new StringField({ required: true }),
     threshold: new SchemaField(BaseValuePair()),
     extended: new BooleanField({ initial: false }),
-    modifiers: new TagifyField(),
+    modifiers: new TagifyMultiField(),
     damage: new ModifiableField(DamageData({ normal_weapon })),
     opposed: OpposedActionRollData({ opposedTest, resistTest }),
     followed: new SchemaField({

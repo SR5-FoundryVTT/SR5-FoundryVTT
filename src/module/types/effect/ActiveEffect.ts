@@ -1,5 +1,5 @@
 import { SR5 } from '@/module/config';
-import { TagifyField } from '@/module/types/fields/TagifyField';
+import { TagifyMultiField } from '@/module/types/fields/TagifyMultiField';
 
 const { BooleanField, StringField } = foundry.data.fields;
 
@@ -23,11 +23,11 @@ const SR5ActiveEffectData = {
     onlyForWireless: new BooleanField(),
     onlyForItemTest: new BooleanField(),
 
-    selection_attributes: new TagifyField(),
-    selection_categories: new TagifyField(),
-    selection_limits: new TagifyField(),
-    selection_skills: new TagifyField(),
-    selection_tests: new TagifyField(),
+    selection_attributes: new TagifyMultiField(),
+    selection_categories: new TagifyMultiField(),
+    selection_limits: new TagifyMultiField(),
+    selection_skills: new TagifyMultiField(),
+    selection_tests: new TagifyMultiField(),
 }
 
 // TODO: fvtt - v14 - Extend V14 datamodel with v13 fvtt types providing some v14 typing.
