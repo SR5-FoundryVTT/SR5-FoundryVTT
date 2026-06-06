@@ -1,13 +1,101 @@
 @use "config/variables";
 
 .sr5v2 {
+    --sr5v2-tagify-bg: #080a0e;
+    --sr5v2-tagify-bg-hover: #12151b;
+    --sr5v2-tagify-tag-bg: #55101e;
+    --sr5v2-tagify-tag-bg-hover: #6d1a2c;
+    --sr5v2-tagify-tag-text: #f0ede4;
+    --sr5v2-tagify-tag-remove-bg: rgba(255, 255, 255, 0.18);
+    --sr5v2-tagify-tag-remove-text: #f0ede4;
+    --sr5v2-tagify-tag-remove-hover-text: #ffffff;
 
     // change tagify input selection to match our theme better
     .tagify-selection {
+        --tag-bg: var(--sr5v2-tagify-tag-bg);
+        --tag-hover: var(--sr5v2-tagify-tag-bg-hover);
+        --tag-text-color: var(--sr5v2-tagify-tag-text);
+        --tag-text-color--edit: var(--sr5v2-tagify-tag-text);
+        --tag-remove-bg: var(--sr5v2-tagify-tag-remove-bg);
+        --tag-remove-btn-color: var(--sr5v2-tagify-tag-remove-text);
+        --tag-remove-btn-bg: transparent;
+        --tag-remove-btn-bg--hover: var(--sr5v2-tagify-tag-remove-bg);
+        --input-color: var(--sr5v2-control-text);
+        --placeholder-color: var(--sr5v2-text-muted);
+        --tags-border-color: var(--sr5v2-control-border);
+        --tags-hover-border-color: var(--sr5v2-control-border-hover);
+        --tags-focus-border-color: var(--sr5v2-control-border-hover);
+        --tags-disabled-bg: var(--sr5v2-tagify-bg);
+        --tag-border-radius: 3px;
+        --tag-pad: 0.2em 0.35em;
+
         border-radius: 4px;
-        background: var(--sr5v2-control-bg-strong);
+        background: var(--sr5v2-tagify-bg);
         border: 1px solid var(--sr5v2-control-border);
         width: 100%;
+        min-height: 1.75rem;
+        color: var(--sr5v2-control-text);
+
+        &:hover,
+        &.tagify--focus {
+            background: var(--sr5v2-tagify-bg-hover);
+        }
+
+        &[disabled],
+        &[readonly] {
+            background: var(--sr5v2-tagify-bg);
+            filter: none;
+            opacity: 1;
+            pointer-events: none;
+
+            .tagify__tag {
+                opacity: 0.95;
+            }
+
+            .tagify__tag > div {
+                color: var(--sr5v2-tagify-tag-text);
+            }
+
+            .tagify__tag > div::before,
+            .tagify__tag[readonly] > div::before {
+                animation: none !important;
+                background: none !important;
+                box-shadow: 0 0 0 var(--tag-inset-shadow-size) var(--sr5v2-tagify-tag-bg) inset !important;
+                filter: none !important;
+            }
+        }
+
+        .tagify__tag {
+            margin: 3px 0 3px 4px;
+            max-width: calc(100% - 8px);
+
+            > div {
+                min-width: 0;
+            }
+        }
+
+        .tagify__tag-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .tagify__tag__removeBtn {
+            color: var(--sr5v2-tagify-tag-remove-text);
+            margin-inline: 0 4px;
+            opacity: 0.85;
+            transition: opacity 120ms ease, background 120ms ease, color 120ms ease;
+
+            &:hover {
+                color: var(--sr5v2-tagify-tag-remove-hover-text);
+                opacity: 1;
+            }
+        }
+
+        .tagify__input {
+            margin: 3px 4px;
+            padding: 0.2em 0.35em;
+        }
     }
 
     // single-value tagify select (spirit/sprite type picker)
@@ -16,30 +104,149 @@
         --tag-text-color: var(--sr5v2-control-text);
         --tag-text-color--edit: var(--sr5v2-control-text);
         --input-color: var(--sr5v2-control-text);
-        --placeholder-color: rgba(240, 237, 228, 0.4);
+        --placeholder-color: var(--sr5v2-text-muted);
         --tags-border-color: var(--sr5v2-control-border);
         --tags-hover-border-color: var(--sr5v2-control-border-hover);
         --tags-focus-border-color: var(--sr5v2-control-border-hover);
+        --tags-disabled-bg: var(--sr5v2-tagify-bg);
 
         // make the selected tag blend into the control background, not a chip
         --tag-bg: transparent;
         --tag-hover: transparent;
         --tag-pad: 0.15em 0.3em;
 
-        background: var(--sr5v2-control-bg-strong);
+        display: inline-flex;
+        align-items: center;
+        color: var(--sr5v2-control-text);
+        background: var(--sr5v2-tagify-bg);
         border-radius: 4px;
+        box-shadow: none;
+        line-height: 1.25rem;
+        min-height: 1.5rem;
         min-width: 14em;
+        transition: border-color 120ms ease, background 120ms ease;
+
+        &:hover,
+        &.tagify--focus {
+            background: var(--sr5v2-tagify-bg-hover);
+        }
+
+        &[disabled],
+        &[readonly] {
+            color: var(--sr5v2-text-muted);
+            opacity: 0.75;
+        }
+
+        &::after {
+            color: var(--sr5v2-control-text);
+            opacity: 0.75;
+            right: 0.15rem;
+        }
 
         // tighten vertical size
         &.tagify--select .tagify__tag {
+            align-items: center;
             margin-block: 0;
+            margin-inline: 0 1.5rem;
             padding-block: 2px;
+            min-width: 0;
+
+            > div {
+                min-width: 0;
+                padding-inline: 0.25rem;
+            }
         }
 
         .tagify__input {
+            flex: 1;
             min-height: unset;
+            min-width: 0;
             margin: 2px 4px;
             padding: 1px 3px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .tagify__tag-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+}
+
+body {
+    --sr5-tagify-dropdown-bg: #080a0e;
+    --sr5-tagify-dropdown-hover-bg: #4b4a44;
+    --sr5-tagify-dropdown-text: #f0ede4;
+    --sr5-tagify-dropdown-border: rgba(215, 209, 195, 0.28);
+    --sr5-tagify-dropdown-label: #ebb531;
+    --sr5-tagify-dropdown-hover-text: #ffffff;
+    --sr5-tagify-dropdown-shadow: 0 0 10px 5px rgba(235, 181, 49, 0.4);
+}
+
+body.theme-light .sr5v2:not(.theme-dark),
+.sr5v2.theme-light {
+    --sr5v2-tagify-bg: #e5e9ee;
+    --sr5v2-tagify-bg-hover: #d9dfe6;
+    --sr5v2-tagify-tag-bg: #6c7480;
+    --sr5v2-tagify-tag-bg-hover: #88919d;
+    --sr5v2-tagify-tag-text: #fff9ef;
+    --sr5v2-tagify-tag-remove-bg: rgba(255, 249, 239, 0.18);
+    --sr5v2-tagify-tag-remove-text: #fff9ef;
+    --sr5v2-tagify-tag-remove-hover-text: #ffffff;
+}
+
+body.theme-light,
+body .tagify__dropdown.sr5-tagify-dropdown-light {
+    --sr5-tagify-dropdown-bg: #e5e9ee;
+    --sr5-tagify-dropdown-hover-bg: #d9dfe6;
+    --sr5-tagify-dropdown-text: #232a33;
+    --sr5-tagify-dropdown-border: rgba(80, 92, 109, 0.22);
+    --sr5-tagify-dropdown-label: #6a4e12;
+    --sr5-tagify-dropdown-hover-text: #171d24;
+    --sr5-tagify-dropdown-shadow: 0 16px 38px rgba(26, 31, 40, 0.18);
+}
+
+body .tagify__dropdown.sr5-tagify-dropdown-dark {
+    --sr5-tagify-dropdown-bg: #080a0e;
+    --sr5-tagify-dropdown-hover-bg: #4b4a44;
+    --sr5-tagify-dropdown-text: #f0ede4;
+    --sr5-tagify-dropdown-border: rgba(215, 209, 195, 0.28);
+    --sr5-tagify-dropdown-label: #ebb531;
+    --sr5-tagify-dropdown-hover-text: #ffffff;
+    --sr5-tagify-dropdown-shadow: 0 0 10px 5px rgba(235, 181, 49, 0.4);
+}
+
+body .tagify__dropdown {
+    --tagify-dd-color-primary: var(--sr5-tagify-dropdown-border);
+    --tagify-dd-bg-color: var(--sr5-tagify-dropdown-bg);
+    --tagify-dd-text-color: var(--sr5-tagify-dropdown-text);
+    --tagify-dd-item-pad: 0.3rem 0.45rem;
+
+    border-top: 1px solid var(--sr5-tagify-dropdown-border);
+    color: var(--sr5-tagify-dropdown-text);
+    font-size: var(--font-size-13, 13px);
+
+    .tagify__dropdown__wrapper {
+        background: var(--sr5-tagify-dropdown-bg);
+        border-color: var(--sr5-tagify-dropdown-border);
+        box-shadow: var(--sr5-tagify-dropdown-shadow);
+    }
+
+    .tagify__dropdown__item {
+        color: var(--sr5-tagify-dropdown-text);
+        border-radius: 3px;
+
+        &:hover,
+        &.tagify__dropdown__item--active {
+            color: var(--sr5-tagify-dropdown-hover-text);
+            background: var(--sr5-tagify-dropdown-hover-bg);
+        }
+
+        &.tagify__dropdown__item--selected {
+            color: var(--sr5-tagify-dropdown-label);
         }
     }
 }

@@ -24,6 +24,14 @@ function localizeWhitelist(whitelist: TagifyValues) {
     return whitelist.map(entry => ({ id: entry.id, value: game.i18n.localize(entry.label) }));
 }
 
+function tagifyDropdownThemeClass(element: HTMLElement) {
+    const sheet = element.closest('.sr5v2');
+    const isLight = sheet?.classList.contains('theme-light')
+        || (!sheet?.classList.contains('theme-dark') && document.body.classList.contains('theme-light'));
+
+    return isLight ? 'sr5-tagify-dropdown-light' : 'sr5-tagify-dropdown-dark';
+}
+
 /**
  * Create a multi-value Tagify instance on an input element.
  *
@@ -43,7 +51,13 @@ export function createTagifyMulti(
         enforceWhitelist: true,
         editTags: false,
         skipInvalid: true,
-        dropdown: { maxItems: tagifyWhitelist.length, fuzzySearch: true, enabled: 0, searchKeys: ['id', 'value'] },
+        dropdown: {
+            maxItems: tagifyWhitelist.length,
+            fuzzySearch: true,
+            enabled: 0,
+            searchKeys: ['id', 'value'],
+            classname: tagifyDropdownThemeClass(element),
+        },
     });
 
     tagify.whitelist = tagifyWhitelist;
@@ -81,7 +95,14 @@ export function createTagifySelect(
             if (!tag) return '';
             return tagifyWhitelist.find(w => w.value === tag.value)?.id ?? tag.value ?? '';
         },
-        dropdown: { maxItems: tagifyWhitelist.length, fuzzySearch: true, enabled: 0, highlightFirst: false, searchKeys: ['id', 'value'] },
+        dropdown: {
+            maxItems: tagifyWhitelist.length,
+            fuzzySearch: true,
+            enabled: 0,
+            highlightFirst: false,
+            searchKeys: ['id', 'value'],
+            classname: tagifyDropdownThemeClass(element),
+        },
     });
 
     tagify.whitelist = tagifyWhitelist;
