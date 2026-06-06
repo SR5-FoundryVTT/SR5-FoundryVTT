@@ -9,7 +9,6 @@ import {
     PRESET_SPIRIT_PROFILES,
     SPIRIT_ATTRIBUTE_IDS,
     type SpiritProfileInitiative,
-    humanizePresetTypeKey,
     normalizeSpiritTypeForPreset,
 } from "@/module/data/SpiritSpritePresetProfiles";
 
@@ -92,7 +91,7 @@ export class SpiritImporter {
             return null;
 
         return this.importFromSeed(chummerData, importOptions, (spirit) => {
-            spirit.system.spiritType = humanizePresetTypeKey(spiritTypeKey);
+            spirit.system.spiritType = spiritTypeKey;
             const forceOff = new Set(profile.forceOff ?? []);
 
             const offsets = profile.attributes ?? {};

@@ -8,7 +8,6 @@ import {
     type SpiritProfileInitiative,
     type SpiritInitiativeFormula,
     type SpriteAttributeId,
-    humanizePresetTypeKey,
 } from '@/module/data/SpiritSpritePresetProfiles';
 
 const { hasProperty, setProperty, getProperty } = foundry.utils;
@@ -72,10 +71,9 @@ export class Version0_36_0 extends VersionMigration {
         const system = actor.system;
         if (!system || typeof system !== 'object') return;
 
-        const spiritType = typeof system.spiritType === 'string' ? system.spiritType.trim().toLowerCase() : '';
+        const spiritType = typeof system.spiritType === 'string' ? system.spiritType : '';
         const profile = PRESET_SPIRIT_PROFILES[spiritType as keyof typeof PRESET_SPIRIT_PROFILES];
         if (!profile) return;
-        system.spiritType = humanizePresetTypeKey(spiritType);
 
         const forceOff = new Set(profile.forceOff ?? []);
 
@@ -127,10 +125,9 @@ export class Version0_36_0 extends VersionMigration {
         setProperty(system, 'attributes.level.base', getProperty(system, 'level'));
         delete system.level;
 
-        const spriteType = typeof system.spriteType === 'string' ? system.spriteType.trim().toLowerCase() : '';
+        const spriteType = typeof system.spriteType === 'string' ? system.spriteType : '';
         const profile = PRESET_SPRITE_PROFILES[spriteType];
         if (!profile) return;
-        system.spriteType = humanizePresetTypeKey(spriteType);
 
         this.migrateSkillToggles(actor, profile.skills);
         this.migrateSpriteAttributeOffsets(system, profile.offsets ?? {}, profile.levelOff);
@@ -178,7 +175,15 @@ export class Version0_36_0 extends VersionMigration {
         return name.trim().replace(/[\s-]+/g, '_').toLowerCase();
     }
 
-    override migrateActiveEffect(effect: { changes: { key: string }[] }): void {
+    private _mapSelectionValue(value: unknown): string | undefined {
+        if (typeof value === 'string') return value;
+        if (typeof value === 'object' && value !== null && typeof value['id'] === 'string') {
+            return value['id'];
+        }
+        return undefined;
+    }
+
+    override migrateActiveEffect(effect: any): void {
         const keyMap: Record<string, string> = {
             'system.level': 'system.attributes.level',
             'system.initiative.meatspace.base': 'system.initiative.meatspace.constant',
@@ -224,5 +229,25 @@ export class Version0_36_0 extends VersionMigration {
         };
 
         this.migrateEffectChanges(effect, keyMap, valueMap);
+
+        const system = effect.system;
+        if (!system) return;
+
+        const selectionFields = [
+            'selection_attributes',
+            'selection_categories',
+            'selection_limits',
+            'selection_skills',
+            'selection_tests',
+        ] as const;
+
+        for (const field of selectionFields) {
+            const values = system[field];
+            if (!Array.isArray(values)) continue;
+
+            system[field] = values
+                .map(value => this._mapSelectionValue(value))
+                .filter(value => typeof value === 'string');
+        }
     }
 }

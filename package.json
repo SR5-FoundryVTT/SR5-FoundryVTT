@@ -8,6 +8,7 @@
         "@foundryvtt/foundryvtt-cli": "^3.0.3",
         "@types/node": "^22.19.1",
         "@types/xml2js": "^0.4.14",
+        "@types/yaireo__tagify": "^4.27.0",
         "@typescript/native-preview": "^7.0.0-dev.20260527.2",
         "@yaireo/tagify": "^4.37.1",
         "buffer": "^6.0.3",

@@ -132,7 +132,7 @@ export class BonusHelper {
                     sheet, {
                         disabled: !!limitModifier.condition,
                         changes: [{ key: "data.limit", value: limitModifier.value._TEXT }],
-                        system: { applyTo: 'test_all', selection_limits: [{ value: name, id: key }] }
+                        system: { applyTo: 'test_all', selection_limits: [key] }
                     }
                 );
             }
@@ -146,7 +146,7 @@ export class BonusHelper {
                     sheet, {
                         disabled: !!skill.condition,
                         changes: [{ key: "data.pool", value: skill.bonus._TEXT }],
-                        system: { applyTo: 'test_all', selection_attributes: [{ value: key.capitalize(), id: key }] }
+                        system: { applyTo: 'test_all', selection_attributes: [key] }
                     }
                 );
             }
@@ -158,8 +158,7 @@ export class BonusHelper {
 
                 type Keys = keyof typeof BC.BonusConstant.skillCategoryTable;
                 const skills = BC.BonusConstant.skillCategoryTable[skillCategory.name._TEXT as Keys]
-                                .filter(skillId => !excludedSkill || skillId !== excludedSkill)
-                                .map(skillId => ({ value: skillId.capitalize(), id: skillId }))
+                                .filter(skillId => !excludedSkill || skillId !== excludedSkill);
 
                 if (!skills?.length)
                     console.log("Error skillcategory:", skillCategory.name._TEXT);
@@ -180,8 +179,7 @@ export class BonusHelper {
 
                 type Keys = keyof typeof BC.BonusConstant.skillGroupTable;
                 const skills = BC.BonusConstant.skillGroupTable[skillGroup.name._TEXT as Keys]
-                                .filter(skillId => !excludedSkill || skillId !== excludedSkill)
-                                .map(skillId => ({ value: skillId.capitalize(), id: skillId }))
+                                .filter(skillId => !excludedSkill || skillId !== excludedSkill);
 
                 this.createEffect(
                     sheet, {
@@ -217,7 +215,7 @@ export class BonusHelper {
                     sheet, {
                         disabled: !!skill.condition,
                         changes: [{ key: "data.pool", value: skill.bonus._TEXT }],
-                        system: { applyTo: 'test_all', selection_skills: [{ value: name, id: key }] }
+                        system: { applyTo: 'test_all', selection_skills: [key] }
                     }
                 );
             }

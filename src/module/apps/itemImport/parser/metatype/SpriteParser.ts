@@ -2,6 +2,7 @@ import { Metatype } from "../../schema/MetatypeSchema";
 import { CompendiumKey } from "../../importer/Constants";
 import { MetatypeParserBase } from './MetatypeParserBase';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
+import { normalizeSpriteTypeForPreset } from "@/module/data/SpiritSpritePresetProfiles";
 
 const LEVEL_OFFSET_ATTRIBUTE_MAP = {
     resonance: 'resmin',
@@ -17,7 +18,7 @@ export class SpriteParser extends MetatypeParserBase<'sprite'> {
     protected override getSystem(jsonData: Metatype) {
         const system = this.getBaseSystem();
 
-        system.spriteType = jsonData.name._TEXT.split(" ")[0];
+        system.spriteType = normalizeSpriteTypeForPreset(jsonData.name._TEXT);
         this.applyLevelOffsetAttributes(system, jsonData);
         this.parseInitiative(system, jsonData, { mode: 'matrix', specialAttr: 'level' });
 

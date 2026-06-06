@@ -7,7 +7,6 @@ import { ActorImportUtil, type BlankImportedActor } from "../ActorImportUtil";
 import {
     PRESET_SPRITE_PROFILES,
     SPRITE_MATRIX_ATTRIBUTE_IDS,
-    humanizePresetTypeKey,
     normalizeSpriteTypeForPreset,
 } from "@/module/data/SpiritSpritePresetProfiles";
 
@@ -89,7 +88,7 @@ export class SpriteImporter {
             return null;
 
         return this.importFromSeed(chummerData, importOptions, (sprite) => {
-            sprite.system.spriteType = humanizePresetTypeKey(spriteTypeKey);
+            sprite.system.spriteType = spriteTypeKey;
             const levelOff = new Set(profile.levelOff ?? []);
             sprite.system.attributes.resonance.applies_special = !levelOff.has('resonance');
             sprite.system.attributes.resonance.base = profile.offsets?.resonance ?? 0;
