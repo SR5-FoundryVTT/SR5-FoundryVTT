@@ -29,22 +29,6 @@ const DEFAULT_IMPORT_SELECTIONS = Object.fromEntries(
     IMPORT_FIELDS.map((field) => [field, true])
 ) as ImportSelections;
 
-const SPIRIT_TYPES = [
-    'air', 'aircraft', 'airwave', 'ally', 'automotive', 'beasts', 'ceramic', 'earth', 'energy',
-    'fire', 'guardian', 'guidance', 'homunculus', 'man', 'metal', 'plant', 'ship', 'task', 'train',
-    'water', 'watcher', 'blood', 'muse', 'nightmare', 'shade', 'succubus', 'wraith',
-    'shedim', 'hopper', 'blade_summoned', 'horror_show', 'unbreakable', 'master_shedim',
-    'caretaker', 'nymph', 'scout', 'soldier', 'worker', 'queen',
-    'carcass', 'corpse', 'rot', 'detritus',
-    'anarch', 'arboreal', 'blackjack', 'boggle', 'bugul', 'chindi', 'croki',
-    'duende', 'ejerian', 'elvar', 'erinyes', 'green_man', 'imp', 'jarl', 'kappa', 'kokopelli',
-    'morbi', 'nocnitsa', 'phantom', 'preta', 'stabber', 'tungak', 'vucub_caquix',
-    'gum_toad', 'crawler', 'ghasts', 'gremlin', 'anansi', 'tsuchigumo_warrior',
-    'corps_cadavre', 'abomination', 'barren', 'noxious', 'nuclear', 'plague', 'sludge'
-] as const satisfies Actor.SystemOfType<'spirit'>["spiritType"][];
-
-type SpiritType = Actor.SystemOfType<'spirit'>["spiritType"] | undefined;
-
 interface ImporterContext extends foundry.applications.api.ApplicationV2.RenderContext {
     folders: FolderContext[]
     canUploadFiles: boolean
@@ -65,6 +49,29 @@ export class ActorImporter extends BaseClass {
     private selectedJsonFile: File | null = null;
     private selectedFolderId: string | null = null;
     private importSelections: ImportSelections = { ...DEFAULT_IMPORT_SELECTIONS };
+
+    static async importActorData(
+        actorData: ActorSchema,
+        importOptions: ImportOptionsType,
+    ) {
+        const spiritTemplate = await SpiritImporter.findSpiritByGuid(actorData.metatype_guid);
+        if (spiritTemplate)
+            return SpiritImporter.import(actorData, spiritTemplate, importOptions);
+
+        const spriteTemplate = await SpriteImporter.findSpriteByGuid(actorData.metatype_guid);
+        if (spriteTemplate)
+            return SpriteImporter.import(actorData, spriteTemplate, importOptions);
+
+        const importedSpiritByProfile = await SpiritImporter.importFromPresetProfile(actorData, importOptions);
+        if (importedSpiritByProfile)
+            return importedSpiritByProfile;
+
+        const importedSpriteByProfile = await SpriteImporter.importFromPresetProfile(actorData, importOptions);
+        if (importedSpriteByProfile)
+            return importedSpriteByProfile;
+
+        return CharacterImporter.import(actorData, importOptions);
+    }
 
     /**
      * Default options for the application window.
@@ -207,15 +214,7 @@ export class ActorImporter extends BaseClass {
             console.debug("Parsed Chummer Data:", actorData);
             console.debug("Import Options:", importOptions);
 
-            const spiritType = this.getSpiritType(actorData);
-            if (spiritType) {
-                await SpiritImporter.import(actorData, spiritType, importOptions);
-            } else if (actorData.metatype_english?.toLowerCase().includes('sprite')) {
-                await SpriteImporter.import(actorData, importOptions);
-            } else {
-                await CharacterImporter.import(actorData, importOptions);
-            }
-
+            await ActorImporter.importActorData(actorData, importOptions);
             await this.close();
         } catch (error) {
             console.error("Actor import failed:", error);
@@ -263,17 +262,6 @@ export class ActorImporter extends BaseClass {
             console.error("JSON Parse Error:", error);
             return null;
         }
-    }
-
-    private getSpiritType(chummerChar: ActorSchema): SpiritType | undefined {
-        const chummerType = chummerChar.metatype_english
-            .replace(/\s*\(.*?\)\s*/g, '')
-            .replace(/^Spirit of /, '')
-            .replace(/ Spirit$/, '')
-            .replace(/[\s-]/g, '_')
-            .toLowerCase()
-            .trim();
-        return SPIRIT_TYPES.find(v => RegExp(`\\b${v}\\b`, "i").test(chummerType));
     }
 
     private openJsonFilePicker() {

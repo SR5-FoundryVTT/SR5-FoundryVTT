@@ -121,7 +121,7 @@ export type ActorSchema = {
     tradition?: MaybeEmpty<{
         guid: string;
         sourceid: string;
-        istechnomancertradition: string;
+        istechnomancertradition: TruthyString;
         name: string;
         name_english: string;
         fullname: string;
@@ -586,15 +586,15 @@ export type ActorSchema = {
                     ownweight: string;
                     source: MaybeEmpty<string>;
                     page: MaybeEmpty<string>;
-                    included: string;
+                    included: TruthyString;
                     equipped: TruthyString;
-                    wirelesson: string;
+                    wirelesson: TruthyString;
                     gears: ActorSchema['gears'];
                     extra: MaybeEmpty<string>;
                     notes?: MaybeEmpty<string>;
                 }>;
             }>;
-            gears: ActorSchema['gears'];
+            gears: MaybeEmpty<ActorSchema['gears']>;
             extra: MaybeEmpty<string>;
             location: MaybeEmpty<string>;
             attack: string;
@@ -806,7 +806,7 @@ export type ActorSchema = {
             conditionmonitor: string;
             matrixcmfilled: string;
             gears?: ActorSchema['gears'];
-            children: ActorSchema['cyberwares'];
+            children: MaybeEmpty<ActorSchema['cyberwares']>;
             notes?: MaybeEmpty<string>;
         }>;
     }>;
@@ -924,7 +924,7 @@ export type ActorSchema = {
             homenode: TruthyString;
             conditionmonitor: string;
             matrixcmfilled: string;
-            children: ActorSchema['gears'];
+            children: MaybeEmpty<ActorSchema['gears']>;
             weaponbonusdamage?: string;
             weaponbonusdamage_english?: string;
             weaponbonusap?: string;
@@ -1057,14 +1057,14 @@ export type ActorSchema = {
                     page: MaybeEmpty<string>;
                     location?: MaybeEmpty<string>;
                     included: TruthyString;
-                    weapons: ActorSchema['weapons'];
-                    cyberwares?: ActorSchema['cyberwares'];
+                    weapons: MaybeEmpty<ActorSchema['weapons']>;
+                    cyberwares?: MaybeEmpty<ActorSchema['cyberwares']>;
                     notes?: MaybeEmpty<string>;
                     mods?: null;
                 }>;
             }>;
             gears: ActorSchema['gears'];
-            weapons: ActorSchema['weapons'];
+            weapons: MaybeEmpty<ActorSchema['weapons']>;
             notes?: MaybeEmpty<string>;
         }>;
     }>;
@@ -1198,7 +1198,7 @@ export type ActorSchema = {
             fullname: string;
             force: string;
             nethits: string;
-            self: string;
+            self: TruthyString;
         }>;
     }>;
     otherarmors: MaybeEmpty<{

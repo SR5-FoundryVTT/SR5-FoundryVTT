@@ -1,17 +1,23 @@
 <form>
     <div class="dialog-content-common">
-        {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-documents.hbs'}}
+        {{#if test.actor}}
+            <div class="document">
+                <img src="{{speakerImg test.actor}}"/>
+                <a class="content-link" data-type="Actor" data-link data-id="{{test.actor.id}}" data-uuid="{{test.actor.uuid}}">{{speakerName test.actor}}</a>
+            </div>
+        {{/if}}
+        {{#if test.item}}
+            <div class="document">
+                <img src="{{test.item.img}}"/>
+                <a class="entity-link content-link" data-type="Item"
+                   data-id="{{test.item.id}}" data-uuid="{{test.item.uuid}}">{{localizeContent test.item.name}}</a>
+            </div>
+        {{/if}}
         <hr />
         <div>
             <div class="form-group">
-                <label data-tooltip="SR5.Tooltips.SummoningTest.SpiritType">{{localize 'SR5.Labels.Action.SpiritType'}}</label>
-                <select name="test.data.spiritTypeSelected" {{#if test.preparedActorUsed}}disabled data-tooltip="SR5.Tooltips.Item.DisabledForPreparedActor"{{/if}}>
-                    {{selectOptions config.spiritTypes selected=test.data.spiritTypeSelected localize=true}}
-                </select>
-            </div>
-            <div class="form-group">
                 <label data-tooltip="SR5.Tooltips.SummoningTest.Force">{{localize "SR5.Force"}}</label>
-                <input name="test.data.force" type="number" class="disabled-for-display" value="{{test.data.force}}" {{#if test.preparedActorUsed}}disabled data-tooltip="SR5.Tooltips.Item.DisabledForPreparedActor"{{/if}}/>
+                <input name="test.data.force" type="number" class="disabled-for-display" value="{{test.data.force}}" {{#if test.preparedSpiritForceLocked}}disabled data-tooltip="SR5.Tooltips.Item.DisabledForPreparedActor"{{/if}}/>
             </div>
             <div class="form-group">
                 <label data-tooltip="SR5.Tooltips.SummoningTest.ReagentDrams">{{localize "SR5.Reagent"}}</label>

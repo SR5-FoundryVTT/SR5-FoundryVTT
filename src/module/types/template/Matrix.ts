@@ -1,6 +1,6 @@
 import { SR5 } from "@/module/config";
 import { ConditionData } from "./Condition";
-import { AttributeField } from "./Attributes";
+import { AttributeField, type AttributeFieldOptions } from "./Attributes";
 import { ModifiableField } from "../fields/ModifiableField";
 
 const { SchemaField, NumberField, BooleanField, AnyField, StringField, ArrayField, DocumentUUIDField } = foundry.data.fields;
@@ -23,9 +23,9 @@ export const MatrixAttributes = (editable: boolean) => ({
     att4: new SchemaField(DeviceAttribute('firewall', editable)),
 });
 
-export const MatrixAttributeField = () => ({
-    ...AttributeField(),
-    device_att: new StringField({ required: true }),
+export const MatrixAttributeField = (options: AttributeFieldOptions = {}) => ({
+    ...AttributeField(options),
+    device_att: new StringField({ required: true, blank: true, choices: ['att1', 'att2', 'att3', 'att4'] }),
 });
 
 export const MatrixMarksTarget = () => (
@@ -41,11 +41,11 @@ export const LastGridData = () => ({
 });
 
 // Intended for limited matrix actors, shared across all.
-export const MatrixData = () => ({
-    attack: new ModifiableField(MatrixAttributeField()),
-    sleaze: new ModifiableField(MatrixAttributeField()),
-    data_processing: new ModifiableField(MatrixAttributeField()),
-    firewall: new ModifiableField(MatrixAttributeField()),
+export const MatrixData = ({ isSprite = false } = {}) => ({
+    attack: new ModifiableField(MatrixAttributeField({ appliesSpecial: isSprite })),
+    sleaze: new ModifiableField(MatrixAttributeField({ appliesSpecial: isSprite })),
+    data_processing: new ModifiableField(MatrixAttributeField({ appliesSpecial: isSprite })),
+    firewall: new ModifiableField(MatrixAttributeField({ appliesSpecial: isSprite })),
 
     condition_monitor: new SchemaField(ConditionData()),
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),

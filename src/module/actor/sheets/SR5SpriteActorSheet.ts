@@ -6,6 +6,7 @@ import { Helpers } from '@/module/helpers';
 export interface SpriteActorSheetData extends MatrixActorSheetData {
     technomancer?: SR5Actor | null;
     isSprite: boolean;
+    hasLanguageKnowledgeSkills?: boolean;
 }
 
 export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetData> {
@@ -36,10 +37,10 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
         skills: {
             template: SheetFlow.templateBase('actor/tabs/sprite-skills'),
             templates: [
-                ...SheetFlow.templateActorSystemParts('active-skills'),
+                ...SheetFlow.templateActorSystemParts('active-skills', 'language-and-knowledge-skills'),
                 ...SheetFlow.templateListItem('skill')
             ],
-            scrollable: ['#active-skills-scroll']
+            scrollable: ['#active-skills-scroll', '#language-knowledge-skills-scrollable']
         },
     }
     /**
@@ -68,6 +69,19 @@ export class SR5SpriteActorSheet extends SR5MatrixActorSheet<SpriteActorSheetDat
         data.isSprite = true;
 
         return data;
+    }
+
+    override async _preparePartContext(
+        ...[partId, context, options]: Parameters<SR5MatrixActorSheet["_preparePartContext"]>
+    ) {
+        const partContext = await super._preparePartContext(partId, context, options) as SpriteActorSheetData;
+
+        if (partId === 'skills') {
+            partContext.hasLanguageKnowledgeSkills = Object.keys(this.actor.system.skills.language).length > 0
+                || Object.values(this.actor.system.skills.knowledge).some(knowledgeType => Object.keys(knowledgeType).length > 0);
+        }
+
+        return partContext;
     }
 
     override async _onDropActor(event: DragEvent, actor: SR5Actor) {

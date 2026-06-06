@@ -219,6 +219,59 @@
   .modifiable-value {
     border-radius: 0;
 
+    .form-fields {
+      padding-top: 1px;
+      padding-bottom: 1px;
+
+      .modifier-summary,
+      .base-summary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 22px;
+        padding: 0 8px;
+        border-radius: 999px;
+        border: 1px solid var(--sr5v2-control-border);
+        background: var(--sr5v2-control-bg-strong);
+        color: var(--sr5v2-text-primary);
+        font-size: 1em;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+
+        .summary-count {
+          color: var(--sr5v2-text-secondary);
+          font-size: 0.78em;
+        }
+
+        &.positive {
+          border-color: var(--sr5v2-positive-border);
+          background: var(--sr5v2-positive-bg);
+          color: var(--sr5v2-text-primary);
+        }
+
+        &.negative {
+          border-color: var(--sr5v2-negative-border);
+          background: var(--sr5v2-negative-bg);
+          color: var(--sr5v2-text-primary);
+        }
+
+        &.neutral {
+          border-color: var(--sr5v2-control-border);
+          background: var(--sr5v2-control-bg-strong);
+          color: var(--sr5v2-text-primary);
+        }
+
+        &.base-summary .summary-count {
+          display: none;
+        }
+      }
+
+      .toggle-breakdown {
+        margin-right: 4px;
+      }
+    }
+
     .breakdown-list {
       padding: 2px 6px;
       gap: 2px;
@@ -238,19 +291,94 @@
     .mod-name {
       flex: 1;
       min-width: 0;
+      padding-left: 7px;
+      font-size: 1em;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .mod-value {
-      flex: 0 0 2.5rem;
+    .mod-value,
+    .modifier-value-input,
+    .manual-modifier-value {
+      width: 50px;
+      min-width: 50px;
+      max-width: 50px;
+      flex-basis: 50px;
       text-align: right;
+    }
+
+    input.modifier-value-input,
+    .manual-modifier-value {
+      height: 25px;
+      margin: 0;
+      padding: 3px;
+      box-sizing: border-box;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 400;
+      background: var(--sr5v2-control-bg);
+      border: 1px solid var(--sr5v2-control-border);
+      border-radius: 4px;
+      color: var(--sr5v2-control-text);
+    }
+
+    span.modifier-value-input {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 25px;
+      margin: 0;
+      padding: 3px;
+      box-sizing: border-box;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 400;
+      background: var(--sr5v2-control-bg-strong);
+      border: none;
+      border-radius: 4px;
+      color: var(--sr5v2-control-text);
+    }
+
+    &.manual-modifier-entry {
+      .manual-modifier-name {
+        flex: 1 1 auto;
+        min-width: 0;
+        height: 24px;
+        font-size: 1em;
+      }
+
+      .manual-modifier-value {
+        font-size: 1em;
+      }
+
+      .manual-modifier-create {
+        flex: 0 0 auto;
+        margin-left: auto;
+        width: 18px;
+        height: 18px;
+        padding: 0;
+        border: 1px solid var(--sr5v2-control-border);
+        border-radius: 2px;
+        background: var(--sr5v2-control-bg-strong);
+        color: var(--sr5v2-text-primary);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 0.625rem;
+
+        &:hover {
+          border-color: var(--sr5v2-control-border-hover);
+        }
+      }
     }
 
     > input[type='checkbox'] {
       flex: 0 0 auto;
       margin-left: auto;
+      width: 18px;
+      height: 18px;
     }
 
     .modifier-effect-button {

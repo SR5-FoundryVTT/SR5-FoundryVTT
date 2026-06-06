@@ -1072,7 +1072,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
                 value: this.getRating(),
                 device_att: '',
             },
-        };
+        } as Record<Shadowrun.MatrixAttribute, {value: number; device_att: '' | 'att1' | 'att2' | 'att3' | 'att4'}>;
 
         // This if statement should cover all types of devices, meaning the "getRating" calls above are always overwritten
         if (['cyberdeck', 'rcc', 'commlink'].includes(this.system.category)) {

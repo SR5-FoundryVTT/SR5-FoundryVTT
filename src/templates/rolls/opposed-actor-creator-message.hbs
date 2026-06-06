@@ -1,9 +1,21 @@
 {{> 'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs'}}
-{{#if test.failure}}
+{{#if (and test.failure test.actor)}}
 <div class="sr5 chat-card roll-card">
     <div class="card-content">
         <div class="left-side">
-            <p><a class="content-link" draggable="true" data-link="" data-uuid="{{test.actor.uuid}}" data-id="{{test.actor.id}}" data-type="Actor" data-tooltip="SR5.Tooltips.SummoningTest.DragOnCanvas"><i class="fas fa-user"></i>{{test.actor.name}}</a></p>
+            <div class="document">
+                <img src="{{#if test.actor.prototypeToken.texture.src}}{{test.actor.prototypeToken.texture.src}}{{else}}{{speakerImg test.actor}}{{/if}}"
+                     data-tooltip="{{speakerName test.actor}}" />
+                <h3 class="header-name">
+                    <a class="content-link"
+                       draggable="true"
+                       data-link=""
+                       data-uuid="{{test.actor.uuid}}"
+                       data-id="{{test.actor.id}}"
+                       data-type="Actor"
+                       data-tooltip="SR5.Tooltips.SummoningTest.DragOnCanvas">{{speakerName test.actor}}</a>
+                </h3>
+            </div>
         </div>
     </div>
 </div>
