@@ -715,11 +715,12 @@ export const SR5 = {
     },
 
     actionTypes: {
-        none: 'SR5.ActionTypeNone',
-        free: 'SR5.ActionTypeFree',
-        simple: 'SR5.ActionTypeSimple',
-        complex: 'SR5.ActionTypeComplex',
-        varies: 'SR5.ActionTypeVaries',
+        none: 'SR5.ActionType.None',
+        free: 'SR5.ActionType.Free',
+        simple: 'SR5.ActionType.Simple',
+        complex: 'SR5.ActionType.Complex',
+        interrupt: 'SR5.ActionType.Interrupt',
+        varies: 'SR5.ActionType.Varies',
     },
 
     // Use within action damage calculation (base <operator> attribute) => value

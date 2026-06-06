@@ -106,12 +106,15 @@
             "SpellRitual": "Magia Ritual",
             "Summoning": "Ações de Invocação"
         },
-        "ActionType": "Tipo",
-        "ActionTypeComplex": "Complexa",
-        "ActionTypeFree": "Livre",
-        "ActionTypeNone": "Nenhuma",
-        "ActionTypeSimple": "Simples",
-        "ActionTypeVaries": "Variada",
+        "ActionType": {
+            "Label": "Tipo",
+            "Complex": "Complexa",
+            "Free": "Livre",
+            "Interrupt": "Interrupt",
+            "None": "Nenhuma",
+            "Simple": "Simples",
+            "Varies": "Variada"
+        },
         "Actions": "Ações",
         "Active": "Ativo",
         "ActiveDefense": "Defesa Ativa",
@@ -644,6 +647,7 @@
         "InitCatMeatspace": "Espaço Real",
         "Initiation": "Iniciação",
         "Initiative": "Iniciativa",
+        "InitiativeMod": "Modificador de Iniciativa",
         "Internal": "Interno",
         "IsCritter": "Criatura",
         "IsFreshImport": "Este item foi importado do Chummer e precisa de revisão manual.",
@@ -658,6 +662,10 @@
                             "hint": "If this damage is considered a normal (non-magical) weapon attack",
                             "label": "Normal Weapon"
                         }
+                    },
+                    "initiative_mod": {
+                        "hint": "Modificador de iniciativa aplicado ao realizar esta ação",
+                        "label": "Modificador de Iniciativa"
                     }
                 }
             }
@@ -818,6 +826,8 @@
         },
         "Magic": "Magia",
         "Manual": "Manual",
+        "ManualModifier": "Modificador manual",
+        "ManualModifierValue": "Valor do modificador manual",
         "ManualOverride": "Substituição de Resultado",
         "MarkImportedItemReviewed": "Marcar Item Importado Como Revisado",
         "MarkImportedItemTooltip": "Marca este item importado como tendo sido revisado.",

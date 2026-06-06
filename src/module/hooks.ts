@@ -523,7 +523,7 @@ ___________________
         await IconAssign.refreshIconFiles();
 
         if (game.user?.isGM) {
-            await Migrator.BeginMigration();
+            Migrator.BeginMigration();
 
             if (ChangelogApplication.showApplication)
                 new ChangelogApplication().render(true);
