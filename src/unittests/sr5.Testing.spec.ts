@@ -88,6 +88,25 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(test.pool.value, 10);
         });
 
+        it('marks manual-priority changes as manual modifiers', () => {
+            const valueField = DataDefaults.createData('value_field', {
+                label: 'SR5.DicePool',
+                base: 10,
+            });
+
+            ModifiableValue.add(valueField, 'Custom Modifier', 3, {
+                mode: 'ADD',
+                priority: ModifiableValue.MANUAL_PRIORITY,
+            });
+
+            const createdChange = valueField.changes.find(change => change.name === 'Custom Modifier');
+            if (!createdChange) assert.fail('Expected manual-priority modifier to exist');
+            if (!createdChange) return;
+
+            assert.strictEqual(createdChange.priority, ModifiableValue.MANUAL_PRIORITY);
+            assert.isTrue(ModifiableValue.isManualChange(createdChange));
+        });
+
         it('buy hits uses floor(pool / 4) and has no glitches', async () => {
             const test = TestCreator.fromPool({ pool: 10, limit: 2, threshold: 1 }, { showMessage: false, showDialog: false });
             test.data.buyHits = true;

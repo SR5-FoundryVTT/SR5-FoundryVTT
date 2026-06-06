@@ -1817,6 +1817,8 @@
         },
         "Magic": "Magie",
         "Manual": "Manuell",
+        "ManualModifier": "Manueller Modifikator",
+        "ManualModifierValue": "Wert des manuellen Modifikators",
         "ManualOverride": "Ergebnis-Überschreibung",
         "MarkImportedItemReviewed": "Importiertes Item überprüft.",
         "MarkImportedItemTooltip": "Markiert dieses importierte Item als überprüft.",

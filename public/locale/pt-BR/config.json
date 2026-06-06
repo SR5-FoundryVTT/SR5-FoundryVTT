@@ -818,6 +818,8 @@
         },
         "Magic": "Magia",
         "Manual": "Manual",
+        "ManualModifier": "Modificador manual",
+        "ManualModifierValue": "Valor do modificador manual",
         "ManualOverride": "Substituição de Resultado",
         "MarkImportedItemReviewed": "Marcar Item Importado Como Revisado",
         "MarkImportedItemTooltip": "Marca este item importado como tendo sido revisado.",
