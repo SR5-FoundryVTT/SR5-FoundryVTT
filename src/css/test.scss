@@ -308,7 +308,7 @@
       text-align: right;
     }
 
-    .modifier-value-input,
+    input.modifier-value-input,
     .manual-modifier-value {
       height: 25px;
       margin: 0;
@@ -319,6 +319,24 @@
       font-weight: 400;
       background: var(--sr5v2-control-bg);
       border: 1px solid var(--sr5v2-control-border);
+      border-radius: 4px;
+      color: var(--sr5v2-control-text);
+    }
+
+    span.modifier-value-input {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 25px;
+      margin: 0;
+      padding: 3px;
+      box-sizing: border-box;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 400;
+      background: var(--sr5v2-control-bg-strong);
+      border: none;
+      border-radius: 4px;
       color: var(--sr5v2-control-text);
     }
 
