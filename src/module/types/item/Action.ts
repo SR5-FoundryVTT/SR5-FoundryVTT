@@ -143,6 +143,7 @@ export const ActionRollData = (
     ...MinimalActionData(),
     test: new StringField({ required: true, initial: test }),
     type: new StringField({ required: true, initial: type, blank: true, choices: SR5.actionTypes }),
+    initiative_mod: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     category: new SchemaField(ActionCategory()),
     categories: new TagifyAltField(new StringField({ required: true })),
     spec: new BooleanField(),
@@ -173,7 +174,8 @@ export const ActionRollData = (
     roll_mode: new StringField({
         blank: true,
         required: true,
-        choices: CONFIG.Dice.rollModes,
+        // TODO: fvtt-types - type CONFIG.ChatMessage.modes upstream once available
+        choices: (CONFIG.ChatMessage as unknown as { modes: CONFIG.ChatMessage.modes }).modes,
     }),
 });
 

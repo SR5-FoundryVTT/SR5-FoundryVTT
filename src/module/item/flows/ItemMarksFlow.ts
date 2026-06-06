@@ -37,6 +37,8 @@ export const ItemMarksFlow = {
 
     /**
      * Place a Matrix Mark for this Item.
+     * 
+     * See SR5#233 'PANS and WANS'
      *
      * @param host The matrix device that places the marks.
      * @param target The Document the marks are placed on. This can be an actor (character, technomancer, IC) OR an item (Host)
@@ -52,7 +54,7 @@ export const ItemMarksFlow = {
 
         if (!target?.uuid) return;
 
-        if (target.hasMaster) {
+        if (target.hasMaster && !target.master?.isType('grid')) {
             const master = target.master;
             if (master) await host.setMarks(master, marks, options);
         }

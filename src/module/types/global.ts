@@ -58,7 +58,27 @@ import ThermographicVisionDetectionMode from "../vision/thermographicVision/ther
 import { DiceSoNice } from "../rolls/DiceSoNice";
 import { Skill } from "./item/Skill";
 
+export type ChatMessageMode = keyof CONFIG.ChatMessage.modes;
+
 declare module "fvtt-types/configuration" {
+    namespace CONFIG {
+        interface ChatMessageModeConfig {
+            label: string;
+            icon: string;
+            handler?: (chatData: object) => unknown;
+        }
+
+        namespace ChatMessage {
+            type modes = {
+                public: CONFIG.ChatMessageModeConfig;
+                gm: CONFIG.ChatMessageModeConfig;
+                blind: CONFIG.ChatMessageModeConfig;
+                self: CONFIG.ChatMessageModeConfig;
+                ic: CONFIG.ChatMessageModeConfig;
+            };
+        }
+    }
+
     interface DocumentClassConfig {
         ActiveEffect: typeof SR5ActiveEffect;
         Actor: typeof SR5Actor<Actor.ConfiguredSubType>;

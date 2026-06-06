@@ -24,6 +24,7 @@ import { Translation } from '../utils/strings';
 import { GmOnlyMessageContentFlow } from '../actor/flows/GmOnlyMessageContentFlow';
 import { ActionResultType, ActionRollType, DamageType, MinimalActionType, OpposedTestType, ResultActionType } from '../types/item/Action';
 import { ValueFieldType } from '../types/template/Base';
+import { ChatMessageMode } from '../types/global';
 import { DeepPartial } from "fvtt-types/utils";
 export interface TestDocuments {
     // Legacy field that used be the source document.
@@ -130,7 +131,7 @@ export interface SuccessTestData extends TestData {
 export interface TestOptions {
     showDialog?: boolean // Show dialog when defined as true.
     showMessage?: boolean // Show message when defined as true.
-    rollMode?: foundry.dice.Roll.Mode
+    rollMode?: ChatMessageMode
 }
 
 export interface SuccessTestMessageData {
@@ -289,10 +290,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * The tests roll mode can be given by specific option, action setting or global configuration.
      * @param options The test options for the whole test
      */
-    _prepareRollMode(data, options: TestOptions): foundry.dice.Roll.Mode {
+    _prepareRollMode(data, options: TestOptions): ChatMessageMode {
         if (options.rollMode != null) return options.rollMode;
-        if (data?.action?.roll_mode) return data.action.roll_mode;
-        else return game.settings.get(CORE_NAME, 'rollMode') as foundry.dice.Roll.Mode;
+        if (data?.action?.roll_mode) return data.action.roll_mode as ChatMessageMode;
+        // @ts-expect-error TODO: fvtt - v14 - missing settings typing
+        else return game.settings.get(CORE_NAME, 'messageMode') as ChatMessageMode;
     }
 
     /**
@@ -1143,6 +1145,32 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return this.targets.length > 0;
     }
 
+    get targetRangeOptions(): { value: number, label: string }[] {
+        const data = this.data as T & {
+            targetRanges?: Array<{ name: string, distance: number, unit: string }>
+        };
+
+        if (!Array.isArray(data.targetRanges)) return [];
+
+        return data.targetRanges.map((target, index) => ({
+            value: index,
+            label: `${target.name} (${target.distance} ${target.unit})`
+        }));
+    }
+
+    get rangeOptions(): { value: number, label: string }[] {
+        const data = this.data as T & {
+            ranges?: Record<string, { modifier: number, label: string, distance: number }>
+        };
+
+        if (!data.ranges) return [];
+
+        return Object.values(data.ranges).map(range => ({
+            value: Number(range.modifier),
+            label: `${game.i18n.localize(range.label)} (${range.distance} m)`
+        }));
+    }
+
     /**
      * Has this test been derived from an action?
      *
@@ -1711,14 +1739,16 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             whisper = game.users.filter(user => this.actor?.testUserPermission(user, 'OWNER') === true);
         }
 
+        const rollMode = this.data.options?.rollMode;
+
         // ...for rollMode include GM when GM roll
-        if (this.data.options?.rollMode === 'gmroll' || this.data.options?.rollMode === "blindroll") {
+        if (rollMode === 'gm' || rollMode === "blind") {
             whisper = [...game.users.filter(user => user.isGM), ...(whisper || [])];
         }
 
         // Don't show dice to a user casting blind.
-        const blind = this.data.options?.rollMode === 'blindroll';
-        const synchronize = this.data.options?.rollMode === 'publicroll';
+        const blind = rollMode === 'blind';
+        const synchronize = rollMode === 'public' || rollMode === 'ic';
 
         void dice3d.showForRoll(roll, game.user, synchronize, whisper, blind, this.data.messageUuid);
     }
@@ -1873,6 +1903,18 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     _prepareResultActionsTemplateData(): ResultActionType[] {
         const actions: ResultActionType[] = [];
+
+        // Interrupt/Varies actions carry an initiative modifier that can be applied to the combatant.
+        const actionType = this.data.action?.type;
+        const initiativeMod = this.data.action?.initiative_mod;
+        if (initiativeMod && (actionType === 'interrupt' || actionType === 'varies')) {
+            actions.push({
+                action: 'modifyCombatantInit',
+                label: 'SR5.InitiativeMod',
+                value: String(initiativeMod)
+            });
+        }
+
         const actionResultData = this.results;
         if (!actionResultData) return actions;
 
@@ -1882,8 +1924,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * What ChatMessage rollMode is this test supposed to use?
      */
-    get _rollMode(): string {
-        return this.data.options?.rollMode as string ?? game.settings.get('core', 'rollMode');
+    get _rollMode(): ChatMessageMode {
+        // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
+        return this.data.options?.rollMode ?? game.settings.get('core', 'messageMode') as ChatMessageMode;
     }
 
     /**
@@ -1926,7 +1969,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         }
 
         // Instead of manually applying whisper ids, let Foundry do it.
-        ChatMessage.applyRollMode(messageData, game.settings.get("core", "rollMode"));
+        // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
+        ChatMessage.applyMode(messageData, game.settings.get("core", "messageMode"));
 
         return messageData;
     }

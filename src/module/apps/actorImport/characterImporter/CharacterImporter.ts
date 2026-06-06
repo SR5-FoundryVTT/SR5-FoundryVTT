@@ -221,13 +221,10 @@ export class CharacterImporter {
     }
 
     private static importInitiative(system: BlankCharacter['system'], chummerChar: ActorSchema) {
-        // TODO: These modifiers are very unclear in how they're used here and where they come from.
-        system.modifiers.meat_initiative = Number(chummerChar.initbonus) || 0;
-
-        // 'initdice' contains the total amount of initiative dice, not just the bonus.
-        system.modifiers.meat_initiative_dice = (Number(chummerChar.initdice) || 1) - 1;
-        system.modifiers.astral_initiative_dice = (Number(chummerChar.astralinitdice) || 2) - 2;
-        system.modifiers.matrix_initiative_dice = (Number(chummerChar.matrixarinitdice) || 3) - 3;
+        // Chummer fields store final initiative constants/dice, so import directly into initiative config fields.
+        system.initiative.meatspace.dice.base = Number(chummerChar.initdice) || 1;
+        system.initiative.astral.dice.base = Number(chummerChar.astralinitdice) || 2;
+        system.initiative.matrix.dice.base = Number(chummerChar.matrixarinitdice) || 3;
+        system.initiative.meatspace.constant.base = Number(chummerChar.initbonus) || 0;
     }
-
 }

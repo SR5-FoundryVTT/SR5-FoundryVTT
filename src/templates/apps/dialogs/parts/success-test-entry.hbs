@@ -1,6 +1,7 @@
 <div
     class="form-group modifiable-value
     {{#if (hasModifierChanges data.changes)}}has-modifiers{{/if}}
+    has-manual-input
     {{#if (includes @root.expandedPaths path)}}expanded{{else}}{{/if}}"
     data-path="{{path}}"
 >
@@ -8,6 +9,10 @@
 
     <div class="form-fields">
         {{#if (hasModifierChanges data.changes)}}
+        <span class="base-summary">
+            <span class="summary-base">{{modifierBaseTotal data}}</span>
+        </span>
+
         <span
             class="modifier-summary {{modifierSummaryClass data}}"
             data-tooltip="{{modifierSummaryTooltip data.changes}}"
@@ -18,7 +23,7 @@
         {{/if}}
 
         <input type="number" name="{{path}}" value="{{data.value}}" size="3" maxlength="3" data-dtype="Number"/>
-        <a class="toggle-breakdown {{#unless (hasModifierChanges data.changes)}}disabled{{/unless}}" title="{{localize 'SR5.ToggleBreakdown'}}">
+        <a class="toggle-breakdown" title="{{localize 'SR5.ToggleBreakdown'}}">
             <i class="fas fa-chevron-up"></i>
         </a>
     </div>
@@ -66,11 +71,50 @@
             </button>
             {{/if}}
             <span class="mod-name" data-tooltip="{{getChangeDescription change}}">{{localize change.name}}</span>
-            <span class="mod-value">{{getChangeValue change}}</span>
+            {{#if (isManualChange change)}}
+            <input
+                type="number"
+                class="modifier-value-input"
+                name="{{../path}}.changes.{{index}}.value"
+                value="{{change.value}}"
+                data-dtype="Number"
+            />
+            {{else}}
+            <span class="modifier-value-input">{{getChangeValue change}}</span>
+            {{/if}}
 
             <input type="checkbox" name="{{../path}}.changes.{{index}}.enabled" data-dtype="Boolean" {{checked change.enabled}} />
         </li>
         {{/unless}}
         {{/each}}
+
+        <li class="breakdown-entry manual-modifier-entry" data-path="{{path}}">
+            <button
+                type="button"
+                class="modifier-effect-button no-effect disabled"
+                disabled
+            >
+            </button>
+            <input
+                type="text"
+                class="manual-modifier-name"
+                placeholder="{{localize 'SR5.ManualModifier'}}"
+                aria-label="{{localize 'SR5.ManualModifier'}}"
+            />
+            <input
+                type="number"
+                class="manual-modifier-value"
+                placeholder="0"
+                aria-label="{{localize 'SR5.ManualModifierValue'}}"
+            />
+            <button
+                type="button"
+                class="manual-modifier-create"
+                data-tooltip="SR5.Add"
+                aria-label="{{localize 'SR5.Add'}}"
+            >
+                <i class="fas fa-plus"></i>
+            </button>
+        </li>
     </ol>
 </div>

@@ -18,12 +18,12 @@ export const FireModeRules = {
     fireModeDefenseModifier: function(fireMode: FireModeType, ammoLeft=0): number {
         // For negative rounds use a sane default.
         const rounds = fireMode.value < 0 ? fireMode.value * -1 : fireMode.value;
-        // Due to legecy value, sometimes a string numerical sneaks in...
+        // Due to legacy value, sometimes a string numerical sneaks in...
         const modifier = Number(fireMode.defense);
         // Zero modifier can't be further reduced by missing ammunition.
         if (modifier === 0) return 0;
 
-        // Reduce modifier by avaiable ammunition.
+        // Reduce modifier by available ammunition.
         if (ammoLeft <= 0) ammoLeft = rounds;
         if (ammoLeft >= rounds) return modifier;
 
@@ -39,16 +39,16 @@ export const FireModeRules = {
      *
      * @param fireMode The chosen fire mode for the attack
      * @param compensation Actors recoil compensation
-     * @param recoil Accured progressive recoil of the actor before current attack
+     * @param recoil Current progressive recoil of the actor before current attack
      * @param ammoLeft Amount of ammunition available
      *
      * @return compensation Amount of compensation left.
      * @return new recoil modifier.
      */
     recoilModifierAfterAttack: function(fireMode: FireModeType, compensation: number, recoil=0, ammoLeft = 0): number {
-        // Sanitze negative fire mode values by pretending not to shoot.
+        // Sanitize negative fire mode values by pretending not to shoot.
         if (fireMode.value < 0) return 0;
-        // Sanitaze negative ammo values by pretending to have just enough.
+        // Sanitize negative ammo values by pretending to have just enough.
         if (ammoLeft <= 0) ammoLeft = fireMode.value;
         // Only fire amount of rounds available.
         const additionalRecoil = FireModeRules.additionalRecoil(fireMode, ammoLeft);
@@ -69,7 +69,7 @@ export const FireModeRules = {
     },
 
     /**
-     * Calculate the revoil modifier value according to SR5#175 'Recoil' and 'Progressive Recoil'
+     * Calculate the recoil modifier value according to SR5#175 'Recoil' and 'Progressive Recoil'
      * 
      * @param compensation Amount of total recoil compensation available.
      * @param recoil Current Amount of total progressive recoil.
@@ -97,7 +97,7 @@ export const FireModeRules = {
             .sort((modeA, modeB) => {
             // Same modes, ascending spent rounds.
             if (modeA.mode === modeB.mode) {
-                // Numerical values can be substracted to 1 / -1 aprox.
+                // Numerical values can be subtracted to 1 / -1 aprox.
                 return modeA.value - modeB.value;
             }
             

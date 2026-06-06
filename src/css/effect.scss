@@ -95,11 +95,31 @@
     }
 }
 
-.sr5v2 {
+.application.sheet.active-effect-config.sr5v2 {
     /* Facilitate resizable effect sheet and scaling effect changes to width */
-    &.active-effect-config .tab.changes header, 
-    &.active-effect-config .tab.changes ol {
-        // grid layout: key | mode | value | priority | controls
-        grid-template-columns: auto 7rem auto 4rem 1rem;
+    .tab.changes header,
+    .tab.changes ol {
+        // grid layout: key | type | value | priority | phase | controls
+        grid-template-columns: minmax(12rem, 2fr) 7rem minmax(8rem, 1fr) 4rem 7rem 2rem !important;
+    }
+
+    .tab.changes header,
+    .tab.changes ol li {
+        align-items: center;
+    }
+
+    .tab.changes header .controls,
+    .tab.changes ol .controls {
+        justify-self: start;
+        text-align: left;
+    }
+
+    .tab.changes header .controls .inline-control,
+    .tab.changes ol .controls .inline-control {
+        display: inline-flex;
+        justify-content: flex-start;
+        align-items: center;
+        margin: 0;
+        padding: 0;
     }
 }

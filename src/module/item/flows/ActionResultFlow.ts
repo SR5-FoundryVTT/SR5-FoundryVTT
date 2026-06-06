@@ -56,10 +56,15 @@ export class ActionResultFlow {
         if (!test) return;
 
         await test.populateDocuments();
-        // NOTE: Use test data typing here, as including PhysicalDefenseTest would cause circular dependencies, breaking SuccessTest/OpposedTest import order.
+        // NOTE: Use test data typing here, as including PhysicalDefenseTest would
+        // cause circular dependencies, breaking SuccessTest/OpposedTest import order.
         const data = test.data as PhysicalDefenseTestData;
-        if (!data.iniMod) return;
-        await test.actor?.changeCombatInitiative(data.iniMod);
+
+        // DefenseTests store the active defense modifier in iniMod,
+        // while Interrupt/Varies actions store it on the action itself.
+        const iniMod = data.iniMod ?? data.action?.initiative_mod;
+        if (!iniMod) return;
+        await test.actor?.changeCombatInitiative(iniMod);
     }
 
     /**

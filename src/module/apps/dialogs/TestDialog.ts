@@ -26,7 +26,7 @@ export interface TestDialogListener {
 interface TestDialogContext extends HandlebarsApplicationMixin.RenderContext {
     test: any;
     rollMode: string;
-    rollModes: CONFIG.Dice.RollModes;
+    rollModes: CONFIG.ChatMessage.modes;
     config: typeof SR5;
     expandedPaths: string[];
     dialogContent: string;
@@ -163,8 +163,10 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
         const context = await super._prepareContext(options);
 
         context.test = this.test;
-        context.rollMode = this.test.data.options?.rollMode ?? game.settings.get('core', 'rollMode');
-        context.rollModes = CONFIG.Dice.rollModes;
+        // @ts-expect-error TODO: fvtt - v14 - missing messageMode setting
+        context.rollMode = this.test.data.options?.rollMode ?? game.settings.get('core', 'messageMode');
+        // TODO: fvtt-types - type CONFIG.ChatMessage.modes upstream once available
+        context.rollModes = (CONFIG.ChatMessage as unknown as { modes: CONFIG.ChatMessage.modes }).modes;
         context.config = SR5;
         context.expandedPaths = Array.from(this._expandedList);
         context.dialogContent = await foundry.applications.handlebars.renderTemplate(this.test._dialogTemplate, context as unknown as Record<string, unknown>);
@@ -190,15 +192,45 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
             const path = modValueDiv?.dataset.path;
             if (!modValueDiv || !path) return;
 
-            if (!modValueDiv.classList.contains('has-modifiers')) return;
-
             const isExpanded = modValueDiv.classList.toggle('expanded');
             if (isExpanded) this._expandedList.add(path);
             else this._expandedList.delete(path);
             void this.render();
         };
 
-        html.find('input,select,textarea').on('change', () => applyAndRender());
+        html.find('input:not(.manual-modifier-name):not(.manual-modifier-value),select,textarea').on('change', () => applyAndRender());
+
+        html.find('.manual-modifier-name, .manual-modifier-value').on('keydown', ev => {
+            if (ev.key !== 'Enter') return;
+
+            ev.preventDefault();
+            ev.stopPropagation();
+
+            const input = ev.currentTarget;
+            const row = input.closest<HTMLLIElement>('.manual-modifier-entry');
+            if (!row) return;
+
+            if (!this._createManualModifierFromRow(row)) return;
+
+            const path = row.dataset.path;
+            if (path) this._expandedList.add(path);
+            void this.render();
+        });
+
+        html.find('.manual-modifier-create').on('click', event => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            const button = event.currentTarget as HTMLButtonElement;
+            const row = button.closest<HTMLLIElement>('.manual-modifier-entry');
+            if (!row) return;
+
+            if (!this._createManualModifierFromRow(row)) return;
+
+            const path = row.dataset.path;
+            if (path) this._expandedList.add(path);
+            void this.render();
+        });
 
         html.find('.modifiable-value .form-fields input[type="number"]').on('keydown', ev => {
             if (ev.key === 'Enter') { ev.preventDefault(); ev.currentTarget.blur(); }
@@ -236,8 +268,8 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
 
         html.find('.breakdown-entry').on('click', event => {
             const target = event.target;
-            // Let the checkbox and effect icon keep native behavior.
-            if (target.closest('input[type="checkbox"], .modifier-effect-button')) return;
+            // Let form controls and effect icon keep native behavior.
+            if (target.closest('input, select, textarea, button, .modifier-effect-button')) return;
 
             const checkbox = event.currentTarget.querySelector<HTMLInputElement>('input[type="checkbox"]');
             if (!checkbox) return;
@@ -306,16 +338,58 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
         this._updateData(data);
     }
 
+    _createManualModifierFromRow(row: HTMLLIElement): boolean {
+        const path = row.dataset.path;
+        if (!path) return false;
+
+        const nameInput = row.querySelector<HTMLInputElement>('.manual-modifier-name');
+        const valueInput = row.querySelector<HTMLInputElement>('.manual-modifier-value');
+        const rawName = nameInput?.value?.trim() ?? '';
+        const rawValue = valueInput?.value?.trim() ?? '';
+        if (!rawName && !rawValue) return false;
+
+        const context = { test: this.test };
+        const valueField = foundry.utils.getProperty(context, path);
+        if (!ModifiableValue.isModifiableValue(valueField)) return false;
+
+        const value = Number(rawValue || 0);
+        const safeValue = Number.isFinite(value) ? value : 0;
+        const name = rawName || game.i18n.localize('SR5.ManualModifier');
+
+        ModifiableValue.add(valueField, name, safeValue, {
+            mode: 'ADD',
+            enabled: true,
+            priority: ModifiableValue.MANUAL_PRIORITY,
+        });
+
+        this.test.prepareBaseValues();
+        this.test.calculateBaseValues();
+        this.test.validateBaseValues();
+
+        return true;
+    }
+
     _updateData(data: AnyMutableObject) {
         if (this.selectedButton === 'cancel') return;
 
         const entries = Object.entries(data);
         const enabledEntries = entries.filter(([key]) => key.endsWith('.enabled'));
         const otherEntries = entries.filter(([key]) => !key.endsWith('.enabled'));
+        const changePathPattern = /^test\.data\.(pool|limit|threshold)\.changes\.(\d+)\./;
 
         const context = { test: this.test };
 
         for (const [key, value] of [...enabledEntries, ...otherEntries]) {
+            const changeMatch = changePathPattern.exec(key);
+            if (changeMatch) {
+                const path = `test.data.${changeMatch[1]}`;
+                const modValue = foundry.utils.getProperty(context, path);
+                if (!ModifiableValue.isModifiableValue(modValue)) continue;
+
+                const index = Number(changeMatch[2]);
+                if (!Number.isInteger(index) || !modValue.changes[index]) continue;
+            }
+
             const valueField = foundry.utils.getProperty(context, key);
             if (!ModifiableValue.isModifiableValue(valueField)) {
                 foundry.utils.setProperty(context, key, value);
@@ -330,7 +404,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
                     value as number | null,
                     { mode: 'OVERRIDE', priority: ModifiableValue.TOP_PRIORITY }
                 );
-            }
+            } 
         }
 
         this.test.prepareBaseValues();

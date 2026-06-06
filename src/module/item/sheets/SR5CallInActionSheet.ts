@@ -100,12 +100,15 @@ export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData>
      * @param spirit The prepared actor
      */
     async updatePreparedSpirit(spirit: SR5Actor<'spirit'>) {
+        const spiritType = spirit.system.spiritType;
+        const type = spiritType ?? '';
+
         await this.item.update({
             system: {
                 actor_type: 'spirit',
                 spirit: {
                     uuid: spirit.uuid,
-                    type: spirit.system.spiritType,
+                    type,
                     force: spirit.system.attributes.force.value
                 }
             }
@@ -124,7 +127,7 @@ export class SR5CallInActionSheet extends SR5ItemSheet<SR5CallInActionSheetData>
                 sprite: {
                     uuid: sprite.uuid,
                     type: sprite.system.spriteType,
-                    level: sprite.system.level
+                    level: sprite.system.attributes.level.value
                 }
             }
         });

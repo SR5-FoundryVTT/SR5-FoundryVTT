@@ -6,14 +6,7 @@
             <div class="form-group">
                 <label>{{localize 'SR5.ActiveDefense'}}</label>
                 <select name="test.data.activeDefense">
-                    {{#select test.data.activeDefense}}
-                    <option value="">{{localize 'SR5.None'}}</option>
-                    {{#each test.data.activeDefenses as |mode key|}}
-                    <option value="{{key}}" {{#if mode.disabled}}disabled{{/if}}>(+{{mode.value}}) {{localize mode.label}}{{#if mode.weapon}} -
-                        {{mode.weapon}}{{/if}}
-                    </option>
-                    {{/each}}
-                    {{/select}}
+                    {{selectOptions test.activeDefenseOptions selected=test.data.activeDefense blank='SR5.None' localize=true}}
                 </select>
             </div>
         </div>

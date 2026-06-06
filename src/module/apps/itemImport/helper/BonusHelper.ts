@@ -39,7 +39,8 @@ export class BonusHelper {
 
         for (const change of changes) {
             change.value = this.normalizeValue(sheet, change.value);
-            if (!change.mode) change.mode = BC.ADD;
+            // SimpleEffect doesn't contain change type, so explicitly add a default to not rely on foundry defaults.
+            if (!change.type) change.type = 'add';
         }
 
         sheet.effects!.push({
@@ -49,11 +50,12 @@ export class BonusHelper {
         });
     }
 
-    public static addBonus(sheet: BC.DocCreateData, bonus: BonusSchema) {
+    public static addBonus(sheet: BC.DocCreateData, bonus?: BonusSchema): void {
+        if (!bonus) return;
         this.addEffects(sheet, bonus);
     }
 
-    private static addEffects(sheet: BC.DocCreateData, bonus: BonusSchema) {
+    private static addEffects(sheet: BC.DocCreateData, bonus: BonusSchema): void {
         sheet.effects ??= [];
 
         for (const [key, data] of Object.entries(bonus)) {
@@ -72,7 +74,7 @@ export class BonusHelper {
             if (cm.overflow) {
                 this.createEffect(
                     sheet, {
-                        changes: [{ key: "system.modifiers.physical_overflow_track", value: cm.overflow._TEXT, mode: BC.OVERRIDE }]
+                        changes: [{ key: "system.modifiers.physical_overflow_track", value: cm.overflow._TEXT, type: BC.OVERRIDE }]
                     },
                 );
             }
@@ -80,7 +82,7 @@ export class BonusHelper {
             if (cm.physical) {
                 this.createEffect(
                     sheet, {
-                        changes: [{ key: "system.modifiers.physical_track", value: cm.physical._TEXT, mode: BC.OVERRIDE }]
+                        changes: [{ key: "system.modifiers.physical_track", value: cm.physical._TEXT, type: BC.OVERRIDE }]
                     },
                 );
             }
@@ -88,7 +90,7 @@ export class BonusHelper {
             if (cm.stun) {
                 this.createEffect(
                     sheet, {
-                        changes: [{ key: "system.modifiers.stun_track", value: cm.stun._TEXT, mode: BC.OVERRIDE }]
+                        changes: [{ key: "system.modifiers.stun_track", value: cm.stun._TEXT, type: BC.OVERRIDE }]
                     }
                 );
             }

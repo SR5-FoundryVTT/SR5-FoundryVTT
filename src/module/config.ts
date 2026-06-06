@@ -75,6 +75,7 @@ export const SR5 = {
         willpower: 'SR5.AttrWillpower',
         pilot: 'SR5.Vehicle.Stats.Pilot',
         force: 'SR5.Force',
+        level: 'SR5.Level',
         initiation: 'SR5.Initiation',
         submersion: 'SR5.Submersion',
         rating: 'SR5.Rating',
@@ -715,11 +716,12 @@ export const SR5 = {
     },
 
     actionTypes: {
-        none: 'SR5.ActionTypeNone',
-        free: 'SR5.ActionTypeFree',
-        simple: 'SR5.ActionTypeSimple',
-        complex: 'SR5.ActionTypeComplex',
-        varies: 'SR5.ActionTypeVaries',
+        none: 'SR5.ActionType.None',
+        free: 'SR5.ActionType.Free',
+        simple: 'SR5.ActionType.Simple',
+        complex: 'SR5.ActionType.Complex',
+        interrupt: 'SR5.ActionType.Interrupt',
+        varies: 'SR5.ActionType.Varies',
     },
 
     // Use within action damage calculation (base <operator> attribute) => value
@@ -949,113 +951,6 @@ export const SR5 = {
         track: "SR5.IC.Types.Track"
     },
 
-    spiritTypes: {
-        // base types
-        air: 'SR5.Spirit.Types.Air',
-        aircraft: 'SR5.Spirit.Types.Aircraft',
-        airwave: 'SR5.Spirit.Types.Airwave',
-        ally: 'SR5.Spirit.Types.Ally',
-        automotive: 'SR5.Spirit.Types.Automotive',
-        beasts: 'SR5.Spirit.Types.Beasts',
-        ceramic: 'SR5.Spirit.Types.Ceramic',
-        earth: 'SR5.Spirit.Types.Earth',
-        energy: 'SR5.Spirit.Types.Energy',
-        fire: 'SR5.Spirit.Types.Fire',
-        guardian: 'SR5.Spirit.Types.Guardian',
-        guidance: 'SR5.Spirit.Types.Guidance',
-        homunculus: 'SR5.Spirit.Types.Homunculus',
-        man: 'SR5.Spirit.Types.Man',
-        metal: 'SR5.Spirit.Types.Metal',
-        plant: 'SR5.Spirit.Types.Plant',
-        ship: 'SR5.Spirit.Types.Ship',
-        task: 'SR5.Spirit.Types.Task',
-        train: 'SR5.Spirit.Types.Train',
-        water: 'SR5.Spirit.Types.Water',
-        watcher: 'SR5.Spirit.Types.Watcher',
-
-        // toxic types
-        abomination: 'SR5.Spirit.Types.Abomination',
-        barren: 'SR5.Spirit.Types.Barren',
-        noxious: 'SR5.Spirit.Types.Noxious',
-        nuclear: 'SR5.Spirit.Types.Nuclear',
-        plague: 'SR5.Spirit.Types.Plague',
-        sludge: 'SR5.Spirit.Types.Sludge',
-
-        // blood types
-        blood: 'SR5.Spirit.Types.Blood',
-
-        // shadow types
-        muse: 'SR5.Spirit.Types.Muse',
-        nightmare: 'SR5.Spirit.Types.Nightmare',
-        shade: 'SR5.Spirit.Types.Shade',
-        succubus: 'SR5.Spirit.Types.Succubus',
-        wraith: 'SR5.Spirit.Types.Wraith',
-
-        // shedim types
-        shedim: 'SR5.Spirit.Types.Shedim',
-        hopper: 'SR5.Spirit.Types.Hopper',
-        blade_summoned: 'SR5.Spirit.Types.BladeSummoned',
-        horror_show: 'SR5.Spirit.Types.HorrorShow',
-        unbreakable: 'SR5.Spirit.Types.Unbreakable',
-        master_shedim: 'SR5.Spirit.Types.MasterShedim',
-
-        // insect types
-        caretaker: 'SR5.Spirit.Types.Caretaker',
-        nymph: 'SR5.Spirit.Types.Nymph',
-        scout: 'SR5.Spirit.Types.Scout',
-        soldier: 'SR5.Spirit.Types.Soldier',
-        worker: 'SR5.Spirit.Types.Worker',
-        queen: 'SR5.Spirit.Types.Queen',
-
-        // Necro types
-        carcass: "SR5.Spirit.Types.Carcass",
-        corpse: "SR5.Spirit.Types.Corpse",
-        rot: "SR5.Spirit.Types.Rot",
-        palefire: "SR5.Spirit.Types.Palefire",
-        detritus: "SR5.Spirit.Types.Detritus",
-
-        // Howling Shadow spirits
-        anarch: "SR5.Spirit.Types.Anarch",
-        arboreal: "SR5.Spirit.Types.Arboreal",
-        blackjack: "SR5.Spirit.Types.Blackjack",
-        boggle: "SR5.Spirit.Types.Boggle",
-        bugul: "SR5.Spirit.Types.Bugul",
-        chindi: "SR5.Spirit.Types.Chindi",
-        croki: "SR5.Spirit.Types.Croki",
-        duende: "SR5.Spirit.Types.Duende",
-        ejerian: "SR5.Spirit.Types.Ejerian",
-        elvar: "SR5.Spirit.Types.Elvar",
-        erinyes: "SR5.Spirit.Types.Erinyes",
-        green_man: "SR5.Spirit.Types.GreenMan",
-        imp: "SR5.Spirit.Types.Imp",
-        jarl: "SR5.Spirit.Types.Jarl",
-        kappa: "SR5.Spirit.Types.Kappa",
-        kokopelli: "SR5.Spirit.Types.Kokopelli",
-        morbi: "SR5.Spirit.Types.Morbi",
-        nocnitsa: "SR5.Spirit.Types.Nocnitsa",
-        phantom: "SR5.Spirit.Types.Phantom",
-        preta: "SR5.Spirit.Types.Preta",
-        stabber: "SR5.Spirit.Types.Stabber",
-        tungak: "SR5.Spirit.Types.Tungak",
-        vucub_caquix: "SR5.Spirit.Types.VucubCaquix",
-
-        // blood magic spirits
-        blood_shade: 'SR5.Spirit.Types.BloodShade',
-        bone: 'SR5.Spirit.Types.Bone',
-
-        // aetherology spirits
-        gum_toad: 'SR5.Spirit.Types.GumToad',
-        crawler: 'SR5.Spirit.Types.Crawler',
-        ghasts: 'SR5.Spirit.Types.Ghasts',
-        vrygoths: 'SR5.Spirit.Types.Vrygoths',
-        gremlin: 'SR5.Spirit.Types.Gremlin',
-        anansi: 'SR5.Spirit.Types.Anansi',
-        tsuchigumo_warrior: 'SR5.Spirit.Types.TsuchigumoWarrior',
-
-        // horror terrors spirits
-        corps_cadavre: 'SR5.Spirit.Types.CorpsCadavre',
-    },
-
     /**
      * Actor types that can be called in using the call in action type and be
      * set in it's system.action_type property.
@@ -1108,16 +1003,6 @@ export const SR5 = {
             sustained: 'SR5.ComplexForm.Durations.Sustained',
             permanent: 'SR5.ComplexForm.Durations.Permanent',
         }
-    },
-
-    spriteTypes: {
-        courier: 'SR5.Sprite.Types.Courier',
-        crack: 'SR5.Sprite.Types.Crack',
-        data: 'SR5.Sprite.Types.Data',
-        fault: 'SR5.Sprite.Types.Fault',
-        machine: 'SR5.Sprite.Types.Machine',
-        companion: 'SR5.Sprite.Types.Companion',
-        generalist: 'SR5.Sprite.Types.Generalist',
     },
 
     spritePower: {
@@ -1230,10 +1115,10 @@ export const SR5 = {
     ],
 
     rangeWeaponModeLabel: {
-        'single_shot': 'SR5.Weapon.Mode.SingleShot',
-        'semi_auto': 'SR5.Weapon.Mode.SemiAuto',
-        'burst_file': 'SR5.Weapon.Mode.BurstFire',
-        'full_auto': 'SR5.Weapon.Mode.FullAuto'
+        'single_shot': 'SR5.Weapon.Mode.Short.SingleShot',
+        'semi_auto': 'SR5.Weapon.Mode.Short.SemiAuto',
+        'burst_file': 'SR5.Weapon.Mode.Short.BurstFire',
+        'full_auto': 'SR5.Weapon.Mode.Short.FullAuto'
     },
 
     wirelessModes: {
@@ -1251,7 +1136,7 @@ export const SR5 = {
      */
     fireModes: [
         {
-            label: "SR5.Weapon.Mode.SingleShot",
+            label: "SR5.Weapon.Mode.Full.SingleShot",
             value: 1,
             recoil: false,
             defense: 0,
@@ -1260,7 +1145,7 @@ export const SR5 = {
             mode: 'single_shot'
         },
         {
-            label: "SR5.Weapon.Mode.SemiAutoShort",
+            label: "SR5.Weapon.Mode.Full.SemiAutoShort",
             value: 1,
             recoil: true,
             defense: 0,
@@ -1269,7 +1154,7 @@ export const SR5 = {
             mode: 'semi_auto'
         },
         {
-            label: "SR5.Weapon.Mode.SemiAutoBurst",
+            label: "SR5.Weapon.Mode.Full.SemiAutoBurst",
             value: 3,
             recoil: true,
             defense: -2,
@@ -1279,7 +1164,7 @@ export const SR5 = {
         },
 
         {
-            label: "SR5.Weapon.Mode.BurstFire",
+            label: "SR5.Weapon.Mode.Full.BurstFire",
             value: 3,
             recoil: true,
             defense: -2,
@@ -1288,7 +1173,7 @@ export const SR5 = {
             mode: 'burst_fire'
         },
         {
-            label: "SR5.Weapon.Mode.BurstFireLong",
+            label: "SR5.Weapon.Mode.Full.BurstFireLong",
             value: 6,
             recoil: true,
             defense: -5,
@@ -1297,7 +1182,7 @@ export const SR5 = {
             mode: 'burst_fire',
         },
         {
-            label: "SR5.Weapon.Mode.FullAutoShort",
+            label: "SR5.Weapon.Mode.Full.FullAutoShort",
             value: 6,
             recoil: true,
             defense: -5,
@@ -1306,7 +1191,7 @@ export const SR5 = {
             mode: 'full_auto'
         },
         {
-            label: 'SR5.Weapon.Mode.FullAutoLong',
+            label: 'SR5.Weapon.Mode.Full.FullAutoLong',
             value: 10,
             recoil: true,
             defense: -9,
@@ -1315,7 +1200,7 @@ export const SR5 = {
             mode: 'full_auto'
         },
         {
-            label: 'SR5.Suppressing',
+            label: 'SR5.Weapon.Mode.Full.Suppressing',
             value: 20,
             recoil: false,
             defense: 0,

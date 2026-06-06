@@ -53,6 +53,8 @@ export class ActionParser extends Parser<'action'> {
         action.type = jsonData.type._TEXT.toLowerCase() as ActionRollType['type'];
         action.extended = jsonData.type._TEXT === "Extended";
         description.value = jsonData.test?.bonusstring?._TEXT ?? "";
+        if (jsonData.initiativecost?._TEXT)
+            action.initiative_mod = -Number(jsonData.initiativecost._TEXT);
 
         // 2. Parse the test dice pools if they exist
         if (jsonData.test) {

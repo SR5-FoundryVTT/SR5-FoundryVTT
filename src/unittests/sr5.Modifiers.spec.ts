@@ -3,6 +3,8 @@ import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { SituationModifier } from "../module/rules/modifiers/SituationModifier";
 import { DocumentSituationModifiers } from "../module/rules/DocumentSituationModifiers";
 import { EnvironmentalModifier } from './../module/rules/modifiers/EnvironmentalModifier';
+import { TestCreator } from '../module/tests/TestCreator';
+import { SR5Item } from '../module/item/SR5Item';
 
 export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -224,6 +226,67 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
 
                 await modifiers.clearAll();
                 assert.deepEqual(modifiers.source, DocumentSituationModifiers._defaultModifiers);
+            });
+
+            it('apply actor modifier effects during total calculation', async () => {
+                const actor = await factory.createActor({
+                    type: 'character',
+                    system: {
+                        situation_modifiers: {
+                            environmental: {
+                                active: { light: -1 }
+                            }
+                        }
+                    }
+                });
+
+                await actor.createEmbeddedDocuments('ActiveEffect', [{
+                    name: 'Low Light Vision',
+                    system: { applyTo: 'modifier' },
+                    changes: [{ key: 'environmental.low_light_vision', value: '1', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+                }]);
+
+                const modifiers = actor.getSituationModifiers();
+                const total = modifiers.getTotalFor('environmental', { reapply: true });
+
+                assert.strictEqual(modifiers.environmental.applied.active.light, 0);
+                assert.strictEqual(total, modifiers.environmental.levels.good);
+            });
+
+            it('apply onlyForItemTest modifier effects only for the matching test item', async () => {
+                const actor = await factory.createActor({
+                    type: 'character',
+                    system: {
+                        situation_modifiers: {
+                            environmental: {
+                                active: { light: -1 }
+                            }
+                        }
+                    }
+                });
+
+                const items = await actor.createEmbeddedDocuments('Item', [
+                    { type: 'action', name: 'Matching Action' },
+                    { type: 'action', name: 'Other Action' }
+                ]);
+                const matchingItem = items[0] as SR5Item;
+                const otherItem = items[1] as SR5Item;
+
+                await matchingItem.createEmbeddedDocuments('ActiveEffect', [{
+                    name: 'Scoped Low Light Vision',
+                    system: { applyTo: 'modifier', onlyForItemTest: true },
+                    changes: [{ key: 'environmental.low_light_vision', value: '1', mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+                }]);
+
+                const matchingTest = (await TestCreator.fromItem(matchingItem, actor, { showDialog: false, showMessage: false }))!;
+                const otherTest = (await TestCreator.fromItem(otherItem, actor, { showDialog: false, showMessage: false }))!;
+
+                const modifiers = actor.getSituationModifiers();
+                const unmatchedTotal = modifiers.getTotalFor('environmental', { reapply: true, test: otherTest });
+                const matchedTotal = modifiers.getTotalFor('environmental', { reapply: true, test: matchingTest });
+
+                assert.strictEqual(unmatchedTotal, modifiers.environmental.levels.light);
+                assert.strictEqual(matchedTotal, modifiers.environmental.levels.good);
             });
         })
     })

@@ -1,4 +1,4 @@
-<div class="attribute" data-attribute-id="{{attributeField.name}}" data-context-menu="attribute">
+<div class="attribute" data-attribute-id="{{key}}" data-context-menu="attribute">
     {{#if isCyberdeck}}
         <label>
             <select class="matrix-att-selector sr5-select" name="matrix-{{key}}" data-att="{{key}}">
@@ -17,7 +17,7 @@
             <button class="icon sr5-icon"
                     type="button"
                     data-action="rollAttribute"
-                    data-attribute-modifier-tooltip="{{attributeField.name}}">{{matrixAtt.value}}</button>
+                    data-attribute-modifier-tooltip="{{key}}">{{matrixAtt.value}}</button>
         {{/if}}
     </div>
 </div>
