@@ -356,47 +356,49 @@ export const Migrators = (context: QuenchBatchContext) => {
             };
 
             const effect = {
-                changes: [
-                    {
-                        key: 'system.modifiers.matrix_initiative',
-                        value: '(@system.modifiers.matrix_initiative + @system.level + @system.modifiers.matrix_initiative_dice)',
-                        mode: CONST.ACTIVE_EFFECT_MODES.ADD
-                    },
-                    {
-                        key: 'system.attributes.reaction',
-                        value: '@system.attributes.reaction + @system.unknown.path',
-                        mode: CONST.ACTIVE_EFFECT_MODES.ADD
-                    },
-                    {
-                        key: 'system.modifiers.matrix_initiative_dice',
-                        value: 2,
-                        mode: CONST.ACTIVE_EFFECT_MODES.ADD
-                    },
-                    {
-                        key: 'system.attributes.body',
-                        value: 5,
-                        mode: CONST.ACTIVE_EFFECT_MODES.ADD
-                    },
-                ],
+                system: {
+                    changes: [
+                        {
+                            key: 'system.modifiers.matrix_initiative',
+                            value: '(@system.modifiers.matrix_initiative + @system.level + @system.modifiers.matrix_initiative_dice)',
+                            mode: CONST.ACTIVE_EFFECT_MODES.ADD
+                        },
+                        {
+                            key: 'system.attributes.reaction',
+                            value: '@system.attributes.reaction + @system.unknown.path',
+                            mode: CONST.ACTIVE_EFFECT_MODES.ADD
+                        },
+                        {
+                            key: 'system.modifiers.matrix_initiative_dice',
+                            value: 2,
+                            mode: CONST.ACTIVE_EFFECT_MODES.ADD
+                        },
+                        {
+                            key: 'system.attributes.body',
+                            value: 5,
+                            mode: CONST.ACTIVE_EFFECT_MODES.ADD
+                        },
+                    ],
+                },
             };
 
             migrator.remap(effect, keyMap);
 
-            assert.strictEqual(effect.changes[0].key, 'system.initiative.matrix.constant.base');
+            assert.strictEqual(effect.system.changes[0].key, 'system.initiative.matrix.constant.base');
             assert.strictEqual(
-                effect.changes[0].value,
+                effect.system.changes[0].value,
                 '(@system.initiative.matrix.constant.base + @system.attributes.level + @system.initiative.matrix.dice.base)'
             );
-            assert.strictEqual(typeof effect.changes[0].value, 'string');
+            assert.strictEqual(typeof effect.system.changes[0].value, 'string');
 
-            assert.strictEqual(effect.changes[1].key, 'system.attributes.reaction');
-            assert.strictEqual(effect.changes[1].value, '@system.attributes.reaction + @system.unknown.path');
+            assert.strictEqual(effect.system.changes[1].key, 'system.attributes.reaction');
+            assert.strictEqual(effect.system.changes[1].value, '@system.attributes.reaction + @system.unknown.path');
 
-            assert.strictEqual(effect.changes[2].key, 'system.initiative.matrix.dice.base');
-            assert.strictEqual(effect.changes[2].value, 2);
+            assert.strictEqual(effect.system.changes[2].key, 'system.initiative.matrix.dice.base');
+            assert.strictEqual(effect.system.changes[2].value, 2);
 
-            assert.strictEqual(effect.changes[3].key, 'system.attributes.body');
-            assert.strictEqual(effect.changes[3].value, 5);
+            assert.strictEqual(effect.system.changes[3].key, 'system.attributes.body');
+            assert.strictEqual(effect.system.changes[3].value, 5);
         });
     });
 
@@ -693,19 +695,21 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.isUndefined(actor.system.level);
 
             const effect = {
-                changes: [
-                    { key: 'system.level', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'system.modifiers.matrix_initiative', value: 1, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'system.modifiers.matrix_initiative_dice', value: 1, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'system.attributes.reaction', value: 1, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                ],
+                system: {
+                    changes: [
+                        { key: 'system.level', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                        { key: 'system.modifiers.matrix_initiative', value: 1, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                        { key: 'system.modifiers.matrix_initiative_dice', value: 1, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                        { key: 'system.attributes.reaction', value: 1, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    ],
+                },
             };
             migrator.migrateActiveEffect(effect);
 
-            assert.strictEqual(effect.changes[0].key, 'system.attributes.level');
-            assert.strictEqual(effect.changes[1].key, 'system.initiative.matrix.constant.base');
-            assert.strictEqual(effect.changes[2].key, 'system.initiative.matrix.dice.base');
-            assert.strictEqual(effect.changes[3].key, 'system.attributes.reaction');
+            assert.strictEqual(effect.system.changes[0].key, 'system.attributes.level');
+            assert.strictEqual(effect.system.changes[1].key, 'system.initiative.matrix.constant.base');
+            assert.strictEqual(effect.system.changes[2].key, 'system.initiative.matrix.dice.base');
+            assert.strictEqual(effect.system.changes[3].key, 'system.attributes.reaction');
         });
 
     });
