@@ -145,7 +145,7 @@ export class DefenseTest<T extends DefenseTestData = DefenseTestData> extends Op
 
         actions.push({
             action: 'modifyCombatantInit',
-            label: 'SR5.Initiative',
+            label: 'SR5.InitiativeMod',
             value: String(activeDefense.initMod)
         });
 

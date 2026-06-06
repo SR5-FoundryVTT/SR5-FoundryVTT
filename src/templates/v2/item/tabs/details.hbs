@@ -559,6 +559,17 @@
                             </label>
                         </div>
                     </div>
+                    {{#if (or (eq system.action.type 'interrupt') (eq system.action.type 'varies'))}}
+                        <div class="list-item">
+                            <div class="list-item-start skinny">
+                                <label data-tooltip="{{systemFields.action.fields.initiative_mod.hint}}">{{systemFields.action.fields.initiative_mod.label}}</label>
+                            </div>
+                            <div class="list-item-col">
+                                {{formInput systemFields.action.fields.initiative_mod value=source.system.action.initiative_mod
+                                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                            </div>
+                        </div>
+                    {{/if}}
                     {{#if (isType item 'action' 'critter_power')}}
                         <div class="list-item">
                             <div class="list-item-start skinny">

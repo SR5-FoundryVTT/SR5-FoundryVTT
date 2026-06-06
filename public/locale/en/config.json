@@ -117,12 +117,15 @@
             "SpellRitual": "Spellcasting Ritual",
             "Summoning": "Summoning Actions"
         },
-        "ActionType": "Type",
-        "ActionTypeComplex": "Complex",
-        "ActionTypeFree": "Free",
-        "ActionTypeNone": "None",
-        "ActionTypeSimple": "Simple",
-        "ActionTypeVaries": "Varies",
+        "ActionType": {
+            "Label": "Type",
+            "Complex": "Complex",
+            "Free": "Free",
+            "Interrupt": "Interrupt",
+            "None": "None",
+            "Simple": "Simple",
+            "Varies": "Varies"
+        },
         "Actions": "Actions",
         "Active": "Active",
         "ActiveDefense": "Active Defense",
@@ -1285,6 +1288,7 @@
         "InitCatMeatspace": "Meatspace",
         "Initiation": "Initiation",
         "Initiative": "Initiative",
+        "InitiativeMod": "Initiative Modifier",
         "Internal": "Internal",
         "InventoryRename": {
             "Cancel": "Cancel",
@@ -1367,6 +1371,10 @@
                     "extended": {
                         "hint": "If this is an Extended Test",
                         "label": "Extended Test"
+                    },
+                    "initiative_mod": {
+                        "hint": "Initiative modifier applied when taking this action",
+                        "label": "Initiative Modifier"
                     },
                     "limit": {
                         "attribute": {

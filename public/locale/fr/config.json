@@ -37,12 +37,15 @@
         "Accessory": "Accessoire",
         "Accuracy": "Précision",
         "Action": "Action",
-        "ActionType": "Type",
-        "ActionTypeComplex": "Complexe",
-        "ActionTypeFree": "Gratuite",
-        "ActionTypeNone": "Aucune",
-        "ActionTypeSimple": "Simple",
-        "ActionTypeVaries": "Variée",
+        "ActionType": {
+            "Label": "Type",
+            "Complex": "Complexe",
+            "Free": "Gratuite",
+            "Interrupt": "Interrupt",
+            "None": "Aucune",
+            "Simple": "Simple",
+            "Varies": "Variée"
+        },
         "Actions": "Actions",
         "Active": "Active",
         "ActiveDefense": "Défense active",
@@ -398,6 +401,7 @@
         "InitCatMatrix": "Matrice",
         "InitCatMeatspace": "Terrestre",
         "Initiative": "Initiative",
+        "InitiativeMod": "Modificateur d'Initiative",
         "Internal": "Interne",
         "IsCritter": "Créature",
         "IsGrunt": "Brute",
@@ -411,6 +415,10 @@
                             "hint": "If this damage is considered a normal (non-magical) weapon attack",
                             "label": "Normal Weapon"
                         }
+                    },
+                    "initiative_mod": {
+                        "hint": "Modificateur d'initiative appliqué lors de l'exécution de cette action",
+                        "label": "Modificateur d'Initiative"
                     }
                 }
             }
