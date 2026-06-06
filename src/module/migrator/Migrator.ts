@@ -64,7 +64,7 @@ export class Migrator {
         new Version0_35_1(),
     ] as const;
 
-    private static documentsToBeMigrated = 0;
+    private static pendingMigrationCount = 0;
 
     // Generate the migration version mark used to track current system version in documents.
     private static get _migrationMark() {
@@ -86,6 +86,11 @@ export class Migrator {
     private static normalizeArray(data: any): any[] {
         if (data == null) return [];
         return Array.isArray(data) ? data : Object.values(data); 
+    }
+
+    private static markMigrated(data: { _stats: { systemVersion: string } }, nested: boolean): void {
+        data._stats.systemVersion = nested ? game.system.version : this._migrationMark;
+        this.pendingMigrationCount += nested ? 0 : 1;
     }
 
     private static formatElapsedTime(milliseconds: number): string {
@@ -132,7 +137,8 @@ export class Migrator {
         if (!data._stats || !('systemVersion' in data._stats)) return false;
         if (this.compareVersion(data._stats.systemVersion, game.system.version) === 0) return false;
 
-        path = [...path, type, data._id];
+        path = [...path, type, data._id ?? "unknown"];
+        const migrationKey = path.join(".");
 
         let migrated = false;
         if (type === "Item") {
@@ -157,31 +163,48 @@ export class Migrator {
 
         if (migrators.length === 0) {
             if (migrated)
-                data._stats.systemVersion = nested ? game.system.version : this._migrationMark;
+                this.markMigrated(data, nested);
 
             return migrated;
         }
 
-        for (const migrator of migrators)
-            migrator[`migrate${type}`](data);
+        for (const migrator of migrators) {
+            try {
+                migrator[`migrate${type}`](data);
+            } catch (error) {
+                console.error(
+                    `Failed ${type} migration to ${migrator.TargetVersion}.\n` + 
+                    `UUID: ${migrationKey}; Name: ${data.name};\n` +
+                    `Type: ${type}; SubType: ${data.type}; Version: ${data._stats.systemVersion};\n`,
+                    error
+                );
+            }
+        }
 
         // After all migrations, sanitize the data model.
         // This ensures that the data conforms to the current schema.
-        const schema = CONFIG[type].dataModels[data.type].schema;
-        const correctionLogs = Sanitizer.sanitize(schema, data.system);
-
-        if (correctionLogs) {
-            console.warn(
-                `Document Sanitized on Migration:\n` +
-                `UUID: ${path.join('.')}; Name: ${data.name};\n` +
+        const schema = CONFIG[type].dataModels[data.type]?.schema;
+        if (!schema) {
+            console.error(
+                `Skipping migration sanitization due to missing schema:\n` +
+                `UUID: ${migrationKey}; Name: ${data.name};\n` +
                 `Type: ${type}; SubType: ${data.type}; Version: ${data._stats.systemVersion};\n`
             );
-            console.table(correctionLogs);
+        } else {
+            const correctionLogs = Sanitizer.sanitize(schema, data.system);
+
+            if (correctionLogs) {
+                console.warn(
+                    `Document Sanitized on Migration:\n` +
+                    `UUID: ${migrationKey}; Name: ${data.name};\n` +
+                    `Type: ${type}; SubType: ${data.type}; Version: ${data._stats.systemVersion};\n`
+                );
+                console.table(correctionLogs);
+            }
         }
 
         // Mark as a migratable document.
-        data._stats.systemVersion = nested ? game.system.version : this._migrationMark;
-        this.documentsToBeMigrated++;
+        this.markMigrated(data, nested);
         return true;
     }
 
@@ -206,15 +229,15 @@ export class Migrator {
         doc._source._stats.systemVersion = game.system.version;
 
         // Update Parent First
-        if (doc.parent instanceof Actor || doc.parent instanceof Item)
+        if (doc.parent instanceof Actor || doc.parent instanceof Item || doc.parent instanceof Combat)
             await this.updateMigratedDocument(doc.parent);
 
         // Persist the change without triggering diff logic
         return doc.update(doc.toObject() as any, { diff: false, recursive: false });
     }
 
-    public static async BeginMigration() {
-        if (this.documentsToBeMigrated === 0) return;
+    public static BeginMigration() {
+        if (this.pendingMigrationCount === 0) return;
 
         const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.WarningTitle');
         const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.WarningHeader');
@@ -223,10 +246,10 @@ export class Migrator {
         const localizedWarningBackup = game.i18n.localize('SR5.MIGRATION.WarningBackup');
         const localizedWarningBegin = game.i18n.localize('SR5.MIGRATION.BeginMigration');
 
-        const d = new Dialog({
+        const d = new foundry.appv1.api.Dialog({
             title: localizedWarningTitle,
             content:
-                `<h2 style="color: red; text-align: center">${localizedWarningHeader} (${this.documentsToBeMigrated})</h2>` +
+                `<h2 style="color: red; text-align: center">${localizedWarningHeader} (${this.pendingMigrationCount})</h2>` +
                 `<p style="text-align: center"><i>${localizedWarningRequired}</i></p>` +
                 `<p>${localizedWarningDescription}</p>` +
                 `<h3 style="color: red">${localizedWarningBackup}</h3>`,
@@ -327,8 +350,9 @@ export class Migrator {
 
         /* Finalize Migration */
         await game.settings.set(game.system.id, FLAGS.KEY_DATA_VERSION, game.system.version);
+        this.pendingMigrationCount = 0;
 
-        new Dialog({
+        new foundry.appv1.api.Dialog({
             title: "Migration Complete",
             content: `
                 <h2 style="color: red; text-align: center">Migration Complete</h2>
@@ -349,8 +373,6 @@ export class Migrator {
 
     /**
      * compare two version numbers
-     * @param v1
-     * @param v2
      * @return 1 if v1 > v2, -1 if v1 < v2, 0 if equal
      */
     public static compareVersion(v1: string | null, v2: string | null): number {

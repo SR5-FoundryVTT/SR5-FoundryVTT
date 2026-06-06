@@ -27,6 +27,11 @@ export class SR5Combatant extends Combatant<"base"> {
         return super.migrateData(source);
     }
 
+    override async update(...args: Parameters<Combatant["update"]>) {
+        await Migrator.updateMigratedDocument(this);
+        return super.update(...args);
+    }
+
     /** Checks if the combatant can perform an action. */
     canAct(): boolean {
         return this.initiative !== null && this.initiative > 0;
