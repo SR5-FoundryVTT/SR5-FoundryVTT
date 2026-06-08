@@ -264,6 +264,57 @@
                     border-bottom: none;
                 }
 
+                &.is-selection-mode {
+                    cursor: pointer;
+                }
+
+                .entry-select {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 0 10px 0 15px;
+                    cursor: pointer;
+
+                    input[type="checkbox"] {
+                        -webkit-appearance: none;
+                        appearance: none;
+                        width: 18px;
+                        height: 18px;
+                        border-radius: 3px;
+                        cursor: pointer;
+                        position: relative;
+                        transition: all 0.2s ease;
+                        background-color: var(--sr5cb-checkbox-bg);
+                        border: 1px solid var(--sr5cb-checkbox-border);
+                        flex-shrink: 0;
+
+                        &::after {
+                            content: '\f00c';
+                            font-family: "Font Awesome 6 Free";
+                            font-weight: 900;
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-25%, -50%);
+                            font-size: 11px;
+                            color: transparent;
+                        }
+
+                        &:hover {
+                            border-color: var(--sr5cb-accent);
+                        }
+
+                        &:checked {
+                            background-color: var(--sr5cb-accent);
+                            border-color: var(--sr5cb-accent);
+
+                            &::after {
+                                color: var(--sr5cb-checkbox-icon);
+                            }
+                        }
+                    }
+                }
+
                 .item-main {
                     display: flex;
                     align-items: center;
@@ -341,6 +392,34 @@
                 color: var(--sr5cb-text-placeholder);
                 font-style: italic;
                 background: var(--sr5cb-bg-primary);
+            }
+
+            .selection-actions {
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+                padding: 10px 15px;
+                border-top: 1px solid var(--sr5cb-border-medium);
+                background: var(--sr5cb-bg-secondary);
+
+                .selection-button {
+                    border: 1px solid var(--sr5cb-border-strong);
+                    border-radius: 4px;
+                    padding: 8px 12px;
+                    cursor: pointer;
+                    color: var(--sr5cb-text-primary);
+                    background: var(--sr5cb-bg-tertiary);
+
+                    &:hover {
+                        border-color: var(--sr5cb-accent);
+                    }
+
+                    &.accept {
+                        background: var(--sr5cb-accent);
+                        color: var(--sr5cb-checkbox-icon);
+                        border-color: var(--sr5cb-accent);
+                    }
+                }
             }
         }
 

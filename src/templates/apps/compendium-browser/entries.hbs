@@ -1,4 +1,9 @@
-<div class="compendium-entry" data-uuid="{{entry.uuid}}" draggable="true">
+<div class="compendium-entry {{#if selectionMode}}is-selection-mode{{/if}}" data-uuid="{{entry.uuid}}" draggable="{{#unless selectionMode}}true{{/unless}}">
+    {{#if selectionMode}}
+    <label class="entry-select">
+        <input type="checkbox" data-entry-uuid="{{entry.uuid}}" {{#if isSelected}}checked{{/if}}>
+    </label>
+    {{/if}}
     <div class="item-main" data-action="openDoc">
         <div class="item-image">
             <img src="{{entry.img}}" alt="{{entry.name}}" loading="lazy"/>

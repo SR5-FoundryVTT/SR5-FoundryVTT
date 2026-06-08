@@ -6,6 +6,11 @@
             <img class="sheet-image matrix-opposed-device-header__image" src="{{data.img}}" alt="{{imageAlt}}" data-edit="img" data-action="editImage" />
 
             <div class="sheet-header-labels matrix-opposed-device-header__labels">
+                <div class="sheet-header-open-browser">
+                    <button type="button" data-action="openCompendiumBrowser">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </div>
                 <div class="sheet-header-name matrix-opposed-device-header__name">
                     <span>
                         {{formInput fields.name value=data.name name="data.name" classes="sheet-name" placeholder=namePlaceholder rootId=rootId autofocus=true}}

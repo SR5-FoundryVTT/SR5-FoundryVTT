@@ -5,11 +5,21 @@ import { SR5Item } from '@/module/item/SR5Item';
 import { DevicePartData } from '@/module/types/item/Device';
 import { DeepPartial } from 'fvtt-types/utils';
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
+import { CompendiumBrowser } from '../compendiumBrowser/CompendiumBrowser';
 const { StringField, NumberField, HTMLField } = foundry.data.fields;
 const FilePicker = foundry.applications.apps.FilePicker.implementation;
 
+
 const DEFAULT_DEVICE_IMAGE = 'systems/shadowrun5e/dist/icons/importer/device.svg';
 
+interface MatrixOpposedDeviceDialogInitialData {
+    img?: string
+    name?: string
+    category?: keyof typeof SR5.deviceCategories
+    rating?: number
+    description?: string
+    networkUuid?: string
+}
 export interface MatrixOpposedDeviceDialogSelection {
     img: string
     name: string
@@ -17,6 +27,8 @@ export interface MatrixOpposedDeviceDialogSelection {
     rating: number
     description: string
     networkUuid: string
+    sourceUuid?: string
+    sourceData?: Record<string, unknown>
 }
 
 type MatrixOpposedDeviceDialogOptions = {
@@ -42,7 +54,6 @@ type MatrixOpposedDeviceDialogTemplateData = {
         networkUuid: ReturnType<typeof createNetworkUuidField>
     }
     networks: SR5Item[]
-    rootId: string
 }
 
 const matrixOpposedDeviceDialogFields = {
@@ -53,21 +64,38 @@ const matrixOpposedDeviceDialogFields = {
 };
 
 export class MatrixOpposedDeviceDialog extends PromptDialog {
-    constructor(selection: MatrixOpposedDeviceDialogSelection, options: MatrixOpposedDeviceDialogOptions) {
+    static override DEFAULT_OPTIONS = {
+        classes: [SR5_APPV2_CSS_CLASS, 'sr5', 'form-dialog', 'matrix-opposed-device-dialog'],
+        position: {
+            width: 420,
+            height: "auto" as const,
+        },
+        window: {
+            resizable: false,
+        },
+        actions: {
+            openCompendiumBrowser: MatrixOpposedDeviceDialog.#openCompendiumBrowser,
+            editImage: MatrixOpposedDeviceDialog.#editImage
+        }
+    }
+
+    constructor(initial: MatrixOpposedDeviceDialogInitialData, options: MatrixOpposedDeviceDialogOptions) {
         const networkChoices = Object.fromEntries(options.networks.map(network => [network.uuid ?? '', network.name]));
+
+        const data = MatrixOpposedDeviceDialog.prepareData(initial);
         const templateData: MatrixOpposedDeviceDialogTemplateData = {
-            data: selection,
+            data,
             namePlaceholder: game.i18n.localize(SR5.itemTypes.device),
             imageAlt: game.i18n.localize(SR5.itemTypes.device),
             fields: {
                 ...matrixOpposedDeviceDialogFields,
-                networkUuid: createNetworkUuidField(networkChoices, selection.networkUuid)
+                networkUuid: createNetworkUuidField(networkChoices, data.networkUuid)
             },
-            networks: options.networks,
-            rootId: 'matrix-opposed-device-dialog',
+            networks: options.networks
         };
 
-        const data: PromptDialogData = {
+        const dialogData: PromptDialogData = {
+            // TODO: tamif - localize title
             title: 'Matrix Opposed Device',
             templateData,
             templatePath: 'systems/shadowrun5e/dist/templates/apps/dialogs/matrix-opposed-device-dialog.hbs',
@@ -83,31 +111,22 @@ export class MatrixOpposedDeviceDialog extends PromptDialog {
             onAfterClose: () => templateData.data
         };
 
-        super(data, {
-            classes: [SR5_APPV2_CSS_CLASS, 'sr5', 'form-dialog', 'matrix-opposed-device-dialog'],
-            position: {
-                width: 420,
-                height: 'auto',
-            }
-        });
+        super(dialogData);
     }
 
-    protected override async _onRender(
-        context: DeepPartial<foundry.applications.api.HandlebarsApplicationMixin.RenderContext>,
-        options: DeepPartial<ApplicationV2.RenderOptions>
-    ) {
-        await super._onRender(context, options);
-
-        const image = this.element.querySelector<HTMLImageElement>('.matrix-opposed-device-header__image');
-        if (!image) return;
-
-        image.addEventListener('click', event => {
-            event.preventDefault();
-            void this.#editImage(image);
-        });
+    static prepareData(data: MatrixOpposedDeviceDialogInitialData): MatrixOpposedDeviceDialogSelection {
+        return {
+            name: data.name || '',
+            img: data.img || DEFAULT_DEVICE_IMAGE,
+            category: data.category || 'device',
+            rating: data.rating ?? 1,
+            description: data.description || '',
+            networkUuid: data.networkUuid || '',
+        };
     }
 
-    async #editImage(target: HTMLImageElement) {
+    static async #editImage(this: MatrixOpposedDeviceDialog, event: Event, target: HTMLImageElement) {
+        // TODO: tamif - clean up this data reference mess to point to a dialog local attribute
         const templateData = this.dialogData.templateData as MatrixOpposedDeviceDialogTemplateData | undefined;
         if (!templateData) return;
 
@@ -127,6 +146,31 @@ export class MatrixOpposedDeviceDialog extends PromptDialog {
 
         await fp.browse();
     }
-}
 
-export { DEFAULT_DEVICE_IMAGE };
+    static async #openCompendiumBrowser(this: MatrixOpposedDeviceDialog) {
+        /** Callback handler to process returned selection document with dialog data. */
+        const selectionCallback = async (entry: { uuid?: string }) => {
+            const source = await fromUuid<SR5Item>(String(entry.uuid));
+            // TODO: tamif - inform user about unsupported selection.
+            if (source?.type !== 'device') return;
+
+            const dialogData = this.dialogData.templateData as MatrixOpposedDeviceDialogTemplateData | undefined;
+            if (!dialogData) return;
+
+            dialogData.data.sourceUuid = String(source.uuid ?? entry.uuid ?? '');
+            dialogData.data.sourceData = source.toObject(false);
+            dialogData.data.img = source.img || DEFAULT_DEVICE_IMAGE;
+            dialogData.data.name = source.name || '';
+            dialogData.data.category = (source.system.category as keyof typeof SR5.deviceCategories | undefined) ?? 'device';
+            dialogData.data.rating = Number(source.system.technology?.rating ?? 1);
+            dialogData.data.description = source.system.description?.value || '';
+
+            await this.render({ force: true });
+        }
+
+        const browser = new CompendiumBrowser()
+        browser.activateSelectionMode(selectionCallback);
+        browser.selectTypesFilters(['device']);
+        await browser.render({ force: true });
+    }
+}
