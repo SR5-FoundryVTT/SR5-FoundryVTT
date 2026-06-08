@@ -208,7 +208,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
 
         if (this.document.system.applyTo === select.value) return;
 
-        if (this.document.changes.length) {
+        if (this.document.system.changes.length) {
             ui.notifications?.error('You must delete changes before changing the apply-to type.');
         } else {
             // Make sure applyTo is saved but also save all other form data on sheet.
@@ -223,8 +223,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
      * NOTE: This is taken from FoundryVTT v14 preparePartsContext 'changes'
      */
     prepareChangeTypes() {
-        // @ts-ignore TODO: fvtt- v14 - types missing
-        return Object.entries(SR5ActiveEffect.CHANGE_TYPES as unknown as any)
+        return Object.entries(SR5ActiveEffect.CHANGE_TYPES)
             // TODO: fvtt - v14 - Remove subtract type until typings to cleanly change ModifiableValue implemenation to use type instead of mode
             .filter(([type]) => type !== 'subtract')
             .map(([type, { label }]) => ({ type, label: game.i18n.localize(label) }))
@@ -315,7 +314,6 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
 
         // Update the priority value to match the type selection
         // Use FoundryVTT default approach of changing priority based on type changes using _onChangeForm
-        // @ts-expect-error TODO: fvtt - v14 - missing type foundry.utils.isElementInstanceOf
         if (foundry.utils.isElementInstanceOf(event.target, "select") && event.target.name.endsWith(".type")) {
             const typeSelect = event.target as HTMLSelectElement;
             const selector = `input[name="${typeSelect.name.replace(/\.type$/, ".priority")}"]`;

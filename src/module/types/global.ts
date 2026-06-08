@@ -278,12 +278,6 @@ declare module "fvtt-types/configuration" {
         }
     }
 
-    namespace ActiveEffect {
-        interface ChangeData {
-            effect: SR5ActiveEffect;
-        }
-    }
-
     interface SettingConfig {
         "shadowrun5e.applyLimits": boolean;
         "shadowrun5e.diagonalMovement": string;

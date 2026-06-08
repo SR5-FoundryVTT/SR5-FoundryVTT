@@ -33,10 +33,11 @@ export class ModifiableField<
     override applyChange(value: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData): undefined {
         const changeValue = Number(change.value);
         if (isNaN(changeValue)) return undefined;
+        if (!change.effect) return undefined;
 
         const field = value as ModifiableValueType;
         const effectName = change.effect.name;
-        const effectMode = change.mode;
+        const effectMode = change.mode ?? CONST.ACTIVE_EFFECT_MODES.ADD;
         const effectPriority = change.priority ?? 10 * effectMode;
 
         field.changes.push(
