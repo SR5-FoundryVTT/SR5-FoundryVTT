@@ -1844,6 +1844,9 @@
             "Invite": "초대 요청",
             "Title": "네트워크로 연결"
         },
+        "MatrixOpposedDeviceDialog": {
+            "Title": "매트릭스 장치 생성"
+        },
         "MatrixTarget": "매트릭스 목표",
         "MeleeWeaponAttack": "근거리 무기 공격",
         "MentalLimit": "정신 한계치",

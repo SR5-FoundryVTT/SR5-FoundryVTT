@@ -3,8 +3,6 @@ import { SR5 } from '@/module/config';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 import { SR5Item } from '@/module/item/SR5Item';
 import { DevicePartData } from '@/module/types/item/Device';
-import { DeepPartial } from 'fvtt-types/utils';
-import ApplicationV2 = foundry.applications.api.ApplicationV2;
 import { CompendiumBrowser } from '../compendiumBrowser/CompendiumBrowser';
 const { StringField, NumberField, HTMLField } = foundry.data.fields;
 const FilePicker = foundry.applications.apps.FilePicker.implementation;
@@ -63,6 +61,10 @@ const matrixOpposedDeviceDialogFields = {
     description: new HTMLField({ required: true, initial: '' }),
 };
 
+/**
+ * Allow GMs to either manually enter basic device data or select a prepared compendium device
+ * to add into an Matrix Opposed Test flow.
+ */
 export class MatrixOpposedDeviceDialog extends PromptDialog {
     static override DEFAULT_OPTIONS = {
         classes: [SR5_APPV2_CSS_CLASS, 'sr5', 'form-dialog', 'matrix-opposed-device-dialog'],
@@ -95,8 +97,7 @@ export class MatrixOpposedDeviceDialog extends PromptDialog {
         };
 
         const dialogData: PromptDialogData = {
-            // TODO: tamif - localize title
-            title: 'Matrix Opposed Device',
+            title: game.i18n.localize('SR5.MatrixOpposedDeviceDialog.Title'),
             templateData,
             templatePath: 'systems/shadowrun5e/dist/templates/apps/dialogs/matrix-opposed-device-dialog.hbs',
             buttons: {
@@ -126,7 +127,6 @@ export class MatrixOpposedDeviceDialog extends PromptDialog {
     }
 
     static async #editImage(this: MatrixOpposedDeviceDialog, event: Event, target: HTMLImageElement) {
-        // TODO: tamif - clean up this data reference mess to point to a dialog local attribute
         const templateData = this.dialogData.templateData as MatrixOpposedDeviceDialogTemplateData | undefined;
         if (!templateData) return;
 

@@ -1846,6 +1846,9 @@
             "Invite": "Einladung anfordern",
             "Title": "Mit Netzwerk verbinden"
         },
+        "MatrixOpposedDeviceDialog": {
+            "Title": "Matrixgerät erstellen"
+        },
         "MatrixTarget": "Matrixziel",
         "MeleeWeaponAttack": "Nahkampfangriff",
         "MentalLimit": "Geistiges Limit",

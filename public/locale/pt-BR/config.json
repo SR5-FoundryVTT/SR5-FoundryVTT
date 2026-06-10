@@ -839,6 +839,9 @@
         "MatrixAttrDataProc": "Datagrama",
         "MatrixAttrFirewall": "Firewall",
         "MatrixAttrSleaze": "Subversão",
+        "MatrixOpposedDeviceDialog": {
+            "Title": "Criar Dispositivo de Matriz"
+        },
         "MatrixTarget": "Alvo da Matriz",
         "MeleeWeaponAttack": "Ataque com Arma Corpo-a-corpo",
         "MentalLimit": "Limite Mental",

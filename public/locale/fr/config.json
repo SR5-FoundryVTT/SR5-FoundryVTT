@@ -529,6 +529,9 @@
         "MatrixAttrSleaze": "Corruption",
         "MatrixDice": "Dés init. Matricielle",
         "MatrixInit": "Init. Matricielle",
+        "MatrixOpposedDeviceDialog": {
+            "Title": "Créer un appareil matriciel"
+        },
         "MatrixTarget": "Cible Matricielle",
         "MeatSpaceDice": "Dés init. terrestre",
         "MeatSpaceInit": "Init. terrestre",

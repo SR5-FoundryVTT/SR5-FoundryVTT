@@ -1848,6 +1848,9 @@
             "Invite": "Ask for invite",
             "Title": "Connect to Network"
         },
+        "MatrixOpposedDeviceDialog": {
+            "Title": "Create Matrix Device"
+        },
         "MatrixTarget": "Matrix Target",
         "MeleeWeaponAttack": "Melee Weapon Attack",
         "MentalLimit": "Mental Limit",
