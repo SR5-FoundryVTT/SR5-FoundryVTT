@@ -26,7 +26,7 @@ export interface MatrixOpposedDeviceDialogSelection {
     description: string
     networkUuid: string
     sourceUuid?: string
-    sourceData?: Record<string, unknown>
+    sourceData?: any
 }
 
 type MatrixOpposedDeviceDialogOptions = {
@@ -63,7 +63,7 @@ const matrixOpposedDeviceDialogFields = {
 
 /**
  * Allow GMs to either manually enter basic device data or select a prepared compendium device
- * to add into an Matrix Opposed Test flow.
+ * to add into an ongoing Matrix Opposed Test flow.
  */
 export class MatrixOpposedDeviceDialog extends PromptDialog {
     static override DEFAULT_OPTIONS = {
@@ -126,32 +126,29 @@ export class MatrixOpposedDeviceDialog extends PromptDialog {
         };
     }
 
+    /** Let user choose a new image */
     static async #editImage(this: MatrixOpposedDeviceDialog, event: Event, target: HTMLImageElement) {
         const templateData = this.dialogData.templateData as MatrixOpposedDeviceDialogTemplateData | undefined;
         if (!templateData) return;
 
-        const current = templateData.data.img || DEFAULT_DEVICE_IMAGE;
+        const current = templateData.data.img;
         const fp = new FilePicker({
             current,
             type: 'image',
             callback: (path: string) => {
                 target.src = path;
                 templateData.data.img = path;
-            },
-            position: {
-                top: (this.position.top ?? 0) + 40,
-                left: (this.position.left ?? 0) + 10,
             }
         });
 
         await fp.browse();
     }
 
+    /** Let user choose a device from the compendium browser */
     static async #openCompendiumBrowser(this: MatrixOpposedDeviceDialog) {
         /** Callback handler to process returned selection document with dialog data. */
         const selectionCallback = async (entry: { uuid?: string }) => {
-            const source = await fromUuid<SR5Item>(String(entry.uuid));
-            // TODO: tamif - inform user about unsupported selection.
+            const source = await fromUuid<SR5Item<'device'>>(String(entry.uuid));
             if (source?.type !== 'device') return;
 
             const dialogData = this.dialogData.templateData as MatrixOpposedDeviceDialogTemplateData | undefined;
@@ -160,17 +157,17 @@ export class MatrixOpposedDeviceDialog extends PromptDialog {
             dialogData.data.sourceUuid = String(source.uuid ?? entry.uuid ?? '');
             dialogData.data.sourceData = source.toObject(false);
             dialogData.data.img = source.img || DEFAULT_DEVICE_IMAGE;
-            dialogData.data.name = source.name || '';
-            dialogData.data.category = (source.system.category as keyof typeof SR5.deviceCategories | undefined) ?? 'device';
-            dialogData.data.rating = Number(source.system.technology?.rating ?? 1);
-            dialogData.data.description = source.system.description?.value || '';
+            dialogData.data.name = source.name;
+            dialogData.data.category = source.system.category || 'device';
+            dialogData.data.rating = source.system.technology.rating;
+            dialogData.data.description = source.system.description.value;
 
             await this.render({ force: true });
         }
 
         const browser = new CompendiumBrowser()
         browser.activateSelectionMode(selectionCallback);
-        browser.selectTypesFilters(['device']);
+        browser.selectTypesFilters('item', ['device']);
         await browser.render({ force: true });
     }
 }

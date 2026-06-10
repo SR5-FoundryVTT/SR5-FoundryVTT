@@ -207,6 +207,7 @@ export class CompendiumBrowser extends BaseClass {
     private allFilters: CompendiumBrowserTypes.FilterEntry[] = [];
     private packBlackList: string[] = [];
     private _searchQuery = "";
+    private requestedTab?: CompendiumBrowserTypes.Tabs;
     private selectionMode = false;
     private selectionCallback?: CompendiumBrowserTypes.SelectionCallback;
     private selectedEntryUuid: string | null = null;
@@ -270,6 +271,13 @@ export class CompendiumBrowser extends BaseClass {
 
     protected override async _onRender(...[context, options]: Parameters<BaseClassType["_onRender"]>) {
         await super._onRender(context, options);
+
+        if (this.requestedTab && options.tab !== this.requestedTab) {
+            const tab = this.requestedTab;
+            this.requestedTab = undefined;
+            void this.render({ tab, parts: ["tabs", "filters", "results", "settings"] });
+            return;
+        }
 
         if (this.activeTab === "Settings") {
             void this._renderSettings().then(() => this.settingsListeners(this.element));
@@ -758,10 +766,28 @@ export class CompendiumBrowser extends BaseClass {
         );
     }
 
-    /** Select selected document types */
-    selectTypesFilters(types: string[]) {
+    /** 
+     * Selects the specified document types for a given document tab.
+     * @param document - The type of document, which will open the corresponding tab if not already active.
+     * @param types - An array of document type strings to select.
+     */
+    selectTypesFilters(document: 'actor' | 'item', types: string[]) {
+        const requestedDocTab: CompendiumBrowserTypes.Tabs = document === 'actor' ? 'Actor' : 'Item';
+
+        if (requestedDocTab !== this.activeTab) {
+            this.activeTab = requestedDocTab;
+            this.requestedTab = requestedDocTab;
+            this._buildFilterList();
+        }
+
+        const selectedTypes = new Set(types.map((type) => type.toLowerCase()));
+
         this.allFilters.forEach((filter) => {
-            filter.selected = types.includes(filter.id);
+            filter.selected = selectedTypes.has(filter.id.toLowerCase());
         });
+
+        if (this.rendered) {
+            void this.render({ tab: this.activeTab, parts: ["tabs", "filters", "results", "settings"] });
+        }
     }
 }

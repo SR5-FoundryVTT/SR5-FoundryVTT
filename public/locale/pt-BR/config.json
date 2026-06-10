@@ -771,6 +771,7 @@
                 "ClearNetwork": "Limpar rede de todos os dispositivos",
                 "ItemEffects": "Efeitos do Item",
                 "MissingNetworkDevices": "Arraste e solte um dispositivo para adicioná-lo",
+                "RemoveImprovisedDevices": "Remover dispositivos improvisados",
                 "NetworkDevices": "Dispositivos em Rede",
                 "PAN": "RAP",
                 "SubtractOne": "Subtrair Um",

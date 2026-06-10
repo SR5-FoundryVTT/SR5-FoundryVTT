@@ -1736,6 +1736,7 @@
                 "NotVisible": "숨김",
                 "PAN": "PAN",
                 "RebootDevice": "재부팅",
+                "RemoveImprovisedDevices": "즉석 장치 제거",
                 "SubtractOne": "제외",
                 "Type": "종류",
                 "Visible": "보임",

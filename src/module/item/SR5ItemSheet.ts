@@ -789,7 +789,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (!userConsented) return;
 
         await this.item.removeImprovisedDevices();
-        this.#renderIfNetworkIsEmpty();
+        void this.render();
     }
 
     #renderIfNetworkIsEmpty() {
