@@ -57,6 +57,8 @@ const { fromUuid, mergeObject, expandObject } = foundry.utils;
  *       Be wary of SR5Item.actor for this reason!
  */
 export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSubType> extends Item<SubType> {
+    static readonly MAX_CONTAINER_DEPTH = 5;
+
     //Those declarations must be initialized on prepareData, otherwise they will be undefined
 
     // Item.items isn't the Foundry default ItemCollection but is overwritten within
@@ -152,6 +154,147 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     async clearNestedItems() {
         return this.unsetFlag(SYSTEM_NAME, FLAGS.EmbeddedItems);
+    }
+
+    /**
+     * The storage container this item belongs to, if any.
+     */
+    get container() {
+        const containerId = foundry.utils.getProperty(this.system, 'container') as string | null | undefined;
+        if (!containerId) return;
+
+        if (this.isEmbedded) return this.actorOwner?.items.get(containerId);
+        if (this.pack) return game.packs.get(this.pack)?.getDocument(containerId);
+        return game.items?.get(containerId);
+    }
+
+    /**
+     * Direct storage contents of this container.
+     */
+    get contents(): foundry.utils.Collection<SR5Item> | Promise<foundry.utils.Collection<SR5Item>> {
+        if (!this.id) return new foundry.utils.Collection<SR5Item>();
+
+        if (this.pack && !this.isEmbedded) {
+            const pack = game.packs.get(this.pack);
+            return pack?.getDocuments({ system: { container: this.id } }).then(documents =>
+                new foundry.utils.Collection<SR5Item>(
+                    documents.flatMap(document => document.id ? [[document.id, document as SR5Item] as [string, SR5Item]] : [])
+                )
+            ) ?? new foundry.utils.Collection<SR5Item>();
+        }
+
+        const items = this.isEmbedded ? this.actorOwner?.items : game.items;
+        const collection = new foundry.utils.Collection<SR5Item>();
+        for (const item of items?.contents ?? []) {
+            const sr5Item = item as SR5Item;
+            if (sr5Item.id && foundry.utils.getProperty(sr5Item.system, 'container') === this.id) {
+                collection.set(sr5Item.id, sr5Item);
+            }
+        }
+        return collection;
+    }
+
+    getContainedItem(id: string) {
+        if (this.isEmbedded) return this.actorOwner?.items.get(id);
+        if (this.pack) return game.packs.get(this.pack)?.getDocument(id);
+        return game.items?.get(id);
+    }
+
+    /**
+     * Recursive storage contents, capped to avoid cyclic relationships.
+     */
+    get allContainedItems() {
+        const contents = this.contents;
+        if (contents instanceof Promise) return contents.then(items => this._collectContainedItemsAsync(items));
+        return this._collectContainedItems(contents);
+    }
+
+    private _collectContainedItems(contents: foundry.utils.Collection<SR5Item>, depth = 0, visited = new Set<string>()) {
+        const collection = new foundry.utils.Collection<SR5Item>();
+        if (depth >= SR5Item.MAX_CONTAINER_DEPTH) return collection;
+
+        for (const item of contents) {
+            if (!item.id || visited.has(item.id)) continue;
+
+            visited.add(item.id);
+            collection.set(item.id, item);
+
+            if (item.isType('container')) {
+                const nested = item.contents;
+                if (nested instanceof Promise) continue;
+
+                for (const nestedItem of this._collectContainedItems(nested, depth + 1, visited)) {
+                    if (nestedItem.id) collection.set(nestedItem.id, nestedItem);
+                }
+            }
+        }
+
+        return collection;
+    }
+
+    private async _collectContainedItemsAsync(contents: foundry.utils.Collection<SR5Item>, depth = 0, visited = new Set<string>()) {
+        const collection = new foundry.utils.Collection<SR5Item>();
+        if (depth >= SR5Item.MAX_CONTAINER_DEPTH) return collection;
+
+        for (const item of contents) {
+            if (!item.id || visited.has(item.id)) continue;
+
+            visited.add(item.id);
+            collection.set(item.id, item);
+
+            if (item.isType('container')) {
+                const nested = await item.contents;
+                for (const nestedItem of await this._collectContainedItemsAsync(nested, depth + 1, visited)) {
+                    if (nestedItem.id) collection.set(nestedItem.id, nestedItem);
+                }
+            }
+        }
+
+        return collection;
+    }
+
+    async allContainers(): Promise<SR5Item[]> {
+        let item: SR5Item = this;
+        const containers: SR5Item[] = [];
+        const visited = new Set<string>(this.id ? [this.id] : []);
+
+        while (containers.length < SR5Item.MAX_CONTAINER_DEPTH) {
+            const container = await item.container as SR5Item | null | undefined;
+            if (!container?.id || visited.has(container.id)) break;
+
+            containers.push(container);
+            visited.add(container.id);
+            item = container;
+        }
+
+        return containers;
+    }
+
+    async canContainItem(item: SR5Item): Promise<boolean> {
+        if (!this.isType('container')) return false;
+        if (!this.id || !item.id) return false;
+        if (this.id === item.id) return false;
+
+        const containers = await this.allContainers();
+        return !containers.some(container => container.id === item.id);
+    }
+
+    async clearContainerContents(): Promise<void> {
+        if (!this.isType('container')) return;
+
+        const contents = await this.contents;
+        const updates: any[] = Array.from(contents)
+            .filter(item => item.id)
+            .map(item => ({ _id: item.id, 'system.container': null }));
+        if (updates.length === 0) return;
+
+        if (this.isEmbedded && this.actorOwner) {
+            await this.actorOwner.updateEmbeddedDocuments('Item', updates);
+        } else if (this.pack) {
+            await Item.implementation.updateDocuments(updates, { pack: this.pack });
+        } else {
+            await Item.implementation.updateDocuments(updates);
+        }
     }
 
     get hasOpposedRoll(): boolean {
@@ -1583,6 +1726,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @param args
      */
     override async _preDelete(...args: Parameters<Item['_preDelete']>) {
+        await this.clearContainerContents();
         await StorageFlow.deleteStorageReferences(this);
         return super._preDelete(...args);
     }

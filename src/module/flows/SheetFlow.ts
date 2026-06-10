@@ -27,6 +27,8 @@ export const SheetFlow = {
                 return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Gear' });
             case 'complex_form':
                 return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.ComplexForm' });
+            case 'container':
+                return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Container' });
             case 'program':
                 return formatStrict('SR5.Create', { type: 'SR5.ItemTypes.Program' });
             case 'weapon':

@@ -5,6 +5,8 @@ import { Migrator } from '@/module/migrator/Migrator';
 import { VersionMigration } from '@/module/migrator/VersionMigration';
 import { Version0_33_1 } from '@/module/migrator/versions/Version0_33_1';
 import { Version0_36_0 } from 'src/module/migrator/versions/Version0_36_0';
+import { Version0_37_0 } from 'src/module/migrator/versions/Version0_37_0';
+import { FLAGS, SYSTEM_NAME } from '@/module/constants';
 
 export const Migrators = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -753,6 +755,84 @@ export const Migrators = (context: QuenchBatchContext) => {
 
             assert.deepEqual(effect.system.selection_attributes, ['body']);
             assert.deepEqual(effect.system.selection_skills, ['automatics']);
+        });
+    });
+
+    describe('Version0_37_0 container migration', () => {
+        it('normalizes missing item system.container to null', () => {
+            const migrator = new Version0_37_0();
+            const item: any = {
+                _id: foundry.utils.randomID(16),
+                name: 'Old Gear',
+                type: 'equipment',
+                system: DataDefaults.baseSystemData('equipment'),
+            };
+            delete item.system.container;
+
+            migrator.migrateItem(item);
+
+            assert.isNull(item.system.container);
+        });
+
+        it('does not convert weapon nested ammo or mods into actor items', () => {
+            const migrator = new Version0_37_0();
+            const weapon: any = {
+                _id: foundry.utils.randomID(16),
+                name: 'Weapon With Ammo',
+                type: 'weapon',
+                system: DataDefaults.baseSystemData('weapon'),
+                flags: {
+                    [SYSTEM_NAME]: {
+                        [FLAGS.EmbeddedItems]: [{
+                            _id: foundry.utils.randomID(16),
+                            name: 'Nested Ammo',
+                            type: 'ammo',
+                            system: DataDefaults.baseSystemData('ammo'),
+                        }],
+                    },
+                },
+            };
+            delete weapon.system.container;
+            const actor: any = { items: [weapon] };
+
+            migrator.migrateActor(actor);
+
+            assert.lengthOf(actor.items, 1);
+            assert.isNull(weapon.system.container);
+            assert.lengthOf(weapon.flags[SYSTEM_NAME][FLAGS.EmbeddedItems], 1);
+        });
+
+        it('lifts actor-owned nested container items into sibling actor items', () => {
+            const migrator = new Version0_37_0();
+            const container: any = {
+                _id: foundry.utils.randomID(16),
+                name: 'Backpack',
+                type: 'container',
+                system: DataDefaults.baseSystemData('container'),
+                flags: {
+                    [SYSTEM_NAME]: {
+                        [FLAGS.EmbeddedItems]: [{
+                            _id: foundry.utils.randomID(16),
+                            name: 'Rope',
+                            type: 'equipment',
+                            system: DataDefaults.baseSystemData('equipment'),
+                        }],
+                    },
+                },
+            };
+            delete container.system.container;
+            const actor: any = { items: [container] };
+
+            migrator.migrateActor(actor);
+
+            assert.lengthOf(actor.items, 2);
+            assert.isNull(container.system.container);
+            assert.isUndefined(container.flags[SYSTEM_NAME][FLAGS.EmbeddedItems]);
+
+            const lifted = actor.items.find((item: any) => item.name === 'Rope');
+            assert.exists(lifted);
+            assert.strictEqual(lifted.system.container, container._id);
+            assert.notStrictEqual(lifted._id, container._id);
         });
     });
 };

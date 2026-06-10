@@ -1,0 +1,52 @@
+<section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="fill-container">
+        <div class="list-item list-item-header header-for-scrollable">
+            <div class="list-item-start">
+                <label>{{localize 'SR5.Tabs.Item.ContainerContents'}}</label>
+            </div>
+            <div class="list-item-icons">
+                <span data-tooltip="SR5.Container.Capacity">
+                    <i class="fas fa-box-open"></i>&nbsp;{{@root.containerCapacity}}
+                </span>
+            </div>
+        </div>
+
+        <div class="scrollable">
+            {{#each @root.containerContents as |contained|}}
+                <div class="list-item-container">
+                    <div class="list-item draggable"
+                         data-item-id="{{contained.id}}"
+                         data-uuid="{{contained.uuid}}">
+                        <div class="list-item-start">
+                            <img class="list-item-img" src="{{contained.img}}" alt="{{contained.name}}" />
+                            <span class="item-text item-name">{{contained.name}}</span>
+                        </div>
+                        <div class="list-item-icons">
+                            <a data-action="editContainerItem"
+                               data-item-id="{{contained.id}}"
+                               data-tooltip="SR5.Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a data-action="removeContainerItem"
+                               data-item-id="{{contained.id}}"
+                               data-tooltip="SR5.Container.Remove">
+                                <i class="fas fa-arrow-up-from-bracket"></i>
+                            </a>
+                            <a data-action="deleteContainerItem"
+                               data-item-id="{{contained.id}}"
+                               data-tooltip="SR5.Delete">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {{else}}
+                <div class="list-item">
+                    <div class="list-item-start">
+                        <span class="item-text item-name">{{localize 'SR5.Container.Empty'}}</span>
+                    </div>
+                </div>
+            {{/each}}
+        </div>
+    </div>
+</section>

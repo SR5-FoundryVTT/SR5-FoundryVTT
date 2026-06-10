@@ -81,6 +81,9 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     armorMods: SR5Item<'modification'>[]
     vehicleMods: SR5Item<'modification'>[]
     droneMods: SR5Item<'modification'>[]
+    containerContents: SR5Item[]
+    containerCapacity: string
+    containerCapacityFull: boolean
 
     // Sorted lists for usage in select elements.
     activeSkills: Record<string, string> // skill id: label
@@ -135,6 +138,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             deleteItem: SR5ItemSheet.#deleteItem,
             addItemQty: SR5ItemSheet.#addItemQty,
             removeItemQty: SR5ItemSheet.#removeItemQty,
+            editContainerItem: SR5ItemSheet.#editContainerItem,
+            removeContainerItem: SR5ItemSheet.#removeContainerItem,
+            deleteContainerItem: SR5ItemSheet.#deleteContainerItem,
 
             addLicense: SR5ItemSheet.#addLicense,
             removeLicense: SR5ItemSheet.#removeLicense,
@@ -225,6 +231,10 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             templates: SheetFlow.templateListItem('armor-modification'),
             scrollable: ['.scrollable']
         },
+        containerContents: {
+            template: SheetFlow.templateBase('item/tabs/container-contents'),
+            scrollable: ['.scrollable']
+        },
         effects: {
             template: SheetFlow.templateBase('item/tabs/effects'),
             templates: SheetFlow.templateListItem('effect'),
@@ -247,6 +257,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 { id: 'weaponAmmo', label: 'SR5.Tabs.Item.WeaponAmmo', cssClass: '' },
                 { id: 'weaponModifications', label: 'SR5.Tabs.Item.WeaponMods', cssClass: '' },
                 { id: 'armorModifications', label: 'SR5.Tabs.Item.ArmorMods', cssClass: '' },
+                { id: 'containerContents', label: 'SR5.Tabs.Item.ContainerContents', cssClass: '' },
                 { id: 'licenses', label: 'SR5.Tabs.Item.SinLicenses', cssClass: '' },
                 { id: 'effects', label: 'SR5.Tabs.Item.Effects', cssClass: '' },
             ]
@@ -322,6 +333,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
         if (!item.isType('armor')) {
             delete parts.armorModifications;
+        }
+        if (!item.isType('container')) {
+            delete parts.containerContents;
         }
         if (!item.isType('sin')) {
             delete parts.licenses;
@@ -406,6 +420,14 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         data['armorMods'] = sortByName((grouped.armor ?? []) as SR5Item<'modification'>[]);
         data['vehicleMods'] = sortByName((grouped.vehicle ?? []) as SR5Item<'modification'>[]);
         data['droneMods'] = sortByName((grouped.drone ?? []) as SR5Item<'modification'>[]);
+
+        if (this.item.isType('container')) {
+            const contents = await this.item.contents;
+            data['containerContents'] = sortByName(Array.from(contents.values()) as SR5Item[]);
+            const max = Number(foundry.utils.getProperty(this.item.system, 'capacity.count') ?? 0);
+            data['containerCapacity'] = max > 0 ? `${contents.size}/${max}` : `${contents.size}`;
+            data['containerCapacityFull'] = max > 0 && contents.size >= max;
+        }
 
         data['activeSkills'] = await this._getSortedActiveSkillsForSelect();
         data['attributes'] = this._getSortedAttributesForSelect();
@@ -693,6 +715,33 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (id && item) {
             await this.item.deleteOwnedItem(id);
         }
+    }
+
+    static async #editContainerItem(this: SR5ItemSheet, event: Event) {
+        event.preventDefault();
+
+        const id = SheetFlow.closestItemId(event.target);
+        const item = await this.item.getContainedItem(id) as SR5Item | undefined;
+        await item?.sheet?.render(true);
+    }
+
+    static async #removeContainerItem(this: SR5ItemSheet, event: Event) {
+        event.preventDefault();
+
+        const id = SheetFlow.closestItemId(event.target);
+        const item = await this.item.getContainedItem(id) as SR5Item | undefined;
+        await item?.update({ 'system.container': null } as any);
+    }
+
+    static async #deleteContainerItem(this: SR5ItemSheet, event: Event) {
+        event.preventDefault();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        const id = SheetFlow.closestItemId(event.target);
+        const item = await this.item.getContainedItem(id) as SR5Item | undefined;
+        await item?.delete();
     }
 
     static async #addItem(this: SR5ItemSheet, event: Event) {
@@ -1206,6 +1255,10 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @protected
      */
     protected async _onDropItem(event: DragEvent, item: SR5Item) {
+        if (this.item.isType('container')) {
+            return this._onDropContainerItem(item);
+        }
+
         // dropped ammo and matching mods get added as nested items for compatible parents
         if (this.item.isType('weapon') && item.isType('ammo', 'modification')) {
             const nested = item.toObject();
@@ -1234,6 +1287,55 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (this.item.canBeSlave && item.canBeMaster) {
             return item.addSlave(this.item);
         }
+    }
+
+    protected async _onDropContainerItem(item: SR5Item) {
+        if (!this.item.isOwner || !this.item.id) return null;
+
+        const currentContainer = foundry.utils.getProperty(item.system, 'container');
+        if (currentContainer === this.item.id) return item;
+
+        if (!await this.item.canContainItem(item)) {
+            ui.notifications?.warn(game.i18n.localize('SR5.Container.CannotContain'));
+            return null;
+        }
+
+        const contents = await this.item.contents;
+        const max = Number(foundry.utils.getProperty(this.item.system, 'capacity.count') ?? 0);
+        if (max > 0 && contents.size >= max) {
+            ui.notifications?.warn(game.i18n.localize('SR5.Container.Full'));
+            return null;
+        }
+
+        if (this._sameContainerCollection(item)) {
+            return item.update({ 'system.container': this.item.id } as any);
+        }
+
+        const itemData = item.toObject() as Item.CreateData;
+        delete itemData._id;
+        foundry.utils.setProperty(itemData, 'system.container', this.item.id);
+
+        if (this.item.isEmbedded && this.item.actorOwner) {
+            const created = await this.item.actorOwner.createEmbeddedDocuments('Item', [itemData]);
+            return created?.[0] ?? null;
+        }
+
+        if (this.item.pack) {
+            const created = await Item.implementation.createDocuments([itemData], { pack: this.item.pack });
+            return created?.[0] ?? null;
+        }
+
+        if (this.item.folder) itemData.folder = this.item.folder.id;
+        const created = await Item.implementation.createDocuments([itemData]);
+        return created?.[0] ?? null;
+    }
+
+    private _sameContainerCollection(item: SR5Item) {
+        const target = this.item;
+        const sameActor = target.isEmbedded && item.isEmbedded && target.actorOwner === item.actorOwner;
+        const samePack = !target.isEmbedded && !item.isEmbedded && !!target.pack && target.pack === item.pack;
+        const sameWorld = !target.isEmbedded && !item.isEmbedded && !target.pack && !item.pack;
+        return sameActor || samePack || sameWorld;
     }
 
     /* -------------------------------------------- */

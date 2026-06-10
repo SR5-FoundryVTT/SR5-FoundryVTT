@@ -29,6 +29,7 @@ import { Armor } from './item/Armor';
 import { Bioware } from './item/Bioware';
 import { CallInAction } from './item/CallInAction';
 import { ComplexForm } from './item/ComplexForm';
+import { Container } from './item/Container';
 import { Contact } from './item/Contact';
 import { CritterPower } from './item/CritterPower';
 import { Cyberware } from './item/Cyberware';
@@ -176,6 +177,7 @@ declare module "fvtt-types/configuration" {
             bioware: typeof Bioware;
             call_in_action: typeof CallInAction;
             complex_form:  typeof ComplexForm;
+            container: typeof Container;
             contact: typeof Contact;
             critter_power: typeof CritterPower;
             cyberware: typeof Cyberware;
