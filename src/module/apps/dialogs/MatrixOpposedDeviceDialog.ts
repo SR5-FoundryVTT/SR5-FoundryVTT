@@ -15,6 +15,7 @@ interface MatrixOpposedDeviceDialogInitialData {
     name?: string
     category?: keyof typeof SR5.deviceCategories
     rating?: number
+    wireless?: keyof typeof SR5.wirelessModes
     description?: string
     networkUuid?: string
 }
@@ -23,6 +24,7 @@ export interface MatrixOpposedDeviceDialogSelection {
     name: string
     category: keyof typeof SR5.deviceCategories
     rating: number
+    wireless: keyof typeof SR5.wirelessModes
     description: string
     networkUuid: string
     sourceUuid?: string
@@ -48,6 +50,7 @@ type MatrixOpposedDeviceDialogTemplateData = {
         name: InstanceType<typeof StringField>
         category: ReturnType<typeof DevicePartData>['category']
         rating: InstanceType<typeof NumberField>
+        wireless: InstanceType<typeof StringField>
         description: InstanceType<typeof HTMLField>
         networkUuid: ReturnType<typeof createNetworkUuidField>
     }
@@ -58,6 +61,7 @@ const matrixOpposedDeviceDialogFields = {
     name: new StringField({ required: true, blank: false, initial: '' }),
     category: DevicePartData().category,
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 1 }),
+    wireless: new StringField({ required: true, initial: 'online', choices: SR5.wirelessModes }),
     description: new HTMLField({ required: true, initial: '' }),
 };
 
@@ -121,6 +125,7 @@ export class MatrixOpposedDeviceDialog extends PromptDialog {
             img: data.img || DEFAULT_DEVICE_IMAGE,
             category: data.category || 'device',
             rating: data.rating ?? 1,
+            wireless: data.wireless || 'online',
             description: data.description || '',
             networkUuid: data.networkUuid || '',
         };
@@ -160,6 +165,7 @@ export class MatrixOpposedDeviceDialog extends PromptDialog {
             dialogData.data.name = source.name;
             dialogData.data.category = source.system.category || 'device';
             dialogData.data.rating = source.system.technology.rating;
+            dialogData.data.wireless = source.system.technology.wireless;
             dialogData.data.description = source.system.description.value;
 
             await this.render({ force: true });

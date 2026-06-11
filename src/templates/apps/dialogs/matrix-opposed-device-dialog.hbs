@@ -32,7 +32,12 @@
                 {{formInput fields.rating value=data.rating name="data.rating" rootId=rootId}}
             </div>
 
-            <div class="form-group device-details-grid__network">
+            <div class="form-group">
+                <label>{{localize "SR5.Wireless"}}</label>
+                {{formInput fields.wireless value=data.wireless name="data.wireless" localize=true rootId=rootId}}
+            </div>
+
+            <div class="form-group">
                 <label>{{localize "SR5.Network"}}</label>
                 {{formInput fields.networkUuid value=data.networkUuid name="data.networkUuid" rootId=rootId}}
             </div>

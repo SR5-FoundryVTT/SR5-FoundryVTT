@@ -127,10 +127,6 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .device-details-grid__network {
-        grid-column: 1 / -1;
-    }
-
     .dialog-sheet-section--editor .form-group {
         align-items: stretch;
     }

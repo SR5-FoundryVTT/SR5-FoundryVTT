@@ -12,6 +12,7 @@ export const shadowrunMatrixOpposedDeviceDialog = (context: QuenchBatchContext) 
                 name: 'Custom Device',
                 category: 'device' as const,
                 rating: 3,
+                wireless: 'online' as const,
                 description: 'Edited description',
                 networkUuid: '',
                 sourceData: {
@@ -45,6 +46,7 @@ export const shadowrunMatrixOpposedDeviceDialog = (context: QuenchBatchContext) 
             assert.strictEqual(data.type, 'device');
             assert.strictEqual(system.category, 'device');
             assert.strictEqual(system.technology?.rating, 3);
+            assert.strictEqual(system.technology?.wireless, 'online');
             assert.strictEqual(system.technology?.availability, '3');
             assert.strictEqual(system.description?.value, 'Edited description');
             assert.strictEqual(system.description?.source, 'Compendium Source');

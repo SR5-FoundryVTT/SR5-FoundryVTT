@@ -87,6 +87,7 @@ export const MatrixOpposedTargetFlow = {
                 category: selection.category,
                 technology: {
                     rating: selection.rating,
+                    wireless: selection.wireless || 'online',
                 },
                 description: {
                     value: selection.description
