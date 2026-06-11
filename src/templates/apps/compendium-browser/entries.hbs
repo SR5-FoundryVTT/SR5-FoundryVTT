@@ -1,4 +1,4 @@
-<div class="compendium-entry {{#if selectionMode}}is-selection-mode{{/if}}" data-uuid="{{entry.uuid}}" draggable="{{#unless selectionMode}}true{{/unless}}">
+<div class="compendium-entry {{#if selectionMode}}is-selection-mode{{/if}}" data-uuid="{{entry.uuid}}" draggable="{{#if selectionMode}}false{{else}}true{{/if}}">
     {{#if selectionMode}}
     <label class="entry-select">
         <input type="checkbox" data-entry-uuid="{{entry.uuid}}" {{#if isSelected}}checked{{/if}}>
