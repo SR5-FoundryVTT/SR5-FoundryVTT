@@ -15,25 +15,58 @@
             {{#each @root.containerContents as |contained|}}
                 <div class="list-item-container">
                     <div class="list-item draggable"
-                         data-item-id="{{contained.id}}"
-                         data-uuid="{{contained.uuid}}">
+                         data-source="{{contained.item.system.description.source}}"
+                         data-item-id="{{contained.item.id}}"
+                         data-uuid="{{contained.item.uuid}}">
                         <div class="list-item-start">
-                            <img class="list-item-img" src="{{contained.img}}" alt="{{contained.name}}" />
-                            <span class="item-text item-name">{{contained.name}}</span>
+                            <button class="list-item-image-container icon sr5-icon"
+                                    type="button"
+                                    data-action="editContainerItem"
+                                    data-item-id="{{contained.item.id}}"
+                                    data-tooltip="SR5.Edit">
+                                <img src="{{contained.item.img}}"
+                                     {{#if @root.isEditMode}}
+                                     class="list-item-image-edit"
+                                     {{else if (hasRoll contained.item)}}
+                                     class="list-item-image-roll"
+                                     {{else}}
+                                     class="list-item-image-info"
+                                     {{/if}}
+                                />
+                            </button>
+                            {{#with contained.item}}
+                                {{> 'systems/shadowrun5e/dist/templates/v2/common/import-flag.hbs' }}
+                            {{/with}}
+                            <a class="item-name-link {{#if (isBroken contained.item)}}faded {{/if}}{{#if contained.item.system.importFlags.isFreshImport}}{{#if (itemMarking "COLOR")}}fresh-import{{/if}}{{/if}}"
+                               data-action="showItemDescription">
+                                {{contained.item.name}}
+                            </a>
+                        </div>
+                        <div class="list-item-col thicc-col">
+                            <label>{{contained.typeLabel}}</label>
+                        </div>
+                        <div class="list-item-col rtg-col">
+                            <label>{{contained.primaryValue}}</label>
+                        </div>
+                        <div class="list-item-col rtg-col">
+                            <label>{{contained.secondaryValue}}</label>
+                        </div>
+                        <div class="list-item-col qty-input-col">
+                            <label>{{contained.tertiaryValue}}</label>
                         </div>
                         <div class="list-item-icons">
                             <a data-action="editContainerItem"
-                               data-item-id="{{contained.id}}"
+                               data-item-id="{{contained.item.id}}"
                                data-tooltip="SR5.Edit">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <a data-action="removeContainerItem"
-                               data-item-id="{{contained.id}}"
+                               data-item-id="{{contained.item.id}}"
                                data-tooltip="SR5.Container.Remove">
                                 <i class="fas fa-arrow-up-from-bracket"></i>
                             </a>
                             <a data-action="deleteContainerItem"
-                               data-item-id="{{contained.id}}"
+                               data-item-id="{{contained.item.id}}"
                                data-tooltip="SR5.Delete">
                                 <i class="fas fa-trash"></i>
                             </a>

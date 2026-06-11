@@ -81,7 +81,7 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     armorMods: SR5Item<'modification'>[]
     vehicleMods: SR5Item<'modification'>[]
     droneMods: SR5Item<'modification'>[]
-    containerContents: SR5Item[]
+    containerContents: ContainerContentRow[]
     containerCapacity: string
     containerCapacityFull: boolean
 
@@ -119,6 +119,14 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     calculatedCost: boolean
     calculatedAvailability: boolean
     ratingForCalculation: boolean
+}
+
+interface ContainerContentRow {
+    item: SR5Item
+    typeLabel: string
+    primaryValue: string
+    secondaryValue: string
+    tertiaryValue: string
 }
 
 /**
@@ -321,7 +329,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @protected
      */
     protected _cleanParts(item: SR5Item, parts: Record<string, any>) {
-        if (item.isType('contact', 'lifestyle', 'sin', 'grid', 'program')) {
+        if (item.isType('contact', 'lifestyle', 'sin', 'grid', 'program', 'container')) {
             delete parts.details;
         }
         if (!item.canBeMaster) {
@@ -423,7 +431,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         if (this.item.isType('container')) {
             const contents = await this.item.contents;
-            data['containerContents'] = sortByName(Array.from(contents.values()) as SR5Item[]);
+            data['containerContents'] = this._prepareContainerContents(sortByName(Array.from(contents.values()) as SR5Item[]));
             const max = Number(foundry.utils.getProperty(this.item.system, 'capacity.count') ?? 0);
             data['containerCapacity'] = max > 0 ? `${contents.size}/${max}` : `${contents.size}`;
             data['containerCapacityFull'] = max > 0 && contents.size >= max;
@@ -491,6 +499,99 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         data.bindings = this._prepareKeybindings();
 
         return data;
+    }
+
+    private _prepareContainerContents(items: SR5Item[]): ContainerContentRow[] {
+        return items.map(item => {
+            const [primaryValue = '', secondaryValue = '', tertiaryValue = ''] = this._getContainerItemValues(item);
+
+            return {
+                item,
+                typeLabel: this._getContainerItemTypeLabel(item),
+                primaryValue,
+                secondaryValue,
+                tertiaryValue,
+            };
+        });
+    }
+
+    private _getContainerItemTypeLabel(item: SR5Item): string {
+        const key = `TYPES.Item.${item.type}`;
+        return game.i18n.has(key) ? game.i18n.localize(key) : item.type;
+    }
+
+    private _getContainerItemValues(item: SR5Item): string[] {
+        const system = item.system as Record<string, any>;
+        const technology = system.technology ?? {};
+        const values: string[] = [];
+
+        switch (item.type) {
+            case 'weapon': {
+                const current = foundry.utils.getProperty(system, 'ammo.current.value');
+                const max = foundry.utils.getProperty(system, 'ammo.current.max');
+                if (typeof current === 'number' && typeof max === 'number' && max > 0) {
+                    values.push(`${current}/${max}`);
+                }
+                break;
+            }
+            case 'armor': {
+                const armorValue = foundry.utils.getProperty(system, 'armor.value');
+                const hardenedValue = foundry.utils.getProperty(system, 'armor.hardened');
+                if (typeof armorValue === 'number') {
+                    values.push(typeof hardenedValue === 'number' && hardenedValue > 0 ? `${armorValue}/${hardenedValue}H` : `${armorValue}`);
+                }
+                break;
+            }
+            case 'contact': {
+                const connection = system.connection;
+                const loyalty = system.loyalty;
+                if (typeof connection === 'number' || typeof loyalty === 'number') {
+                    values.push(`C/L ${connection ?? 0}/${loyalty ?? 0}`);
+                }
+                break;
+            }
+            case 'lifestyle': {
+                if (typeof system.cost === 'number' && system.cost > 0) {
+                    values.push(`¥${Number(system.cost).toLocaleString(game.i18n.lang)}`);
+                }
+                break;
+            }
+            case 'complex_form': {
+                if (typeof system.fade === 'number' && system.fade > 0) {
+                    values.push(`Fade ${system.fade}`);
+                }
+                break;
+            }
+            case 'spell': {
+                if (typeof system.drain === 'number' && system.drain > 0) {
+                    values.push(`Drain ${system.drain}`);
+                }
+                break;
+            }
+            case 'adept_power': {
+                if (typeof system.level === 'number' && system.level > 0) {
+                    values.push(`Lvl ${system.level}`);
+                }
+                break;
+            }
+        }
+
+        const rating = typeof technology.rating === 'number' ? technology.rating : system.rating;
+        if (typeof rating === 'number' && rating > 0 && !values.some(value => value.startsWith('Rtg '))) {
+            values.push(`Rtg ${rating}`);
+        }
+
+        const quantity = typeof technology.quantity === 'number' ? technology.quantity : system.quantity;
+        if (typeof quantity === 'number' && quantity > 0) {
+            values.push(`Qty ${quantity}`);
+        }
+
+        const availability = foundry.utils.getProperty(system, 'technology.calculated.availability.value') ?? technology.availability;
+        if (typeof availability === 'string' && availability.length > 0) {
+            values.push(`Avail ${availability}`);
+        }
+
+        return values.slice(0, 3);
     }
 
     /**
