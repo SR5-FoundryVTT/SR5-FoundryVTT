@@ -475,6 +475,9 @@
                 "SpriteConfiguration": "Configuration de sprite",
                 "SpritePowers": "Pouvoirs",
                 "VehicleConfiguration": "Configuration véhicule"
+            },
+            "Sheet": {
+                "RemoveImprovisedDevices": "Supprimer les appareils improvisés"
             }
         },
         "Languages": "Langues",
@@ -776,7 +779,6 @@
             "CatCombat": "Combat",
             "CatDetection": "Détection",
             "CatHealth": "Santé",
-                "RemoveImprovisedDevices": "Supprimer les appareils improvisés",
             "CatIllusion": "Illusion",
             "CatManipulation": "Manipulation",
             "Category": "Catégorie",
