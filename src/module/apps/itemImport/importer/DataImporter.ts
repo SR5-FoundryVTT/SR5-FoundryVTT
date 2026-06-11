@@ -116,7 +116,7 @@ export abstract class DataImporter {
                     continue;
                 }
 
-                const item = await parser.Parse(data, key);                
+                const item = await parser.Parse(data, key) as (Actor.CreateData | Item.CreateData) & { _embeddedItems?: Item.Source[] };
                 injectActionTests?.(item as Item.CreateData);
 
                 item._id = id;
@@ -126,6 +126,17 @@ export abstract class DataImporter {
 
                 if (!itemMap.has(key)) itemMap.set(key, []);
                 itemMap.get(key)!.push(item);
+                if ('type' in item && Array.isArray(item._embeddedItems)) {
+                    for (const embeddedItem of item._embeddedItems) {
+                        const linked = foundry.utils.duplicate(embeddedItem) as Item.CreateData;
+                        linked._id = foundry.utils.randomID();
+                        foundry.utils.setProperty(linked, 'system.parentId', id);
+                        if (item.folder) linked.folder = item.folder;
+                        itemMap.get(key)!.push(linked);
+                    }
+
+                    delete item._embeddedItems;
+                }
             } catch (error) {
                 console.error("Error:\n", error, "\nData:\n", data);
                 ui.notifications?.error(`Failed parsing ${documentType}: ${data?.name?._TEXT ?? "Unknown"}`);

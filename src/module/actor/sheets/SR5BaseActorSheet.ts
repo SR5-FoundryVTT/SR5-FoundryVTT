@@ -1351,6 +1351,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
             const containerId = foundry.utils.getProperty(item.system, 'container') as string | null | undefined;
             if (containerId && this.actor.items.has(containerId)) continue;
+            const parentId = foundry.utils.getProperty(item.system, 'parentId') as string | null | undefined;
+            if (parentId && this.actor.items.has(parentId)) continue;
 
             // Determine what inventory the item sits in.
             const inventory = itemIdInventory[item.id] || this.actor.defaultInventory;

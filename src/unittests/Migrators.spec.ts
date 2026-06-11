@@ -6,6 +6,7 @@ import { VersionMigration } from '@/module/migrator/VersionMigration';
 import { Version0_33_1 } from '@/module/migrator/versions/Version0_33_1';
 import { Version0_36_0 } from 'src/module/migrator/versions/Version0_36_0';
 import { Version0_37_0 } from 'src/module/migrator/versions/Version0_37_0';
+import { Version0_38_0 } from 'src/module/migrator/versions/Version0_38_0';
 import { FLAGS, SYSTEM_NAME } from '@/module/constants';
 
 export const Migrators = (context: QuenchBatchContext) => {
@@ -833,6 +834,104 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.exists(lifted);
             assert.strictEqual(lifted.system.container, container._id);
             assert.notStrictEqual(lifted._id, container._id);
+        });
+    });
+
+    describe('Version0_38_0 attachment migration', () => {
+        it('normalizes missing item parent fields to null', () => {
+            const migrator = new Version0_38_0();
+            const item: any = {
+                _id: foundry.utils.randomID(16),
+                name: 'Old Gear',
+                type: 'equipment',
+                system: DataDefaults.baseSystemData('equipment'),
+            };
+
+            delete item.system.parentId;
+            delete item.system.parentRole;
+
+            migrator.migrateItem(item);
+
+            assert.isNull(item.system.parentId);
+            assert.isNull(item.system.parentRole);
+        });
+
+        it('lifts actor-owned weapon ammo and mods into sibling actor items', () => {
+            const migrator = new Version0_38_0();
+            const weapon: any = {
+                _id: foundry.utils.randomID(16),
+                name: 'Ares Alpha',
+                type: 'weapon',
+                system: DataDefaults.baseSystemData('weapon'),
+                flags: {
+                    [SYSTEM_NAME]: {
+                        [FLAGS.EmbeddedItems]: [
+                            {
+                                _id: foundry.utils.randomID(16),
+                                name: 'APDS',
+                                type: 'ammo',
+                                system: DataDefaults.baseSystemData('ammo'),
+                            },
+                            {
+                                _id: foundry.utils.randomID(16),
+                                name: 'Gas Vent',
+                                type: 'modification',
+                                system: DataDefaults.baseSystemData('modification'),
+                            },
+                        ],
+                    },
+                },
+            };
+            const actor: any = { items: [weapon] };
+
+            migrator.migrateActor(actor);
+
+            assert.lengthOf(actor.items, 3);
+            assert.isUndefined(weapon.flags[SYSTEM_NAME][FLAGS.EmbeddedItems]);
+
+            const ammo = actor.items.find((item: any) => item.name === 'APDS');
+            const mod = actor.items.find((item: any) => item.name === 'Gas Vent');
+
+            assert.exists(ammo);
+            assert.strictEqual(ammo.system.parentId, weapon._id);
+            assert.strictEqual(ammo.system.parentRole, 'weapon_ammo');
+
+            assert.exists(mod);
+            assert.strictEqual(mod.system.parentId, weapon._id);
+            assert.strictEqual(mod.system.parentRole, 'weapon_mod');
+            assert.strictEqual(mod.system.type, 'weapon');
+        });
+
+        it('lifts actor-owned armor mods into sibling actor items', () => {
+            const migrator = new Version0_38_0();
+            const armor: any = {
+                _id: foundry.utils.randomID(16),
+                name: 'Armor Jacket',
+                type: 'armor',
+                system: DataDefaults.baseSystemData('armor'),
+                flags: {
+                    [SYSTEM_NAME]: {
+                        [FLAGS.EmbeddedItems]: [{
+                            _id: foundry.utils.randomID(16),
+                            name: 'Chemical Seal',
+                            type: 'modification',
+                            system: DataDefaults.baseSystemData('modification'),
+                        }],
+                    },
+                },
+            };
+            const actor: any = { items: [armor] };
+
+            migrator.migrateActor(actor);
+
+            assert.lengthOf(actor.items, 2);
+            assert.isUndefined(armor.flags[SYSTEM_NAME][FLAGS.EmbeddedItems]);
+
+            const mod = actor.items.find((item: any) => item.name === 'Chemical Seal');
+            assert.exists(mod);
+            assert.strictEqual(mod.system.parentId, armor._id);
+            assert.strictEqual(mod.system.parentRole, 'armor_mod');
+            assert.strictEqual(mod.system.type, 'armor');
         });
     });
 };

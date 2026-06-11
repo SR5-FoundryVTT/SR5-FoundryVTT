@@ -411,7 +411,7 @@ ___________________
         CONFIG.statusEffects.splice(5, 0, ...SRStatus);
 
         CONFIG.Actor.compendiumIndexFields.push("system.description", "system.importFlags.isFreshImport");
-        CONFIG.Item.compendiumIndexFields.push("system.description", "system.importFlags.isFreshImport", "system.container");
+        CONFIG.Item.compendiumIndexFields.push("system.description", "system.importFlags.isFreshImport", "system.container", "system.parentId", "system.parentRole");
 
         CONFIG.ActiveEffect.dataModels["base"] = ActiveEffectDM;
 

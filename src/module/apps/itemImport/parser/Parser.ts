@@ -71,7 +71,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
         if (this.isActor())
             (entity as Actor.CreateData).items = await itemPromise;
         else
-            (entity as Item.CreateData).flags = { shadowrun5e: { embeddedItems: await itemPromise } };
+            (entity as Item.CreateData & { _embeddedItems?: Item.Source[] })._embeddedItems = this.prepareEmbeddedItems(entity as Item.CreateData, await itemPromise);
 
         return entity;
     }
@@ -97,4 +97,23 @@ export abstract class Parser<SubType extends SystemEntityType> {
     protected getBaseSystem(createData: SystemConstructorArgs<SubType> = {}) {
         return DataDefaults.baseSystemData<SubType>(this.parseType, createData);
     };
+
+    protected prepareEmbeddedItems(parent: Item.CreateData, items: Item.Source[]): Item.Source[] {
+        return items.map(item => {
+            const linked = foundry.utils.duplicate(item) as Item.Source;
+            foundry.utils.setProperty(linked, 'system.container', null);
+
+            if (parent.type === 'weapon' && linked.type === 'ammo') {
+                foundry.utils.setProperty(linked, 'system.parentRole', 'weapon_ammo');
+            } else if (parent.type === 'weapon' && linked.type === 'modification') {
+                foundry.utils.setProperty(linked, 'system.parentRole', 'weapon_mod');
+                foundry.utils.setProperty(linked, 'system.type', 'weapon');
+            } else if (parent.type === 'armor' && linked.type === 'modification') {
+                foundry.utils.setProperty(linked, 'system.parentRole', 'armor_mod');
+                foundry.utils.setProperty(linked, 'system.type', 'armor');
+            }
+
+            return linked;
+        }).filter(item => typeof foundry.utils.getProperty(item, 'system.parentRole') === 'string');
+    }
 }
