@@ -95,7 +95,7 @@ export const MatrixOpposedTargetFlow = {
                 managed: {
                     onScene: canvas.scene?.uuid ?? '',
                     byUser: game.user?.uuid ?? '',
-                    createAt: new Date().toISOString(),
+                    createdAt: new Date().toISOString(),
                 },
             }
         };
