@@ -765,7 +765,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (!userConsented) return;
 
         await this.item.removeAllSlaves();
-        this.#renderIfNetworkIsEmpty();
     }
 
     static async #removeSlave(this: SR5ItemSheet, event: Event) {
@@ -779,7 +778,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (!document) return;
 
         await this.item.removeSlave(document);
-        this.#renderIfNetworkIsEmpty();
     }
 
     static async #removeImprovisedDevices(this: SR5ItemSheet, event: Event) {
@@ -789,13 +787,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (!userConsented) return;
 
         await this.item.removeImprovisedDevices();
-        void this.render();
-    }
-
-    #renderIfNetworkIsEmpty() {
-        if (!this.item.isNetwork()) return;
-        if (this.item.slaves.length > 0) return;
-
         void this.render();
     }
 
