@@ -2,12 +2,12 @@
     <div class="fill-container">
         {{> 'systems/shadowrun5e/dist/templates/v2/list-items/armor-modification/header.hbs'
             label='SR5.Tabs.Item.Mods'
-            valueLabel='SR5.Armor.label'
+            valueLabel='SR5.EssenceCost'
             type='modification'
             cssClass="header-for-scrollable"
         }}
         <div class="scrollable">
-            {{#each @root.armorMods}}
+            {{#each @root.wareMods}}
                 {{> 'systems/shadowrun5e/dist/templates/v2/list-items/armor-modification/item.hbs' item=this }}
             {{/each}}
         </div>

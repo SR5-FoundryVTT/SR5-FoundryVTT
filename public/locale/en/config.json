@@ -1923,6 +1923,9 @@
         "ModificationCategories": "Modification Categories",
         "ModificationCategory": "Category",
         "ModificationSlots": "Slots",
+        "ModificationTypes": {
+            "Ware": "Ware"
+        },
         "Modified": "Modified",
         "ModifiedArmor": "Mod. Armor",
         "ModifiedDamage": "Mod. Damage",
@@ -2754,15 +2757,14 @@
                 "Vehicle": "Vehicle"
             },
             "Item": {
-                "ArmorMods": "Armor Mods",
                 "Description": "Description",
                 "Details": "Details",
                 "Effects": "Effects",
+                "Mods": "Mods",
                 "Network": "Network",
                 "SinLicenses": "Licenses",
                 "SinNetworks": "Networks",
-                "WeaponAmmo": "Ammo",
-                "WeaponMods": "Mods"
+                "WeaponAmmo": "Ammo"
             }
         },
         "Target": "Target",

@@ -791,6 +791,7 @@ export const SR5 = {
     modificationTypes: {
         weapon: 'SR5.Weapon.Weapon',
         armor: 'SR5.Armor.label',
+        ware: 'SR5.ModificationTypes.Ware',
         vehicle: 'SR5.Vehicle.Vehicle',
         drone: 'SR5.Vehicle.Drone'
     },

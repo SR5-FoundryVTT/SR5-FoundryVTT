@@ -1921,6 +1921,9 @@
         "ModificationCategories": "Modification Categories",
         "ModificationCategory": "Modification Category",
         "ModificationSlots": "Modification Slots",
+        "ModificationTypes": {
+            "Ware": "Implantat"
+        },
         "Modified": "Modifiziert",
         "ModifiedArmor": "Mod. Panzerung",
         "ModifiedDamage": "Mod. Schaden",
@@ -2746,15 +2749,14 @@
                 "Vehicle": "Fahrzeug"
             },
             "Item": {
-                "ArmorMods": "Rüstungsmods",
                 "Description": "Beschreibung",
                 "Details": "Details",
                 "Effects": "Effekte",
+                "Mods": "Mods",
                 "Network": "Netzwerk",
                 "SinLicenses": "Lizenzen",
                 "SinNetworks": "Netzwerke",
-                "WeaponAmmo": "Munition",
-                "WeaponMods": "Mods"
+                "WeaponAmmo": "Munition"
             }
         },
         "Target": "Ziel",

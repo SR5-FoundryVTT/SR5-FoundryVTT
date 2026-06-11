@@ -1,12 +1,12 @@
 import { DataImporter } from './DataImporter';
-import { WareParser } from '../parser/ware/WareParser';
+import { WareModParser } from '../parser/mod/WareModParser';
 import { ImportHelper as IH } from '../helper/ImportHelper';
 import { Bioware, BiowareSchema } from '../schema/BiowareSchema';
 import { Cyberware, CyberwareSchema } from '../schema/CyberwareSchema';
 import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
 type WareTypes = Bioware | Cyberware;
 
-export class WareImporter extends DataImporter {
+export class WareModImporter extends DataImporter {
     public readonly files = ['bioware.xml', 'cyberware.xml'] as const;
 
     async _parse(jsonObject: BiowareSchema | CyberwareSchema): Promise<void> {
@@ -17,12 +17,12 @@ export class WareImporter extends DataImporter {
         const jsonDatas = 'biowares' in jsonObject ? jsonObject.biowares.bioware
                                                    : jsonObject.cyberwares.cyberware;
 
-        return WareImporter.ParseItems<WareTypes>(
+        return WareModImporter.ParseItems<WareTypes>(
             jsonDatas,
             {
-                compendiumKey: () => "Ware",
-                parser: new WareParser(key, jsonObject.categories.category),
-                filter: ware => !('requireparent' in ware),
+                compendiumKey: () => "Ware_Mod",
+                parser: new WareModParser(key, jsonObject.categories.category),
+                filter: ware => 'requireparent' in ware || ware.capacity._TEXT.includes('['),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },

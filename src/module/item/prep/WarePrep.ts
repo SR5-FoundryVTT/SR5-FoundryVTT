@@ -1,15 +1,40 @@
 import { SR } from "../../constants";
 import { Helpers } from "../../helpers";
-import { ItemAvailabilityFlow } from "../flows/ItemAvailabilityFlow";
+import type { SR5Item } from "../SR5Item";
 import { ItemCostFlow } from "../flows/ItemCostFlow";
+import { ItemAvailabilityFlow } from "../flows/ItemAvailabilityFlow";
 
 
 /**
  * Prepare item data for Cyberware and Bioware items.
  */
 export const WarePrep = {
-    prepareBaseData(system: Item.SystemOfType<'bioware' | 'cyberware'>) {
+    prepareBaseData(
+        system: Item.SystemOfType<'bioware' | 'cyberware'>,
+        equippedMods: SR5Item<'modification'>[] = []
+    ) {
+        WarePrep.prepareCapacity(system, equippedMods);
         WarePrep.prepareGrade(system);
+        WarePrep.prepareEssence(system, equippedMods);
+    },
+
+    prepareCapacity(
+        system: Item.SystemOfType<'bioware' | 'cyberware'>,
+        equippedMods: SR5Item<'modification'>[]
+    ) {
+        system.capacity.used = equippedMods.reduce((used, mod) => used + mod.system.slots, 0);
+    },
+
+    prepareEssence(
+        system: Item.SystemOfType<'bioware' | 'cyberware'>,
+        equippedMods: SR5Item<'modification'>[]
+    ) {
+        const modificationEssence = equippedMods.reduce((essence, mod) => {
+            const quantity = mod.system.technology.quantity || 1;
+            return essence + (mod.system.essence * quantity);
+        }, 0);
+
+        system.technology.calculated.essence.value += modificationEssence;
     },
 
     /**

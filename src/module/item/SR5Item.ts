@@ -231,8 +231,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             AdeptPowerPrep.prepareBaseData(this.system);
         else if (this.isType('sin'))
             SinPrep.prepareBaseData(this.system);
-        else if (this.asType('bioware', 'cyberware'))
-            WarePrep.prepareBaseData(this.system as Item.SystemOfType<'bioware' | 'cyberware'>);
+        else if (this.isType('bioware', 'cyberware'))
+            WarePrep.prepareBaseData(this.system, equippedMods);
     }
 
     override prepareDerivedData(this: SR5Item): void {
@@ -614,6 +614,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     modificationType(): Item.SystemOfType<'modification'>['type'] | null {
         if (this.isType('weapon')) return 'weapon';
         if (this.isType('armor')) return 'armor';
+        if (this.isType('bioware', 'cyberware')) return 'ware';
         return null;
     }
 
@@ -701,8 +702,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      */
     async createNestedItem(itemData: Item.Source | Item.Source[]) {
         if (!Array.isArray(itemData)) itemData = [itemData];
-        // weapons and armor accept nested items
-        if (this.type === 'weapon' || this.type === 'armor') {
+        // weapons, armor, cyberware and bioware accept nested items
+        if (this.isType('weapon', 'armor', 'cyberware', 'bioware')) {
             const currentItems = foundry.utils.duplicate(this.getNestedItems()) as Item.Source[];
 
             for (const ogItem of itemData) {
@@ -1028,15 +1029,18 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *
      * @returns The total essence loss as a number.
      */
-    getEssenceLoss(this: SR5Item<'bioware' | 'cyberware'>): number {
+    getEssenceLoss(this: SR5Item<'bioware' | 'cyberware' | 'modification'>): number {
         const tech = this.system.technology;
         const quantity = Number(tech?.quantity) || 1;
 
-        // Prefer adjusted essence if present, otherwise use base essence
         let essenceLoss = 0;
-        if (tech?.calculated?.essence?.adjusted) {
-            essenceLoss = Number(tech.calculated.essence.value);
-        } else if (this.system.essence) {
+        if (this.isType('bioware', 'cyberware')) {
+            const calculatedEssence = Number(tech?.calculated?.essence?.value);
+            const baseEssence = Number(this.system.essence);
+            essenceLoss = Number.isFinite(calculatedEssence) && (calculatedEssence !== 0 || baseEssence === 0)
+                ? calculatedEssence
+                : baseEssence;
+        } else if (this.isType('modification') && this.system.type === 'ware') {
             essenceLoss = Number(this.system.essence);
         }
 
