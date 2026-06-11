@@ -79,7 +79,7 @@
       },
       "opposed": {
         "type": "",
-        "test": "OpposedTest",
+        "test": "OpposedMatrixTest",
         "attribute": "resonance",
         "attribute2": "resonance",
         "skill": "",

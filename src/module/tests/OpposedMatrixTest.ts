@@ -8,6 +8,7 @@ import { TestOptions } from "./SuccessTest";
 /**
  * Basic Test for opposing Matrix Actions
  * - provides support for targeting matrix icons
+ * - provides support for targeting non existant matrix icons
  */
 export class OpposedMatrixTest<T extends OpposedMatrixTestData = OpposedMatrixTestData> extends OpposedTest<T> {
     declare against: MatrixTest;

@@ -2728,6 +2728,7 @@
             "OpposedCheckOverwatchScoreTest": "감시 점수 확인 대항",
             "OpposedCompileSpriteTest": "컴파일 경쟁\n",
             "OpposedHackOnTheFlyTest": "즉석 해킹 대항",
+            "OpposedMatrixTest": "매트릭스 경쟁 판정",
             "OpposedRitualTest": "의식 봉인",
             "OpposedSummonSpiritTest": "소환 경쟁\n",
             "OpposedTest": "경쟁 판정",
