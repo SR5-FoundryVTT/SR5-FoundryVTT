@@ -4,11 +4,9 @@
 export class SR5Items extends foundry.documents.collections.Items {
     protected override _getVisibleTreeContents(): this["contents"] {
         return this.contents.filter(item => {
-            const containerId = foundry.utils.getProperty(item, 'system.container');
             const parentId = foundry.utils.getProperty(item, 'system.parentId');
-            const hiddenByContainer = typeof containerId === 'string' && this.has(containerId);
             const hiddenByParent = typeof parentId === 'string' && this.has(parentId);
-            return item.visible && !hiddenByContainer && !hiddenByParent;
+            return item.visible && !hiddenByParent;
         }) as this["contents"];
     }
 }

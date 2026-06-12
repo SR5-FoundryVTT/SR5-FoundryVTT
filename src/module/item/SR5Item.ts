@@ -37,7 +37,6 @@ import { IconAssign } from 'src/module/apps/iconAssigner/IconAssign';
 import GetEmbeddedDocumentOptions = foundry.abstract.Document.GetEmbeddedDocumentOptions;
 
 type OneOrMany<T> = T | T[];
-export type ItemAttachmentRole = 'weapon_ammo' | 'weapon_mod' | 'armor_mod' | 'vehicle_mod' | 'drone_mod';
 const { fromUuid, getProperty, setProperty } = foundry.utils;
 
 /**
@@ -46,6 +45,15 @@ const { fromUuid, getProperty, setProperty } = foundry.utils;
 export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSubType> extends Item<SubType> {
     static readonly MAX_CONTAINER_DEPTH = 5;
     static readonly MAX_ATTACHMENT_DEPTH = 5;
+    private static readonly MOD_PARENT_TYPES = ['weapon', 'armor', 'vehicle', 'drone'];
+
+    /**
+     * Whether a child item type can be attached to (linked via system.parentId to) a given parent item type.
+     */
+    static isAttachment(parentType: string, childType: string): boolean {
+        if (parentType === 'weapon' && childType === 'ammo') return true;
+        return childType === 'modification' && SR5Item.MOD_PARENT_TYPES.includes(parentType);
+    }
 
     //Those declarations must be initialized on prepareData, otherwise they will be undefined
 
@@ -124,11 +132,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return super.migrateData(source);
     }
 
-    get parentRole(): ItemAttachmentRole | null {
-        const role = getProperty(this.system, 'parentRole');
-        return typeof role === 'string' && role.length > 0 ? role as ItemAttachmentRole : null;
-    }
-
     get parentItem() {
         const parentId = getProperty(this.system, 'parentId') as string | null | undefined;
         if (!parentId) return;
@@ -155,20 +158,27 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     getNestedItems(): Item.Source[] {
-        if (this.linkedChildren.length > 0) return this.linkedChildren.map(item => item.toObject(false));
-        return this.getFlag(SYSTEM_NAME, FLAGS.EmbeddedItems) ?? [];
+        return this.linkedChildren.map(item => item.toObject(false));
     }
 
     /**
      * The storage container this item belongs to, if any.
      */
-    get container() {
-        const containerId = foundry.utils.getProperty(this.system, 'container') as string | null | undefined;
-        if (!containerId) return;
+    get container(): SR5Item | Promise<SR5Item | undefined> | undefined {
+        const parentId = getProperty(this.system, 'parentId') as string | null | undefined;
+        if (!parentId) return undefined;
 
-        if (this.isEmbedded) return this.actorOwner?.items.get(containerId);
-        if (this.pack) return game.packs.get(this.pack)?.getDocument(containerId);
-        return game.items?.get(containerId);
+        if (this.isEmbedded) {
+            const parent = this.actorOwner?.items.get(parentId) as SR5Item | undefined;
+            return parent?.isType('container') ? parent : undefined;
+        }
+        if (this.pack) {
+            const pack = game.packs.get(this.pack) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
+            if (pack?.index.get(parentId)?.type !== 'container') return undefined;
+            return pack.getDocument(parentId) as Promise<SR5Item | undefined>;
+        }
+        const parent = game.items?.get(parentId) as SR5Item | undefined;
+        return parent?.isType('container') ? parent : undefined;
     }
 
     /**
@@ -179,22 +189,16 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
         if (this.pack && !this.isEmbedded) {
             const pack = game.packs.get(this.pack);
-            return pack?.getDocuments({ system: { container: this.id } }).then(documents =>
+            return pack?.getDocuments({ system: { parentId: this.id } }).then(documents =>
                 new foundry.utils.Collection<SR5Item>(
                     documents.flatMap(document => document.id ? [[document.id, document as SR5Item] as [string, SR5Item]] : [])
                 )
             ) ?? new foundry.utils.Collection<SR5Item>();
         }
 
-        const items = this.isEmbedded ? this.actorOwner?.items : game.items;
-        const collection = new foundry.utils.Collection<SR5Item>();
-        for (const item of items?.contents ?? []) {
-            const sr5Item = item as SR5Item;
-            if (sr5Item.id && foundry.utils.getProperty(sr5Item.system, 'container') === this.id) {
-                collection.set(sr5Item.id, sr5Item);
-            }
-        }
-        return collection;
+        return new foundry.utils.Collection<SR5Item>(
+            this.linkedChildren.flatMap(item => item.id ? [[item.id, item] as [string, SR5Item]] : [])
+        );
     }
 
     getContainedItem(id: string) {
@@ -282,13 +286,13 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return !containers.some(container => container.id === item.id);
     }
 
-    async clearContainerContents(): Promise<void> {
-        if (!this.isType('container')) return;
+    async clearLinkedChildren(): Promise<void> {
+        if (!this.id) return;
 
         const contents = await this.contents;
         const updates: any[] = Array.from(contents)
             .filter(item => item.id)
-            .map(item => ({ _id: item.id, 'system.container': null }));
+            .map(item => ({ _id: item.id, 'system.parentId': null }));
         if (updates.length === 0) return;
 
         if (this.isEmbedded && this.actorOwner) {
@@ -302,23 +306,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         this.prepareLinkedItems();
         this.prepareRelationshipData();
         this.render(false);
-    }
-
-    async clearAttachmentChildren(): Promise<void> {
-        if (!this.id) return;
-
-        const updates = this.linkedChildren
-            .filter(item => item.id)
-            .map(item => ({ _id: item.id, 'system.parentId': null, 'system.parentRole': null }));
-        if (updates.length === 0) return;
-
-        if (this.isEmbedded && this.actorOwner) {
-            await this.actorOwner.updateEmbeddedDocuments('Item', updates);
-        } else if (this.pack) {
-            await Item.implementation.updateDocuments(updates, { pack: this.pack });
-        } else {
-            await Item.implementation.updateDocuments(updates);
-        }
     }
 
     get hasOpposedRoll(): boolean {
@@ -853,20 +840,20 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     /**
-     * Create an item in this item
+     * Create an active effect embedded in this item
      * @param effectData
      */
-    async createNestedActiveEffect(effectData: ActiveEffect.Stored | ActiveEffect.Stored[]) {
+    async createEmbeddedActiveEffect(effectData: ActiveEffect.Stored | ActiveEffect.Stored[]) {
         const effects = Array.isArray(effectData) ? effectData : [effectData];
         await this.createEmbeddedDocuments('ActiveEffect', effects as unknown as ActiveEffect.CreateData[]);
         return true;
     }
 
     /**
-     * Create an item in this item
+     * Create sibling items linked to this item via system.parentId
      * @param itemData
      */
-    async createNestedItem(itemData: Item.Source | Item.Source[]) {
+    async createLinkedItem(itemData: Item.Source | Item.Source[]) {
         if (!Array.isArray(itemData)) itemData = [itemData];
         if (!this.id) return false;
 
@@ -901,33 +888,20 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
         this.items = collection.contents.filter(item => {
             const linked = item as SR5Item;
-            return getProperty(linked.system, 'parentId') === this.id && typeof getProperty(linked.system, 'parentRole') === 'string';
+            return getProperty(linked.system, 'parentId') === this.id;
         }) as SR5Item[];
     }
 
     private _prepareNestedChildData(item: Item.Source): Item.Source | null {
-        const role = this._attachmentRoleFor(item);
-        if (!role || !this.id) return null;
+        if (!SR5Item.isAttachment(this.type, item.type) || !this.id) return null;
 
         delete (item as Partial<Item.Source>)._id;
         setProperty(item, 'system.parentId', this.id);
-        setProperty(item, 'system.parentRole', role);
         setProperty(item, '_stats.systemVersion', game.system.version);
 
-        if (item.type === 'modification') {
-            if (role === 'weapon_mod') setProperty(item, 'system.type', 'weapon');
-            else if (role === 'armor_mod') setProperty(item, 'system.type', 'armor');
-        }
+        if (item.type === 'modification') setProperty(item, 'system.type', this.type);
 
         return item;
-    }
-
-    private _attachmentRoleFor(item: Pick<Item.Source, 'type' | 'system'>): ItemAttachmentRole | null {
-        if (this.isType('weapon') && item.type === 'ammo') return 'weapon_ammo';
-        if (item.type !== 'modification') return null;
-        if (this.isType('weapon')) return 'weapon_mod';
-        if (this.isType('armor')) return 'armor_mod';
-        return null;
     }
 
     // TODO: Rework to either use custom embeddedCollection or Map
@@ -1709,8 +1683,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @param args
      */
     override async _preDelete(...args: Parameters<Item['_preDelete']>) {
-        await this.clearContainerContents();
-        await this.clearAttachmentChildren();
+        await this.clearLinkedChildren();
         await StorageFlow.deleteStorageReferences(this);
         return super._preDelete(...args);
     }

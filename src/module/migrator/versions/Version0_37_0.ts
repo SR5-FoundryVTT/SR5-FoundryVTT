@@ -1,47 +1,48 @@
-import { FLAGS, SYSTEM_NAME } from '@/module/constants';
 import { VersionMigration } from '../VersionMigration';
+import { liftLegacyEmbeddedChildren } from './legacyLift';
 
-const { deepClone, getProperty, hasProperty, randomID, setProperty } = foundry.utils;
+const { getProperty, hasProperty, setProperty } = foundry.utils;
 
 export class Version0_37_0 extends VersionMigration {
     readonly TargetVersion = '0.37.0';
 
     override migrateItem(item: any): void {
-        this.normalizeContainerField(item);
+        this.consolidateParentId(item);
     }
 
     override migrateActor(actor: any): void {
-        const items = Array.isArray(actor.items) ? actor.items : [];
+        const items = Array.isArray(actor.items) ? [...actor.items] : [];
         for (const item of items) {
-            this.normalizeContainerField(item);
-            this.liftContainerNestedItems(actor, item);
+            this.consolidateParentId(item);
+        }
+
+        const lifted: any[] = [];
+        for (const item of items) {
+            lifted.push(...liftLegacyEmbeddedChildren(item));
+        }
+
+        for (const child of lifted) {
+            this.consolidateParentId(child);
+        }
+
+        if (lifted.length > 0) {
+            actor.items.push(...lifted);
         }
     }
 
-    private normalizeContainerField(item: any) {
+    /**
+     * Fold the legacy system.container field into system.parentId (a child is either stored in a
+     * container or attached to a parent, never both, so they share one field), and ensure
+     * parentId is always present.
+     */
+    private consolidateParentId(item: any) {
         if (!item?.system || typeof item.system !== 'object') return;
-        if (!hasProperty(item.system, 'container')) setProperty(item.system, 'container', null);
-    }
 
-    private liftContainerNestedItems(actor: any, item: any) {
-        if (item?.type !== 'container') return;
-        if (!item._id) return;
-
-        const embeddedItems = this.normalizeArray(getProperty(item, `flags.${SYSTEM_NAME}.${FLAGS.EmbeddedItems}`));
-        if (embeddedItems.length === 0) return;
-
-        for (const embeddedItem of embeddedItems) {
-            const lifted = deepClone(embeddedItem);
-            lifted._id = randomID();
-            setProperty(lifted, 'system.container', item._id);
-            actor.items.push(lifted);
+        const parentId = getProperty(item.system, 'parentId');
+        const container = getProperty(item.system, 'container');
+        if ((parentId === null || parentId === undefined || parentId === '') && typeof container === 'string' && container) {
+            setProperty(item.system, 'parentId', container);
         }
-
-        delete item.flags?.[SYSTEM_NAME]?.[FLAGS.EmbeddedItems];
-    }
-
-    private normalizeArray(data: any): any[] {
-        if (data == null) return [];
-        return Array.isArray(data) ? data : Object.values(data);
+        if (!hasProperty(item.system, 'parentId')) setProperty(item.system, 'parentId', null);
     }
 }

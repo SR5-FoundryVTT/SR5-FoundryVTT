@@ -3,9 +3,7 @@ import { DescriptionData } from "../template/Description";
 const { SchemaField, StringField } = foundry.data.fields;
 
 export const BaseItemData = () => ({
-    container: new StringField({ required: true, nullable: true, initial: null }),
     parentId: new StringField({ required: true, nullable: true, initial: null }),
-    parentRole: new StringField({ required: true, nullable: true, initial: null }),
     description: new SchemaField(DescriptionData()),
     importFlags: new SchemaField(ImportFlagData(), { nullable: true }),
 });

@@ -1,4 +1,5 @@
 import { ActorSchema } from "../ActorSchema";
+import { SR5Item } from "@/module/item/SR5Item";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 import { IconAssign } from "../../iconAssigner/IconAssign";
 import { DataDefaults, SystemEntityType } from "src/module/data/DataDefaults";
@@ -179,19 +180,12 @@ export abstract class Parser<T extends ItemSystems> {
         return items.map(item => {
             const linked = foundry.utils.duplicate(item) as Item.CreateData;
             foundry.utils.setProperty(linked, 'system.parentId', parent._id);
-            foundry.utils.setProperty(linked, 'system.container', null);
 
-            if (parent.type === 'weapon' && linked.type === 'ammo') {
-                foundry.utils.setProperty(linked, 'system.parentRole', 'weapon_ammo');
-            } else if (parent.type === 'weapon' && linked.type === 'modification') {
-                foundry.utils.setProperty(linked, 'system.parentRole', 'weapon_mod');
-                foundry.utils.setProperty(linked, 'system.type', 'weapon');
-            } else if (parent.type === 'armor' && linked.type === 'modification') {
-                foundry.utils.setProperty(linked, 'system.parentRole', 'armor_mod');
-                foundry.utils.setProperty(linked, 'system.type', 'armor');
+            if (linked.type === 'modification') {
+                foundry.utils.setProperty(linked, 'system.type', parent.type);
             }
 
             return linked;
-        }).filter(item => typeof foundry.utils.getProperty(item, 'system.parentRole') === 'string');
+        }).filter(item => SR5Item.isAttachment(parent.type, item.type!));
     }
 }

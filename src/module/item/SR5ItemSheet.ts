@@ -831,7 +831,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         const id = SheetFlow.closestItemId(event.target);
         const item = await this.item.getContainedItem(id) as SR5Item | undefined;
-        await item?.update({ 'system.container': null } as any);
+        await item?.update({ 'system.parentId': null } as any);
     }
 
     static async #deleteContainerItem(this: SR5ItemSheet, event: Event) {
@@ -858,7 +858,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             SR5ItemSheet.addModificationItem(this.item, itemData as Item.CreateData<'modification'>);
 
         const item = new SR5Item(itemData);
-        await this.item.createNestedItem(item._source);
+        await this.item.createLinkedItem(item._source);
     }
 
     /**
@@ -1346,10 +1346,10 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
 
         if (this.item.isType('weapon') && item.isType('ammo', 'modification')) {
-            return this._onDropAttachmentItem(item, this.item.isType('weapon') && item.isType('ammo') ? 'weapon_ammo' : 'weapon_mod');
+            return this._onDropAttachmentItem(item);
         }
         if (this.item.isType('armor') && item.isType('modification')) {
-            return this._onDropAttachmentItem(item, 'armor_mod');
+            return this._onDropAttachmentItem(item);
         }
         // dropped Grid and Hosts on SIN allows for adding the SIN as a network option
         if (this.item.isType('sin') && item.isNetwork()) {
@@ -1371,8 +1371,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     protected async _onDropContainerItem(item: SR5Item) {
         if (!this.item.isOwner || !this.item.id) return null;
 
-        const currentContainer = foundry.utils.getProperty(item.system, 'container');
-        if (currentContainer === this.item.id) return item;
+        const currentParentId = foundry.utils.getProperty(item.system, 'parentId');
+        if (currentParentId === this.item.id) return item;
 
         if (!await this.item.canContainItem(item)) {
             ui.notifications?.warn(game.i18n.localize('SR5.Container.CannotContain'));
@@ -1387,14 +1387,12 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
 
         if (this._sameItemCollection(item)) {
-            return item.update({ 'system.container': this.item.id, 'system.parentId': null, 'system.parentRole': null } as any);
+            return item.update({ 'system.parentId': this.item.id } as any);
         }
 
         const itemData = item.toObject() as Item.CreateData;
         delete itemData._id;
-        foundry.utils.setProperty(itemData, 'system.container', this.item.id);
-        foundry.utils.setProperty(itemData, 'system.parentId', null);
-        foundry.utils.setProperty(itemData, 'system.parentRole', null);
+        foundry.utils.setProperty(itemData, 'system.parentId', this.item.id);
 
         if (this.item.isEmbedded && this.item.actorOwner) {
             const created = await this.item.actorOwner.createEmbeddedDocuments('Item', [itemData]);
@@ -1411,20 +1409,20 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         return created?.[0] ?? null;
     }
 
-    protected async _onDropAttachmentItem(item: SR5Item, role: 'weapon_ammo' | 'weapon_mod' | 'armor_mod') {
+    protected async _onDropAttachmentItem(item: SR5Item) {
         if (!this.item.isOwner || !this.item.id) return null;
         if (item.id === this.item.id) return null;
         if (await this._isAttachmentAncestor(item)) return null;
 
+        const modType = this.item.type as 'weapon' | 'armor' | 'vehicle' | 'drone';
+
         if (this._sameItemCollection(item)) {
             const update: Record<string, unknown> = {
                 'system.parentId': this.item.id,
-                'system.parentRole': role,
-                'system.container': null,
             };
 
             if (item.isType('modification')) {
-                update['system.type'] = role === 'armor_mod' ? 'armor' : 'weapon';
+                update['system.type'] = modType;
             }
 
             return item.update(update as any);
@@ -1433,11 +1431,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         const itemData = item.toObject() as Item.CreateData;
         delete itemData._id;
         foundry.utils.setProperty(itemData, 'system.parentId', this.item.id);
-        foundry.utils.setProperty(itemData, 'system.parentRole', role);
-        foundry.utils.setProperty(itemData, 'system.container', null);
 
         if (item.isType('modification')) {
-            foundry.utils.setProperty(itemData, 'system.type', role === 'armor_mod' ? 'armor' : 'weapon');
+            foundry.utils.setProperty(itemData, 'system.type', modType);
         }
 
         if (this.item.isEmbedded && this.item.actorOwner) {

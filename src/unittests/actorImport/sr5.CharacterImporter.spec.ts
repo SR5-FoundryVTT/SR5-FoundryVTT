@@ -211,7 +211,6 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
 
             const linkedAmmo = actor.items.find(item => item.type === 'ammo' && foundry.utils.getProperty(item, 'system.parentId') === weapon._id);
             assert.exists(linkedAmmo);
-            assert.strictEqual(foundry.utils.getProperty(linkedAmmo, 'system.parentRole'), 'weapon_ammo');
         });
 
         it('Should have the correct vehicles', async () => {
