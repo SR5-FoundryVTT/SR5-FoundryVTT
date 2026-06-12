@@ -22,7 +22,7 @@ export class WareModImporter extends DataImporter {
             {
                 compendiumKey: () => "Ware_Mod",
                 parser: new WareModParser(key, jsonObject.categories.category),
-                filter: ware => 'requireparent' in ware || ware.capacity._TEXT.includes('['),
+                filter: ware => 'requireparent' in ware || ware.required?.parentdetails != null || ware.capacity._TEXT.includes('['),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },
