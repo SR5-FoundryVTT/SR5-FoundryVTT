@@ -1035,13 +1035,9 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
         let essenceLoss = 0;
         if (this.isType('bioware', 'cyberware')) {
-            const calculatedEssence = Number(tech?.calculated?.essence?.value);
-            const baseEssence = Number(this.system.essence);
-            essenceLoss = Number.isFinite(calculatedEssence) && (calculatedEssence !== 0 || baseEssence === 0)
-                ? calculatedEssence
-                : baseEssence;
+            essenceLoss = tech.calculated.essence.value;
         } else if (this.isType('modification') && this.system.type === 'ware') {
-            essenceLoss = Number(this.system.essence);
+            essenceLoss = this.system.essence;
         }
 
         if (isNaN(essenceLoss)) essenceLoss = 0;

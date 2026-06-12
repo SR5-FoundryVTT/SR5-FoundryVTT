@@ -223,12 +223,12 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         },
         armorModifications: {
             template: SheetFlow.templateBase('item/tabs/armor-modifications'),
-            templates: SheetFlow.templateListItem('armor-modification'),
+            templates: SheetFlow.templateListItem('item-modification'),
             scrollable: ['.scrollable']
         },
         itemModifications: {
             template: SheetFlow.templateBase('item/tabs/item-modifications'),
-            templates: SheetFlow.templateListItem('armor-modification'),
+            templates: SheetFlow.templateListItem('item-modification'),
             scrollable: ['.scrollable']
         },
         effects: {
