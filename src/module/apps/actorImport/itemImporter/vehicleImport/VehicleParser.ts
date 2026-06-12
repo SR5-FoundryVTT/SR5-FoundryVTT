@@ -36,6 +36,10 @@ export class VehicleParser {
             const system = vehicleActorData.system;
             system.driver = actor.id!;
             system.isDrone = vehicle.isdrone === "True";
+            const categoryName = vehicle.category_english || vehicle.category || '';
+
+            if (system.isDrone)
+                system.category = categoryName.replace("Drones: ", "").toLowerCase() as typeof system.category;
 
             vehicleActorData.items = [
                 ...await new WeaponParser().parseWeapons(vehicle),
@@ -67,6 +71,13 @@ export class VehicleParser {
             system.attributes.body.base = Number(vehicle.body) || 0;
             system.armor.rating.base = Number(vehicle.armor) || 0;
             system.availability = vehicle.avail || '';
+
+            system.importFlags = {
+                isFreshImport: true,
+                sourceid: vehicle.sourceid || vehicle.guid || '',
+                category: categoryName,
+                name: vehicle.name || vehicle.name_english || vehicleActorData.name,
+            };
 
             const consoleLogs = Sanitizer.sanitize(CONFIG.Actor.dataModels.vehicle.schema, system);
             if (consoleLogs) {

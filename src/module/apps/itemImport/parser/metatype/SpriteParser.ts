@@ -2,6 +2,15 @@ import { Metatype } from "../../schema/MetatypeSchema";
 import { CompendiumKey } from "../../importer/Constants";
 import { MetatypeParserBase } from './MetatypeParserBase';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
+import { normalizeSpriteTypeForPreset } from "@/module/data/SpiritSpritePresetProfiles";
+
+const LEVEL_OFFSET_ATTRIBUTE_MAP = {
+    resonance: 'resmin',
+    attack: 'chamin',
+    sleaze: 'intmin',
+    data_processing: 'logmin',
+    firewall: 'wilmin',
+} as const;
 
 export class SpriteParser extends MetatypeParserBase<'sprite'> {
     protected readonly parseType = 'sprite';
@@ -9,9 +18,28 @@ export class SpriteParser extends MetatypeParserBase<'sprite'> {
     protected override getSystem(jsonData: Metatype) {
         const system = this.getBaseSystem();
 
-        system.spriteType = jsonData.name._TEXT.split(" ")[0].toLowerCase() as any;
+        system.spriteType = normalizeSpriteTypeForPreset(jsonData.name._TEXT);
+        this.applyLevelOffsetAttributes(system, jsonData);
+        this.parseInitiative(system, jsonData, { mode: 'matrix', specialAttr: 'level' });
 
         return system;
+    }
+
+    private applyLevelOffsetAttributes(system: ReturnType<typeof this.getBaseSystem>, jsonData: Metatype) {
+        for (const [attributeId, metatypeAttributeId] of Object.entries(LEVEL_OFFSET_ATTRIBUTE_MAP)) {
+            const value = jsonData[metatypeAttributeId]._TEXT;
+            const parsed = this.parseSpecialOffset(value);
+
+            if (attributeId === 'resonance')
+                system.attributes.resonance.applies_special = parsed.appliesSpecial;
+            else
+                system.matrix[attributeId].applies_special = parsed.appliesSpecial;
+
+            if (attributeId === 'resonance')
+                system.attributes.resonance.base = parsed.base;
+            else
+                system.matrix[attributeId].base = parsed.base;
+        }
     }
 
     protected override async getItems(jsonData: Metatype): Promise<Item.Source[]> {

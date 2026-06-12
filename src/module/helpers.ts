@@ -480,20 +480,19 @@ export class Helpers {
      * This can be relevant for when GMs either manually or by module change the tokens name, while the actors name
      * is untouched and might even be detrimental to share with players.
      *
-     * @param document Any document that can be targeted by a Success Test
+     * @param doc Any document that can be targeted by a Success Test
      * @returns A string representing this documents name.
      */
-    static getChatSpeakerName(document: SR5Actor | SR5Item | TokenDocument): string {
-        if (!document) return '';
+    static getChatSpeakerName(doc: unknown): string {
+        if (!doc || typeof doc !== "object") return '';
 
-        if (document instanceof SR5Item) return document.name;
+        if (doc instanceof SR5Item) return doc.name;
 
         const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
-        const token = document instanceof TokenDocument ? document : document.getToken();
+        const token = doc instanceof TokenDocument ? doc : doc instanceof SR5Actor ? doc.getToken() : null;
 
         if (useTokenNameForChatOutput && token) return token.name;
-
-        return document.name;
+        return "name" in doc && typeof doc.name === "string" ? doc.name : "";
     }
 
     /**
@@ -501,19 +500,19 @@ export class Helpers {
      *
      * The use token name setting is also respected.
      *
-     * @param document Any document that can be targeted by a Success Test
+     * @param doc Any document that can be targeted by a Success Test
      * @returns A path pointing to an image.
      */
-    static getChatSpeakerImg(document: SR5Actor | SR5Item | TokenDocument): string {
-        if (!document) return '';
+    static getChatSpeakerImg(doc: unknown): string {
+        if (!doc || typeof doc !== "object") return '';
 
-        if (document instanceof SR5Item) return document.img!;
+        if (doc instanceof SR5Item) return doc.img!;
 
         const useTokenForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
-        const token = document instanceof TokenDocument ? document : document.getToken();
+        const token = doc instanceof TokenDocument ? doc : doc instanceof SR5Actor ? doc.getToken() : null;
 
         if (useTokenForChatOutput && token) return token.texture.src || '';
-        return 'img' in document ? document.img || '' : '';
+        return "img" in doc && typeof doc.img === "string" ? doc.img : "";
     }
 
     static createDamageData(
@@ -691,24 +690,18 @@ export class Helpers {
      * @param asc Set to true for ascending sorting order and to false for descending order.
      * @return Sorted config values given by the configValues parameter
      */
-    static sortConfigValuesByTranslation(configValues: Record<string, Translation>, asc = true): Record<string, string> {
+    static sortConfigValuesByTranslation(configValues: Record<string, Translation>, asc = true) {
         // Filter entries instead of values to have a store of ids for easy rebuild.
-        const sortedEntries = Object.entries(configValues).sort(([aId, a], [bId, b]) => {
+        const sortedEntries = Object.entries(configValues).sort(([, a], [, b]) => {
             const comparatorA = game.i18n.localize(a);
             const comparatorB = game.i18n.localize(b);
-            // Use String.localeCompare instead of the > Operator to support other alphabets.
-            if (asc)
-                return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
-            else
-                return comparatorA.localeCompare(comparatorB) === 1 ? -1 : 1;
+            const comparison = comparatorA.localeCompare(comparatorB);
+
+            // Multiply by -1 to instantly invert the sort direction
+            return asc ? comparison : -comparison;
         });
 
-        // Rebuild the skills type using the earlier entries.
-        const sortedAsObject = {};
-        for (const [key, translated] of sortedEntries) {
-            sortedAsObject[key] = translated;
-        }
-        return sortedAsObject;
+        return Object.fromEntries(sortedEntries);
     }
 
     /**

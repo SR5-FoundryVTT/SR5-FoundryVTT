@@ -27,6 +27,11 @@ export class SR5Combatant extends Combatant<"base"> {
         return super.migrateData(source);
     }
 
+    override async update(...args: Parameters<Combatant["update"]>) {
+        await Migrator.updateMigratedDocument(this);
+        return super.update(...args);
+    }
+
     /** Checks if the combatant can perform an action. */
     canAct(): boolean {
         return this.initiative !== null && this.initiative > 0;
@@ -101,7 +106,7 @@ export class SR5Combatant extends Combatant<"base"> {
 
         // Calculate adjustments inline
         const diceCountAdjust = (blitz ? SR.initiatives.ranges.dice.max : nextInit.dice.value) - prevInit.dice.value;
-        const baseAdjust = nextInit.base.value - prevInit.base.value;
+        const baseAdjust = nextInit.constant.value - prevInit.constant.value;
 
         const diceRoll = await this._rollD6(Math.abs(diceCountAdjust));
         const diceRolls = diceRoll?.diceResults ?? [];

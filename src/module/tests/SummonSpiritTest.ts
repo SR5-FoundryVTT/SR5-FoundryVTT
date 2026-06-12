@@ -1,16 +1,16 @@
-import { SR5 } from './../config';
 import { DataDefaults } from "../data/DataDefaults";
 import { SuccessTest, SuccessTestData, TestOptions } from "./SuccessTest";
 import { ModifiableValue } from '../mods/ModifiableValue';
 import { SpellcastingRules } from '../rules/SpellcastingRules';
 import { ConjuringRules } from '../rules/ConjuringRules';
 import { DamageType, MinimalActionType } from '../types/item/Action';
+import { SR5Actor } from '../actor/SR5Actor';
 import { DeepPartial } from 'fvtt-types/utils';
+const { fromUuidSync } = foundry.utils;
 
 
 interface SummonSpiritTestData extends SuccessTestData {
-    spiritTypes: typeof SR5.spiritTypes
-    spiritTypeSelected: string
+    optionalPowerCount: number
 
     // Force value as described on SR5#300
     force: number
@@ -41,6 +41,9 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
         data = super._prepareData(data, options);
 
         this._prepareSummoningData(data as SummonSpiritTestData);
+
+        data.preparedSpiritUuid = data.preparedSpiritUuid || '';
+        data.optionalPowerCount = data.optionalPowerCount ?? Math.floor(Number(data.force || 0) / 3);
 
         data.drain ||= 0;
         data.drainDamage ||= DataDefaults.createData('damage');
@@ -133,6 +136,7 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
         const label = SpellcastingRules.limitIsReagentInsteadOfForce(reagent) ? 
             'SR5.Reagent' : 'SR5.Force';
         const limit = SpellcastingRules.calculateLimit(force, reagent);
+        this.data.optionalPowerCount = Math.floor(force / 3);
 
         // Cleanup previous calculation and add new limit part.
         // NOTE: Instead of removing all parts, be specific in case of future additions to limit parts elsewhere.
@@ -145,14 +149,6 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
     }
 
     /**
-     * TODO: Reduce all spirit types to those available to the Summoner according to tradition or validate against selection.
-     * @returns A subset of all spirit types
-     */
-    _prepareSpiritTypes() {
-        return SR5.spiritTypes;
-    }
-
-    /**
      * Take data from summoning item for test execution.
      * @param data Test data to be extended
      */
@@ -161,13 +157,11 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
         const summoning = this.item.asType('call_in_action');
         if (!summoning || !this.item.isSummoning) return;
 
-        data.spiritTypes = this._prepareSpiritTypes();
-
         // Lower from more to less explicit values being given.
         // Don't let force go below one.
         data.force = Math.max(data.force || summoning.system.spirit.force || 1, 1);
-        data.spiritTypeSelected ||= summoning.system.spirit.type;
         data.preparedSpiritUuid ||= summoning.system.spirit.uuid;
+        data.optionalPowerCount = Math.floor(data.force / 3);
         data.reagent ||= 0;
     }
 
@@ -196,5 +190,28 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
      */
     get preparedActorUsed(): boolean {
         return this.data.preparedSpiritUuid !== '';
+    }
+
+    get preparedSpiritIsCompendium(): boolean {
+        return this.data.preparedSpiritUuid?.startsWith('Compendium.') ?? false;
+    }
+
+    get preparedSpiritIsEditable(): boolean {
+        if (!this.preparedActorUsed) return false;
+        if (this.preparedSpiritIsCompendium) return true;
+
+        const preparedSpirit = this.preparedSpirit;
+        if (!preparedSpirit || !game.user) return false;
+
+        return preparedSpirit.testUserPermission(game.user, 'OWNER');
+    }
+
+    get preparedSpiritForceLocked(): boolean {
+        return this.preparedActorUsed && !this.preparedSpiritIsEditable;
+    }
+
+    get preparedSpirit(): SR5Actor | null {
+        if (!this.preparedActorUsed) return null;
+        return fromUuidSync(this.data.preparedSpiritUuid) as SR5Actor | null;
     }
 }

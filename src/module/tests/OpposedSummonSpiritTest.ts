@@ -1,12 +1,14 @@
 import { SR5Actor } from '../actor/SR5Actor';
-import { SR5 } from '../config';
+import { SR5Item } from '../item/SR5Item';
 import { ModifiableValue } from '../mods/ModifiableValue';
 import { ConjuringRules } from '../rules/ConjuringRules';
 import { OpposedTest, OpposedTestData } from './OpposedTest';
-import { TestDocuments, TestOptions } from './SuccessTest';
+import { SuccessTestData, TestDocuments, TestOptions } from './SuccessTest';
 import { DeepPartial } from "fvtt-types/utils";
 import { SummonSpiritTest } from './SummonSpiritTest';
 import { Translation } from '../utils/strings';
+
+const { setProperty, fromUuid } = foundry.utils;
 
 
 interface OpposedSummonSpiritTestData extends OpposedTestData {
@@ -21,6 +23,40 @@ interface OpposedSummonSpiritTestData extends OpposedTestData {
  */
 export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTestData> {
     declare against: SummonSpiritTest;
+
+    static async _resolveOpposedBootstrapDocument(
+        againstData: SuccessTestData
+    ): Promise<SR5Actor | SR5Item | null> {
+        const sourceUuid = againstData.sourceActorUuid || againstData.sourceUuid || '';
+
+        let document: unknown = sourceUuid ? await fromUuid(sourceUuid) : null;
+        if (document instanceof TokenDocument)
+            document = document.actor ?? null;
+
+        if (document instanceof SR5Actor || document instanceof SR5Item)
+            return document;
+
+        return null;
+    }
+
+    static override async executeMessageAction(
+        againstData: SuccessTestData,
+        messageId: string,
+        options: TestOptions
+    ): Promise<void> {
+        const bootstrapDocument = await this._resolveOpposedBootstrapDocument(againstData);
+        if (!bootstrapDocument) {
+            ui.notifications?.error('SR5.Errors.NoAvailableActorFound', { localize: true });
+            return;
+        }
+
+        const data = await this._getOpposedActionTestData(againstData, bootstrapDocument, messageId);
+        if (!data) return;
+
+        const documents = { source: bootstrapDocument };
+        const test = new this(data, documents, options);
+        await test.execute();
+    }
 
     constructor(data: DeepPartial<OpposedSummonSpiritTestData>, documents?: TestDocuments, options?: Partial<TestOptions>) {
         // Due to summoning, the active actor for this test will be created during execution.
@@ -61,12 +97,12 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
     }
 
     /**
-     * To have an opposing actor, that's not on the map already, create the spirit actor.
+     * Resolve prepared spirit context without creating a new actor.
      */
     override async populateDocuments() {
-        await this.createSummonedSpirit();
-
-        this.data.sourceActorUuid = this.data.summonedSpiritUuid || this.against.data.preparedSpiritUuid;
+        const preparedSpiritUuid = this.against.data.preparedSpiritUuid || '';
+        this.data.sourceActorUuid = preparedSpiritUuid;
+        this.data.sourceUuid = preparedSpiritUuid;
 
         await super.populateDocuments();
     }
@@ -76,7 +112,7 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
      */
     override applyPoolModifiers() {
         // NOTE: We don't have an actor, therefore don't need to call document modifiers.
-        ModifiableValue.addUnique(this.data.pool, 'SR5.Force', this.against.data.force);
+        ModifiableValue.addUniqueBase(this.data.pool, 'SR5.Force', this.against.data.force);
     }
 
     /**
@@ -84,6 +120,7 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
      */
     override async processFailure() {
         await this.updateSummonTestForFollowup();
+        await this.createSummonedSpirit();
         await this.finalizeSummonedSpirit();
     }
 
@@ -125,11 +162,14 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
      */
     async finalizeSummonedSpirit() {
         if (!this.actor) return;
+        if (this.against.preparedSpiritIsCompendium && !this.data.summonedSpiritUuid) return;
+        if (!this.data.summonedSpiritUuid && !this.against.preparedSpiritIsEditable) return;
 
         const summoner = this.against.actor as SR5Actor;        
 
         const updateData = {
             system: {
+                attributes: { force: { base: this.against.data.force } },
                 services: this.deriveSpiritServices(),
                 summonerUuid: summoner.uuid
             }
@@ -168,28 +208,34 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
         if (!this.against) return;
         if (!this.against.actor) return;
 
-        const summoner = this.against.actor;
+        if (!this.against.data.preparedSpiritUuid) return;
 
-        if (this.against.data.preparedSpiritUuid) {
-            // Reuse a prepared actor...
-            const preparedActor = await this.getPreparedSpiritActor();
-            if (!preparedActor) return console.error('Shadowrun 5e | Could not find prepared spirit actor');
-            await preparedActor.update({ system: { summonerUuid: summoner.uuid } });
-            
-        } else {
-            // Create a new spirit actor from scratch...
-            const spiritType = this.against.data.spiritTypeSelected as any;
-            const spiritTypeLabel = game.i18n.localize(SR5.spiritTypes[spiritType]);
-            const name = `${summoner.name} ${spiritTypeLabel} ${game.i18n.localize('TYPES.Actor.spirit')}`;
-            const force = this.against.data.force;
-            const system = { force, spiritType };
-    
-            const actor = await Actor.create({ name, type: 'spirit', system, prototypeToken: {actorLink: true} });
-    
+        const preparedActor = await this.getPreparedSpiritActor();
+        if (!preparedActor) return console.error('Shadowrun 5e | Could not find prepared spirit actor');
+
+        if (this.against.preparedSpiritIsCompendium) {
+            if (!game.user.can('ACTOR_CREATE'))
+                return ui.notifications.warn('SR5.Warnings.NoActorCreatePermission', { localize: true });
+
+            const summonedName = `Summoned ${preparedActor.name}`;
+            const preparedSource = game.actors.fromCompendium(preparedActor);
+
+            preparedSource.name = summonedName;
+            setProperty(preparedSource, 'prototypeToken.actorLink', true);
+
+            const actor = await Actor.create(preparedSource);
             if (!actor) return console.error('Shadowrun 5e | Could not create the summoned spirit actor');
-    
+
             this.data.summonedSpiritUuid = actor.uuid;
+            this.data.sourceActorUuid = actor.uuid;
+            this.data.sourceUuid = actor.uuid;
+            this.actor = actor;
+            return;
         }
+
+        this.data.sourceActorUuid = preparedActor.uuid || '';
+        this.data.sourceUuid = preparedActor.uuid || '';
+        this.actor = preparedActor;
     }
 
     /**
@@ -201,8 +247,6 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
 
     /**
      * Cleanup created actors that aren't needed anymore.
-     * 
-     * When user cancels the dialog, the spirits has been created. Remove it.
      */
     override async _cleanUpAfterDialogCancel() {
         if (!this.data.summonedSpiritUuid) return;

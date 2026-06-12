@@ -34,10 +34,56 @@ export const spiritImporterTesting = (context: QuenchBatchContext) => {
 
     describe('Chummer Spirit Importer', () => {
         it('Should import a chummer character', async () => {
-            spirit = await SpiritImporter.import(character, 'fire', importOptions);
+            const template = await factory.createActor({
+                type: 'spirit',
+                system: {
+                    spiritType: 'fire_template',
+                    attributes: {
+                        body: { base: 1, applies_special: true },
+                        agility: { base: 2, applies_special: true },
+                        reaction: { base: 3, applies_special: true },
+                        strength: { base: -2, applies_special: true },
+                        willpower: { base: 0, applies_special: true },
+                        logic: { base: 0, applies_special: true },
+                        intuition: { base: 1, applies_special: true },
+                        charisma: { base: 0, applies_special: true },
+                        magic: { base: 0, applies_special: true },
+                        essence: { base: -2, applies_special: true },
+                    }
+                }
+            });
+
+            spirit = await SpiritImporter.import(character, template, importOptions);
             assert.notEqual(spirit, null, 'Spirit not created');
             factory.actors.push(spirit as Actor.Stored<'spirit'>);
-            assert.strictEqual(spirit!.system.spiritType, 'fire');
+            assert.strictEqual(spirit!.system.spiritType, 'fire_template');
+        });
+
+        it('imports a spirit using preset profile fallback without template', async () => {
+            const fallbackSpirit = await SpiritImporter.importFromPresetProfile(character, importOptions);
+            assert.notEqual(fallbackSpirit, null, 'Spirit fallback import failed');
+            factory.actors.push(fallbackSpirit as Actor.Stored<'spirit'>);
+
+            assert.strictEqual(fallbackSpirit!.system.spiritType, 'fire');
+            assert.strictEqual(fallbackSpirit!.system.half_value_skill, false);
+            assert.strictEqual(fallbackSpirit!.system.attributes.body.applies_special, true);
+            assert.strictEqual(fallbackSpirit!.system.attributes.magic.applies_special, true);
+            assert.strictEqual(fallbackSpirit!.system.attributes.body.base, 1);
+            assert.strictEqual(fallbackSpirit!.system.attributes.agility.base, 2);
+            assert.strictEqual(fallbackSpirit!.system.attributes.reaction.base, 3);
+            assert.strictEqual(fallbackSpirit!.system.attributes.strength.base, -2);
+            assert.strictEqual(fallbackSpirit!.system.attributes.intuition.base, 1);
+            assert.strictEqual(fallbackSpirit!.system.initiative.meatspace.attribute_a, 'force');
+            assert.strictEqual(fallbackSpirit!.system.initiative.meatspace.attribute_b, 'force');
+            assert.strictEqual(fallbackSpirit!.system.initiative.meatspace.constant.base, 3);
+            assert.strictEqual(fallbackSpirit!.system.initiative.meatspace.dice.value, 2);
+            assert.strictEqual(fallbackSpirit!.system.initiative.astral.attribute_a, 'force');
+            assert.strictEqual(fallbackSpirit!.system.initiative.astral.attribute_b, 'force');
+            assert.strictEqual(fallbackSpirit!.system.initiative.astral.constant.base, 0);
+            assert.strictEqual(fallbackSpirit!.system.initiative.astral.dice.value, 3);
+            assert.strictEqual(fallbackSpirit!.system.attributes.force.base, 3);
+            assert.strictEqual(fallbackSpirit!.system.attributes.edge.base, 2);
+            assert.strictEqual(fallbackSpirit!.system.attributes.essence.value, 3);
         });
 
         it('Should have the correct attributes and limits', async () => {
@@ -71,3 +117,4 @@ export const spiritImporterTesting = (context: QuenchBatchContext) => {
         });
     });
 };
+

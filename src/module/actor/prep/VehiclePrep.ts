@@ -39,9 +39,7 @@ export class VehiclePrep {
 
         VehiclePrep.prepareMovement(system);
 
-        VehiclePrep.prepareMeatspaceInit(system);
-        InitiativePrep.prepareMatrixInit(system);
-        InitiativePrep.prepareCurrentInitiative(system);
+        InitiativePrep.prepareInit('vehicle', system);
 
         ItemPrep.prepareArmor(system, items);
         CharacterPrep.prepareRecoil(system);
@@ -49,24 +47,11 @@ export class VehiclePrep {
     }
 
     static prepareVehicleStats(system: Actor.SystemOfType<'vehicle'>) {
-        const { vehicle_stats, isOffRoad, isDrone } = system;
+        const { vehicle_stats, isDrone } = system;
 
         for (const [key, stat] of Object.entries(vehicle_stats)) {
             ModifiableValue.calcTotal(stat);
             stat.label = SR5.vehicle.stats[key];
-        }
-
-        // hide certain stats depending on if we're offroad
-        if (isOffRoad) {
-            vehicle_stats.off_road_speed.hidden = false;
-            vehicle_stats.off_road_handling.hidden = false;
-            vehicle_stats.speed.hidden = true;
-            vehicle_stats.handling.hidden = true;
-        } else {
-            vehicle_stats.off_road_speed.hidden = true;
-            vehicle_stats.off_road_handling.hidden = true;
-            vehicle_stats.speed.hidden = false;
-            vehicle_stats.handling.hidden = false;
         }
 
         // Hide vehicle seats for drones
@@ -175,20 +160,6 @@ export class VehiclePrep {
 
         movement.run.base = 10 * Math.pow(2, speedTotal - 1);
         movement.run.value = ModifiableValue.calcTotal(movement.run as ModifiableValueType, {min: 0});
-    }
-
-    static prepareMeatspaceInit(system: Actor.SystemOfType<'vehicle'>) {
-        const { vehicle_stats, initiative, modifiers } = system;
-
-        const pilot = ModifiableValue.calcTotal(vehicle_stats.pilot);
-
-        initiative.meatspace.base.base = pilot * 2;
-        ModifiableValue.addUnique(initiative.meatspace.base, "SR5.Bonus", modifiers.meat_initiative);
-        initiative.meatspace.dice.base = 4;
-        ModifiableValue.addUnique(initiative.meatspace.dice, "SR5.Bonus", modifiers.meat_initiative_dice);
-
-        ModifiableValue.calcTotal(initiative.meatspace.base);
-        ModifiableValue.calcTotal(initiative.meatspace.dice);
     }
 
     /**

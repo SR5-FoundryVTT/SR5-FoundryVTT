@@ -9,17 +9,7 @@
                     </a>
                 </div>
             {{/if}}
-            {{#if (isType actor 'sprite')}}
-                <div class="basic-row">
-                    <label>{{localize "SR5.Level"}}</label>
-                    <button class="icon sr5-icon"
-                       data-attribute-modifier-tooltip="level"
-                       data-action="rollAttribute"
-                       data-attribute-id="level">
-                        {{system.level}}
-                    </button>
-                </div>
-            {{else}}
+            {{#unless (isType actor 'sprite')}}
                 <div class="basic-row">
                     <label>{{localize "SR5.Labels.ActorSheet.DeviceRating"}}</label>
                     <button class="icon sr5-icon"
@@ -29,7 +19,7 @@
                         {{system.matrix.rating}}
                     </button>
                 </div>
-            {{/if}}
+            {{/unless}}
             {{#if (isType actor 'character' 'vehicle')}}
                 <div class="basic-row">
                     <label>{{localize "SR5.Labels.Sheet.RebootDevice"}}</label>
@@ -54,6 +44,7 @@
                                 isCyberdeck=../system.matrix.is_cyberdeck
                                 key=key
                                 label=label
+                                rootId=@root.rootId
                                 matrixAttributes=../config/matrixAttributes
                                 item=../system.matrix.item }}
                         {{/each}}

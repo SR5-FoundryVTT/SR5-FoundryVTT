@@ -658,7 +658,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 changes: [{ key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
             }, {
                 name: 'Opposed Effect',
-                system: { applyTo: 'test_all', selection_tests: [{ value: 'Opposed Test', id: 'OpposedTest' }] },
+                system: { applyTo: 'test_all', selection_tests: ['OpposedTest'] },
                 changes: [{ key: 'data.pool', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
             }]);
 
@@ -687,9 +687,9 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 name: 'Selection Effect',
                 system: {
                     applyTo: 'test_all',
-                    selection_skills: [{ value: skillName, id: skillName }],
-                    selection_attributes: [{ value: 'Body', id: 'body' }],
-                    selection_limits: [{ value: 'Physical', id: 'physical' }]
+                    selection_skills: [skillName],
+                    selection_attributes: ['body'],
+                    selection_limits: ['physical']
                 },
                 changes: [{ key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
             }]);
@@ -859,7 +859,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             let actions = await actor.createEmbeddedDocuments('Item', [{ name: 'Test Action', type: 'action' }]);
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                system: { applyTo: 'test_all', selection_tests: [{ value: "Success Test", id: "SuccessTest" }] },
+                system: { applyTo: 'test_all', selection_tests: ["SuccessTest"] },
                 changes: [{ key: 'data.pool', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
             }]);
 
@@ -966,7 +966,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             const actor = await factory.createActor({ type: 'character' });
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                system: { applyTo: 'test_all', selection_categories: [{ value: "Social Actions", id: "social"}] },
+                system: { applyTo: 'test_all', selection_categories: ["social"] },
                 changes: [{ key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
             }]);
 
@@ -1015,7 +1015,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             await actor.createEmbeddedDocuments('ActiveEffect', [
                 {
                     name: 'Skill Effect',
-                    system: { applyTo: 'test_all', selection_skills: [{ value: 'Sneaking', id: 'sneaking' }] },
+                    system: { applyTo: 'test_all', selection_skills: ['sneaking'] },
                     changes: [{ key: 'data.pool', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
                 }                
             ]);

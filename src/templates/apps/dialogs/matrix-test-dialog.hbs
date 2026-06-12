@@ -4,10 +4,28 @@
         <hr/>
         <div>
             {{#if test.data.marks}}
-            <div class="form-group">
+            <div class="form-group matrix-marks-icon-row">
                 <label>{{localize "SR5.Marks"}}</label>
-                <input name="test.data.marks" type="number" class="disabled-for-display"
-                       value="{{test.data.marks}}" min="1" max="3"/>
+                <div class="matrix-marks-icon-group" role="radiogroup" aria-label="{{localize 'SR5.Marks'}}">
+                    <label class="matrix-marks-icon-option">
+                        <input class="matrix-marks-icon-input" type="radio" name="test.data.marks" value="1" data-dtype="Number" {{#if (eq test.data.marks 1)}}checked{{/if}}/>
+                        <span class="matrix-marks-icon-face">
+                            <i class="fa-solid fa-1"></i>
+                        </span>
+                    </label>
+                    <label class="matrix-marks-icon-option">
+                        <input class="matrix-marks-icon-input" type="radio" name="test.data.marks" value="2" data-dtype="Number" {{#if (eq test.data.marks 2)}}checked{{/if}}/>
+                        <span class="matrix-marks-icon-face">
+                            <i class="fa-solid fa-2"></i>
+                        </span>
+                    </label>
+                    <label class="matrix-marks-icon-option">
+                        <input class="matrix-marks-icon-input" type="radio" name="test.data.marks" value="3" data-dtype="Number" {{#if (eq test.data.marks 3)}}checked{{/if}}/>
+                        <span class="matrix-marks-icon-face">
+                            <i class="fa-solid fa-3"></i>
+                        </span>
+                    </label>
+                </div>
             </div>
             {{/if}}
             <div class="form-group">

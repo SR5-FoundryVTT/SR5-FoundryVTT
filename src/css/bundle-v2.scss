@@ -129,8 +129,9 @@ body.theme-light,
     --sr5v2-tab-active-bg: #b6b2a6;
     --sr5v2-tab-active-text: #55101e;
     --sr5v2-tab-active-shadow: 0 0 5px 5px rgba(255, 255, 255, 0.2);
-    --sr5v2-option-bg: rgba(0, 0, 0, 0.92);
-    --sr5v2-option-text: #ebb531;
+    --sr5v2-option-bg: #080a0e;
+    --sr5v2-option-text: #f0ede4;
+    --sr5v2-option-group-text: #ebb531;
     --sr5v2-origin-bg: #dddddd;
     --sr5v2-origin-border: #4b4a44;
     --sr5v2-editor-bg: #939393;
@@ -146,6 +147,10 @@ body.theme-light,
     --sr5v2-cell-filled-text: #000000;
     --sr5v2-positive: #079123;
     --sr5v2-negative: #ff4d4d;
+    --sr5v2-positive-border: #3a7e3f;
+    --sr5v2-positive-bg: rgba(58, 126, 63, 0.16);
+    --sr5v2-negative-border: #8c3d3d;
+    --sr5v2-negative-bg: rgba(140, 61, 61, 0.16);
     --sr5v2-list-selected-bg: radial-gradient(rgba(7, 145, 35, 0.4), rgba(7, 145, 35, 0.01));
     --sr5v2-icon-filter: invert(1);
     box-shadow: var(--sr5v2-window-shadow);
@@ -261,9 +266,21 @@ body.theme-light,
         border-radius: 0.3em;
         border-color: var(--sr5v2-control-border);
 
-        > option {
+        option,
+        optgroup {
             color: var(--sr5v2-option-text);
             background-color: var(--sr5v2-option-bg);
+        }
+
+        optgroup {
+            color: var(--sr5v2-option-group-text);
+            font-style: normal;
+            font-weight: 600;
+        }
+
+        optgroup > option {
+            color: var(--sr5v2-option-text);
+            font-weight: 400;
         }
     }
 
@@ -341,6 +358,40 @@ body.theme-light,
                 align-items: center;
                 flex-flow: column nowrap;
                 gap: .25rem;
+
+                .sheet-header-resource-container {
+                    box-sizing: border-box;
+                    width: 100%;
+                    min-width: 9.25rem;
+                    padding-left: .5rem;
+                }
+
+                .sheet-header-resource {
+                    gap: .5rem;
+                    min-height: 1.75rem;
+
+                    .sheet-header-resource-label {
+                        flex: 0 0 4.5rem;
+                        justify-content: flex-start;
+                    }
+
+                    .sheet-header-resource-value {
+                        flex: 0 0 4rem;
+                        justify-content: center;
+                    }
+
+                    input.short,
+                    select.short {
+                        width: 100%;
+                        text-align: center;
+                    }
+
+                    .sheet-header-service-value {
+                        min-width: 1.5rem;
+                        font-size: 1.1rem;
+                        text-align: center;
+                    }
+                }
             }
 
             .sheet-header-labels {
@@ -440,10 +491,6 @@ body.theme-light,
     input,
     select {
         color: var(--sr5v2-control-text);
-
-        > option {
-            color: var(--sr5v2-option-text);
-        }
     }
 
     input.nuyen {
@@ -539,9 +586,21 @@ body.theme-light,
             color: var(--sr5v2-link-hover);
         }
 
-        > option {
+        option,
+        optgroup {
             color: var(--sr5v2-option-text);
             background-color: var(--sr5v2-option-bg);
+        }
+
+        optgroup {
+            color: var(--sr5v2-option-group-text);
+            font-style: normal;
+            font-weight: 600;
+        }
+
+        optgroup > option {
+            color: var(--sr5v2-option-text);
+            font-weight: 400;
         }
     }
 
@@ -871,6 +930,7 @@ body.theme-light .sr5v2:not(.theme-dark),
     --sr5v2-tab-active-shadow: 0 0 0 1px rgba(108, 31, 44, 0.14), 0 3px 10px rgba(34, 42, 51, 0.12);
     --sr5v2-option-bg: #edf1f5;
     --sr5v2-option-text: #27303a;
+    --sr5v2-option-group-text: #6a4e12;
     --sr5v2-origin-bg: #eef2f6;
     --sr5v2-origin-border: #9aa5b1;
     --sr5v2-editor-bg: #e5eaf0;
@@ -884,6 +944,10 @@ body.theme-light .sr5v2:not(.theme-dark),
     --sr5v2-cell-filled-bg: #b7c7d5;
     --sr5v2-cell-filled-border: #75889b;
     --sr5v2-cell-filled-text: #1d2834;
+    --sr5v2-positive-border: #3a7e3f;
+    --sr5v2-positive-bg: rgba(58, 126, 63, 0.16);
+    --sr5v2-negative-border: #8c3d3d;
+    --sr5v2-negative-bg: rgba(140, 61, 61, 0.16);
     --sr5v2-list-selected-bg: radial-gradient(rgba(7, 145, 35, 0.22), rgba(7, 145, 35, 0.03));
     --sr5v2-icon-filter: none;
 }

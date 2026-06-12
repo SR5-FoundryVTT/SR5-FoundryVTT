@@ -1,0 +1,21 @@
+<div class="attribute" data-attribute-id="{{key}}" data-context-menu="attribute">
+    <label>
+        {{localize label}}
+    </label>
+    <div class="attribute-value">
+        {{#if @root.isEditMode}}
+            <button type="button"
+                    class="attribute-button force-apply-toggle{{#unless matrixAtt.applies_special}} downlight{{/unless}}"
+                    data-action="toggleSpriteLevelAttribute"
+                    data-attribute-id="{{key}}"
+                    data-tooltip="SR5.Sprite.LevelAppliesSettingHint">L +</button>
+            {{formInput attributeField.fields.base value=matrixAtt.base
+                        classes="short skinny center" rootId=rootId }}
+        {{else}}
+            <button class="icon sr5-icon"
+                    type="button"
+                    data-action="rollAttribute"
+                    data-attribute-modifier-tooltip="{{key}}">{{matrixAtt.value}}</button>
+        {{/if}}
+    </div>
+</div>

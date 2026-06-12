@@ -84,7 +84,7 @@ export const AutocompleteInlineHooksFlow =  {
      */
     keyGetterTestData: (EffectConfig: SR5ActiveEffectConfig) => {
         const effect = EffectConfig.document;
-        const testsId = effect.system.selection_tests.map(test => test.id);
+        const testsId = effect.system.selection_tests;
 
         // For  effects targeting specific tests, we can provide a merge of all tests data.
         if (testsId.length > 0) {
