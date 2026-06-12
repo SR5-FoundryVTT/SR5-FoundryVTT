@@ -37,30 +37,27 @@ import { IconAssign } from 'src/module/apps/iconAssigner/IconAssign';
 import GetEmbeddedDocumentOptions = foundry.abstract.Document.GetEmbeddedDocumentOptions;
 
 type OneOrMany<T> = T | T[];
-const { fromUuid, mergeObject, expandObject } = foundry.utils;
+const { fromUuid, getProperty, setProperty } = foundry.utils;
 
 /**
- * Implementation of Shadowrun5e items (owned, unowned and nested).
- *
- *       tamIf here: The current legacy nested items approach has been cleaned up a bit but is still causing some issues
- *       with typing and ease of use.
- *
- *       SR5Item.items currently overwrites foundries internal DocumentCollection mechanism of nested documents. Partially
- *       due to legacy reasons and since Foundry 0.8 SR5Item.update can't be used for nested items in items anymore.
- *
- *        At the moment this means, that this.actor can actually be an SR5Actor as well as an SR5Item, depending on who
- *       'owns' the nested item as they are created using Item.createOwned during the nested item prep phase.
- *
- *       For this reason SR5Item.actorOwner has been introduced to allow access to the actual owning actor, no matter
- *       how deep nested into other items an item is.
- *
- *       Be wary of SR5Item.actor for this reason!
+ * Implementation of Shadowrun5e items, including dnd5e-style sibling item relationships.
  */
 export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSubType> extends Item<SubType> {
+    static readonly MAX_CONTAINER_DEPTH = 5;
+    static readonly MAX_ATTACHMENT_DEPTH = 5;
+    private static readonly MOD_PARENT_TYPES = ['weapon', 'armor', 'vehicle', 'drone'];
+
+    /**
+     * Whether a child item type can be attached to (linked via system.parentId to) a given parent item type.
+     */
+    static isAttachment(parentType: string, childType: string): boolean {
+        if (parentType === 'weapon' && childType === 'ammo') return true;
+        return childType === 'modification' && SR5Item.MOD_PARENT_TYPES.includes(parentType);
+    }
+
     //Those declarations must be initialized on prepareData, otherwise they will be undefined
 
-    // Item.items isn't the Foundry default ItemCollection but is overwritten within
-    // prepareNestedItems to allow for embedded items in items in actors.
+    // Item.items is a virtual list of linked sibling items for weapon ammo/mod and similar attachments.
     declare items: SR5Item[];
     declare descriptionHTML: string | undefined;
     // Item Sheet labels for quick info on an item dropdown.
@@ -135,23 +132,180 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return super.migrateData(source);
     }
 
-    /**
-     * Return an Array of the Embedded Item Data
-     */
+    get parentItem() {
+        const parentId = getProperty(this.system, 'parentId') as string | null | undefined;
+        if (!parentId) return;
+
+        if (this.isEmbedded) return this.actorOwner?.items.get(parentId) as SR5Item | undefined;
+        if (this.pack) return game.packs.get(this.pack)?.getDocument(parentId) as Promise<SR5Item | undefined> | undefined;
+        return game.items?.get(parentId) as SR5Item | undefined;
+    }
+
+    get linkedChildren(): SR5Item[] {
+        return this.items ?? [];
+    }
+
+    get ammoItems(): SR5Item<'ammo'>[] {
+        return this.linkedChildren.filter(item => item.isType('ammo')) as SR5Item<'ammo'>[];
+    }
+
+    get weaponMods(): SR5Item<'modification'>[] {
+        return this.linkedChildren.filter(item => item.isType('modification') && item.system.type === 'weapon') as SR5Item<'modification'>[];
+    }
+
+    get armorMods(): SR5Item<'modification'>[] {
+        return this.linkedChildren.filter(item => item.isType('modification') && item.system.type === 'armor') as SR5Item<'modification'>[];
+    }
+
     getNestedItems(): Item.Source[] {
-        return this.getFlag(SYSTEM_NAME, FLAGS.EmbeddedItems) ?? [];
+        return this.linkedChildren.map(item => item.toObject(false));
     }
 
     /**
-     * Set the embedded item data
-     * @param items
+     * The storage container this item belongs to, if any.
      */
-    async setNestedItems(items: Item.Source[]) {
-        return this.setFlag(SYSTEM_NAME, FLAGS.EmbeddedItems, items);
+    get container(): SR5Item | Promise<SR5Item | undefined> | undefined {
+        const parentId = getProperty(this.system, 'parentId') as string | null | undefined;
+        if (!parentId) return undefined;
+
+        if (this.isEmbedded) {
+            const parent = this.actorOwner?.items.get(parentId) as SR5Item | undefined;
+            return parent?.isType('container') ? parent : undefined;
+        }
+        if (this.pack) {
+            const pack = game.packs.get(this.pack) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
+            if (pack?.index.get(parentId)?.type !== 'container') return undefined;
+            return pack.getDocument(parentId) as Promise<SR5Item | undefined>;
+        }
+        const parent = game.items?.get(parentId) as SR5Item | undefined;
+        return parent?.isType('container') ? parent : undefined;
     }
 
-    async clearNestedItems() {
-        return this.unsetFlag(SYSTEM_NAME, FLAGS.EmbeddedItems);
+    /**
+     * Direct storage contents of this container.
+     */
+    get contents(): foundry.utils.Collection<SR5Item> | Promise<foundry.utils.Collection<SR5Item>> {
+        if (!this.id) return new foundry.utils.Collection<SR5Item>();
+
+        if (this.pack && !this.isEmbedded) {
+            const pack = game.packs.get(this.pack);
+            return pack?.getDocuments({ system: { parentId: this.id } }).then(documents =>
+                new foundry.utils.Collection<SR5Item>(
+                    documents.flatMap(document => document.id ? [[document.id, document as SR5Item] as [string, SR5Item]] : [])
+                )
+            ) ?? new foundry.utils.Collection<SR5Item>();
+        }
+
+        return new foundry.utils.Collection<SR5Item>(
+            this.linkedChildren.flatMap(item => item.id ? [[item.id, item] as [string, SR5Item]] : [])
+        );
+    }
+
+    getContainedItem(id: string) {
+        if (this.isEmbedded) return this.actorOwner?.items.get(id);
+        if (this.pack) return game.packs.get(this.pack)?.getDocument(id);
+        return game.items?.get(id);
+    }
+
+    /**
+     * Recursive storage contents, capped to avoid cyclic relationships.
+     */
+    get allContainedItems() {
+        const contents = this.contents;
+        if (contents instanceof Promise) return contents.then(items => this._collectContainedItemsAsync(items));
+        return this._collectContainedItems(contents);
+    }
+
+    private _collectContainedItems(contents: foundry.utils.Collection<SR5Item>, depth = 0, visited = new Set<string>()) {
+        const collection = new foundry.utils.Collection<SR5Item>();
+        if (depth >= SR5Item.MAX_CONTAINER_DEPTH) return collection;
+
+        for (const item of contents) {
+            if (!item.id || visited.has(item.id)) continue;
+
+            visited.add(item.id);
+            collection.set(item.id, item);
+
+            if (item.isType('container')) {
+                const nested = item.contents;
+                if (nested instanceof Promise) continue;
+
+                for (const nestedItem of this._collectContainedItems(nested, depth + 1, visited)) {
+                    if (nestedItem.id) collection.set(nestedItem.id, nestedItem);
+                }
+            }
+        }
+
+        return collection;
+    }
+
+    private async _collectContainedItemsAsync(contents: foundry.utils.Collection<SR5Item>, depth = 0, visited = new Set<string>()) {
+        const collection = new foundry.utils.Collection<SR5Item>();
+        if (depth >= SR5Item.MAX_CONTAINER_DEPTH) return collection;
+
+        for (const item of contents) {
+            if (!item.id || visited.has(item.id)) continue;
+
+            visited.add(item.id);
+            collection.set(item.id, item);
+
+            if (item.isType('container')) {
+                const nested = await item.contents;
+                for (const nestedItem of await this._collectContainedItemsAsync(nested, depth + 1, visited)) {
+                    if (nestedItem.id) collection.set(nestedItem.id, nestedItem);
+                }
+            }
+        }
+
+        return collection;
+    }
+
+    async allContainers(): Promise<SR5Item[]> {
+        let item: SR5Item = this;
+        const containers: SR5Item[] = [];
+        const visited = new Set<string>(this.id ? [this.id] : []);
+
+        while (containers.length < SR5Item.MAX_CONTAINER_DEPTH) {
+            const container = await item.container as SR5Item | null | undefined;
+            if (!container?.id || visited.has(container.id)) break;
+
+            containers.push(container);
+            visited.add(container.id);
+            item = container;
+        }
+
+        return containers;
+    }
+
+    async canContainItem(item: SR5Item): Promise<boolean> {
+        if (!this.isType('container')) return false;
+        if (!this.id || !item.id) return false;
+        if (this.id === item.id) return false;
+
+        const containers = await this.allContainers();
+        return !containers.some(container => container.id === item.id);
+    }
+
+    async clearLinkedChildren(): Promise<void> {
+        if (!this.id) return;
+
+        const contents = await this.contents;
+        const updates: any[] = Array.from(contents)
+            .filter(item => item.id)
+            .map(item => ({ _id: item.id, 'system.parentId': null }));
+        if (updates.length === 0) return;
+
+        if (this.isEmbedded && this.actorOwner) {
+            await this.actorOwner.updateEmbeddedDocuments('Item', updates);
+        } else if (this.pack) {
+            await Item.implementation.updateDocuments(updates, { pack: this.pack });
+        } else {
+            await Item.implementation.updateDocuments(updates);
+        }
+
+        this.prepareLinkedItems();
+        this.prepareRelationshipData();
+        this.render(false);
     }
 
     get hasOpposedRoll(): boolean {
@@ -185,7 +339,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * This function is run on construction of the item and prepares all data for the item.
      */
     override prepareData(this: SR5Item) {
-        this.prepareNestedItems();
+        this.prepareLinkedItems();
         super.prepareData();
     }
 
@@ -196,17 +350,46 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         // NOTE: this here is likely unused and heavily legacy.
         this.labels = {};
 
-        // Collect the equipped modifying nested items.
-        const equippedMods = this.getEquippedMods();
-        const equippedAmmo = this.getEquippedAmmo();
-
         // Prepare technology data for all item types sharing it.
         const technology = this.getTechnologyData();
         if (technology) {
             TechnologyPrep.prepareConditionMonitor(technology);
-            TechnologyPrep.prepareConceal(technology, equippedMods);
             TechnologyPrep.prepareMatrixAttributes(this.system);
             TechnologyPrep.prepareMentalAttributes(this.system);
+        }
+
+        if (this.isType('host'))
+            HostPrep.prepareBaseData(this.system);
+        else if (this.isType('adept_power'))
+            AdeptPowerPrep.prepareBaseData(this.system);
+        else if (this.isType('sin'))
+            SinPrep.prepareBaseData(this.system);
+        else if (this.asType('bioware', 'cyberware'))
+            WarePrep.prepareBaseData(this.system as Item.SystemOfType<'bioware' | 'cyberware'>);
+
+        if (!this.isEmbedded) {
+            this.prepareRelationshipData();
+        }
+    }
+
+    override prepareDerivedData(this: SR5Item): void {
+        super.prepareDerivedData();
+
+        const technology = this.getTechnologyData();
+        if (technology)
+            TechnologyPrep.calculateAttributes(this.system.attributes!);
+
+        if (this.isType('host'))
+            HostPrep.prepareDerivedData(this.system);
+    }
+
+    prepareRelationshipData(): void {
+        const equippedMods = this.getEquippedMods();
+        const equippedAmmo = this.getEquippedAmmo();
+        const technology = this.getTechnologyData();
+
+        if (technology) {
+            TechnologyPrep.prepareConceal(technology, equippedMods);
             TechnologyPrep.prepareAvailability(this, technology);
             TechnologyPrep.prepareCost(this, technology);
         }
@@ -220,30 +403,9 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             RangePrep.prepareData(this.system.range, equippedMods);
         }
 
-        // Switch item data preparation between types...
-        // ... this is ongoing work to clean up SR5item.prepareData
-        if ('armor' in this.system)
+        if ('armor' in this.system) {
             ArmorPrep.prepareData(this, equippedMods);
-
-        if (this.isType('host'))
-            HostPrep.prepareBaseData(this.system);
-        else if (this.isType('adept_power'))
-            AdeptPowerPrep.prepareBaseData(this.system);
-        else if (this.isType('sin'))
-            SinPrep.prepareBaseData(this.system);
-        else if (this.asType('bioware', 'cyberware'))
-            WarePrep.prepareBaseData(this.system as Item.SystemOfType<'bioware' | 'cyberware'>);
-    }
-
-    override prepareDerivedData(this: SR5Item): void {
-        super.prepareDerivedData();
-
-        const technology = this.getTechnologyData();
-        if (technology)
-            TechnologyPrep.calculateAttributes(this.system.attributes!);
-
-        if (this.isType('host'))
-            HostPrep.prepareDerivedData(this.system);
+        }
     }
 
     async postItemCard() {
@@ -678,90 +840,68 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     /**
-     * Create an item in this item
+     * Create an active effect embedded in this item
      * @param effectData
      */
-    async createNestedActiveEffect(effectData: ActiveEffect.Stored | ActiveEffect.Stored[]) {
-        if (!Array.isArray(effectData)) effectData = [effectData];
-
-        for (const effect of effectData) {
-            this.effects.set(effect._id, effect);
-        }
-
-        this.prepareNestedItems();
-        this.prepareData();
-        this.render(false);
-
+    async createEmbeddedActiveEffect(effectData: ActiveEffect.Stored | ActiveEffect.Stored[]) {
+        const effects = Array.isArray(effectData) ? effectData : [effectData];
+        await this.createEmbeddedDocuments('ActiveEffect', effects as unknown as ActiveEffect.CreateData[]);
         return true;
     }
 
     /**
-     * Create an item in this item
+     * Create sibling items linked to this item via system.parentId
      * @param itemData
      */
-    async createNestedItem(itemData: Item.Source | Item.Source[]) {
+    async createLinkedItem(itemData: Item.Source | Item.Source[]) {
         if (!Array.isArray(itemData)) itemData = [itemData];
-        // weapons and armor accept nested items
-        if (this.type === 'weapon' || this.type === 'armor') {
-            const currentItems = foundry.utils.duplicate(this.getNestedItems()) as Item.Source[];
+        if (!this.id) return false;
 
-            for (const ogItem of itemData) {
-                const item = foundry.utils.duplicate(ogItem) as Item.Source;
-                item._id = foundry.utils.randomID();
-                if (item.type === 'modification' || (this.type === 'weapon' && item.type === 'ammo'))
-                    currentItems.push(item);
-            }
+        const toCreate = itemData
+            .map(data => this._prepareNestedChildData(foundry.utils.duplicate(data) as Item.Source))
+            .filter((data): data is Item.Source => data !== null);
 
-            await this.setNestedItems(currentItems);
+        if (toCreate.length === 0) return false;
+
+        if (this.isEmbedded && this.actorOwner) {
+            await this.actorOwner.createEmbeddedDocuments('Item', toCreate as Item.CreateData[]);
+        } else if (this.pack) {
+            await Item.implementation.createDocuments(toCreate as Item.CreateData[], { pack: this.pack });
+        } else {
+            await Item.implementation.createDocuments(toCreate as Item.CreateData[]);
         }
-        this.prepareNestedItems();
-        this.prepareData();
+
+        this.prepareLinkedItems();
+        this.prepareRelationshipData();
         this.render(false);
 
         return true;
     }
 
-    /**
-     * Prepare embeddedItems
-     */
-    prepareNestedItems() {
-        this.items ??= [];
+    prepareLinkedItems() {
+        this.items = [];
+        if (!this.id) return;
+        if (this.pack && !this.isEmbedded) return;
 
-        const items = this.getNestedItems();
-        if (!items) return;
+        const collection = this.isEmbedded ? this.actorOwner?.items : game.items;
+        if (!collection) return;
 
-        // Reduce items to id:item HashMap style
-        const loaded = this.items.reduce<Record<string, SR5Item>>((object, item) => {
-            object[item.id as string] = item;
-            return object;
-        }, {});
+        this.items = collection.contents.filter(item => {
+            const linked = item as SR5Item;
+            return getProperty(linked.system, 'parentId') === this.id;
+        }) as SR5Item[];
+    }
 
-        // Merge and overwrite existing owned items with new changes.
-        const tempItems = items.map((item) => {
-            // Set user permissions to owner, to allow none-GM users to edit their own nested items.
-            const data = game.user ? { ownership: { [game.user.id]: CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER } } : {};
-            item = mergeObject(item, data) as Item.Source;
+    private _prepareNestedChildData(item: Item.Source): Item.Source | null {
+        if (!SR5Item.isAttachment(this.type, item.type) || !this.id) return null;
 
-            // Case: MODIFY => Update existing item.
-            if (item._id! in loaded) {
-                const currentItem = loaded[item._id!];
+        delete (item as Partial<Item.Source>)._id;
+        setProperty(item, 'system.parentId', this.id);
+        setProperty(item, '_stats.systemVersion', game.system.version);
 
-                // Update DocumentData directly, since we're not really having database items here.
-                currentItem.updateSource(item);
-                currentItem.prepareData();
-                return currentItem;
+        if (item.type === 'modification') setProperty(item, 'system.type', this.type);
 
-                // Case: CREATE => Create new item.
-            } else {
-                // @ts-expect-error "base" is allowed on Item.Source.type but not on Item.CreateData.type and parent as Item
-                // NOTE: It's important to deliver the item as the item parent document, even though this is meant for actor owners.
-                //       The legacy approach for embeddedItems (within another item) relies upon this.actor
-                //       returning an SR5Item instance to call .updateEmbeddedEntities, while Foundry expects an actor
-                return new SR5Item(item, { parent: this });
-            }
-        });
-
-        this.items = tempItems;
+        return item;
     }
 
     // TODO: Rework to either use custom embeddedCollection or Map
@@ -772,48 +912,23 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     async updateNestedEffects(changes: OneOrMany<ActiveEffect.UpdateInput>) {
-        if (!this._isNestedItem) return;
-
-        changes = Array.isArray(changes) ? changes : [changes];
-        if (!changes || changes.length === 0) return;
-
-        for (const change of changes) {
-            const effectId = typeof change._id === 'string' ? change._id : '';
-            const effect = this.effects.get(effectId);
-            if (!effect) continue;
-
-            // We need to delete the _id from the change data, otherwise mergeObject
-            // will merge the _id into the existing effect and cause all kinds of issues.
-            delete change._id;
-
-            mergeObject(effect, expandObject(change), { inplace: true });
-            effect.render(false);
-        }
-
-        const parent = this.parent as unknown as SR5Item;
-        await parent.updateNestedItems(this.toObject(false));
-        this.render(false);
+        const updates = Array.isArray(changes) ? changes : [changes];
+        if (updates.length === 0) return;
+        await this.updateEmbeddedDocuments('ActiveEffect', updates as ActiveEffect.UpdateData[]);
     }
 
     async updateNestedItems(changes: OneOrMany<Item.UpdateInput>) {
-        const items = foundry.utils.duplicate(this.getNestedItems()) as Item.Source[];
         const changesArray = Array.isArray(changes) ? changes : [changes];
+        const updates = changesArray.filter(change => typeof change._id === 'string' && this.getOwnedItem(change._id) !== undefined);
+        if (updates.length === 0) return;
 
-        for (const change of changesArray) {
-            const existing = items.find(i => i._id === change._id);
-            if (!existing) continue;
-
-            // We need to delete the _id from the change data, otherwise mergeObject
-            // will merge the _id into the existing effect and cause all kinds of issues.
-            delete change._id;
-
-            mergeObject(existing, expandObject(change));
+        if (this.isEmbedded && this.actorOwner) {
+            await this.actorOwner.updateEmbeddedDocuments('Item', updates as Item.UpdateData[]);
+        } else if (this.pack) {
+            await Item.implementation.updateDocuments(updates as Item.UpdateData[], { pack: this.pack });
+        } else {
+            await Item.implementation.updateDocuments(updates as Item.UpdateData[]);
         }
-
-        await this.setNestedItems(items);
-        this.prepareNestedItems();
-        this.prepareData();
-        this.render(false);
     }
 
     /**
@@ -822,17 +937,19 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @returns {Promise<boolean>}
      */
     async deleteOwnedItem(deleted: string): Promise<boolean> {
-        const items = foundry.utils.duplicate(this.getNestedItems()) as Item.Source[];
-        if (!items) return false;
+        const item = this.getOwnedItem(deleted);
+        if (!item) throw new Error(`Shadowrun5e | Couldn't find owned item ${deleted}`);
 
-        const idx = items.findIndex((i) => i._id === deleted);
-        if (idx === -1) throw new Error(`Shadowrun5e | Couldn't find owned item ${deleted}`);
-        items.splice(idx, 1);
-        // we need to clear the items when one is deleted or it won't actually be deleted
-        await this.clearNestedItems();
-        await this.setNestedItems(items);
-        this.prepareNestedItems();
-        this.prepareData();
+        if (this.isEmbedded && this.actorOwner) {
+            await this.actorOwner.deleteEmbeddedDocuments('Item', [deleted]);
+        } else if (this.pack) {
+            await Item.implementation.deleteDocuments([deleted], { pack: this.pack });
+        } else {
+            await Item.implementation.deleteDocuments([deleted]);
+        }
+
+        this.prepareLinkedItems();
+        this.prepareRelationshipData();
         this.render(false);
         return true;
     }
@@ -1231,7 +1348,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     get _isNestedItem(): boolean {
-        return Object.hasOwn(this, 'parent') && this.parent instanceof SR5Item;
+        return false;
     }
 
     /**
@@ -1240,27 +1357,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @param data changes made to the SR5ItemData
      */
     async updateNestedItem(data: Item.UpdateInput): Promise<this> {
-        if (!this.parent || this.parent instanceof SR5Actor) return this;
-        // Inform the parent item about changes to one of it's embedded items.
-        // TODO: updateOwnedItem needs the id of the update item. hand the item itself over, to the hack within updateOwnedItem for this.
-        data._id = this.id;
-
-        // Shadowrun Items can contain other items, while Foundry Items can't. Use the system local implementation for items.
-        await (this.parent as SR5Item).updateNestedItems(data);
-
-        // After updating all item embedded data, rerender the sheet to trigger the whole rerender workflow.
-        // Otherwise changes in the template of an hiddenItem will show for some fields, while not rerendering all
-        // #if statements (hidden fields for other values, won't show)
-        await this.sheet?.render(false);
-
-        return this;
+        return super.update(data) as Promise<this>;
     }
 
     override async update(data: Item.UpdateInput, options?: Item.Database.UpdateOneDocumentOperation) {
-        // Item.item => Embedded item into another item!
-        if (this._isNestedItem)
-            return this.updateNestedItem(data);
-
         await Migrator.updateMigratedDocument(this);
         // Actor.item => Directly owned item by an actor!
         return super.update(data, options);
@@ -1583,6 +1683,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @param args
      */
     override async _preDelete(...args: Parameters<Item['_preDelete']>) {
+        await this.clearLinkedChildren();
         await StorageFlow.deleteStorageReferences(this);
         return super._preDelete(...args);
     }

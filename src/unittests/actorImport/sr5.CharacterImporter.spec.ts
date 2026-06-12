@@ -209,8 +209,8 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(weapon.system.range.ranges.short, 5);
             assert.strictEqual(weapon.system.range.modes.single_shot, true);
 
-            //embedded items
-            assert.strictEqual(IH.getArray(weapon.flags.shadowrun5e?.embeddedItems).length, 1);
+            const linkedAmmo = actor.items.find(item => item.type === 'ammo' && foundry.utils.getProperty(item, 'system.parentId') === weapon._id);
+            assert.exists(linkedAmmo);
         });
 
         it('Should have the correct vehicles', async () => {

@@ -39,6 +39,7 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet<SpiritActorSheetData>
             'weapon',
             'ammo',
             'armor',
+            'container',
             'equipment',
             'modification',
         ];

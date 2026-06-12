@@ -76,7 +76,7 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                     }
                 }
             });
-            await armor.createNestedItem(modification.toObject());
+            await armor.createLinkedItem(modification.toObject());
 
             assert.strictEqual(armor.system.armor.value, 8);
             assert.strictEqual(character.system.armor.rating.value, 8);
@@ -130,8 +130,8 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                 }
             });
 
-            await armor.createNestedItem(normalModification.toObject());
-            await armor.createNestedItem(hardenedModification.toObject());
+            await armor.createLinkedItem(normalModification.toObject());
+            await armor.createLinkedItem(hardenedModification.toObject());
 
             assert.strictEqual(armor.system.armor.value, 2);
             assert.strictEqual(armor.system.armor.hardened, 9);

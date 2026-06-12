@@ -121,6 +121,7 @@ export class SR5CharacterSheet extends SR5MatrixActorSheet<CharacterSheetData> {
             'ammo',
             'armor',
             'bioware',
+            'container',
             'cyberware',
             'device',
             'equipment',

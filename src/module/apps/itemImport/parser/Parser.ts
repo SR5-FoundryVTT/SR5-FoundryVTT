@@ -1,4 +1,5 @@
 import { ParseData } from "./Types";
+import { SR5Item } from "@/module/item/SR5Item";
 import { CompendiumKey } from "../importer/Constants";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 import { BonusHelper as BH } from "../helper/BonusHelper";
@@ -71,7 +72,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
         if (this.isActor())
             (entity as Actor.CreateData).items = await itemPromise;
         else
-            (entity as Item.CreateData).flags = { shadowrun5e: { embeddedItems: await itemPromise } };
+            (entity as Item.CreateData & { _embeddedItems?: Item.Source[] })._embeddedItems = this.prepareEmbeddedItems(entity as Item.CreateData, await itemPromise);
 
         return entity;
     }
@@ -97,4 +98,16 @@ export abstract class Parser<SubType extends SystemEntityType> {
     protected getBaseSystem(createData: SystemConstructorArgs<SubType> = {}) {
         return DataDefaults.baseSystemData<SubType>(this.parseType, createData);
     };
+
+    protected prepareEmbeddedItems(parent: Item.CreateData, items: Item.Source[]): Item.Source[] {
+        return items.map(item => {
+            const linked = foundry.utils.duplicate(item) as Item.Source;
+
+            if (linked.type === 'modification') {
+                foundry.utils.setProperty(linked, 'system.type', parent.type);
+            }
+
+            return linked;
+        }).filter(item => SR5Item.isAttachment(parent.type!, item.type));
+    }
 }

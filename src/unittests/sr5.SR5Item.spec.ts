@@ -23,22 +23,23 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
             assert.strictEqual(item.id, itemFromCollection?.id);
         });
 
-        it('embedd a ammo into a weapon and not the global item collection', async () => {
+        it('link ammo to a weapon as a sibling item in the global item collection', async () => {
             const weapon = await factory.createItem({type: 'weapon', system: {category: 'range'}});
             const ammo = await factory.createItem({type: 'ammo'});
 
-            await weapon.createNestedItem(ammo.toObject());
+            await weapon.createLinkedItem(ammo.toObject());
 
-            const embeddedItemDatas = weapon.getNestedItems();
-            assert.isNotEmpty(embeddedItemDatas);
-            assert.lengthOf(embeddedItemDatas, 1);
+            const linkedItemDatas = weapon.getNestedItems();
+            assert.isNotEmpty(linkedItemDatas);
+            assert.lengthOf(linkedItemDatas, 1);
 
-            const embeddedAmmoData = embeddedItemDatas[0];
-            assert.strictEqual(embeddedAmmoData.type, ammo.type);
+            const linkedAmmoData = linkedItemDatas[0];
+            assert.strictEqual(linkedAmmoData.type, ammo.type);
+            assert.strictEqual(linkedAmmoData.system.parentId, weapon.id);
 
-            // An embedded item should NOT appear in the items collection.
-            const embeddedAmmoInCollection = game.items?.get(embeddedAmmoData._id!);
-            assert.strictEqual(embeddedAmmoInCollection, undefined);
+            // A linked item is a sibling and should appear in the items collection.
+            const linkedAmmoInCollection = game.items?.get(linkedAmmoData._id!);
+            assert.notStrictEqual(linkedAmmoInCollection, undefined);
         });
 
         describe('Testing related data injection', () => {

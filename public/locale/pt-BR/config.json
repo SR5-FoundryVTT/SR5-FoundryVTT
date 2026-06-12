@@ -331,6 +331,23 @@
         },
         "ComplexForm": "Forma Complexa",
         "ComplexForms": "Formas Complexas",
+        "Container": {
+            "CannotContain": "This item cannot be placed in that container.",
+            "Capacity": "Capacity",
+            "Empty": "This container is empty.",
+            "FIELDS": {
+                "capacity": {
+                    "count": {
+                        "hint": "Maximum number of direct items this container can hold. Use 0 for unlimited.",
+                        "label": "Capacity"
+                    },
+                    "hint": "Maximum number of direct items this container can hold. Use 0 for unlimited.",
+                    "label": "Capacity"
+                }
+            },
+            "Full": "This container is full.",
+            "Remove": "Remove from container"
+        },
         "Conceal": "Ocultar",
         "ConditionMonitor": "Mon. de Con.",
         "Contact": {
@@ -679,6 +696,7 @@
             "Armor": "Armadura",
             "Bioware": "Biônico",
             "ComplexForm": "Forma Complexa",
+            "Container": "Container",
             "Contact": "Contato",
             "CritterPower": "Poder de Criatura",
             "Cyberware": "Cibernético",
@@ -1736,7 +1754,8 @@
         },
         "Tabs": {
             "Item": {
-                "ArmorMods": "Mods de Armadura"
+                "ArmorMods": "Mods de Armadura",
+                "ContainerContents": "Contents"
             }
         },
         "Wireless": "Conexão Sem Fio"
@@ -1757,6 +1776,7 @@
             "bioware": "Biônico",
             "call_in_action": "Invocar/Compilar",
             "complex_form": "Forma Complexa",
+            "container": "Container",
             "contact": "Contato",
             "critter_power": "Poder de Criatura",
             "cyberware": "Cibernético",
