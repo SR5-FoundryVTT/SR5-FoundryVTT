@@ -260,7 +260,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         data.limit ||= DataDefaults.createData('value_field', { label: 'SR5.Limit' });
 
         data.values ||= {};
-
+        data.opposed ||= {};
         data.codeTermTraces ??= [];
 
         // Prepare basic value structure to allow an opposed tests to access derived values before execution with placeholder
