@@ -59,7 +59,7 @@
       },
       "opposed": {
         "type": "",
-        "test": "OpposedTest",
+        "test": "OpposedMatrixTest",
         "attribute": "willpower",
         "attribute2": "sleaze",
         "skill": "",

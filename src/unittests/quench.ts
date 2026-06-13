@@ -8,6 +8,7 @@ import { shadowrunAttackTesting } from './sr5.AttackTests.spec';
 import { shadowrunRulesModifiers } from './sr5.Modifiers.spec';
 import { shadowrunSR5Item } from './sr5.SR5Item.spec';
 import { shadowrunMatrix } from './sr5.Matrix.spec';
+import { shadowrunMatrixOpposedDeviceDialog } from './sr5.MatrixOpposedDeviceDialog.spec';
 import { shadowrunSR5CharacterDataPrep } from './sr5.CharacterDataPrep.spec';
 import { shadowrunSR5SpiritDataPrep } from './sr5.SpiritDataPrep.spec';
 import { shadowrunSR5SpriteDataPrep } from './sr5.SpriteDataPrep.spec';
@@ -50,6 +51,9 @@ export const quenchRegister = (quench: Quench) => {
 
     quench.registerBatch('shadowrun5e.rules.matrix', shadowrunMatrix, {
         displayName: 'SHADOWRUN5e: Matrix Rules Test',
+    });
+    quench.registerBatch('shadowrun5e.apps.matrix_opposed_device_dialog', shadowrunMatrixOpposedDeviceDialog, {
+        displayName: 'SHADOWRUN5e: Matrix Opposed Device Dialog Test',
     });
     quench.registerBatch('shadowrun5e.rules.modifiers', shadowrunRulesModifiers, {
         displayName: 'SHADOWRUN5e: Modifiers Rules Test',

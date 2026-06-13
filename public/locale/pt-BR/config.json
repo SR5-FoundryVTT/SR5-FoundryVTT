@@ -443,7 +443,8 @@
         "DeviceType": "Tipo",
         "Dialogs": {
             "Common": {
-                "Cancel": "Cancelar"
+                "Cancel": "Cancelar",
+                "Ok": "OK"
             },
             "RangedWeaponTest": {
                 "EnvironmentalOverwriteSet": "Os modificadores ambientais foram definidos manualmente para um valor fixo!"
@@ -770,6 +771,7 @@
                 "ClearNetwork": "Limpar rede de todos os dispositivos",
                 "ItemEffects": "Efeitos do Item",
                 "MissingNetworkDevices": "Arraste e solte um dispositivo para adicioná-lo",
+                "RemoveImprovisedDevices": "Remover dispositivos improvisados",
                 "NetworkDevices": "Dispositivos em Rede",
                 "PAN": "RAP",
                 "SubtractOne": "Subtrair Um",
@@ -838,6 +840,9 @@
         "MatrixAttrDataProc": "Datagrama",
         "MatrixAttrFirewall": "Firewall",
         "MatrixAttrSleaze": "Subversão",
+        "MatrixOpposedDeviceDialog": {
+            "Title": "Criar Dispositivo de Matriz"
+        },
         "MatrixTarget": "Alvo da Matriz",
         "MeleeWeaponAttack": "Ataque com Arma Corpo-a-corpo",
         "MentalLimit": "Limite Mental",
@@ -1375,6 +1380,7 @@
             "NaturalRecoveryPhysicalTest": "Recuperação Natural Física",
             "NaturalRecoveryStunTest": "Recuperação Natural de Atordoamento",
             "OpposedCompileSpriteTest": "Opor à Compilação",
+            "OpposedMatrixTest": "Teste Oposto de Matriz",
             "OpposedRitualTest": "Selar o Ritual",
             "OpposedSummonSpiritTest": "Opor à Invocação",
             "OpposedTest": "Teste Oposto",

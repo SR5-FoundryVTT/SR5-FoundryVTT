@@ -167,6 +167,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
             removeSlave: SR5ItemSheet.#removeSlave,
             removeAllSlaves: SR5ItemSheet.#removeAllSlaves,
+            removeImprovisedDevices: SR5ItemSheet.#removeImprovisedDevices,
 
             toggleActionArmor: SR5ItemSheet.#toggleActionArmor,
             toggleOpposedArmor: SR5ItemSheet.#toggleOpposedArmor,
@@ -777,6 +778,16 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (!document) return;
 
         await this.item.removeSlave(document);
+    }
+
+    static async #removeImprovisedDevices(this: SR5ItemSheet, event: Event) {
+        event.preventDefault();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        await this.item.removeImprovisedDevices();
+        void this.render();
     }
 
     async _onMarksQuantityChange(event: Event) {

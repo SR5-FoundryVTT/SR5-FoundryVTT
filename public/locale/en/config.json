@@ -1047,7 +1047,8 @@
         "DeviceType": "Type",
         "Dialogs": {
             "Common": {
-                "Cancel": "Cancel"
+                "Cancel": "Cancel",
+                "Ok": "OK"
             },
             "RangedWeaponTest": {
                 "EnvironmentalOverwriteSet": "Environmental modifiers have been manually set to a fixed value!"
@@ -1738,6 +1739,7 @@
                 "NotVisible": "Not Visible",
                 "PAN": "PAN",
                 "RebootDevice": "Reboot",
+                "RemoveImprovisedDevices": "Remove improvised devices",
                 "SubtractOne": "Subtract One",
                 "Type": "Type",
                 "Visible": "Visible",
@@ -1845,6 +1847,9 @@
             "Icons": "Icons",
             "Invite": "Ask for invite",
             "Title": "Connect to Network"
+        },
+        "MatrixOpposedDeviceDialog": {
+            "Title": "Create Matrix Device"
         },
         "MatrixTarget": "Matrix Target",
         "MeleeWeaponAttack": "Melee Weapon Attack",
@@ -2826,6 +2831,7 @@
             "OpposedCheckOverwatchScoreTest": "Oppose Check Overwatch Score",
             "OpposedCompileSpriteTest": "Oppose Compilation",
             "OpposedHackOnTheFlyTest": "Oppose Hack On The Fly",
+            "OpposedMatrixTest": "Opposed Matrix Test",
             "OpposedRitualTest": "Seal the Ritual",
             "OpposedSummonSpiritTest": "Oppose Summoning",
             "OpposedTest": "Opposed Test",

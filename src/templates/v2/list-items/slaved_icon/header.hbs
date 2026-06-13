@@ -12,7 +12,12 @@
     </div>
 
     <div class="list-item-icons skinny-icons">
-        <a data-action="removeAllSlaves">
+        {{#if (isType item 'grid' 'host')}}
+            <a data-action="removeImprovisedDevices" data-tooltip="SR5.Labels.Sheet.RemoveImprovisedDevices">
+                <i class="fas fa-broom"></i>
+            </a>
+        {{/if}}
+        <a data-action="removeAllSlaves" data-tooltip="SR5.Labels.Sheet.ClearNetwork">
             <i class="fas fa-trash"></i>
         </a>
     </div>
