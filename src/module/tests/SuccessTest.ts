@@ -197,6 +197,40 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     // Allow this.constructor to not reference Function.
     declare ['constructor']: typeof SuccessTest;
 
+    static applyStructuralDefaults<T extends DeepPartial<SuccessTestData>>(data: T): T & SuccessTestData {
+        data.buyHits ??= false;
+        data.pushTheLimit ??= false;
+        data.secondChance ??= false;
+
+        data.pool ||= DataDefaults.createData('value_field', { label: 'SR5.DicePool' });
+        data.threshold ||= DataDefaults.createData('value_field', { label: 'SR5.Threshold' });
+        data.limit ||= DataDefaults.createData('value_field', { label: 'SR5.Limit' });
+
+        data.values ||= {};
+        data.opposed ||= {} as OpposedTestType;
+        data.codeTermTraces ??= [];
+
+        data.values.hits ||= DataDefaults.createData('value_field', { label: "SR5.Hits" });
+        data.values.extendedHits ||= DataDefaults.createData('value_field', { label: "SR5.ExtendedHits" });
+        data.values.netHits ||= DataDefaults.createData('value_field', { label: "SR5.NetHits" });
+        data.values.glitches ||= DataDefaults.createData('value_field', { label: "SR5.Glitches" });
+
+        data.action ||= DataDefaults.createData('action_roll');
+        data.damage ||= DataDefaults.createData('damage');
+
+        data.categories ||= [];
+        data.targetActorsUuid ||= [];
+        data.evaluated ??= false;
+        data.extended ??= false;
+        data.extendedRoll ??= false;
+
+        return data as T & SuccessTestData;
+    }
+
+    static createStructuralTestData(): SuccessTestData {
+        return this.applyStructuralDefaults({});
+    }
+
     constructor(data: DeepPartial<T>, documents?: TestDocuments, options: Partial<TestOptions> = {}) {
         // Store given documents to avoid later fetching.
         this.actor = documents?.actor;
@@ -226,11 +260,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Any Test should be usable simply by instantiating it with empty TestData
      */
     _prepareData(data: DeepPartial<T>, options: Partial<TestOptions>): T {
-        data.type ||= this.type;
+        data = SuccessTest.applyStructuralDefaults(data);
+        data.type ??= this.type;
 
         // Store the current users targeted token ids for later use.
-        // TODO: remove this.
-        // data.targetActorsUuid = data.targetActorsUuid || Helpers.getUserTargets().map(token => token.actor?.uuid).filter(uuid => !!uuid);
         data.targetUuids ||= Helpers.getUserTargets().map(token => token.actor?.uuid).filter((uuid): uuid is string => !!uuid);
 
         // Store given document uuids to be fetched during evaluation.
@@ -246,35 +279,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             showDialog: options.showDialog ?? true,
             showMessage: options.showMessage ?? true,
         };
-
-        // Keep previous evaluation state.
-        data.evaluated = data.evaluated ?? false;
-
-        data.buyHits ??= false;
-        data.pushTheLimit ??= false;
-        data.secondChance ??= false;
-
-        // Set possible missing values.
-        data.pool ||= DataDefaults.createData('value_field', { label: 'SR5.DicePool' });
-        data.threshold ||= DataDefaults.createData('value_field', { label: 'SR5.Threshold' });
-        data.limit ||= DataDefaults.createData('value_field', { label: 'SR5.Limit' });
-
-        data.values ||= {};
-        data.opposed ||= {};
-        data.codeTermTraces ??= [];
-
-        // Prepare basic value structure to allow an opposed tests to access derived values before execution with placeholder
-        // active tests.
-        data.values.hits ||= DataDefaults.createData('value_field', { label: "SR5.Hits" });
-        data.values.extendedHits ||= DataDefaults.createData('value_field', { label: "SR5.ExtendedHits" });
-        data.values.netHits ||= DataDefaults.createData('value_field', { label: "SR5.NetHits" });
-        data.values.glitches ||= DataDefaults.createData('value_field', { label: "SR5.Glitches" });
-
-        data.action ||= DataDefaults.createData('action_roll');
-
-        data.damage ||= DataDefaults.createData('damage');
-
-        data.extendedRoll ||= false;
 
         console.debug('Shadowrun 5e | Prepared test data', data);
 

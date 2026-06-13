@@ -657,10 +657,9 @@ export const TestCreator = {
 
     /**
      * Return minimal viable test data without test specific customization.
-     * Uses SuccessTest as the single source of truth for default values.
      */
     _minimalTestData: function(): SuccessTestData {
-        return new SuccessTest({}).data;
+        return SuccessTest.createStructuralTestData();
     },
 
     /**
