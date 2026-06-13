@@ -95,7 +95,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             });
 
             ModifiableValue.add(valueField, 'Custom Modifier', 3, {
-                mode: 'ADD',
+                type: 'add',
                 priority: ModifiableValue.MANUAL_PRIORITY,
             });
 

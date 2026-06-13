@@ -29,6 +29,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         return DataDefaults.createData('change_entry', {
             name: effect.name,
             value: parseInt(change.value),
+            // @ts-expect-error - TODO: fvtt-types - v14 - remove mode in favor of v14 type
             mode: change.mode,
             priority: parseInt(String(change.priority)),
             source: effect.uuid

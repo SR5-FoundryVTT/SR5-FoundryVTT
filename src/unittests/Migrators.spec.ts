@@ -361,22 +361,22 @@ export const Migrators = (context: QuenchBatchContext) => {
                         {
                             key: 'system.modifiers.matrix_initiative',
                             value: '(@system.modifiers.matrix_initiative + @system.level + @system.modifiers.matrix_initiative_dice)',
-                            mode: CONST.ACTIVE_EFFECT_MODES.ADD
+                            type: 'add'
                         },
                         {
                             key: 'system.attributes.reaction',
                             value: '@system.attributes.reaction + @system.unknown.path',
-                            mode: CONST.ACTIVE_EFFECT_MODES.ADD
+                            type: 'add'
                         },
                         {
                             key: 'system.modifiers.matrix_initiative_dice',
                             value: 2,
-                            mode: CONST.ACTIVE_EFFECT_MODES.ADD
+                            type: 'add'
                         },
                         {
                             key: 'system.attributes.body',
                             value: 5,
-                            mode: CONST.ACTIVE_EFFECT_MODES.ADD
+                            type: 'add'
                         },
                     ],
                 },
@@ -697,10 +697,10 @@ export const Migrators = (context: QuenchBatchContext) => {
             const effect = {
                 system: {
                     changes: [
-                        { key: 'system.level', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                        { key: 'system.modifiers.matrix_initiative', value: 1, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                        { key: 'system.modifiers.matrix_initiative_dice', value: 1, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                        { key: 'system.attributes.reaction', value: 1, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                        { key: 'system.level', value: 2, type: 'add' },
+                        { key: 'system.modifiers.matrix_initiative', value: 1, type: 'add' },
+                        { key: 'system.modifiers.matrix_initiative_dice', value: 1, type: 'add' },
+                        { key: 'system.attributes.reaction', value: 1, type: 'add' },
                     ],
                 },
             };
