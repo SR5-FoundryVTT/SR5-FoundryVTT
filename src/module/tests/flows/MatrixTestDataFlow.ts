@@ -498,19 +498,19 @@ export const MatrixTestDataFlow = {
         const caster = againstData.sourceActorUuid
             ? await fromUuid<SR5Actor>(againstData.sourceActorUuid)
             : null;
+        
+        // CASE A) Resolve targeted document by targeted icon.
         if (againstData.iconUuid) {
             document = await fromUuid(againstData.iconUuid)
         }
 
+        // CASE B) Resolve targeted document by creation one on the fly.
         if (!document && !againstData.iconUuid) {
-            document = await MatrixOpposedTargetFlow.resolveOpposedDocument(document, caster ?? undefined);
-            if (document instanceof SR5Item) {
-                againstData.iconUuid = document.uuid ?? undefined;
-            }
-
-            if (!document) return;
+            document = await MatrixOpposedTargetFlow.createTemporyDocument(document, caster ?? undefined);
+            if (document) againstData.iconUuid = document.uuid ?? undefined;
         }
 
+        // CASE C) Resolve targeted document by whatever is selected.
         if (!document) {
             const actor = Helpers.getSelectedActorsOrCharacter()[0];
             document = actor;

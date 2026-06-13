@@ -101,8 +101,8 @@ export class CompendiumBrowser extends BaseClass {
             clearSearch: function (this: CompendiumBrowser) {
                 this._onClearSearch();
             },
-            acceptSelection: function (this: CompendiumBrowser) {
-                this._onAcceptSelection();
+            acceptSelection: async function(this: CompendiumBrowser) {
+                await this._onAcceptSelection();
             },
             cancelSelection: function (this: CompendiumBrowser) {
                 this._onCancelSelection();
@@ -409,14 +409,14 @@ export class CompendiumBrowser extends BaseClass {
     }
 
     /** Handles the accept button in selection mode. */
-    private _onAcceptSelection() {
+    private async _onAcceptSelection(this:  CompendiumBrowser) {
         if (!this.selectionMode || !this.selectedEntryUuid) return;
 
         const entry = this.scrollState.entries.find((candidate) => candidate.uuid === this.selectedEntryUuid);
         if (!entry) return;
 
-        this.selectionCallback?.(entry);
-        this.close();
+        await this.selectionCallback?.(entry);
+        await this.close();
     }
 
     /** Handles the cancel button in selection mode. */

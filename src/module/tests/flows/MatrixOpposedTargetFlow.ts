@@ -13,7 +13,7 @@ export const MatrixOpposedTargetFlow = {
         return game.i18n.localize(SR5.itemTypes.device);
     },
 
-    async resolveOpposedDocument(document: foundry.abstract.Document.Any | null | undefined, caster?: SR5Actor): Promise<foundry.abstract.Document.Any | null> {
+    async createTemporyDocument(document: foundry.abstract.Document.Any | null | undefined, caster?: SR5Actor): Promise<foundry.abstract.Document.Any | null> {
         if (document) return document;
         if (!game.user?.isGM) return null;
 
