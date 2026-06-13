@@ -270,7 +270,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         data.values.netHits ||= DataDefaults.createData('value_field', { label: "SR5.NetHits" });
         data.values.glitches ||= DataDefaults.createData('value_field', { label: "SR5.Glitches" });
 
-        data.opposed ||= undefined;
+        data.action ||= DataDefaults.createData('action_roll');
 
         data.damage ||= DataDefaults.createData('damage');
 
