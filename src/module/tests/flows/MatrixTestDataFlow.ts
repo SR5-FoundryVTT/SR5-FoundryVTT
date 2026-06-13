@@ -10,6 +10,7 @@ import { MatrixDefenseTest } from "../MatrixDefenseTest";
 import { MatrixResistTest, MatrixResistTestData } from "../MatrixResistTest";
 import { BiofeedbackResistTest } from "../BiofeedbackResistTest";
 import { OpposedMatrixTest } from '@/module/tests/OpposedMatrixTest';
+import { MatrixOpposedTargetFlow } from '@/module/tests/flows/MatrixOpposedTargetFlow';
 import Document = foundry.abstract.Document;
 
 /**
@@ -469,10 +470,22 @@ export const MatrixTestDataFlow = {
      */
     async executeMessageAction(testCls: any, againstData: MatrixTestData, messageId: string, options: Partial<TestOptions>): Promise<void> {
         let document: Document.Any | null = null;
+        const caster = againstData.sourceActorUuid
+            ? await fromUuid<SR5Actor>(againstData.sourceActorUuid)
+            : null;
+        
+        // CASE A) Resolve targeted document by targeted icon.
         if (againstData.iconUuid) {
             document = await fromUuid(againstData.iconUuid)
         }
 
+        // CASE B) Resolve targeted document by creation one on the fly.
+        if (!document && !againstData.iconUuid) {
+            document = await MatrixOpposedTargetFlow.createTemporyDocument(document, caster ?? undefined);
+            if (document) againstData.iconUuid = document.uuid ?? undefined;
+        }
+
+        // CASE C) Resolve targeted document by whatever is selected.
         if (!document) {
             const actor = Helpers.getSelectedActorsOrCharacter()[0];
             document = actor;

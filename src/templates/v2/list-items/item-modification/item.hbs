@@ -14,7 +14,9 @@
 
         <div class="list-item-col armor-col">
             <label>
-                {{#if item.system.mod_armor.value}}
+                {{#if (isType @root.item 'bioware' 'cyberware')}}
+                    {{floatValue item.system.essence 2}}
+                {{else if item.system.mod_armor.value}}
                     {{numberFormat item.system.mod_armor.value sign=true}}
                 {{/if}}
             </label>

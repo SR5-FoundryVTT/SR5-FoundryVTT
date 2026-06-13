@@ -9,6 +9,7 @@ import { DeepPartial } from "fvtt-types/utils";
 /**
  * Basic Test for opposing Matrix Actions
  * - provides support for targeting matrix icons
+ * - provides support for targeting non-existent matrix icons
  */
 export class OpposedMatrixTest<T extends OpposedMatrixTestData = OpposedMatrixTestData> extends OpposedTest<T> {
     declare against: MatrixTest;
