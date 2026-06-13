@@ -80,17 +80,17 @@ export const registerModifierHelpers = () => {
     });
 
     Handlebars.registerHelper('getChangeValue', (change: ChangeType) => {
-        switch (change.mode) {
-            case 0:
-            case 2:
+        switch (change.type) {
+            case 'add':
+            case 'custom':
                 return change.value > 0 ? `+${change.value}` : `${change.value}`;
-            case 1:
+            case 'multiply':
                 return `* ${change.value}`;
-            case 3:
+            case 'downgrade':
                 return `↓ ${change.value}`;
-            case 4:
+            case 'upgrade':
                 return `↑ ${change.value}`;
-            case 5:
+            case 'override':
                 return `➝ ${change.value}`;
             default:
                 return `? ${change.value}`;

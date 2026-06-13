@@ -30,7 +30,7 @@ const SR5ActiveEffectData = {
     selection_tests: new TagifyMultiField(),
 }
 
-// TODO: fvtt - v14 - Extend V14 datamodel with v13 fvtt types providing some v14 typing.
+// TODO: fvtt-types - Extend V14 datamodel with v13 fvtt types providing some v14 typing.
 type SR5ActiveEffectSchema = typeof SR5ActiveEffectData & {
     changes: foundry.data.fields.ArrayField<foundry.data.fields.SchemaField<ActiveEffectChangeSchema>>;
 };

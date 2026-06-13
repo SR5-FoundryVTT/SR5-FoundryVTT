@@ -163,7 +163,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
         const context = await super._prepareContext(options);
 
         context.test = this.test;
-        // @ts-expect-error TODO: fvtt - v14 - missing messageMode setting
+        // @ts-expect-error TODO: fvtt-types - missing messageMode setting
         context.rollMode = this.test.data.options?.rollMode ?? game.settings.get('core', 'messageMode');
         // TODO: fvtt-types - type CONFIG.ChatMessage.modes upstream once available
         context.rollModes = (CONFIG.ChatMessage as unknown as { modes: CONFIG.ChatMessage.modes }).modes;
@@ -357,7 +357,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
         const name = rawName || game.i18n.localize('SR5.ManualModifier');
 
         ModifiableValue.add(valueField, name, safeValue, {
-            mode: 'ADD',
+            type: 'add',
             enabled: true,
             priority: ModifiableValue.MANUAL_PRIORITY,
         });
@@ -402,7 +402,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
                     valueField,
                     'SR5.ManualOverride',
                     value as number | null,
-                    { mode: 'OVERRIDE', priority: ModifiableValue.TOP_PRIORITY }
+                    { type: 'override', priority: ModifiableValue.TOP_PRIORITY }
                 );
             } 
         }

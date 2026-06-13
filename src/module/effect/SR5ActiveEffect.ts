@@ -23,15 +23,50 @@ import DataModel = foundry.abstract.DataModel;
  * NOTE: FoundryVTT DataModel is used to apply changes as well. Check custom Field implementations for effect change mode
  * application.
  */
+// TODO: fvtt-types - v14 - Replace local types with fvtt-type types
+type SR5ChangeTypeConfig = { label: string; defaultPriority: number; handler: unknown; render: unknown };
+
 export class SR5ActiveEffect extends ActiveEffect {
-    private static readonly legacyModeByChangeType: Record<string, number> = {
-        custom: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-        multiply: CONST.ACTIVE_EFFECT_MODES.MULTIPLY,
-        add: CONST.ACTIVE_EFFECT_MODES.ADD,
-        downgrade: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE,
-        upgrade: CONST.ACTIVE_EFFECT_MODES.UPGRADE,
-        override: CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
-    };
+    private static _CHANGE_TYPES: Record<string, SR5ChangeTypeConfig> | null = null;
+
+    // TODO: fvtt-types - Replace local types with fvtt-type types
+    static get CHANGE_TYPES(): Record<string, SR5ChangeTypeConfig> {
+        if (SR5ActiveEffect._CHANGE_TYPES) return SR5ActiveEffect._CHANGE_TYPES;
+
+        const coreTypes = Object.entries((CONST as any).ACTIVE_EFFECT_CHANGE_TYPES ?? {}).map(([value, defaultPriority]) => ({
+            value,
+            defaultPriority,
+            label: `EFFECT.CHANGES.TYPES.${value}`,
+            handler: null,
+            render: null,
+        }));
+
+        const registeredTypes = Object.entries(((CONFIG as any).ActiveEffect?.changeTypes ?? {}) as Record<string, {
+            label?: string;
+            defaultPriority?: number;
+            handler?: unknown;
+            render?: unknown;
+        }>).map(([value, config]) => ({
+            value,
+            label: config.label ?? value,
+            defaultPriority: config.defaultPriority ?? 0,
+            handler: config.handler ?? null,
+            render: config.render ?? null,
+        }));
+
+        SR5ActiveEffect._CHANGE_TYPES = [...coreTypes, ...registeredTypes].reduce((types, type) => {
+            types[type.value] = {
+                label: String(type.label),
+                defaultPriority: Number(type.defaultPriority ?? 0),
+                handler: type.handler ?? null,
+                render: type.render ?? null,
+            };
+            return types;
+        }, {} as Record<string, SR5ChangeTypeConfig>);
+
+        return SR5ActiveEffect._CHANGE_TYPES;
+    }
+
 
     /**
      * Can be used to determine if the origin of the effect is a document owned by another document.
@@ -159,19 +194,6 @@ export class SR5ActiveEffect extends ActiveEffect {
         return ['base', 'changes', 'value'] satisfies (keyof ModifiableValueType)[];
     }
 
-    /**
-     * Convert a v14 string-based change type into the legacy numeric mode value.
-     */
-    static getLegacyChangeMode(change: { mode?: number; type?: string | null }): number {
-        if (typeof change.mode === 'number') return change.mode;
-
-        const changeType = typeof change.type === 'string' ? change.type : '';
-        const mappedMode = this.legacyModeByChangeType[changeType];
-        if (mappedMode !== undefined) return mappedMode;
-
-        console.error(`Shadowrun5e | Unrecognized change type "${change.type}", defaulting to "add" mode.`);
-        return CONST.ACTIVE_EFFECT_MODES.ADD;
-    }
 
     override get isSuppressed(): boolean {
         if (!(this.parent instanceof SR5Item)) return false;
@@ -252,12 +274,12 @@ export class SR5ActiveEffect extends ActiveEffect {
         
         // Other cases should be directly applied to the data, without actor / schema handling.
         // This is used when applying effects to non-Actor objects, like tests.
-        // TODO: v14 - double check TokenDocument.
+        // TODO: fvtt-types - v14 - double check TokenDocument.
         if (!(targetDoc instanceof SR5Actor) && !(targetDoc instanceof SR5Item) && !(targetDoc instanceof TokenDocument)) {
             return SR5ActiveEffect._applyToObject(targetDoc, change);
         }
 
-        // @ts-expect-error TODO: fvtt - v14 - missing types
+        // @ts-expect-error TODO: fvtt-types - missing types
         return super.applyChange(targetDoc, change, {replacementData, modifyTarget});
     }
 
@@ -282,14 +304,16 @@ export class SR5ActiveEffect extends ActiveEffect {
         }
 
         if (ModifiableValue.isModifiableValue(target)) {
-            const mode = SR5ActiveEffect.getLegacyChangeMode(change);
+            // @ts-expect-error TODO: fvtt-types - v14 - Replace local types with fvtt-type types
+            const type = change.type as string;
+            const priority = change.priority ?? SR5ActiveEffect.CHANGE_TYPES[type]?.defaultPriority ?? 20;
             target.changes.push(
                 DataDefaults.createData('change_entry', {
                     enabled: change.effect.active,
                     name: change.effect.name,
                     value: delta,
-                    mode: mode,
-                    priority: change.priority ?? 10 * mode,
+                    type,
+                    priority,
                     source: change.effect.uuid,
                 })
             );
@@ -299,10 +323,9 @@ export class SR5ActiveEffect extends ActiveEffect {
         // In case of non-existent change.key targets, catch errors and log it, but still allow the overall process to continue.
         // An example could be applying test effect changes, and a single misconfigured effect change shouldn't stop the test dialog 
         // from showing up.
-        // TODO: v14 - check if the commented out code is still needed
         try {
             const changes = {};
-            // @ts-expect-error TODO: fvtt - v14 - missing types
+            // @ts-expect-error TODO: fvtt-types - missing types
             return SR5ActiveEffect._applyChangeUnguided(object, change, changes);
         } catch (err) {
             console.error(`Test [${object.constructor.name}] | Failed to apply active effect change for ${change.key}: "${change.value}"`, err);
@@ -427,9 +450,9 @@ export class SR5ActiveEffect extends ActiveEffect {
         
         // Overwrite foundry priority handling, as they provide a defaultPriority in CHANGE_TYPES but use
         // priority in their ActiveEffect#prepareBaseData implementation.
-        for ( const change of this.system.changes ) {
-        // @ts-expect-error TODO: fvtt - v14 - missing CHANGE_TYPES typing
-          change.priority = change.priority === 0 ? ActiveEffect.CHANGE_TYPES[change.type]?.defaultPriority : change.priority;
+        for (const change of this.system.changes) {
+            const changeType = SR5ActiveEffect.CHANGE_TYPES[change.type as string] ?? SR5ActiveEffect.CHANGE_TYPES.add;
+            change.priority = change.priority === 0 ? changeType.defaultPriority : change.priority;
         }
     }
 }

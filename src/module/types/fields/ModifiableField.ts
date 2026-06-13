@@ -4,6 +4,7 @@ import { AnyObject } from "fvtt-types/utils";
 import DataModel = foundry.abstract.DataModel;
 import SchemaField = foundry.data.fields.SchemaField;
 import { DataDefaults } from "@/module/data/DataDefaults";
+import { SR5ActiveEffect } from "@/module/effect/SR5ActiveEffect";
 
 /**
  * A ModifiableSchemaField is a SchemaField that represents a ModifiableValue type, which 
@@ -35,16 +36,17 @@ export class ModifiableField<
         if (isNaN(changeValue)) return undefined;
 
         const field = value as ModifiableValueType;
-        const effectName = change.effect.name;
-        const effectMode = change.mode;
-        const effectPriority = change.priority ?? 10 * effectMode;
+        const name = change.effect.name;
+        // @ts-expect-error TODO: fvtt-types - Replace local types with fvtt-type types
+        const type = change.type as string; 
+        const priority = change.priority ?? SR5ActiveEffect.CHANGE_TYPES[type]?.defaultPriority ?? 20;
 
         field.changes.push(
             DataDefaults.createData('change_entry', {
-                name: effectName,
-                mode: effectMode,
+                name,
+                type,
                 value: changeValue,
-                priority: effectPriority,
+                priority,
                 source: change.effect.uuid,
             })
         );

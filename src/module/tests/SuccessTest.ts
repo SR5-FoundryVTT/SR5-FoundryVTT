@@ -293,7 +293,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     _prepareRollMode(data, options: TestOptions): ChatMessageMode {
         if (options.rollMode != null) return options.rollMode;
         if (data?.action?.roll_mode) return data.action.roll_mode as ChatMessageMode;
-        // @ts-expect-error TODO: fvtt - v14 - missing settings typing
+        // @ts-expect-error TODO: fvtt-types - missing settings typing
         else return game.settings.get(CORE_NAME, 'messageMode') as ChatMessageMode;
     }
 
@@ -1925,7 +1925,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * What ChatMessage rollMode is this test supposed to use?
      */
     get _rollMode(): ChatMessageMode {
-        // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
+        // @ts-expect-error - TODO: fvtt-types - missing settings typing
         return this.data.options?.rollMode ?? game.settings.get('core', 'messageMode') as ChatMessageMode;
     }
 
@@ -1969,7 +1969,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         }
 
         // Instead of manually applying whisper ids, let Foundry do it.
-        // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
+        // @ts-expect-error - TODO: fvtt-types - missing settings typing
         ChatMessage.applyMode(messageData, game.settings.get("core", "messageMode"));
 
         return messageData;

@@ -31,11 +31,11 @@ const createChatData = async (template: string, templateData) => {
         },
         item: templateData.item,
         content: html,
-        // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
+        // @ts-expect-error - TODO: fvtt-types - missing settings typing
         rollMode: game.settings.get(CORE_NAME, 'messageMode'),
     };
 
-    // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
+    // @ts-expect-error - TODO: fvtt-types - missing settings typing
     ChatMessage.applyMode(chatData, chatData.rollMode);
 
     return chatData;

@@ -89,7 +89,9 @@ export class Version0_31_0 extends VersionMigration {
                     name: tempField.label,
                     changes: [{
                         key: tempField.path,
-                        mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
+                        // NOTE: Used to migrate to mode CUSTOM, with 0.35.0 and Foundry v14, 
+                        //       we switched to change types and from CUSTOM to ADD as default. 
+                        mode: CONST.ACTIVE_EFFECT_MODES.ADD,
                         priority: 0,
                         value: String(tempField.value),
                     }],

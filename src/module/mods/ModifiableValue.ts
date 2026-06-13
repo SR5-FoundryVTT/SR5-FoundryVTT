@@ -1,9 +1,11 @@
 import { DataDefaults } from "../data/DataDefaults";
 import { ChangeEntryType, ModifiableValueType } from "../types/template/Base";
+import { SR5ActiveEffect } from "../effect/SR5ActiveEffect";
 
 // Allows for managing a list of named changes with numeric values, including calculating totals based on change modes and priorities.
-export type ChangeOptionsType = Partial<Omit<ChangeEntryType, 'name' | 'value' | 'mode'>>
-        & { mode?: ChangeEntryType['mode'] | keyof typeof CONST.ACTIVE_EFFECT_MODES; };
+// TODO: fvtt-types - Replace local types with fvtt-type types
+export type ChangeOptionsType = Partial<Omit<ChangeEntryType, 'name' | 'value' | 'type'>>
+        & { type?: ChangeEntryType['type']; };
 
 /**
  * A class for managing a list of named parts with generic values.
@@ -16,6 +18,8 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
     static readonly TOP_PRIORITY = Number.MAX_SAFE_INTEGER;
     // Manual modifiers should appear last, only before override.
     static readonly MANUAL_PRIORITY = Number.MAX_SAFE_INTEGER - 10;
+    // Use this type for changes without a type given.
+    static readonly DEFAULT_CHANGE_TYPE: ChangeEntryType['type'] = 'add';
 
     private readonly _field: Field;
 
@@ -44,7 +48,7 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
      * Create a change object.
      * @param {string} name - The change name/key.
      * @param {number} value - Numeric value for the change.
-     * @param {ChangeOptionsType} [options] - Mode for applying the change.
+     * @param {ChangeOptionsType} [options] - Type for applying the change.
      * @returns {ModifiableValueType['changes'][number]} A newly created change object.
      */
     private _createChange(
@@ -53,13 +57,15 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
         options: ChangeOptionsType = {}
     ): ModifiableValueType['changes'][number] {
         const createData = { name, value, ...options };
-        if (typeof createData.mode === 'string')
-            createData.mode = CONST.ACTIVE_EFFECT_MODES[createData.mode] ?? CONST.ACTIVE_EFFECT_MODES.ADD;
+
+        if (createData.type === undefined) {
+            createData.type = ModifiableValue.DEFAULT_CHANGE_TYPE;
+        }
 
         if (createData.priority === undefined)
-            createData.priority = createData.mode != null ? 10 * createData.mode : undefined;
+            createData.priority = ModifiableValue.defaultPriority(createData.type);
 
-        return DataDefaults.createData('change_entry', createData as Partial<ChangeEntryType>);
+        return DataDefaults.createData('change_entry', createData);
     }
 
     /**
@@ -81,9 +87,9 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
     addBase(
         name: string,
         value: number,
-        options: Omit<ChangeOptionsType, 'mode' | 'priority'> = {}
+        options: Omit<ChangeOptionsType, 'priority'> = {}
     ): void {
-        return this.add(name, value, { mode: 'ADD', priority: ModifiableValue.BASE_PRIORITY, ...options });
+        return this.add(name, value, { type: ModifiableValue.DEFAULT_CHANGE_TYPE, priority: ModifiableValue.BASE_PRIORITY, ...options });
     }
 
     /**
@@ -99,7 +105,7 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
     ): void {
         const index = this._field.changes.findIndex(part => part.name === name);
 
-        if (value != null) {
+        if (value !== null && value !== undefined) {
             const newPart = this._createChange(name, value, options);
             if (index !== -1) {
                 newPart.enabled = this._field.changes[index].enabled;
@@ -125,9 +131,9 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
     addUniqueBase(
         name: string,
         value: number | undefined | null,
-        options: Omit<ChangeOptionsType, 'mode' | 'priority'> = {}
+        options: Omit<ChangeOptionsType, 'type' | 'priority'> = {}
     ): void {
-        return this.addUnique(name, value, { mode: 'ADD', priority: ModifiableValue.BASE_PRIORITY, ...options });
+        return this.addUnique(name, value, { type: ModifiableValue.DEFAULT_CHANGE_TYPE, priority: ModifiableValue.BASE_PRIORITY, ...options });
     }
 
     /**
@@ -179,19 +185,19 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
 
             if (!change.enabled) continue;
 
-            switch (change.mode) {
-                case CONST.ACTIVE_EFFECT_MODES.ADD:
-                case CONST.ACTIVE_EFFECT_MODES.CUSTOM:
+            switch (change.type) {
+                case 'add':
+                case 'custom':
                     this._field.value += change.value;
                     break;
-                case CONST.ACTIVE_EFFECT_MODES.MULTIPLY:
+                case 'multiply':
                     this._field.value *= change.value;
                     break;
-                case CONST.ACTIVE_EFFECT_MODES.OVERRIDE:
+                case 'override':
                     this._field.value = change.value;
                     this._markPreviousChangesMasked(i);
                     break;
-                case CONST.ACTIVE_EFFECT_MODES.UPGRADE:
+                case 'upgrade':
                     if (this._field.value < change.value) {
                         this._field.value = change.value;
                         this._markPreviousChangesMasked(i);
@@ -199,7 +205,7 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
                         change.invalidated = true;
                     }
                     break;
-                case CONST.ACTIVE_EFFECT_MODES.DOWNGRADE:
+                case 'downgrade':
                     if (this._field.value > change.value) {
                         this._field.value = change.value;
                         this._markPreviousChangesMasked(i);
@@ -208,20 +214,20 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
                     }
                     break;
                 default:
-                    console.warn(`Unknown Active Effect mode ${change.mode} encountered.`);
+                    console.warn(`Unknown Active Effect type ${change.type} encountered.`);
                     break;
             }
         }
 
         if (options?.max != null && this._field.value > options.max) {
             this._markPreviousChangesMasked(this._field.changes.length);
-            this.addUnique('SR5.EnforcedMaximum', options.max, { mode: 'DOWNGRADE', priority: ModifiableValue.TOP_PRIORITY });
+            this.addUnique('SR5.EnforcedMaximum', options.max, { type: 'downgrade', priority: ModifiableValue.TOP_PRIORITY });
             this._field.value = options.max;
         }
 
         if (options?.min != null && this._field.value < options.min) {
             this._markPreviousChangesMasked(this._field.changes.length);
-            this.addUnique('SR5.EnforcedMinimum', options.min, { mode: 'UPGRADE', priority: ModifiableValue.TOP_PRIORITY });
+            this.addUnique('SR5.EnforcedMinimum', options.min, { type: 'upgrade', priority: ModifiableValue.TOP_PRIORITY });
             this._field.value = options.min;
         }
 
@@ -245,13 +251,23 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
     }
 
     /**
+     * Returns the default priority for a given change type.
+     * @param {ChangeEntryType['type']} type - The type of change.
+     * @returns {number} The default priority for the change type.
+     * TODO: fvtt-types - Replace local types with fvtt-type types
+     */
+    private static defaultPriority(type: ChangeEntryType['type']): number {
+        return SR5ActiveEffect.CHANGE_TYPES[type].defaultPriority;
+    }
+
+    /**
      * Type-guard that checks whether `list` looks like a `ModifiableValueType`.
      * @param {any} list - The object to test for `base`, `changes`, and `value` keys.
      * @returns {list is ModifiableValueType} True when the object matches the shape of a ModifiableValueType.
      */
-    static isModifiableValue(list: any): list is ModifiableValueType {
+    static isModifiableValue(list: unknown): list is ModifiableValueType {
         const keys = ['base', 'changes', 'value'] satisfies ReadonlyArray<keyof ModifiableValueType>;
-        return typeof list === 'object' && keys.every(key => Object.hasOwn(list, key));
+        return typeof list === 'object' && list !== null && keys.every(key => Object.hasOwn(list, key));
     }
 
     /**

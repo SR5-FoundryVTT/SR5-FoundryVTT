@@ -37,7 +37,7 @@ export const EffectCreationFlow = {
             changes: [
                 {
                     key: path,
-                    mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+                    type: 'add',
                     priority: 0,
                     value: '',
                 }

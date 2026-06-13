@@ -30,13 +30,14 @@ export const ValueMaxPair = () => ({
 
 /**
  * Expansion of Foundry's ActiveEffect.ChangeData.
- * The 'key' is implied by the field this is attached to, while 'mode'
- * and 'priority' follow standard CONST.ACTIVE_EFFECT_MODES behavior.
+ * The 'key' is implied by the field this is attached to, while 'type'
+ * and 'priority' follow Foundry v14 change-type behavior.
  */
 export const ChangeEntry = () => ({
     // Default values for the change entry on Active Effects.
     name: new StringField({ required: true }),
-    mode: new NumberField({ required: true, nullable: false, integer: true, initial: CONST.ACTIVE_EFFECT_MODES.ADD }),
+    // TODO: fvtt- v14 - implement choices based on types.
+    type: new StringField({ required: true, initial: 'add' }),
     value: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
     priority: new NumberField({ required: true, nullable: false, integer: true, initial: 20 /* Standard priority for ADD */ }),
 

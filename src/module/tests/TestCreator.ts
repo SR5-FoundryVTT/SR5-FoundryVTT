@@ -538,7 +538,7 @@ export const TestCreator = {
         //...add limit modifiers
         if (action.limit.changes) {
             action.limit.changes.forEach(change =>
-                ModifiableValue.addUnique(data.limit, change.name, change.value, { mode: change.mode as any, priority: change.priority })
+                ModifiableValue.addUnique(data.limit, change.name, change.value, { type: change.type, priority: change.priority })
             );
         }
 

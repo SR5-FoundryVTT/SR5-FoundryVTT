@@ -225,7 +225,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     prepareChangeTypes() {
         // @ts-ignore TODO: fvtt- v14 - types missing
         return Object.entries(SR5ActiveEffect.CHANGE_TYPES as unknown as any)
-            // TODO: fvtt - v14 - Remove subtract type until typings to cleanly change ModifiableValue implemenation to use type instead of mode
+            // TODO: fvtt-types - Remove subtract type until typings to cleanly change ModifiableValue implemenation to use type instead of mode
             .filter(([type]) => type !== 'subtract')
             .map(([type, { label }]) => ({ type, label: game.i18n.localize(label) }))
             .sort((a, b) => a.label.localeCompare(b.label, game.i18n.lang))
@@ -315,12 +315,12 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
 
         // Update the priority value to match the type selection
         // Use FoundryVTT default approach of changing priority based on type changes using _onChangeForm
-        // @ts-expect-error TODO: fvtt - v14 - missing type foundry.utils.isElementInstanceOf
+        // @ts-expect-error TODO: fvtt-types - missing type foundry.utils.isElementInstanceOf
         if (foundry.utils.isElementInstanceOf(event.target, "select") && event.target.name.endsWith(".type")) {
             const typeSelect = event.target as HTMLSelectElement;
             const selector = `input[name="${typeSelect.name.replace(/\.type$/, ".priority")}"]`;
             const priorityInput = typeSelect.closest("li")!.querySelector(selector);
-            // @ts-expect-error TODO: fvtt - v14 - missing type ActiveEffect.CHANGE_TYPES
+            // @ts-expect-error TODO: fvtt-types - missing type ActiveEffect.CHANGE_TYPES
             priorityInput.value = ActiveEffect.CHANGE_TYPES[typeSelect.value]?.defaultPriority ?? "";
         }
       }
