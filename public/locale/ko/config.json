@@ -1925,6 +1925,9 @@
         "ModificationCategories": "개조 범위",
         "ModificationCategory": "개조 범위",
         "ModificationSlots": "개조 슬롯",
+        "ModificationTypes": {
+            "Ware": "웨어"
+        },
         "Modified": "수정치",
         "ModifiedArmor": "개조된 방어구 수치",
         "ModifiedDamage": "수정된 피해량",
@@ -2750,15 +2753,14 @@
                 "Vehicle": "탑승물"
             },
             "Item": {
-                "ArmorMods": "방어구 개조",
                 "Description": "설명",
                 "Details": "세부사항",
                 "Effects": "효과",
+                "Mods": "개조",
                 "Network": "네트워크",
                 "SinLicenses": "면허증",
                 "SinNetworks": "네트워크",
-                "WeaponAmmo": "탄약",
-                "WeaponMods": "부착물"
+                "WeaponAmmo": "탄약"
             }
         },
         "Target": "목표",

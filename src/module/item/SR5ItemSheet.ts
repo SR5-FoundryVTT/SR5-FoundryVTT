@@ -77,6 +77,7 @@ export interface SR5BaseItemSheetData extends ItemSheet.RenderContext, SR5Applic
 interface SR5ItemSheetData extends SR5BaseItemSheetData {
     // Nested item typing for different sheets
     ammunition: SR5Item<'ammo'>[]
+    wareMods: SR5Item<'modification'>[]
     weaponMods: SR5Item<'modification'>[]
     armorMods: SR5Item<'modification'>[]
     vehicleMods: SR5Item<'modification'>[]
@@ -223,7 +224,12 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         },
         armorModifications: {
             template: SheetFlow.templateBase('item/tabs/armor-modifications'),
-            templates: SheetFlow.templateListItem('armor-modification'),
+            templates: SheetFlow.templateListItem('item-modification'),
+            scrollable: ['.scrollable']
+        },
+        itemModifications: {
+            template: SheetFlow.templateBase('item/tabs/item-modifications'),
+            templates: SheetFlow.templateListItem('item-modification'),
             scrollable: ['.scrollable']
         },
         effects: {
@@ -246,8 +252,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 { id: 'network', label: 'SR5.Tabs.Item.Network', cssClass: '' },
                 { id: 'sinNetworks', label: 'SR5.Tabs.Item.SinNetworks', cssClass: '' },
                 { id: 'weaponAmmo', label: 'SR5.Tabs.Item.WeaponAmmo', cssClass: '' },
-                { id: 'weaponModifications', label: 'SR5.Tabs.Item.WeaponMods', cssClass: '' },
-                { id: 'armorModifications', label: 'SR5.Tabs.Item.ArmorMods', cssClass: '' },
+                { id: 'weaponModifications', label: 'SR5.Tabs.Item.Mods', cssClass: '' },
+                { id: 'armorModifications', label: 'SR5.Tabs.Item.Mods', cssClass: '' },
+                { id: 'itemModifications', label: 'SR5.Tabs.Item.Mods', cssClass: '' },
                 { id: 'licenses', label: 'SR5.Tabs.Item.SinLicenses', cssClass: '' },
                 { id: 'effects', label: 'SR5.Tabs.Item.Effects', cssClass: '' },
             ]
@@ -323,6 +330,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
         if (!item.isType('armor')) {
             delete parts.armorModifications;
+        }
+        if (!item.isType('bioware', 'cyberware')) {
+            delete parts.itemModifications;
         }
         if (!item.isType('sin')) {
             delete parts.licenses;
@@ -405,6 +415,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         data['ammunition'] = sortByName((grouped.ammo ?? []) as SR5Item<'ammo'>[]);
         data['weaponMods'] = sortByName((grouped.weapon ?? []) as SR5Item<'modification'>[]);
         data['armorMods'] = sortByName((grouped.armor ?? []) as SR5Item<'modification'>[]);
+        data['wareMods'] = sortByName((grouped.ware ?? []) as SR5Item<'modification'>[]);
         data['vehicleMods'] = sortByName((grouped.vehicle ?? []) as SR5Item<'modification'>[]);
         data['droneMods'] = sortByName((grouped.drone ?? []) as SR5Item<'modification'>[]);
 
@@ -1225,9 +1236,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             }
             return this.item.createNestedItem(nested);
         }
-        if (this.item.isType('armor') && item.isType('modification')) {
+        if (this.item.isType('armor', 'bioware', 'cyberware') && item.isType('modification')) {
             const nested = item.toObject();
-            foundry.utils.setProperty(nested, 'system.type', 'armor');
+            foundry.utils.setProperty(nested, 'system.type', this.item.modificationType());
             return this.item.createNestedItem(nested);
         }
         // dropped Grid and Hosts on SIN allows for adding the SIN as a network option

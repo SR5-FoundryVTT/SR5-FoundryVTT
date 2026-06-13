@@ -551,6 +551,9 @@
         "ModificationCategories": "Catégories de modifications",
         "ModificationCategory": "Catégorie de modifications",
         "ModificationSlots": "Emplacements de modification",
+        "ModificationTypes": {
+            "Ware": "Implant"
+        },
         "Modified": "Modifié",
         "ModifiedArmor": "Mod. Blindage",
         "Modifier": "Modificateur",
@@ -1079,7 +1082,7 @@
         },
         "Tabs": {
             "Item": {
-                "ArmorMods": "Mods d'armure"
+                "Mods": "Mods"
             }
         },
         "Wireless": "Sans fil",

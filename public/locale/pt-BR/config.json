@@ -878,6 +878,9 @@
         "ModificationCategories": "Categorias de Modificação",
         "ModificationCategory": "Categoria de Modificação",
         "ModificationSlots": "Espaços de Modificação",
+        "ModificationTypes": {
+            "Ware": "Implante"
+        },
         "Modified": "Modificado",
         "ModifiedArmor": "Armadura Mod.",
         "ModifiedDamage": "Dano Mod.",
@@ -1742,7 +1745,7 @@
         },
         "Tabs": {
             "Item": {
-                "ArmorMods": "Mods de Armadura"
+                "Mods": "Mods"
             }
         },
         "Wireless": "Conexão Sem Fio"

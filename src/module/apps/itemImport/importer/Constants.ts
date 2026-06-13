@@ -68,6 +68,7 @@ export class Constants {
         // --- Modifications ---
         Armor_Mod:      this.MAP_COMPENDIUM_CONFIG.Modification,
         Vehicle_Mod:    this.MAP_COMPENDIUM_CONFIG.Modification,
+        Ware_Mod:       this.MAP_COMPENDIUM_CONFIG.Modification,
         Weapon_Mod:     this.MAP_COMPENDIUM_CONFIG.Modification,
 
         // Misc
