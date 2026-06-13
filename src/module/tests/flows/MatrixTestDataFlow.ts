@@ -493,7 +493,7 @@ export const MatrixTestDataFlow = {
         }
         if (!document) {
             document = game.user.character;
-            againstData.iconUuid = game.user?.character?.uuid ?? undefined;
+            againstData.iconUuid = game.user.character?.uuid ?? undefined;
         }
         if (!document) return;
 
