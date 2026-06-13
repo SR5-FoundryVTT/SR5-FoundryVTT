@@ -117,7 +117,7 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
             personaUuid: opposedData.personaUuid,
         };
 
-        const action = await ResistTestDataFlow._getResistActionData(this, opposedData, 'MatrixResistTest');
+        const action = await ResistTestDataFlow._getResistActionData(this as typeof SuccessTest, opposedData, document, 'MatrixResistTest');
 
         return this._prepareActionTestData(action, document, data) as MatrixResistTestData;
     }
@@ -135,6 +135,6 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
     static override async executeMessageAction(againstData: MatrixDefenseTestData, messageId: string, options: Partial<TestOptions>) {
         // Determine documents to roll test with.
         const documents = await Helpers.getMatrixTestTargetDocuments(againstData)
-        await ResistTestDataFlow.executeMessageAction(this, againstData, messageId, documents, options);
+        await ResistTestDataFlow.executeMessageAction(this as typeof SuccessTest, againstData, messageId, documents as (SR5Actor | SR5Item)[], options);
     }
 }

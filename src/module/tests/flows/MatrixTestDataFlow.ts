@@ -468,20 +468,20 @@ export const MatrixTestDataFlow = {
      *
      * NOTE: This method is bound to the calling class and should be called after .bind(s.this) by the caller.
      */
-    async executeMessageAction(testCls: any, againstData: MatrixTestData, messageId: string, options: Partial<TestOptions>): Promise<void> {
-        let document: Document.Any | null = null;
+    async executeMessageAction(testCls: typeof SuccessTest, againstData: MatrixTestData, messageId: string, options: Partial<TestOptions>): Promise<void> {
+        let document: SR5Actor | SR5Item | null = null;
         const caster = againstData.sourceActorUuid
             ? await fromUuid<SR5Actor>(againstData.sourceActorUuid)
             : null;
-        
+
         // CASE A) Resolve targeted document by targeted icon.
         if (againstData.iconUuid) {
-            document = await fromUuid(againstData.iconUuid)
+            document = await fromUuid(againstData.iconUuid);
         }
 
         // CASE B) Resolve targeted document by creation one on the fly.
         if (!document && !againstData.iconUuid) {
-            document = await MatrixOpposedTargetFlow.createTemporyDocument(document, caster ?? undefined);
+            document = await MatrixOpposedTargetFlow.createTemporaryDocument(caster ?? undefined);
             if (document) againstData.iconUuid = document.uuid ?? undefined;
         }
 
@@ -492,7 +492,7 @@ export const MatrixTestDataFlow = {
             againstData.iconUuid = actor?.uuid ?? undefined;
         }
         if (!document) {
-            document = game.user?.character;
+            document = game.user.character;
             againstData.iconUuid = game.user?.character?.uuid ?? undefined;
         }
         if (!document) return;
@@ -500,8 +500,7 @@ export const MatrixTestDataFlow = {
         const data = await testCls._getOpposedActionTestData(againstData, document, messageId);
         if (!data) return;
 
-        const documents = { source: document };
-        const test = new testCls(data, documents, options);
+        const test = new testCls(data, { source: document }, options);
 
         await test.execute();
     },

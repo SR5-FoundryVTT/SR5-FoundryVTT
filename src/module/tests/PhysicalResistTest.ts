@@ -197,7 +197,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         }
         // get most of our resist data from the ResistTestDataFlow test data
         const data = ResistTestDataFlow._getResistTestData(opposedData, 'SR5.Tests.PhysicalResistTest', previousMessageId);
-        const action = await ResistTestDataFlow._getResistActionData(this, opposedData, 'PhysicalResistTest');
+        const action = await ResistTestDataFlow._getResistActionData(this as typeof SuccessTest, opposedData, document, 'PhysicalResistTest');
         return this._prepareActionTestData(action, document, data) as MatrixResistTestData;
     }
 
@@ -209,6 +209,6 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
     static override async executeMessageAction(againstData: PhysicalDefenseTestData, messageId: string, options: Partial<TestOptions>) {
         // Roll resist tests with the currently selected token actor(s).
         const documents = Helpers.getSelectedActorsOrCharacter();
-        await ResistTestDataFlow.executeMessageAction(this, againstData, messageId, documents, options);
+        await ResistTestDataFlow.executeMessageAction(this as typeof SuccessTest, againstData, messageId, documents, options);
     }
 }

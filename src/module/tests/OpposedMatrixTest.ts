@@ -3,7 +3,7 @@ import { SR5Item } from "../item/SR5Item";
 import { MatrixTestDataFlow } from "./flows/MatrixTestDataFlow";
 import { MatrixTest, MatrixTestData, OpposedMatrixTestData } from './MatrixTest';
 import { OpposedTest } from "./OpposedTest";
-import { TestOptions } from "./SuccessTest";
+import { SuccessTest, TestOptions } from "./SuccessTest";
 import { DeepPartial } from "fvtt-types/utils";
 
 /**
@@ -27,6 +27,6 @@ export class OpposedMatrixTest<T extends OpposedMatrixTestData = OpposedMatrixTe
     }
 
     static override async executeMessageAction(againstData: MatrixTestData, messageId: string, options: Partial<TestOptions>): Promise<void> {
-        await MatrixTestDataFlow.executeMessageAction(this, againstData, messageId, options);
+        await MatrixTestDataFlow.executeMessageAction(this as typeof SuccessTest, againstData, messageId, options);
     }
 }

@@ -144,7 +144,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         // Allow the OpposedTest to overwrite action data dynamically based on item data.
         if (againstData.sourceItemUuid) {
             const item = await fromUuid(againstData.sourceItemUuid) as SR5Item;
-            if (item) {
+            if (item && document instanceof SR5Actor) {
                 const itemAction = this._getDocumentTestAction(item, document);
                 action = TestCreator._mergeMinimalActionDataInOrder(action, itemAction);
             }

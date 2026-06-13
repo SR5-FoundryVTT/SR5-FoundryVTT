@@ -147,7 +147,7 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
         // get most of our resist data from the ResistTestDataFlow test data
         const data = ResistTestDataFlow._getResistTestData(newData, 'SR5.Tests.BiofeedbackResistTest', previousMessageId);
 
-        const action = await ResistTestDataFlow._getResistAgainActionData(this, newData, 'BiofeedbackResistTest');
+        const action = await ResistTestDataFlow._getResistAgainActionData(this as typeof SuccessTest, newData, document, 'BiofeedbackResistTest');
 
         return this._prepareActionTestData(action, document, data) as BiofeedbackResistTestData;
     }
@@ -162,6 +162,6 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
         const documents = againstData.action.test === 'MatrixResistTest'
                                             ? await Helpers.getMatrixTestTargetDocuments(againstData as any)
                                             : await Helpers.getTestTargetDocuments(againstData)
-        await ResistTestDataFlow.executeMessageAction(this, againstData, messageId, documents, options);
+        await ResistTestDataFlow.executeMessageAction(this as typeof SuccessTest, againstData, messageId, documents as (SR5Actor | SR5Item)[], options);
     }
 }

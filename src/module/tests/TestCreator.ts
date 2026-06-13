@@ -180,12 +180,13 @@ export const TestCreator = {
         testData = foundry.utils.deepClone(testData);
         if (!testData?.rolls) return;
 
-        // @ts-expect-error Does it work?
+        // Rolls are stored as toJSON output, which fromData consumes at runtime, but
+        // @ts-expect-error fvtt-types' Roll.Data stub doesn't match that shape.
         const rolls = testData.rolls.map(roll => SR5Roll.fromData(roll));
         const documents = {rolls};
 
-        // Allow callers to overwrite previous test options, otherwise fall back.
-        options = options ?? testData.data.options;
+        // Allow callers to overwrite previous test options, otherwise fall back to stored options.
+        options = { ...testData.data.options, ...options };
         return TestCreator.fromTestData(testData.data, documents, options);
     },
 
@@ -269,10 +270,12 @@ export const TestCreator = {
         const resistTestCls = TestCreator._getTestClass(opposedData.against.opposed.resist.test);
         if (!resistTestCls) return undefined;
 
-        const data = TestCreator._getOpposedResistTestData(resistTestCls, opposedData, opposed.source, opposed.data.messageUuid);
-        const documents = {source: opposed.source};
+        const data = await TestCreator._getOpposedResistTestData(resistTestCls, opposedData, opposed.source, opposed.data.messageUuid);
+        if (!data) return undefined;
 
-        return new resistTestCls(data ?? {}, documents, options);
+        const documents = { source: opposed.source };
+
+        return new resistTestCls(data, documents, options);
     },
 
     /**
@@ -302,10 +305,10 @@ export const TestCreator = {
         // Allow different elements of this to override action data.
         const action = TestCreator._mergeMinimalActionDataInOrder(
             DataDefaults.createData('action_roll', {test: testCls.name}),
-            await testCls._getDocumentTestAction(test.item, test.actor),
+            testCls._getDocumentTestAction(test.item, test.actor),
             testCls._getDefaultTestAction());
 
-        const testData = await testCls._prepareActionTestData(action, test.actor, data);
+        const testData = testCls._prepareActionTestData(action, test.actor, data);
         (testData as { following?: unknown }).following = test.data;
 
         const documents = {source: test.source, item: test.item, actor: test.actor};
@@ -360,7 +363,7 @@ export const TestCreator = {
 
         action = TestCreator._mergeMinimalActionDataInOrder(
             action,
-            await testCls._getDocumentTestAction(item, actor),
+            testCls._getDocumentTestAction(item, actor),
             testCls._getDefaultTestAction()
         );
 
@@ -401,7 +404,7 @@ export const TestCreator = {
      * @param document The actor doing the testing.
      * @param previousMessageId The Message id of the originating opposing test.
      */
-    _getOpposedResistTestData: function(resistTestCls: typeof SuccessTest, opposedData: OpposedTestData, document: SR5Actor|SR5Item, previousMessageId?: string) {
+    _getOpposedResistTestData: async function(resistTestCls: typeof SuccessTest, opposedData: OpposedTestData, document: SR5Actor|SR5Item, previousMessageId?: string) {
         if (!opposedData.against.opposed.resist.test) {
             console.error(`Shadowrun 5e | Supplied test action doesn't contain an resist test in it's opposed test configuration`, opposedData, this);
             return;
@@ -422,12 +425,18 @@ export const TestCreator = {
         let action = DataDefaults.createData('action_roll', {
             ...opposedData.against.opposed.resist
         });
+
+        // Allow the resist test to overwrite action data dynamically based on the source item.
+        let documentAction: DeepPartial<MinimalActionType> = {};
+        if (opposedData.sourceItemUuid) {
+            const item = await fromUuid(opposedData.sourceItemUuid) as SR5Item;
+            if (item && document instanceof SR5Actor) documentAction = resistTestCls._getDocumentTestAction(item, document);
+        }
+
         // Provide default action information.
         action = TestCreator._mergeMinimalActionDataInOrder(
             action,
-
-            // @ts-expect-error no idea what to do here
-            resistTestCls._getDocumentTestAction(),
+            documentAction,
             resistTestCls._getDefaultTestAction()
         );
 

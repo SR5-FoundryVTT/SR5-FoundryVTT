@@ -7,7 +7,7 @@ import { MatrixTest, MatrixTestData, OpposedMatrixTestData } from './MatrixTest'
 import { SR5Item } from '../item/SR5Item';
 import { SR5Actor } from '../actor/SR5Actor';
 import { MatrixTestDataFlow } from './flows/MatrixTestDataFlow';
-import { TestOptions } from './SuccessTest';
+import { SuccessTest, TestOptions } from './SuccessTest';
 import { DeepPartial } from "fvtt-types/utils";
 import { MatrixResistTest } from './MatrixResistTest';
 import { TestCreator } from './TestCreator';
@@ -146,6 +146,6 @@ export class MatrixDefenseTest<T extends MatrixDefenseTestData = MatrixDefenseTe
     }
 
     static override async executeMessageAction(againstData: MatrixTestData, messageId: string, options: Partial<TestOptions>): Promise<void> {
-        await MatrixTestDataFlow.executeMessageAction(this, againstData, messageId, options);
+        await MatrixTestDataFlow.executeMessageAction(this as typeof SuccessTest, againstData, messageId, options);
     }
 }

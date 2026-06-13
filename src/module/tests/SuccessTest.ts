@@ -136,7 +136,7 @@ export interface TestOptions {
 
 export interface SuccessTestMessageData {
     data: SuccessTestData,
-    rolls: SR5Roll[]
+    rolls: ReturnType<SR5Roll['toJSON']>[]
 }
 
 /**
@@ -227,6 +227,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return data as T & SuccessTestData;
     }
 
+    /**
+     * Build the structural skeleton of a SuccessTestData. Contextual fields (type, title,
+     * targetUuids, options, source*Uuid) are left for _prepareData to populate on construction.
+     */
     static createStructuralTestData(): SuccessTestData {
         return this.applyStructuralDefaults({});
     }
@@ -357,9 +361,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * directly part of the action template.
      *
      * @param item The item holding the action configuration.
-     * @param document The actor used for value calculation.
+     * @param actor The actor used for value calculation.
      */
-    static _getDocumentTestAction(item: SR5Item, document: SR5Actor|SR5Item): DeepPartial<MinimalActionType> {
+    static _getDocumentTestAction(item: SR5Item, actor: SR5Actor): DeepPartial<MinimalActionType> {
         return {};
     }
 
@@ -2255,7 +2259,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * This will hide / show them, when called with a card event.
      * @param event A PointerEvent triggered anywhere from within a chat-card
      */
-    static async _chatToggleCardDescription(event: Event) {
+    static _chatToggleCardDescription(event: Event) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -2306,18 +2310,18 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // Fallback to player character.
         if (documents.length === 0 && game.user?.character) {
-            documents.push(game.user.character as SR5Actor);
+            documents.push(game.user.character);
         }
 
         console.log('Shadowrun 5e | Casting an opposed test using these actors', documents, againstData);
 
         for (const document of documents) {
-            // taM check this
-            const data = await this._getOpposedActionTestData(againstData, document as SR5Actor | SR5Item, messageId);
+            const source = document instanceof TokenDocument ? document.actor! : document;
+
+            const data = await this._getOpposedActionTestData(againstData, source, messageId);
             if (!data) return;
 
-            const documents = { source: document as SR5Actor | SR5Item };
-            const test = new this(data, documents, options);
+            const test = new this(data, { source }, options);
 
             // Await test chain resolution for each actor, to avoid dialog spam.
             await test.execute();
