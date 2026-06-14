@@ -55,6 +55,11 @@ export class SR5Combat extends Combat<"base"> {
         return super.migrateData(source);
     }
 
+    override async update(...args: Parameters<Combat["update"]>) {
+        await Migrator.updateMigratedDocument(this);
+        return super.update(...args);
+    }
+
     /**
      * Add ContextMenu options to CombatTracker Entries -- adds the basic Initiative Subtractions.
      */
