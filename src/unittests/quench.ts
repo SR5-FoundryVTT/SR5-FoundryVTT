@@ -44,8 +44,7 @@ const registerBatch = (
     options?: QuenchRegisterBatchOptions,
 ) => {
     quench.registerBatch(key, async function (context) {
-        const batchRoot = this as Mocha.Suite & { timeout: (ms: number) => Mocha.Suite };
-        batchRoot.timeout(QUENCH_TIMEOUT_MS);
+        this.timeout(QUENCH_TIMEOUT_MS);
 
         return fn.call(this, context);
     }, options);
