@@ -2,11 +2,41 @@
     <!-- This select gets modified a little by the SR5ActiveEffectConfig class in _onRender -->
     {{formGroup systemFields.applyTo value=source.system.applyTo options=applyToOptions rootId=rootId}}
 {{#ife source.system.applyTo "test_all"}}
+        <div class="form-group negate-group">
+        <label class="inline-checkbox" style="flex: 0 0 auto; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.25rem; margin-right: 0.35rem;">
+            <input type="checkbox" name="system.negate_selection_tests" {{#if source.system.negate_selection_tests}}checked{{/if}} />
+            NOT:
+        </label>
     {{formGroup systemFields.selection_tests value=source.system.selection_tests options=selection_test_options rootId=rootId}}
+            </div>
+    <div class="form-group negate-group">
+        <label class="inline-checkbox" style="flex: 0 0 auto; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.25rem; margin-right: 0.35rem;">
+            <input type="checkbox" name="system.negate_selection_categories" {{#if source.system.negate_selection_categories}}checked{{/if}} />
+            NOT:
+        </label>
     {{formGroup systemFields.selection_categories value=source.system.selection_categories options=selection_category_options rootId=rootId}}
+        </div>
+    <div class="form-group negate-group">
+        <label class="inline-checkbox" style="flex: 0 0 auto; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.25rem; margin-right: 0.35rem;">
+            <input type="checkbox" name="system.negate_selection_skills" {{#if source.system.negate_selection_skills}}checked{{/if}} />
+            NOT:
+        </label>
     {{formGroup systemFields.selection_skills value=source.system.selection_skills options=selection_skill_options rootId=rootId}}
+        </div>
+    <div class="form-group negate-group">
+        <label class="inline-checkbox" style="flex: 0 0 auto; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.25rem; margin-right: 0.35rem;">
+            <input type="checkbox" name="system.negate_selection_attributes" {{#if source.system.negate_selection_attributes}}checked{{/if}} />
+            NOT:
+        </label>
     {{formGroup systemFields.selection_attributes value=source.system.selection_attributes options=selection_attribute_options rootId=rootId}}
+         </div>
+    <div class="form-group negate-group">
+        <label class="inline-checkbox" style="flex: 0 0 auto; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.25rem; margin-right: 0.35rem;">
+            <input type="checkbox" name="system.negate_selection_limits" {{#if source.system.negate_selection_limits}}checked{{/if}} />
+            NOT:
+        </label>
     {{formGroup systemFields.selection_limits value=source.system.selection_limits options=selection_limit_options rootId=rootId}}
+        </div>
 {{/ife}}
 
 {{#ife source.system.applyTo "modifier"}}
