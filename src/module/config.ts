@@ -885,7 +885,7 @@ export const SR5 = {
     },
 
     /**
-     * Using different resist tests for the oppositing depending on active tests details
+     * Using different resist tests for the opposing depending on active tests details
      *  Structure: {
      *  [item.type]: {[item.system.type]}: 'OpposedTest'
      * }

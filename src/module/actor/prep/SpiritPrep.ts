@@ -547,7 +547,7 @@ export class SpiritPrep {
                 overrides.attributes.charisma = -1;
                 overrides.skills.push("assensing", "astral_combat", "counterspelling", "exotic_ranged_weapon", "perception", "unarmed_combat");
                 break;
-            case "palefile":
+            case "palefire":
                 overrides.attributes.body = 2;
                 overrides.attributes.agility = 1;
                 overrides.attributes.reaction = 3;
