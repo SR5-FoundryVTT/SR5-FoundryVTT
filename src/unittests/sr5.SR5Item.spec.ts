@@ -45,11 +45,11 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
             it('Correctly add defense tests to spells', async () => {
                 const item = await factory.createItem({type: 'spell'});
 
-                await item.update({ system: { category: 'combat' } });
+                await item.update({ system: { category: 'combat', combat: { type: 'direct' } } });
                 assert.equal(item.system.action.test, 'SpellCastingTest');
                 assert.equal(item.system.action.followed.test, 'DrainTest');
                 assert.equal(item.system.action.opposed.test, 'CombatSpellDefenseTest');
-                assert.equal(item.system.action.opposed.resist.test, 'PhysicalResistTest');
+                assert.equal(item.system.action.opposed.resist.test, '');
 
                 await item.update({ system: { category: 'detection' } });
                 assert.equal(item.system.action.test, 'SpellCastingTest');
