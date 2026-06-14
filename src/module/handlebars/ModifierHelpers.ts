@@ -23,12 +23,25 @@ export const registerModifierHelpers = () => {
     }
 
     const getChangeEffect = (change: ChangeType) => {
-        if (!LinksHelpers.isUuid(change?.source)) return null;
-
-        const effect = fromUuidSync(change.source) as unknown;
-        if (!(effect instanceof ActiveEffect)) return null;
-
-        return effect;
+    // Original native function: If the UUID is available (as in SuccessTest), it is used.
+    if (LinksHelpers.isUuid(change?.source)) {
+      const effect = fromUuidSync(change.source);
+      if (effect instanceof ActiveEffect) return effect;
+    }
+    // If the UUID is missing or has been cleared, look for the corresponding effect based on its name.
+    if (change?.name) {
+      // Retrieve the character currently performing this test, either from the active combat or from the selected token.
+      const activeActor = game.combat?.combatant?.actor || canvas.tokens.controlled?.[0]?.actor;     
+      if (activeActor) {
+        // Search the character's effect list for the one whose name matches or is contained in the variable name.
+        const foundEffect = activeActor.effects.find(e => change.name.includes(e.name) || e.name.includes(change.name));       
+        // Return the actual ActiveEffect instance! This fixes the broken data chain along the way.
+        if (foundEffect instanceof ActiveEffect) {
+          return foundEffect;
+        }
+      }
+    }
+    return null;
     }
 
     Handlebars.registerHelper('isBaseChange', (change: ChangeType) => {
