@@ -321,6 +321,53 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         return Object.entries(SR5.limits).map(([limit, label]) => ({ label, id: limit }));
     }
 
+    // Adding reverse (not) filtering options to active effects to rule out specific tests, categories, skills, attributes or limits.
+  _processFormData(formConfig, form, formData) {
+    const submitData = super._processFormData ? super._processFormData(formConfig, form, formData) : formData || {};
+    const fields = ["selection_tests", "selection_categories", "selection_skills", "selection_attributes", "selection_limits"];
+    for (const f of fields) {
+      try {
+        const neg = this.element.querySelector(`input[name="system.negate_${f}"]`);
+        if (!neg || !neg.checked) continue;
+        const raw = foundry.utils.getProperty(submitData, `system.${f}`);
+        let arr;
+        if (raw == null) {
+          arr = [];
+        } else if (Array.isArray(raw)) {
+          arr = raw;
+        } else if (typeof raw === "string") {
+          try {
+            const parsed = JSON.parse(raw);
+            arr = Array.isArray(parsed) ? parsed : [parsed];
+          } catch (e) {
+            arr = raw === "" ? [] : [raw];
+          }
+        } else if (typeof raw === "object") {
+          arr = [raw];
+        } else {
+          arr = [raw];
+        }
+        console.log("SR5ActiveEffectConfig | _processFormData called for", f, "(coerced)", arr);
+        const mapped = arr.map((item) => {
+          if (typeof item === "string") {
+            return { id: item, value: item, not: true };
+          }
+          if (item && typeof item === "object") {
+            const copy = Object.assign({}, item);
+            copy.not = true;
+            return copy;
+          }
+          return item;
+        });
+        foundry.utils.setProperty(submitData, `system.${f}`, mapped);
+        console.log("SR5ActiveEffectConfig | _processFormData set", f, "to", mapped);
+      } catch (err) {
+        console.error("Shadowrun5e | Error applying negate mapping for", f, err);
+      }
+    }
+    return submitData;
+  }
+    
     override _onChangeForm(formConfig, event) {
         super._onChangeForm(formConfig, event);
     
