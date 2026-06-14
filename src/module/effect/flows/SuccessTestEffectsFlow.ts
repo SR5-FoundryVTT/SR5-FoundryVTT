@@ -78,41 +78,49 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * @returns 
      */
     _skipEffectForTestLimitations(effect: SR5ActiveEffect) {
-        // Filter effects that don't apply to this test.
-        const tests = effect.system.selection_tests.map(test => test.id);
-        // Opposed tests use the same item as the success test but normally don't apply effects from it.
-        // However if an effect defines a test, it should apply to it.
-        if (tests.length === 0 && this.test.opposing) return true;
-        if (tests.length > 0 && !tests.includes(this.test.type)) return true;
+    // Changed to check also the reversed (not) filters that may have been set to rule out specific tests, categories, skills, attributes or limits - if any of those filters match the test, the effect should not be applied.
+    // 1. Tests / Opposing
+    const normalTests = effect.system.selection_tests.filter(test => !test.not).map(test => test.id);
+    const notTests = effect.system.selection_tests.filter(test => test.not).map(test => test.id);
+    if (normalTests.length === 0 && notTests.length === 0 && this.test.opposing) return true;
+    if (notTests.includes(this.test.type)) return true;
+    if (normalTests.length > 0 && !normalTests.includes(this.test.type)) return true;
 
-        // Check for action categories
-        // Both the effect and test can both define multiple categories.
-        // One match is enough.
-        const categories = effect.system.selection_categories.map(test => test.id) as Shadowrun.ActionCategories[];
-        const testCategories = this.test.data.categories;
-        if (categories.length > 0 && !categories.find(category => testCategories.includes(category))) return true;
+    // 2. Categories
+    const normalCategories = effect.system.selection_categories.filter(test => !test.not).map(test => test.id);
+    const notCategories = effect.system.selection_categories.filter(test => test.not).map(test => test.id);
+    const testCategories = this.test.data.categories;
+    if (notCategories.some(cat => testCategories.includes(cat))) return true;
+    if (normalCategories.length > 0 && !normalCategories.some(cat => testCategories.includes(cat))) return true;
 
-        // Check for test skill.
-        const skills = effect.system.selection_skills.map(test => test.id);
-        const skillId = this.test.data.action.skill;
-        const skillName = this.test.actor?.getSkill(skillId)?.name || skillId;
-        if (skills.length > 0 && !skills.includes(skillId) && !skills.includes(skillName)) return true;
+    // 3. Skills
+    const normalSkills = effect.system.selection_skills.filter(test => !test.not).map(test => test.id);
+    const notSkills = effect.system.selection_skills.filter(test => test.not).map(test => test.id);
+    const skillId = this.test.data.action.skill;
+    const skillName = this.test.actor?.getSkill(skillId)?.name || skillId;
+    if (notSkills.includes(skillId) || notSkills.includes(skillName)) return true;
+    if (normalSkills.length > 0 && !normalSkills.includes(skillId) && !normalSkills.includes(skillName)) return true;
 
-        // Check for test attributes used.
-        const attributes = effect.system.selection_attributes.map(test => test.id);
-        const attribute = this.test.data.action.attribute;
-        const attribute2 = this.test.data.action.attribute2;
-        if (attributes.length > 0 && attribute && !attributes.includes(attribute)) return true;
-        if (attributes.length > 0 && attribute2 && !attributes.includes(attribute2)) return true;
-        if (attributes.length > 0 && !attribute && !attribute2) return true;
-
-        // Check for test limits used.
-        const limits = effect.system.selection_limits.map(test => test.id);
-        const limit = this.test.data.action.limit.attribute;
-        if (limits.length > 0 && !limits.includes(limit)) return true;
-
-        return false;
+    // 4. Attributes
+    const normalAttributes = effect.system.selection_attributes.filter(test => !test.not).map(test => test.id);
+    const notAttributes = effect.system.selection_attributes.filter(test => test.not).map(test => test.id);
+    const attribute = this.test.data.action.attribute;
+    const attribute2 = this.test.data.action.attribute2;
+    if (notAttributes.includes(attribute) || notAttributes.includes(attribute2)) return true;
+    if (normalAttributes.length > 0) {
+        if (!attribute && !attribute2) return true;
+        if (!normalAttributes.includes(attribute) && !normalAttributes.includes(attribute2)) return true;
     }
+
+    // 5. Limits
+    const normalLimits = effect.system.selection_limits.filter(test => !test.not).map(test => test.id);
+    const notLimits = effect.system.selection_limits.filter(test => test.not).map(test => test.id);
+    const limit = this.test.data.action.limit.attribute;
+    if (notLimits.includes(limit)) return true;
+    if (normalLimits.length > 0 && !normalLimits.includes(limit)) return true;
+
+    return false;
+  }
 
     /**
      * Create Effects of applyTo 'test_all' after a success test has finished.
