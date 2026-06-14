@@ -50,7 +50,10 @@ export const spriteImporterTesting = (context: QuenchBatchContext) => {
                 }
             });
 
-            sprite = await SpriteImporter.import(character, template, importOptions);
+            sprite = await SpriteImporter.import(character, template, {
+                ...importOptions,
+                folderId: await factory.getOrCreateFolderId('Actor'),
+            });
             assert.notEqual(sprite, null, 'sprite not created');
             factory.actors.push(sprite as Actor.Stored<'sprite'>);
             assert.strictEqual(sprite!.system.spriteType, 'companion_template');
@@ -62,7 +65,10 @@ export const spriteImporterTesting = (context: QuenchBatchContext) => {
         });
 
         it('imports a sprite using preset profile fallback without template', async () => {
-            const fallbackSprite = await SpriteImporter.importFromPresetProfile(character, importOptions);
+            const fallbackSprite = await SpriteImporter.importFromPresetProfile(character, {
+                ...importOptions,
+                folderId: await factory.getOrCreateFolderId('Actor'),
+            });
             assert.notEqual(fallbackSprite, null, 'Sprite fallback import failed');
             factory.actors.push(fallbackSprite as Actor.Stored<'sprite'>);
 
@@ -96,4 +102,3 @@ export const spriteImporterTesting = (context: QuenchBatchContext) => {
         });
     });
 };
-
