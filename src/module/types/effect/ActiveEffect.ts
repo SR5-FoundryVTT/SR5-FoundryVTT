@@ -27,30 +27,35 @@ const SR5ActiveEffectData = {
         new SchemaField({
             value: new StringField({ required: true, nullable: false }),
             id: new StringField({ required: true, nullable: false }),
+            not: new BooleanField({ nullable: true }),
         })
     ),
     selection_categories: new TagifyField(
         new SchemaField({
             value: new StringField({ required: true, nullable: false }),
             id: new StringField({ required: true, nullable: false }),
+            not: new BooleanField({ nullable: true }),
         })
     ),
     selection_limits: new TagifyField(
         new SchemaField({
             value: new StringField({ required: true, nullable: false }),
             id: new StringField({ required: true, nullable: false }),
+            not: new BooleanField({ nullable: true }),
         })
     ),
     selection_skills: new TagifyField(
         new SchemaField({
             value: new StringField({ required: true, nullable: false }),
             id: new StringField({ required: true, nullable: false }),
+            not: new BooleanField({ nullable: true }),
         })
     ),
     selection_tests: new TagifyField(
         new SchemaField({
             value: new StringField({ required: true, nullable: false }),
             id: new StringField({ required: true, nullable: false }),
+            not: new BooleanField({ nullable: true }),
         })
     ),
 }
