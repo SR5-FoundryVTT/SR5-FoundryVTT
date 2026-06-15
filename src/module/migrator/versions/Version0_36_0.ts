@@ -196,9 +196,8 @@ export class Version0_36_0 extends VersionMigration {
             );
         }
 
-        const items = Array.isArray(actor.items) ? actor.items : [];
-        for (const item of items) {
-            if (!item || typeof item !== 'object') continue;
+        const migrateItemEffects = (item: any): void => {
+            if (!item || typeof item !== 'object') return;
 
             const itemEffects = Array.isArray(item.effects) ? item.effects : [];
             for (const effect of itemEffects) {
@@ -209,6 +208,17 @@ export class Version0_36_0 extends VersionMigration {
                     {}
                 );
             }
+
+            const embeddedItems = getProperty(item, 'flags.shadowrun5e.embeddedItems');
+            const nestedItems = Array.isArray(embeddedItems) ? embeddedItems : Object.values(embeddedItems ?? {});
+            for (const nestedItem of nestedItems) {
+                migrateItemEffects(nestedItem);
+            }
+        };
+
+        const items = Array.isArray(actor.items) ? actor.items : [];
+        for (const item of items) {
+            migrateItemEffects(item);
         }
     }
 
