@@ -25,8 +25,8 @@ export interface TestDialogListener {
 
 interface TestDialogContext extends HandlebarsApplicationMixin.RenderContext {
     test: any;
-    rollMode: string;
-    rollModes: CONFIG.ChatMessage.modes;
+    rollMode: ChatMessage.MessageMode;
+    rollModes: typeof CONFIG.ChatMessage.modes;
     config: typeof SR5;
     expandedPaths: string[];
     dialogContent: string;
@@ -304,13 +304,13 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
         html.find('.roll-mode-button').on('click', event => {
             event.preventDefault();
 
-            const button = event.currentTarget;
+            const button = event.currentTarget as HTMLElement;
             const rollMode = button.dataset.rollMode;
-            if (!rollMode) return;
+            if (!rollMode || !(rollMode in CONFIG.ChatMessage.modes)) return;
 
             if (this.test.data.options?.rollMode === rollMode) return;
 
-            foundry.utils.setProperty(this.test, 'data.options.rollMode', rollMode);
+            foundry.utils.setProperty(this.test, 'data.options.rollMode', rollMode as ChatMessage.MessageMode);
             this.test.prepareBaseValues();
             this.test.calculateBaseValues();
             this.test.validateBaseValues();

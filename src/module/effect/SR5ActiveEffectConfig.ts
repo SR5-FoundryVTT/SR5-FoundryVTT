@@ -314,12 +314,12 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
 
         // Update the priority value to match the type selection
         // Use FoundryVTT default approach of changing priority based on type changes using _onChangeForm
-        if (foundry.utils.isElementInstanceOf(event.target, "select") && event.target.name.endsWith(".type")) {
-            const typeSelect = event.target as HTMLSelectElement;
-            const selector = `input[name="${typeSelect.name.replace(/\.type$/, ".priority")}"]`;
-            const priorityInput = typeSelect.closest("li")!.querySelector(selector);
-            // @ts-expect-error TODO: fvtt - v14 - missing type ActiveEffect.CHANGE_TYPES
-            priorityInput.value = ActiveEffect.CHANGE_TYPES[typeSelect.value]?.defaultPriority ?? "";
+        const target = event.target;
+        if (target instanceof HTMLSelectElement && target.name.endsWith(".type")) {
+            const selector = `input[name="${target.name.replace(/\.type$/, ".priority")}"]`;
+            const priorityInput = target.closest("li")?.querySelector<HTMLInputElement>(selector);
+            if (!priorityInput) return;
+            priorityInput.value = String(ActiveEffect.CHANGE_TYPES[target.value]?.defaultPriority ?? "");
         }
       }
 }

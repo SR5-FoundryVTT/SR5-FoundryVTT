@@ -24,7 +24,6 @@ import { Translation } from '../utils/strings';
 import { GmOnlyMessageContentFlow } from '../actor/flows/GmOnlyMessageContentFlow';
 import { ActionResultType, ActionRollType, DamageType, MinimalActionType, OpposedTestType, ResultActionType } from '../types/item/Action';
 import { ValueFieldType } from '../types/template/Base';
-import { ChatMessageMode } from '../types/global';
 import { DeepPartial } from "fvtt-types/utils";
 export interface TestDocuments {
     // Legacy field that used be the source document.
@@ -131,7 +130,7 @@ export interface SuccessTestData extends TestData {
 export interface TestOptions {
     showDialog?: boolean // Show dialog when defined as true.
     showMessage?: boolean // Show message when defined as true.
-    rollMode?: ChatMessageMode
+    rollMode?: ChatMessage.MessageMode
 }
 
 export interface SuccessTestMessageData {
@@ -290,11 +289,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * The tests roll mode can be given by specific option, action setting or global configuration.
      * @param options The test options for the whole test
      */
-    _prepareRollMode(data, options: TestOptions): ChatMessageMode {
+    _prepareRollMode(data, options: TestOptions): ChatMessage.MessageMode {
         if (options.rollMode != null) return options.rollMode;
-        if (data?.action?.roll_mode) return data.action.roll_mode as ChatMessageMode;
-        // @ts-expect-error TODO: fvtt - v14 - missing settings typing
-        else return game.settings.get(CORE_NAME, 'messageMode') as ChatMessageMode;
+        if (data?.action?.roll_mode) return data.action.roll_mode;
+        else return game.settings.get(CORE_NAME, 'messageMode');
     }
 
     /**
@@ -1924,9 +1922,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     /**
      * What ChatMessage rollMode is this test supposed to use?
      */
-    get _rollMode(): ChatMessageMode {
-        // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
-        return this.data.options?.rollMode ?? game.settings.get('core', 'messageMode') as ChatMessageMode;
+    get _rollMode() {
+        return this.data.options?.rollMode ?? game.settings.get('core', 'messageMode');
     }
 
     /**
@@ -1969,8 +1966,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         }
 
         // Instead of manually applying whisper ids, let Foundry do it.
-        // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
-        ChatMessage.applyMode(messageData, game.settings.get("core", "messageMode"));
+        ChatMessage.applyMode(messageData, this._rollMode);
 
         return messageData;
     }

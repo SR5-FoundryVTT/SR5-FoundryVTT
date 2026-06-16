@@ -4,7 +4,6 @@ import { SR5Roll } from "../rolls/SR5Roll";
 import { Migrator } from "../migrator/Migrator";
 import { CombatRules } from "../rules/CombatRules";
 import { FLAGS, SR, SYSTEM_NAME } from "../constants";
-import { ChatMessageMode } from "../types/global";
 
 export type InitiativeModeOptions = 'meatspace' | 'astral' | 'cold_sim' | 'hot_sim';
 
@@ -187,7 +186,6 @@ export class SR5Combatant extends Combatant<"base"> {
         } as ChatMessage.CreateData;
 
         const rollMode = this.hidden ? 'gm' : 'public';
-        // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
         ChatMessage.applyMode(messageData, rollMode);
 
         const message = await foundry.documents.ChatMessage.implementation.create(messageData);
@@ -197,7 +195,7 @@ export class SR5Combatant extends Combatant<"base"> {
 
     async playDSNInitiativeAnimation(
         roll: Roll,
-        rollMode: ChatMessageMode,
+        rollMode: ChatMessage.MessageMode,
         message: Pick<ChatMessage, 'id' | 'speaker' | 'whisper'>,
     ): Promise<boolean> {
         if (!game.modules.get('dice-so-nice')?.active || !game.dice3d) return false;

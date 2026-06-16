@@ -685,7 +685,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                     system: {
                         changes: [{ key: 'data.pool', value: '2', type: 'add' }],
                         applyTo: 'test_all',
-                        selection_tests: [{ value: 'Opposed Test', id: 'OpposedTest' }],
+                        selection_tests: ['OpposedTest'],
                     },
                 },
             ]);
@@ -715,9 +715,9 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 name: 'Selection Effect',
                 system: {
                     applyTo: 'test_all',
-                    selection_skills: [{ value: skillName, id: skillName }],
-                    selection_attributes: [{ value: 'Body', id: 'body' }],
-                    selection_limits: [{ value: 'Physical', id: 'physical' }],
+                    selection_skills: [skillName],
+                    selection_attributes: ['body'],
+                    selection_limits: ['physical'],
                     changes: [{ key: 'data.pool', value: '3', type: 'add' }],
                 }
             }]);
@@ -928,7 +928,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 system: {
                     applyTo: 'test_all',
                     changes: [{ key: 'data.pool', value: '2', type: 'add' }],
-                    selection_tests: [{ value: 'Success Test', id: 'SuccessTest' }],
+                    selection_tests: ['SuccessTest'],
                 }
             }]);
 
@@ -1047,7 +1047,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 system: {
                     applyTo: 'test_all',
                     changes: [{ key: 'data.pool', value: '3', type: 'add' }],
-                    selection_categories: [{ value: 'Social Actions', id: 'social' }],
+                    selection_categories: ['social'],
                 }
             }]);
 
@@ -1098,7 +1098,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 system: {
                     applyTo: 'test_all',
                     changes: [{ key: 'data.pool', value: '2', type: 'add' }],
-                    selection_skills: [{ value: 'Sneaking', id: 'sneaking' }],
+                    selection_skills: ['sneaking'],
                 }
             }]);
 
