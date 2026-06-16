@@ -766,7 +766,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 if (!test) throw new Error('Failed to create skill test.');
 
                 test.effects.applyAllEffects();
-                ModifiableValue.calcTotal(test.pool);
+                ModifiableValue.calcTotal(test.pool, { min: 0 });
 
                 assert.strictEqual(test.pool.value, expected);
             };
