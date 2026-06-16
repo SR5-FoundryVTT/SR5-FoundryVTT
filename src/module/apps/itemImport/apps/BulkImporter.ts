@@ -279,8 +279,7 @@ export class BulkImporter extends BaseClass {
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(langXml, "text/xml");
                 const stringNodes = xmlDoc.getElementsByTagName("string");
-                for (let i = 0; i < stringNodes.length; i++) {
-                    const node = stringNodes[i];
+                for (const node of stringNodes) {
                     const key = node.getElementsByTagName("key")[0]?.textContent;
                     const text = node.getElementsByTagName("text")[0]?.textContent;
                     if (key && text) {
@@ -313,8 +312,7 @@ export class BulkImporter extends BaseClass {
                 const xmlDoc = parser.parseFromString(dataLangXml, "text/xml");
                 const nameNodes = xmlDoc.getElementsByTagName("name");
                 let dataKeysCount = 0;
-                for (let i = 0; i < nameNodes.length; i++) {
-                    const nameNode = nameNodes[i];
+                for (const nameNode of nameNodes) {
                     const parent = nameNode.parentElement;
                     if (parent) {
                         const translateNode = parent.getElementsByTagName("translate")[0];
@@ -330,8 +328,7 @@ export class BulkImporter extends BaseClass {
                 }
 
                 const categoryNodes = xmlDoc.getElementsByTagName("category");
-                for (let i = 0; i < categoryNodes.length; i++) {
-                    const node = categoryNodes[i];
+                for (const node of categoryNodes) {
                     const translateAttr = node.getAttribute("translate");
                     const key = node.textContent?.trim();
                     if (key && translateAttr) {
