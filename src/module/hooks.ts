@@ -175,7 +175,8 @@ export class HooksManager {
         Hooks.on('deleteItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('getChatMessageContextOptions', SuccessTest.chatMessageContextOptions.bind(SuccessTest));
 
-        Hooks.on("renderChatLog", HooksManager.chatLogListeners.bind(HooksManager));
+        (Hooks as any).on('renderChatInput', HooksManager.renderSuccessTestPromptButton.bind(HooksManager));
+        Hooks.on('renderChatLog', HooksManager.chatLogListeners.bind(HooksManager));
 
         MatrixHooks.registerHooks();
         RiggingHooks.registerHooks();
@@ -706,28 +707,42 @@ ___________________
     /**
      * Add a button to Prompt for a Success Test
      */
-    static renderSuccessTestPromptButton() {
+    static renderSuccessTestPromptButton(...args: unknown[]) {
+        const elements = args[1] as Record<string, HTMLElement> | undefined;
         const id = 'sr5e-success-test-button-prompt';
-        const inner = `<i class="fas fa-dice"></i>`;
-        // look for an already rendered button and update the innerHTML of it just in case it changed (I'm not sure this is necessary)
+        const inner = '<i class="fas fa-dice"></i>';
+
         const rendered = document.getElementById(id);
+        const container = elements?.['#chat-controls']
+            ?? elements?.['#message-modes']
+            ?? document.getElementById('chat-controls')
+            ?? document.getElementById('roll-privacy');
+
         if (rendered) {
             rendered.innerHTML = inner;
+            if (container && rendered.parentElement !== container) {
+                container.prepend(rendered);
+            }
+            return;
+        }
+
+        if (!container) return;
+
+        const button = document.createElement('button');
+        button.setAttribute('type', 'button');
+        button.setAttribute('id', id);
+        button.setAttribute('data-tooltip', 'SR5.Tests.SuccessTest');
+        button.setAttribute('aria-label', game.i18n.localize('SR5.Tests.SuccessTest'));
+        button.setAttribute('class', 'ui-control icon');
+        button.innerHTML = inner;
+        button.addEventListener('click', () => {
+            void TestCreator.promptSuccessTest();
+        });
+
+        if (container.firstElementChild && container.firstElementChild.id !== id) {
+            container.insertBefore(button, container.firstElementChild);
         } else {
-            // create the button using custom attributes 
-            const button = document.createElement('button');
-            button.setAttribute('type', 'button');
-            button.setAttribute('id', id);
-            button.setAttribute('data-tooltip', 'SR5.Tests.SuccessTest');
-            // this class matches what the existing icons use
-            button.setAttribute('class', 'ui-control icon');
-            button.innerHTML = inner;
-            button.addEventListener('click', () => {
-                TestCreator.promptSuccessTest();
-            })
-            // target the roll-privacy div that holds the different Roll options (Public/Self/etc)
-            const element = document.getElementById('roll-privacy');
-            element?.prepend(button);
+            container.prepend(button);
         }
     }
 }
