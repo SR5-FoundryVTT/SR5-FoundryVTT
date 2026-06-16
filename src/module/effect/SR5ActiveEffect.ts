@@ -20,19 +20,10 @@ import DataModel = foundry.abstract.DataModel;
  * Effects can also define the type of target data to be applied to. Default effects only apply to actor data, system effects
  * can apply to actors, tests and also only to actors targeted by tests.
  * 
- * NOTE: FoundryVTT DataModel is used to apply changes as well. Check custom Field implementations for effect change mode
+ * NOTE: FoundryVTT DataModel is used to apply changes as well. Check custom Field implementations for effect change type
  * application.
  */
 export class SR5ActiveEffect extends ActiveEffect {
-    private static readonly legacyModeByChangeType: Record<string, number> = {
-        custom: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-        multiply: CONST.ACTIVE_EFFECT_MODES.MULTIPLY,
-        add: CONST.ACTIVE_EFFECT_MODES.ADD,
-        downgrade: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE,
-        upgrade: CONST.ACTIVE_EFFECT_MODES.UPGRADE,
-        override: CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
-    };
-
     /**
      * Can be used to determine if the origin of the effect is a document owned by another document.
      *
@@ -159,20 +150,6 @@ export class SR5ActiveEffect extends ActiveEffect {
         return ['base', 'changes', 'value'] satisfies (keyof ModifiableValueType)[];
     }
 
-    /**
-     * Convert a v14 string-based change type into the legacy numeric mode value.
-     */
-    static getLegacyChangeMode(change: { mode?: number; type?: string | null }): number {
-        if (typeof change.mode === 'number') return change.mode;
-
-        const changeType = typeof change.type === 'string' ? change.type : '';
-        const mappedMode = this.legacyModeByChangeType[changeType];
-        if (mappedMode !== undefined) return mappedMode;
-
-        console.error(`Shadowrun5e | Unrecognized change type "${change.type}", defaulting to "add" mode.`);
-        return CONST.ACTIVE_EFFECT_MODES.ADD;
-    }
-
     override get isSuppressed(): boolean {
         if (!(this.parent instanceof SR5Item)) return false;
 
@@ -286,14 +263,13 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (ModifiableValue.isModifiableValue(target)) {
             const effect = change.effect;
             if (!effect) return {};
-            const mode = SR5ActiveEffect.getLegacyChangeMode(change);
             target.changes.push(
                 DataDefaults.createData('change_entry', {
                     enabled: effect.active,
                     name: effect.name,
                     value: delta,
-                    mode: mode,
-                    priority: change.priority ?? 10 * mode,
+                    type: change.type,
+                    priority: change.priority ?? ActiveEffect.CHANGE_TYPES[change.type]?.defaultPriority ?? 20,
                     source: effect.uuid,
                 })
             );
@@ -320,7 +296,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      *
      * A dynamic change value follows the same rules as a Foundry roll formula (including dice pools).
      *
-     * A change could contain the key of 'system.attributes.body' with the mode Modify and a dynamic value of
+     * A change could contain the key of 'system.attributes.body' with the type add and a dynamic value of
      * '@system.technology.rating * 3'. The dynamic property path would be taken from either the source or parent
      * document of the effect before the resolved value would be applied onto the target document / object.
      *

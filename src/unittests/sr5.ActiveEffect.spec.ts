@@ -29,7 +29,6 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         return DataDefaults.createData('change_entry', {
             name: effect.name,
             value: parseInt(String(change.value)),
-            // @ts-expect-error TODO: fvtt - v14 - missing type properties on ActiveEffectChangeData
             type: change.type,
             priority: parseInt(String(change.priority)),
             source: effect.uuid,
@@ -390,6 +389,46 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.skills.active.automatics.value, 15);
             assert.deepEqual(actor.system.skills.active.automatics.changes, [createTestChange(effects[0], 1)]);
         });
+
+        it('SUBTRACT mode: subtracts the change value from base values', async () => {
+            window.doNotPopulateDefaultSkills = true;
+            const actor = await factory.createActor({
+                type: 'character',
+                system: {
+                    attributes: { body: { base: 5 } },
+                },
+            });
+            delete window.doNotPopulateDefaultSkills;
+
+            await actor.createEmbeddedDocuments('Item', [{
+                type: 'skill',
+                name: 'Automatics',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        attribute: 'agility',
+                        rating: 5,
+                    }
+                }
+            }]);
+
+            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                system: {
+                    changes: [
+                        { key: 'system.skills.active.automatics.value', value: '3', type: 'subtract' },
+                        { key: 'system.attributes.body.value', value: '3', type: 'subtract' },
+                    ]
+                }
+            }]);
+
+            assert.strictEqual(actor.system.attributes.body.value, 2);
+            assert.deepEqual(actor.system.attributes.body.changes, [createTestChange(effects[0], 0)]);
+            assert.strictEqual(actor.system.skills.active.automatics.value, 2);
+            assert.deepEqual(actor.system.skills.active.automatics.changes, [createTestChange(effects[0], 1)]);
+        });
     });
     /**
      * Tests around the systems 'advanced' effects on top of Foundry core active effects.
@@ -700,7 +739,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             const opposedEffect = opposedTest.pool.changes.find((effect) => effect.name === 'Opposed Effect') as any;
             assert.isDefined(opposedEffect, 'Expected to find the opposed effect in the opposed test pool changes.');
             assert.equal(opposedEffect.name, 'Opposed Effect');
-            assert.equal(opposedEffect.mode, CONST.ACTIVE_EFFECT_MODES.ADD);
+            assert.equal(opposedEffect.type, 'add');
             assert.equal(opposedEffect.value, 2);
             assert.equal(opposedEffect.priority, 20);
             assert.equal(opposedEffect.enabled, true);

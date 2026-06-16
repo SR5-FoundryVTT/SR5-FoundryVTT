@@ -224,8 +224,6 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
      */
     prepareChangeTypes() {
         return Object.entries(SR5ActiveEffect.CHANGE_TYPES)
-            // TODO: fvtt - v14 - Remove subtract type until typings to cleanly change ModifiableValue implemenation to use type instead of mode
-            .filter(([type]) => type !== 'subtract')
             .map(([type, { label }]) => ({ type, label: game.i18n.localize(label) }))
             .sort((a, b) => a.label.localeCompare(b.label, game.i18n.lang))
             .reduce((types, { type, label }) => {

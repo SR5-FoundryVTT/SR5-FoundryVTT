@@ -12,7 +12,7 @@ import { DataDefaults } from "@/module/data/DataDefaults";
  * Foundry will hand over authority over applying value changes to SchemaFields, when the document
  * is using a DataModel schema.
  * 
- * ModifiableField alteres default Foundry mode behavior to allow the system to show the whole 
+ * ModifiableField alteres default Foundry type behavior to allow the system to show the whole 
  * value resolution instead of just altering the total modified value.
  */
 /**
@@ -37,13 +37,13 @@ export class ModifiableField<
 
         const field = value as ModifiableValueType;
         const effectName = change.effect.name;
-        const effectMode = change.mode ?? CONST.ACTIVE_EFFECT_MODES.ADD;
-        const effectPriority = change.priority ?? 10 * effectMode;
+        const effectType = change.type;
+        const effectPriority = change.priority ?? CONST.ACTIVE_EFFECT_CHANGE_TYPES[change.type]?.defaultPriority ?? 20;
 
         field.changes.push(
             DataDefaults.createData('change_entry', {
                 name: effectName,
-                mode: effectMode,
+                type: effectType,
                 value: changeValue,
                 priority: effectPriority,
                 source: change.effect.uuid,

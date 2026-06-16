@@ -233,6 +233,13 @@ export class Version0_36_0 extends VersionMigration {
         const system = effect.system;
         if (!system) return;
 
+        // Convert legacy `custom` change types (and their numeric `mode` equivalent) into `add`.
+        const changes = getProperty(system, 'changes') as { type?: string }[] ?? [];
+        for (const change of changes) {
+            if (change.type === 'custom')
+                change.type = 'add';
+        }
+
         const selectionFields = [
             'selection_attributes',
             'selection_categories',

@@ -355,7 +355,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
         const name = rawName || game.i18n.localize('SR5.ManualModifier');
 
         ModifiableValue.add(valueField, name, safeValue, {
-            mode: 'ADD',
+            type: 'add',
             enabled: true,
             priority: ModifiableValue.MANUAL_PRIORITY,
         });
@@ -400,7 +400,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
                     valueField,
                     'SR5.ManualOverride',
                     value as number | null,
-                    { mode: 'OVERRIDE', priority: ModifiableValue.TOP_PRIORITY }
+                    { type: 'override', priority: ModifiableValue.TOP_PRIORITY }
                 );
             } 
         }
