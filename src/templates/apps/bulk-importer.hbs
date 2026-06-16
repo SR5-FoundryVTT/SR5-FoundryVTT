@@ -6,7 +6,8 @@
       Import data from Chummer5a using the <strong>Data Exporter</strong> format.<br />
       Upload your own package for full content (including translations and custom data),
       or let us download the latest supported version
-      (<strong><a href="{{info.versionLink}}" target="_blank" rel="noopener noreferrer">{{info.version}}</a></strong>) automatically.
+      (<strong><a href="{{info.versionLink}}" target="_blank" rel="noopener noreferrer">{{info.version}}</a></strong>)
+      automatically.
     </p>
 
     <div class="import-warning">
@@ -16,7 +17,10 @@
     </div>
 
     <p class="import-size">
-      Auto-download size: <strong>7&nbsp;MB</strong> (English only, standard data).
+      Auto-download size: <strong>7&nbsp;MB</strong> (English, default).
+    </p>
+    <p class="import-size">
+      use the german, portuguese, french or korean translations at your own risk.
     </p>
   </div>
 
@@ -24,76 +28,64 @@
   <fieldset class="import-settings">
     <legend>Import Settings</legend>
     <label class="import-setting">
-      <input
-        type="checkbox"
-        id="deleteCompendiums"
-        {{#if isImporting}}disabled{{else}}{{#if importDone}}disabled{{/if}}{{/if}}
-        {{#if deleteCompendiums}}checked{{/if}}
-      />
+      <input type="checkbox" id="deleteCompendiums" {{#if isImporting}}disabled{{else}}{{#if
+        importDone}}disabled{{/if}}{{/if}} {{#if deleteCompendiums}}checked{{/if}} />
       <span>Clear previously imported data before import</span>
     </label>
     <label class="import-setting">
-      <input
-        type="checkbox"
-        id="overrideDocuments"
-        {{#if isImporting}}disabled{{else}}{{#if importDone}}disabled{{/if}}{{/if}}
-        {{#if overrideDocuments}}checked{{/if}}
-      />
+      <input type="checkbox" id="overrideDocuments" {{#if isImporting}}disabled{{else}}{{#if
+        importDone}}disabled{{/if}}{{/if}} {{#if overrideDocuments}}checked{{/if}} />
       <span>Override previously imported documents in compendiums</span>
+    </label>
+    <label class="import-setting">
+      <input type="checkbox" id="useEnglishDefault" {{#if isImporting}}disabled{{else}}{{#if
+        importDone}}disabled{{/if}}{{/if}} {{#if useEnglishDefault}}checked{{/if}} />
+      <span>Use English default instead of system language</span>
     </label>
   </fieldset>
 
   <!-- File Input & Action Button -->
   <div class="import-actions">
     <div class="file-input-wrapper">
-      <input
-        type="file"
-        id="zipFileInput"
-        accept=".zip,application/zip"
-        aria-label="Select a Chummer data export .zip file"
-        {{#if isImporting}}disabled{{/if}}
-      />
+      <input type="file" id="zipFileInput" accept=".zip,application/zip"
+        aria-label="Select a Chummer data export .zip file" {{#if isImporting}}disabled{{/if}} />
       <label for="zipFileInput" class="file-input-label">
         {{#if zipFileName}}
-          <i class="fa-solid fa-folder"></i> <strong>{{zipFileName}}</strong>
+        <i class="fa-solid fa-folder"></i> <strong>{{zipFileName}}</strong>
         {{else}}
-          <i class="fa-solid fa-upload"></i> Select a .zip Package (Optional)
+        <i class="fa-solid fa-upload"></i> Select a .zip Package (Optional)
         {{/if}}
       </label>
     </div>
 
     <!-- Import Button / Progress Bar / Done State -->
     {{#if isImporting}}
-      <div class="import-progress-container">
-        <div class="import-progress-bar">
-          <div class="import-progress-fill" style="width: {{progress.pct}}%"></div>
-        </div>
-        <div class="import-progress-text">{{progress.pct}}% {{progress.message}}</div>
+    <div class="import-progress-container">
+      <div class="import-progress-bar">
+        <div class="import-progress-fill" style="width: {{progress.pct}}%"></div>
       </div>
+      <div class="import-progress-text">{{progress.pct}}% {{progress.message}}</div>
+    </div>
     {{else}}
-      {{#if importDone}}
-        <div class="import-done-container">
-          <div class="import-done-text">
-            <i class="fa-solid fa-check-circle"></i>
-            Import completed successfully!
-          </div>
-          <button type="button" id="resetImport" class="reset-button">
-            <i class="fa-solid fa-redo"></i> Import Again
-          </button>
-        </div>
+    {{#if importDone}}
+    <div class="import-done-container">
+      <div class="import-done-text">
+        <i class="fa-solid fa-check-circle"></i>
+        Import completed successfully!
+      </div>
+      <button type="button" id="resetImport" class="reset-button">
+        <i class="fa-solid fa-redo"></i> Import Again
+      </button>
+    </div>
+    {{else}}
+    <button type="button" id="importBtn" class="import-button">
+      {{#if zipFileName}}
+      <i class="fa-solid fa-folder"></i> Import from File
       {{else}}
-        <button
-          type="button"
-          id="importBtn"
-          class="import-button"
-        >
-          {{#if zipFileName}}
-            <i class="fa-solid fa-folder"></i> Import from File
-          {{else}}
-            <i class="fa-solid fa-download"></i> Download &amp; Import
-          {{/if}}
-        </button>
+      <i class="fa-solid fa-download"></i> Download &amp; Import
       {{/if}}
+    </button>
+    {{/if}}
     {{/if}}
   </div>
 

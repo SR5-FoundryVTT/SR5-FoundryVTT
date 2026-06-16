@@ -106,6 +106,7 @@ export class BulkImporter extends BaseClass {
      */
     private static overrideDocuments = true;
     private static deleteCompendiums = false;
+    private static useEnglishDefault = false;
     private static isImporting = false;
     private static importDone = false;
     private static zipFile: File | null = null;
@@ -165,6 +166,7 @@ export class BulkImporter extends BaseClass {
             zipFileName: BulkImporter.zipFile?.name,
             deleteCompendiums: BulkImporter.deleteCompendiums,
             overrideDocuments: BulkImporter.overrideDocuments,
+            useEnglishDefault: BulkImporter.useEnglishDefault,
 
             // GitHub version info
             info: {
@@ -233,6 +235,116 @@ export class BulkImporter extends BaseClass {
         // Load ZIP file if provided
         const ZIP = BulkImporter.zipFile ? await (new JSZip()).loadAsync(BulkImporter.zipFile) : null;
 
+        // Load localization file based on Foundry locale
+        const locale = game.i18n.lang;
+        const normLocale = locale.toLowerCase();
+        let langFile = "en-us.xml";
+        if (!BulkImporter.useEnglishDefault) {
+            if (normLocale === "de" || normLocale.startsWith("de-")) {
+                langFile = "de-de.xml";
+            } else if (normLocale === "fr" || normLocale.startsWith("fr-")) {
+                langFile = "fr-fr.xml";
+            } else if (normLocale === "pt" || normLocale.startsWith("pt-")) {
+                langFile = "pt-br.xml";
+            } else if (normLocale === "ru" || normLocale.startsWith("ru-")) {
+                langFile = "ru-ru.xml";
+            } else if (normLocale === "pl" || normLocale.startsWith("pl-")) {
+                langFile = "pl-pl.xml";
+            } else if (normLocale === "zh" || normLocale.startsWith("zh-")) {
+                langFile = "zh-cn.xml";
+            } else if (normLocale === "it" || normLocale.startsWith("it-")) {
+                langFile = "it-it.xml";
+            } else if (normLocale === "es" || normLocale.startsWith("es-")) {
+                langFile = "es-es.xml";
+            }
+        }
+
+        let langXml: string | undefined;
+        if (ZIP) {
+            langXml = await ZIP.file(`lang/${langFile}`)?.async("string")
+                   ?? await ZIP.file(`Chummer/lang/${langFile}`)?.async("string");
+        }
+        if (!langXml) {
+            try {
+                langXml = await BulkImporter.fetchGitHubFile(`Chummer/lang/${langFile}`);
+            } catch (e) {
+                console.error(`Failed to fetch language file ${langFile} from GitHub:`, e);
+            }
+        }
+
+        ImportHelper.translationMap = {};
+
+        if (langXml) {
+            try {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(langXml, "text/xml");
+                const stringNodes = xmlDoc.getElementsByTagName("string");
+                for (let i = 0; i < stringNodes.length; i++) {
+                    const node = stringNodes[i];
+                    const key = node.getElementsByTagName("key")[0]?.textContent;
+                    const text = node.getElementsByTagName("text")[0]?.textContent;
+                    if (key && text) {
+                        ImportHelper.translationMap[key] = text;
+                    }
+                }
+                console.log(`Loaded ${Object.keys(ImportHelper.translationMap).length} translations from Chummer ${langFile}`);
+            } catch (e) {
+                console.error(`Failed to parse language XML:`, e);
+            }
+        }
+
+        const dataLangFile = langFile.replace(".xml", "_data.xml");
+        let dataLangXml: string | undefined;
+        if (ZIP) {
+            dataLangXml = await ZIP.file(`lang/${dataLangFile}`)?.async("string")
+                       ?? await ZIP.file(`Chummer/lang/${dataLangFile}`)?.async("string");
+        }
+        if (!dataLangXml) {
+            try {
+                dataLangXml = await BulkImporter.fetchGitHubFile(`Chummer/lang/${dataLangFile}`);
+            } catch (e) {
+                console.debug(`No data language file ${dataLangFile} found on GitHub or it failed to fetch:`, e);
+            }
+        }
+
+        if (dataLangXml) {
+            try {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(dataLangXml, "text/xml");
+                const nameNodes = xmlDoc.getElementsByTagName("name");
+                let dataKeysCount = 0;
+                for (let i = 0; i < nameNodes.length; i++) {
+                    const nameNode = nameNodes[i];
+                    const parent = nameNode.parentElement;
+                    if (parent) {
+                        const translateNode = parent.getElementsByTagName("translate")[0];
+                        if (translateNode) {
+                            const key = nameNode.textContent?.trim();
+                            const text = translateNode.textContent?.trim();
+                            if (key && text) {
+                                ImportHelper.translationMap[key] = text;
+                                dataKeysCount++;
+                            }
+                        }
+                    }
+                }
+
+                const categoryNodes = xmlDoc.getElementsByTagName("category");
+                for (let i = 0; i < categoryNodes.length; i++) {
+                    const node = categoryNodes[i];
+                    const translateAttr = node.getAttribute("translate");
+                    const key = node.textContent?.trim();
+                    if (key && translateAttr) {
+                        ImportHelper.translationMap[key] = translateAttr;
+                        dataKeysCount++;
+                    }
+                }
+                console.log(`Loaded ${dataKeysCount} additional data translations from ${dataLangFile}`);
+            } catch (e) {
+                console.error(`Failed to parse data language XML:`, e);
+            }
+        }
+
         // Configure shared importer settings
         DataImporter.overrideDocuments = BulkImporter.overrideDocuments;
 
@@ -294,6 +406,7 @@ export class BulkImporter extends BaseClass {
         ImportHelper.categoryMap = {};
         ImportHelper.nameToId = {};
         ImportHelper.idToName = {};
+        ImportHelper.translationMap = {};
 
         console.debug(`Bulk import time: ${(performance.now() - start).toFixed(2)} ms`);
     }
@@ -319,6 +432,12 @@ export class BulkImporter extends BaseClass {
         const overrideDocuments = this.element.querySelector<HTMLSelectElement>("#overrideDocuments");
         overrideDocuments?.addEventListener("change", (event) => {
             BulkImporter.overrideDocuments = (event.currentTarget as HTMLInputElement).checked;
+        });
+
+        // Checkbox: Use English default
+        const useEnglishDefault = this.element.querySelector<HTMLSelectElement>("#useEnglishDefault");
+        useEnglishDefault?.addEventListener("change", (event) => {
+            BulkImporter.useEnglishDefault = (event.currentTarget as HTMLInputElement).checked;
         });
 
         // File input: Load ZIP file

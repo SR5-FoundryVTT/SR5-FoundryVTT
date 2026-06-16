@@ -16,6 +16,13 @@ export class ImportHelper {
     static categoryMap: Partial<Record<ChummerFile, Record<string, string>>> = {};
     static nameToId: Partial<Record<CompendiumKey, Record<string, string>>> = {};
     static idToName: Partial<Record<CompendiumKey, Record<string, string>>> = {};
+    static translationMap: Record<string, string> = {};
+
+    public static translate(text: string | null | undefined): string {
+        if (!text) return "";
+        return this.translationMap[text] ?? text;
+    }
+
 
     /**
      * Ensures the provided value is returned as an array.
