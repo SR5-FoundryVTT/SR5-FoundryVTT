@@ -53,14 +53,20 @@ export const spiritImporterTesting = (context: QuenchBatchContext) => {
                 }
             });
 
-            spirit = await SpiritImporter.import(character, template, importOptions);
+            spirit = await SpiritImporter.import(character, template, {
+                ...importOptions,
+                folderId: await factory.getOrCreateFolderId('Actor'),
+            });
             assert.notEqual(spirit, null, 'Spirit not created');
             factory.actors.push(spirit as Actor.Stored<'spirit'>);
             assert.strictEqual(spirit!.system.spiritType, 'fire_template');
         });
 
         it('imports a spirit using preset profile fallback without template', async () => {
-            const fallbackSpirit = await SpiritImporter.importFromPresetProfile(character, importOptions);
+            const fallbackSpirit = await SpiritImporter.importFromPresetProfile(character, {
+                ...importOptions,
+                folderId: await factory.getOrCreateFolderId('Actor'),
+            });
             assert.notEqual(fallbackSpirit, null, 'Spirit fallback import failed');
             factory.actors.push(fallbackSpirit as Actor.Stored<'spirit'>);
 
@@ -117,4 +123,3 @@ export const spiritImporterTesting = (context: QuenchBatchContext) => {
         });
     });
 };
-

@@ -135,6 +135,7 @@ import { CompendiumBrowser } from './apps/compendiumBrowser/CompendiumBrowser';
 import { Skill } from './types/item/Skill';
 import { SR5SkillSheet } from './item/sheets/SR5SkillSheet';
 import { SkillGroupFlow } from './actor/flows/SkillGroupFlow';
+import { OpposedMatrixTest } from './tests/OpposedMatrixTest';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -280,7 +281,8 @@ ___________________
                 MatrixResistTest,
                 BiofeedbackResistTest,
                 CheckOverwatchScoreTest,
-                OpposedCheckOverwatchScoreTest
+                OpposedCheckOverwatchScoreTest,
+                OpposedMatrixTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -331,7 +333,8 @@ ___________________
                 OpposedRitualTest,
                 OpposedBruteForceTest,
                 OpposedHackOnTheFlyTest,
-                OpposedCheckOverwatchScoreTest
+                OpposedCheckOverwatchScoreTest,
+                OpposedMatrixTest
             },
             /**
              * Subset of tests meant to be used as resist tests.

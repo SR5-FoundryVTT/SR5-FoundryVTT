@@ -70,7 +70,7 @@
       },
       "opposed": {
         "type": "custom",
-        "test": "OpposedTest",
+        "test": "OpposedMatrixTest",
         "attribute": "logic",
         "attribute2": "attack",
         "skill": "",

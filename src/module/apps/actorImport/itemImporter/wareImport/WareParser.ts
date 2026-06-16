@@ -1,4 +1,5 @@
 import { BlankItem, ExtractItemType, Parser } from "../Parser";
+import { WareModParser } from "./WareModParser";
 
 export class WareParser extends Parser<'bioware' | 'cyberware'> {
     protected readonly parseType: 'bioware' | 'cyberware';
@@ -21,5 +22,11 @@ export class WareParser extends Parser<'bioware' | 'cyberware'> {
         if (this.parseType === 'bioware') {
             system.technology.wireless = 'none';
         }
+    }
+
+    protected override async getEmbeddedItems(itemData: ExtractItemType<'cyberwares', 'cyberware'>): Promise<Item.Source[]> {
+        return [
+            ...(await new WareModParser(this.parseType).parseItems(itemData.children?.cyberware))
+        ] as Item.Source[];
     }
 }

@@ -19,6 +19,7 @@ import { SpellImporter } from "../importer/SpellImporter";
 import { VehicleImporter } from "../importer/VehicleImporter";
 import { VehicleModImporter } from "../importer/VehicleModImporter";
 import { WareImporter } from "../importer/WareImporter";
+import { WareModImporter } from "../importer/WareModImporter";
 import { WeaponImporter } from "../importer/WeaponImporter";
 import { WeaponModImporter } from "../importer/WeaponModImporter";
 
@@ -130,6 +131,7 @@ export class BulkImporter extends BaseClass {
         new VehicleImporter(),
         new SpellImporter(),
         new ComplexFormImporter(),
+        new WareModImporter(),
         new WareImporter(),
         new QualityImporter(),
         new CritterPowerImporter(),

@@ -134,9 +134,11 @@ export const UpdateActionFlow = {
 
         // Based on category switch out active, opposed and resist test.
         const test = SR5.activeTests[type];
-        const opposedTest = SR5.opposedTests[type][changeData.system.category] || 'OpposedTest';
-        const resistTest = SR5.opposedResistTests[type][changeData.system.category] || '';
         const drainTest = SR5.followedTests[test] ?? '';
+        const opposedTest = SR5.opposedTests[type][changeData.system.category] || 'OpposedTest';
+
+        const isDirectCombatSpell = changeData.system.category === 'combat' && changeData.system.combat?.type === 'direct';
+        const resistTest = isDirectCombatSpell ? '' : SR5.opposedResistTests[type][changeData.system.category] || '';
 
         foundry.utils.setProperty(applyData, 'system.action.test', test);
         foundry.utils.setProperty(applyData, 'system.action.opposed.test', opposedTest);
