@@ -175,7 +175,6 @@ export class HooksManager {
         Hooks.on('deleteItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('getChatMessageContextOptions', SuccessTest.chatMessageContextOptions.bind(SuccessTest));
 
-        (Hooks as any).on('renderChatInput', HooksManager.renderSuccessTestPromptButton.bind(HooksManager));
         Hooks.on('renderChatLog', HooksManager.chatLogListeners.bind(HooksManager));
 
         MatrixHooks.registerHooks();
@@ -572,6 +571,18 @@ ___________________
 
         const situationModifiersControl = SituationModifiersApplication.getControl();
         controls.tokens.tools[situationModifiersControl.name] = situationModifiersControl;
+
+        const successTestControl = {
+            name: 'sr5-success-test',
+            title: 'SR5.Tests.SuccessTest',
+            icon: 'fas fa-dice',
+            button: true,
+            onChange: (_event: Event, active: boolean) => {
+                if (!active) return;
+                void TestCreator.promptSuccessTest();
+            },
+        };
+        controls.tokens.tools[successTestControl.name] = successTestControl;
     }
 
     /**
@@ -688,8 +699,6 @@ ___________________
         await ActionFollowupFlow.chatLogListeners(chatLog, html, data);
         await TeamworkTest.chatLogListeners(chatLog, html);
         await JournalEnrichers.chatlogRequestHooks(html);
-
-        this.renderSuccessTestPromptButton();
     }
 
     static configureVision() {
@@ -704,45 +713,4 @@ ___________________
         JournalEnrichers.setEnrichers();
     }
 
-    /**
-     * Add a button to Prompt for a Success Test
-     */
-    static renderSuccessTestPromptButton(...args: unknown[]) {
-        const elements = args[1] as Record<string, HTMLElement> | undefined;
-        const id = 'sr5e-success-test-button-prompt';
-        const inner = '<i class="fas fa-dice"></i>';
-
-        const rendered = document.getElementById(id);
-        const container = elements?.['#chat-controls']
-            ?? elements?.['#message-modes']
-            ?? document.getElementById('chat-controls')
-            ?? document.getElementById('roll-privacy');
-
-        if (rendered) {
-            rendered.innerHTML = inner;
-            if (container && rendered.parentElement !== container) {
-                container.prepend(rendered);
-            }
-            return;
-        }
-
-        if (!container) return;
-
-        const button = document.createElement('button');
-        button.setAttribute('type', 'button');
-        button.setAttribute('id', id);
-        button.setAttribute('data-tooltip', 'SR5.Tests.SuccessTest');
-        button.setAttribute('aria-label', game.i18n.localize('SR5.Tests.SuccessTest'));
-        button.setAttribute('class', 'ui-control icon');
-        button.innerHTML = inner;
-        button.addEventListener('click', () => {
-            void TestCreator.promptSuccessTest();
-        });
-
-        if (container.firstElementChild && container.firstElementChild.id !== id) {
-            container.insertBefore(button, container.firstElementChild);
-        } else {
-            container.prepend(button);
-        }
-    }
 }

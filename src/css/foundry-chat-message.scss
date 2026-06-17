@@ -18,39 +18,6 @@
     }
 }
 
-.chat-sidebar {
-    /** Style changes to suport the added roll dice icon on the icon row above the chat message input 
-    *   If not made, the chat messages will shrink, due to the icon added.
-    */
-    .chat-log {
-        width: 100%;
-        max-width: none;
-        padding-inline-start: 0;
-
-        > li.chat-message {
-            width: 100%;
-            max-width: none;
-            margin: 0 0 var(--chat-message-spacing);
-            padding: 8px;
-            box-sizing: border-box;
-        }
-
-        .message-content {
-            width: 100%;
-            max-width: none;
-            min-width: 0;
-            padding: 0;
-        }
-
-        .sr5.chat-card.roll-card {
-            width: 100%;
-            max-width: none;
-            margin-inline: 0;
-            box-sizing: border-box;
-        }
-    }
-}
-
 
 .sr5 {
     &.chat-card {
@@ -149,13 +116,11 @@
         --sr5-card-glitch-a: var(--sr5-theme-glitch-a);
         --sr5-card-glitch-b: var(--sr5-theme-glitch-b);
 
-        margin: 0;
+        margin: 0.2rem 0.1rem;
         font-size: 12px;
         color: var(--sr5-theme-text-primary);
         color: var(--sr5-card-text);
         border-color: var(--sr5-card-border);
-        width: 100%;
-        box-sizing: border-box;
 
         .card-title {
             display: flex;
