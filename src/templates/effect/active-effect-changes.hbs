@@ -5,7 +5,6 @@
         <div class="type">{{localize "EFFECT.FIELDS.changes.element.type.label"}}</div>
         <div class="value">{{localize "EFFECT.FIELDS.changes.element.value.label"}}</div>
         <div class="priority">{{localize "EFFECT.FIELDS.changes.element.priority.label"}}</div>
-        <div class="phase">{{localize "EFFECT.FIELDS.changes.element.phase.label"}}</div>
         <div class="controls">
             <a class="inline-control icon" data-action="addChange"><i class="fa-regular fa-square-plus"></i></a>
         </div>
@@ -36,15 +35,11 @@
                     <div class="priority">
                         {{formInput changeFields.priority name=(concat "system.changes." i ".priority") value=change.priority disabled=true}}
                     </div>
-                    <div class="phase">
-                        {{formInput changeFields.phase name=(concat "system.changes." i ".phase") value=change.phase disabled=true}}
-                    </div>
                     {{/ifne}}
                     {{#ife (lookup @root.targetApplyToById change.target) "modifier"}}
                     {{!-- Modifier changes hide these columns; keep them in the form so submitOnChange doesn't reset them. --}}
                     <input type="hidden" name="{{concat "system.changes." i ".type"}}" value="{{change.type}}">
                     <input type="hidden" name="{{concat "system.changes." i ".value"}}" value="{{change.value}}">
-                    <input type="hidden" name="{{concat "system.changes." i ".phase"}}" value="{{change.phase}}">
                     <input type="hidden" name="{{concat "system.changes." i ".priority"}}" value="{{change.priority}}">
                     {{/ife}}
                     <div class="controls">

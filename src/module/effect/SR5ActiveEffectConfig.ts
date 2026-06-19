@@ -179,6 +179,8 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
             });
         }
 
+        this._updateConditionTypeOptions();
+
         // disable and set tooltips on the priority inputs since we don't currently support changing it
         for (let i = 0; i < this.document.system.changes.length; i++) {
             const input = this.element.querySelector<HTMLInputElement>(`input[name="system.changes.${i}.priority"]`);
@@ -242,7 +244,12 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         const targetIndex = Number(target.dataset.targetIndex ?? -1);
         const { targets } = this._currentEffectFormData();
         if (!targets[targetIndex]) return;
-        targets[targetIndex].conditions = [...(targets[targetIndex].conditions ?? []), {}];
+
+        const usedTypes = new Set<string>((targets[targetIndex].conditions ?? []).map(c => c.type));
+        const availableType = Object.keys(SR5.effectFilterTypes).find(t => !usedTypes.has(t));
+        if (!availableType) return;
+
+        targets[targetIndex].conditions = [...(targets[targetIndex].conditions ?? []), { type: availableType }];
         await this.document.update({ system: { targets } });
     }
 
@@ -298,6 +305,22 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         return [];
     }
 
+    /**
+     * Disable condition type options already in use by sibling conditions within the same target,
+     * so each filter type can only appear once per target.
+     */
+    private _updateConditionTypeOptions() {
+        for (const targetEl of this.element.querySelectorAll<HTMLElement>('.effect-target')) {
+            const typeSelects = [...targetEl.querySelectorAll<HTMLSelectElement>('select.filter-condition-type')];
+            const usedTypes = new Set(typeSelects.map(s => s.value));
+            for (const select of typeSelects) {
+                for (const option of select.options) {
+                    option.disabled = option.value !== select.value && usedTypes.has(option.value);
+                }
+            }
+        }
+    }
+
     private async _onConditionTypeChange(event: Event, select: HTMLSelectElement) {
         event.stopPropagation();
 
@@ -344,11 +367,9 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
      * position and apply-to destination.
      */
     prepareChangeTargetOptions() {
-        const targetLabel = game.i18n.localize('SR5.ActiveEffect.Target');
-        // system.targets falls back to a single implicit 'actor' target when none are defined.
         return this.document.system.targets.map((target, index: number) => ({
             value: target.id,
-            label: `${targetLabel} ${index + 1} — ${game.i18n.localize(SR5.effectApplyTo[target.applyTo] ?? target.applyTo)}`,
+            label: `#${index + 1}`,
         }));
     }
 

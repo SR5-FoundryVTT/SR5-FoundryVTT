@@ -101,12 +101,13 @@
        Use max-height (not height: 100%) so the section doesn't collapse against the auto-sized window. */
     overflow-y: auto;
     max-height: 60vh;
+    gap: var(--spacer-8, 0.5rem);
 
     .effect-target {
         border: 1px solid var(--color-border-light-secondary, #ccc);
         border-radius: 4px;
         padding: 0.5rem;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
 
         legend {
             display: flex;
@@ -117,13 +118,32 @@
         }
     }
 
+    .effect-target-add {
+        margin-top: 0.5rem;
+    }
+
     .effect-target-add,
     .filter-condition-add {
-        margin-top: 0.25rem;
-        text-align: center;
-
         a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            width: 100%;
+            padding: 0.3rem 0.5rem;
+            border: 1px dashed var(--sr5v2-border-strong);
+            border-radius: 4px;
+            color: var(--sr5v2-text-secondary);
             cursor: pointer;
+            font-size: 0.85em;
+            transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+
+            &:hover {
+                background: var(--sr5v2-bg-hover);
+                border-color: var(--sr5v2-border-strong);
+                border-style: solid;
+                color: var(--sr5v2-link-hover);
+            }
         }
     }
 
@@ -154,20 +174,27 @@
 }
 
 .application.sheet.active-effect-config.sr5v2 {
+    min-width: 400px;
+
+    .form-footer {
+        padding-top: 0.5rem;
+    }
+
     /* Keep the top navigation clear of the sheet edges.
        margin-inline overrides blocks.base's negative bleed margin. */
     nav.sheet-tabs {
         box-sizing: border-box;
         width: auto;
         margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
         margin-inline: 0.5rem;
     }
 
     /* Facilitate resizable effect sheet and scaling effect changes to width */
     .tab.changes header,
     .tab.changes ol {
-        // grid layout: target | key | type | value | priority | phase | controls
-        grid-template-columns: 8rem minmax(10rem, 2fr) 7rem minmax(8rem, 1fr) 4rem 7rem 2rem !important;
+        // grid layout: target | key | type | value | priority | controls
+        grid-template-columns: 4rem minmax(8rem, 1fr) 7rem minmax(8rem, 1fr) 4rem 2rem !important;
     }
 
     .tab.changes header,
@@ -182,11 +209,11 @@
 
     /* Modifier changes only use the key column; span it and keep controls in the last column. */
     .tab.changes ol li.change-modifier .key {
-        grid-column: 2 / 7;
+        grid-column: 2 / 6;
     }
 
     .tab.changes ol li.change-modifier .controls {
-        grid-column: 7;
+        grid-column: 6;
     }
 
     .tab.changes header .controls,
