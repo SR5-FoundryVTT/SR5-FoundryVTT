@@ -243,8 +243,8 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
                 await actor.createEmbeddedDocuments('ActiveEffect', [{
                     name: 'Low Light Vision',
                     system: {
-                        applyTo: 'modifier',
-                        changes: [{ key: 'environmental.low_light_vision', value: '1', type: 'custom' }]
+                        targets: [{ id: 'm', applyTo: 'modifier' }],
+                        changes: [{ key: 'environmental.low_light_vision', value: '1', type: 'custom', target: 'm' }]
                     },
                 }]);
 
@@ -277,9 +277,9 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
                 await matchingItem.createEmbeddedDocuments('ActiveEffect', [{
                     name: 'Scoped Low Light Vision',
                     system: {
-                        applyTo: 'modifier',
+                        targets: [{ id: 'm', applyTo: 'modifier' }],
                         onlyForItemTest: true,
-                        changes: [{ key: 'environmental.low_light_vision', value: '1', type: 'custom' }]
+                        changes: [{ key: 'environmental.low_light_vision', value: '1', type: 'custom', target: 'm' }]
                     },
                 }]);
 

@@ -53,7 +53,7 @@ export const AutocompleteInlineHooksFlow =  {
 
         // NOTE: AIP 3.1.0 has issues with 'core' fieldConfig overwriting custom fieldConfigs. Replace all configs with ours, works.
         // Other fieldConfigs are 'core' and built-in systems, which we don't need, as we custom map all our fields for AIP.
-        // This shoud be revisited, however it also shouldn't matter, as we don't rely on the core fieldConfig anyway.
+        // This should be revisited, however it also shouldn't matter, as we don't rely on the core fieldConfig anyway.
         // - See their GitHub issue #748
         // - Our GitHub issue #1684
         // Remove only 'core' configs, then prepend ours for higher priority.
@@ -84,7 +84,12 @@ export const AutocompleteInlineHooksFlow =  {
      */
     keyGetterTestData: (EffectConfig: SR5ActiveEffectConfig) => {
         const effect = EffectConfig.document;
-        const testsId = effect.system.selection_tests;
+        // Collect unique test class names from all 'tests' conditions across all targets.
+        const testsId = [...new Set(
+            effect.system.targets.flatMap(
+                t => t.conditions.filter(c => c.type === 'tests').flatMap(c => c.values)
+            )
+        )];
 
         // For  effects targeting specific tests, we can provide a merge of all tests data.
         if (testsId.length > 0) {

@@ -894,7 +894,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     protected override async _onDropActiveEffect(event: DragEvent, effect: SR5ActiveEffect) {
         if (effect.actor?.uuid === this.actor.uuid) return null;
         // if the effect is just supposed to apply to the item's test, it won't work on an actor
-        if (effect.system.applyTo === 'test_item') {
+        if (effect.appliesToAnyOf(['test_item'])) {
             ui.notifications?.warn(game.i18n.localize('SR5.ActiveEffect.CannotAddTestViaItemToActor'));
             return null;
         }

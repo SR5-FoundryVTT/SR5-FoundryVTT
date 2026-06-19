@@ -30,7 +30,9 @@
         "ShowSkillsWithDetails": "Afficher plus de détails sur la liste des compétences",
         "ShowSkillsWithDetailsDescription": "L'écriture des compétences va copier celle du livre de règles (italique, noms d'attributs raccourcis)",
         "ShowTokenNameForChatOutputDescription": "Utiliser le nom de jetons pour les messages de lancés de dés au lieu du nom du personnage",
-        "ShowTokenNameForChatOutputName": "Utiliser les noms des Jetons dans les affichages de lancés dans le tchat"
+        "ShowTokenNameForChatOutputName": "Utiliser les noms des Jetons dans les affichages de lancés dans le tchat",
+        "TokenAutoRunning": "Détection automatique de la course",
+        "TokenAutoRunningDescription": "Bascule automatiquement le mode de déplacement du token en course lorsque la distance mesurée dépasse la vitesse de marche."
     },
     "SR5": {
         "AP": "PA",
@@ -250,7 +252,8 @@
             "Types": {
                 "Mana": "Mana",
                 "Physical": "Physique"
-            }
+            },
+            "OptionalSelectionCount": "Pouvoirs optionnels"
         },
         "Cyberware": "Cyberware",
         "CyberwareGrade": "Gamme",
@@ -904,7 +907,9 @@
                 "Watcher": "Beobachterin",
                 "Worker": "Insecte Ouvrier",
                 "Wraith": "Spectre"
-            }
+            },
+            "ForceAppliesSetting": "Force applicable à",
+            "ForceAppliesSettingHint": "Détermine quels attributs de l'esprit reçoivent le bonus de Force."
         },
         "Sprite": {
             "Level": "Niveau",
@@ -1020,7 +1025,8 @@
             "RitualNotConcluded": "Le Rituel a échoué. En attente du jeu du rituel pour déterminer le drain.",
             "RitualNotEnoughReagents": "Pas assez de réactifs offerts.",
             "SkillCantBeDefault": "Cette compétence ne peut pas être lancée sans l'avoir apprise",
-            "TokenSelectionNeeded": "Un ou plusieurs jetons doivent être selectionnés"
+            "TokenSelectionNeeded": "Un ou plusieurs jetons doivent être selectionnés",
+            "NoActorCreatePermission": "Vous n'avez pas la permission de créer des acteurs."
         },
         "Tooltips": {
             "Test": {
@@ -1030,6 +1036,9 @@
             },
             "Effect": {
                 "HelpLinkEnglishOnly": "Help (External link, English only)"
+            },
+            "SummoningTest": {
+                "OptionalPowerCount": "Compteur informatif des pouvoirs optionnels de l'esprit (plancher(force / 3))."
             }
         },
         "Weapon": {
@@ -1088,6 +1097,10 @@
         "Wireless": "Sans fil",
         "WoundModifier": "Mod. de blessures",
         "WoundTolerance": "Tolérance blessures",
-        "Wounds": "Blessures"
+        "Wounds": "Blessures",
+        "StatusEffects": {
+            "Running": "Course",
+            "Sprinting": "Sprint"
+        }
     }
 }

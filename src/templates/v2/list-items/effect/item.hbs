@@ -23,7 +23,7 @@
         </div>
 
         <div class="list-item-col thicc-col">
-            <label>{{localizeOb item.system.applyTo @root.config.effectApplyTo}}</label>
+            <label>{{#each item.system.targets}}{{localizeOb this.applyTo @root.config.effectApplyTo}}{{#unless @last}}, {{/unless}}{{/each}}</label>
         </div>
 
         {{!-- Add in when we actual deal with durations

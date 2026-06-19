@@ -42,7 +42,8 @@ export class SituationModifierEffectsFlow<T extends SituationModifier> {
             // Special case for modifier effects: Some only apply to tests of their parent item.
             if (effect.system.onlyForItemTest && (test === undefined || effect.parent !== test?.item)) continue;
 
-            const effectChanges = effect.system?.changes ?? [];
+            // Only apply changes assigned to a 'modifier' target.
+            const effectChanges = effect.changesForApplyTo('modifier');
             changes.push(...effectChanges.map(change => {
                 const c = foundry.utils.deepClone<typeof changes[number]>(change as any);
                 c.effect = effect;

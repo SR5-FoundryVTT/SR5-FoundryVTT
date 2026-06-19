@@ -1321,6 +1321,19 @@ export const SR5 = {
         'modifier': 'SR5.Modifier'
     },
 
+    effectSelectionModes: {
+        'include': 'SR5.ActiveEffect.SelectionModes.Include',
+        'exclude': 'SR5.ActiveEffect.SelectionModes.Exclude',
+    },
+
+    effectFilterTypes: {
+        'tests': 'SR5.ActiveEffect.FilterTypes.Tests',
+        'categories': 'SR5.ActiveEffect.FilterTypes.Categories',
+        'skills': 'SR5.ActiveEffect.FilterTypes.Skills',
+        'attributes': 'SR5.ActiveEffect.FilterTypes.Attributes',
+        'limits': 'SR5.ActiveEffect.FilterTypes.Limits',
+    },
+
     itemCategoryIconOverrides: {
         action: {},
         adept_power: {},

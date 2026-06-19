@@ -270,8 +270,30 @@ export const SRStatus = [
         name: 'SR5.StatusEffects.Running',
         img: 'systems/shadowrun5e/dist/icons/status-effects/run.svg',
         system: {
-            applyTo: 'test_all',
-            changes: [{ key: "data.pool", type: "add", value: "-2" }],
+            targets: [
+                {
+                    id: 'penalty',
+                    applyTo: 'test_all',
+                    conditions: [
+                        // Exclude defense and resist tests from the penalty.
+                        { type: 'tests', mode: 'exclude', values: ['PhysicalDefenseTest', 'SuppressionDefenseTest', 'PhysicalResistTest'] },
+                        // Exclude the running skill test itself from the penalty.
+                        { type: 'skills', mode: 'exclude', values: ['running'] },
+                    ],
+                },
+                {
+                    // +4 raw on melee attacks = net +2 after the general -2 penalty.
+                    id: 'melee',
+                    applyTo: 'test_all',
+                    conditions: [
+                        { type: 'tests', mode: 'include', values: ['MeleeAttackTest'] },
+                    ],
+                },
+            ],
+            changes: [
+                { key: "data.pool", type: "add", value: "-2", target: 'penalty' },
+                { key: "data.pool", type: "add", value: "4",  target: 'melee' },
+            ],
         },
     },
     {
@@ -279,8 +301,28 @@ export const SRStatus = [
         name: 'SR5.StatusEffects.Sprinting',
         img: 'systems/shadowrun5e/dist/icons/status-effects/sprint.svg',
         system: {
-            applyTo: 'test_all',
-            changes: [{ key: "data.pool", type: "add", value: "-4" }],
+            targets: [
+                {
+                    id: 'penalty',
+                    applyTo: 'test_all',
+                    conditions: [
+                        { type: 'tests', mode: 'exclude', values: ['PhysicalDefenseTest', 'SuppressionDefenseTest', 'PhysicalResistTest'] },
+                        { type: 'skills', mode: 'exclude', values: ['running'] },
+                    ],
+                },
+                {
+                    // +4 raw on melee attacks = net +2 after the general -2 penalty.
+                    id: 'melee',
+                    applyTo: 'test_all',
+                    conditions: [
+                        { type: 'tests', mode: 'include', values: ['MeleeAttackTest'] },
+                    ],
+                },
+            ],
+            changes: [
+                { key: "data.pool", type: "add", value: "-2", target: 'penalty' },
+                { key: "data.pool", type: "add", value: "4",  target: 'melee' },
+            ],
         },
     },
 ] as const satisfies CONFIG.StatusEffect[];

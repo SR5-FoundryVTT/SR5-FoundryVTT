@@ -66,6 +66,42 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
+     * Whether this effect has a target for any of the given apply-to destinations.
+     */
+    appliesToAnyOf(applyTo: string[]): boolean {
+        return this.system.targets.some(target => applyTo.includes(target.applyTo));
+    }
+
+    /**
+     * Resolve the target a change belongs to, falling back to the first target for
+     * changes with a blank/unresolved target reference (back-compat).
+     */
+    targetForChange(change: { target?: string }) {
+        return this.system.targets.find(target => target.id === change.target);
+    }
+
+    /**
+     * All changes whose resolved target applies to the given apply-to destination.
+     */
+    changesForApplyTo(applyTo: string) {
+        return this.system.changes.filter(change => this.targetForChange(change)?.applyTo === applyTo);
+    }
+
+    /**
+     * Ensure every effect is created with at least one target, so the config sheet always shows a
+     * target and changes have a concrete destination. Effects created with explicit targets (tests,
+     * imports, migration) keep theirs.
+     */
+    protected override async _preCreate(...args: Parameters<ActiveEffect['_preCreate']>): Promise<boolean | void> {
+        const allowed = await super._preCreate(...args);
+        if (allowed === false) return false;
+
+        if (!this.system.targets?.length) {
+            this.updateSource({ system: { targets: [{ applyTo: 'actor' }] } });
+        }
+    }
+
+    /**
      * Always returns the parent actor of the effect, even if the effect is applied to an item.
      */
     override get actor(): SR5Actor | null {
@@ -175,17 +211,28 @@ export class SR5ActiveEffect extends ActiveEffect {
         const actor = this.actor;
         if (!actor) return false;
 
-        if (this.system.applyTo === 'targeted_actor') {
-            return this.system.appliedByTest;
-        }
+        // Effects copied onto a target actor by a test always apply to that actor.
+        if (this.system.appliedByTest) return true;
 
-        return true;
+        // Otherwise hide only effects whose targets are exclusively targeted_actor,
+        // as those are meant for another actor acted upon, not the one acting.
+        return this.system.targets.some(target => target.applyTo !== 'targeted_actor');
     }
 
     /**
      * < v14 used #apply instead of applyChange.
      */
     override apply(model: DataModel.Any, change: ActiveEffect.ChangeData) {
+        // Foundry core iterates every change of an applicable effect when applying to actor data.
+        // Only apply changes whose target is actor-bound. Both 'actor' and 'targeted_actor' targets
+        // apply to actor data (targeted_actor effects are only collected onto an actor when they
+        // belong to it - either embedded directly or copied there by a test).
+        if (model instanceof SR5Actor) {
+            const target = this.targetForChange(change as { target?: string });
+            const appliesToActor = !!target && (target.applyTo === 'actor' || target.applyTo === 'targeted_actor');
+            if (!appliesToActor) return {};
+        }
+
         // @ts-expect-error TODO: v14 remove once v14 implementation is stable
         return super.apply(model, change);
         // return Object.fromEntries(
@@ -207,7 +254,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * The DataModel handles effect application within they applyChange methods.
      * The objects are handled by SR5ActiveEffect legacy _applyToObject and _apply methods.
      * 
-     * This can cause diffeing beahvior between these two for effect application.
+     * This can cause differing behavior between these two for effect application.
      *
      * @param targetDoc The targeted document or object...
      * @param change The effect change being applied
@@ -335,7 +382,7 @@ export class SR5ActiveEffect extends ActiveEffect {
             if (!data || !this.id) return this;
 
             await this.parent.updateNestedEffects({ ...data, _id: this.id } as ActiveEffect.UpdateInput);
-            await this.render();
+            this.render();
             return this;
         }
 

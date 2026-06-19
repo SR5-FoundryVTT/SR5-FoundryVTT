@@ -95,17 +95,98 @@
     }
 }
 
+/* Targets: target container + inline apply-to + condition rows */
+.application.sheet.active-effect-config.sr5v2 .tab[data-tab="targets"] {
+    /* Bound the tab so long target lists scroll instead of growing the window off-screen.
+       Use max-height (not height: 100%) so the section doesn't collapse against the auto-sized window. */
+    overflow-y: auto;
+    max-height: 60vh;
+
+    .effect-target {
+        border: 1px solid var(--color-border-light-secondary, #ccc);
+        border-radius: 4px;
+        padding: 0.5rem;
+        margin-bottom: 0.5rem;
+
+        legend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: bold;
+            padding: 0 0.25rem;
+        }
+    }
+
+    .effect-target-add,
+    .filter-condition-add {
+        margin-top: 0.25rem;
+        text-align: center;
+
+        a {
+            cursor: pointer;
+        }
+    }
+
+    /* A condition row: type select, mode select, tag input and a remove button on one line */
+    .filter-condition {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        margin-bottom: 0.35rem;
+
+        select {
+            flex: 0 0 auto;
+            width: auto;
+            min-width: 8ch;
+        }
+
+        input.tagify-selection,
+        .tagify {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .inline-control {
+            flex: 0 0 auto;
+            cursor: pointer;
+        }
+    }
+}
+
 .application.sheet.active-effect-config.sr5v2 {
+    /* Keep the top navigation clear of the sheet edges.
+       margin-inline overrides blocks.base's negative bleed margin. */
+    nav.sheet-tabs {
+        box-sizing: border-box;
+        width: auto;
+        margin-top: 0.5rem;
+        margin-inline: 0.5rem;
+    }
+
     /* Facilitate resizable effect sheet and scaling effect changes to width */
     .tab.changes header,
     .tab.changes ol {
-        // grid layout: key | type | value | priority | phase | controls
-        grid-template-columns: minmax(12rem, 2fr) 7rem minmax(8rem, 1fr) 4rem 7rem 2rem !important;
+        // grid layout: target | key | type | value | priority | phase | controls
+        grid-template-columns: 8rem minmax(10rem, 2fr) 7rem minmax(8rem, 1fr) 4rem 7rem 2rem !important;
     }
 
     .tab.changes header,
     .tab.changes ol li {
         align-items: center;
+    }
+
+    .tab.changes .target select {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Modifier changes only use the key column; span it and keep controls in the last column. */
+    .tab.changes ol li.change-modifier .key {
+        grid-column: 2 / 7;
+    }
+
+    .tab.changes ol li.change-modifier .controls {
+        grid-column: 7;
     }
 
     .tab.changes header .controls,

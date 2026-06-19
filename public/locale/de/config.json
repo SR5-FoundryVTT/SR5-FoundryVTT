@@ -68,7 +68,9 @@
         "UseDamageConditionDescription": "Das System markiert die Token entsprechend ihrem Zustandsmonitor",
         "UseDamageConditionName": "Systembehandlung für Token-Statuseffekte verwenden",
         "UseImportIconOverridesDescription": "Beim Importieren von Items die gleichen Symbole für verschiedene Itemtypen verwenden, wenn dies sinnvoll ist. Deaktivieren wenn benutzerdefinierte Symbole verwendet werden.",
-        "UseImportIconOverridesName": "Standard Importer Icon benutzen"
+        "UseImportIconOverridesName": "Standard Importer Icon benutzen",
+        "TokenAutoRunning": "Laufbewegung automatisch erkennen",
+        "TokenAutoRunningDescription": "Wechselt den Bewegungsmodus des Tokens automatisch auf Laufen, wenn die gemessene Distanz die Gehgeschwindigkeit überschreitet."
     },
     "SR5": {
         "AP": "DK",
@@ -139,6 +141,12 @@
                     "hint": "Anwenden auf Test des Items",
                     "label": "Anwenden auf Test"
                 },
+                "conditionMode": {
+                    "hint": "Include: the test must match these values; Exclude: the test must not match these values."
+                },
+                "conditionType": {
+                    "hint": "Which part of the test this condition filters on."
+                },
                 "applyTo": {
                     "hint": "Anwenden auf verschiedene Ziele",
                     "label": "Anwenden auf"
@@ -159,27 +167,65 @@
                     "hint": "Nur für Tests mit diesen Attribute",
                     "label": "Attributs-Filter"
                 },
+                "selection_attributes_mode": {
+                    "hint": "Include: only these attributes apply; Exclude: all attributes except these.",
+                    "label": "Attributes Mode"
+                },
                 "selection_categories": {
                     "hint": "Nur für Tests mit diesen Handlungskategorien",
                     "label": "Handlungs-Kategorien Filter"
+                },
+                "selection_categories_mode": {
+                    "hint": "Include: only these categories apply; Exclude: all categories except these.",
+                    "label": "Categories Mode"
                 },
                 "selection_limits": {
                     "hint": "Nur für Tests mit diesen Limits",
                     "label": "Limit-Filter"
                 },
+                "selection_limits_mode": {
+                    "hint": "Include: only these limits apply; Exclude: all limits except these.",
+                    "label": "Limits Mode"
+                },
                 "selection_skills": {
                     "hint": "Nur für Tests mit diesen Fertigkeiten",
                     "label": "Fertigkeits-Filter"
                 },
+                "selection_skills_mode": {
+                    "hint": "Include: only these skills apply; Exclude: all skills except these.",
+                    "label": "Skills Mode"
+                },
                 "selection_tests": {
                     "hint": "Nur für Tests mit diesen Proben",
                     "label": "Proben-Filter"
+                },
+                "selection_tests_mode": {
+                    "hint": "Include: only these test types apply; Exclude: all test types except these.",
+                    "label": "Tests Mode"
                 }
+            },
+            "AddCondition": "Add Condition",
+            "AddTarget": "Add Target",
+            "AtLeastOneTarget": "An effect must keep at least one target.",
+            "FilterTypes": {
+                "Attributes": "Attributes",
+                "Categories": "Action Categories",
+                "Limits": "Limits",
+                "Skills": "Skills",
+                "Tests": "Tests"
             },
             "Modes": {
                 "Modify": "Modifizieren"
             },
-            "New": "Neuer Effekt"
+            "New": "Neuer Effekt",
+            "RemoveCondition": "Remove Condition",
+            "RemoveTarget": "Remove Target",
+            "SelectionModes": {
+                "Exclude": "Exclude",
+                "Include": "Include"
+            },
+            "Target": "Target",
+            "Targets": "Targets"
         },
         "ActiveSkills": "Aktionsfertigkeiten",
         "Actor": {
@@ -983,7 +1029,8 @@
             "Types": {
                 "Mana": "Mana",
                 "Physical": "Physisch"
-            }
+            },
+            "OptionalSelectionCount": "Optionale Kräfte"
         },
         "Cyberware": "Cyberware",
         "CyberwareGrade": "Kategorie",
@@ -2645,7 +2692,9 @@
                 "Water": "Wasser",
                 "Worker": "Insekt: Arbeiter",
                 "Wraith": "Wraith"
-            }
+            },
+            "ForceAppliesSetting": "Kraft wird angewendet auf",
+            "ForceAppliesSettingHint": "Legt fest, welche Geistattribute den Kraftbonus erhalten."
         },
         "Sprite": {
             "FIELDS": {
@@ -2985,7 +3034,8 @@
                 "Force": "Kraft des herbeizurufenden Geistes",
                 "PreparedSpirit": "Nutze einen vorbereiteten Geist-Akteur anstelle eines generisch Erstellten",
                 "ReagentDrams": "Dram aus Reagenzien für das Herbeirufen-Limit",
-                "SpiritType": "Art des herbeizurufenden Geistes"
+                "SpiritType": "Art des herbeizurufenden Geistes",
+                "OptionalPowerCount": "Informativer Zähler für optionale Geistkräfte (Abrunden(Kraft / 3))."
             },
             "Test": {
                 "BuyHits": "Würfelt keine Würfel. Kauft Erfolge mit ⌊Würfelpool / 4⌋.",
@@ -3135,7 +3185,8 @@
             "SkillCantBeDefault": "Auf diese Fertigkeit kann keine Probe abgelegt werden, da sie nicht improvisiert werden kann",
             "SkillSetDefaultTypeOutsideCompendium": "Nur Skillsets im konfigurierten Skillset Kompendium beeinflussen neue Akteure.",
             "SummoningNotConcluded": "Herbeirufung unvollständig. Warte auf Gegenprobe des Geists, um Entzug zu bestimmen.",
-            "TokenSelectionNeeded": "Ein oder mehrere Tokens müssen ausgewählt sein"
+            "TokenSelectionNeeded": "Ein oder mehrere Tokens müssen ausgewählt sein",
+            "NoActorCreatePermission": "Du hast keine Berechtigung, Akteure zu erstellen."
         },
         "Weapon": {
             "AmmoCount": "Munition",
@@ -3339,7 +3390,11 @@
         "Wireless": "WiFi",
         "WirelessOffline": "Offline",
         "WirelessOnline": "Online",
-        "WirelessUnavailable": "Kabel"
+        "WirelessUnavailable": "Kabel",
+        "StatusEffects": {
+            "Running": "Laufen",
+            "Sprinting": "Sprint"
+        }
     },
     "TYPES": {
         "Actor": {

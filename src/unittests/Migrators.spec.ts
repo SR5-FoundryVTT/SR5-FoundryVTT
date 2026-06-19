@@ -5,6 +5,7 @@ import { Migrator } from '@/module/migrator/Migrator';
 import { VersionMigration } from '@/module/migrator/VersionMigration';
 import { Version0_33_1 } from '@/module/migrator/versions/Version0_33_1';
 import { Version0_36_0 } from 'src/module/migrator/versions/Version0_36_0';
+import { Version0_36_1 } from 'src/module/migrator/versions/Version0_36_1';
 
 export const Migrators = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -753,6 +754,70 @@ export const Migrators = (context: QuenchBatchContext) => {
 
             assert.deepEqual(effect.system.selection_attributes, ['body']);
             assert.deepEqual(effect.system.selection_skills, ['automatics']);
+        });
+    });
+
+    describe('Version0_36_1 active effect targets migration', () => {
+        it('migrates applyTo + filterGroups into a target and assigns changes to it', () => {
+            const migrator = new Version0_36_1();
+            const effect: any = {
+                system: {
+                    applyTo: 'test_all',
+                    filterGroups: [{ conditions: [{ type: 'skills', mode: 'include', values: ['automatics'] }] }],
+                    changes: [{ key: 'data.pool', value: '2', type: 'add' }],
+                },
+            };
+
+            assert.isTrue(migrator.handlesActiveEffect(effect));
+            migrator.migrateActiveEffect(effect);
+
+            assert.lengthOf(effect.system.targets, 1);
+            assert.strictEqual(effect.system.targets[0].applyTo, 'test_all');
+            assert.deepEqual(effect.system.targets[0].conditions, [{ type: 'skills', mode: 'include', values: ['automatics'] }]);
+            assert.strictEqual(effect.system.changes[0].target, effect.system.targets[0].id);
+        });
+
+        it('migrates flat selection fields into a single target of conditions', () => {
+            const migrator = new Version0_36_1();
+            const effect: any = {
+                system: {
+                    applyTo: 'test_all',
+                    selection_skills: ['automatics'],
+                    selection_attributes: ['body'],
+                    changes: [{ key: 'data.pool', value: '2', type: 'add' }],
+                },
+            };
+
+            assert.isTrue(migrator.handlesActiveEffect(effect));
+            migrator.migrateActiveEffect(effect);
+
+            assert.lengthOf(effect.system.targets, 1);
+            assert.strictEqual(effect.system.targets[0].applyTo, 'test_all');
+            assert.sameDeepMembers(effect.system.targets[0].conditions, [
+                { type: 'skills', mode: 'include', values: ['automatics'] },
+                { type: 'attributes', mode: 'include', values: ['body'] },
+            ]);
+            assert.strictEqual(effect.system.changes[0].target, effect.system.targets[0].id);
+        });
+
+        it('creates a default actor target for a plain effect and leaves migrated data alone', () => {
+            const migrator = new Version0_36_1();
+            const effect: any = {
+                system: {
+                    applyTo: 'actor',
+                    changes: [{ key: 'system.attributes.body', value: '3', type: 'add' }],
+                },
+            };
+            migrator.migrateActiveEffect(effect);
+
+            assert.lengthOf(effect.system.targets, 1);
+            assert.strictEqual(effect.system.targets[0].applyTo, 'actor');
+            assert.strictEqual(effect.system.changes[0].target, effect.system.targets[0].id);
+
+            // Already-migrated effects are not touched again.
+            const before = foundry.utils.deepClone(effect.system.targets);
+            migrator.migrateActiveEffect(effect);
+            assert.deepEqual(effect.system.targets, before);
         });
     });
 };
