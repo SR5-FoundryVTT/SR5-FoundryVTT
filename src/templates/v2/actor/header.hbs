@@ -10,7 +10,7 @@
             {{#unless isLimited}}
                 {{#if (hasAnyFreshImports actor)}}
                     {{#if @root.isEditMode}}
-                        <button type="button" class="toggle-fresh-import" data-tooltip="SR5.MarkImportsTooltip" data-action="toggleFreshImports">
+                        <button type="button" class="toggle-fresh-import" data-tooltip="SR5.MarkImportsTooltip" data-action="clearFreshImports">
                             <img src="systems/shadowrun5e/dist/icons/checklist-white.svg" width="32px" height="32px" />
                         </button>
                     {{else}}

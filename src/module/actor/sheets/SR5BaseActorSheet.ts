@@ -351,6 +351,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             clearConditionMonitor: SR5BaseActorSheet.#clearConditionMonitor,
             rollConditionMonitor: SR5BaseActorSheet.#rollConditionMonitor,
 
+            clearFreshImports: SR5BaseActorSheet.#clearFreshImports,
             openSituationalModifiers: SR5BaseActorSheet.#openSituationalModifiers
         },
         filters: [{ inputSelector: '#filter-active-skills', contentSelector: '', callback: SR5BaseActorSheet.#handleFilterActiveSkills }],
@@ -2076,18 +2077,24 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     /**
-     * Toggle to isFreshImport property of importFlags for all items on the character sheet
-     *
-     * @param event
+     * Clear the fresh import flag for all owned items on the actor sheet.
      */
-    async _toggleAllFreshImportFlags(event: PointerEvent, onOff: boolean) {
+    static async #clearFreshImports(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        event.stopPropagation();
         if (!(event.target instanceof HTMLElement)) return;
+
         const allItems = this.actor.items;
-        console.debug('Toggling all importFlags on owned items to ->', onOff, event);
-        for (const item of allItems) {
-            if (item.system.importFlags) {
-                await item.update({ system: { importFlags: { isFreshImport: onOff } } });
-            }
+        console.debug(`Shadowrun 5e | Clearing fresh import flags for ${allItems.size} owned items`, event);
+        const updates = allItems
+            .filter(item => item.system.importFlags?.isFreshImport === true)
+            .map(item => ({
+                _id: item.id,
+                system: { importFlags: { isFreshImport: false } }
+            }));
+
+        if (updates.length > 0) {
+            await this.actor.updateEmbeddedDocuments('Item', updates);
         }
     }
 
