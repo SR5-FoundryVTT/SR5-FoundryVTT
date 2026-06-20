@@ -42,7 +42,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
 
         const entity = {
             img: undefined as string | undefined | null,
-            name: IH.translate(IH.getArray(jsonData.translate)[0]?._TEXT ?? jsonData.name._TEXT),
+            name: IH.translate(IH.getArray(jsonData.translate)[0]?._TEXT ?? jsonData.name._TEXT, (jsonData as any).id?._TEXT),
             type: this.parseType as any,
             system: this.getSanitizedSystem(jsonData),
             folder: (await this.getFolder(jsonData, compendiumKey)).id,

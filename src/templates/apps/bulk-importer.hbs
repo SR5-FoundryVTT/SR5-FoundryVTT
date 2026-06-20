@@ -37,10 +37,13 @@
         importDone}}disabled{{/if}}{{/if}} {{#if overrideDocuments}}checked{{/if}} />
       <span>Override previously imported documents in compendiums</span>
     </label>
-    <label class="import-setting">
-      <input type="checkbox" id="useEnglishDefault" {{#if isImporting}}disabled{{else}}{{#if
-        importDone}}disabled{{/if}}{{/if}} {{#if useEnglishDefault}}checked{{/if}} />
-      <span>Use English default instead of system language</span>
+    <label class="import-setting-select" style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+      <span>Translation Language:</span>
+      <select id="selectedLanguage" {{#if isImporting}}disabled{{else}}{{#if importDone}}disabled{{/if}}{{/if}}>
+        {{#each languages as |lang|}}
+          <option value="{{lang.value}}" {{#if lang.selected}}selected{{/if}}>{{lang.label}}</option>
+        {{/each}}
+      </select>
     </label>
   </fieldset>
 

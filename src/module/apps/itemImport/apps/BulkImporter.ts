@@ -101,12 +101,21 @@ export class BulkImporter extends BaseClass {
         branch: "0c354ec2b81da5ccd2c93648f93ec8f6831c030e",
     } as const;
 
+    static readonly SUPPORTED_LANGUAGES = [
+        { value: "en-us.xml", label: "English" },
+        { value: "de-de.xml", label: "Deutsch (German)" },
+        { value: "fr-fr.xml", label: "Français (French)" },
+        { value: "pt-br.xml", label: "Português (Portuguese)" },
+        { value: "ja-jp.xml", label: "日本語 (Japanese)" },
+        { value: "zh-cn.xml", label: "简体中文 (Chinese)" }
+    ] as const;
+
     /**
      * UI and import behavior flags.
      */
     private static overrideDocuments = true;
     private static deleteCompendiums = false;
-    private static useEnglishDefault = false;
+    private static selectedLanguage = "";
     private static isImporting = false;
     private static importDone = false;
     private static zipFile: File | null = null;
@@ -153,6 +162,28 @@ export class BulkImporter extends BaseClass {
         // Destructure GitHub config for cleaner access
         const { owner, repo, branch, version } = BulkImporter.githubConfig;
 
+        if (!BulkImporter.selectedLanguage) {
+            const locale = game.i18n.lang.toLowerCase();
+            if (locale === "de" || locale.startsWith("de-")) {
+                BulkImporter.selectedLanguage = "de-de.xml";
+            } else if (locale === "fr" || locale.startsWith("fr-")) {
+                BulkImporter.selectedLanguage = "fr-fr.xml";
+            } else if (locale === "pt" || locale.startsWith("pt-")) {
+                BulkImporter.selectedLanguage = "pt-br.xml";
+            } else if (locale === "ja" || locale.startsWith("ja-")) {
+                BulkImporter.selectedLanguage = "ja-jp.xml";
+            } else if (locale === "zh" || locale.startsWith("zh-")) {
+                BulkImporter.selectedLanguage = "zh-cn.xml";
+            } else {
+                BulkImporter.selectedLanguage = "en-us.xml";
+            }
+        }
+
+        const languages = BulkImporter.SUPPORTED_LANGUAGES.map(lang => ({
+            ...lang,
+            selected: lang.value === BulkImporter.selectedLanguage
+        }));
+
         return {
             ...baseContext,
 
@@ -166,7 +197,7 @@ export class BulkImporter extends BaseClass {
             zipFileName: BulkImporter.zipFile?.name,
             deleteCompendiums: BulkImporter.deleteCompendiums,
             overrideDocuments: BulkImporter.overrideDocuments,
-            useEnglishDefault: BulkImporter.useEnglishDefault,
+            languages,
 
             // GitHub version info
             info: {
@@ -235,110 +266,96 @@ export class BulkImporter extends BaseClass {
         // Load ZIP file if provided
         const ZIP = BulkImporter.zipFile ? await (new JSZip()).loadAsync(BulkImporter.zipFile) : null;
 
-        // Load localization file based on Foundry locale
-        const locale = game.i18n.lang;
-        const normLocale = locale.toLowerCase();
-        let langFile = "en-us.xml";
-        if (!BulkImporter.useEnglishDefault) {
-            if (normLocale === "de" || normLocale.startsWith("de-")) {
-                langFile = "de-de.xml";
-            } else if (normLocale === "fr" || normLocale.startsWith("fr-")) {
-                langFile = "fr-fr.xml";
-            } else if (normLocale === "pt" || normLocale.startsWith("pt-")) {
-                langFile = "pt-br.xml";
-            } else if (normLocale === "ru" || normLocale.startsWith("ru-")) {
-                langFile = "ru-ru.xml";
-            } else if (normLocale === "pl" || normLocale.startsWith("pl-")) {
-                langFile = "pl-pl.xml";
-            } else if (normLocale === "zh" || normLocale.startsWith("zh-")) {
-                langFile = "zh-cn.xml";
-            } else if (normLocale === "it" || normLocale.startsWith("it-")) {
-                langFile = "it-it.xml";
-            } else if (normLocale === "es" || normLocale.startsWith("es-")) {
-                langFile = "es-es.xml";
-            }
-        }
+        ImportHelper.translationMap = { global: {}, files: {}, ids: {} };
 
-        let langXml: string | undefined;
-        if (ZIP) {
-            langXml = await ZIP.file(`lang/${langFile}`)?.async("string")
-                   ?? await ZIP.file(`Chummer/lang/${langFile}`)?.async("string");
-        }
-        if (!langXml) {
+        if (!ZIP) {
+            const langFile = BulkImporter.selectedLanguage || "en-us.xml";
+
+            let langXml: string | undefined;
             try {
                 langXml = await BulkImporter.fetchGitHubFile(`Chummer/lang/${langFile}`);
             } catch (e) {
                 console.error(`Failed to fetch language file ${langFile} from GitHub:`, e);
             }
-        }
 
-        ImportHelper.translationMap = {};
-
-        if (langXml) {
-            try {
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(langXml, "text/xml");
-                const stringNodes = xmlDoc.getElementsByTagName("string");
-                for (const node of stringNodes) {
-                    const key = node.getElementsByTagName("key")[0]?.textContent;
-                    const text = node.getElementsByTagName("text")[0]?.textContent;
-                    if (key && text) {
-                        ImportHelper.translationMap[key] = text;
+            if (langXml) {
+                try {
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(langXml, "text/xml");
+                    const stringNodes = xmlDoc.getElementsByTagName("string");
+                    for (const node of stringNodes) {
+                        const key = node.getElementsByTagName("key")[0]?.textContent;
+                        const text = node.getElementsByTagName("text")[0]?.textContent;
+                        if (key && text) {
+                            ImportHelper.translationMap.global[key] = text;
+                        }
                     }
+                    console.log(`Loaded ${Object.keys(ImportHelper.translationMap.global).length} translations from Chummer ${langFile}`);
+                } catch (e) {
+                    console.error(`Failed to parse language XML:`, e);
                 }
-                console.log(`Loaded ${Object.keys(ImportHelper.translationMap).length} translations from Chummer ${langFile}`);
-            } catch (e) {
-                console.error(`Failed to parse language XML:`, e);
             }
-        }
 
-        const dataLangFile = langFile.replace(".xml", "_data.xml");
-        let dataLangXml: string | undefined;
-        if (ZIP) {
-            dataLangXml = await ZIP.file(`lang/${dataLangFile}`)?.async("string")
-                       ?? await ZIP.file(`Chummer/lang/${dataLangFile}`)?.async("string");
-        }
-        if (!dataLangXml) {
+            const dataLangFile = langFile.replace(".xml", "_data.xml");
+            let dataLangXml: string | undefined;
             try {
                 dataLangXml = await BulkImporter.fetchGitHubFile(`Chummer/lang/${dataLangFile}`);
             } catch (e) {
                 console.debug(`No data language file ${dataLangFile} found on GitHub or it failed to fetch:`, e);
             }
-        }
 
-        if (dataLangXml) {
-            try {
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(dataLangXml, "text/xml");
-                const nameNodes = xmlDoc.getElementsByTagName("name");
-                let dataKeysCount = 0;
-                for (const nameNode of nameNodes) {
-                    const parent = nameNode.parentElement;
-                    if (parent) {
-                        const translateNode = parent.getElementsByTagName("translate")[0];
-                        if (translateNode) {
-                            const key = nameNode.textContent?.trim();
-                            const text = translateNode.textContent?.trim();
-                            if (key && text) {
-                                ImportHelper.translationMap[key] = text;
+            if (dataLangXml) {
+                try {
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(dataLangXml, "text/xml");
+                    const chummerSections = xmlDoc.getElementsByTagName("chummer");
+                    let dataKeysCount = 0;
+
+                    for (const section of chummerSections) {
+                        const fileName = section.getAttribute("file");
+                        if (!fileName) continue;
+
+                        ImportHelper.translationMap.files[fileName] ??= {};
+
+                        // Find all <name> tags inside this section
+                        const nameNodes = section.getElementsByTagName("name");
+                        for (const nameNode of nameNodes) {
+                            const parent = nameNode.parentElement;
+                            if (parent) {
+                                const translateNode = parent.getElementsByTagName("translate")[0];
+                                if (translateNode) {
+                                    const key = nameNode.textContent?.trim();
+                                    const text = translateNode.textContent?.trim();
+                                    if (key && text) {
+                                        ImportHelper.translationMap.files[fileName][key] = text;
+                                        const idNode = parent.getElementsByTagName("id")[0];
+                                        const id = idNode?.textContent?.trim();
+                                        if (id) {
+                                            ImportHelper.translationMap.ids[id] = text;
+                                        }
+                                        dataKeysCount++;
+                                    }
+                                }
+                            }
+                        }
+
+                        // Populate categoryMap for this file
+                        const fileKey = fileName.replace(".xml", "") as any;
+                        const categoryNodes = section.getElementsByTagName("category");
+                        for (const node of categoryNodes) {
+                            const translateAttr = node.getAttribute("translate");
+                            const key = node.textContent?.trim();
+                            if (key && translateAttr) {
+                                ImportHelper.categoryMap[fileKey] ??= {};
+                                ImportHelper.categoryMap[fileKey][key] = translateAttr;
                                 dataKeysCount++;
                             }
                         }
                     }
+                    console.log(`Loaded ${dataKeysCount} additional data translations from ${dataLangFile}`);
+                } catch (e) {
+                    console.error(`Failed to parse data language XML:`, e);
                 }
-
-                const categoryNodes = xmlDoc.getElementsByTagName("category");
-                for (const node of categoryNodes) {
-                    const translateAttr = node.getAttribute("translate");
-                    const key = node.textContent?.trim();
-                    if (key && translateAttr) {
-                        ImportHelper.translationMap[key] = translateAttr;
-                        dataKeysCount++;
-                    }
-                }
-                console.log(`Loaded ${dataKeysCount} additional data translations from ${dataLangFile}`);
-            } catch (e) {
-                console.error(`Failed to parse data language XML:`, e);
             }
         }
 
@@ -366,7 +383,9 @@ export class BulkImporter extends BaseClass {
                     if (file === undefined)
                         throw new Error(`File ${fileName} not found`);
 
+                    ImportHelper.currentFile = fileName;
                     await importer.parse(file);
+                    ImportHelper.currentFile = null;
 
                     const duration = performance.now() - fetchStart;
                     console.debug(`Importing ${fileName} took ${duration.toFixed(2)} ms`);
@@ -403,7 +422,8 @@ export class BulkImporter extends BaseClass {
         ImportHelper.categoryMap = {};
         ImportHelper.nameToId = {};
         ImportHelper.idToName = {};
-        ImportHelper.translationMap = {};
+        ImportHelper.translationMap = { global: {}, files: {}, ids: {} };
+        ImportHelper.currentFile = null;
 
         console.debug(`Bulk import time: ${(performance.now() - start).toFixed(2)} ms`);
     }
@@ -431,10 +451,10 @@ export class BulkImporter extends BaseClass {
             BulkImporter.overrideDocuments = (event.currentTarget as HTMLInputElement).checked;
         });
 
-        // Checkbox: Use English default
-        const useEnglishDefault = this.element.querySelector<HTMLSelectElement>("#useEnglishDefault");
-        useEnglishDefault?.addEventListener("change", (event) => {
-            BulkImporter.useEnglishDefault = (event.currentTarget as HTMLInputElement).checked;
+        // Select: selectedLanguage
+        const selectedLanguage = this.element.querySelector<HTMLSelectElement>("#selectedLanguage");
+        selectedLanguage?.addEventListener("change", (event) => {
+            BulkImporter.selectedLanguage = (event.currentTarget as HTMLSelectElement).value;
         });
 
         // File input: Load ZIP file

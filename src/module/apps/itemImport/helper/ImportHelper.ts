@@ -16,11 +16,26 @@ export class ImportHelper {
     static categoryMap: Partial<Record<ChummerFile, Record<string, string>>> = {};
     static nameToId: Partial<Record<CompendiumKey, Record<string, string>>> = {};
     static idToName: Partial<Record<CompendiumKey, Record<string, string>>> = {};
-    static translationMap: Record<string, string> = {};
+    static translationMap: {
+        global: Record<string, string>;
+        files: Record<string, Record<string, string>>;
+        ids: Record<string, string>;
+    } = {
+        global: {},
+        files: {},
+        ids: {}
+    };
+    static currentFile: string | null = null;
 
-    public static translate(text: string | null | undefined): string {
+    public static translate(text: string | null | undefined, id?: string | null): string {
+        if (id && this.translationMap.ids[id]) {
+            return this.translationMap.ids[id];
+        }
         if (!text) return "";
-        return this.translationMap[text] ?? text;
+        if (this.currentFile && this.translationMap.files[this.currentFile]?.[text]) {
+            return this.translationMap.files[this.currentFile][text];
+        }
+        return this.translationMap.global[text] ?? text;
     }
 
 
