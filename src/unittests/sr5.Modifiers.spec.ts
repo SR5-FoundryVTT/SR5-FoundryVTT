@@ -277,8 +277,7 @@ export const shadowrunRulesModifiers = (context: QuenchBatchContext) => {
                 await matchingItem.createEmbeddedDocuments('ActiveEffect', [{
                     name: 'Scoped Low Light Vision',
                     system: {
-                        targets: [{ id: 'm', applyTo: 'modifier' }],
-                        onlyForItemTest: true,
+                        targets: [{ id: 'm', applyTo: 'modifier', onlyForItemTest: true }],
                         changes: [{ key: 'environmental.low_light_vision', value: '1', type: 'custom', target: 'm' }]
                     },
                 }]);

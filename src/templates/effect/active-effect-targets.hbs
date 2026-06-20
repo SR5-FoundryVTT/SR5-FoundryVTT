@@ -24,8 +24,13 @@
         {{#ife target.applyTo "test_all"}}
             {{> "systems/shadowrun5e/dist/templates/effect/active-effect-target-conditions.hbs" target=target ti=ti}}
         {{/ife}}
-        {{#ife target.applyTo "test_item"}}
-            {{> "systems/shadowrun5e/dist/templates/effect/active-effect-target-conditions.hbs" target=target ti=ti}}
+        {{#ife target.applyTo "modifier"}}
+            {{formGroup (lookup @root.systemFields.targets.element.fields "onlyForItemTest")
+                name=(concat "system.targets." ti ".onlyForItemTest")
+                value=target.onlyForItemTest
+                label=(localize "SR5.ActiveEffect.FIELDS.onlyForItemTest.label")
+                hint=(localize "SR5.ActiveEffect.FIELDS.onlyForItemTest.hint")
+                rootId=@root.rootId}}
         {{/ife}}
     </fieldset>
   {{/each}}

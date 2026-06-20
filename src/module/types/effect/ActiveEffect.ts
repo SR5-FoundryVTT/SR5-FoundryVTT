@@ -13,13 +13,13 @@ const TargetData = () => ({
     id:         new StringField({ required: true, blank: false, initial: () => foundry.utils.randomID() }),
     applyTo:    new StringField({ required: true, initial: 'actor', choices: SR5.effectApplyTo }),
     conditions: new ArrayField(new SchemaField(FilterConditionData())),
+    onlyForItemTest: new BooleanField(),
 });
 
 const ActiveEffectData = (baseChanges: foundry.data.ActiveEffectTypeDataModel.ChangeSchema) => ({
     appliedByTest:   new BooleanField(),
     onlyForEquipped: new BooleanField(),
     onlyForWireless: new BooleanField(),
-    onlyForItemTest: new BooleanField(),
     targets: new ArrayField(new SchemaField(TargetData())),
     changes: new ArrayField(new SchemaField({
         // SchemaField owns its children, so spreading baseChanges would reuse already-parented fields.

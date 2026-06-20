@@ -7,11 +7,9 @@
 {{#if item.system.onlyForWireless}}
     <label>{{localize "SR5.ActiveEffect.FIELDS.onlyForWireless.label"}}</label>
 {{/if}}
-{{#if item.system.onlyForItemTest}}
-    <label>{{localize "SR5.ActiveEffect.FIELDS.onlyForItemTest.label"}}</label>
-{{/if}}
 {{#each item.system.targets as |target ti|}}
     <label>{{localize "SR5.ActiveEffect.Target"}} {{sum ti 1}}:&nbsp;{{localizeOb target.applyTo @root.config.effectApplyTo}}
+        {{#if target.onlyForItemTest}} — {{localize "SR5.ActiveEffect.FIELDS.onlyForItemTest.label"}}{{/if}}
         {{#each target.conditions as |condition ci|}}
             — {{localizeOb condition.type @root.config.effectFilterTypes}}
             ({{localizeOb condition.mode @root.config.effectSelectionModes}})

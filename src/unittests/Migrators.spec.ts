@@ -5,7 +5,7 @@ import { Migrator } from '@/module/migrator/Migrator';
 import { VersionMigration } from '@/module/migrator/VersionMigration';
 import { Version0_33_1 } from '@/module/migrator/versions/Version0_33_1';
 import { Version0_36_0 } from 'src/module/migrator/versions/Version0_36_0';
-import { Version0_36_1 } from 'src/module/migrator/versions/Version0_36_1';
+import { Version0_37_0 } from 'src/module/migrator/versions/Version0_37_0';
 
 export const Migrators = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -806,9 +806,9 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
     });
 
-    describe('Version0_36_1 active effect targets migration', () => {
+    describe('Version0_37_0 active effect targets migration', () => {
         it('migrates applyTo + filterGroups into a target and assigns changes to it', () => {
-            const migrator = new Version0_36_1();
+            const migrator = new Version0_37_0();
             const effect: any = {
                 system: {
                     applyTo: 'test_all',
@@ -827,7 +827,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
 
         it('migrates flat selection fields into a single target of conditions', () => {
-            const migrator = new Version0_36_1();
+            const migrator = new Version0_37_0();
             const effect: any = {
                 system: {
                     applyTo: 'test_all',
@@ -849,8 +849,25 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(effect.system.changes[0].target, effect.system.targets[0].id);
         });
 
+        it('folds the effect-level onlyForItemTest onto a modifier target', () => {
+            const migrator = new Version0_37_0();
+            const effect: any = {
+                system: {
+                    applyTo: 'modifier',
+                    onlyForItemTest: true,
+                    changes: [{ key: 'environmental.low_light_vision', value: '1', type: 'custom' }],
+                },
+            };
+            migrator.migrateActiveEffect(effect);
+
+            assert.lengthOf(effect.system.targets, 1);
+            assert.strictEqual(effect.system.targets[0].applyTo, 'modifier');
+            assert.isTrue(effect.system.targets[0].onlyForItemTest);
+            assert.notProperty(effect.system, 'onlyForItemTest');
+        });
+
         it('creates a default actor target for a plain effect and leaves migrated data alone', () => {
-            const migrator = new Version0_36_1();
+            const migrator = new Version0_37_0();
             const effect: any = {
                 system: {
                     applyTo: 'actor',

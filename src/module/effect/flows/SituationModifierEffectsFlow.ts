@@ -39,11 +39,13 @@ export class SituationModifierEffectsFlow<T extends SituationModifier> {
         const changes: (ActiveEffect.ChangeData & { effect: SR5ActiveEffect; priority: number })[] = [];
         for (const effect of this.allApplicableEffects()) {
             if (!effect.active) continue;
-            // Special case for modifier effects: Some only apply to tests of their parent item.
-            if (effect.system.onlyForItemTest && (test === undefined || effect.parent !== test?.item)) continue;
 
-            // Only apply changes assigned to a 'modifier' target.
-            const effectChanges = effect.changesForApplyTo('modifier');
+            // Only apply changes assigned to a 'modifier' target. A target may opt to only apply
+            // to tests of its parent item via its onlyForItemTest flag.
+            const effectChanges = effect.changesForApplyTo('modifier').filter(change => {
+                const target = effect.targetForChange(change);
+                return !(target?.onlyForItemTest && (test === undefined || effect.parent !== test?.item));
+            });
             changes.push(...effectChanges.map(change => {
                 const c = foundry.utils.deepClone<typeof changes[number]>(change as any);
                 c.effect = effect;
