@@ -5,7 +5,7 @@
     </label>
     <label data-tooltip="SR5.Weapon.Range.Modes">
         <i class="far fa-gun"></i>
-        {{#if item.system.range.modes.single_shot}}{{localize "SR5.Weapon.Mode.SingleShot"}}{{#if (or item.system.range.modes.semi_auto item.system.range.modes.burst_fire item.system.range.modes.full_auto)}}/{{/if}}{{/if}}{{#if item.system.range.modes.semi_auto}}{{localize "SR5.Weapon.Mode.SemiAuto"}}{{#if (or item.system.range.modes.burst_fire item.system.range.modes.full_auto)}}/{{/if}}{{/if}}{{#if item.system.range.modes.burst_fire}}{{localize "SR5.Weapon.Mode.BurstFire"}}{{#if item.system.range.modes.full_auto}}/{{/if}}{{/if}}{{#if item.system.range.modes.full_auto}}{{localize "SR5.Weapon.Mode.FullAuto"}}{{/if}}
+        {{#if item.system.range.modes.single_shot}}{{localize "SR5.Weapon.Mode.Short.SingleShot"}}{{#if (or item.system.range.modes.semi_auto item.system.range.modes.burst_fire item.system.range.modes.full_auto)}}/{{/if}}{{/if}}{{#if item.system.range.modes.semi_auto}}{{localize "SR5.Weapon.Mode.Short.SemiAuto"}}{{#if (or item.system.range.modes.burst_fire item.system.range.modes.full_auto)}}/{{/if}}{{/if}}{{#if item.system.range.modes.burst_fire}}{{localize "SR5.Weapon.Mode.Short.BurstFire"}}{{#if item.system.range.modes.full_auto}}/{{/if}}{{/if}}{{#if item.system.range.modes.full_auto}}{{localize "SR5.Weapon.Mode.Short.FullAuto"}}{{/if}}
     </label>
     <label>
         {{localize "SR5.RecoilCompensation"}}&nbsp;{{item.system.range.rc.value}}

@@ -4,6 +4,7 @@ import { Helpers } from '@/module/helpers';
 
 interface SpiritActorSheetData extends SR5ActorSheetData {
     summoner?: Actor.Implementation;
+    hasLanguageKnowledgeSkills?: boolean;
 }
 
 export class SR5SpiritActorSheet extends SR5BaseActorSheet<SpiritActorSheetData> {
@@ -72,7 +73,7 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet<SpiritActorSheetData>
         skills: {
             template: SheetFlow.templateBase('actor/tabs/spirit-skills'),
             templates: [
-                ...SheetFlow.templateActorSystemParts('active-skills', 'attributes'),
+                ...SheetFlow.templateActorSystemParts('active-skills', 'language-and-knowledge-skills', 'attributes'),
                 ...SheetFlow.templateListItem('skill')
             ],
             scrollable: ['.scrollable']
@@ -109,6 +110,27 @@ export class SR5SpiritActorSheet extends SR5BaseActorSheet<SpiritActorSheetData>
         data.isSpirit = true;
 
         return data;
+    }
+
+    override async _preparePartContext(
+        ...[partId, context, options]: Parameters<SR5BaseActorSheet["_preparePartContext"]>
+    ) {
+        const partContext = await super._preparePartContext(partId, context, options) as SpiritActorSheetData;
+
+        if (partId === 'skills') {
+            // initialize the check by seeing if we have language skills to skill over the other check
+            partContext.hasLanguageKnowledgeSkills = Object.keys(this.actor.system.skills.language).length > 0;
+            if (!partContext.hasLanguageKnowledgeSkills) {
+                // iterate over the knowledge skill object and check if we have anything
+                for (const knowledgeType of Object.values(this.actor.system.skills.knowledge)) {
+                    if (Object.keys(knowledgeType).length > 0) {
+                        partContext.hasLanguageKnowledgeSkills = true;
+                    }
+                }
+            }
+        }
+
+        return partContext;
     }
 
     protected override _prepareTabs(group: string) {

@@ -1,0 +1,33 @@
+import { DataImporter } from './DataImporter';
+import { WareModParser } from '../parser/mod/WareModParser';
+import { ImportHelper as IH } from '../helper/ImportHelper';
+import { Bioware, BiowareSchema } from '../schema/BiowareSchema';
+import { Cyberware, CyberwareSchema } from '../schema/CyberwareSchema';
+import { UpdateActionFlow } from '../../../item/flows/UpdateActionFlow';
+type WareTypes = Bioware | Cyberware;
+
+export class WareModImporter extends DataImporter {
+    public readonly files = ['bioware.xml', 'cyberware.xml'] as const;
+
+    async _parse(jsonObject: BiowareSchema | CyberwareSchema): Promise<void> {
+        const key = 'biowares' in jsonObject ? 'bioware' : 'cyberware';
+
+        IH.setTranslatedCategory(key, jsonObject.categories.category);
+
+        const jsonDatas = 'biowares' in jsonObject ? jsonObject.biowares.bioware
+                                                   : jsonObject.cyberwares.cyberware;
+
+        return WareModImporter.ParseItems<WareTypes>(
+            jsonDatas,
+            {
+                compendiumKey: () => "Ware_Mod",
+                parser: new WareModParser(key, jsonObject.categories.category),
+                filter: ware => 'requireparent' in ware || ware.required?.parentdetails != null || ware.capacity._TEXT.includes('['),
+                injectActionTests: item => {
+                    UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
+                },
+                documentType: `${key.capitalize()}`
+            }
+        );
+    }
+}

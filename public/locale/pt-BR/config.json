@@ -106,12 +106,15 @@
             "SpellRitual": "Magia Ritual",
             "Summoning": "Ações de Invocação"
         },
-        "ActionType": "Tipo",
-        "ActionTypeComplex": "Complexa",
-        "ActionTypeFree": "Livre",
-        "ActionTypeNone": "Nenhuma",
-        "ActionTypeSimple": "Simples",
-        "ActionTypeVaries": "Variada",
+        "ActionType": {
+            "Label": "Tipo",
+            "Complex": "Complexa",
+            "Free": "Livre",
+            "Interrupt": "Interrupt",
+            "None": "Nenhuma",
+            "Simple": "Simples",
+            "Varies": "Variada"
+        },
         "Actions": "Ações",
         "Active": "Ativo",
         "ActiveDefense": "Defesa Ativa",
@@ -440,7 +443,8 @@
         "DeviceType": "Tipo",
         "Dialogs": {
             "Common": {
-                "Cancel": "Cancelar"
+                "Cancel": "Cancelar",
+                "Ok": "OK"
             },
             "RangedWeaponTest": {
                 "EnvironmentalOverwriteSet": "Os modificadores ambientais foram definidos manualmente para um valor fixo!"
@@ -623,6 +627,9 @@
             },
             "Spirit": {
                 "SpiritTypeNotFound": "O tipo de espírito não foi encontrado. Por favor, abra uma questão no github com seu json de exportação chummer."
+            },
+            "Sprite": {
+                "SpriteTypeNotFound": "O tipo de sprite não foi encontrado. Por favor, abra uma questão no github com seu json de exportação chummer."
             }
         },
         "ImportCharacter": "Importar Personagem",
@@ -641,10 +648,12 @@
         "InitCatMeatspace": "Espaço Real",
         "Initiation": "Iniciação",
         "Initiative": "Iniciativa",
+        "InitiativeMod": "Modificador de Iniciativa",
         "Internal": "Interno",
         "IsCritter": "Criatura",
         "IsFreshImport": "Este item foi importado do Chummer e precisa de revisão manual.",
         "IsGrunt": "Soldado",
+        "IsGruntHint": "Usa as regras de monitor de condição para soldados (SR5 p.378).",
         "IsNPC": "NPC",
         "Item": {
             "FIELDS": {
@@ -654,6 +663,10 @@
                             "hint": "If this damage is considered a normal (non-magical) weapon attack",
                             "label": "Normal Weapon"
                         }
+                    },
+                    "initiative_mod": {
+                        "hint": "Modificador de iniciativa aplicado ao realizar esta ação",
+                        "label": "Modificador de Iniciativa"
                     }
                 }
             }
@@ -758,6 +771,7 @@
                 "ClearNetwork": "Limpar rede de todos os dispositivos",
                 "ItemEffects": "Efeitos do Item",
                 "MissingNetworkDevices": "Arraste e solte um dispositivo para adicioná-lo",
+                "RemoveImprovisedDevices": "Remover dispositivos improvisados",
                 "NetworkDevices": "Dispositivos em Rede",
                 "PAN": "RAP",
                 "SubtractOne": "Subtrair Um",
@@ -814,6 +828,8 @@
         },
         "Magic": "Magia",
         "Manual": "Manual",
+        "ManualModifier": "Modificador manual",
+        "ManualModifierValue": "Valor do modificador manual",
         "ManualOverride": "Substituição de Resultado",
         "MarkImportedItemReviewed": "Marcar Item Importado Como Revisado",
         "MarkImportedItemTooltip": "Marca este item importado como tendo sido revisado.",
@@ -824,6 +840,9 @@
         "MatrixAttrDataProc": "Datagrama",
         "MatrixAttrFirewall": "Firewall",
         "MatrixAttrSleaze": "Subversão",
+        "MatrixOpposedDeviceDialog": {
+            "Title": "Criar Dispositivo de Matriz"
+        },
         "MatrixTarget": "Alvo da Matriz",
         "MeleeWeaponAttack": "Ataque com Arma Corpo-a-corpo",
         "MentalLimit": "Limite Mental",
@@ -859,6 +878,9 @@
         "ModificationCategories": "Categorias de Modificação",
         "ModificationCategory": "Categoria de Modificação",
         "ModificationSlots": "Espaços de Modificação",
+        "ModificationTypes": {
+            "Ware": "Implante"
+        },
         "Modified": "Modificado",
         "ModifiedArmor": "Armadura Mod.",
         "ModifiedDamage": "Dano Mod.",
@@ -1183,6 +1205,12 @@
         "Spirit": {
             "Bound": "Vinculado",
             "Force": "Força",
+            "HalfValueSkill": "Perícia em Meio Valor",
+            "HalfValueSkillHint": "Perícias ativas ligadas usam ⌈Força/2⌉.",
+            "InitiativeFormulaAstral": "Fórmula de Iniciativa Astral",
+            "InitiativeFormulaAstralHint": "Escolha os termos da iniciativa astral.",
+            "InitiativeFormulaMeatspace": "Fórmula de Iniciativa no Espaço Real",
+            "InitiativeFormulaMeatspaceHint": "Escolha os termos da iniciativa no espaço real.",
             "MissingSummoner": "Sem invocador ativo",
             "Services": "Serviços",
             "Summoner": "Invocador",
@@ -1275,6 +1303,7 @@
         },
         "Sprite": {
             "Level": "Nível",
+            "LevelAppliesSettingHint": "Controla quais atributos de sprite recebem o bônus de Nível.",
             "MissingTechnomancer": "Sem tecnomante ativo",
             "Registered": "Registrada",
             "Services": "Serviços",
@@ -1354,6 +1383,7 @@
             "NaturalRecoveryPhysicalTest": "Recuperação Natural Física",
             "NaturalRecoveryStunTest": "Recuperação Natural de Atordoamento",
             "OpposedCompileSpriteTest": "Opor à Compilação",
+            "OpposedMatrixTest": "Teste Oposto de Matriz",
             "OpposedRitualTest": "Selar o Ritual",
             "OpposedSummonSpiritTest": "Opor à Invocação",
             "OpposedTest": "Teste Oposto",
@@ -1639,18 +1669,32 @@
             "FullReload": "Carregado",
             "Mod": "Mod",
             "Mode": {
-                "BurstFire": "RJ",
-                "BurstFireLong": "RL",
-                "BurstFireShort": "RJ",
-                "FullAuto": "RC",
-                "FullAutoLong": "EC",
-                "FullAutoShort": "Auto Completo",
-                "Modes": "Modos",
-                "SemiAuto": "SA",
-                "SemiAutoBurst": "RS",
-                "SemiAutoShort": "SA",
-                "SingleShot": "TS",
-                "SingleShotShort": "TS"
+                "Mode": "Modos",
+                "Short": {
+                    "BurstFire": "RJ",
+                    "BurstFireLong": "RL",
+                    "BurstFireShort": "RJ",
+                    "FullAuto": "RC",
+                    "FullAutoLong": "EC",
+                    "FullAutoShort": "Auto Completo",
+                    "SemiAuto": "SA",
+                    "SemiAutoBurst": "RS",
+                    "SemiAutoShort": "SA",
+                    "SingleShot": "TS",
+                    "SingleShotShort": "TS"
+                },
+                "Full": {
+                    "BurstFire": "Rajada",
+                    "BurstFireLong": "Rajada Longa",
+                    "FullAuto": "Automático",
+                    "FullAutoLong": "Automático (Complexa)",
+                    "FullAutoShort": "Automático (Simples)",
+                    "SemiAuto": "Semiautomático",
+                    "SemiAutoBurst": "Rajada Semiautomática",
+                    "SemiAutoShort": "Semiautomático",
+                    "SingleShot": "Tiro Único",
+                    "Suppressing": "Fogo de Supressão"
+                }
             },
             "Mods": "Mods",
             "PartialReload": "Parcial",
@@ -1701,7 +1745,7 @@
         },
         "Tabs": {
             "Item": {
-                "ArmorMods": "Mods de Armadura"
+                "Mods": "Mods"
             }
         },
         "Wireless": "Conexão Sem Fio"

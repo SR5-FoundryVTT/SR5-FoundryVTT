@@ -2,22 +2,32 @@
     <div class="fill-container">
         <div class="attributes">
             {{#each config.matrixAttributes as |label key|}}
-                {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/matrix-attribute.hbs"
+                {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/matrix-attribute-sprite.hbs"
                         matrixAtt=(lookup ../system.matrix key)
                         attributeField=(objValue @root.systemFields.matrix.fields key)
                         label=label
                         key=key
+                        rootId=@root.rootId
                         matrixAttributes=../config/matrixAttributes
                 }}
             {{/each}}
             {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/attribute.hbs"
                     attributeId='resonance'
                     attribute=system.attributes.resonance
+                    attributeField=@root.systemFields.attributes.fields.resonance
+                    rootId=@root.rootId
             }}
         </div>
 
-        <div class="full-container">
-            {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/active-skills.hbs' }}
+        <div class="split-container">
+            <div>
+                {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/active-skills.hbs' }}
+            </div>
+            {{#if hasLanguageKnowledgeSkills}}
+                <div>
+                    {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/language-and-knowledge-skills.hbs' }}
+                </div>
+            {{/if}}
         </div>
     </div>
 </section>

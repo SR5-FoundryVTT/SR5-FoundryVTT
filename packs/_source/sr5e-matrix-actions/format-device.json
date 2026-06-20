@@ -64,7 +64,7 @@
       },
       "opposed": {
         "type": "custom",
-        "test": "OpposedTest",
+        "test": "OpposedMatrixTest",
         "attribute": "willpower",
         "attribute2": "firewall",
         "skill": "",

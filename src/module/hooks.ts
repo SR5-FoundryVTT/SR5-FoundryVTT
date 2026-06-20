@@ -19,6 +19,7 @@ import { HandlebarManager } from './handlebars/HandlebarManager';
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
 import { ActorImporter } from './apps/itemImport/apps/ActorImporter';
 import { BulkImporter } from './apps/itemImport/apps/BulkImporter';
+import { CharacterImporter } from './apps/actorImport/characterImporter/CharacterImporter';
 import { ChangelogApplication } from "./apps/ChangelogApplication";
 import { SituationModifiersApplication } from './apps/SituationModifiersApplication';
 import { SR5ICActorSheet } from "./actor/sheets/SR5ICActorSheet";
@@ -135,6 +136,7 @@ import { CompendiumBrowser } from './apps/compendiumBrowser/CompendiumBrowser';
 import { Skill } from './types/item/Skill';
 import { SR5SkillSheet } from './item/sheets/SR5SkillSheet';
 import { SkillGroupFlow } from './actor/flows/SkillGroupFlow';
+import { OpposedMatrixTest } from './tests/OpposedMatrixTest';
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -280,7 +282,8 @@ ___________________
                 MatrixResistTest,
                 BiofeedbackResistTest,
                 CheckOverwatchScoreTest,
-                OpposedCheckOverwatchScoreTest
+                OpposedCheckOverwatchScoreTest,
+                OpposedMatrixTest
             },
             /**
              * Subset of tests meant to be used as the main, active test.
@@ -331,7 +334,8 @@ ___________________
                 OpposedRitualTest,
                 OpposedBruteForceTest,
                 OpposedHackOnTheFlyTest,
-                OpposedCheckOverwatchScoreTest
+                OpposedCheckOverwatchScoreTest,
+                OpposedMatrixTest
             },
             /**
              * Subset of tests meant to be used as resist tests.
@@ -361,7 +365,13 @@ ___________________
             /**
              * The global data storage for the system.
              */
-            storage: SRStorage
+            storage: SRStorage,
+
+
+            /**
+             *The Character Importer for the SR5 system.
+             */
+            CharacterImporter
         };
 
         // Register document classes
@@ -393,7 +403,7 @@ ___________________
         };
 
         // Register initiative directly (outside of system.json) as DnD5e does it.
-        CONFIG.Combat.initiative.formula = "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
+        CONFIG.Combat.initiative.formula = "@initiative.current.constant.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
 
         // Register general SR5Roll for JSON serialization support.
         CONFIG.Dice.terms[SR5Die.DENOMINATION] = SR5Die;

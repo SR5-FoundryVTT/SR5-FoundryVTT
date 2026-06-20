@@ -7,7 +7,7 @@
     "description": {
       "value": "",
       "chat": "",
-      "source": ""
+      "source": "SR5 243"
     },
     "action": {
       "type": "complex",
@@ -59,7 +59,7 @@
       },
       "opposed": {
         "type": "",
-        "test": "OpposedTest",
+        "test": "OpposedMatrixTest",
         "attribute": "willpower",
         "attribute2": "sleaze",
         "skill": "",

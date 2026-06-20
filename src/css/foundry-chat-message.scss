@@ -249,6 +249,21 @@
             justify-content: center;
             gap: 0.5rem;
 
+            .document {
+                display: flex;
+                align-items: center;
+                gap: 0.25em;
+            }
+            .header-name {
+                margin: 0;
+                border-bottom: none;
+                color: variables.$white;
+
+                &:hover {
+                    text-shadow: -1px -1px 0 variables.$cornflower, 1px -1px 0 variables.$cornflower, -1px 1px 0 variables.$cornflower, 1px 1px 0 variables.$cornflower;
+                }
+            }
+
             .left-side,
             .right-side {
                 display: flex;
