@@ -42,12 +42,27 @@ type SR5ActiveEffectSheetData = ActiveEffectConfig.RenderContext & {
  * its filter conditions. Each change of the effect is assigned to one of these targets, so a single effect can
  * drive different changes against different destinations with different rules.
  *
+ * Editing model: the sheet edits a temporary working copy (`this.clone`) of the document rather than the
+ * document itself. Structural actions (add/remove targets, conditions, changes) fold the live form into the
+ * clone and mutate it through the schema (`clone.updateSource`). Nothing reaches the database until the user
+ * presses "Submit Changes", at which point the form is written to the real document and the clone is dropped.
+ *
  * Some apply-to types follow the default key-value change structure of altering data, while others (modifiers) allow
  * defining custom handlers to apply complex behaviors to targets. These differing behaviors are defined in
  * <>EffectsFlow.ts or <>ChangeFlow.ts and follow the Foundry interface of 'apply' and 'allApplicableEffects' methods.
  */
 export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEffectConfig<SR5ActiveEffectSheetData> {
     private static readonly HELP_PAGE_URL = 'http://sr5-foundryvtt.privateworks.com/index.php/Active_Effect';
+
+    /**
+     * Temporary working copy the sheet renders from and mutates. Created lazily from the document and
+     * dropped on submit/close so the next render reflects the saved document.
+     */
+    private _clone: SR5ActiveEffect | null = null;
+
+    get clone(): SR5ActiveEffect {
+        return (this._clone ??= this.document.clone({}, { keepId: true }) as unknown as SR5ActiveEffect);
+    }
 
     static override DEFAULT_OPTIONS = {
         ...super.DEFAULT_OPTIONS,
@@ -64,8 +79,6 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         window: {
             resizable: true
         },
-        // Persist edits immediately on any change rather than requiring a manual submit.
-        form: { submitOnChange: true, closeOnSubmit: false }
     }
 
     static override TABS = {
@@ -132,11 +145,16 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     }
 
     /**
-     * Prepare data for the templates to use
-     * @param options
+     * Prepare data for the templates to use.
+     * Renders from the working clone so unsaved structural edits show without touching the document.
      */
     override async _prepareContext(...args: Parameters<ActiveEffectConfig['_prepareContext']>) {
         const data = await super._prepareContext(...args);
+
+        // Render every field from the working clone instead of the saved document.
+        data.source = this.clone.toObject();
+        data.system = this.clone.system;
+        data.systemFields = this.clone.system.schema.fields;
 
         // create the lists of options for each selection
         data.selection_test_options = this._getTestOptions();
@@ -159,10 +177,15 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         data.targetApplyToById = this.prepareTargetApplyToById();
         data.changeTypes = this.prepareChangeTypes();
 
-        data.systemFields = this.document.system.schema.fields;
-        data.system = this.document.system;
-
         return data;
+    }
+
+    /**
+     * Discard the working copy when the sheet closes so a reused instance doesn't keep stale edits.
+     */
+    protected override _onClose(...args: Parameters<ActiveEffectConfig['_onClose']>) {
+        super._onClose(...args);
+        this._clone = null;
     }
 
     /**
@@ -182,7 +205,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         this._updateConditionTypeOptions();
 
         // disable and set tooltips on the priority inputs since we don't currently support changing it
-        for (let i = 0; i < this.document.system.changes.length; i++) {
+        for (let i = 0; i < this.clone.system.changes.length; i++) {
             const input = this.element.querySelector<HTMLInputElement>(`input[name="system.changes.${i}.priority"]`);
             if (input) {
                 input.removeAttribute('disabled');
@@ -209,10 +232,11 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
 
     static async #onAddTarget(this: SR5ActiveEffectConfig, event: PointerEvent, _target: HTMLElement) {
         event.preventDefault();
-        const { targets } = this._currentEffectFormData();
-        // schema fills id + empty conditions
+        const { targets } = this._syncFormIntoClone();
+        // schema cleaning fills id + empty conditions
         targets.push({ applyTo: 'actor' });
-        await this.document.update({ system: { targets } });
+        this.clone.updateSource({ system: { targets } });
+        await this.render();
     }
 
     static async #onRemoveTarget(this: SR5ActiveEffectConfig, event: PointerEvent, target: HTMLElement) {
@@ -220,8 +244,9 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         const index = Number(target.dataset.targetIndex ?? -1);
         if (index < 0) return;
 
+        const { targets, changes } = this._syncFormIntoClone();
+
         // Always keep at least one target so changes have a destination.
-        const { targets, changes } = this._currentEffectFormData();
         if (targets.length <= 1) {
             ui.notifications?.warn(game.i18n.localize('SR5.ActiveEffect.AtLeastOneTarget'));
             return;
@@ -236,73 +261,88 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
             if (change.target === removed?.id) change.target = fallbackId;
         }
 
-        await this.document.update({ system: { targets, changes } });
+        this.clone.updateSource({ system: { targets, changes } });
+        await this.render();
     }
 
     static async #onAddCondition(this: SR5ActiveEffectConfig, event: PointerEvent, target: HTMLElement) {
         event.preventDefault();
         const targetIndex = Number(target.dataset.targetIndex ?? -1);
-        const { targets } = this._currentEffectFormData();
+        const { targets } = this._syncFormIntoClone();
         if (!targets[targetIndex]) return;
 
-        const usedTypes = new Set<string>((targets[targetIndex].conditions ?? []).map(c => c.type));
+        const usedTypes = new Set<string>((targets[targetIndex].conditions ?? []).map((c: any) => c.type as string));
         const availableType = Object.keys(SR5.effectFilterTypes).find(t => !usedTypes.has(t));
         if (!availableType) return;
 
-        targets[targetIndex].conditions = [...(targets[targetIndex].conditions ?? []), { type: availableType }];
-        await this.document.update({ system: { targets } });
+        targets[targetIndex].conditions.push({ type: availableType });
+        this.clone.updateSource({ system: { targets } });
+        await this.render();
     }
 
     static async #onRemoveCondition(this: SR5ActiveEffectConfig, event: PointerEvent, target: HTMLElement) {
         event.preventDefault();
         const targetIndex = Number(target.dataset.targetIndex ?? -1);
         const conditionIndex = Number(target.dataset.conditionIndex ?? -1);
-        const { targets } = this._currentEffectFormData();
+        const { targets } = this._syncFormIntoClone();
         if (!targets[targetIndex]?.conditions?.[conditionIndex]) return;
         targets[targetIndex].conditions.splice(conditionIndex, 1);
-        await this.document.update({ system: { targets } });
+        this.clone.updateSource({ system: { targets } });
+        await this.render();
     }
 
     static async #onAddChange(this: SR5ActiveEffectConfig, event: PointerEvent, _target: HTMLElement) {
         event.preventDefault();
-        const { targets, changes } = this._currentEffectFormData();
+        const { targets, changes } = this._syncFormIntoClone();
         const firstTarget = targets[0]?.id ?? '';
         changes.push({ key: '', value: '', target: firstTarget });
-        await this.document.update({ system: { changes } });
+        this.clone.updateSource({ system: { changes } });
+        await this.render();
     }
 
     /**
-     * Extract current targets and changes from the live form.
-     *
-     * Foundry expands indexed field names into numeric-keyed objects. Normalize those objects
-     * into arrays before structural edits so submit validation can clean each schema element.
+     * Preserve conditional data which is intentionally absent from the rendered form.
+     * This applies both to working-clone synchronization and the final document submit.
      */
-    private _currentEffectFormData(): { targets: any[], changes: any[] } {
+    protected override _processFormData(...args: Parameters<ActiveEffectConfig['_processFormData']>) {
+        const submitData = super._processFormData(...args) as {
+            system?: { targets?: unknown }
+        };
+        const submittedTargets = submitData.system?.targets;
+
+        if (submittedTargets && typeof submittedTargets === 'object') {
+            const cloneTargets = this.clone.system.toObject().targets as any[];
+            for (const [index, submittedTarget] of Object.entries(submittedTargets)) {
+                if (!submittedTarget || typeof submittedTarget !== 'object' || 'conditions' in submittedTarget) continue;
+
+                const target = submittedTarget as { id?: string, conditions?: unknown[] };
+                const existingTarget = cloneTargets.find(candidate => candidate.id === target.id)
+                    ?? cloneTargets[Number(index)];
+                target.conditions = existingTarget?.conditions ?? [];
+            }
+        }
+
+        return submitData;
+    }
+
+    /**
+     * Fold the live form's edits into the working clone before a structural mutation, so pending
+     * field edits (apply-to, tags, key/value) survive the re-render. `updateSource` cleans the
+     * form data — normalizing indexed-object arrays and filling schema defaults.
+     */
+    private _syncFormIntoClone() {
         const form = this.form;
         if (!form) throw new Error('Cannot read Active Effect data before its form is rendered.');
 
         const formData = new foundry.applications.ux.FormDataExtended(form);
-        const submitData = this._processFormData(null, form, formData) as {
-            system?: { targets?: unknown, changes?: unknown }
-        };
-        const targets = this._normalizeIndexedArray(submitData.system?.targets);
+        this.clone.updateSource(this._processFormData(null, form, formData));
 
-        for (const target of targets) {
-            target.conditions = this._normalizeIndexedArray(target.conditions);
-        }
-
+        // Return detached data so callers can safely perform structural edits before updateSource.
+        const { targets, changes } = this.clone.system.toObject();
         return {
-            targets,
-            changes: this._normalizeIndexedArray(submitData.system?.changes),
+            targets: targets as any[],
+            changes: changes as any[],
         };
-    }
-
-    private _normalizeIndexedArray<T = Record<string, any>>(value: unknown): T[] {
-        if (Array.isArray(value)) return value as T[];
-        if (typeof value === 'object' && value !== null) {
-            return Object.values(value as Record<string, T>);
-        }
-        return [];
     }
 
     /**
@@ -327,13 +367,14 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         const match = /^system\.targets\.(\d+)\.conditions\.(\d+)\.type$/.exec(select.name);
         if (!match) return;
 
-        const { targets } = this._currentEffectFormData();
+        const { targets } = this._syncFormIntoClone();
         const condition = targets[Number(match[1])]?.conditions?.[Number(match[2])];
         if (!condition) return;
 
         condition.type = select.value;
         condition.values = [];
-        await this.document.update({ system: { targets } });
+        this.clone.updateSource({ system: { targets } });
+        await this.render();
     }
 
     /**
@@ -363,11 +404,10 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     }
 
     /**
-     * Options for the per-change Target dropdown: one entry per target, labelled by its
-     * position and apply-to destination.
+     * Options for the per-change Target dropdown: one entry per target, labelled by its position.
      */
     prepareChangeTargetOptions() {
-        return this.document.system.targets.map((target, index: number) => ({
+        return this.clone.system.targets.map((target, index: number) => ({
             value: target.id,
             label: `#${index + 1}`,
         }));
@@ -378,7 +418,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
      * each change row's apply-to (for autocomplete classes and column visibility).
      */
     prepareTargetApplyToById(): Record<string, string> {
-        return Object.fromEntries(this.document.system.targets.map(target => [target.id, target.applyTo]));
+        return Object.fromEntries(this.clone.system.targets.map(target => [target.id, target.applyTo]));
     }
 
     /**
@@ -417,15 +457,16 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     }
 
     /**
-     * Get the available Skills for applyTo Test options
+     * Get the available Skills for applyTo Test options.
+     * Includes skills already used in conditions so they remain selectable.
      */
     _getSkillOptions() {
         // Make sure custom skills of an actor source are included.
         const actor = this.document.actor;
         const actorOrNothing = !(actor instanceof SR5Actor) ? undefined : actor;
 
-        const usedSkills = this.document.system.targets
-            .flatMap(t => t.conditions)
+        const usedSkills = this.clone.system.targets
+            .flatMap(t => t.conditions ?? [])
             .filter(c => c.type === 'skills')
             .flatMap(c => c.values ?? []);
 
@@ -450,14 +491,26 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         super._onChangeForm(...args);
         const [, event] = args;
         const target = event.target;
+        
+        // Safely extract the name string
+        const name = (target as HTMLSelectElement).name || "";
 
-        // Update the priority value to match the type selection
-        // Use FoundryVTT default approach of changing priority based on type changes using _onChangeForm
-        if (target instanceof HTMLSelectElement && target.name.endsWith(".type")) {
-            const selector = `input[name="${target.name.replace(/\.type$/, ".priority")}"]`;
-            const priorityInput = target.closest("li")?.querySelector<HTMLInputElement>(selector);
-            if (!priorityInput) return;
-            priorityInput.value = String(ActiveEffect.CHANGE_TYPES[target.value]?.defaultPriority ?? "");
+        // The combined regex as a boolean constant
+        const isTargetOrApplyToChange = /^system\.(targets\.\d+\.applyTo|changes\.\d+\.target)$/.test(name);
+
+        if (target instanceof HTMLSelectElement && isTargetOrApplyToChange) {
+            this._syncFormIntoClone();
+            void this.render();
+            return;
+        }
+
+        if (target instanceof HTMLSelectElement && name.endsWith(".type")) {
+            const priorityInput = target.closest("li")?.querySelector<HTMLInputElement>(
+                `input[name="${name.replace(/\.type$/, ".priority")}"]`
+            );
+            if (priorityInput) {
+                priorityInput.value = String(ActiveEffect.CHANGE_TYPES[target.value]?.defaultPriority ?? "");
+            }
         }
     }
 }

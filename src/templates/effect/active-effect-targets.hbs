@@ -2,7 +2,7 @@
 
   {{#each source.system.targets as |target ti|}}
     <fieldset class="effect-target" data-index="{{ti}}">
-        {{!-- Keep the stable target id in the form so submitOnChange round-trips it instead of regenerating it. --}}
+        {{!-- Keep the stable target id in the form so clone sync and final submit do not regenerate it. --}}
         <input type="hidden" name="{{concat "system.targets." ti ".id"}}" value="{{target.id}}">
         <legend>
             {{localize "SR5.ActiveEffect.Target"}} #{{sum ti 1}}

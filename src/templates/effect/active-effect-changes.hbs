@@ -10,7 +10,7 @@
         </div>
     </header>
     <ol class="scrollable" data-changes>
-        {{#each system.changes as |change i|}}
+        {{#each source.system.changes as |change i|}}
             {{#with @root.systemFields.changes.element.fields as |changeFields|}}
                 <li data-index="{{i}}"{{#ife (lookup @root.targetApplyToById change.target) "modifier"}} class="change-modifier"{{/ife}}>
                     {{!-- Which target (apply-to + conditions) this change belongs to --}}
@@ -36,8 +36,10 @@
                         {{formInput changeFields.priority name=(concat "system.changes." i ".priority") value=change.priority disabled=true}}
                     </div>
                     {{/ifne}}
+                    {{!-- phase is required by the schema but not shown; always preserve it. --}}
+                    <input type="hidden" name="{{concat "system.changes." i ".phase"}}" value="{{change.phase}}">
                     {{#ife (lookup @root.targetApplyToById change.target) "modifier"}}
-                    {{!-- Modifier changes hide these columns; keep them in the form so submitOnChange doesn't reset them. --}}
+                    {{!-- Modifier changes hide these columns; keep them in the form so they aren't lost on submit. --}}
                     <input type="hidden" name="{{concat "system.changes." i ".type"}}" value="{{change.type}}">
                     <input type="hidden" name="{{concat "system.changes." i ".value"}}" value="{{change.value}}">
                     <input type="hidden" name="{{concat "system.changes." i ".priority"}}" value="{{change.priority}}">
