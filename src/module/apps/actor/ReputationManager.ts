@@ -102,7 +102,11 @@ export class ReputationManager extends HandlebarsApplicationMixin(ApplicationV2)
         await this.render();
     }
 
-    static async #submitChanges(this: ReputationManager) {
+    static async #submitChanges(this: ReputationManager, event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!(event.target instanceof HTMLElement)) return;
+
         const updateData = {};
         if (this.streetCredModifier !== 0) {
             updateData['system.street_cred'] = this.getStreetCred() + this.streetCredModifier;
@@ -113,7 +117,7 @@ export class ReputationManager extends HandlebarsApplicationMixin(ApplicationV2)
         if (this.notorietyModifier !== 0) {
             updateData['system.notoriety'] = this.getNotoriety() + this.notorietyModifier;
         }
-        if (!isEmpty(updateData)) {
+        if (!foundry.utils.isEmpty(updateData)) {
             await this.actor.update(updateData);
         }
         void this.close();
