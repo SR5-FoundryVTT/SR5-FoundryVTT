@@ -463,7 +463,7 @@ export class MatrixNetworkFlow {
 
         const messageData = {
             content,
-            speaker: ChatMessage.getSpeaker({actor}),
+            speaker: ChatMessage.getSpeaker({actor: actor as Actor.Stored}),
             type: 'base',
             flags: {
                 [`${SYSTEM_NAME}.${FLAGS.MatrixNetworkMarkInvite}`]: {
