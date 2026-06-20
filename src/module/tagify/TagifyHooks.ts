@@ -1,25 +1,29 @@
-import { createTagifyOnInput } from '@/module/utils/sheets';
+import { createTagifyMulti, createTagifySelect, TagifyTags, TagifyValues } from '@/module/utils/sheets';
 
 export const TagifyHooks = {
     registerHooks: () => {
         Hooks.on('sr5_processTagifyElements', (html: HTMLElement) => {
-            const elements = html.querySelectorAll<HTMLInputElement>('input.tagify-selection');
+            // Multi-value tagify (arrays)
+            const multiElements = html.querySelectorAll<HTMLInputElement>('input.tagify-selection');
+            for (const element of multiElements) {
+                const values = JSON.parse(element.getAttribute('value') ?? '[]') as TagifyTags;
+                const options = JSON.parse(element.getAttribute('options') ?? '[]') as TagifyValues;
 
-            for (const element of elements) {
-                // Tagify expects this format for localized tags.
-                const values = JSON.parse(element.getAttribute('value') ?? '[]') as any[];
-                const options = JSON.parse(element.getAttribute('options') ?? '[]') as any[];
-
-                // Tagify dropdown should show all whitelist tags.
-                const maxItems = options.length;
-
-                // create the tagify element, capture any changes to update the currentTarget's value
-                createTagifyOnInput(element, options, maxItems, values, (event) => {
+                createTagifyMulti(element, options, values);
+                element.addEventListener('change', (event) => {
                     if (event.currentTarget) {
                         const target = event.currentTarget as HTMLInputElement & { tagifyValue: string };
                         target.setAttribute('value', target.tagifyValue);
                     }
                 });
+            }
+
+            // Single-value tagify select (string fields)
+            const selectElements = html.querySelectorAll<HTMLInputElement>('input.tagify-select');
+            for (const element of selectElements) {
+                const currentValue = element.getAttribute('value') ?? '';
+                const options = JSON.parse(element.getAttribute('options') ?? '[]') as TagifyValues;
+                createTagifySelect(element, options, currentValue);
             }
         })
     }

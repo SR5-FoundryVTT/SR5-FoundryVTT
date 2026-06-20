@@ -1,17 +1,15 @@
 import { DeepPartial } from "fvtt-types/utils";
-import { SR5 } from "../config";
 import { DataDefaults } from "../data/DataDefaults";
 import { ModifiableValue } from "../mods/ModifiableValue";
 import { CompilationRules } from "../rules/CompilationRules";
 import { DamageType, MinimalActionType } from "../types/item/Action";
 import { SuccessTest, SuccessTestData, TestOptions } from "./SuccessTest";
+import { SR5Actor } from "../actor/SR5Actor";
+
+const { fromUuidSync } = foundry.utils;
 
 
 interface CompileSpriteTestData extends SuccessTestData {
-    // Sprite type selection.
-    spriteTypes: typeof SR5.spriteTypes
-    spriteTypeSelected: string
-
     // Testing values as described on SR5#254
     level: number
     fade: number
@@ -50,14 +48,7 @@ export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
         // Choose the most explicit value given, making sure it's still usable.
         data.level = Math.max(data.level || compilation.system.sprite.level || 1, 1);
 
-        data.spriteTypes = this._prepareSpriteTypes();
-        data.spriteTypeSelected = data.spriteTypeSelected || compilation.system.sprite.type;
-
         data.preparedSpriteUuid = data.preparedSpriteUuid || compilation.system.sprite.uuid;
-    }
-
-    _prepareSpriteTypes() {
-        return SR5.spriteTypes;
     }
 
     override get _dialogTemplate() {
@@ -159,5 +150,24 @@ export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
      */
     get preparedActorUsed(): boolean {
         return this.data.preparedSpriteUuid !== '';
+    }
+
+    get preparedSpriteIsCompendium(): boolean {
+        return this.data.preparedSpriteUuid?.startsWith('Compendium.') ?? false;
+    }
+
+    get preparedSpriteIsEditable(): boolean {
+        if (!this.preparedActorUsed) return false;
+        if (this.preparedSpriteIsCompendium) return true;
+
+        const preparedSprite = this.preparedSprite;
+        if (!preparedSprite || !game.user) return false;
+
+        return preparedSprite.testUserPermission(game.user, 'OWNER');
+    }
+
+    get preparedSprite(): SR5Actor | null {
+        if (!this.preparedActorUsed) return null;
+        return fromUuidSync(this.data.preparedSpriteUuid) as SR5Actor | null;
     }
 }

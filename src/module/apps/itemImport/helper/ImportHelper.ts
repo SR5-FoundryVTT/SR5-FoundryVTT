@@ -192,7 +192,7 @@ export class ImportHelper {
      * @returns {Promise<Folder>} A promise that resolves with the folder object when the folder is created.
      */
     private static async getCompendiumFolder(name: string, parent: Folder | null = null): Promise<Folder<'Compendium'>> {
-        let folder = game.folders?.find(f => f.name === name && f.type === "Compendium" && f.folder === parent);
+        let folder = game.folders.find(f => f.name === name && f.type === "Compendium" && f.folder === parent);
         if (!folder)
             folder = await Folder.create({ name, color: "#00cc00", folder: parent?.id ?? null, type: "Compendium" });
         return folder as Folder<'Compendium'>;

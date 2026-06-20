@@ -490,6 +490,26 @@
                         </div>
                     </div>
 
+                {{else if (eq system.type 'ware')}}
+                    <div class="list-item">
+                        <div class="list-item-start skinny">
+                            <label data-tooltip="{{systemFields.slots.hint}}">{{systemFields.slots.label}}</label>
+                        </div>
+                        <div class="list-item-col">
+                            {{formInput systemFields.slots value=source.system.slots
+                                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                        </div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-start skinny">
+                            <label data-tooltip="{{systemFields.essence.hint}}">{{localize "SR5.EssenceCost"}}</label>
+                        </div>
+                        <div class="list-item-col">
+                            {{formInput systemFields.essence value=source.system.essence
+                                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                        </div>
+                    </div>
+
                 {{else if (eq system.type 'vehicle')}}
                     <div class="list-item">
                         <div class="list-item-start skinny">
@@ -559,6 +579,17 @@
                             </label>
                         </div>
                     </div>
+                    {{#if (or (eq system.action.type 'interrupt') (eq system.action.type 'varies'))}}
+                        <div class="list-item">
+                            <div class="list-item-start skinny">
+                                <label data-tooltip="{{systemFields.action.fields.initiative_mod.hint}}">{{systemFields.action.fields.initiative_mod.label}}</label>
+                            </div>
+                            <div class="list-item-col">
+                                {{formInput systemFields.action.fields.initiative_mod value=source.system.action.initiative_mod
+                                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                            </div>
+                        </div>
+                    {{/if}}
                     {{#if (isType item 'action' 'critter_power')}}
                         <div class="list-item">
                             <div class="list-item-start skinny">

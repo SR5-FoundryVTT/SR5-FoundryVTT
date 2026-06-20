@@ -115,12 +115,15 @@
             "SpellRitual": "Spruchzauberei Ritual",
             "Summoning": "BeschwörungsHandlungen"
         },
-        "ActionType": "Handlung",
-        "ActionTypeComplex": "Komplexe",
-        "ActionTypeFree": "Freie",
-        "ActionTypeNone": "Keine",
-        "ActionTypeSimple": "Einfache",
-        "ActionTypeVaries": "Variiert",
+        "ActionType": {
+            "Label": "Handlung",
+            "Complex": "Komplexe",
+            "Free": "Freie",
+            "Interrupt": "Interrupt",
+            "None": "Keine",
+            "Simple": "Einfache",
+            "Varies": "Variiert"
+        },
         "Actions": "Aktionen",
         "Active": "Aktiv",
         "ActiveDefense": "Unterbrechungsh.",
@@ -1043,7 +1046,8 @@
         "DeviceType": "Typ",
         "Dialogs": {
             "Common": {
-                "Cancel": "Cancel"
+                "Cancel": "Cancel",
+                "Ok": "OK"
             },
             "RangedWeaponTest": {
                 "EnvironmentalOverwriteSet": "Umgebungsmodifikatoren wurden manuell auf einen fixen Wert gesetzt!"
@@ -1262,6 +1266,9 @@
             },
             "Spirit": {
                 "SpiritTypeNotFound": "Die Geisterart wurde nicht gefunden. Bitte öffne ein GitHub-Issue mit deiner Chummer-Export-json."
+            },
+            "Sprite": {
+                "SpriteTypeNotFound": "Der Sprite-Typ wurde nicht gefunden. Bitte öffne ein GitHub-Issue mit deiner Chummer-Export-json."
             }
         },
         "ImportCharacter": "Charakter importieren",
@@ -1280,6 +1287,7 @@
         "InitCatMeatspace": "Fleischwelt-Initiative",
         "Initiation": "Initiation",
         "Initiative": "Initiative",
+        "InitiativeMod": "Initiativmodifikator",
         "Internal": "Intern",
         "InventoryRename": {
             "Cancel": "Abbrechen",
@@ -1290,6 +1298,7 @@
         "IsCritter": "Critter",
         "IsFreshImport": "Dieser Eintrag wurde aus Chummer importiert und benötigt eine manuelle Überprüfung.",
         "IsGrunt": "Scherge",
+        "IsGruntHint": "Verwendet Schergen-Zustandsmonitor-Regeln (SR5 S.378).",
         "IsNPC": "NSC",
         "Item": {
             "FIELDS": {
@@ -1361,6 +1370,10 @@
                     "extended": {
                         "hint": "Ist diese Aktion Teil einer Ausgedehnten Probe?",
                         "label": "Ausgedehnte Probe"
+                    },
+                    "initiative_mod": {
+                        "hint": "Initiativmodifikator, der beim Ausführen dieser Aktion angewendet wird",
+                        "label": "Initiativmodifikator"
                     },
                     "limit": {
                         "attribute": {
@@ -1724,6 +1737,7 @@
                 "NotVisible": "Schleichend",
                 "PAN": "PAN",
                 "RebootDevice": "Neustarten",
+                "RemoveImprovisedDevices": "Improvisierte Geräte entfernen",
                 "SubtractOne": "Eine entfernen",
                 "Type": "Typ",
                 "Visible": "Sichtbar",
@@ -1813,6 +1827,8 @@
         },
         "Magic": "Magie",
         "Manual": "Manuell",
+        "ManualModifier": "Manueller Modifikator",
+        "ManualModifierValue": "Wert des manuellen Modifikators",
         "ManualOverride": "Ergebnis-Überschreibung",
         "MarkImportedItemReviewed": "Importiertes Item überprüft.",
         "MarkImportedItemTooltip": "Markiert dieses importierte Item als überprüft.",
@@ -1829,6 +1845,9 @@
             "Icons": "Icons",
             "Invite": "Einladung anfordern",
             "Title": "Mit Netzwerk verbinden"
+        },
+        "MatrixOpposedDeviceDialog": {
+            "Title": "Matrixgerät erstellen"
         },
         "MatrixTarget": "Matrixziel",
         "MeleeWeaponAttack": "Nahkampfangriff",
@@ -1907,6 +1926,9 @@
         "ModificationCategories": "Modification Categories",
         "ModificationCategory": "Modification Category",
         "ModificationSlots": "Modification Slots",
+        "ModificationTypes": {
+            "Ware": "Implantat"
+        },
         "Modified": "Modifiziert",
         "ModifiedArmor": "Mod. Panzerung",
         "ModifiedDamage": "Mod. Schaden",
@@ -2529,6 +2551,12 @@
         "Spirit": {
             "Bound": "Gebunden",
             "Force": "Kraft",
+            "HalfValueSkill": "Halber Fertigkeitswert",
+            "HalfValueSkillHint": "Aktive Fertigkeiten auf EIN nutzen ⌈Kraft/2⌉.",
+            "InitiativeFormulaAstral": "Astrale Initiativformel",
+            "InitiativeFormulaAstralHint": "Wähle die Terme der astralen Initiative.",
+            "InitiativeFormulaMeatspace": "Fleischwelt-Initiativformel",
+            "InitiativeFormulaMeatspaceHint": "Wähle die Terme der Fleischwelt-Initiative.",
             "MissingSummoner": "Kein aktiver Beschwörer",
             "Services": "Dienste",
             "Summoner": "Beschwörer",
@@ -2643,6 +2671,7 @@
                 }
             },
             "Level": "Stufe",
+            "LevelAppliesSettingHint": "Steuert, welche Sprite-Attribute den Stufenbonus erhalten.",
             "MissingTechnomancer": "Kein aktiver Technomancer",
             "Registered": "Registriert",
             "Services": "Aufgaben",
@@ -2725,15 +2754,14 @@
                 "Vehicle": "Fahrzeug"
             },
             "Item": {
-                "ArmorMods": "Rüstungsmods",
                 "Description": "Beschreibung",
                 "Details": "Details",
                 "Effects": "Effekte",
+                "Mods": "Mods",
                 "Network": "Netzwerk",
                 "SinLicenses": "Lizenzen",
                 "SinNetworks": "Netzwerke",
-                "WeaponAmmo": "Munition",
-                "WeaponMods": "Mods"
+                "WeaponAmmo": "Munition"
             }
         },
         "Target": "Ziel",
@@ -2797,6 +2825,7 @@
             "OpposedCheckOverwatchScoreTest": "Widerstehe Overwatch-Wert prüfen",
             "OpposedCompileSpriteTest": "Widerstehe Kompilierung",
             "OpposedHackOnTheFlyTest": "Widerstehe Eiliges Hacken",
+            "OpposedMatrixTest": "Vergleichende Matrix-Probe",
             "OpposedRitualTest": "Besiegel das Ritual",
             "OpposedSummonSpiritTest": "Widerstehe Herbeirufung",
             "OpposedTest": "Vergleichende Probe",
@@ -3230,18 +3259,32 @@
             "FullReload": "Komplett",
             "Mod": "Mod",
             "Mode": {
-                "BurstFire": "SM",
-                "BurstFireLong": "SM-LS",
-                "BurstFireShort": "SM",
-                "FullAuto": "AM",
-                "FullAutoLong": "AM-L",
-                "FullAutoShort": "AM",
-                "Modes": "Modus",
-                "SemiAuto": "HM",
-                "SemiAutoBurst": "HM-HS",
-                "SemiAutoShort": "HM",
-                "SingleShot": "EM",
-                "SingleShotShort": "EM"
+                "Mode": "Modus",
+                "Short": {
+                    "BurstFire": "SM",
+                    "BurstFireLong": "SM-LS",
+                    "BurstFireShort": "SM",
+                    "FullAuto": "AM",
+                    "FullAutoLong": "AM-L",
+                    "FullAutoShort": "AM",
+                    "SemiAuto": "HM",
+                    "SemiAutoBurst": "HM-HS",
+                    "SemiAutoShort": "HM",
+                    "SingleShot": "EM",
+                    "SingleShotShort": "EM"
+                },
+                "Full": {
+                    "BurstFire": "Salvenmodus",
+                    "BurstFireLong": "Lange Salve",
+                    "FullAuto": "Automatisches Feuer",
+                    "FullAutoLong": "Automatisches Feuer (Komplex)",
+                    "FullAutoShort": "Automatisches Feuer (Einfach)",
+                    "SemiAuto": "Halbautomatisch",
+                    "SemiAutoBurst": "Halbautomatische Salve",
+                    "SemiAutoShort": "Halbautomatisch",
+                    "SingleShot": "Einzelschuss",
+                    "Suppressing": "Unterdrückungsfeuer"
+                }
             },
             "Mods": "Mods",
             "PartialReload": "Teilweise",

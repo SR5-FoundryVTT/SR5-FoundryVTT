@@ -16,6 +16,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
         return Object.keys(CONFIG.Actor.dataModels).includes(this.parseType);
     }
 
+    protected getBonus(jsonData: ParseData) { return 'bonus' in jsonData ? jsonData.bonus : undefined; }
     protected abstract getFolder(jsonData: ParseData, compendiumKey: CompendiumKey): Promise<Folder>;
     protected async getItems(jsonData: ParseData): Promise<Item.Source[]> { return []; }
     protected getSystem(jsonData: ParseData) { return this.getBaseSystem(); }
@@ -58,8 +59,7 @@ export abstract class Parser<SubType extends SystemEntityType> {
 
         entity.img = IconAssign.iconAssign(entity);
 
-        if ('bonus' in jsonData && jsonData.bonus)
-            BH.addBonus(entity as any, jsonData.bonus);
+        BH.addBonus(entity, this.getBonus(jsonData));
 
         if (jsonData.page && jsonData.source) {
             const page = IH.getArray(jsonData.altpage)[0]?._TEXT ?? jsonData.page._TEXT;

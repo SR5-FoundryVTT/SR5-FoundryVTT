@@ -1903,6 +1903,18 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     _prepareResultActionsTemplateData(): ResultActionType[] {
         const actions: ResultActionType[] = [];
+
+        // Interrupt/Varies actions carry an initiative modifier that can be applied to the combatant.
+        const actionType = this.data.action?.type;
+        const initiativeMod = this.data.action?.initiative_mod;
+        if (initiativeMod && (actionType === 'interrupt' || actionType === 'varies')) {
+            actions.push({
+                action: 'modifyCombatantInit',
+                label: 'SR5.InitiativeMod',
+                value: String(initiativeMod)
+            });
+        }
+
         const actionResultData = this.results;
         if (!actionResultData) return actions;
 

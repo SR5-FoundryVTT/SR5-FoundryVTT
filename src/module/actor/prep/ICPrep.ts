@@ -33,8 +33,7 @@ export class ICPrep {
         ICPrep.prepareMatrix(system);
         ICPrep.prepareMatrixTrack(system);
 
-        ICPrep.prepareMatrixInit(system);
-        InitiativePrep.prepareCurrentInitiative(system);
+        InitiativePrep.prepareInit('ic', system);
     }
 
     static prepareMatrix(system: Actor.SystemOfType<'ic'>) {
@@ -53,20 +52,6 @@ export class ICPrep {
         ModifiableValue.addUnique(track.matrix, "SR5.Bonus", Number(modifiers['matrix_track']));
         track.matrix.max = matrix.condition_monitor.max;
         track.matrix.label = SR5.damageTypes.matrix;
-    }
-
-    static prepareMatrixInit(system: Actor.SystemOfType<'ic'>) {
-        const { initiative, modifiers, host } = system;
-
-        // Set current initiative to matrix
-        initiative.perception = 'matrix';
-
-        // Prepare used initiative parts
-        initiative.matrix.base.base = MatrixRules.getICInitiativeBase(host.rating);
-        ModifiableValue.addUnique(initiative.matrix.base, "SR5.Bonus", modifiers.matrix_initiative);
-
-        initiative.matrix.dice.base = MatrixRules.getICInitiativeDice();
-        ModifiableValue.addUnique(initiative.matrix.dice, "SR5.Bonus", modifiers.matrix_initiative_dice);
     }
 
     /**

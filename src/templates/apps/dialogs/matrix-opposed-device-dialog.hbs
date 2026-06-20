@@ -1,0 +1,53 @@
+<form class="matrix-opposed-device-form">
+    <section class="dialog-sheet-section dialog-sheet-section--device">
+        <h2 class="dialog-sheet-section__title">{{localize "SR5.ItemTypes.Device"}}</h2>
+
+        <div class="sheet-header matrix-opposed-device-header">
+            <div class="matrix-opposed-device-header__image-frame">
+                <img class="sheet-image matrix-opposed-device-header__image" src="{{data.img}}" alt="{{imageAlt}}" data-edit="img" data-action="editImage" />
+            </div>
+
+            <div class="sheet-header-labels matrix-opposed-device-header__labels">
+                <div class="sheet-header-open-browser">
+                    <button type="button" data-action="openCompendiumBrowser">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </div>
+                <div class="sheet-header-name matrix-opposed-device-header__name">
+                    <span>
+                        {{formInput fields.name value=data.name name="data.name" classes="sheet-name" placeholder=namePlaceholder rootId=rootId autofocus=true}}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="device-details-grid">
+            <div class="form-group">
+                <label>{{localize "SR5.Device.FIELDS.category.label"}}</label>
+                {{formInput fields.category value=data.category name="data.category" localize=true rootId=rootId}}
+            </div>
+
+            <div class="form-group">
+                <label>{{localize "SR5.Rating"}}</label>
+                {{formInput fields.rating value=data.rating name="data.rating" rootId=rootId}}
+            </div>
+
+            <div class="form-group">
+                <label>{{localize "SR5.Wireless"}}</label>
+                {{formInput fields.wireless value=data.wireless name="data.wireless" localize=true rootId=rootId}}
+            </div>
+
+            <div class="form-group">
+                <label>{{localize "SR5.Network"}}</label>
+                {{formInput fields.networkUuid value=data.networkUuid name="data.networkUuid" rootId=rootId}}
+            </div>
+        </div>
+    </section>
+
+    <section class="dialog-sheet-section dialog-sheet-section--editor">
+        <div class="form-group">
+            <label>{{localize "SR5.Description"}}</label>
+            {{formInput fields.description value=data.description name="data.description" rootId=rootId}}
+        </div>
+    </section>
+</form>

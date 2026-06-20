@@ -85,6 +85,7 @@ export const preloadHandlebarsTemplates = async () => {
             'language-and-knowledge-skills',
             'limits',
             'matrix-attribute',
+            'matrix-attribute-sprite',
             'special-attributes',
             'vehicle-paired-attribute',
         ),

@@ -4,7 +4,7 @@
   "author": "MhM0V7OoctM9Cezw",
   "img": "icons/svg/dice-target.svg",
   "scope": "global",
-  "command": "console.log('Shadowrun 5e | Reset all actors for a new run');\n\ngame.actors.forEach(actor => actor.resetRunData());\ngame.items.forEach(item => item.resetRunData());",
+  "command": "console.log('Shadowrun 5e | Reset all actors for a new run');\n\nfor (const actor of game.actors) {\n  await actor.resetRunData();\n}\n\nfor (const item of game.items) {\n  await item.resetRunData();\n}",
   "flags": {},
   "_stats": {
     "compendiumSource": null,

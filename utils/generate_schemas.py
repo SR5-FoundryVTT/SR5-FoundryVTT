@@ -19,7 +19,7 @@ from io import BytesIO
 # Repository details for fetching XML files if no local path is provided
 OWNER = "chummer5a"
 REPO = "chummer5a"
-BRANCH = "0c354ec2b81da5ccd2c93648f93ec8f6831c030e"  # v5.256.0
+BRANCH = "8544ecee1ad3edccc0853b7821067542130a5c68"  # v5.226.91
 
 # String length threshold for inline union literals
 STRING_LIMIT = 100

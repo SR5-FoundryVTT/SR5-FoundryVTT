@@ -86,6 +86,7 @@ interface SheetSkills {
 interface SheetSkillGroup {
     item: SR5Item<'skill'>;
     label: string;
+    displayRating: number;
 }
 
 export interface SR5ActorSheetData extends ActorSheetV2.RenderContext, SR5ApplicationMixinTypes.RenderContext {
@@ -114,6 +115,9 @@ export interface SR5ActorSheetData extends ActorSheetV2.RenderContext, SR5Applic
     hasSkills: boolean;
     hasFullDefense: boolean;
     woundTolerance: number;
+    optionalPowerCount: number;
+    optionalPowerSelected: number;
+    optionalPowerTotal: number;
 
     // Effects
     effects: SR5ActiveEffect[];
@@ -146,6 +150,7 @@ export interface SR5ActorSheetData extends ActorSheetV2.RenderContext, SR5Applic
         value: string;
         options: { label: string; value: string }[];
     };
+    initiativeFormulaModes: { id: Shadowrun.SpaceTypes; label: string; }[];
 
     // Situation Modifiers
     situationModifiers: {
@@ -309,6 +314,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             rollSkillSpecialization: SR5BaseActorSheet.#rollSkillSpec,
             openSkillDescription: SR5BaseActorSheet.#toggleSkillDescription,
             filterTrainedSkills: SR5BaseActorSheet.#filterUntrainedSkills,
+            toggleSpiritForceAttribute: SR5BaseActorSheet.#toggleSpiritForceAttribute,
+            toggleSpriteLevelAttribute: SR5BaseActorSheet.#toggleSpriteLevelAttribute,
 
             resetActorRunData: SR5BaseActorSheet.#resetActorRunData,
 
@@ -319,6 +326,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
             addItem: SR5BaseActorSheet.#createItem,
             editItem: SR5BaseActorSheet.#editItem,
+            moveItem: SR5BaseActorSheet.#moveItem,
             deleteItem: SR5BaseActorSheet.#deleteItem,
             favoriteItem: SR5BaseActorSheet.#favoriteItem,
 
@@ -343,6 +351,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             clearConditionMonitor: SR5BaseActorSheet.#clearConditionMonitor,
             rollConditionMonitor: SR5BaseActorSheet.#rollConditionMonitor,
 
+            clearFreshImports: SR5BaseActorSheet.#clearFreshImports,
             openSituationalModifiers: SR5BaseActorSheet.#openSituationalModifiers
         },
         filters: [{ inputSelector: '#filter-active-skills', contentSelector: '', callback: SR5BaseActorSheet.#handleFilterActiveSkills }],
@@ -415,6 +424,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         data.skillset = await this._prepareSkillset();
 
         data.itemType = this._prepareItemTypes();
+        this._prepareSpiritOptionalPowerCounts(data);
         data.effects = prepareSortedEffects(this.actor.effects.contents);
         data.itemEffects = prepareSortedItemEffects(this.actor, { applyTo: this.itemEffectApplyTos });
 
@@ -432,6 +442,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         data.bindings = this._prepareKeybindings();
 
         data.initiativePerception = this._prepareInitiativePresence();
+        data.initiativeFormulaModes = this._prepareInitiativeFormulaModes();
 
         data.primaryTabs = this._prepareTabs('primary');
 
@@ -764,6 +775,16 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         return { options, value };
     }
 
+    _prepareInitiativeFormulaModes() {
+        const modes = [
+            { id: 'meatspace' as const, label: 'SR5.InitCatMeatspace' },
+            { id: 'astral' as const, label: 'SR5.InitCatAstral' },
+            { id: 'matrix' as const, label: 'SR5.Labels.ActorSheet.Matrix' },
+        ];
+
+        return modes.filter(mode => this.actor.system.initiative?.[mode.id]);
+    }
+
     /**
      * Handle Changing Initiative Perception
      * - the select handles hot sim vs cold sim and doesn't match our dataset exactly
@@ -1076,6 +1097,12 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             item = await fromUuid(uuid);
         }
         if (item) await item.sheet?.render(true, { mode: 'edit' } as any);
+    }
+
+    static async #moveItem(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
+        await this._moveItemToInventory(event.target);
     }
 
     async _handleDeleteItem(item: SR5Item) {
@@ -1523,6 +1550,23 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
         return `(${active}/${max})`;
     }
+
+    _prepareSpiritOptionalPowerCounts(sheetData: SR5ActorSheetData) {
+        sheetData.optionalPowerCount = 0;
+        sheetData.optionalPowerSelected = 0;
+        sheetData.optionalPowerTotal = 0;
+
+        if (!sheetData.isSpirit) return;
+        const spirit = this.actor.asType('spirit');
+        if (!spirit) return;
+
+        const optionalPowers = (sheetData.itemType.critter_power ?? [])
+            .filter(item => item.isType('critter_power') && item.system.optional !== 'standard');
+
+        sheetData.optionalPowerCount = Math.floor(spirit.system.attributes.force.value / 3);
+        sheetData.optionalPowerSelected = optionalPowers.filter(item => item.system.optional === 'enabled_option').length;
+        sheetData.optionalPowerTotal = optionalPowers.length;
+    }
     /**
      * Prepare skills with sorting.
      *
@@ -1544,11 +1588,22 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     _prepareSkillGroups(): SheetSkillGroup[] {
+        const getDisplayRating = (item: SR5Item<'skill'>): number => {
+            const rawRating = item.system.group.rating;
+            
+            if (!this.actor.isType('spirit')) return rawRating;
+            if (rawRating <= 0) return 0;
+
+            const force = this.actor.system.attributes.force.value;
+            return this.actor.system.half_value_skill ? Math.ceil(force / 2) : force;
+        };
+
         // NOTE: SR5Actor.itemsForType seems to not be loaded on actors when they're opened from a pack or copied over from it.
         return this.actor.getSkillGroups()
             .map(item => ({
                 item,
                 label: SkillNamingFlow.localizeSkillgroupName(item.name),
+                displayRating: getDisplayRating(item),
             }))
             .sort(sortByLocalizedLabel);
     }
@@ -1746,6 +1801,43 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         }
     }
 
+    static async #toggleSpiritForceAttribute(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!this.actor.isType('spirit')) return;
+        if (!(event.target instanceof HTMLElement)) return;
+
+        const attributeId = event.target.closest<HTMLElement>('[data-attribute-id]')?.dataset.attributeId;
+        if (!attributeId || attributeId === 'force') return;
+
+        const enabled = !!this.actor.system.attributes[attributeId]?.applies_special;
+        await this.actor.update({ system: { attributes: { [attributeId]: { applies_special: !enabled } } } });
+    }
+
+    static async #toggleSpriteLevelAttribute(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!this.actor.isType('sprite')) return;
+        if (!(event.target instanceof HTMLElement)) return;
+
+        const attributeId = event.target.closest<HTMLElement>('[data-attribute-id]')?.dataset.attributeId;
+        if (!attributeId) return;
+
+        const isSpriteLevelAttribute = ['resonance', 'attack', 'sleaze', 'data_processing', 'firewall'].includes(attributeId);
+        if (!isSpriteLevelAttribute) return;
+
+        if (attributeId === 'resonance') {
+            const enabled = !!this.actor.system.attributes.resonance.applies_special;
+            await this.actor.update({ system: { attributes: { resonance: { applies_special: !enabled } } } });
+            return;
+        }
+
+        const enabled = !!this.actor.system.matrix[attributeId]?.applies_special;
+        await this.actor.update({ system: { matrix: { [attributeId]: { applies_special: !enabled } } } });
+    }
+
     /**
      * Change the quantity on an item shown within a sheet item list.
      *
@@ -1924,7 +2016,9 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const closest = this._closestSkillTarget(event.target);
         const skillId = closest?.dataset.skillId;
         if (!skillId) return;
-        const rating = Number(event.target.value);
+        const rating = event.target.type === 'checkbox'
+            ? (event.target.checked ? 1 : 0)
+            : Number(event.target.value);
         if (isNaN(rating)) return;
 
         await SkillItemFlow.changeSkillRating(this.actor, skillId, rating);
@@ -1983,18 +2077,24 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     }
 
     /**
-     * Toggle to isFreshImport property of importFlags for all items on the character sheet
-     *
-     * @param event
+     * Clear the fresh import flag for all owned items on the actor sheet.
      */
-    async _toggleAllFreshImportFlags(event: PointerEvent, onOff: boolean) {
+    static async #clearFreshImports(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        event.stopPropagation();
         if (!(event.target instanceof HTMLElement)) return;
+
         const allItems = this.actor.items;
-        console.debug('Toggling all importFlags on owned items to ->', onOff, event);
-        for (const item of allItems) {
-            if (item.system.importFlags) {
-                await item.update({ system: { importFlags: { isFreshImport: onOff } } });
-            }
+        console.debug(`Shadowrun 5e | Clearing fresh import flags for ${allItems.size} owned items`, event);
+        const updates = allItems
+            .filter(item => item.system.importFlags?.isFreshImport === true)
+            .map(item => ({
+                _id: item.id,
+                system: { importFlags: { isFreshImport: false } }
+            }));
+
+        if (updates.length > 0) {
+            await this.actor.updateEmbeddedDocuments('Item', updates);
         }
     }
 
@@ -2119,7 +2219,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                             changes: [
                                 {
                                     key: path,
-                                    type: 'custom',
+                                    type: 'add',
                                     priority: 0,
                                     value: '',
                                 }

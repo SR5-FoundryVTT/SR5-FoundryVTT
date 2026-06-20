@@ -110,7 +110,8 @@ export class SR5Combat extends Combat<"base"> {
         return this.system.pass;
     }
 
-    // Don't alert next player, because it can change easily
+    // Foundry's Combat interface defines nextCombatant as a getter, but SR5's initiative flow
+    // @ts-expect-error - doesn't have a single "next" combatant due to initiative passes.
     override get nextCombatant(): undefined { return undefined; }
 
 
@@ -453,7 +454,7 @@ export class SR5Combat extends Combat<"base"> {
      * @param adjustment The delta to adjust the initiative score with.
      */
     async adjustActorInitiative(actor: SR5Actor, adjustment: number) {
-        for (const combatant of this.getCombatantsByActor(actor))
+        for (const combatant of this.getCombatantsByActor(actor as Actor.Stored))
             await combatant.adjustInitiative(adjustment);
     }
 
@@ -462,7 +463,7 @@ export class SR5Combat extends Combat<"base"> {
      * If multiple combatants exist, tries to resolve by controlled tokens.
      */
     getActorCombatant(actor: SR5Actor): SR5Combatant | null {
-        const combatants = this.getCombatantsByActor(actor);
+        const combatants = this.getCombatantsByActor(actor as Actor.Stored);
 
         // If only one combatant, return it directly
         if (combatants.length === 1) {
@@ -625,7 +626,7 @@ export class SR5Combat extends Combat<"base"> {
         const { actor, token, name } = combatant;
         const initiativeData = actor?.system?.initiative;
 
-        const base = Number(initiativeData?.current?.base?.value ?? 0);
+        const base = Number(initiativeData?.current?.constant?.value ?? 0);
 
         // Fallback to 'unknown' if mode is undefined or an invalid string at runtime
         const mode = initiativeData?.perception;

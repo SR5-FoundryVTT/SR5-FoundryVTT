@@ -5,100 +5,127 @@
 import Tagify from '@yaireo/tagify';
 import { Translation } from './strings';
 
-// A single whitelist / dropdown / tag element
-interface TagData {
-    // Identification value
-    id: string
-    // Display information for id
-    value: string
+/** An option before localization: stable id + i18n label key. */
+export interface TagifyValue {
+    id: string;
+    label: Translation;
 }
 
-interface TagifyOptions {
-    // Allowed tag inputs / dropdown content for selection
-    whitelist?: TagData[]
-    // tagify.dropdown.maxItems => max items shown on dropdown
-    maxItems?: number
-    // Tags to be pre-applied
-    tags?: TagData[]
-    // Should only tags in whitelist be allowed?
-    enforceWhitelist?: boolean
+/** A pre-selected tag: stable id + already-localized display string. */
+export interface TagifyTag {
+    id: string;
+    value: string;
+}
+
+export type TagifyValues = TagifyValue[];
+export type TagifyTags = TagifyTag[];
+
+function localizeWhitelist(whitelist: TagifyValues) {
+    return whitelist.map(entry => ({ id: entry.id, value: game.i18n.localize(entry.label) }));
+}
+
+function tagifyDropdownThemeClass(element: HTMLElement) {
+    const sheet = element.closest('.sr5v2');
+    const isLight = sheet?.classList.contains('theme-light')
+        || (!sheet?.classList.contains('theme-dark') && document.body.classList.contains('theme-light'));
+
+    return isLight ? 'sr5-tagify-dropdown-light' : 'sr5-tagify-dropdown-dark';
 }
 
 /**
- * Create a tagify instance for a given DOM element.
- * 
- * For tagify information, check this: https://github.com/yairEO/tagify
- * 
- * @param input The dom input element for a tagify element to be created onto.
+ * Create a multi-value Tagify instance on an input element.
+ *
+ * @param element   The input element to attach Tagify to.
+ * @param whitelist Option sources — each entry has a stable id and an i18n label key.
+ * @param selected  Tags to pre-select — each entry has a stable id and a localized value.
  */
-export function createTagify(input: HTMLInputElement|HTMLTextAreaElement|null, options: TagifyOptions = {}) {
-    const tagify = new Tagify(input, {
-        enforceWhitelist: options.enforceWhitelist ?? true,
+export function createTagifyMulti(
+    element: HTMLInputElement,
+    whitelist: TagifyValues,
+    selected: TagifyTags,
+): Tagify<TagifyTag> {
+    const tagifyWhitelist = localizeWhitelist(whitelist);
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+    const tagify = new Tagify<TagifyTag>(element, {
+        enforceWhitelist: true,
         editTags: false,
         skipInvalid: true,
         dropdown: {
-            maxItems: options.maxItems,
+            maxItems: tagifyWhitelist.length,
             fuzzySearch: true,
             enabled: 0,
-            searchKeys: ["id", "value"]
-        }
+            searchKeys: ['id', 'value'],
+            classname: tagifyDropdownThemeClass(element),
+        },
     });
 
-
-    tagify.whitelist = options.whitelist ?? [];
-    tagify.addTags(options.tags ?? []);
+    tagify.whitelist = tagifyWhitelist;
+    tagify.addTags(selected);
 
     return tagify;
 }
 
-interface TagifyValue {
-    label: Translation
-    id: string
-}
-interface TagifyTag {
-    value: string
-    id: string
-}
-
-export type TagifyValues = TagifyValue[]
-export type TagifyTags = TagifyTag[]
-export type OnEventCallback = (event: Event) => void
-
 /**
- * Create a tagify from a given input element.
- * 
- * TODO: This function is horrific and in need of a refactor for clarity.
- * 
- * @param element 
- * @param values 
- * @param maxItems 
- * @param tags 
- * @param onChangeCallback
- * @param options
+ * Create a single-value Tagify select on an input element.
+ *
+ * Stores the stable id of the chosen option back to the original input (or raw
+ * typed text for custom values not in the whitelist).
+ *
+ * @param element       The input element to attach Tagify to.
+ * @param whitelist     Option sources — each entry has a stable id and an i18n label key.
+ * @param currentValue  The currently stored value (stable key or free-form text).
  */
-export function createTagifyOnInput(element: HTMLInputElement, values: TagifyValues, maxItems: number, tags: TagifyTags, onChangeCallback?: OnEventCallback, options?: TagifyOptions): Tagify {
-    options = options ?? {};
+export function createTagifySelect(
+    element: HTMLInputElement,
+    whitelist: TagifyValues,
+    currentValue: string,
+): Tagify<TagifyTag> {
+    const tagifyWhitelist = localizeWhitelist(whitelist);
 
-    const whitelist = values.map(value => ({value: game.i18n.localize(value.label), id: value.id}));
-    const tagify = createTagify(element, {whitelist, maxItems, tags, ...options});
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+    const tagify = new Tagify<TagifyTag>(element, {
+        mode: 'select',
+        enforceWhitelist: false,
+        editTags: 1,
+        addTagOnBlur: true,
+        skipInvalid: false,
+        originalInputValueFormat: (vals) => {
+            const tag = vals[0];
+            if (!tag) return '';
+            return tagifyWhitelist.find(w => w.value === tag.value)?.id ?? tag.value ?? '';
+        },
+        dropdown: {
+            maxItems: tagifyWhitelist.length,
+            fuzzySearch: true,
+            enabled: 0,
+            highlightFirst: false,
+            searchKeys: ['id', 'value'],
+            classname: tagifyDropdownThemeClass(element),
+        },
+    });
 
-    if (onChangeCallback) $(element).on('change', onChangeCallback);
+    tagify.whitelist = tagifyWhitelist;
+
+    if (currentValue) {
+        const known = tagifyWhitelist.find(w => w.id === currentValue);
+        tagify.addTags([known ?? { id: currentValue, value: currentValue }]);
+    }
 
     return tagify;
 }
 
 /**
- * Helper to parse FoundryVTT DropData directly from it's source event
+ * Helper to parse FoundryVTT DropData directly from its source event.
  *
  * This is a legacy handler for earlier FoundryVTT versions, however it's good
  * practice to not trust faulty input and inform about.
  *
- * @param event
- * @returns undefined when an DropData couldn't be parsed from it's JSON.
+ * @returns undefined when DropData couldn't be parsed from its JSON.
  */
 export function parseDropData<T = unknown>(event: DragEvent): T | undefined {
     try {
-        const raw = event.dataTransfer?.getData("text/plain");
+        const raw = event.dataTransfer?.getData('text/plain');
         if (!raw) return undefined;
 
         return JSON.parse(raw) as T;

@@ -22,6 +22,7 @@ export class WareImporter extends DataImporter {
             {
                 compendiumKey: () => "Ware",
                 parser: new WareParser(key, jsonObject.categories.category),
+                filter: ware => !('requireparent' in ware || ware.required?.parentdetails),
                 injectActionTests: item => {
                     UpdateActionFlow.injectActionTestsIntoChangeData(item.type, item, item);
                 },

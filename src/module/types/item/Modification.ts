@@ -1,7 +1,7 @@
 import { SR5 } from "@/module/config";
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { TechnologyPartData } from "../template/Technology";
-import { TagifyAltField } from "../fields/TagifyAltField";
+import { TagifyMultiField } from "../fields/TagifyMultiField";
 const { SchemaField, NumberField, StringField, BooleanField } = foundry.data.fields;
 
 const ModificationData = () => ({
@@ -41,8 +41,9 @@ const ModificationData = () => ({
             water: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
             pollutant: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
         }),
-        immunities: new TagifyAltField(new StringField({ required: true, choices: SR5.armorImmunityTypes })),
+        immunities: new TagifyMultiField(SR5.armorImmunityTypes),
     }),
+    essence: new NumberField({ required: true, nullable: false, initial: 0 }),
     slots: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
 });
 

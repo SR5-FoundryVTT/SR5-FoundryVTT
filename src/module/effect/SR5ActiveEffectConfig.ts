@@ -1,14 +1,29 @@
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5 } from '../config';
 import { ActionFlow } from '../item/flows/ActionFlow';
-import { Translation } from '../utils/strings';
-import { TagifyValues } from '@/module/utils/sheets';
 import { LinksHelpers } from '@/module/utils/links';
 
 import ActiveEffectConfig = foundry.applications.sheets.ActiveEffectConfig;
 import { ActiveEffectDM } from '@/module/types/effect/ActiveEffect';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 import { SR5ActiveEffect } from './SR5ActiveEffect';
+import { Translation } from '../utils/strings';
+
+/**
+ * Data Object that gets provided to the templates for ActiveEffects
+ */
+type SR5ActiveEffectSheetData = ActiveEffectConfig.RenderContext & {
+    selection_test_options: Record<string, Translation>;
+    selection_category_options: Record<string, Translation>;
+    selection_attribute_options: Record<string, Translation>;
+    selection_skill_options: Record<string, Translation>;
+    selection_limit_options: Record<string, Translation>;
+
+    applyToOptions: { label: Translation, value: string }[];
+    changeTypes: Record<string, string>;
+    system: ActiveEffectDM;
+    systemFields: typeof ActiveEffectDM.schema.fields;
+}
 
 /**
  * Shadowrun system alters some behaviors of Active Effects, making a custom ActiveEffectConfig necessary.
@@ -32,26 +47,6 @@ import { SR5ActiveEffect } from './SR5ActiveEffect';
  * While actors apply effects as part of their prepareData flow the modifier apply-to target applies effects as part of the calculation of their
  * situational modifiers and others still can behave differently.
  */
-
-type ApplyToOptions = { label: string, value: string }[];
-
-/**
- * Data Object that gets provided to the templates for ActiveEffects
- */
-type SR5ActiveEffectSheetData = ActiveEffectConfig.RenderContext & {
-    selection_test_options: TagifyValues;
-    selection_category_options: TagifyValues;
-    selection_attribute_options: TagifyValues;
-    selection_skill_options: TagifyValues;
-    selection_limit_options: TagifyValues;
-
-    applyToOptions: ApplyToOptions;
-    changeTypes: Record<string, string>;
-    isv11: boolean;
-    system: ActiveEffectDM;
-    systemFields: typeof ActiveEffectDM.schema.fields;
-}
-
 export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEffectConfig<SR5ActiveEffectSheetData> {
     private static readonly HELP_PAGE_URL = 'http://sr5-foundryvtt.privateworks.com/index.php/Active_Effect';
 
@@ -85,7 +80,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
      */
     protected override async _renderHTML(context, options) {
         // push footer to the end of parts so it is rendered at the bottom
-        if (options.parts.includes("footer")) {
+        if (options.parts?.includes("footer")) {
             const index = options.parts.indexOf("footer");
             options.parts.push(options.parts.splice(index, 1)[0]);
         }
@@ -147,8 +142,6 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         data.applyToOptions = this.prepareApplyToOptions();
         data.changeTypes = this.prepareChangeTypes();
 
-        data.isv11 = game.release.generation === 11;
-
         data.systemFields = this.document.system.schema.fields;
         data.system = this.document.system;
 
@@ -161,6 +154,8 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
      * - access "html" via $(this.element) to use JQuery stuff
      */
     override async _onRender(...args: Parameters<ActiveEffectConfig['_onRender']>) {
+        await super._onRender(...args);
+
         const applyToSelect = this.element.querySelector<HTMLSelectElement>('select[name="system.applyTo"]')
         if (applyToSelect) {
             applyToSelect.addEventListener('change', (event) => { void this.onApplyToChange(event, applyToSelect); });
@@ -245,21 +240,14 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
      * Depending on this effects source document being actor or item, some effect apply to
      * should not be available.
      */
-    prepareApplyToOptions(): {label: string, value: string}[] {
-        const effectApplyTo = foundry.utils.deepClone(SR5.effectApplyTo) as Record<string, string>;
+    prepareApplyToOptions() {
+        const isActor = this.document.parent instanceof SR5Actor;
 
-        // Actors can't use effects that only apply to tests from items.
-        if (this.document.parent instanceof SR5Actor) {
-            delete effectApplyTo.test_item;
-        }
-
-        // data model types expect an array of value/label objects
-        return Object.entries(effectApplyTo).map(([value, label]) => {
-            return {
-                label: game.i18n.localize(label),
-                value,
-            }
-        });
+        return Object.entries(SR5.effectApplyTo)
+            // Skip 'test_item' if the parent is an Actor
+            .filter(([value]) => !(isActor && value === 'test_item'))
+            // Map the remaining entries to the expected data model format
+            .map(([value, label]) => ({ label: game.i18n.localize(label) as Translation, value }));
     }
 
     /**
@@ -277,11 +265,13 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
      * Get the available Test types for applyTo Test options
      */
     _getTestOptions() {
-        // Tagify expects this format for localized tags.
-        // FIXME TS 'test' comes out as 'unknown' so we need to cast it to any here
-        return Object.values(game.shadowrun5e.tests).map(((test: any) => ({
-            label: test.label, id: test.name
-        })));
+        const options: Record<string, Translation> = {};
+
+        for (const test of Object.values(game.shadowrun5e.tests) as any[]) {
+            options[test.name] = test.label;
+        }
+
+        return options;
     }
 
     /**
@@ -289,7 +279,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
      */
     _getCategoryOptions() {
         // Tagify expects this format for localized tags.
-        return Object.entries(SR5.actionCategories).map(([category, label]) => ({ label, id: category }));
+        return { ...SR5.actionCategories };
     }
 
     /**
@@ -302,35 +292,34 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
 
         // Use ActionFlow to assure either custom skills or global skills to be included.
         const selected = this.document.system.selection_skills;
-        const selectedSkillNames = selected.map(({id}) => id);
-        const skills = ActionFlow.sortedActiveSkills(actorOrNothing, selectedSkillNames);
-        return Object.entries(skills).map(([id, label]) => ({ label: label as Translation, id }));
+        return ActionFlow.sortedActiveSkills(actorOrNothing, selected);
     }
 
     /**
      * Get the available Attributes for applyTo Test options
      */
     _getAttributeOptions() {
-        return Object.entries(SR5.attributes).map(([attribute, label]) => ({ label, id: attribute }));
+        return { ...SR5.attributes };
     }
 
     /**
      * Get the available Limits for applyTo Test options
      */
     _getLimitOptions() {
-        return Object.entries(SR5.limits).map(([limit, label]) => ({ label, id: limit }));
+        return { ...SR5.limits };
     }
 
-    override _onChangeForm(formConfig, event) {
-        super._onChangeForm(formConfig, event);
-    
+    override _onChangeForm(...args: Parameters<ActiveEffectConfig['_onChangeForm']>) {
+        super._onChangeForm(...args);
+        const [, event] = args;
+
         // Update the priority value to match the type selection
         // Use FoundryVTT default approach of changing priority based on type changes using _onChangeForm
         // @ts-expect-error TODO: fvtt - v14 - missing type foundry.utils.isElementInstanceOf
         if (foundry.utils.isElementInstanceOf(event.target, "select") && event.target.name.endsWith(".type")) {
-            const typeSelect = event.target;
+            const typeSelect = event.target as HTMLSelectElement;
             const selector = `input[name="${typeSelect.name.replace(/\.type$/, ".priority")}"]`;
-            const priorityInput = typeSelect.closest("li").querySelector(selector);
+            const priorityInput = typeSelect.closest("li")!.querySelector(selector);
             // @ts-expect-error TODO: fvtt - v14 - missing type ActiveEffect.CHANGE_TYPES
             priorityInput.value = ActiveEffect.CHANGE_TYPES[typeSelect.value]?.defaultPriority ?? "";
         }
