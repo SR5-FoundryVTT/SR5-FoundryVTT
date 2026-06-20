@@ -326,6 +326,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
             addItem: SR5BaseActorSheet.#createItem,
             editItem: SR5BaseActorSheet.#editItem,
+            moveItem: SR5BaseActorSheet.#moveItem,
             deleteItem: SR5BaseActorSheet.#deleteItem,
             favoriteItem: SR5BaseActorSheet.#favoriteItem,
 
@@ -1095,6 +1096,12 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
             item = await fromUuid(uuid);
         }
         if (item) await item.sheet?.render(true, { mode: 'edit' } as any);
+    }
+
+    static async #moveItem(this: SR5BaseActorSheet, event: PointerEvent) {
+        event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
+        await this._moveItemToInventory(event.target);
     }
 
     async _handleDeleteItem(item: SR5Item) {
