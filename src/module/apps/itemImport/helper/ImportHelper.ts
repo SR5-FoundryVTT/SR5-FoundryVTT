@@ -35,7 +35,16 @@ export class ImportHelper {
         if (this.currentFile && this.translationMap.files[this.currentFile]?.[text]) {
             return this.translationMap.files[this.currentFile][text];
         }
-        return this.translationMap.global[text] ?? text;
+        if (this.translationMap.global[text]) {
+            return this.translationMap.global[text];
+        }
+        // Fallback: Check other file translation maps for a match on the name
+        for (const file of Object.keys(this.translationMap.files)) {
+            if (file !== this.currentFile && this.translationMap.files[file][text]) {
+                return this.translationMap.files[file][text];
+            }
+        }
+        return text;
     }
 
 
