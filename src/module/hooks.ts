@@ -19,6 +19,7 @@ import { HandlebarManager } from './handlebars/HandlebarManager';
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
 import { ActorImporter } from './apps/itemImport/apps/ActorImporter';
 import { BulkImporter } from './apps/itemImport/apps/BulkImporter';
+import { CharacterImporter } from './apps/actorImport/characterImporter/CharacterImporter';
 import { ChangelogApplication } from "./apps/ChangelogApplication";
 import { SituationModifiersApplication } from './apps/SituationModifiersApplication';
 import { SR5ICActorSheet } from "./actor/sheets/SR5ICActorSheet";
@@ -176,7 +177,7 @@ export class HooksManager {
         Hooks.on('deleteItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('getChatMessageContextOptions', SuccessTest.chatMessageContextOptions.bind(SuccessTest));
 
-        Hooks.on("renderChatLog", HooksManager.chatLogListeners.bind(HooksManager));
+        Hooks.on('renderChatLog', HooksManager.chatLogListeners.bind(HooksManager));
 
         MatrixHooks.registerHooks();
         RiggingHooks.registerHooks();
@@ -364,7 +365,13 @@ ___________________
             /**
              * The global data storage for the system.
              */
-            storage: SRStorage
+            storage: SRStorage,
+
+
+            /**
+             *The Character Importer for the SR5 system.
+             */
+            CharacterImporter
         };
 
         // Register document classes
@@ -571,6 +578,18 @@ ___________________
 
         const situationModifiersControl = SituationModifiersApplication.getControl();
         controls.tokens.tools[situationModifiersControl.name] = situationModifiersControl;
+
+        const successTestControl = {
+            name: 'sr5-success-test',
+            title: 'SR5.Tests.SuccessTest',
+            icon: 'fas fa-dice',
+            button: true,
+            onChange: (_event: Event, active: boolean) => {
+                if (!active) return;
+                void TestCreator.promptSuccessTest();
+            },
+        };
+        controls.tokens.tools[successTestControl.name] = successTestControl;
     }
 
     /**
@@ -687,8 +706,6 @@ ___________________
         await ActionFollowupFlow.chatLogListeners(chatLog, html, data);
         await TeamworkTest.chatLogListeners(chatLog, html);
         await JournalEnrichers.chatlogRequestHooks(html);
-
-        this.renderSuccessTestPromptButton();
     }
 
     static configureVision() {
@@ -703,31 +720,4 @@ ___________________
         JournalEnrichers.setEnrichers();
     }
 
-    /**
-     * Add a button to Prompt for a Success Test
-     */
-    static renderSuccessTestPromptButton() {
-        const id = 'sr5e-success-test-button-prompt';
-        const inner = `<i class="fas fa-dice"></i>`;
-        // look for an already rendered button and update the innerHTML of it just in case it changed (I'm not sure this is necessary)
-        const rendered = document.getElementById(id);
-        if (rendered) {
-            rendered.innerHTML = inner;
-        } else {
-            // create the button using custom attributes 
-            const button = document.createElement('button');
-            button.setAttribute('type', 'button');
-            button.setAttribute('id', id);
-            button.setAttribute('data-tooltip', 'SR5.Tests.SuccessTest');
-            // this class matches what the existing icons use
-            button.setAttribute('class', 'ui-control icon');
-            button.innerHTML = inner;
-            button.addEventListener('click', () => {
-                TestCreator.promptSuccessTest();
-            })
-            // target the roll-privacy div that holds the different Roll options (Public/Self/etc)
-            const element = document.getElementById('roll-privacy');
-            element?.prepend(button);
-        }
-    }
 }
