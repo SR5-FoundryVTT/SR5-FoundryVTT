@@ -19,6 +19,7 @@ import { HandlebarManager } from './handlebars/HandlebarManager';
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
 import { ActorImporter } from './apps/itemImport/apps/ActorImporter';
 import { BulkImporter } from './apps/itemImport/apps/BulkImporter';
+import { CharacterImporter } from './apps/actorImport/characterImporter/CharacterImporter';
 import { ChangelogApplication } from "./apps/ChangelogApplication";
 import { SituationModifiersApplication } from './apps/SituationModifiersApplication';
 import { SR5ICActorSheet } from "./actor/sheets/SR5ICActorSheet";
@@ -364,7 +365,13 @@ ___________________
             /**
              * The global data storage for the system.
              */
-            storage: SRStorage
+            storage: SRStorage,
+
+
+            /**
+             *The Character Importer for the SR5 system.
+             */
+            CharacterImporter
         };
 
         // Register document classes
