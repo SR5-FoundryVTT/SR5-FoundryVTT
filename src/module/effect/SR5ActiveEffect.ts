@@ -1,3 +1,4 @@
+import { SR } from '../constants';
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
@@ -99,6 +100,13 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (!this.system.targets?.length) {
             this.updateSource({ system: { targets: [{ applyTo: 'actor' }] } });
         }
+
+        // Core only anchors `start` for Actor-owned effects. Item-owned temporary effects need an
+        // anchor too, otherwise isExpiryTrackable (requires !!start) will never be true for them.
+        if (this.parent instanceof SR5Item && this.isTemporary && !this.start) {
+            const combat = this.actor?.inCombat ? (game.combat ?? null) : null;
+            this.updateSource({ start: SR5ActiveEffect.getEffectStart(combat) });
+        }
     }
 
     /**
@@ -187,6 +195,10 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     override get isSuppressed(): boolean {
+        // Native registry sets duration.expired when the span+boundary are reached. Mirror that suppression
+        // here so expired effects are greyed out and not applied, regardless of parent type.
+        if (this.duration.expired) return true;
+
         if (!(this.parent instanceof SR5Item)) return false;
 
         if (this.system.onlyForEquipped && !this.parent.isEquipped()) return true;
@@ -195,6 +207,64 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (this.parent.isType('sprite_power') && !this.parent.system.enabled) return true;
 
         return false;
+    }
+
+    /**
+     * Determine whether the given expiry event triggers expiry for this effect.
+     * Real-time and permanent effects delegate to the native implementation.
+     * Combat-duration effects (units='rounds') use SR5 pass-aware boundary logic.
+     */
+    override isExpiryEvent(event: string, context?: ActiveEffect.IsExpiryEventContext): boolean {
+        // Real-time (time units) and permanent (no value) delegate entirely to native:
+        //   - real_time: updateWorldTime → native checks secondsRemaining ≤ 0
+        //   - permanent: not isTemporary → not registered → never called
+        const rawUnits = this.toObject().duration?.units;
+        if (rawUnits !== 'rounds') return super.isExpiryEvent(event, context);
+
+        // Combat duration (units='rounds'): out-of-combat expiry is time-based via span alone.
+        if (event === 'updateWorldTime') return !(this.actor?.inCombat);
+
+        const dur = this.system.duration;
+        const combat = context?.combat ?? game.combat;
+        // During fast-forward/multi-step dispatch, combat.combatant is already at the final
+        // position. Read the acting combatant for this event from context.turn instead.
+        const ctx = context as any;
+        const acting = ctx?.turn != null
+            ? combat?.turns[ctx.turn as number]
+            : combat?.combatant;
+
+        switch (dur.boundary) {
+            case '':
+                // Expires at the end of the round once remaining ≤ 0.
+                return event === 'roundEnd';
+
+            case 'first_acting':
+                // Pass-1-only, via turnStart. combatRewind excluded: it only fires on pass transitions
+                // (pass ≥ 2), where the FIRST_PASS guard would make it unreachable.
+                return event === 'turnStart'
+                    && acting?.actor === this.actor
+                    && combat?.system?.pass === SR.combat.FIRST_PASS;
+
+            case 'initiative':
+                // Expires when the acting combatant's initiative falls below the stored threshold.
+                return (event === 'turnStart' || event === 'combatRewind')
+                    && (acting?.initiative ?? Infinity) < (dur.initiative ?? Infinity);
+        }
+
+        return false;
+    }
+
+    /**
+     * Re-enable an expired effect, reset its anchor, and re-register it with the expiry registry.
+     * Use this to restart a duration that was consumed (e.g. buff renewed for another combat).
+     */
+    async restart(): Promise<this | void> {
+        const combat = this.actor?.inCombat ? (game.combat ?? undefined) : undefined;
+        return this.update({
+            disabled: false,
+            duration: { expired: false },
+            start: SR5ActiveEffect.getEffectStart(combat ?? null),
+        });
     }
 
     /**

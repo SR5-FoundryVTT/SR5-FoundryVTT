@@ -100,7 +100,6 @@
     /* Bound the tab so long target lists scroll instead of growing the window off-screen.
        Use max-height (not height: 100%) so the section doesn't collapse against the auto-sized window. */
     overflow-y: auto;
-    max-height: 60vh;
     gap: var(--spacer-8, 0.5rem);
 
     .effect-target {
@@ -229,5 +228,226 @@
         align-items: center;
         margin: 0;
         padding: 0;
+    }
+
+    .tab[data-tab="duration"] {
+        container-type: inline-size;
+        overflow-y: auto;
+    }
+
+    .sr5-effect-duration {
+        display: grid;
+        gap: 0.75rem;
+        padding: 0.5rem;
+    }
+
+    .duration-panel {
+        display: grid;
+        gap: 0.5rem;
+        min-width: 0;
+        margin: 0;
+        padding: 0.65rem 0.75rem 0.75rem;
+        border: 1px solid var(--sr5v2-border);
+        border-radius: 0.4rem;
+        background: var(--sr5v2-bg-elevated);
+
+        > legend {
+            padding-inline: 0.35rem;
+            color: var(--sr5v2-text-primary);
+            font-weight: 700;
+        }
+    }
+
+    .duration-control {
+        display: grid;
+        grid-template-columns: minmax(9rem, 0.7fr) minmax(14rem, 1.5fr);
+        gap: 0.75rem;
+        align-items: center;
+        min-width: 0;
+
+        > label {
+            color: var(--sr5v2-label);
+            font-weight: 700;
+        }
+    }
+
+    .duration-control-fields {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        min-width: 0;
+
+        input,
+        select {
+            width: 100%;
+            min-width: 0;
+        }
+    }
+
+    .duration-value-fields {
+        display: grid;
+        grid-template-columns: minmax(5rem, 1fr) minmax(9rem, 1fr);
+    }
+
+    .duration-status {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        gap: 0.65rem;
+        align-items: center;
+        padding: 0.2rem 0;
+        color: var(--sr5v2-text-primary);
+    }
+
+    .duration-status-icon {
+        width: 1.25rem;
+        color: var(--sr5v2-label);
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    .duration-status-copy {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+
+        strong {
+            color: var(--sr5v2-text-primary);
+            line-height: 1.2;
+        }
+
+        span {
+            color: var(--sr5v2-text-muted);
+            font-size: 0.85em;
+            line-height: 1.25;
+        }
+    }
+
+    .duration-status-panel--pending,
+    .duration-status-panel--restart-pending {
+        border-color: var(--sr5v2-label-muted);
+        background: color-mix(in srgb, var(--sr5v2-label) 8%, transparent);
+    }
+
+    .duration-status-panel--expired {
+        border-color: var(--sr5-theme-failure);
+        background: color-mix(in srgb, var(--sr5-theme-failure) 8%, transparent);
+
+        .duration-status-icon {
+            color: var(--sr5-theme-failure);
+        }
+    }
+
+    .duration-start-row {
+        display: grid;
+        grid-template-columns: minmax(9rem, 0.7fr) minmax(14rem, 1.5fr);
+        gap: 0.75rem;
+        align-items: baseline;
+        min-width: 0;
+        padding-block: 0.2rem;
+
+        .label {
+            color: var(--sr5v2-label);
+            font-weight: 700;
+        }
+
+        .value {
+            min-width: 0;
+            color: var(--sr5v2-text-primary);
+            font-weight: 600;
+            text-align: right;
+            overflow-wrap: anywhere;
+        }
+    }
+
+    .duration-restart {
+        display: inline-flex;
+        gap: 0.4rem;
+        align-items: center;
+        justify-content: center;
+        width: auto;
+        min-width: max-content;
+        margin: 0;
+        padding-inline: 0.75rem;
+        color: var(--sr5v2-control-text);
+        background: var(--sr5v2-control-bg-strong);
+        border-color: var(--sr5v2-control-border);
+
+        &:hover,
+        &:focus-visible {
+            color: var(--sr5v2-text-primary);
+            background: var(--sr5v2-bg-hover);
+            border-color: var(--sr5v2-control-border-hover);
+        }
+    }
+
+    @container (max-width: 520px) {
+        .duration-control {
+            grid-template-columns: 1fr;
+            gap: 0.25rem;
+        }
+
+        .duration-start-row {
+            grid-template-columns: 1fr;
+            gap: 0.1rem;
+
+            .value {
+                text-align: left;
+            }
+        }
+
+        .duration-status {
+            grid-template-columns: auto minmax(0, 1fr);
+        }
+
+        .duration-restart {
+            grid-column: 1 / -1;
+            width: 100%;
+        }
+    }
+}
+
+/* Active Effect rows shared by actor and item sheets. */
+.sr5v2 {
+    .list-item {
+        .effect-duration-col {
+            flex: 0 1 9rem;
+            min-width: 5rem;
+            justify-content: flex-start;
+            overflow: hidden;
+
+            > i {
+                flex: 0 0 1rem;
+                color: var(--sr5v2-text-muted);
+                text-align: center;
+            }
+
+            > label {
+                min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+
+        .effect-duration-col--pending > i {
+            color: var(--sr5v2-label);
+        }
+
+        .effect-duration-col--expired {
+            color: var(--sr5-theme-failure);
+
+            > i {
+                color: inherit;
+            }
+        }
+
+        .effect-expired-control {
+            color: var(--sr5-theme-failure);
+
+            &:hover,
+            &:focus-visible {
+                color: var(--sr5v2-link-hover);
+            }
+        }
     }
 }

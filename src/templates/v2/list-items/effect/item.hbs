@@ -22,15 +22,15 @@
             </a>
         </div>
 
-        <div class="list-item-col thicc-col">
-            <label>{{#each item.system.targets}}{{localizeOb this.applyTo @root.config.effectApplyTo}}{{#unless @last}}, {{/unless}}{{/each}}</label>
+        {{#with (effectDurationStatus item) as |dur|}}
+        <div class="list-item-col effect-duration-col effect-duration-col--{{dur.state}}"
+             data-tooltip="{{#if (eq dur.state "expired")}}SR5.ActiveEffect.Duration.ExpiredOpenEditor{{else}}{{dur.detail}}{{/if}}">
+            <i class="{{dur.icon}}" aria-hidden="true"></i>
+            {{#unless (eq dur.state "permanent")}}
+            <label>{{dur.summary}}</label>
+            {{/unless}}
         </div>
-
-        {{!-- Add in when we actual deal with durations
-        <div class="list-item-col">
-            <label>{{effectDurationLabel item}}</label>
-        </div>
-        --}}
+        {{/with}}
 
         <div class="list-item-icons {{#if @root.isPlayMode}} skinny-icons {{/if}}">
             {{#if @root.isPlayMode}}

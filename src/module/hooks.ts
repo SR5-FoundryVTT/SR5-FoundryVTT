@@ -458,6 +458,10 @@ ___________________
         CONFIG.time.turnTime = SR.combat.TURN_TIME_SECONDS;
         CONFIG.time.roundTime = SR.combat.ROUND_TIME_SECONDS;
 
+        // Keep expired effects (greyed, restartable) instead of deleting.
+        // Explicit so a core/module change can't silently flip it to "delete".
+        CONFIG.ActiveEffect.expiryAction = "update";
+
         registerSystemSettings();
         registerSystemKeybindings();
 

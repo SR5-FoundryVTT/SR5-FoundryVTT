@@ -1334,6 +1334,13 @@ export const SR5 = {
         'limits': 'SR5.ActiveEffect.FilterTypes.Limits',
     },
 
+    // Combat duration boundary choices: when within the remaining span the effect expires.
+    effectDurationBoundaries: {
+        '':             'SR5.ActiveEffect.Boundaries.RoundEnd',
+        'first_acting': 'SR5.ActiveEffect.Boundaries.FirstActing',
+        'initiative':   'SR5.ActiveEffect.Boundaries.Initiative',
+    },
+
     itemCategoryIconOverrides: {
         action: {},
         adept_power: {},

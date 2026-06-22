@@ -15,6 +15,7 @@ import { shadowrunSR5SpriteDataPrep } from './sr5.SpriteDataPrep.spec';
 import { shadowrunSR5ICDataPrep } from './sr5.ICDataPrep.spec';
 import { shadowrunSR5VehicleDataPrep } from './sr5.VehicleDataPrep.spec';
 import { shadowrunSR5ActiveEffect } from './sr5.ActiveEffect.spec';
+import { shadowrunEffectDuration } from './sr5.EffectDuration.spec';
 import { shadowrunTesting } from './sr5.Testing.spec';
 import { shadowrunInventoryFlow } from './sr5.Inventory.spec';
 import { weaponParserBaseTesting } from './sr5.WeaponParser.spec';
@@ -88,6 +89,9 @@ export const quenchRegister = (quench: Quench) => {
     registerBatch(quench, 'shadowrun5e.entities.items', shadowrunSR5Item, { displayName: 'SHADOWRUN5e: SR5Item Test' });
     registerBatch(quench, 'shadowrun5e.entities.effects', shadowrunSR5ActiveEffect, {
         displayName: 'SHADOWRUN5e: SR5ActiveEffect Test',
+    });
+    registerBatch(quench, 'shadowrun5e.entities.effects.duration', shadowrunEffectDuration, {
+        displayName: 'SHADOWRUN5e: ActiveEffect Duration Test',
     });
     registerBatch(quench, 'shadowrun5e.data_prep.character', shadowrunSR5CharacterDataPrep, {
         displayName: 'SHADOWRUN5e: SR5CharacterDataPreparation Test',

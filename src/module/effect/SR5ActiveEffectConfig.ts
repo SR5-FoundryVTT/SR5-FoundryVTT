@@ -8,6 +8,7 @@ import { ActiveEffectDM } from '@/module/types/effect/ActiveEffect';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 import { SR5ActiveEffect } from './SR5ActiveEffect';
 import { Translation } from '../utils/strings';
+import { EffectDurationStatus, prepareEffectDurationStatus } from './EffectDurationStatus';
 
 /**
  * Data Object that gets provided to the templates for ActiveEffects
@@ -29,6 +30,15 @@ type SR5ActiveEffectSheetData = ActiveEffectConfig.RenderContext & {
     changeTypes: Record<string, string>;
     system: ActiveEffectDM;
     systemFields: typeof ActiveEffectDM.schema.fields;
+
+    /** 'permanent' | 'realtime' | 'combat' — derived from duration.units for the duration tab. */
+    durationType: string;
+    /** Prepared boundary choices for the combat duration type's boundary select. */
+    boundaryOptions: { value: string; label: string; selected: boolean }[];
+    /** State-aware summary for the duration status strip. */
+    durationStatus: EffectDurationStatus;
+    /** Prepared display data for the effect's working-copy start anchor. */
+    start?: ActiveEffectConfig.StartContext | null;
 }
 
 /**
@@ -59,6 +69,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
      * dropped on submit/close so the next render reflects the saved document.
      */
     private _clone: SR5ActiveEffect | null = null;
+    private _restartDurationPending = false;
 
     get clone(): SR5ActiveEffect {
         return (this._clone ??= this.document.clone({}, { keepId: true }) as unknown as SR5ActiveEffect);
@@ -73,6 +84,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
             addCondition: this.#onAddCondition,
             removeCondition: this.#onRemoveCondition,
             addChange: this.#onAddChange,
+            restartDuration: this.#onRestartDuration,
         },
         classes: ["active-effect-config", SR5_APPV2_CSS_CLASS, 'named-sheet'],
         position: { width: 760 },
@@ -116,6 +128,8 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         changes: {template: 'systems/shadowrun5e/dist/templates/effect/active-effect-changes.hbs', scrollable: ["ol[data-changes]"]},
         // override the details tab so we can include our extra settings
         details: {template: 'systems/shadowrun5e/dist/templates/effect/active-effect-details.hbs', scrollable: [""]},
+        // override the duration tab with SR5-specific type/boundary controls
+        duration: {template: 'systems/shadowrun5e/dist/templates/effect/active-effect-duration.hbs', scrollable: [""]},
         targets: {template: 'systems/shadowrun5e/dist/templates/effect/active-effect-targets.hbs', scrollable: [""]},
     }
 
@@ -142,6 +156,26 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         }
 
         return frame;
+    }
+
+    /**
+     * Prepare start details from the working clone so staged restarts are reflected before submit.
+     */
+    protected override async _prepareStartContext(): Promise<ActiveEffectConfig.StartContext | null> {
+        const start = this.clone.toObject().start;
+        if (!start) return null;
+
+        const time = game.time.calendar.format(game.time.worldTime - start.time, 'ago');
+        const combat = this.clone.start?.combat ?? null;
+        const combatant = start.combatant ? (combat?.combatants.get(start.combatant) ?? null) : null;
+        const combatantName = combatant?.visible ? (combatant.name ?? '???') : '???';
+        const combatantInitiative = combatant?.visible === false
+            ? '???'
+            : typeof combatant?.initiative === 'number'
+                ? combatant.initiative
+                : game.i18n.localize('EFFECT.START.NoInitiative');
+
+        return { ...start, time, combat, combatant, combatantName, combatantInitiative };
     }
 
     /**
@@ -177,6 +211,13 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         data.targetApplyToById = this.prepareTargetApplyToById();
         data.changeTypes = this.prepareChangeTypes();
 
+        // Duration tab context
+        data.durationType = this.prepareDurationType();
+        data.boundaryOptions = this.prepareBoundaryOptions();
+        data.durationStatus = prepareEffectDurationStatus(this.clone, {
+            restartPending: this._restartDurationPending,
+        });
+
         return data;
     }
 
@@ -186,6 +227,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     protected override _onClose(...args: Parameters<ActiveEffectConfig['_onClose']>) {
         super._onClose(...args);
         this._clone = null;
+        this._restartDurationPending = false;
     }
 
     /**
@@ -301,17 +343,36 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     }
 
     /**
+     * Stage a restart on the working clone. The saved effect is not changed until the sheet is submitted.
+     */
+    static async #onRestartDuration(this: SR5ActiveEffectConfig, event: PointerEvent, _target: HTMLElement) {
+        event.preventDefault();
+        this._syncFormIntoClone();
+
+        const combat = this.clone.actor?.inCombat ? (game.combat ?? null) : null;
+        this.clone.updateSource({
+            disabled: false,
+            duration: { expired: false },
+            start: SR5ActiveEffect.getEffectStart(combat),
+        });
+        this._restartDurationPending = true;
+
+        await this.render();
+    }
+
+    /**
      * Preserve conditional data which is intentionally absent from the rendered form.
      * This applies both to working-clone synchronization and the final document submit.
      */
     protected override _processFormData(...args: Parameters<ActiveEffectConfig['_processFormData']>) {
         const submitData = super._processFormData(...args) as {
-            system?: { targets?: unknown }
+            system?: { targets?: unknown };
+            [key: string]: unknown;
         };
         const submittedTargets = submitData.system?.targets;
 
         if (submittedTargets && typeof submittedTargets === 'object') {
-            const cloneTargets = this.clone.system.toObject().targets as any[];
+            const cloneTargets = this.clone.system.toObject().targets;
             for (const [index, submittedTarget] of Object.entries(submittedTargets)) {
                 if (!submittedTarget || typeof submittedTarget !== 'object' || 'conditions' in submittedTarget) continue;
 
@@ -321,6 +382,31 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
                 target.conditions = existingTarget?.conditions ?? [];
             }
         }
+
+        const durationType = submitData._durationType as string | undefined;
+        delete submitData._durationType;
+
+        const dur = (submitData.duration ?? {}) as Record<string, unknown>;
+        if (durationType === 'permanent') {
+            // No value → Infinity → not isTemporary → not tracked.
+            dur.value = null;
+            dur.units = 'seconds';
+        } else if (durationType === 'combat') {
+            // Always store combat as 'rounds'.
+            dur.units = 'rounds';
+        }
+        // Force expiry to null for all duration types: our isExpiryEvent override fully owns the
+        // trigger moment and the core default (expiry="turnStart" for numeric values) would
+        // interfere with roundEnd and combatRewind boundaries.
+        dur.expiry = null;
+
+        if (this._restartDurationPending) {
+            submitData.disabled = false;
+            dur.expired = false;
+            submitData.start = this.clone.toObject().start;
+        }
+
+        submitData.duration = dur;
 
         return submitData;
     }
@@ -491,7 +577,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         super._onChangeForm(...args);
         const [, event] = args;
         const target = event.target;
-        
+
         // Safely extract the name string
         const name = (target as HTMLSelectElement).name || "";
 
@@ -511,6 +597,71 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
             if (priorityInput) {
                 priorityInput.value = String(ActiveEffect.CHANGE_TYPES[target.value]?.defaultPriority ?? "");
             }
+        }
+
+        if (target instanceof HTMLSelectElement && name === '_durationType') {
+            this._applyDurationTypeToClone(target.value);
+            void this.render();
+            return;
+        }
+
+        if ((target instanceof HTMLInputElement || target instanceof HTMLSelectElement)
+            && (name === 'duration.value' || name === 'duration.units')) {
+            this._syncFormIntoClone();
+            void this.render();
+            return;
+        }
+
+        if (target instanceof HTMLSelectElement && name === 'system.duration.boundary') {
+            this._syncFormIntoClone();
+            void this.render();
+            return;
+        }
+    }
+
+    /** Derive the current display type from the clone's native duration units. */
+    private prepareDurationType(): string {
+        const raw = this.clone.toObject().duration;
+        if (raw.value == null || !Number.isFinite(Number(raw.value))) return 'permanent';
+        if (raw.units === 'rounds') return 'combat';
+        return 'realtime';
+    }
+
+    /** Build the boundary choices list for the combat duration type select. */
+    private prepareBoundaryOptions() {
+        const current = this.clone.system.duration.boundary;
+        return Object.entries(SR5.effectDurationBoundaries).map(([value, locKey]) => ({
+            value,
+            label: game.i18n.localize(locKey),
+            selected: value === current,
+        }));
+    }
+
+    /**
+     * Update the working clone with sensible defaults when the user switches duration type via the
+     * _durationType select. Called from _onChangeForm before re-render.
+     */
+    private _applyDurationTypeToClone(durationType: string): void {
+        const currentUnits = this.clone.duration.units;
+        const currentValue = this.clone.duration.value;
+        const TIME_UNITS: string[] = ['seconds', 'minutes', 'hours', 'days', 'months', 'years'];
+
+        if (durationType === 'permanent') {
+            this.clone.updateSource({ duration: { value: null } });
+        } else if (durationType === 'realtime') {
+            const needsTimeUnit = !TIME_UNITS.includes(currentUnits);
+            const needsValue = !Number.isFinite(currentValue);
+            if (needsTimeUnit || needsValue) {
+                this.clone.updateSource({ duration: {
+                    ...(needsValue ? { value: 1 } : {}),
+                    ...(needsTimeUnit ? { units: 'minutes' } : {}),
+                }});
+            }
+        } else if (durationType === 'combat') {
+            this.clone.updateSource({ duration: {
+                units: 'rounds',
+                ...((!Number.isFinite(currentValue) || currentValue == null) ? { value: 1 } : {}),
+            }});
         }
     }
 }

@@ -16,6 +16,13 @@ const TargetData = () => ({
     onlyForItemTest: new BooleanField(),
 });
 
+const DurationData = () => ({
+    // Which combat event within the remaining span triggers expiry.
+    boundary:   new StringField({ required: true, blank: true, initial: '', choices: SR5.effectDurationBoundaries }),
+    // Initiative score threshold; only meaningful when boundary === 'initiative'.
+    initiative: new NumberField({ required: false, integer: true, nullable: true, initial: null }),
+});
+
 const ActiveEffectData = (baseChanges: foundry.data.ActiveEffectTypeDataModel.ChangeSchema) => ({
     appliedByTest:   new BooleanField(),
     onlyForEquipped: new BooleanField(),
@@ -30,6 +37,7 @@ const ActiveEffectData = (baseChanges: foundry.data.ActiveEffectTypeDataModel.Ch
         priority: new NumberField(baseChanges.priority.options),
         target: new StringField({ required: false, blank: true, initial: "" }),
     })),
+    duration: new SchemaField(DurationData()),
 });
 
 export class ActiveEffectDM extends foundry.data.ActiveEffectTypeDataModel<ReturnType<typeof ActiveEffectData>> {
