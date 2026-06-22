@@ -132,6 +132,7 @@
         "ActiveEffect": {
             "ApplyTo": "적용 대상",
             "ApplyTos": {
+                "TestTargetingThisActor": "이 액터를 대상으로 하는 판정",
                 "TargetedActor": "목표 액터",
                 "TestItem": "물품을 통한 판정"
             },

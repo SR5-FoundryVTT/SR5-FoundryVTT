@@ -287,6 +287,32 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
             yield { effect, applyTo: 'test_all' };
         }
 
+        // Effects on actors targeted by this test can modify the incoming test. Resolve both
+        // Actor and TokenDocument targets to actors, deduplicating linked actor/token references.
+        const targetActors = new Map<string, SR5Actor>();
+        for (const target of this.test.targets) {
+            const actor = target instanceof SR5Actor
+                ? target
+                : target instanceof TokenDocument
+                    ? target.actor
+                    : null;
+            if (!(actor instanceof SR5Actor)) continue;
+
+            const actorKey = actor.uuid ?? actor.id;
+            if (!actorKey) continue;
+            targetActors.set(actorKey, actor);
+        }
+
+        for (const actor of targetActors.values()) {
+            for (const effect of allApplicableDocumentEffects(actor, { applyTo: ['test_target'] })) {
+                yield { effect, applyTo: 'test_target' };
+            }
+
+            for (const effect of allApplicableItemsEffects(actor, { applyTo: ['test_target'] })) {
+                yield { effect, applyTo: 'test_target' };
+            }
+        }
+
         // Skip tests without an item for apply-to test_item effects.
         if (!this.test.item) return;
 

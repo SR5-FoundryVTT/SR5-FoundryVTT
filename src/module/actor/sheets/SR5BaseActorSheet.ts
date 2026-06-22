@@ -2130,7 +2130,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
      * on the actors own sheet.
      */
     get itemEffectApplyTos() {
-        return ['actor', 'item', 'test_all', 'test_item', 'modifier'];
+        return ['actor', 'item', 'test_all', 'test_item', 'test_target', 'modifier'];
     }
 
     override async _onFirstRender(context, options) {

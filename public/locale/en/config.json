@@ -132,6 +132,7 @@
         "ActiveEffect": {
             "ApplyTo": "Apply-To",
             "ApplyTos": {
+                "TestTargetingThisActor": "Test Targeting This Actor",
                 "TargetedActor": "Targeted Actor",
                 "TestItem": "Test via Item"
             },

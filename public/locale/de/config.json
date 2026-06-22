@@ -132,6 +132,7 @@
         "ActiveEffect": {
             "ApplyTo": "Anwenden auf",
             "ApplyTos": {
+                "TestTargetingThisActor": "Probe, die diesen Akteur als Ziel hat",
                 "TargetedActor": "Anvisierten Akteur",
                 "TestItem": "Probe aus Item"
             },

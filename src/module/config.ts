@@ -1318,6 +1318,7 @@ export const SR5 = {
         'targeted_actor': 'SR5.ActiveEffect.ApplyTos.TargetedActor',
         'test_all': 'SR5.Test',
         'test_item': 'SR5.ActiveEffect.ApplyTos.TestItem',
+        'test_target': 'SR5.ActiveEffect.ApplyTos.TestTargetingThisActor',
         'modifier': 'SR5.Modifier'
     },
 

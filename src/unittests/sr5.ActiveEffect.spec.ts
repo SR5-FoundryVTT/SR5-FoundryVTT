@@ -498,6 +498,13 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                     },
                 },
                 {
+                    name: 'Incoming Test Effect',
+                    system: {
+                        changes: [{ key: 'system.attributes.body', value: '3', type: 'add', target: 't' }],
+                        targets: [{ id: 't', applyTo: 'test_target' }],
+                    },
+                },
+                {
                     name: 'Modifiers Effect',
                     system: {
                         changes: [{ key: 'system.attributes.body', value: '3', type: 'add', target: 't' }],
@@ -506,7 +513,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 },
             ]);
 
-            assert.lengthOf(actor.effects.contents, 5);
+            assert.lengthOf(actor.effects.contents, 6);
             assert.lengthOf(actor.system.attributes.body.changes, 2);
             assert.equal(actor.system.attributes.body.value, 6);
         });
@@ -615,6 +622,154 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.equal(test.pool.value, poolValue);
             assert.deepEqual(test.hits.changes, [createTestChange(effects[0], 2)]);
             assert.isAtLeast(test.hits.value, hitsValue);
+        });
+
+        it('INCOMING TEST apply-to: targeted actor effect modifies the incoming test only', async () => {
+            const attacker = await factory.createActor({ type: 'character' });
+            const target = await factory.createActor({ type: 'character' });
+            const other = await factory.createActor({ type: 'character' });
+
+            await target.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Incoming Target Effect',
+                system: {
+                    targets: [
+                        {
+                            id: 'incoming',
+                            applyTo: 'test_target',
+                            conditions: [{ type: 'categories', values: ['social'] }],
+                        },
+                        { id: 'actor', applyTo: 'actor' },
+                    ],
+                    changes: [
+                        { key: 'data.pool', value: '2', type: 'add', target: 'incoming' },
+                        { key: 'system.attributes.body', value: '4', type: 'add', target: 'actor' },
+                    ],
+                },
+            }]);
+            await other.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Untargeted Incoming Effect',
+                system: {
+                    targets: [{ id: 'incoming', applyTo: 'test_target' }],
+                    changes: [{ key: 'data.pool', value: '9', type: 'add', target: 'incoming' }],
+                },
+            }]);
+
+            const action = DataDefaults.createData('action_roll', {
+                test: SkillTest.name,
+                categories: ['social'],
+            });
+            const test = (await TestCreator.fromAction(
+                action,
+                attacker,
+                { showDialog: false, showMessage: false },
+            ))!;
+            test.targets = [target];
+            test.prepareTestCategories();
+            test.effects.applyAllEffects();
+            ModifiableValue.calcTotal(test.pool);
+
+            assert.strictEqual(test.pool.value, 2);
+            assert.include(test.pool.changes.map(change => change.name), 'Incoming Target Effect');
+            assert.notInclude(test.pool.changes.map(change => change.name), 'Untargeted Incoming Effect');
+            assert.strictEqual(target.system.attributes.body.value, 4, 'actor-targeted change still applies only to actor data');
+        });
+
+        it('INCOMING TEST apply-to: targeted actor item effects apply and resolve target-side dynamic values', async () => {
+            const attacker = await factory.createActor({ type: 'character' });
+            const target = await factory.createActor({ type: 'character' });
+            const items = await target.createEmbeddedDocuments('Item', [{
+                type: 'action',
+                name: 'Target-side Source',
+                system: { action: { mod: 4 } },
+            }]);
+            const item = items[0] as SR5Item;
+
+            await item.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Target Item Incoming Effect',
+                system: {
+                    targets: [{ id: 'incoming', applyTo: 'test_target' }],
+                    changes: [{ key: 'data.pool', value: '@system.action.mod', type: 'add', target: 'incoming' }],
+                },
+            }]);
+
+            const action = DataDefaults.createData('action_roll', { test: SkillTest.name });
+            const test = (await TestCreator.fromAction(
+                action,
+                attacker,
+                { showDialog: false, showMessage: false },
+            ))!;
+            test.targets = [target];
+            test.effects.applyAllEffects();
+            ModifiableValue.calcTotal(test.pool);
+
+            assert.strictEqual(test.pool.value, 4);
+            assert.include(test.pool.changes.map(change => change.name), 'Target Item Incoming Effect');
+        });
+
+        it('INCOMING TEST apply-to: multiple target effects stack while duplicate actor targets apply once', async () => {
+            const attacker = await factory.createActor({ type: 'character' });
+            const targetA = await factory.createActor({ type: 'character' });
+            const targetB = await factory.createActor({ type: 'character' });
+
+            await targetA.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Incoming A',
+                system: {
+                    targets: [{ id: 'incoming', applyTo: 'test_target' }],
+                    changes: [{ key: 'data.pool', value: '2', type: 'add', target: 'incoming' }],
+                },
+            }]);
+            await targetB.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Incoming B',
+                system: {
+                    targets: [{ id: 'incoming', applyTo: 'test_target' }],
+                    changes: [{ key: 'data.pool', value: '3', type: 'add', target: 'incoming' }],
+                },
+            }]);
+
+            const action = DataDefaults.createData('action_roll', { test: SkillTest.name });
+            const test = (await TestCreator.fromAction(
+                action,
+                attacker,
+                { showDialog: false, showMessage: false },
+            ))!;
+            test.targets = [targetA, targetA, targetB];
+            test.effects.applyAllEffects();
+            ModifiableValue.calcTotal(test.pool);
+
+            assert.strictEqual(test.pool.value, 5);
+            assert.strictEqual(test.pool.changes.filter(change => change.name === 'Incoming A').length, 1);
+            assert.strictEqual(test.pool.changes.filter(change => change.name === 'Incoming B').length, 1);
+        });
+
+        it('INCOMING TEST apply-to: targeted items do not contribute effects', async () => {
+            const attacker = await factory.createActor({ type: 'character' });
+            const target = await factory.createActor({ type: 'character' });
+            const items = await target.createEmbeddedDocuments('Item', [{
+                type: 'action',
+                name: 'Item-only Target',
+            }]);
+            const item = items[0] as SR5Item;
+
+            await item.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Ignored Item Target Effect',
+                system: {
+                    targets: [{ id: 'incoming', applyTo: 'test_target' }],
+                    changes: [{ key: 'data.pool', value: '7', type: 'add', target: 'incoming' }],
+                },
+            }]);
+
+            const action = DataDefaults.createData('action_roll', { test: SkillTest.name });
+            const test = (await TestCreator.fromAction(
+                action,
+                attacker,
+                { showDialog: false, showMessage: false },
+            ))!;
+            test.targets = [item];
+            test.effects.applyAllEffects();
+            ModifiableValue.calcTotal(test.pool);
+
+            assert.strictEqual(test.pool.value, 0);
+            assert.notInclude(test.pool.changes.map(change => change.name), 'Ignored Item Target Effect');
         });
 
         it('TEST_ITEM apply-to: Item effect applies only when on test item', async () => {
