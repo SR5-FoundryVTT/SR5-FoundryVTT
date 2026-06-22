@@ -289,10 +289,19 @@ export const SRStatus = [
                         { type: 'tests', mode: 'include', values: ['MeleeAttackTest'] },
                     ],
                 },
+                {
+                    // -2 to a ranged/thrown attack made against this running actor (applies to the attacker's test).
+                    id: 'targetRanged',
+                    applyTo: 'test_target',
+                    conditions: [
+                        { type: 'tests', mode: 'include', values: ['RangedAttackTest', 'ThrownAttackTest'] },
+                    ],
+                },
             ],
             changes: [
                 { key: "data.pool", type: "add", value: "-2", target: 'penalty' },
                 { key: "data.pool", type: "add", value: "4",  target: 'melee' },
+                { key: "data.pool", type: "add", value: "-2", target: 'targetRanged' },
             ],
         },
     },
@@ -318,10 +327,19 @@ export const SRStatus = [
                         { type: 'tests', mode: 'include', values: ['MeleeAttackTest'] },
                     ],
                 },
+                {
+                    // -4 to a ranged/thrown attack made against this sprinting actor (applies to the attacker's test).
+                    id: 'targetRanged',
+                    applyTo: 'test_target',
+                    conditions: [
+                        { type: 'tests', mode: 'include', values: ['RangedAttackTest', 'ThrownAttackTest'] },
+                    ],
+                },
             ],
             changes: [
                 { key: "data.pool", type: "add", value: "-2", target: 'penalty' },
                 { key: "data.pool", type: "add", value: "4",  target: 'melee' },
+                { key: "data.pool", type: "add", value: "-4", target: 'targetRanged' },
             ],
         },
     },

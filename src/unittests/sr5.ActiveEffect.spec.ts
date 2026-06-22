@@ -704,6 +704,49 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.strictEqual(target.system.attributes.body.value, 4, 'actor-targeted change still applies only to actor data');
         });
 
+        it('SR5 Running Modifiers: ranged attack vs a running/sprinting target gets -2/-4 (test_target)', async () => {
+            const attacker = await factory.createActor({ type: 'character' });
+            const target = await factory.createActor({ type: 'character' });
+            const ranged = await factory.createItem({ type: 'weapon', system: { category: 'range' } });
+
+            const rangedPoolVsTarget = async () => {
+                const test = (await TestCreator.fromItem(ranged, attacker, { showDialog: false, showMessage: false }))!;
+                test.targets = [target];
+                test.prepareTestCategories();
+                test.effects.applyAllEffects();
+                ModifiableValue.calcTotal(test.pool);
+                return test.pool.value;
+            };
+
+            const baseline = await rangedPoolVsTarget();
+
+            await target.toggleStatusEffect('sr5run', { active: true });
+            assert.equal(await rangedPoolVsTarget(), baseline - 2, 'ranged attack vs a running target should be -2');
+
+            await target.toggleStatusEffect('sr5run', { active: false });
+            await target.toggleStatusEffect('sr5sprint', { active: true });
+            assert.equal(await rangedPoolVsTarget(), baseline - 4, 'ranged attack vs a sprinting target should be -4');
+        });
+
+        it('SR5 Running Modifiers: a melee attack vs a running target gets no ranged penalty', async () => {
+            const attacker = await factory.createActor({ type: 'character' });
+            const target = await factory.createActor({ type: 'character' });
+            const melee = await factory.createItem({ type: 'weapon', system: { category: 'melee' } });
+
+            const meleePoolVsTarget = async () => {
+                const test = (await TestCreator.fromItem(melee, attacker, { showDialog: false, showMessage: false }))!;
+                test.targets = [target];
+                test.prepareTestCategories();
+                test.effects.applyAllEffects();
+                ModifiableValue.calcTotal(test.pool);
+                return test.pool.value;
+            };
+
+            const baseline = await meleePoolVsTarget();
+            await target.toggleStatusEffect('sr5run', { active: true });
+            assert.equal(await meleePoolVsTarget(), baseline, 'the ranged-only penalty must not apply to melee attacks');
+        });
+
         it('INCOMING TEST apply-to: targeted actor item effects apply and resolve target-side dynamic values', async () => {
             const attacker = await factory.createActor({ type: 'character' });
             const target = await factory.createActor({ type: 'character' });

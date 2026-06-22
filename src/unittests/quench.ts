@@ -26,7 +26,6 @@ import { shadowrunSR5ItemDataPrep } from './sr5.ItemDataPrep.spec';
 import { shadowrunMatrixTesting } from './sr5.MatrixTesting.spec';
 import { shadowrunDriver } from './sr5.Driver.spec';
 import { shadowrunNPC } from './sr5.NPC.spec';
-import { shadowrunCombatModifierFlow } from './sr5.CombatModifierFlow.spec';
 import { itemSkillTesting } from './ItemSkill.spec';
 import { shadowrunOpposedCompileSpriteTesting } from './sr5.OpposedCompileSprite.spec';
 import { shadowrunOpposedCallInMessageActionTesting } from './sr5.OpposedCallInMessageAction.spec';
@@ -119,9 +118,6 @@ export const quenchRegister = (quench: Quench) => {
     });
     registerBatch(quench, 'shadowrun5e.flow.driver', shadowrunDriver, {
         displayName: 'SHADOWRUN5e: Driver Flow Test',
-    });
-    registerBatch(quench, 'shadowrun5e.flow.combat_modifiers', shadowrunCombatModifierFlow, {
-        displayName: 'SHADOWRUN5e: CombatModifierFlow Test',
     });
     registerBatch(quench, 'shadowrun5e.flow.rigger', shadowrunRiggerTesting, {
         displayName: 'SHADOWRUN5e: Rigger Flow Testing',
