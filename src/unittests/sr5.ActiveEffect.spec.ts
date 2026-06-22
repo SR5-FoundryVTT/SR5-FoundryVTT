@@ -1,5 +1,4 @@
 import { SR5TestFactory } from './utils';
-import { SR5Item } from '../module/item/SR5Item';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { SkillTest } from '../module/tests/SkillTest';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
@@ -25,7 +24,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
      * @returns The change object.
      */
     const createTestChange = (effect: SR5ActiveEffect, id: number): ModifiableValueType['changes'][number] => {
-        const change = effect.changes[id];
+        const change = effect.system.changes[id];
         return DataDefaults.createData('change_entry', {
             name: effect.name,
             value: parseInt(String(change.value)),
@@ -33,6 +32,37 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             priority: parseInt(String(change.priority)),
             source: effect.uuid,
         });
+    };
+
+    /**
+     * Create a character with deterministic zero-rated, defaultable active skills.
+     * These tests must not depend on the world's configured skill compendia.
+     */
+    const createCharacterWithSkills = async (skills: string[]) => {
+        const previousSkipDefaultSkills = window.doNotPopulateDefaultSkills;
+        window.doNotPopulateDefaultSkills = true;
+
+        try {
+            return await factory.createActor({
+                type: 'character',
+                items: skills.map(name => ({
+                    name,
+                    type: 'skill',
+                    system: {
+                        type: 'skill',
+                        skill: {
+                            category: 'active',
+                            rating: 0,
+                            defaulting: true,
+                            attribute: 'agility',
+                        },
+                    },
+                })),
+            });
+        } finally {
+            if (previousSkipDefaultSkills === undefined) delete window.doNotPopulateDefaultSkills;
+            else window.doNotPopulateDefaultSkills = previousSkipDefaultSkills;
+        }
     };
 
     describe('SR5ActiveEffect', () => {
@@ -58,9 +88,9 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('OVERRIDE mode: apply the system override mode', async () => {
-            const actor = await factory.createActor({ type: 'character' });
+            const actor = await createCharacterWithSkills(['Automatics']);
 
-            // Assert overriden default values.
+            // Assert overridden default values.
             assert.strictEqual(actor.system.skills.active.automatics.canDefault, true);
 
             const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
@@ -87,7 +117,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.attributes.agility.base, 0);
             assert.strictEqual(actor.system.attributes.agility.value, 3);
 
-            // Case - ModifableValue with a direct key not part of value calculation (see SR5ActiveEffect.modifiableValueProperties)
+            // Case - ModifiableValue with a direct key not part of value calculation (see SR5ActiveEffect.modifiableValueProperties)
             // Skill automatics normally can default, which we overwrite here.
             // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
             const active = actor.system.skills.active;
@@ -98,7 +128,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.nuyen, 4);
         });
 
-        it('OVERRIDE mode: override all existing .mod values', async () => {
+        it('OVERRIDE mode: override all existing .mod values', () => {
             it('apply the custom override mode', async () => {
                 const actor = await factory.createActor({ type: 'character' });
                 const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
@@ -145,7 +175,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('ADD mode: adding to ModifiableField should cause MODIFY mode to be used', async () => {
-            const actor = await factory.createActor({ type: 'character' });
+            const actor = await createCharacterWithSkills(['Automatics']);
 
             assert.strictEqual(actor.system.attributes.body.value, 0);
             assert.strictEqual(actor.system.skills.active.automatics.value, 0);
@@ -169,7 +199,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('ADD mode: adding to ModifiableField property should cause MODIFY mode to be used', async () => {
-            const actor = await factory.createActor({ type: 'character' });
+            const actor = await createCharacterWithSkills(['Automatics']);
 
             assert.strictEqual(actor.system.attributes.body.value, 0);
             assert.strictEqual(actor.system.skills.active.automatics.value, 0);
@@ -529,7 +559,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             const target = await factory.createActor({ type: 'character' });
 
             const items = await attacker.createEmbeddedDocuments('Item', [{ type: 'action', name: 'Test Action' }]);
-            const item = items[0] as SR5Item;
+            const item = items[0];
 
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Targeted Effect',
@@ -611,7 +641,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 }
             }]);
 
-            const test = (await TestCreator.fromItem(item as SR5Item, actor, { showDialog: false, showMessage: false }))!;
+            const test = (await TestCreator.fromItem(item, actor, { showDialog: false, showMessage: false }))!;
 
             await test.execute();
 
@@ -682,7 +712,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 name: 'Target-side Source',
                 system: { action: { mod: 4 } },
             }]);
-            const item = items[0] as SR5Item;
+            const item = items[0];
 
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Target Item Incoming Effect',
@@ -748,7 +778,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 type: 'action',
                 name: 'Item-only Target',
             }]);
-            const item = items[0] as SR5Item;
+            const item = items[0];
 
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Ignored Item Target Effect',
@@ -816,7 +846,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             const item2 = items.pop()!;
 
             // Create the wrong effect on the wrong item.
-            const item2Effects = await item2.createEmbeddedDocuments('ActiveEffect', [{
+            await item2.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect Wrong Item',
                 system: {
                     targets: [{ id: 't', applyTo: 'test_item' }],
@@ -829,7 +859,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             }]);
 
             // Test is created using the correct item.
-            const test = (await TestCreator.fromItem(item as SR5Item, actor, { showDialog: false, showMessage: false }))!;
+            const test = (await TestCreator.fromItem(item, actor, { showDialog: false, showMessage: false }))!;
 
             await test.execute();
 
@@ -883,7 +913,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 },
             ]);
 
-            const activeTest = (await TestCreator.fromItem(items[0] as SR5Item, actor, { showDialog: false, showMessage: false }))!;
+            const activeTest = (await TestCreator.fromItem(items[0], actor, { showDialog: false, showMessage: false }))!;
             const opposedData = await OpposedTest._getOpposedActionTestData(activeTest.data, actor, '');
             if (!opposedData) throw new Error('Failed to create opposed test data.');
 
@@ -943,7 +973,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('TEST_ALL apply-to: respect skill, attribute and limit selections', async () => {
-            const actor = await factory.createActor({ type: 'character' });
+            const actor = await createCharacterWithSkills(['Automatics', 'Clubs']);
             const skillName = actor.getSkill('automatics')?.name ?? 'automatics';
 
             await actor.createEmbeddedDocuments('ActiveEffect', [{
@@ -1167,7 +1197,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 }
             }]);
 
-            let test = (await TestCreator.fromItem(actions[0] as SR5Item, actor, { showDialog: false, showMessage: false }))!;
+            let test = (await TestCreator.fromItem(actions[0], actor, { showDialog: false, showMessage: false }))!;
             await test.execute();
 
             // The first roll should have the effect applied
@@ -1181,7 +1211,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             actions = await actor.createEmbeddedDocuments('Item', [
                 { name: 'Test Action', type: 'action', system: { action: { extended: true } } },
             ]);
-            test = (await TestCreator.fromItem(actions[0] as SR5Item, actor, { showDialog: false, showMessage: false }))!;
+            test = (await TestCreator.fromItem(actions[0], actor, { showDialog: false, showMessage: false }))!;
 
             // This will trigger the first and all extended rolls...
             await test.execute();
@@ -1326,7 +1356,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('Should apply skill-filtered modifiers for canonical keys and legacy skill names', async () => {
-            const actor = await factory.createActor({ type: 'character' });
+            const actor = await createCharacterWithSkills(['Sneaking']);
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Skill Effect',
                 system: {
