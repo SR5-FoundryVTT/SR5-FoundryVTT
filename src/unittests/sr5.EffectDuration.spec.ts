@@ -51,9 +51,11 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
         rawDuration: Partial<ActiveEffect.DurationData>,
         preparedDuration: Partial<ActiveEffect.Duration>,
         restartPending = false,
+        systemDuration?: { boundary?: string; initiative?: number | null },
     ) => prepareEffectDurationStatus({
         toObject: () => ({ duration: rawDuration }),
         duration: preparedDuration,
+        system: systemDuration ? { duration: systemDuration } : undefined,
     } as unknown as SR5ActiveEffect, { restartPending });
 
     // -------------------------------------------------------------------------
@@ -109,6 +111,39 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
             assert.equal(expired.summary, game.i18n.localize('SR5.ActiveEffect.Duration.Expired'));
             assert.notInclude(expired.summary, 'ago');
             assert.equal(restartPending.state, 'restart-pending');
+        });
+
+        it('shows the initiative threshold (not a generic message) for a pending initiative boundary', () => {
+            const status = durationStatus(
+                { value: 1, units: 'rounds', expired: false },
+                { remaining: 0, label: '0 Rounds' },
+                false,
+                { boundary: 'initiative', initiative: 10 },
+            );
+
+            assert.equal(status.state, 'pending');
+            assert.equal(status.summary, game.i18n.format('SR5.ActiveEffect.Duration.UntilInitiative', { initiative: 10 }));
+            assert.notEqual(status.summary, game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingBoundary'));
+        });
+
+        it('shows boundary-specific pending text for first_acting and end-of-turn', () => {
+            const firstActing = durationStatus(
+                { value: 1, units: 'rounds', expired: false },
+                { remaining: 0, label: '0 Rounds' },
+                false,
+                { boundary: 'first_acting', initiative: null },
+            );
+            const turnEnd = durationStatus(
+                { value: 1, units: 'rounds', expired: false },
+                { remaining: 0, label: '0 Rounds' },
+                false,
+                { boundary: '', initiative: null },
+            );
+
+            assert.equal(firstActing.summary, game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingFirstActing'));
+            assert.equal(turnEnd.summary, game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingTurnEnd'));
+            assert.notEqual(firstActing.summary, game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingBoundary'));
+            assert.notEqual(turnEnd.summary, game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingBoundary'));
         });
     });
 
@@ -230,15 +265,15 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
     // isExpiryEvent — combat boundary='initiative'
     // -------------------------------------------------------------------------
     describe("isExpiryEvent — combat, boundary='initiative'", () => {
-        it("fires on turnStart when acting initiative < threshold", async () => {
+        it("fires on sr5ActionPhase when acting initiative < threshold", async () => {
             const { actor, effect } = await createEffect({type: 'character'}, {
                 duration: { value: 1, units: 'rounds', expiry: null } as any,
                 system: { duration: { boundary: 'initiative', initiative: 10 } } as any,
             });
             // Simulate a context where the acting combatant has initiative 8 < 10
             const fakeCombatant = { actor, initiative: 8 };
-            const fakeContext = { turn: 0, combat: { turns: [fakeCombatant], system: { pass: 1 } } };
-            const result = effect.isExpiryEvent('turnStart', fakeContext as any);
+            const fakeContext = { combat: { combatant: fakeCombatant, system: { pass: 1 } } };
+            const result = effect.isExpiryEvent('sr5ActionPhase', fakeContext as any);
             assert.isTrue(result, 'should expire when acting initiative 8 < threshold 10');
         });
 
@@ -248,20 +283,21 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
                 system: { duration: { boundary: 'initiative', initiative: 10 } } as any,
             });
             const fakeCombatant = { actor, initiative: 12 };
-            const fakeContext = { turn: 0, combat: { turns: [fakeCombatant], system: { pass: 1 } } };
-            const result = effect.isExpiryEvent('turnStart', fakeContext as any);
+            const fakeContext = { combat: { combatant: fakeCombatant, system: { pass: 1 } } };
+            const result = effect.isExpiryEvent('sr5ActionPhase', fakeContext as any);
             assert.isFalse(result, 'should not expire when acting initiative 12 >= threshold 10');
         });
 
-        it("fires on combatRewind when acting initiative < threshold", async () => {
+        it("ignores Foundry's native turn events (only sr5ActionPhase drives it)", async () => {
             const { actor, effect } = await createEffect({type: 'character'}, {
                 duration: { value: 1, units: 'rounds', expiry: null } as any,
                 system: { duration: { boundary: 'initiative', initiative: 10 } } as any,
             });
             const fakeCombatant = { actor, initiative: 5 };
-            const fakeContext = { turn: 0, combat: { turns: [fakeCombatant], system: { pass: 1 } } };
-            const result = effect.isExpiryEvent('combatRewind', fakeContext as any);
-            assert.isTrue(result, 'should expire on combatRewind when initiative < threshold');
+            const fakeContext = { combat: { combatant: fakeCombatant, system: { pass: 1 } } };
+            assert.isFalse(effect.isExpiryEvent('turnStart', fakeContext as any), 'turnStart must not drive expiry');
+            assert.isFalse(effect.isExpiryEvent('combatRewind', fakeContext as any), 'combatRewind must not drive expiry');
+            assert.isTrue(effect.isExpiryEvent('sr5ActionPhase', fakeContext as any), 'sr5ActionPhase must drive expiry');
         });
     });
 
@@ -269,14 +305,14 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
     // isExpiryEvent — combat boundary='first_acting'
     // -------------------------------------------------------------------------
     describe("isExpiryEvent — combat, boundary='first_acting'", () => {
-        it("fires on turnStart when owning actor acts in pass 1", async () => {
+        it("fires on sr5ActionPhase when owning actor acts in pass 1", async () => {
             const { actor, effect } = await createEffect({type: 'character'}, {
                 duration: { value: 1, units: 'rounds', expiry: null } as any,
                 system: { duration: { boundary: 'first_acting', initiative: null } } as any,
             });
             const fakeCombatant = { actor };
-            const fakeContext = { turn: 0, combat: { turns: [fakeCombatant], system: { pass: 1 } } };
-            const result = effect.isExpiryEvent('turnStart', fakeContext as any);
+            const fakeContext = { combat: { combatant: fakeCombatant, system: { pass: 1 } } };
+            const result = effect.isExpiryEvent('sr5ActionPhase', fakeContext as any);
             assert.isTrue(result, 'should expire when owning actor acts in pass 1');
         });
 
@@ -288,8 +324,8 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
             // Different actor in the combatant slot
             const otherActor = await factory.createActor({ type: 'character' });
             const fakeCombatant = { actor: otherActor };
-            const fakeContext = { turn: 0, combat: { turns: [fakeCombatant], system: { pass: 1 } } };
-            const result = effect.isExpiryEvent('turnStart', fakeContext as any);
+            const fakeContext = { combat: { combatant: fakeCombatant, system: { pass: 1 } } };
+            const result = effect.isExpiryEvent('sr5ActionPhase', fakeContext as any);
             assert.isFalse(result, 'should not expire when a different actor acts');
         });
 
@@ -299,8 +335,8 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
                 system: { duration: { boundary: 'first_acting', initiative: null } } as any,
             });
             const fakeCombatant = { actor };
-            const fakeContext = { turn: 0, combat: { turns: [fakeCombatant], system: { pass: 2 } } };
-            const result = effect.isExpiryEvent('turnStart', fakeContext as any);
+            const fakeContext = { combat: { combatant: fakeCombatant, system: { pass: 2 } } };
+            const result = effect.isExpiryEvent('sr5ActionPhase', fakeContext as any);
             assert.isFalse(result, 'should not expire in pass 2 (only pass 1 is first_acting)');
         });
     });
@@ -339,53 +375,57 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
     });
 
     // -------------------------------------------------------------------------
-    // Combat integration — which native expiry events SR5 combat actually fires.
-    // Closes handoff gate D1: the whole combat design rests on turnStart firing
-    // within a pass, combatRewind on pass transition, and roundEnd/roundStart on
-    // round advance. This drives a REAL SR5Combat and records registry events.
+    // Combat integration — SR5Combat must drive the expiry registry on every action
+    // phase via 'sr5ActionPhase', because Foundry's turn-index dispatch skips events
+    // when the turn index doesn't move (notably a SINGLE combatant pushed to a new pass).
     // -------------------------------------------------------------------------
-    describe('combat integration — expiry event dispatch (gate D1)', () => {
-        it('fires turnStart within a pass, combatRewind on pass transition, roundEnd on round', async function () {
-            // Registry expiry writes and turn-event dispatch are GM-only.
-            if (!game.user?.isActiveGM) { this.skip(); return; }
-
-            const a1 = await factory.createActor({ type: 'character' });
-            const a2 = await factory.createActor({ type: 'character' });
-
+    describe('combat integration — sr5ActionPhase dispatch', () => {
+        /** Run `drive` against a real SR5Combat with `count` combatants and return the registry events seen. */
+        const recordEvents = async (count: number, drive: (combat: Combat.Implementation) => Promise<void>) => {
             const combat = await getDocumentClass('Combat').create({}) as Combat.Implementation;
+            const combatants: { actorId: string }[] = [];
+            for (let i = 0; i < count; i++) {
+                const actor = await factory.createActor({ type: 'character' });
+                combatants.push({ actorId: actor.id! });
+            }
+            const events: string[] = [];
+            const registry = foundry.documents.ActiveEffect.registry;
+            const originalRefresh = registry.refresh.bind(registry);
             try {
-                await combat.createEmbeddedDocuments('Combatant', [{ actorId: a1.id }, { actorId: a2.id }]);
+                await combat.createEmbeddedDocuments('Combatant', combatants);
                 await combat.startCombat();
-                // Deterministic initiative high enough that a second pass exists
-                // (initAfterPass = init − PASS_PENALTY > 0 ⇒ init > 10), forcing nextPass.
+                // High enough that a second pass exists (initAfterPass = init − PASS_PENALTY > 0 ⇒ init > 10).
                 for (const c of combat.combatants) await c.update({ initiative: 20 });
 
-                // Record the events SR5 combat dispatches to the expiry registry.
-                const events: string[] = [];
-                const registry = foundry.documents.ActiveEffect.registry;
-                const originalRefresh = registry.refresh.bind(registry);
-                registry.refresh = (event: string, ctx: any) => {
-                    events.push(event);
-                    return originalRefresh(event, ctx);
-                };
-
-                try {
-                    await combat.nextTurn();   // within pass 1 → turnStart
-                    await combat.nextTurn();   // both acted → nextPass → pass transition
-                    await combat.nextRound();  // round advance → roundEnd/roundStart
-                } finally {
-                    registry.refresh = originalRefresh;
-                }
-
-                assert.include(events, 'turnStart', 'turnStart must fire for a turn within a pass');
-                assert.include(events, 'roundEnd', 'roundEnd must fire on round advance');
-                assert.include(events, 'roundStart', 'roundStart must fire on round advance');
-                // The load-bearing prediction: a pass transition moves the turn index backward,
-                // which Foundry dispatches as combatRewind (NOT turnStart).
-                assert.include(events, 'combatRewind', 'pass transition must fire combatRewind');
+                registry.refresh = (event: string, ctx: any) => { events.push(event); return originalRefresh(event, ctx); };
+                await drive(combat);
             } finally {
+                registry.refresh = originalRefresh;
                 await combat.delete();
             }
+            return events;
+        };
+
+        it('fires sr5ActionPhase advancing turns/passes with multiple combatants', async function () {
+            if (!game.user?.isActiveGM) { this.skip(); return; }
+            const events = await recordEvents(2, async (combat) => {
+                await combat.nextTurn();   // within pass 1
+                await combat.nextTurn();   // both acted → nextPass (pass transition)
+                await combat.nextRound();  // round advance
+            });
+            assert.include(events, 'sr5ActionPhase', 'sr5ActionPhase must fire while advancing combat');
+        });
+
+        it('fires sr5ActionPhase with a SINGLE combatant (regression: same combatant re-acts each pass)', async function () {
+            if (!game.user?.isActiveGM) { this.skip(); return; }
+            // The reported bug: with one combatant, a new pass re-acts the SAME combatant (a pad shifts the
+            // index, but combat.combatant is unchanged), so Foundry dispatches no turnStart. SR5Combat._onUpdate
+            // must still emit sr5ActionPhase so the boundary is evaluated.
+            const events = await recordEvents(1, async (combat) => {
+                await combat.nextTurn();   // sole combatant acts → nextPass → re-acts (index stays 0)
+                await combat.nextTurn();
+            });
+            assert.include(events, 'sr5ActionPhase', 'sr5ActionPhase must fire even with one combatant');
         });
     });
 };

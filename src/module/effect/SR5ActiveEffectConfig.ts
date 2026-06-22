@@ -175,7 +175,13 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
                 ? combatant.initiative
                 : game.i18n.localize('EFFECT.START.NoInitiative');
 
-        return { ...start, time, combat, combatant, combatantName, combatantInitiative };
+        // A missing acting initiative is recorded as MAX_SAFE_INTEGER ("effectively infinite");
+        // show ∞ instead of a giant number (or a raw null for legacy effects).
+        const initiative = (start.initiative == null || start.initiative >= Number.MAX_SAFE_INTEGER)
+            ? '∞' as unknown as number
+            : start.initiative;
+
+        return { ...start, initiative, time, combat, combatant, combatantName, combatantInitiative };
     }
 
     /**

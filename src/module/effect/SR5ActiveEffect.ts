@@ -226,32 +226,40 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         const dur = this.system.duration;
         const combat = context?.combat ?? game.combat;
-        // During fast-forward/multi-step dispatch, combat.combatant is already at the final
-        // position. Read the acting combatant for this event from context.turn instead.
-        const ctx = context as any;
-        const acting = ctx?.turn != null
-            ? combat?.turns[ctx.turn as number]
-            : combat?.combatant;
+        // The acting combatant is whoever the combat currently points at. SR5Combat fires sr5ActionPhase
+        // from _onUpdate after the turn/pass advance, so combat.combatant is already the current actor.
+        const acting = combat?.combatant;
 
         switch (dur.boundary) {
             case '':
-                // Expires at the end of the round once remaining ≤ 0.
+                // Expires at the end of the round once remaining ≤ 0. roundEnd fires natively on every
+                // round change (single combatant included), so it needs no SR5-specific dispatch.
                 return event === 'roundEnd';
 
             case 'first_acting':
-                // Pass-1-only, via turnStart. combatRewind excluded: it only fires on pass transitions
-                // (pass ≥ 2), where the FIRST_PASS guard would make it unreachable.
-                return event === 'turnStart'
+                // Pass-1-only. Driven by SR5Combat's sr5ActionPhase (fires every action phase); Foundry's
+                // turnStart isn't emitted when the same combatant re-acts in a new pass.
+                return event === 'sr5ActionPhase'
                     && acting?.actor === this.actor
                     && combat?.system?.pass === SR.combat.FIRST_PASS;
 
             case 'initiative':
                 // Expires when the acting combatant's initiative falls below the stored threshold.
-                return (event === 'turnStart' || event === 'combatRewind')
+                return event === 'sr5ActionPhase'
                     && (acting?.initiative ?? Infinity) < (dur.initiative ?? Infinity);
         }
 
         return false;
+    }
+
+    /**
+     * Capture the duration start anchor, recording a missing acting initiative as effectively-infinite rather
+     * than null (NumberField rejects Infinity, so MAX_SAFE_INTEGER is the sentinel).
+     */
+    static override getEffectStart(combat = game.combat ?? null) {
+        const start = super.getEffectStart(combat ?? null);
+        if (start.initiative == null) start.initiative = Number.MAX_SAFE_INTEGER;
+        return start;
     }
 
     /**
