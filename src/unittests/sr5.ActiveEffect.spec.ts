@@ -475,6 +475,20 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.strictEqual(effect.system.targets[0].applyTo, 'actor');
         });
 
+        it('_preCreate auto-binding: target-less changes are bound to the seeded actor target and apply', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const effects = (await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Binding Test',
+                system: { changes: [{ key: 'system.attributes.body', value: '2', type: 'add' }] },
+            }])) as SR5ActiveEffect[];
+
+            const effect = effects[0];
+            assert.lengthOf(effect.system.targets, 1, 'one actor target was seeded');
+            assert.strictEqual(effect.system.targets[0].applyTo, 'actor');
+            assert.strictEqual(effect.system.changes[0].target, effect.system.targets[0].id, 'change was bound to the seeded target');
+            assert.strictEqual(actor.system.attributes.body.value, 2, 'change applied to actor data');
+        });
+
         it('Create an item effect and assert its not created on actor as until FoundryVTT v10', async () => {
             const actor = await factory.createActor({ type: 'character' });
             const items = await actor.createEmbeddedDocuments('Item', [{

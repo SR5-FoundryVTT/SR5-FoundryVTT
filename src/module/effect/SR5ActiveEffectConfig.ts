@@ -210,7 +210,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         data.changeTypes = this.prepareChangeTypes();
 
         // Duration tab context
-        data.boundaryOptions = this.prepareBoundaryOptions();
+        data.boundaryOptions = this.prepareBoundaryOptions(data.source);
         data.durationStatus = prepareEffectDurationStatus(this.clone, {
             restartPending: this._restartDurationPending,
         });
@@ -604,8 +604,8 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     }
 
     /** Build the expiry trigger choices list for the expiry trigger select. */
-    private prepareBoundaryOptions() {
-        const current = this.clone.toObject().duration?.expiry ?? null;
+    private prepareBoundaryOptions(source: ReturnType<SR5ActiveEffect['toObject']>) {
+        const current = source.duration?.expiry ?? null;
         return Object.entries(SR5.effectExpiryTriggers).map(([value, locKey]) => ({
             value,
             label: game.i18n.localize(locKey),

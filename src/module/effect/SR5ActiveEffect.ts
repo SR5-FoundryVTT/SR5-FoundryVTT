@@ -74,8 +74,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
-     * Resolve the target a change belongs to, falling back to the first target for
-     * changes with a blank/unresolved target reference (back-compat).
+     * Resolve the target a change belongs to or undefined if no matching target is found.
      */
     targetForChange(change: { target?: string }) {
         return this.system.targets.find(target => target.id === change.target);
@@ -98,7 +97,18 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (allowed === false) return false;
 
         if (!this.system.targets?.length) {
-            this.updateSource({ system: { targets: [{ applyTo: 'actor' }] } });
+            const id = 'actor';
+            const changes = this.system.toObject().changes.map(change => ({
+                ...change, target: change.target || id,
+            }));
+            this.updateSource({ system: { changes, targets: [{ id, applyTo: 'actor' }] } });
+        } else {
+            const firstId = this.system.targets[0].id;
+            const sourceChanges = this.system.toObject().changes;
+            if (sourceChanges.some(change => !change.target)) {
+                const changes = sourceChanges.map(change => ({ ...change, target: change.target || firstId }));
+                this.updateSource({ system: { changes } });
+            }
         }
 
         // Core only anchors `start` for Actor-owned effects. Item-owned temporary effects need an

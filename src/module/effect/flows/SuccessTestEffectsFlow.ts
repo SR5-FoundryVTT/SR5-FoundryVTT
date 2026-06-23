@@ -332,7 +332,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         if (!this.test.item) return;
 
         for (const effect of this.test.item.effects) {
-            if (effect.system.targets.some(target => target.applyTo === 'targeted_actor')) yield effect;
+            if (effect.appliesToAnyOf(['targeted_actor'])) yield effect;
         }
     }
 }
