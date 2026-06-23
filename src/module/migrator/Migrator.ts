@@ -236,8 +236,8 @@ export class Migrator {
         if (doc.parent instanceof Actor || doc.parent instanceof Item || doc.parent instanceof Combat)
             await this.updateMigratedDocument(doc.parent);
 
-        // Persist the change without triggering diff logic
-        return doc.update(doc.toObject() as any, { diff: false, recursive: false });
+        // Save migrated data silently (no hooks/renders) to avoid intermediate state issues.
+        return doc.update(doc.toObject() as any, { diff: false, recursive: false, noHook: true, render: false });
     }
 
     public static BeginMigration() {
@@ -297,6 +297,7 @@ export class Migrator {
         try {
             return await cls.implementation.updateDocuments(
                 docs.filter(d => d._stats?.systemVersion === this._migrationMark) as any,
+                // Save migrated data silently (no hooks/renders) to avoid intermediate state issues.
                 { parent: parent as any, diff: false, recursive: false, noHook: true, render: false }
             );
         } catch (error) {
@@ -356,6 +357,7 @@ export class Migrator {
 
                         return data;
                     }),
+                    // Save migrated data silently (no hooks/renders) to avoid intermediate state issues.
                     { parent: scene, diff: false, recursive: false, noHook: true, render: false }
                 );
             } catch (error) {
