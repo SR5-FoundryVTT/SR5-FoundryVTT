@@ -352,12 +352,11 @@
             <div class="test-value metric-row">
                 <span class="value">{{localize this.label}}:</span>
                 <span class="value-result">
-                    <span class="button result-action" data-action="{{this.action}}">{{this.value}}</span>
+                    <span class="button result-action" data-action="{{this.action}}">{{signedValue this.value}}</span>
                 </span>
             </div>
             {{/each}}
         </div>
-        <div class="right-side"></div>
     </div>
     {{/if}}
 </div>

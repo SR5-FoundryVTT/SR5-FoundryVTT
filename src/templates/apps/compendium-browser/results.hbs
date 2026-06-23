@@ -11,4 +11,10 @@
             No documents found.
         </div>
     </div>
+    {{#if selectionMode}}
+    <div class="selection-actions">
+        <button type="button" class="selection-button cancel" data-action="cancelSelection">Cancel</button>
+        <button type="button" class="selection-button accept" data-action="acceptSelection">Accept</button>
+    </div>
+    {{/if}}
 </div>

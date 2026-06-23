@@ -6,6 +6,7 @@ import { SkillSetFlow } from '@/module/actor/flows/SkillSetFlow';
 import { SkillSelectionFlow } from '@/module/flows/SkillSelectionFlow';
 import { ActionFlow } from '@/module/item/flows/ActionFlow';
 import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
+import { SkillItemFlow } from '@/module/item/flows/SkillItemFlow';
 import { SR5Item } from '@/module/item/SR5Item';
 import { SR5TestFactory } from './utils';
 
@@ -874,6 +875,76 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(derivedSkill?.base, 5);
             assert.strictEqual(derivedSkill?.value, 5);
             assert.strictEqual(actor.getPool('Pistols'), 8);
+        });
+
+        // Guards spirit checkbox semantics so group rows can store ON/OFF as 1/0 via the shared rating flow.
+        it('accepts boolean-style 1/0 ratings for skill groups through changeSkillRating', async () => {
+            const actor = await factory.createActor({
+                type: 'spirit',
+                system: {
+                    attributes: {
+                        agility: { base: 3 },
+                    },
+                },
+            });
+
+            await actor.createEmbeddedDocuments('Item', [
+                {
+                    type: 'skill',
+                    name: 'Firearms',
+                    system: {
+                        type: 'group',
+                        group: {
+                            rating: 4,
+                            skills: ['Pistols'],
+                        },
+                    },
+                },
+                {
+                    type: 'skill',
+                    name: 'Pistols',
+                    system: {
+                        type: 'skill',
+                        skill: {
+                            category: 'active',
+                            attribute: 'agility',
+                            rating: 1,
+                        },
+                    },
+                },
+            ]);
+
+            const groupItem = actor.items.find(item => {
+                return item.isType('skill') && item.system.type === 'group' && item.name === 'Firearms';
+            }) as SR5Item<'skill'> | undefined;
+
+            assert.exists(groupItem);
+
+            await SkillItemFlow.changeSkillRating(actor, groupItem!.id!, 1);
+            await SkillGroupFlow.syncSkillItemGroups(actor);
+
+            const groupOn = actor.items.get(groupItem!.id!) as SR5Item<'skill'> | undefined;
+            const pistolsOn = actor.items.find(item => {
+                return item.isType('skill') && item.system.type === 'skill' && item.name === 'Pistols';
+            }) as SR5Item<'skill'> | undefined;
+
+            assert.exists(groupOn);
+            assert.exists(pistolsOn);
+            assert.strictEqual(groupOn?.system.group.rating, 1);
+            assert.strictEqual(pistolsOn?.system.skill.rating, 1);
+
+            await SkillItemFlow.changeSkillRating(actor, groupItem!.id!, 0);
+            await SkillGroupFlow.syncSkillItemGroups(actor);
+
+            const groupOff = actor.items.get(groupItem!.id!) as SR5Item<'skill'> | undefined;
+            const pistolsOff = actor.items.find(item => {
+                return item.isType('skill') && item.system.type === 'skill' && item.name === 'Pistols';
+            }) as SR5Item<'skill'> | undefined;
+
+            assert.exists(groupOff);
+            assert.exists(pistolsOff);
+            assert.strictEqual(groupOff?.system.group.rating, 0);
+            assert.strictEqual(pistolsOff?.system.skill.rating, 0);
         });
     });
 

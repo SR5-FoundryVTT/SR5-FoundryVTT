@@ -115,12 +115,15 @@
             "SpellRitual": "주문시전 의식",
             "Summoning": "소환 행동"
         },
-        "ActionType": "유형",
-        "ActionTypeComplex": "복잡",
-        "ActionTypeFree": "자유",
-        "ActionTypeNone": "없음",
-        "ActionTypeSimple": "단순",
-        "ActionTypeVaries": "다양",
+        "ActionType": {
+            "Label": "유형",
+            "Complex": "복잡",
+            "Free": "자유",
+            "Interrupt": "Interrupt",
+            "None": "없음",
+            "Simple": "단순",
+            "Varies": "다양"
+        },
         "Actions": "행동",
         "Active": "활성형",
         "ActiveDefense": "능동 방어",
@@ -1042,7 +1045,8 @@
         "DeviceType": "유형",
         "Dialogs": {
             "Common": {
-                "Cancel": "취소"
+                "Cancel": "취소",
+                "Ok": "확인"
             },
             "RangedWeaponTest": {
                 "EnvironmentalOverwriteSet": "환경 수정치가 수동으로 고정 값으로 설정되었습니다!"
@@ -1261,6 +1265,9 @@
             },
             "Spirit": {
                 "SpiritTypeNotFound": "해당 영혼 유형을 찾을 수 없습니다. chummer에서 내보낸 json으로 github 이슈를 열어주세요."
+            },
+            "Sprite": {
+                "SpriteTypeNotFound": "해당 스프라이트 유형을 찾을 수 없습니다. chummer에서 내보낸 json으로 github 이슈를 열어주세요."
             }
         },
         "ImportCharacter": "캐릭터 불러오기",
@@ -1279,6 +1286,7 @@
         "InitCatMeatspace": "현실",
         "Initiation": "입회",
         "Initiative": "우선권",
+        "InitiativeMod": "우선권 수정치",
         "Internal": "내부",
         "InventoryRename": {
             "Cancel": "취소",
@@ -1289,6 +1297,7 @@
         "IsCritter": "생명체",
         "IsFreshImport": "해당 물품은 처머에서 불러와졌기에 수동으로 살펴봐야 합니다.",
         "IsGrunt": "하수인",
+        "IsGruntHint": "하수인 상태 모니터 규칙(SR5 p.378)을 사용합니다.",
         "IsNPC": "NPC",
         "Item": {
             "FIELDS": {
@@ -1360,6 +1369,10 @@
                     "extended": {
                         "hint": "연장 판정일 경우 선택",
                         "label": "연장 판정"
+                    },
+                    "initiative_mod": {
+                        "hint": "이 행동을 수행할 때 적용되는 우선권 수정치",
+                        "label": "우선권 수정치"
                     },
                     "limit": {
                         "attribute": {
@@ -1723,6 +1736,7 @@
                 "NotVisible": "숨김",
                 "PAN": "PAN",
                 "RebootDevice": "재부팅",
+                "RemoveImprovisedDevices": "즉석 장치 제거",
                 "SubtractOne": "제외",
                 "Type": "종류",
                 "Visible": "보임",
@@ -1812,6 +1826,8 @@
         },
         "Magic": "마법",
         "Manual": "수동 조종",
+        "ManualModifier": "수동 수정치",
+        "ManualModifierValue": "수동 수정치 값",
         "ManualOverride": "결과 오버라이드",
         "MarkImportedItemReviewed": "불러온 항목 검토 완료 표시",
         "MarkImportedItemTooltip": "불러온 항목이 검토된 것으로 표시합니다.",
@@ -1828,6 +1844,9 @@
             "Icons": "아이콘",
             "Invite": "초대 요청",
             "Title": "네트워크로 연결"
+        },
+        "MatrixOpposedDeviceDialog": {
+            "Title": "매트릭스 장치 생성"
         },
         "MatrixTarget": "매트릭스 목표",
         "MeleeWeaponAttack": "근거리 무기 공격",
@@ -1906,6 +1925,9 @@
         "ModificationCategories": "개조 범위",
         "ModificationCategory": "개조 범위",
         "ModificationSlots": "개조 슬롯",
+        "ModificationTypes": {
+            "Ware": "웨어"
+        },
         "Modified": "수정치",
         "ModifiedArmor": "개조된 방어구 수치",
         "ModifiedDamage": "수정된 피해량",
@@ -2528,6 +2550,12 @@
         "Spirit": {
             "Bound": "속박",
             "Force": "강도",
+            "HalfValueSkill": "절반값 기술",
+            "HalfValueSkillHint": "활성화된 기술은 ⌈강도/2⌉를 사용합니다.",
+            "InitiativeFormulaAstral": "아스트랄 우선권 공식",
+            "InitiativeFormulaAstralHint": "아스트랄 우선권의 항목을 선택하세요.",
+            "InitiativeFormulaMeatspace": "현실 우선권 공식",
+            "InitiativeFormulaMeatspaceHint": "현실 우선권의 항목을 선택하세요.",
             "MissingSummoner": "유효한 소환자 없음",
             "Services": "봉사",
             "Summoner": "소환자",
@@ -2642,6 +2670,7 @@
                 }
             },
             "Level": "단계",
+            "LevelAppliesSettingHint": "어떤 스프라이트 속성에 레벨 보너스를 적용할지 설정합니다.",
             "MissingTechnomancer": "유효한 테크노맨서 없음",
             "Registered": "레지스트",
             "Services": "봉사",
@@ -2724,15 +2753,14 @@
                 "Vehicle": "탑승물"
             },
             "Item": {
-                "ArmorMods": "방어구 개조",
                 "Description": "설명",
                 "Details": "세부사항",
                 "Effects": "효과",
+                "Mods": "개조",
                 "Network": "네트워크",
                 "SinLicenses": "면허증",
                 "SinNetworks": "네트워크",
-                "WeaponAmmo": "탄약",
-                "WeaponMods": "부착물"
+                "WeaponAmmo": "탄약"
             }
         },
         "Target": "목표",
@@ -2796,6 +2824,7 @@
             "OpposedCheckOverwatchScoreTest": "감시 점수 확인 대항",
             "OpposedCompileSpriteTest": "컴파일 경쟁\n",
             "OpposedHackOnTheFlyTest": "즉석 해킹 대항",
+            "OpposedMatrixTest": "매트릭스 경쟁 판정",
             "OpposedRitualTest": "의식 봉인",
             "OpposedSummonSpiritTest": "소환 경쟁\n",
             "OpposedTest": "경쟁 판정",
@@ -3184,18 +3213,32 @@
             "FullReload": "완전 장전",
             "Mod": "부착물",
             "Mode": {
-                "BurstFire": "BF",
-                "BurstFireLong": "BF-LB",
-                "BurstFireShort": "BF",
-                "FullAuto": "FA",
-                "FullAutoLong": "FA-L",
-                "FullAutoShort": "FA",
-                "Modes": "사격방식",
-                "SemiAuto": "SA",
-                "SemiAutoBurst": "SA-BF",
-                "SemiAutoShort": "SA",
-                "SingleShot": "SS",
-                "SingleShotShort": "SS"
+                "Mode": "사격방식",
+                "Short": {
+                    "BurstFire": "BF",
+                    "BurstFireLong": "BF-LB",
+                    "BurstFireShort": "BF",
+                    "FullAuto": "FA",
+                    "FullAutoLong": "FA-L",
+                    "FullAutoShort": "FA",
+                    "SemiAuto": "SA",
+                    "SemiAutoBurst": "SA-BF",
+                    "SemiAutoShort": "SA",
+                    "SingleShot": "SS",
+                    "SingleShotShort": "SS"
+                },
+                "Full": {
+                    "BurstFire": "점사",
+                    "BurstFireLong": "긴 점사",
+                    "FullAuto": "완전 자동",
+                    "FullAutoLong": "완전 자동 (복잡)",
+                    "FullAutoShort": "완전 자동 (단순)",
+                    "SemiAuto": "반자동",
+                    "SemiAutoBurst": "반자동 점사",
+                    "SemiAutoShort": "반자동",
+                    "SingleShot": "단발",
+                    "Suppressing": "제압 사격"
+                }
             },
             "Mods": "부착물",
             "PartialReload": "일부 장전",

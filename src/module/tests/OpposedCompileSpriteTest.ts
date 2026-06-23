@@ -1,10 +1,12 @@
 import { SR5Actor } from "../actor/SR5Actor";
-import { SR5 } from "../config";
+import { SR5Item } from "../item/SR5Item";
 import { ModifiableValue } from "../mods/ModifiableValue";
 import { CompileSpriteTest } from "./CompileSpriteTest";
 import { OpposedTest, OpposedTestData } from "./OpposedTest";
-import { TestDocuments, TestOptions } from "./SuccessTest";
+import { SuccessTestData, TestDocuments, TestOptions } from "./SuccessTest";
 import { Translation } from '../utils/strings';
+
+const { setProperty, fromUuid } = foundry.utils;
 
 
 interface OpposedCompileSpriteTestData extends OpposedTestData {
@@ -18,6 +20,40 @@ interface OpposedCompileSpriteTestData extends OpposedTestData {
  */
 export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTestData> {
     declare public against: CompileSpriteTest;
+
+    static async _resolveOpposedBootstrapDocument(
+        againstData: SuccessTestData
+    ): Promise<SR5Actor | SR5Item | null> {
+        const sourceUuid = againstData.sourceActorUuid || againstData.sourceUuid || '';
+
+        let document: unknown = sourceUuid ? await fromUuid(sourceUuid) : null;
+        if (document instanceof TokenDocument)
+            document = document.actor ?? null;
+
+        if (document instanceof SR5Actor || document instanceof SR5Item)
+            return document;
+
+        return null;
+    }
+
+    static override async executeMessageAction(
+        againstData: SuccessTestData,
+        messageId: string,
+        options: TestOptions
+    ): Promise<void> {
+        const bootstrapDocument = await this._resolveOpposedBootstrapDocument(againstData);
+        if (!bootstrapDocument) {
+            ui.notifications?.error('SR5.Errors.NoAvailableActorFound', { localize: true });
+            return;
+        }
+
+        const data = await this._getOpposedActionTestData(againstData, bootstrapDocument, messageId);
+        if (!data) return;
+
+        const documents = { source: bootstrapDocument };
+        const test = new this(data, documents, options);
+        await test.execute();
+    }
 
     constructor(data, documents?: TestDocuments, options?: TestOptions) {
         // Due to compilation, the active actor for this test will be created during execution.
@@ -55,12 +91,12 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
     }
 
     /**
-     * To have an opposing actor, that's not on the map already, create the sprite actor.
+     * Resolve prepared sprite context without creating a new actor.
      */
     override async populateDocuments() {
-        await this.createCompiledSprite();
-
-        this.data.sourceActorUuid = this.data.compiledSpriteUuid || this.against.data.preparedSpriteUuid;
+        const preparedSpriteUuid = this.against.data.preparedSpriteUuid || '';
+        this.data.sourceActorUuid = preparedSpriteUuid;
+        this.data.sourceUuid = preparedSpriteUuid;
 
         await super.populateDocuments();
     }
@@ -78,7 +114,8 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
      */
     override async processFailure() {
         await this.updateCompilationTestForFollowup();
-        await this.finalizeSummonedSprite();
+        await this.createCompiledSprite();
+        await this.finalizeCompiledSprite();
     }
 
     /**
@@ -104,7 +141,7 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
      */
     override async _cleanUpAfterDialogCancel() {
         if (!this.data.compiledSpriteUuid) return;
-        const actor = await fromUuid(this.data.compiledSpriteUuid as any) as SR5Actor;
+        const actor = await fromUuid(this.data.compiledSpriteUuid) as SR5Actor;
         await actor?.delete();
         delete this.actor;
     }
@@ -124,15 +161,17 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
      * 
      * This should be called as the last step in summoning.
      */
-    async finalizeSummonedSprite() {
+    async finalizeCompiledSprite() {
         if (!this.actor) return;
+        if (this.against.preparedSpriteIsCompendium && !this.data.compiledSpriteUuid) return;
+        if (!this.data.compiledSpriteUuid && !this.against.preparedSpriteIsEditable) return;
 
-        const technomancer = this.against.actor!;
+        const technomancer = this.against.actor as SR5Actor;
 
         const updateData = {
             // 'system.services': this.deriveSpriteServices(),
             system: { technomancerUuid: technomancer.uuid }
-        }
+        };
 
         this._addOwnershipToUpdateData(updateData);
 
@@ -169,29 +208,34 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
         if (!this.against) return;
         if (!this.against.actor) return;
 
-        const technomancer = this.against.actor;
+        if (!this.against.data.preparedSpriteUuid) return;
 
-        if (this.against.data.preparedSpriteUuid) {
-            // Reuse a prepared actor...
-            const preparedActor = await this.getPreparedSpriteActor();
-            if (!preparedActor) return console.error('Shadowrun 5e | Could not find prepared actor');
-            await preparedActor.addTechnomancer(technomancer);
-            console.error('Add compiler/mancer? reference to sprite');
+        const preparedActor = await this.getPreparedSpriteActor();
+        if (!preparedActor) return console.error('Shadowrun 5e | Could not find prepared sprite actor');
 
-        } else {
-            // Create a new sprite actor from scratch...
-            const spriteType = this.against.data.spriteTypeSelected as any;
-            const spriteTypeLabel = game.i18n.localize(SR5.spriteTypes[spriteType]);
-            const name = `${technomancer.name} ${spriteTypeLabel} ${game.i18n.localize('TYPES.Actor.sprite')}`;
-            const level = this.against.data.level;
-            const system = { level, spriteType };
+        if (this.against.preparedSpriteIsCompendium) {
+            if (!game.user.can('ACTOR_CREATE'))
+                return ui.notifications.warn('SR5.Warnings.NoActorCreatePermission', { localize: true });
 
-            const actor = await Actor.create({ name, type: 'sprite', system, prototypeToken: { actorLink: true } });
+            const compiledName = `Compiled ${preparedActor.name}`;
+            const preparedSource = game.actors.fromCompendium(preparedActor);
 
+            preparedSource.name = compiledName;
+            setProperty(preparedSource, 'prototypeToken.actorLink', true);
+
+            const actor = await Actor.create(preparedSource);
             if (!actor) return console.error('Shadowrun 5e | Could not create the compiled sprite actor');
 
             this.data.compiledSpriteUuid = actor.uuid;
+            this.data.sourceActorUuid = actor.uuid;
+            this.data.sourceUuid = actor.uuid;
+            this.actor = actor;
+            return;
         }
+
+        this.data.sourceActorUuid = preparedActor.uuid || '';
+        this.data.sourceUuid = preparedActor.uuid || '';
+        this.actor = preparedActor;
     }
 
     /**
@@ -200,6 +244,6 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
      * @returns 
      */
     async getPreparedSpriteActor(): Promise<SR5Actor | null> {
-        return fromUuid<SR5Actor>(this.data.compiledSpriteUuid);
+        return fromUuid<SR5Actor>(this.against.data.preparedSpriteUuid);
     }
 }

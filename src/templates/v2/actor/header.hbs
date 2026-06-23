@@ -10,19 +10,21 @@
             {{#unless isLimited}}
                 {{#if (hasAnyFreshImports actor)}}
                     {{#if @root.isEditMode}}
-                        <button type="button" class="toggle-fresh-import" data-tooltip="SR5.MarkImportsTooltip" data-action="toggleFreshImports">
+                        <button type="button" class="toggle-fresh-import" data-tooltip="SR5.MarkImportsTooltip" data-action="clearFreshImports">
                             <img src="systems/shadowrun5e/dist/icons/checklist-white.svg" width="32px" height="32px" />
                         </button>
                     {{else}}
-                        <label class="toggle-fresh-import" data-tooltip="SR5.MarkImportsTooltip" style="width: 1.5rem; flex-shrink: 0;">
+                        <label class="toggle-fresh-import" data-tooltip="SR5.MarkImportsTooltip">
                             <img src="systems/shadowrun5e/dist/icons/checklist-white.svg" width="32px" height="32px" />
                         </label>
                     {{/if}}
                 {{/if}}
                 {{> 'systems/shadowrun5e/dist/templates/v2/common/document-source-icon.hbs' system.description.source }}
             {{/unless}}
-            {{formInput fields.name value=actor.name classes="sheet-name"
-                        placeholder=(localize "SR5.Name") disabled=@root.isPlayMode rootId=rootId}}
+            <span class="sheet-header-name-input">
+                {{formInput fields.name value=actor.name classes="sheet-name"
+                            placeholder=(localize "SR5.Name") disabled=@root.isPlayMode rootId=rootId}}
+            </span>
         </div>
         {{#if @root.isEditMode}}
             <div class="sheet-header-source">
@@ -80,14 +82,14 @@
         <div class="sheet-header-col">
             {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/initiative.hbs' }}
             {{#if @root.isEditMode}}
-                <div>
-                    <div class="list-item">
-                        <div class="list-item-start">
+                <div class="sheet-header-resource-container">
+                    <div class="list-item sheet-header-resource">
+                        <div class="list-item-start sheet-header-resource-label">
                             <label data-tooltip="{{systemFields.attributes.fields.edge.fields.base.hint}}">
                                 {{systemFields.attributes.fields.edge.fields.base.label}}
                             </label>
                         </div>
-                        <div class="list-item-col">
+                        <div class="list-item-col sheet-header-resource-value">
                             {{formInput systemFields.attributes.fields.edge.fields.base value=source.system.attributes.edge.base
                                         rootId=rootId class="short"}}
                         </div>
@@ -116,12 +118,12 @@
                 </div>
             {{/if}}
             {{#if (or isSpirit isSprite)}}
-                <div>
-                    <div class="list-item">
-                        <div class="list-item-start">
+                <div class="sheet-header-resource-container">
+                    <div class="list-item sheet-header-resource">
+                        <div class="list-item-start sheet-header-resource-label">
                             <label>{{localize "SR5.Sprite.Services"}}</label>
                         </div>
-                        <div class="list-item-col qty-input-col hover-show-button-container"
+                        <div class="list-item-col sheet-header-resource-value qty-input-col hover-show-button-container"
                              data-tooltip="{{#if isSpirit}}SR5.Spirit.Services{{else}}SR5.Sprite.Services{{/if}}">
                             {{#if @root.isEditMode}}
                                 {{formInput systemFields.services value=source.system.services rootId=rootId class="short"}}
@@ -131,7 +133,7 @@
                                    data-tooltip="SR5.Tooltips.Actor.RemoveOneService">
                                     <i class="fas fa-minus-square"></i>
                                 </a>
-                                <label style="font-size: 1.1rem">{{system.services}}</label>
+                                <label class="sheet-header-service-value">{{system.services}}</label>
                                 <a class="hover-show-button"
                                    data-action="addOneService"
                                    data-tooltip="SR5.Tooltips.Actor.AddOneService">

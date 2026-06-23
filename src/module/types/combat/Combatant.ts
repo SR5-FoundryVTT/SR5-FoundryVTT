@@ -3,7 +3,7 @@ import { InitiativeSchema } from "../template/Initiative";
 const { NumberField, BooleanField, SchemaField } = foundry.data.fields;
 
 const CombatantInitiativeData = () => ({
-    last: new SchemaField(InitiativeSchema()),
+    last: new SchemaField(InitiativeSchema({ attributeA: 'reaction', attributeB: 'intuition', constant: 0, dice: 1 })),
     blitz: new BooleanField({ initial: false }),
 });
 

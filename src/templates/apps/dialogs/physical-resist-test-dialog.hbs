@@ -8,14 +8,18 @@
                 <input type="number" value="{{test.data.incomingDamage.value}}" name="test.data.incomingDamage"/>
             </div>
             <div class="form-group">
+                <label>{{localize 'SR5.AP'}}</label>
+                <input type="number" value="{{test.data.incomingDamage.ap.value}}" name="test.data.incomingDamage.ap" data-dtype="Number"/>
+            </div>
+            <div class="form-group">
+                <label>{{localize 'SR5.Item.FIELDS.action.damage.normal_weapon.label'}}</label>
+                <input type="checkbox" class="checkbox" name="test.data.incomingDamage.normal_weapon" {{checked test.data.incomingDamage.normal_weapon}}/>
+            </div>
+            <div class="form-group">
                 <label>{{localize 'SR5.DamageType'}}</label>
                 <select name="test.data.incomingDamage.type.value">
                     {{selectOptions config.damageTypes selected=test.data.incomingDamage.type.value localize=true}}
                 </select>
-            </div>
-            <div class="form-group">
-                <label>{{localize 'SR5.AP'}}</label>
-                <input type="number" value="{{test.data.incomingDamage.ap.value}}" name="test.data.incomingDamage.ap" data-dtype="Number"/>
             </div>
             <div class="form-group">
                 <label>{{localize 'SR5.Element.Label'}}</label>

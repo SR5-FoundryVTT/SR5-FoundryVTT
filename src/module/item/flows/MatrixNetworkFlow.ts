@@ -196,6 +196,33 @@ export class MatrixNetworkFlow {
     }
 
     /**
+     * Collect all improvised devices connected to a network.
+     */
+    static getImprovisedDevices(master: SR5Item): SR5Item<'device'>[] {
+        if (!master.isNetwork()) return [];
+
+        return this.getSlaves(master).filter(slave => {
+            if (!(slave instanceof SR5Item) || !slave.isType('device')) return false;
+            return slave.asType('device')?.system.managed !== null;
+        }) as SR5Item<'device'>[];
+    }
+
+    /**
+     * Delete all improvised devices connected to a given host or grid.
+     */
+    static async removeImprovisedDevices(master: SR5Item): Promise<number> {
+        if (!game.user?.isGM) return 0;
+        if (!master.isNetwork()) return 0;
+
+        const devices = this.getImprovisedDevices(master);
+        for (const device of devices) {
+            await device.delete();
+        }
+
+        return devices.length;
+    }
+
+    /**
      * Note: This handler will be called for all active users, even if they lack permission to alter item data.
      *       This can result in lingering network devices or masters, when no GM or device owner is active.
      *
@@ -436,7 +463,7 @@ export class MatrixNetworkFlow {
 
         const messageData = {
             content,
-            speaker: ChatMessage.getSpeaker({actor}),
+            speaker: ChatMessage.getSpeaker({actor: actor as Actor.Stored}),
             type: 'base',
             flags: {
                 [`${SYSTEM_NAME}.${FLAGS.MatrixNetworkMarkInvite}`]: {

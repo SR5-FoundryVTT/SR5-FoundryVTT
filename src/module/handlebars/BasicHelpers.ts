@@ -17,6 +17,18 @@ export const registerBasicHelpers = () => {
         return game.i18n.localize(strId);
     });
 
+    /**
+     * Localize a stable type key using a config map (e.g. config.spiritTypes).
+     * Falls back to a humanized form of the key for unknown/custom values.
+     * Used in play mode for spiritType and spriteType display.
+     */
+    Handlebars.registerHelper('localizeTypeOr', function (key?: string, configMap?: Record<string, string>) {
+        if (!key) return '';
+        const i18nKey = configMap?.[key];
+        if (i18nKey) return game.i18n.localize(i18nKey as Translation);
+        return key;
+    });
+
     Handlebars.registerHelper('localizeDocumentType', function (document) {
         if (document.type.length < 1) return '';
         const documentClass = document instanceof SR5Actor ? 'Actor' : 'Item';
@@ -32,6 +44,15 @@ export const registerBasicHelpers = () => {
      */
     Handlebars.registerHelper('localizeActionSkill', function (skill: string, options): string {
         return SkillNamingFlow.localizeSkillName(skill as string);
+    });
+
+    /**
+     * Transform a test id (e.g. 'SuccessTest') into its localized test label.
+     * Falls back to the raw id when the test isn't registered.
+     */
+    Handlebars.registerHelper('localizeTest', function (testId: string): string {
+        const test = game.shadowrun5e?.tests?.[testId];
+        return test ? game.i18n.localize(test.label) : testId;
     });
 
     Handlebars.registerHelper('concatStrings', function (...args) {

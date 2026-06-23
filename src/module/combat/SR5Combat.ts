@@ -5,6 +5,7 @@ import { Migrator } from "../migrator/Migrator";
 import { CombatRules } from "../rules/CombatRules";
 import { FLAGS, SR, SYSTEM_NAME } from "../constants";
 import { SR5Die } from "../rolls/SR5Die";
+import { ChatMessageMode } from "../types/global";
 import SocketMessageData = Shadowrun.SocketMessageData;
 import BaseCombat = foundry.documents.BaseCombat;
 
@@ -52,6 +53,11 @@ export class SR5Combat extends Combat<"base"> {
     static override migrateData(source: any) {
         Migrator.migrate("Combat", source);
         return super.migrateData(source);
+    }
+
+    override async update(...args: Parameters<Combat["update"]>) {
+        await Migrator.updateMigratedDocument(this);
+        return super.update(...args);
     }
 
     /**
@@ -104,7 +110,8 @@ export class SR5Combat extends Combat<"base"> {
         return this.system.pass;
     }
 
-    // Don't alert next player, because it can change easily
+    // Foundry's Combat interface defines nextCombatant as a getter, but SR5's initiative flow
+    // @ts-expect-error - doesn't have a single "next" combatant due to initiative passes.
     override get nextCombatant(): undefined { return undefined; }
 
 
@@ -387,9 +394,9 @@ export class SR5Combat extends Combat<"base"> {
         const combatantIds = Array.isArray(ids) ? ids : [ids];
         const updates: Combatant.UpdateData[] = [];
         const messageGroups = {
-            [CONST.DICE_ROLL_MODES.PUBLIC]: [] as InitiativeSummaryRow[],
-            [CONST.DICE_ROLL_MODES.PRIVATE]: [] as InitiativeSummaryRow[],
-        } satisfies Partial<Record<foundry.dice.Roll.Mode, InitiativeSummaryRow[]>>;
+            public: [] as InitiativeSummaryRow[],
+            gm: [] as InitiativeSummaryRow[],
+        } satisfies Partial<Record<ChatMessageMode, InitiativeSummaryRow[]>>;
 
         for (const id of combatantIds) {
             const combatant = this.combatants.get(id) as SR5Combatant | undefined;
@@ -404,7 +411,7 @@ export class SR5Combat extends Combat<"base"> {
 
             updates.push({ _id: id, initiative, system: { initiative: { blitz, last: lastInitiative } } });
 
-            const rollMode = CONST.DICE_ROLL_MODES[combatant.hidden ? 'PRIVATE' : 'PUBLIC'];
+            const rollMode = combatant.hidden ? 'gm' : 'public';
             messageGroups[rollMode].push(this._buildInitiativeRow(combatant, initiative, roll));
         }
 
@@ -447,7 +454,7 @@ export class SR5Combat extends Combat<"base"> {
      * @param adjustment The delta to adjust the initiative score with.
      */
     async adjustActorInitiative(actor: SR5Actor, adjustment: number) {
-        for (const combatant of this.getCombatantsByActor(actor))
+        for (const combatant of this.getCombatantsByActor(actor as Actor.Stored))
             await combatant.adjustInitiative(adjustment);
     }
 
@@ -456,7 +463,7 @@ export class SR5Combat extends Combat<"base"> {
      * If multiple combatants exist, tries to resolve by controlled tokens.
      */
     getActorCombatant(actor: SR5Actor): SR5Combatant | null {
-        const combatants = this.getCombatantsByActor(actor);
+        const combatants = this.getCombatantsByActor(actor as Actor.Stored);
 
         // If only one combatant, return it directly
         if (combatants.length === 1) {
@@ -564,7 +571,7 @@ export class SR5Combat extends Combat<"base"> {
      * @param messageOptions - Base configuration options for the created ChatMessage documents.
      */
     private async _createInitiativeMessages(
-        messageGroups: Partial<Record<foundry.dice.Roll.Mode, InitiativeSummaryRow[]>>,
+        messageGroups: Partial<Record<ChatMessageMode, InitiativeSummaryRow[]>>,
         messageOptions: ChatMessage.CreateData,
     ) {
         let hasPlayedSound = false;
@@ -619,7 +626,7 @@ export class SR5Combat extends Combat<"base"> {
         const { actor, token, name } = combatant;
         const initiativeData = actor?.system?.initiative;
 
-        const base = Number(initiativeData?.current?.base?.value ?? 0);
+        const base = Number(initiativeData?.current?.constant?.value ?? 0);
 
         // Fallback to 'unknown' if mode is undefined or an invalid string at runtime
         const mode = initiativeData?.perception;

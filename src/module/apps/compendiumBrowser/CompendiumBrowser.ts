@@ -9,6 +9,7 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
  */
 export namespace CompendiumBrowserTypes {
     export type DocType = "Actor" | "Item";
+    export type SelectionCallback = (entry: SearchResult<CompendiumCollection.DocumentName>) => Promise<void>;
     export type Tabs = "Actor" | "Item" | "Settings";
     export type Pack = foundry.documents.collections.CompendiumCollection<DocType>;
     export type FilterEntry = { value: string; id: string; selected: boolean };
@@ -32,6 +33,7 @@ export namespace CompendiumBrowserTypes {
     export interface Context extends foundry.applications.api.ApplicationV2.RenderContext {
         activeTab: Tabs;
         types: FilterEntry[];
+        selectionMode?: boolean;
     }
 
     export type Configuration = foundry.applications.api.ApplicationV2.Configuration
@@ -98,6 +100,12 @@ export class CompendiumBrowser extends BaseClass {
         actions: {
             clearSearch: function (this: CompendiumBrowser) {
                 this._onClearSearch();
+            },
+            acceptSelection: async function(this: CompendiumBrowser) {
+                await this._onAcceptSelection();
+            },
+            cancelSelection: function (this: CompendiumBrowser) {
+                this._onCancelSelection();
             },
             openDoc: (event: MouseEvent, target: HTMLElement) => CompendiumBrowser._openDoc(event, target),
             openSource: (event: MouseEvent, target: HTMLElement) => CompendiumBrowser._openSource(event, target),
@@ -199,6 +207,10 @@ export class CompendiumBrowser extends BaseClass {
     private allFilters: CompendiumBrowserTypes.FilterEntry[] = [];
     private packBlackList: string[] = [];
     private _searchQuery = "";
+    private requestedTab?: CompendiumBrowserTypes.Tabs;
+    private selectionMode = false;
+    private selectionCallback?: CompendiumBrowserTypes.SelectionCallback;
+    private selectedEntryUuid: string | null = null;
 
     /** State for virtual scrolling */
     private readonly scrollState = {
@@ -210,6 +222,13 @@ export class CompendiumBrowser extends BaseClass {
     // =========================================================================
     //                               LIFECYCLE HOOKS
     // =========================================================================
+
+    /** Activates selection mode and registers the callback to invoke when an entry is accepted. */
+    public activateSelectionMode(callback: CompendiumBrowserTypes.SelectionCallback) {
+        this.selectionMode = true;
+        this.selectionCallback = callback;
+        this.selectedEntryUuid = null;
+    }
 
     /** Initializes the Compendium Browser, populating available packs and setting initial filters. */
     constructor(options?: ConstructorParameters<typeof BaseClass>[0]) {
@@ -235,16 +254,30 @@ export class CompendiumBrowser extends BaseClass {
     protected override async _preparePartContext(
         ...[partId, context, options]: Parameters<BaseClassType["_preparePartContext"]>
     ) {
-        await super._preparePartContext(partId, context, options);
+        const typedContext = context as CompendiumBrowserTypes.Context;
+
+        await super._preparePartContext(partId, typedContext, options);
         if (partId === "filters") {
-            context.activeTab = this.activeTab;
-            context.types = this.allFilters;
+            typedContext.activeTab = this.activeTab;
+            typedContext.types = this.allFilters;
         }
+
+        if (partId === "results") {
+            typedContext.selectionMode = this.selectionMode;
+        }
+
         return context;
     }
 
     protected override async _onRender(...[context, options]: Parameters<BaseClassType["_onRender"]>) {
         await super._onRender(context, options);
+
+        if (this.requestedTab && options.tab !== this.requestedTab) {
+            const tab = this.requestedTab;
+            this.requestedTab = undefined;
+            void this.render({ tab, parts: ["tabs", "filters", "results", "settings"] });
+            return;
+        }
 
         if (this.activeTab === "Settings") {
             void this._renderSettings().then(() => this.settingsListeners(this.element));
@@ -262,6 +295,8 @@ export class CompendiumBrowser extends BaseClass {
     protected override _attachFrameListeners() {
         super._attachFrameListeners();
         this.element.addEventListener("dragstart", this._onDrag.bind(this));
+        this.element.addEventListener("click", this._onEntryClick.bind(this), true);
+        this.element.addEventListener("change", this._onEntryChange.bind(this));
         this.element.addEventListener("scroll", (event) => {
             void this._scrollResults(event);
         }, { capture: true, passive: true });
@@ -344,6 +379,49 @@ export class CompendiumBrowser extends BaseClass {
 
         const { type } = foundry.utils.parseUuid(uuid);
         event.dataTransfer?.setData("text/plain", JSON.stringify({ type, uuid }));
+    }
+
+    /** Stops selection-area clicks from bubbling into row-opening actions while preserving native checkbox behavior. */
+    private _onEntryClick(event: MouseEvent) {
+        if (!this.selectionMode) return;
+
+        const selector = (event.target as HTMLElement | null)?.closest<HTMLElement>(".entry-select, input[type='checkbox'][data-entry-uuid]");
+        if (!selector) return;
+
+        event.stopPropagation();
+    }
+
+    /** Handles selection checkbox changes on result entries. */
+    private _onEntryChange(event: Event) {
+        if (!this.selectionMode) return;
+
+        const target = event.target as HTMLInputElement | null;
+        if (!target?.matches("input[type='checkbox'][data-entry-uuid]")) return;
+
+        const uuid = target.dataset.entryUuid;
+        if (!uuid) return;
+
+        this.selectedEntryUuid = target.checked ? uuid : null;
+
+        this.element.querySelectorAll<HTMLInputElement>(".compendium-entry input[type='checkbox'][data-entry-uuid]").forEach((checkbox) => {
+            if (checkbox !== target) checkbox.checked = false;
+        });
+    }
+
+    /** Handles the accept button in selection mode. */
+    private async _onAcceptSelection(this:  CompendiumBrowser) {
+        if (!this.selectionMode || !this.selectedEntryUuid) return;
+
+        const entry = this.scrollState.entries.find((candidate) => candidate.uuid === this.selectedEntryUuid);
+        if (!entry) return;
+
+        await this.selectionCallback?.(entry);
+        await this.close();
+    }
+
+    /** Handles the cancel button in selection mode. */
+    private _onCancelSelection() {
+        this.close();
     }
 
     /** Handles a change event on a pack or folder checkbox in the settings. */
@@ -472,7 +550,11 @@ export class CompendiumBrowser extends BaseClass {
             const entry = this.scrollState.entries[idx];
             const html = await foundry.applications.handlebars.renderTemplate(
                 "systems/shadowrun5e/dist/templates/apps/compendium-browser/entries.hbs",
-                { entry },
+                {
+                    entry,
+                    selectionMode: this.selectionMode,
+                    isSelected: this.selectedEntryUuid === entry.uuid,
+                },
             );
             const template = document.createElement("template");
             template.innerHTML = html;
@@ -682,5 +764,30 @@ export class CompendiumBrowser extends BaseClass {
                 }))
                 .sort((a, b) => a.value.localeCompare(b.value, game.i18n.lang)),
         );
+    }
+
+    /** 
+     * Selects the specified document types for a given document tab.
+     * @param document - The type of document, which will open the corresponding tab if not already active.
+     * @param types - An array of document type strings to select.
+     */
+    selectTypesFilters(document: 'actor' | 'item', types: string[]) {
+        const requestedDocTab: CompendiumBrowserTypes.Tabs = document === 'actor' ? 'Actor' : 'Item';
+
+        if (requestedDocTab !== this.activeTab) {
+            this.activeTab = requestedDocTab;
+            this.requestedTab = requestedDocTab;
+            this._buildFilterList();
+        }
+
+        const selectedTypes = new Set(types.map((type) => type.toLowerCase()));
+
+        this.allFilters.forEach((filter) => {
+            filter.selected = selectedTypes.has(filter.id.toLowerCase());
+        });
+
+        if (this.rendered) {
+            void this.render({ tab: this.activeTab, parts: ["tabs", "filters", "results", "settings"] });
+        }
     }
 }

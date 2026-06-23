@@ -34,10 +34,59 @@ export const spriteImporterTesting = (context: QuenchBatchContext) => {
 
     describe('Chummer Sprite Importer', () => {
         it('Should import a chummer character', async () => {
-            sprite = await SpriteImporter.import(character, importOptions);
+            const template = await factory.createActor({
+                type: 'sprite',
+                system: {
+                    spriteType: 'companion_template',
+                    attributes: {
+                        resonance: { base: 1, applies_special: true },
+                    },
+                    matrix: {
+                        attack: { base: -1, applies_special: true },
+                        sleaze: { base: 2, applies_special: true },
+                        data_processing: { base: 1, applies_special: true },
+                        firewall: { base: 0, applies_special: true },
+                    }
+                }
+            });
+
+            sprite = await SpriteImporter.import(character, template, {
+                ...importOptions,
+                folderId: await factory.getOrCreateFolderId('Actor'),
+            });
             assert.notEqual(sprite, null, 'sprite not created');
             factory.actors.push(sprite as Actor.Stored<'sprite'>);
-            assert.strictEqual(sprite!.system.spriteType, 'companion');
+            assert.strictEqual(sprite!.system.spriteType, 'companion_template');
+            assert.strictEqual(sprite!.system.attributes.level.base, 2);
+            assert.strictEqual(sprite!.system.attributes.level.value, 2);
+            assert.strictEqual(sprite!.system.attributes.edge.base, 1);
+            assert.strictEqual(sprite!.system.matrix.sleaze.applies_special, true);
+            assert.strictEqual(sprite!.system.matrix.sleaze.base, 2);
+        });
+
+        it('imports a sprite using preset profile fallback without template', async () => {
+            const fallbackSprite = await SpriteImporter.importFromPresetProfile(character, {
+                ...importOptions,
+                folderId: await factory.getOrCreateFolderId('Actor'),
+            });
+            assert.notEqual(fallbackSprite, null, 'Sprite fallback import failed');
+            factory.actors.push(fallbackSprite as Actor.Stored<'sprite'>);
+
+            assert.strictEqual(fallbackSprite!.system.spriteType, 'companion');
+            assert.strictEqual(fallbackSprite!.system.attributes.resonance.applies_special, true);
+            assert.strictEqual(fallbackSprite!.system.matrix.attack.applies_special, true);
+            assert.strictEqual(fallbackSprite!.system.matrix.sleaze.applies_special, true);
+            assert.strictEqual(fallbackSprite!.system.matrix.data_processing.applies_special, true);
+            assert.strictEqual(fallbackSprite!.system.matrix.firewall.applies_special, true);
+            assert.strictEqual(fallbackSprite!.system.attributes.resonance.base, 0);
+            assert.strictEqual(fallbackSprite!.system.matrix.attack.base, -1);
+            assert.strictEqual(fallbackSprite!.system.matrix.sleaze.base, 1);
+            assert.strictEqual(fallbackSprite!.system.matrix.data_processing.base, 0);
+            assert.strictEqual(fallbackSprite!.system.matrix.firewall.base, 4);
+            assert.strictEqual(fallbackSprite!.system.initiative.matrix.constant.base, 0);
+            assert.strictEqual(fallbackSprite!.system.attributes.level.base, 3);
+            assert.strictEqual(fallbackSprite!.system.attributes.level.value, 3);
+            assert.strictEqual(fallbackSprite!.system.attributes.edge.base, 1);
         });
 
         it('Should have the correct item number', async () => {

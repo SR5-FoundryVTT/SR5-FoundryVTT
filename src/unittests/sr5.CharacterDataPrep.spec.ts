@@ -237,12 +237,12 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             });
 
             // Check default values.
-            assert.strictEqual(character.system.initiative.meatspace.base.base, 2); // REA+INT
-            assert.strictEqual(character.system.initiative.meatspace.dice.base, 1);
-            assert.strictEqual(character.system.initiative.matrix.base.base, 1); // No matrix device
-            assert.strictEqual(character.system.initiative.matrix.dice.base, 3); // Cold SIM
-            assert.strictEqual(character.system.initiative.astral.base.base, 2); // INT+INT
-            assert.strictEqual(character.system.initiative.astral.dice.base, 2);
+            assert.strictEqual(character.system.initiative.meatspace.constant.value, 2); // REA+INT
+            assert.strictEqual(character.system.initiative.meatspace.dice.value, 1);
+            assert.strictEqual(character.system.initiative.matrix.constant.value, 1); // No matrix device
+            assert.strictEqual(character.system.initiative.matrix.dice.value, 3); // Cold SIM
+            assert.strictEqual(character.system.initiative.astral.constant.value, 2); // INT+INT
+            assert.strictEqual(character.system.initiative.astral.dice.value, 2);
 
             // Check calculated values.
             await character.update({
@@ -251,13 +251,10 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                         reaction: { base: 6 },
                         intuition: { base: 6 }
                     },
-                    modifiers: {
-                        meat_initiative: 2,
-                        meat_initiative_dice: 1,
-                        astral_initiative: 2,
-                        astral_initiative_dice: 1,
-                        matrix_initiative: 2,
-                        matrix_initiative_dice: 1
+                    initiative: {
+                        meatspace: { constant: { base: 2 }, dice: { base: 2 } },
+                        astral: { constant: { base: 2 }, dice: { base: 3 } },
+                        matrix: { constant: { base: 2 }, dice: { base: 4 } },
                     }
                 }
             });
@@ -273,11 +270,11 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                 }
             }]);
 
-            assert.strictEqual(character.system.initiative.meatspace.base.value, 14); // REA+INT
+            assert.strictEqual(character.system.initiative.meatspace.constant.value, 14); // REA+INT
             assert.strictEqual(character.system.initiative.meatspace.dice.value, 2);
-            assert.strictEqual(character.system.initiative.matrix.base.value, 14); // No matrix device
+            assert.strictEqual(character.system.initiative.matrix.constant.value, 14); // No matrix device
             assert.strictEqual(character.system.initiative.matrix.dice.value, 4); // Cold SIM
-            assert.strictEqual(character.system.initiative.astral.base.value, 14); // INT+INT
+            assert.strictEqual(character.system.initiative.astral.constant.value, 14); // INT+INT
             assert.strictEqual(character.system.initiative.astral.dice.value, 3);
 
             // Matrix ini - Hot SIM
@@ -288,10 +285,10 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             // Check for ini dice upper limits
             await character.update({
                 system: {
-                    modifiers: {
-                        meat_initiative_dice: 6,
-                        astral_initiative_dice: 6,
-                        matrix_initiative_dice: 6
+                    initiative: {
+                        meatspace: { dice: { base: 8 } },
+                        astral: { dice: { base: 8 } },
+                        matrix: { dice: { base: 8 } },
                     }
                 }
             });
@@ -299,6 +296,35 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(character.system.initiative.meatspace.dice.value, 5);
             assert.strictEqual(character.system.initiative.matrix.dice.value, 5);
             assert.strictEqual(character.system.initiative.astral.dice.value, 5);
+        });
+
+        it('custom initiative formulae apply to all modes and matrix hot-sim keeps +1d6', async () => {
+            const character = await factory.createActor({
+                type: 'character',
+                system: {
+                    attributes: {
+                        reaction: { base: 5 },
+                        intuition: { base: 4 },
+                        logic: { base: 3 },
+                        charisma: { base: 2 },
+                    },
+                    initiative: {
+                        meatspace: { attribute_a: 'charisma', attribute_b: 'logic', constant: { base: 1 }, dice: { base: 4 } },
+                        astral: { attribute_a: 'reaction', attribute_b: 'intuition', constant: { base: 2 }, dice: { base: 1 } },
+                        matrix: { attribute_a: 'reaction', attribute_b: 'intuition', constant: { base: 0 }, dice: { base: 2 } },
+                    },
+                    matrix: {
+                        hot_sim: true,
+                    },
+                }
+            });
+
+            assert.strictEqual(character.system.initiative.meatspace.constant.value, 6);
+            assert.strictEqual(character.system.initiative.meatspace.dice.value, 4);
+            assert.strictEqual(character.system.initiative.astral.constant.value, 11);
+            assert.strictEqual(character.system.initiative.astral.dice.value, 1);
+            assert.strictEqual(character.system.initiative.matrix.constant.value, 9);
+            assert.strictEqual(character.system.initiative.matrix.dice.value, 3);
         });
 
         it('limit calculation', async () => {

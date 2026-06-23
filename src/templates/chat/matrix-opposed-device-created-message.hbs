@@ -1,0 +1,28 @@
+<div class="sr5 chat-card roll-card">
+    <div class="card-title card-header">
+        {{localize "SR5.Temporary"}} {{localize "SR5.TargetDevice"}}
+    </div>
+
+    <div class="card-title card-header">
+        <div class="document">
+            <img src="{{device.img}}" data-tooltip="{{device.name}}" />
+            <h3 class="header-name">
+                <a class="chat-document-link" data-uuid="{{device.uuid}}">{{device.name}}</a>
+            </h3>
+        </div>
+
+        {{#if network}}
+            <div class="document">
+                <img src="{{network.img}}" data-tooltip="{{network.name}}" />
+                <h3 class="header-name">
+                    <a class="chat-document-link" data-uuid="{{network.uuid}}">{{network.name}}</a>
+                </h3>
+            </div>
+        {{else}}
+            <div class="document">
+                <span class="value">{{localize "SR5.Labels.Item.Network"}}:</span>
+                <h3 class="header-name">{{localize "SR5.None"}}</h3>
+            </div>
+        {{/if}}
+    </div>
+</div>

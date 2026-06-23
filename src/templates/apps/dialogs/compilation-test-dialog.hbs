@@ -4,12 +4,6 @@
         <hr />
         <div>
             <div class="form-group">
-                <label data-tooltip="SR5.Tooltips.CompilationTest.SpriteType">{{localize 'SR5.Labels.Action.SpriteType'}}</label>
-                <select name="test.data.spriteTypeSelected" {{#if test.preparedActorUsed}}disabled data-tooltip="SR5.Tooltips.Item.DisabledForPreparedActor"{{/if}}>
-                    {{selectOptions config.spriteTypes selected=test.data.spriteTypeSelected localize=true sort=true}}
-                </select>
-            </div>
-            <div class="form-group">
                 <label data-tooltip="SR5.Tooltips.CompilationTest.Level">{{localize "SR5.Level"}}</label>
                 <input name="test.data.level" type="number" class="disabled-for-display" value="{{test.data.level}}" {{#if test.preparedActorUsed}}disabled data-tooltip="SR5.Tooltips.Item.DisabledForPreparedActor"{{/if}}/>
             </div>

@@ -36,7 +36,10 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
 
     describe('Character Importer', () => {
         it('Should import a chummer character', async () => {
-            [actor, ...vehicles] = await CI.import(character, importOptions);
+            [actor, ...vehicles] = await CI.import(character, {
+                ...importOptions,
+                folderId: await factory.getOrCreateFolderId('Actor'),
+            });
             assert.notEqual(actor, null, 'Actor not created');
             factory.actors.push(actor as Actor.Stored<'character'>, ...vehicles as Actor.Stored<'vehicle'>[]);
             assert.lengthOf(vehicles, 1, 'Vehicle not created');
@@ -230,6 +233,8 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(vehicle.system.vehicle_stats.seats.value, 2, 'Seats');
             assert.strictEqual(vehicle.system.availability, '0', 'Availability');
             assert.strictEqual(vehicle.system.cost, 10000, 'Cost');
+            assert.strictEqual(vehicle.system.importFlags?.isFreshImport, true, 'Vehicle import flag');
+            assert.strictEqual(vehicle.system.importFlags?.category, 'Bikes', 'Vehicle category import flag');
 
             const nonSkillItems = vehicle.items.filter(item => !item.isType('skill'));
             assert.strictEqual(nonSkillItems.length, 2, 'Non-skill item count');
