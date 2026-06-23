@@ -248,6 +248,8 @@
                 "Restart": "Restart Duration",
                 "RestartPending": "Restart ready",
                 "RestartPendingDetail": "The duration will restart when changes are submitted.",
+                "DeleteOnExpiry": "Delete when expired",
+                "DeleteOnExpiryHint": "Remove this effect entirely when it expires, instead of greying it out.",
                 "Status": "Status",
                 "Turns": "Turns",
                 "TypeLabel": "Duration Type",

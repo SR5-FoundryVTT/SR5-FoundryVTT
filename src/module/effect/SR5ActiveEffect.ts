@@ -220,6 +220,16 @@ export class SR5ActiveEffect extends ActiveEffect {
         return event === 'sr5ActionPhase' && combat?.combatant?.actor === this.actor;
     }
 
+    override _onUpdate(...args: Parameters<ActiveEffect["_onUpdate"]>) {
+        super._onUpdate(...args);
+        if (!game.users?.activeGM?.isSelf) return;
+        const [changed] = args;
+
+        if (changed?.duration?.expired === true && this.system.deleteOnExpiry) {
+            void this.delete();
+        }
+    }
+
     /**
      * Re-enable an expired effect, reset its anchor, and re-register it with the expiry registry.
      * Use this to restart a duration that was consumed (e.g. buff renewed for another combat).

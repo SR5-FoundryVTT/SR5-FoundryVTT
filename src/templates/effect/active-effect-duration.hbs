@@ -79,6 +79,14 @@
                     </select>
                 </div>
             </div>
+
+            <div class="duration-control">
+                <label for="{{rootId}}-delete-on-expiry">{{localize "SR5.ActiveEffect.Duration.DeleteOnExpiry"}}</label>
+                <div class="duration-control-fields">
+                    <input id="{{rootId}}-delete-on-expiry" type="checkbox" name="system.deleteOnExpiry"
+                        {{#if source.system.deleteOnExpiry}}checked{{/if}} />
+                </div>
+            </div>
         </fieldset>
 
         <fieldset class="duration-panel duration-status-panel duration-status-panel--{{durationStatus.state}}">
