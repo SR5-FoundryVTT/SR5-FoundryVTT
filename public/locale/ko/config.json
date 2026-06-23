@@ -142,10 +142,10 @@
                     "label": "물품을 통한 판정에 적용"
                 },
                 "conditionMode": {
-                    "hint": "Include: the test must match these values; Exclude: the test must not match these values."
+                    "hint": "포함: 판정이 이 값들과 일치해야 합니다. 제외: 판정이 이 값들과 일치하면 안 됩니다."
                 },
                 "conditionType": {
-                    "hint": "Which part of the test this condition filters on."
+                    "hint": "이 조건이 필터링할 판정의 부분입니다."
                 },
                 "applyTo": {
                     "hint": "다른 목표에 적용",
@@ -167,65 +167,90 @@
                     "hint": "사용된 특성에 따라 판정을 필터링",
                     "label": "특성치 필터링"
                 },
-                "selection_attributes_mode": {
-                    "hint": "Include: only these attributes apply; Exclude: all attributes except these.",
-                    "label": "Attributes Mode"
-                },
                 "selection_categories": {
                     "hint": "사용된 행동 범주에 따라 판정을 필터링",
                     "label": "행동 범주 필터링"
-                },
-                "selection_categories_mode": {
-                    "hint": "Include: only these categories apply; Exclude: all categories except these.",
-                    "label": "Categories Mode"
                 },
                 "selection_limits": {
                     "hint": "사용된 한계에 따라 판정을 필터링",
                     "label": "한계 필터링"
                 },
-                "selection_limits_mode": {
-                    "hint": "Include: only these limits apply; Exclude: all limits except these.",
-                    "label": "Limits Mode"
-                },
                 "selection_skills": {
                     "hint": "사용된 기술에 따라 판정을 필터링",
                     "label": "기술 필터"
                 },
-                "selection_skills_mode": {
-                    "hint": "Include: only these skills apply; Exclude: all skills except these.",
-                    "label": "Skills Mode"
-                },
                 "selection_tests": {
                     "hint": "사용된 판정에 따라 판정을 필터링",
                     "label": "판정 필터링"
-                },
-                "selection_tests_mode": {
-                    "hint": "Include: only these test types apply; Exclude: all test types except these.",
-                    "label": "Tests Mode"
                 }
             },
-            "AddCondition": "Add Condition",
-            "AddTarget": "Add Target",
-            "AtLeastOneTarget": "An effect must keep at least one target.",
+            "AddCondition": "조건 추가",
+            "AddTarget": "대상 추가",
+            "AtLeastOneTarget": "효과에는 하나 이상의 대상이 있어야 합니다.",
+            "ExpiryTriggers": {
+                "CombatStart": "전투 시작",
+                "CombatEnd": "전투 종료",
+                "TurnStart": "턴 시작",
+                "TurnEnd": "턴 종료",
+                "MyAction": "내 행동 단계 시작"
+            },
+            "Duration": {
+                "Active": "활성",
+                "ActiveDetail": "지속 시간이 활성화되어 있습니다.",
+                "AwaitingCombatStart": "전투 시작까지",
+                "AwaitingCombatStartDetail": "다음 전투가 시작되면 만료됩니다.",
+                "AwaitingCombatEnd": "전투 종료까지",
+                "AwaitingCombatEndDetail": "현재 전투가 끝나면 만료됩니다.",
+                "AwaitingTurnStart": "전투 턴 시작까지",
+                "AwaitingTurnStartDetail": "다음 전투 턴 시작 시 만료됩니다.",
+                "AwaitingTurnEnd": "전투 턴 종료까지",
+                "AwaitingTurnEndDetail": "현재 전투 턴 종료 시 만료됩니다.",
+                "AwaitingMyAction": "소유자의 행동 단계 시작까지",
+                "AwaitingMyActionDetail": "소유자의 다음 행동 단계 시작 시 만료됩니다.",
+                "AwaitingTrigger": "만료 트리거 대기 중",
+                "AwaitingTriggerDetail": "지속 시간이 완료되었으며 설정된 트리거에서 만료됩니다.",
+                "Combat": "전투",
+                "GroupCombat": "전투",
+                "GroupTime": "시간",
+                "UnitTurns": "전투 턴",
+                "CombatStart": "전투 턴 {turn}, 우선권 {initiative}",
+                "CombatStartNoInitiative": "전투 턴 {turn}",
+                "CombatTurn": "전투 턴 {turns}",
+                "CombatTurns": "전투 턴 {turns}",
+                "DoesNotExpire": "만료되지 않음",
+                "Expired": "만료됨",
+                "ExpiredDetail": "이 효과의 지속 시간을 다시 시작하려면 효과를 재시작하세요.",
+                "ExpiredOpenEditor": "만료됨 — 효과 편집기 열기",
+                "ExpiryTrigger": "만료 트리거",
+                "Remaining": "남은 시간",
+                "RemainingDetail": "{remaining} 남음",
+                "Restart": "지속 시간 재시작",
+                "RestartPending": "재시작 준비됨",
+                "RestartPendingDetail": "변경 사항을 제출하면 지속 시간이 재시작됩니다.",
+                "DeleteOnExpiry": "만료 시 삭제",
+                "Status": "상태",
+                "Units": "지속 시간 단위",
+                "Value": "지속 시간"
+            },
             "FilterTypes": {
-                "Attributes": "Attributes",
-                "Categories": "Action Categories",
-                "Limits": "Limits",
-                "Skills": "Skills",
-                "Tests": "Tests"
+                "Attributes": "특성치",
+                "Categories": "행동 범주",
+                "Limits": "한계",
+                "Skills": "기술",
+                "Tests": "판정"
             },
             "Modes": {
                 "Modify": "수정"
             },
             "New": "새로운 효과",
-            "RemoveCondition": "Remove Condition",
-            "RemoveTarget": "Remove Target",
+            "RemoveCondition": "조건 제거",
+            "RemoveTarget": "대상 제거",
             "SelectionModes": {
-                "Exclude": "Exclude",
-                "Include": "Include"
+                "Exclude": "제외",
+                "Include": "포함"
             },
-            "Target": "Target",
-            "Targets": "Targets"
+            "Target": "대상",
+            "Targets": "대상"
         },
         "ActiveSkills": "활성형 기술",
         "Actor": {

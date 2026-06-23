@@ -143,10 +143,10 @@
                     "label": "Anwenden auf Test"
                 },
                 "conditionMode": {
-                    "hint": "Include: the test must match these values; Exclude: the test must not match these values."
+                    "hint": "Einschließen: Die Probe muss diesen Werten entsprechen; Ausschließen: Die Probe darf diesen Werten nicht entsprechen."
                 },
                 "conditionType": {
-                    "hint": "Which part of the test this condition filters on."
+                    "hint": "Welcher Teil der Probe durch diese Bedingung gefiltert wird."
                 },
                 "applyTo": {
                     "hint": "Anwenden auf verschiedene Ziele",
@@ -168,65 +168,90 @@
                     "hint": "Nur für Tests mit diesen Attribute",
                     "label": "Attributs-Filter"
                 },
-                "selection_attributes_mode": {
-                    "hint": "Include: only these attributes apply; Exclude: all attributes except these.",
-                    "label": "Attributes Mode"
-                },
                 "selection_categories": {
                     "hint": "Nur für Tests mit diesen Handlungskategorien",
                     "label": "Handlungs-Kategorien Filter"
-                },
-                "selection_categories_mode": {
-                    "hint": "Include: only these categories apply; Exclude: all categories except these.",
-                    "label": "Categories Mode"
                 },
                 "selection_limits": {
                     "hint": "Nur für Tests mit diesen Limits",
                     "label": "Limit-Filter"
                 },
-                "selection_limits_mode": {
-                    "hint": "Include: only these limits apply; Exclude: all limits except these.",
-                    "label": "Limits Mode"
-                },
                 "selection_skills": {
                     "hint": "Nur für Tests mit diesen Fertigkeiten",
                     "label": "Fertigkeits-Filter"
                 },
-                "selection_skills_mode": {
-                    "hint": "Include: only these skills apply; Exclude: all skills except these.",
-                    "label": "Skills Mode"
-                },
                 "selection_tests": {
                     "hint": "Nur für Tests mit diesen Proben",
                     "label": "Proben-Filter"
-                },
-                "selection_tests_mode": {
-                    "hint": "Include: only these test types apply; Exclude: all test types except these.",
-                    "label": "Tests Mode"
                 }
             },
-            "AddCondition": "Add Condition",
-            "AddTarget": "Add Target",
-            "AtLeastOneTarget": "An effect must keep at least one target.",
+            "AddCondition": "Bedingung hinzufügen",
+            "AddTarget": "Ziel hinzufügen",
+            "AtLeastOneTarget": "Ein Effekt muss mindestens ein Ziel behalten.",
+            "ExpiryTriggers": {
+                "CombatStart": "Kampfbeginn",
+                "CombatEnd": "Kampfende",
+                "TurnStart": "Rundenbeginn",
+                "TurnEnd": "Rundenende",
+                "MyAction": "Beginn meiner Handlungsphase"
+            },
+            "Duration": {
+                "Active": "Aktiv",
+                "ActiveDetail": "Die Dauer ist aktiv.",
+                "AwaitingCombatStart": "Bis Kampfbeginn",
+                "AwaitingCombatStartDetail": "Läuft ab, wenn der nächste Kampf beginnt.",
+                "AwaitingCombatEnd": "Bis Kampfende",
+                "AwaitingCombatEndDetail": "Läuft ab, wenn der aktuelle Kampf endet.",
+                "AwaitingTurnStart": "Bis Beginn der Kampfrunde",
+                "AwaitingTurnStartDetail": "Läuft zu Beginn der nächsten Kampfrunde ab.",
+                "AwaitingTurnEnd": "Bis Ende der Kampfrunde",
+                "AwaitingTurnEndDetail": "Läuft am Ende der aktuellen Kampfrunde ab.",
+                "AwaitingMyAction": "Bis Beginn der Handlungsphase des Besitzers",
+                "AwaitingMyActionDetail": "Läuft zu Beginn der nächsten Handlungsphase des Besitzers ab.",
+                "AwaitingTrigger": "Wartet auf Ablauf-Auslöser",
+                "AwaitingTriggerDetail": "Die Dauer ist abgelaufen und der Effekt wartet auf seinen konfigurierten Auslöser.",
+                "Combat": "Kampf",
+                "GroupCombat": "Kampf",
+                "GroupTime": "Zeit",
+                "UnitTurns": "Kampfrunden",
+                "CombatStart": "Kampfrunde {turn}, Initiative {initiative}",
+                "CombatStartNoInitiative": "Kampfrunde {turn}",
+                "CombatTurn": "{turns} Kampfrunde",
+                "CombatTurns": "{turns} Kampfrunden",
+                "DoesNotExpire": "Läuft nicht ab",
+                "Expired": "Abgelaufen",
+                "ExpiredDetail": "Starte diesen Effekt neu, um seine Dauer erneut zu beginnen.",
+                "ExpiredOpenEditor": "Abgelaufen — Effekt-Editor öffnen",
+                "ExpiryTrigger": "Ablauf-Auslöser",
+                "Remaining": "Verbleibend",
+                "RemainingDetail": "{remaining} verbleibend",
+                "Restart": "Dauer neu starten",
+                "RestartPending": "Neustart bereit",
+                "RestartPendingDetail": "Die Dauer wird neu gestartet, wenn die Änderungen gespeichert werden.",
+                "DeleteOnExpiry": "Bei Ablauf löschen",
+                "Status": "Status",
+                "Units": "Dauer-Einheiten",
+                "Value": "Dauer"
+            },
             "FilterTypes": {
-                "Attributes": "Attributes",
-                "Categories": "Action Categories",
+                "Attributes": "Attribute",
+                "Categories": "Handlungskategorien",
                 "Limits": "Limits",
-                "Skills": "Skills",
-                "Tests": "Tests"
+                "Skills": "Fertigkeiten",
+                "Tests": "Proben"
             },
             "Modes": {
                 "Modify": "Modifizieren"
             },
             "New": "Neuer Effekt",
-            "RemoveCondition": "Remove Condition",
-            "RemoveTarget": "Remove Target",
+            "RemoveCondition": "Bedingung entfernen",
+            "RemoveTarget": "Ziel entfernen",
             "SelectionModes": {
-                "Exclude": "Exclude",
-                "Include": "Include"
+                "Exclude": "Ausschließen",
+                "Include": "Einschließen"
             },
-            "Target": "Target",
-            "Targets": "Targets"
+            "Target": "Ziel",
+            "Targets": "Ziele"
         },
         "ActiveSkills": "Aktionsfertigkeiten",
         "Actor": {

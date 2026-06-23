@@ -51,6 +51,82 @@
         "Actions": "Actions",
         "Active": "Active",
         "ActiveDefense": "Défense active",
+        "ActiveEffect": {
+            "ApplyTos": {
+                "TestTargetingThisActor": "Test ciblant cet acteur"
+            },
+            "FIELDS": {
+                "conditionMode": {
+                    "hint": "Inclure : le test doit correspondre à ces valeurs. Exclure : le test ne doit pas correspondre à ces valeurs."
+                },
+                "conditionType": {
+                    "hint": "Partie du test filtrée par cette condition."
+                }
+            },
+            "AddCondition": "Ajouter une condition",
+            "AddTarget": "Ajouter une cible",
+            "AtLeastOneTarget": "Un effet doit conserver au moins une cible.",
+            "ExpiryTriggers": {
+                "CombatStart": "Début du combat",
+                "CombatEnd": "Fin du combat",
+                "TurnStart": "Début du tour",
+                "TurnEnd": "Fin du tour",
+                "MyAction": "Début de ma phase d'action"
+            },
+            "Duration": {
+                "Active": "Actif",
+                "ActiveDetail": "La durée est active.",
+                "AwaitingCombatStart": "Jusqu'au début du combat",
+                "AwaitingCombatStartDetail": "Expire au début du prochain combat.",
+                "AwaitingCombatEnd": "Jusqu'à la fin du combat",
+                "AwaitingCombatEndDetail": "Expire à la fin du combat actuel.",
+                "AwaitingTurnStart": "Jusqu'au début du tour de combat",
+                "AwaitingTurnStartDetail": "Expire au début du prochain tour de combat.",
+                "AwaitingTurnEnd": "Jusqu'à la fin du tour de combat",
+                "AwaitingTurnEndDetail": "Expire à la fin du tour de combat actuel.",
+                "AwaitingMyAction": "Jusqu'au début de la phase d'action du propriétaire",
+                "AwaitingMyActionDetail": "Expire au début de la prochaine phase d'action du propriétaire.",
+                "AwaitingTrigger": "En attente du déclencheur d'expiration",
+                "AwaitingTriggerDetail": "La durée est écoulée et expirera au déclencheur configuré.",
+                "Combat": "Combat",
+                "GroupCombat": "Combat",
+                "GroupTime": "Temps",
+                "UnitTurns": "Tours de combat",
+                "CombatStart": "Tour de combat {turn}, Initiative {initiative}",
+                "CombatStartNoInitiative": "Tour de combat {turn}",
+                "CombatTurn": "{turns} tour de combat",
+                "CombatTurns": "{turns} tours de combat",
+                "DoesNotExpire": "N'expire pas",
+                "Expired": "Expiré",
+                "ExpiredDetail": "Redémarrez cet effet pour recommencer sa durée.",
+                "ExpiredOpenEditor": "Expiré — ouvrir l'éditeur d'effet",
+                "ExpiryTrigger": "Déclencheur d'expiration",
+                "Remaining": "Restant",
+                "RemainingDetail": "{remaining} restant",
+                "Restart": "Redémarrer la durée",
+                "RestartPending": "Redémarrage prêt",
+                "RestartPendingDetail": "La durée redémarrera lorsque les modifications seront enregistrées.",
+                "DeleteOnExpiry": "Supprimer à l'expiration",
+                "Status": "Statut",
+                "Units": "Unités de durée",
+                "Value": "Durée"
+            },
+            "FilterTypes": {
+                "Attributes": "Attributs",
+                "Categories": "Catégories d'action",
+                "Limits": "Limites",
+                "Skills": "Compétences",
+                "Tests": "Tests"
+            },
+            "RemoveCondition": "Retirer la condition",
+            "RemoveTarget": "Retirer la cible",
+            "SelectionModes": {
+                "Exclude": "Exclure",
+                "Include": "Inclure"
+            },
+            "Target": "Cible",
+            "Targets": "Cibles"
+        },
         "ActiveSkills": "Compétence Active",
         "ActorTypes": {
             "Character": "Personnage",

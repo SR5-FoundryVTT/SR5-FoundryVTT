@@ -167,41 +167,21 @@
                     "hint": "Filter the test based on Attributes used",
                     "label": "Attributes Filter"
                 },
-                "selection_attributes_mode": {
-                    "hint": "Include: only these attributes apply; Exclude: all attributes except these.",
-                    "label": "Attributes Mode"
-                },
                 "selection_categories": {
                     "hint": "Filter the test based on Action Category used",
                     "label": "Action Categories Filter"
-                },
-                "selection_categories_mode": {
-                    "hint": "Include: only these categories apply; Exclude: all categories except these.",
-                    "label": "Categories Mode"
                 },
                 "selection_limits": {
                     "hint": "Filter the test based on the Limit used",
                     "label": "Limits Filter"
                 },
-                "selection_limits_mode": {
-                    "hint": "Include: only these limits apply; Exclude: all limits except these.",
-                    "label": "Limits Mode"
-                },
                 "selection_skills": {
                     "hint": "Filter the test based on the Skills used",
                     "label": "Skills Filter"
                 },
-                "selection_skills_mode": {
-                    "hint": "Include: only these skills apply; Exclude: all skills except these.",
-                    "label": "Skills Mode"
-                },
                 "selection_tests": {
                     "hint": "Filter the test based on the Tests used",
                     "label": "Tests Filter"
-                },
-                "selection_tests_mode": {
-                    "hint": "Include: only these test types apply; Exclude: all test types except these.",
-                    "label": "Tests Mode"
                 }
             },
             "AddCondition": "Add Condition",
@@ -241,18 +221,13 @@
                 "ExpiredDetail": "Restart this effect to begin its duration again.",
                 "ExpiredOpenEditor": "Expired — open effect editor",
                 "ExpiryTrigger": "Expiry Trigger",
-                "Permanent": "Permanent",
-                "RealTime": "Real Time",
                 "Remaining": "Remaining",
                 "RemainingDetail": "{remaining} remaining",
                 "Restart": "Restart Duration",
                 "RestartPending": "Restart ready",
                 "RestartPendingDetail": "The duration will restart when changes are submitted.",
                 "DeleteOnExpiry": "Delete when expired",
-                "DeleteOnExpiryHint": "Remove this effect entirely when it expires, instead of greying it out.",
                 "Status": "Status",
-                "Turns": "Turns",
-                "TypeLabel": "Duration Type",
                 "Units": "Duration units",
                 "Value": "Duration"
             },
