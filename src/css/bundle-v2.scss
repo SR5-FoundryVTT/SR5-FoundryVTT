@@ -412,6 +412,19 @@ body.theme-light,
                 display: flex;
                 flex-flow: row nowrap;
                 align-items: center;
+                gap: .25rem;
+                min-width: 0;
+            }
+
+            .sheet-header-name-input {
+                flex: 1 1 auto;
+                min-width: 0;
+
+                .sheet-name {
+                    width: 100%;
+                    min-width: 0;
+                    flex-shrink: 1;
+                }
             }
         }
 
@@ -482,9 +495,15 @@ body.theme-light,
         padding: 0;
     }
 
-    button.toggle-fresh-import {
+    .toggle-fresh-import {
         width: 1.5rem;
         flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    button.toggle-fresh-import {
         padding: 0;
     }
 

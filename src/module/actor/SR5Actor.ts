@@ -259,7 +259,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *
      * NOTE: Foundry also shows disabled effects by default. We behave the same.
      */
-    override get temporaryEffects(): SR5ActiveEffect[] {
+    override get temporaryEffects(): ActiveEffect.Stored[] {
         const showEffectIcon = (effect: SR5ActiveEffect) => !effect.disabled && !effect.isSuppressed && effect.isTemporary && effect.appliesToLocalActor;
 
         // Collect actor effects.
@@ -1590,13 +1590,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     get combatActive(): boolean {
         if (!game.combat) return false;
-        const combatants = game.combat.getCombatantsByActor(this);
+        const combatants = game.combat.getCombatantsByActor(this as Actor.Stored);
         return combatants.length > 0 && combatants.some(c => c.initiative != null);
     }
 
     get combatants() {
         if (!this.combatActive) return [];
-        return game.combat!.getCombatantsByActor(this);
+        return game.combat!.getCombatantsByActor(this as Actor.Stored);
     }
 
     /**

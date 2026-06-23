@@ -1,3 +1,5 @@
+import type { SR5 } from "../config";
+
 // Preset spirit/sprite profile data shared between migration and importer fallbacks.
 type SpiritAttributeId =
     | 'body'
@@ -66,7 +68,7 @@ export const PRESET_INITIATIVE_DEFAULTS: SpiritProfileInitiative = {
     astral_init_dice: 3,
 };
 
-export const PRESET_SPIRIT_PROFILES: Record<string, SpiritProfileData> = {
+export const PRESET_SPIRIT_PROFILES: Record<keyof typeof SR5.spiritTypes, SpiritProfileData> = {
     abomination: {
         attributes: { body: 2, agility: 1, strength: 2 },
         skills: ['assensing', 'astral_combat', 'exotic_ranged_weapon', 'gymnastics', 'perception', 'running', 'unarmed_combat'],
@@ -176,7 +178,6 @@ export const PRESET_SPIRIT_PROFILES: Record<string, SpiritProfileData> = {
         initiative: { init: 2 },
         skills: ['assensing', 'astral_combat', 'perception', 'unarmed_combat'],
     },
-    corpselight: {},
     crawler: {
         attributes: { body: 4, reaction: 3, strength: 6, willpower: -1, intuition: 3, charisma: -1 },
         initiative: { init: 6, astral_init: 6 },
@@ -340,7 +341,7 @@ export const PRESET_SPIRIT_PROFILES: Record<string, SpiritProfileData> = {
         initiative: { init: 3 },
         skills: ['assensing', 'astral_combat', 'perception', 'gymnastics', 'spellcasting', 'unarmed_combat'],
     },
-    palefile: {
+    palefire: {
         attributes: { body: 2, agility: 1, reaction: 3, strength: -2, intuition: 1, charisma: -1 },
         initiative: { init: 3 },
         skills: ['assensing', 'astral_combat', 'exotic_ranged_weapon', 'flight', 'perception', 'unarmed_combat'],
@@ -467,7 +468,7 @@ export const PRESET_SPIRIT_PROFILES: Record<string, SpiritProfileData> = {
     },
 } as const;
 
-export const PRESET_SPRITE_PROFILES: Record<string, SpriteProfileData> = {
+export const PRESET_SPRITE_PROFILES: Record<keyof typeof SR5.spriteTypes, SpriteProfileData> = {
     courier: {
         offsets: { sleaze: 3, data_processing: 1, firewall: 2 },
         init: 1,

@@ -4,7 +4,6 @@ import { TestOptions } from "./SuccessTest";
 import {DataDefaults} from "../data/DataDefaults";
 import { Translation } from '../utils/strings';
 import { DamageType } from "../types/item/Action";
-import { SR5Combat } from "../combat/SR5Combat";
 import { SYSTEM_NAME, FLAGS } from "../constants";
 import { CombatRules } from "../rules/CombatRules";
 
@@ -78,8 +77,7 @@ export class DefenseTest<T extends DefenseTestData = DefenseTestData> extends Op
     override canConsumeDocumentResources() {
         // Check if the actor is in active combat situation and has enough initiative score left.
         if (this.actor && this.data.iniMod && game.combat) {
-            const combat: SR5Combat = game.combat as unknown as SR5Combat;
-            const combatant = combat.getActorCombatant(this.actor);
+            const combatant = game.combat.getActorCombatant(this.actor);
             if (!combatant?.initiative) return true;
 
             if (combatant && combatant.initiative + this.data.iniMod < 0) {
