@@ -5,6 +5,95 @@ import { chromium } from 'playwright';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const log = (...args) => console.info('[quench]', ...args);
+const colorsEnabled =
+    !('NO_COLOR' in process.env) && (Boolean(process.env.FORCE_COLOR) || process.stdout.isTTY || process.stderr.isTTY);
+const colorCodes = {
+    bold: ['\u001b[1m', '\u001b[22m'],
+    dim: ['\u001b[2m', '\u001b[22m'],
+    green: ['\u001b[32m', '\u001b[39m'],
+    red: ['\u001b[31m', '\u001b[39m'],
+    yellow: ['\u001b[33m', '\u001b[39m'],
+};
+
+function color(name, value) {
+    if (!colorsEnabled) return String(value);
+    const [open, close] = colorCodes[name];
+    return `${open}${value}${close}`;
+}
+
+function formatDuration(ms) {
+    if (!Number.isFinite(ms)) return 'unknown';
+    if (ms < 1000) return `${ms}ms`;
+    return `${(ms / 1000).toFixed(1)}s`;
+}
+
+function indentText(value, spaces = 4) {
+    const indentation = ' '.repeat(spaces);
+    return String(value)
+        .trimEnd()
+        .split('\n')
+        .map((line) => `${indentation}${line}`)
+        .join('\n');
+}
+
+function formatValue(value) {
+    if (value === undefined) return undefined;
+    if (typeof value === 'string') return value;
+    try {
+        return JSON.stringify(value, null, 2);
+    } catch {
+        return String(value);
+    }
+}
+
+function formatFailureDetails(failure) {
+    const details = [];
+    if (failure.file) details.push(`File: ${failure.file}`);
+    if (failure.duration !== undefined) details.push(`Duration: ${formatDuration(failure.duration)}`);
+    if (failure.speed) details.push(`Speed: ${failure.speed}`);
+    if (failure.operator) details.push(`Operator: ${failure.operator}`);
+    if (failure.error) details.push(failure.error);
+
+    const expected = formatValue(failure.expected);
+    const actual = formatValue(failure.actual);
+    if (expected !== undefined) details.push(`Expected:\n${indentText(expected, 2)}`);
+    if (actual !== undefined) details.push(`Actual:\n${indentText(actual, 2)}`);
+
+    return details.join('\n');
+}
+
+function printQuenchSummary({ pattern, stats }) {
+    const total = stats.tests;
+    const failed = stats.failures > 0;
+    const status = color(failed ? 'red' : 'green', failed ? 'FAILED' : 'PASSED');
+
+    console.info(`\n${color('bold', 'Quench result')}`);
+    console.info(`  Status:   ${status}`);
+    console.info(`  Pattern:  ${color('dim', pattern)}`);
+    console.info(`  Tests:    ${total}`);
+    console.info(`  Passed:   ${color('green', stats.passes)}`);
+    console.info(`  Failed:   ${failed ? color('red', stats.failures) : stats.failures}`);
+    console.info(`  Pending:  ${stats.pending > 0 ? color('yellow', stats.pending) : stats.pending}`);
+    console.info(`  Duration: ${formatDuration(stats.duration)}`);
+}
+
+function printQuenchFailures({ failures }) {
+    if (!failures.length) return;
+
+    const width = String(failures.length).length;
+    console.error(`\n${color('red', color('bold', 'Failures'))}`);
+    failures.forEach((failure, index) => {
+        const number = String(index + 1).padStart(width, ' ');
+        console.error(`\n${color('red', `${number}. ${failure.title}`)}`);
+        console.error(color('dim', indentText(formatFailureDetails(failure))));
+    });
+}
+
+function printFatalError(error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`\n${color('red', color('bold', 'Quench runner failed'))}`);
+    console.error(color('dim', indentText(message, 2)));
+}
 
 async function loadEnvLocal() {
     const file = path.join(repoRoot, '.env.local');
@@ -124,53 +213,126 @@ async function runQuench(page, pattern, runTimeoutMs) {
         async ({ pattern, runTimeoutMs }) => {
             const quench = globalThis.quench;
             if (!quench) throw new Error('The global Quench API is unavailable.');
+            const Runner = quench.mocha?.Runner ?? globalThis.Mocha?.Runner;
+            if (!Runner) throw new Error('Mocha Runner is unavailable.');
+
+            const cleanCycles = (value) => {
+                const cache = [];
+                return JSON.parse(
+                    JSON.stringify(value, (_key, nested) => {
+                        if (typeof nested === 'object' && nested !== null) {
+                            if (cache.includes(nested)) return String(nested);
+                            cache.push(nested);
+                        }
+                        return nested;
+                    }),
+                );
+            };
+            const serializeError = (error) => {
+                if (!error || typeof error !== 'object') return { message: String(error ?? 'unknown error') };
+
+                const result = {};
+                for (const key of Object.getOwnPropertyNames(error)) {
+                    result[key] = error[key];
+                }
+                if (!('message' in result)) result.message = error.message ?? String(error);
+                if (!('stack' in result) && error.stack) result.stack = error.stack;
+                return cleanCycles(result);
+            };
+            const errorText = (error) => {
+                const message = error?.message ?? String(error ?? 'unknown error');
+                if (error?.stack) return error.stack.startsWith(message) ? error.stack : `${message}\n${error.stack}`;
+                return message;
+            };
+            const failureKey = (failure) => `${failure.title}\n${failure.error ?? ''}`;
+            const fromMochaFailure = (test, error) => {
+                const err = serializeError(error);
+                const title = test?.fullTitle?.() ?? test?.title ?? 'Unknown failed test';
+                const hook = test?.type === 'hook';
+
+                return {
+                    title: hook ? `Hook failure: ${title}` : title,
+                    file: test?.file,
+                    duration: test?.duration,
+                    speed: test?.speed,
+                    error: errorText(error),
+                    actual: err.actual,
+                    expected: err.expected,
+                    operator: err.operator,
+                    source: hook ? 'mocha-hook' : 'mocha',
+                };
+            };
+            const fromReportFailure = (test) => {
+                const err = test.err ?? {};
+                const error = errorText(err);
+
+                return {
+                    title: test.fullTitle ?? test.title ?? 'Unknown failed test',
+                    file: test.file,
+                    duration: test.duration,
+                    speed: test.speed,
+                    error,
+                    actual: err.actual,
+                    expected: err.expected,
+                    operator: err.operator,
+                    source: 'quench-report',
+                };
+            };
 
             // Quench's run handlers access the results application's DOM. If it
             // has not been rendered, runBatches can throw and leave Mocha stuck.
             await quench.app.render({ force: true });
 
-            const runner = await quench.runBatches(pattern);
+            const capturedFailures = [];
+            const failEvent = Runner.constants?.EVENT_TEST_FAIL ?? 'fail';
+            const originalEmit = Runner.prototype.emit;
+            const patchedEmit = function (event, ...args) {
+                if (event === failEvent) capturedFailures.push(fromMochaFailure(args[0], args[1]));
+                return originalEmit.call(this, event, ...args);
+            };
+
+            let runner;
+            Runner.prototype.emit = patchedEmit;
+            try {
+                runner = await quench.runBatches(pattern);
+
+                // Quench returns the runner before Mocha finishes. Register the
+                // end listener before checking stats to avoid missing fast runs.
+                await new Promise((resolve, reject) => {
+                    const timer = setTimeout(
+                        () => reject(new Error(`Quench did not finish within ${runTimeoutMs}ms`)),
+                        runTimeoutMs,
+                    );
+                    const finish = () => {
+                        clearTimeout(timer);
+                        resolve();
+                    };
+                    runner.once('end', finish);
+                    if (runner.stats?.end) finish();
+                });
+            } finally {
+                if (Runner.prototype.emit === patchedEmit) Runner.prototype.emit = originalEmit;
+            }
+
+            let report;
+            if (typeof quench.reports?.json === 'string') {
+                report = JSON.parse(quench.reports.json);
+            }
+
+            const stats = report?.stats ?? runner?.stats ?? {};
+            if (!stats.tests) throw new Error(`No Quench tests matched "${pattern}".`);
+
             const failures = [];
             const seen = new Set();
-            const addFailure = (test, error) => {
-                const title = test?.fullTitle?.() ?? test?.title ?? 'Unknown failed test';
-                const message = error?.message ?? String(error ?? 'unknown error');
-                const key = `${title}\n${message}`;
+            const addFailure = (failure) => {
+                const key = failureKey(failure);
                 if (seen.has(key)) return;
                 seen.add(key);
-                failures.push({ title, error: message });
+                failures.push(failure);
             };
-            // Capture Mocha fail events because failed hooks are not represented
-            // by normal test entries in the suite tree.
-            runner.on('fail', addFailure);
 
-            // Quench returns the runner before Mocha finishes. Register the end
-            // listener before checking stats to avoid missing a fast completion.
-            await new Promise((resolve, reject) => {
-                const timer = setTimeout(
-                    () => reject(new Error(`Quench did not finish within ${runTimeoutMs}ms`)),
-                    runTimeoutMs,
-                );
-                const finish = () => {
-                    clearTimeout(timer);
-                    resolve();
-                };
-                runner.once('end', finish);
-                if (runner.stats?.end) finish();
-            });
-
-            const walk = (suite) => {
-                for (const test of suite.tests ?? []) {
-                    if (test.state === 'failed') addFailure(test, test.err);
-                }
-                for (const child of suite.suites ?? []) walk(child);
-            };
-            // runBatches starts immediately, so fast test failures can occur
-            // before the fail listener is attached. Recover them from the suite.
-            if (runner.suite) walk(runner.suite);
-
-            const stats = runner.stats ?? {};
-            if (!stats.tests) throw new Error(`No Quench tests matched "${pattern}".`);
+            for (const failure of report?.failures ?? []) addFailure(fromReportFailure(failure));
+            for (const failure of capturedFailures) addFailure(failure);
 
             const failureCount = stats.failures ?? failures.length;
             while (failures.length < failureCount) {
@@ -217,12 +379,15 @@ async function main() {
     try {
         const context = await browser.newContext({ baseURL: url, viewport });
         const page = await context.newPage();
+        const pageLogsEnabled = process.env.QUENCH_PAGE_LOGS === '1';
         page.on('console', (message) => {
-            if (process.env.QUENCH_PAGE_LOGS === '1' || message.type() === 'error') {
+            if (pageLogsEnabled) {
                 console.log(`[page:${message.type()}]`, message.text());
             }
         });
-        page.on('pageerror', (error) => console.error('[page:error]', error.message));
+        page.on('pageerror', (error) => {
+            if (pageLogsEnabled) console.error('[page:error]', error.message);
+        });
 
         log(`connecting to ${url}`);
         await joinWorld(page);
@@ -230,12 +395,9 @@ async function main() {
 
         log(`running "${pattern}"`);
         const result = await runQuench(page, pattern, runTimeoutMs);
-        const { stats, failures } = result;
-        console.info(
-            `\nQuench: ${stats.passes}/${stats.tests} passed, ${stats.failures} failed, ` +
-                `${stats.pending} pending (${stats.duration}ms)`,
-        );
-        for (const failure of failures) console.error(`  x ${failure.title}\n      ${failure.error}`);
+        const { stats } = result;
+        printQuenchFailures(result);
+        printQuenchSummary(result);
 
         process.exitCode = stats.failures > 0 ? 1 : 0;
     } finally {
@@ -244,6 +406,6 @@ async function main() {
 }
 
 main().catch((error) => {
-    console.error('[quench] failed:', error instanceof Error ? error.message : error);
+    printFatalError(error);
     process.exitCode = 1;
 });
