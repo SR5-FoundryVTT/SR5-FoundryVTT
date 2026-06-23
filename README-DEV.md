@@ -135,6 +135,20 @@ Afterwards open a terminal (cmd.exe on Windows) with administrative permissions 
 
 You should see a success message and a little arrow symbol on the shadowrun5e folder within the FoundryVTT _Data/systems_ directory. Now you can use the Gulp watch-Task as described above. This needs to be repeated after each Shadowrun5eVTT system update.
 
+### Running Quench locally
+
+The Quench runner connects to an existing Foundry development world and tests the currently checked-out
+branch. It does not build the system or start Foundry.
+
+* Run `gulp watch` or `npm run build:dev` so the development system is available to Foundry.
+* Install Quench in the same Foundry data directory and launch a world using the development system.
+* Install the browser once with `npx playwright install chromium`.
+* Run `npm run quench`.
+
+The runner uses `http://localhost:30000` by default. Set `FOUNDRY_URL` in a gitignored `.env.local` when
+Foundry uses another address. Use `npm run quench -- -- --headed` to display the browser or
+`npm run quench -- -- --pattern shadowrun5e.rules.**` to select batches.
+
 
 ## Linux and docker workflow changes
 > **NOTE:** This approach is considered legacy and not actively used anymore. @taMiF left it here for your consideration.
