@@ -28,6 +28,13 @@ async function loadEnvLocal() {
 }
 
 function getArg(name) {
+    const inline = process.argv.find((arg) => arg.startsWith(`--${name}=`));
+    if (inline) {
+        const value = inline.slice(name.length + 3);
+        if (!value) throw new Error(`--${name} requires a value`);
+        return value;
+    }
+
     const index = process.argv.indexOf(`--${name}`);
     if (index === -1) return undefined;
 
@@ -104,6 +111,8 @@ async function ensureQuenchActive(page) {
         await game.settings.set('core', 'moduleConfiguration', modules);
     });
 
+    // Foundry reloads the world after its module configuration changes, so the
+    // browser must join again before checking for the global Quench API.
     await joinWorld(page);
     if (!(await quenchReady(page, 60000))) {
         throw new Error('Quench is still unavailable after enabling the module and reloading the world.');
@@ -116,7 +125,8 @@ async function runQuench(page, pattern, runTimeoutMs) {
             const quench = globalThis.quench;
             if (!quench) throw new Error('The global Quench API is unavailable.');
 
-            // Quench's run handlers require the results application to be rendered.
+            // Quench's run handlers access the results application's DOM. If it
+            // has not been rendered, runBatches can throw and leave Mocha stuck.
             await quench.app.render({ force: true });
 
             const runner = await quench.runBatches(pattern);
@@ -130,19 +140,23 @@ async function runQuench(page, pattern, runTimeoutMs) {
                 seen.add(key);
                 failures.push({ title, error: message });
             };
+            // Capture Mocha fail events because failed hooks are not represented
+            // by normal test entries in the suite tree.
             runner.on('fail', addFailure);
 
-            // runBatches resolves before the underlying Mocha run ends.
+            // Quench returns the runner before Mocha finishes. Register the end
+            // listener before checking stats to avoid missing a fast completion.
             await new Promise((resolve, reject) => {
-                if (runner.stats?.end) return resolve();
                 const timer = setTimeout(
                     () => reject(new Error(`Quench did not finish within ${runTimeoutMs}ms`)),
                     runTimeoutMs,
                 );
-                runner.once('end', () => {
+                const finish = () => {
                     clearTimeout(timer);
                     resolve();
-                });
+                };
+                runner.once('end', finish);
+                if (runner.stats?.end) finish();
             });
 
             const walk = (suite) => {
@@ -151,9 +165,13 @@ async function runQuench(page, pattern, runTimeoutMs) {
                 }
                 for (const child of suite.suites ?? []) walk(child);
             };
+            // runBatches starts immediately, so fast test failures can occur
+            // before the fail listener is attached. Recover them from the suite.
             if (runner.suite) walk(runner.suite);
 
             const stats = runner.stats ?? {};
+            if (!stats.tests) throw new Error(`No Quench tests matched "${pattern}".`);
+
             const failureCount = stats.failures ?? failures.length;
             while (failures.length < failureCount) {
                 failures.push({
@@ -183,10 +201,14 @@ async function main() {
 
     const url = process.env.FOUNDRY_URL || 'http://localhost:30000';
     const pattern = getArg('pattern') || process.env.QUENCH_PATTERN || 'shadowrun5e.**';
+    // This is a watchdog for the complete suite. Individual test timeouts remain
+    // controlled by the test definitions registered with Quench.
     const configuredTimeout = Number(process.env.QUENCH_RUN_TIMEOUT);
     const runTimeoutMs =
         Number.isFinite(configuredTimeout) && configuredTimeout > 0 ? configuredTimeout : 10 * 60 * 1000;
     const headless = !process.argv.includes('--headed');
+    // Keep GPU rendering enabled in headless Chromium because Foundry and PIXI
+    // canvas behavior differs when Chromium falls back to software rendering.
     const args = ['--enable-gpu', '--ignore-gpu-blocklist'];
     const viewport = headless ? { width: 1024, height: 768 } : null;
     if (!headless) args.push('--start-maximized');
