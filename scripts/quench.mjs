@@ -5,8 +5,14 @@ import { chromium } from 'playwright';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const log = (...args) => console.info('[quench]', ...args);
+function isForceColor() {
+    // "0", "false" and empty disable forced color.
+    const value = process.env.FORCE_COLOR;
+    if (value === undefined) return false;
+    return value !== '0' && value !== 'false' && value !== '';
+}
 const colorsEnabled =
-    !('NO_COLOR' in process.env) && (Boolean(process.env.FORCE_COLOR) || process.stdout.isTTY || process.stderr.isTTY);
+    !('NO_COLOR' in process.env) && (isForceColor() || process.stdout.isTTY || process.stderr.isTTY);
 const colorCodes = {
     bold: ['\u001b[1m', '\u001b[22m'],
     dim: ['\u001b[2m', '\u001b[22m'],
@@ -111,6 +117,10 @@ async function loadEnvLocal() {
         let value = line.slice(separator + 1).trim();
         if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
             value = value.slice(1, -1);
+        } else {
+            // Strip an inline comment from unquoted values.
+            const comment = value.search(/\s#/);
+            if (comment !== -1) value = value.slice(0, comment).trimEnd();
         }
         if (!(key in process.env)) process.env[key] = value;
     }
@@ -162,7 +172,7 @@ async function joinWorld(page) {
     await select.waitFor({ timeout: 30000 });
     try {
         await select.selectOption({ label: 'Gamemaster' });
-    } catch {
+    } catch (labelError) {
         const options = await select.locator('option').evaluateAll((elements) =>
             elements.map((option) => ({
                 value: option.value,
@@ -170,7 +180,13 @@ async function joinWorld(page) {
             })),
         );
         const gamemaster = options.find((option) => /game ?master/i.test(option.text));
-        if (!gamemaster) throw new Error('No Gamemaster user is available in the launched world.');
+        if (!gamemaster) {
+            const available = options.map((option) => option.text).join(', ') || 'none';
+            throw new Error(
+                `No Gamemaster user is available in the launched world (available users: ${available}). ` +
+                    `Selecting by label failed: ${labelError}`,
+            );
+        }
         await select.selectOption(gamemaster.value);
     }
 
@@ -194,11 +210,16 @@ async function ensureQuenchActive(page) {
     }
 
     log('enabling Quench in the launched world');
-    await page.evaluate(async () => {
-        const modules = { ...(game.settings.get('core', 'moduleConfiguration') ?? {}) };
-        modules.quench = true;
-        await game.settings.set('core', 'moduleConfiguration', modules);
-    });
+    try {
+        await page.evaluate(async () => {
+            const modules = { ...(game.settings.get('core', 'moduleConfiguration') ?? {}) };
+            modules.quench = true;
+            await game.settings.set('core', 'moduleConfiguration', modules);
+        });
+    } catch (error) {
+        // Foundry's reload on config change can destroy the context mid-call; ignore that, rethrow else.
+        if (!/execution context was destroyed|navigation/i.test(String(error))) throw error;
+    }
 
     // Foundry reloads the world after its module configuration changes, so the
     // browser must join again before checking for the global Quench API.
@@ -334,7 +355,8 @@ async function runQuench(page, pattern, runTimeoutMs) {
             for (const failure of report?.failures ?? []) addFailure(fromReportFailure(failure));
             for (const failure of capturedFailures) addFailure(failure);
 
-            const failureCount = stats.failures ?? failures.length;
+            // Don't let a zero stats.failures hide failures we captured (e.g. hook failures).
+            const failureCount = Math.max(stats.failures ?? 0, failures.length);
             while (failures.length < failureCount) {
                 failures.push({
                     title: `Uncaptured Mocha failure ${failures.length + 1}`,
