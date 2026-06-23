@@ -120,6 +120,8 @@ export class Version0_36_0 extends VersionMigration {
     }
 
     private migrateSprite(actor: any): void {
+        this.migrateLevel(actor);
+
         const system = actor.system;
         if (!system || typeof system !== 'object') return;
         setProperty(system, 'attributes.level.base', getProperty(system, 'level'));
@@ -183,9 +185,45 @@ export class Version0_36_0 extends VersionMigration {
         return undefined;
     }
 
+    // Migrate legacy level field to new attributes.level.base and update related active effect changes and formula paths
+    private migrateLevel(actor: any): void {
+        const actorEffects = Array.isArray(actor.effects) ? actor.effects : [];
+        for (const effect of actorEffects) {
+            this.migrateEffectChanges(
+                effect,
+                { 'system.level': 'system.attributes.level' },
+                { 'system.level': 'system.attributes.level.value' },
+            );
+        }
+
+        const migrateItemEffects = (item: any): void => {
+            if (!item || typeof item !== 'object') return;
+
+            const itemEffects = Array.isArray(item.effects) ? item.effects : [];
+            for (const effect of itemEffects) {
+                // Item schema still owns system.level, so only migrate keys targeting the actor.
+                this.migrateEffectChanges(
+                    effect,
+                    { 'system.level': 'system.attributes.level' },
+                    {}
+                );
+            }
+
+            const embeddedItems = getProperty(item, 'flags.shadowrun5e.embeddedItems');
+            const nestedItems = Array.isArray(embeddedItems) ? embeddedItems : Object.values(embeddedItems ?? {});
+            for (const nestedItem of nestedItems) {
+                migrateItemEffects(nestedItem);
+            }
+        };
+
+        const items = Array.isArray(actor.items) ? actor.items : [];
+        for (const item of items) {
+            migrateItemEffects(item);
+        }
+    }
+
     override migrateActiveEffect(effect: any): void {
         const keyMap: Record<string, string> = {
-            'system.level': 'system.attributes.level',
             'system.initiative.meatspace.base': 'system.initiative.meatspace.constant',
             'system.initiative.meatspace.base.base': 'system.initiative.meatspace.constant.base',
             'system.initiative.meatspace.base.value': 'system.initiative.meatspace.constant.value',
@@ -207,7 +245,6 @@ export class Version0_36_0 extends VersionMigration {
         };
 
         const valueMap: Record<string, string> = {
-            'system.level': 'system.attributes.level.value',
             'system.initiative.meatspace.base': 'system.initiative.meatspace.constant',
             'system.initiative.meatspace.base.base': 'system.initiative.meatspace.constant.base',
             'system.initiative.meatspace.base.value': 'system.initiative.meatspace.constant.value',
