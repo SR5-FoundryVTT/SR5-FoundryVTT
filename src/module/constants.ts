@@ -269,6 +269,7 @@ export const SRStatus = [
         id: 'sr5run',
         name: 'SR5.StatusEffects.Running',
         img: 'systems/shadowrun5e/dist/icons/status-effects/run.svg',
+        duration: { value: 1, units: 'rounds', expiry: 'roundStart' },
         system: {
             targets: [
                 {
@@ -309,6 +310,7 @@ export const SRStatus = [
         id: 'sr5sprint',
         name: 'SR5.StatusEffects.Sprinting',
         img: 'systems/shadowrun5e/dist/icons/status-effects/sprint.svg',
+        duration: { value: 1, units: 'rounds', expiry: 'roundStart' },
         system: {
             targets: [
                 {
