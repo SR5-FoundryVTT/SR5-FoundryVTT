@@ -33,10 +33,10 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
     declare persona: SR5Actor;
 
     override _prepareData(data: BiofeedbackResistTestData, options: Partial<TestOptions>): BiofeedbackResistTestData {
-        data = super._prepareData(data, options);
-        data = ResistTestDataFlow._prepareData(data);
+        let prepared = super._prepareData(data, options);
+        prepared = ResistTestDataFlow._prepareData(prepared);
 
-        return data;
+        return prepared;
     }
 
     /**

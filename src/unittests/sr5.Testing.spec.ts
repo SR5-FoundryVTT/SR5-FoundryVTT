@@ -199,7 +199,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
         });
 
         it('creates structural test data without contextual values', () => {
-            const data = SuccessTest.createStructuralTestData();
+            const data = SuccessTest.applyStructuralDefaults({});
 
             assert.isUndefined(data.type);
             assert.isUndefined(data.title);
@@ -210,7 +210,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
         });
 
         it('stamps subclass identity from structural test data', () => {
-            const test = new SpellCastingTest(SuccessTest.createStructuralTestData());
+            const test = new SpellCastingTest({});
 
             assert.strictEqual(test.data.type, 'SpellCastingTest');
             assert.strictEqual(test.data.title, 'SR5.Tests.SpellCastingTest');

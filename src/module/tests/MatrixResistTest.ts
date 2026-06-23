@@ -32,15 +32,15 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
     declare persona: SR5Actor;
 
     override _prepareData(data: MatrixResistTestData, options: Partial<TestOptions>): MatrixResistTestData {
-        data = super._prepareData(data, options);
-        if (data.following) {
-            data = MatrixTestDataFlow._prepareFollowingData(data);
+        let prepared = super._prepareData(data, options);
+        if (prepared.following) {
+            prepared = MatrixTestDataFlow._prepareFollowingData(prepared);
         } else {
-            data = MatrixTestDataFlow._prepareDataResist(data);
+            prepared = MatrixTestDataFlow._prepareDataResist(prepared);
         }
-        data = ResistTestDataFlow._prepareData(data);
+        prepared = ResistTestDataFlow._prepareData(prepared);
 
-        return data;
+        return prepared;
     }
 
     /**

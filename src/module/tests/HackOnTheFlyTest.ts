@@ -12,8 +12,8 @@ export class HackOnTheFlyTest extends MatrixTest<MatrixPlacementData> {
     declare actor: SR5Actor;
 
     override _prepareData(data: MatrixPlacementData, options: Partial<TestOptions>): MatrixPlacementData {
-        data = super._prepareData(data, options);
-        return MarkPlacementFlow._prepareData(data);
+        const prepared = super._prepareData(data, options);
+        return MarkPlacementFlow._prepareData(prepared);
     }
 
     /**

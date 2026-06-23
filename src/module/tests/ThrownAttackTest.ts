@@ -13,11 +13,11 @@ export class ThrownAttackTest extends SuccessTest<ThrownAttackTestData> {
     declare item: SR5Item;
 
     override _prepareData(data: DeepPartial<ThrownAttackTestData>, options: Partial<TestOptions>): ThrownAttackTestData {
-        data = super._prepareData(data, options);
+        const prepared = super._prepareData(data, options);
 
-        WeaponRangeTestBehavior.prepareData(this, data);
+        WeaponRangeTestBehavior.prepareData(this, prepared);
 
-        return data as ThrownAttackTestData;
+        return prepared as ThrownAttackTestData;
     }
 
     override get canBeExtended() {

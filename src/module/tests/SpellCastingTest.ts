@@ -25,14 +25,14 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
     public override item: SR5Item<'spell'> | undefined = undefined;
 
     override _prepareData(data: DeepPartial<SpellCastingTestData>, options: Partial<TestOptions>): SpellCastingTestData {
-        data = super._prepareData(data, options);
+        const prepared = super._prepareData(data, options);
 
-        data.force ||= 0;
-        data.drain ||= 0;
-        data.reckless ||= false;
-        data.drainDamage ||= DataDefaults.createData('damage');
+        prepared.force ||= 0;
+        prepared.drain ||= 0;
+        prepared.reckless ||= false;
+        prepared.drainDamage ||= DataDefaults.createData('damage');
 
-        return data as SpellCastingTestData;
+        return prepared as SpellCastingTestData;
     }
 
     override get _dialogTemplate()  {

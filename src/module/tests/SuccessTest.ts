@@ -227,14 +227,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         return data as T & SuccessTestData;
     }
 
-    /**
-     * Build the structural skeleton of a SuccessTestData. Contextual fields (type, title,
-     * targetUuids, options, source*Uuid) are left for _prepareData to populate on construction.
-     */
-    static createStructuralTestData(): SuccessTestData {
-        return this.applyStructuralDefaults({});
-    }
-
     constructor(data: DeepPartial<T>, documents?: TestDocuments, options: Partial<TestOptions> = {}) {
         // Store given documents to avoid later fetching.
         this.actor = documents?.actor;

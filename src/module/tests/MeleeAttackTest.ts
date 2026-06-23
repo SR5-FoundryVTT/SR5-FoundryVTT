@@ -13,11 +13,11 @@ export interface MeleeAttackData extends SuccessTestData {
 export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
 
     override _prepareData(data: DeepPartial<MeleeAttackData>, options: Partial<TestOptions>): MeleeAttackData {
-        data = super._prepareData(data, options);
+        const prepared = super._prepareData(data, options);
 
-        data.damage ||= DataDefaults.createData('damage');
+        prepared.damage ||= DataDefaults.createData('damage');
 
-        return data as MeleeAttackData;
+        return prepared as MeleeAttackData;
     }
 
     /**

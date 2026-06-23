@@ -32,9 +32,9 @@ export type PhysicalResistSuccessCondition = {
 export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
 
     override _prepareData(data: PhysicalResistTestData, options: Partial<TestOptions>): PhysicalResistTestData {
-        data = super._prepareData(data, options);
-        data = ResistTestDataFlow._prepareData(data);
-        return data;
+        let prepared = super._prepareData(data, options);
+        prepared = ResistTestDataFlow._prepareData(prepared);
+        return prepared;
     }
 
     override get _chatMessageTemplate() {

@@ -21,19 +21,19 @@ export class FadeTest extends SuccessTest<FadeTestData> {
     declare against: ComplexFormTest;
 
     override _prepareData(data: DeepPartial<FadeTestData>, options: Partial<TestOptions>): FadeTestData {
-        data = super._prepareData(data, options);
+        const prepared: DeepPartial<FadeTestData> = super._prepareData(data, options);
 
         // Is this test part of a followup test chain? complex form => fade
-        if (data.against) {
-            data.incomingFade = foundry.utils.duplicate(data.against.fadeDamage);
-            data.modifiedFade = foundry.utils.duplicate(data.incomingFade);
+        if (prepared.against) {
+            prepared.incomingFade = foundry.utils.duplicate(prepared.against.fadeDamage);
+            prepared.modifiedFade = foundry.utils.duplicate(prepared.incomingFade);
         // This test is part of either a standalone test or created with its own data (i.e. edge reroll).
         } else {
-            data.incomingFade = data.incomingFade ?? DataDefaults.createData('damage');
-            data.modifiedFade = foundry.utils.duplicate(data.incomingFade);
+            prepared.incomingFade = prepared.incomingFade ?? DataDefaults.createData('damage');
+            prepared.modifiedFade = foundry.utils.duplicate(prepared.incomingFade);
         }
 
-        return data as FadeTestData;
+        return prepared as FadeTestData;
     }
 
     override get _dialogTemplate() {

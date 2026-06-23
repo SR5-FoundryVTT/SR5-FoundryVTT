@@ -72,11 +72,11 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
     }
 
     override _prepareData(data: DeepPartial<OpposedCompileSpriteTestData>, options?: Partial<TestOptions>): OpposedCompileSpriteTestData {
-        data = super._prepareData(data, options);
+        const prepared = super._prepareData(data, options);
 
-        data.compiledSpriteUuid ||= '';
+        prepared.compiledSpriteUuid ||= '';
 
-        return data as OpposedCompileSpriteTestData;
+        return prepared as OpposedCompileSpriteTestData;
     }
 
     override get _chatMessageTemplate(): string {

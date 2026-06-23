@@ -27,19 +27,19 @@ export interface DrainTestData extends SuccessTestData {
 export class DrainTest extends SuccessTest<DrainTestData> {
 
     override _prepareData(data: DeepPartial<DrainTestData>, options: Partial<TestOptions>): DrainTestData {
-        data = super._prepareData(data, options);
+        const prepared: DeepPartial<DrainTestData> = super._prepareData(data, options);
 
         // Is this test part of a followup test chain? spell => drain
-        if (data.against) {
-            data.incomingDrain = foundry.utils.duplicate(data.against.drainDamage);
-            data.modifiedDrain = foundry.utils.duplicate(data.incomingDrain);
+        if (prepared.against) {
+            prepared.incomingDrain = foundry.utils.duplicate(prepared.against.drainDamage);
+            prepared.modifiedDrain = foundry.utils.duplicate(prepared.incomingDrain);
         // This test is part of either a standalone test or created with its own data (i.e. edge reroll).
         } else {
-            data.incomingDrain = data.incomingDrain ?? DataDefaults.createData('damage');
-            data.modifiedDrain = foundry.utils.duplicate(data.incomingDrain);
+            prepared.incomingDrain = prepared.incomingDrain ?? DataDefaults.createData('damage');
+            prepared.modifiedDrain = foundry.utils.duplicate(prepared.incomingDrain);
         }
 
-        return data as DrainTestData;
+        return prepared as DrainTestData;
     }
 
     override get _dialogTemplate(): string {

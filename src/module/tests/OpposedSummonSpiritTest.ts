@@ -77,11 +77,11 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
     }
 
     override _prepareData(data: DeepPartial<OpposedSummonSpiritTestData>, options?: Partial<TestOptions>): OpposedSummonSpiritTestData {
-        data = super._prepareData(data, options);
+        const prepared = super._prepareData(data, options);
 
-        data.summonedSpiritUuid ||= '';
+        prepared.summonedSpiritUuid ||= '';
 
-        return data as OpposedSummonSpiritTestData;
+        return prepared as OpposedSummonSpiritTestData;
     }
 
     override get _chatMessageTemplate(): string {

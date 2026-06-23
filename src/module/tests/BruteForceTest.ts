@@ -9,8 +9,8 @@ import { MatrixTest } from './MatrixTest';
  */
 export class BruteForceTest extends MatrixTest<MatrixPlacementData> {
     override _prepareData(data: MatrixPlacementData, options: Partial<TestOptions> = {}): MatrixPlacementData {
-        data = super._prepareData(data, options);
-        return MarkPlacementFlow._prepareData(data);
+        const prepared = super._prepareData(data, options);
+        return MarkPlacementFlow._prepareData(prepared);
     }
 
     /**

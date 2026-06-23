@@ -38,17 +38,17 @@ interface SummonSpiritTestData extends SuccessTestData {
 export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
 
     override _prepareData(data: DeepPartial<SummonSpiritTestData>, options: Partial<TestOptions>): SummonSpiritTestData {
-        data = super._prepareData(data, options);
+        const prepared = super._prepareData(data, options);
 
-        this._prepareSummoningData(data as SummonSpiritTestData);
+        this._prepareSummoningData(prepared as SummonSpiritTestData);
 
-        data.preparedSpiritUuid = data.preparedSpiritUuid || '';
-        data.optionalPowerCount = data.optionalPowerCount ?? Math.floor(Number(data.force || 0) / 3);
+        prepared.preparedSpiritUuid = prepared.preparedSpiritUuid || '';
+        prepared.optionalPowerCount = prepared.optionalPowerCount ?? Math.floor(Number(prepared.force || 0) / 3);
 
-        data.drain ||= 0;
-        data.drainDamage ||= DataDefaults.createData('damage');
+        prepared.drain ||= 0;
+        prepared.drainDamage ||= DataDefaults.createData('damage');
 
-        return data as SummonSpiritTestData;
+        return prepared as SummonSpiritTestData;
     }
 
     override get _dialogTemplate() {

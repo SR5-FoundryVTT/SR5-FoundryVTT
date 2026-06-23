@@ -31,13 +31,13 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
     declare item: SR5Item;
 
     override _prepareData(data: DeepPartial<RangedAttackTestData>, options: Partial<TestOptions>): RangedAttackTestData {
-        data = super._prepareData(data, options);
+        const prepared: DeepPartial<RangedAttackTestData> = super._prepareData(data, options);
 
-        data.fireModes = [];
-        data.fireMode = {value: 0, defense: 0, label: ''};
-        WeaponRangeTestBehavior.prepareData(this, data);
+        prepared.fireModes = [];
+        prepared.fireMode = {value: 0, defense: 0, label: ''};
+        WeaponRangeTestBehavior.prepareData(this, prepared);
 
-        return data as RangedAttackTestData;
+        return prepared as RangedAttackTestData;
     }
 
     override _testDialogListeners() {

@@ -270,7 +270,7 @@ export const TestCreator = {
         const resistTestCls = TestCreator._getTestClass(opposedData.against.opposed.resist.test);
         if (!resistTestCls) return undefined;
 
-        const data = await TestCreator._getOpposedResistTestData(resistTestCls, opposedData, opposed.source, opposed.data.messageUuid);
+        const data = TestCreator._getOpposedResistTestData(resistTestCls, opposedData, opposed.source, opposed.data.messageUuid);
         if (!data) return undefined;
 
         const documents = { source: opposed.source };
@@ -404,7 +404,7 @@ export const TestCreator = {
      * @param document The actor doing the testing.
      * @param previousMessageId The Message id of the originating opposing test.
      */
-    _getOpposedResistTestData: async function(resistTestCls: typeof SuccessTest, opposedData: OpposedTestData, document: SR5Actor|SR5Item, previousMessageId?: string) {
+    _getOpposedResistTestData: function(resistTestCls: typeof SuccessTest, opposedData: OpposedTestData, document: SR5Actor|SR5Item, previousMessageId?: string) {
         if (!opposedData.against.opposed.resist.test) {
             console.error(`Shadowrun 5e | Supplied test action doesn't contain an resist test in it's opposed test configuration`, opposedData, this);
             return;
@@ -429,8 +429,10 @@ export const TestCreator = {
         // Allow the resist test to overwrite action data dynamically based on the source item.
         let documentAction: DeepPartial<MinimalActionType> = {};
         if (opposedData.sourceItemUuid) {
-            const item = await fromUuid(opposedData.sourceItemUuid) as SR5Item;
-            if (item && document instanceof SR5Actor) documentAction = resistTestCls._getDocumentTestAction(item, document);
+            const item = fromUuidSync(opposedData.sourceItemUuid);
+            if (item instanceof SR5Item && document instanceof SR5Actor) {
+                documentAction = resistTestCls._getDocumentTestAction(item, document);
+            }
         }
 
         // Provide default action information.
@@ -668,7 +670,7 @@ export const TestCreator = {
      * Return minimal viable test data without test specific customization.
      */
     _minimalTestData: function(): SuccessTestData {
-        return SuccessTest.createStructuralTestData();
+        return SuccessTest.applyStructuralDefaults({});
     },
 
     /**

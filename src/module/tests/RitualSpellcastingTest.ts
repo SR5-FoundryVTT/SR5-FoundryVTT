@@ -30,14 +30,14 @@ interface RitualSpellcastingTestData extends SuccessTestData {
 export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestData> {
 
     override _prepareData(data: DeepPartial<RitualSpellcastingTestData>, options: Partial<TestOptions>): RitualSpellcastingTestData {
-        data = super._prepareData(data, options);
+        const prepared = super._prepareData(data, options);
 
-        this._prepareRitualData(data as RitualSpellcastingTestData);
+        this._prepareRitualData(prepared as RitualSpellcastingTestData);
 
-        data.drain ||= 0;
-        data.drainDamage ||= DataDefaults.createData('damage');
+        prepared.drain ||= 0;
+        prepared.drainDamage ||= DataDefaults.createData('damage');
 
-        return data as RitualSpellcastingTestData;
+        return prepared as RitualSpellcastingTestData;
     }
 
     override get _dialogTemplate() {
