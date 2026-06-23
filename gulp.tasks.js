@@ -1,7 +1,6 @@
 'use strict';
 const fs = require('fs-extra');
 const path = require('path');
-const { finished } = require('stream/promises');
 
 // Sass
 const gulpsass = require('gulp-sass')(require('sass'));
@@ -85,11 +84,9 @@ const buildJSDev = () => buildJS('dev');
  * COPY ASSETS
  */
 async function copyAssets() {
-    await Promise.all([
-        finished(gulp.src('public/**/*', {encoding: false}).pipe(gulp.dest(destFolder))),
-        finished(gulp.src('src/templates/**/*').pipe(gulp.dest(path.resolve(destFolder, 'templates')))),
-        finished(gulp.src('src/module/tours/jsons/**/*').pipe(gulp.dest(path.resolve(destFolder, 'tours')))),
-    ]);
+    gulp.src('public/**/*', {encoding: false}).pipe(gulp.dest(destFolder));
+    gulp.src('src/templates/**/*').pipe(gulp.dest(path.resolve(destFolder, 'templates')));
+    gulp.src('src/module/tours/jsons/**/*').pipe(gulp.dest(path.resolve(destFolder, 'tours')));
 }
 
 /**
