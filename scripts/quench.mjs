@@ -4,6 +4,7 @@ import fs from 'fs-extra';
 import { chromium } from 'playwright';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const PROGRESS_SENTINEL = '__quench_progress__';
 const log = (...args) => console.info('[quench]', ...args);
 function isForceColor() {
     // "0", "false" and empty disable forced color.
@@ -93,6 +94,14 @@ function printQuenchFailures({ failures }) {
         console.error(`\n${color('red', `${number}. ${failure.title}`)}`);
         console.error(color('dim', indentText(formatFailureDetails(failure))));
     });
+}
+
+function printProgress({ kind, title, duration, hook }) {
+    const label = hook ? `Hook: ${title}` : title;
+    const dur = color('dim', `(${kind === 'pending' ? 'skipped' : formatDuration(duration)})`);
+    if (kind === 'pass') console.info(`  ${color('green', '✓')} ${label} ${dur}`);
+    else if (kind === 'fail') console.error(`  ${color('red', '✗')} ${label} ${dur}`);
+    else console.info(`  ${color('yellow', '○')} ${label} ${dur}`);
 }
 
 function printFatalError(error) {
@@ -231,7 +240,7 @@ async function ensureQuenchActive(page) {
 
 async function runQuench(page, pattern, runTimeoutMs) {
     return page.evaluate(
-        async ({ pattern, runTimeoutMs }) => {
+        async ({ pattern, runTimeoutMs, progressSentinel }) => {
             const quench = globalThis.quench;
             if (!quench) throw new Error('The global Quench API is unavailable.');
             const Runner = quench.mocha?.Runner ?? globalThis.Mocha?.Runner;
@@ -306,9 +315,23 @@ async function runQuench(page, pattern, runTimeoutMs) {
 
             const capturedFailures = [];
             const failEvent = Runner.constants?.EVENT_TEST_FAIL ?? 'fail';
+            const passEvent = Runner.constants?.EVENT_TEST_PASS ?? 'pass';
+            const pendingEvent = Runner.constants?.EVENT_TEST_PENDING ?? 'pending';
             const originalEmit = Runner.prototype.emit;
             const patchedEmit = function (event, ...args) {
                 if (event === failEvent) capturedFailures.push(fromMochaFailure(args[0], args[1]));
+                const kind =
+                    event === passEvent ? 'pass' : event === failEvent ? 'fail' : event === pendingEvent ? 'pending' : null;
+                if (kind) {
+                    const test = args[0];
+                    const payload = {
+                        kind,
+                        title: test?.fullTitle?.() ?? test?.title ?? '',
+                        duration: test?.duration,
+                        hook: test?.type === 'hook',
+                    };
+                    console.log(progressSentinel + JSON.stringify(payload));
+                }
                 return originalEmit.call(this, event, ...args);
             };
 
@@ -376,7 +399,7 @@ async function runQuench(page, pattern, runTimeoutMs) {
                 failures,
             };
         },
-        { pattern, runTimeoutMs },
+        { pattern, runTimeoutMs, progressSentinel: PROGRESS_SENTINEL },
     );
 }
 
@@ -384,7 +407,8 @@ async function main() {
     await loadEnvLocal();
 
     const url = process.env.FOUNDRY_URL || 'http://localhost:30000';
-    const pattern = getArg('pattern') || process.env.QUENCH_PATTERN || 'shadowrun5e.**';
+    const positional = process.argv[2] && !process.argv[2].startsWith('-') ? process.argv[2] : undefined;
+    const pattern = getArg('pattern') || process.env.QUENCH_PATTERN || positional || 'shadowrun5e.**';
     // This is a watchdog for the complete suite. Individual test timeouts remain
     // controlled by the test definitions registered with Quench.
     const configuredTimeout = Number(process.env.QUENCH_RUN_TIMEOUT);
@@ -403,8 +427,17 @@ async function main() {
         const page = await context.newPage();
         const pageLogsEnabled = process.env.QUENCH_PAGE_LOGS === '1';
         page.on('console', (message) => {
+            const text = message.text();
+            if (text.startsWith(PROGRESS_SENTINEL)) {
+                try {
+                    printProgress(JSON.parse(text.slice(PROGRESS_SENTINEL.length)));
+                } catch {
+                    // malformed sentinel message; ignore
+                }
+                return;
+            }
             if (pageLogsEnabled) {
-                console.log(`[page:${message.type()}]`, message.text());
+                console.log(`[page:${message.type()}]`, text);
             }
         });
         page.on('pageerror', (error) => {
@@ -417,6 +450,8 @@ async function main() {
 
         log(`running "${pattern}"`);
         const result = await runQuench(page, pattern, runTimeoutMs);
+        // Let any trailing console events flush before printing the summary.
+        await page.waitForTimeout(50);
         const { stats } = result;
         printQuenchFailures(result);
         printQuenchSummary(result);
