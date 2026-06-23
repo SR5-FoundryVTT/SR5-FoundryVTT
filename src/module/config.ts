@@ -1335,11 +1335,13 @@ export const SR5 = {
         'limits': 'SR5.ActiveEffect.FilterTypes.Limits',
     },
 
-    // Combat duration boundary choices: when within the remaining span the effect expires.
-    effectDurationBoundaries: {
-        '':             'SR5.ActiveEffect.Boundaries.RoundEnd',
-        'first_acting': 'SR5.ActiveEffect.Boundaries.FirstActing',
-        'initiative':   'SR5.ActiveEffect.Boundaries.Initiative',
+    // Combat duration expiry trigger choices (maps to native duration.expiry values).
+    effectExpiryTriggers: {
+        'combatStart': 'SR5.ActiveEffect.ExpiryTriggers.CombatStart',
+        'combatEnd':   'SR5.ActiveEffect.ExpiryTriggers.CombatEnd',
+        'roundStart':  'SR5.ActiveEffect.ExpiryTriggers.TurnStart',
+        'roundEnd':    'SR5.ActiveEffect.ExpiryTriggers.TurnEnd',
+        'sr5MyAction': 'SR5.ActiveEffect.ExpiryTriggers.MyAction',
     },
 
     itemCategoryIconOverrides: {

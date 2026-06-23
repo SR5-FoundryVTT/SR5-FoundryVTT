@@ -210,56 +210,14 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
-     * Determine whether the given expiry event triggers expiry for this effect.
-     * Real-time and permanent effects delegate to the native implementation.
-     * Combat-duration effects (units='rounds') use SR5 pass-aware boundary logic.
+     * `sr5MyAction` fires when the owner acts (any pass); everything else delegates to native.
+     * SR5Combat._onUpdate emits `sr5ActionPhase` every phase, covering single-combatant re-acts
+     * that Foundry's own turn dispatch misses.
      */
     override isExpiryEvent(event: string, context?: ActiveEffect.IsExpiryEventContext): boolean {
-        // Real-time (time units) and permanent (no value) delegate entirely to native:
-        //   - real_time: updateWorldTime → native checks secondsRemaining ≤ 0
-        //   - permanent: not isTemporary → not registered → never called
-        const rawUnits = this.toObject().duration?.units;
-        if (rawUnits !== 'rounds') return super.isExpiryEvent(event, context);
-
-        // Combat duration (units='rounds'): out-of-combat expiry is time-based via span alone.
-        if (event === 'updateWorldTime') return !(this.actor?.inCombat);
-
-        const dur = this.system.duration;
+        if (this.duration.expiry !== 'sr5MyAction') return super.isExpiryEvent(event, context);
         const combat = context?.combat ?? game.combat;
-        // The acting combatant is whoever the combat currently points at. SR5Combat fires sr5ActionPhase
-        // from _onUpdate after the turn/pass advance, so combat.combatant is already the current actor.
-        const acting = combat?.combatant;
-
-        switch (dur.boundary) {
-            case '':
-                // Expires at the end of the round once remaining ≤ 0. roundEnd fires natively on every
-                // round change (single combatant included), so it needs no SR5-specific dispatch.
-                return event === 'roundEnd';
-
-            case 'first_acting':
-                // Pass-1-only. Driven by SR5Combat's sr5ActionPhase (fires every action phase); Foundry's
-                // turnStart isn't emitted when the same combatant re-acts in a new pass.
-                return event === 'sr5ActionPhase'
-                    && acting?.actor === this.actor
-                    && combat?.system?.pass === SR.combat.FIRST_PASS;
-
-            case 'initiative':
-                // Expires when the acting combatant's initiative falls below the stored threshold.
-                return event === 'sr5ActionPhase'
-                    && (acting?.initiative ?? Infinity) < (dur.initiative ?? Infinity);
-        }
-
-        return false;
-    }
-
-    /**
-     * Capture the duration start anchor, recording a missing acting initiative as effectively-infinite rather
-     * than null (NumberField rejects Infinity, so MAX_SAFE_INTEGER is the sentinel).
-     */
-    static override getEffectStart(combat = game.combat ?? null) {
-        const start = super.getEffectStart(combat ?? null);
-        if (start.initiative == null) start.initiative = Number.MAX_SAFE_INTEGER;
-        return start;
+        return event === 'sr5ActionPhase' && combat?.combatant?.actor === this.actor;
     }
 
     /**

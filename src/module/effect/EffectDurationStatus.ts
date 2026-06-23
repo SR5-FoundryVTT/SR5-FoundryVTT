@@ -68,10 +68,8 @@ export function prepareEffectDurationStatus(
 
     const remaining = effect.duration.remaining;
     if (typeof remaining === 'number' && Number.isFinite(remaining) && remaining <= 0) {
-        // The combat-turn span is spent; the effect now waits for its boundary event. Describe the concrete
-        // boundary it's waiting on instead of a generic message.
-        const sysDuration = effect.system?.duration;
-        const { label, detail } = pendingBoundaryText(sysDuration?.boundary, sysDuration?.initiative);
+        // The combat-turn span is spent; the effect now waits for its trigger event.
+        const { label, detail } = pendingTriggerText(rawDuration.expiry ?? null);
 
         return {
             ...base,
@@ -99,29 +97,26 @@ export function prepareEffectDurationStatus(
     };
 }
 
-/** Pending-state label + detail describing the specific combat boundary an effect is waiting on. */
-function pendingBoundaryText(boundary: string | undefined, initiative: number | null | undefined): { label: string; detail: string } {
-    if (boundary === 'initiative' && typeof initiative === 'number') {
+/** Pending-state label + detail describing the trigger event an effect is waiting on. */
+function pendingTriggerText(expiry: string | null): { label: string; detail: string } {
+    const key = expiry ?? '';
+    const labels: Record<string, { label: string; detail: string }> = {
+        combatStart:    { label: 'SR5.ActiveEffect.Duration.AwaitingCombatStart',  detail: 'SR5.ActiveEffect.Duration.AwaitingCombatStartDetail' },
+        combatEnd:      { label: 'SR5.ActiveEffect.Duration.AwaitingCombatEnd',    detail: 'SR5.ActiveEffect.Duration.AwaitingCombatEndDetail' },
+        roundStart:     { label: 'SR5.ActiveEffect.Duration.AwaitingTurnStart',    detail: 'SR5.ActiveEffect.Duration.AwaitingTurnStartDetail' },
+        roundEnd:       { label: 'SR5.ActiveEffect.Duration.AwaitingTurnEnd',      detail: 'SR5.ActiveEffect.Duration.AwaitingTurnEndDetail' },
+        sr5MyAction:    { label: 'SR5.ActiveEffect.Duration.AwaitingMyAction',     detail: 'SR5.ActiveEffect.Duration.AwaitingMyActionDetail' },
+    };
+    const entry = labels[key];
+    if (entry) {
         return {
-            label: game.i18n.format('SR5.ActiveEffect.Duration.UntilInitiative', { initiative }),
-            detail: game.i18n.format('SR5.ActiveEffect.Duration.UntilInitiativeDetail', { initiative }),
-        };
-    }
-    if (boundary === 'first_acting') {
-        return {
-            label: game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingFirstActing'),
-            detail: game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingFirstActingDetail'),
-        };
-    }
-    if (boundary === '') {
-        return {
-            label: game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingTurnEnd'),
-            detail: game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingTurnEndDetail'),
+            label: game.i18n.localize(entry.label),
+            detail: game.i18n.localize(entry.detail),
         };
     }
     return {
-        label: game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingBoundary'),
-        detail: game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingBoundaryDetail'),
+        label: game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingTrigger'),
+        detail: game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingTriggerDetail'),
     };
 }
 

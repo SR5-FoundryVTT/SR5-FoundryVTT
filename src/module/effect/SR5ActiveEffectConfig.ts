@@ -31,9 +31,7 @@ type SR5ActiveEffectSheetData = ActiveEffectConfig.RenderContext & {
     system: ActiveEffectDM;
     systemFields: typeof ActiveEffectDM.schema.fields;
 
-    /** 'permanent' | 'realtime' | 'combat' — derived from duration.units for the duration tab. */
-    durationType: string;
-    /** Prepared boundary choices for the combat duration type's boundary select. */
+    /** Prepared boundary choices for the expiry trigger select. */
     boundaryOptions: { value: string; label: string; selected: boolean }[];
     /** State-aware summary for the duration status strip. */
     durationStatus: EffectDurationStatus;
@@ -175,13 +173,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
                 ? combatant.initiative
                 : game.i18n.localize('EFFECT.START.NoInitiative');
 
-        // A missing acting initiative is recorded as MAX_SAFE_INTEGER ("effectively infinite");
-        // show ∞ instead of a giant number (or a raw null for legacy effects).
-        const initiative = (start.initiative == null || start.initiative >= Number.MAX_SAFE_INTEGER)
-            ? '∞' as unknown as number
-            : start.initiative;
-
-        return { ...start, initiative, time, combat, combatant, combatantName, combatantInitiative };
+        return { ...start, time, combat, combatant, combatantName, combatantInitiative };
     }
 
     /**
@@ -218,7 +210,6 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         data.changeTypes = this.prepareChangeTypes();
 
         // Duration tab context
-        data.durationType = this.prepareDurationType();
         data.boundaryOptions = this.prepareBoundaryOptions();
         data.durationStatus = prepareEffectDurationStatus(this.clone, {
             restartPending: this._restartDurationPending,
@@ -389,22 +380,15 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
             }
         }
 
-        const durationType = submitData._durationType as string | undefined;
-        delete submitData._durationType;
-
         const dur = (submitData.duration ?? {}) as Record<string, unknown>;
-        if (durationType === 'permanent') {
-            // No value → Infinity → not isTemporary → not tracked.
+
+        // A blank value input means permanent — no finite duration, never tracked.
+        if (dur.value === null || dur.value === '' || dur.value === undefined) {
             dur.value = null;
-            dur.units = 'seconds';
-        } else if (durationType === 'combat') {
-            // Always store combat as 'rounds'.
-            dur.units = 'rounds';
         }
-        // Force expiry to null for all duration types: our isExpiryEvent override fully owns the
-        // trigger moment and the core default (expiry="turnStart" for numeric values) would
-        // interfere with roundEnd and combatRewind boundaries.
-        dur.expiry = null;
+
+        // Normalize blank expiry string to null.
+        if (dur.expiry === '' || dur.expiry === undefined) dur.expiry = null;
 
         if (this._restartDurationPending) {
             submitData.disabled = false;
@@ -605,12 +589,6 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
             }
         }
 
-        if (target instanceof HTMLSelectElement && name === '_durationType') {
-            this._applyDurationTypeToClone(target.value);
-            void this.render();
-            return;
-        }
-
         if ((target instanceof HTMLInputElement || target instanceof HTMLSelectElement)
             && (name === 'duration.value' || name === 'duration.units')) {
             this._syncFormIntoClone();
@@ -618,56 +596,21 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
             return;
         }
 
-        if (target instanceof HTMLSelectElement && name === 'system.duration.boundary') {
+        if (target instanceof HTMLSelectElement && name === 'duration.expiry') {
             this._syncFormIntoClone();
             void this.render();
             return;
         }
     }
 
-    /** Derive the current display type from the clone's native duration units. */
-    private prepareDurationType(): string {
-        const raw = this.clone.toObject().duration;
-        if (raw.value == null || !Number.isFinite(Number(raw.value))) return 'permanent';
-        if (raw.units === 'rounds') return 'combat';
-        return 'realtime';
-    }
-
-    /** Build the boundary choices list for the combat duration type select. */
+    /** Build the expiry trigger choices list for the expiry trigger select. */
     private prepareBoundaryOptions() {
-        const current = this.clone.system.duration.boundary;
-        return Object.entries(SR5.effectDurationBoundaries).map(([value, locKey]) => ({
+        const current = this.clone.toObject().duration?.expiry ?? null;
+        return Object.entries(SR5.effectExpiryTriggers).map(([value, locKey]) => ({
             value,
             label: game.i18n.localize(locKey),
             selected: value === current,
         }));
     }
 
-    /**
-     * Update the working clone with sensible defaults when the user switches duration type via the
-     * _durationType select. Called from _onChangeForm before re-render.
-     */
-    private _applyDurationTypeToClone(durationType: string): void {
-        const currentUnits = this.clone.duration.units;
-        const currentValue = this.clone.duration.value;
-        const TIME_UNITS: string[] = ['seconds', 'minutes', 'hours', 'days', 'months', 'years'];
-
-        if (durationType === 'permanent') {
-            this.clone.updateSource({ duration: { value: null } });
-        } else if (durationType === 'realtime') {
-            const needsTimeUnit = !TIME_UNITS.includes(currentUnits);
-            const needsValue = !Number.isFinite(currentValue);
-            if (needsTimeUnit || needsValue) {
-                this.clone.updateSource({ duration: {
-                    ...(needsValue ? { value: 1 } : {}),
-                    ...(needsTimeUnit ? { units: 'minutes' } : {}),
-                }});
-            }
-        } else if (durationType === 'combat') {
-            this.clone.updateSource({ duration: {
-                units: 'rounds',
-                ...((!Number.isFinite(currentValue) || currentValue == null) ? { value: 1 } : {}),
-            }});
-        }
-    }
 }
