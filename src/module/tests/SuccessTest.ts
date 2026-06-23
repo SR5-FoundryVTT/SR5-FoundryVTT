@@ -256,29 +256,29 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Any Test should be usable simply by instantiating it with empty TestData
      */
     _prepareData(data: DeepPartial<T>, options: Partial<TestOptions>): T {
-        data = SuccessTest.applyStructuralDefaults(data);
-        data.type ??= this.type;
+        const prepared = SuccessTest.applyStructuralDefaults(data);
+        prepared.type ??= this.type;
 
         // Store the current users targeted token ids for later use.
-        data.targetUuids ||= Helpers.getUserTargets().map(token => token.actor?.uuid).filter((uuid): uuid is string => !!uuid);
+        prepared.targetUuids ||= Helpers.getUserTargets().map(token => token.actor?.uuid).filter((uuid): uuid is string => !!uuid);
 
         // Store given document uuids to be fetched during evaluation.
-        data.sourceActorUuid ||= this.actor?.uuid ?? undefined;
-        data.sourceItemUuid ||= this.item?.uuid ?? undefined;
-        data.sourceUuid ||= this.source?.uuid ?? undefined;
+        prepared.sourceActorUuid ||= this.actor?.uuid ?? undefined;
+        prepared.sourceItemUuid ||= this.item?.uuid ?? undefined;
+        prepared.sourceUuid ||= this.source?.uuid ?? undefined;
 
-        data.title ||= this.constructor.label;
+        prepared.title ||= this.constructor.label;
 
         // Options will be used when a test is reused further on.
-        data.options = {
-            rollMode: this._prepareRollMode(data, options),
+        prepared.options = {
+            rollMode: this._prepareRollMode(prepared, options),
             showDialog: options.showDialog ?? true,
             showMessage: options.showMessage ?? true,
         };
 
-        console.debug('Shadowrun 5e | Prepared test data', data);
+        console.debug('Shadowrun 5e | Prepared test data', prepared);
 
-        return data as T;
+        return prepared as T;
     }
 
     /**
