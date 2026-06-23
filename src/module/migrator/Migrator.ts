@@ -242,6 +242,8 @@ export class Migrator {
 
     public static BeginMigration() {
         if (this.pendingMigrationCount === 0) return;
+        const migratedVersion = game.settings.get(game.system.id, FLAGS.KEY_DATA_VERSION);
+        if (this.compareVersion(migratedVersion, game.system.version) >= 0) return;
 
         const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.WarningTitle');
         const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.WarningHeader');
@@ -295,7 +297,7 @@ export class Migrator {
         try {
             return await cls.implementation.updateDocuments(
                 docs.filter(d => d._stats?.systemVersion === this._migrationMark) as any,
-                { diff: false, recursive: false, parent: parent as any }
+                { parent: parent as any, diff: false, recursive: false, noHook: true, render: false }
             );
         } catch (error) {
             console.error(`Failed migration update for ${cls.documentName} documents (parent: ${parent?.uuid ?? 'none'}).`, error);
@@ -344,8 +346,17 @@ export class Migrator {
             this.updateProgressbar();
             try {
                 await TokenDocument.implementation.updateDocuments(
-                    scene.tokens.map(t => t.toObject()),
-                    { diff: false, recursive: false, parent: scene }
+                    scene.tokens.map(token => {
+                        const data = token.toObject();
+
+                        // Foundry uses the parent token ID as the ActorDelta ID.
+                        // Provide it upfront to avoid ActorDeltaField._updateDiff assigning _id to the cleaned update value.
+                        if (!token.actorLink && data.delta && !data.delta._id)
+                            data.delta._id = token.id;
+
+                        return data;
+                    }),
+                    { parent: scene, diff: false, recursive: false, noHook: true, render: false }
                 );
             } catch (error) {
                 console.error(`Failed migration update for Token documents in ${scene.uuid}.`, error);
