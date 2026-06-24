@@ -9,6 +9,9 @@ const require = createRequire(import.meta.url);
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PROGRESS_SENTINEL = '__quench_progress__';
 const log = (...args) => console.info('[quench]', ...args);
+
+// ─── output formatting ───────────────────────────────────────────────────────
+
 function isForceColor() {
     // "0", "false" and empty disable forced color.
     const value = process.env.FORCE_COLOR;
@@ -25,10 +28,13 @@ const colorCodes = {
     yellow: ['\u001b[33m', '\u001b[39m'],
 };
 
-function color(name, value) {
-    if (!colorsEnabled) return String(value);
-    const [open, close] = colorCodes[name];
-    return `${open}${value}${close}`;
+function color(...styles) {
+    const value = String(styles.pop());
+    if (!colorsEnabled) return value;
+    return styles.reduceRight((text, name) => {
+        const [open, close] = colorCodes[name];
+        return `${open}${text}${close}`;
+    }, value);
 }
 
 function formatDuration(ms) {
@@ -73,14 +79,13 @@ function formatFailureDetails(failure) {
 }
 
 function printQuenchSummary({ pattern, stats }) {
-    const total = stats.tests;
     const failed = stats.failures > 0;
     const status = color(failed ? 'red' : 'green', failed ? 'FAILED' : 'PASSED');
 
     console.info(`\n${color('bold', 'Quench result')}`);
     console.info(`  Status:   ${status}`);
     console.info(`  Pattern:  ${color('dim', pattern)}`);
-    console.info(`  Tests:    ${total}`);
+    console.info(`  Tests:    ${stats.tests}`);
     console.info(`  Passed:   ${color('green', stats.passes)}`);
     console.info(`  Failed:   ${failed ? color('red', stats.failures) : stats.failures}`);
     console.info(`  Pending:  ${stats.pending > 0 ? color('yellow', stats.pending) : stats.pending}`);
@@ -91,7 +96,7 @@ function printQuenchFailures({ failures }) {
     if (!failures.length) return;
 
     const width = String(failures.length).length;
-    console.error(`\n${color('red', color('bold', 'Failures'))}`);
+    console.error(`\n${color('red', 'bold', 'Failures')}`);
     failures.forEach((failure, index) => {
         const number = String(index + 1).padStart(width, ' ');
         console.error(`\n${color('red', `${number}. ${failure.title}`)}`);
@@ -106,6 +111,14 @@ function printProgress({ kind, title, duration, hook }) {
     else if (kind === 'fail') console.error(`  ${color('red', '✗')} ${label} ${dur}`);
     else console.info(`  ${color('yellow', '○')} ${label} ${dur}`);
 }
+
+function printFatalError(error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`\n${color('red', 'bold', 'Quench runner failed')}`);
+    console.error(color('dim', indentText(message, 2)));
+}
+
+// ─── source maps ─────────────────────────────────────────────────────────────
 
 let _consumerPromise = null;
 function getSourceMapConsumer() {
@@ -137,11 +150,7 @@ async function remapFailureStacks(failures) {
     }
 }
 
-function printFatalError(error) {
-    const message = error instanceof Error ? error.message : String(error);
-    console.error(`\n${color('red', color('bold', 'Quench runner failed'))}`);
-    console.error(color('dim', indentText(message, 2)));
-}
+// ─── config & env ────────────────────────────────────────────────────────────
 
 async function loadEnvLocal() {
     const file = path.join(repoRoot, '.env.local');
@@ -183,6 +192,21 @@ function getArg(name) {
     if (!value || value.startsWith('--')) throw new Error(`--${name} requires a value`);
     return value;
 }
+
+function resolveRunConfig() {
+    const url = process.env.FOUNDRY_URL || 'http://localhost:30000';
+    const positional = process.argv[2] && !process.argv[2].startsWith('-') ? process.argv[2] : undefined;
+    const pattern = getArg('pattern') || process.env.QUENCH_PATTERN || positional || 'shadowrun5e.**';
+    // This is a watchdog for the complete suite. Individual test timeouts remain
+    // controlled by the test definitions registered with Quench.
+    const configuredTimeout = Number(process.env.QUENCH_RUN_TIMEOUT);
+    const runTimeoutMs =
+        Number.isFinite(configuredTimeout) && configuredTimeout > 0 ? configuredTimeout : 10 * 60 * 1000;
+    const headless = !process.argv.includes('--headed');
+    return { url, pattern, runTimeoutMs, headless };
+}
+
+// ─── Foundry orchestration ───────────────────────────────────────────────────
 
 async function waitForGameReady(page, timeout = 120000) {
     await page.waitForFunction(() => globalThis.game?.ready === true, null, { timeout });
@@ -271,6 +295,8 @@ async function ensureQuenchActive(page) {
     }
 }
 
+// ─── browser run ─────────────────────────────────────────────────────────────
+
 async function runQuench(page, pattern, runTimeoutMs) {
     return page.evaluate(
         async ({ pattern, runTimeoutMs, progressSentinel }) => {
@@ -308,74 +334,70 @@ async function runQuench(page, pattern, runTimeoutMs) {
                 return message;
             };
             const failureKey = (failure) => `${failure.title}\n${failure.error ?? ''}`;
+            const makeFailure = ({ title, file, duration, speed, err, source }) => ({
+                title,
+                file,
+                duration,
+                speed,
+                error: errorText(err),
+                actual: err?.actual,
+                expected: err?.expected,
+                operator: err?.operator,
+                source,
+            });
             const fromMochaFailure = (test, error) => {
-                const err = serializeError(error);
-                const title = test?.fullTitle?.() ?? test?.title ?? 'Unknown failed test';
                 const hook = test?.type === 'hook';
-
-                return {
-                    title: hook ? `Hook failure: ${title}` : title,
+                const base = test?.fullTitle?.() ?? test?.title ?? 'Unknown failed test';
+                return makeFailure({
+                    title: hook ? `Hook failure: ${base}` : base,
                     file: test?.file,
                     duration: test?.duration,
                     speed: test?.speed,
-                    error: errorText(error),
-                    actual: err.actual,
-                    expected: err.expected,
-                    operator: err.operator,
+                    err: serializeError(error),
                     source: hook ? 'mocha-hook' : 'mocha',
-                };
+                });
             };
-            const fromReportFailure = (test) => {
-                const err = test.err ?? {};
-                const error = errorText(err);
-
-                return {
+            const fromReportFailure = (test) =>
+                makeFailure({
                     title: test.fullTitle ?? test.title ?? 'Unknown failed test',
                     file: test.file,
                     duration: test.duration,
                     speed: test.speed,
-                    error,
-                    actual: err.actual,
-                    expected: err.expected,
-                    operator: err.operator,
+                    err: test.err ?? {},
                     source: 'quench-report',
-                };
-            };
+                });
 
             // Quench's run handlers access the results application's DOM. If it
             // has not been rendered, runBatches can throw and leave Mocha stuck.
             await quench.app.render({ force: true });
 
             const capturedFailures = [];
-            const failEvent = Runner.constants?.EVENT_TEST_FAIL ?? 'fail';
-            const passEvent = Runner.constants?.EVENT_TEST_PASS ?? 'pass';
-            const pendingEvent = Runner.constants?.EVENT_TEST_PENDING ?? 'pending';
+            const eventKinds = {
+                [Runner.constants?.EVENT_TEST_PASS ?? 'pass']: 'pass',
+                [Runner.constants?.EVENT_TEST_FAIL ?? 'fail']: 'fail',
+                [Runner.constants?.EVENT_TEST_PENDING ?? 'pending']: 'pending',
+            };
             const originalEmit = Runner.prototype.emit;
             const patchedEmit = function (event, ...args) {
-                if (event === failEvent) capturedFailures.push(fromMochaFailure(args[0], args[1]));
-                const kind =
-                    event === passEvent ? 'pass' : event === failEvent ? 'fail' : event === pendingEvent ? 'pending' : null;
+                const kind = eventKinds[event];
+                if (kind === 'fail') capturedFailures.push(fromMochaFailure(args[0], args[1]));
                 if (kind) {
                     const test = args[0];
-                    const payload = {
-                        kind,
-                        title: test?.fullTitle?.() ?? test?.title ?? '',
-                        duration: test?.duration,
-                        hook: test?.type === 'hook',
-                    };
-                    console.log(progressSentinel + JSON.stringify(payload));
+                    console.log(
+                        progressSentinel +
+                            JSON.stringify({
+                                kind,
+                                title: test?.fullTitle?.() ?? test?.title ?? '',
+                                duration: test?.duration,
+                                hook: test?.type === 'hook',
+                            }),
+                    );
                 }
                 return originalEmit.call(this, event, ...args);
             };
 
-            let runner;
-            Runner.prototype.emit = patchedEmit;
-            try {
-                runner = await quench.runBatches(pattern);
-
-                // Quench returns the runner before Mocha finishes. Register the
-                // end listener before checking stats to avoid missing fast runs.
-                await new Promise((resolve, reject) => {
+            const waitForRunEnd = (runner) =>
+                new Promise((resolve, reject) => {
                     const timer = setTimeout(
                         () => reject(new Error(`Quench did not finish within ${runTimeoutMs}ms`)),
                         runTimeoutMs,
@@ -387,6 +409,14 @@ async function runQuench(page, pattern, runTimeoutMs) {
                     runner.once('end', finish);
                     if (runner.stats?.end) finish();
                 });
+
+            let runner;
+            Runner.prototype.emit = patchedEmit;
+            try {
+                runner = await quench.runBatches(pattern);
+                // Quench returns the runner before Mocha finishes. Register the
+                // end listener before checking stats to avoid missing fast runs.
+                await waitForRunEnd(runner);
             } finally {
                 if (Runner.prototype.emit === patchedEmit) Runner.prototype.emit = originalEmit;
             }
@@ -436,18 +466,33 @@ async function runQuench(page, pattern, runTimeoutMs) {
     );
 }
 
+function attachConsoleHandlers(page) {
+    const pageLogsEnabled = process.env.QUENCH_PAGE_LOGS === '1';
+    page.on('console', (message) => {
+        const text = message.text();
+        if (text.startsWith(PROGRESS_SENTINEL)) {
+            try {
+                printProgress(JSON.parse(text.slice(PROGRESS_SENTINEL.length)));
+            } catch {
+                // malformed sentinel message; ignore
+            }
+            return;
+        }
+        if (pageLogsEnabled) {
+            console.log(`[page:${message.type()}]`, text);
+        }
+    });
+    page.on('pageerror', (error) => {
+        if (pageLogsEnabled) console.error('[page:error]', error.message);
+    });
+}
+
+// ─── main ────────────────────────────────────────────────────────────────────
+
 async function main() {
     await loadEnvLocal();
+    const { url, pattern, runTimeoutMs, headless } = resolveRunConfig();
 
-    const url = process.env.FOUNDRY_URL || 'http://localhost:30000';
-    const positional = process.argv[2] && !process.argv[2].startsWith('-') ? process.argv[2] : undefined;
-    const pattern = getArg('pattern') || process.env.QUENCH_PATTERN || positional || 'shadowrun5e.**';
-    // This is a watchdog for the complete suite. Individual test timeouts remain
-    // controlled by the test definitions registered with Quench.
-    const configuredTimeout = Number(process.env.QUENCH_RUN_TIMEOUT);
-    const runTimeoutMs =
-        Number.isFinite(configuredTimeout) && configuredTimeout > 0 ? configuredTimeout : 10 * 60 * 1000;
-    const headless = !process.argv.includes('--headed');
     // Keep GPU rendering enabled in headless Chromium because Foundry and PIXI
     // canvas behavior differs when Chromium falls back to software rendering.
     const args = ['--enable-gpu', '--ignore-gpu-blocklist'];
@@ -458,24 +503,7 @@ async function main() {
     try {
         const context = await browser.newContext({ baseURL: url, viewport });
         const page = await context.newPage();
-        const pageLogsEnabled = process.env.QUENCH_PAGE_LOGS === '1';
-        page.on('console', (message) => {
-            const text = message.text();
-            if (text.startsWith(PROGRESS_SENTINEL)) {
-                try {
-                    printProgress(JSON.parse(text.slice(PROGRESS_SENTINEL.length)));
-                } catch {
-                    // malformed sentinel message; ignore
-                }
-                return;
-            }
-            if (pageLogsEnabled) {
-                console.log(`[page:${message.type()}]`, text);
-            }
-        });
-        page.on('pageerror', (error) => {
-            if (pageLogsEnabled) console.error('[page:error]', error.message);
-        });
+        attachConsoleHandlers(page);
 
         log(`connecting to ${url}`);
         await joinWorld(page);
@@ -486,11 +514,10 @@ async function main() {
         // Let any trailing console events flush before printing the summary.
         await page.waitForTimeout(50);
         await remapFailureStacks(result.failures);
-        const { stats } = result;
         printQuenchFailures(result);
         printQuenchSummary(result);
 
-        process.exitCode = stats.failures > 0 ? 1 : 0;
+        process.exitCode = result.stats.failures > 0 ? 1 : 0;
     } finally {
         await browser.close();
     }
