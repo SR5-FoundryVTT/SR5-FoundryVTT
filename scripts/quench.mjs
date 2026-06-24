@@ -1,7 +1,10 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 import fs from 'fs-extra';
 import { chromium } from 'playwright';
+
+const require = createRequire(import.meta.url);
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PROGRESS_SENTINEL = '__quench_progress__';
@@ -102,6 +105,36 @@ function printProgress({ kind, title, duration, hook }) {
     if (kind === 'pass') console.info(`  ${color('green', '✓')} ${label} ${dur}`);
     else if (kind === 'fail') console.error(`  ${color('red', '✗')} ${label} ${dur}`);
     else console.info(`  ${color('yellow', '○')} ${label} ${dur}`);
+}
+
+let _consumerPromise = null;
+function getSourceMapConsumer() {
+    if (_consumerPromise) return _consumerPromise;
+    _consumerPromise = (async () => {
+        const mapPath = path.join(repoRoot, 'dist', 'bundle.js.map');
+        if (!(await fs.pathExists(mapPath))) return null;
+        const { SourceMapConsumer } = require('source-map');
+        return new SourceMapConsumer(JSON.parse(await fs.readFile(mapPath, 'utf8')));
+    })();
+    return _consumerPromise;
+}
+
+function remapStack(stack, consumer) {
+    return stack.replace(/(?:systems\/shadowrun5e\/)?dist\/bundle\.js:(\d+):(\d+)/g, (m, line, col) => {
+        const pos = consumer.originalPositionFor({ line: Number(line), column: Number(col) });
+        if (!pos.source || pos.line == null) return m;
+        const abs = path.resolve(path.join(repoRoot, 'dist'), pos.source);
+        const rel = path.relative(repoRoot, abs).split(path.sep).join('/');
+        return `${rel}:${pos.line}:${pos.column}`;
+    });
+}
+
+async function remapFailureStacks(failures) {
+    const consumer = await getSourceMapConsumer();
+    if (!consumer) return;
+    for (const failure of failures) {
+        if (failure.error) failure.error = remapStack(failure.error, consumer);
+    }
 }
 
 function printFatalError(error) {
@@ -452,6 +485,7 @@ async function main() {
         const result = await runQuench(page, pattern, runTimeoutMs);
         // Let any trailing console events flush before printing the summary.
         await page.waitForTimeout(50);
+        await remapFailureStacks(result.failures);
         const { stats } = result;
         printQuenchFailures(result);
         printQuenchSummary(result);
