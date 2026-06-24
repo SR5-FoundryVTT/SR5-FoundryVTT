@@ -562,6 +562,27 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.equal(actor.system.attributes.body.value, 6);
         });
 
+        it('ACTOR apply-to: mixed-target effects only apply actor-bound changes onto an actor', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Mixed Target Effect',
+                system: {
+                    targets: [
+                        { id: 'actor-target', applyTo: 'actor' },
+                        { id: 'test-target', applyTo: 'test_all' },
+                    ],
+                    changes: [
+                        { key: 'system.attributes.body', value: '2', type: 'add', target: 'actor-target' },
+                        { key: 'system.attributes.body', value: '4', type: 'add', target: 'test-target' },
+                    ],
+                },
+            }]);
+
+            assert.lengthOf(actor.effects.contents, 1);
+            assert.lengthOf(actor.system.attributes.body.changes, 1);
+            assert.equal(actor.system.attributes.body.value, 2);
+        });
+
         it('TARGETED_ACTOR apply-to: create copied effects with resolved values on the target actor', async () => {
             const attacker = await factory.createActor({
                 type: 'character',
@@ -721,7 +742,10 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         it('SR5 Running Modifiers: ranged attack vs a running/sprinting target gets -2/-4 (test_target)', async () => {
             const attacker = await factory.createActor({ type: 'character' });
             const target = await factory.createActor({ type: 'character' });
-            const ranged = await factory.createItem({ type: 'weapon', system: { category: 'range' } });
+            const ranged = await factory.createItem({
+                type: 'weapon',
+                system: { category: 'range', action: { test: 'RangedAttackTest' } },
+            });
 
             const rangedPoolVsTarget = async () => {
                 const test = (await TestCreator.fromItem(ranged, attacker, { showDialog: false, showMessage: false }))!;
@@ -745,7 +769,10 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         it('SR5 Running Modifiers: a melee attack vs a running target gets no ranged penalty', async () => {
             const attacker = await factory.createActor({ type: 'character' });
             const target = await factory.createActor({ type: 'character' });
-            const melee = await factory.createItem({ type: 'weapon', system: { category: 'melee' } });
+            const melee = await factory.createItem({
+                type: 'weapon',
+                system: { category: 'melee', action: { test: 'MeleeAttackTest' } },
+            });
 
             const meleePoolVsTarget = async () => {
                 const test = (await TestCreator.fromItem(melee, attacker, { showDialog: false, showMessage: false }))!;

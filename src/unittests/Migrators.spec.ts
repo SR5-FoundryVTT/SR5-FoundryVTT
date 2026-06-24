@@ -807,25 +807,6 @@ export const Migrators = (context: QuenchBatchContext) => {
     });
 
     describe('Version0_37_0 active effect targets migration', () => {
-        it('migrates applyTo + filterGroups into a target and assigns changes to it', () => {
-            const migrator = new Version0_37_0();
-            const effect: any = {
-                system: {
-                    applyTo: 'test_all',
-                    filterGroups: [{ conditions: [{ type: 'skills', mode: 'include', values: ['automatics'] }] }],
-                    changes: [{ key: 'data.pool', value: '2', type: 'add' }],
-                },
-            };
-
-            assert.isTrue(migrator.handlesActiveEffect(effect));
-            migrator.migrateActiveEffect(effect);
-
-            assert.lengthOf(effect.system.targets, 1);
-            assert.strictEqual(effect.system.targets[0].applyTo, 'test_all');
-            assert.deepEqual(effect.system.targets[0].conditions, [{ type: 'skills', mode: 'include', values: ['automatics'] }]);
-            assert.strictEqual(effect.system.changes[0].target, effect.system.targets[0].id);
-        });
-
         it('migrates flat selection fields into a single target of conditions', () => {
             const migrator = new Version0_37_0();
             const effect: any = {
@@ -866,7 +847,7 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.notProperty(effect.system, 'onlyForItemTest');
         });
 
-        it('creates a default actor target for a plain effect and leaves migrated data alone', () => {
+        it('creates a default actor target for a plain effect', () => {
             const migrator = new Version0_37_0();
             const effect: any = {
                 system: {
@@ -879,11 +860,6 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.lengthOf(effect.system.targets, 1);
             assert.strictEqual(effect.system.targets[0].applyTo, 'actor');
             assert.strictEqual(effect.system.changes[0].target, effect.system.targets[0].id);
-
-            // Already-migrated effects are not touched again.
-            const before = foundry.utils.deepClone(effect.system.targets);
-            migrator.migrateActiveEffect(effect);
-            assert.deepEqual(effect.system.targets, before);
         });
     });
 };

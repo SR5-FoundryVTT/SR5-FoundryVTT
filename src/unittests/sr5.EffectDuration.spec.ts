@@ -42,6 +42,13 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
     /** Build a minimal fake context as isExpiryEvent receives from the registry. */
     const ctx = (overrides: Record<string, unknown> = {}) => overrides as ActiveEffect.IsExpiryEventContext;
 
+    const combatEventCtx = (actor: SR5ActiveEffect['actor']) => ({
+        combat: {
+            started: true,
+            getCombatantsByActor: () => actor ? [{ actor }] : [],
+        },
+    }) as unknown as ActiveEffect.IsExpiryEventContext;
+
     const durationStatus = (
         rawDuration: Partial<ActiveEffect.DurationData>,
         preparedDuration: Partial<ActiveEffect.Duration>,
@@ -217,19 +224,19 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
     // -------------------------------------------------------------------------
     describe('isExpiryEvent — native combat events delegate to super', () => {
         it('delegates roundEnd to native when expiry is roundEnd', async () => {
-            const { effect } = await createEffect({type: 'character'}, {
+            const { actor, effect } = await createEffect({type: 'character'}, {
                 duration: { value: 1, units: 'rounds', expiry: 'roundEnd' } as any,
             });
             // Native handles roundEnd for effects with expiry='roundEnd'
-            const result = effect.isExpiryEvent('roundEnd', ctx());
+            const result = effect.isExpiryEvent('roundEnd', combatEventCtx(actor));
             assert.isTrue(result, 'roundEnd should delegate to native and return true for matching expiry');
         });
 
         it('does not fire on sr5ActionPhase for non-sr5MyAction effects', async () => {
-            const { effect } = await createEffect({type: 'character'}, {
+            const { actor, effect } = await createEffect({type: 'character'}, {
                 duration: { value: 1, units: 'rounds', expiry: 'roundEnd' } as any,
             });
-            const result = effect.isExpiryEvent('sr5ActionPhase', ctx());
+            const result = effect.isExpiryEvent('sr5ActionPhase', combatEventCtx(actor));
             // native: 'sr5ActionPhase' !== 'roundEnd' → false
             assert.isFalse(result, 'roundEnd effect must not fire on sr5ActionPhase');
         });

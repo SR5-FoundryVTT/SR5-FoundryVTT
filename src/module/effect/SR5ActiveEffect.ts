@@ -276,28 +276,6 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
-     * < v14 used #apply instead of applyChange.
-     */
-    override apply(model: DataModel.Any, change: ActiveEffect.ChangeData) {
-        // Foundry core iterates every change of an applicable effect when applying to actor data.
-        // Only apply changes whose target is actor-bound. Both 'actor' and 'targeted_actor' targets
-        // apply to actor data (targeted_actor effects are only collected onto an actor when they
-        // belong to it - either embedded directly or copied there by a test).
-        if (model instanceof SR5Actor) {
-            const target = this.targetForChange(change as { target?: string });
-            const appliesToActor = !!target && (target.applyTo === 'actor' || target.applyTo === 'targeted_actor');
-            if (!appliesToActor) return {};
-        }
-
-        // @ts-expect-error TODO: v14 remove once v14 implementation is stable
-        return super.apply(model, change);
-        // return Object.fromEntries(
-        //     // @ts-expect-error TODO: tamif - v14 - what is this for?
-        //     Object.entries(super.apply(model, change)).filter(([, v]) => v != null)
-        // );
-    }
-
-    /**
      * Inject features into default FoundryVTT ActiveEffect implementation.
      *
      * - dynamic source properties as change values
@@ -321,6 +299,16 @@ export class SR5ActiveEffect extends ActiveEffect {
         change: ActiveEffect.ChangeData,
         { replacementData = {}, modifyTarget = true }: ActiveEffect.ApplyChangeOptions = {}
     ): Record<string, unknown> {
+        // Foundry core iterates every change of an applicable effect when applying to actor data.
+        // Only apply changes whose target is actor-bound. Both 'actor' and 'targeted_actor' targets
+        // apply to actor data (targeted_actor effects are only collected onto an actor when they
+        // belong to it - either embedded directly or copied there by a test).
+        if (targetDoc instanceof SR5Actor && change.effect instanceof SR5ActiveEffect) {
+            const target = change.effect.targetForChange(change as { target?: string });
+            const appliesToActor = !!target && (target.applyTo === 'actor' || target.applyTo === 'targeted_actor');
+            if (!appliesToActor) return {};
+        }
+
         // Skip applying this change if the target key does not exist on the model.
         // TypedObjectField will otherwise create the missing property as a string,
         // which breaks data integrity and can result in errors like "undefined[object Object]".
@@ -334,8 +322,9 @@ export class SR5ActiveEffect extends ActiveEffect {
         SR5ActiveEffect.resolveDynamicChangeValue(source, change);
         
         // Other cases should be directly applied to the data, without actor / schema handling.
-        // This is used when applying effects to non-Actor objects, like tests.
-        // TODO: v14 - double check TokenDocument.
+        // This is used when applying effects to non-Actor objects, like tests. TokenDocument is
+        // explicitly supported by Foundry v14's ActiveEffect.applyChange and must stay on the
+        // core/schema path for token.* changes routed by Actor.applyActiveEffects.
         if (!(targetDoc instanceof SR5Actor) && !(targetDoc instanceof SR5Item) && !(targetDoc instanceof TokenDocument)) {
             return SR5ActiveEffect._applyToObject(targetDoc, change);
         }
