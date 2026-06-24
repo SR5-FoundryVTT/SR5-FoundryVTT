@@ -94,7 +94,7 @@ export const AutocompleteInlineHooksFlow =  {
                 if (!TestClassName) return {};
                 const TestClass = TestCreator._getTestClass(TestClassName);
                 if (!TestClass) return {};
-                const test = new TestClass({}, {actor});
+                const test = new TestClass({}, {actor: actor ?? undefined});
                 foundry.utils.mergeObject(testData, test.data);
             }
             return {data: testData};
@@ -111,7 +111,7 @@ export const AutocompleteInlineHooksFlow =  {
             const action = item.getAction();
             if (!action) return {};                
             const SuccessTestClass = TestCreator._getTestClass(action.test) || SuccessTest;
-            return {data: new SuccessTestClass({}, {actor: item.actor, item}).data};
+            return {data: new SuccessTestClass({}, {actor: item.actor ?? undefined, item}).data};
         }
 
         return {};
@@ -177,9 +177,9 @@ export const AutocompleteInlineHooksFlow =  {
             const action = item.getAction();
             if (!action) return {};                
             const SuccessTestClass = TestCreator._getTestClass(action.test) || SuccessTest;
-            const OpposedTestClass = TestCreator._getTestClass(action.opposed.test) || OpposedTest;
+            const OpposedTestClass = TestCreator._getTestClass(action.opposed.test) as typeof OpposedTest || OpposedTest;
             const successTest = new SuccessTestClass({});
-            const opposedTest = new OpposedTestClass({against: successTest.data}, {actor: item.actor, item});
+            const opposedTest = new OpposedTestClass({ against: successTest.data }, {actor: item.actor ?? undefined, item});
             
             return {data: opposedTest.data};
         }

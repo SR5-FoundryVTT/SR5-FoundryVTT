@@ -31,10 +31,10 @@ export type PhysicalResistSuccessCondition = {
  */
 export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
 
-    override _prepareData(data: PhysicalResistTestData, options): any {
-        data = super._prepareData(data, options);
-        data = ResistTestDataFlow._prepareData(data);
-        return data;
+    override _prepareData(data: PhysicalResistTestData, options: Partial<TestOptions>): PhysicalResistTestData {
+        let prepared = super._prepareData(data, options);
+        prepared = ResistTestDataFlow._prepareData(prepared);
+        return prepared;
     }
 
     override get _chatMessageTemplate() {
@@ -185,7 +185,6 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
 
     /**
      * Prepare any ResistTest from given test data. This should come from a MatrixDefenseTest
-     *
      */
     static override async _getResistActionTestData(opposedData: PhysicalDefenseTestData, document: SR5Actor|SR5Item, previousMessageId: string): Promise<MatrixResistTestData | undefined> {
         if (!opposedData.against?.opposed.resist) {
@@ -198,7 +197,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         }
         // get most of our resist data from the ResistTestDataFlow test data
         const data = ResistTestDataFlow._getResistTestData(opposedData, 'SR5.Tests.PhysicalResistTest', previousMessageId);
-        const action = await ResistTestDataFlow._getResistActionData(this, opposedData, 'PhysicalResistTest');
+        const action = await ResistTestDataFlow._getResistActionData(this as typeof SuccessTest, opposedData, document, 'PhysicalResistTest');
         return this._prepareActionTestData(action, document, data) as MatrixResistTestData;
     }
 
@@ -207,9 +206,9 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
      *
      * This can be used to trigger resist tests.
      */
-    static override async executeMessageAction(againstData: PhysicalDefenseTestData, messageId: string, options: TestOptions) {
+    static override async executeMessageAction(againstData: PhysicalDefenseTestData, messageId: string, options: Partial<TestOptions>) {
         // Roll resist tests with the currently selected token actor(s).
         const documents = Helpers.getSelectedActorsOrCharacter();
-        await ResistTestDataFlow.executeMessageAction(this, againstData, messageId, documents, options);
+        await ResistTestDataFlow.executeMessageAction(this as typeof SuccessTest, againstData, messageId, documents, options);
     }
 }
