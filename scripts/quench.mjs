@@ -203,7 +203,8 @@ function resolveRunConfig() {
     const runTimeoutMs =
         Number.isFinite(configuredTimeout) && configuredTimeout > 0 ? configuredTimeout : 10 * 60 * 1000;
     const headless = !process.argv.includes('--headed');
-    return { url, pattern, runTimeoutMs, headless };
+    const user = process.env.FOUNDRY_USER || 'Gamemaster';
+    return { url, pattern, runTimeoutMs, headless, user };
 }
 
 // ─── Foundry orchestration ───────────────────────────────────────────────────
@@ -212,7 +213,7 @@ async function waitForGameReady(page, timeout = 120000) {
     await page.waitForFunction(() => globalThis.game?.ready === true, null, { timeout });
 }
 
-async function joinWorld(page) {
+async function joinWorld(page, user = 'Gamemaster') {
     try {
         await page.goto('/', { waitUntil: 'domcontentloaded' });
     } catch (error) {
@@ -237,7 +238,7 @@ async function joinWorld(page) {
     const select = page.locator('[name=userid]');
     await select.waitFor({ timeout: 30000 });
     try {
-        await select.selectOption({ label: 'Gamemaster' });
+        await select.selectOption({ label: user });
     } catch (labelError) {
         const options = await select.locator('option').evaluateAll((elements) =>
             elements.map((option) => ({
@@ -245,15 +246,15 @@ async function joinWorld(page) {
                 text: (option.textContent ?? '').trim(),
             })),
         );
-        const gamemaster = options.find((option) => /game ?master/i.test(option.text));
-        if (!gamemaster) {
+        const match = options.find((option) => option.text.toLowerCase() === user.toLowerCase());
+        if (!match) {
             const available = options.map((option) => option.text).join(', ') || 'none';
             throw new Error(
-                `No Gamemaster user is available in the launched world (available users: ${available}). ` +
+                `User "${user}" is not available in the launched world (available users: ${available}). ` +
                     `Selecting by label failed: ${labelError}`,
             );
         }
-        await select.selectOption(gamemaster.value);
+        await select.selectOption(match.value);
     }
 
     await Promise.all([page.waitForURL('**/game', { timeout: 60000 }), page.click('[name=join]')]);
@@ -267,7 +268,7 @@ async function quenchReady(page, timeout) {
         .catch(() => false);
 }
 
-async function ensureQuenchActive(page) {
+async function ensureQuenchActive(page, user) {
     if (await quenchReady(page, 8000)) return;
 
     const installed = await page.evaluate(() => game.modules.has('quench'));
@@ -289,7 +290,7 @@ async function ensureQuenchActive(page) {
 
     // Foundry reloads the world after its module configuration changes, so the
     // browser must join again before checking for the global Quench API.
-    await joinWorld(page);
+    await joinWorld(page, user);
     if (!(await quenchReady(page, 60000))) {
         throw new Error('Quench is still unavailable after enabling the module and reloading the world.');
     }
@@ -491,7 +492,7 @@ function attachConsoleHandlers(page) {
 
 async function main() {
     await loadEnvLocal();
-    const { url, pattern, runTimeoutMs, headless } = resolveRunConfig();
+    const { url, pattern, runTimeoutMs, headless, user } = resolveRunConfig();
 
     // Keep GPU rendering enabled in headless Chromium because Foundry and PIXI
     // canvas behavior differs when Chromium falls back to software rendering.
@@ -506,8 +507,8 @@ async function main() {
         attachConsoleHandlers(page);
 
         log(`connecting to ${url}`);
-        await joinWorld(page);
-        await ensureQuenchActive(page);
+        await joinWorld(page, user);
+        await ensureQuenchActive(page, user);
 
         log(`running "${pattern}"`);
         const result = await runQuench(page, pattern, runTimeoutMs);
