@@ -3,6 +3,8 @@ import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { TestCreator } from "../module/tests/TestCreator";
 import { DataDefaults } from "@/module/data/DataDefaults";
 import { ModifiableValue } from "@/module/mods/ModifiableValue";
+import { SpellCastingTest } from "@/module/tests/SpellCastingTest";
+import { SuccessTest } from "@/module/tests/SuccessTest";
 
 export const shadowrunTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -194,6 +196,56 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             }));
 
             assert.isTrue(test.codeTerms.threshold.every(term => !term.tooltipSource));
+        });
+
+        it('creates structural test data without contextual values', () => {
+            const data = SuccessTest.applyStructuralDefaults({});
+
+            assert.isUndefined(data.type);
+            assert.isUndefined(data.title);
+            assert.isUndefined(data.sourceActorUuid);
+            assert.isUndefined(data.sourceItemUuid);
+            assert.isUndefined(data.sourceUuid);
+            assert.isUndefined(data.targetUuids);
+        });
+
+        it('stamps subclass identity from structural test data', () => {
+            const test = new SpellCastingTest({});
+
+            assert.strictEqual(test.data.type, 'SpellCastingTest');
+            assert.strictEqual(test.data.title, 'SR5.Tests.SpellCastingTest');
+        });
+
+        it('preserves subclass test identity through serialization and rehydration', async () => {
+            const actor = await factory.createActor({
+                type: 'character',
+                system: {
+                    attributes: {
+                        magic: { base: 5 },
+                        willpower: { base: 4 },
+                        body: { base: 3 },
+                        strength: { base: 3 },
+                        reaction: { base: 3 }
+                    },
+                }
+            });
+
+            const action = DataDefaults.createData('action_roll', {
+                test: 'SpellCastingTest',
+                followed: { test: 'DrainTest' }
+            });
+
+            const test = await TestCreator.fromAction(action, actor, { showMessage: false, showDialog: false });
+            assert.instanceOf(test, SpellCastingTest);
+            assert.strictEqual(test?.data.type, 'SpellCastingTest');
+            assert.strictEqual(test?.data.title, 'SR5.Tests.SpellCastingTest');
+
+            const serialized = test?.toJSON().data;
+            assert.strictEqual(serialized?.type, 'SpellCastingTest');
+
+            const restored = serialized ? TestCreator.fromTestData(serialized) : undefined;
+            assert.instanceOf(restored, SpellCastingTest);
+            assert.strictEqual(restored?.canBeExtended, false);
         });
 
         it('evaluate an opposed roll from a opposed action', async () => {

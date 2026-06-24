@@ -907,7 +907,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const rating = this.system.matrix?.rating || 0;
 
         const showDialog = this.tests.shouldShowDialog(options?.event);
-        const testCls = this.tests._getTestClass('SuccessTest') as typeof SuccessTest;
+        const testCls = this.tests._getTestClass('SuccessTest')!;
         const test = new testCls(TestCreator._minimalTestData(), { actor: this }, { showDialog });
 
         // Build pool values.
