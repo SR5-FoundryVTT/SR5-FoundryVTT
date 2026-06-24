@@ -18,6 +18,9 @@ dist
 # Foundry
 foundryconfig.json
 
+# Local secrets
+.env.local
+
 # Packs: ignore all built packs but keep source
 packs/*
 !packs/_source
