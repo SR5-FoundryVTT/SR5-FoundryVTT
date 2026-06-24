@@ -1,9 +1,9 @@
 import { DataDefaults } from "../data/DataDefaults";
 import { ChangeEntryType, ModifiableValueType } from "../types/template/Base";
 
-// Allows for managing a list of named changes with numeric values, including calculating totals based on change modes and priorities.
-export type ChangeOptionsType = Partial<Omit<ChangeEntryType, 'name' | 'value' | 'mode'>>
-        & { mode?: ChangeEntryType['mode'] | keyof typeof CONST.ACTIVE_EFFECT_MODES; };
+// Allows for managing a list of named changes with numeric values, including calculating totals based on change types and priorities.
+export type ChangeOptionsType = Partial<Omit<ChangeEntryType, 'name' | 'value' | 'type'>>
+        & { type?: ChangeEntryType['type']; };
 
 /**
  * A class for managing a list of named parts with generic values.
@@ -44,7 +44,7 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
      * Create a change object.
      * @param {string} name - The change name/key.
      * @param {number} value - Numeric value for the change.
-     * @param {ChangeOptionsType} [options] - Mode for applying the change.
+     * @param {ChangeOptionsType} [options] - Type for applying the change.
      * @returns {ModifiableValueType['changes'][number]} A newly created change object.
      */
     private _createChange(
@@ -53,13 +53,11 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
         options: ChangeOptionsType = {}
     ): ModifiableValueType['changes'][number] {
         const createData = { name, value, ...options };
-        if (typeof createData.mode === 'string')
-            createData.mode = CONST.ACTIVE_EFFECT_MODES[createData.mode] ?? CONST.ACTIVE_EFFECT_MODES.ADD;
 
-        if (createData.priority === undefined)
-            createData.priority = createData.mode != null ? 10 * createData.mode : undefined;
+        createData.type ??= 'add';
+        createData.priority ??= ActiveEffect.CHANGE_TYPES[createData.type]?.defaultPriority ?? 20;
 
-        return DataDefaults.createData('change_entry', createData as Partial<ChangeEntryType>);
+        return DataDefaults.createData('change_entry', createData);
     }
 
     /**
@@ -81,9 +79,9 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
     addBase(
         name: string,
         value: number,
-        options: Omit<ChangeOptionsType, 'mode' | 'priority'> = {}
+        options: Omit<ChangeOptionsType, 'type' | 'priority'> = {}
     ): void {
-        return this.add(name, value, { mode: 'ADD', priority: ModifiableValue.BASE_PRIORITY, ...options });
+        return this.add(name, value, { type: 'add', priority: ModifiableValue.BASE_PRIORITY, ...options });
     }
 
     /**
@@ -125,9 +123,9 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
     addUniqueBase(
         name: string,
         value: number | undefined | null,
-        options: Omit<ChangeOptionsType, 'mode' | 'priority'> = {}
+        options: Omit<ChangeOptionsType, 'type' | 'priority'> = {}
     ): void {
-        return this.addUnique(name, value, { mode: 'ADD', priority: ModifiableValue.BASE_PRIORITY, ...options });
+        return this.addUnique(name, value, { type: 'add', priority: ModifiableValue.BASE_PRIORITY, ...options });
     }
 
     /**
@@ -179,19 +177,21 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
 
             if (!change.enabled) continue;
 
-            switch (change.mode) {
-                case CONST.ACTIVE_EFFECT_MODES.ADD:
-                case CONST.ACTIVE_EFFECT_MODES.CUSTOM:
+            switch (change.type) {
+                case 'add':
                     this._field.value += change.value;
                     break;
-                case CONST.ACTIVE_EFFECT_MODES.MULTIPLY:
+                case 'subtract':
+                    this._field.value -= change.value;
+                    break;
+                case 'multiply':
                     this._field.value *= change.value;
                     break;
-                case CONST.ACTIVE_EFFECT_MODES.OVERRIDE:
+                case 'override':
                     this._field.value = change.value;
                     this._markPreviousChangesMasked(i);
                     break;
-                case CONST.ACTIVE_EFFECT_MODES.UPGRADE:
+                case 'upgrade':
                     if (this._field.value < change.value) {
                         this._field.value = change.value;
                         this._markPreviousChangesMasked(i);
@@ -199,7 +199,7 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
                         change.invalidated = true;
                     }
                     break;
-                case CONST.ACTIVE_EFFECT_MODES.DOWNGRADE:
+                case 'downgrade':
                     if (this._field.value > change.value) {
                         this._field.value = change.value;
                         this._markPreviousChangesMasked(i);
@@ -208,20 +208,20 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
                     }
                     break;
                 default:
-                    console.warn(`Unknown Active Effect mode ${change.mode} encountered.`);
+                    console.warn(`Unknown Active Effect type ${change.type} encountered.`);
                     break;
             }
         }
 
         if (options?.max != null && this._field.value > options.max) {
             this._markPreviousChangesMasked(this._field.changes.length);
-            this.addUnique('SR5.EnforcedMaximum', options.max, { mode: 'DOWNGRADE', priority: ModifiableValue.TOP_PRIORITY });
+            this.addUnique('SR5.EnforcedMaximum', options.max, { type: 'downgrade', priority: ModifiableValue.TOP_PRIORITY });
             this._field.value = options.max;
         }
 
         if (options?.min != null && this._field.value < options.min) {
             this._markPreviousChangesMasked(this._field.changes.length);
-            this.addUnique('SR5.EnforcedMinimum', options.min, { mode: 'UPGRADE', priority: ModifiableValue.TOP_PRIORITY });
+            this.addUnique('SR5.EnforcedMinimum', options.min, { type: 'upgrade', priority: ModifiableValue.TOP_PRIORITY });
             this._field.value = options.min;
         }
 
@@ -276,7 +276,7 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
      * Static helper to add a change to a `ModifiableValueType` list.
      * @template F
      * @param {F} list - The modifiable list object.
-     * @param {...any} args - Arguments forwarded to instance `add` (name, value, mode, priority).
+     * @param {...any} args - Arguments forwarded to instance `add` (name, value, type, priority).
      */
     static add<F extends ModifiableValueType>(
         list: F, ...args: Parameters<ModifiableValue<F>["add"]>
@@ -300,7 +300,7 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
      * Static helper to add or update a unique change on the given list.
      * @template F
      * @param {F} list - The modifiable list object.
-     * @param {...any} args - Arguments forwarded to instance `addUnique` (name, value, mode, priority).
+     * @param {...any} args - Arguments forwarded to instance `addUnique` (name, value, type, priority).
      */
     static addUnique<F extends ModifiableValueType>(
         list: F, ...args: Parameters<ModifiableValue["addUnique"]>

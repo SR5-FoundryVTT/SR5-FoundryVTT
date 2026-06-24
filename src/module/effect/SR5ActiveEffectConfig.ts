@@ -208,7 +208,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
 
         if (this.document.system.applyTo === select.value) return;
 
-        if (this.document.changes.length) {
+        if (this.document.system.changes.length) {
             ui.notifications?.error('You must delete changes before changing the apply-to type.');
         } else {
             // Make sure applyTo is saved but also save all other form data on sheet.
@@ -223,10 +223,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
      * NOTE: This is taken from FoundryVTT v14 preparePartsContext 'changes'
      */
     prepareChangeTypes() {
-        // @ts-ignore TODO: fvtt- v14 - types missing
-        return Object.entries(SR5ActiveEffect.CHANGE_TYPES as unknown as any)
-            // TODO: fvtt - v14 - Remove subtract type until typings to cleanly change ModifiableValue implemenation to use type instead of mode
-            .filter(([type]) => type !== 'subtract')
+        return Object.entries(SR5ActiveEffect.CHANGE_TYPES)
             .map(([type, { label }]) => ({ type, label: game.i18n.localize(label) }))
             .sort((a, b) => a.label.localeCompare(b.label, game.i18n.lang))
             .reduce((types, { type, label }) => {
@@ -315,13 +312,12 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
 
         // Update the priority value to match the type selection
         // Use FoundryVTT default approach of changing priority based on type changes using _onChangeForm
-        // @ts-expect-error TODO: fvtt - v14 - missing type foundry.utils.isElementInstanceOf
-        if (foundry.utils.isElementInstanceOf(event.target, "select") && event.target.name.endsWith(".type")) {
-            const typeSelect = event.target as HTMLSelectElement;
-            const selector = `input[name="${typeSelect.name.replace(/\.type$/, ".priority")}"]`;
-            const priorityInput = typeSelect.closest("li")!.querySelector(selector);
-            // @ts-expect-error TODO: fvtt - v14 - missing type ActiveEffect.CHANGE_TYPES
-            priorityInput.value = ActiveEffect.CHANGE_TYPES[typeSelect.value]?.defaultPriority ?? "";
+        const target = event.target;
+        if (target instanceof HTMLSelectElement && target.name.endsWith(".type")) {
+            const selector = `input[name="${target.name.replace(/\.type$/, ".priority")}"]`;
+            const priorityInput = target.closest("li")?.querySelector<HTMLInputElement>(selector);
+            if (!priorityInput) return;
+            priorityInput.value = String(ActiveEffect.CHANGE_TYPES[target.value]?.defaultPriority ?? "");
         }
       }
 }

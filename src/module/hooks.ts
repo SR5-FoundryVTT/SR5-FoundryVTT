@@ -382,9 +382,6 @@ ___________________
         CONFIG.Combatant.documentClass = SR5Combatant;
         CONFIG.ChatMessage.documentClass = SR5ChatMessage;
         CONFIG.ActiveEffect.documentClass = SR5ActiveEffect;
-        // Setting to false, will NOT duplicate item effects on actors. Instead items will be traversed for their effects.
-        // Setting to true, will duplicate item effects on actors. Only effects on actors will be traversed.
-        CONFIG.ActiveEffect.legacyTransferral = false;
 
         CONFIG.Token.objectClass = SR5Token;
         CONFIG.Token.documentClass = SR5TokenDocument;

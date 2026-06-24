@@ -97,7 +97,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             });
 
             ModifiableValue.add(valueField, 'Custom Modifier', 3, {
-                mode: 'ADD',
+                type: 'add',
                 priority: ModifiableValue.MANUAL_PRIORITY,
             });
 
@@ -107,6 +107,19 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
             assert.strictEqual(createdChange.priority, ModifiableValue.MANUAL_PRIORITY);
             assert.isTrue(ModifiableValue.isManualChange(createdChange));
+        });
+
+        it('applies subtract changes when calculating totals', () => {
+            const valueField = DataDefaults.createData('value_field', {
+                label: 'SR5.DicePool',
+                base: 10,
+            });
+
+            ModifiableValue.add(valueField, 'Penalty', 3, { type: 'subtract' });
+            ModifiableValue.calcTotal(valueField);
+
+            assert.strictEqual(valueField.value, 7);
+            assert.strictEqual(valueField.changes[0].type, 'subtract');
         });
 
         it('buy hits uses floor(pool / 4) and has no glitches', async () => {
