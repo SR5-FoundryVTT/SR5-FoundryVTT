@@ -295,9 +295,9 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param options Additional FoundryVTT options.
      */
     static override applyChange(
-        targetDoc: DataModel.Any,
+        targetDoc: ActiveEffect.TargetDocument | DataModel.Any,
         change: ActiveEffect.ChangeData,
-        { replacementData = {}, modifyTarget = true }: ActiveEffect.ApplyChangeOptions = {}
+        options: ActiveEffect.ApplyChangeOptions = {}
     ): Record<string, unknown> {
         // Foundry core iterates every change of an applicable effect when applying to actor data.
         // Only apply changes whose target is actor-bound. Both 'actor' and 'targeted_actor' targets
@@ -329,7 +329,7 @@ export class SR5ActiveEffect extends ActiveEffect {
             return SR5ActiveEffect._applyToObject(targetDoc, change);
         }
 
-        return super.applyChange(targetDoc, change, {replacementData, modifyTarget});
+        return super.applyChange(targetDoc, change, options);
     }
 
     /**
