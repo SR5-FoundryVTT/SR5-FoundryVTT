@@ -1261,7 +1261,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.equal(test.pool.changes.reduce(reduceModifiersByName('Test Effect'), 0), 2);
 
             // Trigger the extended roll...
-            test = await test.executeAsExtended();
+            test = (await test.executeAsExtended())!;
             // ... assure effects aren't re applied but taken from the first roll.
             assert.equal(test.pool.changes.reduce(reduceModifiersByName('Test Effect'), 0), 2);
 

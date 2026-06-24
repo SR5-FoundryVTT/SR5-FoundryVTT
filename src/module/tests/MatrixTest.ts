@@ -1,6 +1,7 @@
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
 import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
+import { DeepPartial } from "fvtt-types/utils";
 import { OpposedTestData } from './OpposedTest';
 import { MatrixTestDataFlow } from './flows/MatrixTestDataFlow';
 
@@ -50,9 +51,9 @@ export class MatrixTest<T extends MatrixTestData = MatrixTestData> extends Succe
     // Grid used as main icon.
     declare grid: SR5Item|null;
 
-    override _prepareData(data: MatrixTestData, options: TestOptions = {}): any {
-        data = super._prepareData(data, options);
-        return MatrixTestDataFlow._prepareData(data);
+    override _prepareData(data: DeepPartial<T>, options: Partial<TestOptions> = {}): T {
+        const prepared = super._prepareData(data, options);
+        return MatrixTestDataFlow._prepareData(prepared);
     }
 
     /**

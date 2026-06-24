@@ -36,7 +36,7 @@ jobs:
                   npm ci
                   npm run build:prod
                   npm run build:db
-                  zip -r ./shadowrun5e.zip system.json template.json LICENSE README.md README-DEV.md dist/ packs/ --exclude "packs/_source/*"
+                  zip -r ./shadowrun5e.zip system.json LICENSE README.md README-DEV.md dist/ packs/ --exclude "packs/_source/*"
 
             - name: Update Release with Files
               uses: ncipollo/release-action@v1
