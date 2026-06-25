@@ -18,30 +18,35 @@ export class ImportHelper {
     static idToName: Partial<Record<CompendiumKey, Record<string, string>>> = {};
     static translationMap: {
         global: Record<string, string>;
-        files: Record<string, Record<string, string>>;
-        ids: Record<string, string>;
+        files: Record<string, {
+            names: Record<string, string>;
+            ids: Record<string, string>;
+        }>;
     } = {
         global: {},
-        files: {},
-        ids: {}
+        files: {}
     };
     static currentFile: string | null = null;
+    static isTranslationEnabled = false;
 
     public static translate(text: string | null | undefined, id?: string | null): string {
-        if (id && this.translationMap.ids[id]) {
-            return this.translationMap.ids[id];
-        }
         if (!text) return "";
-        if (this.currentFile && this.translationMap.files[this.currentFile]?.[text]) {
-            return this.translationMap.files[this.currentFile][text];
+        if (!this.isTranslationEnabled) {
+            return text;
+        }
+        if (id && this.currentFile && this.translationMap.files[this.currentFile]?.ids?.[id]) {
+            return this.translationMap.files[this.currentFile].ids[id];
+        }
+        if (this.currentFile && this.translationMap.files[this.currentFile]?.names?.[text]) {
+            return this.translationMap.files[this.currentFile].names[text];
         }
         if (this.translationMap.global[text]) {
             return this.translationMap.global[text];
         }
         // Fallback: Check other file translation maps for a match on the name
         for (const file of Object.keys(this.translationMap.files)) {
-            if (file !== this.currentFile && this.translationMap.files[file][text]) {
-                return this.translationMap.files[file][text];
+            if (file !== this.currentFile && this.translationMap.files[file]?.names?.[text]) {
+                return this.translationMap.files[file].names[text];
             }
         }
         return text;

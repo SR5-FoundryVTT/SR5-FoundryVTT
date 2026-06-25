@@ -20,7 +20,7 @@
       Auto-download size: <strong>7&nbsp;MB</strong> (English, default).
     </p>
     <p class="import-size">
-      use the german, portuguese, french or korean translations at your own risk.
+      Use the German, French, Portuguese, Japanese, or Chinese translations at your own risk.
     </p>
   </div>
 
@@ -37,7 +37,7 @@
         importDone}}disabled{{/if}}{{/if}} {{#if overrideDocuments}}checked{{/if}} />
       <span>Override previously imported documents in compendiums</span>
     </label>
-    <label class="import-setting-select" style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+    <label class="import-setting-select">
       <span>Translation Language:</span>
       <select id="selectedLanguage" {{#if isImporting}}disabled{{else}}{{#if importDone}}disabled{{/if}}{{/if}}>
         {{#each languages as |lang|}}
