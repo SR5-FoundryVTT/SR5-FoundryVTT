@@ -29,6 +29,7 @@ type SR5ActiveEffectSheetData = ActiveEffectConfig.RenderContext & {
     changeTargetOptions: { label: string, value: string }[];
     targetApplyToById: Record<string, string>;
     changeTypes: Record<string, string>;
+    changePriorityPlaceholders: Record<string, string>;
     expiryActionOptions: { label: string, value: 'default' | 'update' | 'delete', selected: boolean }[];
     system: ActiveEffectDM;
     systemFields: typeof ActiveEffectDM.schema.fields;
@@ -216,6 +217,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         data.changeTargetOptions = this.prepareChangeTargetOptions();
         data.targetApplyToById = this.prepareTargetApplyToById();
         data.changeTypes = this.prepareChangeTypes();
+        data.changePriorityPlaceholders = this.prepareChangePriorityPlaceholders();
         data.expiryActionOptions = this.prepareExpiryActionOptions(data.source);
 
         // Duration tab context
@@ -344,9 +346,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         event.preventDefault();
         const { targets, changes } = this._syncFormIntoClone();
         const firstTarget = targets[0]?.id ?? '';
-        const type = 'add';
-        const priority = ActiveEffect.CHANGE_TYPES[type]?.defaultPriority ?? 20;
-        changes.push({ key: '', value: '', target: firstTarget, type, priority });
+        changes.push({ key: '', value: '', target: firstTarget });
         this.clone.updateSource({ system: { changes } });
         await this.render();
     }
@@ -546,6 +546,13 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
 
     }
 
+    prepareChangePriorityPlaceholders() {
+        return Object.entries(SR5ActiveEffect.CHANGE_TYPES).reduce((placeholders, [type, data]) => {
+            placeholders[type] = String(data.defaultPriority ?? '');
+            return placeholders;
+        }, {} as Record<string, string>);
+    }
+
     prepareSelectionModeOptions() {
         return Object.entries(SR5.effectSelectionModes)
             .map(([value, label]) => ({ label: game.i18n.localize(label) as Translation, value }));
@@ -662,7 +669,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
                 `input[name="${name.replace(/\.type$/, ".priority")}"]`
             );
             if (priorityInput) {
-                priorityInput.value = String(ActiveEffect.CHANGE_TYPES[target.value]?.defaultPriority ?? "");
+                priorityInput.placeholder = String(ActiveEffect.CHANGE_TYPES[target.value]?.defaultPriority ?? "");
             }
         }
 

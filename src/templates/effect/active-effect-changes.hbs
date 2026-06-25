@@ -43,7 +43,7 @@
                         </div>
                     </div>
                     <div class="priority">
-                        {{formInput changeFields.priority name=(concat "system.changes." i ".priority") value=change.priority disabled=true}}
+                        {{formInput changeFields.priority name=(concat "system.changes." i ".priority") value=change.priority placeholder=(lookup @root.changePriorityPlaceholders change.type) disabled=true}}
                     </div>
                     {{/ifne}}
                     {{!-- phase is required by the schema but not shown; always preserve it. --}}
