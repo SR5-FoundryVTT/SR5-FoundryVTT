@@ -344,7 +344,9 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         event.preventDefault();
         const { targets, changes } = this._syncFormIntoClone();
         const firstTarget = targets[0]?.id ?? '';
-        changes.push({ key: '', value: '', target: firstTarget });
+        const type = 'add';
+        const priority = ActiveEffect.CHANGE_TYPES[type]?.defaultPriority ?? 20;
+        changes.push({ key: '', value: '', target: firstTarget, type, priority });
         this.clone.updateSource({ system: { changes } });
         await this.render();
     }
