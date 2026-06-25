@@ -326,6 +326,14 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
             assert.isFalse(effect.isExpiryEvent('turnStart', fakeContext as any), 'turnStart must not drive sr5MyAction');
             assert.isTrue(effect.isExpiryEvent('sr5ActionPhase', fakeContext as any), 'sr5ActionPhase must drive it');
         });
+
+        it("falls back to updateWorldTime when the owner is not in combat", async () => {
+            const { effect } = await createEffect({type: 'character'}, {
+                duration: { value: 1, units: 'rounds', expiry: 'sr5MyAction' } as any,
+            });
+
+            assert.isTrue(effect.isExpiryEvent('updateWorldTime', ctx()), 'out-of-combat sr5MyAction should expire on world time updates');
+        });
     });
 
     // -------------------------------------------------------------------------

@@ -222,10 +222,12 @@ export class SR5ActiveEffect extends ActiveEffect {
     /**
      * `sr5MyAction` fires when the owner acts (any pass); everything else delegates to native.
      * SR5Combat._onUpdate emits `sr5ActionPhase` every phase, covering single-combatant re-acts
-     * that Foundry's own turn dispatch misses.
+     * that Foundry's own turn dispatch misses. Outside of combat, fall back to world-time expiry
+     * once the duration span is exhausted, matching Foundry's native combat-trigger behavior.
      */
     override isExpiryEvent(event: string, context?: ActiveEffect.IsExpiryEventContext): boolean {
         if (this.duration.expiry !== 'sr5MyAction') return super.isExpiryEvent(event, context);
+        if (event === 'updateWorldTime') return !this.actor?.inCombat;
         const combat = context?.combat ?? game.combat;
         return event === 'sr5ActionPhase' && combat?.combatant?.actor === this.actor;
     }
