@@ -226,7 +226,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * expiry once the duration span is exhausted, matching native combat-trigger behavior.
      */
     override isExpiryEvent(event: string, context?: ActiveEffect.IsExpiryEventContext): boolean {
-        if (this.duration.expiry !== 'sr5MyAction' && this.duration.expiry !== 'sr5MyActionEnd') {
+        if (this.duration.expiry !== 'sr5MyActionStart' && this.duration.expiry !== 'sr5MyActionEnd') {
             return super.isExpiryEvent(event, context);
         }
 
@@ -236,7 +236,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         const actorMatches = combat?.combatant?.actor === this.actor;
         if (!actorMatches) return false;
 
-        if (this.duration.expiry === 'sr5MyAction') return event === 'sr5ActionPhase';
+        if (this.duration.expiry === 'sr5MyActionStart') return event === 'sr5ActionPhase';
         return event === 'sr5ActionPhaseEnd';
     }
 
