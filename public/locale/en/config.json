@@ -192,7 +192,8 @@
                 "CombatEnd":   "Combat End",
                 "TurnStart":   "Turn Start",
                 "TurnEnd":     "Turn End",
-                "MyAction":    "Start of My Action Phase"
+                "MyActionStart": "Start of My Action Phase",
+                "MyActionEnd": "End of My Action Phase"
             },
             "Duration": {
                 "Active": "Active",
@@ -205,8 +206,10 @@
                 "AwaitingTurnStartDetail": "Expires at the start of the next combat turn.",
                 "AwaitingTurnEnd": "Until end of combat turn",
                 "AwaitingTurnEndDetail": "Expires at the end of the current combat turn.",
-                "AwaitingMyAction": "Until start of owner's action phase",
-                "AwaitingMyActionDetail": "Expires at the start of the next action phase taken by the owner.",
+                "AwaitingMyActionStart": "Until start of owner's action phase",
+                "AwaitingMyActionStartDetail": "Expires at the start of the next action phase taken by the owner.",
+                "AwaitingMyActionEnd": "Until end of owner's action phase",
+                "AwaitingMyActionEndDetail": "Expires when the owner finishes the current action phase.",
                 "AwaitingTrigger": "Awaiting expiry trigger",
                 "AwaitingTriggerDetail": "The duration span is complete and will expire at its configured trigger.",
                 "Combat": "Combat",

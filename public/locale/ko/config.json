@@ -193,7 +193,8 @@
                 "CombatEnd": "전투 종료",
                 "TurnStart": "턴 시작",
                 "TurnEnd": "턴 종료",
-                "MyAction": "내 행동 단계 시작"
+                "MyActionStart": "내 행동 단계 시작",
+                "MyActionEnd": "내 행동 단계 종료"
             },
             "Duration": {
                 "Active": "활성",
@@ -206,8 +207,10 @@
                 "AwaitingTurnStartDetail": "다음 전투 턴 시작 시 만료됩니다.",
                 "AwaitingTurnEnd": "전투 턴 종료까지",
                 "AwaitingTurnEndDetail": "현재 전투 턴 종료 시 만료됩니다.",
-                "AwaitingMyAction": "소유자의 행동 단계 시작까지",
-                "AwaitingMyActionDetail": "소유자의 다음 행동 단계 시작 시 만료됩니다.",
+                "AwaitingMyActionStart": "소유자의 행동 단계 시작까지",
+                "AwaitingMyActionStartDetail": "소유자의 다음 행동 단계 시작 시 만료됩니다.",
+                "AwaitingMyActionEnd": "소유자의 행동 단계 종료까지",
+                "AwaitingMyActionEndDetail": "소유자가 현재 행동 단계를 마치면 만료됩니다.",
                 "AwaitingTrigger": "만료 트리거 대기 중",
                 "AwaitingTriggerDetail": "지속 시간이 완료되었으며 설정된 트리거에서 만료됩니다.",
                 "Combat": "전투",

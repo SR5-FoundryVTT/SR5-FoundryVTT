@@ -466,9 +466,11 @@ ___________________
         // Explicit so a core/module change can't silently flip it to "delete".
         CONFIG.ActiveEffect.expiryAction = "update";
 
-        // Register the SR5-custom expiry event so Foundry's registry knows to call isExpiryEvent for it.
-        // sr5MyAction fires on the owner's action phase (any pass); dispatched by SR5Combat._onUpdate.
-        CONFIG.ActiveEffect.expiryEvents.sr5MyAction = "SR5.ActiveEffect.ExpiryTriggers.MyAction";
+        // Register the SR5-custom expiry events so Foundry's registry knows to call isExpiryEvent for them.
+        // sr5MyActionStart fires on the owner's action phase start (any pass); dispatched by SR5Combat._onUpdate.
+        CONFIG.ActiveEffect.expiryEvents.sr5MyActionStart = "SR5.ActiveEffect.ExpiryTriggers.MyActionStart";
+        // sr5MyActionEnd fires when advancing away from the owner's completed action phase.
+        CONFIG.ActiveEffect.expiryEvents.sr5MyActionEnd = "SR5.ActiveEffect.ExpiryTriggers.MyActionEnd";
 
         registerSystemSettings();
         registerSystemKeybindings();

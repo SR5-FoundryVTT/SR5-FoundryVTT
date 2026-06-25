@@ -299,6 +299,10 @@ export class SR5Combat extends Combat<"base"> {
             return this;
         }
 
+        if (!passedPass && this.combatant?.actor) {
+            void foundry.documents.ActiveEffect.registry.refresh('sr5ActionPhaseEnd', { combat: this });
+        }
+
         const nextTurn = this.turns.findIndex(combatant => {
             if (this.settings.skipDefeated && combatant.isDefeated) return false;
             if (!passedPass && combatant.id === this.combatant?.id) return false;

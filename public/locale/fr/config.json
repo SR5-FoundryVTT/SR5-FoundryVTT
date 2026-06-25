@@ -72,7 +72,8 @@
                 "CombatEnd": "Fin du combat",
                 "TurnStart": "Début du tour",
                 "TurnEnd": "Fin du tour",
-                "MyAction": "Début de ma phase d'action"
+                "MyActionStart": "Début de ma phase d'action",
+                "MyActionEnd": "Fin de ma phase d'action"
             },
             "Duration": {
                 "Active": "Actif",
@@ -85,8 +86,10 @@
                 "AwaitingTurnStartDetail": "Expire au début du prochain tour de combat.",
                 "AwaitingTurnEnd": "Jusqu'à la fin du tour de combat",
                 "AwaitingTurnEndDetail": "Expire à la fin du tour de combat actuel.",
-                "AwaitingMyAction": "Jusqu'au début de la phase d'action du propriétaire",
-                "AwaitingMyActionDetail": "Expire au début de la prochaine phase d'action du propriétaire.",
+                "AwaitingMyActionStart": "Jusqu'au début de la phase d'action du propriétaire",
+                "AwaitingMyActionStartDetail": "Expire au début de la prochaine phase d'action du propriétaire.",
+                "AwaitingMyActionEnd": "Jusqu'à la fin de la phase d'action du propriétaire",
+                "AwaitingMyActionEndDetail": "Expire lorsque le propriétaire termine la phase d'action en cours.",
                 "AwaitingTrigger": "En attente du déclencheur d'expiration",
                 "AwaitingTriggerDetail": "La durée est écoulée et expirera au déclencheur configuré.",
                 "Combat": "Combat",

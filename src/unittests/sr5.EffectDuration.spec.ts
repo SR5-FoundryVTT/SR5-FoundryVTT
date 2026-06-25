@@ -3,11 +3,11 @@
  *
  * Coverage:
  * - isSuppressed respects duration.expired
- * - isExpiryEvent: real_time delegates to native; sr5MyAction (owner first-pass)
+ * - isExpiryEvent: real_time delegates to native; sr5MyActionStart/sr5MyActionEnd owner triggers
  * - Permanent effects are never isTemporary and never registered
  * - restart() clears expired flag and re-anchors
  * - Item-owned temporary effects get a start anchor on _preCreate
- * - Combat integration: SR5Combat dispatches sr5ActionPhase every action phase
+ * - Combat integration: SR5Combat dispatches sr5ActionPhase and sr5ActionPhaseEnd at action boundaries
  */
 import { SR5TestFactory } from './utils';
 import { SR5ActiveEffect } from '../module/effect/SR5ActiveEffect';
@@ -120,9 +120,13 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
             assert.equal(restartPending.state, 'restart-pending');
         });
 
-        it('shows trigger-specific pending text for sr5MyAction and roundEnd', () => {
+        it('shows trigger-specific pending text for sr5MyActionStart, sr5MyActionEnd, and roundEnd', () => {
             const firstAction = durationStatus(
-                { value: 1, units: 'rounds', expired: false, expiry: 'sr5MyAction' },
+                { value: 1, units: 'rounds', expired: false, expiry: 'sr5MyActionStart' },
+                { remaining: 0, label: '0 Rounds' },
+            );
+            const endAction = durationStatus(
+                { value: 1, units: 'rounds', expired: false, expiry: 'sr5MyActionEnd' },
                 { remaining: 0, label: '0 Rounds' },
             );
             const turnEnd = durationStatus(
@@ -130,14 +134,16 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
                 { remaining: 0, label: '0 Rounds' },
             );
 
-            assert.equal(firstAction.summary, game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingMyAction'));
+            assert.equal(firstAction.summary, game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingMyActionStart'));
+            assert.equal(endAction.summary, game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingMyActionEnd'));
             assert.equal(turnEnd.summary, game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingTurnEnd'));
             assert.notEqual(firstAction.summary, game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingTrigger'));
+            assert.notEqual(endAction.summary, game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingTrigger'));
             assert.notEqual(turnEnd.summary, game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingTrigger'));
         });
 
-        it('shows pending text for all five trigger events', () => {
-            const triggers = ['combatStart', 'combatEnd', 'roundStart', 'roundEnd', 'sr5MyAction'] as const;
+        it('shows pending text for all six trigger events', () => {
+            const triggers = ['combatStart', 'combatEnd', 'roundStart', 'roundEnd', 'sr5MyActionStart', 'sr5MyActionEnd'] as const;
             const generic = game.i18n.localize('SR5.ActiveEffect.Duration.AwaitingTrigger');
             for (const expiry of triggers) {
                 const status = durationStatus(
@@ -272,7 +278,7 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
             assert.isTrue(result, 'roundEnd should delegate to native and return true for matching expiry');
         });
 
-        it('does not fire on sr5ActionPhase for non-sr5MyAction effects', async () => {
+        it('does not fire on sr5ActionPhase for non-sr5MyActionStart effects', async () => {
             const { actor, effect } = await createEffect({type: 'character'}, {
                 duration: { value: 1, units: 'rounds', expiry: 'roundEnd' } as any,
             });
@@ -280,15 +286,23 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
             // native: 'sr5ActionPhase' !== 'roundEnd' → false
             assert.isFalse(result, 'roundEnd effect must not fire on sr5ActionPhase');
         });
+
+        it('does not fire on sr5ActionPhaseEnd for non-sr5MyActionEnd effects', async () => {
+            const { actor, effect } = await createEffect({type: 'character'}, {
+                duration: { value: 1, units: 'rounds', expiry: 'roundEnd' } as any,
+            });
+            const result = effect.isExpiryEvent('sr5ActionPhaseEnd', combatEventCtx(actor));
+            assert.isFalse(result, 'roundEnd effect must not fire on sr5ActionPhaseEnd');
+        });
     });
 
     // -------------------------------------------------------------------------
-    // isExpiryEvent — sr5MyAction (owner's action phase, any pass)
+    // isExpiryEvent — sr5MyActionStart (owner's action phase, any pass)
     // -------------------------------------------------------------------------
-    describe("isExpiryEvent — sr5MyAction", () => {
+    describe("isExpiryEvent — sr5MyActionStart", () => {
         it("fires on sr5ActionPhase when owning actor acts (pass 1)", async () => {
             const { actor, effect } = await createEffect({type: 'character'}, {
-                duration: { value: 1, units: 'rounds', expiry: 'sr5MyAction' } as any,
+                duration: { value: 1, units: 'rounds', expiry: 'sr5MyActionStart' } as any,
             });
             const fakeCombatant = { actor };
             const fakeContext = { combat: { combatant: fakeCombatant, system: { pass: 1 } } };
@@ -298,7 +312,7 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
 
         it("fires on sr5ActionPhase when owning actor acts (pass 2 — any pass)", async () => {
             const { actor, effect } = await createEffect({type: 'character'}, {
-                duration: { value: 1, units: 'rounds', expiry: 'sr5MyAction' } as any,
+                duration: { value: 1, units: 'rounds', expiry: 'sr5MyActionStart' } as any,
             });
             const fakeCombatant = { actor };
             const fakeContext = { combat: { combatant: fakeCombatant, system: { pass: 2 } } };
@@ -308,7 +322,7 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
 
         it("does not fire when a different actor acts", async () => {
             const { effect } = await createEffect({type: 'character'}, {
-                duration: { value: 1, units: 'rounds', expiry: 'sr5MyAction' } as any,
+                duration: { value: 1, units: 'rounds', expiry: 'sr5MyActionStart' } as any,
             });
             const otherActor = await factory.createActor({ type: 'character' });
             const fakeCombatant = { actor: otherActor };
@@ -319,20 +333,66 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
 
         it("does not fire on native turn events — only sr5ActionPhase drives it", async () => {
             const { actor, effect } = await createEffect({type: 'character'}, {
-                duration: { value: 1, units: 'rounds', expiry: 'sr5MyAction' } as any,
+                duration: { value: 1, units: 'rounds', expiry: 'sr5MyActionStart' } as any,
             });
             const fakeCombatant = { actor };
             const fakeContext = { combat: { combatant: fakeCombatant, system: { pass: 1 } } };
-            assert.isFalse(effect.isExpiryEvent('turnStart', fakeContext as any), 'turnStart must not drive sr5MyAction');
+            assert.isFalse(effect.isExpiryEvent('turnStart', fakeContext as any), 'turnStart must not drive sr5MyActionStart');
             assert.isTrue(effect.isExpiryEvent('sr5ActionPhase', fakeContext as any), 'sr5ActionPhase must drive it');
         });
 
         it("falls back to updateWorldTime when the owner is not in combat", async () => {
             const { effect } = await createEffect({type: 'character'}, {
-                duration: { value: 1, units: 'rounds', expiry: 'sr5MyAction' } as any,
+                duration: { value: 1, units: 'rounds', expiry: 'sr5MyActionStart' } as any,
             });
 
-            assert.isTrue(effect.isExpiryEvent('updateWorldTime', ctx()), 'out-of-combat sr5MyAction should expire on world time updates');
+            assert.isTrue(effect.isExpiryEvent('updateWorldTime', ctx()), 'out-of-combat sr5MyActionStart should expire on world time updates');
+        });
+
+    });
+
+    // -------------------------------------------------------------------------
+    // isExpiryEvent — sr5MyActionEnd (owner's action phase completion)
+    // -------------------------------------------------------------------------
+    describe("isExpiryEvent — sr5MyActionEnd", () => {
+        it("fires on sr5ActionPhaseEnd when owning actor finishes acting", async () => {
+            const { actor, effect } = await createEffect({type: 'character'}, {
+                duration: { value: 1, units: 'rounds', expiry: 'sr5MyActionEnd' } as any,
+            });
+            const fakeCombatant = { actor };
+            const fakeContext = { combat: { combatant: fakeCombatant, system: { pass: 1 } } };
+            const result = effect.isExpiryEvent('sr5ActionPhaseEnd', fakeContext as any);
+            assert.isTrue(result, 'should expire when owning actor finishes acting');
+        });
+
+        it("does not fire when a different actor finishes acting", async () => {
+            const { effect } = await createEffect({type: 'character'}, {
+                duration: { value: 1, units: 'rounds', expiry: 'sr5MyActionEnd' } as any,
+            });
+            const otherActor = await factory.createActor({ type: 'character' });
+            const fakeCombatant = { actor: otherActor };
+            const fakeContext = { combat: { combatant: fakeCombatant, system: { pass: 1 } } };
+            const result = effect.isExpiryEvent('sr5ActionPhaseEnd', fakeContext as any);
+            assert.isFalse(result, 'should not expire when a different actor finishes acting');
+        });
+
+        it("does not fire on sr5ActionPhase or native turn events", async () => {
+            const { actor, effect } = await createEffect({type: 'character'}, {
+                duration: { value: 1, units: 'rounds', expiry: 'sr5MyActionEnd' } as any,
+            });
+            const fakeCombatant = { actor };
+            const fakeContext = { combat: { combatant: fakeCombatant, system: { pass: 1 } } };
+            assert.isFalse(effect.isExpiryEvent('turnEnd', fakeContext as any), 'turnEnd must not drive sr5MyActionEnd');
+            assert.isFalse(effect.isExpiryEvent('sr5ActionPhase', fakeContext as any), 'sr5ActionPhase must not drive sr5MyActionEnd');
+            assert.isTrue(effect.isExpiryEvent('sr5ActionPhaseEnd', fakeContext as any), 'sr5ActionPhaseEnd must drive it');
+        });
+
+        it("falls back to updateWorldTime when the owner is not in combat", async () => {
+            const { effect } = await createEffect({type: 'character'}, {
+                duration: { value: 1, units: 'rounds', expiry: 'sr5MyActionEnd' } as any,
+            });
+
+            assert.isTrue(effect.isExpiryEvent('updateWorldTime', ctx()), 'out-of-combat sr5MyActionEnd should expire on world time updates');
         });
     });
 
@@ -367,10 +427,11 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
 
     // -------------------------------------------------------------------------
     // Combat integration — SR5Combat must drive the expiry registry on every action
-    // phase via 'sr5ActionPhase', because Foundry's turn-index dispatch skips events
-    // when the turn index doesn't move (notably a SINGLE combatant pushed to a new pass).
+    // phase via 'sr5ActionPhase', and on every completed action via 'sr5ActionPhaseEnd'.
+    // Foundry's turn-index dispatch skips events when the turn index doesn't move
+    // (notably a SINGLE combatant pushed to a new pass).
     // -------------------------------------------------------------------------
-    describe('combat integration — sr5ActionPhase dispatch', () => {
+    describe('combat integration — sr5 action-phase dispatch', () => {
         /** Run `drive` against a real SR5Combat with `count` combatants and return the registry events seen. */
         const recordEvents = async (count: number, drive: (combat: Combat.Implementation) => Promise<void>) => {
             const combat = await getDocumentClass('Combat').create({}) as Combat.Implementation;
@@ -413,6 +474,19 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
                 await combat.nextTurn();
             });
             assert.include(events, 'sr5ActionPhase', 'sr5ActionPhase must fire even with one combatant');
+        });
+
+        it('fires sr5ActionPhaseEnd before sr5ActionPhase when advancing to the next actor', async function () {
+            if (!game.user?.isActiveGM) { this.skip(); return; }
+            const events = await recordEvents(2, async (combat) => {
+                await combat.nextTurn();
+            });
+
+            const endIndex = events.indexOf('sr5ActionPhaseEnd');
+            const startIndex = events.indexOf('sr5ActionPhase');
+            assert.isAtLeast(endIndex, 0, 'sr5ActionPhaseEnd must fire while advancing combat');
+            assert.isAtLeast(startIndex, 0, 'sr5ActionPhase must fire while advancing combat');
+            assert.isBelow(endIndex, startIndex, 'sr5ActionPhaseEnd must fire before the next sr5ActionPhase');
         });
     });
 };

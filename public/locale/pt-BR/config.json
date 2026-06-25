@@ -143,7 +143,8 @@
                 "CombatEnd": "Fim do Combate",
                 "TurnStart": "Início do Turno",
                 "TurnEnd": "Fim do Turno",
-                "MyAction": "Início da Minha Fase de Ação"
+                "MyActionStart": "Início da Minha Fase de Ação",
+                "MyActionEnd": "Fim da Minha Fase de Ação"
             },
             "Duration": {
                 "Active": "Ativo",
@@ -156,8 +157,10 @@
                 "AwaitingTurnStartDetail": "Expira no início do próximo turno de combate.",
                 "AwaitingTurnEnd": "Até o fim do turno de combate",
                 "AwaitingTurnEndDetail": "Expira no fim do turno de combate atual.",
-                "AwaitingMyAction": "Até o início da fase de ação do proprietário",
-                "AwaitingMyActionDetail": "Expira no início da próxima fase de ação do proprietário.",
+                "AwaitingMyActionStart": "Até o início da fase de ação do proprietário",
+                "AwaitingMyActionStartDetail": "Expira no início da próxima fase de ação do proprietário.",
+                "AwaitingMyActionEnd": "Até o fim da fase de ação do proprietário",
+                "AwaitingMyActionEndDetail": "Expira quando o proprietário termina a fase de ação atual.",
                 "AwaitingTrigger": "Aguardando gatilho de expiração",
                 "AwaitingTriggerDetail": "A duração terminou e expirará no gatilho configurado.",
                 "Combat": "Combate",

@@ -194,7 +194,8 @@
                 "CombatEnd": "Kampfende",
                 "TurnStart": "Rundenbeginn",
                 "TurnEnd": "Rundenende",
-                "MyAction": "Beginn meiner Handlungsphase"
+                "MyActionStart": "Beginn meiner Handlungsphase",
+                "MyActionEnd": "Ende meiner Handlungsphase"
             },
             "Duration": {
                 "Active": "Aktiv",
@@ -207,8 +208,10 @@
                 "AwaitingTurnStartDetail": "Läuft zu Beginn der nächsten Kampfrunde ab.",
                 "AwaitingTurnEnd": "Bis Ende der Kampfrunde",
                 "AwaitingTurnEndDetail": "Läuft am Ende der aktuellen Kampfrunde ab.",
-                "AwaitingMyAction": "Bis Beginn der Handlungsphase des Besitzers",
-                "AwaitingMyActionDetail": "Läuft zu Beginn der nächsten Handlungsphase des Besitzers ab.",
+                "AwaitingMyActionStart": "Bis Beginn der Handlungsphase des Besitzers",
+                "AwaitingMyActionStartDetail": "Läuft zu Beginn der nächsten Handlungsphase des Besitzers ab.",
+                "AwaitingMyActionEnd": "Bis Ende der Handlungsphase des Besitzers",
+                "AwaitingMyActionEndDetail": "Läuft ab, wenn der Besitzer die aktuelle Handlungsphase beendet.",
                 "AwaitingTrigger": "Wartet auf Ablauf-Auslöser",
                 "AwaitingTriggerDetail": "Die Dauer ist abgelaufen und der Effekt wartet auf seinen konfigurierten Auslöser.",
                 "Combat": "Kampf",

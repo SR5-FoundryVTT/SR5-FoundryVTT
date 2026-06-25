@@ -101,11 +101,12 @@ export function prepareEffectDurationStatus(
 function pendingTriggerText(expiry: string | null): { label: string; detail: string } {
     const key = expiry ?? '';
     const labels: Record<string, { label: string; detail: string }> = {
-        combatStart:    { label: 'SR5.ActiveEffect.Duration.AwaitingCombatStart',  detail: 'SR5.ActiveEffect.Duration.AwaitingCombatStartDetail' },
-        combatEnd:      { label: 'SR5.ActiveEffect.Duration.AwaitingCombatEnd',    detail: 'SR5.ActiveEffect.Duration.AwaitingCombatEndDetail' },
-        roundStart:     { label: 'SR5.ActiveEffect.Duration.AwaitingTurnStart',    detail: 'SR5.ActiveEffect.Duration.AwaitingTurnStartDetail' },
-        roundEnd:       { label: 'SR5.ActiveEffect.Duration.AwaitingTurnEnd',      detail: 'SR5.ActiveEffect.Duration.AwaitingTurnEndDetail' },
-        sr5MyAction:    { label: 'SR5.ActiveEffect.Duration.AwaitingMyAction',     detail: 'SR5.ActiveEffect.Duration.AwaitingMyActionDetail' },
+        combatStart:      { label: 'SR5.ActiveEffect.Duration.AwaitingCombatStart',     detail: 'SR5.ActiveEffect.Duration.AwaitingCombatStartDetail' },
+        combatEnd:        { label: 'SR5.ActiveEffect.Duration.AwaitingCombatEnd',       detail: 'SR5.ActiveEffect.Duration.AwaitingCombatEndDetail' },
+        roundStart:       { label: 'SR5.ActiveEffect.Duration.AwaitingTurnStart',       detail: 'SR5.ActiveEffect.Duration.AwaitingTurnStartDetail' },
+        roundEnd:         { label: 'SR5.ActiveEffect.Duration.AwaitingTurnEnd',         detail: 'SR5.ActiveEffect.Duration.AwaitingTurnEndDetail' },
+        sr5MyActionStart: { label: 'SR5.ActiveEffect.Duration.AwaitingMyActionStart',   detail: 'SR5.ActiveEffect.Duration.AwaitingMyActionStartDetail' },
+        sr5MyActionEnd:   { label: 'SR5.ActiveEffect.Duration.AwaitingMyActionEnd',     detail: 'SR5.ActiveEffect.Duration.AwaitingMyActionEndDetail' },
     };
     const entry = labels[key];
     if (entry) {
