@@ -77,12 +77,14 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     static override DEFAULT_OPTIONS = {
         ...super.DEFAULT_OPTIONS,
         actions: {
+            ...super.DEFAULT_OPTIONS.actions,
             openHelp: this.#onOpenHelp,
             addTarget: this.#onAddTarget,
             removeTarget: this.#onRemoveTarget,
             addCondition: this.#onAddCondition,
             removeCondition: this.#onRemoveCondition,
             addChange: this.#onAddChange,
+            deleteChange: this.#onDeleteChange,
             restartDuration: this.#onRestartDuration,
         },
         classes: ["active-effect-config", SR5_APPV2_CSS_CLASS, 'named-sheet'],
@@ -337,6 +339,19 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         const { targets, changes } = this._syncFormIntoClone();
         const firstTarget = targets[0]?.id ?? '';
         changes.push({ key: '', value: '', target: firstTarget });
+        this.clone.updateSource({ system: { changes } });
+        await this.render();
+    }
+
+    static async #onDeleteChange(this: SR5ActiveEffectConfig, event: PointerEvent, target: HTMLElement) {
+        event.preventDefault();
+        const index = Number(target.closest('li')?.dataset.index ?? -1);
+        if (index < 0) return;
+
+        const { changes } = this._syncFormIntoClone();
+        if (!changes[index]) return;
+
+        changes.splice(index, 1);
         this.clone.updateSource({ system: { changes } });
         await this.render();
     }
