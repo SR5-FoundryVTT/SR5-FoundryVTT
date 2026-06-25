@@ -3,6 +3,12 @@ import { OpposedTest } from "../../tests/OpposedTest";
 import { SuccessTest } from "../../tests/SuccessTest";
 import { TestCreator } from "../../tests/TestCreator";
 import { SR5ActiveEffectConfig } from "../SR5ActiveEffectConfig";
+import { SR5ActiveEffectValueEditor } from "../SR5ActiveEffectValueEditor";
+import { SR5ActiveEffect } from "../SR5ActiveEffect";
+
+type ActiveEffectAutocompleteHost = {
+    document: SR5ActiveEffect;
+};
 
 /**
  * Collection of functionality necessary for the autocomplete inline properties module
@@ -50,6 +56,15 @@ export const AutocompleteInlineHooksFlow =  {
                     { selector: `.tab[data-tab="changes"] .autocomplete-value-test_item input[type="text"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
                     { selector: `.tab[data-tab="changes"] .autocomplete-value-test_target input[type="text"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
                 ]
+            }, {
+                name: SR5ActiveEffectValueEditor.name,
+                fieldConfigs: [
+                    { selector: `.sr5-effect-value-editor__body.autocomplete-value-actor textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterActor},
+                    { selector: `.sr5-effect-value-editor__body.autocomplete-value-targeted_actor textarea[name$=".value"]`, defaultPath: "", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTargetedActorData},
+                    { selector: `.sr5-effect-value-editor__body.autocomplete-value-test_all textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
+                    { selector: `.sr5-effect-value-editor__body.autocomplete-value-test_item textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
+                    { selector: `.sr5-effect-value-editor__body.autocomplete-value-test_target textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
+                ]
             }]
         };
 
@@ -72,7 +87,7 @@ export const AutocompleteInlineHooksFlow =  {
      * @param EffectConfig The effect config supplying the effect context.
      * @returns Either a SR5Actor or SR5Item source object.
      */
-    valueGetterActor: (EffectConfig: SR5ActiveEffectConfig) => {
+    valueGetterActor: (EffectConfig: ActiveEffectAutocompleteHost) => {
         const effect = EffectConfig.document;
         if (!effect.parent) return {};
         return effect.parent?.toObject();
@@ -84,7 +99,7 @@ export const AutocompleteInlineHooksFlow =  {
      * @param EffectConfig The effect config supplying the effect context.
      * @returns A test object for the autocomplete module to use.
      */
-    keyGetterTestData: (EffectConfig: SR5ActiveEffectConfig) => {
+    keyGetterTestData: (EffectConfig: ActiveEffectAutocompleteHost) => {
         const effect = EffectConfig.document;
         // Collect unique test class names from all 'tests' conditions across all targets.
         const testsId = [...new Set(
@@ -129,7 +144,7 @@ export const AutocompleteInlineHooksFlow =  {
      * 
      * @param EffectConfig 
      */
-    valueGetterTestData: (EffectConfig: SR5ActiveEffectConfig) => {
+    valueGetterTestData: (EffectConfig: ActiveEffectAutocompleteHost) => {
         const effect = EffectConfig.document;
         if (!effect.parent) return {};
 
@@ -156,7 +171,7 @@ export const AutocompleteInlineHooksFlow =  {
      * @param EffectConfig The effect config supplying the effect context.
      * @returns A simple object for autocomplete module to use.
      */
-    keyGetterModifiersData: (EffectConfig: SR5ActiveEffectConfig) => {
+    keyGetterModifiersData: (_EffectConfig: ActiveEffectAutocompleteHost) => {
         return {environmental: {
             low_light_vision: '',
             image_magnification: '',
@@ -176,7 +191,7 @@ export const AutocompleteInlineHooksFlow =  {
      * @param EffectConfig The effect config supplying the effect context.
      * @returns A opposed test instance for autocomplete module to use.
      */
-    valueGetterTargetedActorData: (EffectConfig: SR5ActiveEffectConfig) => {
+    valueGetterTargetedActorData: (EffectConfig: ActiveEffectAutocompleteHost) => {
         const effect = EffectConfig.document;
 
         if (effect.parent instanceof SR5Item) {

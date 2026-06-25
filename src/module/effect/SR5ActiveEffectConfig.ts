@@ -7,6 +7,7 @@ import ActiveEffectConfig = foundry.applications.sheets.ActiveEffectConfig;
 import { ActiveEffectDM } from '@/module/types/effect/ActiveEffect';
 import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 import { SR5ActiveEffect } from './SR5ActiveEffect';
+import { SR5ActiveEffectValueEditor } from './SR5ActiveEffectValueEditor';
 import { Translation } from '../utils/strings';
 import { EffectDurationStatus, prepareEffectDurationStatus } from './EffectDurationStatus';
 
@@ -69,6 +70,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
      */
     private _clone: SR5ActiveEffect | null = null;
     private _restartDurationPending = false;
+    private _valueEditor: SR5ActiveEffectValueEditor | null = null;
 
     get clone(): SR5ActiveEffect {
         return (this._clone ??= this.document.clone({}, { keepId: true }) as unknown as SR5ActiveEffect);
@@ -85,10 +87,11 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
             removeCondition: this.#onRemoveCondition,
             addChange: this.#onAddChange,
             deleteChange: this.#onDeleteChange,
+            editChangeValue: this.#onEditChangeValue,
             restartDuration: this.#onRestartDuration,
         },
         classes: ["active-effect-config", SR5_APPV2_CSS_CLASS, 'named-sheet'],
-        position: { width: 760 },
+        position: { width: 680 },
         window: {
             resizable: true
         },
@@ -111,6 +114,8 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
      * Do any final preparations when rendering the sheet
      */
     protected override async _renderHTML(context, options) {
+        this._closeValueEditor();
+
         // push footer to the end of parts so it is rendered at the bottom
         if (options.parts?.includes("footer")) {
             const index = options.parts.indexOf("footer");
@@ -226,6 +231,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
      * Discard the working copy when the sheet closes so a reused instance doesn't keep stale edits.
      */
     protected override _onClose(...args: Parameters<ActiveEffectConfig['_onClose']>) {
+        this._closeValueEditor();
         super._onClose(...args);
         this._clone = null;
         this._restartDurationPending = false;
@@ -356,6 +362,22 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         await this.render();
     }
 
+    static #onEditChangeValue(this: SR5ActiveEffectConfig, event: PointerEvent, target: HTMLElement) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const control = target.closest<HTMLElement>('.sr5-effect-value-control');
+        const input = control?.querySelector<HTMLInputElement>('input[type="text"]');
+        if (!control || !input) return;
+
+        const applyTo = [...control.closest<HTMLElement>('.value')?.classList ?? []]
+            .find(cssClass => cssClass.startsWith('autocomplete-value-'))
+            ?.replace('autocomplete-value-', '');
+        if (!applyTo) return;
+
+        this._openValueEditor(control, input, applyTo);
+    }
+
     /**
      * Stage a restart on the working clone. The saved effect is not changed until the sheet is submitted.
      */
@@ -436,6 +458,42 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
             targets: targets as any[],
             changes: changes as any[],
         };
+    }
+
+    private _openValueEditor(anchor: HTMLElement, source: HTMLInputElement, applyTo: string) {
+        if (this._valueEditor?.sourceInput === source) {
+            this._valueEditor.bringToFront();
+            this._valueEditor.focusTextarea();
+            return;
+        }
+
+        this._closeValueEditor();
+
+        const anchorRect = anchor.getBoundingClientRect();
+        const editor = new SR5ActiveEffectValueEditor(this, source, applyTo, {
+            top: Math.round(anchorRect.bottom + 6),
+            left: Math.round(anchorRect.right - SR5ActiveEffectValueEditor.DEFAULT_WIDTH),
+        });
+
+        editor.addEventListener('close', () => {
+            if (this._valueEditor === editor) this._valueEditor = null;
+        }, { once: true });
+
+        this._valueEditor = editor;
+        // @ts-expect-error fvtt-types does not expose ApplicationV2 window.windowId yet.
+        const windowId = this.window?.windowId;
+        // @ts-expect-error fvtt-types is missing the AppV2 render options overload here.
+        void editor.render({
+            force: true,
+            window: windowId ? { windowId } : undefined,
+        });
+    }
+
+    private _closeValueEditor() {
+        const editor = this._valueEditor;
+        if (!editor) return;
+        void editor.close();
+        this._valueEditor = null;
     }
 
     /**

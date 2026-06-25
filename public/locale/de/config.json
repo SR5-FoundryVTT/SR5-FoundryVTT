@@ -137,6 +137,7 @@
                 "TestItem": "Probe aus Item"
             },
             "CannotAddTestViaItemToActor": "Einem Akteur kann kein Active Effect vom Typ 'Probe aus Item' hinzugefügt werden.",
+            "ValueEditor": "Wert der Änderung bearbeiten",
             "FIELDS": {
                 "applyByTest": {
                     "hint": "Anwenden auf Test des Items",
@@ -2977,6 +2978,9 @@
                 "EditEffect": "Bearbeite Effekt",
                 "ItemEffects": "Effekte, die von Items auf diesem Dokument gesammelt werden.",
                 "HelpLinkEnglishOnly": "Help (External link, English only)",
+                "OpenValueEditor": "Werteditor öffnen",
+                "ApplyValueEditor": "Wertänderung anwenden",
+                "CancelValueEditor": "Wertänderung abbrechen",
                 "OnlyAllFilteredUsed": "Dieser Effekt gilt nur für Proben, die allen Auswahlen entsprechen.",
                 "OnlyFilteredUsed": "Dieser Effekt gilt nur für Proben, die mindestens einer Auswahl entsprechen.",
                 "OnlyForItemTest": "Dieser Effekt gilt nur für Proben dieses Items.",

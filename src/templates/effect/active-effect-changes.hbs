@@ -29,8 +29,18 @@
                         {{formInput changeFields.type name=(concat "system.changes." i ".type") value=change.type choices=@root.changeTypes}}
                     </div>
                     <div class="value autocomplete-value-{{lookup @root.targetApplyToById change.target}}">
-                        {{!-- Do not use formInput as that renders a giant textblock --}}
-                        {{formInput changeFields.value name=(concat "system.changes." i ".value") value=change.value elementType="input"}}
+                        <div class="sr5-effect-value-control">
+                            {{!-- Do not use formInput as that renders a giant textblock --}}
+                            {{formInput changeFields.value name=(concat "system.changes." i ".value") value=change.value elementType="input"}}
+                            <button
+                                type="button"
+                                class="sr5-effect-value-control__button icon"
+                                data-action="editChangeValue"
+                                data-tooltip="SR5.Tooltips.Effect.OpenValueEditor"
+                                aria-label="{{localize "SR5.Tooltips.Effect.OpenValueEditor"}}">
+                                <i class="fa-solid fa-lambda" inert></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="priority">
                         {{formInput changeFields.priority name=(concat "system.changes." i ".priority") value=change.priority disabled=true}}

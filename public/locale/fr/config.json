@@ -55,6 +55,7 @@
             "ApplyTos": {
                 "TestTargetingThisActor": "Test ciblant cet acteur"
             },
+            "ValueEditor": "Modifier la valeur du changement",
             "FIELDS": {
                 "conditionMode": {
                     "hint": "Inclure : le test doit correspondre à ces valeurs. Exclure : le test ne doit pas correspondre à ces valeurs."
@@ -1114,7 +1115,10 @@
                 "ResultOverrideHits": "Remplace les succès pour ce résultat de test."
             },
             "Effect": {
-                "HelpLinkEnglishOnly": "Help (External link, English only)"
+                "HelpLinkEnglishOnly": "Help (External link, English only)",
+                "OpenValueEditor": "Ouvrir l'éditeur de valeur",
+                "ApplyValueEditor": "Appliquer la modification de valeur",
+                "CancelValueEditor": "Annuler la modification de valeur"
             },
             "SummoningTest": {
                 "OptionalPowerCount": "Compteur informatif des pouvoirs optionnels de l'esprit (plancher(force / 3))."

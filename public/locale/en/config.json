@@ -137,6 +137,7 @@
                 "TestItem": "Test via Item"
             },
             "CannotAddTestViaItemToActor": "Cannot add an Active Effect of type 'Test via Item' to an Actor",
+            "ValueEditor": "Edit Change Value",
             "FIELDS": {
                 "applyByTest": {
                     "label": "Apply-To Test via Item"
@@ -2979,6 +2980,9 @@
                 "EditEffect": "Edit Effect",
                 "ItemEffects": "Effects collected from items on this document",
                 "HelpLinkEnglishOnly": "Help (External link, English only)",
+                "OpenValueEditor": "Open value editor",
+                "ApplyValueEditor": "Apply value edit",
+                "CancelValueEditor": "Cancel value edit",
                 "OnlyAllFilteredUsed": "This effect will only apply for tests matching all selections",
                 "OnlyFilteredUsed": "This effect will only apply for tests matching at least one selection",
                 "OnlyForItemTest": "Only affect test of parent item",

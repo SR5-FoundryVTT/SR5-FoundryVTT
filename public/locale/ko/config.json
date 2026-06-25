@@ -137,6 +137,7 @@
                 "TestItem": "물품을 통한 판정"
             },
             "CannotAddTestViaItemToActor": "액터에 '물품을 통한 판정' 종류의 액티브 이펙트 추가 불가",
+            "ValueEditor": "변경 값 편집",
             "FIELDS": {
                 "applyByTest": {
                     "label": "물품을 통한 판정에 적용"
@@ -2975,6 +2976,9 @@
                 "EditEffect": "효과 수정",
                 "ItemEffects": "이 문서의 항목에서 수집한 효과",
                 "HelpLinkEnglishOnly": "Help (External link, English only)",
+                "OpenValueEditor": "값 편집기 열기",
+                "ApplyValueEditor": "값 편집 적용",
+                "CancelValueEditor": "값 편집 취소",
                 "OnlyAllFilteredUsed": "전체 선택 사항과 맞는 판정에만 효과가 적용됨",
                 "OnlyFilteredUsed": "최소 하나 이상의 선택 사항과 맞는 판정에만 효과가 적용됨",
                 "OnlyForItemTest": "상위 항목의 판정에만 영향",
