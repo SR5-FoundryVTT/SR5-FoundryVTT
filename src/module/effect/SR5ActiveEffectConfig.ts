@@ -28,6 +28,7 @@ type SR5ActiveEffectSheetData = ActiveEffectConfig.RenderContext & {
     changeTargetOptions: { label: string, value: string }[];
     targetApplyToById: Record<string, string>;
     changeTypes: Record<string, string>;
+    expiryActionOptions: { label: string, value: 'default' | 'update' | 'delete', selected: boolean }[];
     system: ActiveEffectDM;
     systemFields: typeof ActiveEffectDM.schema.fields;
 
@@ -208,6 +209,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         data.changeTargetOptions = this.prepareChangeTargetOptions();
         data.targetApplyToById = this.prepareTargetApplyToById();
         data.changeTypes = this.prepareChangeTypes();
+        data.expiryActionOptions = this.prepareExpiryActionOptions(data.source);
 
         // Duration tab context
         data.boundaryOptions = this.prepareBoundaryOptions(data.source);
@@ -611,6 +613,32 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
             label: game.i18n.localize(locKey),
             selected: value === current,
         }));
+    }
+
+    /** Build the expiry action choices list, resolving the default label from Foundry's configured action. */
+    private prepareExpiryActionOptions(source: ReturnType<SR5ActiveEffect['toObject']>) {
+        const current = source.system?.expiryAction ?? 'default';
+        const update = game.i18n.localize('SR5.ActiveEffect.Duration.ExpiryActionUpdate');
+        const deleteAction = game.i18n.localize('SR5.ActiveEffect.Duration.ExpiryActionDelete');
+        const configuredAction = CONFIG.ActiveEffect.expiryAction === 'delete' ? deleteAction : update;
+
+        return [
+            {
+                value: 'default',
+                label: game.i18n.format('SR5.ActiveEffect.Duration.ExpiryActionDefault', { action: configuredAction }),
+                selected: current === 'default',
+            },
+            {
+                value: 'delete',
+                label: deleteAction,
+                selected: current === 'delete',
+            },
+            {
+                value: 'update',
+                label: update,
+                selected: current === 'update',
+            },
+        ] satisfies { label: string, value: 'default' | 'update' | 'delete', selected: boolean }[];
     }
 
 }

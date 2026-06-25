@@ -106,7 +106,10 @@
                 "Restart": "Redémarrer la durée",
                 "RestartPending": "Redémarrage prêt",
                 "RestartPendingDetail": "La durée redémarrera lorsque les modifications seront enregistrées.",
-                "DeleteOnExpiry": "Supprimer à l'expiration",
+                "ExpiryAction": "Action à l'expiration",
+                "ExpiryActionDefault": "Par défaut ({action})",
+                "ExpiryActionDelete": "Supprimer",
+                "ExpiryActionUpdate": "Mettre à jour",
                 "Status": "Statut",
                 "Units": "Unités de durée",
                 "Value": "Durée"

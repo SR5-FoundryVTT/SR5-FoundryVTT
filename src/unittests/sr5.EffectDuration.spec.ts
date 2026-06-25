@@ -58,6 +58,13 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
         duration: preparedDuration,
     } as unknown as SR5ActiveEffect, { restartPending });
 
+    const waitUntil = async (condition: () => boolean, timeout = 1000) => {
+        const started = Date.now();
+        while (!condition() && Date.now() - started < timeout) {
+            await new Promise(resolve => setTimeout(resolve, 25));
+        }
+    };
+
     // -------------------------------------------------------------------------
     // Shared duration presentation
     // -------------------------------------------------------------------------
@@ -160,6 +167,39 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
             const { effect } = await createEffect();
             assert.isFalse(effect.duration.expired);
             assert.isFalse(effect.isSuppressed, 'fresh actor-owned effect must not be suppressed');
+        });
+    });
+
+    // -------------------------------------------------------------------------
+    // expiry action
+    // -------------------------------------------------------------------------
+    describe('expiry action', () => {
+        it('deletes expired effects when expiryAction is delete', async () => {
+            const { actor, effect } = await createEffect({type: 'character'}, {
+                duration: { value: 1, units: 'seconds', expiry: null } as any,
+                system: { expiryAction: 'delete' },
+            });
+
+            await game.time.advance(2);
+            await effect.update({ duration: { expired: true } as any });
+            await waitUntil(() => !actor.effects.has(effect.id!));
+
+            assert.isFalse(actor.effects.has(effect.id!), 'expired delete effects must be removed by the active GM');
+        });
+
+        it('keeps expired effects when expiryAction is update', async () => {
+            const { actor, effect } = await createEffect({type: 'character'}, {
+                duration: { value: 1, units: 'seconds', expiry: null } as any,
+                system: { expiryAction: 'update' },
+            });
+
+            await game.time.advance(2);
+            await effect.update({ duration: { expired: true } as any });
+            await new Promise(resolve => setTimeout(resolve, 50));
+
+            const expiredEffect = actor.effects.get(effect.id!) as SR5ActiveEffect | undefined;
+            assert.exists(expiredEffect, 'expired update effects must remain on the actor');
+            assert.isTrue(expiredEffect?.isSuppressed, 'expired update effects must be suppressed');
         });
     });
 

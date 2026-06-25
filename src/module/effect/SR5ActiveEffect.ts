@@ -235,9 +235,14 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (!game.users?.activeGM?.isSelf) return;
         const [changed] = args;
 
-        if (changed?.duration?.expired === true && this.system.deleteOnExpiry) {
+        if (changed?.duration?.expired === true && this.resolvedExpiryAction === 'delete') {
             void this.delete();
         }
+    }
+
+    private get resolvedExpiryAction() {
+        const action = this.system.expiryAction ?? 'default';
+        return action === 'default' ? CONFIG.ActiveEffect.expiryAction : action;
     }
 
     /**

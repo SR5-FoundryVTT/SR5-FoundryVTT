@@ -227,7 +227,10 @@
                 "Restart": "지속 시간 재시작",
                 "RestartPending": "재시작 준비됨",
                 "RestartPendingDetail": "변경 사항을 제출하면 지속 시간이 재시작됩니다.",
-                "DeleteOnExpiry": "만료 시 삭제",
+                "ExpiryAction": "만료 작업",
+                "ExpiryActionDefault": "기본값 ({action})",
+                "ExpiryActionDelete": "삭제",
+                "ExpiryActionUpdate": "업데이트",
                 "Status": "상태",
                 "Units": "지속 시간 단위",
                 "Value": "지속 시간"

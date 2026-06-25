@@ -226,7 +226,10 @@
                 "Restart": "Restart Duration",
                 "RestartPending": "Restart ready",
                 "RestartPendingDetail": "The duration will restart when changes are submitted.",
-                "DeleteOnExpiry": "Delete when expired",
+                "ExpiryAction": "Expiry Action",
+                "ExpiryActionDefault": "Default ({action})",
+                "ExpiryActionDelete": "Delete",
+                "ExpiryActionUpdate": "Update",
                 "Status": "Status",
                 "Units": "Duration units",
                 "Value": "Duration"

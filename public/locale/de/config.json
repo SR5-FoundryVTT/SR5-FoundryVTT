@@ -228,7 +228,10 @@
                 "Restart": "Dauer neu starten",
                 "RestartPending": "Neustart bereit",
                 "RestartPendingDetail": "Die Dauer wird neu gestartet, wenn die Änderungen gespeichert werden.",
-                "DeleteOnExpiry": "Bei Ablauf löschen",
+                "ExpiryAction": "Ablaufaktion",
+                "ExpiryActionDefault": "Standard ({action})",
+                "ExpiryActionDelete": "Löschen",
+                "ExpiryActionUpdate": "Aktualisieren",
                 "Status": "Status",
                 "Units": "Dauer-Einheiten",
                 "Value": "Dauer"

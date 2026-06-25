@@ -177,7 +177,10 @@
                 "Restart": "Reiniciar Duração",
                 "RestartPending": "Reinício pronto",
                 "RestartPendingDetail": "A duração será reiniciada quando as alterações forem enviadas.",
-                "DeleteOnExpiry": "Excluir ao expirar",
+                "ExpiryAction": "Ação ao Expirar",
+                "ExpiryActionDefault": "Padrão ({action})",
+                "ExpiryActionDelete": "Excluir",
+                "ExpiryActionUpdate": "Atualizar",
                 "Status": "Status",
                 "Units": "Unidades de duração",
                 "Value": "Duração"

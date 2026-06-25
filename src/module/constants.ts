@@ -271,7 +271,7 @@ export const SRStatus = [
         img: 'systems/shadowrun5e/dist/icons/status-effects/run.svg',
         duration: { value: 1, units: 'rounds', expiry: 'roundStart' },
         system: {
-            deleteOnExpiry: true,
+            expiryAction: 'delete',
             targets: [
                 {
                     id: 'penalty',
@@ -313,7 +313,7 @@ export const SRStatus = [
         img: 'systems/shadowrun5e/dist/icons/status-effects/sprint.svg',
         duration: { value: 1, units: 'rounds', expiry: 'roundStart' },
         system: {
-            deleteOnExpiry: true,
+            expiryAction: 'delete',
             targets: [
                 {
                     id: 'penalty',

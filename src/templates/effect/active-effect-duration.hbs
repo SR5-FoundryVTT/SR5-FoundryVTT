@@ -81,10 +81,13 @@
             </div>
 
             <div class="duration-control">
-                <label for="{{rootId}}-delete-on-expiry">{{localize "SR5.ActiveEffect.Duration.DeleteOnExpiry"}}</label>
+                <label for="{{rootId}}-expiry-action">{{localize "SR5.ActiveEffect.Duration.ExpiryAction"}}</label>
                 <div class="duration-control-fields">
-                    <input id="{{rootId}}-delete-on-expiry" type="checkbox" name="system.deleteOnExpiry"
-                        {{#if source.system.deleteOnExpiry}}checked{{/if}} />
+                    <select id="{{rootId}}-expiry-action" name="system.expiryAction" data-dtype="String">
+                        {{#each expiryActionOptions}}
+                        <option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+                        {{/each}}
+                    </select>
                 </div>
             </div>
         </fieldset>
