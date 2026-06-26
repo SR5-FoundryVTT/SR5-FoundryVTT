@@ -17,13 +17,11 @@ export class ImportHelper {
     static nameToId: Partial<Record<CompendiumKey, Record<string, string>>> = {};
     static idToName: Partial<Record<CompendiumKey, Record<string, string>>> = {};
     static translationMap: {
-        global: Record<string, string>;
         files: Record<string, {
             names: Record<string, string>;
             ids: Record<string, string>;
         }>;
     } = {
-        global: {},
         files: {}
     };
     static currentFile: string | null = null;
@@ -39,9 +37,6 @@ export class ImportHelper {
         }
         if (this.currentFile && this.translationMap.files[this.currentFile]?.names?.[text]) {
             return this.translationMap.files[this.currentFile].names[text];
-        }
-        if (this.translationMap.global[text]) {
-            return this.translationMap.global[text];
         }
         // Fallback: Check other file translation maps for a match on the name
         for (const file of Object.keys(this.translationMap.files)) {
