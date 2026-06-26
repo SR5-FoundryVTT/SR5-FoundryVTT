@@ -62,14 +62,13 @@ export class SR5Combat extends Combat<"base"> {
     override _onUpdate(...args: Parameters<Combat["_onUpdate"]>) {
         super._onUpdate(...args);
 
-        // A new initiative pass re-acts the SAME combatant: SR5 inserts a pad combatant to shift the
-        // initiative order (so the turn index moves), but combat.combatant is unchanged. Foundry's turn-event
-        // dispatch (_manageTurnEvents) keys off the acting combatant changing, so it emits no turnStart for the
-        // repeat action phase and the ActiveEffect expiry registry is never consulted. Drive it directly on
-        // every turn/round/pass change so combat-duration boundaries are evaluated each action phase.
+        // A new initiative pass can re-act the SAME combatant: SR5 inserts a pad combatant to shift
+        // the initiative order (so the turn index moves), but combat.combatant may be unchanged from
+        // Foundry's perspective. Drive the registry on turn/round changes after the acting combatant
+        // has been selected; pass-only updates still point at the previous combatant.
         if (!game.user?.isActiveGM) return;
         const [changed] = args;
-        const advanced = ('turn' in changed) || ('round' in changed) || (changed.system && ('pass' in changed.system));
+        const advanced = ('turn' in changed) || ('round' in changed);
         if (advanced) {
             void foundry.documents.ActiveEffect.registry.refresh('sr5ActionPhase', { combat: this });
         }
