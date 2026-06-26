@@ -1,3 +1,4 @@
+import { SR } from '../constants';
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
@@ -63,6 +64,59 @@ export class SR5ActiveEffect extends ActiveEffect {
 
     get isItemOwned(): boolean {
         return this.parent instanceof SR5Item;
+    }
+
+    /**
+     * Whether this effect has a target for any of the given apply-to destinations.
+     */
+    appliesToAnyOf(applyTo: string[]): boolean {
+        return this.system.targets.some(target => applyTo.includes(target.applyTo));
+    }
+
+    /**
+     * Resolve the target a change belongs to or undefined if no matching target is found.
+     */
+    targetForChange(change: { target?: string }) {
+        return this.system.targets.find(target => target.id === change.target);
+    }
+
+    /**
+     * All changes whose resolved target applies to the given apply-to destination.
+     */
+    changesForApplyTo(applyTo: string) {
+        return this.system.changes.filter(change => this.targetForChange(change)?.applyTo === applyTo);
+    }
+
+    /**
+     * Ensure every effect is created with at least one target, so the config sheet always shows a
+     * target and changes have a concrete destination. Effects created with explicit targets (tests,
+     * imports, migration) keep theirs.
+     */
+    protected override async _preCreate(...args: Parameters<ActiveEffect['_preCreate']>): Promise<boolean | void> {
+        const allowed = await super._preCreate(...args);
+        if (allowed === false) return false;
+
+        if (!this.system.targets?.length) {
+            const id = 'actor';
+            const changes = this.system.toObject().changes.map(change => ({
+                ...change, target: change.target || id,
+            }));
+            this.updateSource({ system: { changes, targets: [{ id, applyTo: 'actor' }] } });
+        } else {
+            const firstId = this.system.targets[0].id;
+            const sourceChanges = this.system.toObject().changes;
+            if (sourceChanges.some(change => !change.target)) {
+                const changes = sourceChanges.map(change => ({ ...change, target: change.target || firstId }));
+                this.updateSource({ system: { changes } });
+            }
+        }
+
+        // Core only anchors `start` for Actor-owned effects. Item-owned temporary effects need an
+        // anchor too, otherwise isExpiryTrackable (requires !!start) will never be true for them.
+        if (this.parent instanceof SR5Item && this.isTemporary && !this.start) {
+            const combat = this.actor?.inCombat ? (game.combat ?? null) : null;
+            this.updateSource({ start: SR5ActiveEffect.getEffectStart(combat) });
+        }
     }
 
     /**
@@ -151,6 +205,10 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     override get isSuppressed(): boolean {
+        // Native registry sets duration.expired when the span+boundary are reached. Mirror that suppression
+        // here so expired effects are greyed out and not applied, regardless of parent type.
+        if (this.duration.expired) return true;
+
         if (!(this.parent instanceof SR5Item)) return false;
 
         if (this.system.onlyForEquipped && !this.parent.isEquipped()) return true;
@@ -159,6 +217,55 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (this.parent.isType('sprite_power') && !this.parent.system.enabled) return true;
 
         return false;
+    }
+
+    /**
+     * SR5 adds owner action-phase start/end triggers on top of the native combat boundaries.
+     * `sr5MyActionStart` fires when the owner starts acting; `sr5MyActionEnd` fires when advancing
+     * away from the owner's completed action phase. Outside of combat, both fall back to world-time
+     * expiry once the duration span is exhausted, matching native combat-trigger behavior.
+     */
+    override isExpiryEvent(event: string, context?: ActiveEffect.IsExpiryEventContext): boolean {
+        if (this.duration.expiry !== 'sr5MyActionStart' && this.duration.expiry !== 'sr5MyActionEnd') {
+            return super.isExpiryEvent(event, context);
+        }
+
+        if (event === 'updateWorldTime') return !this.actor?.inCombat;
+
+        const combat = context?.combat ?? game.combat;
+        const actorMatches = combat?.combatant?.actor === this.actor;
+        if (!actorMatches) return false;
+
+        if (this.duration.expiry === 'sr5MyActionStart') return event === 'sr5ActionPhaseStart';
+        return event === 'sr5ActionPhaseEnd';
+    }
+
+    override _onUpdate(...args: Parameters<ActiveEffect["_onUpdate"]>) {
+        super._onUpdate(...args);
+        if (!game.users?.activeGM?.isSelf) return;
+        const [changed] = args;
+
+        if (changed?.duration?.expired === true && this.resolvedExpiryAction === 'delete') {
+            void this.delete();
+        }
+    }
+
+    private get resolvedExpiryAction() {
+        const action = this.system.expiryAction ?? 'default';
+        return action === 'default' ? CONFIG.ActiveEffect.expiryAction : action;
+    }
+
+    /**
+     * Re-enable an expired effect, reset its anchor, and re-register it with the expiry registry.
+     * Use this to restart a duration that was consumed (e.g. buff renewed for another combat).
+     */
+    async restart(): Promise<this | void> {
+        const combat = this.actor?.inCombat ? (game.combat ?? undefined) : undefined;
+        return this.update({
+            disabled: false,
+            duration: { expired: false },
+            start: SR5ActiveEffect.getEffectStart(combat ?? null),
+        });
     }
 
     /**
@@ -175,23 +282,12 @@ export class SR5ActiveEffect extends ActiveEffect {
         const actor = this.actor;
         if (!actor) return false;
 
-        if (this.system.applyTo === 'targeted_actor') {
-            return this.system.appliedByTest;
-        }
+        // Effects copied onto a target actor by a test always apply to that actor.
+        if (this.system.appliedByTest) return true;
 
-        return true;
-    }
-
-    /**
-     * < v14 used #apply instead of applyChange.
-     */
-    override apply(model: DataModel.Any, change: ActiveEffect.ChangeData) {
-        // @ts-expect-error TODO: v14 remove once v14 implementation is stable
-        return super.apply(model, change);
-        // return Object.fromEntries(
-        //     // @ts-expect-error TODO: tamif - v14 - what is this for?
-        //     Object.entries(super.apply(model, change)).filter(([, v]) => v != null)
-        // );
+        // Otherwise hide only effects whose targets are exclusively targeted_actor,
+        // as those are meant for another actor acted upon, not the one acting.
+        return this.system.targets.some(target => target.applyTo !== 'targeted_actor');
     }
 
     /**
@@ -207,17 +303,27 @@ export class SR5ActiveEffect extends ActiveEffect {
      * The DataModel handles effect application within they applyChange methods.
      * The objects are handled by SR5ActiveEffect legacy _applyToObject and _apply methods.
      * 
-     * This can cause diffeing beahvior between these two for effect application.
+     * This can cause differing behavior between these two for effect application.
      *
      * @param targetDoc The targeted document or object...
      * @param change The effect change being applied
      * @param options Additional FoundryVTT options.
      */
     static override applyChange(
-        targetDoc: DataModel.Any,
+        targetDoc: ActiveEffect.TargetDocument | DataModel.Any,
         change: ActiveEffect.ChangeData,
-        { replacementData = {}, modifyTarget = true }: ActiveEffect.ApplyChangeOptions = {}
+        options: ActiveEffect.ApplyChangeOptions = {}
     ): Record<string, unknown> {
+        // Foundry core iterates every change of an applicable effect when applying to actor data.
+        // Only apply changes whose target is actor-bound. Both 'actor' and 'targeted_actor' targets
+        // apply to actor data (targeted_actor effects are only collected onto an actor when they
+        // belong to it - either embedded directly or copied there by a test).
+        if (targetDoc instanceof SR5Actor && change.effect instanceof SR5ActiveEffect) {
+            const target = change.effect.targetForChange(change as { target?: string });
+            const appliesToActor = !!target && (target.applyTo === 'actor' || target.applyTo === 'targeted_actor');
+            if (!appliesToActor) return {};
+        }
+
         // Skip applying this change if the target key does not exist on the model.
         // TypedObjectField will otherwise create the missing property as a string,
         // which breaks data integrity and can result in errors like "undefined[object Object]".
@@ -231,13 +337,14 @@ export class SR5ActiveEffect extends ActiveEffect {
         SR5ActiveEffect.resolveDynamicChangeValue(source, change);
         
         // Other cases should be directly applied to the data, without actor / schema handling.
-        // This is used when applying effects to non-Actor objects, like tests.
-        // TODO: v14 - double check TokenDocument.
+        // This is used when applying effects to non-Actor objects, like tests. TokenDocument is
+        // explicitly supported by Foundry v14's ActiveEffect.applyChange and must stay on the
+        // core/schema path for token.* changes routed by Actor.applyActiveEffects.
         if (!(targetDoc instanceof SR5Actor) && !(targetDoc instanceof SR5Item) && !(targetDoc instanceof TokenDocument)) {
             return SR5ActiveEffect._applyToObject(targetDoc, change);
         }
 
-        return super.applyChange(targetDoc, change, {replacementData, modifyTarget});
+        return super.applyChange(targetDoc, change, options);
     }
 
     /**
@@ -335,7 +442,7 @@ export class SR5ActiveEffect extends ActiveEffect {
             if (!data || !this.id) return this;
 
             await this.parent.updateNestedEffects({ ...data, _id: this.id } as ActiveEffect.UpdateInput);
-            await this.render();
+            this.render();
             return this;
         }
 

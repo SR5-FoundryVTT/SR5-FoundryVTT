@@ -1318,7 +1318,31 @@ export const SR5 = {
         'targeted_actor': 'SR5.ActiveEffect.ApplyTos.TargetedActor',
         'test_all': 'SR5.Test',
         'test_item': 'SR5.ActiveEffect.ApplyTos.TestItem',
+        'test_target': 'SR5.ActiveEffect.ApplyTos.TestTargetingThisActor',
         'modifier': 'SR5.Modifier'
+    },
+
+    effectSelectionModes: {
+        'include': 'SR5.ActiveEffect.SelectionModes.Include',
+        'exclude': 'SR5.ActiveEffect.SelectionModes.Exclude',
+    },
+
+    effectFilterTypes: {
+        'tests': 'SR5.ActiveEffect.FilterTypes.Tests',
+        'categories': 'SR5.ActiveEffect.FilterTypes.Categories',
+        'skills': 'SR5.ActiveEffect.FilterTypes.Skills',
+        'attributes': 'SR5.ActiveEffect.FilterTypes.Attributes',
+        'limits': 'SR5.ActiveEffect.FilterTypes.Limits',
+    },
+
+    // Combat duration expiry trigger choices (maps to native duration.expiry values).
+    effectExpiryTriggers: {
+        'combatStart':      'SR5.ActiveEffect.ExpiryTriggers.CombatStart',
+        'combatEnd':        'SR5.ActiveEffect.ExpiryTriggers.CombatEnd',
+        'roundStart':       'SR5.ActiveEffect.ExpiryTriggers.TurnStart',
+        'roundEnd':         'SR5.ActiveEffect.ExpiryTriggers.TurnEnd',
+        'sr5MyActionStart': 'SR5.ActiveEffect.ExpiryTriggers.MyActionStart',
+        'sr5MyActionEnd':   'SR5.ActiveEffect.ExpiryTriggers.MyActionEnd',
     },
 
     itemCategoryIconOverrides: {

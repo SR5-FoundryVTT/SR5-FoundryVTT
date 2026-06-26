@@ -1,0 +1,114 @@
+<section class="tab scrollable{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+    <div class="sr5-effect-duration">
+        {{#if start}}
+        <fieldset class="duration-panel duration-start">
+            <legend>{{localize "EFFECT.START.Header"}}</legend>
+            <div class="duration-start-row">
+                <span class="label">{{localize "EFFECT.FIELDS.start.time.label"}}</span>
+                <span class="value">{{start.time}}</span>
+            </div>
+            {{#if start.combat}}
+            <div class="duration-start-row">
+                <span class="label">{{localize "DOCUMENT.Combat"}}</span>
+                <span class="value">
+                    {{#if start.initiative}}
+                        {{localize "SR5.ActiveEffect.Duration.CombatStart" turn=start.round initiative=start.initiative}}
+                    {{else}}
+                        {{localize "SR5.ActiveEffect.Duration.CombatStartNoInitiative" turn=start.round}}
+                    {{/if}}
+                </span>
+            </div>
+            {{#if start.combatant}}
+            <div class="duration-start-row">
+                <span class="label">{{localize "DOCUMENT.Combatant"}}</span>
+                <span class="value">{{start.combatantName}}</span>
+            </div>
+            {{/if}}
+            {{/if}}
+        </fieldset>
+        {{/if}}
+
+        <fieldset class="duration-panel duration-settings">
+            <legend>{{localize "EFFECT.DURATION.Header"}}</legend>
+
+            <div class="duration-control">
+                <label for="{{rootId}}-duration-value">{{localize "SR5.ActiveEffect.Duration.Value"}}</label>
+                <div class="duration-control-fields duration-value-fields">
+                    <input id="{{rootId}}-duration-value" type="number" name="duration.value"
+                        value="{{source.duration.value}}" min="1" step="1"
+                        />
+                    <select name="duration.units" data-dtype="String"
+                        aria-label="{{localize "SR5.ActiveEffect.Duration.Units"}}">
+                        <optgroup label="{{localize "SR5.ActiveEffect.Duration.GroupCombat"}}">
+                            <option value="rounds" {{#if (eq source.duration.units "rounds")}}selected{{/if}}>
+                                {{localize "SR5.ActiveEffect.Duration.UnitTurns"}}
+                            </option>
+                        </optgroup>
+                        <optgroup label="{{localize "SR5.ActiveEffect.Duration.GroupTime"}}">
+                            <option value="seconds" {{#if (eq source.duration.units "seconds")}}selected{{/if}}>
+                                {{localize "EFFECT.DURATION.UNITS.seconds"}}
+                            </option>
+                            <option value="minutes" {{#if (eq source.duration.units "minutes")}}selected{{/if}}>
+                                {{localize "EFFECT.DURATION.UNITS.minutes"}}
+                            </option>
+                            <option value="hours" {{#if (eq source.duration.units "hours")}}selected{{/if}}>
+                                {{localize "EFFECT.DURATION.UNITS.hours"}}
+                            </option>
+                            <option value="days" {{#if (eq source.duration.units "days")}}selected{{/if}}>
+                                {{localize "EFFECT.DURATION.UNITS.days"}}
+                            </option>
+                            <option value="months" {{#if (eq source.duration.units "months")}}selected{{/if}}>
+                                {{localize "EFFECT.DURATION.UNITS.months"}}
+                            </option>
+                            <option value="years" {{#if (eq source.duration.units "years")}}selected{{/if}}>
+                                {{localize "EFFECT.DURATION.UNITS.years"}}
+                            </option>
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
+
+            <div class="duration-control">
+                <label for="{{rootId}}-duration-expiry">{{localize "SR5.ActiveEffect.Duration.ExpiryTrigger"}}</label>
+                <div class="duration-control-fields">
+                    <select id="{{rootId}}-duration-expiry" name="duration.expiry" data-dtype="String">
+                        <option value="" {{#unless source.duration.expiry}}selected{{/unless}}></option>
+                        {{#each boundaryOptions}}
+                        <option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+            </div>
+
+            <div class="duration-control">
+                <label for="{{rootId}}-expiry-action">{{localize "SR5.ActiveEffect.Duration.ExpiryAction"}}</label>
+                <div class="duration-control-fields">
+                    <select id="{{rootId}}-expiry-action" name="system.expiryAction" data-dtype="String">
+                        {{#each expiryActionOptions}}
+                        <option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>
+                        {{/each}}
+                    </select>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="duration-panel duration-status-panel duration-status-panel--{{durationStatus.state}}">
+            <legend>{{localize "SR5.ActiveEffect.Duration.Status"}}</legend>
+            <div class="duration-status" role="status">
+                <i class="duration-status-icon {{durationStatus.icon}}" aria-hidden="true"></i>
+                <div class="duration-status-copy">
+                    <strong>{{durationStatus.label}}</strong>
+                    {{#if durationStatus.detail}}
+                    <span>{{durationStatus.detail}}</span>
+                    {{/if}}
+                </div>
+                {{#if durationStatus.showRestart}}
+                <button type="button" class="duration-restart" data-action="restartDuration">
+                    <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
+                    {{localize "SR5.ActiveEffect.Duration.Restart"}}
+                </button>
+                {{/if}}
+            </div>
+        </fieldset>
+    </div>
+</section>

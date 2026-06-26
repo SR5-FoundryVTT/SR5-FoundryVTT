@@ -76,7 +76,9 @@ export class BonusHelper {
             if (cm.overflow) {
                 this.createEffect(
                     sheet, {
-                        system: { changes: [{ key: "system.modifiers.physical_overflow_track", value: cm.overflow._TEXT, type: 'override' }] }
+                        system: {
+                            changes: [{ key: "system.modifiers.physical_overflow_track", value: cm.overflow._TEXT, type: 'override' }],
+                        },
                     },
                 );
             }
@@ -84,7 +86,9 @@ export class BonusHelper {
             if (cm.physical) {
                 this.createEffect(
                     sheet, {
-                        system: { changes: [{ key: "system.modifiers.physical_track", value: cm.physical._TEXT, type: 'override' }] }
+                        system: {
+                            changes: [{ key: "system.modifiers.physical_track", value: cm.physical._TEXT, type: 'override' }],
+                        },
                     },
                 );
             }
@@ -92,7 +96,9 @@ export class BonusHelper {
             if (cm.stun) {
                 this.createEffect(
                     sheet, {
-                        system: { changes: [{ key: "system.modifiers.stun_track", value: cm.stun._TEXT, type: 'override' }] }
+                        system: {
+                            changes: [{ key: "system.modifiers.stun_track", value: cm.stun._TEXT, type: 'override' }],
+                        },
                     }
                 );
             }
@@ -100,7 +106,9 @@ export class BonusHelper {
             if (cm.threshold) {
                 this.createEffect(
                     sheet, {
-                        system: { changes: [{ key: "system.modifiers.wound_tolerance", value: cm.threshold._TEXT }] }
+                        system: {
+                            changes: [{ key: "system.modifiers.wound_tolerance", value: cm.threshold._TEXT }],
+                        },
                     },
                 );
             }
@@ -108,7 +116,9 @@ export class BonusHelper {
             if (cm.thresholdoffset) {
                 this.createEffect(
                     sheet, {
-                        system: { changes: [{ key: "system.modifiers.pain_tolerance_physical", value: cm.thresholdoffset._TEXT }] }
+                        system: {
+                            changes: [{ key: "system.modifiers.pain_tolerance_physical", value: cm.thresholdoffset._TEXT }],
+                        },
                     }
                 );
             }
@@ -120,8 +130,8 @@ export class BonusHelper {
                             changes: [
                                 { key: "system.modifiers.pain_tolerance_physical", value: cm.sharedthresholdoffset._TEXT },
                                 { key: "system.modifiers.pain_tolerance_stun", value: cm.sharedthresholdoffset._TEXT },
-                            ]
-                        }
+                            ],
+                        },
                     }
                 );
             }
@@ -135,7 +145,10 @@ export class BonusHelper {
                 this.createEffect(
                     sheet, {
                         disabled: !!limitModifier.condition,
-                        system: { changes: [{ key: "data.limit", value: limitModifier.value._TEXT }], applyTo: 'test_all', selection_limits: [key] }
+                        system: {
+                            changes: [{ key: "data.limit", value: limitModifier.value._TEXT, target: 'limit_filter' }],
+                            targets: [{ id: 'limit_filter', applyTo: 'test_all', conditions: [{ type: 'limits', values: [key] }] }],
+                        },
                     }
                 );
             }
@@ -148,7 +161,10 @@ export class BonusHelper {
                 this.createEffect(
                     sheet, {
                         disabled: !!skill.condition,
-                        system: { changes: [{ key: "data.pool", value: skill.bonus._TEXT }], applyTo: 'test_all', selection_attributes: [key] }
+                        system: {
+                            changes: [{ key: "data.pool", value: skill.bonus._TEXT, target: 'attr_filter' }],
+                            targets: [{ id: 'attr_filter', applyTo: 'test_all', conditions: [{ type: 'attributes', values: [key] }] }],
+                        },
                     }
                 );
             }
@@ -168,7 +184,10 @@ export class BonusHelper {
                     this.createEffect(
                         sheet, {
                             disabled: !!skillCategory.condition,
-                            system: { changes: [{ key: "data.pool", value: skillCategory.bonus._TEXT }], applyTo: 'test_all', selection_skills: skills }
+                            system: {
+                                changes: [{ key: "data.pool", value: skillCategory.bonus._TEXT, target: 'category_filter' }],
+                                targets: [{ id: 'category_filter', applyTo: 'test_all', conditions: [{ type: 'skills', values: skills }] }],
+                            },
                         }
                     );
             }
@@ -185,7 +204,10 @@ export class BonusHelper {
                 this.createEffect(
                     sheet, {
                         disabled: !!skillGroup.condition,
-                        system: { changes: [{ key: "data.pool", value: skillGroup.bonus._TEXT }], applyTo: 'test_all', selection_skills: skills }
+                        system: {
+                            changes: [{ key: "data.pool", value: skillGroup.bonus._TEXT, target: 'group_filter' }],
+                            targets: [{ id: 'group_filter', applyTo: 'test_all', conditions: [{ type: 'skills', values: skills }] }],
+                        },
                     }
                 );
             }
@@ -214,7 +236,10 @@ export class BonusHelper {
                 this.createEffect(
                     sheet, {
                         disabled: !!skill.condition,
-                        system: { changes: [{ key: "data.pool", value: skill.bonus._TEXT }], applyTo: 'test_all', selection_skills: [key] }
+                        system: {
+                            changes: [{ key: "data.pool", value: skill.bonus._TEXT, target: 'skill_filter' }],
+                            targets: [{ id: 'skill_filter', applyTo: 'test_all', conditions: [{ type: 'skills', values: [key] }] }],
+                        },
                     }
                 );
             }

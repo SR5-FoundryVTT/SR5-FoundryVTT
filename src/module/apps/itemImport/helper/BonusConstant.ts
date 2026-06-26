@@ -57,24 +57,39 @@ export class BonusConstant {
         composure: { system: { changes: [{ key: "system.modifiers.composure" }] } },
         damageresistance: {
             name: "Add Damage Resistance",
-            system: { changes: [{ key: "data.pool" }], applyTo: 'test_all', selection_tests: ["PhysicalResistTest"] },
+            system: {
+                changes: [{ key: "data.pool", target: 'phys_resist' }],
+                targets: [{ id: 'phys_resist', applyTo: 'test_all', conditions: [{ type: 'tests', values: ["PhysicalResistTest"] }] }],
+            },
         },
         defensetest: {
-            system: { changes: [{ key: "data.pool" }], applyTo: 'test_all', selection_tests: ["PhysicalDefenseTest", "SuppressionDefenseTest"]},
+            system: {
+                changes: [{ key: "data.pool", target: 'defense' }],
+                targets: [{ id: 'defense', applyTo: 'test_all', conditions: [{ type: 'tests', values: ["PhysicalDefenseTest", "SuppressionDefenseTest"] }] }],
+            },
         },
         dodge: {
-            system: { changes: [{ key: "data.pool" }], applyTo: 'test_all', selection_tests: ["PhysicalDefenseTest", "SuppressionDefenseTest"]},
+            system: {
+                changes: [{ key: "data.pool", target: 'defense' }],
+                targets: [{ id: 'defense', applyTo: 'test_all', conditions: [{ type: 'tests', values: ["PhysicalDefenseTest", "SuppressionDefenseTest"] }] }],
+            },
         },
         drainresist: {
             name: "Add Drain Resistance",
-            system: { changes: [{ key: "data.pool" }], applyTo: 'test_all', selection_tests: ["DrainTest"] },
+            system: {
+                changes: [{ key: "data.pool", target: 'drain_resist' }],
+                targets: [{ id: 'drain_resist', applyTo: 'test_all', conditions: [{ type: 'tests', values: ["DrainTest"] }] }],
+            },
         },
         electricityarmor: { system: { changes: [{ key: "system.armor.elements.electricity" }] } },
         essencemax: { system: { changes: [{ key: "system.attributes.essence.base" }] } },
         essencepenalty: { system: { changes: [{ key: "system.attributes.essence" }] } },
         fadingresist: {
             name: "Add Fading Resistance",
-            system: { changes: [{ key: "data.pool" }], applyTo: 'test_all', selection_tests: ["FadeTest"] },
+            system: {
+                changes: [{ key: "data.pool", target: 'fading_resist' }],
+                targets: [{ id: 'fading_resist', applyTo: 'test_all', conditions: [{ type: 'tests', values: ["FadeTest"] }] }],
+            },
         },
         firearmor: { system: { changes: [{ key: "system.armor.elements.fire" }] } },
         handling: { system: { changes: [{ key: "system.vehicle_stats.handling" }] } },
@@ -91,7 +106,10 @@ export class BonusConstant {
         pilot: { system: { changes: [{ key: "system.vehicle_stats.pilot" }] } },
         physicalcmrecovery: {
             name: "Natural Recovery Physical",
-            system: { changes: [{ key: "data.pool" }], applyTo: 'test_all', selection_tests: ["NaturalRecoveryPhysicalTest"] }
+            system: {
+                changes: [{ key: "data.pool", target: 'recovery_phys' }],
+                targets: [{ id: 'recovery_phys', applyTo: 'test_all', conditions: [{ type: 'tests', values: ["NaturalRecoveryPhysicalTest"] }] }],
+            },
         },
         physicallimit: { system: { changes: [{ key: "system.limits.physical" }] } },
         reach: { system: { changes: [{ key: "system.modifiers.reach" }] } },
@@ -101,11 +119,17 @@ export class BonusConstant {
         speed: { system: { changes: [{ key: "system.vehicle_stats.speed" }] } },
         spellresistance: {
             name: "Add Spell Resistance",
-            system: { changes: [{ key: "data.pool" }], applyTo: 'test_all', selection_tests: ["CombatSpellDefenseTest"] }
+            system: {
+                changes: [{ key: "data.pool", target: 'spell_resist' }],
+                targets: [{ id: 'spell_resist', applyTo: 'test_all', conditions: [{ type: 'tests', values: ["CombatSpellDefenseTest"] }] }],
+            },
         },
         stuncmrecovery: {
             name: "Natural Recovery Stun",
-            system: { changes: [{ key: "data.pool" }], applyTo: 'test_all', selection_tests: ["NaturalRecoveryStunTest"] }
+            system: {
+                changes: [{ key: "data.pool", target: 'recovery_stun' }],
+                targets: [{ id: 'recovery_stun', applyTo: 'test_all', conditions: [{ type: 'tests', values: ["NaturalRecoveryStunTest"] }] }],
+            },
         }
     } as const satisfies Partial< Record< keyof BonusSchema, AECreateData > >;
 }
