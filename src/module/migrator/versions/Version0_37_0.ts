@@ -43,7 +43,14 @@ export class Version0_37_0 extends VersionMigration {
             conditions,
             onlyForItemTest: applyTo === 'modifier' ? !!system.onlyForItemTest : false,
         }];
+
+        // Remove legacy per-effect routing/filter fields now represented by targets+conditions.
+        delete system.applyTo;
         delete system.onlyForItemTest;
+        for (const { valueKey, modeKey } of flatDimensions) {
+            delete system[valueKey];
+            delete system[modeKey];
+        }
 
         // Assign the target to existing changes
         for (const change of system.changes ?? []) {

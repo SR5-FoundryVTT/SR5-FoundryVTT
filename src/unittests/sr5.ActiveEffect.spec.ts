@@ -128,7 +128,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.nuyen, 4);
         });
 
-        it('OVERRIDE mode: override all existing .mod values', () => {
+        describe('OVERRIDE mode', () => {
             it('apply the custom override mode', async () => {
                 const actor = await factory.createActor({ type: 'character' });
                 const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{

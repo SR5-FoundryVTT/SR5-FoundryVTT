@@ -236,7 +236,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         const actorMatches = combat?.combatant?.actor === this.actor;
         if (!actorMatches) return false;
 
-        if (this.duration.expiry === 'sr5MyActionStart') return event === 'sr5ActionPhase';
+        if (this.duration.expiry === 'sr5MyActionStart') return event === 'sr5ActionPhaseStart';
         return event === 'sr5ActionPhaseEnd';
     }
 

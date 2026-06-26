@@ -70,7 +70,7 @@ export class SR5Combat extends Combat<"base"> {
         const [changed] = args;
         const advanced = ('turn' in changed) || ('round' in changed);
         if (advanced) {
-            void foundry.documents.ActiveEffect.registry.refresh('sr5ActionPhase', { combat: this });
+            void foundry.documents.ActiveEffect.registry.refresh('sr5ActionPhaseStart', { combat: this });
         }
     }
 
