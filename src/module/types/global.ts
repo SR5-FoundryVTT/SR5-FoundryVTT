@@ -295,6 +295,7 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.ImporterCompendiumOrder": string[];
         "shadowrun5e.DieFaceLabels": string;
         "shadowrun5e.TokenAutoRunning": boolean;
+        "shadowrun5e.TokenMovementHistoryReset": 'firstActionPhase' | 'turnStart';
     }
 }
 

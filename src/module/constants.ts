@@ -60,6 +60,7 @@ export const FLAGS = {
     TokenRulerColorSprinting: "TokenRulerColorSprinting",
     TokenRulerOpacity: 'TokenRulerOpacity',
     TokenUseRoutingLib: 'TokenUseRoutingLib',
+    TokenMovementHistoryReset: 'TokenMovementHistoryReset',
     GeneralActionsPack: 'GeneralActionsPack',
     MatrixActionsPack: 'MatrixActionsPack',
     ICActionsPack: 'ICActionsPack',
@@ -264,12 +265,20 @@ export const SR = {
     }
 } as const;
 
+function getMovementExpiry() {
+    const resetSetting = game.settings.get(SYSTEM_NAME, FLAGS.TokenMovementHistoryReset);
+    if (resetSetting === 'firstActionPhase')
+        return 'firstActionPhase';
+
+    return 'roundStart';
+}
+
 export const SRStatus = [
     {
         id: 'sr5run',
         name: 'SR5.StatusEffects.Running',
         img: 'systems/shadowrun5e/dist/icons/status-effects/run.svg',
-        duration: { value: 1, units: 'rounds', expiry: 'roundStart' },
+        duration: { value: 1, units: 'rounds', expiry: getMovementExpiry() },
         system: {
             expiryAction: 'delete',
             targets: [
@@ -311,7 +320,7 @@ export const SRStatus = [
         id: 'sr5sprint',
         name: 'SR5.StatusEffects.Sprinting',
         img: 'systems/shadowrun5e/dist/icons/status-effects/sprint.svg',
-        duration: { value: 1, units: 'rounds', expiry: 'roundStart' },
+        duration: { value: 1, units: 'rounds', expiry: getMovementExpiry() },
         system: {
             expiryAction: 'delete',
             targets: [
