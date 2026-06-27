@@ -30,7 +30,7 @@
                             </div>
                         </div>
                     {{/if}}
-                    {{#if emerged}}
+                    {{#if (and emerged systemFields.technomancer)}}
                         <div class="list-item">
                             <div class="list-item-start">
                                 <label data-tooltip="{{systemFields.technomancer.fields.attribute.hint}}">
@@ -234,34 +234,37 @@
             <section class="scrollable standard-form">
                 {{#if @root.isPlayMode}}
                     {{#each system.modifiers as |value id|}} {{#ifne id 'wound'}} {{#if value}}
+                        {{#with (objValue @root.systemFields.modifiers.fields id) as |modifierField|}}
                         <div class="list-item">
                             <div class="list-item-start">
-                                <label data-tooltip="{{objValue (objValue @root.systemFields.modifiers.fields id) 'hint'}}">
-                                    {{objValue (objValue @root.systemFields.modifiers.fields id) 'label'}}
+                                <label data-tooltip="{{modifierField.hint}}">
+                                    {{modifierField.label}}
                                 </label>
                             </div>
                             <div class="list-item-col">
                                 <label>{{value}}</labeL>
                             </div>
                         </div>
+                        {{/with}}
                     {{/if}} {{/ifne}} {{/each}}
                 {{else}}
                     {{#each source.system.modifiers as |value id|}} {{#ifne id 'wound'}}
+                        {{#with (objValue @root.systemFields.modifiers.fields id) as |modifierField|}}
                         <div class="list-item">
                             <div class="list-item-start">
-                                <label data-tooltip="{{objValue (objValue @root.systemFields.modifiers.fields id) 'hint'}}">
-                                    {{objValue (objValue @root.systemFields.modifiers.fields id) 'label'}}
+                                <label data-tooltip="{{modifierField.hint}}">
+                                    {{modifierField.label}}
                                 </label>
                             </div>
                             <div class="list-item-col">
-                                {{formInput (objValue @root.systemFields.modifiers.fields id) value=value
+                                {{formInput modifierField value=value
                                             classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode }}
                             </div>
                         </div>
+                        {{/with}}
                     {{/ifne}} {{/each}}
                 {{/if}}
             </section>
         </div>
     </div>
 </section>
-
