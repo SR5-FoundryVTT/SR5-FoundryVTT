@@ -180,16 +180,16 @@ export class SR5Combat extends Combat<"base"> {
      * Shadowrun does not clear movement history on turn start.
      */
     protected override async _clearMovementHistoryOnStartTurn(
-        combatant: Combatant.Implementation,
-        context: Combat.TurnEventContext,
+        _combatant: Combatant.Implementation,
+        _context: Combat.TurnEventContext,
     ) {}
 
-    override async clearMovementHistories(combatants: Parameters<Combat['clearMovementHistories']>[0]) {
-        await super.clearMovementHistories(combatants);
+    override async clearMovementHistories(...args: Parameters<Combat['clearMovementHistories']>) {
+        await super.clearMovementHistories(...args);
 
         // Remove running/sprinting status effects from all combatants
         // TokenDocument is not triggered to clear movement history on this path.
-        combatants ??= this.combatants;
+        const combatants = args[0] ?? this.combatants;
         if (game.settings.get(SYSTEM_NAME, FLAGS.TokenAutoRunning)) {
             for (const combatant of combatants) {
                 // Concurrently remove running/sprinting status effects.
@@ -242,6 +242,10 @@ export class SR5Combat extends Combat<"base"> {
         // @ts-expect-error
         Hooks.callAll("combatRound", this, updateData, updateOptions);
         await this.update(updateData, updateOptions);
+
+        if (game.settings.get(SYSTEM_NAME, FLAGS.TokenMovementHistoryReset) === 'turnStart') {
+            await this.clearMovementHistories();
+        }
 
         if (this.combatants.size) {
             await this.resetAll();
