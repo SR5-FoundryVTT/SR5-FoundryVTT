@@ -1,0 +1,46 @@
+<section class="tab{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+
+  {{#each source.system.targets as |target ti|}}
+    <fieldset class="effect-target" data-index="{{ti}}">
+        {{!-- Keep the stable target id in the form so clone sync and final submit do not regenerate it. --}}
+        <input type="hidden" name="{{concat "system.targets." ti ".id"}}" value="{{target.id}}">
+        <legend>
+            {{localize "SR5.ActiveEffect.Target"}} #{{sum ti 1}}
+            <a class="inline-control" data-action="removeTarget" data-target-index="{{ti}}" data-tooltip="{{localize "SR5.ActiveEffect.RemoveTarget"}}">
+                <i class="fas fa-trash"></i>
+            </a>
+        </legend>
+
+        <div class="form-group">
+            <label>{{localize "SR5.ActiveEffect.FIELDS.applyTo.label"}}</label>
+            <div class="form-fields">
+                <select class="target-apply-to" name="{{concat "system.targets." ti ".applyTo"}}"
+                        data-tooltip="{{localize "SR5.ActiveEffect.FIELDS.applyTo.hint"}}">
+                    {{selectOptions @root.applyToOptions selected=target.applyTo valueAttr="value" labelAttr="label" localize=false}}
+                </select>
+            </div>
+        </div>
+
+        {{#ife target.applyTo "test_all"}}
+            {{> "systems/shadowrun5e/dist/templates/effect/active-effect-target-conditions.hbs" target=target ti=ti}}
+        {{/ife}}
+        {{#ife target.applyTo "test_target"}}
+            {{> "systems/shadowrun5e/dist/templates/effect/active-effect-target-conditions.hbs" target=target ti=ti}}
+        {{/ife}}
+        {{#ife target.applyTo "modifier"}}
+            {{formGroup (lookup @root.systemFields.targets.element.fields "onlyForItemTest")
+                name=(concat "system.targets." ti ".onlyForItemTest")
+                value=target.onlyForItemTest
+                label=(localize "SR5.ActiveEffect.FIELDS.onlyForItemTest.label")
+                hint=(localize "SR5.ActiveEffect.FIELDS.onlyForItemTest.hint")
+                rootId=@root.rootId}}
+        {{/ife}}
+    </fieldset>
+  {{/each}}
+
+  <div class="effect-target-add">
+      <a data-action="addTarget">
+          <i class="fas fa-plus"></i> {{localize "SR5.ActiveEffect.AddTarget"}}
+      </a>
+  </div>
+</section>

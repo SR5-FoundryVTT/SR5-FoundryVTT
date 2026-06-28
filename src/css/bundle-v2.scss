@@ -750,7 +750,8 @@ body.theme-light,
     }
 
     &.actor,
-    &.item {
+    &.item,
+    &.active-effect-config {
         .window-content {
             background: var(--sr5v2-app-body-bg);
             background-image: none;

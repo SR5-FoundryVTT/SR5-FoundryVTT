@@ -68,7 +68,9 @@
         "UseDamageConditionDescription": "시스템이 상태 측정기에 따라 토큰을 표시",
         "UseDamageConditionName": "토큰 상태 효과에 시스템 처리 사용",
         "UseImportIconOverridesDescription": "물품 불러오기 시 서로 다른 물품 유형에 동일한 아이콘을 사용하는 것이 합리적일 경우 사용. 사용자 지정 아이콘을 사용하는 경우 체크 해제.",
-        "UseImportIconOverridesName": "기본 불러오기 아이콘 덮어쓰기 사용"
+        "UseImportIconOverridesName": "기본 불러오기 아이콘 덮어쓰기 사용",
+        "TokenAutoRunning": "달리기 움직임 자동 감지",
+        "TokenAutoRunningDescription": "측정된 거리가 걷기 속도를 초과하면 자동으로 토큰 이동 모드를 달리기로 전환합니다."
     },
     "SR5": {
         "AP": "AP",
@@ -130,13 +132,21 @@
         "ActiveEffect": {
             "ApplyTo": "적용 대상",
             "ApplyTos": {
+                "TestTargetingThisActor": "이 액터를 대상으로 하는 판정",
                 "TargetedActor": "목표 액터",
                 "TestItem": "물품을 통한 판정"
             },
             "CannotAddTestViaItemToActor": "액터에 '물품을 통한 판정' 종류의 액티브 이펙트 추가 불가",
+            "ValueEditor": "변경 값 편집",
             "FIELDS": {
                 "applyByTest": {
                     "label": "물품을 통한 판정에 적용"
+                },
+                "conditionMode": {
+                    "hint": "포함: 판정이 이 값들과 일치해야 합니다. 제외: 판정이 이 값들과 일치하면 안 됩니다."
+                },
+                "conditionType": {
+                    "hint": "이 조건이 필터링할 판정의 부분입니다."
                 },
                 "applyTo": {
                     "hint": "다른 목표에 적용",
@@ -175,10 +185,79 @@
                     "label": "판정 필터링"
                 }
             },
+            "AddCondition": "조건 추가",
+            "AddTarget": "대상 추가",
+            "AtLeastOneTarget": "효과에는 하나 이상의 대상이 있어야 합니다.",
+            "ExpiryTriggers": {
+                "CombatStart": "전투 시작",
+                "CombatEnd": "전투 종료",
+                "TurnStart": "턴 시작",
+                "TurnEnd": "턴 종료",
+                "MyActionStart": "내 행동 단계 시작",
+                "MyActionEnd": "내 행동 단계 종료"
+            },
+            "Duration": {
+                "Active": "활성",
+                "ActiveDetail": "지속 시간이 활성화되어 있습니다.",
+                "AwaitingCombatStart": "전투 시작까지",
+                "AwaitingCombatStartDetail": "다음 전투가 시작되면 만료됩니다.",
+                "AwaitingCombatEnd": "전투 종료까지",
+                "AwaitingCombatEndDetail": "현재 전투가 끝나면 만료됩니다.",
+                "AwaitingTurnStart": "전투 턴 시작까지",
+                "AwaitingTurnStartDetail": "다음 전투 턴 시작 시 만료됩니다.",
+                "AwaitingTurnEnd": "전투 턴 종료까지",
+                "AwaitingTurnEndDetail": "현재 전투 턴 종료 시 만료됩니다.",
+                "AwaitingMyActionStart": "소유자의 행동 단계 시작까지",
+                "AwaitingMyActionStartDetail": "소유자의 다음 행동 단계 시작 시 만료됩니다.",
+                "AwaitingMyActionEnd": "소유자의 행동 단계 종료까지",
+                "AwaitingMyActionEndDetail": "소유자가 현재 행동 단계를 마치면 만료됩니다.",
+                "AwaitingTrigger": "만료 트리거 대기 중",
+                "AwaitingTriggerDetail": "지속 시간이 완료되었으며 설정된 트리거에서 만료됩니다.",
+                "Combat": "전투",
+                "GroupCombat": "전투",
+                "GroupTime": "시간",
+                "UnitTurns": "전투 턴",
+                "CombatStart": "전투 턴 {turn}, 우선권 {initiative}",
+                "CombatStartNoInitiative": "전투 턴 {turn}",
+                "CombatTurn": "전투 턴 {turns}",
+                "CombatTurns": "전투 턴 {turns}",
+                "DoesNotExpire": "만료되지 않음",
+                "Expired": "만료됨",
+                "ExpiredDetail": "이 효과의 지속 시간을 다시 시작하려면 효과를 재시작하세요.",
+                "ExpiredOpenEditor": "만료됨 — 효과 편집기 열기",
+                "ExpiryTrigger": "만료 트리거",
+                "Remaining": "남은 시간",
+                "RemainingDetail": "{remaining} 남음",
+                "Restart": "지속 시간 재시작",
+                "RestartPending": "재시작 준비됨",
+                "RestartPendingDetail": "변경 사항을 제출하면 지속 시간이 재시작됩니다.",
+                "ExpiryAction": "만료 작업",
+                "ExpiryActionDefault": "기본값 ({action})",
+                "ExpiryActionDelete": "삭제",
+                "ExpiryActionUpdate": "업데이트",
+                "Status": "상태",
+                "Units": "지속 시간 단위",
+                "Value": "지속 시간"
+            },
+            "FilterTypes": {
+                "Attributes": "특성치",
+                "Categories": "행동 범주",
+                "Limits": "한계",
+                "Skills": "기술",
+                "Tests": "판정"
+            },
             "Modes": {
                 "Modify": "수정"
             },
-            "New": "새로운 효과"
+            "New": "새로운 효과",
+            "RemoveCondition": "조건 제거",
+            "RemoveTarget": "대상 제거",
+            "SelectionModes": {
+                "Exclude": "제외",
+                "Include": "포함"
+            },
+            "Target": "대상",
+            "Targets": "대상"
         },
         "ActiveSkills": "활성형 기술",
         "Actor": {
@@ -982,7 +1061,8 @@
             "Types": {
                 "Mana": "마나",
                 "Physical": "물리"
-            }
+            },
+            "OptionalSelectionCount": "선택 능력"
         },
         "Cyberware": "사이버웨어",
         "CyberwareGrade": "등급",
@@ -2644,7 +2724,9 @@
                 "Water": "물",
                 "Worker": "곤충 일꾼",
                 "Wraith": "유령"
-            }
+            },
+            "ForceAppliesSetting": "포스 적용 대상",
+            "ForceAppliesSettingHint": "포스 보너스를 받는 정령 속성을 지정합니다."
         },
         "Sprite": {
             "FIELDS": {
@@ -2897,6 +2979,9 @@
                 "EditEffect": "효과 수정",
                 "ItemEffects": "이 문서의 항목에서 수집한 효과",
                 "HelpLinkEnglishOnly": "Help (External link, English only)",
+                "OpenValueEditor": "값 편집기 열기",
+                "ApplyValueEditor": "값 편집 적용",
+                "CancelValueEditor": "값 편집 취소",
                 "OnlyAllFilteredUsed": "전체 선택 사항과 맞는 판정에만 효과가 적용됨",
                 "OnlyFilteredUsed": "최소 하나 이상의 선택 사항과 맞는 판정에만 효과가 적용됨",
                 "OnlyForItemTest": "상위 항목의 판정에만 영향",
@@ -2939,7 +3024,8 @@
                 "Force": "소환될 영혼의 강도",
                 "PreparedSpirit": "신규 영혼을 생성하는 대신 준비된 영혼을 사용",
                 "ReagentDrams": "소환 한계 수정에 사용된 시약 드램",
-                "SpiritType": "소환될 영혼의 유형"
+                "SpiritType": "소환될 영혼의 유형",
+                "OptionalPowerCount": "선택적 정령 능력의 수량 정보 (내림(포스 / 3))."
             },
             "Test": {
                 "BuyHits": "주사위를 굴리지 않습니다. ⌊주사위 풀 / 4⌋로 성공을 구매합니다.",
@@ -3089,7 +3175,8 @@
             "SkillCantBeDefault": "해당 기술은 무리한 시도를 할 수 없음",
             "SkillSetDefaultTypeOutsideCompendium": "설정된 기술 설정 컨펜디움에 포함된 기술 설정만 액터 생성에 영향을 줌",
             "SummoningNotConcluded": "소환이 완료되지 않았습니다. 드레인 결정을 위해 영혼 경쟁 판정이 완료되길 기다려야 합니다.",
-            "TokenSelectionNeeded": "하나 이상의 토큰이 선택되어야 함"
+            "TokenSelectionNeeded": "하나 이상의 토큰이 선택되어야 함",
+            "NoActorCreatePermission": "액터를 생성할 권한이 없습니다."
         },
         "Weapon": {
             "AmmoCount": "탄약 수량",
@@ -3293,7 +3380,11 @@
         "Wireless": "무선",
         "WirelessOffline": "오프라인",
         "WirelessOnline": "온라인",
-        "WirelessUnavailable": "이용 불가능"
+        "WirelessUnavailable": "이용 불가능",
+        "StatusEffects": {
+            "Running": "달리기",
+            "Sprinting": "전력 질주"
+        }
     },
     "TYPES": {
         "Actor": {
