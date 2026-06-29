@@ -858,6 +858,18 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
+     * UI-only render state for the test dialog's limit field.
+     * Shows infinity for ignored limits or an explicit no-limit (`0`) without changing roll rules.
+     */
+    get limitUsage(): { infinity: boolean; disabled: boolean } {
+        const applyLimit = game.settings.get(SYSTEM_NAME, FLAGS.ApplyLimits) as boolean;
+        return {
+            infinity: !this.hasLimit,
+            disabled: this.hasPushTheLimit || !applyLimit,
+        };
+    }
+
+    /**
      * Helper to determine if the hits have been lowered by the limit.
      *
      * This will compare actual roll hits, without applied limit.
@@ -871,6 +883,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     get threshold(): ValueFieldType {
         return this.data.threshold;
+    }
+
+    /**
+     * UI-only render state for the test dialog's threshold field.
+     * Shows a dash for explicit no-threshold (`0`) without changing roll rules.
+     */
+    get thresholdUsage(): { dash: boolean } {
+        return { dash: this.threshold.value <= 0 };
     }
 
     /**

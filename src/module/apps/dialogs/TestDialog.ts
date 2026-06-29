@@ -230,8 +230,13 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
             void this.render();
         });
 
-        html.find('.modifiable-value .form-fields input[type="number"]').on('keydown', ev => {
+        html.find('.modifiable-value .form-fields input[type="number"], .modifiable-value .form-fields input.limit-infinity, .modifiable-value .form-fields input.threshold-dash').on('keydown', ev => {
             if (ev.key === 'Enter') { ev.preventDefault(); ev.currentTarget.blur(); }
+        });
+
+        // Symbolic zero fields are pre-filled; select text so typing replaces the symbol.
+        html.find('input.limit-infinity:not([disabled]), input.threshold-dash:not([disabled])').on('focus', ev => {
+            (ev.currentTarget as HTMLInputElement).select();
         });
 
         html.find('.toggle-breakdown').on('click', event => {
@@ -377,7 +382,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
 
         const context = { test: this.test };
 
-        for (const [key, value] of [...enabledEntries, ...otherEntries]) {
+        for (const [key, rawValue] of [...enabledEntries, ...otherEntries]) {
             const changeMatch = changePathPattern.exec(key);
             if (changeMatch) {
                 const path = `test.data.${changeMatch[1]}`;
@@ -388,21 +393,31 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
                 if (!Number.isInteger(index) || !modValue.changes[index]) continue;
             }
 
+            let value = rawValue;
+            const symbolicZero = key === 'test.data.limit' ? '∞' : key === 'test.data.threshold' ? '-' : '';
+            if (symbolicZero) {
+                // Symbolic zero fields use text display but still submit numeric value changes.
+                if (rawValue === symbolicZero) value = 0;
+                else if (rawValue === '' || rawValue == null) value = null;
+                else if (!Number.isFinite(Number(rawValue))) continue;
+                else value = Number(rawValue);
+            }
+
             const valueField = foundry.utils.getProperty(context, key);
             if (!ModifiableValue.isModifiableValue(valueField)) {
                 foundry.utils.setProperty(context, key, value);
                 continue;
             }
 
-            // Don't apply an unneeded override.
-            if (valueField.value !== value) {
+            const numericValue = value as number | null;
+            if (numericValue == null) {
+                ModifiableValue.remove(valueField, 'SR5.ManualOverride');
+            } else if (valueField.value !== numericValue) {
                 ModifiableValue.addUnique(
-                    valueField,
-                    'SR5.ManualOverride',
-                    value as number | null,
+                    valueField, 'SR5.ManualOverride', numericValue,
                     { type: 'override', priority: ModifiableValue.TOP_PRIORITY }
                 );
-            } 
+            }
         }
 
         this.test.prepareBaseValues();
