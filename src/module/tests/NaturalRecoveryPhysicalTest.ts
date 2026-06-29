@@ -27,10 +27,13 @@ export class NaturalRecoveryPhysicalTest extends SuccessTest {
     prepareThreshold() {
         if (!this.actor) return;
 
+        const threshold = new ModifiableValue(this.threshold);
+        if (this.extendedRoll && threshold.get('SR5.PhysicalTrack') !== undefined) return;
+
         const track = this.actor.getPhysicalTrack();
         const boxes = track?.value || 0;
 
-        ModifiableValue.addUniqueBase(this.threshold, 'SR5.PhysicalTrack', boxes)
+        threshold.addUniqueBase('SR5.PhysicalTrack', boxes)
     }
 
     /**
