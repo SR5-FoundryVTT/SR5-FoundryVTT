@@ -3,6 +3,8 @@ import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { TestCreator } from "../module/tests/TestCreator";
 import { DataDefaults } from "@/module/data/DataDefaults";
 import { ModifiableValue } from "@/module/mods/ModifiableValue";
+import { TestDialog } from "../module/apps/dialogs/TestDialog";
+import { FLAGS, SYSTEM_NAME } from "../module/constants";
 
 export const shadowrunTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -86,6 +88,103 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             await test.evaluate();
 
             assert.strictEqual(test.pool.value, 10);
+        });
+
+        describe('limit usage UI state', () => {
+            const COMMON_PARTIAL = 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.hbs';
+
+            // Extract just the limit field's input element from the rendered dialog markup.
+            const renderLimitInput = async (test): Promise<string> => {
+                const html = await foundry.applications.handlebars.renderTemplate(
+                    COMMON_PARTIAL, { test, expandedPaths: [] } as any);
+                return html.match(/<input[^>]*name="test\.data\.limit"[^>]*>/)?.[0] ?? '';
+            };
+
+            it('renders an applied limit (>0) as a normal editable number', async () => {
+                const test = TestCreator.fromPool({ pool: 10, limit: 3 }, { showMessage: false, showDialog: false });
+                assert.deepEqual(test.limitUsage, { infinity: false, disabled: false });
+
+                const input = await renderLimitInput(test);
+                assert.include(input, 'type="number"');
+                assert.include(input, 'value="3"');
+                assert.notInclude(input, 'limit-infinity');
+                assert.notInclude(input, 'disabled');
+            });
+
+            it('renders a disabled infinity field when Push The Limit is active', async () => {
+                const test = TestCreator.fromPool({ pool: 10, limit: 3 }, { showMessage: false, showDialog: false });
+                test.data.pushTheLimit = true;
+                assert.deepEqual(test.limitUsage, { infinity: true, disabled: true, tooltip: 'SR5.Tooltips.Test.LimitIgnored' });
+
+                const input = await renderLimitInput(test);
+                assert.include(input, 'class="limit-infinity"');
+                assert.include(input, 'value="∞"');
+                assert.include(input, 'disabled');
+            });
+
+            it('renders a disabled infinity field when global limits are disabled', async () => {
+                const previous = game.settings.get(SYSTEM_NAME, FLAGS.ApplyLimits);
+                await game.settings.set(SYSTEM_NAME, FLAGS.ApplyLimits, false);
+                try {
+                    const test = TestCreator.fromPool({ pool: 10, limit: 3 }, { showMessage: false, showDialog: false });
+                    assert.deepEqual(test.limitUsage, { infinity: true, disabled: true, tooltip: 'SR5.Tooltips.Test.LimitIgnored' });
+
+                    const input = await renderLimitInput(test);
+                    assert.include(input, 'class="limit-infinity"');
+                    assert.include(input, 'value="∞"');
+                    assert.include(input, 'disabled');
+                } finally {
+                    await game.settings.set(SYSTEM_NAME, FLAGS.ApplyLimits, previous);
+                }
+            });
+
+            it('renders a literal 0 limit as an editable infinity field', async () => {
+                const test = TestCreator.fromPool({ pool: 10, limit: 0 }, { showMessage: false, showDialog: false });
+                assert.deepEqual(test.limitUsage, { infinity: true, disabled: false });
+
+                const input = await renderLimitInput(test);
+                assert.include(input, 'class="limit-infinity"');
+                assert.include(input, 'value="∞"');
+                assert.notInclude(input, 'disabled');
+            });
+
+            it('resets the limit to its computed value when the field is emptied', () => {
+                const test = TestCreator.fromPool({ pool: 10, limit: 4 }, { showMessage: false, showDialog: false });
+                const dialog = new TestDialog(test, [], {});
+
+                // Override the limit, then clear the field to revert back to the computed value.
+                dialog._updateData({ 'test.data.limit': '7' });
+                assert.strictEqual(test.limit.value, 7);
+
+                dialog._updateData({ 'test.data.limit': '' });
+                assert.strictEqual(test.limit.value, 4);
+            });
+
+            it('resets the limit when the infinity symbol is submitted', () => {
+                const test = TestCreator.fromPool({ pool: 10, limit: 4 }, { showMessage: false, showDialog: false });
+                const dialog = new TestDialog(test, [], {});
+
+                dialog._updateData({ 'test.data.limit': '7' });
+                dialog._updateData({ 'test.data.limit': '∞' });
+                assert.strictEqual(test.limit.value, 4);
+            });
+
+            it('keeps an explicit 0 limit and renders it as ∞', () => {
+                const test = TestCreator.fromPool({ pool: 10, limit: 4 }, { showMessage: false, showDialog: false });
+                const dialog = new TestDialog(test, [], {});
+
+                dialog._updateData({ 'test.data.limit': '0' });
+                assert.strictEqual(test.limit.value, 0);
+                assert.deepEqual(test.limitUsage, { infinity: true, disabled: false });
+            });
+
+            it('applies a numeric limit entry as an override', () => {
+                const test = TestCreator.fromPool({ pool: 10, limit: 0 }, { showMessage: false, showDialog: false });
+                const dialog = new TestDialog(test, [], {});
+
+                dialog._updateData({ 'test.data.limit': '5' });
+                assert.strictEqual(test.limit.value, 5);
+            });
         });
 
         it('marks manual-priority changes as manual modifiers', () => {

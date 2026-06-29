@@ -2955,6 +2955,7 @@
                 "BuyHits": "Do not roll dice. Buy hits using ⌊dice pool / 4⌋.",
                 "Extended": "Test will be thrown as an extended test until threshold is reached",
                 "Limit": "Calculated limit value",
+                "LimitIgnored": "Limit is currently ignored for this test",
                 "Modifier": "Sum of all modifiers applied to dice pool",
                 "Pool": "Amount of dice to roll",
                 "PushTheLimit": "Apply push the limit edge rules",

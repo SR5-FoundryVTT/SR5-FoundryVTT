@@ -232,8 +232,15 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
             void this.render();
         });
 
-        html.find('.modifiable-value .form-fields input[type="number"]').on('keydown', ev => {
+        html.find('.modifiable-value .form-fields input[type="number"], input.limit-infinity').on('keydown', ev => {
             if (ev.key === 'Enter') { ev.preventDefault(); ev.currentTarget.blur(); }
+        });
+
+        // The editable limit field is pre-filled with ∞; select it on focus so typing a number
+        // replaces the symbol instead of appending to it. Clearing it resets the limit, while
+        // entering 0 collapses back to ∞ on the next render.
+        html.find('input.limit-infinity:not([disabled])').on('focus', ev => {
+            (ev.currentTarget as HTMLInputElement).select();
         });
 
         html.find('.toggle-breakdown').on('click', event => {
@@ -390,6 +397,30 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
                 if (!Number.isInteger(index) || !modValue.changes[index]) continue;
             }
 
+            // The limit field renders ∞ when limits are effectively absent.
+            // - Emptying it (or leaving the ∞ symbol) resets the field: drop the manual override and
+            //   revert to the test's computed limit.
+            // - Entering 0 keeps an explicit 0, which renders as ∞ ("no limit").
+            if (key === 'test.data.limit') {
+                const limitField = foundry.utils.getProperty(context, key);
+                if (ModifiableValue.isModifiableValue(limitField)) {
+                    const numeric = Number(value);
+                    const reset = value === '' || value === null || value === undefined
+                        || value === '∞' || !Number.isFinite(numeric);
+                    if (reset) {
+                        ModifiableValue.remove(limitField, 'SR5.ManualOverride');
+                    } else if (limitField.value !== numeric) {
+                        ModifiableValue.addUnique(
+                            limitField,
+                            'SR5.ManualOverride',
+                            numeric,
+                            { mode: 'OVERRIDE', priority: ModifiableValue.TOP_PRIORITY }
+                        );
+                    }
+                    continue;
+                }
+            }
+
             const valueField = foundry.utils.getProperty(context, key);
             if (!ModifiableValue.isModifiableValue(valueField)) {
                 foundry.utils.setProperty(context, key, value);
@@ -404,7 +435,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
                     value as number | null,
                     { mode: 'OVERRIDE', priority: ModifiableValue.TOP_PRIORITY }
                 );
-            } 
+            }
         }
 
         this.test.prepareBaseValues();

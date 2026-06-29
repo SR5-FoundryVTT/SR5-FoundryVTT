@@ -22,7 +22,14 @@
         </span>
         {{/if}}
 
+        {{#if usage.infinity}}
+        <input type="text" name="{{path}}" value="∞" class="limit-infinity"
+            {{#if usage.disabled}}disabled{{/if}}
+            {{#if usage.tooltip}}data-tooltip="{{usage.tooltip}}"{{/if}}
+            size="3" maxlength="3"/>
+        {{else}}
         <input type="number" name="{{path}}" value="{{data.value}}" size="3" maxlength="3" data-dtype="Number"/>
+        {{/if}}
         <a class="toggle-breakdown" title="{{localize 'SR5.ToggleBreakdown'}}">
             <i class="fas fa-chevron-up"></i>
         </a>
