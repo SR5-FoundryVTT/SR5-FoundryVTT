@@ -868,27 +868,15 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
-     * UI-facing description of how the limit field should be rendered in the test dialog.
-     *
-     * This is derived purely from the existing limit mechanics and does NOT change any roll
-     * rules ({@link hasLimit}, {@link calculateHits}). It only tells the dialog template when
-     * a limit is effectively absent so it can render an infinity symbol instead of a number.
-     *
-     * - Hard no-limit (Push The Limit or the global ApplyLimits setting off): a disabled field
-     *   showing ∞.
-     * - Literal 0 limit: an editable field showing ∞, which can be erased or overwritten.
-     * - Otherwise: a normal editable number.
+     * UI-only render state for the test dialog's limit field.
+     * Shows infinity for ignored limits or an explicit no-limit (`0`) without changing roll rules.
      */
-    get limitUsage(): { infinity: boolean; disabled: boolean; tooltip?: Translation } {
+    get limitUsage(): { infinity: boolean; disabled: boolean } {
         const applyLimit = game.settings.get(SYSTEM_NAME, FLAGS.ApplyLimits) as boolean;
-        // Hard no-limit: disabled field showing ∞.
-        if (this.hasPushTheLimit || !applyLimit)
-            return { infinity: true, disabled: true, tooltip: 'SR5.Tooltips.Test.LimitIgnored' };
-        // Literal 0 limit: editable field showing ∞.
-        if (this.limit.value <= 0)
-            return { infinity: true, disabled: false };
-        // Normal applied limit.
-        return { infinity: false, disabled: false };
+        return {
+            infinity: !this.hasLimit,
+            disabled: this.hasPushTheLimit || !applyLimit,
+        };
     }
 
     /**

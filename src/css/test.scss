@@ -271,15 +271,13 @@
         margin-right: 4px;
       }
 
-      // Limit field rendered as an infinity symbol when limits are effectively absent.
-      // Keep the symbol centered, enlarged and in normal text color even while disabled.
+      // Enlarged only when disabled; editable variant must match the number inputs.
       input.limit-infinity {
-        text-align: center;
-        font-size: 1.4em;
-        line-height: 1;
         color: var(--sr5v2-control-text);
 
         &:disabled {
+          font-size: 1.4em;
+          line-height: 1;
           color: var(--sr5v2-control-text);
           opacity: 1;
         }

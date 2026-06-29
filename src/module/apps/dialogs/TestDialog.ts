@@ -232,13 +232,12 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
             void this.render();
         });
 
-        html.find('.modifiable-value .form-fields input[type="number"], input.limit-infinity').on('keydown', ev => {
+        html.find('.modifiable-value .form-fields input[type="number"], .modifiable-value .form-fields input.limit-infinity').on('keydown', ev => {
             if (ev.key === 'Enter') { ev.preventDefault(); ev.currentTarget.blur(); }
         });
 
         // The editable limit field is pre-filled with ∞; select it on focus so typing a number
-        // replaces the symbol instead of appending to it. Clearing it resets the limit, while
-        // entering 0 collapses back to ∞ on the next render.
+        // replaces the symbol instead of appending to it.
         html.find('input.limit-infinity:not([disabled])').on('focus', ev => {
             (ev.currentTarget as HTMLInputElement).select();
         });
@@ -386,7 +385,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
 
         const context = { test: this.test };
 
-        for (const [key, value] of [...enabledEntries, ...otherEntries]) {
+        for (const [key, rawValue] of [...enabledEntries, ...otherEntries]) {
             const changeMatch = changePathPattern.exec(key);
             if (changeMatch) {
                 const path = `test.data.${changeMatch[1]}`;
@@ -397,28 +396,14 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
                 if (!Number.isInteger(index) || !modValue.changes[index]) continue;
             }
 
-            // The limit field renders ∞ when limits are effectively absent.
-            // - Emptying it (or leaving the ∞ symbol) resets the field: drop the manual override and
-            //   revert to the test's computed limit.
-            // - Entering 0 keeps an explicit 0, which renders as ∞ ("no limit").
+            // The limit field is a text input showing ∞; normalize it to the numeric contract
+            // used by the other value fields (∞ ⇒ explicit 0, empty ⇒ clear override).
+            let value = rawValue;
             if (key === 'test.data.limit') {
-                const limitField = foundry.utils.getProperty(context, key);
-                if (ModifiableValue.isModifiableValue(limitField)) {
-                    const numeric = Number(value);
-                    const reset = value === '' || value === null || value === undefined
-                        || value === '∞' || !Number.isFinite(numeric);
-                    if (reset) {
-                        ModifiableValue.remove(limitField, 'SR5.ManualOverride');
-                    } else if (limitField.value !== numeric) {
-                        ModifiableValue.addUnique(
-                            limitField,
-                            'SR5.ManualOverride',
-                            numeric,
-                            { mode: 'OVERRIDE', priority: ModifiableValue.TOP_PRIORITY }
-                        );
-                    }
-                    continue;
-                }
+                if (rawValue === '∞') value = 0;
+                else if (rawValue === '' || rawValue == null) value = null;
+                else if (!Number.isFinite(Number(rawValue))) continue;
+                else value = Number(rawValue);
             }
 
             const valueField = foundry.utils.getProperty(context, key);
@@ -427,12 +412,12 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
                 continue;
             }
 
-            // Don't apply an unneeded override.
-            if (valueField.value !== value) {
+            const numericValue = value as number | null;
+            if (numericValue == null) {
+                ModifiableValue.remove(valueField, 'SR5.ManualOverride');
+            } else if (valueField.value !== numericValue) {
                 ModifiableValue.addUnique(
-                    valueField,
-                    'SR5.ManualOverride',
-                    value as number | null,
+                    valueField, 'SR5.ManualOverride', numericValue,
                     { mode: 'OVERRIDE', priority: ModifiableValue.TOP_PRIORITY }
                 );
             }

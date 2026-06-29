@@ -23,10 +23,8 @@
         {{/if}}
 
         {{#if usage.infinity}}
-        <input type="text" name="{{path}}" value="∞" class="limit-infinity"
-            {{#if usage.disabled}}disabled{{/if}}
-            {{#if usage.tooltip}}data-tooltip="{{usage.tooltip}}"{{/if}}
-            size="3" maxlength="3"/>
+        <input type="text" name="{{path}}" value="∞" class="limit-infinity" size="3" maxlength="3"
+            {{#if usage.disabled}}disabled data-tooltip="SR5.Tooltips.Test.LimitIgnored"{{/if}}/>
         {{else}}
         <input type="number" name="{{path}}" value="{{data.value}}" size="3" maxlength="3" data-dtype="Number"/>
         {{/if}}
