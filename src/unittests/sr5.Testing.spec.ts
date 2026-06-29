@@ -97,7 +97,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             const renderLimitInput = async (test): Promise<string> => {
                 const html = await foundry.applications.handlebars.renderTemplate(
                     COMMON_PARTIAL, { test, expandedPaths: [] } as any);
-                return html.match(/<input[^>]*name="test\.data\.limit"[^>]*>/)?.[0] ?? '';
+                return (/<input[^>]*name="test\.data\.limit"[^>]*>/.exec(html))?.[0] ?? '';
             };
             const manualLimitOverride = (test) =>
                 test.limit.changes.find(change => change.name === 'SR5.ManualOverride');
