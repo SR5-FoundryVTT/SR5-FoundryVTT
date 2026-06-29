@@ -210,6 +210,87 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             });
         });
 
+        describe('threshold usage UI state', () => {
+            const COMMON_PARTIAL = 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.hbs';
+
+            const renderThresholdInput = async (test): Promise<string> => {
+                const html = await foundry.applications.handlebars.renderTemplate(
+                    COMMON_PARTIAL, { test, expandedPaths: [] } as any);
+                return (/<input[^>]*name="test\.data\.threshold"[^>]*>/.exec(html))?.[0] ?? '';
+            };
+            const manualThresholdOverride = (test) =>
+                test.threshold.changes.find(change => change.name === 'SR5.ManualOverride');
+
+            it('renders an applied threshold (>0) as a normal editable number', async () => {
+                const test = TestCreator.fromPool({ pool: 10, threshold: 3 }, { showMessage: false, showDialog: false });
+                assert.deepEqual(test.thresholdUsage, { dash: false });
+
+                const input = await renderThresholdInput(test);
+                assert.include(input, 'type="number"');
+                assert.include(input, 'value="3"');
+                assert.notInclude(input, 'threshold-dash');
+                assert.notInclude(input, 'disabled');
+            });
+
+            it('renders a literal 0 threshold as an editable dash field', async () => {
+                const test = TestCreator.fromPool({ pool: 10, threshold: 0 }, { showMessage: false, showDialog: false });
+                assert.deepEqual(test.thresholdUsage, { dash: true });
+
+                const input = await renderThresholdInput(test);
+                assert.include(input, 'class="threshold-dash"');
+                assert.include(input, 'value="-"');
+                assert.notInclude(input, 'disabled');
+            });
+
+            it('resets the threshold to its computed value when the field is emptied', () => {
+                const test = TestCreator.fromPool({ pool: 10, threshold: 4 }, { showMessage: false, showDialog: false });
+                const dialog = new TestDialog(test, [], {});
+
+                dialog._updateData({ 'test.data.threshold': '7' });
+                assert.strictEqual(test.threshold.value, 7);
+
+                dialog._updateData({ 'test.data.threshold': '' });
+                assert.strictEqual(test.threshold.value, 4);
+                assert.isUndefined(manualThresholdOverride(test));
+            });
+
+            it('submits the dash as an explicit 0 threshold', () => {
+                const test = TestCreator.fromPool({ pool: 10, threshold: 4 }, { showMessage: false, showDialog: false });
+                const dialog = new TestDialog(test, [], {});
+
+                dialog._updateData({ 'test.data.threshold': '7' });
+                dialog._updateData({ 'test.data.threshold': '-' });
+                assert.strictEqual(test.threshold.value, 0);
+                assert.strictEqual(manualThresholdOverride(test)?.value, 0);
+            });
+
+            it('keeps an explicit 0 threshold and renders it as a dash', async () => {
+                const test = TestCreator.fromPool({ pool: 10, threshold: 4 }, { showMessage: false, showDialog: false });
+                const dialog = new TestDialog(test, [], {});
+
+                dialog._updateData({ 'test.data.threshold': '0' });
+                assert.strictEqual(test.threshold.value, 0);
+                assert.strictEqual(manualThresholdOverride(test)?.value, 0);
+                assert.deepEqual(test.thresholdUsage, { dash: true });
+
+                const input = await renderThresholdInput(test);
+                assert.include(input, 'class="threshold-dash"');
+                assert.include(input, 'value="-"');
+            });
+
+            it('ignores invalid non-empty threshold text', () => {
+                const test = TestCreator.fromPool({ pool: 10, threshold: 4 }, { showMessage: false, showDialog: false });
+                const dialog = new TestDialog(test, [], {});
+
+                dialog._updateData({ 'test.data.threshold': '6' });
+                assert.strictEqual(test.threshold.value, 6);
+
+                dialog._updateData({ 'test.data.threshold': 'not a number' });
+                assert.strictEqual(test.threshold.value, 6);
+                assert.strictEqual(manualThresholdOverride(test)?.value, 6);
+            });
+        });
+
         it('marks manual-priority changes as manual modifiers', () => {
             const valueField = DataDefaults.createData('value_field', {
                 label: 'SR5.DicePool',

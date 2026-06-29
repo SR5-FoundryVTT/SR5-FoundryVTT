@@ -25,6 +25,8 @@
         {{#if usage.infinity}}
         <input type="text" name="{{path}}" value="∞" class="limit-infinity" size="3" maxlength="3"
             {{#if usage.disabled}}disabled data-tooltip="SR5.Tooltips.Test.LimitIgnored"{{/if}}/>
+        {{else if usage.dash}}
+        <input type="text" name="{{path}}" value="-" class="threshold-dash" size="3" maxlength="3"/>
         {{else}}
         <input type="number" name="{{path}}" value="{{data.value}}" size="3" maxlength="3" data-dtype="Number"/>
         {{/if}}

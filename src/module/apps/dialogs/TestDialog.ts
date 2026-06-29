@@ -232,13 +232,12 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
             void this.render();
         });
 
-        html.find('.modifiable-value .form-fields input[type="number"], .modifiable-value .form-fields input.limit-infinity').on('keydown', ev => {
+        html.find('.modifiable-value .form-fields input[type="number"], .modifiable-value .form-fields input.limit-infinity, .modifiable-value .form-fields input.threshold-dash').on('keydown', ev => {
             if (ev.key === 'Enter') { ev.preventDefault(); ev.currentTarget.blur(); }
         });
 
-        // The editable limit field is pre-filled with ∞; select it on focus so typing a number
-        // replaces the symbol instead of appending to it.
-        html.find('input.limit-infinity:not([disabled])').on('focus', ev => {
+        // Symbolic zero fields are pre-filled; select text so typing replaces the symbol.
+        html.find('input.limit-infinity:not([disabled]), input.threshold-dash:not([disabled])').on('focus', ev => {
             (ev.currentTarget as HTMLInputElement).select();
         });
 
@@ -396,11 +395,11 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
                 if (!Number.isInteger(index) || !modValue.changes[index]) continue;
             }
 
-            // The limit field is a text input showing ∞; normalize it to the numeric contract
-            // used by the other value fields (∞ ⇒ explicit 0, empty ⇒ clear override).
             let value = rawValue;
-            if (key === 'test.data.limit') {
-                if (rawValue === '∞') value = 0;
+            const symbolicZero = key === 'test.data.limit' ? '∞' : key === 'test.data.threshold' ? '-' : '';
+            if (symbolicZero) {
+                // Symbolic zero fields use text display but still submit numeric value changes.
+                if (rawValue === symbolicZero) value = 0;
                 else if (rawValue === '' || rawValue == null) value = null;
                 else if (!Number.isFinite(Number(rawValue))) continue;
                 else value = Number(rawValue);

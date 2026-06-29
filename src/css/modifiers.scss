@@ -157,7 +157,8 @@
         }
 
         input[type="number"],
-        input.limit-infinity {
+        input.limit-infinity,
+        input.threshold-dash {
             height: 25px;
             width: 50px;
             max-width: 50px;

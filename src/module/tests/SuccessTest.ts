@@ -896,6 +896,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     }
 
     /**
+     * UI-only render state for the test dialog's threshold field.
+     * Shows a dash for explicit no-threshold (`0`) without changing roll rules.
+     */
+    get thresholdUsage(): { dash: boolean } {
+        return { dash: this.threshold.value <= 0 };
+    }
+
+    /**
      * Helper to determine if this success test uses a threshold.
      */
     get hasThreshold(): boolean {
