@@ -19,7 +19,7 @@
         "events": "^3.3.0",
         "fs-extra": "^11.3.5",
         "fuse.js": "^7.4.2",
-        "fvtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main",
+        "fvtt-types": "github:BM123499/foundry-vtt-types#SR5_Types",
         "globals": "^17.6.0",
         "gulp": "^5.0.1",
         "gulp-sass": "^6.0.1",

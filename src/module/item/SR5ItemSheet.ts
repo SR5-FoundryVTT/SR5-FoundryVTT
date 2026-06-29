@@ -38,7 +38,7 @@ export interface SR5BaseItemSheetData extends ItemSheet.RenderContext, SR5Applic
     itemEffects: SR5ActiveEffect[];
 
     // FoundryVTT rollmodes
-    rollModes: CONFIG.ChatMessage.modes;
+    rollModes: typeof CONFIG.ChatMessage.modes;
 
     // Document references
     actor?: SR5Actor;
@@ -472,8 +472,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             }
         }
 
-        // TODO: fvtt-types - type CONFIG.ChatMessage.modes upstream once available
-        data.rollModes = (CONFIG.ChatMessage as unknown as { modes: CONFIG.ChatMessage.modes }).modes;
+        data.rollModes = CONFIG.ChatMessage.modes;
 
         data.item = this.item;
 

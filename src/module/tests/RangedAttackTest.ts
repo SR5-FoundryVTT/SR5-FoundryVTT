@@ -5,7 +5,8 @@ import { DamageType } from '../types/item/Action';
 import { DataDefaults } from "../data/DataDefaults";
 import { FireModeRules } from "../rules/FireModeRules";
 import { FireModeType } from '../types/flags/ItemFlags';
-import { SuccessTest, SuccessTestData } from "./SuccessTest";
+import { SuccessTest, SuccessTestData, TestOptions } from "./SuccessTest";
+import { DeepPartial } from "fvtt-types/utils";
 import { TestDialogLike } from '../apps/dialogs/TestDialog';
 import { RangesTemplateType, TargetRangeTemplateType } from '../types/template/Weapon';
 import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
@@ -29,14 +30,14 @@ export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDa
 export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
     declare item: SR5Item;
 
-    override _prepareData(data, options): RangedAttackTestData {
-        data = super._prepareData(data, options);
+    override _prepareData(data: DeepPartial<RangedAttackTestData>, options: Partial<TestOptions>): RangedAttackTestData {
+        const prepared: DeepPartial<RangedAttackTestData> = super._prepareData(data, options);
 
-        data.fireModes = [];
-        data.fireMode = {value: 0, defense: 0, label: ''};
-        WeaponRangeTestBehavior.prepareData(this, data);
+        prepared.fireModes = [];
+        prepared.fireMode = {value: 0, defense: 0, label: ''};
+        WeaponRangeTestBehavior.prepareData(this, prepared);
 
-        return data;
+        return prepared as RangedAttackTestData;
     }
 
     override _testDialogListeners() {
@@ -154,7 +155,6 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
 
     /**
      * Save selections made back to documents.
-     * @returns 
      */
     override async saveUserSelectionAfterDialog() {
         if (!this.actor) return;
@@ -167,7 +167,6 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
 
     /**
      * Apply test selections made by user in dialog.
-     * @returns 
      */
     override prepareBaseValues() {
         if (!this.actor) return;
@@ -224,7 +223,6 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
 
     /**
      * Ranged Attacks not only can consume edge but also reduce ammunition.
-     * 
      */
     override async consumeDocumentRessources() {        
         if (!await super.consumeDocumentRessources()) return false;

@@ -217,7 +217,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     override applyActiveEffects(...args) {
         // Errors during change application will stop that process and cause a broken sheet.
         try {
-            // @ts-expect-error TODO: fvtt - v14 - typing is missing
             super.applyActiveEffects(...args);
         } catch (error) {
             console.error(`Shadowrun5e | Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.id})`);
@@ -907,7 +906,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const rating = this.system.matrix?.rating || 0;
 
         const showDialog = this.tests.shouldShowDialog(options?.event);
-        const testCls = this.tests._getTestClass('SuccessTest') as typeof SuccessTest;
+        const testCls = this.tests._getTestClass('SuccessTest')!;
         const test = new testCls(TestCreator._minimalTestData(), { actor: this }, { showDialog });
 
         // Build pool values.
