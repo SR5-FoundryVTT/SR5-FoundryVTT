@@ -92,7 +92,7 @@ export const MarksStorage = {
     getMarksRelations(uuid: string): string[] {
         const uuidForStorage = Helpers.uuidForStorage(uuid);
         const marksStorage = MarksStorage.getStorage();
-        return marksStorage[`${MarksStorage.key}.${uuidForStorage}`] ?? [];
+        return marksStorage[uuidForStorage] ?? [];
     },
 
     /**
@@ -103,9 +103,17 @@ export const MarksStorage = {
      */
     async storeRelations(uuid: string, marksData: MatrixMarksType) {
         const uuidForStorage = Helpers.uuidForStorage(uuid);
-        const key = `${MarksStorage.key}.${uuidForStorage}`;
         const marks = marksData.map(({uuid}) => uuid);
-        await DataStorage.set(key, marks);
+
+        if (marks.length === 0) {
+            const storage = MarksStorage.getStorage();
+            delete storage[uuidForStorage];
+            await DataStorage.set(MarksStorage.key, storage);
+        } else {
+            const key = `${MarksStorage.key}.${uuidForStorage}`;
+            await DataStorage.set(key, marks);
+        }
+
         await MarksStorage.cleanupOrphanedRelations();
     },
 
@@ -144,7 +152,12 @@ export const MarksStorage = {
             // if we don't include the id, skip this object
             if (!markRelations.includes(uuid)) continue;
             changed = true;
-            storage[uuidForStorage] = markRelations.filter(markedUuid => markedUuid !== uuid);
+            const updatedRelations = markRelations.filter(markedUuid => markedUuid !== uuid);
+            if (updatedRelations.length === 0) {
+                delete storage[uuidForStorage];
+            } else {
+                storage[uuidForStorage] = updatedRelations;
+            }
 
             // Update lokal marks placed on the main uuid.
             const document = fromUuidSync(Helpers.uuidFromStorage(uuidForStorage)) as SR5Actor | SR5Item;
