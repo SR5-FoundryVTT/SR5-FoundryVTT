@@ -1783,7 +1783,8 @@
             "Item": {
                 "AvailabilityAdjustment": "등급별 희귀도 비례 적용",
                 "CostAdjustment": "등급별 가격 비례 적용",
-                "EssenceAdjustment": "등급별 에센스 비례 적용"
+                "EssenceAdjustment": "등급별 에센스 비례 적용",
+                "Properties": "아이템 속성"
             },
             "MarkPlacement": {
                 "PlaceOnDevice": "장치에 배치",

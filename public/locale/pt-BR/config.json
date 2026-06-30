@@ -842,6 +842,9 @@
                 "Carried": "Carregado",
                 "OpenInventory": "Inventário"
             },
+            "Item": {
+                "Properties": "Propriedades do item"
+            },
             "Message": {
                 "ClickToSelect": "Clique para selecionar na cena",
                 "TestEffects": "Efeitos aplicados"

@@ -1784,7 +1784,8 @@
             "Item": {
                 "AvailabilityAdjustment": "Skaliere Verfügbarkeit mit Stufe",
                 "CostAdjustment": "Skaliere Kosten mit Stufe",
-                "EssenceAdjustment": "Skaliere Essenz mit Stufe"
+                "EssenceAdjustment": "Skaliere Essenz mit Stufe",
+                "Properties": "Gegenstandseigenschaften"
             },
             "MarkPlacement": {
                 "PlaceOnDevice": "Platziere auf Gerät",

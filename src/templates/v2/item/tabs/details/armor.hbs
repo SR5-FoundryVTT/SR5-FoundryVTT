@@ -1,0 +1,56 @@
+<div class="list-item list-item-header">
+    <div class="list-item-start skinny">
+        <label>{{localize "SR5.ItemTypes.Armor"}}</label>
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.armor.fields.value.hint}}">{{systemFields.armor.fields.value.label}}</label>
+    </div>
+    <div class="list-item-col">
+        <span>
+            <label data-tooltip="{{systemFields.armor.fields.is_hardened.hint}}">
+                {{systemFields.armor.fields.is_hardened.label}}&nbsp;{{formInput systemFields.armor.fields.is_hardened value=source.system.armor.is_hardened
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            </label>
+        </span>
+        <span>
+            <label data-tooltip="{{systemFields.armor.fields.accessory.hint}}">
+                {{systemFields.armor.fields.accessory.label}}&nbsp;{{formInput systemFields.armor.fields.accessory value=source.system.armor.accessory
+                                                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            </label>
+        </span>
+        <span>
+            {{formInput systemFields.armor.fields.base value=source.system.armor.base
+                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+        </span>
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start">
+        <label>{{localize "SR5.Armor.Resistances"}}</label>
+    </div>
+    <div class="list-item-col select-col">
+        <div class="armor-resistance-row">
+            {{#each config.armorElementTypes as |elementLabel element_id|}}
+                <label class="armor-resistance-field" data-tooltip="{{localize (objValue @root.config.armorElementHints element_id)}}">
+                    {{localize (objValue @root.config.elementTypes element_id)}}
+                    {{formInput (objValue (objValue (objValue @root.systemFields.armor.fields.elements.fields element_id) "fields") "base")
+                                value=(objValue (objValue @root.system.armor.elements element_id) "base")
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </label>
+            {{/each}}
+        </div>
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.armor.fields.immunities.hint}}">
+            {{systemFields.armor.fields.immunities.label}}
+        </label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.armor.fields.immunities.fields.base value=source.system.armor.immunities.base options=config.armorImmunityTypes
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>

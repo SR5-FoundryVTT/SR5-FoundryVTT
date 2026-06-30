@@ -562,6 +562,9 @@
                 "SpritePowers": "Pouvoirs",
                 "VehicleConfiguration": "Configuration véhicule"
             },
+            "Item": {
+                "Properties": "Propriétés de l'objet"
+            },
             "Sheet": {
                 "RemoveImprovisedDevices": "Supprimer les appareils improvisés"
             }

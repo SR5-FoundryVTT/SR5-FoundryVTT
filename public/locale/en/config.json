@@ -1783,7 +1783,8 @@
             "Item": {
                 "AvailabilityAdjustment": "Scale Availability w/ Rating",
                 "CostAdjustment": "Scale Cost w/ Rating",
-                "EssenceAdjustment": "Scale Essence w/ Rating"
+                "EssenceAdjustment": "Scale Essence w/ Rating",
+                "Properties": "Item Properties"
             },
             "MarkPlacement": {
                 "PlaceOnDevice": "Place on device",

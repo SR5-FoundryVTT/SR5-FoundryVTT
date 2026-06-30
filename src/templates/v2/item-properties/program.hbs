@@ -1,1 +1,3 @@
-<label>{{localizeOb item.system.type @root.config.programTypes}}</label>
+{{#unless (empty item.system.type)}}
+    <label>{{localizeOb item.system.type @root.config.programTypes}}</label>
+{{/unless}}

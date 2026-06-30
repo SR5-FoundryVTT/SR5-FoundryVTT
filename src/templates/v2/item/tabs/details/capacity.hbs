@@ -1,0 +1,13 @@
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.capacity.label}}">{{systemFields.capacity.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{#if @root.isEditMode}}
+            {{formInput systemFields.capacity.fields.total value=source.system.capacity.total
+                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+        {{else}}
+            <label>{{system.capacity.used}} / {{system.capacity.total}}</label>
+        {{/if}}
+    </div>
+</div>
