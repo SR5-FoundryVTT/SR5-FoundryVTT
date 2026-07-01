@@ -81,7 +81,7 @@
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/armor.hbs"}}
             {{/if}}
 
-            {{#if (and systemFields.technology (not (isType item 'bioware' 'cyberware')))}}
+            {{#if systemFields.technology}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/technology.hbs"}}
             {{/if}}
 
