@@ -9,12 +9,8 @@
         <label data-tooltip="{{systemFields.grade.hint}}">{{systemFields.grade.label}}</label>
     </div>
     <div class="list-item-col">
-        {{#if @root.isEditMode}}
-            {{formInput systemFields.grade value=source.system.grade localize=true
-                        classes="short thicc" rootId=@root.rootId disabled=@root.isPlayMode}}
-        {{else if system.grade}}
-            <label>{{localizeOb system.grade @root.config.cyberwareGrades}}</label>
-        {{/if}}
+        {{formInput systemFields.grade value=source.system.grade localize=true
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
     </div>
 </div>
 
@@ -26,8 +22,9 @@
         {{#if @root.isEditMode}}
             {{formInput systemFields.essence value=source.system.essence classes="short"
                         rootId=@root.rootId disabled=@root.isPlayMode}}
-        {{else if system.technology.calculated.essence.value}}
-            <label>{{floatValue system.technology.calculated.essence.value 2}}</label>
+        {{else}}
+            {{formInput systemFields.essence value=system.technology.calculated.essence.value classes="short"
+                        rootId=@root.rootId disabled=true}}
         {{/if}}
     </div>
 </div>
