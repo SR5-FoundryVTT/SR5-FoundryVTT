@@ -77,12 +77,12 @@
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/sprite_power.hbs"}}
             {{/if}}
 
-            {{#if (and systemFields.armor systemFields.technology)}}
-                {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/armor.hbs"}}
-            {{/if}}
-
             {{#if systemFields.technology}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/technology.hbs"}}
+            {{/if}}
+
+            {{#if (and systemFields.armor systemFields.technology)}}
+                {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/armor.hbs"}}
             {{/if}}
 
             {{#if (and systemFields.capacity systemFields.technology)}}
