@@ -60,12 +60,6 @@
         </div>
         <div class="list-item-col">
             {{#unless (and system.action.attribute2 (not system.action.skill))}}
-                {{#if system.action.skill}}
-                    <a {{#if @root.isEditMode}} data-action="toggleActionSpecialization" {{else}} disabled {{/if}} data-tooltip="{{systemFields.action.fields.spec.label}}:&nbsp;{{systemFields.action.fields.spec.hint}}">
-                        <i style="font-size: 1.1rem" {{#if system.action.spec}} class="fas fa-circle-star" {{else}} class="fa-light fa-circle-star" {{/if}}></i>
-                    </a>
-                    <label>+</label>
-                {{/if}}
                 {{formInput systemFields.action.fields.skill value=source.system.action.skill options=(config2Array activeSkills) localize=true
                             classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                 <label>+</label>
@@ -80,15 +74,17 @@
             <label>+</label>
             {{formInput systemFields.action.fields.mod value=source.system.action.mod
                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-            <label>+</label>
-            <a style="font-size: 1.1rem" data-tooltip="{{systemFields.action.fields.armor.label}}:&nbsp;{{systemFields.action.fields.armor.hint}}"
-                {{#if @root.isEditMode}} data-action="toggleActionArmor" {{else}} disabled {{/if}}>
-                {{#if system.action.armor}}
-                    <i class="fas fa-shield"></i>
-                {{else}}
-                    <i class="far fa-shield"></i>
-                {{/if}}
-            </a>
+        </div>
+    </div>
+    <div class="list-item">
+        <div class="list-item-start skinny">
+            <label>{{localize "SR5.Options"}}</label>
+        </div>
+        <div class="list-item-col select-col options-col">
+            {{systemFields.action.fields.spec.label}}&nbsp;
+            {{formInput systemFields.action.fields.spec value=source.system.action.spec rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{localize "SR5.Add"}} {{systemFields.action.fields.armor.label}}&nbsp;
+            {{formInput systemFields.action.fields.armor value=source.system.action.armor rootId=@root.rootId disabled=@root.isPlayMode}}
         </div>
     </div>
     <div class="list-item">
@@ -270,15 +266,15 @@
             <label>+</label>
             {{formInput systemFields.action.fields.opposed.fields.mod value=source.system.action.opposed.mod
                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-            <label>+</label>
-            <a style="font-size: 1.1rem" data-tooltip="{{systemFields.action.fields.opposed.fields.armor.label}}:&nbsp;{{systemFields.action.fields.opposed.fields.armor.hint}}"
-                {{#if @root.isEditMode}} data-action="toggleOpposedArmor" {{else}} disabled {{/if}}>
-                {{#if system.action.opposed.armor}}
-                    <i class="fas fa-shield"></i>
-                {{else}}
-                    <i class="far fa-shield"></i>
-                {{/if}}
-            </a>
+        </div>
+    </div>
+    <div class="list-item">
+        <div class="list-item-start skinny">
+            <label>{{localize "SR5.Options"}}</label>
+        </div>
+        <div class="list-item-col select-col options-col">
+            {{localize "SR5.Add"}} {{systemFields.action.fields.opposed.fields.armor.label}}&nbsp;{{formInput systemFields.action.fields.opposed.fields.armor value=source.system.action.opposed.armor
+                        rootId=@root.rootId disabled=@root.isPlayMode}}
         </div>
     </div>
 {{/if}}
@@ -315,15 +311,15 @@
                         value=source.system.action.opposed.resist.attribute2
                         options=(config2Array attributes) localize=true
                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-            <label>+</label>
-            <a style="font-size: 1.1rem" data-tooltip="{{systemFields.action.fields.opposed.fields.resist.fields.armor.label}}:&nbsp;{{systemFields.action.fields.opposed.fields.resist.fields.armor.hint}}"
-                {{#if @root.isEditMode}} data-action="toggleResistArmor" {{else}} disabled {{/if}}>
-                {{#if system.action.opposed.resist.armor}}
-                    <i class="fas fa-shield"></i>
-                {{else}}
-                    <i class="far fa-shield"></i>
-                {{/if}}
-            </a>
+        </div>
+    </div>
+    <div class="list-item">
+        <div class="list-item-start skinny">
+            <label>{{localize "SR5.Options"}}</label>
+        </div>
+        <div class="list-item-col select-col options-col">
+            {{localize "SR5.Add"}} {{systemFields.action.fields.opposed.fields.resist.fields.armor.label}}&nbsp;{{formInput systemFields.action.fields.opposed.fields.resist.fields.armor value=source.system.action.opposed.resist.armor
+                        rootId=@root.rootId disabled=@root.isPlayMode}}
         </div>
     </div>
 {{/if}}

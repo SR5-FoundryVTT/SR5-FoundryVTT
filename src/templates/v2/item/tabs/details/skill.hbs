@@ -157,15 +157,15 @@
                 <label>+</label>
                 {{formInput systemFields.skill.fields.action.fields.opposed.fields.mod value=source.system.skill.action.opposed.mod
                             classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-                <label>+</label>
-                <a style="font-size: 1.1rem" data-tooltip="{{systemFields.skill.fields.action.fields.opposed.fields.armor.label}}:&nbsp;{{systemFields.skill.fields.action.fields.opposed.fields.armor.hint}}"
-                    {{#if @root.isEditMode}} data-action="toggleOpposedArmor" {{else}} disabled {{/if}} >
-                    {{#if system.skill.action.opposed.armor}}
-                        <i class="fas fa-shield"></i>
-                    {{else}}
-                        <i class="far fa-shield"></i>
-                    {{/if}}
-                </a>
+            </div>
+        </div>
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label>{{localize "SR5.Options"}}</label>
+            </div>
+            <div class="list-item-col select-col options-col">
+                {{localize "SR5.Add"}} {{localize "SR5.Armor.label"}}&nbsp;{{formInput systemFields.skill.fields.action.fields.opposed.fields.armor value=source.system.skill.action.opposed.armor
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
             </div>
         </div>
 

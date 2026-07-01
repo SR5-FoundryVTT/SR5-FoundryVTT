@@ -2134,6 +2134,7 @@
         "OpposedType": "유형",
         "OpposingHits": "경쟁 성공횟수",
         "OpposingNetHits": "경쟁 순 성공",
+        "Options": "옵션",
         "OriginalDicePool": "기존 주사위 풀",
         "OutOfRange": "사거리 밖",
         "Overflow": "치명상",
