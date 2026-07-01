@@ -11,24 +11,24 @@
 </div>
 <div class="list-item">
     <div class="list-item-start skinny">
-        <label data-tooltip="{{systemFields.action.fields.test.hint}}">{{systemFields.action.fields.test.label}}</label>
+        <label data-tooltip="{{systemFields.action.fields.type.hint}}">{{systemFields.action.fields.type.label}}</label>
     </div>
     <div class="list-item-col">
-        {{formInput systemFields.action.fields.test value=source.system.action.test options=(tests2Array activeTests)
-                    classes="short" rootId=@root.rootId disabled=true}}
+        {{formInput systemFields.action.fields.type value=source.system.action.type localize=true
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
     </div>
 </div>
-{{#if system.action.test}}
+{{#if system.action.type}}
     <div class="list-item">
         <div class="list-item-start skinny">
-            <label data-tooltip="{{systemFields.action.fields.type.hint}}">{{systemFields.action.fields.type.label}}</label>
+            <label data-tooltip="{{systemFields.action.fields.test.hint}}">{{systemFields.action.fields.test.label}}</label>
         </div>
         <div class="list-item-col">
-            {{formInput systemFields.action.fields.type value=source.system.action.type localize=true
-                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-            <label style="text-wrap: nowrap;">
-                {{localize "SR5.ExtendedTest"}}&nbsp;{{formInput systemFields.action.fields.extended value=source.system.action.extended
-                                                                 rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{formInput systemFields.action.fields.test value=source.system.action.test options=(tests2Array activeTests)
+                        classes="short" rootId=@root.rootId disabled=true}}
+            <label class="basic-row" style="margin-left: auto" data-tooltip="SR5.Tooltips.Test.Extended">
+                {{localize "SR5.Extended"}}&nbsp;{{formInput systemFields.action.fields.extended value=source.system.action.extended
+                             rootId=@root.rootId disabled=@root.isPlayMode}}
             </label>
         </div>
     </div>
