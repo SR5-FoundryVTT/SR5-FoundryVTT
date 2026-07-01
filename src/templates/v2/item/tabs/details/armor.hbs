@@ -9,20 +9,18 @@
     </div>
     <div class="list-item-col">
         <span>
+            {{formInput systemFields.armor.fields.base value=source.system.armor.base
+                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+        </span>
+        <span class="basic-row" style="margin-left: auto">
             <label data-tooltip="{{systemFields.armor.fields.is_hardened.hint}}">
                 {{systemFields.armor.fields.is_hardened.label}}&nbsp;{{formInput systemFields.armor.fields.is_hardened value=source.system.armor.is_hardened
                                 classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
             </label>
-        </span>
-        <span>
             <label data-tooltip="{{systemFields.armor.fields.accessory.hint}}">
                 {{systemFields.armor.fields.accessory.label}}&nbsp;{{formInput systemFields.armor.fields.accessory value=source.system.armor.accessory
-                                                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
             </label>
-        </span>
-        <span>
-            {{formInput systemFields.armor.fields.base value=source.system.armor.base
-                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
         </span>
     </div>
 </div>
