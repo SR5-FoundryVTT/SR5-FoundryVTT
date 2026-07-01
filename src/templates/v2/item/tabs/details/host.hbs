@@ -9,10 +9,8 @@
         <label>{{localize "SR5.Rating"}}</label>
     </div>
     <div class="list-item-col">
-        <span data-tooltip="{{systemFields.rating.label}}:&nbsp;{{systemFields.rating.hint}}">
-            {{formInput systemFields.rating value=source.system.rating
-                        classes="short" rootId=rootId disabled=@root.isPlayMode}}
-        </span>
+        {{formInput systemFields.rating value=source.system.rating
+                    classes="short" rootId=rootId disabled=@root.isPlayMode}}
     </div>
 </div>
 <div class="list-item">

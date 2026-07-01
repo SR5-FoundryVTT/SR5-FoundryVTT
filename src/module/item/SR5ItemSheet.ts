@@ -335,6 +335,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             delete parts.licenses;
             delete parts.sinNetworks;
         }
+        if (item.isType('echo')) {
+            delete parts.details;
+        }
         return parts;
     }
 

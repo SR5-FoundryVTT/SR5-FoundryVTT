@@ -74,17 +74,15 @@
         <div class="list-item-start skinny">
             <label>{{localize "SR5.Armor.label"}}</label>
         </div>
-        <div class="list-item-col mod-armor-col">
-            <span class="mod-armor-hardened">
-                <label style="text-wrap: nowrap" data-tooltip="{{localize 'SR5.Armor.FIELDS.armor.is_hardened.hint'}}">
-                    {{localize "SR5.Armor.FIELDS.armor.is_hardened.label"}}&nbsp;{{formInput systemFields.mod_armor.fields.is_hardened value=source.system.mod_armor.is_hardened
-                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-                </label>
-            </span>
-            <span class="mod-armor-value">
+        <div class="list-item-col">
+            <span>
                 {{formInput systemFields.mod_armor.fields.value value=source.system.mod_armor.value
-                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                            classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
             </span>
+            <label class="basic-row" style="margin-left: auto; text-wrap: nowrap" data-tooltip="{{localize 'SR5.Armor.FIELDS.armor.is_hardened.hint'}}">
+                {{localize "SR5.Armor.FIELDS.armor.is_hardened.label"}}&nbsp;{{formInput systemFields.mod_armor.fields.is_hardened value=source.system.mod_armor.is_hardened
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            </label>
         </div>
     </div>
     <div class="list-item">
@@ -98,7 +96,7 @@
                         {{localize (objValue @root.config.elementTypes element_id)}}
                         {{formInput (objValue @root.systemFields.mod_armor.fields.elements.fields element_id)
                                     value=(objValue @root.source.system.mod_armor.elements element_id)
-                                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                                    classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
                     </label>
                 {{/each}}
             </div>

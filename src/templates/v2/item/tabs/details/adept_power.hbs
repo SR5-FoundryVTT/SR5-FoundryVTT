@@ -9,10 +9,8 @@
         <label>{{systemFields.type.label}}</label>
     </div>
     <div class="list-item-col">
-        <span data-tooltip="{{systemFields.type.hint}}">
-            {{formInput systemFields.type value=source.system.type localize=true
-                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-        </span>
+        {{formInput systemFields.type value=source.system.type localize=true
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
     </div>
 </div>
 <div class="list-item">
