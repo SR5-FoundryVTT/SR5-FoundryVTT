@@ -1,5 +1,5 @@
 import { SR5 } from "@/module/config";
-import { ModifiableValueSchema } from "./Base";
+import { BaseValuePair, ModifiableValueSchema } from "./Base";
 import { ConditionData } from "./Condition";
 import { MatrixMasterData } from "./MatrixNetwork";
 import { TechnologyAttributes } from "./Attributes";
@@ -30,13 +30,8 @@ export const TechnologyData = () => ({
     }),
     master: new DocumentUUIDField({ blank: true, required: true, nullable: false }),
 
-    // === Calculated Values ===
-    calculated: new SchemaField({
-        essence: new SchemaField({
-            value: new NumberField({ required: true, nullable: false, initial: 0 }),
-            adjusted: new BooleanField({ initial: false }),
-        }),
-    }),
+    // === Essence ===
+    essence: new SchemaField(BaseValuePair({ integer: false })),
 });
 
 export const TechnologyPartData = () => ({

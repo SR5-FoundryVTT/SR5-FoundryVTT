@@ -34,7 +34,7 @@ export const WarePrep = {
             return essence + (mod.system.essence * quantity);
         }, 0);
 
-        system.technology.calculated.essence.value += modificationEssence;
+        system.technology.essence.value = system.technology.essence.base + modificationEssence;
     },
 
     /**
@@ -53,8 +53,7 @@ export const WarePrep = {
         }
 
         if (grade === 'standard') {
-            system.technology.calculated.essence.value = system.essence;
-            system.technology.calculated.essence.adjusted = false;
+            system.technology.essence.base = system.essence;
             new ModifiableValue(system.technology.cost).remove('SR5.Grade');
             WarePrep.removeAvailabilityGradeChange(system.technology.availability);
             return;
@@ -67,13 +66,12 @@ export const WarePrep = {
         // Alter essence values.
         const floatEssence = Number(system.essence || 0) * essenceMod;
         const actualEssence = Helpers.roundTo(floatEssence, 4);
-        system.technology.calculated.essence.adjusted = true;
 
         const cost = new ModifiableValue(system.technology.cost);
         cost.addUnique('SR5.Grade', costMod, { type: 'multiply', priority: ModifiableValue.BASE_PRIORITY + 1 });
         WarePrep.setAvailabilityGradeChange(system.technology.availability, availMod);
 
-        system.technology.calculated.essence.value = actualEssence;
+        system.technology.essence.base = actualEssence;
     },
 
     setAvailabilityGradeChange(availability: AvailabilityValueType, value: number) {

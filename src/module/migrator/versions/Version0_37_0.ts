@@ -33,9 +33,21 @@ export class Version0_37_0 extends VersionMigration {
         technology.availability = Version0_37_0.migrateAvailability(technology.availability);
 
         if (technology.calculated && typeof technology.calculated === 'object') {
-            delete technology.calculated.cost;
-            delete technology.calculated.availability;
+            if (!technology.essence && technology.calculated.essence) {
+                technology.essence = Version0_37_0.migrateEssence(technology.calculated.essence);
+            }
+            delete technology.calculated;
         }
+    }
+
+    private static migrateEssence(essence: unknown) {
+        if (essence && typeof essence === 'object') {
+            const data = essence as { base?: unknown; value?: unknown };
+            const value = Version0_37_0.firstFiniteNumber(data.value, data.base, 0);
+            return { base: value, value };
+        }
+
+        return { base: 0, value: 0 };
     }
 
     private static ensureNestedDocumentIds(item: any): void {

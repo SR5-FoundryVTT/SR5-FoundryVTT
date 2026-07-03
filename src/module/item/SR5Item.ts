@@ -1058,7 +1058,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
         let essenceLoss = 0;
         if (this.isType('bioware', 'cyberware')) {
-            essenceLoss = tech.calculated.essence.value;
+            essenceLoss = tech.essence.value;
         } else if (this.isType('modification') && this.system.type === 'ware') {
             essenceLoss = this.system.essence;
         }

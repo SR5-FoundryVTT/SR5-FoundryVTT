@@ -23,7 +23,7 @@
             {{formInput systemFields.essence value=source.system.essence classes="short"
                         rootId=@root.rootId disabled=@root.isPlayMode}}
         {{else}}
-            {{formInput systemFields.essence value=system.technology.calculated.essence.value classes="short"
+            {{formInput systemFields.essence value=system.technology.essence.value classes="short"
                         rootId=@root.rootId disabled=true}}
         {{/if}}
     </div>
