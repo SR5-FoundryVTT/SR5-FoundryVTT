@@ -639,6 +639,17 @@
         "Attribute": "특성치",
         "Attributes": "특성치",
         "Availability": "희귀도",
+        "AvailabilityRestriction": "구매 제한",
+        "AvailabilityRestrictions": {
+            "Forbidden": "금지",
+            "None": "없음",
+            "Restricted": "제한"
+        },
+        "AvailabilityRestrictionSuffixes": {
+            "Forbidden": "F",
+            "None": "",
+            "Restricted": "R"
+        },
         "Awakened": "각성자",
         "AwakenedEmerged": "각성자/공명자",
         "Barrel": "총열",
@@ -1781,8 +1792,6 @@
                 "OpenInventory": "소지품 위치"
             },
             "Item": {
-                "AvailabilityAdjustment": "등급별 희귀도 비례 적용",
-                "CostAdjustment": "등급별 가격 비례 적용",
                 "EssenceAdjustment": "등급별 에센스 비례 적용",
                 "Properties": "아이템 속성"
             },
@@ -2996,8 +3005,6 @@
                 "ActionRollMode": "이 행동을 시전 할 때 무리한 굴림 방식을 사용함. 전체 채팅 설정에 덮어 써짐.",
                 "AddQuantity": "1개 추가. {qtySome}: 5개 추가. {qtyMany}: 20개 추가.",
                 "AmmoReplaceDamage": "무기 피해를 수정하는 대신 대체하도록 설정",
-                "AvailabilityAdjustment": "물품 등급에 따라 현재 희귀도 조정",
-                "CostAdjustment": "물품 등급에 따라 현재 가격 조정",
                 "DisabledForPreparedActor": "준비된 액터를 사용 중이므로 비활성화됨",
                 "EssenceAdjustment": "해당 물품의 등급에 따라 실제 에센스 비용을 조절",
                 "RemoveQuantity": "1개 삭제. {qtySome}: 5개 삭제. {qtyMany}: 20개 삭제.",

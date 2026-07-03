@@ -302,6 +302,17 @@
         "Attribute": "Atributo",
         "Attributes": "Atributos",
         "Availability": "Dispon.",
+        "AvailabilityRestriction": "Restrição de disponibilidade",
+        "AvailabilityRestrictions": {
+            "Forbidden": "Proibido",
+            "None": "Nenhuma",
+            "Restricted": "Restrito"
+        },
+        "AvailabilityRestrictionSuffixes": {
+            "Forbidden": "F",
+            "None": "",
+            "Restricted": "R"
+        },
         "Awakened": "Desperto",
         "AwakenedEmerged": "Desperto/Emergido",
         "Barrel": "Cano",
@@ -1529,10 +1540,8 @@
                 "ActionCategories": "Selecione categorias de ação para usar em vez das categorias padrão do teste. Usando Efeitos Ativos, você pode usar categorias para modificar valores de teste",
                 "ActionModifier": "Selecione modificadores de reserva de dados para usar em vez dos modificadores padrão do teste",
                 "ActionRollMode": "Modo de rolagem padrão ao lançar esta ação. Substituirá a configuração global do chat",
-                "AvailabilityAdjustment": "Ajuste a disponibilidade real com base no nível do item",
                 "AmmoReplaceDamage": "Defina para substituir o dano da arma em vez de modificá-lo",
-                "DisabledForPreparedActor": "Desativado devido ao uso de ator preparado",
-                "CostAdjustment": "Ajuste o custo real com base na nível do item"
+                "DisabledForPreparedActor": "Desativado devido ao uso de ator preparado"
             },
             "Modifiers": {
                 "armor": "Modifica o valor total da armadura",

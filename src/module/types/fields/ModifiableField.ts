@@ -39,6 +39,7 @@ export class ModifiableField<
         const effectName = change.effect.name;
         const effectType = change.type;
         const effectPriority = change.priority ?? CONST.ACTIVE_EFFECT_CHANGE_TYPES[change.type]?.defaultPriority ?? 20;
+        const effectSource = change.effect.uuid ?? change.effect.id ?? change.effect.name;
 
         field.changes.push(
             DataDefaults.createData('change_entry', {
@@ -46,7 +47,7 @@ export class ModifiableField<
                 type: effectType,
                 value: changeValue,
                 priority: effectPriority,
-                source: change.effect.uuid,
+                source: effectSource,
             })
         );
 

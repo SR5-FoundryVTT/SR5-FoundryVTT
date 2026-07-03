@@ -34,6 +34,8 @@ import { MatrixDeviceFlow } from './flows/MatrixDeviceFlow';
 import { StorageFlow } from '@/module/flows/StorageFlow';
 import { ModifiableValueType } from '../types/template/Base';
 import { IconAssign } from 'src/module/apps/iconAssigner/IconAssign';
+import { allApplicableDocumentEffects } from '../effects';
+import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import GetEmbeddedDocumentOptions = foundry.abstract.Document.GetEmbeddedDocumentOptions;
 
 type OneOrMany<T> = T | T[];
@@ -207,8 +209,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             TechnologyPrep.prepareConceal(technology, equippedMods);
             TechnologyPrep.prepareMatrixAttributes(this.system);
             TechnologyPrep.prepareMentalAttributes(this.system);
-            TechnologyPrep.prepareAvailability(this, technology);
-            TechnologyPrep.prepareCost(this, technology);
         }
 
         const action = this.getAction();
@@ -237,13 +237,33 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     override prepareDerivedData(this: SR5Item): void {
         super.prepareDerivedData();
+        this.applyItemActiveEffects();
 
         const technology = this.getTechnologyData();
-        if (technology)
+        if (technology) {
+            TechnologyPrep.prepareCost(technology);
+            TechnologyPrep.prepareAvailability(technology);
             TechnologyPrep.calculateAttributes(this.system.attributes!);
+        }
 
         if (this.isType('host'))
             HostPrep.prepareDerivedData(this.system);
+    }
+
+    private applyItemActiveEffects() {
+        for (const effect of allApplicableDocumentEffects(this, { applyTo: ['item'] })) {
+            if (effect.disabled || effect.isSuppressed) continue;
+
+            for (const change of effect.changesForApplyTo('item')) {
+                try {
+                    SR5ActiveEffect.applyChange(this, { ...change, effect } as unknown as ActiveEffect.ChangeData);
+                } catch (error) {
+                    console.error(`Shadowrun5e | Some effect changes could not be applied and might cause issues. Check effects of item (${this.name}) / id (${this.id})`);
+                    console.error(error);
+                    ui.notifications?.error(`See browser console (F12): Some effect changes could not be applied and might cause issues. Check effects of item (${this.name}) / id (${this.id})`);
+                }
+            }
+        }
     }
 
     async postItemCard() {
@@ -686,6 +706,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         if (!Array.isArray(effectData)) effectData = [effectData];
 
         for (const effect of effectData) {
+            effect._id ??= foundry.utils.randomID();
             this.effects.set(effect._id, effect);
         }
 
@@ -698,19 +719,21 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     /**
      * Create an item in this item
-     * @param itemData
      */
     async createNestedItem(itemData: Item.Source | Item.Source[]) {
         if (!Array.isArray(itemData)) itemData = [itemData];
         // weapons, armor, cyberware and bioware accept nested items
         if (this.isType('weapon', 'armor', 'cyberware', 'bioware')) {
-            const currentItems = foundry.utils.duplicate(this.getNestedItems()) as Item.Source[];
+            const currentItems = foundry.utils.deepClone(this.getNestedItems());
 
             for (const ogItem of itemData) {
-                const item = foundry.utils.duplicate(ogItem) as Item.Source;
+                const item = foundry.utils.deepClone(ogItem);
                 item._id = foundry.utils.randomID();
-                if (item.type === 'modification' || (this.type === 'weapon' && item.type === 'ammo'))
+                if (item.type === 'modification' || (this.type === 'weapon' && item.type === 'ammo')) {
+                    for (const effect of item.effects) effect._id ??= foundry.utils.randomID();
+
                     currentItems.push(item);
+                }
             }
 
             await this.setNestedItems(currentItems);
@@ -932,7 +955,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     parseAvailibility(avail: string) {
-        return ItemAvailabilityFlow.parseAvailibility(avail);
+        return ItemAvailabilityFlow.parseAvailability(avail);
     }
 
     async setMasterUuid(masterUuid: string | undefined): Promise<void> {

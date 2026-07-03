@@ -638,6 +638,17 @@
         "Attribute": "Attribute",
         "Attributes": "Attributes",
         "Availability": "Avail",
+        "AvailabilityRestriction": "Availability Restriction",
+        "AvailabilityRestrictions": {
+            "Forbidden": "Forbidden",
+            "None": "None",
+            "Restricted": "Restricted"
+        },
+        "AvailabilityRestrictionSuffixes": {
+            "Forbidden": "F",
+            "None": "",
+            "Restricted": "R"
+        },
         "Awakened": "Awakened",
         "AwakenedEmerged": "Awakened/Emerged",
         "Barrel": "Barrel",
@@ -1781,8 +1792,6 @@
                 "OpenInventory": "Inventory"
             },
             "Item": {
-                "AvailabilityAdjustment": "Scale Availability w/ Rating",
-                "CostAdjustment": "Scale Cost w/ Rating",
                 "EssenceAdjustment": "Scale Essence w/ Rating",
                 "Properties": "Item Properties"
             },
@@ -3000,8 +3009,6 @@
                 "ActionRollMode": "Default roll mode when casting this action. Will overwrite global chat setting",
                 "AddQuantity": "Add 1 Qty. {qtySome}: Add 5 Qty. {qtyMany}: Add 20 Qty.",
                 "AmmoReplaceDamage": "Set to replace weapon damage instead of modifying it",
-                "AvailabilityAdjustment": "Adjust actual availability based on the item rating",
-                "CostAdjustment": "Adjust actual cost based on the item rating",
                 "DisabledForPreparedActor": "Disabled because the prepared actor cannot be edited by your current user",
                 "EssenceAdjustment": "Adjust actual essence cost based on the item rating",
                 "RemoveQuantity": "Remove 1 Qty. {qtySome}: Remove 5 Qty. {qtyMany}: Remove 20 Qty.",

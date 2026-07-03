@@ -213,6 +213,17 @@
         "Attribute": "Attribut",
         "Attributes": "Attributs",
         "Availability": "Dispo",
+        "AvailabilityRestriction": "Restriction de disponibilité",
+        "AvailabilityRestrictions": {
+            "Forbidden": "Interdit",
+            "None": "Aucune",
+            "Restricted": "Restreint"
+        },
+        "AvailabilityRestrictionSuffixes": {
+            "Forbidden": "F",
+            "None": "",
+            "Restricted": "R"
+        },
         "Awakened": "Éveillé",
         "AwakenedEmerged": "Éveillé/Émergé",
         "Barrel": "Canon",

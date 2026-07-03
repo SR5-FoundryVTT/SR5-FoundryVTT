@@ -57,6 +57,28 @@
         flex-basis: 7rem;
     }
 
+    .item-header-meta .availability-inputs {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        width: 100%;
+    }
+
+    .item-header-meta .availability-inputs > *:first-child {
+        flex: 0 0 2.25rem;
+        padding: 0;
+    }
+
+    .item-header-meta .availability-inputs > *:last-child {
+        flex: 1 1 auto;
+        padding: 0;
+        min-width: 2.5rem;
+    }
+
+    .item-header-meta .availability-restriction-select {
+        padding-left: 0.15rem;
+    }
+
     .item-footer {
         gap: 0.25rem;
         padding-top: 0.25rem;

@@ -861,5 +861,149 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(effect.system.targets[0].applyTo, 'actor');
             assert.strictEqual(effect.system.changes[0].target, effect.system.targets[0].id);
         });
+
+        it('adds missing ids to nested item effects stored in flags', () => {
+            const migrator = new Version0_37_0();
+            const item: any = {
+                flags: {
+                    shadowrun5e: {
+                        embeddedItems: [{
+                            name: 'Nested Mod',
+                            type: 'modification',
+                            effects: [{ name: 'Nested Effect' }],
+                            flags: {
+                                shadowrun5e: {
+                                    embeddedItems: [{
+                                        name: 'Deep Nested Mod',
+                                        type: 'modification',
+                                        effects: [{ name: 'Deep Nested Effect' }],
+                                    }],
+                                },
+                            },
+                        }],
+                    },
+                },
+                system: {},
+            };
+
+            migrator.migrateItem(item);
+
+            const nested = item.flags.shadowrun5e.embeddedItems[0];
+            const deepNested = nested.flags.shadowrun5e.embeddedItems[0];
+            assert.isString(nested._id);
+            assert.isString(nested.effects[0]._id);
+            assert.isString(deepNested._id);
+            assert.isString(deepNested.effects[0]._id);
+        });
+
+        it('migrates technology cost and availability into base/value fields', () => {
+            const migrator = new Version0_37_0();
+            const item: any = {
+                system: {
+                    technology: {
+                        cost: 500,
+                        availability: '6R',
+                        calculated: {
+                            essence: { value: 0, adjusted: false },
+                            cost: { value: 500, adjusted: false },
+                            availability: { value: '6R', adjusted: false },
+                        },
+                    },
+                },
+            };
+
+            assert.isTrue(migrator.handlesItem(item));
+            migrator.migrateItem(item);
+
+            assert.deepEqual(item.system.technology.cost, { base: 500, value: 500, changes: [] });
+            assert.deepEqual(item.system.technology.availability, {
+                base: 6,
+                value: 6,
+                changes: [],
+                restriction: 'restricted',
+                label: '6R',
+            });
+            assert.notProperty(item.system.technology.calculated, 'cost');
+            assert.notProperty(item.system.technology.calculated, 'availability');
+            assert.property(item.system.technology.calculated, 'essence');
+        });
+
+        it('migrates draft technology cost and availability objects into base/value fields', () => {
+            const migrator = new Version0_37_0();
+            const item: any = {
+                system: {
+                    technology: {
+                        cost: { formula: '', value: 0, base: 200 },
+                        availability: { formula: '', value: '', base: '8F' },
+                    },
+                },
+            };
+
+            migrator.migrateItem(item);
+
+            assert.deepEqual(item.system.technology.cost, { base: 200, value: 200, changes: [] });
+            assert.deepEqual(item.system.technology.availability, {
+                base: 8,
+                value: 8,
+                changes: [],
+                restriction: 'forbidden',
+                label: '8F',
+            });
+        });
+
+        it('collapses an intermediate base/value restriction object into a plain string', () => {
+            const migrator = new Version0_37_0();
+            const item: any = {
+                system: {
+                    technology: {
+                        availability: {
+                            base: 6,
+                            value: 6,
+                            changes: [],
+                            restriction: { base: 'restricted', value: 'forbidden', changes: [] },
+                            label: '6R',
+                        },
+                    },
+                },
+            };
+
+            migrator.migrateItem(item);
+
+            assert.strictEqual(item.system.technology.availability.base, 6);
+            assert.strictEqual(item.system.technology.availability.value, 6);
+            assert.strictEqual(item.system.technology.availability.restriction, 'forbidden');
+            assert.strictEqual(item.system.technology.availability.label, '6F');
+        });
+
+        it('migrates availability override changes into a numeric change and a restriction string', () => {
+            const migrator = new Version0_37_0();
+            const item: any = {
+                system: {
+                    technology: {
+                        availability: {
+                            base: '6R',
+                            value: '12F',
+                            changes: [{
+                                enabled: true,
+                                invalidated: false,
+                                name: 'Override',
+                                priority: 50,
+                                source: 'test',
+                                type: 'override',
+                                value: '12F',
+                            }],
+                        },
+                    },
+                },
+            };
+
+            migrator.migrateItem(item);
+
+            assert.strictEqual(item.system.technology.availability.base, 6);
+            assert.strictEqual(item.system.technology.availability.value, 6);
+            assert.strictEqual(item.system.technology.availability.label, '6F');
+            assert.strictEqual(item.system.technology.availability.restriction, 'forbidden');
+            assert.strictEqual(item.system.technology.availability.changes[0].value, 12);
+        });
     });
 };

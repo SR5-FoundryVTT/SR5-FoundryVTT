@@ -124,7 +124,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      */
     override get actor(): SR5Actor | null {
         if (this.parent instanceof SR5Actor) return this.parent;
-        if (this.parent instanceof SR5Item) return this.parent?.parent;
+        if (this.parent instanceof SR5Item) return this.parent.actorOwner ?? null;
         return null;
     }
 
@@ -322,6 +322,10 @@ export class SR5ActiveEffect extends ActiveEffect {
             const target = change.effect.targetForChange(change as { target?: string });
             const appliesToActor = !!target && (target.applyTo === 'actor' || target.applyTo === 'targeted_actor');
             if (!appliesToActor) return {};
+        }
+        if (targetDoc instanceof SR5Item && change.effect instanceof SR5ActiveEffect) {
+            const target = change.effect.targetForChange(change as { target?: string });
+            if (target?.applyTo !== 'item') return {};
         }
 
         // Skip applying this change if the target key does not exist on the model.

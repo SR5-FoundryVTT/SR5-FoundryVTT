@@ -4,29 +4,6 @@
     </div>
 </div>
 
-{{#if @root.isEditMode}}
-    <div class="list-item">
-        <div class="list-item-start skinny">
-            <label data-tooltip="SR5.Tooltips.Item.CostAdjustment">{{localize "SR5.Labels.Item.CostAdjustment"}}</label>
-        </div>
-        <div class="list-item-col">
-            {{formInput systemFields.technology.fields.calculated.fields.cost.fields.adjusted
-                        value=source.system.technology.calculated.cost.adjusted classes="short"
-                        rootId=@root.rootId disabled=@root.isPlayMode}}
-        </div>
-    </div>
-    <div class="list-item">
-        <div class="list-item-start skinny">
-            <label data-tooltip="SR5.Tooltips.Item.AvailabilityAdjustment">{{localize "SR5.Labels.Item.AvailabilityAdjustment"}}</label>
-        </div>
-        <div class="list-item-col">
-            {{formInput systemFields.technology.fields.calculated.fields.availability.fields.adjusted
-                        value=source.system.technology.calculated.availability.adjusted classes="short"
-                        rootId=@root.rootId disabled=@root.isPlayMode}}
-        </div>
-    </div>
-{{/if}}
-
 <div class="list-item">
     <div class="list-item-start skinny">
         <label>{{localize "SR5.Rating"}}</label>

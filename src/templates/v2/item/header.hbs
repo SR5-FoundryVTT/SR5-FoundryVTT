@@ -98,10 +98,17 @@
                                 </div>
                                 <div class="list-item-col sheet-header-resource-value">
                                     {{#if @root.isEditMode}}
-                                        {{formInput systemFields.technology.fields.availability value=source.system.technology.availability
-                                                    classes="short skinny" rootId=rootId disabled=@root.isPlayMode}}
-                                    {{else if system.technology.calculated.availability.value}}
-                                        <label class="sheet-header-service-value">{{system.technology.calculated.availability.value}}</label>
+                                        <div class="availability-inputs">
+                                            {{formInput systemFields.technology.fields.availability.fields.base value=source.system.technology.availability.base
+                                                        classes="short availability-base-input" rootId=rootId disabled=@root.isPlayMode}}
+                                            <span data-tooltip="SR5.AvailabilityRestriction">
+                                                {{formInput systemFields.technology.fields.availability.fields.restriction value=source.system.technology.availability.restriction
+                                                            choices=config.availabilityRestrictionSuffixes localize=true
+                                                            classes="short availability-restriction-select" rootId=rootId disabled=@root.isPlayMode}}
+                                            </span>
+                                        </div>
+                                    {{else if system.technology.availability.label}}
+                                        <label class="sheet-header-service-value">{{system.technology.availability.label}}</label>
                                     {{/if}}
                                 </div>
                             </div>
@@ -115,10 +122,10 @@
                                 </div>
                                 <div class="list-item-col sheet-header-resource-value">
                                     {{#if @root.isEditMode}}
-                                        {{formInput systemFields.technology.fields.cost value=source.system.technology.cost
+                                        {{formInput systemFields.technology.fields.cost.fields.base value=source.system.technology.cost.base
                                                     classes="short nuyen" rootId=rootId disabled=@root.isPlayMode}}
                                     {{else}}
-                                        <label class="sheet-header-service-value">{{nuyenValue system.technology.calculated.cost.value}}</label>
+                                        <label class="sheet-header-service-value">{{nuyenValue system.technology.cost.value}}</label>
                                     {{/if}}
                                 </div>
                             </div>

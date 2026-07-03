@@ -9,9 +9,13 @@ const { SchemaField, NumberField, BooleanField, StringField, DocumentUUIDField }
 export const TechnologyData = () => ({
     // === Basic Info ===
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
-    availability: new StringField({ required: true }),
+    availability: new ModifiableField({
+        ...ModifiableValueSchema(),
+        restriction: new StringField({ required: true, nullable: false, initial: 'none', choices: SR5.availabilityRestrictions }),
+        label: new StringField({ required: true, nullable: false, initial: '0' }),
+    }),
     quantity: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
-    cost: new NumberField({ required: true, nullable: false, initial: 0 }),
+    cost: new ModifiableField(ModifiableValueSchema({ integer: false })),
     equipped: new BooleanField(),
 
     // === Condition & Concealment ===
@@ -32,14 +36,6 @@ export const TechnologyData = () => ({
             value: new NumberField({ required: true, nullable: false, initial: 0 }),
             adjusted: new BooleanField({ initial: false }),
         }),
-        availability: new SchemaField({
-            value: new StringField({ required: true }),
-            adjusted: new BooleanField({ initial: false }),
-        }),
-        cost: new SchemaField({
-            value: new NumberField({ required: true, nullable: false, initial: 0 }),
-            adjusted: new BooleanField({ initial: false }),
-        }),
     }),
 });
 
@@ -50,3 +46,4 @@ export const TechnologyPartData = () => ({
 });
 
 export type TechnologyType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof TechnologyData>>;
+export type AvailabilityValueType = TechnologyType['availability'];

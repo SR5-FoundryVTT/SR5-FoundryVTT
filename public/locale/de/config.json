@@ -640,6 +640,17 @@
         "Attribute": "Attribut",
         "Attributes": "Attribute",
         "Availability": "Verf.",
+        "AvailabilityRestriction": "Verfügbarkeitsbeschränkung",
+        "AvailabilityRestrictions": {
+            "Forbidden": "Verboten",
+            "None": "Keine",
+            "Restricted": "Eingeschränkt"
+        },
+        "AvailabilityRestrictionSuffixes": {
+            "Forbidden": "F",
+            "None": "",
+            "Restricted": "R"
+        },
         "Awakened": "Erwacht",
         "AwakenedEmerged": "Magie/Resonanz",
         "Barrel": "Laufmontiert",
@@ -1782,8 +1793,6 @@
                 "OpenInventory": "Inventar"
             },
             "Item": {
-                "AvailabilityAdjustment": "Skaliere Verfügbarkeit mit Stufe",
-                "CostAdjustment": "Skaliere Kosten mit Stufe",
                 "EssenceAdjustment": "Skaliere Essenz mit Stufe",
                 "Properties": "Gegenstandseigenschaften"
             },
@@ -2998,8 +3007,6 @@
                 "ActionRollMode": "Standard Würfelmodus für diese Aktion. Überschreibt globale Chat Einstellung",
                 "AddQuantity": "Füge zu 1. {qtySome}: Füge zu 5. {qtyMany}: Füge zu 20.",
                 "AmmoReplaceDamage": "Setzen um Waffenschaden zu ersetzen anstatt zu modifizieren",
-                "AvailabilityAdjustment": "Berechne Verfügbarkeit abhängig von der Stufe.",
-                "CostAdjustment": "Berechne die tatsächlichen Kosten basierend auf der Stufe",
                 "DisabledForPreparedActor": "Deaktiviert da ein vorbereiteter Akteur verwendet wird",
                 "EssenceAdjustment": "Berechne die tatsächlichen Essenzkosten basierend auf der Stufe",
                 "RemoveQuantity": "Entferne 1. {qtySome}: Entferne 5. {qtyMany}: Entferne 20.",
