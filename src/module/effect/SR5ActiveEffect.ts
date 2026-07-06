@@ -20,19 +20,10 @@ import DataModel = foundry.abstract.DataModel;
  * Effects can also define the type of target data to be applied to. Default effects only apply to actor data, system effects
  * can apply to actors, tests and also only to actors targeted by tests.
  * 
- * NOTE: FoundryVTT DataModel is used to apply changes as well. Check custom Field implementations for effect change mode
+ * NOTE: FoundryVTT DataModel is used to apply changes as well. Check custom Field implementations for effect change type
  * application.
  */
 export class SR5ActiveEffect extends ActiveEffect {
-    private static readonly legacyModeByChangeType: Record<string, number> = {
-        custom: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-        multiply: CONST.ACTIVE_EFFECT_MODES.MULTIPLY,
-        add: CONST.ACTIVE_EFFECT_MODES.ADD,
-        downgrade: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE,
-        upgrade: CONST.ACTIVE_EFFECT_MODES.UPGRADE,
-        override: CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
-    };
-
     /**
      * Can be used to determine if the origin of the effect is a document owned by another document.
      *
@@ -77,7 +68,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     /**
      * Always returns the parent actor of the effect, even if the effect is applied to an item.
      */
-    get actor(): SR5Actor | null {
+    override get actor(): SR5Actor | null {
         if (this.parent instanceof SR5Actor) return this.parent;
         if (this.parent instanceof SR5Item) return this.parent?.parent;
         return null;
@@ -159,20 +150,6 @@ export class SR5ActiveEffect extends ActiveEffect {
         return ['base', 'changes', 'value'] satisfies (keyof ModifiableValueType)[];
     }
 
-    /**
-     * Convert a v14 string-based change type into the legacy numeric mode value.
-     */
-    static getLegacyChangeMode(change: { mode?: number; type?: string | null }): number {
-        if (typeof change.mode === 'number') return change.mode;
-
-        const changeType = typeof change.type === 'string' ? change.type : '';
-        const mappedMode = this.legacyModeByChangeType[changeType];
-        if (mappedMode !== undefined) return mappedMode;
-
-        console.error(`Shadowrun5e | Unrecognized change type "${change.type}", defaulting to "add" mode.`);
-        return CONST.ACTIVE_EFFECT_MODES.ADD;
-    }
-
     override get isSuppressed(): boolean {
         if (!(this.parent instanceof SR5Item)) return false;
 
@@ -236,17 +213,20 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param change The effect change being applied
      * @param options Additional FoundryVTT options.
      */
-    // @ts-expect-error v14 - missing types
-    override static applyChange(targetDoc: DataModel.Any, change: ActiveEffect.ChangeData, {replacementData = {}, modifyTarget = true} = {}) {
+    static override applyChange(
+        targetDoc: DataModel.Any,
+        change: ActiveEffect.ChangeData,
+        { replacementData = {}, modifyTarget = true }: ActiveEffect.ApplyChangeOptions = {}
+    ): Record<string, unknown> {
         // Skip applying this change if the target key does not exist on the model.
         // TypedObjectField will otherwise create the missing property as a string,
         // which breaks data integrity and can result in errors like "undefined[object Object]".
         // For example, a change targeting "firstaid" instead of "first_aid" would trigger this case.
         if (!foundry.utils.hasProperty(targetDoc, change.key))
             return {};
-        
+
         // Resolve dynamic value references in change.
-        const source = change.effect.parent;
+        const source = change.effect?.parent ?? targetDoc;
         SR5ActiveEffect.alterChange(targetDoc, change);
         SR5ActiveEffect.resolveDynamicChangeValue(source, change);
         
@@ -257,14 +237,13 @@ export class SR5ActiveEffect extends ActiveEffect {
             return SR5ActiveEffect._applyToObject(targetDoc, change);
         }
 
-        // @ts-expect-error TODO: fvtt - v14 - missing types
         return super.applyChange(targetDoc, change, {replacementData, modifyTarget});
     }
 
     /**
      * Handle application for none-Document objects. This is typically used for SuccessTest instances.
      */
-    private static _applyToObject(object: any, change: ActiveEffect.ChangeData) {
+    private static _applyToObject(object: any, change: ActiveEffect.ChangeData): Record<string, unknown> {
         const target = foundry.utils.getProperty(object, change.key);
         const targetType = foundry.utils.getType(target);
 
@@ -273,27 +252,28 @@ export class SR5ActiveEffect extends ActiveEffect {
         try {
             if (Array.isArray(target)) {
                 const innerType = target.length ? foundry.utils.getType(target[0]) : "string";
-                delta = SR5ActiveEffect.__castArray(change.value, innerType);
+                delta = SR5ActiveEffect.__castArray(String(change.value), innerType);
             }
-            else delta = SR5ActiveEffect.__castDelta(change.value, targetType);
+            else delta = SR5ActiveEffect.__castDelta(String(change.value), targetType);
         } catch (err) {
             console.warn(`Test [${object.constructor.name}] | Unable to parse active effect change for ${change.key}: "${change.value}"`);
             return {};
         }
 
         if (ModifiableValue.isModifiableValue(target)) {
-            const mode = SR5ActiveEffect.getLegacyChangeMode(change);
+            const effect = change.effect;
+            if (!effect) return {};
             target.changes.push(
                 DataDefaults.createData('change_entry', {
-                    enabled: change.effect.active,
-                    name: change.effect.name,
+                    enabled: effect.active,
+                    name: effect.name,
                     value: delta,
-                    mode: mode,
-                    priority: change.priority ?? 10 * mode,
-                    source: change.effect.uuid,
+                    type: change.type,
+                    priority: change.priority ?? ActiveEffect.CHANGE_TYPES[change.type]?.defaultPriority ?? 20,
+                    source: effect.uuid,
                 })
             );
-            return undefined;
+            return {};
         }
 
         // In case of non-existent change.key targets, catch errors and log it, but still allow the overall process to continue.
@@ -302,8 +282,8 @@ export class SR5ActiveEffect extends ActiveEffect {
         // TODO: v14 - check if the commented out code is still needed
         try {
             const changes = {};
-            // @ts-expect-error TODO: fvtt - v14 - missing types
-            return SR5ActiveEffect._applyChangeUnguided(object, change, changes);
+            SR5ActiveEffect._applyChangeUnguided(object, change, changes);
+            return changes as Record<string, unknown>;
         } catch (err) {
             console.error(`Test [${object.constructor.name}] | Failed to apply active effect change for ${change.key}: "${change.value}"`, err);
             return {};
@@ -316,7 +296,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      *
      * A dynamic change value follows the same rules as a Foundry roll formula (including dice pools).
      *
-     * A change could contain the key of 'system.attributes.body' with the mode Modify and a dynamic value of
+     * A change could contain the key of 'system.attributes.body' with the type add and a dynamic value of
      * '@system.technology.rating * 3'. The dynamic property path would be taken from either the source or parent
      * document of the effect before the resolved value would be applied onto the target document / object.
      *
@@ -325,7 +305,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      */
     static resolveDynamicChangeValue(source: any, change: ActiveEffect.ChangeData) {
         // Dynamic value present?
-        if (foundry.utils.getType(change.value) !== 'string') return;
+        if (typeof change.value !== 'string') return;
         if (change.value.length === 0) return;
 
         // Use Foundry Roll Term parser to both resolve dynamic values and resolve calculations.
@@ -334,7 +314,7 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         // Overwrite change value with graceful default, to avoid NaN errors during change application.
         // Adhere to FoundryVTT expectation of receiving string values.
-        if (value === undefined) change.value = '0';
+        if (value == null) change.value = '0';
         else change.value = value.toString();
     }
 
@@ -420,8 +400,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         // Overwrite foundry priority handling, as they provide a defaultPriority in CHANGE_TYPES but use
         // priority in their ActiveEffect#prepareBaseData implementation.
         for ( const change of this.system.changes ) {
-        // @ts-expect-error TODO: fvtt - v14 - missing CHANGE_TYPES typing
-          change.priority = change.priority === 0 ? ActiveEffect.CHANGE_TYPES[change.type]?.defaultPriority : change.priority;
+          change.priority = change.priority === 0 ? ActiveEffect.CHANGE_TYPES[change.type!]?.defaultPriority : change.priority;
         }
     }
 }

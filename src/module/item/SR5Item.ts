@@ -45,7 +45,7 @@ const { fromUuid, getProperty, setProperty } = foundry.utils;
 export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSubType> extends Item<SubType> {
     static readonly MAX_CONTAINER_DEPTH = 5;
     static readonly MAX_ATTACHMENT_DEPTH = 5;
-    private static readonly MOD_PARENT_TYPES = ['weapon', 'armor', 'vehicle', 'drone'];
+    private static readonly MOD_PARENT_TYPES = ['weapon', 'armor', 'vehicle', 'drone', 'bioware', 'cyberware'];
 
     /**
      * Whether a child item type can be attached to (linked via system.parentId to) a given parent item type.
@@ -776,6 +776,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     modificationType(): Item.SystemOfType<'modification'>['type'] | null {
         if (this.isType('weapon')) return 'weapon';
         if (this.isType('armor')) return 'armor';
+        if (this.isType('bioware', 'cyberware')) return 'ware';
         return null;
     }
 
@@ -899,7 +900,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         setProperty(item, 'system.parentId', this.id);
         setProperty(item, '_stats.systemVersion', game.system.version);
 
-        if (item.type === 'modification') setProperty(item, 'system.type', this.type);
+        const modificationType = this.modificationType();
+        if (item.type === 'modification' && modificationType) setProperty(item, 'system.type', modificationType);
 
         return item;
     }
@@ -1145,16 +1147,15 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *
      * @returns The total essence loss as a number.
      */
-    getEssenceLoss(this: SR5Item<'bioware' | 'cyberware'>): number {
+    getEssenceLoss(this: SR5Item<'bioware' | 'cyberware' | 'modification'>): number {
         const tech = this.system.technology;
         const quantity = Number(tech?.quantity) || 1;
 
-        // Prefer adjusted essence if present, otherwise use base essence
         let essenceLoss = 0;
-        if (tech?.calculated?.essence?.adjusted) {
-            essenceLoss = Number(tech.calculated.essence.value);
-        } else if (this.system.essence) {
-            essenceLoss = Number(this.system.essence);
+        if (this.isType('bioware', 'cyberware')) {
+            essenceLoss = tech.calculated.essence.value;
+        } else if (this.isType('modification') && this.system.type === 'ware') {
+            essenceLoss = this.system.essence;
         }
 
         if (isNaN(essenceLoss)) essenceLoss = 0;
@@ -1655,8 +1656,20 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     /**
      * Reset everything that needs to be reset between two runs.
      */
-    async restRunData() {
+    async resetRunData() {
+        if (this.isNetwork()) {
+            await this.removeImprovisedDevices();
+        }
+
         return this.clearMarks();
+    }
+
+    /**
+     * Delete all improvised devices connected to this host or grid.
+     */
+    async removeImprovisedDevices() {
+        if (!this.isNetwork()) return 0;
+        return MatrixNetworkFlow.removeImprovisedDevices(this);
     }
 
     /**

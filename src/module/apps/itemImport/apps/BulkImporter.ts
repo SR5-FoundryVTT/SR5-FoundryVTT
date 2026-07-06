@@ -19,6 +19,7 @@ import { SpellImporter } from "../importer/SpellImporter";
 import { VehicleImporter } from "../importer/VehicleImporter";
 import { VehicleModImporter } from "../importer/VehicleModImporter";
 import { WareImporter } from "../importer/WareImporter";
+import { WareModImporter } from "../importer/WareModImporter";
 import { WeaponImporter } from "../importer/WeaponImporter";
 import { WeaponModImporter } from "../importer/WeaponModImporter";
 
@@ -97,8 +98,8 @@ export class BulkImporter extends BaseClass {
     private static readonly githubConfig = {
         owner: "chummer5a",
         repo: "chummer5a",
-        version: "v5.226.0",
-        branch: "0c354ec2b81da5ccd2c93648f93ec8f6831c030e",
+        version: "v5.226.91",
+        branch: "8544ecee1ad3edccc0853b7821067542130a5c68",
     } as const;
 
     /**
@@ -130,6 +131,7 @@ export class BulkImporter extends BaseClass {
         new VehicleImporter(),
         new SpellImporter(),
         new ComplexFormImporter(),
+        new WareModImporter(),
         new WareImporter(),
         new QualityImporter(),
         new CritterPowerImporter(),

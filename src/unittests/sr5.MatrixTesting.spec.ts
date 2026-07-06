@@ -31,7 +31,7 @@ export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
 
             const data = await OpposedBruteForceTest._getOpposedActionTestData(test.data, host, 'testMessageId');
             const documents = { item: host };
-            const opposedTest = new OpposedBruteForceTest(data, documents, testOptions);
+            const opposedTest = new OpposedBruteForceTest(data!, documents, testOptions);
             await opposedTest.execute();
 
             // TODO: In this case, does placing a mark on the host place marks on all it's devices?! or all icons?! What about personas?
@@ -59,7 +59,7 @@ export const shadowrunMatrixTesting = (context: QuenchBatchContext) => {
 
             const data = await OpposedBruteForceTest._getOpposedActionTestData(test.data, ic, 'testMessageId');
             const documents = { actor: ic };
-            const opposedTest = new OpposedBruteForceTest(data, documents, testOptions);
+            const opposedTest = new OpposedBruteForceTest(data!, documents, testOptions);
             await opposedTest.execute();
 
             const marksData = decker.marksData ?? [];

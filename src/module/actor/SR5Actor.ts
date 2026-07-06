@@ -218,7 +218,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     override applyActiveEffects(...args) {
         // Errors during change application will stop that process and cause a broken sheet.
         try {
-            // @ts-expect-error TODO: fvtt - v14 - typing is missing
             super.applyActiveEffects(...args);
         } catch (error) {
             console.error(`Shadowrun5e | Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.id})`);
@@ -260,7 +259,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      *
      * NOTE: Foundry also shows disabled effects by default. We behave the same.
      */
-    override get temporaryEffects(): SR5ActiveEffect[] {
+    override get temporaryEffects(): ActiveEffect.Stored[] {
         const showEffectIcon = (effect: SR5ActiveEffect) => !effect.disabled && !effect.isSuppressed && effect.isTemporary && effect.appliesToLocalActor;
 
         // Collect actor effects.
@@ -935,7 +934,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const rating = this.system.matrix?.rating || 0;
 
         const showDialog = this.tests.shouldShowDialog(options?.event);
-        const testCls = this.tests._getTestClass('SuccessTest') as typeof SuccessTest;
+        const testCls = this.tests._getTestClass('SuccessTest')!;
         const test = new testCls(TestCreator._minimalTestData(), { actor: this }, { showDialog });
 
         // Build pool values.
@@ -1618,13 +1617,13 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      */
     get combatActive(): boolean {
         if (!game.combat) return false;
-        const combatants = game.combat.getCombatantsByActor(this);
+        const combatants = game.combat.getCombatantsByActor(this as Actor.Stored);
         return combatants.length > 0 && combatants.some(c => c.initiative != null);
     }
 
     get combatants() {
         if (!this.combatActive) return [];
-        return game.combat!.getCombatantsByActor(this);
+        return game.combat!.getCombatantsByActor(this as Actor.Stored);
     }
 
     /**

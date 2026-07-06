@@ -1063,7 +1063,8 @@
         "DeviceType": "Typ",
         "Dialogs": {
             "Common": {
-                "Cancel": "Cancel"
+                "Cancel": "Cancel",
+                "Ok": "OK"
             },
             "RangedWeaponTest": {
                 "EnvironmentalOverwriteSet": "Umgebungsmodifikatoren wurden manuell auf einen fixen Wert gesetzt!"
@@ -1754,6 +1755,7 @@
                 "NotVisible": "Schleichend",
                 "PAN": "PAN",
                 "RebootDevice": "Neustarten",
+                "RemoveImprovisedDevices": "Improvisierte Geräte entfernen",
                 "SubtractOne": "Eine entfernen",
                 "Type": "Typ",
                 "Visible": "Sichtbar",
@@ -1862,6 +1864,9 @@
             "Invite": "Einladung anfordern",
             "Title": "Mit Netzwerk verbinden"
         },
+        "MatrixOpposedDeviceDialog": {
+            "Title": "Matrixgerät erstellen"
+        },
         "MatrixTarget": "Matrixziel",
         "MeleeWeaponAttack": "Nahkampfangriff",
         "MentalLimit": "Geistiges Limit",
@@ -1939,6 +1944,9 @@
         "ModificationCategories": "Modification Categories",
         "ModificationCategory": "Modification Category",
         "ModificationSlots": "Modification Slots",
+        "ModificationTypes": {
+            "Ware": "Implantat"
+        },
         "Modified": "Modifiziert",
         "ModifiedArmor": "Mod. Panzerung",
         "ModifiedDamage": "Mod. Schaden",
@@ -2769,11 +2777,11 @@
                 "Description": "Beschreibung",
                 "Details": "Details",
                 "Effects": "Effekte",
+                "Mods": "Mods",
                 "Network": "Netzwerk",
                 "SinLicenses": "Lizenzen",
                 "SinNetworks": "Netzwerke",
-                "WeaponAmmo": "Munition",
-                "WeaponMods": "Mods"
+                "WeaponAmmo": "Munition"
             }
         },
         "Target": "Ziel",
@@ -2837,6 +2845,7 @@
             "OpposedCheckOverwatchScoreTest": "Widerstehe Overwatch-Wert prüfen",
             "OpposedCompileSpriteTest": "Widerstehe Kompilierung",
             "OpposedHackOnTheFlyTest": "Widerstehe Eiliges Hacken",
+            "OpposedMatrixTest": "Vergleichende Matrix-Probe",
             "OpposedRitualTest": "Besiegel das Ritual",
             "OpposedSummonSpiritTest": "Widerstehe Herbeirufung",
             "OpposedTest": "Vergleichende Probe",

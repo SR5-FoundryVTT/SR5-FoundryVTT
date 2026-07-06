@@ -10,6 +10,7 @@ import { MatrixDefenseTest } from "../MatrixDefenseTest";
 import { MatrixResistTest, MatrixResistTestData } from "../MatrixResistTest";
 import { BiofeedbackResistTest } from "../BiofeedbackResistTest";
 import { OpposedMatrixTest } from '@/module/tests/OpposedMatrixTest';
+import { MatrixOpposedTargetFlow } from '@/module/tests/flows/MatrixOpposedTargetFlow';
 import Document = foundry.abstract.Document;
 
 /**
@@ -45,7 +46,6 @@ export const MatrixTestDataFlow = {
 
     /**
      * Is the given attribute id a matrix attribute
-     * @param attribute
      */
     isMatrixAttribute(attribute: string): boolean {
         return Object.hasOwn(SR5.matrixAttributes, attribute);
@@ -124,12 +124,8 @@ export const MatrixTestDataFlow = {
 
     /**
      * Prepare data for Resisting matrix damage
-     *
-     * @param data
-     * @param options
-     * @returns
      */
-    _prepareDataResist(data: MatrixResistTestData): any {
+    _prepareDataResist<D extends MatrixResistTestData>(data: D): D {
         // Allow for token targeting to be used to target the main icon.
         if (!data.iconUuid) data.iconUuid = data.targetUuids.length === 1 ? data.targetUuids[0] : undefined;
 
@@ -141,12 +137,8 @@ export const MatrixTestDataFlow = {
 
     /**
      * Prepare data for the initial mark placement test.
-     *
-     * @param data
-     * @param options
-     * @returns
      */
-    _prepareData(data: MatrixTestData): any {
+    _prepareData<D extends MatrixTestData>(data: D): D {
         // Allow for token targeting to be used to target the main icon.
         if (!data.iconUuid) data.iconUuid = data.targetUuids.length === 1 ? data.targetUuids[0] : undefined;
 
@@ -165,10 +157,8 @@ export const MatrixTestDataFlow = {
 
     /**
      * Prepare data for the opposing mark placement test.
-     * @param data
-     * @returns
      */
-    _prepareOpposedData(data: OpposedMatrixTestData): any {
+    _prepareOpposedData<D extends OpposedMatrixTestData>(data: D): D {
         data.personaUuid = data.personaUuid ?? data.against.personaUuid;
         data.iconUuid = data.iconUuid ?? data.against.iconUuid;
         data.targetMainIcon = data.targetMainIcon ?? data.against.targetMainIcon;
@@ -178,10 +168,8 @@ export const MatrixTestDataFlow = {
 
     /**
      * Prepare data for matrix resist data from following test data
-     * @param data
-     * @returns
      */
-    _prepareFollowingData(data: MatrixResistTestData): any {
+    _prepareFollowingData<D extends MatrixResistTestData>(data: D): D {
         data.personaUuid = data.personaUuid ?? data.following?.personaUuid;
         data.iconUuid = data.iconUuid ?? data.following?.iconUuid;
         return data;
@@ -265,8 +253,6 @@ export const MatrixTestDataFlow = {
 
     /**
      * Prepare icon and persona based on given uuid or user selection.
-     *
-     * @param test
      */
     populateDocuments(test: MatrixTest) {
         // Handle icons around targeting.
@@ -323,7 +309,6 @@ export const MatrixTestDataFlow = {
 
     /**
      * Prepare Icon and Persona for this test based on data.
-     *
      */
     _prepareIcon(test: MatrixTest) {
         // When given an icon uuid, load it.
@@ -445,8 +430,6 @@ export const MatrixTestDataFlow = {
      * - Then select a device to place the mark on
      * - Reverse and place mark on main icon again
      * - iconUuid is still set to the device, as the render flow of the TestDialog doesn't clean up the data set by the
-     *
-     * @param test
      */
     async setIconUuidBasedOnPlacementSelection(test: MatrixTest) {
         // Assure main icon selection is set as the target icon.
@@ -467,9 +450,6 @@ export const MatrixTestDataFlow = {
 
     /**
      * Provide easy way to set a target for mark placement tests.
-     *
-     * @param test
-     * @param document
      */
     async addTarget(test: MatrixTest, document: SR5Actor | SR5Item) {
         if (test.targets.length > 1) {
@@ -487,33 +467,40 @@ export const MatrixTestDataFlow = {
      * Handle target selection flow for matrix mark placement actions.
      *
      * NOTE: This method is bound to the calling class and should be called after .bind(s.this) by the caller.
-     *
-     * @param againstData
-     * @param messageId
-     * @param options
      */
-    async executeMessageAction(testCls: any, againstData: MatrixTestData, messageId: string, options: TestOptions): Promise<void> {
-        let document: Document.Any | null = null;
+    async executeMessageAction(testCls: typeof SuccessTest, againstData: MatrixTestData, messageId: string, options: Partial<TestOptions>): Promise<void> {
+        let document: SR5Actor | SR5Item | null = null;
+        const caster = againstData.sourceActorUuid
+            ? await fromUuid<SR5Actor>(againstData.sourceActorUuid)
+            : null;
+
+        // CASE A) Resolve targeted document by targeted icon.
         if (againstData.iconUuid) {
-            document = await fromUuid(againstData.iconUuid)
+            document = await fromUuid(againstData.iconUuid);
         }
 
+        // CASE B) Resolve targeted document by creation one on the fly.
+        if (!document && !againstData.iconUuid) {
+            document = await MatrixOpposedTargetFlow.createTemporaryDocument(caster ?? undefined);
+            if (document) againstData.iconUuid = document.uuid ?? undefined;
+        }
+
+        // CASE C) Resolve targeted document by whatever is selected.
         if (!document) {
             const actor = Helpers.getSelectedActorsOrCharacter()[0];
             document = actor;
             againstData.iconUuid = actor?.uuid ?? undefined;
         }
         if (!document) {
-            document = game.user?.character;
-            againstData.iconUuid = game.user?.character?.uuid ?? undefined;
+            document = game.user.character;
+            againstData.iconUuid = game.user.character?.uuid ?? undefined;
         }
         if (!document) return;
 
         const data = await testCls._getOpposedActionTestData(againstData, document, messageId);
         if (!data) return;
 
-        const documents = { source: document };
-        const test = new testCls(data, documents, options);
+        const test = new testCls(data, { source: document }, options);
 
         await test.execute();
     },

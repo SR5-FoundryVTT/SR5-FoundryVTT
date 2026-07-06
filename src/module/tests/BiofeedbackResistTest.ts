@@ -32,11 +32,11 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
     // The target icon, if it's representing a persona.
     declare persona: SR5Actor;
 
-    override _prepareData(data: BiofeedbackResistTestData, options: any): any {
-        data = super._prepareData(data, options);
-        data = ResistTestDataFlow._prepareData(data);
+    override _prepareData(data: BiofeedbackResistTestData, options: Partial<TestOptions>): BiofeedbackResistTestData {
+        let prepared = super._prepareData(data, options);
+        prepared = ResistTestDataFlow._prepareData(prepared);
 
-        return data;
+        return prepared;
     }
 
     /**
@@ -125,7 +125,6 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
 
     /**
      * Prepare any ResistTest from given test data. This should come from a Resist Test
-     *
      */
     static override async _getResistActionTestData(opposedData: ResistTestData, document: SR5Actor|SR5Item, previousMessageId: string): Promise<BiofeedbackResistTestData | undefined> {
         if (!document) {
@@ -148,7 +147,7 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
         // get most of our resist data from the ResistTestDataFlow test data
         const data = ResistTestDataFlow._getResistTestData(newData, 'SR5.Tests.BiofeedbackResistTest', previousMessageId);
 
-        const action = await ResistTestDataFlow._getResistAgainActionData(this, newData, 'BiofeedbackResistTest');
+        const action = await ResistTestDataFlow._getResistAgainActionData(this as typeof SuccessTest, newData, document, 'BiofeedbackResistTest');
 
         return this._prepareActionTestData(action, document, data) as BiofeedbackResistTestData;
     }
@@ -158,11 +157,11 @@ export class BiofeedbackResistTest extends SuccessTest<BiofeedbackResistTestData
      *
      * This can be used to trigger resist tests.
      */
-    static override async executeMessageAction(againstData: ResistTestData, messageId: string, options: TestOptions) {
+    static override async executeMessageAction(againstData: ResistTestData, messageId: string, options: Partial<TestOptions>) {
         // Determine documents to roll test with.
         const documents = againstData.action.test === 'MatrixResistTest'
                                             ? await Helpers.getMatrixTestTargetDocuments(againstData as any)
                                             : await Helpers.getTestTargetDocuments(againstData)
-        await ResistTestDataFlow.executeMessageAction(this, againstData, messageId, documents, options);
+        await ResistTestDataFlow.executeMessageAction(this as typeof SuccessTest, againstData, messageId, documents as (SR5Actor | SR5Item)[], options);
     }
 }

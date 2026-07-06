@@ -43,6 +43,7 @@ const ModificationData = () => ({
         }),
         immunities: new TagifyMultiField(SR5.armorImmunityTypes),
     }),
+    essence: new NumberField({ required: true, nullable: false, initial: 0 }),
     slots: new NumberField({ required: true, nullable: false, integer: true, initial: 0 }),
 });
 

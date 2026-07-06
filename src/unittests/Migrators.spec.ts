@@ -699,7 +699,6 @@ export const Migrators = (context: QuenchBatchContext) => {
             const effect = {
                 system: {
                     changes: [
-                        { key: 'system.level', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
                         { key: 'system.modifiers.matrix_initiative', value: 1, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
                         { key: 'system.modifiers.matrix_initiative_dice', value: 1, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
                         { key: 'system.attributes.reaction', value: 1, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
@@ -708,10 +707,60 @@ export const Migrators = (context: QuenchBatchContext) => {
             };
             migrator.migrateActiveEffect(effect);
 
-            assert.strictEqual(effect.system.changes[0].key, 'system.attributes.level');
-            assert.strictEqual(effect.system.changes[1].key, 'system.initiative.matrix.constant.base');
-            assert.strictEqual(effect.system.changes[2].key, 'system.initiative.matrix.dice.base');
-            assert.strictEqual(effect.system.changes[3].key, 'system.attributes.reaction');
+            assert.strictEqual(effect.system.changes[0].key, 'system.initiative.matrix.constant.base');
+            assert.strictEqual(effect.system.changes[1].key, 'system.initiative.matrix.dice.base');
+            assert.strictEqual(effect.system.changes[2].key, 'system.attributes.reaction');
+        });
+
+        it('migrates nested item active effect keys without changing item-scoped level formulas', () => {
+            const migrator = new Version0_36_0();
+            const actor = createSprite('unknown', 6);
+            actor.system.level = 6;
+
+            actor.items.push({
+                _id: foundry.utils.randomID(16),
+                name: 'Parent Weapon',
+                type: 'weapon',
+                effects: [],
+                flags: {
+                    shadowrun5e: {
+                        embeddedItems: [{
+                            _id: foundry.utils.randomID(16),
+                            name: 'Nested Mod',
+                            type: 'modification',
+                            effects: [],
+                            flags: {
+                                shadowrun5e: {
+                                    embeddedItems: [{
+                                        _id: foundry.utils.randomID(16),
+                                        name: 'Deep Nested Mod',
+                                        type: 'modification',
+                                        effects: [{
+                                            system: {
+                                                changes: [
+                                                    { key: 'system.level', value: '@system.level + 1', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                                                ],
+                                            },
+                                        }],
+                                        system: DataDefaults.baseSystemData('modification'),
+                                    }],
+                                },
+                            },
+                            system: DataDefaults.baseSystemData('modification'),
+                        }],
+                    },
+                },
+                system: DataDefaults.baseSystemData('weapon'),
+            } as any);
+
+            migrator.migrateActor(actor);
+
+            const nestedItems = foundry.utils.getProperty(actor.items[0], 'flags.shadowrun5e.embeddedItems') as any[];
+            const deepNestedItems = foundry.utils.getProperty(nestedItems[0], 'flags.shadowrun5e.embeddedItems') as any[];
+            const deepEffect = deepNestedItems[0].effects[0];
+
+            assert.strictEqual(deepEffect.system.changes[0].key, 'system.attributes.level');
+            assert.strictEqual(deepEffect.system.changes[0].value, '@system.level + 1');
         });
 
     });

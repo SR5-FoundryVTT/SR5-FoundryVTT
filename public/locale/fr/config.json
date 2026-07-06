@@ -309,6 +309,10 @@
         "DeviceCatCyberdeck": "Cyberdeck",
         "DeviceType": "Type",
         "Dialogs": {
+            "Common": {
+                "Cancel": "Annuler",
+                "Ok": "OK"
+            },
             "RangedWeaponTest": {
                 "EnvironmentalOverwriteSet": "Les modificateurs environnementals ont été déterminés à une valeur fixe"
             }
@@ -489,6 +493,9 @@
                 "SpriteConfiguration": "Configuration de sprite",
                 "SpritePowers": "Pouvoirs",
                 "VehicleConfiguration": "Configuration véhicule"
+            },
+            "Sheet": {
+                "RemoveImprovisedDevices": "Supprimer les appareils improvisés"
             }
         },
         "Languages": "Langues",
@@ -543,6 +550,9 @@
         "MatrixAttrSleaze": "Corruption",
         "MatrixDice": "Dés init. Matricielle",
         "MatrixInit": "Init. Matricielle",
+        "MatrixOpposedDeviceDialog": {
+            "Title": "Créer un appareil matriciel"
+        },
         "MatrixTarget": "Cible Matricielle",
         "MeatSpaceDice": "Dés init. terrestre",
         "MeatSpaceInit": "Init. terrestre",
@@ -559,6 +569,9 @@
         "ModificationCategories": "Catégories de modifications",
         "ModificationCategory": "Catégorie de modifications",
         "ModificationSlots": "Emplacements de modification",
+        "ModificationTypes": {
+            "Ware": "Implant"
+        },
         "Modified": "Modifié",
         "ModifiedArmor": "Mod. Blindage",
         "Modifier": "Modificateur",
@@ -1088,7 +1101,8 @@
         "Tabs": {
             "Item": {
                 "ArmorMods": "Mods d'armure",
-                "ContainerContents": "Contents"
+                "ContainerContents": "Contents",
+                "Mods": "Mods"
             }
         },
         "Wireless": "Sans fil",

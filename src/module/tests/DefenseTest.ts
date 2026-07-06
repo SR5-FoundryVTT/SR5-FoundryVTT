@@ -1,8 +1,9 @@
 import {OpposedTest, OpposedTestData} from "./OpposedTest";
+import { DeepPartial } from "fvtt-types/utils";
+import { TestOptions } from "./SuccessTest";
 import {DataDefaults} from "../data/DataDefaults";
 import { Translation } from '../utils/strings';
 import { DamageType } from "../types/item/Action";
-import { SR5Combat } from "../combat/SR5Combat";
 import { SYSTEM_NAME, FLAGS } from "../constants";
 import { CombatRules } from "../rules/CombatRules";
 
@@ -29,15 +30,15 @@ export interface DefenseTestData extends OpposedTestData {
  */
 export class DefenseTest<T extends DefenseTestData = DefenseTestData> extends OpposedTest<T> {
 
-    override _prepareData(data, options?) {
-        data = super._prepareData(data, options);
+    override _prepareData(data: DeepPartial<T>, options?: Partial<TestOptions>): T {
+        const prepared = super._prepareData(data, options);
 
-        const damage = data.against ? data.against.damage : DataDefaults.createData('damage');
+        const damage = prepared.against ? prepared.against.damage : DataDefaults.createData('damage');
 
-        data.incomingDamage = foundry.utils.duplicate(damage);
-        data.modifiedDamage = foundry.utils.duplicate(damage);
+        prepared.incomingDamage = foundry.utils.duplicate(damage) as DamageType;
+        prepared.modifiedDamage = foundry.utils.duplicate(damage) as DamageType;
 
-        return data;
+        return prepared;
     }
 
     override get _chatMessageTemplate() {
@@ -76,8 +77,7 @@ export class DefenseTest<T extends DefenseTestData = DefenseTestData> extends Op
     override canConsumeDocumentResources() {
         // Check if the actor is in active combat situation and has enough initiative score left.
         if (this.actor && this.data.iniMod && game.combat) {
-            const combat: SR5Combat = game.combat as unknown as SR5Combat;
-            const combatant = combat.getActorCombatant(this.actor);
+            const combatant = game.combat.getActorCombatant(this.actor);
             if (!combatant?.initiative) return true;
 
             if (combatant && combatant.initiative + this.data.iniMod < 0) {

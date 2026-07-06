@@ -5,7 +5,6 @@ import { Migrator } from "../migrator/Migrator";
 import { CombatRules } from "../rules/CombatRules";
 import { FLAGS, SR, SYSTEM_NAME } from "../constants";
 import { SR5Die } from "../rolls/SR5Die";
-import { ChatMessageMode } from "../types/global";
 import SocketMessageData = Shadowrun.SocketMessageData;
 import BaseCombat = foundry.documents.BaseCombat;
 
@@ -110,7 +109,8 @@ export class SR5Combat extends Combat<"base"> {
         return this.system.pass;
     }
 
-    // Don't alert next player, because it can change easily
+    // Foundry's Combat interface defines nextCombatant as a getter, but SR5's initiative flow
+    // @ts-expect-error - doesn't have a single "next" combatant due to initiative passes.
     override get nextCombatant(): undefined { return undefined; }
 
 
@@ -395,7 +395,7 @@ export class SR5Combat extends Combat<"base"> {
         const messageGroups = {
             public: [] as InitiativeSummaryRow[],
             gm: [] as InitiativeSummaryRow[],
-        } satisfies Partial<Record<ChatMessageMode, InitiativeSummaryRow[]>>;
+        } satisfies Partial<Record<ChatMessage.MessageMode, InitiativeSummaryRow[]>>;
 
         for (const id of combatantIds) {
             const combatant = this.combatants.get(id) as SR5Combatant | undefined;
@@ -453,7 +453,7 @@ export class SR5Combat extends Combat<"base"> {
      * @param adjustment The delta to adjust the initiative score with.
      */
     async adjustActorInitiative(actor: SR5Actor, adjustment: number) {
-        for (const combatant of this.getCombatantsByActor(actor))
+        for (const combatant of this.getCombatantsByActor(actor as Actor.Stored))
             await combatant.adjustInitiative(adjustment);
     }
 
@@ -462,7 +462,7 @@ export class SR5Combat extends Combat<"base"> {
      * If multiple combatants exist, tries to resolve by controlled tokens.
      */
     getActorCombatant(actor: SR5Actor): SR5Combatant | null {
-        const combatants = this.getCombatantsByActor(actor);
+        const combatants = this.getCombatantsByActor(actor as Actor.Stored);
 
         // If only one combatant, return it directly
         if (combatants.length === 1) {
@@ -570,7 +570,7 @@ export class SR5Combat extends Combat<"base"> {
      * @param messageOptions - Base configuration options for the created ChatMessage documents.
      */
     private async _createInitiativeMessages(
-        messageGroups: Partial<Record<ChatMessageMode, InitiativeSummaryRow[]>>,
+        messageGroups: Partial<Record<ChatMessage.MessageMode, InitiativeSummaryRow[]>>,
         messageOptions: ChatMessage.CreateData,
     ) {
         let hasPlayedSound = false;
@@ -596,7 +596,6 @@ export class SR5Combat extends Combat<"base"> {
                 messageOptions,
             );
 
-            // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
             ChatMessage.applyMode(messageData, rollMode);
             const message = await foundry.documents.ChatMessage.implementation.create(messageData);
 

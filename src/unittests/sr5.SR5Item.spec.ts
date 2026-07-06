@@ -43,20 +43,32 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
         });
 
         describe('Testing related data injection', () => {
-            it('Correctly add defense tests to spells', async () => {
+            it('Correctly adds defense tests without resist tests to direct combat spells', async () => {
                 const item = await factory.createItem({type: 'spell'});
 
-                await item.update({ system: { category: 'combat' } });
+                await item.update({ system: { category: 'combat', combat: { type: 'direct' } } });
                 assert.equal(item.system.action.test, 'SpellCastingTest');
                 assert.equal(item.system.action.followed.test, 'DrainTest');
                 assert.equal(item.system.action.opposed.test, 'CombatSpellDefenseTest');
-                assert.equal(item.system.action.opposed.resist.test, 'PhysicalResistTest');
+                assert.equal(item.system.action.opposed.resist.test, '');
+            });
+            it('Correctly adds default opposed tests to detection spells', async () => {
+                const item = await factory.createItem({type: 'spell'});
 
                 await item.update({ system: { category: 'detection' } });
                 assert.equal(item.system.action.test, 'SpellCastingTest');
                 assert.equal(item.system.action.followed.test, 'DrainTest');
                 assert.equal(item.system.action.opposed.test, 'OpposedTest');
                 assert.equal(item.system.action.opposed.resist.test, '');
+            });
+            it('Correctly keeps resist tests for indirect combat spells', async () => {
+                const item = await factory.createItem({type: 'spell'});
+
+                await item.update({ system: { category: 'combat', combat: { type: 'indirect' } } });
+                assert.equal(item.system.action.test, 'SpellCastingTest');
+                assert.equal(item.system.action.followed.test, 'DrainTest');
+                assert.equal(item.system.action.opposed.test, 'CombatSpellDefenseTest');
+                assert.equal(item.system.action.opposed.resist.test, 'PhysicalResistTest');
             });
             it('Correctly add default tests to melee weapons', async () => {
                 const item = await factory.createItem({type: 'weapon'});

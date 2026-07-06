@@ -38,7 +38,7 @@ export interface SR5BaseItemSheetData extends ItemSheet.RenderContext, SR5Applic
     itemEffects: SR5ActiveEffect[];
 
     // FoundryVTT rollmodes
-    rollModes: CONFIG.ChatMessage.modes;
+    rollModes: typeof CONFIG.ChatMessage.modes;
 
     // Document references
     actor?: SR5Actor;
@@ -77,6 +77,7 @@ export interface SR5BaseItemSheetData extends ItemSheet.RenderContext, SR5Applic
 interface SR5ItemSheetData extends SR5BaseItemSheetData {
     // Nested item typing for different sheets
     ammunition: SR5Item<'ammo'>[]
+    wareMods: SR5Item<'modification'>[]
     weaponMods: SR5Item<'modification'>[]
     armorMods: SR5Item<'modification'>[]
     vehicleMods: SR5Item<'modification'>[]
@@ -181,6 +182,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
             removeSlave: SR5ItemSheet.#removeSlave,
             removeAllSlaves: SR5ItemSheet.#removeAllSlaves,
+            removeImprovisedDevices: SR5ItemSheet.#removeImprovisedDevices,
 
             toggleActionArmor: SR5ItemSheet.#toggleActionArmor,
             toggleOpposedArmor: SR5ItemSheet.#toggleOpposedArmor,
@@ -236,7 +238,12 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         },
         armorModifications: {
             template: SheetFlow.templateBase('item/tabs/armor-modifications'),
-            templates: SheetFlow.templateListItem('armor-modification'),
+            templates: SheetFlow.templateListItem('item-modification'),
+            scrollable: ['.scrollable']
+        },
+        itemModifications: {
+            template: SheetFlow.templateBase('item/tabs/item-modifications'),
+            templates: SheetFlow.templateListItem('item-modification'),
             scrollable: ['.scrollable']
         },
         containerContents: {
@@ -263,8 +270,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 { id: 'network', label: 'SR5.Tabs.Item.Network', cssClass: '' },
                 { id: 'sinNetworks', label: 'SR5.Tabs.Item.SinNetworks', cssClass: '' },
                 { id: 'weaponAmmo', label: 'SR5.Tabs.Item.WeaponAmmo', cssClass: '' },
-                { id: 'weaponModifications', label: 'SR5.Tabs.Item.WeaponMods', cssClass: '' },
-                { id: 'armorModifications', label: 'SR5.Tabs.Item.ArmorMods', cssClass: '' },
+                { id: 'weaponModifications', label: 'SR5.Tabs.Item.Mods', cssClass: '' },
+                { id: 'armorModifications', label: 'SR5.Tabs.Item.Mods', cssClass: '' },
+                { id: 'itemModifications', label: 'SR5.Tabs.Item.Mods', cssClass: '' },
                 { id: 'containerContents', label: 'SR5.Tabs.Item.ContainerContents', cssClass: '' },
                 { id: 'licenses', label: 'SR5.Tabs.Item.SinLicenses', cssClass: '' },
                 { id: 'effects', label: 'SR5.Tabs.Item.Effects', cssClass: '' },
@@ -344,6 +352,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
         if (!item.isType('container')) {
             delete parts.containerContents;
+        }
+        if (!item.isType('bioware', 'cyberware')) {
+            delete parts.itemModifications;
         }
         if (!item.isType('sin')) {
             delete parts.licenses;
@@ -426,6 +437,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         data['ammunition'] = sortByName((grouped.ammo ?? []) as SR5Item<'ammo'>[]);
         data['weaponMods'] = sortByName((grouped.weapon ?? []) as SR5Item<'modification'>[]);
         data['armorMods'] = sortByName((grouped.armor ?? []) as SR5Item<'modification'>[]);
+        data['wareMods'] = sortByName((grouped.ware ?? []) as SR5Item<'modification'>[]);
         data['vehicleMods'] = sortByName((grouped.vehicle ?? []) as SR5Item<'modification'>[]);
         data['droneMods'] = sortByName((grouped.drone ?? []) as SR5Item<'modification'>[]);
 
@@ -490,8 +502,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             }
         }
 
-        // TODO: fvtt-types - type CONFIG.ChatMessage.modes upstream once available
-        data.rollModes = (CONFIG.ChatMessage as unknown as { modes: CONFIG.ChatMessage.modes }).modes;
+        data.rollModes = CONFIG.ChatMessage.modes;
 
         data.item = this.item;
 
@@ -929,6 +940,16 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         await this.item.removeSlave(document);
     }
 
+    static async #removeImprovisedDevices(this: SR5ItemSheet, event: Event) {
+        event.preventDefault();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        await this.item.removeImprovisedDevices();
+        void this.render();
+    }
+
     async _onMarksQuantityChange(event: Event) {
         event.stopPropagation();
 
@@ -1348,7 +1369,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (this.item.isType('weapon') && item.isType('ammo', 'modification')) {
             return this._onDropAttachmentItem(item);
         }
-        if (this.item.isType('armor') && item.isType('modification')) {
+        if (this.item.isType('armor', 'bioware', 'cyberware') && item.isType('modification')) {
             return this._onDropAttachmentItem(item);
         }
         // dropped Grid and Hosts on SIN allows for adding the SIN as a network option
@@ -1414,7 +1435,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (item.id === this.item.id) return null;
         if (await this._isAttachmentAncestor(item)) return null;
 
-        const modType = this.item.type as 'weapon' | 'armor' | 'vehicle' | 'drone';
+        const modType = this.item.modificationType();
+        if (item.isType('modification') && !modType) return null;
 
         if (this._sameItemCollection(item)) {
             const update: Record<string, unknown> = {

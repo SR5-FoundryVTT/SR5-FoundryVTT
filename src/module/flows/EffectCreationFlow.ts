@@ -33,16 +33,9 @@ export const EffectCreationFlow = {
             name: `${skillField.label} ${game.i18n.localize('SR5.Effect')}`,
             system: {
                 applyTo: 'actor' as const,
+                changes: [ { key: path, type: 'add' } ]
             },
-            changes: [
-                {
-                    key: path,
-                    mode: CONST.ACTIVE_EFFECT_MODES.ADD,
-                    priority: 0,
-                    value: '',
-                }
-            ]
-        };
+        } as const;
 
         await actor.createEmbeddedDocuments("ActiveEffect", [effectData], { renderSheet: true });
     }

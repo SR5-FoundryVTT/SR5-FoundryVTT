@@ -564,6 +564,7 @@ export const SR5 = {
     },
 
     deviceCategories: {
+        device: 'SR5.ItemTypes.Device',
         commlink: 'SR5.DeviceCatCommlink',
         cyberdeck: 'SR5.DeviceCatCyberdeck',
         rcc: 'SR5.DeviceCatRCC',
@@ -792,6 +793,7 @@ export const SR5 = {
     modificationTypes: {
         weapon: 'SR5.Weapon.Weapon',
         armor: 'SR5.Armor.label',
+        ware: 'SR5.ModificationTypes.Ware',
         vehicle: 'SR5.Vehicle.Vehicle',
         drone: 'SR5.Vehicle.Drone'
     },
@@ -888,7 +890,7 @@ export const SR5 = {
     },
 
     /**
-     * Using different resist tests for the oppositing depending on active tests details
+     * Using different resist tests for the opposing depending on active tests details
      *  Structure: {
      *  [item.type]: {[item.system.type]}: 'OpposedTest'
      * }

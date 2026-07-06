@@ -20,7 +20,7 @@ export const shadowrunCombatModifierFlow = (context: QuenchBatchContext) => {
                 const modifier = CombatModifierFlow.getChargerModifier(actor);
 
                 assert.deepEqual(modifier && { name: modifier.name, value: modifier.value }, { name: 'Charging', value: 4 });
-                assert.equal(modifier?.mode, CONST.ACTIVE_EFFECT_MODES.ADD);
+                assert.equal(modifier?.type, 'add');
                 assert.equal(modifier?.priority, 20);
             });
 
