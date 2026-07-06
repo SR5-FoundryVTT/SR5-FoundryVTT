@@ -44,6 +44,8 @@ export class AmmoParser extends Parser<'ammo'> {
             system.damage = damageData.value;
             system.damageType = damageData.type.value;
             system.element = damageData.element.value;
+            system.replaceAP = !!bonusData.apreplace?._TEXT;
+            system.replaceDamage = !!bonusData.damagereplace?._TEXT;
         }
 
         return system;
