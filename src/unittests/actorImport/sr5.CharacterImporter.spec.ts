@@ -216,6 +216,16 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(IH.getArray(weapon.flags.shadowrun5e?.embeddedItems).length, 1);
         });
 
+        it('Should import strength-based weapon damage from raw Chummer damage', async () => {
+            if (!actor) throw new Error('No actor created');
+            const weapon = actor.items.find(i => i.name === 'Unarmed Attack') as SR5Item<'weapon'>;
+            if (!weapon) throw new Error('Weapon not found');
+
+            assert.strictEqual(weapon.system.action.damage.base, 0);
+            assert.strictEqual(weapon.system.action.damage.attribute, 'strength');
+            assert.strictEqual(weapon.system.action.damage.type.base, 'stun');
+        });
+
         it('Should have the correct vehicles', async () => {
             const vehicle = vehicles[0];
             if (!vehicle) throw new Error('No vehicle created');
