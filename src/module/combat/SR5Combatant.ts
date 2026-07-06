@@ -7,7 +7,7 @@ import { FLAGS, SR, SYSTEM_NAME } from "../constants";
 import { ChatMessageMode } from "../types/global";
 import { SocketMessage } from "../sockets";
 
-export const INITIATIVE_MODE_OPTIONS = ['meatspace', 'astral', 'cold_sim', 'hot_sim'] as const;
+const INITIATIVE_MODE_OPTIONS = ['meatspace', 'astral', 'cold_sim', 'hot_sim'] as const;
 export type InitiativeModeOptions = typeof INITIATIVE_MODE_OPTIONS[number];
 
 export type ChangeModeMessageData = {
