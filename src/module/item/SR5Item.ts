@@ -254,7 +254,20 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         for (const effect of allApplicableDocumentEffects(this, { applyTo: ['item'] })) {
             if (effect.disabled || effect.isSuppressed) continue;
 
-            for (const change of effect.changesForApplyTo('item')) {
+            const changes = effect.changesForApplyTo('item');
+
+            // prepareData can run more than once without a reset() in between, and ModifiableField.applyChange
+            // only pushes entries. Clear this effect's prior contributions from each targeted ModifiableValue
+            // before re-applying, so repeated passes don't double them.
+            const source = effect.uuid ?? effect.id ?? effect.name;
+            for (const change of changes) {
+                const altered = { ...change } as unknown as ActiveEffect.ChangeData;
+                SR5ActiveEffect.alterChange(this, altered);
+                const value = SR5ActiveEffect.getModifiableValue(this, altered.key);
+                if (value) ModifiableValue.removeFromSource(value, source);
+            }
+
+            for (const change of changes) {
                 try {
                     SR5ActiveEffect.applyChange(this, { ...change, effect } as unknown as ActiveEffect.ChangeData);
                 } catch (error) {

@@ -32,7 +32,7 @@ export class ModifiableField<
 > extends foundry.data.fields.SchemaField<Fields, Options, AssignmentType, InitializedType, PersistedType> {
     override applyChange(value: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData): undefined {
         const changeValue = Number(change.value);
-        if (isNaN(changeValue)) return undefined;
+        if (!Number.isFinite(changeValue)) return undefined;
         if (!change.effect) return undefined;
 
         const field = value as ModifiableValueType;
