@@ -5,8 +5,10 @@ import { Migrator } from "../migrator/Migrator";
 import { CombatRules } from "../rules/CombatRules";
 import { FLAGS, SR, SYSTEM_NAME } from "../constants";
 import { ChatMessageMode } from "../types/global";
+import { SocketMessage } from "../sockets";
 
-export type InitiativeModeOptions = 'meatspace' | 'astral' | 'cold_sim' | 'hot_sim';
+export const INITIATIVE_MODE_OPTIONS = ['meatspace', 'astral', 'cold_sim', 'hot_sim'] as const;
+export type InitiativeModeOptions = typeof INITIATIVE_MODE_OPTIONS[number];
 
 export type ChangeModeMessageData = {
     combatantId: string;
@@ -21,10 +23,42 @@ export type ChangeModeMessageData = {
     diceRolls: number[];
 };
 
+function isInitiativeMode(value: unknown): value is InitiativeModeOptions {
+    return typeof value === 'string' && (INITIATIVE_MODE_OPTIONS as readonly string[]).includes(value);
+}
+
 export class SR5Combatant extends Combatant<"base"> {
     static override migrateData(source: any) {
         Migrator.migrate("Combatant", source);
         return super.migrateData(source);
+    }
+
+    /**
+     * Handles socket messages forwarding combatant mutations that require GM permissions
+     * (e.g. updating the parent Combat document) from a non-GM user to an active GM.
+     *
+     * Socket payloads are untrusted (any client can emit them, and the sender is not
+     * authenticated), so both the operation and its arguments are validated explicitly rather
+     * than dispatched generically.
+     */
+    static async _handleCombatantSocketMessage(message: Shadowrun.SocketMessageData) {
+        const { combatId, combatantId, fnName, args } = message.data ?? {};
+        if (typeof combatId !== 'string' || typeof combatantId !== 'string') return;
+
+        const combatant = game.combats.get(combatId)?.combatants.get(combatantId);
+        if (!combatant) return;
+
+        switch (fnName) {
+            case 'applyModeChange': {
+                if (!Array.isArray(args) || args.length !== 2) return;
+
+                const [fromMode, toMode] = args;
+                if (!isInitiativeMode(fromMode) || !isInitiativeMode(toMode)) return;
+                return combatant.applyModeChange(fromMode, toMode);
+            }
+            case 'toggleSeizeInitiative':
+                return combatant.toggleSeizeInitiative();
+        }
     }
 
     override async update(...args: Parameters<Combatant["update"]>) {
@@ -73,6 +107,40 @@ export class SR5Combatant extends Combatant<"base"> {
     }
 
     /**
+     * Toggles the 'Seize the Initiative' edge action for this combatant, spending or refunding edge
+     * and recording a history snapshot for undo.
+     *
+     * Creating the history snapshot updates the parent Combat document, which non-GM users can't do,
+     * so the whole operation is forwarded to an active GM when triggered by a player.
+     */
+    async toggleSeizeInitiative(): Promise<void> {
+        const { actor, combat, id } = this;
+        if (!actor || !combat || !id) return;
+
+        const seized = this.system.seize ?? false;
+
+        // Re-seizing / un-seizing is a GM-only correction (SR5 rule guard).
+        if (seized && !game.user?.isGM) {
+            ui.notifications.warn(game.i18n.localize('SR5.COMBAT.CannotSeizeAgain'));
+            return;
+        }
+
+        if (!game.user?.isGM) {
+            SocketMessage.emitForGM(FLAGS.DoCombatantFunction, {
+                combatId: combat.id, combatantId: id, fnName: 'toggleSeizeInitiative', args: [],
+            });
+            return;
+        }
+
+        const edge = actor.system.attributes.edge;
+        await combat.createHistorySnapshot();
+        await this.update({ system: { seize: !seized } });
+        await actor.update({
+            system: { attributes: { edge: { uses: edge.uses + (seized ? -1 : 1) } } }
+        });
+    }
+
+    /**
      * Processes a change in the combatant's initiative mode (e.g., transitioning from meatspace to hot_sim).
      *
      * Depending on the game's configured `InitiativeModeUpdateStrategy`, this method will either:
@@ -92,6 +160,15 @@ export class SR5Combatant extends Combatant<"base"> {
     ) {
         const { actor, combat, id, initiative: prevInitTotal, system } = this;
         if (!actor || !combat || !id || prevInitTotal === null || fromMode === toMode) return;
+
+        // Non-GM users can't update the Combat document (e.g. the history snapshot below),
+        // so forward the whole flow to an active GM to run in order.
+        if (!game.user?.isGM) {
+            SocketMessage.emitForGM(FLAGS.DoCombatantFunction, {
+                combatId: combat.id, combatantId: id, fnName: 'applyModeChange', args: [fromMode, toMode],
+            });
+            return;
+        }
 
         await combat.createHistorySnapshot();
 

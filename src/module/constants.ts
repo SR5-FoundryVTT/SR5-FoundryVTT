@@ -37,6 +37,7 @@ export const FLAGS = {
     ChangelogShownForVersion: 'changelogShownForVersion',
     Modifier: 'modifier',
     DoCombatFunction: 'doCombatFunction',
+    DoCombatantFunction: 'doCombatantFunction',
     addNetworkController: 'addNetworkController',
     SetDataStorage: 'setDataStorage',
     TokenHealthBars: 'tokenHealthBars',
