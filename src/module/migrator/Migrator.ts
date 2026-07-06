@@ -20,7 +20,6 @@ import { Version0_35_1 } from './versions/Version0_35_1';
 import { Version0_35_2 } from './versions/Version0_35_2';
 import { Version0_36_0 } from './versions/Version0_36_0';
 import { Version0_37_0 } from './versions/Version0_37_0';
-import { liftLegacyEmbeddedChildren } from './versions/legacyLift';
 import { VersionMigration, MigratableDocument, MigratableDocumentName, MigratableDocumentType } from "./VersionMigration";
 
 const { deepClone, setProperty } = foundry.utils;
@@ -86,6 +85,14 @@ export class Migrator {
     ): readonly VersionMigration[] {
         return this.s_Versions.filter(migrator =>
             (!type || migrator[`handles${type}`](data)) &&
+            this.compareVersion(migrator.TargetVersion, version) > 0
+        );
+    }
+
+    private static getPendingWorldMigrators(): readonly VersionMigration[] {
+        const version = game.settings.get(game.system.id, FLAGS.KEY_DATA_VERSION);
+        return this.s_Versions.filter(migrator =>
+            migrator.handlesWorldMigration() &&
             this.compareVersion(migrator.TargetVersion, version) > 0
         );
     }
@@ -244,7 +251,8 @@ export class Migrator {
     }
 
     public static BeginMigration() {
-        if (this.pendingMigrationCount === 0) return;
+        const pendingForcedMigrations = this.getPendingWorldMigrators();
+        if (this.pendingMigrationCount === 0 && pendingForcedMigrations.length === 0) return;
 
         const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.WarningTitle');
         const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.WarningHeader');
@@ -256,7 +264,7 @@ export class Migrator {
         const d = new foundry.appv1.api.Dialog({
             title: localizedWarningTitle,
             content:
-                `<h2 style="color: red; text-align: center">${localizedWarningHeader} (${this.pendingMigrationCount})</h2>` +
+                `<h2 style="color: red; text-align: center">${localizedWarningHeader} (${this.pendingMigrationCount + pendingForcedMigrations.length})</h2>` +
                 `<p style="text-align: center"><i>${localizedWarningRequired}</i></p>` +
                 `<p>${localizedWarningDescription}</p>` +
                 `<h3 style="color: red">${localizedWarningBackup}</h3>`,
@@ -306,81 +314,11 @@ export class Migrator {
     }
 
     /**
-     * Lift legacy `flags.shadowrun5e.embeddedItems` children of world items and item compendium
-     * entries into sibling item documents, linking them via system.parentId.
-     *
-     * Actor-owned items are handled separately by Version0_37_0.migrateActor.
-     */
-    private static async liftLegacyCollectionChildren() {
-        await this.liftLegacyChildrenFromItems(game.items.contents.map(item => item.toObject()), null);
-
-        for (const collection of game.packs) {
-            if (collection.documentName !== 'Item') continue;
-            if (collection.metadata.packageType === 'system') continue;
-
-            const pack = collection as foundry.documents.collections.CompendiumCollection<'Item'>;
-            const wasLocked = pack.locked;
-            if (wasLocked) {
-                try {
-                    await pack.configure({ locked: false });
-                } catch (error) {
-                    console.error(`Failed to unlock compendium ${pack.collection} for legacy attachment migration.`, error);
-                    continue;
-                }
-            }
-
-            try {
-                const documents = await pack.getDocuments();
-                await this.liftLegacyChildrenFromItems(documents.map(document => document.toObject()), pack);
-            } finally {
-                if (wasLocked) {
-                    try {
-                        await pack.configure({ locked: true });
-                    } catch (error) {
-                        console.error(`Failed to re-lock compendium ${pack.collection} after legacy attachment migration.`, error);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Lift legacy embedded children from the given item sources, creating the lifted siblings
-     * and persisting the (shrunk or removed) legacy flag on their parents within the same collection.
-     */
-    private static async liftLegacyChildrenFromItems(items: any[], pack: foundry.documents.collections.CompendiumCollection<'Item'> | null) {
-        this.updateProgressbar();
-
-        const lifted: any[] = [];
-        const updatedParents: any[] = [];
-
-        for (const item of items) {
-            const liftedChildren = liftLegacyEmbeddedChildren(item);
-            if (liftedChildren.length === 0) continue;
-
-            for (const child of liftedChildren) {
-                setProperty(child, '_stats.systemVersion', game.system.version);
-            }
-
-            lifted.push(...liftedChildren);
-            updatedParents.push({ _id: item._id, flags: item.flags });
-        }
-
-        if (lifted.length === 0) return;
-
-        try {
-            await Item.implementation.createDocuments(lifted as Item.CreateData[], { pack: pack?.collection });
-            await Item.implementation.updateDocuments(updatedParents as any, { pack: pack?.collection, diff: false, recursive: false });
-        } catch (error) {
-            console.error(`Failed legacy attachment lift for ${pack ? pack.collection : 'world items'}.`, error);
-        }
-    }
-
-    /**
      * Migrate all actors in the game.
      */
     private static async updateAllMigratableDocuments() {
         const start = performance.now();
+        const worldMigrators = this.getPendingWorldMigrators();
 
         // Estimate total migration steps
         this.totalMigrations =
@@ -389,16 +327,13 @@ export class Migrator {
             [...game.actors].reduce((sum, actor) => sum + actor.items.size, 0) +  // Actor item effects
             1 + game.combats.size +                       // Combats + their combatants
             game.scenes.size +                            // Non-actor tokens
-            1 + [...game.packs].filter(pack => pack.documentName === 'Item').length; // Legacy attachment lifting
+            worldMigrators.length;                       // Forced world migrations
 
         /* Items and its embedded Effects */
         await this.updateDocuments(Item, deepClone(game.items._source));
 
         for (const item of game.items)
             await this.updateDocuments(ActiveEffect, item.toObject().effects, item);
-
-        /* Lift legacy embedded attachment/container items into sibling documents */
-        await this.liftLegacyCollectionChildren();
 
         /* Actors and its embedded documents */
         await this.updateDocuments(Actor, deepClone(game.actors._source));
@@ -427,6 +362,15 @@ export class Migrator {
                 );
             } catch (error) {
                 console.error(`Failed migration update for Token documents in ${scene.uuid}.`, error);
+            }
+        }
+
+        for (const migrator of worldMigrators) {
+            this.updateProgressbar();
+            try {
+                await migrator.MigrateWorld();
+            } catch (error) {
+                console.error(`Failed forced migration to ${migrator.TargetVersion}.`, error);
             }
         }
 

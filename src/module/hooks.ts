@@ -8,6 +8,7 @@ import { registerSystemSettings } from './settings';
 import { FLAGS, SR, SRStatus, SYSTEM_NAME, SYSTEM_SOCKET } from './constants';
 import { SR5Actor } from './actor/SR5Actor';
 import { SR5Item } from './item/SR5Item';
+import { SR5ItemCompendium } from './item/SR5ItemCompendium';
 import { SR5Items } from './item/SR5Items';
 import { SR5ItemSheet } from './item/SR5ItemSheet';
 import { SR5Token } from './token/SR5Token';
@@ -163,6 +164,7 @@ export class HooksManager {
         });
         Hooks.once('aipSetup', AutocompleteInlineHooksFlow.aipSetupHook);
 
+        Hooks.once('setup', HooksManager.setup.bind(HooksManager));
         Hooks.on('ready', HooksManager.ready.bind(HooksManager));
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop.bind(HooksManager));
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons.bind(HooksManager));
@@ -532,6 +534,12 @@ ___________________
         registerSR5Tours();
 
         DataStorage.validate();
+    }
+
+    static setup() {
+        for (const pack of game.packs) {
+            if (pack.metadata.type === 'Item') pack.applicationClass = SR5ItemCompendium;
+        }
     }
 
     static async ready() {

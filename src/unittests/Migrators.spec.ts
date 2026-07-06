@@ -32,6 +32,12 @@ export const Migrators = (context: QuenchBatchContext) => {
         }
     }
 
+    class TestForcedMigration extends VersionMigration {
+        readonly TargetVersion = '0.0.1' as const;
+
+        override async MigrateWorld(): Promise<void> {}
+    }
+
     after(async () => {
         await factory.destroy();
     });
@@ -349,6 +355,12 @@ export const Migrators = (context: QuenchBatchContext) => {
     });
 
     describe('VersionMigration active effect remap helper', () => {
+        it('detects forced world migrations independently from document migrations', () => {
+            assert.isFalse(new TestMigration().handlesWorldMigration());
+            assert.isTrue(new TestForcedMigration().handlesWorldMigration());
+            assert.isTrue(new Version0_37_0().handlesWorldMigration());
+        });
+
         it('rewrites mapped keys and formula string value paths without evaluating math', () => {
             const migrator = new TestMigration();
             const keyMap = {

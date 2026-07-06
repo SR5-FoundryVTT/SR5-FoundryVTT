@@ -1,5 +1,6 @@
 import { SR5TestFactory } from "./utils";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
+import { SR5ItemCompendium } from "@/module/item/SR5ItemCompendium";
 
 export const shadowrunSR5Item = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -40,6 +41,21 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
             // A linked item is a sibling and should appear in the items collection.
             const linkedAmmoInCollection = game.items?.get(linkedAmmoData._id!);
             assert.notStrictEqual(linkedAmmoInCollection, undefined);
+        });
+
+        it('detects linked child items for item compendium display', () => {
+            const parent = { _id: 'parent', name: 'Parent' };
+            const child = { _id: 'child', name: 'Child', system: { parentId: 'parent' } };
+            const orphan = { _id: 'orphan', name: 'Orphan', system: { parentId: 'missing' } };
+            const index = new foundry.utils.Collection<any>([
+                [parent._id, parent],
+                [child._id, child],
+                [orphan._id, orphan],
+            ]);
+
+            const hiddenIds = SR5ItemCompendium.linkedChildIds(index);
+
+            assert.deepEqual(hiddenIds, ['child']);
         });
 
         describe('Testing related data injection', () => {
