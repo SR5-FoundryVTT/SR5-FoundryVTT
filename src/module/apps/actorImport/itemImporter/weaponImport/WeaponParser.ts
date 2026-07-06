@@ -59,7 +59,7 @@ export class WeaponParser extends Parser<'weapon'> {
         let base_formula_operator: AttributeFormulaOperator = 'add';
         let parsed = false;
 
-        const attributeDamage = /^(?:\((.+)\)|(.+))([PSM])?(?:\(([a-zA-Z]+)\))?$/i.exec(damageCode);
+        const attributeDamage = /^(?:\((.+)\)|(.+?))([PSM])?(?:\(([a-zA-Z]+)\))?$/i.exec(damageCode);
         if (attributeDamage) {
             const formulaText = attributeDamage[1] ?? attributeDamage[2];
             if (formulaText.includes('{')) {

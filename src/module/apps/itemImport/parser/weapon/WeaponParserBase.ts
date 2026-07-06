@@ -94,7 +94,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
         system.subcategory = category.toLowerCase();
 
         system.action.skill = this.getSkill(jsonData);
-        system.action.damage = this.getDamage(jsonData as any);
+        system.action.damage = this.parseDamageData(jsonData.damage._TEXT, jsonData.ap._TEXT);
 
         if (jsonData.accuracy?._TEXT) {
             let accuracy: string = jsonData.accuracy._TEXT;
@@ -110,12 +110,12 @@ export class WeaponParserBase extends Parser<'weapon'> {
 
         return system;
     }
-    
-    protected getDamage(jsonData: Weapon): DamageType {
-        const partialDamageData: Partial<DamageType> = {};
-        const damageText = String(jsonData.damage._TEXT).trim();
 
-        const attributeDamage = /^(?:\((.+)\)|(.+))([PSM])?(?:\(([a-zA-Z]+)\))?(?:\s+\(-?\d+\/m\))?$/i.exec(damageText);
+    public parseDamageData(damageText: string | number, apText: string | number): DamageType {
+        const partialDamageData: Partial<DamageType> = {};
+        const parsedDamageText = String(damageText).trim();
+
+        const attributeDamage = /^(?:\((.+)\)|(.+?))([PSM])?(?:\(([a-zA-Z]+)\))?(?:\s+\(-?\d+\/m\))?$/i.exec(parsedDamageText);
         if (attributeDamage) {
             const formulaText = attributeDamage[1] ?? attributeDamage[2];
             if (formulaText.includes('{')) {
@@ -135,7 +135,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
         }
 
         if (partialDamageData.base === undefined) {
-            const simpleDamage = /^(\d+)([PSM])?(?:\(([a-zA-Z]+)\))?(?:\s+\(-?\d+\/m\))?$/i.exec(damageText);
+            const simpleDamage = /^([+-]?\d+(?:\.\d+)?)([PSM])?(?:\(([a-zA-Z]+)\))?(?:\s+\(-?\d+\/m\))?$/i.exec(parsedDamageText);
             if (simpleDamage) {
                 const damageType = this.parseDamageType(simpleDamage[2]);
                 const damageElement = this.parseDamageElement(simpleDamage[3]);
@@ -148,9 +148,9 @@ export class WeaponParserBase extends Parser<'weapon'> {
             }
         }
 
-        const apText = String(jsonData.ap._TEXT).trim();
-        const apFormula = this.parseAttributeFormula(apText);
-        const simpleAP = /^[+-]?\d+(?:\.\d+)?$/.exec(apText);
+        const parsedApText = String(apText).trim();
+        const apFormula = this.parseAttributeFormula(parsedApText);
+        const simpleAP = /^[+-]?\d+(?:\.\d+)?$/.exec(parsedApText);
         if (apFormula) {
             partialDamageData.ap = {
                 base: apFormula.base,
@@ -215,6 +215,9 @@ export class WeaponParserBase extends Parser<'weapon'> {
             case 'fire':
             case '(fire)':
                 return 'fire';
+            case 'acid':
+            case '(acid)':
+                return 'acid';
             default:
                 return '';
         }

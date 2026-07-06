@@ -1,16 +1,10 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
-import { DamageType } from 'src/module/types/item/Action';
 import { DataDefaults } from '../module/data/DataDefaults';
-import { Weapon } from '../module/apps/itemImport/schema/WeaponsSchema';
 import { WeaponParserBase } from '../module/apps/itemImport/parser/weapon/WeaponParserBase';
 import { WeaponParser as ActorWeaponParser } from '../module/apps/actorImport/itemImporter/weaponImport/WeaponParser';
 import { Constants } from '../module/apps/itemImport/importer/Constants';
-
-class TestWeaponParser extends WeaponParserBase {
-    public override getDamage(jsonData: Weapon): DamageType {
-        return super.getDamage(jsonData);
-    }
-}
+import { CritterParser } from '../module/apps/itemImport/parser/metatype/CritterParser';
+import { AmmoParser as ItemAmmoParser } from '../module/apps/itemImport/parser/gear/AmmoParser';
 
 function mockXmlData(data: Record<string, unknown>): Record<string, unknown> {
     return Object.fromEntries(Object.entries(data)
@@ -18,20 +12,26 @@ function mockXmlData(data: Record<string, unknown>): Record<string, unknown> {
             [key, { '_TEXT': value }]));
 }
 
-function getData(damageString: string, apString: string | number = 0): Partial<Weapon> {
-    return mockXmlData({
-        damage: damageString, ap: apString
-    });
+class TestCritterParser extends CritterParser {
+    public override getNaturalWeapons(powers: { _TEXT: string; $?: { select?: string } }[], options: { actorName: string }) {
+        return super.getNaturalWeapons(powers, options);
+    }
+}
+
+class TestItemAmmoParser extends ItemAmmoParser {
+    public override getSystem(jsonData: any) {
+        return super.getSystem(jsonData);
+    }
 }
 
 export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
     const { describe, it, assert } = context;
 
-    const mut = new TestWeaponParser();
+    const mut = new WeaponParserBase();
 
     describe("Weapon Damage Values", () => {
         it("Parses simple damage", () => {
-            const output = mut.getDamage(getData("12P") as Weapon);
+            const output = mut.parseDamageData("12P", 0);
             assert.deepEqual(output, DataDefaults.createData('damage', {
                 base: 12,
                 value: 12,
@@ -43,7 +43,7 @@ export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
         });
 
         it("Parses elemental damage", () => {
-            const output = mut.getDamage(getData("8S(e)") as Weapon);
+            const output = mut.parseDamageData("8S(e)", 0);
             assert.deepEqual(output, DataDefaults.createData('damage', {
                 base: 8,
                 value: 8,
@@ -59,7 +59,7 @@ export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
         });
 
         it("Parses strength-based damage", () => {
-            const output = mut.getDamage(getData("({STR}+3)P") as Weapon);
+            const output = mut.parseDamageData("({STR}+3)P", 0);
             assert.deepEqual(output, DataDefaults.createData('damage', {
                 base: 3,
                 value: 3,
@@ -72,7 +72,7 @@ export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
         });
 
         it("Parses damage without type as physical", () => {
-            const output = mut.getDamage(getData("11") as Weapon);
+            const output = mut.parseDamageData("11", 0);
             assert.deepEqual(output, DataDefaults.createData('damage', {
                 base: 11,
                 value: 11,
@@ -84,7 +84,7 @@ export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
         });
 
         it("Parses 0 damage", () => {
-            const output = mut.getDamage(getData("0") as Weapon);
+            const output = mut.parseDamageData("0", 0);
             assert.deepEqual(output, DataDefaults.createData('damage', {
                 base: 0,
                 value: 0,
@@ -96,7 +96,7 @@ export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
         });
 
         it("Parses basic matrix damage", () => {
-            const output = mut.getDamage(getData("7M") as Weapon);
+            const output = mut.parseDamageData("7M", 0);
             assert.deepEqual(output, DataDefaults.createData('damage', {
                 base: 7,
                 value: 7,
@@ -108,7 +108,7 @@ export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
         });
 
         it("Parses strength-based damage without modifier", () => {
-            const output = mut.getDamage(getData("({STR})P") as Weapon);
+            const output = mut.parseDamageData("({STR})P", 0);
             assert.deepEqual(output, DataDefaults.createData('damage', {
                 base: 0,
                 value: 0,
@@ -121,7 +121,7 @@ export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
         });
 
         it("Parses multiplied attribute damage", () => {
-            const output = mut.getDamage(getData("({MAG}*2)P") as Weapon);
+            const output = mut.parseDamageData("({MAG}*2)P", 0);
             assert.deepEqual(output, DataDefaults.createData('damage', {
                 base: 2,
                 value: 2,
@@ -135,7 +135,7 @@ export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
         });
 
         it("Parses attribute AP formulas", () => {
-            const output = mut.getDamage(getData("9P", "-{MAG}*0.5") as Weapon);
+            const output = mut.parseDamageData("9P", "-{MAG}*0.5");
             assert.deepEqual(output, DataDefaults.createData('damage', {
                 base: 9,
                 value: 9,
@@ -164,7 +164,7 @@ export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
         });
 
         it("Parses short fire elemental damage", () => {
-            const output = mut.getDamage(getData("8P(f)") as Weapon);
+            const output = mut.parseDamageData("8P(f)", 0);
             assert.deepEqual(output, DataDefaults.createData('damage', {
                 base: 8,
                 value: 8,
@@ -180,8 +180,24 @@ export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
         });
 
         it("Leaves unsupported complex damage at defaults", () => {
-            const output = mut.getDamage(getData("({STR}+2)P + 12(e)", "-") as Weapon);
+            const output = mut.parseDamageData("({STR}+2)P + 12(e)", "-");
             assert.deepEqual(output, DataDefaults.createData('damage'));
+        });
+
+        it("Parses signed elemental damage modifiers", () => {
+            const output = mut.parseDamageData("-2S(e)", 0);
+            assert.deepEqual(output, DataDefaults.createData('damage', {
+                base: -2,
+                value: -2,
+                type: {
+                    base: 'stun',
+                    value: 'stun',
+                },
+                element: {
+                    base: 'electricity',
+                    value: 'electricity',
+                },
+            }));
         });
     })
 
@@ -295,5 +311,55 @@ export const weaponParserBaseTesting = (context: QuenchBatchContext) => {
 
             assert.strictEqual(output, null);
         });
-    })
+    });
+
+    describe("Item Import Natural Weapon Values", () => {
+        const critterParser = new TestCritterParser();
+
+        it("Parses metatype natural weapon formulas from power select text", () => {
+            const [item] = critterParser.getNaturalWeapons([{
+                _TEXT: 'Natural Weapon',
+                $: { select: 'Kick: DV ({STR} + 2)P, AP +1, +1 Reach' },
+            }], { actorName: 'Centaur' });
+
+            const system = (item as unknown as { system: Item.SystemOfType<'weapon'> }).system;
+            assert.strictEqual(system.action.damage.base, 2);
+            assert.strictEqual(system.action.damage.attribute, 'strength');
+            assert.strictEqual(system.action.damage.ap.base, 1);
+            assert.strictEqual(system.melee.reach, 1);
+        });
+    });
+
+    describe("Item Import Ammo Bonus Values", () => {
+        const ammoParser = new TestItemAmmoParser([] as any);
+
+        it("Parses signed elemental ammo damage bonuses", () => {
+            const output = ammoParser.getSystem({
+                weaponbonus: {
+                    damage: { _TEXT: '-2S(e)' },
+                    ap: { _TEXT: '-5' },
+                },
+            });
+
+            assert.strictEqual(output.damage, -2);
+            assert.strictEqual(output.damageType, 'stun');
+            assert.strictEqual(output.element, 'electricity');
+            assert.strictEqual(output.ap, -5);
+        });
+
+        it("Parses ammo damage replacements with acid damage types", () => {
+            const output = ammoParser.getSystem({
+                weaponbonus: {
+                    damagereplace: { _TEXT: '6P' },
+                    damagetype: { _TEXT: 'Acid' },
+                    apreplace: { _TEXT: '-5' },
+                },
+            });
+
+            assert.strictEqual(output.damage, 6);
+            assert.strictEqual(output.damageType, 'physical');
+            assert.strictEqual(output.element, 'acid');
+            assert.strictEqual(output.ap, -5);
+        });
+    });
 }
