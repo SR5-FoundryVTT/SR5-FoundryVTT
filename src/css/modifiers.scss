@@ -399,6 +399,7 @@
                 font-weight: normal;
                 flex: 1 1 auto;
                 min-width: 0;
+                white-space: nowrap;
             }
 
             > input[type="checkbox"] {
@@ -406,24 +407,12 @@
                 flex: 0 0 auto;
             }
 
-            > .roll-mode-controls {
+            > select {
                 margin-left: auto;
-                flex: 0 0 auto;
+                flex: 0 1 65%;
+                min-width: 6rem;
                 width: auto;
-                --button-size: 24px;
-
-                .roll-mode-button {
-                    min-width: var(--button-size);
-                    width: var(--button-size);
-                    height: var(--button-size);
-                    line-height: var(--button-size);
-                    padding: 0;
-
-                    &[aria-pressed='true'] {
-                        border-color: var(--control-active-border-color);
-                        z-index: 1;
-                    }
-                }
+                height: 24px;
             }
         }
     }
