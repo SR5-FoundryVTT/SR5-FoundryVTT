@@ -676,15 +676,18 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             return;
         }
 
-        const uuid = SheetFlow.closestUuid(event.target);
-        if (!uuid) return;
+        // Only consider the stored mark id on the element when clearing a single mark.
+        const el = event.target.closest<HTMLElement>('[data-mark-id]');
+        if (!el) return;
+        const markId = el.dataset.markId;
+        if (!markId) return;
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
         // Change selection state before triggering an update caused re-render.
         this.toggleMatrixTargetSelection(undefined);
-        await this.actor.clearMark(uuid);
+        await this.actor.clearMark(markId);
     }
 
     static async #clearAllMarks(this: SR5MatrixActorSheet, event: PointerEvent) {
