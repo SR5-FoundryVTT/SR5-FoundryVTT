@@ -437,6 +437,24 @@ body.theme-light,
             border-top: 1px solid var(--sr5v2-border-strong);
             flex-shrink: 0;
             vertical-align: bottom;
+
+            /* Make the inner list-item distribute its children across the footer
+               so the footer content fills the full width and the armor badge
+               stays pinned to the far right. */
+            .list-item {
+                width: 100%;
+                display: flex;
+                flex-flow: row nowrap;
+                align-items: center;
+                gap: .5rem;
+                /* Allow children to grow to fill space so items span the full width */
+            }
+
+            /* By default each immediate child should flex to take available space */
+            .list-item > * {
+                flex: 1 1 auto;
+                min-width: 0; /* prevent overflow from long labels */
+            }
         }
 
         &.standard-form, .standard-form {

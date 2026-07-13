@@ -253,6 +253,12 @@
                 {{> 'systems/shadowrun5e/dist/templates/v2/actor/parts/movement.hbs' }}
             {{/unless}}
         {{/unless}}
+        {{#if (or (eq actor.type 'character') (eq actor.type 'spirit') (eq actor.type 'vehicle'))}}
+            <label class="sheet-footer-armor" data-tooltip="{{localize 'SR5.Armor.label'}}">
+                <i class="fas fa-shield"></i>
+                {{system.armor.rating.value}}
+            </label>
+        {{/if}}
         <div></div>
     </div>
 </footer>
