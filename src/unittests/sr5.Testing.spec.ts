@@ -3,6 +3,8 @@ import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { TestCreator } from "../module/tests/TestCreator";
 import { DataDefaults } from "@/module/data/DataDefaults";
 import { ModifiableValue } from "@/module/mods/ModifiableValue";
+import { NaturalRecoveryStunTest } from "@/module/tests/NaturalRecoveryStunTest";
+import { NaturalRecoveryPhysicalTest } from "@/module/tests/NaturalRecoveryPhysicalTest";
 
 export const shadowrunTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -194,6 +196,60 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             }));
 
             assert.isTrue(test.codeTerms.threshold.every(term => !term.tooltipSource));
+        });
+
+        it('keeps the stun recovery threshold fixed on extended rolls', async () => {
+            const actor = await factory.createActor({
+                type: 'character',
+                system: {
+                    track: {
+                        stun: { value: 5 }
+                    }
+                }
+            });
+
+            const test = new NaturalRecoveryStunTest(TestCreator._minimalTestData(), { actor }, { showMessage: false, showDialog: false });
+            test.prepareBaseValues();
+            test.calculateBaseValues();
+
+            assert.strictEqual(test.threshold.value, 5);
+
+            await actor.update({ system: { track: { stun: { value: 2 } } } });
+
+            const extendedData = foundry.utils.duplicate(test.data);
+            extendedData.extendedRoll = true;
+            const extendedTest = new NaturalRecoveryStunTest(extendedData, { actor }, { showMessage: false, showDialog: false });
+            extendedTest.prepareBaseValues();
+            extendedTest.calculateBaseValues();
+
+            assert.strictEqual(extendedTest.threshold.value, 5);
+        });
+
+        it('keeps the physical recovery threshold fixed on extended rolls', async () => {
+            const actor = await factory.createActor({
+                type: 'character',
+                system: {
+                    track: {
+                        physical: { value: 6 }
+                    }
+                }
+            });
+
+            const test = new NaturalRecoveryPhysicalTest(TestCreator._minimalTestData(), { actor }, { showMessage: false, showDialog: false });
+            test.prepareBaseValues();
+            test.calculateBaseValues();
+
+            assert.strictEqual(test.threshold.value, 6);
+
+            await actor.update({ system: { track: { physical: { value: 3 } } } });
+
+            const extendedData = foundry.utils.duplicate(test.data);
+            extendedData.extendedRoll = true;
+            const extendedTest = new NaturalRecoveryPhysicalTest(extendedData, { actor }, { showMessage: false, showDialog: false });
+            extendedTest.prepareBaseValues();
+            extendedTest.calculateBaseValues();
+
+            assert.strictEqual(extendedTest.threshold.value, 6);
         });
 
         it('evaluate an opposed roll from a opposed action', async () => {

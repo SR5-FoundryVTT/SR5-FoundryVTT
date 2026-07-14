@@ -1,5 +1,7 @@
 import { SR5TestFactory } from "./utils";
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
+import { Helpers } from "@/module/helpers";
+import { MarksStorage } from "@/module/storage/MarksStorage";
 
 export const shadowrunMarks = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -85,6 +87,55 @@ export const shadowrunMarks = (context: QuenchBatchContext) => {
 
             correctMarks = decker.getMarksPlaced(grid.uuid);
             assert.equal(correctMarks, 0);
+        });
+
+        it('Should remove one cleared mark from actor data and global marks storage', async () => {
+            const decker = await factory.createActor({ type: 'character' });
+            const firstTarget = await factory.createItem({ type: 'device' });
+            const secondTarget = await factory.createItem({ type: 'device' });
+
+            await decker.setMarks(firstTarget, 1);
+            await decker.setMarks(secondTarget, 1);
+            await decker.clearMark(firstTarget.uuid);
+
+            assert.equal(decker.getMarksPlaced(firstTarget.uuid), 0);
+            assert.equal(decker.getMarksPlaced(secondTarget.uuid), 1);
+            assert.sameMembers(MarksStorage.retrieveMarks(decker), [secondTarget.uuid]);
+            assert.sameMembers(MarksStorage.getMarksRelations(decker.uuid), [secondTarget.uuid]);
+        });
+
+        it('Should remove all cleared marks from actor data and global marks storage', async () => {
+            const decker = await factory.createActor({ type: 'character' });
+            const target = await factory.createItem({ type: 'device' });
+
+            await decker.setMarks(target, 1);
+            await decker.clearMarks();
+
+            assert.lengthOf(decker.marksData ?? [], 0);
+            assert.notProperty(MarksStorage.getStorage(), Helpers.uuidForStorage(decker.uuid));
+        });
+
+        it('Should remove global marks storage relations when the marking actor is deleted', async () => {
+            const decker = await factory.createActor({ type: 'character' });
+            const target = await factory.createItem({ type: 'device' });
+
+            await decker.setMarks(target, 1);
+            await decker.delete();
+            factory.actors.splice(factory.actors.indexOf(decker), 1);
+
+            assert.notProperty(MarksStorage.getStorage(), Helpers.uuidForStorage(decker.uuid));
+        });
+
+        it('Should clear actor marks and empty storage relations when the marked item is deleted', async () => {
+            const decker = await factory.createActor({ type: 'character' });
+            const target = await factory.createItem({ type: 'device' });
+
+            await decker.setMarks(target, 1);
+            await target.delete();
+            factory.items.splice(factory.items.indexOf(target), 1);
+
+            assert.equal(decker.getMarksPlaced(target.uuid), 0);
+            assert.notProperty(MarksStorage.getStorage(), Helpers.uuidForStorage(decker.uuid));
         });
     });
 };
