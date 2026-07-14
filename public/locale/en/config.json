@@ -2800,7 +2800,7 @@
             "ResistedAllDamage": "No Damage taken!",
             "ResistedSomeDamage": "Damage taken!",
             "Results": "Results",
-            "RitualFailure": "The ritual was to strong for you",
+            "RitualFailure": "The ritual was too strong for you",
             "RitualSuccess": "The ritual is sealed",
             "SoakBlockedByHardenedArmor": "Blocked By Hardened Armor",
             "SpiritSummonFailure": "Spirit fled!",

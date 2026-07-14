@@ -17,10 +17,13 @@ export class NaturalRecoveryStunTest extends SuccessTest {
     prepareThreshold() {
         if (!this.actor) return;
 
+        const threshold = new ModifiableValue(this.threshold);
+        if (this.extendedRoll && threshold.get('SR5.StunTrack') !== undefined) return;
+
         const track = this.actor.getStunTrack();
         const boxes = track?.value || 0;
 
-        ModifiableValue.addUniqueBase(this.threshold, 'SR5.StunTrack', boxes)
+        threshold.addUniqueBase('SR5.StunTrack', boxes)
     }
 
     /**
