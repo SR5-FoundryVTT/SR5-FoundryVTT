@@ -42,6 +42,8 @@ export class SR5Combatant extends Combatant<"base"> {
      * than dispatched generically.
      */
     static async _handleCombatantSocketMessage(message: Shadowrun.SocketMessageData) {
+        if (!game.user?.isGM) return;
+
         const { combatId, combatantId, fnName, args } = message.data ?? {};
         if (typeof combatId !== 'string' || typeof combatantId !== 'string') return;
 
@@ -135,8 +137,9 @@ export class SR5Combatant extends Combatant<"base"> {
         const edge = actor.system.attributes.edge;
         await combat.createHistorySnapshot();
         await this.update({ system: { seize: !seized } });
+        const nextUses = Math.min(edge.value, Math.max(0, edge.uses + (seized ? 1 : -1)));
         await actor.update({
-            system: { attributes: { edge: { uses: edge.uses + (seized ? -1 : 1) } } }
+            system: { attributes: { edge: { uses: nextUses } } }
         });
     }
 

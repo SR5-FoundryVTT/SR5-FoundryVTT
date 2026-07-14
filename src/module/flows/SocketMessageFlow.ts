@@ -8,6 +8,8 @@ export const SocketMessageFlow = {
      * @param message.data [Array] of {uuid: string, updateData: any}
      */
     async handleUpdateDocumentsAsGMMessage(message: Shadowrun.SocketMessageData) {
+        if (!game.user?.isGM) return;
+
         console.debug('Shadowrun 5e | Handling update documents as GM message', message);
 
         for (const documentData of message.data as {uuid: string, updateData: any}[]) {
