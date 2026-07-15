@@ -463,6 +463,22 @@
     }
   }
 
+  .import-setting-select {
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+
+    span {
+      flex: 0 0 200px;
+    }
+
+    select {
+      flex: 1 1 auto;
+    }
+  }
+
   // 🔽 File Input & Button
   .import-actions {
     display: flex;
