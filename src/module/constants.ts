@@ -37,6 +37,7 @@ export const FLAGS = {
     ChangelogShownForVersion: 'changelogShownForVersion',
     Modifier: 'modifier',
     DoCombatFunction: 'doCombatFunction',
+    DoCombatantFunction: 'doCombatantFunction',
     addNetworkController: 'addNetworkController',
     SetDataStorage: 'setDataStorage',
     TokenHealthBars: 'tokenHealthBars',
@@ -71,8 +72,7 @@ export const FLAGS = {
     CompendiaSettingsMenu: 'CompendiaSettingsMenu',
     TokenAutoRunning: 'TokenAutoRunning',
     CompendiumBrowserBlacklist: 'CompendiumBrowserBlacklist',
-    ImporterCompendiumOrder: 'ImporterCompendiumOrder',
-    DieFaceLabels: "DieFaceLabels"
+    ImporterCompendiumOrder: 'ImporterCompendiumOrder'
 } as const;
 export const CORE_NAME = 'core';
 export const METATYPEMODIFIER = 'SR5.Character.Modifiers.NPCMetatypeAttribute';

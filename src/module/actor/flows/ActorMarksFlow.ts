@@ -97,6 +97,7 @@ export const ActorMarksFlow = {
 
         // Delete all markId properties from ActorData
         await persona.update({ system: { matrix: { marks: [] } } });
+        if (persona.uuid) await MarksStorage.storeRelations(persona.uuid, []);
     },
 
     /**
@@ -107,6 +108,7 @@ export const ActorMarksFlow = {
 
         const marksData = persona.matrixData()?.marks.filter(mark => mark.uuid !== uuid) ?? [];
         await persona.update({ system: { matrix: { marks: marksData } } });
+        if (persona.uuid) await MarksStorage.storeRelations(persona.uuid, marksData);
     },
 
     /**

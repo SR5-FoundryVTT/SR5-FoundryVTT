@@ -128,6 +128,8 @@ export class TeamworkTest {
      * @returns 
      */
     static async _handleUpdateSocketMessage(socketMessage: Shadowrun.SocketMessageData) {
+        if (!game.user?.isGM) return;
+
         const requiredProps = ['messageUuid', 'content', 'teamworkData'] as const;
         const missingProps = requiredProps.some(prop => !Object.hasOwn(socketMessage.data, prop));
         if (missingProps) {
