@@ -21,8 +21,6 @@
         "DefaultOpposedTestActorSelectionDescription": "항상 선택한 토큰을 판정에 사용된 대상으로 덮어씀",
         "DiagonalMovementDescription": "격자판 사용 시 대각선 이동 처리 방식",
         "DiagonalMovementName": "대각선 이동",
-        "DieFaceLabels": "판정 주사위 면 라벨",
-        "DieFaceLabelsDescription": "[Dice So Nice] 판정 주사위 면에 대한 6개의 라벨을 쉼표로 구분한 목록으로, 1번부터 시작한다.",
         "DisplayDefaultRollCardDescription": "기본 굴림 카드와 함께 섀도우런 굴림 카드 표시 여부",
         "DisplayDefaultRollCardName": "기본 굴림 카드 표시",
         "EstimateDiagonal": "대각선 이동 계산 (1-2-1)",

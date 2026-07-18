@@ -739,7 +739,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * Determine if an actor can choose a full defense attribute
      */
     get hasFullDefense(): boolean {
-        return ['character', 'vehicle', 'sprite', 'spirit'].includes(this.type);
+        return ['character', 'vehicle', 'spirit'].includes(this.type);
     }
 
     /**

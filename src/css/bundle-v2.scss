@@ -301,6 +301,33 @@ body.theme-light,
                         -1px -1px 1px var(--sr5v2-link-hover),
                         -1px 1px 1px var(--sr5v2-link-hover);
         }
+        > button.header-control.icon.fa-stack {
+            padding: 0;
+            position: relative;
+            width: 1.75rem;
+            flex-basis: 1.75rem;
+            overflow: visible;
+            font-size: 0.8rem;
+
+            > .fa-toggle-large-on,
+            > .fa-toggle-large-off {
+                left: 50%;
+                top: 50%;
+                width: 3.25em;
+                transform: translate(-50%, -90%);
+                z-index: 0;
+            }
+
+            > .edit-wrench-icon {
+                left: calc(50% - 0.25rem);
+                top: 50%;
+                width: auto;
+                margin: 0;
+                font-size: 0.6rem;
+                transform: translate(-60%, -50%) rotate(270deg);
+                z-index: 1;
+            }
+        }
     }
 
     &.named-sheet {
@@ -437,6 +464,24 @@ body.theme-light,
             border-top: 1px solid var(--sr5v2-border-strong);
             flex-shrink: 0;
             vertical-align: bottom;
+
+            /* Make the inner list-item distribute its children across the footer
+               so the footer content fills the full width and the armor badge
+               stays pinned to the far right. */
+            .list-item {
+                width: 100%;
+                display: flex;
+                flex-flow: row nowrap;
+                align-items: center;
+                gap: .5rem;
+                /* Allow children to grow to fill space so items span the full width */
+            }
+
+            /* By default each immediate child should flex to take available space */
+            .list-item > * {
+                flex: 1 1 auto;
+                min-width: 0; /* prevent overflow from long labels */
+            }
         }
 
         &.standard-form, .standard-form {
@@ -970,6 +1015,12 @@ body.theme-light .sr5v2:not(.theme-dark),
     --sr5v2-negative-bg: rgba(140, 61, 61, 0.16);
     --sr5v2-list-selected-bg: radial-gradient(rgba(7, 145, 35, 0.22), rgba(7, 145, 35, 0.03));
     --sr5v2-icon-filter: none;
+}
+
+body.theme-light .sr5v2:not(.theme-dark) .window-header > button.header-control.icon.fa-stack > .edit-wrench-icon,
+.sr5v2.theme-light .window-header > button.header-control.icon.fa-stack > .edit-wrench-icon {
+    color: #fff;
+    text-shadow: none;
 }
 
 body.theme-light .sr5v2:not(.theme-dark) .toggle-fresh-import img[src$='.svg'],

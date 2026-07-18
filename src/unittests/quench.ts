@@ -30,6 +30,7 @@ import { itemSkillTesting } from './ItemSkill.spec';
 import { shadowrunOpposedCompileSpriteTesting } from './sr5.OpposedCompileSprite.spec';
 import { shadowrunOpposedCallInMessageActionTesting } from './sr5.OpposedCallInMessageAction.spec';
 import { actorArmorFlowTesting } from './sr5.ActorArmorFlow.spec';
+import { shadowrunDiceSoNiceTesting } from './sr5.DiceSoNice.spec';
 
 import { Quench, QuenchRegisterBatchFunction, QuenchRegisterBatchOptions } from '@ethaks/fvtt-quench';
 import { shadowrunRiggerTesting } from '@/unittests/sr5.RiggerTesting.spec';
@@ -132,6 +133,9 @@ export const quenchRegister = (quench: Quench) => {
         displayName: 'SHADOWRUN5e: Resist Matrix Test'
     });
     registerBatch(quench, 'shadowrun5e.flow.sr5roll', shadowrunRolling, { displayName: 'SHADOWRUN5e: SR5Roll' });
+    registerBatch(quench, 'shadowrun5e.integration.dice_so_nice', shadowrunDiceSoNiceTesting, {
+        displayName: 'SHADOWRUN5e: Dice So Nice Integration',
+    });
     registerBatch(quench, 'shadowrun5e.parser.weapon', weaponParserBaseTesting, {
         displayName: 'SHADOWRUN5e: Data Importer Weapon Parsing',
     });

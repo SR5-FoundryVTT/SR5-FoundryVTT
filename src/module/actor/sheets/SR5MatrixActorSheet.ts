@@ -508,12 +508,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         const uuid = SheetFlow.closestUuid(event.target);
         if (!uuid) return;
 
-        if (this.selectedMatrixTarget === uuid) {
-            this.selectedMatrixTarget = undefined;
-        } else {
-            this.selectedMatrixTarget = uuid;
-        }
-
+        this.toggleMatrixTargetSelection(uuid);
         this.informAboutOfflineSelection();
 
         void this.render();
@@ -605,6 +600,25 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
     }
 
     /**
+     * Set given uuid as the selected matrix target for this actor sheet.
+     * @param uuid The uuid of the matrix target to select. If undefined, no target is selected.
+     */
+    toggleMatrixTargetSelection(uuid: string | undefined) {
+        // Allow caller to unset selection completly.
+        if (!uuid) {
+            this.selectedMatrixTarget = undefined;
+            return;
+        };
+
+        // Toggle target selection on of, either to unselect or select another target.
+        if (this.selectedMatrixTarget === uuid) {
+            this.selectedMatrixTarget = undefined;
+        } else {
+            this.selectedMatrixTarget = uuid;
+        }
+    }
+
+    /**
      * Offline targets can be selected however later matrix actions may not be possible.
      *
      * Let users know about the limitations of selecting offline targets.
@@ -663,13 +677,18 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             return;
         }
 
-        const uuid = SheetFlow.closestUuid(event.target);
-        if (!uuid) return;
+        // Only consider the stored mark id on the element when clearing a single mark.
+        const el = event.target.closest<HTMLElement>('[data-mark-id]');
+        if (!el) return;
+        const markId = el.dataset.markId;
+        if (!markId) return;
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        await this.actor.clearMark(uuid);
+        // Change selection state before triggering an update caused re-render.
+        this.toggleMatrixTargetSelection(undefined);
+        await this.actor.clearMark(markId);
     }
 
     static async #clearAllMarks(this: SR5MatrixActorSheet, event: PointerEvent) {
@@ -684,6 +703,8 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
+        // Change selection state before triggering an update caused re-render.
+        this.toggleMatrixTargetSelection(undefined);
         await this.actor.clearMarks();
     }
 
