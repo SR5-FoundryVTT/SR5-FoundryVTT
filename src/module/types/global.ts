@@ -319,7 +319,6 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.SkillSetsPack": string;
         "shadowrun5e.CompendiumBrowserBlacklist": string[];
         "shadowrun5e.ImporterCompendiumOrder": string[];
-        "shadowrun5e.DieFaceLabels": string;
         "shadowrun5e.TokenAutoRunning": boolean;
     }
 }
