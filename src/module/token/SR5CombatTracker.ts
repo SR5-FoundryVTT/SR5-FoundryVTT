@@ -215,22 +215,7 @@ export class SR5CombatTracker extends CombatTracker {
     }
 
     private async _onSeizeInitiative(li: HTMLElement): Promise<void> {
-        const combatant = this._getCombatant(li);
-        if (!combatant?.actor) return;
-
-        const edge = combatant.actor.system.attributes.edge;
-        const seized = combatant.system.seize ?? false;
-
-        if (seized && !game.user.isGM) {
-            ui.notifications.warn(game.i18n.localize('SR5.COMBAT.CannotSeizeAgain'));
-            return;
-        }
-
-        await this.viewed?.createHistorySnapshot();
-        await combatant.update({ system: { seize: !seized } });
-        await combatant.actor.update({
-            system: { attributes: { edge: { uses: edge.uses + (seized ? -1 : 1) } } }
-        });
+        await this._getCombatant(li)?.toggleSeizeInitiative();
     }
 
     private async _onSetInitiativeMode(combatant: SR5Combatant, mode: InitiativeModeOptions): Promise<void> {

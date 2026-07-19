@@ -525,6 +525,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         html.find('select[name="change-ammo"]').on('change', this._onAmmoSelect.bind(this));
         html.find('select[name="change-clip-type"]').on('change', (event) => { void this._onClipSelect((event.target as HTMLSelectElement).value) });
 
+        // Inline change handlers for nested list items (qty inputs in edit mode)
+        html.find('input[data-system-action="changeItemQty"]').on('change', this._onListItemChangeQuantity.bind(this));
+
         // Marks handling
         html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
 
@@ -798,6 +801,23 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         const marks = parseInt(currentTarget.value);
         await this.item.setMarks(markedDocument, marks, { overwrite: true });
+    }
+
+    /**
+     * Change the quantity on a nested item shown within this item sheet's list.
+     * @param event A DOM event
+     */
+    async _onListItemChangeQuantity(event: Event) {
+        const iid = SheetFlow.closestItemId(event.currentTarget);
+        const item = this.item.getOwnedItem(iid);
+        const quantity = parseInt((event.currentTarget as HTMLInputElement).value);
+
+        if (!quantity || !item?.system?.technology) {
+            console.error(`Shadowrun 5e | Tried altering technology quantity on an item without technology data: ${item?.id}`, item);
+            return;
+        }
+
+        await SheetFlow.changeItemQuantity(item, quantity);
     }
 
     static async #addOneQty(this: SR5ItemSheet, event: Event) {

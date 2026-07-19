@@ -102,6 +102,8 @@ export class SR5Combat extends Combat<"base"> {
      * Handles socket messages to trigger combat functions remotely.
      */
     static async _handleSocketMessage(message: SocketMessageData) {
+        if (!game.user?.isGM) return;
+
         const { id, fnName } = message.data ?? {};
         if (typeof id !== 'string' || typeof fnName !== 'string') return;
 
@@ -125,7 +127,7 @@ export class SR5Combat extends Combat<"base"> {
     }
 
     // Foundry's Combat interface defines nextCombatant as a getter, but SR5's initiative flow
-    // @ts-expect-error - doesn't have a single "next" combatant due to initiative passes.
+    // doesn't have a single "next" combatant due to initiative passes.
     override get nextCombatant(): undefined { return undefined; }
 
 
