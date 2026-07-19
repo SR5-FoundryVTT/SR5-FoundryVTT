@@ -6,6 +6,9 @@ import { ImportHelper as IH } from '../helper/ImportHelper';
 import { ChummerFileXML, CompendiumKey, Constants } from './Constants';
 import CompendiumCollection = foundry.documents.collections.CompendiumCollection;
 
+type ImportCreateData = Actor.CreateData | Item.CreateData;
+type ImportCreateDataWithEmbeddedItems = ImportCreateData & { _embeddedItems?: Item.Source[] };
+
 /**
  * The most basic Chummer item data importer, designed to handle one or more Chummer5a data <type>.xml files.
  */
@@ -81,13 +84,13 @@ export abstract class DataImporter {
         options: {
             documentType: string;
             compendiumKey: (data: TInput) => CompendiumKey;
-            parser: { Parse: (data: TInput, compendiumKey: CompendiumKey) => Promise<Actor.CreateData | Item.CreateData> };
+            parser: { Parse: (data: TInput, compendiumKey: CompendiumKey) => Promise<ImportCreateData> };
             filter?: (input: TInput) => boolean;
             injectActionTests?: (item: Item.CreateData) => void;
         }
     ): Promise<void> {
         const { compendiumKey, parser, filter, injectActionTests, documentType } = options;
-        const itemMap = new Map<CompendiumKey, (Actor.CreateData | Item.CreateData)[]>();
+        const itemMap = new Map<CompendiumKey, ImportCreateData[]>();
         const compendiums: Partial<Record<CompendiumKey, CompendiumCollection<'Actor' | 'Item'>>> = {};
         const dataInput = filter ? inputs.filter(x => {
             try { return filter(x); }
@@ -116,7 +119,7 @@ export abstract class DataImporter {
                     continue;
                 }
 
-                const item = await parser.Parse(data, key);
+                const item = await parser.Parse(data, key) as ImportCreateDataWithEmbeddedItems;
                 injectActionTests?.(item as Item.CreateData);
 
                 item._id = id;
