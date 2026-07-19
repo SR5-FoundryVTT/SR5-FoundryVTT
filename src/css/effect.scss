@@ -107,13 +107,30 @@
         border-radius: 4px;
         padding: 0.5rem;
         margin-bottom: 0.25rem;
+        position: relative;
 
         legend {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
             font-weight: bold;
             padding: 0 0.25rem;
+        }
+
+        .effect-target-name {
+            input[type="text"] {
+                width: 6rem;
+                min-width: 6rem;
+                height: 1.625rem;
+                font-weight: bold;
+            }
+        }
+
+        .effect-target-controls {
+            position: absolute;
+            top: -1.5rem;
+            right: 0.5rem;
+            display: flex;
+            align-items: center;
+            padding: 0 0.25rem;
+            background: var(--sr5v2-app-body-bg);
         }
     }
 
@@ -193,7 +210,7 @@
     .tab.changes header,
     .tab.changes ol {
         // grid layout: target | key | type | value | priority | controls
-        grid-template-columns: 3.5rem minmax(7.75rem, 1.1fr) 6rem minmax(5.4rem, 0.65fr) 3.25rem 2rem !important;
+        grid-template-columns: minmax(5rem, 0.4fr) minmax(6rem, 0.9fr) 6rem minmax(5.4rem, 0.65fr) 3.25rem 2rem !important;
     }
 
     .tab.changes header,
@@ -216,9 +233,26 @@
         align-items: stretch;
         min-width: 0;
 
-        > input[type="text"] {
+        > input[type="text"],
+        > textarea {
             flex: 1 1 auto;
             min-width: 0;
+        }
+
+        > textarea {
+            // Core styles textareas as a 60px tall monospace block with vertical padding.
+            // Mirror the core text input box instead, so the single line this field shows
+            // sits on the same baseline as the key column next to it.
+            // Centre the first line with block padding rather than a tall line-height,
+            // so wrapped lines stay tightly spaced. 2px accounts for the 1px borders.
+            box-sizing: border-box;
+            height: var(--input-height);
+            min-height: var(--input-height);
+            padding: calc((var(--input-height) - 2px - 1.25em) / 2) 0.5rem;
+            font: inherit;
+            line-height: 1.25;
+            resize: none;
+            overflow: hidden;
         }
     }
 

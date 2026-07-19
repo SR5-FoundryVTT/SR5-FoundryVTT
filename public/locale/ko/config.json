@@ -181,6 +181,9 @@
                 "selection_tests": {
                     "hint": "사용된 판정에 따라 판정을 필터링",
                     "label": "판정 필터링"
+                },
+                "targetName": {
+                    "label": "대상 이름"
                 }
             },
             "AddCondition": "조건 추가",

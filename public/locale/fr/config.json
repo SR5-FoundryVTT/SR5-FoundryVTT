@@ -62,6 +62,9 @@
                 },
                 "conditionType": {
                     "hint": "Partie du test filtrée par cette condition."
+                },
+                "targetName": {
+                    "label": "Nom de la cible"
                 }
             },
             "AddCondition": "Ajouter une condition",

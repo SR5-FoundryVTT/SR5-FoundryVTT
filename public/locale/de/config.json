@@ -182,6 +182,9 @@
                 "selection_tests": {
                     "hint": "Nur für Tests mit diesen Proben",
                     "label": "Proben-Filter"
+                },
+                "targetName": {
+                    "label": "Zielname"
                 }
             },
             "AddCondition": "Bedingung hinzufügen",

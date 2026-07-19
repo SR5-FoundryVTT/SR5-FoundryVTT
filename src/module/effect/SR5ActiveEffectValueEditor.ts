@@ -18,7 +18,7 @@ export class SR5ActiveEffectValueEditor extends HandlebarsApplicationMixin(Appli
 
     constructor(
         private readonly owner: SR5ActiveEffectConfig,
-        readonly sourceInput: HTMLInputElement,
+        readonly sourceInput: HTMLInputElement | HTMLTextAreaElement,
         private readonly applyTo: string,
         initialPosition: { top?: number; left?: number } = {},
     ) {

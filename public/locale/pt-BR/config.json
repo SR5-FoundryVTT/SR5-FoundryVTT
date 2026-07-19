@@ -131,6 +131,9 @@
                 },
                 "conditionType": {
                     "hint": "A parte do teste que esta condição filtra."
+                },
+                "targetName": {
+                    "label": "Nome do Alvo"
                 }
             },
             "AddCondition": "Adicionar Condição",

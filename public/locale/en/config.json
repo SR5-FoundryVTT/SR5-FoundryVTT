@@ -181,6 +181,9 @@
                 "selection_tests": {
                     "hint": "Filter the test based on the Tests used",
                     "label": "Tests Filter"
+                },
+                "targetName": {
+                    "label": "Target Name"
                 }
             },
             "AddCondition": "Add Condition",

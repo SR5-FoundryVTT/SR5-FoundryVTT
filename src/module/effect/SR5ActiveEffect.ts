@@ -101,7 +101,7 @@ export class SR5ActiveEffect extends ActiveEffect {
             const changes = this.system.toObject().changes.map(change => ({
                 ...change, target: change.target || id,
             }));
-            this.updateSource({ system: { changes, targets: [{ id, applyTo: 'actor' }] } });
+            this.updateSource({ system: { changes, targets: [{ id, name: game.i18n.localize('SR5.ActiveEffect.Target'), applyTo: 'actor' }] } });
         } else {
             const firstId = this.system.targets[0].id;
             const sourceChanges = this.system.toObject().changes;
