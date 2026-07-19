@@ -180,9 +180,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
 
             await defender.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Reach Effect',
-                system: {
-                    changes: [{ key: 'system.modifiers.reach', value: '1', type: 'add' }],
-                },
+                system: { changes: [{ key: 'system.modifiers.reach', value: '1', type: 'add' }] },
             }]);
 
             const attackTest = await TestCreator.fromItem(weapon, attacker, { showDialog: false, showMessage: false });
