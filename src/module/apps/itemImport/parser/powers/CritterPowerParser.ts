@@ -3,6 +3,9 @@ import { CompendiumKey } from '../../importer/Constants';
 import { Power } from '../../schema/CritterpowersSchema';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { CritterPowerCategories } from 'src/module/types/item/CritterPower';
+import { WeaponParserBase } from '../weapon/WeaponParserBase';
+
+const weaponParser = new WeaponParserBase();
 
 export class CritterPowerParser extends Parser<'critter_power'> {
     protected readonly parseType = 'critter_power';
@@ -25,6 +28,17 @@ export class CritterPowerParser extends Parser<'critter_power'> {
         system.powerType = CritterPowerParser.typeMap[type] as any ?? "";
 
         system.rating = 1;
+
+        const naturalWeapon = jsonData.bonus?.naturalweapon;
+        if (naturalWeapon) {
+            system.action.type = 'varies';
+            system.action.attribute = 'agility';
+            system.action.skill = naturalWeapon.useskill._TEXT.replace(/[\s-]/g, '_').toLowerCase();
+            system.action.damage = weaponParser.parseDamageData(naturalWeapon.damage._TEXT, naturalWeapon.ap._TEXT);
+
+            if (naturalWeapon.accuracy._TEXT.includes('Physical'))
+                system.action.limit.attribute = 'physical';
+        }
 
         return system;
     }

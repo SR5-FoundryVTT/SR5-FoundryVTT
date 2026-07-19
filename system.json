@@ -23,8 +23,8 @@
     "url": "#{URL}#",
     "version": "0.37.0",
     "compatibility": {
-        "minimum": "14",
-        "verified": "14.363",
+        "minimum": "14.363",
+        "verified": "14.365",
         "maximum": "14"
     },
     "documentTypes": {

@@ -1,5 +1,34 @@
 import { SR5Die } from "./SR5Die";
-import { FLAGS, SYSTEM_NAME } from "../constants";
+
+type DiceSoNiceDieType = `d${string}`;
+
+export type DiceSoNicePreset = {
+    type: DiceSoNiceDieType,
+    labels: string[],
+    system: string,
+    colorset?: string,
+    font?: string,
+    fontScale?: number | Record<string, number>,
+    bumpMaps?: string[],
+    values?: { min: number, max: number, step?: number },
+    emissiveMaps?: string[],
+    emissive?: string | number,
+    emissiveIntensity?: number,
+    atlas?: string,
+    backgrounds?: {
+        labels?: string[],
+        bumpMaps?: string[],
+        emissiveMaps?: string[],
+    },
+    labelScale?: number,
+    modelFile?: string,
+    scaleModifier?: number,
+    valueMap?: Record<string | number, number>,
+};
+
+export type DiceSoNiceSystem = {
+    dice: Map<DiceSoNiceDieType, DiceSoNicePreset>
+};
 
 /*
  * Interface to interact with Dice So Nice module.
@@ -47,36 +76,60 @@ export interface DiceSoNice {
      * - atlas (optional): a TexturePacker JSON spritesheet that contains labels/bumps/emissiveMaps for this dice preset. Can be used for multiple types to create a single spritesheet for a full dice set.
      */
     addDicePreset: (
-        dice: {
-            type: `d${string}`,
-            labels: string[],
-            system: string,
-            colorset?: string,
-            font?: string,
-            fontScale?: number | Record<string, number>,
-            bumpMaps?: string[],
-            values?: { min: number, max: number },
-            emissiveMaps?: string[],
-            emissive?: string,
-            atlas?: object
-        },
-        shape?: `d${string}`,
+        dice: DiceSoNicePreset,
+        shape?: DiceSoNiceDieType,
     ) => void;
+
+    /**
+     * Get loaded Dice So Nice systems and their registered dice presets.
+     */
+    getLoadedDiceSystems: () => Map<string, DiceSoNiceSystem>;
 };
+
+const D6_DIE_TYPE = 'd6';
+const SR5_DIE_TYPE = `d${SR5Die.DENOMINATION}` as const;
+
+/**
+ * Clone a loaded `d6` Dice So Nice preset into an SR5 `ds` preset.
+ *
+ * The cloned preset keeps the original asset references and presentation
+ * settings, but changes the die type to `ds` so SR5 rolls continue to use
+ * their own denomination and any `ds`-specific effects keep working.
+ */
+export function mirrorD6Preset(source: DiceSoNicePreset, system: string): DiceSoNicePreset {
+    const preset = foundry.utils.deepClone(source);
+    preset.type = SR5_DIE_TYPE;
+    preset.system = system;
+    return preset;
+}
+
+/**
+ * Build SR5 `ds` presets for every loaded Dice So Nice system that exposes a
+ * `d6` preset.
+ *
+ * Systems without a `d6` entry are ignored. The returned presets are meant to
+ * be re-registered with Dice So Nice during `diceSoNiceReady` so the SR5 `ds`
+ * die can use the same visual systems as `d6`.
+ */
+export function mirrorD6Presets(systems: Map<string, DiceSoNiceSystem>): DiceSoNicePreset[] {
+    const presets: DiceSoNicePreset[] = [];
+
+    for (const [system, diceSystem] of systems) {
+        const d6Preset = diceSystem.dice.get(D6_DIE_TYPE);
+        if (!d6Preset) continue;
+
+        presets.push(mirrorD6Preset(d6Preset, system));
+    }
+
+    return presets;
+}
 
 export function initDiceSoNice() {
     Hooks.once('diceSoNiceReady', (dice3d) => {
         if (!dice3d) return;
-        const rawFaces = game.settings.get(SYSTEM_NAME, FLAGS.DieFaceLabels);
-        const parts = rawFaces.split(',').map(s => s.trim());
-        const faces = Array.from({ length: 6 }, (_, i) =>
-            parts[i] !== undefined ? parts[i] : String(i + 1)
-        );
 
-        dice3d.addDicePreset({
-            type: `d${SR5Die.DENOMINATION}`,
-            labels: faces,
-            system: 'standard'
-        }, 'd6');
+        for (const preset of mirrorD6Presets(dice3d.getLoadedDiceSystems())) {
+            dice3d.addDicePreset(preset, D6_DIE_TYPE);
+        }
     });
 }

@@ -1,4 +1,4 @@
-import { DamageTypeType } from "src/module/types/item/Action";
+import { DamageType, DamageTypeType } from "src/module/types/item/Action";
 import { DataDefaults } from "src/module/data/DataDefaults";
 import { ActorSchema } from "../../ActorSchema";
 import { Unwrap } from "../ItemsParser";
@@ -7,6 +7,10 @@ import { ImportHelper as IH } from "@/module/apps/itemImport/helper/ImportHelper
 import { AccessoryParser } from "./AccessoryParser";
 import { ClipParser } from "./ClipParser";
 import { RangeType } from "@/module/types/item/Weapon";
+import { Constants } from "@/module/apps/itemImport/importer/Constants";
+
+type DamageElement = DamageType['element']['base'];
+type AttributeFormulaOperator = DamageType['base_formula_operator'];
 
 export class WeaponParser extends Parser<'weapon'> {
     protected readonly parseType = 'weapon';
@@ -14,46 +18,163 @@ export class WeaponParser extends Parser<'weapon'> {
     private getValues(val: string) {
         const regex = /(-?[0-9]+)(?:([0-9]+))*/g;
         const l = val.match(regex);
-        return l || ['0'];
+        return l ?? ['0'];
     }
 
-    private parseDamage(val: string) {
-        const damage = {
-            damage: 0,
-            type: '' as DamageTypeType,
-            radius: 0,
-            dropoff: 0,
-        };
+    public parseChummerDamage(rawDamage?: string | null, fallbackDamage?: string | null) {
+        return this.parseDamage(rawDamage) ?? this.parseDamage(fallbackDamage);
+    }
 
-        const split = val.split(' ');
+    public parseChummerAP(rawAP?: string | null, fallbackAP?: string | null) {
+        for (const ap of [rawAP, fallbackAP]) {
+            const apText = ap?.trim();
+            if (!apText || apText === '-') continue;
 
-        if (split.length > 0) {
-            const l = /(\d+)(\w+)/.exec(split[0]);
-            
-            if (l?.[1]) {
-                damage.damage = parseInt(l[1]);
-            }
+            const formula = this.parseAttributeFormula(apText);
+            if (formula) return formula;
 
-            if (l?.[2]) {
-                damage.type = l[2] === 'P' ? 'physical' : 'stun';
-            }
-        }
-
-        for (let i = 1; i < split.length; i++) {
-            const l = /(-?\d+)(.*)/.exec(split[i]);
-            if (l?.[2]) {
-                if (l[2].toLowerCase().includes('/m')) { 
-                    damage.dropoff = parseInt(l[1]);
-                    damage.radius = damage.damage / Math.abs(damage.dropoff)
-                }
-                else {
-                    damage.radius = parseInt(l[1]);
-                }
+            const simpleAP = /^[+-]?\d+(?:\.\d+)?$/.exec(apText);
+            if (simpleAP) {
+                return {
+                    base: Number(simpleAP[0]) || 0,
+                    attribute: '',
+                    base_formula_operator: 'add',
+                } as const;
             }
         }
 
-        return damage;
-    };
+        return null;
+    }
+
+    private parseDamage(val?: string | null) {
+        const damageText = val?.trim();
+        if (!damageText) return null;
+
+        const blast = this.parseBlast(damageText);
+        const damageCode = blast.damageCode;
+        let damage = 0;
+        let type: DamageTypeType = 'physical';
+        let element: DamageElement = '';
+        let attribute: DamageType['attribute'] = '';
+        let base_formula_operator: AttributeFormulaOperator = 'add';
+        let parsed = false;
+
+        const attributeDamage = /^(?:\((.+)\)|(.+?))([PSM])?(?:\(([a-zA-Z]+)\))?$/i.exec(damageCode);
+        if (attributeDamage) {
+            const formulaText = attributeDamage[1] ?? attributeDamage[2];
+            if (formulaText.includes('{')) {
+                const formula = this.parseAttributeFormula(formulaText);
+                if (!formula) return null;
+
+                damage = formula.base;
+                type = this.parseDamageType(attributeDamage[3]);
+                element = this.parseDamageElement(attributeDamage[4]);
+                attribute = formula.attribute;
+                base_formula_operator = formula.base_formula_operator;
+                parsed = true;
+            }
+        }
+
+        if (!parsed) {
+            const simpleDamage = /^(\d+)([PSM])?(?:\(([a-zA-Z]+)\))?$/i.exec(damageCode);
+            if (!simpleDamage) return null;
+
+            damage = Number(simpleDamage[1]) || 0;
+            type = this.parseDamageType(simpleDamage[2]);
+            element = this.parseDamageElement(simpleDamage[3]);
+        }
+
+        return {
+            damage,
+            type,
+            element,
+            attribute,
+            base_formula_operator,
+            dropoff: blast.dropoff,
+            radius: blast.dropoff && !blast.radius ? damage / Math.abs(blast.dropoff) : blast.radius,
+        } as const;
+    }
+
+    public parseAttributeFormula(val: string) {
+        const expression = val.replace(/\s/g, '');
+        const attributeFormula = /^(-)?\{([A-Z]+)\}(?:(\+|-|\*|\/)([+-]?\d+(?:\.\d+)?))?$/i.exec(expression);
+        if (!attributeFormula) return null;
+
+        const attribute = Constants.attributeTable[attributeFormula[2].toUpperCase()] as DamageType['attribute'] | undefined;
+        if (!attribute) return null;
+
+        const sign = attributeFormula[1] === '-' ? -1 : 1;
+        const operator = attributeFormula[3];
+        const operand = Number(attributeFormula[4]) || 0;
+
+        switch (operator) {
+            case '+':
+                return { base: operand, attribute, base_formula_operator: 'add' } as const;
+            case '-':
+                return { base: -operand, attribute, base_formula_operator: 'add' } as const;
+            case '*':
+                return { base: sign * operand, attribute, base_formula_operator: 'multiply' } as const;
+            case '/':
+                return null;
+            default:
+                return { base: 0, attribute, base_formula_operator: sign === -1 ? 'subtract' : 'add' } as const;
+        }
+    }
+
+    private parseBlast(damageText: string) {
+        let damageCode = damageText;
+        let radius = 0;
+        let dropoff = 0;
+
+        const dropoffMatch = /\((-?\d+)\/m\)/i.exec(damageCode);
+        if (dropoffMatch) {
+            dropoff = Number(dropoffMatch[1]) || 0;
+            damageCode = damageCode.replace(dropoffMatch[0], '').trim();
+        }
+
+        const radiusMatch = /\((\d+)m(?:\s+radius)?\)/i.exec(damageCode);
+        if (radiusMatch) {
+            radius = Number(radiusMatch[1]) || 0;
+            damageCode = damageCode.replace(radiusMatch[0], '').trim();
+        }
+
+        return { damageCode, radius, dropoff } as const;
+    }
+
+    private parseDamageType(parsedType?: string): DamageTypeType {
+        switch (parsedType?.toUpperCase()) {
+            case 'S':
+                return 'stun';
+            case 'M':
+                return 'matrix';
+            case 'P':
+            default:
+                return 'physical';
+        }
+    }
+
+    private parseDamageElement(parsedElement?: string): DamageElement {
+        switch (parsedElement?.toLowerCase()) {
+            case 'e':
+            case 'electricity':
+                return 'electricity';
+            case 'f':
+            case 'fire':
+                return 'fire';
+            case 'cold':
+                return 'cold';
+            case 'acid':
+                return 'acid';
+            case 'pollutant':
+                return 'pollutant';
+            case 'radiation':
+                return 'radiation';
+            case 'water':
+                return 'water';
+            default:
+                return '';
+        }
+    }
 
     async parseWeapons(chummerChar: ActorSchema | Unwrap<NonNullable<ActorSchema['vehicles']>['vehicle']>) {
         return this.parseItems(IH.getArray(chummerChar.weapons?.weapon))
@@ -65,7 +186,13 @@ export class WeaponParser extends Parser<'weapon'> {
         const action = system.action;
         const damage = system.action.damage;
 
-        damage.ap.base = Number(this.getValues(itemData.rawap)[0]) || 0;
+        const chummerAP = this.parseChummerAP(itemData.rawap, itemData.ap_english);
+        if (chummerAP) {
+            damage.ap.base = chummerAP.base;
+            damage.ap.value = damage.ap.base;
+            damage.ap.attribute = chummerAP.attribute;
+            damage.ap.base_formula_operator = chummerAP.base_formula_operator;
+        }
 
         action.type = 'varies';
 
@@ -115,11 +242,17 @@ export class WeaponParser extends Parser<'weapon'> {
             }
         }
 
-        {
-            //TODO change this to 'rawdamage' when mods can have damage value
-            const chummerDamage = this.parseDamage(itemData.damage_noammo_english);
+        const chummerDamage = this.parseChummerDamage(itemData.rawdamage, itemData.damage_english);
+        if (chummerDamage) {
             damage.base = chummerDamage.damage;
+            damage.value = chummerDamage.damage;
+            damage.attribute = chummerDamage.attribute;
             damage.type.base = chummerDamage.type;
+            damage.type.value = chummerDamage.type;
+            damage.element.base = chummerDamage.element;
+            damage.element.value = chummerDamage.element;
+            damage.base_formula_operator = chummerDamage.base_formula_operator;
+
             if (chummerDamage.dropoff || chummerDamage.radius) {
                 system.thrown = {
                     ...system.thrown,

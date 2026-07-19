@@ -6,6 +6,7 @@ import { CombatRules } from '../module/rules/CombatRules';
 import { DataDefaults } from '../module/data/DataDefaults';
 import { FireModeRules } from '../module/rules/FireModeRules';
 import { TestCreator } from '../module/tests/TestCreator';
+import { PhysicalDefenseTest } from '../module/tests/PhysicalDefenseTest';
 import { DamageType, DamageTypeType } from 'src/module/types/item/Action';
 type DamageElementType = DamageType['element']['base'];
 
@@ -158,6 +159,47 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
             }), 3); // per default rules only one single shot mode
         })
     })
+
+    describe('PhysicalDefenseTest', () => {
+        it('includes defender reach from Active Effects in melee defense reach modifiers', async () => {
+            const attacker = await factory.createActor({ type: 'character' });
+            const defender = await factory.createActor({ type: 'character' });
+            const [weapon] = await attacker.createEmbeddedDocuments('Item', [{
+                name: 'Attack Weapon',
+                type: 'weapon',
+                system: {
+                    category: 'melee',
+                    melee: { reach: 0 },
+                    action: {
+                        test: 'MeleeAttackTest',
+                        opposed: { test: 'PhysicalDefenseTest' },
+                    },
+                    technology: { equipped: true },
+                },
+            }]);
+
+            await defender.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Reach Effect',
+                changes: [{ key: 'system.modifiers.reach', value: '1', mode: CONST.ACTIVE_EFFECT_MODES.ADD }],
+            }]);
+
+            const attackTest = await TestCreator.fromItem(weapon, attacker, { showDialog: false, showMessage: false });
+            if (!attackTest) return assert.fail('Failed to create melee attack test');
+            await attackTest._prepareExecution();
+
+            const defenseData = await PhysicalDefenseTest._getOpposedActionTestData(attackTest.data, defender, '');
+            if (!defenseData) return assert.fail('Failed to create physical defense test data');
+
+            const defenseTest = new PhysicalDefenseTest(defenseData, { actor: defender, source: defender }, { showDialog: false, showMessage: false });
+            await defenseTest._prepareExecution();
+
+            const reachModifier = defenseTest.pool.changes.find(change => change.name === 'SR5.Weapon.Reach');
+
+            assert.strictEqual(defender.system.modifiers.reach, 1);
+            assert.strictEqual(defenseTest.data.defenseReach, 1);
+            assert.strictEqual(reachModifier?.value, 1);
+        });
+    });
 
     describe('CombatRules', () => {
         const getCharacterWithArmor = async (armorValue: number, {

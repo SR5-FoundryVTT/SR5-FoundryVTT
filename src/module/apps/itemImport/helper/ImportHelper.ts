@@ -16,6 +16,37 @@ export class ImportHelper {
     static categoryMap: Partial<Record<ChummerFile, Record<string, string>>> = {};
     static nameToId: Partial<Record<CompendiumKey, Record<string, string>>> = {};
     static idToName: Partial<Record<CompendiumKey, Record<string, string>>> = {};
+    static translationMap: {
+        files: Record<string, {
+            names: Record<string, string>;
+            ids: Record<string, string>;
+        }>;
+    } = {
+        files: {}
+    };
+    static currentFile: string | null = null;
+    static isTranslationEnabled = false;
+
+    public static translate(text: string | null | undefined, id?: string | null): string {
+        if (!text) return "";
+        if (!this.isTranslationEnabled) {
+            return text;
+        }
+        if (id && this.currentFile && this.translationMap.files[this.currentFile]?.ids?.[id]) {
+            return this.translationMap.files[this.currentFile].ids[id];
+        }
+        if (this.currentFile && this.translationMap.files[this.currentFile]?.names?.[text]) {
+            return this.translationMap.files[this.currentFile].names[text];
+        }
+        // Fallback: Check other file translation maps for a match on the name
+        for (const file of Object.keys(this.translationMap.files)) {
+            if (file !== this.currentFile && this.translationMap.files[file]?.names?.[text]) {
+                return this.translationMap.files[file].names[text];
+            }
+        }
+        return text;
+    }
+
 
     /**
      * Ensures the provided value is returned as an array.

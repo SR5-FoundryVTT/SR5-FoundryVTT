@@ -4,11 +4,14 @@ import { BonusSchema } from '../../schema/BonusSchema';
 import { DataDefaults } from 'src/module/data/DataDefaults';
 import { InitiativeType } from 'src/module/types/template/Initiative';
 import { ImportHelper as IH, OneOrMany, RetrievedItem } from '../../helper/ImportHelper';
+import { WeaponParserBase } from '../weapon/WeaponParserBase';
 
 type MetatypeItemData = {
     _TEXT: string;
     $?: { select?: string; rating?: string; spec?: string };
 };
+
+const weaponParser = new WeaponParserBase();
 
 export abstract class MetatypeParserBase<TResult extends ('character' | 'spirit' | 'sprite')> extends Parser<TResult> {
     /**
@@ -205,50 +208,16 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'spirit'
             const names = rawName.split('/').map(n => n.trim()).filter(Boolean);
             if (names.length === 0) names.push('Natural Weapon');
 
-            // 2. Extract DV segment anywhere in the string
-            const dvMatch = /\bDV\s+(\(?[A-Z0-9+-]+\)?)\s*([PSM])?\b/i.exec(select);
-            if (!dvMatch) {
+            const damageText = /\bDV\s+([^,]+)/i.exec(select)?.[1]?.trim();
+            if (!damageText) {
                 console.warn(`[Natural Weapon Parse]\nCritter: ${options.actorName}\nSelect: ${select}`);
                 continue;
             }
-
-            const dvFormula = dvMatch[1].toUpperCase().replace(/[()\s]/g, '');
-            let damageBase = 0;
-            let damageAttribute: 'strength' | 'force' | undefined;
-
-            if (dvFormula.includes('STR')) {
-                damageAttribute = 'strength';
-                damageBase = Number(/[+-]\d+/.exec(dvFormula)?.[0]) || 0;
-            } else if (dvFormula.includes('F')) {
-                damageAttribute = 'force';
-                damageBase = Number(/[+-]\d+/.exec(dvFormula)?.[0]) || 0;
-            } else {
-                damageBase = Number(dvFormula) || 0;
-            }
-
-            const typeStr = dvMatch[2]?.toUpperCase();
-            const damageType = typeStr === 'S' ? 'stun' : 'physical';
-
-            // 3. Extract AP segment anywhere in the string (Optional)
-            const apMatch = /\bAP\s+([-A-Z0-9+]+)\b/i.exec(select);
-            let apBase = 0;
-            let apAttribute: 'force' | undefined;
-            let apOperator: 'add' | 'subtract' | undefined;
-
-            if (apMatch) {
-                const apRaw = apMatch[1].toUpperCase().replace(/\s+/g, '');
-                if (apRaw.includes('F')) {
-                    apAttribute = 'force';
-                    apOperator = apRaw.includes('-') ? 'subtract' : 'add';
-                    apBase = Number(/[+-]\d+/.exec(apRaw)?.[0]) || 0;
-                } else {
-                    apBase = Number(apRaw) || 0;
-                }
-            }
+            const apText = /\bAP\s+([^,]+)/i.exec(select)?.[1]?.trim() ?? '-';
 
             // 4. Extract Reach (Optional)
-            const reachMatch = /\bREACH\s+([-+]?\d+)\b/i.exec(select);
-            const reach = reachMatch ? Number(reachMatch[1]) || 0 : undefined;
+            const reachMatch = /(?:\bREACH\s+([-+]?\d+)\b|\b([-+]?\d+)\s+REACH\b)/i.exec(select);
+            const reach = reachMatch ? Number(reachMatch[1] ?? reachMatch[2]) || 0 : undefined;
 
             // 5. Detect if the weapon is Ranged
             const isRanged = /\bRANGED?\b/i.test(select);
@@ -263,19 +232,7 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'spirit'
 
             system.action.attribute = 'agility';
             system.action.skill = isRanged ? 'exotic_ranged_weapon' : 'unarmed_combat';
-            
-            system.action.damage = DataDefaults.createData('damage', {
-                base: damageBase,
-                type: { base: damageType },
-                ap: { 
-                    base: apBase,
-                    ...(apAttribute && { 
-                        attribute: apAttribute,
-                        base_formula_operator: apOperator 
-                    })
-                },
-                ...(damageAttribute && { attribute: damageAttribute }),
-            });
+            system.action.damage = weaponParser.parseDamageData(damageText, apText);
 
             // --- Push Items ---
             // Loop through all parsed names and create a unique item for each one

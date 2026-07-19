@@ -681,6 +681,7 @@ ___________________
         console.log('Registering Shadowrun5e system socket messages...');
         const hooks = {
             [FLAGS.DoCombatFunction]: [SR5Combat._handleSocketMessage.bind(SR5Combat)],
+            [FLAGS.DoCombatantFunction]: [SR5Combatant._handleCombatantSocketMessage.bind(SR5Combatant)],
             [FLAGS.CreateTargetedEffects]: [SuccessTestEffectsFlow._handleCreateTargetedEffectsSocketMessage.bind(SuccessTestEffectsFlow)],
             [FLAGS.TeamworkTestFlow]: [TeamworkTest._handleUpdateSocketMessage.bind(TeamworkTest)],
             [FLAGS.SetDataStorage]: [DataStorage._handleSetDataStorageSocketMessage.bind(DataStorage)],
