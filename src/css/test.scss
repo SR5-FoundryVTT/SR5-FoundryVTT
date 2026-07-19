@@ -270,6 +270,21 @@
       .toggle-breakdown {
         margin-right: 4px;
       }
+
+      input.limit-infinity,
+      input.threshold-dash {
+        color: var(--sr5v2-control-text);
+      }
+
+      // Enlarged only when disabled; editable variant must match the number inputs.
+      input.limit-infinity {
+        &:disabled {
+          font-size: 1.4em;
+          line-height: 1;
+          color: var(--sr5v2-control-text);
+          opacity: 1;
+        }
+      }
     }
 
     .breakdown-list {
