@@ -422,6 +422,31 @@
     }
   }
 
+  // Extended test interval control, styled like the active effect duration fields.
+  .extended-interval-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.25rem;
+
+    > label {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .extended-interval-fields {
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      gap: 0.25rem;
+
+      input {
+        width: 3.5em;
+        text-align: center;
+      }
+    }
+  }
+
   .matrix-marks-icon-row {
     min-height: 27px;
     padding-top: 1px;

@@ -2,8 +2,10 @@
     "CONTROLS": {
         "SR5": {
             "EnvironmentalModifiers": "Modificadores Ambientais",
+            "ExtendedTestManager": "Testes Estendidos",
             "OverwatchScoreTracker": "Monitor de Valor de Vigilância",
-            "SituationalModifiers": "Modificadores Situacionais"
+            "SituationalModifiers": "Modificadores Situacionais",
+            "TimeControl": "Controle de Tempo"
         }
     },
     "SETTINGS": {
@@ -633,6 +635,115 @@
         "Extended": "Estendido",
         "ExtendedHits": "Sucessos Estendidos",
         "ExtendedTest": "Teste Estendido",
+        "ExtendedTestManager": {
+            "Actions": {
+                "Cancel": "Cancelar teste",
+                "Complete": "Marcar como concluído",
+                "Delete": "Excluir",
+                "Edit": "Editar",
+                "Pause": "Pausar",
+                "Resume": "Retomar",
+                "Roll": "Rolar"
+            },
+            "Actor": "Ator",
+            "AdvanceTime": "Avançar o tempo de jogo ao rolar",
+            "AdvanceTimeTooltip": "Avança o tempo do mundo pelo intervalo do teste após cada rolagem.",
+            "CanEdit": "Editar",
+            "CanRoll": "Rolar",
+            "CanView": "Ver",
+            "ConfirmDelete": "Excluir o teste estendido \"{name}\"?",
+            "CreateTest": "Novo Teste Estendido",
+            "Creator": "Criado por",
+            "CumulativeModifier": "Modificador cumulativo de -1 na pilha de dados",
+            "CumulativeModifierTooltip": "Reduz a pilha de dados em 1 a cada rolagem realizada. SR5 p. 48.",
+            "Description": "Descrição",
+            "Due": "Vencimento",
+            "DueTooltip": "Intervalos de tempo de jogo decorridos desde a última rolagem",
+            "EditTest": "Editar Teste Estendido",
+            "Filters": {
+                "Actor": "Ator",
+                "AllActors": "Todos os atores",
+                "AllStatuses": "Todos os status",
+                "AllVisibilities": "Público e privado",
+                "Created": "Criado dentro de",
+                "Mine": "Somente os meus",
+                "Private": "Privado",
+                "Search": "Buscar nome ou descrição...",
+                "Status": "Status",
+                "Updated": "Atualizado dentro de",
+                "Visibility": "Visibilidade"
+            },
+            "GameTime": "Tempo de Jogo",
+            "Interval": "Intervalo",
+            "LastUpdate": "Última atualização",
+            "Log": {
+                "cancel": "Cancelado",
+                "complete": "Concluído",
+                "create": "Criado",
+                "fail": "Falhou",
+                "pause": "Pausado",
+                "resume": "Retomado",
+                "roll": "Rolado",
+                "update": "Atualizado"
+            },
+            "Name": "Nome",
+            "NewTest": "Teste Estendido",
+            "NextPool": "Pilha de dados da próxima rolagem",
+            "NoActor": "Nenhum",
+            "NoTests": "Nenhum teste estendido para exibir.",
+            "Notes": "Anotações",
+            "Notifications": {
+                "Completed": "Teste estendido \"{name}\" concluído!",
+                "Failed": "Teste estendido \"{name}\" falhou: a pilha de dados se esgotou.",
+                "NoEditPermission": "Você não tem permissão para editar este teste estendido.",
+                "NoRollPermission": "Você não tem permissão para rolar este teste estendido.",
+                "Registered": "O teste estendido \"{name}\" agora é acompanhado no gerenciador de Testes Estendidos."
+            },
+            "OpenMessage": "Abrir mensagem do chat",
+            "Periods": {
+                "any": "Qualquer período",
+                "day": "Último dia",
+                "hour": "Última hora",
+                "month": "Último mês",
+                "week": "Última semana"
+            },
+            "PoolUsed": "Pilha",
+            "RealTime": "Tempo Real",
+            "Rolls": "Rolagens realizadas",
+            "SaveTest": "Salvar",
+            "Sort": {
+                "accumulatedHits": "Acertos acumulados",
+                "createdAt": "Criado",
+                "createdWorldTime": "Início no tempo de jogo",
+                "interval": "Intervalo",
+                "name": "Nome",
+                "progress": "Progresso",
+                "rollCount": "Rolagens",
+                "status": "Status",
+                "threshold": "Limiar",
+                "updatedAt": "Atualizado"
+            },
+            "SortBy": "Ordenar por",
+            "SortDirection": "Alternar direção da ordenação",
+            "StartedGameTime": "Iniciado (tempo de jogo)",
+            "Status": {
+                "active": "Ativo",
+                "cancelled": "Cancelado",
+                "completed": "Concluído",
+                "failed": "Falhou",
+                "paused": "Pausado"
+            },
+            "Title": "Testes Estendidos",
+            "User": "Usuário",
+            "UserPermissions": "Permissões de Usuário",
+            "UserPermissionsHint": "Mestres, o criador e os proprietários do ator vinculado sempre têm acesso completo. As caixas de seleção de visualização só se aplicam com a visibilidade \"Usuários selecionados\".",
+            "Visibility": {
+                "gmAndOwner": "Mestre e proprietário",
+                "gmOnly": "Somente Mestre",
+                "public": "Público",
+                "selectedUsers": "Usuários selecionados"
+            }
+        },
         "FOUNDRY": {
             "Actor": "Ator",
             "Item": "Item",
@@ -1483,6 +1594,36 @@
             "ThrownAttackTest": "Ataque de Arma Lançada"
         },
         "Threshold": "Limiar",
+        "TimeControl": {
+            "Advance": "Avançar",
+            "Amount": "Quantidade",
+            "Apply": "Aplicar",
+            "CustomAmount": "Valor Personalizado",
+            "CustomMinutes": "min",
+            "CustomMinutesTooltip": "Avançar o tempo do mundo por uma quantidade personalizada de minutos",
+            "Day": "Dia",
+            "GmOnly": "Somente Mestres podem alterar o tempo do mundo.",
+            "Hour": "Hora",
+            "Minute": "Minuto",
+            "Month": "Mês",
+            "Presets": {
+                "CombatTurn": "Turno de Combate",
+                "Day": "1 Dia",
+                "Header": "Avanço Rápido",
+                "Hour": "1 Hora",
+                "Minute": "1 Minuto",
+                "TenMinutes": "10 Minutos",
+                "Week": "1 Semana"
+            },
+            "Preview": "Prévia",
+            "Rewind": "Retroceder",
+            "Second": "Segundo",
+            "SetTime": "Definir Data e Hora",
+            "Title": "Controle de Tempo",
+            "Unit": "Unidade",
+            "UnitWeeks": "Semanas",
+            "Year": "Ano"
+        },
         "ToggleBreakdown": "Alternar detalhamento",
         "ToggleActive": "Alternar Ativo",
         "ToggleEquip": "Alternar Equipamento",

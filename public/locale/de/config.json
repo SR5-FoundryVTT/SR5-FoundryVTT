@@ -2,8 +2,10 @@
     "CONTROLS": {
         "SR5": {
             "EnvironmentalModifiers": "Umgebungsmodifikatoren",
+            "ExtendedTestManager": "Ausgedehnte Proben",
             "OverwatchScoreTracker": "Overwatch-Wert-Übersicht",
-            "SituationalModifiers": "Situationsmodifikatoren"
+            "SituationalModifiers": "Situationsmodifikatoren",
+            "TimeControl": "Zeitsteuerung"
         }
     },
     "SETTINGS": {
@@ -1243,6 +1245,115 @@
         "Extended": "Ausgedehnt",
         "ExtendedHits": "Ausged. Erfolge",
         "ExtendedTest": "Ausged. Probe",
+        "ExtendedTestManager": {
+            "Actions": {
+                "Cancel": "Probe abbrechen",
+                "Complete": "Als abgeschlossen markieren",
+                "Delete": "Löschen",
+                "Edit": "Bearbeiten",
+                "Pause": "Pausieren",
+                "Resume": "Fortsetzen",
+                "Roll": "Würfeln"
+            },
+            "Actor": "Akteur",
+            "AdvanceTime": "Spielzeit beim Würfeln vorstellen",
+            "AdvanceTimeTooltip": "Stellt die Weltzeit nach jedem Wurf um das Probenintervall vor.",
+            "CanEdit": "Bearbeiten",
+            "CanRoll": "Würfeln",
+            "CanView": "Ansehen",
+            "ConfirmDelete": "Die ausgedehnte Probe \"{name}\" löschen?",
+            "CreateTest": "Neue ausgedehnte Probe",
+            "Creator": "Erstellt von",
+            "CumulativeModifier": "Kumulativer Würfelpool-Modifikator von -1",
+            "CumulativeModifierTooltip": "Reduziert den Würfelpool mit jedem durchgeführten Wurf um 1. SR5 S. 48.",
+            "Description": "Beschreibung",
+            "Due": "Fällig",
+            "DueTooltip": "Seit dem letzten Wurf vergangene Spielzeit-Intervalle",
+            "EditTest": "Ausgedehnte Probe bearbeiten",
+            "Filters": {
+                "Actor": "Akteur",
+                "AllActors": "Alle Akteure",
+                "AllStatuses": "Alle Status",
+                "AllVisibilities": "Öffentlich und privat",
+                "Created": "Erstellt innerhalb",
+                "Mine": "Nur meine",
+                "Private": "Privat",
+                "Search": "Name oder Beschreibung suchen...",
+                "Status": "Status",
+                "Updated": "Aktualisiert innerhalb",
+                "Visibility": "Sichtbarkeit"
+            },
+            "GameTime": "Spielzeit",
+            "Interval": "Intervall",
+            "LastUpdate": "Letzte Aktualisierung",
+            "Log": {
+                "cancel": "Abgebrochen",
+                "complete": "Abgeschlossen",
+                "create": "Erstellt",
+                "fail": "Fehlgeschlagen",
+                "pause": "Pausiert",
+                "resume": "Fortgesetzt",
+                "roll": "Gewürfelt",
+                "update": "Aktualisiert"
+            },
+            "Name": "Name",
+            "NewTest": "Ausgedehnte Probe",
+            "NextPool": "Würfelpool für den nächsten Wurf",
+            "NoActor": "Keiner",
+            "NoTests": "Keine ausgedehnten Proben vorhanden.",
+            "Notes": "Notizen",
+            "Notifications": {
+                "Completed": "Ausgedehnte Probe \"{name}\" abgeschlossen!",
+                "Failed": "Ausgedehnte Probe \"{name}\" fehlgeschlagen: Der Würfelpool ist erschöpft.",
+                "NoEditPermission": "Du darfst diese ausgedehnte Probe nicht bearbeiten.",
+                "NoRollPermission": "Du darfst für diese ausgedehnte Probe nicht würfeln.",
+                "Registered": "Ausgedehnte Probe \"{name}\" wird jetzt in der Verwaltung für ausgedehnte Proben verfolgt."
+            },
+            "OpenMessage": "Chatnachricht öffnen",
+            "Periods": {
+                "any": "Beliebiger Zeitraum",
+                "day": "Letzter Tag",
+                "hour": "Letzte Stunde",
+                "month": "Letzter Monat",
+                "week": "Letzte Woche"
+            },
+            "PoolUsed": "Pool",
+            "RealTime": "Echtzeit",
+            "Rolls": "Durchgeführte Würfe",
+            "SaveTest": "Speichern",
+            "Sort": {
+                "accumulatedHits": "Angesammelte Erfolge",
+                "createdAt": "Erstellt",
+                "createdWorldTime": "Spielzeit-Beginn",
+                "interval": "Intervall",
+                "name": "Name",
+                "progress": "Fortschritt",
+                "rollCount": "Würfe",
+                "status": "Status",
+                "threshold": "Schwellenwert",
+                "updatedAt": "Aktualisiert"
+            },
+            "SortBy": "Sortieren nach",
+            "SortDirection": "Sortierreihenfolge umschalten",
+            "StartedGameTime": "Begonnen (Spielzeit)",
+            "Status": {
+                "active": "Aktiv",
+                "cancelled": "Abgebrochen",
+                "completed": "Abgeschlossen",
+                "failed": "Fehlgeschlagen",
+                "paused": "Pausiert"
+            },
+            "Title": "Ausgedehnte Proben",
+            "User": "Benutzer",
+            "UserPermissions": "Benutzerrechte",
+            "UserPermissionsHint": "Spielleiter, der Ersteller und Besitzer des verknüpften Akteurs haben immer vollen Zugriff. Die Ansehen-Kontrollkästchen gelten nur bei der Sichtbarkeit \"Ausgewählte Benutzer\".",
+            "Visibility": {
+                "gmAndOwner": "SL und Besitzer",
+                "gmOnly": "Nur SL",
+                "public": "Öffentlich",
+                "selectedUsers": "Ausgewählte Benutzer"
+            }
+        },
         "FOUNDRY": {
             "Actor": "Akteur",
             "Item": "Item",
@@ -2925,6 +3036,36 @@
             "ThrownAttackTest": "Wurfwaffen-Angriff"
         },
         "Threshold": "Schwellenwert",
+        "TimeControl": {
+            "Advance": "Vorstellen",
+            "Amount": "Menge",
+            "Apply": "Anwenden",
+            "CustomAmount": "Eigener Wert",
+            "CustomMinutes": "Min",
+            "CustomMinutesTooltip": "Die Weltzeit um eine eigene Anzahl Minuten vorstellen",
+            "Day": "Tag",
+            "GmOnly": "Nur Spielleiter dürfen die Weltzeit ändern.",
+            "Hour": "Stunde",
+            "Minute": "Minute",
+            "Month": "Monat",
+            "Presets": {
+                "CombatTurn": "Kampfrunde",
+                "Day": "1 Tag",
+                "Header": "Schnell vorstellen",
+                "Hour": "1 Stunde",
+                "Minute": "1 Minute",
+                "TenMinutes": "10 Minuten",
+                "Week": "1 Woche"
+            },
+            "Preview": "Vorschau",
+            "Rewind": "Zurückstellen",
+            "Second": "Sekunde",
+            "SetTime": "Datum & Uhrzeit setzen",
+            "Title": "Zeitsteuerung",
+            "Unit": "Einheit",
+            "UnitWeeks": "Wochen",
+            "Year": "Jahr"
+        },
         "ToggleBreakdown": "Aufschlüsselung umschalten",
         "ToggleActive": "De/aktivieren",
         "ToggleEquip": "Anlegen/Ablegen",

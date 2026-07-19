@@ -242,6 +242,8 @@ declare module "fvtt-types/configuration" {
             sr5_testProcessResults: any;
             sr5_afterTestComplete: any;
             sr5_processTagifyElements: any;
+            // Fired on all clients whenever the global data storage setting changes.
+            'sr5e.storageChanged': () => void;
             "routinglib.ready": () => void;
             SR5_CastItemAction: (arg0: SR5Item) => void;
             SR5_PreActorItemRoll: (arg0: SR5Actor, arg1: SR5Item) => void;

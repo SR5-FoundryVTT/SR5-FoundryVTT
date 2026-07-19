@@ -94,6 +94,10 @@ export interface TestData {
     extended: boolean
     // When false, this test is on it's first roll. When true, it's on an extended roll.
     extendedRoll: boolean
+    // The interval between extended test rolls. A value above zero marks this test as extended.
+    extendedInterval: import('../types/flows/ExtendedTest').ExtendedTestInterval
+    // The managed extended test record this roll belongs to, if any. See ExtendedTestFlow.
+    extendedManagedId?: string
 
     // The source action this test is derived from.
     action: ActionRollType
@@ -222,6 +226,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         data.evaluated ??= false;
         data.extended ??= false;
         data.extendedRoll ??= false;
+        data.extendedInterval ??= { value: 0, unit: 'minutes' };
 
         return data as T & SuccessTestData;
     }
@@ -1000,7 +1005,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Check if this test is currently being extended.
      */
     get extended(): boolean {
-        return this.canBeExtended && this.data.extended;
+        return this.canBeExtended && (this.data.extended || (this.data.extendedInterval?.value ?? 0) > 0);
     }
 
     /**
@@ -1591,9 +1596,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             await this.executeFollowUpTest();
         }
 
-        if (this.extended) {
-            await this.executeAsExtended();
-        }
+        // NOTE: Extended tests used to auto-chain here via executeAsExtended. They are now
+        // managed as records by ExtendedTestFlow, which listens on sr5_afterTestComplete.
 
         Hooks.call('sr5_afterTestComplete', this);
     }
@@ -2171,6 +2175,14 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
                 return ui.notifications?.warn('SR5.Warnings.CantExtendTest', { localize: true });
             }
 
+            // Managed extended tests roll through their record, keeping its state current.
+            if (test.data.extendedManagedId) {
+                const { ExtendedTestFlow } = await import('../flows/ExtendedTestFlow');
+                await ExtendedTestFlow.roll(test.data.extendedManagedId);
+                return;
+            }
+
+            // Keep legacy auto-chain behavior for extended tests from before managed records.
             await test.executeAsExtended();
         };
 

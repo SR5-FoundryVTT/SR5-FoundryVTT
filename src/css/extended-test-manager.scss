@@ -1,0 +1,298 @@
+@use 'config/variables';
+@use 'config/mixins';
+
+.sr5.extended-test-manager {
+    .extended-test-manager-app {
+        display: flex;
+        flex-flow: column nowrap;
+        height: 100%;
+        color: variables.$white;
+
+        .etm-time-strip {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5em;
+            padding: 0.25em 0.5em;
+            border-bottom: 1px solid variables.$yellow;
+
+            .etm-time-current {
+                font-weight: bold;
+                color: variables.$yellow;
+                white-space: nowrap;
+            }
+
+            .etm-time-presets {
+                display: flex;
+                flex-flow: row wrap;
+                gap: 0.25em;
+                align-items: center;
+
+                button {
+                    font-size: var(--font-size-11);
+                    padding: 1px 6px;
+                    line-height: 1.4em;
+                    width: auto;
+                }
+
+                input {
+                    width: 4.5em;
+                    color: variables.$white;
+                }
+            }
+        }
+
+        .etm-toolbar {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: space-between;
+            gap: 0.35em;
+            padding: 0.3em 0.5em;
+
+            .etm-filters,
+            .etm-sort {
+                display: flex;
+                flex-flow: row nowrap;
+                gap: 0.2em;
+                align-items: center;
+            }
+
+            .etm-filters select {
+                max-width: 9em;
+                height: 1.8em;
+                font-size: var(--font-size-11);
+            }
+
+            input[type='search'] {
+                min-width: 8em;
+                max-width: 16em;
+                height: 1.8em;
+                font-size: var(--font-size-11);
+                color: variables.$white;
+            }
+
+            .etm-mine-filter {
+                display: flex;
+                align-items: center;
+                gap: 0.2em;
+                white-space: nowrap;
+            }
+
+            button {
+                width: auto;
+                white-space: nowrap;
+            }
+        }
+
+        .etm-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 0.5em;
+
+            .etm-empty {
+                text-align: center;
+                color: variables.$grey;
+                margin-top: 2em;
+            }
+
+            .etm-row {
+                border: variables.$groove;
+                border-radius: 0.3em;
+                margin-bottom: 0.35em;
+                padding: 0.35em 0.5em;
+                background: rgba(variables.$white, 0.03);
+
+                &.status-completed { border-left: 3px solid green; }
+                &.status-failed { border-left: 3px solid variables.$crimson; }
+                &.status-paused { border-left: 3px solid variables.$grey; }
+                &.status-cancelled { border-left: 3px solid variables.$grey; opacity: 0.7; }
+                &.status-active { border-left: 3px solid variables.$yellow; }
+
+                .etm-row-main {
+                    display: flex;
+                    flex-flow: row nowrap;
+                    justify-content: space-between;
+                    align-items: center;
+                    gap: 0.5em;
+                }
+
+                .etm-row-info {
+                    flex: 1;
+                    overflow: hidden;
+
+                    .etm-row-name {
+                        font-weight: bold;
+                        font-size: var(--font-size-14);
+                        @include mixins.rollable;
+                    }
+
+                    .etm-row-meta {
+                        display: flex;
+                        flex-flow: row wrap;
+                        gap: 0.75em;
+                        font-size: var(--font-size-11);
+                        color: variables.$grey;
+
+                        a {
+                            @include mixins.rollable;
+                        }
+                    }
+                }
+
+                .etm-status {
+                    text-transform: uppercase;
+                    font-weight: bold;
+
+                    &.etm-status-active { color: variables.$yellow; }
+                    &.etm-status-completed { color: green; }
+                    &.etm-status-failed { color: variables.$crimson; }
+                }
+
+                .etm-due {
+                    color: variables.$crimson;
+                    font-weight: bold;
+                }
+
+                .etm-row-values {
+                    display: flex;
+                    flex-flow: row nowrap;
+                    align-items: center;
+                    gap: 0.9em;
+                    white-space: nowrap;
+                    font-size: var(--font-size-12);
+
+                    .etm-progress {
+                        display: flex;
+                        flex-flow: column nowrap;
+                        align-items: center;
+                        min-width: 7em;
+
+                        progress {
+                            width: 100%;
+                            height: 6px;
+                        }
+                    }
+                }
+
+                .etm-row-actions {
+                    display: flex;
+                    flex-flow: row nowrap;
+                    gap: 0.5em;
+                    font-size: var(--font-size-13);
+
+                    a {
+                        @include mixins.rollable;
+                    }
+                }
+
+                .etm-row-details {
+                    border-top: 1px solid rgba(variables.$white, 0.15);
+                    margin-top: 0.35em;
+                    padding-top: 0.35em;
+                    font-size: var(--font-size-12);
+
+                    .etm-detail-meta {
+                        display: flex;
+                        flex-flow: row wrap;
+                        gap: 1.5em;
+                        color: variables.$grey;
+                        margin-bottom: 0.3em;
+                    }
+
+                    .etm-roll-history {
+                        width: 100%;
+                        margin: 0.3em 0;
+
+                        th, td {
+                            text-align: center;
+                            padding: 0.15em 0.3em;
+                        }
+
+                        a {
+                            @include mixins.rollable;
+                        }
+                    }
+
+                    .etm-log {
+                        color: variables.$grey;
+                        font-size: var(--font-size-11);
+
+                        .etm-log-entry {
+                            display: flex;
+                            gap: 0.6em;
+
+                            .etm-log-action {
+                                font-weight: bold;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.sr5.extended-test-config {
+    .extended-test-config-form {
+        display: flex;
+        flex-flow: column nowrap;
+        gap: 0.4em;
+        padding: 0.5em;
+        color: variables.$white;
+
+        .form-group {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            gap: 0.5em;
+
+            > label {
+                flex: 0 0 11em;
+                font-weight: bold;
+            }
+
+            input, select, textarea {
+                flex: 1;
+                color: variables.$white;
+            }
+
+            textarea {
+                resize: vertical;
+            }
+        }
+
+        .etm-config-values {
+            input {
+                width: 4em;
+                flex: 0;
+            }
+        }
+
+        .etm-config-users {
+            table {
+                width: 100%;
+
+                th, td {
+                    text-align: center;
+                }
+
+                td:first-child, th:first-child {
+                    text-align: left;
+                }
+            }
+
+            .hint {
+                font-size: var(--font-size-11);
+                color: variables.$grey;
+            }
+        }
+
+        .etm-config-footer {
+            display: flex;
+            flex-flow: row nowrap;
+            gap: 0.5em;
+            margin-top: 0.5em;
+        }
+    }
+}

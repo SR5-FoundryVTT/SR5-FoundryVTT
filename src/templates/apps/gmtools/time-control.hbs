@@ -1,0 +1,86 @@
+<div class="time-control-app">
+    <div class="time-control-current">
+        <i class="far fa-clock" aria-hidden="true"></i>
+        <span class="time-control-current-value">{{currentTime}}</span>
+    </div>
+
+    <fieldset class="time-control-panel">
+        <legend>{{localize "SR5.TimeControl.Presets.Header"}}</legend>
+        <div class="time-preset-grid">
+            {{#each presets}}
+            <button type="button" data-action="shiftPreset" data-seconds="{{this.seconds}}">
+                {{this.label}}
+            </button>
+            {{/each}}
+        </div>
+    </fieldset>
+
+    <fieldset class="time-control-panel">
+        <legend>{{localize "SR5.TimeControl.CustomAmount"}}</legend>
+        <div class="time-shift-fields duration-value-fields">
+            <input type="number" name="shift.value" value="1" min="0" step="1"
+                aria-label="{{localize 'SR5.TimeControl.Amount'}}"/>
+            <select name="shift.unit" data-dtype="String" aria-label="{{localize 'SR5.TimeControl.Unit'}}">
+                <optgroup label="{{localize 'SR5.ActiveEffect.Duration.GroupCombat'}}">
+                    <option value="rounds">{{localize "SR5.ActiveEffect.Duration.UnitTurns"}}</option>
+                </optgroup>
+                <optgroup label="{{localize 'SR5.ActiveEffect.Duration.GroupTime'}}">
+                    <option value="seconds">{{localize "EFFECT.DURATION.UNITS.seconds"}}</option>
+                    <option value="minutes" selected>{{localize "EFFECT.DURATION.UNITS.minutes"}}</option>
+                    <option value="hours">{{localize "EFFECT.DURATION.UNITS.hours"}}</option>
+                    <option value="days">{{localize "EFFECT.DURATION.UNITS.days"}}</option>
+                    <option value="weeks">{{localize "SR5.TimeControl.UnitWeeks"}}</option>
+                    <option value="months">{{localize "EFFECT.DURATION.UNITS.months"}}</option>
+                </optgroup>
+            </select>
+        </div>
+        <div class="time-control-buttons">
+            <button type="button" data-action="rewindCustom">
+                <i class="fas fa-backward" aria-hidden="true"></i>
+                {{localize "SR5.TimeControl.Rewind"}}
+            </button>
+            <button type="button" data-action="advanceCustom">
+                <i class="fas fa-forward" aria-hidden="true"></i>
+                {{localize "SR5.TimeControl.Advance"}}
+            </button>
+        </div>
+        <div class="time-control-preview">
+            <span class="label">{{localize "SR5.TimeControl.Preview"}}:</span>
+            <span class="time-shift-preview"></span>
+        </div>
+    </fieldset>
+
+    <fieldset class="time-control-panel">
+        <legend>{{localize "SR5.TimeControl.SetTime"}}</legend>
+        <div class="time-absolute-fields">
+            <label>{{localize "SR5.TimeControl.Year"}}
+                <input type="number" name="absolute.year" value="{{components.year}}" step="1"/>
+            </label>
+            <label>{{localize "SR5.TimeControl.Month"}}
+                <input type="number" name="absolute.month" value="{{components.month}}" min="1" step="1"/>
+            </label>
+            <label>{{localize "SR5.TimeControl.Day"}}
+                <input type="number" name="absolute.dayOfMonth" value="{{components.dayOfMonth}}" min="1" step="1"/>
+            </label>
+            <label>{{localize "SR5.TimeControl.Hour"}}
+                <input type="number" name="absolute.hour" value="{{components.hour}}" min="0" step="1"/>
+            </label>
+            <label>{{localize "SR5.TimeControl.Minute"}}
+                <input type="number" name="absolute.minute" value="{{components.minute}}" min="0" step="1"/>
+            </label>
+            <label>{{localize "SR5.TimeControl.Second"}}
+                <input type="number" name="absolute.second" value="{{components.second}}" min="0" step="1"/>
+            </label>
+        </div>
+        <div class="time-control-preview">
+            <span class="label">{{localize "SR5.TimeControl.Preview"}}:</span>
+            <span class="time-absolute-preview"></span>
+        </div>
+        <div class="time-control-buttons">
+            <button type="button" data-action="setAbsolute">
+                <i class="fas fa-check" aria-hidden="true"></i>
+                {{localize "SR5.TimeControl.Apply"}}
+            </button>
+        </div>
+    </fieldset>
+</div>

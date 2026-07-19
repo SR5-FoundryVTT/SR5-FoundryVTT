@@ -2,8 +2,10 @@
     "CONTROLS": {
         "SR5": {
             "EnvironmentalModifiers": "Environmental Modifiers",
+            "ExtendedTestManager": "Extended Tests",
             "OverwatchScoreTracker": "Overwatch Score Tracker",
-            "SituationalModifiers": "Situational Modifiers"
+            "SituationalModifiers": "Situational Modifiers",
+            "TimeControl": "Time Control"
         }
     },
     "SETTINGS": {
@@ -1241,6 +1243,115 @@
         "Extended": "Extended",
         "ExtendedHits": "Extended Hits",
         "ExtendedTest": "Extended Test",
+        "ExtendedTestManager": {
+            "Actions": {
+                "Cancel": "Cancel test",
+                "Complete": "Mark completed",
+                "Delete": "Delete",
+                "Edit": "Edit",
+                "Pause": "Pause",
+                "Resume": "Resume",
+                "Roll": "Roll"
+            },
+            "Actor": "Actor",
+            "AdvanceTime": "Advance game time on roll",
+            "AdvanceTimeTooltip": "Advance the world time by the test interval after each roll.",
+            "CanEdit": "Edit",
+            "CanRoll": "Roll",
+            "CanView": "View",
+            "ConfirmDelete": "Delete the extended test \"{name}\"?",
+            "CreateTest": "New Extended Test",
+            "Creator": "Created by",
+            "CumulativeModifier": "Cumulative -1 dice pool modifier",
+            "CumulativeModifierTooltip": "Reduce the dice pool by 1 for each roll performed. SR5 p. 48.",
+            "Description": "Description",
+            "Due": "Due",
+            "DueTooltip": "Game time intervals elapsed since the last roll",
+            "EditTest": "Edit Extended Test",
+            "Filters": {
+                "Actor": "Actor",
+                "AllActors": "All actors",
+                "AllStatuses": "All statuses",
+                "AllVisibilities": "Public and private",
+                "Created": "Created within",
+                "Mine": "Only mine",
+                "Private": "Private",
+                "Search": "Search name or description...",
+                "Status": "Status",
+                "Updated": "Updated within",
+                "Visibility": "Visibility"
+            },
+            "GameTime": "Game Time",
+            "Interval": "Interval",
+            "LastUpdate": "Last update",
+            "Log": {
+                "cancel": "Cancelled",
+                "complete": "Completed",
+                "create": "Created",
+                "fail": "Failed",
+                "pause": "Paused",
+                "resume": "Resumed",
+                "roll": "Rolled",
+                "update": "Updated"
+            },
+            "Name": "Name",
+            "NewTest": "Extended Test",
+            "NextPool": "Dice pool for the next roll",
+            "NoActor": "None",
+            "NoTests": "No extended tests to show.",
+            "Notes": "Notes",
+            "Notifications": {
+                "Completed": "Extended test \"{name}\" completed!",
+                "Failed": "Extended test \"{name}\" failed: the dice pool is exhausted.",
+                "NoEditPermission": "You are not allowed to edit this extended test.",
+                "NoRollPermission": "You are not allowed to roll this extended test.",
+                "Registered": "Extended test \"{name}\" is now tracked in the Extended Tests manager."
+            },
+            "OpenMessage": "Open chat message",
+            "Periods": {
+                "any": "Any time",
+                "day": "Last day",
+                "hour": "Last hour",
+                "month": "Last month",
+                "week": "Last week"
+            },
+            "PoolUsed": "Pool",
+            "RealTime": "Real Time",
+            "Rolls": "Rolls performed",
+            "SaveTest": "Save",
+            "Sort": {
+                "accumulatedHits": "Accumulated hits",
+                "createdAt": "Created",
+                "createdWorldTime": "Game start time",
+                "interval": "Interval",
+                "name": "Name",
+                "progress": "Progress",
+                "rollCount": "Rolls",
+                "status": "Status",
+                "threshold": "Threshold",
+                "updatedAt": "Updated"
+            },
+            "SortBy": "Sort by",
+            "SortDirection": "Toggle sort direction",
+            "StartedGameTime": "Started (game time)",
+            "Status": {
+                "active": "Active",
+                "cancelled": "Cancelled",
+                "completed": "Completed",
+                "failed": "Failed",
+                "paused": "Paused"
+            },
+            "Title": "Extended Tests",
+            "User": "User",
+            "UserPermissions": "User Permissions",
+            "UserPermissionsHint": "GMs, the creator and owners of the linked actor always have full access. Viewing checkboxes only apply with visibility \"Selected users\".",
+            "Visibility": {
+                "gmAndOwner": "GM and owner",
+                "gmOnly": "GM only",
+                "public": "Public",
+                "selectedUsers": "Selected users"
+            }
+        },
         "FOUNDRY": {
             "Actor": "Actor",
             "Item": "Item",
@@ -2928,6 +3039,36 @@
             "ThrownAttackTest": "Thrown Weapon Attack"
         },
         "Threshold": "Threshold",
+        "TimeControl": {
+            "Advance": "Advance",
+            "Amount": "Amount",
+            "Apply": "Apply",
+            "CustomAmount": "Custom Amount",
+            "CustomMinutes": "min",
+            "CustomMinutesTooltip": "Advance world time by a custom amount of minutes",
+            "Day": "Day",
+            "GmOnly": "Only Game Masters may change the world time.",
+            "Hour": "Hour",
+            "Minute": "Minute",
+            "Month": "Month",
+            "Presets": {
+                "CombatTurn": "Combat Turn",
+                "Day": "1 Day",
+                "Header": "Quick Advance",
+                "Hour": "1 Hour",
+                "Minute": "1 Minute",
+                "TenMinutes": "10 Minutes",
+                "Week": "1 Week"
+            },
+            "Preview": "Preview",
+            "Rewind": "Rewind",
+            "Second": "Second",
+            "SetTime": "Set Date & Time",
+            "Title": "Time Control",
+            "Unit": "Unit",
+            "UnitWeeks": "Weeks",
+            "Year": "Year"
+        },
         "ToggleBreakdown": "Toggle Breakdown",
         "ToggleActive": "Toggle Active",
         "ToggleEquip": "Toggle Equipped",

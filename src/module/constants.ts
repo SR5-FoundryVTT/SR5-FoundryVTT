@@ -72,7 +72,9 @@ export const FLAGS = {
     CompendiaSettingsMenu: 'CompendiaSettingsMenu',
     TokenAutoRunning: 'TokenAutoRunning',
     CompendiumBrowserBlacklist: 'CompendiumBrowserBlacklist',
-    ImporterCompendiumOrder: 'ImporterCompendiumOrder'
+    ImporterCompendiumOrder: 'ImporterCompendiumOrder',
+    DieFaceLabels: "DieFaceLabels",
+    AdvanceWorldTime: 'AdvanceWorldTime'
 } as const;
 export const CORE_NAME = 'core';
 export const METATYPEMODIFIER = 'SR5.Character.Modifiers.NPCMetatypeAttribute';

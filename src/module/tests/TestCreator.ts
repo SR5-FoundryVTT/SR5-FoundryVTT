@@ -621,8 +621,11 @@ export const TestCreator = {
             ModifiableValue.setUnique(data.pool, label, value);
         }
 
-        // Mark test as extended.
+        // Mark test as extended and pre-fill a default interval for the dialog.
         data.extended = action.extended;
+        if (action.extended && !data.extendedInterval?.value) {
+            data.extendedInterval = { value: 1, unit: 'minutes' };
+        }
 
         return data;
     },

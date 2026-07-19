@@ -17,6 +17,9 @@ import { SR5CombatTracker } from './token/SR5CombatTracker';
 import { HandlebarManager } from './handlebars/HandlebarManager';
 
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
+import { TimeControlApplication } from './apps/gmtools/TimeControlApplication';
+import { ExtendedTestManager } from './apps/ExtendedTestManager';
+import { ExtendedTestFlow } from './flows/ExtendedTestFlow';
 import { ActorImporter } from './apps/itemImport/apps/ActorImporter';
 import { BulkImporter } from './apps/itemImport/apps/BulkImporter';
 import { CharacterImporter } from './apps/actorImport/characterImporter/CharacterImporter';
@@ -176,6 +179,8 @@ export class HooksManager {
         Hooks.on('updateItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('deleteItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('getChatMessageContextOptions', SuccessTest.chatMessageContextOptions.bind(SuccessTest));
+        // Register and update managed extended tests from finished test rolls.
+        Hooks.on('sr5_afterTestComplete', (test: SuccessTest) => { void ExtendedTestFlow.handleTestComplete(test); });
 
         Hooks.on('renderChatLog', HooksManager.chatLogListeners.bind(HooksManager));
 
@@ -461,6 +466,10 @@ ___________________
 
         CONFIG.time.turnTime = SR.combat.TURN_TIME_SECONDS;
         CONFIG.time.roundTime = SR.combat.ROUND_TIME_SECONDS;
+        // Foundry world time uses 1970-01-01 as its epoch. Match Gregorian
+        // calendar modules (including Calendaria) instead of displaying the
+        // elapsed year count as an absolute year.
+        CONFIG.time.worldCalendarConfig.years!.yearZero = 2072;
 
         // Keep expired effects (greyed, restartable) instead of deleting.
         // Explicit so a core/module change can't silently flip it to "delete".
@@ -588,7 +597,31 @@ ___________________
                 }
             };
             controls.tokens.tools[overwatchScoreTrackControl.name] = overwatchScoreTrackControl;
+
+            const timeControl = {
+                name: 'sr5-time-control',
+                title: 'CONTROLS.SR5.TimeControl',
+                icon: 'far fa-clock',
+                button: true,
+                onChange: (_event: Event, active: boolean) => {
+                    if (!active) return;
+                    TimeControlApplication.open();
+                }
+            };
+            controls.tokens.tools[timeControl.name] = timeControl;
         }
+
+        const extendedTestManagerControl = {
+            name: 'extended-test-manager',
+            title: 'CONTROLS.SR5.ExtendedTestManager',
+            icon: 'fas fa-hourglass-half',
+            button: true,
+            onChange: (_event: Event, active: boolean) => {
+                if (!active) return;
+                ExtendedTestManager.open();
+            }
+        };
+        controls.tokens.tools[extendedTestManagerControl.name] = extendedTestManagerControl;
 
         const situationModifiersControl = SituationModifiersApplication.getControl();
         controls.tokens.tools[situationModifiersControl.name] = situationModifiersControl;
@@ -684,6 +717,7 @@ ___________________
             [FLAGS.TeamworkTestFlow]: [TeamworkTest._handleUpdateSocketMessage.bind(TeamworkTest)],
             [FLAGS.SetDataStorage]: [DataStorage._handleSetDataStorageSocketMessage.bind(DataStorage)],
             [FLAGS.UpdateDocumentsAsGM]: [SocketMessageFlow.handleUpdateDocumentsAsGMMessage.bind(SocketMessage)],
+            [FLAGS.AdvanceWorldTime]: [ExtendedTestFlow._handleAdvanceWorldTimeSocketMessage.bind(ExtendedTestFlow)],
         } as const;
 
         game.socket.on(SYSTEM_SOCKET, async (message: Shadowrun.SocketMessageData) => {

@@ -17,7 +17,9 @@ export const registerSystemSettings = () => {
         scope: 'world',
         config: false,
         type: Object,
-        default: {}
+        default: {},
+        // World setting onChange fires on every client, allowing apps to re-render on storage changes.
+        onChange: () => { Hooks.callAll('sr5e.storageChanged'); }
     });
 
     /**

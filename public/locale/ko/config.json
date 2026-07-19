@@ -2,8 +2,10 @@
     "CONTROLS": {
         "SR5": {
             "EnvironmentalModifiers": "환경 수정치",
+            "ExtendedTestManager": "연장 판정",
             "OverwatchScoreTracker": "감시 점수 추적기",
-            "SituationalModifiers": "상황 수정치"
+            "SituationalModifiers": "상황 수정치",
+            "TimeControl": "시간 조절"
         }
     },
     "SETTINGS": {
@@ -1242,6 +1244,115 @@
         "Extended": "연장",
         "ExtendedHits": "연장 판정 성공횟수",
         "ExtendedTest": "연장 판정",
+        "ExtendedTestManager": {
+            "Actions": {
+                "Cancel": "판정 취소",
+                "Complete": "완료로 표시",
+                "Delete": "삭제",
+                "Edit": "편집",
+                "Pause": "일시 중지",
+                "Resume": "재개",
+                "Roll": "굴리기"
+            },
+            "Actor": "액터",
+            "AdvanceTime": "굴릴 때 게임 시간 진행",
+            "AdvanceTimeTooltip": "굴림을 할 때마다 판정 간격만큼 월드 시간을 진행합니다.",
+            "CanEdit": "편집",
+            "CanRoll": "굴리기",
+            "CanView": "보기",
+            "ConfirmDelete": "연장 판정 \"{name}\"을(를) 삭제하시겠습니까?",
+            "CreateTest": "새 연장 판정",
+            "Creator": "만든 사람",
+            "CumulativeModifier": "누적 -1 주사위 풀 수정치",
+            "CumulativeModifierTooltip": "굴림을 할 때마다 주사위 풀을 1씩 줄입니다. SR5 48쪽.",
+            "Description": "설명",
+            "Due": "예정",
+            "DueTooltip": "마지막 굴림 이후 경과한 게임 시간 간격",
+            "EditTest": "연장 판정 편집",
+            "Filters": {
+                "Actor": "액터",
+                "AllActors": "모든 액터",
+                "AllStatuses": "모든 상태",
+                "AllVisibilities": "공개 및 비공개",
+                "Created": "생성 기간",
+                "Mine": "내 것만",
+                "Private": "비공개",
+                "Search": "이름 또는 설명 검색...",
+                "Status": "상태",
+                "Updated": "갱신 기간",
+                "Visibility": "공개 범위"
+            },
+            "GameTime": "게임 시간",
+            "Interval": "간격",
+            "LastUpdate": "마지막 갱신",
+            "Log": {
+                "cancel": "취소됨",
+                "complete": "완료됨",
+                "create": "생성됨",
+                "fail": "실패함",
+                "pause": "일시 중지됨",
+                "resume": "재개됨",
+                "roll": "굴림",
+                "update": "갱신됨"
+            },
+            "Name": "이름",
+            "NewTest": "연장 판정",
+            "NextPool": "다음 굴림의 주사위 풀",
+            "NoActor": "없음",
+            "NoTests": "표시할 연장 판정이 없습니다.",
+            "Notes": "메모",
+            "Notifications": {
+                "Completed": "연장 판정 \"{name}\"이(가) 완료되었습니다!",
+                "Failed": "연장 판정 \"{name}\" 실패: 주사위 풀이 모두 소진되었습니다.",
+                "NoEditPermission": "이 연장 판정을 편집할 권한이 없습니다.",
+                "NoRollPermission": "이 연장 판정을 굴릴 권한이 없습니다.",
+                "Registered": "연장 판정 \"{name}\"이(가) 이제 연장 판정 관리자에서 추적됩니다."
+            },
+            "OpenMessage": "채팅 메시지 열기",
+            "Periods": {
+                "any": "전체 기간",
+                "day": "최근 하루",
+                "hour": "최근 한 시간",
+                "month": "최근 한 달",
+                "week": "최근 일주일"
+            },
+            "PoolUsed": "풀",
+            "RealTime": "실제 시간",
+            "Rolls": "굴린 횟수",
+            "SaveTest": "저장",
+            "Sort": {
+                "accumulatedHits": "누적 성공횟수",
+                "createdAt": "생성일",
+                "createdWorldTime": "게임 시작 시간",
+                "interval": "간격",
+                "name": "이름",
+                "progress": "진행도",
+                "rollCount": "굴림 수",
+                "status": "상태",
+                "threshold": "요구 성공횟수",
+                "updatedAt": "갱신일"
+            },
+            "SortBy": "정렬 기준",
+            "SortDirection": "정렬 방향 전환",
+            "StartedGameTime": "시작 (게임 시간)",
+            "Status": {
+                "active": "진행 중",
+                "cancelled": "취소됨",
+                "completed": "완료됨",
+                "failed": "실패함",
+                "paused": "일시 중지됨"
+            },
+            "Title": "연장 판정",
+            "User": "사용자",
+            "UserPermissions": "사용자 권한",
+            "UserPermissionsHint": "GM, 만든 사람, 연결된 액터의 소유자는 항상 모든 권한을 가집니다. 보기 체크박스는 공개 범위가 \"선택한 사용자\"일 때만 적용됩니다.",
+            "Visibility": {
+                "gmAndOwner": "GM과 소유자",
+                "gmOnly": "GM만",
+                "public": "공개",
+                "selectedUsers": "선택한 사용자"
+            }
+        },
         "FOUNDRY": {
             "Actor": "액터",
             "Item": "물품",
@@ -2924,6 +3035,36 @@
             "ThrownAttackTest": "투척 무기 공격"
         },
         "Threshold": "요구 성공횟수",
+        "TimeControl": {
+            "Advance": "진행",
+            "Amount": "수량",
+            "Apply": "적용",
+            "CustomAmount": "사용자 지정 값",
+            "CustomMinutes": "분",
+            "CustomMinutesTooltip": "월드 시간을 지정한 분만큼 진행합니다",
+            "Day": "일",
+            "GmOnly": "게임 마스터만 월드 시간을 변경할 수 있습니다.",
+            "Hour": "시간",
+            "Minute": "분",
+            "Month": "월",
+            "Presets": {
+                "CombatTurn": "전투 턴",
+                "Day": "1일",
+                "Header": "빠른 진행",
+                "Hour": "1시간",
+                "Minute": "1분",
+                "TenMinutes": "10분",
+                "Week": "1주"
+            },
+            "Preview": "미리 보기",
+            "Rewind": "되감기",
+            "Second": "초",
+            "SetTime": "날짜 및 시간 설정",
+            "Title": "시간 조절",
+            "Unit": "단위",
+            "UnitWeeks": "주",
+            "Year": "년"
+        },
         "ToggleBreakdown": "세부 내역 전환",
         "ToggleActive": "활성 전환",
         "ToggleEquip": "장착 전환",
