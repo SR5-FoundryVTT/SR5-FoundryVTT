@@ -122,21 +122,21 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 },
             });
 
-            const originalGetSkillsForSkillSet = PackItemFlow.prepareSkillsForSkillSet;
-            const originalGetSkillGroupsForSkillSet = PackItemFlow.prepareSkillGroupsForSkillSet;
+            const originalPrepareSkillSetItems = PackItemFlow.prepareSkillSetItems;
 
-            PackItemFlow.prepareSkillsForSkillSet = async () => [skillTemplate.toObject()];
-            PackItemFlow.prepareSkillGroupsForSkillSet = async () => {
+            PackItemFlow.prepareSkillSetItems = async () => {
                 const groupData = groupTemplate.toObject();
                 groupData.system.group.rating = 4;
-                return [groupData];
+                return {
+                    skills: [skillTemplate.toObject()],
+                    groups: [groupData],
+                };
             };
 
             try {
                 await SkillSetFlow.applySkillSetToActor(actor, skillSet);
             } finally {
-                PackItemFlow.prepareSkillsForSkillSet = originalGetSkillsForSkillSet;
-                PackItemFlow.prepareSkillGroupsForSkillSet = originalGetSkillGroupsForSkillSet;
+                PackItemFlow.prepareSkillSetItems = originalPrepareSkillSetItems;
             }
 
             const createdSkill = actor.items.find(item => {
@@ -189,25 +189,20 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 },
             });
 
-            const originalGetSkillsForSkillSet = PackItemFlow.prepareSkillsForSkillSet;
-            const originalGetSkillGroupsForSkillSet = PackItemFlow.prepareSkillGroupsForSkillSet;
-
-            PackItemFlow.prepareSkillsForSkillSet = originalGetSkillsForSkillSet;
-            PackItemFlow.prepareSkillGroupsForSkillSet = async () => {
+            const originalPrepareSkillSetItems = PackItemFlow.prepareSkillSetItems;
+            PackItemFlow.prepareSkillSetItems = async () => {
                 const groupData = groupTemplate.toObject();
                 groupData.system.group.rating = 4;
-                return [groupData];
+                return {
+                    skills: [skillTemplate.toObject()],
+                    groups: [groupData],
+                };
             };
-
-            const originalGetPackSkills = PackItemFlow.getPackSkills;
-            PackItemFlow.getPackSkills = async () => [skillTemplate];
 
             try {
                 await SkillSetFlow.applySkillSetToActor(actor, skillSet);
             } finally {
-                PackItemFlow.getPackSkills = originalGetPackSkills;
-                PackItemFlow.prepareSkillsForSkillSet = originalGetSkillsForSkillSet;
-                PackItemFlow.prepareSkillGroupsForSkillSet = originalGetSkillGroupsForSkillSet;
+                PackItemFlow.prepareSkillSetItems = originalPrepareSkillSetItems;
             }
 
             const createdSkill = actor.items.find(item => {
@@ -296,12 +291,10 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             });
 
             const originalGetAllPackSkillSets = PackItemFlow.getAllPackSkillSets;
-            const originalGetSkillsForSkillSet = PackItemFlow.prepareSkillsForSkillSet;
-            const originalGetSkillGroupsForSkillSet = PackItemFlow.prepareSkillGroupsForSkillSet;
+            const originalPrepareSkillSetItems = PackItemFlow.prepareSkillSetItems;
 
             PackItemFlow.getAllPackSkillSets = async () => [skillSet];
-            PackItemFlow.prepareSkillsForSkillSet = async () => [skillTemplate.toObject()];
-            PackItemFlow.prepareSkillGroupsForSkillSet = async () => [];
+            PackItemFlow.prepareSkillSetItems = async () => ({ skills: [skillTemplate.toObject()], groups: [] });
 
             try {
                 const actor = await factory.createActor({
@@ -326,8 +319,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 assert.exists(actor.getSkill('Pistols'));
             } finally {
                 PackItemFlow.getAllPackSkillSets = originalGetAllPackSkillSets;
-                PackItemFlow.prepareSkillsForSkillSet = originalGetSkillsForSkillSet;
-                PackItemFlow.prepareSkillGroupsForSkillSet = originalGetSkillGroupsForSkillSet;
+                PackItemFlow.prepareSkillSetItems = originalPrepareSkillSetItems;
             }
         });
 
@@ -360,12 +352,10 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             });
 
             const originalGetAllPackSkillSets = PackItemFlow.getAllPackSkillSets;
-            const originalGetSkillsForSkillSet = PackItemFlow.prepareSkillsForSkillSet;
-            const originalGetSkillGroupsForSkillSet = PackItemFlow.prepareSkillGroupsForSkillSet;
+            const originalPrepareSkillSetItems = PackItemFlow.prepareSkillSetItems;
 
             PackItemFlow.getAllPackSkillSets = async () => [];
-            PackItemFlow.prepareSkillsForSkillSet = async () => [skillTemplate.toObject()];
-            PackItemFlow.prepareSkillGroupsForSkillSet = async () => [];
+            PackItemFlow.prepareSkillSetItems = async () => ({ skills: [skillTemplate.toObject()], groups: [] });
 
             try {
                 const actor = await factory.createActor({ type: 'character' });
@@ -392,8 +382,160 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
                 assert.lengthOf(pistolsItems, 0);
             } finally {
                 PackItemFlow.getAllPackSkillSets = originalGetAllPackSkillSets;
-                PackItemFlow.prepareSkillsForSkillSet = originalGetSkillsForSkillSet;
-                PackItemFlow.prepareSkillGroupsForSkillSet = originalGetSkillGroupsForSkillSet;
+                PackItemFlow.prepareSkillSetItems = originalPrepareSkillSetItems;
+            }
+        });
+
+        it('uses consolidated skill set preparation once when applying a skill set', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const skillSet = await factory.createItem({
+                type: 'skill',
+                name: 'Test Skill Set',
+                system: {
+                    type: 'set',
+                    set: {
+                        skills: [{ name: 'Pistols', rating: 6 }],
+                        groups: [{ name: 'Firearms', rating: 4 }],
+                    },
+                },
+            });
+
+            const skillTemplate = await factory.createItem({
+                type: 'skill',
+                name: 'Pistols',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        category: 'active',
+                    },
+                },
+            });
+
+            const groupTemplate = await factory.createItem({
+                type: 'skill',
+                name: 'Firearms',
+                system: {
+                    type: 'group',
+                    group: {
+                        skills: ['Pistols'],
+                    },
+                },
+            });
+
+            const originalPrepareSkillSetItems = PackItemFlow.prepareSkillSetItems;
+            let calls = 0;
+            PackItemFlow.prepareSkillSetItems = async () => {
+                calls += 1;
+                return {
+                    skills: [skillTemplate.toObject()],
+                    groups: [groupTemplate.toObject()],
+                };
+            };
+
+            try {
+                await SkillSetFlow.applySkillSetToActor(actor, skillSet);
+                assert.strictEqual(calls, 1);
+            } finally {
+                PackItemFlow.prepareSkillSetItems = originalPrepareSkillSetItems;
+            }
+        });
+    });
+
+    describe('PackItemFlow cache helpers', () => {
+        it('memoizes in-flight and resolved values per key', async () => {
+            const cache = new Map<string, Promise<number>>();
+            let calls = 0;
+
+            const loader = async () => {
+                calls += 1;
+                return 42;
+            };
+
+            const first = PackItemFlow.getCachedPackDocuments(cache, 'test-key', loader);
+            const second = PackItemFlow.getCachedPackDocuments(cache, 'test-key', loader);
+            const [firstValue, secondValue] = await Promise.all([first, second]);
+
+            assert.strictEqual(firstValue, 42);
+            assert.strictEqual(secondValue, 42);
+            assert.strictEqual(calls, 1);
+        });
+
+        it('treats different keys as cache misses', async () => {
+            const cache = new Map<string, Promise<number>>();
+            let calls = 0;
+
+            await PackItemFlow.getCachedPackDocuments(cache, 'key-a', async () => {
+                calls += 1;
+                return 1;
+            });
+            await PackItemFlow.getCachedPackDocuments(cache, 'key-b', async () => {
+                calls += 1;
+                return 2;
+            });
+
+            assert.strictEqual(calls, 2);
+        });
+
+        it('invalidates an individual skill cache bucket by type and pack', async () => {
+            const packName = 'sr5e-skills';
+            PackItemFlow._packSkillsCache.set(`skills:${packName}`, Promise.resolve([]));
+            PackItemFlow._packSkillGroupsCache.set(`skillgroups:${packName}`, Promise.resolve([]));
+            PackItemFlow._packSkillSetsCache.set(`skillsets:${packName}`, Promise.resolve([]));
+
+            PackItemFlow.invalidateSkillCacheByTypeAndPack('skills', packName);
+            PackItemFlow.invalidateSkillCacheByTypeAndPack('skillgroups', packName);
+            PackItemFlow.invalidateSkillCacheByTypeAndPack('skillsets', packName);
+
+            assert.isFalse(PackItemFlow._packSkillsCache.has(`skills:${packName}`));
+            assert.isFalse(PackItemFlow._packSkillGroupsCache.has(`skillgroups:${packName}`));
+            assert.isFalse(PackItemFlow._packSkillSetsCache.has(`skillsets:${packName}`));
+        });
+
+        it('clears all skill caches at once', async () => {
+            PackItemFlow._packSkillsCache.set('skills:a', Promise.resolve([]));
+            PackItemFlow._packSkillGroupsCache.set('skillgroups:b', Promise.resolve([]));
+            PackItemFlow._packSkillSetsCache.set('skillsets:c', Promise.resolve([]));
+
+            PackItemFlow.invalidateAllSkillCaches();
+
+            assert.strictEqual(PackItemFlow._packSkillsCache.size, 0);
+            assert.strictEqual(PackItemFlow._packSkillGroupsCache.size, 0);
+            assert.strictEqual(PackItemFlow._packSkillSetsCache.size, 0);
+        });
+
+        it('invalidates and rewarms cache when a relevant compendium skill item changes', async () => {
+            const originalGetSkillsPackName = PackItemFlow.getSkillsPackName;
+            const originalGetSkillGroupsPackName = PackItemFlow.getSkillGroupsPackName;
+            const originalGetSkillSetsPackName = PackItemFlow.getSkillSetsPackName;
+            const originalWarmSkillCaches = PackItemFlow.warmSkillCaches;
+
+            const skillPackName = 'sr5e-skills';
+            PackItemFlow._packSkillsCache.set(`skills:${skillPackName}`, Promise.resolve([]));
+
+            let warmCalls = 0;
+            PackItemFlow.getSkillsPackName = () => skillPackName as Shadowrun.PackName;
+            PackItemFlow.getSkillGroupsPackName = () => 'sr5e-skill-groups' as Shadowrun.PackName;
+            PackItemFlow.getSkillSetsPackName = () => 'sr5e-skill-sets' as Shadowrun.PackName;
+            PackItemFlow.warmSkillCaches = async () => {
+                warmCalls += 1;
+            };
+
+            const changedCompendiumSkill = {
+                pack: `world.${skillPackName}`,
+                isType: (...types: Item.ConfiguredSubType[]) => types.includes('skill'),
+            } as unknown as SR5Item;
+
+            try {
+                PackItemFlow.handleCompendiumSkillItemMutation(changedCompendiumSkill);
+                await Promise.resolve();
+
+                assert.isFalse(PackItemFlow._packSkillsCache.has(`skills:${skillPackName}`));
+                assert.strictEqual(warmCalls, 1);
+            } finally {
+                PackItemFlow.getSkillsPackName = originalGetSkillsPackName;
+                PackItemFlow.getSkillGroupsPackName = originalGetSkillGroupsPackName;
+                PackItemFlow.getSkillSetsPackName = originalGetSkillSetsPackName;
+                PackItemFlow.warmSkillCaches = originalWarmSkillCaches;
             }
         });
     });
