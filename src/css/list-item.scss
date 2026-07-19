@@ -306,23 +306,28 @@
         }
 
         .armor-resistance-row {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
             width: 100%;
             gap: 0.4rem;
-            flex-wrap: wrap;
-            justify-content: center;
             align-items: center;
         }
 
         .armor-resistance-field {
-            display: inline-flex;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 2.75rem;
             align-items: center;
             gap: 0.2rem;
-            flex: 1 0 auto;
-            max-width: 100%;
-            text-align: center;
+            width: 100%;
+            text-align: left;
             text-wrap: nowrap;
+
+            input,
+            select {
+                justify-self: end;
+                width: 2.75rem;
+                text-align: right;
+            }
         }
 
         .list-item-icons {

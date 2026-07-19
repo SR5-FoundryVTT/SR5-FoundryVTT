@@ -8,11 +8,11 @@
         <label data-tooltip="{{systemFields.armor.fields.value.hint}}">{{systemFields.armor.fields.value.label}}</label>
     </div>
     <div class="list-item-col">
-        <span>
+        <span class="armor-value-field">
             {{formInput systemFields.armor.fields.base value=source.system.armor.base
                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
         </span>
-        <span class="basic-row" style="margin-left: auto">
+        <span class="basic-row armor-toggle-fields">
             <label data-tooltip="{{systemFields.armor.fields.is_hardened.hint}}">
                 {{systemFields.armor.fields.is_hardened.label}}&nbsp;{{formInput systemFields.armor.fields.is_hardened value=source.system.armor.is_hardened
                                 classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}

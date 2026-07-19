@@ -54,12 +54,32 @@
     }
 
     .item-header-meta .sheet-header-resource .sheet-header-resource-label {
-        flex-basis: 7rem;
+        flex: 0 0 5.5rem;
+        min-width: 0;
+        justify-content: flex-start;
+    }
+
+    .item-header-meta .sheet-header-resource .sheet-header-resource-value {
+        flex: 1 1 auto;
+        justify-content: flex-end;
+        min-width: 0;
+        text-align: right;
+    }
+
+    .item-header-meta .sheet-header-resource .sheet-header-service-value {
+        font-size: var(--font-size-14);
+        line-height: 1.5rem;
+        text-align: right;
+    }
+
+    .item-header-meta .sheet-header-resource input.short {
+        text-align: right;
     }
 
     .item-header-meta .availability-inputs {
         display: flex;
         align-items: center;
+        justify-content: flex-end;
         gap: 0.25rem;
         width: 100%;
     }
@@ -77,6 +97,7 @@
 
     .item-header-meta .availability-restriction-select {
         padding-left: 0.15rem;
+        text-align: left;
     }
 
     .item-footer {
@@ -124,6 +145,22 @@
 
     .action-specialization-icon {
         color: white;
+    }
+
+    .armor-value-field {
+        flex: 1 1 auto;
+        min-width: 0;
+
+        input,
+        select {
+            width: 100%;
+        }
+    }
+
+    .armor-toggle-fields {
+        flex: 0 0 auto;
+        margin-left: auto;
+        text-wrap: nowrap;
     }
 
 }

@@ -585,7 +585,7 @@
                     },
                     "is_hardened": {
                         "hint": "Wenn diese Panzerung verstärkten Schutz gewährt",
-                        "label": "Verstärkt Aktiv"
+                        "label": "Verstärkt"
                     },
                     "immunities": {
                         "hint": "Damage sources this armor grants Immunity against",

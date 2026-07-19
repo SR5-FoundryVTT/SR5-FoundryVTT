@@ -584,7 +584,7 @@
                     },
                     "is_hardened": {
                         "hint": "If this Armor grants hardened protection",
-                        "label": "Hardened Active"
+                        "label": "Hardened"
                     },
                     "immunities": {
                         "hint": "Damage sources this armor grants Immunity against",

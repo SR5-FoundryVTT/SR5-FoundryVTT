@@ -170,7 +170,7 @@
                     },
                     "is_hardened": {
                         "hint": "Si cette armure accorde une protection renforcee",
-                        "label": "Renforcee active"
+                        "label": "Renforcee"
                     },
                     "immunities": {
                         "hint": "Damage sources this armor grants Immunity against",

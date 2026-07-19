@@ -586,7 +586,7 @@
                     },
                     "is_hardened": {
                         "hint": "이 방어구가 강화 방어를 제공하는지 여부",
-                        "label": "강화 적용"
+                        "label": "강화"
                     },
                     "immunities": {
                         "hint": "Damage sources this armor grants Immunity against",

@@ -257,7 +257,7 @@
                     },
                     "is_hardened": {
                         "hint": "Se esta armadura concede protecao endurecida",
-                        "label": "Endurecida Ativa"
+                        "label": "Endurecida"
                     },
                     "immunities": {
                         "hint": "Damage sources this armor grants Immunity against",
