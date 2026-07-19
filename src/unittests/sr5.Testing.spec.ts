@@ -281,7 +281,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
             await actor.update({ system: { track: { stun: { value: 2 } } } });
 
-            const extendedData = foundry.utils.duplicate(test.data);
+            const extendedData = foundry.utils.deepClone(test.data);
             extendedData.extendedRoll = true;
             const extendedTest = new NaturalRecoveryStunTest(extendedData, { actor }, { showMessage: false, showDialog: false });
             extendedTest.prepareBaseValues();
@@ -308,7 +308,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
             await actor.update({ system: { track: { physical: { value: 3 } } } });
 
-            const extendedData = foundry.utils.duplicate(test.data);
+            const extendedData = foundry.utils.deepClone(test.data);
             extendedData.extendedRoll = true;
             const extendedTest = new NaturalRecoveryPhysicalTest(extendedData, { actor }, { showMessage: false, showDialog: false });
             extendedTest.prepareBaseValues();

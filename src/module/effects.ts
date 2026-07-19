@@ -18,7 +18,7 @@ export function prepareSortedEffects(effects: SR5ActiveEffect[], byKey = "name")
 }
 
 /**
- * Collect all enabled Active Effects which are present on any owned or nested Item.
+ * Collect all enabled Active Effects which are present on any owned item.
  * 
  * TODO: Move into data preparation phase, similar to how actor.effects works.
  * @param document The document to collect item effects from.
@@ -62,31 +62,19 @@ export function *allApplicableDocumentEffects(document: SR5Actor|SR5Item, option
 }
 
 /**
- * Collect all effects from a documents items and nested items.
+ * Collect all effects from a document's items.
  * 
  * @param document Either a actor or item document.
  * @param options.applyTo A iterable of apply-to target values
- * @param options.nestedItems Whether to include nested items
  * @returns An iterator effect
  */
 export function *allApplicableItemsEffects(document: SR5Actor|SR5Item, options: ApplicableItemEffectOptions = {}) {
     const applyTo = options.applyTo ?? [];
-    const nestedItems = options.nestedItems ?? true;
 
     for (const item of document.items) {
         for (const effect of item.effects) {
             if (applyTo.length > 0 && !applyTo.includes(effect.system.applyTo)) continue ;
             yield effect;
-        }
-
-        if (!nestedItems) continue;
-        if (document instanceof SR5Item) continue;
-
-        for (const nestedItem of item.items) {
-            for (const effect of nestedItem.effects) {
-                if (applyTo.length > 0 && !applyTo.includes(effect.system.applyTo)) continue;
-                yield effect;
-            }
         }
     }
 }

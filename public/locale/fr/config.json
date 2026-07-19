@@ -196,6 +196,23 @@
         "CommonProgram": "Programme courant",
         "ComplexForm": "Forme complexe",
         "ComplexForms": "Formes complexes",
+        "Container": {
+            "CannotContain": "This item cannot be placed in that container.",
+            "Capacity": "Capacity",
+            "Empty": "This container is empty.",
+            "FIELDS": {
+                "capacity": {
+                    "count": {
+                        "hint": "Maximum number of direct items this container can hold. Use 0 for unlimited.",
+                        "label": "Capacity"
+                    },
+                    "hint": "Maximum number of direct items this container can hold. Use 0 for unlimited.",
+                    "label": "Capacity"
+                }
+            },
+            "Full": "This container is full.",
+            "Remove": "Remove from container"
+        },
         "Conceal": "Dissimulation",
         "ConditionMonitor": "Mon. Cond.",
         "Contact": {
@@ -436,6 +453,7 @@
             "Armor": "Armure",
             "Bioware": "Bioware",
             "ComplexForm": "Forme complexe",
+            "Container": "Container",
             "Contact": "Contact",
             "CritterPower": "Pouvoir de Créature",
             "Cyberware": "Cyberware",
@@ -1082,6 +1100,8 @@
         },
         "Tabs": {
             "Item": {
+                "ArmorMods": "Mods d'armure",
+                "ContainerContents": "Contents",
                 "Mods": "Mods"
             }
         },

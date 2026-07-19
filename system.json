@@ -21,7 +21,7 @@
         }
     ],
     "url": "#{URL}#",
-    "version": "0.36.0",
+    "version": "0.37.0",
     "compatibility": {
         "minimum": "14.363",
         "verified": "14.365",
@@ -65,6 +65,9 @@
                 "htmlField": ["description.value"]
             },
             "complex_form": {
+                "htmlField": ["description.value"]
+            },
+            "container": {
                 "htmlField": ["description.value"]
             },
             "contact": {

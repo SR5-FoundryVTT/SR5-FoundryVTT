@@ -1,4 +1,5 @@
 import { ActorSchema } from "../ActorSchema";
+import { SR5Item } from "@/module/item/SR5Item";
 import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 import { IconAssign } from "../../iconAssigner/IconAssign";
 import { DataDefaults, SystemEntityType } from "src/module/data/DataDefaults";
@@ -126,10 +127,10 @@ export abstract class Parser<T extends ItemSystems> {
         };
     }
 
-    public async parseItems(itemsData: BaseType[] | BaseType | undefined) {
+    public async parseItems(itemsData: BaseType[] | BaseType | undefined): Promise<Item.CreateData[]> {
         if (!itemsData) return [];
 
-        const parsedItems: BlankItem<T>[] = [];
+        const parsedItems: Item.CreateData[] = [];
 
         for (const itemData of IH.getArray(itemsData)) {
             try {
@@ -142,8 +143,8 @@ export abstract class Parser<T extends ItemSystems> {
                 this.parseTechnology(item, itemData);
                 this.parseItem(item, itemData);
                 this.parseImportFlags(item, itemData);
-
-                item.flags.shadowrun5e.embeddedItems = await this.getEmbeddedItems(itemData);
+                const embeddedItems = await this.getEmbeddedItems(itemData);
+                const linkedItems = this.linkEmbeddedItems(item, embeddedItems);
 
                 if (!item.img)
                     item.img = IconAssign.iconAssign(item);
@@ -159,7 +160,7 @@ export abstract class Parser<T extends ItemSystems> {
                     console.table(correctionLogs);
                 }
 
-                parsedItems.push(item);
+                parsedItems.push(item, ...linkedItems);
             } catch (error) {
                 console.error(`Error parsing item ${itemData.name}:`, error);
             }
@@ -169,7 +170,22 @@ export abstract class Parser<T extends ItemSystems> {
     }
 
     protected abstract parseItem(item: BlankItem<T>, itemData: BaseType): void;
-    protected async getEmbeddedItems(itemData: BaseType): Promise<Item.Source[]> {
-        return [] as Item.Source[];
+    protected async getEmbeddedItems(itemData: BaseType): Promise<Item.CreateData[]> {
+        return [] as Item.CreateData[];
+    }
+
+    protected linkEmbeddedItems(parent: { _id?: string; type: string }, items: Item.CreateData[]): Item.CreateData[] {
+        if (!parent._id) return [];
+
+        return items.map(item => {
+            const linked = foundry.utils.duplicate(item) as Item.CreateData;
+            foundry.utils.setProperty(linked, 'system.parentId', parent._id);
+
+            if (linked.type === 'modification') {
+                foundry.utils.setProperty(linked, 'system.type', parent.type);
+            }
+
+            return linked;
+        }).filter(item => SR5Item.isAttachment(parent.type, item.type!));
     }
 }

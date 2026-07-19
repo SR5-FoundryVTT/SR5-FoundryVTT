@@ -800,6 +800,23 @@
             }
         },
         "ComplexForms": "Komplexe Formen",
+        "Container": {
+            "CannotContain": "Dieser Gegenstand kann nicht in diesen Behälter gelegt werden.",
+            "Capacity": "Kapazität",
+            "Empty": "Dieser Behälter ist leer.",
+            "FIELDS": {
+                "capacity": {
+                    "count": {
+                        "hint": "Maximale Anzahl direkter Gegenstände in diesem Behälter. 0 bedeutet unbegrenzt.",
+                        "label": "Kapazität"
+                    },
+                    "hint": "Maximale Anzahl direkter Gegenstände in diesem Behälter. 0 bedeutet unbegrenzt.",
+                    "label": "Kapazität"
+                }
+            },
+            "Full": "Dieser Behälter ist voll.",
+            "Remove": "Aus Behälter entfernen"
+        },
         "Conceal": "Tarnbarkeit",
         "ConditionMonitor": "Zustandsmonitor",
         "ConnectToNetwork": "Mit Netzwerk verbinden",
@@ -1557,6 +1574,7 @@
             "Armor": "Panzerung",
             "Bioware": "Bioware",
             "ComplexForm": "Komplexe Form",
+            "Container": "Behälter",
             "Contact": "Kontakt",
             "CritterPower": "Critterkraft",
             "Cyberware": "Cyberware",
@@ -2752,6 +2770,8 @@
                 "Vehicle": "Fahrzeug"
             },
             "Item": {
+                "ArmorMods": "Rüstungsmods",
+                "ContainerContents": "Inhalt",
                 "Description": "Beschreibung",
                 "Details": "Details",
                 "Effects": "Effekte",
@@ -3355,6 +3375,7 @@
             "bioware": "Bioware",
             "call_in_action": "Beschwören/Kompilieren",
             "complex_form": "Komplexe Form",
+            "container": "Behälter",
             "contact": "Kontakt",
             "critter_power": "Critterkraft",
             "cyberware": "Cyberware",

@@ -35,6 +35,7 @@ export const SR5 = {
         armor: 'SR5.ItemTypes.Armor',
         bioware: 'SR5.ItemTypes.Bioware',
         complex_form: 'SR5.ItemTypes.ComplexForm',
+        container: 'SR5.ItemTypes.Container',
         contact: 'SR5.ItemTypes.Contact',
         critter_power: 'SR5.ItemTypes.CritterPower',
         cyberware: 'SR5.ItemTypes.Cyberware',

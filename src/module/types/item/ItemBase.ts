@@ -1,8 +1,9 @@
 import { ImportFlagData } from "../template/ImportFlags";
 import { DescriptionData } from "../template/Description";
-const { SchemaField } = foundry.data.fields;
+const { SchemaField, StringField } = foundry.data.fields;
 
 export const BaseItemData = () => ({
+    parentId: new StringField({ required: true, nullable: true, initial: null }),
     description: new SchemaField(DescriptionData()),
     importFlags: new SchemaField(ImportFlagData(), { nullable: true }),
 });

@@ -21,6 +21,8 @@
         "DefaultOpposedTestActorSelectionDescription": "항상 선택한 토큰을 판정에 사용된 대상으로 덮어씀",
         "DiagonalMovementDescription": "격자판 사용 시 대각선 이동 처리 방식",
         "DiagonalMovementName": "대각선 이동",
+        "DieFaceLabels": "판정 주사위 면 라벨",
+        "DieFaceLabelsDescription": "[Dice So Nice] 판정 주사위 면에 대한 6개의 라벨을 쉼표로 구분한 목록으로, 1번부터 시작한다.",
         "DisplayDefaultRollCardDescription": "기본 굴림 카드와 함께 섀도우런 굴림 카드 표시 여부",
         "DisplayDefaultRollCardName": "기본 굴림 카드 표시",
         "EstimateDiagonal": "대각선 이동 계산 (1-2-1)",
@@ -799,6 +801,23 @@
             }
         },
         "ComplexForms": "컴플렉스 폼",
+        "Container": {
+            "CannotContain": "This item cannot be placed in that container.",
+            "Capacity": "Capacity",
+            "Empty": "This container is empty.",
+            "FIELDS": {
+                "capacity": {
+                    "count": {
+                        "hint": "Maximum number of direct items this container can hold. Use 0 for unlimited.",
+                        "label": "Capacity"
+                    },
+                    "hint": "Maximum number of direct items this container can hold. Use 0 for unlimited.",
+                    "label": "Capacity"
+                }
+            },
+            "Full": "This container is full.",
+            "Remove": "Remove from container"
+        },
         "Conceal": "은폐도",
         "ConditionMonitor": "상태 측정기",
         "ConnectToNetwork": "네트워크에 연결",
@@ -1556,6 +1575,7 @@
             "Armor": "방어구",
             "Bioware": "바이오웨어",
             "ComplexForm": "컴플렉스 폼",
+            "Container": "Container",
             "Contact": "연줄",
             "CritterPower": "생명체 능력",
             "Cyberware": "사이버웨어",
@@ -2751,6 +2771,8 @@
                 "Vehicle": "탑승물"
             },
             "Item": {
+                "ArmorMods": "방어구 개조",
+                "ContainerContents": "Contents",
                 "Description": "설명",
                 "Details": "세부사항",
                 "Effects": "효과",
@@ -2758,7 +2780,8 @@
                 "Network": "네트워크",
                 "SinLicenses": "면허증",
                 "SinNetworks": "네트워크",
-                "WeaponAmmo": "탄약"
+                "WeaponAmmo": "탄약",
+                "WeaponMods": "부착물"
             }
         },
         "Target": "목표",
@@ -3309,6 +3332,7 @@
             "bioware": "바이오웨어",
             "call_in_action": "소환/컴파일",
             "complex_form": "컴플렉스 폼",
+            "container": "Container",
             "contact": "연줄",
             "critter_power": "생명체 능력",
             "cyberware": "사이버웨어",

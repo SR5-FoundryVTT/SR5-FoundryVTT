@@ -800,6 +800,23 @@
             }
         },
         "ComplexForms": "Complex Forms",
+        "Container": {
+            "CannotContain": "This item cannot be placed in that container.",
+            "Capacity": "Capacity",
+            "Empty": "This container is empty.",
+            "FIELDS": {
+                "capacity": {
+                    "count": {
+                        "hint": "Maximum number of direct items this container can hold. Use 0 for unlimited.",
+                        "label": "Capacity"
+                    },
+                    "hint": "Maximum number of direct items this container can hold. Use 0 for unlimited.",
+                    "label": "Capacity"
+                }
+            },
+            "Full": "This container is full.",
+            "Remove": "Remove from container"
+        },
         "Conceal": "Conceal",
         "ConditionMonitor": "Con. Mon.",
         "ConnectToNetwork": "Connect to Network",
@@ -1559,6 +1576,7 @@
             "Armor": "Armor",
             "Bioware": "Bioware",
             "ComplexForm": "Complex Form",
+            "Container": "Container",
             "Contact": "Contact",
             "CritterPower": "Critter Power",
             "Cyberware": "Cyberware",
@@ -2760,6 +2778,8 @@
                 "Vehicle": "Vehicle"
             },
             "Item": {
+                "ArmorMods": "Armor Mods",
+                "ContainerContents": "Contents",
                 "Description": "Description",
                 "Details": "Details",
                 "Effects": "Effects",
@@ -3320,6 +3340,7 @@
             "bioware": "Bioware",
             "call_in_action": "Summon/Compile",
             "complex_form": "Complex Form",
+            "container": "Container",
             "contact": "Contact",
             "critter_power": "Critter Power",
             "cyberware": "Cyberware",
