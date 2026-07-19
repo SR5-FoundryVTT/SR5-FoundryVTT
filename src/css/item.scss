@@ -67,9 +67,17 @@
     }
 
     .item-header-meta .sheet-header-resource .sheet-header-service-value {
-        font-size: var(--font-size-14);
+        display: block;
+        flex: 1 1 auto;
+        width: 100%;
+        min-width: 0;
+        font-size: var(--font-size-12);
         line-height: 1.5rem;
         text-align: right;
+    }
+
+    .item-header-meta .sheet-header-resource .hover-show-button {
+        flex: 0 0 auto;
     }
 
     .item-header-meta .sheet-header-resource input.short {
@@ -161,6 +169,28 @@
         flex: 0 0 auto;
         margin-left: auto;
         text-wrap: nowrap;
+    }
+
+    .capacity-fields {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        align-items: center;
+        gap: 0.25rem;
+        width: 100%;
+    }
+
+    .capacity-field {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .capacity-fields input,
+    .capacity-fields select {
+        width: 100%;
+    }
+
+    .capacity-separator {
+        justify-self: center;
     }
 
 }

@@ -638,7 +638,7 @@
         "AttrWillpower": "의지력",
         "Attribute": "특성치",
         "Attributes": "특성치",
-        "Availability": "희귀도",
+        "Availability": "가용성",
         "AvailabilityRestriction": "구매 제한",
         "AvailabilityRestrictions": {
             "Forbidden": "금지",

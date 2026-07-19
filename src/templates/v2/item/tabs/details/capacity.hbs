@@ -2,12 +2,10 @@
     <div class="list-item-start skinny">
         <label data-tooltip="{{systemFields.capacity.label}}">{{systemFields.capacity.label}}</label>
     </div>
-    <div class="list-item-col">
-        {{#if @root.isEditMode}}
-            {{formInput systemFields.capacity.fields.total value=source.system.capacity.total
-                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-        {{else}}
-            <label>{{system.capacity.used}} / {{system.capacity.total}}</label>
-        {{/if}}
+    <div class="list-item-col capacity-fields">
+        <input type="number" class="short capacity-field" value="{{system.capacity.used}}" disabled>
+        <label class="capacity-separator">/</label>
+        {{formInput systemFields.capacity.fields.total value=source.system.capacity.total
+                    classes="short capacity-field" rootId=@root.rootId disabled=@root.isPlayMode}}
     </div>
 </div>

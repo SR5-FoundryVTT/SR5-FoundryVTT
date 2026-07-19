@@ -1,16 +1,20 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
         <div class="scrollable">
+            {{#if systemFields.technology}}
+                {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/technology.hbs"}}
+            {{/if}}
+
+            {{#if systemFields.capacity}}
+                {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/capacity.hbs"}}
+            {{/if}}
+
             {{#if (eq item.type 'adept_power')}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/adept_power.hbs"}}
             {{/if}}
 
             {{#if (eq item.type 'critter_power')}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/critter_power.hbs"}}
-            {{/if}}
-
-            {{#if (and systemFields.armor (not systemFields.technology))}}
-                {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/armor.hbs"}}
             {{/if}}
 
             {{#if (eq item.type 'ammo')}}
@@ -77,29 +81,18 @@
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/sprite_power.hbs"}}
             {{/if}}
 
-            {{#if systemFields.technology}}
-                {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/technology.hbs"}}
+            {{#if (isType item 'skill')}}
+                {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/skill.hbs"}}
             {{/if}}
 
-            {{#if (and systemFields.armor systemFields.technology)}}
+            {{#if systemFields.armor}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/armor.hbs"}}
-            {{/if}}
-
-            {{#if (and systemFields.capacity systemFields.technology)}}
-                {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/capacity.hbs"}}
             {{/if}}
 
             {{#if systemFields.action}}
                 {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/action.hbs"}}
             {{/if}}
 
-            {{#if (and systemFields.capacity (not systemFields.technology) (not systemFields.armor))}}
-                {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/capacity.hbs"}}
-            {{/if}}
-
-            {{#if (isType item 'skill')}}
-                {{> "systems/shadowrun5e/dist/templates/v2/item/tabs/details/skill.hbs"}}
-            {{/if}}
         </div>
     </div>
 </section>
