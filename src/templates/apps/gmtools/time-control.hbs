@@ -4,8 +4,11 @@
         <span class="time-control-current-value">{{currentTime}}</span>
     </div>
 
-    <fieldset class="time-control-panel">
-        <legend>{{localize "SR5.TimeControl.Presets.Header"}}</legend>
+    <details class="time-control-panel" data-sync="presets" open>
+        <summary>
+            <i class="fas fa-caret-right" aria-hidden="true"></i>
+            {{localize "SR5.TimeControl.Presets.Header"}}
+        </summary>
         <div class="time-preset-grid">
             {{#each presets}}
             <button type="button" data-action="shiftPreset" data-seconds="{{this.seconds}}">
@@ -13,10 +16,13 @@
             </button>
             {{/each}}
         </div>
-    </fieldset>
+    </details>
 
-    <fieldset class="time-control-panel">
-        <legend>{{localize "SR5.TimeControl.CustomAmount"}}</legend>
+    <details class="time-control-panel" data-sync="shift">
+        <summary>
+            <i class="fas fa-caret-right" aria-hidden="true"></i>
+            {{localize "SR5.TimeControl.CustomAmount"}}
+        </summary>
         <div class="time-shift-fields duration-value-fields">
             <input type="number" name="shift.value" value="1" min="0" step="1"
                 aria-label="{{localize 'SR5.TimeControl.Amount'}}"/>
@@ -39,10 +45,13 @@
             <span class="label">{{localize "SR5.TimeControl.Preview"}}:</span>
             <span class="time-shift-preview"></span>
         </div>
-    </fieldset>
+    </details>
 
-    <fieldset class="time-control-panel">
-        <legend>{{localize "SR5.TimeControl.SetTime"}}</legend>
+    <details class="time-control-panel" data-sync="absolute">
+        <summary>
+            <i class="fas fa-caret-right" aria-hidden="true"></i>
+            {{localize "SR5.TimeControl.SetTime"}}
+        </summary>
         <div class="time-absolute-fields">
             <label>{{localize "SR5.TimeControl.Year"}}
                 <input type="number" name="absolute.year" value="{{components.year}}" step="1"/>
@@ -73,5 +82,5 @@
                 {{localize "SR5.TimeControl.Apply"}}
             </button>
         </div>
-    </fieldset>
+    </details>
 </div>
