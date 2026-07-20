@@ -23,7 +23,6 @@ import {
  */
 export interface ExtendedTestCreateParams {
     name: string;
-    description?: string;
     notes?: string;
     actorUuid?: string;
     dicePool: number;
@@ -75,7 +74,6 @@ export const ExtendedTestFlow = {
      */
     async _persist(record: ExtendedTestRecord) {
         record.updatedAt = Date.now();
-        record.updatedWorldTime = game.time.worldTime;
         await ExtendedTestStorage.setRecord(record);
     },
 
@@ -89,7 +87,6 @@ export const ExtendedTestFlow = {
         const record: ExtendedTestRecord = {
             id: foundry.utils.randomID(),
             name: params.name || game.i18n.localize('SR5.ExtendedTestManager.NewTest'),
-            description: params.description ?? '',
             notes: params.notes ?? '',
             actorUuid: params.actorUuid || undefined,
             creatorUserId: game.user?.id ?? '',
@@ -98,7 +95,6 @@ export const ExtendedTestFlow = {
             testData: undefined,
 
             dicePool: Math.max(params.dicePool, 0),
-            currentPool: Math.max(params.dicePool, 0),
             cumulativeModifier: params.cumulativeModifier ?? true,
             threshold: Math.max(params.threshold, 0),
             accumulatedHits: 0,
@@ -113,7 +109,6 @@ export const ExtendedTestFlow = {
             createdAt: now,
             createdWorldTime: worldTime,
             updatedAt: now,
-            updatedWorldTime: worldTime,
 
             rolls: [],
             log: [ExtendedTestFlow._logEntry('create')],
@@ -157,7 +152,6 @@ export const ExtendedTestFlow = {
         const record: ExtendedTestRecord = {
             id: foundry.utils.randomID(),
             name,
-            description: '',
             notes: '',
             actorUuid: test.data.sourceActorUuid,
             creatorUserId: game.user?.id ?? '',
@@ -167,7 +161,6 @@ export const ExtendedTestFlow = {
 
             // Use the pool without the cumulative modifier as a starting value.
             dicePool: test.pool.value,
-            currentPool: test.pool.value,
             cumulativeModifier: true,
             threshold: test.threshold.value,
             accumulatedHits: test.extendedHits.value,
@@ -182,14 +175,12 @@ export const ExtendedTestFlow = {
             createdAt: now,
             createdWorldTime: worldTime,
             updatedAt: now,
-            updatedWorldTime: worldTime,
             lastRollWorldTime: worldTime,
 
             rolls: [ExtendedTestFlow._rollEntry(test)],
             log: [ExtendedTestFlow._logEntry('create'), ExtendedTestFlow._logEntry('roll')],
         };
 
-        record.currentPool = ExtendedTestRules.nextPool(record);
         ExtendedTestFlow._applyStatusTransitions(record);
 
         await ExtendedTestStorage.setRecord(record);
@@ -244,8 +235,14 @@ export const ExtendedTestFlow = {
         const record = ExtendedTestStorage.get(id);
         if (!record || !game.user) return;
 
-        if (record.status !== 'active' || !ExtendedTestRules.canRoll(record, game.user)) {
+        if (!ExtendedTestRules.canRoll(record, game.user)) {
             ui.notifications?.warn('SR5.ExtendedTestManager.Notifications.NoRollPermission', { localize: true });
+            return;
+        }
+
+        // A paused or ended record isn't a permission problem, say so separately.
+        if (record.status !== 'active') {
+            ui.notifications?.warn('SR5.ExtendedTestManager.Notifications.NotActive', { localize: true });
             return;
         }
 
@@ -331,13 +328,11 @@ export const ExtendedTestFlow = {
         }
         data.threshold.base = record.threshold;
 
-        // Apply the cumulative dice pool modifier for this iteration.
+        // One die less per roll already made, as a situational modifier instead of pool base.
+        // A zero value removes the change, so the first roll shows no modifier at all.
+        const priorRolls = record.cumulativeModifier ? record.rollCount : 0;
         const pool = new ModifiableValue(data.pool);
-        if (record.cumulativeModifier) {
-            pool.addUniqueBase('SR5.ExtendedTest', TestRules.extendedModifierValue * record.rollCount);
-        } else {
-            pool.remove('SR5.ExtendedTest');
-        }
+        pool.setUnique('SR5.ExtendedTest', TestRules.extendedModifierValue * priorRolls);
         pool.calcTotal({ min: 0 });
 
         // Seed accumulated hits from the record, keeping it the source of truth.
@@ -388,7 +383,6 @@ export const ExtendedTestFlow = {
 
         // Keep the snapshot current, so following rolls include actor / effect changes.
         record.testData = testData;
-        record.currentPool = ExtendedTestRules.nextPool(record);
 
         ExtendedTestFlow._applyStatusTransitions(record);
 
@@ -430,13 +424,19 @@ export const ExtendedTestFlow = {
     },
 
     /**
-     * Change a record status after checking edit permission.
+     * Change a record status after checking permission.
+     *
+     * Pausing is a scheduling matter and stays with editors. Ending a test, or bringing an
+     * ended one back, changes its outcome and stays with the GM or creator.
      */
-    async _setStatus(id: string, status: ExtendedTestStatus, action: ExtendedTestLogEntry['action']) {
+    async _setStatus(id: string, status: ExtendedTestStatus, action: ExtendedTestLogEntry['action'], requireManage = false) {
         const record = ExtendedTestStorage.get(id);
         if (!record || !game.user) return;
 
-        if (!ExtendedTestRules.canEdit(record, game.user)) {
+        const allowed = requireManage
+            ? ExtendedTestRules.canManage(record, game.user)
+            : ExtendedTestRules.canEdit(record, game.user);
+        if (!allowed) {
             ui.notifications?.warn('SR5.ExtendedTestManager.Notifications.NoEditPermission', { localize: true });
             return;
         }
@@ -459,11 +459,20 @@ export const ExtendedTestFlow = {
     },
 
     async complete(id: string) {
-        await ExtendedTestFlow._setStatus(id, 'completed', 'complete');
+        await ExtendedTestFlow._setStatus(id, 'completed', 'complete', true);
     },
 
     async cancel(id: string) {
-        await ExtendedTestFlow._setStatus(id, 'cancelled', 'cancel');
+        await ExtendedTestFlow._setStatus(id, 'cancelled', 'cancel', true);
+    },
+
+    /**
+     * Bring an ended record back to active, so a misclick or a GM ruling isn't final.
+     */
+    async reactivate(id: string) {
+        const record = ExtendedTestStorage.get(id);
+        if (!record || !ExtendedTestRules.isTerminal(record)) return;
+        await ExtendedTestFlow._setStatus(id, 'active', 'resume', true);
     },
 
     /**
@@ -478,7 +487,7 @@ export const ExtendedTestFlow = {
             return;
         }
 
-        const editableKeys = ['name', 'description', 'notes'] as const;
+        const editableKeys = ['name', 'notes'] as const;
         // How hard the test is and who may take part stays with the owner.
         const managedKeys = [
             'actorUuid', 'dicePool', 'threshold', 'interval',
@@ -496,7 +505,6 @@ export const ExtendedTestFlow = {
         }
         if (!applied.length) return;
 
-        record.currentPool = ExtendedTestRules.nextPool(record);
         record.log.push(ExtendedTestFlow._logEntry('update', applied.join(', ')));
         await ExtendedTestFlow._persist(record);
     },

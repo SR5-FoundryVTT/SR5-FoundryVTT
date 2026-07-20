@@ -47,7 +47,7 @@ export interface ExtendedTestPermissions {
 export interface ExtendedTestRecord {
     id: string;
     name: string;
-    description: string;
+    // Free text about the test, searched alongside the name.
     notes: string;
     // Actor this test belongs to, if any.
     actorUuid?: string;
@@ -58,10 +58,9 @@ export interface ExtendedTestRecord {
     // Snapshot of the last rolled test's data. Used to rebuild follow up rolls.
     testData?: SuccessTestData;
 
-    // Starting dice pool of the extended test.
+    // Starting dice pool of the extended test. Only used while testData is absent, as the
+    // snapshot of a registered test is what actually gets rolled. See ExtendedTestRules.nextPool.
     dicePool: number;
-    // Pool available for the next roll, after cumulative modifiers.
-    currentPool: number;
     // Apply the cumulative -1 dice pool modifier per roll.
     cumulativeModifier: boolean;
     threshold: number;
@@ -78,7 +77,6 @@ export interface ExtendedTestRecord {
     createdAt: number;
     createdWorldTime: number;
     updatedAt: number;
-    updatedWorldTime: number;
     lastRollWorldTime?: number;
 
     rolls: ExtendedTestRollEntry[];

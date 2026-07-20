@@ -1668,8 +1668,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const currentModifierValue = pool.get('SR5.ExtendedTest') || 0;
         const nextModifierValue = TestRules.calcNextExtendedModifier(currentModifierValue);
 
-        // A pool could be overwritten or not.
-        pool.addUniqueBase('SR5.ExtendedTest', nextModifierValue);
+        // A situational modifier, not part of the pool itself, so it stays among the changes.
+        pool.setUnique('SR5.ExtendedTest', nextModifierValue);
 
         ModifiableValue.calcTotal(data.pool, { min: 0 });
 

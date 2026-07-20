@@ -1,4 +1,5 @@
 @use 'config/variables';
+@use 'config/mixins';
 
 .sr5.time-control {
     .time-control-app {
@@ -20,37 +21,11 @@
         }
 
         .time-control-panel {
+            @include mixins.collapsible;
+
             border: variables.$groove;
             border-radius: 0.3em;
             padding: 0.5em;
-
-            summary {
-                display: flex;
-                align-items: center;
-                gap: 0.4em;
-                font-weight: bold;
-                cursor: pointer;
-                // The caret icon takes over from the default marker, to follow the open state.
-                list-style: none;
-
-                &::-webkit-details-marker {
-                    display: none;
-                }
-
-                i {
-                    width: 0.75em;
-                    text-align: center;
-                    transition: transform 150ms ease;
-                }
-            }
-
-            &[open] > summary {
-                margin-bottom: 0.5em;
-
-                i {
-                    transform: rotate(90deg);
-                }
-            }
         }
 
         .time-preset-grid {

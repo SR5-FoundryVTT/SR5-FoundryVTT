@@ -54,19 +54,17 @@
             .etm-sort {
                 display: flex;
                 flex-flow: row nowrap;
-                gap: 0.2em;
+                gap: 0.3em;
                 align-items: center;
             }
 
-            .etm-filters select {
-                max-width: 9em;
+            select {
                 height: 1.8em;
                 font-size: var(--font-size-11);
             }
 
             input[type='search'] {
-                min-width: 8em;
-                max-width: 16em;
+                min-width: 10em;
                 height: 1.8em;
                 font-size: var(--font-size-11);
                 color: variables.$white;
@@ -82,6 +80,38 @@
             button {
                 width: auto;
                 white-space: nowrap;
+            }
+        }
+
+        .etm-advanced-filters {
+            @include mixins.collapsible;
+
+            margin: 0 0.5em 0.3em;
+            font-size: var(--font-size-11);
+
+            // Flag a filter hidden behind the collapsed summary.
+            .etm-filter-count {
+                background: variables.$yellow;
+                color: variables.$black;
+                border-radius: 1em;
+                padding: 0 0.45em;
+                font-size: var(--font-size-10);
+            }
+
+            .etm-advanced-filter-fields {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(11em, 1fr));
+                gap: 0.3em;
+
+                label {
+                    display: flex;
+                    flex-flow: column nowrap;
+                    color: variables.$grey;
+                }
+
+                select {
+                    height: 1.8em;
+                }
             }
         }
 
@@ -109,10 +139,10 @@
                 &.status-cancelled { border-left: 3px solid variables.$grey; opacity: 0.7; }
                 &.status-active { border-left: 3px solid variables.$yellow; }
 
+                // Fixed tracks, so values and actions line up across rows of differing content.
                 .etm-row-main {
-                    display: flex;
-                    flex-flow: row nowrap;
-                    justify-content: space-between;
+                    display: grid;
+                    grid-template-columns: minmax(0, 1fr) auto auto;
                     align-items: center;
                     gap: 0.5em;
                 }
@@ -147,6 +177,8 @@
                     &.etm-status-active { color: variables.$yellow; }
                     &.etm-status-completed { color: green; }
                     &.etm-status-failed { color: variables.$crimson; }
+                    &.etm-status-paused { color: variables.$grey; }
+                    &.etm-status-cancelled { color: variables.$grey; }
                 }
 
                 .etm-due {
@@ -154,11 +186,13 @@
                     font-weight: bold;
                 }
 
+                // One fixed track per value. Widths hold the widest expected content
+                // (three digit pools, 'Combat Turns'), so nothing shifts row to row.
                 .etm-row-values {
-                    display: flex;
-                    flex-flow: row nowrap;
+                    display: grid;
+                    grid-template-columns: 7.5em 3.5em 8em 3.5em;
                     align-items: center;
-                    gap: 0.9em;
+                    gap: 0.6em;
                     white-space: nowrap;
                     font-size: var(--font-size-12);
 
@@ -166,26 +200,53 @@
                         display: flex;
                         flex-flow: column nowrap;
                         align-items: center;
-                        min-width: 7em;
 
                         progress {
                             width: 100%;
                             height: 6px;
                         }
+
+                        // Reserved without a threshold, to keep every row the same height.
+                        progress.is-placeholder {
+                            visibility: hidden;
+                        }
+                    }
+
+                    .etm-value {
+                        display: grid;
+                        grid-template-columns: 1.2em minmax(1.4em, auto) auto;
+                        align-items: center;
+                        gap: 0.25em;
+                        overflow: hidden;
+
+                        i {
+                            text-align: center;
+                        }
+
+                        // Right aligned, so digits form a column whatever their width.
+                        .etm-value-number {
+                            text-align: right;
+                        }
+
+                        .etm-value-unit {
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
                     }
                 }
 
                 .etm-row-actions {
-                    display: flex;
-                    flex-flow: row nowrap;
-                    gap: 0.5em;
+                    display: grid;
+                    grid-template-columns: repeat(6, 1.4em);
+                    justify-items: center;
+                    align-items: center;
                     font-size: var(--font-size-13);
 
                     a {
                         @include mixins.rollable;
                     }
 
-                    // Actions withheld until enough game time has passed.
+                    // Actions withheld until enough game time has passed, or pool ran out.
                     .etm-action-disabled {
                         opacity: 0.4;
                         cursor: not-allowed;
@@ -243,62 +304,173 @@
     .extended-test-config-form {
         display: flex;
         flex-flow: column nowrap;
-        gap: 0.4em;
+        gap: 0.6em;
         padding: 0.5em;
         color: variables.$white;
 
-        .form-group {
+        // Section heading, shared by the fieldset legends and the collapsible summary.
+        @mixin section-heading {
+            font-weight: bold;
+            color: variables.$yellow;
+            text-transform: uppercase;
+            font-size: var(--font-size-11);
+            letter-spacing: 0.05em;
+        }
+
+        fieldset.etm-config-section {
             display: flex;
-            flex-flow: row nowrap;
+            flex-flow: column nowrap;
+            gap: 0.4em;
+
+            legend {
+                @include section-heading;
+
+                padding: 0 0.4em;
+            }
+        }
+
+        .etm-config-section {
+            border: variables.$groove;
+            border-radius: 0.3em;
+            padding: 0.5em 0.6em 0.6em;
+            margin: 0;
+        }
+
+        details.etm-config-section {
+            @include mixins.collapsible;
+
+            summary {
+                @include section-heading;
+            }
+
+            // The mixin only styles the summary, the body still needs its own flow.
+            &[open] {
+                display: flex;
+                flex-flow: column nowrap;
+                gap: 0.4em;
+
+                // The gap already separates the summary from the body.
+                > summary {
+                    margin-bottom: 0;
+                }
+            }
+        }
+
+        // One grid per row, so labels and fields line up across every section.
+        .form-group {
+            display: grid;
+            grid-template-columns: 10em minmax(0, 1fr);
             align-items: center;
             gap: 0.5em;
 
             > label {
-                flex: 0 0 11em;
                 font-weight: bold;
+                // Long labels wrap inside their column instead of widening it.
+                line-height: 1.25;
             }
 
             input, select, textarea {
-                flex: 1;
                 color: variables.$white;
+                min-width: 0;
             }
 
             textarea {
                 resize: vertical;
             }
+
+            // A disabled field has to read as display, not as an empty input.
+            input:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+                font-style: italic;
+            }
         }
 
-        .etm-config-values {
-            input {
-                width: 4em;
-                flex: 0;
+        // Toggle labels are sentences, so they get the full width and keep to one line.
+        // The checkbox follows at the end instead of sitting in the field column.
+        .toggle-checkbox-row {
+            grid-template-columns: minmax(0, 1fr) auto;
+
+            > label {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
+
+            > input[type='checkbox'] {
+                width: 1.1em;
+                height: 1.1em;
+                margin: 0;
+            }
+        }
+
+        // Pool and threshold in one row: number, inline label, number.
+        .etm-config-values {
+            display: grid;
+            grid-template-columns: 4.5em auto 4.5em;
+            align-items: center;
+            gap: 0.5em;
+
+            > label {
+                font-weight: bold;
+                justify-self: end;
+            }
+        }
+
+        .etm-config-interval {
+            display: grid;
+            grid-template-columns: 5em minmax(0, 1fr);
+            align-items: center;
+            gap: 0.5em;
+        }
+
+        .hint {
+            font-size: var(--font-size-11);
+            color: variables.$grey;
+            margin: 0;
         }
 
         .etm-config-users {
             table {
                 width: 100%;
+                border-collapse: collapse;
 
                 th, td {
                     text-align: center;
+                    padding: 0.2em 0.3em;
+                }
+
+                th {
+                    font-size: var(--font-size-11);
+                    color: variables.$grey;
+                    text-transform: uppercase;
                 }
 
                 td:first-child, th:first-child {
                     text-align: left;
                 }
-            }
 
-            .hint {
-                font-size: var(--font-size-11);
-                color: variables.$grey;
+                tbody tr:nth-child(odd) {
+                    background: rgba(variables.$white, 0.04);
+                }
             }
         }
 
         .etm-config-footer {
             display: flex;
             flex-flow: row nowrap;
+            justify-content: flex-end;
             gap: 0.5em;
-            margin-top: 0.5em;
+
+            button {
+                width: auto;
+                padding: 0.2em 1em;
+            }
+
+            .etm-config-submit {
+                font-weight: bold;
+                border-color: variables.$yellow;
+            }
         }
     }
 }

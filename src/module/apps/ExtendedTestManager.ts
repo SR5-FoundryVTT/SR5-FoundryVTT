@@ -22,7 +22,7 @@ interface ExtendedTestRowContext {
     creatorName: string;
     progress?: number;
     nextPool: number;
-    intervalLabel: string;
+    intervalUnitLabel: string;
     intervalsElapsed: number;
     isDue: boolean;
     createdGameTime: string;
@@ -30,8 +30,14 @@ interface ExtendedTestRowContext {
     canRoll: boolean;
     // Only the elapsed game time blocks rolling, everything else would allow it.
     rollBlockedByInterval: boolean;
+    // The pool ran out, so no further roll is possible.
+    rollBlockedByPool: boolean;
     canEdit: boolean;
     canDelete: boolean;
+    canPauseResume: boolean;
+    // Ending a running test, or bringing an ended one back, is the owners call.
+    canEnd: boolean;
+    canReactivate: boolean;
     canContinue: boolean;
     isActive: boolean;
     isPaused: boolean;
@@ -65,6 +71,8 @@ interface ExtendedTestManagerContext extends HandlebarsApplicationMixin.RenderCo
     isGM: boolean;
     currentTime: string;
     timePresets: (WorldTimePreset & { label: string })[];
+    // Non-default filters hidden inside the collapsed advanced section.
+    advancedFilterCount: number;
 }
 
 const STATUS_FILTERS = ['all', 'active', 'completed', 'failed', 'paused', 'cancelled'] as const;
@@ -114,6 +122,7 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
             rollTest: ExtendedTestManager.#onRollTest,
             pauseTest: ExtendedTestManager.#onPauseTest,
             resumeTest: ExtendedTestManager.#onResumeTest,
+            reactivateTest: ExtendedTestManager.#onReactivateTest,
             completeTest: ExtendedTestManager.#onCompleteTest,
             cancelTest: ExtendedTestManager.#onCancelTest,
             deleteTest: ExtendedTestManager.#onDeleteTest,
@@ -144,7 +153,9 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
         if (!changedKeys.includes(ExtendedTestStorage.key)) return;
         void this.render();
     };
-    #onUpdateWorldTime = () => { void this.render(); };
+    // Due state touches every row, so this is a full render. Debounced, as holding a time
+    // preset would otherwise rebuild the whole list per tick.
+    #onUpdateWorldTime = foundry.utils.debounce(() => { void this.render(); }, 100);
     // Don't rebuild the list on every keystroke.
     #onSearchInput = foundry.utils.debounce(() => { void this.render(); }, 200);
 
@@ -204,6 +215,15 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
         }
         context.actorOptions = [...actorOptions.entries()].map(([uuid, name]) => ({ uuid, name }));
 
+        // Keep a filter hidden behind the collapsed advanced section visible as a count.
+        const { actorUuid, visibility, createdWithin, updatedWithin } = this.filterState;
+        context.advancedFilterCount = [
+            actorUuid !== '',
+            visibility !== 'all',
+            createdWithin !== 'any',
+            updatedWithin !== 'any',
+        ].filter(Boolean).length;
+
         // GM time strip.
         context.currentTime = WorldTimeFlow.format();
         context.timePresets = WorldTimeFlow.PRESETS.map(preset => ({
@@ -231,7 +251,7 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
 
         if (filters.search) {
             const search = filters.search.toLowerCase();
-            const haystack = `${record.name} ${record.description}`.toLowerCase();
+            const haystack = `${record.name} ${record.notes}`.toLowerCase();
             if (!haystack.includes(search)) return false;
         }
 
@@ -266,10 +286,13 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
         const actor = record.actorUuid ? fromUuidSync(record.actorUuid) : null;
         const enforceInterval = game.settings.get(SYSTEM_NAME, FLAGS.EnforceExtendedTestInterval) as boolean;
         const intervalAllowsRoll = !enforceInterval || ExtendedTestRules.intervalAllowsRoll(record, worldTime);
-        const rollAllowed = record.status === 'active'
-            && ExtendedTestRules.canRoll(record, user)
-            && ExtendedTestRules.canContinue(record);
-        const canRoll = rollAllowed && intervalAllowsRoll;
+        const canContinue = ExtendedTestRules.canContinue(record);
+        const mayRoll = record.status === 'active' && ExtendedTestRules.canRoll(record, user);
+        const canRoll = mayRoll && canContinue && intervalAllowsRoll;
+
+        const canEdit = ExtendedTestRules.canEdit(record, user);
+        const canManage = ExtendedTestRules.canManage(record, user);
+        const isTerminal = ExtendedTestRules.isTerminal(record);
 
         const userName = (id: string) => game.users?.get(id)?.name ?? '?';
         const expanded = this.#expanded.has(record.id);
@@ -282,16 +305,20 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
             creatorName: userName(record.creatorUserId),
             progress: ExtendedTestRules.progress(record),
             nextPool: ExtendedTestRules.nextPool(record),
-            intervalLabel: `${record.interval.value} ${unitLabel(record.interval.unit)}`,
+            intervalUnitLabel: unitLabel(record.interval.unit),
             intervalsElapsed: ExtendedTestRules.intervalsElapsed(record, worldTime),
             isDue: ExtendedTestRules.isDue(record, worldTime),
             createdGameTime: WorldTimeFlow.format(record.createdWorldTime),
             updatedRealTime: new Date(record.updatedAt).toLocaleString(),
             canRoll,
-            rollBlockedByInterval: rollAllowed && !intervalAllowsRoll,
-            canEdit: ExtendedTestRules.canEdit(record, user),
+            rollBlockedByInterval: mayRoll && canContinue && !intervalAllowsRoll,
+            rollBlockedByPool: mayRoll && !canContinue,
+            canEdit,
             canDelete: ExtendedTestRules.canDelete(record, user),
-            canContinue: ExtendedTestRules.canContinue(record),
+            canPauseResume: canEdit && (record.status === 'active' || record.status === 'paused'),
+            canEnd: canManage && !isTerminal,
+            canReactivate: canManage && isTerminal,
+            canContinue,
             isActive: record.status === 'active',
             isPaused: record.status === 'paused',
             expanded,
@@ -361,10 +388,11 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
         return actionTarget?.closest<HTMLElement>('[data-record-id]')?.dataset.recordId;
     }
 
+    // Storage writes come back through sr5e.storageChanged, which already re-renders. For a
+    // player the write is a socket round trip, so rendering here would only paint stale data.
     static async #onCreateTest(this: ExtendedTestManager, event: Event) {
         event.preventDefault();
         await ExtendedTestConfigDialog.create();
-        await this.render();
     }
 
     static async #onEditTest(this: ExtendedTestManager, event: Event, target?: HTMLElement) {
@@ -372,7 +400,6 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
         const id = ExtendedTestManager.#recordId(event, target);
         if (!id) return;
         await ExtendedTestConfigDialog.edit(id);
-        await this.render();
     }
 
     static async #onRollTest(this: ExtendedTestManager, event: Event, target?: HTMLElement) {
@@ -380,35 +407,46 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
         const id = ExtendedTestManager.#recordId(event, target);
         if (!id) return;
         await ExtendedTestFlow.roll(id);
-        await this.render();
     }
 
     static async #onPauseTest(this: ExtendedTestManager, event: Event, target?: HTMLElement) {
         event.preventDefault();
         const id = ExtendedTestManager.#recordId(event, target);
         if (id) await ExtendedTestFlow.pause(id);
-        await this.render();
     }
 
     static async #onResumeTest(this: ExtendedTestManager, event: Event, target?: HTMLElement) {
         event.preventDefault();
         const id = ExtendedTestManager.#recordId(event, target);
         if (id) await ExtendedTestFlow.resume(id);
-        await this.render();
+    }
+
+    static async #onReactivateTest(this: ExtendedTestManager, event: Event, target?: HTMLElement) {
+        event.preventDefault();
+        const id = ExtendedTestManager.#recordId(event, target);
+        if (id) await ExtendedTestFlow.reactivate(id);
     }
 
     static async #onCompleteTest(this: ExtendedTestManager, event: Event, target?: HTMLElement) {
         event.preventDefault();
         const id = ExtendedTestManager.#recordId(event, target);
         if (id) await ExtendedTestFlow.complete(id);
-        await this.render();
     }
 
     static async #onCancelTest(this: ExtendedTestManager, event: Event, target?: HTMLElement) {
         event.preventDefault();
         const id = ExtendedTestManager.#recordId(event, target);
-        if (id) await ExtendedTestFlow.cancel(id);
-        await this.render();
+        if (!id) return;
+
+        const record = ExtendedTestStorage.get(id);
+        // Cancelling ends the test; only a manager can undo it afterwards.
+        const confirmed = await foundry.applications.api.DialogV2.confirm({
+            window: { title: game.i18n.localize('SR5.ExtendedTestManager.Actions.Cancel') },
+            content: game.i18n.format('SR5.ExtendedTestManager.ConfirmCancel', { name: record?.name ?? '' }),
+        });
+        if (!confirmed) return;
+
+        await ExtendedTestFlow.cancel(id);
     }
 
     static async #onDeleteTest(this: ExtendedTestManager, event: Event, target?: HTMLElement) {
@@ -425,7 +463,6 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
 
         await ExtendedTestFlow.remove(id);
         this.#expanded.delete(id);
-        await this.render();
     }
 
     static async #onToggleDetails(this: ExtendedTestManager, event: Event, target?: HTMLElement) {

@@ -93,15 +93,24 @@ export const ExtendedTestRules = {
      * starting pool. Only manually created records lack one.
      */
     nextPool: (record: ExtendedTestRecord): number => {
-        const modifier = record.cumulativeModifier ? TestRules.extendedModifierValue * record.rollCount : 0;
+        const pool = record.testData?.pool;
 
-        // The snapshot total already contains the modifier of the roll it was taken on.
-        const snapshotPool = record.testData?.pool?.value;
-        if (snapshotPool !== undefined) {
-            const applied = record.cumulativeModifier ? TestRules.extendedModifierValue : 0;
-            return Math.max(snapshotPool + applied, 0);
+        // Mirror what ExtendedTestFlow._prepareRollData will do to the snapshot, rather than
+        // assuming the modifier is present: toggling cumulativeModifier off leaves the last
+        // snapshot carrying a modifier that the next roll removes again.
+        if (pool?.value !== undefined) {
+            // Swap the modifier the snapshot was rolled with for the one the next roll will
+            // use, exactly as ExtendedTestFlow._prepareRollData does.
+            const inSnapshot = pool.changes
+                ?.filter(change => change.name === 'SR5.ExtendedTest' && change.enabled)
+                .reduce((total, change) => total + change.value, 0) ?? 0;
+            const next = record.cumulativeModifier
+                ? TestRules.extendedModifierValue * record.rollCount
+                : 0;
+            return Math.max(pool.value - inSnapshot + next, 0);
         }
 
+        const modifier = record.cumulativeModifier ? TestRules.extendedModifierValue * record.rollCount : 0;
         return Math.max(record.dicePool + modifier, 0);
     },
 
@@ -166,6 +175,18 @@ export const ExtendedTestRules = {
     intervalAllowsRoll: (record: ExtendedTestRecord, worldTime: number): boolean => {
         if (record.rollCount === 0) return true;
         if (intervalToSeconds(record.interval) <= 0) return true;
+
+        // A GM rewinding world time past the last roll re-anchors the interval, instead of
+        // locking the record out forever on the clamp in intervalsElapsed.
+        if (worldTime < (record.lastRollWorldTime ?? record.createdWorldTime)) return true;
+
         return ExtendedTestRules.intervalsElapsed(record, worldTime) >= 1;
+    },
+
+    /**
+     * Has this record run its course? Terminal records only move again through reactivate.
+     */
+    isTerminal: (record: ExtendedTestRecord): boolean => {
+        return ['completed', 'failed', 'cancelled'].includes(record.status);
     },
 }

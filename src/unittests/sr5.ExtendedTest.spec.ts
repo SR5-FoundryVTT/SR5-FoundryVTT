@@ -53,15 +53,24 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
     });
 
     describe('Extended Test Rules', () => {
+        /**
+         * A test data snapshot as ExtendedTestFlow._prepareRollData leaves it: pool.value is
+         * the total actually rolled, with the cumulative modifier of that roll among changes.
+         */
+        const snapshotTestData = (value: number, extendedModifier: number) => ({
+            pool: {
+                value,
+                changes: [{ name: 'SR5.ExtendedTest', value: extendedModifier, enabled: true }],
+            },
+        }) as any;
+
         const baseRecord = (overrides: Partial<ExtendedTestRecord> = {}): ExtendedTestRecord => ({
             id: 'test',
             name: 'Test',
-            description: '',
             notes: '',
             creatorUserId: 'creator',
             testType: 'SuccessTest',
             dicePool: 10,
-            currentPool: 10,
             cumulativeModifier: true,
             threshold: 5,
             accumulatedHits: 0,
@@ -73,7 +82,6 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             createdAt: 0,
             createdWorldTime: 0,
             updatedAt: 0,
-            updatedWorldTime: 0,
             rolls: [],
             log: [],
             ...overrides,
@@ -94,15 +102,25 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             // Manually created records have no snapshot and use plain starting pool math.
             assert.strictEqual(ExtendedTestRules.nextPool(baseRecord({ rollCount: 2 })), 8);
 
-            // Registered records roll what their snapshot says, minus the next modifier.
+            // A snapshot rolled as the second roll carries a -1 of its own. The third roll
+            // replaces it with -2, so a base 5 pool ends up at 3.
             const snapshot = baseRecord({
                 rollCount: 2,
-                testData: { pool: { value: 4 } } as any,
+                testData: snapshotTestData(4, -1),
             });
             assert.strictEqual(ExtendedTestRules.nextPool(snapshot), 3);
+        });
 
-            snapshot.cumulativeModifier = false;
-            assert.strictEqual(ExtendedTestRules.nextPool(snapshot), 4);
+        it('drops the snapshot modifier when the cumulative modifier is turned off', () => {
+            // The snapshot still carries the -2 it was rolled with, but the next roll will
+            // remove it entirely, so the manager has to show the full pool.
+            const record = baseRecord({
+                rollCount: 3,
+                cumulativeModifier: false,
+                testData: snapshotTestData(8, -2),
+            });
+
+            assert.strictEqual(ExtendedTestRules.nextPool(record), 10);
         });
 
         it('detects completion and continuation', () => {
@@ -184,6 +202,18 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             // Records without an interval are never gated.
             record.interval = { value: 0, unit: 'hours' };
             assert.isTrue(ExtendedTestRules.intervalAllowsRoll(record, 0));
+        });
+
+        it('re-anchors the interval when world time is rewound past the last roll', () => {
+            const record = baseRecord({
+                interval: { value: 1, unit: 'hours' },
+                lastRollWorldTime: 7200,
+                rollCount: 1,
+            });
+
+            // Without the rewind allowance the elapsed clamp would lock this record forever.
+            assert.strictEqual(ExtendedTestRules.intervalsElapsed(record, 3600), 0);
+            assert.isTrue(ExtendedTestRules.intervalAllowsRoll(record, 3600));
         });
 
         it('keeps rules and permission changes with the record owner', () => {
@@ -269,7 +299,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             assert.strictEqual(updated.rolls[0].poolUsed, 20);
             assert.strictEqual(updated.accumulatedHits, updated.rolls[0].hits);
             // Cumulative -1: next roll uses 19 dice.
-            assert.strictEqual(updated.currentPool, 19);
+            assert.strictEqual(ExtendedTestRules.nextPool(updated), 19);
 
             const secondTest = await ExtendedTestFlow.roll(record.id, { showDialog: false, showMessage: false });
             assert.isDefined(secondTest);
@@ -330,6 +360,21 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             assert.strictEqual(ExtendedTestStorage.get(record.id)!.status, 'cancelled');
         });
 
+        it('brings an ended record back to active through reactivate', async () => {
+            const record = await createRecord();
+
+            await ExtendedTestFlow.cancel(record.id);
+            assert.isTrue(ExtendedTestRules.isTerminal(ExtendedTestStorage.get(record.id)!));
+
+            await ExtendedTestFlow.reactivate(record.id);
+            assert.strictEqual(ExtendedTestStorage.get(record.id)!.status, 'active');
+
+            // Only ended records reactivate; an active one is left alone.
+            await ExtendedTestFlow.pause(record.id);
+            await ExtendedTestFlow.reactivate(record.id);
+            assert.strictEqual(ExtendedTestStorage.get(record.id)!.status, 'paused');
+        });
+
         it('updates editable fields and logs the change', async () => {
             const record = await createRecord();
 
@@ -352,8 +397,29 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             const updated = ExtendedTestStorage.get(record.id)!;
             assert.strictEqual(updated.rollCount, 1);
             assert.strictEqual(updated.accumulatedHits, 3);
-            assert.strictEqual(updated.currentPool, 11);
+            assert.strictEqual(ExtendedTestRules.nextPool(updated), 11);
             assert.strictEqual(updated.status, 'active');
+        });
+
+        it('applies the cumulative modifier as a modifier, not into the pool base', async () => {
+            const record = await createRecord({ dicePool: 12, threshold: 40 });
+            record.rollCount = 2;
+
+            const data = ExtendedTestFlow._prepareRollData(record)!;
+            const change = data.pool.changes.find(entry => entry.name === 'SR5.ExtendedTest')!;
+
+            assert.isDefined(change, 'the extended modifier is a change on the pool');
+            assert.strictEqual(change.value, -2);
+            // Base priority would fold it into the pool itself and hide it as its own line.
+            assert.notStrictEqual(change.priority, Number.MIN_SAFE_INTEGER);
+            assert.strictEqual(data.pool.base, 12);
+            assert.strictEqual(data.pool.value, 10);
+
+            // The first roll carries no modifier at all, rather than a zero valued one.
+            record.rollCount = 0;
+            const first = ExtendedTestFlow._prepareRollData(record)!;
+            assert.isUndefined(first.pool.changes.find(entry => entry.name === 'SR5.ExtendedTest'));
+            assert.strictEqual(first.pool.value, 12);
         });
 
         it('ends a record when a roll critically glitches', async () => {

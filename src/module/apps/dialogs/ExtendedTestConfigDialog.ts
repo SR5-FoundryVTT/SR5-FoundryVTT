@@ -19,6 +19,10 @@ interface ExtendedTestConfigContext extends HandlebarsApplicationMixin.RenderCon
     record: Partial<ExtendedTestRecord>;
     isCreate: boolean;
     canManage: boolean;
+    // Records registered from a real roll take their pool from the test snapshot, so the
+    // dicePool field would be a no-op. See ExtendedTestRules.nextPool.
+    poolFromSnapshot: boolean;
+    snapshotPool: number;
     actorOptions: { uuid: string; name: string; selected: boolean }[];
     userOptions: { id: string; name: string; visible: boolean; edit: boolean; roll: boolean }[];
     visibilityOptions: { value: string; label: string; selected: boolean }[];
@@ -99,7 +103,6 @@ export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(Applica
         const record = this.#record;
         context.record = record ?? {
             name: '',
-            description: '',
             notes: '',
             dicePool: 8,
             threshold: 4,
@@ -110,6 +113,8 @@ export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(Applica
         context.isCreate = !record;
         // Rules and permissions of an existing record are the owners business only.
         context.canManage = !record || ExtendedTestRules.canManage(record, game.user!);
+        context.poolFromSnapshot = !!record?.testData;
+        context.snapshotPool = record ? ExtendedTestRules.nextPool(record) : 0;
 
         // Actors the user may associate: owned actors (GM sees all).
         context.actorOptions = game.actors!
@@ -157,10 +162,11 @@ export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(Applica
 
         const changes = {
             name: String(data.name ?? '').trim(),
-            description: String(data.description ?? ''),
             notes: String(data.notes ?? ''),
             actorUuid: String(data.actorUuid ?? '') || undefined,
-            dicePool: Math.max(Number(data.dicePool) || 0, 0),
+            // Absent when the field is disabled for a snapshot backed record, where the
+            // stored starting pool is unused anyway. Don't zero it in that case.
+            ...(data.dicePool === undefined ? {} : { dicePool: Math.max(Number(data.dicePool) || 0, 0) }),
             threshold: Math.max(Number(data.threshold) || 0, 0),
             interval: {
                 value: Math.max(Number(data['interval.value']) || 0, 0),
@@ -179,7 +185,8 @@ export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(Applica
         if (this.#record) {
             await ExtendedTestFlow.update(this.#record.id, changes);
         } else {
-            await ExtendedTestFlow.create(changes);
+            // New records are never snapshot backed, so the pool field is always present.
+            await ExtendedTestFlow.create({ dicePool: 0, ...changes });
         }
     }
 
