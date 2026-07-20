@@ -19,9 +19,21 @@ export const registerSystemSettings = () => {
         config: false,
         type: Object,
         default: {},
-        // World setting onChange fires on every client, allowing apps to re-render on storage changes.
-        // The changed top level keys are passed on, so listeners can ignore unrelated storage.
+        // Fires on every client, so apps can re-render. Listeners get the changed top level
+        // keys, as onChange itself only ever sees the complete storage.
         onChange: (storage: object) => { Hooks.callAll('sr5e.storageChanged', DataStorage.changedKeys(storage)); }
+    });
+
+    /**
+     * No actual setting. Keeps the world time initialization from running a second time,
+     * should a GM ever wind the clock back to the FoundryVTT epoch.
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.WorldTimeInitialized, {
+        name: 'World Time Initialized.',
+        scope: 'world',
+        config: false,
+        type: Boolean,
+        default: false,
     });
 
     /**

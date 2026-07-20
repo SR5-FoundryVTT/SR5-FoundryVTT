@@ -34,10 +34,8 @@ export function intervalToSeconds(interval: ExtendedTestInterval): number {
 }
 
 /**
- * The localization key labeling a single interval unit.
- *
- * Combat rounds use the system label, all other units reuse the FoundryVTT effect
- * duration labels.
+ * The localization key labeling a single interval unit. Combat rounds use the system label,
+ * everything else the FoundryVTT effect duration labels.
  */
 export function unitLabelKey(unit: ExtendedIntervalUnit): Parameters<typeof game.i18n.localize>[0] {
     if (unit === 'rounds') return 'SR5.ActiveEffect.Duration.UnitTurns';

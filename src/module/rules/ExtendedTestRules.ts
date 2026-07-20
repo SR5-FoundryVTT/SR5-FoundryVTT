@@ -71,11 +71,9 @@ export const ExtendedTestRules = {
     },
 
     /**
-     * Can the given user manage this record?
+     * Can the given user change the rules of this record, or who may take part in it?
      *
-     * Managing covers everything that changes the rules of the test or who may take part
-     * in it. Users merely granted edit permission must not be able to escalate themselves,
-     * so this is limited to the GM and the creator.
+     * Limited to GM and creator, so granting edit permission can't be escalated.
      */
     canManage: (record: ExtendedTestRecord, user: User): boolean => {
         return user.isGM || ExtendedTestRules.isCreator(record, user);
@@ -91,14 +89,13 @@ export const ExtendedTestRules = {
     /**
      * The dice pool available for the next roll, after cumulative modifiers.
      *
-     * Records registered from a real test carry a test data snapshot, whose pool is the
-     * actual source of truth for the next roll. Only manually created records without a
-     * snapshot fall back to the plain starting pool arithmetic.
+     * The snapshot of a registered test is what actually gets rolled, so it wins over the
+     * starting pool. Only manually created records lack one.
      */
     nextPool: (record: ExtendedTestRecord): number => {
         const modifier = record.cumulativeModifier ? TestRules.extendedModifierValue * record.rollCount : 0;
 
-        // The snapshot pool total already contains the modifier of the roll it was taken on.
+        // The snapshot total already contains the modifier of the roll it was taken on.
         const snapshotPool = record.testData?.pool?.value;
         if (snapshotPool !== undefined) {
             const applied = record.cumulativeModifier ? TestRules.extendedModifierValue : 0;
@@ -123,10 +120,8 @@ export const ExtendedTestRules = {
     },
 
     /**
-     * Is this record open ended, without a threshold to reach?
-     *
-     * Such tests answer 'how far did I get', so running out of dice pool completes them
-     * instead of failing them.
+     * Is this record open ended, without a threshold to reach? Such tests answer 'how far
+     * did I get', so running out of pool completes them instead of failing them.
      */
     isOpenEnded: (record: ExtendedTestRecord): boolean => {
         return record.threshold <= 0;
@@ -165,10 +160,8 @@ export const ExtendedTestRules = {
     },
 
     /**
-     * Does elapsed game time allow another roll?
-     *
-     * The very first roll of a record is always allowed, as is any record without an
-     * interval. Only relevant when the interval enforcement setting is active.
+     * Does elapsed game time allow another roll? The first roll and records without an
+     * interval always pass.
      */
     intervalAllowsRoll: (record: ExtendedTestRecord, worldTime: number): boolean => {
         if (record.rollCount === 0) return true;

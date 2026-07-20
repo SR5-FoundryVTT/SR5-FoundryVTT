@@ -2,10 +2,11 @@ import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { ExtendedTestFlow } from "@/module/flows/ExtendedTestFlow";
 import { ExtendedTestRules } from "@/module/rules/ExtendedTestRules";
 import { ExtendedTestStorage } from "@/module/storage/ExtendedTestStorage";
+import { WorldTimeFlow } from "@/module/flows/WorldTimeFlow";
 import { intervalToSeconds } from "@/module/utils/timeUnits";
 import { ExtendedTestRecord } from "@/module/types/flows/ExtendedTest";
 import { TestCreator } from "@/module/tests/TestCreator";
-import { SR } from "@/module/constants";
+import { FLAGS, SR, SYSTEM_NAME } from "@/module/constants";
 
 export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
     const { describe, it, afterEach } = context;
@@ -364,6 +365,84 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             }, undefined as never);
 
             assert.strictEqual(ExtendedTestStorage.get(record.id)!.status, 'failed');
+        });
+    });
+
+    describe('World Time Flow', () => {
+        // As the Time Control application hands them over, all zero based.
+        const components = (month: number, dayOfMonth: number) =>
+            ({ year: 2077, month, dayOfMonth, hour: 12, minute: 4, second: 17 });
+
+        // 2077 is a non leap year in either numbering, so the offset can't skew these.
+        it('resolves month and day of month into the day of the year', () => {
+            assert.strictEqual(WorldTimeFlow.withDayOfYear(components(0, 0)).day, 0);
+            assert.strictEqual(WorldTimeFlow.withDayOfYear(components(0, 11)).day, 11);
+            // Days of January, then January and February, before the given month.
+            assert.strictEqual(WorldTimeFlow.withDayOfYear(components(1, 0)).day, 31);
+            assert.strictEqual(WorldTimeFlow.withDayOfYear(components(2, 0)).day, 59);
+
+            const resolved = WorldTimeFlow.withDayOfYear(components(11, 11));
+            assert.strictEqual(resolved.day, 345);
+
+            // Kept, calendar modules may read those instead of the day of the year.
+            assert.strictEqual(resolved.month, 11);
+            assert.strictEqual(resolved.dayOfMonth, 11);
+        });
+
+        it('round trips an absolute date through world time', () => {
+            const time = WorldTimeFlow.componentsToTime(components(11, 11));
+            const parsed = game.time.calendar.timeToComponents(time);
+
+            // Raw components carry the epoch year, not the calendar year.
+            assert.strictEqual(parsed.year, 2077 - WorldTimeFlow.yearZero);
+            assert.strictEqual(parsed.month, 11);
+            assert.strictEqual(parsed.dayOfMonth, 11);
+            assert.strictEqual(parsed.hour, 12);
+            assert.strictEqual(parsed.minute, 4);
+            assert.strictEqual(parsed.second, 17);
+        });
+
+        it('keeps components without a month untouched', () => {
+            // Interval shifts pass plain seconds and never carry a month.
+            const shift = { day: 3, hour: 2 };
+            assert.deepEqual(WorldTimeFlow.withDayOfYear(shift), shift);
+        });
+
+        it('resolves the start date into the configured Shadowrun era', () => {
+            const worldTime = WorldTimeFlow.componentsToTime(SR.time.START_DATE);
+            const shown = WorldTimeFlow.components(worldTime);
+
+            assert.strictEqual(shown.year, 2075);
+            assert.strictEqual(shown.month, 0);
+            assert.strictEqual(shown.dayOfMonth, 0);
+            assert.strictEqual(WorldTimeFlow.format(worldTime), '2075-01-01 00:00:00');
+        });
+
+        // The guard that keeps a running campaign from being reset to the start date.
+        it('leaves an already initialized world time alone', async () => {
+            const before = game.time.worldTime;
+            assert.isTrue(game.settings.get(SYSTEM_NAME, FLAGS.WorldTimeInitialized));
+
+            await WorldTimeFlow.initialize();
+
+            assert.strictEqual(game.time.worldTime, before);
+        });
+
+        it('reports years in the numbering of the world calendar', () => {
+            const yearZero = WorldTimeFlow.yearZero;
+            const raw = game.time.calendar.timeToComponents(game.time.worldTime);
+
+            assert.strictEqual(WorldTimeFlow.components().year, raw.year + yearZero);
+        });
+
+        it('round trips a displayed year back to the same world time', () => {
+            const worldTime = WorldTimeFlow.componentsToTime(components(11, 11));
+            const shown = WorldTimeFlow.components(worldTime);
+
+            assert.strictEqual(shown.year, 2077);
+            assert.strictEqual(shown.month, 11);
+            assert.strictEqual(shown.dayOfMonth, 11);
+            assert.strictEqual(WorldTimeFlow.format(worldTime), '2077-12-12 12:04:17');
         });
     });
 

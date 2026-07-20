@@ -34,17 +34,15 @@ export interface ExtendedTestCreateParams {
     permissions?: Partial<ExtendedTestPermissions>;
 }
 
+// Records currently being rolled on this client, to keep a double click from rolling twice.
+const rollsInFlight = new Set<string>();
+
 /**
  * Orchestrate managed extended tests. SR5#48.
  *
  * Records live in the global data storage (see ExtendedTestStorage) and each roll
  * runs through the full SuccessTest pipeline, producing a normal test chat message.
  */
-/**
- * Records currently being rolled on this client, to keep a double click from rolling twice.
- */
-const rollsInFlight = new Set<string>();
-
 export const ExtendedTestFlow = {
     /**
      * Default permissions for newly created records.
@@ -221,7 +219,7 @@ export const ExtendedTestFlow = {
     _applyStatusTransitions(record: ExtendedTestRecord) {
         if (record.status !== 'active') return;
 
-        // A critical glitch ends the test, no matter how much pool or progress is left.
+        // A critical glitch ends the test, whatever pool or progress is left.
         if (ExtendedTestRules.isCriticalGlitchEnd(record)) {
             record.status = 'failed';
             record.log.push(ExtendedTestFlow._logEntry('fail', 'criticalGlitch'));
@@ -232,7 +230,7 @@ export const ExtendedTestFlow = {
             record.status = 'completed';
             record.log.push(ExtendedTestFlow._logEntry('complete'));
         } else if (!ExtendedTestRules.canContinue(record)) {
-            // Without a threshold there is nothing to fail at, the test simply ran its course.
+            // Without a threshold there is nothing to fail at, it just ran its course.
             const openEnded = ExtendedTestRules.isOpenEnded(record);
             record.status = openEnded ? 'completed' : 'failed';
             record.log.push(ExtendedTestFlow._logEntry(openEnded ? 'complete' : 'fail'));
@@ -251,7 +249,6 @@ export const ExtendedTestFlow = {
             return;
         }
 
-        // A roll takes a dialog and a server roundtrip, don't let a second one start meanwhile.
         if (rollsInFlight.has(id)) return;
 
         if (!ExtendedTestRules.canContinue(record)) {
@@ -303,7 +300,7 @@ export const ExtendedTestFlow = {
     },
 
     /**
-     * Check the elapsed game time against the record interval, when enforcement is active.
+     * Check elapsed game time against the record interval, when enforcement is active.
      */
     _intervalAllowsRoll(record: ExtendedTestRecord): boolean {
         const enforce = game.settings.get(SYSTEM_NAME, FLAGS.EnforceExtendedTestInterval) as boolean;
@@ -356,9 +353,8 @@ export const ExtendedTestFlow = {
     /**
      * Store the result of a managed roll back onto its record.
      *
-     * Players can't write world settings and DataStorage doesn't await the GM write, so a
-     * player applying the result locally would read-modify-write a possibly stale record.
-     * Instead the roll result is handed to a GM, who applies it against the current record.
+     * DataStorage doesn't await the GM write, so a player applying this locally would
+     * read-modify-write a stale record. Hand it to a GM instead.
      */
     async recordRollResult(test: SuccessTest) {
         const id = test.data.extendedManagedId;
@@ -378,8 +374,7 @@ export const ExtendedTestFlow = {
     /**
      * Apply a roll result onto its record and advance world time, as the GM.
      *
-     * Reads the record fresh and performs every mutation in one pass, so concurrent rolls
-     * can't lose each others hits.
+     * Reads the record fresh and mutates in one pass, so concurrent rolls can't lose hits.
      */
     async _applyRollResult(id: string, rollEntry: ExtendedTestRollEntry, testData: SuccessTestData) {
         const record = ExtendedTestStorage.get(id);
@@ -483,9 +478,8 @@ export const ExtendedTestFlow = {
             return;
         }
 
-        // Descriptive fields are open to anyone with edit permission.
         const editableKeys = ['name', 'description', 'notes'] as const;
-        // Fields that decide who may do what, or how hard the test is, stay with the owner.
+        // How hard the test is and who may take part stays with the owner.
         const managedKeys = [
             'actorUuid', 'dicePool', 'threshold', 'interval',
             'cumulativeModifier', 'advanceTimeOnRoll', 'permissions',

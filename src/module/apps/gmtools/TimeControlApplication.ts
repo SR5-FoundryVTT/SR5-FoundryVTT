@@ -28,7 +28,7 @@ export class TimeControlApplication extends HandlebarsApplicationMixin(Applicati
     static open() {
         if (!game.user?.isGM) return;
 
-        // Reuse an open control, a second instance would share its DOM id and orphan the first.
+        // A second instance would share its DOM id and orphan the first.
         const existing = foundry.applications.instances.get('time-control');
         if (existing instanceof TimeControlApplication) {
             void existing.render({ force: true });
@@ -63,9 +63,7 @@ export class TimeControlApplication extends HandlebarsApplicationMixin(Applicati
     }
 
     /**
-     * Refresh the displayed time in place.
-     *
-     * A full re-render would reset the shift and absolute fields while the GM is typing.
+     * Refresh the displayed time in place, a re-render would reset the fields being typed in.
      */
     #onUpdateWorldTime = () => {
         const current = this.element?.querySelector<HTMLElement>('.time-control-current-value');
@@ -90,7 +88,7 @@ export class TimeControlApplication extends HandlebarsApplicationMixin(Applicati
             label: game.i18n.localize(preset.labelKey as Parameters<typeof game.i18n.localize>[0]),
         }));
 
-        const components = game.time.components;
+        const components = WorldTimeFlow.components();
         context.components = {
             year: components.year,
             // Display month and day of month as 1-based values.
@@ -132,16 +130,13 @@ export class TimeControlApplication extends HandlebarsApplicationMixin(Applicati
     }
 
     /**
-     * Write the current world time into the absolute fields.
-     *
-     * Skipped while the GM is editing them, so an incoming time change doesn't overwrite
-     * a date being typed.
+     * Write the current world time into the absolute fields, unless they're being edited.
      */
     #syncAbsoluteFields() {
         const fields = this.element?.querySelector<HTMLElement>('.time-absolute-fields');
         if (!fields || fields.contains(document.activeElement)) return;
 
-        const components = game.time.components;
+        const components = WorldTimeFlow.components();
         const values: Record<string, number> = {
             year: components.year,
             // Month and day of month are displayed as 1-based values.

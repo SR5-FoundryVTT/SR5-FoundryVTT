@@ -1,10 +1,4 @@
-{{!--
-    Interval unit options, shared by the test dialog, the extended test config and the time control.
-
-    @param name The input name of the select.
-    @param selected The currently selected unit.
-    @param label The aria-label of the select.
---}}
+{{!-- Interval units, shared by the test dialog, extended test config and time control. --}}
 <select name="{{name}}" data-dtype="String" aria-label="{{label}}">
     <optgroup label="{{localize 'SR5.ActiveEffect.Duration.GroupCombat'}}">
         <option value="rounds" {{#if (eq selected "rounds")}}selected{{/if}}>

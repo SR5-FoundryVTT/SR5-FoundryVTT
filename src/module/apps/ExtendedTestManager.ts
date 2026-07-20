@@ -28,7 +28,7 @@ interface ExtendedTestRowContext {
     createdGameTime: string;
     updatedRealTime: string;
     canRoll: boolean;
-    // Rolling is only blocked by the elapsed game time, everything else would allow it.
+    // Only the elapsed game time blocks rolling, everything else would allow it.
     rollBlockedByInterval: boolean;
     canEdit: boolean;
     canDelete: boolean;
@@ -80,7 +80,7 @@ type SortKey = 'name' | 'createdAt' | 'updatedAt' | 'createdWorldTime' | 'thresh
 
 export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV2)<ExtendedTestManagerContext> {
     static open() {
-        // Reuse an open manager, a second instance would share its DOM id and orphan the first.
+        // A second instance would share its DOM id and orphan the first.
         const existing = foundry.applications.instances.get('extended-test-manager');
         if (existing instanceof ExtendedTestManager) {
             void existing.render({ force: true });
@@ -93,7 +93,7 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
     static override PARTS = {
         main: {
             template: 'systems/shadowrun5e/dist/templates/apps/extended-test-manager.hbs',
-            // Keep the list position across the frequent re-renders caused by storage and time changes.
+            // Keep the list position across storage and world time re-renders.
             scrollable: ['.etm-list']
         }
     }
@@ -139,13 +139,13 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
 
     #expanded = new Set<string>();
 
-    // Only re-render for changes to the extended test section of the global storage.
+    // Ignore storage changes of unrelated sections.
     #onStorageChanged = (changedKeys: string[]) => {
         if (!changedKeys.includes(ExtendedTestStorage.key)) return;
         void this.render();
     };
     #onUpdateWorldTime = () => { void this.render(); };
-    // Typing in the search field shouldn't rebuild the list on every keystroke.
+    // Don't rebuild the list on every keystroke.
     #onSearchInput = foundry.utils.debounce(() => { void this.render(); }, 200);
 
     override get title() {

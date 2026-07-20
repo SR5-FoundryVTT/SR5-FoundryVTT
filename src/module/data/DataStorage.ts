@@ -2,10 +2,8 @@ import { FLAGS, SYSTEM_NAME } from "../constants";
 import { SocketMessage } from "../sockets";
 
 /**
- * Serialized top level storage sections of the last seen storage state.
- *
- * Used to tell which sections a storage update actually touched, as the setting onChange
- * only ever hands over the complete storage.
+ * Serialized top level sections of the last seen storage, to tell which ones an update
+ * touched. The setting onChange only ever hands over the complete storage.
  */
 let lastSeenSections: Record<string, string> = {};
 
@@ -26,9 +24,7 @@ export const DataStorage = {
     /**
      * Determine which top level storage keys changed compared to the last check.
      *
-     * Each call consumes the diff and becomes the baseline for the next one, so this is
-     * meant to be called once per storage change, from the setting onChange. Call it once
-     * during startup (see validate) to seed the baseline with the loaded storage.
+     * Each call becomes the baseline for the next, so call it once per storage change only.
      *
      * @param storage The current complete storage.
      * @returns The changed (added, removed or modified) top level keys.
@@ -58,8 +54,7 @@ export const DataStorage = {
             await game.settings.set(SYSTEM_NAME, FLAGS.GlobalDataStorage, {});
         }
 
-        // Take the loaded storage as the baseline, so the first update after startup only
-        // reports the sections it actually changed instead of all of them.
+        // Baseline, so the first update after startup only reports what really changed.
         DataStorage.changedKeys(DataStorage.storage());
     },
 
@@ -93,8 +88,7 @@ export const DataStorage = {
     /**
      * Store a value in the global data storage.
      *
-     * Players lack the permission to write world settings, so they hand the write over to
-     * an active GM instead.
+     * Players lack the permission to write world settings and hand it to an active GM.
      *
      * @param key A object property string 'key1.key2'
      * @param value Any value to store. Take care to not overwrite complete objects, if unwanted.
@@ -116,7 +110,6 @@ export const DataStorage = {
      * Remove a key from the global data storage.
      *
      * Foundry doesn't handle unset on settings, so the containing object is rewritten.
-     * As with set, players hand the write over to an active GM.
      *
      * @param key A object property string 'key1.key2'
      */

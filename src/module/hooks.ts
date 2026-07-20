@@ -18,6 +18,7 @@ import { HandlebarManager } from './handlebars/HandlebarManager';
 
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
 import { TimeControlApplication } from './apps/gmtools/TimeControlApplication';
+import { WorldTimeFlow } from './flows/WorldTimeFlow';
 import { ExtendedTestManager } from './apps/ExtendedTestManager';
 import { ExtendedTestFlow } from './flows/ExtendedTestFlow';
 import { ActorImporter } from './apps/itemImport/apps/ActorImporter';
@@ -550,6 +551,8 @@ ___________________
 
         if (game.user?.isGM) {
             Migrator.BeginMigration();
+
+            await WorldTimeFlow.initialize();
 
             if (ChangelogApplication.showApplication)
                 new ChangelogApplication().render(true);
