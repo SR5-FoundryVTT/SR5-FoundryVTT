@@ -1,6 +1,7 @@
 // game settings for shadowrun 5e
 
 import { FLAGS, SYSTEM_NAME } from './constants';
+import { DataStorage } from './data/DataStorage';
 import { IconAssign } from './apps/iconAssigner/IconAssign';
 import SR5CompendiaSettings from './settings/SR5CompendiaSettings';
 
@@ -19,7 +20,20 @@ export const registerSystemSettings = () => {
         type: Object,
         default: {},
         // World setting onChange fires on every client, allowing apps to re-render on storage changes.
-        onChange: () => { Hooks.callAll('sr5e.storageChanged'); }
+        // The changed top level keys are passed on, so listeners can ignore unrelated storage.
+        onChange: (storage: object) => { Hooks.callAll('sr5e.storageChanged', DataStorage.changedKeys(storage)); }
+    });
+
+    /**
+     * Only allow extended test rolls once their interval has passed in game time.
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.EnforceExtendedTestInterval, {
+        name: 'SETTINGS.EnforceExtendedTestIntervalName',
+        hint: 'SETTINGS.EnforceExtendedTestIntervalDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: false,
     });
 
     /**

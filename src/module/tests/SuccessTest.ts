@@ -1005,7 +1005,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Check if this test is currently being extended.
      */
     get extended(): boolean {
-        return this.canBeExtended && (this.data.extended || (this.data.extendedInterval?.value ?? 0) > 0);
+        if (!this.canBeExtended) return false;
+        // The interval is the source of truth, setting it to zero opts out of extending.
+        if ((this.data.extendedInterval?.value ?? 0) > 0) return true;
+        // Legacy: tests from before extendedInterval existed only carry the extended flag.
+        return this.data.extended && this.data.extendedRoll;
     }
 
     /**

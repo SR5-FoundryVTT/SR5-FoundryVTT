@@ -5,6 +5,7 @@ import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 import { ExtendedTestFlow } from '@/module/flows/ExtendedTestFlow';
 import { ExtendedTestRules } from '@/module/rules/ExtendedTestRules';
 import { ExtendedTestStorage } from '@/module/storage/ExtendedTestStorage';
+import { INTERVAL_UNITS, unitLabel } from '@/module/utils/timeUnits';
 import {
     ExtendedIntervalUnit,
     ExtendedTestRecord,
@@ -17,6 +18,7 @@ import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicati
 interface ExtendedTestConfigContext extends HandlebarsApplicationMixin.RenderContext {
     record: Partial<ExtendedTestRecord>;
     isCreate: boolean;
+    canManage: boolean;
     actorOptions: { uuid: string; name: string; selected: boolean }[];
     userOptions: { id: string; name: string; visible: boolean; edit: boolean; roll: boolean }[];
     visibilityOptions: { value: string; label: string; selected: boolean }[];
@@ -106,6 +108,8 @@ export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(Applica
             advanceTimeOnRoll: false,
         };
         context.isCreate = !record;
+        // Rules and permissions of an existing record are the owners business only.
+        context.canManage = !record || ExtendedTestRules.canManage(record, game.user!);
 
         // Actors the user may associate: owned actors (GM sees all).
         context.actorOptions = game.actors!
@@ -134,21 +138,13 @@ export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(Applica
         }));
 
         const unit = record?.interval.unit ?? 'minutes';
-        context.intervalUnits = (['rounds', 'seconds', 'minutes', 'hours', 'days', 'weeks', 'months'] as ExtendedIntervalUnit[]).map(value => ({
+        context.intervalUnits = INTERVAL_UNITS.map(value => ({
             value,
-            label: game.i18n.localize(ExtendedTestConfigDialog.unitLabel(value)),
+            label: unitLabel(value),
             selected: unit === value,
         }));
 
         return context;
-    }
-
-    static unitLabel(unit: ExtendedIntervalUnit): Parameters<typeof game.i18n.localize>[0] {
-        switch (unit) {
-            case 'rounds': return 'SR5.ActiveEffect.Duration.UnitTurns';
-            case 'weeks': return 'SR5.TimeControl.UnitWeeks';
-            default: return `EFFECT.DURATION.UNITS.${unit}` as Parameters<typeof game.i18n.localize>[0];
-        }
     }
 
     static async #onSubmit(this: ExtendedTestConfigDialog, event: Event | SubmitEvent, form: HTMLFormElement, formData: foundry.applications.ux.FormDataExtended) {

@@ -17,6 +17,8 @@
         "AutomateProgressiveRecoilDescription": "Kumulativer Rückstoß wird automatisch aufgerechnet.",
         "CompendiumBrowserBlacklist": "Kompendium Browser Blacklist",
         "CompendiumBrowserBlacklistDescription": "Im Kompendium Browser auszublendende Kompendien",
+        "EnforceExtendedTestIntervalDescription": "Erlaubt den nächsten Wurf einer ausgedehnten Probe erst, wenn ihr Intervall in Spielzeit vergangen ist.",
+        "EnforceExtendedTestIntervalName": "Intervalle ausgedehnter Proben erzwingen",
         "ModifyRollExpanded": "Zustand von Wurf anpassen merken",
         "ModifyRollExpandedDescription": "Speichert, ob der Abschnitt Wurf anpassen beim letzten Mal geöffnet war, und stellt diesen Zustand im nächsten Testdialog wieder her.",
         "DefaultOpposedTestActorSelection": "Nutze immer Ziele für Vergleichsproben",
@@ -1307,6 +1309,7 @@
                 "Failed": "Ausgedehnte Probe \"{name}\" fehlgeschlagen: Der Würfelpool ist erschöpft.",
                 "NoEditPermission": "Du darfst diese ausgedehnte Probe nicht bearbeiten.",
                 "NoRollPermission": "Du darfst für diese ausgedehnte Probe nicht würfeln.",
+                "NotDue": "Es ist noch nicht genug Spielzeit für den nächsten Wurf dieser ausgedehnten Probe vergangen.",
                 "Registered": "Ausgedehnte Probe \"{name}\" wird jetzt in der Verwaltung für ausgedehnte Proben verfolgt."
             },
             "OpenMessage": "Chatnachricht öffnen",
@@ -3063,7 +3066,6 @@
             "SetTime": "Datum & Uhrzeit setzen",
             "Title": "Zeitsteuerung",
             "Unit": "Einheit",
-            "UnitWeeks": "Wochen",
             "Year": "Jahr"
         },
         "ToggleBreakdown": "Aufschlüsselung umschalten",
@@ -3217,7 +3219,8 @@
             },
             "Test": {
                 "BuyHits": "Würfelt keine Würfel. Kauft Erfolge mit ⌊Würfelpool / 4⌋.",
-                "Extended": "Probe wird als ausgedehnte Probe geworfen, bis der Schwellenwert erreicht ist",
+                "Extended": "Die Probe wird als ausgedehnte Probe geworfen, bis der Schwellenwert erreicht ist. Setze das Intervall auf null, um sie als normale Probe zu werfen.",
+                "ExtendedInterval": "Spielzeit zwischen den Würfen. Null wirft die Probe als normale, nicht ausgedehnte Probe.",
                 "Limit": "Vollständiger Limitwert",
                 "Modifier": "Summe aller auf den Pool angewendenten Modifikatoren",
                 "Pool": "Anzahl zu werfender Würfel",

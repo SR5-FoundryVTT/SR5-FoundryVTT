@@ -14,6 +14,7 @@
         <textarea name="notes" rows="2">{{record.notes}}</textarea>
     </div>
 
+    {{#if canManage}}
     <div class="form-group">
         <label>{{localize "SR5.ExtendedTestManager.Actor"}}</label>
         <select name="actorUuid">
@@ -23,6 +24,7 @@
             {{/each}}
         </select>
     </div>
+
 
     <div class="form-group etm-config-values">
         <label>{{localize "SR5.DicePool"}}</label>
@@ -61,8 +63,9 @@
             {{/each}}
         </select>
     </div>
+    {{/if}}
 
-    {{#if userOptions.length}}
+    {{#if (and canManage userOptions.length)}}
     <fieldset class="etm-config-users">
         <legend>{{localize "SR5.ExtendedTestManager.UserPermissions"}}</legend>
         <table>

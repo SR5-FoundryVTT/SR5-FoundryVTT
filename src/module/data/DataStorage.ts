@@ -2,6 +2,14 @@ import { FLAGS, SYSTEM_NAME } from "../constants";
 import { SocketMessage } from "../sockets";
 
 /**
+ * Serialized top level storage sections of the last seen storage state.
+ *
+ * Used to tell which sections a storage update actually touched, as the setting onChange
+ * only ever hands over the complete storage.
+ */
+let lastSeenSections: Record<string, string> = {};
+
+/**
  * Handle the global storage setting for the system.
  * 
  * This allows you to store data globally, without a FoundryVTT document, and retrieve it later.
@@ -16,6 +24,29 @@ import { SocketMessage } from "../sockets";
  */
 export const DataStorage = {
     /**
+     * Determine which top level storage keys changed compared to the last check.
+     *
+     * Each call consumes the diff and becomes the baseline for the next one, so this is
+     * meant to be called once per storage change, from the setting onChange. Call it once
+     * during startup (see validate) to seed the baseline with the loaded storage.
+     *
+     * @param storage The current complete storage.
+     * @returns The changed (added, removed or modified) top level keys.
+     */
+    changedKeys: function (storage: object | undefined): string[] {
+        const sections: Record<string, string> = {};
+        for (const [key, value] of Object.entries(storage ?? {})) {
+            sections[key] = JSON.stringify(value);
+        }
+
+        const keys = new Set([...Object.keys(sections), ...Object.keys(lastSeenSections)]);
+        const changed = [...keys].filter(key => sections[key] !== lastSeenSections[key]);
+
+        lastSeenSections = sections;
+        return changed;
+    },
+
+    /**
      * Assure a usable data storage, even if data is lost.
      */
     validate: async function () {
@@ -26,6 +57,10 @@ export const DataStorage = {
             console.error('Shadowrun 5e | Global data storage could not be loaded. Resetting to empty object. This might cause some game information to be deleted.', storage);
             await game.settings.set(SYSTEM_NAME, FLAGS.GlobalDataStorage, {});
         }
+
+        // Take the loaded storage as the baseline, so the first update after startup only
+        // reports the sections it actually changed instead of all of them.
+        DataStorage.changedKeys(DataStorage.storage());
     },
 
     /**
@@ -57,19 +92,19 @@ export const DataStorage = {
 
     /**
      * Store a value in the global data storage.
-     * 
+     *
+     * Players lack the permission to write world settings, so they hand the write over to
+     * an active GM instead.
+     *
      * @param key A object property string 'key1.key2'
      * @param value Any value to store. Take care to not overwrite complete objects, if unwanted.
      */
     set: async function (key: string, value: any) {
-        if (game.user?.isGM) await this._setAsGM(key, value);
-        else await this._setAsPlayer(key, value);
-    },
+        if (!game.user?.isGM) {
+            console.debug('Shadowrun 5e | Requesting GM to set a value in global data storage.', key, value);
+            return SocketMessage.emitForGM(FLAGS.SetDataStorage, { key, value });
+        }
 
-    /**
-     * Store a value in the global data storage as GM, as players lack the permission for it.
-     */
-    _setAsGM: async function (key: string, value: any) {
         const storage = this.storage();
         console.debug('Shadowrun 5e | Setting a value in global data storage.', key, value, storage);
         foundry.utils.setProperty(storage, key, value);
@@ -78,11 +113,31 @@ export const DataStorage = {
     },
 
     /**
-     * Store a value in the global data storage as a player, by requesting the GM to do it.
+     * Remove a key from the global data storage.
+     *
+     * Foundry doesn't handle unset on settings, so the containing object is rewritten.
+     * As with set, players hand the write over to an active GM.
+     *
+     * @param key A object property string 'key1.key2'
      */
-    _setAsPlayer: async function (key: string, value: any) {
-        console.debug('Shadowrun 5e | Requesting GM to set a value in global data storage.', key, value);
-        SocketMessage.emitForGM(FLAGS.SetDataStorage, { key, value });
+    unset: async function (key: string) {
+        if (!game.user?.isGM) {
+            console.debug('Shadowrun 5e | Requesting GM to unset a value in global data storage.', key);
+            return SocketMessage.emitForGM(FLAGS.UnsetDataStorage, { key });
+        }
+
+        const storage = this.storage();
+
+        const path = key.split('.');
+        const property = path.pop();
+        if (!property) return;
+
+        const parent = path.length ? foundry.utils.getProperty(storage, path.join('.')) : storage;
+        if (!parent || typeof parent !== 'object') return;
+
+        console.debug('Shadowrun 5e | Unsetting a value in global data storage.', key, storage);
+        delete (parent as Record<string, unknown>)[property];
+        await DataStorage.save(storage);
     },
 
     /**
@@ -93,6 +148,16 @@ export const DataStorage = {
     _handleSetDataStorageSocketMessage: async function (message: Shadowrun.SocketMessageData) {
         if (!game.user?.isGM) return;
 
-        await DataStorage._setAsGM(message.data.key, message.data.value);
+        await DataStorage.set(message.data.key, message.data.value);
+    },
+
+    /**
+     * Handle socket messages around unsetting data storage as GM only.
+     * @param message.data.key The unset method key param
+     */
+    _handleUnsetDataStorageSocketMessage: async function (message: Shadowrun.SocketMessageData) {
+        if (!game.user?.isGM) return;
+
+        await DataStorage.unset(message.data.key);
     }
 }

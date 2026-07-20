@@ -18,43 +18,43 @@
 
     <div class="etm-toolbar">
         <div class="etm-filters">
-            <input type="search" data-filter="search" value="{{filters.search}}"
+            <input type="search" data-filter="search" name="filter-search" value="{{filters.search}}"
                 placeholder="{{localize 'SR5.ExtendedTestManager.Filters.Search'}}"/>
-            <select data-filter="status" aria-label="{{localize 'SR5.ExtendedTestManager.Filters.Status'}}">
+            <select data-filter="status" name="filter-status" aria-label="{{localize 'SR5.ExtendedTestManager.Filters.Status'}}">
                 {{#each statusOptions}}
                 <option value="{{this.value}}" {{#if (eq this.value ../filters.status)}}selected{{/if}}>{{this.label}}</option>
                 {{/each}}
             </select>
-            <select data-filter="actorUuid" aria-label="{{localize 'SR5.ExtendedTestManager.Filters.Actor'}}">
+            <select data-filter="actorUuid" name="filter-actorUuid" aria-label="{{localize 'SR5.ExtendedTestManager.Filters.Actor'}}">
                 <option value="">{{localize "SR5.ExtendedTestManager.Filters.AllActors"}}</option>
                 {{#each actorOptions}}
                 <option value="{{this.uuid}}" {{#if (eq this.uuid ../filters.actorUuid)}}selected{{/if}}>{{this.name}}</option>
                 {{/each}}
             </select>
-            <select data-filter="visibility" aria-label="{{localize 'SR5.ExtendedTestManager.Filters.Visibility'}}">
+            <select data-filter="visibility" name="filter-visibility" aria-label="{{localize 'SR5.ExtendedTestManager.Filters.Visibility'}}">
                 <option value="all" {{#if (eq filters.visibility "all")}}selected{{/if}}>{{localize "SR5.ExtendedTestManager.Filters.AllVisibilities"}}</option>
                 <option value="public" {{#if (eq filters.visibility "public")}}selected{{/if}}>{{localize "SR5.ExtendedTestManager.Visibility.public"}}</option>
                 <option value="private" {{#if (eq filters.visibility "private")}}selected{{/if}}>{{localize "SR5.ExtendedTestManager.Filters.Private"}}</option>
             </select>
-            <select data-filter="createdWithin" aria-label="{{localize 'SR5.ExtendedTestManager.Filters.Created'}}"
+            <select data-filter="createdWithin" name="filter-createdWithin" aria-label="{{localize 'SR5.ExtendedTestManager.Filters.Created'}}"
                 data-tooltip="SR5.ExtendedTestManager.Filters.Created">
                 {{#each periodOptions}}
                 <option value="{{this.value}}" {{#if (eq this.value ../filters.createdWithin)}}selected{{/if}}>{{this.label}}</option>
                 {{/each}}
             </select>
-            <select data-filter="updatedWithin" aria-label="{{localize 'SR5.ExtendedTestManager.Filters.Updated'}}"
+            <select data-filter="updatedWithin" name="filter-updatedWithin" aria-label="{{localize 'SR5.ExtendedTestManager.Filters.Updated'}}"
                 data-tooltip="SR5.ExtendedTestManager.Filters.Updated">
                 {{#each periodOptions}}
                 <option value="{{this.value}}" {{#if (eq this.value ../filters.updatedWithin)}}selected{{/if}}>{{this.label}}</option>
                 {{/each}}
             </select>
             <label class="etm-mine-filter">
-                <input type="checkbox" data-filter="mine" {{#if filters.mine}}checked{{/if}}/>
+                <input type="checkbox" data-filter="mine" name="filter-mine" {{#if filters.mine}}checked{{/if}}/>
                 {{localize "SR5.ExtendedTestManager.Filters.Mine"}}
             </label>
         </div>
         <div class="etm-sort">
-            <select data-filter="sortBy" aria-label="{{localize 'SR5.ExtendedTestManager.SortBy'}}">
+            <select data-filter="sortBy" name="filter-sortBy" aria-label="{{localize 'SR5.ExtendedTestManager.SortBy'}}">
                 {{#each sortOptions}}
                 <option value="{{this.value}}" {{#if (eq this.value ../filters.sortBy)}}selected{{/if}}>{{this.label}}</option>
                 {{/each}}
@@ -123,6 +123,10 @@
                 <div class="etm-row-actions">
                     {{#if this.canRoll}}
                     <a data-action="rollTest" data-tooltip="SR5.ExtendedTestManager.Actions.Roll"><i class="fas fa-dice"></i></a>
+                    {{else if this.rollBlockedByInterval}}
+                    <span class="etm-action-disabled" data-tooltip="SR5.ExtendedTestManager.Notifications.NotDue">
+                        <i class="fas fa-dice"></i>
+                    </span>
                     {{/if}}
                     {{#if this.canEdit}}
                         {{#if this.isActive}}

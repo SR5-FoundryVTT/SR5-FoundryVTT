@@ -2,12 +2,12 @@
  * A world global manager application for Shadowrun 5e extended tests.
  */
 import { DeepPartial } from "fvtt-types/utils";
-import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
+import { FLAGS, SR5_APPV2_CSS_CLASS, SYSTEM_NAME } from '@/module/constants';
 import { ExtendedTestFlow } from '@/module/flows/ExtendedTestFlow';
 import { ExtendedTestRules } from '@/module/rules/ExtendedTestRules';
 import { ExtendedTestStorage } from '@/module/storage/ExtendedTestStorage';
 import { WorldTimeFlow, WorldTimePreset } from '@/module/flows/WorldTimeFlow';
-import { intervalToSeconds } from '@/module/utils/timeUnits';
+import { intervalToSeconds, unitLabel } from '@/module/utils/timeUnits';
 import { ExtendedTestRecord, ExtendedTestStatus } from '@/module/types/flows/ExtendedTest';
 import { ExtendedTestConfigDialog } from '@/module/apps/dialogs/ExtendedTestConfigDialog';
 
@@ -28,6 +28,8 @@ interface ExtendedTestRowContext {
     createdGameTime: string;
     updatedRealTime: string;
     canRoll: boolean;
+    // Rolling is only blocked by the elapsed game time, everything else would allow it.
+    rollBlockedByInterval: boolean;
     canEdit: boolean;
     canDelete: boolean;
     canContinue: boolean;
@@ -78,22 +80,27 @@ type SortKey = 'name' | 'createdAt' | 'updatedAt' | 'createdWorldTime' | 'thresh
 
 export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV2)<ExtendedTestManagerContext> {
     static open() {
+        // Reuse an open manager, a second instance would share its DOM id and orphan the first.
+        const existing = foundry.applications.instances.get('extended-test-manager');
+        if (existing instanceof ExtendedTestManager) {
+            void existing.render({ force: true });
+            return;
+        }
+
         void new ExtendedTestManager().render({ force: true });
     }
 
     static override PARTS = {
         main: {
-            template: 'systems/shadowrun5e/dist/templates/apps/extended-test-manager.hbs'
+            template: 'systems/shadowrun5e/dist/templates/apps/extended-test-manager.hbs',
+            // Keep the list position across the frequent re-renders caused by storage and time changes.
+            scrollable: ['.etm-list']
         }
     }
 
     static override DEFAULT_OPTIONS = {
         id: 'extended-test-manager',
         classes: [SR5_APPV2_CSS_CLASS, 'sr5', 'extended-test-manager'],
-        form: {
-            submitOnChange: false,
-            closeOnSubmit: false,
-        },
         position: {
             width: 900,
             height: 640,
@@ -132,8 +139,14 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
 
     #expanded = new Set<string>();
 
-    #onStorageChanged = () => { void this.render(); };
+    // Only re-render for changes to the extended test section of the global storage.
+    #onStorageChanged = (changedKeys: string[]) => {
+        if (!changedKeys.includes(ExtendedTestStorage.key)) return;
+        void this.render();
+    };
     #onUpdateWorldTime = () => { void this.render(); };
+    // Typing in the search field shouldn't rebuild the list on every keystroke.
+    #onSearchInput = foundry.utils.debounce(() => { void this.render(); }, 200);
 
     override get title() {
         return game.i18n.localize('SR5.ExtendedTestManager.Title');
@@ -251,9 +264,12 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
     #prepareRow(record: ExtendedTestRecord, user: User): ExtendedTestRowContext {
         const worldTime = game.time.worldTime;
         const actor = record.actorUuid ? fromUuidSync(record.actorUuid) : null;
-        const canRoll = record.status === 'active'
+        const enforceInterval = game.settings.get(SYSTEM_NAME, FLAGS.EnforceExtendedTestInterval) as boolean;
+        const intervalAllowsRoll = !enforceInterval || ExtendedTestRules.intervalAllowsRoll(record, worldTime);
+        const rollAllowed = record.status === 'active'
             && ExtendedTestRules.canRoll(record, user)
             && ExtendedTestRules.canContinue(record);
+        const canRoll = rollAllowed && intervalAllowsRoll;
 
         const userName = (id: string) => game.users?.get(id)?.name ?? '?';
         const expanded = this.#expanded.has(record.id);
@@ -266,12 +282,13 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
             creatorName: userName(record.creatorUserId),
             progress: ExtendedTestRules.progress(record),
             nextPool: ExtendedTestRules.nextPool(record),
-            intervalLabel: `${record.interval.value} ${game.i18n.localize(ExtendedTestManager.intervalUnitLabel(record.interval.unit))}`,
+            intervalLabel: `${record.interval.value} ${unitLabel(record.interval.unit)}`,
             intervalsElapsed: ExtendedTestRules.intervalsElapsed(record, worldTime),
             isDue: ExtendedTestRules.isDue(record, worldTime),
             createdGameTime: WorldTimeFlow.format(record.createdWorldTime),
             updatedRealTime: new Date(record.updatedAt).toLocaleString(),
             canRoll,
+            rollBlockedByInterval: rollAllowed && !intervalAllowsRoll,
             canEdit: ExtendedTestRules.canEdit(record, user),
             canDelete: ExtendedTestRules.canDelete(record, user),
             canContinue: ExtendedTestRules.canContinue(record),
@@ -298,14 +315,6 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
         };
     }
 
-    static intervalUnitLabel(unit: string): Parameters<typeof game.i18n.localize>[0] {
-        switch (unit) {
-            case 'rounds': return 'SR5.ActiveEffect.Duration.UnitTurns';
-            case 'weeks': return 'SR5.TimeControl.UnitWeeks';
-            default: return `EFFECT.DURATION.UNITS.${unit}` as Parameters<typeof game.i18n.localize>[0];
-        }
-    }
-
     override async _onRender(
         context: DeepPartial<ExtendedTestManagerContext>,
         options: DeepPartial<ApplicationV2.RenderOptions>
@@ -313,10 +322,11 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
         // Filter inputs re-render the list on change.
         this.element.querySelectorAll<HTMLElement>('[data-filter]').forEach(element => {
             const filter = element.dataset.filter!;
-            const eventName = filter === 'search' ? 'input' : 'change';
-            element.addEventListener(eventName, () => {
+            const isSearch = filter === 'search';
+            element.addEventListener(isSearch ? 'input' : 'change', () => {
                 this.#readFilter(filter, element);
-                void this.render();
+                if (isSearch) this.#onSearchInput();
+                else void this.render();
             });
         });
 

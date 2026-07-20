@@ -29,6 +29,31 @@ export function unitToSeconds(unit: ExtendedIntervalUnit): number {
  * Convert an extended test interval into world time seconds.
  */
 export function intervalToSeconds(interval: ExtendedTestInterval): number {
-    if (!interval || !interval.value) return 0;
+    if (!interval?.value) return 0;
     return interval.value * unitToSeconds(interval.unit);
 }
+
+/**
+ * The localization key labeling a single interval unit.
+ *
+ * Combat rounds use the system label, all other units reuse the FoundryVTT effect
+ * duration labels.
+ */
+export function unitLabelKey(unit: ExtendedIntervalUnit): Parameters<typeof game.i18n.localize>[0] {
+    if (unit === 'rounds') return 'SR5.ActiveEffect.Duration.UnitTurns';
+    return `EFFECT.DURATION.UNITS.${unit}` as Parameters<typeof game.i18n.localize>[0];
+}
+
+/**
+ * The localized label of a single interval unit.
+ */
+export function unitLabel(unit: ExtendedIntervalUnit): string {
+    return game.i18n.localize(unitLabelKey(unit));
+}
+
+/**
+ * All interval units, in the order they're offered for selection.
+ */
+export const INTERVAL_UNITS: ExtendedIntervalUnit[] = [
+    'rounds', 'seconds', 'minutes', 'hours', 'days', 'weeks', 'months',
+];

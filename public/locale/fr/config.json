@@ -11,6 +11,8 @@
     "SETTINGS": {
         "ApplyLimitsDescription": "Est-ce que des limites doivent être appliquées aux lancés",
         "ApplyLimitsName": "Appliquer des limites aux lancés",
+        "EnforceExtendedTestIntervalDescription": "N'autoriser le prochain lancer d'un test étendu qu'une fois son intervalle écoulé en temps de jeu.",
+        "EnforceExtendedTestIntervalName": "Imposer les intervalles des tests étendus",
         "ModifyRollExpanded": "Mémoriser l'état de Modifier le lancer",
         "ModifyRollExpandedDescription": "Enregistre si la section Modifier le lancer était déployée la dernière fois et restaure cet état lors de la prochaine boîte de dialogue de test.",
         "DiagonalMovementDescription": "Comment le mouvement en diagonal doit être pris en compte quand la grille est utilisée",
@@ -537,6 +539,7 @@
                 "Failed": "Test étendu « {name} » échoué : la réserve de dés est épuisée.",
                 "NoEditPermission": "Vous n'êtes pas autorisé à modifier ce test étendu.",
                 "NoRollPermission": "Vous n'êtes pas autorisé à lancer ce test étendu.",
+                "NotDue": "Il ne s'est pas écoulé assez de temps de jeu pour le prochain lancer de ce test étendu.",
                 "Registered": "Le test étendu « {name} » est désormais suivi dans le gestionnaire de tests étendus."
             },
             "OpenMessage": "Ouvrir le message de chat",
@@ -1175,7 +1178,6 @@
             "SetTime": "Définir la date et l'heure",
             "Title": "Contrôle du temps",
             "Unit": "Unité",
-            "UnitWeeks": "Semaines",
             "Year": "Année"
         },
         "ToggleBreakdown": "Afficher/masquer le détail",
@@ -1259,6 +1261,7 @@
         "Tooltips": {
             "Test": {
                 "BuyHits": "Ne lance pas de dés. Achète des succès avec ⌊réserve de dés / 4⌋.",
+                "ExtendedInterval": "Temps de jeu entre les lancers. Zéro lance le test comme un test normal, non étendu.",
                 "ResultOverrideGlitches": "Remplace les glitches pour ce résultat de test.",
                 "ResultOverrideHits": "Remplace les succès pour ce résultat de test."
             },

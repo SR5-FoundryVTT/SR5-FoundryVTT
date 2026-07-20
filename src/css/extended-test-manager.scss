@@ -184,6 +184,12 @@
                     a {
                         @include mixins.rollable;
                     }
+
+                    // Actions withheld until enough game time has passed.
+                    .etm-action-disabled {
+                        opacity: 0.4;
+                        cursor: not-allowed;
+                    }
                 }
 
                 .etm-row-details {

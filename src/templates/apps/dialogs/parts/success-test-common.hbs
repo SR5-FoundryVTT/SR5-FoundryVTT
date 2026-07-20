@@ -74,35 +74,12 @@
                 <div class="duration-control-fields duration-value-fields extended-interval-fields">
                     <input type="number" name="test.data.extendedInterval.value"
                         value="{{test.data.extendedInterval.value}}" min="0" step="1"
+                        data-tooltip="SR5.Tooltips.Test.ExtendedInterval"
                         aria-label="{{localize 'SR5.ExtendedTestManager.Interval'}}"/>
-                    <select name="test.data.extendedInterval.unit" data-dtype="String"
-                        aria-label="{{localize 'SR5.ActiveEffect.Duration.Units'}}">
-                        <optgroup label="{{localize 'SR5.ActiveEffect.Duration.GroupCombat'}}">
-                            <option value="rounds" {{#if (eq test.data.extendedInterval.unit "rounds")}}selected{{/if}}>
-                                {{localize "SR5.ActiveEffect.Duration.UnitTurns"}}
-                            </option>
-                        </optgroup>
-                        <optgroup label="{{localize 'SR5.ActiveEffect.Duration.GroupTime'}}">
-                            <option value="seconds" {{#if (eq test.data.extendedInterval.unit "seconds")}}selected{{/if}}>
-                                {{localize "EFFECT.DURATION.UNITS.seconds"}}
-                            </option>
-                            <option value="minutes" {{#if (eq test.data.extendedInterval.unit "minutes")}}selected{{/if}}>
-                                {{localize "EFFECT.DURATION.UNITS.minutes"}}
-                            </option>
-                            <option value="hours" {{#if (eq test.data.extendedInterval.unit "hours")}}selected{{/if}}>
-                                {{localize "EFFECT.DURATION.UNITS.hours"}}
-                            </option>
-                            <option value="days" {{#if (eq test.data.extendedInterval.unit "days")}}selected{{/if}}>
-                                {{localize "EFFECT.DURATION.UNITS.days"}}
-                            </option>
-                            <option value="weeks" {{#if (eq test.data.extendedInterval.unit "weeks")}}selected{{/if}}>
-                                {{localize "SR5.TimeControl.UnitWeeks"}}
-                            </option>
-                            <option value="months" {{#if (eq test.data.extendedInterval.unit "months")}}selected{{/if}}>
-                                {{localize "EFFECT.DURATION.UNITS.months"}}
-                            </option>
-                        </optgroup>
-                    </select>
+                    {{> 'systems/shadowrun5e/dist/templates/apps/partials/interval-units.hbs'
+                        name="test.data.extendedInterval.unit"
+                        selected=test.data.extendedInterval.unit
+                        label=(localize 'SR5.ActiveEffect.Duration.Units')}}
                 </div>
             </div>
             {{/if}}

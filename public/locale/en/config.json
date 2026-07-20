@@ -17,6 +17,8 @@
         "AutomateProgressiveRecoilDescription": "Characters accrue progressive recoil until reset",
         "CompendiumBrowserBlacklist": "Compendium Browser Blacklist",
         "CompendiumBrowserBlacklistDescription": "List of compendiums to hide from the compendium browser",
+        "EnforceExtendedTestIntervalDescription": "Only allow the next roll of an extended test once its interval has passed in game time.",
+        "EnforceExtendedTestIntervalName": "Enforce Extended Test Intervals",
         "ModifyRollExpanded": "Remember Modify Roll section state",
         "ModifyRollExpandedDescription": "Stores whether the Modify Roll section was expanded last time and restores that state in the next test dialog.",
         "DefaultOpposedTestActorSelection": "Overwrite opposed test token selections",
@@ -1305,6 +1307,7 @@
                 "Failed": "Extended test \"{name}\" failed: the dice pool is exhausted.",
                 "NoEditPermission": "You are not allowed to edit this extended test.",
                 "NoRollPermission": "You are not allowed to roll this extended test.",
+                "NotDue": "Not enough game time has passed for the next roll of this extended test.",
                 "Registered": "Extended test \"{name}\" is now tracked in the Extended Tests manager."
             },
             "OpenMessage": "Open chat message",
@@ -3066,7 +3069,6 @@
             "SetTime": "Set Date & Time",
             "Title": "Time Control",
             "Unit": "Unit",
-            "UnitWeeks": "Weeks",
             "Year": "Year"
         },
         "ToggleBreakdown": "Toggle Breakdown",
@@ -3175,7 +3177,8 @@
             },
             "Test": {
                 "BuyHits": "Do not roll dice. Buy hits using ⌊dice pool / 4⌋.",
-                "Extended": "Test will be thrown as an extended test until threshold is reached",
+                "Extended": "Test will be thrown as an extended test until threshold is reached. Set the interval to zero to roll it as a normal test.",
+                "ExtendedInterval": "Game time between rolls. Zero rolls this as a normal, non extended test.",
                 "Limit": "Calculated limit value",
                 "Modifier": "Sum of all modifiers applied to dice pool",
                 "Pool": "Amount of dice to roll",

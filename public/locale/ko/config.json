@@ -17,6 +17,8 @@
         "AutomateProgressiveRecoilDescription": "초기화 전까지 캐릭터에게 점진적 반동이 누적됨",
         "CompendiumBrowserBlacklist": "컨펜디움 탐색기 블랙리스트",
         "CompendiumBrowserBlacklistDescription": "컨펜디움 탐색기에서 숨긴 컨펜디움 목록",
+        "EnforceExtendedTestIntervalDescription": "연장 판정의 간격만큼 게임 시간이 지난 뒤에만 다음 굴림을 허용합니다.",
+        "EnforceExtendedTestIntervalName": "연장 판정 간격 강제",
         "ModifyRollExpanded": "굴림 수정 섹션 상태 기억",
         "ModifyRollExpandedDescription": "마지막에 굴림 수정 섹션이 펼쳐져 있었는지 저장하고 다음 테스트 대화창에서 그 상태를 복원합니다.",
         "DefaultOpposedTestActorSelection": "경쟁 판정 토큰 선택 덮어쓰기",
@@ -1306,6 +1308,7 @@
                 "Failed": "연장 판정 \"{name}\" 실패: 주사위 풀이 모두 소진되었습니다.",
                 "NoEditPermission": "이 연장 판정을 편집할 권한이 없습니다.",
                 "NoRollPermission": "이 연장 판정을 굴릴 권한이 없습니다.",
+                "NotDue": "이 연장 판정을 다시 굴리기에는 게임 시간이 충분히 지나지 않았습니다.",
                 "Registered": "연장 판정 \"{name}\"이(가) 이제 연장 판정 관리자에서 추적됩니다."
             },
             "OpenMessage": "채팅 메시지 열기",
@@ -3062,7 +3065,6 @@
             "SetTime": "날짜 및 시간 설정",
             "Title": "시간 조절",
             "Unit": "단위",
-            "UnitWeeks": "주",
             "Year": "년"
         },
         "ToggleBreakdown": "세부 내역 전환",
@@ -3171,7 +3173,8 @@
             },
             "Test": {
                 "BuyHits": "주사위를 굴리지 않습니다. ⌊주사위 풀 / 4⌋로 성공을 구매합니다.",
-                "Extended": "요구 성공횟수 도달 전까지 연장 판정으로 진행",
+                "Extended": "요구 성공횟수에 도달할 때까지 연장 판정으로 굴립니다. 간격을 0으로 두면 일반 판정으로 굴립니다.",
+                "ExtendedInterval": "굴림 사이의 게임 시간입니다. 0이면 연장 판정이 아닌 일반 판정으로 굴립니다.",
                 "Limit": "계산된 한계치",
                 "Modifier": "주사위 풀에 적용되는 모든 수정치의 합계",
                 "Pool": "굴릴 수 있는 주사위 개수",

@@ -38,12 +38,10 @@ export const ExtendedTestStorage = {
     /**
      * Delete a single extended test record.
      *
-     * DataStorage has no delete primitive, so the whole map is rewritten.
+     * Uses a per record key, so deleting one record can't revert concurrent writes to another.
      */
     async delete(id: string) {
-        const records = ExtendedTestStorage.getAll();
-        delete records[id];
-        await DataStorage.set(ExtendedTestStorage.key, records);
+        await DataStorage.unset(`${ExtendedTestStorage.key}.${id}`);
     },
 
     /**

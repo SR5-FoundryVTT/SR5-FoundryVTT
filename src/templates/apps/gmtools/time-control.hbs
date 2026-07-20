@@ -20,19 +20,10 @@
         <div class="time-shift-fields duration-value-fields">
             <input type="number" name="shift.value" value="1" min="0" step="1"
                 aria-label="{{localize 'SR5.TimeControl.Amount'}}"/>
-            <select name="shift.unit" data-dtype="String" aria-label="{{localize 'SR5.TimeControl.Unit'}}">
-                <optgroup label="{{localize 'SR5.ActiveEffect.Duration.GroupCombat'}}">
-                    <option value="rounds">{{localize "SR5.ActiveEffect.Duration.UnitTurns"}}</option>
-                </optgroup>
-                <optgroup label="{{localize 'SR5.ActiveEffect.Duration.GroupTime'}}">
-                    <option value="seconds">{{localize "EFFECT.DURATION.UNITS.seconds"}}</option>
-                    <option value="minutes" selected>{{localize "EFFECT.DURATION.UNITS.minutes"}}</option>
-                    <option value="hours">{{localize "EFFECT.DURATION.UNITS.hours"}}</option>
-                    <option value="days">{{localize "EFFECT.DURATION.UNITS.days"}}</option>
-                    <option value="weeks">{{localize "SR5.TimeControl.UnitWeeks"}}</option>
-                    <option value="months">{{localize "EFFECT.DURATION.UNITS.months"}}</option>
-                </optgroup>
-            </select>
+            {{> 'systems/shadowrun5e/dist/templates/apps/partials/interval-units.hbs'
+                name="shift.unit"
+                selected="minutes"
+                label=(localize 'SR5.TimeControl.Unit')}}
         </div>
         <div class="time-control-buttons">
             <button type="button" data-action="rewindCustom">

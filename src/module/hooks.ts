@@ -466,10 +466,6 @@ ___________________
 
         CONFIG.time.turnTime = SR.combat.TURN_TIME_SECONDS;
         CONFIG.time.roundTime = SR.combat.ROUND_TIME_SECONDS;
-        // Foundry world time uses 1970-01-01 as its epoch. Match Gregorian
-        // calendar modules (including Calendaria) instead of displaying the
-        // elapsed year count as an absolute year.
-        CONFIG.time.worldCalendarConfig.years!.yearZero = 2072;
 
         // Keep expired effects (greyed, restartable) instead of deleting.
         // Explicit so a core/module change can't silently flip it to "delete".
@@ -612,7 +608,7 @@ ___________________
         }
 
         const extendedTestManagerControl = {
-            name: 'extended-test-manager',
+            name: 'sr5-extended-test-manager',
             title: 'CONTROLS.SR5.ExtendedTestManager',
             icon: 'fas fa-hourglass-half',
             button: true,
@@ -716,8 +712,9 @@ ___________________
             [FLAGS.CreateTargetedEffects]: [SuccessTestEffectsFlow._handleCreateTargetedEffectsSocketMessage.bind(SuccessTestEffectsFlow)],
             [FLAGS.TeamworkTestFlow]: [TeamworkTest._handleUpdateSocketMessage.bind(TeamworkTest)],
             [FLAGS.SetDataStorage]: [DataStorage._handleSetDataStorageSocketMessage.bind(DataStorage)],
+            [FLAGS.UnsetDataStorage]: [DataStorage._handleUnsetDataStorageSocketMessage.bind(DataStorage)],
             [FLAGS.UpdateDocumentsAsGM]: [SocketMessageFlow.handleUpdateDocumentsAsGMMessage.bind(SocketMessage)],
-            [FLAGS.AdvanceWorldTime]: [ExtendedTestFlow._handleAdvanceWorldTimeSocketMessage.bind(ExtendedTestFlow)],
+            [FLAGS.ApplyExtendedTestRoll]: [ExtendedTestFlow._handleApplyRollSocketMessage.bind(ExtendedTestFlow)],
         } as const;
 
         game.socket.on(SYSTEM_SOCKET, async (message: Shadowrun.SocketMessageData) => {

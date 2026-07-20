@@ -71,17 +71,40 @@ export const ExtendedTestRules = {
     },
 
     /**
-     * Can the given user delete this record?
+     * Can the given user manage this record?
+     *
+     * Managing covers everything that changes the rules of the test or who may take part
+     * in it. Users merely granted edit permission must not be able to escalate themselves,
+     * so this is limited to the GM and the creator.
      */
-    canDelete: (record: ExtendedTestRecord, user: User): boolean => {
+    canManage: (record: ExtendedTestRecord, user: User): boolean => {
         return user.isGM || ExtendedTestRules.isCreator(record, user);
     },
 
     /**
+     * Can the given user delete this record?
+     */
+    canDelete: (record: ExtendedTestRecord, user: User): boolean => {
+        return ExtendedTestRules.canManage(record, user);
+    },
+
+    /**
      * The dice pool available for the next roll, after cumulative modifiers.
+     *
+     * Records registered from a real test carry a test data snapshot, whose pool is the
+     * actual source of truth for the next roll. Only manually created records without a
+     * snapshot fall back to the plain starting pool arithmetic.
      */
     nextPool: (record: ExtendedTestRecord): number => {
         const modifier = record.cumulativeModifier ? TestRules.extendedModifierValue * record.rollCount : 0;
+
+        // The snapshot pool total already contains the modifier of the roll it was taken on.
+        const snapshotPool = record.testData?.pool?.value;
+        if (snapshotPool !== undefined) {
+            const applied = record.cumulativeModifier ? TestRules.extendedModifierValue : 0;
+            return Math.max(snapshotPool + applied, 0);
+        }
+
         return Math.max(record.dicePool + modifier, 0);
     },
 
@@ -90,6 +113,23 @@ export const ExtendedTestRules = {
      */
     isComplete: (record: ExtendedTestRecord): boolean => {
         return record.threshold > 0 && record.accumulatedHits >= record.threshold;
+    },
+
+    /**
+     * Did the last roll of this record end the test with a critical glitch? SR5#48.
+     */
+    isCriticalGlitchEnd: (record: ExtendedTestRecord): boolean => {
+        return record.rolls.at(-1)?.criticalGlitch === true;
+    },
+
+    /**
+     * Is this record open ended, without a threshold to reach?
+     *
+     * Such tests answer 'how far did I get', so running out of dice pool completes them
+     * instead of failing them.
+     */
+    isOpenEnded: (record: ExtendedTestRecord): boolean => {
+        return record.threshold <= 0;
     },
 
     /**
@@ -122,5 +162,17 @@ export const ExtendedTestRules = {
      */
     isDue: (record: ExtendedTestRecord, worldTime: number): boolean => {
         return record.status === 'active' && ExtendedTestRules.intervalsElapsed(record, worldTime) >= 1;
+    },
+
+    /**
+     * Does elapsed game time allow another roll?
+     *
+     * The very first roll of a record is always allowed, as is any record without an
+     * interval. Only relevant when the interval enforcement setting is active.
+     */
+    intervalAllowsRoll: (record: ExtendedTestRecord, worldTime: number): boolean => {
+        if (record.rollCount === 0) return true;
+        if (intervalToSeconds(record.interval) <= 0) return true;
+        return ExtendedTestRules.intervalsElapsed(record, worldTime) >= 1;
     },
 }

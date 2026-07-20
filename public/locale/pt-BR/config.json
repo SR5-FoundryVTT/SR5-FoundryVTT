@@ -17,6 +17,8 @@
         "AutomateProgressiveRecoilDescription": "Personagens acumulam recuo progressivo até serem reiniciados",
         "CompendiumBrowserBlacklist": "Lista Negra do Navegador de Compêndio",
         "CompendiumBrowserBlacklistDescription": "Lista de compêndios a serem ocultados no navegador de compêndios",
+        "EnforceExtendedTestIntervalDescription": "Só permite a próxima rolagem de um teste estendido depois que seu intervalo tiver passado no tempo de jogo.",
+        "EnforceExtendedTestIntervalName": "Impor intervalos de testes estendidos",
         "ModifyRollExpanded": "Lembrar estado da seção Modificar Rolagem",
         "ModifyRollExpandedDescription": "Salva se a seção Modificar Rolagem estava expandida na última vez e restaura esse estado na próxima janela de teste.",
         "DefaultOpposedTestActorSelection": "Sobrescrever seleções de token de testes de oposição",
@@ -697,6 +699,7 @@
                 "Failed": "Teste estendido \"{name}\" falhou: a pilha de dados se esgotou.",
                 "NoEditPermission": "Você não tem permissão para editar este teste estendido.",
                 "NoRollPermission": "Você não tem permissão para rolar este teste estendido.",
+                "NotDue": "Ainda não passou tempo de jogo suficiente para a próxima rolagem deste teste estendido.",
                 "Registered": "O teste estendido \"{name}\" agora é acompanhado no gerenciador de Testes Estendidos."
             },
             "OpenMessage": "Abrir mensagem do chat",
@@ -1621,7 +1624,6 @@
             "SetTime": "Definir Data e Hora",
             "Title": "Controle de Tempo",
             "Unit": "Unidade",
-            "UnitWeeks": "Semanas",
             "Year": "Ano"
         },
         "ToggleBreakdown": "Alternar detalhamento",
@@ -1735,7 +1737,8 @@
             },
             "Test": {
                 "BuyHits": "Não rola dados. Compra acertos usando ⌊reserva de dados / 4⌋.",
-                "Extended": "O teste será rolado como um teste estendido até que o limite seja alcançado",
+                "Extended": "O teste será rolado como um teste estendido até que o limiar seja alcançado. Defina o intervalo como zero para rolá-lo como um teste normal.",
+                "ExtendedInterval": "Tempo de jogo entre as rolagens. Zero rola como um teste normal, não estendido.",
                 "Limit": "Valor do limite calculado",
                 "Modifier": "Soma de todos os modificadores aplicados à reserva de dados",
                 "Pool": "Quantidade de dados para rolar",

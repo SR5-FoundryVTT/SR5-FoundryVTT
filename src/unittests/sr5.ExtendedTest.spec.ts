@@ -89,6 +89,21 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             assert.strictEqual(ExtendedTestRules.nextPool(record), 10);
         });
 
+        it('prefers the test data snapshot pool over the starting pool', () => {
+            // Manually created records have no snapshot and use plain starting pool math.
+            assert.strictEqual(ExtendedTestRules.nextPool(baseRecord({ rollCount: 2 })), 8);
+
+            // Registered records roll what their snapshot says, minus the next modifier.
+            const snapshot = baseRecord({
+                rollCount: 2,
+                testData: { pool: { value: 4 } } as any,
+            });
+            assert.strictEqual(ExtendedTestRules.nextPool(snapshot), 3);
+
+            snapshot.cumulativeModifier = false;
+            assert.strictEqual(ExtendedTestRules.nextPool(snapshot), 4);
+        });
+
         it('detects completion and continuation', () => {
             const record = baseRecord({ accumulatedHits: 5 });
             assert.isTrue(ExtendedTestRules.isComplete(record));
@@ -123,6 +138,66 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             assert.strictEqual(ExtendedTestRules.intervalsElapsed(record, 7200), 2);
             record.lastRollWorldTime = 7200;
             assert.strictEqual(ExtendedTestRules.intervalsElapsed(record, 10800), 1);
+        });
+
+        it('ends the test on a critical glitch', () => {
+            const record = baseRecord({
+                rolls: [{
+                    hits: 1, glitch: true, criticalGlitch: true, poolUsed: 10,
+                    timestamp: 0, worldTime: 0, userId: 'creator',
+                }],
+                rollCount: 1,
+                accumulatedHits: 1,
+            });
+
+            assert.isTrue(ExtendedTestRules.isCriticalGlitchEnd(record));
+            ExtendedTestFlow._applyStatusTransitions(record);
+            assert.strictEqual(record.status, 'failed');
+            assert.isTrue(record.log.some(entry => entry.detail === 'criticalGlitch'));
+        });
+
+        it('completes an open ended record once its pool runs out', () => {
+            const open = baseRecord({ threshold: 0, rollCount: 10 });
+            assert.isTrue(ExtendedTestRules.isOpenEnded(open));
+            assert.isFalse(ExtendedTestRules.canContinue(open));
+
+            ExtendedTestFlow._applyStatusTransitions(open);
+            assert.strictEqual(open.status, 'completed');
+
+            // A thresholded record in the same spot did fail to reach its threshold.
+            const thresholded = baseRecord({ rollCount: 10 });
+            ExtendedTestFlow._applyStatusTransitions(thresholded);
+            assert.strictEqual(thresholded.status, 'failed');
+        });
+
+        it('only allows a roll once the interval has passed', () => {
+            const record = baseRecord({ interval: { value: 1, unit: 'hours' }, lastRollWorldTime: 0 });
+
+            // The first roll is always allowed, no time needs to pass for it.
+            assert.isTrue(ExtendedTestRules.intervalAllowsRoll(record, 0));
+
+            record.rollCount = 1;
+            assert.isFalse(ExtendedTestRules.intervalAllowsRoll(record, 3599));
+            assert.isTrue(ExtendedTestRules.intervalAllowsRoll(record, 3600));
+
+            // Records without an interval are never gated.
+            record.interval = { value: 0, unit: 'hours' };
+            assert.isTrue(ExtendedTestRules.intervalAllowsRoll(record, 0));
+        });
+
+        it('keeps rules and permission changes with the record owner', () => {
+            const record = baseRecord({
+                permissions: { visibility: 'public', visibleUsers: [], editUsers: ['editor'], rollUsers: [] },
+            });
+            const editor = { id: 'editor', isGM: false } as User;
+            const creator = { id: 'creator', isGM: false } as User;
+
+            assert.isTrue(ExtendedTestRules.canEdit(record, editor));
+            assert.isFalse(ExtendedTestRules.canManage(record, editor));
+            assert.isFalse(ExtendedTestRules.canDelete(record, editor));
+
+            assert.isTrue(ExtendedTestRules.canManage(record, creator));
+            assert.isTrue(ExtendedTestRules.canManage(record, game.user!));
         });
 
         it('handles permissions for the GM user', () => {
@@ -184,7 +259,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
         it('rolls a managed record, accumulates hits and reduces the pool', async () => {
             const record = await createRecord({ dicePool: 20, threshold: 40 });
 
-            const test = await ExtendedTestFlow.roll(record.id);
+            const test = await ExtendedTestFlow.roll(record.id, { showDialog: false, showMessage: false });
             assert.isDefined(test);
 
             const updated = ExtendedTestStorage.get(record.id)!;
@@ -195,7 +270,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             // Cumulative -1: next roll uses 19 dice.
             assert.strictEqual(updated.currentPool, 19);
 
-            const secondTest = await ExtendedTestFlow.roll(record.id);
+            const secondTest = await ExtendedTestFlow.roll(record.id, { showDialog: false, showMessage: false });
             assert.isDefined(secondTest);
             const secondUpdate = ExtendedTestStorage.get(record.id)!;
             assert.strictEqual(secondUpdate.rollCount, 2);
@@ -213,7 +288,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             for (let i = 0; i < 40; i++) {
                 const current = ExtendedTestStorage.get(record.id)!;
                 if (current.status !== 'active') break;
-                await ExtendedTestFlow.roll(record.id);
+                await ExtendedTestFlow.roll(record.id, { showDialog: false, showMessage: false });
             }
 
             const finished = ExtendedTestStorage.get(record.id)!;
@@ -227,11 +302,11 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             const record = await createRecord({ dicePool: 1, threshold: 100 });
 
             // First roll uses the last die, second roll can't continue.
-            await ExtendedTestFlow.roll(record.id);
+            await ExtendedTestFlow.roll(record.id, { showDialog: false, showMessage: false });
             let current = ExtendedTestStorage.get(record.id)!;
 
             if (current.status === 'active') {
-                await ExtendedTestFlow.roll(record.id);
+                await ExtendedTestFlow.roll(record.id, { showDialog: false, showMessage: false });
                 current = ExtendedTestStorage.get(record.id)!;
             }
 
@@ -264,6 +339,32 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             assert.strictEqual(updated.threshold, 12);
             assert.isTrue(updated.log.some(entry => entry.action === 'update'));
         });
+
+        it('applies a roll result onto the current record state', async () => {
+            const record = await createRecord({ dicePool: 12, threshold: 40 });
+
+            await ExtendedTestFlow._applyRollResult(record.id, {
+                hits: 3, glitch: false, criticalGlitch: false, poolUsed: 12,
+                timestamp: Date.now(), worldTime: game.time.worldTime, userId: game.user!.id!,
+            }, undefined as never);
+
+            const updated = ExtendedTestStorage.get(record.id)!;
+            assert.strictEqual(updated.rollCount, 1);
+            assert.strictEqual(updated.accumulatedHits, 3);
+            assert.strictEqual(updated.currentPool, 11);
+            assert.strictEqual(updated.status, 'active');
+        });
+
+        it('ends a record when a roll critically glitches', async () => {
+            const record = await createRecord({ dicePool: 12, threshold: 40 });
+
+            await ExtendedTestFlow._applyRollResult(record.id, {
+                hits: 1, glitch: true, criticalGlitch: true, poolUsed: 12,
+                timestamp: Date.now(), worldTime: game.time.worldTime, userId: game.user!.id!,
+            }, undefined as never);
+
+            assert.strictEqual(ExtendedTestStorage.get(record.id)!.status, 'failed');
+        });
     });
 
     describe('SuccessTest extended interval integration', () => {
@@ -273,6 +374,23 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             assert.isFalse(test.extended);
 
             test.data.extendedInterval = { value: 1, unit: 'hours' };
+            assert.isTrue(test.extended);
+        });
+
+        it('opts out of extending when the interval is zeroed', () => {
+            const test = TestCreator.fromPool({ pool: 5 }, { showDialog: false, showMessage: false });
+
+            // An action derived test arrives marked extended with a default interval.
+            test.data.extended = true;
+            test.data.extendedInterval = { value: 1, unit: 'minutes' };
+            assert.isTrue(test.extended);
+
+            // Zeroing the interval in the dialog turns it back into a normal test.
+            test.data.extendedInterval = { value: 0, unit: 'minutes' };
+            assert.isFalse(test.extended);
+
+            // Legacy messages from before the interval existed still extend.
+            test.data.extendedRoll = true;
             assert.isTrue(test.extended);
         });
     });

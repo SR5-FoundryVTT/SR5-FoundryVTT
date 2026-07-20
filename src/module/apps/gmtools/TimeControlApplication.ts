@@ -27,6 +27,14 @@ interface TimeControlContext extends HandlebarsApplicationMixin.RenderContext {
 export class TimeControlApplication extends HandlebarsApplicationMixin(ApplicationV2)<TimeControlContext> {
     static open() {
         if (!game.user?.isGM) return;
+
+        // Reuse an open control, a second instance would share its DOM id and orphan the first.
+        const existing = foundry.applications.instances.get('time-control');
+        if (existing instanceof TimeControlApplication) {
+            void existing.render({ force: true });
+            return;
+        }
+
         void new TimeControlApplication().render({ force: true });
     }
 
@@ -39,10 +47,6 @@ export class TimeControlApplication extends HandlebarsApplicationMixin(Applicati
     static override DEFAULT_OPTIONS = {
         id: 'time-control',
         classes: [SR5_APPV2_CSS_CLASS, 'sr5', 'time-control'],
-        form: {
-            submitOnChange: false,
-            closeOnSubmit: false,
-        },
         position: {
             width: 420,
             height: 'auto' as const,
@@ -58,7 +62,19 @@ export class TimeControlApplication extends HandlebarsApplicationMixin(Applicati
         }
     }
 
-    #onUpdateWorldTime = () => { void this.render(); };
+    /**
+     * Refresh the displayed time in place.
+     *
+     * A full re-render would reset the shift and absolute fields while the GM is typing.
+     */
+    #onUpdateWorldTime = () => {
+        const current = this.element?.querySelector<HTMLElement>('.time-control-current-value');
+        if (current) current.textContent = WorldTimeFlow.format();
+
+        this.#syncAbsoluteFields();
+        this.#updateShiftPreview();
+        this.#updateAbsolutePreview();
+    };
 
     override get title() {
         return game.i18n.localize('SR5.TimeControl.Title');
@@ -113,6 +129,33 @@ export class TimeControlApplication extends HandlebarsApplicationMixin(Applicati
         this.#updateAbsolutePreview();
 
         return super._onRender(context, options);
+    }
+
+    /**
+     * Write the current world time into the absolute fields.
+     *
+     * Skipped while the GM is editing them, so an incoming time change doesn't overwrite
+     * a date being typed.
+     */
+    #syncAbsoluteFields() {
+        const fields = this.element?.querySelector<HTMLElement>('.time-absolute-fields');
+        if (!fields || fields.contains(document.activeElement)) return;
+
+        const components = game.time.components;
+        const values: Record<string, number> = {
+            year: components.year,
+            // Month and day of month are displayed as 1-based values.
+            month: components.month + 1,
+            dayOfMonth: components.dayOfMonth + 1,
+            hour: components.hour,
+            minute: components.minute,
+            second: components.second,
+        };
+
+        for (const [name, value] of Object.entries(values)) {
+            const input = fields.querySelector<HTMLInputElement>(`[name="absolute.${name}"]`);
+            if (input) input.value = String(value);
+        }
     }
 
     /**

@@ -1,4 +1,4 @@
-import { FLAGS } from "../constants";
+import { FLAGS, SYSTEM_NAME } from "../constants";
 import { SocketMessage } from "../sockets";
 import { SR5Actor } from "../actor/SR5Actor";
 import { TestRules } from "../rules/TestRules";
@@ -7,13 +7,14 @@ import { ModifiableValue } from "../mods/ModifiableValue";
 import { ExtendedTestRules } from "../rules/ExtendedTestRules";
 import { intervalToSeconds } from "../utils/timeUnits";
 import { ExtendedTestStorage } from "../storage/ExtendedTestStorage";
-import { SuccessTest, SuccessTestData } from "../tests/SuccessTest";
+import { SuccessTest, SuccessTestData, TestOptions } from "../tests/SuccessTest";
 import { TestCreator } from "../tests/TestCreator";
 import {
     ExtendedTestInterval,
     ExtendedTestLogEntry,
     ExtendedTestPermissions,
     ExtendedTestRecord,
+    ExtendedTestRollEntry,
     ExtendedTestStatus,
 } from "../types/flows/ExtendedTest";
 
@@ -39,6 +40,11 @@ export interface ExtendedTestCreateParams {
  * Records live in the global data storage (see ExtendedTestStorage) and each roll
  * runs through the full SuccessTest pipeline, producing a normal test chat message.
  */
+/**
+ * Records currently being rolled on this client, to keep a double click from rolling twice.
+ */
+const rollsInFlight = new Set<string>();
+
 export const ExtendedTestFlow = {
     /**
      * Default permissions for newly created records.
@@ -210,24 +216,33 @@ export const ExtendedTestFlow = {
     },
 
     /**
-     * Transition a record to completed / failed based on its current values.
+     * Transition a record to completed / failed based on its current values. SR5#48.
      */
     _applyStatusTransitions(record: ExtendedTestRecord) {
         if (record.status !== 'active') return;
+
+        // A critical glitch ends the test, no matter how much pool or progress is left.
+        if (ExtendedTestRules.isCriticalGlitchEnd(record)) {
+            record.status = 'failed';
+            record.log.push(ExtendedTestFlow._logEntry('fail', 'criticalGlitch'));
+            return;
+        }
 
         if (ExtendedTestRules.isComplete(record)) {
             record.status = 'completed';
             record.log.push(ExtendedTestFlow._logEntry('complete'));
         } else if (!ExtendedTestRules.canContinue(record)) {
-            record.status = 'failed';
-            record.log.push(ExtendedTestFlow._logEntry('fail'));
+            // Without a threshold there is nothing to fail at, the test simply ran its course.
+            const openEnded = ExtendedTestRules.isOpenEnded(record);
+            record.status = openEnded ? 'completed' : 'failed';
+            record.log.push(ExtendedTestFlow._logEntry(openEnded ? 'complete' : 'fail'));
         }
     },
 
     /**
      * Roll the next iteration of a managed extended test through the full test pipeline.
      */
-    async roll(id: string): Promise<SuccessTest | undefined> {
+    async roll(id: string, options: Partial<TestOptions> = {}): Promise<SuccessTest | undefined> {
         const record = ExtendedTestStorage.get(id);
         if (!record || !game.user) return;
 
@@ -236,11 +251,18 @@ export const ExtendedTestFlow = {
             return;
         }
 
+        // A roll takes a dialog and a server roundtrip, don't let a second one start meanwhile.
+        if (rollsInFlight.has(id)) return;
+
         if (!ExtendedTestRules.canContinue(record)) {
-            record.log.push(ExtendedTestFlow._logEntry('fail'));
-            record.status = 'failed';
+            ExtendedTestFlow._applyStatusTransitions(record);
             await ExtendedTestFlow._persist(record);
             ui.notifications?.warn('SR5.Warnings.CantExtendTestFurther', { localize: true });
+            return;
+        }
+
+        if (!ExtendedTestFlow._intervalAllowsRoll(record)) {
+            ui.notifications?.warn('SR5.ExtendedTestManager.Notifications.NotDue', { localize: true });
             return;
         }
 
@@ -256,7 +278,7 @@ export const ExtendedTestFlow = {
         const actor = record.actorUuid ? await fromUuid(record.actorUuid) : undefined;
         const documents = actor instanceof SR5Actor ? { actor } : undefined;
 
-        const test = new testCls(data, documents, { showDialog: true, showMessage: true });
+        const test = new testCls(data, documents, { showDialog: true, showMessage: true, ...options });
 
         // Remove any previous edge usage.
         test.data.pushTheLimit = false;
@@ -267,12 +289,26 @@ export const ExtendedTestFlow = {
         // Permission was already checked against the record.
         test.allowUserExecute();
 
-        await test.execute();
+        rollsInFlight.add(id);
+        try {
+            await test.execute();
 
-        // Rolls can be canceled or fail before evaluation, only record real results.
-        if (test.evaluated) await ExtendedTestFlow.recordRollResult(test);
+            // Rolls can be canceled or fail before evaluation, only record real results.
+            if (test.evaluated) await ExtendedTestFlow.recordRollResult(test);
+        } finally {
+            rollsInFlight.delete(id);
+        }
 
         return test;
+    },
+
+    /**
+     * Check the elapsed game time against the record interval, when enforcement is active.
+     */
+    _intervalAllowsRoll(record: ExtendedTestRecord): boolean {
+        const enforce = game.settings.get(SYSTEM_NAME, FLAGS.EnforceExtendedTestInterval) as boolean;
+        if (!enforce) return true;
+        return ExtendedTestRules.intervalAllowsRoll(record, game.time.worldTime);
     },
 
     /**
@@ -319,22 +355,44 @@ export const ExtendedTestFlow = {
 
     /**
      * Store the result of a managed roll back onto its record.
+     *
+     * Players can't write world settings and DataStorage doesn't await the GM write, so a
+     * player applying the result locally would read-modify-write a possibly stale record.
+     * Instead the roll result is handed to a GM, who applies it against the current record.
      */
     async recordRollResult(test: SuccessTest) {
         const id = test.data.extendedManagedId;
         if (!id) return;
 
+        const rollEntry = ExtendedTestFlow._rollEntry(test);
+        const testData = foundry.utils.deepClone(test.data);
+
+        if (game.user?.isGM) {
+            await ExtendedTestFlow._applyRollResult(id, rollEntry, testData);
+            return;
+        }
+
+        SocketMessage.emitForGM(FLAGS.ApplyExtendedTestRoll, { id, rollEntry, testData });
+    },
+
+    /**
+     * Apply a roll result onto its record and advance world time, as the GM.
+     *
+     * Reads the record fresh and performs every mutation in one pass, so concurrent rolls
+     * can't lose each others hits.
+     */
+    async _applyRollResult(id: string, rollEntry: ExtendedTestRollEntry, testData: SuccessTestData) {
         const record = ExtendedTestStorage.get(id);
         if (!record) return;
 
-        record.rolls.push(ExtendedTestFlow._rollEntry(test));
-        record.log.push(ExtendedTestFlow._logEntry('roll'));
-        record.accumulatedHits += test.hits.value;
+        record.rolls.push(rollEntry);
+        record.log.push({ ...ExtendedTestFlow._logEntry('roll'), userId: rollEntry.userId });
+        record.accumulatedHits += rollEntry.hits;
         record.rollCount += 1;
-        record.lastRollWorldTime = game.time.worldTime;
+        record.lastRollWorldTime = rollEntry.worldTime;
 
         // Keep the snapshot current, so following rolls include actor / effect changes.
-        record.testData = foundry.utils.deepClone(test.data);
+        record.testData = testData;
         record.currentPool = ExtendedTestRules.nextPool(record);
 
         ExtendedTestFlow._applyStatusTransitions(record);
@@ -342,9 +400,17 @@ export const ExtendedTestFlow = {
         await ExtendedTestFlow._persist(record);
 
         if (record.advanceTimeOnRoll) {
-            await ExtendedTestFlow._advanceTime(record);
+            const seconds = intervalToSeconds(record.interval);
+            if (seconds > 0) await game.time.advance(seconds);
         }
 
+        ExtendedTestFlow._notifyStatus(record);
+    },
+
+    /**
+     * Notify about a record having reached a terminal status.
+     */
+    _notifyStatus(record: ExtendedTestRecord) {
         if (record.status === 'completed') {
             ui.notifications?.info(game.i18n.format('SR5.ExtendedTestManager.Notifications.Completed', { name: record.name }));
         } else if (record.status === 'failed') {
@@ -353,34 +419,19 @@ export const ExtendedTestFlow = {
     },
 
     /**
-     * Advance world time by the record interval, delegating to a GM when needed.
+     * Handle a player roll result, applying it as GM.
      */
-    async _advanceTime(record: ExtendedTestRecord) {
-        const seconds = intervalToSeconds(record.interval);
-        if (seconds <= 0) return;
-
-        if (game.user?.isGM) {
-            await game.time.advance(seconds);
-        } else {
-            SocketMessage.emitForGM(FLAGS.AdvanceWorldTime, { id: record.id });
-        }
-    },
-
-    /**
-     * Handle a player request to advance world time for an extended test roll.
-     *
-     * Re-validates against the stored record instead of trusting the message payload.
-     */
-    async _handleAdvanceWorldTimeSocketMessage(message: Shadowrun.SocketMessageData) {
+    async _handleApplyRollSocketMessage(message: Shadowrun.SocketMessageData) {
         if (!game.user?.isGM) return;
 
-        const record = ExtendedTestStorage.get(message.data.id);
-        if (!record || !record.advanceTimeOnRoll) return;
+        const { id, rollEntry, testData } = message.data as {
+            id: string;
+            rollEntry: ExtendedTestRollEntry;
+            testData: SuccessTestData;
+        };
+        if (!id || !rollEntry) return;
 
-        const seconds = intervalToSeconds(record.interval);
-        if (seconds <= 0) return;
-
-        await game.time.advance(seconds);
+        await ExtendedTestFlow._applyRollResult(id, rollEntry, testData);
     },
 
     /**
@@ -432,14 +483,19 @@ export const ExtendedTestFlow = {
             return;
         }
 
-        // Only allow updating user editable fields.
-        const editableKeys = [
-            'name', 'description', 'notes', 'actorUuid', 'dicePool', 'threshold',
-            'interval', 'cumulativeModifier', 'advanceTimeOnRoll', 'permissions',
+        // Descriptive fields are open to anyone with edit permission.
+        const editableKeys = ['name', 'description', 'notes'] as const;
+        // Fields that decide who may do what, or how hard the test is, stay with the owner.
+        const managedKeys = [
+            'actorUuid', 'dicePool', 'threshold', 'interval',
+            'cumulativeModifier', 'advanceTimeOnRoll', 'permissions',
         ] as const;
 
+        const canManage = ExtendedTestRules.canManage(record, game.user);
+        const allowedKeys = canManage ? [...editableKeys, ...managedKeys] : editableKeys;
+
         const applied: string[] = [];
-        for (const key of editableKeys) {
+        for (const key of allowedKeys) {
             if (!(key in changes)) continue;
             (record as any)[key] = changes[key];
             applied.push(key);

@@ -40,6 +40,7 @@ export const FLAGS = {
     DoCombatantFunction: 'doCombatantFunction',
     addNetworkController: 'addNetworkController',
     SetDataStorage: 'setDataStorage',
+    UnsetDataStorage: 'unsetDataStorage',
     TokenHealthBars: 'tokenHealthBars',
     Test: 'TestData',
     HideGMOnlyChatContent: 'HideGMOnlyChatContent',
@@ -73,8 +74,8 @@ export const FLAGS = {
     TokenAutoRunning: 'TokenAutoRunning',
     CompendiumBrowserBlacklist: 'CompendiumBrowserBlacklist',
     ImporterCompendiumOrder: 'ImporterCompendiumOrder',
-    DieFaceLabels: "DieFaceLabels",
-    AdvanceWorldTime: 'AdvanceWorldTime'
+    ApplyExtendedTestRoll: 'ApplyExtendedTestRoll',
+    EnforceExtendedTestInterval: 'EnforceExtendedTestInterval'
 } as const;
 export const CORE_NAME = 'core';
 export const METATYPEMODIFIER = 'SR5.Character.Modifiers.NPCMetatypeAttribute';
