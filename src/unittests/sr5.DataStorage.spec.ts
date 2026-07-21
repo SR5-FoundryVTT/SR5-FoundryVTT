@@ -1,5 +1,5 @@
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
-import { DataStorage } from "@/module/data/DataStorage";
+import { DataStorage, DataStorageContent } from "@/module/data/DataStorage";
 import { FLAGS } from "@/module/constants";
 
 /**
@@ -23,7 +23,7 @@ export const shadowrunDataStorage = (context: QuenchBatchContext) => {
     const ROOT = 'quenchDataStorage';
     const key = (...path: string[]) => [ROOT, ...path].join('.');
 
-    let snapshot: any;
+    let snapshot: DataStorageContent;
 
     before(() => {
         snapshot = foundry.utils.deepClone(DataStorage.storage());

@@ -1,7 +1,7 @@
 // game settings for shadowrun 5e
 
 import { FLAGS, SYSTEM_NAME } from './constants';
-import { DataStorage } from './data/DataStorage';
+import { DataStorage, DataStorageContent } from './data/DataStorage';
 import { IconAssign } from './apps/iconAssigner/IconAssign';
 import SR5CompendiaSettings from './settings/SR5CompendiaSettings';
 
@@ -21,7 +21,9 @@ export const registerSystemSettings = () => {
         default: {},
         // Fires on every client, so apps can re-render. Listeners get the changed top level
         // keys, as onChange itself only ever sees the complete storage.
-        onChange: (storage: object) => { Hooks.callAll('sr5e.storageChanged', DataStorage.changedKeys(storage)); }
+        onChange: (storage: object) => {
+            Hooks.callAll('sr5e.storageChanged', DataStorage.changedKeys(storage as DataStorageContent));
+        }
     });
 
     /**

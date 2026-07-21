@@ -15,14 +15,14 @@ export const ExtendedTestStorage = {
      * Retrieve all extended test records.
      */
     getAll(): Record<string, ExtendedTestRecord> {
-        return DataStorage.get(ExtendedTestStorage.key) ?? {};
+        return DataStorage.get<Record<string, ExtendedTestRecord>>(ExtendedTestStorage.key) ?? {};
     },
 
     /**
      * Retrieve a single extended test record.
      */
     get(id: string): ExtendedTestRecord | undefined {
-        return DataStorage.get(`${ExtendedTestStorage.key}.${id}`);
+        return DataStorage.get<ExtendedTestRecord>(`${ExtendedTestStorage.key}.${id}`);
     },
 
     /**
