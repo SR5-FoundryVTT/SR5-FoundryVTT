@@ -665,6 +665,56 @@
                         "hint": "Modificateur d'initiative appliqué lors de l'exécution de cette action",
                         "label": "Modificateur d'Initiative"
                     }
+                },
+                "technology": {
+                    "availability": {
+                        "hint": "L'attribut Disponibilité de l'objet, il détermine la facilité avec laquelle on peut se le procurer",
+                        "label": "Disponibilité"
+                    },
+                    "conceal": {
+                        "base": {
+                            "hint": "À quel point cet appareil est dissimulé aux yeux des autres",
+                            "label": "Dissimulation"
+                        }
+                    },
+                    "condition_monitor": {
+                        "value": {
+                            "hint": "Dégâts actuellement infligés au moniteur de condition de l'objet",
+                            "label": "Dégâts du moniteur de condition"
+                        }
+                    },
+                    "cost": {
+                        "hint": "Somme d'argent que coûte cet objet",
+                        "label": "Prix"
+                    },
+                    "equipped": {
+                        "hint": "Si l'objet est équipé",
+                        "label": "Équipé"
+                    },
+                    "master": {
+                        "hint": "Appareil maître auquel cet objet est asservi, formant un PAN ou un WAN",
+                        "label": "Appareil maître"
+                    },
+                    "max_rating": {
+                        "hint": "L'indice le plus élevé auquel cet objet peut être acheté. Zéro signifie que l'objet n'a pas de limite d'indice.",
+                        "label": "Indice maximum"
+                    },
+                    "quantity": {
+                        "hint": "Le nombre d'exemplaires que représente cet objet",
+                        "label": "Quantité"
+                    },
+                    "rating": {
+                        "hint": "L'indice d'appareil de l'objet, il intervient dans les actions matricielles.",
+                        "label": "Indice"
+                    },
+                    "show_quantity": {
+                        "hint": "Si la quantité de cet objet doit être affichée sur la feuille de l'acteur et dans l'en-tête de la feuille d'objet",
+                        "label": "Afficher la quantité"
+                    },
+                    "wireless": {
+                        "hint": "L'état sans fil de l'objet",
+                        "label": "Sans fil"
+                    }
                 }
             }
         },

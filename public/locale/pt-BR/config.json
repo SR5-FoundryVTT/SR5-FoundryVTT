@@ -900,6 +900,56 @@
                         "hint": "Modificador de iniciativa aplicado ao realizar esta ação",
                         "label": "Modificador de Iniciativa"
                     }
+                },
+                "technology": {
+                    "availability": {
+                        "hint": "O atributo de Disponibilidade do item, que determina o quão fácil é consegui-lo",
+                        "label": "Disponibilidade"
+                    },
+                    "conceal": {
+                        "base": {
+                            "hint": "O quanto este dispositivo fica escondido das outras pessoas",
+                            "label": "Ocultar"
+                        }
+                    },
+                    "condition_monitor": {
+                        "value": {
+                            "hint": "Dano atual causado ao Monitor de Condição do item",
+                            "label": "Dano no Monitor de Condição"
+                        }
+                    },
+                    "cost": {
+                        "hint": "Quantia em dinheiro que este item custa",
+                        "label": "Custo"
+                    },
+                    "equipped": {
+                        "hint": "Se o item está equipado",
+                        "label": "Equipado"
+                    },
+                    "master": {
+                        "hint": "Dispositivo Mestre ao qual este item está subordinado, formando uma RAP ou RAA",
+                        "label": "Dispositivo Mestre"
+                    },
+                    "max_rating": {
+                        "hint": "O maior Nível pelo qual este item pode ser comprado. Zero significa que o item não tem limite de nível.",
+                        "label": "Nível Máximo"
+                    },
+                    "quantity": {
+                        "hint": "A quantidade de itens que este Item representa",
+                        "label": "Quantidade"
+                    },
+                    "rating": {
+                        "hint": "O Nível de Dispositivo do item, que influencia as ações de matriz.",
+                        "label": "Nível"
+                    },
+                    "show_quantity": {
+                        "hint": "Se a Quantidade deste Item deve ser exibida na ficha do Ator e no cabeçalho da ficha do Item",
+                        "label": "Mostrar Quantidade"
+                    },
+                    "wireless": {
+                        "hint": "O estado de conexão sem fio do item",
+                        "label": "Conexão Sem Fio"
+                    }
                 }
             }
         },
