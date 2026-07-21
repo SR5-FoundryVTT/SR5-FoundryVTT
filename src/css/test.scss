@@ -440,9 +440,22 @@
       align-items: center;
       gap: 0.25rem;
 
-      input {
-        width: 3.5em;
+      // The fields sit in a wrapper, so the sizing the section gives its direct child
+      // controls misses them. Repeated here to keep the row as tall as its neighbours.
+      input[type='number'] {
+        flex: 0 0 3.4rem;
+        min-width: 3.4rem;
+        max-width: 3.4rem;
+        width: 3.4rem;
+        height: 24px;
         text-align: center;
+      }
+
+      select {
+        flex: 0 1 auto;
+        min-width: 6rem;
+        width: auto;
+        height: 24px;
       }
     }
   }
