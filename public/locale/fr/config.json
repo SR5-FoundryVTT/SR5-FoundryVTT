@@ -640,6 +640,18 @@
                             "label": "Normal Weapon"
                         }
                     },
+                    "extended": {
+                        "hint": "Temps de jeu entre les jets de cette action étendue. Zéro la lance comme un test normal.",
+                        "label": "Test étendu",
+                        "unit": {
+                            "hint": "Unité de temps de l'intervalle du test étendu.",
+                            "label": "Unité d'intervalle"
+                        },
+                        "value": {
+                            "hint": "Temps de jeu entre les jets. Zéro lance ce test comme un test normal, non étendu.",
+                            "label": "Intervalle"
+                        }
+                    },
                     "initiative_mod": {
                         "hint": "Modificateur d'initiative appliqué lors de l'exécution de cette action",
                         "label": "Modificateur d'Initiative"

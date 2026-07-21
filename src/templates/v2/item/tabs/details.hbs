@@ -574,8 +574,14 @@
                             {{formInput systemFields.action.fields.type value=source.system.action.type localize=true
                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                             <label style="text-wrap: nowrap;">
-                                {{localize "SR5.ExtendedTest"}}&nbsp;{{formInput systemFields.action.fields.extended value=source.system.action.extended
-                                                                                 rootId=@root.rootId disabled=@root.isPlayMode}}
+                                {{localize "SR5.ExtendedTest"}}&nbsp;{{formInput systemFields.action.fields.extended.fields.value
+                                                                                 value=source.system.action.extended.value
+                                                                                 classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                                {{> 'systems/shadowrun5e/dist/templates/apps/partials/interval-units.hbs'
+                                    name="system.action.extended.unit"
+                                    selected=source.system.action.extended.unit
+                                    label=(localize 'SR5.ActiveEffect.Duration.Units')
+                                    disabled=@root.isPlayMode}}
                             </label>
                         </div>
                     </div>

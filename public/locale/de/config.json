@@ -1579,8 +1579,16 @@
                         }
                     },
                     "extended": {
-                        "hint": "Ist diese Aktion Teil einer Ausgedehnten Probe?",
-                        "label": "Ausgedehnte Probe"
+                        "hint": "Spielzeit zwischen den Würfen dieser ausgedehnten Aktion. Null würfelt sie als normale Probe.",
+                        "label": "Ausgedehnte Probe",
+                        "unit": {
+                            "hint": "Zeiteinheit des Intervalls der ausgedehnten Probe.",
+                            "label": "Intervall-Einheit"
+                        },
+                        "value": {
+                            "hint": "Spielzeit zwischen den Würfen. Null würfelt dies als normale, nicht ausgedehnte Probe.",
+                            "label": "Intervall"
+                        }
                     },
                     "initiative_mod": {
                         "hint": "Initiativmodifikator, der beim Ausführen dieser Aktion angewendet wird",

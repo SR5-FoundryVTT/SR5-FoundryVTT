@@ -875,6 +875,18 @@
                             "label": "Normal Weapon"
                         }
                     },
+                    "extended": {
+                        "hint": "Tempo de jogo entre as rolagens desta ação estendida. Zero a rola como um teste normal.",
+                        "label": "Teste Estendido",
+                        "unit": {
+                            "hint": "Unidade de tempo do intervalo do teste estendido.",
+                            "label": "Unidade do Intervalo"
+                        },
+                        "value": {
+                            "hint": "Tempo de jogo entre as rolagens. Zero rola como um teste normal, não estendido.",
+                            "label": "Intervalo"
+                        }
+                    },
                     "initiative_mod": {
                         "hint": "Modificador de iniciativa aplicado ao realizar esta ação",
                         "label": "Modificador de Iniciativa"

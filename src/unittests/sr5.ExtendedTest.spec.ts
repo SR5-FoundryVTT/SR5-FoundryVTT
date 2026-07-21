@@ -1,4 +1,5 @@
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
+import { SR5TestFactory } from "./utils";
 import { ExtendedTestFlow } from "@/module/flows/ExtendedTestFlow";
 import { ExtendedTestDueFlow } from "@/module/flows/ExtendedTestDueFlow";
 import { ExtendedTestRules } from "@/module/rules/ExtendedTestRules";
@@ -10,8 +11,11 @@ import { TestCreator } from "@/module/tests/TestCreator";
 import { FLAGS, SR, SYSTEM_NAME } from "@/module/constants";
 
 export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
-    const { describe, it, afterEach } = context;
+    const { describe, it, afterEach, after } = context;
     const assert: Chai.AssertStatic = context.assert;
+
+    const factory = new SR5TestFactory();
+    after(async () => { await factory.destroy(); });
 
     const createdIds: string[] = [];
 
@@ -590,6 +594,34 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             // Legacy messages from before the interval existed still extend.
             test.data.extendedRoll = true;
             assert.isTrue(test.extended);
+        });
+
+        it('takes the interval from the action it was created with', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const item = await factory.createItem({
+                type: 'action',
+                system: { action: { test: 'SuccessTest', attribute: 'body', extended: { value: 1, unit: 'hours' } } },
+            });
+
+            const test = await TestCreator.fromItem(item, actor, { showDialog: false, showMessage: false });
+
+            assert.isTrue(test?.data.extended);
+            assert.deepEqual(test?.data.extendedInterval, { value: 1, unit: 'hours' });
+            assert.isTrue(test?.extended);
+        });
+
+        it('stays a normal test for an action without an interval', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const item = await factory.createItem({
+                type: 'action',
+                system: { action: { test: 'SuccessTest', attribute: 'body' } },
+            });
+
+            const test = await TestCreator.fromItem(item, actor, { showDialog: false, showMessage: false });
+
+            assert.isFalse(test?.data.extended);
+            assert.strictEqual(test?.data.extendedInterval.value, 0);
+            assert.isFalse(test?.extended);
         });
     });
 };

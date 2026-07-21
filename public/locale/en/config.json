@@ -1578,8 +1578,16 @@
                         }
                     },
                     "extended": {
-                        "hint": "If this is an Extended Test",
-                        "label": "Extended Test"
+                        "hint": "Game time between rolls of this extended action. Zero rolls it as a normal test.",
+                        "label": "Extended Test",
+                        "unit": {
+                            "hint": "Time unit of the extended test interval.",
+                            "label": "Interval Unit"
+                        },
+                        "value": {
+                            "hint": "Game time between rolls. Zero rolls this as a normal, non extended test.",
+                            "label": "Interval"
+                        }
                     },
                     "initiative_mod": {
                         "hint": "Initiative modifier applied when taking this action",

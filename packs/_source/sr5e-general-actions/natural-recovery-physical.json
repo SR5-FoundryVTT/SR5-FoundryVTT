@@ -49,7 +49,10 @@
         "value": 0,
         "base": 0
       },
-      "extended": true,
+      "extended": {
+        "value": 1,
+        "unit": "days"
+      },
       "damage": {
         "type": {
           "value": "",

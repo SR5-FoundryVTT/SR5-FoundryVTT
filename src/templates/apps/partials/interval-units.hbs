@@ -1,5 +1,5 @@
 {{!-- Interval units, shared by the test dialog, extended test config and time control. --}}
-<select name="{{name}}" data-dtype="String" aria-label="{{label}}">
+<select name="{{name}}" data-dtype="String" aria-label="{{label}}" {{#if disabled}}disabled{{/if}}>
     <optgroup label="{{localize 'SR5.ActiveEffect.Duration.GroupCombat'}}">
         <option value="rounds" {{#if (eq selected "rounds")}}selected{{/if}}>
             {{localize "SR5.ActiveEffect.Duration.UnitTurns"}}
