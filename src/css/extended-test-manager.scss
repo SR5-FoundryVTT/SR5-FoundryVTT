@@ -320,6 +320,19 @@
     }
 }
 
+// The whispered 'ready to continue' chat card takes its layout from the roll card in
+// foundry-chat-message.scss. Only the parts that card has no equivalent for live here.
+.sr5.roll-card.etm-due-card {
+    // The status band stands alone, the roll card only ever pairs it with a glitch.
+    .card-test-content--status {
+        grid-template-columns: 1fr;
+    }
+
+    .card-content--notes {
+        margin-bottom: 0.35rem;
+    }
+}
+
 .sr5.extended-test-config {
     .extended-test-config-form {
         display: flex;

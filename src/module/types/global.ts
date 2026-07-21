@@ -297,6 +297,7 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.ImporterCompendiumOrder": string[];
         "shadowrun5e.TokenAutoRunning": boolean;
         "shadowrun5e.EnforceExtendedTestInterval": boolean;
+        "shadowrun5e.ExtendedTestDueMessage": boolean;
         "shadowrun5e.WorldTimeInitialized": boolean;
     }
 }

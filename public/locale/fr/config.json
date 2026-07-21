@@ -13,6 +13,8 @@
         "ApplyLimitsName": "Appliquer des limites aux lancés",
         "EnforceExtendedTestIntervalDescription": "N'autoriser le prochain lancer d'un test étendu qu'une fois son intervalle écoulé en temps de jeu.",
         "EnforceExtendedTestIntervalName": "Imposer les intervalles des tests étendus",
+        "ExtendedTestDueMessageDescription": "Chuchote un message avec l'état du test et un bouton de jet à toutes les personnes autorisées à lancer, dès qu'assez de temps de jeu s'est écoulé pour le jet suivant.",
+        "ExtendedTestDueMessageName": "Messages de test étendu à poursuivre",
         "ModifyRollExpanded": "Mémoriser l'état de Modifier le lancer",
         "ModifyRollExpandedDescription": "Enregistre si la section Modifier le lancer était déployée la dernière fois et restaure cet état lors de la prochaine boîte de dialogue de test.",
         "DiagonalMovementDescription": "Comment le mouvement en diagonal doit être pris en compte quand la grille est utilisée",
@@ -503,6 +505,12 @@
             "CumulativeModifierTooltip": "Réduit la réserve de dés de 1 à chaque lancer effectué. SR5 p. 48.",
             "Due": "Échéance",
             "DueTooltip": "Intervalles de temps de jeu écoulés depuis le dernier lancer",
+            "DueMessage": {
+                "Header": "Test étendu prêt à poursuivre",
+                "OpenManager": "Ouvrir le gestionnaire",
+                "Overdue": "{count} intervalles écoulés",
+                "Rolls": "Jets"
+            },
             "EditTest": "Modifier le test étendu",
             "Filters": {
                 "Actor": "Acteur",

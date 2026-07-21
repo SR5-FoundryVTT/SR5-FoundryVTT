@@ -19,6 +19,8 @@
         "CompendiumBrowserBlacklistDescription": "컨펜디움 탐색기에서 숨긴 컨펜디움 목록",
         "EnforceExtendedTestIntervalDescription": "연장 판정의 간격만큼 게임 시간이 지난 뒤에만 다음 굴림을 허용합니다.",
         "EnforceExtendedTestIntervalName": "연장 판정 간격 강제",
+        "ExtendedTestDueMessageDescription": "다음 굴림에 필요한 게임 시간이 지나면 판정 상태와 굴림 버튼이 담긴 귀속말을 굴릴 수 있는 모든 사용자에게 보냅니다.",
+        "ExtendedTestDueMessageName": "확장 판정 재개 알림",
         "ModifyRollExpanded": "굴림 수정 섹션 상태 기억",
         "ModifyRollExpandedDescription": "마지막에 굴림 수정 섹션이 펼쳐져 있었는지 저장하고 다음 테스트 대화창에서 그 상태를 복원합니다.",
         "DefaultOpposedTestActorSelection": "경쟁 판정 토큰 선택 덮어쓰기",
@@ -1272,6 +1274,12 @@
             "CumulativeModifierTooltip": "굴림을 할 때마다 주사위 풀을 1씩 줄입니다. SR5 48쪽.",
             "Due": "예정",
             "DueTooltip": "마지막 굴림 이후 경과한 게임 시간 간격",
+            "DueMessage": {
+                "Header": "확장 판정을 이어갈 수 있습니다",
+                "OpenManager": "관리자 열기",
+                "Overdue": "{count}개 간격 경과",
+                "Rolls": "굴림"
+            },
             "EditTest": "연장 판정 편집",
             "Filters": {
                 "Actor": "액터",

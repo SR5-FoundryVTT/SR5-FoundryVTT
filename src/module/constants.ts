@@ -76,6 +76,7 @@ export const FLAGS = {
     ImporterCompendiumOrder: 'ImporterCompendiumOrder',
     ApplyExtendedTestRoll: 'ApplyExtendedTestRoll',
     EnforceExtendedTestInterval: 'EnforceExtendedTestInterval',
+    ExtendedTestDueMessage: 'ExtendedTestDueMessage',
     WorldTimeInitialized: 'WorldTimeInitialized'
 } as const;
 export const CORE_NAME = 'core';

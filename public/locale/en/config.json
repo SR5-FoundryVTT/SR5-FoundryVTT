@@ -19,6 +19,8 @@
         "CompendiumBrowserBlacklistDescription": "List of compendiums to hide from the compendium browser",
         "EnforceExtendedTestIntervalDescription": "Only allow the next roll of an extended test once its interval has passed in game time.",
         "EnforceExtendedTestIntervalName": "Enforce Extended Test Intervals",
+        "ExtendedTestDueMessageDescription": "Whisper a chat message with the test state and a roll button to everyone allowed to roll it, once enough game time has passed for its next roll.",
+        "ExtendedTestDueMessageName": "Extended test due messages",
         "ModifyRollExpanded": "Remember Modify Roll section state",
         "ModifyRollExpandedDescription": "Stores whether the Modify Roll section was expanded last time and restores that state in the next test dialog.",
         "DefaultOpposedTestActorSelection": "Overwrite opposed test token selections",
@@ -1271,6 +1273,12 @@
             "CumulativeModifierTooltip": "Reduce the dice pool by 1 for each roll performed. SR5 p. 48.",
             "Due": "Due",
             "DueTooltip": "Game time intervals elapsed since the last roll",
+            "DueMessage": {
+                "Header": "Extended test ready to continue",
+                "OpenManager": "Open manager",
+                "Overdue": "{count} intervals elapsed",
+                "Rolls": "Rolls"
+            },
             "EditTest": "Edit Extended Test",
             "Filters": {
                 "Actor": "Actor",

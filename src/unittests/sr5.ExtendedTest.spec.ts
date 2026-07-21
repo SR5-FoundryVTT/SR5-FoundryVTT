@@ -1,5 +1,6 @@
 import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { ExtendedTestFlow } from "@/module/flows/ExtendedTestFlow";
+import { ExtendedTestDueFlow } from "@/module/flows/ExtendedTestDueFlow";
 import { ExtendedTestRules } from "@/module/rules/ExtendedTestRules";
 import { ExtendedTestStorage } from "@/module/storage/ExtendedTestStorage";
 import { WorldTimeFlow } from "@/module/flows/WorldTimeFlow";
@@ -25,6 +26,30 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
         createdIds.push(record.id);
         return record;
     };
+
+    /** A record built in memory, for the rules and predicates that are pure over one. */
+    const baseRecord = (overrides: Partial<ExtendedTestRecord> = {}): ExtendedTestRecord => ({
+        id: 'test',
+        name: 'Test',
+        notes: '',
+        creatorUserId: 'creator',
+        testType: 'SuccessTest',
+        dicePool: 10,
+        cumulativeModifier: true,
+        threshold: 5,
+        accumulatedHits: 0,
+        rollCount: 0,
+        interval: { value: 1, unit: 'hours' },
+        advanceTimeOnRoll: false,
+        status: 'active',
+        permissions: { visibility: 'gmAndOwner', visibleUsers: [], editUsers: [], rollUsers: [] },
+        createdAt: 0,
+        createdWorldTime: 0,
+        updatedAt: 0,
+        rolls: [],
+        log: [],
+        ...overrides,
+    });
 
     afterEach(async () => {
         while (createdIds.length) {
@@ -63,29 +88,6 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
                 changes: [{ name: 'SR5.ExtendedTest', value: extendedModifier, enabled: true }],
             },
         }) as any;
-
-        const baseRecord = (overrides: Partial<ExtendedTestRecord> = {}): ExtendedTestRecord => ({
-            id: 'test',
-            name: 'Test',
-            notes: '',
-            creatorUserId: 'creator',
-            testType: 'SuccessTest',
-            dicePool: 10,
-            cumulativeModifier: true,
-            threshold: 5,
-            accumulatedHits: 0,
-            rollCount: 0,
-            interval: { value: 1, unit: 'hours' },
-            advanceTimeOnRoll: false,
-            status: 'active',
-            permissions: { visibility: 'gmAndOwner', visibleUsers: [], editUsers: [], rollUsers: [] },
-            createdAt: 0,
-            createdWorldTime: 0,
-            updatedAt: 0,
-            rolls: [],
-            log: [],
-            ...overrides,
-        });
 
         it('applies the cumulative dice pool modifier per roll', () => {
             const record = baseRecord();
@@ -256,6 +258,57 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             assert.isTrue(ExtendedTestRules.canView(gmOnlyRecord, creator));
             assert.isTrue(ExtendedTestRules.canEdit(gmOnlyRecord, creator));
             assert.isTrue(ExtendedTestRules.canRoll(gmOnlyRecord, creator));
+        });
+    });
+
+    describe('Extended Test Due Messages', () => {
+        const HOUR = 3600;
+
+        it('announces a record once an interval has passed', () => {
+            const record = baseRecord({ rollCount: 1, lastRollWorldTime: 0 });
+
+            assert.isFalse(ExtendedTestDueFlow.shouldAnnounce(record, HOUR - 1));
+            assert.isTrue(ExtendedTestDueFlow.shouldAnnounce(record, HOUR));
+        });
+
+        it('announces a pending roll only once, however world time moves', () => {
+            const record = baseRecord({ rollCount: 1, lastRollWorldTime: 0, dueAnnouncedRollCount: 1 });
+
+            // A GM rewinding and re-advancing must not repeat the card.
+            assert.isFalse(ExtendedTestDueFlow.shouldAnnounce(record, HOUR));
+            assert.isFalse(ExtendedTestDueFlow.shouldAnnounce(record, HOUR * 20));
+
+            // Rolling re-arms it.
+            record.rollCount = 2;
+            record.lastRollWorldTime = HOUR * 20;
+            assert.isTrue(ExtendedTestDueFlow.shouldAnnounce(record, HOUR * 21));
+        });
+
+        it('stays quiet for records that cannot be rolled', () => {
+            const due = { rollCount: 1, lastRollWorldTime: 0 };
+
+            assert.isFalse(ExtendedTestDueFlow.shouldAnnounce(baseRecord({ ...due, status: 'paused' }), HOUR));
+            assert.isFalse(ExtendedTestDueFlow.shouldAnnounce(baseRecord({ ...due, status: 'completed' }), HOUR));
+            // Out of dice pool: the record is about to end, not ready to continue.
+            assert.isFalse(ExtendedTestDueFlow.shouldAnnounce(baseRecord({ ...due, dicePool: 1, rollCount: 1 }), HOUR));
+            // Without an interval nothing is ever due.
+            assert.isFalse(ExtendedTestDueFlow.shouldAnnounce(baseRecord({ ...due, interval: { value: 0, unit: 'hours' } }), HOUR));
+        });
+
+        it('whispers only to users allowed to roll the record', () => {
+            const record = baseRecord({
+                permissions: { visibility: 'selectedUsers', visibleUsers: ['viewer'], editUsers: [], rollUsers: ['roller'] },
+            });
+
+            const recipients = ExtendedTestDueFlow.recipients(record);
+            const canRoll = (id: string) => {
+                const user = game.users?.get(id);
+                return !!user && ExtendedTestRules.canRoll(record, user);
+            };
+
+            assert.isTrue(recipients.every(canRoll));
+            // Every GM is allowed to roll, so a GM running this has to be among them.
+            if (game.user?.isGM) assert.include(recipients, game.user.id);
         });
     });
 

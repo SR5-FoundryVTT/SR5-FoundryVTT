@@ -19,6 +19,8 @@
         "CompendiumBrowserBlacklistDescription": "Im Kompendium Browser auszublendende Kompendien",
         "EnforceExtendedTestIntervalDescription": "Erlaubt den nächsten Wurf einer ausgedehnten Probe erst, wenn ihr Intervall in Spielzeit vergangen ist.",
         "EnforceExtendedTestIntervalName": "Intervalle ausgedehnter Proben erzwingen",
+        "ExtendedTestDueMessageDescription": "Sendet eine Flüsternachricht mit dem Probenstand und einer Würfelschaltfläche an alle, die würfeln dürfen, sobald genug Spielzeit für den nächsten Wurf vergangen ist.",
+        "ExtendedTestDueMessageName": "Nachrichten zu fälligen ausgedehnten Proben",
         "ModifyRollExpanded": "Zustand von Wurf anpassen merken",
         "ModifyRollExpandedDescription": "Speichert, ob der Abschnitt Wurf anpassen beim letzten Mal geöffnet war, und stellt diesen Zustand im nächsten Testdialog wieder her.",
         "DefaultOpposedTestActorSelection": "Nutze immer Ziele für Vergleichsproben",
@@ -1273,6 +1275,12 @@
             "CumulativeModifierTooltip": "Reduziert den Würfelpool mit jedem durchgeführten Wurf um 1. SR5 S. 48.",
             "Due": "Fällig",
             "DueTooltip": "Seit dem letzten Wurf vergangene Spielzeit-Intervalle",
+            "DueMessage": {
+                "Header": "Ausgedehnte Probe kann fortgesetzt werden",
+                "OpenManager": "Verwaltung öffnen",
+                "Overdue": "{count} Intervalle vergangen",
+                "Rolls": "Würfe"
+            },
             "EditTest": "Ausgedehnte Probe bearbeiten",
             "Filters": {
                 "Actor": "Akteur",

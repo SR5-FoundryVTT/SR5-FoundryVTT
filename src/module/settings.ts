@@ -49,6 +49,19 @@ export const registerSystemSettings = () => {
     });
 
     /**
+     * Whisper a chat message to everyone allowed to roll an extended test, once enough
+     * game time has passed for its next roll.
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.ExtendedTestDueMessage, {
+        name: 'SETTINGS.ExtendedTestDueMessageName',
+        hint: 'SETTINGS.ExtendedTestDueMessageDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true,
+    });
+
+    /**
      * Default limit behavior
      */
     game.settings.register(SYSTEM_NAME, 'applyLimits', {

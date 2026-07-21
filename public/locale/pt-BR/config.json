@@ -19,6 +19,8 @@
         "CompendiumBrowserBlacklistDescription": "Lista de compêndios a serem ocultados no navegador de compêndios",
         "EnforceExtendedTestIntervalDescription": "Só permite a próxima rolagem de um teste estendido depois que seu intervalo tiver passado no tempo de jogo.",
         "EnforceExtendedTestIntervalName": "Impor intervalos de testes estendidos",
+        "ExtendedTestDueMessageDescription": "Sussurra uma mensagem com o estado do teste e um botão de rolagem para todos que podem rolar, assim que passar tempo de jogo suficiente para a próxima rolagem.",
+        "ExtendedTestDueMessageName": "Mensagens de teste estendido pendente",
         "ModifyRollExpanded": "Lembrar estado da seção Modificar Rolagem",
         "ModifyRollExpandedDescription": "Salva se a seção Modificar Rolagem estava expandida na última vez e restaura esse estado na próxima janela de teste.",
         "DefaultOpposedTestActorSelection": "Sobrescrever seleções de token de testes de oposição",
@@ -663,6 +665,12 @@
             "CumulativeModifierTooltip": "Reduz a pilha de dados em 1 a cada rolagem realizada. SR5 p. 48.",
             "Due": "Vencimento",
             "DueTooltip": "Intervalos de tempo de jogo decorridos desde a última rolagem",
+            "DueMessage": {
+                "Header": "Teste estendido pronto para continuar",
+                "OpenManager": "Abrir gerenciador",
+                "Overdue": "{count} intervalos decorridos",
+                "Rolls": "Rolagens"
+            },
             "EditTest": "Editar Teste Estendido",
             "Filters": {
                 "Actor": "Ator",

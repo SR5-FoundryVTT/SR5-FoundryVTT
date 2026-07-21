@@ -5,6 +5,7 @@ import { TestRules } from "../rules/TestRules";
 import { DataDefaults } from "../data/DataDefaults";
 import { ModifiableValue } from "../mods/ModifiableValue";
 import { ExtendedTestRules } from "../rules/ExtendedTestRules";
+import { ExtendedTestDueFlow } from "./ExtendedTestDueFlow";
 import { intervalToSeconds } from "../utils/timeUnits";
 import { ExtendedTestStorage } from "../storage/ExtendedTestStorage";
 import { SuccessTest, SuccessTestData, TestOptions } from "../tests/SuccessTest";
@@ -444,6 +445,10 @@ export const ExtendedTestFlow = {
         record.status = status;
         record.log.push(ExtendedTestFlow._logEntry(action));
         await ExtendedTestFlow._persist(record);
+
+        // A record resumed while already overdue would otherwise wait for the next world
+        // time change to announce itself.
+        if (status === 'active') await ExtendedTestDueFlow.announceDue();
     },
 
     async pause(id: string) {

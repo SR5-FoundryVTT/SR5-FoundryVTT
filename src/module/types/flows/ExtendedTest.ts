@@ -78,6 +78,9 @@ export interface ExtendedTestRecord {
     createdWorldTime: number;
     updatedAt: number;
     lastRollWorldTime?: number;
+    // Roll count the due message was last posted for. Keeps a rewind and re-advance of world
+    // time from announcing the same pending roll twice. See ExtendedTestDueFlow.
+    dueAnnouncedRollCount?: number;
 
     rolls: ExtendedTestRollEntry[];
     log: ExtendedTestLogEntry[];

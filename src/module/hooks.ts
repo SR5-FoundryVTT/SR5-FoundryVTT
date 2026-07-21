@@ -21,6 +21,7 @@ import { TimeControlApplication } from './apps/gmtools/TimeControlApplication';
 import { WorldTimeFlow } from './flows/WorldTimeFlow';
 import { ExtendedTestManager } from './apps/ExtendedTestManager';
 import { ExtendedTestFlow } from './flows/ExtendedTestFlow';
+import { ExtendedTestDueFlow } from './flows/ExtendedTestDueFlow';
 import { ActorImporter } from './apps/itemImport/apps/ActorImporter';
 import { BulkImporter } from './apps/itemImport/apps/BulkImporter';
 import { CharacterImporter } from './apps/actorImport/characterImporter/CharacterImporter';
@@ -182,6 +183,9 @@ export class HooksManager {
         Hooks.on('getChatMessageContextOptions', SuccessTest.chatMessageContextOptions.bind(SuccessTest));
         // Register and update managed extended tests from finished test rolls.
         Hooks.on('sr5_afterTestComplete', (test: SuccessTest) => { void ExtendedTestFlow.handleTestComplete(test); });
+        // Announce extended tests game time has made rollable again. Debounced, as holding a
+        // time preset would otherwise scan every record per tick.
+        Hooks.on('updateWorldTime', foundry.utils.debounce(() => { void ExtendedTestDueFlow.announceDue(); }, 250));
 
         Hooks.on('renderChatLog', HooksManager.chatLogListeners.bind(HooksManager));
 
@@ -747,6 +751,7 @@ ___________________
         await TeamworkTest.chatMessageListeners(message, html);
         await JournalEnrichers.messageRequestHooks(html);
         await MatrixNetworkFlow.chatMessageListeners(message, html, data);
+        await ExtendedTestDueFlow.chatMessageListeners(message, html);
     }
 
     static async chatLogListeners(chatLog: ChatLog, html, data) {
