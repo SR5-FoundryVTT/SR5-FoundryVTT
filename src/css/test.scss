@@ -602,16 +602,6 @@
     }
   }
 
-  .roll-mode-controls {
-    display: flex;
-    gap: 2px;
-
-    .ui-control {
-      border: 1px solid var(--sr5v2-control-border);
-      border-left: 1px solid var(--sr5v2-control-border);
-    }
-  }
-
   .common-test,
   .common-test .test-code,
   .common-test .test-code-term {
