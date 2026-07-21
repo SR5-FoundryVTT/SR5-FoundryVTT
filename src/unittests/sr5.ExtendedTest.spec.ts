@@ -134,8 +134,9 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             assert.isTrue(ExtendedTestRules.isComplete(record));
             assert.isFalse(ExtendedTestRules.canContinue(record));
 
+            // An empty pool is no longer a stop, the user may be adding modifiers by hand.
             const exhausted = baseRecord({ rollCount: 10 });
-            assert.isFalse(ExtendedTestRules.canContinue(exhausted));
+            assert.isTrue(ExtendedTestRules.canContinue(exhausted));
 
             const running = baseRecord({ accumulatedHits: 3, rollCount: 2 });
             assert.isFalse(ExtendedTestRules.isComplete(running));
@@ -181,18 +182,18 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             assert.isTrue(record.log.some(entry => entry.detail === 'criticalGlitch'));
         });
 
-        it('completes an open ended record once its pool runs out', () => {
+        it('keeps a record running once its pool runs out', () => {
+            // Modifiers the system doesn't automate live outside the record, so an empty pool
+            // is the users call to make, not an automatic end. See TestRules.canExtendTest.
             const open = baseRecord({ threshold: 0, rollCount: 10 });
-            assert.isTrue(ExtendedTestRules.isOpenEnded(open));
-            assert.isFalse(ExtendedTestRules.canContinue(open));
+            assert.isTrue(ExtendedTestRules.canContinue(open));
 
             ExtendedTestFlow._applyStatusTransitions(open);
-            assert.strictEqual(open.status, 'completed');
+            assert.strictEqual(open.status, 'active');
 
-            // A thresholded record in the same spot did fail to reach its threshold.
             const thresholded = baseRecord({ rollCount: 10 });
             ExtendedTestFlow._applyStatusTransitions(thresholded);
-            assert.strictEqual(thresholded.status, 'failed');
+            assert.strictEqual(thresholded.status, 'active');
         });
 
         it('only allows a roll once the interval has passed', () => {
@@ -293,8 +294,6 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
 
             assert.isFalse(ExtendedTestDueFlow.shouldAnnounce(baseRecord({ ...due, status: 'paused' }), HOUR));
             assert.isFalse(ExtendedTestDueFlow.shouldAnnounce(baseRecord({ ...due, status: 'completed' }), HOUR));
-            // Out of dice pool: the record is about to end, not ready to continue.
-            assert.isFalse(ExtendedTestDueFlow.shouldAnnounce(baseRecord({ ...due, dicePool: 1, rollCount: 1 }), HOUR));
             // Without an interval nothing is ever due.
             assert.isFalse(ExtendedTestDueFlow.shouldAnnounce(baseRecord({ ...due, interval: { value: 0, unit: 'hours' } }), HOUR));
         });
@@ -386,19 +385,19 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             }
         });
 
-        it('fails the record when the pool is exhausted', async () => {
-            const record = await createRecord({ dicePool: 1, threshold: 100 });
+        it('keeps rolling a record whose pool is exhausted', async () => {
+            // An empty pool from the start, so no roll can glitch its way to an end, and no
+            // interval, so the second roll isn't gated on elapsed game time either.
+            const record = await createRecord({ dicePool: 0, threshold: 100, interval: { value: 0, unit: 'minutes' } });
 
-            // First roll uses the last die, second roll can't continue.
+            // Both rolls go through, as the user may be applying a modifier the record
+            // can't see. See TestRules.canExtendTest.
             await ExtendedTestFlow.roll(record.id, { showDialog: false, showMessage: false });
-            let current = ExtendedTestStorage.get(record.id)!;
+            await ExtendedTestFlow.roll(record.id, { showDialog: false, showMessage: false });
 
-            if (current.status === 'active') {
-                await ExtendedTestFlow.roll(record.id, { showDialog: false, showMessage: false });
-                current = ExtendedTestStorage.get(record.id)!;
-            }
-
-            assert.strictEqual(current.status, 'failed');
+            const current = ExtendedTestStorage.get(record.id)!;
+            assert.strictEqual(current.status, 'active');
+            assert.strictEqual(current.rollCount, 2);
         });
 
         it('handles pause, resume, complete and cancel transitions', async () => {

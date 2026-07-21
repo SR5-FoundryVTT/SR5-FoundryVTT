@@ -21,7 +21,6 @@ interface ExtendedTestRowContext {
     actorName?: string;
     creatorName: string;
     progress?: number;
-    nextPool: number;
     intervalUnitLabel: string;
     intervalsElapsed: number;
     isDue: boolean;
@@ -30,8 +29,6 @@ interface ExtendedTestRowContext {
     canRoll: boolean;
     // Only the elapsed game time blocks rolling, everything else would allow it.
     rollBlockedByInterval: boolean;
-    // The pool ran out, so no further roll is possible.
-    rollBlockedByPool: boolean;
     canEdit: boolean;
     canDelete: boolean;
     canPauseResume: boolean;
@@ -304,7 +301,6 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
             actorName: (actor as { name?: string } | null)?.name,
             creatorName: userName(record.creatorUserId),
             progress: ExtendedTestRules.progress(record),
-            nextPool: ExtendedTestRules.nextPool(record),
             intervalUnitLabel: unitLabel(record.interval.unit),
             intervalsElapsed: ExtendedTestRules.intervalsElapsed(record, worldTime),
             isDue: ExtendedTestRules.isDue(record, worldTime),
@@ -312,7 +308,6 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
             updatedRealTime: new Date(record.updatedAt).toLocaleString(),
             canRoll,
             rollBlockedByInterval: mayRoll && canContinue && !intervalAllowsRoll,
-            rollBlockedByPool: mayRoll && !canContinue,
             canEdit,
             canDelete: ExtendedTestRules.canDelete(record, user),
             canPauseResume: canEdit && (record.status === 'active' || record.status === 'paused'),

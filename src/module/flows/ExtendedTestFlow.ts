@@ -218,14 +218,10 @@ export const ExtendedTestFlow = {
             return;
         }
 
+        // Reaching the threshold is the only thing that ends a test on its own.
         if (ExtendedTestRules.isComplete(record)) {
             record.status = 'completed';
             record.log.push(ExtendedTestFlow._logEntry('complete'));
-        } else if (!ExtendedTestRules.canContinue(record)) {
-            // Without a threshold there is nothing to fail at, it just ran its course.
-            const openEnded = ExtendedTestRules.isOpenEnded(record);
-            record.status = openEnded ? 'completed' : 'failed';
-            record.log.push(ExtendedTestFlow._logEntry(openEnded ? 'complete' : 'fail'));
         }
     },
 

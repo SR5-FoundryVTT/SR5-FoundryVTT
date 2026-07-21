@@ -129,18 +129,10 @@ export const ExtendedTestRules = {
     },
 
     /**
-     * Is this record open ended, without a threshold to reach? Such tests answer 'how far
-     * did I get', so running out of pool completes them instead of failing them.
-     */
-    isOpenEnded: (record: ExtendedTestRecord): boolean => {
-        return record.threshold <= 0;
-    },
-
-    /**
      * Can another roll be made for this record?
      */
     canContinue: (record: ExtendedTestRecord): boolean => {
-        return TestRules.canExtendTest(ExtendedTestRules.nextPool(record), record.threshold, record.accumulatedHits);
+        return TestRules.canExtendTest(record.threshold, record.accumulatedHits);
     },
 
     /**

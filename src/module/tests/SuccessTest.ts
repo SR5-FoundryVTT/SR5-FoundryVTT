@@ -1673,7 +1673,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         ModifiableValue.calcTotal(data.pool, { min: 0 });
 
-        if (!TestRules.canExtendTest(data.pool.value, this.threshold.value, this.extendedHits.value)) {
+        if (!TestRules.canExtendTest(this.threshold.value, this.extendedHits.value)) {
             ui.notifications?.warn('SR5.Warnings.CantExtendTestFurther', { localize: true });
             return this;
         }

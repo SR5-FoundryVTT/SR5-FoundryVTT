@@ -198,10 +198,10 @@
                 }
 
                 // One fixed track per value. Widths hold the widest expected content
-                // (three digit pools, 'Combat Turns'), so nothing shifts row to row.
+                // ('Combat Turns', three digit roll counts), so nothing shifts row to row.
                 .etm-row-values {
                     display: grid;
-                    grid-template-columns: 7.5em 3.5em 8em 3.5em;
+                    grid-template-columns: 7.5em 8em 3.5em;
                     align-items: center;
                     gap: 0.6em;
                     white-space: nowrap;
@@ -211,6 +211,9 @@
                         display: flex;
                         flex-flow: column nowrap;
                         align-items: center;
+                        // Sets the progress apart from the values that follow it, without
+                        // widening the gap between those values themselves.
+                        margin-right: 0.5em;
 
                         progress {
                             width: 100%;
@@ -225,9 +228,9 @@
 
                     .etm-value {
                         display: grid;
-                        grid-template-columns: 1.2em minmax(1.4em, auto) auto;
+                        grid-template-columns: 1.2em minmax(0.9em, auto) auto;
                         align-items: center;
-                        gap: 0.25em;
+                        gap: 0.15em;
                         overflow: hidden;
 
                         i {
@@ -257,7 +260,7 @@
                         @include mixins.rollable;
                     }
 
-                    // Actions withheld until enough game time has passed, or pool ran out.
+                    // Actions withheld until enough game time has passed.
                     .etm-action-disabled {
                         opacity: 0.4;
                         cursor: not-allowed;

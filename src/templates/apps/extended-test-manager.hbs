@@ -125,9 +125,6 @@
                         <progress max="100" value="{{#if this.record.threshold}}{{this.progress}}{{else}}0{{/if}}"
                             class="{{#unless this.record.threshold}}is-placeholder{{/unless}}"></progress>
                     </div>
-                    <span class="etm-value" data-tooltip="SR5.ExtendedTestManager.NextPool">
-                        <i class="fas fa-dice-six"></i> <span class="etm-value-number">{{this.nextPool}}</span>
-                    </span>
                     <span class="etm-value" data-tooltip="SR5.ExtendedTestManager.Interval">
                         <i class="fas fa-hourglass-half"></i>
                         <span class="etm-value-number">{{this.record.interval.value}}</span>
@@ -144,10 +141,6 @@
                     <a data-action="rollTest" data-tooltip="SR5.ExtendedTestManager.Actions.Roll"><i class="fas fa-dice"></i></a>
                     {{else if this.rollBlockedByInterval}}
                     <span class="etm-action-disabled" data-tooltip="SR5.ExtendedTestManager.Notifications.NotDue">
-                        <i class="fas fa-dice"></i>
-                    </span>
-                    {{else if this.rollBlockedByPool}}
-                    <span class="etm-action-disabled" data-tooltip="SR5.Warnings.CantExtendTestFurther">
                         <i class="fas fa-dice"></i>
                     </span>
                     {{else if this.canReactivate}}
