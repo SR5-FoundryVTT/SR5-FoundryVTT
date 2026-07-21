@@ -55,8 +55,10 @@
             <label>{{localize "SR5.ExtendedTestManager.Filters.Actor"}}
                 <select data-filter="actorUuid" name="filter-actorUuid">
                     <option value="">{{localize "SR5.ExtendedTestManager.Filters.AllActors"}}</option>
+                    {{! Folder headers are disabled options, see utils/folderOptions. }}
                     {{#each actorOptions}}
-                    <option value="{{this.uuid}}" {{#if (eq this.uuid ../filters.actorUuid)}}selected{{/if}}>{{this.name}}</option>
+                    <option value="{{this.value}}" {{#if this.disabled}}disabled class="folder-option"{{/if}}
+                        {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
                     {{/each}}
                 </select>
             </label>

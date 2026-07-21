@@ -20,10 +20,12 @@
 
         <div class="form-group">
             <label for="etm-config-actor">{{localize "SR5.ExtendedTestManager.Actor"}}</label>
+            {{! Folder headers are disabled options, see utils/folderOptions. }}
             <select id="etm-config-actor" name="actorUuid">
                 <option value="">{{localize "SR5.ExtendedTestManager.NoActor"}}</option>
                 {{#each actorOptions}}
-                <option value="{{this.uuid}}" {{#if this.selected}}selected{{/if}}>{{this.name}}</option>
+                <option value="{{this.value}}" {{#if this.disabled}}disabled class="folder-option"{{/if}}
+                    {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
                 {{/each}}
             </select>
         </div>
@@ -54,11 +56,9 @@
             <div class="etm-config-interval">
                 <input type="number" id="etm-config-interval" name="interval.value"
                     value="{{record.interval.value}}" min="0" step="1"/>
-                <select name="interval.unit" data-dtype="String">
-                    {{#each intervalUnits}}
-                    <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
-                    {{/each}}
-                </select>
+                {{> 'systems/shadowrun5e/dist/templates/apps/partials/interval-units.hbs'
+                    name="interval.unit" selected=record.interval.unit
+                    label=(localize 'SR5.ExtendedTestManager.Interval')}}
             </div>
         </div>
 

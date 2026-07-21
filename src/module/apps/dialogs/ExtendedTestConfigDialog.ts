@@ -5,7 +5,7 @@ import { SR5_APPV2_CSS_CLASS } from '@/module/constants';
 import { ExtendedTestFlow } from '@/module/flows/ExtendedTestFlow';
 import { ExtendedTestRules } from '@/module/rules/ExtendedTestRules';
 import { ExtendedTestStorage } from '@/module/storage/ExtendedTestStorage';
-import { INTERVAL_UNITS, unitLabel } from '@/module/utils/timeUnits';
+import { FolderSelectOption, documentSelectOptions } from '@/module/utils/folderOptions';
 import {
     ExtendedIntervalUnit,
     ExtendedTestRecord,
@@ -23,10 +23,9 @@ interface ExtendedTestConfigContext extends HandlebarsApplicationMixin.RenderCon
     // dicePool field would be a no-op and accumulated hits are shown instead.
     // See ExtendedTestRules.nextPool.
     poolFromSnapshot: boolean;
-    actorOptions: { uuid: string; name: string; selected: boolean }[];
+    actorOptions: FolderSelectOption[];
     userOptions: { id: string; name: string; visible: boolean; edit: boolean; roll: boolean }[];
     visibilityOptions: { value: string; label: string; selected: boolean }[];
-    intervalUnits: { value: string; label: string; selected: boolean }[];
 }
 
 export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(ApplicationV2)<ExtendedTestConfigContext> {
@@ -116,14 +115,9 @@ export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(Applica
         context.canManage = !record || ExtendedTestRules.canManage(record, game.user!);
         context.poolFromSnapshot = !!record?.testData;
 
-        // Actors the user may associate: owned actors (GM sees all).
-        context.actorOptions = game.actors!
-            .filter(actor => actor.isOwner)
-            .map(actor => ({
-                uuid: actor.uuid,
-                name: actor.name ?? '',
-                selected: record?.actorUuid === actor.uuid,
-            }));
+        // Actors the user may associate: owned actors (GM sees all), under their folders.
+        context.actorOptions = documentSelectOptions(
+            game.actors!.filter(actor => actor.isOwner), record?.actorUuid);
 
         context.userOptions = game.users!
             .filter(user => !user.isGM)
@@ -140,13 +134,6 @@ export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(Applica
             value,
             label: game.i18n.localize(`SR5.ExtendedTestManager.Visibility.${value}` as Parameters<typeof game.i18n.localize>[0]),
             selected: visibility === value,
-        }));
-
-        const unit = record?.interval.unit ?? 'minutes';
-        context.intervalUnits = INTERVAL_UNITS.map(value => ({
-            value,
-            label: unitLabel(value),
-            selected: unit === value,
         }));
 
         return context;

@@ -8,6 +8,7 @@ import { ExtendedTestRules } from '@/module/rules/ExtendedTestRules';
 import { ExtendedTestStorage } from '@/module/storage/ExtendedTestStorage';
 import { WorldTimeFlow, WorldTimePreset } from '@/module/flows/WorldTimeFlow';
 import { intervalToSeconds, unitLabel } from '@/module/utils/timeUnits';
+import { FolderSelectOption, SelectableDocument, documentSelectOptions } from '@/module/utils/folderOptions';
 import { ExtendedTestRecord, ExtendedTestStatus } from '@/module/types/flows/ExtendedTest';
 import { ExtendedTestConfigDialog } from '@/module/apps/dialogs/ExtendedTestConfigDialog';
 
@@ -64,7 +65,7 @@ interface ExtendedTestManagerContext extends HandlebarsApplicationMixin.RenderCo
     statusOptions: { value: string; label: string }[];
     periodOptions: { value: string; label: string }[];
     sortOptions: { value: string; label: string }[];
-    actorOptions: { uuid: string; name: string }[];
+    actorOptions: FolderSelectOption[];
     isGM: boolean;
     // Action slots at least one visible row can fill. A slot no row uses is dropped
     // entirely, so a player isn't left with a row of blank reserved columns.
@@ -216,14 +217,15 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
             label: game.i18n.localize(`SR5.ExtendedTestManager.Sort.${value}` as Parameters<typeof game.i18n.localize>[0]),
         }));
 
-        // Actors referenced by any visible record, for the actor filter.
-        const actorOptions = new Map<string, string>();
+        // Actors referenced by any visible record, for the actor filter. Under their folders,
+        // same as the config dialog's actor picker.
+        const actors = new Map<string, SelectableDocument>();
         for (const record of records) {
-            if (!record.actorUuid) continue;
-            const actor = fromUuidSync(record.actorUuid);
-            if (actor) actorOptions.set(record.actorUuid, (actor as { name?: string }).name ?? record.actorUuid);
+            if (!record.actorUuid || actors.has(record.actorUuid)) continue;
+            const actor = fromUuidSync(record.actorUuid) as SelectableDocument | null;
+            if (actor) actors.set(record.actorUuid, actor);
         }
-        context.actorOptions = [...actorOptions.entries()].map(([uuid, name]) => ({ uuid, name }));
+        context.actorOptions = documentSelectOptions(actors.values(), this.filterState.actorUuid);
 
         // Keep a filter hidden behind the collapsed advanced section visible as a count.
         const { actorUuid, visibility, createdWithin, updatedWithin } = this.filterState;

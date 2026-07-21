@@ -6,6 +6,7 @@ import { ExtendedTestRules } from "@/module/rules/ExtendedTestRules";
 import { ExtendedTestStorage } from "@/module/storage/ExtendedTestStorage";
 import { WorldTimeFlow } from "@/module/flows/WorldTimeFlow";
 import { intervalToSeconds } from "@/module/utils/timeUnits";
+import { documentSelectOptions } from "@/module/utils/folderOptions";
 import { ExtendedTestRecord } from "@/module/types/flows/ExtendedTest";
 import { TestCreator } from "@/module/tests/TestCreator";
 import { FLAGS, SR, SYSTEM_NAME } from "@/module/constants";
@@ -78,6 +79,48 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             await ExtendedTestStorage.delete(first.id);
             assert.isUndefined(ExtendedTestStorage.get(first.id));
             assert.strictEqual(ExtendedTestStorage.get(second.id)?.name, 'Second');
+        });
+    });
+
+    describe('Folder Select Options', () => {
+        /**
+         * Only the three fields the helper reads, so a folder tree can be described inline
+         * without creating documents. Ancestors are ordered nearest first, as Foundry does.
+         */
+        const folder = (name: string, ...ancestors: { name: string }[]) =>
+            ({ id: name, name, ancestors }) as any;
+        const doc = (name: string, parent: any = null) => ({ uuid: `Actor.${name}`, name, folder: parent });
+
+        it('lists documents under their folders, in tree order', () => {
+            const runners = folder('Runners');
+            const npcs = folder('NPCs', runners);
+
+            const options = documentSelectOptions([
+                doc('Loose Actor'),
+                doc('Silent NPC', npcs),
+                doc('Byte', runners),
+                doc('Aria', runners),
+            ]);
+
+            assert.deepEqual(options.map(option => option.label), [
+                'Runners', '─ Aria', '─ Byte', '─ NPCs', '── Silent NPC', 'Loose Actor',
+            ]);
+            // Headers can't be picked, and carry no value to submit.
+            assert.deepEqual(options.filter(option => option.disabled).map(option => option.value), ['', '']);
+        });
+
+        it('lists only the folders the given documents reach', () => {
+            const runners = folder('Runners');
+            const npcs = folder('NPCs', runners);
+            // Never passed a document, so it has no reason to be offered.
+            const empty = folder('Empty');
+            doc('Hidden', empty);
+
+            // A parent holding nothing itself still appears, its child needs the path.
+            const options = documentSelectOptions([doc('Silent NPC', npcs)], 'Actor.Silent NPC');
+
+            assert.deepEqual(options.map(option => option.label), ['Runners', '─ NPCs', '── Silent NPC']);
+            assert.deepEqual(options.filter(option => option.selected).map(option => option.value), ['Actor.Silent NPC']);
         });
     });
 
