@@ -1293,7 +1293,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.equal(test.pool.changes.reduce(reduceModifiersByName('Test Effect'), 0), 2);
 
             actions = await actor.createEmbeddedDocuments('Item', [
-                { name: 'Test Action', type: 'action', system: { action: { extended: true } } },
+                { name: 'Test Action', type: 'action', system: { action: { extended: { value: 1, unit: 'minutes' } } } },
             ]);
             test = (await TestCreator.fromItem(actions[0], actor, { showDialog: false, showMessage: false }))!;
 

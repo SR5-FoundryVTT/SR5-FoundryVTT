@@ -2,8 +2,10 @@
     "CONTROLS": {
         "SR5": {
             "EnvironmentalModifiers": "Umgebungsmodifikatoren",
+            "ExtendedTestManager": "Ausgedehnte Proben",
             "OverwatchScoreTracker": "Overwatch-Wert-Übersicht",
-            "SituationalModifiers": "Situationsmodifikatoren"
+            "SituationalModifiers": "Situationsmodifikatoren",
+            "TimeControl": "Zeitsteuerung"
         }
     },
     "SETTINGS": {
@@ -15,6 +17,10 @@
         "AutomateProgressiveRecoilDescription": "Kumulativer Rückstoß wird automatisch aufgerechnet.",
         "CompendiumBrowserBlacklist": "Kompendium Browser Blacklist",
         "CompendiumBrowserBlacklistDescription": "Im Kompendium Browser auszublendende Kompendien",
+        "EnforceExtendedTestIntervalDescription": "Erlaubt den nächsten Wurf einer ausgedehnten Probe erst, wenn ihr Intervall in Spielzeit vergangen ist.",
+        "EnforceExtendedTestIntervalName": "Intervalle ausgedehnter Proben erzwingen",
+        "ExtendedTestDueMessageDescription": "Sendet eine Flüsternachricht mit dem Probenstand und einer Würfelschaltfläche an alle, die würfeln dürfen, sobald genug Spielzeit für den nächsten Wurf vergangen ist.",
+        "ExtendedTestDueMessageName": "Nachrichten zu fälligen ausgedehnten Proben",
         "ModifyRollExpanded": "Zustand von Wurf anpassen merken",
         "ModifyRollExpandedDescription": "Speichert, ob der Abschnitt Wurf anpassen beim letzten Mal geöffnet war, und stellt diesen Zustand im nächsten Testdialog wieder her.",
         "DefaultOpposedTestActorSelection": "Nutze immer Ziele für Vergleichsproben",
@@ -1243,6 +1249,128 @@
         "Extended": "Ausgedehnt",
         "ExtendedHits": "Ausged. Erfolge",
         "ExtendedTest": "Ausged. Probe",
+        "ExtendedTestManager": {
+            "Actions": {
+                "Cancel": "Probe abbrechen",
+                "Complete": "Als abgeschlossen markieren",
+                "Delete": "Löschen",
+                "Edit": "Bearbeiten",
+                "Pause": "Pausieren",
+                "Reactivate": "Test reaktivieren",
+                "Resume": "Fortsetzen",
+                "Roll": "Würfeln"
+            },
+            "ActivityLog": "Aktivitätsprotokoll",
+            "Actor": "Akteur",
+            "AdvanceTime": "Spielzeit beim Würfeln vorstellen",
+            "AdvanceTimeTooltip": "Stellt die Weltzeit nach jedem Wurf um das Probenintervall vor.",
+            "CanEdit": "Bearbeiten",
+            "CanRoll": "Würfeln",
+            "CanView": "Ansehen",
+            "ConfirmCancel": "Den ausgedehnten Test \"{name}\" abbrechen? Der Test wird beendet, ein SL kann ihn später reaktivieren.",
+            "ConfirmDelete": "Die ausgedehnte Probe \"{name}\" löschen?",
+            "CreateTest": "Neue ausgedehnte Probe",
+            "Creator": "Erstellt von",
+            "CumulativeModifier": "Kumulativer Würfelpool-Modifikator von -1",
+            "CumulativeModifierTooltip": "Reduziert den Würfelpool mit jedem durchgeführten Wurf um 1. SR5 S. 48.",
+            "Due": "Fällig",
+            "DueTooltip": "Seit dem letzten Wurf vergangene Spielzeit-Intervalle",
+            "DueMessage": {
+                "Header": "Ausgedehnte Probe kann fortgesetzt werden",
+                "OpenManager": "Verwaltung öffnen",
+                "Overdue": "{count} Intervalle vergangen",
+                "Rolls": "Würfe"
+            },
+            "EditTest": "Ausgedehnte Probe bearbeiten",
+            "Filters": {
+                "Actor": "Akteur",
+                "Advanced": "Weitere Filter",
+                "AllActors": "Alle Akteure",
+                "AllStatuses": "Alle Status",
+                "AllVisibilities": "Öffentlich und privat",
+                "Created": "Erstellt innerhalb",
+                "Mine": "Nur meine",
+                "Private": "Privat",
+                "Search": "Name oder Notizen suchen...",
+                "Status": "Status",
+                "Updated": "Aktualisiert innerhalb",
+                "Visibility": "Sichtbarkeit"
+            },
+            "GameTime": "Spielzeit",
+            "Interval": "Intervall",
+            "LastUpdate": "Letzte Aktualisierung",
+            "Log": {
+                "cancel": "Abgebrochen",
+                "complete": "Abgeschlossen",
+                "create": "Erstellt",
+                "fail": "Fehlgeschlagen",
+                "pause": "Pausiert",
+                "resume": "Fortgesetzt",
+                "roll": "Gewürfelt",
+                "update": "Aktualisiert"
+            },
+            "Name": "Name",
+            "NewTest": "Ausgedehnte Probe",
+            "NoActor": "Keiner",
+            "NoTests": "Keine ausgedehnten Proben vorhanden.",
+            "Notes": "Notizen",
+            "NotesPlaceholder": "Freitext zu dieser Probe. Durchsuchbar.",
+            "Notifications": {
+                "Completed": "Ausgedehnte Probe \"{name}\" abgeschlossen!",
+                "Failed": "Ausgedehnte Probe \"{name}\" fehlgeschlagen: Der Würfelpool ist erschöpft.",
+                "NoEditPermission": "Du darfst diese ausgedehnte Probe nicht bearbeiten.",
+                "NoRollPermission": "Du darfst für diese ausgedehnte Probe nicht würfeln.",
+                "NotActive": "Dieser ausgedehnte Test ist nicht aktiv. Setze ihn zuerst fort oder reaktiviere ihn.",
+                "NotDue": "Es ist noch nicht genug Spielzeit für den nächsten Wurf dieser ausgedehnten Probe vergangen.",
+                "Registered": "Ausgedehnte Probe \"{name}\" wird jetzt in der Verwaltung für ausgedehnte Proben verfolgt."
+            },
+            "OpenMessage": "Chatnachricht öffnen",
+            "Periods": {
+                "any": "Beliebiger Zeitraum",
+                "day": "Letzter Tag",
+                "hour": "Letzte Stunde",
+                "month": "Letzter Monat",
+                "week": "Letzte Woche"
+            },
+            "PoolUsed": "Pool",
+            "RealTime": "Echtzeit",
+            "Rolls": "Durchgeführte Würfe",
+            "SaveTest": "Speichern",
+            "SectionDetails": "Details",
+            "SectionRules": "Regeln",
+            "Sort": {
+                "accumulatedHits": "Angesammelte Erfolge",
+                "createdAt": "Erstellt",
+                "createdWorldTime": "Spielzeit-Beginn",
+                "interval": "Intervall",
+                "name": "Name",
+                "progress": "Fortschritt",
+                "rollCount": "Würfe",
+                "status": "Status",
+                "threshold": "Schwellenwert",
+                "updatedAt": "Aktualisiert"
+            },
+            "SortBy": "Sortieren nach",
+            "SortDirection": "Sortierreihenfolge umschalten",
+            "StartedGameTime": "Begonnen (Spielzeit)",
+            "Status": {
+                "active": "Aktiv",
+                "cancelled": "Abgebrochen",
+                "completed": "Abgeschlossen",
+                "failed": "Fehlgeschlagen",
+                "paused": "Pausiert"
+            },
+            "Title": "Ausgedehnte Proben",
+            "User": "Benutzer",
+            "UserPermissions": "Benutzerrechte",
+            "UserPermissionsHint": "Spielleiter, der Ersteller und Besitzer des verknüpften Akteurs haben immer vollen Zugriff. Die Ansehen-Kontrollkästchen gelten nur bei der Sichtbarkeit \"Ausgewählte Benutzer\".",
+            "Visibility": {
+                "gmAndOwner": "SL und Besitzer",
+                "gmOnly": "Nur SL",
+                "public": "Öffentlich",
+                "selectedUsers": "Ausgewählte Benutzer"
+            }
+        },
         "FOUNDRY": {
             "Actor": "Akteur",
             "Item": "Item",
@@ -1449,8 +1577,16 @@
                         }
                     },
                     "extended": {
-                        "hint": "Ist diese Aktion Teil einer Ausgedehnten Probe?",
-                        "label": "Ausgedehnte Probe"
+                        "hint": "Spielzeit zwischen den Würfen dieser ausgedehnten Aktion. Null würfelt sie als normale Probe.",
+                        "label": "Ausgedehnte Probe",
+                        "unit": {
+                            "hint": "Zeiteinheit des Intervalls der ausgedehnten Probe.",
+                            "label": "Intervall-Einheit"
+                        },
+                        "value": {
+                            "hint": "Spielzeit zwischen den Würfen. Null würfelt dies als normale, nicht ausgedehnte Probe.",
+                            "label": "Intervall"
+                        }
                     },
                     "initiative_mod": {
                         "hint": "Initiativmodifikator, der beim Ausführen dieser Aktion angewendet wird",
@@ -2925,6 +3061,35 @@
             "ThrownAttackTest": "Wurfwaffen-Angriff"
         },
         "Threshold": "Schwellenwert",
+        "TimeControl": {
+            "Advance": "Vorstellen",
+            "Amount": "Menge",
+            "Apply": "Anwenden",
+            "CustomAmount": "Eigener Wert",
+            "CustomMinutes": "Min",
+            "CustomMinutesTooltip": "Die Weltzeit um eine eigene Anzahl Minuten vorstellen",
+            "Day": "Tag",
+            "GmOnly": "Nur Spielleiter dürfen die Weltzeit ändern.",
+            "Hour": "Stunde",
+            "Minute": "Minute",
+            "Month": "Monat",
+            "Presets": {
+                "CombatTurn": "Kampfrunde",
+                "Day": "1 Tag",
+                "Header": "Schnell vorstellen",
+                "Hour": "1 Stunde",
+                "Minute": "1 Minute",
+                "TenMinutes": "10 Minuten",
+                "Week": "1 Woche"
+            },
+            "Preview": "Vorschau",
+            "Rewind": "Zurückstellen",
+            "Second": "Sekunde",
+            "SetTime": "Datum & Uhrzeit setzen",
+            "Title": "Zeitsteuerung",
+            "Unit": "Einheit",
+            "Year": "Jahr"
+        },
         "ToggleBreakdown": "Aufschlüsselung umschalten",
         "ToggleActive": "De/aktivieren",
         "ToggleEquip": "Anlegen/Ablegen",
@@ -3076,7 +3241,8 @@
             },
             "Test": {
                 "BuyHits": "Würfelt keine Würfel. Kauft Erfolge mit ⌊Würfelpool / 4⌋.",
-                "Extended": "Probe wird als ausgedehnte Probe geworfen, bis der Schwellenwert erreicht ist",
+                "Extended": "Die Probe wird als ausgedehnte Probe geworfen, bis der Schwellenwert erreicht ist. Setze das Intervall auf null, um sie als normale Probe zu werfen.",
+                "ExtendedInterval": "Spielzeit zwischen den Würfen. Null wirft die Probe als normale, nicht ausgedehnte Probe.",
                 "Limit": "Vollständiger Limitwert",
                 "Modifier": "Summe aller auf den Pool angewendenten Modifikatoren",
                 "Pool": "Anzahl zu werfender Würfel",

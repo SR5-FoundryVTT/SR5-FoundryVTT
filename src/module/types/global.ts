@@ -242,6 +242,8 @@ declare module "fvtt-types/configuration" {
             sr5_testProcessResults: any;
             sr5_afterTestComplete: any;
             sr5_processTagifyElements: any;
+            // Fired on all clients on global data storage changes, with the changed keys.
+            'sr5e.storageChanged': (changedKeys: string[]) => void;
             "routinglib.ready": () => void;
             SR5_CastItemAction: (arg0: SR5Item) => void;
             SR5_PreActorItemRoll: (arg0: SR5Actor, arg1: SR5Item) => void;
@@ -294,6 +296,9 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.CompendiumBrowserBlacklist": string[];
         "shadowrun5e.ImporterCompendiumOrder": string[];
         "shadowrun5e.TokenAutoRunning": boolean;
+        "shadowrun5e.EnforceExtendedTestInterval": boolean;
+        "shadowrun5e.ExtendedTestDueMessage": boolean;
+        "shadowrun5e.WorldTimeInitialized": boolean;
     }
 }
 

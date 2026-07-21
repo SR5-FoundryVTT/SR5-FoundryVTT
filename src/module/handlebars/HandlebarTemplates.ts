@@ -135,6 +135,9 @@ export const preloadHandlebarsTemplates = async () => {
         // Application - Situational Modifiers
         'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs',
 
+        // Shared interval unit selection
+        'systems/shadowrun5e/dist/templates/apps/partials/interval-units.hbs',
+
         // Active Effect - shared target conditions partial
         'systems/shadowrun5e/dist/templates/effect/active-effect-target-conditions.hbs'
     ];

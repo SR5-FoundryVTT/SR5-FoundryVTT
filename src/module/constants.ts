@@ -40,6 +40,7 @@ export const FLAGS = {
     DoCombatantFunction: 'doCombatantFunction',
     addNetworkController: 'addNetworkController',
     SetDataStorage: 'setDataStorage',
+    UnsetDataStorage: 'unsetDataStorage',
     TokenHealthBars: 'tokenHealthBars',
     Test: 'TestData',
     HideGMOnlyChatContent: 'HideGMOnlyChatContent',
@@ -72,7 +73,11 @@ export const FLAGS = {
     CompendiaSettingsMenu: 'CompendiaSettingsMenu',
     TokenAutoRunning: 'TokenAutoRunning',
     CompendiumBrowserBlacklist: 'CompendiumBrowserBlacklist',
-    ImporterCompendiumOrder: 'ImporterCompendiumOrder'
+    ImporterCompendiumOrder: 'ImporterCompendiumOrder',
+    ApplyExtendedTestRoll: 'ApplyExtendedTestRoll',
+    EnforceExtendedTestInterval: 'EnforceExtendedTestInterval',
+    ExtendedTestDueMessage: 'ExtendedTestDueMessage',
+    WorldTimeInitialized: 'WorldTimeInitialized'
 } as const;
 export const CORE_NAME = 'core';
 export const METATYPEMODIFIER = 'SR5.Character.Modifiers.NPCMetatypeAttribute';
@@ -121,6 +126,16 @@ export const SR = {
         ROUND_TIME_SECONDS: 3,
         TURN_TIME_SECONDS: 0,
         MAX_HISTORY_SIZE: 50,
+    },
+    time: {
+        START_DATE: {
+            year: 2075,
+            month: 0,
+            dayOfMonth: 0,
+            hour: 0,
+            minute: 0,
+            second: 0,
+        },
     },
     defense: {
         spell: {

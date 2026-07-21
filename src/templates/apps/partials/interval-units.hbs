@@ -1,0 +1,17 @@
+{{!-- Interval units, shared by the test dialog, extended test config and time control.
+      Same set as INTERVAL_UNITS in utils/timeUnits, which the TS side selects from. --}}
+<select name="{{name}}" data-dtype="String" aria-label="{{label}}" {{#if disabled}}disabled{{/if}}>
+    <optgroup label="{{localize 'SR5.ActiveEffect.Duration.GroupCombat'}}">
+        <option value="rounds" {{#if (eq selected "rounds")}}selected{{/if}}>
+            {{localize "SR5.ActiveEffect.Duration.UnitTurns"}}
+        </option>
+    </optgroup>
+    <optgroup label="{{localize 'SR5.ActiveEffect.Duration.GroupTime'}}">
+        <option value="seconds" {{#if (eq selected "seconds")}}selected{{/if}}>{{localize "EFFECT.DURATION.UNITS.seconds"}}</option>
+        <option value="minutes" {{#if (eq selected "minutes")}}selected{{/if}}>{{localize "EFFECT.DURATION.UNITS.minutes"}}</option>
+        <option value="hours" {{#if (eq selected "hours")}}selected{{/if}}>{{localize "EFFECT.DURATION.UNITS.hours"}}</option>
+        <option value="days" {{#if (eq selected "days")}}selected{{/if}}>{{localize "EFFECT.DURATION.UNITS.days"}}</option>
+        <option value="weeks" {{#if (eq selected "weeks")}}selected{{/if}}>{{localize "EFFECT.DURATION.UNITS.weeks"}}</option>
+        <option value="months" {{#if (eq selected "months")}}selected{{/if}}>{{localize "EFFECT.DURATION.UNITS.months"}}</option>
+    </optgroup>
+</select>

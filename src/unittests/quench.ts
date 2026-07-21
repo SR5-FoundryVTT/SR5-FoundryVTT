@@ -16,6 +16,7 @@ import { shadowrunSR5ICDataPrep } from './sr5.ICDataPrep.spec';
 import { shadowrunSR5VehicleDataPrep } from './sr5.VehicleDataPrep.spec';
 import { shadowrunSR5ActiveEffect } from './sr5.ActiveEffect.spec';
 import { shadowrunEffectDuration } from './sr5.EffectDuration.spec';
+import { shadowrunExtendedTests } from './sr5.ExtendedTest.spec';
 import { shadowrunTesting } from './sr5.Testing.spec';
 import { shadowrunInventoryFlow } from './sr5.Inventory.spec';
 import { weaponParserBaseTesting } from './sr5.WeaponParser.spec';
@@ -31,6 +32,7 @@ import { shadowrunOpposedCompileSpriteTesting } from './sr5.OpposedCompileSprite
 import { shadowrunOpposedCallInMessageActionTesting } from './sr5.OpposedCallInMessageAction.spec';
 import { actorArmorFlowTesting } from './sr5.ActorArmorFlow.spec';
 import { shadowrunDiceSoNiceTesting } from './sr5.DiceSoNice.spec';
+import { shadowrunDataStorage } from './sr5.DataStorage.spec';
 
 import { Quench, QuenchRegisterBatchFunction, QuenchRegisterBatchOptions } from '@ethaks/fvtt-quench';
 import { shadowrunRiggerTesting } from '@/unittests/sr5.RiggerTesting.spec';
@@ -92,6 +94,12 @@ export const quenchRegister = (quench: Quench) => {
     });
     registerBatch(quench, 'shadowrun5e.entities.effects.duration', shadowrunEffectDuration, {
         displayName: 'SHADOWRUN5e: ActiveEffect Duration Test',
+    });
+    registerBatch(quench, 'shadowrun5e.flows.extended_test', shadowrunExtendedTests, {
+        displayName: 'SHADOWRUN5e: Extended Test Test',
+    });
+    registerBatch(quench, 'shadowrun5e.data.storage', shadowrunDataStorage, {
+        displayName: 'SHADOWRUN5e: DataStorage Test',
     });
     registerBatch(quench, 'shadowrun5e.data_prep.character', shadowrunSR5CharacterDataPrep, {
         displayName: 'SHADOWRUN5e: SR5CharacterDataPreparation Test',

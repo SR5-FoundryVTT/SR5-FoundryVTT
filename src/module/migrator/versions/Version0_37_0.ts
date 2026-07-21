@@ -9,6 +9,12 @@ const flatDimensions = [
     { valueKey: 'selection_limits', modeKey: 'selection_limits_mode', type: 'limits' },
 ] as const;
 
+// Natural recovery intervals, SR5 CRB p. 207.
+const recoveryIntervals: Record<string, { value: number, unit: string }> = {
+    NaturalRecoveryStunTest: { value: 1, unit: 'hours' },
+    NaturalRecoveryPhysicalTest: { value: 1, unit: 'days' },
+};
+
 /**
  * Migrate Active Effect filters/apply-to to the per-target model.
  *
@@ -21,6 +27,22 @@ const flatDimensions = [
  */
 export class Version0_37_0 extends VersionMigration {
     readonly TargetVersion = '0.37.0';
+
+    /**
+     * Turn the action extended flag into the interval it always implied.
+     *
+     * Recovery gets its book interval, everything else the one minute TestCreator used to
+     * apply to any extended action.
+     */
+    override migrateItem(item: any): void {
+        const action = item.system?.action;
+        // Only a boolean is unmigrated. The migrator reruns until a document can persist.
+        if (typeof action?.extended !== 'boolean') return;
+
+        action.extended = action.extended
+            ? recoveryIntervals[action.test] ?? { value: 1, unit: 'minutes' }
+            : { value: 0, unit: 'minutes' };
+    }
 
     override migrateActiveEffect(effect: any): void {
         const system = effect.system;
