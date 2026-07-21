@@ -2,8 +2,10 @@
     "CONTROLS": {
         "SR5": {
             "EnvironmentalModifiers": "Modificadores Ambientais",
+            "ExtendedTestManager": "Testes Estendidos",
             "OverwatchScoreTracker": "Monitor de Valor de Vigilância",
-            "SituationalModifiers": "Modificadores Situacionais"
+            "SituationalModifiers": "Modificadores Situacionais",
+            "TimeControl": "Controle de Tempo"
         }
     },
     "SETTINGS": {
@@ -15,6 +17,10 @@
         "AutomateProgressiveRecoilDescription": "Personagens acumulam recuo progressivo até serem reiniciados",
         "CompendiumBrowserBlacklist": "Lista Negra do Navegador de Compêndio",
         "CompendiumBrowserBlacklistDescription": "Lista de compêndios a serem ocultados no navegador de compêndios",
+        "EnforceExtendedTestIntervalDescription": "Só permite a próxima rolagem de um teste estendido depois que seu intervalo tiver passado no tempo de jogo.",
+        "EnforceExtendedTestIntervalName": "Impor intervalos de testes estendidos",
+        "ExtendedTestDueMessageDescription": "Sussurra uma mensagem com o estado do teste e um botão de rolagem para todos que podem rolar, assim que passar tempo de jogo suficiente para a próxima rolagem.",
+        "ExtendedTestDueMessageName": "Mensagens de teste estendido pendente",
         "ModifyRollExpanded": "Lembrar estado da seção Modificar Rolagem",
         "ModifyRollExpandedDescription": "Salva se a seção Modificar Rolagem estava expandida na última vez e restaura esse estado na próxima janela de teste.",
         "DefaultOpposedTestActorSelection": "Sobrescrever seleções de token de testes de oposição",
@@ -131,6 +137,9 @@
                 },
                 "conditionType": {
                     "hint": "A parte do teste que esta condição filtra."
+                },
+                "targetName": {
+                    "label": "Nome do Alvo"
                 }
             },
             "AddCondition": "Adicionar Condição",
@@ -641,6 +650,128 @@
         "Extended": "Estendido",
         "ExtendedHits": "Sucessos Estendidos",
         "ExtendedTest": "Teste Estendido",
+        "ExtendedTestManager": {
+            "Actions": {
+                "Cancel": "Cancelar teste",
+                "Complete": "Marcar como concluído",
+                "Delete": "Excluir",
+                "Edit": "Editar",
+                "Pause": "Pausar",
+                "Reactivate": "Reativar teste",
+                "Resume": "Retomar",
+                "Roll": "Rolar"
+            },
+            "ActivityLog": "Registro de atividades",
+            "Actor": "Ator",
+            "AdvanceTime": "Avançar o tempo de jogo ao rolar",
+            "AdvanceTimeTooltip": "Avança o tempo do mundo pelo intervalo do teste após cada rolagem.",
+            "CanEdit": "Editar",
+            "CanRoll": "Rolar",
+            "CanView": "Ver",
+            "ConfirmCancel": "Cancelar o teste estendido \"{name}\"? Isso encerra o teste, mas um GM pode reativá-lo depois.",
+            "ConfirmDelete": "Excluir o teste estendido \"{name}\"?",
+            "CreateTest": "Novo Teste Estendido",
+            "Creator": "Criado por",
+            "CumulativeModifier": "Modificador cumulativo de -1 na pilha de dados",
+            "CumulativeModifierTooltip": "Reduz a pilha de dados em 1 a cada rolagem realizada. SR5 p. 48.",
+            "Due": "Vencimento",
+            "DueTooltip": "Intervalos de tempo de jogo decorridos desde a última rolagem",
+            "DueMessage": {
+                "Header": "Teste estendido pronto para continuar",
+                "OpenManager": "Abrir gerenciador",
+                "Overdue": "{count} intervalos decorridos",
+                "Rolls": "Rolagens"
+            },
+            "EditTest": "Editar Teste Estendido",
+            "Filters": {
+                "Actor": "Ator",
+                "Advanced": "Mais filtros",
+                "AllActors": "Todos os atores",
+                "AllStatuses": "Todos os status",
+                "AllVisibilities": "Público e privado",
+                "Created": "Criado dentro de",
+                "Mine": "Somente os meus",
+                "Private": "Privado",
+                "Search": "Pesquisar nome ou notas...",
+                "Status": "Status",
+                "Updated": "Atualizado dentro de",
+                "Visibility": "Visibilidade"
+            },
+            "GameTime": "Tempo de Jogo",
+            "Interval": "Intervalo",
+            "LastUpdate": "Última atualização",
+            "Log": {
+                "cancel": "Cancelado",
+                "complete": "Concluído",
+                "create": "Criado",
+                "fail": "Falhou",
+                "pause": "Pausado",
+                "resume": "Retomado",
+                "roll": "Rolado",
+                "update": "Atualizado"
+            },
+            "Name": "Nome",
+            "NewTest": "Teste Estendido",
+            "NoActor": "Nenhum",
+            "NoTests": "Nenhum teste estendido para exibir.",
+            "Notes": "Anotações",
+            "NotesPlaceholder": "Texto livre sobre este teste. Pesquisável.",
+            "Notifications": {
+                "Completed": "Teste estendido \"{name}\" concluído!",
+                "Failed": "Teste estendido \"{name}\" falhou: a pilha de dados se esgotou.",
+                "NoEditPermission": "Você não tem permissão para editar este teste estendido.",
+                "NoRollPermission": "Você não tem permissão para rolar este teste estendido.",
+                "NotActive": "Este teste estendido não está ativo. Retome ou reative-o primeiro.",
+                "NotDue": "Ainda não passou tempo de jogo suficiente para a próxima rolagem deste teste estendido.",
+                "Registered": "O teste estendido \"{name}\" agora é acompanhado no gerenciador de Testes Estendidos."
+            },
+            "OpenMessage": "Abrir mensagem do chat",
+            "Periods": {
+                "any": "Qualquer período",
+                "day": "Último dia",
+                "hour": "Última hora",
+                "month": "Último mês",
+                "week": "Última semana"
+            },
+            "PoolUsed": "Pilha",
+            "RealTime": "Tempo Real",
+            "Rolls": "Rolagens realizadas",
+            "SaveTest": "Salvar",
+            "SectionDetails": "Detalhes",
+            "SectionRules": "Regras",
+            "Sort": {
+                "accumulatedHits": "Acertos acumulados",
+                "createdAt": "Criado",
+                "createdWorldTime": "Início no tempo de jogo",
+                "interval": "Intervalo",
+                "name": "Nome",
+                "progress": "Progresso",
+                "rollCount": "Rolagens",
+                "status": "Status",
+                "threshold": "Limiar",
+                "updatedAt": "Atualizado"
+            },
+            "SortBy": "Ordenar por",
+            "SortDirection": "Alternar direção da ordenação",
+            "StartedGameTime": "Iniciado (tempo de jogo)",
+            "Status": {
+                "active": "Ativo",
+                "cancelled": "Cancelado",
+                "completed": "Concluído",
+                "failed": "Falhou",
+                "paused": "Pausado"
+            },
+            "Title": "Testes Estendidos",
+            "User": "Usuário",
+            "UserPermissions": "Permissões de Usuário",
+            "UserPermissionsHint": "Mestres, o criador e os proprietários do ator vinculado sempre têm acesso completo. As caixas de seleção de visualização só se aplicam com a visibilidade \"Usuários selecionados\".",
+            "Visibility": {
+                "gmAndOwner": "Mestre e proprietário",
+                "gmOnly": "Somente Mestre",
+                "public": "Público",
+                "selectedUsers": "Usuários selecionados"
+            }
+        },
         "FOUNDRY": {
             "Actor": "Ator",
             "Item": "Item",
@@ -751,6 +882,18 @@
                         "normal_weapon": {
                             "hint": "If this damage is considered a normal (non-magical) weapon attack",
                             "label": "Normal Weapon"
+                        }
+                    },
+                    "extended": {
+                        "hint": "Tempo de jogo entre as rolagens desta ação estendida. Zero a rola como um teste normal.",
+                        "label": "Teste Estendido",
+                        "unit": {
+                            "hint": "Unidade de tempo do intervalo do teste estendido.",
+                            "label": "Unidade do Intervalo"
+                        },
+                        "value": {
+                            "hint": "Tempo de jogo entre as rolagens. Zero rola como um teste normal, não estendido.",
+                            "label": "Intervalo"
                         }
                     },
                     "initiative_mod": {
@@ -1495,6 +1638,35 @@
             "ThrownAttackTest": "Ataque de Arma Lançada"
         },
         "Threshold": "Limiar",
+        "TimeControl": {
+            "Advance": "Avançar",
+            "Amount": "Quantidade",
+            "Apply": "Aplicar",
+            "CustomAmount": "Valor Personalizado",
+            "CustomMinutes": "min",
+            "CustomMinutesTooltip": "Avançar o tempo do mundo por uma quantidade personalizada de minutos",
+            "Day": "Dia",
+            "GmOnly": "Somente Mestres podem alterar o tempo do mundo.",
+            "Hour": "Hora",
+            "Minute": "Minuto",
+            "Month": "Mês",
+            "Presets": {
+                "CombatTurn": "Turno de Combate",
+                "Day": "1 Dia",
+                "Header": "Avanço Rápido",
+                "Hour": "1 Hora",
+                "Minute": "1 Minuto",
+                "TenMinutes": "10 Minutos",
+                "Week": "1 Semana"
+            },
+            "Preview": "Prévia",
+            "Rewind": "Retroceder",
+            "Second": "Segundo",
+            "SetTime": "Definir Data e Hora",
+            "Title": "Controle de Tempo",
+            "Unit": "Unidade",
+            "Year": "Ano"
+        },
         "ToggleBreakdown": "Alternar detalhamento",
         "ToggleActive": "Alternar Ativo",
         "ToggleEquip": "Alternar Equipamento",
@@ -1604,7 +1776,8 @@
             },
             "Test": {
                 "BuyHits": "Não rola dados. Compra acertos usando ⌊reserva de dados / 4⌋.",
-                "Extended": "O teste será rolado como um teste estendido até que o limite seja alcançado",
+                "Extended": "O teste será rolado como um teste estendido até que o limiar seja alcançado. Defina o intervalo como zero para rolá-lo como um teste normal.",
+                "ExtendedInterval": "Tempo de jogo entre as rolagens. Zero rola como um teste normal, não estendido.",
                 "Limit": "Valor do limite calculado",
                 "Modifier": "Soma de todos os modificadores aplicados à reserva de dados",
                 "Pool": "Quantidade de dados para rolar",

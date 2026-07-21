@@ -55,3 +55,35 @@
     text-shadow: 0 0 8px var(--color-shadow-primary);
     color: variables.$fLightRed;
 }
+
+/// A collapsible <details> panel with a caret that follows the open state.
+///
+/// Expects a leading <i> inside the <summary>; the default marker is dropped in its favour.
+@mixin collapsible {
+    summary {
+        display: flex;
+        align-items: center;
+        gap: 0.4em;
+        font-weight: bold;
+        cursor: pointer;
+        list-style: none;
+
+        &::-webkit-details-marker {
+            display: none;
+        }
+
+        i {
+            width: 0.75em;
+            text-align: center;
+            transition: transform 150ms ease;
+        }
+    }
+
+    &[open] > summary {
+        margin-bottom: 0.5em;
+
+        i {
+            transform: rotate(90deg);
+        }
+    }
+}

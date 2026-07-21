@@ -186,6 +186,6 @@ export const NetworkStorage = {
      * @returns The complete network storage.
      */
     getStorage(): Shadowrun.Storage['matrix']['networks'] {
-        return DataStorage.get(NetworkStorage.key) ?? {};
+        return DataStorage.get<Shadowrun.Storage['matrix']['networks']>(NetworkStorage.key) ?? {};
     }
 }

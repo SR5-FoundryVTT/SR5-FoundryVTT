@@ -1,0 +1,134 @@
+<div class="extended-test-config-form">
+    <fieldset class="etm-config-section">
+        <legend>{{localize "SR5.ExtendedTestManager.SectionDetails"}}</legend>
+
+        <div class="form-group">
+            <label for="etm-config-name">{{localize "SR5.ExtendedTestManager.Name"}}</label>
+            <input type="text" id="etm-config-name" name="name" value="{{record.name}}" required autofocus/>
+        </div>
+
+        <div class="form-group">
+            <label for="etm-config-notes">{{localize "SR5.ExtendedTestManager.Notes"}}</label>
+            <textarea id="etm-config-notes" name="notes" rows="3"
+                placeholder="{{localize 'SR5.ExtendedTestManager.NotesPlaceholder'}}">{{record.notes}}</textarea>
+        </div>
+    </fieldset>
+
+    {{#if canManage}}
+    <fieldset class="etm-config-section">
+        <legend>{{localize "SR5.ExtendedTestManager.SectionRules"}}</legend>
+
+        <div class="form-group">
+            <label for="etm-config-actor">{{localize "SR5.ExtendedTestManager.Actor"}}</label>
+            {{! Folder headers are disabled options, see utils/folderOptions. }}
+            <select id="etm-config-actor" name="actorUuid">
+                <option value="">{{localize "SR5.ExtendedTestManager.NoActor"}}</option>
+                {{#each actorOptions}}
+                <option value="{{this.value}}" {{#if this.disabled}}disabled class="folder-option"{{/if}}
+                    {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+                {{/each}}
+            </select>
+        </div>
+
+        {{! Both are short numbers, so they share one row. Once the test has rolled its pool
+            comes from the actor and the snapshot, leaving progress as the useful value. }}
+        <div class="form-group">
+            {{#if poolFromSnapshot}}
+            {{! The sort options label their keys by field name, so this is the same string. }}
+            <label for="etm-config-hits">{{localize "SR5.ExtendedTestManager.Sort.accumulatedHits"}}</label>
+            {{else}}
+            <label for="etm-config-pool">{{localize "SR5.DicePool"}}</label>
+            {{/if}}
+            <div class="etm-config-values">
+                {{#if poolFromSnapshot}}
+                <input type="number" id="etm-config-hits" name="accumulatedHits"
+                    value="{{record.accumulatedHits}}" min="0" step="1"/>
+                {{else}}
+                <input type="number" id="etm-config-pool" name="dicePool" value="{{record.dicePool}}" min="0" step="1"/>
+                {{/if}}
+                <label for="etm-config-threshold">{{localize "SR5.Threshold"}}</label>
+                <input type="number" id="etm-config-threshold" name="threshold" value="{{record.threshold}}" min="0" step="1"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="etm-config-interval">{{localize "SR5.ExtendedTestManager.Interval"}}</label>
+            <div class="etm-config-interval">
+                <input type="number" id="etm-config-interval" name="interval.value"
+                    value="{{record.interval.value}}" min="0" step="1"/>
+                {{> 'systems/shadowrun5e/dist/templates/apps/partials/interval-units.hbs'
+                    name="interval.unit" selected=record.interval.unit
+                    label=(localize 'SR5.ExtendedTestManager.Interval')}}
+            </div>
+        </div>
+
+        <div class="form-group toggle-checkbox-row">
+            <label for="etm-config-cumulative" data-tooltip="SR5.ExtendedTestManager.CumulativeModifierTooltip">
+                {{localize "SR5.ExtendedTestManager.CumulativeModifier"}}
+            </label>
+            <input type="checkbox" id="etm-config-cumulative" name="cumulativeModifier"
+                {{#if record.cumulativeModifier}}checked{{/if}}/>
+        </div>
+
+        <div class="form-group toggle-checkbox-row">
+            <label for="etm-config-advance-time" data-tooltip="SR5.ExtendedTestManager.AdvanceTimeTooltip">
+                {{localize "SR5.ExtendedTestManager.AdvanceTime"}}
+            </label>
+            <input type="checkbox" id="etm-config-advance-time" name="advanceTimeOnRoll"
+                {{#if record.advanceTimeOnRoll}}checked{{/if}}/>
+        </div>
+    </fieldset>
+
+    {{! Collapsed by default; the defaults are sane and it is the longest section. }}
+    <details class="etm-config-section etm-config-users" data-sync="permissions">
+        <summary>
+            <i class="fas fa-caret-right" aria-hidden="true"></i>
+            {{localize "SR5.ExtendedTestManager.UserPermissions"}}
+        </summary>
+
+        <div class="form-group">
+            <label for="etm-config-visibility">{{localize "SR5.ExtendedTestManager.Filters.Visibility"}}</label>
+            <select id="etm-config-visibility" name="visibility">
+                {{#each visibilityOptions}}
+                <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+                {{/each}}
+            </select>
+        </div>
+
+        {{#if userOptions.length}}
+        <table>
+            <thead>
+                <tr>
+                    <th>{{localize "SR5.ExtendedTestManager.User"}}</th>
+                    <th>{{localize "SR5.ExtendedTestManager.CanView"}}</th>
+                    <th>{{localize "SR5.ExtendedTestManager.CanEdit"}}</th>
+                    <th>{{localize "SR5.ExtendedTestManager.CanRoll"}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each userOptions}}
+                <tr>
+                    <td>{{this.name}}</td>
+                    <td><input type="checkbox" name="visibleUsers.{{this.id}}" {{#if this.visible}}checked{{/if}}/></td>
+                    <td><input type="checkbox" name="editUsers.{{this.id}}" {{#if this.edit}}checked{{/if}}/></td>
+                    <td><input type="checkbox" name="rollUsers.{{this.id}}" {{#if this.roll}}checked{{/if}}/></td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+        {{/if}}
+        <p class="hint">{{localize "SR5.ExtendedTestManager.UserPermissionsHint"}}</p>
+    </details>
+    {{/if}}
+
+    <footer class="etm-config-footer">
+        <button type="submit" class="etm-config-submit">
+            <i class="fas fa-save"></i>
+            {{#if isCreate}}{{localize "SR5.ExtendedTestManager.CreateTest"}}{{else}}{{localize "SR5.ExtendedTestManager.SaveTest"}}{{/if}}
+        </button>
+        <button type="button" data-action="cancel">
+            <i class="fas fa-times"></i>
+            {{localize "SR5.Dialogs.Common.Cancel"}}
+        </button>
+    </footer>
+</div>

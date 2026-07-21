@@ -2,12 +2,19 @@
     "CONTROLS": {
         "SR5": {
             "EnvironmentalModifiers": "Modificateurs environnementals",
-            "OverwatchScoreTracker": "Suivi du Score de Surveillace"
+            "ExtendedTestManager": "Tests étendus",
+            "OverwatchScoreTracker": "Suivi du Score de Surveillace",
+            "SituationalModifiers": "Modificateurs situationnels",
+            "TimeControl": "Contrôle du temps"
         }
     },
     "SETTINGS": {
         "ApplyLimitsDescription": "Est-ce que des limites doivent être appliquées aux lancés",
         "ApplyLimitsName": "Appliquer des limites aux lancés",
+        "EnforceExtendedTestIntervalDescription": "N'autoriser le prochain lancer d'un test étendu qu'une fois son intervalle écoulé en temps de jeu.",
+        "EnforceExtendedTestIntervalName": "Imposer les intervalles des tests étendus",
+        "ExtendedTestDueMessageDescription": "Chuchote un message avec l'état du test et un bouton de jet à toutes les personnes autorisées à lancer, dès qu'assez de temps de jeu s'est écoulé pour le jet suivant.",
+        "ExtendedTestDueMessageName": "Messages de test étendu à poursuivre",
         "ModifyRollExpanded": "Mémoriser l'état de Modifier le lancer",
         "ModifyRollExpandedDescription": "Enregistre si la section Modifier le lancer était déployée la dernière fois et restaure cet état lors de la prochaine boîte de dialogue de test.",
         "DiagonalMovementDescription": "Comment le mouvement en diagonal doit être pris en compte quand la grille est utilisée",
@@ -62,6 +69,9 @@
                 },
                 "conditionType": {
                     "hint": "Partie du test filtrée par cette condition."
+                },
+                "targetName": {
+                    "label": "Nom de la cible"
                 }
             },
             "AddCondition": "Ajouter une condition",
@@ -480,6 +490,128 @@
         "ExpandAll": "Étendre Tout",
         "Extended": "Étendu",
         "ExtendedTest": "Test étendu",
+        "ExtendedTestManager": {
+            "Actions": {
+                "Cancel": "Annuler le test",
+                "Complete": "Marquer comme terminé",
+                "Delete": "Supprimer",
+                "Edit": "Modifier",
+                "Pause": "Mettre en pause",
+                "Reactivate": "Réactiver le test",
+                "Resume": "Reprendre",
+                "Roll": "Lancer"
+            },
+            "ActivityLog": "Journal d'activité",
+            "Actor": "Acteur",
+            "AdvanceTime": "Avancer le temps de jeu à chaque lancer",
+            "AdvanceTimeTooltip": "Avance le temps du monde de l'intervalle du test après chaque lancer.",
+            "CanEdit": "Modifier",
+            "CanRoll": "Lancer",
+            "CanView": "Voir",
+            "ConfirmCancel": "Annuler le test étendu \"{name}\" ? Cela met fin au test, mais un MJ pourra le réactiver.",
+            "ConfirmDelete": "Supprimer le test étendu « {name} » ?",
+            "CreateTest": "Nouveau test étendu",
+            "Creator": "Créé par",
+            "CumulativeModifier": "Modificateur cumulatif de -1 à la réserve de dés",
+            "CumulativeModifierTooltip": "Réduit la réserve de dés de 1 à chaque lancer effectué. SR5 p. 48.",
+            "Due": "Échéance",
+            "DueTooltip": "Intervalles de temps de jeu écoulés depuis le dernier lancer",
+            "DueMessage": {
+                "Header": "Test étendu prêt à poursuivre",
+                "OpenManager": "Ouvrir le gestionnaire",
+                "Overdue": "{count} intervalles écoulés",
+                "Rolls": "Jets"
+            },
+            "EditTest": "Modifier le test étendu",
+            "Filters": {
+                "Actor": "Acteur",
+                "Advanced": "Plus de filtres",
+                "AllActors": "Tous les acteurs",
+                "AllStatuses": "Tous les statuts",
+                "AllVisibilities": "Public et privé",
+                "Created": "Créé depuis",
+                "Mine": "Seulement les miens",
+                "Private": "Privé",
+                "Search": "Rechercher un nom ou des notes...",
+                "Status": "Statut",
+                "Updated": "Mis à jour depuis",
+                "Visibility": "Visibilité"
+            },
+            "GameTime": "Temps de jeu",
+            "Interval": "Intervalle",
+            "LastUpdate": "Dernière mise à jour",
+            "Log": {
+                "cancel": "Annulé",
+                "complete": "Terminé",
+                "create": "Créé",
+                "fail": "Échoué",
+                "pause": "Mis en pause",
+                "resume": "Repris",
+                "roll": "Lancé",
+                "update": "Mis à jour"
+            },
+            "Name": "Nom",
+            "NewTest": "Test étendu",
+            "NoActor": "Aucun",
+            "NoTests": "Aucun test étendu à afficher.",
+            "Notes": "Notes",
+            "NotesPlaceholder": "Texte libre sur ce test. Recherchable.",
+            "Notifications": {
+                "Completed": "Test étendu « {name} » terminé !",
+                "Failed": "Test étendu « {name} » échoué : la réserve de dés est épuisée.",
+                "NoEditPermission": "Vous n'êtes pas autorisé à modifier ce test étendu.",
+                "NoRollPermission": "Vous n'êtes pas autorisé à lancer ce test étendu.",
+                "NotActive": "Ce test étendu n'est pas actif. Reprenez-le ou réactivez-le d'abord.",
+                "NotDue": "Il ne s'est pas écoulé assez de temps de jeu pour le prochain lancer de ce test étendu.",
+                "Registered": "Le test étendu « {name} » est désormais suivi dans le gestionnaire de tests étendus."
+            },
+            "OpenMessage": "Ouvrir le message de chat",
+            "Periods": {
+                "any": "N'importe quand",
+                "day": "Dernier jour",
+                "hour": "Dernière heure",
+                "month": "Dernier mois",
+                "week": "Dernière semaine"
+            },
+            "PoolUsed": "Réserve",
+            "RealTime": "Temps réel",
+            "Rolls": "Lancers effectués",
+            "SaveTest": "Enregistrer",
+            "SectionDetails": "Détails",
+            "SectionRules": "Règles",
+            "Sort": {
+                "accumulatedHits": "Succès accumulés",
+                "createdAt": "Créé",
+                "createdWorldTime": "Début (temps de jeu)",
+                "interval": "Intervalle",
+                "name": "Nom",
+                "progress": "Progression",
+                "rollCount": "Lancers",
+                "status": "Statut",
+                "threshold": "Seuil",
+                "updatedAt": "Mis à jour"
+            },
+            "SortBy": "Trier par",
+            "SortDirection": "Inverser le sens du tri",
+            "StartedGameTime": "Commencé (temps de jeu)",
+            "Status": {
+                "active": "Actif",
+                "cancelled": "Annulé",
+                "completed": "Terminé",
+                "failed": "Échoué",
+                "paused": "En pause"
+            },
+            "Title": "Tests étendus",
+            "User": "Utilisateur",
+            "UserPermissions": "Permissions des utilisateurs",
+            "UserPermissionsHint": "Les MJ, le créateur et les propriétaires de l'acteur lié ont toujours un accès complet. Les cases de visualisation ne s'appliquent qu'avec la visibilité « Utilisateurs sélectionnés ».",
+            "Visibility": {
+                "gmAndOwner": "MJ et propriétaire",
+                "gmOnly": "MJ uniquement",
+                "public": "Public",
+                "selectedUsers": "Utilisateurs sélectionnés"
+            }
+        },
         "Fade": "Technodrain",
         "FadeValue": "Valeur de technodrain",
         "Filter": "Filtre",
@@ -515,6 +647,18 @@
                         "normal_weapon": {
                             "hint": "If this damage is considered a normal (non-magical) weapon attack",
                             "label": "Normal Weapon"
+                        }
+                    },
+                    "extended": {
+                        "hint": "Temps de jeu entre les jets de cette action étendue. Zéro la lance comme un test normal.",
+                        "label": "Test étendu",
+                        "unit": {
+                            "hint": "Unité de temps de l'intervalle du test étendu.",
+                            "label": "Unité d'intervalle"
+                        },
+                        "value": {
+                            "hint": "Temps de jeu entre les jets. Zéro lance ce test comme un test normal, non étendu.",
+                            "label": "Intervalle"
                         }
                     },
                     "initiative_mod": {
@@ -1048,6 +1192,35 @@
         "Temporary": "Temporaire",
         "TemporaryModifiers": "Modificateurs temporaires",
         "Test": "Test",
+        "TimeControl": {
+            "Advance": "Avancer",
+            "Amount": "Quantité",
+            "Apply": "Appliquer",
+            "CustomAmount": "Valeur personnalisée",
+            "CustomMinutes": "min",
+            "CustomMinutesTooltip": "Avancer le temps du monde d'un nombre de minutes personnalisé",
+            "Day": "Jour",
+            "GmOnly": "Seuls les MJ peuvent modifier le temps du monde.",
+            "Hour": "Heure",
+            "Minute": "Minute",
+            "Month": "Mois",
+            "Presets": {
+                "CombatTurn": "Tour de combat",
+                "Day": "1 jour",
+                "Header": "Avance rapide",
+                "Hour": "1 heure",
+                "Minute": "1 minute",
+                "TenMinutes": "10 minutes",
+                "Week": "1 semaine"
+            },
+            "Preview": "Aperçu",
+            "Rewind": "Reculer",
+            "Second": "Seconde",
+            "SetTime": "Définir la date et l'heure",
+            "Title": "Contrôle du temps",
+            "Unit": "Unité",
+            "Year": "Année"
+        },
         "ToggleBreakdown": "Afficher/masquer le détail",
         "ToggleEquip": "(Des)équiper",
         "Top": "Coté",
@@ -1129,6 +1302,7 @@
         "Tooltips": {
             "Test": {
                 "BuyHits": "Ne lance pas de dés. Achète des succès avec ⌊réserve de dés / 4⌋.",
+                "ExtendedInterval": "Temps de jeu entre les lancers. Zéro lance le test comme un test normal, non étendu.",
                 "ResultOverrideGlitches": "Remplace les glitches pour ce résultat de test.",
                 "ResultOverrideHits": "Remplace les succès pour ce résultat de test."
             },

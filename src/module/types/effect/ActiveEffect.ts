@@ -11,6 +11,7 @@ const FilterConditionData = () => ({
 
 const TargetData = () => ({
     id:         new StringField({ required: true, blank: false, initial: () => foundry.utils.randomID() }),
+    name:       new StringField({ required: true, blank: true, initial: '' }),
     applyTo:    new StringField({ required: true, initial: 'actor', choices: SR5.effectApplyTo }),
     conditions: new ArrayField(new SchemaField(FilterConditionData())),
     onlyForItemTest: new BooleanField(),

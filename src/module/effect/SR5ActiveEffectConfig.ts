@@ -285,7 +285,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         event.preventDefault();
         const { targets } = this._syncFormIntoClone();
         // schema cleaning fills id + empty conditions
-        targets.push({ applyTo: 'actor' });
+        targets.push({ applyTo: 'actor', name: `${game.i18n.localize('SR5.ActiveEffect.Target')} #${targets.length + 1}` });
         this.clone.updateSource({ system: { targets } });
         await this.render();
     }
@@ -369,7 +369,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         event.stopPropagation();
 
         const control = target.closest<HTMLElement>('.sr5-effect-value-control');
-        const input = control?.querySelector<HTMLInputElement>('input[type="text"]');
+        const input = control?.querySelector<HTMLInputElement | HTMLTextAreaElement>('[name]');
         if (!control || !input) return;
 
         const applyTo = [...control.closest<HTMLElement>('.value')?.classList ?? []]
@@ -462,7 +462,7 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         };
     }
 
-    private _openValueEditor(anchor: HTMLElement, source: HTMLInputElement, applyTo: string) {
+    private _openValueEditor(anchor: HTMLElement, source: HTMLInputElement | HTMLTextAreaElement, applyTo: string) {
         if (this._valueEditor?.sourceInput === source) {
             this._valueEditor.bringToFront();
             this._valueEditor.focusTextarea();
@@ -564,12 +564,12 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
     }
 
     /**
-     * Options for the per-change Target dropdown: one entry per target, labelled by its position.
+     * Options for the per-change Target dropdown: one entry per target, labelled by its name.
      */
     prepareChangeTargetOptions() {
         return this.clone.system.targets.map((target, index: number) => ({
             value: target.id,
-            label: `#${index + 1}`,
+            label: target.name || `${game.i18n.localize('SR5.ActiveEffect.Target')} #${index + 1}`,
         }));
     }
 
@@ -656,9 +656,9 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         const name = (target as HTMLSelectElement).name || "";
 
         // The combined regex as a boolean constant
-        const isTargetOrApplyToChange = /^system\.(targets\.\d+\.applyTo|changes\.\d+\.target)$/.test(name);
+        const isTargetOrApplyToChange = /^system\.(targets\.\d+\.(applyTo|name)|changes\.\d+\.target)$/.test(name);
 
-        if (target instanceof HTMLSelectElement && isTargetOrApplyToChange) {
+        if ((target instanceof HTMLInputElement || target instanceof HTMLSelectElement) && isTargetOrApplyToChange) {
             this._syncFormIntoClone();
             void this.render();
             return;

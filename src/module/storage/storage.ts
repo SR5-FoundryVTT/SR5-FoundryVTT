@@ -1,4 +1,5 @@
 import { DataStorage } from "../data/DataStorage";
+import { ExtendedTestStorage } from "./ExtendedTestStorage";
 import { MarksStorage } from "./MarksStorage";
 import { NetworkStorage } from "./NetworkStorage";
 import { OverwatchStorage } from "./OverwatchStorage";
@@ -15,6 +16,7 @@ export const SRStorage = {
         ow: OverwatchStorage,
         networks: NetworkStorage
     },
+    extendedTests: ExtendedTestStorage,
     // Allow direct access to global data storage.
     _storage: DataStorage
 }

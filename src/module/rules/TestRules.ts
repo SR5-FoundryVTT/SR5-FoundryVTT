@@ -16,18 +16,21 @@ export const TestRules = {
     },
 
     /**
-     * Can a test be extended using the given pool value
-     * @param pool The pool of the test to be extended.
+     * Can a test be extended further?
+     *
+     * Only the threshold ends a test here. SR5 also ends one when the pool runs out, but
+     * modifiers a user applies by hand aren't part of the pool we can see, so an empty pool
+     * is left as the users call rather than a hard stop. A test without a threshold answers
+     * 'how far did I get' and runs until it is ended by hand.
+     *
      * @param threshold The extended test threshold to be met
      * @param extendedHits The summed up hits across all test iterations
      * @returns When true, test can be extended.
      */
-    canExtendTest: (pool: number, threshold: number, extendedHits: number): boolean => {
-        // An extended test without a threshold set can extend until no pool is left.
-        if (threshold > 0)
-            return extendedHits < threshold && pool > 0;
+    canExtendTest: (threshold: number, extendedHits: number): boolean => {
+        if (threshold > 0) return extendedHits < threshold;
 
-        return pool > 0;
+        return true;
     },
 
     /**

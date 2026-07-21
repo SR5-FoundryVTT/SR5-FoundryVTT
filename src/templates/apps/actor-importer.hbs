@@ -77,7 +77,7 @@
     <select id="chummer-folder-select" {{#if isImporting}}disabled{{/if}}>
         <option value=""></option>
         {{#each folders as |folder|}}
-            <option value="{{folder.id}}" {{#if folder.selected}}selected{{/if}}>{{folder.name}}</option>
+            <option value="{{folder.value}}" {{#if folder.selected}}selected{{/if}}>{{folder.label}}</option>
         {{/each}}
     </select>
     <button type="button" data-action="import" {{#if isImporting}}disabled aria-busy="true"{{/if}}>

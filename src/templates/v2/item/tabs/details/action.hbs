@@ -27,8 +27,14 @@
             {{formInput systemFields.action.fields.test value=source.system.action.test options=(tests2Array activeTests)
                         classes="short" rootId=@root.rootId disabled=true}}
             <label class="basic-row" style="margin-left: auto" data-tooltip="SR5.Tooltips.Test.Extended">
-                {{localize "SR5.Extended"}}&nbsp;{{formInput systemFields.action.fields.extended value=source.system.action.extended
-                             rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{localize "SR5.Extended"}}&nbsp;{{formInput systemFields.action.fields.extended.fields.value
+                             value=source.system.action.extended.value
+                             classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{> 'systems/shadowrun5e/dist/templates/apps/partials/interval-units.hbs'
+                    name="system.action.extended.unit"
+                    selected=source.system.action.extended.unit
+                    label=(localize 'SR5.ActiveEffect.Duration.Units')
+                    disabled=@root.isPlayMode}}
             </label>
         </div>
     </div>

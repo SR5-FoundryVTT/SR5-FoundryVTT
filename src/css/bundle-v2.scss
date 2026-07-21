@@ -282,6 +282,11 @@ body.theme-light,
             color: var(--sr5v2-option-text);
             font-weight: 400;
         }
+
+        option.folder-option {
+            color: var(--sr5v2-option-group-text);
+            font-weight: 600;
+        }
     }
 
     .window-header {
@@ -552,7 +557,8 @@ body.theme-light,
     }
 
     input,
-    select {
+    select,
+    textarea {
         color: var(--sr5v2-control-text);
     }
 
