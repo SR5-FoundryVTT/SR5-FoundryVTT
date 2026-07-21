@@ -251,7 +251,8 @@
 
                 .etm-row-actions {
                     display: grid;
-                    grid-template-columns: repeat(6, 1.4em);
+                    grid-auto-flow: column;
+                    grid-auto-columns: 1.4em;
                     justify-items: center;
                     align-items: center;
                     font-size: var(--font-size-13);

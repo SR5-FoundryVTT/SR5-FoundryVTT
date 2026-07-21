@@ -135,8 +135,10 @@
                     </span>
                 </div>
 
-                {{! Six fixed slots, empty ones reserved, so the icons form columns. }}
+                {{! A slot some row can fill is reserved on every row, so the icons form
+                    columns. A slot no row can fill isn't rendered at all. }}
                 <div class="etm-row-actions">
+                    {{#if @root.actionColumns.roll}}
                     {{#if this.canRoll}}
                     <a data-action="rollTest" data-tooltip="SR5.ExtendedTestManager.Actions.Roll"><i class="fas fa-dice"></i></a>
                     {{else if this.rollBlockedByInterval}}
@@ -150,7 +152,9 @@
                     {{else}}
                     <span class="etm-action-empty"></span>
                     {{/if}}
+                    {{/if}}
 
+                    {{#if @root.actionColumns.pauseResume}}
                     {{#if this.canPauseResume}}
                         {{#if this.isPaused}}
                         <a data-action="resumeTest" data-tooltip="SR5.ExtendedTestManager.Actions.Resume"><i class="fas fa-play"></i></a>
@@ -160,7 +164,9 @@
                     {{else}}
                     <span class="etm-action-empty"></span>
                     {{/if}}
+                    {{/if}}
 
+                    {{#if @root.actionColumns.end}}
                     {{#if this.canEnd}}
                     <a data-action="completeTest" data-tooltip="SR5.ExtendedTestManager.Actions.Complete"><i class="fas fa-check"></i></a>
                     <a data-action="cancelTest" data-tooltip="SR5.ExtendedTestManager.Actions.Cancel"><i class="fas fa-ban"></i></a>
@@ -168,17 +174,22 @@
                     <span class="etm-action-empty"></span>
                     <span class="etm-action-empty"></span>
                     {{/if}}
+                    {{/if}}
 
+                    {{#if @root.actionColumns.edit}}
                     {{#if this.canEdit}}
                     <a data-action="editTest" data-tooltip="SR5.ExtendedTestManager.Actions.Edit"><i class="fas fa-edit"></i></a>
                     {{else}}
                     <span class="etm-action-empty"></span>
                     {{/if}}
+                    {{/if}}
 
+                    {{#if @root.actionColumns.delete}}
                     {{#if this.canDelete}}
                     <a data-action="deleteTest" data-tooltip="SR5.ExtendedTestManager.Actions.Delete"><i class="fas fa-trash"></i></a>
                     {{else}}
                     <span class="etm-action-empty"></span>
+                    {{/if}}
                     {{/if}}
                 </div>
             </div>

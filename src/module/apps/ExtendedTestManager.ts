@@ -66,6 +66,9 @@ interface ExtendedTestManagerContext extends HandlebarsApplicationMixin.RenderCo
     sortOptions: { value: string; label: string }[];
     actorOptions: { uuid: string; name: string }[];
     isGM: boolean;
+    // Action slots at least one visible row can fill. A slot no row uses is dropped
+    // entirely, so a player isn't left with a row of blank reserved columns.
+    actionColumns: { roll: boolean; pauseResume: boolean; end: boolean; edit: boolean; delete: boolean };
     currentTime: string;
     timePresets: (WorldTimePreset & { label: string })[];
     // Non-default filters hidden inside the collapsed advanced section.
@@ -186,6 +189,16 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
         context.rows = filtered.map(record => this.#prepareRow(record, user));
         context.filters = this.filterState;
         context.isGM = user.isGM;
+
+        // Reserved across the whole list rather than per row, so the icons still form
+        // columns, but a slot nobody can use costs no width.
+        context.actionColumns = {
+            roll: context.rows.some(row => row.canRoll || row.rollBlockedByInterval || row.canReactivate),
+            pauseResume: context.rows.some(row => row.canPauseResume),
+            end: context.rows.some(row => row.canEnd),
+            edit: context.rows.some(row => row.canEdit),
+            delete: context.rows.some(row => row.canDelete),
+        };
 
         context.statusOptions = STATUS_FILTERS.map(value => ({
             value,
