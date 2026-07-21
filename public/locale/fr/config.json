@@ -563,7 +563,6 @@
                 "month": "Dernier mois",
                 "week": "Dernière semaine"
             },
-            "PoolFromSnapshotHint": "La réserve de dés provient de l'acteur et du dernier jet, elle ne peut pas être définie ici.",
             "PoolUsed": "Réserve",
             "RealTime": "Temps réel",
             "Rolls": "Lancers effectués",

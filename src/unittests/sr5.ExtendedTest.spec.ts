@@ -443,6 +443,38 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             assert.isTrue(updated.log.some(entry => entry.action === 'update'));
         });
 
+        it('logs only the fields a resubmitted form actually changed', async () => {
+            const record = await createRecord();
+
+            // The config dialog submits every field it renders, changed or not.
+            await ExtendedTestFlow.update(record.id, {
+                name: record.name,
+                notes: record.notes,
+                actorUuid: record.actorUuid,
+                dicePool: record.dicePool,
+                accumulatedHits: 2,
+                threshold: record.threshold,
+                interval: { ...record.interval },
+                cumulativeModifier: record.cumulativeModifier,
+                advanceTimeOnRoll: record.advanceTimeOnRoll,
+                permissions: foundry.utils.deepClone(record.permissions),
+            });
+
+            const updated = ExtendedTestStorage.get(record.id)!;
+            const entry = updated.log.filter(entry => entry.action === 'update').at(-1);
+            assert.strictEqual(entry?.detail, 'accumulatedHits');
+        });
+
+        it('completes the record when hits are corrected up to the threshold', async () => {
+            const record = await createRecord({ threshold: 4 });
+
+            await ExtendedTestFlow.update(record.id, { accumulatedHits: 4 });
+            const updated = ExtendedTestStorage.get(record.id)!;
+
+            assert.strictEqual(updated.accumulatedHits, 4);
+            assert.strictEqual(updated.status, 'completed');
+        });
+
         it('applies a roll result onto the current record state', async () => {
             const record = await createRecord({ dicePool: 12, threshold: 40 });
 

@@ -20,9 +20,9 @@ interface ExtendedTestConfigContext extends HandlebarsApplicationMixin.RenderCon
     isCreate: boolean;
     canManage: boolean;
     // Records registered from a real roll take their pool from the test snapshot, so the
-    // dicePool field would be a no-op. See ExtendedTestRules.nextPool.
+    // dicePool field would be a no-op and accumulated hits are shown instead.
+    // See ExtendedTestRules.nextPool.
     poolFromSnapshot: boolean;
-    snapshotPool: number;
     actorOptions: { uuid: string; name: string; selected: boolean }[];
     userOptions: { id: string; name: string; visible: boolean; edit: boolean; roll: boolean }[];
     visibilityOptions: { value: string; label: string; selected: boolean }[];
@@ -106,6 +106,7 @@ export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(Applica
             notes: '',
             dicePool: 8,
             threshold: 4,
+            accumulatedHits: 0,
             interval: { value: 1, unit: 'minutes' },
             cumulativeModifier: true,
             advanceTimeOnRoll: false,
@@ -114,7 +115,6 @@ export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(Applica
         // Rules and permissions of an existing record are the owners business only.
         context.canManage = !record || ExtendedTestRules.canManage(record, game.user!);
         context.poolFromSnapshot = !!record?.testData;
-        context.snapshotPool = record ? ExtendedTestRules.nextPool(record) : 0;
 
         // Actors the user may associate: owned actors (GM sees all).
         context.actorOptions = game.actors!
@@ -164,9 +164,10 @@ export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(Applica
             name: String(data.name ?? '').trim(),
             notes: String(data.notes ?? ''),
             actorUuid: String(data.actorUuid ?? '') || undefined,
-            // Absent when the field is disabled for a snapshot backed record, where the
-            // stored starting pool is unused anyway. Don't zero it in that case.
+            // Only one of the two is rendered: the starting pool while it still matters, the
+            // accumulated hits once the record rolls from its snapshot. Don't zero the other.
             ...(data.dicePool === undefined ? {} : { dicePool: Math.max(Number(data.dicePool) || 0, 0) }),
+            ...(data.accumulatedHits === undefined ? {} : { accumulatedHits: Math.max(Number(data.accumulatedHits) || 0, 0) }),
             threshold: Math.max(Number(data.threshold) || 0, 0),
             interval: {
                 value: Math.max(Number(data['interval.value']) || 0, 0),

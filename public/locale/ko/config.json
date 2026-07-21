@@ -1332,7 +1332,6 @@
                 "month": "최근 한 달",
                 "week": "최근 일주일"
             },
-            "PoolFromSnapshotHint": "주사위 풀은 액터와 마지막 굴림에서 가져오며 여기서 설정할 수 없습니다.",
             "PoolUsed": "풀",
             "RealTime": "실제 시간",
             "Rolls": "굴린 횟수",

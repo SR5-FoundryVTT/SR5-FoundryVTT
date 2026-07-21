@@ -1333,7 +1333,6 @@
                 "month": "Letzter Monat",
                 "week": "Letzte Woche"
             },
-            "PoolFromSnapshotHint": "Der Würfelpool stammt vom Akteur und vom letzten Wurf und kann hier nicht gesetzt werden.",
             "PoolUsed": "Pool",
             "RealTime": "Echtzeit",
             "Rolls": "Durchgeführte Würfe",

@@ -481,6 +481,27 @@ export const ExtendedTestFlow = {
     },
 
     /**
+     * Deep compare two record values. Everything a record holds is plain JSON data, but
+     * both foundry.utils.equals and diffObject fall back to a reference compare for arrays,
+     * which the rebuilt user permission lists would always fail.
+     */
+    _valuesEqual(a: unknown, b: unknown): boolean {
+        if (a === b) return true;
+        if (a === null || b === null || typeof a !== 'object' || typeof b !== 'object') return false;
+
+        if (Array.isArray(a) || Array.isArray(b)) {
+            if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false;
+            return a.every((entry, index) => ExtendedTestFlow._valuesEqual(entry, b[index]));
+        }
+
+        const left = a as Record<string, unknown>;
+        const right = b as Record<string, unknown>;
+        const keys = Object.keys(left);
+        if (keys.length !== Object.keys(right).length) return false;
+        return keys.every(key => key in right && ExtendedTestFlow._valuesEqual(left[key], right[key]));
+    },
+
+    /**
      * Update editable fields of a record after checking edit permission.
      */
     async update(id: string, changes: Partial<ExtendedTestRecord>) {
@@ -495,20 +516,32 @@ export const ExtendedTestFlow = {
         const editableKeys = ['name', 'notes'] as const;
         // How hard the test is and who may take part stays with the owner.
         const managedKeys = [
-            'actorUuid', 'dicePool', 'threshold', 'interval',
+            'actorUuid', 'dicePool', 'accumulatedHits', 'threshold', 'interval',
             'cumulativeModifier', 'advanceTimeOnRoll', 'permissions',
         ] as const;
 
         const canManage = ExtendedTestRules.canManage(record, game.user);
         const allowedKeys = canManage ? [...editableKeys, ...managedKeys] : editableKeys;
 
+        // The config dialog always submits every field it renders, so compare before applying.
+        // Otherwise a single corrected value logs the whole form as changed.
         const applied: string[] = [];
         for (const key of allowedKeys) {
             if (!(key in changes)) continue;
-            (record as any)[key] = changes[key];
+            if (ExtendedTestFlow._valuesEqual(record[key], changes[key])) continue;
+            record[key as string] = changes[key];
             applied.push(key);
         }
         if (!applied.length) return;
+
+        // Correcting hits or threshold can reach the goal on its own. Only completion is
+        // applied here: the failure paths belong to a roll, and a reactivated record would
+        // otherwise fall straight back into the critical glitch that ended it.
+        if (record.status === 'active' && ExtendedTestRules.isComplete(record)) {
+            record.status = 'completed';
+            record.log.push(ExtendedTestFlow._logEntry('complete'));
+            ExtendedTestFlow._notifyStatus(record);
+        }
 
         record.log.push(ExtendedTestFlow._logEntry('update', applied.join(', ')));
         await ExtendedTestFlow._persist(record);

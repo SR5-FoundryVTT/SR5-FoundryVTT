@@ -1331,7 +1331,6 @@
                 "month": "Last month",
                 "week": "Last week"
             },
-            "PoolFromSnapshotHint": "The dice pool comes from the actor and the last roll, and cannot be set here.",
             "PoolUsed": "Pool",
             "RealTime": "Real Time",
             "Rolls": "Rolls performed",

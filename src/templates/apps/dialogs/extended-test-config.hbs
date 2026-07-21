@@ -28,14 +28,19 @@
             </select>
         </div>
 
-        {{! Pool and threshold are both short numbers, so they share one row. }}
+        {{! Both are short numbers, so they share one row. Once the test has rolled its pool
+            comes from the actor and the snapshot, leaving progress as the useful value. }}
         <div class="form-group">
+            {{#if poolFromSnapshot}}
+            {{! The sort options label their keys by field name, so this is the same string. }}
+            <label for="etm-config-hits">{{localize "SR5.ExtendedTestManager.Sort.accumulatedHits"}}</label>
+            {{else}}
             <label for="etm-config-pool">{{localize "SR5.DicePool"}}</label>
+            {{/if}}
             <div class="etm-config-values">
                 {{#if poolFromSnapshot}}
-                {{! The rolled pool comes from the actor and the last roll, not from this field. }}
-                <input type="number" id="etm-config-pool" value="{{snapshotPool}}" readonly disabled
-                    data-tooltip="SR5.ExtendedTestManager.PoolFromSnapshotHint"/>
+                <input type="number" id="etm-config-hits" name="accumulatedHits"
+                    value="{{record.accumulatedHits}}" min="0" step="1"/>
                 {{else}}
                 <input type="number" id="etm-config-pool" name="dicePool" value="{{record.dicePool}}" min="0" step="1"/>
                 {{/if}}

@@ -723,7 +723,6 @@
                 "month": "Último mês",
                 "week": "Última semana"
             },
-            "PoolFromSnapshotHint": "A parada de dados vem do ator e da última rolagem, e não pode ser definida aqui.",
             "PoolUsed": "Pilha",
             "RealTime": "Tempo Real",
             "Rolls": "Rolagens realizadas",
