@@ -1257,6 +1257,7 @@
                 "Resume": "재개",
                 "Roll": "굴리기"
             },
+            "ActivityLog": "활동 기록",
             "Actor": "액터",
             "AdvanceTime": "굴릴 때 게임 시간 진행",
             "AdvanceTimeTooltip": "굴림을 할 때마다 판정 간격만큼 월드 시간을 진행합니다.",

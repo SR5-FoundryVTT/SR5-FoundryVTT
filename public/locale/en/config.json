@@ -1256,6 +1256,7 @@
                 "Resume": "Resume",
                 "Roll": "Roll"
             },
+            "ActivityLog": "Activity log",
             "Actor": "Actor",
             "AdvanceTime": "Advance game time on roll",
             "AdvanceTimeTooltip": "Advance the world time by the test interval after each roll.",

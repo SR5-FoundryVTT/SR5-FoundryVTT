@@ -1258,6 +1258,7 @@
                 "Resume": "Fortsetzen",
                 "Roll": "Würfeln"
             },
+            "ActivityLog": "Aktivitätsprotokoll",
             "Actor": "Akteur",
             "AdvanceTime": "Spielzeit beim Würfeln vorstellen",
             "AdvanceTimeTooltip": "Stellt die Weltzeit nach jedem Wurf um das Probenintervall vor.",

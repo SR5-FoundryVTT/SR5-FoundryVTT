@@ -488,6 +488,7 @@
                 "Resume": "Reprendre",
                 "Roll": "Lancer"
             },
+            "ActivityLog": "Journal d'activité",
             "Actor": "Acteur",
             "AdvanceTime": "Avancer le temps de jeu à chaque lancer",
             "AdvanceTimeTooltip": "Avance le temps du monde de l'intervalle du test après chaque lancer.",

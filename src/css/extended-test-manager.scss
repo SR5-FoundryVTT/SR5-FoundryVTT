@@ -2,6 +2,10 @@
 @use 'config/mixins';
 
 .sr5.extended-test-manager {
+    // Below this the toolbar wraps and the row value tracks start colliding with the
+    // name column. ApplicationV2._updatePosition clamps dragging to the computed value.
+    min-width: 750px;
+
     .extended-test-manager-app {
         display: flex;
         flex-flow: column nowrap;
@@ -30,15 +34,10 @@
                 align-items: center;
 
                 button {
-                    font-size: var(--font-size-11);
+                    font-size: var(--font-size-12);
                     padding: 1px 6px;
                     line-height: 1.4em;
                     width: auto;
-                }
-
-                input {
-                    width: 4.5em;
-                    color: variables.$white;
                 }
             }
         }
@@ -58,15 +57,27 @@
                 align-items: center;
             }
 
+            // The search field takes whatever the fixed width controls leave over.
+            .etm-filters {
+                flex: 1;
+                min-width: 20em;
+            }
+
+            // Foundry's base select is width: 100%, which would eat the row's slack.
+            // Sized to their content instead, so only the search field grows.
             select {
+                flex: 0 0 auto;
+                width: auto;
+                max-width: 12em;
                 height: 1.8em;
-                font-size: var(--font-size-11);
+                font-size: var(--font-size-12);
             }
 
             input[type='search'] {
-                min-width: 10em;
+                flex: 1;
+                min-width: 12em;
                 height: 1.8em;
-                font-size: var(--font-size-11);
+                font-size: var(--font-size-12);
                 color: variables.$white;
             }
 
@@ -87,7 +98,7 @@
             @include mixins.collapsible;
 
             margin: 0 0.5em 0.3em;
-            font-size: var(--font-size-11);
+            font-size: var(--font-size-12);
 
             // Flag a filter hidden behind the collapsed summary.
             .etm-filter-count {
@@ -95,7 +106,7 @@
                 color: variables.$black;
                 border-radius: 1em;
                 padding: 0 0.45em;
-                font-size: var(--font-size-10);
+                font-size: var(--font-size-12);
             }
 
             .etm-advanced-filter-fields {
@@ -161,7 +172,7 @@
                         display: flex;
                         flex-flow: row wrap;
                         gap: 0.75em;
-                        font-size: var(--font-size-11);
+                        font-size: var(--font-size-12);
                         color: variables.$grey;
 
                         a {
@@ -282,8 +293,17 @@
                     }
 
                     .etm-log {
+                        @include mixins.collapsible;
+
                         color: variables.$grey;
-                        font-size: var(--font-size-11);
+                        font-size: var(--font-size-12);
+
+                        // The entry count stands in for the body while collapsed.
+                        .etm-log-count {
+                            border: variables.$groove;
+                            border-radius: 1em;
+                            padding: 0 0.45em;
+                        }
 
                         .etm-log-entry {
                             display: flex;
@@ -313,7 +333,7 @@
             font-weight: bold;
             color: variables.$yellow;
             text-transform: uppercase;
-            font-size: var(--font-size-11);
+            font-size: var(--font-size-12);
             letter-spacing: 0.05em;
         }
 
@@ -425,7 +445,7 @@
         }
 
         .hint {
-            font-size: var(--font-size-11);
+            font-size: var(--font-size-12);
             color: variables.$grey;
             margin: 0;
         }
@@ -441,7 +461,7 @@
                 }
 
                 th {
-                    font-size: var(--font-size-11);
+                    font-size: var(--font-size-12);
                     color: variables.$grey;
                     text-transform: uppercase;
                 }

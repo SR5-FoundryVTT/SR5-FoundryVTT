@@ -10,8 +10,6 @@
             <button type="button" data-action="timePreset" data-seconds="{{this.seconds}}"
                 data-tooltip="SR5.TimeControl.Advance">+{{this.label}}</button>
             {{/each}}
-            <input type="number" data-action-custom-shift placeholder="{{localize 'SR5.TimeControl.CustomMinutes'}}"
-                data-tooltip="SR5.TimeControl.CustomMinutesTooltip" step="1"/>
         </span>
     </div>
     {{/if}}
@@ -47,7 +45,7 @@
     </div>
 
     {{! The rarely changed filters, collapsed by default. data-sync keeps the open state across renders. }}
-    <details class="etm-advanced-filters sr5-collapsible" data-sync="filters" {{#if advancedFilterCount}}open{{/if}}>
+    <details class="etm-advanced-filters" data-sync="filters" {{#if advancedFilterCount}}open{{/if}}>
         <summary>
             <i class="fas fa-caret-right" aria-hidden="true"></i>
             {{localize "SR5.ExtendedTestManager.Filters.Advanced"}}
@@ -244,8 +242,14 @@
                 </table>
                 {{/if}}
 
+                {{! Collapsed by default; the log grows without bound and is rarely the reason to expand a row. }}
                 {{#if this.log.length}}
-                <div class="etm-log">
+                <details class="etm-log" data-sync="log-{{this.record.id}}">
+                    <summary>
+                        <i class="fas fa-caret-right" aria-hidden="true"></i>
+                        {{localize "SR5.ExtendedTestManager.ActivityLog"}}
+                        <span class="etm-log-count">{{this.log.length}}</span>
+                    </summary>
                     {{#each this.log}}
                     <div class="etm-log-entry">
                         <span class="etm-log-action">{{this.actionLabel}}</span>
@@ -254,7 +258,7 @@
                         <span class="etm-log-time">{{this.realTime}}</span>
                     </div>
                     {{/each}}
-                </div>
+                </details>
                 {{/if}}
             </div>
             {{/if}}

@@ -357,15 +357,6 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
             });
         });
 
-        // GM time strip custom shift.
-        this.element.querySelector<HTMLElement>('[data-action-custom-shift]')?.addEventListener('change', event => {
-            const input = event.currentTarget as HTMLInputElement;
-            const minutes = Number(input.value);
-            if (!minutes || Number.isNaN(minutes)) return;
-            input.value = '';
-            void WorldTimeFlow.shift(minutes * 60);
-        });
-
         return super._onRender(context, options);
     }
 

@@ -648,6 +648,7 @@
                 "Resume": "Retomar",
                 "Roll": "Rolar"
             },
+            "ActivityLog": "Registro de atividades",
             "Actor": "Ator",
             "AdvanceTime": "Avançar o tempo de jogo ao rolar",
             "AdvanceTimeTooltip": "Avança o tempo do mundo pelo intervalo do teste após cada rolagem.",
