@@ -26,7 +26,7 @@ export const ExtendedTestDueFlow = {
     shouldAnnounce(record: ExtendedTestRecord, worldTime: number): boolean {
         if (record.status !== 'active') return false;
         if (!ExtendedTestRules.isDue(record, worldTime)) return false;
-        // A record out of dice pool is about to end, not ready to continue.
+        // A record that already met its threshold is done, not ready to continue.
         if (!ExtendedTestRules.canContinue(record)) return false;
 
         // Announced once per roll, so re-advancing rewound world time stays quiet.
