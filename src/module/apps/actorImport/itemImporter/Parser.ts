@@ -19,6 +19,7 @@ export type BaseType = {
     description?: string | null;
     notes?: string | null;
     rating?: string | null;
+    maxrating?: string | null;
     avail?: string | null;
     qty?: string | null;
     owncost?: string | null;
@@ -94,6 +95,9 @@ export abstract class Parser<T extends ItemSystems> {
 
         if (itemData.rating != null)
             technology.rating = Number(itemData.rating) || 0;
+
+        if (itemData.maxrating != null)
+            technology.max_rating = Number(itemData.maxrating) || 0;
 
         if (itemData.avail != null) {
             const availability = ItemAvailabilityFlow.parseAvailabilityString(itemData.avail);

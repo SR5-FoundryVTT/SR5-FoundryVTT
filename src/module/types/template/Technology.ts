@@ -9,6 +9,7 @@ const { SchemaField, NumberField, BooleanField, StringField, DocumentUUIDField }
 export const TechnologyData = () => ({
     // === Basic Info ===
     rating: new NumberField({ required: true, nullable: false, integer: true, initial: 1, min: 0 }),
+    max_rating: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
     availability: new ModifiableField({
         ...ModifiableValueSchema(),
         restriction: new StringField({ required: true, nullable: false, initial: 'none', choices: SR5.availabilityRestrictions }),

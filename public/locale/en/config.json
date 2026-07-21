@@ -1758,6 +1758,10 @@
                         "hint": "Master Device that this Item is Slaved to, forming a PAN or WAN",
                         "label": "Master Device"
                     },
+                    "max_rating": {
+                        "hint": "The highest Rating this item can be bought at. Zero means the item has no rating ceiling.",
+                        "label": "Max Rating"
+                    },
                     "quantity": {
                         "hint": "The amount of items this Item represents",
                         "label": "Quantity"

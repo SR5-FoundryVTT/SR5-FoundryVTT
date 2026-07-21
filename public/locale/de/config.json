@@ -1759,6 +1759,10 @@
                         "hint": "Master zu dem dieses Gerät als Teil eines PAN/WAN geslaved ist.",
                         "label": "Master"
                     },
+                    "max_rating": {
+                        "hint": "Die höchste Stufe, auf die dieser Gegenstand gekauft werden kann. Null bedeutet, dass der Gegenstand keine Stufenobergrenze hat.",
+                        "label": "Maximale Stufe"
+                    },
                     "quantity": {
                         "hint": "Welche Anzahl dieses Gegenstands ist im Inventar?",
                         "label": "Anzahl"

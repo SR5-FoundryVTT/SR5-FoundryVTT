@@ -171,7 +171,8 @@
         text-wrap: nowrap;
     }
 
-    .capacity-fields {
+    // A "current / total" pair of inputs sharing one row, e.g. capacity or rating.
+    .paired-fields {
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
         align-items: center;
@@ -179,17 +180,17 @@
         width: 100%;
     }
 
-    .capacity-field {
+    .paired-field {
         min-width: 0;
         width: 100%;
     }
 
-    .capacity-fields input,
-    .capacity-fields select {
+    .paired-fields input,
+    .paired-fields select {
         width: 100%;
     }
 
-    .capacity-separator {
+    .paired-separator {
         justify-self: center;
     }
 

@@ -86,7 +86,10 @@ export abstract class Parser<SubType extends SystemEntityType> {
             technology.availability.label = availability.label;
         }
         technology.cost.base = 'cost' in jsonData && jsonData.cost ? Number(jsonData.cost._TEXT) || 0 : 0;
-        technology.rating = 'rating' in jsonData && jsonData.rating ? Number(jsonData.rating._TEXT) || 0 : 0;
+        // Chummer's data files store the item's *maximum* rating in <rating>. An item starts out at
+        // rating 1, as it does in Chummer when added to a character.
+        technology.max_rating = 'rating' in jsonData && jsonData.rating ? Number(jsonData.rating._TEXT) || 0 : 0;
+        technology.rating = technology.max_rating > 0 ? 1 : 0;
         technology.conceal.base = 'conceal' in jsonData && jsonData.conceal ? Number(jsonData.conceal._TEXT) || 0 : 0;
     }
 

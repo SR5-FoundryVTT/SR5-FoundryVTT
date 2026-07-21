@@ -8,9 +8,13 @@
     <div class="list-item-start skinny">
         <label>{{localize "SR5.Rating"}}</label>
     </div>
-    <div class="list-item-col">
+    <div class="list-item-col paired-fields">
         {{formInput systemFields.technology.fields.rating value=source.system.technology.rating
-                    classes="short" rootId=rootId disabled=@root.isPlayMode}}
+                    max=(ift source.system.technology.max_rating source.system.technology.max_rating)
+                    classes="short paired-field" rootId=rootId disabled=@root.isPlayMode}}
+        <label class="paired-separator">/</label>
+        {{formInput systemFields.technology.fields.max_rating value=source.system.technology.max_rating
+                    classes="short paired-field" rootId=rootId disabled=@root.isPlayMode}}
     </div>
 </div>
 
