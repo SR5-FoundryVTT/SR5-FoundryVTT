@@ -72,7 +72,7 @@ export const TestCreator = {
 
         const action = item.getAction();
         if (!action) return;
-        // Determine what initial test type to use.
+
         if (!action.test) {
             action.test = 'SuccessTest';
             console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);

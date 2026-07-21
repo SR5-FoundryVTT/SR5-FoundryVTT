@@ -4,6 +4,7 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { MatrixNetworkFlow } from '../item/flows/MatrixNetworkFlow';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
+import { prepareEffectDurationStatus } from '../effect/EffectDurationStatus';
 
 export const registerItemLineHelpers = () => {
 
@@ -97,6 +98,11 @@ export const registerItemLineHelpers = () => {
 
         }
         return new Handlebars.SafeString(getDurationLabel());
+    })
+
+    // State-aware duration presentation for the actor/item effect list (state/summary/icon).
+    Handlebars.registerHelper('effectDurationStatus', function (effect: SR5ActiveEffect) {
+        return prepareEffectDurationStatus(effect);
     })
 
     Handlebars.registerHelper('isFreshImport', function (document, options) {

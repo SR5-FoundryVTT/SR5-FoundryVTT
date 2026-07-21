@@ -45,8 +45,8 @@
         "ShowSkillsWithDetailsDescription": "Quando selecionado, a exibição da lista de perícias espelhará o estilo do livro de regras básicas (itálico, atributos curtos)",
         "ShowTokenNameForChatOutputDescription": "O nome do token deve ser usado para a saída do cartão de rolagem em vez do nome do ator quando disponível",
         "ShowTokenNameForChatOutputName": "Usar Nome do Token para Cartão de Rolagem",
-        "TokenAutoRunning": "Detecção Automática de Movimento de Corrida",
-        "TokenAutoRunningDescription": "Alterna automaticamente o modo de movimento do token para corrida quando a distância medida excede a velocidade de caminhada",
+        "TokenAutoRunning": "Detectar Corrida Automaticamente",
+        "TokenAutoRunningDescription": "Alterna automaticamente o modo de movimento do token para corrida quando a distância medida excede a velocidade de caminhada.",
         "TokenHealthBars": "Barras de saúde do token",
         "TokenHealthBarsDescription": "Um monitor de dano completa será mostrada como uma barra de saúde vazia em um Token em vez de espelhar",
         "TokenRulerColorRunning": "Cor de Movimento de Corrida do Token",
@@ -119,10 +119,84 @@
         "ActiveEffect": {
             "ApplyTo": "Aplicar a",
             "ApplyTos": {
+                "TestTargetingThisActor": "Teste que Tem Este Ator como Alvo",
                 "TargetedActor": "Ator Alvo",
                 "TestItem": "Testar via Item"
             },
             "CannotAddTestViaItemToActor": "Não é possível adicionar um Efeito Ativo do tipo 'Testar via Item' a um Ator",
+            "ValueEditor": "Editar valor da mudança",
+            "FIELDS": {
+                "conditionMode": {
+                    "hint": "Incluir: o teste deve corresponder a estes valores. Excluir: o teste não deve corresponder a estes valores."
+                },
+                "conditionType": {
+                    "hint": "A parte do teste que esta condição filtra."
+                },
+                "targetName": {
+                    "label": "Nome do Alvo"
+                }
+            },
+            "AddCondition": "Adicionar Condição",
+            "AddTarget": "Adicionar Alvo",
+            "AtLeastOneTarget": "Um efeito deve manter pelo menos um alvo.",
+            "ExpiryTriggers": {
+                "CombatStart": "Início do Combate",
+                "CombatEnd": "Fim do Combate",
+                "TurnStart": "Início do Turno",
+                "TurnEnd": "Fim do Turno",
+                "MyActionStart": "Início da Minha Fase de Ação",
+                "MyActionEnd": "Fim da Minha Fase de Ação"
+            },
+            "Duration": {
+                "Active": "Ativo",
+                "ActiveDetail": "A duração está ativa.",
+                "AwaitingCombatStart": "Até o início do combate",
+                "AwaitingCombatStartDetail": "Expira quando o próximo combate começar.",
+                "AwaitingCombatEnd": "Até o fim do combate",
+                "AwaitingCombatEndDetail": "Expira quando o combate atual terminar.",
+                "AwaitingTurnStart": "Até o início do turno de combate",
+                "AwaitingTurnStartDetail": "Expira no início do próximo turno de combate.",
+                "AwaitingTurnEnd": "Até o fim do turno de combate",
+                "AwaitingTurnEndDetail": "Expira no fim do turno de combate atual.",
+                "AwaitingMyActionStart": "Até o início da fase de ação do proprietário",
+                "AwaitingMyActionStartDetail": "Expira no início da próxima fase de ação do proprietário.",
+                "AwaitingMyActionEnd": "Até o fim da fase de ação do proprietário",
+                "AwaitingMyActionEndDetail": "Expira quando o proprietário termina a fase de ação atual.",
+                "AwaitingTrigger": "Aguardando gatilho de expiração",
+                "AwaitingTriggerDetail": "A duração terminou e expirará no gatilho configurado.",
+                "Combat": "Combate",
+                "GroupCombat": "Combate",
+                "GroupTime": "Tempo",
+                "UnitTurns": "Turnos de Combate",
+                "CombatStart": "Turno de Combate {turn}, Iniciativa {initiative}",
+                "CombatStartNoInitiative": "Turno de Combate {turn}",
+                "CombatTurn": "{turns} Turno de Combate",
+                "CombatTurns": "{turns} Turnos de Combate",
+                "DoesNotExpire": "Não expira",
+                "Expired": "Expirado",
+                "ExpiredDetail": "Reinicie este efeito para começar sua duração novamente.",
+                "ExpiredOpenEditor": "Expirado — abrir editor do efeito",
+                "ExpiryTrigger": "Gatilho de Expiração",
+                "Remaining": "Restante",
+                "RemainingDetail": "{remaining} restante",
+                "Restart": "Reiniciar Duração",
+                "RestartPending": "Reinício pronto",
+                "RestartPendingDetail": "A duração será reiniciada quando as alterações forem enviadas.",
+                "ExpiryAction": "Ação ao Expirar",
+                "ExpiryActionDefault": "Padrão ({action})",
+                "ExpiryActionDelete": "Excluir",
+                "ExpiryActionUpdate": "Atualizar",
+                "Status": "Status",
+                "Units": "Unidades de duração",
+                "Value": "Duração"
+            },
+            "FilterTypes": {
+                "Attributes": "Atributos",
+                "Categories": "Categorias de Ação",
+                "Limits": "Limites",
+                "Skills": "Perícias",
+                "Tests": "Testes"
+            },
             "Modes": {
                 "Modify": "Modificar"
             },
@@ -136,7 +210,15 @@
                 "Limits": "Filtro de Limites",
                 "Skills": "Filtro de Perícias",
                 "Tests": "Filtro de Testes"
-            }
+            },
+            "RemoveCondition": "Remover Condição",
+            "RemoveTarget": "Remover Alvo",
+            "SelectionModes": {
+                "Exclude": "Excluir",
+                "Include": "Incluir"
+            },
+            "Target": "Alvo",
+            "Targets": "Alvos"
         },
         "ActiveSkills": "Perícias Ativas",
         "ActorTypes": {
@@ -386,7 +468,8 @@
             "Types": {
                 "Mana": "Mana",
                 "Physical": "Físico"
-            }
+            },
+            "OptionalSelectionCount": "Poderes Opcionais"
         },
         "Cyberware": "Cibernético",
         "CyberwareGrade": "Classe",
@@ -1297,7 +1380,9 @@
                 "Watcher": "Observador",
                 "Worker": "Inseto Trabalhador",
                 "Wraith": "Espectro"
-            }
+            },
+            "ForceAppliesSetting": "Força se Aplica a",
+            "ForceAppliesSettingHint": "Controla quais atributos do espírito recebem o bônus de Força."
         },
         "Sprite": {
             "Level": "Nível",
@@ -1429,6 +1514,9 @@
                 "DocumentEffects": "Efeitos diretamente neste documento",
                 "ItemEffects": "Efeitos coletados de itens neste documento",
                 "HelpLinkEnglishOnly": "Help (External link, English only)",
+                "OpenValueEditor": "Abrir editor de valor",
+                "ApplyValueEditor": "Aplicar edição do valor",
+                "CancelValueEditor": "Cancelar edição do valor",
                 "OnlyAllFilteredUsed": "Este efeito só se aplicará para testes que correspondam a todas as seleções",
                 "OnlyFilteredUsed": "Este efeito só se aplicará para testes que correspondam a pelo menos uma seleção",
                 "OnlyForItemTest": "Apenas afeta o teste do item pai",
@@ -1501,7 +1589,8 @@
                 "Force": "Força do espírito invocado",
                 "PreparedSpirit": "Use um ator espírito preparado em vez de criar um genérico",
                 "ReagentDrams": "Dracmas de reagentes usados para alterar o limite de invocação",
-                "SpiritType": "Tipo do espírito invocado"
+                "SpiritType": "Tipo do espírito invocado",
+                "OptionalPowerCount": "Contagem informativa de poderes opcionais do espírito (piso(força / 3))."
             },
             "Test": {
                 "BuyHits": "Não rola dados. Compra acertos usando ⌊reserva de dados / 4⌋.",
@@ -1645,7 +1734,8 @@
             "RitualNotEnoughReagents": "Não foram oferecidos reagentes suficientes.",
             "SkillCantBeDefault": "Esta pericia não pode ser lançada, pois não pode ser feita sem perícia",
             "SummoningNotConcluded": "Invocação incompleta. Aguarde o espírito se opor à invocação para determinar o dreno.",
-            "TokenSelectionNeeded": "Um ou mais tokens precisam ser selecionados"
+            "TokenSelectionNeeded": "Um ou mais tokens precisam ser selecionados",
+            "NoActorCreatePermission": "Você não tem permissão para criar atores."
         },
         "Weapon": {
             "AmmoCount": "Qtd Munição",
@@ -1746,7 +1836,11 @@
                 "Mods": "Mods"
             }
         },
-        "Wireless": "Conexão Sem Fio"
+        "Wireless": "Conexão Sem Fio",
+        "StatusEffects": {
+            "Running": "Correndo",
+            "Sprinting": "Corrida Veloz"
+        }
     },
     "TYPES": {
         "Actor": {

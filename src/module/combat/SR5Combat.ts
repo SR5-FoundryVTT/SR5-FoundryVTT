@@ -59,6 +59,21 @@ export class SR5Combat extends Combat<"base"> {
         return super.update(...args);
     }
 
+    override _onUpdate(...args: Parameters<Combat["_onUpdate"]>) {
+        super._onUpdate(...args);
+
+        // A new initiative pass can re-act the SAME combatant: SR5 inserts a pad combatant to shift
+        // the initiative order (so the turn index moves), but combat.combatant may be unchanged from
+        // Foundry's perspective. Drive the registry on turn/round changes after the acting combatant
+        // has been selected; pass-only updates still point at the previous combatant.
+        if (!game.user?.isActiveGM) return;
+        const [changed] = args;
+        const advanced = ('turn' in changed) || ('round' in changed);
+        if (advanced) {
+            void foundry.documents.ActiveEffect.registry.refresh('sr5ActionPhaseStart', { combat: this });
+        }
+    }
+
     /**
      * Add ContextMenu options to CombatTracker Entries -- adds the basic Initiative Subtractions.
      */
@@ -284,6 +299,10 @@ export class SR5Combat extends Combat<"base"> {
         if (!game.user?.isGM) {
             SocketMessage.emitForGM(FLAGS.DoCombatFunction, { id: this.id, fnName: 'nextTurn' });
             return this;
+        }
+
+        if (!passedPass && this.combatant?.actor) {
+            void foundry.documents.ActiveEffect.registry.refresh('sr5ActionPhaseEnd', { combat: this });
         }
 
         const nextTurn = this.turns.findIndex(combatant => {

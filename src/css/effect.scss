@@ -95,17 +95,197 @@
     }
 }
 
+/* Targets: target container + inline apply-to + condition rows */
+.application.sheet.active-effect-config.sr5v2 .tab[data-tab="targets"] {
+    /* Bound the tab so long target lists scroll instead of growing the window off-screen.
+       Use max-height (not height: 100%) so the section doesn't collapse against the auto-sized window. */
+    overflow-y: auto;
+    gap: var(--spacer-8, 0.5rem);
+
+    .effect-target {
+        border: 1px solid var(--color-border-light-secondary, #ccc);
+        border-radius: 4px;
+        padding: 0.5rem;
+        margin-bottom: 0.25rem;
+        position: relative;
+
+        legend {
+            font-weight: bold;
+            padding: 0 0.25rem;
+        }
+
+        .effect-target-name {
+            input[type="text"] {
+                width: 6rem;
+                min-width: 6rem;
+                height: 1.625rem;
+                font-weight: bold;
+            }
+        }
+
+        .effect-target-controls {
+            position: absolute;
+            top: -1.5rem;
+            right: 0.5rem;
+            display: flex;
+            align-items: center;
+            padding: 0 0.25rem;
+            background: var(--sr5v2-app-body-bg);
+        }
+    }
+
+    .effect-target-add {
+        margin-top: 0.5rem;
+    }
+
+    .effect-target-add,
+    .filter-condition-add {
+        a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            width: 100%;
+            padding: 0.3rem 0.5rem;
+            border: 1px dashed var(--sr5v2-border-strong);
+            border-radius: 4px;
+            color: var(--sr5v2-text-secondary);
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+
+            &:hover {
+                background: var(--sr5v2-bg-hover);
+                border-color: var(--sr5v2-border-strong);
+                border-style: solid;
+                color: var(--sr5v2-link-hover);
+            }
+        }
+    }
+
+    /* A condition row: type select, mode select, tag input and a remove button on one line */
+    .filter-condition {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        margin-bottom: 0.35rem;
+
+        select {
+            flex: 0 0 auto;
+            width: auto;
+            min-width: 8ch;
+        }
+
+        input.tagify-selection,
+        .tagify {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .inline-control {
+            flex: 0 0 auto;
+            cursor: pointer;
+        }
+    }
+}
+
 .application.sheet.active-effect-config.sr5v2 {
+    min-width: 400px;
+
+    .form-footer {
+        padding-top: 0.5rem;
+    }
+
+    /* Keep the top navigation clear of the sheet edges.
+       margin-inline overrides blocks.base's negative bleed margin. */
+    nav.sheet-tabs {
+        box-sizing: border-box;
+        width: auto;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+        margin-inline: 0.5rem;
+    }
+
     /* Facilitate resizable effect sheet and scaling effect changes to width */
     .tab.changes header,
     .tab.changes ol {
-        // grid layout: key | type | value | priority | phase | controls
-        grid-template-columns: minmax(12rem, 2fr) 7rem minmax(8rem, 1fr) 4rem 7rem 2rem !important;
+        // grid layout: target | key | type | value | priority | controls
+        grid-template-columns: minmax(5rem, 0.4fr) minmax(6rem, 0.9fr) 6rem minmax(5.4rem, 0.65fr) 3.25rem 2rem !important;
     }
 
     .tab.changes header,
     .tab.changes ol li {
         align-items: center;
+    }
+
+    .tab.changes .target select {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .tab.changes .value {
+        min-width: 0;
+    }
+
+    .sr5-effect-value-control {
+        display: flex;
+        gap: 0.2rem;
+        align-items: stretch;
+        min-width: 0;
+
+        > input[type="text"],
+        > textarea {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        > textarea {
+            // Core styles textareas as a 60px tall monospace block with vertical padding.
+            // Mirror the core text input box instead, so the single line this field shows
+            // sits on the same baseline as the key column next to it.
+            // Centre the first line with block padding rather than a tall line-height,
+            // so wrapped lines stay tightly spaced. 2px accounts for the 1px borders.
+            box-sizing: border-box;
+            height: var(--input-height);
+            min-height: var(--input-height);
+            padding: calc((var(--input-height) - 2px - 1.25em) / 2) 0.5rem;
+            font: inherit;
+            line-height: 1.25;
+            resize: none;
+            overflow: hidden;
+        }
+    }
+
+    .sr5-effect-value-control__button {
+        display: inline-flex;
+        flex: 0 0 auto;
+        align-items: center;
+        justify-content: center;
+        width: 1.7rem;
+        min-width: 1.7rem;
+        margin: 0;
+        padding: 0;
+        color: var(--sr5v2-text-secondary);
+        background: var(--sr5v2-bg-subtle);
+        border: 1px solid var(--sr5v2-border);
+        border-radius: 0.3rem;
+        box-shadow: none;
+
+        &:hover,
+        &:focus-visible {
+            color: var(--sr5v2-text-primary);
+            background: var(--sr5v2-bg-hover);
+            border-color: var(--sr5v2-control-border-hover);
+        }
+    }
+
+    /* Modifier changes only use the key column; span it and keep controls in the last column. */
+    .tab.changes ol li.change-modifier .key {
+        grid-column: 2 / 6;
+    }
+
+    .tab.changes ol li.change-modifier .controls {
+        grid-column: 6;
     }
 
     .tab.changes header .controls,
@@ -121,5 +301,289 @@
         align-items: center;
         margin: 0;
         padding: 0;
+    }
+
+    .tab[data-tab="duration"] {
+        container-type: inline-size;
+        overflow-y: auto;
+    }
+
+    .sr5-effect-duration {
+        display: grid;
+        gap: 0.75rem;
+        padding: 0.5rem;
+    }
+
+    .duration-panel {
+        display: grid;
+        gap: 0.5rem;
+        min-width: 0;
+        margin: 0;
+        padding: 0.65rem 0.75rem 0.75rem;
+        border: 1px solid var(--sr5v2-border);
+        border-radius: 0.4rem;
+        background: var(--sr5v2-bg-elevated);
+
+        > legend {
+            padding-inline: 0.35rem;
+            color: var(--sr5v2-text-primary);
+            font-weight: 700;
+        }
+    }
+
+    .duration-control {
+        display: grid;
+        grid-template-columns: minmax(9rem, 0.7fr) minmax(14rem, 1.5fr);
+        gap: 0.75rem;
+        align-items: center;
+        min-width: 0;
+
+        > label {
+            color: var(--sr5v2-label);
+            font-weight: 700;
+        }
+    }
+
+    .duration-control-fields {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        min-width: 0;
+
+        input,
+        select {
+            width: 100%;
+            min-width: 0;
+        }
+    }
+
+    .duration-value-fields {
+        display: grid;
+        grid-template-columns: minmax(5rem, 1fr) minmax(9rem, 1fr);
+    }
+
+    .duration-status {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        gap: 0.65rem;
+        align-items: center;
+        padding: 0.2rem 0;
+        color: var(--sr5v2-text-primary);
+    }
+
+    .duration-status-icon {
+        width: 1.25rem;
+        color: var(--sr5v2-label);
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    .duration-status-copy {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+
+        strong {
+            color: var(--sr5v2-text-primary);
+            line-height: 1.2;
+        }
+
+        span {
+            color: var(--sr5v2-text-muted);
+            font-size: 0.85em;
+            line-height: 1.25;
+        }
+    }
+
+    .duration-status-panel--pending,
+    .duration-status-panel--restart-pending {
+        border-color: var(--sr5v2-label-muted);
+        background: color-mix(in srgb, var(--sr5v2-label) 8%, transparent);
+    }
+
+    .duration-status-panel--expired {
+        border-color: var(--sr5-theme-failure);
+        background: color-mix(in srgb, var(--sr5-theme-failure) 8%, transparent);
+
+        .duration-status-icon {
+            color: var(--sr5-theme-failure);
+        }
+    }
+
+    .duration-start-row {
+        display: grid;
+        grid-template-columns: minmax(9rem, 0.7fr) minmax(14rem, 1.5fr);
+        gap: 0.75rem;
+        align-items: baseline;
+        min-width: 0;
+        padding-block: 0.2rem;
+
+        .label {
+            color: var(--sr5v2-label);
+            font-weight: 700;
+        }
+
+        .value {
+            min-width: 0;
+            color: var(--sr5v2-text-primary);
+            font-weight: 600;
+            text-align: right;
+            overflow-wrap: anywhere;
+        }
+    }
+
+    .duration-restart {
+        display: inline-flex;
+        gap: 0.4rem;
+        align-items: center;
+        justify-content: center;
+        width: auto;
+        min-width: max-content;
+        margin: 0;
+        padding-inline: 0.75rem;
+        color: var(--sr5v2-control-text);
+        background: var(--sr5v2-control-bg-strong);
+        border-color: var(--sr5v2-control-border);
+
+        &:hover,
+        &:focus-visible {
+            color: var(--sr5v2-text-primary);
+            background: var(--sr5v2-bg-hover);
+            border-color: var(--sr5v2-control-border-hover);
+        }
+    }
+
+    @container (max-width: 520px) {
+        .duration-control {
+            grid-template-columns: 1fr;
+            gap: 0.25rem;
+        }
+
+        .duration-start-row {
+            grid-template-columns: 1fr;
+            gap: 0.1rem;
+
+            .value {
+                text-align: left;
+            }
+        }
+
+        .duration-status {
+            grid-template-columns: auto minmax(0, 1fr);
+        }
+
+        .duration-restart {
+            grid-column: 1 / -1;
+            width: 100%;
+        }
+    }
+}
+
+.sr5-active-effect-value-editor {
+    min-width: min(22.5rem, calc(100vw - 1rem));
+    min-height: 215px;
+
+    .window-content {
+        display: flex;
+        min-height: 0;
+        padding: 0.35rem;
+    }
+
+    .sr5-effect-value-editor__body {
+        display: grid;
+        flex: 1 1 auto;
+        gap: 0.35rem;
+        grid-template-rows: minmax(0, 1fr) auto;
+        min-height: 0;
+    }
+
+    .sr5-effect-value-editor__input {
+        flex: 1 1 auto;
+        height: 100%;
+        width: 100%;
+        min-height: 8.5rem;
+        margin: 0;
+        padding: 0.4rem 0.5rem;
+        min-width: 0;
+        resize: none;
+        color: var(--color-text-primary);
+        border: 1px solid var(--color-border-light-tertiary, #7a7971);
+        border-radius: 0.3rem;
+        font-family: monospace;
+        font-size: var(--font-size-12);
+        line-height: 1.35;
+    }
+
+    .sr5-effect-value-editor__controls {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.25rem;
+    }
+
+    .sr5-effect-value-editor__button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.8rem;
+        height: 1.8rem;
+        margin: 0;
+        padding: 0;
+        color: var(--color-text-primary);
+        border: 1px solid var(--color-border-dark-5, #4b4a44);
+        border-radius: 0.3rem;
+        box-shadow: none;
+
+        &:hover,
+        &:focus-visible {
+            color: var(--color-text-primary);
+            text-shadow: 0 0 5px var(--color-shadow-primary);
+            border-color: var(--color-border-highlight-alt, #c9b36b);
+        }
+    }
+}
+
+/* Active Effect rows shared by actor and item sheets. */
+.sr5v2 {
+    .list-item {
+        .effect-duration-col {
+            flex: 0 1 9rem;
+            min-width: 5rem;
+            justify-content: flex-start;
+            overflow: hidden;
+
+            > i {
+                flex: 0 0 1rem;
+                color: var(--sr5v2-text-muted);
+                text-align: center;
+            }
+
+            > label {
+                min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+
+        .effect-duration-col--pending > i {
+            color: var(--sr5v2-label);
+        }
+
+        .effect-duration-col--expired {
+            color: var(--sr5-theme-failure);
+
+            > i {
+                color: inherit;
+            }
+        }
+
+        .effect-expired-control {
+            color: var(--sr5-theme-failure);
+
+            &:hover,
+            &:focus-visible {
+                color: var(--sr5v2-link-hover);
+            }
+        }
     }
 }

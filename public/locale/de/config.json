@@ -66,7 +66,9 @@
         "UseDamageConditionDescription": "Das System markiert die Token entsprechend ihrem Zustandsmonitor",
         "UseDamageConditionName": "Systembehandlung für Token-Statuseffekte verwenden",
         "UseImportIconOverridesDescription": "Beim Importieren von Items die gleichen Symbole für verschiedene Itemtypen verwenden, wenn dies sinnvoll ist. Deaktivieren wenn benutzerdefinierte Symbole verwendet werden.",
-        "UseImportIconOverridesName": "Standard Importer Icon benutzen"
+        "UseImportIconOverridesName": "Standard Importer Icon benutzen",
+        "TokenAutoRunning": "Laufbewegung automatisch erkennen",
+        "TokenAutoRunningDescription": "Wechselt den Bewegungsmodus des Tokens automatisch auf Laufen, wenn die gemessene Distanz die Gehgeschwindigkeit überschreitet."
     },
     "SR5": {
         "AP": "DK",
@@ -128,14 +130,22 @@
         "ActiveEffect": {
             "ApplyTo": "Anwenden auf",
             "ApplyTos": {
+                "TestTargetingThisActor": "Probe, die diesen Akteur als Ziel hat",
                 "TargetedActor": "Anvisierten Akteur",
                 "TestItem": "Probe aus Item"
             },
             "CannotAddTestViaItemToActor": "Einem Akteur kann kein Active Effect vom Typ 'Probe aus Item' hinzugefügt werden.",
+            "ValueEditor": "Wert der Änderung bearbeiten",
             "FIELDS": {
                 "applyByTest": {
                     "hint": "Anwenden auf Test des Items",
                     "label": "Anwenden auf Test"
+                },
+                "conditionMode": {
+                    "hint": "Einschließen: Die Probe muss diesen Werten entsprechen; Ausschließen: Die Probe darf diesen Werten nicht entsprechen."
+                },
+                "conditionType": {
+                    "hint": "Welcher Teil der Probe durch diese Bedingung gefiltert wird."
                 },
                 "applyTo": {
                     "hint": "Anwenden auf verschiedene Ziele",
@@ -172,12 +182,84 @@
                 "selection_tests": {
                     "hint": "Nur für Tests mit diesen Proben",
                     "label": "Proben-Filter"
+                },
+                "targetName": {
+                    "label": "Zielname"
                 }
+            },
+            "AddCondition": "Bedingung hinzufügen",
+            "AddTarget": "Ziel hinzufügen",
+            "AtLeastOneTarget": "Ein Effekt muss mindestens ein Ziel behalten.",
+            "ExpiryTriggers": {
+                "CombatStart": "Kampfbeginn",
+                "CombatEnd": "Kampfende",
+                "TurnStart": "Rundenbeginn",
+                "TurnEnd": "Rundenende",
+                "MyActionStart": "Beginn meiner Handlungsphase",
+                "MyActionEnd": "Ende meiner Handlungsphase"
+            },
+            "Duration": {
+                "Active": "Aktiv",
+                "ActiveDetail": "Die Dauer ist aktiv.",
+                "AwaitingCombatStart": "Bis Kampfbeginn",
+                "AwaitingCombatStartDetail": "Läuft ab, wenn der nächste Kampf beginnt.",
+                "AwaitingCombatEnd": "Bis Kampfende",
+                "AwaitingCombatEndDetail": "Läuft ab, wenn der aktuelle Kampf endet.",
+                "AwaitingTurnStart": "Bis Beginn der Kampfrunde",
+                "AwaitingTurnStartDetail": "Läuft zu Beginn der nächsten Kampfrunde ab.",
+                "AwaitingTurnEnd": "Bis Ende der Kampfrunde",
+                "AwaitingTurnEndDetail": "Läuft am Ende der aktuellen Kampfrunde ab.",
+                "AwaitingMyActionStart": "Bis Beginn der Handlungsphase des Besitzers",
+                "AwaitingMyActionStartDetail": "Läuft zu Beginn der nächsten Handlungsphase des Besitzers ab.",
+                "AwaitingMyActionEnd": "Bis Ende der Handlungsphase des Besitzers",
+                "AwaitingMyActionEndDetail": "Läuft ab, wenn der Besitzer die aktuelle Handlungsphase beendet.",
+                "AwaitingTrigger": "Wartet auf Ablauf-Auslöser",
+                "AwaitingTriggerDetail": "Die Dauer ist abgelaufen und der Effekt wartet auf seinen konfigurierten Auslöser.",
+                "Combat": "Kampf",
+                "GroupCombat": "Kampf",
+                "GroupTime": "Zeit",
+                "UnitTurns": "Kampfrunden",
+                "CombatStart": "Kampfrunde {turn}, Initiative {initiative}",
+                "CombatStartNoInitiative": "Kampfrunde {turn}",
+                "CombatTurn": "{turns} Kampfrunde",
+                "CombatTurns": "{turns} Kampfrunden",
+                "DoesNotExpire": "Läuft nicht ab",
+                "Expired": "Abgelaufen",
+                "ExpiredDetail": "Starte diesen Effekt neu, um seine Dauer erneut zu beginnen.",
+                "ExpiredOpenEditor": "Abgelaufen — Effekt-Editor öffnen",
+                "ExpiryTrigger": "Ablauf-Auslöser",
+                "Remaining": "Verbleibend",
+                "RemainingDetail": "{remaining} verbleibend",
+                "Restart": "Dauer neu starten",
+                "RestartPending": "Neustart bereit",
+                "RestartPendingDetail": "Die Dauer wird neu gestartet, wenn die Änderungen gespeichert werden.",
+                "ExpiryAction": "Ablaufaktion",
+                "ExpiryActionDefault": "Standard ({action})",
+                "ExpiryActionDelete": "Löschen",
+                "ExpiryActionUpdate": "Aktualisieren",
+                "Status": "Status",
+                "Units": "Dauer-Einheiten",
+                "Value": "Dauer"
+            },
+            "FilterTypes": {
+                "Attributes": "Attribute",
+                "Categories": "Handlungskategorien",
+                "Limits": "Limits",
+                "Skills": "Fertigkeiten",
+                "Tests": "Proben"
             },
             "Modes": {
                 "Modify": "Modifizieren"
             },
-            "New": "Neuer Effekt"
+            "New": "Neuer Effekt",
+            "RemoveCondition": "Bedingung entfernen",
+            "RemoveTarget": "Ziel entfernen",
+            "SelectionModes": {
+                "Exclude": "Ausschließen",
+                "Include": "Einschließen"
+            },
+            "Target": "Ziel",
+            "Targets": "Ziele"
         },
         "ActiveSkills": "Aktionsfertigkeiten",
         "Actor": {
@@ -981,7 +1063,8 @@
             "Types": {
                 "Mana": "Mana",
                 "Physical": "Physisch"
-            }
+            },
+            "OptionalSelectionCount": "Optionale Kräfte"
         },
         "Cyberware": "Cyberware",
         "CyberwareGrade": "Kategorie",
@@ -2643,7 +2726,9 @@
                 "Water": "Wasser",
                 "Worker": "Insekt: Arbeiter",
                 "Wraith": "Wraith"
-            }
+            },
+            "ForceAppliesSetting": "Kraft wird angewendet auf",
+            "ForceAppliesSettingHint": "Legt fest, welche Geistattribute den Kraftbonus erhalten."
         },
         "Sprite": {
             "FIELDS": {
@@ -2897,6 +2982,9 @@
                 "EditEffect": "Bearbeite Effekt",
                 "ItemEffects": "Effekte, die von Items auf diesem Dokument gesammelt werden.",
                 "HelpLinkEnglishOnly": "Help (External link, English only)",
+                "OpenValueEditor": "Werteditor öffnen",
+                "ApplyValueEditor": "Wertänderung anwenden",
+                "CancelValueEditor": "Wertänderung abbrechen",
                 "OnlyAllFilteredUsed": "Dieser Effekt gilt nur für Proben, die allen Auswahlen entsprechen.",
                 "OnlyFilteredUsed": "Dieser Effekt gilt nur für Proben, die mindestens einer Auswahl entsprechen.",
                 "OnlyForItemTest": "Dieser Effekt gilt nur für Proben dieses Items.",
@@ -2983,7 +3071,8 @@
                 "Force": "Kraft des herbeizurufenden Geistes",
                 "PreparedSpirit": "Nutze einen vorbereiteten Geist-Akteur anstelle eines generisch Erstellten",
                 "ReagentDrams": "Dram aus Reagenzien für das Herbeirufen-Limit",
-                "SpiritType": "Art des herbeizurufenden Geistes"
+                "SpiritType": "Art des herbeizurufenden Geistes",
+                "OptionalPowerCount": "Informativer Zähler für optionale Geistkräfte (Abrunden(Kraft / 3))."
             },
             "Test": {
                 "BuyHits": "Würfelt keine Würfel. Kauft Erfolge mit ⌊Würfelpool / 4⌋.",
@@ -3133,7 +3222,8 @@
             "SkillCantBeDefault": "Auf diese Fertigkeit kann keine Probe abgelegt werden, da sie nicht improvisiert werden kann",
             "SkillSetDefaultTypeOutsideCompendium": "Nur Skillsets im konfigurierten Skillset Kompendium beeinflussen neue Akteure.",
             "SummoningNotConcluded": "Herbeirufung unvollständig. Warte auf Gegenprobe des Geists, um Entzug zu bestimmen.",
-            "TokenSelectionNeeded": "Ein oder mehrere Tokens müssen ausgewählt sein"
+            "TokenSelectionNeeded": "Ein oder mehrere Tokens müssen ausgewählt sein",
+            "NoActorCreatePermission": "Du hast keine Berechtigung, Akteure zu erstellen."
         },
         "Weapon": {
             "AmmoCount": "Munition",
@@ -3337,7 +3427,11 @@
         "Wireless": "WiFi",
         "WirelessOffline": "Offline",
         "WirelessOnline": "Online",
-        "WirelessUnavailable": "Kabel"
+        "WirelessUnavailable": "Kabel",
+        "StatusEffects": {
+            "Running": "Laufen",
+            "Sprinting": "Sprint"
+        }
     },
     "TYPES": {
         "Actor": {

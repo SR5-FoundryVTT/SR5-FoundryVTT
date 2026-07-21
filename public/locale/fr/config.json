@@ -30,7 +30,9 @@
         "ShowSkillsWithDetails": "Afficher plus de détails sur la liste des compétences",
         "ShowSkillsWithDetailsDescription": "L'écriture des compétences va copier celle du livre de règles (italique, noms d'attributs raccourcis)",
         "ShowTokenNameForChatOutputDescription": "Utiliser le nom de jetons pour les messages de lancés de dés au lieu du nom du personnage",
-        "ShowTokenNameForChatOutputName": "Utiliser les noms des Jetons dans les affichages de lancés dans le tchat"
+        "ShowTokenNameForChatOutputName": "Utiliser les noms des Jetons dans les affichages de lancés dans le tchat",
+        "TokenAutoRunning": "Détection automatique de la course",
+        "TokenAutoRunningDescription": "Bascule automatiquement le mode de déplacement du token en course lorsque la distance mesurée dépasse la vitesse de marche."
     },
     "SR5": {
         "AP": "PA",
@@ -49,6 +51,92 @@
         "Actions": "Actions",
         "Active": "Active",
         "ActiveDefense": "Défense active",
+        "ActiveEffect": {
+            "ApplyTos": {
+                "TestTargetingThisActor": "Test ciblant cet acteur"
+            },
+            "ValueEditor": "Modifier la valeur du changement",
+            "FIELDS": {
+                "conditionMode": {
+                    "hint": "Inclure : le test doit correspondre à ces valeurs. Exclure : le test ne doit pas correspondre à ces valeurs."
+                },
+                "conditionType": {
+                    "hint": "Partie du test filtrée par cette condition."
+                },
+                "targetName": {
+                    "label": "Nom de la cible"
+                }
+            },
+            "AddCondition": "Ajouter une condition",
+            "AddTarget": "Ajouter une cible",
+            "AtLeastOneTarget": "Un effet doit conserver au moins une cible.",
+            "ExpiryTriggers": {
+                "CombatStart": "Début du combat",
+                "CombatEnd": "Fin du combat",
+                "TurnStart": "Début du tour",
+                "TurnEnd": "Fin du tour",
+                "MyActionStart": "Début de ma phase d'action",
+                "MyActionEnd": "Fin de ma phase d'action"
+            },
+            "Duration": {
+                "Active": "Actif",
+                "ActiveDetail": "La durée est active.",
+                "AwaitingCombatStart": "Jusqu'au début du combat",
+                "AwaitingCombatStartDetail": "Expire au début du prochain combat.",
+                "AwaitingCombatEnd": "Jusqu'à la fin du combat",
+                "AwaitingCombatEndDetail": "Expire à la fin du combat actuel.",
+                "AwaitingTurnStart": "Jusqu'au début du tour de combat",
+                "AwaitingTurnStartDetail": "Expire au début du prochain tour de combat.",
+                "AwaitingTurnEnd": "Jusqu'à la fin du tour de combat",
+                "AwaitingTurnEndDetail": "Expire à la fin du tour de combat actuel.",
+                "AwaitingMyActionStart": "Jusqu'au début de la phase d'action du propriétaire",
+                "AwaitingMyActionStartDetail": "Expire au début de la prochaine phase d'action du propriétaire.",
+                "AwaitingMyActionEnd": "Jusqu'à la fin de la phase d'action du propriétaire",
+                "AwaitingMyActionEndDetail": "Expire lorsque le propriétaire termine la phase d'action en cours.",
+                "AwaitingTrigger": "En attente du déclencheur d'expiration",
+                "AwaitingTriggerDetail": "La durée est écoulée et expirera au déclencheur configuré.",
+                "Combat": "Combat",
+                "GroupCombat": "Combat",
+                "GroupTime": "Temps",
+                "UnitTurns": "Tours de combat",
+                "CombatStart": "Tour de combat {turn}, Initiative {initiative}",
+                "CombatStartNoInitiative": "Tour de combat {turn}",
+                "CombatTurn": "{turns} tour de combat",
+                "CombatTurns": "{turns} tours de combat",
+                "DoesNotExpire": "N'expire pas",
+                "Expired": "Expiré",
+                "ExpiredDetail": "Redémarrez cet effet pour recommencer sa durée.",
+                "ExpiredOpenEditor": "Expiré — ouvrir l'éditeur d'effet",
+                "ExpiryTrigger": "Déclencheur d'expiration",
+                "Remaining": "Restant",
+                "RemainingDetail": "{remaining} restant",
+                "Restart": "Redémarrer la durée",
+                "RestartPending": "Redémarrage prêt",
+                "RestartPendingDetail": "La durée redémarrera lorsque les modifications seront enregistrées.",
+                "ExpiryAction": "Action à l'expiration",
+                "ExpiryActionDefault": "Par défaut ({action})",
+                "ExpiryActionDelete": "Supprimer",
+                "ExpiryActionUpdate": "Mettre à jour",
+                "Status": "Statut",
+                "Units": "Unités de durée",
+                "Value": "Durée"
+            },
+            "FilterTypes": {
+                "Attributes": "Attributs",
+                "Categories": "Catégories d'action",
+                "Limits": "Limites",
+                "Skills": "Compétences",
+                "Tests": "Tests"
+            },
+            "RemoveCondition": "Retirer la condition",
+            "RemoveTarget": "Retirer la cible",
+            "SelectionModes": {
+                "Exclude": "Exclure",
+                "Include": "Inclure"
+            },
+            "Target": "Cible",
+            "Targets": "Cibles"
+        },
         "ActiveSkills": "Compétence Active",
         "ActorTypes": {
             "Character": "Personnage",
@@ -250,7 +338,8 @@
             "Types": {
                 "Mana": "Mana",
                 "Physical": "Physique"
-            }
+            },
+            "OptionalSelectionCount": "Pouvoirs optionnels"
         },
         "Cyberware": "Cyberware",
         "CyberwareGrade": "Gamme",
@@ -904,7 +993,9 @@
                 "Watcher": "Beobachterin",
                 "Worker": "Insecte Ouvrier",
                 "Wraith": "Spectre"
-            }
+            },
+            "ForceAppliesSetting": "Force applicable à",
+            "ForceAppliesSettingHint": "Détermine quels attributs de l'esprit reçoivent le bonus de Force."
         },
         "Sprite": {
             "Level": "Niveau",
@@ -1020,7 +1111,8 @@
             "RitualNotConcluded": "Le Rituel a échoué. En attente du jeu du rituel pour déterminer le drain.",
             "RitualNotEnoughReagents": "Pas assez de réactifs offerts.",
             "SkillCantBeDefault": "Cette compétence ne peut pas être lancée sans l'avoir apprise",
-            "TokenSelectionNeeded": "Un ou plusieurs jetons doivent être selectionnés"
+            "TokenSelectionNeeded": "Un ou plusieurs jetons doivent être selectionnés",
+            "NoActorCreatePermission": "Vous n'avez pas la permission de créer des acteurs."
         },
         "Tooltips": {
             "Test": {
@@ -1029,7 +1121,13 @@
                 "ResultOverrideHits": "Remplace les succès pour ce résultat de test."
             },
             "Effect": {
-                "HelpLinkEnglishOnly": "Help (External link, English only)"
+                "HelpLinkEnglishOnly": "Help (External link, English only)",
+                "OpenValueEditor": "Ouvrir l'éditeur de valeur",
+                "ApplyValueEditor": "Appliquer la modification de valeur",
+                "CancelValueEditor": "Annuler la modification de valeur"
+            },
+            "SummoningTest": {
+                "OptionalPowerCount": "Compteur informatif des pouvoirs optionnels de l'esprit (plancher(force / 3))."
             }
         },
         "Weapon": {
@@ -1088,6 +1186,10 @@
         "Wireless": "Sans fil",
         "WoundModifier": "Mod. de blessures",
         "WoundTolerance": "Tolérance blessures",
-        "Wounds": "Blessures"
+        "Wounds": "Blessures",
+        "StatusEffects": {
+            "Running": "Course",
+            "Sprinting": "Sprint"
+        }
     }
 }
