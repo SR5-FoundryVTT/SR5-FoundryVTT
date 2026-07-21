@@ -67,17 +67,43 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
-     * Whether this effect has a target for any of the given apply-to destinations.
+     * The target used for changes that don't reference one, mirroring the target _preCreate seeds.
+     * Effects predating targets, or built without them, keep behaving like plain actor effects.
      */
-    appliesToAnyOf(applyTo: string[]): boolean {
-        return this.system.targets.some(target => applyTo.includes(target.applyTo));
+    static get defaultTarget(): SR5ActiveEffect['system']['targets'][number] {
+        return { id: 'actor', name: game.i18n.localize('SR5.ActiveEffect.Target'), applyTo: 'actor', conditions: [], onlyForItemTest: false };
     }
 
     /**
-     * Resolve the target a change belongs to or undefined if no matching target is found.
+     * The effects targets, or a single default actor target when it has none.
+     *
+     * _preCreate seeds a target for every effect, so an empty list only comes from data built without
+     * targets. Routing such an effect nowhere would silently drop all of its changes, so it's treated
+     * as a plain actor effect instead.
+     */
+    get effectiveTargets(): SR5ActiveEffect['system']['targets'] {
+        return this.system.targets.length ? this.system.targets : [SR5ActiveEffect.defaultTarget];
+    }
+
+    /**
+     * Whether this effect has a target for any of the given apply-to destinations.
+     */
+    appliesToAnyOf(applyTo: string[]): boolean {
+        return this.effectiveTargets.some(target => applyTo.includes(target.applyTo));
+    }
+
+    /**
+     * Resolve the target a change belongs to or undefined if its target no longer exists.
+     *
+     * Changes created outside of _preCreate and the config sheet (updates, macros, imports) can carry
+     * no target at all. Those fall back to the effects first target, instead of silently never applying.
+     *
+     * A dangling target does resolve to undefined, as that target was removed on purpose and its
+     * changes shouldn't silently move to another destination.
      */
     targetForChange(change: { target?: string }) {
-        return this.system.targets.find(target => target.id === change.target);
+        if (!change.target) return this.effectiveTargets[0];
+        return this.effectiveTargets.find(target => target.id === change.target);
     }
 
     /**
@@ -96,19 +122,16 @@ export class SR5ActiveEffect extends ActiveEffect {
         const allowed = await super._preCreate(...args);
         if (allowed === false) return false;
 
-        if (!this.system.targets?.length) {
-            const id = 'actor';
-            const changes = this.system.toObject().changes.map(change => ({
-                ...change, target: change.target || id,
-            }));
-            this.updateSource({ system: { changes, targets: [{ id, name: game.i18n.localize('SR5.ActiveEffect.Target'), applyTo: 'actor' }] } });
-        } else {
-            const firstId = this.system.targets[0].id;
-            const sourceChanges = this.system.toObject().changes;
-            if (sourceChanges.some(change => !change.target)) {
-                const changes = sourceChanges.map(change => ({ ...change, target: change.target || firstId }));
-                this.updateSource({ system: { changes } });
-            }
+        let targetId = this.system.targets[0]?.id;
+        if (!targetId) {
+            targetId = 'actor';
+            this.updateSource({ system: { targets: [{ id: targetId, name: game.i18n.localize('SR5.ActiveEffect.Target'), applyTo: 'actor' }] } });
+        }
+
+        const sourceChanges = this.system.toObject().changes;
+        if (sourceChanges.some(change => !change.target)) {
+            const changes = sourceChanges.map(change => ({ ...change, target: change.target || targetId }));
+            this.updateSource({ system: { changes } });
         }
 
         // Core only anchors `start` for Actor-owned effects. Item-owned temporary effects need an
@@ -287,7 +310,7 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         // Otherwise hide only effects whose targets are exclusively targeted_actor,
         // as those are meant for another actor acted upon, not the one acting.
-        return this.system.targets.some(target => target.applyTo !== 'targeted_actor');
+        return this.effectiveTargets.some(target => target.applyTo !== 'targeted_actor');
     }
 
     /**
