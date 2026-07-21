@@ -47,10 +47,6 @@ export interface SR5BaseItemSheetData extends ItemSheet.RenderContext, SR5Applic
 
     // State flags
     isNestedItem: boolean;
-    calculatedEssence?: boolean;
-    calculatedCost: boolean;
-    calculatedAvailability: boolean;
-    ratingForCalculation: boolean;
     isUsingRangeCategory: boolean;
 
     // Tests
@@ -111,12 +107,6 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     sourceIsUuid: boolean
 
     isUsingRangeCategory: boolean
-
-    // Allow users to view what values is calculated and what isn´t
-    calculatedEssence: boolean
-    calculatedCost: boolean
-    calculatedAvailability: boolean
-    ratingForCalculation: boolean
 }
 
 /**
@@ -318,9 +308,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * @protected
      */
     protected _cleanParts(item: SR5Item, parts: Record<string, any>) {
-        if (item.isType('contact', 'lifestyle', 'sin', 'grid', 'program')) {
-            delete parts.details;
-        }
         if (!item.canBeMaster) {
             delete parts.network;
         }
@@ -338,6 +325,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             delete parts.licenses;
             delete parts.sinNetworks;
         }
+        if (item.isType('echo')) {
+            delete parts.details;
+        }
         return parts;
     }
 
@@ -351,12 +341,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         const data = await super._prepareContext(options) as T;
         const itemData = this.item.toObject(false).system as SR5Item['system'];
         data.actor = this.item.actorOwner;
-
-        // Calculated values for derived data.
-        data.calculatedEssence = itemData.technology?.calculated.essence.adjusted ?? false;
-        data.calculatedCost = data.calculatedEssence ? true : itemData.technology?.calculated.cost.adjusted ?? false;
-        data.calculatedAvailability = data.calculatedEssence ? true : itemData.technology?.calculated.availability.adjusted ?? false;
-        data.ratingForCalculation = data.calculatedEssence || data.calculatedCost || data.calculatedAvailability;
 
         if ('action' in itemData && itemData.action) {
             try {
@@ -390,7 +374,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 const technology = itemData.technology as any;
                 if (technology.rating === 0) delete technology.rating;
                 if (technology.quantity === 0) delete technology.quantity;
-                if (technology.cost === 0) delete technology.cost;
+                if (technology.cost?.base === 0) delete technology.cost.base;
             } catch (e) {
                 console.log(e);
             }

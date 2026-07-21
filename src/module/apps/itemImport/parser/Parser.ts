@@ -4,6 +4,7 @@ import { Sanitizer } from "@/module/sanitizer/Sanitizer";
 import { BonusHelper as BH } from "../helper/BonusHelper";
 import { IconAssign } from "../../iconAssigner/IconAssign";
 import { ImportHelper as IH } from "../helper/ImportHelper";
+import { ItemAvailabilityFlow } from "@/module/item/flows/ItemAvailabilityFlow";
 import { TechnologyType } from "src/module/types/template/Technology";
 import { DataDefaults, SystemConstructorArgs, SystemEntityType } from "src/module/data/DataDefaults";
 
@@ -77,9 +78,18 @@ export abstract class Parser<SubType extends SystemEntityType> {
     }
 
     private setTechnology(technology: TechnologyType, jsonData: ParseData) {
-        technology.availability = 'avail' in jsonData && jsonData.avail ? jsonData.avail._TEXT || '' : '';
-        technology.cost = 'cost' in jsonData && jsonData.cost ? Number(jsonData.cost._TEXT) || 0 : 0;
-        technology.rating = 'rating' in jsonData && jsonData.rating ? Number(jsonData.rating._TEXT) || 0 : 0;
+        if ('avail' in jsonData && jsonData.avail) {
+            const availability = ItemAvailabilityFlow.parseAvailabilityString(jsonData.avail._TEXT || '');
+            technology.availability.base = availability.base;
+            technology.availability.value = availability.value;
+            technology.availability.restriction = availability.restriction;
+            technology.availability.label = availability.label;
+        }
+        technology.cost.base = 'cost' in jsonData && jsonData.cost ? Number(jsonData.cost._TEXT) || 0 : 0;
+        // Chummer's data files store the item's *maximum* rating in <rating>. An item starts out at
+        // rating 1, as it does in Chummer when added to a character.
+        technology.max_rating = 'rating' in jsonData && jsonData.rating ? Number(jsonData.rating._TEXT) || 0 : 0;
+        technology.rating = technology.max_rating > 0 ? 1 : 0;
         technology.conceal.base = 'conceal' in jsonData && jsonData.conceal ? Number(jsonData.conceal._TEXT) || 0 : 0;
     }
 

@@ -593,7 +593,7 @@
                     },
                     "is_hardened": {
                         "hint": "If this Armor grants hardened protection",
-                        "label": "Hardened Active"
+                        "label": "Hardened"
                     },
                     "immunities": {
                         "hint": "Damage sources this armor grants Immunity against",
@@ -644,7 +644,18 @@
         "AttrWillpower": "Willpower",
         "Attribute": "Attribute",
         "Attributes": "Attributes",
-        "Availability": "Avail",
+        "Availability": "Availability",
+        "AvailabilityRestriction": "Availability Restriction",
+        "AvailabilityRestrictions": {
+            "Forbidden": "Forbidden",
+            "None": "None",
+            "Restricted": "Restricted"
+        },
+        "AvailabilityRestrictionSuffixes": {
+            "Forbidden": "F",
+            "None": "",
+            "Restricted": "R"
+        },
         "Awakened": "Awakened",
         "AwakenedEmerged": "Awakened/Emerged",
         "Barrel": "Barrel",
@@ -1747,6 +1758,10 @@
                         "hint": "Master Device that this Item is Slaved to, forming a PAN or WAN",
                         "label": "Master Device"
                     },
+                    "max_rating": {
+                        "hint": "The highest Rating this item can be bought at. Zero means the item has no rating ceiling.",
+                        "label": "Max Rating"
+                    },
                     "quantity": {
                         "hint": "The amount of items this Item represents",
                         "label": "Quantity"
@@ -1918,9 +1933,8 @@
                 "OpenInventory": "Inventory"
             },
             "Item": {
-                "AvailabilityAdjustment": "Scale Availability w/ Rating",
-                "CostAdjustment": "Scale Cost w/ Rating",
-                "EssenceAdjustment": "Scale Essence w/ Rating"
+                "EssenceAdjustment": "Scale Essence w/ Rating",
+                "Properties": "Item Properties"
             },
             "MarkPlacement": {
                 "PlaceOnDevice": "Place on device",
@@ -2270,6 +2284,7 @@
         "OpposedType": "Type",
         "OpposingHits": "Opposing Hits",
         "OpposingNetHits": "Opposing Net Hits",
+        "Options": "Options",
         "OriginalDicePool": "Original Dice Pool",
         "OutOfRange": "Out of Range",
         "Overflow": "Overflow",
@@ -3164,8 +3179,6 @@
                 "ActionRollMode": "Default roll mode when casting this action. Will overwrite global chat setting",
                 "AddQuantity": "Add 1 Qty. {qtySome}: Add 5 Qty. {qtyMany}: Add 20 Qty.",
                 "AmmoReplaceDamage": "Set to replace weapon damage instead of modifying it",
-                "AvailabilityAdjustment": "Adjust actual availability based on the item rating",
-                "CostAdjustment": "Adjust actual cost based on the item rating",
                 "DisabledForPreparedActor": "Disabled because the prepared actor cannot be edited by your current user",
                 "EssenceAdjustment": "Adjust actual essence cost based on the item rating",
                 "RemoveQuantity": "Remove 1 Qty. {qtySome}: Remove 5 Qty. {qtyMany}: Remove 20 Qty.",

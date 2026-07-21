@@ -47,23 +47,24 @@ export const AutocompleteInlineHooksFlow =  {
             sheetClasses: [{
                 name: SR5ActiveEffectConfig.name,
                 fieldConfigs: [
-                    { selector: `.tab[data-tab="changes"] .autocomplete-key-actor ${field}`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
-                    { selector: `.tab[data-tab="changes"] .autocomplete-key-targeted_actor ${field}`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
-                    { selector: `.tab[data-tab="changes"] .autocomplete-key-test_all ${field}`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterTestData},
-                    { selector: `.tab[data-tab="changes"] .autocomplete-key-test_item ${field}`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterTestData},
-                    { selector: `.tab[data-tab="changes"] .autocomplete-key-test_target ${field}`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterTestData},
-                    { selector: `.tab[data-tab="changes"] .autocomplete-key-modifier ${field}`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterModifiersData},
+                    { selector: `.tab[data-tab="changes"] .autocomplete-key-actor input[type="text"]`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
+                    { selector: `.tab[data-tab="changes"] .autocomplete-key-targeted_actor input[type="text"]`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
+                    { selector: `.tab[data-tab="changes"] .autocomplete-key-test_all input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterTestData},
+                    { selector: `.tab[data-tab="changes"] .autocomplete-key-test_item input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterTestData},
+                    { selector: `.tab[data-tab="changes"] .autocomplete-key-test_target input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterTestData},
+                    { selector: `.tab[data-tab="changes"] .autocomplete-key-modifier input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterModifiersData},
 
-                    { selector: `.tab[data-tab="changes"] .autocomplete-value-actor ${field}`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterActor},
-                    { selector: `.tab[data-tab="changes"] .autocomplete-value-targeted_actor ${field}`, defaultPath: "", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTargetedActorData},
-                    { selector: `.tab[data-tab="changes"] .autocomplete-value-test_all ${field}`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
-                    { selector: `.tab[data-tab="changes"] .autocomplete-value-test_item ${field}`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
-                    { selector: `.tab[data-tab="changes"] .autocomplete-value-test_target ${field}`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
+                    { selector: `.tab[data-tab="changes"] .autocomplete-value-actor input[type="text"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterActor},
+                    { selector: `.tab[data-tab="changes"] .autocomplete-value-targeted_actor input[type="text"]`, defaultPath: "", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTargetedActorData},
+                    { selector: `.tab[data-tab="changes"] .autocomplete-value-test_all input[type="text"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
+                    { selector: `.tab[data-tab="changes"] .autocomplete-value-test_item input[type="text"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
+                    { selector: `.tab[data-tab="changes"] .autocomplete-value-test_target input[type="text"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
                 ]
             }, {
                 name: SR5ActiveEffectValueEditor.name,
                 fieldConfigs: [
                     { selector: `.sr5-effect-value-editor__body.autocomplete-value-actor textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterActor},
+                    { selector: `.sr5-effect-value-editor__body.autocomplete-value-item textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterActor},
                     { selector: `.sr5-effect-value-editor__body.autocomplete-value-targeted_actor textarea[name$=".value"]`, defaultPath: "", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTargetedActorData},
                     { selector: `.sr5-effect-value-editor__body.autocomplete-value-test_all textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
                     { selector: `.sr5-effect-value-editor__body.autocomplete-value-test_item textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
@@ -94,7 +95,7 @@ export const AutocompleteInlineHooksFlow =  {
     valueGetterActor: (EffectConfig: ActiveEffectAutocompleteHost) => {
         const effect = EffectConfig.document;
         if (!effect.parent) return {};
-        return effect.parent?.toObject();
+        return effect.parent.toObject();
     },
 
     /**
@@ -206,7 +207,7 @@ export const AutocompleteInlineHooksFlow =  {
             const OpposedTestClass = TestCreator._getTestClass(action.opposed.test) as typeof OpposedTest || OpposedTest;
             const successTest = new SuccessTestClass({});
             const opposedTest = new OpposedTestClass({ against: successTest.data }, {actor: item.actor ?? undefined, item});
-            
+
             return {data: opposedTest.data};
         }
         return {};

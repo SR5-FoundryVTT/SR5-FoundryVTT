@@ -1225,6 +1225,20 @@ export const SR5 = {
         'none': 'SR5.WirelessUnavailable'
     },
 
+    availabilityRestrictions: {
+        'none': 'SR5.AvailabilityRestrictions.None',
+        'restricted': 'SR5.AvailabilityRestrictions.Restricted',
+        'forbidden': 'SR5.AvailabilityRestrictions.Forbidden',
+    },
+
+    // Minimal, per-language abbreviations shown in the availability restriction select and composed
+    // value (e.g. 12R, 12F). Translators may pick a different letter than the English R/F.
+    availabilityRestrictionSuffixes: {
+        'none': 'SR5.AvailabilityRestrictionSuffixes.None',
+        'restricted': 'SR5.AvailabilityRestrictionSuffixes.Restricted',
+        'forbidden': 'SR5.AvailabilityRestrictionSuffixes.Forbidden',
+    },
+
     /**
      * The preconfigured default Shadowrun firemodes according to SR5#180
      *
@@ -1314,7 +1328,7 @@ export const SR5 = {
      */
     effectApplyTo: {
         'actor': 'SR5.FOUNDRY.Actor',
-        // 'item': 'SR5.FOUNDRY.Item', // Disabled, as systems nested item approach brings issues.
+        'item': 'SR5.FOUNDRY.Item',
         'targeted_actor': 'SR5.ActiveEffect.ApplyTos.TargetedActor',
         'test_all': 'SR5.Test',
         'test_item': 'SR5.ActiveEffect.ApplyTos.TestItem',

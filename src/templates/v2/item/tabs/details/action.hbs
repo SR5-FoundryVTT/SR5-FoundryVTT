@@ -1,0 +1,340 @@
+<div class="list-item list-item-header">
+    <div class="list-item-start skinny">
+        <label>
+            {{#if (isType item 'weapon')}}
+                {{localize "SR5.Attack"}}
+            {{else}}
+                {{localize "SR5.Action"}}
+            {{/if}}
+        </label>
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.action.fields.type.hint}}">{{systemFields.action.fields.type.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.action.fields.type value=source.system.action.type localize=true
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+{{#if system.action.type}}
+    <div class="list-item">
+        <div class="list-item-start skinny">
+            <label data-tooltip="{{systemFields.action.fields.test.hint}}">{{systemFields.action.fields.test.label}}</label>
+        </div>
+        <div class="list-item-col">
+            {{formInput systemFields.action.fields.test value=source.system.action.test options=(tests2Array activeTests)
+                        classes="short" rootId=@root.rootId disabled=true}}
+        </div>
+    </div>
+    <div class="list-item">
+        <div class="list-item-start skinny">
+            <label data-tooltip="SR5.Tooltips.Test.Extended">{{localize "SR5.Extended"}}</label>
+        </div>
+        <div class="list-item-col">
+            {{formInput systemFields.action.fields.extended.fields.value
+                        value=source.system.action.extended.value
+                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{> 'systems/shadowrun5e/dist/templates/apps/partials/interval-units.hbs'
+                name="system.action.extended.unit"
+                selected=source.system.action.extended.unit
+                label=(localize 'SR5.ActiveEffect.Duration.Units')
+                disabled=@root.isPlayMode}}
+        </div>
+    </div>
+    {{#if (or (eq system.action.type 'interrupt') (eq system.action.type 'varies'))}}
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label data-tooltip="{{systemFields.action.fields.initiative_mod.hint}}">{{systemFields.action.fields.initiative_mod.label}}</label>
+            </div>
+            <div class="list-item-col">
+                {{formInput systemFields.action.fields.initiative_mod value=source.system.action.initiative_mod
+                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            </div>
+        </div>
+    {{/if}}
+    {{#if (isType item 'action' 'critter_power')}}
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label data-tooltip="{{systemFields.action.fields.categories.hint}}">{{systemFields.action.fields.categories.label}}</label>
+            </div>
+            <div class="list-item-col">
+                {{formInput systemFields.action.fields.categories value=source.system.action.categories options=config.actionCategories
+                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            </div>
+        </div>
+    {{/if}}
+    <div class="list-item">
+        <div class="list-item-start skinny">
+            <label>{{localize "SR5.Roll"}}</label>
+        </div>
+        <div class="list-item-col">
+            {{#unless (and system.action.attribute2 (not system.action.skill))}}
+                {{#if system.action.skill}}
+                    <a class="action-roll-icon" {{#if @root.isEditMode}} data-action="toggleActionSpecialization" {{else}} disabled {{/if}} data-tooltip="{{systemFields.action.fields.spec.label}}:&nbsp;{{systemFields.action.fields.spec.hint}}">
+                        <i {{#if system.action.spec}} class="fas fa-circle-star action-specialization-icon" {{else}} class="fa-light fa-circle-star action-specialization-icon" {{/if}}></i>
+                    </a>
+                    <label>+</label>
+                {{/if}}
+                {{formInput systemFields.action.fields.skill value=source.system.action.skill options=(config2Array activeSkills) localize=true
+                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                <label>+</label>
+            {{/unless}}
+            {{formInput systemFields.action.fields.attribute value=source.system.action.attribute options=(config2Array attributes)
+                        localize=true classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{#unless system.action.skill}}
+                <label>+</label>
+                {{formInput systemFields.action.fields.attribute2 value=source.system.action.attribute2 options=(config2Array attributes)
+                            localize=true classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{/unless}}
+            <label>+</label>
+            {{formInput systemFields.action.fields.mod value=source.system.action.mod
+                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            <label>+</label>
+            <a class="action-roll-icon" data-tooltip="{{systemFields.action.fields.armor.label}}:&nbsp;{{systemFields.action.fields.armor.hint}}"
+                {{#if @root.isEditMode}} data-action="toggleActionArmor" {{else}} disabled {{/if}}>
+                {{#if system.action.armor}}
+                    <i class="fas fa-shield"></i>
+                {{else}}
+                    <i class="far fa-shield"></i>
+                {{/if}}
+            </a>
+        </div>
+    </div>
+    <div class="list-item">
+        <div class="list-item-start skinny">
+            <label data-tooltip="{{systemFields.action.fields.modifiers.hint}}">{{systemFields.action.fields.modifiers.label}}</label>
+        </div>
+        <div class="list-item-col">
+            {{formInput systemFields.action.fields.modifiers value=source.system.action.modifiers options=config.modifierTypes
+                        localize=true classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+        </div>
+    </div>
+    {{#ifne item.type "spell"}}{{#ifne item.type "complex_form"}}
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label data-tooltip="{{systemFields.action.fields.limit.fields.base.hint}}">{{systemFields.action.fields.limit.fields.base.label}}</label>
+            </div>
+            <div class="list-item-col">
+                {{formInput systemFields.action.fields.limit.fields.attribute value=source.system.action.limit.attribute options=(config2Array limits)
+                            localize=true classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                <label>+</label>
+                {{formInput systemFields.action.fields.limit.fields.base value=source.system.action.limit.base
+                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            </div>
+        </div>
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label data-tooltip="{{systemFields.action.fields.threshold.fields.base.hint}}">{{systemFields.action.fields.threshold.fields.base.label}}</label>
+            </div>
+            <div class="list-item-col">
+                {{formInput systemFields.action.fields.threshold.fields.base
+                            value=source.system.action.threshold.base
+                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            </div>
+        </div>
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label data-tooltip="{{systemFields.action.fields.roll_mode.hint}}">{{systemFields.action.fields.roll_mode.label}}</label>
+            </div>
+            <div class="list-item-col">
+                {{formInput systemFields.action.fields.roll_mode value=source.system.action.roll_mode localize=true
+                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            </div>
+        </div>
+    {{/ifne}}{{/ifne}}
+{{/if}}
+<div class="list-item list-item-header">
+    <div class="list-item-start skinny">
+        <label>{{localize "SR5.Damage"}}</label>
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label>{{localize "SR5.DamageType"}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.action.fields.damage.fields.type.fields.base
+                    value=source.system.action.damage.type.base localize=true
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+
+{{#if system.action.damage.type.base}}
+    {{#if (eq system.action.damage.type.base "matrix")}}
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label data-tooltip="{{systemFields.action.fields.damage.fields.biofeedback.hint}}">
+                    {{systemFields.action.fields.damage.fields.biofeedback.label}}
+                </label>
+            </div>
+            <div class="list-item-col">
+                {{formInput systemFields.action.fields.damage.fields.biofeedback
+                            value=source.system.action.damage.biofeedback localize=true classes="short"
+                            rootId=@root.rootId disabled=@root.isPlayMode}}
+            </div>
+        </div>
+    {{else}}
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label data-tooltip="{{systemFields.action.fields.damage.fields.element.fields.base.hint}}">
+                    {{systemFields.action.fields.damage.fields.element.fields.base.label}}
+                </label>
+            </div>
+            <div class="list-item-col">
+                {{formInput systemFields.action.fields.damage.fields.element.fields.base
+                            value=source.system.action.damage.element.base localize=true
+                            classes="short thicc" rootId=@root.rootId disabled=@root.isPlayMode}}
+            </div>
+        </div>
+    {{/if}}
+    {{#unless (eq item.type 'spell')}}
+        <div class="list-item">
+            <div class="list-item-start skinny">
+                <label data-tooltip="{{systemFields.action.fields.damage.fields.base.hint}}">{{systemFields.action.fields.damage.fields.base.label}}</label>
+            </div>
+            <div class="list-item-col">
+                {{formInput systemFields.action.fields.damage.fields.base value=source.system.action.damage.base
+                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formInput systemFields.action.fields.damage.fields.base_formula_operator
+                            value=source.system.action.damage.base_formula_operator
+                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                {{formInput systemFields.action.fields.damage.fields.attribute
+                            value=source.system.action.damage.attribute options=(config2Array attributes) localize=true
+                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            </div>
+        </div>
+
+        {{#unless (eq system.action.damage.type.base "matrix")}}
+            <div class="list-item">
+                <div class="list-item-start skinny">
+                    <label data-tooltip="{{systemFields.action.fields.damage.fields.ap.fields.base.hint}}">{{systemFields.action.fields.damage.fields.ap.fields.base.label}}</label>
+                </div>
+                <div class="list-item-col">
+                    {{formInput systemFields.action.fields.damage.fields.ap.fields.base
+                                value=source.system.action.damage.ap.base
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formInput systemFields.action.fields.damage.fields.ap.fields.base_formula_operator
+                                value=source.system.action.damage.ap.base_formula_operator
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                    {{formInput systemFields.action.fields.damage.fields.ap.fields.attribute
+                                value=source.system.action.damage.ap.attribute
+                                options=(config2Array attributes) localize=true
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </div>
+            </div>
+            <div class="list-item">
+                <div class="list-item-start skinny">
+                    <label data-tooltip="{{systemFields.action.fields.damage.fields.normal_weapon.hint}}">
+                        {{systemFields.action.fields.damage.fields.normal_weapon.label}}
+                    </label>
+                </div>
+                <div class="list-item-col">
+                    {{formInput systemFields.action.fields.damage.fields.normal_weapon
+                                value=source.system.action.damage.normal_weapon
+                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                </div>
+            </div>
+        {{/unless}}
+    {{/unless}}
+{{/if}}
+<div class="list-item list-item-header">
+    <div class="list-item-start skinny">
+        <label>{{systemFields.action.fields.opposed.fields.test.label}}</label>
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.action.fields.opposed.fields.test.hint}}">{{systemFields.action.fields.opposed.fields.test.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.action.fields.opposed.fields.test value=source.system.action.opposed.test
+                    options=(tests2Array opposedTests) classes="short" rootId=@root.rootId
+                    disabled=(or @root.isPlayMode (isType item 'call_in_action' 'complex_form' 'ritual' 'weapons'))}}
+    </div>
+</div>
+
+{{#if system.action.opposed.test}}
+    <div class="list-item">
+        <div class="list-item-start skinny">
+            <label>{{localize "SR5.Roll"}}</label>
+        </div>
+        <div class="list-item-col">
+            {{#unless (and system.action.opposed.attribute2 (not system.action.opposed.skill))}}
+                {{formInput systemFields.action.fields.opposed.fields.skill value=source.system.action.opposed.skill
+                            options=(config2Array activeSkills) localize=true
+                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+                <label>+</label>
+            {{/unless}}
+            {{formInput systemFields.action.fields.opposed.fields.attribute
+                        value=source.system.action.opposed.attribute
+                        options=(config2Array attributes) localize=true
+                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{#unless system.action.opposed.skill}}
+                <label>+</label>
+                {{formInput systemFields.action.fields.opposed.fields.attribute2
+                            value=source.system.action.opposed.attribute2
+                            options=(config2Array attributes) localize=true
+                            classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            {{/unless}}
+            <label>+</label>
+            {{formInput systemFields.action.fields.opposed.fields.mod value=source.system.action.opposed.mod
+                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            <label>+</label>
+            <a class="action-roll-icon" data-tooltip="{{systemFields.action.fields.opposed.fields.armor.label}}:&nbsp;{{systemFields.action.fields.opposed.fields.armor.hint}}"
+                {{#if @root.isEditMode}} data-action="toggleOpposedArmor" {{else}} disabled {{/if}}>
+                {{#if system.action.opposed.armor}}
+                    <i class="fas fa-shield"></i>
+                {{else}}
+                    <i class="far fa-shield"></i>
+                {{/if}}
+            </a>
+        </div>
+    </div>
+{{/if}}
+<div class="list-item list-item-header">
+    <div class="list-item-start skinny">
+        <label>{{systemFields.action.fields.opposed.fields.resist.fields.test.label}}</label>
+    </div>
+</div>
+
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.action.fields.opposed.fields.resist.fields.test.hint}}">{{systemFields.action.fields.opposed.fields.resist.fields.test.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.action.fields.opposed.fields.resist.fields.test
+                    value=source.system.action.opposed.resist.test options=(tests2Array resistTests)
+                    classes="short" rootId=@root.rootId
+                    disabled=(or @root.isPlayMode (isType item 'call_in_action' 'complex_form' 'ritual' 'weapons'))}}
+    </div>
+</div>
+
+{{#if system.action.opposed.resist.test}}
+    <div class="list-item">
+        <div class="list-item-start skinny">
+            <label>{{localize "SR5.Roll"}}</label>
+        </div>
+        <div class="list-item-col">
+            {{formInput systemFields.action.fields.opposed.fields.resist.fields.attribute
+                        value=source.system.action.opposed.resist.attribute
+                        options=(config2Array attributes) localize=true
+                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            <label>+</label>
+            {{formInput systemFields.action.fields.opposed.fields.resist.fields.attribute2
+                        value=source.system.action.opposed.resist.attribute2
+                        options=(config2Array attributes) localize=true
+                        classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+            <label>+</label>
+            <a class="action-roll-icon" data-tooltip="{{systemFields.action.fields.opposed.fields.resist.fields.armor.label}}:&nbsp;{{systemFields.action.fields.opposed.fields.resist.fields.armor.hint}}"
+                {{#if @root.isEditMode}} data-action="toggleResistArmor" {{else}} disabled {{/if}}>
+                {{#if system.action.opposed.resist.armor}}
+                    <i class="fas fa-shield"></i>
+                {{else}}
+                    <i class="far fa-shield"></i>
+                {{/if}}
+            </a>
+        </div>
+    </div>
+{{/if}}

@@ -124,7 +124,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      */
     override get actor(): SR5Actor | null {
         if (this.parent instanceof SR5Actor) return this.parent;
-        if (this.parent instanceof SR5Item) return this.parent?.parent;
+        if (this.parent instanceof SR5Item) return this.parent.actorOwner ?? null;
         return null;
     }
 
@@ -323,6 +323,10 @@ export class SR5ActiveEffect extends ActiveEffect {
             const appliesToActor = !!target && (target.applyTo === 'actor' || target.applyTo === 'targeted_actor');
             if (!appliesToActor) return {};
         }
+        if (targetDoc instanceof SR5Item && change.effect instanceof SR5ActiveEffect) {
+            const target = change.effect.targetForChange(change as { target?: string });
+            if (target?.applyTo !== 'item') return {};
+        }
 
         // Skip applying this change if the target key does not exist on the model.
         // TypedObjectField will otherwise create the missing property as a string,
@@ -398,14 +402,12 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
-     * Resolve a dynamic change value to the actual numerical value. A dynamic change value contains key references
-     * to model properties, which must be resolved before application as literal values.
+     * Resolve a dynamic change value against model data before it's applied to a document.
      *
-     * A dynamic change value follows the same rules as a Foundry roll formula (including dice pools).
-     *
-     * A change could contain the key of 'system.attributes.body' with the type add and a dynamic value of
-     * '@system.technology.rating * 3'. The dynamic property path would be taken from either the source or parent
-     * document of the effect before the resolved value would be applied onto the target document / object.
+     * A dynamic value contains @property references (e.g. '@system.technology.rating * 3'),
+     * substituted from source, then evaluated with Foundry's Math-sandboxed evaluator. On success,
+     * change.value is overwritten with the resulting number; otherwise it's left as-is so the
+     * change is skipped.
      *
      * @param source Any object style value, either a Foundry document or a plain object
      * @param change A singular ActiveEffect.ChangeData object
@@ -415,14 +417,15 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (typeof change.value !== 'string') return;
         if (change.value.length === 0) return;
 
-        // Use Foundry Roll Term parser to both resolve dynamic values and resolve calculations.
-        const expression = Roll.replaceFormulaData(change.value, source);
-        const value = Roll.validate(expression) ? Roll.safeEval(expression) : change.value;
-
-        // Overwrite change value with graceful default, to avoid NaN errors during change application.
-        // Adhere to FoundryVTT expectation of receiving string values.
-        if (value == null) change.value = '0';
-        else change.value = value.toString();
+        // Evaluated via Foundry's Math-sandboxed evaluator.
+        // Trim: a leading newline triggers ASI on safeEval's internal `return`.
+        const expression = Roll.replaceFormulaData(change.value, source).trim();
+        try {
+            const value = Roll.safeEval(expression);
+            if (Number.isFinite(value)) change.value = value.toString();
+        } catch {
+            // Unresolvable: leave change.value as-is so appliers reject it and skip the change.
+        }
     }
 
     static override migrateData(data: Parameters<typeof ActiveEffect['migrateData']>[0]) {

@@ -180,7 +180,7 @@
                     },
                     "is_hardened": {
                         "hint": "Si cette armure accorde une protection renforcee",
-                        "label": "Renforcee active"
+                        "label": "Renforcee"
                     },
                     "immunities": {
                         "hint": "Damage sources this armor grants Immunity against",
@@ -222,7 +222,18 @@
         "AttrWillpower": "Volonté",
         "Attribute": "Attribut",
         "Attributes": "Attributs",
-        "Availability": "Dispo",
+        "Availability": "Disponibilite",
+        "AvailabilityRestriction": "Restriction de disponibilité",
+        "AvailabilityRestrictions": {
+            "Forbidden": "Interdit",
+            "None": "Aucune",
+            "Restricted": "Restreint"
+        },
+        "AvailabilityRestrictionSuffixes": {
+            "Forbidden": "F",
+            "None": "",
+            "Restricted": "R"
+        },
         "Awakened": "Éveillé",
         "AwakenedEmerged": "Éveillé/Émergé",
         "Barrel": "Canon",
@@ -654,6 +665,56 @@
                         "hint": "Modificateur d'initiative appliqué lors de l'exécution de cette action",
                         "label": "Modificateur d'Initiative"
                     }
+                },
+                "technology": {
+                    "availability": {
+                        "hint": "L'attribut Disponibilité de l'objet, il détermine la facilité avec laquelle on peut se le procurer",
+                        "label": "Disponibilité"
+                    },
+                    "conceal": {
+                        "base": {
+                            "hint": "À quel point cet appareil est dissimulé aux yeux des autres",
+                            "label": "Dissimulation"
+                        }
+                    },
+                    "condition_monitor": {
+                        "value": {
+                            "hint": "Dégâts actuellement infligés au moniteur de condition de l'objet",
+                            "label": "Dégâts du moniteur de condition"
+                        }
+                    },
+                    "cost": {
+                        "hint": "Somme d'argent que coûte cet objet",
+                        "label": "Prix"
+                    },
+                    "equipped": {
+                        "hint": "Si l'objet est équipé",
+                        "label": "Équipé"
+                    },
+                    "master": {
+                        "hint": "Appareil maître auquel cet objet est asservi, formant un PAN ou un WAN",
+                        "label": "Appareil maître"
+                    },
+                    "max_rating": {
+                        "hint": "L'indice le plus élevé auquel cet objet peut être acheté. Zéro signifie que l'objet n'a pas de limite d'indice.",
+                        "label": "Indice maximum"
+                    },
+                    "quantity": {
+                        "hint": "Le nombre d'exemplaires que représente cet objet",
+                        "label": "Quantité"
+                    },
+                    "rating": {
+                        "hint": "L'indice d'appareil de l'objet, il intervient dans les actions matricielles.",
+                        "label": "Indice"
+                    },
+                    "show_quantity": {
+                        "hint": "Si la quantité de cet objet doit être affichée sur la feuille de l'acteur et dans l'en-tête de la feuille d'objet",
+                        "label": "Afficher la quantité"
+                    },
+                    "wireless": {
+                        "hint": "L'état sans fil de l'objet",
+                        "label": "Sans fil"
+                    }
                 }
             }
         },
@@ -705,6 +766,9 @@
                 "SpriteConfiguration": "Configuration de sprite",
                 "SpritePowers": "Pouvoirs",
                 "VehicleConfiguration": "Configuration véhicule"
+            },
+            "Item": {
+                "Properties": "Propriétés de l'objet"
             },
             "Sheet": {
                 "RemoveImprovisedDevices": "Supprimer les appareils improvisés"
@@ -845,6 +909,7 @@
         "NotExtended": "Non étendu",
         "Notoriety": "Rumeur",
         "Nuyen": "Nuyen",
+        "Options": "Options",
         "OpenSourcePdf": "Ouvrir le PDF lié à l'objet",
         "OpposedType": "Type",
         "OriginalDicePool": "Réserve de dés originale",

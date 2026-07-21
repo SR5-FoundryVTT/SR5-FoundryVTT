@@ -589,8 +589,8 @@ export class SR5ActiveEffectConfig extends foundry.applications.sheets.ActiveEff
         const isActor = this.document.parent instanceof SR5Actor;
 
         return Object.entries(SR5.effectApplyTo)
-            // Skip 'test_item' if the parent is an Actor
-            .filter(([value]) => !(isActor && value === 'test_item'))
+            // Skip item-only targets when the parent is an Actor.
+            .filter(([value]) => !(isActor && (value === 'test_item' || value === 'item')))
             // Map the remaining entries to the expected data model format
             .map(([value, label]) => ({ label: game.i18n.localize(label) as Translation, value }));
     }

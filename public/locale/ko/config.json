@@ -593,7 +593,7 @@
                     },
                     "is_hardened": {
                         "hint": "이 방어구가 강화 방어를 제공하는지 여부",
-                        "label": "강화 적용"
+                        "label": "강화"
                     },
                     "immunities": {
                         "hint": "Damage sources this armor grants Immunity against",
@@ -645,7 +645,18 @@
         "AttrWillpower": "의지력",
         "Attribute": "특성치",
         "Attributes": "특성치",
-        "Availability": "희귀도",
+        "Availability": "가용성",
+        "AvailabilityRestriction": "구매 제한",
+        "AvailabilityRestrictions": {
+            "Forbidden": "금지",
+            "None": "없음",
+            "Restricted": "제한"
+        },
+        "AvailabilityRestrictionSuffixes": {
+            "Forbidden": "F",
+            "None": "",
+            "Restricted": "R"
+        },
         "Awakened": "각성자",
         "AwakenedEmerged": "각성자/공명자",
         "Barrel": "총열",
@@ -1747,6 +1758,10 @@
                         "hint": "해당 물품이 종속화되어 PAN 또는 WAN이 구성된 마스터 장치",
                         "label": "마스터 장치"
                     },
+                    "max_rating": {
+                        "hint": "해당 물품을 구매할 수 있는 최고 등급. 0은 등급 상한이 없음을 의미함.",
+                        "label": "최대 등급"
+                    },
                     "quantity": {
                         "hint": "물품의 보유 수량",
                         "label": "수량"
@@ -1920,7 +1935,8 @@
             "Item": {
                 "AvailabilityAdjustment": "등급별 희귀도 비례 적용",
                 "CostAdjustment": "등급별 가격 비례 적용",
-                "EssenceAdjustment": "등급별 에센스 비례 적용"
+                "EssenceAdjustment": "등급별 에센스 비례 적용",
+                "Properties": "아이템 속성"
             },
             "MarkPlacement": {
                 "PlaceOnDevice": "장치에 배치",
@@ -2270,6 +2286,7 @@
         "OpposedType": "유형",
         "OpposingHits": "경쟁 성공횟수",
         "OpposingNetHits": "경쟁 순 성공",
+        "Options": "옵션",
         "OriginalDicePool": "기존 주사위 풀",
         "OutOfRange": "사거리 밖",
         "Overflow": "치명상",

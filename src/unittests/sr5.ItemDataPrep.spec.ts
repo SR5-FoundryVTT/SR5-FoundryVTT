@@ -55,6 +55,278 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.equal(device.system.technology.conceal.value, 6);
             assert.equal(device.system.technology.conceal.changes.length, 2);
         });
+
+        it('applies item-target active effects to technology cost', async () => {
+            const device = await factory.createItem({
+                type: 'device',
+                system: { technology: { cost: { base: 100, value: 100 } } },
+            });
+
+            await device.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Cost Modifier',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [
+                        { key: 'system.technology.cost', value: '50', type: 'add', target: 'item' },
+                    ],
+                },
+            }]);
+            device.prepareData();
+
+            assert.strictEqual(device.system.technology.cost.value, 150);
+        });
+
+        it('applies item-target active effect multipliers to technology cost', async () => {
+            const device = await factory.createItem({
+                type: 'device',
+                system: { technology: { cost: { base: 100, value: 100 } } },
+            });
+
+            await device.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Cost Multiplier',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [
+                        { key: 'system.technology.cost', value: '2', type: 'multiply', target: 'item' },
+                    ],
+                },
+            }]);
+            device.prepareData();
+
+            assert.strictEqual(device.system.technology.cost.value, 200);
+        });
+
+        it('applies item-target active effect overrides to technology cost', async () => {
+            const device = await factory.createItem({
+                type: 'device',
+                system: { technology: { cost: { base: 100, value: 100 } } },
+            });
+
+            await device.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Cost Override',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [
+                        { key: 'system.technology.cost', value: '500', type: 'override', target: 'item' },
+                    ],
+                },
+            }]);
+            device.prepareData();
+
+            assert.strictEqual(device.system.technology.cost.value, 500);
+        });
+
+        it('item-target active effects apply only to their parent item', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const items = await actor.createEmbeddedDocuments('Item', [
+                { type: 'device', name: 'Modified Device', system: { technology: { cost: { base: 100, value: 100 } } } },
+                { type: 'device', name: 'Plain Device', system: { technology: { cost: { base: 100, value: 100 } } } },
+            ]);
+            const modified = items[0] as SR5Item<'device'>;
+            const plain = items[1] as SR5Item<'device'>;
+
+            await modified.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Cost Modifier',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [
+                        { key: 'system.technology.cost', value: '50', type: 'add', target: 'item' },
+                    ],
+                },
+            }]);
+            actor.prepareData();
+
+            assert.strictEqual(modified.system.technology.cost.value, 150);
+            assert.strictEqual(plain.system.technology.cost.value, 100);
+        });
+
+        it('item-target active effects on nested items apply only to the nested item', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const [weapon] = await actor.createEmbeddedDocuments('Item', [{
+                type: 'weapon',
+                name: 'Parent Weapon',
+                system: { technology: { cost: { base: 500, value: 500 } } },
+            }]) as SR5Item<'weapon'>[];
+
+            await weapon.createNestedItem({
+                type: 'modification',
+                name: 'Nested Mod',
+                system: { technology: { cost: { base: 100, value: 100 } } },
+                effects: [{
+                    name: 'Nested Cost Modifier',
+                    system: {
+                        targets: [{ id: 'item', applyTo: 'item' }],
+                        changes: [
+                            { key: 'system.technology.cost', value: '50', type: 'add', target: 'item' },
+                        ],
+                    },
+                }],
+            } as Item.Source);
+
+            actor.prepareData();
+
+            const nested = weapon.items[0] as SR5Item<'modification'>;
+            assert.exists(nested);
+            assert.strictEqual(nested.system.technology.cost.base, 100);
+            assert.strictEqual(nested.system.technology.cost.changes.length, 1);
+            assert.strictEqual(nested.system.technology.cost.value, 150);
+            assert.strictEqual(weapon.system.technology.cost.value, 500);
+        });
+
+        it('does not apply actor-target item effects to the item itself', async () => {
+            const device = await factory.createItem({
+                type: 'device',
+                system: { technology: { cost: { base: 100, value: 100 } } },
+            });
+
+            await device.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Actor Cost Modifier',
+                system: {
+                    targets: [{ id: 'actor', applyTo: 'actor' }],
+                    changes: [
+                        { key: 'system.technology.cost', value: '50', type: 'add', target: 'actor' },
+                    ],
+                },
+            }]);
+            device.prepareData();
+
+            assert.strictEqual(device.system.technology.cost.value, 100);
+        });
+
+        it('applies item-target active effects to non-technology items', async () => {
+            const spell = await factory.createItem({
+                type: 'spell',
+                system: { description: { source: 'Core Rulebook' } },
+            });
+
+            await spell.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Item Source Override',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [
+                        { key: 'system.description.source', value: 'Street Grimoire', type: 'override', target: 'item' },
+                    ],
+                },
+            }]);
+            spell.prepareData();
+
+            assert.strictEqual(spell.system.description.source, 'Street Grimoire');
+        });
+
+        it('applies item-target active effects to availability while preserving suffix', async () => {
+            const device = await factory.createItem({
+                type: 'device',
+                system: { technology: { availability: { base: 6, restriction: 'restricted', label: '6R' } } },
+            });
+
+            await device.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Availability Modifier',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [
+                        { key: 'system.technology.availability', value: '2', type: 'add', target: 'item' },
+                    ],
+                },
+            }]);
+            device.prepareData();
+
+            assert.strictEqual(device.system.technology.availability.value, 8);
+            assert.strictEqual(device.system.technology.availability.label, '8R');
+        });
+
+        it('applies item-target active effect overrides to availability number only', async () => {
+            const device = await factory.createItem({
+                type: 'device',
+                system: { technology: { availability: { base: 6, restriction: 'restricted', label: '6R' } } },
+            });
+
+            await device.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Availability Number Override',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [
+                        { key: 'system.technology.availability', value: '12', type: 'override', target: 'item' },
+                    ],
+                },
+            }]);
+            device.prepareData();
+
+            assert.strictEqual(device.system.technology.availability.value, 12);
+            assert.strictEqual(device.system.technology.availability.label, '12R');
+        });
+
+        it('applies item-target active effect overrides to availability restriction', async () => {
+            const device = await factory.createItem({
+                type: 'device',
+                system: { technology: { availability: { base: 12, restriction: 'restricted', label: '12R' } } },
+            });
+
+            await device.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Availability Restriction Override',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [
+                        { key: 'system.technology.availability.restriction', value: 'forbidden', type: 'override', target: 'item' },
+                    ],
+                },
+            }]);
+            device.prepareData();
+
+            assert.strictEqual(device.system.technology.availability.value, 12);
+            assert.strictEqual(device.system.technology.availability.restriction, 'forbidden');
+            assert.strictEqual(device.system.technology.availability.label, '12F');
+        });
+
+        it('does not apply disabled or suppressed item-target active effects', async () => {
+            const disabledDevice = await factory.createItem({
+                type: 'device',
+                system: { technology: { cost: { base: 100, value: 100 } } },
+            });
+            const unequippedDevice = await factory.createItem({
+                type: 'device',
+                system: { technology: { cost: { base: 100, value: 100 }, equipped: false } },
+            });
+
+            const effectData: any = {
+                name: 'Cost Modifier',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [
+                        { key: 'system.technology.cost', value: '50', type: 'add', target: 'item' },
+                    ],
+                },
+            };
+
+            await disabledDevice.createEmbeddedDocuments('ActiveEffect', [{ ...effectData, disabled: true }]);
+            await unequippedDevice.createEmbeddedDocuments('ActiveEffect', [{
+                ...effectData,
+                system: { ...effectData.system, onlyForEquipped: true },
+            }]);
+            disabledDevice.prepareData();
+            unequippedDevice.prepareData();
+
+            assert.strictEqual(disabledDevice.system.technology.cost.value, 100);
+            assert.strictEqual(unequippedDevice.system.technology.cost.value, 100);
+        });
+
+        it('keeps ware grade cost and availability adjustments', async () => {
+            const ware = await factory.createItem({
+                type: 'cyberware',
+                system: {
+                    grade: 'alpha',
+                    essence: 1,
+                    technology: {
+                        availability: { base: 6, restriction: 'restricted', label: '6R' },
+                        cost: { base: 100, value: 100 },
+                    },
+                },
+            });
+            ware.prepareData();
+
+            assert.strictEqual(ware.system.technology.availability.value, 8);
+            assert.strictEqual(ware.system.technology.availability.label, '8R');
+            assert.strictEqual(ware.system.technology.cost.value, 120);
+        });
     });
 
     describe('ActionRollData preparation', () => {

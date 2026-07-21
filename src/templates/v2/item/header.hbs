@@ -54,50 +54,110 @@
             {{/unless}}
         </div>
 
+        {{#unless isLimited}}
+            {{#if (or systemFields.technology (eq item.type 'lifestyle'))}}
+                <div class="sheet-header-col item-header-meta">
+                    {{#if systemFields.technology}}
+                        {{#unless (isType item 'sin')}}
+                            <div class="sheet-header-resource-container">
+                                <div class="list-item sheet-header-resource">
+                                    <div class="list-item-start sheet-header-resource-label">
+                                        <label>{{localize "SR5.Quantity"}}</label>
+                                    </div>
+                                    <div class="list-item-col sheet-header-resource-value qty-input-col hover-show-button-container">
+                                        {{#if @root.isPlayMode}}
+                                            {{#if isEditable}}
+                                                <a class="hover-show-button"
+                                                   data-action="removeOneQty"
+                                                   data-tooltip="{{localize 'SR5.Tooltips.Item.RemoveQuantity'
+                                                                            qtySome=@root.bindings.qtySome qtyMany=@root.bindings.qtyMany}}">
+                                                    <i class="fas fa-minus-square"></i>
+                                                </a>
+                                            {{/if}}
+                                            <label class="sheet-header-service-value">{{system.technology.quantity}}</label>
+                                            {{#if isEditable}}
+                                                <a class="hover-show-button"
+                                                   data-action="addOneQty"
+                                                   data-tooltip="{{localize 'SR5.Tooltips.Item.AddQuantity'
+                                                                            qtySome=@root.bindings.qtySome qtyMany=@root.bindings.qtyMany}}">
+                                                    <i class="fas fa-plus-square"></i>
+                                                </a>
+                                            {{/if}}
+                                        {{else}}
+                                            {{formInput systemFields.technology.fields.quantity value=source.system.technology.quantity
+                                                        classes="short midd" rootId=rootId disabled=@root.isPlayMode}}
+                                        {{/if}}
+                                    </div>
+                                </div>
+                            </div>
+                        {{/unless}}
+                        <div class="sheet-header-resource-container">
+                            <div class="list-item sheet-header-resource">
+                                <div class="list-item-start sheet-header-resource-label">
+                                    <label>{{localize "SR5.Availability"}}</label>
+                                </div>
+                                <div class="list-item-col sheet-header-resource-value">
+                                    {{#if @root.isEditMode}}
+                                        <div class="availability-inputs">
+                                            {{formInput systemFields.technology.fields.availability.fields.base value=source.system.technology.availability.base
+                                                        classes="short availability-base-input" rootId=rootId disabled=@root.isPlayMode}}
+                                            <span data-tooltip="SR5.AvailabilityRestriction">
+                                                {{formInput systemFields.technology.fields.availability.fields.restriction value=source.system.technology.availability.restriction
+                                                            choices=config.availabilityRestrictionSuffixes localize=true
+                                                            classes="short availability-restriction-select" rootId=rootId disabled=@root.isPlayMode}}
+                                            </span>
+                                        </div>
+                                    {{else if system.technology.availability.label}}
+                                        <label class="sheet-header-service-value">{{system.technology.availability.label}}</label>
+                                    {{/if}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sheet-header-resource-container">
+                            <div class="list-item sheet-header-resource">
+                                <div class="list-item-start sheet-header-resource-label">
+                                    <label data-tooltip="{{systemFields.technology.fields.cost.label}}">
+                                        {{localize "SR5.Cost"}}
+                                    </label>
+                                </div>
+                                <div class="list-item-col sheet-header-resource-value">
+                                    {{#if @root.isEditMode}}
+                                        {{formInput systemFields.technology.fields.cost.fields.base value=source.system.technology.cost.base
+                                                    classes="short nuyen" rootId=rootId disabled=@root.isPlayMode}}
+                                    {{else}}
+                                        <label class="sheet-header-service-value">{{nuyenValue system.technology.cost.value}}</label>
+                                    {{/if}}
+                                </div>
+                            </div>
+                        </div>
+                    {{else if (eq item.type 'lifestyle')}}
+                        <div class="sheet-header-resource-container">
+                            <div class="list-item sheet-header-resource">
+                                <div class="list-item-start sheet-header-resource-label">
+                                    <label data-tooltip="{{systemFields.cost.label}}">
+                                        {{localize "SR5.Cost"}}
+                                    </label>
+                                </div>
+                                <div class="list-item-col sheet-header-resource-value">
+                                    {{#if @root.isEditMode}}
+                                        {{formInput systemFields.cost value=source.system.cost
+                                                    classes="short nuyen" rootId=@root.rootId disabled=@root.isPlayMode}}
+                                    {{else}}
+                                        <label class="sheet-header-service-value">{{nuyenValue system.cost}}</label>
+                                    {{/if}}
+                                </div>
+                            </div>
+                        </div>
+                    {{/if}}
+                </div>
+            {{/if}}
+        {{/unless}}
+
     </div>
     {{!-- TODO go through this and allow fields that could be shown on a limited item --}}
     {{#unless isLimited}}
+    {{#unless (eq item.type 'spell')}}
     <div class="list-item list-item-header">
-        {{#if (eq item.type 'spell')}}
-            <div class="list-item-col">
-                <label data-tooltip="{{systemFields.type.hint}}">{{localize "SR5.Spell.Type"}}:</label>
-                {{#if @root.isEditMode}}
-                    {{formInput systemFields.type value=source.system.type localize=true
-                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-                {{else}}
-                    <label>{{localizeOb system.type @root.config.spellTypes}}</label>
-                {{/if}}
-            </div>
-
-            <div class="list-item-col">
-                <label data-tooltip="{{systemFields.duration.hint}}">{{localize "SR5.Duration"}}:</label>
-                {{#if @root.isEditMode}}
-                    {{formInput systemFields.duration value=source.system.duration localize=true
-                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-                {{else}}
-                    <label>{{localizeOb system.duration @root.config.durations}}</label>
-                {{/if}}
-            </div>
-            <div class="list-item-col">
-                <label data-tooltip="{{systemFields.range.hint}}">{{localize "SR5.Range"}}:</label>
-                {{#if @root.isEditMode}}
-                    {{formInput systemFields.range value=source.system.range localize=true
-                                classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
-                {{else}}
-                    <label>{{localizeOb system.range @root.config.spellRanges}}</label>
-                {{/if}}
-            </div>
-
-            <div class="list-item-col">
-                <label>{{localize "SR5.Drain"}}:</label>
-                {{#if @root.isEditMode}}
-                    {{formInput systemFields.drain value=source.system.drain
-                                classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
-                {{else}}
-                    <label>{{localize "SR5.Force"}}{{#if system.drain}}{{numberFormat system.drain sign=true}}{{/if}}</label>
-                {{/if}}
-            </div>
-        {{else}}
             <div class="list-item-start">
                 {{#if (isType item 'contact')}}
                     {{#if linkedActor}}
@@ -206,7 +266,7 @@
                     {{/if}}
                 {{/if}}
             </div>
-        {{/if}}
     </div>
+    {{/unless}}
     {{/unless}}
 </div>

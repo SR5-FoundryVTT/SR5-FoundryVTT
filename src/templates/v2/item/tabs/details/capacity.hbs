@@ -1,0 +1,11 @@
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.capacity.label}}">{{systemFields.capacity.label}}</label>
+    </div>
+    <div class="list-item-col paired-fields">
+        <input type="number" class="short paired-field" value="{{system.capacity.used}}" disabled>
+        <label class="paired-separator">/</label>
+        {{formInput systemFields.capacity.fields.total value=source.system.capacity.total
+                    classes="short paired-field" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>

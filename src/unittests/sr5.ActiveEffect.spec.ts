@@ -66,6 +66,33 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
     };
 
     describe('SR5ActiveEffect', () => {
+        it('resolves the owning actor for nested item effects', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const [weapon] = await actor.createEmbeddedDocuments('Item', [{
+                type: 'weapon',
+                name: 'Parent Weapon',
+                system: { category: 'range' },
+            }]);
+
+            await weapon.createNestedItem({
+                type: 'modification',
+                name: 'Nested Mod',
+                effects: [{
+                    name: 'Nested Effect',
+                    system: {
+                        targets: [{ id: 'item', applyTo: 'item' }],
+                        changes: [
+                            { key: 'system.technology.cost', value: '50', type: 'add', target: 'item' },
+                        ],
+                    },
+                }],
+            } as Item.Source);
+
+            const nestedEffect = weapon.items[0]?.effects.contents[0];
+            assert.exists(nestedEffect);
+            assert.strictEqual(nestedEffect?.actor, actor);
+        });
+
         it('MODIFY mode: apply system custom mode to main and sub value-keys', async () => {
             const actor = await factory.createActor({ type: 'character' });
             const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
