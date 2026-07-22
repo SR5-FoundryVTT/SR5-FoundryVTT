@@ -65,14 +65,14 @@ export class AttributesPrep {
         // Each attribute can have a unique value range.
         // TODO:  Implement metatype attribute value ranges for character actors.
         const range = ranges ? ranges[name] : SR.attributes.ranges[name];
-        ModifiableValue.applyChanges(attribute, undefined, range);
+        ModifiableValue.applyChanges(attribute, range);
     }
 
     /**
      * Out-of-place AE spike: re-enforce attribute value ranges after native ActiveEffect application.
      *
      * Foundry's NumberField applies AE changes onto `attribute.value` but only cleans against the field's
-     * own options (integer), not SR5's augmented min/max ranges. calcTotal normally enforces those via
+     * own options (integer), not SR5's augmented min/max ranges. applyChanges normally enforces those via
      * EnforcedMinimum/Maximum, so re-clamp here to keep natively-applied values within range and refresh
      * the tracked `max` for attributes that expose one.
      *
@@ -114,6 +114,6 @@ export class AttributesPrep {
                 parts.add(item.name, -item.getEssenceLoss());
         }
 
-        ModifiableValue.applyChanges(system.attributes.essence, undefined, { decimal: true });
+        ModifiableValue.applyChanges(system.attributes.essence, { decimal: true });
     }
 }

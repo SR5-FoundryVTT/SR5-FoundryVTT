@@ -58,7 +58,7 @@ export class OpposedBruteForceTest extends OpposedMatrixTest<OpposedBruteForceTe
         // Setup optional damage value
         const damage = Math.floor(this.againstNetHits.value / 2);
         this.data.modifiedDamage = DataDefaults.createData('damage', {base: damage, type: {base: 'matrix', value: 'matrix'}});
-        ModifiableValue.calcTotal(this.data.modifiedDamage);
+        ModifiableValue.applyChanges(this.data.modifiedDamage);
         this.data.incomingDamage = this.data.modifiedDamage;
     }
 

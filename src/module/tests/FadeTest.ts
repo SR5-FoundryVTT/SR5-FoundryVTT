@@ -97,7 +97,7 @@ export class FadeTest extends SuccessTest<FadeTestData> {
         super.calculateBaseValues();
 
         // Avoid using a user defined value override.
-        this.data.modifiedFade.base = ModifiableValue.calcTotal(this.data.incomingFade, { min: 0 });
+        this.data.modifiedFade.base = ModifiableValue.applyChanges(this.data.incomingFade, { min: 0 });
     }
 
     override async processResults() {

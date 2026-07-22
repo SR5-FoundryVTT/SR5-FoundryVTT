@@ -18,7 +18,7 @@ export class SpritePrep {
     }
 
     static prepareDerivedData(system: Actor.SystemOfType<'sprite'>, items: SR5Item[]) {
-        ModifiableValue.applyChanges(system.attributes.level, undefined, { min: 1 });
+        ModifiableValue.applyChanges(system.attributes.level, { min: 1 });
         system.parent?.applyActiveEffects('level');
         const level = system.attributes.level.value;
 
@@ -27,17 +27,17 @@ export class SpritePrep {
         SpritePrep.prepareSpriteSkills(system, level);
 
         AttributesPrep.prepareAttributes(system, undefined, new Set(['level']));
-        SkillsPrep.prepareSkills(system, true);
+        SkillsPrep.prepareSkills(system);
         system.parent?.applyActiveEffects('attributes');
 
-        LimitsPrep.prepareLimits(system, true);
+        LimitsPrep.prepareLimits(system);
 
         system.parent?.applyActiveEffects('matrix');
         MatrixPrep.prepareMatrixToLimitsAndAttributes(system, true);
 
         SpritePrep.prepareMatrixTrack(system, level);
 
-        InitiativePrep.prepareInit('sprite', system, true);
+        InitiativePrep.prepareInit('sprite', system);
         system.parent?.applyActiveEffects('derived');
     }
 

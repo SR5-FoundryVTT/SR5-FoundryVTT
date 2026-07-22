@@ -19,7 +19,7 @@ export class DrainRules {
 
         const damage = DataDefaults.createData('damage');
         damage.base = drain;
-        ModifiableValue.calcTotal(damage, {min: 0});
+        ModifiableValue.applyChanges(damage, {min: 0});
         damage.type.base = damage.type.value = DrainRules.calcDrainDamageType(hits, magic);
 
         return damage;
@@ -48,7 +48,7 @@ export class DrainRules {
         drainDamage = foundry.utils.duplicate(drainDamage) as DamageType;
 
         ModifiableValue.addUnique(drainDamage, 'SR5.Hits', -hits);
-        ModifiableValue.calcTotal(drainDamage, {min: 0});
+        ModifiableValue.applyChanges(drainDamage, {min: 0});
 
         return drainDamage;
     }

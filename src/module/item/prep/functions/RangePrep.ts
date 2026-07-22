@@ -27,6 +27,8 @@ export const RangePrep = {
             if (mod.system.mod_weapon.rc)
                 rangeParts.add(mod.name, mod.system.mod_weapon.rc);
 
-        ModifiableValue.calcTotal(range.rc);
+        // Out-of-place: fold mod parts onto `.value` once (changes are cleared each prep by clearMods);
+        // item ActiveEffects on rc apply natively on top in the derived apply loop.
+        rangeParts.applyChanges();
     }
 }

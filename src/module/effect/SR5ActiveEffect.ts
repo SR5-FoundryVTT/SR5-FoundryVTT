@@ -194,6 +194,11 @@ export class SR5ActiveEffect extends ActiveEffect {
     static readonly OUT_OF_PLACE_ITEM_VALUE_KEYS: readonly string[] = [
         'system.technology.cost',
         'system.technology.availability',
+        'system.technology.conceal',
+        'system.range.rc',
+        'system.action.damage',
+        'system.action.damage.ap',
+        'system.action.limit',
     ];
 
     static readonly ATTRIBUTES_PHASE = 'attributes';

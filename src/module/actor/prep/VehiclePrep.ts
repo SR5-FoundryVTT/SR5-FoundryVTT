@@ -33,20 +33,20 @@ export class VehiclePrep {
         system.parent?.applyActiveEffects('attributes');
         AttributesPrep.clampAttributesToRange(system, SR.actorTypeAttributes['vehicle']);
         
-        SkillsPrep.prepareSkills(system, true);
+        SkillsPrep.prepareSkills(system);
 
-        LimitsPrep.prepareLimits(system, true);
+        LimitsPrep.prepareLimits(system);
         VehiclePrep.prepareConditionMonitor(system);
 
-        MatrixPrep.prepareMatrixAttributesForDevice(system, undefined, true);
+        MatrixPrep.prepareMatrixAttributesForDevice(system);
         system.parent?.applyActiveEffects('matrix');
         MatrixPrep.prepareMatrixToLimitsAndAttributes(system, true);
 
         VehiclePrep.prepareMovement(system);
 
-        InitiativePrep.prepareInit('vehicle', system, true);
+        InitiativePrep.prepareInit('vehicle', system);
 
-        ItemPrep.prepareArmor(system, items, true);
+        ItemPrep.prepareArmor(system, items);
         CharacterPrep.prepareRecoil(system);
         VehiclePrep.prepareRecoilCompensation(system);
         system.parent?.applyActiveEffects('derived');
@@ -162,10 +162,10 @@ export class VehiclePrep {
         // algorithm to determine speed, CRB pg 202 table.
         // Allow ActiveEffects to apply to movement directly.
         movement.walk.base = 5 * Math.pow(2, speedTotal - 1);
-        movement.walk.value = ModifiableValue.applyChanges(movement.walk as ModifiableValueType, undefined, {min: 0});
+        movement.walk.value = ModifiableValue.applyChanges(movement.walk as ModifiableValueType, {min: 0});
 
         movement.run.base = 10 * Math.pow(2, speedTotal - 1);
-        movement.run.value = ModifiableValue.applyChanges(movement.run as ModifiableValueType, undefined, {min: 0});
+        movement.run.value = ModifiableValue.applyChanges(movement.run as ModifiableValueType, {min: 0});
     }
 
     /**
@@ -176,7 +176,7 @@ export class VehiclePrep {
 
         const recoilCompensation = RangedWeaponRules.vehicleRecoilCompensationValue(attributes.body.value);
         ModifiableValue.addUnique(system.values.recoil_compensation, 'SR5.RecoilCompensation', recoilCompensation);
-        ModifiableValue.applyChanges(system.values.recoil_compensation, undefined, {min: 0});
+        ModifiableValue.applyChanges(system.values.recoil_compensation, {min: 0});
     }
 
     /**
@@ -189,7 +189,7 @@ export class VehiclePrep {
      */
     static prepareAttributeRanges(system: Actor.SystemOfType<'vehicle'>) {
         const ranges = SR.actorTypeAttributes['vehicle'];
-        ModifiableValue.applyChanges(system.attributes.strength, undefined, ranges.strength);
-        ModifiableValue.applyChanges(system.attributes.agility, undefined, ranges.agility);
+        ModifiableValue.applyChanges(system.attributes.strength, ranges.strength);
+        ModifiableValue.applyChanges(system.attributes.agility, ranges.agility);
     }
 }

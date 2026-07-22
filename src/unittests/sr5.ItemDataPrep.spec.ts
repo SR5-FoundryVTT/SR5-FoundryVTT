@@ -56,6 +56,28 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.equal(device.system.technology.conceal.changes.length, 2);
         });
 
+        it('applies item-target active effects to technology conceal out-of-place', async () => {
+            const device = await factory.createItem({
+                type: 'device',
+                system: { technology: { conceal: { base: 4, value: 4 } } },
+            });
+
+            await device.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Conceal Modifier',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [
+                        { key: 'system.technology.conceal', value: '3', type: 'add', target: 'item' },
+                    ],
+                },
+            }]);
+
+            device.prepareData();
+            device.prepareData();
+
+            assert.strictEqual(device.system.technology.conceal.value, 7);
+        });
+
         it('applies item-target active effects to technology cost', async () => {
             const device = await factory.createItem({
                 type: 'device',
@@ -465,6 +487,30 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(weapon.system.action.damage.element.base, '');
             assert.strictEqual(weapon.system.action.damage.element.value, 'cold');
         });
+
+        it('applies item-target active effects to action damage and limit out-of-place', async () => {
+            const weapon = await factory.createItem({
+                type: 'weapon',
+                system: { action: { damage: { base: 4, value: 4 }, limit: { base: 5, value: 5 } } },
+            });
+
+            await weapon.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Action Modifier',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [
+                        { key: 'system.action.damage', value: '2', type: 'add', target: 'item' },
+                        { key: 'system.action.limit', value: '1', type: 'add', target: 'item' },
+                    ],
+                },
+            }]);
+
+            weapon.prepareData();
+            weapon.prepareData();
+
+            assert.strictEqual(weapon.system.action.damage.value, 6);
+            assert.strictEqual(weapon.system.action.limit.value, 6);
+        });
     });
 
     describe('RangeData preparation', () => {
@@ -478,6 +524,25 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(weapon.system.range.rc.base, 2);
             assert.strictEqual(weapon.system.range.rc.changes.length, 1);
             assert.strictEqual(weapon.system.range.rc.value, 4);
+        });
+
+        it('applies item-target active effects to recoil compensation out-of-place', async () => {
+            const weapon = await factory.createItem({ type: 'weapon', system: { category: 'range', range: { rc: { base: 2, value: 2 } } } });
+
+            await weapon.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'RC Modifier',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [
+                        { key: 'system.range.rc', value: '3', type: 'add', target: 'item' },
+                    ],
+                },
+            }]);
+
+            weapon.prepareData();
+            weapon.prepareData();
+
+            assert.strictEqual(weapon.system.range.rc.value, 5);
         });
     });
 

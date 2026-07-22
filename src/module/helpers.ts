@@ -603,7 +603,7 @@ export class Helpers {
 
         const mod = new ModifiableValue(modified);
         mod.addUnique(modificationLabel, hits);
-        mod.calcTotal({ min: 0 });
+        mod.applyChanges({ min: 0 });
 
         return { incoming, modified };
     }

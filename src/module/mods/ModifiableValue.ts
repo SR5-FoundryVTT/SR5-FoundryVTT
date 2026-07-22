@@ -165,80 +165,14 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
     }
 
     /**
-     * Calculate the total value by applying changes in priority order.
-     * @param {{min?: number, max?: number, decimal?: boolean}} [options] - Optional bounds to enforce on the final value.
-     * @param {number} [options.min] - If provided, enforces a minimum value (adds an `SR5.EnforcedMinimum` change).
-     * @param {number} [options.max] - If provided, enforces a maximum value (adds an `SR5.EnforcedMaximum` change).
-     * @param {boolean} [options.decimal] - If false, the final value will be rounded up.
-     * @returns {number} The computed total (rounded up per SR5 rules).
+     * Remove every change that carries a non-empty `source`, i.e. display-log entries left by a previous
+     * prep cycle's native ActiveEffect application. System-provided parts keep an empty `source` and remain.
+     *
+     * Out-of-place item values are not reset between prepare cycles, so this must run before re-folding the
+     * system parts, otherwise a prior native entry would be re-folded as if it were a system part.
      */
-    calcTotal(options?: { min?: number; max?: number, decimal?: boolean }): number {
-        this._field.value = this._field.base;
-
-        this.remove('SR5.EnforcedMaximum');
-        this.remove('SR5.EnforcedMinimum');
-
-        this._field.changes.sort((a, b) => a.priority - b.priority);
-        for (let i = 0; i < this._field.changes.length; i++) {
-            const change = this._field.changes[i];
-            change.invalidated = false;
-
-            if (!change.enabled) continue;
-
-            switch (change.type) {
-                case 'add':
-                    this._field.value += change.value;
-                    break;
-                case 'subtract':
-                    this._field.value -= change.value;
-                    break;
-                case 'multiply':
-                    this._field.value *= change.value;
-                    break;
-                case 'override':
-                    this._field.value = change.value;
-                    this._markPreviousChangesMasked(i);
-                    break;
-                case 'upgrade':
-                    if (this._field.value < change.value) {
-                        this._field.value = change.value;
-                        this._markPreviousChangesMasked(i);
-                    } else {
-                        change.invalidated = true;
-                    }
-                    break;
-                case 'downgrade':
-                    if (this._field.value > change.value) {
-                        this._field.value = change.value;
-                        this._markPreviousChangesMasked(i);
-                    } else {
-                        change.invalidated = true;
-                    }
-                    break;
-                default:
-                    console.warn(`Unknown Active Effect type ${change.type} encountered.`);
-                    break;
-            }
-        }
-
-        if (options?.max !== undefined && this._field.value > options.max) {
-            this._markPreviousChangesMasked(this._field.changes.length);
-            this.addUnique('SR5.EnforcedMaximum', options.max, { type: 'downgrade', priority: ModifiableValue.TOP_PRIORITY });
-            this._field.value = options.max;
-        }
-
-        if (options?.min !== undefined && this._field.value < options.min) {
-            this._markPreviousChangesMasked(this._field.changes.length);
-            this.addUnique('SR5.EnforcedMinimum', options.min, { type: 'upgrade', priority: ModifiableValue.TOP_PRIORITY });
-            this._field.value = options.min;
-        }
-
-        // SR5#78 - All values are rounded up
-        if (!options?.decimal) {
-            this._field.value = Math.ceil(this._field.value);
-        }
-
-        return this._field.value;
+    dropEffectSourced(): void {
+        this._field.changes = this._field.changes.filter(part => !part.source);
     }
 
     /**
@@ -249,16 +183,14 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
      * into the value by a subsequent read.
      */
     applyChanges(
-        entries: readonly ModifiableValueType['changes'][number][] = this._field.changes,
         options?: { min?: number; max?: number, decimal?: boolean }
     ): number {
         const enforcedNames = new Set(['SR5.EnforcedMaximum', 'SR5.EnforcedMinimum']);
-        const appliedEntries = entries.filter(change => !enforcedNames.has(change.name));
 
         this._field.changes = this._field.changes.filter(change => !enforcedNames.has(change.name));
         this._field.value = this._field.base;
 
-        for (const change of [...appliedEntries].sort((a, b) => a.priority - b.priority)) {
+        for (const change of [...this._field.changes].sort((a, b) => a.priority - b.priority)) {
             if (!change.enabled) continue;
 
             switch (change.type) {
@@ -298,17 +230,6 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
 
         if (!options?.decimal) this._field.value = Math.ceil(this._field.value);
         return this._field.value;
-    }
-
-    /**
-     * Mark all previously applied changes as masked up to `currentIndex` (exclusive).
-     * @param {number} currentIndex - Index at which masking begins; previous indices will be masked.
-     */
-    private _markPreviousChangesMasked(currentIndex: number): void {
-        for (let i = 0; i < currentIndex; i++) {
-            if (!this._field.changes[i].enabled) continue;
-            this._field.changes[i].invalidated = true;
-        }
     }
 
     /**
@@ -412,6 +333,15 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
     }
 
     /**
+     * Static helper to drop effect-sourced (display-log) changes from the given list.
+     * @template F
+     * @param {F} list - The modifiable list object.
+     */
+    static dropEffectSourced<F extends ModifiableValueType>(list: F): void {
+        new ModifiableValue(list).dropEffectSourced();
+    }
+
+    /**
      * Static helper to add or remove a unique change based on the presence of a value.
      * If `value` is provided, it adds/updates the change;
      * if `value` is falsy, it removes the change with the given name.
@@ -425,20 +355,7 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
     }
 
     /**
-     * Static helper to calculate the total for the given modifiable list.
-     * @template F
-     * @param {F} list - The modifiable list object.
-     * @param {...any} args - Arguments forwarded to instance `calcTotal` (options).
-     * @returns {number} The computed total value.
-     */
-    static calcTotal<F extends ModifiableValueType>(
-        list: F, ...args: Parameters<ModifiableValue<F>["calcTotal"]>
-    ): number {
-        return new ModifiableValue(list).calcTotal(...args);
-    }
-
-    /**
-     * Static helper for out-of-place actor preparation.
+     * Static helper to resolve system-provided parts into a value (see instance {@link applyChanges}).
      */
     static applyChanges<F extends ModifiableValueType>(
         list: F, ...args: Parameters<ModifiableValue<F>["applyChanges"]>

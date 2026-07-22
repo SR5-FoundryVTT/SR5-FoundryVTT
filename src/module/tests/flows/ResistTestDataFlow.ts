@@ -34,8 +34,8 @@ export const ResistTestDataFlow = {
      */
     calculateBaseValues(data: ResistTestData) {
         // Calculate damage values in case of user dialog interaction.
-        ModifiableValue.calcTotal(data.incomingDamage, {min: 0});
-        ModifiableValue.calcTotal(data.incomingDamage.ap);
+        ModifiableValue.applyChanges(data.incomingDamage, {min: 0});
+        ModifiableValue.applyChanges(data.incomingDamage.ap);
 
         // Remove user override and resulting incoming damage as base.
         data.modifiedDamage = foundry.utils.duplicate(data.incomingDamage) as DamageType;
@@ -44,8 +44,8 @@ export const ResistTestDataFlow = {
         data.modifiedDamage.ap.base = data.incomingDamage.ap.value;
         data.modifiedDamage.ap.changes = [];
 
-        ModifiableValue.calcTotal(data.modifiedDamage);
-        ModifiableValue.calcTotal(data.modifiedDamage.ap);
+        ModifiableValue.applyChanges(data.modifiedDamage);
+        ModifiableValue.applyChanges(data.modifiedDamage.ap);
     },
 
     /**

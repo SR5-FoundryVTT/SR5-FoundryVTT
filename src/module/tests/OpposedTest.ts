@@ -76,7 +76,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
     calculateAgainstNetHits() {
         const base = Math.max(this.against.hits.value - this.hits.value, 0);
         const againstNetHits = DataDefaults.createData('value_field', {label: 'SR5.NetHits', base});
-        againstNetHits.value = ModifiableValue.calcTotal(againstNetHits, {min: 0});
+        againstNetHits.value = ModifiableValue.applyChanges(againstNetHits, {min: 0});
         return againstNetHits;
     }
 

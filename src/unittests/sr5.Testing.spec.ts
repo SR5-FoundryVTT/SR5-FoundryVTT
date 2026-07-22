@@ -118,7 +118,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             });
 
             ModifiableValue.add(valueField, 'Penalty', 3, { type: 'subtract' });
-            ModifiableValue.calcTotal(valueField);
+            ModifiableValue.applyChanges(valueField);
 
             assert.strictEqual(valueField.value, 7);
             assert.strictEqual(valueField.changes[0].type, 'subtract');
@@ -373,7 +373,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             const action = DataDefaults.createData('action_roll', { attribute: 'willpower', attribute2: 'firewall' });
             const data = TestCreator._prepareTestDataWithActionForItem(action, item, TestCreator._minimalTestData());
 
-            ModifiableValue.calcTotal(data.pool);
+            ModifiableValue.applyChanges(data.pool);
 
             assert.strictEqual(data.pool.value, 10);
         });

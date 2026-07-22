@@ -78,7 +78,7 @@ export class CombatRules {
         const mod = new ModifiableValue(modified);
         mod.addUnique('SR5.Attacker', attackerHits);
         mod.addUnique('SR5.Defender', -defenderHits);
-        ModifiableValue.calcTotal(modified, { min: 0 });
+        ModifiableValue.applyChanges(modified, { min: 0 });
 
         // SR5#173 Step 3: Defend B.
         modified = CombatRules.modifyDamageTypeAfterHit(modified, defender);
@@ -162,11 +162,11 @@ export class CombatRules {
         ModifiableValue.add(
             modifiedDamage, 'SR5.TestResults.Success', 0, { type: 'override', priority: ModifiableValue.TOP_PRIORITY }
         );
-        ModifiableValue.calcTotal(modifiedDamage, { min: 0 });
+        ModifiableValue.applyChanges(modifiedDamage, { min: 0 });
         ModifiableValue.add(
             modifiedDamage.ap, 'SR5.TestResults.Success', 0, { type: 'override', priority: ModifiableValue.TOP_PRIORITY }
         );
-        ModifiableValue.calcTotal(modifiedDamage.ap);
+        ModifiableValue.applyChanges(modifiedDamage.ap);
         modifiedDamage.type.value = 'physical';
 
         // If attack hits but deals no damage, keep the element of the attack for any side effects.
@@ -189,7 +189,7 @@ export class CombatRules {
         if (hits < 0) hits = 0;
 
         const { modified } = SoakRules.reduceDamage(actor, damage, hits);
-        ModifiableValue.calcTotal(modified, { min: 0 });
+        ModifiableValue.applyChanges(modified, { min: 0 });
 
         return modified;
     }
@@ -209,7 +209,7 @@ export class CombatRules {
 
         console.error('Check if ap is a negative value or positive value during weapon item configuration');
         ModifiableValue.addUnique(modifiedArmor, 'SR5.AP', damage.ap.value);
-        modifiedArmor.value = ModifiableValue.calcTotal(modifiedArmor, {min: 0});
+        modifiedArmor.value = ModifiableValue.applyChanges(modifiedArmor, {min: 0});
 
         return modifiedArmor;
     }

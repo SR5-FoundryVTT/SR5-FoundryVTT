@@ -44,9 +44,9 @@ export class CharacterPrep {
         system.parent?.applyActiveEffects('attributes');
         AttributesPrep.clampAttributesToRange(system);
 
-        SkillsPrep.prepareSkills(system, true);
+        SkillsPrep.prepareSkills(system);
 
-        ItemPrep.prepareArmor(system, items, true);
+        ItemPrep.prepareArmor(system, items);
 
         MatrixPrep.prepareMatrix(system, items);
         system.parent?.applyActiveEffects('matrix');
@@ -54,15 +54,15 @@ export class CharacterPrep {
 
         // Limits depend on attributes and active effects.
         LimitsPrep.prepareLimitBaseFromAttributes(system);
-        LimitsPrep.prepareLimits(system, true);
-        LimitsPrep.prepareDerivedLimits(system, true);
+        LimitsPrep.prepareLimits(system);
+        LimitsPrep.prepareDerivedLimits(system);
 
         GruntPrep.prepareConditionMonitors(system);
 
-        MovementPrep.prepareMovement(system, true);
-        WoundsPrep.prepareWounds(system, true);
+        MovementPrep.prepareMovement(system);
+        WoundsPrep.prepareWounds(system);
 
-        InitiativePrep.prepareInit('character', system, true);
+        InitiativePrep.prepareInit('character', system);
 
         CharacterPrep.prepareRecoil(system);
         CharacterPrep.prepareRecoilCompensation(system);
@@ -78,7 +78,7 @@ export class CharacterPrep {
      * @param system Physical humanoid system data.
      */
     static prepareRecoil(system: Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>) {
-        ModifiableValue.applyChanges(system.values.recoil, undefined, { min: 0 });
+        ModifiableValue.applyChanges(system.values.recoil, { min: 0 });
     }
 
     /**
@@ -93,7 +93,7 @@ export class CharacterPrep {
 
         const mod = new ModifiableValue(system.values.recoil_compensation);
         mod.addUnique("SR5.RecoilCompensation", recoilCompensation);
-        mod.applyChanges(undefined, { min: 0 });
+        mod.applyChanges({ min: 0 });
     }
 
     static addSpecialAttributes(system: Actor.SystemOfType<'character'>) {

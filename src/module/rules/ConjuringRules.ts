@@ -44,7 +44,7 @@ export const ConjuringRules = {
         const damage = DataDefaults.createData('damage');
         damage.base = ConjuringRules.summoningDrainValue(hitsSpirit);
         damage.type.base = damage.type.value = DrainRules.calcDrainDamageType(force, magic);
-        ModifiableValue.calcTotal(damage, {min: 0});
+        ModifiableValue.applyChanges(damage, {min: 0});
         
         return damage;
     },

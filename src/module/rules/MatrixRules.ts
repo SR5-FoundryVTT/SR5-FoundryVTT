@@ -264,7 +264,7 @@ export class MatrixRules {
             netHits = 0;
         }
         const damage = DataDefaults.createData('damage', { base: netHits, type: { base: 'matrix', value: 'matrix' }, biofeedback });
-        ModifiableValue.calcTotal(damage, { min: 0 });
+        ModifiableValue.applyChanges(damage, { min: 0 });
         return damage;
     }
 
@@ -325,7 +325,7 @@ export class MatrixRules {
         const mod = new ModifiableValue(modified);
         mod.addUnique('SR5.Attacker',  attackerHits);
         mod.addUnique('SR5.Defender', -defenderHits);
-        mod.calcTotal({ min: 0 });
+        mod.applyChanges({ min: 0 });
 
         return modified;
     }

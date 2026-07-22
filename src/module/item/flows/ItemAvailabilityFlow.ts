@@ -68,7 +68,7 @@ export const ItemAvailabilityFlow = {
     },
 
     calculateValue(availability: AvailabilityValueType): string {
-        ModifiableValue.calcTotal(availability, { min: 0 });
+        ModifiableValue.applyChanges(availability, { min: 0 });
         return ItemAvailabilityFlow.finalizeLabel(availability);
     },
 

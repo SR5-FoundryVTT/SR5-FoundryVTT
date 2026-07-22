@@ -26,7 +26,7 @@ export class InitiativePrep {
         return 0;
     }
 
-    private static prepareFormulaMode(system: SR5Actor['system'], mode: Shadowrun.SpaceTypes, outOfPlace: boolean) {
+    private static prepareFormulaMode(system: SR5Actor['system'], mode: Shadowrun.SpaceTypes) {
         const modeInit = system.initiative[mode] as InitiativeType | undefined;
         if (!modeInit) return;
 
@@ -41,27 +41,21 @@ export class InitiativePrep {
             constMod.addBase(`SR5.attributes.${modeInit.attribute_b}`, attributeB);
         }
 
-        if (outOfPlace) {
-            constMod.applyChanges();
-            ModifiableValue.applyChanges(modeInit.dice, undefined, { min: 0, max: 5 });
-        } else {
-            constMod.calcTotal();
-            ModifiableValue.calcTotal(modeInit.dice, { min: 0, max: 5 });
-        }
+        constMod.applyChanges();
+        ModifiableValue.applyChanges(modeInit.dice, { min: 0, max: 5 });
     }
 
     /**
      * Current initiative is the selected initiative to be used within FoundryVTT Combat.
      *
      */
-    private static prepareCurrentInitiative(system: SR5Actor['system'], outOfPlace: boolean) {
+    private static prepareCurrentInitiative(system: SR5Actor['system']) {
         const { initiative, attributes } = system;
 
         initiative.current = initiative[initiative.perception] as InitiativeType;
 
         // Recalculate selected initiative to be sure.
-        if (outOfPlace) ModifiableValue.applyChanges(initiative.current.constant);
-        else ModifiableValue.calcTotal(initiative.current.constant);
+        ModifiableValue.applyChanges(initiative.current.constant);
 
         // Disable blitz if edge is depleted.
         if (attributes.edge.uses >= attributes.edge.value)
@@ -73,8 +67,7 @@ export class InitiativePrep {
                 { type: 'override', priority: ModifiableValue.TOP_PRIORITY }
             );
         }
-        if (outOfPlace) ModifiableValue.applyChanges(initiative.current.dice, undefined, {min: 0, max: 5});
-        else ModifiableValue.calcTotal(initiative.current.dice, {min: 0, max: 5});
+        ModifiableValue.applyChanges(initiative.current.dice, {min: 0, max: 5});
 
         (initiative.current.dice as any).text = `${initiative.current.dice.value}d6`;
     }
@@ -82,18 +75,18 @@ export class InitiativePrep {
     /**
      * Prepares initiative for an actor.
      */
-    static prepareInit<ST extends Actor.ConfiguredSubType>(actorType: ST, system: Actor.SystemOfType<ST>, outOfPlace = false) {
+    static prepareInit<ST extends Actor.ConfiguredSubType>(actorType: ST, system: Actor.SystemOfType<ST>) {
         if ('meatspace' in system.initiative)
-            this.prepareFormulaMode(system, 'meatspace', outOfPlace);
+            this.prepareFormulaMode(system, 'meatspace');
         if ('astral' in system.initiative)
-            this.prepareFormulaMode(system, 'astral', outOfPlace);
+            this.prepareFormulaMode(system, 'astral');
         if ('matrix' in system.initiative && 'matrix' in system) {
             if (actorType === 'character' && system.matrix.hot_sim)
                 ModifiableValue.addUniqueBase(system.initiative.matrix.dice, "SR5.HotSim", 1);
 
-            this.prepareFormulaMode(system, 'matrix', outOfPlace);
+            this.prepareFormulaMode(system, 'matrix');
         }
 
-        this.prepareCurrentInitiative(system, outOfPlace);
+        this.prepareCurrentInitiative(system);
     }
 }

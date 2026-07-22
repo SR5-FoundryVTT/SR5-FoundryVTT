@@ -758,7 +758,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             test.targets = [target];
             test.prepareTestCategories();
             test.effects.applyAllEffects();
-            ModifiableValue.calcTotal(test.pool);
+            ModifiableValue.applyChanges(test.pool);
 
             assert.strictEqual(test.pool.value, 2);
             assert.include(test.pool.changes.map(change => change.name), 'Incoming Target Effect');
@@ -779,7 +779,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 test.targets = [target];
                 test.prepareTestCategories();
                 test.effects.applyAllEffects();
-                ModifiableValue.calcTotal(test.pool);
+                ModifiableValue.applyChanges(test.pool);
                 return test.pool.value;
             };
 
@@ -806,7 +806,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 test.targets = [target];
                 test.prepareTestCategories();
                 test.effects.applyAllEffects();
-                ModifiableValue.calcTotal(test.pool);
+                ModifiableValue.applyChanges(test.pool);
                 return test.pool.value;
             };
 
@@ -841,7 +841,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             ))!;
             test.targets = [target];
             test.effects.applyAllEffects();
-            ModifiableValue.calcTotal(test.pool);
+            ModifiableValue.applyChanges(test.pool);
 
             assert.strictEqual(test.pool.value, 4);
             assert.include(test.pool.changes.map(change => change.name), 'Target Item Incoming Effect');
@@ -875,7 +875,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             ))!;
             test.targets = [targetA, targetA, targetB];
             test.effects.applyAllEffects();
-            ModifiableValue.calcTotal(test.pool);
+            ModifiableValue.applyChanges(test.pool);
 
             assert.strictEqual(test.pool.value, 5);
             assert.strictEqual(test.pool.changes.filter(change => change.name === 'Incoming A').length, 1);
@@ -907,7 +907,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             ))!;
             test.targets = [item];
             test.effects.applyAllEffects();
-            ModifiableValue.calcTotal(test.pool);
+            ModifiableValue.applyChanges(test.pool);
 
             assert.strictEqual(test.pool.value, 0);
             assert.notInclude(test.pool.changes.map(change => change.name), 'Ignored Item Target Effect');
@@ -1104,7 +1104,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 if (!test) throw new Error('Failed to create skill test.');
 
                 test.effects.applyAllEffects();
-                ModifiableValue.calcTotal(test.pool, { min: 0 });
+                ModifiableValue.applyChanges(test.pool, { min: 0 });
 
                 assert.strictEqual(test.pool.value, expected);
             };
@@ -1366,7 +1366,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             const test = (await TestCreator.fromItem(weapon, actor, { showDialog: false, showMessage: false }))!;
 
             await test.execute();
-            ModifiableValue.calcTotal(test.data.damage);
+            ModifiableValue.applyChanges(test.data.damage);
 
             assert.equal(test.data.damage.value, 3);
         });
@@ -1435,7 +1435,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             test.prepareTestCategories();
             test.effects.applyAllEffects();
 
-            ModifiableValue.calcTotal(test.pool);
+            ModifiableValue.applyChanges(test.pool);
 
             assert.strictEqual(test.pool.value, 3);
 
@@ -1448,7 +1448,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             test.prepareTestCategories();
             test.effects.applyAllEffects();
 
-            ModifiableValue.calcTotal(test.pool);
+            ModifiableValue.applyChanges(test.pool);
 
             assert.strictEqual(test.pool.value, 0);
 
@@ -1461,7 +1461,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             test.prepareTestCategories();
             test.effects.applyAllEffects();
 
-            ModifiableValue.calcTotal(test.pool);
+            ModifiableValue.applyChanges(test.pool);
 
             assert.strictEqual(test.pool.value, 0);
         });
@@ -1485,7 +1485,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             if (!test) throw new Error('Failed to create test from action.');
 
             test.effects.applyAllEffects();
-            ModifiableValue.calcTotal(test.pool);
+            ModifiableValue.applyChanges(test.pool);
 
             assert.strictEqual(test.pool.value, 1); // 2 - 1 (defaulted skill)
         });
@@ -1612,9 +1612,11 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 assert.strictEqual(effect.system.changes[0].key, 'system.attributes.body.value');
                 assert.strictEqual(effect.system.changes[0].phase, SR5ActiveEffect.ATTRIBUTES_PHASE);
             }
-            assert.strictEqual(foundry.utils.getProperty(effects[0]._source, 'system.changes.0.key'), 'system.attributes.body');
-            assert.strictEqual(foundry.utils.getProperty(effects[1]._source, 'system.changes.0.key'), 'system.attributes.body.base');
-            assert.strictEqual(foundry.utils.getProperty(effects[3]._source, 'system.changes.0.key'), 'system.attributes.body.changes');
+            // createEmbeddedDocuments does not guarantee return order matches input order, so resolve by name.
+            const byName = (name: string) => effects.find(effect => effect.name === name)!;
+            assert.strictEqual(foundry.utils.getProperty(byName('Parent Key')._source, 'system.changes.0.key'), 'system.attributes.body');
+            assert.strictEqual(foundry.utils.getProperty(byName('Base Key')._source, 'system.changes.0.key'), 'system.attributes.body.base');
+            assert.strictEqual(foundry.utils.getProperty(byName('Changes Key')._source, 'system.changes.0.key'), 'system.attributes.body.changes');
         });
 
         it('resolves dynamic @system refs from raw _source, not effect-modified derived data', async () => {

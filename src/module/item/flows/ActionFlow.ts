@@ -29,10 +29,10 @@ export class ActionFlow {
             damage.source = ActionFlow._damageSource(actor, item);
 
         this._applyModifiableValue(damage, actor);
-        damage.value = ModifiableValue.calcTotal(damage, { min: 0 });
+        damage.value = ModifiableValue.applyChanges(damage, { min: 0 });
 
         this._applyModifiableValue(damage.ap, actor);
-        damage.ap.value = ModifiableValue.calcTotal(damage.ap, { min: 0 });
+        damage.ap.value = ModifiableValue.applyChanges(damage.ap, { min: 0 });
 
         return damage;
     }

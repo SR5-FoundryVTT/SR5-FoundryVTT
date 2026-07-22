@@ -2,7 +2,7 @@ import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { MonitorRules } from './../../../rules/MonitorRules';
 
 export class WoundsPrep {
-    static prepareWounds(system: Actor.SystemOfType<'character' | 'spirit'>, outOfPlace = false) {
+    static prepareWounds(system: Actor.SystemOfType<'character' | 'spirit'>) {
         const { modifiers, track } = system;
 
         // The actor overall has a wound tolerance.
@@ -23,7 +23,6 @@ export class WoundsPrep {
 
         // The actor as a whole derives these wounds for wound modifier calculation
         system.wounds.base = stunWounds + physicalWounds;
-        if (outOfPlace) ModifiableValue.applyChanges(system.wounds);
-        else ModifiableValue.calcTotal(system.wounds);
+        ModifiableValue.applyChanges(system.wounds);
     }
 }

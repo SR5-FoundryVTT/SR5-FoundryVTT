@@ -112,7 +112,7 @@ export class MatrixPrep {
         }
     }
 
-    static prepareMatrixAttributesForDevice(system: Actor.SystemOfType<'vehicle'>, rating?: number, outOfPlace = false) {
+    static prepareMatrixAttributesForDevice(system: Actor.SystemOfType<'vehicle'>, rating?: number) {
         const { matrix } = system;
         rating = rating ?? matrix.rating;
         const matrixAttributes = ['firewall', 'data_processing'] as const;
@@ -120,8 +120,7 @@ export class MatrixPrep {
         for (const attribute of matrixAttributes)
             matrix[attribute].base = rating;
         for (const attId of [...matrixAttributes, 'sleaze', 'attack']) {
-            if (outOfPlace) ModifiableValue.applyChanges(matrix[attId]);
-            else ModifiableValue.calcTotal(matrix[attId]);
+            ModifiableValue.applyChanges(matrix[attId]);
         }
     }
 }

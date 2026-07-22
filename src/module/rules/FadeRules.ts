@@ -17,7 +17,7 @@ export const FadeRules = {
 
         const damage = DataDefaults.createData('damage');
         damage.base = fade;
-        ModifiableValue.calcTotal(damage, {min: 0});
+        ModifiableValue.applyChanges(damage, {min: 0});
 
         damage.type.base = damage.type.value = FadeRules.calcFadeDamageType(hits, resonance);
 
@@ -44,7 +44,7 @@ export const FadeRules = {
         fadeDamage = foundry.utils.duplicate(fadeDamage) as DamageType;
 
         ModifiableValue.addUnique(fadeDamage, 'SR5.Hits', -hits);
-        ModifiableValue.calcTotal(fadeDamage, {min: 0});
+        ModifiableValue.applyChanges(fadeDamage, {min: 0});
 
         return fadeDamage;
     }

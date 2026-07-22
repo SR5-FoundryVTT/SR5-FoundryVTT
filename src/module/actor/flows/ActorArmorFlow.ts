@@ -19,14 +19,14 @@ export const ActorArmorFlow = {
 
         damage ??= DataDefaults.createData('damage');
 
-        ModifiableValue.calcTotal(damage);
-        ModifiableValue.calcTotal(damage.ap);
+        ModifiableValue.applyChanges(damage);
+        ModifiableValue.applyChanges(damage.ap);
 
         // 2. Modify by element
         const element = damage.element?.value;
         if (element) {
             const elArmor = armor.elements[element];
-            ModifiableValue.calcTotal(elArmor, { min: 0 });
+            ModifiableValue.applyChanges(elArmor, { min: 0 });
             if (elArmor.value > 0) {
                 ModifiableValue.addUnique(armor.rating, 'SR5.Element.Label', elArmor.value);
             }
@@ -37,12 +37,12 @@ export const ActorArmorFlow = {
             let immunityArmor = 0;
 
             if (damage.normal_weapon) {
-                ModifiableValue.calcTotal(armor.immunities.normal_weapons);
+                ModifiableValue.applyChanges(armor.immunities.normal_weapons);
                 immunityArmor = Math.max(immunityArmor, armor.immunities.normal_weapons.value);
             }
 
             if (element) {
-                ModifiableValue.calcTotal(armor.immunities[element]);
+                ModifiableValue.applyChanges(armor.immunities[element]);
                 immunityArmor = Math.max(immunityArmor, armor.immunities[element].value);
             }
 
@@ -53,8 +53,8 @@ export const ActorArmorFlow = {
 
         // 4. Modify by penetration (AP)
         // Calculate current rating & hardened values before applying AP reduction
-        ModifiableValue.calcTotal(armor.rating, { min: 0 });
-        ModifiableValue.calcTotal(armor.hardened, { min: 0 });
+        ModifiableValue.applyChanges(armor.rating, { min: 0 });
+        ModifiableValue.applyChanges(armor.hardened, { min: 0 });
 
         const ap = damage.ap.value;
         if (ap > 0) {
@@ -76,8 +76,8 @@ export const ActorArmorFlow = {
         }
 
         // 5. Final calculation of modified fields
-        ModifiableValue.calcTotal(armor.rating, { min: 0 });
-        ModifiableValue.calcTotal(armor.hardened, { min: 0 });
+        ModifiableValue.applyChanges(armor.rating, { min: 0 });
+        ModifiableValue.applyChanges(armor.hardened, { min: 0 });
 
         return armor;
     }

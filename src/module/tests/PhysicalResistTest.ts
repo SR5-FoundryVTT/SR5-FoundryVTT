@@ -164,7 +164,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
             if (hardenedHits > 0) {
                 hits.addUnique('SR5.HardenedArmor', hardenedHits);
             }
-            hits.calcTotal();
+            hits.applyChanges();
         }
 
         return this;

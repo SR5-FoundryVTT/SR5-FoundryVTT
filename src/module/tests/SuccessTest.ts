@@ -396,7 +396,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Shadowrun5e: SR5#44
      */
     get formula(): string {
-        const pool = ModifiableValue.calcTotal(this.data.pool, { min: 0 });
+        const pool = ModifiableValue.applyChanges(this.data.pool, { min: 0 });
         return this.buildFormula(pool, this.hasPushTheLimit);
     }
 
@@ -622,12 +622,12 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     calculateBaseValues() {
         this.roundBaseValueParts();
 
-        ModifiableValue.calcTotal(this.data.pool, { min: 0 });
-        ModifiableValue.calcTotal(this.data.threshold, { min: 0 });
-        ModifiableValue.calcTotal(this.data.limit, { min: 0 });
+        ModifiableValue.applyChanges(this.data.pool, { min: 0 });
+        ModifiableValue.applyChanges(this.data.threshold, { min: 0 });
+        ModifiableValue.applyChanges(this.data.limit, { min: 0 });
 
         // Shows AP on incoming attacks
-        ModifiableValue.calcTotal(this.data.damage.ap);
+        ModifiableValue.applyChanges(this.data.damage.ap);
 
         console.debug(`Shadowrun 5e | Calculated base values for ${this.constructor.name}`, this.data);
     }
@@ -908,7 +908,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // Calculate a ValueField for standardization.
         const netHits = DataDefaults.createData('value_field', { label: "SR5.NetHits", base });
-        ModifiableValue.calcTotal(netHits, { min: 0 });
+        ModifiableValue.applyChanges(netHits, { min: 0 });
 
         return netHits;
     }
@@ -929,7 +929,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         this.hits.base = rollHits;
 
         // First, calculate hits based on roll and modifiers.
-        ModifiableValue.calcTotal(this.hits, { min: 0 });
+        ModifiableValue.applyChanges(this.hits, { min: 0 });
         // Second, reduce hits by limit.
         this.hits.value = this.hasLimit ? Math.min(this.limit.value, this.hits.value) : this.hits.value;
 
@@ -982,7 +982,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             base: rollGlitches
         });
  
-        glitches.value = ModifiableValue.calcTotal(glitches, { min: 0 });
+        glitches.value = ModifiableValue.applyChanges(glitches, { min: 0 });
 
         return glitches;
     }
@@ -996,7 +996,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const extendedHits = this.extendedHits;
         ModifiableValue.addBase(extendedHits, 'SR5.Hits', this.hits.value);
 
-        ModifiableValue.calcTotal(extendedHits, { min: 0 });
+        ModifiableValue.applyChanges(extendedHits, { min: 0 });
 
         return extendedHits;
     }
@@ -1671,7 +1671,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // A situational modifier, not part of the pool itself, so it stays among the changes.
         pool.setUnique('SR5.ExtendedTest', nextModifierValue);
 
-        ModifiableValue.calcTotal(data.pool, { min: 0 });
+        ModifiableValue.applyChanges(data.pool, { min: 0 });
 
         if (!TestRules.canExtendTest(this.threshold.value, this.extendedHits.value)) {
             ui.notifications?.warn('SR5.Warnings.CantExtendTestFurther', { localize: true });

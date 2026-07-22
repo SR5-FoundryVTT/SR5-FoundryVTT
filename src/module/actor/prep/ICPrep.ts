@@ -24,7 +24,7 @@ export class ICPrep {
         ICPrep.prepareMatrixAttributes(system);
 
         ICSkillPrep.prepareSkills(system);
-        SkillsPrep.prepareSkills(system, true);
+        SkillsPrep.prepareSkills(system);
 
         ICPrep.prepareMeatAttributes(system);
         system.parent?.applyActiveEffects('attributes');
@@ -35,7 +35,7 @@ export class ICPrep {
         ICPrep.prepareMatrix(system);
         ICPrep.prepareMatrixTrack(system);
 
-        InitiativePrep.prepareInit('ic', system, true);
+        InitiativePrep.prepareInit('ic', system);
         system.parent?.applyActiveEffects('derived');
     }
 

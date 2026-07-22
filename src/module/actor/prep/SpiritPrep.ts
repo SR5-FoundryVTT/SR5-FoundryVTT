@@ -19,7 +19,7 @@ export class SpiritPrep {
     }
 
     static prepareDerivedData(system: Actor.SystemOfType<'spirit'>, items: SR5Item[]) {
-        ModifiableValue.applyChanges(system.attributes.force, undefined, { min: 1 });
+        ModifiableValue.applyChanges(system.attributes.force, { min: 1 });
         system.parent?.applyActiveEffects('force');
         AttributesPrep.clampAttributesToRange(system, SR.attributes.rangesSpirit);
         const force = system.attributes.force.value;
@@ -29,23 +29,23 @@ export class SpiritPrep {
 
         // Use spirit attribute range to avoid issues with attribute calculation causing unusable attributes.
         AttributesPrep.prepareAttributes(system, SR.attributes.rangesSpirit, new Set(['force']));
-        SkillsPrep.prepareSkills(system, true);
+        SkillsPrep.prepareSkills(system);
         system.parent?.applyActiveEffects('attributes');
         AttributesPrep.clampAttributesToRange(system, SR.attributes.rangesSpirit);
 
         LimitsPrep.prepareLimitBaseFromAttributes(system);
-        LimitsPrep.prepareLimits(system, true);
-        LimitsPrep.prepareDerivedLimits(system, true);
+        LimitsPrep.prepareLimits(system);
+        LimitsPrep.prepareDerivedLimits(system);
 
         SpiritPrep.prepareSpiritArmor(system);
-        ItemPrep.prepareArmor(system, items, true);
+        ItemPrep.prepareArmor(system, items);
 
         GruntPrep.prepareConditionMonitors(system);
 
-        MovementPrep.prepareMovement(system, true);
-        WoundsPrep.prepareWounds(system, true);
+        MovementPrep.prepareMovement(system);
+        WoundsPrep.prepareWounds(system);
 
-        InitiativePrep.prepareInit('spirit', system, true);
+        InitiativePrep.prepareInit('spirit', system);
 
         CharacterPrep.prepareRecoil(system);
         CharacterPrep.prepareRecoilCompensation(system);

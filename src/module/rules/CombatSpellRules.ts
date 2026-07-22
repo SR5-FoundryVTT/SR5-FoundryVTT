@@ -35,8 +35,8 @@ export class CombatSpellRules {
         ModifiableValue.addUnique(damage, 'SR5.Force', force);
 
         // Armor piercing can both be a negative and positive value.
-        ModifiableValue.calcTotal(damage.ap);
-        ModifiableValue.calcTotal(damage, { min: 0 });
+        ModifiableValue.applyChanges(damage.ap);
+        ModifiableValue.applyChanges(damage, { min: 0 });
 
         return damage;
     }

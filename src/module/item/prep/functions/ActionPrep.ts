@@ -127,8 +127,11 @@ export const ActionPrep = {
      * @param action To be altered action data.
      */
     calculateValues(action: ActionRollType) {
-        ModifiableValue.calcTotal(action.damage);
-        ModifiableValue.calcTotal(action.damage.ap);
-        ModifiableValue.calcTotal(action.limit);
+        // Out-of-place: drop prior native display entries, then fold system parts onto `.value` once.
+        // Item ActiveEffects on these values apply natively on top in the derived apply loop.
+        for (const field of [action.damage, action.damage.ap, action.limit]) {
+            ModifiableValue.dropEffectSourced(field);
+            ModifiableValue.applyChanges(field);
+        }
     }
 }

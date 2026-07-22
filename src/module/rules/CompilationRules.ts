@@ -44,7 +44,7 @@ export const CompilationRules = {
         damage.base = CompilationRules.compilationFadeValue(spriteHits);
         damage.type.base = damage.type.value = CompilationRules.calcFadeDamageType(level, resonance);
 
-        ModifiableValue.calcTotal(damage, {min: 0});
+        ModifiableValue.applyChanges(damage, {min: 0});
 
         return damage;
     },

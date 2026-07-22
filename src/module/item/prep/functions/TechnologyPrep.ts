@@ -31,11 +31,14 @@ export const TechnologyPrep = {
      * @param equippedMods Those item mods that are equipped.
      */
     prepareConceal(technology: TechnologyType, equippedMods: SR5Item<'modification'>[]) {
+        TechnologyPrep.dropEffectSourcedChanges(technology.conceal);
+
         const concealParts = new ModifiableValue(technology.conceal);
         for (const mod of equippedMods)
             concealParts.setUnique(mod.name, mod.system.mod_weapon.conceal);
 
-        concealParts.calcTotal();
+        // Out-of-place: fold mod parts onto `.value` once; item ActiveEffects apply natively on top later.
+        concealParts.applyChanges();
     },
 
     /**
@@ -108,7 +111,7 @@ export const TechnologyPrep = {
      */
     prepareAvailability(technology: TechnologyType) {
         TechnologyPrep.dropEffectSourcedChanges(technology.availability);
-        ModifiableValue.applyChanges(technology.availability, undefined, { min: 0 });
+        ModifiableValue.applyChanges(technology.availability, { min: 0 });
     },
 
     /**
@@ -130,7 +133,7 @@ export const TechnologyPrep = {
      */
     prepareCost(technology: TechnologyType) {
         TechnologyPrep.dropEffectSourcedChanges(technology.cost);
-        ModifiableValue.applyChanges(technology.cost, undefined, { decimal: true });
+        ModifiableValue.applyChanges(technology.cost, { decimal: true });
     },
 
     /**
@@ -141,6 +144,6 @@ export const TechnologyPrep = {
      * `source`; native effect entries carry the effect uuid.
      */
     dropEffectSourcedChanges(field: ModifiableValueType) {
-        field.changes = field.changes.filter(change => !change.source);
+        ModifiableValue.dropEffectSourced(field);
     },
 }

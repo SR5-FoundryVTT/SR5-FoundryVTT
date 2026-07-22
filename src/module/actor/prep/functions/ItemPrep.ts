@@ -8,7 +8,7 @@ export class ItemPrep {
      * - will only allow one "Base" armor item to be used (automatically takes the best one if multiple are equipped)
      * - all "accessories" will be added to the armor
      */
-    static prepareArmor(system: Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>, items: SR5Item[], outOfPlace = false) {
+    static prepareArmor(system: Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>, items: SR5Item[]) {
         const { armor } = system;
 
         // NOTE: We retrieve different types of items, all containing armor data.
@@ -59,9 +59,7 @@ export class ItemPrep {
         if (system.modifiers.armor)
             ModifiableValue.addUnique(armor.rating, game.i18n.localize('SR5.Bonus'), system.modifiers.armor);
 
-        const resolve = <F extends ModifiableValueType>(field: F) => outOfPlace ?
-            ModifiableValue.applyChanges(field) :
-            ModifiableValue.calcTotal(field);
+        const resolve = <F extends ModifiableValueType>(field: F) => ModifiableValue.applyChanges(field);
 
         resolve(armor.rating);
         resolve(armor.hardened);

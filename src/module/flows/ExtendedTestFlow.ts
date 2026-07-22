@@ -330,14 +330,14 @@ export const ExtendedTestFlow = {
         const priorRolls = record.cumulativeModifier ? record.rollCount : 0;
         const pool = new ModifiableValue(data.pool);
         pool.setUnique('SR5.ExtendedTest', TestRules.extendedModifierValue * priorRolls);
-        pool.calcTotal({ min: 0 });
+        pool.applyChanges({ min: 0 });
 
         // Seed accumulated hits from the record, keeping it the source of truth.
         data.values.extendedHits = DataDefaults.createData('value_field', { label: 'SR5.ExtendedHits' });
         if (record.accumulatedHits > 0) {
             ModifiableValue.addBase(data.values.extendedHits, 'SR5.Hits', record.accumulatedHits);
         }
-        ModifiableValue.calcTotal(data.values.extendedHits, { min: 0 });
+        ModifiableValue.applyChanges(data.values.extendedHits, { min: 0 });
 
         return data;
     },
