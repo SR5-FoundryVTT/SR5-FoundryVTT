@@ -1544,7 +1544,8 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             // Baseline (no effect): derived consumers read the un-modified body.
             assert.strictEqual(actor.system.attributes.body.value, 6);
-            assert.strictEqual(actor.system.limits.physical.base, 2);       // ceil((2*0 + 6 + 0) / 3)
+            // Limit anchors are BASE_PRIORITY change entries now, so assert the derived value, not `base`.
+            assert.strictEqual(actor.system.limits.physical.value, 2);      // ceil((2*0 + 6 + 0) / 3)
             assert.strictEqual(actor.system.track.physical.base, 11);       // 8 + ceil(6 / 2)
             assert.strictEqual(actor.system.track.physical.overflow.max, 6);
 
@@ -1561,7 +1562,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             });
 
             // Downstream in-place consumers see the AE-modified attribute.
-            assert.strictEqual(actor.system.limits.physical.base, 3);       // ceil((2*0 + 8 + 0) / 3)
+            assert.strictEqual(actor.system.limits.physical.value, 3);      // ceil((2*0 + 8 + 0) / 3)
             assert.strictEqual(actor.system.track.physical.base, 12);       // 8 + ceil(8 / 2)
             assert.strictEqual(actor.system.track.physical.overflow.max, 8);
 

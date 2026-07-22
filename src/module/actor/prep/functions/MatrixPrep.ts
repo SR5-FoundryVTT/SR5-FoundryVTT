@@ -15,11 +15,10 @@ export class MatrixPrep {
 
         const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'] as const;
 
-        // Clear matrix data to defaults before rebuilding it from an equipped device or living persona.
-        for (const key of MatrixList) {
-            matrix[key].base = 0;
-        }
-
+        // Matrix attributes are rebuilt from an equipped device or living persona every cycle. Their anchor
+        // is logged as a BASE_PRIORITY change entry and folded from 0, instead of being written to `base`.
+        // Nothing needs clearing here: actor change lists are reset in prepareBaseData and the anchor is
+        // added with addUniqueBase, which replaces any earlier entry.
         matrix.condition_monitor.max = 0;
         matrix.rating = 0;
         matrix.name = '';
@@ -47,17 +46,17 @@ export class MatrixPrep {
                 if (!value) continue;
                 // create a new attribute field from the current one, this also works if the matrix[key] field doesn't exist
                 const att = DataDefaults.createData('matrix_attribute_field', matrix[key]);
-                att.base = value.value;
                 att.device_att = value.device_att;
+                ModifiableValue.addUniqueBase(att, 'SR5.BaseValue', value.value);
                 matrix[key] = att;
             }
         } // if we don't have a device, use living persona
         else if (system.special === 'resonance') {
-            matrix.firewall.base = attributes.willpower.value;
-            matrix.data_processing.base = attributes.logic.value;
+            ModifiableValue.addUniqueBase(matrix.firewall, 'SR5.BaseValue', attributes.willpower.value);
+            ModifiableValue.addUniqueBase(matrix.data_processing, 'SR5.BaseValue', attributes.logic.value);
             matrix.rating = attributes.resonance.value;
-            matrix.attack.base = attributes.charisma.value;
-            matrix.sleaze.base = attributes.intuition.value;
+            ModifiableValue.addUniqueBase(matrix.attack, 'SR5.BaseValue', attributes.charisma.value);
+            ModifiableValue.addUniqueBase(matrix.sleaze, 'SR5.BaseValue', attributes.intuition.value);
             // if we have a Living Persona device, we want to use some of its data to make the sheet sync up best
             if (device?.isLivingPersona()) {
                 matrix.device = device._id!;
@@ -77,7 +76,7 @@ export class MatrixPrep {
         }
 
         for (const key of MatrixList) {
-            ModifiableValue.applyChanges(matrix[key]);
+            ModifiableValue.applyChanges(matrix[key], { from: 0 });
         }
 
         // Add Rating as an Attribute Field to the actor's Attributes
