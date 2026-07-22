@@ -22,7 +22,10 @@ export class WoundsPrep {
         track.physical.wounds = physicalWounds;
 
         // The actor as a whole derives these wounds for wound modifier calculation
-        system.wounds.base = stunWounds + physicalWounds;
-        ModifiableValue.applyChanges(system.wounds);
+        // Derived anchor: logged as a BASE_PRIORITY change entry instead of the `base` field, then folded
+        // from 0. Preparation recomputes it every cycle, so it stays stable without relying on `base`.
+        const wounds = new ModifiableValue(system.wounds);
+        wounds.addUniqueBase('SR5.BaseValue', stunWounds + physicalWounds);
+        wounds.applyChanges({ from: 0 });
     }
 }

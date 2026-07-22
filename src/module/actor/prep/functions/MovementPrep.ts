@@ -6,12 +6,17 @@ export class MovementPrep {
         const { attributes, modifiers } = system;
 
         const movement = system.movement;
-        // default movement: WALK = AGI * 2, RUN = AGI * 4
-        movement.walk.base = attributes.agility.value * (2 + modifiers.walk);
-        movement.run.base = attributes.agility.value * (4 + modifiers.run);
 
-        const resolve = <F extends ModifiableValueType>(field: F) => ModifiableValue.applyChanges(field, { min: 0 });
-        resolve(movement.walk);
-        resolve(movement.run);
+        // Derived anchors are logged as BASE_PRIORITY change entries instead of the `base` field, then
+        // folded from 0. Preparation recomputes them every cycle, so they stay stable without `base`.
+        const resolve = <F extends ModifiableValueType>(field: F, base: number) => {
+            const mod = new ModifiableValue(field);
+            mod.addUniqueBase('SR5.BaseValue', base);
+            return mod.applyChanges({ from: 0, min: 0 });
+        };
+
+        // default movement: WALK = AGI * 2, RUN = AGI * 4
+        resolve(movement.walk, attributes.agility.value * (2 + modifiers.walk));
+        resolve(movement.run, attributes.agility.value * (4 + modifiers.run));
     }
 }

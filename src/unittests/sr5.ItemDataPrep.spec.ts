@@ -362,6 +362,59 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(unequippedDevice.system.technology.cost.value, 100);
         });
 
+        it('applies item-target effects to a device matrix attribute', async () => {
+            const device = await factory.createItem({
+                type: 'device',
+                system: { technology: { rating: 3 } },
+            });
+
+            await device.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Firewall Boost',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [
+                        { key: 'system.attributes.firewall', value: '2', type: 'add', target: 'item' },
+                    ],
+                },
+            }]);
+
+            device.prepareData();
+            const once = device.system.attributes!.firewall.value;
+            device.prepareData();
+            const twice = device.system.attributes!.firewall.value;
+
+            assert.strictEqual(once, twice, 'repeated prepareData must be idempotent');
+            // base is the device rating (3); if the effect applies, value is 5.
+            assert.strictEqual(device.system.attributes!.firewall.base, 3, 'firewall base');
+            assert.strictEqual(once, 5, 'firewall value after +2 effect');
+        });
+
+        it('applies item-target effects to armor item rating out-of-place', async () => {
+            const armorItem = await factory.createItem({
+                type: 'armor',
+                system: { armor: { base: 6, value: 6 } },
+            });
+
+            await armorItem.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Armor Boost',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [
+                        { key: 'system.armor', value: '2', type: 'add', target: 'item' },
+                    ],
+                },
+            }]);
+
+            armorItem.prepareData();
+            const once = armorItem.system.armor.value;
+            armorItem.prepareData();
+            const twice = armorItem.system.armor.value;
+
+            assert.strictEqual(once, twice, 'repeated prepareData must be idempotent');
+            // base is 6; if the effect applies, value is 8.
+            assert.strictEqual(once, 8, 'armor value after +2 effect');
+        });
+
         it('keeps ware grade cost and availability adjustments', async () => {
             const ware = await factory.createItem({
                 type: 'cyberware',

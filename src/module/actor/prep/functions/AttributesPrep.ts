@@ -9,10 +9,16 @@ export class AttributesPrep {
     /**
      * Prepare actor data for attributes
      */
+    /**
+     * @param useSourceAnchor Anchor each attribute on its persisted `_source` value instead of the prepared
+     *   `base` field. Opt-in because some actor types (IC, vehicle) deliberately overwrite `attribute.base`
+     *   during preparation, where the prepared base - not the persisted one - is the intended anchor.
+     */
     static prepareAttributes(
         system: SR5Actor['system'],
         ranges?: Record<string, {min: number, max?: number}>,
-        preparedAttributes: ReadonlySet<string> = new Set()
+        preparedAttributes: ReadonlySet<string> = new Set(),
+        useSourceAnchor = false
     ) {
         const {attributes} = system;
 
@@ -27,7 +33,7 @@ export class AttributesPrep {
         // set the value for the attributes
         for (const [name, attribute] of Object.entries(attributes)) {
             if (preparedAttributes.has(name)) attribute.label = SR5.attributes[name];
-            else AttributesPrep.prepareAttribute(name, attribute, ranges);
+            else AttributesPrep.prepareAttribute(name, attribute, ranges, useSourceAnchor ? system : undefined);
 
             if ('max' in attribute) {
                 attribute.max = attribute.value;
@@ -40,13 +46,18 @@ export class AttributesPrep {
      * @param name The key field (and name) of the attribute given
      * @param attribute The AttributeField to prepare
      */
-    static prepareAttribute(name: string, attribute: AttributeFieldType, ranges?: Record<string, {min: number, max?: number}>) {
+    static prepareAttribute(
+        name: string,
+        attribute: AttributeFieldType,
+        ranges?: Record<string, {min: number, max?: number}>,
+        sourceModel?: object
+    ) {
         // Check for valid attributes. Active Effects can cause unexpected properties to appear.
         if (!Object.hasOwn(SR5.attributes, name) || !attribute) return;
 
         // Each attribute can have a unique value range.
         // TODO:  Implement metatype attribute value ranges for character actors.
-        AttributesPrep.calculateAttribute(name, attribute, ranges);
+        AttributesPrep.calculateAttribute(name, attribute, ranges, sourceModel);
 
         // add i18n labels.
         attribute.label = SR5.attributes[name];
@@ -58,14 +69,26 @@ export class AttributesPrep {
      * @param name The attributes name / id
      * @param attribute The attribute will be modified in place
      */
-    static calculateAttribute(name: string, attribute: AttributeFieldType, ranges?: Record<string, {min: number, max?: number}>) {
+    static calculateAttribute(
+        name: string,
+        attribute: AttributeFieldType,
+        ranges?: Record<string, {min: number, max?: number}>,
+        sourceModel?: object
+    ) {
         // Check for valid attributes. Active Effects can cause unexpected properties to appear.
         if (!Object.hasOwn(SR5.attributes, name) || !attribute) return;
 
         // Each attribute can have a unique value range.
         // TODO:  Implement metatype attribute value ranges for character actors.
         const range = ranges ? ranges[name] : SR.attributes.ranges[name];
-        ModifiableValue.applyChanges(attribute, range);
+
+        // Anchor on the persisted `_source` value when available. Preparation never resets the model, so the
+        // prepared `base` is not a reliable starting point; `_source` is the authored number.
+        const from = sourceModel
+            ? ModifiableValue.sourceAnchor(sourceModel, `attributes.${name}`)
+            : undefined;
+
+        ModifiableValue.applyChanges(attribute, { ...range, from });
     }
 
     /**

@@ -33,7 +33,9 @@ export class CharacterPrep {
      * @param items
      */
     static prepareDerivedData(system: Actor.SystemOfType<'character'>, items: SR5Item[]) {
-        AttributesPrep.prepareAttributes(system);
+        // Character attribute bases are authored data (importers/sheet), never rewritten by preparation, so
+        // they anchor on the persisted `_source` value rather than the prepared `base` field.
+        AttributesPrep.prepareAttributes(system, undefined, undefined, true);
         AttributesPrep.prepareEssence(system, items);
 
         // NPC metatype modifiers are attribute inputs and therefore must resolve before the
@@ -89,11 +91,12 @@ export class CharacterPrep {
     static prepareRecoilCompensation(system: Actor.SystemOfType<'character' | 'spirit'>) {
         const recoilCompensation = RangedWeaponRules.humanoidRecoilCompensationValue(system.attributes.strength.value);
         const baseRc = RangedWeaponRules.humanoidBaseRecoilCompensation();
-        system.values.recoil_compensation.base = baseRc;
 
+        // Derived anchor logged as a BASE_PRIORITY entry instead of the `base` field, then folded from 0.
         const mod = new ModifiableValue(system.values.recoil_compensation);
+        mod.addUniqueBase('SR5.BaseValue', baseRc);
         mod.addUnique("SR5.RecoilCompensation", recoilCompensation);
-        mod.applyChanges({ min: 0 });
+        mod.applyChanges({ from: 0, min: 0 });
     }
 
     static addSpecialAttributes(system: Actor.SystemOfType<'character'>) {

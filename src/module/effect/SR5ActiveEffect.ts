@@ -199,6 +199,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         'system.action.damage',
         'system.action.damage.ap',
         'system.action.limit',
+        'system.armor',
     ];
 
     static readonly ATTRIBUTES_PHASE = 'attributes';

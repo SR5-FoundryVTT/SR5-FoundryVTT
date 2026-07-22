@@ -181,14 +181,19 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
      * Actor preparation uses this before Foundry applies native ActiveEffect changes to `.value`.
      * The change list remains a display log, so native entries appended later are never folded back
      * into the value by a subsequent read.
+     *
+     * @param options.from Starting value to fold onto, replacing `base`. `prepareData` does not `reset()`
+     *   the model (reset only happens around create/update), so a converted value needs an explicit,
+     *   recomputed anchor every cycle or repeated preparation would accumulate. Pass the freshly computed
+     *   number for derived values; omit to keep using the legacy `base` field.
      */
     applyChanges(
-        options?: { min?: number; max?: number, decimal?: boolean }
+        options?: { from?: number; min?: number; max?: number, decimal?: boolean }
     ): number {
         const enforcedNames = new Set(['SR5.EnforcedMaximum', 'SR5.EnforcedMinimum']);
 
         this._field.changes = this._field.changes.filter(change => !enforcedNames.has(change.name));
-        this._field.value = this._field.base;
+        this._field.value = options?.from ?? this._field.base;
 
         for (const change of [...this._field.changes].sort((a, b) => a.priority - b.priority)) {
             if (!change.enabled) continue;
@@ -339,6 +344,34 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
      */
     static dropEffectSourced<F extends ModifiableValueType>(list: F): void {
         new ModifiableValue(list).dropEffectSourced();
+    }
+
+    /**
+     * Read a modifiable value's persisted anchor out of the owning DataModel's `_source`.
+     *
+     * `ClientDocument#prepareData` never calls `reset()` (that only happens around create/update), so the
+     * prepared `base` is not a stable anchor: preparation can overwrite it, and repeated preparation would
+     * otherwise compound. `_source` always holds the authored, persisted number and is never touched by
+     * preparation, which makes it the correct starting point for {@link applyChanges}'s `from`.
+     *
+     * Transitional: the persisted anchor is `base` today and becomes `value` once `base` leaves the schema,
+     * so both are accepted here.
+     *
+     * @param model The DataModel owning the value (e.g. an actor's `system`).
+     * @param path Path to the modifiable value within that model, e.g. `attributes.body`.
+     * @returns The persisted anchor, or 0 when absent.
+     */
+    static sourceAnchor(model: object | undefined | null, path: string): number {
+        const source = (model as { _source?: object } | undefined | null)?._source;
+        if (!source) return 0;
+
+        const raw = foundry.utils.getProperty(source, path);
+        if (raw == null) return 0;
+        if (typeof raw === 'number') return Number.isFinite(raw) ? raw : 0;
+
+        const anchor = Number((raw as { base?: unknown; value?: unknown }).base
+            ?? (raw as { value?: unknown }).value ?? 0);
+        return Number.isFinite(anchor) ? anchor : 0;
     }
 
     /**

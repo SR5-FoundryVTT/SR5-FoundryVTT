@@ -8,6 +8,10 @@ export const ArmorPrep = {
         const armor = item.system.armor;
         if (!armor) return;
 
+        // Out-of-place: armor resolves its system parts (base + equipped mods) directly onto `.value` below,
+        // resetting from `base` every cycle. Item ActiveEffects on `system.armor` are routed to the `.value`
+        // leaf and apply natively on top in the derived apply loop. Armor is a base/value pair without a
+        // `changes[]` list, so there is no display log to reset here.
         armor.value = armor.is_hardened ? 0 : armor.base;
         armor.hardened = armor.is_hardened ? armor.base : 0;
         for (const element of Object.keys(armor.elements)) {
