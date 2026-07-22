@@ -77,7 +77,12 @@ export class SR5ActiveEffect extends ActiveEffect {
      * Resolve the target a change belongs to or undefined if no matching target is found.
      */
     targetForChange(change: { target?: string }) {
-        return this.system.targets.find(target => target.id === change.target);
+        const target = this.system.targets.find(target => target.id === change.target);
+        if (target || change.target) return target;
+
+        // Changes added through a later effect update do not pass through _preCreate's target
+        // binding. A lone target is unambiguous and preserves the legacy actor-target default.
+        return this.system.targets.length === 1 ? this.system.targets[0] : undefined;
     }
 
     /**
@@ -174,12 +179,99 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
+     * Out-of-place AE spike: custom application phase names for the native path.
+     *
+     * Actor-bound ModifiableValue changes are normalized into one of these phases during effect preparation.
+     * They apply to the leaf `.value` NumberField at the matching dependency-layer boundary instead of being
+     * redirected into a ModifiableValue's `changes[]`.
+     */
+    /**
+     * Out-of-place AE spike (items): ModifiableValue keys whose item-target changes apply natively to the
+     * leaf `.value` NumberField instead of being redirected into `changes[]`. Items are not applied through
+     * Foundry's phase system (SR5 applies them manually in SR5Item.applyItemActiveEffects), so a flat key set
+     * plays the role the phase names play for actors.
+     */
+    static readonly OUT_OF_PLACE_ITEM_VALUE_KEYS: readonly string[] = [
+        'system.technology.cost',
+        'system.technology.availability',
+    ];
+
+    static readonly ATTRIBUTES_PHASE = 'attributes';
+    static readonly FORCE_PHASE = 'force';
+    static readonly LEVEL_PHASE = 'level';
+    static readonly MATRIX_PHASE = 'matrix';
+    static readonly VEHICLE_PHASE = 'vehicle';
+    static readonly DERIVED_PHASE = 'derived';
+    static readonly NATIVE_PHASES: readonly string[] = [
+        SR5ActiveEffect.ATTRIBUTES_PHASE,
+        SR5ActiveEffect.FORCE_PHASE,
+        SR5ActiveEffect.LEVEL_PHASE,
+        SR5ActiveEffect.MATRIX_PHASE,
+        SR5ActiveEffect.VEHICLE_PHASE,
+        SR5ActiveEffect.DERIVED_PHASE,
+    ];
+
+    /**
+     * Whether a change's phase opts it into the native (out-of-place) application path.
+     */
+    static isNativePhase(phase: string | undefined): boolean {
+        return !!phase && SR5ActiveEffect.NATIVE_PHASES.includes(phase);
+    }
+
+    /**
+     * Normalize a character, spirit, or sprite actor's ModifiableValue change to its leaf NumberField and dependency phase.
+     * This only mutates prepared effect data. The saved source remains in its original, user-authored form.
+     */
+    private normalizeActorValueChange(change: { key: string; phase: string; target?: string }) {
+        const actor = this.actor;
+        const target = this.targetForChange(change);
+        if (!actor || !['character', 'spirit', 'sprite', 'vehicle', 'ic'].includes(actor.type) ||
+            !target || !['actor', 'targeted_actor'].includes(target.applyTo)) return;
+
+        const key = change.key;
+        let valueKey: string | null = null;
+        if (SR5ActiveEffect.getModifiableValue(actor, key)) {
+            valueKey = `${key}.value`;
+        } else {
+            const nodes = key.split('.');
+            const property = nodes.pop();
+            const parentKey = nodes.join('.');
+            if (property && SR5ActiveEffect.modifiableValueProperties.includes(property) &&
+                SR5ActiveEffect.getModifiableValue(actor, parentKey)) {
+                valueKey = `${parentKey}.value`;
+            }
+        }
+
+        if (!valueKey) return;
+
+        change.key = valueKey;
+        if (actor.type === 'spirit' && valueKey === 'system.attributes.force.value') {
+            change.phase = SR5ActiveEffect.FORCE_PHASE;
+        } else if (actor.type === 'sprite' && valueKey === 'system.attributes.level.value') {
+            change.phase = SR5ActiveEffect.LEVEL_PHASE;
+        } else if (actor.type === 'vehicle' && /^system\.vehicle_stats\.[^.]+\.value$/.test(valueKey)) {
+            change.phase = SR5ActiveEffect.VEHICLE_PHASE;
+        } else if (/^system\.attributes\.[^.]+\.value$/.test(valueKey)) {
+            change.phase = SR5ActiveEffect.ATTRIBUTES_PHASE;
+        } else if (/^system\.matrix\.(attack|sleaze|data_processing|firewall)\.value$/.test(valueKey)) {
+            change.phase = SR5ActiveEffect.MATRIX_PHASE;
+        } else {
+            change.phase = SR5ActiveEffect.DERIVED_PHASE;
+        }
+    }
+
+    /**
      * Effect change given by user is altered to what is best for the system.
-     * 
+     *
      * We do this to avoid effects breaking the sheet and easing the use of custom changes
      * for users not aware of system internal around ModifiableValue.
      */
     static alterChange(model: DataModel.Any, change: ActiveEffect.ChangeData) {
+        // Out-of-place AE spike: changes opted into a native phase (actors) or flagged out-of-place (items)
+        // are applied natively to the leaf `.value` NumberField, so skip redirection to the parent
+        // ModifiableField that would otherwise divert them into `changes[]`.
+        if (SR5ActiveEffect.isNativePhase(change.phase) || (change as { outOfPlace?: boolean }).outOfPlace) return;
+
         if (!SR5ActiveEffect.getModifiableValue(model, change.key))
             SR5ActiveEffect.redirectToNearModifiableValue(model, change);
     }
@@ -336,7 +428,7 @@ export class SR5ActiveEffect extends ActiveEffect {
             return {};
 
         // Resolve dynamic value references in change.
-        const source = change.effect?.parent ?? targetDoc;
+        const source = SR5ActiveEffect.dynamicChangeSource(change.effect?.parent) ?? targetDoc;
         SR5ActiveEffect.alterChange(targetDoc, change);
         SR5ActiveEffect.resolveDynamicChangeValue(source, change);
         
@@ -348,7 +440,52 @@ export class SR5ActiveEffect extends ActiveEffect {
             return SR5ActiveEffect._applyToObject(targetDoc, change);
         }
 
-        return super.applyChange(targetDoc, change, options);
+        const result = super.applyChange(targetDoc, change, options);
+
+        // Out-of-place AE spike: native application mutates `.value` directly and leaves `changes[]` empty,
+        // so the sheet tooltip would lose the attribute AE. Record a display-only entry so the existing
+        // tooltip renderer (ModifierHelpers reads the value's `changes[]`) still shows it.
+        // NOTE (Risk 2): this is a plain applied-delta log; it does NOT recompute override/upgrade masking
+        // across multiple changes, so a masked change would still display un-struck.
+        const actorNative = SR5ActiveEffect.isNativePhase(change.phase) && targetDoc instanceof SR5Actor;
+        const itemNative = (change as { outOfPlace?: boolean }).outOfPlace && targetDoc instanceof SR5Item;
+        if (actorNative || itemNative) {
+            SR5ActiveEffect.recordNativeChange(targetDoc, change);
+        }
+
+        return result;
+    }
+
+    /**
+     * Out-of-place AE spike: append a display-only entry into the target ModifiableValue's `changes[]`
+     * for a natively-applied change, so the sheet tooltip keeps showing it. The value itself is already
+     * set by Foundry's native application; this entry is for display and is cleared each prep cycle by
+     * ModifiableFieldPrep.resetAllModifiers.
+     *
+     * @param actor The actor the change was applied to.
+     * @param change The natively-applied change (leaf key, e.g. system.attributes.body.value).
+     */
+    static recordNativeChange(target: SR5Actor | SR5Item, change: ActiveEffect.ChangeData) {
+        if (!change.effect) return;
+
+        const value = Number(change.value);
+        if (!Number.isFinite(value)) return;
+
+        // The ModifiableValue lives one level up from the leaf value key.
+        const nodes = change.key.split('.');
+        nodes.pop();
+        const mod = SR5ActiveEffect.getModifiableValue(target, nodes.join('.'));
+        if (!mod) return;
+
+        mod.changes.push(
+            DataDefaults.createData('change_entry', {
+                name: change.effect.name,
+                type: change.type,
+                value,
+                priority: change.priority ?? ActiveEffect.CHANGE_TYPES[change.type!]?.defaultPriority ?? 20,
+                source: change.effect.uuid,
+            })
+        );
     }
 
     /**
@@ -412,6 +549,26 @@ export class SR5ActiveEffect extends ActiveEffect {
      * @param source Any object style value, either a Foundry document or a plain object
      * @param change A singular ActiveEffect.ChangeData object
      */
+    /**
+     * Out-of-place AE spike: build the data object that dynamic change values (`@` references) resolve
+     * against. `@system.*` references are resolved from the effect parent's raw persisted `_source`
+     * instead of the prepared model, so a dynamic value is deterministic and independent of prior effect
+     * application / derived-data preparation order.
+     *
+     * Falls back to the parent as-is when it has no DataModel `_source` (e.g. plain-object test targets).
+     *
+     * @param parent The effect's parent document (Actor/Item) or undefined.
+     * @returns The resolution data object, or null when there is no parent.
+     */
+    static dynamicChangeSource(parent: any): object | null {
+        if (!parent) return null;
+
+        const rawSystem = parent.system?._source;
+        if (!rawSystem) return parent;
+
+        return { ...parent, system: rawSystem };
+    }
+
     static resolveDynamicChangeValue(source: any, change: ActiveEffect.ChangeData) {
         // Dynamic value present?
         if (typeof change.value !== 'string') return;
@@ -518,7 +675,8 @@ export class SR5ActiveEffect extends ActiveEffect {
         // Overwrite foundry priority handling, as they provide a defaultPriority in CHANGE_TYPES but use
         // priority in their ActiveEffect#prepareBaseData implementation.
         for ( const change of this.system.changes ) {
-          change.priority = change.priority === 0 ? ActiveEffect.CHANGE_TYPES[change.type!]?.defaultPriority : change.priority;
+            change.priority = change.priority === 0 ? ActiveEffect.CHANGE_TYPES[change.type!]?.defaultPriority : change.priority;
+            this.normalizeActorValueChange(change);
         }
     }
 }

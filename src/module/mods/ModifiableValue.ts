@@ -221,13 +221,13 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
             }
         }
 
-        if (options?.max != null && this._field.value > options.max) {
+        if (options?.max !== undefined && this._field.value > options.max) {
             this._markPreviousChangesMasked(this._field.changes.length);
             this.addUnique('SR5.EnforcedMaximum', options.max, { type: 'downgrade', priority: ModifiableValue.TOP_PRIORITY });
             this._field.value = options.max;
         }
 
-        if (options?.min != null && this._field.value < options.min) {
+        if (options?.min !== undefined && this._field.value < options.min) {
             this._markPreviousChangesMasked(this._field.changes.length);
             this.addUnique('SR5.EnforcedMinimum', options.min, { type: 'upgrade', priority: ModifiableValue.TOP_PRIORITY });
             this._field.value = options.min;
@@ -238,6 +238,65 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
             this._field.value = Math.ceil(this._field.value);
         }
 
+        return this._field.value;
+    }
+
+    /**
+     * Resolve system-provided parts into a value without using `changes` as the source of truth.
+     *
+     * Actor preparation uses this before Foundry applies native ActiveEffect changes to `.value`.
+     * The change list remains a display log, so native entries appended later are never folded back
+     * into the value by a subsequent read.
+     */
+    applyChanges(
+        entries: readonly ModifiableValueType['changes'][number][] = this._field.changes,
+        options?: { min?: number; max?: number, decimal?: boolean }
+    ): number {
+        const enforcedNames = new Set(['SR5.EnforcedMaximum', 'SR5.EnforcedMinimum']);
+        const appliedEntries = entries.filter(change => !enforcedNames.has(change.name));
+
+        this._field.changes = this._field.changes.filter(change => !enforcedNames.has(change.name));
+        this._field.value = this._field.base;
+
+        for (const change of [...appliedEntries].sort((a, b) => a.priority - b.priority)) {
+            if (!change.enabled) continue;
+
+            switch (change.type) {
+                case 'add':
+                    this._field.value += change.value;
+                    break;
+                case 'subtract':
+                    this._field.value -= change.value;
+                    break;
+                case 'multiply':
+                    this._field.value *= change.value;
+                    break;
+                case 'override':
+                    this._field.value = change.value;
+                    break;
+                case 'upgrade':
+                    this._field.value = Math.max(this._field.value, change.value);
+                    break;
+                case 'downgrade':
+                    this._field.value = Math.min(this._field.value, change.value);
+                    break;
+                default:
+                    console.warn(`Unknown Active Effect type ${change.type} encountered.`);
+                    break;
+            }
+        }
+
+        if (options?.max != null && this._field.value > options.max) {
+            this.addUnique('SR5.EnforcedMaximum', options.max, { type: 'downgrade', priority: ModifiableValue.TOP_PRIORITY });
+            this._field.value = options.max;
+        }
+
+        if (options?.min != null && this._field.value < options.min) {
+            this.addUnique('SR5.EnforcedMinimum', options.min, { type: 'upgrade', priority: ModifiableValue.TOP_PRIORITY });
+            this._field.value = options.min;
+        }
+
+        if (!options?.decimal) this._field.value = Math.ceil(this._field.value);
         return this._field.value;
     }
 
@@ -376,5 +435,14 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
         list: F, ...args: Parameters<ModifiableValue<F>["calcTotal"]>
     ): number {
         return new ModifiableValue(list).calcTotal(...args);
+    }
+
+    /**
+     * Static helper for out-of-place actor preparation.
+     */
+    static applyChanges<F extends ModifiableValueType>(
+        list: F, ...args: Parameters<ModifiableValue<F>["applyChanges"]>
+    ): number {
+        return new ModifiableValue(list).applyChanges(...args);
     }
 }

@@ -76,6 +76,37 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(device.system.technology.cost.value, 150);
         });
 
+        it('applies item-target active effects to technology cost out-of-place (idempotent, logged)', async () => {
+            const device = await factory.createItem({
+                type: 'device',
+                system: { technology: { cost: { base: 100, value: 100 } } },
+            });
+
+            const [effect] = await device.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Cost Modifier',
+                system: {
+                    targets: [{ id: 'item', applyTo: 'item' }],
+                    changes: [
+                        { key: 'system.technology.cost', value: '50', type: 'add', target: 'item' },
+                    ],
+                },
+            }]);
+
+            // Repeated preparation must not re-fold the native effect onto the value (items are not reset
+            // between prepare cycles, so a prior display entry could otherwise double the applied delta).
+            device.prepareData();
+            device.prepareData();
+            device.prepareData();
+            assert.strictEqual(device.system.technology.cost.value, 150);
+
+            // The native delta lands on `.value`; `changes[]` holds only a single descriptive display entry
+            // (the tooltip log), sourced from the effect, not a folded system part.
+            const logged = device.system.technology.cost.changes.filter(change => change.source === effect.uuid);
+            assert.strictEqual(logged.length, 1);
+            assert.strictEqual(logged[0].name, 'Cost Modifier');
+            assert.strictEqual(logged[0].value, 50);
+        });
+
         it('applies item-target active effect multipliers to technology cost', async () => {
             const device = await factory.createItem({
                 type: 'device',

@@ -256,6 +256,32 @@
             "Modes": {
                 "Modify": "Modify"
             },
+            "Phases": {
+                "Attributes": {
+                    "label": "Attributes",
+                    "hint": "Apply after attribute values are prepared."
+                },
+                "Force": {
+                    "label": "Force",
+                    "hint": "Apply before Force-derived spirit values are prepared."
+                },
+                "Level": {
+                    "label": "Level",
+                    "hint": "Apply before Level-derived sprite values are prepared."
+                },
+                "Matrix": {
+                    "label": "Matrix",
+                    "hint": "Apply after matrix values are prepared."
+                },
+                "Vehicle": {
+                    "label": "Vehicle",
+                    "hint": "Apply after vehicle stats are prepared."
+                },
+                "Derived": {
+                    "label": "Derived",
+                    "hint": "Apply after derived values are prepared."
+                }
+            },
             "New": "New Effect",
             "RemoveCondition": "Remove Condition",
             "RemoveTarget": "Remove Target",

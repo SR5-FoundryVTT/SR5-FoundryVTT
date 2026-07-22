@@ -1,5 +1,6 @@
 import { SR5TestFactory } from './utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
+import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
 
 export const shadowrunSR5VehicleDataPrep = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -108,6 +109,29 @@ export const shadowrunSR5VehicleDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(vehicle.system.attributes.strength.value, 5);
         });
 
+        it('applies vehicle stat effects before pilot attributes and matrix effects before aliases', async () => {
+            const vehicle = await factory.createActor({
+                type: 'vehicle',
+                system: {
+                    vehicle_stats: { pilot: { base: 3 } },
+                },
+            });
+            const effects = await vehicle.createEmbeddedDocuments('ActiveEffect', [
+                { name: 'Raise Pilot', system: { changes: [{ key: 'system.vehicle_stats.pilot', value: '2', type: 'add' }] } },
+                { name: 'Raise Firewall', system: { changes: [{ key: 'system.matrix.firewall', value: '1', type: 'add' }] } },
+            ]) as SR5ActiveEffect[];
+
+            // createEmbeddedDocuments does not guarantee return order matches input order, so resolve by name.
+            const pilotEffect = effects.find(e => e.name === 'Raise Pilot')!;
+            const firewallEffect = effects.find(e => e.name === 'Raise Firewall')!;
+            assert.strictEqual(pilotEffect.system.changes[0].phase, SR5ActiveEffect.VEHICLE_PHASE);
+            assert.strictEqual(firewallEffect.system.changes[0].phase, SR5ActiveEffect.MATRIX_PHASE);
+            assert.strictEqual(vehicle.system.vehicle_stats.pilot.value, 5);
+            assert.strictEqual(vehicle.system.attributes.willpower.value, 5);
+            assert.strictEqual(vehicle.system.matrix.firewall.value, 6);
+            assert.strictEqual(foundry.utils.getProperty(vehicle.system, 'attributes.firewall.value'), 6);
+        });
+
         it('custom initiative formulae apply for vehicle meatspace/matrix', async () => {
             const vehicle = await factory.createActor({
                 type: 'vehicle',
@@ -127,6 +151,4 @@ export const shadowrunSR5VehicleDataPrep = (context: QuenchBatchContext) => {
         });
     });
 };
-
-
 

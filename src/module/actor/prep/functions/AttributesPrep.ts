@@ -9,7 +9,11 @@ export class AttributesPrep {
     /**
      * Prepare actor data for attributes
      */
-    static prepareAttributes(system: SR5Actor['system'], ranges?: Record<string, {min: number, max?: number}>) {
+    static prepareAttributes(
+        system: SR5Actor['system'],
+        ranges?: Record<string, {min: number, max?: number}>,
+        preparedAttributes: ReadonlySet<string> = new Set()
+    ) {
         const {attributes} = system;
 
         // hide magic and resonance based on the actor's special property
@@ -22,7 +26,8 @@ export class AttributesPrep {
 
         // set the value for the attributes
         for (const [name, attribute] of Object.entries(attributes)) {
-            AttributesPrep.prepareAttribute(name, attribute, ranges);
+            if (preparedAttributes.has(name)) attribute.label = SR5.attributes[name];
+            else AttributesPrep.prepareAttribute(name, attribute, ranges);
 
             if ('max' in attribute) {
                 attribute.max = attribute.value;
@@ -60,7 +65,32 @@ export class AttributesPrep {
         // Each attribute can have a unique value range.
         // TODO:  Implement metatype attribute value ranges for character actors.
         const range = ranges ? ranges[name] : SR.attributes.ranges[name];
-        ModifiableValue.calcTotal(attribute, range);
+        ModifiableValue.applyChanges(attribute, undefined, range);
+    }
+
+    /**
+     * Out-of-place AE spike: re-enforce attribute value ranges after native ActiveEffect application.
+     *
+     * Foundry's NumberField applies AE changes onto `attribute.value` but only cleans against the field's
+     * own options (integer), not SR5's augmented min/max ranges. calcTotal normally enforces those via
+     * EnforcedMinimum/Maximum, so re-clamp here to keep natively-applied values within range and refresh
+     * the tracked `max` for attributes that expose one.
+     *
+     * @param system A system actor with attributes.
+     * @param ranges Optional per-attribute ranges, defaulting to the SR5 attribute ranges.
+     */
+    static clampAttributesToRange(system: SR5Actor['system'], ranges?: Record<string, {min: number, max?: number}>) {
+        for (const [name, attribute] of Object.entries(system.attributes)) {
+            if (!Object.hasOwn(SR5.attributes, name) || !attribute) continue;
+
+            const range = ranges ? ranges[name] : SR.attributes.ranges[name];
+            if (!range) continue;
+
+            if (range.max != null && attribute.value > range.max) attribute.value = range.max;
+            if (range.min != null && attribute.value < range.min) attribute.value = range.min;
+
+            if ('max' in attribute) attribute.max = attribute.value;
+        }
     }
 
     /**
@@ -84,6 +114,6 @@ export class AttributesPrep {
                 parts.add(item.name, -item.getEssenceLoss());
         }
 
-        ModifiableValue.calcTotal(system.attributes.essence, { decimal: true });
+        ModifiableValue.applyChanges(system.attributes.essence, undefined, { decimal: true });
     }
 }

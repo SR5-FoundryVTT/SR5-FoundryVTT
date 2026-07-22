@@ -1,5 +1,6 @@
 import { SR5Item } from 'src/module/item/SR5Item';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
+import { ModifiableValueType } from '@/module/types/template/Base';
  
 export class ItemPrep {
     /**
@@ -7,7 +8,7 @@ export class ItemPrep {
      * - will only allow one "Base" armor item to be used (automatically takes the best one if multiple are equipped)
      * - all "accessories" will be added to the armor
      */
-    static prepareArmor(system: Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>, items: SR5Item[]) {
+    static prepareArmor(system: Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>, items: SR5Item[], outOfPlace = false) {
         const { armor } = system;
 
         // NOTE: We retrieve different types of items, all containing armor data.
@@ -58,14 +59,18 @@ export class ItemPrep {
         if (system.modifiers.armor)
             ModifiableValue.addUnique(armor.rating, game.i18n.localize('SR5.Bonus'), system.modifiers.armor);
 
-        ModifiableValue.calcTotal(armor.rating);
-        ModifiableValue.calcTotal(armor.hardened);
+        const resolve = <F extends ModifiableValueType>(field: F) => outOfPlace ?
+            ModifiableValue.applyChanges(field) :
+            ModifiableValue.calcTotal(field);
+
+        resolve(armor.rating);
+        resolve(armor.hardened);
         for (const element of Object.values(armor.elements)) {
-            ModifiableValue.calcTotal(element);
+            resolve(element);
         }
 
         for (const immunity of Object.values(armor.immunities)) {
-            ModifiableValue.calcTotal(immunity);
+            resolve(immunity);
         }
     }
 }

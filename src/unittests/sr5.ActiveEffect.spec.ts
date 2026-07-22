@@ -1533,4 +1533,165 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.armor.elements.radiation.value, 8);
         });
     });
+
+    describe('Out-of-place character actor ActiveEffects', () => {
+
+        it('applies natively and propagates to limits and condition monitors', async () => {
+            const actor = await factory.createActor({
+                type: 'character',
+                system: { attributes: { body: { base: 6 } } },
+            });
+
+            // Baseline (no effect): derived consumers read the un-modified body.
+            assert.strictEqual(actor.system.attributes.body.value, 6);
+            assert.strictEqual(actor.system.limits.physical.base, 2);       // ceil((2*0 + 6 + 0) / 3)
+            assert.strictEqual(actor.system.track.physical.base, 11);       // 8 + ceil(6 / 2)
+            assert.strictEqual(actor.system.track.physical.overflow.max, 6);
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Native Body Effect',
+                system: { changes: [{ key: 'system.attributes.body', value: '2', type: 'add' }] },
+            }]);
+
+            // body.value is applied natively by Foundry; changes[] holds only a display-only tooltip entry.
+            assert.strictEqual(actor.system.attributes.body.value, 8);
+            assert.lengthOf(actor.system.attributes.body.changes, 1);
+            assert.include(actor.system.attributes.body.changes[0], {
+                name: 'Native Body Effect', type: 'add', value: 2,
+            });
+
+            // Downstream in-place consumers see the AE-modified attribute.
+            assert.strictEqual(actor.system.limits.physical.base, 3);       // ceil((2*0 + 8 + 0) / 3)
+            assert.strictEqual(actor.system.track.physical.base, 12);       // 8 + ceil(8 / 2)
+            assert.strictEqual(actor.system.track.physical.overflow.max, 8);
+
+            // Native application records the key in overrides (locks the sheet input).
+            assert.strictEqual(foundry.utils.getProperty(actor.overrides, 'system.attributes.body.value'), 8);
+        });
+
+        it('supports override mode and clamps below-range values', async () => {
+            const actor = await factory.createActor({
+                type: 'character',
+                system: { attributes: { body: { base: 6 } } },
+            });
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Native Body Override',
+                system: { changes: [{ key: 'system.attributes.body.value', value: '9', type: 'override' }] },
+            }]);
+            assert.strictEqual(actor.system.attributes.body.value, 9);
+            assert.strictEqual(foundry.utils.getProperty(actor.overrides, 'system.attributes.body.value'), 9);
+
+            // An override below the attribute's minimum range is re-clamped after native application.
+            const belowRange = await factory.createActor({
+                type: 'character',
+                system: { attributes: { body: { base: 6 } } },
+            });
+            await belowRange.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Below Range Override',
+                system: { changes: [{ key: 'system.attributes.body.value', value: '-5', type: 'override' }] },
+            }]);
+            assert.strictEqual(belowRange.system.attributes.body.value, 0);  // clamped from -5 to range.min (0)
+        });
+
+        it('normalizes legacy ModifiableValue parent and leaf keys without persisting the rewrite', async () => {
+            const actor = await factory.createActor({
+                type: 'character',
+                system: { attributes: { body: { base: 6 } } },
+            });
+
+            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [
+                { name: 'Parent Key', system: { changes: [{ key: 'system.attributes.body', value: '1', type: 'add' }] } },
+                { name: 'Base Key', system: { changes: [{ key: 'system.attributes.body.base', value: '1', type: 'add' }] } },
+                { name: 'Value Key', system: { changes: [{ key: 'system.attributes.body.value', value: '1', type: 'add' }] } },
+                { name: 'Changes Key', system: { changes: [{ key: 'system.attributes.body.changes', value: '1', type: 'add' }] } },
+            ]) as SR5ActiveEffect[];
+
+            assert.strictEqual(actor.system.attributes.body.value, 10);
+            for (const effect of effects) {
+                assert.strictEqual(effect.system.changes[0].key, 'system.attributes.body.value');
+                assert.strictEqual(effect.system.changes[0].phase, SR5ActiveEffect.ATTRIBUTES_PHASE);
+            }
+            assert.strictEqual(foundry.utils.getProperty(effects[0]._source, 'system.changes.0.key'), 'system.attributes.body');
+            assert.strictEqual(foundry.utils.getProperty(effects[1]._source, 'system.changes.0.key'), 'system.attributes.body.base');
+            assert.strictEqual(foundry.utils.getProperty(effects[3]._source, 'system.changes.0.key'), 'system.attributes.body.changes');
+        });
+
+        it('resolves dynamic @system refs from raw _source, not effect-modified derived data', async () => {
+            const actor = await factory.createActor({
+                type: 'character',
+                system: { modifiers: { global: 6 } },
+            });
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [
+                // Effect A raises modifiers.global in the derived data; the raw _source stays 6.
+                { name: 'Raise Global', system: { changes: [{ key: 'system.modifiers.global', value: '10', type: 'add' }] } },
+                // Effect B references it dynamically; resolved from raw _source (6), not the derived 16.
+                { name: 'Global To Nuyen', system: { changes: [{ key: 'system.nuyen', value: '@system.modifiers.global', type: 'add' }] } },
+            ]);
+
+            assert.strictEqual(actor.system.modifiers.global, 16);  // derived value reflects effect A
+            assert.strictEqual(actor.system.nuyen, 6);              // dynamic ref read raw _source (6), not derived (16)
+        });
+
+        it('maps matrix changes before matrix values are copied into attribute and limit aliases', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Matrix Attack',
+                system: { changes: [{ key: 'system.matrix.attack', value: '3', type: 'add' }] },
+            }]) as SR5ActiveEffect[];
+
+            assert.strictEqual(effects[0].system.changes[0].phase, SR5ActiveEffect.MATRIX_PHASE);
+            assert.strictEqual(actor.system.matrix.attack.value, 3);
+            assert.strictEqual(actor.system.attributes.attack.value, 3);
+            assert.strictEqual(actor.system.limits.attack.value, 3);
+        });
+
+        it('maps derived changes after their values are computed', async () => {
+            const actor = await factory.createActor({
+                type: 'character',
+                system: { attributes: { body: { base: 6 } } },
+            });
+
+            // Baseline: physical limit is derived from attributes = ceil((2*0 + 6 + 0) / 3) = 2.
+            assert.strictEqual(actor.system.limits.physical.value, 2);
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Native Limit Effect',
+                system: { changes: [{ key: 'system.limits.physical.value', value: '3', type: 'add' }] },
+            }]);
+
+            // The `derived` phase applies natively after LimitsPrep computed the limit.
+            assert.strictEqual(actor.system.limits.physical.value, 5);      // 2 + 3 native (on top of the SR5.Bonus system part)
+            const nativeEntry = actor.system.limits.physical.changes.find(change => change.name === 'Native Limit Effect');
+            assert.exists(nativeEntry, 'native change recorded a display-only tooltip entry');
+            assert.include(nativeEntry, { type: 'add', value: 3 });
+        });
+
+        it('does not re-fold native changes when a prepared value is read later', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Control Rig',
+                system: { changes: [{ key: 'system.values.control_rig_rating', value: '2', type: 'add' }] },
+            }]);
+
+            assert.strictEqual(actor.system.values.control_rig_rating.value, 2);
+            assert.strictEqual(actor.getControlRigRating(), 2);
+        });
+
+        it('leaves non-actor targets on the existing in-place path', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Test Pool Effect',
+                system: {
+                    targets: [{ id: 'test', applyTo: 'test_all' }],
+                    changes: [{ key: 'data.pool', value: '2', type: 'add', target: 'test' }],
+                },
+            }]) as SR5ActiveEffect[];
+
+            assert.strictEqual(effects[0].system.changes[0].key, 'data.pool');
+            assert.notStrictEqual(effects[0].system.changes[0].phase, SR5ActiveEffect.ATTRIBUTES_PHASE);
+            assert.notStrictEqual(effects[0].system.changes[0].phase, SR5ActiveEffect.DERIVED_PHASE);
+        });
+    });
 };

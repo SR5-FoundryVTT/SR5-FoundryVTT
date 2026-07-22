@@ -20,20 +20,23 @@ export class ICPrep {
     }
 
     static prepareDerivedData(system: Actor.SystemOfType<'ic'>, items: SR5Item[]) {
+        ICPrep.prepareHostAttributes(system);
         ICPrep.prepareMatrixAttributes(system);
 
         ICSkillPrep.prepareSkills(system);
-        SkillsPrep.prepareSkills(system);
+        SkillsPrep.prepareSkills(system, true);
 
-        ICPrep.prepareHostAttributes(system);
         ICPrep.prepareMeatAttributes(system);
+        system.parent?.applyActiveEffects('attributes');
 
-        MatrixPrep.prepareMatrixToLimitsAndAttributes(system);
+        system.parent?.applyActiveEffects('matrix');
+        MatrixPrep.prepareMatrixToLimitsAndAttributes(system, true);
 
         ICPrep.prepareMatrix(system);
         ICPrep.prepareMatrixTrack(system);
 
-        InitiativePrep.prepareInit('ic', system);
+        InitiativePrep.prepareInit('ic', system, true);
+        system.parent?.applyActiveEffects('derived');
     }
 
     static prepareMatrix(system: Actor.SystemOfType<'ic'>) {

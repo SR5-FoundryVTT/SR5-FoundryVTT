@@ -1,5 +1,6 @@
 import { SR5TestFactory } from './utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
+import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
 
 export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -77,6 +78,29 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(sprite.system.initiative.matrix.constant.value, 12);
             assert.strictEqual(sprite.system.initiative.matrix.dice.value, 4);
             assert.strictEqual(sprite.system.initiative.matrix.dice.value, 4);
+        });
+
+        it('applies Level effects before Level-derived matrix attributes and matrix effects before aliases', async () => {
+            const sprite = await factory.createActor({
+                type: 'sprite',
+                system: {
+                    attributes: { level: { base: 6 } },
+                    matrix: { attack: { base: 1, applies_special: true } },
+                },
+            });
+            const effects = await sprite.createEmbeddedDocuments('ActiveEffect', [
+                { name: 'Raise Level', system: { changes: [{ key: 'system.attributes.level', value: '2', type: 'add' }] } },
+                { name: 'Raise Attack', system: { changes: [{ key: 'system.matrix.attack', value: '1', type: 'add' }] } },
+            ]) as SR5ActiveEffect[];
+
+            // createEmbeddedDocuments does not guarantee return order matches input order, so resolve by name.
+            const levelEffect = effects.find(e => e.name === 'Raise Level')!;
+            const attackEffect = effects.find(e => e.name === 'Raise Attack')!;
+            assert.strictEqual(levelEffect.system.changes[0].phase, SR5ActiveEffect.LEVEL_PHASE);
+            assert.strictEqual(attackEffect.system.changes[0].phase, SR5ActiveEffect.MATRIX_PHASE);
+            assert.strictEqual(sprite.system.attributes.level.value, 8);
+            assert.strictEqual(sprite.system.matrix.attack.value, 10);
+            assert.strictEqual(sprite.system.attributes.attack.value, 10);
         });
 
         it('sprite skill toggles apply to active, language, and knowledge skills', async () => {

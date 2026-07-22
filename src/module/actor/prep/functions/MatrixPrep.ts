@@ -3,7 +3,6 @@ import { AttributesPrep } from "./AttributesPrep";
 import { SR5Item } from 'src/module/item/SR5Item';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
 import { DataDefaults } from '@/module/data/DataDefaults';
-import { MatrixAttributeFieldType } from '@/module/types/template/Matrix';
 
 export class MatrixPrep {
     /**
@@ -16,10 +15,9 @@ export class MatrixPrep {
 
         const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'] as const;
 
-        // clear matrix data to defaults
+        // Clear matrix data to defaults before rebuilding it from an equipped device or living persona.
         for (const key of MatrixList) {
             matrix[key].base = 0;
-            ModifiableValue.calcTotal(matrix[key]);
         }
 
         matrix.condition_monitor.max = 0;
@@ -55,11 +53,11 @@ export class MatrixPrep {
             }
         } // if we don't have a device, use living persona
         else if (system.special === 'resonance') {
-            matrix.firewall.base = ModifiableValue.calcTotal(attributes.willpower);
-            matrix.data_processing.base = ModifiableValue.calcTotal(attributes.logic);
-            matrix.rating = ModifiableValue.calcTotal(attributes.resonance);
-            matrix.attack.base = ModifiableValue.calcTotal(attributes.charisma);
-            matrix.sleaze.base = ModifiableValue.calcTotal(attributes.intuition);
+            matrix.firewall.base = attributes.willpower.value;
+            matrix.data_processing.base = attributes.logic.value;
+            matrix.rating = attributes.resonance.value;
+            matrix.attack.base = attributes.charisma.value;
+            matrix.sleaze.base = attributes.intuition.value;
             // if we have a Living Persona device, we want to use some of its data to make the sheet sync up best
             if (device?.isLivingPersona()) {
                 matrix.device = device._id!;
@@ -78,6 +76,10 @@ export class MatrixPrep {
             matrix.condition_monitor.value = matrix.condition_monitor.max;
         }
 
+        for (const key of MatrixList) {
+            ModifiableValue.applyChanges(matrix[key]);
+        }
+
         // Add Rating as an Attribute Field to the actor's Attributes
         // this should only happen for character's and critters
         const ratingAtt = DataDefaults.createData('attribute_field', { base: matrix.rating, hidden: true, });
@@ -89,14 +91,17 @@ export class MatrixPrep {
      * Add Matrix Attributes to Limits and Attributes
      * @param system
      */
-    static prepareMatrixToLimitsAndAttributes(system: Actor.SystemOfType<'character' | 'ic' | 'sprite' | 'vehicle'>) {
+    static prepareMatrixToLimitsAndAttributes(
+        system: Actor.SystemOfType<'character' | 'ic' | 'sprite' | 'vehicle'>,
+        matrixAlreadyPrepared = false
+    ) {
         const { matrix, attributes, limits } = system;
 
         // add matrix attributes to both limits and attributes as hidden entries
         for (const attributeName of Object.keys(SR5.matrixAttributes)) {
             const attribute = matrix[attributeName];
 
-            AttributesPrep.prepareAttribute(attributeName, attribute);
+            if (!matrixAlreadyPrepared) AttributesPrep.prepareAttribute(attributeName, attribute);
             const { value, base, changes, label } = attribute;
 
             // Each matrix attribute also functions as a limit.
@@ -107,14 +112,16 @@ export class MatrixPrep {
         }
     }
 
-    static prepareMatrixAttributesForDevice(system: Actor.SystemOfType<'vehicle'>, rating?: number) {
+    static prepareMatrixAttributesForDevice(system: Actor.SystemOfType<'vehicle'>, rating?: number, outOfPlace = false) {
         const { matrix } = system;
         rating = rating ?? matrix.rating;
         const matrixAttributes = ['firewall', 'data_processing'] as const;
 
         for (const attribute of matrixAttributes)
             matrix[attribute].base = rating;
-        for (const attId of [...matrixAttributes, 'sleaze', 'attack'])
-            ModifiableValue.calcTotal(matrix[attId]);
+        for (const attId of [...matrixAttributes, 'sleaze', 'attack']) {
+            if (outOfPlace) ModifiableValue.applyChanges(matrix[attId]);
+            else ModifiableValue.calcTotal(matrix[attId]);
+        }
     }
 }

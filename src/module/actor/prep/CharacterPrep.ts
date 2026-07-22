@@ -36,30 +36,40 @@ export class CharacterPrep {
         AttributesPrep.prepareAttributes(system);
         AttributesPrep.prepareEssence(system, items);
 
-        // NPCPrep is reliant to be called after AttributesPrep.
+        // NPC metatype modifiers are attribute inputs and therefore must resolve before the
+        // native attribute phase. Native effects then apply to the completed values below.
         NPCPrep.prepareNPCData(system);
 
-        SkillsPrep.prepareSkills(system);
+        // Attribute ActiveEffects apply after all attribute inputs and before their consumers.
+        system.parent?.applyActiveEffects('attributes');
+        AttributesPrep.clampAttributesToRange(system);
 
-        ItemPrep.prepareArmor(system, items);
+        SkillsPrep.prepareSkills(system, true);
+
+        ItemPrep.prepareArmor(system, items, true);
 
         MatrixPrep.prepareMatrix(system, items);
-        MatrixPrep.prepareMatrixToLimitsAndAttributes(system);
+        system.parent?.applyActiveEffects('matrix');
+        MatrixPrep.prepareMatrixToLimitsAndAttributes(system, true);
 
         // Limits depend on attributes and active effects.
         LimitsPrep.prepareLimitBaseFromAttributes(system);
-        LimitsPrep.prepareLimits(system);
-        LimitsPrep.prepareDerivedLimits(system);
+        LimitsPrep.prepareLimits(system, true);
+        LimitsPrep.prepareDerivedLimits(system, true);
 
         GruntPrep.prepareConditionMonitors(system);
 
-        MovementPrep.prepareMovement(system);
-        WoundsPrep.prepareWounds(system);
+        MovementPrep.prepareMovement(system, true);
+        WoundsPrep.prepareWounds(system, true);
 
-        InitiativePrep.prepareInit('character', system);
+        InitiativePrep.prepareInit('character', system, true);
 
         CharacterPrep.prepareRecoil(system);
         CharacterPrep.prepareRecoilCompensation(system);
+        ModifiableValue.applyChanges(system.values.control_rig_rating);
+
+        // Derived ActiveEffects apply after their local value producers have completed.
+        system.parent?.applyActiveEffects('derived');
     }
 
     /**
@@ -68,7 +78,7 @@ export class CharacterPrep {
      * @param system Physical humanoid system data.
      */
     static prepareRecoil(system: Actor.SystemOfType<'character' | 'spirit' | 'vehicle'>) {
-        ModifiableValue.calcTotal(system.values.recoil, { min: 0 });
+        ModifiableValue.applyChanges(system.values.recoil, undefined, { min: 0 });
     }
 
     /**
@@ -83,7 +93,7 @@ export class CharacterPrep {
 
         const mod = new ModifiableValue(system.values.recoil_compensation);
         mod.addUnique("SR5.RecoilCompensation", recoilCompensation);
-        mod.calcTotal({ min: 0 });
+        mod.applyChanges(undefined, { min: 0 });
     }
 
     static addSpecialAttributes(system: Actor.SystemOfType<'character'>) {

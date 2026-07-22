@@ -3,6 +3,7 @@ import { SR5Item } from "../../SR5Item";
 import { ModifiableValue } from "../../../mods/ModifiableValue";
 import { DataDefaults } from "@/module/data/DataDefaults";
 import { TechnologyType } from "src/module/types/template/Technology";
+import { ModifiableValueType } from "@/module/types/template/Base";
 import { ItemAvailabilityFlow } from "../../flows/ItemAvailabilityFlow";
 import { AttributesPrep } from "@/module/actor/prep/functions/AttributesPrep";
 import { TechnologyAttributesType } from "@/module/types/template/Attributes";
@@ -97,22 +98,49 @@ export const TechnologyPrep = {
     },
 
     /**
-     * Calculate availability values.
-     * 
-     * @param item The item for additional data
+     * Resolve availability from base + system parts, before item ActiveEffects apply natively on top.
+     *
+     * Out-of-place: system-provided parts (e.g. ware grade) are folded onto `.value` once and left in
+     * `changes[]` as a display log. The final label/restriction is composed after effects by
+     * {@link finalizeAvailability}.
+     *
      * @param technology The system technology section to be altered
      */
     prepareAvailability(technology: TechnologyType) {
-        ItemAvailabilityFlow.calculateValue(technology.availability);
+        TechnologyPrep.dropEffectSourcedChanges(technology.availability);
+        ModifiableValue.applyChanges(technology.availability, undefined, { min: 0 });
     },
 
     /**
-     * Calculate cost values.
-     * 
-     * @param item The item for additional data
+     * Compose the availability label and restriction from the post-effect `.value`.
+     *
+     * Runs after item ActiveEffects so an effect on the availability number or restriction is reflected
+     * in the displayed label (e.g. 6R + 2 -> 8R).
+     *
+     * @param technology The system technology section to be altered
+     */
+    finalizeAvailability(technology: TechnologyType) {
+        ItemAvailabilityFlow.finalizeLabel(technology.availability);
+    },
+
+    /**
+     * Resolve cost from base + system parts, before item ActiveEffects apply natively on top.
+     *
      * @param technology The system technology section to be altered
      */
     prepareCost(technology: TechnologyType) {
-        ModifiableValue.calcTotal(technology.cost, { decimal: true });
+        TechnologyPrep.dropEffectSourcedChanges(technology.cost);
+        ModifiableValue.applyChanges(technology.cost, undefined, { decimal: true });
+    },
+
+    /**
+     * Remove display-log entries left by a previous prep's native ActiveEffect application.
+     *
+     * Item ModifiableValues are not reset between prepare cycles (unlike actor values), so prior native
+     * effect entries would otherwise be re-folded as if they were system parts. System parts keep an empty
+     * `source`; native effect entries carry the effect uuid.
+     */
+    dropEffectSourcedChanges(field: ModifiableValueType) {
+        field.changes = field.changes.filter(change => !change.source);
     },
 }

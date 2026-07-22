@@ -18,33 +18,34 @@ export class SpritePrep {
     }
 
     static prepareDerivedData(system: Actor.SystemOfType<'sprite'>, items: SR5Item[]) {
-        const level = SpritePrep.getSpriteLevel(system);
+        ModifiableValue.applyChanges(system.attributes.level, undefined, { min: 1 });
+        system.parent?.applyActiveEffects('level');
+        const level = system.attributes.level.value;
 
         SpritePrep.prepareSpriteMatrixAttributes(system, level);
         SpritePrep.prepareSpriteAttributes(system, level);
         SpritePrep.prepareSpriteSkills(system, level);
 
-        AttributesPrep.prepareAttributes(system);
-        SkillsPrep.prepareSkills(system);
+        AttributesPrep.prepareAttributes(system, undefined, new Set(['level']));
+        SkillsPrep.prepareSkills(system, true);
+        system.parent?.applyActiveEffects('attributes');
 
-        LimitsPrep.prepareLimits(system);
+        LimitsPrep.prepareLimits(system, true);
 
-        MatrixPrep.prepareMatrixToLimitsAndAttributes(system);
+        system.parent?.applyActiveEffects('matrix');
+        MatrixPrep.prepareMatrixToLimitsAndAttributes(system, true);
 
         SpritePrep.prepareMatrixTrack(system, level);
 
-        InitiativePrep.prepareInit('sprite', system);
-    }
-
-    static getSpriteLevel(system: Actor.SystemOfType<'sprite'>): number {
-        return ModifiableValue.calcTotal(system.attributes.level, { min: 1 });
+        InitiativePrep.prepareInit('sprite', system, true);
+        system.parent?.applyActiveEffects('derived');
     }
 
     static prepareSpriteAttributes(system: Actor.SystemOfType<'sprite'>, level: number) {
         const { attributes } = system;
         if (attributes.resonance.applies_special)
             ModifiableValue.addUniqueBase(attributes.resonance, 'SR5.Level', level);
-        ModifiableValue.calcTotal(attributes.resonance);
+        ModifiableValue.applyChanges(attributes.resonance);
     }
 
     static prepareSpriteMatrixAttributes(system: Actor.SystemOfType<'sprite'>, level: number) {
@@ -56,7 +57,7 @@ export class SpritePrep {
             if (!matrix[att]) continue;
             if (matrix[att].applies_special)
                 ModifiableValue.addUniqueBase(matrix[att], 'SR5.Level', level);
-            ModifiableValue.calcTotal(matrix[att]);
+            ModifiableValue.applyChanges(matrix[att]);
         }
 
         matrix.rating = level;

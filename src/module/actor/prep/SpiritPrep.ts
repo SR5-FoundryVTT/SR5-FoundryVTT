@@ -19,31 +19,37 @@ export class SpiritPrep {
     }
 
     static prepareDerivedData(system: Actor.SystemOfType<'spirit'>, items: SR5Item[]) {
-        const force = ModifiableValue.calcTotal(system.attributes.force, { min: 1 });
+        ModifiableValue.applyChanges(system.attributes.force, undefined, { min: 1 });
+        system.parent?.applyActiveEffects('force');
+        AttributesPrep.clampAttributesToRange(system, SR.attributes.rangesSpirit);
+        const force = system.attributes.force.value;
 
         SpiritPrep.prepareSpiritAttributes(system, force);
         SpiritPrep.prepareSpiritSkills(system, force);
 
         // Use spirit attribute range to avoid issues with attribute calculation causing unusable attributes.
-        AttributesPrep.prepareAttributes(system, SR.attributes.rangesSpirit);
-        SkillsPrep.prepareSkills(system);
+        AttributesPrep.prepareAttributes(system, SR.attributes.rangesSpirit, new Set(['force']));
+        SkillsPrep.prepareSkills(system, true);
+        system.parent?.applyActiveEffects('attributes');
+        AttributesPrep.clampAttributesToRange(system, SR.attributes.rangesSpirit);
 
         LimitsPrep.prepareLimitBaseFromAttributes(system);
-        LimitsPrep.prepareLimits(system);
-        LimitsPrep.prepareDerivedLimits(system);
+        LimitsPrep.prepareLimits(system, true);
+        LimitsPrep.prepareDerivedLimits(system, true);
 
         SpiritPrep.prepareSpiritArmor(system);
-        ItemPrep.prepareArmor(system, items);
+        ItemPrep.prepareArmor(system, items, true);
 
         GruntPrep.prepareConditionMonitors(system);
 
-        MovementPrep.prepareMovement(system);
-        WoundsPrep.prepareWounds(system);
+        MovementPrep.prepareMovement(system, true);
+        WoundsPrep.prepareWounds(system, true);
 
-        InitiativePrep.prepareInit('spirit', system);
+        InitiativePrep.prepareInit('spirit', system, true);
 
         CharacterPrep.prepareRecoil(system);
         CharacterPrep.prepareRecoilCompensation(system);
+        system.parent?.applyActiveEffects('derived');
     }
 
     static prepareSpiritAttributes(system: Actor.SystemOfType<'spirit'>, force: number) {

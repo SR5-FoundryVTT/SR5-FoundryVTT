@@ -482,6 +482,37 @@ ___________________
         // sr5MyActionEnd fires when advancing away from the owner's completed action phase.
         CONFIG.ActiveEffect.expiryEvents.sr5MyActionEnd = "SR5.ActiveEffect.ExpiryTriggers.MyActionEnd";
 
+        // Out-of-place AE spike: register custom application phases for native change application. Foundry only
+        // auto-applies the built-in "initial"/"final" phases; SR5Actor.prepareDerivedData applies these manually
+        // at dependency-layer boundaries, so native NumberField application lands after each value's inputs are
+        // final and before its consumers read it (instead of being clobbered by later derived computation).
+        // `attributes` applies after attribute base + system parts; `matrix` applies after matrix base data
+        // and before its aliases are copied; `derived` applies after the remaining value producers.
+        CONFIG.ActiveEffect.phases.attributes = {
+            label: "SR5.ActiveEffect.Phases.Attributes.label",
+            hint: "SR5.ActiveEffect.Phases.Attributes.hint",
+        };
+        CONFIG.ActiveEffect.phases.force = {
+            label: "SR5.ActiveEffect.Phases.Force.label",
+            hint: "SR5.ActiveEffect.Phases.Force.hint",
+        };
+        CONFIG.ActiveEffect.phases.level = {
+            label: "SR5.ActiveEffect.Phases.Level.label",
+            hint: "SR5.ActiveEffect.Phases.Level.hint",
+        };
+        CONFIG.ActiveEffect.phases.vehicle = {
+            label: "SR5.ActiveEffect.Phases.Vehicle.label",
+            hint: "SR5.ActiveEffect.Phases.Vehicle.hint",
+        };
+        CONFIG.ActiveEffect.phases.matrix = {
+            label: "SR5.ActiveEffect.Phases.Matrix.label",
+            hint: "SR5.ActiveEffect.Phases.Matrix.hint",
+        };
+        CONFIG.ActiveEffect.phases.derived = {
+            label: "SR5.ActiveEffect.Phases.Derived.label",
+            hint: "SR5.ActiveEffect.Phases.Derived.hint",
+        };
+
         registerSystemSettings();
         registerSystemKeybindings();
 

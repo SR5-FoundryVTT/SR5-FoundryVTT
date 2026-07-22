@@ -1,5 +1,6 @@
 import { SR5TestFactory } from './utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
+import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
 
 export const shadowrunSR5ICDataPrep = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -55,6 +56,26 @@ export const shadowrunSR5ICDataPrep = (context: QuenchBatchContext) => {
                 assert.strictEqual(skill?.base, 5, skillId);
                 assert.strictEqual(skill?.value, 5, skillId);
             }
+        });
+
+        it('applies attributes and matrix effects before IC consumers and aliases', async () => {
+            const ic = await factory.createActor({
+                type: 'ic',
+                system: { host: { rating: 5 }, matrix: { attack: { base: 1 } } },
+            });
+            const effects = await ic.createEmbeddedDocuments('ActiveEffect', [
+                { name: 'Raise Body', system: { changes: [{ key: 'system.attributes.body', value: '1', type: 'add' }] } },
+                { name: 'Raise Attack', system: { changes: [{ key: 'system.matrix.attack', value: '2', type: 'add' }] } },
+            ]) as SR5ActiveEffect[];
+
+            // createEmbeddedDocuments does not guarantee return order matches input order, so resolve by name.
+            const bodyEffect = effects.find(e => e.name === 'Raise Body')!;
+            const attackEffect = effects.find(e => e.name === 'Raise Attack')!;
+            assert.strictEqual(bodyEffect.system.changes[0].phase, SR5ActiveEffect.ATTRIBUTES_PHASE);
+            assert.strictEqual(attackEffect.system.changes[0].phase, SR5ActiveEffect.MATRIX_PHASE);
+            assert.strictEqual(ic.system.attributes.body.value, 6);
+            assert.strictEqual(ic.system.matrix.attack.value, 2);
+            assert.strictEqual(foundry.utils.getProperty(ic.system, 'attributes.attack.value'), 2);
         });
 
         it('custom matrix initiative formula is honored for IC', async () => {

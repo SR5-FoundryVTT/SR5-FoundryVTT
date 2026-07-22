@@ -88,6 +88,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      *       update within the ItemCollection but instead have this.actor.updateEmbeddedEntities actually trigger SR5Item.updateEmbeddedEntities
      */
     get actorOwner(): SR5Actor | undefined {
+        // Foundry v14 no longer exposes an item's parent item through `this.actor`.
+        // Nested SR5 items still retain that parent, so resolve ownership through it first.
+        if (this._isNestedItem) return (this.parent as unknown as SR5Item).actorOwner;
+
         // An unowned item won't have an actor.
         if (!this.actor) return;
         // An owned item will have an actor.
@@ -237,12 +241,20 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     override prepareDerivedData(this: SR5Item): void {
         super.prepareDerivedData();
-        this.applyItemActiveEffects();
 
+        // Out-of-place: resolve system-provided cost/availability parts onto `.value` first, so item
+        // ActiveEffects applied below compose natively on top instead of being folded from `changes[]`.
         const technology = this.getTechnologyData();
         if (technology) {
             TechnologyPrep.prepareCost(technology);
             TechnologyPrep.prepareAvailability(technology);
+        }
+
+        this.applyItemActiveEffects();
+
+        if (technology) {
+            // Availability label/restriction depend on the post-effect value.
+            TechnologyPrep.finalizeAvailability(technology);
             TechnologyPrep.calculateAttributes(this.system.attributes!);
         }
 
@@ -268,8 +280,16 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             }
 
             for (const change of changes) {
+                // Out-of-place: cost/availability changes apply natively to the leaf `.value` NumberField
+                // (composing onto the already-resolved system value) instead of being redirected into
+                // `changes[]`. All other item changes keep the legacy in-place path.
+                const outOfPlace = SR5ActiveEffect.OUT_OF_PLACE_ITEM_VALUE_KEYS.includes(change.key);
+                const applied = outOfPlace
+                    ? { ...change, key: `${change.key}.value`, outOfPlace: true, effect }
+                    : { ...change, effect };
+
                 try {
-                    SR5ActiveEffect.applyChange(this, { ...change, effect } as unknown as ActiveEffect.ChangeData);
+                    SR5ActiveEffect.applyChange(this, applied as unknown as ActiveEffect.ChangeData);
                 } catch (error) {
                     console.error(`Shadowrun5e | Some effect changes could not be applied and might cause issues. Check effects of item (${this.name}) / id (${this.id})`);
                     console.error(error);

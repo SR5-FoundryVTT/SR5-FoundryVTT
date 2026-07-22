@@ -69,7 +69,16 @@ export const ItemAvailabilityFlow = {
 
     calculateValue(availability: AvailabilityValueType): string {
         ModifiableValue.calcTotal(availability, { min: 0 });
+        return ItemAvailabilityFlow.finalizeLabel(availability);
+    },
 
+    /**
+     * Compose the displayed label and normalize the restriction from the current `.value`.
+     *
+     * Separated from {@link calculateValue} so the out-of-place item path can fold the value (via
+     * ModifiableValue.applyChanges) and apply ActiveEffects before the label is composed.
+     */
+    finalizeLabel(availability: AvailabilityValueType): string {
         const restriction = ItemAvailabilityFlow.normalizeRestriction(availability.restriction);
         availability.restriction = restriction;
 

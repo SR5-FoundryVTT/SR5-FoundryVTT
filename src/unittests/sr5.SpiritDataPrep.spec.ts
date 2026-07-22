@@ -1,5 +1,6 @@
 import { SR5TestFactory } from './utils';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
+import { SR5ActiveEffect } from '@/module/effect/SR5ActiveEffect';
 
 export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -83,6 +84,30 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(spirit.system.attributes.reaction.value, 1);
             assert.strictEqual(spirit.system.attributes.strength.value, 4);
             assert.strictEqual(spirit.system.attributes.willpower.value, 7);
+        });
+
+        it('applies Force effects before Force-derived attributes and later attribute effects', async () => {
+            const spirit = await factory.createActor({
+                type: 'spirit',
+                system: {
+                    attributes: {
+                        force: { base: 6 },
+                        body: { base: 2, applies_special: true },
+                    },
+                },
+            });
+            const effects = await spirit.createEmbeddedDocuments('ActiveEffect', [
+                { name: 'Raise Force', system: { changes: [{ key: 'system.attributes.force', value: '2', type: 'add' }] } },
+                { name: 'Raise Body', system: { changes: [{ key: 'system.attributes.body', value: '1', type: 'add' }] } },
+            ]) as SR5ActiveEffect[];
+
+            // createEmbeddedDocuments does not guarantee return order matches input order, so resolve by name.
+            const forceEffect = effects.find(e => e.name === 'Raise Force')!;
+            const bodyEffect = effects.find(e => e.name === 'Raise Body')!;
+            assert.strictEqual(forceEffect.system.changes[0].phase, SR5ActiveEffect.FORCE_PHASE);
+            assert.strictEqual(bodyEffect.system.changes[0].phase, SR5ActiveEffect.ATTRIBUTES_PHASE);
+            assert.strictEqual(spirit.system.attributes.force.value, 8);
+            assert.strictEqual(spirit.system.attributes.body.value, 11);
         });
 
         it('default spirit initiative formula uses reaction + intuition (meatspace) and intuition + intuition (astral)', async () => {

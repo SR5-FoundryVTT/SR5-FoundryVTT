@@ -5,11 +5,13 @@ export class SkillsPrep {
     /**
      * Calculate skill ModifiableValue / SkillField totals.
      */
-    static prepareSkills(system: Actor.SystemOfType<'character' | 'ic' | 'spirit' | 'sprite' | 'vehicle'>) {
+    static prepareSkills(system: Actor.SystemOfType<'character' | 'ic' | 'spirit' | 'sprite' | 'vehicle'>, outOfPlace = false) {
         const { language, active, knowledge } = system.skills;
 
         // function that will set the total of a skill correctly
-        const prepareSkill = (skill: SkillFieldType) => ModifiableValue.calcTotal(skill);
+        const prepareSkill = (skill: SkillFieldType) => outOfPlace ?
+            ModifiableValue.applyChanges(skill) :
+            ModifiableValue.calcTotal(skill);
 
         for (const skill of Object.values(active)) {
             prepareSkill(skill);
