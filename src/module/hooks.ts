@@ -5,7 +5,8 @@ import { RitualSpellcastingTest } from './tests/RitualSpellcastingTest';
 import { SR5 } from './config';
 import { Migrator } from './migrator/Migrator';
 import { registerSystemSettings } from './settings';
-import { FLAGS, SR, SRStatus, SYSTEM_NAME, SYSTEM_SOCKET } from './constants';
+import { FLAGS, SR, SYSTEM_NAME, SYSTEM_SOCKET } from './constants';
+import { getSRStatus } from './statusEffects';
 import { SR5Actor } from './actor/SR5Actor';
 import { SR5Item } from './item/SR5Item';
 import { SR5ItemSheet } from './item/SR5ItemSheet';
@@ -412,12 +413,6 @@ ___________________
         // @ts-expect-error // TODO: Add declaration merging
         CONFIG.SR5 = SR5;
 
-        CONFIG.statusEffects = [
-            ...CONFIG.statusEffects.slice(0, 5),
-            ...SRStatus,
-            ...CONFIG.statusEffects.slice(5),
-        ];
-
         CONFIG.Actor.compendiumIndexFields.push("system.description", "system.importFlags.isFreshImport");
         CONFIG.Item.compendiumIndexFields.push("system.description", "system.importFlags.isFreshImport");
 
@@ -474,6 +469,12 @@ ___________________
 
         registerSystemSettings();
         registerSystemKeybindings();
+
+        CONFIG.statusEffects = [
+            ...CONFIG.statusEffects.slice(0, 5),
+            ...getSRStatus(),
+            ...CONFIG.statusEffects.slice(5),
+        ];
 
         // Register sheets for collection documents.
         // NOTE: See dnd5e for a multi class approach for all actor types using the types array in Actors.registerSheet

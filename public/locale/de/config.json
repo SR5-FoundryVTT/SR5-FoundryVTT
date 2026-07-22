@@ -68,7 +68,11 @@
         "UseImportIconOverridesDescription": "Beim Importieren von Items die gleichen Symbole für verschiedene Itemtypen verwenden, wenn dies sinnvoll ist. Deaktivieren wenn benutzerdefinierte Symbole verwendet werden.",
         "UseImportIconOverridesName": "Standard Importer Icon benutzen",
         "TokenAutoRunning": "Laufbewegung automatisch erkennen",
-        "TokenAutoRunningDescription": "Wechselt den Bewegungsmodus des Tokens automatisch auf Laufen, wenn die gemessene Distanz die Gehgeschwindigkeit überschreitet."
+        "TokenAutoRunningDescription": "Wechselt den Bewegungsmodus des Tokens automatisch auf Laufen, wenn die gemessene Distanz die Gehgeschwindigkeit überschreitet.",
+        "TokenMovementHistoryReset": "Zeitpunkt zum Zurücksetzen des Bewegungsverlaufs",
+        "TokenMovementHistoryResetDescription": "Legt fest, wann der Bewegungsverlauf von Kämpfenden im Kampf gelöscht wird",
+        "TokenMovementHistoryResetFirstActionPhase": "Bei meiner ersten Handlungsphase",
+        "TokenMovementHistoryResetTurnStart": "Zu Beginn des Zuges zurücksetzen"
     },
     "SR5": {
         "AP": "DK",

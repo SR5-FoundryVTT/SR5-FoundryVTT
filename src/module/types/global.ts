@@ -294,6 +294,7 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.CompendiumBrowserBlacklist": string[];
         "shadowrun5e.ImporterCompendiumOrder": string[];
         "shadowrun5e.TokenAutoRunning": boolean;
+        "shadowrun5e.TokenMovementHistoryReset": 'firstActionPhase' | 'turnStart';
     }
 }
 

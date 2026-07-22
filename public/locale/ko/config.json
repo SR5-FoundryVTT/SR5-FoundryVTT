@@ -68,7 +68,11 @@
         "UseImportIconOverridesDescription": "물품 불러오기 시 서로 다른 물품 유형에 동일한 아이콘을 사용하는 것이 합리적일 경우 사용. 사용자 지정 아이콘을 사용하는 경우 체크 해제.",
         "UseImportIconOverridesName": "기본 불러오기 아이콘 덮어쓰기 사용",
         "TokenAutoRunning": "달리기 움직임 자동 감지",
-        "TokenAutoRunningDescription": "측정된 거리가 걷기 속도를 초과하면 자동으로 토큰 이동 모드를 달리기로 전환합니다."
+        "TokenAutoRunningDescription": "측정된 거리가 걷기 속도를 초과하면 자동으로 토큰 이동 모드를 달리기로 전환합니다.",
+        "TokenMovementHistoryReset": "이동 기록 초기화 시점",
+        "TokenMovementHistoryResetDescription": "전투 중 전투원의 이동 기록을 언제 초기화할지 선택합니다",
+        "TokenMovementHistoryResetFirstActionPhase": "내 첫 행동 단계에서",
+        "TokenMovementHistoryResetTurnStart": "턴 시작 시 초기화"
     },
     "SR5": {
         "AP": "AP",
