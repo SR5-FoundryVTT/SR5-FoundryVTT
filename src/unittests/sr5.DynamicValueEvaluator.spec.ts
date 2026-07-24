@@ -44,6 +44,19 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 ['3 >= 2 && 1 < 5', true],
                 ['3 < 2 || 4 > 1', true],
                 ['1 && 0 ? 10 : 20', 20],
+                // Logical not, binding as tightly as unary minus.
+                ['!0', true],
+                ['!1', false],
+                ['!true', false],
+                ['!(3 >= 2)', false],
+                ['!!5', true],
+                // String literals and string equality.
+                ['\'physical\'', 'physical'],
+                ['"stun"', 'stun'],
+                ['\'a\' == \'a\'', true],
+                ['\'a\' == \'b\'', false],
+                ['1 == 1 ? \'physical\' : \'stun\'', 'physical'],
+                ['[\'physical\',\'stun\'][1]', 'stun'],
                 // Comparisons and ternaries.
                 ['3 >= 2 ? 10 : 20', 10],
                 ['3 < 2 ? 10 : 20', 20],
@@ -79,8 +92,10 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 ['[][[]]', 'indexing something that is not an array literal'],
                 ['alert(1)', 'a function outside the allowlist'],
                 ['true * 2', 'arithmetic on a boolean'],
+                ['\'a\' < \'b\'', 'ordering comparison on strings'],
+                ['\'a\' + 1', 'concatenation - + is numeric only'],
                 // Values that are not expressions, which appliers cast by target type.
-                ['@system.technology.rating * 3', 'an unresolved property reference'],
+                ['@system.technology.rating * 3', 'a reference with no resolver'],
                 ['2d6', 'dice notation'],
                 ['physical', 'a plain string value'],
                 // Malformed input.
@@ -98,6 +113,41 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
             it('returns input beyond the length limit unchanged', () => {
                 const long = '1'.repeat(600);
                 assert.strictEqual(DynamicValueEvaluator.evaluate(long), long);
+            });
+        });
+
+        describe('resolves @property references with their types intact', () => {
+            const data = {
+                system: {
+                    rating: 3,
+                    wireless: true,
+                    offline: false,
+                    action: { damage: { type: { value: 'physical' } } },
+                },
+            };
+            const resolve = (path: string) => foundry.utils.getProperty(data, path);
+
+            const accepted: [string, DynamicValue][] = [
+                ['@system.rating * 3', 9],
+                ['@system.wireless', true],
+                ['@system.offline', false],
+                ['!@system.wireless', false],
+                ['@system.wireless && @system.rating >= 3', true],
+                ['@{system.rating}', 3],
+                ['@system.action.damage.type.value == \'physical\'', true],
+                ['@system.action.damage.type.value == \'stun\'', false],
+                ['@system.action.damage.type.value == \'physical\' ? \'stun\' : \'physical\'', 'stun'],
+            ];
+
+            for (const [expression, expected] of accepted) {
+                it(`evaluates ${JSON.stringify(expression)} to ${expected}`, () => {
+                    assert.strictEqual(DynamicValueEvaluator.evaluate(expression, resolve), expected);
+                });
+            }
+
+            it('returns the input verbatim when a reference is missing', () => {
+                const expression = '@system.missing + 1';
+                assert.strictEqual(DynamicValueEvaluator.evaluate(expression, resolve), expression);
             });
         });
 

@@ -425,11 +425,11 @@ export class SR5ActiveEffect extends ActiveEffect {
      * Resolve a dynamic change value against model data before it's applied to a document.
      *
      * A dynamic value contains @property references (e.g. '@system.technology.rating * 3'),
-     * substituted from source, then evaluated by DynamicValueEvaluator. change.value is
-     * overwritten with the result rendered as the target field expects it - a comparison landing
-     * on a number field becomes 1/0, a number landing on a boolean field becomes true/false - so
-     * the evaluated type and the field type don't have to match. A value the evaluator can't parse
-     * comes back unchanged, and a non-finite number is left untouched for appliers to reject.
+     * resolved from source, then evaluated by DynamicValueEvaluator. change.value is overwritten
+     * with the result rendered as the target field expects it - a comparison landing on a number
+     * field becomes 1/0, a number landing on a boolean field becomes true/false - so the evaluated
+     * type and the field type don't have to match. A value the evaluator can't parse comes back
+     * unchanged, and a non-finite number is left untouched for appliers to reject.
      *
      * When targetDoc is omitted (there's no concrete field yet, as when baking a targeted_actor
      * effect before it's copied), the result is simply stringified.
@@ -443,8 +443,9 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (typeof change.value !== 'string') return;
         if (change.value.length === 0) return;
 
-        const expression = Roll.replaceFormulaData(change.value, source);
-        const value = DynamicValueEvaluator.evaluate(expression);
+        // The evaluator resolves @refs itself (keeping string/boolean types), rather than
+        // Roll.replaceFormulaData which substitutes strings unquoted and coerces booleans to 1/0.
+        const value = DynamicValueEvaluator.evaluate(change.value, path => foundry.utils.getProperty(source, path));
 
         const rendered = SR5ActiveEffect.renderValueForField(value, change.key, targetDoc);
         if (rendered !== undefined) change.value = rendered;

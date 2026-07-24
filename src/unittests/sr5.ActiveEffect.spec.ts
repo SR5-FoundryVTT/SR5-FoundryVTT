@@ -651,6 +651,34 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.strictEqual(target.system.attributes.body.value, test.pool.value);
         });
 
+        it('TARGETED_ACTOR apply-to: render a baked comparison as the destination field expects', async () => {
+            const attacker = await factory.createActor({ type: 'character', system: { attributes: { body: { base: 2 } } } });
+            const target = await factory.createActor({ type: 'character' });
+
+            const items = await attacker.createEmbeddedDocuments('Item', [{ type: 'action', name: 'Test Action' }]);
+            const item = items[0];
+
+            await item.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Targeted Effect',
+                system: {
+                    targets: [{ id: 't', applyTo: 'targeted_actor' }],
+                    // A comparison baked for the destination number field must render as 1, not 'true'.
+                    changes: [{ key: 'system.attributes.body', value: '@data.pool.value >= 0', type: 'add', target: 't' }],
+                }
+            }]);
+
+            const test = (await TestCreator.fromItem(item, attacker, { showDialog: false, showMessage: false }))!;
+
+            await test.evaluate();
+            await test.effects.createTargetActorEffects(target);
+
+            const appliedEffect = target.effects.find((effect) => effect.name === 'Targeted Effect') as SR5ActiveEffect | undefined;
+            if (!appliedEffect) throw new Error('Expected copied targeted actor effect to exist on target actor.');
+
+            assert.strictEqual(appliedEffect.system.changes[0].value, 1);
+            assert.strictEqual(target.system.attributes.body.value, 1);
+        });
+
         it('TEST_ALL apply-to: Actor effect applies to test', async () => {
             const limitValue = 3;
             const poolValue = 3;
@@ -1425,6 +1453,24 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             assert.equal(actor.system.attributes.body.value, 4);
             assert.equal(actor.system.attributes.agility.value, 1);
+        });
+
+        it('ACTOR apply-to: Resolve a string reference comparison to a string field', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            assert.strictEqual(actor.system.metatype, 'human');
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Actor Effect',
+                system: {
+                    changes: [{
+                        key: 'system.metatype',
+                        value: '@system.metatype == \'human\' ? \'elf\' : \'dwarf\'',
+                        type: 'override',
+                    }],
+                },
+            }]);
+
+            assert.strictEqual(actor.system.metatype, 'elf');
         });
     });
 
