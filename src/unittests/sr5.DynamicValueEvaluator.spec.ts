@@ -73,6 +73,12 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 ['1 in []', false],
                 ['2 in [1, 2] && 3 > 2', true],
                 ['\'blade\' in [\'blade\'] ? 10 : 20', 10],
+                // Fallback operator - the left when it evaluates, else the right.
+                ['5 ?? 3', 5],
+                ['0 ?? 3', 0],
+                ['false ?? 3', false],
+                ['\'a\' ?? \'b\'', 'a'],
+                ['[1, 2][9] ?? 7', 7],
                 // Comparisons and ternaries.
                 ['3 >= 2 ? 10 : 20', 10],
                 ['3 < 2 ? 10 : 20', 20],
@@ -126,6 +132,7 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 ['[100,200][5]', 'an out of range index'],
                 ['[100,200][-1]', 'a negative index'],
                 ['1 + ', 'a missing operand'],
+                ['[1][9] ?? [1][9]', 'a ?? where both sides fail'],
             ];
 
             for (const [expression, reason] of verbatim) {
@@ -151,6 +158,7 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 ['true || [1][99]', true],
                 ['0 && [1][99]', false],
                 ['1 || [1][99]', true],
+                ['5 ?? [1][99]', 5],
             ];
 
             for (const [expression, expected] of accepted) {
@@ -191,6 +199,10 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 ['@system.action.damage.type.value == \'physical\'', true],
                 ['@system.action.damage.type.value == \'stun\'', false],
                 ['@system.action.damage.type.value == \'physical\' ? \'stun\' : \'physical\'', 'stun'],
+                ['@system.missing ?? 5', 5],
+                ['@system.rating ?? 5', 3],
+                ['@system.offline ?? 5', false],
+                ['@system.missing ?? @system.rating ?? 0', 3],
             ];
 
             for (const [expression, expected] of accepted) {

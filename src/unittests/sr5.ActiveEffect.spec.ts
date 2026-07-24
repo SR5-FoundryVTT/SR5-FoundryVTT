@@ -1472,6 +1472,23 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             assert.strictEqual(actor.system.metatype, 'elf');
         });
+
+        it('ACTOR apply-to: Default a missing reference with ?? instead of dropping the change', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Actor Effect',
+                system: {
+                    changes: [{
+                        // A missing reference falls back to the default rather than dropping the change.
+                        key: 'system.attributes.agility',
+                        value: '@system.nonexistent ?? 1',
+                        type: 'add',
+                    }],
+                },
+            }]);
+
+            assert.equal(actor.system.attributes.agility.value, 1);
+        });
     });
 
     /**

@@ -20,10 +20,11 @@ type Node =
  *
  * Supports number literals, true/false, quoted string literals, `@property` references,
  * + - * / % **, unary +/-, logical not (!), parentheses, comparisons, membership ('x in [a, b]'),
- * the logical operators && and ||, ternaries, array literals with numeric indexing
+ * the logical operators && and ||, the fallback operator ?? (yields the right operand when the left
+ * can't be evaluated, e.g. a missing reference), ternaries, array literals with numeric indexing
  * ('[100, 200, 300][2]') and a fixed set of Math functions. Evaluation is total: input that isn't
  * a valid expression is returned verbatim as a string, so a plain value like 'physical' comes back
- * unchanged. Ternaries and && / || short-circuit, so a guard like '@r >= 1 ? [a,b][@r-1] : 0'
+ * unchanged. Ternaries, && / || and ?? short-circuit, so a guard like '@r >= 1 ? [a,b][@r-1] : 0'
  * never evaluates the branch it doesn't take.
  *
  * `@property` references are resolved through an optional resolver passed to evaluate, keeping the
@@ -60,7 +61,7 @@ export class DynamicValueEvaluator {
     /**
      * Binary operators. Ordering and arithmetic go through numeric() to assert their operands;
      * equality compares without coercion so 'true == true' holds. Comparisons yield booleans.
-     * && and || are not here - they short-circuit in run() rather than taking both operands.
+     * ??, && and || are not here - they short-circuit in run() rather than taking both operands.
      */
     private static readonly OPERATORS: Record<string, (left: DynamicValue, right: DynamicValue) => DynamicValue> = {
         '<': DynamicValueEvaluator.numeric((a, b) => a < b),
@@ -92,6 +93,7 @@ export class DynamicValueEvaluator {
      * is right-associative, so exponent() parses it rather than this table.
      */
     private static readonly PRECEDENCE = [
+        ['??'],
         ['||'],
         ['&&'],
         ['<', '<=', '>', '>=', '==', '===', '!=', '!==', 'in'],
@@ -109,7 +111,7 @@ export class DynamicValueEvaluator {
      * '.' - fails the parse, so evaluate returns the input verbatim as a string.
      */
     private static readonly TOKEN =
-        /\s*('[^']*'|"[^"]*"|@\{[-.\w]+\}|@[-.\w]+|\d+(?:\.\d+)?|<=|>=|===|!==|==|!=|&&|\|\||\*\*|[-+*/%()[\],?:<>!]|[A-Za-z_]\w*)/y;
+        /\s*('[^']*'|"[^"]*"|@\{[-.\w]+\}|@[-.\w]+|\d+(?:\.\d+)?|<=|>=|===|!==|==|!=|&&|\|\||\?\?|\*\*|[-+*/%()[\],?:<>!]|[A-Za-z_]\w*)/y;
 
     private readonly tokens: string[];
     private readonly resolve?: (path: string) => unknown;
@@ -346,8 +348,16 @@ export class DynamicValueEvaluator {
         }
     }
 
-    /** && and || short-circuit here; every other operator takes both operands from OPERATORS. */
+    /** ??, && and || short-circuit here; every other operator takes both operands from OPERATORS. */
     private runBinary(node: Extract<Node, { kind: 'binary' }>): DynamicValue {
+        // ?? falls back to the right operand when the left can't be evaluated (e.g. a missing ref).
+        if (node.op === '??') {
+            try {
+                return this.run(node.left);
+            } catch {
+                return this.run(node.right);
+            }
+        }
         if (node.op === '&&')
             return DynamicValueEvaluator.truthy(this.run(node.left)) && DynamicValueEvaluator.truthy(this.run(node.right));
         if (node.op === '||')
