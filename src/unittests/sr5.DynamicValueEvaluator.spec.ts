@@ -151,7 +151,7 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
             }
 
             it('returns input beyond the length limit unchanged', () => {
-                const long = '1'.repeat(600);
+                const long = '1'.repeat(2000);
                 assert.strictEqual(DynamicValueEvaluator.evaluate(long), long);
             });
         });

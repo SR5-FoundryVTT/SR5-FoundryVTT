@@ -138,7 +138,7 @@ export class DynamicValueEvaluator {
     ];
 
     /** Bounds parse cost, as evaluation runs per change, per effect, on every data preparation. */
-    private static readonly MAX_LENGTH = 512;
+    private static readonly MAX_LENGTH = 1024;
 
     /**
      * Matches a single token, skipping leading whitespace. Order matters: string literals first,
