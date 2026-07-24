@@ -157,6 +157,7 @@ export class DynamicValueEvaluator {
 
     private readonly tokens: string[];
     private readonly resolve?: (path: string) => unknown;
+    private readonly ast: Node;
     private pos = 0;
 
     /** `$name`s bound by an enclosing binding, so primary() tells a bound name from an unknown one. */
@@ -175,8 +176,7 @@ export class DynamicValueEvaluator {
      */
     static evaluate(expression: string, resolve?: (path: string) => unknown): DynamicValue {
         try {
-            const evaluator = new DynamicValueEvaluator(expression, resolve);
-            return evaluator.run(evaluator.parse());
+            return new DynamicValueEvaluator(expression, resolve).run();
         } catch {
             // Not an expression, so the text is the value itself (e.g. 'physical').
             return expression;
@@ -212,6 +212,7 @@ export class DynamicValueEvaluator {
 
         this.tokens = DynamicValueEvaluator.tokenize(expression);
         this.resolve = resolve;
+        this.ast = this.parse();
     }
 
     private static tokenize(expression: string): string[] {
@@ -453,7 +454,8 @@ export class DynamicValueEvaluator {
     /*  Evaluation - Node tree to value             */
     /* -------------------------------------------- */
 
-    private run(node: Node): DynamicValue {
+    /** Walk a node to its value, defaulting to the whole parsed expression. */
+    private run(node: Node = this.ast): DynamicValue {
         switch (node.kind) {
             case 'value':
                 return node.value;
