@@ -4,11 +4,12 @@ export type DynamicValue = number | boolean | string;
 /**
  * Evaluate the small expression language used by dynamic Active Effect change values.
  *
- * Supports number literals, true/false, quoted string literals, @property references, + - * / %,
- * unary +/-, logical not (!), parentheses, comparisons, the logical operators && and ||,
- * ternaries, array literals with numeric indexing ('[100, 200, 300][2]') and a fixed set of Math
- * functions. Evaluation is total: input that isn't a valid expression is returned verbatim as a
- * string, so a plain value like 'physical' comes back unchanged.
+ * Supports number literals, true/false, quoted string literals, @property references,
+ * + - * / % **, unary +/-, logical not (!), parentheses, comparisons, membership ('x in [a, b]'),
+ * the logical operators && and ||, ternaries, array literals with numeric indexing
+ * ('[100, 200, 300][2]') and a fixed set of Math functions. Evaluation is total: input that isn't
+ * a valid expression is returned verbatim as a string, so a plain value like 'physical' comes back
+ * unchanged.
  *
  * @property references are resolved through an optional resolver passed to evaluate, keeping the
  * types of string and boolean references intact (Roll.replaceFormulaData, by contrast, substitutes
@@ -63,11 +64,15 @@ export class DynamicValueEvaluator {
         '||': (left, right) => DynamicValueEvaluator.truthy(left) || DynamicValueEvaluator.truthy(right),
     };
 
-    /** Binary operators grouped into precedence levels, loosest binding first. */
+    /**
+     * Binary operators grouped into precedence levels, loosest binding first. 'in' (membership,
+     * right operand is a bracketed list) binds like a comparison. Exponentiation is tighter than
+     * everything here and right-associative, so it lives in exponent() rather than the table.
+     */
     private static readonly PRECEDENCE = [
         ['||'],
         ['&&'],
-        ['<', '<=', '>', '>=', '==', '===', '!=', '!=='],
+        ['<', '<=', '>', '>=', '==', '===', '!=', '!==', 'in'],
         ['+', '-'],
         ['*', '/', '%'],
     ];
@@ -82,7 +87,7 @@ export class DynamicValueEvaluator {
      * '.' - fails the parse, so evaluate returns the input verbatim as a string.
      */
     private static readonly TOKEN =
-        /\s*('[^']*'|"[^"]*"|@\{[-.\w]+\}|@[-.\w]+|\d+(?:\.\d+)?|<=|>=|===|!==|==|!=|&&|\|\||[-+*/%()[\],?:<>!]|[A-Za-z_]\w*)/y;
+        /\s*('[^']*'|"[^"]*"|@\{[-.\w]+\}|@[-.\w]+|\d+(?:\.\d+)?|<=|>=|===|!==|==|!=|&&|\|\||\*\*|[-+*/%()[\],?:<>!]|[A-Za-z_]\w*)/y;
 
     private readonly tokens: string[];
     private readonly resolve?: (path: string) => unknown;
@@ -183,15 +188,30 @@ export class DynamicValueEvaluator {
     /** Left associative binary operators, one PRECEDENCE level per recursion. */
     private binary(level = 0): DynamicValue {
         const operators = DynamicValueEvaluator.PRECEDENCE[level];
-        if (!operators) return this.unary();
+        if (!operators) return this.exponent();
 
         let value = this.binary(level + 1);
         while (operators.includes(this.peek())) {
-            const apply = DynamicValueEvaluator.OPERATORS[this.next()];
-            value = apply(value, this.binary(level + 1));
+            const op = this.next();
+            // 'in' takes a bracketed list on the right instead of another operand.
+            if (op === 'in') {
+                this.expect('[');
+                value = this.list(']').includes(value);
+            } else {
+                value = DynamicValueEvaluator.OPERATORS[op](value, this.binary(level + 1));
+            }
         }
 
         return value;
+    }
+
+    /** Exponentiation - tighter than the binary operators and right-associative. */
+    private exponent(): DynamicValue {
+        const base = this.unary();
+        if (this.peek() !== '**') return base;
+
+        this.next();
+        return DynamicValueEvaluator.number(base) ** DynamicValueEvaluator.number(this.exponent());
     }
 
     private unary(): DynamicValue {

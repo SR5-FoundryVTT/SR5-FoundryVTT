@@ -57,6 +57,20 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 ['\'a\' == \'b\'', false],
                 ['1 == 1 ? \'physical\' : \'stun\'', 'physical'],
                 ['[\'physical\',\'stun\'][1]', 'stun'],
+                // Exponentiation - tighter than * and right-associative.
+                ['2 ** 3', 8],
+                ['2 ** 3 ** 2', 512],
+                ['2 * 3 ** 2', 18],
+                ['4 ** 0.5', 2],
+                ['2 ** -2', 0.25],
+                // Membership, binding like a comparison.
+                ['2 in [1, 2, 3]', true],
+                ['5 in [1, 2, 3]', false],
+                ['\'blade\' in [\'blade\', \'blunt\']', true],
+                ['\'exotic\' in [\'blade\', \'blunt\']', false],
+                ['1 in []', false],
+                ['2 in [1, 2] && 3 > 2', true],
+                ['\'blade\' in [\'blade\'] ? 10 : 20', 10],
                 // Comparisons and ternaries.
                 ['3 >= 2 ? 10 : 20', 10],
                 ['3 < 2 ? 10 : 20', 20],
@@ -94,6 +108,8 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 ['true * 2', 'arithmetic on a boolean'],
                 ['\'a\' < \'b\'', 'ordering comparison on strings'],
                 ['\'a\' + 1', 'concatenation - + is numeric only'],
+                ['2 in 3', 'membership without a bracketed list'],
+                ['\'a\' ** 2', 'exponentiation on a string'],
                 // Values that are not expressions, which appliers cast by target type.
                 ['@system.technology.rating * 3', 'a reference with no resolver'],
                 ['2d6', 'dice notation'],
@@ -122,6 +138,7 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                     rating: 3,
                     wireless: true,
                     offline: false,
+                    category: 'blade',
                     action: { damage: { type: { value: 'physical' } } },
                 },
             };
@@ -129,11 +146,14 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
 
             const accepted: [string, DynamicValue][] = [
                 ['@system.rating * 3', 9],
+                ['@system.rating ** 2', 9],
                 ['@system.wireless', true],
                 ['@system.offline', false],
                 ['!@system.wireless', false],
                 ['@system.wireless && @system.rating >= 3', true],
                 ['@{system.rating}', 3],
+                ['@system.category in [\'blade\', \'blunt\']', true],
+                ['@system.category in [\'exotic\']', false],
                 ['@system.action.damage.type.value == \'physical\'', true],
                 ['@system.action.damage.type.value == \'stun\'', false],
                 ['@system.action.damage.type.value == \'physical\' ? \'stun\' : \'physical\'', 'stun'],
