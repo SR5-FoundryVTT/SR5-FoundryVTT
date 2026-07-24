@@ -164,7 +164,7 @@ export class DynamicValueEvaluator {
     private readonly scope = new Set<string>();
 
     /** Bound `$name`s to their memoizing thunks during evaluation, mirroring the lexical scope. */
-    private readonly env = new Map<string, () => DynamicValue>();
+    private env = new Map<string, () => DynamicValue>();
 
     /**
      * Evaluate an expression down to a single value.
@@ -499,14 +499,26 @@ export class DynamicValueEvaluator {
      */
     private runBind(node: Extract<Node, { kind: 'bind' }>): DynamicValue {
         let cached: { value: DynamicValue } | undefined;
+        const lexicalEnv = new Map(this.env);
         const previous = this.env.get(node.name);
-        this.env.set(node.name, () => (cached ??= { value: this.run(node.value) }).value);
+        this.env.set(node.name, () => (cached ??= { value: this.runWithEnv(node.value, lexicalEnv) }).value);
 
         try {
             return this.run(node.body);
         } finally {
             if (previous) this.env.set(node.name, previous);
             else this.env.delete(node.name);
+        }
+    }
+
+    /** Run a node against a captured lexical environment, restoring the current one afterwards. */
+    private runWithEnv(node: Node, env: Map<string, () => DynamicValue>): DynamicValue {
+        const current = this.env;
+        this.env = env;
+        try {
+            return this.run(node);
+        } finally {
+            this.env = current;
         }
     }
 

@@ -80,6 +80,9 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 ['$x = 2; $y = $x + 1; $x * $y', 6],
                 ['$x = 3; $x >= 2 ? $x * 10 : 0', 30],
                 ['$x = 3; $x == 3', true],
+                // Initializers retain their lexical scope even when a later binding shadows a name.
+                ['$x = 1; $y = $x; $x = 2; $y', 1],
+                ['$x = 1; $x = $x + 1; $x', 2],
                 // The '$' sigil is its own namespace: '$PI'/'$floor' never collide with PI/floor.
                 ['$PI = 3; $PI', 3],
                 ['$PI = 3; $PI + PI', 3 + Math.PI],
