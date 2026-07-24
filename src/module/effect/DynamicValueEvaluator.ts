@@ -19,17 +19,17 @@ type Node =
  * Evaluate the small expression language used by dynamic Active Effect change values.
  *
  * Supports number literals, true/false, quoted string literals, `@property` references,
- * + - * / % **, unary +/-, logical not (!), parentheses, comparisons, membership ('x in [a, b]'),
- * the logical operators && and ||, the fallback operator ?? (yields the right operand when the left
+ * `+` `-` `*` `/` `%` `**`, unary `+`/`-`, logical not (`!`), parentheses, comparisons, membership (`'x in [a, b]'`),
+ * the logical operators `&&` and `||`, the fallback operator `??` (yields the right operand when the left
  * can't be evaluated, e.g. a missing reference), ternaries, array literals with numeric indexing
- * ('[100, 200, 300][2]') and a fixed set of Math functions. Evaluation is total: input that isn't
+ * (`'[100, 200, 300][2]'`), and a fixed set of Math functions and constants (e.g. PI). Evaluation is total: input that isn't
  * a valid expression is returned verbatim as a string, so a plain value like 'physical' comes back
- * unchanged. Ternaries, && / || and ?? short-circuit, so a guard like '@r >= 1 ? [a,b][@r-1] : 0'
+ * unchanged. Ternaries, `&&` `/` `||` and `??` short-circuit, so a guard like `'@r >= 1 ? [a,b][@r-1] : 0'`
  * never evaluates the branch it doesn't take.
  *
  * `@property` references are resolved through an optional resolver passed to evaluate, keeping the
  * types of string and boolean references intact (Roll.replaceFormulaData, by contrast, substitutes
- * strings unquoted and coerces booleans to 1/0). Without a resolver, a reference is an unknown
+ * strings unquoted and coerces booleans to `1`/`0`). Without a resolver, a reference is an unknown
  * token and the input falls through verbatim.
  *
  * This exists instead of Roll.safeEval, which executes its argument as JavaScript via
@@ -48,14 +48,50 @@ export class DynamicValueEvaluator {
      */
     private static readonly FUNCTIONS: Record<string, (...args: number[]) => number> = {
         abs: Math.abs,
+        acos: Math.acos,
+        acosh: Math.acosh,
+        asin: Math.asin,
+        asinh: Math.asinh,
+        atan: Math.atan,
+        atan2: Math.atan2,
+        atanh: Math.atanh,
+        cbrt: Math.cbrt,
         ceil: Math.ceil,
+        cos: Math.cos,
+        cosh: Math.cosh,
+        exp: Math.exp,
         floor: Math.floor,
+        hypot: Math.hypot,
+        log: Math.log,
+        log10: Math.log10,
+        log2: Math.log2,
         max: Math.max,
         min: Math.min,
         pow: Math.pow,
         round: Math.round,
         sign: Math.sign,
+        sin: Math.sin,
+        sinh: Math.sinh,
+        sqrt: Math.sqrt,
+        tan: Math.tan,
+        tanh: Math.tanh,
         trunc: Math.trunc,
+    };
+
+    /**
+     * Named numeric constants usable as bare identifiers. Held apart from FUNCTIONS because these
+     * are values, not callables: an expression uses 'PI', not 'PI()'. Membership is tested with
+     * Object.hasOwn so inherited names don't match.
+     */
+    private static readonly CONSTANTS: Record<string, number> = {
+        E: Math.E,
+        LN10: Math.LN10,
+        LN2: Math.LN2,
+        LOG10E: Math.LOG10E,
+        LOG2E: Math.LOG2E,
+        PI: Math.PI,
+        SQRT1_2: Math.SQRT1_2,
+        SQRT2: Math.SQRT2,
     };
 
     /**
@@ -288,6 +324,9 @@ export class DynamicValueEvaluator {
             this.expect('(');
             return { kind: 'call', fn: token, args: this.list(')') };
         }
+
+        if (Object.hasOwn(DynamicValueEvaluator.CONSTANTS, token))
+            return { kind: 'value', value: DynamicValueEvaluator.CONSTANTS[token] };
 
         throw new Error(`Unknown token '${token}'.`);
     }

@@ -28,6 +28,13 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 ['floor(7 / 2)', 3],
                 ['max(1, 2, 3) + min(4, 5)', 7],
                 ['pow(2, 3)', 8],
+                ['sqrt(16)', 4],
+                ['hypot(3, 4)', 5],
+                ['log2(8)', 3],
+                // Math constants, usable as bare identifiers.
+                ['PI', Math.PI],
+                ['floor(PI)', 3],
+                ['E ** 0', 1],
                 // Booleans, from keywords and from comparisons.
                 ['true', true],
                 ['false', false],
@@ -113,6 +120,8 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 ['(![]+[])[+[]]', 'character extraction from a coerced boolean'],
                 ['[][[]]', 'indexing something that is not an array literal'],
                 ['alert(1)', 'a function outside the allowlist'],
+                ['random()', 'random is excluded to keep evaluation deterministic'],
+                ['PI()', 'a constant is a value, not a callable'],
                 // Inherited Object.prototype members must not be callable or usable as operators.
                 ['constructor(1)', 'the inherited constructor'],
                 ['toString(1)', 'the inherited toString'],
