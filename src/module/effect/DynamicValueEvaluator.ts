@@ -12,7 +12,7 @@
  * values, and module content ships effects - so safeEval allowed arbitrary code execution in
  * the GM's client and unrecoverable tab hangs through loops. Foundry's Roll parser is no
  * alternative either: its grammar reserves square brackets for flavor text and has no array
- * indexing, which is exactly what the rating lookup tables need.
+ * indexing, which is exactly what the lookup tables need.
  */
 export class DynamicValueEvaluator {
     /**
@@ -31,8 +31,32 @@ export class DynamicValueEvaluator {
         trunc: Math.trunc,
     };
 
+    /** Binary operators. Comparisons resolve to 1 or 0, so they can be used as operands. */
+    private static readonly OPERATORS: Record<string, (left: number, right: number) => number> = {
+        '<': (left, right) => Number(left < right),
+        '<=': (left, right) => Number(left <= right),
+        '>': (left, right) => Number(left > right),
+        '>=': (left, right) => Number(left >= right),
+        '==': (left, right) => Number(left === right),
+        '===': (left, right) => Number(left === right),
+        '!=': (left, right) => Number(left !== right),
+        '!==': (left, right) => Number(left !== right),
+        '+': (left, right) => left + right,
+        '-': (left, right) => left - right,
+        '*': (left, right) => left * right,
+        '/': (left, right) => left / right,
+        '%': (left, right) => left % right,
+    };
+
+    /** Binary operators grouped into precedence levels, loosest binding first. */
+    private static readonly PRECEDENCE = [
+        ['<', '<=', '>', '>=', '==', '===', '!=', '!=='],
+        ['+', '-'],
+        ['*', '/', '%'],
+    ];
+
     /** Bounds parse cost, as evaluation runs per change, per effect, on every data preparation. */
-    private static readonly MAX_LENGTH = 500;
+    private static readonly MAX_LENGTH = 512;
 
     /**
      * Matches a single token, skipping leading whitespace. Anything this can't match - '@', '.',
@@ -94,24 +118,15 @@ export class DynamicValueEvaluator {
         if (this.next() !== token) throw new Error(`Expected '${token}'.`);
     }
 
-    /**
-     * Assert a value is numeric. Array literals only exist to be indexed, so they're rejected
-     * everywhere an operand is expected.
-     */
-    private numeric(value: number | number[]): number {
-        if (typeof value !== 'number') throw new Error('Expression is not numeric.');
-        return value;
-    }
-
     private parse(): number {
         const value = this.ternary();
         if (this.pos < this.tokens.length) throw new Error(`Unexpected token '${this.peek()}'.`);
-        return this.numeric(value);
+        return value;
     }
 
     /** cond ? a : b, right associative. */
-    private ternary(): number | number[] {
-        const condition = this.comparison();
+    private ternary(): number {
+        const condition = this.binary();
         if (this.peek() !== '?') return condition;
 
         this.next();
@@ -119,87 +134,37 @@ export class DynamicValueEvaluator {
         this.expect(':');
         const whenFalse = this.ternary();
 
-        return this.numeric(condition) !== 0 ? whenTrue : whenFalse;
+        return condition !== 0 ? whenTrue : whenFalse;
     }
 
-    /** Comparisons resolve to 1 or 0, so they can be used as ternary conditions and operands. */
-    private comparison(): number | number[] {
-        const comparators: Record<string, (left: number, right: number) => boolean> = {
-            '<': (left, right) => left < right,
-            '<=': (left, right) => left <= right,
-            '>': (left, right) => left > right,
-            '>=': (left, right) => left >= right,
-            '==': (left, right) => left === right,
-            '===': (left, right) => left === right,
-            '!=': (left, right) => left !== right,
-            '!==': (left, right) => left !== right,
-        };
+    /** Left associative binary operators, one PRECEDENCE level per recursion. */
+    private binary(level = 0): number {
+        const operators = DynamicValueEvaluator.PRECEDENCE[level];
+        if (!operators) return this.unary();
 
-        let value = this.additive();
-        while (this.peek() in comparators) {
-            const comparator = comparators[this.next()];
-            value = comparator(this.numeric(value), this.numeric(this.additive())) ? 1 : 0;
+        let value = this.binary(level + 1);
+        while (operators.includes(this.peek())) {
+            const apply = DynamicValueEvaluator.OPERATORS[this.next()];
+            value = apply(value, this.binary(level + 1));
         }
 
         return value;
     }
 
-    private additive(): number | number[] {
-        let value = this.multiplicative();
-        while (this.peek() === '+' || this.peek() === '-') {
-            const operator = this.next();
-            const right = this.numeric(this.multiplicative());
-            value = operator === '+' ? this.numeric(value) + right : this.numeric(value) - right;
-        }
-
-        return value;
-    }
-
-    private multiplicative(): number | number[] {
-        let value = this.unary();
-        while (this.peek() === '*' || this.peek() === '/' || this.peek() === '%') {
-            const operator = this.next();
-            const right = this.numeric(this.unary());
-            const left = this.numeric(value);
-            value = operator === '*' ? left * right : operator === '/' ? left / right : left % right;
-        }
-
-        return value;
-    }
-
-    private unary(): number | number[] {
+    private unary(): number {
         if (this.peek() === '-') {
             this.next();
-            return -this.numeric(this.unary());
+            return -this.unary();
         }
         if (this.peek() === '+') {
             this.next();
-            return this.numeric(this.unary());
+            return this.unary();
         }
 
-        return this.postfix();
+        return this.primary();
     }
 
-    /** Indexing, which is only allowed on an array literal with an in-range integer index. */
-    private postfix(): number | number[] {
-        let value = this.primary();
-
-        while (this.peek() === '[') {
-            this.next();
-            const index = this.numeric(this.ternary());
-            this.expect(']');
-
-            if (!Array.isArray(value)) throw new Error('Only array literals can be indexed.');
-            if (!Number.isInteger(index) || index < 0 || index >= value.length)
-                throw new Error(`Index ${index} out of range.`);
-
-            value = value[index];
-        }
-
-        return value;
-    }
-
-    private primary(): number | number[] {
+    private primary(): number {
         const token = this.next();
         if (token === undefined) throw new Error('Unexpected end of expression.');
 
@@ -211,33 +176,43 @@ export class DynamicValueEvaluator {
             return value;
         }
 
-        if (token === '[') {
-            const values = this.numericList(']');
-            this.expect(']');
-            return values;
-        }
+        if (token === '[') return this.lookup();
 
         if (token in DynamicValueEvaluator.FUNCTIONS) {
             this.expect('(');
-            const args = this.numericList(')');
-            this.expect(')');
-            return DynamicValueEvaluator.FUNCTIONS[token](...args);
+            return DynamicValueEvaluator.FUNCTIONS[token](...this.numbers(')'));
         }
 
         throw new Error(`Unknown token '${token}'.`);
     }
 
     /**
-     * Parse a comma separated list of numbers, stopping at but not consuming the closing token.
+     * '[a, b, c][index]' - an array literal is only ever a lookup table, so it must be indexed
+     * immediately and can never escape as a value of its own.
      */
-    private numericList(closing: string): number[] {
+    private lookup(): number {
+        const values = this.numbers(']');
+        this.expect('[');
+        const index = this.ternary();
+        this.expect(']');
+
+        if (!Number.isInteger(index) || index < 0 || index >= values.length)
+            throw new Error(`Index ${index} out of range.`);
+
+        return values[index];
+    }
+
+    /** Parse a comma separated list of numbers up to and including the closing token. */
+    private numbers(closing: string): number[] {
         const values: number[] = [];
-        if (this.peek() === closing) return values;
 
-        do {
-            values.push(this.numeric(this.ternary()));
-        } while (this.peek() === ',' && this.next());
+        if (this.peek() !== closing) {
+            do {
+                values.push(this.ternary());
+            } while (this.peek() === ',' && this.next());
+        }
 
+        this.expect(closing);
         return values;
     }
 }
