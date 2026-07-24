@@ -43,25 +43,32 @@ export class DynamicValueEvaluator {
     };
 
     /**
-     * Binary operators. Ordering and arithmetic require numeric operands and assert as much;
+     * Binary operators. Ordering and arithmetic go through numeric() to assert their operands;
      * equality compares without coercion so 'true == true' holds. Comparisons yield booleans.
      */
     private static readonly OPERATORS: Record<string, (left: DynamicValue, right: DynamicValue) => DynamicValue> = {
-        '<': (left, right) => DynamicValueEvaluator.number(left) < DynamicValueEvaluator.number(right),
-        '<=': (left, right) => DynamicValueEvaluator.number(left) <= DynamicValueEvaluator.number(right),
-        '>': (left, right) => DynamicValueEvaluator.number(left) > DynamicValueEvaluator.number(right),
-        '>=': (left, right) => DynamicValueEvaluator.number(left) >= DynamicValueEvaluator.number(right),
+        '<': DynamicValueEvaluator.numeric((a, b) => a < b),
+        '<=': DynamicValueEvaluator.numeric((a, b) => a <= b),
+        '>': DynamicValueEvaluator.numeric((a, b) => a > b),
+        '>=': DynamicValueEvaluator.numeric((a, b) => a >= b),
         '==': (left, right) => left === right,
         '===': (left, right) => left === right,
         '!=': (left, right) => left !== right,
         '!==': (left, right) => left !== right,
-        '+': (left, right) => DynamicValueEvaluator.number(left) + DynamicValueEvaluator.number(right),
-        '-': (left, right) => DynamicValueEvaluator.number(left) - DynamicValueEvaluator.number(right),
-        '*': (left, right) => DynamicValueEvaluator.number(left) * DynamicValueEvaluator.number(right),
-        '/': (left, right) => DynamicValueEvaluator.number(left) / DynamicValueEvaluator.number(right),
-        '%': (left, right) => DynamicValueEvaluator.number(left) % DynamicValueEvaluator.number(right),
+        '+': DynamicValueEvaluator.numeric((a, b) => a + b),
+        '-': DynamicValueEvaluator.numeric((a, b) => a - b),
+        '*': DynamicValueEvaluator.numeric((a, b) => a * b),
+        '/': DynamicValueEvaluator.numeric((a, b) => a / b),
+        '%': DynamicValueEvaluator.numeric((a, b) => a % b),
         '&&': (left, right) => DynamicValueEvaluator.truthy(left) && DynamicValueEvaluator.truthy(right),
         '||': (left, right) => DynamicValueEvaluator.truthy(left) || DynamicValueEvaluator.truthy(right),
+    };
+
+    /** Prefix operators. '-'/'+' require a number, '!' takes any condition. */
+    private static readonly UNARY: Record<string, (value: DynamicValue) => DynamicValue> = {
+        '-': value => -DynamicValueEvaluator.number(value),
+        '+': value => DynamicValueEvaluator.number(value),
+        '!': value => !DynamicValueEvaluator.truthy(value),
     };
 
     /**
@@ -114,6 +121,12 @@ export class DynamicValueEvaluator {
     private static number(value: DynamicValue): number {
         if (typeof value !== 'number') throw new Error(`Expected a number, got '${value}'.`);
         return value;
+    }
+
+    /** Wrap a binary operation that requires two numeric operands. */
+    private static numeric(op: (a: number, b: number) => DynamicValue) {
+        return (left: DynamicValue, right: DynamicValue): DynamicValue =>
+            op(DynamicValueEvaluator.number(left), DynamicValueEvaluator.number(right));
     }
 
     /**
@@ -215,20 +228,11 @@ export class DynamicValueEvaluator {
     }
 
     private unary(): DynamicValue {
-        if (this.peek() === '-') {
-            this.next();
-            return -DynamicValueEvaluator.number(this.unary());
-        }
-        if (this.peek() === '+') {
-            this.next();
-            return DynamicValueEvaluator.number(this.unary());
-        }
-        if (this.peek() === '!') {
-            this.next();
-            return !DynamicValueEvaluator.truthy(this.unary());
-        }
+        const op = DynamicValueEvaluator.UNARY[this.peek()];
+        if (!op) return this.primary();
 
-        return this.primary();
+        this.next();
+        return op(this.unary());
     }
 
     private primary(): DynamicValue {
