@@ -1352,6 +1352,40 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.lengthOf(actor.effects.contents, 1);
             assert.equal(actor.system.attributes.body.value, 6);
         });
+
+        it('ACTOR apply-to: Resolve a rating indexed lookup table', async () => {
+            const actor = await factory.createActor({ type: 'character', system: { modifiers: { global: 2 } } });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Actor Effect',
+                system: {
+                    changes: [{
+                        key: 'system.attributes.body',
+                        value: '[10, 20, 30][@system.modifiers.global - 1]',
+                        type: 'add',
+                    }],
+                },
+            }]);
+
+            assert.equal(actor.system.attributes.body.value, 20);
+        });
+
+        it('ACTOR apply-to: A change value is never executed as code', async () => {
+            const marker = '__sr5ChangeValueExecutionMarker';
+            const actor = await factory.createActor({ type: 'character' });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Actor Effect',
+                system: {
+                    changes: [{
+                        key: 'system.attributes.body',
+                        value: `constructor.constructor('globalThis.${marker} = true; return 1')()`,
+                        type: 'add',
+                    }],
+                },
+            }]);
+
+            assert.isUndefined(globalThis[marker], 'the change value must not be executed');
+            assert.equal(actor.system.attributes.body.value, 0, 'the unresolvable change must be dropped');
+        });
     });
 
     /**
