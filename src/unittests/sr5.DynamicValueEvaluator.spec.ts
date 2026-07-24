@@ -227,6 +227,7 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                     wireless: true,
                     offline: false,
                     category: 'blade',
+                    'hyphen-key': 4,
                     action: { damage: { type: { value: 'physical' } } },
                 },
             };
@@ -234,13 +235,16 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
 
             const accepted: [string, DynamicValue][] = [
                 ['@system.rating * 3', 9],
+                ['@system.rating-1', 2],
                 ['@system.rating ** 2', 9],
+                ['@system.rating >= 1 ? [10, 20, 30][@system.rating-1] : 0', 30],
                 ['$x = @system.rating * 2; $x >= 4 ? $x : 0', 6],
                 ['@system.wireless', true],
                 ['@system.offline', false],
                 ['!@system.wireless', false],
                 ['@system.wireless && @system.rating >= 3', true],
                 ['@{system.rating}', 3],
+                ['@{system.hyphen-key}', 4],
                 ['{\'blade\': 10, \'blunt\': 5}[@system.category]', 10],
                 ['@system.category in [\'blade\', \'blunt\']', true],
                 ['@system.category in [\'exotic\']', false],

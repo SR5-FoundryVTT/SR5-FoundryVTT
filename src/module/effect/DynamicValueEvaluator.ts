@@ -149,11 +149,13 @@ export class DynamicValueEvaluator {
     /**
      * Matches a single token, skipping leading whitespace. Order matters: string literals first,
      * references before numbers, and multi-character operators before the single-character class
-     * so '!=' and '!==' win over '!'. Anything this can't match - backticks, dice notation, a bare
-     * '.' - fails the parse, so evaluate returns the input verbatim as a string.
+     * so '!=' and '!==' win over '!'. Unbraced references exclude '-' so subtraction doesn't
+     * require whitespace; hyphenated paths use the braced form. Anything this can't match -
+     * backticks, dice notation, a bare '.' - fails the parse, so evaluate returns the input
+     * verbatim as a string.
      */
     private static readonly TOKEN =
-        /\s*('[^']*'|"[^"]*"|@\{[-.\w]+\}|@[-.\w]+|\$[A-Za-z_]\w*|\d+(?:\.\d+)?|<=|>=|===|!==|==|!=|&&|\|\||\?\?|\*\*|[-+*/%(){}[\],?:<>!=;]|[A-Za-z_]\w*)/y;
+        /\s*('[^']*'|"[^"]*"|@\{[-.\w]+\}|@[.\w]+|\$[A-Za-z_]\w*|\d+(?:\.\d+)?|<=|>=|===|!==|==|!=|&&|\|\||\?\?|\*\*|[-+*/%(){}[\],?:<>!=;]|[A-Za-z_]\w*)/y;
 
     private readonly tokens: string[];
     private readonly resolve?: (path: string) => unknown;
