@@ -75,6 +75,21 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 ['{blade: 1, \'exotic-melee\': 3}[\'exotic-melee\']', 3],
                 // A bare key is a key, never a function/constant, even when it shadows one.
                 ['{abs: 7, PI: 9}[\'abs\']', 7],
+                // $name bindings - name a value once and reuse it, chaining allowed.
+                ['$x = 5; $x + $x', 10],
+                ['$x = 2; $y = $x + 1; $x * $y', 6],
+                ['$x = 3; $x >= 2 ? $x * 10 : 0', 30],
+                ['$x = 3; $x == 3', true],
+                // The '$' sigil is its own namespace: '$PI'/'$floor' never collide with PI/floor.
+                ['$PI = 3; $PI', 3],
+                ['$PI = 3; $PI + PI', 3 + Math.PI],
+                ['$floor = 2; $floor + floor(2.5)', 4],
+                ['$true = 1; $true', 1],
+                // The value is lazy, so a binding the body never reaches can't sink the expression.
+                ['$x = [1][9]; true ? 5 : $x', 5],
+                // A single trailing ';' is tolerated, on a binding or a plain expression.
+                ['$x = 5; $x + $x;', 10],
+                ['2 + 2;', 4],
                 // Exponentiation - tighter than * and right-associative, looser than unary minus.
                 ['2 ** 3', 8],
                 ['2 ** 3 ** 2', 512],
@@ -154,6 +169,11 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 ['{\'a\': 1}[\'b\']', 'a missing map key'],
                 ['{\'a\': 1}[2]', 'a non-string lookup key'],
                 ['{1: \'a\'}[\'1\']', 'a numeric object key - use an array for numeric indexing'],
+                ['$x = 5 $x', 'a binding with no separating semicolon'],
+                ['$= 5; 1', 'a binding with no name'],
+                ['$x = $x; 1', 'a self-referencing binding value'],
+                ['2 + 2;;', 'more than one trailing separator'],
+                ['$x = 5;', 'a binding with no body'],
                 ['1 + ', 'a missing operand'],
                 ['[1][9] ?? [1][9]', 'a ?? where both sides fail'],
             ];
@@ -212,6 +232,7 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
             const accepted: [string, DynamicValue][] = [
                 ['@system.rating * 3', 9],
                 ['@system.rating ** 2', 9],
+                ['$x = @system.rating * 2; $x >= 4 ? $x : 0', 6],
                 ['@system.wireless', true],
                 ['@system.offline', false],
                 ['!@system.wireless', false],

@@ -8,6 +8,8 @@ export type DynamicValue = number | boolean | string;
 type Node =
     | { kind: 'value'; value: DynamicValue }
     | { kind: 'ref'; token: string; path: string }
+    | { kind: 'bind'; name: string; value: Node; body: Node }
+    | { kind: 'var'; name: string }
     | { kind: 'unary'; op: string; operand: Node }
     | { kind: 'binary'; op: string; left: Node; right: Node }
     | { kind: 'ternary'; condition: Node; whenTrue: Node; whenFalse: Node }
@@ -27,6 +29,7 @@ type Node =
  * - Ternaries: `'cond ? a : b'`.
  * - Array lookups: `'[100, 200, 300][2]'`.
  * - Map lookups: string-keyed tables like `{physical: 10, 'exotic-melee': 5}[type]` (bare or quoted keys).
+ * - Bindings: `'$x = …; …'` names a value for reuse; a binding is evaluated at most once, only if reached.
  * - A fixed set of Math functions (`floor`, `sqrt`, `max`, …) and constants (`PI`, `E`, …).
  *
  * Evaluation is total: anything that isn't a valid expression comes back verbatim as a string, so
@@ -150,11 +153,17 @@ export class DynamicValueEvaluator {
      * '.' - fails the parse, so evaluate returns the input verbatim as a string.
      */
     private static readonly TOKEN =
-        /\s*('[^']*'|"[^"]*"|@\{[-.\w]+\}|@[-.\w]+|\d+(?:\.\d+)?|<=|>=|===|!==|==|!=|&&|\|\||\?\?|\*\*|[-+*/%(){}[\],?:<>!]|[A-Za-z_]\w*)/y;
+        /\s*('[^']*'|"[^"]*"|@\{[-.\w]+\}|@[-.\w]+|\$[A-Za-z_]\w*|\d+(?:\.\d+)?|<=|>=|===|!==|==|!=|&&|\|\||\?\?|\*\*|[-+*/%(){}[\],?:<>!=;]|[A-Za-z_]\w*)/y;
 
     private readonly tokens: string[];
     private readonly resolve?: (path: string) => unknown;
     private pos = 0;
+
+    /** `$name`s bound by an enclosing binding, so primary() tells a bound name from an unknown one. */
+    private readonly scope = new Set<string>();
+
+    /** Bound `$name`s to their memoizing thunks during evaluation, mirroring the lexical scope. */
+    private readonly env = new Map<string, () => DynamicValue>();
 
     /**
      * Evaluate an expression down to a single value.
@@ -243,9 +252,38 @@ export class DynamicValueEvaluator {
     }
 
     private parse(): Node {
-        const node = this.ternary();
+        this.pos = 0;
+        const node = this.expression();
+        // A single trailing ';' is tolerated, so a habitual terminator doesn't sink the expression.
+        if (this.peek() === ';') this.next();
         if (this.pos < this.tokens.length) throw new Error(`Unexpected token '${this.peek()}'.`);
         return node;
+    }
+
+    /** A `$name = value; …` binding, or - without the '$name =' prefix - a plain expression. */
+    private expression(): Node {
+        const token = this.peek();
+        return token?.startsWith('$') && this.tokens[this.pos + 1] === '=' ? this.binding() : this.ternary();
+    }
+
+    /**
+     * '$name = value; body' - names a value for reuse within body. The value is parsed in the outer
+     * scope (so '$x = $x' is unknown, no self-reference); the body sees the name, and being an
+     * expression itself can chain further bindings. The '$' sigil gives names their own space, so a
+     * name can never reach a function or constant - '$floor' and 'floor' are simply different names.
+     */
+    private binding(): Node {
+        const name = this.next();
+        this.expect('=');
+        const value = this.ternary();
+        this.expect(';');
+
+        this.scope.add(name);
+        try {
+            return { kind: 'bind', name, value, body: this.expression() };
+        } finally {
+            this.scope.delete(name);
+        }
     }
 
     /** cond ? a : b, right associative. Branches may be any type and needn't match. */
@@ -313,6 +351,12 @@ export class DynamicValueEvaluator {
         if (token === 'false') return { kind: 'value', value: false };
         if (token.startsWith('\'') || token.startsWith('"')) return { kind: 'value', value: token.slice(1, -1) };
         if (token.startsWith('@')) return { kind: 'ref', token, path: token.replace(/^@\{?|\}$/g, '') };
+
+        // A '$name' is a binding reference; unknown here unless an enclosing binding put it in scope.
+        if (token.startsWith('$')) {
+            if (this.scope.has(token)) return { kind: 'var', name: token };
+            throw new Error(`Unbound name '${token}'.`);
+        }
 
         if (token === '(') {
             const node = this.ternary();
@@ -415,6 +459,13 @@ export class DynamicValueEvaluator {
                 return node.value;
             case 'ref':
                 return this.resolveRef(node);
+            case 'bind':
+                return this.runBind(node);
+            case 'var': {
+                const thunk = this.env.get(node.name);
+                if (!thunk) throw new Error(`Unbound name '${node.name}'.`);
+                return thunk();
+            }
             case 'unary':
                 return DynamicValueEvaluator.UNARY[node.op](this.run(node.operand));
             case 'ternary':
@@ -435,6 +486,25 @@ export class DynamicValueEvaluator {
                 return DynamicValueEvaluator.FUNCTIONS[node.fn](
                     ...node.args.map(arg => DynamicValueEvaluator.number(this.run(arg))),
                 );
+        }
+    }
+
+    /**
+     * Bind the name to a thunk over its value, run the body, then restore the outer binding (if any)
+     * so a rebinding of the same name in a nested scope is undone on the way out. The thunk memoizes,
+     * so a value reused across the body is computed once; a value the body never reaches is never
+     * computed, which keeps the short-circuit guarantee - an unreached binding can't sink the expression.
+     */
+    private runBind(node: Extract<Node, { kind: 'bind' }>): DynamicValue {
+        let cached: { value: DynamicValue } | undefined;
+        const previous = this.env.get(node.name);
+        this.env.set(node.name, () => (cached ??= { value: this.run(node.value) }).value);
+
+        try {
+            return this.run(node.body);
+        } finally {
+            if (previous) this.env.set(node.name, previous);
+            else this.env.delete(node.name);
         }
     }
 
