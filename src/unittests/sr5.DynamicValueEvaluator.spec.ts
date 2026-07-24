@@ -64,6 +64,17 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 ['\'a\' == \'b\'', false],
                 ['1 == 1 ? \'physical\' : \'stun\'', 'physical'],
                 ['[\'physical\',\'stun\'][1]', 'stun'],
+                // Map lookups - string-keyed tables, indexed immediately like an array literal.
+                ['{\'physical\': 10, \'stun\': 5}[\'physical\']', 10],
+                ['{\'physical\': 10, \'stun\': 5}[\'stun\']', 5],
+                ['{\'a\': 2 * 3, \'b\': 1}[\'a\']', 6],
+                ['{\'a\': 1}[\'z\'] ?? 7', 7],
+                ['{\'blade\': 10}[1 == 1 ? \'blade\' : \'blunt\']', 10],
+                // Bare-word keys, and mixing them with quoted keys (needed for non-identifier keys).
+                ['{physical: 10, stun: 5}[\'physical\']', 10],
+                ['{blade: 1, \'exotic-melee\': 3}[\'exotic-melee\']', 3],
+                // A bare key is a key, never a function/constant, even when it shadows one.
+                ['{abs: 7, PI: 9}[\'abs\']', 7],
                 // Exponentiation - tighter than * and right-associative, looser than unary minus.
                 ['2 ** 3', 8],
                 ['2 ** 3 ** 2', 512],
@@ -140,6 +151,9 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 // Malformed input.
                 ['[100,200][5]', 'an out of range index'],
                 ['[100,200][-1]', 'a negative index'],
+                ['{\'a\': 1}[\'b\']', 'a missing map key'],
+                ['{\'a\': 1}[2]', 'a non-string lookup key'],
+                ['{1: \'a\'}[\'1\']', 'a numeric object key - use an array for numeric indexing'],
                 ['1 + ', 'a missing operand'],
                 ['[1][9] ?? [1][9]', 'a ?? where both sides fail'],
             ];
@@ -203,6 +217,7 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 ['!@system.wireless', false],
                 ['@system.wireless && @system.rating >= 3', true],
                 ['@{system.rating}', 3],
+                ['{\'blade\': 10, \'blunt\': 5}[@system.category]', 10],
                 ['@system.category in [\'blade\', \'blunt\']', true],
                 ['@system.category in [\'exotic\']', false],
                 ['@system.action.damage.type.value == \'physical\'', true],

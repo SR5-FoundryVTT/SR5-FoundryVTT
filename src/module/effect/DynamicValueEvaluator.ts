@@ -13,6 +13,7 @@ type Node =
     | { kind: 'ternary'; condition: Node; whenTrue: Node; whenFalse: Node }
     | { kind: 'in'; value: Node; list: Node[] }
     | { kind: 'lookup'; values: Node[]; index: Node }
+    | { kind: 'objectLookup'; entries: { key: string; value: Node }[]; key: Node }
     | { kind: 'call'; fn: string; args: Node[] };
 
 /**
@@ -25,6 +26,7 @@ type Node =
  * - Membership: `'x in [a, b]'`.
  * - Ternaries: `'cond ? a : b'`.
  * - Array lookups: `'[100, 200, 300][2]'`.
+ * - Map lookups: string-keyed tables like `{physical: 10, 'exotic-melee': 5}[type]` (bare or quoted keys).
  * - A fixed set of Math functions (`floor`, `sqrt`, `max`, …) and constants (`PI`, `E`, …).
  *
  * Evaluation is total: anything that isn't a valid expression comes back verbatim as a string, so
@@ -148,7 +150,7 @@ export class DynamicValueEvaluator {
      * '.' - fails the parse, so evaluate returns the input verbatim as a string.
      */
     private static readonly TOKEN =
-        /\s*('[^']*'|"[^"]*"|@\{[-.\w]+\}|@[-.\w]+|\d+(?:\.\d+)?|<=|>=|===|!==|==|!=|&&|\|\||\?\?|\*\*|[-+*/%()[\],?:<>!]|[A-Za-z_]\w*)/y;
+        /\s*('[^']*'|"[^"]*"|@\{[-.\w]+\}|@[-.\w]+|\d+(?:\.\d+)?|<=|>=|===|!==|==|!=|&&|\|\||\?\?|\*\*|[-+*/%(){}[\],?:<>!]|[A-Za-z_]\w*)/y;
 
     private readonly tokens: string[];
     private readonly resolve?: (path: string) => unknown;
@@ -320,6 +322,8 @@ export class DynamicValueEvaluator {
 
         if (token === '[') return this.lookup();
 
+        if (token === '{') return this.objectLookup();
+
         // Object.hasOwn so inherited members ('constructor', 'toString', ...) aren't callable.
         if (Object.hasOwn(DynamicValueEvaluator.FUNCTIONS, token)) {
             this.expect('(');
@@ -343,6 +347,48 @@ export class DynamicValueEvaluator {
         this.expect(']');
 
         return { kind: 'lookup', values, index };
+    }
+
+    /**
+     * "{a: x, 'b-c': y}[key]" - like a lookup but keyed by a string. As with an array literal, the
+     * object is only ever a lookup table, so it must be indexed immediately and can never escape as
+     * a value of its own.
+     */
+    private objectLookup(): Node {
+        const entries = this.entries();
+        this.expect('[');
+        const key = this.ternary();
+        this.expect(']');
+
+        return { kind: 'objectLookup', entries, key };
+    }
+
+    /** Parse a comma separated list of 'key: expression' entries up to and including the '}'. */
+    private entries(): { key: string; value: Node }[] {
+        const entries: { key: string; value: Node }[] = [];
+
+        if (this.peek() !== '}') {
+            do {
+                const key = this.key();
+                this.expect(':');
+                entries.push({ key, value: this.ternary() });
+            } while (this.peek() === ',' && this.next());
+        }
+
+        this.expect('}');
+        return entries;
+    }
+
+    /**
+     * A map key: a quoted string (any characters) or a bare identifier for the common case. Key
+     * position is its own context, so a bare word here is a key, never a function/constant. Numbers
+     * aren't keys - array lookup covers numeric indexing.
+     */
+    private key(): string {
+        const token = this.next();
+        if (token !== undefined && (token.startsWith('\'') || token.startsWith('"'))) return token.slice(1, -1);
+        if (token !== undefined && /^[A-Za-z_]\w*$/.test(token)) return token;
+        throw new Error(`Expected a string or identifier key, got '${token}'.`);
     }
 
     /** Parse a comma separated list of expressions up to and including the closing token. */
@@ -383,6 +429,8 @@ export class DynamicValueEvaluator {
             }
             case 'lookup':
                 return this.runLookup(node);
+            case 'objectLookup':
+                return this.runObjectLookup(node);
             case 'call':
                 return DynamicValueEvaluator.FUNCTIONS[node.fn](
                     ...node.args.map(arg => DynamicValueEvaluator.number(this.run(arg))),
@@ -416,6 +464,17 @@ export class DynamicValueEvaluator {
             throw new Error(`Index ${index} out of range.`);
 
         return this.run(node.values[index]);
+    }
+
+    /** Evaluate only the matched entry, after resolving the key to a string. */
+    private runObjectLookup(node: Extract<Node, { kind: 'objectLookup' }>): DynamicValue {
+        const key = this.run(node.key);
+        if (typeof key !== 'string') throw new Error(`Expected a string key, got '${key}'.`);
+
+        const entry = node.entries.find(entry => entry.key === key);
+        if (!entry) throw new Error(`Key '${key}' not found.`);
+
+        return this.run(entry.value);
     }
 
     /**
