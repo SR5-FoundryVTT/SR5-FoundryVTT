@@ -19,7 +19,10 @@ export class SpiritPrep {
     }
 
     static prepareDerivedData(system: Actor.SystemOfType<'spirit'>, items: SR5Item[]) {
-        ModifiableValue.applyChanges(system.attributes.force, { min: 1 });
+        // Force is authored and never rewritten by preparation, so it anchors on the persisted `_source`.
+        ModifiableValue.applyChanges(system.attributes.force, {
+            from: ModifiableValue.sourceAnchor(system, 'attributes.force'), min: 1,
+        });
         system.parent?.applyActiveEffects('force');
         AttributesPrep.clampAttributesToRange(system, SR.attributes.rangesSpirit);
         const force = system.attributes.force.value;
@@ -70,9 +73,14 @@ export class SpiritPrep {
         skills.push(...Object.values(system.skills.language));
         skills.push(...Object.values(system.skills.knowledge).flatMap(category => Object.values(category)));
 
+        // `skill.base` here is the skill item's authored rating: SR5Actor.prepareBaseData rebuilds
+        // system.skills from skill items every cycle, so this reads fresh data, not the previous pass.
+        // A rating above zero means the spirit has the skill, which then resolves from Force.
         for (const skill of skills) {
-            if (skill.base > 0)
-                skill.base = onSkillValue;
+            if (skill.base <= 0) continue;
+
+            skill.base = 0;
+            ModifiableValue.addUniqueBase(skill, 'SR5.BaseValue', onSkillValue);
         }
     }
 

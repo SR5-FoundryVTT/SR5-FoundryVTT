@@ -123,11 +123,13 @@ export class AttributesPrep {
      * @param items The items that might cause an essence loss.
      */
     static prepareEssence(system: Actor.SystemOfType<'character'>, items: SR5Item[]) {
-        // The essence base is fixed. Changes should be made through the attribute.temp field.
-        system.attributes.essence.base = SR.attributes.defaults.essence;
+        // The essence base is a fixed constant, logged as a BASE_PRIORITY entry so it survives `base` leaving
+        // the schema. Changes should be made through the attribute.temp field.
+        system.attributes.essence.base = 0;
 
         // Modify essence by actor modifer
         const parts = new ModifiableValue(system.attributes.essence);
+        parts.addUniqueBase('SR5.BaseValue', SR.attributes.defaults.essence);
 
         const essenceMod = system.modifiers.essence;
         parts.addUnique('SR5.Bonus', essenceMod);
@@ -137,6 +139,6 @@ export class AttributesPrep {
                 parts.add(item.name, -item.getEssenceLoss());
         }
 
-        ModifiableValue.applyChanges(system.attributes.essence, { decimal: true });
+        ModifiableValue.applyChanges(system.attributes.essence, { from: 0, decimal: true });
     }
 }

@@ -362,6 +362,23 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(unequippedDevice.system.technology.cost.value, 100);
         });
 
+        it('does not compound the device rating attribute across repeated preparation', async () => {
+            const device = await factory.createItem({
+                type: 'device',
+                system: { technology: { rating: 4 } },
+            });
+
+            device.prepareData();
+            const once = device.system.attributes!.rating.value;
+            device.prepareData();
+            device.prepareData();
+
+            // `attributes.rating` is not recreated per cycle and item values are never reset, so a
+            // non-idempotent part would accumulate the rating on every preparation.
+            assert.strictEqual(device.system.attributes!.rating.value, once);
+            assert.strictEqual(once, 4);
+        });
+
         it('applies item-target effects to a device matrix attribute', async () => {
             const device = await factory.createItem({
                 type: 'device',
@@ -384,8 +401,8 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
             const twice = device.system.attributes!.firewall.value;
 
             assert.strictEqual(once, twice, 'repeated prepareData must be idempotent');
-            // base is the device rating (3); if the effect applies, value is 5.
-            assert.strictEqual(device.system.attributes!.firewall.base, 3, 'firewall base');
+            // The device rating (3) is the anchor, now a BASE_PRIORITY entry rather than `base`, so the
+            // effect's +2 lands on top of it for a value of 5.
             assert.strictEqual(once, 5, 'firewall value after +2 effect');
         });
 

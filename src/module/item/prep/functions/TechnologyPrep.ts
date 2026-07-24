@@ -30,7 +30,7 @@ export const TechnologyPrep = {
      * @param technology The system technology section to be altered
      * @param equippedMods Those item mods that are equipped.
      */
-    prepareConceal(technology: TechnologyType, equippedMods: SR5Item<'modification'>[]) {
+    prepareConceal(technology: TechnologyType, equippedMods: SR5Item<'modification'>[], sourceModel?: object) {
         TechnologyPrep.dropEffectSourcedChanges(technology.conceal);
 
         const concealParts = new ModifiableValue(technology.conceal);
@@ -38,7 +38,10 @@ export const TechnologyPrep = {
             concealParts.setUnique(mod.name, mod.system.mod_weapon.conceal);
 
         // Out-of-place: fold mod parts onto `.value` once; item ActiveEffects apply natively on top later.
-        concealParts.applyChanges();
+        // The authored conceal rating anchors on the persisted `_source`.
+        concealParts.applyChanges({
+            from: sourceModel ? ModifiableValue.sourceAnchor(sourceModel, 'technology.conceal') : undefined,
+        });
     },
 
     /**
@@ -59,7 +62,9 @@ export const TechnologyPrep = {
             const base = Number(rating);
             const label = SR5.attributes[name];
 
-            const attribute = DataDefaults.createData('attribute_field', { label, base });
+            // Device rating is the anchor, logged as a BASE_PRIORITY entry rather than written to `base`.
+            const attribute = DataDefaults.createData('attribute_field', { label });
+            ModifiableValue.addUniqueBase(attribute, 'SR5.BaseValue', base);
             attributes[name] = attribute;
         }
     },
@@ -80,14 +85,18 @@ export const TechnologyPrep = {
             const base = Number(rating);
             const label = SR5.attributes[name];
 
-            const attribute = DataDefaults.createData('attribute_field', { label, base });
+            // Device rating is the anchor, logged as a BASE_PRIORITY entry rather than written to `base`.
+            const attribute = DataDefaults.createData('attribute_field', { label });
+            ModifiableValue.addUniqueBase(attribute, 'SR5.BaseValue', base);
             attributes[name] = attribute;
         }
 
         // Add device rating as attribute to allow for rolls with it.
+        // NOTE: unlike the attributes above, `attributes.rating` is not recreated each cycle, and item
+        // ModifiableValues are never reset. A plain `add` here appended a fresh entry on every preparation,
+        // compounding the rating; addUniqueBase replaces it instead and is idempotent.
         const rating = Number(technology.rating ?? 0);
-        const parts = new ModifiableValue(attributes.rating);
-        parts.add('SR5.Host.Rating', rating);
+        ModifiableValue.addUniqueBase(attributes.rating, 'SR5.Host.Rating', rating);
     },
 
     /**
@@ -109,9 +118,12 @@ export const TechnologyPrep = {
      *
      * @param technology The system technology section to be altered
      */
-    prepareAvailability(technology: TechnologyType) {
+    prepareAvailability(technology: TechnologyType, sourceModel?: object) {
         TechnologyPrep.dropEffectSourcedChanges(technology.availability);
-        ModifiableValue.applyChanges(technology.availability, { min: 0 });
+        ModifiableValue.applyChanges(technology.availability, {
+            from: sourceModel ? ModifiableValue.sourceAnchor(sourceModel, 'technology.availability') : undefined,
+            min: 0,
+        });
     },
 
     /**
@@ -131,9 +143,12 @@ export const TechnologyPrep = {
      *
      * @param technology The system technology section to be altered
      */
-    prepareCost(technology: TechnologyType) {
+    prepareCost(technology: TechnologyType, sourceModel?: object) {
         TechnologyPrep.dropEffectSourcedChanges(technology.cost);
-        ModifiableValue.applyChanges(technology.cost, { decimal: true });
+        ModifiableValue.applyChanges(technology.cost, {
+            from: sourceModel ? ModifiableValue.sourceAnchor(sourceModel, 'technology.cost') : undefined,
+            decimal: true,
+        });
     },
 
     /**

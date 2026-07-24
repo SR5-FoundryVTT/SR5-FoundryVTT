@@ -1546,7 +1546,8 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.attributes.body.value, 6);
             // Limit anchors are BASE_PRIORITY change entries now, so assert the derived value, not `base`.
             assert.strictEqual(actor.system.limits.physical.value, 2);      // ceil((2*0 + 6 + 0) / 3)
-            assert.strictEqual(actor.system.track.physical.base, 11);       // 8 + ceil(6 / 2)
+            // Monitor capacity is a local now, so assert the derived max rather than `base`.
+            assert.strictEqual(actor.system.track.physical.max, 11);        // 8 + ceil(6 / 2)
             assert.strictEqual(actor.system.track.physical.overflow.max, 6);
 
             await actor.createEmbeddedDocuments('ActiveEffect', [{
@@ -1563,7 +1564,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             // Downstream in-place consumers see the AE-modified attribute.
             assert.strictEqual(actor.system.limits.physical.value, 3);      // ceil((2*0 + 8 + 0) / 3)
-            assert.strictEqual(actor.system.track.physical.base, 12);       // 8 + ceil(8 / 2)
+            assert.strictEqual(actor.system.track.physical.max, 12);        // 8 + ceil(8 / 2)
             assert.strictEqual(actor.system.track.physical.overflow.max, 8);
 
             // Native application records the key in overrides (locks the sheet input).

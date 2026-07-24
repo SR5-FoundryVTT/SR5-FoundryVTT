@@ -115,12 +115,23 @@ export class VehiclePrep {
     static prepareLimits(system: Actor.SystemOfType<'vehicle'>) {
         const { limits, vehicle_stats, isOffRoad } = system;
 
-        limits.mental.base = vehicle_stats.sensor.value;
+        // Sensor is the anchor, logged as a BASE_PRIORITY entry so it survives `base` removal.
+        limits.mental.base = 0;
+        ModifiableValue.addUniqueBase(limits.mental, 'SR5.BaseValue', vehicle_stats.sensor.value);
 
-        // add sensor, handling, and speed as limits
-        limits.sensor = { ...vehicle_stats.sensor, hidden: true, attribute: 'sensor' };
-        limits.handling = { ...(isOffRoad ? vehicle_stats.off_road_handling : vehicle_stats.handling), hidden: true, attribute: 'handling' };
-        limits.speed = { ...(isOffRoad ? vehicle_stats.off_road_speed : vehicle_stats.speed), hidden: true, attribute: 'speed' };
+        // add sensor, handling, and speed as limits.
+        // The stat's own anchor is still its `base`, so carry it over as a BASE_PRIORITY entry and zero the
+        // copy's base. `changes` must be cloned: a plain spread shares the array with the vehicle stat, so
+        // adding the anchor would mutate the stat itself.
+        const asLimit = <F extends ModifiableValueType, A extends string>(stat: F, attribute: A) => {
+            const limit = { ...stat, changes: [...stat.changes], base: 0, hidden: true, attribute };
+            ModifiableValue.addUniqueBase(limit, 'SR5.BaseValue', stat.base);
+            return limit;
+        };
+
+        limits.sensor = asLimit(vehicle_stats.sensor, 'sensor');
+        limits.handling = asLimit(isOffRoad ? vehicle_stats.off_road_handling : vehicle_stats.handling, 'handling');
+        limits.speed = asLimit(isOffRoad ? vehicle_stats.off_road_speed : vehicle_stats.speed, 'speed');
     }
 
     /**
@@ -138,8 +149,9 @@ export class VehiclePrep {
         const halfBody = Math.ceil(attributes.body.value / 2);
         // CRB pg 199 drone vs vehicle physical condition monitor rules
         // Anthro vehicles have condition monitor as 8 + (body/2). R5 pg 145
-        track.physical.base = (isDrone ? (category === 'anthro' ? 8 : 6) : 12) + halfBody;
-        track.physical.max =  track.physical.base + modifiers['physical_track'];
+        // Capacity is an intermediate for `max`, not a fold anchor, so it stays a local.
+        const capacity = (isDrone ? (category === 'anthro' ? 8 : 6) : 12) + halfBody;
+        track.physical.max = capacity + modifiers['physical_track'];
         track.physical.label = SR5.damageTypes.physical;
 
         // Prepare internal matrix condition monitor values
@@ -147,8 +159,8 @@ export class VehiclePrep {
         const rating = matrix.rating || 0;
         matrix.condition_monitor.max = MatrixRules.getVehicleMonitor(rating) + Number(modifiers.matrix_track);
 
-        // Prepare user visible matrix track values
-        track.matrix.base = MatrixRules.getVehicleMonitor(rating);
+        // Prepare user visible matrix track values. `max` comes from the condition monitor above; the track's
+        // own `base` was write-only (nothing reads it), so it is no longer set.
         ModifiableValue.addUnique(track.matrix, "SR5.Bonus", modifiers.matrix_track);
         track.matrix.max = matrix.condition_monitor.max;
         track.matrix.label = SR5.damageTypes.matrix;
@@ -160,12 +172,16 @@ export class VehiclePrep {
         const speedTotal = (isOffRoad ? vehicle_stats.off_road_speed : vehicle_stats.speed).value;
 
         // algorithm to determine speed, CRB pg 202 table.
-        // Allow ActiveEffects to apply to movement directly.
-        movement.walk.base = 5 * Math.pow(2, speedTotal - 1);
-        movement.walk.value = ModifiableValue.applyChanges(movement.walk as ModifiableValueType, {min: 0});
+        // Allow ActiveEffects to apply to movement directly. The derived anchor is a BASE_PRIORITY entry
+        // folded from 0, so it survives `base` leaving the schema.
+        const resolve = (field: ModifiableValueType, base: number) => {
+            const mod = new ModifiableValue(field);
+            mod.addUniqueBase('SR5.BaseValue', base);
+            return mod.applyChanges({ from: 0, min: 0 });
+        };
 
-        movement.run.base = 10 * Math.pow(2, speedTotal - 1);
-        movement.run.value = ModifiableValue.applyChanges(movement.run as ModifiableValueType, {min: 0});
+        movement.walk.value = resolve(movement.walk as ModifiableValueType, 5 * Math.pow(2, speedTotal - 1));
+        movement.run.value = resolve(movement.run as ModifiableValueType, 10 * Math.pow(2, speedTotal - 1));
     }
 
     /**

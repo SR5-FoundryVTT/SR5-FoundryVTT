@@ -50,8 +50,8 @@ export class ICPrep {
         // LEGACY: matrix.condition_monitor is no TrackType. It will only be used as a info, should ever be needed anywhere
         matrix.condition_monitor.max = Number(modifiers['matrix_track']) + MatrixRules.getConditionMonitor(matrix.rating);
 
-        // Prepare user visible matrix track values
-        track.matrix.base = MatrixRules.getConditionMonitor(matrix.rating);
+        // Prepare user visible matrix track values. `max` comes from the condition monitor above; the track's
+        // own `base` was write-only (nothing reads it), so it is no longer set.
         ModifiableValue.addUnique(track.matrix, "SR5.Bonus", Number(modifiers['matrix_track']));
         track.matrix.max = matrix.condition_monitor.max;
         track.matrix.label = SR5.damageTypes.matrix;
@@ -64,8 +64,13 @@ export class ICPrep {
         if (!system.host.atts) return;
 
         Object.entries(system.host.atts).forEach(([deviceAttribute, attribute]) => {
-            system.matrix[attribute.att].base = attribute.value;
-            system.matrix[attribute.att].device_att = deviceAttribute;
+            const matrixAttribute = system.matrix[attribute.att];
+
+            // Host attribute is the anchor, logged as a BASE_PRIORITY entry. `base` is zeroed so it
+            // contributes nothing to the fold; the zeroing goes away when `base` leaves the schema.
+            matrixAttribute.base = 0;
+            ModifiableValue.addUniqueBase(matrixAttribute, 'SR5.BaseValue', attribute.value);
+            matrixAttribute.device_att = deviceAttribute;
         });
     }
 

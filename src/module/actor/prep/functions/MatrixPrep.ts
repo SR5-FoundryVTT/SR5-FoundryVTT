@@ -116,8 +116,12 @@ export class MatrixPrep {
         rating = rating ?? matrix.rating;
         const matrixAttributes = ['firewall', 'data_processing'] as const;
 
-        for (const attribute of matrixAttributes)
-            matrix[attribute].base = rating;
+        // Device rating is the anchor, logged as a BASE_PRIORITY entry. `base` is zeroed so it contributes
+        // nothing to the fold; the zeroing goes away when `base` leaves the schema.
+        for (const attribute of matrixAttributes) {
+            matrix[attribute].base = 0;
+            ModifiableValue.addUniqueBase(matrix[attribute], 'SR5.BaseValue', rating);
+        }
         for (const attId of [...matrixAttributes, 'sleaze', 'attack']) {
             ModifiableValue.applyChanges(matrix[attId]);
         }

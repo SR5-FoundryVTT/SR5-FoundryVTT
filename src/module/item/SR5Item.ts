@@ -210,7 +210,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         const technology = this.getTechnologyData();
         if (technology) {
             TechnologyPrep.prepareConditionMonitor(technology);
-            TechnologyPrep.prepareConceal(technology, equippedMods);
+            TechnologyPrep.prepareConceal(technology, equippedMods, this.system);
             TechnologyPrep.prepareMatrixAttributes(this.system);
             TechnologyPrep.prepareMentalAttributes(this.system);
         }
@@ -246,8 +246,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         // ActiveEffects applied below compose natively on top instead of being folded from `changes[]`.
         const technology = this.getTechnologyData();
         if (technology) {
-            TechnologyPrep.prepareCost(technology);
-            TechnologyPrep.prepareAvailability(technology);
+            TechnologyPrep.prepareCost(technology, this.system);
+            TechnologyPrep.prepareAvailability(technology, this.system);
         }
 
         this.applyItemActiveEffects();

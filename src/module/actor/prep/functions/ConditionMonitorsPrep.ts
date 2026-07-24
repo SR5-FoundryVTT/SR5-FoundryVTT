@@ -4,8 +4,10 @@ export class ConditionMonitorsPrep {
     static prepareStun(system: Actor.SystemOfType<'character' | 'spirit'>) {
         const { track, attributes, modifiers } = system;
 
-        track.stun.base = 8 + Math.ceil(attributes.willpower.value / 2);
-        track.stun.max = Math.max(1, track.stun.base + modifiers.stun_track);
+        // Monitor capacity is an intermediate for `max`, not a fold anchor (tracks are never folded), so it
+        // stays a local rather than being written to `base`.
+        const capacity = 8 + Math.ceil(attributes.willpower.value / 2);
+        track.stun.max = Math.max(1, capacity + modifiers.stun_track);
         track.stun.label = SR5.damageTypes.stun;
         track.stun.disabled = false;
     }
@@ -13,8 +15,8 @@ export class ConditionMonitorsPrep {
     static preparePhysical(system: Actor.SystemOfType<'character' | 'spirit'>) {
         const { track, attributes, modifiers } = system;
 
-        track.physical.base = 8 + Math.ceil(attributes.body.value / 2);
-        track.physical.max = Math.max(1, track.physical.base + modifiers.physical_track);
+        const capacity = 8 + Math.ceil(attributes.body.value / 2);
+        track.physical.max = Math.max(1, capacity + modifiers.physical_track);
         track.physical.overflow.max = attributes.body.value + modifiers.physical_overflow_track;
         track.physical.label = SR5.damageTypes.physical;
         track.physical.disabled = false;
@@ -34,8 +36,8 @@ export class ConditionMonitorsPrep {
             attributes.willpower:
             attributes.body;
 
-        track.physical.base = 8 + Math.ceil(attribute.value / 2);
-        track.physical.max = Math.max(1, track.physical.base + modifiers.physical_track);
+        const capacity = 8 + Math.ceil(attribute.value / 2);
+        track.physical.max = Math.max(1, capacity + modifiers.physical_track);
         track.physical.overflow.max = attributes.body.value;
         track.physical.label = "SR5.ConditionMonitor";
         track.physical.disabled = false;

@@ -52,8 +52,8 @@ export const shadowrunSR5ICDataPrep = (context: QuenchBatchContext) => {
             for (const skillId of ['computer', 'cybercombat', 'electronic_warfare', 'hacking', 'software']) {
                 const skill = ic.getSkill(skillId);
 
+                // The host-derived anchor is a BASE_PRIORITY change entry now, so assert the resolved value.
                 assert.exists(skill, skillId);
-                assert.strictEqual(skill?.base, 5, skillId);
                 assert.strictEqual(skill?.value, 5, skillId);
             }
         });

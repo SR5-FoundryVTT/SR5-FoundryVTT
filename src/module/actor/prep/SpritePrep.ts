@@ -18,7 +18,10 @@ export class SpritePrep {
     }
 
     static prepareDerivedData(system: Actor.SystemOfType<'sprite'>, items: SR5Item[]) {
-        ModifiableValue.applyChanges(system.attributes.level, { min: 1 });
+        // Level is authored and never rewritten by preparation, so it anchors on the persisted `_source`.
+        ModifiableValue.applyChanges(system.attributes.level, {
+            from: ModifiableValue.sourceAnchor(system, 'attributes.level'), min: 1,
+        });
         system.parent?.applyActiveEffects('level');
         const level = system.attributes.level.value;
 
@@ -45,7 +48,10 @@ export class SpritePrep {
         const { attributes } = system;
         if (attributes.resonance.applies_special)
             ModifiableValue.addUniqueBase(attributes.resonance, 'SR5.Level', level);
-        ModifiableValue.applyChanges(attributes.resonance);
+        // Authored attribute: anchor on the persisted `_source` rather than the prepared `base`.
+        ModifiableValue.applyChanges(attributes.resonance, {
+            from: ModifiableValue.sourceAnchor(system, 'attributes.resonance'),
+        });
     }
 
     static prepareSpriteMatrixAttributes(system: Actor.SystemOfType<'sprite'>, level: number) {
@@ -57,7 +63,10 @@ export class SpritePrep {
             if (!matrix[att]) continue;
             if (matrix[att].applies_special)
                 ModifiableValue.addUniqueBase(matrix[att], 'SR5.Level', level);
-            ModifiableValue.applyChanges(matrix[att]);
+            // Authored matrix attribute: anchor on the persisted `_source`.
+            ModifiableValue.applyChanges(matrix[att], {
+                from: ModifiableValue.sourceAnchor(system, `matrix.${att}`),
+            });
         }
 
         matrix.rating = level;
@@ -71,8 +80,14 @@ export class SpritePrep {
             ...Object.values(skills.knowledge).flatMap(category => Object.values(category)),
         ];
 
+        // `skill.base` here is the skill item's authored rating: SR5Actor.prepareBaseData rebuilds
+        // system.skills from skill items every cycle, so this reads fresh data, not the previous pass.
+        // A rating above zero means the sprite has the skill, which then resolves from Level.
         for (const skill of allSkills) {
-            skill.base = skill.base > 0 ? level : 0;
+            const hasSkill = skill.base > 0;
+
+            skill.base = 0;
+            ModifiableValue.addUniqueBase(skill, 'SR5.BaseValue', hasSkill ? level : 0);
         }
     }
 
@@ -83,8 +98,8 @@ export class SpritePrep {
         // LEGACY: matrix.condition_monitor is no TrackType. It will only be used as a info, should ever be needed anywhere
         matrix.condition_monitor.max = modifiers['matrix_track'] + MatrixRules.getConditionMonitor(level);
 
-        // Prepare user visible matrix track values
-        track.matrix.base = MatrixRules.getConditionMonitor(level);
+        // Prepare user visible matrix track values. `max` comes from the condition monitor above; the track's
+        // own `base` was write-only (nothing reads it), so it is no longer set.
         ModifiableValue.addUnique(track.matrix, "SR5.Bonus", modifiers['matrix_track']);
         track.matrix.max = matrix.condition_monitor.max;
         track.matrix.label = SR5.damageTypes.matrix;

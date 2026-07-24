@@ -1,4 +1,5 @@
 import { MatrixRules } from '@/module/rules/MatrixRules';
+import { ModifiableValue } from '@/module/mods/ModifiableValue';
 
 
 export class ICSkillPrep {
@@ -13,8 +14,10 @@ export class ICSkillPrep {
     static prepareSkills(system: Actor.SystemOfType<'ic'>) {
         const skillBase = MatrixRules.getICSkillBase(system.host.rating);
 
+        // Host-derived anchor logged as a BASE_PRIORITY entry rather than written to `base`.
         for (const skillField of Object.values(system.skills.active)) {
-            skillField.base = skillBase;
+            skillField.base = 0;
+            ModifiableValue.addUniqueBase(skillField, 'SR5.BaseValue', skillBase);
         }
     }
 }
