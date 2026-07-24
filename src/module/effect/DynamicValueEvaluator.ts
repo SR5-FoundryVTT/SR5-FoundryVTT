@@ -2,16 +2,31 @@
 export type DynamicValue = number | boolean | string;
 
 /**
+ * A node in the parsed expression tree. Parsing builds this tree, then run() walks it, so
+ * evaluation is separate from parsing - which lets ternaries and && / || short-circuit.
+ */
+type Node =
+    | { kind: 'value'; value: DynamicValue }
+    | { kind: 'ref'; token: string; path: string }
+    | { kind: 'unary'; op: string; operand: Node }
+    | { kind: 'binary'; op: string; left: Node; right: Node }
+    | { kind: 'ternary'; condition: Node; whenTrue: Node; whenFalse: Node }
+    | { kind: 'in'; value: Node; list: Node[] }
+    | { kind: 'lookup'; values: Node[]; index: Node }
+    | { kind: 'call'; fn: string; args: Node[] };
+
+/**
  * Evaluate the small expression language used by dynamic Active Effect change values.
  *
- * Supports number literals, true/false, quoted string literals, @property references,
+ * Supports number literals, true/false, quoted string literals, `@property` references,
  * + - * / % **, unary +/-, logical not (!), parentheses, comparisons, membership ('x in [a, b]'),
  * the logical operators && and ||, ternaries, array literals with numeric indexing
  * ('[100, 200, 300][2]') and a fixed set of Math functions. Evaluation is total: input that isn't
  * a valid expression is returned verbatim as a string, so a plain value like 'physical' comes back
- * unchanged.
+ * unchanged. Ternaries and && / || short-circuit, so a guard like '@r >= 1 ? [a,b][@r-1] : 0'
+ * never evaluates the branch it doesn't take.
  *
- * @property references are resolved through an optional resolver passed to evaluate, keeping the
+ * `@property` references are resolved through an optional resolver passed to evaluate, keeping the
  * types of string and boolean references intact (Roll.replaceFormulaData, by contrast, substitutes
  * strings unquoted and coerces booleans to 1/0). Without a resolver, a reference is an unknown
  * token and the input falls through verbatim.
@@ -27,8 +42,8 @@ export type DynamicValue = number | boolean | string;
  */
 export class DynamicValueEvaluator {
     /**
-     * Functions callable from an expression. Any other identifier is an unknown token.
-     * Extend this when an importer starts emitting a construct that isn't covered.
+     * Functions callable from an expression. Any other identifier is an unknown token. Membership
+     * is tested with Object.hasOwn so inherited names like 'constructor' or 'toString' don't match.
      */
     private static readonly FUNCTIONS: Record<string, (...args: number[]) => number> = {
         abs: Math.abs,
@@ -45,6 +60,7 @@ export class DynamicValueEvaluator {
     /**
      * Binary operators. Ordering and arithmetic go through numeric() to assert their operands;
      * equality compares without coercion so 'true == true' holds. Comparisons yield booleans.
+     * && and || are not here - they short-circuit in run() rather than taking both operands.
      */
     private static readonly OPERATORS: Record<string, (left: DynamicValue, right: DynamicValue) => DynamicValue> = {
         '<': DynamicValueEvaluator.numeric((a, b) => a < b),
@@ -60,8 +76,7 @@ export class DynamicValueEvaluator {
         '*': DynamicValueEvaluator.numeric((a, b) => a * b),
         '/': DynamicValueEvaluator.numeric((a, b) => a / b),
         '%': DynamicValueEvaluator.numeric((a, b) => a % b),
-        '&&': (left, right) => DynamicValueEvaluator.truthy(left) && DynamicValueEvaluator.truthy(right),
-        '||': (left, right) => DynamicValueEvaluator.truthy(left) || DynamicValueEvaluator.truthy(right),
+        '**': DynamicValueEvaluator.numeric((a, b) => a ** b),
     };
 
     /** Prefix operators. '-'/'+' require a number, '!' takes any condition. */
@@ -73,8 +88,8 @@ export class DynamicValueEvaluator {
 
     /**
      * Binary operators grouped into precedence levels, loosest binding first. 'in' (membership,
-     * right operand is a bracketed list) binds like a comparison. Exponentiation is tighter than
-     * everything here and right-associative, so it lives in exponent() rather than the table.
+     * right operand is a bracketed list) binds like a comparison. Exponentiation binds tighter and
+     * is right-associative, so exponent() parses it rather than this table.
      */
     private static readonly PRECEDENCE = [
         ['||'],
@@ -104,13 +119,14 @@ export class DynamicValueEvaluator {
      * Evaluate an expression down to a single value.
      *
      * @param expression The expression to evaluate.
-     * @param resolve Optional resolver mapping an @property path (without the leading @) to its
+     * @param resolve Optional resolver mapping an `@property` path (without the leading @) to its
      *                value. Omit it and references become unknown tokens.
      * @returns The result, or the input verbatim when it isn't a valid expression.
      */
     static evaluate(expression: string, resolve?: (path: string) => unknown): DynamicValue {
         try {
-            return new DynamicValueEvaluator(expression, resolve).parse();
+            const evaluator = new DynamicValueEvaluator(expression, resolve);
+            return evaluator.run(evaluator.parse());
         } catch {
             // Not an expression, so the text is the value itself (e.g. 'physical').
             return expression;
@@ -167,6 +183,10 @@ export class DynamicValueEvaluator {
         return tokens;
     }
 
+    /* -------------------------------------------- */
+    /*  Parsing - token stream to Node tree         */
+    /* -------------------------------------------- */
+
     private peek() {
         return this.tokens[this.pos];
     }
@@ -179,14 +199,14 @@ export class DynamicValueEvaluator {
         if (this.next() !== token) throw new Error(`Expected '${token}'.`);
     }
 
-    private parse(): DynamicValue {
-        const value = this.ternary();
+    private parse(): Node {
+        const node = this.ternary();
         if (this.pos < this.tokens.length) throw new Error(`Unexpected token '${this.peek()}'.`);
-        return value;
+        return node;
     }
 
     /** cond ? a : b, right associative. Branches may be any type and needn't match. */
-    private ternary(): DynamicValue {
+    private ternary(): Node {
         const condition = this.binary();
         if (this.peek() !== '?') return condition;
 
@@ -195,117 +215,170 @@ export class DynamicValueEvaluator {
         this.expect(':');
         const whenFalse = this.ternary();
 
-        return DynamicValueEvaluator.truthy(condition) ? whenTrue : whenFalse;
+        return { kind: 'ternary', condition, whenTrue, whenFalse };
     }
 
     /** Left associative binary operators, one PRECEDENCE level per recursion. */
-    private binary(level = 0): DynamicValue {
+    private binary(level = 0): Node {
         const operators = DynamicValueEvaluator.PRECEDENCE[level];
-        if (!operators) return this.exponent();
+        if (!operators) return this.unary();
 
-        let value = this.binary(level + 1);
+        let node = this.binary(level + 1);
         while (operators.includes(this.peek())) {
             const op = this.next();
             // 'in' takes a bracketed list on the right instead of another operand.
             if (op === 'in') {
                 this.expect('[');
-                value = this.list(']').includes(value);
+                node = { kind: 'in', value: node, list: this.list(']') };
             } else {
-                value = DynamicValueEvaluator.OPERATORS[op](value, this.binary(level + 1));
+                node = { kind: 'binary', op, left: node, right: this.binary(level + 1) };
             }
         }
 
-        return value;
+        return node;
     }
 
-    /** Exponentiation - tighter than the binary operators and right-associative. */
-    private exponent(): DynamicValue {
-        const base = this.unary();
+    /** Prefix operators, binding looser than exponentiation. */
+    private unary(): Node {
+        const token = this.peek();
+        if (token !== undefined && Object.hasOwn(DynamicValueEvaluator.UNARY, token)) {
+            this.next();
+            return { kind: 'unary', op: token, operand: this.unary() };
+        }
+
+        return this.exponent();
+    }
+
+    /**
+     * Exponentiation, binding tighter than the binary and unary operators and right-associative.
+     * The base is a primary; the exponent parses unary, so a signed or chained exponent nests.
+     */
+    private exponent(): Node {
+        const base = this.primary();
         if (this.peek() !== '**') return base;
 
         this.next();
-        return DynamicValueEvaluator.number(base) ** DynamicValueEvaluator.number(this.exponent());
+        return { kind: 'binary', op: '**', left: base, right: this.unary() };
     }
 
-    private unary(): DynamicValue {
-        const op = DynamicValueEvaluator.UNARY[this.peek()];
-        if (!op) return this.primary();
-
-        this.next();
-        return op(this.unary());
-    }
-
-    private primary(): DynamicValue {
+    private primary(): Node {
         const token = this.next();
         if (token === undefined) throw new Error('Unexpected end of expression.');
 
-        if (/^\d/.test(token)) return Number(token);
-        if (token === 'true') return true;
-        if (token === 'false') return false;
-        if (token.startsWith('\'') || token.startsWith('"')) return token.slice(1, -1);
-        if (token.startsWith('@')) return this.reference(token);
+        if (/^\d/.test(token)) return { kind: 'value', value: Number(token) };
+        if (token === 'true') return { kind: 'value', value: true };
+        if (token === 'false') return { kind: 'value', value: false };
+        if (token.startsWith('\'') || token.startsWith('"')) return { kind: 'value', value: token.slice(1, -1) };
+        if (token.startsWith('@')) return { kind: 'ref', token, path: token.replace(/^@\{?|\}$/g, '') };
 
         if (token === '(') {
-            const value = this.ternary();
+            const node = this.ternary();
             this.expect(')');
-            return value;
+            return node;
         }
 
         if (token === '[') return this.lookup();
 
-        if (token in DynamicValueEvaluator.FUNCTIONS) {
+        // Object.hasOwn so inherited members ('constructor', 'toString', ...) aren't callable.
+        if (Object.hasOwn(DynamicValueEvaluator.FUNCTIONS, token)) {
             this.expect('(');
-            const args = this.list(')').map(value => DynamicValueEvaluator.number(value));
-            return DynamicValueEvaluator.FUNCTIONS[token](...args);
+            return { kind: 'call', fn: token, args: this.list(')') };
         }
 
         throw new Error(`Unknown token '${token}'.`);
     }
 
     /**
-     * Resolve an @property reference to a typed value. Only primitives are usable in an
-     * expression; a missing reference or a non-primitive throws, so evaluate falls through to
-     * returning the input verbatim and the change is dropped.
-     */
-    private reference(token: string): DynamicValue {
-        if (!this.resolve) throw new Error('No resolver for references.');
-
-        const path = token.replace(/^@\{?|\}$/g, '');
-        const value = this.resolve(path);
-
-        if (typeof value === 'number') return value;
-        if (typeof value === 'boolean') return value;
-        if (typeof value === 'string') return value.trim();
-        throw new Error(`Reference '${token}' did not resolve to a primitive.`);
-    }
-
-    /**
      * '[a, b, c][index]' - an array literal is only ever a lookup table, so it must be indexed
      * immediately and can never escape as a value of its own.
      */
-    private lookup(): DynamicValue {
+    private lookup(): Node {
         const values = this.list(']');
         this.expect('[');
-        const index = DynamicValueEvaluator.number(this.ternary());
+        const index = this.ternary();
         this.expect(']');
 
-        if (!Number.isInteger(index) || index < 0 || index >= values.length)
-            throw new Error(`Index ${index} out of range.`);
-
-        return values[index];
+        return { kind: 'lookup', values, index };
     }
 
-    /** Parse a comma separated list of values up to and including the closing token. */
-    private list(closing: string): DynamicValue[] {
-        const values: DynamicValue[] = [];
+    /** Parse a comma separated list of expressions up to and including the closing token. */
+    private list(closing: string): Node[] {
+        const nodes: Node[] = [];
 
         if (this.peek() !== closing) {
             do {
-                values.push(this.ternary());
+                nodes.push(this.ternary());
             } while (this.peek() === ',' && this.next());
         }
 
         this.expect(closing);
-        return values;
+        return nodes;
+    }
+
+    /* -------------------------------------------- */
+    /*  Evaluation - Node tree to value             */
+    /* -------------------------------------------- */
+
+    private run(node: Node): DynamicValue {
+        switch (node.kind) {
+            case 'value':
+                return node.value;
+            case 'ref':
+                return this.resolveRef(node);
+            case 'unary':
+                return DynamicValueEvaluator.UNARY[node.op](this.run(node.operand));
+            case 'ternary':
+                return DynamicValueEvaluator.truthy(this.run(node.condition))
+                    ? this.run(node.whenTrue)
+                    : this.run(node.whenFalse);
+            case 'binary':
+                return this.runBinary(node);
+            case 'in': {
+                const value = this.run(node.value);
+                return node.list.some(item => this.run(item) === value);
+            }
+            case 'lookup':
+                return this.runLookup(node);
+            case 'call':
+                return DynamicValueEvaluator.FUNCTIONS[node.fn](
+                    ...node.args.map(arg => DynamicValueEvaluator.number(this.run(arg))),
+                );
+        }
+    }
+
+    /** && and || short-circuit here; every other operator takes both operands from OPERATORS. */
+    private runBinary(node: Extract<Node, { kind: 'binary' }>): DynamicValue {
+        if (node.op === '&&')
+            return DynamicValueEvaluator.truthy(this.run(node.left)) && DynamicValueEvaluator.truthy(this.run(node.right));
+        if (node.op === '||')
+            return DynamicValueEvaluator.truthy(this.run(node.left)) || DynamicValueEvaluator.truthy(this.run(node.right));
+
+        return DynamicValueEvaluator.OPERATORS[node.op](this.run(node.left), this.run(node.right));
+    }
+
+    /** Evaluate only the indexed element, after bounds-checking the resolved index. */
+    private runLookup(node: Extract<Node, { kind: 'lookup' }>): DynamicValue {
+        const index = DynamicValueEvaluator.number(this.run(node.index));
+
+        if (!Number.isInteger(index) || index < 0 || index >= node.values.length)
+            throw new Error(`Index ${index} out of range.`);
+
+        return this.run(node.values[index]);
+    }
+
+    /**
+     * Resolve an `@property` reference to a typed value. Only primitives are usable in an
+     * expression; a missing reference or a non-primitive throws, so evaluate falls through to
+     * returning the input verbatim and the change is dropped.
+     */
+    private resolveRef(node: Extract<Node, { kind: 'ref' }>): DynamicValue {
+        if (!this.resolve) throw new Error('No resolver for references.');
+
+        const value = this.resolve(node.path);
+
+        if (typeof value === 'number') return value;
+        if (typeof value === 'boolean') return value;
+        if (typeof value === 'string') return value.trim();
+        throw new Error(`Reference '${node.token}' did not resolve to a primitive.`);
     }
 }

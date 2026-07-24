@@ -57,12 +57,14 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 ['\'a\' == \'b\'', false],
                 ['1 == 1 ? \'physical\' : \'stun\'', 'physical'],
                 ['[\'physical\',\'stun\'][1]', 'stun'],
-                // Exponentiation - tighter than * and right-associative.
+                // Exponentiation - tighter than * and right-associative, looser than unary minus.
                 ['2 ** 3', 8],
                 ['2 ** 3 ** 2', 512],
                 ['2 * 3 ** 2', 18],
                 ['4 ** 0.5', 2],
                 ['2 ** -2', 0.25],
+                ['-2 ** 2', -4],
+                ['-(2 ** 2)', -4],
                 // Membership, binding like a comparison.
                 ['2 in [1, 2, 3]', true],
                 ['5 in [1, 2, 3]', false],
@@ -105,6 +107,12 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 ['(![]+[])[+[]]', 'character extraction from a coerced boolean'],
                 ['[][[]]', 'indexing something that is not an array literal'],
                 ['alert(1)', 'a function outside the allowlist'],
+                // Inherited Object.prototype members must not be callable or usable as operators.
+                ['constructor(1)', 'the inherited constructor'],
+                ['toString(1)', 'the inherited toString'],
+                ['valueOf(1)', 'the inherited valueOf'],
+                ['hasOwnProperty(1)', 'an inherited method'],
+                ['toString 5', 'an inherited name as a prefix operator'],
                 ['true * 2', 'arithmetic on a boolean'],
                 ['\'a\' < \'b\'', 'ordering comparison on strings'],
                 ['\'a\' + 1', 'concatenation - + is numeric only'],
@@ -129,6 +137,32 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
             it('returns input beyond the length limit unchanged', () => {
                 const long = '1'.repeat(600);
                 assert.strictEqual(DynamicValueEvaluator.evaluate(long), long);
+            });
+        });
+
+        describe('short-circuits ternaries and logical operators', () => {
+            // The branch or operand not taken is never evaluated, so an error there - an
+            // out-of-range lookup, a missing reference - can't sink the whole expression.
+            const accepted: [string, DynamicValue][] = [
+                ['true ? 1 : [1][99]', 1],
+                ['false ? [1][99] : 2', 2],
+                ['1 < 2 ? 10 : [0][5]', 10],
+                ['false && [1][99]', false],
+                ['true || [1][99]', true],
+                ['0 && [1][99]', false],
+                ['1 || [1][99]', true],
+            ];
+
+            for (const [expression, expected] of accepted) {
+                it(`evaluates ${JSON.stringify(expression)} to ${expected}`, () => {
+                    assert.strictEqual(DynamicValueEvaluator.evaluate(expression), expected);
+                });
+            }
+
+            it('does not resolve a reference in the branch it skips', () => {
+                const resolve = (path: string) => (path === 'ok' ? 1 : (() => { throw new Error('resolved a skipped ref'); })());
+                assert.strictEqual(DynamicValueEvaluator.evaluate('@ok >= 1 ? @ok : @missing', resolve), 1);
+                assert.strictEqual(DynamicValueEvaluator.evaluate('@ok >= 1 || @missing', resolve), true);
             });
         });
 
