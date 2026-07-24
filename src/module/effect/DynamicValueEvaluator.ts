@@ -149,11 +149,13 @@ export class DynamicValueEvaluator {
 
     /**
      * Coerce a value used as a condition. A number is truthy when non-zero, which is how
-     * Roll.replaceFormulaData delivers boolean @refs (as 1 or 0).
+     * Roll.replaceFormulaData delivers boolean @refs (as 1 or 0). A string has no truth value
+     * here, so using one as a condition throws rather than being treated as truthy.
      */
     private static truthy(value: DynamicValue): boolean {
         if (typeof value === 'boolean') return value;
-        return DynamicValueEvaluator.number(value) !== 0;
+        if (typeof value === 'string') throw new Error(`Cannot use string '${value}' as a condition.`);
+        return value !== 0;
     }
 
     private constructor(expression: string, resolve?: (path: string) => unknown) {
