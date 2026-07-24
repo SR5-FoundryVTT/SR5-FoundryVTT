@@ -1,9 +1,14 @@
+/** The result of evaluating a dynamic change value. */
+export type DynamicValue = number | boolean | string;
+
 /**
  * Evaluate the small expression language used by dynamic Active Effect change values.
  *
- * Supports number literals, + - * / %, unary +/-, parentheses, comparisons, ternaries, array
- * literals with numeric indexing ('[100, 200, 300][2]') and a fixed set of Math functions.
- * Anything else is a syntax error.
+ * Supports number literals, true/false, + - * / %, unary +/-, parentheses, comparisons, the
+ * logical operators && and ||, ternaries, array literals with numeric indexing
+ * ('[100, 200, 300][2]') and a fixed set of Math functions. Evaluation is total: input that
+ * isn't a valid expression is returned verbatim as a string, so a plain value like 'physical'
+ * comes back unchanged.
  *
  * This exists instead of Roll.safeEval, which executes its argument as JavaScript via
  * 'new Function' and is not sandboxed: its Math proxy only rebinds bare identifiers, leaving
@@ -31,25 +36,32 @@ export class DynamicValueEvaluator {
         trunc: Math.trunc,
     };
 
-    /** Binary operators. Comparisons resolve to 1 or 0, so they can be used as operands. */
-    private static readonly OPERATORS: Record<string, (left: number, right: number) => number> = {
-        '<': (left, right) => Number(left < right),
-        '<=': (left, right) => Number(left <= right),
-        '>': (left, right) => Number(left > right),
-        '>=': (left, right) => Number(left >= right),
-        '==': (left, right) => Number(left === right),
-        '===': (left, right) => Number(left === right),
-        '!=': (left, right) => Number(left !== right),
-        '!==': (left, right) => Number(left !== right),
-        '+': (left, right) => left + right,
-        '-': (left, right) => left - right,
-        '*': (left, right) => left * right,
-        '/': (left, right) => left / right,
-        '%': (left, right) => left % right,
+    /**
+     * Binary operators. Ordering and arithmetic require numeric operands and assert as much;
+     * equality compares without coercion so 'true == true' holds. Comparisons yield booleans.
+     */
+    private static readonly OPERATORS: Record<string, (left: DynamicValue, right: DynamicValue) => DynamicValue> = {
+        '<': (left, right) => DynamicValueEvaluator.number(left) < DynamicValueEvaluator.number(right),
+        '<=': (left, right) => DynamicValueEvaluator.number(left) <= DynamicValueEvaluator.number(right),
+        '>': (left, right) => DynamicValueEvaluator.number(left) > DynamicValueEvaluator.number(right),
+        '>=': (left, right) => DynamicValueEvaluator.number(left) >= DynamicValueEvaluator.number(right),
+        '==': (left, right) => left === right,
+        '===': (left, right) => left === right,
+        '!=': (left, right) => left !== right,
+        '!==': (left, right) => left !== right,
+        '+': (left, right) => DynamicValueEvaluator.number(left) + DynamicValueEvaluator.number(right),
+        '-': (left, right) => DynamicValueEvaluator.number(left) - DynamicValueEvaluator.number(right),
+        '*': (left, right) => DynamicValueEvaluator.number(left) * DynamicValueEvaluator.number(right),
+        '/': (left, right) => DynamicValueEvaluator.number(left) / DynamicValueEvaluator.number(right),
+        '%': (left, right) => DynamicValueEvaluator.number(left) % DynamicValueEvaluator.number(right),
+        '&&': (left, right) => DynamicValueEvaluator.truthy(left) && DynamicValueEvaluator.truthy(right),
+        '||': (left, right) => DynamicValueEvaluator.truthy(left) || DynamicValueEvaluator.truthy(right),
     };
 
     /** Binary operators grouped into precedence levels, loosest binding first. */
     private static readonly PRECEDENCE = [
+        ['||'],
+        ['&&'],
         ['<', '<=', '>', '>=', '==', '===', '!=', '!=='],
         ['+', '-'],
         ['*', '/', '%'],
@@ -60,22 +72,42 @@ export class DynamicValueEvaluator {
 
     /**
      * Matches a single token, skipping leading whitespace. Anything this can't match - '@', '.',
-     * quotes, backticks, '!', braces, dice notation - aborts evaluation.
+     * quotes, backticks, '!', braces, dice notation - fails the parse, so evaluate returns the
+     * input verbatim as a string.
      */
-    private static readonly TOKEN = /\s*(\d+(?:\.\d+)?|<=|>=|===|!==|==|!=|[-+*/%()[\],?:<>]|[A-Za-z_]\w*)/y;
+    private static readonly TOKEN = /\s*(\d+(?:\.\d+)?|<=|>=|===|!==|==|!=|&&|\|\||[-+*/%()[\],?:<>]|[A-Za-z_]\w*)/y;
 
     private readonly tokens: string[];
     private pos = 0;
 
     /**
-     * Evaluate an expression down to a single number.
+     * Evaluate an expression down to a single value.
      *
      * @param expression The expression, with all @property references already substituted.
-     * @returns The numeric result.
-     * @throws If the expression is malformed, uses unsupported syntax or isn't numeric.
+     * @returns The result, or the input verbatim when it isn't a valid expression.
      */
-    static evaluate(expression: string): number {
-        return new DynamicValueEvaluator(expression).parse();
+    static evaluate(expression: string): DynamicValue {
+        try {
+            return new DynamicValueEvaluator(expression).parse();
+        } catch {
+            // Not an expression, so the text is the value itself (e.g. 'physical').
+            return expression;
+        }
+    }
+
+    /** Assert a value is numeric, for operators and positions that only accept numbers. */
+    private static number(value: DynamicValue): number {
+        if (typeof value !== 'number') throw new Error(`Expected a number, got '${value}'.`);
+        return value;
+    }
+
+    /**
+     * Coerce a value used as a condition. A number is truthy when non-zero, which is how
+     * Roll.replaceFormulaData delivers boolean @refs (as 1 or 0).
+     */
+    private static truthy(value: DynamicValue): boolean {
+        if (typeof value === 'boolean') return value;
+        return DynamicValueEvaluator.number(value) !== 0;
     }
 
     private constructor(expression: string) {
@@ -118,14 +150,14 @@ export class DynamicValueEvaluator {
         if (this.next() !== token) throw new Error(`Expected '${token}'.`);
     }
 
-    private parse(): number {
+    private parse(): DynamicValue {
         const value = this.ternary();
         if (this.pos < this.tokens.length) throw new Error(`Unexpected token '${this.peek()}'.`);
         return value;
     }
 
-    /** cond ? a : b, right associative. */
-    private ternary(): number {
+    /** cond ? a : b, right associative. Branches may be any type and needn't match. */
+    private ternary(): DynamicValue {
         const condition = this.binary();
         if (this.peek() !== '?') return condition;
 
@@ -134,11 +166,11 @@ export class DynamicValueEvaluator {
         this.expect(':');
         const whenFalse = this.ternary();
 
-        return condition !== 0 ? whenTrue : whenFalse;
+        return DynamicValueEvaluator.truthy(condition) ? whenTrue : whenFalse;
     }
 
     /** Left associative binary operators, one PRECEDENCE level per recursion. */
-    private binary(level = 0): number {
+    private binary(level = 0): DynamicValue {
         const operators = DynamicValueEvaluator.PRECEDENCE[level];
         if (!operators) return this.unary();
 
@@ -151,24 +183,26 @@ export class DynamicValueEvaluator {
         return value;
     }
 
-    private unary(): number {
+    private unary(): DynamicValue {
         if (this.peek() === '-') {
             this.next();
-            return -this.unary();
+            return -DynamicValueEvaluator.number(this.unary());
         }
         if (this.peek() === '+') {
             this.next();
-            return this.unary();
+            return DynamicValueEvaluator.number(this.unary());
         }
 
         return this.primary();
     }
 
-    private primary(): number {
+    private primary(): DynamicValue {
         const token = this.next();
         if (token === undefined) throw new Error('Unexpected end of expression.');
 
         if (/^\d/.test(token)) return Number(token);
+        if (token === 'true') return true;
+        if (token === 'false') return false;
 
         if (token === '(') {
             const value = this.ternary();
@@ -180,7 +214,8 @@ export class DynamicValueEvaluator {
 
         if (token in DynamicValueEvaluator.FUNCTIONS) {
             this.expect('(');
-            return DynamicValueEvaluator.FUNCTIONS[token](...this.numbers(')'));
+            const args = this.list(')').map(value => DynamicValueEvaluator.number(value));
+            return DynamicValueEvaluator.FUNCTIONS[token](...args);
         }
 
         throw new Error(`Unknown token '${token}'.`);
@@ -190,10 +225,10 @@ export class DynamicValueEvaluator {
      * '[a, b, c][index]' - an array literal is only ever a lookup table, so it must be indexed
      * immediately and can never escape as a value of its own.
      */
-    private lookup(): number {
-        const values = this.numbers(']');
+    private lookup(): DynamicValue {
+        const values = this.list(']');
         this.expect('[');
-        const index = this.ternary();
+        const index = DynamicValueEvaluator.number(this.ternary());
         this.expect(']');
 
         if (!Number.isInteger(index) || index < 0 || index >= values.length)
@@ -202,9 +237,9 @@ export class DynamicValueEvaluator {
         return values[index];
     }
 
-    /** Parse a comma separated list of numbers up to and including the closing token. */
-    private numbers(closing: string): number[] {
-        const values: number[] = [];
+    /** Parse a comma separated list of values up to and including the closing token. */
+    private list(closing: string): DynamicValue[] {
+        const values: DynamicValue[] = [];
 
         if (this.peek() !== closing) {
             do {

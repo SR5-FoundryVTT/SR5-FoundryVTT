@@ -7,7 +7,7 @@ import { LinksHelpers } from '@/module/utils/links';
 import { DataDefaults } from "../data/DataDefaults";
 import { ModifiableValueType } from "../types/template/Base";
 import { ModifiableValue } from "../mods/ModifiableValue";
-import { DynamicValueEvaluator } from "./DynamicValueEvaluator";
+import { DynamicValue, DynamicValueEvaluator } from "./DynamicValueEvaluator";
 import DataModel = foundry.abstract.DataModel;
 
 /**
@@ -358,7 +358,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         // Resolve dynamic value references in change.
         const source = change.effect?.parent ?? targetDoc;
         SR5ActiveEffect.alterChange(targetDoc, change);
-        SR5ActiveEffect.resolveDynamicChangeValue(source, change);
+        SR5ActiveEffect.resolveDynamicChangeValue(source, change, targetDoc);
         
         // Other cases should be directly applied to the data, without actor / schema handling.
         // This is used when applying effects to non-Actor objects, like tests. TokenDocument is
@@ -425,23 +425,56 @@ export class SR5ActiveEffect extends ActiveEffect {
      * Resolve a dynamic change value against model data before it's applied to a document.
      *
      * A dynamic value contains @property references (e.g. '@system.technology.rating * 3'),
-     * substituted from source, then evaluated by DynamicValueEvaluator. On success change.value is
-     * overwritten with the resulting number, otherwise it's left as-is so the change is skipped.
+     * substituted from source, then evaluated by DynamicValueEvaluator. change.value is
+     * overwritten with the result rendered as the target field expects it - a comparison landing
+     * on a number field becomes 1/0, a number landing on a boolean field becomes true/false - so
+     * the evaluated type and the field type don't have to match. A value the evaluator can't parse
+     * comes back unchanged, and a non-finite number is left untouched for appliers to reject.
+     *
+     * When targetDoc is omitted (there's no concrete field yet, as when baking a targeted_actor
+     * effect before it's copied), the result is simply stringified.
      *
      * @param source Any object style value, either a Foundry document or a plain object
      * @param change A singular ActiveEffect.ChangeData object
+     * @param targetDoc The document being changed, whose field type drives the rendering
      */
-    static resolveDynamicChangeValue(source: any, change: ActiveEffect.ChangeData) {
+    static resolveDynamicChangeValue(source: any, change: ActiveEffect.ChangeData, targetDoc?: any) {
         // Dynamic value present?
         if (typeof change.value !== 'string') return;
         if (change.value.length === 0) return;
 
         const expression = Roll.replaceFormulaData(change.value, source);
-        try {
-            const value = DynamicValueEvaluator.evaluate(expression);
-            if (Number.isFinite(value)) change.value = value.toString();
-        } catch {
-            // Unresolvable: leave change.value as-is so appliers reject it and skip the change.
+        const value = DynamicValueEvaluator.evaluate(expression);
+
+        const rendered = SR5ActiveEffect.renderValueForField(value, change.key, targetDoc);
+        if (rendered !== undefined) change.value = rendered;
+    }
+
+    /**
+     * Render an evaluated value as the string its target field expects. A ModifiableValue counts
+     * as a number field. Without a known target the value is just stringified.
+     *
+     * @returns The string to store, or undefined to leave change.value untouched (a non-numeric
+     *          value aimed at a number field, which appliers then drop).
+     */
+    private static renderValueForField(value: DynamicValue, key: string, targetDoc?: any): string | undefined {
+        // A non-finite number (e.g. a division by zero) is meaningless whatever the field; leave
+        // change.value untouched so appliers reject it.
+        if (typeof value === 'number' && !Number.isFinite(value)) return undefined;
+        if (!targetDoc) return String(value);
+
+        const target = foundry.utils.getProperty(targetDoc, key);
+        const type = ModifiableValue.isModifiableValue(target) ? 'number' : foundry.utils.getType(target);
+
+        switch (type) {
+            case 'number': {
+                const number = Number(value);
+                return Number.isFinite(number) ? String(number) : undefined;
+            }
+            case 'boolean':
+                return String(value === true || (typeof value === 'number' && value !== 0));
+            default:
+                return String(value);
         }
     }
 

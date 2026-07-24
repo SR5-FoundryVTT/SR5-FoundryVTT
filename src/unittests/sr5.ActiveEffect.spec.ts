@@ -1386,6 +1386,46 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.isUndefined(globalThis[marker], 'the change value must not be executed');
             assert.equal(actor.system.attributes.body.value, 0, 'the unresolvable change must be dropped');
         });
+
+        it('ACTOR apply-to: Resolve a comparison to a boolean field', async () => {
+            const actor = await createCharacterWithSkills(['Automatics']);
+            assert.strictEqual(actor.system.skills.active.automatics.canDefault, true);
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Actor Effect',
+                system: {
+                    changes: [{
+                        key: 'system.skills.active.automatics.canDefault',
+                        value: '@system.attributes.body.value >= 100',
+                        type: 'override',
+                    }],
+                },
+            }]);
+
+            assert.strictEqual(actor.system.skills.active.automatics.canDefault, false);
+        });
+
+        it('ACTOR apply-to: Resolve a comparison to a number field as 1/0', async () => {
+            const actor = await factory.createActor({ type: 'character', system: { modifiers: { global: 5 } } });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Actor Effect',
+                system: {
+                    changes: [{
+                        key: 'system.attributes.body',
+                        value: '@system.modifiers.global >= 3 ? 4 : 0',
+                        type: 'add',
+                    }, {
+                        // A bare comparison on a number field must render as 1, not NaN -> 0.
+                        key: 'system.attributes.agility',
+                        value: '@system.modifiers.global >= 3',
+                        type: 'add',
+                    }],
+                },
+            }]);
+
+            assert.equal(actor.system.attributes.body.value, 4);
+            assert.equal(actor.system.attributes.agility.value, 1);
+        });
     });
 
     /**

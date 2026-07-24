@@ -1,5 +1,5 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
-import { DynamicValueEvaluator } from '@/module/effect/DynamicValueEvaluator';
+import { DynamicValue, DynamicValueEvaluator } from '@/module/effect/DynamicValueEvaluator';
 
 export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
     const { describe, it } = context;
@@ -9,9 +9,9 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
         describe('accepts the expressions used by dynamic change values', () => {
             /**
              * Expressions reaching the evaluator have their @property references already
-             * substituted by Roll.replaceFormulaData, so they're plain numbers here.
+             * substituted by Roll.replaceFormulaData, so they're plain values here.
              */
-            const accepted: [string, number][] = [
+            const accepted: [string, DynamicValue][] = [
                 // FixedValues lookup tables, indexed by rating.
                 ['[100, 200, 300][2 - 1]', 200],
                 ['[100,200,300][0]', 100],
@@ -20,14 +20,36 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 ['500 * 3', 1500],
                 ['(3 * 3)', 9],
                 ['-0.1', -0.1],
+                // Operator precedence and left-associativity.
+                ['2 + 3 * 4', 14],
+                ['10 - 2 - 3', 5],
+                ['20 / 2 / 5', 2],
                 // Math functions.
                 ['floor(7 / 2)', 3],
                 ['max(1, 2, 3) + min(4, 5)', 7],
                 ['pow(2, 3)', 8],
+                // Booleans, from keywords and from comparisons.
+                ['true', true],
+                ['false', false],
+                ['3 >= 2', true],
+                ['3 < 2', false],
+                ['1 == 1', true],
+                ['1 != 2', true],
+                ['true == true', true],
+                // Logical operators, binding looser than comparisons.
+                ['1 && 1', true],
+                ['1 && 0', false],
+                ['0 || 1', true],
+                ['0 || 0', false],
+                ['3 >= 2 && 1 < 5', true],
+                ['3 < 2 || 4 > 1', true],
+                ['1 && 0 ? 10 : 20', 20],
                 // Comparisons and ternaries.
                 ['3 >= 2 ? 10 : 20', 10],
                 ['3 < 2 ? 10 : 20', 20],
                 ['2 >= 2 ? [1,2][0] : 9', 1],
+                ['true ? 5 : 6', 5],
+                ['0 ? 5 : 6', 6],
                 // Surrounding whitespace, including the leading newline of a multiline value.
                 ['  2 + 2  ', 4],
                 ['\n2 + 2', 4],
@@ -40,8 +62,12 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
             }
         });
 
-        describe('rejects everything else', () => {
-            const rejected: [string, string][] = [
+        describe('returns unparseable input verbatim', () => {
+            /**
+             * Evaluation is total: anything that isn't a valid expression comes back as the
+             * original string, for the appliers to cast or reject by target type.
+             */
+            const verbatim: [string, string][] = [
                 // Escapes that Roll.safeEval would have executed. The first reaches Function
                 // through Math.constructor, the rest build it from array and string coercions
                 // using only characters an arithmetic expression must allow.
@@ -52,7 +78,8 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 ['(![]+[])[+[]]', 'character extraction from a coerced boolean'],
                 ['[][[]]', 'indexing something that is not an array literal'],
                 ['alert(1)', 'a function outside the allowlist'],
-                // Values that are not expressions, which must be left for other appliers to handle.
+                ['true * 2', 'arithmetic on a boolean'],
+                // Values that are not expressions, which appliers cast by target type.
                 ['@system.technology.rating * 3', 'an unresolved property reference'],
                 ['2d6', 'dice notation'],
                 ['physical', 'a plain string value'],
@@ -62,24 +89,21 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 ['1 + ', 'a missing operand'],
             ];
 
-            for (const [expression, reason] of rejected) {
-                it(`rejects ${JSON.stringify(expression)} - ${reason}`, () => {
-                    assert.throws(() => DynamicValueEvaluator.evaluate(expression));
+            for (const [expression, reason] of verbatim) {
+                it(`returns ${JSON.stringify(expression)} unchanged - ${reason}`, () => {
+                    assert.strictEqual(DynamicValueEvaluator.evaluate(expression), expression);
                 });
             }
 
-            it('rejects expressions beyond the length limit', () => {
-                assert.throws(() => DynamicValueEvaluator.evaluate('1'.repeat(600)));
+            it('returns input beyond the length limit unchanged', () => {
+                const long = '1'.repeat(600);
+                assert.strictEqual(DynamicValueEvaluator.evaluate(long), long);
             });
         });
 
         it('never executes its input', () => {
             const marker = '__sr5DynamicValueEvaluatorMarker';
-            try {
-                DynamicValueEvaluator.evaluate(`constructor.constructor('globalThis.${marker} = true; return 1')()`);
-            } catch {
-                // Expected: the expression is rejected.
-            }
+            DynamicValueEvaluator.evaluate(`constructor.constructor('globalThis.${marker} = true; return 1')()`);
 
             assert.isUndefined(globalThis[marker]);
         });
