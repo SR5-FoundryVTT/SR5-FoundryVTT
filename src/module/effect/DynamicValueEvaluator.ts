@@ -16,30 +16,31 @@ type Node =
     | { kind: 'call'; fn: string; args: Node[] };
 
 /**
- * Evaluate the small expression language used by dynamic Active Effect change values.
+ * Evaluate the small expression language used by dynamic Active Effect change values. It supports:
  *
- * Supports number literals, true/false, quoted string literals, `@property` references,
- * `+` `-` `*` `/` `%` `**`, unary `+`/`-`, logical not (`!`), parentheses, comparisons, membership (`'x in [a, b]'`),
- * the logical operators `&&` and `||`, the fallback operator `??` (yields the right operand when the left
- * can't be evaluated, e.g. a missing reference), ternaries, array literals with numeric indexing
- * (`'[100, 200, 300][2]'`), and a fixed set of Math functions and constants (e.g. PI). Evaluation is total: input that isn't
- * a valid expression is returned verbatim as a string, so a plain value like 'physical' comes back
- * unchanged. Ternaries, `&&` `/` `||` and `??` short-circuit, so a guard like `'@r >= 1 ? [a,b][@r-1] : 0'`
- * never evaluates the branch it doesn't take.
+ * - Literals: numbers, `true`/`false`, quoted strings, and `@property` references.
+ * - Arithmetic: `+ - * / %` and `**` (right-associative), plus unary `+ - !` and parentheses.
+ * - Comparisons: `< <= > >= == != === !==`, yielding booleans.
+ * - Logic: `&&`, `||`, and the fallback `??` (yields the right operand when the left can't evaluate).
+ * - Membership: `'x in [a, b]'`.
+ * - Ternaries: `'cond ? a : b'`.
+ * - Array lookups: `'[100, 200, 300][2]'`.
+ * - A fixed set of Math functions (`floor`, `sqrt`, `max`, …) and constants (`PI`, `E`, …).
  *
- * `@property` references are resolved through an optional resolver passed to evaluate, keeping the
- * types of string and boolean references intact (Roll.replaceFormulaData, by contrast, substitutes
- * strings unquoted and coerces booleans to `1`/`0`). Without a resolver, a reference is an unknown
- * token and the input falls through verbatim.
+ * Evaluation is total: anything that isn't a valid expression comes back verbatim as a string, so
+ * a plain value like 'physical' is unchanged. Ternaries, `&&` / `||` and `??` short-circuit, so a
+ * guard like `'@r >= 1 ? [a,b][@r-1] : 0'` never evaluates the branch it doesn't take.
  *
- * This exists instead of Roll.safeEval, which executes its argument as JavaScript via
- * 'new Function' and is not sandboxed: its Math proxy only rebinds bare identifiers, leaving
- * property access, 'this' and calls intact. Change values are attacker-controlled - players
- * author effects on their own documents, the Chummer importer writes imported XML into change
- * values, and module content ships effects - so safeEval allowed arbitrary code execution in
- * the GM's client and unrecoverable tab hangs through loops. Foundry's Roll parser is no
- * alternative either: its grammar reserves square brackets for flavor text and has no array
- * indexing, which is exactly what the lookup tables need.
+ * `@property` references resolve through an optional resolver passed to evaluate, keeping string
+ * and boolean types intact (Roll.replaceFormulaData substitutes strings unquoted and coerces
+ * booleans to `1`/`0`). Without a resolver a reference is an unknown token, so the input falls
+ * through verbatim.
+ *
+ * This exists because change values are attacker-controlled (players author effects, the Chummer
+ * importer writes imported XML into them, modules ship effects), so Roll.safeEval - which runs its
+ * argument as un-sandboxed JavaScript - allowed arbitrary code execution. Foundry's Roll parser is no
+ * alternative either: it reserves square brackets for flavor text and has no array indexing, which
+ * the lookup tables need.
  */
 export class DynamicValueEvaluator {
     /**
