@@ -651,6 +651,34 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.strictEqual(target.system.attributes.body.value, test.pool.value);
         });
 
+        it('TARGETED_ACTOR apply-to: render a baked comparison as the destination field expects', async () => {
+            const attacker = await factory.createActor({ type: 'character', system: { attributes: { body: { base: 2 } } } });
+            const target = await factory.createActor({ type: 'character' });
+
+            const items = await attacker.createEmbeddedDocuments('Item', [{ type: 'action', name: 'Test Action' }]);
+            const item = items[0];
+
+            await item.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Targeted Effect',
+                system: {
+                    targets: [{ id: 't', applyTo: 'targeted_actor' }],
+                    // A comparison baked for the destination number field must render as 1, not 'true'.
+                    changes: [{ key: 'system.attributes.body', value: '@data.pool.value >= 0', type: 'add', target: 't' }],
+                }
+            }]);
+
+            const test = (await TestCreator.fromItem(item, attacker, { showDialog: false, showMessage: false }))!;
+
+            await test.evaluate();
+            await test.effects.createTargetActorEffects(target);
+
+            const appliedEffect = target.effects.find((effect) => effect.name === 'Targeted Effect') as SR5ActiveEffect | undefined;
+            if (!appliedEffect) throw new Error('Expected copied targeted actor effect to exist on target actor.');
+
+            assert.strictEqual(appliedEffect.system.changes[0].value, 1);
+            assert.strictEqual(target.system.attributes.body.value, 1);
+        });
+
         it('TEST_ALL apply-to: Actor effect applies to test', async () => {
             const limitValue = 3;
             const poolValue = 3;
@@ -1351,6 +1379,98 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             assert.lengthOf(actor.effects.contents, 1);
             assert.equal(actor.system.attributes.body.value, 6);
+        });
+
+        it('ACTOR apply-to: Resolve a rating indexed lookup table', async () => {
+            const actor = await factory.createActor({ type: 'character', system: { modifiers: { global: 2 } } });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Actor Effect',
+                system: {
+                    changes: [{
+                        key: 'system.attributes.body',
+                        value: '[10, 20, 30][@system.modifiers.global - 1]',
+                        type: 'add',
+                    }],
+                },
+            }]);
+
+            assert.equal(actor.system.attributes.body.value, 20);
+        });
+
+        it('ACTOR apply-to: A change value is never executed as code', async () => {
+            const marker = '__sr5ChangeValueExecutionMarker';
+            const actor = await factory.createActor({ type: 'character' });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Actor Effect',
+                system: {
+                    changes: [{
+                        key: 'system.attributes.body',
+                        value: `constructor.constructor('globalThis.${marker} = true; return 1')()`,
+                        type: 'add',
+                    }],
+                },
+            }]);
+
+            assert.isUndefined(globalThis[marker], 'the change value must not be executed');
+            assert.equal(actor.system.attributes.body.value, 0, 'the unresolvable change must be dropped');
+        });
+
+        it('ACTOR apply-to: Resolve a comparison to a boolean field', async () => {
+            const actor = await createCharacterWithSkills(['Automatics']);
+            assert.strictEqual(actor.system.skills.active.automatics.canDefault, true);
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Actor Effect',
+                system: {
+                    changes: [{
+                        key: 'system.skills.active.automatics.canDefault',
+                        value: '@system.attributes.body.value >= 100',
+                        type: 'override',
+                    }],
+                },
+            }]);
+
+            assert.strictEqual(actor.system.skills.active.automatics.canDefault, false);
+        });
+
+        it('ACTOR apply-to: Resolve a comparison to a number field as 1/0', async () => {
+            const actor = await factory.createActor({ type: 'character', system: { modifiers: { global: 5 } } });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Actor Effect',
+                system: {
+                    changes: [{
+                        key: 'system.attributes.body',
+                        value: '@system.modifiers.global >= 3 ? 4 : 0',
+                        type: 'add',
+                    }, {
+                        // A bare comparison on a number field must render as 1, not NaN -> 0.
+                        key: 'system.attributes.agility',
+                        value: '@system.modifiers.global >= 3',
+                        type: 'add',
+                    }],
+                },
+            }]);
+
+            assert.equal(actor.system.attributes.body.value, 4);
+            assert.equal(actor.system.attributes.agility.value, 1);
+        });
+
+        it('ACTOR apply-to: Resolve a string reference comparison to a string field', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            assert.strictEqual(actor.system.metatype, 'human');
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Actor Effect',
+                system: {
+                    changes: [{
+                        key: 'system.metatype',
+                        value: '@system.metatype == \'human\' ? \'elf\' : \'dwarf\'',
+                        type: 'override',
+                    }],
+                },
+            }]);
+
+            assert.strictEqual(actor.system.metatype, 'elf');
         });
     });
 
