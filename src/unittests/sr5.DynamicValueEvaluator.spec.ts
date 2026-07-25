@@ -115,6 +115,8 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 ['false ?? 3', false],
                 ['\'a\' ?? \'b\'', 'a'],
                 ['[1, 2][9] ?? 7', 7],
+                ['1 / 0 ?? 7', 7],
+                ['sqrt(-1) ?? 7', 7],
                 // Comparisons and ternaries.
                 ['3 >= 2 ? 10 : 20', 10],
                 ['3 < 2 ? 10 : 20', 20],
@@ -179,6 +181,8 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
                 ['$x = 5;', 'a binding with no body'],
                 ['1 + ', 'a missing operand'],
                 ['[1][9] ?? [1][9]', 'a ?? where both sides fail'],
+                ['1 / 0', 'a non-finite arithmetic result'],
+                ['sqrt(-1)', 'a non-finite Math result'],
             ];
 
             for (const [expression, reason] of verbatim) {
@@ -235,16 +239,15 @@ export const shadowrunDynamicValueEvaluator = (context: QuenchBatchContext) => {
 
             const accepted: [string, DynamicValue][] = [
                 ['@system.rating * 3', 9],
-                ['@system.rating-1', 2],
+                ['@system.rating - 1', 2],
                 ['@system.rating ** 2', 9],
-                ['@system.rating >= 1 ? [10, 20, 30][@system.rating-1] : 0', 30],
+                ['@system.rating >= 1 ? [10, 20, 30][@system.rating - 1] : 0', 30],
                 ['$x = @system.rating * 2; $x >= 4 ? $x : 0', 6],
                 ['@system.wireless', true],
                 ['@system.offline', false],
                 ['!@system.wireless', false],
                 ['@system.wireless && @system.rating >= 3', true],
-                ['@{system.rating}', 3],
-                ['@{system.hyphen-key}', 4],
+                ['@system.hyphen-key', 4],
                 ['{\'blade\': 10, \'blunt\': 5}[@system.category]', 10],
                 ['@system.category in [\'blade\', \'blunt\']', true],
                 ['@system.category in [\'exotic\']', false],

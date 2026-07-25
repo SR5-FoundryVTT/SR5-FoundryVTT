@@ -21,7 +21,8 @@ type Node =
 /**
  * Evaluate the small expression language used by dynamic Active Effect change values. It supports:
  *
- * - Literals: numbers, `true`/`false`, quoted strings, and `@property` references.
+ * - Literals: numbers, `true`/`false`, quoted strings, and `@property` references. Hyphens are
+ *   part of an unbraced reference, so write subtraction after one with whitespace (`@rating - 1`).
  * - Arithmetic: `+ - * / %` and `**` (right-associative), plus unary `+ - !` and parentheses.
  * - Comparisons: `< <= > >= == != === !==`, yielding booleans.
  * - Logic: `&&`, `||`, and the fallback `??` (yields the right operand when the left can't evaluate).
@@ -34,7 +35,7 @@ type Node =
  *
  * Evaluation is total: anything that isn't a valid expression comes back verbatim as a string, so
  * a plain value like 'physical' is unchanged. Ternaries, `&&` / `||` and `??` short-circuit, so a
- * guard like `'@r >= 1 ? [a,b][@r-1] : 0'` never evaluates the branch it doesn't take.
+ * guard like `'@r >= 1 ? [a,b][@r - 1] : 0'` never evaluates the branch it doesn't take.
  *
  * `@property` references resolve through an optional resolver passed to evaluate, keeping string
  * and boolean types intact (Roll.replaceFormulaData substitutes strings unquoted and coerces
@@ -149,13 +150,12 @@ export class DynamicValueEvaluator {
     /**
      * Matches a single token, skipping leading whitespace. Order matters: string literals first,
      * references before numbers, and multi-character operators before the single-character class
-     * so '!=' and '!==' win over '!'. Unbraced references exclude '-' so subtraction doesn't
-     * require whitespace; hyphenated paths use the braced form. Anything this can't match -
-     * backticks, dice notation, a bare '.' - fails the parse, so evaluate returns the input
-     * verbatim as a string.
+     * so '!=' and '!==' win over '!'. A hyphen belongs to a reference path, so subtraction after
+     * a reference must be separated by whitespace. Anything this can't match - backticks, dice
+     * notation, a bare '.' - fails the parse, so evaluate returns the input verbatim as a string.
      */
     private static readonly TOKEN =
-        /\s*('[^']*'|"[^"]*"|@\{[-.\w]+\}|@[.\w]+|\$[A-Za-z_]\w*|\d+(?:\.\d+)?|<=|>=|===|!==|==|!=|&&|\|\||\?\?|\*\*|[-+*/%(){}[\],?:<>!=;]|[A-Za-z_]\w*)/y;
+        /\s*('[^']*'|"[^"]*"|@[-.\w]+|\$[A-Za-z_]\w*|\d+(?:\.\d+)?|<=|>=|===|!==|==|!=|&&|\|\||\?\?|\*\*|[-+*/%(){}[\],?:<>!=;]|[A-Za-z_]\w*)/y;
 
     private readonly tokens: string[];
     private readonly resolve?: (path: string) => unknown;
@@ -187,14 +187,21 @@ export class DynamicValueEvaluator {
 
     /** Assert a value is numeric, for operators and positions that only accept numbers. */
     private static number(value: DynamicValue): number {
-        if (typeof value !== 'number') throw new Error(`Expected a number, got '${value}'.`);
+        if (typeof value !== 'number' || !Number.isFinite(value))
+            throw new Error(`Expected a finite number, got '${value}'.`);
         return value;
     }
 
     /** Wrap a binary operation that requires two numeric operands. */
     private static numeric(op: (a: number, b: number) => DynamicValue) {
         return (left: DynamicValue, right: DynamicValue): DynamicValue =>
-            op(DynamicValueEvaluator.number(left), DynamicValueEvaluator.number(right));
+            DynamicValueEvaluator.finite(op(DynamicValueEvaluator.number(left), DynamicValueEvaluator.number(right)));
+    }
+
+    /** Reject a non-finite numeric result from arithmetic or a Math function. */
+    private static finite(value: DynamicValue): DynamicValue {
+        if (typeof value === 'number') return DynamicValueEvaluator.number(value);
+        return value;
     }
 
     /**
@@ -349,11 +356,11 @@ export class DynamicValueEvaluator {
         const token = this.next();
         if (token === undefined) throw new Error('Unexpected end of expression.');
 
-        if (/^\d/.test(token)) return { kind: 'value', value: Number(token) };
+        if (/^\d/.test(token)) return { kind: 'value', value: DynamicValueEvaluator.number(Number(token)) };
         if (token === 'true') return { kind: 'value', value: true };
         if (token === 'false') return { kind: 'value', value: false };
         if (token.startsWith('\'') || token.startsWith('"')) return { kind: 'value', value: token.slice(1, -1) };
-        if (token.startsWith('@')) return { kind: 'ref', token, path: token.replace(/^@\{?|\}$/g, '') };
+        if (token.startsWith('@')) return { kind: 'ref', token, path: token.slice(1) };
 
         // A '$name' is a binding reference; unknown here unless an enclosing binding put it in scope.
         if (token.startsWith('$')) {
@@ -487,8 +494,10 @@ export class DynamicValueEvaluator {
             case 'objectLookup':
                 return this.runObjectLookup(node);
             case 'call':
-                return DynamicValueEvaluator.FUNCTIONS[node.fn](
-                    ...node.args.map(arg => DynamicValueEvaluator.number(this.run(arg))),
+                return DynamicValueEvaluator.number(
+                    DynamicValueEvaluator.FUNCTIONS[node.fn](
+                        ...node.args.map(arg => DynamicValueEvaluator.number(this.run(arg))),
+                    )
                 );
         }
     }
@@ -573,7 +582,7 @@ export class DynamicValueEvaluator {
 
         const value = this.resolve(node.path);
 
-        if (typeof value === 'number') return value;
+        if (typeof value === 'number') return DynamicValueEvaluator.number(value);
         if (typeof value === 'boolean') return value;
         if (typeof value === 'string') return value.trim();
         throw new Error(`Reference '${node.token}' did not resolve to a primitive.`);
