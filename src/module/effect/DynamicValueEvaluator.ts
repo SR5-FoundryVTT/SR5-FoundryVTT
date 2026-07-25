@@ -1,10 +1,7 @@
 /** The result of evaluating a dynamic change value. */
 export type DynamicValue = number | boolean | string;
 
-/**
- * A node in the parsed expression tree. Parsing builds this tree, then run() walks it, so
- * evaluation is separate from parsing - which lets ternaries and && / || short-circuit.
- */
+/** A node in the parsed expression tree. */
 type Node =
     | { kind: 'value'; value: DynamicValue }
     | { kind: 'ref'; token: string; path: string }
@@ -18,41 +15,26 @@ type Node =
     | { kind: 'objectLookup'; entries: { key: string; value: Node }[]; key: Node }
     | { kind: 'call'; fn: string; args: Node[] };
 
+type Environment = ReadonlyMap<string, () => DynamicValue>;
+
 /**
- * Evaluate the small expression language used by dynamic Active Effect change values. It supports:
+ * Safely evaluates dynamic Active Effect values without executing JavaScript.
  *
- * - Literals: numbers, `true`/`false`, quoted strings, and `@property` references. Hyphens are
- *   part of an unbraced reference, so write subtraction after one with whitespace (`@rating - 1`).
- * - Arithmetic: `+ - * / %` and `**` (right-associative), plus unary `+ - !` and parentheses.
- * - Comparisons: `< <= > >= == != === !==`, yielding booleans.
- * - Logic: `&&`, `||`, and the fallback `??` (yields the right operand when the left can't evaluate).
- * - Membership: `'x in [a, b]'`.
- * - Ternaries: `'cond ? a : b'`.
- * - Array lookups: `'[100, 200, 300][2]'`.
- * - Map lookups: string-keyed tables like `{physical: 10, 'exotic-melee': 5}[type]` (bare or quoted keys).
- * - Bindings: `'$x = …; …'` names a value for reuse; a binding is evaluated at most once, only if reached.
- * - A fixed set of Math functions (`floor`, `sqrt`, `max`, …) and constants (`PI`, `E`, …).
+ * Supports:
+ * - Numbers, booleans, quoted strings, and `@property` references
+ * - Arithmetic, comparisons, logic, and ternaries
+ * - Membership with `in`
+ * - Array and map lookup tables
+ * - Lazy `$name` bindings
+ * - Allowlisted Math functions and constants
  *
- * Evaluation is total: anything that isn't a valid expression comes back verbatim as a string, so
- * a plain value like 'physical' is unchanged. Ternaries, `&&` / `||` and `??` short-circuit, so a
- * guard like `'@r >= 1 ? [a,b][@r - 1] : 0'` never evaluates the branch it doesn't take.
+ * Invalid expressions are returned unchanged. Conditional operators short-circuit.
  *
- * `@property` references resolve through an optional resolver passed to evaluate, keeping string
- * and boolean types intact (Roll.replaceFormulaData substitutes strings unquoted and coerces
- * booleans to `1`/`0`). Without a resolver a reference is an unknown token, so the input falls
- * through verbatim.
- *
- * This exists because change values are attacker-controlled (players author effects, the Chummer
- * importer writes imported XML into them, modules ship effects), so Roll.safeEval - which runs its
- * argument as un-sandboxed JavaScript - allowed arbitrary code execution. Foundry's Roll parser is no
- * alternative either: it reserves square brackets for flavor text and has no array indexing, which
- * the lookup tables need.
+ * Hyphens belong to reference paths, so subtraction after a reference needs whitespace:
+ * `@rating - 1`.
  */
 export class DynamicValueEvaluator {
-    /**
-     * Functions callable from an expression. Any other identifier is an unknown token. Membership
-     * is tested with Object.hasOwn so inherited names like 'constructor' or 'toString' don't match.
-     */
+    /** Math functions allowed in expressions. */
     private static readonly FUNCTIONS: Record<string, (...args: number[]) => number> = {
         abs: Math.abs,
         acos: Math.acos,
@@ -85,11 +67,7 @@ export class DynamicValueEvaluator {
         trunc: Math.trunc,
     };
 
-    /**
-     * Named numeric constants usable as bare identifiers. Held apart from FUNCTIONS because these
-     * are values, not callables: an expression uses 'PI', not 'PI()'. Membership is tested with
-     * Object.hasOwn so inherited names don't match.
-     */
+    /** Math constants allowed as bare identifiers, such as `PI`. */
     private static readonly CONSTANTS: Record<string, number> = {
         E: Math.E,
         LN10: Math.LN10,
@@ -101,11 +79,7 @@ export class DynamicValueEvaluator {
         SQRT2: Math.SQRT2,
     };
 
-    /**
-     * Binary operators. Ordering and arithmetic go through numeric() to assert their operands;
-     * equality compares without coercion so 'true == true' holds. Comparisons yield booleans.
-     * ??, && and || are not here - they short-circuit in run() rather than taking both operands.
-     */
+    /** Non-short-circuiting binary operators. Arithmetic requires finite numbers. */
     private static readonly OPERATORS: Record<string, (left: DynamicValue, right: DynamicValue) => DynamicValue> = {
         '<': DynamicValueEvaluator.numeric((a, b) => a < b),
         '<=': DynamicValueEvaluator.numeric((a, b) => a <= b),
@@ -123,18 +97,14 @@ export class DynamicValueEvaluator {
         '**': DynamicValueEvaluator.numeric((a, b) => a ** b),
     };
 
-    /** Prefix operators. '-'/'+' require a number, '!' takes any condition. */
+    /** Prefix operators. */
     private static readonly UNARY: Record<string, (value: DynamicValue) => DynamicValue> = {
         '-': value => -DynamicValueEvaluator.number(value),
         '+': value => DynamicValueEvaluator.number(value),
         '!': value => !DynamicValueEvaluator.truthy(value),
     };
 
-    /**
-     * Binary operators grouped into precedence levels, loosest binding first. 'in' (membership,
-     * right operand is a bracketed list) binds like a comparison. Exponentiation binds tighter and
-     * is right-associative, so exponent() parses it rather than this table.
-     */
+    /** Binary precedence from lowest to highest. Exponentiation is parsed separately. */
     private static readonly PRECEDENCE = [
         ['??'],
         ['||'],
@@ -144,16 +114,10 @@ export class DynamicValueEvaluator {
         ['*', '/', '%'],
     ];
 
-    /** Bounds parse cost, as evaluation runs per change, per effect, on every data preparation. */
+    /** Maximum accepted expression length. */
     private static readonly MAX_LENGTH = 1024;
 
-    /**
-     * Matches a single token, skipping leading whitespace. Order matters: string literals first,
-     * references before numbers, and multi-character operators before the single-character class
-     * so '!=' and '!==' win over '!'. A hyphen belongs to a reference path, so subtraction after
-     * a reference must be separated by whitespace. Anything this can't match - backticks, dice
-     * notation, a bare '.' - fails the parse, so evaluate returns the input verbatim as a string.
-     */
+    /** Matches one token and leading whitespace. Token order gives longer forms priority. */
     private static readonly TOKEN =
         /\s*('[^']*'|"[^"]*"|@[-.\w]+|\$[A-Za-z_]\w*|\d+(?:\.\d+)?|<=|>=|===|!==|==|!=|&&|\|\||\?\?|\*\*|[-+*/%(){}[\],?:<>!=;]|[A-Za-z_]\w*)/y;
 
@@ -162,53 +126,42 @@ export class DynamicValueEvaluator {
     private readonly ast: Node;
     private pos = 0;
 
-    /** `$name`s bound by an enclosing binding, so primary() tells a bound name from an unknown one. */
+    /** Names visible at the current parse position. */
     private readonly scope = new Set<string>();
 
-    /** Bound `$name`s to their memoizing thunks during evaluation, mirroring the lexical scope. */
-    private env = new Map<string, () => DynamicValue>();
-
     /**
-     * Evaluate an expression down to a single value.
-     *
-     * @param expression The expression to evaluate.
-     * @param resolve Optional resolver mapping an `@property` path (without the leading @) to its
-     *                value. Omit it and references become unknown tokens.
-     * @returns The result, or the input verbatim when it isn't a valid expression.
+     * Evaluate an expression, optionally resolving `@property` paths.
+     * Returns the original text if parsing or evaluation fails.
      */
     static evaluate(expression: string, resolve?: (path: string) => unknown): DynamicValue {
         try {
             return new DynamicValueEvaluator(expression, resolve).run();
         } catch {
-            // Not an expression, so the text is the value itself (e.g. 'physical').
+            // Plain or invalid values remain unchanged.
             return expression;
         }
     }
 
-    /** Assert a value is numeric, for operators and positions that only accept numbers. */
+    /** Require a finite number. */
     private static number(value: DynamicValue): number {
         if (typeof value !== 'number' || !Number.isFinite(value))
             throw new Error(`Expected a finite number, got '${value}'.`);
         return value;
     }
 
-    /** Wrap a binary operation that requires two numeric operands. */
+    /** Wrap an operation that requires numeric operands. */
     private static numeric(op: (a: number, b: number) => DynamicValue) {
         return (left: DynamicValue, right: DynamicValue): DynamicValue =>
             DynamicValueEvaluator.finite(op(DynamicValueEvaluator.number(left), DynamicValueEvaluator.number(right)));
     }
 
-    /** Reject a non-finite numeric result from arithmetic or a Math function. */
+    /** Reject non-finite numeric results. */
     private static finite(value: DynamicValue): DynamicValue {
         if (typeof value === 'number') return DynamicValueEvaluator.number(value);
         return value;
     }
 
-    /**
-     * Coerce a value used as a condition. A number is truthy when non-zero, which is how
-     * Roll.replaceFormulaData delivers boolean @refs (as 1 or 0). A string has no truth value
-     * here, so using one as a condition throws rather than being treated as truthy.
-     */
+    /** Convert booleans and numbers to conditions; strings are not conditions. */
     private static truthy(value: DynamicValue): boolean {
         if (typeof value === 'boolean') return value;
         if (typeof value === 'string') throw new Error(`Cannot use string '${value}' as a condition.`);
@@ -245,9 +198,7 @@ export class DynamicValueEvaluator {
         return tokens;
     }
 
-    /* -------------------------------------------- */
-    /*  Parsing - token stream to Node tree         */
-    /* -------------------------------------------- */
+    /* Parsing */
 
     private peek() {
         return this.tokens[this.pos];
@@ -264,24 +215,19 @@ export class DynamicValueEvaluator {
     private parse(): Node {
         this.pos = 0;
         const node = this.expression();
-        // A single trailing ';' is tolerated, so a habitual terminator doesn't sink the expression.
+        // Allow one optional trailing semicolon.
         if (this.peek() === ';') this.next();
         if (this.pos < this.tokens.length) throw new Error(`Unexpected token '${this.peek()}'.`);
         return node;
     }
 
-    /** A `$name = value; …` binding, or - without the '$name =' prefix - a plain expression. */
+    /** Parse a binding or a regular expression. */
     private expression(): Node {
         const token = this.peek();
         return token?.startsWith('$') && this.tokens[this.pos + 1] === '=' ? this.binding() : this.ternary();
     }
 
-    /**
-     * '$name = value; body' - names a value for reuse within body. The value is parsed in the outer
-     * scope (so '$x = $x' is unknown, no self-reference); the body sees the name, and being an
-     * expression itself can chain further bindings. The '$' sigil gives names their own space, so a
-     * name can never reach a function or constant - '$floor' and 'floor' are simply different names.
-     */
+    /** Parse `$name = value; body`. The initializer uses the outer lexical scope. */
     private binding(): Node {
         const name = this.next();
         this.expect('=');
@@ -296,7 +242,7 @@ export class DynamicValueEvaluator {
         }
     }
 
-    /** cond ? a : b, right associative. Branches may be any type and needn't match. */
+    /** Parse a right-associative ternary. */
     private ternary(): Node {
         const condition = this.binary();
         if (this.peek() !== '?') return condition;
@@ -309,7 +255,7 @@ export class DynamicValueEvaluator {
         return { kind: 'ternary', condition, whenTrue, whenFalse };
     }
 
-    /** Left associative binary operators, one PRECEDENCE level per recursion. */
+    /** Parse left-associative binary operators by precedence. */
     private binary(level = 0): Node {
         const operators = DynamicValueEvaluator.PRECEDENCE[level];
         if (!operators) return this.unary();
@@ -317,7 +263,7 @@ export class DynamicValueEvaluator {
         let node = this.binary(level + 1);
         while (operators.includes(this.peek())) {
             const op = this.next();
-            // 'in' takes a bracketed list on the right instead of another operand.
+            // `in` requires a list on the right.
             if (op === 'in') {
                 this.expect('[');
                 node = { kind: 'in', value: node, list: this.list(']') };
@@ -329,7 +275,7 @@ export class DynamicValueEvaluator {
         return node;
     }
 
-    /** Prefix operators, binding looser than exponentiation. */
+    /** Parse prefix operators. */
     private unary(): Node {
         const token = this.peek();
         if (token !== undefined && Object.hasOwn(DynamicValueEvaluator.UNARY, token)) {
@@ -340,10 +286,7 @@ export class DynamicValueEvaluator {
         return this.exponent();
     }
 
-    /**
-     * Exponentiation, binding tighter than the binary and unary operators and right-associative.
-     * The base is a primary; the exponent parses unary, so a signed or chained exponent nests.
-     */
+    /** Parse right-associative exponentiation. */
     private exponent(): Node {
         const base = this.primary();
         if (this.peek() !== '**') return base;
@@ -362,7 +305,7 @@ export class DynamicValueEvaluator {
         if (token.startsWith('\'') || token.startsWith('"')) return { kind: 'value', value: token.slice(1, -1) };
         if (token.startsWith('@')) return { kind: 'ref', token, path: token.slice(1) };
 
-        // A '$name' is a binding reference; unknown here unless an enclosing binding put it in scope.
+        // Binding references must already be in scope.
         if (token.startsWith('$')) {
             if (this.scope.has(token)) return { kind: 'var', name: token };
             throw new Error(`Unbound name '${token}'.`);
@@ -378,7 +321,7 @@ export class DynamicValueEvaluator {
 
         if (token === '{') return this.objectLookup();
 
-        // Object.hasOwn so inherited members ('constructor', 'toString', ...) aren't callable.
+        // Exclude inherited names such as `constructor`.
         if (Object.hasOwn(DynamicValueEvaluator.FUNCTIONS, token)) {
             this.expect('(');
             return { kind: 'call', fn: token, args: this.list(')') };
@@ -390,10 +333,7 @@ export class DynamicValueEvaluator {
         throw new Error(`Unknown token '${token}'.`);
     }
 
-    /**
-     * '[a, b, c][index]' - an array literal is only ever a lookup table, so it must be indexed
-     * immediately and can never escape as a value of its own.
-     */
+    /** Parse `[values][index]`. Arrays exist only as lookup tables. */
     private lookup(): Node {
         const values = this.list(']');
         this.expect('[');
@@ -403,11 +343,7 @@ export class DynamicValueEvaluator {
         return { kind: 'lookup', values, index };
     }
 
-    /**
-     * "{a: x, 'b-c': y}[key]" - like a lookup but keyed by a string. As with an array literal, the
-     * object is only ever a lookup table, so it must be indexed immediately and can never escape as
-     * a value of its own.
-     */
+    /** Parse `{key: value}[key]`. Objects exist only as lookup tables. */
     private objectLookup(): Node {
         const entries = this.entries();
         this.expect('[');
@@ -417,7 +353,7 @@ export class DynamicValueEvaluator {
         return { kind: 'objectLookup', entries, key };
     }
 
-    /** Parse a comma separated list of 'key: expression' entries up to and including the '}'. */
+    /** Parse comma-separated map entries. */
     private entries(): { key: string; value: Node }[] {
         const entries: { key: string; value: Node }[] = [];
 
@@ -433,11 +369,7 @@ export class DynamicValueEvaluator {
         return entries;
     }
 
-    /**
-     * A map key: a quoted string (any characters) or a bare identifier for the common case. Key
-     * position is its own context, so a bare word here is a key, never a function/constant. Numbers
-     * aren't keys - array lookup covers numeric indexing.
-     */
+    /** Parse a quoted string or bare identifier as a map key. */
     private key(): string {
         const token = this.next();
         if (token !== undefined && (token.startsWith('\'') || token.startsWith('"'))) return token.slice(1, -1);
@@ -445,7 +377,7 @@ export class DynamicValueEvaluator {
         throw new Error(`Expected a string or identifier key, got '${token}'.`);
     }
 
-    /** Parse a comma separated list of expressions up to and including the closing token. */
+    /** Parse a comma-separated expression list. */
     private list(closing: string): Node[] {
         const nodes: Node[] = [];
 
@@ -459,124 +391,97 @@ export class DynamicValueEvaluator {
         return nodes;
     }
 
-    /* -------------------------------------------- */
-    /*  Evaluation - Node tree to value             */
-    /* -------------------------------------------- */
+    /* Evaluation */
 
-    /** Walk a node to its value, defaulting to the whole parsed expression. */
-    private run(node: Node = this.ast): DynamicValue {
+    /** Evaluate a node in its lexical environment. */
+    private run(node: Node = this.ast, env: Environment = new Map()): DynamicValue {
         switch (node.kind) {
             case 'value':
                 return node.value;
             case 'ref':
                 return this.resolveRef(node);
             case 'bind':
-                return this.runBind(node);
+                return this.runBind(node, env);
             case 'var': {
-                const thunk = this.env.get(node.name);
+                const thunk = env.get(node.name);
                 if (!thunk) throw new Error(`Unbound name '${node.name}'.`);
                 return thunk();
             }
             case 'unary':
-                return DynamicValueEvaluator.UNARY[node.op](this.run(node.operand));
+                return DynamicValueEvaluator.UNARY[node.op](this.run(node.operand, env));
             case 'ternary':
-                return DynamicValueEvaluator.truthy(this.run(node.condition))
-                    ? this.run(node.whenTrue)
-                    : this.run(node.whenFalse);
+                return DynamicValueEvaluator.truthy(this.run(node.condition, env))
+                    ? this.run(node.whenTrue, env)
+                    : this.run(node.whenFalse, env);
             case 'binary':
-                return this.runBinary(node);
+                return this.runBinary(node, env);
             case 'in': {
-                const value = this.run(node.value);
-                return node.list.some(item => this.run(item) === value);
+                const value = this.run(node.value, env);
+                return node.list.some(item => this.run(item, env) === value);
             }
             case 'lookup':
-                return this.runLookup(node);
+                return this.runLookup(node, env);
             case 'objectLookup':
-                return this.runObjectLookup(node);
+                return this.runObjectLookup(node, env);
             case 'call':
                 return DynamicValueEvaluator.number(
                     DynamicValueEvaluator.FUNCTIONS[node.fn](
-                        ...node.args.map(arg => DynamicValueEvaluator.number(this.run(arg))),
+                        ...node.args.map(arg => DynamicValueEvaluator.number(this.run(arg, env))),
                     )
                 );
         }
     }
 
-    /**
-     * Bind the name to a thunk over its value, run the body, then restore the outer binding (if any)
-     * so a rebinding of the same name in a nested scope is undone on the way out. The thunk memoizes,
-     * so a value reused across the body is computed once; a value the body never reaches is never
-     * computed, which keeps the short-circuit guarantee - an unreached binding can't sink the expression.
-     */
-    private runBind(node: Extract<Node, { kind: 'bind' }>): DynamicValue {
+    /** Evaluate a lazy, memoized lexical binding. */
+    private runBind(node: Extract<Node, { kind: 'bind' }>, env: Environment): DynamicValue {
         let cached: { value: DynamicValue } | undefined;
-        const lexicalEnv = new Map(this.env);
-        const previous = this.env.get(node.name);
-        this.env.set(node.name, () => (cached ??= { value: this.runWithEnv(node.value, lexicalEnv) }).value);
-
-        try {
-            return this.run(node.body);
-        } finally {
-            if (previous) this.env.set(node.name, previous);
-            else this.env.delete(node.name);
-        }
+        const bodyEnv = new Map(env);
+        bodyEnv.set(node.name, () => (cached ??= { value: this.run(node.value, env) }).value);
+        return this.run(node.body, bodyEnv);
     }
 
-    /** Run a node against a captured lexical environment, restoring the current one afterwards. */
-    private runWithEnv(node: Node, env: Map<string, () => DynamicValue>): DynamicValue {
-        const current = this.env;
-        this.env = env;
-        try {
-            return this.run(node);
-        } finally {
-            this.env = current;
-        }
-    }
-
-    /** ??, && and || short-circuit here; every other operator takes both operands from OPERATORS. */
-    private runBinary(node: Extract<Node, { kind: 'binary' }>): DynamicValue {
-        // ?? falls back to the right operand when the left can't be evaluated (e.g. a missing ref).
+    /** Evaluate binary operators, including short-circuiting operators. */
+    private runBinary(node: Extract<Node, { kind: 'binary' }>, env: Environment): DynamicValue {
+        // Fall back when the left side cannot be evaluated.
         if (node.op === '??') {
             try {
-                return this.run(node.left);
+                return this.run(node.left, env);
             } catch {
-                return this.run(node.right);
+                return this.run(node.right, env);
             }
         }
         if (node.op === '&&')
-            return DynamicValueEvaluator.truthy(this.run(node.left)) && DynamicValueEvaluator.truthy(this.run(node.right));
+            return DynamicValueEvaluator.truthy(this.run(node.left, env)) &&
+                DynamicValueEvaluator.truthy(this.run(node.right, env));
         if (node.op === '||')
-            return DynamicValueEvaluator.truthy(this.run(node.left)) || DynamicValueEvaluator.truthy(this.run(node.right));
+            return DynamicValueEvaluator.truthy(this.run(node.left, env)) ||
+                DynamicValueEvaluator.truthy(this.run(node.right, env));
 
-        return DynamicValueEvaluator.OPERATORS[node.op](this.run(node.left), this.run(node.right));
+        return DynamicValueEvaluator.OPERATORS[node.op](this.run(node.left, env), this.run(node.right, env));
     }
 
-    /** Evaluate only the indexed element, after bounds-checking the resolved index. */
-    private runLookup(node: Extract<Node, { kind: 'lookup' }>): DynamicValue {
-        const index = DynamicValueEvaluator.number(this.run(node.index));
+    /** Evaluate an array lookup. */
+    private runLookup(node: Extract<Node, { kind: 'lookup' }>, env: Environment): DynamicValue {
+        const index = DynamicValueEvaluator.number(this.run(node.index, env));
 
         if (!Number.isInteger(index) || index < 0 || index >= node.values.length)
             throw new Error(`Index ${index} out of range.`);
 
-        return this.run(node.values[index]);
+        return this.run(node.values[index], env);
     }
 
-    /** Evaluate only the matched entry, after resolving the key to a string. */
-    private runObjectLookup(node: Extract<Node, { kind: 'objectLookup' }>): DynamicValue {
-        const key = this.run(node.key);
+    /** Evaluate a map lookup. */
+    private runObjectLookup(node: Extract<Node, { kind: 'objectLookup' }>, env: Environment): DynamicValue {
+        const key = this.run(node.key, env);
         if (typeof key !== 'string') throw new Error(`Expected a string key, got '${key}'.`);
 
         const entry = node.entries.find(entry => entry.key === key);
         if (!entry) throw new Error(`Key '${key}' not found.`);
 
-        return this.run(entry.value);
+        return this.run(entry.value, env);
     }
 
-    /**
-     * Resolve an `@property` reference to a typed value. Only primitives are usable in an
-     * expression; a missing reference or a non-primitive throws, so evaluate falls through to
-     * returning the input verbatim and the change is dropped.
-     */
+    /** Resolve an `@property` reference to a supported primitive. */
     private resolveRef(node: Extract<Node, { kind: 'ref' }>): DynamicValue {
         if (!this.resolve) throw new Error('No resolver for references.');
 
