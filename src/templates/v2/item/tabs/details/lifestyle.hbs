@@ -1,0 +1,51 @@
+<div class="list-item list-item-header">
+    <div class="list-item-start skinny">
+        <label>{{localize (objValue @root.config.itemTypes item.type)}}</label>
+    </div>
+</div>
+
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.type.hint}}">{{systemFields.type.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.type value=source.system.type localize=true
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.neighborhood.label}}">{{systemFields.neighborhood.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.neighborhood value=source.system.neighborhood
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.comforts.label}}">{{systemFields.comforts.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.comforts value=source.system.comforts
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.security.label}}">{{systemFields.security.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.security value=source.system.security
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>
+<div class="list-item">
+    <div class="list-item-start skinny">
+        <label data-tooltip="{{systemFields.guests.label}}">{{systemFields.guests.label}}</label>
+    </div>
+    <div class="list-item-col">
+        {{formInput systemFields.guests value=source.system.guests
+                    classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
+    </div>
+</div>

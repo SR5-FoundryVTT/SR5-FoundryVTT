@@ -19,6 +19,11 @@ import { SR5CombatTracker } from './token/SR5CombatTracker';
 import { HandlebarManager } from './handlebars/HandlebarManager';
 
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
+import { TimeControlApplication } from './apps/gmtools/TimeControlApplication';
+import { WorldTimeFlow } from './flows/WorldTimeFlow';
+import { ExtendedTestManager } from './apps/ExtendedTestManager';
+import { ExtendedTestFlow } from './flows/ExtendedTestFlow';
+import { ExtendedTestDueFlow } from './flows/ExtendedTestDueFlow';
 import { ActorImporter } from './apps/itemImport/apps/ActorImporter';
 import { BulkImporter } from './apps/itemImport/apps/BulkImporter';
 import { CharacterImporter } from './apps/actorImport/characterImporter/CharacterImporter';
@@ -180,6 +185,11 @@ export class HooksManager {
         Hooks.on('updateItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('deleteItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('getChatMessageContextOptions', SuccessTest.chatMessageContextOptions.bind(SuccessTest));
+        // Register and update managed extended tests from finished test rolls.
+        Hooks.on('sr5_afterTestComplete', (test: SuccessTest) => { void ExtendedTestFlow.handleTestComplete(test); });
+        // Announce extended tests game time has made rollable again. Debounced, as holding a
+        // time preset would otherwise scan every record per tick.
+        Hooks.on('updateWorldTime', foundry.utils.debounce(() => { void ExtendedTestDueFlow.announceDue(); }, 250));
 
         Hooks.on('renderChatLog', HooksManager.chatLogListeners.bind(HooksManager));
 
@@ -468,6 +478,16 @@ ___________________
         CONFIG.time.turnTime = SR.combat.TURN_TIME_SECONDS;
         CONFIG.time.roundTime = SR.combat.ROUND_TIME_SECONDS;
 
+        // Keep expired effects (greyed, restartable) instead of deleting.
+        // Explicit so a core/module change can't silently flip it to "delete".
+        CONFIG.ActiveEffect.expiryAction = "update";
+
+        // Register the SR5-custom expiry events so Foundry's registry knows to call isExpiryEvent for them.
+        // sr5MyActionStart fires on the owner's action phase start (any pass); dispatched by SR5Combat._onUpdate.
+        CONFIG.ActiveEffect.expiryEvents.sr5MyActionStart = "SR5.ActiveEffect.ExpiryTriggers.MyActionStart";
+        // sr5MyActionEnd fires when advancing away from the owner's completed action phase.
+        CONFIG.ActiveEffect.expiryEvents.sr5MyActionEnd = "SR5.ActiveEffect.ExpiryTriggers.MyActionEnd";
+
         registerSystemSettings();
         registerSystemKeybindings();
 
@@ -548,6 +568,8 @@ ___________________
         if (game.user?.isGM) {
             Migrator.BeginMigration();
 
+            await WorldTimeFlow.initialize();
+
             if (ChangelogApplication.showApplication)
                 new ChangelogApplication().render(true);
         }
@@ -590,7 +612,31 @@ ___________________
                 }
             };
             controls.tokens.tools[overwatchScoreTrackControl.name] = overwatchScoreTrackControl;
+
+            const timeControl = {
+                name: 'sr5-time-control',
+                title: 'CONTROLS.SR5.TimeControl',
+                icon: 'far fa-clock',
+                button: true,
+                onChange: (_event: Event, active: boolean) => {
+                    if (!active) return;
+                    TimeControlApplication.open();
+                }
+            };
+            controls.tokens.tools[timeControl.name] = timeControl;
         }
+
+        const extendedTestManagerControl = {
+            name: 'sr5-extended-test-manager',
+            title: 'CONTROLS.SR5.ExtendedTestManager',
+            icon: 'fas fa-hourglass-half',
+            button: true,
+            onChange: (_event: Event, active: boolean) => {
+                if (!active) return;
+                ExtendedTestManager.open();
+            }
+        };
+        controls.tokens.tools[extendedTestManagerControl.name] = extendedTestManagerControl;
 
         const situationModifiersControl = SituationModifiersApplication.getControl();
         controls.tokens.tools[situationModifiersControl.name] = situationModifiersControl;
@@ -685,7 +731,9 @@ ___________________
             [FLAGS.CreateTargetedEffects]: [SuccessTestEffectsFlow._handleCreateTargetedEffectsSocketMessage.bind(SuccessTestEffectsFlow)],
             [FLAGS.TeamworkTestFlow]: [TeamworkTest._handleUpdateSocketMessage.bind(TeamworkTest)],
             [FLAGS.SetDataStorage]: [DataStorage._handleSetDataStorageSocketMessage.bind(DataStorage)],
+            [FLAGS.UnsetDataStorage]: [DataStorage._handleUnsetDataStorageSocketMessage.bind(DataStorage)],
             [FLAGS.UpdateDocumentsAsGM]: [SocketMessageFlow.handleUpdateDocumentsAsGMMessage.bind(SocketMessage)],
+            [FLAGS.ApplyExtendedTestRoll]: [ExtendedTestFlow._handleApplyRollSocketMessage.bind(ExtendedTestFlow)],
         } as const;
 
         game.socket.on(SYSTEM_SOCKET, async (message: Shadowrun.SocketMessageData) => {
@@ -715,6 +763,7 @@ ___________________
         await TeamworkTest.chatMessageListeners(message, html);
         await JournalEnrichers.messageRequestHooks(html);
         await MatrixNetworkFlow.chatMessageListeners(message, html, data);
+        await ExtendedTestDueFlow.chatMessageListeners(message, html);
     }
 
     static async chatLogListeners(chatLog: ChatLog, html, data) {

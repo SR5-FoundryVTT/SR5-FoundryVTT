@@ -56,7 +56,7 @@ export function *allApplicableDocumentEffects(document: SR5Actor|SR5Item, option
     const applyTo = options.applyTo ?? [];
 
     for (const effect of document.effects) {
-        if (applyTo.length > 0 && !applyTo.includes(effect.system.applyTo)) continue;
+        if (applyTo.length > 0 && !effect.appliesToAnyOf(applyTo)) continue;
         yield effect;
     }
 }
@@ -73,7 +73,7 @@ export function *allApplicableItemsEffects(document: SR5Actor|SR5Item, options: 
 
     for (const item of document.items) {
         for (const effect of item.effects) {
-            if (applyTo.length > 0 && !applyTo.includes(effect.system.applyTo)) continue ;
+            if (applyTo.length > 0 && !effect.appliesToAnyOf(applyTo)) continue ;
             yield effect;
         }
     }

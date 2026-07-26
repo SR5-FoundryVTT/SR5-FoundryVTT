@@ -282,6 +282,11 @@ body.theme-light,
             color: var(--sr5v2-option-text);
             font-weight: 400;
         }
+
+        option.folder-option {
+            color: var(--sr5v2-option-group-text);
+            font-weight: 600;
+        }
     }
 
     .window-header {
@@ -384,7 +389,6 @@ body.theme-light,
                 justify-content: start;
                 align-items: center;
                 flex-flow: column nowrap;
-                gap: .25rem;
 
                 .sheet-header-resource-container {
                     box-sizing: border-box;
@@ -403,7 +407,7 @@ body.theme-light,
                     }
 
                     .sheet-header-resource-value {
-                        flex: 0 0 4rem;
+                        flex: 0 0 5rem;
                         justify-content: center;
                     }
 
@@ -553,7 +557,8 @@ body.theme-light,
     }
 
     input,
-    select {
+    select,
+    textarea {
         color: var(--sr5v2-control-text);
     }
 
@@ -795,7 +800,8 @@ body.theme-light,
     }
 
     &.actor,
-    &.item {
+    &.item,
+    &.active-effect-config {
         .window-content {
             background: var(--sr5v2-app-body-bg);
             background-image: none;

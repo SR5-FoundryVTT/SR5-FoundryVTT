@@ -34,6 +34,8 @@ import { MatrixDeviceFlow } from './flows/MatrixDeviceFlow';
 import { StorageFlow } from '@/module/flows/StorageFlow';
 import { ModifiableValueType } from '../types/template/Base';
 import { IconAssign } from 'src/module/apps/iconAssigner/IconAssign';
+import { allApplicableDocumentEffects } from '../effects';
+import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import GetEmbeddedDocumentOptions = foundry.abstract.Document.GetEmbeddedDocumentOptions;
 
 type OneOrMany<T> = T | T[];
@@ -374,10 +376,14 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     override prepareDerivedData(this: SR5Item): void {
         super.prepareDerivedData();
+        this.applyItemActiveEffects();
 
         const technology = this.getTechnologyData();
-        if (technology)
+        if (technology) {
+            TechnologyPrep.prepareCost(technology);
+            TechnologyPrep.prepareAvailability(technology);
             TechnologyPrep.calculateAttributes(this.system.attributes!);
+        }
 
         if (this.isType('host'))
             HostPrep.prepareDerivedData(this.system);
@@ -390,8 +396,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
         if (technology) {
             TechnologyPrep.prepareConceal(technology, equippedMods);
-            TechnologyPrep.prepareAvailability(this, technology);
-            TechnologyPrep.prepareCost(this, technology);
         }
 
         const action = this.getAction();
@@ -405,6 +409,35 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
         if ('armor' in this.system) {
             ArmorPrep.prepareData(this, equippedMods);
+        }
+    }
+
+    private applyItemActiveEffects() {
+        for (const effect of allApplicableDocumentEffects(this, { applyTo: ['item'] })) {
+            if (effect.disabled || effect.isSuppressed) continue;
+
+            const changes = effect.changesForApplyTo('item');
+
+            // prepareData can run more than once without a reset() in between, and ModifiableField.applyChange
+            // only pushes entries. Clear this effect's prior contributions from each targeted ModifiableValue
+            // before re-applying, so repeated passes don't double them.
+            const source = effect.uuid ?? effect.id ?? effect.name;
+            for (const change of changes) {
+                const altered = { ...change } as unknown as ActiveEffect.ChangeData;
+                SR5ActiveEffect.alterChange(this, altered);
+                const value = SR5ActiveEffect.getModifiableValue(this, altered.key);
+                if (value) ModifiableValue.removeFromSource(value, source);
+            }
+
+            for (const change of changes) {
+                try {
+                    SR5ActiveEffect.applyChange(this, { ...change, effect } as unknown as ActiveEffect.ChangeData);
+                } catch (error) {
+                    console.error(`Shadowrun5e | Some effect changes could not be applied and might cause issues. Check effects of item (${this.name}) / id (${this.id})`);
+                    console.error(error);
+                    ui.notifications?.error(`See browser console (F12): Some effect changes could not be applied and might cause issues. Check effects of item (${this.name}) / id (${this.id})`);
+                }
+            }
         }
     }
 
@@ -1035,12 +1068,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return this.system.action;
     }
 
-    getExtended(): boolean {
-        const action = this.getAction();
-        if (!action) return false;
-        return action.extended;
-    }
-
     getTechnologyData(this: SR5Item) {
         return this.system.technology;
     }
@@ -1050,7 +1077,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     parseAvailibility(avail: string) {
-        return ItemAvailabilityFlow.parseAvailibility(avail);
+        return ItemAvailabilityFlow.parseAvailability(avail);
     }
 
     async setMasterUuid(masterUuid: string | undefined): Promise<void> {
@@ -1153,7 +1180,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
         let essenceLoss = 0;
         if (this.isType('bioware', 'cyberware')) {
-            essenceLoss = tech.calculated.essence.value;
+            essenceLoss = tech.essence.value;
         } else if (this.isType('modification') && this.system.type === 'ware') {
             essenceLoss = this.system.essence;
         }

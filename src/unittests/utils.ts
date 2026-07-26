@@ -1,5 +1,6 @@
 import { SR5Actor } from "src/module/actor/SR5Actor";
 import { SR5Item } from "src/module/item/SR5Item";
+import { ExtendedTestStorage } from "src/module/storage/ExtendedTestStorage";
 
 export class SR5TestFactory {
     static readonly folderName = '#Quench';
@@ -49,11 +50,28 @@ export class SR5TestFactory {
         return scene;
     }
 
+    /** Remove extended test records rolling these actors registered, leaving the world's own. */
+    async destroyExtendedTestRecords(actorUuids: Set<string>) {
+        if (!actorUuids.size) return;
+
+        const owned = Object.values(ExtendedTestStorage.getAll())
+            .filter(record => record.actorUuid && actorUuids.has(record.actorUuid));
+
+        for (const record of owned) {
+            await ExtendedTestStorage.delete(record.id);
+        }
+    }
+
     async destroy() {
+        // Captured before deletion, the records only keep the uuid string.
+        const actorUuids = new Set(this.actors.map(actor => actor.uuid));
+
         await Actor.deleteDocuments(this.actors.map(actor => actor.id));
         await Item.deleteDocuments(this.items.map(item => item.id));
         await Scene.deleteDocuments(this.scenes.map(scene => scene.id));
         await Folder.deleteDocuments(Array.from(this.createdFolder.values()));
+
+        await this.destroyExtendedTestRecords(actorUuids);
 
         this.actors.length = 0;
         this.items.length = 0;

@@ -29,7 +29,29 @@ export const preloadHandlebarsTemplates = async () => {
             'common/import-flag',
             'common/skill-source-indicator',
             'item/header',
+            'item/tabs/details/action',
+            'item/tabs/details/adept_power',
+            'item/tabs/details/ammo',
+            'item/tabs/details/armor',
+            'item/tabs/details/call_in_action',
+            'item/tabs/details/capacity',
+            'item/tabs/details/complex_form',
+            'item/tabs/details/contact',
+            'item/tabs/details/critter_power',
+            'item/tabs/details/device-host',
+            'item/tabs/details/grid',
+            'item/tabs/details/host',
+            'item/tabs/details/lifestyle',
+            'item/tabs/details/modification',
+            'item/tabs/details/program',
+            'item/tabs/details/quality',
+            'item/tabs/details/ritual',
             'item/tabs/details/skill',
+            'item/tabs/details/spell',
+            'item/tabs/details/sprite_power',
+            'item/tabs/details/technology',
+            'item/tabs/details/ware',
+            'item/tabs/details/weapon',
             'item/footer/skill',
             'common/generic-data-properties',
             'list-items/connect-network-icon',
@@ -133,7 +155,13 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/apps/compendium-browser/settings-folder.hbs',
 
         // Application - Situational Modifiers
-        'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs'
+        'systems/shadowrun5e/dist/templates/apps/partials/modifiers-physical.hbs',
+
+        // Shared interval unit selection
+        'systems/shadowrun5e/dist/templates/apps/partials/interval-units.hbs',
+
+        // Active Effect - shared target conditions partial
+        'systems/shadowrun5e/dist/templates/effect/active-effect-target-conditions.hbs'
     ];
 
     for (const type of Object.keys(SR5.itemTypes)) {

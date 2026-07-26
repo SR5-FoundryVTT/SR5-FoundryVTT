@@ -1,1 +1,3 @@
-<label>{{localizeOb item.system.duration @root.config.durations}}</label>
+{{#unless (empty item.system.duration)}}
+    <label>{{localizeOb item.system.duration @root.config.durations}}</label>
+{{/unless}}

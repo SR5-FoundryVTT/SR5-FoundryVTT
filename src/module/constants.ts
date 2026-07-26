@@ -40,6 +40,7 @@ export const FLAGS = {
     DoCombatantFunction: 'doCombatantFunction',
     addNetworkController: 'addNetworkController',
     SetDataStorage: 'setDataStorage',
+    UnsetDataStorage: 'unsetDataStorage',
     TokenHealthBars: 'tokenHealthBars',
     Test: 'TestData',
     HideGMOnlyChatContent: 'HideGMOnlyChatContent',
@@ -72,7 +73,11 @@ export const FLAGS = {
     CompendiaSettingsMenu: 'CompendiaSettingsMenu',
     TokenAutoRunning: 'TokenAutoRunning',
     CompendiumBrowserBlacklist: 'CompendiumBrowserBlacklist',
-    ImporterCompendiumOrder: 'ImporterCompendiumOrder'
+    ImporterCompendiumOrder: 'ImporterCompendiumOrder',
+    ApplyExtendedTestRoll: 'ApplyExtendedTestRoll',
+    EnforceExtendedTestInterval: 'EnforceExtendedTestInterval',
+    ExtendedTestDueMessage: 'ExtendedTestDueMessage',
+    WorldTimeInitialized: 'WorldTimeInitialized'
 } as const;
 export const CORE_NAME = 'core';
 export const METATYPEMODIFIER = 'SR5.Character.Modifiers.NPCMetatypeAttribute';
@@ -121,6 +126,16 @@ export const SR = {
         ROUND_TIME_SECONDS: 3,
         TURN_TIME_SECONDS: 0,
         MAX_HISTORY_SIZE: 50,
+    },
+    time: {
+        START_DATE: {
+            year: 2075,
+            month: 0,
+            dayOfMonth: 0,
+            hour: 0,
+            minute: 0,
+            second: 0,
+        },
     },
     defense: {
         spell: {
@@ -269,18 +284,82 @@ export const SRStatus = [
         id: 'sr5run',
         name: 'SR5.StatusEffects.Running',
         img: 'systems/shadowrun5e/dist/icons/status-effects/run.svg',
+        duration: { value: 1, units: 'rounds', expiry: 'roundStart' },
         system: {
-            applyTo: 'test_all',
-            changes: [{ key: "data.pool", type: "add", value: "-2" }],
+            expiryAction: 'delete',
+            targets: [
+                {
+                    id: 'penalty',
+                    applyTo: 'test_all',
+                    conditions: [
+                        // Exclude defense and resist tests from the penalty.
+                        { type: 'tests', mode: 'exclude', values: ['PhysicalDefenseTest', 'SuppressionDefenseTest', 'PhysicalResistTest'] },
+                        // Exclude the running skill test itself from the penalty.
+                        { type: 'skills', mode: 'exclude', values: ['running'] },
+                    ],
+                },
+                {
+                    // +4 raw on melee attacks = net +2 after the general -2 penalty.
+                    id: 'melee',
+                    applyTo: 'test_all',
+                    conditions: [
+                        { type: 'tests', mode: 'include', values: ['MeleeAttackTest'] },
+                    ],
+                },
+                {
+                    // -2 to a ranged/thrown attack made against this running actor (applies to the attacker's test).
+                    id: 'targetRanged',
+                    applyTo: 'test_target',
+                    conditions: [
+                        { type: 'tests', mode: 'include', values: ['RangedAttackTest', 'ThrownAttackTest'] },
+                    ],
+                },
+            ],
+            changes: [
+                { key: "data.pool", type: "add", value: "-2", target: 'penalty' },
+                { key: "data.pool", type: "add", value: "4",  target: 'melee' },
+                { key: "data.pool", type: "add", value: "-2", target: 'targetRanged' },
+            ],
         },
     },
     {
         id: 'sr5sprint',
         name: 'SR5.StatusEffects.Sprinting',
         img: 'systems/shadowrun5e/dist/icons/status-effects/sprint.svg',
+        duration: { value: 1, units: 'rounds', expiry: 'roundStart' },
         system: {
-            applyTo: 'test_all',
-            changes: [{ key: "data.pool", type: "add", value: "-4" }],
+            expiryAction: 'delete',
+            targets: [
+                {
+                    id: 'penalty',
+                    applyTo: 'test_all',
+                    conditions: [
+                        { type: 'tests', mode: 'exclude', values: ['PhysicalDefenseTest', 'SuppressionDefenseTest', 'PhysicalResistTest'] },
+                        { type: 'skills', mode: 'exclude', values: ['running'] },
+                    ],
+                },
+                {
+                    // +4 raw on melee attacks = net +2 after the general -2 penalty.
+                    id: 'melee',
+                    applyTo: 'test_all',
+                    conditions: [
+                        { type: 'tests', mode: 'include', values: ['MeleeAttackTest'] },
+                    ],
+                },
+                {
+                    // -4 to a ranged/thrown attack made against this sprinting actor (applies to the attacker's test).
+                    id: 'targetRanged',
+                    applyTo: 'test_target',
+                    conditions: [
+                        { type: 'tests', mode: 'include', values: ['RangedAttackTest', 'ThrownAttackTest'] },
+                    ],
+                },
+            ],
+            changes: [
+                { key: "data.pool", type: "add", value: "-2", target: 'penalty' },
+                { key: "data.pool", type: "add", value: "4",  target: 'melee' },
+                { key: "data.pool", type: "add", value: "-4", target: 'targetRanged' },
+            ],
         },
     },
 ] as const satisfies CONFIG.StatusEffect[];

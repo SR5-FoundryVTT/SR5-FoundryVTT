@@ -1226,6 +1226,20 @@ export const SR5 = {
         'none': 'SR5.WirelessUnavailable'
     },
 
+    availabilityRestrictions: {
+        'none': 'SR5.AvailabilityRestrictions.None',
+        'restricted': 'SR5.AvailabilityRestrictions.Restricted',
+        'forbidden': 'SR5.AvailabilityRestrictions.Forbidden',
+    },
+
+    // Minimal, per-language abbreviations shown in the availability restriction select and composed
+    // value (e.g. 12R, 12F). Translators may pick a different letter than the English R/F.
+    availabilityRestrictionSuffixes: {
+        'none': 'SR5.AvailabilityRestrictionSuffixes.None',
+        'restricted': 'SR5.AvailabilityRestrictionSuffixes.Restricted',
+        'forbidden': 'SR5.AvailabilityRestrictionSuffixes.Forbidden',
+    },
+
     /**
      * The preconfigured default Shadowrun firemodes according to SR5#180
      *
@@ -1315,11 +1329,35 @@ export const SR5 = {
      */
     effectApplyTo: {
         'actor': 'SR5.FOUNDRY.Actor',
-        // 'item': 'SR5.FOUNDRY.Item', // Disabled, as systems nested item approach brings issues.
+        'item': 'SR5.FOUNDRY.Item',
         'targeted_actor': 'SR5.ActiveEffect.ApplyTos.TargetedActor',
         'test_all': 'SR5.Test',
         'test_item': 'SR5.ActiveEffect.ApplyTos.TestItem',
+        'test_target': 'SR5.ActiveEffect.ApplyTos.TestTargetingThisActor',
         'modifier': 'SR5.Modifier'
+    },
+
+    effectSelectionModes: {
+        'include': 'SR5.ActiveEffect.SelectionModes.Include',
+        'exclude': 'SR5.ActiveEffect.SelectionModes.Exclude',
+    },
+
+    effectFilterTypes: {
+        'tests': 'SR5.ActiveEffect.FilterTypes.Tests',
+        'categories': 'SR5.ActiveEffect.FilterTypes.Categories',
+        'skills': 'SR5.ActiveEffect.FilterTypes.Skills',
+        'attributes': 'SR5.ActiveEffect.FilterTypes.Attributes',
+        'limits': 'SR5.ActiveEffect.FilterTypes.Limits',
+    },
+
+    // Combat duration expiry trigger choices (maps to native duration.expiry values).
+    effectExpiryTriggers: {
+        'combatStart':      'SR5.ActiveEffect.ExpiryTriggers.CombatStart',
+        'combatEnd':        'SR5.ActiveEffect.ExpiryTriggers.CombatEnd',
+        'roundStart':       'SR5.ActiveEffect.ExpiryTriggers.TurnStart',
+        'roundEnd':         'SR5.ActiveEffect.ExpiryTriggers.TurnEnd',
+        'sr5MyActionStart': 'SR5.ActiveEffect.ExpiryTriggers.MyActionStart',
+        'sr5MyActionEnd':   'SR5.ActiveEffect.ExpiryTriggers.MyActionEnd',
     },
 
     itemCategoryIconOverrides: {

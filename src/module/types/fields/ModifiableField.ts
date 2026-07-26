@@ -32,13 +32,14 @@ export class ModifiableField<
 > extends foundry.data.fields.SchemaField<Fields, Options, AssignmentType, InitializedType, PersistedType> {
     override applyChange(value: InitializedType, model: DataModel.Any, change: ActiveEffect.ChangeData): undefined {
         const changeValue = Number(change.value);
-        if (isNaN(changeValue)) return undefined;
+        if (!Number.isFinite(changeValue)) return undefined;
         if (!change.effect) return undefined;
 
         const field = value as ModifiableValueType;
         const effectName = change.effect.name;
         const effectType = change.type;
         const effectPriority = change.priority ?? CONST.ACTIVE_EFFECT_CHANGE_TYPES[change.type]?.defaultPriority ?? 20;
+        const effectSource = change.effect.uuid ?? change.effect.id ?? change.effect.name;
 
         field.changes.push(
             DataDefaults.createData('change_entry', {
@@ -46,7 +47,7 @@ export class ModifiableField<
                 type: effectType,
                 value: changeValue,
                 priority: effectPriority,
-                source: change.effect.uuid,
+                source: effectSource,
             })
         );
 

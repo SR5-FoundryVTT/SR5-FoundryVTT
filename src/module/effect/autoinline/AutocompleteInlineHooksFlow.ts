@@ -3,6 +3,12 @@ import { OpposedTest } from "../../tests/OpposedTest";
 import { SuccessTest } from "../../tests/SuccessTest";
 import { TestCreator } from "../../tests/TestCreator";
 import { SR5ActiveEffectConfig } from "../SR5ActiveEffectConfig";
+import { SR5ActiveEffectValueEditor } from "../SR5ActiveEffectValueEditor";
+import { SR5ActiveEffect } from "../SR5ActiveEffect";
+
+type ActiveEffectAutocompleteHost = {
+    document: SR5ActiveEffect;
+};
 
 /**
  * Collection of functionality necessary for the autocomplete inline properties module
@@ -32,6 +38,10 @@ export const AutocompleteInlineHooksFlow =  {
         // @ts-expect-error AIP typing
         const DATA_MODE = aipModule.API.CONST.DATA_MODE;
 
+        // AIP only attaches to text inputs and textareas. Match both, as change keys render as
+        // <input type="text"> while change values render as <textarea> (to preserve newlines).
+        const field = `:is(input[type="text"], textarea)`;
+
         const config = {
             packageName: "shadowrun5e",
             sheetClasses: [{
@@ -41,19 +51,31 @@ export const AutocompleteInlineHooksFlow =  {
                     { selector: `.tab[data-tab="changes"] .autocomplete-key-targeted_actor input[type="text"]`, defaultPath: "system", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
                     { selector: `.tab[data-tab="changes"] .autocomplete-key-test_all input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterTestData},
                     { selector: `.tab[data-tab="changes"] .autocomplete-key-test_item input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterTestData},
+                    { selector: `.tab[data-tab="changes"] .autocomplete-key-test_target input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterTestData},
                     { selector: `.tab[data-tab="changes"] .autocomplete-key-modifier input[type="text"]`, defaultPath: "", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.keyGetterModifiersData},
 
                     { selector: `.tab[data-tab="changes"] .autocomplete-value-actor input[type="text"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterActor},
                     { selector: `.tab[data-tab="changes"] .autocomplete-value-targeted_actor input[type="text"]`, defaultPath: "", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTargetedActorData},
                     { selector: `.tab[data-tab="changes"] .autocomplete-value-test_all input[type="text"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
                     { selector: `.tab[data-tab="changes"] .autocomplete-value-test_item input[type="text"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
+                    { selector: `.tab[data-tab="changes"] .autocomplete-value-test_target input[type="text"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
+                ]
+            }, {
+                name: SR5ActiveEffectValueEditor.name,
+                fieldConfigs: [
+                    { selector: `.sr5-effect-value-editor__body.autocomplete-value-actor textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterActor},
+                    { selector: `.sr5-effect-value-editor__body.autocomplete-value-item textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterActor},
+                    { selector: `.sr5-effect-value-editor__body.autocomplete-value-targeted_actor textarea[name$=".value"]`, defaultPath: "", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTargetedActorData},
+                    { selector: `.sr5-effect-value-editor__body.autocomplete-value-test_all textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
+                    { selector: `.sr5-effect-value-editor__body.autocomplete-value-test_item textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
+                    { selector: `.sr5-effect-value-editor__body.autocomplete-value-test_target textarea[name$=".value"]`, defaultPath: "system", inlinePrefix: "@", showButton: true, allowHotkey: true, dataMode: DATA_MODE.CUSTOM, customDataGetter: AutocompleteInlineHooksFlow.valueGetterTestData},
                 ]
             }]
         };
 
         // NOTE: AIP 3.1.0 has issues with 'core' fieldConfig overwriting custom fieldConfigs. Replace all configs with ours, works.
         // Other fieldConfigs are 'core' and built-in systems, which we don't need, as we custom map all our fields for AIP.
-        // This shoud be revisited, however it also shouldn't matter, as we don't rely on the core fieldConfig anyway.
+        // This should be revisited, however it also shouldn't matter, as we don't rely on the core fieldConfig anyway.
         // - See their GitHub issue #748
         // - Our GitHub issue #1684
         // Remove only 'core' configs, then prepend ours for higher priority.
@@ -70,10 +92,10 @@ export const AutocompleteInlineHooksFlow =  {
      * @param EffectConfig The effect config supplying the effect context.
      * @returns Either a SR5Actor or SR5Item source object.
      */
-    valueGetterActor: (EffectConfig: SR5ActiveEffectConfig) => {
+    valueGetterActor: (EffectConfig: ActiveEffectAutocompleteHost) => {
         const effect = EffectConfig.document;
         if (!effect.parent) return {};
-        return effect.parent?.toObject();
+        return effect.parent.toObject();
     },
 
     /**
@@ -82,9 +104,14 @@ export const AutocompleteInlineHooksFlow =  {
      * @param EffectConfig The effect config supplying the effect context.
      * @returns A test object for the autocomplete module to use.
      */
-    keyGetterTestData: (EffectConfig: SR5ActiveEffectConfig) => {
+    keyGetterTestData: (EffectConfig: ActiveEffectAutocompleteHost) => {
         const effect = EffectConfig.document;
-        const testsId = effect.system.selection_tests;
+        // Collect unique test class names from all 'tests' conditions across all targets.
+        const testsId = [...new Set(
+            effect.system.targets.flatMap(
+                t => t.conditions.filter(c => c.type === 'tests').flatMap(c => c.values)
+            )
+        )];
 
         // For  effects targeting specific tests, we can provide a merge of all tests data.
         if (testsId.length > 0) {
@@ -122,7 +149,7 @@ export const AutocompleteInlineHooksFlow =  {
      * 
      * @param EffectConfig 
      */
-    valueGetterTestData: (EffectConfig: SR5ActiveEffectConfig) => {
+    valueGetterTestData: (EffectConfig: ActiveEffectAutocompleteHost) => {
         const effect = EffectConfig.document;
         if (!effect.parent) return {};
 
@@ -149,7 +176,7 @@ export const AutocompleteInlineHooksFlow =  {
      * @param EffectConfig The effect config supplying the effect context.
      * @returns A simple object for autocomplete module to use.
      */
-    keyGetterModifiersData: (EffectConfig: SR5ActiveEffectConfig) => {
+    keyGetterModifiersData: (_EffectConfig: ActiveEffectAutocompleteHost) => {
         return {environmental: {
             low_light_vision: '',
             image_magnification: '',
@@ -169,7 +196,7 @@ export const AutocompleteInlineHooksFlow =  {
      * @param EffectConfig The effect config supplying the effect context.
      * @returns A opposed test instance for autocomplete module to use.
      */
-    valueGetterTargetedActorData: (EffectConfig: SR5ActiveEffectConfig) => {
+    valueGetterTargetedActorData: (EffectConfig: ActiveEffectAutocompleteHost) => {
         const effect = EffectConfig.document;
 
         if (effect.parent instanceof SR5Item) {
@@ -180,7 +207,7 @@ export const AutocompleteInlineHooksFlow =  {
             const OpposedTestClass = TestCreator._getTestClass(action.opposed.test) as typeof OpposedTest || OpposedTest;
             const successTest = new SuccessTestClass({});
             const opposedTest = new OpposedTestClass({ against: successTest.data }, {actor: item.actor ?? undefined, item});
-            
+
             return {data: opposedTest.data};
         }
         return {};

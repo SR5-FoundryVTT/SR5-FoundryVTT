@@ -168,6 +168,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         },
         compilations: {
             template: SheetFlow.templateBase('actor/tabs/matrix/compilations'),
+            templates: SheetFlow.templateListItem('call_in_action'),
             scrollable: ['.scrollable']
         },
         spritePowers: {

@@ -1,4 +1,6 @@
-<label>{{localizeOb item.system.target @root.config.matrixTargets}}</label>
+{{#unless (empty item.system.target)}}
+    <label>{{localizeOb item.system.target @root.config.matrixTargets}}</label>
+{{/unless}}
 {{#if item.system.duration}}
     <label>{{item.system.duration}}</label>
 {{/if}}
