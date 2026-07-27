@@ -39,6 +39,11 @@ import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 import GetEmbeddedDocumentOptions = foundry.abstract.Document.GetEmbeddedDocumentOptions;
 
 type OneOrMany<T> = T | T[];
+type LinkedItemTransformer = (item: SR5Item, depth: number) => Item.CreateData | Promise<Item.CreateData>;
+interface CreateWithLinkedItemsOptions {
+    parentId?: string | null;
+    transformAll?: LinkedItemTransformer;
+}
 const { fromUuid, getProperty, setProperty } = foundry.utils;
 
 /**
@@ -55,6 +60,37 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     static isAttachment(parentType: string, childType: string): boolean {
         if (parentType === 'weapon' && childType === 'ammo') return true;
         return childType === 'modification' && SR5Item.MOD_PARENT_TYPES.includes(parentType);
+    }
+
+    /**
+     * Prepare creation data for items and all sibling documents linked beneath them.
+     * New IDs are assigned up-front so every copied parentId points at the new graph.
+     */
+    static async createWithLinkedItems(
+        items: SR5Item[],
+        { parentId = null, transformAll }: CreateWithLinkedItemsOptions = {}
+    ): Promise<Item.CreateData[]> {
+        const created: Item.CreateData[] = [];
+        const visited = new Set<string>();
+
+        const createItemData = async (item: SR5Item, linkedParentId: string | null, depth: number) => {
+            if (item.id && visited.has(item.uuid ?? item.id)) return;
+            if (item.id) visited.add(item.uuid ?? item.id);
+
+            const transformed = transformAll ? await transformAll(item, depth) : item.toObject();
+            const itemData = foundry.utils.deepClone(transformed);
+            itemData._id = foundry.utils.randomID();
+            setProperty(itemData, 'system.parentId', linkedParentId);
+            created.push(itemData);
+
+            const contents = await item.contents;
+            for (const child of contents) {
+                await createItemData(child, itemData._id, depth + 1);
+            }
+        };
+
+        for (const item of items) await createItemData(item, parentId, 0);
+        return created;
     }
 
     //Those declarations must be initialized on prepareData, otherwise they will be undefined
@@ -144,11 +180,17 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     get linkedChildren(): SR5Item[] {
-        return this.items ?? [];
+        if (this.pack && !this.isEmbedded) return this.items ?? [];
+        if (!this.id) return [];
+
+        const collection = this.isEmbedded ? this.actorOwner?.items : game.items;
+        if (!collection) return [];
+
+        return collection.contents.filter(item => item.system.parentId === this.id);
     }
 
     get ammoItems(): SR5Item<'ammo'>[] {
-        return this.linkedChildren.filter(item => item.isType('ammo')) as SR5Item<'ammo'>[];
+        return this.linkedChildren.filter(item => item.isType('ammo'));
     }
 
     get weaponMods(): SR5Item<'modification'>[] {
@@ -267,7 +309,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         const containers: SR5Item[] = [];
         const visited = new Set<string>(this.id ? [this.id] : []);
 
-        while (containers.length < SR5Item.MAX_CONTAINER_DEPTH) {
+        while (true) {
             const container = await item.container as SR5Item | null | undefined;
             if (!container?.id || visited.has(container.id)) break;
 
@@ -285,16 +327,34 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         if (this.id === item.id) return false;
 
         const containers = await this.allContainers();
-        return !containers.some(container => container.id === item.id);
+        if (containers.some(container => container.id === item.id)) return false;
+        if (!item.isType('container')) return true;
+
+        const subtreeDepth = await SR5Item._containerSubtreeDepth(item);
+        return containers.length + 1 + subtreeDepth <= SR5Item.MAX_CONTAINER_DEPTH;
+    }
+
+    private static async _containerSubtreeDepth(item: SR5Item, visited = new Set<string>()): Promise<number> {
+        if (!item.id || visited.has(item.id)) return SR5Item.MAX_CONTAINER_DEPTH + 1;
+        visited.add(item.id);
+
+        let childDepth = 0;
+        const contents = await item.contents;
+        for (const child of contents) {
+            if (!child.isType('container')) continue;
+            childDepth = Math.max(childDepth, await SR5Item._containerSubtreeDepth(child, new Set(visited)));
+        }
+
+        return childDepth + 1;
     }
 
     async clearLinkedChildren(): Promise<void> {
         if (!this.id) return;
 
         const contents = await this.contents;
-        const updates: any[] = Array.from(contents)
+        const updates = Array.from(contents)
             .filter(item => item.id)
-            .map(item => ({ _id: item.id, 'system.parentId': null }));
+            .map(item => ({ _id: item.id, system: { parentId: null } }));
         if (updates.length === 0) return;
 
         if (this.isEmbedded && this.actorOwner) {
@@ -305,9 +365,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             await Item.implementation.updateDocuments(updates);
         }
 
-        this.prepareLinkedItems();
-        this.prepareRelationshipData();
-        this.render(false);
+        await this.refreshLinkedData();
     }
 
     get hasOpposedRoll(): boolean {
@@ -366,8 +424,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             AdeptPowerPrep.prepareBaseData(this.system);
         else if (this.isType('sin'))
             SinPrep.prepareBaseData(this.system);
-        else if (this.asType('bioware', 'cyberware'))
-            WarePrep.prepareBaseData(this.system as Item.SystemOfType<'bioware' | 'cyberware'>);
+        else if (this.isType('bioware', 'cyberware'))
+            WarePrep.prepareBaseData(this.system, this.getEquippedMods());
 
         if (!this.isEmbedded) {
             this.prepareRelationshipData();
@@ -556,7 +614,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     getEquippedAmmo(): SR5Item<'ammo'> | undefined {
-        const equippedAmmos = (this.items || [])
+        const equippedAmmos = this.linkedChildren
             .filter((item) => item.isType('ammo') && item.isEquipped()) as SR5Item<'ammo'>[];
         return equippedAmmos[0];
     }
@@ -564,7 +622,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     getEquippedMods(): SR5Item<'modification'>[] {
         const type = this.modificationType();
         if (!type) return [];
-        return this.items.filter((item) =>
+        return this.linkedChildren.filter((item) =>
             item.isType('modification') &&
             item.system.type === type &&
             item.isEquipped()
@@ -746,7 +804,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
         // Collect all item data and update at once.
         const updateData: Item.UpdateData[] = [];
-        const ammoItems = this.items.filter(item => item.type === type);
+        const ammoItems = this.linkedChildren.filter(item => item.type === type);
 
         for (const item of ammoItems) {
             if (!unequipOthers && item.id !== id) continue;
@@ -905,25 +963,45 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             await Item.implementation.createDocuments(toCreate as Item.CreateData[]);
         }
 
-        this.prepareLinkedItems();
-        this.prepareRelationshipData();
-        this.render(false);
+        await this.refreshLinkedData();
 
         return true;
     }
 
     prepareLinkedItems() {
-        this.items = [];
-        if (!this.id) return;
+        if (!this.id) {
+            this.items = [];
+            return;
+        }
+        // Compendium relationships require an asynchronous query. Preserve an already-loaded
+        // cache across reset() so data preparation can use those linked documents.
         if (this.pack && !this.isEmbedded) return;
 
-        const collection = this.isEmbedded ? this.actorOwner?.items : game.items;
-        if (!collection) return;
+        this.items = this.linkedChildren;
+    }
 
-        this.items = collection.contents.filter(item => {
-            const linked = item as SR5Item;
-            return getProperty(linked.system, 'parentId') === this.id;
-        }) as SR5Item[];
+    /**
+     * Load relationships which cannot be resolved synchronously, primarily compendium siblings.
+     */
+    async loadLinkedItems(): Promise<SR5Item[]> {
+        if (!this.pack || this.isEmbedded) {
+            this.prepareLinkedItems();
+            return this.linkedChildren;
+        }
+
+        const contents = await this.contents;
+        this.items = Array.from(contents.values());
+        return this.items;
+    }
+
+    /**
+     * Reinitialize this item after its linked sibling documents change.
+     */
+    async refreshLinkedData({ render = true } = {}) {
+        if (this.pack && !this.isEmbedded) await this.loadLinkedItems();
+        this.reset();
+        if (this.isEmbedded) this.prepareRelationshipData();
+        if (render) this.render(false);
     }
 
     private _prepareNestedChildData(item: Item.Source): Item.Source | null {
@@ -940,10 +1018,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     // TODO: Rework to either use custom embeddedCollection or Map
-    getOwnedItem(itemId): SR5Item | undefined {
-        const items = this.items;
-        if (!items) return;
-        return items.find((item) => item.id === itemId);
+    getOwnedItem(itemId: string): SR5Item | undefined {
+        return this.linkedChildren.find((item) => item.id === itemId);
     }
 
     async updateNestedEffects(changes: OneOrMany<ActiveEffect.UpdateInput>) {
@@ -958,12 +1034,13 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         if (updates.length === 0) return;
 
         if (this.isEmbedded && this.actorOwner) {
-            await this.actorOwner.updateEmbeddedDocuments('Item', updates as Item.UpdateData[]);
+            await this.actorOwner.updateEmbeddedDocuments('Item', updates);
         } else if (this.pack) {
-            await Item.implementation.updateDocuments(updates as Item.UpdateData[], { pack: this.pack });
+            await Item.implementation.updateDocuments(updates, { pack: this.pack });
         } else {
-            await Item.implementation.updateDocuments(updates as Item.UpdateData[]);
+            await Item.implementation.updateDocuments(updates);
         }
+        await this.refreshLinkedData();
     }
 
     /**
@@ -983,9 +1060,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             await Item.implementation.deleteDocuments([deleted]);
         }
 
-        this.prepareLinkedItems();
-        this.prepareRelationshipData();
-        this.render(false);
+        await this.refreshLinkedData();
         return true;
     }
 
@@ -1706,6 +1781,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      */
     override async _preUpdate(...args: Parameters<Item['_preUpdate']>) {
         const [changed, options] = args;
+        if (foundry.utils.hasProperty(changed, 'system.parentId')) {
+            (options as any).sr5FormerParentId = getProperty(this.system, 'parentId');
+        }
+
         // Some Foundry core updates will no diff and just replace everything. This doesn't match with the
         // differential approach of action test injection. (NOTE: Changing ownership of a document)
         if (options.diff && options.recursive) {
@@ -1723,9 +1802,56 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @param args
      */
     override async _preDelete(...args: Parameters<Item['_preDelete']>) {
+        const [options] = args;
+        (options as any).sr5ParentId = getProperty(this.system, 'parentId');
         await this.clearLinkedChildren();
         await StorageFlow.deleteStorageReferences(this);
         return super._preDelete(...args);
+    }
+
+    override _onCreate(...args: Parameters<Item['_onCreate']>) {
+        super._onCreate(...args);
+        const [, options] = args;
+        if (options.render === false) return;
+        void this._refreshLinkedParents([getProperty(this.system, 'parentId')]);
+    }
+
+    override _onUpdate(...args: Parameters<Item['_onUpdate']>) {
+        super._onUpdate(...args);
+        const [, options] = args;
+        if (options.render === false) return;
+
+        void this._refreshLinkedParents([
+            (options as any).sr5FormerParentId,
+            getProperty(this.system, 'parentId'),
+        ]);
+    }
+
+    override _onDelete(...args: Parameters<Item['_onDelete']>) {
+        super._onDelete(...args);
+        const [options] = args;
+        if (options.render === false) return;
+        void this._refreshLinkedParents([(options as any).sr5ParentId]);
+    }
+
+    /**
+     * Re-prepare and rerender documents whose derived data depends on this linked item.
+     */
+    private async _refreshLinkedParents(parentIds: unknown[]) {
+        const ids = new Set(parentIds.filter((id): id is string => typeof id === 'string' && id.length > 0));
+        for (const parentId of ids) {
+            let parent: SR5Item | undefined;
+            if (this.isEmbedded) {
+                parent = this.actorOwner?.items.get(parentId);
+            } else if (this.pack) {
+                parent = await game.packs.get(this.pack)?.getDocument(parentId) as SR5Item | undefined;
+            } else {
+                parent = game.items?.get(parentId);
+            }
+            if (!parent) continue;
+
+            await parent.refreshLinkedData();
+        }
     }
 
     /**

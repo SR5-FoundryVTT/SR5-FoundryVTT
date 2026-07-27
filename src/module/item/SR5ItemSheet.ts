@@ -360,6 +360,10 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      * The prepared data object contains both the actor data as well as additional sheet options
      */
     override async _prepareContext(options: DeepPartial<SR5ApplicationMixinTypes.RenderOptions> & { isFirstRender: boolean }) {
+        if (this.item.pack && !this.item.isEmbedded) {
+            await this.item.refreshLinkedData({ render: false });
+        }
+
         const data = await super._prepareContext(options) as T;
         const itemData = this.item.toObject(false).system as SR5Item['system'];
         data.actor = this.item.actorOwner;
@@ -408,7 +412,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
          * - Modification items are grouped by their specific system type (e.g., 'weapon', 'armor', etc.).
          * - All other items are grouped under 'other'.
          */
-        const grouped = Object.groupBy(this.item.items, item => {
+        const grouped = Object.groupBy(this.item.linkedChildren, item => {
             if (item.isType('ammo')) return 'ammo';
             if (item.isType('modification')) return item.system.type;
             return 'other';
@@ -1415,22 +1419,23 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             return item.update({ 'system.parentId': this.item.id } as any);
         }
 
-        const itemData = item.toObject() as Item.CreateData;
-        delete itemData._id;
-        foundry.utils.setProperty(itemData, 'system.parentId', this.item.id);
+        const itemData = await SR5Item.createWithLinkedItems([item], { parentId: this.item.id });
+        if (itemData.length === 0) return null;
 
         if (this.item.isEmbedded && this.item.actorOwner) {
-            const created = await this.item.actorOwner.createEmbeddedDocuments('Item', [itemData]);
+            const created = await this.item.actorOwner.createEmbeddedDocuments('Item', itemData, { keepId: true });
             return created?.[0] ?? null;
         }
 
         if (this.item.pack) {
-            const created = await Item.implementation.createDocuments([itemData], { pack: this.item.pack });
+            const created = await Item.implementation.createDocuments(itemData, { pack: this.item.pack, keepId: true });
             return created?.[0] ?? null;
         }
 
-        if (this.item.folder) itemData.folder = this.item.folder.id;
-        const created = await Item.implementation.createDocuments([itemData]);
+        if (this.item.folder) {
+            for (const data of itemData) data.folder = this.item.folder.id;
+        }
+        const created = await Item.implementation.createDocuments(itemData, { keepId: true });
         return created?.[0] ?? null;
     }
 
@@ -1454,26 +1459,27 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             return item.update(update as any);
         }
 
-        const itemData = item.toObject() as Item.CreateData;
-        delete itemData._id;
-        foundry.utils.setProperty(itemData, 'system.parentId', this.item.id);
+        const itemData = await SR5Item.createWithLinkedItems([item], { parentId: this.item.id });
+        if (itemData.length === 0) return null;
 
         if (item.isType('modification')) {
-            foundry.utils.setProperty(itemData, 'system.type', modType);
+            foundry.utils.setProperty(itemData[0], 'system.type', modType);
         }
 
         if (this.item.isEmbedded && this.item.actorOwner) {
-            const created = await this.item.actorOwner.createEmbeddedDocuments('Item', [itemData]);
+            const created = await this.item.actorOwner.createEmbeddedDocuments('Item', itemData, { keepId: true });
             return created?.[0] ?? null;
         }
 
         if (this.item.pack) {
-            const created = await Item.implementation.createDocuments([itemData], { pack: this.item.pack });
+            const created = await Item.implementation.createDocuments(itemData, { pack: this.item.pack, keepId: true });
             return created?.[0] ?? null;
         }
 
-        if (this.item.folder) itemData.folder = this.item.folder.id;
-        const created = await Item.implementation.createDocuments([itemData]);
+        if (this.item.folder) {
+            for (const data of itemData) data.folder = this.item.folder.id;
+        }
+        const created = await Item.implementation.createDocuments(itemData, { keepId: true });
         return created?.[0] ?? null;
     }
 
