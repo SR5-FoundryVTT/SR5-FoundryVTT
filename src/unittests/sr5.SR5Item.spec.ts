@@ -28,9 +28,9 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
             const weapon = await factory.createItem({type: 'weapon', system: {category: 'range'}});
             const ammo = await factory.createItem({type: 'ammo'});
 
-            await weapon.createLinkedItem(ammo.toObject());
+            await weapon.createChildItems(ammo.toObject());
 
-            const linkedItemDatas = weapon.getNestedItems();
+            const linkedItemDatas = weapon.getChildItemSources();
             assert.isNotEmpty(linkedItemDatas);
             assert.lengthOf(linkedItemDatas, 1);
 

@@ -37,7 +37,6 @@ export function prepareSortedItemEffects(document: SR5Actor|SR5Item, options: Ap
 
 interface ApplicableItemEffectOptions {
     applyTo?: string[]
-    nestedItems?: boolean
 }
 
 interface ApplicableDocumentEffectOptions {
@@ -71,7 +70,9 @@ export function *allApplicableDocumentEffects(document: SR5Actor|SR5Item, option
 export function *allApplicableItemsEffects(document: SR5Actor|SR5Item, options: ApplicableItemEffectOptions = {}) {
     const applyTo = options.applyTo ?? [];
 
-    for (const item of document.items) {
+    const items = document instanceof SR5Item ? document.childItems : document.items;
+
+    for (const item of items) {
         for (const effect of item.effects) {
             if (applyTo.length > 0 && !effect.appliesToAnyOf(applyTo)) continue ;
             yield effect;

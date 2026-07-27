@@ -22,7 +22,7 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
         const item = items[0] as SR5Item<'weapon'>;
 
         const ammoItem = await factory.createItem({type: 'ammo', system: {technology: {quantity: ammoQuantity, equipped: true}}});
-        await item.createLinkedItem(ammoItem.toObject());
+        await item.createChildItems(ammoItem.toObject());
 
         return item;
     };
@@ -31,7 +31,7 @@ export const shadowrunSR5RangedWeaponRules = (context: QuenchBatchContext) => {
         it('Item recoil compensation', async () => {
             const weapon = await factory.createItem({type: 'weapon', system: {category: 'range' }});
             const modification = await factory.createItem({type: 'modification', system: {type: 'weapon', mod_weapon: {rc: 2}, technology: {equipped: true}}});
-            await weapon.createLinkedItem(modification.toObject());
+            await weapon.createChildItems(modification.toObject());
 
             assert.strictEqual(weapon.system.range.rc.value, 2);
         });

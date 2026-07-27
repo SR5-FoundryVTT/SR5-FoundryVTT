@@ -318,10 +318,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
     prepareLinkedItemRelationships() {
         const items = this.items as unknown as SR5Item[];
-        for (const item of items) {
-            item.prepareLinkedItems();
-        }
-
         const prepared = [...items].sort((left, right) => this._attachmentDepth(right) - this._attachmentDepth(left));
         for (const item of prepared) {
             item.prepareRelationshipData();

@@ -14,7 +14,7 @@ export class SR5ItemCompendium extends foundry.applications.sidebar.apps.Compend
         root.updateSource({ system: { parentId: null } });
         const created = (await collection.importDocument(root, { dialog: true } as any))!;
 
-        const contents = await entry.contents;
+        const contents = await entry.loadContents();
         if (contents.size === 0) return created;
 
         const itemData = await SR5Item.createWithLinkedItems(Array.from(contents.values()), {

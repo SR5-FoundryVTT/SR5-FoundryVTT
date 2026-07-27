@@ -25,7 +25,7 @@ export class SR5Items extends foundry.documents.collections.Items {
         const source = await pack.getDocument(id) as SR5Item | undefined;
         if (!source) return created;
 
-        const contents = await source.contents;
+        const contents = await source.loadContents();
         if (contents.size === 0) return created;
 
         const fromOptions = foundry.utils.mergeObject({ clearSort: false }, options);

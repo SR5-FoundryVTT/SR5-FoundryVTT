@@ -148,7 +148,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
                 system: { technology: { cost: { base: 500, value: 500 } } },
             }]) as SR5Item<'weapon'>[];
 
-            await weapon.createLinkedItem({
+            await weapon.createChildItems({
                 type: 'modification',
                 name: 'Nested Mod',
                 system: { technology: { cost: { base: 100, value: 100 } } },
@@ -165,7 +165,7 @@ export const shadowrunSR5ItemDataPrep = (context: QuenchBatchContext) => {
 
             actor.prepareData();
 
-            const nested = weapon.items[0] as SR5Item<'modification'>;
+            const nested = weapon.childItems.contents[0] as SR5Item<'modification'>;
             assert.exists(nested);
             assert.strictEqual(nested.system.technology.cost.base, 100);
             assert.strictEqual(nested.system.technology.cost.changes.length, 1);

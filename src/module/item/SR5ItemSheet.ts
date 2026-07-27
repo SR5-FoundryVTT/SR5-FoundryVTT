@@ -412,7 +412,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
          * - Modification items are grouped by their specific system type (e.g., 'weapon', 'armor', etc.).
          * - All other items are grouped under 'other'.
          */
-        const grouped = Object.groupBy(this.item.linkedChildren, item => {
+        const grouped = Object.groupBy(this.item.childItems, item => {
             if (item.isType('ammo')) return 'ammo';
             if (item.isType('modification')) return item.system.type;
             return 'other';
@@ -430,7 +430,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         data['droneMods'] = sortByName((grouped.drone ?? []) as SR5Item<'modification'>[]);
 
         if (this.item.isType('container')) {
-            const contents = await this.item.contents;
+            const contents = await this.item.loadContents();
             data['containerContents'] = this._prepareContainerContents(sortByName(Array.from(contents.values()) as SR5Item[]));
             const max = Number(foundry.utils.getProperty(this.item.system, 'capacity.count') ?? 0);
             data['containerCapacity'] = max > 0 ? `${contents.size}/${max}` : `${contents.size}`;
@@ -770,7 +770,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     static async #addItemQty(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         const id = SheetFlow.closestItemId(event.target);
-        const item = this.item.getOwnedItem(id);
+        const item = this.item.getChildItem(id);
         if (item) {
             await SheetFlow.addToQuantity(item, event);
         }
@@ -779,7 +779,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     static async #removeItemQty(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         const id = SheetFlow.closestItemId(event.target);
-        const item = this.item.getOwnedItem(id);
+        const item = this.item.getChildItem(id);
         if (item) {
             await SheetFlow.removeFromQuantity(item, event);
         }
@@ -788,7 +788,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     static async #equipItem(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         const id = SheetFlow.closestItemId(event.target);
-        const item = this.item.getOwnedItem(id);
+        const item = this.item.getChildItem(id);
         if (id && item) {
             if (item.type === 'modification') {
                 await this.item.equipModification(id);
@@ -801,7 +801,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     static async #editItem(this: SR5ItemSheet, event: Event) {
         event.preventDefault();
         const id = SheetFlow.closestItemId(event.target);
-        const item = this.item.getOwnedItem(id);
+        const item = this.item.getChildItem(id);
         if (item) {
             await item.sheet?.render(true);
         }
@@ -814,9 +814,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (!userConsented) return;
 
         const id = SheetFlow.closestItemId(event.target);
-        const item = this.item.getOwnedItem(id);
+        const item = this.item.getChildItem(id);
         if (id && item) {
-            await this.item.deleteOwnedItem(id);
+            await this.item.deleteChildItem(id);
         }
     }
 
@@ -860,7 +860,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             SR5ItemSheet.addModificationItem(this.item, itemData as Item.CreateData<'modification'>);
 
         const item = new SR5Item(itemData);
-        await this.item.createLinkedItem(item._source);
+        await this.item.createChildItems(item._source);
     }
 
     /**
@@ -963,7 +963,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
      */
     async _onListItemChangeQuantity(event: Event) {
         const iid = SheetFlow.closestItemId(event.currentTarget);
-        const item = this.item.getOwnedItem(iid);
+        const item = this.item.getChildItem(iid);
         const quantity = parseInt((event.currentTarget as HTMLInputElement).value);
 
         if (!quantity || !item?.system?.technology) {
@@ -1170,7 +1170,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                 icon: "<i class='fas fa-pen-to-square'></i>",
                 callback: async (target: HTMLElement) => {
                     const id = SheetFlow.closestItemId(target);
-                    const item = this.item.getOwnedItem(id);
+                    const item = this.item.getChildItem(id);
                     if (item) {
                         await item.sheet?.render(true)
                     }
@@ -1183,9 +1183,9 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
                     const userConsented = await Helpers.confirmDeletion();
                     if (!userConsented) return;
                     const id = SheetFlow.closestItemId(target);
-                    const item = this.item.getOwnedItem(id);
+                    const item = this.item.getChildItem(id);
                     if (item?.id) {
-                        await this.item.deleteOwnedItem(item.id);
+                        await this.item.deleteChildItem(item.id);
                     }
                 }
             }
@@ -1408,7 +1408,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             return null;
         }
 
-        const contents = await this.item.contents;
+        const contents = await this.item.loadContents();
         const max = Number(foundry.utils.getProperty(this.item.system, 'capacity.count') ?? 0);
         if (max > 0 && contents.size >= max) {
             ui.notifications?.warn(game.i18n.localize('SR5.Container.Full'));
@@ -1538,7 +1538,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         // Owned Items
         if (target.dataset.itemId) {
-            const item = this.item.getOwnedItem(target.dataset.itemId);
+            const item = this.item.getChildItem(target.dataset.itemId);
             if (item) {
                 dragData = item.toDragData();
             }
