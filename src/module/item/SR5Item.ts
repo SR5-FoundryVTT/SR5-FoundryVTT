@@ -38,6 +38,8 @@ import { allApplicableDocumentEffects } from '../effects';
 import { SR5ActiveEffect } from '../effect/SR5ActiveEffect';
 
 type OneOrMany<T> = T | T[];
+// Former parentId per updated document, stashed on the operation options shared by the whole batch.
+type FormerParentIdOptions = { sr5FormerParentIds?: Record<string, string | null | undefined> };
 type LinkedItemTransformer = (item: SR5Item, depth: number) => Item.CreateData | Promise<Item.CreateData>;
 interface CreateWithLinkedItemsOptions {
     parentId?: string | null;
@@ -78,6 +80,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             const transformed = transformAll ? await transformAll(item, depth) : item.toObject();
             const itemData = foundry.utils.deepClone(transformed);
             itemData._id = foundry.utils.randomID();
+            // CreateData.system is a per subtype union, which a direct write can't satisfy.
             setProperty(itemData, 'system.parentId', linkedParentId);
             created.push(itemData);
 
@@ -114,6 +117,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
         const childIdsByParent = new Map<string, string[]>();
         for (const item of await SR5Item._deletionSource(operation)) {
+            // Compendium index entries don't declare system fields, so this can't be read typed.
             const parentId = getProperty(item, 'system.parentId');
             if (typeof item._id !== 'string' || typeof parentId !== 'string' || !parentId) continue;
 
@@ -208,7 +212,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     get parentItem() {
-        const parentId = getProperty(this.system, 'parentId') as string | null | undefined;
+        const parentId = this.system.parentId;
         if (!parentId) return;
 
         if (this.isEmbedded) return this.actor?.items.get(parentId) as SR5Item | undefined;
@@ -238,7 +242,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * The storage container this item belongs to, if any.
      */
     get container(): SR5Item | Promise<SR5Item | undefined> | undefined {
-        const parentId = getProperty(this.system, 'parentId') as string | null | undefined;
+        const parentId = this.system.parentId;
         if (!parentId) return undefined;
 
         if (this.isEmbedded) {
@@ -926,6 +930,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         if (!SR5Item.isAttachment(this.type, item.type) || !this.id) return null;
 
         delete (item as Partial<Item.Source>)._id;
+        // Source.system is a per subtype union, which a direct write can't satisfy.
         setProperty(item, 'system.parentId', this.id);
         setProperty(item, '_stats.systemVersion', game.system.version);
 
@@ -1681,8 +1686,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         const [changed, options] = args;
         const id = this.id;
         if (id && foundry.utils.hasProperty(changed, 'system.parentId')) {
-            const formerParentIds = ((options as any).sr5FormerParentIds ??= {});
-            formerParentIds[id] = getProperty(this.system, 'parentId');
+            const formerParentIds = ((options as FormerParentIdOptions).sr5FormerParentIds ??= {});
+            formerParentIds[id] = this.system.parentId;
         }
 
         // Some Foundry core updates will no diff and just replace everything. This doesn't match with the
@@ -1710,7 +1715,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         super._onCreate(...args);
         const [, options] = args;
         if (options.render === false) return;
-        void this._refreshLinkedParents([getProperty(this.system, 'parentId')]);
+        void this._refreshLinkedParents([this.system.parentId]);
     }
 
     override _onUpdate(...args: Parameters<Item['_onUpdate']>) {
@@ -1718,9 +1723,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         const [, options] = args;
         if (options.render === false) return;
 
+        const formerParentIds = (options as FormerParentIdOptions).sr5FormerParentIds;
         void this._refreshLinkedParents([
-            this.id ? (options as any).sr5FormerParentIds?.[this.id] : undefined,
-            getProperty(this.system, 'parentId'),
+            this.id ? formerParentIds?.[this.id] : undefined,
+            this.system.parentId,
         ]);
     }
 
@@ -1728,14 +1734,14 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         super._onDelete(...args);
         const [options] = args;
         if (options.render === false) return;
-        void this._refreshLinkedParents([getProperty(this.system, 'parentId')]);
+        void this._refreshLinkedParents([this.system.parentId]);
     }
 
     /**
      * Re-prepare and rerender documents whose derived data depends on this linked item.
      */
-    private async _refreshLinkedParents(parentIds: unknown[]) {
-        const ids = new Set(parentIds.filter((id): id is string => typeof id === 'string' && id.length > 0));
+    private async _refreshLinkedParents(parentIds: (string | null | undefined)[]) {
+        const ids = new Set(parentIds.filter((id): id is string => !!id));
         for (const parentId of ids) {
             let parent: SR5Item | undefined;
             if (this.isEmbedded) {

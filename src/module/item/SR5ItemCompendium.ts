@@ -1,6 +1,14 @@
 import { SR5Item } from './SR5Item';
 
 /**
+ * A pack entry, either a document or an index entry, which only carries requested system fields.
+ */
+interface CompendiumItemEntry {
+    _id?: string | null;
+    system?: { parentId?: string | null };
+}
+
+/**
  * Compendium application with support for sibling item relationships.
  *
  * Mirrors dnd5e's approach: keep child items in the pack/index as real documents,
@@ -37,7 +45,7 @@ export class SR5ItemCompendium extends foundry.applications.sidebar.apps.Compend
         await super._onRender(...args);
 
         const collection = (this as any).collection as foundry.documents.collections.CompendiumCollection<'Item'>;
-        let items: Iterable<any> = collection;
+        let items: Iterable<CompendiumItemEntry> = collection;
 
         if (collection.index) {
             await collection.getIndex({ fields: ['system.parentId'] });
@@ -50,17 +58,17 @@ export class SR5ItemCompendium extends foundry.applications.sidebar.apps.Compend
         }
     }
 
-    static linkedChildIds(items: Iterable<any>): string[] {
+    static linkedChildIds(items: Iterable<CompendiumItemEntry>): string[] {
         const ids = new Set<string>();
         const entries = Array.from(items);
 
         for (const item of entries) {
-            if (typeof item?._id === 'string') ids.add(item._id);
+            if (typeof item._id === 'string') ids.add(item._id);
         }
 
-        return entries.flatMap((item: Item.Implementation) => {
-            const parentId = foundry.utils.getProperty(item, 'system.parentId');
-            return typeof item?._id === 'string' && typeof parentId === 'string' && ids.has(parentId) ? [item._id] : [];
+        return entries.flatMap(item => {
+            const parentId = item.system?.parentId;
+            return typeof item._id === 'string' && !!parentId && ids.has(parentId) ? [item._id] : [];
         });
     }
 }

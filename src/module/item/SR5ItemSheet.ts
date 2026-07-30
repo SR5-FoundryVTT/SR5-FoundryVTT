@@ -431,7 +431,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (this.item.isType('container')) {
             const contents = await this.item.loadContents();
             data['containerContents'] = this._prepareContainerContents(sortByName(Array.from(contents.values()) as SR5Item[]));
-            const max = Number(foundry.utils.getProperty(this.item.system, 'capacity.count') ?? 0);
+            const max = this.item.system.capacity.count;
             data['containerCapacity'] = max > 0 ? `${contents.size}/${max}` : `${contents.size}`;
             data['containerCapacityFull'] = max > 0 && contents.size >= max;
         }
@@ -518,75 +518,38 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     }
 
     private _getContainerItemValues(item: SR5Item): string[] {
-        const system = item.system as Record<string, any>;
-        const technology = system.technology ?? {};
         const values: string[] = [];
 
-        switch (item.type) {
-            case 'weapon': {
-                const current = foundry.utils.getProperty(system, 'ammo.current.value');
-                const max = foundry.utils.getProperty(system, 'ammo.current.max');
-                if (typeof current === 'number' && typeof max === 'number' && max > 0) {
-                    values.push(`${current}/${max}`);
-                }
-                break;
-            }
-            case 'armor': {
-                const armorValue = foundry.utils.getProperty(system, 'armor.value');
-                const hardenedValue = foundry.utils.getProperty(system, 'armor.hardened');
-                if (typeof armorValue === 'number') {
-                    values.push(typeof hardenedValue === 'number' && hardenedValue > 0 ? `${armorValue}/${hardenedValue}H` : `${armorValue}`);
-                }
-                break;
-            }
-            case 'contact': {
-                const connection = system.connection;
-                const loyalty = system.loyalty;
-                if (typeof connection === 'number' || typeof loyalty === 'number') {
-                    values.push(`C/L ${connection ?? 0}/${loyalty ?? 0}`);
-                }
-                break;
-            }
-            case 'lifestyle': {
-                if (typeof system.cost === 'number' && system.cost > 0) {
-                    values.push(`¥${Number(system.cost).toLocaleString(game.i18n.lang)}`);
-                }
-                break;
-            }
-            case 'complex_form': {
-                if (typeof system.fade === 'number' && system.fade > 0) {
-                    values.push(`Fade ${system.fade}`);
-                }
-                break;
-            }
-            case 'spell': {
-                if (typeof system.drain === 'number' && system.drain > 0) {
-                    values.push(`Drain ${system.drain}`);
-                }
-                break;
-            }
-            case 'adept_power': {
-                if (typeof system.level === 'number' && system.level > 0) {
-                    values.push(`Lvl ${system.level}`);
-                }
-                break;
-            }
+        if (item.isType('weapon')) {
+            const { value, max } = item.system.ammo.current;
+            if (max > 0) values.push(`${value}/${max}`);
+        } else if (item.isType('armor')) {
+            // ArmorPrep keeps value and hardened mutually exclusive.
+            const { value, hardened } = item.system.armor;
+            values.push(hardened > 0 ? `${hardened}H` : `${value}`);
+        } else if (item.isType('contact')) {
+            values.push(`C/L ${item.system.connection}/${item.system.loyalty}`);
+        } else if (item.isType('lifestyle')) {
+            if (item.system.cost > 0) values.push(`¥${item.system.cost.toLocaleString(game.i18n.lang)}`);
+        } else if (item.isType('complex_form')) {
+            if (item.system.fade > 0) values.push(`Fade ${item.system.fade}`);
+        } else if (item.isType('spell')) {
+            if (item.system.drain > 0) values.push(`Drain ${item.system.drain}`);
+        } else if (item.isType('adept_power')) {
+            if (item.system.level > 0) values.push(`Lvl ${item.system.level}`);
         }
 
-        const rating = typeof technology.rating === 'number' ? technology.rating : system.rating;
-        if (typeof rating === 'number' && rating > 0 && !values.some(value => value.startsWith('Rtg '))) {
-            values.push(`Rtg ${rating}`);
-        }
+        const technology = item.getTechnologyData();
 
-        const quantity = typeof technology.quantity === 'number' ? technology.quantity : system.quantity;
-        if (typeof quantity === 'number' && quantity > 0) {
-            values.push(`Qty ${quantity}`);
-        }
+        // Types without technology carry their own rating, critter powers, hosts and qualities.
+        const rating = technology?.rating ?? item.system.rating ?? 0;
+        if (rating > 0) values.push(`Rtg ${rating}`);
 
-        const availability = foundry.utils.getProperty(system, 'technology.calculated.availability.value') ?? technology.availability;
-        if (typeof availability === 'string' && availability.length > 0) {
-            values.push(`Avail ${availability}`);
-        }
+        const quantity = technology?.quantity ?? 0;
+        if (quantity > 0) values.push(`Qty ${quantity}`);
+
+        const availability = technology?.availability.label;
+        if (availability) values.push(`Avail ${availability}`);
 
         return values.slice(0, 3);
     }
@@ -612,7 +575,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         const selectedSkills = [this.document.system.action?.skill, this.document.system.action?.opposed?.skill]
             .filter((selectedSkill): selectedSkill is string => !!selectedSkill);
 
-        return await SkillSelectionFlow.getSkillSelection(this.item.actor ?? undefined, {
+        return await SkillSelectionFlow.getSkillSelection(this.item.actor, {
             categories: ['active'],
             selectedSkills,
             valueType: 'key',
@@ -830,7 +793,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         const id = SheetFlow.closestItemId(event.target);
         const item = await this.item.getContainedItem(id) as SR5Item | undefined;
-        await item?.update({ 'system.parentId': null } as any);
+        await item?.update({ system: { parentId: null } });
     }
 
     static async #deleteContainerItem(this: SR5ItemSheet, event: Event) {
@@ -1395,42 +1358,42 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     }
 
     protected async _onDropContainerItem(item: SR5Item) {
-        if (!this.item.isOwner || !this.item.id) return null;
+        const container = this.item.asType('container');
+        if (!container?.isOwner || !container.id) return null;
 
-        const currentParentId = foundry.utils.getProperty(item.system, 'parentId');
-        if (currentParentId === this.item.id) return item;
+        if (item.system.parentId === container.id) return item;
 
-        if (!await this.item.canContainItem(item)) {
+        if (!await container.canContainItem(item)) {
             ui.notifications?.warn(game.i18n.localize('SR5.Container.CannotContain'));
             return null;
         }
 
-        const contents = await this.item.loadContents();
-        const max = Number(foundry.utils.getProperty(this.item.system, 'capacity.count') ?? 0);
+        const contents = await container.loadContents();
+        const max = container.system.capacity.count;
         if (max > 0 && contents.size >= max) {
             ui.notifications?.warn(game.i18n.localize('SR5.Container.Full'));
             return null;
         }
 
         if (this._sameItemCollection(item)) {
-            return item.update({ 'system.parentId': this.item.id } as any);
+            return item.update({ system: { parentId: container.id } });
         }
 
-        const itemData = await SR5Item.createWithLinkedItems([item], { parentId: this.item.id });
+        const itemData = await SR5Item.createWithLinkedItems([item], { parentId: container.id });
         if (itemData.length === 0) return null;
 
-        if (this.item.isEmbedded && this.item.actor) {
-            const created = await this.item.actor.createEmbeddedDocuments('Item', itemData, { keepId: true });
+        if (container.isEmbedded && container.actor) {
+            const created = await container.actor.createEmbeddedDocuments('Item', itemData, { keepId: true });
             return created?.[0] ?? null;
         }
 
-        if (this.item.pack) {
-            const created = await Item.implementation.createDocuments(itemData, { pack: this.item.pack, keepId: true });
+        if (container.pack) {
+            const created = await Item.implementation.createDocuments(itemData, { pack: container.pack, keepId: true });
             return created?.[0] ?? null;
         }
 
-        if (this.item.folder) {
-            for (const data of itemData) data.folder = this.item.folder.id;
+        if (container.folder) {
+            for (const data of itemData) data.folder = container.folder.id;
         }
         const created = await Item.implementation.createDocuments(itemData, { keepId: true });
         return created?.[0] ?? null;
@@ -1445,21 +1408,18 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (item.isType('modification') && !modType) return null;
 
         if (this._sameItemCollection(item)) {
-            const update: Record<string, unknown> = {
-                'system.parentId': this.item.id,
-            };
-
             if (item.isType('modification')) {
-                update['system.type'] = modType;
+                return item.update({ system: { parentId: this.item.id, type: modType } });
             }
 
-            return item.update(update as any);
+            return item.update({ system: { parentId: this.item.id } });
         }
 
         const itemData = await SR5Item.createWithLinkedItems([item], { parentId: this.item.id });
         if (itemData.length === 0) return null;
 
         if (item.isType('modification')) {
+            // CreateData.system is a per subtype union, which a direct write can't satisfy.
             foundry.utils.setProperty(itemData[0], 'system.type', modType);
         }
 

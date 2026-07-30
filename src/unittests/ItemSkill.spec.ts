@@ -492,7 +492,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             PackItemFlow.getPackSkills = async () => [];
 
             try {
-                const skills = await SkillSelectionFlow.getSkillSelection(undefined, {
+                const skills = await SkillSelectionFlow.getSkillSelection(null, {
                     categories: ['active'],
                     selectedSkills: ['Custom Missing Skill'],
                 });
@@ -508,7 +508,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             PackItemFlow.getPackSkills = async () => [];
 
             try {
-                const skills = await SkillSelectionFlow.getSkillSelection(undefined, {
+                const skills = await SkillSelectionFlow.getSkillSelection(null, {
                     categories: ['active'],
                     selectedSkills: ['Custom Missing Skill'],
                     valueType: 'key',
