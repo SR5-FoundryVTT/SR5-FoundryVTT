@@ -532,5 +532,19 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(character.system.track.stun.disabled, true);
             assert.strictEqual(character.system.track.physical.disabled, false);
         });
+
+        it('NPC essence should keep decimal precision (GH#2009)', async () => {
+            const character = await factory.createActor({ type: 'character', system: { is_npc: true } });
+            await character.createEmbeddedDocuments('Item', [{
+                type: 'cyberware',
+                name: 'Cybereyes',
+                system: {
+                    essence: 0.75,
+                    technology: { equipped: true }
+                }
+            }]);
+
+            assert.strictEqual(character.system.attributes.essence.value, SR.attributes.defaults['essence'] - 0.75);
+        });
     });
 };
