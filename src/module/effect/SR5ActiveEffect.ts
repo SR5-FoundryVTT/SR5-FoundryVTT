@@ -143,15 +143,6 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
-     * Always returns the parent actor of the effect, even if the effect is applied to an item.
-     */
-    override get actor(): SR5Actor | null {
-        if (this.parent instanceof SR5Actor) return this.parent;
-        if (this.parent instanceof SR5Item) return this.parent.actorOwner ?? null;
-        return null;
-    }
-
-    /**
      * Use to display this effect on sheet, including a possible parent item structure.
      */
     public get sheetName(): string | null {

@@ -46,7 +46,6 @@ export interface SR5BaseItemSheetData extends ItemSheet.RenderContext, SR5Applic
     slaves?: (SR5Item | SR5Actor)[];
 
     // State flags
-    isNestedItem: boolean;
     isUsingRangeCategory: boolean;
 
     // Tests
@@ -71,7 +70,7 @@ export interface SR5BaseItemSheetData extends ItemSheet.RenderContext, SR5Applic
  * Template fields for item sheet
  */
 interface SR5ItemSheetData extends SR5BaseItemSheetData {
-    // Nested item typing for different sheets
+    // Child item typing for different sheets
     ammunition: SR5Item<'ammo'>[]
     wareMods: SR5Item<'modification'>[]
     weaponMods: SR5Item<'modification'>[]
@@ -366,7 +365,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         const data = await super._prepareContext(options) as T;
         const itemData = this.item.toObject(false).system as SR5Item['system'];
-        data.actor = this.item.actorOwner;
+        data.actor = this.item.actor ?? undefined;
 
         if ('action' in itemData && itemData.action) {
             try {
@@ -407,7 +406,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         }
 
         /**
-         * Groups nested items by their type for rendering on the item sheet.
+         * Groups child items by their type for rendering on the item sheet.
          * - Ammo items are grouped under 'ammo'.
          * - Modification items are grouped by their specific system type (e.g., 'weapon', 'armor', etc.).
          * - All other items are grouped under 'other'.
@@ -418,7 +417,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             return 'other';
         });
 
-        // Sort nested items by name before assigning to template data
+        // Sort child items by name before assigning to template data
         const sortByName = <T extends { name: string }>(arr: T[]) =>
             arr.toSorted((a, b) => a.name.localeCompare(b.name, game.i18n.lang));
 
@@ -494,7 +493,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         data.item = this.item;
 
-        data.isNestedItem = this.item._isNestedItem;
         data.bindings = this._prepareKeybindings();
 
         return data;
@@ -614,8 +612,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         const selectedSkills = [this.document.system.action?.skill, this.document.system.action?.opposed?.skill]
             .filter((selectedSkill): selectedSkill is string => !!selectedSkill);
 
-        // Instead of item.parent, use the actorOwner as NestedItems have an actor grand parent.
-        return await SkillSelectionFlow.getSkillSelection(this.item.actorOwner, {
+        return await SkillSelectionFlow.getSkillSelection(this.item.actor ?? undefined, {
             categories: ['active'],
             selectedSkills,
             valueType: 'key',
@@ -652,7 +649,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         html.find('select[name="change-ammo"]').on('change', this._onAmmoSelect.bind(this));
         html.find('select[name="change-clip-type"]').on('change', (event) => { void this._onClipSelect((event.target as HTMLSelectElement).value) });
 
-        // Inline change handlers for nested list items (qty inputs in edit mode)
+        // Inline change handlers for child list items (qty inputs in edit mode)
         html.find('input[data-system-action="changeItemQty"]').on('change', this._onListItemChangeQuantity.bind(this));
 
         // Marks handling
@@ -864,7 +861,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     }
 
     /**
-     * Set nested modification type to match the parent item.
+     * Set child modification type to match the parent item.
      */
     static addModificationItem(parentItem: SR5Item, itemData: Item.CreateData<'modification'>) {
         const type = parentItem.modificationType();
@@ -958,7 +955,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     }
 
     /**
-     * Change the quantity on a nested item shown within this item sheet's list.
+     * Change the quantity on a child item shown within this item sheet's list.
      * @param event A DOM event
      */
     async _onListItemChangeQuantity(event: Event) {
@@ -1150,8 +1147,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
     override async _onFirstRender(context, options) {
         await super._onFirstRender(context, options);
 
-        this._createContextMenu(this._getNestedItemContextOptions.bind(this), "[data-item-id]", {
-            hookName: "getNestedItemContextOptions",
+        this._createContextMenu(this._getChildItemContextOptions.bind(this), "[data-item-id]", {
+            hookName: "getChildItemContextOptions",
             jQuery: false,
             fixed: true,
         });
@@ -1162,7 +1159,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         });
     }
 
-    _getNestedItemContextOptions() {
+    _getChildItemContextOptions() {
         return [
             SheetFlow._getSourceContextOption(),
             {
@@ -1422,8 +1419,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         const itemData = await SR5Item.createWithLinkedItems([item], { parentId: this.item.id });
         if (itemData.length === 0) return null;
 
-        if (this.item.isEmbedded && this.item.actorOwner) {
-            const created = await this.item.actorOwner.createEmbeddedDocuments('Item', itemData, { keepId: true });
+        if (this.item.isEmbedded && this.item.actor) {
+            const created = await this.item.actor.createEmbeddedDocuments('Item', itemData, { keepId: true });
             return created?.[0] ?? null;
         }
 
@@ -1466,8 +1463,8 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
             foundry.utils.setProperty(itemData[0], 'system.type', modType);
         }
 
-        if (this.item.isEmbedded && this.item.actorOwner) {
-            const created = await this.item.actorOwner.createEmbeddedDocuments('Item', itemData, { keepId: true });
+        if (this.item.isEmbedded && this.item.actor) {
+            const created = await this.item.actor.createEmbeddedDocuments('Item', itemData, { keepId: true });
             return created?.[0] ?? null;
         }
 
@@ -1504,7 +1501,7 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
     private _sameItemCollection(item: SR5Item) {
         const target = this.item;
-        const sameActor = target.isEmbedded && item.isEmbedded && target.actorOwner === item.actorOwner;
+        const sameActor = target.isEmbedded && item.isEmbedded && target.actor === item.actor;
         const samePack = !target.isEmbedded && !item.isEmbedded && !!target.pack && target.pack === item.pack;
         const sameWorld = !target.isEmbedded && !item.isEmbedded && !target.pack && !item.pack;
         return sameActor || samePack || sameWorld;

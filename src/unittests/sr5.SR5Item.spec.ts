@@ -30,7 +30,7 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
 
             await weapon.createChildItems(ammo.toObject());
 
-            const linkedItemDatas = weapon.getChildItemSources();
+            const linkedItemDatas = weapon.childItems.map(item => item.toObject(false));
             assert.isNotEmpty(linkedItemDatas);
             assert.lengthOf(linkedItemDatas, 1);
 

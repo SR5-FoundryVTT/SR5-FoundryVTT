@@ -1974,7 +1974,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         // CASE - Vehicle marks are stored on their master actor.
         if (this.isType('vehicle')) {
             const master = this.master;
-            return master?.actorOwner;
+            return master?.actor;
         }
 
         // DEFAULT CASE
