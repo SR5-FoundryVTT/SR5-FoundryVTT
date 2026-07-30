@@ -1792,8 +1792,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      */
     override async _preUpdate(...args: Parameters<Item['_preUpdate']>) {
         const [changed, options] = args;
-        if (foundry.utils.hasProperty(changed, 'system.parentId')) {
-            (options as any).sr5FormerParentId = getProperty(this.system, 'parentId');
+        const id = this.id;
+        if (id && foundry.utils.hasProperty(changed, 'system.parentId')) {
+            const formerParentIds = ((options as any).sr5FormerParentIds ??= {});
+            formerParentIds[id] = getProperty(this.system, 'parentId');
         }
 
         // Some Foundry core updates will no diff and just replace everything. This doesn't match with the
@@ -1813,8 +1815,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
      * @param args
      */
     override async _preDelete(...args: Parameters<Item['_preDelete']>) {
-        const [options] = args;
-        (options as any).sr5ParentId = getProperty(this.system, 'parentId');
         await StorageFlow.deleteStorageReferences(this);
         return super._preDelete(...args);
     }
@@ -1832,7 +1832,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         if (options.render === false) return;
 
         void this._refreshLinkedParents([
-            (options as any).sr5FormerParentId,
+            this.id ? (options as any).sr5FormerParentIds?.[this.id] : undefined,
             getProperty(this.system, 'parentId'),
         ]);
     }
@@ -1841,7 +1841,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         super._onDelete(...args);
         const [options] = args;
         if (options.render === false) return;
-        void this._refreshLinkedParents([(options as any).sr5ParentId]);
+        void this._refreshLinkedParents([getProperty(this.system, 'parentId')]);
     }
 
     /**
