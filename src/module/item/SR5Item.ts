@@ -93,6 +93,75 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return created;
     }
 
+    /**
+     * Deleting an item deletes everything linked below it via system.parentId — ammo, mods and
+     * container contents, at any depth.
+     *
+     * Every deletion path funnels through here (Document#delete, Actor#deleteEmbeddedDocuments, the
+     * sidebar and compendium context menus), so expanding the id list is enough to cover them all.
+     * Expanding before the deletion workflow starts also gives each descendant a regular _preDelete.
+     */
+    static override async deleteDocuments(
+        ids: readonly string[] = [],
+        operation: Parameters<typeof Item.deleteDocuments>[1] = {}
+    ) {
+        return super.deleteDocuments(await SR5Item._withDescendantIds(ids, operation), operation);
+    }
+
+    /**
+     * Expand a list of item ids with every item linked below them via system.parentId.
+     *
+     * The result is deduplicated: Foundry resolves each id with a strict get and would otherwise run
+     * _preDelete twice for a repeat. That also terminates the walk on cyclic parentId data.
+     */
+    private static async _withDescendantIds(
+        ids: readonly string[],
+        operation: Parameters<typeof Item.deleteDocuments>[1] = {}
+    ): Promise<string[]> {
+        // A deleteAll operation removes the whole collection anyway and must pass no ids.
+        if (operation.deleteAll) return Array.from(ids);
+
+        const childIdsByParent = new Map<string, string[]>();
+        for (const item of await SR5Item._deletionSource(operation)) {
+            const parentId = getProperty(item, 'system.parentId');
+            if (typeof item._id !== 'string' || typeof parentId !== 'string' || !parentId) continue;
+
+            const siblings = childIdsByParent.get(parentId);
+            if (siblings) siblings.push(item._id);
+            else childIdsByParent.set(parentId, [item._id]);
+        }
+
+        const deleted = new Set(ids);
+        const pending = Array.from(deleted);
+        while (pending.length > 0) {
+            const id = pending.shift()!;
+            for (const childId of childIdsByParent.get(id) ?? []) {
+                if (deleted.has(childId)) continue;
+                deleted.add(childId);
+                pending.push(childId);
+            }
+        }
+
+        return Array.from(deleted);
+    }
+
+    /**
+     * The collection a deletion operation targets, as sources carrying _id and system.parentId.
+     *
+     * For compendiums this is the index rather than the documents, so the whole tree is available
+     * without loading it. system.parentId is a registered compendium index field, but the index
+     * shipped at world load only carries the core fields until it's requested.
+     */
+    private static async _deletionSource(
+        operation: Parameters<typeof Item.deleteDocuments>[1] = {}
+    ): Promise<Iterable<{ _id?: string | null }>> {
+        if (operation.parent) return operation.parent.items as Iterable<{ _id?: string | null }>;
+        if (!operation.pack) return (game.items ?? []) as Iterable<{ _id?: string | null }>;
+
+        const pack = game.packs.get(operation.pack);
+        return (await pack?.getIndex() ?? []) as Iterable<{ _id?: string | null }>;
+    }
+
     //Those declarations must be initialized on prepareData, otherwise they will be undefined
 
     // Compendium children can only be resolved asynchronously, so they're cached by loadPackChildItems.
@@ -331,26 +400,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         }
 
         return childDepth + 1;
-    }
-
-    async clearChildItems(): Promise<void> {
-        if (!this.id) return;
-
-        const contents = await this.loadContents();
-        const updates = Array.from(contents)
-            .filter(item => item.id)
-            .map(item => ({ _id: item.id, system: { parentId: null } }));
-        if (updates.length === 0) return;
-
-        if (this.isEmbedded && this.actorOwner) {
-            await this.actorOwner.updateEmbeddedDocuments('Item', updates);
-        } else if (this.pack) {
-            await Item.implementation.updateDocuments(updates, { pack: this.pack });
-        } else {
-            await Item.implementation.updateDocuments(updates);
-        }
-
-        await this.refreshLinkedData();
     }
 
     get hasOpposedRoll(): boolean {
@@ -1766,7 +1815,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     override async _preDelete(...args: Parameters<Item['_preDelete']>) {
         const [options] = args;
         (options as any).sr5ParentId = getProperty(this.system, 'parentId');
-        await this.clearChildItems();
         await StorageFlow.deleteStorageReferences(this);
         return super._preDelete(...args);
     }

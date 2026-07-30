@@ -43,6 +43,40 @@ export const shadowrunSR5Item = (context: QuenchBatchContext) => {
             assert.notStrictEqual(linkedAmmoInCollection, undefined);
         });
 
+        it('deletes linked children when their parent is deleted', async () => {
+            const weapon = await factory.createItem({type: 'weapon', system: {category: 'range'}});
+            const ammo = await factory.createItem({type: 'ammo'});
+            await ammo.update({ system: { parentId: weapon.id } } as any);
+
+            await weapon.delete();
+
+            assert.isUndefined(game.items.get(ammo.id!));
+        });
+
+        it('deletes linked children at any depth', async () => {
+            const container = await factory.createItem({type: 'container'});
+            const nested = await factory.createItem({type: 'container'});
+            const content = await factory.createItem({type: 'ammo'});
+            await nested.update({ system: { parentId: container.id } } as any);
+            await content.update({ system: { parentId: nested.id } } as any);
+
+            await container.delete();
+
+            assert.isUndefined(game.items.get(nested.id!));
+            assert.isUndefined(game.items.get(content.id!));
+        });
+
+        it('keeps items which have been unlinked from their former parent', async () => {
+            const container = await factory.createItem({type: 'container'});
+            const content = await factory.createItem({type: 'ammo'});
+            await content.update({ system: { parentId: container.id } } as any);
+            await content.update({ system: { parentId: null } } as any);
+
+            await container.delete();
+
+            assert.isDefined(game.items.get(content.id!));
+        });
+
         it('detects linked child items for item compendium display', () => {
             const parent = { _id: 'parent', name: 'Parent' };
             const child = { _id: 'child', name: 'Child', system: { parentId: 'parent' } };
