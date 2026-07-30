@@ -54,7 +54,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     private static readonly MOD_PARENT_TYPES = ['weapon', 'armor', 'vehicle', 'drone', 'bioware', 'cyberware'];
 
     /**
-     * Whether a child item type can be attached to (linked via system.parentId to) a given parent item type.
+     * Whether a child item type can be attached to a parent item type.
      */
     static isAttachment(parentType: string, childType: string): boolean {
         if (parentType === 'weapon' && childType === 'ammo') return true;
@@ -62,8 +62,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     /**
-     * Prepare creation data for items and all sibling documents linked beneath them.
-     * New IDs are assigned up-front so every copied parentId points at the new graph.
+     * Prepare creation data for items and everything linked beneath them, with new ids throughout.
      */
     static async createWithLinkedItems(
         items: SR5Item[],
@@ -93,12 +92,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     /**
-     * Deleting an item deletes everything linked below it via system.parentId — ammo, mods and
-     * container contents, at any depth.
-     *
-     * Every deletion path funnels through here (Document#delete, Actor#deleteEmbeddedDocuments, the
-     * sidebar and compendium context menus), so expanding the id list is enough to cover them all.
-     * Expanding before the deletion workflow starts also gives each descendant a regular _preDelete.
+     * Delete everything linked below the given items via system.parentId as well.
      */
     static override async deleteDocuments(
         ids: readonly string[] = [],
@@ -109,9 +103,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     /**
      * Expand a list of item ids with every item linked below them via system.parentId.
-     *
-     * The result is deduplicated: Foundry resolves each id with a strict get and would otherwise run
-     * _preDelete twice for a repeat. That also terminates the walk on cyclic parentId data.
+     * Deduplicated, which also terminates the walk on cyclic parentId data.
      */
     private static async _withDescendantIds(
         ids: readonly string[],
@@ -146,10 +138,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     /**
      * The collection a deletion operation targets, as sources carrying _id and system.parentId.
-     *
-     * For compendiums this is the index rather than the documents, so the whole tree is available
-     * without loading it. system.parentId is a registered compendium index field, but the index
-     * shipped at world load only carries the core fields until it's requested.
+     * Compendiums use the index, so the whole tree is available without loading it.
      */
     private static async _deletionSource(
         operation: Parameters<typeof Item.deleteDocuments>[1] = {}
@@ -163,7 +152,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     //Those declarations must be initialized on prepareData, otherwise they will be undefined
 
-    // Compendium children can only be resolved asynchronously, so they're cached by loadPackChildItems.
+    // Cache filled by loadPackChildItems, as compendium children resolve asynchronously.
     declare private _packChildItems?: foundry.utils.Collection<SR5Item>;
     declare descriptionHTML: string | undefined;
     // Item Sheet labels for quick info on an item dropdown.
@@ -228,11 +217,8 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     /**
-     * Items linked to this item as children via system.parentId, covering weapon ammo and mods,
-     * armor mods and container contents.
-     *
-     * Compendium children can't be resolved synchronously, so for those this serves the cache filled
-     * by loadPackChildItems. Use loadContents() when they must be fetched from the pack instead.
+     * Items linked to this item as children via system.parentId.
+     * Compendium children come from the loadPackChildItems cache, use loadContents() for the pack.
      */
     get childItems(): foundry.utils.Collection<SR5Item> {
         if (this.pack && !this.isEmbedded) return this._packChildItems ?? new foundry.utils.Collection<SR5Item>();
@@ -269,10 +255,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     /**
-     * Direct storage contents of this container.
-     *
-     * Unlike childItems this queries the pack for compendium items instead of serving the cache, so
-     * it can walk compendium trees which have never been loaded.
+     * Direct storage contents of this container, querying the pack for compendium items.
      */
     async loadContents(): Promise<foundry.utils.Collection<SR5Item>> {
         if (!this.id) return new foundry.utils.Collection<SR5Item>();
@@ -921,8 +904,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     /**
      * Load children which cannot be resolved synchronously, meaning compendium items only.
-     *
-     * The resulting cache is preserved across reset() so data preparation can use those documents.
      */
     async loadPackChildItems(): Promise<foundry.utils.Collection<SR5Item>> {
         if (!this.pack || this.isEmbedded) return this.childItems;
