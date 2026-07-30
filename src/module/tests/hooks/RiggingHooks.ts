@@ -9,6 +9,8 @@ export const RiggingHooks = {
         Hooks.on('sr5_testPrepareBaseValues', RiggingHooks.onTestPrepareBaseValues_AddControlRigModifier.bind(this));
         Hooks.on('sr5_testPrepareBaseValues', RiggingHooks.onTestPrepareBaseValues_AddMatrixModifier.bind(this));
         Hooks.on('sr5_testPrepareBaseValues', RiggingHooks.onTestPrepareBaseValues_AddVehicleHandlingDamageModifier.bind(this));
+        Hooks.on('sr5_testPrepareBaseValues', RiggingHooks.onTestPrepareBaseValues_AddAutosoftModifier.bind(this));
+        Hooks.on('sr5_testPrepareBaseValues', RiggingHooks.onTestPrepareBaseValues_AddSwarmModifier.bind(this));
         Hooks.on('sr5_beforePrepareTestDataWithAction', RiggingHooks.onBeforePrepareTestDataWithAction_ReplaceAttributesForMental.bind(this));
     },
 
@@ -22,6 +24,14 @@ export const RiggingHooks = {
 
     onTestPrepareBaseValues_AddVehicleHandlingDamageModifier: (test: SuccessTest) => {
         RiggingTestDataFlow.addVehicleHandlingDamageModifier(test);
+    },
+
+    onTestPrepareBaseValues_AddAutosoftModifier: (test: SuccessTest) => {
+        RiggingTestDataFlow.addAutosoftModifier(test);
+    },
+
+    onTestPrepareBaseValues_AddSwarmModifier: (test: SuccessTest) => {
+        RiggingTestDataFlow.addSwarmModifier(test);
     },
 
     onBeforePrepareTestDataWithAction_ReplaceAttributesForMental: (action: ActionRollType, document: SR5Item|SR5Actor) => {

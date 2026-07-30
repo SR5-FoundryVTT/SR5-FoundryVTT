@@ -9,7 +9,7 @@ import { VisibilityChecks } from "../template/Visibility";
 import { ModifiableField } from "../fields/ModifiableField";
 import { Attributes, AttributeField } from "../template/Attributes";
 import { CommonData, PhysicalCombatValues, CreateModifiers, ActorBase } from "./Common";
-const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
+const { SchemaField, NumberField, BooleanField, StringField, ArrayField } = foundry.data.fields;
 
 const VehicleStats = () => ({
     pilot: new ModifiableField(AttributeField()),
@@ -85,6 +85,12 @@ const VehicleData = () => ({
     // === Driver & Networking ===
     driver: new StringField({ required: true }),
     master: new StringField({ required: true }),
+
+    // === Swarm ===
+    isSwarm: new BooleanField({ initial: false }),
+    isSwarmLeader: new BooleanField({ initial: false }),
+    swarmLeaderUuid: new StringField({ required: false, initial: '' }),
+    swarmMemberUuids: new ArrayField(new StringField({ required: true })),
 
     // === Condition & Movement ===
     track: new SchemaField(Tracks('physical', 'matrix')),

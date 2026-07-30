@@ -181,8 +181,76 @@
                                             rootId=rootId disabled=@root.isPlayMode }}
                             </div>
                         </div>
+                        {{#if (eq system.category 'rcc')}}
+                            <div class="list-item">
+                                <div class="list-item-start skinny">
+                                    <label>{{localize "SR5.RCC.Sharing"}}</label>
+                                </div>
+                                <div class="list-item-col">
+                                    {{formInput systemFields.sharing value=source.system.sharing classes="short"
+                                                rootId=rootId disabled=@root.isPlayMode }}
+                                </div>
+                            </div>
+                            <div class="list-item">
+                                <div class="list-item-start skinny">
+                                    <label>{{localize "SR5.RCC.NoiseReduction"}}</label>
+                                </div>
+                                <div class="list-item-col">
+                                    {{formInput systemFields.noise_reduction value=source.system.noise_reduction classes="short"
+                                                rootId=rootId disabled=@root.isPlayMode }}
+                                </div>
+                            </div>
+                        {{/if}}
                     {{/if}}
                 {{/unless}}
+            {{else if (isType item 'program')}}
+                <div class="list-item list-item-header">
+                    <div class="list-item-start skinny">
+                        {{localize "SR5.Programs"}}
+                    </div>
+                </div>
+                <div class="list-item">
+                    <div class="list-item-start skinny">
+                        <label>{{localize "SR5.Type"}}</label>
+                    </div>
+                    <div class="list-item-col">
+                        {{formInput systemFields.type value=source.system.type options=config.programTypes classes="short"
+                                    rootId=rootId disabled=@root.isPlayMode}}
+                    </div>
+                </div>
+                {{#if (eq system.type 'autosoft')}}
+                    <div class="list-item">
+                        <div class="list-item-start skinny">
+                            <label>{{localize "SR5.AutosoftType"}}</label>
+                        </div>
+                        <div class="list-item-col">
+                            {{formInput systemFields.autosoftType value=source.system.autosoftType options=config.autosoftTypes classes="short"
+                                        rootId=rootId disabled=@root.isPlayMode}}
+                        </div>
+                    </div>
+                    {{#if (or (eq system.autosoftType 'maneuvering') (eq system.autosoftType 'stealth') (eq system.autosoftType 'evasion'))}}
+                        <div class="list-item">
+                            <div class="list-item-start skinny">
+                                <label>{{localize "SR5.TargetModel"}}</label>
+                            </div>
+                            <div class="list-item-col">
+                                {{formInput systemFields.targetModel value=source.system.targetModel classes="short"
+                                            rootId=rootId disabled=@root.isPlayMode}}
+                            </div>
+                        </div>
+                    {{/if}}
+                    {{#if (eq system.autosoftType 'targeting')}}
+                        <div class="list-item">
+                            <div class="list-item-start skinny">
+                                <label>{{localize "SR5.TargetWeapon"}}</label>
+                            </div>
+                            <div class="list-item-col">
+                                {{formInput systemFields.targetWeapon value=source.system.targetWeapon classes="short"
+                                            rootId=rootId disabled=@root.isPlayMode}}
+                            </div>
+                        </div>
+                    {{/if}}
+                {{/if}}
             {{else if (eq item.type 'weapon')}}
                 <div class="list-item">
                     <div class="list-item-start skinny">

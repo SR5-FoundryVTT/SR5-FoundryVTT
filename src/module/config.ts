@@ -933,6 +933,23 @@ export const SR5 = {
         common_program: 'SR5.CommonProgram',
         hacking_program: 'SR5.HackingProgram',
         agent: 'SR5.Agent',
+        autosoft: 'SR5.Autosoft',
+    },
+
+    autosoftTypes: {
+        clearsight: 'SR5.AutosoftTypes.Clearsight',
+        evasion: 'SR5.AutosoftTypes.Evasion',
+        maneuvering: 'SR5.AutosoftTypes.Maneuvering',
+        stealth: 'SR5.AutosoftTypes.Stealth',
+        targeting: 'SR5.AutosoftTypes.Targeting',
+        electronic_warfare: 'SR5.AutosoftTypes.ElectronicWarfare',
+    },
+
+    controlModes: {
+        autopilot: 'SR5.ControlModes.Autopilot',
+        remote: 'SR5.ControlModes.Remote',
+        rigger: 'SR5.ControlModes.Rigger',
+        manual: 'SR5.ControlModes.Manual',
     },
 
     icTypes: {

@@ -1,4 +1,33 @@
 {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/limits.hbs" }}
+
+<div class="list-item rigger-control-mode-bar">
+    <div class="list-item-start">
+        <label><strong>{{localize "SR5.ControlMode"}}:</strong></label>&nbsp;
+        {{#if @root.isEditMode}}
+            {{formInput systemFields.controlMode value=source.system.controlMode options=config.controlModes rootId=@root.rootId}}
+        {{else}}
+            <span class="tag badge {{system.controlMode}}">{{localize (objValue @root.config.controlModes system.controlMode)}}</span>
+        {{/if}}
+    </div>
+    <div class="list-item-icons">
+        <button class="icon sr5-icon {{#if system.isSwarm}}active{{/if}}" data-action="toggleSwarmLeader" data-tooltip="SR5.Swarm.Toggle">
+            <i class="fas fa-network-wired"></i>
+            {{#if system.isSwarm}}
+                <span>{{localize "SR5.Swarm.Active"}} ({{swarmInfo.memberCount}} {{localize "SR5.Swarm.Drones"}}, +{{swarmInfo.bonus}} {{localize "SR5.Bonus"}})</span>
+            {{else}}
+                <span>{{localize "SR5.Swarm.Form"}}</span>
+            {{/if}}
+        </button>
+    </div>
+</div>
+
+{{#if autosoftInfo.isOverSlots}}
+    <div class="list-item warning-banner" style="background-color: rgba(255, 165, 0, 0.2); padding: 4px 8px; border: 1px solid orange; border-radius: 4px; margin-bottom: 4px;">
+        <i class="fas fa-triangle-exclamation" style="color: orange; margin-right: 6px;"></i>
+        <span>{{localize "SR5.Warnings.OverAutosoftSlots"}} ({{autosoftInfo.runningCount}} / {{autosoftInfo.maxSlots}})</span>
+    </div>
+{{/if}}
+
 <div class="attributes">
     {{#if @root.isEditMode}}
         {{> "systems/shadowrun5e/dist/templates/v2/actor/parts/vehicle-paired-attribute.hbs"

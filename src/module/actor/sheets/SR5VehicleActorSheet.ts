@@ -1,19 +1,44 @@
-import {SR5Actor} from "../SR5Actor";
+import { SR5Actor } from "../SR5Actor";
 import { SR5Item } from '../../item/SR5Item';
 import { MatrixNetworkFlow } from "@/module/item/flows/MatrixNetworkFlow";
 import { MatrixActorSheetData, SR5MatrixActorSheet } from '@/module/actor/sheets/SR5MatrixActorSheet';
 import { Helpers } from '@/module/helpers';
 import { MatrixRules } from '@/module/rules/MatrixRules';
+import { RiggingRules } from '@/module/rules/RiggingRules';
 import { PackItemFlow } from "@/module/item/flows/PackItemFlow";
 import { SheetFlow } from '@/module/flows/SheetFlow';
+import { TestCreator } from '@/module/tests/TestCreator';
+import { SR5 } from '@/module/config';
+import { TokenLockHooks } from '@/module/token/TokenLockHooks';
 
 interface VehicleSheetDataFields extends MatrixActorSheetData {
     isVehicle: boolean;
     vehicle: {
         driver: SR5Actor|undefined,
         master: SR5Item | undefined
-    }
+    };
     modifications: SR5Item<'modification'>[];
+    autosoftInfo: {
+        maxSlots: number;
+        runningCount: number;
+        isOverSlots: boolean;
+        runningAutosofts: SR5Item[];
+    };
+    swarmInfo: {
+        swarmPilot: number;
+        highestPilot: number;
+        memberCount: number;
+        bonus: number;
+    };
+    rccInfo?: {
+        deviceRating: number;
+        sharing: number;
+        noiseReduction: number;
+        isOverAllocated: boolean;
+        loadedAutosoftsCount: number;
+        isOverSharingLimit: boolean;
+        loadedAutosofts: SR5Item[];
+    };
 }
 
 export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFields> {
@@ -42,6 +67,9 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
             removeVehicleDriver: SR5VehicleActorSheet.#removeVehicleDriver,
             toggleChaseEnvironment: SR5VehicleActorSheet.#toggleChaseEnvironment,
             toggleOffRoad: SR5VehicleActorSheet.#toggleOffRoad,
+            toggleJumpIn: SR5VehicleActorSheet.#toggleJumpIn,
+            toggleSwarmLeader: SR5VehicleActorSheet.#toggleSwarmLeader,
+            toggleProgramEquipped: SR5VehicleActorSheet.#toggleProgramEquipped,
         }
     }
 
@@ -75,6 +103,27 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
         data.vehicle = this._prepareVehicleFields();
         data.modifications = this._prepareEquippedModifications();
         data.isVehicle = true;
+
+        const maxSlots = RiggingRules.getMaxAutosoftSlots(this.actor);
+        const runningAutosofts = RiggingRules.getRunningLocalAutosofts(this.actor);
+        const runningCount = runningAutosofts.length;
+
+        data.autosoftInfo = {
+            maxSlots,
+            runningCount,
+            isOverSlots: runningCount > maxSlots,
+            runningAutosofts
+        };
+
+        data.swarmInfo = RiggingRules.getSwarmPilotInfo(this.actor);
+
+        if (data.vehicle.master && data.vehicle.master.system.category === 'rcc') {
+            const info = RiggingRules.getRCCSharingInfo(data.vehicle.master);
+            data.rccInfo = {
+                ...info,
+                loadedAutosofts: RiggingRules.getLoadedRCCAutosofts(data.vehicle.master)
+            };
+        }
 
         return data;
     }
@@ -240,5 +289,101 @@ export class SR5VehicleActorSheet extends SR5MatrixActorSheet<VehicleSheetDataFi
 
         await MatrixNetworkFlow.removeSlaveFromMaster(this.actor);
         await this.render();
+    }
+
+    static async #toggleJumpIn(this: SR5VehicleActorSheet, event: Event) {
+        event.preventDefault();
+        const isJumpedIn = this.actor.system.controlMode === 'rigger';
+
+        let driver: SR5Actor | null = this.actor.getVehicleDriver() || null;
+        if (!driver && game.user.character && (game.user.character as SR5Actor).isType('character')) {
+            driver = game.user.character as SR5Actor;
+        }
+        if (!driver) {
+            const controlled = Helpers.getControlledTokenActors();
+            const charActor = controlled.find(a => a.isType('character') && a.id !== this.actor.id);
+            if (charActor) driver = charActor;
+        }
+
+        if (isJumpedIn) {
+            await this.actor.update({ system: { controlMode: 'autopilot' } } as any);
+            if (driver) {
+                await TokenLockHooks.setJumpedInState(driver, null, false);
+            }
+            ui.notifications?.info(game.i18n.format('SR5.Rigger.JumpedOutSuccess', { vehicle: this.actor.name }));
+        } else {
+            if (!driver) {
+                ui.notifications?.error(game.i18n.localize('SR5.Errors.NoDriverSelectedForJumpIn'));
+                return;
+            }
+
+            if (!this.actor.isOwner && !game.user.isGM) {
+                ui.notifications?.info(game.i18n.format('SR5.Rigger.JumpInTestRequired', { vehicle: this.actor.name }));
+                const test = await TestCreator.fromPackAction(
+                    SR5.packNames.GeneralActionsPack,
+                    'drone_pilot_vehicle',
+                    this.actor,
+                    { showDialog: true }
+                );
+                if (test) {
+                    await test.execute();
+                }
+            }
+
+            if (driver.uuid) {
+                await this.actor.addVehicleDriver(driver.uuid);
+            }
+
+            await this.actor.update({ system: { controlMode: 'rigger' } } as any);
+            await driver.update({
+                system: {
+                    matrix: {
+                        vr: true,
+                        hot_sim: true
+                    }
+                }
+            } as any);
+
+            await TokenLockHooks.setJumpedInState(driver, this.actor, true);
+
+            ui.notifications?.info(game.i18n.format('SR5.Rigger.JumpedInSuccess', {
+                rigger: driver.name,
+                vehicle: this.actor.name
+            }));
+        }
+        void this.render();
+    }
+
+    static async #toggleSwarmLeader(this: SR5VehicleActorSheet, event: Event) {
+        event.preventDefault();
+        const currentIsSwarm = !!(this.actor.system as any).isSwarm;
+        const currentIsLeader = !!(this.actor.system as any).isSwarmLeader;
+
+        await this.actor.update({
+            system: {
+                isSwarm: !currentIsSwarm,
+                isSwarmLeader: !currentIsSwarm ? true : !currentIsLeader
+            }
+        } as any);
+        void this.render();
+    }
+
+    static async #toggleProgramEquipped(this: SR5VehicleActorSheet, event: Event) {
+        event.preventDefault();
+        if (!(event.target instanceof HTMLElement)) return;
+        const itemId = SheetFlow.closestAction(event.target)?.dataset?.itemId;
+        if (!itemId) return;
+        const item = this.actor.items.get(itemId);
+        if (!item || !item.system.technology) return;
+
+        const isCurrentlyEquipped = item.isEquipped();
+        await item.update({
+            system: {
+                technology: {
+                    equipped: !isCurrentlyEquipped
+                }
+            }
+        } as any);
+        void this.render();
     }
 }

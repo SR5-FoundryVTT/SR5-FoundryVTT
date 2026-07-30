@@ -806,6 +806,42 @@
         "Collapse": "Einklappen",
         "CollapseAll": "Alles einklappen",
         "CommonProgram": "Standardprogramm",
+        "Autosoft": "Autosoft",
+        "AutosoftType": "Autosoft-Typ",
+        "TargetModel": "Ziel-Modell",
+        "TargetWeapon": "Ziel-Waffe",
+        "ControlMode": "Steuerungsmodus",
+        "AutosoftTypes": {
+            "Clearsight": "Clearsight",
+            "Evasion": "Ausweichen",
+            "Maneuvering": "Manövrieren",
+            "Stealth": "Schleichen",
+            "Targeting": "Zielerfassung",
+            "ElectronicWarfare": "Elektronische Kriegsführung"
+        },
+        "ControlModes": {
+            "Autopilot": "Autopilot",
+            "Remote": "Fernsteuerung",
+            "Rigger": "Hineingesprungen",
+            "Manual": "Manuell"
+        },
+        "Rigger": {
+            "JumpIn": "Hineinspringen",
+            "JumpOut": "Hinausspringen",
+            "JumpedInSuccess": "{rigger} ist in {vehicle} hineingesprungen",
+            "JumpedOutSuccess": "Aus {vehicle} hinausgesprungen",
+            "JumpInTestRequired": "Das Hineinspringen in das fremde Fahrzeug {vehicle} erfordert eine Probe."
+        },
+        "Swarm": {
+            "Toggle": "Schwarm umschalten",
+            "Active": "Schwarmführer",
+            "Form": "Schwarm bilden",
+            "Drones": "Drohnen"
+        },
+        "RCC": {
+            "Sharing": "Zugriff",
+            "NoiseReduction": "Rauschunterdrückung"
+        },
         "CompendiaSettings": {
             "Description": "Diese Kompendien werden vom System verwendet. Du kannst sie mit eigenen Kompendien überschreiben, solltest sie aber nicht entfernen.",
             "GeneralActionsPack": {
@@ -3380,6 +3416,9 @@
         "Walk": "Gehen",
         "WalkingSpeed": "Gehen",
         "Warnings": {
+            "OverAutosoftSlots": "Autosoft-Programmplätze für diese Drohne überschritten",
+            "OverSharingLimit": "Geladene Autosofts überschreiten RCC-Zugriffskapazität",
+            "TokenMovementLockedJumpedIn": "{vehicle} ist aktuell geriggt! Metamensch-Tokenbewegung ist gesperrt.",
             "ActorMissingRequirements": "Der Akteur muss die Voraussetzung der Fertigkeit erfüllen: erwacht oder emergiert",
             "AlreadyExistingInventory": "Ein Inventar mit diesem Namen existiert bereits",
             "AlreadyJoinedNetwork": "bereits mit dem Netzwerk {name} verbunden",

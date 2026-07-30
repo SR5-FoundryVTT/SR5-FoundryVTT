@@ -804,6 +804,42 @@
         "Collapse": "Collapse",
         "CollapseAll": "Collapse All",
         "CommonProgram": "Common Program",
+        "Autosoft": "Autosoft",
+        "AutosoftType": "Autosoft Type",
+        "TargetModel": "Target Model",
+        "TargetWeapon": "Target Weapon",
+        "ControlMode": "Control Mode",
+        "AutosoftTypes": {
+            "Clearsight": "Clearsight",
+            "Evasion": "Evasion",
+            "Maneuvering": "Maneuvering",
+            "Stealth": "Stealth",
+            "Targeting": "Targeting",
+            "ElectronicWarfare": "Electronic Warfare"
+        },
+        "ControlModes": {
+            "Autopilot": "Autopilot",
+            "Remote": "Remote Control",
+            "Rigger": "Jumped-In",
+            "Manual": "Manual"
+        },
+        "Rigger": {
+            "JumpIn": "Jump In",
+            "JumpOut": "Jump Out",
+            "JumpedInSuccess": "{rigger} jumped into {vehicle}",
+            "JumpedOutSuccess": "Jumped out of {vehicle}",
+            "JumpInTestRequired": "Jumping into unowned vehicle {vehicle} requires a test."
+        },
+        "Swarm": {
+            "Toggle": "Toggle Swarm",
+            "Active": "Swarm Leader",
+            "Form": "Form Swarm",
+            "Drones": "Drones"
+        },
+        "RCC": {
+            "Sharing": "Sharing",
+            "NoiseReduction": "Noise Reduction"
+        },
         "CompendiaSettings": {
             "Description": "These packs will be used for the system. You can override them with your own packs, but you should not remove them.",
             "GeneralActionsPack": {
@@ -1229,6 +1265,7 @@
         "Equipment": "Equipment",
         "Equipped": "Equipped",
         "Errors": {
+            "NoDriverSelectedForJumpIn": "No driver selected or assigned for Jump In.",
             "CantConnectICToGrid": "IC actors can't be connected to a grid network",
             "CantConnectToPAN": "Given document can't be added to PAN network",
             "CantConnectToWAN": "Given document can't be added to WAN network",
@@ -3340,6 +3377,9 @@
         "Walk": "Walk",
         "WalkingSpeed": "Walking",
         "Warnings": {
+            "OverAutosoftSlots": "Autosoft program slots exceeded for this drone",
+            "OverSharingLimit": "Loaded autosofts exceed RCC Sharing capacity",
+            "TokenMovementLockedJumpedIn": "{vehicle} is currently geriggt! Metahuman token movement is locked.",
             "ActorMissingRequirements": "Actor must match the skills awakened or emerged requirement",
             "AlreadyExistingInventory": "An inventory with this name already exists",
             "AlreadyJoinedNetwork": "{name} already joined this network",
