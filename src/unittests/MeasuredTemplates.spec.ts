@@ -1,5 +1,5 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
-import { getWeaponRangeCircleLayout } from '../module/WeaponRangeMeasuredTemplate';
+import { getWeaponRangeCircleLayout } from '../module/WeaponRangeOverlay';
 import { hasValidWeaponRanges } from '../module/flows/MeasuredTemplateFlow';
 import { RangesTemplateType } from '../module/types/template/Weapon';
 
@@ -15,7 +15,7 @@ export const measuredTemplateTesting = (context: QuenchBatchContext) => {
             extreme: { label: 'Extreme', distance: 40, modifier: -6 },
         };
 
-        it('places each weapon range and modifier at all four corners', () => {
+        it('places each weapon range and modifier at cardinal positions', () => {
             const layout = getWeaponRangeCircleLayout(ranges, 10, 'm');
 
             assert.deepEqual(layout.map(circle => circle.radius), [50, 100, 200, 400]);
@@ -28,12 +28,18 @@ export const measuredTemplateTesting = (context: QuenchBatchContext) => {
             assert.deepEqual(layout.map(circle => circle.modifierLabel), ['0', '-1', '-3', '-6']);
             assert.deepEqual(layout.map(circle => circle.borderPositions.length), [4, 4, 4, 4]);
             assert.deepEqual(layout.map(circle => circle.modifierPositions.length), [4, 4, 4, 4]);
-            assert.approximately(Math.hypot(layout[0].borderPositions[0].x, layout[0].borderPositions[0].y), 50, 0.001);
-            assert.approximately(Math.hypot(layout[0].borderPositions[3].x, layout[0].borderPositions[3].y), 50, 0.001);
-            assert.approximately(Math.hypot(layout[0].modifierPositions[0].x, layout[0].modifierPositions[0].y), 25, 0.001);
-            assert.approximately(Math.hypot(layout[1].modifierPositions[1].x, layout[1].modifierPositions[1].y), 75, 0.001);
-            assert.approximately(Math.hypot(layout[2].modifierPositions[2].x, layout[2].modifierPositions[2].y), 150, 0.001);
-            assert.approximately(Math.hypot(layout[3].modifierPositions[3].x, layout[3].modifierPositions[3].y), 300, 0.001);
+            assert.deepEqual(layout[0].borderPositions, [
+                { x: 0, y: -50 },
+                { x: 50, y: 0 },
+                { x: -50, y: 0 },
+                { x: 0, y: 50 },
+            ]);
+            assert.deepEqual(layout[0].modifierPositions, [
+                { x: 0, y: -25 },
+                { x: 25, y: 0 },
+                { x: -25, y: 0 },
+                { x: 0, y: 25 },
+            ]);
         });
 
         it('accepts ascending, non-zero weapon ranges only', () => {

@@ -11,7 +11,7 @@ import { TestDialogLike } from '../apps/dialogs/TestDialog';
 import { RangesTemplateType, TargetRangeTemplateType } from '../types/template/Weapon';
 import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
 import { MeasuredTemplateFlow } from '../flows/MeasuredTemplateFlow';
-import { WeaponRangeMeasuredTemplate } from '../WeaponRangeMeasuredTemplate';
+import { WeaponRangeOverlay } from '../WeaponRangeOverlay';
 
 export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDataFragment {
     damage: DamageType
@@ -31,7 +31,7 @@ export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDa
 
 export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
     declare item: SR5Item;
-    #weaponRangeTemplate?: WeaponRangeMeasuredTemplate;
+    #weaponRangeTemplate?: WeaponRangeOverlay;
 
     override _prepareData(data: DeepPartial<RangedAttackTestData>, options: Partial<TestOptions>): RangedAttackTestData {
         const prepared: DeepPartial<RangedAttackTestData> = super._prepareData(data, options);
@@ -55,7 +55,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         }]
     }
 
-    async _handleShowWeaponRanges(event: JQuery.Event, dialog: TestDialogLike) {
+    _handleShowWeaponRanges(event: JQuery.Event, dialog: TestDialogLike) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -72,7 +72,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
             return;
         }
 
-        this.#weaponRangeTemplate = await MeasuredTemplateFlow.showWeaponRanges(token, this.data.ranges);
+        this.#weaponRangeTemplate = MeasuredTemplateFlow.showWeaponRanges(token, this.data.ranges);
     }
 
     override async _cleanUpAfterDialogCancel() {

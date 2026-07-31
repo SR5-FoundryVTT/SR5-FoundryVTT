@@ -1,9 +1,15 @@
 import { RangesTemplateType } from './types/template/Weapon';
 
 const RANGE_KEYS = ['short', 'medium', 'long', 'extreme'] as const;
-const BORDER_LABEL_ANGLES = [-Math.PI / 4, Math.PI / 4, (3 * Math.PI) / 4, (5 * Math.PI) / 4];
+const CARDINAL_DIRECTIONS = [
+    { x: 0, y: -1 },
+    { x: 1, y: 0 },
+    { x: -1, y: 0 },
+    { x: 0, y: 1 },
+] as const;
 const RANGE_COLORS = [0x33aa33, 0xd9b300, 0xcc3333, 0x7b3fb2];
 const RANGE_FILL_ALPHA = 0.2;
+const DEFAULT_BORDER_COLOR = 0x000000;
 
 export type WeaponRangeCircleLayout = {
     key: typeof RANGE_KEYS[number]
@@ -34,57 +40,62 @@ export const getWeaponRangeCircleLayout = (
             key,
             radius,
             borderLabel: `${range.label ?? key}: ${range.distance} ${unit}`,
-            borderPositions: BORDER_LABEL_ANGLES.map(angle => ({
-                x: radius * Math.cos(angle),
-                y: radius * Math.sin(angle),
+            borderPositions: CARDINAL_DIRECTIONS.map(direction => ({
+                x: radius * direction.x,
+                y: radius * direction.y,
             })),
             modifierLabel: range.modifier > 0 ? `+${range.modifier}` : String(range.modifier),
-            modifierPositions: BORDER_LABEL_ANGLES.map(angle => ({
-                x: modifierRadius * Math.cos(angle),
-                y: modifierRadius * Math.sin(angle),
+            modifierPositions: CARDINAL_DIRECTIONS.map(direction => ({
+                x: modifierRadius * direction.x,
+                y: modifierRadius * direction.y,
             })),
         };
     });
 };
 
 /**
- * A transient Foundry v14 measured-template overlay for displaying weapon range bands.
+ * A transient canvas overlay for displaying weapon range bands.
  *
- * MeasuredTemplate is deprecated in v14 but remains the canvas primitive for this preview
- * through v16. Keep all API-sensitive drawing and placement code isolated here.
+ * This deliberately has no Foundry document because it only exists while an
+ * attack dialog is open and must not become a persistent scene placeable.
  */
-export class WeaponRangeMeasuredTemplate extends foundry.canvas.placeables.MeasuredTemplate {
+export class WeaponRangeOverlay extends PIXI.Container {
     readonly ranges: RangesTemplateType;
 
-    #rangeGraphics!: PIXI.Graphics;
-    #borderLabels: PIXI.Text[][] = [];
-    #modifierLabels: PIXI.Text[][] = [];
-    #overlayGroup?: PIXI.Container;
+    readonly #rangeGraphics: PIXI.Graphics;
+    readonly #borderLabels: PIXI.Text[][] = [];
+    readonly #modifierLabels: PIXI.Text[][] = [];
     #removeOnRightClick?: (event: PIXI.FederatedPointerEvent) => void;
 
-    // eslint-disable-next-line @typescript-eslint/no-deprecated -- MeasuredTemplate remains the v14-v16 preview primitive.
-    constructor(document: MeasuredTemplateDocument, ranges: RangesTemplateType) {
-        super(document);
+    constructor(ranges: RangesTemplateType) {
+        super();
         this.ranges = ranges;
-    }
-
-    override async _draw(options: Record<string, never>) {
-        await super._draw(options);
+        this.eventMode = 'none';
         this.#rangeGraphics = this.addChild(new PIXI.Graphics());
 
         RANGE_KEYS.forEach(() => {
-            this.#borderLabels.push(BORDER_LABEL_ANGLES.map(() => this.addChild(this.#createLabel())));
-            this.#modifierLabels.push(BORDER_LABEL_ANGLES.map(() => this.addChild(this.#createLabel())));
+            this.#borderLabels.push(CARDINAL_DIRECTIONS.map(() => this.addChild(this.#createLabel())));
+            this.#modifierLabels.push(CARDINAL_DIRECTIONS.map(() => this.addChild(this.#createLabel())));
         });
     }
 
-    override _refreshTemplate() {
-        if (!this.#rangeGraphics) return;
+    drawAt(position: { x: number, y: number }) {
+        this.position.set(position.x, position.y);
+        this.#refresh();
+        canvas.interface.addChild(this);
+        this.#addManualRemovalListener();
+    }
 
+    remove() {
+        this.#removeManualRemovalListener();
+        this.parent?.removeChild(this);
+        this.destroy({ children: true });
+    }
+
+    #refresh() {
         const scale = canvas.dimensions!.uiScale;
         const layout = getWeaponRangeCircleLayout(this.ranges, canvas.dimensions!.distancePixels, canvas.grid?.units ?? '');
         const graphics = this.#rangeGraphics.clear();
-        this.template?.clear();
 
         for (const [index, circle] of layout.entries()) {
             graphics.beginFill(RANGE_COLORS[index], RANGE_FILL_ALPHA)
@@ -97,7 +108,7 @@ export class WeaponRangeMeasuredTemplate extends foundry.canvas.placeables.Measu
             }
             graphics.endFill();
 
-            graphics.lineStyle(this._borderThickness * scale, this.document.borderColor, 0.9)
+            graphics.lineStyle(3 * scale, DEFAULT_BORDER_COLOR, 0.9)
                 .drawCircle(0, 0, circle.radius);
 
             for (const [labelIndex, label] of this.#borderLabels[index].entries()) {
@@ -109,53 +120,13 @@ export class WeaponRangeMeasuredTemplate extends foundry.canvas.placeables.Measu
         }
     }
 
-    override highlightGrid() {
-        // The core highlight fills the complete template using the user's color.
-        // Range bands are drawn explicitly above with their configured colors.
-    }
-
-    override _refreshState() {
-        super._refreshState();
-        const alpha = this.document.hidden ? 0.5 : 1;
-        this.#rangeGraphics.alpha = alpha;
-        for (const label of [...this.#borderLabels.flat(), ...this.#modifierLabels.flat()]) label.alpha = alpha;
-    }
-
-    override _destroy(options: object) {
-        this.#removeManualRemovalListener();
-        this.#borderLabels = [];
-        this.#modifierLabels = [];
-        super._destroy(options);
-    }
-
-    async drawAt(position: { x: number, y: number }): Promise<void> {
-        if (!canvas.ready || !canvas.templates) return;
-
-        this.document.updateSource(position);
-        await this.draw();
-
-        this.#overlayGroup = new PIXI.Container();
-        canvas.templates.addChild(this.#overlayGroup);
-        this.#overlayGroup.addChild(this);
-        this.#addManualRemovalListener();
-    }
-
-    remove() {
-        this.#removeManualRemovalListener();
-        if (this.#overlayGroup) {
-            this.#overlayGroup.parent?.removeChild(this.#overlayGroup);
-            this.#overlayGroup.destroy({ children: true });
-            this.#overlayGroup = undefined;
-        } else this.destroy();
-    }
-
     #addManualRemovalListener() {
         this.#removeOnRightClick = event => {
             if (event.button !== 2) return;
 
-            const position = event.getLocalPosition(this.layer);
+            const position = event.getLocalPosition(canvas.interface);
             const radius = this.ranges.extreme.distance * canvas.dimensions!.distancePixels;
-            const distance = Math.hypot(position.x - this.document.x, position.y - this.document.y);
+            const distance = Math.hypot(position.x - this.position.x, position.y - this.position.y);
             if (distance > radius) return;
 
             event.stopPropagation();

@@ -1,4 +1,4 @@
-import { WeaponRangeMeasuredTemplate } from '../WeaponRangeMeasuredTemplate';
+import { WeaponRangeOverlay } from '../WeaponRangeOverlay';
 import { RangesTemplateType } from '../types/template/Weapon';
 
 const RANGE_KEYS = ['short', 'medium', 'long', 'extreme'] as const;
@@ -16,12 +16,11 @@ export const hasValidWeaponRanges = (ranges: RangesTemplateType): boolean => {
 };
 
 /**
- * General handling of any MeasuredTemplate related system to Foundry intercation and creation of system
- * custo sub-classes of MeasuredTemplate.
+ * General handling of transient range overlays displayed during attack tests.
  */
 export const MeasuredTemplateFlow = {
-    async showWeaponRanges(token: TokenDocument, ranges: RangesTemplateType): Promise<WeaponRangeMeasuredTemplate | undefined> {
-        if (!canvas.ready || !canvas.scene || !canvas.templates) return;
+    showWeaponRanges(token: TokenDocument, ranges: RangesTemplateType): WeaponRangeOverlay | undefined {
+        if (!canvas.ready) return;
         if (!hasValidWeaponRanges(ranges)) {
             ui.notifications?.warn('SR5.Warnings.InvalidWeaponRanges', { localize: true });
             return;
@@ -34,28 +33,14 @@ export const MeasuredTemplateFlow = {
         }
         const origin = { x: position.x, y: position.y };
 
-        const templateData = {
-            t: 'circle' as const,
-            user: game.user?.id,
-            direction: 0,
-            x: 0,
-            y: 0,
-            fillColor: game.user?.color,
-            distance: ranges.extreme.distance,
-        };
-
-        const documentClass = CONFIG.MeasuredTemplate.documentClass;
-        // The core document provides bounds and refresh flags; this flow never persists it.
-        // @ts-expect-error Foundry's generic document constructor does not infer source data here.
-        const document = new documentClass(templateData, { parent: canvas.scene });
-        const template = new WeaponRangeMeasuredTemplate(document, ranges);
+        const overlay = new WeaponRangeOverlay(ranges);
 
         try {
-            await template.drawAt(origin);
-            return template;
+            overlay.drawAt(origin);
+            return overlay;
         } catch (error) {
             if (error) console.error('Shadowrun 5e | Could not render weapon range preview', error);
-            template.destroy();
+            overlay.remove();
         }
     },
 };
