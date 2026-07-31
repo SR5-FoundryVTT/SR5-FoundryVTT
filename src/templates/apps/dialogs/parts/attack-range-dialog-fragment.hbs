@@ -11,4 +11,12 @@
     <select name="test.data.range" {{#if test.hasTargets}}disabled{{/if}}>
         {{selectOptions test.rangeOptions selected=test.data.range}}
     </select>
+    <button
+        id="show-weapon-ranges"
+        type="button"
+        data-tooltip="SR5.Tooltips.RangedAttack.ShowWeaponRanges"
+        aria-label="{{localize 'SR5.Tooltips.RangedAttack.ShowWeaponRanges'}}"
+    >
+        <i class="fa-solid fa-bullseye"></i>
+    </button>
 </div>

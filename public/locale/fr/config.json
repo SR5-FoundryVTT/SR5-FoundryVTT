@@ -1014,6 +1014,7 @@
         },
         "Walk": "Marcher",
         "Warnings": {
+            "InvalidWeaponRanges": "Les portées d'arme doivent être croissantes et se terminer au-dessus de zéro.",
             "CantCombineBuyHitsWithEdge": "Acheter des succès ne peut pas être combiné avec Seconde chance.",
             "MissingSkillOnActor": "Le personnage selectionné ne connait pas cette compétence",
             "NegativeLimitValue": "Les valeurs des limites doivent être supérieures à 0",
@@ -1023,6 +1024,9 @@
             "TokenSelectionNeeded": "Un ou plusieurs jetons doivent être selectionnés"
         },
         "Tooltips": {
+            "RangedAttack": {
+                "ShowWeaponRanges": "Aperçu des portées d'arme"
+            },
             "Test": {
                 "BuyHits": "Ne lance pas de dés. Achète des succès avec ⌊réserve de dés / 4⌋.",
                 "ResultOverrideGlitches": "Remplace les glitches pour ce résultat de test.",

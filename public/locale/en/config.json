@@ -2932,7 +2932,8 @@
                 "RecoilAfterAttack": "Progressive Recoil including this attack",
                 "RecoilBeforeAttack": "Progressive Recoil now, before attacking",
                 "RecoilCompensation": "Total RC, including actor and item RC",
-                "ResetRecoil": "Reset progressive recoil to none"
+                "ResetRecoil": "Reset progressive recoil to none",
+                "ShowWeaponRanges": "Preview weapon ranges"
             },
             "Ritual": {
                 "Force": "Force of the ritual",
@@ -3066,6 +3067,7 @@
         "WalkingSpeed": "Walking",
         "Warnings": {
             "ActorMissingRequirements": "Actor must match the skills awakened or emerged requirement",
+            "InvalidWeaponRanges": "Weapon ranges must be in ascending order and end above zero.",
             "AlreadyExistingInventory": "An inventory with this name already exists",
             "AlreadyJoinedNetwork": "{name} already joined this network",
             "BulkImportPerformanceWarning": "If you imported a large number of items, Foundry may run slowly until you refresh your browser. It is recommended to refresh now.",

@@ -1487,7 +1487,8 @@
                 "RecoilAfterAttack": "Recuo Progressivo incluindo este ataque",
                 "RecoilBeforeAttack": "Recuo Progressivo agora, antes de atacar",
                 "RecoilCompensation": "CR total, incluindo CR do ator e do item",
-                "ResetRecoil": "Redefinir recuo progressivo para nenhum"
+                "ResetRecoil": "Redefinir recuo progressivo para nenhum",
+                "ShowWeaponRanges": "Visualizar alcances da arma"
             },
             "Ritual": {
                 "Force": "Força do ritual",
@@ -1618,6 +1619,7 @@
         "Walk": "Caminhar",
         "WalkingSpeed": "Caminhando",
         "Warnings": {
+            "InvalidWeaponRanges": "Os alcances da arma devem estar em ordem crescente e terminar acima de zero.",
             "AlreadyExistingInventory": "Um inventário com este nome já existe",
             "BulkImportPerformanceWarning": "Se você importou um grande número de itens, o Foundry pode funcionar lentamente até que você atualize seu navegador. É recomendado atualizar agora.",
             "CantEditDefaultInventory": "O inventário padrão não pode ser renomeado",

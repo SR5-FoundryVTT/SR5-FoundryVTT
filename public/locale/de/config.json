@@ -2969,7 +2969,8 @@
                 "RecoilAfterAttack": "Kumulativer Rückstoß nach diesem Angriff",
                 "RecoilBeforeAttack": "Kumulativer Rückstoß jetzt, vor dem Angriff",
                 "RecoilCompensation": "Gesamte RK, inklusive RK der Waffe",
-                "ResetRecoil": "Setze kumulativen Rückstoß zurück"
+                "ResetRecoil": "Setze kumulativen Rückstoß zurück",
+                "ShowWeaponRanges": "Waffenreichweiten anzeigen"
             },
             "Ritual": {
                 "Force": "Kraftstufe des Rituals",
@@ -3102,6 +3103,7 @@
         "WalkingSpeed": "Gehen",
         "Warnings": {
             "ActorMissingRequirements": "Der Akteur muss die Voraussetzung der Fertigkeit erfüllen: erwacht oder emergiert",
+            "InvalidWeaponRanges": "Waffenreichweiten müssen aufsteigend sein und über null enden.",
             "AlreadyExistingInventory": "Ein Inventar mit diesem Namen existiert bereits",
             "AlreadyJoinedNetwork": "bereits mit dem Netzwerk {name} verbunden",
             "BulkImportPerformanceWarning": "Wenn du eine große Anzahl von Items importiert hast, kann Foundry langsam laufen, bis du deinen Browser aktualisierst. Es wird empfohlen, jetzt zu aktualisieren.",

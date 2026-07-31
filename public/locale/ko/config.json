@@ -2923,7 +2923,8 @@
                 "RecoilAfterAttack": "이번 공격을 포함한 점진적 반동",
                 "RecoilBeforeAttack": "공격 전, 현재 점진적 반동",
                 "RecoilCompensation": "액터와 아이템을 포함한 총 RC",
-                "ResetRecoil": "점진적 반동을 없음으로 초기화"
+                "ResetRecoil": "점진적 반동을 없음으로 초기화",
+                "ShowWeaponRanges": "무기 사거리 미리보기"
             },
             "Ritual": {
                 "Force": "의식 강도",
@@ -3056,6 +3057,7 @@
         "WalkingSpeed": "걷기",
         "Warnings": {
             "ActorMissingRequirements": "액터는 ‘각성’ 또는 ‘공명’ 기술 요건과 일치해야 함",
+            "InvalidWeaponRanges": "Weapon ranges must be in ascending order and end above zero.",
             "AlreadyExistingInventory": "해당 이름의 소지품 위치가 이미 존재",
             "AlreadyJoinedNetwork": "{name} 은/는 이미 네트워크에 접속함",
             "BulkImportPerformanceWarning": "한 번에 다수의 물품을 불러올 경우 브라우저를 새로고침 하기 전까지 Foundry가 느려질 수 있습니다. 즉시 새로고침 하는 것을 추천합니다.",
