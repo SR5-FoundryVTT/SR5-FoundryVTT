@@ -73,7 +73,8 @@ export const SkillSetFlow = {
 
         // Support document creation flow.
         if (options.useSource) {
-            actor.updateSource({ items, system: { skillset: skillSet.uuid } });
+            const existingItems = actor.items.map(item => item.toObject());
+            actor.updateSource({ items: [...existingItems, ...items], system: { skillset: skillSet.uuid } });
             return;
         }
 

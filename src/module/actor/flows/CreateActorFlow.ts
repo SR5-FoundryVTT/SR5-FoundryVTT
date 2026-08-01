@@ -1,13 +1,6 @@
 import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
-import { SkillItemFlow } from '@/module/item/flows/SkillItemFlow';
 import { SR5Actor } from '../SR5Actor';
 import { SkillSetFlow } from './SkillSetFlow';
-import type { PreparedSkillSetItems } from './SkillSetFlow';
-
-interface PreparedDefaultSkillSet {
-    uuid: string;
-    items: PreparedSkillSetItems;
-}
 
 /**
  * SR5 specific options understood while an actor document is created.
@@ -61,36 +54,5 @@ export const CreateActorFlow = {
         }
 
         return skillSet;
-    },
-
-    /** Add each actor type's default skill set to its creation sources. */
-    async addDefaultSkillsetsToSources(actorSources: Actor.CreateData[]) {
-        // Cache misses as null to avoid repeat lookups.
-        const skillSetsByActorType = new Map<string, PreparedDefaultSkillSet | null>();
-
-        for (const source of actorSources) {
-            // Preserve skill sets assigned by import data.
-            if (foundry.utils.getProperty(source, 'system.skillset')) continue;
-
-            let skillSetData = skillSetsByActorType.get(source.type);
-            if (skillSetData === undefined) {
-                const skillSet = await this.getDefaultSkillSet(source.type);
-                skillSetData = skillSet?.uuid
-                    ? { uuid: skillSet.uuid, items: await SkillSetFlow.prepareSkillSetItems(skillSet) }
-                    : null;
-
-                skillSetsByActorType.set(source.type, skillSetData);
-            }
-
-            if (!skillSetData) continue;
-
-            // Normalize keyed and list item sources.
-            const existingItems = Object.values(source.items ?? {}) as Item.CreateData[];
-            const items = SkillSetFlow.selectMissingSkillSetItems(skillSetData.items, SkillItemFlow.skillKeys(existingItems));
-
-            // Prepared items are shared by actor type.
-            source.items = [...existingItems, ...foundry.utils.deepClone(items)];
-            foundry.utils.setProperty(source, 'system.skillset', skillSetData.uuid);
-        }
     }
 };

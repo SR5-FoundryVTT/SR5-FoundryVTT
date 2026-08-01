@@ -1,7 +1,6 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 
 import { SR5Actor } from '@/module/actor/SR5Actor';
-import { CreateActorFlow } from '@/module/actor/flows/CreateActorFlow';
 import { SkillGroupFlow } from '@/module/actor/flows/SkillGroupFlow';
 import { SkillSetFlow } from '@/module/actor/flows/SkillSetFlow';
 import { DataDefaults } from '@/module/data/DataDefaults';
@@ -917,205 +916,6 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
         });
     });
 
-    describe('CreateActorFlow.addDefaultSkillsetsToSources', () => {
-        /** Mock skill sets and count item preparations. */
-        const withSkillSets = async (
-            sets: [string, string[]][],
-            body: (context: { skillSetUuids: Record<string, string>, buildCount: () => number }) => Promise<void>,
-        ) => {
-            const originalGetAllPackSkillSets = PackItemFlow.getAllPackSkillSets;
-            const originalPrepareSkills = PackItemFlow.prepareSkillsForSkillSet;
-            const originalPrepareGroups = PackItemFlow.prepareSkillGroupsForSkillSet;
-
-            const skillSetItems = new Map<string, string[]>();
-            const skillSetUuids: Record<string, string> = {};
-            const skillSets: SR5Item<'skill'>[] = [];
-            const skillTemplates = new Map<string, SR5Item<'skill'>>();
-            let builds = 0;
-
-            for (const [actorType, skillNames] of sets) {
-                const skillSet = await factory.createItem({
-                    type: 'skill',
-                    name: `${actorType} set`,
-                    system: {
-                        type: 'set',
-                        set: {
-                            skills: skillNames.map(name => ({ name, rating: 0 })),
-                            groups: [],
-                            default: { type: actorType as never },
-                        },
-                    },
-                });
-
-                skillSets.push(skillSet);
-                skillSetUuids[actorType] = skillSet.uuid!;
-                skillSetItems.set(skillSet.uuid!, skillNames);
-
-                for (const name of skillNames) {
-                    if (skillTemplates.has(name)) continue;
-                    skillTemplates.set(name, await factory.createItem({
-                        type: 'skill',
-                        name,
-                        system: { type: 'skill', skill: { category: 'active' } },
-                    }));
-                }
-            }
-
-            PackItemFlow.getAllPackSkillSets = async () => skillSets;
-            PackItemFlow.prepareSkillsForSkillSet = async (skillSet) => {
-                builds++;
-                return (skillSetItems.get(skillSet.uuid!) ?? []).map(name => {
-                    const source = skillTemplates.get(name)!.toObject();
-                    foundry.utils.setProperty(source, 'system.source.uuid', skillSet.uuid!);
-                    return source;
-                });
-            };
-            PackItemFlow.prepareSkillGroupsForSkillSet = async () => [];
-
-            try {
-                await body({ skillSetUuids, buildCount: () => builds });
-            } finally {
-                PackItemFlow.getAllPackSkillSets = originalGetAllPackSkillSets;
-                PackItemFlow.prepareSkillsForSkillSet = originalPrepareSkills;
-                PackItemFlow.prepareSkillGroupsForSkillSet = originalPrepareGroups;
-            }
-        };
-
-        const actorSource = (type: string, items: Item.CreateData[] = []) =>
-            ({ name: `#QUENCH ${type}`, type, system: {}, items } as unknown as Actor.CreateData);
-
-        const skillNames = (source: Actor.CreateData) =>
-            (source.items as Item.CreateData[]).filter(item => item.type === 'skill').map(item => item.name);
-
-        // Guards the bulk import optimization: one build per actor type, not per actor.
-        it('builds a type\'s skill set once and gives every actor of that type the full list', async () => {
-            await withSkillSets([['character', ['Pistols', 'Perception', 'Running']]], async ({ skillSetUuids, buildCount }) => {
-                const sources = [actorSource('character'), actorSource('character'), actorSource('character')];
-
-                await CreateActorFlow.addDefaultSkillsetsToSources(sources);
-
-                assert.strictEqual(buildCount(), 1);
-                for (const source of sources) {
-                    assert.sameMembers(skillNames(source), ['Pistols', 'Perception', 'Running']);
-                    assert.strictEqual(foundry.utils.getProperty(source, 'system.skillset'), skillSetUuids.character);
-                }
-            });
-        });
-
-        // Guards that each actor type keeps its own skill set, an ic gets far fewer skills.
-        it('gives each actor type its own skill set within a mixed batch', async () => {
-            const sets: [string, string[]][] = [
-                ['character', ['Pistols', 'Perception', 'Running']],
-                ['spirit', ['Assensing', 'Astral Combat']],
-                ['ic', ['Computer', 'Hacking']],
-            ];
-
-            await withSkillSets(sets, async ({ skillSetUuids, buildCount }) => {
-                const sources = [
-                    actorSource('character'), actorSource('spirit'), actorSource('ic'),
-                    actorSource('character'), actorSource('ic'),
-                ];
-
-                await CreateActorFlow.addDefaultSkillsetsToSources(sources);
-
-                // One build per distinct type, not per actor.
-                assert.strictEqual(buildCount(), 3);
-
-                assert.sameMembers(skillNames(sources[0]), ['Pistols', 'Perception', 'Running']);
-                assert.sameMembers(skillNames(sources[1]), ['Assensing', 'Astral Combat']);
-                assert.sameMembers(skillNames(sources[2]), ['Computer', 'Hacking']);
-                assert.sameMembers(skillNames(sources[4]), ['Computer', 'Hacking']);
-
-                assert.strictEqual(foundry.utils.getProperty(sources[2], 'system.skillset'), skillSetUuids.ic);
-                assert.notStrictEqual(foundry.utils.getProperty(sources[2], 'system.skillset'), skillSetUuids.character);
-            });
-        });
-
-        it('skips actor types without a default skill set without looking them up again', async () => {
-            await withSkillSets([['character', ['Pistols']]], async ({ buildCount }) => {
-                const sources = [actorSource('vehicle'), actorSource('vehicle'), actorSource('character')];
-
-                await CreateActorFlow.addDefaultSkillsetsToSources(sources);
-
-                assert.strictEqual(buildCount(), 1);
-                assert.lengthOf(skillNames(sources[0]), 0);
-                assert.isUndefined(foundry.utils.getProperty(sources[0], 'system.skillset'));
-                assert.sameMembers(skillNames(sources[2]), ['Pistols']);
-            });
-        });
-
-        // Guards the Chummer defined subset, whose ratings must survive the top up.
-        it('keeps an actor\'s own rated skill instead of the skill set duplicate', async () => {
-            await withSkillSets([['character', ['Pistols', 'Perception']]], async () => {
-                const ownPistols = {
-                    name: 'Pistols',
-                    type: 'skill' as const,
-                    system: DataDefaults.baseSystemData('skill', {
-                        type: 'skill',
-                        skill: { category: 'active', rating: 6 },
-                    }),
-                } as unknown as Item.CreateData;
-                const sources = [actorSource('character', [ownPistols])];
-
-                await CreateActorFlow.addDefaultSkillsetsToSources(sources);
-
-                const pistols = (sources[0].items as Item.CreateData[]).filter(item => item.name === 'Pistols');
-                assert.lengthOf(pistols, 1);
-                assert.strictEqual(foundry.utils.getProperty(pistols[0], 'system.skill.rating'), 6);
-                assert.isEmpty(foundry.utils.getProperty(pistols[0], 'system.source.uuid') ?? '');
-                assert.sameMembers(skillNames(sources[0]), ['Pistols', 'Perception']);
-            });
-        });
-
-        // The prepared items are shared by every actor of a type, so each needs its own copy.
-        it('gives each actor independent item data', async () => {
-            await withSkillSets([['character', ['Pistols']]], async () => {
-                const sources = [actorSource('character'), actorSource('character')];
-
-                await CreateActorFlow.addDefaultSkillsetsToSources(sources);
-
-                const [first] = sources[0].items as Item.CreateData[];
-                foundry.utils.setProperty(first, 'system.skill.rating', 12);
-                first.name = 'Mutated';
-
-                const [second] = sources[1].items as Item.CreateData[];
-                assert.strictEqual(second.name, 'Pistols');
-                assert.strictEqual(foundry.utils.getProperty(second, 'system.skill.rating'), 0);
-            });
-        });
-
-        it('leaves an already assigned skillset alone', async () => {
-            await withSkillSets([['character', ['Pistols']]], async () => {
-                const source = actorSource('character');
-                foundry.utils.setProperty(source, 'system.skillset', 'Compendium.some.other.Item.abcdef1234567890');
-
-                await CreateActorFlow.addDefaultSkillsetsToSources([source]);
-
-                assert.lengthOf(skillNames(source), 0);
-                assert.strictEqual(foundry.utils.getProperty(source, 'system.skillset'), 'Compendium.some.other.Item.abcdef1234567890');
-            });
-        });
-
-        // Guards that moving the work out of _preCreate did not change the resulting actor.
-        it('produces the same actor as the per document _preCreate flow', async () => {
-            await withSkillSets([['character', ['Pistols', 'Perception']]], async () => {
-                const source = actorSource('character');
-                await CreateActorFlow.addDefaultSkillsetsToSources([source]);
-
-                const fromSources = await factory.createActor(
-                    { ...source, type: 'character' } as Parameters<typeof factory.createActor>[0],
-                    { skipDefaultSkills: true },
-                );
-                // Opt back in to the _preCreate flow this batch's factory skips by default.
-                const fromPreCreate = await factory.createActor({ type: 'character' }, { skipDefaultSkills: false });
-
-                const names = (actor: SR5Actor) => actor.items.filter(item => item.type === 'skill').map(item => item.name);
-                assert.sameMembers(names(fromSources), names(fromPreCreate));
-                assert.strictEqual(fromSources.system.skillset, fromPreCreate.system.skillset);
-            });
-        });
-    });
-
     describe('PackItemFlow pack cache', () => {
         /**
          * Counts pack reads while running the given test body and always restores the original
@@ -1191,6 +991,50 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
 
                 await PackItemFlow.getPackSkills();
                 assert.strictEqual(reads(), 2);
+            });
+        });
+
+        // Guards SR5Actor.createDocuments, so any batch creation shares its reads, not just imports.
+        it('shares pack reads across actors created in one batch', async () => {
+            const folder = await factory.getOrCreateFolderId('Actor');
+            const importedSkill = {
+                name: 'Pistols',
+                type: 'skill',
+                system: DataDefaults.baseSystemData('skill', {
+                    type: 'skill', skill: { category: 'active', rating: 6 },
+                }),
+            } as Item.CreateData;
+
+            await withPackReadCounter(async (reads) => {
+                const created = await SR5Actor.create(
+                    [
+                        { name: '#QUENCH', folder, type: 'character', items: [importedSkill] },
+                        { name: '#QUENCH', folder, type: 'character' },
+                        { name: '#QUENCH', folder, type: 'spirit' },
+                    ],
+                );
+                factory.actors.push(...created);
+
+                assert.strictEqual(reads(), 3);
+                for (const actor of created) assert.isNotEmpty(actor.items.filter(item => item.type === 'skill'));
+
+                const pistols = created[0].items.filter(item => item.name === 'Pistols');
+                assert.lengthOf(pistols, 1);
+                assert.strictEqual(foundry.utils.getProperty(pistols[0], 'system.skill.rating'), 6);
+            });
+        });
+
+        // Each creation gets its own scope, so a pack edited between two of them is picked up.
+        it('does not share pack reads between separate creations', async () => {
+            await withPackReadCounter(async (reads) => {
+                await factory.createActor({ type: 'character' }, { skipDefaultSkills: false });
+                const single = reads();
+
+                await factory.createActor({ type: 'character' }, { skipDefaultSkills: false });
+
+                // Reads scale with the actor count, separate creations share nothing.
+                assert.isAbove(single, 0);
+                assert.strictEqual(reads(), single * 2);
             });
         });
     });

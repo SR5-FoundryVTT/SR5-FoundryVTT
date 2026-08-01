@@ -135,6 +135,14 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return { img: assignedImage, texture: { src: assignedImage } };
     }
 
+    /** Share skill pack reads across a creation. */
+    static override async createDocuments<Temporary extends boolean | undefined = undefined>(
+        data: Actor.CreateInput[],
+        operation?: Actor.Database.CreateDocumentsOperation<Temporary>,
+    ) {
+        return PackItemFlow.withSkillPackCache(async () => await super.createDocuments(data, operation));
+    }
+
     /**
      * Lifecycle hook called before an actor document is created.
      *
