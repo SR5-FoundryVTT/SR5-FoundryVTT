@@ -138,9 +138,7 @@ export abstract class DataImporter {
         for (const [key, docs] of itemMap.entries()) {
             const compendium = Constants.MAP_COMPENDIUM_KEY[key];
             if (compendium.type === 'Actor') {
-                await SR5Actor.create(docs as Actor.CreateData[], {
-                    pack: `world.${compendium.pack}`, keepId: true,
-                });
+                await SR5Actor.create(docs as Actor.CreateData[], { pack: `world.${compendium.pack}`, keepId: true });
             } else {
                 await SR5Item.create(docs as Item.CreateData[], { pack: `world.${compendium.pack}`, keepId: true });
             }
