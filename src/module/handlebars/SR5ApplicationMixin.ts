@@ -459,7 +459,6 @@ export function SR5ApplicationMixin<BaseClass extends Identity<typeof AnyApplica
             if (this.isEditable) {
                 const button = document.createElement('button');
                 button.className = 'header-control icon fa-stack';
-                button.style.fontSize = '.6rem';
                 button.dataset.tooltip = 'SR5.Tooltips.ToggleEditMode';
                 button.dataset.action = 'toggleEditMode';
 

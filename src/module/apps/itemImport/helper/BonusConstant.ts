@@ -4,11 +4,10 @@ export type DocCreateData = (
     Actor.CreateData | Item.CreateData
 ) & { effects?: any[] };
 
-export type AECreateData = Omit<ActiveEffect.CreateData, "name"> & { name?: string, changes?: any[] };
-
-export type ActiveEffectMode = typeof CONST.ACTIVE_EFFECT_MODES[keyof typeof CONST.ACTIVE_EFFECT_MODES];
-export const { MULTIPLY, ADD, DOWNGRADE, UPGRADE, OVERRIDE } = CONST.ACTIVE_EFFECT_MODES;
-export type EffectChangeParameter = { key: string; value: string | number; mode?: number; priority?: ActiveEffectMode; };
+export type AECreateData = Omit<ActiveEffect.CreateData, "name"> & {
+    name?: string;
+    system?: Record<string, unknown> & { changes?: any[] };
+};
 
 export class BonusConstant {
     public static readonly skillGroupTable = {
@@ -48,73 +47,65 @@ export class BonusConstant {
     } as const;
 
     public static readonly simpleEffects = {
-        accel: { changes: [{ key: "system.vehicle_stats.acceleration" }] },
+        accel: { system: { changes: [{ key: "system.vehicle_stats.acceleration" }] } },
         armor: {
             name: "Add Armor",
-            changes: [{ key: "system.armor.rating" }]
+            system: { changes: [{ key: "system.armor.rating" }] }
         },
-        body: { changes: [{ key: "system.attributes.body" }] },
-        coldarmor: { changes: [{ key: "system.armor.elements.cold" }] },
-        composure: { changes: [{ key: "system.modifiers.composure" }] },
+        body: { system: { changes: [{ key: "system.attributes.body" }] } },
+        coldarmor: { system: { changes: [{ key: "system.armor.elements.cold" }] } },
+        composure: { system: { changes: [{ key: "system.modifiers.composure" }] } },
         damageresistance: {
             name: "Add Damage Resistance",
-            changes: [{ key: "data.pool" }],
-            system: { applyTo: 'test_all', selection_tests: ["PhysicalResistTest"] },
+            system: { changes: [{ key: "data.pool" }], applyTo: 'test_all', selection_tests: ["PhysicalResistTest"] },
         },
         defensetest: {
-            changes: [{ key: "data.pool" }],
-            system: { applyTo: 'test_all', selection_tests: ["PhysicalDefenseTest", "SuppressionDefenseTest"]},
+            system: { changes: [{ key: "data.pool" }], applyTo: 'test_all', selection_tests: ["PhysicalDefenseTest", "SuppressionDefenseTest"]},
         },
         dodge: {
-            changes: [{ key: "data.pool" }],
-            system: { applyTo: 'test_all', selection_tests: ["PhysicalDefenseTest", "SuppressionDefenseTest"]},
+            system: { changes: [{ key: "data.pool" }], applyTo: 'test_all', selection_tests: ["PhysicalDefenseTest", "SuppressionDefenseTest"]},
         },
         drainresist: {
             name: "Add Drain Resistance",
-            changes: [{ key: "data.pool" }],
-            system: { applyTo: 'test_all', selection_tests: ["DrainTest"] },
+            system: { changes: [{ key: "data.pool" }], applyTo: 'test_all', selection_tests: ["DrainTest"] },
         },
-        electricityarmor: { changes: [{ key: "system.armor.elements.electricity" }] },
-        essencemax: { changes: [{ key: "system.attributes.essence.base" }] },
-        essencepenalty: { changes: [{ key: "system.attributes.essence" }] },
+        electricityarmor: { system: { changes: [{ key: "system.armor.elements.electricity" }] } },
+        essencemax: { system: { changes: [{ key: "system.attributes.essence.base" }] } },
+        essencepenalty: { system: { changes: [{ key: "system.attributes.essence" }] } },
         fadingresist: {
             name: "Add Fading Resistance",
-            changes: [{ key: "data.pool" }],
-            system: { applyTo: 'test_all', selection_tests: ["FadeTest"] },
+            system: { changes: [{ key: "data.pool" }], applyTo: 'test_all', selection_tests: ["FadeTest"] },
         },
-        firearmor: { changes: [{ key: "system.armor.elements.fire" }] },
-        handling: { changes: [{ key: "system.vehicle_stats.handling" }] },
-        initiative: { changes: [{ key: "system.initiative.meatspace.constant" }] },
-        initiativedice: { changes: [{ key: "system.initiative.meatspace.dice" }] },
-        initiativepass: { changes: [{ key: "system.initiative.meatspace.dice" }] },
-        judgeintentions: { changes: [{ key: "system.modifiers.judge_intentions"}] },
-        matrixinitiativediceadd: { changes: [{ key: "system.initiative.matrix.dice" }] },
-        mentallimit: { changes: [{ key: "system.limits.mental" }] },
-        memory: { changes: [{ key: "system.modifiers.memory" }] },
-        offroadaccel: { changes: [{ key: "system.vehicle_stats.off_road_acceleration" }] },
-        offroadhandling: { changes: [{ key: "system.vehicle_stats.off_road_handling" }] },
-        offroadspeed: { changes: [{ key: "system.vehicle_stats.off_road_speed" }] },
-        pilot: { changes: [{ key: "system.vehicle_stats.pilot" }] },
+        firearmor: { system: { changes: [{ key: "system.armor.elements.fire" }] } },
+        handling: { system: { changes: [{ key: "system.vehicle_stats.handling" }] } },
+        initiative: { system: { changes: [{ key: "system.initiative.meatspace.constant" }] } },
+        initiativedice: { system: { changes: [{ key: "system.initiative.meatspace.dice" }] } },
+        initiativepass: { system: { changes: [{ key: "system.initiative.meatspace.dice" }] } },
+        judgeintentions: { system: { changes: [{ key: "system.modifiers.judge_intentions"}] } },
+        matrixinitiativediceadd: { system: { changes: [{ key: "system.initiative.matrix.dice" }] } },
+        mentallimit: { system: { changes: [{ key: "system.limits.mental" }] } },
+        memory: { system: { changes: [{ key: "system.modifiers.memory" }] } },
+        offroadaccel: { system: { changes: [{ key: "system.vehicle_stats.off_road_acceleration" }] } },
+        offroadhandling: { system: { changes: [{ key: "system.vehicle_stats.off_road_handling" }] } },
+        offroadspeed: { system: { changes: [{ key: "system.vehicle_stats.off_road_speed" }] } },
+        pilot: { system: { changes: [{ key: "system.vehicle_stats.pilot" }] } },
         physicalcmrecovery: {
             name: "Natural Recovery Physical",
-            changes: [{ key: "data.pool" }],
-            system: { applyTo: 'test_all', selection_tests: ["NaturalRecoveryPhysicalTest"] }
+            system: { changes: [{ key: "data.pool" }], applyTo: 'test_all', selection_tests: ["NaturalRecoveryPhysicalTest"] }
         },
-        physicallimit: { changes: [{ key: "system.limits.physical" }] },
-        reach: { changes: [{ key: "system.modifiers.reach" }] },
-        seats: { changes: [{ key: "system.vehicle_stats.seats" }] },
-        sensor: { changes: [{ key: "system.vehicle_stats.sensor" }] },
-        sociallimit: { changes: [{ key: "system.limits.social" }] },
-        speed: { changes: [{ key: "system.vehicle_stats.speed" }] },
+        physicallimit: { system: { changes: [{ key: "system.limits.physical" }] } },
+        reach: { system: { changes: [{ key: "system.modifiers.reach" }] } },
+        seats: { system: { changes: [{ key: "system.vehicle_stats.seats" }] } },
+        sensor: { system: { changes: [{ key: "system.vehicle_stats.sensor" }] } },
+        sociallimit: { system: { changes: [{ key: "system.limits.social" }] } },
+        speed: { system: { changes: [{ key: "system.vehicle_stats.speed" }] } },
         spellresistance: {
             name: "Add Spell Resistance",
-            changes: [{ key: "data.pool" } ],
-            system: { applyTo: 'test_all', selection_tests: ["CombatSpellDefenseTest"] }
+            system: { changes: [{ key: "data.pool" }], applyTo: 'test_all', selection_tests: ["CombatSpellDefenseTest"] }
         },
         stuncmrecovery: {
             name: "Natural Recovery Stun",
-            changes: [{ key: "data.pool" }],
-            system: { applyTo: 'test_all', selection_tests: ["NaturalRecoveryStunTest"] }
+            system: { changes: [{ key: "data.pool" }], applyTo: 'test_all', selection_tests: ["NaturalRecoveryStunTest"] }
         }
     } as const satisfies Partial< Record< keyof BonusSchema, AECreateData > >;
 }

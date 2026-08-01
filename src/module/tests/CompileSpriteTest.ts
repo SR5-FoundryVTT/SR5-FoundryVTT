@@ -29,15 +29,15 @@ interface CompileSpriteTestData extends SuccessTestData {
  */
 export class CompileSpriteTest extends SuccessTest<CompileSpriteTestData> {
 
-    override _prepareData(data: any, options: TestOptions) {
-        data = super._prepareData(data, options);
+    override _prepareData(data: DeepPartial<CompileSpriteTestData>, options: Partial<TestOptions>): CompileSpriteTestData {
+        const prepared = super._prepareData(data, options);
 
-        this._prepareCompilationData(data);
+        this._prepareCompilationData(prepared);
 
-        data.fade = data.fade || 0;
-        data.fadeDamage = data.fadeDamage || DataDefaults.createData('damage');
+        prepared.fade ||= 0;
+        prepared.fadeDamage ||= DataDefaults.createData('damage');
 
-        return data;
+        return prepared as CompileSpriteTestData;
     }
 
     _prepareCompilationData(data) {

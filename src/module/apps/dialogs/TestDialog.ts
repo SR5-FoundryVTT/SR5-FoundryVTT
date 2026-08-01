@@ -25,8 +25,8 @@ export interface TestDialogListener {
 
 interface TestDialogContext extends HandlebarsApplicationMixin.RenderContext {
     test: any;
-    rollMode: string;
-    rollModes: CONFIG.ChatMessage.modes;
+    rollMode: ChatMessage.MessageMode;
+    rollModes: typeof CONFIG.ChatMessage.modes;
     config: typeof SR5;
     expandedPaths: string[];
     dialogContent: string;
@@ -163,10 +163,8 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
         const context = await super._prepareContext(options);
 
         context.test = this.test;
-        // @ts-expect-error TODO: fvtt - v14 - missing messageMode setting
         context.rollMode = this.test.data.options?.rollMode ?? game.settings.get('core', 'messageMode');
-        // TODO: fvtt-types - type CONFIG.ChatMessage.modes upstream once available
-        context.rollModes = (CONFIG.ChatMessage as unknown as { modes: CONFIG.ChatMessage.modes }).modes;
+        context.rollModes = CONFIG.ChatMessage.modes;
         context.config = SR5;
         context.expandedPaths = Array.from(this._expandedList);
         context.dialogContent = await foundry.applications.handlebars.renderTemplate(this.test._dialogTemplate, context as unknown as Record<string, unknown>);
@@ -306,13 +304,13 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
         html.find('.roll-mode-button').on('click', event => {
             event.preventDefault();
 
-            const button = event.currentTarget;
+            const button = event.currentTarget as HTMLElement;
             const rollMode = button.dataset.rollMode;
-            if (!rollMode) return;
+            if (!rollMode || !(rollMode in CONFIG.ChatMessage.modes)) return;
 
             if (this.test.data.options?.rollMode === rollMode) return;
 
-            foundry.utils.setProperty(this.test, 'data.options.rollMode', rollMode);
+            foundry.utils.setProperty(this.test, 'data.options.rollMode', rollMode as ChatMessage.MessageMode);
             this.test.prepareBaseValues();
             this.test.calculateBaseValues();
             this.test.validateBaseValues();
@@ -357,7 +355,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
         const name = rawName || game.i18n.localize('SR5.ManualModifier');
 
         ModifiableValue.add(valueField, name, safeValue, {
-            mode: 'ADD',
+            type: 'add',
             enabled: true,
             priority: ModifiableValue.MANUAL_PRIORITY,
         });
@@ -402,7 +400,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
                     valueField,
                     'SR5.ManualOverride',
                     value as number | null,
-                    { mode: 'OVERRIDE', priority: ModifiableValue.TOP_PRIORITY }
+                    { type: 'override', priority: ModifiableValue.TOP_PRIORITY }
                 );
             } 
         }

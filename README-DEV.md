@@ -135,43 +135,50 @@ Afterwards open a terminal (cmd.exe on Windows) with administrative permissions 
 
 You should see a success message and a little arrow symbol on the shadowrun5e folder within the FoundryVTT _Data/systems_ directory. Now you can use the Gulp watch-Task as described above. This needs to be repeated after each Shadowrun5eVTT system update.
 
+### Running Quench locally
 
-## Linux and docker workflow changes
-> **NOTE:** This approach is considered legacy and not actively used anymore. @taMiF left it here for your consideration.
+The Quench runner connects to an existing Foundry development world and tests the currently checked-out
+branch. It does not build the system or start Foundry.
 
-On Linux you can use `docker` (or another container runtime like `podman`) to
-quickly set up a local instance of `foundry`:
+* Run `gulp watch` or `npm run build:dev` so the development system is available to Foundry.
+* Install Quench in the same Foundry data directory and launch a world using the development system.
+* Install the browser once with `npx playwright install chromium`.
+* Run `npm run quench`.
 
-This will use `docker-compose` (or `podman-compose`) to manage the containers.
+The runner prints one line per test as it runs (`✓` pass, `✗` fail, `○` pending), then a failure
+summary with source-mapped stack traces and final counts. It exits with code `1` if any tests fail.
 
-It requires some manual setup to make the `foundryvtt.zip` avaiable for
-installation:
+#### CLI usage
 
-1. Create a `data` and a `data/cache` directory - this will host all files of
-   the installation: `mkdir -p data/cache`
-2. Download the desired version of foundry from your account as `zip` and place
-   it inside the `data/cache` folder (this version has to match the version of
-   the container-image in `docker-compose.yml`):
-
-``` sh
-wget -O data/cache/foundryvtt-$SOME_VERSION.zip $URL_TO_DOWNLOAD_LINK
-```
-3. Spin up `foundryvtt` using `docker-compose`:
-
-``` sh
-# This command must be run inside the root directory of this repository
-# It will automatically symlink this system into data/Data/systems
-docker-compose up
+```sh
+npm run quench                             # full suite (shadowrun5e.**)
+npm run quench -- shadowrun5e.rules.**     # one batch by pattern
+npm run quench -- --headed                 # open a visible browser window
 ```
 
-Now an instance of `foundryvtt` will be running on http://localhost:30000
+#### Configuration via `.env.local`
 
-If you need to restart the instance:
+Create a `.env.local` file in the repo root (it is gitignored) to override defaults:
 
-``` sh
-docker-compose down
-docker-compose up
+```sh
+# URL of the running Foundry instance (default: http://localhost:30000)
+FOUNDRY_URL=http://localhost:30001
+
+# Username to join the world as (default: Gamemaster)
+FOUNDRY_USER=Gamemaster
+
+# Default test pattern when none is given on the command line (default: shadowrun5e.**)
+QUENCH_PATTERN=shadowrun5e.rules.**
+
+# Watchdog timeout for the full run in milliseconds (default: 600000)
+QUENCH_RUN_TIMEOUT=600000
+
+# Set to 1 to print raw browser console output (useful for debugging)
+QUENCH_PAGE_LOGS=0
 ```
+
+Values already set in your shell environment take precedence over `.env.local`.
+
 
 # System Concepts
 General concepts as used in the shadowrun5e system.

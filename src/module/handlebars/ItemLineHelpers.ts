@@ -80,12 +80,21 @@ export const registerItemLineHelpers = () => {
 
     Handlebars.registerHelper('effectDurationLabel', function (effect: SR5ActiveEffect) {
         const getDurationLabel = () => {
-            if (effect.duration.seconds) return `${effect.duration.seconds}s`;
-            if (effect.duration.rounds && effect.duration.turns) return `${effect.duration.rounds}r, ${effect.duration.turns}t`;
-            if (effect.duration.rounds) return `${effect.duration.rounds}r`;
-            if (effect.duration.turns) return `${effect.duration.turns}t`;
+            const value = effect.duration.value;
+            if (value == null) return '';
 
-            return '';
+            const unitLabels: Record<typeof effect.duration.units, string> = {
+                seconds: 's',
+                rounds: 'r',
+                turns: 't',
+                minutes: 'm',
+                hours: 'h',
+                days: 'd',
+                months: 'mo',
+                years: 'y',
+            };
+            return `${value}${unitLabels[effect.duration.units] ?? ''}`;
+
         }
         return new Handlebars.SafeString(getDurationLabel());
     })

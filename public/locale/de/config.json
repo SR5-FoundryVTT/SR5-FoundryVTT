@@ -21,8 +21,6 @@
         "DefaultOpposedTestActorSelectionDescription": "Überschreibe Tokenauswahl mit den Zielen der Probe.",
         "DiagonalMovementDescription": "Wie soll diagonale Bewegung auf dem Gitter gehandhabt werden?",
         "DiagonalMovementName": "Diagonale Bewegung",
-        "DieFaceLabels": "Würfelseitenbeschriftungen",
-        "DieFaceLabelsDescription": "[Dice So Nice] Beschriftungen der Würfelseiten auf der Würfelkarte, beginnend mit 1.",
         "DisplayDefaultRollCardDescription": "Soll die Standard-Würfelkarte zusammen mit der Shadowrun Würfelkarte angezeigt werden?",
         "DisplayDefaultRollCardName": "Zeige Standard-Würfelkarte",
         "EstimateDiagonal": "Schätze diagonale Bewegung (1-2-1)",

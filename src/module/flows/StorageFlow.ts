@@ -2,6 +2,7 @@ import { MatrixNetworkFlow } from '@/module/item/flows/MatrixNetworkFlow';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SR5Item } from '@/module/item/SR5Item';
 import { ItemMarksFlow } from '@/module/item/flows/ItemMarksFlow';
+import { MarksStorage } from '@/module/storage/MarksStorage';
 
 /**
  * Storage Flow Handles global storage changes when an actor or item is deleted
@@ -54,6 +55,7 @@ export const StorageFlow = {
             message: `${actor.name} - ${game.i18n.localize(`SR5.Notifications.DeletingStorageReferences.Finished`)}`,
         });
         // handle our own actual deletion
+        if (actor.uuid) await MarksStorage.clearRelations(actor.uuid);
         await MatrixNetworkFlow.handleOnDeleteDocument(actor);
         // remove the progress bar now, we don't need to keep it around
         progressBar.remove();

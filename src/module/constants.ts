@@ -37,6 +37,7 @@ export const FLAGS = {
     ChangelogShownForVersion: 'changelogShownForVersion',
     Modifier: 'modifier',
     DoCombatFunction: 'doCombatFunction',
+    DoCombatantFunction: 'doCombatantFunction',
     addNetworkController: 'addNetworkController',
     SetDataStorage: 'setDataStorage',
     TokenHealthBars: 'tokenHealthBars',
@@ -71,8 +72,7 @@ export const FLAGS = {
     CompendiaSettingsMenu: 'CompendiaSettingsMenu',
     TokenAutoRunning: 'TokenAutoRunning',
     CompendiumBrowserBlacklist: 'CompendiumBrowserBlacklist',
-    ImporterCompendiumOrder: 'ImporterCompendiumOrder',
-    DieFaceLabels: "DieFaceLabels"
+    ImporterCompendiumOrder: 'ImporterCompendiumOrder'
 } as const;
 export const CORE_NAME = 'core';
 export const METATYPEMODIFIER = 'SR5.Character.Modifiers.NPCMetatypeAttribute';
@@ -269,18 +269,18 @@ export const SRStatus = [
         id: 'sr5run',
         name: 'SR5.StatusEffects.Running',
         img: 'systems/shadowrun5e/dist/icons/status-effects/run.svg',
-        system: { applyTo: 'test_all' },
-        changes: [
-            {key: "data.pool", mode: CONST.ACTIVE_EFFECT_MODES.ADD, value: "-2"},
-        ],
+        system: {
+            applyTo: 'test_all',
+            changes: [{ key: "data.pool", type: "add", value: "-2" }],
+        },
     },
     {
         id: 'sr5sprint',
         name: 'SR5.StatusEffects.Sprinting',
         img: 'systems/shadowrun5e/dist/icons/status-effects/sprint.svg',
-        system: { applyTo: 'test_all' },
-        changes: [
-            {key: "data.pool", mode: CONST.ACTIVE_EFFECT_MODES.ADD, value: "-4"},
-        ],
+        system: {
+            applyTo: 'test_all',
+            changes: [{ key: "data.pool", type: "add", value: "-4" }],
+        },
     },
 ] as const satisfies CONFIG.StatusEffect[];

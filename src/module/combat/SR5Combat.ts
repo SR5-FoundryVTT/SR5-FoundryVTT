@@ -5,7 +5,6 @@ import { Migrator } from "../migrator/Migrator";
 import { CombatRules } from "../rules/CombatRules";
 import { FLAGS, SR, SYSTEM_NAME } from "../constants";
 import { SR5Die } from "../rolls/SR5Die";
-import { ChatMessageMode } from "../types/global";
 import SocketMessageData = Shadowrun.SocketMessageData;
 import BaseCombat = foundry.documents.BaseCombat;
 
@@ -88,6 +87,8 @@ export class SR5Combat extends Combat<"base"> {
      * Handles socket messages to trigger combat functions remotely.
      */
     static async _handleSocketMessage(message: SocketMessageData) {
+        if (!game.user?.isGM) return;
+
         const { id, fnName } = message.data ?? {};
         if (typeof id !== 'string' || typeof fnName !== 'string') return;
 
@@ -111,7 +112,8 @@ export class SR5Combat extends Combat<"base"> {
     }
 
     // Foundry's Combat interface defines nextCombatant as a getter, but SR5's initiative flow
-    // @ts-expect-error - doesn't have a single "next" combatant due to initiative passes.
+    // doesn't have a single "next" combatant due to initiative passes.
+    // @ts-expect-error it will be correctly typed later
     override get nextCombatant(): undefined { return undefined; }
 
 
@@ -396,7 +398,7 @@ export class SR5Combat extends Combat<"base"> {
         const messageGroups = {
             public: [] as InitiativeSummaryRow[],
             gm: [] as InitiativeSummaryRow[],
-        } satisfies Partial<Record<ChatMessageMode, InitiativeSummaryRow[]>>;
+        } satisfies Partial<Record<ChatMessage.MessageMode, InitiativeSummaryRow[]>>;
 
         for (const id of combatantIds) {
             const combatant = this.combatants.get(id) as SR5Combatant | undefined;
@@ -571,7 +573,7 @@ export class SR5Combat extends Combat<"base"> {
      * @param messageOptions - Base configuration options for the created ChatMessage documents.
      */
     private async _createInitiativeMessages(
-        messageGroups: Partial<Record<ChatMessageMode, InitiativeSummaryRow[]>>,
+        messageGroups: Partial<Record<ChatMessage.MessageMode, InitiativeSummaryRow[]>>,
         messageOptions: ChatMessage.CreateData,
     ) {
         let hasPlayedSound = false;
@@ -597,7 +599,6 @@ export class SR5Combat extends Combat<"base"> {
                 messageOptions,
             );
 
-            // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
             ChatMessage.applyMode(messageData, rollMode);
             const message = await foundry.documents.ChatMessage.implementation.create(messageData);
 

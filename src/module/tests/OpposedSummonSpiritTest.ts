@@ -4,6 +4,7 @@ import { ModifiableValue } from '../mods/ModifiableValue';
 import { ConjuringRules } from '../rules/ConjuringRules';
 import { OpposedTest, OpposedTestData } from './OpposedTest';
 import { SuccessTestData, TestDocuments, TestOptions } from './SuccessTest';
+import { DeepPartial } from "fvtt-types/utils";
 import { SummonSpiritTest } from './SummonSpiritTest';
 import { Translation } from '../utils/strings';
 
@@ -57,7 +58,7 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
         await test.execute();
     }
 
-    constructor(data, documents?: TestDocuments, options?: TestOptions) {
+    constructor(data: DeepPartial<OpposedSummonSpiritTestData>, documents?: TestDocuments, options?: Partial<TestOptions>) {
         // Due to summoning, the active actor for this test will be created during execution.
         // The selected or user character aren't the correct choice here.
         delete documents?.actor;
@@ -75,12 +76,12 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
         if (this.against.type !== 'SummonSpiritTest') throw new Error(`${this.constructor.name} can only oppose SummonSpiritTest but is opposing a ${this.against.type}`);
     }
 
-    override _prepareData(data: any, options?: any) {
-        data = super._prepareData(data, options);
+    override _prepareData(data: DeepPartial<OpposedSummonSpiritTestData>, options?: Partial<TestOptions>): OpposedSummonSpiritTestData {
+        const prepared = super._prepareData(data, options);
 
-        data.summonedSpiritUuid = data.summonedSpiritUuid || '';
+        prepared.summonedSpiritUuid ||= '';
 
-        return data;
+        return prepared as OpposedSummonSpiritTestData;
     }
 
     override get _chatMessageTemplate(): string {
@@ -239,8 +240,6 @@ export class OpposedSummonSpiritTest extends OpposedTest<OpposedSummonSpiritTest
 
     /**
      * Try getting a prepared spirit actor to reuse.
-     * 
-     * @returns 
      */
     async getPreparedSpiritActor(): Promise<SR5Actor|null> {
         return fromUuid(this.against.data.preparedSpiritUuid) as Promise<SR5Actor>;
