@@ -3,6 +3,18 @@ import { SR5Actor } from '../SR5Actor';
 import { SkillSetFlow } from './SkillSetFlow';
 
 /**
+ * SR5 specific options understood while an actor document is created.
+ *
+ * They're passed as part of the create operation and reach the document through
+ * its _preCreate options:
+ * `SR5Actor.create(data, { skipDefaultSkills: true })`
+ */
+export interface SR5ActorCreateOptions {
+    /** Skip applying the default skill set configured for the created actor type. */
+    skipDefaultSkills?: boolean;
+}
+
+/**
  * Handles actor initialization concerns that only apply during document creation.
  *
  * This flow is intentionally narrow: it prepares newly created actors with any
@@ -20,8 +32,6 @@ export const CreateActorFlow = {
      * @param data Creation data containing the actor type used for skill set selection.
      */
     async addDefaultActorSkillset(actor: SR5Actor, data: Actor.CreateData) {
-        if (window.doNotPopulateDefaultSkills) return console.warn(`Shadowrun 5e | Skipping default skill set application for actor ${actor.name} due to doNotPopulateDefaultSkills flag`);
-
         const skillSets = await PackItemFlow.getAllPackSkillSets();
         const skillSet = skillSets.find(skillSet => {
             if (!skillSet.system.set.default.type) return false;

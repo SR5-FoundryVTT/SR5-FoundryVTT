@@ -17,8 +17,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
     describe('SuccessTest', () => {
         it('evaluate a roll from action data', async () => {
-            window.doNotPopulateDefaultSkills = true;
-
             const action = await factory.createItem({
                 type: 'action',
                 system: {
@@ -51,7 +49,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                 system: {
                     attributes: { body: { base: 5 }, strength: { base: 1 }, reaction: { base: 1 } },
                 }
-            });
+            }, { skipDefaultSkills: true });
             await actor.createEmbeddedDocuments('Item', [
                 {
                     type: 'skill',
@@ -65,8 +63,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                     }
                 }
             ]);
-            
-            delete window.doNotPopulateDefaultSkills;
 
             const test = await TestCreator.fromItem(action, actor, {showMessage: false, showDialog: false});
 
@@ -145,8 +141,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
         });
 
         it('stores code term traces for labeled pool and limit parts', async () => {
-            window.doNotPopulateDefaultSkills = true;
-
             const actor = await factory.createActor({
                 type: 'character',
                 system: {
@@ -157,7 +151,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                         reaction: { base: 3 }
                     },
                 }
-            });
+            }, { skipDefaultSkills: true });
 
             await actor.createEmbeddedDocuments('Item', [
                 {
@@ -172,8 +166,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                     }
                 }
             ]);
-            
-            delete window.doNotPopulateDefaultSkills;
 
             const action = DataDefaults.createData('action_roll', {
                 test: 'SuccessTest',

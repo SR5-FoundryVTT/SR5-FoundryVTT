@@ -11,17 +11,13 @@ import { SR5Item } from '@/module/item/SR5Item';
 import { SR5TestFactory } from './utils';
 
 export const itemSkillTesting = (context: QuenchBatchContext) => {
-    const factory = new SR5TestFactory();
-    const { describe, it, before, after } = context;
+    // These tests build their skill sets by hand, so actors must start without any default skills.
+    const factory = new SR5TestFactory({ skipDefaultSkills: true });
+    const { describe, it, after } = context;
     const assert: Chai.AssertStatic = context.assert;
-
-    before(async () => {
-        window.doNotPopulateDefaultSkills = true;
-    });
 
     after(async () => {
         await factory.destroy();
-        delete window.doNotPopulateDefaultSkills;
     });
 
     describe('SkillSetFlow.applySkillSetToActor', () => {

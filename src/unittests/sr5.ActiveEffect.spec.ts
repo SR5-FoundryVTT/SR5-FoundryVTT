@@ -193,15 +193,12 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('UPGRADE mode: should raise the value to a max', async () => {
-            window.doNotPopulateDefaultSkills = true;
-
             const actor = await factory.createActor({
                 type: 'character',
                 system: {
                     attributes: { body: { base: 2 } },
                 },
-            });
-            delete window.doNotPopulateDefaultSkills;
+            }, { skipDefaultSkills: true });
 
             await actor.createEmbeddedDocuments('Item', [{
                 type: 'skill',
@@ -237,11 +234,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('UPGRADE mode: uses the highest value for multiple upgrade changes', async () => {
-            window.doNotPopulateDefaultSkills = true;
-
-            const actor = await factory.createActor({ type: 'character' });
-            //
-            delete window.doNotPopulateDefaultSkills;
+            const actor = await factory.createActor({ type: 'character' }, { skipDefaultSkills: true });
 
             await actor.createEmbeddedDocuments('Item', [{
                 type: 'skill',
@@ -273,14 +266,12 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('DOWNGRADE mode: should reduce the value to a min', async () => {
-            window.doNotPopulateDefaultSkills = true;
             const actor = await factory.createActor({
                 type: 'character',
                 system: {
                     attributes: { body: { base: 5 } },
                 },
-            });
-            delete window.doNotPopulateDefaultSkills;
+            }, { skipDefaultSkills: true });
 
             await actor.createEmbeddedDocuments('Item', [{
                 type: 'skill',
@@ -316,9 +307,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('DOWNGRADE mode: uses the lowest value for multiple downgrade changes', async () => {
-            window.doNotPopulateDefaultSkills = true;
-            const actor = await factory.createActor({ type: 'character' });
-            delete window.doNotPopulateDefaultSkills;
+            const actor = await factory.createActor({ type: 'character' }, { skipDefaultSkills: true });
 
             await actor.createEmbeddedDocuments('Item', [{
                 type: 'skill',
@@ -348,14 +337,12 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('MULTIPLY mode: multiplies base values by the change value', async () => {
-            window.doNotPopulateDefaultSkills = true;
             const actor = await factory.createActor({
                 type: 'character',
                 system: {
                     attributes: { body: { base: 5 } },
                 },
-            });
-            delete window.doNotPopulateDefaultSkills;
+            }, { skipDefaultSkills: true });
 
             await actor.createEmbeddedDocuments('Item', [{
                 type: 'skill',
@@ -391,14 +378,12 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('SUBTRACT mode: subtracts the change value from base values', async () => {
-            window.doNotPopulateDefaultSkills = true;
             const actor = await factory.createActor({
                 type: 'character',
                 system: {
                     attributes: { body: { base: 5 } },
                 },
-            });
-            delete window.doNotPopulateDefaultSkills;
+            }, { skipDefaultSkills: true });
 
             await actor.createEmbeddedDocuments('Item', [{
                 type: 'skill',

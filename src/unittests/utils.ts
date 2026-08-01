@@ -1,5 +1,6 @@
 import { SR5Actor } from "src/module/actor/SR5Actor";
 import { SR5Item } from "src/module/item/SR5Item";
+import type { SR5ActorCreateOptions } from "src/module/actor/flows/CreateActorFlow";
 
 export class SR5TestFactory {
     static readonly folderName = '#Quench';
@@ -8,6 +9,12 @@ export class SR5TestFactory {
     readonly items: Item.Stored[] = [];
     readonly scenes: Scene.Stored[] = [];
     readonly createdFolder = new Map<string, string>();
+
+    /**
+     * @param actorCreateOptions SR5 create options applied to every actor this factory creates.
+     *                           Individual createActor calls can override them.
+     */
+    constructor(readonly actorCreateOptions: SR5ActorCreateOptions = {}) {}
 
     async getOrCreateFolderId(type: 'Actor' | 'Item' | 'Scene'): Promise<string> {
         if (this.createdFolder.has(type)) return this.createdFolder.get(type)!;
@@ -21,10 +28,13 @@ export class SR5TestFactory {
 
     async createActor<T extends Actor.ConfiguredSubType>(
         data: Omit<Actor.CreateData, "name"> & { name?: string, type: T },
-        context?: Actor.ConstructionContext
+        operation?: Actor.Database.CreateDocumentsOperation & SR5ActorCreateOptions
     ) {
         const folder = await this.getOrCreateFolderId('Actor');
-        const actor = await SR5Actor.create({ name: `#QUENCH`, folder: folder, ...data }, context) as Actor.Stored<T>;
+        const actor = await SR5Actor.create(
+            { name: `#QUENCH`, folder: folder, ...data },
+            { ...this.actorCreateOptions, ...operation }
+        ) as Actor.Stored<T>;
         this.actors.push(actor);
         return actor;
     }
