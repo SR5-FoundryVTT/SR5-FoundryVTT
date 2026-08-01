@@ -172,10 +172,11 @@ export class HooksManager {
         Hooks.on('moveToken', SR5TokenDocument.moveToken.bind(SR5Token));
         Hooks.on('renderTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
         Hooks.on('renderPrototypeTokenConfig', SR5Token.tokenConfig.bind(HooksManager));
-        Hooks.on('createItem', (item) => { void HooksManager.handleSkillItemMutation(item); });
+        Hooks.on('createItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('updateItem', (item, data, options, userId) => { void HooksManager.updateIcConnectedToHostItem(item, data, options, userId); });
-        Hooks.on('updateItem', (item) => { void HooksManager.handleSkillItemMutation(item); });
-        Hooks.on('deleteItem', (item) => { void HooksManager.handleSkillItemMutation(item); });
+        Hooks.on('updateItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
+        Hooks.on('deleteItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
+        Hooks.on('updateCompendium', (pack) => { PackItemFlow.handleCompendiumMutation(pack.metadata.name); });
         Hooks.on('getChatMessageContextOptions', SuccessTest.chatMessageContextOptions.bind(SuccessTest));
 
         Hooks.on('renderChatLog', HooksManager.chatLogListeners.bind(HooksManager));
@@ -654,12 +655,11 @@ ___________________
             await MatrixICFlow.handleUpdateItemHost(item);
     }
 
-    static async handleSkillItemMutation(item: SR5Item) {
-        if (!item.isType('skill')) return;
-        PackItemFlow.handleCompendiumSkillItemMutation(item);
-
+    static async syncSkillGroupMembership(item: SR5Item) {
         if (!item.actor) return;
+        if (!item.isType('skill')) return;
         if (!['group', 'skill'].includes(item.system.type)) return;
+
         await SkillGroupFlow.syncSkillItemGroups(item.actor);
     }
 

@@ -476,25 +476,68 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(calls, 2);
         });
 
-        it('invalidates an individual skill cache bucket by type and pack', async () => {
-            const packName = 'sr5e-skills';
-            PackItemFlow._packSkillsCache.set(`skills:${packName}`, Promise.resolve([]));
-            PackItemFlow._packSkillGroupsCache.set(`skillgroups:${packName}`, Promise.resolve([]));
-            PackItemFlow._packSkillSetsCache.set(`skillsets:${packName}`, Promise.resolve([]));
+        it('does not cache a failed load', async () => {
+            const cache = new Map<string, Promise<number>>();
+            let calls = 0;
 
-            PackItemFlow.invalidateSkillCacheByTypeAndPack('skills', packName);
-            PackItemFlow.invalidateSkillCacheByTypeAndPack('skillgroups', packName);
-            PackItemFlow.invalidateSkillCacheByTypeAndPack('skillsets', packName);
+            const loader = async () => {
+                calls += 1;
+                if (calls === 1) throw new Error('pack unavailable');
+                return 7;
+            };
 
-            assert.isFalse(PackItemFlow._packSkillsCache.has(`skills:${packName}`));
-            assert.isFalse(PackItemFlow._packSkillGroupsCache.has(`skillgroups:${packName}`));
-            assert.isFalse(PackItemFlow._packSkillSetsCache.has(`skillsets:${packName}`));
+            let rejected = false;
+            try {
+                await PackItemFlow.getCachedPackDocuments(cache, 'key', loader);
+            } catch {
+                rejected = true;
+            }
+
+            assert.isTrue(rejected, 'First load rejects');
+            assert.isFalse(cache.has('key'), 'A failed load must not stay cached');
+
+            // A retry has to reach the loader again instead of replaying the rejection.
+            assert.strictEqual(await PackItemFlow.getCachedPackDocuments(cache, 'key', loader), 7);
+            assert.strictEqual(calls, 2);
+        });
+
+        it('hands each caller its own list so the cache cannot be modified', async () => {
+            const originalGetSkillsPackName = PackItemFlow.getSkillsPackName;
+            const originalGetItemPack = PackItemFlow.getItemPack;
+            const originalGetPackDocuments = PackItemFlow.getPackDocuments;
+
+            const packName = 'test-skills-pack';
+            const packSkill = { name: 'Pistols' } as unknown as SR5Item<'skill'>;
+
+            PackItemFlow.getSkillsPackName = () => packName as Shadowrun.PackName;
+            PackItemFlow.getItemPack = (() => ({
+                index: [{ _id: 'skill-id', type: 'skill' }],
+            })) as unknown as typeof PackItemFlow.getItemPack;
+            PackItemFlow.getPackDocuments = (async () => [packSkill]) as typeof PackItemFlow.getPackDocuments;
+
+            try {
+                PackItemFlow._packSkillsCache.delete(packName);
+
+                // SkillSelectionFlow adds actor owned skills onto the list it gets back.
+                const first = await PackItemFlow.getPackSkills();
+                first.push({ name: 'Actor owned skill' } as unknown as SR5Item<'skill'>);
+
+                const second = await PackItemFlow.getPackSkills();
+
+                assert.lengthOf(second, 1, 'Cached list must not grow when a caller adds to its own list');
+                assert.strictEqual(second[0], packSkill);
+            } finally {
+                PackItemFlow._packSkillsCache.delete(packName);
+                PackItemFlow.getSkillsPackName = originalGetSkillsPackName;
+                PackItemFlow.getItemPack = originalGetItemPack;
+                PackItemFlow.getPackDocuments = originalGetPackDocuments;
+            }
         });
 
         it('clears all skill caches at once', async () => {
-            PackItemFlow._packSkillsCache.set('skills:a', Promise.resolve([]));
-            PackItemFlow._packSkillGroupsCache.set('skillgroups:b', Promise.resolve([]));
-            PackItemFlow._packSkillSetsCache.set('skillsets:c', Promise.resolve([]));
+            PackItemFlow._packSkillsCache.set('a', Promise.resolve([]));
+            PackItemFlow._packSkillGroupsCache.set('b', Promise.resolve([]));
+            PackItemFlow._packSkillSetsCache.set('c', Promise.resolve([]));
 
             PackItemFlow.invalidateAllSkillCaches();
 
@@ -503,38 +546,63 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(PackItemFlow._packSkillSetsCache.size, 0);
         });
 
-        it('invalidates and rewarms cache when a relevant compendium skill item changes', async () => {
+        it('invalidates and rewarms only the caches reading from a changed compendium', async () => {
             const originalGetSkillsPackName = PackItemFlow.getSkillsPackName;
             const originalGetSkillGroupsPackName = PackItemFlow.getSkillGroupsPackName;
             const originalGetSkillSetsPackName = PackItemFlow.getSkillSetsPackName;
             const originalWarmSkillCaches = PackItemFlow.warmSkillCaches;
 
             const skillPackName = 'sr5e-skills';
-            PackItemFlow._packSkillsCache.set(`skills:${skillPackName}`, Promise.resolve([]));
+            const skillGroupsPackName = 'sr5e-skill-groups';
 
             let warmCalls = 0;
             PackItemFlow.getSkillsPackName = () => skillPackName as Shadowrun.PackName;
-            PackItemFlow.getSkillGroupsPackName = () => 'sr5e-skill-groups' as Shadowrun.PackName;
+            PackItemFlow.getSkillGroupsPackName = () => skillGroupsPackName as Shadowrun.PackName;
             PackItemFlow.getSkillSetsPackName = () => 'sr5e-skill-sets' as Shadowrun.PackName;
             PackItemFlow.warmSkillCaches = async () => {
                 warmCalls += 1;
             };
 
-            const changedCompendiumSkill = {
-                pack: `world.${skillPackName}`,
-                isType: (...types: Item.ConfiguredSubType[]) => types.includes('skill'),
-            } as unknown as SR5Item;
+            PackItemFlow._packSkillsCache.set(skillPackName, Promise.resolve([]));
+            PackItemFlow._packSkillGroupsCache.set(skillGroupsPackName, Promise.resolve([]));
 
             try {
-                PackItemFlow.handleCompendiumSkillItemMutation(changedCompendiumSkill);
-                await Promise.resolve();
+                PackItemFlow.handleCompendiumMutation(skillPackName);
 
-                assert.isFalse(PackItemFlow._packSkillsCache.has(`skills:${skillPackName}`));
+                assert.isFalse(PackItemFlow._packSkillsCache.has(skillPackName), 'Changed pack is dropped');
+                assert.isTrue(PackItemFlow._packSkillGroupsCache.has(skillGroupsPackName), 'Unrelated pack is kept');
                 assert.strictEqual(warmCalls, 1);
             } finally {
+                PackItemFlow._packSkillGroupsCache.delete(skillGroupsPackName);
                 PackItemFlow.getSkillsPackName = originalGetSkillsPackName;
                 PackItemFlow.getSkillGroupsPackName = originalGetSkillGroupsPackName;
                 PackItemFlow.getSkillSetsPackName = originalGetSkillSetsPackName;
+                PackItemFlow.warmSkillCaches = originalWarmSkillCaches;
+            }
+        });
+
+        it('ignores changes to compendiums no skill cache reads from', async () => {
+            const originalGetSkillsPackName = PackItemFlow.getSkillsPackName;
+            const originalWarmSkillCaches = PackItemFlow.warmSkillCaches;
+
+            const skillPackName = 'sr5e-skills';
+
+            let warmCalls = 0;
+            PackItemFlow.getSkillsPackName = () => skillPackName as Shadowrun.PackName;
+            PackItemFlow.warmSkillCaches = async () => {
+                warmCalls += 1;
+            };
+
+            PackItemFlow._packSkillsCache.set(skillPackName, Promise.resolve([]));
+
+            try {
+                PackItemFlow.handleCompendiumMutation('some-unrelated-pack');
+
+                assert.isTrue(PackItemFlow._packSkillsCache.has(skillPackName));
+                assert.strictEqual(warmCalls, 0);
+            } finally {
+                PackItemFlow._packSkillsCache.delete(skillPackName);
+                PackItemFlow.getSkillsPackName = originalGetSkillsPackName;
                 PackItemFlow.warmSkillCaches = originalWarmSkillCaches;
             }
         });
