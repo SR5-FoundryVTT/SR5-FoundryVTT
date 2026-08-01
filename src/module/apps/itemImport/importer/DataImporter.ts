@@ -1,6 +1,8 @@
 import { Parser } from 'xml2js';
 import { SR5Item } from '@/module/item/SR5Item';
 import { SR5Actor } from '@/module/actor/SR5Actor';
+import { CreateActorFlow, type SR5ActorCreateOptions } from '@/module/actor/flows/CreateActorFlow';
+import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
 import { ParseData, Schemas } from "../parser/Types";
 import { ImportHelper as IH } from '../helper/ImportHelper';
 import { ChummerFileXML, CompendiumKey, Constants } from './Constants';
@@ -138,7 +140,16 @@ export abstract class DataImporter {
         for (const [key, docs] of itemMap.entries()) {
             const compendium = Constants.MAP_COMPENDIUM_KEY[key];
             if (compendium.type === 'Actor') {
-                await SR5Actor.create(docs as Actor.CreateData[], { pack: `world.${compendium.pack}`, keepId: true });
+                // Prepare default skills once per actor type.
+                const actors = docs as Actor.CreateData[];
+                await PackItemFlow.withSkillPackCache(async () => {
+                    await CreateActorFlow.addDefaultSkillsetsToSources(actors);
+                });
+
+                const operation: Actor.Database.CreateDocumentsOperation & SR5ActorCreateOptions = {
+                    pack: `world.${compendium.pack}`, keepId: true, skipDefaultSkills: true,
+                };
+                await SR5Actor.create(actors, operation);
             } else {
                 await SR5Item.create(docs as Item.CreateData[], { pack: `world.${compendium.pack}`, keepId: true });
             }

@@ -1,6 +1,13 @@
 import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
+import { SkillItemFlow } from '@/module/item/flows/SkillItemFlow';
 import { SR5Actor } from '../SR5Actor';
 import { SkillSetFlow } from './SkillSetFlow';
+import type { PreparedSkillSetItems } from './SkillSetFlow';
+
+interface PreparedDefaultSkillSet {
+    uuid: string;
+    items: PreparedSkillSetItems;
+}
 
 /**
  * SR5 specific options understood while an actor document is created.
@@ -32,19 +39,58 @@ export const CreateActorFlow = {
      * @param data Creation data containing the actor type used for skill set selection.
      */
     async addDefaultActorSkillset(actor: SR5Actor, data: Actor.CreateData) {
-        const skillSets = await PackItemFlow.getAllPackSkillSets();
-        const skillSet = skillSets.find(skillSet => {
-            if (!skillSet.system.set.default.type) return false;
-            return skillSet.system.set.default.type === data.type;
-        });
-
-        if (!skillSet) {
-            console.debug(`Shadowrun 5e | No default skill set found for actor type ${data.type}, skipping default skill set application`);
-            return;
-        }
+        const skillSet = await this.getDefaultSkillSet(data.type);
+        if (!skillSet) return;
 
         await SkillSetFlow.applySkillSetToActor(actor, skillSet, { useSource: true });
 
         console.debug(`Shadowrun 5e | Added skill set ${skillSet.name} to actor source data`);
+    },
+
+    /** Get the default skill set for an actor type. */
+    async getDefaultSkillSet(actorType?: string) {
+        const skillSets = await PackItemFlow.getAllPackSkillSets();
+        const skillSet = skillSets.find(skillSet => {
+            if (!skillSet.system.set.default.type) return false;
+            return skillSet.system.set.default.type === actorType;
+        });
+
+        if (!skillSet) {
+            console.debug(`Shadowrun 5e | No default skill set found for actor type ${actorType}, skipping default skill set application`);
+            return;
+        }
+
+        return skillSet;
+    },
+
+    /** Add each actor type's default skill set to its creation sources. */
+    async addDefaultSkillsetsToSources(actorSources: Actor.CreateData[]) {
+        // Cache misses as null to avoid repeat lookups.
+        const skillSetsByActorType = new Map<string, PreparedDefaultSkillSet | null>();
+
+        for (const source of actorSources) {
+            // Preserve skill sets assigned by import data.
+            if (foundry.utils.getProperty(source, 'system.skillset')) continue;
+
+            let skillSetData = skillSetsByActorType.get(source.type);
+            if (skillSetData === undefined) {
+                const skillSet = await this.getDefaultSkillSet(source.type);
+                skillSetData = skillSet?.uuid
+                    ? { uuid: skillSet.uuid, items: await SkillSetFlow.prepareSkillSetItems(skillSet) }
+                    : null;
+
+                skillSetsByActorType.set(source.type, skillSetData);
+            }
+
+            if (!skillSetData) continue;
+
+            // Normalize keyed and list item sources.
+            const existingItems = Object.values(source.items ?? {}) as Item.CreateData[];
+            const items = SkillSetFlow.selectMissingSkillSetItems(skillSetData.items, SkillItemFlow.skillKeys(existingItems));
+
+            // Prepared items are shared by actor type.
+            source.items = [...existingItems, ...foundry.utils.deepClone(items)];
+            foundry.utils.setProperty(source, 'system.skillset', skillSetData.uuid);
+        }
     }
 };
