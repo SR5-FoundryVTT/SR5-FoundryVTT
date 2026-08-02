@@ -182,13 +182,6 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
     }
 
     /**
-     * Opposed tests can't cause any blast template.
-     */
-    override get _canPlaceBlastTemplate(): boolean {
-        return false;
-    }
-
-    /**
      * Derived net hits of the active vs opposed test pair.
      */
     get againstNetHits(): ValueFieldType {

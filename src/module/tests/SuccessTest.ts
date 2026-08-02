@@ -1,5 +1,4 @@
 import { SR5 } from "../config";
-import Template from "../template";
 import { Helpers } from "../helpers";
 import { SR5Die } from "../rolls/SR5Die";
 import { SR5Item } from "../item/SR5Item";
@@ -13,7 +12,7 @@ import { ActionFlow } from "../item/flows/ActionFlow";
 import { CORE_NAME, FLAGS, SYSTEM_NAME } from "../constants";
 import { SheetFlow } from "../flows/SheetFlow";
 import { DamageApplicationFlow } from '../actor/flows/DamageApplicationFlow';
-import { TestDialog, TestDialogLike, TestDialogListener } from "../apps/dialogs/TestDialog";
+import { TestDialog, TestDialogListener } from "../apps/dialogs/TestDialog";
 
 import ModifierTypes = Shadowrun.ModifierTypes;
 
@@ -187,9 +186,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
     // Targets can be either actor/item or a token.
     public targets: (SR5Actor | SR5Item | TokenDocument)[];
     public dialog: TestDialog | null;
-
-    #blastTemplate?: Template;
-    #blastTemplatePositionSelected = false;
 
     // Flows to handle different aspects of a Success Test that are not directly related to the test itself.
     public effects: SuccessTestEffectsFlow<this>;
@@ -507,71 +503,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * it's behavior without the need to sub-class TestDialog.
      */
     _testDialogListeners() {
-        return [{
-            query: '#show-blast-template',
-            on: 'click',
-            callback: this._handleShowBlastTemplate.bind(this)
-        }] as TestDialogListener[];
-    }
-
-    _handleShowBlastTemplate(event: JQuery.Event, dialog: TestDialogLike) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (this.#blastTemplate) {
-            void this.#removeBlastTemplate();
-            return;
-        }
-
-        dialog.applyFormData?.();
-        const item = this.item;
-        if (!item?.hasBlastTemplate) return;
-
-        const template = Template.fromItem(item, undefined, this.blastTemplateData);
-        if (!template) return;
-
-        this.#blastTemplate = template;
-        this.#blastTemplatePositionSelected = false;
-        void template.drawPreview({
-            persistOnConfirm: false,
-            onPositionSelected: (_position, token) => {
-                this.#blastTemplatePositionSelected = true;
-                if (token?.uuid) {
-                    this.data.targetUuids = [token.uuid];
-                    this.data.targetActorsUuid = token.actor?.uuid ? [token.actor.uuid] : [];
-                    this.targets = [token];
-                    this.prepareTargetDataAfterSelection();
-                    void dialog.render();
-                }
-            }
-        });
-    }
-
-    /**
-     * Refresh derived target data after a target is selected during a dialog.
-     */
-    prepareTargetDataAfterSelection() { }
-
-    protected get blastTemplateData() {
-        return this.item?.getBlastData();
-    }
-
-    async #removeBlastTemplate() {
-        await this.#blastTemplate?.cancelPreview();
-        this.#blastTemplate = undefined;
-        this.#blastTemplatePositionSelected = false;
-    }
-
-    async #placeBlastTemplate() {
-        if (!this.#blastTemplate) return;
-
-        if (this.#blastTemplatePositionSelected)
-            await this.#blastTemplate.place();
-        else
-            await this.#blastTemplate.cancelPreview();
-
-        this.#blastTemplate = undefined;
-        this.#blastTemplatePositionSelected = false;
+        return [] as TestDialogListener[];
     }
 
     /**
@@ -614,16 +546,13 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * but before the tests actual execution.
      */
     async _cleanUpAfterDialogCancel() {
-        await this.#removeBlastTemplate();
         this.dialog = null;
     }
 
     /**
      * Allow implementations to clean up after a dialog has been shown.
      */
-    async _cleanUpAfterDialog() {
-        await this.#placeBlastTemplate();
-    }
+    async _cleanUpAfterDialog() { }
 
     /**
      * Override this method if you want to save any document data after a user has selected values
@@ -1868,7 +1797,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             followupActions: this._prepareFollowupActionsTemplateData(),
             resistActions: this._prepareResistActionsTemplateData(),
             resultActions: this._prepareResultActionsTemplateData(),
-            previewTemplate: this._canPlaceBlastTemplate,
             showDescription: this._canShowDescription,
             description: await this.item?.getChatData() || '',
             // Some message segments are only meant for the gm, when the gm is the one creating the message.
@@ -1885,16 +1813,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     get _canShowDescription(): boolean {
         return true;
-    }
-
-    /**
-     * Indicate if this test can be used to place a blast template using the shown chat message.
-     *
-     * This is indicated by the source items ability to cause an area of effect blast and which kind
-     * of test is used.
-     */
-    get _canPlaceBlastTemplate(): boolean {
-        return this.item?.hasBlastTemplate || false;
     }
 
     /**
@@ -2055,7 +1973,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         $(html).find('.show-roll').on('click', this._chatToggleCardRolls.bind(this));
         $(html).find('.show-description').on('click', this._chatToggleCardDescription.bind(this));
         $(html).find('.chat-document-link').on('click', Helpers.renderEntityLinkSheet.bind(Helpers));
-        $(html).find('.place-template').on('click', this._placeItemBlastZoneTemplate.bind(this));
         $(html).find('.result-action').on('click', this._castResultAction.bind(this));
         $(html).find('.chat-select-link').on('click', this._selectSceneToken.bind(this));
         $(html).find('.test-action').on('click', this._castTestAction.bind(this));
@@ -2182,32 +2099,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             if (!message) continue;
             await this.chatMessageListeners(message, element, message.toObject());
         }
-    }
-
-    /**
-     * Items with an area of effect will allow users to place a measuring template matching the items blast values.
-     *
-     * @param event A PointerEvent triggered from anywhere within the chat-card
-     */
-    static async _placeItemBlastZoneTemplate(event: Event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        // Get test data from message.
-        const element = $(event.currentTarget as HTMLElement);
-        const card = element.closest<HTMLElement>('.chat-message');
-        const messageId = card.data('messageId');
-        const test = await TestCreator.fromMessage(messageId);
-        if (!test) return;
-
-        // Get item used in test
-        await test.populateDocuments();
-
-        // Place template based on last used spell force for the item.
-        if (!test.item) return;
-        const template = Template.fromItem(test.item);
-        if (!template) return;
-        await template.drawPreview();
     }
 
     /**

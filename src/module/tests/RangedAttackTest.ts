@@ -10,8 +10,8 @@ import { DeepPartial } from "fvtt-types/utils";
 import { TestDialogLike } from '../apps/dialogs/TestDialog';
 import { RangesTemplateType, TargetRangeTemplateType } from '../types/template/Weapon';
 import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
-import { MeasuredTemplateFlow } from '../flows/MeasuredTemplateFlow';
-import { WeaponRangeOverlay } from '../WeaponRangeOverlay';
+import { TestTemplateFlow } from './flows/TestTemplateFlow';
+import { WeaponRangeOverlayFlow } from './flows/WeaponRangeOverlayFlow';
 
 export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDataFragment {
     damage: DamageType
@@ -31,7 +31,8 @@ export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDa
 
 export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
     declare item: SR5Item;
-    #weaponRangeTemplate?: WeaponRangeOverlay;
+    public templateFlow = new TestTemplateFlow(this);
+    public rangeOverlayFlow = new WeaponRangeOverlayFlow(this);
 
     override _prepareData(data: DeepPartial<RangedAttackTestData>, options: Partial<TestOptions>): RangedAttackTestData {
         const prepared: DeepPartial<RangedAttackTestData> = super._prepareData(data, options);
@@ -48,46 +49,17 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
             query: '#reset-progressive-recoil',
             on: 'click',
             callback: this._handleResetProgressiveRecoil.bind(this)
-        }, {
-            query: '#show-weapon-ranges',
-            on: 'click',
-            callback: this._handleShowWeaponRanges.bind(this)
-        }]
-    }
-
-    _handleShowWeaponRanges(event: JQuery.Event, dialog: TestDialogLike) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        if (this.#weaponRangeTemplate && !this.#weaponRangeTemplate.destroyed) {
-            this.#removeWeaponRangeTemplate();
-            return;
-        }
-        this.#weaponRangeTemplate = undefined;
-
-        dialog.applyFormData?.();
-        const token = this.actor?.getToken();
-        if (!token) {
-            ui.notifications?.warn('SR5.TargetingNeedsActorWithToken', { localize: true });
-            return;
-        }
-
-        this.#weaponRangeTemplate = MeasuredTemplateFlow.showWeaponRanges(token, this.data.ranges);
+        }, ...this.rangeOverlayFlow.dialogListeners()]
     }
 
     override async _cleanUpAfterDialogCancel() {
-        this.#removeWeaponRangeTemplate();
+        this.rangeOverlayFlow.remove();
         await super._cleanUpAfterDialogCancel();
     }
 
     override async _cleanUpAfterDialog() {
-        this.#removeWeaponRangeTemplate();
+        this.rangeOverlayFlow.remove();
         await super._cleanUpAfterDialog();
-    }
-
-    #removeWeaponRangeTemplate() {
-        this.#weaponRangeTemplate?.remove();
-        this.#weaponRangeTemplate = undefined;
     }
 
     /**
@@ -181,10 +153,6 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         this._prepareFireMode();
 
         await super.prepareDocumentData();
-    }
-
-    override prepareTargetDataAfterSelection() {
-        WeaponRangeTestBehavior.prepareTargetData(this);
     }
 
     override get _dialogTemplate(): string {

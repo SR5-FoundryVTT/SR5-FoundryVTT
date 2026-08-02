@@ -208,15 +208,22 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
 
         const destination = canvas.grid!.getSnappedPoint({x: this.document.x, y: this.document.y}, {mode: CONST.GRID_SNAPPING_MODES.CENTER});
         this.document.updateSource(destination);
-        const point = event.data.getLocalPosition(this.layer);
-        const token = canvas.tokens?.placeables.find(candidate => {
-            if (!candidate.visible || !candidate.renderable) return false;
-            return candidate.getBounds().contains(point.x, point.y);
-        })?.document;
+        const resolution = canvas.app?.renderer?.resolution ?? 1;
+        const point = {
+            x: event.global.x * resolution,
+            y: event.global.y * resolution,
+        };
+        const token = event.target instanceof foundry.canvas.placeables.Token ?
+            event.target.document :
+            canvas.tokens?.placeables.find(candidate => {
+                if (!candidate.visible || !candidate.renderable) return false;
+                return candidate.getBounds().contains(point.x, point.y);
+            })?.document;
 
         if (!this.#persistOnConfirm) {
             this.#positionSelected = true;
-            token?.object?.setTarget(true, {releaseOthers: !event.shiftKey});
+            if (token?.id)
+                canvas.tokens?.setTargets([token.id], {mode: event.shiftKey ? 'acquire' : 'replace'});
             this.#onPositionSelected?.(destination, token);
             return;
         }

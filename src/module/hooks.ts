@@ -32,6 +32,7 @@ import { SR5SpriteActorSheet } from "./actor/sheets/SR5SpriteActorSheet";
 import { SR5Die } from './rolls/SR5Die';
 import { SR5Roll } from "./rolls/SR5Roll";
 import { SuccessTest } from "./tests/SuccessTest";
+import { TestTemplateFlow } from './tests/flows/TestTemplateFlow';
 import { TeamworkTest } from "./actor/flows/TeamworkFlow";
 import { OpposedTest } from "./tests/OpposedTest";
 import { PhysicalDefenseTest } from "./tests/PhysicalDefenseTest";
@@ -698,6 +699,7 @@ ___________________
 
     static async chatMessageListeners(message: ChatMessage, html, data) {
         await SuccessTest.chatMessageListeners(message, html, data);
+        TestTemplateFlow.chatMessageListeners(html);
         await OpposedTest.chatMessageListeners(message, html, data);
         await ActionFollowupFlow.chatMessageListeners(message, html, data);
         await TeamworkTest.chatMessageListeners(message, html);

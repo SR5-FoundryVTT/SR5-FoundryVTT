@@ -7,6 +7,7 @@ import ModifierTypes = Shadowrun.ModifierTypes;
 import { DamageType, MinimalActionType } from "../types/item/Action";
 import { DeepPartial } from "fvtt-types/utils";
 import { SR5Item } from "../item/SR5Item";
+import { TestTemplateFlow } from './flows/TestTemplateFlow';
 
 
 export interface SpellCastingTestData extends SuccessTestData {
@@ -23,6 +24,9 @@ export interface SpellCastingTestData extends SuccessTestData {
  */
 export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
     public override item: SR5Item<'spell'> | undefined = undefined;
+    public templateFlow = new TestTemplateFlow(this, {
+        getBlastData: () => this.getBlastData(),
+    });
 
     override _prepareData(data: DeepPartial<SpellCastingTestData>, options: Partial<TestOptions>): SpellCastingTestData {
         const prepared = super._prepareData(data, options);
@@ -86,13 +90,27 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
         await super.prepareDocumentData();
     }
 
-    protected override get blastTemplateData() {
+    getBlastData() {
         if (!this.item?.isAreaOfEffect()) return this.item?.getBlastData();
 
         return {
             radius: Number(this.data.force) * (this.item.system.extended ? 10 : 1),
             dropoff: 0,
         };
+    }
+
+    override _testDialogListeners() {
+        return [...super._testDialogListeners(), ...this.templateFlow.dialogListeners()];
+    }
+
+    override async _cleanUpAfterDialogCancel() {
+        await this.templateFlow.cancelPreview();
+        await super._cleanUpAfterDialogCancel();
+    }
+
+    override async _cleanUpAfterDialog() {
+        await this.templateFlow.finalizePreview();
+        await super._cleanUpAfterDialog();
     }
 
     /**
