@@ -124,6 +124,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.hbs',
         'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-documents.hbs',
         'systems/shadowrun5e/dist/templates/apps/dialogs/parts/attack-range-dialog-fragment.hbs',
+        'systems/shadowrun5e/dist/templates/apps/dialogs/parts/blast-template-dialog-fragment.hbs',
 
         // Test chat messages and their parts
         'systems/shadowrun5e/dist/templates/rolls/success-test-message.hbs',

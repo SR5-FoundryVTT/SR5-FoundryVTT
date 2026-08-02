@@ -86,6 +86,15 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
         await super.prepareDocumentData();
     }
 
+    protected override get blastTemplateData() {
+        if (!this.item?.isAreaOfEffect()) return this.item?.getBlastData();
+
+        return {
+            radius: Number(this.data.force) * (this.item.system.extended ? 10 : 1),
+            dropoff: 0,
+        };
+    }
+
     /**
      * Set a force value based on the items history or viable suggestions.
      */

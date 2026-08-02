@@ -44,7 +44,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
     }
 
     override _testDialogListeners() {
-        return [{
+        return [...super._testDialogListeners(), {
             query: '#reset-progressive-recoil',
             on: 'click',
             callback: this._handleResetProgressiveRecoil.bind(this)

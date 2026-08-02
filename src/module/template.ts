@@ -33,19 +33,16 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
      */
     #moveTime = 0;
 
-    /* -------------------------------------------- */
-
-    /**
-     * The initially active CanvasLayer to re-activate after the workflow is complete.
-     */
-    #initialLayer: TemplateLayer | undefined;
-
-    /* -------------------------------------------- */
-
     /**
      * Track the bound event handlers so they can be properly canceled later.
      */
     #events: any;
+
+    #persistOnConfirm = true;
+
+    #onPositionSelected?: (position: { x: number, y: number }, token?: TokenDocument) => void;
+
+    #positionSelected = false;
 
     /**
      * Create a template preview based on given items blast data.
@@ -56,12 +53,10 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
      * @param onComplete Handler to call when template is placed.
      * @returns Template instance. Not drawn on scene.
      */
-    static fromItem(item: SR5Item, onComplete?: () => void): Template | undefined {
+    static fromItem(item: SR5Item, onComplete?: () => void, blast = item.getBlastData()): Template | undefined {
         if (!canvas.scene) return undefined;
 
         // Either use blast data or default values.
-        const blast = item.getBlastData();
-
         // Cast string to const for type const string union to match.
         const templateShape = 'circle' as const;
 
@@ -94,8 +89,15 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
     /**
      * Draw a preview of this Template instance on the currently active scene.
      */
-    async drawPreview() {
+    async drawPreview(options: {
+        persistOnConfirm?: boolean
+        onPositionSelected?: (position: { x: number, y: number }, token?: TokenDocument) => void
+    } = {}) {
         if (!canvas.ready || !canvas.templates) return;
+
+        this.#persistOnConfirm = options.persistOnConfirm ?? true;
+        this.#onPositionSelected = options.onPositionSelected;
+        this.#positionSelected = false;
 
         const layer = canvas.templates;
         await this.draw();
@@ -104,14 +106,25 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
         layer.addChild(previewGroup);
         previewGroup.addChild(this);
 
-        return this.activatePreviewListeners(layer);
+        return this.activatePreviewListeners();
     }
 
-    async activatePreviewListeners(initialLayer: TemplateLayer): Promise<void> {
+    async cancelPreview() {
+        await this._finishPlacement();
+    }
+
+    async place() {
+        if (!canvas.ready) return;
+
+        await this._finishPlacement();
+        const destination = canvas.grid!.getSnappedPoint({x: this.document.x, y: this.document.y}, {mode: CONST.GRID_SNAPPING_MODES.CENTER});
+        this.document.updateSource(destination);
+        await canvas.scene!.createEmbeddedDocuments('MeasuredTemplate', [this.document.toObject()]);
+    }
+
+    async activatePreviewListeners(): Promise<void> {
         return new Promise((resolve, reject) => {
             if (!canvas.ready) return;
-
-            this.#initialLayer = initialLayer;
 
             // Store listeners
             this.#events = {
@@ -134,7 +147,7 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
      * Shared code for when template placement ends by being confirmed or canceled.
     * @param event  Triggering event that ended the placement.
     */
-    async _finishPlacement(event: PointerEvent) {
+    async _finishPlacement() {
         if (!canvas.ready) return;
 
         // Remove this template from the preview
@@ -145,10 +158,6 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
         canvas.stage!.off("mousedown", this.#events.confirm);
         canvas.app!.view.oncontextmenu = null;
         canvas.app!.view.onwheel = null;
-
-        if (this.#initialLayer) {
-            this.#initialLayer.activate();
-        }
 
         // Run the completion callback
         this.onComplete?.();
@@ -162,6 +171,7 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
      */
     _onMovePlacement(event: PIXI.FederatedPointerEvent) {
         event.stopPropagation();
+        if (!this.#persistOnConfirm && this.#positionSelected) return;
         const now = Date.now(); // Apply a 20ms throttle
         if (now - this.#moveTime <= 20) return;
         const center = event.data.getLocalPosition(this.layer);
@@ -194,9 +204,20 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
      * @param {Event} event  Triggering mouse event.
      */
     async _onConfirmPlacement(event: PointerEvent) {
-        await this._finishPlacement(event);
+        if (event.button !== 0) return;
+
         const destination = canvas.grid!.getSnappedPoint({x: this.document.x, y: this.document.y}, {mode: CONST.GRID_SNAPPING_MODES.CENTER});
         this.document.updateSource(destination);
+        const token = event.target instanceof foundry.canvas.placeables.Token ? event.target.document : undefined;
+
+        if (!this.#persistOnConfirm) {
+            this.#positionSelected = true;
+            token?.object?.setTarget(true, {releaseOthers: !event.shiftKey});
+            this.#onPositionSelected?.(destination, token);
+            return;
+        }
+
+        await this._finishPlacement();
         this.#events.resolve(canvas.scene!.createEmbeddedDocuments("MeasuredTemplate", [this.document.toObject()]));
     }
 
@@ -207,7 +228,7 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
      * @param {Event} event  Triggering mouse event.
      */
     async _onCancelPlacement(event: PointerEvent) {
-        await this._finishPlacement(event);
+        await this._finishPlacement();
         this.#events.reject();
     }
 }
