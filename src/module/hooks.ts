@@ -724,7 +724,7 @@ ___________________
             [FLAGS.ApplyExtendedTestRoll]: [ExtendedTestFlow._handleApplyRollSocketMessage.bind(ExtendedTestFlow)],
         } as const;
 
-        game.socket.on(SYSTEM_SOCKET, async (message: Shadowrun.SocketMessageData) => {
+        game.socket.on(SYSTEM_SOCKET, async (message: Shadowrun.SocketMessageData, senderId?: string) => {
             console.log('Shadowrun 5e | Received system socket message.', message);
 
             const handlers = hooks[message.type] as typeof hooks[keyof typeof hooks] | undefined;
@@ -736,7 +736,7 @@ ___________________
             for (const handler of handlers) {
                 console.debug(`Shadowrun 5e | Handover system socket message to handler: ${handler.name}`);
                 try {
-                    await handler(message);
+                    await handler(message, senderId);
                 } catch (error) {
                     console.error(`Shadowrun 5e | Error occurred in socket message handler ${handler.name}`, error);
                 }

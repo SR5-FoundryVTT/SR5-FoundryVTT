@@ -1600,8 +1600,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             await this.executeFollowUpTest();
         }
 
-        // NOTE: Extended tests used to auto-chain here via executeAsExtended. They are now
-        // managed as records by ExtendedTestFlow, which listens on sr5_afterTestComplete.
+        // Managed tests are continued by their record. Preserve auto-chaining for in-progress
+        // tests restored from pre-manager chat messages, which have no managed record to update.
+        if (this.extended && this.extendedRoll && !this.data.extendedManagedId) {
+            await this.executeAsExtended();
+        }
 
         Hooks.call('sr5_afterTestComplete', this);
     }

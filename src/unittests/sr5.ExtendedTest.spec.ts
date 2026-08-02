@@ -532,6 +532,22 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             assert.strictEqual(updated.status, 'active');
         });
 
+        it('rejects a result when the record was ended while the roll dialog was open', async () => {
+            const record = await createRecord({ dicePool: 12, threshold: 40 });
+            record.status = 'cancelled';
+            await ExtendedTestStorage.setRecord(record);
+
+            await ExtendedTestFlow._applyRollResult(record.id, {
+                hits: 3, glitch: false, criticalGlitch: false, poolUsed: 12,
+                timestamp: Date.now(), worldTime: game.time.worldTime, userId: game.user!.id!,
+            }, undefined as never);
+
+            const unchanged = ExtendedTestStorage.get(record.id)!;
+            assert.strictEqual(unchanged.rollCount, 0);
+            assert.strictEqual(unchanged.accumulatedHits, 0);
+            assert.strictEqual(unchanged.status, 'cancelled');
+        });
+
         it('applies the cumulative modifier as a modifier, not into the pool base', async () => {
             const record = await createRecord({ dicePool: 12, threshold: 40 });
             record.rollCount = 2;
