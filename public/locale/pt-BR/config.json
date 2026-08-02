@@ -1488,6 +1488,7 @@
                 "RecoilBeforeAttack": "Recuo Progressivo agora, antes de atacar",
                 "RecoilCompensation": "CR total, incluindo CR do ator e do item",
                 "ResetRecoil": "Redefinir recuo progressivo para nenhum",
+                "ShowSuppressiveFireTemplate": "Colocar cone de fogo supressivo",
                 "ShowWeaponRanges": "Visualizar alcances da arma"
             },
             "Ritual": {

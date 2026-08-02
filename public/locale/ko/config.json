@@ -2924,6 +2924,7 @@
                 "RecoilBeforeAttack": "공격 전, 현재 점진적 반동",
                 "RecoilCompensation": "액터와 아이템을 포함한 총 RC",
                 "ResetRecoil": "점진적 반동을 없음으로 초기화",
+                "ShowSuppressiveFireTemplate": "제압 사격 원뿔 배치",
                 "ShowWeaponRanges": "무기 사거리 미리보기"
             },
             "Ritual": {

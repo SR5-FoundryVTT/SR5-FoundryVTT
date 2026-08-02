@@ -2933,6 +2933,7 @@
                 "RecoilBeforeAttack": "Progressive Recoil now, before attacking",
                 "RecoilCompensation": "Total RC, including actor and item RC",
                 "ResetRecoil": "Reset progressive recoil to none",
+                "ShowSuppressiveFireTemplate": "Place suppressive fire cone",
                 "ShowWeaponRanges": "Preview weapon ranges"
             },
             "Ritual": {

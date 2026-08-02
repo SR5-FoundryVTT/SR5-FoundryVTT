@@ -2970,6 +2970,7 @@
                 "RecoilBeforeAttack": "Kumulativer Rückstoß jetzt, vor dem Angriff",
                 "RecoilCompensation": "Gesamte RK, inklusive RK der Waffe",
                 "ResetRecoil": "Setze kumulativen Rückstoß zurück",
+                "ShowSuppressiveFireTemplate": "Unterdrückungsfeuerkegel platzieren",
                 "ShowWeaponRanges": "Waffenreichweiten anzeigen"
             },
             "Ritual": {

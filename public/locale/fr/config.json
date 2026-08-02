@@ -1025,6 +1025,7 @@
         },
         "Tooltips": {
             "RangedAttack": {
+                "ShowSuppressiveFireTemplate": "Placer le cône de tir de suppression",
                 "ShowWeaponRanges": "Aperçu des portées d'arme"
             },
             "Test": {

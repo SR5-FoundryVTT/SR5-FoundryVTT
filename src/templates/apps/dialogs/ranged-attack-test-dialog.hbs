@@ -39,6 +39,16 @@
                 <select name="test.data.fireModeSelected">
                     {{selectOptions test.fireModeOptions selected=test.data.fireModeSelected}}
                 </select>
+                {{#if test.canPlaceSuppressiveFire}}
+                    <button
+                        id="show-suppressive-fire-template"
+                        type="button"
+                        data-tooltip="SR5.Tooltips.RangedAttack.ShowSuppressiveFireTemplate"
+                        aria-label="{{localize 'SR5.Tooltips.RangedAttack.ShowSuppressiveFireTemplate'}}"
+                    >
+                        <i class="fa-solid fa-bullseye"></i>
+                    </button>
+                {{/if}}
             </div>
             {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/attack-range-dialog-fragment.hbs'}}
         </div>

@@ -12,6 +12,7 @@ import { RangesTemplateType, TargetRangeTemplateType } from '../types/template/W
 import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
 import { TestTemplateFlow } from './flows/TestTemplateFlow';
 import { WeaponRangeOverlayFlow } from './flows/WeaponRangeOverlayFlow';
+import { SuppressiveFireTemplateFlow } from './flows/SuppressiveFireTemplateFlow';
 
 export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDataFragment {
     damage: DamageType
@@ -33,6 +34,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
     declare item: SR5Item;
     public templateFlow = new TestTemplateFlow(this);
     public rangeOverlayFlow = new WeaponRangeOverlayFlow(this);
+    public suppressiveFireTemplateFlow = new SuppressiveFireTemplateFlow(this);
 
     override _prepareData(data: DeepPartial<RangedAttackTestData>, options: Partial<TestOptions>): RangedAttackTestData {
         const prepared: DeepPartial<RangedAttackTestData> = super._prepareData(data, options);
@@ -49,17 +51,23 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
             query: '#reset-progressive-recoil',
             on: 'click',
             callback: this._handleResetProgressiveRecoil.bind(this)
-        }, ...this.rangeOverlayFlow.dialogListeners()]
+        }, ...this.rangeOverlayFlow.dialogListeners(), ...this.suppressiveFireTemplateFlow.dialogListeners()]
     }
 
     override async _cleanUpAfterDialogCancel() {
         this.rangeOverlayFlow.remove();
+        this.suppressiveFireTemplateFlow.cancelPreview();
         await super._cleanUpAfterDialogCancel();
     }
 
     override async _cleanUpAfterDialog() {
         this.rangeOverlayFlow.remove();
+        await this.suppressiveFireTemplateFlow.finalizePreview();
         await super._cleanUpAfterDialog();
+    }
+
+    get canPlaceSuppressiveFire(): boolean {
+        return this.suppressiveFireTemplateFlow.canPlace;
     }
 
     /**
