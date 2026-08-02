@@ -63,8 +63,8 @@ export class WeaponRangeOverlay extends PIXI.Container {
     readonly ranges: RangesTemplateType;
 
     readonly #rangeGraphics: PIXI.Graphics;
-    readonly #borderLabels: PIXI.Text[][] = [];
-    readonly #modifierLabels: PIXI.Text[][] = [];
+    readonly #borderLabels: foundry.canvas.containers.PreciseText[][] = [];
+    readonly #modifierLabels: foundry.canvas.containers.PreciseText[][] = [];
     #removeOnRightClick?: (event: PIXI.FederatedPointerEvent) => void;
 
     constructor(ranges: RangesTemplateType) {
@@ -141,19 +141,13 @@ export class WeaponRangeOverlay extends PIXI.Container {
         this.#removeOnRightClick = undefined;
     }
 
-    #createLabel(): PIXI.Text {
-        const style = CONFIG.canvasTextStyle.clone();
-        style.align = 'center';
-        style.fontSize = 16;
-        style.stroke = 0x000000;
-        style.strokeThickness = 4;
-
-        const label = new PIXI.Text('', style);
+    #createLabel(): foundry.canvas.containers.PreciseText {
+        const label = new foundry.canvas.containers.PreciseText('', CONFIG.canvasTextStyle);
         label.anchor.set(0.5);
         return label;
     }
 
-    #refreshLabel(label: PIXI.Text, text: string, position: { x: number, y: number }, scale: number) {
+    #refreshLabel(label: foundry.canvas.containers.PreciseText, text: string, position: { x: number, y: number }, scale: number) {
         label.text = text;
         label.position.set(position.x, position.y);
         label.scale.set(scale);
