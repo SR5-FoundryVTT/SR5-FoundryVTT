@@ -103,7 +103,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             ]);
 
             assert.deepEqual(options.map(option => option.label), [
-                'Runners', '─ Aria', '─ Byte', '─ NPCs', '── Silent NPC', 'Loose Actor',
+                'Runners', '├─ Aria', '├─ Byte', '└─ NPCs', '\u00A0\u00A0\u00A0└─ Silent NPC', 'Loose Actor',
             ]);
             // Headers can't be picked, and carry no value to submit.
             assert.deepEqual(options.filter(option => option.disabled).map(option => option.value), ['', '']);
@@ -119,7 +119,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             // A parent holding nothing itself still appears, its child needs the path.
             const options = documentSelectOptions([doc('Silent NPC', npcs)], 'Actor.Silent NPC');
 
-            assert.deepEqual(options.map(option => option.label), ['Runners', '─ NPCs', '── Silent NPC']);
+            assert.deepEqual(options.map(option => option.label), ['Runners', '└─ NPCs', '\u00A0\u00A0\u00A0└─ Silent NPC']);
             assert.deepEqual(options.filter(option => option.selected).map(option => option.value), ['Actor.Silent NPC']);
         });
     });
