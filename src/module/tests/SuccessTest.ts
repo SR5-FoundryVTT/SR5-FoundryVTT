@@ -7,6 +7,7 @@ import { SR5Roll } from "../rolls/SR5Roll";
 import { TestCreator } from "./TestCreator";
 import { SR5Actor } from "../actor/SR5Actor";
 import { TestRules } from "../rules/TestRules";
+import type { ExtendedTestInterval } from '../types/flows/ExtendedTest';
 import { ModifiableValue } from "../mods/ModifiableValue";
 import { DataDefaults } from "../data/DataDefaults";
 import { ActionFlow } from "../item/flows/ActionFlow";
@@ -95,7 +96,7 @@ export interface TestData {
     // When false, this test is on it's first roll. When true, it's on an extended roll.
     extendedRoll: boolean
     // The interval between extended test rolls. A value above zero marks this test as extended.
-    extendedInterval: import('../types/flows/ExtendedTest').ExtendedTestInterval
+    extendedInterval: ExtendedTestInterval
     // The managed extended test record this roll belongs to, if any. See ExtendedTestFlow.
     extendedManagedId?: string
 
@@ -2184,6 +2185,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
             // Managed extended tests roll through their record, keeping its state current.
             if (test.data.extendedManagedId) {
+                // Avoid a module cycle: ExtendedTestFlow already imports SuccessTest.
                 const { ExtendedTestFlow } = await import('../flows/ExtendedTestFlow');
                 await ExtendedTestFlow.roll(test.data.extendedManagedId);
                 return;

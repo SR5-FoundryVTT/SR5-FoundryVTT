@@ -65,7 +65,7 @@ export class TimeControlApplication extends HandlebarsApplicationMixin(Applicati
     /**
      * Refresh the displayed time in place, a re-render would reset the fields being typed in.
      */
-    #onUpdateWorldTime = () => {
+    readonly #onUpdateWorldTime = () => {
         const current = this.element?.querySelector<HTMLElement>('.time-control-current-value');
         if (current) current.textContent = WorldTimeFlow.format();
 
@@ -102,7 +102,10 @@ export class TimeControlApplication extends HandlebarsApplicationMixin(Applicati
         return context;
     }
 
-    protected override _onFirstRender(context: DeepPartial<TimeControlContext>, options: DeepPartial<ApplicationV2.RenderOptions>) {
+    protected override async _onFirstRender(
+        context: DeepPartial<TimeControlContext>,
+        options: DeepPartial<ApplicationV2.RenderOptions>
+    ) {
         Hooks.on('updateWorldTime', this.#onUpdateWorldTime);
         return super._onFirstRender(context, options);
     }
