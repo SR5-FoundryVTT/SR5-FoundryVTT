@@ -183,6 +183,10 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         await super.prepareDocumentData();
     }
 
+    override prepareTargetDataAfterSelection() {
+        WeaponRangeTestBehavior.prepareTargetData(this);
+    }
+
     override get _dialogTemplate(): string {
         return 'systems/shadowrun5e/dist/templates/apps/dialogs/ranged-attack-test-dialog.hbs';
     }

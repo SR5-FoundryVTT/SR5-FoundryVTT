@@ -203,12 +203,16 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
      * Confirm placement when the left mouse button is clicked.
      * @param {Event} event  Triggering mouse event.
      */
-    async _onConfirmPlacement(event: PointerEvent) {
+    async _onConfirmPlacement(event: PIXI.FederatedPointerEvent) {
         if (event.button !== 0) return;
 
         const destination = canvas.grid!.getSnappedPoint({x: this.document.x, y: this.document.y}, {mode: CONST.GRID_SNAPPING_MODES.CENTER});
         this.document.updateSource(destination);
-        const token = event.target instanceof foundry.canvas.placeables.Token ? event.target.document : undefined;
+        const point = event.data.getLocalPosition(this.layer);
+        const token = canvas.tokens?.placeables.find(candidate => {
+            if (!candidate.visible || !candidate.renderable) return false;
+            return candidate.getBounds().contains(point.x, point.y);
+        })?.document;
 
         if (!this.#persistOnConfirm) {
             this.#positionSelected = true;

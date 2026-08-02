@@ -540,11 +540,17 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
                     this.data.targetUuids = [token.uuid];
                     this.data.targetActorsUuid = token.actor?.uuid ? [token.actor.uuid] : [];
                     this.targets = [token];
+                    this.prepareTargetDataAfterSelection();
                     void dialog.render();
                 }
             }
         });
     }
+
+    /**
+     * Refresh derived target data after a target is selected during a dialog.
+     */
+    prepareTargetDataAfterSelection() { }
 
     protected get blastTemplateData() {
         return this.item?.getBlastData();
