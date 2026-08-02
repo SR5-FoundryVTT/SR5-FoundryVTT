@@ -47,7 +47,8 @@ export const SkillItemFlow = {
 
         for (const item of items) {
             if (!SkillItemFlow.isSkillItem(item)) continue;
-            keys.add(SkillItemFlow.skillNameByCategoryKey(item.name ?? '', SkillItemFlow.getSkillCategory(item)));
+            const key = SkillItemFlow.skillNameByCategoryKey(item.name ?? '', SkillItemFlow.getSkillCategory(item));
+            if (key) keys.add(key);
         }
 
         return keys;

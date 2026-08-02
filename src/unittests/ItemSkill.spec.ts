@@ -21,6 +21,18 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
         await factory.destroy();
     });
 
+    describe('SkillItemFlow.skillKeys', () => {
+        it('ignores skills without a canonical name key', () => {
+            const keys = SkillItemFlow.skillKeys([
+                { name: '', type: 'skill', system: { type: 'skill', skill: { category: 'active' } } },
+                { type: 'skill', system: { type: 'skill', skill: { category: 'active' } } },
+                { name: 'Pistols', type: 'skill', system: { type: 'skill', skill: { category: 'active' } } },
+            ] as Item.CreateData[]);
+
+            assert.deepEqual([...keys], ['pistols:active']);
+        });
+    });
+
     describe('SkillSetFlow.applySkillSetToActor', () => {
         // Guards provenance tracking so imported skillset items can still be identified later.
         it('stores non-empty source UUIDs on created skills and groups', async () => {
@@ -919,7 +931,7 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
     describe('PackItemFlow pack cache', () => {
         /**
          * Counts pack reads while running the given test body and always restores the original
-         * retrieval helper and cache state.
+         * retrieval helper.
          */
         const withPackReadCounter = async (body: (reads: () => number) => Promise<void>) => {
             const originalGetPackDocuments = PackItemFlow.getPackDocuments;
