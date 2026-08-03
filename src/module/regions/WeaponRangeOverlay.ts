@@ -1,4 +1,4 @@
-import { RangesTemplateType } from './types/template/Weapon';
+import { RangesTemplateType } from '../types/template/Weapon';
 
 const RANGE_KEYS = ['short', 'medium', 'long', 'extreme'] as const;
 const CARDINAL_DIRECTIONS = [

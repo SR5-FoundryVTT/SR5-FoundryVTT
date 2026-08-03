@@ -2,7 +2,7 @@ import { TestDialogLike, TestDialogListener } from '../../apps/dialogs/TestDialo
 import { MeasuredTemplateFlow } from '../../flows/MeasuredTemplateFlow';
 import { SR5Actor } from '../../actor/SR5Actor';
 import { RangesTemplateType } from '../../types/template/Weapon';
-import { WeaponRangeOverlay } from '../../WeaponRangeOverlay';
+import { WeaponRangeOverlay } from '../../regions/WeaponRangeOverlay';
 
 interface WeaponRangeOverlayFlowHost {
     actor: SR5Actor | undefined

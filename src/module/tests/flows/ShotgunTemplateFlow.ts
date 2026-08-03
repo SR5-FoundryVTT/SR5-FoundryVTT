@@ -1,5 +1,5 @@
 import { TestDialogListener } from '../../apps/dialogs/TestDialog';
-import { getWeaponRangeCircleLayout, WEAPON_RANGE_COLORS } from '../../WeaponRangeOverlay';
+import { getWeaponRangeCircleLayout, WEAPON_RANGE_COLORS } from '../../regions/WeaponRangeOverlay';
 import { RangesTemplateType } from '../../types/template/Weapon';
 import { ShotgunChoke } from '../../rules/FireModeRules';
 

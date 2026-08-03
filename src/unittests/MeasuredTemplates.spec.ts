@@ -1,5 +1,5 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
-import { getWeaponRangeCircleLayout } from '../module/WeaponRangeOverlay';
+import { getWeaponRangeCircleLayout } from '../module/regions/WeaponRangeOverlay';
 import { hasValidWeaponRanges } from '../module/flows/MeasuredTemplateFlow';
 import { RangesTemplateType } from '../module/types/template/Weapon';
 

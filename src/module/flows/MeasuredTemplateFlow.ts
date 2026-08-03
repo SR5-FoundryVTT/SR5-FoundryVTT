@@ -1,4 +1,4 @@
-import { WeaponRangeOverlay } from '../WeaponRangeOverlay';
+import { WeaponRangeOverlay } from '../regions/WeaponRangeOverlay';
 import { RangesTemplateType } from '../types/template/Weapon';
 
 const RANGE_KEYS = ['short', 'medium', 'long', 'extreme'] as const;
