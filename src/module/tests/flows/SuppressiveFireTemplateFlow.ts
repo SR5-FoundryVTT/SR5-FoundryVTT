@@ -19,6 +19,7 @@ type Point = { x: number, y: number };
 /** Handles the placement of a suppressive-fire cone with a selected outer width. */
 export class SuppressiveFireTemplateFlow {
     #preview?: PIXI.Graphics;
+    #placedTemplateId?: string;
     #base!: Point;
     #direction = 0;
     #distance = 0;
@@ -40,11 +41,11 @@ export class SuppressiveFireTemplateFlow {
         return [{
             query: '#show-suppressive-fire-template',
             on: 'click',
-            callback: (event: JQuery.Event) => { this.showPreview(event, getMeters()); }
+            callback: (event: JQuery.Event) => { void this.showPreview(event, getMeters()); }
         }];
     }
 
-    showPreview(event: JQuery.Event, meters: number) {
+    async showPreview(event: JQuery.Event, meters: number) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -64,6 +65,14 @@ export class SuppressiveFireTemplateFlow {
 
         const gridSize = canvas.grid?.size;
         if (!gridSize) return;
+
+        const scene = canvas.scene;
+        if (!scene) return;
+
+        if (this.#placedTemplateId) {
+            await scene.deleteEmbeddedDocuments('MeasuredTemplate', [this.#placedTemplateId]);
+            this.#placedTemplateId = undefined;
+        }
 
         this.#base = {
             x: token.x + token.width * gridSize / 2,
@@ -140,6 +149,9 @@ export class SuppressiveFireTemplateFlow {
 
         const position = this.#base;
         const direction = this.#direction;
+        const scene = canvas.scene;
+        if (!scene) return;
+
         this.cancelPreview();
 
         const templateData = {
@@ -152,7 +164,8 @@ export class SuppressiveFireTemplateFlow {
             distance: this.#distance,
             fillColor: game.user?.color?.toString() ?? '#ffffff',
         };
-        await canvas.scene?.createEmbeddedDocuments('MeasuredTemplate', [templateData]);
+        const [placedTemplate] = await scene.createEmbeddedDocuments('MeasuredTemplate', [templateData]);
+        this.#placedTemplateId = placedTemplate?.id;
     }
 
     #drawCone(pointer: Point) {
