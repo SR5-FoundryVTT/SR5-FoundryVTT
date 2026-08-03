@@ -57,7 +57,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
             query: '#reset-progressive-recoil',
             on: 'click',
             callback: this._handleResetProgressiveRecoil.bind(this)
-        }, ...this.rangeOverlayFlow.dialogListeners(), ...this.suppressiveFireTemplateFlow.dialogListeners(() => this.data.suppressiveFireWidth), ...this.shotgunTemplateFlow.dialogListeners(() => this.data.ranges)]
+        }, ...this.rangeOverlayFlow.dialogListeners(), ...this.suppressiveFireTemplateFlow.dialogListeners(() => this.data.suppressiveFireWidth), ...this.shotgunTemplateFlow.dialogListeners(() => this.data.ranges, () => this.data.shotgunChoke)]
     }
 
     override async _cleanUpAfterDialogCancel() {

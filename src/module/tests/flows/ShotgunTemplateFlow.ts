@@ -1,6 +1,7 @@
 import { TestDialogListener } from '../../apps/dialogs/TestDialog';
 import { getWeaponRangeCircleLayout, WEAPON_RANGE_COLORS } from '../../WeaponRangeOverlay';
 import { RangesTemplateType } from '../../types/template/Weapon';
+import { ShotgunChoke } from '../../rules/FireModeRules';
 
 interface ShotgunTemplateFlowHost {
     actor: {
@@ -12,6 +13,11 @@ const FILL_ALPHA = 0.2;
 const BORDER_COLOR = 0x000000;
 const HOVER_LIGHTEN_AMOUNT = 0.2;
 const RANGE_KEYS = ['short', 'medium', 'long', 'extreme'] as const;
+const SHOTGUN_SPREADS: Record<ShotgunChoke, readonly number[]> = {
+    narrow: [1, 2, 3, 4],
+    medium: [2, 4, 6, 8],
+    wide: [3, 6, 9, 12],
+};
 
 type Point = { x: number, y: number };
 
@@ -24,17 +30,17 @@ const lightenColor = (color: number): number => {
     return (lighten(red) << 16) | (lighten(green) << 8) | lighten(blue);
 };
 
-/** Handles placement of a shotgun shot cone. */
+/** Handles placement of fixed-width shotgun range bands. */
 export class ShotgunTemplateFlow {
     #preview?: PIXI.Container;
     #graphics?: PIXI.Graphics;
     #rangeLabels: foundry.canvas.containers.PreciseText[] = [];
-    #placedTemplateId?: string;
+    #placedTemplateIds: string[] = [];
     #base!: Point;
     #direction = 0;
-    #distance = 0;
     #hoveredRangeIndex = -1;
     #ranges!: RangesTemplateType;
+    #choke: ShotgunChoke = 'medium';
     #events?: {
         move: (event: PIXI.FederatedPointerEvent) => void
         confirm: (event: PIXI.FederatedPointerEvent) => void
@@ -43,15 +49,15 @@ export class ShotgunTemplateFlow {
 
     constructor(private readonly test: ShotgunTemplateFlowHost) { }
 
-    dialogListeners(getRanges: () => RangesTemplateType): TestDialogListener[] {
+    dialogListeners(getRanges: () => RangesTemplateType, getChoke: () => ShotgunChoke): TestDialogListener[] {
         return [{
             query: '#show-shotgun-template',
             on: 'click',
-            callback: (event: JQuery.Event) => { void this.showPreview(event, getRanges()); }
+            callback: (event: JQuery.Event) => { void this.showPreview(event, getRanges(), getChoke()); }
         }];
     }
 
-    async showPreview(event: JQuery.Event, ranges: RangesTemplateType) {
+    async showPreview(event: JQuery.Event, ranges: RangesTemplateType, choke: ShotgunChoke) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -72,9 +78,9 @@ export class ShotgunTemplateFlow {
         const scene = canvas.scene;
         if (!gridSize || !scene) return;
 
-        if (this.#placedTemplateId) {
-            await scene.deleteEmbeddedDocuments('MeasuredTemplate', [this.#placedTemplateId]);
-            this.#placedTemplateId = undefined;
+        if (this.#placedTemplateIds.length > 0) {
+            await scene.deleteEmbeddedDocuments('MeasuredTemplate', this.#placedTemplateIds);
+            this.#placedTemplateIds = [];
         }
 
         this.#base = {
@@ -82,9 +88,9 @@ export class ShotgunTemplateFlow {
             y: token.y + token.height * gridSize / 2,
         };
         this.#direction = 0;
-        this.#distance = ranges.extreme.distance;
         this.#hoveredRangeIndex = -1;
         this.#ranges = ranges;
+        this.#choke = choke;
         this.#preview = canvas.templates.addChild(new PIXI.Container());
         this.#graphics = this.#preview.addChild(new PIXI.Graphics());
         this.#rangeLabels = RANGE_KEYS.map(() => this.#preview!.addChild(this.#createLabel()));
@@ -113,15 +119,14 @@ export class ShotgunTemplateFlow {
         this.#events = {
             move: event => {
                 event.stopPropagation();
-                this.#drawCone(event.data.getLocalPosition(canvas.templates!));
+                this.#drawShotgunTemplate(event.data.getLocalPosition(canvas.templates!));
             },
             confirm: event => {
                 if (event.button !== 0) return;
 
                 event.stopPropagation();
                 const pointer = event.data.getLocalPosition(canvas.templates!);
-                this.#drawCone(pointer);
-                this.#distance = this.#getRangeDistance(pointer);
+                this.#drawShotgunTemplate(pointer);
                 void this.#place();
             },
             cancel: event => {
@@ -152,22 +157,28 @@ export class ShotgunTemplateFlow {
         const scene = canvas.scene;
         if (!scene) return;
 
+        const distancePixels = canvas.dimensions!.distancePixels;
+        const direction = this.#direction * Math.PI / 180;
+        const rangeIndex = this.#hoveredRangeIndex < 0 ? 0 : this.#hoveredRangeIndex;
+        const key = RANGE_KEYS[rangeIndex];
+        const startDistance = rangeIndex === 0 ? 0 : this.#ranges[RANGE_KEYS[rangeIndex - 1]].distance;
+        const endDistance = this.#ranges[key].distance;
         const templateData = {
-            t: 'cone' as const,
+            t: 'ray' as const,
             user: game.user?.id,
-            x: this.#base.x,
-            y: this.#base.y,
+            x: this.#base.x + Math.cos(direction) * startDistance * distancePixels,
+            y: this.#base.y + Math.sin(direction) * startDistance * distancePixels,
             direction: this.#direction,
-            distance: this.#distance,
-            angle: 180,
+            distance: endDistance - startDistance,
+            width: this.#getSpread(rangeIndex),
             fillColor: game.user?.color?.toString() ?? '#ffffff',
         };
         this.cancelPreview();
-        const [placedTemplate] = await scene.createEmbeddedDocuments('MeasuredTemplate', [templateData]);
-        this.#placedTemplateId = placedTemplate?.id;
+        const placedTemplates = await scene.createEmbeddedDocuments('MeasuredTemplate', [templateData]);
+        this.#placedTemplateIds = placedTemplates.map(template => template.id);
     }
 
-    #drawCone(pointer: Point) {
+    #drawShotgunTemplate(pointer: Point) {
         const graphics = this.#graphics;
         if (!graphics) return;
 
@@ -175,28 +186,13 @@ export class ShotgunTemplateFlow {
         this.#direction = angle * 180 / Math.PI;
         this.#hoveredRangeIndex = this.#getRangeIndex(pointer);
         const distancePixels = canvas.dimensions!.distancePixels;
-        const segments = 24;
         const layout = getWeaponRangeCircleLayout(this.#ranges, distancePixels, canvas.grid?.units ?? '');
         graphics.clear();
         let previousRadius = 0;
 
         for (const [index] of RANGE_KEYS.entries()) {
             const radius = layout[index].radius;
-            const outerPoints: number[] = [];
-            for (let segment = 0; segment <= segments; segment++) {
-                const segmentAngle = angle - Math.PI / 2 + (segment / segments) * Math.PI;
-                outerPoints.push(this.#base.x + Math.cos(segmentAngle) * radius, this.#base.y + Math.sin(segmentAngle) * radius);
-            }
-            const bandPoints = [...outerPoints];
-            if (previousRadius === 0) {
-                bandPoints.unshift(this.#base.y);
-                bandPoints.unshift(this.#base.x);
-            } else {
-                for (let segment = segments; segment >= 0; segment--) {
-                    const segmentAngle = angle - Math.PI / 2 + (segment / segments) * Math.PI;
-                    bandPoints.push(this.#base.x + Math.cos(segmentAngle) * previousRadius, this.#base.y + Math.sin(segmentAngle) * previousRadius);
-                }
-            }
+            const bandPoints = this.#getBandPoints(angle, previousRadius, radius, this.#getSpread(index), distancePixels);
             const color = index === this.#hoveredRangeIndex
                 ? lightenColor(WEAPON_RANGE_COLORS[index])
                 : WEAPON_RANGE_COLORS[index];
@@ -217,8 +213,29 @@ export class ShotgunTemplateFlow {
         }
     }
 
-    #getRangeDistance(pointer: Point): number {
-        return this.#ranges[RANGE_KEYS[this.#getRangeIndex(pointer)]].distance;
+    #getSpread(rangeIndex: number): number {
+        return SHOTGUN_SPREADS[this.#choke][rangeIndex];
+    }
+
+    #getBandPoints(angle: number, startRadius: number, endRadius: number, width: number, distancePixels: number): number[] {
+        const forward = { x: Math.cos(angle), y: Math.sin(angle) };
+        const perpendicular = { x: -forward.y, y: forward.x };
+        const halfWidth = width * distancePixels / 2;
+        const start = {
+            x: this.#base.x + forward.x * startRadius,
+            y: this.#base.y + forward.y * startRadius,
+        };
+        const end = {
+            x: this.#base.x + forward.x * endRadius,
+            y: this.#base.y + forward.y * endRadius,
+        };
+
+        return [
+            start.x + perpendicular.x * halfWidth, start.y + perpendicular.y * halfWidth,
+            end.x + perpendicular.x * halfWidth, end.y + perpendicular.y * halfWidth,
+            end.x - perpendicular.x * halfWidth, end.y - perpendicular.y * halfWidth,
+            start.x - perpendicular.x * halfWidth, start.y - perpendicular.y * halfWidth,
+        ];
     }
 
     #getRangeIndex(pointer: Point): number {
