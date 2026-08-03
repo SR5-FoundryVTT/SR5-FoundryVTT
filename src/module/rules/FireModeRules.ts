@@ -2,6 +2,7 @@ import { SR5 } from "../config";
 import { FiringModeType } from "../types/item/Weapon";
 import { FireModeType } from "../types/flags/ItemFlags";
 
+export type ShotgunChoke = 'narrow' | 'medium' | 'wide';
 
 export const FireModeRules = {
     /**
@@ -120,5 +121,6 @@ export const FireModeRules = {
             normal: 10,
             double: 20
         }
-    }
+    },
+
 }

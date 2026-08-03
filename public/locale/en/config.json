@@ -2739,6 +2739,14 @@
                 "Normal": "Normal (10 meters)"
             }
         },
+        "Shotgun": {
+            "Label": "Shotgun Choke",
+            "Choke": {
+                "Narrow": "Narrow",
+                "Medium": "Medium",
+                "Wide": "Wide"
+            }
+        },
         "Tabs": {
             "Actor": {
                 "Actions": "Actions",
@@ -2943,6 +2951,7 @@
                 "RecoilCompensation": "Total RC, including actor and item RC",
                 "ResetRecoil": "Reset progressive recoil to none",
                 "ShowSuppressiveFireTemplate": "Place suppressive fire cone",
+                "ShowShotgunTemplate": "Place shotgun shot cone",
                 "ShowWeaponRanges": "Preview weapon ranges"
             },
             "Ritual": {

@@ -2730,6 +2730,14 @@
                 "Normal": "일반 (10미터)"
             }
         },
+        "Shotgun": {
+            "Label": "산탄총 초크",
+            "Choke": {
+                "Narrow": "좁음",
+                "Medium": "중간",
+                "Wide": "넓음"
+            }
+        },
         "Tabs": {
             "Actor": {
                 "Actions": "행동",
@@ -2934,6 +2942,7 @@
                 "RecoilCompensation": "액터와 아이템을 포함한 총 RC",
                 "ResetRecoil": "점진적 반동을 없음으로 초기화",
                 "ShowSuppressiveFireTemplate": "제압 사격 원뿔 배치",
+                "ShowShotgunTemplate": "산탄 원뿔 배치",
                 "ShowWeaponRanges": "무기 사거리 미리보기"
             },
             "Ritual": {

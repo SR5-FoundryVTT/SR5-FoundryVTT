@@ -943,6 +943,14 @@
                 "Normal": "Normal (10 mètres)"
             }
         },
+        "Shotgun": {
+            "Label": "Choke du fusil à pompe",
+            "Choke": {
+                "Narrow": "Étroit",
+                "Medium": "Moyen",
+                "Wide": "Large"
+            }
+        },
         "Target": "Cible",
         "TargetDevice": "Appareil",
         "TargetFile": "Fichier",
@@ -1035,6 +1043,7 @@
         "Tooltips": {
             "RangedAttack": {
                 "ShowSuppressiveFireTemplate": "Placer le cône de tir de suppression",
+                "ShowShotgunTemplate": "Placer le cône de chevrotine",
                 "ShowWeaponRanges": "Aperçu des portées d'arme"
             },
             "Test": {

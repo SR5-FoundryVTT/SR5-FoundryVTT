@@ -7,7 +7,7 @@ const CARDINAL_DIRECTIONS = [
     { x: -1, y: 0 },
     { x: 0, y: 1 },
 ] as const;
-const RANGE_COLORS = [0x33aa33, 0xd9b300, 0xcc3333, 0x7b3fb2];
+export const WEAPON_RANGE_COLORS = [0x33aa33, 0xd9b300, 0xcc3333, 0x7b3fb2] as const;
 const RANGE_FILL_ALPHA = 0.2;
 const DEFAULT_BORDER_COLOR = 0x000000;
 
@@ -98,7 +98,7 @@ export class WeaponRangeOverlay extends PIXI.Container {
         const graphics = this.#rangeGraphics.clear();
 
         for (const [index, circle] of layout.entries()) {
-            graphics.beginFill(RANGE_COLORS[index], RANGE_FILL_ALPHA)
+            graphics.beginFill(WEAPON_RANGE_COLORS[index], RANGE_FILL_ALPHA)
                 .drawCircle(0, 0, circle.radius);
 
             if (index > 0) {

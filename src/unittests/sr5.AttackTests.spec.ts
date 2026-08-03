@@ -7,6 +7,7 @@ import { DataDefaults } from '../module/data/DataDefaults';
 import { FireModeRules } from '../module/rules/FireModeRules';
 import { TestCreator } from '../module/tests/TestCreator';
 import { PhysicalDefenseTest } from '../module/tests/PhysicalDefenseTest';
+import { RangesTemplateType } from '../module/types/template/Weapon';
 import { DamageType, DamageTypeType } from 'src/module/types/item/Action';
 type DamageElementType = DamageType['element']['base'];
 
@@ -158,6 +159,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
                 full_auto: true
             }), 3); // per default rules only one single shot mode
         })
+
     })
 
     describe('PhysicalDefenseTest', () => {

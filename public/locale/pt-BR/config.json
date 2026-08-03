@@ -1346,6 +1346,14 @@
                 "Normal": "Normal (10 metros)"
             }
         },
+        "Shotgun": {
+            "Label": "Choke da espingarda",
+            "Choke": {
+                "Narrow": "Estreito",
+                "Medium": "Médio",
+                "Wide": "Amplo"
+            }
+        },
         "Target": "Alvo",
         "TargetDevice": "Dispositivo",
         "TargetFile": "Arquivo",
@@ -1498,6 +1506,7 @@
                 "RecoilCompensation": "CR total, incluindo CR do ator e do item",
                 "ResetRecoil": "Redefinir recuo progressivo para nenhum",
                 "ShowSuppressiveFireTemplate": "Colocar cone de fogo supressivo",
+                "ShowShotgunTemplate": "Colocar cone de disparo de espingarda",
                 "ShowWeaponRanges": "Visualizar alcances da arma"
             },
             "Ritual": {

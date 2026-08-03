@@ -3,7 +3,7 @@ import { SR5Item } from "../item/SR5Item";
 import { TestCreator } from './TestCreator';
 import { DamageType } from '../types/item/Action';
 import { DataDefaults } from "../data/DataDefaults";
-import { FireModeRules } from "../rules/FireModeRules";
+import { FireModeRules, ShotgunChoke } from "../rules/FireModeRules";
 import { FireModeType } from '../types/flags/ItemFlags';
 import { SuccessTest, SuccessTestData, TestOptions } from "./SuccessTest";
 import { DeepPartial } from "fvtt-types/utils";
@@ -13,6 +13,7 @@ import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/W
 import { TestTemplateFlow } from './flows/TestTemplateFlow';
 import { WeaponRangeOverlayFlow } from './flows/WeaponRangeOverlayFlow';
 import { SuppressiveFireTemplateFlow } from './flows/SuppressiveFireTemplateFlow';
+import { ShotgunTemplateFlow } from './flows/ShotgunTemplateFlow';
 
 export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDataFragment {
     damage: DamageType
@@ -21,6 +22,7 @@ export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDa
     // index of selected fireMode in fireModes
     fireModeSelected: number
     suppressiveFireWidth: number
+    shotgunChoke: ShotgunChoke
     ranges: RangesTemplateType
     range: number
     targetRanges: TargetRangeTemplateType[]
@@ -36,6 +38,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
     public templateFlow = new TestTemplateFlow(this);
     public rangeOverlayFlow = new WeaponRangeOverlayFlow(this);
     public suppressiveFireTemplateFlow = new SuppressiveFireTemplateFlow(this);
+    public shotgunTemplateFlow = new ShotgunTemplateFlow(this);
 
     override _prepareData(data: DeepPartial<RangedAttackTestData>, options: Partial<TestOptions>): RangedAttackTestData {
         const prepared: DeepPartial<RangedAttackTestData> = super._prepareData(data, options);
@@ -43,6 +46,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         prepared.fireModes = [];
         prepared.fireMode = {value: 0, defense: 0, label: ''};
         prepared.suppressiveFireWidth = prepared.suppressiveFireWidth ?? 10;
+        prepared.shotgunChoke = prepared.shotgunChoke ?? 'medium';
         WeaponRangeTestBehavior.prepareData(this, prepared);
 
         return prepared as RangedAttackTestData;
@@ -53,23 +57,29 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
             query: '#reset-progressive-recoil',
             on: 'click',
             callback: this._handleResetProgressiveRecoil.bind(this)
-        }, ...this.rangeOverlayFlow.dialogListeners(), ...this.suppressiveFireTemplateFlow.dialogListeners(() => this.data.suppressiveFireWidth)]
+        }, ...this.rangeOverlayFlow.dialogListeners(), ...this.suppressiveFireTemplateFlow.dialogListeners(() => this.data.suppressiveFireWidth), ...this.shotgunTemplateFlow.dialogListeners(() => this.data.ranges)]
     }
 
     override async _cleanUpAfterDialogCancel() {
         this.rangeOverlayFlow.remove();
         this.suppressiveFireTemplateFlow.cancelPreview();
+        this.shotgunTemplateFlow.cancelPreview();
         await super._cleanUpAfterDialogCancel();
     }
 
     override async _cleanUpAfterDialog() {
         this.rangeOverlayFlow.remove();
         await this.suppressiveFireTemplateFlow.finalizePreview();
+        await this.shotgunTemplateFlow.finalizePreview();
         await super._cleanUpAfterDialog();
     }
 
     get canPlaceSuppressiveFire(): boolean {
         return this.suppressiveFireTemplateFlow.canPlace;
+    }
+
+    get canPlaceShotgunTemplate(): boolean {
+        return this.item?.asType('weapon')?.system.range.ranges.category === 'shotgunFlechette';
     }
 
     /**
@@ -115,6 +125,14 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
             { value: suppressiveFireArcs.enhanced, label: game.i18n.localize('SR5.SuppressiveFire.Modes.Enhanced') },
             { value: suppressiveFireArcs.normal, label: game.i18n.localize('SR5.SuppressiveFire.Modes.Normal') },
             { value: suppressiveFireArcs.double, label: game.i18n.localize('SR5.SuppressiveFire.Modes.Double') },
+        ];
+    }
+
+    get shotgunChokeOptions(): { value: ShotgunChoke, label: string }[] {
+        return [
+            { value: 'narrow', label: game.i18n.localize('SR5.Shotgun.Choke.Narrow') },
+            { value: 'medium', label: game.i18n.localize('SR5.Shotgun.Choke.Medium') },
+            { value: 'wide', label: game.i18n.localize('SR5.Shotgun.Choke.Wide') },
         ];
     }
 

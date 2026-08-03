@@ -2731,6 +2731,14 @@
                 "Normal": "Normal (10 Meter)"
             }
         },
+        "Shotgun": {
+            "Label": "Schrotflinten-Choke",
+            "Choke": {
+                "Narrow": "Eng",
+                "Medium": "Mittel",
+                "Wide": "Weit"
+            }
+        },
         "Tabs": {
             "Actor": {
                 "Actions": "Aktionen",
@@ -2980,6 +2988,7 @@
                 "RecoilCompensation": "Gesamte RK, inklusive RK der Waffe",
                 "ResetRecoil": "Setze kumulativen Rückstoß zurück",
                 "ShowSuppressiveFireTemplate": "Unterdrückungsfeuerkegel platzieren",
+                "ShowShotgunTemplate": "Schrotkegel platzieren",
                 "ShowWeaponRanges": "Waffenreichweiten anzeigen"
             },
             "Ritual": {

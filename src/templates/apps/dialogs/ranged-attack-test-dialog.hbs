@@ -56,6 +56,22 @@
                     </button>
                 </div>
             {{/if}}
+            {{#if test.canPlaceShotgunTemplate}}
+                <div class="form-group fire-mode-select-row shotgun-select-row">
+                    <label>{{localize 'SR5.Shotgun.Label'}}</label>
+                    <select name="test.data.shotgunChoke">
+                        {{selectOptions test.shotgunChokeOptions selected=test.data.shotgunChoke}}
+                    </select>
+                    <button
+                        id="show-shotgun-template"
+                        type="button"
+                        data-tooltip="SR5.Tooltips.RangedAttack.ShowShotgunTemplate"
+                        aria-label="{{localize 'SR5.Tooltips.RangedAttack.ShowShotgunTemplate'}}"
+                    >
+                        <i class="fa-solid fa-bullseye"></i>
+                    </button>
+                </div>
+            {{/if}}
             {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/attack-range-dialog-fragment.hbs'}}
         </div>
         <div>
