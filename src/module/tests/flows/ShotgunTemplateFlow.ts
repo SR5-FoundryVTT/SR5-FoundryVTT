@@ -11,7 +11,7 @@ interface ShotgunTemplateFlowHost {
 
 const FILL_ALPHA = 0.2;
 const BORDER_COLOR = 0x000000;
-const HOVER_LIGHTEN_AMOUNT = 0.2;
+const HOVER_LIGHTEN_AMOUNT = 0.55;
 const RANGE_KEYS = ['short', 'medium', 'long', 'extreme'] as const;
 const SHOTGUN_SPREADS: Record<ShotgunChoke, readonly number[]> = {
     narrow: [1, 2, 3, 4],
