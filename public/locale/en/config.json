@@ -2730,6 +2730,15 @@
             "SpiritType": "Spirit Type"
         },
         "Suppressing": "Suppressing",
+        "SuppressiveFire": {
+            "Label": "Suppressive Fire",
+            "Mode": "Suppressive Mode",
+            "Modes": {
+                "Double": "Double (20 meters)",
+                "Enhanced": "Enhanced (5 meters)",
+                "Normal": "Normal (10 meters)"
+            }
+        },
         "Tabs": {
             "Actor": {
                 "Actions": "Actions",

@@ -934,6 +934,15 @@
         "StunTrack": "Suivi Etourdi",
         "Successes": "Succès",
         "Suppressing": "Suppression",
+        "SuppressiveFire": {
+            "Label": "Tir de suppression",
+            "Mode": "Mode de suppression",
+            "Modes": {
+                "Double": "Double (20 mètres)",
+                "Enhanced": "Renforcé (5 mètres)",
+                "Normal": "Normal (10 mètres)"
+            }
+        },
         "Target": "Cible",
         "TargetDevice": "Appareil",
         "TargetFile": "Fichier",

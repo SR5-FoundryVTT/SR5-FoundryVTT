@@ -105,5 +105,20 @@ export const FireModeRules = {
             const modeBIndex = SR5.rangeWeaponMode.indexOf(modeB.mode);
             return modeAIndex > modeBIndex ? 1 : -1;
         });
+    },
+
+    /**
+     * The available suppressive fire modes and arc widths in meters according to 
+     * - SR5#179 'Suppressive Fire'
+     * - RG#120 'Enhanced Suppression'
+     * - #TODO: tamif#2025 'double'?
+     * @returns 
+     */
+    suppressiveFireArcs: function() {
+        return {
+            enhanced: 5,
+            normal: 10,
+            double: 20
+        }
     }
 }

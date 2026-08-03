@@ -1,4 +1,4 @@
-import { TestDialogLike, TestDialogListener } from '../../apps/dialogs/TestDialog';
+import { TestDialogListener } from '../../apps/dialogs/TestDialog';
 import { FireModeType } from '../../types/flags/ItemFlags';
 
 interface SuppressiveFireTemplateFlowHost {
@@ -10,20 +10,20 @@ interface SuppressiveFireTemplateFlowHost {
     }
 }
 
-const TEMPLATE_OUTER_ARC = 10;
 const FILL_COLOR = 0xd9b300;
 const FILL_ALPHA = 0.2;
 const BORDER_COLOR = 0x000000;
 
 type Point = { x: number, y: number };
 
-/** Handles the placement of a suppressive-fire cone with a fixed outer arc. */
+/** Handles the placement of a suppressive-fire cone with a selected outer width. */
 export class SuppressiveFireTemplateFlow {
     #preview?: PIXI.Graphics;
     #base!: Point;
     #direction = 0;
     #distance = 0;
     #angle = 0;
+    #width = 10;
     #events?: {
         move: (event: PIXI.FederatedPointerEvent) => void
         confirm: (event: PIXI.FederatedPointerEvent) => void
@@ -36,15 +36,15 @@ export class SuppressiveFireTemplateFlow {
         return this.test.data.fireMode.suppression === true;
     }
 
-    dialogListeners(): TestDialogListener[] {
+    dialogListeners(getMeters: () => number): TestDialogListener[] {
         return [{
             query: '#show-suppressive-fire-template',
             on: 'click',
-            callback: this.showPreview.bind(this)
+            callback: (event: JQuery.Event) => { this.showPreview(event, getMeters()); }
         }];
     }
 
-    showPreview(event: JQuery.Event, _dialog: TestDialogLike) {
+    showPreview(event: JQuery.Event, meters: number) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -72,6 +72,7 @@ export class SuppressiveFireTemplateFlow {
         this.#direction = 0;
         this.#distance = 0;
         this.#angle = 0;
+        this.#width = meters;
         this.#preview = canvas.templates.addChild(new PIXI.Graphics());
         this.#bindPreviewListeners();
     }
@@ -162,7 +163,8 @@ export class SuppressiveFireTemplateFlow {
         const radius = Math.max(distancePixels, 1);
         const distance = radius / canvas.dimensions!.distancePixels;
         const angle = Math.atan2(pointer.y - this.#base.y, pointer.x - this.#base.x);
-        const coneAngle = Math.min(360, TEMPLATE_OUTER_ARC / distance * 180 / Math.PI);
+        const effectiveWidth = Math.min(this.#width, distance * Math.PI * 2);
+        const coneAngle = effectiveWidth / distance * 180 / Math.PI;
         const halfAngle = coneAngle * Math.PI / 360;
         const points = [this.#base.x, this.#base.y];
         const segments = 24;

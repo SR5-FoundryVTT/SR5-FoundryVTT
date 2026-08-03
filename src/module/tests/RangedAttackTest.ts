@@ -20,6 +20,7 @@ export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDa
     fireMode: FireModeType
     // index of selected fireMode in fireModes
     fireModeSelected: number
+    suppressiveFireWidth: number
     ranges: RangesTemplateType
     range: number
     targetRanges: TargetRangeTemplateType[]
@@ -41,6 +42,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
 
         prepared.fireModes = [];
         prepared.fireMode = {value: 0, defense: 0, label: ''};
+        prepared.suppressiveFireWidth = prepared.suppressiveFireWidth ?? 10;
         WeaponRangeTestBehavior.prepareData(this, prepared);
 
         return prepared as RangedAttackTestData;
@@ -51,7 +53,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
             query: '#reset-progressive-recoil',
             on: 'click',
             callback: this._handleResetProgressiveRecoil.bind(this)
-        }, ...this.rangeOverlayFlow.dialogListeners(), ...this.suppressiveFireTemplateFlow.dialogListeners()]
+        }, ...this.rangeOverlayFlow.dialogListeners(), ...this.suppressiveFireTemplateFlow.dialogListeners(() => this.data.suppressiveFireWidth)]
     }
 
     override async _cleanUpAfterDialogCancel() {
@@ -105,6 +107,15 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
             value: index,
             label: game.i18n.localize(fireMode.label)
         }));
+    }
+
+    get suppressiveFireWidthOptions(): { value: number, label: string }[] {
+        const suppressiveFireArcs = FireModeRules.suppressiveFireArcs();
+        return [
+            { value: suppressiveFireArcs.enhanced, label: game.i18n.localize('SR5.SuppressiveFire.Modes.Enhanced') },
+            { value: suppressiveFireArcs.normal, label: game.i18n.localize('SR5.SuppressiveFire.Modes.Normal') },
+            { value: suppressiveFireArcs.double, label: game.i18n.localize('SR5.SuppressiveFire.Modes.Double') },
+        ];
     }
 
     get fireModeSummary(): { ammo: string, recoil: string, rc: number, defense: number, rounds: number, action: string } {

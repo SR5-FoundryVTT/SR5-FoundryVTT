@@ -2722,6 +2722,15 @@
             "SpiritType": "Geistart"
         },
         "Suppressing": "Sperrfeuer",
+        "SuppressiveFire": {
+            "Label": "Sperrfeuer",
+            "Mode": "Sperrfeuer-Modus",
+            "Modes": {
+                "Double": "Doppelt (20 Meter)",
+                "Enhanced": "Verstärkt (5 Meter)",
+                "Normal": "Normal (10 Meter)"
+            }
+        },
         "Tabs": {
             "Actor": {
                 "Actions": "Aktionen",
