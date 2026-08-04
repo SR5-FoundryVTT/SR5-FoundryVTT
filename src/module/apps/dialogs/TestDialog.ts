@@ -87,7 +87,7 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
 
     static override DEFAULT_OPTIONS = {
         classes: [SR5_APPV2_CSS_CLASS, 'sr5', 'form-dialog'],
-        id: 'test-dialog-v2',
+        id: 'test-dialog-{id}',
         position: {
             width: 300,
             height: 'auto' as const,

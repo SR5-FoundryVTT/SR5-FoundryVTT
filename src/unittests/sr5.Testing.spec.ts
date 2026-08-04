@@ -7,6 +7,7 @@ import { SpellCastingTest } from "@/module/tests/SpellCastingTest";
 import { SuccessTest } from "@/module/tests/SuccessTest";
 import { NaturalRecoveryStunTest } from "@/module/tests/NaturalRecoveryStunTest";
 import { NaturalRecoveryPhysicalTest } from "@/module/tests/NaturalRecoveryPhysicalTest";
+import { TestDialog } from "../module/apps/dialogs/TestDialog";
 
 export const shadowrunTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -16,6 +17,26 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
     after(async () => { await factory.destroy(); });
 
     describe('SuccessTest', () => {
+        it('allows multiple test dialogs to remain open', async () => {
+            const firstTest = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: true });
+            const secondTest = TestCreator.fromPool({ pool: 8 }, { showMessage: false, showDialog: true });
+            const firstDialog = new TestDialog(firstTest);
+            const secondDialog = new TestDialog(secondTest);
+
+            try {
+                await Promise.all([
+                    firstDialog.render({ force: true }),
+                    secondDialog.render({ force: true }),
+                ]);
+
+                assert.notEqual(firstDialog.id, secondDialog.id);
+                assert.exists(document.getElementById(firstDialog.id));
+                assert.exists(document.getElementById(secondDialog.id));
+            } finally {
+                await Promise.all([firstDialog.close(), secondDialog.close()]);
+            }
+        });
+
         it('evaluate a roll from action data', async () => {
             window.doNotPopulateDefaultSkills = true;
 
