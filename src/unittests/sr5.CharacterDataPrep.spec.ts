@@ -327,6 +327,21 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(character.system.initiative.matrix.dice.value, 3);
         });
 
+        it('clears hot-sim when switching to non-matrix initiative mode', async () => {
+            const character = await factory.createActor({
+                type: 'character',
+                system: {
+                    initiative: { perception: 'matrix' },
+                    matrix: { hot_sim: true },
+                },
+            });
+
+            await character.setInitiativeMode('meatspace');
+
+            assert.strictEqual(character.system.initiative.perception, 'meatspace');
+            assert.strictEqual(character.system.matrix.hot_sim, false);
+        });
+
         it('limit calculation', async () => {
             const character = await factory.createActor({
                 type: 'character',
