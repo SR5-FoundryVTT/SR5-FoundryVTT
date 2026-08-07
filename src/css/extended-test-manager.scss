@@ -1,0 +1,513 @@
+@use 'config/variables';
+@use 'config/mixins';
+
+.sr5.extended-test-manager {
+    // Below this the toolbar wraps and the row value tracks start colliding with the
+    // name column. ApplicationV2._updatePosition clamps dragging to the computed value.
+    min-width: 750px;
+
+    .extended-test-manager-app {
+        display: flex;
+        flex-flow: column nowrap;
+        height: 100%;
+        color: variables.$white;
+
+        .etm-time-strip {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5em;
+            padding: 0.25em 0.5em;
+            border-bottom: 1px solid variables.$yellow;
+
+            .etm-time-current {
+                font-weight: bold;
+                color: variables.$yellow;
+                white-space: nowrap;
+            }
+
+            .etm-time-presets {
+                display: flex;
+                flex-flow: row wrap;
+                gap: 0.25em;
+                align-items: center;
+
+                button {
+                    font-size: var(--font-size-12);
+                    padding: 1px 6px;
+                    line-height: 1.4em;
+                    width: auto;
+                }
+            }
+        }
+
+        .etm-toolbar {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: space-between;
+            gap: 0.35em;
+            padding: 0.3em 0.5em;
+
+            .etm-filters,
+            .etm-sort {
+                display: flex;
+                flex-flow: row nowrap;
+                gap: 0.3em;
+                align-items: center;
+            }
+
+            // The search field takes whatever the fixed width controls leave over.
+            .etm-filters {
+                flex: 1;
+                min-width: 20em;
+            }
+
+            // Foundry's base select is width: 100%, which would eat the row's slack.
+            // Sized to their content instead, so only the search field grows.
+            select {
+                flex: 0 0 auto;
+                width: auto;
+                max-width: 12em;
+                height: 1.8em;
+                font-size: var(--font-size-12);
+            }
+
+            input[type='search'] {
+                flex: 1;
+                min-width: 12em;
+                height: 1.8em;
+                font-size: var(--font-size-12);
+                color: variables.$white;
+            }
+
+            .etm-mine-filter {
+                display: flex;
+                align-items: center;
+                gap: 0.2em;
+                white-space: nowrap;
+            }
+
+            button {
+                width: auto;
+                white-space: nowrap;
+            }
+        }
+
+        .etm-advanced-filters {
+            @include mixins.collapsible;
+
+            margin: 0 0.5em 0.3em;
+            font-size: var(--font-size-12);
+
+            // Flag a filter hidden behind the collapsed summary.
+            .etm-filter-count {
+                background: variables.$yellow;
+                color: variables.$black;
+                border-radius: 1em;
+                padding: 0 0.45em;
+                font-size: var(--font-size-12);
+            }
+
+            .etm-advanced-filter-fields {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(11em, 1fr));
+                gap: 0.3em;
+
+                label {
+                    display: flex;
+                    flex-flow: column nowrap;
+                    color: variables.$grey;
+                }
+
+                select {
+                    height: 1.8em;
+                }
+            }
+        }
+
+        .etm-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 0.5em;
+
+            .etm-empty {
+                text-align: center;
+                color: variables.$grey;
+                margin-top: 2em;
+            }
+
+            .etm-row {
+                border: variables.$groove;
+                border-radius: 0.3em;
+                margin-bottom: 0.35em;
+                padding: 0.35em 0.5em;
+                background: rgba(variables.$white, 0.03);
+
+                &.status-completed { border-left: 3px solid green; }
+                &.status-failed { border-left: 3px solid variables.$crimson; }
+                &.status-paused { border-left: 3px solid variables.$grey; }
+                &.status-cancelled { border-left: 3px solid variables.$grey; opacity: 0.7; }
+                &.status-active { border-left: 3px solid variables.$yellow; }
+
+                // Fixed tracks, so values and actions line up across rows of differing content.
+                .etm-row-main {
+                    display: grid;
+                    grid-template-columns: minmax(0, 1fr) auto auto;
+                    align-items: center;
+                    gap: 0.5em;
+                }
+
+                .etm-row-info {
+                    flex: 1;
+                    overflow: hidden;
+
+                    .etm-row-name {
+                        font-weight: bold;
+                        font-size: var(--font-size-14);
+                        @include mixins.rollable;
+                    }
+
+                    .etm-row-meta {
+                        display: flex;
+                        flex-flow: row wrap;
+                        gap: 0.75em;
+                        font-size: var(--font-size-12);
+                        color: variables.$grey;
+
+                        a {
+                            @include mixins.rollable;
+                        }
+                    }
+                }
+
+                .etm-status {
+                    text-transform: uppercase;
+                    font-weight: bold;
+
+                    &.etm-status-active { color: variables.$yellow; }
+                    &.etm-status-completed { color: green; }
+                    &.etm-status-failed { color: variables.$crimson; }
+                    &.etm-status-paused { color: variables.$grey; }
+                    &.etm-status-cancelled { color: variables.$grey; }
+                }
+
+                .etm-due {
+                    color: variables.$crimson;
+                    font-weight: bold;
+                }
+
+                // One fixed track per value. Widths hold the widest expected content
+                // ('Combat Turns', three digit roll counts), so nothing shifts row to row.
+                .etm-row-values {
+                    display: grid;
+                    grid-template-columns: 7.5em 8em 3.5em;
+                    align-items: center;
+                    gap: 0.6em;
+                    white-space: nowrap;
+                    font-size: var(--font-size-12);
+
+                    .etm-progress {
+                        display: flex;
+                        flex-flow: column nowrap;
+                        align-items: center;
+                        // Sets the progress apart from the values that follow it, without
+                        // widening the gap between those values themselves.
+                        margin-right: 0.5em;
+
+                        progress {
+                            width: 100%;
+                            height: 6px;
+                        }
+
+                        // Reserved without a threshold, to keep every row the same height.
+                        progress.is-placeholder {
+                            visibility: hidden;
+                        }
+                    }
+
+                    .etm-value {
+                        display: grid;
+                        grid-template-columns: 1.2em minmax(0.9em, auto) auto;
+                        align-items: center;
+                        gap: 0.15em;
+                        overflow: hidden;
+
+                        i {
+                            text-align: center;
+                        }
+
+                        // Right aligned, so digits form a column whatever their width.
+                        .etm-value-number {
+                            text-align: right;
+                        }
+
+                        .etm-value-unit {
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
+                    }
+                }
+
+                .etm-row-actions {
+                    display: grid;
+                    grid-auto-flow: column;
+                    grid-auto-columns: 1.4em;
+                    justify-items: center;
+                    align-items: center;
+                    font-size: var(--font-size-13);
+
+                    a {
+                        @include mixins.rollable;
+                    }
+
+                    // Actions withheld until enough game time has passed.
+                    .etm-action-disabled {
+                        opacity: 0.4;
+                        cursor: not-allowed;
+                    }
+                }
+
+                .etm-row-details {
+                    border-top: 1px solid rgba(variables.$white, 0.15);
+                    margin-top: 0.35em;
+                    padding-top: 0.35em;
+                    font-size: var(--font-size-12);
+
+                    .etm-detail-meta {
+                        display: flex;
+                        flex-flow: row wrap;
+                        gap: 1.5em;
+                        color: variables.$grey;
+                        margin-bottom: 0.3em;
+                    }
+
+                    .etm-roll-history {
+                        width: 100%;
+                        margin: 0.3em 0;
+
+                        th, td {
+                            text-align: center;
+                            padding: 0.15em 0.3em;
+                        }
+
+                        a {
+                            @include mixins.rollable;
+                        }
+                    }
+
+                    .etm-log {
+                        @include mixins.collapsible;
+
+                        color: variables.$grey;
+                        font-size: var(--font-size-12);
+
+                        // The entry count stands in for the body while collapsed.
+                        .etm-log-count {
+                            border: variables.$groove;
+                            border-radius: 1em;
+                            padding: 0 0.45em;
+                        }
+
+                        .etm-log-entry {
+                            display: flex;
+                            gap: 0.6em;
+
+                            .etm-log-action {
+                                font-weight: bold;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// The whispered 'ready to continue' chat card takes its layout from the roll card in
+// foundry-chat-message.scss. Only the parts that card has no equivalent for live here.
+.sr5.roll-card.etm-due-card {
+    // The status band stands alone, the roll card only ever pairs it with a glitch.
+    .card-test-content--status {
+        grid-template-columns: 1fr;
+    }
+
+    .card-content--notes {
+        margin-bottom: 0.35rem;
+    }
+}
+
+.sr5.extended-test-config {
+    .extended-test-config-form {
+        display: flex;
+        flex-flow: column nowrap;
+        gap: 0.6em;
+        padding: 0.5em;
+        color: variables.$white;
+
+        // Section heading, shared by the fieldset legends and the collapsible summary.
+        @mixin section-heading {
+            font-weight: bold;
+            color: variables.$yellow;
+            text-transform: uppercase;
+            font-size: var(--font-size-12);
+            letter-spacing: 0.05em;
+        }
+
+        fieldset.etm-config-section {
+            display: flex;
+            flex-flow: column nowrap;
+            gap: 0.4em;
+
+            legend {
+                @include section-heading;
+
+                padding: 0 0.4em;
+            }
+        }
+
+        .etm-config-section {
+            border: variables.$groove;
+            border-radius: 0.3em;
+            padding: 0.5em 0.6em 0.6em;
+            margin: 0;
+        }
+
+        details.etm-config-section {
+            @include mixins.collapsible;
+
+            summary {
+                @include section-heading;
+            }
+
+            // The mixin only styles the summary, the body still needs its own flow.
+            &[open] {
+                display: flex;
+                flex-flow: column nowrap;
+                gap: 0.4em;
+
+                // The gap already separates the summary from the body.
+                > summary {
+                    margin-bottom: 0;
+                }
+            }
+        }
+
+        // One grid per row, so labels and fields line up across every section.
+        .form-group {
+            display: grid;
+            grid-template-columns: 10em minmax(0, 1fr);
+            align-items: center;
+            gap: 0.5em;
+
+            > label {
+                font-weight: bold;
+                // Long labels wrap inside their column instead of widening it.
+                line-height: 1.25;
+            }
+
+            input, select, textarea {
+                color: variables.$white;
+                min-width: 0;
+            }
+
+            textarea {
+                resize: vertical;
+            }
+
+            // A disabled field has to read as display, not as an empty input.
+            input:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+                font-style: italic;
+            }
+        }
+
+        // Toggle labels are sentences, so they get the full width and keep to one line.
+        // The checkbox follows at the end instead of sitting in the field column.
+        .toggle-checkbox-row {
+            grid-template-columns: minmax(0, 1fr) auto;
+
+            > label {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            > input[type='checkbox'] {
+                width: 1.1em;
+                height: 1.1em;
+                margin: 0;
+            }
+        }
+
+        // Pool and threshold in one row: number, inline label, number.
+        .etm-config-values {
+            display: grid;
+            grid-template-columns: 4.5em auto 4.5em;
+            align-items: center;
+            gap: 0.5em;
+
+            > label {
+                font-weight: bold;
+                justify-self: end;
+            }
+        }
+
+        .etm-config-interval {
+            display: grid;
+            grid-template-columns: 5em minmax(0, 1fr);
+            align-items: center;
+            gap: 0.5em;
+        }
+
+        .hint {
+            font-size: var(--font-size-12);
+            color: variables.$grey;
+            margin: 0;
+        }
+
+        .etm-config-users {
+            table {
+                width: 100%;
+                border-collapse: collapse;
+
+                th, td {
+                    text-align: center;
+                    padding: 0.2em 0.3em;
+                }
+
+                th {
+                    font-size: var(--font-size-12);
+                    color: variables.$grey;
+                    text-transform: uppercase;
+                }
+
+                td:first-child, th:first-child {
+                    text-align: left;
+                }
+
+                tbody tr:nth-child(odd) {
+                    background: rgba(variables.$white, 0.04);
+                }
+            }
+        }
+
+        .etm-config-footer {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: flex-end;
+            gap: 0.5em;
+
+            button {
+                width: auto;
+                padding: 0.2em 1em;
+            }
+
+            .etm-config-submit {
+                font-weight: bold;
+                border-color: variables.$yellow;
+            }
+        }
+    }
+}

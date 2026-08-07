@@ -1,6 +1,7 @@
 // game settings for shadowrun 5e
 
 import { FLAGS, SYSTEM_NAME } from './constants';
+import { DataStorage, DataStorageContent } from './data/DataStorage';
 import { IconAssign } from './apps/iconAssigner/IconAssign';
 import SR5CompendiaSettings from './settings/SR5CompendiaSettings';
 
@@ -17,7 +18,49 @@ export const registerSystemSettings = () => {
         scope: 'world',
         config: false,
         type: Object,
-        default: {}
+        default: {},
+        // Fires on every client, so apps can re-render. Listeners get the changed top level
+        // keys, as onChange itself only ever sees the complete storage.
+        onChange: (storage: object) => {
+            Hooks.callAll('sr5e.storageChanged', DataStorage.changedKeys(storage as DataStorageContent));
+        }
+    });
+
+    /**
+     * No actual setting. Keeps the world time initialization from running a second time,
+     * should a GM ever wind the clock back to the FoundryVTT epoch.
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.WorldTimeInitialized, {
+        name: 'World Time Initialized.',
+        scope: 'world',
+        config: false,
+        type: Boolean,
+        default: false,
+    });
+
+    /**
+     * Only allow extended test rolls once their interval has passed in game time.
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.EnforceExtendedTestInterval, {
+        name: 'SETTINGS.EnforceExtendedTestIntervalName',
+        hint: 'SETTINGS.EnforceExtendedTestIntervalDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: false,
+    });
+
+    /**
+     * Whisper a chat message to everyone allowed to roll an extended test, once enough
+     * game time has passed for its next roll.
+     */
+    game.settings.register(SYSTEM_NAME, FLAGS.ExtendedTestDueMessage, {
+        name: 'SETTINGS.ExtendedTestDueMessageName',
+        hint: 'SETTINGS.ExtendedTestDueMessageDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true,
     });
 
     /**

@@ -917,12 +917,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return this.system.action;
     }
 
-    getExtended(): boolean {
-        const action = this.getAction();
-        if (!action) return false;
-        return action.extended;
-    }
-
     getTechnologyData(this: SR5Item) {
         return this.system.technology;
     }

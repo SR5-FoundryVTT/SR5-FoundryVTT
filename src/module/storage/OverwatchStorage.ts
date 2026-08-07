@@ -89,7 +89,7 @@ export const OverwatchStorage = {
      * Helper to retrieve valid storage.
      */
     getStorage(): Shadowrun.Storage['matrix']['ow'] {
-        return DataStorage.get(OverwatchStorage.key) ?? {};
+        return DataStorage.get<Shadowrun.Storage['matrix']['ow']>(OverwatchStorage.key) ?? {};
     },
 
     /**
