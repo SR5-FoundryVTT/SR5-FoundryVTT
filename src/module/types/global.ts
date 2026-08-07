@@ -299,6 +299,7 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.EnforceExtendedTestInterval": boolean;
         "shadowrun5e.ExtendedTestDueMessage": boolean;
         "shadowrun5e.WorldTimeInitialized": boolean;
+        "shadowrun5e.TokenMovementHistoryReset": 'firstActionPhase' | 'turnStart';
     }
 }
 
