@@ -39,7 +39,11 @@
         "ShowTokenNameForChatOutputDescription": "Utiliser le nom de jetons pour les messages de lancés de dés au lieu du nom du personnage",
         "ShowTokenNameForChatOutputName": "Utiliser les noms des Jetons dans les affichages de lancés dans le tchat",
         "TokenAutoRunning": "Détection automatique de la course",
-        "TokenAutoRunningDescription": "Bascule automatiquement le mode de déplacement du token en course lorsque la distance mesurée dépasse la vitesse de marche."
+        "TokenAutoRunningDescription": "Bascule automatiquement le mode de déplacement du token en course lorsque la distance mesurée dépasse la vitesse de marche.",
+        "TokenMovementHistoryReset": "Moment de réinitialisation de l'historique de déplacement",
+        "TokenMovementHistoryResetDescription": "Choisit quand l'historique de déplacement est effacé pour les combattants pendant le combat",
+        "TokenMovementHistoryResetFirstActionPhase": "À ma première phase d'action",
+        "TokenMovementHistoryResetTurnStart": "Réinitialiser au début du tour"
     },
     "SR5": {
         "AP": "PA",
@@ -171,28 +175,52 @@
             "FIELDS": {
                 "armor": {
                     "accessory": {
-                        "hint": "If this Armor is an Accessory (adds its value to the actor's base Armor)",
-                        "label": "Accessory"
+                        "hint": "Si cette Armure est un Accessoire (ajoute sa valeur au Blindage de base de l'acteur)",
+                        "label": "Accessoire"
+                    },
+                    "acid": {
+                        "hint": "Blindage supplémentaire contre les attaques à l'Acide",
+                        "label": "Résistance à l'acide"
+                    },
+                    "cold": {
+                        "hint": "Blindage supplémentaire contre les attaques de Froid",
+                        "label": "Isolation"
+                    },
+                    "electricity": {
+                        "hint": "Blindage supplémentaire contre les attaques d'Électricité",
+                        "label": "Non-conductivité"
+                    },
+                    "fire": {
+                        "hint": "Blindage supplémentaire contre les attaques de Feu",
+                        "label": "Résistance au feu"
                     },
                     "hardened": {
-                        "hint": "Si cette armure est renforcee",
-                        "label": "Armure renforcee"
-                    },
-                    "is_hardened": {
-                        "hint": "Si cette armure accorde une protection renforcee",
-                        "label": "Renforcee"
+                        "hint": "Si cette armure est renforcée",
+                        "label": "Armure renforcée"
                     },
                     "immunities": {
-                        "hint": "Damage sources this armor grants Immunity against",
-                        "label": "Immunities"
+                        "hint": "Sources de dégâts contre lesquelles cette armure accorde l'Immunité",
+                        "label": "Immunités"
+                    },
+                    "is_hardened": {
+                        "hint": "Si cette armure accorde une protection renforcée",
+                        "label": "Renforcée"
                     },
                     "pollutant": {
-                        "hint": "Extra Armor against attacks with Pollutant",
-                        "label": "Chemical Protection"
+                        "hint": "Blindage supplémentaire contre les attaques de Polluants",
+                        "label": "Protection chimique"
+                    },
+                    "radiation": {
+                        "hint": "Blindage supplémentaire contre les attaques de Radiations",
+                        "label": "Résistance aux radiations"
+                    },
+                    "value": {
+                        "hint": "Quantité de Blindage que cet objet fournit",
+                        "label": "Valeur Blindage"
                     },
                     "water": {
-                        "hint": "Extra Armor against attacks with Water",
-                        "label": "Water Protection"
+                        "hint": "Blindage supplémentaire contre les attaques d'Eau",
+                        "label": "Protection contre l'eau"
                     }
                 }
             },
@@ -207,6 +235,7 @@
         "ArmorValue": "Valeur Blindage",
         "AstralDice": "Dés init. Astral",
         "AstralInit": "Init. Astral",
+        "Attack": "Attaque",
         "AttackerHits": "Succès de l'attaquant",
         "AttrAgility": "Agilité",
         "AttrBody": "Constitution",
@@ -660,10 +689,68 @@
         "Item": {
             "FIELDS": {
                 "action": {
+                    "armor": {
+                        "hint": "Si le Blindage de l'acteur doit être ajouté au test",
+                        "label": "Blindage"
+                    },
+                    "attribute": {
+                        "hint": "L'Attribut utilisé par le test",
+                        "label": "Attribut"
+                    },
+                    "attribute2": {
+                        "hint": "L'Autre Attribut utilisé par ce test",
+                        "label": "Autre Attribut"
+                    },
+                    "categories": {
+                        "hint": "Catégories d'Action que ce test intègre. Ces actions peuvent être ciblées par des Effets Actifs",
+                        "label": "Catégories"
+                    },
                     "damage": {
+                        "ap": {
+                            "attribute": {
+                                "hint": "Attribut à utiliser dans le calcul de la PA",
+                                "label": "Attribut de PA"
+                            },
+                            "base": {
+                                "hint": "Pénétration d'Armure des Dégâts",
+                                "label": "PA"
+                            },
+                            "base_formula_operator": {
+                                "hint": "Comment la valeur de base de PA doit affecter l'Attribut",
+                                "label": "Opérateur"
+                            }
+                        },
+                        "attribute": {
+                            "hint": "Attribut à utiliser dans le calcul des Dégâts",
+                            "label": "Attribut de Dégâts"
+                        },
+                        "base": {
+                            "hint": "Le montant de base des Dégâts infligés par cette action",
+                            "label": "Dégâts de Base"
+                        },
+                        "base_formula_operator": {
+                            "hint": "Comment la valeur de base des Dégâts doit affecter l'Attribut",
+                            "label": "Opérateur"
+                        },
+                        "biofeedback": {
+                            "hint": "Si cette action inflige également des dégâts de Biofeedback. Ceci peut être ciblé par des Effets Actifs",
+                            "label": "Biofeedback"
+                        },
+                        "element": {
+                            "base": {
+                                "hint": "L'Élément du type de dégâts. Laisser vide pour aucun élément.",
+                                "label": "Élément"
+                            }
+                        },
                         "normal_weapon": {
-                            "hint": "If this damage is considered a normal (non-magical) weapon attack",
-                            "label": "Normal Weapon"
+                            "hint": "Si ces dégâts sont considérés comme une attaque d'arme normale (non magique)",
+                            "label": "Arme Normale"
+                        },
+                        "type": {
+                            "base": {
+                                "hint": "Type de Dégâts infligés par cette action",
+                                "label": "Type de Dégâts"
+                            }
                         }
                     },
                     "extended": {
@@ -681,6 +768,94 @@
                     "initiative_mod": {
                         "hint": "Modificateur d'initiative appliqué lors de l'exécution de cette action",
                         "label": "Modificateur d'Initiative"
+                    },
+                    "limit": {
+                        "attribute": {
+                            "hint": "La Limite spécifique de l'Acteur utilisée pour le test.",
+                            "label": "Limite"
+                        },
+                        "base": {
+                            "hint": "Valeur de Limite utilisée pour le test. Elle est ajoutée si une limite spécifique est sélectionnée",
+                            "label": "Valeur de Limite"
+                        }
+                    },
+                    "mod": {
+                        "hint": "Tout modificateur appliqué au test",
+                        "label": "Modificateur"
+                    },
+                    "modifiers": {
+                        "hint": "Modificateurs d'Action qui affectent ce test.",
+                        "label": "Modificateurs"
+                    },
+                    "opposed": {
+                        "armor": {
+                            "hint": "Si le Blindage de l'acteur doit être ajouté au Test opposé",
+                            "label": "Blindage"
+                        },
+                        "attribute": {
+                            "hint": "L'Attribut utilisé par le Test opposé",
+                            "label": "Attribut"
+                        },
+                        "attribute2": {
+                            "hint": "L'Autre Attribut utilisé par ce Test opposé",
+                            "label": "Autre Attribut"
+                        },
+                        "mod": {
+                            "hint": "Tout modificateur appliqué au Test opposé",
+                            "label": "Modificateur"
+                        },
+                        "resist": {
+                            "armor": {
+                                "hint": "Si le Blindage de l'acteur doit être ajouté au Test de résistance",
+                                "label": "Blindage"
+                            },
+                            "attribute": {
+                                "hint": "L'Attribut utilisé par le Test de résistance",
+                                "label": "Attribut"
+                            },
+                            "attribute2": {
+                                "hint": "L'Autre Attribut utilisé par ce Test de résistance",
+                                "label": "Autre Attribut"
+                            },
+                            "test": {
+                                "hint": "Test que la cible effectue pour résister aux dégâts après le Test opposé",
+                                "label": "Test de résistance"
+                            }
+                        },
+                        "skill": {
+                            "hint": "Compétence utilisée par le Test opposé. Laisser vide si aucune compétence n'est utilisée",
+                            "label": "Compétence"
+                        },
+                        "test": {
+                            "hint": "Le Test que la cible de l'action doit effectuer",
+                            "label": "Test opposé"
+                        }
+                    },
+                    "roll_mode": {
+                        "hint": "Le Mode lancer de dés du test. Laisser vide pour utiliser le Mode lancer de dés sélectionné par l'utilisateur",
+                        "label": "Mode lancer de dés"
+                    },
+                    "skill": {
+                        "hint": "Compétence utilisée par cette action. Laisser vide si aucune compétence n'est utilisée",
+                        "label": "Compétence"
+                    },
+                    "spec": {
+                        "hint": "Si le modificateur de spécialisation de compétence (+2) doit être appliqué à ce test",
+                        "label": "Spécialisé"
+                    },
+                    "test": {
+                        "hint": "Type spécifique de test à utiliser pour cette Action",
+                        "label": "Type de Test"
+                    },
+                    "threshold": {
+                        "base": {
+                            "hint": "Le Seuil que le test doit atteindre",
+                            "label": "Valeur de Seuil"
+                        }
+                    },
+                    "type": {
+                        "hint": "Type d'action que cette compétence utilise",
+                        "label": "Type d'Action"
                     }
                 },
                 "technology": {

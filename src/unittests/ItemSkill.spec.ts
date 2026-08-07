@@ -3,6 +3,7 @@ import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SkillGroupFlow } from '@/module/actor/flows/SkillGroupFlow';
 import { SkillSetFlow } from '@/module/actor/flows/SkillSetFlow';
+import { DataDefaults } from '@/module/data/DataDefaults';
 import { SkillSelectionFlow } from '@/module/flows/SkillSelectionFlow';
 import { ActionFlow } from '@/module/item/flows/ActionFlow';
 import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
@@ -11,17 +12,25 @@ import { SR5Item } from '@/module/item/SR5Item';
 import { SR5TestFactory } from './utils';
 
 export const itemSkillTesting = (context: QuenchBatchContext) => {
-    const factory = new SR5TestFactory();
-    const { describe, it, before, after } = context;
+    // These tests build their skill sets by hand, so actors must start without any default skills.
+    const factory = new SR5TestFactory({ skipDefaultSkills: true });
+    const { describe, it, after } = context;
     const assert: Chai.AssertStatic = context.assert;
-
-    before(async () => {
-        window.doNotPopulateDefaultSkills = true;
-    });
 
     after(async () => {
         await factory.destroy();
-        delete window.doNotPopulateDefaultSkills;
+    });
+
+    describe('SkillItemFlow.skillKeys', () => {
+        it('ignores skills without a canonical name key', () => {
+            const keys = SkillItemFlow.skillKeys([
+                { name: '', type: 'skill', system: { type: 'skill', skill: { category: 'active' } } },
+                { type: 'skill', system: { type: 'skill', skill: { category: 'active' } } },
+                { name: 'Pistols', type: 'skill', system: { type: 'skill', skill: { category: 'active' } } },
+            ] as Item.CreateData[]);
+
+            assert.deepEqual([...keys], ['pistols:active']);
+        });
     });
 
     describe('SkillSetFlow.applySkillSetToActor', () => {
@@ -916,6 +925,129 @@ export const itemSkillTesting = (context: QuenchBatchContext) => {
             assert.property(skills, 'heavy_weapons');
             assert.strictEqual(skills.heavy_weapons, 'Heavy Weapons');
             assert.notProperty(skills, 'Heavy Weapons');
+        });
+    });
+
+    describe('PackItemFlow pack cache', () => {
+        /**
+         * Counts pack reads while running the given test body and always restores the original
+         * retrieval helper.
+         */
+        const withPackReadCounter = async (body: (reads: () => number) => Promise<void>) => {
+            const originalGetPackDocuments = PackItemFlow.getPackDocuments;
+            let reads = 0;
+
+            PackItemFlow.getPackDocuments = (async (...args: Parameters<typeof originalGetPackDocuments>) => {
+                reads++;
+                return originalGetPackDocuments.apply(PackItemFlow, args);
+            }) as typeof PackItemFlow.getPackDocuments;
+
+            try {
+                await body(() => reads);
+            } finally {
+                PackItemFlow.getPackDocuments = originalGetPackDocuments;
+            }
+        };
+
+        // Guards the default behaviour, so pack edits during normal play are picked up immediately.
+        it('reads the pack on every call while the cache is disabled', async () => {
+            await withPackReadCounter(async (reads) => {
+                await PackItemFlow.getPackSkills();
+                await PackItemFlow.getPackSkills();
+
+                assert.strictEqual(reads(), 2);
+            });
+        });
+
+        // Guards the bulk import optimization, where hundreds of actors pull the same documents.
+        it('reads the pack once per document type within a cache scope', async () => {
+            await withPackReadCounter(async (reads) => {
+                await PackItemFlow.withSkillPackCache(async () => {
+                    const firstSkills = await PackItemFlow.getPackSkills();
+                    const secondSkills = await PackItemFlow.getPackSkills();
+
+                    assert.strictEqual(reads(), 1);
+                    assert.deepEqual(firstSkills, secondSkills);
+
+                    await PackItemFlow.getPackSkillgroups();
+                    await PackItemFlow.getPackSkillgroups();
+                    await PackItemFlow.getAllPackSkillSets();
+                    await PackItemFlow.getAllPackSkillSets();
+                });
+
+                assert.strictEqual(reads(), 3);
+            });
+        });
+
+        it('reads the pack again after the cache scope ends', async () => {
+            await withPackReadCounter(async (reads) => {
+                await PackItemFlow.withSkillPackCache(async () => {
+                    await PackItemFlow.getPackSkills();
+                });
+                await PackItemFlow.getPackSkills();
+
+                assert.strictEqual(reads(), 2);
+            });
+        });
+
+        it('releases the cache when a scoped operation fails', async () => {
+            await withPackReadCounter(async (reads) => {
+                try {
+                    await PackItemFlow.withSkillPackCache(async () => {
+                        await PackItemFlow.getPackSkills();
+                        throw new Error('Expected test failure');
+                    });
+                } catch (error) {
+                    assert.strictEqual((error as Error).message, 'Expected test failure');
+                }
+
+                await PackItemFlow.getPackSkills();
+                assert.strictEqual(reads(), 2);
+            });
+        });
+
+        // Guards SR5Actor.createDocuments, so any batch creation shares its reads, not just imports.
+        it('shares pack reads across actors created in one batch', async () => {
+            const folder = await factory.getOrCreateFolderId('Actor');
+            const importedSkill = {
+                name: 'Pistols',
+                type: 'skill',
+                system: DataDefaults.baseSystemData('skill', {
+                    type: 'skill', skill: { category: 'active', rating: 6 },
+                }),
+            } as Item.CreateData;
+
+            await withPackReadCounter(async (reads) => {
+                const created = await SR5Actor.create(
+                    [
+                        { name: '#QUENCH', folder, type: 'character', items: [importedSkill] },
+                        { name: '#QUENCH', folder, type: 'character' },
+                        { name: '#QUENCH', folder, type: 'spirit' },
+                    ],
+                );
+                factory.actors.push(...created);
+
+                assert.strictEqual(reads(), 3);
+                for (const actor of created) assert.isNotEmpty(actor.items.filter(item => item.type === 'skill'));
+
+                const pistols = created[0].items.filter(item => item.name === 'Pistols');
+                assert.lengthOf(pistols, 1);
+                assert.strictEqual(foundry.utils.getProperty(pistols[0], 'system.skill.rating'), 6);
+            });
+        });
+
+        // Each creation gets its own scope, so a pack edited between two of them is picked up.
+        it('does not share pack reads between separate creations', async () => {
+            await withPackReadCounter(async (reads) => {
+                await factory.createActor({ type: 'character' }, { skipDefaultSkills: false });
+                const single = reads();
+
+                await factory.createActor({ type: 'character' }, { skipDefaultSkills: false });
+
+                // Reads scale with the actor count, separate creations share nothing.
+                assert.isAbove(single, 0);
+                assert.strictEqual(reads(), single * 2);
+            });
         });
     });
 };

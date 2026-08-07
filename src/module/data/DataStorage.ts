@@ -34,7 +34,7 @@ let lastSeenSections: Record<string, string> = {};
  * This allows you to store data globally, without a FoundryVTT document, and retrieve it later.
  * Since it's stored within a world setting, this will handle the GM socket updates for you.
  * 
- * NOTE: Foundry doesn´t do it's typical differential merge on updates, nor does it handle unset / delete.
+ * NOTE: Foundry doesn't do it's typical differential merge on updates, nor does it handle unset / delete.
  * 
  * Usage:
  * > const mydata = game.shadowrun5e.storage.get('key1.key2');
@@ -85,7 +85,7 @@ export const DataStorage = {
      * @returns object
      */
     storage: function(): DataStorageContent {
-        return game.settings.get(SYSTEM_NAME, FLAGS.GlobalDataStorage) as DataStorageContent;
+        return game.settings.get(SYSTEM_NAME, FLAGS.GlobalDataStorage);
     },
 
     /**

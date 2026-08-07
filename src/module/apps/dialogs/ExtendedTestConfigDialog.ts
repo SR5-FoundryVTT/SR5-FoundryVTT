@@ -29,7 +29,7 @@ interface ExtendedTestConfigContext extends HandlebarsApplicationMixin.RenderCon
 }
 
 export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(ApplicationV2)<ExtendedTestConfigContext> {
-    #record?: ExtendedTestRecord;
+    readonly #record?: ExtendedTestRecord;
     #resolve?: () => void;
 
     constructor(record?: ExtendedTestRecord, options = {}) {
@@ -112,21 +112,20 @@ export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(Applica
         };
         context.isCreate = !record;
         // Rules and permissions of an existing record are the owners business only.
-        context.canManage = !record || ExtendedTestRules.canManage(record, game.user!);
+        context.canManage = !record || ExtendedTestRules.canManage(record, game.user);
         context.poolFromSnapshot = !!record?.testData;
 
         // Actors the user may associate: owned actors (GM sees all), under their folders.
-        context.actorOptions = documentSelectOptions(
-            game.actors!.filter(actor => actor.isOwner), record?.actorUuid);
+        context.actorOptions = documentSelectOptions(game.actors.filter(actor => actor.isOwner), record?.actorUuid);
 
-        context.userOptions = game.users!
+        context.userOptions = game.users
             .filter(user => !user.isGM)
             .map(user => ({
-                id: user.id!,
+                id: user.id,
                 name: user.name ?? '',
-                visible: record?.permissions.visibleUsers.includes(user.id!) ?? false,
-                edit: record?.permissions.editUsers.includes(user.id!) ?? false,
-                roll: record?.permissions.rollUsers.includes(user.id!) ?? false,
+                visible: record?.permissions.visibleUsers.includes(user.id) ?? false,
+                edit: record?.permissions.editUsers.includes(user.id) ?? false,
+                roll: record?.permissions.rollUsers.includes(user.id) ?? false,
             }));
 
         const visibility = record?.permissions.visibility ?? 'gmAndOwner';
@@ -139,7 +138,12 @@ export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(Applica
         return context;
     }
 
-    static async #onSubmit(this: ExtendedTestConfigDialog, event: Event | SubmitEvent, form: HTMLFormElement, formData: foundry.applications.ux.FormDataExtended) {
+    static async #onSubmit(
+        this: ExtendedTestConfigDialog,
+        event: Event | SubmitEvent,
+        form: HTMLFormElement,
+        formData: foundry.applications.ux.FormDataExtended
+    ) {
         const data = formData.object as Record<string, any>;
 
         const readUsers = (prefix: string): string[] =>
@@ -155,7 +159,7 @@ export class ExtendedTestConfigDialog extends HandlebarsApplicationMixin(Applica
             // accumulated hits once the record rolls from its snapshot. Don't zero the other.
             ...(data.dicePool === undefined ? {} : { dicePool: Math.max(Number(data.dicePool) || 0, 0) }),
             ...(data.accumulatedHits === undefined ? {} : { accumulatedHits: Math.max(Number(data.accumulatedHits) || 0, 0) }),
-            threshold: Math.max(Number(data.threshold) || 0, 0),
+            threshold: Math.max(Number(data.threshold) || 0, 0),    
             interval: {
                 value: Math.max(Number(data['interval.value']) || 0, 0),
                 unit: (data['interval.unit'] ?? 'minutes') as ExtendedIntervalUnit,

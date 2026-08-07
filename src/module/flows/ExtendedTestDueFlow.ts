@@ -100,12 +100,12 @@ export const ExtendedTestDueFlow = {
      *
      * Needs to be registered to the 'renderChatMessage' FoundryVTT hook.
      */
-    async chatMessageListeners(_message: ChatMessage, html) {
+    chatMessageListeners(_message: ChatMessage, html) {
         // The card is only a shortcut into the flow. ExtendedTestFlow.roll re-checks
         // permission, status, pool and interval, and warns about whatever it refuses.
         $(html).find('[data-action="extended-test-roll"]').on('click', event => {
             event.preventDefault();
-            const id = (event.currentTarget as HTMLElement).dataset.recordId;
+            const id = event.currentTarget.dataset.recordId;
             if (id) void ExtendedTestFlow.roll(id);
         });
 

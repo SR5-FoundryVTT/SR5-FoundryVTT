@@ -9,7 +9,7 @@ import { ExtendedTestStorage } from '@/module/storage/ExtendedTestStorage';
 import { WorldTimeFlow, WorldTimePreset } from '@/module/flows/WorldTimeFlow';
 import { intervalToSeconds, unitLabel } from '@/module/utils/timeUnits';
 import { FolderSelectOption, SelectableDocument, documentSelectOptions } from '@/module/utils/folderOptions';
-import { ExtendedTestRecord, ExtendedTestStatus } from '@/module/types/flows/ExtendedTest';
+import { ExtendedTestRecord } from '@/module/types/flows/ExtendedTest';
 import { ExtendedTestConfigDialog } from '@/module/apps/dialogs/ExtendedTestConfigDialog';
 
 import ApplicationV2 = foundry.applications.api.ApplicationV2;
@@ -147,24 +147,27 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
         sortDir: 'desc' as 'asc' | 'desc',
     };
 
-    #expanded = new Set<string>();
+    readonly #expanded = new Set<string>();
 
     // Ignore storage changes of unrelated sections.
-    #onStorageChanged = (changedKeys: string[]) => {
+    readonly #onStorageChanged = (changedKeys: string[]) => {
         if (!changedKeys.includes(ExtendedTestStorage.key)) return;
         void this.render();
     };
     // Due state touches every row, so this is a full render. Debounced, as holding a time
     // preset would otherwise rebuild the whole list per tick.
-    #onUpdateWorldTime = foundry.utils.debounce(() => { void this.render(); }, 100);
+    readonly #onUpdateWorldTime = foundry.utils.debounce(() => { void this.render(); }, 100);
     // Don't rebuild the list on every keystroke.
-    #onSearchInput = foundry.utils.debounce(() => { void this.render(); }, 200);
+    readonly #onSearchInput = foundry.utils.debounce(() => { void this.render(); }, 200);
 
     override get title() {
         return game.i18n.localize('SR5.ExtendedTestManager.Title');
     }
 
-    protected override _onFirstRender(context: DeepPartial<ExtendedTestManagerContext>, options: DeepPartial<ApplicationV2.RenderOptions>) {
+    protected override async _onFirstRender(
+        context: DeepPartial<ExtendedTestManagerContext>,
+        options: DeepPartial<ApplicationV2.RenderOptions>
+    ) {
         Hooks.on('sr5e.storageChanged', this.#onStorageChanged);
         Hooks.on('updateWorldTime', this.#onUpdateWorldTime);
         return super._onFirstRender(context, options);
@@ -179,7 +182,7 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
     override async _prepareContext(options: Parameters<ApplicationV2['_prepareContext']>[0]) {
         const context = await super._prepareContext(options);
 
-        const user = game.user!;
+        const user = game.user;
         const records = Object.values(ExtendedTestStorage.getAll())
             // The privacy layer: only show records the current user may view.
             .filter(record => ExtendedTestRules.canView(record, user));

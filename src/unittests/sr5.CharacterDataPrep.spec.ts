@@ -327,6 +327,21 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
             assert.strictEqual(character.system.initiative.matrix.dice.value, 3);
         });
 
+        it('clears hot-sim when switching to non-matrix initiative mode', async () => {
+            const character = await factory.createActor({
+                type: 'character',
+                system: {
+                    initiative: { perception: 'matrix' },
+                    matrix: { hot_sim: true },
+                },
+            });
+
+            await character.setInitiativeMode('meatspace');
+
+            assert.strictEqual(character.system.initiative.perception, 'meatspace');
+            assert.strictEqual(character.system.matrix.hot_sim, false);
+        });
+
         it('limit calculation', async () => {
             const character = await factory.createActor({
                 type: 'character',
@@ -388,11 +403,9 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('skill calculation', async () => {
-            window.doNotPopulateDefaultSkills = true;
-
             const character = await factory.createActor({
                 type: 'character'
-            });
+            }, { skipDefaultSkills: true });
 
             // create a skill item to trigger SkillField preparation.
             await character.createEmbeddedDocuments('Item', [{
@@ -406,8 +419,6 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                     }
                 },
             }]);
-
-            delete window.doNotPopulateDefaultSkills;
 
             // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
             assert.strictEqual(character.system.skills.active.test.value, 3);

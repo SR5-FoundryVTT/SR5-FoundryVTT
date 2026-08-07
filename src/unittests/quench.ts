@@ -15,6 +15,7 @@ import { shadowrunSR5SpriteDataPrep } from './sr5.SpriteDataPrep.spec';
 import { shadowrunSR5ICDataPrep } from './sr5.ICDataPrep.spec';
 import { shadowrunSR5VehicleDataPrep } from './sr5.VehicleDataPrep.spec';
 import { shadowrunSR5ActiveEffect } from './sr5.ActiveEffect.spec';
+import { shadowrunDynamicValueEvaluator } from './sr5.DynamicValueEvaluator.spec';
 import { shadowrunEffectDuration } from './sr5.EffectDuration.spec';
 import { shadowrunExtendedTests } from './sr5.ExtendedTest.spec';
 import { shadowrunTesting } from './sr5.Testing.spec';
@@ -94,6 +95,9 @@ export const quenchRegister = (quench: Quench) => {
     });
     registerBatch(quench, 'shadowrun5e.entities.effects.duration', shadowrunEffectDuration, {
         displayName: 'SHADOWRUN5e: ActiveEffect Duration Test',
+    });
+    registerBatch(quench, 'shadowrun5e.effect.dynamic_values', shadowrunDynamicValueEvaluator, {
+        displayName: 'SHADOWRUN5e: Dynamic Value Evaluator Test',
     });
     registerBatch(quench, 'shadowrun5e.flows.extended_test', shadowrunExtendedTests, {
         displayName: 'SHADOWRUN5e: Extended Test Test',

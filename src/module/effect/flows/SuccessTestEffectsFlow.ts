@@ -146,7 +146,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * @param actor The actor to create the effects on.
      */
     async createTargetActorEffects(actor: SR5Actor) {
-        const effectsData = this._collectTargetActorEffectsData();
+        const effectsData = this._collectTargetActorEffectsData(actor);
         if (!effectsData || effectsData.length === 0) return;
 
         // Inject a flag to mark the effect as applied by a test.
@@ -162,14 +162,12 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         }
     }
 
-    _collectTargetActorEffectsData() {
-        const actor = this.test.actor;
-
-        if (actor === undefined || this.test.item === undefined) return;
+    _collectTargetActorEffectsData(targetActor: SR5Actor) {
+        if (this.test.actor === undefined || this.test.item === undefined) return;
 
         const effectsData: SR5ActiveEffect[] = [];
         const collect = (effect: SR5ActiveEffect) => {
-            const trimmed = this._trimToTargetedActorEffectData(effect);
+            const trimmed = this._trimToTargetedActorEffectData(effect, targetActor);
             if (trimmed) effectsData.push(trimmed);
         };
 
@@ -181,7 +179,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
             collect(effect);
         }
 
-        console.debug(`Shadowrun5e | To be created effects on target actor ${actor.name}`, effectsData);
+        console.debug(`Shadowrun5e | To be created effects on target actor ${targetActor.name}`, effectsData);
 
         return effectsData;
     }
@@ -191,9 +189,11 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * assigned to them, resolving dynamic change values from the current test context.
      *
      * @param effect The source effect that has at least one targeted_actor target.
+     * @param targetActor The actor the effect will be copied onto, whose field types drive how
+     *                    resolved values are rendered.
      * @returns Trimmed effect data, or undefined when there's nothing to copy.
      */
-    _trimToTargetedActorEffectData(effect: SR5ActiveEffect) {
+    _trimToTargetedActorEffectData(effect: SR5ActiveEffect, targetActor: SR5Actor) {
         const targetedIds = new Set(
             effect.system.targets.filter(target => target.applyTo === 'targeted_actor').map(target => target.id)
         );
@@ -205,7 +205,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         effectData.system.changes = effectData.system.changes
             .filter(change => targetedIds.has(change.target))
             .map(change => {
-                SR5ActiveEffect.resolveDynamicChangeValue(this.test, change as unknown as ActiveEffect.ChangeData);
+                SR5ActiveEffect.resolveDynamicChangeValue(this.test, change as unknown as ActiveEffect.ChangeData, targetActor);
                 return change;
             });
 

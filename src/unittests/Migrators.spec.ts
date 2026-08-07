@@ -6,6 +6,7 @@ import { VersionMigration } from '@/module/migrator/VersionMigration';
 import { Version0_33_1 } from '@/module/migrator/versions/Version0_33_1';
 import { Version0_36_0 } from 'src/module/migrator/versions/Version0_36_0';
 import { Version0_37_0 } from 'src/module/migrator/versions/Version0_37_0';
+import { Version0_38_0 } from 'src/module/migrator/versions/Version0_38_0';
 import { FLAGS, SYSTEM_NAME } from '@/module/constants';
 
 export const Migrators = (context: QuenchBatchContext) => {
@@ -358,7 +359,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         it('detects forced world migrations independently from document migrations', () => {
             assert.isFalse(new TestMigration().handlesWorldMigration());
             assert.isTrue(new TestForcedMigration().handlesWorldMigration());
-            assert.isTrue(new Version0_37_0().handlesWorldMigration());
+            assert.isTrue(new Version0_38_0().handlesWorldMigration());
         });
 
         it('rewrites mapped keys and formula string value paths without evaluating math', () => {
@@ -819,9 +820,9 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
     });
 
-    describe('Version0_37_0 nested item migration', () => {
+    describe('Version0_38_0 nested item migration', () => {
         it('normalizes missing item parentId to null', () => {
-            const migrator = new Version0_37_0();
+            const migrator = new Version0_38_0();
             const item: any = {
                 _id: foundry.utils.randomID(16),
                 name: 'Old Gear',
@@ -836,7 +837,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
 
         it('lifts actor-owned nested container items into sibling actor items', () => {
-            const migrator = new Version0_37_0();
+            const migrator = new Version0_38_0();
             const container: any = {
                 _id: foundry.utils.randomID(16),
                 name: 'Backpack',
@@ -867,7 +868,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
 
         it('lifts actor-owned weapon ammo and mods into sibling actor items', () => {
-            const migrator = new Version0_37_0();
+            const migrator = new Version0_38_0();
             const weapon: any = {
                 _id: foundry.utils.randomID(16),
                 name: 'Ares Alpha',
@@ -911,7 +912,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
 
         it('lifts actor-owned armor mods into sibling actor items', () => {
-            const migrator = new Version0_37_0();
+            const migrator = new Version0_38_0();
             const armor: any = {
                 _id: foundry.utils.randomID(16),
                 name: 'Armor Jacket',
@@ -999,7 +1000,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
 
         it('adds missing ids to nested item effects stored in flags', () => {
-            const migrator = new Version0_37_0();
+            const migrator = new Version0_38_0();
             const item: any = {
                 flags: {
                     shadowrun5e: {
@@ -1033,7 +1034,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
 
         it('migrates technology cost and availability into base/value fields', () => {
-            const migrator = new Version0_37_0();
+            const migrator = new Version0_38_0();
             const item: any = {
                 system: {
                     technology: {
@@ -1064,7 +1065,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
 
         it('migrates draft technology cost and availability objects into base/value fields', () => {
-            const migrator = new Version0_37_0();
+            const migrator = new Version0_38_0();
             const item: any = {
                 system: {
                     technology: {
@@ -1087,7 +1088,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
 
         it('collapses an intermediate base/value restriction object into a plain string', () => {
-            const migrator = new Version0_37_0();
+            const migrator = new Version0_38_0();
             const item: any = {
                 system: {
                     technology: {
@@ -1111,7 +1112,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
 
         it('migrates availability override changes into a numeric change and a restriction string', () => {
-            const migrator = new Version0_37_0();
+            const migrator = new Version0_38_0();
             const item: any = {
                 system: {
                     technology: {

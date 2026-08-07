@@ -345,7 +345,8 @@ export class SR5Combatant extends Combatant<"base"> {
 
     /** Handles updates at the start of a combatant's turn. */
     async turnUpdate(pass: number): Promise<void> {
-        if (pass === SR.combat.FIRST_PASS) {
+        const historyReset = game.settings.get(SYSTEM_NAME, FLAGS.TokenMovementHistoryReset);
+        if (pass === SR.combat.FIRST_PASS && historyReset === 'firstActionPhase') {
             await this.clearMovementHistory();
         }
 

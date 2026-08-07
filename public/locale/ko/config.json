@@ -76,7 +76,11 @@
         "UseImportIconOverridesDescription": "물품 불러오기 시 서로 다른 물품 유형에 동일한 아이콘을 사용하는 것이 합리적일 경우 사용. 사용자 지정 아이콘을 사용하는 경우 체크 해제.",
         "UseImportIconOverridesName": "기본 불러오기 아이콘 덮어쓰기 사용",
         "TokenAutoRunning": "달리기 움직임 자동 감지",
-        "TokenAutoRunningDescription": "측정된 거리가 걷기 속도를 초과하면 자동으로 토큰 이동 모드를 달리기로 전환합니다."
+        "TokenAutoRunningDescription": "측정된 거리가 걷기 속도를 초과하면 자동으로 토큰 이동 모드를 달리기로 전환합니다.",
+        "TokenMovementHistoryReset": "이동 기록 초기화 시점",
+        "TokenMovementHistoryResetDescription": "전투 중 전투원의 이동 기록을 언제 초기화할지 선택합니다",
+        "TokenMovementHistoryResetFirstActionPhase": "내 첫 행동 단계에서",
+        "TokenMovementHistoryResetTurnStart": "턴 시작 시 초기화"
     },
     "SR5": {
         "AP": "AP",
@@ -1953,8 +1957,6 @@
                 "OpenInventory": "소지품 위치"
             },
             "Item": {
-                "AvailabilityAdjustment": "등급별 희귀도 비례 적용",
-                "CostAdjustment": "등급별 가격 비례 적용",
                 "EssenceAdjustment": "등급별 에센스 비례 적용",
                 "Properties": "아이템 속성"
             },
@@ -3200,8 +3202,6 @@
                 "ActionRollMode": "이 행동을 시전 할 때 무리한 굴림 방식을 사용함. 전체 채팅 설정에 덮어 써짐.",
                 "AddQuantity": "1개 추가. {qtySome}: 5개 추가. {qtyMany}: 20개 추가.",
                 "AmmoReplaceDamage": "무기 피해를 수정하는 대신 대체하도록 설정",
-                "AvailabilityAdjustment": "물품 등급에 따라 현재 희귀도 조정",
-                "CostAdjustment": "물품 등급에 따라 현재 가격 조정",
                 "DisabledForPreparedActor": "준비된 액터를 사용 중이므로 비활성화됨",
                 "EssenceAdjustment": "해당 물품의 등급에 따라 실제 에센스 비용을 조절",
                 "RemoveQuantity": "1개 삭제. {qtySome}: 5개 삭제. {qtyMany}: 20개 삭제.",
