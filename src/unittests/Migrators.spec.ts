@@ -6,6 +6,7 @@ import { VersionMigration } from '@/module/migrator/VersionMigration';
 import { Version0_33_1 } from '@/module/migrator/versions/Version0_33_1';
 import { Version0_36_0 } from 'src/module/migrator/versions/Version0_36_0';
 import { Version0_37_0 } from 'src/module/migrator/versions/Version0_37_0';
+import { Version0_38_0 } from 'src/module/migrator/versions/Version0_38_0';
 
 export const Migrators = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -861,9 +862,11 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(effect.system.targets[0].applyTo, 'actor');
             assert.strictEqual(effect.system.changes[0].target, effect.system.targets[0].id);
         });
+    });
 
+    describe('Version0_38_0 item-sheet migration', () => {
         it('adds missing ids to nested item effects stored in flags', () => {
-            const migrator = new Version0_37_0();
+            const migrator = new Version0_38_0();
             const item: any = {
                 flags: {
                     shadowrun5e: {
@@ -897,7 +900,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
 
         it('migrates technology cost and availability into base/value fields', () => {
-            const migrator = new Version0_37_0();
+            const migrator = new Version0_38_0();
             const item: any = {
                 system: {
                     technology: {
@@ -929,7 +932,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
 
         it('migrates draft technology cost and availability objects into base/value fields', () => {
-            const migrator = new Version0_37_0();
+            const migrator = new Version0_38_0();
             const item: any = {
                 system: {
                     technology: {
@@ -952,7 +955,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
 
         it('collapses an intermediate base/value restriction object into a plain string', () => {
-            const migrator = new Version0_37_0();
+            const migrator = new Version0_38_0();
             const item: any = {
                 system: {
                     technology: {
@@ -976,7 +979,7 @@ export const Migrators = (context: QuenchBatchContext) => {
         });
 
         it('migrates availability override changes into a numeric change and a restriction string', () => {
-            const migrator = new Version0_37_0();
+            const migrator = new Version0_38_0();
             const item: any = {
                 system: {
                     technology: {
