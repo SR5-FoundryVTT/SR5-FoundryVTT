@@ -41,6 +41,19 @@ export const SkillItemFlow = {
         return actor.items.filter(item => SkillItemFlow.isSkillItem(item));
     },
 
+    /** Collect canonical keys from skill items or sources. */
+    skillKeys(items: Iterable<Partial<Item.CreateData>>) {
+        const keys = new Set<string>();
+
+        for (const item of items) {
+            if (!SkillItemFlow.isSkillItem(item)) continue;
+            const key = SkillItemFlow.skillNameByCategoryKey(item.name ?? '', SkillItemFlow.getSkillCategory(item));
+            if (key) keys.add(key);
+        }
+
+        return keys;
+    },
+
     /**
      * Return a base name for a newly created skill item.
      *
