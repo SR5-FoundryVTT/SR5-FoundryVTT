@@ -1,7 +1,7 @@
 /**
  * Folder aware option lists for plain <select> controls.
  *
- * A select can't nest, so depth is shown with a '─' prefix per level. Leading whitespace
+ * A select can't nest, so the folder hierarchy is drawn with tree glyphs. Leading whitespace
  * would be collapsed by the browser, which is why the indent is drawn rather than spaced.
  */
 
@@ -27,6 +27,10 @@ export interface SelectableDocument {
 }
 
 const COMPARE_OPTIONS = { numeric: true, sensitivity: 'base' } satisfies Intl.CollatorOptions;
+// Native <option> controls collapse ordinary leading spaces. NBSP keeps the tree columns
+// visible when a branch needs blank space instead of a vertical connector.
+const TREE_INDENT = '\u00A0\u00A0\u00A0';
+const TREE_PIPE_INDENT = `│\u00A0\u00A0`;
 
 /**
  * Compare two folder paths segment by segment, so a child sorts directly under its parent.
@@ -105,23 +109,41 @@ export function documentSelectOptions(
         (a.name ?? '').localeCompare(b.name ?? '', undefined, COMPARE_OPTIONS);
 
     const options: FolderSelectOption[] = [];
-    const sorted = [...folders.values()]
-        .map(folder => ({ folder, path: folderPath(folder) }))
-        .sort((a, b) => comparePaths(a.path, b.path));
+    const childFolders = new Map<string | undefined, Folder[]>();
+    for (const folder of folders.values()) {
+        // Foundry lists ancestors nearest-first. Every ancestor was added above, so a
+        // missing parent means this folder is at the visible tree's root.
+        const parentId = folder.ancestors[0]?.id ?? undefined;
+        childFolders.set(parentId, [...childFolders.get(parentId) ?? [], folder]);
+    }
 
-    for (const { folder } of sorted) {
-        const depth = folder.ancestors.length;
-        options.push({ value: '', label: indent(depth, folder.name), disabled: true, selected: false });
+    const byFolderName = (a: Folder, b: Folder) =>
+        a.name.localeCompare(b.name, undefined, COMPARE_OPTIONS);
 
-        for (const document of (byFolder.get(folder.id ?? '') ?? []).sort(byName)) {
+    const addFolder = (folder: Folder, prefix: string, isLast: boolean, isRoot = false) => {
+        const documents = (byFolder.get(folder.id ?? '') ?? []).sort(byName);
+        const children = (childFolders.get(folder.id ?? undefined) ?? []).sort(byFolderName);
+        const childCount = documents.length + children.length;
+        const branch = isRoot ? '' : `${prefix}${isLast ? '└─ ' : '├─ '}`;
+        options.push({ value: '', label: `${branch}${folder.name}`, disabled: true, selected: false });
+        const childPrefix = isRoot ? '' : `${prefix}${isLast ? TREE_INDENT : TREE_PIPE_INDENT}`;
+
+        documents.forEach((document, index) => {
+            const documentIsLast = index === childCount - 1;
             options.push({
                 value: document.uuid,
-                label: indent(depth + 1, document.name),
+                label: `${childPrefix}${documentIsLast ? '└─ ' : '├─ '}${document.name ?? ''}`,
                 disabled: false,
                 selected: document.uuid === selected,
             });
-        }
-    }
+        });
+        children.forEach((child, index) => {
+            addFolder(child, childPrefix, documents.length + index === childCount - 1);
+        });
+    };
+
+    const roots = (childFolders.get(undefined) ?? []).sort(byFolderName);
+    roots.forEach((folder, index) => addFolder(folder, '', index === roots.length - 1, true));
 
     for (const document of unfoldered.sort(byName)) {
         options.push({

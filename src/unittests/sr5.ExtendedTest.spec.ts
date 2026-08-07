@@ -103,7 +103,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             ]);
 
             assert.deepEqual(options.map(option => option.label), [
-                'Runners', '─ Aria', '─ Byte', '─ NPCs', '── Silent NPC', 'Loose Actor',
+                'Runners', '├─ Aria', '├─ Byte', '└─ NPCs', '\u00A0\u00A0\u00A0└─ Silent NPC', 'Loose Actor',
             ]);
             // Headers can't be picked, and carry no value to submit.
             assert.deepEqual(options.filter(option => option.disabled).map(option => option.value), ['', '']);
@@ -119,7 +119,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             // A parent holding nothing itself still appears, its child needs the path.
             const options = documentSelectOptions([doc('Silent NPC', npcs)], 'Actor.Silent NPC');
 
-            assert.deepEqual(options.map(option => option.label), ['Runners', '─ NPCs', '── Silent NPC']);
+            assert.deepEqual(options.map(option => option.label), ['Runners', '└─ NPCs', '\u00A0\u00A0\u00A0└─ Silent NPC']);
             assert.deepEqual(options.filter(option => option.selected).map(option => option.value), ['Actor.Silent NPC']);
         });
     });
@@ -530,6 +530,22 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             assert.strictEqual(updated.accumulatedHits, 3);
             assert.strictEqual(ExtendedTestRules.nextPool(updated), 11);
             assert.strictEqual(updated.status, 'active');
+        });
+
+        it('rejects a result when the record was ended while the roll dialog was open', async () => {
+            const record = await createRecord({ dicePool: 12, threshold: 40 });
+            record.status = 'cancelled';
+            await ExtendedTestStorage.setRecord(record);
+
+            await ExtendedTestFlow._applyRollResult(record.id, {
+                hits: 3, glitch: false, criticalGlitch: false, poolUsed: 12,
+                timestamp: Date.now(), worldTime: game.time.worldTime, userId: game.user!.id!,
+            }, undefined as never);
+
+            const unchanged = ExtendedTestStorage.get(record.id)!;
+            assert.strictEqual(unchanged.rollCount, 0);
+            assert.strictEqual(unchanged.accumulatedHits, 0);
+            assert.strictEqual(unchanged.status, 'cancelled');
         });
 
         it('applies the cumulative modifier as a modifier, not into the pool base', async () => {

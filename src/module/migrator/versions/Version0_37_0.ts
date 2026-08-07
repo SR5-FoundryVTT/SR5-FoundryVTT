@@ -29,9 +29,22 @@ const recoveryIntervals: Record<string, { value: number, unit: string }> = {
 export class Version0_37_0 extends VersionMigration {
     readonly TargetVersion = '0.37.0';
 
+    /**
+     * Turn the action extended flag into the interval it always implied.
+     *
+     * Recovery gets its book interval, everything else the one minute TestCreator used to
+     * apply to any extended action.
+     */
     override migrateItem(item: any): void {
+        const action = item.system?.action;
+        // Only a boolean is unmigrated. The migrator reruns until a document can persist.
+        if (typeof action?.extended === 'boolean') {
+            action.extended = action.extended
+                ? recoveryIntervals[action.test] ?? { value: 1, unit: 'minutes' }
+                : { value: 0, unit: 'minutes' };
+        }
+
         Version0_37_0.ensureNestedDocumentIds(item);
-        Version0_37_0.migrateExtendedAction(item);
 
         const technology = item.system?.technology;
         if (!technology || typeof technology !== 'object') return;
@@ -72,22 +85,6 @@ export class Version0_37_0 extends VersionMigration {
 
             Version0_37_0.ensureNestedDocumentIds(embeddedItem);
         }
-    }
-
-    /**
-     * Turn the action extended flag into the interval it always implied.
-     *
-     * Recovery gets its book interval, everything else the one minute TestCreator used to
-     * apply to any extended action.
-     */
-    private static migrateExtendedAction(item: any): void {
-        const action = item.system?.action;
-        // Only a boolean is unmigrated. The migrator reruns until a document can persist.
-        if (typeof action?.extended !== 'boolean') return;
-
-        action.extended = action.extended
-            ? recoveryIntervals[action.test] ?? { value: 1, unit: 'minutes' }
-            : { value: 0, unit: 'minutes' };
     }
 
     override migrateActiveEffect(effect: any): void {

@@ -360,7 +360,10 @@ export const ExtendedTestFlow = {
             return;
         }
 
-        SocketMessage.emitForGM(FLAGS.ApplyExtendedTestRoll, { id, rollEntry, testData });
+        // The GM rebuilds the result from this chat message instead of trusting client supplied
+        // hits or test data. Foundry supplies the sender ID to the receiving socket handler.
+        if (!rollEntry.messageUuid) return;
+        SocketMessage.emitForGM(FLAGS.ApplyExtendedTestRoll, { id, messageUuid: rollEntry.messageUuid });
     },
 
     /**
@@ -371,6 +374,21 @@ export const ExtendedTestFlow = {
     async _applyRollResult(id: string, rollEntry: ExtendedTestRollEntry, testData: SuccessTestData) {
         const record = ExtendedTestStorage.get(id);
         if (!record) return;
+
+        // This is the authoritative write path. A dialog can remain open while another user
+        // pauses, ends, or completes the record, so repeat the state checks made before rolling.
+        const rollingUser = game.users?.get(rollEntry.userId);
+        if (!rollingUser || !ExtendedTestRules.canRoll(record, rollingUser)) return;
+        if (record.status !== 'active' || !ExtendedTestRules.canContinue(record)) return;
+        if (!ExtendedTestFlow._intervalAllowsRoll(record)) return;
+        if (rollEntry.messageUuid && record.rolls.some(roll => roll.messageUuid === rollEntry.messageUuid)) return;
+
+        // The world time is set by the GM when accepting the result, never by a player socket.
+        rollEntry = {
+            ...rollEntry,
+            timestamp: Date.now(),
+            worldTime: game.time.worldTime,
+        };
 
         record.rolls.push(rollEntry);
         record.log.push({ ...ExtendedTestFlow._logEntry('roll'), userId: rollEntry.userId });
@@ -407,17 +425,37 @@ export const ExtendedTestFlow = {
     /**
      * Handle a player roll result, applying it as GM.
      */
-    async _handleApplyRollSocketMessage(message: Shadowrun.SocketMessageData) {
+    async _handleApplyRollSocketMessage(message: Shadowrun.SocketMessageData, senderId?: string) {
         if (!game.user?.isGM) return;
 
-        const { id, rollEntry, testData } = message.data as {
+        const { id, messageUuid } = message.data as {
             id: string;
-            rollEntry: ExtendedTestRollEntry;
-            testData: SuccessTestData;
+            messageUuid: string;
         };
-        if (!id || !rollEntry) return;
+        if (!id || !messageUuid || !senderId) return;
 
-        await ExtendedTestFlow._applyRollResult(id, rollEntry, testData);
+        const record = ExtendedTestStorage.get(id);
+        const rollingUser = game.users?.get(senderId);
+        if (!record || !rollingUser || !ExtendedTestRules.canRoll(record, rollingUser)) return;
+
+        const chatMessage = fromUuidSync(messageUuid);
+        if (!(chatMessage instanceof ChatMessage) || chatMessage.author?.id !== senderId) return;
+
+        // The message contains the evaluated test and its original dice rolls. It must be the
+        // managed roll we were asked to store, rather than a different roll the player owns.
+        const test = await TestCreator.fromMessage(chatMessage.id!);
+        if (!test?.evaluated || test.data.extendedManagedId !== id || test.data.messageUuid !== messageUuid) return;
+
+        await ExtendedTestFlow._applyRollResult(id, {
+            hits: test.hits.value,
+            glitch: test.glitched,
+            criticalGlitch: test.criticalGlitched,
+            poolUsed: test.pool.value,
+            timestamp: chatMessage.timestamp,
+            worldTime: game.time.worldTime,
+            messageUuid,
+            userId: senderId,
+        }, foundry.utils.deepClone(test.data));
     },
 
     /**
