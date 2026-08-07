@@ -155,8 +155,6 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('spirit skills are toggles where on equals force and off equals zero', async () => {
-            window.doNotPopulateDefaultSkills = true;
-
             const spirit = await factory.createActor({
                 type: 'spirit',
                 system: {
@@ -164,7 +162,7 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
                         force: { base: 6 },
                     }
                 }
-            });
+            }, { skipDefaultSkills: true });
 
             await spirit.createEmbeddedDocuments('Item', [
                 {
@@ -205,16 +203,12 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
                 },
             ]);
 
-            delete window.doNotPopulateDefaultSkills;
-
             assert.strictEqual(spirit.system.skills.active.assensing.value, 6);
             assert.strictEqual(spirit.system.skills.active.perception.value, 6);
             assert.strictEqual(spirit.system.skills.active.arcana.value, 0);
         });
 
         it('spirit half value skill mode applies ceil(force/2) to ON skills', async () => {
-            window.doNotPopulateDefaultSkills = true;
-
             const spirit = await factory.createActor({
                 type: 'spirit',
                 system: {
@@ -223,7 +217,7 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
                         force: { base: 5 },
                     }
                 }
-            });
+            }, { skipDefaultSkills: true });
 
             await spirit.createEmbeddedDocuments('Item', [
                 {
@@ -251,8 +245,6 @@ export const shadowrunSR5SpiritDataPrep = (context: QuenchBatchContext) => {
                     }
                 },
             ]);
-
-            delete window.doNotPopulateDefaultSkills;
 
             assert.strictEqual(spirit.system.skills.active.assensing.value, 3);
             assert.strictEqual(spirit.system.skills.active.arcana.value, 0);
