@@ -51,6 +51,7 @@ import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 import { LinksHelpers } from '@/module/utils/links';
 import type { InitiativeModeOptions } from '../combat/SR5Combatant';
 import { CreateActorFlow } from './flows/CreateActorFlow';
+import type { SR5ActorCreateOptions } from './flows/CreateActorFlow';
 import { SkillNamingFlow } from '@/module/flows/SkillNamingFlow';
 import { SkillFieldType } from '../types/template/Skills';
 import { IconAssign } from 'src/module/apps/iconAssigner/IconAssign';
@@ -134,6 +135,14 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return { img: assignedImage, texture: { src: assignedImage } };
     }
 
+    /** Share skill pack reads across a creation. */
+    static override async createDocuments<Temporary extends boolean | undefined = undefined>(
+        data: Actor.CreateInput[],
+        operation?: Actor.Database.CreateDocumentsOperation<Temporary>,
+    ) {
+        return PackItemFlow.withSkillPackCache(async () => await super.createDocuments(data, operation));
+    }
+
     /**
      * Lifecycle hook called before an actor document is created.
      *
@@ -144,13 +153,15 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param user The User requesting the document creation
      */
     override async _preCreate(...args: Parameters<Actor<SubType>['_preCreate']>) {
-        const [data] = args;
+        const [data, options] = args;
         await super._preCreate(...args);
 
         // Abort skill creation data injection when duplicating
         if (foundry.utils.getProperty(data, '_stats.duplicateSource')) return;
         // Abort if a skillset was already assigned (e.g. during Chummer import)
         if (foundry.utils.getProperty(data, 'system.skillset')) return;
+        // Abort when the creation request opted out of default skills
+        if ((options as SR5ActorCreateOptions | undefined)?.skipDefaultSkills) return;
         await CreateActorFlow.addDefaultActorSkillset(this, data);
     }
 
