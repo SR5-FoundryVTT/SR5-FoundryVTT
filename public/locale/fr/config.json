@@ -32,7 +32,11 @@
         "ShowTokenNameForChatOutputDescription": "Utiliser le nom de jetons pour les messages de lancés de dés au lieu du nom du personnage",
         "ShowTokenNameForChatOutputName": "Utiliser les noms des Jetons dans les affichages de lancés dans le tchat",
         "TokenAutoRunning": "Détection automatique de la course",
-        "TokenAutoRunningDescription": "Bascule automatiquement le mode de déplacement du token en course lorsque la distance mesurée dépasse la vitesse de marche."
+        "TokenAutoRunningDescription": "Bascule automatiquement le mode de déplacement du token en course lorsque la distance mesurée dépasse la vitesse de marche.",
+        "TokenMovementHistoryReset": "Moment de réinitialisation de l'historique de déplacement",
+        "TokenMovementHistoryResetDescription": "Choisit quand l'historique de déplacement est effacé pour les combattants pendant le combat",
+        "TokenMovementHistoryResetFirstActionPhase": "À ma première phase d'action",
+        "TokenMovementHistoryResetTurnStart": "Réinitialiser au début du tour"
     },
     "SR5": {
         "AP": "PA",

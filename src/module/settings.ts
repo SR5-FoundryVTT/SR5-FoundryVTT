@@ -256,6 +256,20 @@ export const registerSystemSettings = () => {
         default: true,
     });
 
+    game.settings.register(SYSTEM_NAME, FLAGS.TokenMovementHistoryReset, {
+        name: 'SETTINGS.TokenMovementHistoryReset',
+        hint: 'SETTINGS.TokenMovementHistoryResetDescription',
+        scope: 'world',
+        config: true,
+        type: String,
+        choices: {
+            firstActionPhase: 'SETTINGS.TokenMovementHistoryResetFirstActionPhase',
+            turnStart: 'SETTINGS.TokenMovementHistoryResetTurnStart',
+        },
+        default: 'firstActionPhase',
+        requiresReload: true,
+    });
+
     /**
      * TokenRuler color: Walking
      */
