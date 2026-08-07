@@ -2,6 +2,9 @@ import { Parser, SystemType } from "../Parser";
 import { CompendiumKey } from "../../importer/Constants";
 import { Gear, GearSchema } from "../../schema/GearSchema";
 import { ImportHelper as IH } from "../../helper/ImportHelper";
+import { WeaponParserBase } from "../weapon/WeaponParserBase";
+
+const weaponParser = new WeaponParserBase();
 
 export class AmmoParser extends Parser<'ammo'> {
     protected readonly parseType = 'ammo';
@@ -16,16 +19,33 @@ export class AmmoParser extends Parser<'ammo'> {
 
         const bonusData = jsonData.weaponbonus;
         if (bonusData) {
-            system.ap = Number(bonusData.ap?._TEXT) || 0;
-            system.damage = Number(bonusData.damage?._TEXT) || 0;
+            let damageText = bonusData.damagereplace?._TEXT?.trim() ?? bonusData.damage?._TEXT?.trim() ?? '';
+            const apText = bonusData.apreplace?._TEXT?.trim() ?? bonusData.ap?._TEXT ?? 0;
+            const damageTypeText = bonusData.damagetype?._TEXT?.trim() ?? '';
+            let normalizedDamageType = '';
 
-            const damageType = bonusData.damagetype?._TEXT ?? '';
-            if (damageType.includes('S'))
-                system.damageType = 'stun';
-            else if (damageType.includes('M'))
-                system.damageType = 'matrix';
-            else
-                system.damageType = 'physical';
+            if (/^\([PSM]\)$/i.test(damageTypeText))
+                normalizedDamageType = damageTypeText.slice(1, -1);
+            else if (/^[PSM](?:\([a-zA-Z]+\))?$/i.test(damageTypeText))
+                normalizedDamageType = damageTypeText;
+            else if (/^Acid$/i.test(damageTypeText))
+                normalizedDamageType = 'P(acid)';
+
+            const parsedDamageText = /^([+-]?\d+(?:\.\d+)?)([PSM])?(?:\(([a-zA-Z]+)\))?$/i.exec(damageText);
+            if (parsedDamageText && normalizedDamageType) {
+                const [, amount] = parsedDamageText;
+                damageText = `${amount}${normalizedDamageType}`;
+            } else if (!damageText && normalizedDamageType) {
+                damageText = `0${normalizedDamageType}`;
+            }
+
+            const damageData = weaponParser.parseDamageData(damageText, apText);
+            system.ap = damageData.ap.value;
+            system.damage = damageData.value;
+            system.damageType = damageData.type.value;
+            system.element = damageData.element.value;
+            system.replaceAP = !!bonusData.apreplace?._TEXT;
+            system.replaceDamage = !!bonusData.damagereplace?._TEXT;
         }
 
         return system;

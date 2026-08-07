@@ -293,7 +293,6 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.SkillSetsPack": string;
         "shadowrun5e.CompendiumBrowserBlacklist": string[];
         "shadowrun5e.ImporterCompendiumOrder": string[];
-        "shadowrun5e.DieFaceLabels": string;
         "shadowrun5e.TokenAutoRunning": boolean;
         "shadowrun5e.TokenMovementHistoryReset": 'firstActionPhase' | 'turnStart';
     }
@@ -341,8 +340,4 @@ declare global {
             { [K in E[0]]: _NormalizeNever<Extract<E, readonly [K, unknown]>[1]> };
         fromEntries<K extends PropertyKey, V>(obj: Iterable<readonly [K, V]>): Record<K, V>;
     }
-
-    // IF set to true, will disable auto population of pack based skill items on actors.
-    // This is only necessary for qunech unit tests and shouldn't be used otherwise.
-    var doNotPopulateDefaultSkills: boolean | undefined;
 }

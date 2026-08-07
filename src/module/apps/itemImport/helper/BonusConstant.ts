@@ -6,8 +6,29 @@ export type DocCreateData = (
 
 export type AECreateData = Omit<ActiveEffect.CreateData, "name"> & {
     name?: string;
-    system?: Record<string, unknown> & { changes?: any[] };
+    system?: Record<string, unknown> & {
+        changes?: any[];
+        targets?: AETargetData[];
+    };
 };
+
+export interface AEFilterConditionData {
+    type: ActiveEffect.SystemOfType<'base'>['targets'][number]['conditions'][number]['type'];
+    mode?: ActiveEffect.SystemOfType<'base'>['targets'][number]['conditions'][number]['mode'];
+    values: string[];
+}
+
+export interface AETargetData {
+    id: string;
+    applyTo: string;
+    conditions?: AEFilterConditionData[];
+    onlyForItemTest?: boolean;
+}
+
+export interface LimitConditionTranslation {
+    conditions: AEFilterConditionData[];
+    disabled?: boolean;
+}
 
 export class BonusConstant {
     public static readonly skillGroupTable = {
@@ -44,6 +65,138 @@ export class BonusConstant {
         "Language": [],
         "Professional": [],
         "Street": [],
+    } as const;
+
+    public static readonly limitConditionTable: Record<string, LimitConditionTranslation> = {
+        LimitCondition_SkillsActiveFirstAidMedicine: {
+            conditions: [{ type: 'skills', mode: 'include', values: ['first_aid', 'medicine'] }],
+        },
+        LimitCondition_SkillsActiveEscapeArtist: {
+            conditions: [{ type: 'skills', mode: 'include', values: ['escape_artist'] }],
+        },
+        LimitCondition_SkillsActiveDisguiseImpersonation: {
+            conditions: [{ type: 'skills', mode: 'include', values: ['disguise', 'impersonation'] }],
+        },
+        LimitCondition_Intimidation: {
+            conditions: [{ type: 'skills', mode: 'include', values: ['intimidation'] }],
+        },
+        LimitCondition_SkillsActiveNavigation: {
+            conditions: [{ type: 'skills', mode: 'include', values: ['navigation'] }],
+        },
+        LimitCondition_SkillsActivePerception: {
+            conditions: [{ type: 'skills', mode: 'include', values: ['perception'] }],
+        },
+        LimitCondition_SkillsActivePerformance: {
+            conditions: [{ type: 'skills', mode: 'include', values: ['performance'] }],
+        },
+        LimitCondition_SkillsActiveSwimming: {
+            conditions: [{ type: 'skills', mode: 'include', values: ['swimming'] }],
+        },
+        LimitCondition_SkillsActiveLeadership: {
+            conditions: [{ type: 'skills', mode: 'include', values: ['leadership'] }],
+        },
+        LimitCondition_SkillGroupStealth: {
+            conditions: [{ type: 'skills', mode: 'include', values: ['disguise', 'palming', 'sneaking'] }],
+        },
+        LimitCondition_TestAttribAGI: {
+            conditions: [{ type: 'attributes', mode: 'include', values: ['agility'] }],
+        },
+        LimitCondition_TestAttribINT: {
+            conditions: [{ type: 'attributes', mode: 'include', values: ['intuition'] }],
+        },
+        LimitCondition_TestAttribLOG: {
+            conditions: [{ type: 'attributes', mode: 'include', values: ['logic'] }],
+        },
+        LimitCondition_AttribSkillINT: {
+            conditions: [{ type: 'skills', mode: 'include', values: ['artisan', 'assensing', 'disguise', 'navigation', 'perception', 'tracking'] }],
+        },
+        LimitCondition_AttribSkillLOG: {
+            conditions: [{ type: 'skills', mode: 'include', values: [
+                'aeronautics_mechanic', 'arcana', 'armorer', 'automotive_mechanic', 'biotechnology', 'chemistry',
+                'computer', 'cybercombat', 'cybertechnology', 'demolitions', 'electronic_warfare', 'first_aid',
+                'forgery', 'hacking', 'hardware', 'industrial_mechanic', 'medicine', 'nautical_mechanic', 'software',
+            ] }],
+        },
+        LimitCondition_ClimbingTests: {
+            conditions: [{ type: 'categories', mode: 'include', values: ['climbing'] }],
+        },
+        LimitCondition_SkillsActiveGymnasticsClimbing: {
+            conditions: [
+                { type: 'skills', mode: 'include', values: ['gymnastics'] },
+                { type: 'categories', mode: 'include', values: ['climbing'] },
+            ],
+        },
+        LimitCondition_SoldierParagon: {
+            conditions: [{ type: 'categories', mode: 'include', values: ['attack'] }],
+        },
+        LimitCondition_ExcludeIntimidation: {
+            conditions: [{ type: 'skills', mode: 'include', values: ['con', 'etiquette', 'impersonation', 'instruction', 'leadership', 'negotiation', 'performance'] }],
+        },
+
+        LimitCondition_SkillsActivePerceptionHearing: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['perception'] }],
+        },
+        LimitCondition_SkillsActivePerceptionVisual: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['perception'] }],
+        },
+        LimitCondition_SkillsActivePerceptionSpatialRecognizer: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['perception'] }],
+        },
+        LimitCondition_SkillsActivePerformanceSinging: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['performance'] }],
+        },
+        LimitCondition_SkillsActivePerformanceSynthtrument: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['performance'] }],
+        },
+        LimitCondition_SkillsActiveEscapeArtistGrappleLoose: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['escape_artist'] }],
+        },
+        LimitCondition_IntimidationVisible: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['intimidation'] }],
+        },
+        LimitCondition_ExcludeIntimidationVisible: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['con', 'etiquette', 'impersonation', 'instruction', 'leadership', 'negotiation', 'performance'] }],
+        },
+        LimitCondition_SkillGroupStealthNaked: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['disguise', 'palming', 'sneaking'] }],
+        },
+        LimitCondition_TestSneakingThermal: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['sneaking'] }],
+        },
+        LimitCondition_SkillsActiveSneakingVisible: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['sneaking'] }],
+        },
+        LimitCondition_SkillsActiveSneakingNaked: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['sneaking'] }],
+        },
+        LimitCondition_GearAutopicker: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['locksmith'] }],
+        },
+        LimitCondition_CyberwareHydraulicJacks: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['gymnastics', 'running'] }],
+        },
+        LimitCondition_CyberwareBalanceTail: {
+            disabled: true,
+            conditions: [{ type: 'skills', mode: 'include', values: ['gymnastics', 'running'] }],
+        },
+        LimitCondition_CyberwareRaptorFoot: {
+            disabled: true,
+            conditions: [{ type: 'categories', mode: 'include', values: ['attack_melee'] }],
+        },
     } as const;
 
     public static readonly simpleEffects = {

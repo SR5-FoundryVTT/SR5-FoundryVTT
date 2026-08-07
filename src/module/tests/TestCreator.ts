@@ -72,10 +72,6 @@ export const TestCreator = {
 
         const action = item.getAction();
         if (!action) return;
-        // Determine what initial test type to use.
-        if (!action.test && item.isType('weapon') && item.system.category) {
-            action.test = SR5.weaponCategoryActiveTests[item.system.category];
-        }
 
         if (!action.test) {
             action.test = 'SuccessTest';

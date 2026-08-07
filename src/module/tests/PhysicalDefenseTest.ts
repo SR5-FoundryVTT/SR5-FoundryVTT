@@ -94,6 +94,9 @@ export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDef
             this.data.defenseReach = Math.max(this.data.defenseReach, weapon.getReach());
         });
 
+        if ('reach' in this.actor.system.modifiers)
+            this.data.defenseReach += this.actor.system.modifiers.reach || 0;
+
         const attackData = this.against.data as MeleeAttackData;
         const incomingReach = attackData.reach || 0;
         const defenseReach = this.data.defenseReach;

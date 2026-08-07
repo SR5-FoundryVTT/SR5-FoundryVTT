@@ -302,7 +302,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
     static override DEFAULT_OPTIONS: DeepPartial<SR5ApplicationMixinTypes.Configuration> = {
         classes: ['actor', 'named-sheet'],
         position: {
-            width: 700,
+            width: 770,
             height: 600,
         },
         actions: {

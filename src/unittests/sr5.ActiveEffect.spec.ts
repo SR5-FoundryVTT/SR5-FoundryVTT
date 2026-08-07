@@ -23,7 +23,10 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
      * @param priority The priority for the change (default: mode * 10).
      * @returns The change object.
      */
-    const createTestChange = (effect: SR5ActiveEffect, id: number): ModifiableValueType['changes'][number] => {
+    const createTestChange = (
+        effect: SR5ActiveEffect, id: number,
+        overrides: Partial<ModifiableValueType['changes'][number]> = {},
+    ): ModifiableValueType['changes'][number] => {
         const change = effect.system.changes[id];
         return DataDefaults.createData('change_entry', {
             name: effect.name,
@@ -31,6 +34,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             type: change.type,
             priority: parseInt(String(change.priority)),
             source: effect.uuid,
+            ...overrides,
         });
     };
 
@@ -145,7 +149,8 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
                 assert.strictEqual(actor.system.attributes.body.changes.length, 2);
                 assert.deepEqual(actor.system.attributes.body.changes, [
-                    createTestChange(effects[0], 0),
+                    // The override masks the preceding add, which is marked as invalidated.
+                    createTestChange(effects[0], 0, { invalidated: true }),
                     createTestChange(effects[0], 1),
                 ]);
                 assert.strictEqual(actor.system.attributes.body.value, 3);
@@ -223,15 +228,12 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('UPGRADE mode: should raise the value to a max', async () => {
-            window.doNotPopulateDefaultSkills = true;
-
             const actor = await factory.createActor({
                 type: 'character',
                 system: {
                     attributes: { body: { base: 2 } },
                 },
-            });
-            delete window.doNotPopulateDefaultSkills;
+            }, { skipDefaultSkills: true });
 
             await actor.createEmbeddedDocuments('Item', [{
                 type: 'skill',
@@ -267,11 +269,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('UPGRADE mode: uses the highest value for multiple upgrade changes', async () => {
-            window.doNotPopulateDefaultSkills = true;
-
-            const actor = await factory.createActor({ type: 'character' });
-            //
-            delete window.doNotPopulateDefaultSkills;
+            const actor = await factory.createActor({ type: 'character' }, { skipDefaultSkills: true });
 
             await actor.createEmbeddedDocuments('Item', [{
                 type: 'skill',
@@ -303,14 +301,12 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('DOWNGRADE mode: should reduce the value to a min', async () => {
-            window.doNotPopulateDefaultSkills = true;
             const actor = await factory.createActor({
                 type: 'character',
                 system: {
                     attributes: { body: { base: 5 } },
                 },
-            });
-            delete window.doNotPopulateDefaultSkills;
+            }, { skipDefaultSkills: true });
 
             await actor.createEmbeddedDocuments('Item', [{
                 type: 'skill',
@@ -346,9 +342,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('DOWNGRADE mode: uses the lowest value for multiple downgrade changes', async () => {
-            window.doNotPopulateDefaultSkills = true;
-            const actor = await factory.createActor({ type: 'character' });
-            delete window.doNotPopulateDefaultSkills;
+            const actor = await factory.createActor({ type: 'character' }, { skipDefaultSkills: true });
 
             await actor.createEmbeddedDocuments('Item', [{
                 type: 'skill',
@@ -378,14 +372,12 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('MULTIPLY mode: multiplies base values by the change value', async () => {
-            window.doNotPopulateDefaultSkills = true;
             const actor = await factory.createActor({
                 type: 'character',
                 system: {
                     attributes: { body: { base: 5 } },
                 },
-            });
-            delete window.doNotPopulateDefaultSkills;
+            }, { skipDefaultSkills: true });
 
             await actor.createEmbeddedDocuments('Item', [{
                 type: 'skill',
@@ -421,14 +413,12 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('SUBTRACT mode: subtracts the change value from base values', async () => {
-            window.doNotPopulateDefaultSkills = true;
             const actor = await factory.createActor({
                 type: 'character',
                 system: {
                     attributes: { body: { base: 5 } },
                 },
-            });
-            delete window.doNotPopulateDefaultSkills;
+            }, { skipDefaultSkills: true });
 
             await actor.createEmbeddedDocuments('Item', [{
                 type: 'skill',
@@ -486,6 +476,35 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.lengthOf(effect.system.targets, 1, 'one actor target was seeded');
             assert.strictEqual(effect.system.targets[0].applyTo, 'actor');
             assert.strictEqual(effect.system.changes[0].target, effect.system.targets[0].id, 'change was bound to the seeded target');
+            assert.strictEqual(actor.system.attributes.body.value, 2, 'change applied to actor data');
+        });
+
+        it('target-less changes added after creation still apply to the actor', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const effects = (await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Late Change Test',
+            }])) as SR5ActiveEffect[];
+
+            // Changes added by update, macros or imports carry no target and must not be dropped.
+            await effects[0].update({
+                system: { changes: [{ key: 'system.attributes.body', value: '2', type: 'add' }] },
+            });
+
+            assert.strictEqual(effects[0].system.changes[0].target, '', 'change carries no target');
+            assert.strictEqual(actor.system.attributes.body.value, 2, 'change applied to actor data');
+        });
+
+        it('changes of an effect without any target fall back to actor application', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const effects = (await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Target-less Test',
+                system: { changes: [{ key: 'system.attributes.body', value: '2', type: 'add' }] },
+            }])) as SR5ActiveEffect[];
+
+            // Effects predating targets, or stripped of them, must keep working as plain actor effects.
+            await effects[0].update({ system: { targets: [] } });
+
+            assert.lengthOf(effects[0].system.targets, 0, 'effect has no target');
             assert.strictEqual(actor.system.attributes.body.value, 2, 'change applied to actor data');
         });
 

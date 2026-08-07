@@ -6,8 +6,13 @@ import { DataDefaults } from '../../../../data/DataDefaults';
 import { ImportHelper as IH } from '../../helper/ImportHelper';
 import { CompendiumKey, Constants } from '../../importer/Constants';
 import { DamageType, DamageTypeType } from 'src/module/types/item/Action';
-import PhysicalAttribute = Shadowrun.PhysicalAttribute;
 type DamageElement = DamageType['element']['base'];
+type AttributeFormulaOperator = DamageType['base_formula_operator'];
+type ParsedAttributeFormula = {
+    base: number;
+    attribute: DamageType['attribute'];
+    base_formula_operator: AttributeFormulaOperator;
+};
 
 export class WeaponParserBase extends Parser<'weapon'> {
     protected readonly parseType = 'weapon';
@@ -89,7 +94,7 @@ export class WeaponParserBase extends Parser<'weapon'> {
         system.subcategory = category.toLowerCase();
 
         system.action.skill = this.getSkill(jsonData);
-        system.action.damage = this.getDamage(jsonData as any);
+        system.action.damage = this.parseDamageData(jsonData.damage._TEXT, jsonData.ap._TEXT);
 
         if (jsonData.accuracy?._TEXT) {
             let accuracy: string = jsonData.accuracy._TEXT;
@@ -105,50 +110,87 @@ export class WeaponParserBase extends Parser<'weapon'> {
 
         return system;
     }
-    
-    protected getDamage(jsonData: Weapon): DamageType {
-        const jsonDamage = jsonData.damage._TEXT;
-        // ex. 15S(e)
-        const simpleDamage = /^([0-9]+)([PSM])? ?(\([a-zA-Z]+\))?/g.exec(jsonDamage);
-        // ex. ({STR}+1)P(fire)
-        const strengthDamage = /^\({STR}([+-]?[0-9]*)\)([PSM])? ?(\([a-zA-Z]+\))?/g.exec(jsonDamage);
 
-        let damageType: DamageTypeType = 'physical';
-        let damageAttribute: PhysicalAttribute | undefined;
-        let damageBase = 0;
-        let damageElement: DamageElement = '';
+    public parseDamageData(damageText: string | number, apText: string | number): DamageType {
+        const partialDamageData: Partial<DamageType> = {};
+        const parsedDamageText = String(damageText).trim();
 
-        if(simpleDamage) {
-            damageBase = parseInt(simpleDamage[1], 10);
-            damageType = this.parseDamageType(simpleDamage[2]);
-            damageElement = this.parseDamageElement(simpleDamage[3])
-        } else if (strengthDamage) {
-            damageAttribute = 'strength';
-            damageBase = parseInt(strengthDamage[1], 10) || 0;
-            damageType = this.parseDamageType(strengthDamage[2]);
-            damageElement = this.parseDamageElement(strengthDamage[3]);
+        const attributeDamage = /^(?:\((.+)\)|(.+?))([PSM])?(?:\(([a-zA-Z]+)\))?(?:\s+\(-?\d+\/m\))?$/i.exec(parsedDamageText);
+        if (attributeDamage) {
+            const formulaText = attributeDamage[1] ?? attributeDamage[2];
+            if (formulaText.includes('{')) {
+                const formula = this.parseAttributeFormula(formulaText);
+                if (formula) {
+                    const damageType = this.parseDamageType(attributeDamage[3]);
+                    const damageElement = this.parseDamageElement(attributeDamage[4]);
+
+                    partialDamageData.base = formula.base;
+                    partialDamageData.value = formula.base;
+                    partialDamageData.attribute = formula.attribute;
+                    partialDamageData.base_formula_operator = formula.base_formula_operator;
+                    partialDamageData.type = { base: damageType, value: damageType };
+                    partialDamageData.element = { base: damageElement, value: damageElement };
+                }
+            }
         }
 
-        const damageAp = Number(jsonData.ap._TEXT) || 0;
+        if (partialDamageData.base === undefined) {
+            const simpleDamage = /^([+-]?\d+(?:\.\d+)?)([PSM])?(?:\(([a-zA-Z]+)\))?(?:\s+\(-?\d+\/m\))?$/i.exec(parsedDamageText);
+            if (simpleDamage) {
+                const damageType = this.parseDamageType(simpleDamage[2]);
+                const damageElement = this.parseDamageElement(simpleDamage[3]);
+                const damageBase = Number(simpleDamage[1]) || 0;
 
-        const partialDamageData = {
-            type: {
-                base: damageType,
-                value: damageType,
-            },
-            base: damageBase,
-            value: damageBase,
-            ap: {
-                base: damageAp,
-                value: damageAp,
-            },
-            element: {
-                base: damageElement,
-                value: damageElement,
-            },
-            ...(damageAttribute && { attribute: damageAttribute })
-        } as const;
+                partialDamageData.base = damageBase;
+                partialDamageData.value = damageBase;
+                partialDamageData.type = { base: damageType, value: damageType };
+                partialDamageData.element = { base: damageElement, value: damageElement };
+            }
+        }
+
+        const parsedApText = String(apText).trim();
+        const apFormula = this.parseAttributeFormula(parsedApText);
+        const simpleAP = /^[+-]?\d+(?:\.\d+)?$/.exec(parsedApText);
+        if (apFormula) {
+            partialDamageData.ap = {
+                base: apFormula.base,
+                value: apFormula.base,
+                attribute: apFormula.attribute,
+                base_formula_operator: apFormula.base_formula_operator,
+            } as DamageType['ap'];
+        } else if (simpleAP) {
+            const damageAp = Number(simpleAP[0]) || 0;
+            partialDamageData.ap = { base: damageAp, value: damageAp } as DamageType['ap'];
+        }
+
         return DataDefaults.createData('damage', partialDamageData);
+    }
+
+    public parseAttributeFormula(val: string): ParsedAttributeFormula | null {
+        const expression = val.replace(/\s/g, '');
+        const attributeFormula = /^(-)?\{([A-Z]+)\}(?:(\+|-|\*|\/)([+-]?\d+(?:\.\d+)?))?$/i.exec(expression);
+        if (!attributeFormula) return null;
+
+        const mappedAttribute = Constants.attributeTable[attributeFormula[2].toUpperCase() as keyof typeof Constants.attributeTable];
+        if (!mappedAttribute) return null;
+        const attribute = mappedAttribute as DamageType['attribute'];
+
+        const sign = attributeFormula[1] === '-' ? -1 : 1;
+        const operator = attributeFormula[3];
+        const operand = Number(attributeFormula[4]) || 0;
+
+        switch (operator) {
+            case '+':
+                return { base: operand, attribute, base_formula_operator: 'add' };
+            case '-':
+                return { base: -operand, attribute, base_formula_operator: 'add' };
+            case '*':
+                return { base: sign * operand, attribute, base_formula_operator: 'multiply' };
+            case '/':
+                return null;
+            default:
+                return { base: 0, attribute, base_formula_operator: sign === -1 ? 'subtract' : 'add' };
+        }
     }
 
     protected parseDamageType(parsedType: string | undefined): DamageTypeType {
@@ -165,10 +207,17 @@ export class WeaponParserBase extends Parser<'weapon'> {
 
     protected parseDamageElement(parsedElement: string | undefined): DamageElement {
         switch(parsedElement?.toLowerCase()) {
+            case 'e':
             case '(e)':
                 return 'electricity';
+            case 'f':
+            case '(f)':
+            case 'fire':
             case '(fire)':
                 return 'fire';
+            case 'acid':
+            case '(acid)':
+                return 'acid';
             default:
                 return '';
         }

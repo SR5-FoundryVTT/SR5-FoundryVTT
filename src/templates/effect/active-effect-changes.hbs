@@ -30,8 +30,8 @@
                     </div>
                     <div class="value autocomplete-value-{{lookup @root.targetApplyToById change.target}}">
                         <div class="sr5-effect-value-control">
-                            {{!-- Do not use formInput as that renders a giant textblock --}}
-                            {{formInput changeFields.value name=(concat "system.changes." i ".value") value=change.value elementType="input"}}
+                            {{!-- Use a textarea so multiline values preserve newline characters through form submission. --}}
+                            <textarea name="{{concat "system.changes." i ".value"}}" rows="1">{{change.value}}</textarea>
                             <button
                                 type="button"
                                 class="sr5-effect-value-control__button icon"
@@ -51,7 +51,7 @@
                     {{#ife (lookup @root.targetApplyToById change.target) "modifier"}}
                     {{!-- Modifier changes hide these columns; keep them in the form so they aren't lost on submit. --}}
                     <input type="hidden" name="{{concat "system.changes." i ".type"}}" value="{{change.type}}">
-                    <input type="hidden" name="{{concat "system.changes." i ".value"}}" value="{{change.value}}">
+                    <textarea hidden name="{{concat "system.changes." i ".value"}}">{{change.value}}</textarea>
                     <input type="hidden" name="{{concat "system.changes." i ".priority"}}" value="{{change.priority}}">
                     {{/ife}}
                     <div class="controls">

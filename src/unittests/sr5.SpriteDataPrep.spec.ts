@@ -80,14 +80,12 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
         });
 
         it('sprite skill toggles apply to active, language, and knowledge skills', async () => {
-            window.doNotPopulateDefaultSkills = true;
-
             const sprite = await factory.createActor({
                 type: 'sprite',
                 system: {
                     attributes: { level: { base: 7 } },
                 }
-            });
+            }, { skipDefaultSkills: true });
 
             await sprite.createEmbeddedDocuments('Item', [
                 {
@@ -123,8 +121,6 @@ export const shadowrunSR5SpriteDataPrep = (context: QuenchBatchContext) => {
                     }
                 },
             ]);
-
-            delete window.doNotPopulateDefaultSkills;
 
             const languageSkill = Object.values(sprite.system.skills.language).find(skill => skill.name === 'Sperethiel');
             const knowledgeSkill = Object.values(sprite.system.skills.knowledge.academic).find(skill => skill.name === 'Matrix Hosts');
