@@ -43,30 +43,22 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
      * These tests must not depend on the world's configured skill compendia.
      */
     const createCharacterWithSkills = async (skills: string[]) => {
-        const previousSkipDefaultSkills = window.doNotPopulateDefaultSkills;
-        window.doNotPopulateDefaultSkills = true;
-
-        try {
-            return await factory.createActor({
-                type: 'character',
-                items: skills.map(name => ({
-                    name,
+        return factory.createActor({
+            type: 'character',
+            items: skills.map(name => ({
+                name,
+                type: 'skill',
+                system: {
                     type: 'skill',
-                    system: {
-                        type: 'skill',
-                        skill: {
-                            category: 'active',
-                            rating: 0,
-                            defaulting: true,
-                            attribute: 'agility',
-                        },
+                    skill: {
+                        category: 'active',
+                        rating: 0,
+                        defaulting: true,
+                        attribute: 'agility',
                     },
-                })),
-            });
-        } finally {
-            if (previousSkipDefaultSkills === undefined) delete window.doNotPopulateDefaultSkills;
-            else window.doNotPopulateDefaultSkills = previousSkipDefaultSkills;
-        }
+                },
+            })),
+        }, { skipDefaultSkills: true });
     };
 
     describe('SR5ActiveEffect', () => {
