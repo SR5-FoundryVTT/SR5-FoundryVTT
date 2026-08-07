@@ -37,20 +37,22 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         // Since we're extending EffectChangeData by a effect field only locally, I don't care enough to resolve the typing issue.
         const changes: (ActiveEffect.ChangeData & { effect: SR5ActiveEffect; priority: number })[] = [];
 
-        for (const effect of this.allApplicableEffects()) {
-            if (this._skipEffectForTestLimitations(effect)) continue;
+        for (const { effect, applyTo } of this.allApplicableEffects()) {
+            // Each target on the effect that matches the relevant apply-to is gated by its own
+            // conditions, and contributes only the changes assigned to it.
+            for (const target of effect.system.targets) {
+                if (target.applyTo !== applyTo) continue;
+                if (!this._evaluateTarget(target)) continue;
 
-            // Collect all changes of effect left.
-            const effectChanges = effect.system?.changes ?? [];
-            changes.push(...effectChanges.map(change => {
-                const c = foundry.utils.deepClone<typeof changes[number]>(change as any);
-                // TODO: v15 - Foundry used to change data. references in changes to system. But tests use data. 
-                c.key = c.key.replace(/^system\./, 'data.');
-                c.effect = effect;
-                return c;
-            }));
-            // TODO: What's with the statuses?
-            // for (const statusId of effect.statuses) this.statuses.add(statusId);
+                const targetChanges = effect.system.changes.filter(change => change.target === target.id);
+                changes.push(...targetChanges.map(change => {
+                    const c = foundry.utils.deepClone<typeof changes[number]>(change as any);
+                    // TODO: v15 - Foundry used to change data. references in changes to system. But tests use data.
+                    c.key = c.key.replace(/^system\./, 'data.');
+                    c.effect = effect;
+                    return c;
+                }));
+            }
         }
 
         changes.sort((a, b) => a.priority - b.priority);
@@ -64,54 +66,69 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
     }
 
     /**
-     * Should this effect be skipped for this test?
-     * 
-     * Check all limitations of the effect against the test.
-     * 
-     * There is a few special cases to consider:
-     * - effects limit a category (skill, attribute), but the test doesn't use that category.
-     *   in that case the effect shouldn't apply.
-     * - effects that don't limit the test type, shouldn't apply to opposed tests
-     *   however, if a test limitation is used, it should still apply. 
-     * 
-     * @param effect An apply-to 'test_all' effect with possible test limitations.
-     * @returns 
+     * Evaluate whether a target's conditions pass for the current test.
+     * All conditions must pass (AND logic).
+     *
+     * Special case: a target without any explicit 'tests' condition is skipped for opposed
+     * tests (preserves the original opposed-test guard behavior).
+     *
+     * @param target A test apply-to target with possible filter conditions.
      */
-    _skipEffectForTestLimitations(effect: SR5ActiveEffect) {
-        // Filter effects that don't apply to this test.
-        const tests = effect.system.selection_tests;
-        // Opposed tests use the same item as the success test but normally don't apply effects from it.
-        // However if an effect defines a test, it should apply to it.
-        if (tests.length === 0 && this.test.opposing) return true;
-        if (tests.length > 0 && !tests.includes(this.test.type)) return true;
+    _evaluateTarget(target: SR5ActiveEffect['system']['targets'][number]): boolean {
+        const conditions = target.conditions ?? [];
 
-        // Check for action categories
-        // Both the effect and test can both define multiple categories.
-        // One match is enough.
-        const categories = effect.system.selection_categories as Shadowrun.ActionCategories[];
-        const testCategories = this.test.data.categories;
-        if (categories.length > 0 && !categories.find(category => testCategories.includes(category))) return true;
+        const hasTestsCondition = conditions.some(c => c.type === 'tests' && (c.values ?? []).length > 0);
+        if (this.test.opposing && !hasTestsCondition) return false;
 
-        // Check for test skill.
-        const skills = effect.system.selection_skills;
-        const skillId = this.test.data.action.skill;
-        const skillName = this.test.actor?.getSkill(skillId)?.name || skillId;
-        if (skills.length > 0 && !skills.includes(skillId) && !skills.includes(skillName)) return true;
+        return conditions.every(condition => this._evaluateFilterCondition(condition));
+    }
 
-        // Check for test attributes used.
-        const attributes = effect.system.selection_attributes;
-        const attribute = this.test.data.action.attribute;
-        const attribute2 = this.test.data.action.attribute2;
-        if (attributes.length > 0 && attribute && !attributes.includes(attribute)) return true;
-        if (attributes.length > 0 && attribute2 && !attributes.includes(attribute2)) return true;
-        if (attributes.length > 0 && !attribute && !attribute2) return true;
+    /**
+     * Evaluate a single filter condition against the current test.
+     * The condition's `type` picks the test dimension, `mode` flips include/exclude,
+     * and `values` are the ids to match. Empty filters remain active: an empty include
+     * matches nothing, while an empty exclude excludes nothing.
+     */
+    _evaluateFilterCondition(condition: SR5ActiveEffect['system']['targets'][number]['conditions'][number]): boolean {
+        const values = condition.values ?? [];
+        if (values.length === 0) return condition.mode === 'exclude';
 
-        // Check for test limits used.
-        const limits = effect.system.selection_limits;
-        const limit = this.test.data.action.limit.attribute;
-        if (limits.length > 0 && !limits.includes(limit)) return true;
+        let matches = false;
+        switch (condition.type) {
+            case 'tests':
+                matches = values.includes(this.test.type);
+                break;
 
-        return false;
+            // Any test category matching any selected category counts.
+            case 'categories': {
+                const testCategories = this.test.data.categories;
+                matches = !!(values as Shadowrun.ActionCategories[]).find(category => testCategories.includes(category));
+                break;
+            }
+
+            case 'skills': {
+                const skillId = this.test.data.action.skill;
+                const skillName = this.test.actor?.getSkill(skillId)?.name || skillId;
+                matches = values.includes(skillId) || values.includes(skillName);
+                break;
+            }
+
+            // Test has up to two attribute slots; each present slot must be in the list.
+            case 'attributes': {
+                const attribute = this.test.data.action.attribute;
+                const attribute2 = this.test.data.action.attribute2;
+                matches = !!(attribute || attribute2) &&
+                    (!attribute || values.includes(attribute)) &&
+                    (!attribute2 || values.includes(attribute2));
+                break;
+            }
+
+            case 'limits':
+                matches = values.includes(this.test.data.action.limit.attribute);
+                break;
+        }
+
+        return condition.mode === 'exclude' ? !matches : matches;
     }
 
     /**
@@ -151,33 +168,48 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         if (actor === undefined || this.test.item === undefined) return;
 
         const effectsData: SR5ActiveEffect[] = [];
+        const collect = (effect: SR5ActiveEffect) => {
+            const trimmed = this._trimToTargetedActorEffectData(effect);
+            if (trimmed) effectsData.push(trimmed);
+        };
+
         for (const effect of allApplicableDocumentEffects(this.test.item, { applyTo: ['targeted_actor'] })) {
-            const effectData = effect.toObject() as unknown as SR5ActiveEffect;
-
-            // Transform all dynamic values to static values.
-            effectData.system.changes = effectData.system.changes.map(change => {
-                SR5ActiveEffect.resolveDynamicChangeValue(this.test, change as unknown as ActiveEffect.ChangeData);
-                return change;
-            });
-
-            effectsData.push(effectData);
+            collect(effect);
         }
 
         for (const effect of allApplicableItemsEffects(this.test.item, { applyTo: ['targeted_actor'], nestedItems: false })) {
-            const effectData = effect.toObject() as unknown as SR5ActiveEffect;
-
-            // Transform all dynamic values to static values.
-            effectData.system.changes = effectData.system.changes.map(change => {
-                SR5ActiveEffect.resolveDynamicChangeValue(this.test, change as unknown as ActiveEffect.ChangeData);
-                return change;
-            });
-
-            effectsData.push(effectData);
+            collect(effect);
         }
 
         console.debug(`Shadowrun5e | To be created effects on target actor ${actor.name}`, effectsData);
 
         return effectsData;
+    }
+
+    /**
+     * Build a copy of an effect containing only its targeted_actor targets and the changes
+     * assigned to them, resolving dynamic change values from the current test context.
+     *
+     * @param effect The source effect that has at least one targeted_actor target.
+     * @returns Trimmed effect data, or undefined when there's nothing to copy.
+     */
+    _trimToTargetedActorEffectData(effect: SR5ActiveEffect) {
+        const targetedIds = new Set(
+            effect.system.targets.filter(target => target.applyTo === 'targeted_actor').map(target => target.id)
+        );
+        if (targetedIds.size === 0) return undefined;
+
+        const effectData = effect.toObject() as unknown as SR5ActiveEffect;
+
+        effectData.system.targets = effectData.system.targets.filter(target => targetedIds.has(target.id));
+        effectData.system.changes = effectData.system.changes
+            .filter(change => targetedIds.has(change.target))
+            .map(change => {
+                SR5ActiveEffect.resolveDynamicChangeValue(this.test, change as unknown as ActiveEffect.ChangeData);
+                return change;
+            });
+
+        return effectData;
     }
 
     /**
@@ -200,7 +232,9 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
                 token
             }
         };
-        const content = await renderTemplate('systems/shadowrun5e/dist/templates/chat/test-effects-message.hbs', templateData);
+        const content = await foundry.applications.handlebars.renderTemplate(
+            'systems/shadowrun5e/dist/templates/chat/test-effects-message.hbs', templateData
+        );
         const messageData = {
             content
         };
@@ -243,27 +277,53 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
      * Since Foundry Core uses a generator, keep this pattern for consistency.
      * 
      */
-    *allApplicableEffects(): Generator<SR5ActiveEffect> {
+    *allApplicableEffects(): Generator<{ effect: SR5ActiveEffect, applyTo: string }> {
         // Pool only tests will don't have actors attached.
         if (!this.test.actor) return;
 
         for (const effect of allApplicableDocumentEffects(this.test.actor, { applyTo: ['test_all'] })) {
-            yield effect;
+            yield { effect, applyTo: 'test_all' };
         }
 
         for (const effect of allApplicableItemsEffects(this.test.actor, { applyTo: ['test_all'] })) {
-            yield effect;
+            yield { effect, applyTo: 'test_all' };
+        }
+
+        // Effects on actors targeted by this test can modify the incoming test. Resolve both
+        // Actor and TokenDocument targets to actors, deduplicating linked actor/token references.
+        const targetActors = new Map<string, SR5Actor>();
+        for (const target of this.test.targets) {
+            const actor = target instanceof SR5Actor
+                ? target
+                : target instanceof TokenDocument
+                    ? target.actor
+                    : null;
+            if (!(actor instanceof SR5Actor)) continue;
+
+            const actorKey = actor.uuid ?? actor.id;
+            if (!actorKey) continue;
+            targetActors.set(actorKey, actor);
+        }
+
+        for (const actor of targetActors.values()) {
+            for (const effect of allApplicableDocumentEffects(actor, { applyTo: ['test_target'] })) {
+                yield { effect, applyTo: 'test_target' };
+            }
+
+            for (const effect of allApplicableItemsEffects(actor, { applyTo: ['test_target'] })) {
+                yield { effect, applyTo: 'test_target' };
+            }
         }
 
         // Skip tests without an item for apply-to test_item effects.
         if (!this.test.item) return;
 
         for (const effect of allApplicableDocumentEffects(this.test.item, { applyTo: ['test_item'] })) {
-            yield effect;
+            yield { effect, applyTo: 'test_item' };
         }
 
         for (const effect of allApplicableItemsEffects(this.test.item, { applyTo: ['test_item'] })) {
-            yield effect;
+            yield { effect, applyTo: 'test_item' };
         }
     }
 
@@ -274,7 +334,7 @@ export class SuccessTestEffectsFlow<T extends SuccessTest> {
         if (!this.test.item) return;
 
         for (const effect of this.test.item.effects) {
-            if (effect.system.applyTo === 'targeted_actor') yield effect;
+            if (effect.appliesToAnyOf(['targeted_actor'])) yield effect;
         }
     }
 }

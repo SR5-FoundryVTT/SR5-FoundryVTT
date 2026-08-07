@@ -553,7 +553,8 @@ body.theme-light,
     }
 
     input,
-    select {
+    select,
+    textarea {
         color: var(--sr5v2-control-text);
     }
 
@@ -795,7 +796,8 @@ body.theme-light,
     }
 
     &.actor,
-    &.item {
+    &.item,
+    &.active-effect-config {
         .window-content {
             background: var(--sr5v2-app-body-bg);
             background-image: none;
