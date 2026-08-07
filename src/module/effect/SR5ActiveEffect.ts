@@ -7,6 +7,7 @@ import { LinksHelpers } from '@/module/utils/links';
 import { DataDefaults } from "../data/DataDefaults";
 import { ModifiableValueType } from "../types/template/Base";
 import { ModifiableValue } from "../mods/ModifiableValue";
+import { DynamicValue, DynamicValueEvaluator } from "./DynamicValueEvaluator";
 import DataModel = foundry.abstract.DataModel;
 
 /**
@@ -357,7 +358,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         // Resolve dynamic value references in change.
         const source = change.effect?.parent ?? targetDoc;
         SR5ActiveEffect.alterChange(targetDoc, change);
-        SR5ActiveEffect.resolveDynamicChangeValue(source, change);
+        SR5ActiveEffect.resolveDynamicChangeValue(source, change, targetDoc);
         
         // Other cases should be directly applied to the data, without actor / schema handling.
         // This is used when applying effects to non-Actor objects, like tests. TokenDocument is
@@ -421,31 +422,61 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
-     * Resolve a dynamic change value to the actual numerical value. A dynamic change value contains key references
-     * to model properties, which must be resolved before application as literal values.
+     * Resolve a dynamic change value against model data before it's applied to a document.
      *
-     * A dynamic change value follows the same rules as a Foundry roll formula (including dice pools).
+     * A dynamic value contains @property references (e.g. '@system.technology.rating * 3'),
+     * resolved from source, then evaluated by DynamicValueEvaluator. change.value is overwritten
+     * with the result rendered as the target field expects it - a comparison landing on a number
+     * field becomes 1/0, a number landing on a boolean field becomes true/false - so the evaluated
+     * type and the field type don't have to match. A value the evaluator can't parse comes back
+     * unchanged, and a non-finite number is left untouched for appliers to reject.
      *
-     * A change could contain the key of 'system.attributes.body' with the type add and a dynamic value of
-     * '@system.technology.rating * 3'. The dynamic property path would be taken from either the source or parent
-     * document of the effect before the resolved value would be applied onto the target document / object.
+     * When targetDoc is omitted (there's no concrete field yet, as when baking a targeted_actor
+     * effect before it's copied), the result is simply stringified.
      *
      * @param source Any object style value, either a Foundry document or a plain object
      * @param change A singular ActiveEffect.ChangeData object
+     * @param targetDoc The document being changed, whose field type drives the rendering
      */
-    static resolveDynamicChangeValue(source: any, change: ActiveEffect.ChangeData) {
+    static resolveDynamicChangeValue(source: any, change: ActiveEffect.ChangeData, targetDoc?: any) {
         // Dynamic value present?
         if (typeof change.value !== 'string') return;
         if (change.value.length === 0) return;
 
-        // Use Foundry Roll Term parser to both resolve dynamic values and resolve calculations.
-        const expression = Roll.replaceFormulaData(change.value, source);
-        const value = Roll.validate(expression) ? Roll.safeEval(expression) : change.value;
+        // The evaluator resolves @refs itself (keeping string/boolean types), rather than
+        // Roll.replaceFormulaData which substitutes strings unquoted and coerces booleans to 1/0.
+        const value = DynamicValueEvaluator.evaluate(change.value, path => foundry.utils.getProperty(source, path));
 
-        // Overwrite change value with graceful default, to avoid NaN errors during change application.
-        // Adhere to FoundryVTT expectation of receiving string values.
-        if (value == null) change.value = '0';
-        else change.value = value.toString();
+        const rendered = SR5ActiveEffect.renderValueForField(value, change.key, targetDoc);
+        if (rendered !== undefined) change.value = rendered;
+    }
+
+    /**
+     * Render an evaluated value as the string its target field expects. A ModifiableValue counts
+     * as a number field. Without a known target the value is just stringified.
+     *
+     * @returns The string to store, or undefined to leave change.value untouched (a non-numeric
+     *          value aimed at a number field, which appliers then drop).
+     */
+    private static renderValueForField(value: DynamicValue, key: string, targetDoc?: any): string | undefined {
+        // A non-finite number (e.g. a division by zero) is meaningless whatever the field; leave
+        // change.value untouched so appliers reject it.
+        if (typeof value === 'number' && !Number.isFinite(value)) return undefined;
+        if (!targetDoc) return String(value);
+
+        const target = foundry.utils.getProperty(targetDoc, key);
+        const type = ModifiableValue.isModifiableValue(target) ? 'number' : foundry.utils.getType(target);
+
+        switch (type) {
+            case 'number': {
+                const number = Number(value);
+                return Number.isFinite(number) ? String(number) : undefined;
+            }
+            case 'boolean':
+                return String(value === true || (typeof value === 'number' && value !== 0));
+            default:
+                return String(value);
+        }
     }
 
     static override migrateData(data: Parameters<typeof ActiveEffect['migrateData']>[0]) {
