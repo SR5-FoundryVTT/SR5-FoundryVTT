@@ -41,9 +41,6 @@ updates:
       labels:
           - 'dependencies'
 
-      ignore:
-          - dependency-name: '@types/node'
-
     - package-ecosystem: 'github-actions'
       directory: '/'
       schedule:
