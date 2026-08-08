@@ -270,6 +270,12 @@
             }
         ]
     },
+    "flags": {
+        "hotReload": {
+            "extensions": ["css", "hbs", "html", "json"],
+            "paths": ["dist"]
+        }
+    },
     "socket": true,
     "manifest": "#{MANIFEST}#",
     "download": "#{DOWNLOAD}#",
