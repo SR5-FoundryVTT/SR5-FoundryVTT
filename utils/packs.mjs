@@ -342,7 +342,7 @@ function toPortablePathSegment(name) {
 function cleanPackEntry(data, { clearSourceId = true, ownership = 0 } = {}) {
     if (data.ownership) data.ownership = { default: ownership };
     if (clearSourceId) delete data.flags?.core?.sourceId;
-    if (data._stats?.lastModifiedBy) data._stats.lastModifiedBy = 'sr5ebuilder';
+    if (data._stats) delete data._stats.lastModifiedBy;
 
     // Remove empty entries in flags
     if (!data.flags) data.flags = {};
