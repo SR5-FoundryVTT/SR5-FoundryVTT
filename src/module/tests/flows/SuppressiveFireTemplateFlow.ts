@@ -1,5 +1,6 @@
 import { TestDialogListener } from '../../apps/dialogs/TestDialog';
 import { FireModeType } from '../../types/flags/ItemFlags';
+import { TestCreator } from '../TestCreator';
 
 interface SuppressiveFireTemplateFlowHost {
     actor: {
@@ -7,7 +8,13 @@ interface SuppressiveFireTemplateFlowHost {
     } | undefined
     data: {
         fireMode: FireModeType
+        suppressiveFireWidth: number
     }
+}
+
+interface SuppressiveFireTest extends SuppressiveFireTemplateFlowHost {
+    populateDocuments(): Promise<void>
+    suppressiveFireTemplateFlow: SuppressiveFireTemplateFlow
 }
 
 const FILL_COLOR = 0xd9b300;
@@ -55,6 +62,38 @@ export class SuppressiveFireTemplateFlow {
             return;
         }
 
+        await this.#startPreview(meters);
+    }
+
+    async drawChatPreview() {
+        if (this.#preview) {
+            this.cancelPreview();
+            return;
+        }
+
+        await this.#startPreview(this.test.data.suppressiveFireWidth);
+    }
+
+    static async drawChatPreviewFromMessage(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const element = $(event.currentTarget as HTMLElement);
+        const card = element.closest<HTMLElement>('.chat-message');
+        const messageId = card[0]?.dataset.messageId;
+        if (!messageId) return;
+        const test = await TestCreator.fromMessage(messageId) as SuppressiveFireTest | undefined;
+        if (!test) return;
+
+        await test.populateDocuments();
+        await test.suppressiveFireTemplateFlow.drawChatPreview();
+    }
+
+    static chatMessageListeners(html: HTMLElement | JQuery) {
+        $(html).find('.place-suppressive-fire-template').on('click', this.drawChatPreviewFromMessage);
+    }
+
+    async #startPreview(meters: number) {
         if (!canvas.ready || !canvas.templates) return;
 
         const token = this.test.actor?.getToken();

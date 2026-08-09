@@ -125,6 +125,12 @@
                     <span class="value-result"><i class="fas fa-bullseye roll place-template"></i></span>
                 </div>
                 {{/if}}
+                {{#if test.suppressiveFireTemplateFlow.canPlace}}
+                <div class="test-value metric-row metric-row--template">
+                    <span class="value" data-tooltip="SR5.PlaceTemplate">{{localize "SR5.PlaceTemplate"}}:</span>
+                    <span class="value-result"><i class="fas fa-bullseye roll place-suppressive-fire-template"></i></span>
+                </div>
+                {{/if}}
             </div>
         </div>
         {{#if showDescription}}
