@@ -61,7 +61,7 @@ export class BlastTemplateFlow {
         const item = this.test.item;
         if (!item || !this.canPlace) return;
 
-        const template = BlastTemplate.fromItem(item, undefined, this.blastData);
+        const template = BlastTemplate.fromItem(item, this.clearPreviewState.bind(this), this.blastData);
         if (!template) return;
 
         this.#template = template;
@@ -85,10 +85,14 @@ export class BlastTemplateFlow {
         void dialog.render({force: true});
     }
 
-    async cancelPreview() {
-        await this.#template?.cancelPreview();
+    private clearPreviewState() {
         this.#template = undefined;
         this.#positionSelected = false;
+    }
+
+    async cancelPreview() {
+        await this.#template?.cancelPreview();
+        this.clearPreviewState();
     }
 
     async finalizePreview() {
@@ -99,8 +103,7 @@ export class BlastTemplateFlow {
         else
             await this.#template.cancelPreview();
 
-        this.#template = undefined;
-        this.#positionSelected = false;
+        this.clearPreviewState();
     }
 
     async drawChatPreview() {
