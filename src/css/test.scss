@@ -622,6 +622,19 @@
 
 body.theme-light .application.sr5v2.form-dialog:not(.theme-dark),
 .application.sr5v2.form-dialog.theme-light {
+  .ui-control {
+    border-color: transparent;
+    background: var(--sr5v2-button-bg);
+    box-shadow: 0 1px 2px rgba(34, 42, 51, 0.18), inset 0 1px rgba(255, 255, 255, 0.55);
+  }
+
+  .ui-control:hover,
+  .ui-control:focus-visible {
+    border-color: transparent;
+    background: var(--sr5v2-button-hover-bg);
+    box-shadow: 0 2px 4px rgba(34, 42, 51, 0.22), inset 0 1px rgba(255, 255, 255, 0.35);
+  }
+
   .window-content select {
     color-scheme: light;
 
