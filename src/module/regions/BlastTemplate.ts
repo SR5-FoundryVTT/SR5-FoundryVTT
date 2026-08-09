@@ -1,4 +1,4 @@
-import { SR5Item } from './item/SR5Item';
+import { SR5Item } from '../item/SR5Item';
 
 /**
  * This class has been mostly copied from the FoundryVTT Dnd5e system.
@@ -21,7 +21,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
  * - cancel template preview on right click
  * 
  */
-export default class Template extends foundry.canvas.placeables.MeasuredTemplate {
+export default class BlastTemplate extends foundry.canvas.placeables.MeasuredTemplate {
     // The source item of this template.
     // NOTE: This is never really used.
     item?: SR5Item;
@@ -53,7 +53,7 @@ export default class Template extends foundry.canvas.placeables.MeasuredTemplate
      * @param onComplete Handler to call when template is placed.
      * @returns Template instance. Not drawn on scene.
      */
-    static fromItem(item: SR5Item, onComplete?: () => void, blast = item.getBlastData()): Template | undefined {
+    static fromItem(item: SR5Item, onComplete?: () => void, blast = item.getBlastData()): BlastTemplate | undefined {
         if (!canvas.scene) return undefined;
 
         // Either use blast data or default values.

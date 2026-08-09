@@ -2,7 +2,7 @@ import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
 import { DeepPartial } from "fvtt-types/utils";
 import { SR5Item } from '../item/SR5Item';
 import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
-import { TestTemplateFlow } from './flows/TestTemplateFlow';
+import { BlastTemplateFlow } from './flows/BlastTemplateFlow';
 
 export interface ThrownAttackTestData extends SuccessTestData, WeaponRangeTestDataFragment {
 }
@@ -12,7 +12,7 @@ export interface ThrownAttackTestData extends SuccessTestData, WeaponRangeTestDa
  */
 export class ThrownAttackTest extends SuccessTest<ThrownAttackTestData> {
     declare item: SR5Item;
-    public templateFlow = new TestTemplateFlow(this, {
+    public blastTemplateFlow = new BlastTemplateFlow(this, {
         prepareTargetData: () => WeaponRangeTestBehavior.prepareTargetData(this),
     });
 
@@ -46,16 +46,16 @@ export class ThrownAttackTest extends SuccessTest<ThrownAttackTestData> {
     }
 
     override _testDialogListeners() {
-        return [...super._testDialogListeners(), ...this.templateFlow.dialogListeners()];
+        return [...super._testDialogListeners(), ...this.blastTemplateFlow.dialogListeners()];
     }
 
     override async _cleanUpAfterDialogCancel() {
-        await this.templateFlow.cancelPreview();
+        await this.blastTemplateFlow.cancelPreview();
         await super._cleanUpAfterDialogCancel();
     }
 
     override async _cleanUpAfterDialog() {
-        await this.templateFlow.finalizePreview();
+        await this.blastTemplateFlow.finalizePreview();
         await super._cleanUpAfterDialog();
     }
 

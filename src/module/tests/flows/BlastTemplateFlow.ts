@@ -1,10 +1,10 @@
 import { TestDialogLike, TestDialogListener } from '../../apps/dialogs/TestDialog';
 import { SR5Actor } from '../../actor/SR5Actor';
 import { SR5Item } from '../../item/SR5Item';
-import Template from '../../template';
+import BlastTemplate from '../../regions/BlastTemplate';
 import { TestCreator } from '../TestCreator';
 
-interface TestTemplateFlowHost {
+interface BlastTemplateFlowHost {
     actor: SR5Actor | undefined
     item: SR5Item | undefined
     data: {
@@ -14,26 +14,26 @@ interface TestTemplateFlowHost {
     targets: (SR5Actor | SR5Item | TokenDocument)[]
 }
 
-interface TestTemplateFlowOptions {
+interface BlastTemplateFlowOptions {
     getBlastData?: () => { radius: number, dropoff: number } | undefined
     prepareTargetData?: () => void
 }
 
-interface TestWithTemplateFlow extends TestTemplateFlowHost {
-    templateFlow?: TestTemplateFlow
+interface TestWithBlastTemplateFlow extends BlastTemplateFlowHost {
+    blastTemplateFlow?: BlastTemplateFlow
     populateDocuments(): Promise<void>
 }
 
 /**
  * Handles item area-template previews for tests that opt into this behavior.
  */
-export class TestTemplateFlow {
-    #template?: Template;
+export class BlastTemplateFlow {
+    #template?: BlastTemplate;
     #positionSelected = false;
 
     constructor(
-        private readonly test: TestTemplateFlowHost,
-        private readonly options: TestTemplateFlowOptions = {}
+        private readonly test: BlastTemplateFlowHost,
+        private readonly options: BlastTemplateFlowOptions = {}
     ) { }
 
     get canPlace(): boolean {
@@ -61,7 +61,7 @@ export class TestTemplateFlow {
         const item = this.test.item;
         if (!item || !this.canPlace) return;
 
-        const template = Template.fromItem(item, undefined, this.blastData);
+        const template = BlastTemplate.fromItem(item, undefined, this.blastData);
         if (!template) return;
 
         this.#template = template;
@@ -107,7 +107,7 @@ export class TestTemplateFlow {
         const item = this.test.item;
         if (!item || !this.canPlace) return;
 
-        const template = Template.fromItem(item, undefined, this.blastData);
+        const template = BlastTemplate.fromItem(item, undefined, this.blastData);
         if (!template) return;
         await template.drawPreview();
     }
@@ -119,11 +119,11 @@ export class TestTemplateFlow {
         const element = $(event.currentTarget as HTMLElement);
         const card = element.closest<HTMLElement>('.chat-message');
         const messageId = card.data('messageId');
-        const test = await TestCreator.fromMessage(messageId) as TestWithTemplateFlow | undefined;
+        const test = await TestCreator.fromMessage(messageId) as TestWithBlastTemplateFlow | undefined;
         if (!test) return;
 
         await test.populateDocuments();
-        await test.templateFlow?.drawChatPreview();
+        await test.blastTemplateFlow?.drawChatPreview();
     }
 
     static chatMessageListeners(html: HTMLElement | JQuery) {

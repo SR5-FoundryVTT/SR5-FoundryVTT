@@ -10,7 +10,6 @@ import { DeepPartial } from "fvtt-types/utils";
 import { TestDialogLike } from '../apps/dialogs/TestDialog';
 import { RangesTemplateType, TargetRangeTemplateType } from '../types/template/Weapon';
 import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
-import { TestTemplateFlow } from './flows/TestTemplateFlow';
 import { WeaponRangeOverlayFlow } from './flows/WeaponRangeOverlayFlow';
 import { SuppressiveFireTemplateFlow } from './flows/SuppressiveFireTemplateFlow';
 import { ShotgunTemplateFlow } from './flows/ShotgunTemplateFlow';
@@ -35,7 +34,6 @@ export interface RangedAttackTestData extends SuccessTestData, WeaponRangeTestDa
 
 export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
     declare item: SR5Item;
-    public templateFlow = new TestTemplateFlow(this);
     public rangeOverlayFlow = new WeaponRangeOverlayFlow(this);
     public suppressiveFireTemplateFlow = new SuppressiveFireTemplateFlow(this);
     public shotgunTemplateFlow = new ShotgunTemplateFlow(this);
