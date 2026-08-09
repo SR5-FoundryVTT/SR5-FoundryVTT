@@ -34,6 +34,7 @@ import { SR5Roll } from "./rolls/SR5Roll";
 import { SuccessTest } from "./tests/SuccessTest";
 import { BlastTemplateFlow } from './tests/flows/BlastTemplateFlow';
 import { SuppressiveFireTemplateFlow } from './tests/flows/SuppressiveFireTemplateFlow';
+import { ShotgunTemplateFlow } from './tests/flows/ShotgunTemplateFlow';
 import { TeamworkTest } from "./actor/flows/TeamworkFlow";
 import { OpposedTest } from "./tests/OpposedTest";
 import { PhysicalDefenseTest } from "./tests/PhysicalDefenseTest";
@@ -702,6 +703,7 @@ ___________________
         await SuccessTest.chatMessageListeners(message, html, data);
         BlastTemplateFlow.chatMessageListeners(html);
         SuppressiveFireTemplateFlow.chatMessageListeners(html);
+        ShotgunTemplateFlow.chatMessageListeners(html);
         await OpposedTest.chatMessageListeners(message, html, data);
         await ActionFollowupFlow.chatMessageListeners(message, html, data);
         await TeamworkTest.chatMessageListeners(message, html);
@@ -712,6 +714,7 @@ ___________________
     static async chatLogListeners(chatLog: ChatLog, html, data) {
         await SuccessTest.chatLogListeners(chatLog, html, data);
         SuppressiveFireTemplateFlow.chatMessageListeners(html);
+        ShotgunTemplateFlow.chatMessageListeners(html);
         await OpposedTest.chatLogListeners(chatLog, html, data);
         await ActionFollowupFlow.chatLogListeners(chatLog, html, data);
         await TeamworkTest.chatLogListeners(chatLog, html);

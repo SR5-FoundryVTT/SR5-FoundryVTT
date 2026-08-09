@@ -2,11 +2,21 @@ import { TestDialogListener } from '../../apps/dialogs/TestDialog';
 import { getWeaponRangeCircleLayout, WEAPON_RANGE_COLORS } from '../../regions/WeaponRangeOverlay';
 import { RangesTemplateType } from '../../types/template/Weapon';
 import { ShotgunChoke } from '../../rules/FireModeRules';
+import { TestCreator } from '../TestCreator';
 
 interface ShotgunTemplateFlowHost {
     actor: {
         getToken(): TokenDocument | null
     } | undefined
+    data: {
+        ranges: RangesTemplateType
+        shotgunChoke: ShotgunChoke
+    }
+}
+
+interface ShotgunTest extends ShotgunTemplateFlowHost {
+    populateDocuments(): Promise<void>
+    shotgunTemplateFlow: ShotgunTemplateFlow
 }
 
 const FILL_ALPHA = 0.2;
@@ -66,6 +76,43 @@ export class ShotgunTemplateFlow {
             return;
         }
 
+        await this.#startPreview(ranges, choke);
+    }
+
+    async drawChatPreview(ranges = this.test.data.ranges, choke = this.test.data.shotgunChoke) {
+        if (this.#preview) {
+            this.cancelPreview();
+            return;
+        }
+
+        await this.#startPreview(ranges, choke);
+    }
+
+    static async drawChatPreviewFromMessage(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const element = $(event.currentTarget as HTMLElement);
+        const card = element.closest<HTMLElement>('.chat-message');
+        const messageId = card[0]?.dataset.messageId;
+        if (!messageId) return;
+
+        const test = await TestCreator.fromMessage(messageId) as ShotgunTest | undefined;
+        if (!test) return;
+
+        const testData = TestCreator.getTestDataFromMessage(messageId)?.data as Partial<ShotgunTemplateFlowHost['data']> | undefined;
+        await test.populateDocuments();
+        await test.shotgunTemplateFlow.drawChatPreview(
+            testData?.ranges as RangesTemplateType,
+            testData?.shotgunChoke as ShotgunChoke,
+        );
+    }
+
+    static chatMessageListeners(html: HTMLElement | JQuery) {
+        $(html).find('.place-shotgun-template').on('click', this.drawChatPreviewFromMessage);
+    }
+
+    async #startPreview(ranges: RangesTemplateType, choke: ShotgunChoke) {
         if (!canvas.ready || !canvas.templates) return;
 
         const token = this.test.actor?.getToken();
@@ -95,6 +142,10 @@ export class ShotgunTemplateFlow {
         this.#graphics = this.#preview.addChild(new PIXI.Graphics());
         this.#rangeLabels = RANGE_KEYS.map(() => this.#preview!.addChild(this.#createLabel()));
         this.#bindPreviewListeners();
+        this.#drawShotgunTemplate({
+            x: this.#base.x + canvas.dimensions!.distancePixels,
+            y: this.#base.y,
+        });
     }
 
     cancelPreview() {
