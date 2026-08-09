@@ -122,19 +122,31 @@
                 {{#if test.canPlaceBlastTemplate}}
                 <div class="test-value metric-row metric-row--template">
                     <span class="value" data-tooltip="SR5.PlaceTemplate">{{localize "SR5.PlaceTemplate"}}:</span>
-                    <span class="value-result"><i class="fas fa-bullseye roll place-template"></i></span>
+                    <span class="value-result">
+                        {{> 'systems/shadowrun5e/dist/templates/common/template-preview-button.hbs'
+                            actionClass='roll place-template'
+                            tooltip='SR5.PlaceTemplate' }}
+                    </span>
                 </div>
                 {{/if}}
                 {{#if test.canPlaceSuppressiveFireTemplate}}
                 <div class="test-value metric-row metric-row--template">
                     <span class="value" data-tooltip="SR5.PlaceTemplate">{{localize "SR5.PlaceTemplate"}}:</span>
-                    <span class="value-result"><i class="fas fa-bullseye roll place-suppressive-fire-template"></i></span>
+                    <span class="value-result">
+                        {{> 'systems/shadowrun5e/dist/templates/common/template-preview-button.hbs'
+                            actionClass='roll place-suppressive-fire-template'
+                            tooltip='SR5.PlaceTemplate' }}
+                    </span>
                 </div>
                 {{/if}}
                 {{#if test.canPlaceShotgunTemplate}}
                 <div class="test-value metric-row metric-row--template">
                     <span class="value" data-tooltip="SR5.PlaceTemplate">{{localize "SR5.PlaceTemplate"}}:</span>
-                    <span class="value-result"><i class="fas fa-bullseye roll place-shotgun-template"></i></span>
+                    <span class="value-result">
+                        {{> 'systems/shadowrun5e/dist/templates/common/template-preview-button.hbs'
+                            actionClass='roll place-shotgun-template'
+                            tooltip='SR5.PlaceTemplate' }}
+                    </span>
                 </div>
                 {{/if}}
             </div>

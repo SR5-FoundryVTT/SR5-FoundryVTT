@@ -46,15 +46,9 @@
                     <select name="test.data.suppressiveFireWidth">
                         {{selectOptions test.suppressiveFireWidthOptions selected=test.data.suppressiveFireWidth}}
                     </select>
-                    <button
-                        id="show-suppressive-fire-template"
-                        class="ui-control icon"
-                        type="button"
-                        data-tooltip="SR5.Tooltips.RangedAttack.ShowSuppressiveFireTemplate"
-                        aria-label="{{localize 'SR5.Tooltips.RangedAttack.ShowSuppressiveFireTemplate'}}"
-                    >
-                        <i class="fa-solid fa-bullseye"></i>
-                    </button>
+                    {{> 'systems/shadowrun5e/dist/templates/common/template-preview-button.hbs'
+                        actionClass='show-suppressive-fire-template'
+                        tooltip='SR5.Tooltips.RangedAttack.ShowSuppressiveFireTemplate' }}
                 </div>
             {{/if}}
             {{#if test.canPlaceShotgunTemplate}}
@@ -63,15 +57,9 @@
                     <select name="test.data.shotgunChoke">
                         {{selectOptions test.shotgunChokeOptions selected=test.data.shotgunChoke}}
                     </select>
-                    <button
-                        id="show-shotgun-template"
-                        class="ui-control icon"
-                        type="button"
-                        data-tooltip="SR5.Tooltips.RangedAttack.ShowShotgunTemplate"
-                        aria-label="{{localize 'SR5.Tooltips.RangedAttack.ShowShotgunTemplate'}}"
-                    >
-                        <i class="fa-solid fa-bullseye"></i>
-                    </button>
+                    {{> 'systems/shadowrun5e/dist/templates/common/template-preview-button.hbs'
+                        actionClass='show-shotgun-template'
+                        tooltip='SR5.Tooltips.RangedAttack.ShowShotgunTemplate' }}
                 </div>
             {{/if}}
             {{> 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/attack-range-dialog-fragment.hbs'}}

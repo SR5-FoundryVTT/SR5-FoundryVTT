@@ -1,14 +1,8 @@
 {{#if test.canPlaceBlastTemplate}}
     <div class="form-group">
         <label>{{localize 'SR5.PlaceTemplate'}}</label>
-        <button
-            id="show-blast-template"
-            class="ui-control icon"
-            type="button"
-            data-tooltip="SR5.PlaceTemplate"
-            aria-label="{{localize 'SR5.PlaceTemplate'}}"
-        >
-            <i class="fa-solid fa-bullseye"></i>
-        </button>
+        {{> 'systems/shadowrun5e/dist/templates/common/template-preview-button.hbs'
+            id='show-blast-template'
+            tooltip='SR5.PlaceTemplate' }}
     </div>
 {{/if}}

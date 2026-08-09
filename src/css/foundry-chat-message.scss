@@ -407,18 +407,12 @@
 
             .metric-row--template .value-result {
                 color: var(--sr5-card-accent);
-            }
 
-            .place-template {
-                color: var(--sr5-card-accent);
-                font-size: 1.05rem;
-                line-height: 1;
-                padding: 0 0.1rem;
-
-                &:hover {
-                    text-shadow: 0 0 8px rgba(variables.$yellow, 0.55);
+                .template-preview-button {
+                    color: var(--sr5v2-text-primary);
                 }
             }
+
         }
 
         .card-content--results {

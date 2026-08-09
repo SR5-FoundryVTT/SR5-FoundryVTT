@@ -119,6 +119,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/common/List/ListHeader.hbs',
 
         // dialogs
+        'systems/shadowrun5e/dist/templates/common/template-preview-button.hbs',
         'systems/shadowrun5e/dist/templates/apps/dialogs/damage-application.hbs',
         'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-entry.hbs',
         'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.hbs',
