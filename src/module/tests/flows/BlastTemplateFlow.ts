@@ -121,7 +121,8 @@ export class BlastTemplateFlow {
 
         const element = $(event.currentTarget as HTMLElement);
         const card = element.closest<HTMLElement>('.chat-message');
-        const messageId = card.data('messageId');
+        const messageId = card[0]?.dataset.messageId;
+        if (!messageId) return;
         const test = await TestCreator.fromMessage(messageId) as TestWithBlastTemplateFlow | undefined;
         if (!test) return;
 

@@ -713,6 +713,7 @@ ___________________
 
     static async chatLogListeners(chatLog: ChatLog, html, data) {
         await SuccessTest.chatLogListeners(chatLog, html, data);
+        BlastTemplateFlow.chatMessageListeners(html);
         SuppressiveFireTemplateFlow.chatMessageListeners(html);
         ShotgunTemplateFlow.chatMessageListeners(html);
         await OpposedTest.chatLogListeners(chatLog, html, data);
