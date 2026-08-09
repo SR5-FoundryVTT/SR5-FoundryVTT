@@ -3,6 +3,7 @@ import { DeepPartial } from "fvtt-types/utils";
 import { SR5Item } from '../item/SR5Item';
 import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
 import { BlastTemplateFlow } from './flows/BlastTemplateFlow';
+import { WeaponRangeOverlayFlow } from './flows/WeaponRangeOverlayFlow';
 
 export interface ThrownAttackTestData extends SuccessTestData, WeaponRangeTestDataFragment {
 }
@@ -12,6 +13,7 @@ export interface ThrownAttackTestData extends SuccessTestData, WeaponRangeTestDa
  */
 export class ThrownAttackTest extends SuccessTest<ThrownAttackTestData> {
     declare item: SR5Item;
+    public rangeOverlayFlow = new WeaponRangeOverlayFlow(this);
     public blastTemplateFlow = new BlastTemplateFlow(this, {
         prepareTargetData: () => WeaponRangeTestBehavior.prepareTargetData(this),
     });
@@ -46,15 +48,17 @@ export class ThrownAttackTest extends SuccessTest<ThrownAttackTestData> {
     }
 
     override _testDialogListeners() {
-        return [...super._testDialogListeners(), ...this.blastTemplateFlow.dialogListeners()];
+        return [...super._testDialogListeners(), ...this.rangeOverlayFlow.dialogListeners(), ...this.blastTemplateFlow.dialogListeners()];
     }
 
     override async _cleanUpAfterDialogCancel() {
+        this.rangeOverlayFlow.remove();
         await this.blastTemplateFlow.cancelPreview();
         await super._cleanUpAfterDialogCancel();
     }
 
     override async _cleanUpAfterDialog() {
+        this.rangeOverlayFlow.remove();
         await this.blastTemplateFlow.finalizePreview();
         await super._cleanUpAfterDialog();
     }
