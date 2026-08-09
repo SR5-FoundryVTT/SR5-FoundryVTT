@@ -40,7 +40,7 @@
                     {{selectOptions test.fireModeOptions selected=test.data.fireModeSelected}}
                 </select>
             </div>
-            {{#if test.canPlaceSuppressiveFire}}
+            {{#if test.canPlaceSuppressiveFireTemplate}}
                 <div class="form-group fire-mode-select-row suppressive-fire-select-row">
                     <label>{{localize 'SR5.SuppressiveFire.Label'}}</label>
                     <select name="test.data.suppressiveFireWidth">

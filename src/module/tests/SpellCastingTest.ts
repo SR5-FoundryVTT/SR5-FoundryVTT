@@ -54,6 +54,10 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
         return false;
     }
 
+    get canPlaceBlastTemplate(): boolean {
+        return this.blastTemplateFlow.canPlace;
+    }
+
     static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {
         return {
             skill: 'spellcasting',

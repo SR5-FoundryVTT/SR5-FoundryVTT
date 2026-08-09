@@ -72,7 +72,7 @@ export class RangedAttackTest extends SuccessTest<RangedAttackTestData> {
         await super._cleanUpAfterDialog();
     }
 
-    get canPlaceSuppressiveFire(): boolean {
+    get canPlaceSuppressiveFireTemplate(): boolean {
         return this.suppressiveFireTemplateFlow.canPlace;
     }
 

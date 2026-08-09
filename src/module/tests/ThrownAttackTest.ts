@@ -30,6 +30,10 @@ export class ThrownAttackTest extends SuccessTest<ThrownAttackTestData> {
         return false;
     }
 
+    get canPlaceBlastTemplate(): boolean {
+        return this.blastTemplateFlow.canPlace;
+    }
+
     override get showSuccessLabel(): boolean {
         return this.success;
     }
