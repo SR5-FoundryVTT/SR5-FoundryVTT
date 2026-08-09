@@ -1,6 +1,6 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
 import { getWeaponRangeCircleLayout } from '../module/regions/WeaponRangeOverlay';
-import { hasValidWeaponRanges } from '../module/flows/MeasuredTemplateFlow';
+import { hasValidWeaponRanges } from '../module/tests/flows/WeaponRangeOverlayFlow';
 import { RangesTemplateType } from '../module/types/template/Weapon';
 
 export const measuredTemplateTesting = (context: QuenchBatchContext) => {
