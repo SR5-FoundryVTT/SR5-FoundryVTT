@@ -161,24 +161,24 @@
     min-width: 0;
 
     > label {
-      flex: 1 1 auto;
+      flex: 0 1 35%;
       min-width: 0;
       margin: 0;
     }
 
     > input[type='text'],
     > input[type='number'] {
-      flex: 0 0 3.4rem;
-      min-width: 3.4rem;
-      max-width: 3.4rem;
-      width: 3.4rem;
+      flex: 1 1 0;
+      min-width: 0;
+      max-width: none;
+      width: auto;
       height: 24px;
       text-align: center;
     }
 
     > select {
-      flex: 0 1 56%;
-      min-width: 6rem;
+      flex: 1 1 0;
+      min-width: 0;
       width: auto;
       height: 24px;
     }
@@ -212,8 +212,8 @@
 
   .dialog-content-common > div > .form-group.fire-mode-select-row:not(.modifiable-value):not(.toggle-checkbox-row) > select,
   .dialog-content-common > div > .form-group.range-select-row:not(.modifiable-value):not(.toggle-checkbox-row) > select {
-    flex: 0 1 65%;
-    min-width: 8.75rem;
+    flex: 1 1 0;
+    min-width: 0;
   }
 
   .modifiable-value {
