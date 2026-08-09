@@ -2734,9 +2734,9 @@
             "Label": "Suppressive Fire",
             "Mode": "Suppressive Mode",
             "Modes": {
-                "Double": "Double (20 meters)",
-                "Enhanced": "Enhanced (5 meters)",
-                "Normal": "Normal (10 meters)"
+                "Double": "Double (20 m)",
+                "Enhanced": "Enhanced (5 m)",
+                "Normal": "Normal (10 m)"
             }
         },
         "Shotgun": {

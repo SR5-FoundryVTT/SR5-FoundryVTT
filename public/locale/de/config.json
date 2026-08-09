@@ -2726,9 +2726,9 @@
             "Label": "Sperrfeuer",
             "Mode": "Sperrfeuer-Modus",
             "Modes": {
-                "Double": "Doppelt (20 Meter)",
-                "Enhanced": "Verstärkt (5 Meter)",
-                "Normal": "Normal (10 Meter)"
+                "Double": "Doppelt (20 m)",
+                "Enhanced": "Verstärkt (5 m)",
+                "Normal": "Normal (10 m)"
             }
         },
         "Shotgun": {

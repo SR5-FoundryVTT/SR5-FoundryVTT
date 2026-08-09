@@ -2725,9 +2725,9 @@
             "Label": "제압 사격",
             "Mode": "제압 사격 모드",
             "Modes": {
-                "Double": "2배 (20미터)",
-                "Enhanced": "강화 (5미터)",
-                "Normal": "일반 (10미터)"
+                "Double": "2배 (20 m)",
+                "Enhanced": "강화 (5 m)",
+                "Normal": "일반 (10 m)"
             }
         },
         "Shotgun": {

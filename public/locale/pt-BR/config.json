@@ -1341,9 +1341,9 @@
             "Label": "Fogo de Supressão",
             "Mode": "Modo de Supressão",
             "Modes": {
-                "Double": "Duplo (20 metros)",
-                "Enhanced": "Aprimorado (5 metros)",
-                "Normal": "Normal (10 metros)"
+                "Double": "Duplo (20 m)",
+                "Enhanced": "Aprimorado (5 m)",
+                "Normal": "Normal (10 m)"
             }
         },
         "Shotgun": {
