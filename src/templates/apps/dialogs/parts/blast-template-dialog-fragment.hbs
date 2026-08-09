@@ -1,10 +1,14 @@
 {{#if test.blastTemplateFlow.canPlace}}
-    <button
-        id="show-blast-template"
-        type="button"
-        data-tooltip="SR5.PlaceTemplate"
-        aria-label="{{localize 'SR5.PlaceTemplate'}}"
-    >
-        <i class="fa-solid fa-bullseye"></i>
-    </button>
+    <div class="form-group">
+        <label>{{localize 'SR5.PlaceTemplate'}}</label>
+        <button
+            id="show-blast-template"
+            class="ui-control icon"
+            type="button"
+            data-tooltip="SR5.PlaceTemplate"
+            aria-label="{{localize 'SR5.PlaceTemplate'}}"
+        >
+            <i class="fa-solid fa-bullseye"></i>
+        </button>
+    </div>
 {{/if}}
