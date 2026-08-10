@@ -31,6 +31,21 @@ const SHOTGUN_SPREADS: Record<ShotgunChoke, readonly number[]> = {
 
 type Point = { x: number, y: number };
 
+// TODO: fvtt-types v14 BaseShapeData lacks the updateSource declaration used by Region placement.
+type RegionShape = {
+    updateSource: (data: Record<string, unknown>) => void
+};
+
+// TODO: fvtt-types v14 RegionLayer lacks the placeRegion and _cancelPlacement declarations.
+type RegionLayerV14 = typeof canvas.regions & {
+    placeRegion: (data: Record<string, unknown>, options: {
+        create: boolean
+        allowRotation: boolean
+        onMove: (args: { position: Point, shape: RegionShape }) => false
+    }) => Promise<foundry.documents.RegionDocument | null>
+    _cancelPlacement?: () => void
+};
+
 const lightenColor = (color: number): number => {
     const red = (color >> 16) & 0xff;
     const green = (color >> 8) & 0xff;
@@ -45,17 +60,12 @@ export class ShotgunTemplateFlow {
     #preview?: PIXI.Container;
     #graphics?: PIXI.Graphics;
     #rangeLabels: foundry.canvas.containers.PreciseText[] = [];
-    #placedTemplateIds: string[] = [];
+    #placement?: Promise<foundry.documents.RegionDocument | null>;
+    #placedRegionId?: string;
     #base!: Point;
-    #direction = 0;
     #hoveredRangeIndex = -1;
     #ranges!: RangesTemplateType;
     #choke: ShotgunChoke = 'medium';
-    #events?: {
-        move: (event: PIXI.FederatedPointerEvent) => void
-        confirm: (event: PIXI.FederatedPointerEvent) => void
-        cancel: (event: MouseEvent) => void
-    };
 
     constructor(private readonly test: ShotgunTemplateFlowHost) { }
 
@@ -71,7 +81,7 @@ export class ShotgunTemplateFlow {
         event.preventDefault();
         event.stopPropagation();
 
-        if (this.#preview) {
+        if (this.#placement) {
             this.cancelPreview();
             return;
         }
@@ -80,7 +90,7 @@ export class ShotgunTemplateFlow {
     }
 
     async drawChatPreview(ranges = this.test.data.ranges, choke = this.test.data.shotgunChoke) {
-        if (this.#preview) {
+        if (this.#placement) {
             this.cancelPreview();
             return;
         }
@@ -113,7 +123,7 @@ export class ShotgunTemplateFlow {
     }
 
     async #startPreview(ranges: RangesTemplateType, choke: ShotgunChoke) {
-        if (!canvas.ready || !canvas.templates) return;
+        if (!canvas.ready || !canvas.regions) return;
 
         const token = this.test.actor?.getToken();
         if (!token) {
@@ -125,108 +135,81 @@ export class ShotgunTemplateFlow {
         const scene = canvas.scene;
         if (!gridSize || !scene) return;
 
-        if (this.#placedTemplateIds.length > 0) {
-            await scene.deleteEmbeddedDocuments('MeasuredTemplate', this.#placedTemplateIds);
-            this.#placedTemplateIds = [];
+        if (this.#placedRegionId) {
+            await scene.deleteEmbeddedDocuments('Region', [this.#placedRegionId]);
+            this.#placedRegionId = undefined;
         }
 
         this.#base = {
             x: token.x + token.width * gridSize / 2,
             y: token.y + token.height * gridSize / 2,
         };
-        this.#direction = 0;
         this.#hoveredRangeIndex = -1;
         this.#ranges = ranges;
         this.#choke = choke;
-        this.#preview = canvas.templates.addChild(new PIXI.Container());
+        const previewLayer = canvas.regions.preview;
+        if (!previewLayer) return;
+
+        this.#preview = previewLayer.addChild(new PIXI.Container());
         this.#graphics = this.#preview.addChild(new PIXI.Graphics());
         this.#rangeLabels = RANGE_KEYS.map(() => this.#preview!.addChild(this.#createLabel()));
-        this.#bindPreviewListeners();
-        this.#drawShotgunTemplate({
-            x: this.#base.x + canvas.dimensions!.distancePixels,
+
+        const distancePixels = canvas.dimensions!.distancePixels;
+        const initialPointer = {
+            x: this.#base.x + distancePixels,
             y: this.#base.y,
+        };
+        const rangeIndex = this.#getRangeIndex(initialPointer);
+        this.#drawShotgunTemplate(initialPointer);
+
+        const regions = canvas.regions as RegionLayerV14;
+        this.#placement = regions.placeRegion({
+            name: game.i18n.localize('SR5.Shotgun.Label'),
+            color: game.user?.color?.toString() ?? '#ffffff',
+            shapes: [this.#getRegionLine(rangeIndex, 0)],
+            elevation: {bottom: null, top: null, topInclusive: null},
+            levels: [],
+            visibility: CONST.REGION_VISIBILITY.ALWAYS,
+            restriction: {enabled: false, type: 'move', priority: 0},
+            attachment: {token: null},
+            highlightMode: 'coverage',
+            displayMeasurements: true,
+            behaviors: [],
+            ownership: {[game.user.id]: CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER},
+        }, {
+            create: true,
+            allowRotation: false,
+            onMove: ({position, shape}) => {
+                const direction = Math.atan2(position.y - this.#base.y, position.x - this.#base.x);
+                const pointer = {x: position.x, y: position.y};
+                const nextRangeIndex = this.#getRangeIndex(pointer);
+                this.#drawShotgunTemplate(pointer);
+                shape.updateSource(this.#getRegionLine(nextRangeIndex, direction));
+                return false;
+            },
+        }).then(region => {
+            this.#placement = undefined;
+            this.#destroyPreviewOverlay();
+            if (region?.id) this.#placedRegionId = region.id;
+            return region;
+        }).catch(error => {
+            this.#placement = undefined;
+            console.error('Shotgun Region placement failed', error);
+            return null;
         });
     }
 
     cancelPreview() {
-        this.#unbindPreviewListeners();
-        this.#preview?.destroy();
-        this.#preview = undefined;
-        this.#graphics = undefined;
-        this.#rangeLabels = [];
-        this.#hoveredRangeIndex = -1;
-    }
-
-    async finalizePreview() {
-        if (!this.#preview) {
-            this.cancelPreview();
-            return;
+        this.#destroyPreviewOverlay();
+        if (this.#placement) {
+            const regions = canvas.regions as RegionLayerV14;
+            regions._cancelPlacement?.();
+            this.#placement = undefined;
         }
-
-        await this.#place();
     }
 
-    #bindPreviewListeners() {
-        this.#events = {
-            move: event => {
-                event.stopPropagation();
-                this.#drawShotgunTemplate(event.data.getLocalPosition(canvas.templates!));
-            },
-            confirm: event => {
-                if (event.button !== 0) return;
-
-                event.stopPropagation();
-                const pointer = event.data.getLocalPosition(canvas.templates!);
-                this.#drawShotgunTemplate(pointer);
-                void this.#place();
-            },
-            cancel: event => {
-                event.preventDefault();
-                event.stopPropagation();
-                this.cancelPreview();
-            },
-        };
-
-        canvas.stage?.on('mousemove', this.#events.move);
-        canvas.stage?.on('mousedown', this.#events.confirm);
-        canvas.app!.view.oncontextmenu = this.#events.cancel;
-    }
-
-    #unbindPreviewListeners() {
-        if (!this.#events) return;
-
-        canvas.stage?.off('mousemove', this.#events.move);
-        canvas.stage?.off('mousedown', this.#events.confirm);
-        if (canvas.app?.view.oncontextmenu === this.#events.cancel)
-            canvas.app.view.oncontextmenu = null;
-        this.#events = undefined;
-    }
-
-    async #place() {
-        if (!this.#base) return;
-
-        const scene = canvas.scene;
-        if (!scene) return;
-
-        const distancePixels = canvas.dimensions!.distancePixels;
-        const direction = this.#direction * Math.PI / 180;
-        const rangeIndex = this.#hoveredRangeIndex < 0 ? 0 : this.#hoveredRangeIndex;
-        const key = RANGE_KEYS[rangeIndex];
-        const startDistance = rangeIndex === 0 ? 0 : this.#ranges[RANGE_KEYS[rangeIndex - 1]].distance;
-        const endDistance = this.#ranges[key].distance;
-        const templateData = {
-            t: 'ray' as const,
-            user: game.user?.id,
-            x: this.#base.x + Math.cos(direction) * startDistance * distancePixels,
-            y: this.#base.y + Math.sin(direction) * startDistance * distancePixels,
-            direction: this.#direction,
-            distance: endDistance - startDistance,
-            width: this.#getSpread(rangeIndex),
-            fillColor: game.user?.color?.toString() ?? '#ffffff',
-        };
+    finalizePreview() {
         this.cancelPreview();
-        const placedTemplates = await scene.createEmbeddedDocuments('MeasuredTemplate', [templateData]);
-        this.#placedTemplateIds = placedTemplates.map(template => template.id);
     }
 
     #drawShotgunTemplate(pointer: Point) {
@@ -234,7 +217,6 @@ export class ShotgunTemplateFlow {
         if (!graphics) return;
 
         const angle = Math.atan2(pointer.y - this.#base.y, pointer.x - this.#base.x);
-        this.#direction = angle * 180 / Math.PI;
         this.#hoveredRangeIndex = this.#getRangeIndex(pointer);
         const distancePixels = canvas.dimensions!.distancePixels;
         const layout = getWeaponRangeCircleLayout(this.#ranges, distancePixels, canvas.grid?.units ?? '');
@@ -266,6 +248,30 @@ export class ShotgunTemplateFlow {
 
     #getSpread(rangeIndex: number): number {
         return SHOTGUN_SPREADS[this.#choke][rangeIndex];
+    }
+
+    #destroyPreviewOverlay() {
+        this.#preview?.destroy();
+        this.#preview = undefined;
+        this.#graphics = undefined;
+        this.#rangeLabels = [];
+        this.#hoveredRangeIndex = -1;
+    }
+
+    #getRegionLine(rangeIndex: number, direction: number): Record<string, unknown> {
+        const distancePixels = canvas.dimensions!.distancePixels;
+        const key = RANGE_KEYS[rangeIndex];
+        const startDistance = rangeIndex === 0 ? 0 : this.#ranges[RANGE_KEYS[rangeIndex - 1]].distance;
+        const endDistance = this.#ranges[key].distance;
+        return {
+            type: 'line',
+            x: this.#base.x + Math.cos(direction) * startDistance * distancePixels,
+            y: this.#base.y + Math.sin(direction) * startDistance * distancePixels,
+            length: (endDistance - startDistance) * distancePixels,
+            width: this.#getSpread(rangeIndex) * distancePixels,
+            rotation: direction * 180 / Math.PI,
+            gridBased: false,
+        };
     }
 
     #getBandPoints(angle: number, startRadius: number, endRadius: number, width: number, distancePixels: number): number[] {
