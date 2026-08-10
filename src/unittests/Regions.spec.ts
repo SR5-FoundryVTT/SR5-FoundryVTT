@@ -4,7 +4,7 @@ import { getWeaponRangeCircleLayout } from '../module/regions/WeaponRangeOverlay
 import { hasValidWeaponRanges } from '../module/tests/flows/WeaponRangeOverlayFlow';
 import { RangesTemplateType } from '../module/types/template/Weapon';
 
-export const measuredTemplateTesting = (context: QuenchBatchContext) => {
+export const regionsTesting = (context: QuenchBatchContext) => {
     const { describe, it } = context;
     const assert: Chai.AssertStatic = context.assert;
 

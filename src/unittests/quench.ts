@@ -4,7 +4,7 @@ import { shadowrunTestValueResolution } from './sr5.TestValueResolution.spec';
 import { shadowrunMarks } from './sr5.Marks.spec';
 import { shadowrunRolling } from './sr5.SR5Roll.spec';
 import { shadowrunSR5RangedWeaponRules } from './sr5.RangedWeapon.spec';
-import { measuredTemplateTesting } from './MeasuredTemplates.spec';
+import { regionsTesting } from './Regions.spec';
 import { shadowrunAttackTesting } from './sr5.AttackTests.spec';
 import { shadowrunRulesModifiers } from './sr5.Modifiers.spec';
 import { shadowrunSR5Item } from './sr5.SR5Item.spec';
@@ -78,8 +78,8 @@ export const quenchRegister = (quench: Quench) => {
     registerBatch(quench, 'shadowrun5e.rules.ranged_weapon', shadowrunSR5RangedWeaponRules, {
         displayName: 'SHADOWRUN5e: Ranged Weapon Rules Test',
     });
-    registerBatch(quench, 'shadowrun5e.canvas.measured_templates', measuredTemplateTesting, {
-        displayName: 'SHADOWRUN5e: Measured Template Test',
+    registerBatch(quench, 'shadowrun5e.canvas.regions', regionsTesting, {
+        displayName: 'SHADOWRUN5e: Region Test',
     });
     registerBatch(quench, 'shadowrun5e.characterImporter', characterImporterTesting, {
         displayName: 'SHADOWRUN5e: Chummer Character Importer',
