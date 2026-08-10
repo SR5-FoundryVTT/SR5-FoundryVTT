@@ -17,26 +17,29 @@ interface SuppressiveFireTest extends SuppressiveFireTemplateFlowHost {
     suppressiveFireTemplateFlow: SuppressiveFireTemplateFlow
 }
 
-const FILL_COLOR = 0xd9b300;
-const FILL_ALPHA = 0.2;
-const BORDER_COLOR = 0x000000;
-
 type Point = { x: number, y: number };
+
+// TODO: fvtt-types v14 BaseShapeData lacks the updateSource declaration used by Region placement.
+type RegionShape = {
+    updateSource: (data: Record<string, unknown>) => void
+};
+
+// TODO: fvtt-types v14 RegionLayer lacks the placeRegion and _cancelPlacement declarations.
+type RegionLayerV14 = typeof canvas.regions & {
+    placeRegion: (data: Record<string, unknown>, options: {
+        create: boolean
+        allowRotation: boolean
+        onMove: (args: { position: Point, shape: RegionShape }) => false
+    }) => Promise<foundry.documents.RegionDocument | null>
+    _cancelPlacement?: () => void
+};
 
 /** Handles the placement of a suppressive-fire cone with a selected outer width. */
 export class SuppressiveFireTemplateFlow {
-    #preview?: PIXI.Graphics;
-    #placedTemplateId?: string;
+    #placement?: Promise<foundry.documents.RegionDocument | null>;
+    #placedRegionId?: string;
     #base!: Point;
-    #direction = 0;
-    #distance = 0;
-    #angle = 0;
     #width = 10;
-    #events?: {
-        move: (event: PIXI.FederatedPointerEvent) => void
-        confirm: (event: PIXI.FederatedPointerEvent) => void
-        cancel: (event: MouseEvent) => void
-    };
 
     constructor(private readonly test: SuppressiveFireTemplateFlowHost) { }
 
@@ -57,7 +60,7 @@ export class SuppressiveFireTemplateFlow {
         event.stopPropagation();
 
         if (!this.canPlace) return;
-        if (this.#preview) {
+        if (this.#placement) {
             this.cancelPreview();
             return;
         }
@@ -66,7 +69,7 @@ export class SuppressiveFireTemplateFlow {
     }
 
     async drawChatPreview() {
-        if (this.#preview) {
+        if (this.#placement) {
             this.cancelPreview();
             return;
         }
@@ -94,7 +97,7 @@ export class SuppressiveFireTemplateFlow {
     }
 
     async #startPreview(meters: number) {
-        if (!canvas.ready || !canvas.templates) return;
+        if (!canvas.ready || !canvas.regions) return;
 
         const token = this.test.actor?.getToken();
         if (!token) {
@@ -108,131 +111,83 @@ export class SuppressiveFireTemplateFlow {
         const scene = canvas.scene;
         if (!scene) return;
 
-        if (this.#placedTemplateId) {
-            await scene.deleteEmbeddedDocuments('MeasuredTemplate', [this.#placedTemplateId]);
-            this.#placedTemplateId = undefined;
+        if (this.#placedRegionId) {
+            await scene.deleteEmbeddedDocuments('Region', [this.#placedRegionId]);
+            this.#placedRegionId = undefined;
         }
 
         this.#base = {
             x: token.x + token.width * gridSize / 2,
             y: token.y + token.height * gridSize / 2,
         };
-        this.#direction = 0;
-        this.#distance = 0;
-        this.#angle = 0;
         this.#width = meters;
-        this.#preview = canvas.templates.addChild(new PIXI.Graphics());
-        this.#bindPreviewListeners();
+
+        const regions = canvas.regions as RegionLayerV14;
+        this.#placement = regions.placeRegion({
+            name: game.i18n.localize('SR5.SuppressiveFire.Label'),
+            color: game.user?.color?.toString() ?? '#ffffff',
+            shapes: [{
+                type: 'cone',
+                x: this.#base.x,
+                y: this.#base.y,
+                radius: 1,
+                angle: 0,
+                rotation: 0,
+                curvature: 'round',
+                gridBased: false,
+            }],
+            elevation: {bottom: null, top: null, topInclusive: null},
+            levels: [],
+            visibility: CONST.REGION_VISIBILITY.ALWAYS,
+            restriction: {enabled: false, type: 'move', priority: 0},
+            attachment: {token: null},
+            highlightMode: 'coverage',
+            displayMeasurements: true,
+            behaviors: [],
+            ownership: {[game.user.id]: CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER},
+        }, {
+            create: true,
+            allowRotation: false,
+            onMove: ({position, shape}) => {
+                this.#updateShape(shape, position);
+                return false;
+            },
+        }).then(region => {
+            this.#placement = undefined;
+            if (region?.id) this.#placedRegionId = region.id;
+            return region;
+        }).catch(error => {
+            this.#placement = undefined;
+            console.error('Suppressive fire Region placement failed', error);
+            return null;
+        });
     }
 
     cancelPreview() {
-        this.#unbindPreviewListeners();
-        this.#preview?.destroy();
-        this.#preview = undefined;
+        if (!this.#placement) return;
+
+        const regions = canvas.regions as RegionLayerV14;
+        regions._cancelPlacement?.();
+        this.#placement = undefined;
     }
 
-    async finalizePreview() {
-        if (!this.#preview) {
-            this.cancelPreview();
-            return;
-        }
-
-        await this.#place();
-    }
-
-    #bindPreviewListeners() {
-        this.#events = {
-            move: this.#onMove.bind(this),
-            confirm: this.#onConfirm.bind(this),
-            cancel: this.#onCancel.bind(this),
-        };
-
-        canvas.stage?.on('mousemove', this.#events.move);
-        canvas.stage?.on('mousedown', this.#events.confirm);
-        canvas.app!.view.oncontextmenu = this.#events.cancel;
-    }
-
-    #unbindPreviewListeners() {
-        if (!this.#events) return;
-
-        canvas.stage?.off('mousemove', this.#events.move);
-        canvas.stage?.off('mousedown', this.#events.confirm);
-        if (canvas.app?.view.oncontextmenu === this.#events.cancel)
-            canvas.app.view.oncontextmenu = null;
-        this.#events = undefined;
-    }
-
-    #onMove(event: PIXI.FederatedPointerEvent) {
-        event.stopPropagation();
-        const point = event.data.getLocalPosition(canvas.templates!);
-        this.#drawCone(point);
-    }
-
-    #onConfirm(event: PIXI.FederatedPointerEvent) {
-        if (event.button !== 0) return;
-
-        event.stopPropagation();
-        const point = event.data.getLocalPosition(canvas.templates!);
-        this.#drawCone(point);
-        void this.#place();
-    }
-
-    #onCancel(event: MouseEvent) {
-        event.preventDefault();
-        event.stopPropagation();
+    finalizePreview() {
         this.cancelPreview();
     }
 
-    async #place() {
-        if (!this.#base) return;
-
-        const position = this.#base;
-        const direction = this.#direction;
-        const scene = canvas.scene;
-        if (!scene) return;
-
-        this.cancelPreview();
-
-        const templateData = {
-            t: 'cone' as const,
-            user: game.user?.id,
-            x: position.x,
-            y: position.y,
-            direction,
-            angle: this.#angle,
-            distance: this.#distance,
-            fillColor: game.user?.color?.toString() ?? '#ffffff',
-        };
-        const [placedTemplate] = await scene.createEmbeddedDocuments('MeasuredTemplate', [templateData]);
-        this.#placedTemplateId = placedTemplate?.id;
-    }
-
-    #drawCone(pointer: Point) {
-        const graphics = this.#preview;
-        if (!graphics) return;
-
+    #updateShape(shape: RegionShape, pointer: Point) {
         const distancePixels = Math.hypot(pointer.x - this.#base.x, pointer.y - this.#base.y);
         const radius = Math.max(distancePixels, 1);
         const distance = radius / canvas.dimensions!.distancePixels;
         const angle = Math.atan2(pointer.y - this.#base.y, pointer.x - this.#base.x);
         const effectiveWidth = Math.min(this.#width, distance * Math.PI * 2);
         const coneAngle = effectiveWidth / distance * 180 / Math.PI;
-        const halfAngle = coneAngle * Math.PI / 360;
-        const points = [this.#base.x, this.#base.y];
-        const segments = 24;
-
-        this.#direction = angle * 180 / Math.PI;
-        this.#distance = distance;
-        this.#angle = coneAngle;
-        for (let index = 0; index <= segments; index++) {
-            const segmentAngle = angle - halfAngle + (index / segments) * halfAngle * 2;
-            points.push(this.#base.x + Math.cos(segmentAngle) * radius, this.#base.y + Math.sin(segmentAngle) * radius);
-        }
-
-        graphics.clear()
-            .lineStyle(2, BORDER_COLOR, 0.9)
-            .beginFill(FILL_COLOR, FILL_ALPHA)
-            .drawPolygon(points)
-            .endFill();
+        shape.updateSource({
+            x: this.#base.x,
+            y: this.#base.y,
+            radius,
+            angle: coneAngle,
+            rotation: angle * 180 / Math.PI,
+        });
     }
 }
