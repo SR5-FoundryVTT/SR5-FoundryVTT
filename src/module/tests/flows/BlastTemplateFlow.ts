@@ -1,7 +1,7 @@
 import { TestDialogLike, TestDialogListener } from '../../apps/dialogs/TestDialog';
 import { SR5Actor } from '../../actor/SR5Actor';
 import { SR5Item } from '../../item/SR5Item';
-import BlastTemplate from '../../regions/BlastTemplate';
+import BlastTemplate, { BlastTemplateData } from '../../regions/BlastTemplate';
 import { TestCreator } from '../TestCreator';
 
 interface BlastTemplateFlowHost {
@@ -10,6 +10,7 @@ interface BlastTemplateFlowHost {
     data: {
         targetUuids: string[]
         targetActorsUuid: string[]
+        damage?: { value: number, type?: { value: string } }
     }
     targets: (SR5Actor | SR5Item | TokenDocument)[]
 }
@@ -61,7 +62,7 @@ export class BlastTemplateFlow {
         const item = this.test.item;
         if (!item || !this.canPlace) return;
 
-        const template = BlastTemplate.fromItem(item, this.clearPreviewState.bind(this), this.blastData);
+        const template = BlastTemplate.fromItem(item, this.clearPreviewState.bind(this), this.previewData);
         if (!template) return;
 
         this.#template = template;
@@ -110,7 +111,7 @@ export class BlastTemplateFlow {
         const item = this.test.item;
         if (!item || !this.canPlace) return;
 
-        const template = BlastTemplate.fromItem(item, undefined, this.blastData);
+        const template = BlastTemplate.fromItem(item, undefined, this.previewData);
         if (!template) return;
         await template.drawPreview();
     }
@@ -136,5 +137,16 @@ export class BlastTemplateFlow {
 
     get blastData() {
         return this.options.getBlastData?.() ?? this.test.item?.getBlastData();
+    }
+
+    get previewData(): BlastTemplateData | undefined {
+        const blast = this.blastData;
+        if (!blast) return undefined;
+
+        return {
+            ...blast,
+            damageValue: this.test.data.damage?.value,
+            damageType: this.test.data.damage?.type?.value,
+        };
     }
 }

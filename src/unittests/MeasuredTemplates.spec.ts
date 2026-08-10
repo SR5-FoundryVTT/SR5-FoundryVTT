@@ -1,4 +1,5 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
+import { getBlastCircleLayout, getBlastDamageAtDistance } from '../module/regions/BlastTemplate';
 import { getWeaponRangeCircleLayout } from '../module/regions/WeaponRangeOverlay';
 import { hasValidWeaponRanges } from '../module/tests/flows/WeaponRangeOverlayFlow';
 import { RangesTemplateType } from '../module/types/template/Weapon';
@@ -52,6 +53,44 @@ export const measuredTemplateTesting = (context: QuenchBatchContext) => {
                 ...ranges,
                 extreme: { ...ranges.extreme, distance: 0 },
             }));
+        });
+    });
+
+    describe('Blast template layout', () => {
+        it('shows each positive damage band through the effective radius', () => {
+            const layout = getBlastCircleLayout({
+                radius: 8,
+                dropoff: -2,
+                damageValue: 16,
+                damageType: 'P',
+            }, 10);
+
+            assert.deepEqual(layout.map(circle => circle.distance), [1, 2, 3, 4, 5, 6, 7, 8]);
+            assert.deepEqual(layout.map(circle => circle.radius), [10, 20, 30, 40, 50, 60, 70, 80]);
+        });
+
+        it('uses the item falloff and caps bands at the template radius', () => {
+            const layout = getBlastCircleLayout({
+                radius: 3,
+                dropoff: -3,
+                damageValue: 20,
+            }, 10);
+
+            assert.deepEqual(layout.map(circle => circle.radius), [10, 20, 30]);
+        });
+
+        it('does not create damage bands for zero dropoff or zero damage', () => {
+            assert.deepEqual(getBlastCircleLayout({ radius: 10, dropoff: 0, damageValue: 16 }, 10), []);
+            assert.deepEqual(getBlastCircleLayout({ radius: 10, dropoff: -2, damageValue: 0 }, 10), []);
+        });
+
+        it('calculates the damage received by a token at a measured distance', () => {
+            const blast = { radius: 8, dropoff: -2, damageValue: 16 };
+
+            assert.strictEqual(getBlastDamageAtDistance(blast, 0), 16);
+            assert.strictEqual(getBlastDamageAtDistance(blast, 2.9), 12);
+            assert.strictEqual(getBlastDamageAtDistance(blast, 8), 2);
+            assert.isUndefined(getBlastDamageAtDistance(blast, 9));
         });
     });
 };
