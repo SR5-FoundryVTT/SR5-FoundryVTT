@@ -72,5 +72,5 @@ When validating a single claim, report:
 
 - Prefer `mcp_sourcebook-ci_lookup_citation_page`, `mcp_sourcebook-ci_lookup_citation_page_range`, and `mcp_sourcebook-ci_lookup_citation_heading` over raw markdown searching.
 - Use raw file reads in the repo for code under review.
-- Use `mcp_sourcebook-ci_rebuild_sourcebook_assets` only if citation resolution fails because sourcebook assets are missing or stale.
+- If citation resolution fails, report the MCP error and avoid falling back to unavailable server-side tools or direct sourcebook filesystem access.
 - Do not cite rules more strongly than the excerpt supports.

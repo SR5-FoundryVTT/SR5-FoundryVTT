@@ -33,13 +33,12 @@ Primary examples:
 Prefer the installed `mcp-sourcebook-citation` MCP server before any other approach.
 
 Use these MCP tools by request shape:
-1. `activate_sourcebook_lookup_tools` if the lookup tool category is not already active.
-2. `mcp_sourcebook-ci_resolve_sourcebook` to confirm the shorthand code and resolved sourcebook metadata.
-3. `mcp_sourcebook-ci_lookup_citation_page` for a single page such as `SR5#140`.
-4. `mcp_sourcebook-ci_lookup_citation_page_range` for a continuous range such as `SR5 pages 139-141`.
-5. `mcp_sourcebook-ci_lookup_citation_heading` for a heading or section title inside a sourcebook.
-6. `mcp_sourcebook-ci_lookup_citation_table_of_contents` for TOC pages and parsed section lists.
-7. `mcp_sourcebook-ci_lookup_citation_sourcebook_text` only when the user explicitly asks for full-book text.
+1. `mcp_sourcebook-ci_resolve_sourcebook` to confirm the shorthand code and resolved sourcebook metadata.
+2. `mcp_sourcebook-ci_lookup_citation_page` for a single page such as `SR5#140`.
+3. `mcp_sourcebook-ci_lookup_citation_page_range` for a continuous range such as `SR5 pages 139-141`.
+4. `mcp_sourcebook-ci_lookup_citation_heading` for a heading or section title inside a sourcebook.
+5. `mcp_sourcebook-ci_lookup_citation_table_of_contents` for TOC pages and parsed section lists.
+6. `mcp_sourcebook-ci_lookup_citation_sourcebook_text` only when the user explicitly asks for full-book text.
 
 The MCP responses provide the authoritative metadata and excerpt text needed for citation checks. Prefer those results over ad-hoc inference.
 
@@ -53,8 +52,7 @@ Do not fall back to reading `mcp-sourcebook-citation` repository paths, generate
 	- `code + heading`
 	- `code + table of contents`
 	- `code + full book`
-2. Activate lookup tools if needed with `activate_sourcebook_lookup_tools`.
-3. Resolve the sourcebook with `mcp_sourcebook-ci_resolve_sourcebook`.
+2. Resolve the sourcebook with `mcp_sourcebook-ci_resolve_sourcebook`.
 3. Run the narrowest lookup tool that fits the request:
 	- Single page: `mcp_sourcebook-ci_lookup_citation_page`
 	- Page range: `mcp_sourcebook-ci_lookup_citation_page_range`
@@ -65,7 +63,7 @@ Do not fall back to reading `mcp-sourcebook-citation` repository paths, generate
 5. Use the returned excerpt or metadata as the primary evidence for the answer.
 6. Summarize only what is supported by the returned MCP content. Distinguish direct support from inference.
 7. When the user asks for headings, list the headings or TOC entries present in the returned result and say when a match is ambiguous.
-8. If the response is incomplete, refine the lookup with a narrower page range, a more specific heading, or an explicit query string. Do not switch to direct filesystem access.
+8. If the response is incomplete, refine the lookup with a narrower page range or a more specific heading. Do not switch to direct filesystem access.
 
 ## Reporting Guidance
 
