@@ -404,6 +404,7 @@
 
         .card-content--metrics {
             cursor: pointer;
+            flex-flow: row wrap;
 
             .metric-row--template .value-result {
                 color: var(--sr5-card-accent);
@@ -413,6 +414,13 @@
                 }
             }
 
+        }
+
+        .scatter-metrics-row {
+            display: flex;
+            flex: 1 1 100%;
+            width: 100%;
+            gap: 0.5rem;
         }
 
         .card-content--results {

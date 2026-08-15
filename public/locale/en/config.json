@@ -72,6 +72,15 @@
     },
     "SR5": {
         "AP": "AP",
+        "Scatter": {
+            "Title": "Scatter",
+            "Grenade": "Grenade scatter",
+            "Spell": "Indirect combat spell scatter",
+            "Rolls": "Scatter rolls",
+            "Direction": "Direction",
+            "Distance": "Distance",
+            "RolledDistance": "Rolled distance"
+        },
         "Accessory": "Accessory",
         "Accuracy": "Accuracy",
         "Action": "Action",
@@ -3205,6 +3214,10 @@
                     }
                 },
                 "thrown": {
+                    "grenade_type": {
+                        "hint": "Type of grenade used for scatter distance. Leave empty for non-grenade thrown weapons.",
+                        "label": "Grenade Type"
+                    },
                     "blast": {
                         "dropoff": {
                             "hint": "The Damage Reduction per meter from the blast",

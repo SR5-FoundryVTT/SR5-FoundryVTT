@@ -65,6 +65,15 @@
     },
     "SR5": {
         "AP": "PA",
+        "Scatter": {
+            "Title": "Dispersão",
+            "Grenade": "Dispersão de granada",
+            "Spell": "Dispersão de feitiço de combate indireto",
+            "Rolls": "Rolagens de dispersão",
+            "Direction": "Direção",
+            "Distance": "Distância",
+            "RolledDistance": "Distância rolada"
+        },
         "Accessory": "Acessório",
         "Accuracy": "Precisão",
         "Action": "Ação",
@@ -1687,6 +1696,14 @@
                 "InternalMagazin": "Pente Interna",
                 "MuzzleLoader": "Carregador de Boca",
                 "RemovableClip": "Pente Removível"
+            },
+            "FIELDS": {
+                "thrown": {
+                    "grenade_type": {
+                        "hint": "Tipo de granada usado para a distância de dispersão. Deixe vazio para armas arremessadas que não sejam granadas.",
+                        "label": "Tipo de Granada"
+                    }
+                }
             },
             "FullReload": "Carregado",
             "Mod": "Mod",

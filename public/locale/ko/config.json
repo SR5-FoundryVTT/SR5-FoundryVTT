@@ -70,6 +70,15 @@
     },
     "SR5": {
         "AP": "AP",
+        "Scatter": {
+            "Title": "흩어짐",
+            "Grenade": "수류탄 흩어짐",
+            "Spell": "간접 전투 주문 흩어짐",
+            "Rolls": "흩어짐 굴림",
+            "Direction": "방향",
+            "Distance": "거리",
+            "RolledDistance": "굴린 거리"
+        },
         "Accessory": "부착물",
         "Accuracy": "정확도",
         "Action": "행동",
@@ -3194,6 +3203,10 @@
                     }
                 },
                 "thrown": {
+                    "grenade_type": {
+                        "hint": "산란 거리에 사용할 수류탄 유형입니다. 수류탄이 아닌 투척 무기는 비워 두세요.",
+                        "label": "수류탄 유형"
+                    },
                     "blast": {
                         "dropoff": {
                             "hint": "폭발 지점으로부터 미터당 적용되는 피해 감소량",

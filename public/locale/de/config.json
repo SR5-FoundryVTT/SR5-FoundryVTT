@@ -70,6 +70,15 @@
     },
     "SR5": {
         "AP": "DK",
+        "Scatter": {
+            "Title": "Streuung",
+            "Grenade": "Granatenstreuung",
+            "Spell": "Streuung indirekter Kampfzauber",
+            "Rolls": "Streuungswürfe",
+            "Direction": "Richtung",
+            "Distance": "Entfernung",
+            "RolledDistance": "Gewürfelte Entfernung"
+        },
         "Accessory": "Zubehör",
         "Accuracy": "Präz.",
         "Action": "Handlung",
@@ -3240,6 +3249,10 @@
                     }
                 },
                 "thrown": {
+                    "grenade_type": {
+                        "hint": "Granatentyp für die Streuweite. Für geworfene Waffen ohne Granate leer lassen.",
+                        "label": "Granatentyp"
+                    },
                     "blast": {
                         "dropoff": {
                             "hint": "Schadensreduktion pro Meter Distanz zur Explosion",

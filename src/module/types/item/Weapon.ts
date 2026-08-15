@@ -53,6 +53,12 @@ const MeleeWeaponData = () => ({
 });
 
 const ThrownWeaponData = () => ({
+    grenade_type: new StringField({
+        required: true,
+        initial: '',
+        blank: true,
+        choices: SR5.grenadeTypes,
+    }),
     ranges: new SchemaField(RangeData()),
     blast: new SchemaField(BlastData()),
 });
@@ -93,3 +99,4 @@ export type BlastType = foundry.data.fields.SchemaField.InitializedData<ReturnTy
 export type FiringModeType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof FiringModeData>>;
 export type AmmunitionType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof AmmunitionData>>;
 export type RangeWeaponType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof RangeWeaponData>>;
+export type ThrownWeaponType = foundry.data.fields.SchemaField.InitializedData<ReturnType<typeof ThrownWeaponData>>;

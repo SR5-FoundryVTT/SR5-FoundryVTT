@@ -32,6 +32,7 @@ import { shadowrunOpposedCompileSpriteTesting } from './sr5.OpposedCompileSprite
 import { shadowrunOpposedCallInMessageActionTesting } from './sr5.OpposedCallInMessageAction.spec';
 import { actorArmorFlowTesting } from './sr5.ActorArmorFlow.spec';
 import { shadowrunDiceSoNiceTesting } from './sr5.DiceSoNice.spec';
+import { scatterRulesTesting } from './ScatterRules.spec';
 
 import { Quench, QuenchRegisterBatchFunction, QuenchRegisterBatchOptions } from '@ethaks/fvtt-quench';
 import { shadowrunRiggerTesting } from '@/unittests/sr5.RiggerTesting.spec';
@@ -80,6 +81,9 @@ export const quenchRegister = (quench: Quench) => {
     });
     registerBatch(quench, 'shadowrun5e.canvas.regions', regionsTesting, {
         displayName: 'SHADOWRUN5e: Region Test',
+    });
+    registerBatch(quench, 'shadowrun5e.rules.scatter', scatterRulesTesting, {
+        displayName: 'SHADOWRUN5e: Scatter Rules Test',
     });
     registerBatch(quench, 'shadowrun5e.characterImporter', characterImporterTesting, {
         displayName: 'SHADOWRUN5e: Chummer Character Importer',

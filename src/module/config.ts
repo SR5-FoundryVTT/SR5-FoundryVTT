@@ -531,6 +531,11 @@ export const SR5 = {
         thrown: 'SR5.Weapon.Category.Thrown',
     },
 
+    grenadeTypes: {
+        grenade_standard: 'SR5.Weapon.Range.Category.StandardThrownGrenade',
+        grenade_aerodynamic: 'SR5.Weapon.Range.Category.AerodynamicThrownGrenade',
+    },
+
     weaponCliptypes: {
         removable_clip: 'SR5.Weapon.Cliptype.RemovableClip',
         break_action: 'SR5.Weapon.Cliptype.BreakAction',

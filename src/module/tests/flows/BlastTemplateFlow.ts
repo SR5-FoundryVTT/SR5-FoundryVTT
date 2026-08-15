@@ -3,12 +3,14 @@ import { SR5Actor } from '../../actor/SR5Actor';
 import { SR5Item } from '../../item/SR5Item';
 import { getBlastCircleLayout, getBlastDamageAtDistance, BlastTemplateData } from '../../regions/BlastTemplate';
 import { TestCreator } from '../TestCreator';
+import type { SuccessTest } from '../SuccessTest';
 
 const BLAST_FILL_COLORS = [0xcc3333, 0xd9b300, 0x33aa33] as const;
 const BLAST_FILL_ALPHA = 0.2;
 const DEFAULT_BORDER_COLOR = 0x000000;
 
 type Point = { x: number, y: number };
+type RegionShapeData = { x?: number, y?: number, [key: string]: unknown };
 type RegionShape = {
     updateSource: (data: Record<string, unknown>) => void
 };
@@ -34,7 +36,7 @@ type RegionCreateEmbeddedDocuments = (
     embeddedName: 'Region',
     data: object[],
     options: {controlObject: boolean}
-) => Promise<unknown>;
+) => Promise<foundry.documents.RegionDocument[]>;
 
 interface BlastTemplateFlowHost {
     actor: SR5Actor | undefined
@@ -52,10 +54,12 @@ interface BlastTemplateFlowOptions {
     prepareTargetData?: () => void
 }
 
-interface TestWithBlastTemplateFlow extends BlastTemplateFlowHost {
+type TestWithBlastTemplateFlow = SuccessTest & BlastTemplateFlowHost & {
     blastTemplateFlow?: BlastTemplateFlow
     populateDocuments: () => Promise<void>
-}
+};
+
+type BlastTemplatePlacementCallback = (test: SuccessTest) => void | Promise<void>;
 
 /**
  * Handles item area-template previews for tests that opt into this behavior.
@@ -68,6 +72,8 @@ export class BlastTemplateFlow {
     #blastTokenDamageLabels: foundry.canvas.containers.PreciseText[] = [];
     #center: Point = {x: 0, y: 0};
     #blastData?: BlastTemplateData;
+    #placedRegion?: foundry.documents.RegionDocument;
+    #placedRegionOrigin?: Point;
 
     constructor(
         private readonly test: BlastTemplateFlowHost,
@@ -76,6 +82,34 @@ export class BlastTemplateFlow {
 
     get canPlace(): boolean {
         return this.test.item?.hasBlastTemplate ?? false;
+    }
+
+    get placedRegion(): foundry.documents.RegionDocument | undefined {
+        return this.#placedRegion;
+    }
+
+    get placedRegionOrigin(): Point | undefined {
+        return this.#placedRegionOrigin;
+    }
+
+    async movePlacedRegion(offset: Point): Promise<void> {
+        const region = this.#placedRegion;
+        const origin = this.#placedRegionOrigin;
+        if (!region || !origin) return;
+
+        const regionData = region.toObject() as { shapes?: RegionShapeData[] };
+        const shapes = regionData.shapes;
+        if (!shapes?.length) return;
+
+        const [shape, ...remainingShapes] = shapes;
+        const updateData = {
+            shapes: [{
+                ...shape,
+                x: origin.x + offset.x,
+                y: origin.y + offset.y,
+            }, ...remainingShapes],
+        } as unknown as Parameters<typeof region.update>[0];
+        await region.update(updateData);
     }
 
     dialogListeners(): TestDialogListener[] {
@@ -140,22 +174,23 @@ export class BlastTemplateFlow {
         const scene = canvas.scene;
         if (scene) {
             const createEmbeddedDocuments = scene.createEmbeddedDocuments.bind(scene) as unknown as RegionCreateEmbeddedDocuments;
-            await createEmbeddedDocuments('Region', [region.toObject()], {controlObject: true});
+            const [placedRegion] = await createEmbeddedDocuments('Region', [region.toObject()], {controlObject: true});
+            if (placedRegion) this.#rememberPlacedRegion(placedRegion);
         }
         this.clearPreviewState();
     }
 
-    async drawChatPreview() {
+    async drawChatPreview(): Promise<foundry.documents.RegionDocument | undefined> {
         if (!this.test.item || !this.canPlace) return;
         if (this.#placement || this.#selectedRegion) {
             await this.cancelPreview();
             return;
         }
 
-        this.#startPreview(true);
+        return (await this.#startPreview(true)) ?? undefined;
     }
 
-    static async drawChatPreviewFromMessage(event: Event) {
+    static async drawChatPreviewFromMessage(event: Event | JQuery.ClickEvent): Promise<SuccessTest | undefined> {
         event.preventDefault();
         event.stopPropagation();
 
@@ -167,11 +202,18 @@ export class BlastTemplateFlow {
         if (!test) return;
 
         await test.populateDocuments();
-        await test.blastTemplateFlow?.drawChatPreview();
+        const blastTemplateFlow = test.blastTemplateFlow;
+        if (!blastTemplateFlow) return;
+
+        const placedRegion = await blastTemplateFlow.drawChatPreview();
+        return placedRegion ? test : undefined;
     }
 
-    static chatMessageListeners(html: HTMLElement | JQuery) {
-        $(html).find('.place-template').on('click', this.drawChatPreviewFromMessage);
+    static chatMessageListeners(html: HTMLElement | JQuery, onPlaced?: BlastTemplatePlacementCallback) {
+        $(html).find('.place-template').on('click', async event => {
+            const test = await this.drawChatPreviewFromMessage(event);
+            if (test) await onPlaced?.(test);
+        });
     }
 
     get blastData() {
@@ -189,7 +231,7 @@ export class BlastTemplateFlow {
         };
     }
 
-    #startPreview(persistOnConfirm: boolean, dialog?: TestDialogLike) {
+    #startPreview(persistOnConfirm: boolean, dialog?: TestDialogLike): Promise<foundry.documents.RegionDocument | null> | undefined {
         if (!canvas.ready || !canvas.regions || !canvas.grid || !canvas.dimensions) return;
 
         const blast = this.previewData;
@@ -236,6 +278,7 @@ export class BlastTemplateFlow {
 
         this.#placement = placement.then(region => {
             this.#placement = undefined;
+            if (persistOnConfirm && region) this.#rememberPlacedRegion(region);
             if (!persistOnConfirm && region) this.#selectedRegion = region;
             this.#overlay?.destroy({children: true});
             this.#overlay = undefined;
@@ -252,6 +295,16 @@ export class BlastTemplateFlow {
         this.#overlay = regions.preview.addChild(new PIXI.Container());
         this.#graphics = this.#overlay.addChild(new PIXI.Graphics());
         this.#refreshBlastOverlay();
+
+        return this.#placement;
+    }
+
+    #rememberPlacedRegion(region: foundry.documents.RegionDocument) {
+        this.#placedRegion = region;
+        const shape = region.toObject().shapes?.[0] as RegionShapeData | undefined;
+        if (shape && typeof shape.x === 'number' && typeof shape.y === 'number') {
+            this.#placedRegionOrigin = {x: shape.x, y: shape.y};
+        }
     }
 
     #updateCircle(shape: RegionShape, position: Point) {

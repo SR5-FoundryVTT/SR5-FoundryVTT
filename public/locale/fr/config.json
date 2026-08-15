@@ -34,6 +34,15 @@
     },
     "SR5": {
         "AP": "PA",
+        "Scatter": {
+            "Title": "Dispersion",
+            "Grenade": "Dispersion de grenade",
+            "Spell": "Dispersion de sort de combat indirect",
+            "Rolls": "Jets de dispersion",
+            "Direction": "Direction",
+            "Distance": "Distance",
+            "RolledDistance": "Distance obtenue"
+        },
         "Accessory": "Accessoire",
         "Accuracy": "Précision",
         "Action": "Action",
@@ -1064,6 +1073,14 @@
                 "Melee": "Melée",
                 "Range": "Portée",
                 "Thrown": "Lancé"
+            },
+            "FIELDS": {
+                "thrown": {
+                    "grenade_type": {
+                        "hint": "Type de grenade utilisé pour la distance de dispersion. Laissez vide pour les armes lancées sans grenade.",
+                        "label": "Type de grenade"
+                    }
+                }
             },
             "Mod": "Mod",
             "Mode": {
