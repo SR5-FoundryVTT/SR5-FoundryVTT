@@ -1,6 +1,26 @@
 @use 'config/variables';
 @use 'config/mixins';
 
+.sr5v2.extended-test-manager,
+.sr5v2.extended-test-config {
+    --etm-text: var(--sr5v2-text-primary);
+    --etm-text-secondary: var(--sr5v2-text-secondary);
+    --etm-text-muted: var(--sr5v2-text-muted);
+    --etm-label: var(--sr5v2-label);
+    --etm-border: var(--sr5v2-border);
+    --etm-border-strong: var(--sr5v2-border-strong);
+    --etm-row-bg: var(--sr5v2-bg-subtle);
+    --etm-surface: var(--sr5v2-control-bg);
+    --etm-surface-strong: var(--sr5v2-control-bg-strong);
+    --etm-input-text: var(--sr5v2-control-text);
+    --etm-input-bg: var(--sr5v2-control-bg-strong);
+    --etm-hover-bg: var(--sr5v2-button-hover-bg);
+    --etm-hover-text: var(--sr5v2-button-hover-text);
+    --etm-positive: var(--sr5v2-positive);
+    --etm-negative: var(--sr5v2-negative);
+    --etm-table-alt: var(--sr5v2-bg-subtle);
+}
+
 .sr5.extended-test-manager {
     // Below this the toolbar wraps and the row value tracks start colliding with the
     // name column. ApplicationV2._updatePosition clamps dragging to the computed value.
@@ -10,7 +30,7 @@
         display: flex;
         flex-flow: column nowrap;
         height: 100%;
-        color: variables.$white;
+        color: var(--etm-text);
 
         .etm-time-strip {
             display: flex;
@@ -19,11 +39,11 @@
             justify-content: space-between;
             gap: 0.5em;
             padding: 0.25em 0.5em;
-            border-bottom: 1px solid variables.$yellow;
+            border-bottom: 1px solid var(--etm-border-strong);
 
             .etm-time-current {
                 font-weight: bold;
-                color: variables.$yellow;
+                color: var(--etm-label);
                 white-space: nowrap;
             }
 
@@ -78,7 +98,9 @@
                 min-width: 12em;
                 height: 1.8em;
                 font-size: var(--font-size-12);
-                color: variables.$white;
+                color: var(--etm-input-text);
+                background: var(--etm-input-bg);
+                border: 1px solid var(--etm-border);
             }
 
             .etm-mine-filter {
@@ -86,6 +108,7 @@
                 align-items: center;
                 gap: 0.2em;
                 white-space: nowrap;
+                color: var(--etm-text-secondary);
             }
 
             button {
@@ -102,8 +125,8 @@
 
             // Flag a filter hidden behind the collapsed summary.
             .etm-filter-count {
-                background: variables.$yellow;
-                color: variables.$black;
+                background: var(--etm-label);
+                color: var(--sr5v2-text-inverse);
                 border-radius: 1em;
                 padding: 0 0.45em;
                 font-size: var(--font-size-12);
@@ -117,7 +140,7 @@
                 label {
                     display: flex;
                     flex-flow: column nowrap;
-                    color: variables.$grey;
+                    color: var(--etm-text-secondary);
                 }
 
                 select {
@@ -133,22 +156,22 @@
 
             .etm-empty {
                 text-align: center;
-                color: variables.$grey;
+                color: var(--etm-text-muted);
                 margin-top: 2em;
             }
 
             .etm-row {
-                border: variables.$groove;
+                border: 1px solid var(--etm-border);
                 border-radius: 0.3em;
                 margin-bottom: 0.35em;
                 padding: 0.35em 0.5em;
-                background: rgba(variables.$white, 0.03);
+                background: var(--etm-row-bg);
 
-                &.status-completed { border-left: 3px solid green; }
-                &.status-failed { border-left: 3px solid variables.$crimson; }
-                &.status-paused { border-left: 3px solid variables.$grey; }
-                &.status-cancelled { border-left: 3px solid variables.$grey; opacity: 0.7; }
-                &.status-active { border-left: 3px solid variables.$yellow; }
+                &.status-completed { border-left: 3px solid var(--etm-positive); }
+                &.status-failed { border-left: 3px solid var(--etm-negative); }
+                &.status-paused { border-left: 3px solid var(--etm-text-muted); }
+                &.status-cancelled { border-left: 3px solid var(--etm-text-muted); opacity: 0.7; }
+                &.status-active { border-left: 3px solid var(--etm-label); }
 
                 // Fixed tracks, so values and actions line up across rows of differing content.
                 .etm-row-main {
@@ -173,7 +196,7 @@
                         flex-flow: row wrap;
                         gap: 0.75em;
                         font-size: var(--font-size-12);
-                        color: variables.$grey;
+                        color: var(--etm-text-muted);
 
                         a {
                             @include mixins.rollable;
@@ -185,15 +208,15 @@
                     text-transform: uppercase;
                     font-weight: bold;
 
-                    &.etm-status-active { color: variables.$yellow; }
-                    &.etm-status-completed { color: green; }
-                    &.etm-status-failed { color: variables.$crimson; }
-                    &.etm-status-paused { color: variables.$grey; }
-                    &.etm-status-cancelled { color: variables.$grey; }
+                    &.etm-status-active { color: var(--etm-label); }
+                    &.etm-status-completed { color: var(--etm-positive); }
+                    &.etm-status-failed { color: var(--etm-negative); }
+                    &.etm-status-paused { color: var(--etm-text-muted); }
+                    &.etm-status-cancelled { color: var(--etm-text-muted); }
                 }
 
                 .etm-due {
-                    color: variables.$crimson;
+                    color: var(--etm-negative);
                     font-weight: bold;
                 }
 
@@ -269,7 +292,7 @@
                 }
 
                 .etm-row-details {
-                    border-top: 1px solid rgba(variables.$white, 0.15);
+                    border-top: 1px solid var(--etm-border);
                     margin-top: 0.35em;
                     padding-top: 0.35em;
                     font-size: var(--font-size-12);
@@ -278,7 +301,7 @@
                         display: flex;
                         flex-flow: row wrap;
                         gap: 1.5em;
-                        color: variables.$grey;
+                        color: var(--etm-text-muted);
                         margin-bottom: 0.3em;
                     }
 
@@ -299,12 +322,12 @@
                     .etm-log {
                         @include mixins.collapsible;
 
-                        color: variables.$grey;
+                        color: var(--etm-text-muted);
                         font-size: var(--font-size-12);
 
                         // The entry count stands in for the body while collapsed.
                         .etm-log-count {
-                            border: variables.$groove;
+                            border: 1px solid var(--etm-border);
                             border-radius: 1em;
                             padding: 0 0.45em;
                         }
@@ -321,6 +344,113 @@
                 }
             }
         }
+    }
+}
+
+body.theme-light .sr5v2.extended-test-manager:not(.theme-dark),
+.sr5v2.extended-test-manager.theme-light {
+    color-scheme: light;
+
+    .window-header {
+        background: var(--sr5v2-app-header-bg);
+        border-bottom: 1px solid var(--sr5v2-border);
+        color: var(--sr5v2-text-primary);
+
+        .window-title,
+        .header-control,
+        i,
+        button {
+            color: var(--sr5v2-text-primary);
+        }
+    }
+
+    .window-content {
+        background: var(--sr5v2-content-bg);
+        background-repeat: repeat;
+        background-size: 100% 20px auto;
+        color: var(--sr5v2-text-primary);
+    }
+
+    button,
+    input,
+    select,
+    textarea,
+    progress,
+    summary,
+    label,
+    .etm-row-name,
+    .etm-row-meta,
+    .etm-row-meta a,
+    .etm-row-meta span,
+    .etm-status,
+    .etm-due,
+    .etm-progress-text,
+    .etm-value,
+    .etm-value-number,
+    .etm-value-unit,
+    .etm-detail-meta,
+    .etm-log,
+    .etm-log-entry,
+    .etm-empty,
+    .etm-action-disabled,
+    .etm-action-empty,
+    .etm-row-actions a,
+    .etm-row-actions span,
+    .etm-row-actions i,
+    .etm-roll-history,
+    .etm-roll-history th,
+    .etm-roll-history td,
+    .etm-row-info a,
+    .etm-row-info span,
+    .etm-mine-filter,
+    .etm-time-current,
+    .etm-time-presets button,
+    .etm-advanced-filter-fields label,
+    .etm-config-form label,
+    .etm-config-form input,
+    .etm-config-form select,
+    .etm-config-form textarea,
+    .etm-config-form legend,
+    .etm-config-form .hint {
+        color: var(--sr5v2-text-primary);
+    }
+
+    i,
+    svg,
+    .fa,
+    .fas,
+    .far,
+    .fab {
+        color: var(--sr5v2-text-primary);
+    }
+
+    .etm-filter-count {
+        color: var(--sr5v2-text-inverse);
+    }
+
+    button,
+    input,
+    select,
+    textarea,
+    progress,
+    summary {
+        color-scheme: light;
+    }
+
+    select,
+    input[type='search'],
+    input[type='text'],
+    input[type='number'],
+    textarea {
+        color: var(--sr5v2-control-text);
+        background: var(--sr5v2-control-bg-strong);
+        border-color: var(--sr5v2-control-border);
+    }
+
+    button {
+        color: var(--sr5v2-button-text);
+        background: var(--sr5v2-button-bg);
+        border-color: var(--sr5v2-button-border);
     }
 }
 
@@ -343,12 +473,12 @@
         flex-flow: column nowrap;
         gap: 0.6em;
         padding: 0.5em;
-        color: variables.$white;
+        color: var(--etm-text);
 
         // Section heading, shared by the fieldset legends and the collapsible summary.
         @mixin section-heading {
             font-weight: bold;
-            color: variables.$yellow;
+            color: var(--etm-label);
             text-transform: uppercase;
             font-size: var(--font-size-12);
             letter-spacing: 0.05em;
@@ -367,7 +497,7 @@
         }
 
         .etm-config-section {
-            border: variables.$groove;
+            border: 1px solid var(--etm-border);
             border-radius: 0.3em;
             padding: 0.5em 0.6em 0.6em;
             margin: 0;
@@ -407,7 +537,9 @@
             }
 
             input, select, textarea {
-                color: variables.$white;
+                color: var(--etm-input-text);
+                background: var(--etm-input-bg);
+                border: 1px solid var(--etm-border);
                 min-width: 0;
             }
 
@@ -463,7 +595,7 @@
 
         .hint {
             font-size: var(--font-size-12);
-            color: variables.$grey;
+            color: var(--etm-text-muted);
             margin: 0;
         }
 
@@ -479,7 +611,7 @@
 
                 th {
                     font-size: var(--font-size-12);
-                    color: variables.$grey;
+                    color: var(--etm-text-muted);
                     text-transform: uppercase;
                 }
 
@@ -488,7 +620,7 @@
                 }
 
                 tbody tr:nth-child(odd) {
-                    background: rgba(variables.$white, 0.04);
+                    background: var(--etm-table-alt);
                 }
             }
         }
@@ -506,7 +638,7 @@
 
             .etm-config-submit {
                 font-weight: bold;
-                border-color: variables.$yellow;
+                border-color: var(--etm-label);
             }
         }
     }

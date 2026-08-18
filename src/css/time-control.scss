@@ -1,13 +1,38 @@
-@use 'config/variables';
 @use 'config/mixins';
 
-.sr5.time-control {
+.sr5v2.time-control {
+    color-scheme: dark;
+    background: var(--sr5v2-surface-bg);
+    background-repeat: repeat;
+    background-size: 100% 20px auto;
+    color: var(--sr5v2-text-primary);
+
+    .window-header {
+        background: var(--sr5v2-app-header-bg);
+        border-bottom: 1px solid var(--sr5v2-border);
+        color: var(--sr5v2-text-primary);
+
+        .window-title,
+        .header-control,
+        i,
+        button {
+            color: var(--sr5v2-text-primary);
+        }
+    }
+
+    .window-content {
+        background: var(--sr5v2-content-bg);
+        background-repeat: repeat;
+        background-size: 100% 20px auto;
+        color: var(--sr5v2-text-primary);
+    }
+
     .time-control-app {
         display: flex;
         flex-flow: column nowrap;
         gap: 0.5em;
         padding: 0.5em;
-        color: variables.$white;
+        color: var(--sr5v2-text-primary);
 
         .time-control-current {
             display: flex;
@@ -16,16 +41,24 @@
             gap: 0.5em;
             font-size: var(--font-size-18);
             font-weight: bold;
-            color: variables.$yellow;
+            color: var(--sr5v2-label);
             padding: 0.25em;
         }
 
         .time-control-panel {
             @include mixins.collapsible;
 
-            border: variables.$groove;
+            border: 1px solid var(--sr5v2-border);
             border-radius: 0.3em;
             padding: 0.5em;
+
+            summary {
+                color: var(--sr5v2-text-primary);
+
+                i {
+                    color: var(--sr5v2-label);
+                }
+            }
         }
 
         .time-preset-grid {
@@ -45,7 +78,6 @@
 
             input {
                 width: 5em;
-                color: variables.$white;
             }
 
             select {
@@ -62,10 +94,6 @@
                 display: flex;
                 flex-flow: column nowrap;
                 font-size: var(--font-size-11);
-
-                input {
-                    color: variables.$white;
-                }
             }
         }
 
@@ -83,13 +111,45 @@
         .time-control-preview {
             margin-top: 0.4em;
             font-size: var(--font-size-12);
-            color: variables.$grey;
+            color: var(--sr5v2-text-muted);
 
             .time-shift-preview,
             .time-absolute-preview {
-                color: variables.$yellow;
+                color: var(--sr5v2-label);
                 font-weight: bold;
             }
         }
+
+        input,
+        select {
+            color: var(--sr5v2-control-text);
+            background: var(--sr5v2-control-bg);
+            border-color: var(--sr5v2-control-border);
+        }
+
+        select {
+            option,
+            optgroup {
+                color: var(--sr5v2-option-text);
+                background: var(--sr5v2-option-bg);
+            }
+        }
+
+        button {
+            color: var(--sr5v2-button-text);
+            border-color: var(--sr5v2-button-border);
+            background: var(--sr5v2-button-bg);
+
+            &:not(:disabled):hover {
+                color: var(--sr5v2-button-hover-text);
+                border-color: var(--sr5v2-button-hover-border);
+                background: var(--sr5v2-button-hover-bg);
+            }
+        }
     }
+}
+
+body.theme-light .sr5v2.time-control:not(.theme-dark),
+.sr5v2.time-control.theme-light {
+    color-scheme: light;
 }
