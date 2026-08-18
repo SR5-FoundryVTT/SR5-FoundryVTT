@@ -225,7 +225,7 @@
                 .etm-row-values {
                     display: grid;
                     grid-template-columns: 7.5em 8em 3.5em;
-                    align-items: center;
+                    align-items: baseline;
                     gap: 0.6em;
                     white-space: nowrap;
                     font-size: var(--font-size-12);
