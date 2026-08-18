@@ -89,6 +89,21 @@ export const WorldTimeFlow = {
     },
 
     /**
+     * Calendar components for display, with fractional seconds removed without changing
+     * the underlying world time.
+     */
+    displayComponents(worldTime: number = game.time.worldTime): foundry.data.CalendarData.TimeComponents {
+        return WorldTimeFlow.components(WorldTimeFlow.floorToSecond(worldTime));
+    },
+
+    /**
+     * Truncate a time value expressed in seconds to the start of its current second.
+     */
+    floorToSecond(seconds: number): number {
+        return Math.floor(seconds);
+    },
+
+    /**
      * Convert absolute calendar components, as displayed, into world time seconds.
      *
      * NOTE: CalendarData#componentsToTime ignores month and dayOfMonth, which would place
@@ -129,11 +144,19 @@ export const WorldTimeFlow = {
      * Mirrors CalendarData.formatTimestamp, which prints the unshifted year.
      */
     format(worldTime: number = game.time.worldTime): string {
-        const { year, month, dayOfMonth, hour, minute, second } = WorldTimeFlow.components(worldTime);
+        const { year, month, dayOfMonth, hour, minute, second } = WorldTimeFlow.displayComponents(worldTime);
         const ordinal = game.time.calendar.months?.values?.[month]?.ordinal ?? month + 1;
 
         const pad = (value: number, length = 2) => String(value).padStart(length, '0');
         return `${pad(year, 4)}-${pad(ordinal)}-${pad(dayOfMonth + 1)} ${pad(hour)}:${pad(minute)}:${pad(second)}`;
+    },
+
+    /**
+     * Format a real-time timestamp for display without showing milliseconds.
+     */
+    formatRealTime(timestamp: number = Date.now()): string {
+        const wholeSeconds = WorldTimeFlow.floorToSecond(timestamp / 1000);
+        return new Date(wholeSeconds * 1000).toLocaleString();
     },
 
     /**
