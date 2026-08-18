@@ -2,12 +2,19 @@ import { TestDialogLike, TestDialogListener } from '../../apps/dialogs/TestDialo
 import { SR5Actor } from '../../actor/SR5Actor';
 import { SR5Item } from '../../item/SR5Item';
 import { getBlastCircleLayout, getBlastDamageAtDistance, BlastTemplateData } from '../../regions/BlastTemplate';
+import { getScatterDirectionAngle, getScatterLaunchAngle, SCATTER_DIRECTIONS } from '../../rules/ScatterRules';
 import { TestCreator } from '../TestCreator';
 import type { SuccessTest } from '../SuccessTest';
 
 const BLAST_FILL_COLORS = [0xcc3333, 0xd9b300, 0x33aa33] as const;
 const BLAST_FILL_ALPHA = 0.2;
 const DEFAULT_BORDER_COLOR = 0x000000;
+const SCATTER_ARROW_COLOR = 0xffffff;
+const SCATTER_ARROW_LENGTH = 1.5;
+const SCATTER_ARROWHEAD_ANGLE = Math.PI / 8;
+const SCATTER_ARROWHEAD_LENGTH = 10;
+// Directions 2 and 12 share the same bearing; nudge their labels apart so they stay legible.
+const SCATTER_LABEL_OVERLAP_OFFSET = 10;
 
 type Point = { x: number, y: number };
 type RegionShapeData = { x?: number, y?: number, [key: string]: unknown };
@@ -52,6 +59,8 @@ interface BlastTemplateFlowHost {
 interface BlastTemplateFlowOptions {
     getBlastData?: () => { radius: number, dropoff: number } | undefined
     prepareTargetData?: () => void
+    /** Whether the test can scatter on a failed roll (SR5#182), used to preview scatter direction arrows. */
+    canScatter?: () => boolean
 }
 
 type TestWithBlastTemplateFlow = SuccessTest & BlastTemplateFlowHost & {
@@ -70,6 +79,7 @@ export class BlastTemplateFlow {
     #overlay?: PIXI.Container;
     #graphics?: PIXI.Graphics;
     #blastTokenDamageLabels: foundry.canvas.containers.PreciseText[] = [];
+    #scatterDirectionLabels: foundry.canvas.containers.PreciseText[] = [];
     #center: Point = {x: 0, y: 0};
     #blastData?: BlastTemplateData;
     #placedRegion?: foundry.documents.RegionDocument;
@@ -82,6 +92,11 @@ export class BlastTemplateFlow {
 
     get canPlace(): boolean {
         return this.test.item?.hasBlastTemplate ?? false;
+    }
+
+    /** Whether this template preview should show scatter direction arrows (SR5#182). */
+    get canScatter(): boolean {
+        return this.options.canScatter?.() ?? false;
     }
 
     get placedRegion(): foundry.documents.RegionDocument | undefined {
@@ -150,6 +165,7 @@ export class BlastTemplateFlow {
         this.#overlay = undefined;
         this.#graphics = undefined;
         this.#blastTokenDamageLabels = [];
+        this.#scatterDirectionLabels = [];
         this.#selectedRegion?.object?.destroy({children: true});
         this.#selectedRegion = undefined;
     }
@@ -284,6 +300,7 @@ export class BlastTemplateFlow {
             this.#overlay = undefined;
             this.#graphics = undefined;
             this.#blastTokenDamageLabels = [];
+            this.#scatterDirectionLabels = [];
             return region;
         }).catch(error => {
             this.#placement = undefined;
@@ -334,7 +351,56 @@ export class BlastTemplateFlow {
             graphics.lineStyle(3 * scale, DEFAULT_BORDER_COLOR, 0.9).drawCircle(0, 0, circle.radius);
         });
 
+        this.#refreshScatterArrows(graphics, scale);
         this.#refreshTokenDamageLabels(scale);
+    }
+
+    #refreshScatterArrows(graphics: PIXI.Graphics, scale: number) {
+        for (const label of this.#scatterDirectionLabels) {
+            this.#overlay?.removeChild(label);
+            label.destroy();
+        }
+        this.#scatterDirectionLabels = [];
+
+        if (!this.canScatter || !this.#blastData || !canvas.dimensions) return;
+
+        const arrowLength = canvas.dimensions.distancePixels * SCATTER_ARROW_LENGTH;
+        const source = this.test.actor?.getActiveTokens(true)[0];
+        const launchAngle = getScatterLaunchAngle(this.#center, source?.center);
+
+        graphics.lineStyle(2 * scale, SCATTER_ARROW_COLOR, 0.9);
+
+        for (const direction of SCATTER_DIRECTIONS) {
+            const angle = getScatterDirectionAngle(direction, launchAngle);
+            const dx = Math.cos(angle);
+            const dy = Math.sin(angle);
+            const endX = dx * arrowLength;
+            const endY = dy * arrowLength;
+
+            graphics.moveTo(0, 0).lineTo(endX, endY);
+
+            const headLength = SCATTER_ARROWHEAD_LENGTH * scale;
+            const leftAngle = angle + Math.PI - SCATTER_ARROWHEAD_ANGLE;
+            const rightAngle = angle + Math.PI + SCATTER_ARROWHEAD_ANGLE;
+            graphics
+                .moveTo(endX, endY)
+                .lineTo(endX + (Math.cos(leftAngle) * headLength), endY + (Math.sin(leftAngle) * headLength))
+                .moveTo(endX, endY)
+                .lineTo(endX + (Math.cos(rightAngle) * headLength), endY + (Math.sin(rightAngle) * headLength));
+
+            let labelX = endX + (dx * 14 * scale);
+            let labelY = endY + (dy * 14 * scale);
+            if (direction === 2 || direction === 12) {
+                const side = direction === 2 ? -1 : 1;
+                labelX += side * -dy * SCATTER_LABEL_OVERLAP_OFFSET * scale;
+                labelY += side * dx * SCATTER_LABEL_OVERLAP_OFFSET * scale;
+            }
+
+            if (!this.#overlay) continue;
+            const label = this.#overlay.addChild(this.#createBlastLabel());
+            this.#refreshBlastLabel(label, `${direction}`, {x: labelX, y: labelY}, scale);
+            this.#scatterDirectionLabels.push(label);
+        }
     }
 
     #refreshTokenDamageLabels(scale: number) {

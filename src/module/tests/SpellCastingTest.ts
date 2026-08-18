@@ -7,6 +7,7 @@ import ModifierTypes = Shadowrun.ModifierTypes;
 import { DamageType, MinimalActionType } from "../types/item/Action";
 import { DeepPartial } from "fvtt-types/utils";
 import { SR5Item } from "../item/SR5Item";
+import { getItemScatterKind } from "../rules/ScatterRules";
 import { BlastTemplateFlow } from './flows/BlastTemplateFlow';
 
 
@@ -26,6 +27,7 @@ export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
     public override item: SR5Item<'spell'> | undefined = undefined;
     public blastTemplateFlow = new BlastTemplateFlow(this, {
         getBlastData: () => this.getBlastData(),
+        canScatter: () => getItemScatterKind(this.item) !== undefined,
     });
 
     override _prepareData(data: DeepPartial<SpellCastingTestData>, options: Partial<TestOptions>): SpellCastingTestData {

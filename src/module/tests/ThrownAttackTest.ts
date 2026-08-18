@@ -2,6 +2,7 @@ import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
 import { DeepPartial } from "fvtt-types/utils";
 import { SR5Item } from '../item/SR5Item';
 import { WeaponRangeTestBehavior, WeaponRangeTestDataFragment } from '../rules/WeaponRangeRules';
+import { getItemScatterKind } from '../rules/ScatterRules';
 import { BlastTemplateFlow } from './flows/BlastTemplateFlow';
 import { WeaponRangeOverlayFlow } from './flows/WeaponRangeOverlayFlow';
 
@@ -16,6 +17,7 @@ export class ThrownAttackTest extends SuccessTest<ThrownAttackTestData> {
     public rangeOverlayFlow = new WeaponRangeOverlayFlow(this);
     public blastTemplateFlow = new BlastTemplateFlow(this, {
         prepareTargetData: () => WeaponRangeTestBehavior.prepareTargetData(this),
+        canScatter: () => getItemScatterKind(this.item) !== undefined,
     });
 
     override _prepareData(data: DeepPartial<ThrownAttackTestData>, options: Partial<TestOptions>): ThrownAttackTestData {

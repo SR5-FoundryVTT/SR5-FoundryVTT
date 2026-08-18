@@ -1,3 +1,5 @@
+import type { SR5Item } from '../item/SR5Item';
+
 export type ScatterDirection = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
 export interface ScatterRollResult {
@@ -47,7 +49,19 @@ const SCATTER_DIRECTION_BEARINGS: Record<ScatterDirection, number> = {
     12: 180,
 };
 
-/** 
+/** All scatter directions of the 2d6 scatter diagram, in diagram order. */
+export const SCATTER_DIRECTIONS: ScatterDirection[] = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+/**
+ * Canvas angle (radians) a given scatter direction points towards, rotated on top of the
+ * launch direction the same way a rolled scatter result would be.
+ */
+export function getScatterDirectionAngle(direction: ScatterDirection, launchAngle = -Math.PI / 2): number {
+    const bearing = SCATTER_DIRECTION_BEARINGS[direction];
+    return launchAngle + ((bearing * Math.PI) / 180);
+}
+
+/**
  * Convert a scatter result to canvas pixels around the original launch direction. 
  */
 export function getScatterOffset(
@@ -55,8 +69,7 @@ export function getScatterOffset(
     distancePixels: number,
     launchAngle = -Math.PI / 2,
 ): ScatterOffset {
-    const bearing = SCATTER_DIRECTION_BEARINGS[result.direction];
-    const angle = launchAngle + (bearing * Math.PI) / 180;
+    const angle = getScatterDirectionAngle(result.direction, launchAngle);
     const distance = result.distance * distancePixels;
 
     return {
@@ -66,9 +79,30 @@ export function getScatterOffset(
 }
 
 /**
+ * Launch direction (radians) from a source token towards the template origin, matching the
+ * angle scatter offsets are rotated around. Defaults to canvas north when no source is known.
+ */
+export function getScatterLaunchAngle(origin: ScatterOffset, sourceCenter?: ScatterOffset): number {
+    if (!sourceCenter) return -Math.PI / 2;
+
+    return Math.atan2(origin.y - sourceCenter.y, origin.x - sourceCenter.x);
+}
+
+/**
  * These scatter kinds have different kind of behavior across different rules.
  */
 export type ScatterKind = 'grenade_standard' |  'grenade_aerodynamic' | 'grenade_launcher' | 'missile_launcher' | 'rocket_launcher' | 'spell';
+
+/**
+ * Determine the scatter kind (if any) for an item, according to SR5#182.
+ * A grenade thrown by hand or an indirect combat spell can scatter on a failed test.
+ */
+export function getItemScatterKind(item: SR5Item | undefined): ScatterKind | undefined {
+    if (item?.isGrenade()) return item.system.thrown.grenade_type as ScatterKind;
+    if (item?.isCombatSpell() && item.system.combat.type === 'indirect') return 'spell';
+
+    return undefined;
+}
 
 export const ScatterRules = {
     /**

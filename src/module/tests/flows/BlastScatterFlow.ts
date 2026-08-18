@@ -1,5 +1,5 @@
 import { GmOnlyMessageContentFlow } from '../../actor/flows/GmOnlyMessageContentFlow';
-import { getScatterOffset, resolveScatterRoll, ScatterKind, ScatterRollResult, ScatterRules } from '../../rules/ScatterRules';
+import { getItemScatterKind, getScatterLaunchAngle, getScatterOffset, resolveScatterRoll, ScatterKind, ScatterRollResult, ScatterRules } from '../../rules/ScatterRules';
 import { SR5Roll } from '../../rolls/SR5Roll';
 import { SpellCastingTest } from '../SpellCastingTest';
 import { SuccessTest } from '../SuccessTest';
@@ -81,24 +81,17 @@ export const BlastScatterFlow = {
     },
 
     getScatterKind(test: SuccessTest): ScatterKind | undefined {
-        if (test instanceof ThrownAttackTest && test.item?.isGrenade())
-            return test.item.system.thrown.grenade_type as ScatterKind;
+        if (!(test instanceof ThrownAttackTest) && !(test instanceof SpellCastingTest)) return undefined;
 
-        if (test instanceof SpellCastingTest) {
-            const spell = test.item;
-            if (spell?.isCombatSpell() && spell.system.combat.type === 'indirect') return 'spell';
-        }
-
-        return undefined;
+        return getItemScatterKind(test.item);
     },
 
     getLaunchAngle(test: ScatterTest, blastTemplateFlow: ScatterTest['blastTemplateFlow']): number {
         const origin = blastTemplateFlow.placedRegionOrigin;
-        const source = test.actor?.getActiveTokens(true)[0];
-        const sourceCenter = source?.center;
-        if (!origin || !sourceCenter) return -Math.PI / 2;
+        if (!origin) return -Math.PI / 2;
 
-        return Math.atan2(origin.y - sourceCenter.y, origin.x - sourceCenter.x);
+        const source = test.actor?.getActiveTokens(true)[0];
+        return getScatterLaunchAngle(origin, source?.center);
     },
 
     async createMessage(
