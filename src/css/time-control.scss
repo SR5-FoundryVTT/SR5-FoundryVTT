@@ -2,9 +2,8 @@
 
 .sr5v2.time-control {
     color-scheme: dark;
-    background: var(--sr5v2-surface-bg);
-    background-repeat: repeat;
-    background-size: 100% 20px auto;
+    background: var(--sr5v2-option-bg);
+    background-image: none;
     color: var(--sr5v2-text-primary);
 
     .window-header {
@@ -21,9 +20,8 @@
     }
 
     .window-content {
-        background: var(--sr5v2-content-bg);
-        background-repeat: repeat;
-        background-size: 100% 20px auto;
+        background: var(--sr5v2-option-bg);
+        background-image: none;
         color: var(--sr5v2-text-primary);
     }
 
