@@ -89,15 +89,15 @@ export const WorldTimeFlow = {
     },
 
     /**
-     * Calendar components for display, with fractional seconds removed without changing
-     * the underlying world time.
+     * Calendar components for display, with fractional seconds floored for formatting
+     * without modifying the stored world time.
      */
     displayComponents(worldTime: number = game.time.worldTime): foundry.data.CalendarData.TimeComponents {
         return WorldTimeFlow.components(WorldTimeFlow.floorToSecond(worldTime));
     },
 
     /**
-     * Truncate a time value expressed in seconds to the start of its current second.
+     * Floor a time value expressed in seconds to the start of its current second.
      */
     floorToSecond(seconds: number): number {
         return Math.floor(seconds);
