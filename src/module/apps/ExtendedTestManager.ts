@@ -323,7 +323,7 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
             intervalsElapsed: ExtendedTestRules.intervalsElapsed(record, worldTime),
             isDue: ExtendedTestRules.isDue(record, worldTime),
             createdGameTime: WorldTimeFlow.format(record.createdWorldTime),
-            updatedRealTime: new Date(record.updatedAt).toLocaleString(),
+            updatedRealTime: WorldTimeFlow.formatRealTime(record.updatedAt),
             canRoll,
             rollBlockedByInterval: mayRoll && canContinue && !intervalAllowsRoll,
             canEdit,
@@ -341,7 +341,7 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
                 glitch: roll.glitch,
                 criticalGlitch: roll.criticalGlitch,
                 poolUsed: roll.poolUsed,
-                realTime: new Date(roll.timestamp).toLocaleString(),
+                realTime: WorldTimeFlow.formatRealTime(roll.timestamp),
                 gameTime: WorldTimeFlow.format(roll.worldTime),
                 messageUuid: roll.messageUuid,
                 userName: userName(roll.userId),
@@ -349,7 +349,7 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
             log: expanded ? record.log.map(entry => ({
                 actionLabel: game.i18n.localize(`SR5.ExtendedTestManager.Log.${entry.action}` as Parameters<typeof game.i18n.localize>[0]),
                 detail: entry.detail,
-                realTime: new Date(entry.timestamp).toLocaleString(),
+                realTime: WorldTimeFlow.formatRealTime(entry.timestamp),
                 userName: userName(entry.userId),
             })) : [],
         };
