@@ -42,6 +42,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
         testType: 'SuccessTest',
         dicePool: 10,
         cumulativeModifier: true,
+        cumulativeRollCount: 0,
         threshold: 5,
         accumulatedHits: 0,
         rollCount: 0,
@@ -141,11 +142,17 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             const record = baseRecord();
             assert.strictEqual(ExtendedTestRules.nextPool(record), 10);
             record.rollCount = 3;
+            record.cumulativeRollCount = 3;
             assert.strictEqual(ExtendedTestRules.nextPool(record), 7);
             record.rollCount = 15;
+            record.cumulativeRollCount = 15;
             assert.strictEqual(ExtendedTestRules.nextPool(record), 0);
             record.cumulativeModifier = false;
             assert.strictEqual(ExtendedTestRules.nextPool(record), 10);
+
+            record.cumulativeModifier = true;
+            record.cumulativeRollCount = 2;
+            assert.strictEqual(ExtendedTestRules.nextPool(record), 8);
         });
 
         it('prefers the test data snapshot pool over the starting pool', () => {
@@ -156,6 +163,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             // replaces it with -2, so a base 5 pool ends up at 3.
             const snapshot = baseRecord({
                 rollCount: 2,
+                cumulativeRollCount: 2,
                 testData: snapshotTestData(4, -1),
             });
             assert.strictEqual(ExtendedTestRules.nextPool(snapshot), 3);
@@ -166,6 +174,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             // remove it entirely, so the manager has to show the full pool.
             const record = baseRecord({
                 rollCount: 3,
+                cumulativeRollCount: 3,
                 cumulativeModifier: false,
                 testData: snapshotTestData(8, -2),
             });

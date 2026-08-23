@@ -61,8 +61,10 @@ export interface ExtendedTestRecord {
     // Starting dice pool of the extended test. Only used while testData is absent, as the
     // snapshot of a registered test is what actually gets rolled. See ExtendedTestRules.nextPool.
     dicePool: number;
-    // Apply the cumulative -1 dice pool modifier per roll.
+    // Apply the cumulative -1 dice-pool modifier per roll.
     cumulativeModifier: boolean;
+    // How many rolls the cumulative modifier should consider.
+    cumulativeRollCount: number;
     threshold: number;
     accumulatedHits: number;
     rollCount: number;

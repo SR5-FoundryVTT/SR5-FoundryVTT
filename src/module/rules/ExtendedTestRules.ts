@@ -110,8 +110,8 @@ export const ExtendedTestRules = {
         const pool = record.testData?.pool;
 
         // Mirror what ExtendedTestFlow._prepareRollData will do to the snapshot, rather than
-        // assuming the modifier is present: toggling cumulativeModifier off leaves the last
-        // snapshot carrying a modifier that the next roll removes again.
+        // assuming the modifier is present: disabling it leaves the last snapshot carrying
+        // a modifier that the next roll removes.
         if (pool?.value !== undefined) {
             // Swap the modifier the snapshot was rolled with for the one the next roll will
             // use, exactly as ExtendedTestFlow._prepareRollData does.
@@ -119,12 +119,14 @@ export const ExtendedTestRules = {
                 ?.filter(change => change.name === 'SR5.ExtendedTest' && change.enabled)
                 .reduce((total, change) => total + change.value, 0) ?? 0;
             const next = record.cumulativeModifier
-                ? TestRules.extendedModifierValue * record.rollCount
+                ? TestRules.extendedModifierValue * record.cumulativeRollCount
                 : 0;
             return Math.max(pool.value - inSnapshot + next, 0);
         }
 
-        const modifier = record.cumulativeModifier ? TestRules.extendedModifierValue * record.rollCount : 0;
+        const modifier = record.cumulativeModifier
+            ? TestRules.extendedModifierValue * record.cumulativeRollCount
+            : 0;
         return Math.max(record.dicePool + modifier, 0);
     },
 

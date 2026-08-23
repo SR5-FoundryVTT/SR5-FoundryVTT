@@ -30,6 +30,7 @@ export interface ExtendedTestCreateParams {
     threshold: number;
     interval: ExtendedTestInterval;
     cumulativeModifier?: boolean;
+    cumulativeRollCount?: number;
     advanceTimeOnRoll?: boolean;
     permissions?: Partial<ExtendedTestPermissions>;
 }
@@ -97,6 +98,7 @@ export const ExtendedTestFlow = {
 
             dicePool: Math.max(params.dicePool, 0),
             cumulativeModifier: params.cumulativeModifier ?? true,
+            cumulativeRollCount: Math.max(Math.floor(params.cumulativeRollCount ?? 0), 0),
             threshold: Math.max(params.threshold, 0),
             accumulatedHits: 0,
             rollCount: 0,
@@ -163,6 +165,7 @@ export const ExtendedTestFlow = {
             // Use the pool without the cumulative modifier as a starting value.
             dicePool: test.pool.value,
             cumulativeModifier: true,
+            cumulativeRollCount: 1,
 
             // Keep the source value: the snapshot retains modifiers that determine its
             // effective threshold on each follow-up roll.
@@ -328,9 +331,9 @@ export const ExtendedTestFlow = {
         }
         data.threshold.base = record.threshold;
 
-        // One die less per roll already made, as a situational modifier instead of pool base.
+        // Apply -1 once for each configured prior roll, as a situational modifier instead of pool base.
         // A zero value removes the change, so the first roll shows no modifier at all.
-        const priorRolls = record.cumulativeModifier ? record.rollCount : 0;
+        const priorRolls = record.cumulativeModifier ? record.cumulativeRollCount : 0;
         const pool = new ModifiableValue(data.pool);
         pool.setUnique('SR5.ExtendedTest', TestRules.extendedModifierValue * priorRolls);
         pool.calcTotal({ min: 0 });
@@ -396,7 +399,9 @@ export const ExtendedTestFlow = {
         record.rolls.push(rollEntry);
         record.log.push({ ...ExtendedTestFlow._logEntry('roll'), userId: rollEntry.userId });
         record.accumulatedHits += rollEntry.hits;
+        const cumulativeRollCount = record.cumulativeRollCount;
         record.rollCount += 1;
+        record.cumulativeRollCount = cumulativeRollCount + 1;
         record.lastRollWorldTime = rollEntry.worldTime;
 
         // Keep the snapshot current, so following rolls include actor / effect changes.
@@ -554,7 +559,7 @@ export const ExtendedTestFlow = {
         // How hard the test is and who may take part stays with the owner.
         const managedKeys = [
             'actorUuid', 'dicePool', 'accumulatedHits', 'threshold', 'interval',
-            'cumulativeModifier', 'advanceTimeOnRoll', 'permissions',
+            'cumulativeModifier', 'cumulativeRollCount', 'advanceTimeOnRoll', 'permissions',
         ] as const;
 
         const canManage = ExtendedTestRules.canManage(record, game.user);
