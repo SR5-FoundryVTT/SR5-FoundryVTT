@@ -74,6 +74,8 @@ export interface ExtendedTestRecord {
     advanceTimeOnRoll: boolean;
 
     status: ExtendedTestStatus;
+    // Lets a reactivated failed test open one manual roll dialog.
+    continuationGranted: boolean;
     permissions: ExtendedTestPermissions;
 
     createdAt: number;

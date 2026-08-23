@@ -104,30 +104,20 @@ export const ExtendedTestRules = {
      * The dice pool available for the next roll, after cumulative modifiers.
      *
      * The snapshot of a registered test is what actually gets rolled, so it wins over the
-     * starting pool. Only manually created records lack one.
+     * starting pool. Recalculate its changes rather than relying on its cached value.
      */
     nextPool: (record: ExtendedTestRecord): number => {
-        const pool = record.testData?.pool;
-
-        // Mirror what ExtendedTestFlow._prepareRollData will do to the snapshot, rather than
-        // assuming the modifier is present: disabling it leaves the last snapshot carrying
-        // a modifier that the next roll removes.
-        if (pool?.value !== undefined) {
-            // Swap the modifier the snapshot was rolled with for the one the next roll will
-            // use, exactly as ExtendedTestFlow._prepareRollData does.
-            const inSnapshot = pool.changes
-                ?.filter(change => change.name === 'SR5.ExtendedTest' && change.enabled)
-                .reduce((total, change) => total + change.value, 0) ?? 0;
-            const next = record.cumulativeModifier
-                ? TestRules.extendedModifierValue * record.cumulativeRollCount
-                : 0;
-            return Math.max(pool.value - inSnapshot + next, 0);
-        }
-
-        const modifier = record.cumulativeModifier
+        const pool = foundry.utils.deepClone(record.testData?.pool ?? {
+            base: record.dicePool,
+            value: record.dicePool,
+            changes: [],
+        });
+        const modifier = new ModifiableValue(pool);
+        const next = record.cumulativeModifier
             ? TestRules.extendedModifierValue * record.cumulativeRollCount
             : 0;
-        return Math.max(record.dicePool + modifier, 0);
+        modifier.setUnique('SR5.ExtendedTest', next);
+        return modifier.calcTotal({ min: 0 });
     },
 
     /**
@@ -149,7 +139,8 @@ export const ExtendedTestRules = {
      * Can another roll be made for this record?
      */
     canContinue: (record: ExtendedTestRecord): boolean => {
-        return TestRules.canExtendTest(ExtendedTestRules.threshold(record), record.accumulatedHits);
+        return ExtendedTestRules.nextPool(record) > 0
+            && TestRules.canExtendTest(ExtendedTestRules.threshold(record), record.accumulatedHits);
     },
 
     /**

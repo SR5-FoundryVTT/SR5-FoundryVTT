@@ -107,6 +107,7 @@ export const ExtendedTestFlow = {
             advanceTimeOnRoll: params.advanceTimeOnRoll ?? false,
 
             status: 'active',
+            continuationGranted: false,
             permissions: ExtendedTestFlow._defaultPermissions(params.permissions),
 
             createdAt: now,
@@ -177,6 +178,7 @@ export const ExtendedTestFlow = {
             advanceTimeOnRoll: false,
 
             status: 'active',
+            continuationGranted: false,
             permissions: ExtendedTestFlow._defaultPermissions(),
 
             createdAt: now,
@@ -224,10 +226,13 @@ export const ExtendedTestFlow = {
             return;
         }
 
-        // Reaching the threshold is the only thing that ends a test on its own.
+        // Completion wins over pool exhaustion when the final roll reaches the threshold.
         if (ExtendedTestRules.isComplete(record)) {
             record.status = 'completed';
             record.log.push(ExtendedTestFlow._logEntry('complete'));
+        } else if (ExtendedTestRules.nextPool(record) <= 0) {
+            record.status = 'failed';
+            record.log.push(ExtendedTestFlow._logEntry('fail', 'poolExhausted'));
         }
     },
 
@@ -251,7 +256,7 @@ export const ExtendedTestFlow = {
 
         if (rollsInFlight.has(id)) return;
 
-        if (!ExtendedTestRules.canContinue(record)) {
+        if (!ExtendedTestRules.canContinue(record) && !record.continuationGranted) {
             ExtendedTestFlow._applyStatusTransitions(record);
             await ExtendedTestFlow._persist(record);
             ui.notifications?.warn('SR5.Warnings.CantExtendTestFurther', { localize: true });
@@ -385,7 +390,8 @@ export const ExtendedTestFlow = {
         // pauses, ends, or completes the record, so repeat the state checks made before rolling.
         const rollingUser = game.users?.get(rollEntry.userId);
         if (!rollingUser || !ExtendedTestRules.canRoll(record, rollingUser)) return;
-        if (record.status !== 'active' || !ExtendedTestRules.canContinue(record)) return;
+        if (record.status !== 'active') return;
+        if (!ExtendedTestRules.canContinue(record) && !record.continuationGranted) return;
         if (!ExtendedTestFlow._intervalAllowsRoll(record)) return;
         if (rollEntry.messageUuid && record.rolls.some(roll => roll.messageUuid === rollEntry.messageUuid)) return;
 
@@ -403,6 +409,7 @@ export const ExtendedTestFlow = {
         record.rollCount += 1;
         record.cumulativeRollCount = cumulativeRollCount + 1;
         record.lastRollWorldTime = rollEntry.worldTime;
+        record.continuationGranted = false;
 
         // Keep the snapshot current, so following rolls include actor / effect changes.
         record.testData = testData;
@@ -519,6 +526,7 @@ export const ExtendedTestFlow = {
     async reactivate(id: string) {
         const record = ExtendedTestStorage.get(id);
         if (!record || !ExtendedTestRules.isTerminal(record)) return;
+        record.continuationGranted = record.status === 'failed' && !ExtendedTestRules.canContinue(record);
         await ExtendedTestFlow._setStatus(id, 'active', 'resume', true);
     },
 
@@ -584,7 +592,12 @@ export const ExtendedTestFlow = {
             record.status = 'completed';
             record.log.push(ExtendedTestFlow._logEntry('complete'));
             ExtendedTestFlow._notifyStatus(record);
-        } else if (record.status === 'completed' && !ExtendedTestRules.isComplete(record)) {
+        } else if (
+            (record.status === 'completed' && !ExtendedTestRules.isComplete(record))
+            || (record.status === 'failed'
+                && record.log.at(-1)?.detail === 'poolExhausted'
+                && ExtendedTestRules.canContinue(record))
+        ) {
             record.status = 'active';
             record.log.push(ExtendedTestFlow._logEntry('resume'));
         }
