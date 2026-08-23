@@ -33,9 +33,6 @@ interface TestDialogContext extends HandlebarsApplicationMixin.RenderContext {
 }
 
 export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDialogContext> {
-    // Settle the displaced dialog because Foundry replaces duplicate ApplicationV2 IDs without closing it.
-    static #activeDialog?: TestDialog;
-
     test: SuccessTest;
     listeners: TestDialogListener[];
     _expandedList: Set<string>;
@@ -116,12 +113,6 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
     }
 
     async select(): Promise<SuccessTestData> {
-        const previous = TestDialog.#activeDialog;
-        if (previous && previous !== this) {
-            await previous.close({ animate: false, closeKey: false, submitted: false });
-        }
-        TestDialog.#activeDialog = this;
-
         await this.render({ force: true });
 
         if (this._selectionPromise === undefined || this.selection === undefined)
@@ -141,8 +132,6 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
             this._selectionSettled = true;
             this._selectionResolve(this.selection);
         }
-
-        if (TestDialog.#activeDialog === this) TestDialog.#activeDialog = undefined;
 
         return closed;
     }
