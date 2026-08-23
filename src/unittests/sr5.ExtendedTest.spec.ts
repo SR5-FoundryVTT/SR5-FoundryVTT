@@ -9,6 +9,7 @@ import { intervalToSeconds } from "@/module/utils/timeUnits";
 import { documentSelectOptions } from "@/module/utils/folderOptions";
 import { ExtendedTestRecord } from "@/module/types/flows/ExtendedTest";
 import { TestCreator } from "@/module/tests/TestCreator";
+import { ModifiableValue } from "@/module/mods/ModifiableValue";
 import { FLAGS, SR, SYSTEM_NAME } from "@/module/constants";
 
 export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
@@ -190,6 +191,23 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             assert.strictEqual(ExtendedTestRules.progress(baseRecord({ accumulatedHits: 2, threshold: 4 })), 50);
             assert.strictEqual(ExtendedTestRules.progress(baseRecord({ accumulatedHits: 8, threshold: 4 })), 100);
             assert.isUndefined(ExtendedTestRules.progress(baseRecord({ threshold: 0 })));
+        });
+
+        it('uses saved threshold changes to calculate the effective target', () => {
+            const record = baseRecord({
+                threshold: 5,
+                accumulatedHits: 4,
+                testData: {
+                    threshold: {
+                        base: 5, value: 4,
+                        changes: [{ name: 'T', value: -1, type: 'add', priority: 0, enabled: true, invalidated: false, source: '' }],
+                    },
+                } as any,
+            });
+
+            assert.strictEqual(ExtendedTestRules.threshold(record), 4);
+            assert.isTrue(ExtendedTestRules.isComplete(record));
+            assert.strictEqual(ExtendedTestRules.progress(record), 100);
         });
 
         it('converts intervals to seconds, including combat rounds', () => {
@@ -517,6 +535,17 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             assert.strictEqual(updated.status, 'completed');
         });
 
+        it('resumes a completed record when its threshold is raised above its hits', async () => {
+            const record = await createRecord({ threshold: 4 });
+            await ExtendedTestFlow.update(record.id, { accumulatedHits: 4 });
+
+            await ExtendedTestFlow.update(record.id, { threshold: 5 });
+            const updated = ExtendedTestStorage.get(record.id)!;
+
+            assert.strictEqual(updated.status, 'active');
+            assert.isTrue(updated.log.some(entry => entry.action === 'resume'));
+        });
+
         it('applies a roll result onto the current record state', async () => {
             const record = await createRecord({ dicePool: 12, threshold: 40 });
 
@@ -567,6 +596,23 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             const first = ExtendedTestFlow._prepareRollData(record)!;
             assert.isUndefined(first.pool.changes.find(entry => entry.name === 'SR5.ExtendedTest'));
             assert.strictEqual(first.pool.value, 12);
+        });
+
+        it('uses an edited threshold base with the saved modifiers in the roll snapshot', async () => {
+            const record = await createRecord({ threshold: 4 });
+            record.testData = TestCreator.fromPool({ pool: 12, threshold: 10 }, {
+                showDialog: false,
+                showMessage: false,
+            }).data;
+            record.testData.threshold.changes.push({
+                name: 'Threshold modifier', value: -1, type: 'add', priority: 20,
+                enabled: true, invalidated: false, source: '',
+            });
+
+            const data = ExtendedTestFlow._prepareRollData(record)!;
+            assert.strictEqual(data.threshold.base, 4);
+            assert.lengthOf(data.threshold.changes, 1);
+            assert.strictEqual(ModifiableValue.calcTotal(data.threshold, { min: 0 }), 3);
         });
 
         it('ends a record when a roll critically glitches', async () => {

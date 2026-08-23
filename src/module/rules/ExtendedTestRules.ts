@@ -1,6 +1,7 @@
 import { TestRules } from "./TestRules";
 import { intervalToSeconds } from "../utils/timeUnits";
 import { ExtendedTestRecord } from "../types/flows/ExtendedTest";
+import { ModifiableValue } from "../mods/ModifiableValue";
 import { SR5Actor } from "../actor/SR5Actor";
 
 /**
@@ -10,6 +11,19 @@ import { SR5Actor } from "../actor/SR5Actor";
  * See SR5#48 'Extended Tests'.
  */
 export const ExtendedTestRules = {
+    /**
+     * The manager stores the source threshold; a registered test's snapshot retains the
+     * modifiers that determine the threshold actually required to complete it.
+     */
+    threshold: (record: ExtendedTestRecord): number => {
+        const threshold = record.testData?.threshold;
+        if (!threshold) return record.threshold;
+
+        const value = foundry.utils.deepClone(threshold);
+        value.base = record.threshold;
+        return ModifiableValue.calcTotal(value, { min: 0 });
+    },
+
     /**
      * Determine if the given user owns the actor associated with the record.
      */
@@ -118,7 +132,8 @@ export const ExtendedTestRules = {
      * Has the record reached its threshold?
      */
     isComplete: (record: ExtendedTestRecord): boolean => {
-        return record.threshold > 0 && record.accumulatedHits >= record.threshold;
+        const threshold = ExtendedTestRules.threshold(record);
+        return threshold > 0 && record.accumulatedHits >= threshold;
     },
 
     /**
@@ -132,15 +147,16 @@ export const ExtendedTestRules = {
      * Can another roll be made for this record?
      */
     canContinue: (record: ExtendedTestRecord): boolean => {
-        return TestRules.canExtendTest(record.threshold, record.accumulatedHits);
+        return TestRules.canExtendTest(ExtendedTestRules.threshold(record), record.accumulatedHits);
     },
 
     /**
      * Progress towards the threshold in percent. Undefined without a threshold.
      */
     progress: (record: ExtendedTestRecord): number | undefined => {
-        if (record.threshold <= 0) return undefined;
-        return Math.min(100, Math.round(record.accumulatedHits / record.threshold * 100));
+        const threshold = ExtendedTestRules.threshold(record);
+        if (threshold <= 0) return undefined;
+        return Math.min(100, Math.round(record.accumulatedHits / threshold * 100));
     },
 
     /**

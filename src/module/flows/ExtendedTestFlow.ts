@@ -163,7 +163,10 @@ export const ExtendedTestFlow = {
             // Use the pool without the cumulative modifier as a starting value.
             dicePool: test.pool.value,
             cumulativeModifier: true,
-            threshold: test.threshold.value,
+
+            // Keep the source value: the snapshot retains modifiers that determine its
+            // effective threshold on each follow-up roll.
+            threshold: test.threshold.base,
             accumulatedHits: test.extendedHits.value,
             rollCount: 1,
 
@@ -568,13 +571,17 @@ export const ExtendedTestFlow = {
         }
         if (!applied.length) return;
 
-        // Correcting hits or threshold can reach the goal on its own. Only completion is
-        // applied here: the failure paths belong to a roll, and a reactivated record would
-        // otherwise fall straight back into the critical glitch that ended it.
+        // Correcting hits or threshold can reach the goal on its own. Conversely, raising
+        // the threshold of a completed test resumes it: its former completion is no longer
+        // true. Failure paths stay attached to rolls, so a critical glitch isn't undone by
+        // an unrelated edit.
         if (record.status === 'active' && ExtendedTestRules.isComplete(record)) {
             record.status = 'completed';
             record.log.push(ExtendedTestFlow._logEntry('complete'));
             ExtendedTestFlow._notifyStatus(record);
+        } else if (record.status === 'completed' && !ExtendedTestRules.isComplete(record)) {
+            record.status = 'active';
+            record.log.push(ExtendedTestFlow._logEntry('resume'));
         }
 
         record.log.push(ExtendedTestFlow._logEntry('update', applied.join(', ')));

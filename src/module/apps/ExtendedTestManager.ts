@@ -17,6 +17,7 @@ import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicati
 
 interface ExtendedTestRowContext {
     record: ExtendedTestRecord;
+    threshold: number;
     statusLabel: string;
     visibilityLabel: string;
     actorName?: string;
@@ -314,6 +315,7 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
 
         return {
             record,
+            threshold: ExtendedTestRules.threshold(record),
             statusLabel: game.i18n.localize(`SR5.ExtendedTestManager.Status.${record.status}` as Parameters<typeof game.i18n.localize>[0]),
             visibilityLabel: game.i18n.localize(`SR5.ExtendedTestManager.Visibility.${record.permissions.visibility}` as Parameters<typeof game.i18n.localize>[0]),
             actorName: (actor as { name?: string } | null)?.name,
