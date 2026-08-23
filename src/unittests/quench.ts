@@ -16,6 +16,9 @@ import { shadowrunSR5SpriteDataPrep } from './sr5.SpriteDataPrep.spec';
 import { shadowrunSR5ICDataPrep } from './sr5.ICDataPrep.spec';
 import { shadowrunSR5VehicleDataPrep } from './sr5.VehicleDataPrep.spec';
 import { shadowrunSR5ActiveEffect } from './sr5.ActiveEffect.spec';
+import { shadowrunDynamicValueEvaluator } from './sr5.DynamicValueEvaluator.spec';
+import { shadowrunEffectDuration } from './sr5.EffectDuration.spec';
+import { shadowrunExtendedTests } from './sr5.ExtendedTest.spec';
 import { shadowrunTesting } from './sr5.Testing.spec';
 import { shadowrunInventoryFlow } from './sr5.Inventory.spec';
 import { weaponParserBaseTesting } from './sr5.WeaponParser.spec';
@@ -26,13 +29,13 @@ import { shadowrunSR5ItemDataPrep } from './sr5.ItemDataPrep.spec';
 import { shadowrunMatrixTesting } from './sr5.MatrixTesting.spec';
 import { shadowrunDriver } from './sr5.Driver.spec';
 import { shadowrunNPC } from './sr5.NPC.spec';
-import { shadowrunCombatModifierFlow } from './sr5.CombatModifierFlow.spec';
 import { itemSkillTesting } from './ItemSkill.spec';
 import { shadowrunOpposedCompileSpriteTesting } from './sr5.OpposedCompileSprite.spec';
 import { shadowrunOpposedCallInMessageActionTesting } from './sr5.OpposedCallInMessageAction.spec';
 import { actorArmorFlowTesting } from './sr5.ActorArmorFlow.spec';
 import { shadowrunDiceSoNiceTesting } from './sr5.DiceSoNice.spec';
 import { scatterRulesTesting } from './ScatterRules.spec';
+import { shadowrunDataStorage } from './sr5.DataStorage.spec';
 
 import { Quench, QuenchRegisterBatchFunction, QuenchRegisterBatchOptions } from '@ethaks/fvtt-quench';
 import { shadowrunRiggerTesting } from '@/unittests/sr5.RiggerTesting.spec';
@@ -98,6 +101,18 @@ export const quenchRegister = (quench: Quench) => {
     registerBatch(quench, 'shadowrun5e.entities.effects', shadowrunSR5ActiveEffect, {
         displayName: 'SHADOWRUN5e: SR5ActiveEffect Test',
     });
+    registerBatch(quench, 'shadowrun5e.entities.effects.duration', shadowrunEffectDuration, {
+        displayName: 'SHADOWRUN5e: ActiveEffect Duration Test',
+    });
+    registerBatch(quench, 'shadowrun5e.effect.dynamic_values', shadowrunDynamicValueEvaluator, {
+        displayName: 'SHADOWRUN5e: Dynamic Value Evaluator Test',
+    });
+    registerBatch(quench, 'shadowrun5e.flows.extended_test', shadowrunExtendedTests, {
+        displayName: 'SHADOWRUN5e: Extended Test Test',
+    });
+    registerBatch(quench, 'shadowrun5e.data.storage', shadowrunDataStorage, {
+        displayName: 'SHADOWRUN5e: DataStorage Test',
+    });
     registerBatch(quench, 'shadowrun5e.data_prep.character', shadowrunSR5CharacterDataPrep, {
         displayName: 'SHADOWRUN5e: SR5CharacterDataPreparation Test',
     });
@@ -124,9 +139,6 @@ export const quenchRegister = (quench: Quench) => {
     });
     registerBatch(quench, 'shadowrun5e.flow.driver', shadowrunDriver, {
         displayName: 'SHADOWRUN5e: Driver Flow Test',
-    });
-    registerBatch(quench, 'shadowrun5e.flow.combat_modifiers', shadowrunCombatModifierFlow, {
-        displayName: 'SHADOWRUN5e: CombatModifierFlow Test',
     });
     registerBatch(quench, 'shadowrun5e.flow.rigger', shadowrunRiggerTesting, {
         displayName: 'SHADOWRUN5e: Rigger Flow Testing',

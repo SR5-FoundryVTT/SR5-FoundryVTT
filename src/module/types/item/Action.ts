@@ -3,6 +3,7 @@ import { BaseItemData, ItemBase } from "./ItemBase";
 import { ModifiableField } from "../fields/ModifiableField";
 import { ModifiableValueLinked, BaseValuePair, ChangeList } from "../template/Base";
 import { TagifyMultiField } from '@/module/types/fields/TagifyMultiField';
+import { INTERVAL_UNITS } from '@/module/utils/timeUnits';
 const { SchemaField, NumberField, BooleanField, StringField } = foundry.data.fields;
 
 const ResultActionData = () => ({
@@ -149,7 +150,10 @@ export const ActionRollData = (
     spec: new BooleanField(),
     mod_description: new StringField({ required: true }),
     threshold: new SchemaField(BaseValuePair()),
-    extended: new BooleanField({ initial: false }),
+    extended: new SchemaField({
+        value: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
+        unit: new StringField({ required: true, initial: 'minutes', choices: INTERVAL_UNITS }),
+    }),
     modifiers: new TagifyMultiField(),
     damage: new ModifiableField(DamageData({ normal_weapon })),
     opposed: OpposedActionRollData({ opposedTest, resistTest }),

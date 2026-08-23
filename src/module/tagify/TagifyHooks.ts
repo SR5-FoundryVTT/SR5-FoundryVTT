@@ -10,12 +10,6 @@ export const TagifyHooks = {
                 const options = JSON.parse(element.getAttribute('options') ?? '[]') as TagifyValues;
 
                 createTagifyMulti(element, options, values);
-                element.addEventListener('change', (event) => {
-                    if (event.currentTarget) {
-                        const target = event.currentTarget as HTMLInputElement & { tagifyValue: string };
-                        target.setAttribute('value', target.tagifyValue);
-                    }
-                });
             }
 
             // Single-value tagify select (string fields)

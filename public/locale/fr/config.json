@@ -2,12 +2,19 @@
     "CONTROLS": {
         "SR5": {
             "EnvironmentalModifiers": "Modificateurs environnementals",
-            "OverwatchScoreTracker": "Suivi du Score de Surveillace"
+            "ExtendedTestManager": "Tests étendus",
+            "OverwatchScoreTracker": "Suivi du Score de Surveillace",
+            "SituationalModifiers": "Modificateurs situationnels",
+            "TimeControl": "Contrôle du temps"
         }
     },
     "SETTINGS": {
         "ApplyLimitsDescription": "Est-ce que des limites doivent être appliquées aux lancés",
         "ApplyLimitsName": "Appliquer des limites aux lancés",
+        "EnforceExtendedTestIntervalDescription": "N'autoriser le prochain lancer d'un test étendu qu'une fois son intervalle écoulé en temps de jeu.",
+        "EnforceExtendedTestIntervalName": "Imposer les intervalles des tests étendus",
+        "ExtendedTestDueMessageDescription": "Chuchote un message avec l'état du test et un bouton de jet à toutes les personnes autorisées à lancer, dès qu'assez de temps de jeu s'est écoulé pour le jet suivant.",
+        "ExtendedTestDueMessageName": "Messages de test étendu à poursuivre",
         "ModifyRollExpanded": "Mémoriser l'état de Modifier le lancer",
         "ModifyRollExpandedDescription": "Enregistre si la section Modifier le lancer était déployée la dernière fois et restaure cet état lors de la prochaine boîte de dialogue de test.",
         "DiagonalMovementDescription": "Comment le mouvement en diagonal doit être pris en compte quand la grille est utilisée",
@@ -30,7 +37,13 @@
         "ShowSkillsWithDetails": "Afficher plus de détails sur la liste des compétences",
         "ShowSkillsWithDetailsDescription": "L'écriture des compétences va copier celle du livre de règles (italique, noms d'attributs raccourcis)",
         "ShowTokenNameForChatOutputDescription": "Utiliser le nom de jetons pour les messages de lancés de dés au lieu du nom du personnage",
-        "ShowTokenNameForChatOutputName": "Utiliser les noms des Jetons dans les affichages de lancés dans le tchat"
+        "ShowTokenNameForChatOutputName": "Utiliser les noms des Jetons dans les affichages de lancés dans le tchat",
+        "TokenAutoRunning": "Détection automatique de la course",
+        "TokenAutoRunningDescription": "Bascule automatiquement le mode de déplacement du token en course lorsque la distance mesurée dépasse la vitesse de marche.",
+        "TokenMovementHistoryReset": "Moment de réinitialisation de l'historique de déplacement",
+        "TokenMovementHistoryResetDescription": "Choisit quand l'historique de déplacement est effacé pour les combattants pendant le combat",
+        "TokenMovementHistoryResetFirstActionPhase": "À ma première phase d'action",
+        "TokenMovementHistoryResetTurnStart": "Réinitialiser au début du tour"
     },
     "SR5": {
         "AP": "PA",
@@ -58,6 +71,92 @@
         "Actions": "Actions",
         "Active": "Active",
         "ActiveDefense": "Défense active",
+        "ActiveEffect": {
+            "ApplyTos": {
+                "TestTargetingThisActor": "Test ciblant cet acteur"
+            },
+            "ValueEditor": "Modifier la valeur du changement",
+            "FIELDS": {
+                "conditionMode": {
+                    "hint": "Inclure : le test doit correspondre à ces valeurs. Exclure : le test ne doit pas correspondre à ces valeurs."
+                },
+                "conditionType": {
+                    "hint": "Partie du test filtrée par cette condition."
+                },
+                "targetName": {
+                    "label": "Nom de la cible"
+                }
+            },
+            "AddCondition": "Ajouter une condition",
+            "AddTarget": "Ajouter une cible",
+            "AtLeastOneTarget": "Un effet doit conserver au moins une cible.",
+            "ExpiryTriggers": {
+                "CombatStart": "Début du combat",
+                "CombatEnd": "Fin du combat",
+                "TurnStart": "Début du tour",
+                "TurnEnd": "Fin du tour",
+                "MyActionStart": "Début de ma phase d'action",
+                "MyActionEnd": "Fin de ma phase d'action"
+            },
+            "Duration": {
+                "Active": "Actif",
+                "ActiveDetail": "La durée est active.",
+                "AwaitingCombatStart": "Jusqu'au début du combat",
+                "AwaitingCombatStartDetail": "Expire au début du prochain combat.",
+                "AwaitingCombatEnd": "Jusqu'à la fin du combat",
+                "AwaitingCombatEndDetail": "Expire à la fin du combat actuel.",
+                "AwaitingTurnStart": "Jusqu'au début du tour de combat",
+                "AwaitingTurnStartDetail": "Expire au début du prochain tour de combat.",
+                "AwaitingTurnEnd": "Jusqu'à la fin du tour de combat",
+                "AwaitingTurnEndDetail": "Expire à la fin du tour de combat actuel.",
+                "AwaitingMyActionStart": "Jusqu'au début de la phase d'action du propriétaire",
+                "AwaitingMyActionStartDetail": "Expire au début de la prochaine phase d'action du propriétaire.",
+                "AwaitingMyActionEnd": "Jusqu'à la fin de la phase d'action du propriétaire",
+                "AwaitingMyActionEndDetail": "Expire lorsque le propriétaire termine la phase d'action en cours.",
+                "AwaitingTrigger": "En attente du déclencheur d'expiration",
+                "AwaitingTriggerDetail": "La durée est écoulée et expirera au déclencheur configuré.",
+                "Combat": "Combat",
+                "GroupCombat": "Combat",
+                "GroupTime": "Temps",
+                "UnitTurns": "Tours de combat",
+                "CombatStart": "Tour de combat {turn}, Initiative {initiative}",
+                "CombatStartNoInitiative": "Tour de combat {turn}",
+                "CombatTurn": "{turns} tour de combat",
+                "CombatTurns": "{turns} tours de combat",
+                "DoesNotExpire": "N'expire pas",
+                "Expired": "Expiré",
+                "ExpiredDetail": "Redémarrez cet effet pour recommencer sa durée.",
+                "ExpiredOpenEditor": "Expiré — ouvrir l'éditeur d'effet",
+                "ExpiryTrigger": "Déclencheur d'expiration",
+                "Remaining": "Restant",
+                "RemainingDetail": "{remaining} restant",
+                "Restart": "Redémarrer la durée",
+                "RestartPending": "Redémarrage prêt",
+                "RestartPendingDetail": "La durée redémarrera lorsque les modifications seront enregistrées.",
+                "ExpiryAction": "Action à l'expiration",
+                "ExpiryActionDefault": "Par défaut ({action})",
+                "ExpiryActionDelete": "Supprimer",
+                "ExpiryActionUpdate": "Mettre à jour",
+                "Status": "Statut",
+                "Units": "Unités de durée",
+                "Value": "Durée"
+            },
+            "FilterTypes": {
+                "Attributes": "Attributs",
+                "Categories": "Catégories d'action",
+                "Limits": "Limites",
+                "Skills": "Compétences",
+                "Tests": "Tests"
+            },
+            "RemoveCondition": "Retirer la condition",
+            "RemoveTarget": "Retirer la cible",
+            "SelectionModes": {
+                "Exclude": "Exclure",
+                "Include": "Inclure"
+            },
+            "Target": "Cible",
+            "Targets": "Cibles"
+        },
         "ActiveSkills": "Compétence Active",
         "ActorTypes": {
             "Character": "Personnage",
@@ -85,28 +184,52 @@
             "FIELDS": {
                 "armor": {
                     "accessory": {
-                        "hint": "If this Armor is an Accessory (adds its value to the actor's base Armor)",
-                        "label": "Accessory"
+                        "hint": "Si cette Armure est un Accessoire (ajoute sa valeur au Blindage de base de l'acteur)",
+                        "label": "Accessoire"
+                    },
+                    "acid": {
+                        "hint": "Blindage supplémentaire contre les attaques à l'Acide",
+                        "label": "Résistance à l'acide"
+                    },
+                    "cold": {
+                        "hint": "Blindage supplémentaire contre les attaques de Froid",
+                        "label": "Isolation"
+                    },
+                    "electricity": {
+                        "hint": "Blindage supplémentaire contre les attaques d'Électricité",
+                        "label": "Non-conductivité"
+                    },
+                    "fire": {
+                        "hint": "Blindage supplémentaire contre les attaques de Feu",
+                        "label": "Résistance au feu"
                     },
                     "hardened": {
-                        "hint": "Si cette armure est renforcee",
-                        "label": "Armure renforcee"
-                    },
-                    "is_hardened": {
-                        "hint": "Si cette armure accorde une protection renforcee",
-                        "label": "Renforcee active"
+                        "hint": "Si cette armure est renforcée",
+                        "label": "Armure renforcée"
                     },
                     "immunities": {
-                        "hint": "Damage sources this armor grants Immunity against",
-                        "label": "Immunities"
+                        "hint": "Sources de dégâts contre lesquelles cette armure accorde l'Immunité",
+                        "label": "Immunités"
+                    },
+                    "is_hardened": {
+                        "hint": "Si cette armure accorde une protection renforcée",
+                        "label": "Renforcée active"
                     },
                     "pollutant": {
-                        "hint": "Extra Armor against attacks with Pollutant",
-                        "label": "Chemical Protection"
+                        "hint": "Blindage supplémentaire contre les attaques de Polluants",
+                        "label": "Protection chimique"
+                    },
+                    "radiation": {
+                        "hint": "Blindage supplémentaire contre les attaques de Radiations",
+                        "label": "Résistance aux radiations"
+                    },
+                    "value": {
+                        "hint": "Quantité de Blindage que cet objet fournit",
+                        "label": "Valeur Blindage"
                     },
                     "water": {
-                        "hint": "Extra Armor against attacks with Water",
-                        "label": "Water Protection"
+                        "hint": "Blindage supplémentaire contre les attaques d'Eau",
+                        "label": "Protection contre l'eau"
                     }
                 }
             },
@@ -121,6 +244,7 @@
         "ArmorValue": "Valeur Blindage",
         "AstralDice": "Dés init. Astral",
         "AstralInit": "Init. Astral",
+        "Attack": "Attaque",
         "AttackerHits": "Succès de l'attaquant",
         "AttrAgility": "Agilité",
         "AttrBody": "Constitution",
@@ -259,7 +383,8 @@
             "Types": {
                 "Mana": "Mana",
                 "Physical": "Physique"
-            }
+            },
+            "OptionalSelectionCount": "Pouvoirs optionnels"
         },
         "Cyberware": "Cyberware",
         "CyberwareGrade": "Gamme",
@@ -395,6 +520,128 @@
         "ExpandAll": "Étendre Tout",
         "Extended": "Étendu",
         "ExtendedTest": "Test étendu",
+        "ExtendedTestManager": {
+            "Actions": {
+                "Cancel": "Annuler le test",
+                "Complete": "Marquer comme terminé",
+                "Delete": "Supprimer",
+                "Edit": "Modifier",
+                "Pause": "Mettre en pause",
+                "Reactivate": "Réactiver le test",
+                "Resume": "Reprendre",
+                "Roll": "Lancer"
+            },
+            "ActivityLog": "Journal d'activité",
+            "Actor": "Acteur",
+            "AdvanceTime": "Avancer le temps de jeu à chaque lancer",
+            "AdvanceTimeTooltip": "Avance le temps du monde de l'intervalle du test après chaque lancer.",
+            "CanEdit": "Modifier",
+            "CanRoll": "Lancer",
+            "CanView": "Voir",
+            "ConfirmCancel": "Annuler le test étendu \"{name}\" ? Cela met fin au test, mais un MJ pourra le réactiver.",
+            "ConfirmDelete": "Supprimer le test étendu « {name} » ?",
+            "CreateTest": "Nouveau test étendu",
+            "Creator": "Créé par",
+            "CumulativeModifier": "Modificateur cumulatif de -1 à la réserve de dés",
+            "CumulativeModifierTooltip": "Réduit la réserve de dés de 1 à chaque lancer effectué. SR5 p. 48.",
+            "Due": "Échéance",
+            "DueTooltip": "Intervalles de temps de jeu écoulés depuis le dernier lancer",
+            "DueMessage": {
+                "Header": "Test étendu prêt à poursuivre",
+                "OpenManager": "Ouvrir le gestionnaire",
+                "Overdue": "{count} intervalles écoulés",
+                "Rolls": "Jets"
+            },
+            "EditTest": "Modifier le test étendu",
+            "Filters": {
+                "Actor": "Acteur",
+                "Advanced": "Plus de filtres",
+                "AllActors": "Tous les acteurs",
+                "AllStatuses": "Tous les statuts",
+                "AllVisibilities": "Public et privé",
+                "Created": "Créé depuis",
+                "Mine": "Seulement les miens",
+                "Private": "Privé",
+                "Search": "Rechercher un nom ou des notes...",
+                "Status": "Statut",
+                "Updated": "Mis à jour depuis",
+                "Visibility": "Visibilité"
+            },
+            "GameTime": "Temps de jeu",
+            "Interval": "Intervalle",
+            "LastUpdate": "Dernière mise à jour",
+            "Log": {
+                "cancel": "Annulé",
+                "complete": "Terminé",
+                "create": "Créé",
+                "fail": "Échoué",
+                "pause": "Mis en pause",
+                "resume": "Repris",
+                "roll": "Lancé",
+                "update": "Mis à jour"
+            },
+            "Name": "Nom",
+            "NewTest": "Test étendu",
+            "NoActor": "Aucun",
+            "NoTests": "Aucun test étendu à afficher.",
+            "Notes": "Notes",
+            "NotesPlaceholder": "Texte libre sur ce test. Recherchable.",
+            "Notifications": {
+                "Completed": "Test étendu « {name} » terminé !",
+                "Failed": "Test étendu « {name} » échoué : la réserve de dés est épuisée.",
+                "NoEditPermission": "Vous n'êtes pas autorisé à modifier ce test étendu.",
+                "NoRollPermission": "Vous n'êtes pas autorisé à lancer ce test étendu.",
+                "NotActive": "Ce test étendu n'est pas actif. Reprenez-le ou réactivez-le d'abord.",
+                "NotDue": "Il ne s'est pas écoulé assez de temps de jeu pour le prochain lancer de ce test étendu.",
+                "Registered": "Le test étendu « {name} » est désormais suivi dans le gestionnaire de tests étendus."
+            },
+            "OpenMessage": "Ouvrir le message de chat",
+            "Periods": {
+                "any": "N'importe quand",
+                "day": "Dernier jour",
+                "hour": "Dernière heure",
+                "month": "Dernier mois",
+                "week": "Dernière semaine"
+            },
+            "PoolUsed": "Réserve",
+            "RealTime": "Temps réel",
+            "Rolls": "Lancers effectués",
+            "SaveTest": "Enregistrer",
+            "SectionDetails": "Détails",
+            "SectionRules": "Règles",
+            "Sort": {
+                "accumulatedHits": "Succès accumulés",
+                "createdAt": "Créé",
+                "createdWorldTime": "Début (temps de jeu)",
+                "interval": "Intervalle",
+                "name": "Nom",
+                "progress": "Progression",
+                "rollCount": "Lancers",
+                "status": "Statut",
+                "threshold": "Seuil",
+                "updatedAt": "Mis à jour"
+            },
+            "SortBy": "Trier par",
+            "SortDirection": "Inverser le sens du tri",
+            "StartedGameTime": "Commencé (temps de jeu)",
+            "Status": {
+                "active": "Actif",
+                "cancelled": "Annulé",
+                "completed": "Terminé",
+                "failed": "Échoué",
+                "paused": "En pause"
+            },
+            "Title": "Tests étendus",
+            "User": "Utilisateur",
+            "UserPermissions": "Permissions des utilisateurs",
+            "UserPermissionsHint": "Les MJ, le créateur et les propriétaires de l'acteur lié ont toujours un accès complet. Les cases de visualisation ne s'appliquent qu'avec la visibilité « Utilisateurs sélectionnés ».",
+            "Visibility": {
+                "gmAndOwner": "MJ et propriétaire",
+                "gmOnly": "MJ uniquement",
+                "public": "Public",
+                "selectedUsers": "Utilisateurs sélectionnés"
+            }
+        },
         "Fade": "Technodrain",
         "FadeValue": "Valeur de technodrain",
         "Filter": "Filtre",
@@ -426,15 +673,173 @@
         "Item": {
             "FIELDS": {
                 "action": {
+                    "armor": {
+                        "hint": "Si le Blindage de l'acteur doit être ajouté au test",
+                        "label": "Blindage"
+                    },
+                    "attribute": {
+                        "hint": "L'Attribut utilisé par le test",
+                        "label": "Attribut"
+                    },
+                    "attribute2": {
+                        "hint": "L'Autre Attribut utilisé par ce test",
+                        "label": "Autre Attribut"
+                    },
+                    "categories": {
+                        "hint": "Catégories d'Action que ce test intègre. Ces actions peuvent être ciblées par des Effets Actifs",
+                        "label": "Catégories"
+                    },
                     "damage": {
+                        "ap": {
+                            "attribute": {
+                                "hint": "Attribut à utiliser dans le calcul de la PA",
+                                "label": "Attribut de PA"
+                            },
+                            "base": {
+                                "hint": "Pénétration d'Armure des Dégâts",
+                                "label": "PA"
+                            },
+                            "base_formula_operator": {
+                                "hint": "Comment la valeur de base de PA doit affecter l'Attribut",
+                                "label": "Opérateur"
+                            }
+                        },
+                        "attribute": {
+                            "hint": "Attribut à utiliser dans le calcul des Dégâts",
+                            "label": "Attribut de Dégâts"
+                        },
+                        "base": {
+                            "hint": "Le montant de base des Dégâts infligés par cette action",
+                            "label": "Dégâts de Base"
+                        },
+                        "base_formula_operator": {
+                            "hint": "Comment la valeur de base des Dégâts doit affecter l'Attribut",
+                            "label": "Opérateur"
+                        },
+                        "biofeedback": {
+                            "hint": "Si cette action inflige également des dégâts de Biofeedback. Ceci peut être ciblé par des Effets Actifs",
+                            "label": "Biofeedback"
+                        },
+                        "element": {
+                            "base": {
+                                "hint": "L'Élément du type de dégâts. Laisser vide pour aucun élément.",
+                                "label": "Élément"
+                            }
+                        },
                         "normal_weapon": {
-                            "hint": "If this damage is considered a normal (non-magical) weapon attack",
-                            "label": "Normal Weapon"
+                            "hint": "Si ces dégâts sont considérés comme une attaque d'arme normale (non magique)",
+                            "label": "Arme Normale"
+                        },
+                        "type": {
+                            "base": {
+                                "hint": "Type de Dégâts infligés par cette action",
+                                "label": "Type de Dégâts"
+                            }
+                        }
+                    },
+                    "extended": {
+                        "hint": "Temps de jeu entre les jets de cette action étendue. Zéro la lance comme un test normal.",
+                        "label": "Test étendu",
+                        "unit": {
+                            "hint": "Unité de temps de l'intervalle du test étendu.",
+                            "label": "Unité d'intervalle"
+                        },
+                        "value": {
+                            "hint": "Temps de jeu entre les jets. Zéro lance ce test comme un test normal, non étendu.",
+                            "label": "Intervalle"
                         }
                     },
                     "initiative_mod": {
                         "hint": "Modificateur d'initiative appliqué lors de l'exécution de cette action",
                         "label": "Modificateur d'Initiative"
+                    },
+                    "limit": {
+                        "attribute": {
+                            "hint": "La Limite spécifique de l'Acteur utilisée pour le test.",
+                            "label": "Limite"
+                        },
+                        "base": {
+                            "hint": "Valeur de Limite utilisée pour le test. Elle est ajoutée si une limite spécifique est sélectionnée",
+                            "label": "Valeur de Limite"
+                        }
+                    },
+                    "mod": {
+                        "hint": "Tout modificateur appliqué au test",
+                        "label": "Modificateur"
+                    },
+                    "modifiers": {
+                        "hint": "Modificateurs d'Action qui affectent ce test.",
+                        "label": "Modificateurs"
+                    },
+                    "opposed": {
+                        "armor": {
+                            "hint": "Si le Blindage de l'acteur doit être ajouté au Test opposé",
+                            "label": "Blindage"
+                        },
+                        "attribute": {
+                            "hint": "L'Attribut utilisé par le Test opposé",
+                            "label": "Attribut"
+                        },
+                        "attribute2": {
+                            "hint": "L'Autre Attribut utilisé par ce Test opposé",
+                            "label": "Autre Attribut"
+                        },
+                        "mod": {
+                            "hint": "Tout modificateur appliqué au Test opposé",
+                            "label": "Modificateur"
+                        },
+                        "resist": {
+                            "armor": {
+                                "hint": "Si le Blindage de l'acteur doit être ajouté au Test de résistance",
+                                "label": "Blindage"
+                            },
+                            "attribute": {
+                                "hint": "L'Attribut utilisé par le Test de résistance",
+                                "label": "Attribut"
+                            },
+                            "attribute2": {
+                                "hint": "L'Autre Attribut utilisé par ce Test de résistance",
+                                "label": "Autre Attribut"
+                            },
+                            "test": {
+                                "hint": "Test que la cible effectue pour résister aux dégâts après le Test opposé",
+                                "label": "Test de résistance"
+                            }
+                        },
+                        "skill": {
+                            "hint": "Compétence utilisée par le Test opposé. Laisser vide si aucune compétence n'est utilisée",
+                            "label": "Compétence"
+                        },
+                        "test": {
+                            "hint": "Le Test que la cible de l'action doit effectuer",
+                            "label": "Test opposé"
+                        }
+                    },
+                    "roll_mode": {
+                        "hint": "Le Mode lancer de dés du test. Laisser vide pour utiliser le Mode lancer de dés sélectionné par l'utilisateur",
+                        "label": "Mode lancer de dés"
+                    },
+                    "skill": {
+                        "hint": "Compétence utilisée par cette action. Laisser vide si aucune compétence n'est utilisée",
+                        "label": "Compétence"
+                    },
+                    "spec": {
+                        "hint": "Si le modificateur de spécialisation de compétence (+2) doit être appliqué à ce test",
+                        "label": "Spécialisé"
+                    },
+                    "test": {
+                        "hint": "Type spécifique de test à utiliser pour cette Action",
+                        "label": "Type de Test"
+                    },
+                    "threshold": {
+                        "base": {
+                            "hint": "Le Seuil que le test doit atteindre",
+                            "label": "Valeur de Seuil"
+                        }
+                    },
+                    "type": {
+                        "hint": "Type d'action que cette compétence utilise",
+                        "label": "Type d'Action"
                     }
                 }
             }
@@ -916,7 +1321,9 @@
                 "Watcher": "Beobachterin",
                 "Worker": "Insecte Ouvrier",
                 "Wraith": "Spectre"
-            }
+            },
+            "ForceAppliesSetting": "Force applicable à",
+            "ForceAppliesSettingHint": "Détermine quels attributs de l'esprit reçoivent le bonus de Force."
         },
         "Sprite": {
             "Level": "Niveau",
@@ -974,6 +1381,35 @@
         "Temporary": "Temporaire",
         "TemporaryModifiers": "Modificateurs temporaires",
         "Test": "Test",
+        "TimeControl": {
+            "Advance": "Avancer",
+            "Amount": "Quantité",
+            "Apply": "Appliquer",
+            "CustomAmount": "Valeur personnalisée",
+            "CustomMinutes": "min",
+            "CustomMinutesTooltip": "Avancer le temps du monde d'un nombre de minutes personnalisé",
+            "Day": "Jour",
+            "GmOnly": "Seuls les MJ peuvent modifier le temps du monde.",
+            "Hour": "Heure",
+            "Minute": "Minute",
+            "Month": "Mois",
+            "Presets": {
+                "CombatTurn": "Tour de combat",
+                "Day": "1 jour",
+                "Header": "Avance rapide",
+                "Hour": "1 heure",
+                "Minute": "1 minute",
+                "TenMinutes": "10 minutes",
+                "Week": "1 semaine"
+            },
+            "Preview": "Aperçu",
+            "Rewind": "Reculer",
+            "Second": "Seconde",
+            "SetTime": "Définir la date et l'heure",
+            "Title": "Contrôle du temps",
+            "Unit": "Unité",
+            "Year": "Année"
+        },
         "ToggleBreakdown": "Afficher/masquer le détail",
         "ToggleEquip": "(Des)équiper",
         "Top": "Coté",
@@ -1050,7 +1486,8 @@
             "RitualNotConcluded": "Le Rituel a échoué. En attente du jeu du rituel pour déterminer le drain.",
             "RitualNotEnoughReagents": "Pas assez de réactifs offerts.",
             "SkillCantBeDefault": "Cette compétence ne peut pas être lancée sans l'avoir apprise",
-            "TokenSelectionNeeded": "Un ou plusieurs jetons doivent être selectionnés"
+            "TokenSelectionNeeded": "Un ou plusieurs jetons doivent être selectionnés",
+            "NoActorCreatePermission": "Vous n'avez pas la permission de créer des acteurs."
         },
         "Tooltips": {
             "RangedAttack": {
@@ -1060,11 +1497,18 @@
             },
             "Test": {
                 "BuyHits": "Ne lance pas de dés. Achète des succès avec ⌊réserve de dés / 4⌋.",
+                "ExtendedInterval": "Temps de jeu entre les lancers. Zéro lance le test comme un test normal, non étendu.",
                 "ResultOverrideGlitches": "Remplace les glitches pour ce résultat de test.",
                 "ResultOverrideHits": "Remplace les succès pour ce résultat de test."
             },
             "Effect": {
-                "HelpLinkEnglishOnly": "Help (External link, English only)"
+                "HelpLinkEnglishOnly": "Help (External link, English only)",
+                "OpenValueEditor": "Ouvrir l'éditeur de valeur",
+                "ApplyValueEditor": "Appliquer la modification de valeur",
+                "CancelValueEditor": "Annuler la modification de valeur"
+            },
+            "SummoningTest": {
+                "OptionalPowerCount": "Compteur informatif des pouvoirs optionnels de l'esprit (plancher(force / 3))."
             }
         },
         "Weapon": {
@@ -1131,6 +1575,10 @@
         "Wireless": "Sans fil",
         "WoundModifier": "Mod. de blessures",
         "WoundTolerance": "Tolérance blessures",
-        "Wounds": "Blessures"
+        "Wounds": "Blessures",
+        "StatusEffects": {
+            "Running": "Course",
+            "Sprinting": "Sprint"
+        }
     }
 }

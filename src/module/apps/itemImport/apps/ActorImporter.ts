@@ -4,6 +4,7 @@ import { SpriteImporter } from "../../actorImport/spriteImporter/SpriteImporter"
 import { ActorFile, ActorSchema } from "../../actorImport/ActorSchema";
 import { ImporterSourcesConfig } from "./ImporterSourcesConfig";
 import { ImportHelper as IH } from "../helper/ImportHelper";
+import { FolderSelectOption, folderSelectOptions } from "../../../utils/folderOptions";
 
 const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api
 
@@ -23,14 +24,13 @@ const IMPORT_FIELDS = [
 
 type ImportField = (typeof IMPORT_FIELDS)[number];
 type ImportSelections = Record<ImportField, boolean>;
-type FolderContext = { id: string, name: string, selected: boolean };
 
 const DEFAULT_IMPORT_SELECTIONS = Object.fromEntries(
     IMPORT_FIELDS.map((field) => [field, true])
 ) as ImportSelections;
 
 interface ImporterContext extends foundry.applications.api.ApplicationV2.RenderContext {
-    folders: FolderContext[]
+    folders: FolderSelectOption[]
     canUploadFiles: boolean
     hasSelectedFile: boolean
     selectedFileName: string | null
@@ -129,7 +129,7 @@ export class ActorImporter extends BaseClass {
             canUploadFiles,
             isImporting: this.isImporting,
             pastedJsonText: this.pastedJsonText,
-            folders: this.prepareFolderContext(),
+            folders: folderSelectOptions("Actor", this.selectedFolderId),
             hasSelectedFile: this.selectedJsonFile !== null,
             selectedFileName: this.selectedJsonFile?.name ?? null,
             selectedFileSize: this.selectedJsonFile ? this.formatFileSize(this.selectedJsonFile.size) : null,
@@ -225,26 +225,6 @@ export class ActorImporter extends BaseClass {
                 await this.render();
             }
         }
-    }
-
-    private prepareFolderContext(): FolderContext[] {
-        const compareOptions = { numeric: true, sensitivity: 'base' } satisfies Intl.CollatorOptions;
-        return game.folders
-            .filter(folder => folder.type === "Actor")
-            .map(folder => ({
-                id: folder.id,
-                name: `${'─'.repeat(folder.ancestors.length) + ' '}${folder.name}`.trim(),
-                sortKey: [...folder.ancestors].reverse().map(ancestor => ancestor.name).concat(folder.name)
-            }))
-            .sort((a, b) => {
-                const len = Math.min(a.sortKey.length, b.sortKey.length);
-                for (let i = 0; i < len; i++) {
-                    const cmp = a.sortKey[i].localeCompare(b.sortKey[i], undefined, compareOptions);
-                    if (cmp !== 0) return cmp;
-                }
-                return a.sortKey.length - b.sortKey.length;
-            })
-            .map(({ id, name }) => ({ id, name, selected: id === this.selectedFolderId }));
     }
 
     private parseActorData(jsonText: string): ActorSchema | null {

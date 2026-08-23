@@ -111,7 +111,7 @@ export class ActionFlow {
      * @returns Sorted list of skills with a name : label key-value structure for select elements on sheets.
      */
     static sortedActiveSkills(actor?: SR5Actor, skillNames?: string[]) {
-        // CASE - Return default skills whenn no local actor skills are used.
+        // CASE - Return default skills when no local actor skills are used.
         //        The major use case is the sidebar item creation, where no actor is available.
         if (!actor || actor.isType('ic')) {
             // Inject this items custom skill into the global skill list.

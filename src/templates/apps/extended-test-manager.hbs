@@ -1,0 +1,276 @@
+<div class="extended-test-manager-app">
+    {{#if isGM}}
+    <div class="etm-time-strip">
+        <span class="etm-time-current">
+            <i class="far fa-clock" aria-hidden="true"></i>
+            {{currentTime}}
+        </span>
+        <span class="etm-time-presets">
+            {{#each timePresets}}
+            <button type="button" data-action="timePreset" data-seconds="{{this.seconds}}"
+                data-tooltip="SR5.TimeControl.Advance">+{{this.label}}</button>
+            {{/each}}
+        </span>
+    </div>
+    {{/if}}
+
+    <div class="etm-toolbar">
+        <div class="etm-filters">
+            <input type="search" data-filter="search" name="filter-search" value="{{filters.search}}"
+                placeholder="{{localize 'SR5.ExtendedTestManager.Filters.Search'}}"/>
+            <select data-filter="status" name="filter-status" aria-label="{{localize 'SR5.ExtendedTestManager.Filters.Status'}}">
+                {{#each statusOptions}}
+                <option value="{{this.value}}" {{#if (eq this.value ../filters.status)}}selected{{/if}}>{{this.label}}</option>
+                {{/each}}
+            </select>
+            <label class="etm-mine-filter">
+                <input type="checkbox" data-filter="mine" name="filter-mine" {{#if filters.mine}}checked{{/if}}/>
+                {{localize "SR5.ExtendedTestManager.Filters.Mine"}}
+            </label>
+        </div>
+        <div class="etm-sort">
+            <select data-filter="sortBy" name="filter-sortBy" aria-label="{{localize 'SR5.ExtendedTestManager.SortBy'}}">
+                {{#each sortOptions}}
+                <option value="{{this.value}}" {{#if (eq this.value ../filters.sortBy)}}selected{{/if}}>{{this.label}}</option>
+                {{/each}}
+            </select>
+            <button type="button" data-action="toggleSortDir" data-tooltip="SR5.ExtendedTestManager.SortDirection">
+                <i class="fas {{#if (eq filters.sortDir 'asc')}}fa-sort-amount-up{{else}}fa-sort-amount-down{{/if}}"></i>
+            </button>
+            <button type="button" data-action="createTest">
+                <i class="fas fa-plus"></i>
+                {{localize "SR5.ExtendedTestManager.CreateTest"}}
+            </button>
+        </div>
+    </div>
+
+    {{! The rarely changed filters, collapsed by default. data-sync keeps the open state across renders. }}
+    <details class="etm-advanced-filters" data-sync="filters" {{#if advancedFilterCount}}open{{/if}}>
+        <summary>
+            <i class="fas fa-caret-right" aria-hidden="true"></i>
+            {{localize "SR5.ExtendedTestManager.Filters.Advanced"}}
+            {{#if advancedFilterCount}}<span class="etm-filter-count">{{advancedFilterCount}}</span>{{/if}}
+        </summary>
+        <div class="etm-advanced-filter-fields">
+            <label>{{localize "SR5.ExtendedTestManager.Filters.Actor"}}
+                <select data-filter="actorUuid" name="filter-actorUuid">
+                    <option value="">{{localize "SR5.ExtendedTestManager.Filters.AllActors"}}</option>
+                    {{! Folder headers are disabled options, see utils/folderOptions. }}
+                    {{#each actorOptions}}
+                    <option value="{{this.value}}" {{#if this.disabled}}disabled class="folder-option"{{/if}}
+                        {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+                    {{/each}}
+                </select>
+            </label>
+            <label>{{localize "SR5.ExtendedTestManager.Filters.Visibility"}}
+                <select data-filter="visibility" name="filter-visibility">
+                    <option value="all" {{#if (eq filters.visibility "all")}}selected{{/if}}>{{localize "SR5.ExtendedTestManager.Filters.AllVisibilities"}}</option>
+                    <option value="public" {{#if (eq filters.visibility "public")}}selected{{/if}}>{{localize "SR5.ExtendedTestManager.Visibility.public"}}</option>
+                    <option value="private" {{#if (eq filters.visibility "private")}}selected{{/if}}>{{localize "SR5.ExtendedTestManager.Filters.Private"}}</option>
+                </select>
+            </label>
+            <label>{{localize "SR5.ExtendedTestManager.Filters.Created"}}
+                <select data-filter="createdWithin" name="filter-createdWithin">
+                    {{#each periodOptions}}
+                    <option value="{{this.value}}" {{#if (eq this.value ../filters.createdWithin)}}selected{{/if}}>{{this.label}}</option>
+                    {{/each}}
+                </select>
+            </label>
+            <label>{{localize "SR5.ExtendedTestManager.Filters.Updated"}}
+                <select data-filter="updatedWithin" name="filter-updatedWithin">
+                    {{#each periodOptions}}
+                    <option value="{{this.value}}" {{#if (eq this.value ../filters.updatedWithin)}}selected{{/if}}>{{this.label}}</option>
+                    {{/each}}
+                </select>
+            </label>
+        </div>
+    </details>
+
+    <div class="etm-list scroll-area">
+        {{#each rows}}
+        <div class="etm-row status-{{this.record.status}}" data-record-id="{{this.record.id}}">
+            <div class="etm-row-main">
+                <div class="etm-row-info">
+                    <a class="etm-row-name" data-action="toggleDetails">
+                        <i class="fas {{#if this.expanded}}fa-chevron-down{{else}}fa-chevron-right{{/if}}"></i>
+                        {{this.record.name}}
+                    </a>
+                    <div class="etm-row-meta">
+                        <span class="etm-status etm-status-{{this.record.status}}">{{this.statusLabel}}</span>
+                        {{#if this.isDue}}
+                        <span class="etm-due" data-tooltip="SR5.ExtendedTestManager.DueTooltip">
+                            {{localize "SR5.ExtendedTestManager.Due"}} ({{this.intervalsElapsed}})
+                        </span>
+                        {{/if}}
+                        {{#if this.actorName}}
+                        <a data-action="openActor">
+                            <i class="fas fa-user"></i> {{this.actorName}}
+                        </a>
+                        {{/if}}
+                        <span data-tooltip="SR5.ExtendedTestManager.Creator">
+                            <i class="fas fa-user-pen"></i> {{this.creatorName}}
+                        </span>
+                        <span data-tooltip="SR5.ExtendedTestManager.Filters.Visibility">
+                            <i class="fas fa-eye"></i> {{this.visibilityLabel}}
+                        </span>
+                    </div>
+                </div>
+
+                {{! Every value sits in its own fixed grid track, so numbers line up across rows. }}
+                <div class="etm-row-values">
+                    <div class="etm-progress">
+                        <div class="etm-progress-text">
+                            {{this.record.accumulatedHits}}{{#if this.record.threshold}} / {{this.record.threshold}}{{/if}}
+                            {{localize "SR5.Hits"}}
+                        </div>
+                        {{! Always rendered, hidden without a threshold, to keep row heights equal. }}
+                        <progress max="100" value="{{#if this.record.threshold}}{{this.progress}}{{else}}0{{/if}}"
+                            class="{{#unless this.record.threshold}}is-placeholder{{/unless}}"></progress>
+                    </div>
+                    <span class="etm-value" data-tooltip="SR5.ExtendedTestManager.Interval">
+                        <i class="fas fa-hourglass-half"></i>
+                        <span class="etm-value-number">{{this.record.interval.value}}</span>
+                        <span class="etm-value-unit">{{this.intervalUnitLabel}}</span>
+                    </span>
+                    <span class="etm-value" data-tooltip="SR5.ExtendedTestManager.Rolls">
+                        <i class="fas fa-rotate"></i> <span class="etm-value-number">{{this.record.rollCount}}</span>
+                    </span>
+                </div>
+
+                {{! A slot some row can fill is reserved on every row, so the icons form
+                    columns. A slot no row can fill isn't rendered at all. }}
+                <div class="etm-row-actions">
+                    {{#if @root.actionColumns.roll}}
+                    {{#if this.canRoll}}
+                    <a data-action="rollTest" data-tooltip="SR5.ExtendedTestManager.Actions.Roll"><i class="fas fa-dice"></i></a>
+                    {{else if this.rollBlockedByInterval}}
+                    <span class="etm-action-disabled" data-tooltip="SR5.ExtendedTestManager.Notifications.NotDue">
+                        <i class="fas fa-dice"></i>
+                    </span>
+                    {{else if this.canReactivate}}
+                    <a data-action="reactivateTest" data-tooltip="SR5.ExtendedTestManager.Actions.Reactivate">
+                        <i class="fas fa-rotate-left"></i>
+                    </a>
+                    {{else}}
+                    <span class="etm-action-empty"></span>
+                    {{/if}}
+                    {{/if}}
+
+                    {{#if @root.actionColumns.pauseResume}}
+                    {{#if this.canPauseResume}}
+                        {{#if this.isPaused}}
+                        <a data-action="resumeTest" data-tooltip="SR5.ExtendedTestManager.Actions.Resume"><i class="fas fa-play"></i></a>
+                        {{else}}
+                        <a data-action="pauseTest" data-tooltip="SR5.ExtendedTestManager.Actions.Pause"><i class="fas fa-pause"></i></a>
+                        {{/if}}
+                    {{else}}
+                    <span class="etm-action-empty"></span>
+                    {{/if}}
+                    {{/if}}
+
+                    {{#if @root.actionColumns.end}}
+                    {{#if this.canEnd}}
+                    <a data-action="completeTest" data-tooltip="SR5.ExtendedTestManager.Actions.Complete"><i class="fas fa-check"></i></a>
+                    <a data-action="cancelTest" data-tooltip="SR5.ExtendedTestManager.Actions.Cancel"><i class="fas fa-ban"></i></a>
+                    {{else}}
+                    <span class="etm-action-empty"></span>
+                    <span class="etm-action-empty"></span>
+                    {{/if}}
+                    {{/if}}
+
+                    {{#if @root.actionColumns.edit}}
+                    {{#if this.canEdit}}
+                    <a data-action="editTest" data-tooltip="SR5.ExtendedTestManager.Actions.Edit"><i class="fas fa-edit"></i></a>
+                    {{else}}
+                    <span class="etm-action-empty"></span>
+                    {{/if}}
+                    {{/if}}
+
+                    {{#if @root.actionColumns.delete}}
+                    {{#if this.canDelete}}
+                    <a data-action="deleteTest" data-tooltip="SR5.ExtendedTestManager.Actions.Delete"><i class="fas fa-trash"></i></a>
+                    {{else}}
+                    <span class="etm-action-empty"></span>
+                    {{/if}}
+                    {{/if}}
+                </div>
+            </div>
+
+            {{#if this.expanded}}
+            <div class="etm-row-details">
+                {{#if this.record.notes}}
+                <p class="etm-notes"><strong>{{localize "SR5.ExtendedTestManager.Notes"}}:</strong> {{this.record.notes}}</p>
+                {{/if}}
+                <div class="etm-detail-meta">
+                    <span><strong>{{localize "SR5.ExtendedTestManager.StartedGameTime"}}:</strong> {{this.createdGameTime}}</span>
+                    <span><strong>{{localize "SR5.ExtendedTestManager.LastUpdate"}}:</strong> {{this.updatedRealTime}}</span>
+                </div>
+
+                {{#if this.rolls.length}}
+                <table class="etm-roll-history">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>{{localize "SR5.Hits"}}</th>
+                            <th>{{localize "SR5.ExtendedTestManager.PoolUsed"}}</th>
+                            <th>{{localize "SR5.Glitch"}}</th>
+                            <th>{{localize "SR5.ExtendedTestManager.GameTime"}}</th>
+                            <th>{{localize "SR5.ExtendedTestManager.RealTime"}}</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each this.rolls}}
+                        <tr>
+                            <td>{{this.index}}</td>
+                            <td>{{this.hits}}</td>
+                            <td>{{this.poolUsed}}</td>
+                            <td>
+                                {{#if this.criticalGlitch}}
+                                <i class="fas fa-skull" data-tooltip="SR5.GlitchCritical"></i>
+                                {{else if this.glitch}}
+                                <i class="fas fa-bolt" data-tooltip="SR5.Glitch"></i>
+                                {{/if}}
+                            </td>
+                            <td>{{this.gameTime}}</td>
+                            <td>{{this.realTime}}</td>
+                            <td>
+                                {{#if this.messageUuid}}
+                                <a data-action="openMessage" data-message-uuid="{{this.messageUuid}}"
+                                    data-tooltip="SR5.ExtendedTestManager.OpenMessage">
+                                    <i class="fas fa-comment"></i>
+                                </a>
+                                {{/if}}
+                            </td>
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+                {{/if}}
+
+                {{! Collapsed by default; the log grows without bound and is rarely the reason to expand a row. }}
+                {{#if this.log.length}}
+                <details class="etm-log" data-sync="log-{{this.record.id}}">
+                    <summary>
+                        <i class="fas fa-caret-right" aria-hidden="true"></i>
+                        {{localize "SR5.ExtendedTestManager.ActivityLog"}}
+                        <span class="etm-log-count">{{this.log.length}}</span>
+                    </summary>
+                    {{#each this.log}}
+                    <div class="etm-log-entry">
+                        <span class="etm-log-action">{{this.actionLabel}}</span>
+                        {{#if this.detail}}<span class="etm-log-detail">({{this.detail}})</span>{{/if}}
+                        <span class="etm-log-user">{{this.userName}}</span>
+                        <span class="etm-log-time">{{this.realTime}}</span>
+                    </div>
+                    {{/each}}
+                </details>
+                {{/if}}
+            </div>
+            {{/if}}
+        </div>
+        {{else}}
+        <p class="etm-empty">{{localize "SR5.ExtendedTestManager.NoTests"}}</p>
+        {{/each}}
+    </div>
+</div>

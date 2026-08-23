@@ -40,6 +40,7 @@ export const FLAGS = {
     DoCombatantFunction: 'doCombatantFunction',
     addNetworkController: 'addNetworkController',
     SetDataStorage: 'setDataStorage',
+    UnsetDataStorage: 'unsetDataStorage',
     TokenHealthBars: 'tokenHealthBars',
     Test: 'TestData',
     HideGMOnlyChatContent: 'HideGMOnlyChatContent',
@@ -61,6 +62,7 @@ export const FLAGS = {
     TokenRulerColorSprinting: "TokenRulerColorSprinting",
     TokenRulerOpacity: 'TokenRulerOpacity',
     TokenUseRoutingLib: 'TokenUseRoutingLib',
+    TokenMovementHistoryReset: 'TokenMovementHistoryReset',
     GeneralActionsPack: 'GeneralActionsPack',
     MatrixActionsPack: 'MatrixActionsPack',
     ICActionsPack: 'ICActionsPack',
@@ -72,7 +74,11 @@ export const FLAGS = {
     CompendiaSettingsMenu: 'CompendiaSettingsMenu',
     TokenAutoRunning: 'TokenAutoRunning',
     CompendiumBrowserBlacklist: 'CompendiumBrowserBlacklist',
-    ImporterCompendiumOrder: 'ImporterCompendiumOrder'
+    ImporterCompendiumOrder: 'ImporterCompendiumOrder',
+    ApplyExtendedTestRoll: 'ApplyExtendedTestRoll',
+    EnforceExtendedTestInterval: 'EnforceExtendedTestInterval',
+    ExtendedTestDueMessage: 'ExtendedTestDueMessage',
+    WorldTimeInitialized: 'WorldTimeInitialized'
 } as const;
 export const CORE_NAME = 'core';
 export const METATYPEMODIFIER = 'SR5.Character.Modifiers.NPCMetatypeAttribute';
@@ -121,6 +127,16 @@ export const SR = {
         ROUND_TIME_SECONDS: 3,
         TURN_TIME_SECONDS: 0,
         MAX_HISTORY_SIZE: 50,
+    },
+    time: {
+        START_DATE: {
+            year: 2075,
+            month: 0,
+            dayOfMonth: 0,
+            hour: 0,
+            minute: 0,
+            second: 0,
+        },
     },
     defense: {
         spell: {
@@ -263,24 +279,3 @@ export const SR = {
         used: { essence: 1.25, avail: -4, cost: 0.75 },
     }
 } as const;
-
-export const SRStatus = [
-    {
-        id: 'sr5run',
-        name: 'SR5.StatusEffects.Running',
-        img: 'systems/shadowrun5e/dist/icons/status-effects/run.svg',
-        system: {
-            applyTo: 'test_all',
-            changes: [{ key: "data.pool", type: "add", value: "-2" }],
-        },
-    },
-    {
-        id: 'sr5sprint',
-        name: 'SR5.StatusEffects.Sprinting',
-        img: 'systems/shadowrun5e/dist/icons/status-effects/sprint.svg',
-        system: {
-            applyTo: 'test_all',
-            changes: [{ key: "data.pool", type: "add", value: "-4" }],
-        },
-    },
-] as const satisfies CONFIG.StatusEffect[];

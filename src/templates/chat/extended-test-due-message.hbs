@@ -1,0 +1,83 @@
+{{! Mirrors the success test roll card layout, see rolls/success-test-message.hbs. }}
+<div class="sr5 chat-card roll-card etm-due-card">
+    <div class="card-title card-header card-header--title">
+        <span class="test-name">{{record.name}}</span>
+    </div>
+
+    {{#if actorName}}
+    <div class="card-title card-header card-header--entities">
+        <div class="container container--fluid">
+            <div class="container__row">
+                <div class="container__col">
+                    <div class="document">
+                        <img src="{{actorImg}}" data-tooltip="{{actorName}}" />
+                        <h3 class="header-name">
+                            <a class="chat-document-link" data-uuid="{{record.actorUuid}}">{{actorName}}</a>
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/if}}
+
+    <div class="card-main-content">
+        <div class="card-content card-content--metrics">
+            <div class="left-side">
+                {{#if record.threshold}}
+                <div class="test-value metric-row">
+                    <span class="value">{{localize "SR5.Threshold"}}:</span>
+                    <span class="value-result">{{record.threshold}}</span>
+                </div>
+                {{/if}}
+                <div class="test-value metric-row">
+                    <span class="value">{{localize "SR5.ExtendedTestManager.Interval"}}:</span>
+                    <span class="value-result">{{record.interval.value}} {{intervalUnitLabel}}</span>
+                </div>
+            </div>
+            <div class="right-side">
+                <div class="test-value metric-row">
+                    <span class="value">{{localize "SR5.DicePool"}}:</span>
+                    <span class="value-result">{{nextPool}}</span>
+                </div>
+                <div class="test-value metric-row">
+                    <span class="value">{{localize "SR5.ExtendedHits"}}:</span>
+                    <span class="value-result">{{record.accumulatedHits}}</span>
+                </div>
+                <div class="test-value metric-row">
+                    <span class="value">{{localize "SR5.ExtendedTestManager.DueMessage.Rolls"}}:</span>
+                    <span class="value-result">{{record.rollCount}}</span>
+                </div>
+            </div>
+        </div>
+
+        {{#if record.notes}}
+        <div class="card-content card-content--notes">
+            <div class="left-side">
+                <div class="category-line">{{record.notes}}</div>
+            </div>
+        </div>
+        {{/if}}
+
+        <div class="card-test-content card-test-content--status">
+            <div class="glitch-content">
+                <div class="glitch">{{localize "SR5.ExtendedTestManager.DueMessage.Header"}}</div>
+            </div>
+            {{! Only worth saying once the test has been due for more than the one interval. }}
+            {{#if overdue}}
+            <div class="glitch-content glitch-content--warning">
+                <div class="glitch">{{localize "SR5.ExtendedTestManager.DueMessage.Overdue" count=intervalsElapsed}}</div>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+
+    <div class="card-buttons card-buttons--actions">
+        <div class="button" data-action="extended-test-roll" data-record-id="{{record.id}}">
+            {{localize "SR5.ExtendedTestManager.Actions.Roll"}}
+        </div>
+        <div class="button" data-action="extended-test-open">
+            {{localize "SR5.ExtendedTestManager.DueMessage.OpenManager"}}
+        </div>
+    </div>
+</div>

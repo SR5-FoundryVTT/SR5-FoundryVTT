@@ -168,6 +168,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         },
         compilations: {
             template: SheetFlow.templateBase('actor/tabs/matrix/compilations'),
+            templates: SheetFlow.templateListItem('call_in_action'),
             scrollable: ['.scrollable']
         },
         spritePowers: {
@@ -313,6 +314,10 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      */
     static async #rebootPersonaDevice(this: SR5MatrixActorSheet) {
         await MatrixSheetFlow.promptRebootPersonaDevice(this.actor);
+        // Avoid stale target selection, mostly for marked icons. Will also remove non-marked selections.
+        this.toggleMatrixTargetSelection(undefined);
+
+        void this.render();
     }
 
     /**

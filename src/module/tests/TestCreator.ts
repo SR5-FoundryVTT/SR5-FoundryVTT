@@ -72,7 +72,7 @@ export const TestCreator = {
 
         const action = item.getAction();
         if (!action) return;
-        // Determine what initial test type to use.
+
         if (!action.test) {
             action.test = 'SuccessTest';
             console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
@@ -617,8 +617,11 @@ export const TestCreator = {
             ModifiableValue.setUnique(data.pool, label, value);
         }
 
-        // Mark test as extended.
-        data.extended = action.extended;
+        // Mark test as extended and pre-fill the action interval for the dialog.
+        data.extended = action.extended.value > 0;
+        if (data.extended && !data.extendedInterval?.value) {
+            data.extendedInterval = { value: action.extended.value, unit: action.extended.unit };
+        }
 
         return data;
     },
