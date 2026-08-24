@@ -1,0 +1,25 @@
+<section class="sr5-effect-value-editor__body autocomplete-value-{{applyTo}}">
+    <textarea
+        class="sr5-effect-value-editor__input"
+        name="{{inputName}}"
+        rows="8"
+        spellcheck="false">{{~value~}}</textarea>
+    <footer class="sr5-effect-value-editor__controls">
+        <button
+            type="button"
+            class="sr5-effect-value-editor__button"
+            data-action="cancel"
+            data-tooltip="SR5.Tooltips.Effect.CancelValueEditor"
+            aria-label="{{localize "SR5.Tooltips.Effect.CancelValueEditor"}}">
+            <i class="fa-solid fa-xmark" inert></i>
+        </button>
+        <button
+            type="button"
+            class="sr5-effect-value-editor__button"
+            data-action="apply"
+            data-tooltip="SR5.Tooltips.Effect.ApplyValueEditor"
+            aria-label="{{localize "SR5.Tooltips.Effect.ApplyValueEditor"}}">
+            <i class="fa-solid fa-check" inert></i>
+        </button>
+    </footer>
+</section>

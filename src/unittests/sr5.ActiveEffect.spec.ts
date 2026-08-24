@@ -1,14 +1,13 @@
-import { SR5TestFactory } from "./utils";
-import { SR5Item } from "../module/item/SR5Item";
-import { ModifiableValue } from "@/module/mods/ModifiableValue";
-import { SkillTest } from "../module/tests/SkillTest";
-import { QuenchBatchContext } from "@ethaks/fvtt-quench";
-import { TestCreator } from "../module/tests/TestCreator";
-import { OpposedTest } from "../module/tests/OpposedTest";
-import { ActionRollType } from "src/module/types/item/Action";
-import { DataDefaults } from "../module/data/DataDefaults";
-import { SR5ActiveEffect } from "src/module/effect/SR5ActiveEffect";
-import { ModifiableValueType } from "@/module/types/template/Base";
+import { SR5TestFactory } from './utils';
+import { ModifiableValue } from '@/module/mods/ModifiableValue';
+import { SkillTest } from '../module/tests/SkillTest';
+import { QuenchBatchContext } from '@ethaks/fvtt-quench';
+import { TestCreator } from '../module/tests/TestCreator';
+import { OpposedTest } from '../module/tests/OpposedTest';
+import { ActionRollType } from 'src/module/types/item/Action';
+import { DataDefaults } from '../module/data/DataDefaults';
+import { SR5ActiveEffect } from 'src/module/effect/SR5ActiveEffect';
+import { ModifiableValueType } from '@/module/types/template/Base';
 
 export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -24,15 +23,42 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
      * @param priority The priority for the change (default: mode * 10).
      * @returns The change object.
      */
-    const createTestChange = (effect: SR5ActiveEffect, id: number): ModifiableValueType['changes'][number] => {
-        const change = effect.changes[id];
+    const createTestChange = (
+        effect: SR5ActiveEffect, id: number,
+        overrides: Partial<ModifiableValueType['changes'][number]> = {},
+    ): ModifiableValueType['changes'][number] => {
+        const change = effect.system.changes[id];
         return DataDefaults.createData('change_entry', {
             name: effect.name,
-            value: parseInt(change.value),
-            mode: change.mode,
+            value: parseInt(String(change.value)),
+            type: change.type,
             priority: parseInt(String(change.priority)),
-            source: effect.uuid
+            source: effect.uuid,
+            ...overrides,
         });
+    };
+
+    /**
+     * Create a character with deterministic zero-rated, defaultable active skills.
+     * These tests must not depend on the world's configured skill compendia.
+     */
+    const createCharacterWithSkills = async (skills: string[]) => {
+        return factory.createActor({
+            type: 'character',
+            items: skills.map(name => ({
+                name,
+                type: 'skill',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        category: 'active',
+                        rating: 0,
+                        defaulting: true,
+                        attribute: 'agility',
+                    },
+                },
+            })),
+        }, { skipDefaultSkills: true });
     };
 
     describe('SR5ActiveEffect', () => {
@@ -58,38 +84,36 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('OVERRIDE mode: apply the system override mode', async () => {
-            const actor = await factory.createActor({ type: 'character' });
+            const actor = await createCharacterWithSkills(['Automatics']);
 
-            // Assert overriden default values.
+            // Assert overridden default values.
             assert.strictEqual(actor.system.skills.active.automatics.canDefault, true);
 
             const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
                 origin: actor.uuid,
                 disabled: false,
                 name: 'Test Effect',
-                changes: [
-                    { key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE },
-                    { key: 'system.attributes.agility.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE },
-                    { key: 'system.nuyen', value: '4', mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE },
-                    { key: 'system.skills.active.automatics.canDefault', value: 'false', mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE }
-                ]
+                system: {
+                    changes: [
+                        { key: 'system.attributes.body', value: '3', type: 'override' },
+                        { key: 'system.attributes.agility.value', value: '3', type: 'override' },
+                        { key: 'system.nuyen', value: '4', type: 'override' },
+                        { key: 'system.skills.active.automatics.canDefault', value: 'false', type: 'override' },
+                    ]
+                }
             }]);
 
             // ModifiableValue should have a custom override value
             // Case - Direct change key
-            assert.deepEqual(actor.system.attributes.body.changes,
-                [createTestChange(effects[0], 0)]
-            );
+            assert.deepEqual(actor.system.attributes.body.changes, [createTestChange(effects[0], 0)]);
             assert.strictEqual(actor.system.attributes.body.base, 0);
             assert.strictEqual(actor.system.attributes.body.value, 3);
             // Case - Indirect change key
-            assert.deepEqual(actor.system.attributes.agility.changes,
-                [createTestChange(effects[0], 1)]
-            );
+            assert.deepEqual(actor.system.attributes.agility.changes, [createTestChange(effects[0], 1)]);
             assert.strictEqual(actor.system.attributes.agility.base, 0);
             assert.strictEqual(actor.system.attributes.agility.value, 3);
 
-            // Case - ModifableValue with a direct key not part of value calculation (see SR5ActiveEffect.modifiableValueProperties)
+            // Case - ModifiableValue with a direct key not part of value calculation (see SR5ActiveEffect.modifiableValueProperties)
             // Skill automatics normally can default, which we overwrite here.
             // FVTT types currently do not support the `TypedObjectField` type, so we need to cast it.
             const active = actor.system.skills.active;
@@ -100,42 +124,47 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.strictEqual(actor.system.nuyen, 4);
         });
 
-        it('OVERRIDE mode: override all existing .mod values', async () => {
+        describe('OVERRIDE mode', () => {
             it('apply the custom override mode', async () => {
                 const actor = await factory.createActor({ type: 'character' });
                 const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
                     origin: actor.uuid,
                     disabled: false,
                     name: 'Test Effect',
-                    changes: [
-                        { key: 'system.attributes.body', value: '5', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                        { key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE }
-                    ]
+                    system: {
+                        changes: [
+                            { key: 'system.attributes.body', value: '5', type: 'add' },
+                            { key: 'system.attributes.body', value: '3', type: 'override' },
+                        ]
+                    }
                 }]);
 
                 assert.strictEqual(actor.system.attributes.body.changes.length, 2);
-                assert.deepEqual(actor.system.attributes.body.changes,
-                    [
-                        createTestChange(effects[0], 0),
-                        createTestChange(effects[0], 1)
-                    ]
-                );
+                assert.deepEqual(actor.system.attributes.body.changes, [
+                    // The override masks the preceding add, which is marked as invalidated.
+                    createTestChange(effects[0], 0, { invalidated: true }),
+                    createTestChange(effects[0], 1),
+                ]);
                 assert.strictEqual(actor.system.attributes.body.value, 3);
             });
 
             it('apply custom override mode, none ModifiableValue should work without altering anything', async () => {
                 const actor = await factory.createActor({ type: 'character' });
-                const effect = await actor.createEmbeddedDocuments('ActiveEffect', [{
-                    origin: actor.uuid,
-                    disabled: false,
-                    name: 'Test Effect'
-                }]);
+                const effect = await actor.createEmbeddedDocuments('ActiveEffect', [
+                    {
+                        origin: actor.uuid,
+                        disabled: false,
+                        name: 'Test Effect',
+                    },
+                ]);
                 await effect[0]?.update({
-                    changes: [{
-                        key: 'system.modifiers.global',
-                        value: '3',
-                        mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE
-                    }]
+                    system: {
+                        changes: [{
+                            key: 'system.modifiers.global',
+                            value: '3',
+                            type: 'override',
+                        }]
+                    },
                 });
 
                 assert.strictEqual(actor.system.modifiers.global, 3);
@@ -143,7 +172,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('ADD mode: adding to ModifiableField should cause MODIFY mode to be used', async () => {
-            const actor = await factory.createActor({ type: 'character' });
+            const actor = await createCharacterWithSkills(['Automatics']);
 
             assert.strictEqual(actor.system.attributes.body.value, 0);
             assert.strictEqual(actor.system.skills.active.automatics.value, 0);
@@ -152,20 +181,22 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 origin: actor.uuid,
                 disabled: false,
                 name: 'Test Effect',
-                changes: [
-                    { key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'system.skills.active.automatics', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }
-                ]
+                system: {
+                    changes: [
+                        { key: 'system.attributes.body', value: '3', type: 'add' },
+                        { key: 'system.skills.active.automatics', value: '3', type: 'add' },
+                    ],
+                }
             }]);
 
             assert.strictEqual(actor.system.attributes.body.value, 3);
-            assert.deepEqual(actor.system.attributes.body.changes, [ createTestChange(effects[0], 0) ]);
+            assert.deepEqual(actor.system.attributes.body.changes, [createTestChange(effects[0], 0)]);
             assert.strictEqual(actor.system.skills.active.automatics.value, 3);
             assert.deepEqual(actor.system.skills.active.automatics.changes, [createTestChange(effects[0], 1)]);
         });
-        
+
         it('ADD mode: adding to ModifiableField property should cause MODIFY mode to be used', async () => {
-            const actor = await factory.createActor({ type: 'character' });
+            const actor = await createCharacterWithSkills(['Automatics']);
 
             assert.strictEqual(actor.system.attributes.body.value, 0);
             assert.strictEqual(actor.system.skills.active.automatics.value, 0);
@@ -174,10 +205,12 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 origin: actor.uuid,
                 disabled: false,
                 name: 'Test Effect',
-                changes: [
-                    { key: 'system.attributes.body.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }
-                ]
+                system: {
+                    changes: [
+                        { key: 'system.attributes.body.value', value: '3', type: 'add' },
+                        { key: 'system.skills.active.automatics.value', value: '3', type: 'add' },
+                    ]
+                }
             }]);
 
             assert.strictEqual(actor.system.attributes.body.value, 3);
@@ -187,12 +220,12 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('UPGRADE mode: should raise the value to a max', async () => {
-            window.doNotPopulateDefaultSkills = true;
-            
-            const actor = await factory.createActor({ type: 'character', system: { 
-                attributes: { body: { base: 2 } }
-            }});
-            delete window.doNotPopulateDefaultSkills;
+            const actor = await factory.createActor({
+                type: 'character',
+                system: {
+                    attributes: { body: { base: 2 } },
+                },
+            }, { skipDefaultSkills: true });
 
             await actor.createEmbeddedDocuments('Item', [{
                 type: 'skill',
@@ -201,11 +234,10 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                     type: 'skill',
                     skill: {
                         attribute: 'agility',
-                        rating: 2
+                        rating: 2,
                     }
                 }
             }]);
-
 
             assert.strictEqual(actor.system.attributes.body.base, 2);
             assert.strictEqual(actor.system.skills.active.automatics.base, 2);
@@ -214,26 +246,22 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 origin: actor.uuid,
                 disabled: false,
                 name: 'Test Effect',
-                changes: [
-                    { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.UPGRADE },
-                    { key: 'system.attributes.body.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.UPGRADE }
-                ]
+                system: {
+                    changes: [
+                        { key: 'system.skills.active.automatics.value', value: '3', type: 'upgrade' },
+                        { key: 'system.attributes.body.value', value: '3', type: 'upgrade' },
+                    ]
+                }
             }]);
 
             assert.strictEqual(actor.system.attributes.body.value, 3);
-            assert.deepEqual(actor.system.attributes.body.changes, [
-                createTestChange(effects[0], 0)
-            ]);
+            assert.deepEqual(actor.system.attributes.body.changes, [createTestChange(effects[0], 0)]);
             assert.strictEqual(actor.system.skills.active.automatics.value, 3);
             assert.deepEqual(actor.system.skills.active.automatics.changes, [createTestChange(effects[0], 1)]);
         });
 
         it('UPGRADE mode: uses the highest value for multiple upgrade changes', async () => {
-            window.doNotPopulateDefaultSkills = true;
-
-            const actor = await factory.createActor({ type: 'character' });
-            //
-            delete window.doNotPopulateDefaultSkills;
+            const actor = await factory.createActor({ type: 'character' }, { skipDefaultSkills: true });
 
             await actor.createEmbeddedDocuments('Item', [{
                 type: 'skill',
@@ -242,11 +270,10 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                     type: 'skill',
                     skill: {
                         attribute: 'agility',
-                        rating: 2
+                        rating: 2,
                     }
                 }
             }]);
-
 
             assert.strictEqual(actor.system.skills.active.automatics.base, 2);
 
@@ -254,21 +281,24 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 origin: actor.uuid,
                 disabled: false,
                 name: 'Test Effect',
-                changes: [
-                    { key: 'system.skills.active.automatics.value', value: '5', mode: CONST.ACTIVE_EFFECT_MODES.UPGRADE },
-                    { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.UPGRADE }
-                ]
+                system: {
+                    changes: [
+                        { key: 'system.skills.active.automatics.value', value: '5', type: 'upgrade' },
+                        { key: 'system.skills.active.automatics.value', value: '3', type: 'upgrade' },
+                    ]
+                }
             }]);
 
             assert.strictEqual(actor.system.skills.active.automatics.value, 5);
         });
 
         it('DOWNGRADE mode: should reduce the value to a min', async () => {
-            window.doNotPopulateDefaultSkills = true;
-            const actor = await factory.createActor({ type: 'character', system: { 
-                attributes: { body: { base: 5 } }
-            }});
-            delete window.doNotPopulateDefaultSkills;
+            const actor = await factory.createActor({
+                type: 'character',
+                system: {
+                    attributes: { body: { base: 5 } },
+                },
+            }, { skipDefaultSkills: true });
 
             await actor.createEmbeddedDocuments('Item', [{
                 type: 'skill',
@@ -277,11 +307,10 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                     type: 'skill',
                     skill: {
                         attribute: 'agility',
-                        rating: 5
+                        rating: 5,
                     }
                 }
             }]);
-
 
             assert.strictEqual(actor.system.attributes.body.base, 5);
             assert.strictEqual(actor.system.skills.active.automatics.base, 5);
@@ -290,24 +319,22 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 origin: actor.uuid,
                 disabled: false,
                 name: 'Test Effect',
-                changes: [
-                    { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE },
-                    { key: 'system.attributes.body.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE }
-                ]
+                system: {
+                    changes: [
+                        { key: 'system.skills.active.automatics.value', value: '3', type: 'downgrade' },
+                        { key: 'system.attributes.body.value', value: '3', type: 'downgrade' },
+                    ]
+                }
             }]);
 
             assert.strictEqual(actor.system.attributes.body.value, 3);
-            assert.deepEqual(actor.system.attributes.body.changes,
-                [createTestChange(effects[0], 0)]);
+            assert.deepEqual(actor.system.attributes.body.changes, [createTestChange(effects[0], 0)]);
             assert.strictEqual(actor.system.skills.active.automatics.value, 3);
-            assert.deepEqual(actor.system.skills.active.automatics.changes,
-                [createTestChange(effects[0], 1)]);
+            assert.deepEqual(actor.system.skills.active.automatics.changes, [createTestChange(effects[0], 1)]);
         });
 
         it('DOWNGRADE mode: uses the lowest value for multiple downgrade changes', async () => {
-            window.doNotPopulateDefaultSkills = true;
-            const actor = await factory.createActor({ type: 'character' });
-            delete window.doNotPopulateDefaultSkills;
+            const actor = await factory.createActor({ type: 'character' }, { skipDefaultSkills: true });
 
             await actor.createEmbeddedDocuments('Item', [{
                 type: 'skill',
@@ -316,7 +343,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                     type: 'skill',
                     skill: {
                         attribute: 'agility',
-                        rating: 6
+                        rating: 6,
                     }
                 }
             }]);
@@ -325,21 +352,24 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 origin: actor.uuid,
                 disabled: false,
                 name: 'Test Effect',
-                changes: [
-                    { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE },
-                    { key: 'system.skills.active.automatics.value', value: '5', mode: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE }
-                ]
+                system: {
+                    changes: [
+                        { key: 'system.skills.active.automatics.value', value: '3', type: 'downgrade' },
+                        { key: 'system.skills.active.automatics.value', value: '5', type: 'downgrade' },
+                    ]
+                }
             }]);
 
             assert.strictEqual(actor.system.skills.active.automatics.value, 3);
         });
 
         it('MULTIPLY mode: multiplies base values by the change value', async () => {
-            window.doNotPopulateDefaultSkills = true;
-            const actor = await factory.createActor({ type: 'character', system: { 
-                attributes: { body: { base: 5 } }, 
-            }});
-            delete window.doNotPopulateDefaultSkills;
+            const actor = await factory.createActor({
+                type: 'character',
+                system: {
+                    attributes: { body: { base: 5 } },
+                },
+            }, { skipDefaultSkills: true });
 
             await actor.createEmbeddedDocuments('Item', [{
                 type: 'skill',
@@ -348,7 +378,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                     type: 'skill',
                     skill: {
                         attribute: 'agility',
-                        rating: 5
+                        rating: 5,
                     }
                 }
             }]);
@@ -360,20 +390,56 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 origin: actor.uuid,
                 disabled: false,
                 name: 'Test Effect',
-                changes: [
-                    { key: 'system.skills.active.automatics.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.MULTIPLY },
-                    { key: 'system.attributes.body.value', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.MULTIPLY }
-                ]
+                system: {
+                    changes: [
+                        { key: 'system.skills.active.automatics.value', value: '3', type: 'multiply' },
+                        { key: 'system.attributes.body.value', value: '3', type: 'multiply' },
+                    ]
+                }
             }]);
 
             assert.strictEqual(actor.system.attributes.body.value, 15);
-            assert.deepEqual(actor.system.attributes.body.changes, [
-                createTestChange(effects[0], 0)
-            ]);
+            assert.deepEqual(actor.system.attributes.body.changes, [createTestChange(effects[0], 0)]);
             assert.strictEqual(actor.system.skills.active.automatics.value, 15);
-            assert.deepEqual(actor.system.skills.active.automatics.changes, [
-                createTestChange(effects[0], 1)
-            ]);
+            assert.deepEqual(actor.system.skills.active.automatics.changes, [createTestChange(effects[0], 1)]);
+        });
+
+        it('SUBTRACT mode: subtracts the change value from base values', async () => {
+            const actor = await factory.createActor({
+                type: 'character',
+                system: {
+                    attributes: { body: { base: 5 } },
+                },
+            }, { skipDefaultSkills: true });
+
+            await actor.createEmbeddedDocuments('Item', [{
+                type: 'skill',
+                name: 'Automatics',
+                system: {
+                    type: 'skill',
+                    skill: {
+                        attribute: 'agility',
+                        rating: 5,
+                    }
+                }
+            }]);
+
+            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+                origin: actor.uuid,
+                disabled: false,
+                name: 'Test Effect',
+                system: {
+                    changes: [
+                        { key: 'system.skills.active.automatics.value', value: '3', type: 'subtract' },
+                        { key: 'system.attributes.body.value', value: '3', type: 'subtract' },
+                    ]
+                }
+            }]);
+
+            assert.strictEqual(actor.system.attributes.body.value, 2);
+            assert.deepEqual(actor.system.attributes.body.changes, [createTestChange(effects[0], 0)]);
+            assert.strictEqual(actor.system.skills.active.automatics.value, 2);
+            assert.deepEqual(actor.system.skills.active.automatics.changes, [createTestChange(effects[0], 1)]);
         });
     });
     /**
@@ -382,13 +448,56 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
     describe('SR5AdvancedEffect apply-to modes', () => {
         it('A default active effect should adhere to apply-to actor rules', async () => {
             const actor = await factory.createActor({ type: 'character' });
-            const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+            const effects = (await actor.createEmbeddedDocuments('ActiveEffect', [{
+                system: { changes: [{ key: 'system.attributes.body', value: '3', type: 'add' }] },
                 name: 'Test Effect',
-                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-            }]) as SR5ActiveEffect[];
+            }])) as SR5ActiveEffect[];
 
             const effect = effects.pop()!;
-            assert.strictEqual(effect.system.applyTo, 'actor');
+            assert.strictEqual(effect.system.targets[0].applyTo, 'actor');
+        });
+
+        it('_preCreate auto-binding: target-less changes are bound to the seeded actor target and apply', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const effects = (await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Binding Test',
+                system: { changes: [{ key: 'system.attributes.body', value: '2', type: 'add' }] },
+            }])) as SR5ActiveEffect[];
+
+            const effect = effects[0];
+            assert.lengthOf(effect.system.targets, 1, 'one actor target was seeded');
+            assert.strictEqual(effect.system.targets[0].applyTo, 'actor');
+            assert.strictEqual(effect.system.changes[0].target, effect.system.targets[0].id, 'change was bound to the seeded target');
+            assert.strictEqual(actor.system.attributes.body.value, 2, 'change applied to actor data');
+        });
+
+        it('target-less changes added after creation still apply to the actor', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const effects = (await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Late Change Test',
+            }])) as SR5ActiveEffect[];
+
+            // Changes added by update, macros or imports carry no target and must not be dropped.
+            await effects[0].update({
+                system: { changes: [{ key: 'system.attributes.body', value: '2', type: 'add' }] },
+            });
+
+            assert.strictEqual(effects[0].system.changes[0].target, '', 'change carries no target');
+            assert.strictEqual(actor.system.attributes.body.value, 2, 'change applied to actor data');
+        });
+
+        it('changes of an effect without any target fall back to actor application', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            const effects = (await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Target-less Test',
+                system: { changes: [{ key: 'system.attributes.body', value: '2', type: 'add' }] },
+            }])) as SR5ActiveEffect[];
+
+            // Effects predating targets, or stripped of them, must keep working as plain actor effects.
+            await effects[0].update({ system: { targets: [] } });
+
+            assert.lengthOf(effects[0].system.targets, 0, 'effect has no target');
+            assert.strictEqual(actor.system.attributes.body.value, 2, 'change applied to actor data');
         });
 
         it('Create an item effect and assert its not created on actor as until FoundryVTT v10', async () => {
@@ -396,16 +505,14 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             const items = await actor.createEmbeddedDocuments('Item', [{
                 name: 'Test Item',
                 type: 'weapon',
-                system: {
-                    category: 'range'
-                }
+                system: { category: 'range' }
             }]);
             const weapon = items[0];
             const effects = await weapon.createEmbeddedDocuments('ActiveEffect', [{
                 origin: weapon.uuid,
                 name: 'Test Effect',
                 transfer: true, // Foundry uses transfer to find item effects that should be transferred. This is disabled by the system.
-                changes: [{ key: 'system.limit', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+                system: { changes: [{ key: 'system.limit', value: '3', type: 'add' }] },
             }]);
 
             // Effects with a custom applyTo should not be applied to the actor.
@@ -416,31 +523,75 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
         it('ACTOR apply-to: Only actor and targeted_actor effects should apply onto an actor', async () => {
             const actor = await factory.createActor({ type: 'character' });
-            await actor.createEmbeddedDocuments('ActiveEffect', [{
-                name: 'Actor Effect',
-                system: { applyTo: 'actor' },
-                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-            }, {
-                name: 'Targeted Actor Effect',
-                system: { applyTo: 'targeted_actor' },
-                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-            }, {
-                name: 'Test_All Effect',
-                system: { applyTo: 'test_all' },
-                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-            }, {
-                name: 'Test_Item Effect',
-                system: { applyTo: 'test_item' },
-                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-            }, {
-                name: 'Modifiers Effect',
-                system: { applyTo: 'modifier' },
-                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-            }]);
+            await actor.createEmbeddedDocuments('ActiveEffect', [
+                {
+                    name: 'Actor Effect',
+                    system: {
+                        changes: [{ key: 'system.attributes.body', value: '3', type: 'add', target: 't' }],
+                        targets: [{ id: 't', applyTo: 'actor' }],
+                    },
+                },
+                {
+                    name: 'Targeted Actor Effect',
+                    system: {
+                        changes: [{ key: 'system.attributes.body', value: '3', type: 'add', target: 't' }],
+                        targets: [{ id: 't', applyTo: 'targeted_actor' }],
+                    },
+                },
+                {
+                    name: 'Test_All Effect',
+                    system: {
+                        changes: [{ key: 'system.attributes.body', value: '3', type: 'add', target: 't' }],
+                        targets: [{ id: 't', applyTo: 'test_all' }],
+                    },
+                },
+                {
+                    name: 'Test_Item Effect',
+                    system: {
+                        changes: [{ key: 'system.attributes.body', value: '3', type: 'add', target: 't' }],
+                        targets: [{ id: 't', applyTo: 'test_item' }],
+                    },
+                },
+                {
+                    name: 'Incoming Test Effect',
+                    system: {
+                        changes: [{ key: 'system.attributes.body', value: '3', type: 'add', target: 't' }],
+                        targets: [{ id: 't', applyTo: 'test_target' }],
+                    },
+                },
+                {
+                    name: 'Modifiers Effect',
+                    system: {
+                        changes: [{ key: 'system.attributes.body', value: '3', type: 'add', target: 't' }],
+                        targets: [{ id: 't', applyTo: 'modifier' }],
+                    },
+                },
+            ]);
 
-            assert.lengthOf(actor.effects.contents, 5);
+            assert.lengthOf(actor.effects.contents, 6);
             assert.lengthOf(actor.system.attributes.body.changes, 2);
             assert.equal(actor.system.attributes.body.value, 6);
+        });
+
+        it('ACTOR apply-to: mixed-target effects only apply actor-bound changes onto an actor', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Mixed Target Effect',
+                system: {
+                    targets: [
+                        { id: 'actor-target', applyTo: 'actor' },
+                        { id: 'test-target', applyTo: 'test_all' },
+                    ],
+                    changes: [
+                        { key: 'system.attributes.body', value: '2', type: 'add', target: 'actor-target' },
+                        { key: 'system.attributes.body', value: '4', type: 'add', target: 'test-target' },
+                    ],
+                },
+            }]);
+
+            assert.lengthOf(actor.effects.contents, 1);
+            assert.lengthOf(actor.system.attributes.body.changes, 1);
+            assert.equal(actor.system.attributes.body.value, 2);
         });
 
         it('TARGETED_ACTOR apply-to: create copied effects with resolved values on the target actor', async () => {
@@ -454,13 +605,13 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             const target = await factory.createActor({ type: 'character' });
 
             const items = await attacker.createEmbeddedDocuments('Item', [{ type: 'action', name: 'Test Action' }]);
-            const item = items[0] as SR5Item;
+            const item = items[0];
 
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Targeted Effect',
                 system: {
-                    applyTo: 'targeted_actor',
-                    changes: [{ key: 'system.attributes.body', value: '@data.pool.value', type: 'custom' }]
+                    targets: [{ id: 't', applyTo: 'targeted_actor' }],
+                    changes: [{ key: 'system.attributes.body', value: '@data.pool.value', type: 'add', target: 't' }],
                 }
             }]);
 
@@ -469,7 +620,7 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             await test.evaluate();
             await test.effects.createTargetActorEffects(target);
 
-            const appliedEffect = target.effects.find(effect => effect.name === 'Targeted Effect') as SR5ActiveEffect | undefined;
+            const appliedEffect = target.effects.find((effect) => effect.name === 'Targeted Effect') as SR5ActiveEffect | undefined;
             if (!appliedEffect) throw new Error('Expected copied targeted actor effect to exist on target actor.');
 
             assert.strictEqual(appliedEffect.system.appliedByTest, true);
@@ -477,7 +628,35 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.strictEqual(target.system.attributes.body.value, test.pool.value);
         });
 
-        it('TEST_ALL apply-to: Actor effect applies to test', async () => { 
+        it('TARGETED_ACTOR apply-to: render a baked comparison as the destination field expects', async () => {
+            const attacker = await factory.createActor({ type: 'character', system: { attributes: { body: { base: 2 } } } });
+            const target = await factory.createActor({ type: 'character' });
+
+            const items = await attacker.createEmbeddedDocuments('Item', [{ type: 'action', name: 'Test Action' }]);
+            const item = items[0];
+
+            await item.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Targeted Effect',
+                system: {
+                    targets: [{ id: 't', applyTo: 'targeted_actor' }],
+                    // A comparison baked for the destination number field must render as 1, not 'true'.
+                    changes: [{ key: 'system.attributes.body', value: '@data.pool.value >= 0', type: 'add', target: 't' }],
+                }
+            }]);
+
+            const test = (await TestCreator.fromItem(item, attacker, { showDialog: false, showMessage: false }))!;
+
+            await test.evaluate();
+            await test.effects.createTargetActorEffects(target);
+
+            const appliedEffect = target.effects.find((effect) => effect.name === 'Targeted Effect') as SR5ActiveEffect | undefined;
+            if (!appliedEffect) throw new Error('Expected copied targeted actor effect to exist on target actor.');
+
+            assert.strictEqual(appliedEffect.system.changes[0].value, 1);
+            assert.strictEqual(target.system.attributes.body.value, 1);
+        });
+
+        it('TEST_ALL apply-to: Actor effect applies to test', async () => {
             const limitValue = 3;
             const poolValue = 3;
             const hitsValue = 3;
@@ -486,13 +665,15 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
                 origin: actor.uuid,
                 name: 'Test Effect',
-                system: { applyTo: 'test_all' },
-                changes: [
-                    // NOTE: test doesn't use system.
-                    { key: 'data.limit', value: `${limitValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'data.pool', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'data.values.hits', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD }
-                ]
+                system: {
+                    targets: [{ id: 't', applyTo: 'test_all' }],
+                    changes: [
+                        // NOTE: test doesn't use system.
+                        { key: 'data.limit', value: `${limitValue}`, type: 'add', target: 't' },
+                        { key: 'data.pool', value: `${poolValue}`, type: 'add', target: 't' },
+                        { key: 'data.values.hits', value: `${poolValue}`, type: 'add', target: 't' },
+                    ]
+                }
             }]);
 
             const action = DataDefaults.createData('action_roll', { test: 'SuccessTest' });
@@ -502,18 +683,12 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             await test.execute();
 
-            assert.deepEqual(test.limit.changes,
-                [createTestChange(effects[0], 0)]
-            );
+            assert.deepEqual(test.limit.changes, [createTestChange(effects[0], 0)]);
             assert.equal(test.limit.value, limitValue);
             // SuccessTest will always include global and wounds modifier by default.
-            assert.deepEqual(test.pool.changes, [
-                createTestChange(effects[0], 1)
-            ]);
+            assert.deepEqual(test.pool.changes, [createTestChange(effects[0], 1)]);
             assert.equal(test.pool.value, poolValue);
-            assert.deepEqual(test.hits.changes,
-                [createTestChange(effects[0], 2)]
-            );
+            assert.deepEqual(test.hits.changes, [createTestChange(effects[0], 2)]);
             assert.isAtLeast(test.hits.value, hitsValue);
         });
 
@@ -529,35 +704,228 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
             const effects = await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                system: { applyTo: 'test_all' },
-                changes: [
-                    // NOTE: test doesn't use system.
-                    { key: 'data.limit', value: `${limitValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'data.pool', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'data.values.hits', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD }
-                ]
+                system: {
+                    targets: [{ id: 't', applyTo: 'test_all' }],
+                    changes: [
+                        // NOTE: test doesn't use system.
+                        { key: 'data.limit', value: `${limitValue}`, type: 'add', target: 't' },
+                        { key: 'data.pool', value: `${poolValue}`, type: 'add', target: 't' },
+                        { key: 'data.values.hits', value: `${poolValue}`, type: 'add', target: 't' },
+                    ],
+                }
             }]);
 
-            const test = (await TestCreator.fromItem(item as SR5Item, actor, { showDialog: false, showMessage: false }))!;
+            const test = (await TestCreator.fromItem(item, actor, { showDialog: false, showMessage: false }))!;
 
             await test.execute();
 
-            assert.deepEqual(test.limit.changes,
-                [createTestChange(effects[0], 0)]
-            );
+            assert.deepEqual(test.limit.changes, [createTestChange(effects[0], 0)]);
             assert.equal(test.limit.value, limitValue);
             // SuccessTest will always include global and wounds modifier by default.
-            assert.deepEqual(test.pool.changes, [
-                createTestChange(effects[0], 1)
-            ]);
+            assert.deepEqual(test.pool.changes, [createTestChange(effects[0], 1)]);
             assert.equal(test.pool.value, poolValue);
-            assert.deepEqual(test.hits.changes,
-                [createTestChange(effects[0], 2)]
-            );
+            assert.deepEqual(test.hits.changes, [createTestChange(effects[0], 2)]);
             assert.isAtLeast(test.hits.value, hitsValue);
         });
 
-        it('TEST_ITEM apply-to: Item effect applies only when on test item', async () => { 
+        it('INCOMING TEST apply-to: targeted actor effect modifies the incoming test only', async () => {
+            const attacker = await factory.createActor({ type: 'character' });
+            const target = await factory.createActor({ type: 'character' });
+            const other = await factory.createActor({ type: 'character' });
+
+            await target.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Incoming Target Effect',
+                system: {
+                    targets: [
+                        {
+                            id: 'incoming',
+                            applyTo: 'test_target',
+                            conditions: [{ type: 'categories', values: ['social'] }],
+                        },
+                        { id: 'actor', applyTo: 'actor' },
+                    ],
+                    changes: [
+                        { key: 'data.pool', value: '2', type: 'add', target: 'incoming' },
+                        { key: 'system.attributes.body', value: '4', type: 'add', target: 'actor' },
+                    ],
+                },
+            }]);
+            await other.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Untargeted Incoming Effect',
+                system: {
+                    targets: [{ id: 'incoming', applyTo: 'test_target' }],
+                    changes: [{ key: 'data.pool', value: '9', type: 'add', target: 'incoming' }],
+                },
+            }]);
+
+            const action = DataDefaults.createData('action_roll', {
+                test: SkillTest.name,
+                categories: ['social'],
+            });
+            const test = (await TestCreator.fromAction(
+                action,
+                attacker,
+                { showDialog: false, showMessage: false },
+            ))!;
+            test.targets = [target];
+            test.prepareTestCategories();
+            test.effects.applyAllEffects();
+            ModifiableValue.calcTotal(test.pool);
+
+            assert.strictEqual(test.pool.value, 2);
+            assert.include(test.pool.changes.map(change => change.name), 'Incoming Target Effect');
+            assert.notInclude(test.pool.changes.map(change => change.name), 'Untargeted Incoming Effect');
+            assert.strictEqual(target.system.attributes.body.value, 4, 'actor-targeted change still applies only to actor data');
+        });
+
+        it('SR5 Running Modifiers: ranged attack vs a running/sprinting target gets -2/-4 (test_target)', async () => {
+            const attacker = await factory.createActor({ type: 'character' });
+            const target = await factory.createActor({ type: 'character' });
+            const ranged = await factory.createItem({
+                type: 'weapon',
+                system: { category: 'range', action: { test: 'RangedAttackTest' } },
+            });
+
+            const rangedPoolVsTarget = async () => {
+                const test = (await TestCreator.fromItem(ranged, attacker, { showDialog: false, showMessage: false }))!;
+                test.targets = [target];
+                test.prepareTestCategories();
+                test.effects.applyAllEffects();
+                ModifiableValue.calcTotal(test.pool);
+                return test.pool.value;
+            };
+
+            const baseline = await rangedPoolVsTarget();
+
+            await target.toggleStatusEffect('sr5run', { active: true });
+            assert.equal(await rangedPoolVsTarget(), baseline - 2, 'ranged attack vs a running target should be -2');
+
+            await target.toggleStatusEffect('sr5run', { active: false });
+            await target.toggleStatusEffect('sr5sprint', { active: true });
+            assert.equal(await rangedPoolVsTarget(), baseline - 4, 'ranged attack vs a sprinting target should be -4');
+        });
+
+        it('SR5 Running Modifiers: a melee attack vs a running target gets no ranged penalty', async () => {
+            const attacker = await factory.createActor({ type: 'character' });
+            const target = await factory.createActor({ type: 'character' });
+            const melee = await factory.createItem({
+                type: 'weapon',
+                system: { category: 'melee', action: { test: 'MeleeAttackTest' } },
+            });
+
+            const meleePoolVsTarget = async () => {
+                const test = (await TestCreator.fromItem(melee, attacker, { showDialog: false, showMessage: false }))!;
+                test.targets = [target];
+                test.prepareTestCategories();
+                test.effects.applyAllEffects();
+                ModifiableValue.calcTotal(test.pool);
+                return test.pool.value;
+            };
+
+            const baseline = await meleePoolVsTarget();
+            await target.toggleStatusEffect('sr5run', { active: true });
+            assert.equal(await meleePoolVsTarget(), baseline, 'the ranged-only penalty must not apply to melee attacks');
+        });
+
+        it('INCOMING TEST apply-to: targeted actor item effects apply and resolve target-side dynamic values', async () => {
+            const attacker = await factory.createActor({ type: 'character' });
+            const target = await factory.createActor({ type: 'character' });
+            const items = await target.createEmbeddedDocuments('Item', [{
+                type: 'action',
+                name: 'Target-side Source',
+                system: { action: { mod: 4 } },
+            }]);
+            const item = items[0];
+
+            await item.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Target Item Incoming Effect',
+                system: {
+                    targets: [{ id: 'incoming', applyTo: 'test_target' }],
+                    changes: [{ key: 'data.pool', value: '@system.action.mod', type: 'add', target: 'incoming' }],
+                },
+            }]);
+
+            const action = DataDefaults.createData('action_roll', { test: SkillTest.name });
+            const test = (await TestCreator.fromAction(
+                action,
+                attacker,
+                { showDialog: false, showMessage: false },
+            ))!;
+            test.targets = [target];
+            test.effects.applyAllEffects();
+            ModifiableValue.calcTotal(test.pool);
+
+            assert.strictEqual(test.pool.value, 4);
+            assert.include(test.pool.changes.map(change => change.name), 'Target Item Incoming Effect');
+        });
+
+        it('INCOMING TEST apply-to: multiple target effects stack while duplicate actor targets apply once', async () => {
+            const attacker = await factory.createActor({ type: 'character' });
+            const targetA = await factory.createActor({ type: 'character' });
+            const targetB = await factory.createActor({ type: 'character' });
+
+            await targetA.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Incoming A',
+                system: {
+                    targets: [{ id: 'incoming', applyTo: 'test_target' }],
+                    changes: [{ key: 'data.pool', value: '2', type: 'add', target: 'incoming' }],
+                },
+            }]);
+            await targetB.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Incoming B',
+                system: {
+                    targets: [{ id: 'incoming', applyTo: 'test_target' }],
+                    changes: [{ key: 'data.pool', value: '3', type: 'add', target: 'incoming' }],
+                },
+            }]);
+
+            const action = DataDefaults.createData('action_roll', { test: SkillTest.name });
+            const test = (await TestCreator.fromAction(
+                action,
+                attacker,
+                { showDialog: false, showMessage: false },
+            ))!;
+            test.targets = [targetA, targetA, targetB];
+            test.effects.applyAllEffects();
+            ModifiableValue.calcTotal(test.pool);
+
+            assert.strictEqual(test.pool.value, 5);
+            assert.strictEqual(test.pool.changes.filter(change => change.name === 'Incoming A').length, 1);
+            assert.strictEqual(test.pool.changes.filter(change => change.name === 'Incoming B').length, 1);
+        });
+
+        it('INCOMING TEST apply-to: targeted items do not contribute effects', async () => {
+            const attacker = await factory.createActor({ type: 'character' });
+            const target = await factory.createActor({ type: 'character' });
+            const items = await target.createEmbeddedDocuments('Item', [{
+                type: 'action',
+                name: 'Item-only Target',
+            }]);
+            const item = items[0];
+
+            await item.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Ignored Item Target Effect',
+                system: {
+                    targets: [{ id: 'incoming', applyTo: 'test_target' }],
+                    changes: [{ key: 'data.pool', value: '7', type: 'add', target: 'incoming' }],
+                },
+            }]);
+
+            const action = DataDefaults.createData('action_roll', { test: SkillTest.name });
+            const test = (await TestCreator.fromAction(
+                action,
+                attacker,
+                { showDialog: false, showMessage: false },
+            ))!;
+            test.targets = [item];
+            test.effects.applyAllEffects();
+            ModifiableValue.calcTotal(test.pool);
+
+            assert.strictEqual(test.pool.value, 0);
+            assert.notInclude(test.pool.changes.map(change => change.name), 'Ignored Item Target Effect');
+        });
+
+        it('TEST_ITEM apply-to: Item effect applies only when on test item', async () => {
             const limitValue = 3;
             const poolValue = 3;
             const hitsValue = 3;
@@ -567,18 +935,20 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             // Create a effect on actor that should NOT apply.
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect Actor',
-                system: { applyTo: 'test_item' },
-                changes: [
-                    { key: 'data.limit', value: `${limitValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'data.pool', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'data.values.hits', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD }
-                ]
+                system: {
+                    targets: [{ id: 't', applyTo: 'test_item' }],
+                    changes: [
+                        { key: 'data.limit', value: `${limitValue}`, type: 'add', target: 't' },
+                        { key: 'data.pool', value: `${poolValue}`, type: 'add', target: 't' },
+                        { key: 'data.values.hits', value: `${poolValue}`, type: 'add', target: 't' },
+                    ],
+                }
             }]);
 
             // Create one item that will carry the correct effect and one carries the wrong effect.
             const items = await actor.createEmbeddedDocuments('Item', [
                 { type: 'action', name: 'Test Action' },
-                { type: 'action', name: 'Test Action 2' }
+                { type: 'action', name: 'Test Action 2' },
             ]);
 
             const item = items.pop()!;
@@ -586,45 +956,42 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             // Create the correct effect on the correct item.
             const itemEffects = await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect Correct Item',
-                system: { applyTo: 'test_item' },
-                changes: [
-                    { key: 'data.limit', value: `${limitValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'data.pool', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'data.values.hits', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD }
-                ]
+                system: {
+                    targets: [{ id: 't', applyTo: 'test_item' }],
+                    changes: [
+                        { key: 'data.limit', value: `${limitValue}`, type: 'add', target: 't' },
+                        { key: 'data.pool', value: `${poolValue}`, type: 'add', target: 't' },
+                        { key: 'data.values.hits', value: `${poolValue}`, type: 'add', target: 't' },
+                    ],
+                }
             }]);
 
             const item2 = items.pop()!;
 
             // Create the wrong effect on the wrong item.
-            const item2Effects = await item2.createEmbeddedDocuments('ActiveEffect', [{
+            await item2.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect Wrong Item',
-                system: { applyTo: 'test_item' },
-                changes: [
-                    { key: 'data.limit', value: `${limitValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'data.pool', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'data.values.hits', value: `${poolValue}`, mode: CONST.ACTIVE_EFFECT_MODES.ADD }
-                ]
+                system: {
+                    targets: [{ id: 't', applyTo: 'test_item' }],
+                    changes: [
+                        { key: 'data.limit', value: `${limitValue}`, type: 'add', target: 't' },
+                        { key: 'data.pool', value: `${poolValue}`, type: 'add', target: 't' },
+                        { key: 'data.values.hits', value: `${poolValue}`, type: 'add', target: 't' },
+                    ],
+                },
             }]);
 
-
             // Test is created using the correct item.
-            const test = (await TestCreator.fromItem(item as SR5Item, actor, { showDialog: false, showMessage: false }))!;
+            const test = (await TestCreator.fromItem(item, actor, { showDialog: false, showMessage: false }))!;
 
             await test.execute();
 
-            assert.deepEqual(test.limit.changes,
-                [createTestChange(itemEffects[0], 0)]
-            );
+            assert.deepEqual(test.limit.changes, [createTestChange(itemEffects[0], 0)]);
             assert.equal(test.limit.value, limitValue);
             // SuccessTest will always include global and wounds modifier by default.
-            assert.deepEqual(test.pool.changes, [
-                createTestChange(itemEffects[0], 1)
-            ]);
+            assert.deepEqual(test.pool.changes, [createTestChange(itemEffects[0], 1)]);
             assert.equal(test.pool.value, poolValue);
-            assert.deepEqual(test.hits.changes,
-                [createTestChange(itemEffects[0], 2)]
-            );
+            assert.deepEqual(test.hits.changes, [createTestChange(itemEffects[0], 2)]);
             assert.isAtLeast(test.hits.value, hitsValue);
         });
 
@@ -646,91 +1013,153 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                             attribute: 'reaction',
                             attribute2: 'intuition',
                             skill: '',
-                            description: ''
+                            description: '',
                         }
                     }
                 }
             }]);
 
-            await actor.createEmbeddedDocuments('ActiveEffect', [{
-                name: 'Unrestricted Effect',
-                system: { applyTo: 'test_all' },
-                changes: [{ key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-            }, {
-                name: 'Opposed Effect',
-                system: { applyTo: 'test_all', selection_tests: ['OpposedTest'] },
-                changes: [{ key: 'data.pool', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-            }]);
+            await actor.createEmbeddedDocuments('ActiveEffect', [
+                {
+                    name: 'Unrestricted Effect',
+                    system: {
+                        changes: [{ key: 'data.pool', value: '3', type: 'add', target: 't' }],
+                        targets: [{ id: 't', applyTo: 'test_all' }],
+                    },
+                },
+                {
+                    name: 'Opposed Effect',
+                    system: {
+                        changes: [{ key: 'data.pool', value: '2', type: 'add', target: 't' }],
+                        targets: [{ id: 't', applyTo: 'test_all', conditions: [{ type: 'tests', values: ['OpposedTest'] }] }],
+                    },
+                },
+            ]);
 
-            const activeTest = (await TestCreator.fromItem(items[0] as SR5Item, actor, { showDialog: false, showMessage: false }))!;
+            const activeTest = (await TestCreator.fromItem(items[0], actor, { showDialog: false, showMessage: false }))!;
             const opposedData = await OpposedTest._getOpposedActionTestData(activeTest.data, actor, '');
             if (!opposedData) throw new Error('Failed to create opposed test data.');
 
             const opposedTest = new OpposedTest(opposedData, { actor });
             opposedTest.effects.applyAllEffects();
 
-            const opposedEffect = opposedTest.pool.changes.find(effect => effect.name === 'Opposed Effect') as any;
+            const opposedEffect = opposedTest.pool.changes.find((effect) => effect.name === 'Opposed Effect') as any;
             assert.isDefined(opposedEffect, 'Expected to find the opposed effect in the opposed test pool changes.');
             assert.equal(opposedEffect.name, 'Opposed Effect');
-            assert.equal(opposedEffect.mode, CONST.ACTIVE_EFFECT_MODES.ADD);
+            assert.equal(opposedEffect.type, 'add');
             assert.equal(opposedEffect.value, 2);
             assert.equal(opposedEffect.priority, 20);
             assert.equal(opposedEffect.enabled, true);
             assert.equal(opposedEffect.invalidated, false);
         });
 
-        it('TEST_ALL apply-to: respect skill, attribute and limit selections', async () => {
+        it('TEST_ALL apply-to: keep empty filters active', async () => {
             const actor = await factory.createActor({ type: 'character' });
+            await actor.createEmbeddedDocuments('ActiveEffect', [
+                {
+                    name: 'Empty Include Effect',
+                    system: {
+                        targets: [{
+                            id: 'include',
+                            applyTo: 'test_all',
+                            conditions: [{ type: 'categories', mode: 'include', values: [] }],
+                        }],
+                        changes: [{ key: 'data.pool', value: '2', type: 'add', target: 'include' }],
+                    },
+                },
+                {
+                    name: 'Empty Exclude Effect',
+                    system: {
+                        targets: [{
+                            id: 'exclude',
+                            applyTo: 'test_all',
+                            conditions: [{ type: 'categories', mode: 'exclude', values: [] }],
+                        }],
+                        changes: [{ key: 'data.pool', value: '3', type: 'add', target: 'exclude' }],
+                    },
+                },
+            ]);
+
+            const action = DataDefaults.createData('action_roll', {
+                test: SkillTest.name,
+                categories: ['social'],
+            });
+            const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false });
+            if (!test) throw new Error('Failed to create test from action.');
+
+            test.prepareTestCategories();
+            test.effects.applyAllEffects();
+
+            const effectNames = test.pool.changes.map(change => change.name);
+            assert.notInclude(effectNames, 'Empty Include Effect');
+            assert.include(effectNames, 'Empty Exclude Effect');
+        });
+
+        it('TEST_ALL apply-to: respect skill, attribute and limit selections', async () => {
+            const actor = await createCharacterWithSkills(['Automatics', 'Clubs']);
             const skillName = actor.getSkill('automatics')?.name ?? 'automatics';
 
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Selection Effect',
                 system: {
-                    applyTo: 'test_all',
-                    selection_skills: [skillName],
-                    selection_attributes: ['body'],
-                    selection_limits: ['physical']
-                },
-                changes: [{ key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+                    targets: [{ id: 't', applyTo: 'test_all', conditions: [
+                        { type: 'skills', values: [skillName] },
+                        { type: 'attributes', values: ['body'] },
+                        { type: 'limits', values: ['physical'] },
+                    ] }],
+                    changes: [{ key: 'data.pool', value: '3', type: 'add', target: 't' }],
+                }
             }]);
 
             const assertPoolValue = async (actionData: ActionRollType, expected: number) => {
-                const test = await TestCreator.fromAction(actionData, actor, { showDialog: false, showMessage: false }) as SkillTest;
+                const test = (await TestCreator.fromAction(actionData, actor, { showDialog: false, showMessage: false })) as SkillTest;
                 if (!test) throw new Error('Failed to create skill test.');
 
                 test.effects.applyAllEffects();
-                ModifiableValue.calcTotal(test.pool);
+                ModifiableValue.calcTotal(test.pool, { min: 0 });
 
                 assert.strictEqual(test.pool.value, expected);
             };
 
-            await assertPoolValue(DataDefaults.createData('action_roll', {
-                test: SkillTest.name,
-                skill: 'automatics',
-                attribute: 'body',
-                limit: { attribute: 'physical' }
-            }), 2); // skill defaulting 3 -1 => 2
+            await assertPoolValue(
+                DataDefaults.createData('action_roll', {
+                    test: SkillTest.name,
+                    skill: 'automatics',
+                    attribute: 'body',
+                    limit: { attribute: 'physical' },
+                }),
+                2,
+            ); // skill defaulting 3 -1 => 2
 
-            await assertPoolValue(DataDefaults.createData('action_roll', {
-                test: SkillTest.name,
-                skill: 'clubs',
-                attribute: 'body',
-                limit: { attribute: 'physical' }
-            }), -1);
+            await assertPoolValue(
+                DataDefaults.createData('action_roll', {
+                    test: SkillTest.name,
+                    skill: 'clubs',
+                    attribute: 'body',
+                    limit: { attribute: 'physical' },
+                }),
+                0,
+            );
 
-            await assertPoolValue(DataDefaults.createData('action_roll', {
-                test: SkillTest.name,
-                skill: 'automatics',
-                attribute: 'logic',
-                limit: { attribute: 'physical' }
-            }), -1);
+            await assertPoolValue(
+                DataDefaults.createData('action_roll', {
+                    test: SkillTest.name,
+                    skill: 'automatics',
+                    attribute: 'logic',
+                    limit: { attribute: 'physical' },
+                }),
+                0,
+            );
 
-            await assertPoolValue(DataDefaults.createData('action_roll', {
-                test: SkillTest.name,
-                skill: 'automatics',
-                attribute: 'body',
-                limit: { attribute: 'mental' }
-            }), -1);
+            await assertPoolValue(
+                DataDefaults.createData('action_roll', {
+                    test: SkillTest.name,
+                    skill: 'automatics',
+                    attribute: 'body',
+                    limit: { attribute: 'mental' },
+                }),
+                0,
+            );
         });
     });
 
@@ -738,9 +1167,9 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         it('A disabled effect should not apply', async () => {
             const actor = await factory.createActor({ type: 'character' });
             const effects = await actor.createEmbeddedDocuments('ActiveEffect', [{
+                system: { changes: [{ key: 'system.attributes.body', value: '3', type: 'add' }] },
                 name: 'Test Effect',
                 disabled: true,
-                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
             }]);
 
             const effect = effects.pop()!;
@@ -754,21 +1183,25 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             const actor = await factory.createActor({ type: 'character' });
             const items = await actor.createEmbeddedDocuments('Item', [
                 { type: 'cyberware', name: 'Wired Item', system: { technology: { wireless: 'none' } } },
-                { type: 'cyberware', name: 'Wireless Item', system: { technology: { wireless: 'online' } } }
+                { type: 'cyberware', name: 'Wireless Item', system: { technology: { wireless: 'online' } } },
             ]);
 
             let item = items.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                system: { onlyForWireless: true },
-                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+                system: {
+                    onlyForWireless: true,
+                    changes: [{ key: 'system.attributes.body', value: '3', type: 'add' }],
+                }
             }]);
 
             item = items.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                system: { onlyForWireless: true },
-                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+                system: {
+                    changes: [{ key: 'system.attributes.body', value: '3', type: 'add' }],
+                    onlyForWireless: true,
+                }
             }]);
 
             assert.lengthOf(actor.system.attributes.body.changes, 1);
@@ -785,15 +1218,19 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             let item = items.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                system: { onlyForEquipped: true },
-                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+                system: {
+                    onlyForEquipped: true,
+                    changes: [{ key: 'system.attributes.body', value: '3', type: 'add' }],
+                }
             }]);
 
             item = items.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                system: { onlyForEquipped: true },
-                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+                system: {
+                    changes: [{ key: 'system.attributes.body', value: '3', type: 'add' }],
+                    onlyForEquipped: true,
+                },
             }]);
 
             assert.lengthOf(actor.system.attributes.body.changes, 1);
@@ -803,22 +1240,36 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         it('A wireless and equipped only effect should not apply for a wired and unequipped item', async () => {
             const actor = await factory.createActor({ type: 'character' });
             const items = await actor.createEmbeddedDocuments('Item', [
-                { type: 'cyberware', name: 'Wireless Equipped Item', system: { technology: { equipped: true, wireless: 'online' } } },
-                { type: 'cyberware', name: 'Wired Unequipped Item', system: { technology: { equipped: false, wireless: 'offline' } } }
+                {
+                    type: 'cyberware',
+                    name: 'Wireless Equipped Item',
+                    system: { technology: { equipped: true, wireless: 'online' } },
+                },
+                {
+                    type: 'cyberware',
+                    name: 'Wired Unequipped Item',
+                    system: { technology: { equipped: false, wireless: 'offline' } },
+                },
             ]);
 
             let item = items.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                system: { onlyForEquipped: true, onlyForWireless: true },
-                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+                system: {
+                    onlyForEquipped: true,
+                    onlyForWireless: true,
+                    changes: [{ key: 'system.attributes.body', value: '3', type: 'add' }],
+                }
             }]);
 
             item = items.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                system: { onlyForEquipped: true, onlyForWireless: false },
-                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+                system: {
+                    onlyForEquipped: true,
+                    onlyForWireless: false,
+                    changes: [{ key: 'system.attributes.body', value: '3', type: 'add' }],
+                }
             }]);
 
             assert.lengthOf(actor.system.attributes.body.changes, 1);
@@ -827,16 +1278,21 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
 
         it('A wireless and equipped only effect should not apply if it the effect itself disabled', async () => {
             const actor = await factory.createActor({ type: 'character' });
-            const items = await actor.createEmbeddedDocuments('Item', [
-                { type: 'cyberware', name: 'Wireless Equipped Item', system: { technology: { equipped: true, wireless: 'online' } } },
-            ]);
+            const items = await actor.createEmbeddedDocuments('Item', [{
+                type: 'cyberware',
+                name: 'Wireless Equipped Item',
+                system: { technology: { equipped: true, wireless: 'online' } },
+            }]);
 
             const item = items.pop()!;
             await item.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
                 disabled: true,
-                system: { onlyForEquipped: true, onlyForWireless: true },
-                changes: [{ key: 'system.attributes.body', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+                system: {
+                    onlyForEquipped: true,
+                    onlyForWireless: true,
+                    changes: [{ key: 'system.attributes.body', value: '3', type: 'add' }],
+                }
             }]);
 
             // The value will match the attribute min value (0) due to ValueField flow.
@@ -847,35 +1303,38 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         it('A extended test should not apply effects on extended rolls', async () => {
             /**
              * Sum all modifier values for the given name.
-             * 
+             *
              * @param name The modifier name
              * @returns the sum of all modifier values matching the name
              */
-            const reduceModifiersByName = (name: string) => 
-                (acc: number, modifier: { name: string, value: number }) => 
-                    modifier.name === name ? acc + modifier.value : acc;
+            const reduceModifiersByName = (name: string) => (acc: number, modifier: { name: string; value: number }) =>
+                modifier.name === name ? acc + modifier.value : acc;
 
             const actor = await factory.createActor({ type: 'character' });
             let actions = await actor.createEmbeddedDocuments('Item', [{ name: 'Test Action', type: 'action' }]);
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                system: { applyTo: 'test_all', selection_tests: ["SuccessTest"] },
-                changes: [{ key: 'data.pool', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+                system: {
+                    targets: [{ id: 't', applyTo: 'test_all', conditions: [{ type: 'tests', values: ['SuccessTest'] }] }],
+                    changes: [{ key: 'data.pool', value: '2', type: 'add', target: 't' }],
+                }
             }]);
 
-            let test = (await TestCreator.fromItem(actions[0] as SR5Item, actor, { showDialog: false, showMessage: false }))!;
+            let test = (await TestCreator.fromItem(actions[0], actor, { showDialog: false, showMessage: false }))!;
             await test.execute();
 
             // The first roll should have the effect applied
             assert.equal(test.pool.changes.reduce(reduceModifiersByName('Test Effect'), 0), 2);
 
             // Trigger the extended roll...
-            test = await test.executeAsExtended();
+            test = (await test.executeAsExtended())!;
             // ... assure effects aren't re applied but taken from the first roll.
             assert.equal(test.pool.changes.reduce(reduceModifiersByName('Test Effect'), 0), 2);
 
-            actions = await actor.createEmbeddedDocuments('Item', [{ name: 'Test Action', type: 'action', system: { action: { extended : true  } } }]);
-            test = (await TestCreator.fromItem(actions[0] as SR5Item, actor, { showDialog: false, showMessage: false }))!;
+            actions = await actor.createEmbeddedDocuments('Item', [
+                { name: 'Test Action', type: 'action', system: { action: { extended: { value: 1, unit: 'minutes' } } } },
+            ]);
+            test = (await TestCreator.fromItem(actions[0], actor, { showDialog: false, showMessage: false }))!;
 
             // This will trigger the first and all extended rolls...
             await test.execute();
@@ -890,13 +1349,122 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             const actor = await factory.createActor({ type: 'character', system: { modifiers: { global: 6 } } });
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Actor Effect',
-                changes: [
-                    { key: 'system.attributes.body', value: '@system.modifiers.global', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                ]
+                system: {
+                    changes: [{ key: 'system.attributes.body', value: '@system.modifiers.global', type: 'add' }],
+                },
             }]);
 
             assert.lengthOf(actor.effects.contents, 1);
             assert.equal(actor.system.attributes.body.value, 6);
+        });
+
+        it('ACTOR apply-to: Resolve a rating indexed lookup table', async () => {
+            const actor = await factory.createActor({ type: 'character', system: { modifiers: { global: 2 } } });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Actor Effect',
+                system: {
+                    changes: [{
+                        key: 'system.attributes.body',
+                        value: '[10, 20, 30][@system.modifiers.global - 1]',
+                        type: 'add',
+                    }],
+                },
+            }]);
+
+            assert.equal(actor.system.attributes.body.value, 20);
+        });
+
+        it('ACTOR apply-to: A change value is never executed as code', async () => {
+            const marker = '__sr5ChangeValueExecutionMarker';
+            const actor = await factory.createActor({ type: 'character' });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Actor Effect',
+                system: {
+                    changes: [{
+                        key: 'system.attributes.body',
+                        value: `constructor.constructor('globalThis.${marker} = true; return 1')()`,
+                        type: 'add',
+                    }],
+                },
+            }]);
+
+            assert.isUndefined(globalThis[marker], 'the change value must not be executed');
+            assert.equal(actor.system.attributes.body.value, 0, 'the unresolvable change must be dropped');
+        });
+
+        it('ACTOR apply-to: Resolve a comparison to a boolean field', async () => {
+            const actor = await createCharacterWithSkills(['Automatics']);
+            assert.strictEqual(actor.system.skills.active.automatics.canDefault, true);
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Actor Effect',
+                system: {
+                    changes: [{
+                        key: 'system.skills.active.automatics.canDefault',
+                        value: '@system.attributes.body.value >= 100',
+                        type: 'override',
+                    }],
+                },
+            }]);
+
+            assert.strictEqual(actor.system.skills.active.automatics.canDefault, false);
+        });
+
+        it('ACTOR apply-to: Resolve a comparison to a number field as 1/0', async () => {
+            const actor = await factory.createActor({ type: 'character', system: { modifiers: { global: 5 } } });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Actor Effect',
+                system: {
+                    changes: [{
+                        key: 'system.attributes.body',
+                        value: '@system.modifiers.global >= 3 ? 4 : 0',
+                        type: 'add',
+                    }, {
+                        // A bare comparison on a number field must render as 1, not NaN -> 0.
+                        key: 'system.attributes.agility',
+                        value: '@system.modifiers.global >= 3',
+                        type: 'add',
+                    }],
+                },
+            }]);
+
+            assert.equal(actor.system.attributes.body.value, 4);
+            assert.equal(actor.system.attributes.agility.value, 1);
+        });
+
+        it('ACTOR apply-to: Resolve a string reference comparison to a string field', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            assert.strictEqual(actor.system.metatype, 'human');
+
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Actor Effect',
+                system: {
+                    changes: [{
+                        key: 'system.metatype',
+                        value: '@system.metatype == \'human\' ? \'elf\' : \'dwarf\'',
+                        type: 'override',
+                    }],
+                },
+            }]);
+
+            assert.strictEqual(actor.system.metatype, 'elf');
+        });
+
+        it('ACTOR apply-to: Default a missing reference with ?? instead of dropping the change', async () => {
+            const actor = await factory.createActor({ type: 'character' });
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Actor Effect',
+                system: {
+                    changes: [{
+                        // A missing reference falls back to the default rather than dropping the change.
+                        key: 'system.attributes.agility',
+                        value: '@system.nonexistent ?? 1',
+                        type: 'add',
+                    }],
+                },
+            }]);
+
+            assert.equal(actor.system.attributes.agility.value, 1);
         });
     });
 
@@ -910,8 +1478,10 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             const weapon = await factory.createItem({ type: 'weapon', system: { category: 'range' } });
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                system: { applyTo: 'test_all' },
-                changes: [{ key: 'data.damage', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+                system: {
+                    targets: [{ id: 't', applyTo: 'test_all' }],
+                    changes: [{ key: 'data.damage', value: '3', type: 'add', target: 't' }],
+                }
             }]);
 
             const test = (await TestCreator.fromItem(weapon, actor, { showDialog: false, showMessage: false }))!;
@@ -926,15 +1496,20 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             const actor = await factory.createActor({ type: 'character' });
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                system: { applyTo: 'test_all' },
-                changes: [
-                    { key: 'data.limit', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }
-                ]
+                system: {
+                    targets: [{ id: 't', applyTo: 'test_all' }],
+                    changes: [
+                        { key: 'data.limit', value: '3', type: 'add', target: 't' },
+                        { key: 'data.pool', value: '3', type: 'add', target: 't' },
+                    ],
+                }
             }]);
 
-            const action = DataDefaults.createData('action_roll', { test: SkillTest.name, limit: { attribute: 'social' } });
-            const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SkillTest;
+            const action = DataDefaults.createData('action_roll', {
+                test: SkillTest.name,
+                limit: { attribute: 'social' },
+            });
+            const test = (await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false })) as SkillTest;
             if (!test) throw new Error('Failed to create test from action.');
 
             // Simulate relevant part of #execute
@@ -960,14 +1535,16 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
             assert.strictEqual(test.limit.value, actor.getLimit('physical')!.value + 3);
         });
     });
-    
+
     describe('AdvanceEffects apply modification based on test categories', () => {
         it('Should apply modifier to a single category only', async () => {
             const actor = await factory.createActor({ type: 'character' });
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                system: { applyTo: 'test_all', selection_categories: ["social"] },
-                changes: [{ key: 'data.pool', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
+                system: {
+                    targets: [{ id: 't', applyTo: 'test_all', conditions: [{ type: 'categories', values: ['social'] }] }],
+                    changes: [{ key: 'data.pool', value: '3', type: 'add', target: 't' }],
+                }
             }]);
 
             // CASE - Test uses the same category
@@ -1011,21 +1588,21 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
         });
 
         it('Should apply skill-filtered modifiers for canonical keys and legacy skill names', async () => {
-            const actor = await factory.createActor({ type: 'character' });
-            await actor.createEmbeddedDocuments('ActiveEffect', [
-                {
-                    name: 'Skill Effect',
-                    system: { applyTo: 'test_all', selection_skills: ['sneaking'] },
-                    changes: [{ key: 'data.pool', value: '2', mode: CONST.ACTIVE_EFFECT_MODES.ADD }]
-                }                
-            ]);
+            const actor = await createCharacterWithSkills(['Sneaking']);
+            await actor.createEmbeddedDocuments('ActiveEffect', [{
+                name: 'Skill Effect',
+                system: {
+                    targets: [{ id: 't', applyTo: 'test_all', conditions: [{ type: 'skills', values: ['sneaking'] }] }],
+                    changes: [{ key: 'data.pool', value: '2', type: 'add', target: 't' }],
+                }
+            }]);
 
             const action = DataDefaults.createData('action_roll', {
                 test: SkillTest.name,
                 skill: 'sneaking',
                 attribute: 'agility',
             });
-            const test = await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false }) as SkillTest;
+            const test = (await TestCreator.fromAction(action, actor, { showDialog: false, showMessage: false })) as SkillTest;
             if (!test) throw new Error('Failed to create test from action.');
 
             test.effects.applyAllEffects();
@@ -1038,18 +1615,20 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
     /**
      * These tests cover interaction between Effect change application and data preparation code.
      */
-    describe("AdvancedEffects should hold true to data preparation expectations", () => {
+    describe('AdvancedEffects should hold true to data preparation expectations', () => {
         it('Should apply armor element modifiers from effect changes and armor items correctly', async () => {
             const actor = await factory.createActor({ type: 'character' });
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
-                changes: [
-                    { key: 'system.armor.elements.fire', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'system.armor.elements.acid', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'system.armor.elements.cold', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'system.armor.elements.electricity', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'system.armor.elements.radiation', value: '3', mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                ]
+                system: {
+                    changes: [
+                        { key: 'system.armor.elements.fire', value: '3', type: 'add' },
+                        { key: 'system.armor.elements.acid', value: '3', type: 'add' },
+                        { key: 'system.armor.elements.cold', value: '3', type: 'add' },
+                        { key: 'system.armor.elements.electricity', value: '3', type: 'add' },
+                        { key: 'system.armor.elements.radiation', value: '3', type: 'add' },
+                    ]
+                }
             }]);
             await actor.createEmbeddedDocuments('Item', [{
                 name: 'Test Armor',
@@ -1058,12 +1637,12 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                     technology: { equipped: true },
                     armor: {
                         elements: {
-                            fire: { base: 1},
-                            acid: { base: 2},
-                            cold: { base: 3},
-                            electricity: { base: 4},
-                            radiation: { base: 5}
-                        }
+                            fire: { base: 1 },
+                            acid: { base: 2 },
+                            cold: { base: 3 },
+                            electricity: { base: 4 },
+                            radiation: { base: 5 },
+                        },
                     }
                 }
             }]);

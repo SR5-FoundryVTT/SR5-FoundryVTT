@@ -4,7 +4,6 @@ import { SR5Roll } from "../rolls/SR5Roll";
 import { Migrator } from "../migrator/Migrator";
 import { CombatRules } from "../rules/CombatRules";
 import { FLAGS, SR, SYSTEM_NAME } from "../constants";
-import { ChatMessageMode } from "../types/global";
 import { SocketMessage } from "../sockets";
 
 const INITIATIVE_MODE_OPTIONS = ['meatspace', 'astral', 'cold_sim', 'hot_sim'] as const;
@@ -267,7 +266,6 @@ export class SR5Combatant extends Combatant<"base"> {
         } as ChatMessage.CreateData;
 
         const rollMode = this.hidden ? 'gm' : 'public';
-        // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
         ChatMessage.applyMode(messageData, rollMode);
 
         const message = await foundry.documents.ChatMessage.implementation.create(messageData);
@@ -277,7 +275,7 @@ export class SR5Combatant extends Combatant<"base"> {
 
     async playDSNInitiativeAnimation(
         roll: Roll,
-        rollMode: ChatMessageMode,
+        rollMode: ChatMessage.MessageMode,
         message: Pick<ChatMessage, 'id' | 'speaker' | 'whisper'>,
     ): Promise<boolean> {
         if (!game.modules.get('dice-so-nice')?.active || !game.dice3d) return false;
@@ -347,7 +345,8 @@ export class SR5Combatant extends Combatant<"base"> {
 
     /** Handles updates at the start of a combatant's turn. */
     async turnUpdate(pass: number): Promise<void> {
-        if (pass === SR.combat.FIRST_PASS) {
+        const historyReset = game.settings.get(SYSTEM_NAME, FLAGS.TokenMovementHistoryReset);
+        if (pass === SR.combat.FIRST_PASS && historyReset === 'firstActionPhase') {
             await this.clearMovementHistory();
         }
 

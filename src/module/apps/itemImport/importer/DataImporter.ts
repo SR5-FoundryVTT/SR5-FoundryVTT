@@ -116,7 +116,7 @@ export abstract class DataImporter {
                     continue;
                 }
 
-                const item = await parser.Parse(data, key);                
+                const item = await parser.Parse(data, key);
                 injectActionTests?.(item as Item.CreateData);
 
                 item._id = id;

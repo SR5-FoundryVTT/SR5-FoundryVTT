@@ -9,6 +9,7 @@ import { FLAGS, SYSTEM_NAME } from "../constants";
 import { Translation } from '../utils/strings';
 import { ActiveDefenseRules } from "../rules/ActiveDefenseRules";
 import { DeepPartial } from "fvtt-types/utils";
+import { TestOptions } from "./SuccessTest";
 import { MinimalActionType } from "../types/item/Action";
 import { SR5Item } from "../item/SR5Item";
 
@@ -27,16 +28,16 @@ export type PhysicalDefenseNoDamageCondition = {
 
 export class PhysicalDefenseTest<T extends PhysicalDefenseTestData = PhysicalDefenseTestData> extends DefenseTest<T> {
 
-    override _prepareData(data, options?): any {
-        data = super._prepareData(data, options);
+    override _prepareData(data: DeepPartial<T>, options?: Partial<TestOptions>): T {
+        const prepared = super._prepareData(data, options);
 
-        data.cover = 0;
-        data.activeDefense = '';
-        data.activeDefenses = {};
-        data.isMeleeAttack = false;
-        data.defenseReach = 0;
+        prepared.cover = 0;
+        prepared.activeDefense = '';
+        prepared.activeDefenses = {};
+        prepared.isMeleeAttack = false;
+        prepared.defenseReach = 0;
 
-        return data;
+        return prepared;
     }
 
     override get _dialogTemplate(): string {

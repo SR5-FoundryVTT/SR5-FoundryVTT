@@ -1,5 +1,5 @@
 import { DataDefaults } from "../data/DataDefaults";
-import { SuccessTest, SuccessTestData } from "./SuccessTest";
+import { SuccessTest, SuccessTestData, TestOptions } from "./SuccessTest";
 import { ModifiableValue } from '../mods/ModifiableValue';
 import { SpellcastingRules } from '../rules/SpellcastingRules';
 import { ConjuringRules } from '../rules/ConjuringRules';
@@ -37,18 +37,18 @@ interface SummonSpiritTestData extends SuccessTestData {
  */
 export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
 
-    override _prepareData(data: any, options: any) {
-        data = super._prepareData(data, options);
+    override _prepareData(data: DeepPartial<SummonSpiritTestData>, options: Partial<TestOptions>): SummonSpiritTestData {
+        const prepared = super._prepareData(data, options);
 
-        this._prepareSummoningData(data);
+        this._prepareSummoningData(prepared as SummonSpiritTestData);
 
-        data.preparedSpiritUuid = data.preparedSpiritUuid || '';
-        data.optionalPowerCount = data.optionalPowerCount ?? Math.floor(Number(data.force || 0) / 3);
+        prepared.preparedSpiritUuid = prepared.preparedSpiritUuid || '';
+        prepared.optionalPowerCount = prepared.optionalPowerCount ?? Math.floor(Number(prepared.force || 0) / 3);
 
-        data.drain = data.drain || 0;
-        data.drainDamage = data.drainDamage || DataDefaults.createData('damage');
+        prepared.drain ||= 0;
+        prepared.drainDamage ||= DataDefaults.createData('damage');
 
-        return data;
+        return prepared as SummonSpiritTestData;
     }
 
     override get _dialogTemplate() {
@@ -160,9 +160,9 @@ export class SummonSpiritTest extends SuccessTest<SummonSpiritTestData> {
         // Lower from more to less explicit values being given.
         // Don't let force go below one.
         data.force = Math.max(data.force || summoning.system.spirit.force || 1, 1);
-        data.preparedSpiritUuid = data.preparedSpiritUuid || summoning.system.spirit.uuid;
-        data.reagent = data.reagent || 0;
+        data.preparedSpiritUuid ||= summoning.system.spirit.uuid;
         data.optionalPowerCount = Math.floor(data.force / 3);
+        data.reagent ||= 0;
     }
 
     /**

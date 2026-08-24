@@ -1,10 +1,10 @@
 import { ActionRollType } from "@/module/types/item/Action";
 import { SR5Actor } from "../../actor/SR5Actor";
 import { SR5Item } from "../SR5Item";
-import { RollDataOptions } from "../Types";
+import { RollDataOptions, RollDataTestAccessor } from "../Types";
 import { AttributeRules } from '@/module/rules/AttributeRules';
 
-type ActionCategoryRollDataCallback = (item: SR5Item, rollData: any, action?: ActionRollType, testData?: any) => undefined;
+type ActionCategoryRollDataCallback = (item: SR5Item, rollData: any, action?: ActionRollType, testData?: RollDataTestAccessor) => undefined;
 
 /**
  * Handle value retrieval for SR5Item test data values.
@@ -70,7 +70,7 @@ export const ItemRollDataFlow = {
      * @param againstData The original tests data, when testData is an OpposedTest.
      * @returns 
      */
-    matrixTestRollDataFlow(item: SR5Item, rollData: any, action?: ActionRollType, testData?: any) {
+    matrixTestRollDataFlow(item: SR5Item, rollData: any, action?: ActionRollType, testData?: RollDataTestAccessor) {
         const actor = item.actorOwner;
 
         // CASE - Matrix Device is slaved inside a PAN or WAN

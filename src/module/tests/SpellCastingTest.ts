@@ -1,4 +1,4 @@
-import {SuccessTest, SuccessTestData} from "./SuccessTest";
+import {SuccessTest, SuccessTestData, TestOptions} from "./SuccessTest";
 import {SpellcastingRules} from "../rules/SpellcastingRules";
 import {ModifiableValue} from "../mods/ModifiableValue";
 import {DataDefaults} from "../data/DataDefaults";
@@ -20,20 +20,19 @@ export interface SpellCastingTestData extends SuccessTestData {
 
 /**
  * Spellcasting tests as described on SR5#281 in the spellcasting chapter.
- *
  */
 export class SpellCastingTest extends SuccessTest<SpellCastingTestData> {
     public override item: SR5Item<'spell'> | undefined = undefined;
 
-    override _prepareData(data, options): any {
-        data = super._prepareData(data, options);
+    override _prepareData(data: DeepPartial<SpellCastingTestData>, options: Partial<TestOptions>): SpellCastingTestData {
+        const prepared = super._prepareData(data, options);
 
-        data.force = data.force || 0;
-        data.drain = data.drain || 0;
-        data.reckless = data.reckless || false;
-        data.drainDamage = data.drainDamage || DataDefaults.createData('damage');
+        prepared.force ||= 0;
+        prepared.drain ||= 0;
+        prepared.reckless ||= false;
+        prepared.drainDamage ||= DataDefaults.createData('damage');
 
-        return data;
+        return prepared as SpellCastingTestData;
     }
 
     override get _dialogTemplate()  {

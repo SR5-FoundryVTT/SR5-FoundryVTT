@@ -58,27 +58,7 @@ import ThermographicVisionDetectionMode from "../vision/thermographicVision/ther
 import { DiceSoNice } from "../rolls/DiceSoNice";
 import { Skill } from "./item/Skill";
 
-export type ChatMessageMode = keyof CONFIG.ChatMessage.modes;
-
 declare module "fvtt-types/configuration" {
-    namespace CONFIG {
-        interface ChatMessageModeConfig {
-            label: string;
-            icon: string;
-            handler?: (chatData: object) => unknown;
-        }
-
-        namespace ChatMessage {
-            type modes = {
-                public: CONFIG.ChatMessageModeConfig;
-                gm: CONFIG.ChatMessageModeConfig;
-                blind: CONFIG.ChatMessageModeConfig;
-                self: CONFIG.ChatMessageModeConfig;
-                ic: CONFIG.ChatMessageModeConfig;
-            };
-        }
-    }
-
     interface DocumentClassConfig {
         ActiveEffect: typeof SR5ActiveEffect;
         Actor: typeof SR5Actor<Actor.ConfiguredSubType>;
@@ -262,6 +242,8 @@ declare module "fvtt-types/configuration" {
             sr5_testProcessResults: any;
             sr5_afterTestComplete: any;
             sr5_processTagifyElements: any;
+            // Fired on all clients on global data storage changes, with the changed keys.
+            'sr5e.storageChanged': (changedKeys: string[]) => void;
             "routinglib.ready": () => void;
             SR5_CastItemAction: (arg0: SR5Item) => void;
             SR5_PreActorItemRoll: (arg0: SR5Actor, arg1: SR5Item) => void;
@@ -275,12 +257,6 @@ declare module "fvtt-types/configuration" {
             dropItemSheetData: any;
             // Hooks for Autocomplete Inline Properties integration
             aipSetup: (packageConfig: {packageName: string}[]) => void;
-        }
-    }
-
-    namespace ActiveEffect {
-        interface ChangeData {
-            effect: SR5ActiveEffect;
         }
     }
 
@@ -320,6 +296,10 @@ declare module "fvtt-types/configuration" {
         "shadowrun5e.CompendiumBrowserBlacklist": string[];
         "shadowrun5e.ImporterCompendiumOrder": string[];
         "shadowrun5e.TokenAutoRunning": boolean;
+        "shadowrun5e.EnforceExtendedTestInterval": boolean;
+        "shadowrun5e.ExtendedTestDueMessage": boolean;
+        "shadowrun5e.WorldTimeInitialized": boolean;
+        "shadowrun5e.TokenMovementHistoryReset": 'firstActionPhase' | 'turnStart';
     }
 }
 
@@ -365,8 +345,4 @@ declare global {
             { [K in E[0]]: _NormalizeNever<Extract<E, readonly [K, unknown]>[1]> };
         fromEntries<K extends PropertyKey, V>(obj: Iterable<readonly [K, V]>): Record<K, V>;
     }
-
-    // IF set to true, will disable auto population of pack based skill items on actors.
-    // This is only necessary for qunech unit tests and shouldn't be used otherwise.
-    var doNotPopulateDefaultSkills: boolean | undefined;
 }

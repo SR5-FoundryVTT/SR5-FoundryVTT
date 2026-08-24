@@ -48,7 +48,10 @@
         "value": 0,
         "base": 0
       },
-      "extended": false,
+      "extended": {
+        "value": 0,
+        "unit": "minutes"
+      },
       "modifiers": [],
       "damage": {
         "value": 0,

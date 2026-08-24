@@ -3,6 +3,10 @@ import { QuenchBatchContext } from "@ethaks/fvtt-quench";
 import { TestCreator } from "../module/tests/TestCreator";
 import { DataDefaults } from "@/module/data/DataDefaults";
 import { ModifiableValue } from "@/module/mods/ModifiableValue";
+import { TestDialog } from "../module/apps/dialogs/TestDialog";
+import { FLAGS, SYSTEM_NAME } from "../module/constants";
+import { SpellCastingTest } from "@/module/tests/SpellCastingTest";
+import { SuccessTest } from "@/module/tests/SuccessTest";
 import { NaturalRecoveryStunTest } from "@/module/tests/NaturalRecoveryStunTest";
 import { NaturalRecoveryPhysicalTest } from "@/module/tests/NaturalRecoveryPhysicalTest";
 
@@ -15,8 +19,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
     describe('SuccessTest', () => {
         it('evaluate a roll from action data', async () => {
-            window.doNotPopulateDefaultSkills = true;
-
             const action = await factory.createItem({
                 type: 'action',
                 system: {
@@ -49,7 +51,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                 system: {
                     attributes: { body: { base: 5 }, strength: { base: 1 }, reaction: { base: 1 } },
                 }
-            });
+            }, { skipDefaultSkills: true });
             await actor.createEmbeddedDocuments('Item', [
                 {
                     type: 'skill',
@@ -63,8 +65,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                     }
                 }
             ]);
-            
-            delete window.doNotPopulateDefaultSkills;
 
             const test = await TestCreator.fromItem(action, actor, {showMessage: false, showDialog: false});
 
@@ -90,6 +90,207 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             assert.strictEqual(test.pool.value, 10);
         });
 
+        describe('limit usage UI state', () => {
+            const COMMON_PARTIAL = 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.hbs';
+
+            // Extract just the limit field's input element from the rendered dialog markup.
+            const renderLimitInput = async (test): Promise<string> => {
+                const html = await foundry.applications.handlebars.renderTemplate(
+                    COMMON_PARTIAL, { test, expandedPaths: [] } as any);
+                return (/<input[^>]*name="test\.data\.limit"[^>]*>/.exec(html))?.[0] ?? '';
+            };
+            const manualLimitOverride = (test) =>
+                test.limit.changes.find(change => change.name === 'SR5.ManualOverride');
+
+            it('renders an applied limit (>0) as a normal editable number', async () => {
+                const test = TestCreator.fromPool({ pool: 10, limit: 3 }, { showMessage: false, showDialog: false });
+                assert.deepEqual(test.limitUsage, { infinity: false, disabled: false });
+
+                const input = await renderLimitInput(test);
+                assert.include(input, 'type="number"');
+                assert.include(input, 'value="3"');
+                assert.notInclude(input, 'limit-infinity');
+                assert.notInclude(input, 'disabled');
+            });
+
+            it('renders a disabled infinity field when Push The Limit is active', async () => {
+                const test = TestCreator.fromPool({ pool: 10, limit: 3 }, { showMessage: false, showDialog: false });
+                test.data.pushTheLimit = true;
+                assert.deepEqual(test.limitUsage, { infinity: true, disabled: true });
+
+                const input = await renderLimitInput(test);
+                assert.include(input, 'class="limit-infinity"');
+                assert.include(input, 'value="∞"');
+                assert.include(input, 'disabled');
+                assert.include(input, 'data-tooltip="SR5.Tooltips.Test.LimitIgnored"');
+            });
+
+            it('renders a disabled infinity field when global limits are disabled', async () => {
+                const previous = game.settings.get(SYSTEM_NAME, FLAGS.ApplyLimits);
+                await game.settings.set(SYSTEM_NAME, FLAGS.ApplyLimits, false);
+                try {
+                    const test = TestCreator.fromPool({ pool: 10, limit: 3 }, { showMessage: false, showDialog: false });
+                    assert.deepEqual(test.limitUsage, { infinity: true, disabled: true });
+
+                    const input = await renderLimitInput(test);
+                    assert.include(input, 'class="limit-infinity"');
+                    assert.include(input, 'value="∞"');
+                    assert.include(input, 'disabled');
+                    assert.include(input, 'data-tooltip="SR5.Tooltips.Test.LimitIgnored"');
+                } finally {
+                    await game.settings.set(SYSTEM_NAME, FLAGS.ApplyLimits, previous);
+                }
+            });
+
+            it('renders a literal 0 limit as an editable infinity field', async () => {
+                const test = TestCreator.fromPool({ pool: 10, limit: 0 }, { showMessage: false, showDialog: false });
+                assert.deepEqual(test.limitUsage, { infinity: true, disabled: false });
+
+                const input = await renderLimitInput(test);
+                assert.include(input, 'class="limit-infinity"');
+                assert.include(input, 'value="∞"');
+                assert.notInclude(input, 'disabled');
+            });
+
+            it('resets the limit to its computed value when the field is emptied', () => {
+                const test = TestCreator.fromPool({ pool: 10, limit: 4 }, { showMessage: false, showDialog: false });
+                const dialog = new TestDialog(test, [], {});
+
+                // Override the limit, then clear the field to revert back to the computed value.
+                dialog._updateData({ 'test.data.limit': '7' });
+                assert.strictEqual(test.limit.value, 7);
+
+                dialog._updateData({ 'test.data.limit': '' });
+                assert.strictEqual(test.limit.value, 4);
+                assert.isUndefined(manualLimitOverride(test));
+            });
+
+            it('submits the infinity symbol as an explicit 0 limit', () => {
+                const test = TestCreator.fromPool({ pool: 10, limit: 4 }, { showMessage: false, showDialog: false });
+                const dialog = new TestDialog(test, [], {});
+
+                dialog._updateData({ 'test.data.limit': '7' });
+                dialog._updateData({ 'test.data.limit': '∞' });
+                assert.strictEqual(test.limit.value, 0);
+                assert.strictEqual(manualLimitOverride(test)?.value, 0);
+            });
+
+            it('keeps an explicit 0 limit and renders it as ∞', async () => {
+                const test = TestCreator.fromPool({ pool: 10, limit: 4 }, { showMessage: false, showDialog: false });
+                const dialog = new TestDialog(test, [], {});
+
+                dialog._updateData({ 'test.data.limit': '0' });
+                assert.strictEqual(test.limit.value, 0);
+                assert.strictEqual(manualLimitOverride(test)?.value, 0);
+                assert.deepEqual(test.limitUsage, { infinity: true, disabled: false });
+
+                const input = await renderLimitInput(test);
+                assert.include(input, 'class="limit-infinity"');
+                assert.include(input, 'value="∞"');
+            });
+
+            it('applies a numeric limit entry as an override', () => {
+                const test = TestCreator.fromPool({ pool: 10, limit: 0 }, { showMessage: false, showDialog: false });
+                const dialog = new TestDialog(test, [], {});
+
+                dialog._updateData({ 'test.data.limit': '5' });
+                assert.strictEqual(test.limit.value, 5);
+            });
+
+            it('ignores invalid non-empty limit text', () => {
+                const test = TestCreator.fromPool({ pool: 10, limit: 4 }, { showMessage: false, showDialog: false });
+                const dialog = new TestDialog(test, [], {});
+
+                dialog._updateData({ 'test.data.limit': '6' });
+                assert.strictEqual(test.limit.value, 6);
+
+                dialog._updateData({ 'test.data.limit': 'not a number' });
+                assert.strictEqual(test.limit.value, 6);
+                assert.strictEqual(manualLimitOverride(test)?.value, 6);
+            });
+        });
+
+        describe('threshold usage UI state', () => {
+            const COMMON_PARTIAL = 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.hbs';
+
+            const renderThresholdInput = async (test): Promise<string> => {
+                const html = await foundry.applications.handlebars.renderTemplate(
+                    COMMON_PARTIAL, { test, expandedPaths: [] } as any);
+                return (/<input[^>]*name="test\.data\.threshold"[^>]*>/.exec(html))?.[0] ?? '';
+            };
+            const manualThresholdOverride = (test) =>
+                test.threshold.changes.find(change => change.name === 'SR5.ManualOverride');
+
+            it('renders an applied threshold (>0) as a normal editable number', async () => {
+                const test = TestCreator.fromPool({ pool: 10, threshold: 3 }, { showMessage: false, showDialog: false });
+                assert.deepEqual(test.thresholdUsage, { dash: false });
+
+                const input = await renderThresholdInput(test);
+                assert.include(input, 'type="number"');
+                assert.include(input, 'value="3"');
+                assert.notInclude(input, 'threshold-dash');
+                assert.notInclude(input, 'disabled');
+            });
+
+            it('renders a literal 0 threshold as an editable dash field', async () => {
+                const test = TestCreator.fromPool({ pool: 10, threshold: 0 }, { showMessage: false, showDialog: false });
+                assert.deepEqual(test.thresholdUsage, { dash: true });
+
+                const input = await renderThresholdInput(test);
+                assert.include(input, 'class="threshold-dash"');
+                assert.include(input, 'value="-"');
+                assert.notInclude(input, 'disabled');
+            });
+
+            it('resets the threshold to its computed value when the field is emptied', () => {
+                const test = TestCreator.fromPool({ pool: 10, threshold: 4 }, { showMessage: false, showDialog: false });
+                const dialog = new TestDialog(test, [], {});
+
+                dialog._updateData({ 'test.data.threshold': '7' });
+                assert.strictEqual(test.threshold.value, 7);
+
+                dialog._updateData({ 'test.data.threshold': '' });
+                assert.strictEqual(test.threshold.value, 4);
+                assert.isUndefined(manualThresholdOverride(test));
+            });
+
+            it('submits the dash as an explicit 0 threshold', () => {
+                const test = TestCreator.fromPool({ pool: 10, threshold: 4 }, { showMessage: false, showDialog: false });
+                const dialog = new TestDialog(test, [], {});
+
+                dialog._updateData({ 'test.data.threshold': '7' });
+                dialog._updateData({ 'test.data.threshold': '-' });
+                assert.strictEqual(test.threshold.value, 0);
+                assert.strictEqual(manualThresholdOverride(test)?.value, 0);
+            });
+
+            it('keeps an explicit 0 threshold and renders it as a dash', async () => {
+                const test = TestCreator.fromPool({ pool: 10, threshold: 4 }, { showMessage: false, showDialog: false });
+                const dialog = new TestDialog(test, [], {});
+
+                dialog._updateData({ 'test.data.threshold': '0' });
+                assert.strictEqual(test.threshold.value, 0);
+                assert.strictEqual(manualThresholdOverride(test)?.value, 0);
+                assert.deepEqual(test.thresholdUsage, { dash: true });
+
+                const input = await renderThresholdInput(test);
+                assert.include(input, 'class="threshold-dash"');
+                assert.include(input, 'value="-"');
+            });
+
+            it('ignores invalid non-empty threshold text', () => {
+                const test = TestCreator.fromPool({ pool: 10, threshold: 4 }, { showMessage: false, showDialog: false });
+                const dialog = new TestDialog(test, [], {});
+
+                dialog._updateData({ 'test.data.threshold': '6' });
+                assert.strictEqual(test.threshold.value, 6);
+
+                dialog._updateData({ 'test.data.threshold': 'not a number' });
+                assert.strictEqual(test.threshold.value, 6);
+                assert.strictEqual(manualThresholdOverride(test)?.value, 6);
+            });
+        });
+
         it('marks manual-priority changes as manual modifiers', () => {
             const valueField = DataDefaults.createData('value_field', {
                 label: 'SR5.DicePool',
@@ -97,7 +298,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             });
 
             ModifiableValue.add(valueField, 'Custom Modifier', 3, {
-                mode: 'ADD',
+                type: 'add',
                 priority: ModifiableValue.MANUAL_PRIORITY,
             });
 
@@ -107,6 +308,19 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
             assert.strictEqual(createdChange.priority, ModifiableValue.MANUAL_PRIORITY);
             assert.isTrue(ModifiableValue.isManualChange(createdChange));
+        });
+
+        it('applies subtract changes when calculating totals', () => {
+            const valueField = DataDefaults.createData('value_field', {
+                label: 'SR5.DicePool',
+                base: 10,
+            });
+
+            ModifiableValue.add(valueField, 'Penalty', 3, { type: 'subtract' });
+            ModifiableValue.calcTotal(valueField);
+
+            assert.strictEqual(valueField.value, 7);
+            assert.strictEqual(valueField.changes[0].type, 'subtract');
         });
 
         it('buy hits uses floor(pool / 4) and has no glitches', async () => {
@@ -130,8 +344,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
         });
 
         it('stores code term traces for labeled pool and limit parts', async () => {
-            window.doNotPopulateDefaultSkills = true;
-
             const actor = await factory.createActor({
                 type: 'character',
                 system: {
@@ -142,7 +354,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                         reaction: { base: 3 }
                     },
                 }
-            });
+            }, { skipDefaultSkills: true });
 
             await actor.createEmbeddedDocuments('Item', [
                 {
@@ -157,8 +369,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                     }
                 }
             ]);
-            
-            delete window.doNotPopulateDefaultSkills;
 
             const action = DataDefaults.createData('action_roll', {
                 test: 'SuccessTest',
@@ -198,6 +408,56 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             assert.isTrue(test.codeTerms.threshold.every(term => !term.tooltipSource));
         });
 
+        it('creates structural test data without contextual values', () => {
+            const data = SuccessTest.applyStructuralDefaults({});
+
+            assert.isUndefined(data.type);
+            assert.isUndefined(data.title);
+            assert.isUndefined(data.sourceActorUuid);
+            assert.isUndefined(data.sourceItemUuid);
+            assert.isUndefined(data.sourceUuid);
+            assert.isUndefined(data.targetUuids);
+        });
+
+        it('stamps subclass identity from structural test data', () => {
+            const test = new SpellCastingTest({});
+
+            assert.strictEqual(test.data.type, 'SpellCastingTest');
+            assert.strictEqual(test.data.title, 'SR5.Tests.SpellCastingTest');
+        });
+
+        it('preserves subclass test identity through serialization and rehydration', async () => {
+            const actor = await factory.createActor({
+                type: 'character',
+                system: {
+                    attributes: {
+                        magic: { base: 5 },
+                        willpower: { base: 4 },
+                        body: { base: 3 },
+                        strength: { base: 3 },
+                        reaction: { base: 3 }
+                    },
+                }
+            });
+
+            const action = DataDefaults.createData('action_roll', {
+                test: 'SpellCastingTest',
+                followed: { test: 'DrainTest' }
+            });
+
+            const test = await TestCreator.fromAction(action, actor, { showMessage: false, showDialog: false });
+            assert.instanceOf(test, SpellCastingTest);
+            assert.strictEqual(test?.data.type, 'SpellCastingTest');
+            assert.strictEqual(test?.data.title, 'SR5.Tests.SpellCastingTest');
+
+            const serialized = test?.toJSON().data;
+            assert.strictEqual(serialized?.type, 'SpellCastingTest');
+
+            const restored = serialized ? TestCreator.fromTestData(serialized) : undefined;
+            assert.instanceOf(restored, SpellCastingTest);
+            assert.strictEqual(restored?.canBeExtended, false);
+        });
+
         it('keeps the stun recovery threshold fixed on extended rolls', async () => {
             const actor = await factory.createActor({
                 type: 'character',
@@ -216,7 +476,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
             await actor.update({ system: { track: { stun: { value: 2 } } } });
 
-            const extendedData = foundry.utils.duplicate(test.data);
+            const extendedData = foundry.utils.deepClone(test.data);
             extendedData.extendedRoll = true;
             const extendedTest = new NaturalRecoveryStunTest(extendedData, { actor }, { showMessage: false, showDialog: false });
             extendedTest.prepareBaseValues();
@@ -243,7 +503,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
             await actor.update({ system: { track: { physical: { value: 3 } } } });
 
-            const extendedData = foundry.utils.duplicate(test.data);
+            const extendedData = foundry.utils.deepClone(test.data);
             extendedData.extendedRoll = true;
             const extendedTest = new NaturalRecoveryPhysicalTest(extendedData, { actor }, { showMessage: false, showDialog: false });
             extendedTest.prepareBaseValues();

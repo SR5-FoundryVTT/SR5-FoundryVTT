@@ -1,5 +1,5 @@
 import { DataDefaults } from "../data/DataDefaults";
-import { SuccessTest, SuccessTestData } from "./SuccessTest";
+import { SuccessTest, SuccessTestData, TestOptions } from "./SuccessTest";
 import { ModifiableValue } from '../mods/ModifiableValue';
 import { RitualRules } from '../rules/RitualRules';
 import { DamageType, MinimalActionType } from "../types/item/Action";
@@ -29,15 +29,15 @@ interface RitualSpellcastingTestData extends SuccessTestData {
  */
 export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestData> {
 
-    override _prepareData(data: any, options: any) {
-        data = super._prepareData(data, options);
+    override _prepareData(data: DeepPartial<RitualSpellcastingTestData>, options: Partial<TestOptions>): RitualSpellcastingTestData {
+        const prepared = super._prepareData(data, options);
 
-        this._prepareRitualData(data);
+        this._prepareRitualData(prepared as RitualSpellcastingTestData);
 
-        data.drain = data.drain || 0;
-        data.drainDamage = data.drainDamage || DataDefaults.createData('damage');
+        prepared.drain ||= 0;
+        prepared.drainDamage ||= DataDefaults.createData('damage');
 
-        return data;
+        return prepared as RitualSpellcastingTestData;
     }
 
     override get _dialogTemplate() {
@@ -63,7 +63,6 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
     }
 
     /**
-     *
      */
     static override _getDefaultTestAction(): DeepPartial<MinimalActionType> {
         return { skill: 'ritual_spellcasting', attribute: 'magic' }
@@ -136,7 +135,6 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
 
     /**
      * Calculate limit based on force selected by user.
-     * 
      */
     prepareLimitValue() {
         ModifiableValue.addUniqueBase(this.data.limit, 'SR5.Force', this.data.force);
@@ -158,7 +156,7 @@ export class RitualSpellcastingTest extends SuccessTest<RitualSpellcastingTestDa
         // Lower from more to less explicit values being given.
         // Don't let force go below one.
         data.force = Math.max(data.force || 1, 1);
-        data.reagents = data.reagents || data.force;
+        data.reagents ||= data.force;
     }
 
     /**

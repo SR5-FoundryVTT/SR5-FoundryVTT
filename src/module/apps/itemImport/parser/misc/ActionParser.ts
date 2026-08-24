@@ -51,7 +51,11 @@ export class ActionParser extends Parser<'action'> {
 
         // 1. Set basic action properties
         action.type = jsonData.type._TEXT.toLowerCase() as ActionRollType['type'];
-        action.extended = jsonData.type._TEXT === "Extended";
+        // Chummer only marks an action extended, without an interval. One minute is the
+        // default the system applied to every extended action before intervals existed.
+        action.extended = jsonData.type._TEXT === "Extended"
+            ? { value: 1, unit: 'minutes' }
+            : { value: 0, unit: 'minutes' };
         description.value = jsonData.test?.bonusstring?._TEXT ?? "";
         if (jsonData.initiativecost?._TEXT)
             action.initiative_mod = -Number(jsonData.initiativecost._TEXT);

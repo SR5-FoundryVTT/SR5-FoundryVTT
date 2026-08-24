@@ -4,6 +4,7 @@ import { ModifiableValue } from "../mods/ModifiableValue";
 import { CompileSpriteTest } from "./CompileSpriteTest";
 import { OpposedTest, OpposedTestData } from "./OpposedTest";
 import { SuccessTestData, TestDocuments, TestOptions } from "./SuccessTest";
+import { DeepPartial } from "fvtt-types/utils";
 import { Translation } from '../utils/strings';
 
 const { setProperty, fromUuid } = foundry.utils;
@@ -55,7 +56,7 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
         await test.execute();
     }
 
-    constructor(data, documents?: TestDocuments, options?: TestOptions) {
+    constructor(data: DeepPartial<OpposedCompileSpriteTestData>, documents?: TestDocuments, options?: Partial<TestOptions>) {
         // Due to compilation, the active actor for this test will be created during execution.
         // The selected or user character aren't the correct choice here.
         delete documents?.actor;
@@ -70,12 +71,12 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
         if (this.against.type !== 'CompileSpriteTest') throw new Error(`${this.constructor.name} can only oppose CompileSpriteTest but is opposing a ${this.against.type}`);
     }
 
-    override _prepareData(data: any, options?: any) {
-        data = super._prepareData(data, options);
+    override _prepareData(data: DeepPartial<OpposedCompileSpriteTestData>, options?: Partial<TestOptions>): OpposedCompileSpriteTestData {
+        const prepared = super._prepareData(data, options);
 
-        data.compiledSpriteUuid = data.compiledSpriteUuid || '';
+        prepared.compiledSpriteUuid ||= '';
 
-        return data;
+        return prepared as OpposedCompileSpriteTestData;
     }
 
     override get _chatMessageTemplate(): string {
@@ -240,8 +241,6 @@ export class OpposedCompileSpriteTest extends OpposedTest<OpposedCompileSpriteTe
 
     /**
      * Try getting a prepared sprite actor to reuse.
-     * 
-     * @returns 
      */
     async getPreparedSpriteActor(): Promise<SR5Actor | null> {
         return fromUuid<SR5Actor>(this.against.data.preparedSpriteUuid);

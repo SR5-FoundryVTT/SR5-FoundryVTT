@@ -2,11 +2,15 @@ import { PackItemFlow } from '@/module/item/flows/PackItemFlow';
 import { SR5Actor } from '../SR5Actor';
 import { SR5Item } from '@/module/item/SR5Item';
 import { SkillItemFlow } from '@/module/item/flows/SkillItemFlow';
-import { ActorSkillFlow } from './ActorSkillFlow';
 import { Helpers } from '@/module/helpers';
 
 interface ReplaceSkillSetOptions {
     askForConfirmation?: boolean;
+}
+
+export interface PreparedSkillSetItems {
+    skills: Item.CreateData[];
+    groups: Item.CreateData[];
 }
 
 /**
@@ -64,34 +68,44 @@ export const SkillSetFlow = {
     async applySkillSetToActor(actor: SR5Actor, skillSet: SR5Item<'skill'>, options: { useSource?: boolean } = {}) {
         if (!skillSet.isType('skill') || skillSet.system.type !== 'set') return;
 
-        let skills = await PackItemFlow.prepareSkillsForSkillSet(skillSet);
-        const groups = await PackItemFlow.prepareSkillGroupsForSkillSet(skillSet) as Item.CreateData[];
-
-        const newSkillKeys = new Set<string>();
-        
-        skills = skills.filter(item => {
-            if (!item.name) return false;
-
-            const skillCategory = foundry.utils.getProperty(item, 'system.skill.category') as string;
-            const skillNameByCategoryKey = SkillItemFlow.skillNameByCategoryKey(item.name, skillCategory);
-            if (newSkillKeys.has(skillNameByCategoryKey) || ActorSkillFlow.hasSkillOfSameNameAndCategory(actor, item.name, skillCategory)) {
-                return false;
-            }
-            newSkillKeys.add(skillNameByCategoryKey);
-            return true;
-        });
-
-        const items = [...skills, ...groups];
+        const prepared = await this.prepareSkillSetItems(skillSet);
+        const items = this.selectMissingSkillSetItems(prepared, SkillItemFlow.skillKeys(actor.items));
 
         // Support document creation flow.
         if (options.useSource) {
-            actor.updateSource({ items, system: { skillset: skillSet.uuid } });
+            const existingItems = actor.items.map(item => item.toObject());
+            actor.updateSource({ items: [...existingItems, ...items], system: { skillset: skillSet.uuid } });
             return;
         }
 
         // Support adding skillset onto existing actor flow.
         await actor.createEmbeddedDocuments('Item', items);
         await actor.update({ system: { skillset: skillSet.uuid } });
-        console.log(`Shadowrun 5e | Added ${skills.length} skills and ${groups.length} skill groups from pack to actor ${actor.name}`);
+        console.log(`Shadowrun 5e | Added ${items.length} skills and skill groups from pack to actor ${actor.name}`);
+    },
+
+    /** Prepare the items contributed by a skill set. */
+    async prepareSkillSetItems(skillSet: SR5Item<'skill'>): Promise<PreparedSkillSetItems> {
+        return {
+            skills: await PackItemFlow.prepareSkillsForSkillSet(skillSet),
+            groups: await PackItemFlow.prepareSkillGroupsForSkillSet(skillSet),
+        };
+    },
+
+    /** Exclude prepared skills already present; always include groups. */
+    selectMissingSkillSetItems(prepared: PreparedSkillSetItems, existingSkillKeys: Set<string>): Item.CreateData[] {
+        const skillKeys = new Set(existingSkillKeys);
+
+        const skills = prepared.skills.filter(item => {
+            if (!item.name) return false;
+
+            const skillNameByCategoryKey = SkillItemFlow.skillNameByCategoryKey(item.name, SkillItemFlow.getSkillCategory(item));
+            if (skillKeys.has(skillNameByCategoryKey)) return false;
+
+            skillKeys.add(skillNameByCategoryKey);
+            return true;
+        });
+
+        return [...skills, ...prepared.groups];
     },
 };

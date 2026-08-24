@@ -81,7 +81,7 @@ export const MarksStorage = {
      * Helper to retrieve a valid marks data storage.
      */
     getStorage(): Shadowrun.Storage['matrix']['marks'] {
-        return DataStorage.get(MarksStorage.key) ?? {};
+        return DataStorage.get<Shadowrun.Storage['matrix']['marks']>(MarksStorage.key) ?? {};
     },
 
     /**

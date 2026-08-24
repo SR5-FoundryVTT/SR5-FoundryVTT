@@ -4,6 +4,7 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { MatrixNetworkFlow } from '../item/flows/MatrixNetworkFlow';
 import { SheetFlow } from '@/module/flows/SheetFlow';
 import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
+import { prepareEffectDurationStatus } from '../effect/EffectDurationStatus';
 
 export const registerItemLineHelpers = () => {
 
@@ -80,14 +81,28 @@ export const registerItemLineHelpers = () => {
 
     Handlebars.registerHelper('effectDurationLabel', function (effect: SR5ActiveEffect) {
         const getDurationLabel = () => {
-            if (effect.duration.seconds) return `${effect.duration.seconds}s`;
-            if (effect.duration.rounds && effect.duration.turns) return `${effect.duration.rounds}r, ${effect.duration.turns}t`;
-            if (effect.duration.rounds) return `${effect.duration.rounds}r`;
-            if (effect.duration.turns) return `${effect.duration.turns}t`;
+            const value = effect.duration.value;
+            if (value == null) return '';
 
-            return '';
+            const unitLabels: Record<typeof effect.duration.units, string> = {
+                seconds: 's',
+                rounds: 'r',
+                turns: 't',
+                minutes: 'm',
+                hours: 'h',
+                days: 'd',
+                months: 'mo',
+                years: 'y',
+            };
+            return `${value}${unitLabels[effect.duration.units] ?? ''}`;
+
         }
         return new Handlebars.SafeString(getDurationLabel());
+    })
+
+    // State-aware duration presentation for the actor/item effect list (state/summary/icon).
+    Handlebars.registerHelper('effectDurationStatus', function (effect: SR5ActiveEffect) {
+        return prepareEffectDurationStatus(effect);
     })
 
     Handlebars.registerHelper('isFreshImport', function (document, options) {
