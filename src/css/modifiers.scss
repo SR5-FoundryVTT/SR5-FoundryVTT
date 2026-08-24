@@ -156,10 +156,13 @@
             }
         }
 
-        input[type="number"] {
+        input[type="number"],
+        input.limit-infinity,
+        input.threshold-dash {
             height: 25px;
             width: 50px;
             max-width: 50px;
+            box-sizing: border-box;
             text-align: center;
             padding: 3px;
             font-size: 1.1em;
