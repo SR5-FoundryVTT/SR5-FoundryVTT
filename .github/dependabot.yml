@@ -7,34 +7,28 @@ updates:
 
       open-pull-requests-limit: 10
 
+      ignore:
+          - dependency-name: 'node'
+          - dependency-name: '@types/node'
+
       groups:
-          lint-and-format:
+          fvtt-types:
               patterns:
-                  - 'oxlint'
-                  - 'oxlint-tsgolint'
-                  - 'prettier'
+                  - 'fvtt-types'
+
+          other-dependencies-minor-and-patch:
+              patterns:
+                  - '*'
+              exclude-patterns:
+                  - 'fvtt-types'
               update-types: ['minor', 'patch']
 
-          build-tools:
+          other-dependencies-major:
               patterns:
-                  - 'esbuild'
-                  - 'fs-extra'
-                  - 'gulp*'
-                  - 'sass'
-              update-types: ['minor', 'patch']
-
-          tests-and-browser:
-              patterns:
-                  - '@ethaks/fvtt-quench'
-                  - '@types/chai'
-                  - '@types/mocha'
-                  - 'playwright'
-              update-types: ['minor', 'patch']
-
-          foundry-tools:
-              patterns:
-                  - '@foundryvtt/*'
-              update-types: ['minor', 'patch']
+                  - '*'
+              exclude-patterns:
+                  - 'fvtt-types'
+              update-types: ['major']
 
       labels:
           - 'dependencies'
