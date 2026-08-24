@@ -16,8 +16,8 @@ const distName = 'dist';
 const destFolder = path.resolve(process.cwd(), distName);
 const jsBundle = 'bundle.js';
 const entryPoint = path.resolve(process.cwd(), 'src/module/main.ts');
-const tsgoPackagePath = require.resolve('@typescript/native-preview/package.json');
-const tsgoScriptPath = path.join(path.dirname(tsgoPackagePath), 'bin', 'tsgo');
+const typescriptPackagePath = require.resolve('typescript/package.json');
+const tscScriptPath = path.join(path.dirname(typescriptPackagePath), 'bin', 'tsc');
 
 /**
  * CLEAN
@@ -48,32 +48,32 @@ async function buildJS(env) {
     });
 }
 
-function startTsgoWatch() {
-    const tsgoArgs = ['-p', 'tsconfig.json', '--noEmit', '--watch', '--preserveWatchOutput'];
-    const tsgo = cp.spawn(process.execPath, [tsgoScriptPath, ...tsgoArgs], {
+function startTypeCheckWatch() {
+    const tscArgs = ['-p', 'tsconfig.json', '--noEmit', '--watch', '--preserveWatchOutput'];
+    const tsc = cp.spawn(process.execPath, [tscScriptPath, ...tscArgs], {
         stdio: 'inherit',
         windowsHide: true,
     });
 
-    const stopTsgo = () => {
+    const stopTsc = () => {
         try {
             if (process.platform === 'win32')
-                cp.execFileSync('taskkill', ['/pid', String(tsgo.pid), '/t', '/f'], { stdio: 'ignore' });
+                cp.execFileSync('taskkill', ['/pid', String(tsc.pid), '/t', '/f'], { stdio: 'ignore' });
             else
-                tsgo.kill('SIGTERM');
+                tsc.kill('SIGTERM');
         } catch (_err) { /* Ignore errors when killing the process, as it might have already exited */ }
     };
 
-    process.once('exit', stopTsgo);
-    process.once('SIGINT', () => { stopTsgo(); process.exit(130); });
-    process.once('SIGTERM', () => { stopTsgo(); process.exit(143); });
+    process.once('exit', stopTsc);
+    process.once('SIGINT', () => { stopTsc(); process.exit(130); });
+    process.once('SIGTERM', () => { stopTsc(); process.exit(143); });
 
-    tsgo.on('error', (err) => {
-        console.error('Error running tsgo watch:', err);
+    tsc.on('error', (err) => {
+        console.error('Error running tsc watch:', err);
     });
 
-    tsgo.on('exit', (code) => {
-        if (code) console.error(`tsgo watch exited with code ${code}`);
+    tsc.on('exit', (code) => {
+        if (code) console.error(`tsc watch exited with code ${code}`);
     });
 }
 
@@ -144,7 +144,7 @@ async function watch(env) {
         plugins: [],
     });
 
-    startTsgoWatch();
+    startTypeCheckWatch();
     await context.watch();
 }
 

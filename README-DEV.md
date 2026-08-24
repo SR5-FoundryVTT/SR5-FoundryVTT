@@ -39,11 +39,11 @@ You can execute this command from within your `cmd` or `Windows Terminal`:
 
 <yourClonedRepoPath> must be the cloned repository that includes the `dist` folder within it.
 
-## ESLint / Prettier
+## oxlint / Prettier
 
-This project uses ESLint and Prettier to enforce code style and formatting.
+This project uses oxlint and Prettier to enforce code style and formatting.
 
-It is strongly recommended to set up Prettier and ESLint in your IDE to run automatically as you develop. ESLint is also ran as part of the PR build pipeline.
+It is strongly recommended to set up Prettier and oxlint in your IDE to run automatically as you develop. oxlint is also ran as part of the PR build pipeline.
 
 The relevant commands are:
  * `npm run lint`: Run the linter, outputting all errors and warnings
@@ -51,6 +51,9 @@ The relevant commands are:
  * `npm run lint:errors`: Run the linter, outputting only errors
  * `npm run lint:errors:fix`: Run the linter, fixing all errors it can auto-fix and outputting the rest
  * `npm run format:all`: Run Prettier over the configured repository files. Keep formatting-only changes separate from behavior changes.
+
+Linting runs with `--type-aware`, which needs type information and therefore the `oxlint-tsgolint` binary that ships as
+a dependency. Rules live in `.oxlintrc.json`.
 
 ## VS Code setup
 
