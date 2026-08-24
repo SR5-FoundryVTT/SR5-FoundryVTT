@@ -306,22 +306,6 @@ export class TestDialog extends HandlebarsApplicationMixin(ApplicationV2)<TestDi
 
         await SuccessTest.hydrateValueModifierTooltipsForTest(this.test, html);
 
-        html.find('.roll-mode-button').on('click', event => {
-            event.preventDefault();
-
-            const button = event.currentTarget as HTMLElement;
-            const rollMode = button.dataset.rollMode;
-            if (!rollMode || !(rollMode in CONFIG.ChatMessage.modes)) return;
-
-            if (this.test.data.options?.rollMode === rollMode) return;
-
-            foundry.utils.setProperty(this.test, 'data.options.rollMode', rollMode as ChatMessage.MessageMode);
-            this.test.prepareBaseValues();
-            this.test.calculateBaseValues();
-            this.test.validateBaseValues();
-            void this.render();
-        });
-
         this._injectExternalActiveListeners(html);
     }
 
