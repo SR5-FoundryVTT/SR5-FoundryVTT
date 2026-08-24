@@ -1,7 +1,7 @@
 # Contributing
 
-Thanks for helping improve Shadowrun 5th Edition for Foundry VTT. Use `master` for ordinary pull requests and an active
-`release/**` branch only when your change explicitly depends on work that has not reached `master`.
+Thanks for helping improve Shadowrun 5th Edition for Foundry VTT. Submit bug fixes and small features to `master`.
+Implement significant features on an active `release/**` branch; if none exists, use `master`.
 
 ## Development setup
 

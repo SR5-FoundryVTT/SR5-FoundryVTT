@@ -1,17 +1,28 @@
-## Summary
+<!--
+Title: prefix with [Bug], [Feature], [Layout], or [Code] to match the issue it addresses, if any.
+-->
 
-Describe the user-visible or maintenance outcome and why it is needed.
+<!-- What changed and why. Delete this comment; a short paragraph is enough for most PRs. -->
 
-## Validation
+<!-- If this closes an issue: Fixes #0000 -->
 
-- [ ] `npm test`
-- [ ] `npm run lint:errors`
-- [ ] `npm run build:prod`
-- [ ] `npm run validate:packs`
-- [ ] Relevant Quench tests or manual Foundry VTT 14 checks were run
-- [ ] Generated `dist` output and compiled packs are not included
-- [ ] Formatting-only changes are separated from behavioral changes
+<!--
+Optional, for multi-part changes only — delete if not needed:
 
-## Foundry testing
+## Changes
+- ...
+-->
 
-List the Foundry version, test world, scenarios, and any checks that could not be run locally.
+<!--
+Optional, for UI/layout PRs — delete if not needed:
+
+## Screenshots
+-->
+
+<!--
+Before requesting review:
+- `npm test`, `npm run lint:errors`, `npm run build:prod`, and `npm run validate:packs` pass locally.
+- Manual Foundry checks (version, world, scenario) are noted above if Quench coverage doesn't cover this.
+- Behavioral changes, dependency bumps, and bulk formatting are kept out of this PR if they're unrelated.
+- No generated `dist` output or compiled packs are included.
+-->

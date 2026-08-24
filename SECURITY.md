@@ -10,7 +10,3 @@ private world data, or copyrighted game content.
 
 Maintainers will acknowledge a usable report when available, investigate it privately, and coordinate disclosure after a
 fix or mitigation is ready. Ordinary bugs without a security impact should use the public issue tracker.
-
-The development-only Foundry type declarations currently pull in `showdown@2.1.0`, for which npm reports unresolved
-moderate advisories. It is not imported by this project and is verified absent from the production browser bundle. Track
-its removal or replacement in the maintained Foundry-types fork; do not treat it as a shipped runtime dependency.

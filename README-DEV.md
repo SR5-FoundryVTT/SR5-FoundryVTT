@@ -133,7 +133,7 @@ The FoundryVTT language config files used by Foundry are at `/dist/locale/<langu
 is generated, so translation changes belong in `/public/locale/<language>/config.json`. Application build and watch
 commands copy those files into `/dist/locale`.
 
-In order to get your translation changes to the `/public` language files into the system, you'll have to create a GitHub pull request against the systems `master`/`main` branch. 
+To include translation changes to `/public` language files in the system, create a GitHub pull request targeting `master`.
 
 ## Separation
 More and more parts of the system move to separate modules organized into these broad layers:
@@ -150,12 +150,12 @@ Additional separations are made for
 ## Branches and Pull Requests
 We'll gladly accept pull requests for all things moving the system forward. :)
 
-The system branch workflow is simple:
-`master` is the main stable branch and the default target for pull requests. CI installs from the lockfile, type-checks
-production and Quench sources, checks error-level lint findings, builds application assets, and validates compendium
-sources; all required checks must pass.
+The system branch workflow is simple: submit bug fixes and small features to `master`. CI installs from the lockfile,
+type-checks production and Quench sources, checks error-level lint findings, builds application assets, and validates
+compendium sources; all required checks must pass.
 
-`release/**` is the active branch for upcoming releases. It's temporary and will be removed once merged into `master`. If you're actively working on changes for that release, you can pull from it and address your pull request into it. It's setup using the same GitHub action as `master`. You should only pull from this branch, if you need commits in its history. Otherwise, use `master`.
+Implement significant features on an active `release/**` branch. These branches are temporary and are removed after
+being merged into `master`. If no active `release/**` branch exists, use `master` instead.
 
 ## Unittesting
 There is unit testing support using the FVTT Quench module. It's encouraged to do some unit testing where possible but it's not mandatory. Rule modules should always contain some testing, while flow modules are encouraged to have some. Any application layers don't need testing. See the structure section for some broad overview over different layers / modules. 
