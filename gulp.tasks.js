@@ -112,7 +112,7 @@ async function watch(env) {
             }
             await fs.remove(path.resolve(destFolder, outputRoot, relativePath));
         };
-        const run = (operation) => (sourcePath) => operation(sourcePath).catch((error) => watcher.emit('error', error));
+        const run = (operation) => (sourcePath) => operation(sourcePath).catch((error) => console.error(error));
 
         watcher.on('add', run(copy));
         watcher.on('change', run(copy));
@@ -125,7 +125,7 @@ async function watch(env) {
     watchCopy('src/module/tours/jsons/**/*', 'src/module/tours/jsons', 'tours');
 
     const sassWatcher = gulp.watch('src/**/*.scss');
-    const rebuildSass = () => buildSass().catch((error) => sassWatcher.emit('error', error));
+    const rebuildSass = () => buildSass().catch((error) => console.error(error));
     sassWatcher.on('add', rebuildSass);
     sassWatcher.on('change', rebuildSass);
     sassWatcher.on('unlink', rebuildSass);
@@ -155,19 +155,21 @@ const watchDev = () => watch('dev');
  * SASS
  */
 async function buildSass() {
-    return gulp
-        .src('src/css/bundle.scss')
-        .pipe(gulpsass().on('error', gulpsass.logError))
-        .pipe(gulp.dest(destFolder));
+    await finished(
+        gulp
+            .src('src/css/bundle.scss')
+            .pipe(gulpsass().on('error', gulpsass.logError))
+            .pipe(gulp.dest(destFolder)),
+    );
 }
 
 exports.clean = cleanDist;
 exports.sass = buildSass;
 exports.assets = copyAssets;
 exports.build = gulp.series(cleanDist, copyAssets, buildSass, buildJSProd);
-exports.buildDev = gulp.series(copyAssets, buildSass, buildJSDev);
+exports.buildDev = gulp.series(cleanDist, copyAssets, buildSass, buildJSDev);
 exports.buildProd = gulp.series(cleanDist, copyAssets, buildSass, buildJSProd);
 exports.watch = gulp.series(copyAssets, buildSass, watchDev);
 exports.watchProd = gulp.series(copyAssets, buildSass, watchProd);
 exports.watchDev = gulp.series(copyAssets, buildSass, watchDev);
-exports.rebuild = gulp.series(cleanDist, exports.build);
+exports.rebuild = exports.build;
