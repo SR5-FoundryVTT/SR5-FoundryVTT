@@ -182,6 +182,7 @@ export class HooksManager {
         Hooks.on('updateItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('deleteItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('getChatMessageContextOptions', SuccessTest.chatMessageContextOptions.bind(SuccessTest));
+        Hooks.on('renderChatMessageHTML', HooksManager.chatMessageListeners.bind(HooksManager));
         // Register and update managed extended tests from finished test rolls.
         Hooks.on('sr5_afterTestComplete', (test: SuccessTest) => { void ExtendedTestFlow.handleTestComplete(test); });
         // Announce extended tests game time has made rollable again. Debounced, as holding a
@@ -563,7 +564,6 @@ ___________________
                 new ChangelogApplication().render(true);
         }
 
-        Hooks.on('renderChatMessage', HooksManager.chatMessageListeners.bind(HooksManager));
         Hooks.on('renderJournalPageSheet', JournalEnrichers.setEnricherHooks.bind(JournalEnrichers));
         HooksManager.registerSocketListeners();
     }

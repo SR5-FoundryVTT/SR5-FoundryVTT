@@ -79,6 +79,7 @@ export const ExtendedTestDueFlow = {
 
         const content = await foundry.applications.handlebars.renderTemplate(TEMPLATE, {
             record,
+            threshold: ExtendedTestRules.threshold(record),
             actorName: actor?.name,
             actorImg: actor?.img,
             nextPool: ExtendedTestRules.nextPool(record),
