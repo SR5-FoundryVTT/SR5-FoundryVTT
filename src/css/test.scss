@@ -278,6 +278,8 @@
 
       // Enlarged only when disabled; editable variant must match the number inputs.
       input.limit-infinity {
+        font-family: "Segoe UI Symbol", "Noto Sans Symbols 2", sans-serif;
+
         &:disabled {
           font-size: 1.4em;
           line-height: 1;
