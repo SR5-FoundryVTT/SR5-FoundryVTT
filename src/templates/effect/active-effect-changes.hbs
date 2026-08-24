@@ -1,41 +1,59 @@
 <section class="tab changes{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <header>
+        <div class="target">{{localize "SR5.ActiveEffect.Target"}}</div>
         <div class="key">{{localize "EFFECT.FIELDS.changes.element.key.label"}}</div>
-        {{#ifne system.applyTo "modifier"}}
         <div class="type">{{localize "EFFECT.FIELDS.changes.element.type.label"}}</div>
         <div class="value">{{localize "EFFECT.FIELDS.changes.element.value.label"}}</div>
         <div class="priority">{{localize "EFFECT.FIELDS.changes.element.priority.label"}}</div>
-        <div class="phase">{{localize "EFFECT.FIELDS.changes.element.phase.label"}}</div>
-        {{/ifne}}
         <div class="controls">
             <a class="inline-control icon" data-action="addChange"><i class="fa-regular fa-square-plus"></i></a>
         </div>
     </header>
     <ol class="scrollable" data-changes>
-        {{#each system.changes as |change i|}}        
+        {{#each source.system.changes as |change i|}}
             {{#with @root.systemFields.changes.element.fields as |changeFields|}}
-                <li data-index="{{i}}">
+                <li data-index="{{i}}"{{#ife (lookup @root.targetApplyToById change.target) "modifier"}} class="change-modifier"{{/ife}}>
+                    {{!-- Which target (apply-to + conditions) this change belongs to --}}
+                    <div class="target">
+                        <select name="{{concat "system.changes." i ".target"}}">
+                            {{selectOptions @root.changeTargetOptions selected=change.target valueAttr="value" labelAttr="label" localize=false}}
+                        </select>
+                    </div>
                     {{!-- FIELDS FOR ALL APPLY TO EFFECTS --}}
-                    <div class="key autocomplete-key-{{@root.source.system.applyTo}}">
+                    <div class="key autocomplete-key-{{lookup @root.targetApplyToById change.target}}">
                         {{formInput changeFields.key name=(concat "system.changes." i ".key") value=change.key}}
                     </div>
                     {{!-- FIELDS FOR NON APPLY TO MODIFIER EFFECTS --}}
-                    {{#ifne @root.source.system.applyTo "modifier"}}
+                    {{#ifne (lookup @root.targetApplyToById change.target) "modifier"}}
                     <div class="type">
                         {{formInput changeFields.type name=(concat "system.changes." i ".type") value=change.type choices=@root.changeTypes}}
                     </div>
-                    <div class="value autocomplete-value-{{@root.source.system.applyTo}}">
-                        {{!-- Do not use formInput as that renders a giant textblock --}}
-                        {{!-- <input type="text" name="system.changes.{{i}}.value" value="{{change.value}}" /> --}}
-                        {{formInput changeFields.value name=(concat "system.changes." i ".value") value=change.value elementType="input"}}
+                    <div class="value autocomplete-value-{{lookup @root.targetApplyToById change.target}}">
+                        <div class="sr5-effect-value-control">
+                            {{!-- Use a textarea so multiline values preserve newline characters through form submission. --}}
+                            <textarea name="{{concat "system.changes." i ".value"}}" rows="1">{{change.value}}</textarea>
+                            <button
+                                type="button"
+                                class="sr5-effect-value-control__button icon"
+                                data-action="editChangeValue"
+                                data-tooltip="SR5.Tooltips.Effect.OpenValueEditor"
+                                aria-label="{{localize "SR5.Tooltips.Effect.OpenValueEditor"}}">
+                                <i class="fa-solid fa-lambda" inert></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="priority">
-                        {{formInput changeFields.priority name=(concat "system.changes." i ".priority") value=change.priority disabled=true}}
-                    </div>
-                    <div class="phase">
-                        {{formInput changeFields.phase name=(concat "system.changes." i ".phase") value=change.phase disabled=true}}
+                        {{formInput changeFields.priority name=(concat "system.changes." i ".priority") value=change.priority placeholder=(lookup @root.changePriorityPlaceholders change.type) disabled=true}}
                     </div>
                     {{/ifne}}
+                    {{!-- phase is required by the schema but not shown; always preserve it. --}}
+                    <input type="hidden" name="{{concat "system.changes." i ".phase"}}" value="{{change.phase}}">
+                    {{#ife (lookup @root.targetApplyToById change.target) "modifier"}}
+                    {{!-- Modifier changes hide these columns; keep them in the form so they aren't lost on submit. --}}
+                    <input type="hidden" name="{{concat "system.changes." i ".type"}}" value="{{change.type}}">
+                    <textarea hidden name="{{concat "system.changes." i ".value"}}">{{change.value}}</textarea>
+                    <input type="hidden" name="{{concat "system.changes." i ".priority"}}" value="{{change.priority}}">
+                    {{/ife}}
                     <div class="controls">
                         <a class="inline-control icon" data-action="deleteChange"><i class="fa-solid fa-trash"></i></a>
                     </div>

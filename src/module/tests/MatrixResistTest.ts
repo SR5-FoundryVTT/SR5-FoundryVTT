@@ -31,16 +31,16 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
     // The target icon, if it's representing a persona.
     declare persona: SR5Actor;
 
-    override _prepareData(data: MatrixResistTestData, options: any): any {
-        data = super._prepareData(data, options);
-        if (data.following) {
-            data = MatrixTestDataFlow._prepareFollowingData(data);
+    override _prepareData(data: MatrixResistTestData, options: Partial<TestOptions>): MatrixResistTestData {
+        let prepared = super._prepareData(data, options);
+        if (prepared.following) {
+            prepared = MatrixTestDataFlow._prepareFollowingData(prepared);
         } else {
-            data = MatrixTestDataFlow._prepareDataResist(data);
+            prepared = MatrixTestDataFlow._prepareDataResist(prepared);
         }
-        data = ResistTestDataFlow._prepareData(data);
+        prepared = ResistTestDataFlow._prepareData(prepared);
 
-        return data;
+        return prepared;
     }
 
     /**
@@ -98,7 +98,6 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
 
     /**
      * Prepare any ResistTest from given test data. This should come from a MatrixDefenseTest
-     *
      */
     static override async _getResistActionTestData(opposedData: MatrixDefenseTestData, document: SR5Actor|SR5Item, previousMessageId: string): Promise<MatrixResistTestData | undefined> {
         if (!opposedData.against?.opposed.resist) {
@@ -118,7 +117,7 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
             personaUuid: opposedData.personaUuid,
         };
 
-        const action = await ResistTestDataFlow._getResistActionData(this, opposedData, 'MatrixResistTest');
+        const action = await ResistTestDataFlow._getResistActionData(this as typeof SuccessTest, opposedData, document, 'MatrixResistTest');
 
         return this._prepareActionTestData(action, document, data) as MatrixResistTestData;
     }
@@ -133,9 +132,9 @@ export class MatrixResistTest extends SuccessTest<MatrixResistTestData> {
      *
      * This can be used to trigger resist tests.
      */
-    static override async executeMessageAction(againstData: MatrixDefenseTestData, messageId: string, options: TestOptions) {
+    static override async executeMessageAction(againstData: MatrixDefenseTestData, messageId: string, options: Partial<TestOptions>) {
         // Determine documents to roll test with.
         const documents = await Helpers.getMatrixTestTargetDocuments(againstData)
-        await ResistTestDataFlow.executeMessageAction(this, againstData, messageId, documents, options);
+        await ResistTestDataFlow.executeMessageAction(this as typeof SuccessTest, againstData, messageId, documents as (SR5Actor | SR5Item)[], options);
     }
 }

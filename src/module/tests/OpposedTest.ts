@@ -1,9 +1,9 @@
 import { SuccessTest, SuccessTestData, SuccessTestValues, TestData, TestDocuments, TestOptions } from "./SuccessTest";
+import { DeepPartial } from "fvtt-types/utils";
 import { DataDefaults } from "../data/DataDefaults";
 import { TestCreator } from "./TestCreator";
 import { SR5Item } from "../item/SR5Item";
 import { ModifiableValue } from "../mods/ModifiableValue";
-import { Helpers } from "../helpers";
 import { ValueFieldType } from "../types/template/Base";
 import { SR5Actor } from "../actor/SR5Actor";
 
@@ -30,27 +30,26 @@ export interface OpposedTestData extends
 export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends SuccessTest<T> {
     public against: SuccessTest;
 
-    constructor(data, documents?: TestDocuments, options?: TestOptions) {
+    constructor(data: DeepPartial<T>, documents?: TestDocuments, options?: Partial<TestOptions>) {
         super(data, documents, options);
 
         // Use the supplied original active test to create a reference.
         // If nothing was given create a default placeholder
         // Feed original / active test data into the class originally used for ease of access.
-        const AgainstCls = data.against ? TestCreator._getTestClass(data.against.type) : SuccessTest;
+        const AgainstCls = TestCreator._getTestClass(data.against?.type) || SuccessTest;
         this.against = new AgainstCls(data.against || {});
     }
 
-    override _prepareData(data, options?): any {
-        data = super._prepareData(data, options);
+    override _prepareData(data: DeepPartial<T>, options?: Partial<TestOptions>): T {
+        const prepared = super._prepareData(data, options ?? {});
 
         // TODO: this isn't needed if opposed is always taken from data.action.opposed
-        delete data.opposed;
-        delete data.targetActorsUuid;
+        delete (prepared as Partial<T>).opposed;
+        delete (prepared as Partial<T>).targetActorsUuid;
 
-        data.values = data.values || {};
-        data.values.againstNetHits = DataDefaults.createData('value_field', {label: 'SR5.NetHits'});
+        prepared.values.againstNetHits = DataDefaults.createData('value_field', {label: 'SR5.NetHits'});
 
-        return data;
+        return prepared;
     }
 
     /**
@@ -145,7 +144,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         // Allow the OpposedTest to overwrite action data dynamically based on item data.
         if (againstData.sourceItemUuid) {
             const item = await fromUuid(againstData.sourceItemUuid) as SR5Item;
-            if (item) {
+            if (item && document instanceof SR5Actor) {
                 const itemAction = this._getDocumentTestAction(item, document);
                 action = TestCreator._mergeMinimalActionDataInOrder(action, itemAction);
             }
@@ -208,7 +207,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         // Do not simply concat list to avoid double applying an otherwise unique test modifier.
         const pool = new ModifiableValue(this.data.pool);
         for (const modifier of opposedMod.changes) {
-            pool.addUnique(modifier.name, modifier.value, { mode: modifier.mode as CONST.ACTIVE_EFFECT_MODES, priority: modifier.priority });
+            pool.addUnique(modifier.name, modifier.value, { type: modifier.type, priority: modifier.priority });
         }
     }
 

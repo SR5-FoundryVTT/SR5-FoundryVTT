@@ -5,11 +5,12 @@ import { SR5Actor } from '@/module/actor/SR5Actor';
 import { SR5TestFactory } from './utils';
 import { OpposedSummonSpiritTest } from '@/module/tests/OpposedSummonSpiritTest';
 import { OpposedCompileSpriteTest } from '@/module/tests/OpposedCompileSpriteTest';
+import { OpposedTestData } from '@/module/tests/OpposedTest';
 
 type OpposedCallInClass = typeof OpposedSummonSpiritTest | typeof OpposedCompileSpriteTest;
 
 function createOpposedTestData(opposedType: string, againstType: string) {
-    const data = TestCreator._minimalTestData();
+    const data = TestCreator._minimalTestData() as OpposedTestData;
     data.type = opposedType;
     data.previousMessageId = 'test-message-id';
     data.against = TestCreator._minimalTestData();
@@ -53,7 +54,7 @@ async function runWithPatches(
     Helpers.getSelectedActorsOrCharacter = () => selectedActors;
 
     try {
-        await cls.executeMessageAction(againstData, 'test-message-id', { showDialog: false, showMessage: false });
+        await cls.executeMessageAction(againstData, 'test-message-id', { showDialog: false, showMessage: false, rollMode: 'public' });
     } finally {
         clsAny._getOpposedActionTestData = originalGetOpposed;
         cls.prototype.execute = originalExecute;

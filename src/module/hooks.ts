@@ -5,7 +5,8 @@ import { RitualSpellcastingTest } from './tests/RitualSpellcastingTest';
 import { SR5 } from './config';
 import { Migrator } from './migrator/Migrator';
 import { registerSystemSettings } from './settings';
-import { FLAGS, SR, SRStatus, SYSTEM_NAME, SYSTEM_SOCKET } from './constants';
+import { FLAGS, SR, SYSTEM_NAME, SYSTEM_SOCKET } from './constants';
+import { getSRStatus } from './statusEffects';
 import { SR5Actor } from './actor/SR5Actor';
 import { SR5Item } from './item/SR5Item';
 import { SR5ItemSheet } from './item/SR5ItemSheet';
@@ -17,6 +18,11 @@ import { SR5CombatTracker } from './token/SR5CombatTracker';
 import { HandlebarManager } from './handlebars/HandlebarManager';
 
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
+import { TimeControlApplication } from './apps/gmtools/TimeControlApplication';
+import { WorldTimeFlow } from './flows/WorldTimeFlow';
+import { ExtendedTestManager } from './apps/ExtendedTestManager';
+import { ExtendedTestFlow } from './flows/ExtendedTestFlow';
+import { ExtendedTestDueFlow } from './flows/ExtendedTestDueFlow';
 import { ActorImporter } from './apps/itemImport/apps/ActorImporter';
 import { BulkImporter } from './apps/itemImport/apps/BulkImporter';
 import { CharacterImporter } from './apps/actorImport/characterImporter/CharacterImporter';
@@ -176,6 +182,12 @@ export class HooksManager {
         Hooks.on('updateItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('deleteItem', (item) => { void HooksManager.syncSkillGroupMembership(item); });
         Hooks.on('getChatMessageContextOptions', SuccessTest.chatMessageContextOptions.bind(SuccessTest));
+        Hooks.on('renderChatMessageHTML', HooksManager.chatMessageListeners.bind(HooksManager));
+        // Register and update managed extended tests from finished test rolls.
+        Hooks.on('sr5_afterTestComplete', (test: SuccessTest) => { void ExtendedTestFlow.handleTestComplete(test); });
+        // Announce extended tests game time has made rollable again. Debounced, as holding a
+        // time preset would otherwise scan every record per tick.
+        Hooks.on('updateWorldTime', foundry.utils.debounce(() => { void ExtendedTestDueFlow.announceDue(); }, 250));
 
         Hooks.on('renderChatLog', HooksManager.chatLogListeners.bind(HooksManager));
 
@@ -382,9 +394,6 @@ ___________________
         CONFIG.Combatant.documentClass = SR5Combatant;
         CONFIG.ChatMessage.documentClass = SR5ChatMessage;
         CONFIG.ActiveEffect.documentClass = SR5ActiveEffect;
-        // Setting to false, will NOT duplicate item effects on actors. Instead items will be traversed for their effects.
-        // Setting to true, will duplicate item effects on actors. Only effects on actors will be traversed.
-        CONFIG.ActiveEffect.legacyTransferral = false;
 
         CONFIG.Token.objectClass = SR5Token;
         CONFIG.Token.documentClass = SR5TokenDocument;
@@ -414,12 +423,6 @@ ___________________
         // Add Shadowrun configuration onto general Foundry config for module access.
         // @ts-expect-error // TODO: Add declaration merging
         CONFIG.SR5 = SR5;
-
-        CONFIG.statusEffects = [
-            ...CONFIG.statusEffects.slice(0, 5),
-            ...SRStatus,
-            ...CONFIG.statusEffects.slice(5),
-        ];
 
         CONFIG.Actor.compendiumIndexFields.push("system.description", "system.importFlags.isFreshImport");
         CONFIG.Item.compendiumIndexFields.push("system.description", "system.importFlags.isFreshImport");
@@ -465,8 +468,24 @@ ___________________
         CONFIG.time.turnTime = SR.combat.TURN_TIME_SECONDS;
         CONFIG.time.roundTime = SR.combat.ROUND_TIME_SECONDS;
 
+        // Keep expired effects (greyed, restartable) instead of deleting.
+        // Explicit so a core/module change can't silently flip it to "delete".
+        CONFIG.ActiveEffect.expiryAction = "update";
+
+        // Register the SR5-custom expiry events so Foundry's registry knows to call isExpiryEvent for them.
+        // sr5MyActionStart fires on the owner's action phase start (any pass); dispatched by SR5Combat._onUpdate.
+        CONFIG.ActiveEffect.expiryEvents.sr5MyActionStart = "SR5.ActiveEffect.ExpiryTriggers.MyActionStart";
+        // sr5MyActionEnd fires when advancing away from the owner's completed action phase.
+        CONFIG.ActiveEffect.expiryEvents.sr5MyActionEnd = "SR5.ActiveEffect.ExpiryTriggers.MyActionEnd";
+
         registerSystemSettings();
         registerSystemKeybindings();
+
+        CONFIG.statusEffects = [
+            ...CONFIG.statusEffects.slice(0, 5),
+            ...getSRStatus(),
+            ...CONFIG.statusEffects.slice(5),
+        ];
 
         // Register sheets for collection documents.
         // NOTE: See dnd5e for a multi class approach for all actor types using the types array in Actors.registerSheet
@@ -539,11 +558,12 @@ ___________________
         if (game.user?.isGM) {
             Migrator.BeginMigration();
 
+            await WorldTimeFlow.initialize();
+
             if (ChangelogApplication.showApplication)
                 new ChangelogApplication().render(true);
         }
 
-        Hooks.on('renderChatMessage', HooksManager.chatMessageListeners.bind(HooksManager));
         Hooks.on('renderJournalPageSheet', JournalEnrichers.setEnricherHooks.bind(JournalEnrichers));
         HooksManager.registerSocketListeners();
     }
@@ -581,7 +601,31 @@ ___________________
                 }
             };
             controls.tokens.tools[overwatchScoreTrackControl.name] = overwatchScoreTrackControl;
+
+            const timeControl = {
+                name: 'sr5-time-control',
+                title: 'CONTROLS.SR5.TimeControl',
+                icon: 'far fa-clock',
+                button: true,
+                onChange: (_event: Event, active: boolean) => {
+                    if (!active) return;
+                    TimeControlApplication.open();
+                }
+            };
+            controls.tokens.tools[timeControl.name] = timeControl;
         }
+
+        const extendedTestManagerControl = {
+            name: 'sr5-extended-test-manager',
+            title: 'CONTROLS.SR5.ExtendedTestManager',
+            icon: 'fas fa-hourglass-half',
+            button: true,
+            onChange: (_event: Event, active: boolean) => {
+                if (!active) return;
+                ExtendedTestManager.open();
+            }
+        };
+        controls.tokens.tools[extendedTestManagerControl.name] = extendedTestManagerControl;
 
         const situationModifiersControl = SituationModifiersApplication.getControl();
         controls.tokens.tools[situationModifiersControl.name] = situationModifiersControl;
@@ -672,13 +716,16 @@ ___________________
         console.log('Registering Shadowrun5e system socket messages...');
         const hooks = {
             [FLAGS.DoCombatFunction]: [SR5Combat._handleSocketMessage.bind(SR5Combat)],
+            [FLAGS.DoCombatantFunction]: [SR5Combatant._handleCombatantSocketMessage.bind(SR5Combatant)],
             [FLAGS.CreateTargetedEffects]: [SuccessTestEffectsFlow._handleCreateTargetedEffectsSocketMessage.bind(SuccessTestEffectsFlow)],
             [FLAGS.TeamworkTestFlow]: [TeamworkTest._handleUpdateSocketMessage.bind(TeamworkTest)],
             [FLAGS.SetDataStorage]: [DataStorage._handleSetDataStorageSocketMessage.bind(DataStorage)],
+            [FLAGS.UnsetDataStorage]: [DataStorage._handleUnsetDataStorageSocketMessage.bind(DataStorage)],
             [FLAGS.UpdateDocumentsAsGM]: [SocketMessageFlow.handleUpdateDocumentsAsGMMessage.bind(SocketMessage)],
+            [FLAGS.ApplyExtendedTestRoll]: [ExtendedTestFlow._handleApplyRollSocketMessage.bind(ExtendedTestFlow)],
         } as const;
 
-        game.socket.on(SYSTEM_SOCKET, async (message: Shadowrun.SocketMessageData) => {
+        game.socket.on(SYSTEM_SOCKET, async (message: Shadowrun.SocketMessageData, senderId?: string) => {
             console.log('Shadowrun 5e | Received system socket message.', message);
 
             const handlers = hooks[message.type] as typeof hooks[keyof typeof hooks] | undefined;
@@ -690,7 +737,7 @@ ___________________
             for (const handler of handlers) {
                 console.debug(`Shadowrun 5e | Handover system socket message to handler: ${handler.name}`);
                 try {
-                    await handler(message);
+                    await handler(message, senderId);
                 } catch (error) {
                     console.error(`Shadowrun 5e | Error occurred in socket message handler ${handler.name}`, error);
                 }
@@ -705,6 +752,7 @@ ___________________
         await TeamworkTest.chatMessageListeners(message, html);
         await JournalEnrichers.messageRequestHooks(html);
         await MatrixNetworkFlow.chatMessageListeners(message, html, data);
+        await ExtendedTestDueFlow.chatMessageListeners(message, html);
     }
 
     static async chatLogListeners(chatLog: ChatLog, html, data) {

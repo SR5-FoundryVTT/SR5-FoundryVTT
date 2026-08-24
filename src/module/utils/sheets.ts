@@ -45,12 +45,16 @@ export function createTagifyMulti(
     selected: TagifyTags,
 ): Tagify<TagifyTag> {
     const tagifyWhitelist = localizeWhitelist(whitelist);
+    element.value = JSON.stringify(selected);
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
     const tagify = new Tagify<TagifyTag>(element, {
+        whitelist: tagifyWhitelist,
         enforceWhitelist: true,
         editTags: false,
         skipInvalid: true,
+        originalInputValueFormat: values => JSON.stringify(
+            values.map(tag => tag.id).filter((id): id is string => typeof id === 'string')
+        ),
         dropdown: {
             maxItems: tagifyWhitelist.length,
             fuzzySearch: true,
@@ -59,9 +63,6 @@ export function createTagifyMulti(
             classname: tagifyDropdownThemeClass(element),
         },
     });
-
-    tagify.whitelist = tagifyWhitelist;
-    tagify.addTags(selected);
 
     return tagify;
 }
@@ -83,7 +84,6 @@ export function createTagifySelect(
 ): Tagify<TagifyTag> {
     const tagifyWhitelist = localizeWhitelist(whitelist);
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
     const tagify = new Tagify<TagifyTag>(element, {
         mode: 'select',
         enforceWhitelist: false,

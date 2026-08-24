@@ -1,12 +1,12 @@
 import { DataDefaults } from '../data/DataDefaults';
 import { ModifiableValue } from '../mods/ModifiableValue';
-import { SuccessTest, SuccessTestData, TestOptions } from './SuccessTest';
-import { Translation } from '../utils/strings';
+import { SuccessTest, SuccessTestData, TestDocuments, TestOptions } from './SuccessTest';
+import { DeepPartial } from "fvtt-types/utils";
 import { TestCreator } from './TestCreator';
 import { SkillNamingFlow } from '../flows/SkillNamingFlow';
 
 export interface SkillTestData extends SuccessTestData {
-    attribute: Shadowrun.ActorAttribute
+    attribute: SuccessTestData['action']['attribute'];
     limitSelection: string
 }
 
@@ -21,7 +21,7 @@ export class SkillTest extends SuccessTest<SkillTestData> {
     lastUsedAttribute: string;
     lastUsedLimit: string;
 
-    constructor(data, documents, options) {
+    constructor(data: DeepPartial<SkillTestData>, documents?: TestDocuments, options?: Partial<TestOptions>) {
         super(data, documents, options);
 
         this.lastUsedAttribute = this.data.attribute;
@@ -48,16 +48,16 @@ export class SkillTest extends SuccessTest<SkillTestData> {
     /**
      * A SkillTest has the need to store attribute and limit selections
      */
-    override _prepareData(data: any, options: TestOptions) {
-        data = super._prepareData(data, options);
+    override _prepareData(data: DeepPartial<SkillTestData>, options: Partial<TestOptions>): SkillTestData {
+        const prepared = super._prepareData(data, options) as SkillTestData;
 
-        data.action = data.action || DataDefaults.createData('action_roll');
+        prepared.action ||= DataDefaults.createData('action_roll');
 
         // Preselect based on action.
-        data.attribute = data.action.attribute;
-        data.limitSelection = data.action.limit.attribute;
+        prepared.attribute = prepared.action.attribute;
+        prepared.limitSelection = prepared.action.limit.attribute;
 
-        return data;
+        return prepared;
     }
 
     /**

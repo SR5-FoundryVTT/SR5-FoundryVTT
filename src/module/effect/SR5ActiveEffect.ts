@@ -1,3 +1,4 @@
+import { SR } from '../constants';
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
 import { SR5Actor } from "../actor/SR5Actor";
@@ -6,6 +7,7 @@ import { LinksHelpers } from '@/module/utils/links';
 import { DataDefaults } from "../data/DataDefaults";
 import { ModifiableValueType } from "../types/template/Base";
 import { ModifiableValue } from "../mods/ModifiableValue";
+import { DynamicValue, DynamicValueEvaluator } from "./DynamicValueEvaluator";
 import DataModel = foundry.abstract.DataModel;
 
 /**
@@ -20,19 +22,10 @@ import DataModel = foundry.abstract.DataModel;
  * Effects can also define the type of target data to be applied to. Default effects only apply to actor data, system effects
  * can apply to actors, tests and also only to actors targeted by tests.
  * 
- * NOTE: FoundryVTT DataModel is used to apply changes as well. Check custom Field implementations for effect change mode
+ * NOTE: FoundryVTT DataModel is used to apply changes as well. Check custom Field implementations for effect change type
  * application.
  */
 export class SR5ActiveEffect extends ActiveEffect {
-    private static readonly legacyModeByChangeType: Record<string, number> = {
-        custom: CONST.ACTIVE_EFFECT_MODES.CUSTOM,
-        multiply: CONST.ACTIVE_EFFECT_MODES.MULTIPLY,
-        add: CONST.ACTIVE_EFFECT_MODES.ADD,
-        downgrade: CONST.ACTIVE_EFFECT_MODES.DOWNGRADE,
-        upgrade: CONST.ACTIVE_EFFECT_MODES.UPGRADE,
-        override: CONST.ACTIVE_EFFECT_MODES.OVERRIDE,
-    };
-
     /**
      * Can be used to determine if the origin of the effect is a document owned by another document.
      *
@@ -75,9 +68,85 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
+     * The target used for changes that don't reference one, mirroring the target _preCreate seeds.
+     * Effects predating targets, or built without them, keep behaving like plain actor effects.
+     */
+    static get defaultTarget(): SR5ActiveEffect['system']['targets'][number] {
+        return { id: 'actor', name: game.i18n.localize('SR5.ActiveEffect.Target'), applyTo: 'actor', conditions: [], onlyForItemTest: false };
+    }
+
+    /**
+     * The effects targets, or a single default actor target when it has none.
+     *
+     * _preCreate seeds a target for every effect, so an empty list only comes from data built without
+     * targets. Routing such an effect nowhere would silently drop all of its changes, so it's treated
+     * as a plain actor effect instead.
+     */
+    get effectiveTargets(): SR5ActiveEffect['system']['targets'] {
+        return this.system.targets.length ? this.system.targets : [SR5ActiveEffect.defaultTarget];
+    }
+
+    /**
+     * Whether this effect has a target for any of the given apply-to destinations.
+     */
+    appliesToAnyOf(applyTo: string[]): boolean {
+        return this.effectiveTargets.some(target => applyTo.includes(target.applyTo));
+    }
+
+    /**
+     * Resolve the target a change belongs to or undefined if its target no longer exists.
+     *
+     * Changes created outside of _preCreate and the config sheet (updates, macros, imports) can carry
+     * no target at all. Those fall back to the effects first target, instead of silently never applying.
+     *
+     * A dangling target does resolve to undefined, as that target was removed on purpose and its
+     * changes shouldn't silently move to another destination.
+     */
+    targetForChange(change: { target?: string }) {
+        if (!change.target) return this.effectiveTargets[0];
+        return this.effectiveTargets.find(target => target.id === change.target);
+    }
+
+    /**
+     * All changes whose resolved target applies to the given apply-to destination.
+     */
+    changesForApplyTo(applyTo: string) {
+        return this.system.changes.filter(change => this.targetForChange(change)?.applyTo === applyTo);
+    }
+
+    /**
+     * Ensure every effect is created with at least one target, so the config sheet always shows a
+     * target and changes have a concrete destination. Effects created with explicit targets (tests,
+     * imports, migration) keep theirs.
+     */
+    protected override async _preCreate(...args: Parameters<ActiveEffect['_preCreate']>): Promise<boolean | void> {
+        const allowed = await super._preCreate(...args);
+        if (allowed === false) return false;
+
+        let targetId = this.system.targets[0]?.id;
+        if (!targetId) {
+            targetId = 'actor';
+            this.updateSource({ system: { targets: [{ id: targetId, name: game.i18n.localize('SR5.ActiveEffect.Target'), applyTo: 'actor' }] } });
+        }
+
+        const sourceChanges = this.system.toObject().changes;
+        if (sourceChanges.some(change => !change.target)) {
+            const changes = sourceChanges.map(change => ({ ...change, target: change.target || targetId }));
+            this.updateSource({ system: { changes } });
+        }
+
+        // Core only anchors `start` for Actor-owned effects. Item-owned temporary effects need an
+        // anchor too, otherwise isExpiryTrackable (requires !!start) will never be true for them.
+        if (this.parent instanceof SR5Item && this.isTemporary && !this.start) {
+            const combat = this.actor?.inCombat ? (game.combat ?? null) : null;
+            this.updateSource({ start: SR5ActiveEffect.getEffectStart(combat) });
+        }
+    }
+
+    /**
      * Always returns the parent actor of the effect, even if the effect is applied to an item.
      */
-    get actor(): SR5Actor | null {
+    override get actor(): SR5Actor | null {
         if (this.parent instanceof SR5Actor) return this.parent;
         if (this.parent instanceof SR5Item) return this.parent?.parent;
         return null;
@@ -159,21 +228,11 @@ export class SR5ActiveEffect extends ActiveEffect {
         return ['base', 'changes', 'value'] satisfies (keyof ModifiableValueType)[];
     }
 
-    /**
-     * Convert a v14 string-based change type into the legacy numeric mode value.
-     */
-    static getLegacyChangeMode(change: { mode?: number; type?: string | null }): number {
-        if (typeof change.mode === 'number') return change.mode;
-
-        const changeType = typeof change.type === 'string' ? change.type : '';
-        const mappedMode = this.legacyModeByChangeType[changeType];
-        if (mappedMode !== undefined) return mappedMode;
-
-        console.error(`Shadowrun5e | Unrecognized change type "${change.type}", defaulting to "add" mode.`);
-        return CONST.ACTIVE_EFFECT_MODES.ADD;
-    }
-
     override get isSuppressed(): boolean {
+        // Native registry sets duration.expired when the span+boundary are reached. Mirror that suppression
+        // here so expired effects are greyed out and not applied, regardless of parent type.
+        if (this.duration.expired) return true;
+
         if (!(this.parent instanceof SR5Item)) return false;
 
         if (this.system.onlyForEquipped && !this.parent.isEquipped()) return true;
@@ -182,6 +241,55 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (this.parent.isType('sprite_power') && !this.parent.system.enabled) return true;
 
         return false;
+    }
+
+    /**
+     * SR5 adds owner action-phase start/end triggers on top of the native combat boundaries.
+     * `sr5MyActionStart` fires when the owner starts acting; `sr5MyActionEnd` fires when advancing
+     * away from the owner's completed action phase. Outside of combat, both fall back to world-time
+     * expiry once the duration span is exhausted, matching native combat-trigger behavior.
+     */
+    override isExpiryEvent(event: string, context?: ActiveEffect.IsExpiryEventContext): boolean {
+        if (this.duration.expiry !== 'sr5MyActionStart' && this.duration.expiry !== 'sr5MyActionEnd') {
+            return super.isExpiryEvent(event, context);
+        }
+
+        if (event === 'updateWorldTime') return !this.actor?.inCombat;
+
+        const combat = context?.combat ?? game.combat;
+        const actorMatches = combat?.combatant?.actor === this.actor;
+        if (!actorMatches) return false;
+
+        if (this.duration.expiry === 'sr5MyActionStart') return event === 'sr5ActionPhaseStart';
+        return event === 'sr5ActionPhaseEnd';
+    }
+
+    override _onUpdate(...args: Parameters<ActiveEffect["_onUpdate"]>) {
+        super._onUpdate(...args);
+        if (!game.users?.activeGM?.isSelf) return;
+        const [changed] = args;
+
+        if (changed?.duration?.expired === true && this.resolvedExpiryAction === 'delete') {
+            void this.delete();
+        }
+    }
+
+    private get resolvedExpiryAction() {
+        const action = this.system.expiryAction ?? 'default';
+        return action === 'default' ? CONFIG.ActiveEffect.expiryAction : action;
+    }
+
+    /**
+     * Re-enable an expired effect, reset its anchor, and re-register it with the expiry registry.
+     * Use this to restart a duration that was consumed (e.g. buff renewed for another combat).
+     */
+    async restart(): Promise<this | void> {
+        const combat = this.actor?.inCombat ? (game.combat ?? undefined) : undefined;
+        return this.update({
+            disabled: false,
+            duration: { expired: false },
+            start: SR5ActiveEffect.getEffectStart(combat ?? null),
+        });
     }
 
     /**
@@ -198,23 +306,12 @@ export class SR5ActiveEffect extends ActiveEffect {
         const actor = this.actor;
         if (!actor) return false;
 
-        if (this.system.applyTo === 'targeted_actor') {
-            return this.system.appliedByTest;
-        }
+        // Effects copied onto a target actor by a test always apply to that actor.
+        if (this.system.appliedByTest) return true;
 
-        return true;
-    }
-
-    /**
-     * < v14 used #apply instead of applyChange.
-     */
-    override apply(model: DataModel.Any, change: ActiveEffect.ChangeData) {
-        // @ts-expect-error TODO: v14 remove once v14 implementation is stable
-        return super.apply(model, change);
-        // return Object.fromEntries(
-        //     // @ts-expect-error TODO: tamif - v14 - what is this for?
-        //     Object.entries(super.apply(model, change)).filter(([, v]) => v != null)
-        // );
+        // Otherwise hide only effects whose targets are exclusively targeted_actor,
+        // as those are meant for another actor acted upon, not the one acting.
+        return this.effectiveTargets.some(target => target.applyTo !== 'targeted_actor');
     }
 
     /**
@@ -230,41 +327,54 @@ export class SR5ActiveEffect extends ActiveEffect {
      * The DataModel handles effect application within they applyChange methods.
      * The objects are handled by SR5ActiveEffect legacy _applyToObject and _apply methods.
      * 
-     * This can cause diffeing beahvior between these two for effect application.
+     * This can cause differing behavior between these two for effect application.
      *
      * @param targetDoc The targeted document or object...
      * @param change The effect change being applied
      * @param options Additional FoundryVTT options.
      */
-    // @ts-expect-error v14 - missing types
-    override static applyChange(targetDoc: DataModel.Any, change: ActiveEffect.ChangeData, {replacementData = {}, modifyTarget = true} = {}) {
+    static override applyChange(
+        targetDoc: ActiveEffect.TargetDocument | DataModel.Any,
+        change: ActiveEffect.ChangeData,
+        options: ActiveEffect.ApplyChangeOptions = {}
+    ): Record<string, unknown> {
+        // Foundry core iterates every change of an applicable effect when applying to actor data.
+        // Only apply changes whose target is actor-bound. Both 'actor' and 'targeted_actor' targets
+        // apply to actor data (targeted_actor effects are only collected onto an actor when they
+        // belong to it - either embedded directly or copied there by a test).
+        if (targetDoc instanceof SR5Actor && change.effect instanceof SR5ActiveEffect) {
+            const target = change.effect.targetForChange(change as { target?: string });
+            const appliesToActor = !!target && (target.applyTo === 'actor' || target.applyTo === 'targeted_actor');
+            if (!appliesToActor) return {};
+        }
+
         // Skip applying this change if the target key does not exist on the model.
         // TypedObjectField will otherwise create the missing property as a string,
         // which breaks data integrity and can result in errors like "undefined[object Object]".
         // For example, a change targeting "firstaid" instead of "first_aid" would trigger this case.
         if (!foundry.utils.hasProperty(targetDoc, change.key))
             return {};
-        
+
         // Resolve dynamic value references in change.
-        const source = change.effect.parent;
+        const source = change.effect?.parent ?? targetDoc;
         SR5ActiveEffect.alterChange(targetDoc, change);
-        SR5ActiveEffect.resolveDynamicChangeValue(source, change);
+        SR5ActiveEffect.resolveDynamicChangeValue(source, change, targetDoc);
         
         // Other cases should be directly applied to the data, without actor / schema handling.
-        // This is used when applying effects to non-Actor objects, like tests.
-        // TODO: v14 - double check TokenDocument.
+        // This is used when applying effects to non-Actor objects, like tests. TokenDocument is
+        // explicitly supported by Foundry v14's ActiveEffect.applyChange and must stay on the
+        // core/schema path for token.* changes routed by Actor.applyActiveEffects.
         if (!(targetDoc instanceof SR5Actor) && !(targetDoc instanceof SR5Item) && !(targetDoc instanceof TokenDocument)) {
             return SR5ActiveEffect._applyToObject(targetDoc, change);
         }
 
-        // @ts-expect-error TODO: fvtt - v14 - missing types
-        return super.applyChange(targetDoc, change, {replacementData, modifyTarget});
+        return super.applyChange(targetDoc, change, options);
     }
 
     /**
      * Handle application for none-Document objects. This is typically used for SuccessTest instances.
      */
-    private static _applyToObject(object: any, change: ActiveEffect.ChangeData) {
+    private static _applyToObject(object: any, change: ActiveEffect.ChangeData): Record<string, unknown> {
         const target = foundry.utils.getProperty(object, change.key);
         const targetType = foundry.utils.getType(target);
 
@@ -273,27 +383,28 @@ export class SR5ActiveEffect extends ActiveEffect {
         try {
             if (Array.isArray(target)) {
                 const innerType = target.length ? foundry.utils.getType(target[0]) : "string";
-                delta = SR5ActiveEffect.__castArray(change.value, innerType);
+                delta = SR5ActiveEffect.__castArray(String(change.value), innerType);
             }
-            else delta = SR5ActiveEffect.__castDelta(change.value, targetType);
+            else delta = SR5ActiveEffect.__castDelta(String(change.value), targetType);
         } catch (err) {
             console.warn(`Test [${object.constructor.name}] | Unable to parse active effect change for ${change.key}: "${change.value}"`);
             return {};
         }
 
         if (ModifiableValue.isModifiableValue(target)) {
-            const mode = SR5ActiveEffect.getLegacyChangeMode(change);
+            const effect = change.effect;
+            if (!effect) return {};
             target.changes.push(
                 DataDefaults.createData('change_entry', {
-                    enabled: change.effect.active,
-                    name: change.effect.name,
+                    enabled: effect.active,
+                    name: effect.name,
                     value: delta,
-                    mode: mode,
-                    priority: change.priority ?? 10 * mode,
-                    source: change.effect.uuid,
+                    type: change.type,
+                    priority: change.priority ?? ActiveEffect.CHANGE_TYPES[change.type]?.defaultPriority ?? 20,
+                    source: effect.uuid,
                 })
             );
-            return undefined;
+            return {};
         }
 
         // In case of non-existent change.key targets, catch errors and log it, but still allow the overall process to continue.
@@ -302,8 +413,8 @@ export class SR5ActiveEffect extends ActiveEffect {
         // TODO: v14 - check if the commented out code is still needed
         try {
             const changes = {};
-            // @ts-expect-error TODO: fvtt - v14 - missing types
-            return SR5ActiveEffect._applyChangeUnguided(object, change, changes);
+            SR5ActiveEffect._applyChangeUnguided(object, change, changes);
+            return changes as Record<string, unknown>;
         } catch (err) {
             console.error(`Test [${object.constructor.name}] | Failed to apply active effect change for ${change.key}: "${change.value}"`, err);
             return {};
@@ -311,31 +422,61 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
-     * Resolve a dynamic change value to the actual numerical value. A dynamic change value contains key references
-     * to model properties, which must be resolved before application as literal values.
+     * Resolve a dynamic change value against model data before it's applied to a document.
      *
-     * A dynamic change value follows the same rules as a Foundry roll formula (including dice pools).
+     * A dynamic value contains @property references (e.g. '@system.technology.rating * 3'),
+     * resolved from source, then evaluated by DynamicValueEvaluator. change.value is overwritten
+     * with the result rendered as the target field expects it - a comparison landing on a number
+     * field becomes 1/0, a number landing on a boolean field becomes true/false - so the evaluated
+     * type and the field type don't have to match. A value the evaluator can't parse comes back
+     * unchanged, and a non-finite number is left untouched for appliers to reject.
      *
-     * A change could contain the key of 'system.attributes.body' with the mode Modify and a dynamic value of
-     * '@system.technology.rating * 3'. The dynamic property path would be taken from either the source or parent
-     * document of the effect before the resolved value would be applied onto the target document / object.
+     * When targetDoc is omitted (there's no concrete field yet, as when baking a targeted_actor
+     * effect before it's copied), the result is simply stringified.
      *
      * @param source Any object style value, either a Foundry document or a plain object
      * @param change A singular ActiveEffect.ChangeData object
+     * @param targetDoc The document being changed, whose field type drives the rendering
      */
-    static resolveDynamicChangeValue(source: any, change: ActiveEffect.ChangeData) {
+    static resolveDynamicChangeValue(source: any, change: ActiveEffect.ChangeData, targetDoc?: any) {
         // Dynamic value present?
-        if (foundry.utils.getType(change.value) !== 'string') return;
+        if (typeof change.value !== 'string') return;
         if (change.value.length === 0) return;
 
-        // Use Foundry Roll Term parser to both resolve dynamic values and resolve calculations.
-        const expression = Roll.replaceFormulaData(change.value, source);
-        const value = Roll.validate(expression) ? Roll.safeEval(expression) : change.value;
+        // The evaluator resolves @refs itself (keeping string/boolean types), rather than
+        // Roll.replaceFormulaData which substitutes strings unquoted and coerces booleans to 1/0.
+        const value = DynamicValueEvaluator.evaluate(change.value, path => foundry.utils.getProperty(source, path));
 
-        // Overwrite change value with graceful default, to avoid NaN errors during change application.
-        // Adhere to FoundryVTT expectation of receiving string values.
-        if (value === undefined) change.value = '0';
-        else change.value = value.toString();
+        const rendered = SR5ActiveEffect.renderValueForField(value, change.key, targetDoc);
+        if (rendered !== undefined) change.value = rendered;
+    }
+
+    /**
+     * Render an evaluated value as the string its target field expects. A ModifiableValue counts
+     * as a number field. Without a known target the value is just stringified.
+     *
+     * @returns The string to store, or undefined to leave change.value untouched (a non-numeric
+     *          value aimed at a number field, which appliers then drop).
+     */
+    private static renderValueForField(value: DynamicValue, key: string, targetDoc?: any): string | undefined {
+        // A non-finite number (e.g. a division by zero) is meaningless whatever the field; leave
+        // change.value untouched so appliers reject it.
+        if (typeof value === 'number' && !Number.isFinite(value)) return undefined;
+        if (!targetDoc) return String(value);
+
+        const target = foundry.utils.getProperty(targetDoc, key);
+        const type = ModifiableValue.isModifiableValue(target) ? 'number' : foundry.utils.getType(target);
+
+        switch (type) {
+            case 'number': {
+                const number = Number(value);
+                return Number.isFinite(number) ? String(number) : undefined;
+            }
+            case 'boolean':
+                return String(value === true || (typeof value === 'number' && value !== 0));
+            default:
+                return String(value);
+        }
     }
 
     static override migrateData(data: Parameters<typeof ActiveEffect['migrateData']>[0]) {
@@ -355,7 +496,7 @@ export class SR5ActiveEffect extends ActiveEffect {
             if (!data || !this.id) return this;
 
             await this.parent.updateNestedEffects({ ...data, _id: this.id } as ActiveEffect.UpdateInput);
-            await this.render();
+            this.render();
             return this;
         }
 
@@ -428,8 +569,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         // Overwrite foundry priority handling, as they provide a defaultPriority in CHANGE_TYPES but use
         // priority in their ActiveEffect#prepareBaseData implementation.
         for ( const change of this.system.changes ) {
-        // @ts-expect-error TODO: fvtt - v14 - missing CHANGE_TYPES typing
-          change.priority = change.priority === 0 ? ActiveEffect.CHANGE_TYPES[change.type]?.defaultPriority : change.priority;
+          change.priority = change.priority === 0 ? ActiveEffect.CHANGE_TYPES[change.type!]?.defaultPriority : change.priority;
         }
     }
 }

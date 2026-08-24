@@ -212,10 +212,13 @@ export class CharacterImporter {
 
         if (Object.keys(fixes).length > 0) {
             const changes = Object.entries(fixes).map(([key, value]) => ({
-                key: `system.attributes.${key}.value`, value: String(value)
+                key: `system.attributes.${key}.value`,
+                value: String(value),
+                type: 'add',
             }));
             await actor.createEmbeddedDocuments('ActiveEffect', [{
-                name: `Attribute Fixes on Import`, changes
+                name: `Attribute Fixes on Import`,
+                system: { changes },
             }]);
         }
     }

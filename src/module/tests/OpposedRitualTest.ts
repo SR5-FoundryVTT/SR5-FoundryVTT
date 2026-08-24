@@ -1,6 +1,7 @@
 import { ModifiableValue } from '../mods/ModifiableValue';
 import { OpposedTest, OpposedTestData } from './OpposedTest';
 import { TestDocuments, TestOptions } from './SuccessTest';
+import { DeepPartial } from "fvtt-types/utils";
 import { RitualSpellcastingTest } from './RitualSpellcastingTest';
 import { Translation } from '../utils/strings';
 
@@ -15,7 +16,7 @@ type OpposedRitualTestData = OpposedTestData;
 export class OpposedRitualTest extends OpposedTest<OpposedRitualTestData> {
     public declare against: RitualSpellcastingTest;
 
-    constructor(data, documents?: TestDocuments, options?: TestOptions) {
+    constructor(data: DeepPartial<OpposedRitualTestData>, documents?: TestDocuments, options?: Partial<TestOptions>) {
         super(data, documents, options);       
 
         this._assertCorrectAgainst();
@@ -46,7 +47,8 @@ export class OpposedRitualTest extends OpposedTest<OpposedRitualTestData> {
     override applyPoolModifiers() {
         // NOTE: We don't have an actor, therefore don't need to call document modifiers.
         const pool = new ModifiableValue(this.data.pool);
-        pool.addUniqueBase('SR5.Force', this.against.data.force);
+        pool.remove('SR5.Force');
+        pool.addBase('SR5.Force', this.against.data.force);
         pool.addBase('SR5.Force', this.against.data.force);
     }
 

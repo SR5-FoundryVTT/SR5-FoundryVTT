@@ -69,9 +69,18 @@
             {{/if}}
 
             {{#if test.canBeExtended}}
-            <div class="form-group toggle-checkbox-row">
+            <div class="form-group extended-interval-row">
                 <label data-tooltip="SR5.Tooltips.Test.Extended">{{localize "SR5.Extended"}}</label>
-                <input type="checkbox" name="test.data.extended" {{#if test.extended}}checked{{/if}} />
+                <div class="duration-control-fields duration-value-fields extended-interval-fields">
+                    <input type="number" name="test.data.extendedInterval.value"
+                        value="{{test.data.extendedInterval.value}}" min="0" step="1"
+                        data-tooltip="SR5.Tooltips.Test.ExtendedInterval"
+                        aria-label="{{localize 'SR5.ExtendedTestManager.Interval'}}"/>
+                    {{> 'systems/shadowrun5e/dist/templates/apps/partials/interval-units.hbs'
+                        name="test.data.extendedInterval.unit"
+                        selected=test.data.extendedInterval.unit
+                        label=(localize 'SR5.ActiveEffect.Duration.Units')}}
+                </div>
             </div>
             {{/if}}
 

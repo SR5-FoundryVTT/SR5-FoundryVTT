@@ -1,8 +1,7 @@
-import { SuccessTest, SuccessTestData } from "./SuccessTest";
+import { SuccessTest, SuccessTestData, TestOptions } from "./SuccessTest";
+import { DeepPartial } from "fvtt-types/utils";
 import { DataDefaults } from "../data/DataDefaults";
 import { SR5Actor } from "../actor/SR5Actor";
-import { ModifiableValue } from "../mods/ModifiableValue";
-import { CombatModifierFlow } from "../actor/flows/CombatModifierFlow";
 import ModifierTypes = Shadowrun.ModifierTypes;
 
 export interface MeleeAttackData extends SuccessTestData {
@@ -11,12 +10,12 @@ export interface MeleeAttackData extends SuccessTestData {
 
 export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
 
-    override _prepareData(data, options): any {
-        data = super._prepareData(data, options);
+    override _prepareData(data: DeepPartial<MeleeAttackData>, options: Partial<TestOptions>): MeleeAttackData {
+        const prepared = super._prepareData(data, options);
 
-        data.damage = data.damage || DataDefaults.createData('damage');
+        prepared.damage ||= DataDefaults.createData('damage');
 
-        return data;
+        return prepared as MeleeAttackData;
     }
 
     /**
@@ -55,9 +54,6 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
      * Remove unneeded environmental modifier categories for melee tests.
      * 
      * See SR5#187 'Environmental Modifiers'
-     * 
-     * @param actor 
-     * @param type 
      */
     override prepareActorModifier(actor: SR5Actor, type: ModifierTypes): { name: string; value: number; } {
         if (type !== 'environmental') return super.prepareActorModifier(actor, type);
@@ -70,19 +66,6 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
         const value = modifiers.environmental.total;
 
         return { name, value };
-    }
-
-    override prepareTestModifiers() {
-        super.prepareTestModifiers();
-
-        if (!this.actor) return;
-
-        ModifiableValue.remove(this.data.pool, 'Charging');
-
-        const modifier = CombatModifierFlow.getChargerModifier(this.actor);
-        if (!modifier) return;
-
-        ModifiableValue.setUnique(this.data.pool, modifier.name, modifier.value);
     }
 
     /**

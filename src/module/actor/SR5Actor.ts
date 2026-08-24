@@ -51,6 +51,7 @@ import { ActorOwnershipFlow } from '@/module/actor/flows/ActorOwnershipFlow';
 import { LinksHelpers } from '@/module/utils/links';
 import type { InitiativeModeOptions } from '../combat/SR5Combatant';
 import { CreateActorFlow } from './flows/CreateActorFlow';
+import type { SR5ActorCreateOptions } from './flows/CreateActorFlow';
 import { SkillNamingFlow } from '@/module/flows/SkillNamingFlow';
 import { SkillFieldType } from '../types/template/Skills';
 import { IconAssign } from 'src/module/apps/iconAssigner/IconAssign';
@@ -134,6 +135,14 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         return { img: assignedImage, texture: { src: assignedImage } };
     }
 
+    /** Share skill pack reads across a creation. */
+    static override async createDocuments<Temporary extends boolean | undefined = undefined>(
+        data: Actor.CreateInput[],
+        operation?: Actor.Database.CreateDocumentsOperation<Temporary>,
+    ) {
+        return PackItemFlow.withSkillPackCache(async () => await super.createDocuments(data, operation));
+    }
+
     /**
      * Lifecycle hook called before an actor document is created.
      *
@@ -144,13 +153,15 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * @param user The User requesting the document creation
      */
     override async _preCreate(...args: Parameters<Actor<SubType>['_preCreate']>) {
-        const [data] = args;
+        const [data, options] = args;
         await super._preCreate(...args);
 
         // Abort skill creation data injection when duplicating
         if (foundry.utils.getProperty(data, '_stats.duplicateSource')) return;
         // Abort if a skillset was already assigned (e.g. during Chummer import)
         if (foundry.utils.getProperty(data, 'system.skillset')) return;
+        // Abort when the creation request opted out of default skills
+        if ((options as SR5ActorCreateOptions | undefined)?.skipDefaultSkills) return;
         await CreateActorFlow.addDefaultActorSkillset(this, data);
     }
 
@@ -217,7 +228,6 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
     override applyActiveEffects(...args) {
         // Errors during change application will stop that process and cause a broken sheet.
         try {
-            // @ts-expect-error TODO: fvtt - v14 - typing is missing
             super.applyActiveEffects(...args);
         } catch (error) {
             console.error(`Shadowrun5e | Some effect changes could not be applied and might cause issues. Check effects of actor (${this.name}) / id (${this.id})`);
@@ -740,7 +750,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
      * Determine if an actor can choose a full defense attribute
      */
     get hasFullDefense(): boolean {
-        return ['character', 'vehicle', 'sprite', 'spirit'].includes(this.type);
+        return ['character', 'vehicle', 'spirit'].includes(this.type);
     }
 
     /**
@@ -907,7 +917,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const rating = this.system.matrix?.rating || 0;
 
         const showDialog = this.tests.shouldShowDialog(options?.event);
-        const testCls = this.tests._getTestClass('SuccessTest') as typeof SuccessTest;
+        const testCls = this.tests._getTestClass('SuccessTest')!;
         const test = new testCls(TestCreator._minimalTestData(), { actor: this }, { showDialog });
 
         // Build pool values.
@@ -1570,7 +1580,9 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const updateData = {
             system: {
                 initiative: { perception: isMatrixMode ? 'matrix' : mode },
-                ...(isMatrixMode && { matrix: { hot_sim: mode === 'hot_sim' } }),
+                // Setting hot-sim to false is necessary even if new ini mode is non-matrix.
+                // Otherwise matrix modifiers will still apply when in non-matrix mode.
+                ...(this.system.matrix && { matrix: { hot_sim: mode === 'hot_sim' } }),
             },
         } as const;
 

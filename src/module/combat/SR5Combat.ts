@@ -5,7 +5,6 @@ import { Migrator } from "../migrator/Migrator";
 import { CombatRules } from "../rules/CombatRules";
 import { FLAGS, SR, SYSTEM_NAME } from "../constants";
 import { SR5Die } from "../rolls/SR5Die";
-import { ChatMessageMode } from "../types/global";
 import SocketMessageData = Shadowrun.SocketMessageData;
 import BaseCombat = foundry.documents.BaseCombat;
 
@@ -60,6 +59,21 @@ export class SR5Combat extends Combat<"base"> {
         return super.update(...args);
     }
 
+    override _onUpdate(...args: Parameters<Combat["_onUpdate"]>) {
+        super._onUpdate(...args);
+
+        // A new initiative pass can re-act the SAME combatant: SR5 inserts a pad combatant to shift
+        // the initiative order (so the turn index moves), but combat.combatant may be unchanged from
+        // Foundry's perspective. Drive the registry on turn/round changes after the acting combatant
+        // has been selected; pass-only updates still point at the previous combatant.
+        if (!game.user?.isActiveGM) return;
+        const [changed] = args;
+        const advanced = ('turn' in changed) || ('round' in changed);
+        if (advanced) {
+            void foundry.documents.ActiveEffect.registry.refresh('sr5ActionPhaseStart', { combat: this });
+        }
+    }
+
     /**
      * Add ContextMenu options to CombatTracker Entries -- adds the basic Initiative Subtractions.
      */
@@ -88,6 +102,8 @@ export class SR5Combat extends Combat<"base"> {
      * Handles socket messages to trigger combat functions remotely.
      */
     static async _handleSocketMessage(message: SocketMessageData) {
+        if (!game.user?.isGM) return;
+
         const { id, fnName } = message.data ?? {};
         if (typeof id !== 'string' || typeof fnName !== 'string') return;
 
@@ -111,7 +127,8 @@ export class SR5Combat extends Combat<"base"> {
     }
 
     // Foundry's Combat interface defines nextCombatant as a getter, but SR5's initiative flow
-    // @ts-expect-error - doesn't have a single "next" combatant due to initiative passes.
+    // doesn't have a single "next" combatant due to initiative passes.
+    // @ts-expect-error it will be correctly typed later
     override get nextCombatant(): undefined { return undefined; }
 
 
@@ -166,16 +183,16 @@ export class SR5Combat extends Combat<"base"> {
      * Shadowrun does not clear movement history on turn start.
      */
     protected override async _clearMovementHistoryOnStartTurn(
-        combatant: Combatant.Implementation,
-        context: Combat.TurnEventContext,
+        _combatant: Combatant.Implementation,
+        _context: Combat.TurnEventContext,
     ) {}
 
-    override async clearMovementHistories(combatants: Parameters<Combat['clearMovementHistories']>[0]) {
-        await super.clearMovementHistories(combatants);
+    override async clearMovementHistories(...args: Parameters<Combat['clearMovementHistories']>) {
+        await super.clearMovementHistories(...args);
 
         // Remove running/sprinting status effects from all combatants
         // TokenDocument is not triggered to clear movement history on this path.
-        combatants ??= this.combatants;
+        const combatants = args[0] ?? this.combatants;
         if (game.settings.get(SYSTEM_NAME, FLAGS.TokenAutoRunning)) {
             for (const combatant of combatants) {
                 // Concurrently remove running/sprinting status effects.
@@ -228,6 +245,10 @@ export class SR5Combat extends Combat<"base"> {
         // @ts-expect-error
         Hooks.callAll("combatRound", this, updateData, updateOptions);
         await this.update(updateData, updateOptions);
+
+        if (game.settings.get(SYSTEM_NAME, FLAGS.TokenMovementHistoryReset) === 'turnStart') {
+            await this.clearMovementHistories();
+        }
 
         if (this.combatants.size) {
             await this.resetAll();
@@ -282,6 +303,10 @@ export class SR5Combat extends Combat<"base"> {
         if (!game.user?.isGM) {
             SocketMessage.emitForGM(FLAGS.DoCombatFunction, { id: this.id, fnName: 'nextTurn' });
             return this;
+        }
+
+        if (!passedPass && this.combatant?.actor) {
+            void foundry.documents.ActiveEffect.registry.refresh('sr5ActionPhaseEnd', { combat: this });
         }
 
         const nextTurn = this.turns.findIndex(combatant => {
@@ -396,7 +421,7 @@ export class SR5Combat extends Combat<"base"> {
         const messageGroups = {
             public: [] as InitiativeSummaryRow[],
             gm: [] as InitiativeSummaryRow[],
-        } satisfies Partial<Record<ChatMessageMode, InitiativeSummaryRow[]>>;
+        } satisfies Partial<Record<ChatMessage.MessageMode, InitiativeSummaryRow[]>>;
 
         for (const id of combatantIds) {
             const combatant = this.combatants.get(id) as SR5Combatant | undefined;
@@ -571,7 +596,7 @@ export class SR5Combat extends Combat<"base"> {
      * @param messageOptions - Base configuration options for the created ChatMessage documents.
      */
     private async _createInitiativeMessages(
-        messageGroups: Partial<Record<ChatMessageMode, InitiativeSummaryRow[]>>,
+        messageGroups: Partial<Record<ChatMessage.MessageMode, InitiativeSummaryRow[]>>,
         messageOptions: ChatMessage.CreateData,
     ) {
         let hasPlayedSound = false;
@@ -597,7 +622,6 @@ export class SR5Combat extends Combat<"base"> {
                 messageOptions,
             );
 
-            // @ts-expect-error - TODO: fvtt - v14 - missing settings typing
             ChatMessage.applyMode(messageData, rollMode);
             const message = await foundry.documents.ChatMessage.implementation.create(messageData);
 

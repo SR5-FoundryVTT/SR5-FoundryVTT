@@ -23,10 +23,10 @@ export class NPCPrep {
         for (const [name, attribute] of Object.entries(attributes)) {
             // Apply NPC modifiers
             const modifyBy = metatypeModifier.attributes?.[name] as number | undefined;
-            if (modifyBy)
+            if (modifyBy) {
                 ModifiableValue.addUnique(attribute, METATYPEMODIFIER, modifyBy);
-
-            AttributesPrep.calculateAttribute(name, attribute);
+                AttributesPrep.calculateAttribute(name, attribute);
+            }
         }
     }
 }

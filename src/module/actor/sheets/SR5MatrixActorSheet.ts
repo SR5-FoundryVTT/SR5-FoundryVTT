@@ -168,6 +168,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         },
         compilations: {
             template: SheetFlow.templateBase('actor/tabs/matrix/compilations'),
+            templates: SheetFlow.templateListItem('call_in_action'),
             scrollable: ['.scrollable']
         },
         spritePowers: {
@@ -313,6 +314,10 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
      */
     static async #rebootPersonaDevice(this: SR5MatrixActorSheet) {
         await MatrixSheetFlow.promptRebootPersonaDevice(this.actor);
+        // Avoid stale target selection, mostly for marked icons. Will also remove non-marked selections.
+        this.toggleMatrixTargetSelection(undefined);
+
+        void this.render();
     }
 
     /**
@@ -676,15 +681,18 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
             return;
         }
 
-        const uuid = SheetFlow.closestUuid(event.target);
-        if (!uuid) return;
+        // Only consider the stored mark id on the element when clearing a single mark.
+        const el = event.target.closest<HTMLElement>('[data-mark-id]');
+        if (!el) return;
+        const markId = el.dataset.markId;
+        if (!markId) return;
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
         // Change selection state before triggering an update caused re-render.
         this.toggleMatrixTargetSelection(undefined);
-        await this.actor.clearMark(uuid);
+        await this.actor.clearMark(markId);
     }
 
     static async #clearAllMarks(this: SR5MatrixActorSheet, event: PointerEvent) {

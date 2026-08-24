@@ -5,12 +5,57 @@ import { FLAGS, SYSTEM_NAME } from "@/module/constants";
 import { SR5 } from "@/module/config";
 import { Helpers } from "@/module/helpers";
 
+type SkillPackCache = Map<string, Promise<SR5Item<'skill'>[]>>;
+
+let activeSkillPackCache: SkillPackCache | null = null;
+let activeSkillPackCacheScopes = 0;
+
+/**
+ * Cache skill-pack reads for the duration of an operation.
+ *
+ * Reads are frozen for the scope's lifetime, there is no invalidation, so a pack edited while a
+ * scope is open won't be seen by it. Keep scopes short, without user interaction or writes to the
+ * skill packs. Nested scopes share one cache and it's released once the outermost one ends.
+ */
+async function withSkillPackCache<T>(operation: () => Promise<T>): Promise<T> {
+    if (activeSkillPackCacheScopes === 0) activeSkillPackCache = new Map();
+    activeSkillPackCacheScopes++;
+
+    try {
+        return await operation();
+    } finally {
+        activeSkillPackCacheScopes--;
+        if (activeSkillPackCacheScopes === 0) activeSkillPackCache = null;
+    }
+}
+
+/** Read from the active skill-pack cache. */
+async function cachedSkillPackRead(
+    key: string,
+    read: () => Promise<SR5Item<'skill'>[]>,
+): Promise<SR5Item<'skill'>[]> {
+    const cache = activeSkillPackCache;
+    if (!cache) return await read();
+
+    let result = cache.get(key);
+    if (!result) {
+        result = read();
+        // Don't let a failed read poison the rest of the scope.
+        result.catch(() => cache.delete(key));
+        cache.set(key, result);
+    }
+
+    return await result;
+}
+
 /**
  * Handle interaction with the system packs for predefined items.
  * 
  * This includes all system item packs, including actions and skills.
  */
 export const PackItemFlow = {
+    withSkillPackCache,
+
     /**
      * A pack document retrieval helper for typed items.
      * @param pack The pack to retrieve documents from.
@@ -240,15 +285,17 @@ export const PackItemFlow = {
      */
     async getPackSkills(): Promise<SR5Item<'skill'>[]> {
         const packName = this.getSkillsPackName();
-        console.debug(`Shadowrun 5e | Trying to fetch all skills from pack ${packName}`);
-        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
-        if (!pack) return [];
+        return cachedSkillPackRead(`skills:${packName}`, async () => {
+            console.debug(`Shadowrun 5e | Trying to fetch all skills from pack ${packName}`);
+            const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
+            if (!pack) return [];
 
-        const packEntryIds = pack.index.filter(data => data.type === 'skill').map(data => data._id);
-        const documents = await this.getPackDocuments<'skill'>(pack, packEntryIds);
+            const packEntryIds = pack.index.filter(data => data.type === 'skill').map(data => data._id);
+            const documents = await this.getPackDocuments<'skill'>(pack, packEntryIds);
 
-        console.debug(`Shadowrun5e | Fetched all skills from pack ${packName}`, documents);
-        return documents;
+            console.debug(`Shadowrun5e | Fetched all skills from pack ${packName}`, documents);
+            return documents;
+        });
     },
 
     /**
@@ -258,16 +305,18 @@ export const PackItemFlow = {
      */
     async getPackSkillgroups(): Promise<SR5Item<'skill'>[]> {
         const packName = this.getSkillGroupsPackName();
-        console.debug(`Shadowrun 5e | Trying to fetch all skill groups from pack ${packName}`);
-        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
-        if (!pack) return [];
+        return cachedSkillPackRead(`groups:${packName}`, async () => {
+            console.debug(`Shadowrun 5e | Trying to fetch all skill groups from pack ${packName}`);
+            const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
+            if (!pack) return [];
 
-        const packEntryIds = pack.index.filter(data => data.type === 'skill').map(data => data._id);
-        const documents = await this.getPackDocuments<'skill'>(pack, packEntryIds);
-        const skillGroups = documents.filter(document => document.system.type === 'group');
+            const packEntryIds = pack.index.filter(data => data.type === 'skill').map(data => data._id);
+            const documents = await this.getPackDocuments<'skill'>(pack, packEntryIds);
+            const skillGroups = documents.filter(document => document.system.type === 'group');
 
-        console.debug(`Shadowrun5e | Fetched all skill groups from pack ${packName}`, skillGroups);
-        return skillGroups;
+            console.debug(`Shadowrun5e | Fetched all skill groups from pack ${packName}`, skillGroups);
+            return skillGroups;
+        });
     },
 
     /**
@@ -293,16 +342,18 @@ export const PackItemFlow = {
      */
     async getAllPackSkillSets(): Promise<SR5Item<'skill'>[]> {
         const packName = this.getSkillSetsPackName();
-        console.debug(`Shadowrun 5e | Trying to fetch all skill sets from pack ${packName}`);
-        const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
-        if (!pack) return [];
+        return cachedSkillPackRead(`sets:${packName}`, async () => {
+            console.debug(`Shadowrun 5e | Trying to fetch all skill sets from pack ${packName}`);
+            const pack = game.packs.find(pack => pack.metadata.system === SYSTEM_NAME && pack.metadata.name === packName) as foundry.documents.collections.CompendiumCollection<'Item'> | undefined;
+            if (!pack) return [];
 
-        const packEntryIds = pack.index.filter(data => data.type === 'skill').map(data => data._id);
-        const documents = await this.getPackDocuments<'skill'>(pack, packEntryIds);
-        const skillSets = documents.filter(document => document.system.type === 'set');
+            const packEntryIds = pack.index.filter(data => data.type === 'skill').map(data => data._id);
+            const documents = await this.getPackDocuments<'skill'>(pack, packEntryIds);
+            const skillSets = documents.filter(document => document.system.type === 'set');
 
-        console.debug(`Shadowrun5e | Fetched all skill sets from pack ${packName}`, skillSets);
-        return skillSets;
+            console.debug(`Shadowrun5e | Fetched all skill sets from pack ${packName}`, skillSets);
+            return skillSets;
+        });
     },
 
     /**
