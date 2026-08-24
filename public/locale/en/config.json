@@ -2,8 +2,10 @@
     "CONTROLS": {
         "SR5": {
             "EnvironmentalModifiers": "Environmental Modifiers",
+            "ExtendedTestManager": "Extended Tests",
             "OverwatchScoreTracker": "Overwatch Score Tracker",
-            "SituationalModifiers": "Situational Modifiers"
+            "SituationalModifiers": "Situational Modifiers",
+            "TimeControl": "Time Control"
         }
     },
     "SETTINGS": {
@@ -15,14 +17,16 @@
         "AutomateProgressiveRecoilDescription": "Characters accrue progressive recoil until reset",
         "CompendiumBrowserBlacklist": "Compendium Browser Blacklist",
         "CompendiumBrowserBlacklistDescription": "List of compendiums to hide from the compendium browser",
+        "EnforceExtendedTestIntervalDescription": "Only allow the next roll of an extended test once its interval has passed in game time.",
+        "EnforceExtendedTestIntervalName": "Enforce Extended Test Intervals",
+        "ExtendedTestDueMessageDescription": "Whisper a chat message with the test state and a roll button to everyone allowed to roll it, once enough game time has passed for its next roll.",
+        "ExtendedTestDueMessageName": "Extended test due messages",
         "ModifyRollExpanded": "Remember Modify Roll section state",
         "ModifyRollExpandedDescription": "Stores whether the Modify Roll section was expanded last time and restores that state in the next test dialog.",
         "DefaultOpposedTestActorSelection": "Overwrite opposed test token selections",
         "DefaultOpposedTestActorSelectionDescription": "Always overwrite selected tokens with targets used for testing",
         "DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
         "DiagonalMovementName": "Diagonal Movement",
-        "DieFaceLabels": "Test Die Face Labels",
-        "DieFaceLabelsDescription": "[Dice So Nice] Comma-separated list of 6 labels for the test die faces, starting with 1.",
         "DisplayDefaultRollCardDescription": "Should the default roll-card be displayed along with the Shadowrun roll-card",
         "DisplayDefaultRollCardName": "Display Default Roll Card",
         "EstimateDiagonal": "Estimate Diagonal Movement (1-2-1)",
@@ -56,6 +60,10 @@
         "ShowTokenNameForChatOutputName": "Use Token Name for Roll Card",
         "TokenAutoRunning": "Auto-Detect Running Movement",
         "TokenAutoRunningDescription": "Automatically switch token movement mode to running when measured distance exceeds walking speed",
+        "TokenMovementHistoryReset": "Movement History Reset Timing",
+        "TokenMovementHistoryResetDescription": "Choose when movement history is cleared for combatants during combat",
+        "TokenMovementHistoryResetFirstActionPhase": "On My First Action Phase",
+        "TokenMovementHistoryResetTurnStart": "Reset on Turn Start",
         "TokenHealthBars": "Token health bars",
         "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring",
         "TokenRulerColorRunning": "Token Movement Running Color",
@@ -132,13 +140,21 @@
         "ActiveEffect": {
             "ApplyTo": "Apply-To",
             "ApplyTos": {
+                "TestTargetingThisActor": "Test Targeting This Actor",
                 "TargetedActor": "Targeted Actor",
                 "TestItem": "Test via Item"
             },
             "CannotAddTestViaItemToActor": "Cannot add an Active Effect of type 'Test via Item' to an Actor",
+            "ValueEditor": "Edit Change Value",
             "FIELDS": {
                 "applyByTest": {
                     "label": "Apply-To Test via Item"
+                },
+                "conditionMode": {
+                    "hint": "Include: the test must match these values; Exclude: the test must not match these values."
+                },
+                "conditionType": {
+                    "hint": "Which part of the test this condition filters on."
                 },
                 "applyTo": {
                     "hint": "Apply-To different Targets",
@@ -175,12 +191,84 @@
                 "selection_tests": {
                     "hint": "Filter the test based on the Tests used",
                     "label": "Tests Filter"
+                },
+                "targetName": {
+                    "label": "Target Name"
                 }
+            },
+            "AddCondition": "Add Condition",
+            "AddTarget": "Add Target",
+            "ExpiryTriggers": {
+                "CombatStart": "Combat Start",
+                "CombatEnd":   "Combat End",
+                "TurnStart":   "Turn Start",
+                "TurnEnd":     "Turn End",
+                "MyActionStart": "Start of My Action Phase",
+                "MyActionEnd": "End of My Action Phase"
+            },
+            "Duration": {
+                "Active": "Active",
+                "ActiveDetail": "The duration is active.",
+                "AwaitingCombatStart": "Until combat starts",
+                "AwaitingCombatStartDetail": "Expires when the next combat begins.",
+                "AwaitingCombatEnd": "Until combat ends",
+                "AwaitingCombatEndDetail": "Expires when the current combat ends.",
+                "AwaitingTurnStart": "Until start of combat turn",
+                "AwaitingTurnStartDetail": "Expires at the start of the next combat turn.",
+                "AwaitingTurnEnd": "Until end of combat turn",
+                "AwaitingTurnEndDetail": "Expires at the end of the current combat turn.",
+                "AwaitingMyActionStart": "Until start of owner's action phase",
+                "AwaitingMyActionStartDetail": "Expires at the start of the next action phase taken by the owner.",
+                "AwaitingMyActionEnd": "Until end of owner's action phase",
+                "AwaitingMyActionEndDetail": "Expires when the owner finishes the current action phase.",
+                "AwaitingTrigger": "Awaiting expiry trigger",
+                "AwaitingTriggerDetail": "The duration span is complete and will expire at its configured trigger.",
+                "Combat": "Combat",
+                "GroupCombat": "Combat",
+                "GroupTime": "Time",
+                "UnitTurns": "Turns",
+                "CombatStart": "Combat Turn {turn}, Initiative {initiative}",
+                "CombatStartNoInitiative": "Combat Turn {turn}",
+                "CombatTurn": "{turns} Combat Turn",
+                "CombatTurns": "{turns} Combat Turns",
+                "DoesNotExpire": "Does not expire",
+                "Expired": "Expired",
+                "ExpiredDetail": "Restart this effect to begin its duration again.",
+                "ExpiredOpenEditor": "Expired — open effect editor",
+                "ExpiryTrigger": "Expiry Trigger",
+                "Remaining": "Remaining",
+                "RemainingDetail": "{remaining} remaining",
+                "Restart": "Restart Duration",
+                "RestartPending": "Restart ready",
+                "RestartPendingDetail": "The duration will restart when changes are submitted.",
+                "ExpiryAction": "Expiry Action",
+                "ExpiryActionDefault": "Default ({action})",
+                "ExpiryActionDelete": "Delete",
+                "ExpiryActionUpdate": "Update",
+                "Status": "Status",
+                "Units": "Duration units",
+                "Value": "Duration"
+            },
+            "AtLeastOneTarget": "An effect must keep at least one target.",
+            "FilterTypes": {
+                "Attributes": "Attributes",
+                "Categories": "Action Categories",
+                "Limits": "Limits",
+                "Skills": "Skills",
+                "Tests": "Tests"
             },
             "Modes": {
                 "Modify": "Modify"
             },
-            "New": "New Effect"
+            "New": "New Effect",
+            "RemoveCondition": "Remove Condition",
+            "RemoveTarget": "Remove Target",
+            "SelectionModes": {
+                "Exclude": "Exclude",
+                "Include": "Include"
+            },
+            "Target": "Target",
+            "Targets": "Targets"
         },
         "ActiveSkills": "Active Skills",
         "Actor": {
@@ -1163,6 +1251,130 @@
         "Extended": "Extended",
         "ExtendedHits": "Extended Hits",
         "ExtendedTest": "Extended Test",
+        "ExtendedTestManager": {
+            "Actions": {
+                "Cancel": "Cancel test",
+                "Complete": "Mark completed",
+                "Delete": "Delete",
+                "Edit": "Edit",
+                "Pause": "Pause",
+                "Reactivate": "Reactivate test",
+                "Resume": "Resume",
+                "Roll": "Roll"
+            },
+            "ActivityLog": "Activity log",
+            "Actor": "Actor",
+            "AdvanceTime": "Advance game time on roll",
+            "AdvanceTimeTooltip": "Advance the world time by the test interval after each roll.",
+            "CanEdit": "Edit",
+            "CanRoll": "Roll",
+            "CanView": "View",
+            "BaseThreshold": "Base Threshold",
+            "ConfirmCancel": "Cancel the extended test \"{name}\"? It ends the test, but a GM can reactivate it later.",
+            "ConfirmDelete": "Delete the extended test \"{name}\"?",
+            "CreateTest": "New Extended Test",
+            "Creator": "Created by",
+            "CumulativeModifier": "Cumulative −1 dice pool modifier",
+            "CumulativeModifierTooltip": "Reduce the dice pool by 1 for each roll performed. SR5 p. 48.",
+            "CumulativeRollCount": "Prior rolls",
+            "Due": "Due",
+            "DueTooltip": "Game time intervals elapsed since the last roll",
+            "DueMessage": {
+                "Header": "Extended test ready to continue",
+                "OpenManager": "Open manager",
+                "Overdue": "{count} intervals elapsed",
+                "Rolls": "Rolls"
+            },
+            "EditTest": "Edit Extended Test",
+            "Filters": {
+                "Actor": "Actor",
+                "Advanced": "More filters",
+                "AllActors": "All actors",
+                "AllStatuses": "All statuses",
+                "AllVisibilities": "Public and private",
+                "Created": "Created within",
+                "Mine": "Only mine",
+                "Private": "Private",
+                "Search": "Search name or notes...",
+                "Status": "Status",
+                "Updated": "Updated within",
+                "Visibility": "Visibility"
+            },
+            "GameTime": "Game Time",
+            "Interval": "Interval",
+            "LastUpdate": "Last update",
+            "Log": {
+                "cancel": "Cancelled",
+                "complete": "Completed",
+                "create": "Created",
+                "fail": "Failed",
+                "pause": "Paused",
+                "resume": "Resumed",
+                "roll": "Rolled",
+                "update": "Updated"
+            },
+            "Name": "Name",
+            "NewTest": "Extended Test",
+            "NoActor": "None",
+            "NoTests": "No extended tests to show.",
+            "Notes": "Notes",
+            "NotesPlaceholder": "Free text about this test. Searchable.",
+            "Notifications": {
+                "Completed": "Extended test \"{name}\" completed!",
+                "Failed": "Extended test \"{name}\" failed: the dice pool is exhausted.",
+                "NoEditPermission": "You are not allowed to edit this extended test.",
+                "NoRollPermission": "You are not allowed to roll this extended test.",
+                "NotActive": "This extended test is not active. Resume or reactivate it first.",
+                "NotDue": "Not enough game time has passed for the next roll of this extended test.",
+                "Registered": "Extended test \"{name}\" is now tracked in the Extended Tests manager."
+            },
+            "OpenMessage": "Open chat message",
+            "Periods": {
+                "any": "Any time",
+                "day": "Last day",
+                "hour": "Last hour",
+                "month": "Last month",
+                "week": "Last week"
+            },
+            "PoolUsed": "Pool",
+            "RealTime": "Real Time",
+            "Rolls": "Rolls performed",
+            "SaveTest": "Save",
+            "SectionDetails": "Details",
+            "SectionRules": "Rules",
+            "Sort": {
+                "accumulatedHits": "Accumulated hits",
+                "createdAt": "Created",
+                "createdWorldTime": "Game start time",
+                "interval": "Interval",
+                "name": "Name",
+                "progress": "Progress",
+                "rollCount": "Rolls",
+                "status": "Status",
+                "threshold": "Threshold",
+                "updatedAt": "Updated"
+            },
+            "SortBy": "Sort by",
+            "SortDirection": "Toggle sort direction",
+            "StartedGameTime": "Started (game time)",
+            "Status": {
+                "active": "Active",
+                "cancelled": "Cancelled",
+                "completed": "Completed",
+                "failed": "Failed",
+                "paused": "Paused"
+            },
+            "Title": "Extended Tests",
+            "User": "User",
+            "UserPermissions": "User Permissions",
+            "UserPermissionsHint": "GMs, the creator and owners of the linked actor always have full access. Viewing checkboxes only apply with visibility \"Selected users\".",
+            "Visibility": {
+                "gmAndOwner": "GM and owner",
+                "gmOnly": "GM only",
+                "public": "Public",
+                "selectedUsers": "Selected users"
+            }
+        },
         "FOUNDRY": {
             "Actor": "Actor",
             "Item": "Item",
@@ -1370,8 +1582,16 @@
                         }
                     },
                     "extended": {
-                        "hint": "If this is an Extended Test",
-                        "label": "Extended Test"
+                        "hint": "Game time between rolls of this extended action. Zero rolls it as a normal test.",
+                        "label": "Extended Test",
+                        "unit": {
+                            "hint": "Time unit of the extended test interval.",
+                            "label": "Interval Unit"
+                        },
+                        "value": {
+                            "hint": "Game time between rolls. Zero rolls this as a normal, non extended test.",
+                            "label": "Interval"
+                        }
                     },
                     "initiative_mod": {
                         "hint": "Initiative modifier applied when taking this action",
@@ -2800,7 +3020,7 @@
             "ResistedAllDamage": "No Damage taken!",
             "ResistedSomeDamage": "Damage taken!",
             "Results": "Results",
-            "RitualFailure": "The ritual was to strong for you",
+            "RitualFailure": "The ritual was too strong for you",
             "RitualSuccess": "The ritual is sealed",
             "SoakBlockedByHardenedArmor": "Blocked By Hardened Armor",
             "SpiritSummonFailure": "Spirit fled!",
@@ -2850,6 +3070,35 @@
             "ThrownAttackTest": "Thrown Weapon Attack"
         },
         "Threshold": "Threshold",
+        "TimeControl": {
+            "Advance": "Advance",
+            "Amount": "Amount",
+            "Apply": "Apply",
+            "CustomAmount": "Custom Amount",
+            "CustomMinutes": "min",
+            "CustomMinutesTooltip": "Advance world time by a custom amount of minutes",
+            "Day": "Day",
+            "GmOnly": "Only Game Masters may change the world time.",
+            "Hour": "Hour",
+            "Minute": "Minute",
+            "Month": "Month",
+            "Presets": {
+                "CombatTurn": "Combat Turn",
+                "Day": "1 Day",
+                "Header": "Quick Advance",
+                "Hour": "1 Hour",
+                "Minute": "1 Minute",
+                "TenMinutes": "10 Minutes",
+                "Week": "1 Week"
+            },
+            "Preview": "Preview",
+            "Rewind": "Rewind",
+            "Second": "Second",
+            "SetTime": "Set Date & Time",
+            "Title": "Time Control",
+            "Unit": "Unit",
+            "Year": "Year"
+        },
         "ToggleBreakdown": "Toggle Breakdown",
         "ToggleActive": "Toggle Active",
         "ToggleEquip": "Toggle Equipped",
@@ -2906,6 +3155,9 @@
                 "EditEffect": "Edit Effect",
                 "ItemEffects": "Effects collected from items on this document",
                 "HelpLinkEnglishOnly": "Help (External link, English only)",
+                "OpenValueEditor": "Open value editor",
+                "ApplyValueEditor": "Apply value edit",
+                "CancelValueEditor": "Cancel value edit",
                 "OnlyAllFilteredUsed": "This effect will only apply for tests matching all selections",
                 "OnlyFilteredUsed": "This effect will only apply for tests matching at least one selection",
                 "OnlyForItemTest": "Only affect test of parent item",
@@ -2953,7 +3205,8 @@
             },
             "Test": {
                 "BuyHits": "Do not roll dice. Buy hits using ⌊dice pool / 4⌋.",
-                "Extended": "Test will be thrown as an extended test until threshold is reached",
+                "Extended": "Test will be thrown as an extended test until threshold is reached. Set the interval to zero to roll it as a normal test.",
+                "ExtendedInterval": "Game time between rolls. Zero rolls this as a normal, non extended test.",
                 "Limit": "Calculated limit value",
                 "LimitIgnored": "Limit is currently ignored for this test",
                 "Modifier": "Sum of all modifiers applied to dice pool",

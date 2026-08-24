@@ -1,5 +1,5 @@
 import JSZip from "jszip";
-import { Constants } from "../importer/Constants";
+import { Constants, ChummerFile } from "../importer/Constants";
 import { ImportHelper } from "../helper/ImportHelper";
 import { SYSTEM_NAME, FLAGS } from "@/module/constants";
 
@@ -102,11 +102,21 @@ export class BulkImporter extends BaseClass {
         branch: "8544ecee1ad3edccc0853b7821067542130a5c68",
     } as const;
 
+    static readonly SUPPORTED_LANGUAGES = [
+        { value: "en-us", label: "English" },
+        { value: "de-de", label: "Deutsch (German)" },
+        { value: "fr-fr", label: "Français (French)" },
+        { value: "pt-br", label: "Português (Portuguese)" },
+        { value: "ja-jp", label: "日本語 (Japanese)" },
+        { value: "zh-cn", label: "简体中文 (Chinese)" }
+    ] as const;
+
     /**
      * UI and import behavior flags.
      */
     private static overrideDocuments = true;
     private static deleteCompendiums = false;
+    private static selectedLanguage = "";
     private static isImporting = false;
     private static importDone = false;
     private static zipFile: File | null = null;
@@ -154,6 +164,28 @@ export class BulkImporter extends BaseClass {
         // Destructure GitHub config for cleaner access
         const { owner, repo, branch, version } = BulkImporter.githubConfig;
 
+        if (!BulkImporter.selectedLanguage) {
+            const locale = game.i18n.lang.toLowerCase();
+            if (locale === "de" || locale.startsWith("de-")) {
+                BulkImporter.selectedLanguage = "de-de";
+            } else if (locale === "fr" || locale.startsWith("fr-")) {
+                BulkImporter.selectedLanguage = "fr-fr";
+            } else if (locale === "pt" || locale.startsWith("pt-")) {
+                BulkImporter.selectedLanguage = "pt-br";
+            } else if (locale === "ja" || locale.startsWith("ja-")) {
+                BulkImporter.selectedLanguage = "ja-jp";
+            } else if (locale === "zh" || locale.startsWith("zh-")) {
+                BulkImporter.selectedLanguage = "zh-cn";
+            } else {
+                BulkImporter.selectedLanguage = "en-us";
+            }
+        }
+
+        const languages = BulkImporter.SUPPORTED_LANGUAGES.map(lang => ({
+            ...lang,
+            selected: lang.value === BulkImporter.selectedLanguage
+        }));
+
         return {
             ...baseContext,
 
@@ -167,6 +199,7 @@ export class BulkImporter extends BaseClass {
             zipFileName: BulkImporter.zipFile?.name,
             deleteCompendiums: BulkImporter.deleteCompendiums,
             overrideDocuments: BulkImporter.overrideDocuments,
+            languages,
 
             // GitHub version info
             info: {
@@ -212,6 +245,81 @@ export class BulkImporter extends BaseClass {
     }
 
     /**
+     * Loads translation maps for non-English imports.
+     * Only needed for the GitHub download path; ZIP imports carry translations inline.
+     */
+    private static async loadTranslations(langCode: string, ZIP: JSZip | null): Promise<void> {
+        ImportHelper.translationMap = { files: {} };
+        ImportHelper.isTranslationEnabled = (langCode !== "en-us");
+
+        if (langCode === "en-us" || ZIP) {
+            return;
+        }
+
+        const dataLangFile = `${langCode}_data.xml`;
+        let dataLangXml: string | undefined;
+        try {
+            dataLangXml = await BulkImporter.fetchGitHubFile(`Chummer/lang/${dataLangFile}`);
+        } catch (e) {
+            console.debug(`No data language file ${dataLangFile} found on GitHub or it failed to fetch:`, e);
+        }
+
+        if (dataLangXml) {
+            try {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(dataLangXml, "text/xml");
+                const chummerSections = xmlDoc.getElementsByTagName("chummer");
+                let dataKeysCount = 0;
+
+                for (const section of chummerSections) {
+                    const fileName = section.getAttribute("file");
+                    if (!fileName) continue;
+
+                    ImportHelper.translationMap.files[fileName] ??= { names: {}, ids: {} };
+
+                    // Find all <name> tags inside this section
+                    const nameNodes = section.getElementsByTagName("name");
+                    for (const nameNode of nameNodes) {
+                        const parent = nameNode.parentElement;
+                        if (parent) {
+                            const translateNode = parent.getElementsByTagName("translate")[0];
+                            if (translateNode) {
+                                const key = nameNode.textContent?.trim();
+                                const text = translateNode.textContent?.trim();
+                                if (key && text) {
+                                    ImportHelper.translationMap.files[fileName].names[key] = text;
+                                    const idNode = parent.getElementsByTagName("id")[0];
+                                    const id = idNode?.textContent?.trim();
+                                    if (id) {
+                                        ImportHelper.translationMap.files[fileName].ids[id] = text;
+                                    }
+                                    dataKeysCount++;
+                                }
+                            }
+                        }
+                    }
+
+                    // Populate categoryMap for this file
+                    const fileKey = fileName.replace(".xml", "") as ChummerFile;
+                    const categoryNodes = section.getElementsByTagName("category");
+                    for (const node of categoryNodes) {
+                        const translateAttr = node.getAttribute("translate");
+                        const key = node.textContent?.trim();
+                        if (key && translateAttr) {
+                            ImportHelper.categoryMap[fileKey] ??= {};
+                            ImportHelper.categoryMap[fileKey][key] = translateAttr;
+                            dataKeysCount++;
+                        }
+                    }
+                }
+                console.log(`Loaded ${dataKeysCount} additional data translations from ${dataLangFile}`);
+            } catch (e) {
+                console.error(`Failed to parse data language XML:`, e);
+            }
+        }
+    }
+
+    /**
      * Handles the full bulk import process:
      * - Prepares compendiums (unlock/delete)
      * - Loads data from ZIP or GitHub
@@ -223,81 +331,107 @@ export class BulkImporter extends BaseClass {
         BulkImporter.isImporting = true;
         const start = performance.now();
 
-        // Unlock all world compendiums for editing
-        for (const compendium of Object.values(Constants.MAP_COMPENDIUM_CONFIG))
-            await game.packs.get("world." + compendium.pack)?.configure({ locked: false });
-
-        // Optionally delete existing compendiums
-        if (BulkImporter.deleteCompendiums)
+        try {
+            // Unlock all world compendiums for editing
             for (const compendium of Object.values(Constants.MAP_COMPENDIUM_CONFIG))
-                await game.packs.get("world." + compendium.pack)?.deleteCompendium();
+                await game.packs.get("world." + compendium.pack)?.configure({ locked: false });
 
-        // Load ZIP file if provided
-        const ZIP = BulkImporter.zipFile ? await (new JSZip()).loadAsync(BulkImporter.zipFile) : null;
+            // Optionally delete existing compendiums
+            if (BulkImporter.deleteCompendiums)
+                for (const compendium of Object.values(Constants.MAP_COMPENDIUM_CONFIG))
+                    await game.packs.get("world." + compendium.pack)?.deleteCompendium();
 
-        // Configure shared importer settings
-        DataImporter.overrideDocuments = BulkImporter.overrideDocuments;
+            // Load ZIP file if provided
+            const ZIP = BulkImporter.zipFile ? await (new JSZip()).loadAsync(BulkImporter.zipFile) : null;
 
-        // Set total progress count
-        BulkImporter.progress.total = BulkImporter.Importers.length;
-        await this.render();
+            const langCode = BulkImporter.selectedLanguage || "en-us";
+            await BulkImporter.loadTranslations(langCode, ZIP);
 
-        // Process each importer
-        for (const importer of BulkImporter.Importers) {
-            for (const fileName of importer.files) {
-                BulkImporter.progress.message = `Importing: ${importer.constructor.name} ${fileName}`;
-                await this.render();
+            // Configure shared importer settings
+            DataImporter.overrideDocuments = BulkImporter.overrideDocuments;
 
-                try {
-                    const fetchStart = performance.now();
+            // Set total progress count
+            BulkImporter.progress.total = BulkImporter.Importers.length;
+            await this.render();
 
-                    // Load file: from ZIP or GitHub
-                    const file = ZIP
-                        ? await ZIP.file(fileName)?.async("string")
-                        : await BulkImporter.fetchGitHubFile(`Chummer/data/${fileName}`);
+            // Process each importer
+            for (const importer of BulkImporter.Importers) {
+                for (const fileName of importer.files) {
+                    BulkImporter.progress.message = `Importing: ${importer.constructor.name} ${fileName}`;
+                    await this.render();
 
-                    if (file === undefined)
-                        throw new Error(`File ${fileName} not found`);
+                    try {
+                        const fetchStart = performance.now();
 
-                    await importer.parse(file);
+                        // Load file: from ZIP or GitHub
+                        const file = ZIP
+                            ? await ZIP.file(fileName)?.async("string")
+                            : await BulkImporter.fetchGitHubFile(`Chummer/data/${fileName}`);
 
-                    const duration = performance.now() - fetchStart;
-                    console.debug(`Importing ${fileName} took ${duration.toFixed(2)} ms`);
-                } catch (error) {
-                    console.error(`Error importing ${fileName}:`, error);
-                    ui.notifications.error(`Error importing ${fileName}`);
+                        if (file === undefined)
+                            throw new Error(`File ${fileName} not found`);
+
+                        try {
+                            ImportHelper.currentFile = fileName;
+                            await importer.parse(file);
+                        } finally {
+                            ImportHelper.currentFile = null;
+                        }
+
+                        const duration = performance.now() - fetchStart;
+                        console.debug(`Importing ${fileName} took ${duration.toFixed(2)} ms`);
+                    } catch (error) {
+                        console.error(`Error importing ${fileName}:`, error);
+                        ui.notifications.error(`Error importing ${fileName}`);
+                    }
+
+                    BulkImporter.progress.idx++;
+                    await this.render();
                 }
-
-                BulkImporter.progress.idx++;
-                await this.render();
             }
+
+            // Lock all compendiums and update compendium order
+            const compendiumList = new Set(game.settings.get(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder));
+            for (const { pack } of Object.values(Constants.MAP_COMPENDIUM_CONFIG)) {
+                // Lock compendium
+                await game.packs.get(`world.${pack}`)?.configure({ locked: true });
+
+                // Add to compendium order if not present
+                compendiumList.add(`world.${pack}`);
+            }
+
+            await game.settings.set(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder, Array.from(compendiumList));
+
+            // Finalize and notify
+            ui.notifications?.warn("SR5.Warnings.BulkImportPerformanceWarning", { localize: true });
+            BulkImporter.importDone = true;
+        } catch (error) {
+            console.error("Bulk import failed:", error);
+            ui.notifications?.error("Bulk import failed. Check console for details.");
+        } finally {
+            // Lock all compendiums as a fallback safety measure
+            for (const { pack } of Object.values(Constants.MAP_COMPENDIUM_CONFIG)) {
+                try {
+                    await game.packs.get(`world.${pack}`)?.configure({ locked: true });
+                } catch (e) {
+                    console.error(`Failed to lock pack ${pack} in finally block:`, e);
+                }
+            }
+
+            BulkImporter.isImporting = false;
+            await this.render();
+
+            // Clear ImportHelper caches
+            ImportHelper.folders = {};
+            ImportHelper.categoryMap = {};
+            ImportHelper.nameToId = {};
+            ImportHelper.idToName = {};
+            ImportHelper.translationMap = { files: {} };
+            ImportHelper.currentFile = null;
+            ImportHelper.isTranslationEnabled = false;
+
+            console.debug(`Bulk import time: ${(performance.now() - start).toFixed(2)} ms`);
         }
-
-        // Lock all compendiums and update compendium order
-        const compendiumList = new Set(game.settings.get(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder));
-        for (const { pack } of Object.values(Constants.MAP_COMPENDIUM_CONFIG)) {
-            // Lock compendium
-            await game.packs.get(`world.${pack}`)?.configure({ locked: true });
-
-            // Add to compendium order if not present
-            compendiumList.add(`world.${pack}`);
-        }
-
-        await game.settings.set(SYSTEM_NAME, FLAGS.ImporterCompendiumOrder, Array.from(compendiumList));
-
-        // Finalize and notify
-        ui.notifications?.warn("SR5.Warnings.BulkImportPerformanceWarning", { localize: true });
-        BulkImporter.isImporting = false;
-        BulkImporter.importDone = true;
-        await this.render();
-
-        // Clear ImportHelper caches
-        ImportHelper.folders = {};
-        ImportHelper.categoryMap = {};
-        ImportHelper.nameToId = {};
-        ImportHelper.idToName = {};
-
-        console.debug(`Bulk import time: ${(performance.now() - start).toFixed(2)} ms`);
     }
 
     /**
@@ -321,6 +455,12 @@ export class BulkImporter extends BaseClass {
         const overrideDocuments = this.element.querySelector<HTMLSelectElement>("#overrideDocuments");
         overrideDocuments?.addEventListener("change", (event) => {
             BulkImporter.overrideDocuments = (event.currentTarget as HTMLInputElement).checked;
+        });
+
+        // Select: selectedLanguage
+        const selectedLanguage = this.element.querySelector<HTMLSelectElement>("#selectedLanguage");
+        selectedLanguage?.addEventListener("change", (event) => {
+            BulkImporter.selectedLanguage = (event.currentTarget as HTMLSelectElement).value;
         });
 
         // File input: Load ZIP file

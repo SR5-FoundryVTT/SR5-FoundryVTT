@@ -7,6 +7,8 @@ import { TestDialog } from "../module/apps/dialogs/TestDialog";
 import { FLAGS, SYSTEM_NAME } from "../module/constants";
 import { SpellCastingTest } from "@/module/tests/SpellCastingTest";
 import { SuccessTest } from "@/module/tests/SuccessTest";
+import { NaturalRecoveryStunTest } from "@/module/tests/NaturalRecoveryStunTest";
+import { NaturalRecoveryPhysicalTest } from "@/module/tests/NaturalRecoveryPhysicalTest";
 
 export const shadowrunTesting = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -17,8 +19,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
     describe('SuccessTest', () => {
         it('evaluate a roll from action data', async () => {
-            window.doNotPopulateDefaultSkills = true;
-
             const action = await factory.createItem({
                 type: 'action',
                 system: {
@@ -51,7 +51,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                 system: {
                     attributes: { body: { base: 5 }, strength: { base: 1 }, reaction: { base: 1 } },
                 }
-            });
+            }, { skipDefaultSkills: true });
             await actor.createEmbeddedDocuments('Item', [
                 {
                     type: 'skill',
@@ -65,8 +65,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                     }
                 }
             ]);
-            
-            delete window.doNotPopulateDefaultSkills;
 
             const test = await TestCreator.fromItem(action, actor, {showMessage: false, showDialog: false});
 
@@ -346,8 +344,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
         });
 
         it('stores code term traces for labeled pool and limit parts', async () => {
-            window.doNotPopulateDefaultSkills = true;
-
             const actor = await factory.createActor({
                 type: 'character',
                 system: {
@@ -358,7 +354,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                         reaction: { base: 3 }
                     },
                 }
-            });
+            }, { skipDefaultSkills: true });
 
             await actor.createEmbeddedDocuments('Item', [
                 {
@@ -373,8 +369,6 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
                     }
                 }
             ]);
-            
-            delete window.doNotPopulateDefaultSkills;
 
             const action = DataDefaults.createData('action_roll', {
                 test: 'SuccessTest',
@@ -462,6 +456,60 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             const restored = serialized ? TestCreator.fromTestData(serialized) : undefined;
             assert.instanceOf(restored, SpellCastingTest);
             assert.strictEqual(restored?.canBeExtended, false);
+        });
+
+        it('keeps the stun recovery threshold fixed on extended rolls', async () => {
+            const actor = await factory.createActor({
+                type: 'character',
+                system: {
+                    track: {
+                        stun: { value: 5 }
+                    }
+                }
+            });
+
+            const test = new NaturalRecoveryStunTest(TestCreator._minimalTestData(), { actor }, { showMessage: false, showDialog: false });
+            test.prepareBaseValues();
+            test.calculateBaseValues();
+
+            assert.strictEqual(test.threshold.value, 5);
+
+            await actor.update({ system: { track: { stun: { value: 2 } } } });
+
+            const extendedData = foundry.utils.deepClone(test.data);
+            extendedData.extendedRoll = true;
+            const extendedTest = new NaturalRecoveryStunTest(extendedData, { actor }, { showMessage: false, showDialog: false });
+            extendedTest.prepareBaseValues();
+            extendedTest.calculateBaseValues();
+
+            assert.strictEqual(extendedTest.threshold.value, 5);
+        });
+
+        it('keeps the physical recovery threshold fixed on extended rolls', async () => {
+            const actor = await factory.createActor({
+                type: 'character',
+                system: {
+                    track: {
+                        physical: { value: 6 }
+                    }
+                }
+            });
+
+            const test = new NaturalRecoveryPhysicalTest(TestCreator._minimalTestData(), { actor }, { showMessage: false, showDialog: false });
+            test.prepareBaseValues();
+            test.calculateBaseValues();
+
+            assert.strictEqual(test.threshold.value, 6);
+
+            await actor.update({ system: { track: { physical: { value: 3 } } } });
+
+            const extendedData = foundry.utils.deepClone(test.data);
+            extendedData.extendedRoll = true;
+            const extendedTest = new NaturalRecoveryPhysicalTest(extendedData, { actor }, { showMessage: false, showDialog: false });
+            extendedTest.prepareBaseValues();
+            extendedTest.calculateBaseValues();
+
+            assert.strictEqual(extendedTest.threshold.value, 6);
         });
 
         it('evaluate an opposed roll from a opposed action', async () => {

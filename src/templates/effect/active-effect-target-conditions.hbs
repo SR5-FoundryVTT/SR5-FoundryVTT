@@ -1,0 +1,30 @@
+{{!--
+  Per-target filter conditions UI. Expects: target, ti (target index).
+  Root context provides systemFields, filterTypeOptions, selectionModeOptions, filterOptionsByType.
+--}}
+{{#each target.conditions as |condition ci|}}
+<div class="filter-condition" data-index="{{ci}}">
+    <select class="filter-condition-type" name="{{concat "system.targets." ../ti ".conditions." ci ".type"}}"
+            data-tooltip="{{localize "SR5.ActiveEffect.FIELDS.conditionType.hint"}}">
+        {{selectOptions @root.filterTypeOptions selected=condition.type valueAttr="value" labelAttr="label" localize=false}}
+    </select>
+    <select class="filter-condition-mode" name="{{concat "system.targets." ../ti ".conditions." ci ".mode"}}"
+            data-tooltip="{{localize "SR5.ActiveEffect.FIELDS.conditionMode.hint"}}">
+        {{selectOptions @root.selectionModeOptions selected=condition.mode valueAttr="value" labelAttr="label" localize=false}}
+    </select>
+    {{formInput @root.systemFields.targets.element.fields.conditions.element.fields.values
+        name=(concat "system.targets." ../ti ".conditions." ci ".values")
+        value=condition.values
+        options=(lookup @root.filterOptionsByType condition.type)
+        rootId=@root.rootId}}
+    <a class="inline-control" data-action="removeCondition" data-target-index="{{../ti}}" data-condition-index="{{ci}}" data-tooltip="{{localize "SR5.ActiveEffect.RemoveCondition"}}">
+        <i class="fas fa-trash"></i>
+    </a>
+</div>
+{{/each}}
+
+<div class="filter-condition-add">
+    <a data-action="addCondition" data-target-index="{{ti}}">
+        <i class="fas fa-plus"></i> {{localize "SR5.ActiveEffect.AddCondition"}}
+    </a>
+</div>

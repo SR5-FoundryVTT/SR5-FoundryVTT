@@ -18,7 +18,7 @@ const destFolder = path.resolve(process.cwd(), distName);
 const jsBundle = 'bundle.js';
 const entryPoint = "./src/module/main.ts";
 const tsgoPackagePath = require.resolve('@typescript/native-preview/package.json');
-const tsgoScriptPath = path.join(path.dirname(tsgoPackagePath), 'bin', 'tsgo.js');
+const tsgoScriptPath = path.join(path.dirname(tsgoPackagePath), 'bin', 'tsgo');
 
 /**
  * CLEAN
