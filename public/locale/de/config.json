@@ -2692,6 +2692,7 @@
             "DetectionArea": "Ungerichtet",
             "DetectionDirectional": "Gerichtet",
             "DetectionPsychic": "Übersinnlich",
+            "Elemental": "Elementar",
             "FIELDS": {
                 "category": {
                     "hint": "Zauberkategorie",
@@ -2768,6 +2769,7 @@
                     "label": "Zauberart"
                 }
             },
+            "HealthEssence": "Essenz",
             "IllusionMultiSense": "Vollsensorisch",
             "IllusionObvious": "Offensichtlich",
             "IllusionRealistic": "Realistisch",

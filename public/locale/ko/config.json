@@ -2691,6 +2691,7 @@
             "DetectionArea": "범위형",
             "DetectionDirectional": "지향형",
             "DetectionPsychic": "초자연",
+            "Elemental": "원소",
             "FIELDS": {
                 "category": {
                     "hint": "주문이 속한 범주",
@@ -2767,6 +2768,7 @@
                     "label": "주문 유형"
                 }
             },
+            "HealthEssence": "에센스",
             "IllusionMultiSense": "다중 감각",
             "IllusionObvious": "명백함",
             "IllusionRealistic": "현실적",

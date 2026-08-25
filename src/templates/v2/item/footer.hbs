@@ -19,19 +19,19 @@
         {{else if (eq item.type 'contact')}}
             {{> "systems/shadowrun5e/dist/templates/v2/item-properties/contact.hbs" item=item }}
         {{else if (isType item 'complex_form')}}
-            {{> "systems/shadowrun5e/dist/templates/v2/item-properties/complex_form.hbs" item=item }}
+            {{> "systems/shadowrun5e/dist/templates/v2/item/footer/complex_form.hbs" item=item }}
         {{else if (eq item.type 'critter_power')}}
-            {{> "systems/shadowrun5e/dist/templates/v2/item-properties/critter_power.hbs" item=item }}
+            {{> "systems/shadowrun5e/dist/templates/v2/item/footer/critter_power.hbs" item=item }}
         {{else if (eq item.type 'lifestyle')}}
             {{> "systems/shadowrun5e/dist/templates/v2/item-properties/lifestyle.hbs" item=item }}
         {{else if (eq item.type 'quality')}}
             {{> "systems/shadowrun5e/dist/templates/v2/item-properties/quality.hbs" item=item }}
         {{else if (eq item.type 'ritual')}}
-            {{> "systems/shadowrun5e/dist/templates/v2/item-properties/ritual.hbs" item=item }}
+            {{> "systems/shadowrun5e/dist/templates/v2/item/footer/ritual.hbs" item=item }}
         {{else if (eq item.type 'spell')}}
-            {{> "systems/shadowrun5e/dist/templates/v2/item-properties/spell.hbs" item=item }}
+            {{> "systems/shadowrun5e/dist/templates/v2/item/footer/spell.hbs" item=item }}
         {{else if (isType item 'sprite_power')}}
-            {{> "systems/shadowrun5e/dist/templates/v2/item-properties/sprite_power.hbs" item=item }}
+            {{> "systems/shadowrun5e/dist/templates/v2/item/footer/sprite_power.hbs" item=item }}
         {{else if (isType item 'program')}}
             {{> "systems/shadowrun5e/dist/templates/v2/item-properties/program.hbs" item=item }}
         {{else if (isType item 'device')}}
