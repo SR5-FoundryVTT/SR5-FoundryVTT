@@ -67,6 +67,9 @@
             "complex_form": {
                 "htmlField": ["description.value"]
             },
+            "container": {
+                "htmlField": ["description.value"]
+            },
             "contact": {
                 "htmlField": ["description.value"]
             },
