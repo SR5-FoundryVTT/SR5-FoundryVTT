@@ -823,7 +823,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
             // will merge the _id into the existing effect and cause all kinds of issues.
             delete change._id;
 
-            mergeObject(effect, expandObject(change), { inplace: true });
+            effect.updateSource(expandObject(change));
             effect.render(false);
         }
 
