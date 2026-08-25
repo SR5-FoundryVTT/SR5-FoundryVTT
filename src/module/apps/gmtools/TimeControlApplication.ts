@@ -88,7 +88,7 @@ export class TimeControlApplication extends HandlebarsApplicationMixin(Applicati
             label: game.i18n.localize(preset.labelKey as Parameters<typeof game.i18n.localize>[0]),
         }));
 
-        const components = WorldTimeFlow.components();
+        const components = WorldTimeFlow.displayComponents();
         context.components = {
             year: components.year,
             // Display month and day of month as 1-based values.
@@ -139,7 +139,7 @@ export class TimeControlApplication extends HandlebarsApplicationMixin(Applicati
         const fields = this.element?.querySelector<HTMLElement>('.time-absolute-fields');
         if (!fields || fields.contains(document.activeElement)) return;
 
-        const components = WorldTimeFlow.components();
+        const components = WorldTimeFlow.displayComponents();
         const values: Record<string, number> = {
             year: components.year,
             // Month and day of month are displayed as 1-based values.

@@ -17,6 +17,7 @@ import HandlebarsApplicationMixin = foundry.applications.api.HandlebarsApplicati
 
 interface ExtendedTestRowContext {
     record: ExtendedTestRecord;
+    threshold: number;
     statusLabel: string;
     visibilityLabel: string;
     actorName?: string;
@@ -302,8 +303,9 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
         const enforceInterval = game.settings.get(SYSTEM_NAME, FLAGS.EnforceExtendedTestInterval) as boolean;
         const intervalAllowsRoll = !enforceInterval || ExtendedTestRules.intervalAllowsRoll(record, worldTime);
         const canContinue = ExtendedTestRules.canContinue(record);
+        const continuationAllowed = canContinue || record.continuationGranted;
         const mayRoll = record.status === 'active' && ExtendedTestRules.canRoll(record, user);
-        const canRoll = mayRoll && canContinue && intervalAllowsRoll;
+        const canRoll = mayRoll && continuationAllowed && intervalAllowsRoll;
 
         const canEdit = ExtendedTestRules.canEdit(record, user);
         const canManage = ExtendedTestRules.canManage(record, user);
@@ -314,6 +316,7 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
 
         return {
             record,
+            threshold: ExtendedTestRules.threshold(record),
             statusLabel: game.i18n.localize(`SR5.ExtendedTestManager.Status.${record.status}` as Parameters<typeof game.i18n.localize>[0]),
             visibilityLabel: game.i18n.localize(`SR5.ExtendedTestManager.Visibility.${record.permissions.visibility}` as Parameters<typeof game.i18n.localize>[0]),
             actorName: (actor as { name?: string } | null)?.name,
@@ -323,9 +326,9 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
             intervalsElapsed: ExtendedTestRules.intervalsElapsed(record, worldTime),
             isDue: ExtendedTestRules.isDue(record, worldTime),
             createdGameTime: WorldTimeFlow.format(record.createdWorldTime),
-            updatedRealTime: new Date(record.updatedAt).toLocaleString(),
+            updatedRealTime: WorldTimeFlow.formatRealTime(record.updatedAt),
             canRoll,
-            rollBlockedByInterval: mayRoll && canContinue && !intervalAllowsRoll,
+            rollBlockedByInterval: mayRoll && continuationAllowed && !intervalAllowsRoll,
             canEdit,
             canDelete: ExtendedTestRules.canDelete(record, user),
             canPauseResume: canEdit && (record.status === 'active' || record.status === 'paused'),
@@ -341,7 +344,7 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
                 glitch: roll.glitch,
                 criticalGlitch: roll.criticalGlitch,
                 poolUsed: roll.poolUsed,
-                realTime: new Date(roll.timestamp).toLocaleString(),
+                realTime: WorldTimeFlow.formatRealTime(roll.timestamp),
                 gameTime: WorldTimeFlow.format(roll.worldTime),
                 messageUuid: roll.messageUuid,
                 userName: userName(roll.userId),
@@ -349,7 +352,7 @@ export class ExtendedTestManager extends HandlebarsApplicationMixin(ApplicationV
             log: expanded ? record.log.map(entry => ({
                 actionLabel: game.i18n.localize(`SR5.ExtendedTestManager.Log.${entry.action}` as Parameters<typeof game.i18n.localize>[0]),
                 detail: entry.detail,
-                realTime: new Date(entry.timestamp).toLocaleString(),
+                realTime: WorldTimeFlow.formatRealTime(entry.timestamp),
                 userName: userName(entry.userId),
             })) : [],
         };

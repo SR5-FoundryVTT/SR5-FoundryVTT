@@ -9,6 +9,7 @@ import { intervalToSeconds } from "@/module/utils/timeUnits";
 import { documentSelectOptions } from "@/module/utils/folderOptions";
 import { ExtendedTestRecord } from "@/module/types/flows/ExtendedTest";
 import { TestCreator } from "@/module/tests/TestCreator";
+import { ModifiableValue } from "@/module/mods/ModifiableValue";
 import { FLAGS, SR, SYSTEM_NAME } from "@/module/constants";
 
 export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
@@ -41,12 +42,14 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
         testType: 'SuccessTest',
         dicePool: 10,
         cumulativeModifier: true,
+        cumulativeRollCount: 0,
         threshold: 5,
         accumulatedHits: 0,
         rollCount: 0,
         interval: { value: 1, unit: 'hours' },
         advanceTimeOnRoll: false,
         status: 'active',
+        continuationGranted: false,
         permissions: { visibility: 'gmAndOwner', visibleUsers: [], editUsers: [], rollUsers: [] },
         createdAt: 0,
         createdWorldTime: 0,
@@ -131,7 +134,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
          */
         const snapshotTestData = (value: number, extendedModifier: number) => ({
             pool: {
-                value,
+                base: value - extendedModifier, value,
                 changes: [{ name: 'SR5.ExtendedTest', value: extendedModifier, enabled: true }],
             },
         }) as any;
@@ -140,23 +143,41 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             const record = baseRecord();
             assert.strictEqual(ExtendedTestRules.nextPool(record), 10);
             record.rollCount = 3;
+            record.cumulativeRollCount = 3;
             assert.strictEqual(ExtendedTestRules.nextPool(record), 7);
             record.rollCount = 15;
+            record.cumulativeRollCount = 15;
             assert.strictEqual(ExtendedTestRules.nextPool(record), 0);
             record.cumulativeModifier = false;
             assert.strictEqual(ExtendedTestRules.nextPool(record), 10);
+
+            record.cumulativeModifier = true;
+            record.cumulativeRollCount = 2;
+            assert.strictEqual(ExtendedTestRules.nextPool(record), 8);
         });
 
         it('prefers the test data snapshot pool over the starting pool', () => {
             // Manually created records have no snapshot and use plain starting pool math.
-            assert.strictEqual(ExtendedTestRules.nextPool(baseRecord({ rollCount: 2 })), 8);
+            assert.strictEqual(ExtendedTestRules.nextPool(baseRecord({ rollCount: 2, cumulativeRollCount: 2 })), 8);
 
             // A snapshot rolled as the second roll carries a -1 of its own. The third roll
             // replaces it with -2, so a base 5 pool ends up at 3.
             const snapshot = baseRecord({
                 rollCount: 2,
+                cumulativeRollCount: 2,
                 testData: snapshotTestData(4, -1),
             });
+            assert.strictEqual(ExtendedTestRules.nextPool(snapshot), 3);
+        });
+
+        it('recalculates the snapshot instead of using its cached pool value', () => {
+            const snapshot = baseRecord({
+                rollCount: 2,
+                cumulativeRollCount: 2,
+                testData: snapshotTestData(999, -1),
+            });
+            snapshot.testData!.pool.base = 5;
+
             assert.strictEqual(ExtendedTestRules.nextPool(snapshot), 3);
         });
 
@@ -165,6 +186,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             // remove it entirely, so the manager has to show the full pool.
             const record = baseRecord({
                 rollCount: 3,
+                cumulativeRollCount: 3,
                 cumulativeModifier: false,
                 testData: snapshotTestData(8, -2),
             });
@@ -177,9 +199,9 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             assert.isTrue(ExtendedTestRules.isComplete(record));
             assert.isFalse(ExtendedTestRules.canContinue(record));
 
-            // An empty pool is no longer a stop, the user may be adding modifiers by hand.
-            const exhausted = baseRecord({ rollCount: 10 });
-            assert.isTrue(ExtendedTestRules.canContinue(exhausted));
+            // An empty pool ends the test until its modifier is manually corrected.
+            const exhausted = baseRecord({ rollCount: 10, cumulativeRollCount: 10 });
+            assert.isFalse(ExtendedTestRules.canContinue(exhausted));
 
             const running = baseRecord({ accumulatedHits: 3, rollCount: 2 });
             assert.isFalse(ExtendedTestRules.isComplete(running));
@@ -190,6 +212,23 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             assert.strictEqual(ExtendedTestRules.progress(baseRecord({ accumulatedHits: 2, threshold: 4 })), 50);
             assert.strictEqual(ExtendedTestRules.progress(baseRecord({ accumulatedHits: 8, threshold: 4 })), 100);
             assert.isUndefined(ExtendedTestRules.progress(baseRecord({ threshold: 0 })));
+        });
+
+        it('uses saved threshold changes to calculate the effective target', () => {
+            const record = baseRecord({
+                threshold: 5,
+                accumulatedHits: 4,
+                testData: {
+                    threshold: {
+                        base: 5, value: 4,
+                        changes: [{ name: 'T', value: -1, type: 'add', priority: 0, enabled: true, invalidated: false, source: '' }],
+                    },
+                } as any,
+            });
+
+            assert.strictEqual(ExtendedTestRules.threshold(record), 4);
+            assert.isTrue(ExtendedTestRules.isComplete(record));
+            assert.strictEqual(ExtendedTestRules.progress(record), 100);
         });
 
         it('converts intervals to seconds, including combat rounds', () => {
@@ -225,18 +264,17 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             assert.isTrue(record.log.some(entry => entry.detail === 'criticalGlitch'));
         });
 
-        it('keeps a record running once its pool runs out', () => {
-            // Modifiers the system doesn't automate live outside the record, so an empty pool
-            // is the users call to make, not an automatic end. See TestRules.canExtendTest.
-            const open = baseRecord({ threshold: 0, rollCount: 10 });
-            assert.isTrue(ExtendedTestRules.canContinue(open));
+        it('fails a record once its pool runs out', () => {
+            const open = baseRecord({ threshold: 0, rollCount: 10, cumulativeRollCount: 10 });
+            assert.isFalse(ExtendedTestRules.canContinue(open));
 
             ExtendedTestFlow._applyStatusTransitions(open);
-            assert.strictEqual(open.status, 'active');
+            assert.strictEqual(open.status, 'failed');
+            assert.strictEqual(open.log.at(-1)?.detail, 'poolExhausted');
 
-            const thresholded = baseRecord({ rollCount: 10 });
+            const thresholded = baseRecord({ rollCount: 10, cumulativeRollCount: 10 });
             ExtendedTestFlow._applyStatusTransitions(thresholded);
-            assert.strictEqual(thresholded.status, 'active');
+            assert.strictEqual(thresholded.status, 'failed');
         });
 
         it('only allows a roll once the interval has passed', () => {
@@ -428,19 +466,20 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             }
         });
 
-        it('keeps rolling a record whose pool is exhausted', async () => {
-            // An empty pool from the start, so no roll can glitch its way to an end, and no
-            // interval, so the second roll isn't gated on elapsed game time either.
+        it('allows one manual roll after reactivating an exhausted record', async () => {
             const record = await createRecord({ dicePool: 0, threshold: 100, interval: { value: 0, unit: 'minutes' } });
 
-            // Both rolls go through, as the user may be applying a modifier the record
-            // can't see. See TestRules.canExtendTest.
             await ExtendedTestFlow.roll(record.id, { showDialog: false, showMessage: false });
+            assert.strictEqual(ExtendedTestStorage.get(record.id)!.status, 'failed');
+
+            await ExtendedTestFlow.reactivate(record.id);
+            assert.isTrue(ExtendedTestStorage.get(record.id)!.continuationGranted);
             await ExtendedTestFlow.roll(record.id, { showDialog: false, showMessage: false });
 
             const current = ExtendedTestStorage.get(record.id)!;
-            assert.strictEqual(current.status, 'active');
-            assert.strictEqual(current.rollCount, 2);
+            assert.strictEqual(current.status, 'failed');
+            assert.strictEqual(current.rollCount, 1);
+            assert.isFalse(current.continuationGranted);
         });
 
         it('handles pause, resume, complete and cancel transitions', async () => {
@@ -517,6 +556,17 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             assert.strictEqual(updated.status, 'completed');
         });
 
+        it('resumes a completed record when its threshold is raised above its hits', async () => {
+            const record = await createRecord({ threshold: 4 });
+            await ExtendedTestFlow.update(record.id, { accumulatedHits: 4 });
+
+            await ExtendedTestFlow.update(record.id, { threshold: 5 });
+            const updated = ExtendedTestStorage.get(record.id)!;
+
+            assert.strictEqual(updated.status, 'active');
+            assert.isTrue(updated.log.some(entry => entry.action === 'resume'));
+        });
+
         it('applies a roll result onto the current record state', async () => {
             const record = await createRecord({ dicePool: 12, threshold: 40 });
 
@@ -567,6 +617,23 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             const first = ExtendedTestFlow._prepareRollData(record)!;
             assert.isUndefined(first.pool.changes.find(entry => entry.name === 'SR5.ExtendedTest'));
             assert.strictEqual(first.pool.value, 12);
+        });
+
+        it('uses an edited threshold base with the saved modifiers in the roll snapshot', async () => {
+            const record = await createRecord({ threshold: 4 });
+            record.testData = TestCreator.fromPool({ pool: 12, threshold: 10 }, {
+                showDialog: false,
+                showMessage: false,
+            }).data;
+            record.testData.threshold.changes.push({
+                name: 'Threshold modifier', value: -1, type: 'add', priority: 20,
+                enabled: true, invalidated: false, source: '',
+            });
+
+            const data = ExtendedTestFlow._prepareRollData(record)!;
+            assert.strictEqual(data.threshold.base, 4);
+            assert.lengthOf(data.threshold.changes, 1);
+            assert.strictEqual(ModifiableValue.calcTotal(data.threshold, { min: 0 }), 3);
         });
 
         it('ends a record when a roll critically glitches', async () => {

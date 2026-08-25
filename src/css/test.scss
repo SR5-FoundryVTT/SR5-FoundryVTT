@@ -270,6 +270,23 @@
       .toggle-breakdown {
         margin-right: 4px;
       }
+
+      input.limit-infinity,
+      input.threshold-dash {
+        color: var(--sr5v2-control-text);
+      }
+
+      // Enlarged only when disabled; editable variant must match the number inputs.
+      input.limit-infinity {
+        font-family: "Segoe UI Symbol", "Noto Sans Symbols 2", sans-serif;
+
+        &:disabled {
+          font-size: 1.4em;
+          line-height: 1;
+          color: var(--sr5v2-control-text);
+          opacity: 1;
+        }
+      }
     }
 
     .breakdown-list {
@@ -637,16 +654,6 @@
           0 0 0 1px var(--sr5-theme-accent-glow) inset;
         text-shadow: none;
       }
-    }
-  }
-
-  .roll-mode-controls {
-    display: flex;
-    gap: 2px;
-
-    .ui-control {
-      border: 1px solid var(--sr5v2-control-border);
-      border-left: 1px solid var(--sr5v2-control-border);
     }
   }
 
