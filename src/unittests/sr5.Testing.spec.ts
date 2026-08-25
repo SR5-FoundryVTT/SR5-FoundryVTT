@@ -96,7 +96,11 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             // Extract just the limit field's input element from the rendered dialog markup.
             const renderLimitInput = async (test): Promise<string> => {
                 const html = await foundry.applications.handlebars.renderTemplate(
-                    COMMON_PARTIAL, { test, expandedPaths: [] } as any);
+                    COMMON_PARTIAL, {
+                        test, expandedPaths: [],
+                        rollModes: CONFIG.ChatMessage.modes, rollMode: game.settings.get('core', 'messageMode') 
+                    }
+                );
                 return (/<input[^>]*name="test\.data\.limit"[^>]*>/.exec(html))?.[0] ?? '';
             };
             const manualLimitOverride = (test) =>
@@ -215,7 +219,11 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
 
             const renderThresholdInput = async (test): Promise<string> => {
                 const html = await foundry.applications.handlebars.renderTemplate(
-                    COMMON_PARTIAL, { test, expandedPaths: [] } as any);
+                    COMMON_PARTIAL, {
+                        test, expandedPaths: [],
+                        rollModes: CONFIG.ChatMessage.modes, rollMode: game.settings.get('core', 'messageMode')
+                    }
+                );
                 return (/<input[^>]*name="test\.data\.threshold"[^>]*>/.exec(html))?.[0] ?? '';
             };
             const manualThresholdOverride = (test) =>
