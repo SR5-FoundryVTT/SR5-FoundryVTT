@@ -8,7 +8,7 @@ import { SR5Combatant } from "../combat/SR5Combatant";
 import { SR5ActiveEffect } from "../effect/SR5ActiveEffect";
 import { SR5Roll } from "../rolls/SR5Roll";
 import { SR5Token } from "../token/SR5Token";
-import { SR5TokenDocument } from "../token/SR5TokenDocument";
+import { MovementPhaseMarker, SR5TokenDocument } from "../token/SR5TokenDocument";
 
 import { Translation } from '../utils/strings';
 
@@ -66,6 +66,7 @@ declare module "fvtt-types/configuration" {
         Combat: typeof SR5Combat;
         Combatant: typeof SR5Combatant;
         Item: typeof SR5Item<Item.ConfiguredSubType>;
+        Token: typeof SR5TokenDocument;
         Roll: typeof SR5Roll;
         Sheet: typeof foundry.appv1.api.FormApplication;
     }
@@ -217,6 +218,7 @@ declare module "fvtt-types/configuration" {
         Token: {
             shadowrun5e: {
                 TokenUseRoutingLib?: boolean;
+                TokenMovementPhaseMarkers?: MovementPhaseMarker[];
             };
         }
         User: {

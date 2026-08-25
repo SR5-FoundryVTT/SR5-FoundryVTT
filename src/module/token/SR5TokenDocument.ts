@@ -3,6 +3,19 @@ import { SYSTEM_NAME, FLAGS } from "../constants";
 import { StorageFlow } from "@/module/flows/StorageFlow";
 
 /**
+ * A completed action phase's endpoint in a token's recorded movement history.
+ * The index is guarded by movementId when rendered, so markers naturally become
+ * inert if an undo replaces or truncates the history.
+ */
+export type MovementPhaseMarker = {
+    combatId: string;
+    round: number;
+    pass: number;
+    waypointIndex: number;
+    movementId: string;
+};
+
+/**
  * A custom TokenDocument class for the SR5 system.
  * It extends the base functionality to handle system-specific movement rules and data cleanup.
  */
@@ -89,6 +102,11 @@ export class SR5TokenDocument extends TokenDocument {
     override async clearMovementHistory() {
         await super.clearMovementHistory();
 
+        // Phase markers are metadata for the recorded history and must never outlive it.
+        if (this.getFlag(SYSTEM_NAME, FLAGS.TokenMovementPhaseMarkers)?.length) {
+            await this.unsetFlag(SYSTEM_NAME, FLAGS.TokenMovementPhaseMarkers);
+        }
+
         if (this.actor && game.settings.get(SYSTEM_NAME, FLAGS.TokenAutoRunning)) {
             // Concurrently remove running/sprinting status effects.
             await Promise.all([
@@ -124,5 +142,32 @@ export class SR5TokenDocument extends TokenDocument {
             token.actor.toggleStatusEffect("sr5run", { active: shouldRun }),
             token.actor.toggleStatusEffect("sr5sprint", { active: shouldSprint }),
         ]);
+    }
+
+    /**
+     * Mark the final recorded waypoint of this token's current action phase.
+     * A marker is replaced when the same combat round and initiative pass are replayed.
+     */
+    async recordMovementPhaseMarker(combatId: string, round: number, pass: number): Promise<void> {
+        const history = this.movementHistory;
+        const waypointIndex = history.length - 1;
+        const waypoint = history.at(-1);
+        if (!waypoint?.movementId) return;
+
+        const markers = this.getFlag(SYSTEM_NAME, FLAGS.TokenMovementPhaseMarkers) ?? [];
+        const marker = { combatId, round, pass, waypointIndex, movementId: waypoint.movementId };
+
+        // A phase with no new movement has the same endpoint as the last marked phase.
+        if (markers.some(existing =>
+            existing.combatId === combatId
+            && existing.waypointIndex === marker.waypointIndex
+            && existing.movementId === marker.movementId
+        )) return;
+
+        const remaining = markers.filter(existing => !(
+            existing.combatId === combatId && existing.round === round && existing.pass === pass
+        ));
+
+        await this.setFlag(SYSTEM_NAME, FLAGS.TokenMovementPhaseMarkers, [...remaining, marker]);
     }
 }

@@ -3,6 +3,15 @@ import { RoutingLibIntegration } from '../integrations/routingLibIntegration';
 import PrototypeTokenConfig = foundry.applications.sheets.PrototypeTokenConfig;
 
 export class SR5Token extends foundry.canvas.placeables.Token {
+    override _onUpdate(...args: Parameters<foundry.canvas.placeables.Token['_onUpdate']>) {
+        super._onUpdate(...args);
+
+        const [changed] = args;
+        if (foundry.utils.hasProperty(changed, `flags.${SYSTEM_NAME}.${FLAGS.TokenMovementPhaseMarkers}`)) {
+            this.renderFlags.set({ refreshRuler: true });
+        }
+    }
+
     override _drawBar(number: number, bar: PIXI.Graphics, data: NonNullable<TokenDocument.GetBarAttributeReturn>) {
         const tokenHealthBars = game.settings.get(SYSTEM_NAME, FLAGS.TokenHealthBars);
         // FoundryVTT draws resource bars as full/good when the value is the
