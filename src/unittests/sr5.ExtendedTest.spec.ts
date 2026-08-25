@@ -600,7 +600,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
 
         it('applies the cumulative modifier as a modifier, not into the pool base', async () => {
             const record = await createRecord({ dicePool: 12, threshold: 40 });
-            record.rollCount = 2;
+            record.cumulativeRollCount = 2;
 
             const data = ExtendedTestFlow._prepareRollData(record)!;
             const change = data.pool.changes.find(entry => entry.name === 'SR5.ExtendedTest')!;
@@ -613,7 +613,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             assert.strictEqual(data.pool.value, 10);
 
             // The first roll carries no modifier at all, rather than a zero valued one.
-            record.rollCount = 0;
+            record.cumulativeRollCount = 0;
             const first = ExtendedTestFlow._prepareRollData(record)!;
             assert.isUndefined(first.pool.changes.find(entry => entry.name === 'SR5.ExtendedTest'));
             assert.strictEqual(first.pool.value, 12);
