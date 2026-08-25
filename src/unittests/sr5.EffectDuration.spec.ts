@@ -9,6 +9,7 @@
  * - Item-owned temporary effects get a start anchor on _preCreate
  * - Combat integration: SR5Combat dispatches sr5ActionPhaseStart and sr5ActionPhaseEnd at action boundaries
  */
+import { SR } from '@/module/constants';
 import { SR5TestFactory } from './utils';
 import { SR5ActiveEffect } from '../module/effect/SR5ActiveEffect';
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
@@ -404,7 +405,9 @@ export const shadowrunEffectDuration = (context: QuenchBatchContext) => {
             const { effect } = await createEffect({type: 'character'}, {
                 duration: { value: 2, units: 'rounds', expiry: 'roundEnd' } as any,
             });
-            await game.time.advance(7);
+
+            const roundSeconds = CONFIG.time.roundTime || SR.combat.ROUND_TIME_SECONDS;
+            await game.time.advance(2 * roundSeconds + 1);
             await effect.update({ duration: { expired: true } as any, disabled: true });
             assert.isTrue(effect.duration.expired, 'precondition: effect must be expired');
 
