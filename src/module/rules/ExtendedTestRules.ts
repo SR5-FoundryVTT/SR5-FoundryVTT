@@ -1,6 +1,7 @@
 import { TestRules } from "./TestRules";
 import { intervalToSeconds } from "../utils/timeUnits";
 import { ExtendedTestRecord } from "../types/flows/ExtendedTest";
+import { ModifiableValue } from "../mods/ModifiableValue";
 import { SR5Actor } from "../actor/SR5Actor";
 
 /**
@@ -10,6 +11,19 @@ import { SR5Actor } from "../actor/SR5Actor";
  * See SR5#48 'Extended Tests'.
  */
 export const ExtendedTestRules = {
+    /**
+     * The manager stores the source threshold; a registered test's snapshot retains the
+     * modifiers that determine the threshold actually required to complete it.
+     */
+    threshold: (record: ExtendedTestRecord): number => {
+        const threshold = record.testData?.threshold;
+        if (!threshold) return record.threshold;
+
+        const value = foundry.utils.deepClone(threshold);
+        value.base = record.threshold;
+        return ModifiableValue.calcTotal(value, { min: 0 });
+    },
+
     /**
      * Determine if the given user owns the actor associated with the record.
      */
@@ -90,35 +104,28 @@ export const ExtendedTestRules = {
      * The dice pool available for the next roll, after cumulative modifiers.
      *
      * The snapshot of a registered test is what actually gets rolled, so it wins over the
-     * starting pool. Only manually created records lack one.
+     * starting pool. Recalculate its changes rather than relying on its cached value.
      */
     nextPool: (record: ExtendedTestRecord): number => {
-        const pool = record.testData?.pool;
-
-        // Mirror what ExtendedTestFlow._prepareRollData will do to the snapshot, rather than
-        // assuming the modifier is present: toggling cumulativeModifier off leaves the last
-        // snapshot carrying a modifier that the next roll removes again.
-        if (pool?.value !== undefined) {
-            // Swap the modifier the snapshot was rolled with for the one the next roll will
-            // use, exactly as ExtendedTestFlow._prepareRollData does.
-            const inSnapshot = pool.changes
-                ?.filter(change => change.name === 'SR5.ExtendedTest' && change.enabled)
-                .reduce((total, change) => total + change.value, 0) ?? 0;
-            const next = record.cumulativeModifier
-                ? TestRules.extendedModifierValue * record.rollCount
-                : 0;
-            return Math.max(pool.value - inSnapshot + next, 0);
-        }
-
-        const modifier = record.cumulativeModifier ? TestRules.extendedModifierValue * record.rollCount : 0;
-        return Math.max(record.dicePool + modifier, 0);
+        const pool = foundry.utils.deepClone(record.testData?.pool ?? {
+            base: record.dicePool,
+            value: record.dicePool,
+            changes: [],
+        });
+        const modifier = new ModifiableValue(pool);
+        const next = record.cumulativeModifier
+            ? TestRules.extendedModifierValue * record.cumulativeRollCount
+            : 0;
+        modifier.setUnique('SR5.ExtendedTest', next);
+        return modifier.calcTotal({ min: 0 });
     },
 
     /**
      * Has the record reached its threshold?
      */
     isComplete: (record: ExtendedTestRecord): boolean => {
-        return record.threshold > 0 && record.accumulatedHits >= record.threshold;
+        const threshold = ExtendedTestRules.threshold(record);
+        return threshold > 0 && record.accumulatedHits >= threshold;
     },
 
     /**
@@ -132,15 +139,17 @@ export const ExtendedTestRules = {
      * Can another roll be made for this record?
      */
     canContinue: (record: ExtendedTestRecord): boolean => {
-        return TestRules.canExtendTest(record.threshold, record.accumulatedHits);
+        return ExtendedTestRules.nextPool(record) > 0
+            && TestRules.canExtendTest(ExtendedTestRules.threshold(record), record.accumulatedHits);
     },
 
     /**
      * Progress towards the threshold in percent. Undefined without a threshold.
      */
     progress: (record: ExtendedTestRecord): number | undefined => {
-        if (record.threshold <= 0) return undefined;
-        return Math.min(100, Math.round(record.accumulatedHits / record.threshold * 100));
+        const threshold = ExtendedTestRules.threshold(record);
+        if (threshold <= 0) return undefined;
+        return Math.min(100, Math.round(record.accumulatedHits / threshold * 100));
     },
 
     /**

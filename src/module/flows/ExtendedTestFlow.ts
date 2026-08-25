@@ -30,6 +30,7 @@ export interface ExtendedTestCreateParams {
     threshold: number;
     interval: ExtendedTestInterval;
     cumulativeModifier?: boolean;
+    cumulativeRollCount?: number;
     advanceTimeOnRoll?: boolean;
     permissions?: Partial<ExtendedTestPermissions>;
 }
@@ -97,6 +98,7 @@ export const ExtendedTestFlow = {
 
             dicePool: Math.max(params.dicePool, 0),
             cumulativeModifier: params.cumulativeModifier ?? true,
+            cumulativeRollCount: Math.max(Math.floor(params.cumulativeRollCount ?? 0), 0),
             threshold: Math.max(params.threshold, 0),
             accumulatedHits: 0,
             rollCount: 0,
@@ -105,6 +107,7 @@ export const ExtendedTestFlow = {
             advanceTimeOnRoll: params.advanceTimeOnRoll ?? false,
 
             status: 'active',
+            continuationGranted: false,
             permissions: ExtendedTestFlow._defaultPermissions(params.permissions),
 
             createdAt: now,
@@ -163,7 +166,11 @@ export const ExtendedTestFlow = {
             // Use the pool without the cumulative modifier as a starting value.
             dicePool: test.pool.value,
             cumulativeModifier: true,
-            threshold: test.threshold.value,
+            cumulativeRollCount: 1,
+
+            // Keep the source value: the snapshot retains modifiers that determine its
+            // effective threshold on each follow-up roll.
+            threshold: test.threshold.base,
             accumulatedHits: test.extendedHits.value,
             rollCount: 1,
 
@@ -171,6 +178,7 @@ export const ExtendedTestFlow = {
             advanceTimeOnRoll: false,
 
             status: 'active',
+            continuationGranted: false,
             permissions: ExtendedTestFlow._defaultPermissions(),
 
             createdAt: now,
@@ -218,10 +226,13 @@ export const ExtendedTestFlow = {
             return;
         }
 
-        // Reaching the threshold is the only thing that ends a test on its own.
+        // Completion wins over pool exhaustion when the final roll reaches the threshold.
         if (ExtendedTestRules.isComplete(record)) {
             record.status = 'completed';
             record.log.push(ExtendedTestFlow._logEntry('complete'));
+        } else if (ExtendedTestRules.nextPool(record) <= 0) {
+            record.status = 'failed';
+            record.log.push(ExtendedTestFlow._logEntry('fail', 'poolExhausted'));
         }
     },
 
@@ -245,7 +256,7 @@ export const ExtendedTestFlow = {
 
         if (rollsInFlight.has(id)) return;
 
-        if (!ExtendedTestRules.canContinue(record)) {
+        if (!ExtendedTestRules.canContinue(record) && !record.continuationGranted) {
             ExtendedTestFlow._applyStatusTransitions(record);
             await ExtendedTestFlow._persist(record);
             ui.notifications?.warn('SR5.Warnings.CantExtendTestFurther', { localize: true });
@@ -325,9 +336,9 @@ export const ExtendedTestFlow = {
         }
         data.threshold.base = record.threshold;
 
-        // One die less per roll already made, as a situational modifier instead of pool base.
+        // Apply -1 once for each configured prior roll, as a situational modifier instead of pool base.
         // A zero value removes the change, so the first roll shows no modifier at all.
-        const priorRolls = record.cumulativeModifier ? record.rollCount : 0;
+        const priorRolls = record.cumulativeModifier ? record.cumulativeRollCount : 0;
         const pool = new ModifiableValue(data.pool);
         pool.setUnique('SR5.ExtendedTest', TestRules.extendedModifierValue * priorRolls);
         pool.calcTotal({ min: 0 });
@@ -379,7 +390,8 @@ export const ExtendedTestFlow = {
         // pauses, ends, or completes the record, so repeat the state checks made before rolling.
         const rollingUser = game.users?.get(rollEntry.userId);
         if (!rollingUser || !ExtendedTestRules.canRoll(record, rollingUser)) return;
-        if (record.status !== 'active' || !ExtendedTestRules.canContinue(record)) return;
+        if (record.status !== 'active') return;
+        if (!ExtendedTestRules.canContinue(record) && !record.continuationGranted) return;
         if (!ExtendedTestFlow._intervalAllowsRoll(record)) return;
         if (rollEntry.messageUuid && record.rolls.some(roll => roll.messageUuid === rollEntry.messageUuid)) return;
 
@@ -393,8 +405,11 @@ export const ExtendedTestFlow = {
         record.rolls.push(rollEntry);
         record.log.push({ ...ExtendedTestFlow._logEntry('roll'), userId: rollEntry.userId });
         record.accumulatedHits += rollEntry.hits;
+        const cumulativeRollCount = record.cumulativeRollCount;
         record.rollCount += 1;
+        record.cumulativeRollCount = cumulativeRollCount + 1;
         record.lastRollWorldTime = rollEntry.worldTime;
+        record.continuationGranted = false;
 
         // Keep the snapshot current, so following rolls include actor / effect changes.
         record.testData = testData;
@@ -511,6 +526,7 @@ export const ExtendedTestFlow = {
     async reactivate(id: string) {
         const record = ExtendedTestStorage.get(id);
         if (!record || !ExtendedTestRules.isTerminal(record)) return;
+        record.continuationGranted = record.status === 'failed' && !ExtendedTestRules.canContinue(record);
         await ExtendedTestFlow._setStatus(id, 'active', 'resume', true);
     },
 
@@ -551,7 +567,7 @@ export const ExtendedTestFlow = {
         // How hard the test is and who may take part stays with the owner.
         const managedKeys = [
             'actorUuid', 'dicePool', 'accumulatedHits', 'threshold', 'interval',
-            'cumulativeModifier', 'advanceTimeOnRoll', 'permissions',
+            'cumulativeModifier', 'cumulativeRollCount', 'advanceTimeOnRoll', 'permissions',
         ] as const;
 
         const canManage = ExtendedTestRules.canManage(record, game.user);
@@ -568,13 +584,22 @@ export const ExtendedTestFlow = {
         }
         if (!applied.length) return;
 
-        // Correcting hits or threshold can reach the goal on its own. Only completion is
-        // applied here: the failure paths belong to a roll, and a reactivated record would
-        // otherwise fall straight back into the critical glitch that ended it.
+        // Correcting hits or threshold can reach the goal on its own. Conversely, raising
+        // the threshold of a completed test resumes it: its former completion is no longer
+        // true. Failure paths stay attached to rolls, so a critical glitch isn't undone by
+        // an unrelated edit.
         if (record.status === 'active' && ExtendedTestRules.isComplete(record)) {
             record.status = 'completed';
             record.log.push(ExtendedTestFlow._logEntry('complete'));
             ExtendedTestFlow._notifyStatus(record);
+        } else if (
+            (record.status === 'completed' && !ExtendedTestRules.isComplete(record))
+            || (record.status === 'failed'
+                && record.log.at(-1)?.detail === 'poolExhausted'
+                && ExtendedTestRules.canContinue(record))
+        ) {
+            record.status = 'active';
+            record.log.push(ExtendedTestFlow._logEntry('resume'));
         }
 
         record.log.push(ExtendedTestFlow._logEntry('update', applied.join(', ')));
