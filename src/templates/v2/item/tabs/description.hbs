@@ -1,5 +1,10 @@
 <section class="tab hide-overflow{{#if tab.active}} active{{/if}}" data-group="{{tab.group}}" data-tab="{{tab.id}}">
     <div class="fill-container">
+        {{#unless isLimited}}
+            {{#if (isType item 'spell' 'ritual' 'complex_form' 'critter_power' 'sprite_power')}}
+                {{> "systems/shadowrun5e/dist/templates/v2/item/spell-summary.hbs"}}
+            {{/if}}
+        {{/unless}}
         <div class="list-item list-item-header">
             <div class="list-item-start">
                 <label>{{localize "SR5.Description"}}</label>

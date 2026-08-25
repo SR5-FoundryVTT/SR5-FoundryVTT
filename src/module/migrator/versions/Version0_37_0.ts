@@ -37,12 +37,11 @@ export class Version0_37_0 extends VersionMigration {
     override migrateItem(item: any): void {
         const action = item.system?.action;
         // Only a boolean is unmigrated. The migrator reruns until a document can persist.
-        if (typeof action?.extended === 'boolean') {
-            action.extended = action.extended
-                ? recoveryIntervals[action.test] ?? { value: 1, unit: 'minutes' }
-                : { value: 0, unit: 'minutes' };
-        }
+        if (typeof action?.extended !== 'boolean') return;
 
+        action.extended = action.extended
+            ? recoveryIntervals[action.test] ?? { value: 1, unit: 'minutes' }
+            : { value: 0, unit: 'minutes' };
     }
 
     override migrateActiveEffect(effect: any): void {
@@ -80,5 +79,4 @@ export class Version0_37_0 extends VersionMigration {
             change.target = targetId;
         }
     }
-
 }

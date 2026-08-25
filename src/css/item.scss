@@ -110,7 +110,7 @@
 
     .item-footer {
         gap: 0.25rem;
-        padding-top: 0.25rem;
+        padding-top: 0;
     }
 
     .item-footer-tags {
@@ -118,6 +118,14 @@
         flex-wrap: wrap;
         gap: 0.25rem;
         width: 100%;
+    }
+
+    .item-footer-tags:empty {
+        display: none;
+    }
+
+    .item-footer-tags:not(:empty) {
+        padding-top: 0.25rem;
     }
 
     .item-footer-tags > label,
@@ -132,6 +140,67 @@
         background: var(--sr5v2-bg-elevated);
         color: var(--sr5v2-text-primary);
         white-space: nowrap;
+    }
+
+    .spell-like-summary {
+        display: flex;
+        flex-direction: column;
+        gap: 0.125rem;
+        margin: 0 0 0.25rem;
+        padding: 0.25rem 0.375rem;
+        border-top: 1px solid var(--sr5v2-control-border);
+        border-bottom: 1px solid var(--sr5v2-control-border);
+        background: rgb(0 0 0 / 25%);
+        color: var(--sr5v2-text-primary);
+    }
+
+    .spell-like-summary-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.125rem 0.75rem;
+    }
+
+    .spell-like-summary-grid-spell {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .spell-like-summary-descriptors {
+        color: var(--sr5v2-text-primary);
+        font-size: var(--font-size-13);
+        font-weight: bold;
+        line-height: 1.1;
+        text-transform: uppercase;
+    }
+
+    .spell-like-summary-field {
+        display: flex;
+        align-items: baseline;
+        gap: 0.25rem;
+        min-width: 0;
+        white-space: nowrap;
+    }
+
+    .spell-like-summary-field-wide {
+        grid-column: span 2;
+    }
+
+    .spell-like-summary-field strong {
+        color: var(--sr5v2-text-primary);
+        font-size: var(--font-size-14);
+        line-height: 1.2;
+    }
+
+    .spell-like-summary-field strong::after {
+        content: ":";
+    }
+
+    .spell-like-summary-field span {
+        min-width: 0;
+        overflow: hidden;
+        color: var(--sr5v2-text-primary);
+        font-size: var(--font-size-14);
+        line-height: 1.2;
+        text-overflow: ellipsis;
     }
 
     .options-col {

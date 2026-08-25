@@ -2709,6 +2709,7 @@
             "DetectionArea": "Area",
             "DetectionDirectional": "Directional",
             "DetectionPsychic": "Psychic",
+            "Elemental": "Elemental",
             "FIELDS": {
                 "category": {
                     "hint": "Category that the Spell belongs to",
@@ -2785,6 +2786,7 @@
                     "label": "Spell Type"
                 }
             },
+            "HealthEssence": "Essence",
             "IllusionMultiSense": "Multi-Sense",
             "IllusionObvious": "Obvious",
             "IllusionRealistic": "Realistic",

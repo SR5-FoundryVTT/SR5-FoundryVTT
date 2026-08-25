@@ -1283,6 +1283,8 @@
             "DetectionArea": "Zone",
             "DetectionDirectional": "Directionnel",
             "DetectionPsychic": "Psychique",
+            "Elemental": "Élémentaire",
+            "HealthEssence": "Essence",
             "IllusionMultiSense": "Sens Multiples",
             "IllusionObvious": "Évident",
             "IllusionRealistic": "Réaliste",
