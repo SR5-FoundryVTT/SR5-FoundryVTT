@@ -49,7 +49,7 @@ export class SR5TokenRuler extends foundry.canvas.placeables.tokens.TokenRuler {
     override _getWaypointStyle(waypoint: Waypoint) {
         const waypointStyle = super._getWaypointStyle(waypoint);
         if (this._getMovementPhaseMarker(waypoint)) {
-            waypointStyle.color = Color.from('#ffff00');
+            waypointStyle.color = Color.from(game.settings.get(SYSTEM_NAME, FLAGS.TokenRulerColorPhaseMarker));
         }
         return waypointStyle;
     }
