@@ -1,3 +1,4 @@
+import { SR5 } from '../config';
 import { RangedWeaponRules } from './../rules/RangedWeaponRules';
 import { SR5Actor } from '../actor/SR5Actor';
 import { createItemChatMessage } from '../chat';
@@ -53,14 +54,13 @@ const { fromUuid, getProperty, setProperty } = foundry.utils;
 export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSubType> extends Item<SubType> {
     static readonly MAX_CONTAINER_DEPTH = 5;
     static readonly MAX_ATTACHMENT_DEPTH = 5;
-    private static readonly MOD_PARENT_TYPES = ['weapon', 'armor', 'vehicle', 'drone', 'bioware', 'cyberware'];
 
     /**
      * Whether a child item type can be attached to a parent item type.
      */
     static isAttachment(parentType: string, childType: string): boolean {
         if (parentType === 'weapon' && childType === 'ammo') return true;
-        return childType === 'modification' && SR5Item.MOD_PARENT_TYPES.includes(parentType);
+        return childType === 'modification' && SR5Item.modificationTypeFor(parentType) !== null;
     }
 
     /**
@@ -813,10 +813,15 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     modificationType(): Item.SystemOfType<'modification'>['type'] | null {
-        if (this.isType('weapon')) return 'weapon';
-        if (this.isType('armor')) return 'armor';
-        if (this.isType('bioware', 'cyberware')) return 'ware';
-        return null;
+        return SR5Item.modificationTypeFor(this.type);
+    }
+
+    /**
+     * The modification type a parent item type accepts, for use where no item instance exists yet.
+     */
+    static modificationTypeFor(parentType: string): Item.SystemOfType<'modification'>['type'] | null {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+        return SR5.modificationTypeByParentType[parentType] ?? null;
     }
 
     /**
@@ -927,7 +932,9 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
     }
 
     private _prepareChildItemData(item: Item.Source): Item.Source | null {
-        if (!SR5Item.isAttachment(this.type, item.type) || !this.id) return null;
+        // Containers take arbitrary items, everything else only its own attachments.
+        if (!this.id) return null;
+        if (!this.isType('container') && !SR5Item.isAttachment(this.type, item.type)) return null;
 
         delete (item as Partial<Item.Source>)._id;
         // Source.system is a per subtype union, which a direct write can't satisfy.

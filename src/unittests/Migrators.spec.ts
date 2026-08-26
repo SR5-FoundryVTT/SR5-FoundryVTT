@@ -911,6 +911,35 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(mod.system.type, 'weapon');
         });
 
+        it('lifts actor-owned ware mods as ware modifications rather than the parent item type', () => {
+            const migrator = new Version0_38_0();
+            const cyberware: any = {
+                _id: foundry.utils.randomID(16),
+                name: 'Cyberarm',
+                type: 'cyberware',
+                system: DataDefaults.baseSystemData('cyberware'),
+                flags: {
+                    [SYSTEM_NAME]: {
+                        [FLAGS.EmbeddedItems]: [{
+                            _id: foundry.utils.randomID(16),
+                            name: 'Armor Enhancement',
+                            type: 'modification',
+                            system: DataDefaults.baseSystemData('modification'),
+                        }],
+                    },
+                },
+            };
+            const actor: any = { items: [cyberware] };
+
+            migrator.migrateActor(actor);
+
+            const mod = actor.items.find((item: any) => item.name === 'Armor Enhancement');
+            assert.exists(mod);
+            assert.strictEqual(mod.system.parentId, cyberware._id);
+            // 'cyberware' is not a valid modification type, getEquippedMods filters on 'ware'.
+            assert.strictEqual(mod.system.type, 'ware');
+        });
+
         it('lifts actor-owned armor mods into sibling actor items', () => {
             const migrator = new Version0_38_0();
             const armor: any = {

@@ -1,6 +1,7 @@
-import { ItemAvailabilityFlow } from '@/module/item/flows/ItemAvailabilityFlow';
-import { FLAGS, SYSTEM_NAME } from '@/module/constants';
+import { SR5 } from '@/module/config';
 import { VersionMigration } from '../VersionMigration';
+import { FLAGS, SYSTEM_NAME } from '@/module/constants';
+import { ItemAvailabilityFlow } from '@/module/item/flows/ItemAvailabilityFlow';
 
 const { deepClone, getProperty, hasProperty, randomID, setProperty } = foundry.utils;
 
@@ -106,12 +107,16 @@ export class Version0_38_0 extends VersionMigration {
         const embeddedItems = rawEmbeddedItems == null ? [] : Array.isArray(rawEmbeddedItems) ? rawEmbeddedItems : Object.values(rawEmbeddedItems);
         if (embeddedItems.length === 0 || !parent?._id) return [];
 
+        // Bioware and cyberware take 'ware' modifications rather than modifications named after
+        // their own item type, so the parent type can't be used as the modification type directly.
+        const modificationType = SR5.modificationTypeByParentType[parent.type];
+
         const lifted: any[] = [];
         const remaining: any[] = [];
         for (const child of embeddedItems) {
             const canLift = parent.type === 'container' ||
                 (parent.type === 'weapon' && child.type === 'ammo') ||
-                (child.type === 'modification' && ['weapon', 'armor', 'vehicle', 'drone', 'bioware', 'cyberware'].includes(parent.type));
+                (child.type === 'modification' && !!modificationType);
             if (!canLift) {
                 remaining.push(child);
                 continue;
@@ -120,7 +125,7 @@ export class Version0_38_0 extends VersionMigration {
             const liftedChild = deepClone(child);
             liftedChild._id = randomID();
             setProperty(liftedChild, 'system.parentId', parent._id);
-            if (parent.type !== 'container' && liftedChild.type === 'modification') setProperty(liftedChild, 'system.type', parent.type);
+            if (liftedChild.type === 'modification' && modificationType) setProperty(liftedChild, 'system.type', modificationType);
             lifted.push(liftedChild);
         }
 

@@ -78,8 +78,6 @@ interface SR5ItemSheetData extends SR5BaseItemSheetData {
     vehicleMods: SR5Item<'modification'>[]
     droneMods: SR5Item<'modification'>[]
     containerContents: ContainerContentRow[]
-    containerCapacity: string
-    containerCapacityFull: boolean
 
     // Sorted lists for usage in select elements.
     activeSkills: Record<string, string> // skill id: label
@@ -431,9 +429,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
         if (this.item.isType('container')) {
             const contents = await this.item.loadContents();
             data['containerContents'] = this._prepareContainerContents(sortByName(Array.from(contents.values()) as SR5Item[]));
-            const max = this.item.system.capacity.count;
-            data['containerCapacity'] = max > 0 ? `${contents.size}/${max}` : `${contents.size}`;
-            data['containerCapacityFull'] = max > 0 && contents.size >= max;
         }
 
         data['activeSkills'] = await this._getSortedActiveSkillsForSelect();
@@ -1365,13 +1360,6 @@ export class SR5ItemSheet<T extends SR5BaseItemSheetData = SR5ItemSheetData> ext
 
         if (!await container.canContainItem(item)) {
             ui.notifications?.warn(game.i18n.localize('SR5.Container.CannotContain'));
-            return null;
-        }
-
-        const contents = await container.loadContents();
-        const max = container.system.capacity.count;
-        if (max > 0 && contents.size >= max) {
-            ui.notifications?.warn(game.i18n.localize('SR5.Container.Full'));
             return null;
         }
 

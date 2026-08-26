@@ -905,19 +905,7 @@
         "ComplexForms": "Komplexe Formen",
         "Container": {
             "CannotContain": "Dieser Gegenstand kann nicht in diesen Behälter gelegt werden.",
-            "Capacity": "Kapazität",
             "Empty": "Dieser Behälter ist leer.",
-            "FIELDS": {
-                "capacity": {
-                    "count": {
-                        "hint": "Maximale Anzahl direkter Gegenstände in diesem Behälter. 0 bedeutet unbegrenzt.",
-                        "label": "Kapazität"
-                    },
-                    "hint": "Maximale Anzahl direkter Gegenstände in diesem Behälter. 0 bedeutet unbegrenzt.",
-                    "label": "Kapazität"
-                }
-            },
-            "Full": "Dieser Behälter ist voll.",
             "Remove": "Aus Behälter entfernen"
         },
         "Conceal": "Tarnbarkeit",

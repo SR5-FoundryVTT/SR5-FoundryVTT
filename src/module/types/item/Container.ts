@@ -1,14 +1,9 @@
 import { BaseItemData, ItemBase } from "./ItemBase";
 import { TechnologyPartData } from "../template/Technology";
-const { SchemaField, NumberField } = foundry.data.fields;
 
 export const ContainerData = () => ({
     ...BaseItemData(),
     ...TechnologyPartData(),
-
-    capacity: new SchemaField({
-        count: new NumberField({ required: true, nullable: false, integer: true, initial: 0, min: 0 }),
-    }),
 });
 
 export class Container extends ItemBase<ReturnType<typeof ContainerData>> {

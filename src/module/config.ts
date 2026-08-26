@@ -798,6 +798,17 @@ export const SR5 = {
         drone: 'SR5.Vehicle.Drone'
     },
 
+    // The modificationTypes key each item type accepts as its modifications. Note that
+    // bioware and cyberware share the 'ware' key rather than using their own item type.
+    modificationTypeByParentType: {
+        weapon: 'weapon',
+        armor: 'armor',
+        bioware: 'ware',
+        cyberware: 'ware',
+        vehicle: 'vehicle',
+        drone: 'drone'
+    },
+
     mountPoints: {
         barrel: 'SR5.Barrel',
         under: 'SR5.UnderBarrel',

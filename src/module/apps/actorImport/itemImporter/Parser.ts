@@ -187,12 +187,14 @@ export abstract class Parser<T extends ItemSystems> {
     protected linkEmbeddedItems(parent: { _id?: string; type: string }, items: Item.CreateData[]): Item.CreateData[] {
         if (!parent._id) return [];
 
+        const modificationType = SR5Item.modificationTypeFor(parent.type);
+
         return items.map(item => {
             const linked = foundry.utils.duplicate(item) as Item.CreateData;
             foundry.utils.setProperty(linked, 'system.parentId', parent._id);
 
-            if (linked.type === 'modification') {
-                foundry.utils.setProperty(linked, 'system.type', parent.type);
+            if (linked.type === 'modification' && modificationType) {
+                foundry.utils.setProperty(linked, 'system.type', modificationType);
             }
 
             return linked;

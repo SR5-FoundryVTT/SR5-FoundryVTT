@@ -110,11 +110,13 @@ export abstract class Parser<SubType extends SystemEntityType> {
     };
 
     protected prepareEmbeddedItems(parent: Item.CreateData, items: Item.Source[]): Item.Source[] {
+        const modificationType = SR5Item.modificationTypeFor(parent.type!);
+
         return items.map(item => {
             const linked = foundry.utils.duplicate(item) as Item.Source;
 
-            if (linked.type === 'modification') {
-                foundry.utils.setProperty(linked, 'system.type', parent.type);
+            if (linked.type === 'modification' && modificationType) {
+                foundry.utils.setProperty(linked, 'system.type', modificationType);
             }
 
             return linked;

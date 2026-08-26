@@ -119,23 +119,7 @@
                 {{/if}}
             {{/if}}
 
-            {{#if (isType item 'container')}}
-                {{#if @root.isEditMode}}
-                    <span class="basic-row">
-                        <label data-tooltip="{{systemFields.capacity.label}}">
-                            <i class="fas fa-box-open"></i>
-                        </label>
-                        <span>
-                            {{formInput systemFields.capacity.fields.count value=source.system.capacity.count
-                                        classes="short skinny" rootId=@root.rootId disabled=@root.isPlayMode}}
-                        </span>
-                    </span>
-                {{else}}
-                    <label data-tooltip="{{systemFields.capacity.label}}">
-                        <i class="fas fa-box-open"></i>&nbsp;{{@root.containerCapacity}}
-                    </label>
-                {{/if}}
-            {{else if systemFields.capacity}}
+            {{#if systemFields.capacity}}
                 <label data-tooltip="{{systemFields.capacity.label}}">
                     <i class="fas fa-toolbox"></i>&nbsp;{{system.capacity.used}} / {{system.capacity.total}}
                 </label>
