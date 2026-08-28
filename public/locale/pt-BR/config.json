@@ -136,6 +136,9 @@
             "CannotAddTestViaItemToActor": "Não é possível adicionar um Efeito Ativo do tipo 'Testar via Item' a um Ator",
             "ValueEditor": "Editar valor da mudança",
             "FIELDS": {
+                "appliedByTest": {
+                    "label": "Aplicado por teste"
+                },
                 "conditionMode": {
                     "hint": "Incluir: o teste deve corresponder a estes valores. Excluir: o teste não deve corresponder a estes valores."
                 },
@@ -531,6 +534,7 @@
         "DamageValue": "Valor do Dano",
         "DefaultCategoryVisibility": "Mostrar categorias vazias",
         "Defaulting": "Padrão",
+        "Delete": "Excluir",
         "Defender": "Defensor",
         "DefenderNetHits": "Acertos Excedentes do Defensor",
         "Defense": "Defesa",
@@ -584,6 +588,7 @@
         "DurationSustained": "Sustentado",
         "Echo": "Eco",
         "Echoes": "Ecos",
+        "Edit": "Editar",
         "EditAmmo": "Editar Munição",
         "EditItem": "Editar Item",
         "EditMod": "Editar Mod",
@@ -601,6 +606,8 @@
             "Label": "Elemento"
         },
         "Emerged": "Emergido",
+        "EnforcedMaximum": "Máximo imposto",
+        "EnforcedMinimum": "Mínimo imposto",
         "EnvModifiersApplication": {
             "ClearModifiers": "Limpar modificadores pessoais",
             "Extreme": "Combinação de duas ou mais condições no nível pesado",
@@ -651,6 +658,7 @@
             "CanOnlyAddTechnologyItemsToANetwork": "Apenas itens de tecnologia podem ser adicionados a uma rede.",
             "CantEditAppliedItemEffects": "Você não pode editar um efeito ativo que foi aplicado por um item.",
             "DefaultInventoryCantBeRemoved": "O inventário padrão não pode ser removido",
+            "LinkLockedReboot": "Um ator com bloqueio de conexão não pode ser reiniciado",
             "InventoryAlreadyExists": "Um inventário com este nome já existe.",
             "KeyNotModifyableByActiveEffect": "O modo de efeito ativo 'modificar' só pode afetar propriedades de mod.",
             "MarkCouldNotBePlaced": "Erro Interno: Suas marcas não puderam ser colocadas.",
@@ -1132,6 +1140,7 @@
                 "SpriteType": "Tipo de Sprite"
             },
             "ActorSheet": {
+                "ConnectToDriver": "Conectar ao piloto",
                 "CreateInventory": "Criar local de inventário",
                 "CritterPowers": "Poderes de Criatura",
                 "DeviceRating": "Nível do Dispositivo",
@@ -1160,6 +1169,9 @@
                 "Carried": "Carregado",
                 "OpenInventory": "Inventário"
             },
+            "Item": {
+                "Network": "Rede"
+            },
             "Message": {
                 "ClickToSelect": "Clique para selecionar na cena",
                 "TestEffects": "Efeitos aplicados"
@@ -1182,6 +1194,7 @@
             }
         },
         "Languages": "Idiomas",
+        "Intervene": "Intervir",
         "LastRoll": "Última Rolagem Solicitada",
         "Level": "Nível",
         "License": "Licença",
@@ -1424,6 +1437,13 @@
         "ResultOverrideHits": "Acertos",
         "ResultOverride": "Substituição de Resultado",
         "RightClickToClear": "Botão Direito para Limpar",
+        "Ritual": {
+            "Anchored": "Ancorado",
+            "MaterialLink": "Vínculo material",
+            "Minion": "Servo",
+            "Spell": "Feitiço",
+            "Spotter": "Observador"
+        },
         "Roll": "Rolagem",
         "RollArmor": "Armadura",
         "RollComposure": "Compostura",
@@ -1701,6 +1721,8 @@
             "ForceAppliesSetting": "Força se Aplica a",
             "ForceAppliesSettingHint": "Controla quais atributos do espírito recebem o bônus de Força."
         },
+        "SpiritType": "Tipo de Espírito",
+        "SprintingBonus": "Bônus de corrida",
         "Sprite": {
             "Level": "Nível",
             "LevelAppliesSettingHint": "Controla quais atributos de sprite recebem o bônus de Nível.",
@@ -1832,6 +1854,7 @@
         "ToggleBreakdown": "Alternar detalhamento",
         "ToggleActive": "Alternar Ativo",
         "ToggleEquip": "Alternar Equipamento",
+        "ToggleSection": "Alternar seção",
         "Tooltips": {
             "Actor": {
                 "Critter": "Permitir o uso de poderes de criatura",
@@ -1840,6 +1863,8 @@
                 "MissingSummoner": "Arraste e solte o personagem ou use a ação de invocação",
                 "MissingTechnomancer": "Arraste e solte o personagem ou use a ação de compilação",
                 "NPC": "Marque o ator como NPC para obter recursos adicionais",
+                "RemoveAllNetworks": "Remover todas as redes",
+                "RemoveNetwork": "Remover rede",
                 "ResetActorForNewRun": "Redefinir dano, vantagem, etc. para uma nova corrida",
                 "DefaultCategoryVisibility": "Mostrar categorias de itens mesmo que nenhum item tenha sido adicionado a eles"
             },
@@ -1977,6 +2002,7 @@
         "UnderBarrel": "Sob o Cano",
         "UseEdgeForInitiativeRoll": "Use a regra de vantagem blitz para iniciativa",
         "Value": "Valor",
+        "VehicleStunImmunity": "Imunidade de veículos a dano de atordoamento",
         "Vehicle": {
             "Category": "Categoria",
             "Categories": {
@@ -2079,6 +2105,7 @@
             "RitualInvalidForce": "A força do ritual é inválida ou maior do que a nível do seu alojamento.",
             "RitualNotConcluded": "Ritual incompleto. Aguarde o ritual se opor à conjuração para determinar o dreno.",
             "RitualNotEnoughReagents": "Não foram oferecidos reagentes suficientes.",
+            "SkillAlreadyExists": "A perícia {name} já existe no ator {actorName} ({actorUuid}). Use cada nome de perícia apenas uma vez por categoria.",
             "SkillCantBeDefault": "Esta pericia não pode ser lançada, pois não pode ser feita sem perícia",
             "SummoningNotConcluded": "Invocação incompleta. Aguarde o espírito se opor à invocação para determinar o dreno.",
             "TokenSelectionNeeded": "Um ou mais tokens precisam ser selecionados",
@@ -2175,6 +2202,11 @@
             },
             "Reach": "Alcance",
             "Reload": "Recarregar",
+            "ResetSpareReloads": "Redefinir recargas sobressalentes",
+            "SpareReloads": "Recargas sobressalentes",
+            "Thrown": {
+                "Range": "Alcance da arma de arremesso"
+            },
             "Type": "Tipo",
             "Weapon": "Arma"
         },

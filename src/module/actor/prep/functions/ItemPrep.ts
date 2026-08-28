@@ -1,5 +1,6 @@
 import { SR5Item } from 'src/module/item/SR5Item';
 import { ModifiableValue } from '@/module/mods/ModifiableValue';
+import { SR5 } from '@/module/config';
  
 export class ItemPrep {
     /**
@@ -51,7 +52,7 @@ export class ItemPrep {
             for (const immunity of item.system.armor.immunities.value) {
                 if (!armor.immunities[immunity]) continue;
                 // Immunity rating is trait-like: apply once per immunity type, not per item piece.
-                ModifiableValue.addUnique(armor.immunities[immunity], `SR5.armorImmunityTypes.${immunity}`, immunityRating);
+                ModifiableValue.addUnique(armor.immunities[immunity], SR5.armorImmunityTypes[immunity], immunityRating);
             }
         }
 
