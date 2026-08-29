@@ -172,7 +172,6 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
         return { img: assignedImage };
     }
 
-
     // Flag Functions
     getLastFireMode(): FireModeType {
         return this.getFlag(SYSTEM_NAME, FLAGS.LastFireMode) || DataDefaults.createData('fire_mode');

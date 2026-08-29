@@ -120,11 +120,11 @@
         width: 100%;
     }
 
-    .item-footer-tags:empty {
+    .item-footer-tags:not(:has(> label, > span)) {
         display: none;
     }
 
-    .item-footer-tags:not(:empty) {
+    .item-footer-tags:has(> label, > span) {
         padding-top: 0.25rem;
     }
 

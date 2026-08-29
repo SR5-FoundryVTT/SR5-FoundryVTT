@@ -185,12 +185,10 @@ export class Version0_38_0 extends VersionMigration {
                 base?: unknown;
                 value?: unknown;
                 restriction?: unknown;
-                changes?: any[];
             };
 
             const base = Version0_38_0.firstString(data.base, data.value, '');
             const migrated = Version0_38_0.createAvailabilityFromString(base);
-            const changes = Array.isArray(data.changes) ? data.changes as any[] : [];
 
             if (typeof data.base === 'number') {
                 migrated.base = Number.isFinite(data.base) ? data.base : 0;
@@ -198,17 +196,6 @@ export class Version0_38_0 extends VersionMigration {
             }
 
             migrated.restriction = Version0_38_0.migrateRestriction(data.restriction, migrated.restriction);
-
-            for (const change of changes) {
-                if (change?.type !== 'override') continue;
-                const parsed = ItemAvailabilityFlow.parseAvailability(String(change.value ?? ''));
-                if (!parsed.isValid || typeof parsed.availability !== 'number') continue;
-
-                change.value = parsed.availability;
-                migrated.restriction = parsed.restriction;
-            }
-
-            migrated.changes = changes;
             migrated.label = ItemAvailabilityFlow.composeValue(migrated.value, migrated.restriction);
             return migrated;
         }
