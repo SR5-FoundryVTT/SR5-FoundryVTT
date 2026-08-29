@@ -81,22 +81,20 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     /**
      * Helper property to get an actual actor for an owned or embedded item. You'll need this for when you work with
-     * embeddedItems, as they have their .actor property set to the item they're embedded into.
+     * embeddedItems, as they are created with the containing item as their parent.
      *
-     * NOTE: This helper is necessary since we have setup embedded items with an item owner, due to the current embedding
-     *       workflow using item.update.isOwned condition within Item.update (foundry Item) to NOT trigger a global item
-     *       update within the ItemCollection but instead have this.actor.updateEmbeddedEntities actually trigger SR5Item.updateEmbeddedEntities
+     * NOTE: Item#actor only resolves a parent that is an actor, so a nested item's actor is always null. Walk the
+     *       parent chain instead to reach the actor owning the outermost item.
      */
     get actorOwner(): SR5Actor | undefined {
-        // An unowned item won't have an actor.
-        if (!this.actor) return;
         // An owned item will have an actor.
         if (this.actor instanceof SR5Actor) return this.actor;
-        // An embedded item will have an item as an actor, which might have an actor owner.
-        // NOTE: This is very likely wrong and should be fixed during embedded item prep / creation. this.actor will only
-        //       check what is set in the items options.actor during it's construction.
-        //@ts-expect-error // Typescript doesn't know that this.actor CAN be an item here...
-        return this.actor.actorOwner;
+        // A nested item has an item as its parent, which might itself have an actor owner.
+        // Typescript only knows about actor parents, so widen before narrowing to an item.
+        const parent: unknown = this.parent;
+        if (parent instanceof SR5Item) return parent.actorOwner;
+        // An unowned item has no actor.
+        return undefined;
     }
 
     // Flag Functions

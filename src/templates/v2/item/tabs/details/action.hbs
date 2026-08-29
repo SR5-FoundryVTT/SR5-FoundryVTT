@@ -252,7 +252,7 @@
     <div class="list-item-col">
         {{formInput systemFields.action.fields.opposed.fields.test value=source.system.action.opposed.test
                     options=(tests2Array opposedTests) classes="short" rootId=@root.rootId
-                    disabled=(or @root.isPlayMode (isType item 'call_in_action' 'complex_form' 'ritual' 'weapons'))}}
+                    disabled=(or @root.isPlayMode (isType item 'call_in_action' 'complex_form' 'ritual' 'weapon'))}}
     </div>
 </div>
 
@@ -308,7 +308,7 @@
         {{formInput systemFields.action.fields.opposed.fields.resist.fields.test
                     value=source.system.action.opposed.resist.test options=(tests2Array resistTests)
                     classes="short" rootId=@root.rootId
-                    disabled=(or @root.isPlayMode (isType item 'call_in_action' 'complex_form' 'ritual' 'weapons'))}}
+                    disabled=(or @root.isPlayMode (isType item 'call_in_action' 'complex_form' 'ritual' 'weapon'))}}
     </div>
 </div>
 

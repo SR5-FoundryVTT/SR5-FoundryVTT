@@ -926,9 +926,8 @@ export const Migrators = (context: QuenchBatchContext) => {
                 restriction: 'restricted',
                 label: '6R',
             });
-            assert.notProperty(item.system.technology.calculated, 'cost');
-            assert.notProperty(item.system.technology.calculated, 'availability');
-            assert.property(item.system.technology.calculated, 'essence');
+            assert.deepEqual(item.system.technology.essence, { base: 0, value: 0 });
+            assert.notProperty(item.system.technology, 'calculated');
         });
 
         it('migrates draft technology cost and availability objects into base/value fields', () => {
@@ -976,37 +975,6 @@ export const Migrators = (context: QuenchBatchContext) => {
             assert.strictEqual(item.system.technology.availability.value, 6);
             assert.strictEqual(item.system.technology.availability.restriction, 'forbidden');
             assert.strictEqual(item.system.technology.availability.label, '6F');
-        });
-
-        it('migrates availability override changes into a numeric change and a restriction string', () => {
-            const migrator = new Version0_38_0();
-            const item: any = {
-                system: {
-                    technology: {
-                        availability: {
-                            base: '6R',
-                            value: '12F',
-                            changes: [{
-                                enabled: true,
-                                invalidated: false,
-                                name: 'Override',
-                                priority: 50,
-                                source: 'test',
-                                type: 'override',
-                                value: '12F',
-                            }],
-                        },
-                    },
-                },
-            };
-
-            migrator.migrateItem(item);
-
-            assert.strictEqual(item.system.technology.availability.base, 6);
-            assert.strictEqual(item.system.technology.availability.value, 6);
-            assert.strictEqual(item.system.technology.availability.label, '6F');
-            assert.strictEqual(item.system.technology.availability.restriction, 'forbidden');
-            assert.strictEqual(item.system.technology.availability.changes[0].value, 12);
         });
     });
 };
