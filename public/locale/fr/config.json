@@ -68,6 +68,9 @@
             },
             "ValueEditor": "Modifier la valeur du changement",
             "FIELDS": {
+                "appliedByTest": {
+                    "label": "Appliqué par un test"
+                },
                 "conditionMode": {
                     "hint": "Inclure : le test doit correspondre à ces valeurs. Exclure : le test ne doit pas correspondre à ces valeurs."
                 },
@@ -416,6 +419,7 @@
         "DamageValue": "Valeur Dégâts",
         "DefaultCategoryVisibility": "Montrer les catégories vides",
         "Defaulting": "Par défaut",
+        "Delete": "Supprimer",
         "Defense": "Defense",
         "DefenseTest": "Test de défense",
         "DeleteConfirmationApplication": {
@@ -457,6 +461,7 @@
         "DurationInstant": "Instantané",
         "DurationPermanent": "Permanent",
         "DurationSustained": "Maintenu",
+        "Edit": "Modifier",
         "EditSkill": "Editer comp.",
         "Element": {
             "Acid": "Acide",
@@ -469,6 +474,8 @@
             "Label": "Élément"
         },
         "Emerged": "Émergé",
+        "EnforcedMaximum": "Maximum imposé",
+        "EnforcedMinimum": "Minimum imposé",
         "EnvModifiersApplication": {
             "ClearModifiers": "Effacer les modificateurs personnels",
             "Extreme": "Combinaison de plusieurs conditions à -6",
@@ -516,6 +523,7 @@
         "Equipment": "Équipement",
         "Equipped": "Équipé",
         "Errors": {
+            "LinkLockedReboot": "Un acteur verrouillé par lien ne peut pas être redémarré",
             "MissingSkill": "Le personnage n'a pas la compétence demandée",
             "SkillWithoutAttribute": "La compétence n'a pas d'attribut assigné"
         },
@@ -933,6 +941,7 @@
         "KnowledgeSkillStreet": "Connaissances de la rue",
         "Labels": {
             "ActorSheet": {
+                "ConnectToDriver": "Se connecter au pilote",
                 "CritterPowers": "Pouvoirs",
                 "DeviceRating": "Indice d'appareil",
                 "DisabledOptionCritterPowers": "Pouvoirs Optionels - Désactivés",
@@ -951,6 +960,7 @@
                 "VehicleConfiguration": "Configuration véhicule"
             },
             "Item": {
+                "Network": "Réseau",
                 "Properties": "Propriétés de l'objet"
             },
             "Sheet": {
@@ -958,6 +968,7 @@
             }
         },
         "Languages": "Langues",
+        "Intervene": "Intervenir",
         "LastRoll": "Dernier lancé affiché",
         "Level": "Niveau",
         "License": "Permis",
@@ -1139,6 +1150,13 @@
         "ResultOverrideHits": "Succès",
         "ResultOverride": "Substitution du résultat",
         "RightClickToClear": "Click droit pour effacer",
+        "Ritual": {
+            "Anchored": "Ancré",
+            "MaterialLink": "Lien matériel",
+            "Minion": "Serviteur",
+            "Spell": "Sort",
+            "Spotter": "Observateur"
+        },
         "Roll": "Lancer",
         "RollArmor": "Armure",
         "RollComposure": "Sang-Froid",
@@ -1388,6 +1406,8 @@
             "ForceAppliesSetting": "Force applicable à",
             "ForceAppliesSettingHint": "Détermine quels attributs de l'esprit reçoivent le bonus de Force."
         },
+        "SpiritType": "Type d'esprit",
+        "SprintingBonus": "Bonus de sprint",
         "Sprite": {
             "Level": "Niveau",
             "LevelAppliesSettingHint": "Contrôle quels attributs de sprite reçoivent le bonus de Niveau.",
@@ -1458,10 +1478,12 @@
         },
         "ToggleBreakdown": "Afficher/masquer le détail",
         "ToggleEquip": "(Des)équiper",
+        "ToggleSection": "Afficher ou masquer la section",
         "Top": "Coté",
         "Total": "Total",
         "UnderBarrel": "Sous le canon",
         "Value": "Valeur",
+        "VehicleStunImmunity": "Immunité des véhicules aux dégâts étourdissants",
         "Vehicle": {
             "ChaseEnvironment": "Environnement de poursuite",
             "Clearsight": "Vue dégagée",
@@ -1530,11 +1552,16 @@
             "NegativeLimitValue": "Les valeurs des limites doivent être supérieures à 0",
             "RitualNotConcluded": "Le Rituel a échoué. En attente du jeu du rituel pour déterminer le drain.",
             "RitualNotEnoughReagents": "Pas assez de réactifs offerts.",
+            "SkillAlreadyExists": "La compétence {name} existe déjà sur l'acteur {actorName} ({actorUuid}). Utilisez chaque nom de compétence une seule fois par catégorie.",
             "SkillCantBeDefault": "Cette compétence ne peut pas être lancée sans l'avoir apprise",
             "TokenSelectionNeeded": "Un ou plusieurs jetons doivent être selectionnés",
             "NoActorCreatePermission": "Vous n'avez pas la permission de créer des acteurs."
         },
         "Tooltips": {
+            "Actor": {
+                "RemoveAllNetworks": "Supprimer tous les réseaux",
+                "RemoveNetwork": "Supprimer le réseau"
+            },
             "Test": {
                 "BuyHits": "Ne lance pas de dés. Achète des succès avec ⌊réserve de dés / 4⌋.",
                 "ExtendedInterval": "Temps de jeu entre les lancers. Zéro lance le test comme un test normal, non étendu.",
@@ -1596,6 +1623,11 @@
             },
             "Reach": "Allonge",
             "Reload": "Recharger",
+            "ResetSpareReloads": "Réinitialiser les recharges de réserve",
+            "SpareReloads": "Recharges de réserve",
+            "Thrown": {
+                "Range": "Portée de l'arme de jet"
+            },
             "Type": "Type",
             "Weapon": "Arme"
         },

@@ -29,8 +29,8 @@ FoundryVTT Shadowrun 5e system implemented in TypeScript + SCSS + Handlebars tem
 - Auto-fix lint: `npm run lint:fix` (or `npm run lint:errors:fix`)
 - Package compendiums: `npm run build:db`
 - Unpack compendiums: `npm run unpack:db`
-- Foundry runtime is usually launched via VS Code tasks (`FoundryVTT 12`, `FoundryVTT 13`).
-- CI gates are `npm test` and `npm run lint`; keep changes passing both.
+- Supported Node.js and Foundry VTT versions are declared in `package.json` and `system.json`; portable VS Code tasks are available in `.vscode`.
+- CI gates are `npm test`, `npm run lint:errors`, `npm run build:prod`, and `npm run validate:packs`; keep changes passing all four.
 
 ## Project conventions
 - Use camelCase for variables/functions/JSON properties; PascalCase for classes/types.

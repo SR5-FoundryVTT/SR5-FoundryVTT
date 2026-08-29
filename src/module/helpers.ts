@@ -77,14 +77,14 @@ export class Helpers {
         // array of labels to check for on the incoming data
         const matrixLabels = [
             'SR5.MatrixAttrFirewall',
-            'SR5.MatrixAttrDataProcessing',
+            'SR5.MatrixAttrDataProc',
             'SR5.MatrixAttrSleaze',
             'SR5.MatrixAttrAttack',
             'SR5.Skill.Computer',
             'SR5.Skill.Hacking',
             'SR5.Skill.Cybercombat',
             'SR5.Skill.ElectronicWarfare',
-            'SR5.Software',
+            'SR5.Skill.Software',
         ];
         if (!Array.isArray(atts)) atts = [atts];
         atts = atts.filter((att) => att);

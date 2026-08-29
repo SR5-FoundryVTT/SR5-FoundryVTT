@@ -2426,7 +2426,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         const inventory = SheetFlow.closestAction(event.target)!.dataset.inventory!;
 
         if (this.actor.inventory.disallowRemove(inventory)) {
-            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantRemoveDefaultInventory'));
+            ui.notifications?.warn(game.i18n.localize('SR5.Errors.DefaultInventoryCantBeRemoved'));
             return;
         }
 

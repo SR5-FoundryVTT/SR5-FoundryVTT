@@ -506,7 +506,7 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     getActionTestName(): string {
         const testName = this.getRollName();
-        return testName || game.i18n.localize('SR5.ItemType.Action');
+        return testName || game.i18n.localize('SR5.ItemTypes.Action');
     }
 
     /**

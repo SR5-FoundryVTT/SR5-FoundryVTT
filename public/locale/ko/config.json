@@ -149,7 +149,7 @@
             "CannotAddTestViaItemToActor": "액터에 '물품을 통한 판정' 종류의 액티브 이펙트 추가 불가",
             "ValueEditor": "변경 값 편집",
             "FIELDS": {
-                "applyByTest": {
+                "appliedByTest": {
                     "label": "물품을 통한 판정에 적용"
                 },
                 "conditionMode": {
@@ -959,8 +959,8 @@
         "Contacts": "연줄",
         "Content": {
             "Actions": {
-                "Armor": "아머",
-                "Biofeedback Resist": "생체반응 저항",
+                "Armor": "방어구",
+                "BiofeedbackResist": "생체반응 저항",
                 "BruteForce": "브루트 포스",
                 "ChangeConfiguration": "환경설정",
                 "ChangeIcon": "아이콘 변경",
@@ -1118,6 +1118,7 @@
         "DamageValue": "피해량",
         "DefaultCategoryVisibility": "비어있는 범주 보기",
         "Defaulting": "무리",
+        "Delete": "삭제",
         "Defender": "방어자",
         "DefenderNetHits": "방어자 순 성공횟수",
         "Defense": "방어",
@@ -1180,6 +1181,7 @@
         "DurationSustained": "지속적",
         "Echo": "에코",
         "Echoes": "에코",
+        "Edit": "편집",
         "EditAmmo": "탄약 수정",
         "EditItem": "물품 수정",
         "EditMod": "부착물 수정",
@@ -1197,6 +1199,8 @@
             "Label": "속성"
         },
         "Emerged": "공명자",
+        "EnforcedMaximum": "최댓값 강제",
+        "EnforcedMinimum": "최솟값 강제",
         "EnvModifiersApplication": {
             "ClearModifiers": "개인 수정치 초기화",
             "Extreme": "두 가지 이상의 극단적 상태가 조합됨",
@@ -1250,6 +1254,7 @@
             "CantEditAppliedItemEffects": "물품에 의해 적용된 활성 효과는 편집할 수 없습니다.",
             "CantExecuteTest": "해당 판정을 실행할 수 없습니다. 이는 사용자가 플레이어이거나 권한이 부족하기 때문일 수 있습니다.",
             "DefaultInventoryCantBeRemoved": "기본 소지품 위치는 삭제할 수 없습니다.",
+            "LinkLockedReboot": "링크 잠금 상태의 액터는 재부팅할 수 없습니다.",
             "InventoryAlreadyExists": "해당 이름의 소지품 위치가 이미 존재합니다.",
             "KeyNotModifyableByActiveEffect": "활성 효과 모드 '수정'은 모드 속성에만 영향을 미칠 수 있습니다.",
             "MarkCouldNotBePlaced": "내부 오류: 당신의 마커는 배치될 수 없습니다.",
@@ -1521,6 +1526,7 @@
         "Initiative": "우선권",
         "InitiativeMod": "우선권 수정치",
         "Internal": "내부",
+        "Intervene": "개입",
         "InventoryRename": {
             "Cancel": "취소",
             "NewName": "새로운 이름",
@@ -1947,7 +1953,10 @@
                 "OpenInventory": "소지품 위치"
             },
             "Item": {
+                "AvailabilityAdjustment": "등급별 희귀도 비례 적용",
+                "CostAdjustment": "등급별 가격 비례 적용",
                 "EssenceAdjustment": "등급별 에센스 비례 적용",
+                "Network": "네트워크",
                 "Properties": "아이템 속성"
             },
             "MarkPlacement": {
@@ -2399,6 +2408,7 @@
         "ResultOverride": "결과 오버라이드",
         "RightClickToClear": "비우려면 우클릭",
         "Ritual": {
+            "Anchored": "고정형",
             "FIELDS": {
                 "descriptors": {
                     "hint": "해당 의식의 핵심어",
@@ -2408,7 +2418,11 @@
                     "hint": "수행할 의식의 유형",
                     "label": "의식 유형"
                 }
-            }
+            },
+            "MaterialLink": "물질 연결",
+            "Minion": "하수인",
+            "Spell": "주문",
+            "Spotter": "관측자"
         },
         "Roll": "굴림",
         "RollArmor": "방어구",
@@ -2798,6 +2812,8 @@
         "Spirit": {
             "Bound": "속박",
             "Force": "강도",
+            "ForceAppliesSetting": "포스 적용 대상",
+            "ForceAppliesSettingHint": "포스 보너스를 받는 정령 속성을 지정합니다.",
             "HalfValueSkill": "절반값 기술",
             "HalfValueSkillHint": "활성화된 기술은 ⌈강도/2⌉를 사용합니다.",
             "InitiativeFormulaAstral": "아스트랄 우선권 공식",
@@ -2892,10 +2908,10 @@
                 "Water": "물",
                 "Worker": "곤충 일꾼",
                 "Wraith": "유령"
-            },
-            "ForceAppliesSetting": "포스 적용 대상",
-            "ForceAppliesSettingHint": "포스 보너스를 받는 정령 속성을 지정합니다."
+            }
         },
+        "SpiritType": "영혼 유형",
+        "SprintingBonus": "전력 질주 보너스",
         "Sprite": {
             "FIELDS": {
                 "level": {
@@ -2962,7 +2978,11 @@
             },
             "Type": "유형"
         },
-        "Stock": "개머리판",
+        "StatusEffects": {
+            "Running": "달리기",
+            "Sprinting": "전력 질주"
+        },																 
+	      "Stock": "개머리판",
         "StreetCred": "길거리 명성",
         "StunTrack": "기절 추적기",
         "Submersion": "몰닉",
@@ -3127,6 +3147,7 @@
         "ToggleActive": "활성 전환",
         "ToggleEquip": "장착 전환",
         "ToggleWireless": "무선 전환",
+        "ToggleSection": "섹션 전환",
         "Tooltips": {
             "Actor": {
                 "AddOneService": "봉사 횟수 1회 추가",
@@ -3138,6 +3159,8 @@
                 "DisconnectNetwork": "해당 호스트/그리드 퇴장",
                 "MarkTarget": "해당 목표에 추가 마크 배치",
                 "MatrixConnectionToggle": "매트릭스 연결 상태 변경: 증강 현실, 콜드 심, 핫 심",
+                "RemoveAllNetworks": "모든 네트워크 제거",
+                "RemoveNetwork": "네트워크 제거",
                 "MatrixRunningSilentToggle": "자신의 매트릭스 장치를 정숙 실행이나 페르소나 표시로 전환",
                 "Metatype": "NPC로서 메타인종은 특성치 빠른 수정치도 적용함",
                 "MiscConfig": "기타 설정 & 수정치",
@@ -3230,6 +3253,7 @@
                 "Extended": "요구 성공횟수에 도달할 때까지 연장 판정으로 굴립니다. 간격을 0으로 두면 일반 판정으로 굴립니다.",
                 "ExtendedInterval": "굴림 사이의 게임 시간입니다. 0이면 연장 판정이 아닌 일반 판정으로 굴립니다.",
                 "Limit": "계산된 한계치",
+                "LimitIgnored": "현재 해당 판정에 대하여 한계가 무시됨Limit is currently ignored for this test",								
                 "Modifier": "주사위 풀에 적용되는 모든 수정치의 합계",
                 "Pool": "굴릴 수 있는 주사위 개수",
                 "PushTheLimit": "한계 돌파 엣지 규칙 적용",
@@ -3265,6 +3289,7 @@
         "UnderBarrel": "총열 하부",
         "UseEdgeForInitiativeRoll": "우선권에 대한 블리츠 엣지 규칙 사용",
         "Value": "수치",
+        "VehicleStunImmunity": "탑승물의 기절 피해 면역",
         "Vehicle": {
             "Categories": {
                 "Anthro": "인간형",
@@ -3572,18 +3597,18 @@
             },
             "Reach": "길이",
             "Reload": "재장전",
+            "ResetSpareReloads": "여분 탄창 초기화",
             "SpareReloads": "여분 탄창 재장전",
+            "Thrown": {
+                "Range": "투척 무기 사거리"
+            },
             "Type": "유형",
             "Weapon": "무기"
         },
         "Wireless": "무선",
         "WirelessOffline": "오프라인",
         "WirelessOnline": "온라인",
-        "WirelessUnavailable": "이용 불가능",
-        "StatusEffects": {
-            "Running": "달리기",
-            "Sprinting": "전력 질주"
-        }
+        "WirelessUnavailable": "이용 불가능"
     },
     "TYPES": {
         "Actor": {

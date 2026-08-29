@@ -24,108 +24,108 @@
     "version": "0.38.0",
     "compatibility": {
         "minimum": "14.363",
-        "verified": "14.365",
+        "verified": "14.367",
         "maximum": "14"
     },
     "documentTypes": {
         "Actor": {
             "character": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "ic": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "spirit": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "sprite": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "vehicle": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             }
         },
         "Item": {
             "action": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "ammo": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "armor": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "adept_power": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "bioware": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "call_in_action": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "complex_form": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "container": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "contact": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "critter_power": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "cyberware": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "device": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "echo": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "equipment": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "grid": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "host": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "lifestyle": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "metamagic": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "modification": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "program": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "quality": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "ritual": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "sin": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "skill": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "spell": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "sprite_power": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             },
             "weapon": {
-                "htmlField": ["description.value"]
+                "htmlFields": ["description.value"]
             }
         }
     },
@@ -261,15 +261,32 @@
             ]
         }
     ],
-    "relationships": [
-        {
-            "id": "autocomplete-inline-properties",
-            "type": "module",
-            "compatibility": {
-                "verified": "3.1.0"
+    "relationships": {
+        "recommends": [
+            {
+                "id": "autocomplete-inline-properties",
+                "type": "module",
+                "compatibility": {
+                    "minimum": "3.1.0",
+                    "verified": "3.3.0"
+                }
+            },
+            {
+                "id": "pdf-pager",
+                "type": "module",
+                "compatibility": {
+                    "minimum": "14.1.0",
+                    "verified": "14.2.2"
+                }
             }
+        ]
+    },
+    "flags": {
+        "hotReload": {
+            "extensions": ["css", "hbs", "html", "json"],
+            "paths": ["dist"]
         }
-    ],
+    },
     "socket": true,
     "manifest": "#{MANIFEST}#",
     "download": "#{DOWNLOAD}#",
