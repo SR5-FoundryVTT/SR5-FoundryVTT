@@ -271,6 +271,9 @@
         "BuyHits": "Acheter des succès",
         "COMBAT": {
             "CannotSeizeAgain": "Vous ne pouvez pas reprendre l'initiative avant le debut de votre prochain tour.",
+            "InitiativeChangedLabel": "Initiative mise a jour",
+            "InitiativeDecreased": "Initiative diminuee",
+            "InitiativeIncreased": "Initiative augmentee",
             "ModeAstral": "Astral",
             "ModeChangedLabel": "Mode d'initiative modifie",
             "ModeChangeNewInitiative": "Nouvelle initiative",

@@ -357,6 +357,9 @@
         "BuyHits": "Comprar Acertos",
         "COMBAT": {
             "CannotSeizeAgain": "Voce nao pode tomar a iniciativa novamente ate o inicio do seu proximo turno.",
+            "InitiativeChangedLabel": "Iniciativa Atualizada",
+            "InitiativeDecreased": "Iniciativa diminuida",
+            "InitiativeIncreased": "Iniciativa aumentada",
             "ModeAstral": "Astral",
             "ModeChangedLabel": "Modo de Iniciativa Alterado",
             "ModeChangeNewInitiative": "Nova iniciativa",

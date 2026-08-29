@@ -670,6 +670,9 @@
         "BuyHits": "Erfolge kaufen",
         "COMBAT": {
             "CannotSeizeAgain": "Du kannst die Initiative erst zu Beginn deines naechsten Zuges erneut ergreifen.",
+            "InitiativeChangedLabel": "Initiative aktualisiert",
+            "InitiativeDecreased": "Initiative verringert",
+            "InitiativeIncreased": "Initiative erhoeht",
             "ModeAstral": "Astral",
             "ModeChangedLabel": "Initiativemodus geaendert",
             "ModeChangeNewInitiative": "Neue Initiative",

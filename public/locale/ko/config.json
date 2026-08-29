@@ -669,6 +669,9 @@
         "BuyHits": "성공 구매",
         "COMBAT": {
             "CannotSeizeAgain": "다음 턴 시작 전까지 다시 선제권을 잡을 수 없습니다.",
+            "InitiativeChangedLabel": "선제권 갱신됨",
+            "InitiativeDecreased": "선제권 감소",
+            "InitiativeIncreased": "선제권 증가",
             "ModeAstral": "아스트랄",
             "ModeChangedLabel": "우선권 모드 변경",
             "ModeChangeNewInitiative": "새 우선권",
