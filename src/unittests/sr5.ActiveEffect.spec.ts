@@ -8,6 +8,8 @@ import { ActionRollType } from 'src/module/types/item/Action';
 import { DataDefaults } from '../module/data/DataDefaults';
 import { SR5ActiveEffect } from 'src/module/effect/SR5ActiveEffect';
 import { ModifiableValueType } from '@/module/types/template/Base';
+import { ExtendedTestFlow } from '@/module/flows/ExtendedTestFlow';
+import { ExtendedTestStorage } from '@/module/storage/ExtendedTestStorage';
 
 export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
     const factory = new SR5TestFactory();
@@ -1311,36 +1313,47 @@ export const shadowrunSR5ActiveEffect = (context: QuenchBatchContext) => {
                 modifier.name === name ? acc + modifier.value : acc;
 
             const actor = await factory.createActor({ type: 'character' });
-            let actions = await actor.createEmbeddedDocuments('Item', [{ name: 'Test Action', type: 'action' }]);
+            // An extended action, so its first roll registers a managed extended test record.
+            const actions = await actor.createEmbeddedDocuments('Item', [
+                { name: 'Test Action', type: 'action', system: { action: { extended: { value: 1, unit: 'minutes' } } } },
+            ]);
+            // The pool is large enough that a critical glitch, which would end the record, stays unlikely.
             await actor.createEmbeddedDocuments('ActiveEffect', [{
                 name: 'Test Effect',
                 system: {
                     targets: [{ id: 't', applyTo: 'test_all', conditions: [{ type: 'tests', values: ['SuccessTest'] }] }],
-                    changes: [{ key: 'data.pool', value: '2', type: 'add', target: 't' }],
+                    changes: [{ key: 'data.pool', value: '8', type: 'add', target: 't' }],
                 }
             }]);
 
-            let test = (await TestCreator.fromItem(actions[0], actor, { showDialog: false, showMessage: false }))!;
+            const knownRecords = new Set(Object.keys(ExtendedTestStorage.getAll()));
+
+            const test = (await TestCreator.fromItem(actions[0], actor, { showDialog: false, showMessage: false }))!;
             await test.execute();
 
             // The first roll should have the effect applied
-            assert.equal(test.pool.changes.reduce(reduceModifiersByName('Test Effect'), 0), 2);
+            assert.equal(test.pool.changes.reduce(reduceModifiersByName('Test Effect'), 0), 8);
 
-            // Trigger the extended roll...
-            test = (await test.executeAsExtended())!;
-            // ... assure effects aren't re applied but taken from the first roll.
-            assert.equal(test.pool.changes.reduce(reduceModifiersByName('Test Effect'), 0), 2);
+            // The first roll registers its record on the sr5_afterTestComplete hook, which can't be
+            // awaited by its caller. Poll for the record to appear.
+            let newIds: string[] = [];
+            for (let i = 0; i < 20 && !newIds.length; i++) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                newIds = Object.keys(ExtendedTestStorage.getAll()).filter(id => !knownRecords.has(id));
+            }
+            assert.lengthOf(newIds, 1);
 
-            actions = await actor.createEmbeddedDocuments('Item', [
-                { name: 'Test Action', type: 'action', system: { action: { extended: { value: 1, unit: 'minutes' } } } },
-            ]);
-            test = (await TestCreator.fromItem(actions[0], actor, { showDialog: false, showMessage: false }))!;
+            try {
+                // Trigger the extended roll. It continues from the first rolls data...
+                const extended = (await ExtendedTestFlow.roll(newIds[0], { showDialog: false, showMessage: false }))!;
+                assert.isDefined(extended);
+                assert.isTrue(extended.extendedRoll);
 
-            // This will trigger the first and all extended rolls...
-            await test.execute();
-
-            /// ... the test reference is for the first roll and should have the effect applied.
-            assert.equal(test.pool.changes.reduce(reduceModifiersByName('Test Effect'), 0), 2);
+                // ... assure effects aren't re applied but taken from the first roll.
+                assert.equal(extended.pool.changes.reduce(reduceModifiersByName('Test Effect'), 0), 8);
+            } finally {
+                await ExtendedTestStorage.delete(newIds[0]);
+            }
         });
     });
 

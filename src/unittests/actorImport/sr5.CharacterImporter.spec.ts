@@ -35,7 +35,10 @@ export const characterImporterTesting = (context: QuenchBatchContext) => {
     } satisfies ImportOptionsType;
 
     describe('Character Importer', () => {
-        it('Should import a chummer character', async () => {
+        it('Should import a chummer character', async function () {
+            // Importing a full character (items, vehicle, etc.) can exceed the batch's default timeout.
+            this.timeout(20000);
+
             [actor, ...vehicles] = await CI.import(character, {
                 ...importOptions,
                 folderId: await factory.getOrCreateFolderId('Actor'),
