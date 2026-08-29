@@ -71,7 +71,7 @@ jobs:
               shell: bash
               run: |
                   payload="$(jq -n \
-                    --arg version "$VERSION" \
+                    --arg version "v$VERSION" \
                     --arg manifest "https://github.com/$GITHUB_REPOSITORY/releases/latest/download/system.json" \
                     --arg notes "https://github.com/$GITHUB_REPOSITORY/releases/tag/$TAG_NAME" \
                     --arg minimum "$(jq -r '.compatibility.minimum' system.json)" \
