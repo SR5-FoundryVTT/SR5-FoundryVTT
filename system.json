@@ -265,7 +265,7 @@
                 "type": "module",
                 "compatibility": {
                     "minimum": "3.1.0",
-                    "verified": "3.1.0"
+                    "verified": "3.3.0"
                 }
             },
             {
@@ -273,7 +273,7 @@
                 "type": "module",
                 "compatibility": {
                     "minimum": "14.1.0",
-                    "verified": "14.1.0"
+                    "verified": "14.2.2"
                 }
             }
         ]
