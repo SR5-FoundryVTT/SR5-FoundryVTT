@@ -147,7 +147,7 @@
             "CannotAddTestViaItemToActor": "Einem Akteur kann kein Active Effect vom Typ 'Probe aus Item' hinzugefügt werden.",
             "ValueEditor": "Wert der Änderung bearbeiten",
             "FIELDS": {
-                "applyByTest": {
+                "appliedByTest": {
                     "hint": "Anwenden auf Test des Items",
                     "label": "Anwenden auf Test"
                 },
@@ -954,7 +954,7 @@
         "Content": {
             "Actions": {
                 "Armor": "Panzerung",
-                "Biofeedback Resist": "Biofeedback widerstehen",
+                "BiofeedbackResist": "Biofeedback widerstehen",
                 "BruteForce": "Brute Force",
                 "ChangeConfiguration": "Konfiguration Ändern",
                 "ChangeIcon": "Icon Verändern",
@@ -1112,6 +1112,7 @@
         "DamageValue": "Schaden",
         "DefaultCategoryVisibility": "Zeige leere Item Sektionen",
         "Defaulting": "Improvisieren",
+        "Delete": "Löschen",
         "Defender": "Verteidiger",
         "DefenderNetHits": "Verteidiger Netto-Erfolge",
         "Defense": "Verteidigung",
@@ -1174,6 +1175,7 @@
         "DurationSustained": "Aufrechterhalten",
         "Echo": "Echo",
         "Echoes": "Echos",
+        "Edit": "Bearbeiten",
         "EditAmmo": "Munition anpassen",
         "EditItem": "Gegenstand anpassen",
         "EditMod": "Modifikation anpassen",
@@ -1191,6 +1193,8 @@
             "Label": "Element"
         },
         "Emerged": "Resonanz",
+        "EnforcedMaximum": "Erzwungenes Maximum",
+        "EnforcedMinimum": "Erzwungenes Minimum",
         "EnvModifiersApplication": {
             "ClearModifiers": "Entferne eigene Modifikatoren",
             "Extreme": "Zwei oder mehr Modifikatoren der Stufe Schwer",
@@ -1244,6 +1248,7 @@
             "CantEditAppliedItemEffects": "Aktive Effekte, die über Items zugefügt wurden, können nicht direkt editiert werden.",
             "CantExecuteTest": "Du kannst diesen Test nicht ausführen. Dies könnte damit zusammenhängen, dass du ein Spieler bist oder nicht ausreichend Berechtigungen hast.",
             "DefaultInventoryCantBeRemoved": "Das Standardinventar kann nicht entfernt werden.",
+            "LinkLockedReboot": "Ein verbindungsgesperrter Akteur kann nicht neu gestartet werden",
             "InventoryAlreadyExists": "Es existiert bereits ein Inventar mit diesem Namen",
             "KeyNotModifyableByActiveEffect": "Aktiver Effekt Modus Modifizieren kann nur auf mod Felder angewendet werden.",
             "MarkCouldNotBePlaced": "Interner Fehler: Die Marken konnten nicht platziert werden.",
@@ -1515,6 +1520,7 @@
         "Initiative": "Initiative",
         "InitiativeMod": "Initiativmodifikator",
         "Internal": "Intern",
+        "Intervene": "Eingreifen",
         "InventoryRename": {
             "Cancel": "Abbrechen",
             "NewName": "Neuer Name",
@@ -1940,7 +1946,10 @@
                 "OpenInventory": "Inventar"
             },
             "Item": {
+                "AvailabilityAdjustment": "Skaliere Verfügbarkeit mit Stufe",
+                "CostAdjustment": "Skaliere Kosten mit Stufe",
                 "EssenceAdjustment": "Skaliere Essenz mit Stufe",
+                "Network": "Netzwerk",
                 "Properties": "Gegenstandseigenschaften"
             },
             "MarkPlacement": {
@@ -2392,6 +2401,7 @@
         "ResultOverride": "Ergebnis-Überschreibung",
         "RightClickToClear": "Rechtsklick zum Leeren",
         "Ritual": {
+            "Anchored": "Verankert",
             "FIELDS": {
                 "descriptors": {
                     "hint": "Beschreibung des Rituals",
@@ -2401,7 +2411,11 @@
                     "hint": "Art des Rituals",
                     "label": "Art"
                 }
-            }
+            },
+            "MaterialLink": "Materielle Verbindung",
+            "Minion": "Diener",
+            "Spell": "Zauber",
+            "Spotter": "Beobachter"
         },
         "Roll": "Würfeln",
         "RollArmor": "Panzerung",
@@ -2889,6 +2903,8 @@
             "ForceAppliesSetting": "Kraft wird angewendet auf",
             "ForceAppliesSettingHint": "Legt fest, welche Geistattribute den Kraftbonus erhalten."
         },
+        "SpiritType": "Geisterart",
+        "SprintingBonus": "Sprintbonus",
         "Sprite": {
             "FIELDS": {
                 "level": {
@@ -3117,6 +3133,7 @@
         "ToggleActive": "De/aktivieren",
         "ToggleEquip": "Anlegen/Ablegen",
         "ToggleWireless": "Kabel(los)",
+        "ToggleSection": "Abschnitt umschalten",
         "Tooltips": {
             "Actor": {
                 "AddOneService": "Füge einen Dienst zum Sprite/Geist hinzu",
@@ -3129,6 +3146,8 @@
                 "Grunt": "Nutze Schergen-Regeln für Akteur",
                 "MarkTarget": "Platziere Marken auf diesem Ziel",
                 "MatrixConnectionToggle": "Ändere den Matrix-Verbindung: Erweiterte Realität, Kalte Sim oder Heiße Sim",
+                "RemoveAllNetworks": "Alle Netzwerke entfernen",
+                "RemoveNetwork": "Netzwerk entfernen",
                 "MatrixRunningSilentToggle": "Wechsle zwischen Schleichfahrt und Anzeige der Persona",
                 "Metatype": "Ein NSC-Akteur bekommt automatische Attributemodifikatoren abhängig vom Metatyp",
                 "MiscConfig": "Verschiedene Einstellungen für den Akteur",
@@ -3300,6 +3319,7 @@
         "UnderBarrel": "Unterlaufmontiert",
         "UseEdgeForInitiativeRoll": "Benutze Edge Regel Blitz für Initiative",
         "Value": "Wert",
+        "VehicleStunImmunity": "Fahrzeugimmunität gegen Betäubungsschaden",
         "Vehicle": {
             "Categories": {
                 "Anthro": "Anthromorph",
@@ -3607,7 +3627,11 @@
             },
             "Reach": "Reichweite",
             "Reload": "Nachladen",
+            "ResetSpareReloads": "Ersatzmagazine zurücksetzen",
             "SpareReloads": "Verfügbares Nachladen",
+            "Thrown": {
+                "Range": "Wurfwaffenreichweite"
+            },
             "Type": "Typ",
             "Weapon": "Waffen"
         },

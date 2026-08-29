@@ -147,7 +147,7 @@
             "CannotAddTestViaItemToActor": "Cannot add an Active Effect of type 'Test via Item' to an Actor",
             "ValueEditor": "Edit Change Value",
             "FIELDS": {
-                "applyByTest": {
+                "appliedByTest": {
                     "label": "Apply-To Test via Item"
                 },
                 "conditionMode": {
@@ -952,7 +952,7 @@
         "Content": {
             "Actions": {
                 "Armor": "Armor",
-                "Biofeedback Resist": "Biofeedback Resist",
+                "BiofeedbackResist": "Biofeedback Resist",
                 "BruteForce": "Brute Force",
                 "ChangeConfiguration": "Change Configuration",
                 "ChangeIcon": "Change Icon",
@@ -1110,6 +1110,7 @@
         "DamageValue": "Damage Value",
         "DefaultCategoryVisibility": "Show empty categories",
         "Defaulting": "Defaulting",
+        "Delete": "Delete",
         "Defender": "Defender",
         "DefenderNetHits": "Defender Net Hits",
         "Defense": "Defense",
@@ -1172,6 +1173,7 @@
         "DurationSustained": "Sustained",
         "Echo": "Echo",
         "Echoes": "Echoes",
+        "Edit": "Edit",
         "EditAmmo": "Edit Ammo",
         "EditItem": "Edit Item",
         "EditMod": "Edit Mod",
@@ -1189,6 +1191,8 @@
             "Label": "Element"
         },
         "Emerged": "Emerged",
+        "EnforcedMaximum": "Enforced Maximum",
+        "EnforcedMinimum": "Enforced Minimum",
         "EnvModifiersApplication": {
             "ClearModifiers": "Clear personal modifiers",
             "Extreme": "Combination of two or more conditions at the heavy level",
@@ -1242,6 +1246,7 @@
             "CantEditAppliedItemEffects": "You can't edit an active effect that's been applied by an item.",
             "CantExecuteTest": "You can't execute this test. This might be related to you being a player or lacking permissions.",
             "DefaultInventoryCantBeRemoved": "The default inventory can't be removed",
+            "LinkLockedReboot": "A link-locked actor cannot be rebooted",
             "InventoryAlreadyExists": "An inventory with this name already exists.",
             "KeyNotModifyableByActiveEffect": "The active effect mode 'modify' can only affect mod properties.",
             "MarkCouldNotBePlaced": "Internal Error: Your marks couldn't be placed.",
@@ -1514,6 +1519,7 @@
         "Initiative": "Initiative",
         "InitiativeMod": "Initiative Modifier",
         "Internal": "Internal",
+        "Intervene": "Intervene",
         "InventoryRename": {
             "Cancel": "Cancel",
             "NewName": "New Name",
@@ -1939,7 +1945,10 @@
                 "OpenInventory": "Inventory"
             },
             "Item": {
+                "AvailabilityAdjustment": "Scale Availability w/ Rating",
+                "CostAdjustment": "Scale Cost w/ Rating",
                 "EssenceAdjustment": "Scale Essence w/ Rating",
+                "Network": "Network",
                 "Properties": "Item Properties"
             },
             "MarkPlacement": {
@@ -2391,6 +2400,7 @@
         "ResultOverride": "Result Override",
         "RightClickToClear": "Right Click to Clear",
         "Ritual": {
+            "Anchored": "Anchored",
             "FIELDS": {
                 "descriptors": {
                     "hint": "Descriptors for the Ritual",
@@ -2400,7 +2410,11 @@
                     "hint": "Type of Ritual to Perform",
                     "label": "Ritual Type"
                 }
-            }
+            },
+            "MaterialLink": "Material Link",
+            "Minion": "Minion",
+            "Spell": "Spell",
+            "Spotter": "Spotter"
         },
         "Roll": "Roll",
         "RollArmor": "Armor",
@@ -2888,6 +2902,8 @@
                 "Wraith": "Wraith"
             }
         },
+        "SpiritType": "Spirit Type",
+        "SprintingBonus": "Sprinting Bonus",
         "Sprite": {
             "FIELDS": {
                 "level": {
@@ -3120,6 +3136,7 @@
         "ToggleActive": "Toggle Active",
         "ToggleEquip": "Toggle Equipped",
         "ToggleWireless": "Toggle Wireless",
+        "ToggleSection": "Toggle Section",
         "Tooltips": {
             "Actor": {
                 "AddOneService": "Add One Service",
@@ -3131,6 +3148,8 @@
                 "DisconnectNetwork": "Leave this host/grid",
                 "MarkTarget": "Place additional marks on this target",
                 "MatrixConnectionToggle": "Change Matrix Connection status: Augmented Reality, Cold Sim, or Hot Sim",
+                "RemoveAllNetworks": "Remove all networks",
+                "RemoveNetwork": "Remove network",
                 "MatrixRunningSilentToggle": "Change your matrix device between Running Silent and Displaying your Persona",
                 "Metatype": "As NPC the metatype will also apply attribute quick modifiers",
                 "MiscConfig": "Miscellaneous Settings & Modifiers",
@@ -3259,6 +3278,7 @@
         "UnderBarrel": "Under Barrel",
         "UseEdgeForInitiativeRoll": "Use edge rule blitz for initiative",
         "Value": "Value",
+        "VehicleStunImmunity": "Vehicle Immunity to Stun Damage",
         "Vehicle": {
             "Categories": {
                 "Anthro": "Anthromorphic",
@@ -3566,7 +3586,11 @@
             },
             "Reach": "Reach",
             "Reload": "Reload",
+            "ResetSpareReloads": "Reset Spare Reloads",
             "SpareReloads": "Spare Reloads",
+            "Thrown": {
+                "Range": "Thrown Weapon Range"
+            },
             "Type": "Type",
             "Weapon": "Weapon"
         },
