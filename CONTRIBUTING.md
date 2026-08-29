@@ -5,7 +5,8 @@ Implement significant features on an active `release/**` branch; if none exists,
 
 ## Development setup
 
-Use Node `>=24.13.1 <25.0.0` and Foundry VTT 14. Run `npm ci` after cloning; no global Gulp installation is needed. See
+Use a Node.js version supported by [`package.json`](package.json) and a Foundry VTT version supported by
+[`system.json`](system.json). Run `npm ci` after cloning; no global Gulp installation is needed. See
 [README-DEV.md](README-DEV.md) for linking, watching, editor, and Quench instructions.
 
 Before opening a pull request, run:

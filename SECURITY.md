@@ -1,7 +1,7 @@
 # Security Policy
 
-Security fixes are provided for the current release line targeting Foundry VTT 14. Older system and Foundry versions may
-no longer receive fixes.
+Security fixes are provided for the Foundry VTT versions supported by [`system.json`](system.json). Older system and
+Foundry versions may no longer receive fixes.
 
 Do not open a public issue for a suspected vulnerability. Use GitHub's
 [private vulnerability reporting form](https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/security/advisories/new) and

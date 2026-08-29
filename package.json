@@ -1,7 +1,7 @@
 {
     "name": "sr5-foundryvtt",
     "private": true,
-    "license": "GPL-3.0-or-later",
+    "license": "GPL-3.0-only",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/SR5-FoundryVTT/SR5-FoundryVTT.git"

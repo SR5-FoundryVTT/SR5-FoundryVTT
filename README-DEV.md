@@ -1,11 +1,12 @@
 # Local development environment
 
 ## General development
-Shadowrun5e targets Foundry Virtual Tabletop 14 and uses TypeScript, esbuild, Sass, npm, and Gulp. Use Node
-`>=24.13.1 <25.0.0`, matching the supported Foundry 14 application runtime. A global Gulp installation is not required.
+Shadowrun5e uses TypeScript, esbuild, Sass, npm, and Gulp. Use a Node.js version supported by
+[`package.json`](package.json) and a Foundry VTT version supported by [`system.json`](system.json). A global Gulp
+installation is not required. The setup instructions below were last tested with Node.js 24.
 
-Install [Node.js 24](https://nodejs.org/en/download), [Git](https://git-scm.com/downloads), and a local Foundry 14
-application. Then clone your fork and run:
+Install a supported [Node.js version](https://nodejs.org/en/download), [Git](https://git-scm.com/downloads), and a
+local Foundry application. Then clone your fork and run:
 
 ```sh
 npm ci
@@ -66,7 +67,7 @@ user environment and create an ignored `.vscode/launch.json`, for example:
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Foundry VTT 14",
+            "name": "Foundry VTT",
             "type": "node",
             "request": "launch",
             "program": "${env:FOUNDRY_APP_PATH}/main.mjs",
