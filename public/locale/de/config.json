@@ -943,7 +943,7 @@
         "Content": {
             "Actions": {
                 "Armor": "Panzerung",
-                "Biofeedback Resist": "Biofeedback widerstehen",
+                "BiofeedbackResist": "Biofeedback widerstehen",
                 "BruteForce": "Brute Force",
                 "ChangeConfiguration": "Konfiguration Ändern",
                 "ChangeIcon": "Icon Verändern",
