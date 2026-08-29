@@ -1,0 +1,6 @@
+{
+    // Type-aware linting resolves the nearest tsconfig per file. The root tsconfig.json excludes
+    // "**/*.spec.ts", which would leave every Quench spec without a program and report its symbols
+    // as unresolved. Point the specs at the test config instead; tsc -p tsconfig.json ignores this file.
+    "extends": "../../tsconfig.tests.json"
+}

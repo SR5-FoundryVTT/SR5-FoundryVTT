@@ -3,64 +3,84 @@ name: Release Creation
 on:
     release:
         types: [published]
+    workflow_dispatch:
+        inputs:
+            tag:
+                description: Tag to use for a local-only artifact dry run
+                required: true
+                default: v0.0.0-test
+permissions:
+    contents: read
+
+concurrency:
+    group: release-${{ github.event.release.tag_name || inputs.tag }}
+    cancel-in-progress: false
 
 jobs:
     build:
         runs-on: ubuntu-latest
+        timeout-minutes: 25
+        permissions:
+            contents: write
+        env:
+            TAG_NAME: ${{ github.event.release.tag_name || inputs.tag }}
+
         steps:
-            - uses: actions/checkout@v4
+            - name: Check out repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-            - name: Install prerequisites
-              run: sudo apt-get install moreutils
-
-            - name: Modify System Manifest With Release-Specific Values
-              env:
-                  URL: https://github.com/${{github.repository}}
-                  MANIFEST: https://github.com/${{github.repository}}/releases/latest/download/system.json
-                  DOWNLOAD: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/shadowrun5e.zip
-                  VERSION: ${{github.event.release.tag_name}}
-              run: |
-                    sudo apt-get install moreutils
-                    jq --arg url $URL '.url=$url' system.json | sponge system.json
-                    jq --arg manifest $MANIFEST '.manifest=$manifest' system.json | sponge system.json
-                    jq --arg download $DOWNLOAD '.download=$download' system.json | sponge system.json
-                    jq --arg version $VERSION '.version=$version' system.json | sponge system.json
-
-            - name: Read System manifest for later use
-              run: |
-                    cat system.json
-                    echo "MANIFEST_JSON=$(jq -c . < system.json)" >> $GITHUB_ENV
-
-            - name: Build and package release artifacts
-              run: |
-                  npm ci
-                  npm run build:prod
-                  npm run build:db
-                  zip -r ./shadowrun5e.zip system.json LICENSE README.md README-DEV.md dist/ packs/ --exclude "packs/_source/*"
-
-            - name: Update Release with Files
-              uses: ncipollo/release-action@v1
+            - name: Set up Node.js
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
-                  makeLatest: false # Must be false, to allow test releases using this workflow.
-                  allowUpdates: true # Must be true, to allow updating existing releases
-                  name: ${{ github.event.release.name }}
-                  draft: false
-                  prerelease: false
-                  token: ${{ secrets.GITHUB_TOKEN }}
-                  artifacts: './system.json, ./shadowrun5e.zip'
-                  tag: ${{ github.event.release.tag_name }}
-                  body: ${{ github.event.release.body }}
+                  node-version: 24.13.1
+                  cache: npm
+                  cache-dependency-path: package-lock.json
 
-            - name: Deploy Release
-              if: github.event.release.prerelease == false
-              uses: fjogeleit/http-request-action@v1
+            - name: Normalize release version
+              shell: bash
+              run: |
+                  version="${TAG_NAME#v}"
+                  if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+                    echo "Unsupported release tag: $TAG_NAME" >&2
+                    exit 1
+                  fi
+                  echo "VERSION=$version" >> "$GITHUB_ENV"
+
+            - name: Prepare release manifest
+              run: node scripts/prepare-release.mjs "$VERSION" "$TAG_NAME" "$GITHUB_REPOSITORY"
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Build application and compendiums once
+              run: npm run package
+
+            - name: Create release archive
+              run: zip -r shadowrun5e.zip system.json LICENSE README.md README-DEV.md dist packs -x "packs/_source/*"
+
+            - name: Upload release artifacts
+              if: github.event_name == 'release'
               env:
-                  MINIMUM: ${{ fromJson(env.MANIFEST_JSON).compatibility.minimum }}
-                  VERIFIED: ${{ fromJson(env.MANIFEST_JSON).compatibility.verified }}
-                  MAXIMUM: ${{ fromJson(env.MANIFEST_JSON).compatibility.maximum }}
-              with:
-                  url: 'https://api.foundryvtt.com/_api/packages/release_version'
-                  method: 'POST'
-                  contentType: 'application/json'
-                  customHeaders: '{"Authorization": "${{ secrets.FVTT_PACKAGE_RELEASE_TOKEN }}"}'
-                  data: '{"id": "shadowrun5e", "release":{"version":"v${{github.event.release.tag_name}}","manifest":"https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/releases/latest/download/system.json","notes":"https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/releases/tag/${{github.event.release.tag_name}}","compatibility":{"minimum":"${{ env.MINIMUM }}","verified":"${{ env.VERIFIED }}","maximum":"${{ env.MAXIMUM }}"}}}'
+                  GH_TOKEN: ${{ github.token }}
+              run: gh release upload "$TAG_NAME" system.json shadowrun5e.zip --clobber
+
+            - name: Deploy stable release to Foundry
+              if: github.event_name == 'release' && github.event.release.prerelease == false
+              env:
+                  FVTT_PACKAGE_RELEASE_TOKEN: ${{ secrets.FVTT_PACKAGE_RELEASE_TOKEN }}
+              shell: bash
+              run: |
+                  payload="$(jq -n \
+                    --arg version "$VERSION" \
+                    --arg manifest "https://github.com/$GITHUB_REPOSITORY/releases/latest/download/system.json" \
+                    --arg notes "https://github.com/$GITHUB_REPOSITORY/releases/tag/$TAG_NAME" \
+                    --arg minimum "$(jq -r '.compatibility.minimum' system.json)" \
+                    --arg verified "$(jq -r '.compatibility.verified' system.json)" \
+                    --arg maximum "$(jq -r '.compatibility.maximum' system.json)" \
+                    '{id:"shadowrun5e",release:{version:$version,manifest:$manifest,notes:$notes,compatibility:{minimum:$minimum,verified:$verified,maximum:$maximum}}}')"
+                  curl --fail-with-body --retry 3 \
+                    --request POST \
+                    --header "Authorization: $FVTT_PACKAGE_RELEASE_TOKEN" \
+                    --header "Content-Type: application/json" \
+                    --data "$payload" \
+                    https://api.foundryvtt.com/_api/packages/release_version

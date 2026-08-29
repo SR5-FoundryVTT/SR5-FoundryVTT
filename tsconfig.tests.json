@@ -1,0 +1,8 @@
+{
+    "extends": "./tsconfig.json",
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules"],
+    "compilerOptions": {
+        "types": ["fvtt-types", "@ethaks/fvtt-quench", "mocha", "chai"]
+    }
+}
