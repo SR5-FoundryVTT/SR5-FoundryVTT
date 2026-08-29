@@ -170,7 +170,6 @@ export class HooksManager {
         Hooks.on('ready', HooksManager.ready.bind(HooksManager));
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop.bind(HooksManager));
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons.bind(HooksManager));
-        Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions.bind(SR5Combat));
         Hooks.on('renderCompendiumDirectory', HooksManager.renderCompendiumDirectory.bind(HooksManager));
         Hooks.on('renderActorDirectory', HooksManager.renderActorDirectory.bind(HooksManager));
         Hooks.on('renderTokenHUD', SituationModifiersApplication.onRenderTokenHUD.bind(SituationModifiersApplication));

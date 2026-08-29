@@ -668,6 +668,9 @@
         "BuyHits": "Buy Hits",
         "COMBAT": {
             "CannotSeizeAgain": "You cannot seize initiative again until the start of your next turn.",
+            "InitiativeChangedLabel": "Initiative Updated",
+            "InitiativeDecreased": "Initiative decreased",
+            "InitiativeIncreased": "Initiative increased",
             "ModeAstral": "Astral",
             "ModeChangedLabel": "Initiative Mode Updated",
             "ModeChangeNewInitiative": "New initiative",
