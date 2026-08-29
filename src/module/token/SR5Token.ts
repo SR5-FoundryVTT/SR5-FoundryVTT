@@ -1,5 +1,7 @@
 import { FLAGS, SYSTEM_NAME } from '../constants';
 import { RoutingLibIntegration } from '../integrations/routingLibIntegration';
+
+import Token = foundry.canvas.placeables.Token;
 import PrototypeTokenConfig = foundry.applications.sheets.PrototypeTokenConfig;
 
 export class SR5Token extends foundry.canvas.placeables.Token {
@@ -8,6 +10,7 @@ export class SR5Token extends foundry.canvas.placeables.Token {
 
         const [changed] = args;
         if (foundry.utils.hasProperty(changed, `flags.${SYSTEM_NAME}.${FLAGS.TokenMovementPhaseMarkers}`)) {
+            // The ruler reads these markers while displaying the token's movement history.
             this.renderFlags.set({ refreshRuler: true });
         }
     }
