@@ -8,65 +8,6 @@
             "ReportIssues": "Rapporter les bugs et proposer des changements",
             "Title": "Mise à jour Shadowrun5e"
         },
-        "CompendiumBrowser": {
-            "Filters": {
-                "ClearSearch": "Effacer la recherche",
-                "SearchPlaceholder": "Rechercher...",
-                "System": "Système",
-                "World": "Monde"
-            },
-            "Tabs": {
-                "Actors": "Acteurs",
-                "Items": "Objets",
-                "Settings": "Paramètres"
-            },
-            "Title": "Navigateur Compendium"
-        },
-        "CompendiumSettings": {
-            "ActionsPacksSection": "Recueils d'actions",
-            "Description": "Ces packs seront utilisés pour le système. Vous pouvez les surcharger avec vos propres packs, mais vous ne devriez pas les supprimer.",
-            "GeneralActionsPack": {
-                "hint": "Ce compendium sera utilisé pour toutes les actions générales, attribut seulement.",
-                "label": "Actions générales"
-            },
-            "ICActionsPack": {
-                "hint": "Ce compendium sera utilisé pour les actions IC, filtrées pour chaque type d'IC",
-                "label": "Actions IC"
-            },
-            "Label": "Packs de compendium",
-            "MatrixActionsPack": {
-                "hint": "Ce compendium sera utilisé pour toutes les actions matricielles.",
-                "label": "Actions matricielles"
-            },
-            "SkillGroupsPack": {
-                "hint": "Ce recueil sera utilisé pour les groupes de compétences.",
-                "label": "Groupes de compétences"
-            },
-            "SkillSetsPack": {
-                "hint": "Ce compendium sera utilisé pour les ensembles de compétences.",
-                "label": "Ensembles de compétences"
-            },
-            "SkillsPack": {
-                "hint": "Ce recueil sera utilisé pour toutes les compétences.",
-                "label": "Compétences"
-            },
-            "SkillsPacksSection": "Recueils de compétences",
-            "Title": "Recueils de systèmes"
-        },
-        "Compendiums": {
-            "Folders": {
-                "Root": "Importations de SR5e"
-            },
-            "sr5critter": "Créatures, esprits & sprites",
-            "sr5drone": "Drones et véhicules",
-            "sr5gear": "Armures & équipement",
-            "sr5magic": "Sorts & formes complexes",
-            "sr5misc": "Divers",
-            "sr5modification": "Modifications",
-            "sr5trait": "Qualités & pouvoirs",
-            "sr5ware": "Bioware & Cyberware",
-            "sr5weapon": "Armes"
-        },
         "DeleteConfirmationApplication": {
             "Cancel": "Non",
             "Consent": "Etes-vous sûr?",
@@ -111,41 +52,6 @@
                 "Title": "Vent"
             }
         },
-        "GMRequest": {
-            "General": "Votre MJ vous demande de faire un",
-            "RollAttribute": "Test d'attribut",
-            "RollSkill": "Test de compétence",
-            "Teamwork": "Test de travail d'équipe",
-            "Threshold": "avec un seuil de"
-        },
-        "Import": {
-            "ActorImporter": {
-                "Title": "Importateur"
-            },
-            "BulkImporter": {
-                "Title": "Importateur en masse"
-            },
-            "ImporterSourcesConfig": {
-                "Title": "Configuration des sources d'importation"
-            },
-            "Spirit": {
-                "SpiritTypeNotFound": "Type d'esprit introuvable. Merci d'ouvrir un ticket GitHub avec votre export JSON Chummer."
-            },
-            "Sprite": {
-                "SpriteTypeNotFound": "Type de sprite introuvable. Merci d'ouvrir un ticket GitHub avec votre export JSON Chummer."
-            }
-        },
-        "KarmaManager": {
-            "Cancel": "Annuler",
-            "CareerKarma": "Karma de carrière accumulé par le personnage",
-            "CurrentKarma": "Quantité de Karma dont dispose actuellement le personnage",
-            "FinalCareerKarma": "Karma de carrière du personnage après validation",
-            "FinalCurrentKarma": "Karma dont disposera ce personnage après validation",
-            "FinalKarma": "Karma final",
-            "StartingKarma": "Karma initial",
-            "Submit": "Soumettre",
-            "Title": "Gestionnaire de Karma"
-        },
         "Migration": {
             "BeginMigration": "Commencer la migration",
             "BeginNotification": "Commencer la migration de cette version du système Shadowrun",
@@ -159,58 +65,14 @@
             "SuccessTitle": "Succès",
             "UpdateCompendiumNoUpdateActor": "A cause de limitations techniques avec FoundryVTT, le pack compendium d'acteurs ne peuvent pas être mis à jour. Vous devez mettre à jour ce pack manuellement.",
             "UpdateCompendiumUpdateMessage": "Chaque compendium pack du monde qui existe ont été mis à jour",
-            "Version18_0_0": {
-                "Line1": "À partir de la version 0.18.0, les effets des objets possédés s'appliquent directement, sans être copiés sur l'acteur.",
-                "Line2": "Les effets précédemment copiés doivent être supprimés ou désactivés pour éviter que les effets de l'objet et de l'acteur n'appliquent tous deux leurs modifications. Par défaut, tous les effets ayant une origine d'objet seront supprimés.",
-                "Line3": "Les effets créés directement sur les acteurs ne sont pas affectés.",
-                "Line4": "Si vous utilisez beaucoup d'effets, notamment avec des modules d'effets, et que vous ne savez pas exactement quels effets proviennent d'un objet, réglez cette migration sur Désactiver afin d'examiner les effets désactivés. Les effets désactivés seront marqués comme tels.",
-                "Line5": "Notez également que les effets activés sur les objets d'un acteur seront désormais appliqués. Vous pouvez voir tous les effets appliqués dans l'onglet Effets de l'acteur.",
-                "OnlyDisable": "Désactiver uniquement les effets",
-                "Warning": "Remarque !"
-            },
             "WarningBackup": "Attention, nous vous conseillons de faire une copie de votre monde avant de cliquer sur le bouton 'Commencer la migration' ci dessous",
             "WarningDescription": "Seul le MJ peut effectuer la mise à jour. Fermer votre navigateur peut causer des problèmes au monde",
             "WarningHeader": "Attention migration en cours",
             "WarningRequired": "Le système Shadowrun 5e doit être mis à jour",
             "WarningTitle": "Alerte"
         },
-        "NuyenManager": {
-            "Cancel": "Annuler",
-            "CurrentNuyen": "Quantité de nuyens dont dispose actuellement le personnage",
-            "FinalNuyen": "Quantité finale de nuyens après validation",
-            "Submit": "Soumettre",
-            "Title": "Gestionnaire de nuyens"
-        },
         "OverwatchScoreTracker": {
-            "AddSelect": "Ajouter les tokens liés sélectionnés",
-            "CantDeleteUserCharacter": "Le personnage de joueur ne peut pas être retiré du tracker",
-            "DeleteScore": "Supprimer le score du tracker",
-            "GMOnly": "Réservé au MJ",
-            "NotifyNoSelectedTokens": "Au moins un jeton lié doit être sélectionné.",
-            "OnlyLinkedActorsSupported": "Seuls les acteurs liés sont pris en charge. Les jetons sélectionnés avec des acteurs non liés seront ignorés.",
             "ResetScore": "Réinitialiser Score de Surveillance"
-        },
-        "ReputationManager": {
-            "Cancel": "Annuler",
-            "Submit": "Soumettre",
-            "Title": "Gestionnaire de réputation"
-        },
-        "SituationalModifiersApplication": {
-            "Category": {
-                "Magic": "Magie",
-                "Matrix": "Matrice",
-                "Physical": "Physique"
-            },
-            "ClearLocalAll": "Supprimer les modificateurs locaux",
-            "ClearLocalAllTokens": "Supprimer tous les modificateurs de jetons sur place",
-            "Magic": {
-                "BackgroundCount": "Bruit de fond"
-            },
-            "Matrix": {
-                "Noise": "Bruit"
-            },
-            "Title": "Modificateurs situationnels",
-            "Total": "Total"
         },
         "TimeControl": {
             "Advance": "Avancer",
@@ -240,26 +102,6 @@
             "Title": "Contrôle du temps",
             "Unit": "Unité",
             "Year": "Année"
-        },
-        "Tours": {
-            "CharacterImport": {
-                "Description": "Cette visite vous donnera un aperçu de l'importation d'un personnage Chummer. Pour plus de détails, consultez https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/wiki/Chummer-Character-Import",
-                "GeneralContent": "Pour importer un personnage, vous avez besoin de l'export JSON de Chummer 5e.",
-                "GeneralTitle": "Importer un personnage",
-                "Title": "Importation de personnage"
-            },
-            "ConditionMonitor": {
-                "ApplyDamageContent": "Pour appliquer des dégâts, cliquez avec le bouton gauche sur une case. Toutes les cases jusqu'à celle-ci incluse seront remplies. Si davantage de cases étaient remplies, celles situées à droite seront vidées.",
-                "ApplyDamageTitle": "Application et élimination des dommages",
-                "Description": "Cette visite vous donnera un aperçu du fonctionnement du moniteur de condition.",
-                "GeneralContent": "Ce sont vos moniteurs de conditions. Ils se composent de plusieurs cellules. Dans certaines cellules, vous pouvez voir un nombre écrit. Si ces cellules sont remplies votre modificateur de blessure est augmenté à ce nombre.",
-                "GeneralTitle": "Moniteur de condition",
-                "RecoveryContent": "En cliquant sur l'étiquette d'un moniteur de condition, vous lancerez un test de récupération étendu. Le résultat du test sera automatiquement appliqué au moniteur.",
-                "RecoveryTitle": "Tests de récupération",
-                "Title": "Visite du moniteur de condition",
-                "WoundModifierContent": "Cette cellule indique que le remplissage augmente votre modificateur de blessure par le nombre écrit dans la cellule",
-                "WoundModifierTitle": "Modificateur de blessure"
-            }
         }
     }
 }

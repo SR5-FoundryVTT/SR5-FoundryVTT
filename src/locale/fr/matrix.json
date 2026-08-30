@@ -1,82 +1,5 @@
 {
     "SR5": {
-        "ComplexForm": {
-            "Durations": {
-                "Immediate": "Immédiatement",
-                "Permanent": "Permanent",
-                "Sustained": "Maintenu"
-            },
-            "FIELDS": {
-                "duration": {
-                    "hint": "Immédiatement (il se produit instantanément sans effets durables), Sustained (vous pouvez le soutenir), ou Permanent (si vous le maintenez pour son Niveau dans le Combat Tours, ses effets restent après que vous arrêtez de le soutenir).",
-                    "label": "Durée"
-                },
-                "fade": {
-                    "hint": "La valeur de perte est ajoutée au niveau choisi lors du filetage pour déterminer la quantité de dommages à résister",
-                    "label": "Technodrain"
-                },
-                "target": {
-                    "hint": "Types de cibles valides pour le formulaire complexe",
-                    "label": "Cible"
-                }
-            }
-        },
-        "Grid": {
-            "FIELDS": {
-                "category": {
-                    "hint": "Les grilles publiques appliquent un modificateur négatif pendant la connexion, les grilles locales et mondiales n'ont pas de modificateurs",
-                    "label": "Type de grille"
-                }
-            }
-        },
-        "Host": {
-            "Attributes": "Attributs de l'hôte",
-            "CustomAttributes": "Attributs personnalisés",
-            "DropICActor": "Glissez-déposez un acteur IC dans l'ordre de réponse de sécurité",
-            "ICOrder": "Ordre des IC",
-            "MissingIC": "IC manquant",
-            "Rating": "Indice de l'hôte"
-        },
-        "IC": {
-            "FIELDS": {
-                "host": {
-                    "hint": "Sur quel hôte ce IC est en cours d'exécution",
-                    "label": "Hôte",
-                    "rating": {
-                        "hint": "Classement de l'hôte sur lequel nous sommes en cours d'exécution",
-                        "label": "Indice"
-                    }
-                },
-                "icType": {
-                    "hint": "Type de CI",
-                    "label": "Type IC"
-                }
-            },
-            "MissingHost": "Glissez-déposez un objet hôte",
-            "Type": "Type",
-            "Types": {
-                "Acid": "Acid",
-                "Binder": "Binder",
-                "BlackIC": "Black IC",
-                "Blaster": "Blaster",
-                "Bloodhound": "Bloodhound",
-                "BlueGoo": "Blue Goo",
-                "Catapult": "Catapult",
-                "Crash": "Crash",
-                "Flicker": "Flicker",
-                "Jammer": "Jammer",
-                "Killer": "Killer",
-                "Marker": "Marker",
-                "Patrol": "Patrol",
-                "Probe": "Probe",
-                "Scramble": "Scramble",
-                "Shocker": "Shocker",
-                "Sleuther": "Sleuther",
-                "Sparky": "Sparky",
-                "TarBaby": "Tar Baby",
-                "Track": "Track"
-            }
-        },
         "Matrix": {
             "Attributes": {
                 "Attack": "Attaque",
@@ -87,116 +10,32 @@
             "Labels": {
                 "Agent": "Agent",
                 "CommonProgram": "Programme courant",
-                "DirectConnection": "Connexion directe",
-                "Grids": "Grilles",
-                "Hosts": "Hôtes",
-                "HotSim": "Sim chaud",
-                "LivingPersona": "Persona vivante",
-                "Marks": "Marques",
-                "MatrixDefense": "Défense matricielle",
-                "MatrixFullDefenseAttribute": "Attribut de Défense matricielle totale",
+                "HotSim": "Hot Sim",
                 "MatrixTarget": "Cible Matricielle",
-                "Network": "Réseau",
-                "Networks": "Réseaux",
                 "OverwatchScore": "Score de Surveillance",
                 "OverwatchScoreTrackerTitle": "Le moniteur pour bébé de Mr. Johnson",
-                "Personas": "Personas",
-                "PublicGrid": "Grille publique",
                 "RunningSilent": "Mode silencieux",
-                "RunningSilentControlledByDevice": "Le mode silencieux est contrôlé par votre appareil matriciel actif :",
-                "Wireless": "Sans fil",
-                "WirelessOffline": "Hors ligne",
-                "WirelessOnline": "En ligne",
-                "WirelessUnavailable": "Indisponible"
+                "Wireless": "Sans fil"
             }
-        },
-        "MatrixNetworkHackingApplication": {
-            "Icons": "Icônes",
-            "Invite": "Demander une invitation",
-            "Title": "Connexion au réseau"
         },
         "MatrixOpposedDeviceDialog": {
             "Title": "Créer un appareil matriciel"
         },
-        "NetworkManager": {
-            "AvailableNetworks": "Réseaux disponibles",
-            "BruteForce": "Force brute",
-            "ConnectedTo": "Connecté à",
-            "HackOnTheFly": "Piratage à la volée",
-            "InviteMark": "Demander une invitation de marque",
-            "NetworkType": "Type",
-            "NoNetwork": "Non connecté",
-            "Title": "Gestionnaire de réseau"
-        },
-        "RebootConfirmationDialog": {
-            "Cancel": "Annuler",
-            "Confirm": "Redémarrer",
-            "Description": "Voulez-vous vraiment redémarrer cet appareil ?",
-            "Title": "Confirmer le redémarrage"
-        },
-        "SelectMatrixNetworkDialog": {
-            "Cancel": "Annuler",
-            "Connect": "Connexion",
-            "Title": "Sélectionnez un réseau"
-        },
         "Sprite": {
-            "FIELDS": {
-                "level": {
-                    "hint": "Niveau du sprite",
-                    "label": "Niveau"
-                },
-                "registered": {
-                    "hint": "Si le Sprite est enregistré",
-                    "label": "Enregistré"
-                },
-                "services": {
-                    "hint": "Nombre de services que doit ce sprite",
-                    "label": "Services"
-                },
-                "spriteType": {
-                    "hint": "Type de sprite",
-                    "label": "Type de sprite"
-                },
-                "technomancerUuid": {
-                    "hint": "Technomancien ayant compilé ce sprite",
-                    "label": "Technomancien"
-                }
-            },
             "Level": "Niveau",
             "LevelAppliesSettingHint": "Contrôle quels attributs de sprite reçoivent le bonus de Niveau.",
-            "MissingTechnomancer": "Technomancien manquant",
             "Registered": "Inscrit",
             "Services": "Tâches",
-            "Technomancer": "Technomancien",
             "Type": "Type",
             "Types": {
-                "Companion": "Compagnon",
                 "Courier": "Coursier",
                 "Crack": "Cracker",
                 "Data": "Données",
                 "Fault": "Erreur",
-                "Generalist": "Généraliste",
                 "Machine": "Machine"
             }
         },
         "SpritePower": {
-            "Durations": {
-                "Always": "Toujours",
-                "Instant": "Instantané",
-                "Permanent": "Permanent",
-                "Special": "Spécial",
-                "Sustained": "Maintenu"
-            },
-            "FIELDS": {
-                "duration": {
-                    "hint": "Durée du pouvoir de sprite",
-                    "label": "Durée"
-                },
-                "optional": {
-                    "hint": "Si le pouvoir de sprite est facultatif",
-                    "label": "Facultatif"
-                }
-            },
             "IsOptional": "Optionel",
             "Optional": {
                 "DisabledOption": "Optionel, disabled",

@@ -15,214 +15,6 @@
                 "Strength": "Force",
                 "Willpower": "Volonté"
             },
-            "FIELDS": {
-                "attributes": {
-                    "edge": {
-                        "base": {
-                            "hint": "La Chance représente la veine du personnage, la faveur des dieux, ce facteur inexplicable qui lui permet de défier les probabilités.",
-                            "label": "Chance"
-                        }
-                    }
-                },
-                "category_visibility": {
-                    "default": {
-                        "hint": "Si les onglets vides et les catégories d'inventaire doivent être visibles",
-                        "label": "Afficher les catégories vides"
-                    }
-                },
-                "full_defense_attribute": {
-                    "hint": "Attribut à utiliser lors de l'action d'interruption Défense totale",
-                    "label": "Attribut de défense totale"
-                },
-                "magic": {
-                    "attribute": {
-                        "hint": "Attribut que le mage/adepte utilise pour résister au Drain",
-                        "label": "Attribut de Drain"
-                    },
-                    "label": "Magie"
-                },
-                "modifiers": {
-                    "armor": {
-                        "hint": "Modifie la valeur totale de l'armure",
-                        "label": "Armure"
-                    },
-                    "astral_initiative": {
-                        "hint": "Modifier la base d'initiatives astrales",
-                        "label": "Initiative astrale"
-                    },
-                    "astral_initiative_dice": {
-                        "hint": "Modifie les dés d'initiative astrale",
-                        "label": "Dés d'initiative astrale"
-                    },
-                    "astral_limit": {
-                        "hint": "Modifie la limite astrale",
-                        "label": "Limite Astrale"
-                    },
-                    "composure": {
-                        "hint": "Modifie la réserve de dés des tests de sang-froid",
-                        "label": "Sang-Froid"
-                    },
-                    "defense": {
-                        "hint": "Modifie la réserve de dés des tests de défense",
-                        "label": "Défense"
-                    },
-                    "defense_block": {
-                        "hint": "Ajoute au modificateur de défense pour le blocage actif",
-                        "label": "Défense (Bloquer)"
-                    },
-                    "defense_dodge": {
-                        "hint": "Ajoute au modificateur de défense pour l'esquive active",
-                        "label": "Défense (Esquiver)"
-                    },
-                    "defense_melee": {
-                        "hint": "Ajoute au modificateur de défense en mêlée",
-                        "label": "Défense (mêlée)"
-                    },
-                    "defense_parry": {
-                        "hint": "Ajoute au modificateur de défense pour la parade active",
-                        "label": "Défense (parade)"
-                    },
-                    "defense_ranged": {
-                        "hint": "Ajoute au modificateur de défense contre les attaques à distance",
-                        "label": "Défense (distance)"
-                    },
-                    "drain": {
-                        "hint": "Modifie la réserve de dés des tests de résistance au drain",
-                        "label": "Drain"
-                    },
-                    "essence": {
-                        "hint": "Modifie l'attribut essence",
-                        "label": "Essence"
-                    },
-                    "fade": {
-                        "hint": "Modifie la réserve de dés des tests de technodrain",
-                        "label": "Technodrain"
-                    },
-                    "global": {
-                        "hint": "Modifie toutes les réserves de dés, sauf celles des tests de résistance aux dégâts",
-                        "label": "Global"
-                    },
-                    "judge_intentions": {
-                        "hint": "Modifie la réserve de dés des tests pour jauger les intentions",
-                        "label": "Jauger les intentions"
-                    },
-                    "lift_carry": {
-                        "hint": "Modifie la réserve de dés des tests de levage et de transport",
-                        "label": "Soulever/Porter"
-                    },
-                    "mark_damage": {
-                        "hint": "Modifie la quantité de dégâts subis par marque placée sur vous",
-                        "label": "Dégâts par marque"
-                    },
-                    "matrix_initiative": {
-                        "hint": "Modifie la base d'initiative matricielle",
-                        "label": "Initiative matricielle"
-                    },
-                    "matrix_initiative_dice": {
-                        "hint": "Modifie les dés d'initiative matricielle",
-                        "label": "Dés d'initiative matricielle"
-                    },
-                    "matrix_track": {
-                        "hint": "Modifie le moniteur de dégâts matriciels",
-                        "label": "Moniteur matriciel"
-                    },
-                    "meat_initiative": {
-                        "hint": "Modifie la base d'initiative physique",
-                        "label": "Initiative physique"
-                    },
-                    "meat_initiative_dice": {
-                        "hint": "Modifie les dés d'initiative physique",
-                        "label": "Dés d'initiative physique"
-                    },
-                    "memory": {
-                        "hint": "Modifie la réserve de dés des tests de mémoire",
-                        "label": "Mémoire"
-                    },
-                    "mental_limit": {
-                        "hint": "Modifie la limite mentale",
-                        "label": "Limite Mentale"
-                    },
-                    "multi_defense": {
-                        "hint": "Modifie la réserve de dés des tests de défense après plusieurs défenses pendant un tour de combat",
-                        "label": "Multi-défense"
-                    },
-                    "pain_tolerance_physical": {
-                        "hint": "Modifie les dégâts ignorés avant le premier modificateur de blessure",
-                        "label": "Tolérance à la douleur (physique)"
-                    },
-                    "pain_tolerance_stun": {
-                        "hint": "Modifie les dégâts ignorés avant le premier modificateur de blessure",
-                        "label": "Tolérance à la douleur (étourdissant)"
-                    },
-                    "physical_limit": {
-                        "hint": "Modifie la limite physique",
-                        "label": "Limite Physique"
-                    },
-                    "physical_overflow_track": {
-                        "hint": "Modifie la piste de dommages physiques au débordement",
-                        "label": "Moniteur de débordement physique"
-                    },
-                    "physical_track": {
-                        "hint": "Modifie le moniteur de dégâts physiques",
-                        "label": "Moniteur physique"
-                    },
-                    "place_three_marks": {
-                        "hint": "Modifie le modificateur pour placer trois marques en même temps",
-                        "label": "Placer trois marques"
-                    },
-                    "place_two_marks": {
-                        "hint": "Modifie le modificateur pour placer deux marques en même temps",
-                        "label": "Placer deux marques"
-                    },
-                    "public_grid": {
-                        "hint": "Modifie le modificateur de la grille publique lorsqu'il est connecté à celle-ci",
-                        "label": "Grille publique"
-                    },
-                    "reach": {
-                        "hint": "Modifie la portée des attaques de mêlée",
-                        "label": "Allonge"
-                    },
-                    "recoil": {
-                        "hint": "Modifie la réserve de dés des tests de recul",
-                        "label": "Recul"
-                    },
-                    "run": {
-                        "hint": "Modifie la distance de course par multiples de l'attribut Agilité",
-                        "label": "Courir"
-                    },
-                    "soak": {
-                        "hint": "Modifie la réserve de dés des tests de résistance aux dégâts physiques",
-                        "label": "Encaisser"
-                    },
-                    "social_limit": {
-                        "hint": "Modifier la limite sociale",
-                        "label": "Limite Sociale"
-                    },
-                    "stun_track": {
-                        "hint": "Modifie le moniteur de dégâts étourdissants",
-                        "label": "Moniteur étourdissant"
-                    },
-                    "walk": {
-                        "hint": "Modifie la distance de marche par multiples de l'attribut Agilité",
-                        "label": "Marcher"
-                    },
-                    "wound_tolerance": {
-                        "hint": "Modifie les dommages par modificateur de blessure",
-                        "label": "Tolérance aux blessures"
-                    }
-                },
-                "special": {
-                    "hint": "Indiquez si le personnage est Éveillé (mage/adepte) ou Émergé (technomancien)",
-                    "label": "Éveillé/Émergé"
-                },
-                "technomancer": {
-                    "attribute": {
-                        "hint": "Attribut utilisé par le technomancien pour résister au technodrain",
-                        "label": "Attribut de Technodrain"
-                    },
-                    "label": "Technomancien"
-                }
-            },
             "Initiative": {
                 "Categories": {
                     "Astral": "Astral",
@@ -235,82 +27,26 @@
                 "Attributes": "Attributs",
                 "Biography": "Bio",
                 "DefaultCategoryVisibility": "Montrer les catégories vides",
-                "Initiation": "Initiation",
                 "Initiative": "Initiative",
                 "InitiativeMod": "Modificateur d'Initiative",
                 "IsCritter": "Créature",
-                "IsFreshImport": "Cet objet a été importé depuis Chummer et doit être vérifié manuellement.",
                 "IsGrunt": "Brute",
                 "IsGruntHint": "Utilise les règles de moniteur de condition des brutes (SR5 p.378).",
                 "IsNPC": "PNJ",
                 "Metatype": "Métatype",
                 "Movement": "Mouvement",
-                "RunningSpeed": "Course",
                 "SheetActor": "Fiche de personnage",
                 "SpecialAttributes": "Attributs spéciaux",
-                "SprintingBonus": "Bonus de sprint",
-                "WalkingSpeed": "Marche"
-            },
-            "NoFavoritesSelected": "Aucun favori n'a été sélectionné"
+                "SprintingBonus": "Bonus de sprint"
+            }
         },
         "ActorTypes": {
             "Character": "Personnage",
-            "IC": "IC",
             "Spirit": "Esprit",
             "Sprite": "Sprite",
             "Vehicle": "Vehicule"
         },
         "Character": {
-            "FIELDS": {
-                "is_critter": {
-                    "hint": "Autoriser l'utilisation des pouvoirs de créature",
-                    "label": "Est une créature"
-                },
-                "is_npc": {
-                    "hint": "Marquer l'acteur comme PNJ pour accéder à des fonctionnalités supplémentaires",
-                    "label": "Est un PNJ"
-                },
-                "karma": {
-                    "max": {
-                        "hint": "Quantité de Karma que ce personnage a accumulée",
-                        "label": "Karma de carrière"
-                    },
-                    "value": {
-                        "hint": "Quantité de Karma dont ce personnage dispose",
-                        "label": "Karma actuel"
-                    }
-                },
-                "matrix_full_defense_attribute": {
-                    "hint": "Attribut à ajouter lors d'une action de Défense matricielle totale",
-                    "label": "Attribut de Défense matricielle totale"
-                },
-                "metatype": {
-                    "hint": "Métatype du personnage. Pour un PNJ, cela ajustera les attributs",
-                    "label": "Métatype"
-                },
-                "notoriety": {
-                    "hint": "Le côté négatif de la réputation du personnage",
-                    "label": "Rumeur"
-                },
-                "npc": {
-                    "is_grunt": {
-                        "hint": "Appliquer les règles de sbire à cet acteur",
-                        "label": "Est un sbire"
-                    }
-                },
-                "nuyen": {
-                    "hint": "Quantité de nuyens que possède ce personnage",
-                    "label": "Nuyen"
-                },
-                "public_awareness": {
-                    "hint": "À quel point ce personnage est connu des médias, des autorités et du grand public",
-                    "label": "Renommée"
-                },
-                "street_cred": {
-                    "hint": "Les hauts faits accomplis par le personnage",
-                    "label": "Réputation"
-                }
-            },
             "Labels": {
                 "CareerKarma": "Karma de carrière",
                 "Notoriety": "Rumeur",
@@ -331,74 +67,15 @@
         },
         "Contact": {
             "Blackmail": "Chantage",
-            "Connection": "Connexion",
-            "DropActor": "Glissez-déposez un acteur pour le lier à ce contact",
-            "FIELDS": {
-                "blackmail": {
-                    "hint": "Vous avez quelque chose qui peut être retenu sur le contact pour les amener à faire des affaires.",
-                    "label": "Chantage"
-                },
-                "connection": {
-                    "hint": "Ceci mesure l'influence du contact sur une échelle de 1 à 12. Plus la cote de connexion est élevée, plus le contact a de jus.",
-                    "label": "Connexion"
-                },
-                "family": {
-                    "hint": "Le sang est toujours plus épais que l'eau, c'est vrai pour avoir une famille comme contacts.",
-                    "label": "Famille"
-                },
-                "group": {
-                    "hint": "Le contact est un groupe; peut être un gang, un corps ou quelques nerds",
-                    "label": "Groupe"
-                },
-                "linkedActor": {
-                    "hint": "Acteur que ce Contact représente",
-                    "label": "Acteur"
-                },
-                "loyalty": {
-                    "hint": "Cela vous montre combien vous pouvez faire confiance au contact, mesuré sur une échelle de 1 à 6. Plus la cote de fidélité est élevée, plus le contact est prêt à faire pour vous",
-                    "label": "Loyauté"
-                },
-                "type": {
-                    "hint": "Le type de contact détermine le type d'accès qu'ils ont pour les équipements, les emplois, les informations, etc.",
-                    "label": "Type"
-                }
-            },
+            "Connection": "Connection",
             "Family": "Famille",
-            "Group": "Groupe",
             "Labels": {
-                "Connection": "Connexion",
-                "ContactType": "Type",
-                "Contacts": "Contacts",
-                "Loyalty": "Loyauté"
+                "Contacts": "Contacts"
             },
-            "LinkedActor": "Acteur",
             "Loyalty": "Loyauté",
-            "LoyaltyConnectionHelp": "Fidélité / Connexion",
-            "LoyaltyConnectionLabel": "L/C",
             "Type": "Type"
         },
-        "InventoryRename": {
-            "Cancel": "Annuler",
-            "NewName": "Nouveau nom",
-            "Submit": "Soumettre",
-            "Title": "Renommer l'inventaire"
-        },
-        "MovementTypes": {
-            "Run": "Courir",
-            "Sprint": "Sprint"
-        },
         "Vehicle": {
-            "Categories": {
-                "Anthro": "Anthrorphique",
-                "Huge": "Énorme",
-                "Large": "Grandes",
-                "Medium": "Moyenne",
-                "Micro": "Micro",
-                "Mini": "Mini",
-                "Missile": "Missile",
-                "Small": "Petite"
-            },
-            "Category": "Catégorie",
             "ChaseEnvironment": "Environnement de poursuite",
             "Clearsight": "Vue dégagée",
             "ControlMode": "Mode Commande",
@@ -410,7 +87,6 @@
             },
             "DamagedVehicle": "Véhicule Endommagé",
             "Driver": "Conducteur",
-            "Drone": "Drone",
             "Environments": {
                 "Handling": "Maniabilité",
                 "Speed": "Vitesse"
@@ -418,7 +94,6 @@
             "IsDrone": "Est un drone",
             "IsOffRoad": "Est hors route",
             "Labels": {
-                "ControlRig": "Control Rig",
                 "VehicleStunImmunity": "Immunité des véhicules aux dégâts étourdissants"
             },
             "Maneuvering": "Manoeuvre",
@@ -440,7 +115,6 @@
                 "OffRoadHandling": "Maniabilité (hors route)",
                 "OffRoadSpeed": "Vitesse (hors route)",
                 "Pilot": "Autopilote",
-                "Seats": "Sièges",
                 "Sensor": "Senseur",
                 "Speed": "Vitesse"
             },
@@ -454,7 +128,7 @@
                 "Walker": "Marcheur",
                 "Water": "Véhicule nautique"
             },
-            "Vehicle": "Véhicule"
+            "Vehicle": "Vehicle"
         },
         "VehicleImport": {
             "MissingPermission": "Vous n'avez pas la permission de créer des acteurs"

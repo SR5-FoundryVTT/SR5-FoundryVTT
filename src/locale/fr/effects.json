@@ -3,14 +3,10 @@
         "ActiveEffect": {
             "AddCondition": "Ajouter une condition",
             "AddTarget": "Ajouter une cible",
-            "ApplyTo": "Appliquer à",
             "ApplyTos": {
-                "TargetedActor": "Acteur ciblé",
-                "TestItem": "Test via objet",
                 "TestTargetingThisActor": "Test ciblant cet acteur"
             },
             "AtLeastOneTarget": "Un effet doit conserver au moins une cible.",
-            "CannotAddTestViaItemToActor": "Impossible d'ajouter un effet actif de type 'Test via Item' à un acteur",
             "Duration": {
                 "Active": "Actif",
                 "ActiveDetail": "La durée est active.",
@@ -66,47 +62,11 @@
                 "appliedByTest": {
                     "label": "Appliqué par un test"
                 },
-                "applyTo": {
-                    "hint": "Appliquer à différentes cibles",
-                    "label": "Appliquer à"
-                },
                 "conditionMode": {
                     "hint": "Inclure : le test doit correspondre à ces valeurs. Exclure : le test ne doit pas correspondre à ces valeurs."
                 },
                 "conditionType": {
                     "hint": "Partie du test filtrée par cette condition."
-                },
-                "onlyForEquipped": {
-                    "hint": "Appliquer uniquement si l'objet est équipé",
-                    "label": "Équipé seulement"
-                },
-                "onlyForItemTest": {
-                    "hint": "Appliquer uniquement au test de l'objet parent",
-                    "label": "Test de l'objet uniquement"
-                },
-                "onlyForWireless": {
-                    "hint": "Appliquer uniquement pour le sans fil actif",
-                    "label": "Sans fil seulement"
-                },
-                "selection_attributes": {
-                    "hint": "Filtrer le test en fonction des attributs utilisés",
-                    "label": "Filtre des attributs"
-                },
-                "selection_categories": {
-                    "hint": "Filtrer le test selon la catégorie d'action utilisée",
-                    "label": "Filtre des catégories d'action"
-                },
-                "selection_limits": {
-                    "hint": "Filtrer le test selon la limite utilisée",
-                    "label": "Filtre de limites"
-                },
-                "selection_skills": {
-                    "hint": "Filtrer le test en fonction des compétences utilisées",
-                    "label": "Filtre de compétences"
-                },
-                "selection_tests": {
-                    "hint": "Filtrer le test selon les tests utilisés",
-                    "label": "Filtre de tests"
                 },
                 "targetName": {
                     "label": "Nom de la cible"
@@ -119,14 +79,6 @@
                 "Skills": "Compétences",
                 "Tests": "Tests"
             },
-            "Labels": {
-                "Effect": "Effet",
-                "Effects": "Effets"
-            },
-            "Modes": {
-                "Modify": "Modifier"
-            },
-            "New": "Nouvel effet",
             "RemoveCondition": "Retirer la condition",
             "RemoveTarget": "Retirer la cible",
             "SelectionModes": {

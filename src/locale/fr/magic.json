@@ -1,33 +1,9 @@
 {
     "SR5": {
         "AdeptPower": {
-            "FIELDS": {
-                "drain": {
-                    "hint": "Si ce pouvoir d'adepte inflige du Drain après utilisation",
-                    "label": "Drain"
-                },
-                "level": {
-                    "hint": "Niveau de cette puissance d'adaptation (le cas échéant)",
-                    "label": "Niveau"
-                },
-                "pp": {
-                    "hint": "Nombre de Points de Pouvoir que coûte ce pouvoir",
-                    "label": "Points de Pouvoir"
-                },
-                "type": {
-                    "hint": "Type de puissance de pointe",
-                    "label": "Type de pouvoir"
-                }
-            },
-            "Labels": {
-                "Echo": "Écho",
-                "Echoes": "Échos",
-                "Metamagic": "Métamagie",
-                "Metamagics": "Métamagies"
-            },
             "Types": {
-                "Active": "Actif",
-                "Passive": "Passif"
+                "Active": "Active",
+                "Passive": "Passive"
             }
         },
         "CritterPower": {
@@ -48,30 +24,8 @@
                 "Always": "Toujours",
                 "Instant": "Instantané",
                 "Permanent": "Permanent",
-                "Special": "Spécial",
+                "Special": "Special",
                 "Sustained": "Maintenu"
-            },
-            "FIELDS": {
-                "duration": {
-                    "hint": "Durée du pouvoir de créature",
-                    "label": "Durée"
-                },
-                "karma": {
-                    "hint": "Coût en Karma du pouvoir de créature",
-                    "label": "Karma"
-                },
-                "optional": {
-                    "hint": "Si le pouvoir de créature est facultatif",
-                    "label": "Facultatif"
-                },
-                "powerType": {
-                    "hint": "Le type de pouvoir de créature",
-                    "label": "Type de pouvoir"
-                },
-                "range": {
-                    "hint": "La portée du pouvoir de créature",
-                    "label": "Portée"
-                }
             },
             "IsOptional": "Optionel",
             "Karma": "Karma",
@@ -101,7 +55,6 @@
                 "Emerged": "Émergé",
                 "Magic": "Magie",
                 "Mundane": "Ordinaire",
-                "PP": "PP",
                 "PowerLevel": "Niveau",
                 "PowerPoints": "PP",
                 "PowerType": "Type",
@@ -111,16 +64,6 @@
         },
         "Ritual": {
             "Anchored": "Ancré",
-            "FIELDS": {
-                "descriptors": {
-                    "hint": "Descripteurs pour le rituel",
-                    "label": "Descripteurs"
-                },
-                "type": {
-                    "hint": "Type de rituel à effectuer",
-                    "label": "Type de rituel"
-                }
-            },
             "MaterialLink": "Lien matériel",
             "Minion": "Serviteur",
             "Spell": "Sort",
@@ -134,7 +77,6 @@
             "CatHealth": "Santé",
             "CatIllusion": "Illusion",
             "CatManipulation": "Manipulation",
-            "CatRitual": "Rituel",
             "Category": "Catégorie",
             "CombatDirect": "Direct",
             "CombatIndirect": "Indirect",
@@ -144,82 +86,6 @@
             "DetectionArea": "Zone",
             "DetectionDirectional": "Directionnel",
             "DetectionPsychic": "Psychique",
-            "FIELDS": {
-                "category": {
-                    "hint": "Catégorie à laquelle appartient l'Espell",
-                    "label": "Catégorie"
-                },
-                "combat": {
-                    "type": {
-                        "hint": "Si le sort est direct ou indirect",
-                        "label": "Type de sort de combat"
-                    }
-                },
-                "detection": {
-                    "extended": {
-                        "hint": "Si l'épell est étendu",
-                        "label": "Étendu"
-                    },
-                    "passive": {
-                        "hint": "Si le sort est passif",
-                        "label": "Passif"
-                    },
-                    "type": {
-                        "hint": "Comment le sort affecte les cibles",
-                        "label": "Type de sort de détection"
-                    }
-                },
-                "drain": {
-                    "hint": "Drain Valeur du sort, ceci est ajouté à la Force du sort pour Résister Drain",
-                    "label": "Valeur de Drain"
-                },
-                "duration": {
-                    "hint": "Durée de l'appel",
-                    "label": "Durée"
-                },
-                "illusion": {
-                    "sense": {
-                        "hint": "Le sens affecté par le sort",
-                        "label": "Sens"
-                    },
-                    "type": {
-                        "hint": "Type de sort d'illusion",
-                        "label": "Type de sort d'illusion"
-                    }
-                },
-                "manipulation": {
-                    "damaging": {
-                        "hint": "Si la faute de frappe fait des dégâts",
-                        "label": "Dommageable"
-                    },
-                    "environmental": {
-                        "hint": "Ces sorts n'ont pas vraiment une cible, et ils n'affectent pas vraiment les cibles directement. Ils affectent juste une zone.",
-                        "label": "Environnemental"
-                    },
-                    "mental": {
-                        "hint": "Si le sort affecte mentalement les cibles",
-                        "label": "Mentale"
-                    },
-                    "physical": {
-                        "hint": "Ces sorts affectent les formes physiques et sont généralement défendus contre",
-                        "label": "Physique"
-                    }
-                },
-                "range": {
-                    "hint": "Portée du sort",
-                    "label": "Portée"
-                },
-                "ritual": {
-                    "type": {
-                        "hint": "Type de rituel à exécuter",
-                        "label": "Type de rituel"
-                    }
-                },
-                "type": {
-                    "hint": "Si le sort est physique ou fondé sur le mana",
-                    "label": "Type de sort"
-                }
-            },
             "IllusionMultiSense": "Sens Multiples",
             "IllusionObvious": "Évident",
             "IllusionRealistic": "Réaliste",
@@ -233,9 +99,6 @@
             "ManipulationEnvironmental": "Environnemental",
             "ManipulationMental": "Mental",
             "ManipulationPhysical": "Physique",
-            "QuickInfo": {
-                "DrainForce": "Drain F{sign}{drain}"
-            },
             "Range": "Portée",
             "RangeLos": "CDV",
             "RangeLosA": "CDV (Z)",
@@ -257,9 +120,7 @@
             "InitiativeFormulaAstralHint": "Choisissez les termes de l'initiative astrale.",
             "InitiativeFormulaMeatspace": "Formule d'initiative terrestre",
             "InitiativeFormulaMeatspaceHint": "Choisissez les termes de l'initiative terrestre.",
-            "MissingSummoner": "Invocateur manquant",
             "Services": "Services",
-            "Summoner": "Invocateur",
             "Type": "Type",
             "Types": {
                 "Abomination": "Abomination",
@@ -268,8 +129,6 @@
                 "Airwave": "Aérien",
                 "Ally": "Alliée",
                 "Anansi": "Anansi",
-                "Anarch": "Anarch",
-                "Arboreal": "Arboréal",
                 "Automotive": "Automobile",
                 "Barren": "Aride",
                 "Beasts": "Bêtes",
@@ -301,7 +160,7 @@
                 "Gremlin": "Gremlin",
                 "Guardian": "Gardien",
                 "Guidance": "Guide",
-                "GumToad": "Gum Toad (Démon)",
+                "GumToad": "Gum Toad (Demon)",
                 "Homunculus": "Homunculus",
                 "Hopper": "Hopper",
                 "HorrorShow": "Horror Show",

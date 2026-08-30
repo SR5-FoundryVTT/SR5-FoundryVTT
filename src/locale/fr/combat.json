@@ -37,8 +37,7 @@
         },
         "DamageApplication": {
             "ApplyDamage": "Application des dégâts",
-            "ApplyUnmodifiedDamage": "Appliquer les dégâts bruts",
-            "Title": "Application des dégâts"
+            "ApplyUnmodifiedDamage": "Appliquer les dégâts bruts"
         }
     }
 }

@@ -10,94 +10,22 @@
             }
         },
         "Errors": {
-            "CantConnectICToGrid": "Les acteurs IC ne peuvent pas être connectés à un réseau de réseau",
-            "CantConnectToPAN": "Le document ne peut pas être ajouté au PAN",
-            "CantConnectToWAN": "Le document ne peut pas être ajouté au WAN",
-            "CantEditAppliedItemEffects": "Vous ne pouvez pas modifier un effet actif qui a été appliqué par un élément.",
-            "CantExecuteTest": "Vous ne pouvez pas effectuer ce test. Vous êtes peut-être un joueur ou ne disposez pas des autorisations nécessaires.",
-            "DefaultInventoryCantBeRemoved": "L'inventaire par défaut ne peut pas être supprimé",
-            "InventoryAlreadyExists": "Un inventaire avec ce nom existe déjà.",
-            "KeyNotModifiableByActiveEffect": "Le mode effet actif 'modify' ne peut affecter que les propriétés mod.",
             "LinkLockedReboot": "Un acteur verrouillé par lien ne peut pas être redémarré",
-            "MarkCouldNotBePlaced": "Erreur interne : vos marques ne peuvent pas être placées.",
-            "MarksCantBePlacedBy": "Seuls les personnages peuvent placer des marques.",
-            "MarksCantBePlacedOn": "Le type d'acteur choisi ne peut recevoir aucune marque.",
-            "MarksCantBePlacedWithoutPersona": "L'acteur choisi n'a pas de persona active.",
-            "MasterDeviceIsMissing": "Le dispositif principal est manquant. Retour aux valeurs locales du dispositif.",
             "MissingItemForOpposedTest": "Le test opposé ne peut pas être lancé puisque l'objet concerné est manquant",
             "MissingSkill": "Le personnage n'a pas la compétence demandée",
-            "NoAvailableActorFound": "Aucun acteur disponible n'a été trouvé pour cette action",
             "SkillWithoutAttribute": "La compétence n'a pas d'attribut assigné",
-            "SourceFieldEmpty": "Le champ source est vide, merci d'entrer un texte valide pour la source",
-            "TestExpectsVehicleOnly": "Cet essai ne peut être effectué qu'avec un acteur de type véhicule",
-            "TooManyActionsWithCategory": "Vous devez avoir exactement une action de catégorie {category} sur votre acteur"
-        },
-        "Messages": {
-            "MarkInvitation": {
-                "AcceptInvite": "Accepter",
-                "AskForInvite": "Demande une invitation à marquer :",
-                "InviteAccepted": "N'hésitez pas à rejoindre {networkName}, {userName}!"
-            }
-        },
-        "MissingResources": {
-            "Ammo": "Pas assez de munitions pour tirer",
-            "Edge": "Plus de Chance à dépenser",
-            "Initiative": "Pas assez de score d'initiative",
-            "SomeAmmo": "Pas assez de munitions pour tirer en mode sélectionné, modificateurs de mode seront réduits.",
-            "SomeAmmoMelee": "Il ne reste plus assez de munitions pour faire une attaque à la mêlée"
-        },
-        "Notifications": {
-            "AddDevicesToPAN": {
-                "Adding": "Ajout",
-                "FinishedAddingItems": "Terminé ajouter des appareils à PAN. Veuillez fermer et rouvrir toutes les feuilles d'article qui ont changé de connexion.",
-                "Starting": "Commencer à ajouter des dispositifs équipés au PAN"
-            },
-            "CantModifyHostContent": "Impossible de modifier les données de l'hôte depuis un acteur IC.",
-            "ConsumedEquippedAmmo": "Les munitions équipées sont utilisées",
-            "DeletingStorageReferences": {
-                "Finished": "Références de compensation terminées",
-                "Item": "Effacement des références à l'élément",
-                "Start": "Suppression des références de réseau et de MARK"
-            },
-            "ResetProgressiveRecoil": "Réinitialiser le recul progressif à zéro balle tirée",
-            "VehicleCannotBeOwnDriver": "Un véhicule ne peut pas être le conducteur d'eux-mêmes (c'est à ça que sert Pilote)"
+            "SourceFieldEmpty": "Le champ source est vide, merci d'entrer un texte valide pour la source"
         },
         "Warnings": {
-            "ActorMissingRequirements": "L'acteur doit correspondre aux compétences réveillées ou à l'exigence émergente",
-            "AlreadyExistingInventory": "Un inventaire avec ce nom existe déjà",
-            "AlreadyJoinedNetwork": "{name} a déjà rejoint ce réseau",
-            "BulkImportPerformanceWarning": "Si vous importez un grand nombre d'articles, Foundry peut fonctionner lentement jusqu'à ce que vous rafraîchissez votre navigateur. Il est recommandé de rafraîchir maintenant.",
             "CantCombineBuyHitsWithEdge": "Acheter des succès ne peut pas être combiné avec Seconde chance.",
-            "CantEditDefaultInventory": "L'inventaire par défaut ne peut pas être renommé",
-            "CantExtendTest": "Ce type de test ne peut pas être prolongé.",
-            "CantExtendTestFurther": "Le test ne peut plus être prolongé : aucune réserve de dés restante ou seuil déjà atteint",
-            "CantRecoverPhysicalWithStunDamage": "Cant récupérer des dommages physiques avec des dommages étourdissants encore présents",
-            "CantReloadAtAllDueToAmmo": "Il ne vous reste plus de munitions !",
-            "CantReloadFullyDueToAmmo": "Vous n'aviez pas assez de munitions pour recharger complètement !",
-            "CantReloadPartialDueToAmmo": "Vous n'aviez pas assez de munitions pour une opération de recharge complexe !",
-            "CantReloadWithoutSpareClip": "Vous n'avez plus de chargeurs de rechange !",
-            "CantSecondChanceAGlitch": "On ne peut pas avoir la deuxième chance de passer ce test.",
-            "CantSecondChanceWithoutNoneHits": "Impossible d'utiliser Seconde chance sur ce test : aucun dé sans succès ne reste.",
-            "CantSpendMultiplePointsOfEdge": "Ne peut pas dépenser plusieurs points de bord sur un seul test ou action",
-            "CompilationNotConcluded": "Compilation incomplète. Attendez que le sprite s'oppose à la compilation pour déterminer le technodrain.",
-            "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Les points d'arête ne peuvent pas être dépensés pour des tests sans acteurs",
-            "HostItemOnlyAcceptIC": "Seuls les acteurs IC peuvent être ajoutés aux hôtes",
-            "InvalidCompilationLevel": "L'attribut Résonance est trop faible pour ce niveau de sprite",
-            "InvalidMarksCount": "Vous avez essayé de placer un nombre étrange de marques",
-            "InvalidSummoningForce": "La valeur de Force choisie ne respecte pas les règles",
             "MissingPdfPager": "Pour que les PDFs soient affichés, le module 'pdfpager' doit être installé et un PDF doit être lié à la fiche",
             "NegativeLimitValue": "Les valeurs des limites doivent être supérieures à 0",
             "NoActorCreatePermission": "Vous n'avez pas la permission de créer des acteurs.",
-            "NoFireModeConfigured": "L'arme à tir n'est pas configurée. Elle utilise un seul tir.",
             "NoSelectableToken": "Le personnage n'a pas de jeton sélectionnable sur la page",
-            "OnlyGMCanDoThis": "Seul un MJ peut faire cela",
-            "RitualInvalidForce": "La force rituelle est invalide ou plus que votre classement de loges.",
             "RitualNotConcluded": "Le Rituel a échoué. En attente du jeu du rituel pour déterminer le drain.",
             "RitualNotEnoughReagents": "Pas assez de réactifs offerts.",
             "SkillAlreadyExists": "La compétence {name} existe déjà sur l'acteur {actorName} ({actorUuid}). Utilisez chaque nom de compétence une seule fois par catégorie.",
             "SkillCantBeDefault": "Cette compétence ne peut pas être lancée sans l'avoir apprise",
-            "SkillSetDefaultTypeOutsideCompendium": "Seuls les ensembles de compétences du compendium de compétences configuré affecteront la création d'acteur",
-            "SummoningNotConcluded": "Attendez que l'esprit s'oppose à la convocation pour déterminer l'écoulement.",
             "TokenSelectionNeeded": "Un ou plusieurs jetons doivent être selectionnés"
         }
     }

@@ -1,98 +1,13 @@
 {
     "SR5": {
-        "ActionCategory": {
-            "Addiction": "Actions de dépendance",
-            "AddictionMental": "Dépendance mentale",
-            "AddictionPhysical": "Dépendance physique",
-            "Attack": "Actions d'attaque",
-            "AttackMatrix": "Attaque matricielle",
-            "AttackMelee": "Attaque de mêlée",
-            "AttackRanged": "Attaque à distance",
-            "AttackThrown": "Attaque lancée",
-            "BruteForce": "Force brute",
-            "Climbing": "Actions d'escalade",
-            "Compiling": "Actions de compilation",
-            "ComplexForm": "Actions de formes complexes",
-            "Defense": "Actions de défense",
-            "DefenseMatrix": "Défense matricielle",
-            "DefenseSuppression": "Défense contre tir de suppression",
-            "Drain": "Actions de Drain",
-            "Fade": "Actions de technodrain",
-            "HackOnTheFly": "Piratage à la volée",
-            "Magic": "Actions magiques",
-            "Matrix": "Actions matricielles",
-            "Recovery": "Actions de récupération",
-            "RecoveryPhysical": "Récupération physique",
-            "RecoveryStun": "Récupération étourdissante",
-            "Resist": "Actions de résistance",
-            "ResistBiofeedback": "Résistance au biofeedback",
-            "ResistDisease": "Résistance aux maladies",
-            "ResistMatrix": "Résistance matricielle",
-            "ResistToxin": "Résistance aux toxines",
-            "Resonance": "Actions de résonance",
-            "Rigging": "Actions de rigging",
-            "Social": "Actions sociales",
-            "SpellCombat": "Sort de combat",
-            "SpellDetection": "Sort de détection",
-            "SpellHealing": "Sort de guérison",
-            "SpellIllusion": "Sort d'illusion",
-            "SpellManipulation": "Sort de manipulation",
-            "SpellRitual": "Rituel",
-            "Summoning": "Actions d'invocation"
-        },
         "ActionType": {
             "Complex": "Complexe",
             "Free": "Gratuite",
-            "Interrupt": "Interruption",
+            "Interrupt": "Interrupt",
             "Label": "Type",
             "None": "Aucune",
             "Simple": "Simple",
             "Varies": "Variée"
-        },
-        "CallInAction": {
-            "ActorType": "Type d'acteur",
-            "Compilation": {
-                "DropSprite": "Déposer le sprite",
-                "FixedSprite": "Sprite préparé",
-                "Label": "Compilation",
-                "SpriteType": "Type de sprite"
-            },
-            "Compile": "Compiler",
-            "CreateCompilation": "Créer une action de compilation",
-            "CreateSummoning": "Créer une action d'appel",
-            "FIELDS": {
-                "actor_type": {
-                    "hint": "Type d'acteur de la présente action citation",
-                    "label": "Type"
-                },
-                "spirit": {
-                    "force": {
-                        "hint": "Force de l'esprit à invoquer. Désactivé si un acteur esprit est défini",
-                        "label": "Force"
-                    },
-                    "type": {
-                        "hint": "Type d'esprit à invoquer. Désactivé si un acteur esprit est défini",
-                        "label": "Type d'esprit"
-                    }
-                },
-                "sprite": {
-                    "level": {
-                        "hint": "Niveau du sprite à compiler. Désactivé si un acteur sprite est défini",
-                        "label": "Niveau"
-                    },
-                    "type": {
-                        "hint": "Type de sprite à compiler. Désactivé si un acteur Sprite est défini",
-                        "label": "Type de sprite"
-                    }
-                }
-            },
-            "Summon": "Invoquer",
-            "Summoning": {
-                "DropSpirit": "Déposer l'esprit",
-                "FixedSpirit": "Esprit préparé",
-                "Label": "Invocation",
-                "SpiritType": "Type d'esprit"
-            }
         },
         "ExtendedTestManager": {
             "Actions": {
@@ -223,17 +138,12 @@
             "AstralDice": "Dés init. Astrale",
             "AstralInit": "Init. Astral",
             "AstralLimit": "Limite Astrale",
-            "BackgroundCount": "Bruit de fond",
             "Composure": "Sang-Froid",
-            "ControlRigRating": "Indice du Control Rig",
             "Defense": "Défense",
             "DefenseBlock": "Défense (Bloquer)",
             "DefenseDodge": "Défense (Esquiver)",
-            "DefenseMelee": "Défense (mêlée)",
             "DefenseMulti": "Défense (Multi)",
             "DefenseParry": "Défense (Parrer)",
-            "DefenseRanged": "Défense (distance)",
-            "DifferentGrid": "Grille différente",
             "Drain": "Drain",
             "Environmental": "Environnemental",
             "EnvironmentalLight": "Environnemental (Lumière)",
@@ -243,32 +153,24 @@
             "Essence": "Essence",
             "Fade": "Technodrain",
             "Global": "Global",
-            "JudgeIntentions": "J. Intentions",
+            "JudgeIntentions": "J.Intentions",
             "LiftCarry": "Soulever&Porter",
-            "MarkDamage": "Dégâts par marque",
-            "Marks": "Marques",
             "MatrixDice": "Dés init. Matrice",
             "MatrixInit": "Init. Matrice",
-            "MatrixTrack": "Moniteur matriciel",
             "MeatSpaceDice": "Dés init. terrestre",
             "MeatSpaceInit": "Init. terrestre",
             "Memory": "Mémoire",
             "MentalLimit": "Limite Mentale",
-            "Noise": "Bruit",
             "PainTolerancePhysical": "Résistance à la douleur",
             "PainToleranceStun": "Résistance à l'étourdissement",
             "PhysicalLimit": "Limite Physique",
             "PhysicalOverflowTrack": "Moniteur de surplus physique",
             "PhysicalTrack": "Moniteur Physique",
-            "PublicGrid": "Grille publique",
-            "Reach": "Allonge",
             "Recoil": "Recul",
             "Run": "Courir",
             "Soak": "Encaisser",
             "SocialLimit": "Limite Sociale",
             "StunTrack": "Moniteur Étourdissant",
-            "ThreeMarks": "Trois marques",
-            "TwoMarks": "Deux marques",
             "Walk": "Marcher",
             "WoundTolerance": "Tolérance aux blessures",
             "Wounds": "Blessures"
@@ -290,11 +192,6 @@
             "Binding": "Lien d'esprits",
             "Biotechnology": "Biotechnologie",
             "Blades": "Armes tranchantes",
-            "Category": {
-                "Active": "Actif",
-                "Knowledge": "Connaissances",
-                "Language": "Langue"
-            },
             "Chemistry": "Chimie",
             "Clubs": "Armes contondantes",
             "Compiling": "Compilation",
@@ -313,104 +210,7 @@
             "Etiquette": "Étiquette",
             "ExoticMeleeWeapon": "Armes de mélée exotiques",
             "ExoticRangedWeapon": "Armes à distance exotiques",
-            "FIELDS": {
-                "group": {
-                    "hint": "Configuration pour un groupe de compétences",
-                    "label": "Groupe de compétences",
-                    "rating": {
-                        "hint": "Indice de ce groupe de compétences",
-                        "label": "Indice"
-                    },
-                    "skills": {
-                        "hint": "Compétences qui font partie de ce groupe",
-                        "label": "Compétences"
-                    }
-                },
-                "set": {
-                    "default": {
-                        "hint": "Ajouter cette compétence aux acteurs nouvellement créés",
-                        "label": "Utilisation sur les nouveaux acteurs"
-                    },
-                    "groups": {
-                        "hint": "Groupes de compétences faisant partie de cet ensemble",
-                        "label": "Groupes de compétences",
-                        "name": {
-                            "hint": "Nom du groupe de compétences",
-                            "label": "Nom"
-                        },
-                        "rating": {
-                            "hint": "Indice de ce groupe de compétences",
-                            "label": "Indice"
-                        }
-                    },
-                    "hint": "Configuration pour un ensemble de compétences",
-                    "label": "Ensemble de compétences",
-                    "skills": {
-                        "hint": "Compétences qui font partie de cet ensemble",
-                        "label": "Compétences",
-                        "name": {
-                            "hint": "Nom de la compétence",
-                            "label": "Nom"
-                        },
-                        "rating": {
-                            "hint": "Indice de cette compétence",
-                            "label": "Indice"
-                        },
-                        "specializations": {
-                            "hint": "Spécialisations accordées à cette compétence lors de l'application de l'ensemble",
-                            "label": "Spécialisation"
-                        }
-                    }
-                },
-                "skill": {
-                    "attribute": {
-                        "hint": "Attribut utilisé par cette compétence",
-                        "label": "Attribut"
-                    },
-                    "category": {
-                        "hint": "Catégorie de cette compétence",
-                        "label": "Catégorie"
-                    },
-                    "defaulting": {
-                        "hint": "Si cette compétence peut être par défaut",
-                        "label": "Par défaut"
-                    },
-                    "knowledgeType": {
-                        "hint": "Type de compétence de connaissance",
-                        "label": "Type de connaissances"
-                    },
-                    "language": {
-                        "isNative": {
-                            "hint": "Marque cette langue comme native",
-                            "label": "Langue maternelle"
-                        }
-                    },
-                    "limit": {
-                        "attribute": {
-                            "hint": "Limiter à l'utilisation pour cette action de compétence. Laisser vide pour utiliser la limite d'attribut par défaut.",
-                            "label": "Limite"
-                        }
-                    },
-                    "rating": {
-                        "hint": "Indice de cette compétence",
-                        "label": "Indice"
-                    },
-                    "requirement": {
-                        "hint": "Ce que l'acteur doit être pour que cette compétence soit disponible",
-                        "label": "Prérequis"
-                    },
-                    "specializations": {
-                        "hint": "Spécialisation pour cette compétence, le cas échéant",
-                        "label": "Spécialisation"
-                    }
-                },
-                "type": {
-                    "hint": "Définit le type de configurations de compétences disponibles",
-                    "label": "Type"
-                }
-            },
             "FirstAid": "Premiers soins",
-            "Flight": "Vol",
             "Forgery": "Falsification",
             "FreeFall": "Chute libre",
             "Gunnery": "Armes de véhicules",
@@ -422,23 +222,16 @@
             "IndustrialMechanic": "Mécanique industrielle",
             "Instruction": "Enseignement",
             "Intimidation": "Intimidation",
-            "KnowledgeType": {
-                "Academic": "Connaissances académiques",
-                "Interests": "Hobbies",
-                "Professional": "Connaissances pro.",
-                "Street": "Rue"
-            },
             "KnowledgeTypes": {
                 "Academic": "Connaissances académiques",
                 "Interests": "Hobbies",
                 "Professional": "Connaissances pro.",
                 "Street": "Connaissances de la rue"
             },
-            "Leadership": "Commandement",
+            "Leadership": "Leadership",
             "Locksmith": "Serrurerie",
             "Longarms": "Fusils",
             "Medicine": "Médecine",
-            "Native": "Langue maternelle",
             "NauticalMechanic": "Mécanique nautique",
             "Navigation": "Orientation",
             "Negotiation": "Négotiation",
@@ -455,12 +248,7 @@
             "Registering": "Inscription",
             "RitualSpellcasting": "Magie rituelle",
             "Running": "Course",
-            "Set": {
-                "DifferencesLoggedInConsole": "Ouvrez votre console de navigateur pour afficher les différences",
-                "LogActorDifferences": "Journaliser les différences de l'acteur"
-            },
             "Skill": "Compétence",
-            "SkillGroup": "Groupe de compétences",
             "Skills": "Compétences",
             "Sneaking": "Discrétion",
             "Software": "Logiciels",
@@ -468,61 +256,11 @@
             "Summoning": "Invocation",
             "Survival": "Survie",
             "Swimming": "Natation",
-            "Teamwork": {
-                "Glitched": "Complication",
-                "ParticipantActor": "Choisir un acteur",
-                "RollIt": "Lancer les dés",
-                "TakePart": "Participer"
-            },
             "ThrowingWeapons": "Armes de jet",
             "Tracking": "Pistage",
-            "Types": {
-                "Group": "Groupe de compétences",
-                "Set": "Ensemble de compétences",
-                "Skill": "Compétence"
-            },
-            "UnarmedCombat": "Combat à mains nues",
-            "abbr": {
-                "Native": "N"
-            }
-        },
-        "TestResults": {
-            "AttackBlockedByHardenedArmor": "L'attaque frappe mais est bloquée par un armement durci",
-            "AttackBlockedByVehicleArmor": "L'attaque frappe mais est bloquée par l'armure de véhicule",
-            "AttackDodged": "Attaque esquivée",
-            "AttackDoesNoPhysicalDamageToVehicle": "Attaque frappe mais ne porte pas de dommages physiques au véhicule",
-            "AttackHits": "Succès de l'attaque",
-            "AttackResisted": "Résisté à l'attaque",
-            "BruteForceFailure": "Échec de la Force brute !",
-            "BruteForceSuccess": "Force brute réussie !",
-            "CheckOverwatchScoreFailure": "Échec de la vérification de l'indice de surveillance !",
-            "CheckOverwatchScoreSuccess": "Vérification de l'indice de surveillance réussie !",
-            "Failure": "Échec !",
-            "HackOnTheFlyFailure": "Échec du piratage à la volée !",
-            "HackOnTheFlySuccess": "Piratage à la volée réussi !",
-            "ResistedAllDamage": "Pas de dégâts !",
-            "ResistedSomeDamage": "Dégâts subis !",
-            "Results": "Résultats",
-            "RitualFailure": "Le rituel était trop puissant pour vous.",
-            "RitualSuccess": "Le rituel est scellé",
-            "SoakBlockedByHardenedArmor": "Bloqué par une armure durcie",
-            "SpiritSummonFailure": "L'esprit s'est enfui !",
-            "SpiritSummonSuccess": "Esprit appelé !",
-            "SpriteCompilationFailure": "Sprite s'est enfui !",
-            "SpriteCompilationSuccess": "Sprite compilé !",
-            "Success": "Succès !"
+            "UnarmedCombat": "Combat à mains nues"
         },
         "Tests": {
-            "AttributeOnlyTest": "Test d'attribut seul",
-            "BiofeedbackResistTest": "Résistance au biofeedback",
-            "BruteForceTest": "Force brute",
-            "CheckOverwatchScoreTest": "Vérifier l'Indice de Surveillance",
-            "CombatSpellDefenseTest": "Défense contre un sort de combat",
-            "CompileSpriteTest": "Compiler le sprite",
-            "ComplexFormTest": "Tissage de forme complexe",
-            "DrainTest": "Test de Drain",
-            "DroneInfiltrationTest": "Test d'infiltration de drone",
-            "DronePerceptionTest": "Test de perception de drone",
             "Duration": {
                 "Label": "Durée",
                 "Types": {
@@ -531,44 +269,29 @@
                     "Sustained": "Maintenu"
                 }
             },
-            "ExtendedTest": "Test étendu",
-            "FadeTest": "Test de Technodrain",
-            "HackOnTheFlyTest": "Piratage à la volée",
             "Labels": {
                 "ActiveDefense": "Défense active",
-                "Attacker": "Attaquant",
                 "AttackerHits": "Succès de l'attaquant",
-                "AttackerNetHits": "Succès nets de l'attaquant",
-                "BiofeedbackDamage": "Dégâts de biofeedback",
                 "BuyHits": "Acheter des succès",
                 "CanDefault": "Par défaut",
-                "Defender": "Défenseur",
-                "DefenderNetHits": "Succès nets du défenseur",
                 "DefenseTest": "Test de défense",
                 "DicePool": "Réserve de dés",
                 "DicePoolModifier": "Modif. réserve de dés",
                 "DontApplyWounds": "Ne pas appliquer les blessures",
                 "EnforcedMaximum": "Maximum imposé",
                 "EnforcedMinimum": "Minimum imposé",
-                "ExtendedHits": "Succès étendus",
                 "ExtendedTest": "Test étendu",
-                "FadeAttribute": "Attribut de technodrain",
                 "FadeValue": "Valeur de technodrain",
                 "FullDefense": "Défense totale",
-                "FullMatrixDefense": "Défense matricielle totale",
                 "Hits": "Succès",
                 "IncomingDamage": "Dégâts en approche",
-                "IncomingDrain": "Drain entrant",
-                "IncomingFade": "Technodrain entrant",
                 "MeleeWeaponAttack": "Attaque arme de mélée",
                 "NetHits": "Succès excédentaires",
                 "OpposedType": "Type",
-                "OpposingHits": "Succès adverses",
-                "OpposingNetHits": "Succès nets adverses",
                 "OriginalDicePool": "Réserve de dés originale",
                 "RangedWeaponAttack": "Attaque arme à distance",
                 "ResultOverride": "Substitution du résultat",
-                "ResultOverrideGlitches": "Complications",
+                "ResultOverrideGlitches": "Glitches",
                 "ResultOverrideHits": "Succès",
                 "RollArmor": "Armure",
                 "RollComposure": "Sang-Froid",
@@ -576,54 +299,27 @@
                 "RollDefense": "Défense",
                 "RollDrain": "Drain",
                 "RollFade": "Technodrain",
-                "RollJudgeIntentions": "J. Intentions",
+                "RollJudgeIntentions": "J.Intentions",
                 "RollLiftCarry": "Soulever&Porter",
                 "RollMemory": "Mémoire",
-                "RollMode": "Mode de lancer",
+                "RollMode": "Mode lancer de dés",
                 "RollOneDie": "Tu ne peux pas lancer moins d'un dé, chummer",
                 "RollSoak": "Résistance aux dégâts",
                 "SecondAttribute": "Second Attribut",
                 "SecondChance": "Seconde Chance",
-                "Soak": "Encaisser",
                 "SoakTest": "Test de résistance aux dégâts",
                 "Successes": "Succès",
                 "Suppressing": "Suppression",
-                "TargetingNeedsActorWithToken": "Le personnage actuel a besoin d'être lié à un token pour que le ciblage fonctionne",
-                "UseEdgeForInitiativeRoll": "Utiliser la règle du Blitz (Chance) pour l'initiative"
+                "TargetingNeedsActorWithToken": "Le personnage actuel a besoin d'être lié à un token pour que le ciblage fonctionne"
             },
             "Limit": {
                 "Label": "Limite",
                 "Types": {
-                    "Astral": "Astral",
                     "Mental": "Mentale",
                     "Physical": "Physique",
                     "Social": "Sociale"
                 }
             },
-            "MatrixDefenseTest": "Défense matricielle",
-            "MatrixResistTest": "Résistance aux dégâts matriciels",
-            "MatrixTest": "Test matriciel",
-            "MeleeAttackTest": "Attaque arme de mélée",
-            "NaturalRecoveryPhysicalTest": "Récupération naturelle Physique",
-            "NaturalRecoveryStunTest": "Stun de récupération naturelle",
-            "OpposedBruteForceTest": "Opposez la force brute",
-            "OpposedCheckOverwatchScoreTest": "Test opposé de l'indice de surveillance",
-            "OpposedCompileSpriteTest": "Compilation des oppositions",
-            "OpposedHackOnTheFlyTest": "Test opposé de piratage à la volée",
-            "OpposedMatrixTest": "Test matriciel opposé",
-            "OpposedRitualTest": "Scellez le rituel",
-            "OpposedSummonSpiritTest": "Invocation de la contestation",
-            "OpposedTest": "Test opposé",
-            "PhysicalDefenseTest": "Défense physique",
-            "PhysicalResistTest": "Résiste aux dommages physiques",
-            "PilotVehicleTest": "Test de pilotage de véhicule",
-            "RangedAttackTest": "Attaque d'armes à feu à portée",
-            "RitualSpellcastingTest": "Magie rituelle",
-            "SkillTest": "Test de compétence",
-            "SpellCastingTest": "Lancement de sorts",
-            "SuccessTest": "Test de réussite",
-            "SummonSpiritTest": "Invoquer l'Esprit",
-            "SuppressionDefenseTest": "Suppression de la défense",
             "Target": {
                 "Label": "Cible",
                 "Types": {
@@ -634,8 +330,7 @@
                     "Self": "Soi-même",
                     "Sprite": "Sprite"
                 }
-            },
-            "ThrownAttackTest": "Attaque d'armes lancées"
+            }
         }
     }
 }

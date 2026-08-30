@@ -1,387 +1,57 @@
 {
     "SR5": {
-        "Content": {
-            "Actions": {
-                "Armor": "Armure",
-                "BiofeedbackResist": "Résistance au biofeedback",
-                "BruteForce": "Force brute",
-                "ChangeConfiguration": "Changer la configuration",
-                "ChangeIcon": "Changer d'icône",
-                "CheckOverwatchScore": "Vérifier l'Indice de Surveillance",
-                "Composure": "Sang-Froid",
-                "ControlDevice": "Contrôler un appareil",
-                "CrackFile": "Cracker un fichier",
-                "CrashProgram": "Planter un programme",
-                "DataSpike": "Pointe de données",
-                "DisarmDataBomb": "Désarmer une bombe de données",
-                "Drain": "Drain",
-                "DroneInfiltration": "Infiltration de drone",
-                "DronePerception": "Perception de drone",
-                "DronePilotVehicle": "Piloter un véhicule (drone)",
-                "EditFile": "Modifier le fichier",
-                "EnterExitHost": "Entrer/Sortir d'un hôte",
-                "EraseMark": "Effacer une marque",
-                "EraseMatrixSignature": "Effacer une signature matricielle",
-                "Fade": "Technodrain",
-                "FormatDevice": "Formater un appareil",
-                "FullMatrixDefense": "Défense matricielle totale",
-                "GridHop": "Saut de grille",
-                "HackOnTheFly": "Piratage à la volée",
-                "Hide": "Masquer",
-                "InviteMark": "Inviter une marque",
-                "JackOut": "Se déconnecter",
-                "JamSignals": "Brouiller les signaux",
-                "JudgeIntentions": "Jauger les intentions",
-                "JumpIntoRiggedDevice": "Sauter dans un appareil riggué",
-                "LiftCarry": "Soulever/Porter",
-                "MatrixDamageResist": "Résistance aux dégâts matriciels",
-                "MatrixDefenseTest": "Test de défense matricielle",
-                "MatrixPerception": "Perception matricielle",
-                "MatrixSearch": "Recherche matricielle",
-                "Memory": "Mémoire",
-                "NaturalRecoveryPhysical": "Récupération naturelle Physique",
-                "NaturalRecoveryStun": "Stun de récupération naturelle",
-                "PhysicalDamageResist": "Résiste aux dommages physiques",
-                "PhysicalDefense": "Défense physique",
-                "RebootDevice": "Redémarrer le périphérique",
-                "SendMessage": "Envoyer un message",
-                "SetDataBomb": "Poser une bombe de données",
-                "Snoop": "Espionner",
-                "SpoofCommand": "Commande de la zone",
-                "SwitchInterfaceMode": "Mode d'interface de commutation",
-                "TraceIcon": "Icône de trace"
-            }
-        },
-        "ContextOptions": {
-            "AddAttributeEffect": "Ajouter un effet pour l'attribut",
-            "AddSkillEffect": "Ajouter un effet pour la compétence",
-            "DeleteEffect": "Effacer l'effet",
-            "DeleteItem": "Supprimer l' élément",
-            "DeleteSkill": "Supprimer les compétences",
-            "EditEffect": "Effet d'édition",
-            "EditItem": "Modifier l'élément",
-            "EditSkill": "Editer comp.",
-            "MoveItem": "Déplacer l'élément",
-            "Source": "Référence ouverte",
-            "View": "Voir",
-            "ViewItem": "Afficher l'élément"
-        },
-        "Keybindings": {
-            "AddRemoveManyQty": {
-                "Hint": "Ajouter/supprimer 20 Quantité à la fois",
-                "Label": "Ajouter/supprimer 20"
-            },
-            "AddRemoveSomeQty": {
-                "Hint": "Ajouter/supprimer 5 Quantité à la fois",
-                "Label": "Ajouter/supprimer 5"
-            },
-            "HideTestDialog": {
-                "Hint": "Sauter la boîte de dialogue lors des essais en roulis depuis n'importe quel bouton",
-                "Label": "Masquer la boîte de dialogue d'essai"
-            },
-            "OverwatchScoreTracker": {
-                "Hint": "Ouvrir le tracker de score de surveillance",
-                "Label": "Suivi du Score de Surveillace"
-            },
-            "ShowItemCard": {
-                "Hint": "Afficher uniquement la carte de l'objet dans le chat au lieu de lancer le test",
-                "Label": "Afficher la carte d'élément"
-            },
-            "ShowSituationModifiers": {
-                "Hint": "Modificateurs de situation ouverts pour la sélection",
-                "Label": "Modificateurs de situation"
-            },
-            "SuccessTestPrompt": {
-                "Hint": "Demander de faire un test de réussite standard",
-                "Label": "Test de réussite rapide"
-            }
-        },
         "Labels": {
-            "Action": {
-                "ActiveTest": "Test",
-                "Category": "Catégorie",
-                "DamageResistanceTest": "Test de résistance aux dégâts",
-                "ForceReboot": "Redémarrage de la force",
-                "MatrixAction": "Action matricielle",
-                "Modifier": "Modificateur",
-                "Modifiers": "Modificateurs",
-                "OpposedTest": "Test opposé",
-                "SpiritType": "Type d'esprit",
-                "SpriteType": "Type de sprite"
-            },
-            "Actions": {
-                "BruteForce": "Force brute",
-                "HackOnTheFly": "Piratage à la volée"
-            },
             "ActorSheet": {
-                "AddNetwork": "Réseau de connexion directe",
-                "AddOneMark": "Ajouter une marque",
-                "ColdSim": "Sim froid",
-                "Compilations": "Compilations",
                 "ConnectToDriver": "Se connecter au pilote",
-                "ConnectedTo": "Connecté à",
-                "CreateInventory": "Créer un lieu d'inventaire",
                 "CritterPowers": "Pouvoirs",
                 "DeviceRating": "Indice d'appareil",
-                "DeviceSetup": "Configuration du périphérique",
                 "DisabledOptionCritterPowers": "Pouvoirs Optionels - Désactivés",
                 "DisabledOptionSpritePowers": "Pouvoirs Optionels - Désactivés",
-                "DisplayingPersona": "Affichage de la persona",
                 "EnabledOptionCritterPowers": "Pouvoirs Optionels - Activés",
                 "EnabledOptionSpritePowers": "Pouvoirs Optionels - Activés",
-                "Hacking": "Piratage",
-                "ICConfiguration": "Configuration IC",
-                "Icons": "Icônes",
-                "ManageNetwork": "Gérer le réseau",
-                "MarkNetwork": "Marquer le réseau",
-                "MarkedIcons": "Icônes marquées",
-                "Matrix": "Matrice",
-                "MatrixActions": "Actions matricielles",
-                "Network": "Réseau",
-                "Networks": "Réseaux",
-                "NoNetwork": "Pas de réseau",
-                "NotorietyShort": "N",
-                "Offline": "Hors ligne",
-                "OpenSourceDocument": "Source ouverte",
-                "OwnedIcons": "Icônes détenues",
-                "Persona": "Personne",
-                "PersonalInventory": "Sur la personne",
-                "PhysicalTrack": "Voie physique",
-                "PublicAwarenessShort": "PA",
-                "RemoveOneMark": "Supprimer une marque",
-                "ResetActorForNewRun": "Nouvelle réinitialisation de l'exécution",
                 "Rituals": "Rituels",
                 "RollDroneInfiltration": "Infiltration du drone",
                 "RollDronePerception": "Perception du drone",
                 "RollPilotVehicleTest": "Pilotage du véhicule",
                 "SetMonitor": "Moniteur doit être installé manuellement",
-                "SetupPAN": "Ajouter des dispositifs au PAN",
                 "Spells": "Sorts",
                 "SpiritConfiguration": "Configuration d'esprit",
                 "SpriteConfiguration": "Configuration de sprite",
                 "SpritePowers": "Pouvoirs",
-                "StreetCredShort": "SC",
-                "StunTrack": "Piste étouffée",
-                "TestKBoardModifiers": "{skip} : boîte de dialogue sauter. {descr} : affiche seulement la description.",
                 "VehicleConfiguration": "Configuration véhicule"
             },
-            "Documents": {
-                "Actor": "Acteur",
-                "Item": "Point",
-                "Scene": "Scène",
-                "Token": "Jeton"
-            },
-            "Inventory": {
-                "All": "Tous",
-                "Carried": "Porté",
-                "OpenInventory": "Inventaire"
-            },
             "Item": {
-                "AvailabilityAdjustment": "Ajuster la disponibilité selon l'indice",
-                "CostAdjustment": "Ajuster le coût selon l'indice",
-                "EssenceAdjustment": "Ajuster l'essence selon l'indice",
                 "Network": "Réseau"
             },
-            "MarkPlacement": {
-                "PlaceOnDevice": "Placer sur le dispositif",
-                "PlaceOnMainIcon": "Lieu sur persona/hôte"
-            },
-            "Matrix": {
-                "AttackShort": "A",
-                "DataProcessingShort": "D",
-                "FirewallShort": "F",
-                "Global": "Global",
-                "Local": "Local",
-                "Public": "Public",
-                "SleazeShort": "S",
-                "TargetDevice": "Appareil cible",
-                "TargetMainIcon": "Cible Icône principale"
-            },
-            "Message": {
-                "ClickToSelect": "Cliquez pour sélectionner sur la scène",
-                "FailedAttackAction": "Échec d'une action d'attaque Matrix",
-                "OverwatchConvergence": "Convergence de surveillance",
-                "TargetedIcon": "Icône ciblée",
-                "TestEffects": "Effets appliqués"
-            },
             "Sheet": {
-                "AddOne": "Ajouter un",
-                "ClearNetwork": "Effacer le réseau de tous les appareils",
-                "ItemEffects": "Effets sur l'élément",
-                "MissingNetworkDevices": "Faites glisser et déposez un périphérique réseau pour l'ajouter",
-                "NetworkDevices": "Dispositifs en réseau",
-                "NotVisible": "Non visible",
-                "PAN": "PAN",
-                "RebootDevice": "Redémarrer",
-                "RemoveImprovisedDevices": "Supprimer les appareils improvisés",
-                "SubtractOne": "Sous-traiter un",
-                "Type": "Type",
-                "Visible": "Visibilité",
-                "WAN": "Pour"
-            },
-            "Sidebar": {
-                "Changelog": "Changer de journal",
-                "Issues": "Enjeux",
-                "Wiki": "Wiki"
+                "RemoveImprovisedDevices": "Supprimer les appareils improvisés"
             }
         },
         "Tabs": {
-            "Actor": {
-                "Actions": "Actions",
-                "Ammo": "Munition",
-                "Bio": "Bio",
-                "Character": "Personnage",
-                "Compilations": "Compilations",
-                "ComplexForms": "Formes complexes",
-                "CritterPowers": "Pouvoirs",
-                "Details": "Détails",
-                "Effects": "Effets",
-                "IC": "Autres",
-                "Inventory": "Inventaire",
-                "Licenses": "Permis",
-                "Magic": "Magie",
-                "MarkedIcons": "Marqué",
-                "Matrix": "Matrice",
-                "MatrixActions": "Actions",
-                "Mods": "Modes",
-                "Network": "Réseau",
-                "NetworkIcons": "Icônes",
-                "Networks": "Réseaux",
-                "OwnedIcons": "Propriété",
-                "Social": "Sociale",
-                "Spirit": "Esprit",
-                "Sprite": "Sprite",
-                "SpritePowers": "Pouvoirs",
-                "Vehicle": "Vehicule"
-            },
             "Item": {
-                "Description": "Désignation des marchandises",
-                "Details": "Détails",
-                "Effects": "Effets",
-                "Mods": "Mods",
-                "Network": "Réseau",
-                "SinLicenses": "Permis",
-                "SinNetworks": "Réseaux",
-                "WeaponAmmo": "Munition"
+                "Mods": "Mods"
             }
         },
         "Tooltips": {
             "Actor": {
-                "AddOneService": "Ajouter un service",
-                "Blitz": "Utilisez un point d'Edge pour rouler le nombre maximum de dés (5) pour l'initiative",
-                "ConnectNetwork": "Saisissez cet hôte/réseau",
-                "Critter": "Permettre l'utilisation des pouvoirs de l'écaille",
-                "DefaultCategoryVisibility": "Afficher les catégories d'articles même si aucun élément n'a été ajouté à eux",
-                "Description": "Description de cet acteur",
-                "DisconnectNetwork": "Laissez cet hôte/réseau",
-                "MarkTarget": "Placer des marques supplémentaires sur cette cible",
-                "MatrixConnectionToggle": "Changer le statut de connexion Matrice : Réalité augmentée, Sim froid ou Sim chaud",
-                "MatrixRunningSilentToggle": "Basculez votre appareil matriciel entre mode silencieux et affichage de votre persona",
-                "Metatype": "Comme NPC le métatype appliquera aussi des modificateurs rapides d'attribut",
-                "MiscConfig": "Paramètres et modifications divers",
-                "MissingSummoner": "Invocation manquante",
-                "MissingTechnomancer": "Technomancien manquant",
-                "NPC": "Marquer l'acteur comme NPC pour obtenir des fonctionnalités supplémentaires",
-                "NetworksTab": "Grilles et hôtes",
-                "NoCombatant": "Le rouleau d'initiative (devrait être en rencontre)",
-                "PickControlledTokenAsDriver": "Choisissez l'acteur de jetons actuellement contrôlé comme le conducteur",
-                "PickControlledTokenAsSummoner": "Choisissez l'acteur de jetons actuellement contrôlé comme l'invocateur",
-                "PickControlledTokenAsTechnomancer": "Choisir l'acteur du token actuellement contrôlé comme compilateur (technomancien)",
-                "PlaceMark": "Mesures à prendre pour marquer des cibles déjà marquées",
-                "RebootPersonaAndClearAllMarks": "Redémarrez votre Persona et effacez toutes les Marques que vous avez placées",
                 "RemoveAllNetworks": "Supprimer tous les réseaux",
-                "RemoveFavorite": "Supprimer ceci de la barre de vos favoris",
-                "RemoveNetwork": "Supprimer le réseau",
-                "RemoveOneService": "Supprimer un service",
-                "RemoveSkillSet": "Supprimer l'ensemble des compétences actuelles ainsi que tous les groupes de compétences et de compétences qui en proviennent",
-                "ResetActorForNewRun": "Réinitialiser les dommages, les bords, etc. pour une nouvelle course",
-                "RollInitiative": "Initiative de roulement",
-                "SetupPAN": "Ajouter tous les appareils sans fil équipés à la Persona de ce personnage"
-            },
-            "CallInAction": {
-                "ActorType": "Type d'acteur à appeler",
-                "LinkActor": "Glissez-déposez un acteur à appeler"
-            },
-            "CompilationTest": {
-                "Level": "Niveau du sprite compilé",
-                "PreparedSprite": "Utilisez un acteur sprite préparé au lieu de créer un générique",
-                "SpriteType": "Type de sprite compilé"
-            },
-            "Contact": {
-                "LinkActor": "Faites glisser et installez un acteur pour lier ce contact"
+                "RemoveNetwork": "Supprimer le réseau"
             },
             "Effect": {
-                "AlterApplyToWithChanges": "Supprimer les changements avant de modifier l'effet.",
-                "ApplyTo": "Les changements de cet effet s'appliqueront uniquement à cet objectif",
                 "ApplyValueEditor": "Appliquer la modification de valeur",
                 "CancelValueEditor": "Annuler la modification de valeur",
-                "CreateEffect": "Effet de création",
-                "DeleteEffect": "Effacer l'effet",
-                "DocumentEffects": "Effets directs sur le présent document",
-                "EditEffect": "Effet d'édition",
-                "HelpLinkEnglishOnly": "Aide (Lien externe, anglais seulement)",
-                "ItemEffects": "Effets recueillis à partir des éléments figurant dans le présent document",
-                "OnlyAllFilteredUsed": "Cet effet ne s'appliquera qu'aux tests correspondant à toutes les sélections",
-                "OnlyFilteredUsed": "Cet effet ne s'appliquera qu'aux tests correspondant à au moins une sélection",
-                "OnlyForItemTest": "Affecte uniquement le test de l'objet parent",
-                "OnlyForWireless": "Cet effet s'appliquera uniquement aux articles qui ont activé le sans fil",
-                "OpenValueEditor": "Ouvrir l'éditeur de valeur",
-                "PriorityFieldDisabled": "La priorité personnalisée n'est pas prise en charge pour le moment"
-            },
-            "Item": {
-                "ActionCategories": "Sélectionnez les catégories d'action à utiliser au lieu des catégories par défaut du test. Les effets actifs peuvent cibler ces catégories pour modifier les valeurs du test",
-                "ActionModifier": "Sélectionnez les modificateurs de réserve à utiliser au lieu des modificateurs par défaut du test",
-                "ActionRollMode": "Mode de roulis par défaut lors de la coulée de cette action.",
-                "AddQuantity": "Ajouter 1 unité. {qtySome} : Ajouter 5 unités. {qtyMany} : Ajouter 20 unités.",
-                "AmmoReplaceDamage": "Régler pour remplacer les dommages d'armes au lieu de les modifier",
-                "AvailabilityAdjustment": "Ajuster la disponibilité réelle selon l'indice de l'objet",
-                "CostAdjustment": "Ajuster le coût réel selon l'indice de l'objet",
-                "DisabledForPreparedActor": "Désactivé parce que l'acteur préparé ne peut pas être édité par votre utilisateur actuel",
-                "EssenceAdjustment": "Ajuster le coût réel en essence selon l'indice de l'objet",
-                "RemoveQuantity": "Retirer 1 unité. {qtySome} : Retirer 5 unités. {qtyMany} : Retirer 20 unités.",
-                "ToggleFavorite": "Favoris et afficher dans la barre des favoris",
-                "ToggleVisibility": "Basculer la visibilité de ceci pendant le mode de lecture"
-            },
-            "MatrixTest": {
-                "SameGridDisabled": "Comme l'icône active et cible utilisent les deux grilles, ceci est automatiquement déterminé"
-            },
-            "RangedAttack": {
-                "Recoil": "Récipient progressif",
-                "RecoilAfterAttack": "Recoil progressif incluant cette attaque",
-                "RecoilBeforeAttack": "Recoil progressif maintenant, avant d'attaquer",
-                "RecoilCompensation": "Total CR, y compris acteur et poste RC",
-                "ResetRecoil": "Réinitialiser le recul progressif à zéro"
-            },
-            "Ritual": {
-                "Force": "Force du rituel",
-                "ReagentDrams": "Drams de réactifs utilisés pour modifier le drain"
-            },
-            "SituationalModifier": {
-                "Recoil": "Nombre de balles tirées"
+                "HelpLinkEnglishOnly": "Help (External link, English only)",
+                "OpenValueEditor": "Ouvrir l'éditeur de valeur"
             },
             "SummoningTest": {
-                "DragOnCanvas": "Faites glisser l'esprit sur la toile",
-                "Force": "Force de l'esprit invoqué",
-                "OptionalPowerCount": "Compteur informatif des pouvoirs optionnels de l'esprit (plancher(force / 3)).",
-                "PreparedSpirit": "Utiliser un acteur spirituel préparé au lieu de créer un générique",
-                "ReagentDrams": "Drams de réactifs utilisés pour modifier la limite d'assignation",
-                "SpiritType": "Type d'esprit invoqué"
+                "OptionalPowerCount": "Compteur informatif des pouvoirs optionnels de l'esprit (plancher(force / 3))."
             },
             "Test": {
                 "BuyHits": "Ne lance pas de dés. Achète des succès avec ⌊réserve de dés / 4⌋.",
-                "Extended": "Le test sera lancé comme un test étendu jusqu'à ce que le seuil soit atteint. Réglez l'intervalle sur zéro pour le lancer comme un test normal.",
                 "ExtendedInterval": "Temps de jeu entre les lancers. Zéro lance le test comme un test normal, non étendu.",
-                "Limit": "Valeur limite calculée",
-                "LimitIgnored": "La limite est actuellement ignorée pour cet essai",
-                "Modifier": "Somme de tous les modificateurs appliqués à la réserve de dés",
-                "Pool": "Quantité de dés à rouler",
-                "PushTheLimit": "Appliquer les règles de limite",
-                "ResultOverrideGlitches": "Remplace les complications pour ce résultat de test.",
-                "ResultOverrideHits": "Remplace les succès pour ce résultat de test.",
-                "RollMode": "FoundryVTT chat message rouleau visibilité",
-                "Threshold": "Valeur seuil calculée"
-            },
-            "ToggleEditMode": "Activer le mode d'édition"
+                "ResultOverrideGlitches": "Remplace les glitches pour ce résultat de test.",
+                "ResultOverrideHits": "Remplace les succès pour ce résultat de test."
+            }
         }
     }
 }
