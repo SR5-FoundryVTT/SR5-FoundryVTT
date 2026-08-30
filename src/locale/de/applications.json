@@ -22,6 +22,37 @@
             },
             "Title": "Kompendium Browser"
         },
+        "CompendiumSettings": {
+            "ActionsPacksSection": "Handlungskompendien",
+            "Description": "Diese Kompendien werden vom System verwendet. Du kannst sie mit eigenen Kompendien überschreiben, solltest sie aber nicht entfernen.",
+            "GeneralActionsPack": {
+                "hint": "Dieses Kompendium wird für alle allgemeinen, attributbasierte Proben verwendet.",
+                "label": "Allgemeine Handlungen"
+            },
+            "ICActionsPack": {
+                "hint": "Dieses Kompendium wird für IC-Proben verwendet, gefiltert nach IC-Typ",
+                "label": "IC Handlungen"
+            },
+            "Label": "Kompendien",
+            "MatrixActionsPack": {
+                "hint": "Dieses Kompendium wird für alle Matrix-Handlungen verwendet.",
+                "label": "Matrix Handlungen"
+            },
+            "SkillGroupsPack": {
+                "hint": "Dieses Kompendium wird für Fertigkeitsgruppen verwendet.",
+                "label": "Fertigkeitsgruppen"
+            },
+            "SkillSetsPack": {
+                "hint": "Dieses Kompendium wird für Fertigkeitssets verwendet.",
+                "label": "Fertigkeitssets"
+            },
+            "SkillsPack": {
+                "hint": "Dieses Kompendium wird für Fertigkeiten verwendet.",
+                "label": "Fertigkeiten"
+            },
+            "SkillsPacksSection": "Fertigkeitskompendien",
+            "Title": "System Kompendien"
+        },
         "Compendiums": {
             "Folders": {
                 "Root": "SR5e Importe"
@@ -115,6 +146,34 @@
             "Submit": "Bestätigen",
             "Title": "Karma-Verwaltung"
         },
+        "Migration": {
+            "BeginMigration": "Starte Migration",
+            "BeginNotification": "Starte Shadowrun-System-Migration von Version",
+            "Complete": "Migration vollständig",
+            "DoNotCloseNotification": "Bitte das Spiel nicht schließen oder FoundryVTT herunterfahren.",
+            "SuccessConfirm": "Schließen",
+            "SuccessDescription": "Bestehende Kompendiumspakete, die zu dieser Welt gehören, wurden im Zuge dieser Migration aktualisiert.",
+            "SuccessHeader": "Migration vollständig",
+            "SuccessNotification": "Shadowrun-System erfolgreich migriert zu Version",
+            "SuccessPacksInfo": "Aufgrund technischer Limitierungen von FoundryVTT müssen Kompendien vom Typ Acteur manuell aktualisiert werden.",
+            "SuccessTitle": "Erfolg",
+            "UpdateCompendiumNoUpdateActor": "Aufgrund technischer Limitierungen von FoundryVTT müssen Kompendien vom Typ Acteur manuell aktualisiert werden.",
+            "UpdateCompendiumUpdateMessage": "Alle in der Welt vorhandenen Kompendiumpakete wurden aktualisiert",
+            "Version18_0_0": {
+                "Line1": "Ab Version 0.18.0 werden Effekte auf Akteur Gegenständen direkt angewendet, ohne auf den Akteur kopiert zu werden.",
+                "Line2": "Bisher kopierte Effekte müssen gelöscht oder kopiert werden, um zu verhindern, dass diese Effekte doppelt angewendet werden. Das betrifft alle Effekte mit einem Item im Origin Feld.",
+                "Line3": "Direkt auf dem Akteur erstellte Effekte bleiben bestehen.",
+                "Line4": "Solltest du viele Effekte nutzen, vor allem zusammen mit Effekt-Modulen, und bist unsicher, welche Effekte einen Item-Ursprung haben, setze die Migration auf Deaktivieren. Dadurch werden betroffene Effekte deaktiviert und umbenannt, wodurch diese leicht zu prüfen sind.",
+                "Line5": "Achte außerdem auf aktivierte Effekte in Akteur Gegenständen, die jetzt angewendet werden. Du kannst alle angewendeten Effekte eines Akteurs im Effekts-Tab sehen.",
+                "OnlyDisable": "Effekte nur deaktivieren!",
+                "Warning": "Warnung!"
+            },
+            "WarningBackup": "Erstelle ein Backup deiner Welt, bevor du die Migration startest!",
+            "WarningDescription": "Nur die SL kann die Aktualisierung durchführen. Während der Aktualisierung darf der Browser nicht geschlossen oder der Server heruntergefahren werden, sonst können irreparablen Schäden in dieser Welt entstehen.",
+            "WarningHeader": "Migrationswarnung",
+            "WarningRequired": "Das Shadowrun 5E System muss eine notwendige Aktualisierung ausführen.",
+            "WarningTitle": "Alarm"
+        },
         "NuyenManager": {
             "Cancel": "Abbrechen",
             "CurrentNuyen": "Aktuell verfügbares Nuyen",
@@ -130,6 +189,11 @@
             "NotifyNoSelectedTokens": "Mindestens ein verbundenes Token muss ausgewählt werden.",
             "OnlyLinkedActorsSupported": "Nur verbundene Akteure werden unterstützt. Tokens mit unverbundenen Akteuren werden ignoriert.",
             "ResetScore": "Setze Overwatch-Wert zurück"
+        },
+        "ReputationManager": {
+            "Cancel": "Abbrechen",
+            "Submit": "Bestätigen",
+            "Title": "Rufmanager"
         },
         "SituationalModifiersApplication": {
             "Category": {
@@ -196,70 +260,6 @@
                 "WoundModifierContent": "Dieses Kästchen zeigt an, dass das Ausfüllen den Wundmodifikator um die im Kästchen angegebene Zahl erhöht.",
                 "WoundModifierTitle": "Wundmodifikator"
             }
-        },
-        "Migration": {
-            "BeginMigration": "Starte Migration",
-            "BeginNotification": "Starte Shadowrun-System-Migration von Version",
-            "DoNotCloseNotification": "Bitte das Spiel nicht schließen oder FoundryVTT herunterfahren.",
-            "SuccessConfirm": "Schließen",
-            "SuccessDescription": "Bestehende Kompendiumspakete, die zu dieser Welt gehören, wurden im Zuge dieser Migration aktualisiert.",
-            "SuccessHeader": "Migration vollständig",
-            "SuccessNotification": "Shadowrun-System erfolgreich migriert zu Version",
-            "SuccessPacksInfo": "Aufgrund technischer Limitierungen von FoundryVTT müssen Kompendien vom Typ Acteur manuell aktualisiert werden.",
-            "SuccessTitle": "Erfolg",
-            "WarningBackup": "Erstelle ein Backup deiner Welt, bevor du die Migration startest!",
-            "WarningDescription": "Nur die SL kann die Aktualisierung durchführen. Während der Aktualisierung darf der Browser nicht geschlossen oder der Server heruntergefahren werden, sonst können irreparablen Schäden in dieser Welt entstehen.",
-            "WarningHeader": "Migrationswarnung",
-            "WarningRequired": "Das Shadowrun 5E System muss eine notwendige Aktualisierung ausführen.",
-            "WarningTitle": "Alarm",
-            "Version18_0_0": {
-                "Line1": "Ab Version 0.18.0 werden Effekte auf Akteur Gegenständen direkt angewendet, ohne auf den Akteur kopiert zu werden.",
-                "Line2": "Bisher kopierte Effekte müssen gelöscht oder kopiert werden, um zu verhindern, dass diese Effekte doppelt angewendet werden. Das betrifft alle Effekte mit einem Item im Origin Feld.",
-                "Line3": "Direkt auf dem Akteur erstellte Effekte bleiben bestehen.",
-                "Line4": "Solltest du viele Effekte nutzen, vor allem zusammen mit Effekt-Modulen, und bist unsicher, welche Effekte einen Item-Ursprung haben, setze die Migration auf Deaktivieren. Dadurch werden betroffene Effekte deaktiviert und umbenannt, wodurch diese leicht zu prüfen sind.",
-                "Line5": "Achte außerdem auf aktivierte Effekte in Akteur Gegenständen, die jetzt angewendet werden. Du kannst alle angewendeten Effekte eines Akteurs im Effekts-Tab sehen.",
-                "OnlyDisable": "Effekte nur deaktivieren!",
-                "Warning": "Warnung!"
-            },
-            "Complete": "Migration vollständig",
-            "UpdateCompendiumNoUpdateActor": "Aufgrund technischer Limitierungen von FoundryVTT müssen Kompendien vom Typ Acteur manuell aktualisiert werden.",
-            "UpdateCompendiumUpdateMessage": "Alle in der Welt vorhandenen Kompendiumpakete wurden aktualisiert"
-        },
-        "CompendiumSettings": {
-            "Description": "Diese Kompendien werden vom System verwendet. Du kannst sie mit eigenen Kompendien überschreiben, solltest sie aber nicht entfernen.",
-            "GeneralActionsPack": {
-                "hint": "Dieses Kompendium wird für alle allgemeinen, attributbasierte Proben verwendet.",
-                "label": "Allgemeine Handlungen"
-            },
-            "ICActionsPack": {
-                "hint": "Dieses Kompendium wird für IC-Proben verwendet, gefiltert nach IC-Typ",
-                "label": "IC Handlungen"
-            },
-            "Label": "Kompendien",
-            "MatrixActionsPack": {
-                "hint": "Dieses Kompendium wird für alle Matrix-Handlungen verwendet.",
-                "label": "Matrix Handlungen"
-            },
-            "SkillsPacksSection": "Fertigkeitskompendien",
-            "ActionsPacksSection": "Handlungskompendien",
-            "SkillsPack": {
-                "hint": "Dieses Kompendium wird für Fertigkeiten verwendet.",
-                "label": "Fertigkeiten"
-            },
-            "SkillGroupsPack": {
-                "hint": "Dieses Kompendium wird für Fertigkeitsgruppen verwendet.",
-                "label": "Fertigkeitsgruppen"
-            },
-            "SkillSetsPack": {
-                "hint": "Dieses Kompendium wird für Fertigkeitssets verwendet.",
-                "label": "Fertigkeitssets"
-            },
-            "Title": "System Kompendien"
-        },
-        "ReputationManager": {
-            "Cancel": "Abbrechen",
-            "Submit": "Bestätigen",
-            "Title": "Rufmanager"
         }
     }
 }

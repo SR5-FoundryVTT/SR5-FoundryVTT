@@ -41,7 +41,6 @@
                     "label": "Ersetze"
                 }
             },
-            "label": "Munition",
             "Labels": {
                 "AmmoFull": "Vollgeladen",
                 "AmmoGelRounds": "Gelmunition",
@@ -49,7 +48,8 @@
                 "BulletCount": "Kugeln",
                 "Bullets": "Kugeln",
                 "SpareClips": "Ersatzmagazine"
-            }
+            },
+            "label": "Munition"
         },
         "Armor": {
             "FIELDS": {
@@ -78,13 +78,13 @@
                         "hint": "Verstärkte Panzerung",
                         "label": "Verstärkt"
                     },
-                    "is_hardened": {
-                        "hint": "Wenn diese Panzerung verstärkten Schutz gewährt",
-                        "label": "Verstärkt Aktiv"
-                    },
                     "immunities": {
                         "hint": "Schadensquellen, gegen die diese Rüstung Immunität gewährt",
                         "label": "Immunitäten"
+                    },
+                    "is_hardened": {
+                        "hint": "Wenn diese Panzerung verstärkten Schutz gewährt",
+                        "label": "Verstärkt Aktiv"
                     },
                     "pollutant": {
                         "hint": "Zusätzliche Rüstung gegen Angriffe mit Schadstoff",
@@ -107,8 +107,6 @@
             "Immunity": {
                 "NormalWeapons": "Normale Waffen"
             },
-            "Resistances": "Resistenzen",
-            "label": "Panzerung",
             "Labels": {
                 "Accessory": "Zubehör",
                 "ArmorHardened": "Verstärkt",
@@ -117,33 +115,47 @@
                 "HardenedArmor": "Verstärkte Panzerung",
                 "Immunity": "Immunität",
                 "ImmunityToNormalWeapons": "Immunität gegen normale Waffen"
-            }
+            },
+            "Resistances": "Resistenzen",
+            "label": "Panzerung"
         },
         "Device": {
+            "Categories": {
+                "Commlink": "Kommlink",
+                "Cyberdeck": "Cyberdeck",
+                "RCC": "Riggerkonsole"
+            },
             "FIELDS": {
                 "category": {
                     "hint": "Kategorie des Geräts",
                     "label": "Kategorie"
                 }
             },
-            "label": "Gerät",
-            "Categories": {
-                "Commlink": "Kommlink",
-                "Cyberdeck": "Cyberdeck",
-                "RCC": "Riggerkonsole"
-            }
+            "label": "Gerät"
         },
         "Element": {
             "Acid": "Säure",
             "Cold": "Kälte",
             "Electricity": "Elektrizität",
             "Fire": "Feuer",
+            "Label": "Element",
             "Pollutant": "Schadstoffe",
             "Radiation": "Strahlung",
-            "Water": "Wasser",
-            "Label": "Element"
+            "Water": "Wasser"
         },
         "Item": {
+            "Cyberware": {
+                "Grades": {
+                    "Alpha": "Alphaware",
+                    "Beta": "Betaware",
+                    "Delta": "Deltaware",
+                    "Gamma": "Gammaware",
+                    "Grey": "Greyware",
+                    "Label": "Kategorie",
+                    "Standard": "Standard",
+                    "Used": "Gebraucht"
+                }
+            },
             "FIELDS": {
                 "action": {
                     "armor": {
@@ -400,18 +412,6 @@
                     }
                 }
             },
-            "Cyberware": {
-                "Grades": {
-                    "Label": "Kategorie",
-                    "Alpha": "Alphaware",
-                    "Beta": "Betaware",
-                    "Delta": "Deltaware",
-                    "Gamma": "Gammaware",
-                    "Grey": "Greyware",
-                    "Standard": "Standard",
-                    "Used": "Gebraucht"
-                }
-            },
             "Labels": {
                 "Availability": "Verf.",
                 "Capacity": "Kapazität",
@@ -462,6 +462,12 @@
             "Weapon": "Waffe"
         },
         "Lifestyle": {
+            "Attributes": {
+                "Comforts": "Komfort & Grundversorgung",
+                "Guests": "Gäste",
+                "Neighborhood": "Wohngegend",
+                "Security": "Sicherheit"
+            },
             "FIELDS": {
                 "comforts": {
                     "hint": "Komfort des Lebensstils",
@@ -492,23 +498,17 @@
                     "label": "Art"
                 }
             },
-            "label": "Lebensstil",
-            "Attributes": {
-                "Comforts": "Komfort & Grundversorgung",
-                "Guests": "Gäste",
-                "Neighborhood": "Wohngegend",
-                "Security": "Sicherheit"
-            },
             "Types": {
-                "Label": "Typ",
-                "Street": "Auf der Straße",
-                "Squatter": "Squatter",
-                "Low": "Unterschicht",
-                "Middle": "Mittelschicht",
                 "High": "Oberschicht",
+                "Label": "Typ",
+                "Low": "Unterschicht",
                 "Luxury": "Luxus",
-                "Other": "Anderer"
-            }
+                "Middle": "Mittelschicht",
+                "Other": "Anderer",
+                "Squatter": "Squatter",
+                "Street": "Auf der Straße"
+            },
+            "label": "Lebensstil"
         },
         "Modification": {
             "FIELDS": {
@@ -546,6 +546,9 @@
                 }
             }
         },
+        "ModificationTypes": {
+            "Ware": "Implantat"
+        },
         "MoveInventoryDialog": {
             "Cancel": "Abbrechen",
             "Move": "Verschieben",
@@ -575,13 +578,13 @@
                     "label": "Art"
                 }
             },
-            "label": "Qualität",
             "Types": {
                 "Label": "Typ",
                 "LifeModule": "Lebensmodul",
                 "Negative": "Nachteil",
                 "Positive": "Vorteil"
-            }
+            },
+            "label": "Qualität"
         },
         "Weapon": {
             "AmmoCount": "Munition",
@@ -703,8 +706,29 @@
                 }
             },
             "FullReload": "Komplett",
+            "Labels": {
+                "Accuracy": "Präz.",
+                "Barrel": "Laufmontiert",
+                "FireMode": "Feuermodus",
+                "Range": "Reichweite",
+                "Reach": "Reichweite",
+                "Recoil": "Rückstoß",
+                "RecoilCompensation": "Rückstoßkomp."
+            },
             "Mod": "Mod",
             "Mode": {
+                "Full": {
+                    "BurstFire": "Salvenmodus",
+                    "BurstFireLong": "Lange Salve",
+                    "FullAuto": "Automatisches Feuer",
+                    "FullAutoLong": "Automatisches Feuer (Komplex)",
+                    "FullAutoShort": "Automatisches Feuer (Einfach)",
+                    "SemiAuto": "Halbautomatisch",
+                    "SemiAutoBurst": "Halbautomatische Salve",
+                    "SemiAutoShort": "Halbautomatisch",
+                    "SingleShot": "Einzelschuss",
+                    "Suppressing": "Unterdrückungsfeuer"
+                },
                 "Mode": "Modus",
                 "Short": {
                     "BurstFire": "SM",
@@ -718,18 +742,6 @@
                     "SemiAutoShort": "HM",
                     "SingleShot": "EM",
                     "SingleShotShort": "EM"
-                },
-                "Full": {
-                    "BurstFire": "Salvenmodus",
-                    "BurstFireLong": "Lange Salve",
-                    "FullAuto": "Automatisches Feuer",
-                    "FullAutoLong": "Automatisches Feuer (Komplex)",
-                    "FullAutoShort": "Automatisches Feuer (Einfach)",
-                    "SemiAuto": "Halbautomatisch",
-                    "SemiAutoBurst": "Halbautomatische Salve",
-                    "SemiAutoShort": "Halbautomatisch",
-                    "SingleShot": "Einzelschuss",
-                    "Suppressing": "Unterdrückungsfeuer"
                 }
             },
             "Mods": "Mods",
@@ -784,19 +796,7 @@
                 "Range": "Wurfwaffenreichweite"
             },
             "Type": "Typ",
-            "Weapon": "Waffen",
-            "Labels": {
-                "Accuracy": "Präz.",
-                "Barrel": "Laufmontiert",
-                "FireMode": "Feuermodus",
-                "Range": "Reichweite",
-                "Reach": "Reichweite",
-                "Recoil": "Rückstoß",
-                "RecoilCompensation": "Rückstoßkomp."
-            }
-        },
-        "ModificationTypes": {
-            "Ware": "Implantat"
+            "Weapon": "Waffen"
         }
     }
 }

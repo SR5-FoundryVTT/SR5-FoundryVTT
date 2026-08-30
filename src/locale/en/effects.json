@@ -1,27 +1,80 @@
 {
     "SR5": {
         "ActiveEffect": {
+            "AddCondition": "Add Condition",
+            "AddTarget": "Add Target",
             "ApplyTo": "Apply-To",
             "ApplyTos": {
-                "TestTargetingThisActor": "Test Targeting This Actor",
                 "TargetedActor": "Targeted Actor",
-                "TestItem": "Test via Item"
+                "TestItem": "Test via Item",
+                "TestTargetingThisActor": "Test Targeting This Actor"
             },
+            "AtLeastOneTarget": "An effect must keep at least one target.",
             "CannotAddTestViaItemToActor": "Cannot add an Active Effect of type 'Test via Item' to an Actor",
-            "ValueEditor": "Edit Change Value",
+            "Duration": {
+                "Active": "Active",
+                "ActiveDetail": "The duration is active.",
+                "AwaitingCombatEnd": "Until combat ends",
+                "AwaitingCombatEndDetail": "Expires when the current combat ends.",
+                "AwaitingCombatStart": "Until combat starts",
+                "AwaitingCombatStartDetail": "Expires when the next combat begins.",
+                "AwaitingMyActionEnd": "Until end of owner's action phase",
+                "AwaitingMyActionEndDetail": "Expires when the owner finishes the current action phase.",
+                "AwaitingMyActionStart": "Until start of owner's action phase",
+                "AwaitingMyActionStartDetail": "Expires at the start of the next action phase taken by the owner.",
+                "AwaitingTrigger": "Awaiting expiry trigger",
+                "AwaitingTriggerDetail": "The duration span is complete and will expire at its configured trigger.",
+                "AwaitingTurnEnd": "Until end of combat turn",
+                "AwaitingTurnEndDetail": "Expires at the end of the current combat turn.",
+                "AwaitingTurnStart": "Until start of combat turn",
+                "AwaitingTurnStartDetail": "Expires at the start of the next combat turn.",
+                "Combat": "Combat",
+                "CombatStart": "Combat Turn {turn}, Initiative {initiative}",
+                "CombatStartNoInitiative": "Combat Turn {turn}",
+                "CombatTurn": "{turns} Combat Turn",
+                "CombatTurns": "{turns} Combat Turns",
+                "DoesNotExpire": "Does not expire",
+                "Expired": "Expired",
+                "ExpiredDetail": "Restart this effect to begin its duration again.",
+                "ExpiredOpenEditor": "Expired — open effect editor",
+                "ExpiryAction": "Expiry Action",
+                "ExpiryActionDefault": "Default ({action})",
+                "ExpiryActionDelete": "Delete",
+                "ExpiryActionUpdate": "Update",
+                "ExpiryTrigger": "Expiry Trigger",
+                "GroupCombat": "Combat",
+                "GroupTime": "Time",
+                "Remaining": "Remaining",
+                "RemainingDetail": "{remaining} remaining",
+                "Restart": "Restart Duration",
+                "RestartPending": "Restart ready",
+                "RestartPendingDetail": "The duration will restart when changes are submitted.",
+                "Status": "Status",
+                "UnitTurns": "Turns",
+                "Units": "Duration units",
+                "Value": "Duration"
+            },
+            "ExpiryTriggers": {
+                "CombatEnd": "Combat End",
+                "CombatStart": "Combat Start",
+                "MyActionEnd": "End of My Action Phase",
+                "MyActionStart": "Start of My Action Phase",
+                "TurnEnd": "Turn End",
+                "TurnStart": "Turn Start"
+            },
             "FIELDS": {
                 "appliedByTest": {
                     "label": "Apply-To Test via Item"
+                },
+                "applyTo": {
+                    "hint": "Apply-To different Targets",
+                    "label": "Apply-To"
                 },
                 "conditionMode": {
                     "hint": "Include: the test must match these values; Exclude: the test must not match these values."
                 },
                 "conditionType": {
                     "hint": "Which part of the test this condition filters on."
-                },
-                "applyTo": {
-                    "hint": "Apply-To different Targets",
-                    "label": "Apply-To"
                 },
                 "onlyForEquipped": {
                     "hint": "Apply for equipped item only",
@@ -59,66 +112,16 @@
                     "label": "Target Name"
                 }
             },
-            "AddCondition": "Add Condition",
-            "AddTarget": "Add Target",
-            "ExpiryTriggers": {
-                "CombatStart": "Combat Start",
-                "CombatEnd": "Combat End",
-                "TurnStart": "Turn Start",
-                "TurnEnd": "Turn End",
-                "MyActionStart": "Start of My Action Phase",
-                "MyActionEnd": "End of My Action Phase"
-            },
-            "Duration": {
-                "Active": "Active",
-                "ActiveDetail": "The duration is active.",
-                "AwaitingCombatStart": "Until combat starts",
-                "AwaitingCombatStartDetail": "Expires when the next combat begins.",
-                "AwaitingCombatEnd": "Until combat ends",
-                "AwaitingCombatEndDetail": "Expires when the current combat ends.",
-                "AwaitingTurnStart": "Until start of combat turn",
-                "AwaitingTurnStartDetail": "Expires at the start of the next combat turn.",
-                "AwaitingTurnEnd": "Until end of combat turn",
-                "AwaitingTurnEndDetail": "Expires at the end of the current combat turn.",
-                "AwaitingMyActionStart": "Until start of owner's action phase",
-                "AwaitingMyActionStartDetail": "Expires at the start of the next action phase taken by the owner.",
-                "AwaitingMyActionEnd": "Until end of owner's action phase",
-                "AwaitingMyActionEndDetail": "Expires when the owner finishes the current action phase.",
-                "AwaitingTrigger": "Awaiting expiry trigger",
-                "AwaitingTriggerDetail": "The duration span is complete and will expire at its configured trigger.",
-                "Combat": "Combat",
-                "GroupCombat": "Combat",
-                "GroupTime": "Time",
-                "UnitTurns": "Turns",
-                "CombatStart": "Combat Turn {turn}, Initiative {initiative}",
-                "CombatStartNoInitiative": "Combat Turn {turn}",
-                "CombatTurn": "{turns} Combat Turn",
-                "CombatTurns": "{turns} Combat Turns",
-                "DoesNotExpire": "Does not expire",
-                "Expired": "Expired",
-                "ExpiredDetail": "Restart this effect to begin its duration again.",
-                "ExpiredOpenEditor": "Expired — open effect editor",
-                "ExpiryTrigger": "Expiry Trigger",
-                "Remaining": "Remaining",
-                "RemainingDetail": "{remaining} remaining",
-                "Restart": "Restart Duration",
-                "RestartPending": "Restart ready",
-                "RestartPendingDetail": "The duration will restart when changes are submitted.",
-                "ExpiryAction": "Expiry Action",
-                "ExpiryActionDefault": "Default ({action})",
-                "ExpiryActionDelete": "Delete",
-                "ExpiryActionUpdate": "Update",
-                "Status": "Status",
-                "Units": "Duration units",
-                "Value": "Duration"
-            },
-            "AtLeastOneTarget": "An effect must keep at least one target.",
             "FilterTypes": {
                 "Attributes": "Attributes",
                 "Categories": "Action Categories",
                 "Limits": "Limits",
                 "Skills": "Skills",
                 "Tests": "Tests"
+            },
+            "Labels": {
+                "Effect": "Effect",
+                "Effects": "Effects"
             },
             "Modes": {
                 "Modify": "Modify"
@@ -132,10 +135,7 @@
             },
             "Target": "Target",
             "Targets": "Targets",
-            "Labels": {
-                "Effect": "Effect",
-                "Effects": "Effects"
-            }
+            "ValueEditor": "Edit Change Value"
         },
         "StatusEffects": {
             "Running": "Running",

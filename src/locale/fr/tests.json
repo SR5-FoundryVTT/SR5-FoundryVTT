@@ -41,16 +41,22 @@
             "Summoning": "Actions d'invocation"
         },
         "ActionType": {
-            "Label": "Type",
             "Complex": "Complexe",
             "Free": "Gratuite",
             "Interrupt": "Interruption",
+            "Label": "Type",
             "None": "Aucune",
             "Simple": "Simple",
             "Varies": "Variée"
         },
         "CallInAction": {
             "ActorType": "Type d'acteur",
+            "Compilation": {
+                "DropSprite": "Déposer le sprite",
+                "FixedSprite": "Sprite préparé",
+                "Label": "Compilation",
+                "SpriteType": "Type de sprite"
+            },
             "Compile": "Compiler",
             "CreateCompilation": "Créer une action de compilation",
             "CreateSummoning": "Créer une action d'appel",
@@ -81,16 +87,10 @@
                 }
             },
             "Summon": "Invoquer",
-            "Compilation": {
-                "Label": "Compilation",
-                "DropSprite": "Déposer le sprite",
-                "FixedSprite": "Sprite préparé",
-                "SpriteType": "Type de sprite"
-            },
             "Summoning": {
-                "Label": "Invocation",
                 "DropSpirit": "Déposer l'esprit",
                 "FixedSpirit": "Esprit préparé",
+                "Label": "Invocation",
                 "SpiritType": "Type d'esprit"
             }
         },
@@ -109,10 +109,10 @@
             "Actor": "Acteur",
             "AdvanceTime": "Avancer le temps de jeu à chaque lancer",
             "AdvanceTimeTooltip": "Avance le temps du monde de l'intervalle du test après chaque lancer.",
+            "BaseThreshold": "Seuil de base",
             "CanEdit": "Modifier",
             "CanRoll": "Lancer",
             "CanView": "Voir",
-            "BaseThreshold": "Seuil de base",
             "ConfirmCancel": "Annuler le test étendu \"{name}\" ? Cela met fin au test, mais un MJ pourra le réactiver.",
             "ConfirmDelete": "Supprimer le test étendu « {name} » ?",
             "CreateTest": "Nouveau test étendu",
@@ -121,13 +121,13 @@
             "CumulativeModifierTooltip": "Réduit la réserve de dés de 1 à chaque lancer effectué. SR5 p. 48.",
             "CumulativeRollCount": "Jets précédents",
             "Due": "Échéance",
-            "DueTooltip": "Intervalles de temps de jeu écoulés depuis le dernier lancer",
             "DueMessage": {
                 "Header": "Test étendu prêt à poursuivre",
                 "OpenManager": "Ouvrir le gestionnaire",
                 "Overdue": "{count} intervalles écoulés",
                 "Rolls": "Jets"
             },
+            "DueTooltip": "Intervalles de temps de jeu écoulés depuis le dernier lancer",
             "EditTest": "Modifier le test étendu",
             "Filters": {
                 "Actor": "Acteur",
@@ -274,122 +274,6 @@
             "Wounds": "Blessures"
         },
         "Skill": {
-            "FIELDS": {
-                "type": {
-                    "label": "Type",
-                    "hint": "Définit le type de configurations de compétences disponibles"
-                },
-                "skill": {
-                    "category": {
-                        "label": "Catégorie",
-                        "hint": "Catégorie de cette compétence"
-                    },
-                    "knowledgeType": {
-                        "label": "Type de connaissances",
-                        "hint": "Type de compétence de connaissance"
-                    },
-                    "rating": {
-                        "label": "Indice",
-                        "hint": "Indice de cette compétence"
-                    },
-                    "defaulting": {
-                        "label": "Par défaut",
-                        "hint": "Si cette compétence peut être par défaut"
-                    },
-                    "attribute": {
-                        "label": "Attribut",
-                        "hint": "Attribut utilisé par cette compétence"
-                    },
-                    "limit": {
-                        "attribute": {
-                            "label": "Limite",
-                            "hint": "Limiter à l'utilisation pour cette action de compétence. Laisser vide pour utiliser la limite d'attribut par défaut."
-                        }
-                    },
-                    "specializations": {
-                        "label": "Spécialisation",
-                        "hint": "Spécialisation pour cette compétence, le cas échéant"
-                    },
-                    "language": {
-                        "isNative": {
-                            "label": "Langue maternelle",
-                            "hint": "Marque cette langue comme native"
-                        }
-                    },
-                    "requirement": {
-                        "label": "Prérequis",
-                        "hint": "Ce que l'acteur doit être pour que cette compétence soit disponible"
-                    }
-                },
-                "group": {
-                    "label": "Groupe de compétences",
-                    "hint": "Configuration pour un groupe de compétences",
-                    "skills": {
-                        "label": "Compétences",
-                        "hint": "Compétences qui font partie de ce groupe"
-                    },
-                    "rating": {
-                        "label": "Indice",
-                        "hint": "Indice de ce groupe de compétences"
-                    }
-                },
-                "set": {
-                    "label": "Ensemble de compétences",
-                    "hint": "Configuration pour un ensemble de compétences",
-                    "default": {
-                        "label": "Utilisation sur les nouveaux acteurs",
-                        "hint": "Ajouter cette compétence aux acteurs nouvellement créés"
-                    },
-                    "skills": {
-                        "label": "Compétences",
-                        "hint": "Compétences qui font partie de cet ensemble",
-                        "name": {
-                            "label": "Nom",
-                            "hint": "Nom de la compétence"
-                        },
-                        "rating": {
-                            "label": "Indice",
-                            "hint": "Indice de cette compétence"
-                        },
-                        "specializations": {
-                            "label": "Spécialisation",
-                            "hint": "Spécialisations accordées à cette compétence lors de l'application de l'ensemble"
-                        }
-                    },
-                    "groups": {
-                        "label": "Groupes de compétences",
-                        "hint": "Groupes de compétences faisant partie de cet ensemble",
-                        "name": {
-                            "label": "Nom",
-                            "hint": "Nom du groupe de compétences"
-                        },
-                        "rating": {
-                            "label": "Indice",
-                            "hint": "Indice de ce groupe de compétences"
-                        }
-                    }
-                }
-            },
-            "Types": {
-                "Skill": "Compétence",
-                "Group": "Groupe de compétences",
-                "Set": "Ensemble de compétences"
-            },
-            "Category": {
-                "Active": "Actif",
-                "Knowledge": "Connaissances",
-                "Language": "Langue"
-            },
-            "KnowledgeType": {
-                "Academic": "Connaissances académiques",
-                "Professional": "Connaissances pro.",
-                "Interests": "Hobbies",
-                "Street": "Rue"
-            },
-            "Set": {
-                "LogActorDifferences": "Journaliser les différences de l'acteur",
-                "DifferencesLoggedInConsole": "Ouvrez votre console de navigateur pour afficher les différences"
-            },
             "AeronauticsMechanic": "Mécanique aéronautique",
             "Alchemy": "Alchimie",
             "AnimalHandling": "Animaux",
@@ -406,6 +290,11 @@
             "Binding": "Lien d'esprits",
             "Biotechnology": "Biotechnologie",
             "Blades": "Armes tranchantes",
+            "Category": {
+                "Active": "Actif",
+                "Knowledge": "Connaissances",
+                "Language": "Langue"
+            },
             "Chemistry": "Chimie",
             "Clubs": "Armes contondantes",
             "Compiling": "Compilation",
@@ -424,6 +313,102 @@
             "Etiquette": "Étiquette",
             "ExoticMeleeWeapon": "Armes de mélée exotiques",
             "ExoticRangedWeapon": "Armes à distance exotiques",
+            "FIELDS": {
+                "group": {
+                    "hint": "Configuration pour un groupe de compétences",
+                    "label": "Groupe de compétences",
+                    "rating": {
+                        "hint": "Indice de ce groupe de compétences",
+                        "label": "Indice"
+                    },
+                    "skills": {
+                        "hint": "Compétences qui font partie de ce groupe",
+                        "label": "Compétences"
+                    }
+                },
+                "set": {
+                    "default": {
+                        "hint": "Ajouter cette compétence aux acteurs nouvellement créés",
+                        "label": "Utilisation sur les nouveaux acteurs"
+                    },
+                    "groups": {
+                        "hint": "Groupes de compétences faisant partie de cet ensemble",
+                        "label": "Groupes de compétences",
+                        "name": {
+                            "hint": "Nom du groupe de compétences",
+                            "label": "Nom"
+                        },
+                        "rating": {
+                            "hint": "Indice de ce groupe de compétences",
+                            "label": "Indice"
+                        }
+                    },
+                    "hint": "Configuration pour un ensemble de compétences",
+                    "label": "Ensemble de compétences",
+                    "skills": {
+                        "hint": "Compétences qui font partie de cet ensemble",
+                        "label": "Compétences",
+                        "name": {
+                            "hint": "Nom de la compétence",
+                            "label": "Nom"
+                        },
+                        "rating": {
+                            "hint": "Indice de cette compétence",
+                            "label": "Indice"
+                        },
+                        "specializations": {
+                            "hint": "Spécialisations accordées à cette compétence lors de l'application de l'ensemble",
+                            "label": "Spécialisation"
+                        }
+                    }
+                },
+                "skill": {
+                    "attribute": {
+                        "hint": "Attribut utilisé par cette compétence",
+                        "label": "Attribut"
+                    },
+                    "category": {
+                        "hint": "Catégorie de cette compétence",
+                        "label": "Catégorie"
+                    },
+                    "defaulting": {
+                        "hint": "Si cette compétence peut être par défaut",
+                        "label": "Par défaut"
+                    },
+                    "knowledgeType": {
+                        "hint": "Type de compétence de connaissance",
+                        "label": "Type de connaissances"
+                    },
+                    "language": {
+                        "isNative": {
+                            "hint": "Marque cette langue comme native",
+                            "label": "Langue maternelle"
+                        }
+                    },
+                    "limit": {
+                        "attribute": {
+                            "hint": "Limiter à l'utilisation pour cette action de compétence. Laisser vide pour utiliser la limite d'attribut par défaut.",
+                            "label": "Limite"
+                        }
+                    },
+                    "rating": {
+                        "hint": "Indice de cette compétence",
+                        "label": "Indice"
+                    },
+                    "requirement": {
+                        "hint": "Ce que l'acteur doit être pour que cette compétence soit disponible",
+                        "label": "Prérequis"
+                    },
+                    "specializations": {
+                        "hint": "Spécialisation pour cette compétence, le cas échéant",
+                        "label": "Spécialisation"
+                    }
+                },
+                "type": {
+                    "hint": "Définit le type de configurations de compétences disponibles",
+                    "label": "Type"
+                }
+            },
             "FirstAid": "Premiers soins",
             "Flight": "Vol",
             "Forgery": "Falsification",
@@ -437,6 +422,18 @@
             "IndustrialMechanic": "Mécanique industrielle",
             "Instruction": "Enseignement",
             "Intimidation": "Intimidation",
+            "KnowledgeType": {
+                "Academic": "Connaissances académiques",
+                "Interests": "Hobbies",
+                "Professional": "Connaissances pro.",
+                "Street": "Rue"
+            },
+            "KnowledgeTypes": {
+                "Academic": "Connaissances académiques",
+                "Interests": "Hobbies",
+                "Professional": "Connaissances pro.",
+                "Street": "Connaissances de la rue"
+            },
             "Leadership": "Commandement",
             "Locksmith": "Serrurerie",
             "Longarms": "Fusils",
@@ -458,6 +455,10 @@
             "Registering": "Inscription",
             "RitualSpellcasting": "Magie rituelle",
             "Running": "Course",
+            "Set": {
+                "DifferencesLoggedInConsole": "Ouvrez votre console de navigateur pour afficher les différences",
+                "LogActorDifferences": "Journaliser les différences de l'acteur"
+            },
             "Skill": "Compétence",
             "SkillGroup": "Groupe de compétences",
             "Skills": "Compétences",
@@ -475,15 +476,14 @@
             },
             "ThrowingWeapons": "Armes de jet",
             "Tracking": "Pistage",
+            "Types": {
+                "Group": "Groupe de compétences",
+                "Set": "Ensemble de compétences",
+                "Skill": "Compétence"
+            },
             "UnarmedCombat": "Combat à mains nues",
             "abbr": {
                 "Native": "N"
-            },
-            "KnowledgeTypes": {
-                "Academic": "Connaissances académiques",
-                "Interests": "Hobbies",
-                "Professional": "Connaissances pro.",
-                "Street": "Connaissances de la rue"
             }
         },
         "TestResults": {
@@ -523,9 +523,83 @@
             "DrainTest": "Test de Drain",
             "DroneInfiltrationTest": "Test d'infiltration de drone",
             "DronePerceptionTest": "Test de perception de drone",
+            "Duration": {
+                "Label": "Durée",
+                "Types": {
+                    "Instant": "Instantané",
+                    "Permanent": "Permanent",
+                    "Sustained": "Maintenu"
+                }
+            },
             "ExtendedTest": "Test étendu",
             "FadeTest": "Test de Technodrain",
             "HackOnTheFlyTest": "Piratage à la volée",
+            "Labels": {
+                "ActiveDefense": "Défense active",
+                "Attacker": "Attaquant",
+                "AttackerHits": "Succès de l'attaquant",
+                "AttackerNetHits": "Succès nets de l'attaquant",
+                "BiofeedbackDamage": "Dégâts de biofeedback",
+                "BuyHits": "Acheter des succès",
+                "CanDefault": "Par défaut",
+                "Defender": "Défenseur",
+                "DefenderNetHits": "Succès nets du défenseur",
+                "DefenseTest": "Test de défense",
+                "DicePool": "Réserve de dés",
+                "DicePoolModifier": "Modif. réserve de dés",
+                "DontApplyWounds": "Ne pas appliquer les blessures",
+                "EnforcedMaximum": "Maximum imposé",
+                "EnforcedMinimum": "Minimum imposé",
+                "ExtendedHits": "Succès étendus",
+                "ExtendedTest": "Test étendu",
+                "FadeAttribute": "Attribut de technodrain",
+                "FadeValue": "Valeur de technodrain",
+                "FullDefense": "Défense totale",
+                "FullMatrixDefense": "Défense matricielle totale",
+                "Hits": "Succès",
+                "IncomingDamage": "Dégâts en approche",
+                "IncomingDrain": "Drain entrant",
+                "IncomingFade": "Technodrain entrant",
+                "MeleeWeaponAttack": "Attaque arme de mélée",
+                "NetHits": "Succès excédentaires",
+                "OpposedType": "Type",
+                "OpposingHits": "Succès adverses",
+                "OpposingNetHits": "Succès nets adverses",
+                "OriginalDicePool": "Réserve de dés originale",
+                "RangedWeaponAttack": "Attaque arme à distance",
+                "ResultOverride": "Substitution du résultat",
+                "ResultOverrideGlitches": "Complications",
+                "ResultOverrideHits": "Succès",
+                "RollArmor": "Armure",
+                "RollComposure": "Sang-Froid",
+                "RollCustom": "Personnalisé",
+                "RollDefense": "Défense",
+                "RollDrain": "Drain",
+                "RollFade": "Technodrain",
+                "RollJudgeIntentions": "J. Intentions",
+                "RollLiftCarry": "Soulever&Porter",
+                "RollMemory": "Mémoire",
+                "RollMode": "Mode de lancer",
+                "RollOneDie": "Tu ne peux pas lancer moins d'un dé, chummer",
+                "RollSoak": "Résistance aux dégâts",
+                "SecondAttribute": "Second Attribut",
+                "SecondChance": "Seconde Chance",
+                "Soak": "Encaisser",
+                "SoakTest": "Test de résistance aux dégâts",
+                "Successes": "Succès",
+                "Suppressing": "Suppression",
+                "TargetingNeedsActorWithToken": "Le personnage actuel a besoin d'être lié à un token pour que le ciblage fonctionne",
+                "UseEdgeForInitiativeRoll": "Utiliser la règle du Blitz (Chance) pour l'initiative"
+            },
+            "Limit": {
+                "Label": "Limite",
+                "Types": {
+                    "Astral": "Astral",
+                    "Mental": "Mentale",
+                    "Physical": "Physique",
+                    "Social": "Sociale"
+                }
+            },
             "MatrixDefenseTest": "Défense matricielle",
             "MatrixResistTest": "Résistance aux dégâts matriciels",
             "MatrixTest": "Test matriciel",
@@ -550,81 +624,6 @@
             "SuccessTest": "Test de réussite",
             "SummonSpiritTest": "Invoquer l'Esprit",
             "SuppressionDefenseTest": "Suppression de la défense",
-            "ThrownAttackTest": "Attaque d'armes lancées",
-            "Labels": {
-                "ActiveDefense": "Défense active",
-                "Attacker": "Attaquant",
-                "EnforcedMaximum": "Maximum imposé",
-                "EnforcedMinimum": "Minimum imposé",
-                "AttackerHits": "Succès de l'attaquant",
-                "AttackerNetHits": "Succès nets de l'attaquant",
-                "BiofeedbackDamage": "Dégâts de biofeedback",
-                "BuyHits": "Acheter des succès",
-                "CanDefault": "Par défaut",
-                "Defender": "Défenseur",
-                "DefenderNetHits": "Succès nets du défenseur",
-                "DefenseTest": "Test de défense",
-                "DicePool": "Réserve de dés",
-                "DicePoolModifier": "Modif. réserve de dés",
-                "DontApplyWounds": "Ne pas appliquer les blessures",
-                "ExtendedHits": "Succès étendus",
-                "ExtendedTest": "Test étendu",
-                "FadeAttribute": "Attribut de technodrain",
-                "FadeValue": "Valeur de technodrain",
-                "FullDefense": "Défense totale",
-                "FullMatrixDefense": "Défense matricielle totale",
-                "Hits": "Succès",
-                "IncomingDamage": "Dégâts en approche",
-                "IncomingDrain": "Drain entrant",
-                "IncomingFade": "Technodrain entrant",
-                "MeleeWeaponAttack": "Attaque arme de mélée",
-                "NetHits": "Succès excédentaires",
-                "OpposedType": "Type",
-                "OpposingHits": "Succès adverses",
-                "OpposingNetHits": "Succès nets adverses",
-                "OriginalDicePool": "Réserve de dés originale",
-                "ResultOverride": "Substitution du résultat",
-                "ResultOverrideGlitches": "Complications",
-                "ResultOverrideHits": "Succès",
-                "RollArmor": "Armure",
-                "RollComposure": "Sang-Froid",
-                "RollCustom": "Personnalisé",
-                "RollDefense": "Défense",
-                "RollDrain": "Drain",
-                "RollFade": "Technodrain",
-                "RollJudgeIntentions": "J. Intentions",
-                "RollLiftCarry": "Soulever&Porter",
-                "RollMemory": "Mémoire",
-                "RollMode": "Mode de lancer",
-                "RollOneDie": "Tu ne peux pas lancer moins d'un dé, chummer",
-                "RollSoak": "Résistance aux dégâts",
-                "SecondAttribute": "Second Attribut",
-                "SecondChance": "Seconde Chance",
-                "Soak": "Encaisser",
-                "SoakTest": "Test de résistance aux dégâts",
-                "Successes": "Succès",
-                "Suppressing": "Suppression",
-                "TargetingNeedsActorWithToken": "Le personnage actuel a besoin d'être lié à un token pour que le ciblage fonctionne",
-                "UseEdgeForInitiativeRoll": "Utiliser la règle du Blitz (Chance) pour l'initiative",
-                "RangedWeaponAttack": "Attaque arme à distance"
-            },
-            "Duration": {
-                "Label": "Durée",
-                "Types": {
-                    "Instant": "Instantané",
-                    "Permanent": "Permanent",
-                    "Sustained": "Maintenu"
-                }
-            },
-            "Limit": {
-                "Label": "Limite",
-                "Types": {
-                    "Astral": "Astral",
-                    "Mental": "Mentale",
-                    "Physical": "Physique",
-                    "Social": "Sociale"
-                }
-            },
             "Target": {
                 "Label": "Cible",
                 "Types": {
@@ -635,7 +634,8 @@
                     "Self": "Soi-même",
                     "Sprite": "Sprite"
                 }
-            }
+            },
+            "ThrownAttackTest": "Attaque d'armes lancées"
         }
     }
 }

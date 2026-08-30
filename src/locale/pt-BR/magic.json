@@ -19,15 +19,15 @@
                     "label": "Tipo de Poder"
                 }
             },
-            "Types": {
-                "Active": "Ativo",
-                "Passive": "Passivo"
-            },
             "Labels": {
                 "Echo": "Eco",
                 "Echoes": "Ecos",
                 "Metamagic": "Metamagia",
                 "Metamagics": "Metamagias"
+            },
+            "Types": {
+                "Active": "Ativo",
+                "Passive": "Passivo"
             }
         },
         "CritterPower": {
@@ -75,12 +75,12 @@
             },
             "IsOptional": "Opcionalidade",
             "Karma": "Karma",
-            "OptionalSelectionCount": "Poderes Opcionais",
             "Optional": {
                 "DisabledOption": "Opcional, desabilitado",
                 "EnabledOption": "Opcional, habilitado",
                 "Standard": "Por padrão"
             },
+            "OptionalSelectionCount": "Poderes Opcionais",
             "Range": "Alcance",
             "Ranges": {
                 "LineOfSight": "Linha de Visão",
@@ -93,6 +93,20 @@
             "Types": {
                 "Mana": "Mana",
                 "Physical": "Físico"
+            }
+        },
+        "Magic": {
+            "Labels": {
+                "Awakened": "Desperto",
+                "Emerged": "Emergido",
+                "Magic": "Magia",
+                "Mundane": "Mundano",
+                "PP": "PP",
+                "PowerLevel": "Nível",
+                "PowerPoints": "PP",
+                "PowerType": "Tipo",
+                "Powers": "Poderes",
+                "SpiritType": "Tipo de Espírito"
             }
         },
         "Ritual": {
@@ -210,10 +224,18 @@
             "IllusionObvious": "Óbvio",
             "IllusionRealistic": "Realista",
             "IllusionSingleSense": "Sentido Único",
+            "Labels": {
+                "DetectionSpellExtended": "Estendido",
+                "NormalSpellButton": "Normal",
+                "RecklessSpellButton": "Imprudente"
+            },
             "ManipulationDamaging": "Danoso",
             "ManipulationEnvironmental": "Ambiental",
             "ManipulationMental": "Mental",
             "ManipulationPhysical": "Físico",
+            "QuickInfo": {
+                "DrainForce": "Drenar F{sign}{drain}"
+            },
             "Range": "Alcance",
             "RangeLos": "LDV",
             "RangeLosA": "LDV (A)",
@@ -222,15 +244,7 @@
             "Spells": "Feitiços",
             "Type": "Tipo",
             "TypeMana": "Mana",
-            "TypePhysical": "Físico",
-            "QuickInfo": {
-                "DrainForce": "Drenar F{sign}{drain}"
-            },
-            "Labels": {
-                "DetectionSpellExtended": "Estendido",
-                "NormalSpellButton": "Normal",
-                "RecklessSpellButton": "Imprudente"
-            }
+            "TypePhysical": "Físico"
         },
         "Spirit": {
             "Bound": "Vinculado",
@@ -331,20 +345,6 @@
                 "Water": "Água",
                 "Worker": "Inseto Trabalhador",
                 "Wraith": "Espectro"
-            }
-        },
-        "Magic": {
-            "Labels": {
-                "Awakened": "Desperto",
-                "Emerged": "Emergido",
-                "Mundane": "Mundano",
-                "Magic": "Magia",
-                "PowerLevel": "Nível",
-                "PowerPoints": "PP",
-                "PowerType": "Tipo",
-                "Powers": "Poderes",
-                "PP": "PP",
-                "SpiritType": "Tipo de Espírito"
             }
         }
     }

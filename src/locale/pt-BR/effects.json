@@ -1,27 +1,80 @@
 {
     "SR5": {
         "ActiveEffect": {
+            "AddCondition": "Adicionar Condição",
+            "AddTarget": "Adicionar Alvo",
             "ApplyTo": "Aplicar a",
             "ApplyTos": {
-                "TestTargetingThisActor": "Teste que Tem Este Ator como Alvo",
                 "TargetedActor": "Ator Alvo",
-                "TestItem": "Testar via Item"
+                "TestItem": "Testar via Item",
+                "TestTargetingThisActor": "Teste que Tem Este Ator como Alvo"
             },
+            "AtLeastOneTarget": "Um efeito deve manter pelo menos um alvo.",
             "CannotAddTestViaItemToActor": "Não é possível adicionar um Efeito Ativo do tipo 'Testar via Item' a um Ator",
-            "ValueEditor": "Editar valor da mudança",
+            "Duration": {
+                "Active": "Ativo",
+                "ActiveDetail": "A duração está ativa.",
+                "AwaitingCombatEnd": "Até o fim do combate",
+                "AwaitingCombatEndDetail": "Expira quando o combate atual terminar.",
+                "AwaitingCombatStart": "Até o início do combate",
+                "AwaitingCombatStartDetail": "Expira quando o próximo combate começar.",
+                "AwaitingMyActionEnd": "Até o fim da fase de ação do proprietário",
+                "AwaitingMyActionEndDetail": "Expira quando o proprietário termina a fase de ação atual.",
+                "AwaitingMyActionStart": "Até o início da fase de ação do proprietário",
+                "AwaitingMyActionStartDetail": "Expira no início da próxima fase de ação do proprietário.",
+                "AwaitingTrigger": "Aguardando gatilho de expiração",
+                "AwaitingTriggerDetail": "A duração terminou e expirará no gatilho configurado.",
+                "AwaitingTurnEnd": "Até o fim do turno de combate",
+                "AwaitingTurnEndDetail": "Expira no fim do turno de combate atual.",
+                "AwaitingTurnStart": "Até o início do turno de combate",
+                "AwaitingTurnStartDetail": "Expira no início do próximo turno de combate.",
+                "Combat": "Combate",
+                "CombatStart": "Turno de Combate {turn}, Iniciativa {initiative}",
+                "CombatStartNoInitiative": "Turno de Combate {turn}",
+                "CombatTurn": "{turns} Turno de Combate",
+                "CombatTurns": "{turns} Turnos de Combate",
+                "DoesNotExpire": "Não expira",
+                "Expired": "Expirado",
+                "ExpiredDetail": "Reinicie este efeito para começar sua duração novamente.",
+                "ExpiredOpenEditor": "Expirado — abrir editor do efeito",
+                "ExpiryAction": "Ação ao Expirar",
+                "ExpiryActionDefault": "Padrão ({action})",
+                "ExpiryActionDelete": "Excluir",
+                "ExpiryActionUpdate": "Atualizar",
+                "ExpiryTrigger": "Gatilho de Expiração",
+                "GroupCombat": "Combate",
+                "GroupTime": "Tempo",
+                "Remaining": "Restante",
+                "RemainingDetail": "{remaining} restante",
+                "Restart": "Reiniciar Duração",
+                "RestartPending": "Reinício pronto",
+                "RestartPendingDetail": "A duração será reiniciada quando as alterações forem enviadas.",
+                "Status": "Estado",
+                "UnitTurns": "Turnos de Combate",
+                "Units": "Unidades de duração",
+                "Value": "Duração"
+            },
+            "ExpiryTriggers": {
+                "CombatEnd": "Fim do Combate",
+                "CombatStart": "Início do Combate",
+                "MyActionEnd": "Fim da Minha Fase de Ação",
+                "MyActionStart": "Início da Minha Fase de Ação",
+                "TurnEnd": "Fim do Turno",
+                "TurnStart": "Início do Turno"
+            },
             "FIELDS": {
                 "appliedByTest": {
                     "label": "Aplicado por teste"
+                },
+                "applyTo": {
+                    "hint": "Aplicar-para diferentes alvos",
+                    "label": "Aplicar a"
                 },
                 "conditionMode": {
                     "hint": "Incluir: o teste deve corresponder a estes valores. Excluir: o teste não deve corresponder a estes valores."
                 },
                 "conditionType": {
                     "hint": "A parte do teste que esta condição filtra."
-                },
-                "applyTo": {
-                    "hint": "Aplicar-para diferentes alvos",
-                    "label": "Aplicar a"
                 },
                 "onlyForEquipped": {
                     "hint": "Aplicar apenas para item equipado",
@@ -59,66 +112,16 @@
                     "label": "Nome do Alvo"
                 }
             },
-            "AddCondition": "Adicionar Condição",
-            "AddTarget": "Adicionar Alvo",
-            "ExpiryTriggers": {
-                "CombatStart": "Início do Combate",
-                "CombatEnd": "Fim do Combate",
-                "TurnStart": "Início do Turno",
-                "TurnEnd": "Fim do Turno",
-                "MyActionStart": "Início da Minha Fase de Ação",
-                "MyActionEnd": "Fim da Minha Fase de Ação"
-            },
-            "Duration": {
-                "Active": "Ativo",
-                "ActiveDetail": "A duração está ativa.",
-                "AwaitingCombatStart": "Até o início do combate",
-                "AwaitingCombatStartDetail": "Expira quando o próximo combate começar.",
-                "AwaitingCombatEnd": "Até o fim do combate",
-                "AwaitingCombatEndDetail": "Expira quando o combate atual terminar.",
-                "AwaitingTurnStart": "Até o início do turno de combate",
-                "AwaitingTurnStartDetail": "Expira no início do próximo turno de combate.",
-                "AwaitingTurnEnd": "Até o fim do turno de combate",
-                "AwaitingTurnEndDetail": "Expira no fim do turno de combate atual.",
-                "AwaitingMyActionStart": "Até o início da fase de ação do proprietário",
-                "AwaitingMyActionStartDetail": "Expira no início da próxima fase de ação do proprietário.",
-                "AwaitingMyActionEnd": "Até o fim da fase de ação do proprietário",
-                "AwaitingMyActionEndDetail": "Expira quando o proprietário termina a fase de ação atual.",
-                "AwaitingTrigger": "Aguardando gatilho de expiração",
-                "AwaitingTriggerDetail": "A duração terminou e expirará no gatilho configurado.",
-                "Combat": "Combate",
-                "GroupCombat": "Combate",
-                "GroupTime": "Tempo",
-                "UnitTurns": "Turnos de Combate",
-                "CombatStart": "Turno de Combate {turn}, Iniciativa {initiative}",
-                "CombatStartNoInitiative": "Turno de Combate {turn}",
-                "CombatTurn": "{turns} Turno de Combate",
-                "CombatTurns": "{turns} Turnos de Combate",
-                "DoesNotExpire": "Não expira",
-                "Expired": "Expirado",
-                "ExpiredDetail": "Reinicie este efeito para começar sua duração novamente.",
-                "ExpiredOpenEditor": "Expirado — abrir editor do efeito",
-                "ExpiryTrigger": "Gatilho de Expiração",
-                "Remaining": "Restante",
-                "RemainingDetail": "{remaining} restante",
-                "Restart": "Reiniciar Duração",
-                "RestartPending": "Reinício pronto",
-                "RestartPendingDetail": "A duração será reiniciada quando as alterações forem enviadas.",
-                "ExpiryAction": "Ação ao Expirar",
-                "ExpiryActionDefault": "Padrão ({action})",
-                "ExpiryActionDelete": "Excluir",
-                "ExpiryActionUpdate": "Atualizar",
-                "Status": "Estado",
-                "Units": "Unidades de duração",
-                "Value": "Duração"
-            },
-            "AtLeastOneTarget": "Um efeito deve manter pelo menos um alvo.",
             "FilterTypes": {
                 "Attributes": "Atributos",
                 "Categories": "Categorias de Ação",
                 "Limits": "Limites",
                 "Skills": "Perícias",
                 "Tests": "Testes"
+            },
+            "Labels": {
+                "Effect": "Efeito",
+                "Effects": "Efeitos"
             },
             "Modes": {
                 "Modify": "Modificar"
@@ -132,10 +135,7 @@
             },
             "Target": "Alvo",
             "Targets": "Alvos",
-            "Labels": {
-                "Effect": "Efeito",
-                "Effects": "Efeitos"
-            }
+            "ValueEditor": "Editar valor da mudança"
         },
         "StatusEffects": {
             "Running": "Correndo",

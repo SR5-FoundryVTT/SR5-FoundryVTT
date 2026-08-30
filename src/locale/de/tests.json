@@ -41,16 +41,22 @@
             "Summoning": "BeschwörungsHandlungen"
         },
         "ActionType": {
-            "Label": "Handlung",
             "Complex": "Komplexe",
             "Free": "Freie",
             "Interrupt": "Unterbrechung",
+            "Label": "Handlung",
             "None": "Keine",
             "Simple": "Einfache",
             "Varies": "Variiert"
         },
         "CallInAction": {
             "ActorType": "Akteur-Typ",
+            "Compilation": {
+                "DropSprite": "Sprite ablegen",
+                "FixedSprite": "Sprite vorb.",
+                "Label": "Kompilierung",
+                "SpriteType": "Sprite-Art"
+            },
             "Compile": "Kompilieren",
             "CreateCompilation": "Erstelle Kompilierungs-Aktion",
             "CreateSummoning": "Erstelle Beschwörungs-Aktion",
@@ -81,16 +87,10 @@
                 }
             },
             "Summon": "Beschwören",
-            "Compilation": {
-                "Label": "Kompilierung",
-                "DropSprite": "Sprite ablegen",
-                "FixedSprite": "Sprite vorb.",
-                "SpriteType": "Sprite-Art"
-            },
             "Summoning": {
-                "Label": "Beschwörung",
                 "DropSpirit": "Geist ablegen",
                 "FixedSpirit": "Vorber. Geist",
+                "Label": "Beschwörung",
                 "SpiritType": "Geistart"
             }
         },
@@ -109,10 +109,10 @@
             "Actor": "Akteur",
             "AdvanceTime": "Spielzeit beim Würfeln vorstellen",
             "AdvanceTimeTooltip": "Stellt die Weltzeit nach jedem Wurf um das Probenintervall vor.",
+            "BaseThreshold": "Basisschwelle",
             "CanEdit": "Bearbeiten",
             "CanRoll": "Würfeln",
             "CanView": "Ansehen",
-            "BaseThreshold": "Basisschwelle",
             "ConfirmCancel": "Den ausgedehnten Test \"{name}\" abbrechen? Der Test wird beendet, ein SL kann ihn später reaktivieren.",
             "ConfirmDelete": "Die ausgedehnte Probe \"{name}\" löschen?",
             "CreateTest": "Neue ausgedehnte Probe",
@@ -121,13 +121,13 @@
             "CumulativeModifierTooltip": "Reduziert den Würfelpool mit jedem durchgeführten Wurf um 1. SR5 S. 48.",
             "CumulativeRollCount": "Vorherige Würfe",
             "Due": "Fällig",
-            "DueTooltip": "Seit dem letzten Wurf vergangene Spielzeit-Intervalle",
             "DueMessage": {
                 "Header": "Ausgedehnte Probe kann fortgesetzt werden",
                 "OpenManager": "Verwaltung öffnen",
                 "Overdue": "{count} Intervalle vergangen",
                 "Rolls": "Würfe"
             },
+            "DueTooltip": "Seit dem letzten Wurf vergangene Spielzeit-Intervalle",
             "EditTest": "Ausgedehnte Probe bearbeiten",
             "Filters": {
                 "Actor": "Akteur",
@@ -274,122 +274,6 @@
             "Wounds": "Wunden"
         },
         "Skill": {
-            "FIELDS": {
-                "type": {
-                    "label": "Typ",
-                    "hint": "Definiert, welche Art von Fertigkeitskonfigurationen verfügbar sind"
-                },
-                "skill": {
-                    "category": {
-                        "label": "Kategorie",
-                        "hint": "Kategorie dieser Fertigkeit"
-                    },
-                    "knowledgeType": {
-                        "label": "Wissensart",
-                        "hint": "Art dieser Wissensfertigkeit"
-                    },
-                    "rating": {
-                        "label": "Stufe",
-                        "hint": "Stufe dieses Eintrags"
-                    },
-                    "defaulting": {
-                        "label": "Improvisieren",
-                        "hint": "Ob für diese Fertigkeit improvisiert werden kann"
-                    },
-                    "attribute": {
-                        "label": "Attribut",
-                        "hint": "Attribut, das von dieser Fertigkeit verwendet wird"
-                    },
-                    "limit": {
-                        "attribute": {
-                            "label": "Limit",
-                            "hint": "Limit für diese Fertigkeitsaktion. Leer lassen, um das Standard-Attributslimit zu verwenden."
-                        }
-                    },
-                    "specializations": {
-                        "label": "Spezialisierung",
-                        "hint": "Spezialisierung für diese Fertigkeit, falls vorhanden"
-                    },
-                    "language": {
-                        "isNative": {
-                            "label": "Muttersprache",
-                            "hint": "Markiert diese Sprache als Muttersprache"
-                        }
-                    },
-                    "requirement": {
-                        "label": "Voraussetzung",
-                        "hint": "Was der Akteur sein muss, damit diese Fertigkeit verfügbar ist"
-                    }
-                },
-                "group": {
-                    "label": "Fertigkeitsgruppe",
-                    "hint": "Konfiguration für eine Fertigkeitsgruppe",
-                    "skills": {
-                        "label": "Fertigkeiten",
-                        "hint": "Fertigkeiten, die Teil dieser Gruppe sind"
-                    },
-                    "rating": {
-                        "label": "Stufe",
-                        "hint": "Stufe dieser Fertigkeitsgruppe"
-                    }
-                },
-                "set": {
-                    "label": "Fertigkeitsset",
-                    "hint": "Konfiguration für ein Fertigkeitsset",
-                    "default": {
-                        "label": "Bei neuen Akteuren verwenden",
-                        "hint": "Dieses Fertigkeitsset neu erstellten Akteuren hinzufügen"
-                    },
-                    "skills": {
-                        "label": "Fertigkeiten",
-                        "hint": "Fertigkeiten, die Teil dieses Sets sind",
-                        "name": {
-                            "label": "Name",
-                            "hint": "Name der Fertigkeit"
-                        },
-                        "rating": {
-                            "label": "Stufe",
-                            "hint": "Stufe dieser Fertigkeit"
-                        },
-                        "specializations": {
-                            "label": "Spezialisierungen",
-                            "hint": "Spezialisierungen, die dieser Fertigkeit beim Anwenden des Sets gewährt werden"
-                        }
-                    },
-                    "groups": {
-                        "label": "Fertigkeitsgruppen",
-                        "hint": "Fertigkeitsgruppen, die Teil dieses Sets sind",
-                        "name": {
-                            "label": "Name",
-                            "hint": "Name der Fertigkeitsgruppe"
-                        },
-                        "rating": {
-                            "label": "Stufe",
-                            "hint": "Stufe dieser Fertigkeitsgruppe"
-                        }
-                    }
-                }
-            },
-            "Types": {
-                "Skill": "Fertigkeit",
-                "Group": "Fertigkeitsgruppe",
-                "Set": "Fertigkeitsset"
-            },
-            "Category": {
-                "Active": "Aktiv",
-                "Knowledge": "Wissen",
-                "Language": "Sprache"
-            },
-            "KnowledgeType": {
-                "Academic": "Akademisches Wissen",
-                "Professional": "Berufswissen",
-                "Interests": "Hobbywissen",
-                "Street": "Straßenwissen"
-            },
-            "Set": {
-                "LogActorDifferences": "Akteur-Unterschiede protokollieren",
-                "DifferencesLoggedInConsole": "Öffne deine Browser-Konsole, um die Unterschiede anzuzeigen"
-            },
             "AeronauticsMechanic": "Luftfahrtmechanik",
             "Alchemy": "Alchemie",
             "AnimalHandling": "Tierführung",
@@ -406,6 +290,11 @@
             "Binding": "Binden",
             "Biotechnology": "Biotechnologie",
             "Blades": "Klingenwaffen",
+            "Category": {
+                "Active": "Aktiv",
+                "Knowledge": "Wissen",
+                "Language": "Sprache"
+            },
             "Chemistry": "Chemie",
             "Clubs": "Knüppel",
             "Compiling": "Kompilieren",
@@ -424,6 +313,102 @@
             "Etiquette": "Gebräuche",
             "ExoticMeleeWeapon": "Exotische Nahkampfwaffe",
             "ExoticRangedWeapon": "Exotische Fernkampfwaffe",
+            "FIELDS": {
+                "group": {
+                    "hint": "Konfiguration für eine Fertigkeitsgruppe",
+                    "label": "Fertigkeitsgruppe",
+                    "rating": {
+                        "hint": "Stufe dieser Fertigkeitsgruppe",
+                        "label": "Stufe"
+                    },
+                    "skills": {
+                        "hint": "Fertigkeiten, die Teil dieser Gruppe sind",
+                        "label": "Fertigkeiten"
+                    }
+                },
+                "set": {
+                    "default": {
+                        "hint": "Dieses Fertigkeitsset neu erstellten Akteuren hinzufügen",
+                        "label": "Bei neuen Akteuren verwenden"
+                    },
+                    "groups": {
+                        "hint": "Fertigkeitsgruppen, die Teil dieses Sets sind",
+                        "label": "Fertigkeitsgruppen",
+                        "name": {
+                            "hint": "Name der Fertigkeitsgruppe",
+                            "label": "Name"
+                        },
+                        "rating": {
+                            "hint": "Stufe dieser Fertigkeitsgruppe",
+                            "label": "Stufe"
+                        }
+                    },
+                    "hint": "Konfiguration für ein Fertigkeitsset",
+                    "label": "Fertigkeitsset",
+                    "skills": {
+                        "hint": "Fertigkeiten, die Teil dieses Sets sind",
+                        "label": "Fertigkeiten",
+                        "name": {
+                            "hint": "Name der Fertigkeit",
+                            "label": "Name"
+                        },
+                        "rating": {
+                            "hint": "Stufe dieser Fertigkeit",
+                            "label": "Stufe"
+                        },
+                        "specializations": {
+                            "hint": "Spezialisierungen, die dieser Fertigkeit beim Anwenden des Sets gewährt werden",
+                            "label": "Spezialisierungen"
+                        }
+                    }
+                },
+                "skill": {
+                    "attribute": {
+                        "hint": "Attribut, das von dieser Fertigkeit verwendet wird",
+                        "label": "Attribut"
+                    },
+                    "category": {
+                        "hint": "Kategorie dieser Fertigkeit",
+                        "label": "Kategorie"
+                    },
+                    "defaulting": {
+                        "hint": "Ob für diese Fertigkeit improvisiert werden kann",
+                        "label": "Improvisieren"
+                    },
+                    "knowledgeType": {
+                        "hint": "Art dieser Wissensfertigkeit",
+                        "label": "Wissensart"
+                    },
+                    "language": {
+                        "isNative": {
+                            "hint": "Markiert diese Sprache als Muttersprache",
+                            "label": "Muttersprache"
+                        }
+                    },
+                    "limit": {
+                        "attribute": {
+                            "hint": "Limit für diese Fertigkeitsaktion. Leer lassen, um das Standard-Attributslimit zu verwenden.",
+                            "label": "Limit"
+                        }
+                    },
+                    "rating": {
+                        "hint": "Stufe dieses Eintrags",
+                        "label": "Stufe"
+                    },
+                    "requirement": {
+                        "hint": "Was der Akteur sein muss, damit diese Fertigkeit verfügbar ist",
+                        "label": "Voraussetzung"
+                    },
+                    "specializations": {
+                        "hint": "Spezialisierung für diese Fertigkeit, falls vorhanden",
+                        "label": "Spezialisierung"
+                    }
+                },
+                "type": {
+                    "hint": "Definiert, welche Art von Fertigkeitskonfigurationen verfügbar sind",
+                    "label": "Typ"
+                }
+            },
             "FirstAid": "Erste Hilfe",
             "Flight": "Fliegen",
             "Forgery": "Fälschen",
@@ -437,6 +422,18 @@
             "IndustrialMechanic": "Industriemechanik",
             "Instruction": "Unterricht",
             "Intimidation": "Einschüchtern",
+            "KnowledgeType": {
+                "Academic": "Akademisches Wissen",
+                "Interests": "Hobbywissen",
+                "Professional": "Berufswissen",
+                "Street": "Straßenwissen"
+            },
+            "KnowledgeTypes": {
+                "Academic": "Akademisches Wissen",
+                "Interests": "Hobbywissen",
+                "Professional": "Berufswissen",
+                "Street": "Straßenwissen"
+            },
             "Leadership": "Führung",
             "Locksmith": "Schlosser",
             "Longarms": "Gewehre",
@@ -458,6 +455,10 @@
             "Registering": "Registrieren",
             "RitualSpellcasting": "Ritualzauberei",
             "Running": "Laufen",
+            "Set": {
+                "DifferencesLoggedInConsole": "Öffne deine Browser-Konsole, um die Unterschiede anzuzeigen",
+                "LogActorDifferences": "Akteur-Unterschiede protokollieren"
+            },
             "Skill": "Fertigkeit",
             "SkillGroup": "Fertigkeitsgruppe",
             "Skills": "Fertigkeiten",
@@ -475,15 +476,14 @@
             },
             "ThrowingWeapons": "Wurfwaffen",
             "Tracking": "Spurenlesen",
+            "Types": {
+                "Group": "Fertigkeitsgruppe",
+                "Set": "Fertigkeitsset",
+                "Skill": "Fertigkeit"
+            },
             "UnarmedCombat": "Waffenloser Kampf",
             "abbr": {
                 "Native": "M"
-            },
-            "KnowledgeTypes": {
-                "Academic": "Akademisches Wissen",
-                "Interests": "Hobbywissen",
-                "Professional": "Berufswissen",
-                "Street": "Straßenwissen"
             }
         },
         "TestResults": {
@@ -523,9 +523,83 @@
             "DrainTest": "Entzugswiderstand",
             "DroneInfiltrationTest": "Heimlichkeit",
             "DronePerceptionTest": "Wahrnehmung",
+            "Duration": {
+                "Label": "Dauer",
+                "Types": {
+                    "Instant": "Sofort",
+                    "Permanent": "Permanent",
+                    "Sustained": "Aufrechterhalten"
+                }
+            },
             "ExtendedTest": "Ausgedehnte Probe",
             "FadeTest": "Schwundwiderstand",
             "HackOnTheFlyTest": "Eiliges Hacken",
+            "Labels": {
+                "ActiveDefense": "Unterbrechungsh.",
+                "Attacker": "Angreifer",
+                "AttackerHits": "Angreifer-Erfolge",
+                "AttackerNetHits": "Angreifer-Netto-Erfolge",
+                "BiofeedbackDamage": "Biofeedback Schaden",
+                "BuyHits": "Erfolge kaufen",
+                "CanDefault": "Improvisierbar",
+                "Defender": "Verteidiger",
+                "DefenderNetHits": "Verteidiger Netto-Erfolge",
+                "DefenseTest": "Verteidigungsprobe",
+                "DicePool": "Würfelpool",
+                "DicePoolModifier": "Würfelpool-Modifikator",
+                "DontApplyWounds": "Wunden nicht anwenden",
+                "EnforcedMaximum": "Erzwungenes Maximum",
+                "EnforcedMinimum": "Erzwungenes Minimum",
+                "ExtendedHits": "Ausged. Erfolge",
+                "ExtendedTest": "Ausged. Probe",
+                "FadeAttribute": "Schwund widerstehen",
+                "FadeValue": "Schwund",
+                "FullDefense": "Volle Abwehr",
+                "FullMatrixDefense": "Volle Matrixabwehr",
+                "Hits": "Erfolge",
+                "IncomingDamage": "Schaden",
+                "IncomingDrain": "Entzug",
+                "IncomingFade": "Schwund",
+                "MeleeWeaponAttack": "Nahkampfangriff",
+                "NetHits": "Nettoerfolge",
+                "OpposedType": "Typ",
+                "OpposingHits": "Gegn. Erfolge",
+                "OpposingNetHits": "Gegn. Nettoerfolge",
+                "OriginalDicePool": "Originaler Würfelpool",
+                "RangedWeaponAttack": "Fernkampfangriff",
+                "ResultOverride": "Ergebnis-Überschreibung",
+                "ResultOverrideGlitches": "Patzer",
+                "ResultOverrideHits": "Erfolge",
+                "RollArmor": "Panzerung",
+                "RollComposure": "Selbstbeherr.",
+                "RollCustom": "Benutzerdef.",
+                "RollDefense": "Verteidigung",
+                "RollDrain": "Entzug",
+                "RollFade": "Schwund",
+                "RollJudgeIntentions": "Menschenkenntnis",
+                "RollLiftCarry": "Heben&Tragen",
+                "RollMemory": "Erinnerungsverm.",
+                "RollMode": "Würfelmodus",
+                "RollOneDie": "Chummer, du kannst nicht weniger als einen Würfel werfen",
+                "RollSoak": "Einstecken",
+                "SecondAttribute": "Zweites Attribut",
+                "SecondChance": "Zweite Chance",
+                "Soak": "Widerstand",
+                "SoakTest": "Schadenswiderstandsprobe",
+                "Successes": "Erfolge",
+                "Suppressing": "Sperrfeuer",
+                "TargetingNeedsActorWithToken": "Charakter benötigt eine verbundene Figur, um ein Ziel auswählen zu können",
+                "UseEdgeForInitiativeRoll": "Benutze Edge Regel Blitz für Initiative"
+            },
+            "Limit": {
+                "Label": "Limit",
+                "Types": {
+                    "Astral": "Astral",
+                    "Mental": "Geistig",
+                    "Physical": "Körperlich",
+                    "Social": "Sozial"
+                }
+            },
             "MatrixDefenseTest": "Matrix Verteidigung",
             "MatrixResistTest": "Matrix Schadenswiderstand",
             "MatrixTest": "Matrix Probe",
@@ -550,81 +624,6 @@
             "SuccessTest": "Erfolgsprobe",
             "SummonSpiritTest": "Geist Herbeirufen",
             "SuppressionDefenseTest": "Sperrfeuer-Verteidigung",
-            "ThrownAttackTest": "Wurfwaffen-Angriff",
-            "Labels": {
-                "ActiveDefense": "Unterbrechungsh.",
-                "Attacker": "Angreifer",
-                "EnforcedMaximum": "Erzwungenes Maximum",
-                "EnforcedMinimum": "Erzwungenes Minimum",
-                "AttackerHits": "Angreifer-Erfolge",
-                "AttackerNetHits": "Angreifer-Netto-Erfolge",
-                "BiofeedbackDamage": "Biofeedback Schaden",
-                "BuyHits": "Erfolge kaufen",
-                "CanDefault": "Improvisierbar",
-                "Defender": "Verteidiger",
-                "DefenderNetHits": "Verteidiger Netto-Erfolge",
-                "DefenseTest": "Verteidigungsprobe",
-                "DicePool": "Würfelpool",
-                "DicePoolModifier": "Würfelpool-Modifikator",
-                "DontApplyWounds": "Wunden nicht anwenden",
-                "ExtendedHits": "Ausged. Erfolge",
-                "ExtendedTest": "Ausged. Probe",
-                "FadeAttribute": "Schwund widerstehen",
-                "FadeValue": "Schwund",
-                "FullDefense": "Volle Abwehr",
-                "FullMatrixDefense": "Volle Matrixabwehr",
-                "Hits": "Erfolge",
-                "IncomingDamage": "Schaden",
-                "IncomingDrain": "Entzug",
-                "IncomingFade": "Schwund",
-                "MeleeWeaponAttack": "Nahkampfangriff",
-                "NetHits": "Nettoerfolge",
-                "OpposedType": "Typ",
-                "OpposingHits": "Gegn. Erfolge",
-                "OpposingNetHits": "Gegn. Nettoerfolge",
-                "OriginalDicePool": "Originaler Würfelpool",
-                "ResultOverride": "Ergebnis-Überschreibung",
-                "ResultOverrideGlitches": "Patzer",
-                "ResultOverrideHits": "Erfolge",
-                "RollArmor": "Panzerung",
-                "RollComposure": "Selbstbeherr.",
-                "RollCustom": "Benutzerdef.",
-                "RollDefense": "Verteidigung",
-                "RollDrain": "Entzug",
-                "RollFade": "Schwund",
-                "RollJudgeIntentions": "Menschenkenntnis",
-                "RollLiftCarry": "Heben&Tragen",
-                "RollMemory": "Erinnerungsverm.",
-                "RollMode": "Würfelmodus",
-                "RollOneDie": "Chummer, du kannst nicht weniger als einen Würfel werfen",
-                "RollSoak": "Einstecken",
-                "SecondAttribute": "Zweites Attribut",
-                "SecondChance": "Zweite Chance",
-                "Soak": "Widerstand",
-                "SoakTest": "Schadenswiderstandsprobe",
-                "Successes": "Erfolge",
-                "Suppressing": "Sperrfeuer",
-                "TargetingNeedsActorWithToken": "Charakter benötigt eine verbundene Figur, um ein Ziel auswählen zu können",
-                "UseEdgeForInitiativeRoll": "Benutze Edge Regel Blitz für Initiative",
-                "RangedWeaponAttack": "Fernkampfangriff"
-            },
-            "Duration": {
-                "Label": "Dauer",
-                "Types": {
-                    "Instant": "Sofort",
-                    "Permanent": "Permanent",
-                    "Sustained": "Aufrechterhalten"
-                }
-            },
-            "Limit": {
-                "Label": "Limit",
-                "Types": {
-                    "Astral": "Astral",
-                    "Mental": "Geistig",
-                    "Physical": "Körperlich",
-                    "Social": "Sozial"
-                }
-            },
             "Target": {
                 "Label": "Ziel",
                 "Types": {
@@ -635,7 +634,8 @@
                     "Self": "Selbst",
                     "Sprite": "Sprite"
                 }
-            }
+            },
+            "ThrownAttackTest": "Wurfwaffen-Angriff"
         }
     }
 }

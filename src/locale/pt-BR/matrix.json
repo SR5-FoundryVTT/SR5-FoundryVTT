@@ -77,10 +77,46 @@
                 "Track": "Rastreador"
             }
         },
+        "Matrix": {
+            "Attributes": {
+                "Attack": "Ataque",
+                "DataProcessing": "Datagrama",
+                "Firewall": "Firewall",
+                "Sleaze": "Subversão"
+            },
+            "Labels": {
+                "Agent": "Agente",
+                "CommonProgram": "Programa Comum",
+                "DirectConnection": "Conexão Direta",
+                "Grids": "Grades",
+                "Hosts": "Hosts",
+                "HotSim": "Sim Quente",
+                "LivingPersona": "Persona Viva",
+                "Marks": "Marcas",
+                "MatrixDefense": "Defesa da Matriz",
+                "MatrixFullDefenseAttribute": "Atributo de Defesa Total na Matriz",
+                "MatrixTarget": "Alvo da Matriz",
+                "Network": "Rede",
+                "Networks": "Redes",
+                "OverwatchScore": "Valor de Vigilância",
+                "OverwatchScoreTrackerTitle": "Monitor de Bebê do Sr. Johnson",
+                "Personas": "Personas",
+                "PublicGrid": "Grade Pública",
+                "RunningSilent": "Silenciosamente",
+                "RunningSilentControlledByDevice": "O Modo Silencioso é controlado pelo seu dispositivo de Matriz ativo:",
+                "Wireless": "Conexão Sem Fio",
+                "WirelessOffline": "Offline",
+                "WirelessOnline": "Online",
+                "WirelessUnavailable": "Indisponível"
+            }
+        },
         "MatrixNetworkHackingApplication": {
             "Icons": "Ícones",
             "Invite": "Pedir um convite",
             "Title": "Conectar à rede"
+        },
+        "MatrixOpposedDeviceDialog": {
+            "Title": "Criar Dispositivo de Matriz"
         },
         "NetworkManager": {
             "AvailableNetworks": "Redes Disponíveis",
@@ -168,42 +204,6 @@
                 "Standard": "Por padrão"
             },
             "Type": "Tipo"
-        },
-        "MatrixOpposedDeviceDialog": {
-            "Title": "Criar Dispositivo de Matriz"
-        },
-        "Matrix": {
-            "Attributes": {
-                "Attack": "Ataque",
-                "DataProcessing": "Datagrama",
-                "Firewall": "Firewall",
-                "Sleaze": "Subversão"
-            },
-            "Labels": {
-                "Agent": "Agente",
-                "CommonProgram": "Programa Comum",
-                "DirectConnection": "Conexão Direta",
-                "Grids": "Grades",
-                "Hosts": "Hosts",
-                "HotSim": "Sim Quente",
-                "LivingPersona": "Persona Viva",
-                "Marks": "Marcas",
-                "MatrixDefense": "Defesa da Matriz",
-                "MatrixFullDefenseAttribute": "Atributo de Defesa Total na Matriz",
-                "MatrixTarget": "Alvo da Matriz",
-                "Network": "Rede",
-                "Networks": "Redes",
-                "OverwatchScore": "Valor de Vigilância",
-                "OverwatchScoreTrackerTitle": "Monitor de Bebê do Sr. Johnson",
-                "Personas": "Personas",
-                "PublicGrid": "Grade Pública",
-                "RunningSilent": "Silenciosamente",
-                "RunningSilentControlledByDevice": "O Modo Silencioso é controlado pelo seu dispositivo de Matriz ativo:",
-                "Wireless": "Conexão Sem Fio",
-                "WirelessOffline": "Offline",
-                "WirelessOnline": "Online",
-                "WirelessUnavailable": "Indisponível"
-            }
         }
     }
 }

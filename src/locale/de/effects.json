@@ -1,27 +1,80 @@
 {
     "SR5": {
         "ActiveEffect": {
+            "AddCondition": "Bedingung hinzufügen",
+            "AddTarget": "Ziel hinzufügen",
             "ApplyTo": "Anwenden auf",
             "ApplyTos": {
-                "TestTargetingThisActor": "Probe, die diesen Akteur als Ziel hat",
                 "TargetedActor": "Anvisierten Akteur",
-                "TestItem": "Probe aus Item"
+                "TestItem": "Probe aus Item",
+                "TestTargetingThisActor": "Probe, die diesen Akteur als Ziel hat"
             },
+            "AtLeastOneTarget": "Ein Effekt muss mindestens ein Ziel behalten.",
             "CannotAddTestViaItemToActor": "Einem Akteur kann kein Active Effect vom Typ 'Probe aus Item' hinzugefügt werden.",
-            "ValueEditor": "Wert der Änderung bearbeiten",
+            "Duration": {
+                "Active": "Aktiv",
+                "ActiveDetail": "Die Dauer ist aktiv.",
+                "AwaitingCombatEnd": "Bis Kampfende",
+                "AwaitingCombatEndDetail": "Läuft ab, wenn der aktuelle Kampf endet.",
+                "AwaitingCombatStart": "Bis Kampfbeginn",
+                "AwaitingCombatStartDetail": "Läuft ab, wenn der nächste Kampf beginnt.",
+                "AwaitingMyActionEnd": "Bis Ende der Handlungsphase des Besitzers",
+                "AwaitingMyActionEndDetail": "Läuft ab, wenn der Besitzer die aktuelle Handlungsphase beendet.",
+                "AwaitingMyActionStart": "Bis Beginn der Handlungsphase des Besitzers",
+                "AwaitingMyActionStartDetail": "Läuft zu Beginn der nächsten Handlungsphase des Besitzers ab.",
+                "AwaitingTrigger": "Wartet auf Ablauf-Auslöser",
+                "AwaitingTriggerDetail": "Die Dauer ist abgelaufen und der Effekt wartet auf seinen konfigurierten Auslöser.",
+                "AwaitingTurnEnd": "Bis Ende der Kampfrunde",
+                "AwaitingTurnEndDetail": "Läuft am Ende der aktuellen Kampfrunde ab.",
+                "AwaitingTurnStart": "Bis Beginn der Kampfrunde",
+                "AwaitingTurnStartDetail": "Läuft zu Beginn der nächsten Kampfrunde ab.",
+                "Combat": "Kampf",
+                "CombatStart": "Kampfrunde {turn}, Initiative {initiative}",
+                "CombatStartNoInitiative": "Kampfrunde {turn}",
+                "CombatTurn": "{turns} Kampfrunde",
+                "CombatTurns": "{turns} Kampfrunden",
+                "DoesNotExpire": "Läuft nicht ab",
+                "Expired": "Abgelaufen",
+                "ExpiredDetail": "Starte diesen Effekt neu, um seine Dauer erneut zu beginnen.",
+                "ExpiredOpenEditor": "Abgelaufen — Effekt-Editor öffnen",
+                "ExpiryAction": "Ablaufaktion",
+                "ExpiryActionDefault": "Standard ({action})",
+                "ExpiryActionDelete": "Löschen",
+                "ExpiryActionUpdate": "Aktualisieren",
+                "ExpiryTrigger": "Ablauf-Auslöser",
+                "GroupCombat": "Kampf",
+                "GroupTime": "Zeit",
+                "Remaining": "Verbleibend",
+                "RemainingDetail": "{remaining} verbleibend",
+                "Restart": "Dauer neu starten",
+                "RestartPending": "Neustart bereit",
+                "RestartPendingDetail": "Die Dauer wird neu gestartet, wenn die Änderungen gespeichert werden.",
+                "Status": "Status",
+                "UnitTurns": "Kampfrunden",
+                "Units": "Dauer-Einheiten",
+                "Value": "Dauer"
+            },
+            "ExpiryTriggers": {
+                "CombatEnd": "Kampfende",
+                "CombatStart": "Kampfbeginn",
+                "MyActionEnd": "Ende meiner Handlungsphase",
+                "MyActionStart": "Beginn meiner Handlungsphase",
+                "TurnEnd": "Rundenende",
+                "TurnStart": "Rundenbeginn"
+            },
             "FIELDS": {
                 "appliedByTest": {
                     "label": "Anwenden auf Test"
+                },
+                "applyTo": {
+                    "hint": "Anwenden auf verschiedene Ziele",
+                    "label": "Anwenden auf"
                 },
                 "conditionMode": {
                     "hint": "Einschließen: Die Probe muss diesen Werten entsprechen; Ausschließen: Die Probe darf diesen Werten nicht entsprechen."
                 },
                 "conditionType": {
                     "hint": "Welcher Teil der Probe durch diese Bedingung gefiltert wird."
-                },
-                "applyTo": {
-                    "hint": "Anwenden auf verschiedene Ziele",
-                    "label": "Anwenden auf"
                 },
                 "onlyForEquipped": {
                     "hint": "Nur auf ausgerüstetes Item anwenden",
@@ -59,66 +112,16 @@
                     "label": "Zielname"
                 }
             },
-            "AddCondition": "Bedingung hinzufügen",
-            "AddTarget": "Ziel hinzufügen",
-            "ExpiryTriggers": {
-                "CombatStart": "Kampfbeginn",
-                "CombatEnd": "Kampfende",
-                "TurnStart": "Rundenbeginn",
-                "TurnEnd": "Rundenende",
-                "MyActionStart": "Beginn meiner Handlungsphase",
-                "MyActionEnd": "Ende meiner Handlungsphase"
-            },
-            "Duration": {
-                "Active": "Aktiv",
-                "ActiveDetail": "Die Dauer ist aktiv.",
-                "AwaitingCombatStart": "Bis Kampfbeginn",
-                "AwaitingCombatStartDetail": "Läuft ab, wenn der nächste Kampf beginnt.",
-                "AwaitingCombatEnd": "Bis Kampfende",
-                "AwaitingCombatEndDetail": "Läuft ab, wenn der aktuelle Kampf endet.",
-                "AwaitingTurnStart": "Bis Beginn der Kampfrunde",
-                "AwaitingTurnStartDetail": "Läuft zu Beginn der nächsten Kampfrunde ab.",
-                "AwaitingTurnEnd": "Bis Ende der Kampfrunde",
-                "AwaitingTurnEndDetail": "Läuft am Ende der aktuellen Kampfrunde ab.",
-                "AwaitingMyActionStart": "Bis Beginn der Handlungsphase des Besitzers",
-                "AwaitingMyActionStartDetail": "Läuft zu Beginn der nächsten Handlungsphase des Besitzers ab.",
-                "AwaitingMyActionEnd": "Bis Ende der Handlungsphase des Besitzers",
-                "AwaitingMyActionEndDetail": "Läuft ab, wenn der Besitzer die aktuelle Handlungsphase beendet.",
-                "AwaitingTrigger": "Wartet auf Ablauf-Auslöser",
-                "AwaitingTriggerDetail": "Die Dauer ist abgelaufen und der Effekt wartet auf seinen konfigurierten Auslöser.",
-                "Combat": "Kampf",
-                "GroupCombat": "Kampf",
-                "GroupTime": "Zeit",
-                "UnitTurns": "Kampfrunden",
-                "CombatStart": "Kampfrunde {turn}, Initiative {initiative}",
-                "CombatStartNoInitiative": "Kampfrunde {turn}",
-                "CombatTurn": "{turns} Kampfrunde",
-                "CombatTurns": "{turns} Kampfrunden",
-                "DoesNotExpire": "Läuft nicht ab",
-                "Expired": "Abgelaufen",
-                "ExpiredDetail": "Starte diesen Effekt neu, um seine Dauer erneut zu beginnen.",
-                "ExpiredOpenEditor": "Abgelaufen — Effekt-Editor öffnen",
-                "ExpiryTrigger": "Ablauf-Auslöser",
-                "Remaining": "Verbleibend",
-                "RemainingDetail": "{remaining} verbleibend",
-                "Restart": "Dauer neu starten",
-                "RestartPending": "Neustart bereit",
-                "RestartPendingDetail": "Die Dauer wird neu gestartet, wenn die Änderungen gespeichert werden.",
-                "ExpiryAction": "Ablaufaktion",
-                "ExpiryActionDefault": "Standard ({action})",
-                "ExpiryActionDelete": "Löschen",
-                "ExpiryActionUpdate": "Aktualisieren",
-                "Status": "Status",
-                "Units": "Dauer-Einheiten",
-                "Value": "Dauer"
-            },
-            "AtLeastOneTarget": "Ein Effekt muss mindestens ein Ziel behalten.",
             "FilterTypes": {
                 "Attributes": "Attribute",
                 "Categories": "Handlungskategorien",
                 "Limits": "Limits",
                 "Skills": "Fertigkeiten",
                 "Tests": "Proben"
+            },
+            "Labels": {
+                "Effect": "Effekt",
+                "Effects": "Effekte"
             },
             "Modes": {
                 "Modify": "Modifizieren"
@@ -132,10 +135,7 @@
             },
             "Target": "Ziel",
             "Targets": "Ziele",
-            "Labels": {
-                "Effect": "Effekt",
-                "Effects": "Effekte"
-            }
+            "ValueEditor": "Wert der Änderung bearbeiten"
         },
         "StatusEffects": {
             "Running": "Laufen",

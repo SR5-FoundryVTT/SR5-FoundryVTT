@@ -1,16 +1,11 @@
 {
     "SR5": {
-        "DamageApplication": {
-            "ApplyDamage": "Application des dégâts",
-            "ApplyUnmodifiedDamage": "Appliquer les dégâts bruts",
-            "Title": "Application des dégâts"
-        },
         "Combat": {
             "CannotSeizeAgain": "Vous ne pouvez pas reprendre l'initiative avant le debut de votre prochain tour.",
             "ModeAstral": "Astral",
-            "ModeChangedLabel": "Mode d'initiative modifie",
             "ModeChangeNewInitiative": "Nouvelle initiative",
             "ModeChangePreviousInitiative": "Initiative precedente",
+            "ModeChangedLabel": "Mode d'initiative modifie",
             "ModeMatrix": "Matrice",
             "ModeMeatspace": "Monde reel",
             "ModeTitle": "Mode : {mode}",
@@ -32,13 +27,18 @@
         },
         "Damage": {
             "Label": "Dégâts",
+            "Type": "Type",
             "Types": {
                 "Matrix": "Matrice",
                 "Physical": "Physique",
                 "Stun": "Etourdi."
             },
-            "Type": "Type",
             "Value": "Valeur Dégâts"
+        },
+        "DamageApplication": {
+            "ApplyDamage": "Application des dégâts",
+            "ApplyUnmodifiedDamage": "Appliquer les dégâts bruts",
+            "Title": "Application des dégâts"
         }
     }
 }

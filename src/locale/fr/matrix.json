@@ -77,10 +77,46 @@
                 "Track": "Track"
             }
         },
+        "Matrix": {
+            "Attributes": {
+                "Attack": "Attaque",
+                "DataProcessing": "Trait. Données",
+                "Firewall": "Firewall",
+                "Sleaze": "Corruption"
+            },
+            "Labels": {
+                "Agent": "Agent",
+                "CommonProgram": "Programme courant",
+                "DirectConnection": "Connexion directe",
+                "Grids": "Grilles",
+                "Hosts": "Hôtes",
+                "HotSim": "Sim chaud",
+                "LivingPersona": "Persona vivante",
+                "Marks": "Marques",
+                "MatrixDefense": "Défense matricielle",
+                "MatrixFullDefenseAttribute": "Attribut de Défense matricielle totale",
+                "MatrixTarget": "Cible Matricielle",
+                "Network": "Réseau",
+                "Networks": "Réseaux",
+                "OverwatchScore": "Score de Surveillance",
+                "OverwatchScoreTrackerTitle": "Le moniteur pour bébé de Mr. Johnson",
+                "Personas": "Personas",
+                "PublicGrid": "Grille publique",
+                "RunningSilent": "Mode silencieux",
+                "RunningSilentControlledByDevice": "Le mode silencieux est contrôlé par votre appareil matriciel actif :",
+                "Wireless": "Sans fil",
+                "WirelessOffline": "Hors ligne",
+                "WirelessOnline": "En ligne",
+                "WirelessUnavailable": "Indisponible"
+            }
+        },
         "MatrixNetworkHackingApplication": {
             "Icons": "Icônes",
             "Invite": "Demander une invitation",
             "Title": "Connexion au réseau"
+        },
+        "MatrixOpposedDeviceDialog": {
+            "Title": "Créer un appareil matriciel"
         },
         "NetworkManager": {
             "AvailableNetworks": "Réseaux disponibles",
@@ -168,42 +204,6 @@
                 "Standard": "Par défaut"
             },
             "Type": "Type"
-        },
-        "MatrixOpposedDeviceDialog": {
-            "Title": "Créer un appareil matriciel"
-        },
-        "Matrix": {
-            "Attributes": {
-                "Attack": "Attaque",
-                "DataProcessing": "Trait. Données",
-                "Firewall": "Firewall",
-                "Sleaze": "Corruption"
-            },
-            "Labels": {
-                "Agent": "Agent",
-                "CommonProgram": "Programme courant",
-                "DirectConnection": "Connexion directe",
-                "Grids": "Grilles",
-                "Hosts": "Hôtes",
-                "HotSim": "Sim chaud",
-                "LivingPersona": "Persona vivante",
-                "Marks": "Marques",
-                "MatrixDefense": "Défense matricielle",
-                "MatrixFullDefenseAttribute": "Attribut de Défense matricielle totale",
-                "MatrixTarget": "Cible Matricielle",
-                "Network": "Réseau",
-                "Networks": "Réseaux",
-                "OverwatchScore": "Score de Surveillance",
-                "OverwatchScoreTrackerTitle": "Le moniteur pour bébé de Mr. Johnson",
-                "Personas": "Personas",
-                "PublicGrid": "Grille publique",
-                "RunningSilent": "Mode silencieux",
-                "RunningSilentControlledByDevice": "Le mode silencieux est contrôlé par votre appareil matriciel actif :",
-                "Wireless": "Sans fil",
-                "WirelessOffline": "Hors ligne",
-                "WirelessOnline": "En ligne",
-                "WirelessUnavailable": "Indisponible"
-            }
         }
     }
 }

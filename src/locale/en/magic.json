@@ -19,15 +19,15 @@
                     "label": "Power Type"
                 }
             },
-            "Types": {
-                "Active": "Active",
-                "Passive": "Passive"
-            },
             "Labels": {
                 "Echo": "Echo",
                 "Echoes": "Echoes",
                 "Metamagic": "Metamagic",
                 "Metamagics": "Metamagics"
+            },
+            "Types": {
+                "Active": "Active",
+                "Passive": "Passive"
             }
         },
         "CritterPower": {
@@ -75,12 +75,12 @@
             },
             "IsOptional": "Optionality",
             "Karma": "Karma",
-            "OptionalSelectionCount": "Optional Powers",
             "Optional": {
                 "DisabledOption": "Optional, disabled",
                 "EnabledOption": "Optional, enabled",
                 "Standard": "By default"
             },
+            "OptionalSelectionCount": "Optional Powers",
             "Range": "Range",
             "Ranges": {
                 "LineOfSight": "Line Of Sight",
@@ -93,6 +93,20 @@
             "Types": {
                 "Mana": "Mana",
                 "Physical": "Physical"
+            }
+        },
+        "Magic": {
+            "Labels": {
+                "Awakened": "Awakened",
+                "Emerged": "Emerged",
+                "Magic": "Magic",
+                "Mundane": "Mundane",
+                "PP": "PP",
+                "PowerLevel": "Level",
+                "PowerPoints": "PP",
+                "PowerType": "Type",
+                "Powers": "Powers",
+                "SpiritType": "Spirit Type"
             }
         },
         "Ritual": {
@@ -210,10 +224,18 @@
             "IllusionObvious": "Obvious",
             "IllusionRealistic": "Realistic",
             "IllusionSingleSense": "Single-Sense",
+            "Labels": {
+                "DetectionSpellExtended": "Extended",
+                "NormalSpellButton": "Normal",
+                "RecklessSpellButton": "Reckless"
+            },
             "ManipulationDamaging": "Damaging",
             "ManipulationEnvironmental": "Environmental",
             "ManipulationMental": "Mental",
             "ManipulationPhysical": "Physical",
+            "QuickInfo": {
+                "DrainForce": "Drain F{sign}{drain}"
+            },
             "Range": "Range",
             "RangeLos": "LOS",
             "RangeLosA": "LOS (A)",
@@ -222,15 +244,7 @@
             "Spells": "Spells",
             "Type": "Type",
             "TypeMana": "Mana",
-            "TypePhysical": "Physical",
-            "QuickInfo": {
-                "DrainForce": "Drain F{sign}{drain}"
-            },
-            "Labels": {
-                "DetectionSpellExtended": "Extended",
-                "NormalSpellButton": "Normal",
-                "RecklessSpellButton": "Reckless"
-            }
+            "TypePhysical": "Physical"
         },
         "Spirit": {
             "Bound": "Bound",
@@ -331,20 +345,6 @@
                 "Water": "Water",
                 "Worker": "Insect Worker",
                 "Wraith": "Wraith"
-            }
-        },
-        "Magic": {
-            "Labels": {
-                "Awakened": "Awakened",
-                "Emerged": "Emerged",
-                "Mundane": "Mundane",
-                "Magic": "Magic",
-                "PowerLevel": "Level",
-                "PowerPoints": "PP",
-                "PowerType": "Type",
-                "Powers": "Powers",
-                "PP": "PP",
-                "SpiritType": "Spirit Type"
             }
         }
     }

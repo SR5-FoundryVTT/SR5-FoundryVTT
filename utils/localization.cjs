@@ -52,6 +52,21 @@ function readJson(filePath) {
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
+function assertAlphabeticalKeys(value, sourceName, prefix = '') {
+    if (!isPlainObject(value)) return;
+
+    const keys = Object.keys(value);
+    const sortedKeys = [...keys].sort();
+    if (JSON.stringify(keys) !== JSON.stringify(sortedKeys)) {
+        const location = prefix || '<root>';
+        throw new Error(`${sourceName} has non-alphabetical keys at "${location}"`);
+    }
+
+    for (const key of keys) {
+        assertAlphabeticalKeys(value[key], sourceName, prefix ? `${prefix}.${key}` : key);
+    }
+}
+
 function flattenObject(object, prefix = '', flattened = {}) {
     for (const [key, value] of Object.entries(object)) {
         const flatKey = prefix ? `${prefix}.${key}` : key;
@@ -165,6 +180,7 @@ function loadLocale(locale) {
     for (const moduleName of MODULES) {
         const filePath = path.join(SOURCE_LOCALE_DIR, locale, `${moduleName}.json`);
         const fragment = readJson(filePath);
+        assertAlphabeticalKeys(fragment, `${locale}/${moduleName}.json`);
         assertModuleShape(locale, moduleName, fragment);
         for (const key of Object.keys(flattenObject(fragment))) {
             if (ownership.has(key)) {

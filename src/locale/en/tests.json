@@ -41,16 +41,22 @@
             "Summoning": "Summoning Actions"
         },
         "ActionType": {
-            "Label": "Type",
             "Complex": "Complex",
             "Free": "Free",
             "Interrupt": "Interrupt",
+            "Label": "Type",
             "None": "None",
             "Simple": "Simple",
             "Varies": "Varies"
         },
         "CallInAction": {
             "ActorType": "Actor Type",
+            "Compilation": {
+                "DropSprite": "Drop Sprite",
+                "FixedSprite": "Prep. Sprite",
+                "Label": "Compilation",
+                "SpriteType": "Sprite Type"
+            },
             "Compile": "Compile",
             "CreateCompilation": "Create compilation action",
             "CreateSummoning": "Create summoning action",
@@ -81,16 +87,10 @@
                 }
             },
             "Summon": "Summon",
-            "Compilation": {
-                "Label": "Compilation",
-                "DropSprite": "Drop Sprite",
-                "FixedSprite": "Prep. Sprite",
-                "SpriteType": "Sprite Type"
-            },
             "Summoning": {
-                "Label": "Summoning",
                 "DropSpirit": "Drop Spirit",
                 "FixedSpirit": "Prep. Spirit",
+                "Label": "Summoning",
                 "SpiritType": "Spirit Type"
             }
         },
@@ -109,10 +109,10 @@
             "Actor": "Actor",
             "AdvanceTime": "Advance game time on roll",
             "AdvanceTimeTooltip": "Advance the world time by the test interval after each roll.",
+            "BaseThreshold": "Base Threshold",
             "CanEdit": "Edit",
             "CanRoll": "Roll",
             "CanView": "View",
-            "BaseThreshold": "Base Threshold",
             "ConfirmCancel": "Cancel the extended test \"{name}\"? It ends the test, but a GM can reactivate it later.",
             "ConfirmDelete": "Delete the extended test \"{name}\"?",
             "CreateTest": "New Extended Test",
@@ -121,13 +121,13 @@
             "CumulativeModifierTooltip": "Reduce the dice pool by 1 for each roll performed. SR5 p. 48.",
             "CumulativeRollCount": "Prior rolls",
             "Due": "Due",
-            "DueTooltip": "Game time intervals elapsed since the last roll",
             "DueMessage": {
                 "Header": "Extended test ready to continue",
                 "OpenManager": "Open manager",
                 "Overdue": "{count} intervals elapsed",
                 "Rolls": "Rolls"
             },
+            "DueTooltip": "Game time intervals elapsed since the last roll",
             "EditTest": "Edit Extended Test",
             "Filters": {
                 "Actor": "Actor",
@@ -274,122 +274,6 @@
             "Wounds": "Wounds"
         },
         "Skill": {
-            "FIELDS": {
-                "type": {
-                    "label": "Type",
-                    "hint": "Defines what kind of skill configurations are available"
-                },
-                "skill": {
-                    "category": {
-                        "label": "Category",
-                        "hint": "Category of this skill"
-                    },
-                    "knowledgeType": {
-                        "label": "Knowledge Type",
-                        "hint": "Type of knowledge skill"
-                    },
-                    "rating": {
-                        "label": "Rating",
-                        "hint": "Rating of this entry"
-                    },
-                    "defaulting": {
-                        "label": "Defaulting",
-                        "hint": "If this skill can be defaulted"
-                    },
-                    "attribute": {
-                        "label": "Attribute",
-                        "hint": "Attribute used by this skill"
-                    },
-                    "limit": {
-                        "attribute": {
-                            "label": "Limit",
-                            "hint": "Limit to use for this skill action. Leave empty to use default attribute limit."
-                        }
-                    },
-                    "specializations": {
-                        "label": "Specialization",
-                        "hint": "Specialization for this skill, if any"
-                    },
-                    "language": {
-                        "isNative": {
-                            "label": "Native",
-                            "hint": "Marks this language as native"
-                        }
-                    },
-                    "requirement": {
-                        "label": "Requirement",
-                        "hint": "What the actor must be for this skill to be available"
-                    }
-                },
-                "group": {
-                    "label": "Skill Group",
-                    "hint": "Configuration for a skill group",
-                    "skills": {
-                        "label": "Skills",
-                        "hint": "Skills that are part of this group"
-                    },
-                    "rating": {
-                        "label": "Rating",
-                        "hint": "Rating of this skill group"
-                    }
-                },
-                "set": {
-                    "label": "Skill Set",
-                    "hint": "Configuration for a skill set",
-                    "default": {
-                        "label": "Use On New Actors",
-                        "hint": "Add this skill set to newly created actors"
-                    },
-                    "skills": {
-                        "label": "Skills",
-                        "hint": "Skills that are part of this set",
-                        "name": {
-                            "label": "Name",
-                            "hint": "Name of the skill"
-                        },
-                        "rating": {
-                            "label": "Rating",
-                            "hint": "Rating of this skill"
-                        },
-                        "specializations": {
-                            "label": "Specialization",
-                            "hint": "Specializations granted to this skill when the set is applied"
-                        }
-                    },
-                    "groups": {
-                        "label": "Skill Groups",
-                        "hint": "Skill groups that are part of this set",
-                        "name": {
-                            "label": "Name",
-                            "hint": "Name of the skill group"
-                        },
-                        "rating": {
-                            "label": "Rating",
-                            "hint": "Rating of this skill group"
-                        }
-                    }
-                }
-            },
-            "Types": {
-                "Skill": "Skill",
-                "Group": "Skill Group",
-                "Set": "Skill Set"
-            },
-            "Category": {
-                "Active": "Active",
-                "Knowledge": "Knowledge",
-                "Language": "Language"
-            },
-            "KnowledgeType": {
-                "Academic": "Academic",
-                "Professional": "Professional",
-                "Interests": "Interests",
-                "Street": "Street"
-            },
-            "Set": {
-                "LogActorDifferences": "Log Actor Differences",
-                "DifferencesLoggedInConsole": "Open your browser console to view differences"
-            },
             "AeronauticsMechanic": "Aeronautics Mechanic",
             "Alchemy": "Alchemy",
             "AnimalHandling": "Animal Handling",
@@ -406,6 +290,11 @@
             "Binding": "Binding",
             "Biotechnology": "Biotechnology",
             "Blades": "Blades",
+            "Category": {
+                "Active": "Active",
+                "Knowledge": "Knowledge",
+                "Language": "Language"
+            },
             "Chemistry": "Chemistry",
             "Clubs": "Clubs",
             "Compiling": "Compiling",
@@ -424,6 +313,102 @@
             "Etiquette": "Etiquette",
             "ExoticMeleeWeapon": "Exotic Melee Weapon",
             "ExoticRangedWeapon": "Exotic Ranged Weapon",
+            "FIELDS": {
+                "group": {
+                    "hint": "Configuration for a skill group",
+                    "label": "Skill Group",
+                    "rating": {
+                        "hint": "Rating of this skill group",
+                        "label": "Rating"
+                    },
+                    "skills": {
+                        "hint": "Skills that are part of this group",
+                        "label": "Skills"
+                    }
+                },
+                "set": {
+                    "default": {
+                        "hint": "Add this skill set to newly created actors",
+                        "label": "Use On New Actors"
+                    },
+                    "groups": {
+                        "hint": "Skill groups that are part of this set",
+                        "label": "Skill Groups",
+                        "name": {
+                            "hint": "Name of the skill group",
+                            "label": "Name"
+                        },
+                        "rating": {
+                            "hint": "Rating of this skill group",
+                            "label": "Rating"
+                        }
+                    },
+                    "hint": "Configuration for a skill set",
+                    "label": "Skill Set",
+                    "skills": {
+                        "hint": "Skills that are part of this set",
+                        "label": "Skills",
+                        "name": {
+                            "hint": "Name of the skill",
+                            "label": "Name"
+                        },
+                        "rating": {
+                            "hint": "Rating of this skill",
+                            "label": "Rating"
+                        },
+                        "specializations": {
+                            "hint": "Specializations granted to this skill when the set is applied",
+                            "label": "Specialization"
+                        }
+                    }
+                },
+                "skill": {
+                    "attribute": {
+                        "hint": "Attribute used by this skill",
+                        "label": "Attribute"
+                    },
+                    "category": {
+                        "hint": "Category of this skill",
+                        "label": "Category"
+                    },
+                    "defaulting": {
+                        "hint": "If this skill can be defaulted",
+                        "label": "Defaulting"
+                    },
+                    "knowledgeType": {
+                        "hint": "Type of knowledge skill",
+                        "label": "Knowledge Type"
+                    },
+                    "language": {
+                        "isNative": {
+                            "hint": "Marks this language as native",
+                            "label": "Native"
+                        }
+                    },
+                    "limit": {
+                        "attribute": {
+                            "hint": "Limit to use for this skill action. Leave empty to use default attribute limit.",
+                            "label": "Limit"
+                        }
+                    },
+                    "rating": {
+                        "hint": "Rating of this entry",
+                        "label": "Rating"
+                    },
+                    "requirement": {
+                        "hint": "What the actor must be for this skill to be available",
+                        "label": "Requirement"
+                    },
+                    "specializations": {
+                        "hint": "Specialization for this skill, if any",
+                        "label": "Specialization"
+                    }
+                },
+                "type": {
+                    "hint": "Defines what kind of skill configurations are available",
+                    "label": "Type"
+                }
+            },
             "FirstAid": "First Aid",
             "Flight": "Flight",
             "Forgery": "Forgery",
@@ -437,6 +422,18 @@
             "IndustrialMechanic": "Industrial Mechanic",
             "Instruction": "Instruction",
             "Intimidation": "Intimidation",
+            "KnowledgeType": {
+                "Academic": "Academic",
+                "Interests": "Interests",
+                "Professional": "Professional",
+                "Street": "Street"
+            },
+            "KnowledgeTypes": {
+                "Academic": "Academic",
+                "Interests": "Interests",
+                "Professional": "Professional",
+                "Street": "Street"
+            },
             "Leadership": "Leadership",
             "Locksmith": "Locksmith",
             "Longarms": "Longarms",
@@ -458,6 +455,10 @@
             "Registering": "Registering",
             "RitualSpellcasting": "Ritual Spellcasting",
             "Running": "Running",
+            "Set": {
+                "DifferencesLoggedInConsole": "Open your browser console to view differences",
+                "LogActorDifferences": "Log Actor Differences"
+            },
             "Skill": "Skill",
             "SkillGroup": "Skill Group",
             "Skills": "Skills",
@@ -475,15 +476,14 @@
             },
             "ThrowingWeapons": "Throwing Weapons",
             "Tracking": "Tracking",
+            "Types": {
+                "Group": "Skill Group",
+                "Set": "Skill Set",
+                "Skill": "Skill"
+            },
             "UnarmedCombat": "Unarmed Combat",
             "abbr": {
                 "Native": "N"
-            },
-            "KnowledgeTypes": {
-                "Academic": "Academic",
-                "Interests": "Interests",
-                "Professional": "Professional",
-                "Street": "Street"
             }
         },
         "TestResults": {
@@ -523,9 +523,83 @@
             "DrainTest": "Drain Test",
             "DroneInfiltrationTest": "Drone Infiltration Test",
             "DronePerceptionTest": "Drone Perception Test",
+            "Duration": {
+                "Label": "Duration",
+                "Types": {
+                    "Instant": "Instant",
+                    "Permanent": "Permanent",
+                    "Sustained": "Sustained"
+                }
+            },
             "ExtendedTest": "Extended Test",
             "FadeTest": "Fade Test",
             "HackOnTheFlyTest": "Hack on the Fly",
+            "Labels": {
+                "ActiveDefense": "Active Defense",
+                "Attacker": "Attacker",
+                "AttackerHits": "Attacker Hits",
+                "AttackerNetHits": "Attacker Net Hits",
+                "BiofeedbackDamage": "Biofeedback Damage",
+                "BuyHits": "Buy Hits",
+                "CanDefault": "Can Default",
+                "Defender": "Defender",
+                "DefenderNetHits": "Defender Net Hits",
+                "DefenseTest": "Defense Test",
+                "DicePool": "Pool",
+                "DicePoolModifier": "Dice Pool Mod",
+                "DontApplyWounds": "Don't Apply Wounds",
+                "EnforcedMaximum": "Enforced Maximum",
+                "EnforcedMinimum": "Enforced Minimum",
+                "ExtendedHits": "Extended Hits",
+                "ExtendedTest": "Extended Test",
+                "FadeAttribute": "Fade Attribute",
+                "FadeValue": "Fade Value",
+                "FullDefense": "Full Defense",
+                "FullMatrixDefense": "Full Matrix Defense",
+                "Hits": "Hits",
+                "IncomingDamage": "Incoming Damage",
+                "IncomingDrain": "Incoming Drain",
+                "IncomingFade": "Incoming Fade",
+                "MeleeWeaponAttack": "Melee Weapon Attack",
+                "NetHits": "Net Hits",
+                "OpposedType": "Type",
+                "OpposingHits": "Opposing Hits",
+                "OpposingNetHits": "Opposing Net Hits",
+                "OriginalDicePool": "Original Dice Pool",
+                "RangedWeaponAttack": "Range Weapon Attack",
+                "ResultOverride": "Result Override",
+                "ResultOverrideGlitches": "Glitches",
+                "ResultOverrideHits": "Hits",
+                "RollArmor": "Armor",
+                "RollComposure": "Composure",
+                "RollCustom": "Custom",
+                "RollDefense": "Defense",
+                "RollDrain": "Drain",
+                "RollFade": "Fade",
+                "RollJudgeIntentions": "J.Intentions",
+                "RollLiftCarry": "Lift&Carry",
+                "RollMemory": "Memory",
+                "RollMode": "Roll Mode",
+                "RollOneDie": "You can't roll less than 1 die, chummer",
+                "RollSoak": "Damage Resist",
+                "SecondAttribute": "Second Attribute",
+                "SecondChance": "Second Chance",
+                "Soak": "Soak",
+                "SoakTest": "Damage Resist Test",
+                "Successes": "Successes",
+                "Suppressing": "Suppressing",
+                "TargetingNeedsActorWithToken": "The current actor needs a linked token for targeting to work",
+                "UseEdgeForInitiativeRoll": "Use edge rule blitz for initiative"
+            },
+            "Limit": {
+                "Label": "Limit",
+                "Types": {
+                    "Astral": "Astral",
+                    "Mental": "Mental",
+                    "Physical": "Physical",
+                    "Social": "Social"
+                }
+            },
             "MatrixDefenseTest": "Matrix Defense",
             "MatrixResistTest": "Matrix Damage Resist",
             "MatrixTest": "Matrix Test",
@@ -550,81 +624,6 @@
             "SuccessTest": "Success Test",
             "SummonSpiritTest": "Summon Spirit",
             "SuppressionDefenseTest": "Suppression Defense",
-            "ThrownAttackTest": "Thrown Weapon Attack",
-            "Labels": {
-                "ActiveDefense": "Active Defense",
-                "Attacker": "Attacker",
-                "EnforcedMaximum": "Enforced Maximum",
-                "EnforcedMinimum": "Enforced Minimum",
-                "AttackerHits": "Attacker Hits",
-                "AttackerNetHits": "Attacker Net Hits",
-                "BiofeedbackDamage": "Biofeedback Damage",
-                "BuyHits": "Buy Hits",
-                "CanDefault": "Can Default",
-                "Defender": "Defender",
-                "DefenderNetHits": "Defender Net Hits",
-                "DefenseTest": "Defense Test",
-                "DicePool": "Pool",
-                "DicePoolModifier": "Dice Pool Mod",
-                "DontApplyWounds": "Don't Apply Wounds",
-                "ExtendedHits": "Extended Hits",
-                "ExtendedTest": "Extended Test",
-                "FadeAttribute": "Fade Attribute",
-                "FadeValue": "Fade Value",
-                "FullDefense": "Full Defense",
-                "FullMatrixDefense": "Full Matrix Defense",
-                "Hits": "Hits",
-                "IncomingDamage": "Incoming Damage",
-                "IncomingDrain": "Incoming Drain",
-                "IncomingFade": "Incoming Fade",
-                "MeleeWeaponAttack": "Melee Weapon Attack",
-                "NetHits": "Net Hits",
-                "OpposedType": "Type",
-                "OpposingHits": "Opposing Hits",
-                "OpposingNetHits": "Opposing Net Hits",
-                "OriginalDicePool": "Original Dice Pool",
-                "ResultOverride": "Result Override",
-                "ResultOverrideGlitches": "Glitches",
-                "ResultOverrideHits": "Hits",
-                "RollArmor": "Armor",
-                "RollComposure": "Composure",
-                "RollCustom": "Custom",
-                "RollDefense": "Defense",
-                "RollDrain": "Drain",
-                "RollFade": "Fade",
-                "RollJudgeIntentions": "J.Intentions",
-                "RollLiftCarry": "Lift&Carry",
-                "RollMemory": "Memory",
-                "RollMode": "Roll Mode",
-                "RollOneDie": "You can't roll less than 1 die, chummer",
-                "RollSoak": "Damage Resist",
-                "SecondAttribute": "Second Attribute",
-                "SecondChance": "Second Chance",
-                "Soak": "Soak",
-                "SoakTest": "Damage Resist Test",
-                "Successes": "Successes",
-                "Suppressing": "Suppressing",
-                "TargetingNeedsActorWithToken": "The current actor needs a linked token for targeting to work",
-                "UseEdgeForInitiativeRoll": "Use edge rule blitz for initiative",
-                "RangedWeaponAttack": "Range Weapon Attack"
-            },
-            "Duration": {
-                "Label": "Duration",
-                "Types": {
-                    "Instant": "Instant",
-                    "Permanent": "Permanent",
-                    "Sustained": "Sustained"
-                }
-            },
-            "Limit": {
-                "Label": "Limit",
-                "Types": {
-                    "Astral": "Astral",
-                    "Mental": "Mental",
-                    "Physical": "Physical",
-                    "Social": "Social"
-                }
-            },
             "Target": {
                 "Label": "Target",
                 "Types": {
@@ -635,7 +634,8 @@
                     "Self": "Self",
                     "Sprite": "Sprite"
                 }
-            }
+            },
+            "ThrownAttackTest": "Thrown Weapon Attack"
         }
     }
 }

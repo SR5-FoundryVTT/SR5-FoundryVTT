@@ -41,16 +41,22 @@
             "Summoning": "소환 행동"
         },
         "ActionType": {
-            "Label": "유형",
             "Complex": "복잡",
             "Free": "자유",
             "Interrupt": "인터럽트",
+            "Label": "유형",
             "None": "없음",
             "Simple": "단순",
             "Varies": "다양"
         },
         "CallInAction": {
             "ActorType": "액터 유형",
+            "Compilation": {
+                "DropSprite": "스프라이트 배치",
+                "FixedSprite": "준비된 스프라이트",
+                "Label": "컴파일",
+                "SpriteType": "스프라이트 유형"
+            },
             "Compile": "컴파일",
             "CreateCompilation": "컴파일 행동 생성",
             "CreateSummoning": "소환 행동 생성",
@@ -81,16 +87,10 @@
                 }
             },
             "Summon": "소환",
-            "Compilation": {
-                "Label": "컴파일",
-                "DropSprite": "스프라이트 배치",
-                "FixedSprite": "준비된 스프라이트",
-                "SpriteType": "스프라이트 유형"
-            },
             "Summoning": {
-                "Label": "소환",
                 "DropSpirit": "영혼 배치",
                 "FixedSpirit": "준비된 영혼",
+                "Label": "소환",
                 "SpiritType": "영혼 유형"
             }
         },
@@ -109,10 +109,10 @@
             "Actor": "액터",
             "AdvanceTime": "굴릴 때 게임 시간 진행",
             "AdvanceTimeTooltip": "굴림을 할 때마다 판정 간격만큼 월드 시간을 진행합니다.",
+            "BaseThreshold": "기본 임계값",
             "CanEdit": "편집",
             "CanRoll": "굴리기",
             "CanView": "보기",
-            "BaseThreshold": "기본 임계값",
             "ConfirmCancel": "확장 테스트 \"{name}\"을(를) 취소할까요? 테스트가 종료되지만 GM이 나중에 재활성화할 수 있습니다.",
             "ConfirmDelete": "연장 판정 \"{name}\"을(를) 삭제하시겠습니까?",
             "CreateTest": "새 연장 판정",
@@ -121,13 +121,13 @@
             "CumulativeModifierTooltip": "굴림을 할 때마다 주사위 풀을 1씩 줄입니다. SR5 48쪽.",
             "CumulativeRollCount": "이전 굴림",
             "Due": "예정",
-            "DueTooltip": "마지막 굴림 이후 경과한 게임 시간 간격",
             "DueMessage": {
                 "Header": "확장 판정을 이어갈 수 있습니다",
                 "OpenManager": "관리자 열기",
                 "Overdue": "{count}개 간격 경과",
                 "Rolls": "굴림"
             },
+            "DueTooltip": "마지막 굴림 이후 경과한 게임 시간 간격",
             "EditTest": "연장 판정 편집",
             "Filters": {
                 "Actor": "액터",
@@ -274,122 +274,6 @@
             "Wounds": "부상"
         },
         "Skill": {
-            "FIELDS": {
-                "type": {
-                    "label": "유형",
-                    "hint": "사용 가능한 기술 구성 유형을 정의"
-                },
-                "skill": {
-                    "category": {
-                        "label": "범주",
-                        "hint": "해당 기술의 범주"
-                    },
-                    "knowledgeType": {
-                        "label": "지식 유형",
-                        "hint": "지식 기술의 유형"
-                    },
-                    "rating": {
-                        "label": "등급",
-                        "hint": "해당 항목의 등급"
-                    },
-                    "defaulting": {
-                        "label": "무리한 시도",
-                        "hint": "해당 기술의 무리한 시도 가능 여부"
-                    },
-                    "attribute": {
-                        "label": "특성치",
-                        "hint": "해당 기술이 사용하는 특성치"
-                    },
-                    "limit": {
-                        "attribute": {
-                            "label": "한계치",
-                            "hint": "해당 기술 행동이 사용하는 한계치. 비워둘 경우 기본 특성 한계치를 사용."
-                        }
-                    },
-                    "specializations": {
-                        "label": "전문화",
-                        "hint": "해당하는 경우 해당 기술의 전문화"
-                    },
-                    "language": {
-                        "isNative": {
-                            "label": "모국어",
-                            "hint": "해당 언어를 모국어로 표시"
-                        }
-                    },
-                    "requirement": {
-                        "label": "요구 사항",
-                        "hint": "해당 기술 사용에 액터가 충족해야 하는 조건"
-                    }
-                },
-                "group": {
-                    "label": "기술 묶음",
-                    "hint": "기술 묶음 구성",
-                    "skills": {
-                        "label": "기술",
-                        "hint": "해당 묶음에 속하는 기술"
-                    },
-                    "rating": {
-                        "label": "등급",
-                        "hint": "해당 기술 묶음의 등급"
-                    }
-                },
-                "set": {
-                    "label": "기술 설정",
-                    "hint": "기술 설정에 속하는 기술",
-                    "default": {
-                        "label": "새로운 액터에게 적용",
-                        "hint": "해당 기술 설정을 새롭게 만들어진 액터에 추가"
-                    },
-                    "skills": {
-                        "label": "기술",
-                        "hint": "해당 설정에 포함된 기술들",
-                        "name": {
-                            "label": "이름",
-                            "hint": "해당 기술의 이름"
-                        },
-                        "rating": {
-                            "label": "등급",
-                            "hint": "해당 기술의 등급"
-                        },
-                        "specializations": {
-                            "label": "전문화",
-                            "hint": "해당 설정을 적용했을 때 이 기술에 적용되는 전문화"
-                        }
-                    },
-                    "groups": {
-                        "label": "기술 묶음",
-                        "hint": "해당 설정에 포함된 기술 묶음",
-                        "name": {
-                            "label": "이름",
-                            "hint": "해당 기술 묶음의 이름"
-                        },
-                        "rating": {
-                            "label": "등급",
-                            "hint": "해당 기술 묶음의 등급"
-                        }
-                    }
-                }
-            },
-            "Types": {
-                "Skill": "기술",
-                "Group": "기술 묶음",
-                "Set": "기술 설정"
-            },
-            "Category": {
-                "Active": "활성형",
-                "Knowledge": "지식",
-                "Language": "언어"
-            },
-            "KnowledgeType": {
-                "Academic": "학술적",
-                "Professional": "전문적",
-                "Interests": "흥미",
-                "Street": "길거리"
-            },
-            "Set": {
-                "LogActorDifferences": "액터간 차이 기록",
-                "DifferencesLoggedInConsole": "차이점을 보기 위해 사용자의 브라우저 콘솔 열기"
-            },
             "AeronauticsMechanic": "항공정비",
             "Alchemy": "연금술",
             "AnimalHandling": "동물 조련",
@@ -406,6 +290,11 @@
             "Binding": "속박",
             "Biotechnology": "생명공학",
             "Blades": "도검류",
+            "Category": {
+                "Active": "활성형",
+                "Knowledge": "지식",
+                "Language": "언어"
+            },
             "Chemistry": "화학",
             "Clubs": "둔기류",
             "Compiling": "컴파일링",
@@ -424,6 +313,102 @@
             "Etiquette": "예법",
             "ExoticMeleeWeapon": "희귀 근거리 무기",
             "ExoticRangedWeapon": "희귀 원거리 무기",
+            "FIELDS": {
+                "group": {
+                    "hint": "기술 묶음 구성",
+                    "label": "기술 묶음",
+                    "rating": {
+                        "hint": "해당 기술 묶음의 등급",
+                        "label": "등급"
+                    },
+                    "skills": {
+                        "hint": "해당 묶음에 속하는 기술",
+                        "label": "기술"
+                    }
+                },
+                "set": {
+                    "default": {
+                        "hint": "해당 기술 설정을 새롭게 만들어진 액터에 추가",
+                        "label": "새로운 액터에게 적용"
+                    },
+                    "groups": {
+                        "hint": "해당 설정에 포함된 기술 묶음",
+                        "label": "기술 묶음",
+                        "name": {
+                            "hint": "해당 기술 묶음의 이름",
+                            "label": "이름"
+                        },
+                        "rating": {
+                            "hint": "해당 기술 묶음의 등급",
+                            "label": "등급"
+                        }
+                    },
+                    "hint": "기술 설정에 속하는 기술",
+                    "label": "기술 설정",
+                    "skills": {
+                        "hint": "해당 설정에 포함된 기술들",
+                        "label": "기술",
+                        "name": {
+                            "hint": "해당 기술의 이름",
+                            "label": "이름"
+                        },
+                        "rating": {
+                            "hint": "해당 기술의 등급",
+                            "label": "등급"
+                        },
+                        "specializations": {
+                            "hint": "해당 설정을 적용했을 때 이 기술에 적용되는 전문화",
+                            "label": "전문화"
+                        }
+                    }
+                },
+                "skill": {
+                    "attribute": {
+                        "hint": "해당 기술이 사용하는 특성치",
+                        "label": "특성치"
+                    },
+                    "category": {
+                        "hint": "해당 기술의 범주",
+                        "label": "범주"
+                    },
+                    "defaulting": {
+                        "hint": "해당 기술의 무리한 시도 가능 여부",
+                        "label": "무리한 시도"
+                    },
+                    "knowledgeType": {
+                        "hint": "지식 기술의 유형",
+                        "label": "지식 유형"
+                    },
+                    "language": {
+                        "isNative": {
+                            "hint": "해당 언어를 모국어로 표시",
+                            "label": "모국어"
+                        }
+                    },
+                    "limit": {
+                        "attribute": {
+                            "hint": "해당 기술 행동이 사용하는 한계치. 비워둘 경우 기본 특성 한계치를 사용.",
+                            "label": "한계치"
+                        }
+                    },
+                    "rating": {
+                        "hint": "해당 항목의 등급",
+                        "label": "등급"
+                    },
+                    "requirement": {
+                        "hint": "해당 기술 사용에 액터가 충족해야 하는 조건",
+                        "label": "요구 사항"
+                    },
+                    "specializations": {
+                        "hint": "해당하는 경우 해당 기술의 전문화",
+                        "label": "전문화"
+                    }
+                },
+                "type": {
+                    "hint": "사용 가능한 기술 구성 유형을 정의",
+                    "label": "유형"
+                }
+            },
             "FirstAid": "응급 치료",
             "Flight": "비행",
             "Forgery": "위조",
@@ -437,6 +422,18 @@
             "IndustrialMechanic": "산업 정비",
             "Instruction": "교육",
             "Intimidation": "협박",
+            "KnowledgeType": {
+                "Academic": "학술적",
+                "Interests": "흥미",
+                "Professional": "전문적",
+                "Street": "길거리"
+            },
+            "KnowledgeTypes": {
+                "Academic": "학술적 지식",
+                "Interests": "흥미",
+                "Professional": "전문적 지식",
+                "Street": "길거리 지식"
+            },
             "Leadership": "지도력",
             "Locksmith": "자물쇠 따기",
             "Longarms": "장총류",
@@ -458,6 +455,10 @@
             "Registering": "레지스터링",
             "RitualSpellcasting": "의식 주문 시전",
             "Running": "달리기",
+            "Set": {
+                "DifferencesLoggedInConsole": "차이점을 보기 위해 사용자의 브라우저 콘솔 열기",
+                "LogActorDifferences": "액터간 차이 기록"
+            },
             "Skill": "기술",
             "SkillGroup": "기술 묶음",
             "Skills": "기술",
@@ -475,15 +476,14 @@
             },
             "ThrowingWeapons": "투척용 무기",
             "Tracking": "추적",
+            "Types": {
+                "Group": "기술 묶음",
+                "Set": "기술 설정",
+                "Skill": "기술"
+            },
             "UnarmedCombat": "비무장 전투",
             "abbr": {
                 "Native": "N"
-            },
-            "KnowledgeTypes": {
-                "Academic": "학술적 지식",
-                "Interests": "흥미",
-                "Professional": "전문적 지식",
-                "Street": "길거리 지식"
             }
         },
         "TestResults": {
@@ -523,9 +523,83 @@
             "DrainTest": "드레인 판정",
             "DroneInfiltrationTest": "드론 침투 판정",
             "DronePerceptionTest": "드론 인식 판정",
+            "Duration": {
+                "Label": "지속력",
+                "Types": {
+                    "Instant": "즉각적",
+                    "Permanent": "영구적",
+                    "Sustained": "지속적"
+                }
+            },
             "ExtendedTest": "연장 판정",
             "FadeTest": "페이드 판정",
             "HackOnTheFlyTest": "즉석 해킹",
+            "Labels": {
+                "ActiveDefense": "능동 방어",
+                "Attacker": "공격자",
+                "AttackerHits": "공격자 성공횟수",
+                "AttackerNetHits": "공격자 순 성공횟수",
+                "BiofeedbackDamage": "생체반응 피해",
+                "BuyHits": "성공 구매",
+                "CanDefault": "무리한 시도 가능",
+                "Defender": "방어자",
+                "DefenderNetHits": "방어자 순 성공횟수",
+                "DefenseTest": "방어 판정",
+                "DicePool": "주사위 풀",
+                "DicePoolModifier": "주사위 풀 수정치",
+                "DontApplyWounds": "부상 적용 안함",
+                "EnforcedMaximum": "최댓값 강제",
+                "EnforcedMinimum": "최솟값 강제",
+                "ExtendedHits": "연장 판정 성공횟수",
+                "ExtendedTest": "연장 판정",
+                "FadeAttribute": "페이드 특성치",
+                "FadeValue": "페이드 수치",
+                "FullDefense": "전력방어",
+                "FullMatrixDefense": "매트릭스 전력 방어",
+                "Hits": "성공횟수",
+                "IncomingDamage": "기본 피해",
+                "IncomingDrain": "기본 드레인",
+                "IncomingFade": "기본 페이드",
+                "MeleeWeaponAttack": "근거리 무기 공격",
+                "NetHits": "순 성공횟수",
+                "OpposedType": "유형",
+                "OpposingHits": "경쟁 성공횟수",
+                "OpposingNetHits": "경쟁 순 성공",
+                "OriginalDicePool": "기존 주사위 풀",
+                "RangedWeaponAttack": "원거리 무기 공격",
+                "ResultOverride": "결과 오버라이드",
+                "ResultOverrideGlitches": "글리치",
+                "ResultOverrideHits": "성공",
+                "RollArmor": "방어구",
+                "RollComposure": "평정심",
+                "RollCustom": "맞춤 설정",
+                "RollDefense": "방어",
+                "RollDrain": "드레인",
+                "RollFade": "페이드",
+                "RollJudgeIntentions": "의심",
+                "RollLiftCarry": "들기&운반",
+                "RollMemory": "기억\n",
+                "RollMode": "굴림 방식",
+                "RollOneDie": "1개 미만의 주사위는 굴릴 수 없어, 처머",
+                "RollSoak": "피해 저항",
+                "SecondAttribute": "두 번째 특성치",
+                "SecondChance": "두 번째 기회",
+                "Soak": "피해 저항",
+                "SoakTest": "피해 저항 판정",
+                "Successes": "성공",
+                "Suppressing": "제압 사격",
+                "TargetingNeedsActorWithToken": "현재 액터가 작동하려면 목표에 연결된 토큰이 필요",
+                "UseEdgeForInitiativeRoll": "우선권에 대한 블리츠 엣지 규칙 사용"
+            },
+            "Limit": {
+                "Label": "한계",
+                "Types": {
+                    "Astral": "아스트랄",
+                    "Mental": "정신",
+                    "Physical": "물리",
+                    "Social": "사교"
+                }
+            },
             "MatrixDefenseTest": "매트릭스 방어",
             "MatrixResistTest": "매트릭스 피해 저항",
             "MatrixTest": "매트릭스 판정",
@@ -550,81 +624,6 @@
             "SuccessTest": "성공 판정",
             "SummonSpiritTest": "영혼 소환",
             "SuppressionDefenseTest": "제압사격 방어",
-            "ThrownAttackTest": "투척 무기 공격",
-            "Labels": {
-                "ActiveDefense": "능동 방어",
-                "Attacker": "공격자",
-                "EnforcedMaximum": "최댓값 강제",
-                "EnforcedMinimum": "최솟값 강제",
-                "AttackerHits": "공격자 성공횟수",
-                "AttackerNetHits": "공격자 순 성공횟수",
-                "BiofeedbackDamage": "생체반응 피해",
-                "BuyHits": "성공 구매",
-                "CanDefault": "무리한 시도 가능",
-                "Defender": "방어자",
-                "DefenderNetHits": "방어자 순 성공횟수",
-                "DefenseTest": "방어 판정",
-                "DicePool": "주사위 풀",
-                "DicePoolModifier": "주사위 풀 수정치",
-                "DontApplyWounds": "부상 적용 안함",
-                "ExtendedHits": "연장 판정 성공횟수",
-                "ExtendedTest": "연장 판정",
-                "FadeAttribute": "페이드 특성치",
-                "FadeValue": "페이드 수치",
-                "FullDefense": "전력방어",
-                "FullMatrixDefense": "매트릭스 전력 방어",
-                "Hits": "성공횟수",
-                "IncomingDamage": "기본 피해",
-                "IncomingDrain": "기본 드레인",
-                "IncomingFade": "기본 페이드",
-                "MeleeWeaponAttack": "근거리 무기 공격",
-                "NetHits": "순 성공횟수",
-                "OpposedType": "유형",
-                "OpposingHits": "경쟁 성공횟수",
-                "OpposingNetHits": "경쟁 순 성공",
-                "OriginalDicePool": "기존 주사위 풀",
-                "ResultOverride": "결과 오버라이드",
-                "ResultOverrideGlitches": "글리치",
-                "ResultOverrideHits": "성공",
-                "RollArmor": "방어구",
-                "RollComposure": "평정심",
-                "RollCustom": "맞춤 설정",
-                "RollDefense": "방어",
-                "RollDrain": "드레인",
-                "RollFade": "페이드",
-                "RollJudgeIntentions": "의심",
-                "RollLiftCarry": "들기&운반",
-                "RollMemory": "기억\n",
-                "RollMode": "굴림 방식",
-                "RollOneDie": "1개 미만의 주사위는 굴릴 수 없어, 처머",
-                "RollSoak": "피해 저항",
-                "SecondAttribute": "두 번째 특성치",
-                "SecondChance": "두 번째 기회",
-                "Soak": "피해 저항",
-                "SoakTest": "피해 저항 판정",
-                "Successes": "성공",
-                "Suppressing": "제압 사격",
-                "TargetingNeedsActorWithToken": "현재 액터가 작동하려면 목표에 연결된 토큰이 필요",
-                "UseEdgeForInitiativeRoll": "우선권에 대한 블리츠 엣지 규칙 사용",
-                "RangedWeaponAttack": "원거리 무기 공격"
-            },
-            "Duration": {
-                "Label": "지속력",
-                "Types": {
-                    "Instant": "즉각적",
-                    "Permanent": "영구적",
-                    "Sustained": "지속적"
-                }
-            },
-            "Limit": {
-                "Label": "한계",
-                "Types": {
-                    "Astral": "아스트랄",
-                    "Mental": "정신",
-                    "Physical": "물리",
-                    "Social": "사교"
-                }
-            },
             "Target": {
                 "Label": "목표",
                 "Types": {
@@ -635,7 +634,8 @@
                     "Self": "시전자 적용",
                     "Sprite": "스프라이트"
                 }
-            }
+            },
+            "ThrownAttackTest": "투척 무기 공격"
         }
     }
 }

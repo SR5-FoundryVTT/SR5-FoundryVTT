@@ -19,6 +19,7 @@
                 "DronePerception": "Drohnen-Wahrnehmung",
                 "DronePilotVehicle": "Drohne Fahrzeug steuern",
                 "EditFile": "Datei editieren",
+                "EnterExitHost": "Host betreten/verlassen",
                 "EraseMark": "Marke Löschen",
                 "EraseMatrixSignature": "Matrixsignatur löschen",
                 "Fade": "Schwund",
@@ -48,8 +49,7 @@
                 "Snoop": "Übertragung Abfangen",
                 "SpoofCommand": "Befehl vortäuschen",
                 "SwitchInterfaceMode": "Interfacemodus wechseln",
-                "TraceIcon": "Icon Aufspüren",
-                "EnterExitHost": "Host betreten/verlassen"
+                "TraceIcon": "Icon Aufspüren"
             }
         },
         "ContextOptions": {
@@ -65,6 +65,36 @@
             "Source": "Referenz öffnen",
             "View": "Öffnen",
             "ViewItem": "Gegenstand öffnen"
+        },
+        "Keybindings": {
+            "AddRemoveManyQty": {
+                "Hint": "Füge zu/Enferne 20 Stück pro Klick",
+                "Label": "Füge zu/Entferne 20"
+            },
+            "AddRemoveSomeQty": {
+                "Hint": "Füge zu/Enferne 5 Stück pro Klick",
+                "Label": "Füge zu/Entferne 5"
+            },
+            "HideTestDialog": {
+                "Hint": "Testdialoge werden einmalig übersprungen",
+                "Label": "Testdialog überspringen"
+            },
+            "OverwatchScoreTracker": {
+                "Hint": "Öffne den Overwatch-Wert-Monitor",
+                "Label": "Overwatch-Wert-Monitor"
+            },
+            "ShowItemCard": {
+                "Hint": "Anstelle eines Tests zeige die Itemkarte im Chat",
+                "Label": "Zeige nur Chatkarte"
+            },
+            "ShowSituationModifiers": {
+                "Hint": "Öffne Situationsmodifikatoren für aktuelle Auswahl",
+                "Label": "Situationsmodifikatoren"
+            },
+            "SuccessTestPrompt": {
+                "Hint": "Öffnet Dialog für eine Erfolgsprobe",
+                "Label": "Erfolgsprobe auslösen"
+            }
         },
         "Labels": {
             "Action": {
@@ -135,6 +165,12 @@
                 "TestKBoardModifiers": "{skip}: überspringe Dialog. {descr}: zeige nur Beschreibung.",
                 "VehicleConfiguration": "Fahrzeug-Konfiguration"
             },
+            "Documents": {
+                "Actor": "Akteur",
+                "Item": "Gegenstand",
+                "Scene": "Szene",
+                "Token": "Token"
+            },
             "Inventory": {
                 "All": "Alle",
                 "Carried": "Mitgeführt",
@@ -187,12 +223,6 @@
                 "Changelog": "Änderungsprotokoll",
                 "Issues": "Probleme",
                 "Wiki": "Wiki"
-            },
-            "Documents": {
-                "Actor": "Akteur",
-                "Item": "Gegenstand",
-                "Scene": "Szene",
-                "Token": "Token"
             }
         },
         "Tabs": {
@@ -246,8 +276,6 @@
                 "DisconnectNetwork": "Verlasse Host/ Gitter",
                 "MarkTarget": "Platziere Marken auf diesem Ziel",
                 "MatrixConnectionToggle": "Ändere den Matrix-Verbindung: Erweiterte Realität, Kalte Sim oder Heiße Sim",
-                "RemoveAllNetworks": "Alle Netzwerke entfernen",
-                "RemoveNetwork": "Netzwerk entfernen",
                 "MatrixRunningSilentToggle": "Wechsle zwischen Schleichfahrt und Anzeige der Persona",
                 "Metatype": "Ein NSC-Akteur bekommt automatische Attributemodifikatoren abhängig vom Metatyp",
                 "MiscConfig": "Verschiedene Einstellungen für den Akteur",
@@ -261,12 +289,14 @@
                 "PickControlledTokenAsTechnomancer": "Wähle das aktuell kontrollierte Token als Technomancer aus",
                 "PlaceMark": "Handlung zum Platzieren von Marken auf bereits markierten Zielen",
                 "RebootPersonaAndClearAllMarks": "Starte deine Persona neu und entferne alle von dir platzierten Marken",
+                "RemoveAllNetworks": "Alle Netzwerke entfernen",
                 "RemoveFavorite": "Aus Favoriten entfernen",
+                "RemoveNetwork": "Netzwerk entfernen",
                 "RemoveOneService": "Entferne einen Dienst",
+                "RemoveSkillSet": "Entferne das aktuelle Fertigkeitsset sowie alle daraus stammenden Fertigkeiten und Fertigkeitsgruppen",
                 "ResetActorForNewRun": "Setze Schaden, Edge usw. für einen neuen Run zurück",
                 "RollInitiative": "Werfe Initiative",
-                "SetupPAN": "Füge alle ausgerüsteten Wireless-Geräte zum PAN dieses Charakters hinzu",
-                "RemoveSkillSet": "Entferne das aktuelle Fertigkeitsset sowie alle daraus stammenden Fertigkeiten und Fertigkeitsgruppen"
+                "SetupPAN": "Füge alle ausgerüsteten Wireless-Geräte zum PAN dieses Charakters hinzu"
             },
             "CallInAction": {
                 "ActorType": "Herbeizurufender Akteurtyp",
@@ -283,19 +313,19 @@
             "Effect": {
                 "AlterApplyToWithChanges": "Entferne Änderungen, bevor du änderst, worauf sich der Effekt bezieht.",
                 "ApplyTo": "Änderungen mit diesem Effekt gelten nur für dieses Ziel.",
+                "ApplyValueEditor": "Wertänderung anwenden",
+                "CancelValueEditor": "Wertänderung abbrechen",
                 "CreateEffect": "Erstelle Effekt",
                 "DeleteEffect": "Lösche Effekt",
                 "DocumentEffects": "Auswirkungen direkt auf dieses Dokument.",
                 "EditEffect": "Bearbeite Effekt",
-                "ItemEffects": "Effekte, die von Items auf diesem Dokument gesammelt werden.",
                 "HelpLinkEnglishOnly": "Hilfe (externer Link, nur auf Englisch)",
-                "OpenValueEditor": "Werteditor öffnen",
-                "ApplyValueEditor": "Wertänderung anwenden",
-                "CancelValueEditor": "Wertänderung abbrechen",
+                "ItemEffects": "Effekte, die von Items auf diesem Dokument gesammelt werden.",
                 "OnlyAllFilteredUsed": "Dieser Effekt gilt nur für Proben, die allen Auswahlen entsprechen.",
                 "OnlyFilteredUsed": "Dieser Effekt gilt nur für Proben, die mindestens einer Auswahl entsprechen.",
                 "OnlyForItemTest": "Dieser Effekt gilt nur für Proben dieses Items.",
                 "OnlyForWireless": "Dieser Effekt gilt nur für Items, bei denen WiFi aktiviert ist.",
+                "OpenValueEditor": "Werteditor öffnen",
                 "PriorityFieldDisabled": "Eigene Pioritäten werden im Moment nicht unterstützt."
             },
             "Item": {
@@ -352,36 +382,6 @@
                 "Threshold": "Vollständiger Schwellenwert"
             },
             "ToggleEditMode": "Umschalter Editiermodus"
-        },
-        "Keybindings": {
-            "AddRemoveManyQty": {
-                "Hint": "Füge zu/Enferne 20 Stück pro Klick",
-                "Label": "Füge zu/Entferne 20"
-            },
-            "AddRemoveSomeQty": {
-                "Hint": "Füge zu/Enferne 5 Stück pro Klick",
-                "Label": "Füge zu/Entferne 5"
-            },
-            "HideTestDialog": {
-                "Hint": "Testdialoge werden einmalig übersprungen",
-                "Label": "Testdialog überspringen"
-            },
-            "OverwatchScoreTracker": {
-                "Hint": "Öffne den Overwatch-Wert-Monitor",
-                "Label": "Overwatch-Wert-Monitor"
-            },
-            "ShowItemCard": {
-                "Hint": "Anstelle eines Tests zeige die Itemkarte im Chat",
-                "Label": "Zeige nur Chatkarte"
-            },
-            "ShowSituationModifiers": {
-                "Hint": "Öffne Situationsmodifikatoren für aktuelle Auswahl",
-                "Label": "Situationsmodifikatoren"
-            },
-            "SuccessTestPrompt": {
-                "Hint": "Öffnet Dialog für eine Erfolgsprobe",
-                "Label": "Erfolgsprobe auslösen"
-            }
         }
     }
 }

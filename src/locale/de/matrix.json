@@ -77,10 +77,46 @@
                 "Track": "Aufspüren"
             }
         },
+        "Matrix": {
+            "Attributes": {
+                "Attack": "Angriff",
+                "DataProcessing": "Datenverarb.",
+                "Firewall": "Firewall",
+                "Sleaze": "Schleicher"
+            },
+            "Labels": {
+                "Agent": "Agent",
+                "CommonProgram": "Standardprogramm",
+                "DirectConnection": "Direkte Verbindung",
+                "Grids": "Gitter",
+                "Hosts": "Hosts",
+                "HotSim": "Heißes Sim",
+                "LivingPersona": "Lebende Persona",
+                "Marks": "Marken",
+                "MatrixDefense": "Matrix Verteidigung",
+                "MatrixFullDefenseAttribute": "Matrix Vollverteidigungsattribut",
+                "MatrixTarget": "Matrixziel",
+                "Network": "Netzwerk",
+                "Networks": "Netzwerke",
+                "OverwatchScore": "Overwatch-Wert",
+                "OverwatchScoreTrackerTitle": "Mr. Johnsons Baby-Monitor",
+                "Personas": "Personas",
+                "PublicGrid": "Öffentliches Gitter",
+                "RunningSilent": "Auf Schleichfahrt",
+                "RunningSilentControlledByDevice": "Schleichtfahrt wird vom aktiven Matrixgerät gesteuert:",
+                "Wireless": "WiFi",
+                "WirelessOffline": "Offline",
+                "WirelessOnline": "Online",
+                "WirelessUnavailable": "Kabel"
+            }
+        },
         "MatrixNetworkHackingApplication": {
             "Icons": "Icons",
             "Invite": "Einladung anfordern",
             "Title": "Mit Netzwerk verbinden"
+        },
+        "MatrixOpposedDeviceDialog": {
+            "Title": "Matrixgerät erstellen"
         },
         "NetworkManager": {
             "AvailableNetworks": "Verfügbare Netzwerke",
@@ -168,42 +204,6 @@
                 "Standard": "Standard"
             },
             "Type": "Typ"
-        },
-        "MatrixOpposedDeviceDialog": {
-            "Title": "Matrixgerät erstellen"
-        },
-        "Matrix": {
-            "Attributes": {
-                "Attack": "Angriff",
-                "DataProcessing": "Datenverarb.",
-                "Firewall": "Firewall",
-                "Sleaze": "Schleicher"
-            },
-            "Labels": {
-                "Agent": "Agent",
-                "CommonProgram": "Standardprogramm",
-                "DirectConnection": "Direkte Verbindung",
-                "Grids": "Gitter",
-                "Hosts": "Hosts",
-                "HotSim": "Heißes Sim",
-                "LivingPersona": "Lebende Persona",
-                "Marks": "Marken",
-                "MatrixDefense": "Matrix Verteidigung",
-                "MatrixFullDefenseAttribute": "Matrix Vollverteidigungsattribut",
-                "MatrixTarget": "Matrixziel",
-                "Network": "Netzwerk",
-                "Networks": "Netzwerke",
-                "OverwatchScore": "Overwatch-Wert",
-                "OverwatchScoreTrackerTitle": "Mr. Johnsons Baby-Monitor",
-                "Personas": "Personas",
-                "PublicGrid": "Öffentliches Gitter",
-                "RunningSilent": "Auf Schleichfahrt",
-                "RunningSilentControlledByDevice": "Schleichtfahrt wird vom aktiven Matrixgerät gesteuert:",
-                "Wireless": "WiFi",
-                "WirelessOffline": "Offline",
-                "WirelessOnline": "Online",
-                "WirelessUnavailable": "Kabel"
-            }
         }
     }
 }

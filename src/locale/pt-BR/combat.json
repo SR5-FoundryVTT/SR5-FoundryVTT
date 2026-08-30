@@ -1,16 +1,11 @@
 {
     "SR5": {
-        "DamageApplication": {
-            "ApplyDamage": "Aplicar Dano",
-            "ApplyUnmodifiedDamage": "Aplicar Dano Não Mod.",
-            "Title": "Aplicação de Dano"
-        },
         "Combat": {
             "CannotSeizeAgain": "Voce nao pode tomar a iniciativa novamente ate o inicio do seu proximo turno.",
             "ModeAstral": "Astral",
-            "ModeChangedLabel": "Modo de Iniciativa Alterado",
             "ModeChangeNewInitiative": "Nova iniciativa",
             "ModeChangePreviousInitiative": "Iniciativa anterior",
+            "ModeChangedLabel": "Modo de Iniciativa Alterado",
             "ModeMatrix": "Matriz",
             "ModeMeatspace": "Mundo fisico",
             "ModeTitle": "Modo: {mode}",
@@ -32,13 +27,18 @@
         },
         "Damage": {
             "Label": "Dano",
+            "Type": "Tipo",
             "Types": {
                 "Matrix": "Matriz",
                 "Physical": "Físico",
                 "Stun": "Atord."
             },
-            "Type": "Tipo",
             "Value": "Valor do Dano"
+        },
+        "DamageApplication": {
+            "ApplyDamage": "Aplicar Dano",
+            "ApplyUnmodifiedDamage": "Aplicar Dano Não Mod.",
+            "Title": "Aplicação de Dano"
         }
     }
 }

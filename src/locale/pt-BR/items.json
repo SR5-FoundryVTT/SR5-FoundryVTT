@@ -41,7 +41,6 @@
                     "label": "Substituir"
                 }
             },
-            "label": "Munição",
             "Labels": {
                 "AmmoFull": "Munição Cheia",
                 "AmmoGelRounds": "Munição de Gel",
@@ -49,7 +48,8 @@
                 "BulletCount": "Num. Disparos",
                 "Bullets": "Projéteis",
                 "SpareClips": "Pentes Extras"
-            }
+            },
+            "label": "Munição"
         },
         "Armor": {
             "FIELDS": {
@@ -78,13 +78,13 @@
                         "hint": "Se esta armadura é endurecida",
                         "label": "Armadura Endurecida"
                     },
-                    "is_hardened": {
-                        "hint": "Se esta armadura concede proteção endurecida",
-                        "label": "Endurecida Ativa"
-                    },
                     "immunities": {
                         "hint": "Fontes de dano contra as quais esta armadura concede Imunidade",
                         "label": "Imunidades"
+                    },
+                    "is_hardened": {
+                        "hint": "Se esta armadura concede proteção endurecida",
+                        "label": "Endurecida Ativa"
                     },
                     "pollutant": {
                         "hint": "Armadura extra contra ataques com Poluentes",
@@ -107,8 +107,6 @@
             "Immunity": {
                 "NormalWeapons": "Armas Normais"
             },
-            "Resistances": "Resistências",
-            "label": "Armadura",
             "Labels": {
                 "Accessory": "Acessório",
                 "ArmorHardened": "Endurecido",
@@ -117,33 +115,47 @@
                 "HardenedArmor": "Armadura Endurecida",
                 "Immunity": "Imunidade",
                 "ImmunityToNormalWeapons": "Imunidade a armas normais"
-            }
+            },
+            "Resistances": "Resistências",
+            "label": "Armadura"
         },
         "Device": {
+            "Categories": {
+                "Commlink": "Com-link",
+                "Cyberdeck": "Cyberdeck",
+                "RCC": "Console de Comando de Fusor"
+            },
             "FIELDS": {
                 "category": {
                     "hint": "O tipo de dispositivo",
                     "label": "Tipo de dispositivo"
                 }
             },
-            "label": "Dispositivo",
-            "Categories": {
-                "Commlink": "Com-link",
-                "Cyberdeck": "Cyberdeck",
-                "RCC": "Console de Comando de Fusor"
-            }
+            "label": "Dispositivo"
         },
         "Element": {
             "Acid": "Ácido",
             "Cold": "Frio",
             "Electricity": "Elétrico",
             "Fire": "Fogo",
+            "Label": "Elemento",
             "Pollutant": "Poluente",
             "Radiation": "Radiação",
-            "Water": "Água",
-            "Label": "Elemento"
+            "Water": "Água"
         },
         "Item": {
+            "Cyberware": {
+                "Grades": {
+                    "Alpha": "Alphaware",
+                    "Beta": "Betaware",
+                    "Delta": "Deltaware",
+                    "Gamma": "Gammaware",
+                    "Grey": "Greyware",
+                    "Label": "Classe",
+                    "Standard": "Padrão",
+                    "Used": "Usado"
+                }
+            },
             "FIELDS": {
                 "action": {
                     "armor": {
@@ -400,18 +412,6 @@
                     }
                 }
             },
-            "Cyberware": {
-                "Grades": {
-                    "Label": "Classe",
-                    "Alpha": "Alphaware",
-                    "Beta": "Betaware",
-                    "Delta": "Deltaware",
-                    "Gamma": "Gammaware",
-                    "Grey": "Greyware",
-                    "Standard": "Padrão",
-                    "Used": "Usado"
-                }
-            },
             "Labels": {
                 "Availability": "Dispon.",
                 "Capacity": "Capacidade",
@@ -462,6 +462,12 @@
             "Weapon": "Arma"
         },
         "Lifestyle": {
+            "Attributes": {
+                "Comforts": "Confortos",
+                "Guests": "Convidados",
+                "Neighborhood": "Vizinhança",
+                "Security": "Segurança"
+            },
             "FIELDS": {
                 "comforts": {
                     "hint": "Nível de conforto do estilo de vida",
@@ -492,23 +498,17 @@
                     "label": "Tipo de Estilo de Vida"
                 }
             },
-            "label": "Estilo de Vida",
-            "Attributes": {
-                "Comforts": "Confortos",
-                "Guests": "Convidados",
-                "Neighborhood": "Vizinhança",
-                "Security": "Segurança"
-            },
             "Types": {
-                "Label": "Tipo",
-                "Street": "Rua",
-                "Squatter": "Muquifo",
-                "Low": "Baixo",
-                "Middle": "Médio",
                 "High": "Alto",
+                "Label": "Tipo",
+                "Low": "Baixo",
                 "Luxury": "Luxo",
-                "Other": "Outros"
-            }
+                "Middle": "Médio",
+                "Other": "Outros",
+                "Squatter": "Muquifo",
+                "Street": "Rua"
+            },
+            "label": "Estilo de Vida"
         },
         "Modification": {
             "FIELDS": {
@@ -546,6 +546,9 @@
                 }
             }
         },
+        "ModificationTypes": {
+            "Ware": "Implante"
+        },
         "MoveInventoryDialog": {
             "Cancel": "Cancelar",
             "Move": "Mover",
@@ -575,13 +578,13 @@
                     "label": "Tipo da qualidade"
                 }
             },
-            "label": "Qualidade",
             "Types": {
                 "Label": "Tipo",
                 "LifeModule": "Módulo de Vida",
                 "Negative": "Negativa",
                 "Positive": "Positiva"
-            }
+            },
+            "label": "Qualidade"
         },
         "Weapon": {
             "AmmoCount": "Qtd Munição",
@@ -703,8 +706,29 @@
                 }
             },
             "FullReload": "Carregado",
+            "Labels": {
+                "Accuracy": "Precisão",
+                "Barrel": "Cano",
+                "FireMode": "Modo de Tiro",
+                "Range": "Alcance",
+                "Reach": "Alcance",
+                "Recoil": "Recuo",
+                "RecoilCompensation": "CR"
+            },
             "Mod": "Mod",
             "Mode": {
+                "Full": {
+                    "BurstFire": "Rajada",
+                    "BurstFireLong": "Rajada Longa",
+                    "FullAuto": "Automático",
+                    "FullAutoLong": "Automático (Complexa)",
+                    "FullAutoShort": "Automático (Simples)",
+                    "SemiAuto": "Semiautomático",
+                    "SemiAutoBurst": "Rajada Semiautomática",
+                    "SemiAutoShort": "Semiautomático",
+                    "SingleShot": "Tiro Único",
+                    "Suppressing": "Fogo de Supressão"
+                },
                 "Mode": "Modos",
                 "Short": {
                     "BurstFire": "RJ",
@@ -718,18 +742,6 @@
                     "SemiAutoShort": "SA",
                     "SingleShot": "TS",
                     "SingleShotShort": "TS"
-                },
-                "Full": {
-                    "BurstFire": "Rajada",
-                    "BurstFireLong": "Rajada Longa",
-                    "FullAuto": "Automático",
-                    "FullAutoLong": "Automático (Complexa)",
-                    "FullAutoShort": "Automático (Simples)",
-                    "SemiAuto": "Semiautomático",
-                    "SemiAutoBurst": "Rajada Semiautomática",
-                    "SemiAutoShort": "Semiautomático",
-                    "SingleShot": "Tiro Único",
-                    "Suppressing": "Fogo de Supressão"
                 }
             },
             "Mods": "Mods",
@@ -784,19 +796,7 @@
                 "Range": "Alcance da arma de arremesso"
             },
             "Type": "Tipo",
-            "Weapon": "Arma",
-            "Labels": {
-                "Accuracy": "Precisão",
-                "Barrel": "Cano",
-                "FireMode": "Modo de Tiro",
-                "Range": "Alcance",
-                "Reach": "Alcance",
-                "Recoil": "Recuo",
-                "RecoilCompensation": "CR"
-            }
-        },
-        "ModificationTypes": {
-            "Ware": "Implante"
+            "Weapon": "Arma"
         }
     }
 }

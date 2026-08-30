@@ -1,6 +1,20 @@
 {
     "SR5": {
         "Actor": {
+            "Attributes": {
+                "Agility": "Agilidade",
+                "Body": "Corpo",
+                "Charisma": "Carisma",
+                "Edge": "Trunfo",
+                "Essence": "Essência",
+                "Intuition": "Intuição",
+                "Logic": "Lógica",
+                "Magic": "Magia",
+                "Reaction": "Reação",
+                "Resonance": "Ressonância",
+                "Strength": "Força",
+                "Willpower": "Vontade"
+            },
             "FIELDS": {
                 "attributes": {
                     "edge": {
@@ -209,21 +223,6 @@
                     "label": "Tecnomante"
                 }
             },
-            "NoFavoritesSelected": "Nenhum favorito foi selecionado",
-            "Attributes": {
-                "Agility": "Agilidade",
-                "Body": "Corpo",
-                "Charisma": "Carisma",
-                "Edge": "Trunfo",
-                "Essence": "Essência",
-                "Intuition": "Intuição",
-                "Logic": "Lógica",
-                "Magic": "Magia",
-                "Reaction": "Reação",
-                "Resonance": "Ressonância",
-                "Strength": "Força",
-                "Willpower": "Vontade"
-            },
             "Initiative": {
                 "Categories": {
                     "Astral": "Astral",
@@ -246,12 +245,13 @@
                 "IsNPC": "NPC",
                 "Metatype": "Metatipo",
                 "Movement": "Movimento",
+                "RunningSpeed": "Correndo",
                 "SheetActor": "Ficha de ator",
                 "SpecialAttributes": "Atributos Especiais",
-                "WalkingSpeed": "Caminhando",
-                "RunningSpeed": "Correndo",
-                "SprintingBonus": "Bônus de corrida"
-            }
+                "SprintingBonus": "Bônus de corrida",
+                "WalkingSpeed": "Caminhando"
+            },
+            "NoFavoritesSelected": "Nenhum favorito foi selecionado"
         },
         "ActorTypes": {
             "Character": "Personagem",
@@ -311,6 +311,13 @@
                     "label": "Crédito de Rua"
                 }
             },
+            "Labels": {
+                "CareerKarma": "Karma de Carreira",
+                "Notoriety": "Notoriedade",
+                "Nuyen": "Nuyen",
+                "PublicAwareness": "Consciência Pública",
+                "StreetCred": "Crédito de Rua"
+            },
             "Modifiers": {
                 "NPCMetatypeAttribute": "Atributo de Metatipo de NPC"
             },
@@ -320,13 +327,6 @@
                 "Human": "Humano",
                 "Ork": "Ork",
                 "Troll": "Troll"
-            },
-            "Labels": {
-                "CareerKarma": "Karma de Carreira",
-                "Notoriety": "Notoriedade",
-                "Nuyen": "Nuyen",
-                "PublicAwareness": "Consciência Pública",
-                "StreetCred": "Crédito de Rua"
             }
         },
         "Contact": {
@@ -365,17 +365,17 @@
             },
             "Family": "Família",
             "Group": "Grupo",
+            "Labels": {
+                "Connection": "Conexão",
+                "ContactType": "Tipo",
+                "Contacts": "Contatos",
+                "Loyalty": "Lealdade"
+            },
             "LinkedActor": "Ator",
             "Loyalty": "Lealdade",
             "LoyaltyConnectionHelp": "Lealdade / Conexão",
             "LoyaltyConnectionLabel": "L / C",
-            "Type": "Tipo",
-            "Labels": {
-                "ContactType": "Tipo",
-                "Contacts": "Contatos",
-                "Connection": "Conexão",
-                "Loyalty": "Lealdade"
-            }
+            "Type": "Tipo"
         },
         "InventoryRename": {
             "Cancel": "Cancelar",
@@ -408,8 +408,8 @@
                 "Remote": "Remoto",
                 "Rigger": "Rigger"
             },
-            "Driver": "Motorista",
             "DamagedVehicle": "Veículo Danificado",
+            "Driver": "Motorista",
             "Drone": "Drone",
             "Environments": {
                 "Handling": "Manuseio",
@@ -417,6 +417,10 @@
             },
             "IsDrone": "É Drone",
             "IsOffRoad": "Está Fora da Estrada",
+            "Labels": {
+                "ControlRig": "Control Rig",
+                "VehicleStunImmunity": "Imunidade de veículos a dano de atordoamento"
+            },
             "Maneuvering": "Manobrando",
             "MissingDriver": "Arraste e solte um ator como motorista",
             "ModificationCategoryTypes": {
@@ -450,11 +454,7 @@
                 "Walker": "Andador",
                 "Water": "Embarcação"
             },
-            "Vehicle": "Veículo",
-            "Labels": {
-                "ControlRig": "Control Rig",
-                "VehicleStunImmunity": "Imunidade de veículos a dano de atordoamento"
-            }
+            "Vehicle": "Veículo"
         },
         "VehicleImport": {
             "MissingPermission": "Você não tem permissão para criar atores"

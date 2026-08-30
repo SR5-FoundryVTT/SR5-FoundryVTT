@@ -19,15 +19,15 @@
                     "label": "Art"
                 }
             },
-            "Types": {
-                "Active": "Aktiv",
-                "Passive": "Passiv"
-            },
             "Labels": {
                 "Echo": "Echo",
                 "Echoes": "Echos",
                 "Metamagic": "Metamagie",
                 "Metamagics": "Metamagie"
+            },
+            "Types": {
+                "Active": "Aktiv",
+                "Passive": "Passiv"
             }
         },
         "CritterPower": {
@@ -75,12 +75,12 @@
             },
             "IsOptional": "Optional",
             "Karma": "Karma",
-            "OptionalSelectionCount": "Optionale Kräfte",
             "Optional": {
                 "DisabledOption": "Optional, inaktiv",
                 "EnabledOption": "Optional, aktiv",
                 "Standard": "Standard"
             },
+            "OptionalSelectionCount": "Optionale Kräfte",
             "Range": "Reichweite",
             "Ranges": {
                 "LineOfSight": "Blickfeld",
@@ -93,6 +93,20 @@
             "Types": {
                 "Mana": "Mana",
                 "Physical": "Physisch"
+            }
+        },
+        "Magic": {
+            "Labels": {
+                "Awakened": "Erwacht",
+                "Emerged": "Resonanz",
+                "Magic": "Magie",
+                "Mundane": "Mundan",
+                "PP": "KP",
+                "PowerLevel": "Kraftstufe",
+                "PowerPoints": "Kraftpunkte",
+                "PowerType": "Typ",
+                "Powers": "Kräfte",
+                "SpiritType": "Geisterart"
             }
         },
         "Ritual": {
@@ -210,10 +224,18 @@
             "IllusionObvious": "Offensichtlich",
             "IllusionRealistic": "Realistisch",
             "IllusionSingleSense": "Monosensorisch",
+            "Labels": {
+                "DetectionSpellExtended": "Erweitert",
+                "NormalSpellButton": "Normal",
+                "RecklessSpellButton": "Schnell"
+            },
             "ManipulationDamaging": "Schaden",
             "ManipulationEnvironmental": "Umgebung",
             "ManipulationMental": "Geistig",
             "ManipulationPhysical": "Physisch",
+            "QuickInfo": {
+                "DrainForce": "Entzug K{sign}{drain}"
+            },
             "Range": "Reichweite",
             "RangeLos": "BF",
             "RangeLosA": "BF (F)",
@@ -222,15 +244,7 @@
             "Spells": "Zauber",
             "Type": "Art",
             "TypeMana": "M",
-            "TypePhysical": "P",
-            "QuickInfo": {
-                "DrainForce": "Entzug K{sign}{drain}"
-            },
-            "Labels": {
-                "DetectionSpellExtended": "Erweitert",
-                "NormalSpellButton": "Normal",
-                "RecklessSpellButton": "Schnell"
-            }
+            "TypePhysical": "P"
         },
         "Spirit": {
             "Bound": "Gebunden",
@@ -331,20 +345,6 @@
                 "Water": "Wasser",
                 "Worker": "Insekt: Arbeiter",
                 "Wraith": "Wraith"
-            }
-        },
-        "Magic": {
-            "Labels": {
-                "Awakened": "Erwacht",
-                "Emerged": "Resonanz",
-                "Mundane": "Mundan",
-                "Magic": "Magie",
-                "PowerLevel": "Kraftstufe",
-                "PowerPoints": "Kraftpunkte",
-                "PowerType": "Typ",
-                "Powers": "Kräfte",
-                "PP": "KP",
-                "SpiritType": "Geisterart"
             }
         }
     }

@@ -1,16 +1,11 @@
 {
     "SR5": {
-        "DamageApplication": {
-            "ApplyDamage": "피해 적용",
-            "ApplyUnmodifiedDamage": "보정치 제외 피해 적용",
-            "Title": "피해 적용"
-        },
         "Combat": {
             "CannotSeizeAgain": "다음 턴 시작 전까지 다시 선제권을 잡을 수 없습니다.",
             "ModeAstral": "아스트랄",
-            "ModeChangedLabel": "우선권 모드 변경",
             "ModeChangeNewInitiative": "새 우선권",
             "ModeChangePreviousInitiative": "이전 우선권",
+            "ModeChangedLabel": "우선권 모드 변경",
             "ModeMatrix": "매트릭스",
             "ModeMeatspace": "현실",
             "ModeTitle": "모드: {mode}",
@@ -32,13 +27,18 @@
         },
         "Damage": {
             "Label": "피해",
+            "Type": "유형",
             "Types": {
                 "Matrix": "매트릭스",
                 "Physical": "물리",
                 "Stun": "기절"
             },
-            "Type": "유형",
             "Value": "피해량"
+        },
+        "DamageApplication": {
+            "ApplyDamage": "피해 적용",
+            "ApplyUnmodifiedDamage": "보정치 제외 피해 적용",
+            "Title": "피해 적용"
         }
     }
 }

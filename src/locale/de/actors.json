@@ -1,6 +1,20 @@
 {
     "SR5": {
         "Actor": {
+            "Attributes": {
+                "Agility": "Geschicklichkeit",
+                "Body": "Konstitution",
+                "Charisma": "Charisma",
+                "Edge": "Edge",
+                "Essence": "Essenz",
+                "Intuition": "Intuition",
+                "Logic": "Logik",
+                "Magic": "Magie",
+                "Reaction": "Reaktion",
+                "Resonance": "Resonanz",
+                "Strength": "Stärke",
+                "Willpower": "Willenskraft"
+            },
             "FIELDS": {
                 "attributes": {
                     "edge": {
@@ -209,21 +223,6 @@
                     "label": "Technomancer"
                 }
             },
-            "NoFavoritesSelected": "Keine Favoriten ausgewählt",
-            "Attributes": {
-                "Agility": "Geschicklichkeit",
-                "Body": "Konstitution",
-                "Charisma": "Charisma",
-                "Edge": "Edge",
-                "Essence": "Essenz",
-                "Intuition": "Intuition",
-                "Logic": "Logik",
-                "Magic": "Magie",
-                "Reaction": "Reaktion",
-                "Resonance": "Resonanz",
-                "Strength": "Stärke",
-                "Willpower": "Willenskraft"
-            },
             "Initiative": {
                 "Categories": {
                     "Astral": "Astrale Initiative",
@@ -246,12 +245,13 @@
                 "IsNPC": "NSC",
                 "Metatype": "Metatyp",
                 "Movement": "Bewegungsrate",
+                "RunningSpeed": "Rennen",
                 "SheetActor": "Acteur-Blatt",
                 "SpecialAttributes": "Spez. Attribute",
-                "WalkingSpeed": "Gehen",
-                "RunningSpeed": "Rennen",
-                "SprintingBonus": "Sprintbonus"
-            }
+                "SprintingBonus": "Sprintbonus",
+                "WalkingSpeed": "Gehen"
+            },
+            "NoFavoritesSelected": "Keine Favoriten ausgewählt"
         },
         "ActorTypes": {
             "Character": "Charakter",
@@ -311,6 +311,13 @@
                     "label": "Straßenruf"
                 }
             },
+            "Labels": {
+                "CareerKarma": "Gesamtkarma",
+                "Notoriety": "Schlechter Ruf",
+                "Nuyen": "Nuyen",
+                "PublicAwareness": "Prominenz",
+                "StreetCred": "Straßenruf"
+            },
             "Modifiers": {
                 "NPCMetatypeAttribute": "NPC-Metatyp-Attribute"
             },
@@ -320,13 +327,6 @@
                 "Human": "Mensch",
                 "Ork": "Ork",
                 "Troll": "Troll"
-            },
-            "Labels": {
-                "CareerKarma": "Gesamtkarma",
-                "Notoriety": "Schlechter Ruf",
-                "Nuyen": "Nuyen",
-                "PublicAwareness": "Prominenz",
-                "StreetCred": "Straßenruf"
             }
         },
         "Contact": {
@@ -365,17 +365,17 @@
             },
             "Family": "Familie",
             "Group": "Gruppe",
+            "Labels": {
+                "Connection": "Verbindung",
+                "ContactType": "Typ",
+                "Contacts": "Kontakte",
+                "Loyalty": "Loyalität"
+            },
             "LinkedActor": "Akteur",
             "Loyalty": "Loyalität",
             "LoyaltyConnectionHelp": "Loyalität / Verbindung",
             "LoyaltyConnectionLabel": "L / V",
-            "Type": "Typ",
-            "Labels": {
-                "ContactType": "Typ",
-                "Contacts": "Kontakte",
-                "Connection": "Verbindung",
-                "Loyalty": "Loyalität"
-            }
+            "Type": "Typ"
         },
         "InventoryRename": {
             "Cancel": "Abbrechen",
@@ -408,8 +408,8 @@
                 "Remote": "Fern",
                 "Rigger": "Rigger"
             },
-            "Driver": "Fahrer",
             "DamagedVehicle": "Beschädigtes Fahrzeug",
+            "Driver": "Fahrer",
             "Drone": "Drohne",
             "Environments": {
                 "Handling": "Handling",
@@ -417,6 +417,10 @@
             },
             "IsDrone": "Ist Drohne",
             "IsOffRoad": "Ist im Gelände",
+            "Labels": {
+                "ControlRig": "Riggerkontrolle",
+                "VehicleStunImmunity": "Fahrzeugimmunität gegen Betäubungsschaden"
+            },
             "Maneuvering": "Manövrieren",
             "MissingDriver": "Fahrer per Drag&Drop zufügen",
             "ModificationCategoryTypes": {
@@ -450,11 +454,7 @@
                 "Walker": "Läufer",
                 "Water": "Schiff"
             },
-            "Vehicle": "Fahrzeug",
-            "Labels": {
-                "ControlRig": "Riggerkontrolle",
-                "VehicleStunImmunity": "Fahrzeugimmunität gegen Betäubungsschaden"
-            }
+            "Vehicle": "Fahrzeug"
         },
         "VehicleImport": {
             "MissingPermission": "Dir fehlt die Berechtigung, Akteure zu erstellen."

@@ -19,15 +19,15 @@
                     "label": "능력 유형"
                 }
             },
-            "Types": {
-                "Active": "활성형",
-                "Passive": "자동형"
-            },
             "Labels": {
                 "Echo": "에코",
                 "Echoes": "에코",
                 "Metamagic": "메타 마법",
                 "Metamagics": "메타마법"
+            },
+            "Types": {
+                "Active": "활성형",
+                "Passive": "자동형"
             }
         },
         "CritterPower": {
@@ -75,12 +75,12 @@
             },
             "IsOptional": "능력 설정",
             "Karma": "카르마",
-            "OptionalSelectionCount": "선택 능력",
             "Optional": {
                 "DisabledOption": "추가 능력, 사용 불가능",
                 "EnabledOption": "추가 능력, 사용 가능",
                 "Standard": "기본"
             },
+            "OptionalSelectionCount": "선택 능력",
             "Range": "사거리",
             "Ranges": {
                 "LineOfSight": "시야 범위 내",
@@ -93,6 +93,20 @@
             "Types": {
                 "Mana": "마나",
                 "Physical": "물리"
+            }
+        },
+        "Magic": {
+            "Labels": {
+                "Awakened": "각성자",
+                "Emerged": "공명자",
+                "Magic": "마법",
+                "Mundane": "일반인",
+                "PP": "PP",
+                "PowerLevel": "단계",
+                "PowerPoints": "PP",
+                "PowerType": "유형",
+                "Powers": "능력",
+                "SpiritType": "영혼 유형"
             }
         },
         "Ritual": {
@@ -210,10 +224,18 @@
             "IllusionObvious": "명백함",
             "IllusionRealistic": "현실적",
             "IllusionSingleSense": "단일 감각",
+            "Labels": {
+                "DetectionSpellExtended": "연장",
+                "NormalSpellButton": "보통",
+                "RecklessSpellButton": "무모한 시전"
+            },
             "ManipulationDamaging": "손상",
             "ManipulationEnvironmental": "환경",
             "ManipulationMental": "정신",
             "ManipulationPhysical": "물리",
+            "QuickInfo": {
+                "DrainForce": "드레인 F{sign}{drain}"
+            },
             "Range": "사거리",
             "RangeLos": "시선 방향",
             "RangeLosA": "시선 방향 (A)",
@@ -222,15 +244,7 @@
             "Spells": "주문",
             "Type": "유형",
             "TypeMana": "마나",
-            "TypePhysical": "물리",
-            "QuickInfo": {
-                "DrainForce": "드레인 F{sign}{drain}"
-            },
-            "Labels": {
-                "DetectionSpellExtended": "연장",
-                "NormalSpellButton": "보통",
-                "RecklessSpellButton": "무모한 시전"
-            }
+            "TypePhysical": "물리"
         },
         "Spirit": {
             "Bound": "속박",
@@ -331,20 +345,6 @@
                 "Water": "물",
                 "Worker": "곤충 일꾼",
                 "Wraith": "유령"
-            }
-        },
-        "Magic": {
-            "Labels": {
-                "Awakened": "각성자",
-                "Emerged": "공명자",
-                "Mundane": "일반인",
-                "Magic": "마법",
-                "PowerLevel": "단계",
-                "PowerPoints": "PP",
-                "PowerType": "유형",
-                "Powers": "능력",
-                "PP": "PP",
-                "SpiritType": "영혼 유형"
             }
         }
     }

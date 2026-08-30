@@ -1,16 +1,11 @@
 {
     "SR5": {
-        "DamageApplication": {
-            "ApplyDamage": "Schaden anwenden",
-            "ApplyUnmodifiedDamage": "Unmod. Schaden anwenden",
-            "Title": "Schaden anwenden"
-        },
         "Combat": {
             "CannotSeizeAgain": "Du kannst die Initiative erst zu Beginn deines naechsten Zuges erneut ergreifen.",
             "ModeAstral": "Astral",
-            "ModeChangedLabel": "Initiativemodus geaendert",
             "ModeChangeNewInitiative": "Neue Initiative",
             "ModeChangePreviousInitiative": "Vorherige Initiative",
+            "ModeChangedLabel": "Initiativemodus geaendert",
             "ModeMatrix": "Matrix",
             "ModeMeatspace": "Fleischraum",
             "ModeTitle": "Modus: {mode}",
@@ -32,13 +27,18 @@
         },
         "Damage": {
             "Label": "Schaden",
+            "Type": "Art",
             "Types": {
                 "Matrix": "Matrix",
                 "Physical": "Körperlich",
                 "Stun": "Geistig"
             },
-            "Type": "Art",
             "Value": "Schaden"
+        },
+        "DamageApplication": {
+            "ApplyDamage": "Schaden anwenden",
+            "ApplyUnmodifiedDamage": "Unmod. Schaden anwenden",
+            "Title": "Schaden anwenden"
         }
     }
 }

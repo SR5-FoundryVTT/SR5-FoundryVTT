@@ -19,6 +19,7 @@
                 "DronePerception": "Drone Perception",
                 "DronePilotVehicle": "Drone Pilot Vehicle",
                 "EditFile": "Edit File",
+                "EnterExitHost": "Enter/Exit Host",
                 "EraseMark": "Erase Mark",
                 "EraseMatrixSignature": "Erase Matrix Signature",
                 "Fade": "Fade",
@@ -48,8 +49,7 @@
                 "Snoop": "Snoop",
                 "SpoofCommand": "Spoof Command",
                 "SwitchInterfaceMode": "Switch Interface Mode",
-                "TraceIcon": "Trace Icon",
-                "EnterExitHost": "Enter/Exit Host"
+                "TraceIcon": "Trace Icon"
             }
         },
         "ContextOptions": {
@@ -65,6 +65,36 @@
             "Source": "Open Reference",
             "View": "View",
             "ViewItem": "View Item"
+        },
+        "Keybindings": {
+            "AddRemoveManyQty": {
+                "Hint": "Add/Remove 20 Qty at a time",
+                "Label": "Add/Remove 20"
+            },
+            "AddRemoveSomeQty": {
+                "Hint": "Add/Remove 5 Qty at a time",
+                "Label": "Add/Remove 5"
+            },
+            "HideTestDialog": {
+                "Hint": "Skip dialog when rolling tests from any button",
+                "Label": "Hide Test Dialog"
+            },
+            "OverwatchScoreTracker": {
+                "Hint": "Open overwatch score tracker",
+                "Label": "Overwatch Score Tracker"
+            },
+            "ShowItemCard": {
+                "Hint": "Only show item card in chat instead of rolling test",
+                "Label": "Show Item Card"
+            },
+            "ShowSituationModifiers": {
+                "Hint": "Open situation modifiers for selection",
+                "Label": "Situation Modifiers"
+            },
+            "SuccessTestPrompt": {
+                "Hint": "Prompt to make a standard Success Test",
+                "Label": "Prompt Success Test"
+            }
         },
         "Labels": {
             "Action": {
@@ -135,6 +165,12 @@
                 "TestKBoardModifiers": "{skip}: skip dialog. {descr}: show only description.",
                 "VehicleConfiguration": "Vehicle Configuration"
             },
+            "Documents": {
+                "Actor": "Actor",
+                "Item": "Item",
+                "Scene": "Scene",
+                "Token": "Token"
+            },
             "Inventory": {
                 "All": "All",
                 "Carried": "Carried",
@@ -187,12 +223,6 @@
                 "Changelog": "Changelog",
                 "Issues": "Issues",
                 "Wiki": "Wiki"
-            },
-            "Documents": {
-                "Actor": "Actor",
-                "Item": "Item",
-                "Scene": "Scene",
-                "Token": "Token"
             }
         },
         "Tabs": {
@@ -246,8 +276,6 @@
                 "DisconnectNetwork": "Leave this host/grid",
                 "MarkTarget": "Place additional marks on this target",
                 "MatrixConnectionToggle": "Change Matrix Connection status: Augmented Reality, Cold Sim, or Hot Sim",
-                "RemoveAllNetworks": "Remove all networks",
-                "RemoveNetwork": "Remove network",
                 "MatrixRunningSilentToggle": "Change your matrix device between Running Silent and Displaying your Persona",
                 "Metatype": "As NPC the metatype will also apply attribute quick modifiers",
                 "MiscConfig": "Miscellaneous Settings & Modifiers",
@@ -261,12 +289,14 @@
                 "PickControlledTokenAsTechnomancer": "Pick the currently Controlled Token Actor as the Compiler (Technomancer)",
                 "PlaceMark": "Action to be used to place marks on already marked targets",
                 "RebootPersonaAndClearAllMarks": "Reboot your Persona and clear all Marks you have placed",
+                "RemoveAllNetworks": "Remove all networks",
                 "RemoveFavorite": "Remove this from your favorites bar",
+                "RemoveNetwork": "Remove network",
                 "RemoveOneService": "Remove One Service",
+                "RemoveSkillSet": "Remove the current skill set as well as all skills and skill groups sourced from it",
                 "ResetActorForNewRun": "Reset damage, edge, etc. for a new run",
                 "RollInitiative": "Roll Initiative",
-                "SetupPAN": "Add all Equipped Wireless Devices to this character's Persona",
-                "RemoveSkillSet": "Remove the current skill set as well as all skills and skill groups sourced from it"
+                "SetupPAN": "Add all Equipped Wireless Devices to this character's Persona"
             },
             "CallInAction": {
                 "ActorType": "Type of actor to call in",
@@ -283,19 +313,19 @@
             "Effect": {
                 "AlterApplyToWithChanges": "Remove changes before changing what the effect applies to.",
                 "ApplyTo": "Changes of this effect will apply to this target only",
+                "ApplyValueEditor": "Apply value edit",
+                "CancelValueEditor": "Cancel value edit",
                 "CreateEffect": "Create Effect",
                 "DeleteEffect": "Delete Effect",
                 "DocumentEffects": "Effects directly on this document",
                 "EditEffect": "Edit Effect",
-                "ItemEffects": "Effects collected from items on this document",
                 "HelpLinkEnglishOnly": "Help (External link, English only)",
-                "OpenValueEditor": "Open value editor",
-                "ApplyValueEditor": "Apply value edit",
-                "CancelValueEditor": "Cancel value edit",
+                "ItemEffects": "Effects collected from items on this document",
                 "OnlyAllFilteredUsed": "This effect will only apply for tests matching all selections",
                 "OnlyFilteredUsed": "This effect will only apply for tests matching at least one selection",
                 "OnlyForItemTest": "Only affect test of parent item",
                 "OnlyForWireless": "This effect will apply only for items that have wireless enabled",
+                "OpenValueEditor": "Open value editor",
                 "PriorityFieldDisabled": "Custom priority is not supported at this time"
             },
             "Item": {
@@ -352,36 +382,6 @@
                 "Threshold": "Calculated threshold value"
             },
             "ToggleEditMode": "Toggle Edit Mode"
-        },
-        "Keybindings": {
-            "AddRemoveManyQty": {
-                "Hint": "Add/Remove 20 Qty at a time",
-                "Label": "Add/Remove 20"
-            },
-            "AddRemoveSomeQty": {
-                "Hint": "Add/Remove 5 Qty at a time",
-                "Label": "Add/Remove 5"
-            },
-            "HideTestDialog": {
-                "Hint": "Skip dialog when rolling tests from any button",
-                "Label": "Hide Test Dialog"
-            },
-            "OverwatchScoreTracker": {
-                "Hint": "Open overwatch score tracker",
-                "Label": "Overwatch Score Tracker"
-            },
-            "ShowItemCard": {
-                "Hint": "Only show item card in chat instead of rolling test",
-                "Label": "Show Item Card"
-            },
-            "ShowSituationModifiers": {
-                "Hint": "Open situation modifiers for selection",
-                "Label": "Situation Modifiers"
-            },
-            "SuccessTestPrompt": {
-                "Hint": "Prompt to make a standard Success Test",
-                "Label": "Prompt Success Test"
-            }
         }
     }
 }

@@ -41,16 +41,22 @@
             "Summoning": "Ações de Invocação"
         },
         "ActionType": {
-            "Label": "Tipo",
             "Complex": "Complexa",
             "Free": "Livre",
             "Interrupt": "Interrupção",
+            "Label": "Tipo",
             "None": "Nenhuma",
             "Simple": "Simples",
             "Varies": "Variada"
         },
         "CallInAction": {
             "ActorType": "Tipo de Ator",
+            "Compilation": {
+                "DropSprite": "Soltar Sprite",
+                "FixedSprite": "Sprite preparado",
+                "Label": "Compilação",
+                "SpriteType": "Tipo de Sprite"
+            },
             "Compile": "Compilar",
             "CreateCompilation": "Criar ação de compilação",
             "CreateSummoning": "Criar ação de invocação",
@@ -81,16 +87,10 @@
                 }
             },
             "Summon": "Invocar",
-            "Compilation": {
-                "Label": "Compilação",
-                "DropSprite": "Soltar Sprite",
-                "FixedSprite": "Sprite preparado",
-                "SpriteType": "Tipo de Sprite"
-            },
             "Summoning": {
-                "Label": "Invocação",
                 "DropSpirit": "Largar Espírito",
                 "FixedSpirit": "Prep. Espírito",
+                "Label": "Invocação",
                 "SpiritType": "Tipo de Espírito"
             }
         },
@@ -109,10 +109,10 @@
             "Actor": "Ator",
             "AdvanceTime": "Avançar o tempo de jogo ao rolar",
             "AdvanceTimeTooltip": "Avança o tempo do mundo pelo intervalo do teste após cada rolagem.",
+            "BaseThreshold": "Limiar base",
             "CanEdit": "Editar",
             "CanRoll": "Rolar",
             "CanView": "Ver",
-            "BaseThreshold": "Limiar base",
             "ConfirmCancel": "Cancelar o teste estendido \"{name}\"? Isso encerra o teste, mas um GM pode reativá-lo depois.",
             "ConfirmDelete": "Excluir o teste estendido \"{name}\"?",
             "CreateTest": "Novo Teste Estendido",
@@ -121,13 +121,13 @@
             "CumulativeModifierTooltip": "Reduz a parada de dados em 1 a cada rolagem realizada. SR5 p. 48.",
             "CumulativeRollCount": "Rolagens anteriores",
             "Due": "Vencimento",
-            "DueTooltip": "Intervalos de tempo de jogo decorridos desde a última rolagem",
             "DueMessage": {
                 "Header": "Teste estendido pronto para continuar",
                 "OpenManager": "Abrir gerenciador",
                 "Overdue": "{count} intervalos decorridos",
                 "Rolls": "Rolagens"
             },
+            "DueTooltip": "Intervalos de tempo de jogo decorridos desde a última rolagem",
             "EditTest": "Editar Teste Estendido",
             "Filters": {
                 "Actor": "Ator",
@@ -274,122 +274,6 @@
             "Wounds": "Feridas"
         },
         "Skill": {
-            "FIELDS": {
-                "type": {
-                    "label": "Tipo",
-                    "hint": "Define que tipo de configurações de perícia estão disponíveis"
-                },
-                "skill": {
-                    "category": {
-                        "label": "Categoria",
-                        "hint": "Categoria desta perícia"
-                    },
-                    "knowledgeType": {
-                        "label": "Tipo de conhecimento",
-                        "hint": "Tipo de perícia de conhecimento"
-                    },
-                    "rating": {
-                        "label": "Nível",
-                        "hint": "Nível desta perícia"
-                    },
-                    "defaulting": {
-                        "label": "Padrão",
-                        "hint": "Se esta perícia pode ser usada sem treinamento"
-                    },
-                    "attribute": {
-                        "label": "Atributo",
-                        "hint": "Atributo utilizado por esta perícia"
-                    },
-                    "limit": {
-                        "attribute": {
-                            "label": "Limite",
-                            "hint": "Limite a usar para esta ação de perícia. Deixe vazio para usar o limite de atributo padrão."
-                        }
-                    },
-                    "specializations": {
-                        "label": "Especialização",
-                        "hint": "Especialização para esta perícia, se houver"
-                    },
-                    "language": {
-                        "isNative": {
-                            "label": "Nativo",
-                            "hint": "Marca esta língua como nativa"
-                        }
-                    },
-                    "requirement": {
-                        "label": "Exigência",
-                        "hint": "O que o ator deve ser para que esta perícia esteja disponível"
-                    }
-                },
-                "group": {
-                    "label": "Grupo de Perícias",
-                    "hint": "Configuração para um grupo de perícias",
-                    "skills": {
-                        "label": "Perícias",
-                        "hint": "Perícias que fazem parte deste grupo"
-                    },
-                    "rating": {
-                        "label": "Nível",
-                        "hint": "Nível deste grupo de perícias"
-                    }
-                },
-                "set": {
-                    "label": "Conjunto de Perícias",
-                    "hint": "Configuração para um conjunto de perícias",
-                    "default": {
-                        "label": "Uso em novos atores",
-                        "hint": "Adicionar este conjunto de perícias aos atores recém-criados"
-                    },
-                    "skills": {
-                        "label": "Perícias",
-                        "hint": "Perícias que fazem parte deste conjunto",
-                        "name": {
-                            "label": "Nome",
-                            "hint": "Nome da perícia"
-                        },
-                        "rating": {
-                            "label": "Nível",
-                            "hint": "Nível desta perícia"
-                        },
-                        "specializations": {
-                            "label": "Especialização",
-                            "hint": "Especializações concedidas a esta perícia quando o conjunto é aplicado"
-                        }
-                    },
-                    "groups": {
-                        "label": "Grupos de Perícias",
-                        "hint": "Grupos de perícias que fazem parte deste conjunto",
-                        "name": {
-                            "label": "Nome",
-                            "hint": "Nome do grupo de perícias"
-                        },
-                        "rating": {
-                            "label": "Nível",
-                            "hint": "Nível deste grupo de perícias"
-                        }
-                    }
-                }
-            },
-            "Types": {
-                "Skill": "Perícia",
-                "Group": "Grupo de Perícias",
-                "Set": "Conjunto de Perícias"
-            },
-            "Category": {
-                "Active": "Ativo",
-                "Knowledge": "Conhecimento",
-                "Language": "Língua"
-            },
-            "KnowledgeType": {
-                "Academic": "Acadêmico",
-                "Professional": "Profissional",
-                "Interests": "Interesses",
-                "Street": "Rua"
-            },
-            "Set": {
-                "LogActorDifferences": "Registrar diferenças do ator",
-                "DifferencesLoggedInConsole": "Abra o console do navegador para ver as diferenças"
-            },
             "AeronauticsMechanic": "Mecânica Aeronáutica",
             "Alchemy": "Alquimia",
             "AnimalHandling": "Adestrar Animais",
@@ -406,6 +290,11 @@
             "Binding": "Vinculação",
             "Biotechnology": "Bioengenharia",
             "Blades": "Lâminas",
+            "Category": {
+                "Active": "Ativo",
+                "Knowledge": "Conhecimento",
+                "Language": "Língua"
+            },
             "Chemistry": "Química",
             "Clubs": "Bastões",
             "Compiling": "Compilar",
@@ -424,6 +313,102 @@
             "Etiquette": "Etiqueta",
             "ExoticMeleeWeapon": "Arma Corpo a Corpo Exótica",
             "ExoticRangedWeapon": "Arma a Distância Exótica",
+            "FIELDS": {
+                "group": {
+                    "hint": "Configuração para um grupo de perícias",
+                    "label": "Grupo de Perícias",
+                    "rating": {
+                        "hint": "Nível deste grupo de perícias",
+                        "label": "Nível"
+                    },
+                    "skills": {
+                        "hint": "Perícias que fazem parte deste grupo",
+                        "label": "Perícias"
+                    }
+                },
+                "set": {
+                    "default": {
+                        "hint": "Adicionar este conjunto de perícias aos atores recém-criados",
+                        "label": "Uso em novos atores"
+                    },
+                    "groups": {
+                        "hint": "Grupos de perícias que fazem parte deste conjunto",
+                        "label": "Grupos de Perícias",
+                        "name": {
+                            "hint": "Nome do grupo de perícias",
+                            "label": "Nome"
+                        },
+                        "rating": {
+                            "hint": "Nível deste grupo de perícias",
+                            "label": "Nível"
+                        }
+                    },
+                    "hint": "Configuração para um conjunto de perícias",
+                    "label": "Conjunto de Perícias",
+                    "skills": {
+                        "hint": "Perícias que fazem parte deste conjunto",
+                        "label": "Perícias",
+                        "name": {
+                            "hint": "Nome da perícia",
+                            "label": "Nome"
+                        },
+                        "rating": {
+                            "hint": "Nível desta perícia",
+                            "label": "Nível"
+                        },
+                        "specializations": {
+                            "hint": "Especializações concedidas a esta perícia quando o conjunto é aplicado",
+                            "label": "Especialização"
+                        }
+                    }
+                },
+                "skill": {
+                    "attribute": {
+                        "hint": "Atributo utilizado por esta perícia",
+                        "label": "Atributo"
+                    },
+                    "category": {
+                        "hint": "Categoria desta perícia",
+                        "label": "Categoria"
+                    },
+                    "defaulting": {
+                        "hint": "Se esta perícia pode ser usada sem treinamento",
+                        "label": "Padrão"
+                    },
+                    "knowledgeType": {
+                        "hint": "Tipo de perícia de conhecimento",
+                        "label": "Tipo de conhecimento"
+                    },
+                    "language": {
+                        "isNative": {
+                            "hint": "Marca esta língua como nativa",
+                            "label": "Nativo"
+                        }
+                    },
+                    "limit": {
+                        "attribute": {
+                            "hint": "Limite a usar para esta ação de perícia. Deixe vazio para usar o limite de atributo padrão.",
+                            "label": "Limite"
+                        }
+                    },
+                    "rating": {
+                        "hint": "Nível desta perícia",
+                        "label": "Nível"
+                    },
+                    "requirement": {
+                        "hint": "O que o ator deve ser para que esta perícia esteja disponível",
+                        "label": "Exigência"
+                    },
+                    "specializations": {
+                        "hint": "Especialização para esta perícia, se houver",
+                        "label": "Especialização"
+                    }
+                },
+                "type": {
+                    "hint": "Define que tipo de configurações de perícia estão disponíveis",
+                    "label": "Tipo"
+                }
+            },
             "FirstAid": "Primeiros Socorros",
             "Flight": "Voo",
             "Forgery": "Falsificação",
@@ -437,6 +422,18 @@
             "IndustrialMechanic": "Mecânica Industrial",
             "Instruction": "Instrução",
             "Intimidation": "Intimidação",
+            "KnowledgeType": {
+                "Academic": "Acadêmico",
+                "Interests": "Interesses",
+                "Professional": "Profissional",
+                "Street": "Rua"
+            },
+            "KnowledgeTypes": {
+                "Academic": "Acadêmico",
+                "Interests": "Interesses",
+                "Professional": "Profissional",
+                "Street": "Rua"
+            },
             "Leadership": "Liderança",
             "Locksmith": "Chaveiro",
             "Longarms": "Armas de Cano Longo",
@@ -458,6 +455,10 @@
             "Registering": "Registrar",
             "RitualSpellcasting": "Conjuração Ritual",
             "Running": "Corrida",
+            "Set": {
+                "DifferencesLoggedInConsole": "Abra o console do navegador para ver as diferenças",
+                "LogActorDifferences": "Registrar diferenças do ator"
+            },
             "Skill": "Perícia",
             "SkillGroup": "Grupo de Perícias",
             "Skills": "Perícias",
@@ -475,15 +476,14 @@
             },
             "ThrowingWeapons": "Armas de Arremesso",
             "Tracking": "Rastreamento",
+            "Types": {
+                "Group": "Grupo de Perícias",
+                "Set": "Conjunto de Perícias",
+                "Skill": "Perícia"
+            },
             "UnarmedCombat": "Combate Desarmado",
             "abbr": {
                 "Native": "N"
-            },
-            "KnowledgeTypes": {
-                "Academic": "Acadêmico",
-                "Interests": "Interesses",
-                "Professional": "Profissional",
-                "Street": "Rua"
             }
         },
         "TestResults": {
@@ -523,9 +523,83 @@
             "DrainTest": "Teste de Dreno",
             "DroneInfiltrationTest": "Teste de Infiltração de Drone",
             "DronePerceptionTest": "Teste de Percepção de Drone",
+            "Duration": {
+                "Label": "Duração",
+                "Types": {
+                    "Instant": "Instantâneo",
+                    "Permanent": "Permanente",
+                    "Sustained": "Sustentado"
+                }
+            },
             "ExtendedTest": "Teste Estendido",
             "FadeTest": "Teste de Enfraquecimento",
             "HackOnTheFlyTest": "Hackear na Hora",
+            "Labels": {
+                "ActiveDefense": "Defesa Ativa",
+                "Attacker": "Atacante",
+                "AttackerHits": "Acertos do Atacante",
+                "AttackerNetHits": "Acertos Líquidos do Atacante",
+                "BiofeedbackDamage": "Dano de Biofeedback",
+                "BuyHits": "Comprar Acertos",
+                "CanDefault": "Pode Usar Sem Perícia",
+                "Defender": "Defensor",
+                "DefenderNetHits": "Acertos Excedentes do Defensor",
+                "DefenseTest": "Teste de Defesa",
+                "DicePool": "Parada de Dados",
+                "DicePoolModifier": "Mod. da Parada de Dados",
+                "DontApplyWounds": "Não Aplicar Ferimentos",
+                "EnforcedMaximum": "Máximo imposto",
+                "EnforcedMinimum": "Mínimo imposto",
+                "ExtendedHits": "Sucessos Estendidos",
+                "ExtendedTest": "Teste Estendido",
+                "FadeAttribute": "Atributo de Enfraq",
+                "FadeValue": "Valor de Enfraq",
+                "FullDefense": "Defesa Total",
+                "FullMatrixDefense": "Defesa Matriz Completa",
+                "Hits": "Acertos",
+                "IncomingDamage": "Dano Recebido",
+                "IncomingDrain": "Dreno Recebido",
+                "IncomingFade": "Enfraquecimento Recebido",
+                "MeleeWeaponAttack": "Ataque com Arma Corpo-a-corpo",
+                "NetHits": "Acertos Excedentes",
+                "OpposedType": "Tipo",
+                "OpposingHits": "Acertos de Oposição",
+                "OpposingNetHits": "Acertos Excedentes de Oposição",
+                "OriginalDicePool": "Grupo Original de Dados",
+                "RangedWeaponAttack": "Ataque à Distância",
+                "ResultOverride": "Substituição de Resultado",
+                "ResultOverrideGlitches": "Falhas",
+                "ResultOverrideHits": "Acertos",
+                "RollArmor": "Armadura",
+                "RollComposure": "Compostura",
+                "RollCustom": "Personalizado",
+                "RollDefense": "Defesa",
+                "RollDrain": "Drenar",
+                "RollFade": "Enfraq",
+                "RollJudgeIntentions": "J.Intenção",
+                "RollLiftCarry": "Erg/Carreg",
+                "RollMemory": "Memória",
+                "RollMode": "Modo de Rolagem",
+                "RollOneDie": "Você não pode rolar menos de 1 dado, chapa",
+                "RollSoak": "Resistir Dano",
+                "SecondAttribute": "Segundo Atributo",
+                "SecondChance": "Segunda Chance",
+                "Soak": "Resistir Dano",
+                "SoakTest": "Teste de Resistência a Danos",
+                "Successes": "Sucessos",
+                "Suppressing": "Suprimindo",
+                "TargetingNeedsActorWithToken": "O ator atual precisa de um token vinculado para o direcionamento funcionar",
+                "UseEdgeForInitiativeRoll": "Use a regra de vantagem blitz para iniciativa"
+            },
+            "Limit": {
+                "Label": "Limite",
+                "Types": {
+                    "Astral": "Astral",
+                    "Mental": "Mental",
+                    "Physical": "Físico",
+                    "Social": "Social"
+                }
+            },
             "MatrixDefenseTest": "Defesa da Matriz",
             "MatrixResistTest": "Resistir a Dano da Matriz",
             "MatrixTest": "Teste de Matriz",
@@ -550,81 +624,6 @@
             "SuccessTest": "Teste de Sucesso",
             "SummonSpiritTest": "Invocar Espírito",
             "SuppressionDefenseTest": "Defesa de Supressão",
-            "ThrownAttackTest": "Ataque de Arma Lançada",
-            "Labels": {
-                "ActiveDefense": "Defesa Ativa",
-                "Attacker": "Atacante",
-                "EnforcedMaximum": "Máximo imposto",
-                "EnforcedMinimum": "Mínimo imposto",
-                "AttackerHits": "Acertos do Atacante",
-                "AttackerNetHits": "Acertos Líquidos do Atacante",
-                "BiofeedbackDamage": "Dano de Biofeedback",
-                "BuyHits": "Comprar Acertos",
-                "CanDefault": "Pode Usar Sem Perícia",
-                "Defender": "Defensor",
-                "DefenderNetHits": "Acertos Excedentes do Defensor",
-                "DefenseTest": "Teste de Defesa",
-                "DicePool": "Parada de Dados",
-                "DicePoolModifier": "Mod. da Parada de Dados",
-                "DontApplyWounds": "Não Aplicar Ferimentos",
-                "ExtendedHits": "Sucessos Estendidos",
-                "ExtendedTest": "Teste Estendido",
-                "FadeAttribute": "Atributo de Enfraq",
-                "FadeValue": "Valor de Enfraq",
-                "FullDefense": "Defesa Total",
-                "FullMatrixDefense": "Defesa Matriz Completa",
-                "Hits": "Acertos",
-                "IncomingDamage": "Dano Recebido",
-                "IncomingDrain": "Dreno Recebido",
-                "IncomingFade": "Enfraquecimento Recebido",
-                "MeleeWeaponAttack": "Ataque com Arma Corpo-a-corpo",
-                "NetHits": "Acertos Excedentes",
-                "OpposedType": "Tipo",
-                "OpposingHits": "Acertos de Oposição",
-                "OpposingNetHits": "Acertos Excedentes de Oposição",
-                "OriginalDicePool": "Grupo Original de Dados",
-                "ResultOverride": "Substituição de Resultado",
-                "ResultOverrideGlitches": "Falhas",
-                "ResultOverrideHits": "Acertos",
-                "RollArmor": "Armadura",
-                "RollComposure": "Compostura",
-                "RollCustom": "Personalizado",
-                "RollDefense": "Defesa",
-                "RollDrain": "Drenar",
-                "RollFade": "Enfraq",
-                "RollJudgeIntentions": "J.Intenção",
-                "RollLiftCarry": "Erg/Carreg",
-                "RollMemory": "Memória",
-                "RollMode": "Modo de Rolagem",
-                "RollOneDie": "Você não pode rolar menos de 1 dado, chapa",
-                "RollSoak": "Resistir Dano",
-                "SecondAttribute": "Segundo Atributo",
-                "SecondChance": "Segunda Chance",
-                "Soak": "Resistir Dano",
-                "SoakTest": "Teste de Resistência a Danos",
-                "Successes": "Sucessos",
-                "Suppressing": "Suprimindo",
-                "TargetingNeedsActorWithToken": "O ator atual precisa de um token vinculado para o direcionamento funcionar",
-                "UseEdgeForInitiativeRoll": "Use a regra de vantagem blitz para iniciativa",
-                "RangedWeaponAttack": "Ataque à Distância"
-            },
-            "Duration": {
-                "Label": "Duração",
-                "Types": {
-                    "Instant": "Instantâneo",
-                    "Permanent": "Permanente",
-                    "Sustained": "Sustentado"
-                }
-            },
-            "Limit": {
-                "Label": "Limite",
-                "Types": {
-                    "Astral": "Astral",
-                    "Mental": "Mental",
-                    "Physical": "Físico",
-                    "Social": "Social"
-                }
-            },
             "Target": {
                 "Label": "Alvo",
                 "Types": {
@@ -635,7 +634,8 @@
                     "Self": "Auto",
                     "Sprite": "Sprite"
                 }
-            }
+            },
+            "ThrownAttackTest": "Ataque de Arma Lançada"
         }
     }
 }

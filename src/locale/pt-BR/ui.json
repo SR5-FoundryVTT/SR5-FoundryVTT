@@ -19,6 +19,7 @@
                 "DronePerception": "Percepção de Drone",
                 "DronePilotVehicle": "Pilotar Veículo (Drone)",
                 "EditFile": "Editar Arquivo",
+                "EnterExitHost": "Entrar/Sair do Host",
                 "EraseMark": "Apagar Marca",
                 "EraseMatrixSignature": "Apagar Assinatura da Matriz",
                 "Fade": "Enfraquecimento",
@@ -48,8 +49,7 @@
                 "Snoop": "Bisbilhotar",
                 "SpoofCommand": "Falsificar Comando",
                 "SwitchInterfaceMode": "Alternar Modo de Interface",
-                "TraceIcon": "Rastrear Ícone",
-                "EnterExitHost": "Entrar/Sair do Host"
+                "TraceIcon": "Rastrear Ícone"
             }
         },
         "ContextOptions": {
@@ -65,6 +65,36 @@
             "Source": "Abrir Referência",
             "View": "Ver",
             "ViewItem": "Ver Item"
+        },
+        "Keybindings": {
+            "AddRemoveManyQty": {
+                "Hint": "Adicionar/Remover 20 Qty de cada vez",
+                "Label": "Adicionar/Remover 20"
+            },
+            "AddRemoveSomeQty": {
+                "Hint": "Adicionar/Remover 5 Qty de cada vez",
+                "Label": "Adicionar/Remover 5"
+            },
+            "HideTestDialog": {
+                "Hint": "Pular diálogo ao rolar testes de qualquer botão",
+                "Label": "Ocultar Diálogo de Teste"
+            },
+            "OverwatchScoreTracker": {
+                "Hint": "Abrir monitor de valor de vigilância",
+                "Label": "Monitor de Valor de Vigilância"
+            },
+            "ShowItemCard": {
+                "Hint": "Mostrar apenas o cartão do item no chat em vez de rolar o teste",
+                "Label": "Mostrar Cartão do Item"
+            },
+            "ShowSituationModifiers": {
+                "Hint": "Abrir modificadores de situação para seleção",
+                "Label": "Modificadores de Situação"
+            },
+            "SuccessTestPrompt": {
+                "Hint": "Prompt para fazer um teste de sucesso padrão",
+                "Label": "Prompt Teste de Sucesso"
+            }
         },
         "Labels": {
             "Action": {
@@ -135,6 +165,12 @@
                 "TestKBoardModifiers": "{skip}: pular diálogo. {descr}: mostrar apenas descrição.",
                 "VehicleConfiguration": "Configuração de Veículo"
             },
+            "Documents": {
+                "Actor": "Ator",
+                "Item": "Item",
+                "Scene": "Cena",
+                "Token": "Token"
+            },
             "Inventory": {
                 "All": "Todos",
                 "Carried": "Carregado",
@@ -187,12 +223,6 @@
                 "Changelog": "Registro de Alterações",
                 "Issues": "Problemas",
                 "Wiki": "Wiki"
-            },
-            "Documents": {
-                "Actor": "Ator",
-                "Item": "Item",
-                "Scene": "Cena",
-                "Token": "Token"
             }
         },
         "Tabs": {
@@ -246,8 +276,6 @@
                 "DisconnectNetwork": "Sair deste host/grade",
                 "MarkTarget": "Coloque marcas adicionais neste alvo",
                 "MatrixConnectionToggle": "Alterar o modo de conexão à Matriz: Realidade Aumentada, RV Fria ou RV Quente",
-                "RemoveAllNetworks": "Remover todas as redes",
-                "RemoveNetwork": "Remover rede",
                 "MatrixRunningSilentToggle": "Alterne seu dispositivo de Matriz entre Modo Silencioso e exibir sua Persona",
                 "Metatype": "Como NPC, o metatipo também aplicará modificadores rápidos de atributo",
                 "MiscConfig": "Configurações & Modificadores Diversos",
@@ -261,12 +289,14 @@
                 "PickControlledTokenAsTechnomancer": "Escolha o ator do Token atualmente controlado como o compilador (Tecnomante)",
                 "PlaceMark": "Ação a ser usada para colocar marcas em alvos já marcados",
                 "RebootPersonaAndClearAllMarks": "Reinicie sua Persona e limpe todas as Marcas que você colocou",
+                "RemoveAllNetworks": "Remover todas as redes",
                 "RemoveFavorite": "Remover este conteúdo da barra de favoritos",
+                "RemoveNetwork": "Remover rede",
                 "RemoveOneService": "Remover um Serviço",
+                "RemoveSkillSet": "Remove o conjunto de perícias atual, bem como todas as perícias e grupos de perícias provenientes dele",
                 "ResetActorForNewRun": "Redefinir dano, vantagem, etc. para uma nova corrida",
                 "RollInitiative": "Rolar iniciativa",
-                "SetupPAN": "Adicionar todos os dispositivos sem fio equipados à persona deste personagem",
-                "RemoveSkillSet": "Remove o conjunto de perícias atual, bem como todas as perícias e grupos de perícias provenientes dele"
+                "SetupPAN": "Adicionar todos os dispositivos sem fio equipados à persona deste personagem"
             },
             "CallInAction": {
                 "ActorType": "Tipo de ator para chamar",
@@ -283,19 +313,19 @@
             "Effect": {
                 "AlterApplyToWithChanges": "Remova as alterações antes de alterar para o que o efeito se aplica.",
                 "ApplyTo": "As alterações deste efeito se aplicarão apenas a este alvo",
+                "ApplyValueEditor": "Aplicar edição do valor",
+                "CancelValueEditor": "Cancelar edição do valor",
                 "CreateEffect": "Criar Efeito",
                 "DeleteEffect": "Excluir Efeito",
                 "DocumentEffects": "Efeitos diretamente neste documento",
                 "EditEffect": "Editar Efeito",
-                "ItemEffects": "Efeitos coletados de itens neste documento",
                 "HelpLinkEnglishOnly": "Ajuda (Link externo, somente em inglês)",
-                "OpenValueEditor": "Abrir editor de valor",
-                "ApplyValueEditor": "Aplicar edição do valor",
-                "CancelValueEditor": "Cancelar edição do valor",
+                "ItemEffects": "Efeitos coletados de itens neste documento",
                 "OnlyAllFilteredUsed": "Este efeito só se aplicará para testes que correspondam a todas as seleções",
                 "OnlyFilteredUsed": "Este efeito só se aplicará para testes que correspondam a pelo menos uma seleção",
                 "OnlyForItemTest": "Apenas afeta o teste do item pai",
                 "OnlyForWireless": "Este efeito se aplicará apenas para itens que tenham conexão sem fio habilitado",
+                "OpenValueEditor": "Abrir editor de valor",
                 "PriorityFieldDisabled": "Prioridade personalizada não é suportada neste momento"
             },
             "Item": {
@@ -352,36 +382,6 @@
                 "Threshold": "Valor do limite calculado"
             },
             "ToggleEditMode": "Modo de edição"
-        },
-        "Keybindings": {
-            "AddRemoveManyQty": {
-                "Hint": "Adicionar/Remover 20 Qty de cada vez",
-                "Label": "Adicionar/Remover 20"
-            },
-            "AddRemoveSomeQty": {
-                "Hint": "Adicionar/Remover 5 Qty de cada vez",
-                "Label": "Adicionar/Remover 5"
-            },
-            "HideTestDialog": {
-                "Hint": "Pular diálogo ao rolar testes de qualquer botão",
-                "Label": "Ocultar Diálogo de Teste"
-            },
-            "OverwatchScoreTracker": {
-                "Hint": "Abrir monitor de valor de vigilância",
-                "Label": "Monitor de Valor de Vigilância"
-            },
-            "ShowItemCard": {
-                "Hint": "Mostrar apenas o cartão do item no chat em vez de rolar o teste",
-                "Label": "Mostrar Cartão do Item"
-            },
-            "ShowSituationModifiers": {
-                "Hint": "Abrir modificadores de situação para seleção",
-                "Label": "Modificadores de Situação"
-            },
-            "SuccessTestPrompt": {
-                "Hint": "Prompt para fazer um teste de sucesso padrão",
-                "Label": "Prompt Teste de Sucesso"
-            }
         }
     }
 }

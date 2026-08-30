@@ -1,6 +1,20 @@
 {
     "SR5": {
         "Actor": {
+            "Attributes": {
+                "Agility": "민첩",
+                "Body": "신체",
+                "Charisma": "매력",
+                "Edge": "엣지",
+                "Essence": "에센스",
+                "Intuition": "직관력",
+                "Logic": "논리력",
+                "Magic": "마법",
+                "Reaction": "순발력",
+                "Resonance": "공명",
+                "Strength": "근력",
+                "Willpower": "의지력"
+            },
             "FIELDS": {
                 "attributes": {
                     "edge": {
@@ -209,21 +223,6 @@
                     "label": "테크노맨서"
                 }
             },
-            "NoFavoritesSelected": "선택된 즐겨찾기 항목 없음",
-            "Attributes": {
-                "Agility": "민첩",
-                "Body": "신체",
-                "Charisma": "매력",
-                "Edge": "엣지",
-                "Essence": "에센스",
-                "Intuition": "직관력",
-                "Logic": "논리력",
-                "Magic": "마법",
-                "Reaction": "순발력",
-                "Resonance": "공명",
-                "Strength": "근력",
-                "Willpower": "의지력"
-            },
             "Initiative": {
                 "Categories": {
                     "Astral": "아스트랄",
@@ -246,12 +245,13 @@
                 "IsNPC": "NPC",
                 "Metatype": "메타인종",
                 "Movement": "이동",
+                "RunningSpeed": "달리기",
                 "SheetActor": "액터 시트",
                 "SpecialAttributes": "특별 특성치",
-                "WalkingSpeed": "걷기",
-                "RunningSpeed": "달리기",
-                "SprintingBonus": "전력 질주 보너스"
-            }
+                "SprintingBonus": "전력 질주 보너스",
+                "WalkingSpeed": "걷기"
+            },
+            "NoFavoritesSelected": "선택된 즐겨찾기 항목 없음"
         },
         "ActorTypes": {
             "Character": "캐릭터",
@@ -311,6 +311,13 @@
                     "label": "길거리 명성"
                 }
             },
+            "Labels": {
+                "CareerKarma": "경력 카르마",
+                "Notoriety": "악명",
+                "Nuyen": "뉴엔",
+                "PublicAwareness": "대중 인식도",
+                "StreetCred": "길거리 명성"
+            },
             "Modifiers": {
                 "NPCMetatypeAttribute": "NPC 메타인종 특성치"
             },
@@ -320,13 +327,6 @@
                 "Human": "인간",
                 "Ork": "오크",
                 "Troll": "트롤"
-            },
-            "Labels": {
-                "CareerKarma": "경력 카르마",
-                "Notoriety": "악명",
-                "Nuyen": "뉴엔",
-                "PublicAwareness": "대중 인식도",
-                "StreetCred": "길거리 명성"
             }
         },
         "Contact": {
@@ -365,17 +365,17 @@
             },
             "Family": "가족",
             "Group": "그룹",
+            "Labels": {
+                "Connection": "연결",
+                "ContactType": "유형",
+                "Contacts": "연줄",
+                "Loyalty": "친밀도"
+            },
             "LinkedActor": "액터",
             "Loyalty": "친밀도",
             "LoyaltyConnectionHelp": "우호도 / 영향력",
             "LoyaltyConnectionLabel": "L / C",
-            "Type": "유형",
-            "Labels": {
-                "ContactType": "유형",
-                "Contacts": "연줄",
-                "Connection": "연결",
-                "Loyalty": "친밀도"
-            }
+            "Type": "유형"
         },
         "InventoryRename": {
             "Cancel": "취소",
@@ -408,8 +408,8 @@
                 "Remote": "원격 조종",
                 "Rigger": "리거 조종"
             },
-            "Driver": "조종자",
             "DamagedVehicle": "손상된 탑승물",
+            "Driver": "조종자",
             "Drone": "드론",
             "Environments": {
                 "Handling": "조작력",
@@ -417,6 +417,10 @@
             },
             "IsDrone": "은/는 드론",
             "IsOffRoad": "은/는 비포장 도로 주행 중",
+            "Labels": {
+                "ControlRig": "컨트롤 리그",
+                "VehicleStunImmunity": "탑승물의 기절 피해 면역"
+            },
             "Maneuvering": "기동",
             "MissingDriver": "액터를 끌어서 놓아 조종자로 지정",
             "ModificationCategoryTypes": {
@@ -450,11 +454,7 @@
                 "Walker": "워커",
                 "Water": "수상 탑승물"
             },
-            "Vehicle": "탑승물",
-            "Labels": {
-                "ControlRig": "컨트롤 리그",
-                "VehicleStunImmunity": "탑승물의 기절 피해 면역"
-            }
+            "Vehicle": "탑승물"
         },
         "VehicleImport": {
             "MissingPermission": "액터 생성 권한이 없음"

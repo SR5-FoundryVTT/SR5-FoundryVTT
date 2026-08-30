@@ -1,16 +1,11 @@
 {
     "SR5": {
-        "DamageApplication": {
-            "ApplyDamage": "Apply Damage",
-            "ApplyUnmodifiedDamage": "Apply Unmod. Damage",
-            "Title": "Damage Application"
-        },
         "Combat": {
             "CannotSeizeAgain": "You cannot seize initiative again until the start of your next turn.",
             "ModeAstral": "Astral",
-            "ModeChangedLabel": "Initiative Mode Updated",
             "ModeChangeNewInitiative": "New initiative",
             "ModeChangePreviousInitiative": "Previous initiative",
+            "ModeChangedLabel": "Initiative Mode Updated",
             "ModeMatrix": "Matrix",
             "ModeMeatspace": "Meatspace",
             "ModeTitle": "Mode: {mode}",
@@ -32,13 +27,18 @@
         },
         "Damage": {
             "Label": "Damage",
+            "Type": "Type",
             "Types": {
                 "Matrix": "Matrix",
                 "Physical": "Physical",
                 "Stun": "Stun"
             },
-            "Type": "Type",
             "Value": "Damage Value"
+        },
+        "DamageApplication": {
+            "ApplyDamage": "Apply Damage",
+            "ApplyUnmodifiedDamage": "Apply Unmod. Damage",
+            "Title": "Damage Application"
         }
     }
 }
