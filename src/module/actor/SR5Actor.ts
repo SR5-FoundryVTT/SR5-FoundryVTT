@@ -1580,6 +1580,8 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const updateData = {
             system: {
                 initiative: { perception: isMatrixMode ? 'matrix' : mode },
+                // Matrix initiative uses VR. Clear both flags when leaving it so its
+                // modifiers do not continue to apply in meatspace or astral mode.
                 ...(this.system.matrix && {
                     matrix: {
                         vr: isMatrixMode,
