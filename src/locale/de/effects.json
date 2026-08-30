@@ -116,7 +116,7 @@
             "FilterTypes": {
                 "Attributes": "Attribute",
                 "Categories": "Handlungskategorien",
-                "Limits": "Limits",
+                "Limits": "Grenzwerte",
                 "Skills": "Fertigkeiten",
                 "Tests": "Proben"
             },

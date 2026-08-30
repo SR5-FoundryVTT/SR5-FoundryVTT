@@ -3,25 +3,25 @@
         "AdeptPower": {
             "FIELDS": {
                 "drain": {
-                    "hint": "If this Adept Power incurs Drain after use",
-                    "label": "Drain"
+                    "hint": "Si cette puissance d'Adept est en fuite après utilisation",
+                    "label": "Égoutter"
                 },
                 "level": {
-                    "hint": "Level of this Adept Power (if applicable)",
+                    "hint": "Niveau de cette puissance d'adaptation (le cas échéant)",
                     "label": "Niveau"
                 },
                 "pp": {
-                    "hint": "Number of Power Points this Power Costs",
-                    "label": "Power Points"
+                    "hint": "Nombre de points de puissance ce coût de puissance",
+                    "label": "Points d'alimentation"
                 },
                 "type": {
-                    "hint": "Type of Adept Power",
-                    "label": "Power Type"
+                    "hint": "Type de puissance de pointe",
+                    "label": "Type de puissance"
                 }
             },
             "Types": {
-                "Active": "Active",
-                "Passive": "Passive"
+                "Active": "Activité",
+                "Passive": "Passif"
             }
         },
         "CritterPower": {
@@ -42,28 +42,28 @@
                 "Always": "Toujours",
                 "Instant": "Instantané",
                 "Permanent": "Permanent",
-                "Special": "Special",
+                "Special": "Spécial",
                 "Sustained": "Maintenu"
             },
             "FIELDS": {
                 "duration": {
-                    "hint": "Duration of the Critter Power",
+                    "hint": "Durée du pouvoir de créature",
                     "label": "Durée"
                 },
                 "karma": {
-                    "hint": "Karma cost of the Critter Power",
+                    "hint": "Coût Karma de la puissance de la crotte",
                     "label": "Karma"
                 },
                 "optional": {
-                    "hint": "If the Critter Power is Optional",
-                    "label": "Optional"
+                    "hint": "Si le pouvoir de créature est facultatif",
+                    "label": "Facultatif"
                 },
                 "powerType": {
-                    "hint": "The Type of Critter Power",
-                    "label": "Power Type"
+                    "hint": "Le type de pouvoir de créature",
+                    "label": "Type de puissance"
                 },
                 "range": {
-                    "hint": "Range of the Critter Power",
+                    "hint": "Portée du pouvoir de créature",
                     "label": "Portée"
                 }
             },
@@ -93,12 +93,12 @@
             "Anchored": "Ancré",
             "FIELDS": {
                 "descriptors": {
-                    "hint": "Descriptors for the Ritual",
+                    "hint": "Descripteurs pour le rituel",
                     "label": "Descripteurs"
                 },
                 "type": {
-                    "hint": "Type of Ritual to Perform",
-                    "label": "Ritual Type"
+                    "hint": "Type de rituel à effectuer",
+                    "label": "Type rituel"
                 }
             },
             "MaterialLink": "Lien matériel",
@@ -109,12 +109,12 @@
         "Spell": {
             "Attack": "Attaque de sort",
             "Cast": "Lancer un sort",
-            "CatCombat": "Combat",
+            "CatCombat": "Lutte",
             "CatDetection": "Détection",
             "CatHealth": "Santé",
             "CatIllusion": "Illusion",
             "CatManipulation": "Manipulation",
-            "CatRitual": "Ritual",
+            "CatRitual": "Rituel",
             "Category": "Catégorie",
             "CombatDirect": "Direct",
             "CombatIndirect": "Indirect",
@@ -126,78 +126,78 @@
             "DetectionPsychic": "Psychique",
             "FIELDS": {
                 "category": {
-                    "hint": "Category that the Spell belongs to",
-                    "label": "Category"
+                    "hint": "Catégorie à laquelle appartient l'Espell",
+                    "label": "Catégorie"
                 },
                 "combat": {
                     "type": {
-                        "hint": "If the Spell is Direct or Indirect",
-                        "label": "Combat Spell Type"
+                        "hint": "Si le sort est direct ou indirect",
+                        "label": "Type de sort de combat"
                     }
                 },
                 "detection": {
                     "extended": {
-                        "hint": "If the Spell is Extended",
-                        "label": "Extended"
+                        "hint": "Si l'épell est étendu",
+                        "label": "Étendu"
                     },
                     "passive": {
-                        "hint": "If the Spell is Passive",
-                        "label": "Passive"
+                        "hint": "Si le sort est passif",
+                        "label": "Passif"
                     },
                     "type": {
-                        "hint": "How the Spell affects targets",
-                        "label": "Detection Spell Type"
+                        "hint": "Comment le sort affecte les cibles",
+                        "label": "Type de sort de détection"
                     }
                 },
                 "drain": {
-                    "hint": "Drain Value of the spell, this is is added to the Force of the spell to Resist Drain",
+                    "hint": "Drain Valeur du sort, ceci est ajouté à la Force du sort pour Résister Drain",
                     "label": "Valeur drain"
                 },
                 "duration": {
-                    "hint": "Duration of the Spell",
+                    "hint": "Durée de l'appel",
                     "label": "Durée"
                 },
                 "illusion": {
                     "sense": {
-                        "hint": "The Sense that the Spell affects",
-                        "label": "Sense"
+                        "hint": "Le sens affecté par le sort",
+                        "label": "Sensation"
                     },
                     "type": {
-                        "hint": "Type of Illusion Spell",
-                        "label": "Illusion Spell Type"
+                        "hint": "Type de sort d'illusion",
+                        "label": "Type de sort d'illusion"
                     }
                 },
                 "manipulation": {
                     "damaging": {
-                        "hint": "If the Spell deals Damage",
+                        "hint": "Si la faute de frappe fait des dégâts",
                         "label": "Destruction"
                     },
                     "environmental": {
-                        "hint": "These spells don’t really have a target, and they don’t really affect targets directly. They just affect an area.",
+                        "hint": "Ces sorts n'ont pas vraiment une cible, et ils n'affectent pas vraiment les cibles directement. Ils affectent juste une zone.",
                         "label": "Environnemental"
                     },
                     "mental": {
-                        "hint": "If the Spell affects targets Mentally",
+                        "hint": "Si le sort affecte mentalement les cibles",
                         "label": "Mentale"
                     },
                     "physical": {
-                        "hint": "These spells affect physical forms and are usually defended against",
+                        "hint": "Ces sorts affectent les formes physiques et sont généralement défendus contre",
                         "label": "Physique"
                     }
                 },
                 "range": {
-                    "hint": "Range of the Spell",
+                    "hint": "Portée du sort",
                     "label": "Portée"
                 },
                 "ritual": {
                     "type": {
-                        "hint": "Type of Ritual to perform",
-                        "label": "Ritual Type"
+                        "hint": "Type de rituel à exécuter",
+                        "label": "Type rituel"
                     }
                 },
                 "type": {
-                    "hint": "If the Spell is Physical or Mana based",
-                    "label": "Spell Type"
+                    "hint": "Si le sort est physique ou fondé sur le mana",
+                    "label": "Type de sort"
                 }
             },
             "IllusionMultiSense": "Sens Multiples",
@@ -220,7 +220,7 @@
         },
         "Spirit": {
             "Bound": "Lié",
-            "Force": "Force",
+            "Force": "Forcer",
             "ForceAppliesSetting": "Force applicable à",
             "ForceAppliesSettingHint": "Détermine quels attributs de l'esprit reçoivent le bonus de Force.",
             "HalfValueSkill": "Compétence à demi-valeur",
@@ -229,9 +229,9 @@
             "InitiativeFormulaAstralHint": "Choisissez les termes de l'initiative astrale.",
             "InitiativeFormulaMeatspace": "Formule d'initiative terrestre",
             "InitiativeFormulaMeatspaceHint": "Choisissez les termes de l'initiative terrestre.",
-            "MissingSummoner": "Missing Summoner",
+            "MissingSummoner": "Invocation manquante",
             "Services": "Services",
-            "Summoner": "Summoner",
+            "Summoner": "Invoquer",
             "Type": "Type",
             "Types": {
                 "Abomination": "Abomination",
@@ -239,16 +239,16 @@
                 "Aircraft": "Appareil volant",
                 "Airwave": "Aérien",
                 "Ally": "Alliée",
-                "Anansi": "Anansi",
+                "Anansi": "Anani",
                 "Anarch": "Anarch",
-                "Arboreal": "Arboreal",
+                "Arboreal": "Arboréal",
                 "Automotive": "Automobile",
                 "Barren": "Aride",
                 "Beasts": "Bêtes",
                 "Blackjack": "Blackjack",
                 "BladeSummoned": "Lame-Invoquée",
                 "Blood": "Sang",
-                "BloodShade": "Blood Shade",
+                "BloodShade": "Shade sanguin",
                 "Boggle": "Boggle",
                 "Bone": "Os",
                 "Bugul": "Bugul",
@@ -263,7 +263,7 @@
                 "Detritus": "Détritus",
                 "Duende": "Duende",
                 "Earth": "Terre",
-                "Ejerian": "Ejerian",
+                "Ejerian": "Éjérien",
                 "Elvar": "Elvar",
                 "Energy": "Energie",
                 "Erinyes": "Erinyes",
@@ -273,13 +273,13 @@
                 "Gremlin": "Gremlin",
                 "Guardian": "Gardien",
                 "Guidance": "Guide",
-                "GumToad": "Gum Toad (Demon)",
+                "GumToad": "Crapaud de gum (Démon)",
                 "Homunculus": "Homunculus",
                 "Hopper": "Hopper",
-                "HorrorShow": "Horror Show",
+                "HorrorShow": "Spectacle d'horreur",
                 "Imp": "Imp",
-                "Jarl": "Jarl",
-                "Kappa": "Kappa",
+                "Jarl": "JARL",
+                "Kappa": "C'est un peu trop.",
                 "Kokopelli": "Kokopelli",
                 "Man": "Homme",
                 "MasterShedim": "Maître Shedim",
@@ -287,7 +287,7 @@
                 "Morbi": "Morbi",
                 "Muse": "Muse",
                 "Nightmare": "Cauchemard",
-                "Nocnitsa": "Nocnitsa",
+                "Nocnitsa": "Noctnitsa",
                 "Noxious": "Nocif",
                 "Nuclear": "Nucléaire",
                 "Nymph": "Insecte Nymphe",
@@ -295,7 +295,7 @@
                 "Phantom": "Fantôme",
                 "Plague": "Fléan",
                 "Plant": "Plante",
-                "Preta": "Preta",
+                "Preta": "Préta",
                 "Queen": "Insecte Reine",
                 "Rot": "Pourrir",
                 "Scout": "Insect Éclaireur",
@@ -308,11 +308,11 @@
                 "Succubus": "Succube",
                 "Task": "Tâche",
                 "Train": "Entrainement",
-                "TsuchigumoWarrior": "Tsuchigumo Warrior",
+                "TsuchigumoWarrior": "Tsuchigumo Guerrier",
                 "Tungak": "Tungak",
                 "Unbreakable": "Incassable",
-                "Vrygoths": "Vrygoths",
-                "VucubCaquix": "Vucub Caquix",
+                "Vrygoths": "Vrygothes",
+                "VucubCaquix": "Caquix de Vucub",
                 "Watcher": "Beobachterin",
                 "Water": "Eau",
                 "Worker": "Insecte Ouvrier",

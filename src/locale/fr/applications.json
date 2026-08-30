@@ -9,61 +9,61 @@
             "Title": "Mise à jour Shadowrun5e"
         },
         "CompendiaSettings": {
-            "Description": "These packs will be used for the system. You can override them with your own packs, but you should not remove them.",
+            "Description": "Ces packs seront utilisés pour le système. Vous pouvez les surcharger avec vos propres packs, mais vous ne devriez pas les supprimer.",
             "GeneralActionsPack": {
-                "hint": "This compendium will be used for all general, attribute only actions.",
-                "label": "General Actions"
+                "hint": "Ce compendium sera utilisé pour toutes les actions générales, attribut seulement.",
+                "label": "Actions générales"
             },
             "ICActionsPack": {
-                "hint": "This compendium will be used for IC actions, filtered for each IC type",
-                "label": "IC Actions"
+                "hint": "Ce compendium sera utilisé pour les actions IC, filtrées pour chaque type d'IC",
+                "label": "Actions du CI"
             },
-            "Label": "Compendium Packs",
+            "Label": "Emballages du Compendium",
             "MatrixActionsPack": {
-                "hint": "This compendium will be used for all matrix actions.",
-                "label": "Matrix Actions"
+                "hint": "Ce compendium sera utilisé pour toutes les actions matricielles.",
+                "label": "Actions matricielles"
             },
-            "SkillsPacksSection": "Skills Compendiums",
-            "ActionsPacksSection": "Actions Compendiums",
+            "SkillsPacksSection": "Recueils de compétences",
+            "ActionsPacksSection": "Recueils d'actions",
             "SkillsPack": {
-                "hint": "This compendium will be used for all skills.",
+                "hint": "Ce recueil sera utilisé pour toutes les compétences.",
                 "label": "Compétences"
             },
             "SkillGroupsPack": {
-                "hint": "This compendium will be used for skill groups.",
-                "label": "Skill Groups"
+                "hint": "Ce recueil sera utilisé pour les groupes de compétences.",
+                "label": "Groupes de compétences"
             },
             "SkillSetsPack": {
-                "hint": "This compendium will be used for skill sets.",
-                "label": "Skill Sets"
+                "hint": "Ce compendium sera utilisé pour les ensembles de compétences.",
+                "label": "Ensembles de compétences"
             },
-            "Title": "System compendiums"
+            "Title": "Recueils de systèmes"
         },
         "CompendiumBrowser": {
             "Filters": {
-                "ClearSearch": "Clear Search",
-                "SearchPlaceholder": "Search results...",
-                "System": "System",
-                "World": "World"
+                "ClearSearch": "Effacer la recherche",
+                "SearchPlaceholder": "Résultats de la recherche...",
+                "System": "Système",
+                "World": "Monde"
             },
             "Tabs": {
-                "Actors": "Actors",
-                "Items": "Items",
-                "Settings": "Settings"
+                "Actors": "Acteurs",
+                "Items": "Éléments",
+                "Settings": "Paramètres"
             },
-            "Title": "Compendium Browser"
+            "Title": "Navigateur Compendium"
         },
         "Compendiums": {
             "Folders": {
-                "Root": "SR5e Imports"
+                "Root": "Importations de SR5e"
             },
-            "sr5critter": "Critters & Spirits & Sprites",
-            "sr5drone": "Drones & Vehicles",
-            "sr5gear": "Armors & Gears",
-            "sr5magic": "Spell & Complex Forms",
-            "sr5misc": "Miscellaneous",
+            "sr5critter": "Critères & Esprits & Sprites",
+            "sr5drone": "Drones et véhicules",
+            "sr5gear": "Armures et engins",
+            "sr5magic": "Formes orthographiques et complexes",
+            "sr5misc": "Divers",
             "sr5modification": "Modifications",
-            "sr5trait": "Quality & Powers",
+            "sr5trait": "Qualité et pouvoirs",
             "sr5ware": "Bioware & Cyberware",
             "sr5weapon": "Armes"
         },
@@ -112,39 +112,39 @@
             }
         },
         "GMRequest": {
-            "General": "Your GM wants you to do a",
-            "RollAttribute": "Attribute Check",
-            "RollSkill": "Skill Check",
-            "Teamwork": "Teamwork Test",
-            "Threshold": " with a threshold of "
+            "General": "Votre GM veut que vous fassiez un",
+            "RollAttribute": "Vérification des attributs",
+            "RollSkill": "Vérification des compétences",
+            "Teamwork": "Essai d'équipe",
+            "Threshold": "avec un seuil de"
         },
         "Import": {
             "ActorImporter": {
-                "Title": "Actor Importer"
+                "Title": "Importateur"
             },
             "BulkImporter": {
-                "Title": "Bulk Importer"
+                "Title": "Importateur en vrac"
             },
             "ImporterSourcesConfig": {
-                "Title": "Importer Sources Configuration"
+                "Title": "Configuration des sources d'importation"
             },
             "Spirit": {
-                "SpiritTypeNotFound": "The spirit type was not found. Please open a github issue with your chummer export json."
+                "SpiritTypeNotFound": "Le type d'esprit n'a pas été trouvé. Veuillez ouvrir un problème github avec votre json d'exportation chummer."
             },
             "Sprite": {
-                "SpriteTypeNotFound": "The sprite type was not found. Please open a github issue with your chummer export json."
+                "SpriteTypeNotFound": "Le type sprite n'a pas été trouvé. Veuillez ouvrir un problème github avec votre json d'exportation chummer."
             }
         },
         "KarmaManager": {
             "Cancel": "Annuler",
-            "CareerKarma": "Amount of Career Karma the Character has accumulated",
-            "CurrentKarma": "Amount of Karma the Character currently has",
-            "FinalCareerKarma": "Career Karma the Character will have upon submitting",
-            "FinalCurrentKarma": "Karma this Character will have upon submitting",
-            "FinalKarma": "Final Karma",
-            "StartingKarma": "Starting Karma",
-            "Submit": "Submit",
-            "Title": "Karma Manager"
+            "CareerKarma": "Montant de carrière Karma le personnage a accumulé",
+            "CurrentKarma": "Quantité de Karma le caractère a actuellement",
+            "FinalCareerKarma": "Carrière Karma le personnage aura lors de la soumission",
+            "FinalCurrentKarma": "Karma ce personnage aura lors de la soumission",
+            "FinalKarma": "Finale Karma",
+            "StartingKarma": "Début du karma",
+            "Submit": "Soumettre",
+            "Title": "Directeur Karma"
         },
         "MIGRATION": {
             "BeginMigration": "Commencer la migration",
@@ -164,29 +164,29 @@
         },
         "Migrator": {
             "Version18_0_0": {
-                "Line1": "From version 0.18.0 onwards effects on owned items will directly apply without them having to be copied to the actor.",
-                "Line2": "Previously copied effects must be deleted or disabled to avoid both item and actor effects applying changes. By default all effects with an item origin will be deleted.",
-                "Line3": "Effects created directly on actors aren't affected.",
-                "Line4": "Should you heavily use effects and effects modules and aren't sure about 'item owned effects', you set this migration to disable and review your disabled effects. Disabled effects will be marked as such.",
-                "Line5": "Also be aware that enabled effects on actor items will now be applied. You'll be able to see all applied effects in the actors effects tab.",
-                "OnlyDisable": "Disable Effects only",
-                "Warning": "NOTE!"
+                "Line1": "À partir de la version 0.18.0, les effets sur les objets appartenant s'appliqueront directement sans qu'ils soient à copier à l'acteur.",
+                "Line2": "Les effets précédemment copiés doivent être supprimés ou désactivés pour éviter les effets d'élément et d'acteur qui appliquent des modifications. Par défaut, tous les effets avec une origine d'élément seront supprimés.",
+                "Line3": "Les effets créés directement sur les acteurs ne sont pas affectés.",
+                "Line4": "Si vous utilisez des modules d'effets et d'effets fortement et que vous ne savez pas très bien quels sont les effets personnels, vous définissez cette migration pour désactiver et examiner vos effets désactivés. Les effets désactivés seront marqués comme tels.",
+                "Line5": "Sachez également que les effets activés sur les éléments d'acteur seront maintenant appliqués. Vous pourrez voir tous les effets appliqués dans l'onglet effets d'acteurs.",
+                "OnlyDisable": "Désactiver uniquement les effets",
+                "Warning": "Remarque !"
             }
         },
         "NuyenManager": {
             "Cancel": "Annuler",
-            "CurrentNuyen": "Amount of Nuyen the Character currently has",
-            "FinalNuyen": "Final Amount of Nuyen upon Submitting",
-            "Submit": "Submit",
-            "Title": "Nuyen Manager"
+            "CurrentNuyen": "Quantité de Nuyen le caractère a actuellement",
+            "FinalNuyen": "Montant final de Nuyen lors de la soumission",
+            "Submit": "Soumettre",
+            "Title": "Directeur de Nuyen"
         },
         "OverwatchScoreTracker": {
-            "AddSelect": "Add selected tokens linked actor",
-            "CantDeleteUserCharacter": "Player Character can't be removed from the tracker",
-            "DeleteScore": "Delete score from tracker",
-            "GMOnly": "GOD is tracking your location...",
-            "NotifyNoSelectedTokens": "At least one linked token must be selected.",
-            "OnlyLinkedActorsSupported": "Only linked actors are supported. Selected tokens with unlinked actors will be ignored.",
+            "AddSelect": "Ajouter un acteur lié tokens sélectionné",
+            "CantDeleteUserCharacter": "Le personnage de joueur ne peut pas être retiré du tracker",
+            "DeleteScore": "Supprimer le score du tracker",
+            "GMOnly": "Dieu surveille votre localisation...",
+            "NotifyNoSelectedTokens": "Au moins un jeton lié doit être sélectionné.",
+            "OnlyLinkedActorsSupported": "Seuls les acteurs liés sont pris en charge. Les jetons sélectionnés avec des acteurs non liés seront ignorés.",
             "ResetScore": "Réinitialiser Score de Surveillance"
         },
         "SituationalModifiersApplication": {
@@ -195,13 +195,13 @@
                 "Matrix": "Matrice",
                 "Physical": "Physique"
             },
-            "ClearLocalAll": "Remove local modifiers",
-            "ClearLocalAllTokens": "Remove all token modifiers on scene",
+            "ClearLocalAll": "Supprimer les modificateurs locaux",
+            "ClearLocalAllTokens": "Supprimer tous les modificateurs de jetons sur place",
             "Magic": {
-                "BackgroundCount": "Background Count"
+                "BackgroundCount": "Compte de l ' historique"
             },
             "Matrix": {
-                "Noise": "Noise"
+                "Noise": "Bruit"
             },
             "Title": "Modificateurs situationnels",
             "Total": "Résultat"
@@ -237,22 +237,22 @@
         },
         "Tours": {
             "CharacterImport": {
-                "Description": "This Tour will give you an overview how to import a chummer character. For details look into https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/wiki/Chummer-Character-Import",
-                "GeneralContent": "To import a character you need the export json from chummer 5e.",
-                "GeneralTitle": "Importing a character",
-                "Title": "Character Import"
+                "Description": "Ce tour vous donnera un aperçu de la façon d'importer un personnage chummer. Pour plus de détails, consultez https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/wiki/Chummer-Character-Import",
+                "GeneralContent": "Pour importer un personnage, vous avez besoin de l'export json de chummer 5e.",
+                "GeneralTitle": "Importation d'un caractère",
+                "Title": "Importation de caractères"
             },
             "ConditionMonitor": {
-                "ApplyDamageContent": "To apply damage left click a cell. All cells up to this cell including will be filled. If more cells where filled all cells to the right will not be filled anymore. Right clicking any cell will remove all damage from the monitor.",
-                "ApplyDamageTitle": "Applying and removing Damage",
-                "Description": "This tour will give you an overview how the condition monitor work.",
-                "GeneralContent": "These are your conditions monitors. They consist of several cells. In certain cells you can see a written number. If these cells are filled your wound modifier is increased to this number. The wound modifiers of all monitors are added",
-                "GeneralTitle": "Condition Monitor",
-                "RecoveryContent": "Clicking on the label of a condition monitor will prompt an extended recovery test. The result of the recovery test will be automatically applied to the monitor.",
-                "RecoveryTitle": "Recovery Tests",
-                "Title": "Condition Monitor Tour",
-                "WoundModifierContent": "This cell denotes that filling it increases your wound modifier by the number written in the cell",
-                "WoundModifierTitle": "Wound Modifier"
+                "ApplyDamageContent": "Pour appliquer les dommages gauche cliquez sur une cellule. Toutes les cellules jusqu'à cette cellule, y compris sera remplie. Si plus de cellules où rempli toutes les cellules à droite ne sera plus remplie.",
+                "ApplyDamageTitle": "Application et élimination des dommages",
+                "Description": "Cette visite vous donnera un aperçu du fonctionnement du moniteur de condition.",
+                "GeneralContent": "Ce sont vos moniteurs de conditions. Ils se composent de plusieurs cellules. Dans certaines cellules, vous pouvez voir un nombre écrit. Si ces cellules sont remplies votre modificateur de blessure est augmenté à ce nombre.",
+                "GeneralTitle": "Moniteur de condition",
+                "RecoveryContent": "En cliquant sur l'étiquette d'un moniteur de condition, vous aurez besoin d'un test de récupération étendu. Le résultat de l'essai de récupération sera automatiquement appliqué au moniteur.",
+                "RecoveryTitle": "Essais de récupération",
+                "Title": "Tournée de l'écran de condition",
+                "WoundModifierContent": "Cette cellule indique que le remplissage augmente votre modificateur de blessure par le nombre écrit dans la cellule",
+                "WoundModifierTitle": "Modificateur de blessure"
             }
         }
     }

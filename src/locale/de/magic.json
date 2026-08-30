@@ -8,7 +8,7 @@
                 },
                 "level": {
                     "hint": "Level der Adeptenkraft",
-                    "label": "Level"
+                    "label": "Ebene"
                 },
                 "pp": {
                     "hint": "Kosten in Kraftpunkten",
@@ -41,7 +41,7 @@
             "Durations": {
                 "Always": "Immer",
                 "Instant": "Sofort",
-                "Permanent": "Permanent",
+                "Permanent": "Dauerhaft",
                 "Special": "Speziell",
                 "Sustained": "Aufrechterhalten"
             },
@@ -56,7 +56,7 @@
                 },
                 "optional": {
                     "hint": "Ist die Critter Kraft optional?",
-                    "label": "Optional"
+                    "label": "Fakultativ"
                 },
                 "powerType": {
                     "hint": "Art der Critter Kraft",
@@ -178,7 +178,7 @@
                     },
                     "mental": {
                         "hint": "Beeinträchtigt der Zauber den Geist eines Ziels?",
-                        "label": "Mental"
+                        "label": "Geistig"
                     },
                     "physical": {
                         "hint": "Beeinträchtigt der Zauber den physischen Körper eines Ziels?",
@@ -206,7 +206,7 @@
             "IllusionSingleSense": "Monosensorisch",
             "ManipulationDamaging": "Schaden",
             "ManipulationEnvironmental": "Umgebung",
-            "ManipulationMental": "Mental",
+            "ManipulationMental": "Geistig",
             "ManipulationPhysical": "Physisch",
             "Range": "Reichweite",
             "RangeLos": "BF",
@@ -240,12 +240,12 @@
                 "Airwave": "Radiowelle",
                 "Ally": "Verbündete",
                 "Anansi": "Anansi",
-                "Anarch": "Anarch",
+                "Anarch": "Anarche",
                 "Arboreal": "Arboreal",
                 "Automotive": "Bodenfahrzeug",
                 "Barren": "Ödnis",
                 "Beasts": "Tier",
-                "Blackjack": "Blackjack",
+                "Blackjack": "Schwarzer Jack",
                 "BladeSummoned": "Klinge-Beschworen",
                 "Blood": "Blut",
                 "BloodShade": "Blutschatten",
@@ -256,10 +256,10 @@
                 "Caretaker": "Insekt: Pfleger",
                 "Ceramic": "Keramik",
                 "Chindi": "Chindi",
-                "CorpsCadavre": "Corps Cadavre",
+                "CorpsCadavre": "Korps Cadavre",
                 "Corpse": "Leiche",
                 "Crawler": "Crawler (Dämon)",
-                "Croki": "Croki",
+                "Croki": "Kroki",
                 "Detritus": "Geröll",
                 "Duende": "Duende",
                 "Earth": "Erde",
@@ -275,8 +275,8 @@
                 "Guidance": "Ratgeber",
                 "GumToad": "Gum Toad (Dämon)",
                 "Homunculus": "Homunkulus",
-                "Hopper": "Hopper",
-                "HorrorShow": "Horror Show",
+                "Hopper": "Hopfen",
+                "HorrorShow": "Horror-Show",
                 "Imp": "Imp",
                 "Jarl": "Jarl",
                 "Kappa": "Kappa",
@@ -295,7 +295,7 @@
                 "Phantom": "Phantom",
                 "Plague": "Seuche",
                 "Plant": "Pflanze",
-                "Preta": "Preta",
+                "Preta": "Vorbemerkungen",
                 "Queen": "Insekt: Königin/Mutter",
                 "Rot": "Fäulnis",
                 "Scout": "Insekt: Späher",
@@ -304,14 +304,14 @@
                 "Ship": "Schiff",
                 "Sludge": "Schlamm",
                 "Soldier": "Insekt: Soldat",
-                "Stabber": "Stabber",
+                "Stabber": "Staber",
                 "Succubus": "Sukkubus",
                 "Task": "Helfer",
                 "Train": "Eisenbahn",
-                "TsuchigumoWarrior": "Tsuchigumo Warrior",
+                "TsuchigumoWarrior": "Der Jagdhund-Krieger",
                 "Tungak": "Tungak",
                 "Unbreakable": "Unzerbrechlich",
-                "Vrygoths": "Vrygoths",
+                "Vrygoths": "Vrygoten",
                 "VucubCaquix": "Vucub Caquix",
                 "Watcher": "Beobachter",
                 "Water": "Wasser",

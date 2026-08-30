@@ -3,42 +3,42 @@
         "Ammo": {
             "FIELDS": {
                 "accuracy": {
-                    "hint": "Accuracy modifier of this Ammo",
+                    "hint": "Modificateur de précision de ces munitions",
                     "label": "Précision"
                 },
                 "ap": {
-                    "hint": "Armor Penetration of this Ammo. This may be added to the Weapon's AP or replace it",
+                    "hint": "Pénétration d'armure de ces munitions. Elle peut être ajoutée à la PA de l'arme ou la remplacer",
                     "label": "PA"
                 },
                 "blast": {
                     "dropoff": {
-                        "hint": "Blast Dropoff modifies the Damage per Meter",
-                        "label": "Blast Dropoff"
+                        "hint": "La chute de la flamme modifie les dommages par mètre",
+                        "label": "Décrochage de la flamme"
                     },
                     "radius": {
-                        "hint": "Blast Radius of this Ammo, in Meters",
+                        "hint": "Rayon d'explosion de ces munitions, en mètres",
                         "label": "Rayon d'explosion"
                     }
                 },
                 "damage": {
-                    "hint": "Damage dealt by this ammo. This may be added to the Weapon's Damage or replace it",
+                    "hint": "Dommages infligés par cette bombe. Ceci peut être ajouté aux dommages de l'arme ou le remplacer",
                     "label": "Dégâts"
                 },
                 "damageType": {
-                    "hint": "Type of damage dealt by this Ammo.",
-                    "label": "Damage type"
+                    "hint": "Type de dégâts infligés par ces munitions.",
+                    "label": "Type de dommage"
                 },
                 "element": {
-                    "hint": "Element the damage of this Element does.",
+                    "hint": "Élément que les dommages de cet élément fait.",
                     "label": "Élément"
                 },
                 "replaceAP": {
-                    "hint": "If this Ammo should replace the AP of the Weapon",
-                    "label": "Replace"
+                    "hint": "Si ces munitions doivent remplacer la PA de l'arme",
+                    "label": "Remplacer"
                 },
                 "replaceDamage": {
-                    "hint": "If this Ammo should replace the Damage of the weapon",
-                    "label": "Replace"
+                    "hint": "Si ces munitions doivent remplacer les dégâts de l'arme",
+                    "label": "Remplacer"
                 }
             },
             "label": "Munition"
@@ -97,16 +97,16 @@
                 }
             },
             "Immunity": {
-                "NormalWeapons": "Normal Weapons"
+                "NormalWeapons": "Armes normales"
             },
             "Resistances": "Résistances",
-            "label": "Armor"
+            "label": "Armure"
         },
         "Device": {
             "FIELDS": {
                 "category": {
-                    "hint": "The type of Device",
-                    "label": "Device Type"
+                    "hint": "Le type de périphérique",
+                    "label": "Type de périphérique"
                 }
             },
             "label": "Appareil"
@@ -116,9 +116,9 @@
             "Cold": "Froid",
             "Electricity": "Électrique",
             "Fire": "Feu",
-            "Pollutant": "Pollutant",
+            "Pollutant": "Polluant",
             "Radiation": "Radioactif",
-            "Water": "Water",
+            "Water": "Eau",
             "Label": "Élément"
         },
         "Item": {
@@ -267,8 +267,8 @@
                         }
                     },
                     "roll_mode": {
-                        "hint": "Le Mode lancer de dés du test. Laisser vide pour utiliser le Mode lancer de dés sélectionné par l'utilisateur",
-                        "label": "Mode lancer de dés"
+                        "hint": "Mode de lancer du test. Laisser vide pour utiliser le mode sélectionné par l'utilisateur",
+                        "label": "Mode de lancer"
                     },
                     "skill": {
                         "hint": "Compétence utilisée par cette action. Laisser vide si aucune compétence n'est utilisée",
@@ -295,114 +295,114 @@
                 },
                 "ammo": {
                     "clip_type": {
-                        "hint": "The type of Reloading mechanism that the weapon uses",
-                        "label": "Weapon Reload Type"
+                        "hint": "Le type de mécanisme de rechargement utilisé par l'arme",
+                        "label": "Type de recharge d'armes"
                     },
                     "spare_clips": {
                         "max": {
-                            "hint": "The Maximum number of Spare Clips the actor holds for this Weapon",
-                            "label": "Maximum Spare Reloads"
+                            "hint": "Le nombre maximum de pièces de rechange que détient l'acteur pour cette arme",
+                            "label": "Recharges maximales de rechange"
                         },
                         "value": {
-                            "hint": "The number of Spare Clips the actor has left",
-                            "label": "Current Spare Reloads"
+                            "hint": "Le nombre de pièces de rechange que l'acteur a laissée",
+                            "label": "Recharges de rechange actuelles"
                         }
                     }
                 },
                 "capacity": {
-                    "hint": "Capacity of the Cyberware/Bioware",
+                    "hint": "Capacité du Cyberware/Bioware",
                     "label": "Capacité"
                 },
                 "description": {
                     "base": {
-                        "hint": "Description of the Item",
-                        "label": "Description"
+                        "hint": "Description de l'élément",
+                        "label": "Désignation des marchandises"
                     },
                     "source": {
-                        "hint": "Source of the Item, this can be a PDF Page, URL, or Journal",
+                        "hint": "Source de l'article, ceci peut être une page PDF, URL, ou Journal",
                         "label": "Source"
                     }
                 },
                 "essence": {
-                    "hint": "Essence cost of the Cyberware/Bioware",
+                    "hint": "Coût d'essence du Cyberware/Bioware",
                     "label": "Essence"
                 },
                 "grade": {
-                    "hint": "Grade of the Cyberware/Bioware",
+                    "hint": "Niveau du Cyberware/Bioware",
                     "label": "Gamme"
                 },
                 "technology": {
                     "availability": {
-                        "hint": "The Availability attribute of the Item, this determines how easy it is to get it",
-                        "label": "Availability"
+                        "hint": "L'attribut Disponibilité de l'article, cela détermine à quel point il est facile de l'obtenir",
+                        "label": "Disponibilité"
                     },
                     "conceal": {
                         "base": {
-                            "hint": "How hidden this device is to other people",
+                            "hint": "Comment caché cet appareil est pour d'autres personnes",
                             "label": "Dissimulation"
                         }
                     },
                     "condition_monitor": {
                         "value": {
-                            "hint": "Current Damage done to the Item's Condition Monitor",
-                            "label": "Condition Monitor Damage"
+                            "hint": "Dommages actuels causés au moniteur de l'état de l'article",
+                            "label": "Dommages causés par le moniteur d'état"
                         }
                     },
                     "cost": {
-                        "hint": "Amount of money this item costs",
+                        "hint": "Montant de l'argent ce poste",
                         "label": "Prix"
                     },
                     "equipped": {
-                        "hint": "If the Item is Equipped",
+                        "hint": "Si l'élément est équipé",
                         "label": "Équipé"
                     },
                     "master": {
-                        "hint": "Master Device that this Item is Slaved to, forming a PAN or WAN",
-                        "label": "Master Device"
+                        "hint": "Dispositif principal auquel cet article est esclave, formant un PAN ou un WAN",
+                        "label": "Dispositif principal"
                     },
                     "quantity": {
-                        "hint": "The amount of items this Item represents",
-                        "label": "Quantity"
+                        "hint": "Le montant des postes que ce poste représente",
+                        "label": "Quantité"
                     },
                     "rating": {
-                        "hint": "The Device Rating of the item, this factors into matrix actions.",
+                        "hint": "La cote de l'élément, ces facteurs en actions matricielles.",
                         "label": "Indice"
                     },
                     "show_quantity": {
-                        "hint": "If the Quantity of this Item should be shown on the Actor sheet and the header of the Item sheet",
-                        "label": "Show Quantity"
+                        "hint": "Si la quantité de cet article doit être indiquée sur la feuille de l'acteur et l'en-tête de la feuille de l'article",
+                        "label": "Afficher la quantité"
                     },
                     "wireless": {
-                        "hint": "The Wireless state of the item",
+                        "hint": "L'état du produit sans fil",
                         "label": "Sans fil"
                     }
                 }
             }
         },
         "ItemTypes": {
-            "Action": "Action",
+            "Action": "Décision",
             "AdeptPower": "Pouvoir d'Adepte",
             "Ammo": "Munition",
             "Armor": "Armure",
-            "Bioware": "Bioware",
+            "Bioware": "Biologiciels",
             "ComplexForm": "Forme complexe",
-            "Contact": "Contact",
+            "Contact": "Personne à contacter",
             "CritterPower": "Pouvoir de Créature",
-            "Cyberware": "Cyberware",
+            "Cyberware": "Cyberlogiciels",
             "Device": "Appareil",
-            "Echo": "Echo",
+            "Echo": "Écho",
             "Equipment": "Équipement",
             "Gear": "Matériel",
-            "Grid": "Grid",
-            "Host": "Host",
+            "Grid": "Grille",
+            "Host": "Hôte",
             "License": "Permis",
             "Lifestyle": "Style de vie",
-            "Metamagic": "Metamagic",
+            "Metamagic": "Métamagie",
             "Modification": "Modification",
-            "Program": "Program",
+            "Program": "Programme",
             "Quality": "Qualité",
-            "Ritual": "Ritual",
-            "Sin": "SIN",
+            "Ritual": "Rituel",
+            "Sin": "NÉCESSAIRE",
             "Spell": "Sort",
             "SpritePower": "Pouvoir de Sprite",
             "Weapon": "Arme"
@@ -410,32 +410,32 @@
         "Lifestyle": {
             "FIELDS": {
                 "comforts": {
-                    "hint": "Comforts level of the Lifestyle",
+                    "hint": "Conforts niveau du style de vie",
                     "label": "Conforts"
                 },
                 "cost": {
-                    "hint": "Cost of the Lifestyle per month",
-                    "label": "Lifestyle Cost"
+                    "hint": "Coût du mode de vie par mois",
+                    "label": "Coût du mode de vie"
                 },
                 "guests": {
-                    "hint": "Guests staying in the same Lifestyle",
+                    "hint": "Invités séjournant dans le même style de vie",
                     "label": "Invités"
                 },
                 "neighborhood": {
-                    "hint": "Neighborhood level of the Lifestyle",
+                    "hint": "Niveau de voisinage du style de vie",
                     "label": "Voisinnage"
                 },
                 "permanent": {
-                    "hint": "If this Lifestyle is a Permanent Lifestyle",
+                    "hint": "Si ce style de vie est un mode de vie permanent",
                     "label": "Permanent"
                 },
                 "security": {
-                    "hint": "Security level of the Lifestyle",
+                    "hint": "Niveau de sécurité du style de vie",
                     "label": "Securité"
                 },
                 "type": {
-                    "hint": "Type of Lifestyle",
-                    "label": "Lifestyle Type"
+                    "hint": "Type de mode de vie",
+                    "label": "Type de vie"
                 }
             },
             "label": "Style de vie"
@@ -443,66 +443,66 @@
         "Modification": {
             "FIELDS": {
                 "accuracy": {
-                    "hint": "Accuracy/Limit Modifier to apply",
+                    "hint": "Précision/Modificateur de limites à appliquer",
                     "label": "Précision"
                 },
                 "conceal": {
-                    "hint": "Concealability Modifier to apply",
-                    "label": "Concealability"
+                    "hint": "Modificateur de la dissimulabilité à appliquer",
+                    "label": "Couverture"
                 },
                 "dice_pool": {
-                    "hint": "Dice Pool Modifier to apply",
-                    "label": "Dice Pool"
+                    "hint": "Modificateur de réserve de dés à appliquer",
+                    "label": "Réserve de dés"
                 },
                 "modification_category": {
-                    "hint": "Category this Modification belongs to",
-                    "label": "Modification Category"
+                    "hint": "Catégorie à laquelle cette modification appartient",
+                    "label": "Catégorie de modification"
                 },
                 "mount_point": {
-                    "hint": "Mount Point on the weapon this attaches to",
+                    "hint": "Point de montage sur l'arme que cela attache à",
                     "label": "Point de fixation"
                 },
                 "rc": {
-                    "hint": "Recoil Compensation Modifier to apply",
-                    "label": "Recoil Compensation"
+                    "hint": "Modifier la compensation de réhuile pour appliquer",
+                    "label": "Compensation des pertes de rendement"
                 },
                 "slots": {
-                    "hint": "Number of Slots (Vehicles) or Points (Drones) this takes up",
+                    "hint": "Nombre de fentes (véhicules) ou points (Drones) cela prend en charge",
                     "label": "Emplacements de modification"
                 },
                 "type": {
-                    "hint": "Type of Modification",
-                    "label": "Mod Type"
+                    "hint": "Type de modification",
+                    "label": "Type de mod"
                 }
             }
         },
         "MoveInventoryDialog": {
             "Cancel": "Annuler",
-            "Move": "Move",
-            "Title": "Choose an inventory"
+            "Move": "Bouge",
+            "Title": "Choisir un inventaire"
         },
         "Program": {
             "FIELDS": {
                 "type": {
-                    "hint": "Type of Program, for visual organization only",
-                    "label": "Program Type"
+                    "hint": "Type de programme, pour l'organisation visuelle seulement",
+                    "label": "Type de programme"
                 }
             },
-            "label": "Program"
+            "label": "Programme"
         },
         "Quality": {
             "FIELDS": {
                 "karma": {
-                    "hint": "Amount of Karma this Quality is worth",
+                    "hint": "Quantité de Karma cette qualité vaut",
                     "label": "Karma"
                 },
                 "rating": {
-                    "hint": "Rating of this Quality",
+                    "hint": "Évaluation de cette qualité",
                     "label": "Indice"
                 },
                 "type": {
-                    "hint": "The Type of Quality this represents (Positive/Negative/Life Module)",
-                    "label": "Quality Type"
+                    "hint": "Le type de qualité représenté (positive, négative ou module de vie)",
+                    "label": "Type de qualité"
                 }
             },
             "label": "Qualité"
@@ -515,131 +515,131 @@
                 "Thrown": "Lancé"
             },
             "Cliptype": {
-                "BeltFed": "Belt Fed",
-                "Bow": "Bow",
-                "BreakAction": "Break Action",
-                "Cylinder": "Cylinder",
-                "Drum": "Drum",
-                "InternalMagazin": "Internal Magazine",
-                "MuzzleLoader": "Muzzle Loader",
-                "RemovableClip": "Removable Clip"
+                "BeltFed": "Ceinture Fed",
+                "Bow": "Sous-marin",
+                "BreakAction": "Briser l'action",
+                "Cylinder": "Cylindre",
+                "Drum": "Tambour",
+                "InternalMagazin": "Magazine interne",
+                "MuzzleLoader": "Chargeur de museau",
+                "RemovableClip": "Clip amovible"
             },
             "FIELDS": {
                 "category": {
-                    "hint": "The type of Weapon this item represents. Different types require different configurations",
-                    "label": "Weapon Type"
+                    "hint": "Le type d'arme que représente cet article. Différents types nécessitent des configurations différentes",
+                    "label": "Type d'arme"
                 },
                 "melee": {
                     "reach": {
-                        "hint": "Reach of the Weapon, this is used as a modifier in combat",
+                        "hint": "Portée de l'arme, il est utilisé comme un modificateur dans le combat",
                         "label": "Allonge"
                     }
                 },
                 "range": {
                     "modes": {
                         "burst_fire": {
-                            "hint": "If the Weapon supports Burst-Fire (BF)",
-                            "label": "Burst-Fire"
+                            "hint": "Si l'arme supporte le feu de braquage (BF)",
+                            "label": "Feu de guerre"
                         },
                         "full_auto": {
-                            "hint": "If the Weapon supports Full-Auto (FA)",
-                            "label": "Full-Auto"
+                            "hint": "Si l'arme supporte l'auto-charge (FA)",
+                            "label": "Automatique complète"
                         },
                         "semi_auto": {
-                            "hint": "If the Weapon supports Semi-Automatic (SA)",
-                            "label": "Semi-Auto"
+                            "hint": "Si l'arme supporte semi-automatique (SA)",
+                            "label": "Semi-automatique"
                         },
                         "single_shot": {
-                            "hint": "If the Weapon supports Single Shot (SS)",
+                            "hint": "Si l'arme supporte un seul tir (SS)",
                             "label": "Coup par coup"
                         }
                     },
                     "ranges": {
                         "attribute": {
-                            "hint": "Actor's Attribute to multiply the above Range's by",
-                            "label": "Range Attribute"
+                            "hint": "Attribut de l'acteur pour multiplier les rangs ci-dessus par",
+                            "label": "Attribut de la plage"
                         },
                         "category": {
-                            "hint": "Determine the Ranges of the Weapon based on its category. Select 'Manual' if the weapon uses custom values",
-                            "label": "Range Category"
+                            "hint": "Déterminer les plages de l'arme en fonction de sa catégorie. Sélectionnez « Manuel » si l'arme utilise des valeurs personnalisées",
+                            "label": "Catégorie de l'intervalle"
                         },
                         "extreme": {
-                            "hint": "Extreme Range distance for the Weapon, in meters",
-                            "label": "Extreme Range"
+                            "hint": "Distance extrême pour l'arme, en mètres",
+                            "label": "Étendue"
                         },
                         "long": {
-                            "hint": "Long Range distance for the Weapon, in meters",
-                            "label": "Long Range"
+                            "hint": "Distance longue portée pour l'arme, en mètres",
+                            "label": "Longue portée"
                         },
                         "medium": {
-                            "hint": "Medium Range distance for the Weapon, in meters",
-                            "label": "Medium Range"
+                            "hint": "Distance moyenne pour l'arme, en mètres",
+                            "label": "Moyenne portée"
                         },
                         "short": {
-                            "hint": "Short Range distance for the Weapon, in meters",
-                            "label": "Short Range"
+                            "hint": "Distance courte pour l'arme, en mètres",
+                            "label": "Étendue courte"
                         }
                     },
                     "rc": {
                         "base": {
-                            "hint": "Recoil Compensation of the Weapon",
-                            "label": "Recoil Compensation"
+                            "hint": "Récupération de l ' arme",
+                            "label": "Compensation des pertes de rendement"
                         }
                     }
                 },
                 "thrown": {
                     "blast": {
                         "dropoff": {
-                            "hint": "The Damage Reduction per meter from the blast",
-                            "label": "Blast Dropoff (per m)"
+                            "hint": "La réduction des dégâts par mètre de l'explosion",
+                            "label": "Décrochage par éclatement (par m)"
                         },
                         "radius": {
-                            "hint": "Radius of the Weapon's attack, in meters",
-                            "label": "Blast Radius (m)"
+                            "hint": "Rayon de l'attaque de l'arme, en mètres",
+                            "label": "Rayon de blast (m)"
                         }
                     },
                     "ranges": {
                         "attribute": {
-                            "hint": "Actor's Attribute to multiply the above Range's by",
-                            "label": "Range Attribute"
+                            "hint": "Attribut de l'acteur pour multiplier les rangs ci-dessus par",
+                            "label": "Attribut de la plage"
                         },
                         "category": {
-                            "hint": "Determine the Ranges of the Weapon based on its category. Select 'Manual' if the weapon uses custom values",
-                            "label": "Range Category"
+                            "hint": "Déterminer les plages de l'arme en fonction de sa catégorie. Sélectionnez « Manuel » si l'arme utilise des valeurs personnalisées",
+                            "label": "Catégorie de l'intervalle"
                         },
                         "extreme": {
-                            "hint": "Extreme Range distance for the Weapon, in meters",
-                            "label": "Extreme Range"
+                            "hint": "Distance extrême pour l'arme, en mètres",
+                            "label": "Étendue"
                         },
                         "long": {
-                            "hint": "Long Range distance for the Weapon, in meters",
-                            "label": "Long Range"
+                            "hint": "Distance longue portée pour l'arme, en mètres",
+                            "label": "Longue portée"
                         },
                         "medium": {
-                            "hint": "Medium Range distance for the Weapon, in meters",
-                            "label": "Medium Range"
+                            "hint": "Distance moyenne pour l'arme, en mètres",
+                            "label": "Moyenne portée"
                         },
                         "short": {
-                            "hint": "Short Range distance for the Weapon, in meters",
-                            "label": "Short Range"
+                            "hint": "Distance courte pour l'arme, en mètres",
+                            "label": "Étendue courte"
                         }
                     }
                 }
             },
-            "FullReload": "Full",
-            "Mod": "Mod",
+            "FullReload": "Complète",
+            "Mod": "Mod.",
             "Mode": {
                 "Mode": "Modes",
                 "Short": {
                     "BurstFire": "TR",
                     "BurstFireLong": "RL",
                     "BurstFireShort": "TR",
-                    "FullAuto": "FA",
+                    "FullAuto": "FE",
                     "FullAutoLong": "FA-L",
                     "FullAutoShort": "TA",
-                    "SemiAuto": "SA",
+                    "SemiAuto": "Autres",
                     "SemiAutoBurst": "SR",
-                    "SemiAutoShort": "SA",
+                    "SemiAutoShort": "Autres",
                     "SingleShot": "CC",
                     "SingleShotShort": "CC"
                 },
@@ -657,40 +657,40 @@
                 }
             },
             "Mods": "Modes",
-            "PartialReload": "Partial",
+            "PartialReload": "Partielle",
             "Range": {
                 "Category": {
-                    "AerodynamicThrownGrenade": "Aerodynamic Grenade",
-                    "AssaultCannon": "Assault Cannon",
-                    "AssaultRifle": "Assault Rifle",
-                    "Bow": "Bow",
-                    "Carbine": "Carbine",
-                    "Flamethrower": "Flamethrower",
-                    "GrenadeLauncher": "Grenade Launcher",
-                    "HarpoonGun": "Harpoon Gun",
-                    "HarpoonGunUnderwater": "Harpoon Gun (Underwater)",
-                    "HeavyCrossbow": "Heavy Crossbow",
-                    "HeavyPistol": "Heavy Pistol",
-                    "HoldOutPistol": "Hold-Out Pistol",
-                    "LightCrossbow": "Light Crossbow",
-                    "LightMachinegun": "Light Machinegun",
-                    "LightPistol": "Light Pistol",
-                    "MachinePistol": "Machine Pistol",
+                    "AerodynamicThrownGrenade": "Grenade aérodynamique",
+                    "AssaultCannon": "Cannon pour voies de fait",
+                    "AssaultRifle": "Cri de coups et blessures",
+                    "Bow": "Sous-marin",
+                    "Carbine": "Carburéacteur",
+                    "Flamethrower": "Lance-flammes",
+                    "GrenadeLauncher": "Lanceur de grenade",
+                    "HarpoonGun": "Gun Harpoon",
+                    "HarpoonGunUnderwater": "Gun Harpoon (sous-marin)",
+                    "HeavyCrossbow": "Grosse arbalète",
+                    "HeavyPistol": "Pistol lourd",
+                    "HoldOutPistol": "Pistolet de retenue",
+                    "LightCrossbow": "Écrous léger",
+                    "LightMachinegun": "Mitrailleuse légère",
+                    "LightPistol": "Pistol léger",
+                    "MachinePistol": "Pistol de machine",
                     "Manual": "Manuel",
-                    "MediumCrossbow": "Medium Crossbow",
-                    "MediumHeavyMachinegun": "Medium/Heavy Machinegun",
-                    "MissileLauncher": "Missile Launcher",
-                    "Net": "Net",
+                    "MediumCrossbow": "Acrobatie moyenne",
+                    "MediumHeavyMachinegun": "Mi-glace/Machine lourde",
+                    "MissileLauncher": "Lance-missiles",
+                    "Net": "Montant net",
                     "SMG": "SMG",
-                    "ShotgunFlechette": "Shotgun (Flechette)",
-                    "ShotgunSlug": "Shotgun (Slug)",
-                    "Shuriken": "Shuriken",
-                    "SniperRifle": "Sniper Rifle",
-                    "SportingRifle": "Sporting Rifle",
-                    "SprayPen": "Spray Pen",
-                    "StandardThrownGrenade": "Standard Grenade",
+                    "ShotgunFlechette": "Fusil de chasse (Flechette)",
+                    "ShotgunSlug": "Fusil de chasse (Limace)",
+                    "Shuriken": "Chourir",
+                    "SniperRifle": "Fusil de sniper",
+                    "SportingRifle": "Rifle sportif",
+                    "SprayPen": "Stylo à pulvérisation",
+                    "StandardThrownGrenade": "Grenade standard",
                     "Taser": "Taser",
-                    "ThrownKnife": "Thrown Knife"
+                    "ThrownKnife": "Couteau lancé"
                 },
                 "Extreme": "Extrème",
                 "Long": "Longue",

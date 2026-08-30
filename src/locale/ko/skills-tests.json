@@ -44,7 +44,7 @@
             "Label": "유형",
             "Complex": "복잡",
             "Free": "자유",
-            "Interrupt": "Interrupt",
+            "Interrupt": "인터럽트",
             "None": "없음",
             "Simple": "단순",
             "Varies": "다양"
@@ -485,7 +485,7 @@
             "CheckOverwatchScoreSuccess": "감시 점수 확인 성공!",
             "Failure": "실패!",
             "HackOnTheFlyFailure": "즉석 해킹 실패!",
-            "HackOnTheFlySuccess": "즉성 해킹 성공!",
+            "HackOnTheFlySuccess": "즉석 해킹 성공!",
             "ResistedAllDamage": "피해받지 않음!",
             "ResistedSomeDamage": "피해 받음!",
             "Results": "결과",

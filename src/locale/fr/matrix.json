@@ -2,21 +2,21 @@
     "SR5": {
         "ComplexForm": {
             "Durations": {
-                "Immediate": "Immediate",
+                "Immediate": "Immédiatement",
                 "Permanent": "Permanent",
                 "Sustained": "Maintenu"
             },
             "FIELDS": {
                 "duration": {
-                    "hint": "Immediate (it happens instantly with no lasting effects), Sustained (you can sustain it), or Permanent (if you sustain it for its Level in Combat Turns, its effects remain after you stop sustaining it).",
+                    "hint": "Immédiatement (il se produit instantanément sans effets durables), Sustained (vous pouvez le soutenir), ou Permanent (si vous le maintenez pour son Niveau dans le Combat Tours, ses effets restent après que vous arrêtez de le soutenir).",
                     "label": "Durée"
                 },
                 "fade": {
-                    "hint": "The Fading Value is added to the Level chosen when threading to determine the amount of damage to be resisted",
+                    "hint": "La valeur de perte est ajoutée au niveau choisi lors du filetage pour déterminer la quantité de dommages à résister",
                     "label": "Technodrain"
                 },
                 "target": {
-                    "hint": "Valid Target types for the Complex Form",
+                    "hint": "Types de cibles valides pour le formulaire complexe",
                     "label": "Cible"
                 }
             }
@@ -24,122 +24,122 @@
         "Grid": {
             "FIELDS": {
                 "category": {
-                    "hint": "Public Grids apply a negative modifier while connected, Local and Global Grids have no modifiers",
-                    "label": "Grid Type"
+                    "hint": "Les grilles publiques appliquent un modificateur négatif pendant la connexion, les grilles locales et mondiales n'ont pas de modificateurs",
+                    "label": "Type de grille"
                 }
             }
         },
         "Host": {
-            "Attributes": "Host Attributes",
-            "CustomAttributes": "Custom Attributes",
-            "DropICActor": "Drag&Drop an IC actor in order of security response",
-            "ICOrder": "IC Order",
-            "MissingIC": "Missing IC",
-            "Rating": "Host Rating"
+            "Attributes": "Attributs de l'hôte",
+            "CustomAttributes": "Attributs personnalisés",
+            "DropICActor": "Drag&Drop un acteur IC dans l'ordre de la réponse de sécurité",
+            "ICOrder": "Ordre du CI",
+            "MissingIC": "IC manquant",
+            "Rating": "Évaluation de l'hôte"
         },
         "IC": {
             "FIELDS": {
                 "host": {
-                    "hint": "On which host this IC is running",
-                    "label": "Host",
+                    "hint": "Sur quel hôte ce IC est en cours d'exécution",
+                    "label": "Hôte",
                     "rating": {
-                        "hint": "Rating of the Host we are running on",
+                        "hint": "Classement de l'hôte sur lequel nous sommes en cours d'exécution",
                         "label": "Indice"
                     }
                 },
                 "icType": {
-                    "hint": "Type of IC",
-                    "label": "IC Type"
+                    "hint": "Type de CI",
+                    "label": "Type IC"
                 }
             },
-            "MissingHost": "Drag&Drop a host item",
+            "MissingHost": "Faites glisser et déposez un élément hôte",
             "Type": "Type",
             "Types": {
                 "Acid": "Acide",
-                "Binder": "Binder",
-                "BlackIC": "Black IC",
+                "Binder": "Beurre",
+                "BlackIC": "Noir IC",
                 "Blaster": "Blaster",
-                "Bloodhound": "Bloodhound",
+                "Bloodhound": "Le chien de sang",
                 "BlueGoo": "Bloo Goo",
-                "Catapult": "Catapult",
+                "Catapult": "Catapulte",
                 "Crash": "Crash",
                 "Flicker": "Flicker",
                 "Jammer": "Jammer",
-                "Killer": "Killer",
-                "Marker": "Marker",
-                "Patrol": "Patrol",
-                "Probe": "Probe",
-                "Scramble": "Scramble",
-                "Shocker": "Shocker",
+                "Killer": "Tueur",
+                "Marker": "Marqueur",
+                "Patrol": "Patrouille",
+                "Probe": "Sonde",
+                "Scramble": "Écrasement",
+                "Shocker": "Déchiré",
                 "Sleuther": "Sleuther",
                 "Sparky": "Sparky",
                 "TarBaby": "Tar Baby",
-                "Track": "Track"
+                "Track": "Voie"
             }
         },
         "MatrixNetworkHackingApplication": {
-            "Icons": "Icons",
-            "Invite": "Ask for invite",
-            "Title": "Connect to Network"
+            "Icons": "Icônes",
+            "Invite": "Demander l'invitation",
+            "Title": "Connexion au réseau"
         },
         "NetworkManager": {
-            "AvailableNetworks": "Available Networks",
-            "BruteForce": "Brute Force",
-            "ConnectedTo": "Connected To",
-            "HackOnTheFly": "Hack on the Fly",
-            "InviteMark": "Ask to Invite a Mark",
+            "AvailableNetworks": "Réseaux disponibles",
+            "BruteForce": "Force brute",
+            "ConnectedTo": "Connecté à",
+            "HackOnTheFly": "Piratage à la volée",
+            "InviteMark": "Demandez à inviter une marque",
             "NetworkType": "Type",
-            "NoNetwork": "Not Connected",
-            "Title": "Network Manager"
+            "NoNetwork": "Non connecté",
+            "Title": "Gestionnaire de réseau"
         },
         "RebootConfirmationDialog": {
             "Cancel": "Annuler",
-            "Confirm": "Reboot",
-            "Description": "Are you sure you want to reboot this device?",
-            "Title": "Confirm Reboot"
+            "Confirm": "Redémarrer",
+            "Description": "Voulez-vous vraiment redémarrer cet appareil ?",
+            "Title": "Confirmer le redémarrage"
         },
         "SelectMatrixNetworkDialog": {
             "Cancel": "Annuler",
-            "Connect": "Connect",
-            "Title": "Select a Network"
+            "Connect": "Connexion",
+            "Title": "Sélectionnez un réseau"
         },
         "Sprite": {
             "FIELDS": {
                 "level": {
-                    "hint": "Level of the Sprite",
+                    "hint": "Niveau du sprite",
                     "label": "Niveau"
                 },
                 "registered": {
-                    "hint": "If the Sprite is Registered",
+                    "hint": "Si le Sprite est enregistré",
                     "label": "Inscrit"
                 },
                 "services": {
-                    "hint": "Number of Services the Sprite has",
+                    "hint": "Nombre de services que possède Sprite",
                     "label": "Tâches"
                 },
                 "spriteType": {
-                    "hint": "Type of the Sprite",
-                    "label": "Sprite Type"
+                    "hint": "Type de sprite",
+                    "label": "Type de sprite"
                 },
                 "technomancerUuid": {
-                    "hint": "Technomancer who compiled this Sprite",
+                    "hint": "Technomancien ayant compilé ce sprite",
                     "label": "Technomancer"
                 }
             },
             "Level": "Niveau",
             "LevelAppliesSettingHint": "Contrôle quels attributs de sprite reçoivent le bonus de Niveau.",
-            "MissingTechnomancer": "Missing Technomancer",
+            "MissingTechnomancer": "Technomancer manquant",
             "Registered": "Inscrit",
             "Services": "Tâches",
             "Technomancer": "Technomancer",
             "Type": "Type",
             "Types": {
-                "Companion": "Companion",
+                "Companion": "Compagnon",
                 "Courier": "Coursier",
                 "Crack": "Cracker",
                 "Data": "Données",
                 "Fault": "Erreur",
-                "Generalist": "Generalist",
+                "Generalist": "Généraliste",
                 "Machine": "Machine"
             }
         },
@@ -153,12 +153,12 @@
             },
             "FIELDS": {
                 "duration": {
-                    "hint": "Duration of the Sprite Power",
+                    "hint": "Durée du pouvoir de sprite",
                     "label": "Durée"
                 },
                 "optional": {
-                    "hint": "If the Sprite Power is Optional",
-                    "label": "Optional"
+                    "hint": "Si le pouvoir de sprite est facultatif",
+                    "label": "Facultatif"
                 }
             },
             "IsOptional": "Optionel",

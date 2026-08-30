@@ -5,7 +5,7 @@
             "AddictionMental": "Vício Mental",
             "AddictionPhysical": "Vício Físico",
             "Attack": "Ações de Ataque",
-            "AttackMatrix": "Attack Matrix",
+            "AttackMatrix": "Matrix ataque",
             "AttackMelee": "Ataque Corpo a Corpo",
             "AttackRanged": "Ataque à Distância",
             "AttackThrown": "Ataque de Arremesso",
@@ -14,7 +14,7 @@
             "Compiling": "Ações de Compilação",
             "ComplexForm": "Ações de Forma Complexa",
             "Defense": "Ações de Defesa",
-            "DefenseMatrix": "Defense Matrix",
+            "DefenseMatrix": "Matriz de Defesa",
             "DefenseSuppression": "Supressão de Defesa",
             "Drain": "Ações de Dreno",
             "Fade": "Ações de Enfraquecimento",
@@ -25,9 +25,9 @@
             "RecoveryPhysical": "Recuperação Física",
             "RecoveryStun": "Recuperação de Atordoamento",
             "Resist": "Ações de Resistência",
-            "ResistBiofeedback": "Resist Biofeedback",
+            "ResistBiofeedback": "Resista Biofeedback",
             "ResistDisease": "Resistindo à Doença",
-            "ResistMatrix": "Resist Matrix",
+            "ResistMatrix": "Resista Matrix",
             "ResistToxin": "Resistindo à Toxina",
             "Resonance": "Ações de Ressonância",
             "Rigging": "Ações de Fusor",
@@ -44,7 +44,7 @@
             "Label": "Tipo",
             "Complex": "Complexa",
             "Free": "Livre",
-            "Interrupt": "Interrupt",
+            "Interrupt": "Interrupção",
             "None": "Nenhuma",
             "Simple": "Simples",
             "Varies": "Variada"
@@ -52,36 +52,36 @@
         "CallInAction": {
             "ActorType": "Tipo de Ator",
             "Compilation": "Compilação",
-            "Compile": "Compile",
+            "Compile": "Compilar",
             "CreateCompilation": "Criar ação de compilação",
             "CreateSummoning": "Criar ação de invocação",
             "FIELDS": {
                 "actor_type": {
-                    "hint": "Type of Actor this action summons",
+                    "hint": "Tipo de ator que esta ação convoca",
                     "label": "Tipo"
                 },
                 "spirit": {
                     "force": {
-                        "hint": "Force of Spirit to Summon. Disabled if a Spirit Actor is set",
+                        "hint": "Força do Espírito para Invocar. Desativado se um Ator Espiritual for definido",
                         "label": "Força"
                     },
                     "type": {
-                        "hint": "Type of Spirit to Summon. Disabled if a Spirit Actor is set",
+                        "hint": "Tipo de Espírito para Invocar. Desativado se um Ator Espiritual for definido",
                         "label": "Tipo de Espírito"
                     }
                 },
                 "sprite": {
                     "level": {
-                        "hint": "Level of Sprite to Summon. Disabled if a Sprite Actor is set",
+                        "hint": "Nível do sprite a compilar. Desativado se um ator sprite for definido",
                         "label": "Nível"
                     },
                     "type": {
-                        "hint": "Type of Sprite to Compile. Disabled if a Sprite Actor is set",
+                        "hint": "Tipo de Sprite para Compilar. Desativado se um ator Sprite for definido",
                         "label": "Tipo de Sprite"
                     }
                 }
             },
-            "Summon": "Summon",
+            "Summon": "Invo",
             "Summoning": "Invocação"
         },
         "ExtendedTestManager": {
@@ -107,8 +107,8 @@
             "ConfirmDelete": "Excluir o teste estendido \"{name}\"?",
             "CreateTest": "Novo Teste Estendido",
             "Creator": "Criado por",
-            "CumulativeModifier": "Modificador cumulativo de −1 na pilha de dados",
-            "CumulativeModifierTooltip": "Reduz a pilha de dados em 1 a cada rolagem realizada. SR5 p. 48.",
+            "CumulativeModifier": "Modificador cumulativo de −1 na parada de dados",
+            "CumulativeModifierTooltip": "Reduz a parada de dados em 1 a cada rolagem realizada. SR5 p. 48.",
             "CumulativeRollCount": "Rolagens anteriores",
             "Due": "Vencimento",
             "DueTooltip": "Intervalos de tempo de jogo decorridos desde a última rolagem",
@@ -129,7 +129,7 @@
                 "Mine": "Somente os meus",
                 "Private": "Privado",
                 "Search": "Pesquisar nome ou notas...",
-                "Status": "Status",
+                "Status": "Estado",
                 "Updated": "Atualizado dentro de",
                 "Visibility": "Visibilidade"
             },
@@ -154,7 +154,7 @@
             "NotesPlaceholder": "Texto livre sobre este teste. Pesquisável.",
             "Notifications": {
                 "Completed": "Teste estendido \"{name}\" concluído!",
-                "Failed": "Teste estendido \"{name}\" falhou: a pilha de dados se esgotou.",
+                "Failed": "O teste estendido \"{name}\" falhou: a parada de dados se esgotou.",
                 "NoEditPermission": "Você não tem permissão para editar este teste estendido.",
                 "NoRollPermission": "Você não tem permissão para rolar este teste estendido.",
                 "NotActive": "Este teste estendido não está ativo. Retome ou reative-o primeiro.",
@@ -169,7 +169,7 @@
                 "month": "Último mês",
                 "week": "Última semana"
             },
-            "PoolUsed": "Pilha",
+            "PoolUsed": "Parada",
             "RealTime": "Tempo Real",
             "Rolls": "Rolagens realizadas",
             "SaveTest": "Salvar",
@@ -183,7 +183,7 @@
                 "name": "Nome",
                 "progress": "Progresso",
                 "rollCount": "Rolagens",
-                "status": "Status",
+                "status": "Estado",
                 "threshold": "Limiar",
                 "updatedAt": "Atualizado"
             },
@@ -215,7 +215,7 @@
             "AstralLimit": "Limite Astral",
             "BackgroundCount": "Contagem de Antecedentes",
             "Composure": "Compostura",
-            "ControlRigRating": "Control Rig Rating",
+            "ControlRigRating": "Avaliação do Rig de Controle",
             "Defense": "Defesa",
             "DefenseBlock": "Defesa (Bloqueio)",
             "DefenseDodge": "Defesa (Esquiva)",
@@ -223,7 +223,7 @@
             "DefenseMulti": "Defesa (Multi)",
             "DefenseParry": "Defesa (Aparar)",
             "DefenseRanged": "Defesa (Distância)",
-            "DifferentGrid": "Different Grid",
+            "DifferentGrid": "Grade diferente",
             "Drain": "Dreno",
             "Environmental": "Ambiental",
             "EnvironmentalLight": "Ambiental (Luz)",
@@ -235,7 +235,7 @@
             "Global": "Global",
             "JudgeIntentions": "J. Intenções",
             "LiftCarry": "Erg/Carreg",
-            "MarkDamage": "Per Mark Damage",
+            "MarkDamage": "Dano por Marca",
             "Marks": "Marcas",
             "MatrixDice": "Dados de Inic. da Matriz",
             "MatrixInit": "Inic. da Matriz",
@@ -250,15 +250,15 @@
             "PhysicalLimit": "Limite Físico",
             "PhysicalOverflowTrack": "Monitor de Excesso de Dano",
             "PhysicalTrack": "Monitor Físico",
-            "PublicGrid": "Public Grid",
+            "PublicGrid": "Grade Pública",
             "Reach": "Alcance",
             "Recoil": "Recuo",
             "Run": "Correr",
             "Soak": "Absorver Dano",
             "SocialLimit": "Limite Social",
             "StunTrack": "Monitor de Atordoamento",
-            "ThreeMarks": "Three Marks",
-            "TwoMarks": "Two Marks",
+            "ThreeMarks": "Três Marcas",
+            "TwoMarks": "Duas marcas",
             "Walk": "Caminhar",
             "WoundTolerance": "Tolerância à Ferida",
             "Wounds": "Feridas"
@@ -267,108 +267,108 @@
             "FIELDS": {
                 "type": {
                     "label": "Tipo",
-                    "hint": "Defines what kind of skill configurations are available"
+                    "hint": "Define que tipo de configurações de habilidades estão disponíveis"
                 },
                 "skill": {
                     "category": {
-                        "label": "Category",
-                        "hint": "Category of this skill"
+                        "label": "Categoria",
+                        "hint": "Categoria desta habilidade"
                     },
                     "knowledgeType": {
-                        "label": "Knowledge Type",
-                        "hint": "Type of knowledge skill"
+                        "label": "Tipo de conhecimento",
+                        "hint": "Tipo de habilidade de conhecimento"
                     },
                     "rating": {
                         "label": "Nível",
-                        "hint": "Rating of this entry"
+                        "hint": "Classificação desta entrada"
                     },
                     "defaulting": {
                         "label": "Padrão",
-                        "hint": "If this skill can be defaulted"
+                        "hint": "Se esta habilidade pode ser inadi"
                     },
                     "attribute": {
                         "label": "Atributo",
-                        "hint": "Attribute used by this skill"
+                        "hint": "Atributo utilizado por esta habilidade"
                     },
                     "limit": {
                         "attribute": {
                             "label": "Limite",
-                            "hint": "Limit to use for this skill action. Leave empty to use default attribute limit."
+                            "hint": "Limite de uso para esta ação de habilidade. Deixe vazio para usar o limite de atributo padrão."
                         }
                     },
                     "specializations": {
                         "label": "Especialização",
-                        "hint": "Specialization for this skill, if any"
+                        "hint": "Especialização para esta habilidade, se houver"
                     },
                     "language": {
                         "isNative": {
-                            "label": "Native",
-                            "hint": "Marks this language as native"
+                            "label": "Nativo",
+                            "hint": "Marca esta língua como nativa"
                         }
                     },
                     "requirement": {
-                        "label": "Requirement",
-                        "hint": "What the actor must be for this skill to be available"
+                        "label": "Exigência",
+                        "hint": "O que o ator deve ser para que essa habilidade esteja disponível"
                     }
                 },
                 "group": {
-                    "label": "Skill Group",
-                    "hint": "Configuration for a skill group",
+                    "label": "Grupo de Habilidade",
+                    "hint": "Configuração para um grupo de habilidades",
                     "skills": {
                         "label": "Perícias",
-                        "hint": "Skills that are part of this group"
+                        "hint": "Habilidades que fazem parte deste grupo"
                     },
                     "rating": {
                         "label": "Nível",
-                        "hint": "Rating of this skill group"
+                        "hint": "Classificação deste grupo de habilidades"
                     }
                 },
                 "set": {
-                    "label": "Skill Set",
-                    "hint": "Configuration for a skill set",
+                    "label": "Conjunto de habilidades",
+                    "hint": "Configuração para um conjunto de habilidades",
                     "default": {
-                        "label": "Use On New Actors",
-                        "hint": "Add this skill set to newly created actors"
+                        "label": "Uso em novos atores",
+                        "hint": "Adicionar este conjunto de habilidades aos atores recém-criados"
                     },
                     "skills": {
                         "label": "Perícias",
-                        "hint": "Skills that are part of this set",
+                        "hint": "Habilidades que fazem parte deste conjunto",
                         "name": {
                             "label": "Nome",
-                            "hint": "Name of the skill"
+                            "hint": "Nome da habilidade"
                         },
                         "rating": {
                             "label": "Nível",
-                            "hint": "Rating of this skill"
+                            "hint": "Esta qualificação desta habilidade"
                         },
                         "specializations": {
                             "label": "Especialização",
-                            "hint": "Specializations granted to this skill when the set is applied"
+                            "hint": "Especializações concedidas a esta habilidade quando o conjunto é aplicado"
                         }
                     },
                     "groups": {
-                        "label": "Skill Groups",
-                        "hint": "Skill groups that are part of this set",
+                        "label": "Grupos de Habilidade",
+                        "hint": "Grupos de habilidades que fazem parte deste conjunto",
                         "name": {
                             "label": "Nome",
-                            "hint": "Name of the skill group"
+                            "hint": "Nome do grupo de habilidades"
                         },
                         "rating": {
                             "label": "Nível",
-                            "hint": "Rating of this skill group"
+                            "hint": "Classificação deste grupo de habilidades"
                         }
                     }
                 }
             },
             "Types": {
                 "Skill": "Perícia",
-                "Group": "Skill Group",
-                "Set": "Skill Set"
+                "Group": "Grupo de Habilidade",
+                "Set": "Conjunto de habilidades"
             },
             "Category": {
                 "Active": "Ativo",
-                "Knowledge": "Knowledge",
-                "Language": "Language"
+                "Knowledge": "Conhecimento",
+                "Language": "Língua"
             },
             "KnowledgeType": {
                 "Academic": "Acadêmico",
@@ -379,8 +379,8 @@
             "Groups": {},
             "Sets": {},
             "Set": {
-                "LogActorDifferences": "Log Actor Differences",
-                "DifferencesLoggedInConsole": "Open your browser console to view differences"
+                "LogActorDifferences": "Registrar diferenças do ator",
+                "DifferencesLoggedInConsole": "Abra o console do navegador para ver as diferenças"
             },
             "AeronauticsMechanic": "Mecânica Aeronáutica",
             "Alchemy": "Alquimia",
@@ -433,13 +433,13 @@
             "Locksmith": "Chaveiro",
             "Longarms": "Armas de Cano Longo",
             "Medicine": "Medicina",
-            "Native": "Native",
+            "Native": "Nativo",
             "NauticalMechanic": "Mecânica Náutica",
             "Navigation": "Navegação",
             "Negotiation": "Negociação",
             "Palming": "Empalmar",
             "Perception": "Percepção",
-            "Performance": "Performance",
+            "Performance": "Desempenho",
             "PilotAerospace": "Pilotar Espaçonaves",
             "PilotAircraft": "Pilotar Aeronaves",
             "PilotExoticVehicle": "Pilotar Veículos Exóticos",
@@ -451,7 +451,7 @@
             "RitualSpellcasting": "Conjuração Ritual",
             "Running": "Corrida",
             "Skill": "Perícia",
-            "SkillGroup": "Skill Group",
+            "SkillGroup": "Grupo de Habilidade",
             "Skills": "Perícias",
             "Sneaking": "Esgueirar",
             "Software": "Software",
@@ -469,7 +469,7 @@
             "Tracking": "Rastreamento",
             "UnarmedCombat": "Combate Desarmado",
             "abbr": {
-                "Native": "N"
+                "Native": "E"
             }
         },
         "TestResults": {
@@ -478,14 +478,14 @@
             "AttackDodged": "Ataque Esquivado",
             "AttackDoesNoPhysicalDamageToVehicle": "Ataque Acerta Mas Não Causa Dano Físico Ao Veículo",
             "AttackHits": "Ataque Acerta",
-            "AttackResisted": "Attack Resisted",
-            "BruteForceFailure": "Brute Force failed!",
-            "BruteForceSuccess": "Brute Force successful!",
-            "CheckOverwatchScoreFailure": "Check Overwatch Score failed!",
-            "CheckOverwatchScoreSuccess": "Check Overwatch Score successful!",
+            "AttackResisted": "Ataque resistiu",
+            "BruteForceFailure": "A Força Bruta falhou!",
+            "BruteForceSuccess": "Força Bruta bem sucedida!",
+            "CheckOverwatchScoreFailure": "A verificação da Pontuação de Vigilância falhou!",
+            "CheckOverwatchScoreSuccess": "Verificação da Pontuação de Vigilância bem-sucedida!",
             "Failure": "Falha!",
-            "HackOnTheFlyFailure": "Hack on the Fly failed!",
-            "HackOnTheFlySuccess": "Hack on the Fly successful!",
+            "HackOnTheFlyFailure": "Hackear na Hora falhou!",
+            "HackOnTheFlySuccess": "Hackear na Hora foi bem-sucedido!",
             "ResistedAllDamage": "Nenhum Dano Sofrido!",
             "ResistedSomeDamage": "Dano Sofrido!",
             "Results": "Resultados",
@@ -500,28 +500,28 @@
         },
         "Tests": {
             "AttributeOnlyTest": "Teste Apenas de Atributo",
-            "BiofeedbackResistTest": "Biofeedback Resist",
-            "BruteForceTest": "Brute Force",
-            "CheckOverwatchScoreTest": "Check Overwatch Score",
+            "BiofeedbackResistTest": "Resistência a Biofeedback",
+            "BruteForceTest": "força bruta",
+            "CheckOverwatchScoreTest": "Verificar Pontuação de Vigilância",
             "CombatSpellDefenseTest": "Defesa de Feitiço de Combate",
             "CompileSpriteTest": "Compilar Sprite",
-            "ComplexFormTest": "Forma Complexa de Fiação",
+            "ComplexFormTest": "Tecelagem de Forma Complexa",
             "DrainTest": "Teste de Dreno",
             "DroneInfiltrationTest": "Teste de Infiltração de Drone",
             "DronePerceptionTest": "Teste de Percepção de Drone",
             "ExtendedTest": "Teste Estendido",
             "FadeTest": "Teste de Enfraquecimento",
-            "HackOnTheFlyTest": "Hack on the Fly",
-            "MatrixDefenseTest": "Matrix Defense",
-            "MatrixResistTest": "Matrix Damage Resist",
-            "MatrixTest": "Matrix Test",
+            "HackOnTheFlyTest": "Hackear na Hora",
+            "MatrixDefenseTest": "Defesa Matrix",
+            "MatrixResistTest": "Resista a Dano Matrix",
+            "MatrixTest": "Teste de Matriz",
             "MeleeAttackTest": "Ataque de Arma Corpo a Corpo",
             "NaturalRecoveryPhysicalTest": "Recuperação Natural Física",
             "NaturalRecoveryStunTest": "Recuperação Natural de Atordoamento",
-            "OpposedBruteForceTest": "Oppose Brute Force",
-            "OpposedCheckOverwatchScoreTest": "Oppose Check Overwatch Score",
+            "OpposedBruteForceTest": "Força Bruta Oposta",
+            "OpposedCheckOverwatchScoreTest": "Teste Oposto de Pontuação de Vigilância",
             "OpposedCompileSpriteTest": "Opor à Compilação",
-            "OpposedHackOnTheFlyTest": "Oppose Hack On The Fly",
+            "OpposedHackOnTheFlyTest": "Teste Oposto de Hackear na Hora",
             "OpposedMatrixTest": "Teste Oposto de Matriz",
             "OpposedRitualTest": "Selar o Ritual",
             "OpposedSummonSpiritTest": "Opor à Invocação",

@@ -4,7 +4,7 @@
             "Actions": {
                 "Armor": "Panzerung",
                 "BiofeedbackResist": "Biofeedback widerstehen",
-                "BruteForce": "Brute Force",
+                "BruteForce": "Brute-Force-Angriff",
                 "ChangeConfiguration": "Konfiguration Ändern",
                 "ChangeIcon": "Icon Verändern",
                 "CheckOverwatchScore": "Overwatch-Wert Bestimmen",
@@ -68,9 +68,9 @@
         },
         "FOUNDRY": {
             "Actor": "Akteur",
-            "Item": "Item",
+            "Item": "Gegenstand",
             "Scene": "Szene",
-            "Token": "Token"
+            "Token": "Zeichen"
         },
         "Keybinding": {
             "AddRemoveManyQty": {
@@ -116,7 +116,7 @@
                 "SpriteType": "Sprite-Art"
             },
             "Actions": {
-                "BruteForce": "Brute Force",
+                "BruteForce": "Brute-Force-Angriff",
                 "HackontheFly": "Eiliges Hacken"
             },
             "ActorSheet": {
@@ -137,7 +137,7 @@
                 "EnabledOptionSpritePowers": "Optionale Sprite Kräfte - Aktiv",
                 "Hacking": "Hacken",
                 "ICConfiguration": "IC-Konfiguration",
-                "Icons": "Icons",
+                "Icons": "Symbole",
                 "ManageNetwork": "Netzwerk verwalten",
                 "MarkNetwork": "Markiere Netzwerk",
                 "MarkedIcons": "Markierte Icons",
@@ -194,8 +194,8 @@
                 "Local": "Lokal",
                 "Public": "Öffentlich",
                 "SleazeShort": "S",
-                "TargetDevice": "Target Device",
-                "TargetMainIcon": "Target Main Icon"
+                "TargetDevice": "Zielgerät",
+                "TargetMainIcon": "Hauptsymbol des Ziels"
             },
             "Message": {
                 "ClickToSelect": "Klicke um in Szene auszuwählen",
@@ -220,8 +220,8 @@
                 "WAN": "WAN"
             },
             "Sidebar": {
-                "Changelog": "Changelog",
-                "Issues": "Issues",
+                "Changelog": "Änderungsprotokoll",
+                "Issues": "Fragen",
                 "Wiki": "Wiki"
             }
         },
@@ -234,9 +234,9 @@
                 "Compilations": "Kompilationen",
                 "ComplexForms": "Komplexe Formen",
                 "CritterPowers": "Critter Power",
-                "Details": "Details",
+                "Details": "Einzelheiten",
                 "Effects": "Effekte",
-                "IC": "IC",
+                "IC": "WISSENSCHAFT",
                 "Inventory": "Inventar",
                 "Licenses": "Lizenzen",
                 "Magic": "Magie",
@@ -256,9 +256,9 @@
             },
             "Item": {
                 "Description": "Beschreibung",
-                "Details": "Details",
+                "Details": "Einzelheiten",
                 "Effects": "Effekte",
-                "Mods": "Mods",
+                "Mods": "Modalitäten",
                 "Network": "Netzwerk",
                 "SinLicenses": "Lizenzen",
                 "SinNetworks": "Netzwerke",
@@ -293,7 +293,7 @@
                 "RebootPersonaAndClearAllMarks": "Starte deine Persona neu und entferne alle von dir platzierten Marken",
                 "RemoveFavorite": "Aus Favoriten entfernen",
                 "RemoveOneService": "Entferne einen Dienst",
-                "ResetActorForNewRun": "Setzte Schaden, Edge, usw. für neuen Run zurück",
+                "ResetActorForNewRun": "Setze Schaden, Edge usw. für einen neuen Run zurück",
                 "RollInitiative": "Werfe Initiative",
                 "SetupPAN": "Füge alle ausgerüsteten Wireless-Geräte zum PAN dieses Charakters hinzu",
                 "RemoveSkillSet": "Entferne das aktuelle Fertigkeitsset sowie alle daraus stammenden Fertigkeiten und Fertigkeitsgruppen"
@@ -318,7 +318,7 @@
                 "DocumentEffects": "Auswirkungen direkt auf dieses Dokument.",
                 "EditEffect": "Bearbeite Effekt",
                 "ItemEffects": "Effekte, die von Items auf diesem Dokument gesammelt werden.",
-                "HelpLinkEnglishOnly": "Help (External link, English only)",
+                "HelpLinkEnglishOnly": "Hilfe (nur auf Englisch)",
                 "OpenValueEditor": "Werteditor öffnen",
                 "ApplyValueEditor": "Wertänderung anwenden",
                 "CancelValueEditor": "Wertänderung abbrechen",
@@ -373,7 +373,7 @@
                 "ExtendedInterval": "Spielzeit zwischen den Würfen. Null wirft die Probe als normale, nicht ausgedehnte Probe.",
                 "Limit": "Vollständiger Limitwert",
                 "LimitIgnored": "Das Limit wird für diese Probe derzeit ignoriert",
-                "Modifier": "Summe aller auf den Pool angewendenten Modifikatoren",
+                "Modifier": "Summe aller auf den Würfelpool angewendeten Modifikatoren",
                 "Pool": "Anzahl zu werfender Würfel",
                 "PushTheLimit": "Verwende Edge Regel 'Grenzen sprengen'",
                 "ResultOverrideGlitches": "Überschreibt Patzer für dieses Probenergebnis.",

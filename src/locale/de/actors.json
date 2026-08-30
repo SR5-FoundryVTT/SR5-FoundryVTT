@@ -6,7 +6,7 @@
                     "edge": {
                         "base": {
                             "hint": "Edge is das Glück des Characters, der unerklärbare Faktor, der ihm hilft, in kritischen Situationen zu bestehen.",
-                            "label": "Edge"
+                            "label": "Rand"
                         }
                     }
                 },
@@ -133,11 +133,11 @@
                         "label": "Mehrfachverteidigung"
                     },
                     "pain_tolerance_physical": {
-                        "hint": "Modifiziert ignorierten Schaden for dem ersten Wundenmodifikator",
+                        "hint": "Modifiziert ignorierten Schaden vor dem ersten Wundenmodifikator",
                         "label": "Schmerzresistenz (Physisch)"
                     },
                     "pain_tolerance_stun": {
-                        "hint": "Modifiziert ignorierten Schaden for dem ersten Wundenmodifikator",
+                        "hint": "Modifiziert ignorierten Schaden vor dem ersten Wundenmodifikator",
                         "label": "Schmerzresistenz (Geistig)"
                     },
                     "physical_limit": {
@@ -213,7 +213,7 @@
         },
         "ActorTypes": {
             "Character": "Charakter",
-            "IC": "IC",
+            "IC": "WISSENSCHAFT",
             "Spirit": "Geist",
             "Sprite": "Sprite",
             "Vehicle": "Fahrzeug"
@@ -274,7 +274,7 @@
             },
             "Types": {
                 "Dwarf": "Zwerg",
-                "Elf": "Elf",
+                "Elf": "Elfe",
                 "Human": "Mensch",
                 "Ork": "Ork",
                 "Troll": "Troll"
@@ -345,19 +345,19 @@
             },
             "Category": "Kategorie",
             "ChaseEnvironment": "Verfolgungsumgebung",
-            "Clearsight": "Clearsight",
+            "Clearsight": "Freilicht",
             "ControlMode": "Steuermodus",
             "ControlModes": {
                 "Autopilot": "Autopilot",
                 "Manual": "Manuell",
                 "Remote": "Fern",
-                "Rigger": "Rigger"
+                "Rigger": "Riegel"
             },
             "Driver": "Fahrer",
             "DamagedVehicle": "Beschädigtes Fahrzeug",
             "Drone": "Drohne",
             "Environments": {
-                "Handling": "Handling",
+                "Handling": "Handhabung",
                 "Speed": "Geschwindigkeit"
             },
             "IsDrone": "Ist Drohne",
@@ -365,18 +365,18 @@
             "Maneuvering": "Manövrieren",
             "MissingDriver": "Fahrer per Drag&Drop zufügen",
             "ModificationCategoryTypes": {
-                "body": "Body",
-                "cosmetic": "Cosmetic",
-                "electromagnetic": "Electromagnetic",
-                "powertrain": "Powertrain",
-                "protection": "Protection",
-                "weapons": "Weapons"
+                "body": "Körper",
+                "cosmetic": "Kosmetisch",
+                "electromagnetic": "Elektromagnetisch",
+                "powertrain": "Antriebsstrang",
+                "protection": "Schutz",
+                "weapons": "Waffen"
             },
             "OffRoad": "Off-Road",
             "OnRoad": "Auf Straße",
             "Stats": {
                 "Acceleration": "Beschleunigung",
-                "Handling": "Handling",
+                "Handling": "Handhabung",
                 "OffRoadAcceleration": "Beschleunigung (Gelände)",
                 "OffRoadHandling": "Handling (Gelände)",
                 "OffRoadSpeed": "Geschw. (Gelände)",
@@ -402,7 +402,7 @@
         },
         "Vision": {
             "AstralPerception": "Astrale Wahrnehmung",
-            "AugmentedReality": "Augmented Reality",
+            "AugmentedReality": "Erweiterte Realität",
             "LowLight": "Restlistverstärkung",
             "ThermographicVision": "Infrarotsicht"
         }

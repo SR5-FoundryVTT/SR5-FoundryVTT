@@ -75,12 +75,12 @@
                         "label": "강화 적용"
                     },
                     "immunities": {
-                        "hint": "Damage sources this armor grants Immunity against",
-                        "label": "Immunities"
+                        "hint": "이 방어구가 면역을 제공하는 피해 유형",
+                        "label": "면역"
                     },
                     "pollutant": {
-                        "hint": "Extra Armor against attacks with Pollutant",
-                        "label": "Chemical Protection"
+                        "hint": "오염 물질 공격에 대한 추가 방어도 제공",
+                        "label": "화학 보호"
                     },
                     "radiation": {
                         "hint": "방사선 공격에 대한 추가 방어도 제공",
@@ -91,13 +91,13 @@
                         "label": "방어도 수치"
                     },
                     "water": {
-                        "hint": "Extra Armor against attacks with Water",
-                        "label": "Water Protection"
+                        "hint": "물 속성 공격에 대한 추가 방어도를 제공합니다",
+                        "label": "물 보호"
                     }
                 }
             },
             "Immunity": {
-                "NormalWeapons": "Normal Weapons"
+                "NormalWeapons": "일반 무기"
             },
             "Resistances": "저항",
             "label": "방어구"
@@ -116,9 +116,9 @@
             "Cold": "냉기",
             "Electricity": "전기",
             "Fire": "화염",
-            "Pollutant": "Pollutant",
+            "Pollutant": "오염 물질",
             "Radiation": "방사능",
-            "Water": "Water",
+            "Water": "물",
             "Label": "속성"
         },
         "Item": {
@@ -152,7 +152,7 @@
                             },
                             "base_formula_operator": {
                                 "hint": "기본 AP 수치가 특성치에 영향을 주는 방식",
-                                "label": "Operator"
+                                "label": "연산자"
                             }
                         },
                         "attribute": {
@@ -165,7 +165,7 @@
                         },
                         "base_formula_operator": {
                             "hint": "기본 피해량이 특성치에 영향을 주는 방식",
-                            "label": "Operator"
+                            "label": "연산자"
                         },
                         "biofeedback": {
                             "hint": "해당 행동이 생체반응 피해를 함께 입히는지 여부. 해당 항목은 활성 효과의 대상으로 지정될 수 있음",
@@ -178,8 +178,8 @@
                             }
                         },
                         "normal_weapon": {
-                            "hint": "If this damage is considered a normal (non-magical) weapon attack",
-                            "label": "Normal Weapon"
+                            "hint": "이 피해가 일반적인(비마법적) 무기 공격으로 간주되는지 여부",
+                            "label": "일반 무기"
                         },
                         "type": {
                             "base": {

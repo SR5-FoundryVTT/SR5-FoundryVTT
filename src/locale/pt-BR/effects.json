@@ -20,40 +20,40 @@
                     "hint": "A parte do teste que esta condição filtra."
                 },
                 "applyTo": {
-                    "hint": "Apply-To different Targets",
+                    "hint": "Aplicar-para diferentes alvos",
                     "label": "Aplicar a"
                 },
                 "onlyForEquipped": {
-                    "hint": "Apply for equipped item only",
-                    "label": "Equipped Only"
+                    "hint": "Aplicar apenas para item equipado",
+                    "label": "Equipado apenas"
                 },
                 "onlyForItemTest": {
-                    "hint": "Apply for parent item test only",
-                    "label": "Item Test Only"
+                    "hint": "Aplicar apenas para o teste de item pai",
+                    "label": "Somente Teste do Item"
                 },
                 "onlyForWireless": {
-                    "hint": "Apply for wireless active only",
-                    "label": "Wireless Only"
+                    "hint": "Aplicar apenas para wireless ativo",
+                    "label": "Apenas sem fio"
                 },
                 "selection_attributes": {
-                    "hint": "Filter the test based on Attributes used",
-                    "label": "Attributes Filter"
+                    "hint": "Filtrar o teste com base nos atributos utilizados",
+                    "label": "Atributos Filtro"
                 },
                 "selection_categories": {
-                    "hint": "Filter the test based on Action Category used",
-                    "label": "Action Categories Filter"
+                    "hint": "Filtrar o teste baseado na Categoria de Ação usada",
+                    "label": "Categorias de Ação Filtro"
                 },
                 "selection_limits": {
-                    "hint": "Filter the test based on the Limit used",
-                    "label": "Limits Filter"
+                    "hint": "Filtrar o teste com base no Limite utilizado",
+                    "label": "Limites Filtro"
                 },
                 "selection_skills": {
-                    "hint": "Filter the test based on the Skills used",
-                    "label": "Skills Filter"
+                    "hint": "Filtrar o teste com base nas habilidades utilizadas",
+                    "label": "Habilidades Habilidades Filter"
                 },
                 "selection_tests": {
-                    "hint": "Filter the test based on the Tests used",
-                    "label": "Tests Filter"
+                    "hint": "Filtrar o teste com base nos Testes utilizados",
+                    "label": "Testes Filtro"
                 },
                 "targetName": {
                     "label": "Nome do Alvo"
@@ -108,7 +108,7 @@
                 "ExpiryActionDefault": "Padrão ({action})",
                 "ExpiryActionDelete": "Excluir",
                 "ExpiryActionUpdate": "Atualizar",
-                "Status": "Status",
+                "Status": "Estado",
                 "Units": "Unidades de duração",
                 "Value": "Duração"
             },

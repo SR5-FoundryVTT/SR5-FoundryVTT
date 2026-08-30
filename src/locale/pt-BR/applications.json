@@ -9,35 +9,35 @@
             "Title": "Atualização Shadowrun5e"
         },
         "CompendiaSettings": {
-            "Description": "These packs will be used for the system. You can override them with your own packs, but you should not remove them.",
+            "Description": "Estes pacotes serão usados para o sistema. Você pode substituí-los com seus próprios pacotes, mas você não deve removê-los.",
             "GeneralActionsPack": {
-                "hint": "This compendium will be used for all general, attribute only actions.",
-                "label": "General Actions"
+                "hint": "Este compêndio será usado para todas as ações gerais, apenas atributos.",
+                "label": "Acções gerais"
             },
             "ICActionsPack": {
-                "hint": "This compendium will be used for IC actions, filtered for each IC type",
-                "label": "IC Actions"
+                "hint": "Este compêndio será usado para ações IC, filtrado para cada tipo IC",
+                "label": "Ações IC"
             },
-            "Label": "Compendium Packs",
+            "Label": "Pacotes de Compêndio",
             "MatrixActionsPack": {
-                "hint": "This compendium will be used for all matrix actions.",
+                "hint": "Este compêndio será usado para todas as ações matriciais.",
                 "label": "Ações da Matriz"
             },
-            "SkillsPacksSection": "Skills Compendiums",
-            "ActionsPacksSection": "Actions Compendiums",
+            "SkillsPacksSection": "Competências Competências Compendiums",
+            "ActionsPacksSection": "Ações Compêndios",
             "SkillsPack": {
-                "hint": "This compendium will be used for all skills.",
+                "hint": "Este compêndio será usado para todas as habilidades.",
                 "label": "Perícias"
             },
             "SkillGroupsPack": {
-                "hint": "This compendium will be used for skill groups.",
-                "label": "Skill Groups"
+                "hint": "Este compêndio será usado para grupos de habilidades.",
+                "label": "Grupos de Habilidade"
             },
             "SkillSetsPack": {
-                "hint": "This compendium will be used for skill sets.",
-                "label": "Skill Sets"
+                "hint": "Este compêndio será usado para conjuntos de habilidades.",
+                "label": "Conjuntos de Habilidade"
             },
-            "Title": "System compendiums"
+            "Title": "Compêndios do sistema"
         },
         "CompendiumBrowser": {
             "Filters": {
@@ -61,7 +61,7 @@
             "sr5drone": "Drones & Veículos",
             "sr5gear": "Armaduras & Equipamentos",
             "sr5magic": "Magia & Formas Complexas",
-            "sr5misc": "Miscellaneous",
+            "sr5misc": "Diversos",
             "sr5modification": "Modificações",
             "sr5trait": "Qualidades & Poderes",
             "sr5ware": "Biônicos & Cibernéticos",
@@ -126,7 +126,7 @@
                 "Title": "Importador em Massa"
             },
             "ImporterSourcesConfig": {
-                "Title": "Importer Sources Configuration"
+                "Title": "Configuração de Fontes Importador"
             },
             "Spirit": {
                 "SpiritTypeNotFound": "O tipo de espírito não foi encontrado. Por favor, abra uma questão no github com seu json de exportação chummer."
@@ -137,14 +137,14 @@
         },
         "KarmaManager": {
             "Cancel": "Cancelar",
-            "CareerKarma": "Amount of Career Karma the Character has accumulated",
-            "CurrentKarma": "Amount of Karma the Character currently has",
-            "FinalCareerKarma": "Career Karma the Character will have upon submitting",
-            "FinalCurrentKarma": "Karma this Character will have upon submitting",
-            "FinalKarma": "Final Karma",
-            "StartingKarma": "Starting Karma",
-            "Submit": "Submit",
-            "Title": "Karma Manager"
+            "CareerKarma": "Carma de Carreira que o Caráter acumulou",
+            "CurrentKarma": "A quantidade de Karma que o personagem tem atualmente",
+            "FinalCareerKarma": "Carma de carreira que o personagem terá ao submeter",
+            "FinalCurrentKarma": "Karma, este personagem terá ao apresentar",
+            "FinalKarma": "Karma Final",
+            "StartingKarma": "Karma Iniciar",
+            "Submit": "E-mail",
+            "Title": "Gerente Karma"
         },
         "MIGRATION": {
             "BeginMigration": "Iniciar Migração",
@@ -175,10 +175,10 @@
         },
         "NuyenManager": {
             "Cancel": "Cancelar",
-            "CurrentNuyen": "Amount of Nuyen the Character currently has",
-            "FinalNuyen": "Final Amount of Nuyen upon Submitting",
-            "Submit": "Submit",
-            "Title": "Nuyen Manager"
+            "CurrentNuyen": "A quantidade de Nuyen que o personagem tem atualmente",
+            "FinalNuyen": "Quantidade final de Nuyen após a apresentação",
+            "Submit": "E-mail",
+            "Title": "Gerenciador de Nuyen"
         },
         "OverwatchScoreTracker": {
             "AddSelect": "Adicionar tokens selecionados ao ator vinculado",

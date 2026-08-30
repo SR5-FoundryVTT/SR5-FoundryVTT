@@ -10,11 +10,11 @@
             }
         },
         "Errors": {
-            "CantConnectICToGrid": "IC actors can't be connected to a grid network",
-            "CantConnectToPAN": "Given document can't be added to PAN network",
-            "CantConnectToWAN": "Given document can't be added to WAN network",
+            "CantConnectICToGrid": "Atores IC não podem ser conectados a uma rede de rede",
+            "CantConnectToPAN": "Não é possível adicionar um documento à rede PAN",
+            "CantConnectToWAN": "Não é possível adicionar um documento à rede WAN",
             "CantEditAppliedItemEffects": "Você não pode editar um efeito ativo que foi aplicado por um item.",
-            "CantExecuteTest": "You can't execute this test. This might be related to you being a player or lacking permissions.",
+            "CantExecuteTest": "Você não pode executar este teste. Isso pode estar relacionado a você ser um jogador ou falta de permissões.",
             "DefaultInventoryCantBeRemoved": "O inventário padrão não pode ser removido",
             "LinkLockedReboot": "Um ator com bloqueio de conexão não pode ser reiniciado",
             "InventoryAlreadyExists": "Um inventário com este nome já existe.",
@@ -22,19 +22,19 @@
             "MarkCouldNotBePlaced": "Erro Interno: Suas marcas não puderam ser colocadas.",
             "MarksCantBePlacedBy": "O ator ativo não pode colocar marcas.",
             "MarksCantBePlacedOn": "O tipo de ator escolhido não pode receber marcas.",
-            "MarksCantBePlacedWithoutPersona": "The chosen actor doesn't have an active persona.",
-            "MasterDeviceIsMissing": "The master device is missing. Falling back to local device values.",
+            "MarksCantBePlacedWithoutPersona": "O ator escolhido não tem uma persona ativa.",
+            "MasterDeviceIsMissing": "O dispositivo mestre está ausente. Voltando aos valores do dispositivo local.",
             "MissingSkill": "O ator não possui a pericia solicitada.",
             "NoAvailableActorFound": "Nenhum ator disponível foi encontrado para esta ação",
             "SkillWithoutAttribute": "A pericia não tem um atributo configurado.",
             "TestExpectsVehicleOnly": "Este teste só pode ser feito com um ator do tipo veículo",
-            "TooManyActionsWithCategory": "You should have exactly one action with the category {category} on your actor"
+            "TooManyActionsWithCategory": "Você deve ter exatamente uma ação da categoria {category} no seu ator"
         },
         "Messages": {
             "MarkInvitation": {
-                "AcceptInvite": "Accept",
-                "AskForInvite": "Asks for an mark invitation for:",
-                "InviteAccepted": "Feel free to join {networkName}, {userName}!"
+                "AcceptInvite": "Aceitar",
+                "AskForInvite": "Solicita um convite de marca para:",
+                "InviteAccepted": "Sinta-se à vontade para entrar em {networkName}, {userName}!"
             }
         },
         "MissingRessource": {
@@ -46,21 +46,21 @@
         },
         "Notifications": {
             "AddDevicesToPAN": {
-                "Adding": "Adding",
-                "FinishedAddingItems": "Finished adding devices to PAN. Please close and reopen any item sheets that changed connections.",
-                "Starting": "Starting to add equipped devices to PAN"
+                "Adding": "Adicionando",
+                "FinishedAddingItems": "Terminado adicionando dispositivos ao PAN. Por favor, feche e reabra qualquer folha de itens que mudou as conexões.",
+                "Starting": "Começando a adicionar dispositivos equipados ao PAN"
             },
             "DeletingStorageReferences": {
-                "Finished": "Finished clearing references",
-                "Item": "Clearing references to item",
-                "Start": "Deleting Network and MARK references"
+                "Finished": "Referências de compensação concluídas",
+                "Item": "Limpando referências ao item",
+                "Start": "Exclusão de referências de rede e MARK"
             },
-            "VehicleCannotBeOwnDriver": "A vehicle cannot be the Driver of itself (that's what Pilot is for)"
+            "VehicleCannotBeOwnDriver": "Um veículo não pode ser o motorista de si mesmo (é para isso que o piloto serve)"
         },
         "Warnings": {
-            "ActorMissingRequirements": "Actor must match the skills awakened or emerged requirement",
+            "ActorMissingRequirements": "Ator deve corresponder às habilidades despertadas ou surgiu exigência",
             "AlreadyExistingInventory": "Um inventário com este nome já existe",
-            "AlreadyJoinedNetwork": "{name} already joined this network",
+            "AlreadyJoinedNetwork": "{name} já entrou nesta rede",
             "BulkImportPerformanceWarning": "Se você importou um grande número de itens, o Foundry pode funcionar lentamente até que você atualize seu navegador. É recomendado atualizar agora.",
             "CantEditDefaultInventory": "O inventário padrão não pode ser renomeado",
             "CantExtendTest": "O tipo de teste não pode ser estendido.",
@@ -83,13 +83,13 @@
             "NegativeLimitValue": "Os valores do limite devem ser números positivos",
             "NoFireModeConfigured": "A arma de fogo não tem modo de fogo configurado. Usará tiro único.",
             "NoActorCreatePermission": "Você não tem permissão para criar atores.",
-            "OnlyGMCanDoThis": "Only a GM user can do this",
-            "RitualInvalidForce": "A força do ritual é inválida ou maior do que a nível do seu alojamento.",
+            "OnlyGMCanDoThis": "Somente um usuário GM pode fazer isso",
+            "RitualInvalidForce": "A Força do ritual é inválida ou maior que o nível de Magia do personagem.",
             "RitualNotConcluded": "Ritual incompleto. Aguarde o ritual se opor à conjuração para determinar o dreno.",
             "RitualNotEnoughReagents": "Não foram oferecidos reagentes suficientes.",
             "SkillAlreadyExists": "A perícia {name} já existe no ator {actorName} ({actorUuid}). Use cada nome de perícia apenas uma vez por categoria.",
             "SkillCantBeDefault": "Esta pericia não pode ser lançada, pois não pode ser feita sem perícia",
-            "SkillSetDefaultTypeOutsideCompendium": "Only skillsets in the configured skillset compendium will affect actor creation",
+            "SkillSetDefaultTypeOutsideCompendium": "Somente conjuntos de habilidades no compêndio do conjunto de habilidades configurado afetarão a criação do ator",
             "SummoningNotConcluded": "Invocação incompleta. Aguarde o espírito se opor à invocação para determinar o dreno.",
             "TokenSelectionNeeded": "Um ou mais tokens precisam ser selecionados"
         }

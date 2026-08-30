@@ -75,12 +75,12 @@
                         "label": "Verstärkt Aktiv"
                     },
                     "immunities": {
-                        "hint": "Damage sources this armor grants Immunity against",
-                        "label": "Immunities"
+                        "hint": "Schäden Quellen diese Rüstung gewährt Immunität gegen",
+                        "label": "Immunitäten"
                     },
                     "pollutant": {
-                        "hint": "Extra Armor against attacks with Pollutant",
-                        "label": "Chemical Protection"
+                        "hint": "Zusätzliche Rüstung gegen Angriffe mit Schadstoff",
+                        "label": "Chemischer Schutz"
                     },
                     "radiation": {
                         "hint": "Extra Panzerung gegen Strahlenschaden",
@@ -91,13 +91,13 @@
                         "label": "Panzerung"
                     },
                     "water": {
-                        "hint": "Extra Armor against attacks with Water",
-                        "label": "Water Protection"
+                        "hint": "Zusätzliche Rüstung gegen Angriffe mit Wasser",
+                        "label": "Wasserschutz"
                     }
                 }
             },
             "Immunity": {
-                "NormalWeapons": "Normal Weapons"
+                "NormalWeapons": "Normale Waffen"
             },
             "Resistances": "Resistenzen",
             "label": "Panzerung"
@@ -116,9 +116,9 @@
             "Cold": "Kälte",
             "Electricity": "Elektrizität",
             "Fire": "Feuer",
-            "Pollutant": "Pollutant",
+            "Pollutant": "Schadstoffe",
             "Radiation": "Strahlung",
-            "Water": "Water",
+            "Water": "Wasser",
             "Label": "Element"
         },
         "Item": {
@@ -152,7 +152,7 @@
                             },
                             "base_formula_operator": {
                                 "hint": "Wie soll der DK-Wert das Attribut beeinflussen?",
-                                "label": "Operator"
+                                "label": "Betreiber"
                             }
                         },
                         "attribute": {
@@ -165,7 +165,7 @@
                         },
                         "base_formula_operator": {
                             "hint": "Wie soll der Basis Schaden das Attribut beeinflussen?",
-                            "label": "Operator"
+                            "label": "Betreiber"
                         },
                         "biofeedback": {
                             "hint": "Soll diese Aktion auch Biofeedback Schaden erzeugen?",
@@ -178,8 +178,8 @@
                             }
                         },
                         "normal_weapon": {
-                            "hint": "If this damage is considered a normal (non-magical) weapon attack",
-                            "label": "Normal Weapon"
+                            "hint": "Wenn dieser Schaden als normaler (nicht magischer) Waffenangriff angesehen wird",
+                            "label": "Normale Waffe"
                         },
                         "type": {
                             "base": {
@@ -267,8 +267,8 @@
                         }
                     },
                     "roll_mode": {
-                        "hint": "Roll Modus für den Test. Lasse leer, um den im Chat ausgewählten Modus zu verwenden",
-                        "label": "Roll Modus"
+                        "hint": "Wurfmodus für die Probe. Leer lassen, um den im Chat ausgewählten Modus zu verwenden",
+                        "label": "Wurfmodus"
                     },
                     "skill": {
                         "hint": "Fertigkeit für die Aktion",
@@ -384,7 +384,7 @@
             "AdeptPower": "Adeptenkraft",
             "Ammo": "Munition",
             "Armor": "Panzerung",
-            "Bioware": "Bioware",
+            "Bioware": "Biomaterial",
             "ComplexForm": "Komplexe Form",
             "Contact": "Kontakt",
             "CritterPower": "Critterkraft",
@@ -394,15 +394,15 @@
             "Equipment": "Ausrüstung",
             "Gear": "Ausrüstung",
             "Grid": "Gitter",
-            "Host": "Host",
+            "Host": "Rechner",
             "License": "Lizenz",
             "Lifestyle": "Lebensstil",
-            "Metamagic": "Metamagic",
+            "Metamagic": "Metamagisch",
             "Modification": "Modifikation",
             "Program": "Programm",
             "Quality": "Vor-/Nachteil",
             "Ritual": "Ritual",
-            "Sin": "SIN",
+            "Sin": "SEIN",
             "Spell": "Zauberspruch",
             "SpritePower": "Spritekraft",
             "Weapon": "Waffe"
@@ -427,7 +427,7 @@
                 },
                 "permanent": {
                     "hint": "Ist dieser Lebensstil permanent?",
-                    "label": "Permanent"
+                    "label": "Dauerhaft"
                 },
                 "security": {
                     "hint": "Sicherheitsstufe des Lebensstils",
@@ -468,7 +468,7 @@
                 },
                 "slots": {
                     "hint": "Anzahl der Slots für Fahrzeuge oder Drohnen.",
-                    "label": "Slots"
+                    "label": "Ablagefächer"
                 },
                 "type": {
                     "hint": "Art der Modifikation",
@@ -488,7 +488,7 @@
                     "label": "Art"
                 }
             },
-            "label": "Program"
+            "label": "Programm"
         },
         "Quality": {
             "FIELDS": {
@@ -627,7 +627,7 @@
                 }
             },
             "FullReload": "Komplett",
-            "Mod": "Mod",
+            "Mod": "Änderung",
             "Mode": {
                 "Mode": "Modus",
                 "Short": {
@@ -656,7 +656,7 @@
                     "Suppressing": "Unterdrückungsfeuer"
                 }
             },
-            "Mods": "Mods",
+            "Mods": "Modalitäten",
             "PartialReload": "Teilweise",
             "Range": {
                 "Category": {

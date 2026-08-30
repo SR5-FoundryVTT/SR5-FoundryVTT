@@ -6,7 +6,7 @@
             "ModeChangedLabel": "Modo de Iniciativa Alterado",
             "ModeChangeNewInitiative": "Nova iniciativa",
             "ModeChangePreviousInitiative": "Iniciativa anterior",
-            "ModeMatrix": "Matrix",
+            "ModeMatrix": "Matriz",
             "ModeMeatspace": "Mundo fisico",
             "ModeTitle": "Modo: {mode}",
             "ModeUnknown": "Desconhecido",
@@ -32,8 +32,8 @@
         },
         "ReputationManager": {
             "Cancel": "Cancelar",
-            "Submit": "Submit",
-            "Title": "Reputation Manager"
+            "Submit": "E-mail",
+            "Title": "Gerente Reputação"
         }
     }
 }

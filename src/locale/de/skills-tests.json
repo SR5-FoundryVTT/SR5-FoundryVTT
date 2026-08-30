@@ -44,7 +44,7 @@
             "Label": "Handlung",
             "Complex": "Komplexe",
             "Free": "Freie",
-            "Interrupt": "Interrupt",
+            "Interrupt": "Unterbrechung",
             "None": "Keine",
             "Simple": "Einfache",
             "Varies": "Variiert"
@@ -146,7 +146,7 @@
                 "roll": "Gewürfelt",
                 "update": "Aktualisiert"
             },
-            "Name": "Name",
+            "Name": "Bezeichnung",
             "NewTest": "Ausgedehnte Probe",
             "NoActor": "Keiner",
             "NoTests": "Keine ausgedehnten Proben vorhanden.",
@@ -169,18 +169,18 @@
                 "month": "Letzter Monat",
                 "week": "Letzte Woche"
             },
-            "PoolUsed": "Pool",
+            "PoolUsed": "Würfelpool",
             "RealTime": "Echtzeit",
             "Rolls": "Durchgeführte Würfe",
             "SaveTest": "Speichern",
-            "SectionDetails": "Details",
+            "SectionDetails": "Einzelheiten",
             "SectionRules": "Regeln",
             "Sort": {
                 "accumulatedHits": "Angesammelte Erfolge",
                 "createdAt": "Erstellt",
                 "createdWorldTime": "Spielzeit-Beginn",
                 "interval": "Intervall",
-                "name": "Name",
+                "name": "Bezeichnung",
                 "progress": "Fortschritt",
                 "rollCount": "Würfe",
                 "status": "Status",
@@ -292,7 +292,7 @@
                     },
                     "limit": {
                         "attribute": {
-                            "label": "Limit",
+                            "label": "Höchstmenge",
                             "hint": "Limit für diese Fertigkeitsaktion. Leer lassen, um das Standard-Attributslimit zu verwenden."
                         }
                     },
@@ -334,7 +334,7 @@
                         "label": "Fertigkeiten",
                         "hint": "Fertigkeiten, die Teil dieses Sets sind",
                         "name": {
-                            "label": "Name",
+                            "label": "Bezeichnung",
                             "hint": "Name der Fertigkeit"
                         },
                         "rating": {
@@ -350,7 +350,7 @@
                         "label": "Fertigkeitsgruppen",
                         "hint": "Fertigkeitsgruppen, die Teil dieses Sets sind",
                         "name": {
-                            "label": "Name",
+                            "label": "Bezeichnung",
                             "hint": "Name der Fertigkeitsgruppe"
                         },
                         "rating": {
@@ -401,7 +401,7 @@
             "Chemistry": "Chemie",
             "Clubs": "Knüppel",
             "Compiling": "Kompilieren",
-            "Computer": "Computer",
+            "Computer": "Datenverarbeitung",
             "Con": "Überreden",
             "Counterspelling": "Antimagie",
             "Cybercombat": "Matrixkampf",
@@ -422,7 +422,7 @@
             "FreeFall": "Freifall",
             "Gunnery": "Geschütze",
             "Gymnastics": "Akrobatik",
-            "Hacking": "Hacking",
+            "Hacking": "Hacken",
             "Hardware": "Hardware",
             "HeavyWeapons": "Schwere Waffen",
             "Impersonation": "Verkörperung",
@@ -460,10 +460,10 @@
             "Survival": "Überleben",
             "Swimming": "Schwimmen",
             "Teamwork": {
-                "Glitched": "Glitched",
-                "ParticipantActor": "Choose actor",
-                "RollIt": "Roll it",
-                "TakePart": "Take part"
+                "Glitched": "geglättet",
+                "ParticipantActor": "Schauspieler wählen",
+                "RollIt": "Würfeln",
+                "TakePart": "Teilnehmen"
             },
             "ThrowingWeapons": "Wurfwaffen",
             "Tracking": "Spurenlesen",
@@ -501,7 +501,7 @@
         "Tests": {
             "AttributeOnlyTest": "Attributsprobe",
             "BiofeedbackResistTest": "Biofeedback Widerstehen",
-            "BruteForceTest": "Brute Force",
+            "BruteForceTest": "Brute-Force-Angriff",
             "CheckOverwatchScoreTest": "Prüfe Overwatch-Wert",
             "CombatSpellDefenseTest": "Kampfzauber-Verteidigung",
             "CompileSpriteTest": "Sprite kompilieren",
@@ -519,9 +519,9 @@
             "NaturalRecoveryPhysicalTest": "Natürliche körperliche Genesung",
             "NaturalRecoveryStunTest": "Natürliche geistige Genesung",
             "OpposedBruteForceTest": "Widerstehe Brute Force",
-            "OpposedCheckOverwatchScoreTest": "Widerstehe Overwatch-Wert prüfen",
+            "OpposedCheckOverwatchScoreTest": "Gegenprobe: Overwatch-Wert prüfen",
             "OpposedCompileSpriteTest": "Widerstehe Kompilierung",
-            "OpposedHackOnTheFlyTest": "Widerstehe Eiliges Hacken",
+            "OpposedHackOnTheFlyTest": "Gegenprobe: Eiliges Hacken",
             "OpposedMatrixTest": "Vergleichende Matrix-Probe",
             "OpposedRitualTest": "Besiegel das Ritual",
             "OpposedSummonSpiritTest": "Widerstehe Herbeirufung",

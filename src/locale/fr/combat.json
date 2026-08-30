@@ -32,8 +32,8 @@
         },
         "ReputationManager": {
             "Cancel": "Annuler",
-            "Submit": "Submit",
-            "Title": "Reputation Manager"
+            "Submit": "Soumettre",
+            "Title": "Gestionnaire de réputation"
         }
     }
 }

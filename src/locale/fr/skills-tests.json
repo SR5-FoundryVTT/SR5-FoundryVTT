@@ -1,87 +1,87 @@
 {
     "SR5": {
         "ActionCategory": {
-            "Addiction": "Addiction Actions",
-            "AddictionMental": "Mental Addiction",
-            "AddictionPhysical": "Physical Addiction",
-            "Attack": "Attack Actions",
-            "AttackMatrix": "Attack Matrix",
-            "AttackMelee": "Attack Melee",
-            "AttackRanged": "Attack Ranged",
-            "AttackThrown": "Attack Thrown",
-            "BruteForce": "Matrix Brute Force",
-            "Climbing": "Climbing Actions",
-            "Compiling": "Compiling Actions",
-            "ComplexForm": "Complex Form Actions",
-            "Defense": "Defense Actions",
-            "DefenseMatrix": "Defense Matrix",
-            "DefenseSuppression": "Defense Suppression",
-            "Drain": "Drain Actions",
-            "Fade": "Fade Actions",
-            "HackOnTheFly": "Matrix Hack on the Fly",
-            "Magic": "Magic Actions",
-            "Matrix": "Matrix Actions",
-            "Recovery": "Recovery Actions",
-            "RecoveryPhysical": "Recovery Physical",
-            "RecoveryStun": "Recovery Stun",
-            "Resist": "Resisting Actions",
-            "ResistBiofeedback": "Resist Biofeedback",
-            "ResistDisease": "Resisting Disease",
-            "ResistMatrix": "Resist Matrix",
-            "ResistToxin": "Resisting Toxin",
-            "Resonance": "Resonance Actions",
-            "Rigging": "Rigging Actions",
-            "Social": "Social Actions",
-            "SpellCombat": "Spellcasting Combat",
-            "SpellDetection": "Spellcasting Detection",
-            "SpellHealing": "Spellcasting Healing",
-            "SpellIllusion": "Spellcasting Illusion",
-            "SpellManipulation": "Spellcasting Manipulation",
-            "SpellRitual": "Spellcasting Ritual",
-            "Summoning": "Summoning Actions"
+            "Addiction": "Actions en matière de toxicomanie",
+            "AddictionMental": "Dépendance mentale",
+            "AddictionPhysical": "Dépendance physique",
+            "Attack": "Actions d'attaque",
+            "AttackMatrix": "Matrice d'attaque",
+            "AttackMelee": "Attaque Melee",
+            "AttackRanged": "Attaque portée",
+            "AttackThrown": "Attaque lancée",
+            "BruteForce": "Force de frappe de matrice",
+            "Climbing": "Actions d'escalade",
+            "Compiling": "Compilation des actions",
+            "ComplexForm": "Actions complexes",
+            "Defense": "Actions de défense",
+            "DefenseMatrix": "Matrice de défense",
+            "DefenseSuppression": "répression de la défense",
+            "Drain": "Actions de drainage",
+            "Fade": "Actions de technodrain",
+            "HackOnTheFly": "Piratage à la volée matriciel",
+            "Magic": "Actions magiques",
+            "Matrix": "Actions matricielles",
+            "Recovery": "Actions de redressement",
+            "RecoveryPhysical": "Récupération",
+            "RecoveryStun": "Stun de récupération",
+            "Resist": "Actions de résistance",
+            "ResistBiofeedback": "Résiste Biofeedback",
+            "ResistDisease": "Maladies persistantes",
+            "ResistMatrix": "Résiste à la matrice",
+            "ResistToxin": "Résistant à la toxines",
+            "Resonance": "Actions de résonance",
+            "Rigging": "Actions de réglage",
+            "Social": "Actions sociales",
+            "SpellCombat": "Combat par sort",
+            "SpellDetection": "Détection de la diffusion orthographique",
+            "SpellHealing": "Guérison par sort",
+            "SpellIllusion": "Illusion de la diffusion orthographique",
+            "SpellManipulation": "Manipulation par projection orthographique",
+            "SpellRitual": "Rituel de diffusion orthographique",
+            "Summoning": "Invoquer des actions"
         },
         "ActionType": {
             "Label": "Type",
             "Complex": "Complexe",
             "Free": "Gratuite",
-            "Interrupt": "Interrupt",
+            "Interrupt": "Interruption",
             "None": "Aucune",
             "Simple": "Simple",
             "Varies": "Variée"
         },
         "CallInAction": {
-            "ActorType": "Actor Type",
+            "ActorType": "Type d'acteur",
             "Compilation": "Compilation",
-            "Compile": "Compile",
-            "CreateCompilation": "Create compilation action",
-            "CreateSummoning": "Create summoning action",
+            "Compile": "Compiler",
+            "CreateCompilation": "Créer une action de compilation",
+            "CreateSummoning": "Créer une action d'appel",
             "FIELDS": {
                 "actor_type": {
-                    "hint": "Type of Actor this action summons",
+                    "hint": "Type d'acteur de la présente action citation",
                     "label": "Type"
                 },
                 "spirit": {
                     "force": {
-                        "hint": "Force of Spirit to Summon. Disabled if a Spirit Actor is set",
-                        "label": "Force"
+                        "hint": "Force de l'esprit à invoquer. Désactivé si un acteur esprit est défini",
+                        "label": "Forcer"
                     },
                     "type": {
-                        "hint": "Type of Spirit to Summon. Disabled if a Spirit Actor is set",
+                        "hint": "Type d'esprit à invoquer. Désactivé si un acteur esprit est défini",
                         "label": "Type d'esprit"
                     }
                 },
                 "sprite": {
                     "level": {
-                        "hint": "Level of Sprite to Summon. Disabled if a Sprite Actor is set",
+                        "hint": "Niveau du sprite à compiler. Désactivé si un acteur sprite est défini",
                         "label": "Niveau"
                     },
                     "type": {
-                        "hint": "Type of Sprite to Compile. Disabled if a Sprite Actor is set",
-                        "label": "Sprite Type"
+                        "hint": "Type de sprite à compiler. Désactivé si un acteur Sprite est défini",
+                        "label": "Type de sprite"
                     }
                 }
             },
-            "Summon": "Summon",
+            "Summon": "Invoquer",
             "Summoning": "Invocation"
         },
         "ExtendedTestManager": {
@@ -150,7 +150,7 @@
             "NewTest": "Test étendu",
             "NoActor": "Aucun",
             "NoTests": "Aucun test étendu à afficher.",
-            "Notes": "Notes",
+            "Notes": "Annexe",
             "NotesPlaceholder": "Texte libre sur ce test. Recherchable.",
             "Notifications": {
                 "Completed": "Test étendu « {name} » terminé !",
@@ -213,18 +213,18 @@
             "AstralDice": "Dés init. Astrale",
             "AstralInit": "Init. Astral",
             "AstralLimit": "Limite Astrale",
-            "BackgroundCount": "Background Count",
+            "BackgroundCount": "Compte de l ' historique",
             "Composure": "Sang-Froid",
-            "ControlRigRating": "Control Rig Rating",
+            "ControlRigRating": "Cote du dispositif de contrôle",
             "Defense": "Défense",
             "DefenseBlock": "Défense (Bloquer)",
             "DefenseDodge": "Défense (Esquiver)",
-            "DefenseMelee": "Defense (Melee)",
+            "DefenseMelee": "Défense (Mélé)",
             "DefenseMulti": "Défense (Multi)",
             "DefenseParry": "Défense (Parrer)",
-            "DefenseRanged": "Defense (Ranged)",
-            "DifferentGrid": "Different Grid",
-            "Drain": "Drain",
+            "DefenseRanged": "Défense (rangée)",
+            "DifferentGrid": "Grille différente",
+            "Drain": "Égoutter",
             "Environmental": "Environnemental",
             "EnvironmentalLight": "Environnemental (Lumière)",
             "EnvironmentalRange": "Environnemental (Portée)",
@@ -232,33 +232,33 @@
             "EnvironmentalWind": "Environnemental (Vent)",
             "Essence": "Essence",
             "Fade": "Technodrain",
-            "Global": "Global",
-            "JudgeIntentions": "J.Intentions",
+            "Global": "Mondial",
+            "JudgeIntentions": "J. Objectifs",
             "LiftCarry": "Soulever&Porter",
-            "MarkDamage": "Per Mark Damage",
-            "Marks": "Marks",
+            "MarkDamage": "Par marque",
+            "Marks": "Marques",
             "MatrixDice": "Dés init. Matrice",
             "MatrixInit": "Init. Matrice",
-            "MatrixTrack": "Matrix Track",
+            "MatrixTrack": "Voie de matrice",
             "MeatSpaceDice": "Dés init. terrestre",
             "MeatSpaceInit": "Init. terrestre",
             "Memory": "Mémoire",
             "MentalLimit": "Limite Mentale",
-            "Noise": "Noise",
+            "Noise": "Bruit",
             "PainTolerancePhysical": "Résistance à la douleur",
             "PainToleranceStun": "Résistance à l'étourdissement",
             "PhysicalLimit": "Limite Physique",
             "PhysicalOverflowTrack": "Moniteur de surplus physique",
             "PhysicalTrack": "Moniteur Physique",
-            "PublicGrid": "Public Grid",
+            "PublicGrid": "Grille publique",
             "Reach": "Allonge",
             "Recoil": "Recul",
             "Run": "Courir",
             "Soak": "Encaisser",
             "SocialLimit": "Limite Sociale",
             "StunTrack": "Moniteur Étourdissant",
-            "ThreeMarks": "Three Marks",
-            "TwoMarks": "Two Marks",
+            "ThreeMarks": "Trois marques",
+            "TwoMarks": "Deux marques",
             "Walk": "Marcher",
             "WoundTolerance": "Tolérance aux blessures",
             "Wounds": "Blessures"
@@ -267,120 +267,120 @@
             "FIELDS": {
                 "type": {
                     "label": "Type",
-                    "hint": "Defines what kind of skill configurations are available"
+                    "hint": "Définit le type de configurations de compétences disponibles"
                 },
                 "skill": {
                     "category": {
-                        "label": "Category",
-                        "hint": "Category of this skill"
+                        "label": "Catégorie",
+                        "hint": "Catégorie de cette compétence"
                     },
                     "knowledgeType": {
-                        "label": "Knowledge Type",
-                        "hint": "Type of knowledge skill"
+                        "label": "Type de connaissances",
+                        "hint": "Type de compétences"
                     },
                     "rating": {
                         "label": "Indice",
-                        "hint": "Rating of this entry"
+                        "hint": "Note de cette rubrique"
                     },
                     "defaulting": {
                         "label": "Par défaut",
-                        "hint": "If this skill can be defaulted"
+                        "hint": "Si cette compétence peut être par défaut"
                     },
                     "attribute": {
                         "label": "Attribut",
-                        "hint": "Attribute used by this skill"
+                        "hint": "Attribut utilisé par cette compétence"
                     },
                     "limit": {
                         "attribute": {
                             "label": "Limite",
-                            "hint": "Limit to use for this skill action. Leave empty to use default attribute limit."
+                            "hint": "Limiter à l'utilisation pour cette action de compétence. Laisser vide pour utiliser la limite d'attribut par défaut."
                         }
                     },
                     "specializations": {
                         "label": "Spécialisation",
-                        "hint": "Specialization for this skill, if any"
+                        "hint": "Spécialisation pour cette compétence, le cas échéant"
                     },
                     "language": {
                         "isNative": {
-                            "label": "Native",
-                            "hint": "Marks this language as native"
+                            "label": "Maternelle",
+                            "hint": "Marque cette langue comme native"
                         }
                     },
                     "requirement": {
-                        "label": "Requirement",
-                        "hint": "What the actor must be for this skill to be available"
+                        "label": "Besoin",
+                        "hint": "Ce que l'acteur doit être pour que cette compétence soit disponible"
                     }
                 },
                 "group": {
-                    "label": "Skill Group",
-                    "hint": "Configuration for a skill group",
+                    "label": "Groupe de compétences",
+                    "hint": "Configuration pour un groupe de compétences",
                     "skills": {
                         "label": "Compétences",
-                        "hint": "Skills that are part of this group"
+                        "hint": "Compétences qui font partie de ce groupe"
                     },
                     "rating": {
                         "label": "Indice",
-                        "hint": "Rating of this skill group"
+                        "hint": "Évaluation de ce groupe de compétences"
                     }
                 },
                 "set": {
-                    "label": "Skill Set",
-                    "hint": "Configuration for a skill set",
+                    "label": "Ensemble de compétences",
+                    "hint": "Configuration pour un ensemble de compétences",
                     "default": {
-                        "label": "Use On New Actors",
-                        "hint": "Add this skill set to newly created actors"
+                        "label": "Utilisation sur les nouveaux acteurs",
+                        "hint": "Ajouter cette compétence aux acteurs nouvellement créés"
                     },
                     "skills": {
                         "label": "Compétences",
-                        "hint": "Skills that are part of this set",
+                        "hint": "Compétences qui font partie de cet ensemble",
                         "name": {
                             "label": "Nom",
-                            "hint": "Name of the skill"
+                            "hint": "Nom de la compétence"
                         },
                         "rating": {
                             "label": "Indice",
-                            "hint": "Rating of this skill"
+                            "hint": "Évaluation de cette compétence"
                         },
                         "specializations": {
                             "label": "Spécialisation",
-                            "hint": "Specializations granted to this skill when the set is applied"
+                            "hint": "Spécialisations accordées à cette compétence lors de l'application de l'ensemble"
                         }
                     },
                     "groups": {
-                        "label": "Skill Groups",
-                        "hint": "Skill groups that are part of this set",
+                        "label": "Groupes de compétences",
+                        "hint": "Groupes de compétences faisant partie de cet ensemble",
                         "name": {
                             "label": "Nom",
-                            "hint": "Name of the skill group"
+                            "hint": "Nom du groupe de compétences"
                         },
                         "rating": {
                             "label": "Indice",
-                            "hint": "Rating of this skill group"
+                            "hint": "Évaluation de ce groupe de compétences"
                         }
                     }
                 }
             },
             "Types": {
                 "Skill": "Compétence",
-                "Group": "Skill Group",
-                "Set": "Skill Set"
+                "Group": "Groupe de compétences",
+                "Set": "Ensemble de compétences"
             },
             "Category": {
                 "Active": "Actif",
-                "Knowledge": "Knowledge",
-                "Language": "Language"
+                "Knowledge": "Connaissances",
+                "Language": "Langue"
             },
             "KnowledgeType": {
                 "Academic": "Connaissances académiques",
                 "Professional": "Connaissances pro.",
                 "Interests": "Hobbies",
-                "Street": "Street"
+                "Street": "Rue"
             },
             "Groups": {},
             "Sets": {},
             "Set": {
-                "LogActorDifferences": "Log Actor Differences",
-                "DifferencesLoggedInConsole": "Open your browser console to view differences"
+                "LogActorDifferences": "Différences entre les acteurs du journal",
+                "DifferencesLoggedInConsole": "Ouvrez votre console de navigateur pour afficher les différences"
             },
             "AeronauticsMechanic": "Mécanique aéronautique",
             "Alchemy": "Alchimie",
@@ -417,23 +417,23 @@
             "ExoticMeleeWeapon": "Armes de mélée exotiques",
             "ExoticRangedWeapon": "Armes à distance exotiques",
             "FirstAid": "Premiers soins",
-            "Flight": "Flight",
+            "Flight": "Vol",
             "Forgery": "Falsification",
             "FreeFall": "Chute libre",
             "Gunnery": "Armes de véhicules",
             "Gymnastics": "Gymnastique",
-            "Hacking": "Hacking",
+            "Hacking": "Piratage",
             "Hardware": "Matériel électronique",
             "HeavyWeapons": "Armes lourdes",
             "Impersonation": "Imposture",
             "IndustrialMechanic": "Mécanique industrielle",
             "Instruction": "Enseignement",
             "Intimidation": "Intimidation",
-            "Leadership": "Leadership",
+            "Leadership": "Commandement",
             "Locksmith": "Serrurerie",
             "Longarms": "Fusils",
             "Medicine": "Médecine",
-            "Native": "Native",
+            "Native": "Maternelle",
             "NauticalMechanic": "Mécanique nautique",
             "Navigation": "Orientation",
             "Negotiation": "Négotiation",
@@ -451,7 +451,7 @@
             "RitualSpellcasting": "Magie rituelle",
             "Running": "Course",
             "Skill": "Compétence",
-            "SkillGroup": "Skill Group",
+            "SkillGroup": "Groupe de compétences",
             "Skills": "Compétences",
             "Sneaking": "Discrétion",
             "Software": "Logiciels",
@@ -460,10 +460,10 @@
             "Survival": "Survie",
             "Swimming": "Natation",
             "Teamwork": {
-                "Glitched": "Glitched",
-                "ParticipantActor": "Choose actor",
-                "RollIt": "Roll it",
-                "TakePart": "Take part"
+                "Glitched": "Glissé",
+                "ParticipantActor": "Choisir l'acteur",
+                "RollIt": "Roule-le.",
+                "TakePart": "Participez"
             },
             "ThrowingWeapons": "Armes de jet",
             "Tracking": "Pistage",
@@ -473,70 +473,70 @@
             }
         },
         "TestResults": {
-            "AttackBlockedByHardenedArmor": "Attack Hits But Is Blocked By Hardened Armor",
-            "AttackBlockedByVehicleArmor": "Attack Hits But Is Blocked By Vehicle Armor",
-            "AttackDodged": "Attack Dodged",
-            "AttackDoesNoPhysicalDamageToVehicle": "Attack Hits But Does No Physical Damage To Vehicle",
-            "AttackHits": "Attack Hits",
-            "AttackResisted": "Attack Resisted",
-            "BruteForceFailure": "Brute Force failed!",
-            "BruteForceSuccess": "Brute Force successful!",
-            "CheckOverwatchScoreFailure": "Check Overwatch Score failed!",
-            "CheckOverwatchScoreSuccess": "Check Overwatch Score successful!",
-            "Failure": "Failure!",
-            "HackOnTheFlyFailure": "Hack on the Fly failed!",
-            "HackOnTheFlySuccess": "Hack on the Fly successful!",
-            "ResistedAllDamage": "No Damage taken!",
-            "ResistedSomeDamage": "Damage taken!",
-            "Results": "Results",
-            "RitualFailure": "The ritual was too strong for you",
-            "RitualSuccess": "The ritual is sealed",
-            "SoakBlockedByHardenedArmor": "Blocked By Hardened Armor",
-            "SpiritSummonFailure": "Spirit fled!",
-            "SpiritSummonSuccess": "Spirit summoned!",
-            "SpriteCompilationFailure": "Sprite fled!",
-            "SpriteCompilationSuccess": "Sprite compiled!",
-            "Success": "Success!"
+            "AttackBlockedByHardenedArmor": "L'attaque frappe mais est bloquée par un armement durci",
+            "AttackBlockedByVehicleArmor": "L'attaque frappe mais est bloquée par l'armure de véhicule",
+            "AttackDodged": "Attaque d'un point de vue d'ordre général",
+            "AttackDoesNoPhysicalDamageToVehicle": "Attaque frappe mais ne porte pas de dommages physiques au véhicule",
+            "AttackHits": "Coups de feu",
+            "AttackResisted": "Résisté à l'attaque",
+            "BruteForceFailure": "Brute Force a échoué !",
+            "BruteForceSuccess": "Brute Force réussi !",
+            "CheckOverwatchScoreFailure": "Échec de la vérification de l'indice de surveillance !",
+            "CheckOverwatchScoreSuccess": "Vérification de l'indice de surveillance réussie !",
+            "Failure": "Échec !",
+            "HackOnTheFlyFailure": "Échec du piratage à la volée !",
+            "HackOnTheFlySuccess": "Piratage à la volée réussi !",
+            "ResistedAllDamage": "Pas de dégâts !",
+            "ResistedSomeDamage": "Dommages pris !",
+            "Results": "Résultats",
+            "RitualFailure": "Le rituel était trop fort pour toi.",
+            "RitualSuccess": "Le rituel est scellé",
+            "SoakBlockedByHardenedArmor": "Bloqué par un armement durci",
+            "SpiritSummonFailure": "L'esprit s'est enfui !",
+            "SpiritSummonSuccess": "Esprit appelé !",
+            "SpriteCompilationFailure": "Sprite s'est enfui !",
+            "SpriteCompilationSuccess": "Sprite compilé !",
+            "Success": "Succès !"
         },
         "Tests": {
-            "AttributeOnlyTest": "Attribute-Only Test",
-            "BiofeedbackResistTest": "Biofeedback Resist",
-            "BruteForceTest": "Brute Force",
-            "CheckOverwatchScoreTest": "Check Overwatch Score",
-            "CombatSpellDefenseTest": "Combat Spell Defense",
-            "CompileSpriteTest": "Compile Sprite",
-            "ComplexFormTest": "Threading Complex Form",
-            "DrainTest": "Drain Test",
-            "DroneInfiltrationTest": "Drone Infiltration Test",
-            "DronePerceptionTest": "Drone Perception Test",
+            "AttributeOnlyTest": "Essai de l'attribut uniquement",
+            "BiofeedbackResistTest": "Résiste au biofeedback",
+            "BruteForceTest": "Force brute",
+            "CheckOverwatchScoreTest": "Vérifier l'indice de surveillance",
+            "CombatSpellDefenseTest": "Défense contre un sort de combat",
+            "CompileSpriteTest": "Compiler le sprite",
+            "ComplexFormTest": "Forme complexe de filetage",
+            "DrainTest": "Essai d'évacuation",
+            "DroneInfiltrationTest": "Essai d'infiltration de drone",
+            "DronePerceptionTest": "Essai de perception du drone",
             "ExtendedTest": "Test étendu",
-            "FadeTest": "Fade Test",
-            "HackOnTheFlyTest": "Hack on the Fly",
-            "MatrixDefenseTest": "Matrix Defense",
-            "MatrixResistTest": "Matrix Damage Resist",
-            "MatrixTest": "Matrix Test",
+            "FadeTest": "Test de technodrain",
+            "HackOnTheFlyTest": "Piratage à la volée",
+            "MatrixDefenseTest": "Défense des matrices",
+            "MatrixResistTest": "Résiste aux dommages de la matrice",
+            "MatrixTest": "Essai de matrice",
             "MeleeAttackTest": "Attaque arme de mélée",
-            "NaturalRecoveryPhysicalTest": "Natural Recovery Physical",
-            "NaturalRecoveryStunTest": "Natural Recovery Stun",
-            "OpposedBruteForceTest": "Oppose Brute Force",
-            "OpposedCheckOverwatchScoreTest": "Oppose Check Overwatch Score",
-            "OpposedCompileSpriteTest": "Oppose Compilation",
-            "OpposedHackOnTheFlyTest": "Oppose Hack On The Fly",
-            "OpposedMatrixTest": "Opposed Matrix Test",
-            "OpposedRitualTest": "Seal the Ritual",
-            "OpposedSummonSpiritTest": "Oppose Summoning",
+            "NaturalRecoveryPhysicalTest": "Récupération naturelle Physique",
+            "NaturalRecoveryStunTest": "Stun de récupération naturelle",
+            "OpposedBruteForceTest": "Opposez la force brute",
+            "OpposedCheckOverwatchScoreTest": "Test opposé de l'indice de surveillance",
+            "OpposedCompileSpriteTest": "Compilation des oppositions",
+            "OpposedHackOnTheFlyTest": "Test opposé de piratage à la volée",
+            "OpposedMatrixTest": "Essai de la matrice opposée",
+            "OpposedRitualTest": "Scellez le rituel",
+            "OpposedSummonSpiritTest": "Invocation de la contestation",
             "OpposedTest": "Test opposé",
-            "PhysicalDefenseTest": "Physical Defense",
-            "PhysicalResistTest": "Physical Damage Resist",
-            "PilotVehicleTest": "Pilot Vehicle Test",
-            "RangedAttackTest": "Ranged Weapon Attack",
+            "PhysicalDefenseTest": "Défense physique",
+            "PhysicalResistTest": "Résiste aux dommages physiques",
+            "PilotVehicleTest": "Essai du véhicule pilote",
+            "RangedAttackTest": "Attaque d'armes à feu à portée",
             "RitualSpellcastingTest": "Magie rituelle",
-            "SkillTest": "Skill Test",
+            "SkillTest": "Test de compétence",
             "SpellCastingTest": "Lancement de sorts",
-            "SuccessTest": "Success Test",
-            "SummonSpiritTest": "Summon Spirit",
-            "SuppressionDefenseTest": "Suppression Defense",
-            "ThrownAttackTest": "Thrown Weapon Attack"
+            "SuccessTest": "Essai de réussite",
+            "SummonSpiritTest": "Invoquer l'Esprit",
+            "SuppressionDefenseTest": "Suppression de la défense",
+            "ThrownAttackTest": "Attaque d'armes lancées"
         }
     }
 }

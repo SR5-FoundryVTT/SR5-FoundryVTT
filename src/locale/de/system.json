@@ -83,7 +83,7 @@
     "TYPES": {
         "Actor": {
             "character": "Charakter",
-            "ic": "IC",
+            "ic": "WISSENSCHAFT",
             "spirit": "Geist",
             "sprite": "Sprite",
             "vehicle": "Fahrzeug/Drohne"
@@ -93,7 +93,7 @@
             "adept_power": "Adeptenkraft",
             "ammo": "Munition",
             "armor": "Panzerung",
-            "bioware": "Bioware",
+            "bioware": "Biomaterial",
             "call_in_action": "Beschwören/Kompilieren",
             "complex_form": "Komplexe Form",
             "contact": "Kontakt",
@@ -102,19 +102,19 @@
             "device": "Gerät",
             "echo": "Echo",
             "equipment": "Ausrüstung",
-            "grid": "Grid",
-            "host": "Host",
+            "grid": "Gitter",
+            "host": "Rechner",
             "lifestyle": "Lebensstil",
             "metamagic": "Metamagie",
             "modification": "Modifikation",
             "program": "Programm",
             "quality": "Vor-/Nachteil",
             "ritual": "Ritual",
-            "sin": "SIN",
+            "sin": "SEIN",
             "skill": "Fertigkeit",
             "spell": "Zauberspruch",
             "sprite_power": "Spritekraft",
-            "vehicle": "Vehicle",
+            "vehicle": "Fahrzeug",
             "weapon": "Waffe"
         }
     }

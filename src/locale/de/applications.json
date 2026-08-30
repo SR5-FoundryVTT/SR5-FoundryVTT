@@ -6,7 +6,7 @@
             "LatestChangelog": "Aktueller Changelog",
             "Reason": "Du hast die aktuellste Version installiert!",
             "ReportIssues": "Bitte Fehler und gewünschte Funktionen hier melden",
-            "Title": "Shadowrun5e Update"
+            "Title": "Shadowrun5e aktualisieren"
         },
         "CompendiaSettings": {
             "Description": "Diese Kompendien werden vom System verwendet. Du kannst sie mit eigenen Kompendien überschreiben, solltest sie aber nicht entfernen.",
@@ -18,7 +18,7 @@
                 "hint": "Dieses Kompendium wird für IC-Proben verwendet, gefiltert nach IC-Typ",
                 "label": "IC Handlungen"
             },
-            "Label": "Compendium Packs",
+            "Label": "Kompendiumpackungen",
             "MatrixActionsPack": {
                 "hint": "Dieses Kompendium wird für alle Matrix-Handlungen verwendet.",
                 "label": "Matrix Handlungen"
@@ -64,7 +64,7 @@
             "sr5misc": "Verschiedenes",
             "sr5modification": "Modifikationen",
             "sr5trait": "Qualitäten & Kräfte",
-            "sr5ware": "Bioware & Cyberware",
+            "sr5ware": "Bio- und Cyberware",
             "sr5weapon": "Waffen"
         },
         "DeleteConfirmationApplication": {
@@ -112,11 +112,11 @@
             }
         },
         "GMRequest": {
-            "General": "Your GM wants you to do a",
-            "RollAttribute": "Attribute Check",
-            "RollSkill": "Skill Check",
-            "Teamwork": "Teamwork Test",
-            "Threshold": " with a threshold of "
+            "General": "Ihr GM möchte, dass Sie eine",
+            "RollAttribute": "Attributprüfung",
+            "RollSkill": "Prüfung der Fähigkeiten",
+            "Teamwork": "Test der Teamarbeit",
+            "Threshold": "mit einer Schwelle von"
         },
         "Import": {
             "ActorImporter": {
@@ -144,7 +144,7 @@
             "FinalKarma": "Karma",
             "StartingKarma": "Start Karma",
             "Submit": "Bestätigen",
-            "Title": "Karma Manager"
+            "Title": "Karma-Verwaltung"
         },
         "MIGRATION": {
             "BeginMigration": "Starte Migration",
@@ -167,7 +167,7 @@
                 "Line1": "Ab Version 0.18.0 werden Effekte auf Akteur Gegenständen direkt angewendet, ohne auf den Akteur kopiert zu werden.",
                 "Line2": "Bisher kopierte Effekte müssen gelöscht oder kopiert werden, um zu verhindern, dass diese Effekte doppelt angewendet werden. Das betrifft alle Effekte mit einem Item im Origin Feld.",
                 "Line3": "Direkt auf dem Akteur erstellte Effekte bleiben bestehen.",
-                "Line4": "Solltest du viele Effekte nutzen, vor allem zusammen mit Effekt-Modulen, and bist unsicher welche Effekte einen Item-Origin haben, setzte die Migration auf Deaktivieren. Dadurch werden betroffene Effekte deaktiviert und umbenannt, wodurch diese leicht zu prüfen sind.",
+                "Line4": "Solltest du viele Effekte nutzen, vor allem zusammen mit Effekt-Modulen, und bist unsicher, welche Effekte einen Item-Ursprung haben, setze die Migration auf Deaktivieren. Dadurch werden betroffene Effekte deaktiviert und umbenannt, wodurch diese leicht zu prüfen sind.",
                 "Line5": "Achte außerdem auf aktivierte Effekte in Akteur Gegenständen, die jetzt angewendet werden. Du kannst alle angewendeten Effekte eines Akteurs im Effekts-Tab sehen.",
                 "OnlyDisable": "Effekte nur deaktivieren!",
                 "Warning": "Warnung!"
@@ -178,7 +178,7 @@
             "CurrentNuyen": "Aktuell verfügbares Nuyen",
             "FinalNuyen": "Zukünftiges verfügbares Nuyen",
             "Submit": "Bestätigen",
-            "Title": "Nuyen Manager"
+            "Title": "Nuyen-Verwaltung"
         },
         "OverwatchScoreTracker": {
             "AddSelect": "Füge den verbundenen Actor des ausgewählten und Tokens hinzu",

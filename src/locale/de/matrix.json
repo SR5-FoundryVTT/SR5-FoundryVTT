@@ -3,7 +3,7 @@
         "ComplexForm": {
             "Durations": {
                 "Immediate": "Sofort",
-                "Permanent": "Permanent",
+                "Permanent": "Dauerhaft",
                 "Sustained": "Aufrechterhalten"
             },
             "FIELDS": {
@@ -41,7 +41,7 @@
             "FIELDS": {
                 "host": {
                     "hint": "Auf welchem Host läuft dieses IC?",
-                    "label": "Host",
+                    "label": "Rechner",
                     "rating": {
                         "hint": "Stufe des Hosts",
                         "label": "Stufe"
@@ -65,7 +65,7 @@
                 "Crash": "Absturz",
                 "Flicker": "Flackern",
                 "Jammer": "Störer",
-                "Killer": "Killer",
+                "Killer": "Mörder",
                 "Marker": "Leuchtspur",
                 "Patrol": "Patrouille",
                 "Probe": "Marker",
@@ -78,15 +78,15 @@
             }
         },
         "MatrixNetworkHackingApplication": {
-            "Icons": "Icons",
+            "Icons": "Symbole",
             "Invite": "Einladung anfordern",
             "Title": "Mit Netzwerk verbinden"
         },
         "NetworkManager": {
             "AvailableNetworks": "Verfügbare Netzwerke",
-            "BruteForce": "Brute Force",
+            "BruteForce": "Brute-Force-Angriff",
             "ConnectedTo": "Verbunden mit",
-            "HackOnTheFly": "Hack on the Fly",
+            "HackOnTheFly": "Eiliges Hacken",
             "InviteMark": "Marke einladen",
             "NetworkType": "Netzwerktyp",
             "NoNetwork": "Kein Netzwerk",
@@ -147,7 +147,7 @@
             "Durations": {
                 "Always": "Immer",
                 "Instant": "Sofort",
-                "Permanent": "Permanent",
+                "Permanent": "Dauerhaft",
                 "Special": "Speziell",
                 "Sustained": "Aufrechterhalten"
             },
@@ -158,7 +158,7 @@
                 },
                 "optional": {
                     "hint": "Ob die Kraft optional ist",
-                    "label": "Optional"
+                    "label": "Fakultativ"
                 }
             },
             "IsOptional": "Optional",

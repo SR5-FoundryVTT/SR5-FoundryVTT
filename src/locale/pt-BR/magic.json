@@ -3,20 +3,20 @@
         "AdeptPower": {
             "FIELDS": {
                 "drain": {
-                    "hint": "If this Adept Power incurs Drain after use",
-                    "label": "Drain"
+                    "hint": "Se este Poder Adepto incorre Drenar após o uso",
+                    "label": "Drenar"
                 },
                 "level": {
-                    "hint": "Level of this Adept Power (if applicable)",
+                    "hint": "Nível deste Poder de Adepto (se aplicável)",
                     "label": "Nível"
                 },
                 "pp": {
-                    "hint": "Number of Power Points this Power Costs",
-                    "label": "Power Points"
+                    "hint": "Número de pontos de energia que este poder custa",
+                    "label": "Pontos de Poder"
                 },
                 "type": {
-                    "hint": "Type of Adept Power",
-                    "label": "Power Type"
+                    "hint": "Tipo de Poder Adepto",
+                    "label": "Tipo de Poder"
                 }
             },
             "Types": {
@@ -47,24 +47,24 @@
             },
             "FIELDS": {
                 "duration": {
-                    "hint": "Duration of the Critter Power",
+                    "hint": "Duração do poder da criatura",
                     "label": "Duração"
                 },
                 "karma": {
-                    "hint": "Karma cost of the Critter Power",
+                    "hint": "Custo em Carma do poder da criatura",
                     "label": "Carma"
                 },
                 "optional": {
-                    "hint": "If the Critter Power is Optional",
-                    "label": "Optional"
+                    "hint": "Se o poder da criatura é opcional",
+                    "label": "Opcional"
                 },
                 "powerType": {
-                    "hint": "The Type of Critter Power",
-                    "label": "Power Type"
+                    "hint": "O tipo de poder da criatura",
+                    "label": "Tipo de Poder"
                 },
                 "range": {
-                    "hint": "Range of the Critter Power",
-                    "label": "Range"
+                    "hint": "O alcance do poder da criatura",
+                    "label": "Alcance"
                 }
             },
             "IsOptional": "Opcionalidade",
@@ -85,7 +85,7 @@
             },
             "Type": "Tipo",
             "Types": {
-                "Mana": "Mana",
+                "Mana": "Mana Mana",
                 "Physical": "Físico"
             }
         },
@@ -93,12 +93,12 @@
             "Anchored": "Ancorado",
             "FIELDS": {
                 "descriptors": {
-                    "hint": "Descriptors for the Ritual",
+                    "hint": "Descritores para o Ritual",
                     "label": "Descritores"
                 },
                 "type": {
-                    "hint": "Type of Ritual to Perform",
-                    "label": "Ritual Type"
+                    "hint": "Tipo de Ritual para Realizar",
+                    "label": "Ritual Tipo"
                 }
             },
             "MaterialLink": "Vínculo material",
@@ -126,78 +126,78 @@
             "DetectionPsychic": "Psíquico",
             "FIELDS": {
                 "category": {
-                    "hint": "Category that the Spell belongs to",
-                    "label": "Category"
+                    "hint": "Categoria a que o feitiço pertence",
+                    "label": "Categoria"
                 },
                 "combat": {
                     "type": {
-                        "hint": "If the Spell is Direct or Indirect",
-                        "label": "Combat Spell Type"
+                        "hint": "Se o feitiço for direto ou indireto",
+                        "label": "Tipo de Magia de Combate"
                     }
                 },
                 "detection": {
                     "extended": {
-                        "hint": "If the Spell is Extended",
+                        "hint": "Se o feitiço for estendido",
                         "label": "Estendido"
                     },
                     "passive": {
-                        "hint": "If the Spell is Passive",
+                        "hint": "Se o feitiço é passivo",
                         "label": "Passivo"
                     },
                     "type": {
-                        "hint": "How the Spell affects targets",
-                        "label": "Detection Spell Type"
+                        "hint": "Como o feitiço afeta os alvos",
+                        "label": "Tipo de Feitiço de Detecção"
                     }
                 },
                 "drain": {
-                    "hint": "Drain Value of the spell, this is is added to the Force of the spell to Resist Drain",
+                    "hint": "Valor de Dreno do feitiço; ele é somado à Força do feitiço para resistir ao Dreno",
                     "label": "Valor de Dreno"
                 },
                 "duration": {
-                    "hint": "Duration of the Spell",
+                    "hint": "Duração do feitiço",
                     "label": "Duração"
                 },
                 "illusion": {
                     "sense": {
-                        "hint": "The Sense that the Spell affects",
-                        "label": "Sense"
+                        "hint": "O sentido que o feitiço afeta",
+                        "label": "Sentido"
                     },
                     "type": {
-                        "hint": "Type of Illusion Spell",
-                        "label": "Illusion Spell Type"
+                        "hint": "Tipo de Magia de Ilusão",
+                        "label": "Tipo de Magia Ilusão"
                     }
                 },
                 "manipulation": {
                     "damaging": {
-                        "hint": "If the Spell deals Damage",
+                        "hint": "Se o feitiço causar dano",
                         "label": "Danoso"
                     },
                     "environmental": {
-                        "hint": "These spells don’t really have a target, and they don’t really affect targets directly. They just affect an area.",
+                        "hint": "Esses feitiços realmente não têm um alvo, e eles realmente não afetam alvos diretamente. Eles apenas afetam uma área.",
                         "label": "Ambiental"
                     },
                     "mental": {
-                        "hint": "If the Spell affects targets Mentally",
+                        "hint": "Se o feitiço afetar os alvos mentalmente",
                         "label": "Mental"
                     },
                     "physical": {
-                        "hint": "These spells affect physical forms and are usually defended against",
+                        "hint": "Estes feitiços afetam formas físicas e são geralmente defendidos contra",
                         "label": "Físico"
                     }
                 },
                 "range": {
-                    "hint": "Range of the Spell",
-                    "label": "Range"
+                    "hint": "O alcance do feitiço",
+                    "label": "Alcance"
                 },
                 "ritual": {
                     "type": {
-                        "hint": "Type of Ritual to perform",
-                        "label": "Ritual Type"
+                        "hint": "Tipo de Ritual para realizar",
+                        "label": "Ritual Tipo"
                     }
                 },
                 "type": {
-                    "hint": "If the Spell is Physical or Mana based",
-                    "label": "Spell Type"
+                    "hint": "Se o feitiço for físico ou baseado em Mana",
+                    "label": "Tipo de Feitiço"
                 }
             },
             "IllusionMultiSense": "Multi-Sentido",
@@ -215,7 +215,7 @@
             "Spell": "Feitiço",
             "Spells": "Feitiços",
             "Type": "Tipo",
-            "TypeMana": "Mana",
+            "TypeMana": "Mana Mana",
             "TypePhysical": "Físico"
         },
         "Spirit": {
@@ -239,7 +239,7 @@
                 "Aircraft": "Aeronave",
                 "Airwave": "Onda de Ar",
                 "Ally": "Aliado",
-                "Anansi": "Anansi",
+                "Anansi": "anansi",
                 "Anarch": "Anarquista",
                 "Arboreal": "Arbóreo",
                 "Automotive": "Automotivo",
@@ -248,7 +248,7 @@
                 "Blackjack": "Blackjack",
                 "BladeSummoned": "Lâmina Invocada",
                 "Blood": "Sangue",
-                "BloodShade": "Blood Shade",
+                "BloodShade": "Sombra de Sangue",
                 "Boggle": "Boggle",
                 "Bone": "Osso",
                 "Bugul": "Bugul",
@@ -256,14 +256,14 @@
                 "Caretaker": "Cuidador de Insetos",
                 "Ceramic": "Cerâmica",
                 "Chindi": "Chindi",
-                "CorpsCadavre": "Corps Cadavre",
+                "CorpsCadavre": "Cadavre Corpo",
                 "Corpse": "Cadáver",
                 "Crawler": "Rastejador (Demônio)",
                 "Croki": "Croki",
                 "Detritus": "Detritos",
                 "Duende": "Duende",
                 "Earth": "Terra",
-                "Ejerian": "Ejerian",
+                "Ejerian": "Ejeriano",
                 "Elvar": "Elvar",
                 "Energy": "Energia",
                 "Erinyes": "Eríneas",
@@ -312,7 +312,7 @@
                 "Tungak": "Tungak",
                 "Unbreakable": "Inquebrável",
                 "Vrygoths": "Vrygoths",
-                "VucubCaquix": "Vucub Caquix",
+                "VucubCaquix": "Vcucub Caquix",
                 "Watcher": "Observador",
                 "Water": "Água",
                 "Worker": "Inseto Trabalhador",

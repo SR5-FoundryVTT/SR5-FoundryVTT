@@ -5,211 +5,211 @@
                 "attributes": {
                     "edge": {
                         "base": {
-                            "hint": "Edge is a character’s luck, the favor of the gods, that unexplainable factor that allows her to beat the odds.",
+                            "hint": "Edge é a sorte de um personagem, o favor dos deuses, esse fator inexplicável que lhe permite vencer as probabilidades.",
                             "label": "Trunfo"
                         }
                     }
                 },
                 "category_visibility": {
                     "default": {
-                        "hint": "If empty Tabs and Inventory Categories should be visible",
-                        "label": "Show Empty Categories"
+                        "hint": "Se as abas vazias e as categorias de inventário devem ser visíveis",
+                        "label": "Mostrar Categorias Vazias"
                     }
                 },
                 "full_defense_attribute": {
-                    "hint": "Attribute to use when using the Full Defense interrupt action",
+                    "hint": "Atributo a usar ao usar a ação de interrupção de Defesa Completa",
                     "label": "Atributo de Defesa Total"
                 },
                 "magic": {
                     "attribute": {
-                        "hint": "Attribute the Mage/Adept uses when resisting Drain",
+                        "hint": "Atributo que o Mago/Adept usa quando resiste ao Drenamento",
                         "label": "Atributo de Dreno"
                     },
                     "label": "Magia"
                 },
                 "modifiers": {
                     "armor": {
-                        "hint": "Modifies total armor value",
+                        "hint": "Modifica o valor total da armadura",
                         "label": "Armadura"
                     },
                     "astral_initiative": {
-                        "hint": "Modifies astral initiative base",
-                        "label": "Astral Initiative"
+                        "hint": "Modifica a base de iniciativa astral",
+                        "label": "Iniciativa Astral"
                     },
                     "astral_initiative_dice": {
-                        "hint": "Modifies astral initiative dice",
-                        "label": "Astral Initiative Dice"
+                        "hint": "Modifica dados da iniciativa astral",
+                        "label": "Dados da Iniciativa Astral"
                     },
                     "astral_limit": {
-                        "hint": "Modifies astral limit",
+                        "hint": "Modifica o limite astral",
                         "label": "Limite Astral"
                     },
                     "composure": {
-                        "hint": "Modifies composure tests pool",
+                        "hint": "Modifica a parada de dados dos testes de compostura",
                         "label": "Compostura"
                     },
                     "defense": {
-                        "hint": "Modifies defense tests pool",
+                        "hint": "Modifica a parada de dados dos testes de defesa",
                         "label": "Defesa"
                     },
                     "defense_block": {
-                        "hint": "Adds to the defense modifier for active blocking",
+                        "hint": "Adiciona ao modificador de defesa para bloqueio ativo",
                         "label": "Defesa (Bloqueio)"
                     },
                     "defense_dodge": {
-                        "hint": "Adds to the defense modifier for active dodging",
+                        "hint": "Adiciona ao modificador de defesa para esquiva ativa",
                         "label": "Defesa (Esquiva)"
                     },
                     "defense_melee": {
-                        "hint": "Adds to the defense modifier for melee defense",
+                        "hint": "Adiciona ao modificador de defesa para defesa corpo a corpo",
                         "label": "Defesa (Corpo-a-Corpo)"
                     },
                     "defense_parry": {
-                        "hint": "Adds to the defense modifier for active parrying",
+                        "hint": "Adiciona ao modificador de defesa para aparar ativamente",
                         "label": "Defesa (Aparar)"
                     },
                     "defense_ranged": {
-                        "hint": "Adds to the defense modifier for ranged attack",
+                        "hint": "Adiciona ao modificador de defesa contra ataques à distância",
                         "label": "Defesa (Distância)"
                     },
                     "drain": {
-                        "hint": "Modifies drain tests pool",
-                        "label": "Drain"
+                        "hint": "Modifica a parada de dados dos testes de dreno",
+                        "label": "Drenar"
                     },
                     "essence": {
-                        "hint": "Modifies essence attribute",
-                        "label": "Essence"
+                        "hint": "Modifica atributo essência",
+                        "label": "Essência"
                     },
                     "fade": {
-                        "hint": "Modifies fade tests pool",
-                        "label": "Fade"
+                        "hint": "Modifica a parada de dados dos testes de enfraquecimento",
+                        "label": "Enfraquecimento"
                     },
                     "global": {
-                        "hint": "Modifies all tests pool, excluding damage reducing tests",
+                        "hint": "Modifica todas as paradas de dados, exceto as dos testes de resistência a dano",
                         "label": "Global"
                     },
                     "judge_intentions": {
-                        "hint": "Modifies judge intentions tests pool",
-                        "label": "Judge Intentions"
+                        "hint": "Modifica a parada de dados dos testes para julgar intenções",
+                        "label": "Intenções do juiz"
                     },
                     "lift_carry": {
-                        "hint": "Modifies lift&carry tests pool",
-                        "label": "Lift/Carry"
+                        "hint": "Modifica a parada de dados dos testes de levantar e carregar",
+                        "label": "Elevador/Carry"
                     },
                     "mark_damage": {
-                        "hint": "Modifies the amount of damage taken per MARK done to you",
-                        "label": "Mark Damage"
+                        "hint": "Modifica a quantidade de dano recebido por MARK feito a você",
+                        "label": "Dano Marca Marca"
                     },
                     "matrix_initiative": {
-                        "hint": "Modifies matrix initiative base",
-                        "label": "Matrix Initiative"
+                        "hint": "Base de Iniciativa da Matrix",
+                        "label": "Iniciativa Matrix Matrix"
                     },
                     "matrix_initiative_dice": {
-                        "hint": "Modifies matrix initiative dice",
-                        "label": "Matrix Initiative Dice"
+                        "hint": "Modifica a iniciativa matricial",
+                        "label": "Iniciativa Matrix Dados"
                     },
                     "matrix_track": {
-                        "hint": "Modifies matrix damage track",
+                        "hint": "Modifica a trilha de dano da matriz",
                         "label": "Monitor da Matriz"
                     },
                     "meat_initiative": {
-                        "hint": "Modifies physical initiative base",
-                        "label": "Meatspace Initiative"
+                        "hint": "Modifica a base de iniciativa física",
+                        "label": "Iniciativa Meatspace"
                     },
                     "meat_initiative_dice": {
-                        "hint": "Modifies physical initiative dice",
-                        "label": "Meatspace Initiative Dice"
+                        "hint": "Modifica dados de iniciativa física",
+                        "label": "Meatspace Iniciativa Dados"
                     },
                     "memory": {
-                        "hint": "Modifies memory tests pool",
+                        "hint": "Modifica a parada de dados dos testes de memória",
                         "label": "Memória"
                     },
                     "mental_limit": {
-                        "hint": "Modifies mental limit",
+                        "hint": "Modifica limite mental",
                         "label": "Limite Mental"
                     },
                     "multi_defense": {
-                        "hint": "Modifies defense tests pool for multiple defenses per combat turn",
-                        "label": "Multi-Defense"
+                        "hint": "Modifica a parada de dados dos testes de defesa após várias defesas no mesmo turno de combate",
+                        "label": "Multi-Defesa"
                     },
                     "pain_tolerance_physical": {
-                        "hint": "Modifies damage to be ignored before first wound modifier",
-                        "label": "Pain Tolerance (Physical)"
+                        "hint": "Modifica danos a serem ignorados antes do primeiro modificador de ferida",
+                        "label": "Tolerância à Dor (Física)"
                     },
                     "pain_tolerance_stun": {
-                        "hint": "Modifies damage to be ignored before first wound modifier",
-                        "label": "Pain Tolerance (Stun)"
+                        "hint": "Modifica danos a serem ignorados antes do primeiro modificador de ferida",
+                        "label": "Tolerância à Dor (Stun)"
                     },
                     "physical_limit": {
-                        "hint": "Modifies physical limit",
+                        "hint": "Modifica limite físico",
                         "label": "Limite Físico"
                     },
                     "physical_overflow_track": {
-                        "hint": "Modifies physical overflow damage track",
+                        "hint": "Modifica a trilha de dano físico do transbordamento",
                         "label": "Monitor de Excesso de Dano"
                     },
                     "physical_track": {
-                        "hint": "Modifies physical damage track",
+                        "hint": "Modifica a trilha de danos físicos",
                         "label": "Monitor Físico"
                     },
                     "place_three_marks": {
-                        "hint": "Modifies the modifier to place three marks at the same time",
-                        "label": "Place Three Marks"
+                        "hint": "Modifica o modificador para colocar três marcas ao mesmo tempo",
+                        "label": "Lugar Três Marcas"
                     },
                     "place_two_marks": {
-                        "hint": "Modifies the modifier to place two marks at the same time",
-                        "label": "Place Two Marks"
+                        "hint": "Modifica o modificador para colocar duas marcas ao mesmo tempo",
+                        "label": "Lugar Duas Marcas"
                     },
                     "public_grid": {
-                        "hint": "Modifies the Public Grid modifier when connected to it",
-                        "label": "Public Grid"
+                        "hint": "Modifica o modificador da Rede Pública quando conectado a ele",
+                        "label": "Grade Pública"
                     },
                     "reach": {
-                        "hint": "Modifies reach of melee attacks",
+                        "hint": "Modifica o alcance dos ataques corpo a corpo",
                         "label": "Alcance"
                     },
                     "recoil": {
-                        "hint": "Modifies recoil tests pool",
+                        "hint": "Modifica a parada de dados dos testes de recuo",
                         "label": "Recuo"
                     },
                     "run": {
-                        "hint": "Modifies running distance by multiples of the agility attribute",
+                        "hint": "Modifica a distância de corrida por múltiplos do atributo agilidade",
                         "label": "Correr"
                     },
                     "soak": {
-                        "hint": "Modifies physical damage resist tests pool",
-                        "label": "Soak"
+                        "hint": "Modifica a parada de dados dos testes de resistência a dano físico",
+                        "label": "Embe"
                     },
                     "social_limit": {
-                        "hint": "Modifies social limit",
+                        "hint": "Modifica o limite social",
                         "label": "Limite Social"
                     },
                     "stun_track": {
-                        "hint": "Modifies stun damage track",
+                        "hint": "Modifica a trilha de dano de atordoamento",
                         "label": "Monitor de Atordoamento"
                     },
                     "walk": {
-                        "hint": "Modifies walking distance by multiples of the agility attribute",
+                        "hint": "Modifica a distância a pé por múltiplos do atributo agilidade",
                         "label": "Caminhar"
                     },
                     "wound_tolerance": {
-                        "hint": "Modifies damage per wound modifier",
+                        "hint": "Modifica dano por modificador de ferida",
                         "label": "Tolerância à Ferida"
                     }
                 },
                 "special": {
-                    "hint": "Select if the character is Awakened (mage/adept) or Emerged (technomancer)",
+                    "hint": "Selecione se o personagem está Despertado (mage/adept) ou Emerged (tecnomante)",
                     "label": "Desperto/Emergido"
                 },
                 "technomancer": {
                     "attribute": {
-                        "hint": "Attribute the Technomancer uses when resisting Fade",
+                        "hint": "Atributo usado pelo tecnomante para resistir ao enfraquecimento",
                         "label": "Atributo de Enfraq"
                     },
                     "label": "Tecnomante"
                 }
             },
-            "NoFavoritesSelected": "No favorites have been selected"
+            "NoFavoritesSelected": "Nenhum favorito foi selecionado"
         },
         "ActorTypes": {
             "Character": "Personagem",
@@ -222,50 +222,50 @@
             "FIELDS": {
                 "is_critter": {
                     "hint": "Permitir o uso de poderes de criatura",
-                    "label": "Is Critter"
+                    "label": "É Critter"
                 },
                 "is_npc": {
                     "hint": "Marque o ator como NPC para obter recursos adicionais",
-                    "label": "Is NPC"
+                    "label": "É NPC"
                 },
                 "karma": {
                     "max": {
-                        "hint": "Amount of Karma this Character has accumulated",
+                        "hint": "A quantidade de Karma que este personagem acumulou",
                         "label": "Carma de Carreira"
                     },
                     "value": {
-                        "hint": "Amount of Karma this Character has available",
-                        "label": "Current Karma"
+                        "hint": "A quantidade de Karma que este personagem tem disponível",
+                        "label": "Karma Atual"
                     }
                 },
                 "matrix_full_defense_attribute": {
-                    "hint": "Attribute to add when making a Matrix Full Defense Action",
-                    "label": "Matrix Full Defense Attribute"
+                    "hint": "Atributo a adicionar ao fazer uma Ação de Defesa Completa Matrix",
+                    "label": "Atributo de Defesa Total Matrix"
                 },
                 "metatype": {
-                    "hint": "Metatype of the Character. If an NPC, this will adjust attributes",
+                    "hint": "Metatipo do personagem. Se um NPC, isso irá ajustar atributos",
                     "label": "Metatipo"
                 },
                 "notoriety": {
-                    "hint": "The negative side of the character’s reputation",
+                    "hint": "O lado negativo da reputação do personagem",
                     "label": "Notoriedade"
                 },
                 "npc": {
                     "is_grunt": {
-                        "hint": "Apply grunt rules to this actor",
-                        "label": "Is Grunt"
+                        "hint": "Aplique regras de grunt a este ator",
+                        "label": "é Grunt"
                     }
                 },
                 "nuyen": {
-                    "hint": "Amount of Nuyen this Character has",
+                    "hint": "Quantidade de Nuyen que este personagem tem",
                     "label": "Nuyen"
                 },
                 "public_awareness": {
-                    "hint": "How well the character is known among the media, authorities, and public at large",
+                    "hint": "Quão bem o personagem é conhecido entre a mídia, autoridades e público em geral",
                     "label": "Consciência Pública"
                 },
                 "street_cred": {
-                    "hint": "A character’s lifetime accomplishments",
+                    "hint": "As realizações de um personagem ao longo da vida",
                     "label": "Crédito de Rua"
                 }
             },
@@ -286,31 +286,31 @@
             "DropActor": "Arraste e solte um ator para vinculá-lo a este contato",
             "FIELDS": {
                 "blackmail": {
-                    "hint": "You have something that can be held over the contact to get them to do business.",
+                    "hint": "Você tem algo que pode ser mantido sobre o contato para levá-los a fazer negócios.",
                     "label": "Chantagem"
                 },
                 "connection": {
-                    "hint": "This measures the contact’s influence on a scale of 1 to 12. The higher the Connection Rating, the more juice the contact has.",
+                    "hint": "Isto mede a influência do contato em uma escala de 1 a 12. Quanto maior a Classificação de Conexão, mais suco o contato tem.",
                     "label": "Conexão"
                 },
                 "family": {
-                    "hint": "Blood is always thicker than water, this is true for having family as contacts.",
+                    "hint": "O sangue é sempre mais espesso que a água, isso é verdade para ter a família como contatos.",
                     "label": "Família"
                 },
                 "group": {
-                    "hint": "Contact is a Group; could be a gang, corp, or some nerds",
+                    "hint": "O contato é um grupo; pode ser uma gangue, um corpo ou alguns nerds",
                     "label": "Grupo"
                 },
                 "linkedActor": {
-                    "hint": "Actor that this Contact represents",
+                    "hint": "Ator que este contato representa",
                     "label": "Ator"
                 },
                 "loyalty": {
-                    "hint": "This shows you how much you can trust the contact, measured on a scale of 1 to 6. The higher the Loyalty Rating, the more the contact is willing to do for you",
+                    "hint": "Isso mostra o quanto você pode confiar no contato, medido em uma escala de 1 a 6. Quanto maior a classificação de fidelidade, mais o contato está disposto a fazer por você",
                     "label": "Lealdade"
                 },
                 "type": {
-                    "hint": "Contact Type determines what kind of access they have for gear, jobs, info, etc.",
+                    "hint": "O tipo de contato determina que tipo de acesso eles têm para equipamentos, empregos, informações, etc.",
                     "label": "Tipo"
                 }
             },
@@ -318,15 +318,15 @@
             "Group": "Grupo",
             "LinkedActor": "Ator",
             "Loyalty": "Lealdade",
-            "LoyaltyConnectionHelp": "Loyalty / Connection",
-            "LoyaltyConnectionLabel": "L / C",
+            "LoyaltyConnectionHelp": "Lealidade/conexão",
+            "LoyaltyConnectionLabel": "L / L",
             "Type": "Tipo"
         },
         "InventoryRename": {
             "Cancel": "Cancelar",
-            "NewName": "New Name",
-            "Submit": "Submit",
-            "Title": "Rename Inventory"
+            "NewName": "Novo Nome",
+            "Submit": "E-mail",
+            "Title": "Renomear Inventário"
         },
         "MovementTypes": {
             "Run": "Correr",
@@ -338,7 +338,7 @@
                 "Huge": "Enorme",
                 "Large": "Grande",
                 "Medium": "Médio",
-                "Micro": "Micro",
+                "Micro": "Micro Micro",
                 "Mini": "Mini",
                 "Missile": "Míssil",
                 "Small": "Pequeno"

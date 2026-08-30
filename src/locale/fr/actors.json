@@ -5,215 +5,215 @@
                 "attributes": {
                     "edge": {
                         "base": {
-                            "hint": "Edge is a character’s luck, the favor of the gods, that unexplainable factor that allows her to beat the odds.",
+                            "hint": "Edge est un personnage de chance, la faveur des dieux, ce facteur inexplicable qui lui permet de battre les chances.",
                             "label": "Chance"
                         }
                     }
                 },
                 "category_visibility": {
                     "default": {
-                        "hint": "If empty Tabs and Inventory Categories should be visible",
-                        "label": "Show Empty Categories"
+                        "hint": "Si les onglets vides et les catégories d'inventaire doivent être visibles",
+                        "label": "Afficher les catégories vides"
                     }
                 },
                 "full_defense_attribute": {
-                    "hint": "Attribute to use when using the Full Defense interrupt action",
+                    "hint": "Attribut à utiliser lors de l'utilisation de l'action d'interruption Full Defense",
                     "label": "Attribut de défense totale"
                 },
                 "magic": {
                     "attribute": {
-                        "hint": "Attribute the Mage/Adept uses when resisting Drain",
+                        "hint": "Attribuer les Mages/Adept utilisés pour résister au drain",
                         "label": "Resister au Drain"
                     },
                     "label": "Magie"
                 },
                 "modifiers": {
                     "armor": {
-                        "hint": "Modifies total armor value",
-                        "label": "Armor"
+                        "hint": "Modifie la valeur totale de l'armure",
+                        "label": "Armure"
                     },
                     "astral_initiative": {
-                        "hint": "Modifies astral initiative base",
-                        "label": "Astral Initiative"
+                        "hint": "Modifier la base d'initiatives astrales",
+                        "label": "Initiative astrale"
                     },
                     "astral_initiative_dice": {
-                        "hint": "Modifies astral initiative dice",
-                        "label": "Astral Initiative Dice"
+                        "hint": "Modifie les dés d'initiative astrale",
+                        "label": "Délice de l'initiative Astral"
                     },
                     "astral_limit": {
-                        "hint": "Modifies astral limit",
+                        "hint": "Modifie la limite astrale",
                         "label": "Limite Astrale"
                     },
                     "composure": {
-                        "hint": "Modifies composure tests pool",
+                        "hint": "Modifie la réserve de dés des tests de sang-froid",
                         "label": "Sang-Froid"
                     },
                     "defense": {
-                        "hint": "Modifies defense tests pool",
+                        "hint": "Modifie la réserve de dés des tests de défense",
                         "label": "Défense"
                     },
                     "defense_block": {
-                        "hint": "Adds to the defense modifier for active blocking",
+                        "hint": "Ajoute au modificateur de défense pour le blocage actif",
                         "label": "Défense (Bloquer)"
                     },
                     "defense_dodge": {
-                        "hint": "Adds to the defense modifier for active dodging",
+                        "hint": "Ajoute au modificateur de défense pour l'esquive active",
                         "label": "Défense (Esquiver)"
                     },
                     "defense_melee": {
-                        "hint": "Adds to the defense modifier for melee defense",
-                        "label": "Defense (Melee)"
+                        "hint": "Ajoute au modificateur de défense en mêlée",
+                        "label": "Défense (Mélé)"
                     },
                     "defense_parry": {
-                        "hint": "Adds to the defense modifier for active parrying",
+                        "hint": "Ajoute au modificateur de défense pour la parade active",
                         "label": "Défense (Parrer)"
                     },
                     "defense_ranged": {
-                        "hint": "Adds to the defense modifier for ranged attack",
-                        "label": "Defense (Ranged)"
+                        "hint": "Ajoute au modificateur de défense contre les attaques à distance",
+                        "label": "Défense (rangée)"
                     },
                     "drain": {
-                        "hint": "Modifies drain tests pool",
-                        "label": "Drain"
+                        "hint": "Modifie la réserve de dés des tests de résistance au drain",
+                        "label": "Égoutter"
                     },
                     "essence": {
-                        "hint": "Modifies essence attribute",
+                        "hint": "Modifie l'attribut essence",
                         "label": "Essence"
                     },
                     "fade": {
-                        "hint": "Modifies fade tests pool",
+                        "hint": "Modifie la réserve de dés des tests de technodrain",
                         "label": "Technodrain"
                     },
                     "global": {
-                        "hint": "Modifies all tests pool, excluding damage reducing tests",
-                        "label": "Global"
+                        "hint": "Modifie toutes les réserves de dés, sauf celles des tests de résistance aux dégâts",
+                        "label": "Mondial"
                     },
                     "judge_intentions": {
-                        "hint": "Modifies judge intentions tests pool",
-                        "label": "Judge Intentions"
+                        "hint": "Modifie la réserve de dés des tests pour jauger les intentions",
+                        "label": "Intentions des juges"
                     },
                     "lift_carry": {
-                        "hint": "Modifies lift&carry tests pool",
-                        "label": "Lift/Carry"
+                        "hint": "Modifie la réserve de dés des tests de levage et de transport",
+                        "label": "Soulevez/convoyez"
                     },
                     "mark_damage": {
-                        "hint": "Modifies the amount of damage taken per MARK done to you",
-                        "label": "Mark Damage"
+                        "hint": "Modifie la quantité de dégâts subis par marque placée sur vous",
+                        "label": "Marquer les dommages"
                     },
                     "matrix_initiative": {
-                        "hint": "Modifies matrix initiative base",
-                        "label": "Matrix Initiative"
+                        "hint": "Modifier la base d'initiatives de matrice",
+                        "label": "Initiative Matrice"
                     },
                     "matrix_initiative_dice": {
-                        "hint": "Modifies matrix initiative dice",
-                        "label": "Matrix Initiative Dice"
+                        "hint": "Modifie les dés d'initiative matricielle",
+                        "label": "Matrice de l'initiative Die"
                     },
                     "matrix_track": {
-                        "hint": "Modifies matrix damage track",
-                        "label": "Matrix Track"
+                        "hint": "Modifie la piste de dommages de matrice",
+                        "label": "Voie de matrice"
                     },
                     "meat_initiative": {
-                        "hint": "Modifies physical initiative base",
-                        "label": "Meatspace Initiative"
+                        "hint": "Modifier la base d'initiative physique",
+                        "label": "Initiative Espace viande"
                     },
                     "meat_initiative_dice": {
-                        "hint": "Modifies physical initiative dice",
-                        "label": "Meatspace Initiative Dice"
+                        "hint": "Modifie les dés d'initiative physique",
+                        "label": "Dies de l'initiative Espace de viande"
                     },
                     "memory": {
-                        "hint": "Modifies memory tests pool",
+                        "hint": "Modifie la réserve de dés des tests de mémoire",
                         "label": "Mémoire"
                     },
                     "mental_limit": {
-                        "hint": "Modifies mental limit",
+                        "hint": "Modifie la limite mentale",
                         "label": "Limite Mentale"
                     },
                     "multi_defense": {
-                        "hint": "Modifies defense tests pool for multiple defenses per combat turn",
-                        "label": "Multi-Defense"
+                        "hint": "Modifie la réserve de dés des tests de défense après plusieurs défenses pendant un tour de combat",
+                        "label": "Multi-défense"
                     },
                     "pain_tolerance_physical": {
-                        "hint": "Modifies damage to be ignored before first wound modifier",
-                        "label": "Pain Tolerance (Physical)"
+                        "hint": "Modifie les dommages à ignorer avant la première modification de la blessure",
+                        "label": "Tolérance à la douleur (physique)"
                     },
                     "pain_tolerance_stun": {
-                        "hint": "Modifies damage to be ignored before first wound modifier",
-                        "label": "Pain Tolerance (Stun)"
+                        "hint": "Modifie les dommages à ignorer avant la première modification de la blessure",
+                        "label": "Tolérance à la douleur (arrêt)"
                     },
                     "physical_limit": {
-                        "hint": "Modifies physical limit",
+                        "hint": "Modifie la limite physique",
                         "label": "Limite Physique"
                     },
                     "physical_overflow_track": {
-                        "hint": "Modifies physical overflow damage track",
+                        "hint": "Modifie la piste de dommages physiques au débordement",
                         "label": "Moniteur de surplus physique"
                     },
                     "physical_track": {
-                        "hint": "Modifies physical damage track",
-                        "label": "Physical Track"
+                        "hint": "Modifie la piste de dommages physiques",
+                        "label": "Voie physique"
                     },
                     "place_three_marks": {
-                        "hint": "Modifies the modifier to place three marks at the same time",
-                        "label": "Place Three Marks"
+                        "hint": "Modifie le modificateur pour placer trois marques en même temps",
+                        "label": "Placez trois marques"
                     },
                     "place_two_marks": {
-                        "hint": "Modifies the modifier to place two marks at the same time",
-                        "label": "Place Two Marks"
+                        "hint": "Modifie le modificateur pour placer deux marques en même temps",
+                        "label": "Placez deux marques"
                     },
                     "public_grid": {
-                        "hint": "Modifies the Public Grid modifier when connected to it",
-                        "label": "Public Grid"
+                        "hint": "Modifie le modificateur de la grille publique lorsqu'il est connecté à celle-ci",
+                        "label": "Grille publique"
                     },
                     "reach": {
-                        "hint": "Modifies reach of melee attacks",
+                        "hint": "Modifie la portée des attaques de mêlée",
                         "label": "Allonge"
                     },
                     "recoil": {
-                        "hint": "Modifies recoil tests pool",
+                        "hint": "Modifie la réserve de dés des tests de recul",
                         "label": "Recul"
                     },
                     "run": {
-                        "hint": "Modifies running distance by multiples of the agility attribute",
+                        "hint": "Modifie la distance de fonctionnement par plusieurs de l'attribut agilité",
                         "label": "Courir"
                     },
                     "soak": {
-                        "hint": "Modifies physical damage resist tests pool",
+                        "hint": "Modifie la réserve de dés des tests de résistance aux dégâts physiques",
                         "label": "Encaisser"
                     },
                     "social_limit": {
-                        "hint": "Modifies social limit",
+                        "hint": "Modifier la limite sociale",
                         "label": "Limite Sociale"
                     },
                     "stun_track": {
-                        "hint": "Modifies stun damage track",
-                        "label": "Stun Track"
+                        "hint": "Modifie la piste de dommages assourdissante",
+                        "label": "Piste étouffée"
                     },
                     "walk": {
-                        "hint": "Modifies walking distance by multiples of the agility attribute",
+                        "hint": "Modifie la distance de marche par plusieurs de l'attribut agilité",
                         "label": "Marcher"
                     },
                     "wound_tolerance": {
-                        "hint": "Modifies damage per wound modifier",
+                        "hint": "Modifie les dommages par modificateur de blessure",
                         "label": "Tolérance aux blessures"
                     }
                 },
                 "special": {
-                    "hint": "Select if the character is Awakened (mage/adept) or Emerged (technomancer)",
+                    "hint": "Sélectionnez si le personnage est Aveilé (mage/adapté) ou Emerged (technomancer)",
                     "label": "Éveillé/Émergé"
                 },
                 "technomancer": {
                     "attribute": {
-                        "hint": "Attribute the Technomancer uses when resisting Fade",
-                        "label": "Fade Attribute"
+                        "hint": "Attribut utilisé par le technomancien pour résister au technodrain",
+                        "label": "Attribut de la faille"
                     },
                     "label": "Technomancer"
                 }
             },
-            "NoFavoritesSelected": "No favorites have been selected"
+            "NoFavoritesSelected": "Aucun favori n'a été sélectionné"
         },
         "ActorTypes": {
             "Character": "Personnage",
-            "IC": "IC",
+            "IC": "Autres",
             "Spirit": "Esprit",
             "Sprite": "Sprite",
             "Vehicle": "Vehicule"
@@ -221,51 +221,51 @@
         "Character": {
             "FIELDS": {
                 "is_critter": {
-                    "hint": "Allow the use of critter powers",
-                    "label": "Is Critter"
+                    "hint": "Permettre l'utilisation des pouvoirs de l'écaille",
+                    "label": "C'est Critter"
                 },
                 "is_npc": {
-                    "hint": "Mark actor as NPC to get additional features",
-                    "label": "Is NPC"
+                    "hint": "Marquer l'acteur comme NPC pour obtenir des fonctionnalités supplémentaires",
+                    "label": "Est-ce que NPC"
                 },
                 "karma": {
                     "max": {
-                        "hint": "Amount of Karma this Character has accumulated",
+                        "hint": "Quantité de Karma ce personnage a accumulé",
                         "label": "Karma de carrière"
                     },
                     "value": {
-                        "hint": "Amount of Karma this Character has available",
-                        "label": "Current Karma"
+                        "hint": "Quantité de Karma ce personnage a disponible",
+                        "label": "Karma actuel"
                     }
                 },
                 "matrix_full_defense_attribute": {
-                    "hint": "Attribute to add when making a Matrix Full Defense Action",
-                    "label": "Matrix Full Defense Attribute"
+                    "hint": "Attribut à ajouter lors de la réalisation d'une Matrice Action de Défense Complète",
+                    "label": "Matrice Attribut de la défense intégrale"
                 },
                 "metatype": {
-                    "hint": "Metatype of the Character. If an NPC, this will adjust attributes",
+                    "hint": "Métatype du caractère. Si un PNC, cela ajustera les attributs",
                     "label": "Métatype"
                 },
                 "notoriety": {
-                    "hint": "The negative side of the character’s reputation",
+                    "hint": "Le côté négatif du personnage , la réputation",
                     "label": "Rumeur"
                 },
                 "npc": {
                     "is_grunt": {
-                        "hint": "Apply grunt rules to this actor",
-                        "label": "Is Grunt"
+                        "hint": "Appliquer des règles de grunt à cet acteur",
+                        "label": "Est Grunt"
                     }
                 },
                 "nuyen": {
-                    "hint": "Amount of Nuyen this Character has",
+                    "hint": "Quantité de Nuyen ce caractère a",
                     "label": "Nuyen"
                 },
                 "public_awareness": {
-                    "hint": "How well the character is known among the media, authorities, and public at large",
+                    "hint": "Quelle est la notoriété de ce caractère parmi les médias, les autorités et le grand public?",
                     "label": "Renommée"
                 },
                 "street_cred": {
-                    "hint": "A character’s lifetime accomplishments",
+                    "hint": "Un personnage fait des réalisations de vie",
                     "label": "Réputation"
                 }
             },
@@ -276,57 +276,57 @@
                 "Dwarf": "Nain",
                 "Elf": "Elfe",
                 "Human": "Humain",
-                "Ork": "Ork",
+                "Ork": "Orque",
                 "Troll": "Troll"
             }
         },
         "Contact": {
             "Blackmail": "Chantage",
-            "Connection": "Connection",
-            "DropActor": "Drag&Drop an actor to link it to this contact",
+            "Connection": "Connexion",
+            "DropActor": "Faites glisser et créez un lien entre un acteur et ce contact",
             "FIELDS": {
                 "blackmail": {
-                    "hint": "You have something that can be held over the contact to get them to do business.",
+                    "hint": "Vous avez quelque chose qui peut être retenu sur le contact pour les amener à faire des affaires.",
                     "label": "Chantage"
                 },
                 "connection": {
-                    "hint": "This measures the contact’s influence on a scale of 1 to 12. The higher the Connection Rating, the more juice the contact has.",
-                    "label": "Connection"
+                    "hint": "Ceci mesure l'influence du contact sur une échelle de 1 à 12. Plus la cote de connexion est élevée, plus le contact a de jus.",
+                    "label": "Connexion"
                 },
                 "family": {
-                    "hint": "Blood is always thicker than water, this is true for having family as contacts.",
+                    "hint": "Le sang est toujours plus épais que l'eau, c'est vrai pour avoir une famille comme contacts.",
                     "label": "Famille"
                 },
                 "group": {
-                    "hint": "Contact is a Group; could be a gang, corp, or some nerds",
-                    "label": "Group"
+                    "hint": "Le contact est un groupe; peut être un gang, un corps ou quelques nerds",
+                    "label": "Groupe"
                 },
                 "linkedActor": {
-                    "hint": "Actor that this Contact represents",
+                    "hint": "Acteur que ce Contact représente",
                     "label": "Acteur"
                 },
                 "loyalty": {
-                    "hint": "This shows you how much you can trust the contact, measured on a scale of 1 to 6. The higher the Loyalty Rating, the more the contact is willing to do for you",
+                    "hint": "Cela vous montre combien vous pouvez faire confiance au contact, mesuré sur une échelle de 1 à 6. Plus la cote de fidélité est élevée, plus le contact est prêt à faire pour vous",
                     "label": "Loyauté"
                 },
                 "type": {
-                    "hint": "Contact Type determines what kind of access they have for gear, jobs, info, etc.",
+                    "hint": "Le type de contact détermine le type d'accès qu'ils ont pour les équipements, les emplois, les informations, etc.",
                     "label": "Type"
                 }
             },
             "Family": "Famille",
-            "Group": "Group",
+            "Group": "Groupe",
             "LinkedActor": "Acteur",
             "Loyalty": "Loyauté",
-            "LoyaltyConnectionHelp": "Loyalty / Connection",
-            "LoyaltyConnectionLabel": "L / C",
+            "LoyaltyConnectionHelp": "Fidélité / Connexion",
+            "LoyaltyConnectionLabel": "L/C",
             "Type": "Type"
         },
         "InventoryRename": {
             "Cancel": "Annuler",
-            "NewName": "New Name",
-            "Submit": "Submit",
-            "Title": "Rename Inventory"
+            "NewName": "Nouveau nom",
+            "Submit": "Soumettre",
+            "Title": "Renommer l'inventaire"
         },
         "MovementTypes": {
             "Run": "Courir",
@@ -334,16 +334,16 @@
         },
         "Vehicle": {
             "Categories": {
-                "Anthro": "Anthromorphic",
-                "Huge": "Huge",
-                "Large": "Large",
-                "Medium": "Medium",
+                "Anthro": "Anthrorphique",
+                "Huge": "Énorme",
+                "Large": "Grandes",
+                "Medium": "Moyenne",
                 "Micro": "Micro",
                 "Mini": "Mini",
                 "Missile": "Missile",
-                "Small": "Small"
+                "Small": "Petite"
             },
-            "Category": "Category",
+            "Category": "Catégorie",
             "ChaseEnvironment": "Environnement de poursuite",
             "Clearsight": "Vue dégagée",
             "ControlMode": "Mode Commande",
@@ -381,7 +381,7 @@
                 "OffRoadHandling": "Maniabilité (hors route)",
                 "OffRoadSpeed": "Vitesse (hors route)",
                 "Pilot": "Autopilote",
-                "Seats": "Seats",
+                "Seats": "Sièges",
                 "Sensor": "Senseur",
                 "Speed": "Vitesse"
             },
@@ -395,7 +395,7 @@
                 "Walker": "Marcheur",
                 "Water": "Véhicule nautique"
             },
-            "Vehicle": "Vehicle"
+            "Vehicle": "Véhicule"
         },
         "VehicleImport": {
             "MissingPermission": "Vous n'avez pas la permission de créer des acteurs"

@@ -2,21 +2,21 @@
     "SR5": {
         "ComplexForm": {
             "Durations": {
-                "Immediate": "Immediate",
+                "Immediate": "Imediata",
                 "Permanent": "Permanente",
                 "Sustained": "Sustentado"
             },
             "FIELDS": {
                 "duration": {
-                    "hint": "Immediate (it happens instantly with no lasting effects), Sustained (you can sustain it), or Permanent (if you sustain it for its Level in Combat Turns, its effects remain after you stop sustaining it).",
+                    "hint": "Imediata (isso acontece instantaneamente sem efeitos duradouros), Sustentada (você pode sustentá-la) ou Permanente (se você sustentá-la por seu Nível em Viradas de Combate, seus efeitos permanecem depois que você parar de sustentá-la).",
                     "label": "Duração"
                 },
                 "fade": {
-                    "hint": "The Fading Value is added to the Level chosen when threading to determine the amount of damage to be resisted",
-                    "label": "Fade"
+                    "hint": "O valor de desfading é adicionado ao nível escolhido quando rosqueamento para determinar a quantidade de dano a ser resistido",
+                    "label": "Enfraquecimento"
                 },
                 "target": {
-                    "hint": "Valid Target types for the Complex Form",
+                    "hint": "Tipos de alvo válidos para o formulário complexo",
                     "label": "Alvo"
                 }
             }
@@ -24,42 +24,42 @@
         "Grid": {
             "FIELDS": {
                 "category": {
-                    "hint": "Public Grids apply a negative modifier while connected, Local and Global Grids have no modifiers",
-                    "label": "Grid Type"
+                    "hint": "As redes públicas aplicam um modificador negativo enquanto conectadas, as redes locais e globais não têm modificadores",
+                    "label": "Tipo de grade"
                 }
             }
         },
         "Host": {
-            "Attributes": "Atributos do Central",
+            "Attributes": "Atributos do Anfitrião",
             "CustomAttributes": "Atributos Personalizados",
             "DropICActor": "Arraste e solte um ator GELO na ordem de resposta de segurança",
             "ICOrder": "Ordem GELO",
             "MissingIC": "GELO Faltando",
-            "Rating": "Nível do Central"
+            "Rating": "Nível do Anfitrião"
         },
         "IC": {
             "FIELDS": {
                 "host": {
-                    "hint": "On which host this IC is running",
-                    "label": "Central",
+                    "hint": "Em que host este IC está executando",
+                    "label": "Anfitrião",
                     "rating": {
-                        "hint": "Rating of the Host we are running on",
+                        "hint": "A classificação do anfitrião em que estamos correndo",
                         "label": "Nível"
                     }
                 },
                 "icType": {
-                    "hint": "Type of IC",
-                    "label": "IC Type"
+                    "hint": "Tipo de IC",
+                    "label": "Tipo IC"
                 }
             },
-            "MissingHost": "Arraste e solte um item central",
+            "MissingHost": "Arraste e solte um item de Anfitrião",
             "Type": "Tipo",
             "Types": {
                 "Acid": "Ácido",
                 "Binder": "Cimentador",
                 "BlackIC": "Gelo Negro",
                 "Blaster": "Disruptor",
-                "Bloodhound": "Bloodhound",
+                "Bloodhound": "Cão de Caça",
                 "BlueGoo": "Gosma Azul",
                 "Catapult": "Catapulta",
                 "Crash": "Travamento",
@@ -78,51 +78,51 @@
             }
         },
         "MatrixNetworkHackingApplication": {
-            "Icons": "Icons",
-            "Invite": "Ask for invite",
-            "Title": "Connect to Network"
+            "Icons": "Ícones",
+            "Invite": "Peça um convite",
+            "Title": "Conectar à rede"
         },
         "NetworkManager": {
-            "AvailableNetworks": "Available Networks",
-            "BruteForce": "Brute Force",
-            "ConnectedTo": "Connected To",
-            "HackOnTheFly": "Hack on the Fly",
-            "InviteMark": "Ask to Invite a Mark",
+            "AvailableNetworks": "Redes Disponíveis",
+            "BruteForce": "força bruta",
+            "ConnectedTo": "Conectado a",
+            "HackOnTheFly": "Hackear na Hora",
+            "InviteMark": "Peça para convidar uma marca",
             "NetworkType": "Tipo",
-            "NoNetwork": "Not Connected",
-            "Title": "Network Manager"
+            "NoNetwork": "Não Conectado",
+            "Title": "Gestor de Rede"
         },
         "RebootConfirmationDialog": {
             "Cancel": "Cancelar",
-            "Confirm": "Reboot",
-            "Description": "Are you sure you want to reboot this device?",
-            "Title": "Confirm Reboot"
+            "Confirm": "Reiniciar",
+            "Description": "Tem certeza que deseja reiniciar este dispositivo?",
+            "Title": "Confirmar Reboot"
         },
         "SelectMatrixNetworkDialog": {
             "Cancel": "Cancelar",
-            "Connect": "Connect",
-            "Title": "Select a Network"
+            "Connect": "Conectar",
+            "Title": "Selecione uma rede"
         },
         "Sprite": {
             "FIELDS": {
                 "level": {
-                    "hint": "Level of the Sprite",
+                    "hint": "Nível do Sprite",
                     "label": "Nível"
                 },
                 "registered": {
-                    "hint": "If the Sprite is Registered",
+                    "hint": "Se o Sprite for registrado",
                     "label": "Registrada"
                 },
                 "services": {
-                    "hint": "Number of Services the Sprite has",
+                    "hint": "Número de serviços que o Sprite tem",
                     "label": "Serviços"
                 },
                 "spriteType": {
-                    "hint": "Type of the Sprite",
+                    "hint": "Tipo de Sprite",
                     "label": "Tipo de Sprite"
                 },
                 "technomancerUuid": {
-                    "hint": "Technomancer who compiled this Sprite",
+                    "hint": "Technomancer que compilou este Sprite",
                     "label": "Tecnomante"
                 }
             },
@@ -153,12 +153,12 @@
             },
             "FIELDS": {
                 "duration": {
-                    "hint": "Duration of the Sprite Power",
+                    "hint": "Duração do poder Sprite",
                     "label": "Duração"
                 },
                 "optional": {
-                    "hint": "If the Sprite Power is Optional",
-                    "label": "Optional"
+                    "hint": "Se o poder de sprite é opcional",
+                    "label": "Opcional"
                 }
             },
             "IsOptional": "Opcionalidade",
