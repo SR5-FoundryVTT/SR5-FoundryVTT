@@ -22,7 +22,7 @@
                 },
                 "magic": {
                     "attribute": {
-                        "hint": "Atributo que o Mago/Adept usa quando resiste ao Drenamento",
+                        "hint": "Atributo que o Mago/Adepto usa ao resistir ao Dreno",
                         "label": "Atributo de Dreno"
                     },
                     "label": "Magia"
@@ -74,7 +74,7 @@
                     },
                     "drain": {
                         "hint": "Modifica a parada de dados dos testes de dreno",
-                        "label": "Drenar"
+                        "label": "Dreno"
                     },
                     "essence": {
                         "hint": "Modifica atributo essência",
@@ -90,23 +90,23 @@
                     },
                     "judge_intentions": {
                         "hint": "Modifica a parada de dados dos testes para julgar intenções",
-                        "label": "Intenções do juiz"
+                        "label": "Avaliar Intenções"
                     },
                     "lift_carry": {
                         "hint": "Modifica a parada de dados dos testes de levantar e carregar",
-                        "label": "Elevador/Carry"
+                        "label": "Levantar/Carregar"
                     },
                     "mark_damage": {
                         "hint": "Modifica a quantidade de dano recebido por MARK feito a você",
-                        "label": "Dano Marca Marca"
+                        "label": "Dano por Marca"
                     },
                     "matrix_initiative": {
-                        "hint": "Base de Iniciativa da Matrix",
-                        "label": "Iniciativa Matrix Matrix"
+                        "hint": "Modifica a base de iniciativa da Matriz",
+                        "label": "Iniciativa da Matriz"
                     },
                     "matrix_initiative_dice": {
-                        "hint": "Modifica a iniciativa matricial",
-                        "label": "Iniciativa Matrix Dados"
+                        "hint": "Modifica os dados de iniciativa da Matriz",
+                        "label": "Dados de Iniciativa da Matriz"
                     },
                     "matrix_track": {
                         "hint": "Modifica a trilha de dano da matriz",
@@ -114,11 +114,11 @@
                     },
                     "meat_initiative": {
                         "hint": "Modifica a base de iniciativa física",
-                        "label": "Iniciativa Meatspace"
+                        "label": "Iniciativa Física"
                     },
                     "meat_initiative_dice": {
                         "hint": "Modifica dados de iniciativa física",
-                        "label": "Meatspace Iniciativa Dados"
+                        "label": "Dados de Iniciativa Física"
                     },
                     "memory": {
                         "hint": "Modifica a parada de dados dos testes de memória",
@@ -154,11 +154,11 @@
                     },
                     "place_three_marks": {
                         "hint": "Modifica o modificador para colocar três marcas ao mesmo tempo",
-                        "label": "Lugar Três Marcas"
+                        "label": "Colocar Três Marcas"
                     },
                     "place_two_marks": {
                         "hint": "Modifica o modificador para colocar duas marcas ao mesmo tempo",
-                        "label": "Lugar Duas Marcas"
+                        "label": "Colocar Duas Marcas"
                     },
                     "public_grid": {
                         "hint": "Modifica o modificador da Rede Pública quando conectado a ele",
@@ -178,7 +178,7 @@
                     },
                     "soak": {
                         "hint": "Modifica a parada de dados dos testes de resistência a dano físico",
-                        "label": "Embe"
+                        "label": "Absorção"
                     },
                     "social_limit": {
                         "hint": "Modifica o limite social",
@@ -198,7 +198,7 @@
                     }
                 },
                 "special": {
-                    "hint": "Selecione se o personagem está Despertado (mage/adept) ou Emerged (tecnomante)",
+                    "hint": "Selecione se o personagem é Desperto (mago/adepto) ou Emergido (tecnomante)",
                     "label": "Desperto/Emergido"
                 },
                 "technomancer": {
@@ -231,7 +231,7 @@
                 "karma": {
                     "max": {
                         "hint": "A quantidade de Karma que este personagem acumulou",
-                        "label": "Carma de Carreira"
+                        "label": "Karma de Carreira"
                     },
                     "value": {
                         "hint": "A quantidade de Karma que este personagem tem disponível",
@@ -239,8 +239,8 @@
                     }
                 },
                 "matrix_full_defense_attribute": {
-                    "hint": "Atributo a adicionar ao fazer uma Ação de Defesa Completa Matrix",
-                    "label": "Atributo de Defesa Total Matrix"
+                    "hint": "Atributo a adicionar ao fazer uma Ação de Defesa Total na Matriz",
+                    "label": "Atributo de Defesa Total na Matriz"
                 },
                 "metatype": {
                     "hint": "Metatipo do personagem. Se um NPC, isso irá ajustar atributos",
@@ -253,7 +253,7 @@
                 "npc": {
                     "is_grunt": {
                         "hint": "Aplique regras de grunt a este ator",
-                        "label": "é Grunt"
+                        "label": "É Grunt"
                     }
                 },
                 "nuyen": {
@@ -318,14 +318,14 @@
             "Group": "Grupo",
             "LinkedActor": "Ator",
             "Loyalty": "Lealdade",
-            "LoyaltyConnectionHelp": "Lealidade/conexão",
-            "LoyaltyConnectionLabel": "L / L",
+            "LoyaltyConnectionHelp": "Lealdade / Conexão",
+            "LoyaltyConnectionLabel": "L / C",
             "Type": "Tipo"
         },
         "InventoryRename": {
             "Cancel": "Cancelar",
             "NewName": "Novo Nome",
-            "Submit": "E-mail",
+            "Submit": "Enviar",
             "Title": "Renomear Inventário"
         },
         "MovementTypes": {
@@ -338,7 +338,7 @@
                 "Huge": "Enorme",
                 "Large": "Grande",
                 "Medium": "Médio",
-                "Micro": "Micro Micro",
+                "Micro": "Micro",
                 "Mini": "Mini",
                 "Missile": "Míssil",
                 "Small": "Pequeno"

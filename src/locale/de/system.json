@@ -9,7 +9,7 @@
         }
     },
     "SETTINGS": {
-        "ApplyLimitsDescription": "Sollen Limits auf auf Würfen angewendet werden?",
+        "ApplyLimitsDescription": "Sollen Limits auf Würfen angewendet werden?",
         "ApplyLimitsName": "Verwende Limits bei Würfen",
         "AutomateMultiDefenseModifier": "Automatisiere Verteidigungsmodifikator",
         "AutomateMultiDefenseModifierDescription": "Automatische Anwendung des Verteidigungsmodifikators, wenn man mehrfach pro Runde angegriffen wird.",
@@ -83,7 +83,7 @@
     "TYPES": {
         "Actor": {
             "character": "Charakter",
-            "ic": "WISSENSCHAFT",
+            "ic": "IC",
             "spirit": "Geist",
             "sprite": "Sprite",
             "vehicle": "Fahrzeug/Drohne"
@@ -93,7 +93,7 @@
             "adept_power": "Adeptenkraft",
             "ammo": "Munition",
             "armor": "Panzerung",
-            "bioware": "Biomaterial",
+            "bioware": "Bioware",
             "call_in_action": "Beschwören/Kompilieren",
             "complex_form": "Komplexe Form",
             "contact": "Kontakt",
@@ -103,14 +103,14 @@
             "echo": "Echo",
             "equipment": "Ausrüstung",
             "grid": "Gitter",
-            "host": "Rechner",
+            "host": "Host",
             "lifestyle": "Lebensstil",
             "metamagic": "Metamagie",
             "modification": "Modifikation",
             "program": "Programm",
             "quality": "Vor-/Nachteil",
             "ritual": "Ritual",
-            "sin": "SEIN",
+            "sin": "SIN",
             "skill": "Fertigkeit",
             "spell": "Zauberspruch",
             "sprite_power": "Spritekraft",

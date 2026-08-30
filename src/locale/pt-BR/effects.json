@@ -37,23 +37,23 @@
                 },
                 "selection_attributes": {
                     "hint": "Filtrar o teste com base nos atributos utilizados",
-                    "label": "Atributos Filtro"
+                    "label": "Filtro de Atributos"
                 },
                 "selection_categories": {
                     "hint": "Filtrar o teste baseado na Categoria de Ação usada",
-                    "label": "Categorias de Ação Filtro"
+                    "label": "Filtro de Categorias de Ação"
                 },
                 "selection_limits": {
                     "hint": "Filtrar o teste com base no Limite utilizado",
-                    "label": "Limites Filtro"
+                    "label": "Filtro de Limites"
                 },
                 "selection_skills": {
-                    "hint": "Filtrar o teste com base nas habilidades utilizadas",
-                    "label": "Habilidades Habilidades Filter"
+                    "hint": "Filtrar o teste com base nas perícias utilizadas",
+                    "label": "Filtro de Perícias"
                 },
                 "selection_tests": {
                     "hint": "Filtrar o teste com base nos Testes utilizados",
-                    "label": "Testes Filtro"
+                    "label": "Filtro de Testes"
                 },
                 "targetName": {
                     "label": "Nome do Alvo"

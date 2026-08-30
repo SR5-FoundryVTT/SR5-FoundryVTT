@@ -5,7 +5,7 @@
             "AddictionMental": "Vício Mental",
             "AddictionPhysical": "Vício Físico",
             "Attack": "Ações de Ataque",
-            "AttackMatrix": "Matrix ataque",
+            "AttackMatrix": "Ataque na Matriz",
             "AttackMelee": "Ataque Corpo a Corpo",
             "AttackRanged": "Ataque à Distância",
             "AttackThrown": "Ataque de Arremesso",
@@ -14,7 +14,7 @@
             "Compiling": "Ações de Compilação",
             "ComplexForm": "Ações de Forma Complexa",
             "Defense": "Ações de Defesa",
-            "DefenseMatrix": "Matriz de Defesa",
+            "DefenseMatrix": "Defesa na Matriz",
             "DefenseSuppression": "Supressão de Defesa",
             "Drain": "Ações de Dreno",
             "Fade": "Ações de Enfraquecimento",
@@ -25,9 +25,9 @@
             "RecoveryPhysical": "Recuperação Física",
             "RecoveryStun": "Recuperação de Atordoamento",
             "Resist": "Ações de Resistência",
-            "ResistBiofeedback": "Resista Biofeedback",
+            "ResistBiofeedback": "Resistir Biofeedback",
             "ResistDisease": "Resistindo à Doença",
-            "ResistMatrix": "Resista Matrix",
+            "ResistMatrix": "Resistir Matriz",
             "ResistToxin": "Resistindo à Toxina",
             "Resonance": "Ações de Ressonância",
             "Rigging": "Ações de Fusor",
@@ -81,7 +81,7 @@
                     }
                 }
             },
-            "Summon": "Invo",
+            "Summon": "Invocar",
             "Summoning": "Invocação"
         },
         "ExtendedTestManager": {
@@ -215,7 +215,7 @@
             "AstralLimit": "Limite Astral",
             "BackgroundCount": "Contagem de Antecedentes",
             "Composure": "Compostura",
-            "ControlRigRating": "Avaliação do Rig de Controle",
+            "ControlRigRating": "Nível do Control Rig",
             "Defense": "Defesa",
             "DefenseBlock": "Defesa (Bloqueio)",
             "DefenseDodge": "Defesa (Esquiva)",
@@ -258,7 +258,7 @@
             "SocialLimit": "Limite Social",
             "StunTrack": "Monitor de Atordoamento",
             "ThreeMarks": "Três Marcas",
-            "TwoMarks": "Duas marcas",
+            "TwoMarks": "Duas Marcas",
             "Walk": "Caminhar",
             "WoundTolerance": "Tolerância à Ferida",
             "Wounds": "Feridas"
@@ -267,38 +267,38 @@
             "FIELDS": {
                 "type": {
                     "label": "Tipo",
-                    "hint": "Define que tipo de configurações de habilidades estão disponíveis"
+                    "hint": "Define que tipo de configurações de perícia estão disponíveis"
                 },
                 "skill": {
                     "category": {
                         "label": "Categoria",
-                        "hint": "Categoria desta habilidade"
+                        "hint": "Categoria desta perícia"
                     },
                     "knowledgeType": {
                         "label": "Tipo de conhecimento",
-                        "hint": "Tipo de habilidade de conhecimento"
+                        "hint": "Tipo de perícia de conhecimento"
                     },
                     "rating": {
                         "label": "Nível",
-                        "hint": "Classificação desta entrada"
+                        "hint": "Nível desta perícia"
                     },
                     "defaulting": {
                         "label": "Padrão",
-                        "hint": "Se esta habilidade pode ser inadi"
+                        "hint": "Se esta perícia pode ser usada sem treinamento"
                     },
                     "attribute": {
                         "label": "Atributo",
-                        "hint": "Atributo utilizado por esta habilidade"
+                        "hint": "Atributo utilizado por esta perícia"
                     },
                     "limit": {
                         "attribute": {
                             "label": "Limite",
-                            "hint": "Limite de uso para esta ação de habilidade. Deixe vazio para usar o limite de atributo padrão."
+                            "hint": "Limite a usar para esta ação de perícia. Deixe vazio para usar o limite de atributo padrão."
                         }
                     },
                     "specializations": {
                         "label": "Especialização",
-                        "hint": "Especialização para esta habilidade, se houver"
+                        "hint": "Especialização para esta perícia, se houver"
                     },
                     "language": {
                         "isNative": {
@@ -308,62 +308,62 @@
                     },
                     "requirement": {
                         "label": "Exigência",
-                        "hint": "O que o ator deve ser para que essa habilidade esteja disponível"
+                        "hint": "O que o ator deve ser para que esta perícia esteja disponível"
                     }
                 },
                 "group": {
-                    "label": "Grupo de Habilidade",
-                    "hint": "Configuração para um grupo de habilidades",
+                    "label": "Grupo de Perícias",
+                    "hint": "Configuração para um grupo de perícias",
                     "skills": {
                         "label": "Perícias",
-                        "hint": "Habilidades que fazem parte deste grupo"
+                        "hint": "Perícias que fazem parte deste grupo"
                     },
                     "rating": {
                         "label": "Nível",
-                        "hint": "Classificação deste grupo de habilidades"
+                        "hint": "Nível deste grupo de perícias"
                     }
                 },
                 "set": {
-                    "label": "Conjunto de habilidades",
-                    "hint": "Configuração para um conjunto de habilidades",
+                    "label": "Conjunto de Perícias",
+                    "hint": "Configuração para um conjunto de perícias",
                     "default": {
                         "label": "Uso em novos atores",
-                        "hint": "Adicionar este conjunto de habilidades aos atores recém-criados"
+                        "hint": "Adicionar este conjunto de perícias aos atores recém-criados"
                     },
                     "skills": {
                         "label": "Perícias",
-                        "hint": "Habilidades que fazem parte deste conjunto",
+                        "hint": "Perícias que fazem parte deste conjunto",
                         "name": {
                             "label": "Nome",
-                            "hint": "Nome da habilidade"
+                            "hint": "Nome da perícia"
                         },
                         "rating": {
                             "label": "Nível",
-                            "hint": "Esta qualificação desta habilidade"
+                            "hint": "Nível desta perícia"
                         },
                         "specializations": {
                             "label": "Especialização",
-                            "hint": "Especializações concedidas a esta habilidade quando o conjunto é aplicado"
+                            "hint": "Especializações concedidas a esta perícia quando o conjunto é aplicado"
                         }
                     },
                     "groups": {
-                        "label": "Grupos de Habilidade",
-                        "hint": "Grupos de habilidades que fazem parte deste conjunto",
+                        "label": "Grupos de Perícias",
+                        "hint": "Grupos de perícias que fazem parte deste conjunto",
                         "name": {
                             "label": "Nome",
-                            "hint": "Nome do grupo de habilidades"
+                            "hint": "Nome do grupo de perícias"
                         },
                         "rating": {
                             "label": "Nível",
-                            "hint": "Classificação deste grupo de habilidades"
+                            "hint": "Nível deste grupo de perícias"
                         }
                     }
                 }
             },
             "Types": {
                 "Skill": "Perícia",
-                "Group": "Grupo de Habilidade",
-                "Set": "Conjunto de habilidades"
+                "Group": "Grupo de Perícias",
+                "Set": "Conjunto de Perícias"
             },
             "Category": {
                 "Active": "Ativo",
@@ -451,7 +451,7 @@
             "RitualSpellcasting": "Conjuração Ritual",
             "Running": "Corrida",
             "Skill": "Perícia",
-            "SkillGroup": "Grupo de Habilidade",
+            "SkillGroup": "Grupo de Perícias",
             "Skills": "Perícias",
             "Sneaking": "Esgueirar",
             "Software": "Software",
@@ -469,7 +469,7 @@
             "Tracking": "Rastreamento",
             "UnarmedCombat": "Combate Desarmado",
             "abbr": {
-                "Native": "E"
+                "Native": "N"
             }
         },
         "TestResults": {
@@ -501,7 +501,7 @@
         "Tests": {
             "AttributeOnlyTest": "Teste Apenas de Atributo",
             "BiofeedbackResistTest": "Resistência a Biofeedback",
-            "BruteForceTest": "força bruta",
+            "BruteForceTest": "Força Bruta",
             "CheckOverwatchScoreTest": "Verificar Pontuação de Vigilância",
             "CombatSpellDefenseTest": "Defesa de Feitiço de Combate",
             "CompileSpriteTest": "Compilar Sprite",
@@ -512,13 +512,13 @@
             "ExtendedTest": "Teste Estendido",
             "FadeTest": "Teste de Enfraquecimento",
             "HackOnTheFlyTest": "Hackear na Hora",
-            "MatrixDefenseTest": "Defesa Matrix",
-            "MatrixResistTest": "Resista a Dano Matrix",
+            "MatrixDefenseTest": "Defesa da Matriz",
+            "MatrixResistTest": "Resistir a Dano da Matriz",
             "MatrixTest": "Teste de Matriz",
             "MeleeAttackTest": "Ataque de Arma Corpo a Corpo",
             "NaturalRecoveryPhysicalTest": "Recuperação Natural Física",
             "NaturalRecoveryStunTest": "Recuperação Natural de Atordoamento",
-            "OpposedBruteForceTest": "Força Bruta Oposta",
+            "OpposedBruteForceTest": "Teste Oposto de Força Bruta",
             "OpposedCheckOverwatchScoreTest": "Teste Oposto de Pontuação de Vigilância",
             "OpposedCompileSpriteTest": "Opor à Compilação",
             "OpposedHackOnTheFlyTest": "Teste Oposto de Hackear na Hora",

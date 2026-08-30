@@ -6,7 +6,7 @@
                     "edge": {
                         "base": {
                             "hint": "Edge is das Glück des Characters, der unerklärbare Faktor, der ihm hilft, in kritischen Situationen zu bestehen.",
-                            "label": "Rand"
+                            "label": "Edge"
                         }
                     }
                 },
@@ -213,7 +213,7 @@
         },
         "ActorTypes": {
             "Character": "Charakter",
-            "IC": "WISSENSCHAFT",
+            "IC": "IC",
             "Spirit": "Geist",
             "Sprite": "Sprite",
             "Vehicle": "Fahrzeug"
@@ -274,7 +274,7 @@
             },
             "Types": {
                 "Dwarf": "Zwerg",
-                "Elf": "Elfe",
+                "Elf": "Elf",
                 "Human": "Mensch",
                 "Ork": "Ork",
                 "Troll": "Troll"
@@ -345,19 +345,19 @@
             },
             "Category": "Kategorie",
             "ChaseEnvironment": "Verfolgungsumgebung",
-            "Clearsight": "Freilicht",
+            "Clearsight": "Clearsight",
             "ControlMode": "Steuermodus",
             "ControlModes": {
                 "Autopilot": "Autopilot",
                 "Manual": "Manuell",
                 "Remote": "Fern",
-                "Rigger": "Riegel"
+                "Rigger": "Rigger"
             },
             "Driver": "Fahrer",
             "DamagedVehicle": "Beschädigtes Fahrzeug",
             "Drone": "Drohne",
             "Environments": {
-                "Handling": "Handhabung",
+                "Handling": "Handling",
                 "Speed": "Geschwindigkeit"
             },
             "IsDrone": "Ist Drohne",
@@ -365,7 +365,7 @@
             "Maneuvering": "Manövrieren",
             "MissingDriver": "Fahrer per Drag&Drop zufügen",
             "ModificationCategoryTypes": {
-                "body": "Körper",
+                "body": "Karosserie",
                 "cosmetic": "Kosmetisch",
                 "electromagnetic": "Elektromagnetisch",
                 "powertrain": "Antriebsstrang",
@@ -376,7 +376,7 @@
             "OnRoad": "Auf Straße",
             "Stats": {
                 "Acceleration": "Beschleunigung",
-                "Handling": "Handhabung",
+                "Handling": "Handling",
                 "OffRoadAcceleration": "Beschleunigung (Gelände)",
                 "OffRoadHandling": "Handling (Gelände)",
                 "OffRoadSpeed": "Geschw. (Gelände)",
@@ -402,7 +402,7 @@
         },
         "Vision": {
             "AstralPerception": "Astrale Wahrnehmung",
-            "AugmentedReality": "Erweiterte Realität",
+            "AugmentedReality": "Augmented Reality",
             "LowLight": "Restlistverstärkung",
             "ThermographicVision": "Infrarotsicht"
         }

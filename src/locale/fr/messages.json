@@ -3,7 +3,7 @@
         "Dialogs": {
             "Common": {
                 "Cancel": "Annuler",
-                "Ok": "Très bien."
+                "Ok": "OK"
             },
             "RangedWeaponTest": {
                 "EnvironmentalOverwriteSet": "Les modificateurs environnementals ont été déterminés à une valeur fixe"
@@ -11,8 +11,8 @@
         },
         "Errors": {
             "CantConnectICToGrid": "Les acteurs IC ne peuvent pas être connectés à un réseau de réseau",
-            "CantConnectToPAN": "Le document ne peut pas être ajouté au réseau PAN",
-            "CantConnectToWAN": "Le document ne peut pas être ajouté au réseau WAN",
+            "CantConnectToPAN": "Le document ne peut pas être ajouté au PAN",
+            "CantConnectToWAN": "Le document ne peut pas être ajouté au WAN",
             "CantEditAppliedItemEffects": "Vous ne pouvez pas modifier un effet actif qui a été appliqué par un élément.",
             "CantExecuteTest": "Vous ne pouvez pas effectuer ce test. Vous êtes peut-être un joueur ou ne disposez pas des autorisations nécessaires.",
             "DefaultInventoryCantBeRemoved": "L'inventaire par défaut ne peut pas être supprimé",
@@ -22,7 +22,7 @@
             "MarkCouldNotBePlaced": "Erreur interne : vos marques ne peuvent pas être placées.",
             "MarksCantBePlacedBy": "Seuls les personnages peuvent placer des marques.",
             "MarksCantBePlacedOn": "Le type d'acteur choisi ne peut recevoir aucune marque.",
-            "MarksCantBePlacedWithoutPersona": "L'acteur choisi n'a pas de personnage actif.",
+            "MarksCantBePlacedWithoutPersona": "L'acteur choisi n'a pas de persona active.",
             "MasterDeviceIsMissing": "Le dispositif principal est manquant. Retour aux valeurs locales du dispositif.",
             "MissingSkill": "Le personnage n'a pas la compétence demandée",
             "NoAvailableActorFound": "Aucun acteur disponible n'a été trouvé pour cette action",
@@ -39,7 +39,7 @@
         },
         "MissingRessource": {
             "Ammo": "Pas assez de munitions pour tirer",
-            "Edge": "Pas de bord laissé à consommer",
+            "Edge": "Plus de Chance à dépenser",
             "Initiative": "Pas assez de score d'initiative",
             "SomeAmmo": "Pas assez de munitions pour tirer en mode sélectionné, modificateurs de mode seront réduits.",
             "SomeAmmoMelee": "Il ne reste plus assez de munitions pour faire une attaque à la mêlée"
@@ -63,13 +63,13 @@
             "AlreadyJoinedNetwork": "{name} a déjà rejoint ce réseau",
             "BulkImportPerformanceWarning": "Si vous importez un grand nombre d'articles, Foundry peut fonctionner lentement jusqu'à ce que vous rafraîchissez votre navigateur. Il est recommandé de rafraîchir maintenant.",
             "CantEditDefaultInventory": "L'inventaire par défaut ne peut pas être renommé",
-            "CantExtendTest": "Le type d'essai ne peut pas être prolongé.",
+            "CantExtendTest": "Ce type de test ne peut pas être prolongé.",
             "CantExtendTestFurther": "Le test ne peut plus être prolongé : aucune réserve de dés restante ou seuil déjà atteint",
             "CantRecoverPhysicalWithStunDamage": "Cant récupérer des dommages physiques avec des dommages étourdissants encore présents",
             "CantReloadAtAllDueToAmmo": "Il ne vous reste plus de munitions !",
             "CantReloadFullyDueToAmmo": "Vous n'aviez pas assez de munitions pour recharger complètement !",
             "CantReloadPartialDueToAmmo": "Vous n'aviez pas assez de munitions pour une opération de recharge complexe !",
-            "CantReloadWithoutSpareClip": "Vous n'avez plus de trombones de rechange !",
+            "CantReloadWithoutSpareClip": "Vous n'avez plus de chargeurs de rechange !",
             "CantSecondChanceAGlitch": "On ne peut pas avoir la deuxième chance de passer ce test.",
             "CantSecondChanceWithoutNoneHits": "Impossible d'utiliser Seconde chance sur ce test : aucun dé sans succès ne reste.",
             "CantSpendMulitplePointsOfEdge": "Ne peut pas dépenser plusieurs points de bord sur un seul test ou action",
@@ -79,11 +79,11 @@
             "HostItemOnlyAcceptIC": "Seuls les acteurs IC peuvent être ajoutés aux hôtes",
             "InvalidCompilationLevel": "L'attribut Résonance est trop faible pour ce niveau de sprite",
             "InvalidMarksCount": "Vous avez essayé de placer un nombre étrange de marques",
-            "InvalidSummoningForce": "Forcer la valeur choisie ne respecte pas les règles",
+            "InvalidSummoningForce": "La valeur de Force choisie ne respecte pas les règles",
             "NegativeLimitValue": "Les valeurs des limites doivent être supérieures à 0",
             "NoFireModeConfigured": "L'arme à tir n'est pas configurée. Elle utilise un seul tir.",
             "NoActorCreatePermission": "Vous n'avez pas la permission de créer des acteurs.",
-            "OnlyGMCanDoThis": "Seul un utilisateur de GM peut le faire",
+            "OnlyGMCanDoThis": "Seul un MJ peut faire cela",
             "RitualInvalidForce": "La force rituelle est invalide ou plus que votre classement de loges.",
             "RitualNotConcluded": "Le Rituel a échoué. En attente du jeu du rituel pour déterminer le drain.",
             "RitualNotEnoughReagents": "Pas assez de réactifs offerts.",

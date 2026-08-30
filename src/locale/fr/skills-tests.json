@@ -1,44 +1,44 @@
 {
     "SR5": {
         "ActionCategory": {
-            "Addiction": "Actions en matière de toxicomanie",
+            "Addiction": "Actions de dépendance",
             "AddictionMental": "Dépendance mentale",
             "AddictionPhysical": "Dépendance physique",
             "Attack": "Actions d'attaque",
-            "AttackMatrix": "Matrice d'attaque",
-            "AttackMelee": "Attaque Melee",
-            "AttackRanged": "Attaque portée",
+            "AttackMatrix": "Attaque matricielle",
+            "AttackMelee": "Attaque de mêlée",
+            "AttackRanged": "Attaque à distance",
             "AttackThrown": "Attaque lancée",
-            "BruteForce": "Force de frappe de matrice",
+            "BruteForce": "Force brute",
             "Climbing": "Actions d'escalade",
-            "Compiling": "Compilation des actions",
-            "ComplexForm": "Actions complexes",
+            "Compiling": "Actions de compilation",
+            "ComplexForm": "Actions de formes complexes",
             "Defense": "Actions de défense",
-            "DefenseMatrix": "Matrice de défense",
-            "DefenseSuppression": "répression de la défense",
-            "Drain": "Actions de drainage",
+            "DefenseMatrix": "Défense matricielle",
+            "DefenseSuppression": "Défense contre tir de suppression",
+            "Drain": "Actions de Drain",
             "Fade": "Actions de technodrain",
-            "HackOnTheFly": "Piratage à la volée matriciel",
+            "HackOnTheFly": "Piratage à la volée",
             "Magic": "Actions magiques",
             "Matrix": "Actions matricielles",
-            "Recovery": "Actions de redressement",
-            "RecoveryPhysical": "Récupération",
-            "RecoveryStun": "Stun de récupération",
+            "Recovery": "Actions de récupération",
+            "RecoveryPhysical": "Récupération physique",
+            "RecoveryStun": "Récupération étourdissante",
             "Resist": "Actions de résistance",
-            "ResistBiofeedback": "Résiste Biofeedback",
-            "ResistDisease": "Maladies persistantes",
-            "ResistMatrix": "Résiste à la matrice",
-            "ResistToxin": "Résistant à la toxines",
+            "ResistBiofeedback": "Résistance au biofeedback",
+            "ResistDisease": "Résistance aux maladies",
+            "ResistMatrix": "Résistance matricielle",
+            "ResistToxin": "Résistance aux toxines",
             "Resonance": "Actions de résonance",
-            "Rigging": "Actions de réglage",
+            "Rigging": "Actions de rigging",
             "Social": "Actions sociales",
-            "SpellCombat": "Combat par sort",
-            "SpellDetection": "Détection de la diffusion orthographique",
-            "SpellHealing": "Guérison par sort",
-            "SpellIllusion": "Illusion de la diffusion orthographique",
-            "SpellManipulation": "Manipulation par projection orthographique",
-            "SpellRitual": "Rituel de diffusion orthographique",
-            "Summoning": "Invoquer des actions"
+            "SpellCombat": "Sort de combat",
+            "SpellDetection": "Sort de détection",
+            "SpellHealing": "Sort de guérison",
+            "SpellIllusion": "Sort d'illusion",
+            "SpellManipulation": "Sort de manipulation",
+            "SpellRitual": "Rituel",
+            "Summoning": "Actions d'invocation"
         },
         "ActionType": {
             "Label": "Type",
@@ -63,7 +63,7 @@
                 "spirit": {
                     "force": {
                         "hint": "Force de l'esprit à invoquer. Désactivé si un acteur esprit est défini",
-                        "label": "Forcer"
+                        "label": "Force"
                     },
                     "type": {
                         "hint": "Type d'esprit à invoquer. Désactivé si un acteur esprit est défini",
@@ -150,7 +150,7 @@
             "NewTest": "Test étendu",
             "NoActor": "Aucun",
             "NoTests": "Aucun test étendu à afficher.",
-            "Notes": "Annexe",
+            "Notes": "Notes",
             "NotesPlaceholder": "Texte libre sur ce test. Recherchable.",
             "Notifications": {
                 "Completed": "Test étendu « {name} » terminé !",
@@ -213,18 +213,18 @@
             "AstralDice": "Dés init. Astrale",
             "AstralInit": "Init. Astral",
             "AstralLimit": "Limite Astrale",
-            "BackgroundCount": "Compte de l ' historique",
+            "BackgroundCount": "Bruit de fond",
             "Composure": "Sang-Froid",
-            "ControlRigRating": "Cote du dispositif de contrôle",
+            "ControlRigRating": "Indice du Control Rig",
             "Defense": "Défense",
             "DefenseBlock": "Défense (Bloquer)",
             "DefenseDodge": "Défense (Esquiver)",
-            "DefenseMelee": "Défense (Mélé)",
+            "DefenseMelee": "Défense (mêlée)",
             "DefenseMulti": "Défense (Multi)",
             "DefenseParry": "Défense (Parrer)",
-            "DefenseRanged": "Défense (rangée)",
+            "DefenseRanged": "Défense (distance)",
             "DifferentGrid": "Grille différente",
-            "Drain": "Égoutter",
+            "Drain": "Drain",
             "Environmental": "Environnemental",
             "EnvironmentalLight": "Environnemental (Lumière)",
             "EnvironmentalRange": "Environnemental (Portée)",
@@ -232,14 +232,14 @@
             "EnvironmentalWind": "Environnemental (Vent)",
             "Essence": "Essence",
             "Fade": "Technodrain",
-            "Global": "Mondial",
-            "JudgeIntentions": "J. Objectifs",
+            "Global": "Global",
+            "JudgeIntentions": "J. Intentions",
             "LiftCarry": "Soulever&Porter",
-            "MarkDamage": "Par marque",
+            "MarkDamage": "Dégâts par marque",
             "Marks": "Marques",
             "MatrixDice": "Dés init. Matrice",
             "MatrixInit": "Init. Matrice",
-            "MatrixTrack": "Voie de matrice",
+            "MatrixTrack": "Moniteur matriciel",
             "MeatSpaceDice": "Dés init. terrestre",
             "MeatSpaceInit": "Init. terrestre",
             "Memory": "Mémoire",
@@ -276,11 +276,11 @@
                     },
                     "knowledgeType": {
                         "label": "Type de connaissances",
-                        "hint": "Type de compétences"
+                        "hint": "Type de compétence de connaissance"
                     },
                     "rating": {
                         "label": "Indice",
-                        "hint": "Note de cette rubrique"
+                        "hint": "Indice de cette compétence"
                     },
                     "defaulting": {
                         "label": "Par défaut",
@@ -302,12 +302,12 @@
                     },
                     "language": {
                         "isNative": {
-                            "label": "Maternelle",
+                            "label": "Langue maternelle",
                             "hint": "Marque cette langue comme native"
                         }
                     },
                     "requirement": {
-                        "label": "Besoin",
+                        "label": "Prérequis",
                         "hint": "Ce que l'acteur doit être pour que cette compétence soit disponible"
                     }
                 },
@@ -320,7 +320,7 @@
                     },
                     "rating": {
                         "label": "Indice",
-                        "hint": "Évaluation de ce groupe de compétences"
+                        "hint": "Indice de ce groupe de compétences"
                     }
                 },
                 "set": {
@@ -339,7 +339,7 @@
                         },
                         "rating": {
                             "label": "Indice",
-                            "hint": "Évaluation de cette compétence"
+                            "hint": "Indice de cette compétence"
                         },
                         "specializations": {
                             "label": "Spécialisation",
@@ -355,7 +355,7 @@
                         },
                         "rating": {
                             "label": "Indice",
-                            "hint": "Évaluation de ce groupe de compétences"
+                            "hint": "Indice de ce groupe de compétences"
                         }
                     }
                 }
@@ -379,7 +379,7 @@
             "Groups": {},
             "Sets": {},
             "Set": {
-                "LogActorDifferences": "Différences entre les acteurs du journal",
+                "LogActorDifferences": "Journaliser les différences de l'acteur",
                 "DifferencesLoggedInConsole": "Ouvrez votre console de navigateur pour afficher les différences"
             },
             "AeronauticsMechanic": "Mécanique aéronautique",
@@ -422,7 +422,7 @@
             "FreeFall": "Chute libre",
             "Gunnery": "Armes de véhicules",
             "Gymnastics": "Gymnastique",
-            "Hacking": "Piratage",
+            "Hacking": "Hacking",
             "Hardware": "Matériel électronique",
             "HeavyWeapons": "Armes lourdes",
             "Impersonation": "Imposture",
@@ -433,7 +433,7 @@
             "Locksmith": "Serrurerie",
             "Longarms": "Fusils",
             "Medicine": "Médecine",
-            "Native": "Maternelle",
+            "Native": "Langue maternelle",
             "NauticalMechanic": "Mécanique nautique",
             "Navigation": "Orientation",
             "Negotiation": "Négotiation",
@@ -460,10 +460,10 @@
             "Survival": "Survie",
             "Swimming": "Natation",
             "Teamwork": {
-                "Glitched": "Glissé",
-                "ParticipantActor": "Choisir l'acteur",
-                "RollIt": "Roule-le.",
-                "TakePart": "Participez"
+                "Glitched": "Complication",
+                "ParticipantActor": "Choisir un acteur",
+                "RollIt": "Lancer les dés",
+                "TakePart": "Participer"
             },
             "ThrowingWeapons": "Armes de jet",
             "Tracking": "Pistage",
@@ -475,23 +475,23 @@
         "TestResults": {
             "AttackBlockedByHardenedArmor": "L'attaque frappe mais est bloquée par un armement durci",
             "AttackBlockedByVehicleArmor": "L'attaque frappe mais est bloquée par l'armure de véhicule",
-            "AttackDodged": "Attaque d'un point de vue d'ordre général",
+            "AttackDodged": "Attaque esquivée",
             "AttackDoesNoPhysicalDamageToVehicle": "Attaque frappe mais ne porte pas de dommages physiques au véhicule",
-            "AttackHits": "Coups de feu",
+            "AttackHits": "Succès de l'attaque",
             "AttackResisted": "Résisté à l'attaque",
-            "BruteForceFailure": "Brute Force a échoué !",
-            "BruteForceSuccess": "Brute Force réussi !",
+            "BruteForceFailure": "Échec de la Force brute !",
+            "BruteForceSuccess": "Force brute réussie !",
             "CheckOverwatchScoreFailure": "Échec de la vérification de l'indice de surveillance !",
             "CheckOverwatchScoreSuccess": "Vérification de l'indice de surveillance réussie !",
             "Failure": "Échec !",
             "HackOnTheFlyFailure": "Échec du piratage à la volée !",
             "HackOnTheFlySuccess": "Piratage à la volée réussi !",
             "ResistedAllDamage": "Pas de dégâts !",
-            "ResistedSomeDamage": "Dommages pris !",
+            "ResistedSomeDamage": "Dégâts subis !",
             "Results": "Résultats",
-            "RitualFailure": "Le rituel était trop fort pour toi.",
+            "RitualFailure": "Le rituel était trop puissant pour vous.",
             "RitualSuccess": "Le rituel est scellé",
-            "SoakBlockedByHardenedArmor": "Bloqué par un armement durci",
+            "SoakBlockedByHardenedArmor": "Bloqué par une armure durcie",
             "SpiritSummonFailure": "L'esprit s'est enfui !",
             "SpiritSummonSuccess": "Esprit appelé !",
             "SpriteCompilationFailure": "Sprite s'est enfui !",
@@ -499,22 +499,22 @@
             "Success": "Succès !"
         },
         "Tests": {
-            "AttributeOnlyTest": "Essai de l'attribut uniquement",
-            "BiofeedbackResistTest": "Résiste au biofeedback",
+            "AttributeOnlyTest": "Test d'attribut seul",
+            "BiofeedbackResistTest": "Résistance au biofeedback",
             "BruteForceTest": "Force brute",
-            "CheckOverwatchScoreTest": "Vérifier l'indice de surveillance",
+            "CheckOverwatchScoreTest": "Vérifier l'Indice de Surveillance",
             "CombatSpellDefenseTest": "Défense contre un sort de combat",
             "CompileSpriteTest": "Compiler le sprite",
-            "ComplexFormTest": "Forme complexe de filetage",
-            "DrainTest": "Essai d'évacuation",
-            "DroneInfiltrationTest": "Essai d'infiltration de drone",
-            "DronePerceptionTest": "Essai de perception du drone",
+            "ComplexFormTest": "Tissage de forme complexe",
+            "DrainTest": "Test de Drain",
+            "DroneInfiltrationTest": "Test d'infiltration de drone",
+            "DronePerceptionTest": "Test de perception de drone",
             "ExtendedTest": "Test étendu",
-            "FadeTest": "Test de technodrain",
+            "FadeTest": "Test de Technodrain",
             "HackOnTheFlyTest": "Piratage à la volée",
-            "MatrixDefenseTest": "Défense des matrices",
-            "MatrixResistTest": "Résiste aux dommages de la matrice",
-            "MatrixTest": "Essai de matrice",
+            "MatrixDefenseTest": "Défense matricielle",
+            "MatrixResistTest": "Résistance aux dégâts matriciels",
+            "MatrixTest": "Test matriciel",
             "MeleeAttackTest": "Attaque arme de mélée",
             "NaturalRecoveryPhysicalTest": "Récupération naturelle Physique",
             "NaturalRecoveryStunTest": "Stun de récupération naturelle",
@@ -522,18 +522,18 @@
             "OpposedCheckOverwatchScoreTest": "Test opposé de l'indice de surveillance",
             "OpposedCompileSpriteTest": "Compilation des oppositions",
             "OpposedHackOnTheFlyTest": "Test opposé de piratage à la volée",
-            "OpposedMatrixTest": "Essai de la matrice opposée",
+            "OpposedMatrixTest": "Test matriciel opposé",
             "OpposedRitualTest": "Scellez le rituel",
             "OpposedSummonSpiritTest": "Invocation de la contestation",
             "OpposedTest": "Test opposé",
             "PhysicalDefenseTest": "Défense physique",
             "PhysicalResistTest": "Résiste aux dommages physiques",
-            "PilotVehicleTest": "Essai du véhicule pilote",
+            "PilotVehicleTest": "Test de pilotage de véhicule",
             "RangedAttackTest": "Attaque d'armes à feu à portée",
             "RitualSpellcastingTest": "Magie rituelle",
             "SkillTest": "Test de compétence",
             "SpellCastingTest": "Lancement de sorts",
-            "SuccessTest": "Essai de réussite",
+            "SuccessTest": "Test de réussite",
             "SummonSpiritTest": "Invoquer l'Esprit",
             "SuppressionDefenseTest": "Suppression de la défense",
             "ThrownAttackTest": "Attaque d'armes lancées"

@@ -146,7 +146,7 @@
                 "roll": "Gewürfelt",
                 "update": "Aktualisiert"
             },
-            "Name": "Bezeichnung",
+            "Name": "Name",
             "NewTest": "Ausgedehnte Probe",
             "NoActor": "Keiner",
             "NoTests": "Keine ausgedehnten Proben vorhanden.",
@@ -173,14 +173,14 @@
             "RealTime": "Echtzeit",
             "Rolls": "Durchgeführte Würfe",
             "SaveTest": "Speichern",
-            "SectionDetails": "Einzelheiten",
+            "SectionDetails": "Details",
             "SectionRules": "Regeln",
             "Sort": {
                 "accumulatedHits": "Angesammelte Erfolge",
                 "createdAt": "Erstellt",
                 "createdWorldTime": "Spielzeit-Beginn",
                 "interval": "Intervall",
-                "name": "Bezeichnung",
+                "name": "Name",
                 "progress": "Fortschritt",
                 "rollCount": "Würfe",
                 "status": "Status",
@@ -292,7 +292,7 @@
                     },
                     "limit": {
                         "attribute": {
-                            "label": "Höchstmenge",
+                            "label": "Limit",
                             "hint": "Limit für diese Fertigkeitsaktion. Leer lassen, um das Standard-Attributslimit zu verwenden."
                         }
                     },
@@ -334,7 +334,7 @@
                         "label": "Fertigkeiten",
                         "hint": "Fertigkeiten, die Teil dieses Sets sind",
                         "name": {
-                            "label": "Bezeichnung",
+                            "label": "Name",
                             "hint": "Name der Fertigkeit"
                         },
                         "rating": {
@@ -350,7 +350,7 @@
                         "label": "Fertigkeitsgruppen",
                         "hint": "Fertigkeitsgruppen, die Teil dieses Sets sind",
                         "name": {
-                            "label": "Bezeichnung",
+                            "label": "Name",
                             "hint": "Name der Fertigkeitsgruppe"
                         },
                         "rating": {
@@ -401,7 +401,7 @@
             "Chemistry": "Chemie",
             "Clubs": "Knüppel",
             "Compiling": "Kompilieren",
-            "Computer": "Datenverarbeitung",
+            "Computer": "Computer",
             "Con": "Überreden",
             "Counterspelling": "Antimagie",
             "Cybercombat": "Matrixkampf",
@@ -422,7 +422,7 @@
             "FreeFall": "Freifall",
             "Gunnery": "Geschütze",
             "Gymnastics": "Akrobatik",
-            "Hacking": "Hacken",
+            "Hacking": "Hacking",
             "Hardware": "Hardware",
             "HeavyWeapons": "Schwere Waffen",
             "Impersonation": "Verkörperung",
@@ -460,8 +460,8 @@
             "Survival": "Überleben",
             "Swimming": "Schwimmen",
             "Teamwork": {
-                "Glitched": "geglättet",
-                "ParticipantActor": "Schauspieler wählen",
+                "Glitched": "Patzer",
+                "ParticipantActor": "Akteur wählen",
                 "RollIt": "Würfeln",
                 "TakePart": "Teilnehmen"
             },
@@ -501,7 +501,7 @@
         "Tests": {
             "AttributeOnlyTest": "Attributsprobe",
             "BiofeedbackResistTest": "Biofeedback Widerstehen",
-            "BruteForceTest": "Brute-Force-Angriff",
+            "BruteForceTest": "Brute Force",
             "CheckOverwatchScoreTest": "Prüfe Overwatch-Wert",
             "CombatSpellDefenseTest": "Kampfzauber-Verteidigung",
             "CompileSpriteTest": "Sprite kompilieren",

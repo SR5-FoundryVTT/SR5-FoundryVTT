@@ -12,11 +12,11 @@
                     "label": "Duração"
                 },
                 "fade": {
-                    "hint": "O valor de desfading é adicionado ao nível escolhido quando rosqueamento para determinar a quantidade de dano a ser resistido",
+                    "hint": "O Valor de Enfraquecimento é somado ao Nível escolhido ao tecer a forma complexa para determinar a quantidade de dano a ser resistida",
                     "label": "Enfraquecimento"
                 },
                 "target": {
-                    "hint": "Tipos de alvo válidos para o formulário complexo",
+                    "hint": "Tipos de alvo válidos para a forma complexa",
                     "label": "Alvo"
                 }
             }
@@ -30,20 +30,20 @@
             }
         },
         "Host": {
-            "Attributes": "Atributos do Anfitrião",
+            "Attributes": "Atributos do Host",
             "CustomAttributes": "Atributos Personalizados",
             "DropICActor": "Arraste e solte um ator GELO na ordem de resposta de segurança",
             "ICOrder": "Ordem GELO",
             "MissingIC": "GELO Faltando",
-            "Rating": "Nível do Anfitrião"
+            "Rating": "Nível do Host"
         },
         "IC": {
             "FIELDS": {
                 "host": {
-                    "hint": "Em que host este IC está executando",
-                    "label": "Anfitrião",
+                    "hint": "Em qual host este GELO está sendo executado",
+                    "label": "Host",
                     "rating": {
-                        "hint": "A classificação do anfitrião em que estamos correndo",
+                        "hint": "Nível do Host em que estamos operando",
                         "label": "Nível"
                     }
                 },
@@ -52,14 +52,14 @@
                     "label": "Tipo IC"
                 }
             },
-            "MissingHost": "Arraste e solte um item de Anfitrião",
+            "MissingHost": "Arraste e solte um item de Host",
             "Type": "Tipo",
             "Types": {
                 "Acid": "Ácido",
                 "Binder": "Cimentador",
                 "BlackIC": "Gelo Negro",
                 "Blaster": "Disruptor",
-                "Bloodhound": "Cão de Caça",
+                "Bloodhound": "Bloodhound",
                 "BlueGoo": "Gosma Azul",
                 "Catapult": "Catapulta",
                 "Crash": "Travamento",
@@ -79,18 +79,18 @@
         },
         "MatrixNetworkHackingApplication": {
             "Icons": "Ícones",
-            "Invite": "Peça um convite",
+            "Invite": "Pedir um convite",
             "Title": "Conectar à rede"
         },
         "NetworkManager": {
             "AvailableNetworks": "Redes Disponíveis",
-            "BruteForce": "força bruta",
+            "BruteForce": "Força Bruta",
             "ConnectedTo": "Conectado a",
             "HackOnTheFly": "Hackear na Hora",
-            "InviteMark": "Peça para convidar uma marca",
+            "InviteMark": "Pedir um convite de marca",
             "NetworkType": "Tipo",
             "NoNetwork": "Não Conectado",
-            "Title": "Gestor de Rede"
+            "Title": "Gerenciador de Rede"
         },
         "RebootConfirmationDialog": {
             "Cancel": "Cancelar",
@@ -110,8 +110,8 @@
                     "label": "Nível"
                 },
                 "registered": {
-                    "hint": "Se o Sprite for registrado",
-                    "label": "Registrada"
+                    "hint": "Se o Sprite está registrado",
+                    "label": "Registrado"
                 },
                 "services": {
                     "hint": "Número de serviços que o Sprite tem",
@@ -122,7 +122,7 @@
                     "label": "Tipo de Sprite"
                 },
                 "technomancerUuid": {
-                    "hint": "Technomancer que compilou este Sprite",
+                    "hint": "Tecnomante que compilou este Sprite",
                     "label": "Tecnomante"
                 }
             },

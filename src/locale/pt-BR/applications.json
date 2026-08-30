@@ -11,8 +11,8 @@
         "CompendiaSettings": {
             "Description": "Estes pacotes serão usados para o sistema. Você pode substituí-los com seus próprios pacotes, mas você não deve removê-los.",
             "GeneralActionsPack": {
-                "hint": "Este compêndio será usado para todas as ações gerais, apenas atributos.",
-                "label": "Acções gerais"
+                "hint": "Este compêndio será usado para todas as ações gerais, apenas de atributos.",
+                "label": "Ações Gerais"
             },
             "ICActionsPack": {
                 "hint": "Este compêndio será usado para ações IC, filtrado para cada tipo IC",
@@ -23,19 +23,19 @@
                 "hint": "Este compêndio será usado para todas as ações matriciais.",
                 "label": "Ações da Matriz"
             },
-            "SkillsPacksSection": "Competências Competências Compendiums",
-            "ActionsPacksSection": "Ações Compêndios",
+            "SkillsPacksSection": "Compêndios de Perícias",
+            "ActionsPacksSection": "Compêndios de Ações",
             "SkillsPack": {
-                "hint": "Este compêndio será usado para todas as habilidades.",
+                "hint": "Este compêndio será usado para todas as perícias.",
                 "label": "Perícias"
             },
             "SkillGroupsPack": {
-                "hint": "Este compêndio será usado para grupos de habilidades.",
-                "label": "Grupos de Habilidade"
+                "hint": "Este compêndio será usado para grupos de perícias.",
+                "label": "Grupos de Perícias"
             },
             "SkillSetsPack": {
-                "hint": "Este compêndio será usado para conjuntos de habilidades.",
-                "label": "Conjuntos de Habilidade"
+                "hint": "Este compêndio será usado para conjuntos de perícias.",
+                "label": "Conjuntos de Perícias"
             },
             "Title": "Compêndios do sistema"
         },
@@ -137,14 +137,14 @@
         },
         "KarmaManager": {
             "Cancel": "Cancelar",
-            "CareerKarma": "Carma de Carreira que o Caráter acumulou",
+            "CareerKarma": "Karma de Carreira acumulado pelo personagem",
             "CurrentKarma": "A quantidade de Karma que o personagem tem atualmente",
-            "FinalCareerKarma": "Carma de carreira que o personagem terá ao submeter",
-            "FinalCurrentKarma": "Karma, este personagem terá ao apresentar",
+            "FinalCareerKarma": "Karma de Carreira que o personagem terá ao confirmar",
+            "FinalCurrentKarma": "Karma que este personagem terá ao confirmar",
             "FinalKarma": "Karma Final",
-            "StartingKarma": "Karma Iniciar",
-            "Submit": "E-mail",
-            "Title": "Gerente Karma"
+            "StartingKarma": "Karma Inicial",
+            "Submit": "Enviar",
+            "Title": "Gerenciador de Karma"
         },
         "MIGRATION": {
             "BeginMigration": "Iniciar Migração",
@@ -176,8 +176,8 @@
         "NuyenManager": {
             "Cancel": "Cancelar",
             "CurrentNuyen": "A quantidade de Nuyen que o personagem tem atualmente",
-            "FinalNuyen": "Quantidade final de Nuyen após a apresentação",
-            "Submit": "E-mail",
+            "FinalNuyen": "Quantidade final de Nuyen após confirmar",
+            "Submit": "Enviar",
             "Title": "Gerenciador de Nuyen"
         },
         "OverwatchScoreTracker": {

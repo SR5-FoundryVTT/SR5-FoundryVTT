@@ -32,10 +32,10 @@
         "Host": {
             "Attributes": "Attributs de l'hôte",
             "CustomAttributes": "Attributs personnalisés",
-            "DropICActor": "Drag&Drop un acteur IC dans l'ordre de la réponse de sécurité",
-            "ICOrder": "Ordre du CI",
+            "DropICActor": "Glissez-déposez un acteur IC dans l'ordre de réponse de sécurité",
+            "ICOrder": "Ordre des IC",
             "MissingIC": "IC manquant",
-            "Rating": "Évaluation de l'hôte"
+            "Rating": "Indice de l'hôte"
         },
         "IC": {
             "FIELDS": {
@@ -52,34 +52,34 @@
                     "label": "Type IC"
                 }
             },
-            "MissingHost": "Faites glisser et déposez un élément hôte",
+            "MissingHost": "Glissez-déposez un objet hôte",
             "Type": "Type",
             "Types": {
-                "Acid": "Acide",
-                "Binder": "Beurre",
-                "BlackIC": "Noir IC",
+                "Acid": "Acid",
+                "Binder": "Binder",
+                "BlackIC": "Black IC",
                 "Blaster": "Blaster",
-                "Bloodhound": "Le chien de sang",
-                "BlueGoo": "Bloo Goo",
-                "Catapult": "Catapulte",
+                "Bloodhound": "Bloodhound",
+                "BlueGoo": "Blue Goo",
+                "Catapult": "Catapult",
                 "Crash": "Crash",
                 "Flicker": "Flicker",
                 "Jammer": "Jammer",
-                "Killer": "Tueur",
-                "Marker": "Marqueur",
-                "Patrol": "Patrouille",
-                "Probe": "Sonde",
-                "Scramble": "Écrasement",
-                "Shocker": "Déchiré",
+                "Killer": "Killer",
+                "Marker": "Marker",
+                "Patrol": "Patrol",
+                "Probe": "Probe",
+                "Scramble": "Scramble",
+                "Shocker": "Shocker",
                 "Sleuther": "Sleuther",
                 "Sparky": "Sparky",
                 "TarBaby": "Tar Baby",
-                "Track": "Voie"
+                "Track": "Track"
             }
         },
         "MatrixNetworkHackingApplication": {
             "Icons": "Icônes",
-            "Invite": "Demander l'invitation",
+            "Invite": "Demander une invitation",
             "Title": "Connexion au réseau"
         },
         "NetworkManager": {
@@ -87,7 +87,7 @@
             "BruteForce": "Force brute",
             "ConnectedTo": "Connecté à",
             "HackOnTheFly": "Piratage à la volée",
-            "InviteMark": "Demandez à inviter une marque",
+            "InviteMark": "Demander une invitation de marque",
             "NetworkType": "Type",
             "NoNetwork": "Non connecté",
             "Title": "Gestionnaire de réseau"
@@ -111,11 +111,11 @@
                 },
                 "registered": {
                     "hint": "Si le Sprite est enregistré",
-                    "label": "Inscrit"
+                    "label": "Enregistré"
                 },
                 "services": {
-                    "hint": "Nombre de services que possède Sprite",
-                    "label": "Tâches"
+                    "hint": "Nombre de services que doit ce sprite",
+                    "label": "Services"
                 },
                 "spriteType": {
                     "hint": "Type de sprite",
@@ -123,15 +123,15 @@
                 },
                 "technomancerUuid": {
                     "hint": "Technomancien ayant compilé ce sprite",
-                    "label": "Technomancer"
+                    "label": "Technomancien"
                 }
             },
             "Level": "Niveau",
             "LevelAppliesSettingHint": "Contrôle quels attributs de sprite reçoivent le bonus de Niveau.",
-            "MissingTechnomancer": "Technomancer manquant",
+            "MissingTechnomancer": "Technomancien manquant",
             "Registered": "Inscrit",
             "Services": "Tâches",
-            "Technomancer": "Technomancer",
+            "Technomancer": "Technomancien",
             "Type": "Type",
             "Types": {
                 "Companion": "Compagnon",

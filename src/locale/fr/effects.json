@@ -1,11 +1,11 @@
 {
     "SR5": {
         "ActiveEffect": {
-            "ApplyTo": "Appliquer-à",
+            "ApplyTo": "Appliquer à",
             "ApplyTos": {
                 "TestTargetingThisActor": "Test ciblant cet acteur",
                 "TargetedActor": "Acteur ciblé",
-                "TestItem": "Essai par élément"
+                "TestItem": "Test via objet"
             },
             "CannotAddTestViaItemToActor": "Impossible d'ajouter un effet actif de type 'Test via Item' à un acteur",
             "ValueEditor": "Modifier la valeur du changement",
@@ -20,16 +20,16 @@
                     "hint": "Partie du test filtrée par cette condition."
                 },
                 "applyTo": {
-                    "hint": "Appliquer-à différentes cibles",
-                    "label": "Appliquer-à"
+                    "hint": "Appliquer à différentes cibles",
+                    "label": "Appliquer à"
                 },
                 "onlyForEquipped": {
-                    "hint": "Demande pour un article équipé seulement",
+                    "hint": "Appliquer uniquement si l'objet est équipé",
                     "label": "Équipé seulement"
                 },
                 "onlyForItemTest": {
                     "hint": "Appliquer uniquement au test de l'objet parent",
-                    "label": "Essai de l'élément seulement"
+                    "label": "Test de l'objet uniquement"
                 },
                 "onlyForWireless": {
                     "hint": "Appliquer uniquement pour le sans fil actif",
@@ -53,7 +53,7 @@
                 },
                 "selection_tests": {
                     "hint": "Filtrer le test selon les tests utilisés",
-                    "label": "Filtre d'essai"
+                    "label": "Filtre de tests"
                 },
                 "targetName": {
                     "label": "Nom de la cible"
@@ -86,8 +86,8 @@
                 "AwaitingMyActionEndDetail": "Expire lorsque le propriétaire termine la phase d'action en cours.",
                 "AwaitingTrigger": "En attente du déclencheur d'expiration",
                 "AwaitingTriggerDetail": "La durée est écoulée et expirera au déclencheur configuré.",
-                "Combat": "Lutte",
-                "GroupCombat": "Lutte",
+                "Combat": "Combat",
+                "GroupCombat": "Combat",
                 "GroupTime": "Temps",
                 "UnitTurns": "Tours de combat",
                 "CombatStart": "Tour de combat {turn}, Initiative {initiative}",
@@ -118,12 +118,12 @@
                 "Categories": "Catégories d'action",
                 "Limits": "Limites",
                 "Skills": "Compétences",
-                "Tests": "Essais"
+                "Tests": "Tests"
             },
             "Modes": {
                 "Modify": "Modifier"
             },
-            "New": "Nouveau effet",
+            "New": "Nouvel effet",
             "RemoveCondition": "Retirer la condition",
             "RemoveTarget": "Retirer la cible",
             "SelectionModes": {

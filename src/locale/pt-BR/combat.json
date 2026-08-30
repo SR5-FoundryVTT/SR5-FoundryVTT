@@ -32,8 +32,8 @@
         },
         "ReputationManager": {
             "Cancel": "Cancelar",
-            "Submit": "E-mail",
-            "Title": "Gerente Reputação"
+            "Submit": "Enviar",
+            "Title": "Gerenciador de Reputação"
         }
     }
 }

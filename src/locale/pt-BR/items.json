@@ -12,8 +12,8 @@
                 },
                 "blast": {
                     "dropoff": {
-                        "hint": "Dropoff modifica o Dano por Metro",
-                        "label": "Dropoff Blast"
+                        "hint": "Redução do dano por metro de distância",
+                        "label": "Redução por Metro"
                     },
                     "radius": {
                         "hint": "Raio de explosão desta munição, em metros",
@@ -329,7 +329,7 @@
                 },
                 "grade": {
                     "hint": "Grau do Cyberware/Bioware",
-                    "label": "Classe"
+                    "label": "Grau"
                 },
                 "technology": {
                     "availability": {
@@ -345,7 +345,7 @@
                     "condition_monitor": {
                         "value": {
                             "hint": "Danos atuais causados ao Monitor de Condição do Item",
-                            "label": "Condição Monitor Danos"
+                            "label": "Dano no Monitor de Condição"
                         }
                     },
                     "cost": {
@@ -394,7 +394,7 @@
             "Equipment": "Equipamento",
             "Gear": "Equipamento",
             "Grid": "Grade",
-            "Host": "Anfitrião",
+            "Host": "Host",
             "License": "Licença",
             "Lifestyle": "Estilo de Vida",
             "Metamagic": "Metamagia",
@@ -435,7 +435,7 @@
                 },
                 "type": {
                     "hint": "Tipo de Estilo de Vida",
-                    "label": "Estilo de vida Tipo"
+                    "label": "Tipo de Estilo de Vida"
                 }
             },
             "label": "Estilo de Vida"
@@ -447,8 +447,8 @@
                     "label": "Precisão"
                 },
                 "conceal": {
-                    "hint": "Modificador de Concealabilidade para aplicar",
-                    "label": "Concealabilidade"
+                    "hint": "Modificador de ocultação a aplicar",
+                    "label": "Ocultação"
                 },
                 "dice_pool": {
                     "hint": "Modificador da parada de dados a ser aplicado",
@@ -456,15 +456,15 @@
                 },
                 "modification_category": {
                     "hint": "Categoria a que esta modificação pertence",
-                    "label": "Modificação Categoria"
+                    "label": "Categoria da Modificação"
                 },
                 "mount_point": {
-                    "hint": "A arma que este prende ao",
+                    "hint": "A arma à qual esta modificação é acoplada",
                     "label": "Ponto de Montagem"
                 },
                 "rc": {
                     "hint": "Modificador de Compensação de Recuo para aplicar",
-                    "label": "Compensação de Recoil"
+                    "label": "Compensação de Recuo"
                 },
                 "slots": {
                     "hint": "Número de Slots (Veículos) ou Pontos (Drones) que este ocupa",
@@ -472,7 +472,7 @@
                 },
                 "type": {
                     "hint": "Tipo de modificação",
-                    "label": "Mod Tipo"
+                    "label": "Tipo de Modificação"
                 }
             }
         },
@@ -493,8 +493,8 @@
         "Quality": {
             "FIELDS": {
                 "karma": {
-                    "hint": "Karma, essa qualidade vale a pena",
-                    "label": "Carma"
+                    "hint": "Karma que esta qualidade vale",
+                    "label": "Karma"
                 },
                 "rating": {
                     "hint": "Avaliação desta qualidade",
@@ -531,7 +531,7 @@
                 },
                 "melee": {
                     "reach": {
-                        "hint": "alcance da Arma, isto é usado como um modificador em combate",
+                        "hint": "Alcance da arma; é usado como modificador em combate",
                         "label": "Alcance"
                     }
                 },
@@ -539,7 +539,7 @@
                     "modes": {
                         "burst_fire": {
                             "hint": "Se a arma suporta Burst-Fire (BF)",
-                            "label": "Burst-Fogo"
+                            "label": "Rajada"
                         },
                         "full_auto": {
                             "hint": "Se a arma suporta Full-Auto (FA)",
@@ -547,7 +547,7 @@
                         },
                         "semi_auto": {
                             "hint": "Se a arma suporta semi-automática (SA)",
-                            "label": "semi-auto"
+                            "label": "Semi-automático"
                         },
                         "single_shot": {
                             "hint": "Se a arma suporta tiro único (SS)",
@@ -569,7 +569,7 @@
                         },
                         "long": {
                             "hint": "Longo Alcance da Arma, em metros",
-                            "label": "Longo Alca"
+                            "label": "Alcance Longo"
                         },
                         "medium": {
                             "hint": "Distância de alcance médio para a Arma, em metros",
@@ -577,13 +577,13 @@
                         },
                         "short": {
                             "hint": "Distância de curto alcance para a Arma, em metros",
-                            "label": "Curto Alca"
+                            "label": "Alcance Curto"
                         }
                     },
                     "rc": {
                         "base": {
-                            "hint": "Compensação da Arma",
-                            "label": "Compensação de Recoil"
+                            "hint": "Compensação de recuo da arma",
+                            "label": "Compensação de Recuo"
                         }
                     }
                 },
@@ -591,11 +591,11 @@
                     "blast": {
                         "dropoff": {
                             "hint": "Redução de Dano por metro da explosão",
-                            "label": "Descarga por explosão (por m)"
+                            "label": "Redução por Metro"
                         },
                         "radius": {
                             "hint": "Raio do ataque da Arma, em metros",
-                            "label": "Radius de explosão (m)"
+                            "label": "Raio de Explosão (m)"
                         }
                     },
                     "ranges": {
@@ -613,7 +613,7 @@
                         },
                         "long": {
                             "hint": "Longo Alcance da Arma, em metros",
-                            "label": "Longo Alca"
+                            "label": "Alcance Longo"
                         },
                         "medium": {
                             "hint": "Distância de alcance médio para a Arma, em metros",
@@ -621,7 +621,7 @@
                         },
                         "short": {
                             "hint": "Distância de curto alcance para a Arma, em metros",
-                            "label": "Curto Alca"
+                            "label": "Alcance Curto"
                         }
                     }
                 }

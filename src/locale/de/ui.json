@@ -4,7 +4,7 @@
             "Actions": {
                 "Armor": "Panzerung",
                 "BiofeedbackResist": "Biofeedback widerstehen",
-                "BruteForce": "Brute-Force-Angriff",
+                "BruteForce": "Brute Force",
                 "ChangeConfiguration": "Konfiguration Ändern",
                 "ChangeIcon": "Icon Verändern",
                 "CheckOverwatchScore": "Overwatch-Wert Bestimmen",
@@ -70,7 +70,7 @@
             "Actor": "Akteur",
             "Item": "Gegenstand",
             "Scene": "Szene",
-            "Token": "Zeichen"
+            "Token": "Token"
         },
         "Keybinding": {
             "AddRemoveManyQty": {
@@ -116,7 +116,7 @@
                 "SpriteType": "Sprite-Art"
             },
             "Actions": {
-                "BruteForce": "Brute-Force-Angriff",
+                "BruteForce": "Brute Force",
                 "HackontheFly": "Eiliges Hacken"
             },
             "ActorSheet": {
@@ -137,7 +137,7 @@
                 "EnabledOptionSpritePowers": "Optionale Sprite Kräfte - Aktiv",
                 "Hacking": "Hacken",
                 "ICConfiguration": "IC-Konfiguration",
-                "Icons": "Symbole",
+                "Icons": "Icons",
                 "ManageNetwork": "Netzwerk verwalten",
                 "MarkNetwork": "Markiere Netzwerk",
                 "MarkedIcons": "Markierte Icons",
@@ -195,7 +195,7 @@
                 "Public": "Öffentlich",
                 "SleazeShort": "S",
                 "TargetDevice": "Zielgerät",
-                "TargetMainIcon": "Hauptsymbol des Ziels"
+                "TargetMainIcon": "Haupt-Icon des Ziels"
             },
             "Message": {
                 "ClickToSelect": "Klicke um in Szene auszuwählen",
@@ -221,7 +221,7 @@
             },
             "Sidebar": {
                 "Changelog": "Änderungsprotokoll",
-                "Issues": "Fragen",
+                "Issues": "Probleme",
                 "Wiki": "Wiki"
             }
         },
@@ -234,9 +234,9 @@
                 "Compilations": "Kompilationen",
                 "ComplexForms": "Komplexe Formen",
                 "CritterPowers": "Critter Power",
-                "Details": "Einzelheiten",
+                "Details": "Details",
                 "Effects": "Effekte",
-                "IC": "WISSENSCHAFT",
+                "IC": "IC",
                 "Inventory": "Inventar",
                 "Licenses": "Lizenzen",
                 "Magic": "Magie",
@@ -256,9 +256,9 @@
             },
             "Item": {
                 "Description": "Beschreibung",
-                "Details": "Einzelheiten",
+                "Details": "Details",
                 "Effects": "Effekte",
-                "Mods": "Modalitäten",
+                "Mods": "Mods",
                 "Network": "Netzwerk",
                 "SinLicenses": "Lizenzen",
                 "SinNetworks": "Netzwerke",
@@ -318,7 +318,7 @@
                 "DocumentEffects": "Auswirkungen direkt auf dieses Dokument.",
                 "EditEffect": "Bearbeite Effekt",
                 "ItemEffects": "Effekte, die von Items auf diesem Dokument gesammelt werden.",
-                "HelpLinkEnglishOnly": "Hilfe (nur auf Englisch)",
+                "HelpLinkEnglishOnly": "Hilfe (externer Link, nur auf Englisch)",
                 "OpenValueEditor": "Werteditor öffnen",
                 "ApplyValueEditor": "Wertänderung anwenden",
                 "CancelValueEditor": "Wertänderung abbrechen",

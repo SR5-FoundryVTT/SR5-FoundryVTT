@@ -75,7 +75,7 @@
                         "label": "Verstärkt Aktiv"
                     },
                     "immunities": {
-                        "hint": "Schäden Quellen diese Rüstung gewährt Immunität gegen",
+                        "hint": "Schadensquellen, gegen die diese Rüstung Immunität gewährt",
                         "label": "Immunitäten"
                     },
                     "pollutant": {
@@ -152,7 +152,7 @@
                             },
                             "base_formula_operator": {
                                 "hint": "Wie soll der DK-Wert das Attribut beeinflussen?",
-                                "label": "Betreiber"
+                                "label": "Operator"
                             }
                         },
                         "attribute": {
@@ -165,7 +165,7 @@
                         },
                         "base_formula_operator": {
                             "hint": "Wie soll der Basis Schaden das Attribut beeinflussen?",
-                            "label": "Betreiber"
+                            "label": "Operator"
                         },
                         "biofeedback": {
                             "hint": "Soll diese Aktion auch Biofeedback Schaden erzeugen?",
@@ -384,7 +384,7 @@
             "AdeptPower": "Adeptenkraft",
             "Ammo": "Munition",
             "Armor": "Panzerung",
-            "Bioware": "Biomaterial",
+            "Bioware": "Bioware",
             "ComplexForm": "Komplexe Form",
             "Contact": "Kontakt",
             "CritterPower": "Critterkraft",
@@ -394,15 +394,15 @@
             "Equipment": "Ausrüstung",
             "Gear": "Ausrüstung",
             "Grid": "Gitter",
-            "Host": "Rechner",
+            "Host": "Host",
             "License": "Lizenz",
             "Lifestyle": "Lebensstil",
-            "Metamagic": "Metamagisch",
+            "Metamagic": "Metamagie",
             "Modification": "Modifikation",
             "Program": "Programm",
             "Quality": "Vor-/Nachteil",
             "Ritual": "Ritual",
-            "Sin": "SEIN",
+            "Sin": "SIN",
             "Spell": "Zauberspruch",
             "SpritePower": "Spritekraft",
             "Weapon": "Waffe"
@@ -468,7 +468,7 @@
                 },
                 "slots": {
                     "hint": "Anzahl der Slots für Fahrzeuge oder Drohnen.",
-                    "label": "Ablagefächer"
+                    "label": "Slots"
                 },
                 "type": {
                     "hint": "Art der Modifikation",
@@ -627,7 +627,7 @@
                 }
             },
             "FullReload": "Komplett",
-            "Mod": "Änderung",
+            "Mod": "Mod",
             "Mode": {
                 "Mode": "Modus",
                 "Short": {
@@ -656,7 +656,7 @@
                     "Suppressing": "Unterdrückungsfeuer"
                 }
             },
-            "Mods": "Modalitäten",
+            "Mods": "Mods",
             "PartialReload": "Teilweise",
             "Range": {
                 "Category": {

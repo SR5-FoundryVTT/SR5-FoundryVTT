@@ -3,8 +3,8 @@
         "AdeptPower": {
             "FIELDS": {
                 "drain": {
-                    "hint": "Se este Poder Adepto incorre Drenar após o uso",
-                    "label": "Drenar"
+                    "hint": "Se este Poder de Adepto causa Dreno após o uso",
+                    "label": "Dreno"
                 },
                 "level": {
                     "hint": "Nível deste Poder de Adepto (se aplicável)",
@@ -51,8 +51,8 @@
                     "label": "Duração"
                 },
                 "karma": {
-                    "hint": "Custo em Carma do poder da criatura",
-                    "label": "Carma"
+                    "hint": "Custo em Karma do poder de criatura",
+                    "label": "Karma"
                 },
                 "optional": {
                     "hint": "Se o poder da criatura é opcional",
@@ -68,7 +68,7 @@
                 }
             },
             "IsOptional": "Opcionalidade",
-            "Karma": "Carma",
+            "Karma": "Karma",
             "OptionalSelectionCount": "Poderes Opcionais",
             "Optional": {
                 "DisabledOption": "Opcional, desabilitado",
@@ -85,7 +85,7 @@
             },
             "Type": "Tipo",
             "Types": {
-                "Mana": "Mana Mana",
+                "Mana": "Mana",
                 "Physical": "Físico"
             }
         },
@@ -98,7 +98,7 @@
                 },
                 "type": {
                     "hint": "Tipo de Ritual para Realizar",
-                    "label": "Ritual Tipo"
+                    "label": "Tipo de Ritual"
                 }
             },
             "MaterialLink": "Vínculo material",
@@ -192,7 +192,7 @@
                 "ritual": {
                     "type": {
                         "hint": "Tipo de Ritual para realizar",
-                        "label": "Ritual Tipo"
+                        "label": "Tipo de Ritual"
                     }
                 },
                 "type": {
@@ -215,7 +215,7 @@
             "Spell": "Feitiço",
             "Spells": "Feitiços",
             "Type": "Tipo",
-            "TypeMana": "Mana Mana",
+            "TypeMana": "Mana",
             "TypePhysical": "Físico"
         },
         "Spirit": {
@@ -239,7 +239,7 @@
                 "Aircraft": "Aeronave",
                 "Airwave": "Onda de Ar",
                 "Ally": "Aliado",
-                "Anansi": "anansi",
+                "Anansi": "Anansi",
                 "Anarch": "Anarquista",
                 "Arboreal": "Arbóreo",
                 "Automotive": "Automotivo",
@@ -248,7 +248,7 @@
                 "Blackjack": "Blackjack",
                 "BladeSummoned": "Lâmina Invocada",
                 "Blood": "Sangue",
-                "BloodShade": "Sombra de Sangue",
+                "BloodShade": "Blood Shade",
                 "Boggle": "Boggle",
                 "Bone": "Osso",
                 "Bugul": "Bugul",
@@ -256,14 +256,14 @@
                 "Caretaker": "Cuidador de Insetos",
                 "Ceramic": "Cerâmica",
                 "Chindi": "Chindi",
-                "CorpsCadavre": "Cadavre Corpo",
+                "CorpsCadavre": "Corps Cadavre",
                 "Corpse": "Cadáver",
                 "Crawler": "Rastejador (Demônio)",
                 "Croki": "Croki",
                 "Detritus": "Detritos",
                 "Duende": "Duende",
                 "Earth": "Terra",
-                "Ejerian": "Ejeriano",
+                "Ejerian": "Ejerian",
                 "Elvar": "Elvar",
                 "Energy": "Energia",
                 "Erinyes": "Eríneas",
@@ -312,7 +312,7 @@
                 "Tungak": "Tungak",
                 "Unbreakable": "Inquebrável",
                 "Vrygoths": "Vrygoths",
-                "VucubCaquix": "Vcucub Caquix",
+                "VucubCaquix": "Vucub Caquix",
                 "Watcher": "Observador",
                 "Water": "Água",
                 "Worker": "Inseto Trabalhador",

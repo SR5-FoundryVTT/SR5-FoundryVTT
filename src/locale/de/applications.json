@@ -6,7 +6,7 @@
             "LatestChangelog": "Aktueller Changelog",
             "Reason": "Du hast die aktuellste Version installiert!",
             "ReportIssues": "Bitte Fehler und gewünschte Funktionen hier melden",
-            "Title": "Shadowrun5e aktualisieren"
+            "Title": "Shadowrun5e Update"
         },
         "CompendiaSettings": {
             "Description": "Diese Kompendien werden vom System verwendet. Du kannst sie mit eigenen Kompendien überschreiben, solltest sie aber nicht entfernen.",
@@ -18,7 +18,7 @@
                 "hint": "Dieses Kompendium wird für IC-Proben verwendet, gefiltert nach IC-Typ",
                 "label": "IC Handlungen"
             },
-            "Label": "Kompendiumpackungen",
+            "Label": "Kompendien",
             "MatrixActionsPack": {
                 "hint": "Dieses Kompendium wird für alle Matrix-Handlungen verwendet.",
                 "label": "Matrix Handlungen"
@@ -112,11 +112,11 @@
             }
         },
         "GMRequest": {
-            "General": "Ihr GM möchte, dass Sie eine",
-            "RollAttribute": "Attributprüfung",
-            "RollSkill": "Prüfung der Fähigkeiten",
-            "Teamwork": "Test der Teamarbeit",
-            "Threshold": "mit einer Schwelle von"
+            "General": "Dein SL möchte, dass du folgende Probe machst:",
+            "RollAttribute": "Attributsprobe",
+            "RollSkill": "Fertigkeitsprobe",
+            "Teamwork": "Teamwork-Probe",
+            "Threshold": "mit einem Mindestwurf von"
         },
         "Import": {
             "ActorImporter": {

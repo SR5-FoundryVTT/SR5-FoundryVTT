@@ -3,24 +3,24 @@
         "AdeptPower": {
             "FIELDS": {
                 "drain": {
-                    "hint": "Si cette puissance d'Adept est en fuite après utilisation",
-                    "label": "Égoutter"
+                    "hint": "Si ce pouvoir d'adepte inflige du Drain après utilisation",
+                    "label": "Drain"
                 },
                 "level": {
                     "hint": "Niveau de cette puissance d'adaptation (le cas échéant)",
                     "label": "Niveau"
                 },
                 "pp": {
-                    "hint": "Nombre de points de puissance ce coût de puissance",
-                    "label": "Points d'alimentation"
+                    "hint": "Nombre de Points de Pouvoir que coûte ce pouvoir",
+                    "label": "Points de Pouvoir"
                 },
                 "type": {
                     "hint": "Type de puissance de pointe",
-                    "label": "Type de puissance"
+                    "label": "Type de pouvoir"
                 }
             },
             "Types": {
-                "Active": "Activité",
+                "Active": "Actif",
                 "Passive": "Passif"
             }
         },
@@ -51,7 +51,7 @@
                     "label": "Durée"
                 },
                 "karma": {
-                    "hint": "Coût Karma de la puissance de la crotte",
+                    "hint": "Coût en Karma du pouvoir de créature",
                     "label": "Karma"
                 },
                 "optional": {
@@ -60,10 +60,10 @@
                 },
                 "powerType": {
                     "hint": "Le type de pouvoir de créature",
-                    "label": "Type de puissance"
+                    "label": "Type de pouvoir"
                 },
                 "range": {
-                    "hint": "Portée du pouvoir de créature",
+                    "hint": "La portée du pouvoir de créature",
                     "label": "Portée"
                 }
             },
@@ -98,7 +98,7 @@
                 },
                 "type": {
                     "hint": "Type de rituel à effectuer",
-                    "label": "Type rituel"
+                    "label": "Type de rituel"
                 }
             },
             "MaterialLink": "Lien matériel",
@@ -109,7 +109,7 @@
         "Spell": {
             "Attack": "Attaque de sort",
             "Cast": "Lancer un sort",
-            "CatCombat": "Lutte",
+            "CatCombat": "Combat",
             "CatDetection": "Détection",
             "CatHealth": "Santé",
             "CatIllusion": "Illusion",
@@ -151,7 +151,7 @@
                 },
                 "drain": {
                     "hint": "Drain Valeur du sort, ceci est ajouté à la Force du sort pour Résister Drain",
-                    "label": "Valeur drain"
+                    "label": "Valeur de Drain"
                 },
                 "duration": {
                     "hint": "Durée de l'appel",
@@ -160,7 +160,7 @@
                 "illusion": {
                     "sense": {
                         "hint": "Le sens affecté par le sort",
-                        "label": "Sensation"
+                        "label": "Sens"
                     },
                     "type": {
                         "hint": "Type de sort d'illusion",
@@ -170,7 +170,7 @@
                 "manipulation": {
                     "damaging": {
                         "hint": "Si la faute de frappe fait des dégâts",
-                        "label": "Destruction"
+                        "label": "Dommageable"
                     },
                     "environmental": {
                         "hint": "Ces sorts n'ont pas vraiment une cible, et ils n'affectent pas vraiment les cibles directement. Ils affectent juste une zone.",
@@ -192,7 +192,7 @@
                 "ritual": {
                     "type": {
                         "hint": "Type de rituel à exécuter",
-                        "label": "Type rituel"
+                        "label": "Type de rituel"
                     }
                 },
                 "type": {
@@ -220,7 +220,7 @@
         },
         "Spirit": {
             "Bound": "Lié",
-            "Force": "Forcer",
+            "Force": "Force",
             "ForceAppliesSetting": "Force applicable à",
             "ForceAppliesSettingHint": "Détermine quels attributs de l'esprit reçoivent le bonus de Force.",
             "HalfValueSkill": "Compétence à demi-valeur",
@@ -229,9 +229,9 @@
             "InitiativeFormulaAstralHint": "Choisissez les termes de l'initiative astrale.",
             "InitiativeFormulaMeatspace": "Formule d'initiative terrestre",
             "InitiativeFormulaMeatspaceHint": "Choisissez les termes de l'initiative terrestre.",
-            "MissingSummoner": "Invocation manquante",
+            "MissingSummoner": "Invocateur manquant",
             "Services": "Services",
-            "Summoner": "Invoquer",
+            "Summoner": "Invocateur",
             "Type": "Type",
             "Types": {
                 "Abomination": "Abomination",
@@ -239,7 +239,7 @@
                 "Aircraft": "Appareil volant",
                 "Airwave": "Aérien",
                 "Ally": "Alliée",
-                "Anansi": "Anani",
+                "Anansi": "Anansi",
                 "Anarch": "Anarch",
                 "Arboreal": "Arboréal",
                 "Automotive": "Automobile",
@@ -248,7 +248,7 @@
                 "Blackjack": "Blackjack",
                 "BladeSummoned": "Lame-Invoquée",
                 "Blood": "Sang",
-                "BloodShade": "Shade sanguin",
+                "BloodShade": "Blood Shade",
                 "Boggle": "Boggle",
                 "Bone": "Os",
                 "Bugul": "Bugul",
@@ -263,7 +263,7 @@
                 "Detritus": "Détritus",
                 "Duende": "Duende",
                 "Earth": "Terre",
-                "Ejerian": "Éjérien",
+                "Ejerian": "Ejerian",
                 "Elvar": "Elvar",
                 "Energy": "Energie",
                 "Erinyes": "Erinyes",
@@ -273,13 +273,13 @@
                 "Gremlin": "Gremlin",
                 "Guardian": "Gardien",
                 "Guidance": "Guide",
-                "GumToad": "Crapaud de gum (Démon)",
+                "GumToad": "Gum Toad (Démon)",
                 "Homunculus": "Homunculus",
                 "Hopper": "Hopper",
-                "HorrorShow": "Spectacle d'horreur",
+                "HorrorShow": "Horror Show",
                 "Imp": "Imp",
-                "Jarl": "JARL",
-                "Kappa": "C'est un peu trop.",
+                "Jarl": "Jarl",
+                "Kappa": "Kappa",
                 "Kokopelli": "Kokopelli",
                 "Man": "Homme",
                 "MasterShedim": "Maître Shedim",
@@ -287,7 +287,7 @@
                 "Morbi": "Morbi",
                 "Muse": "Muse",
                 "Nightmare": "Cauchemard",
-                "Nocnitsa": "Noctnitsa",
+                "Nocnitsa": "Nocnitsa",
                 "Noxious": "Nocif",
                 "Nuclear": "Nucléaire",
                 "Nymph": "Insecte Nymphe",
@@ -295,7 +295,7 @@
                 "Phantom": "Fantôme",
                 "Plague": "Fléan",
                 "Plant": "Plante",
-                "Preta": "Préta",
+                "Preta": "Preta",
                 "Queen": "Insecte Reine",
                 "Rot": "Pourrir",
                 "Scout": "Insect Éclaireur",
@@ -308,11 +308,11 @@
                 "Succubus": "Succube",
                 "Task": "Tâche",
                 "Train": "Entrainement",
-                "TsuchigumoWarrior": "Tsuchigumo Guerrier",
+                "TsuchigumoWarrior": "Tsuchigumo Warrior",
                 "Tungak": "Tungak",
                 "Unbreakable": "Incassable",
-                "Vrygoths": "Vrygothes",
-                "VucubCaquix": "Caquix de Vucub",
+                "Vrygoths": "Vrygoths",
+                "VucubCaquix": "Vucub Caquix",
                 "Watcher": "Beobachterin",
                 "Water": "Eau",
                 "Worker": "Insecte Ouvrier",

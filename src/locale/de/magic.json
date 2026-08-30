@@ -8,7 +8,7 @@
                 },
                 "level": {
                     "hint": "Level der Adeptenkraft",
-                    "label": "Ebene"
+                    "label": "Stufe"
                 },
                 "pp": {
                     "hint": "Kosten in Kraftpunkten",
@@ -41,7 +41,7 @@
             "Durations": {
                 "Always": "Immer",
                 "Instant": "Sofort",
-                "Permanent": "Dauerhaft",
+                "Permanent": "Permanent",
                 "Special": "Speziell",
                 "Sustained": "Aufrechterhalten"
             },
@@ -56,7 +56,7 @@
                 },
                 "optional": {
                     "hint": "Ist die Critter Kraft optional?",
-                    "label": "Fakultativ"
+                    "label": "Optional"
                 },
                 "powerType": {
                     "hint": "Art der Critter Kraft",
@@ -240,12 +240,12 @@
                 "Airwave": "Radiowelle",
                 "Ally": "Verbündete",
                 "Anansi": "Anansi",
-                "Anarch": "Anarche",
+                "Anarch": "Anarch",
                 "Arboreal": "Arboreal",
                 "Automotive": "Bodenfahrzeug",
                 "Barren": "Ödnis",
                 "Beasts": "Tier",
-                "Blackjack": "Schwarzer Jack",
+                "Blackjack": "Blackjack",
                 "BladeSummoned": "Klinge-Beschworen",
                 "Blood": "Blut",
                 "BloodShade": "Blutschatten",
@@ -256,10 +256,10 @@
                 "Caretaker": "Insekt: Pfleger",
                 "Ceramic": "Keramik",
                 "Chindi": "Chindi",
-                "CorpsCadavre": "Korps Cadavre",
+                "CorpsCadavre": "Corps Cadavre",
                 "Corpse": "Leiche",
                 "Crawler": "Crawler (Dämon)",
-                "Croki": "Kroki",
+                "Croki": "Croki",
                 "Detritus": "Geröll",
                 "Duende": "Duende",
                 "Earth": "Erde",
@@ -275,8 +275,8 @@
                 "Guidance": "Ratgeber",
                 "GumToad": "Gum Toad (Dämon)",
                 "Homunculus": "Homunkulus",
-                "Hopper": "Hopfen",
-                "HorrorShow": "Horror-Show",
+                "Hopper": "Hopper",
+                "HorrorShow": "Horror Show",
                 "Imp": "Imp",
                 "Jarl": "Jarl",
                 "Kappa": "Kappa",
@@ -295,7 +295,7 @@
                 "Phantom": "Phantom",
                 "Plague": "Seuche",
                 "Plant": "Pflanze",
-                "Preta": "Vorbemerkungen",
+                "Preta": "Preta",
                 "Queen": "Insekt: Königin/Mutter",
                 "Rot": "Fäulnis",
                 "Scout": "Insekt: Späher",
@@ -304,14 +304,14 @@
                 "Ship": "Schiff",
                 "Sludge": "Schlamm",
                 "Soldier": "Insekt: Soldat",
-                "Stabber": "Staber",
+                "Stabber": "Stabber",
                 "Succubus": "Sukkubus",
                 "Task": "Helfer",
                 "Train": "Eisenbahn",
-                "TsuchigumoWarrior": "Der Jagdhund-Krieger",
+                "TsuchigumoWarrior": "Tsuchigumo Warrior",
                 "Tungak": "Tungak",
                 "Unbreakable": "Unzerbrechlich",
-                "Vrygoths": "Vrygoten",
+                "Vrygoths": "Vrygoths",
                 "VucubCaquix": "Vucub Caquix",
                 "Watcher": "Beobachter",
                 "Water": "Wasser",
