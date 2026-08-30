@@ -531,7 +531,7 @@ export const SR5 = {
         thrown: 'SR5.Weapon.Category.Thrown',
     },
 
-    grenadeTypes: {
+    thrownTypes: {
         grenade_standard: 'SR5.Weapon.Range.Category.StandardThrownGrenade',
         grenade_aerodynamic: 'SR5.Weapon.Range.Category.AerodynamicThrownGrenade',
     },

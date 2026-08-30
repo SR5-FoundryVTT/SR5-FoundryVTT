@@ -53,11 +53,11 @@ const MeleeWeaponData = () => ({
 });
 
 const ThrownWeaponData = () => ({
-    grenade_type: new StringField({
+    thrown_type: new StringField({
         required: true,
         initial: '',
         blank: true,
-        choices: SR5.grenadeTypes,
+        choices: SR5.thrownTypes,
     }),
     ranges: new SchemaField(RangeData()),
     blast: new SchemaField(BlastData()),

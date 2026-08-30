@@ -3509,9 +3509,9 @@
                     }
                 },
                 "thrown": {
-                    "grenade_type": {
-                        "hint": "Granatentyp für die Streuweite. Für geworfene Waffen ohne Granate leer lassen.",
-                        "label": "Granatentyp"
+                    "thrown_type": {
+                        "hint": "Typ der Wurfwaffe für die Streuweite. Für Wurfwaffen ohne Explosionswirkung leer lassen.",
+                        "label": "Wurfwaffentyp"
                     },
                     "blast": {
                         "dropoff": {

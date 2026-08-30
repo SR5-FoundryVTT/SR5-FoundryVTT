@@ -2134,9 +2134,9 @@
             },
             "FIELDS": {
                 "thrown": {
-                    "grenade_type": {
-                        "hint": "Tipo de granada usado para a distância de dispersão. Deixe vazio para armas arremessadas que não sejam granadas.",
-                        "label": "Tipo de Granada"
+                    "thrown_type": {
+                        "hint": "Tipo de arma arremessada usado para a distância de dispersão. Deixe vazio para armas arremessadas sem explosão.",
+                        "label": "Tipo de Arma Arremessada"
                     }
                 }
             },

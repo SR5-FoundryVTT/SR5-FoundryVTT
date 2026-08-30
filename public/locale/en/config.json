@@ -3467,9 +3467,9 @@
                     }
                 },
                 "thrown": {
-                    "grenade_type": {
-                        "hint": "Type of grenade used for scatter distance. Leave empty for non-grenade thrown weapons.",
-                        "label": "Grenade Type"
+                    "thrown_type": {
+                        "hint": "Type of thrown weapon used for scatter distance. Leave empty for thrown weapons without a blast.",
+                        "label": "Thrown Type"
                     },
                     "blast": {
                         "dropoff": {

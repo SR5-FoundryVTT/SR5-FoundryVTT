@@ -1,5 +1,6 @@
 import { QuenchBatchContext } from '@ethaks/fvtt-quench';
-import { getScatterOffset, resolveScatterRoll } from '../module/rules/ScatterRules';
+import type { SR5Item } from '../module/item/SR5Item';
+import { getItemScatterKind, getScatterOffset, resolveScatterRoll } from '../module/rules/ScatterRules';
 
 export const scatterRulesTesting = (context: QuenchBatchContext) => {
     const { describe, it } = context;
@@ -22,6 +23,15 @@ export const scatterRulesTesting = (context: QuenchBatchContext) => {
                 hits: 1,
                 distance: 0,
             });
+        });
+
+        it('reads the thrown weapon scatter type from thrown_type', () => {
+            const item = {
+                isGrenade: () => true,
+                system: { thrown: { thrown_type: 'grenade_standard' } },
+            } as unknown as SR5Item;
+
+            assert.equal(getItemScatterKind(item), 'grenade_standard');
         });
 
         it('rejects values outside the 2d6 direction result', () => {

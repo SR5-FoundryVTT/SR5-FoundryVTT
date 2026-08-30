@@ -1520,9 +1520,9 @@
             },
             "FIELDS": {
                 "thrown": {
-                    "grenade_type": {
-                        "hint": "Type de grenade utilisé pour la distance de dispersion. Laissez vide pour les armes lancées sans grenade.",
-                        "label": "Type de grenade"
+                    "thrown_type": {
+                        "hint": "Type d'arme lancée utilisé pour la distance de dispersion. Laissez vide pour les armes lancées sans explosion.",
+                        "label": "Type d'arme lancée"
                     }
                 }
             },
