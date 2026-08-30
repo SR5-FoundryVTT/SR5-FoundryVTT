@@ -134,9 +134,7 @@
             "Targets": "대상",
             "Labels": {
                 "Effect": "효과",
-                "Effects": "효과",
-                "EnforcedMaximum": "최댓값 강제",
-                "EnforcedMinimum": "최솟값 강제"
+                "Effects": "효과"
             }
         },
         "StatusEffects": {

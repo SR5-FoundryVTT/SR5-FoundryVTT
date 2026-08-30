@@ -7,7 +7,7 @@ import itemsTranslations from '../../locale/en/items.json';
 import magicTranslations from '../../locale/en/magic.json';
 import matrixTranslations from '../../locale/en/matrix.json';
 import messagesTranslations from '../../locale/en/messages.json';
-import skillsTestsTranslations from '../../locale/en/skills-tests.json';
+import testsTranslations from '../../locale/en/tests.json';
 import systemTranslations from '../../locale/en/system.json';
 import uiTranslations from '../../locale/en/ui.json';
 import { NestedKeys } from './types';
@@ -23,7 +23,7 @@ export type Translation =
     | NestedKeys<typeof magicTranslations>
     | NestedKeys<typeof matrixTranslations>
     | NestedKeys<typeof messagesTranslations>
-    | NestedKeys<typeof skillsTestsTranslations>
+    | NestedKeys<typeof testsTranslations>
     | NestedKeys<typeof systemTranslations>
     | NestedKeys<typeof uiTranslations>;
 

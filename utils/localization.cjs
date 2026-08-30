@@ -14,7 +14,7 @@ const MODULES = Object.freeze([
     'common',
     'actors',
     'items',
-    'skills-tests',
+    'tests',
     'combat',
     'magic',
     'matrix',
@@ -27,7 +27,7 @@ const EXPECTED_BASE_KEY_COUNT = 2545;
 const MODULE_NAMESPACES = Object.freeze({
     actors: Object.freeze(['Actor', 'ActorTypes', 'Character', 'Contact', 'InventoryRename', 'MovementTypes', 'Vehicle', 'VehicleImport', 'Vision']),
     items: Object.freeze(['Ammo', 'Armor', 'Device', 'Element', 'Item', 'ItemTypes', 'Lifestyle', 'Modification', 'ModificationTypes', 'MoveInventoryDialog', 'Program', 'Quality', 'Weapon']),
-    'skills-tests': Object.freeze(['ActionCategory', 'ActionType', 'CallInAction', 'ExtendedTestManager', 'ModifierTypes', 'Skill', 'TestResults', 'Tests']),
+    tests: Object.freeze(['ActionCategory', 'ActionType', 'CallInAction', 'ExtendedTestManager', 'ModifierTypes', 'Skill', 'TestResults', 'Tests']),
     combat: Object.freeze(['Combat', 'Damage', 'DamageApplication']),
     magic: Object.freeze(['AdeptPower', 'CritterPower', 'Magic', 'Ritual', 'Spell', 'Spirit']),
     matrix: Object.freeze(['ComplexForm', 'Grid', 'Host', 'IC', 'Matrix', 'MatrixNetworkHackingApplication', 'MatrixOpposedDeviceDialog', 'NetworkManager', 'RebootConfirmationDialog', 'SelectMatrixNetworkDialog', 'Sprite', 'SpritePower']),

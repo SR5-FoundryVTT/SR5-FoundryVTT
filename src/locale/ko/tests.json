@@ -554,6 +554,8 @@
             "Labels": {
                 "ActiveDefense": "능동 방어",
                 "Attacker": "공격자",
+                "EnforcedMaximum": "최댓값 강제",
+                "EnforcedMinimum": "최솟값 강제",
                 "AttackerHits": "공격자 성공횟수",
                 "AttackerNetHits": "공격자 순 성공횟수",
                 "BiofeedbackDamage": "생체반응 피해",

@@ -134,9 +134,7 @@
             "Targets": "Cibles",
             "Labels": {
                 "Effect": "Effet",
-                "Effects": "Effets",
-                "EnforcedMaximum": "Maximum imposé",
-                "EnforcedMinimum": "Minimum imposé"
+                "Effects": "Effets"
             }
         },
         "StatusEffects": {

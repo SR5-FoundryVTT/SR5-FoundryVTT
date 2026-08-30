@@ -554,6 +554,8 @@
             "Labels": {
                 "ActiveDefense": "Unterbrechungsh.",
                 "Attacker": "Angreifer",
+                "EnforcedMaximum": "Erzwungenes Maximum",
+                "EnforcedMinimum": "Erzwungenes Minimum",
                 "AttackerHits": "Angreifer-Erfolge",
                 "AttackerNetHits": "Angreifer-Netto-Erfolge",
                 "BiofeedbackDamage": "Biofeedback Schaden",

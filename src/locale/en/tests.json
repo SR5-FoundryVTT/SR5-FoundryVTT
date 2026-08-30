@@ -554,6 +554,8 @@
             "Labels": {
                 "ActiveDefense": "Active Defense",
                 "Attacker": "Attacker",
+                "EnforcedMaximum": "Enforced Maximum",
+                "EnforcedMinimum": "Enforced Minimum",
                 "AttackerHits": "Attacker Hits",
                 "AttackerNetHits": "Attacker Net Hits",
                 "BiofeedbackDamage": "Biofeedback Damage",
