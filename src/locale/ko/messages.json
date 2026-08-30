@@ -30,7 +30,7 @@
             "SkillWithoutAttribute": "해당 기술에 특성치 설정이 없습니다.",
             "SourceFieldEmpty": "출처 부분이 비어있으니 출처에 대한 유효한 문자를 입력해주시기 바랍니다.",
             "TestExpectsVehicleOnly": "해당 판정은 탑승물 유형의 액터만 사용 가능",
-            "TooManyActionsWithCategory": "액터에는 {category} 범주의 행동이 정확히 하나 있어야 합니다"
+            "TooManyActionsWithCategory": "액터에는 {category} 범주의 행동이 정확히 하나 있어야 합니다."
         },
         "Messages": {
             "MarkInvitation": {

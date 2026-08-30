@@ -427,7 +427,7 @@
                 "body": "몸체",
                 "cosmetic": "외장",
                 "electromagnetic": "전자기품",
-                "powertrain": "파워트레인",
+                "powertrain": "구동 장치",
                 "protection": "보호",
                 "weapons": "무기"
             },

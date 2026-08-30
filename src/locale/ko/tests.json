@@ -43,7 +43,7 @@
         "ActionType": {
             "Complex": "복잡",
             "Free": "자유",
-            "Interrupt": "인터럽트",
+            "Interrupt": "방해",
             "Label": "유형",
             "None": "없음",
             "Simple": "단순",
