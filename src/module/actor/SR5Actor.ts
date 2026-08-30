@@ -1572,7 +1572,7 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
 
         const currentPerception = this.system.initiative.perception;
         const fromMode = currentPerception !== 'matrix' ? currentPerception
-            : (this.system.matrix?.hot_sim ? 'hot_sim' : 'cold_sim');
+            : (this.isUsingHotSim ? 'hot_sim' : 'cold_sim');
 
         if (fromMode === mode) return;
 
@@ -1580,9 +1580,12 @@ export class SR5Actor<SubType extends Actor.ConfiguredSubType = Actor.Configured
         const updateData = {
             system: {
                 initiative: { perception: isMatrixMode ? 'matrix' : mode },
-                // Setting hot-sim to false is necessary even if new ini mode is non-matrix.
-                // Otherwise matrix modifiers will still apply when in non-matrix mode.
-                ...(this.system.matrix && { matrix: { hot_sim: mode === 'hot_sim' } }),
+                ...(this.system.matrix && {
+                    matrix: {
+                        vr: isMatrixMode,
+                        hot_sim: mode === 'hot_sim',
+                    },
+                }),
             },
         } as const;
 
