@@ -4,30 +4,21 @@
             "Common": {
                 "Cancel": "Cancelar",
                 "Ok": "OK"
-            },
-            "RangedWeaponTest": {
-                "EnvironmentalOverwriteSet": "Os modificadores ambientais foram definidos manualmente para um valor fixo!"
             }
         },
         "Errors": {
             "CantConnectICToGrid": "Atores GELO não podem ser conectados a uma grade",
             "CantConnectToPAN": "Não é possível adicionar um documento à rede PAN",
             "CantConnectToWAN": "Não é possível adicionar um documento à rede WAN",
-            "CantEditAppliedItemEffects": "Você não pode editar um efeito ativo que foi aplicado por um item.",
             "CantExecuteTest": "Você não pode executar este teste. Isso pode estar relacionado a você ser um jogador ou falta de permissões.",
             "DefaultInventoryCantBeRemoved": "O inventário padrão não pode ser removido",
             "InventoryAlreadyExists": "Um inventário com este nome já existe.",
-            "KeyNotModifiableByActiveEffect": "O modo de efeito ativo 'modificar' só pode afetar propriedades de mod.",
             "LinkLockedReboot": "Um ator com bloqueio de conexão não pode ser reiniciado",
-            "MarkCouldNotBePlaced": "Erro Interno: Suas marcas não puderam ser colocadas.",
             "MarksCantBePlacedBy": "O ator ativo não pode colocar marcas.",
             "MarksCantBePlacedOn": "O tipo de ator escolhido não pode receber marcas.",
             "MarksCantBePlacedWithoutPersona": "O ator escolhido não tem uma persona ativa.",
             "MasterDeviceIsMissing": "O dispositivo mestre está ausente. Voltando aos valores do dispositivo local.",
-            "MissingItemForOpposedTest": "O teste oposto não pode ser realizado porque o item usado na ação não está mais disponível",
-            "MissingSkill": "O ator não possui a pericia solicitada.",
             "NoAvailableActorFound": "Nenhum ator disponível foi encontrado para esta ação",
-            "SkillWithoutAttribute": "A pericia não tem um atributo configurado.",
             "SourceFieldEmpty": "O campo Fonte está vazio, por favor insira um texto válido para a fonte",
             "TestExpectsVehicleOnly": "Este teste só pode ser feito com um ator do tipo veículo",
             "TooManyActionsWithCategory": "Você deve ter exatamente uma ação da categoria {category} no seu ator"
@@ -53,18 +44,15 @@
                 "Starting": "Começando a adicionar dispositivos equipados ao PAN"
             },
             "CantModifyHostContent": "Não é possível alterar os dados do host a partir de um ator GELO.",
-            "ConsumedEquippedAmmo": "Munição equipada consumida",
             "DeletingStorageReferences": {
                 "Finished": "Limpeza de referências concluída",
                 "Item": "Limpando referências ao item",
                 "Start": "Excluindo referências de rede e Marcas"
             },
-            "ResetProgressiveRecoil": "Recuo progressivo reiniciado para zero balas disparadas",
             "VehicleCannotBeOwnDriver": "Um veículo não pode ser o motorista de si mesmo (é para isso que o piloto serve)"
         },
         "Warnings": {
             "ActorMissingRequirements": "O ator deve atender ao requisito de Desperto ou Emergido desta perícia",
-            "AlreadyExistingInventory": "Um inventário com este nome já existe",
             "AlreadyJoinedNetwork": "{name} já entrou nesta rede",
             "BulkImportPerformanceWarning": "Se você importou um grande número de itens, o Foundry pode funcionar lentamente até que você atualize seu navegador. É recomendado atualizar agora.",
             "CantCombineBuyHitsWithEdge": "Comprar Acertos não pode ser combinado com Segunda Chance.",
@@ -81,12 +69,9 @@
             "CantSpendMultiplePointsOfEdge": "Não pode gastar vários pontos de trunfo em um teste ou ação",
             "CompilationNotConcluded": "Compilação incompleta. Aguarde o sprite se opor à compilação para determinar o enfraquecimento.",
             "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Pontos de trunfo não podem ser gastos em testes sem atores",
-            "HostItemOnlyAcceptIC": "Apenas atores GELO podem ser adicionados aos hosts",
             "InvalidCompilationLevel": "Atributo de ressonância muito baixo para este nível de sprite",
-            "InvalidMarksCount": "Você está tentando colocar um número estranho de marcas",
             "InvalidSummoningForce": "O valor da força escolhido não adere às regras",
             "MissingPdfPager": "Para que os PDFs de origem sejam mostrados, o módulo pdf-pager deve estar instalado e um PDF correspondente ao código criado.",
-            "NegativeLimitValue": "Os valores do limite devem ser números positivos",
             "NoActorCreatePermission": "Você não tem permissão para criar atores.",
             "NoFireModeConfigured": "A arma de fogo não tem modo de fogo configurado. Usará tiro único.",
             "NoSelectableToken": "O ator não tem token selecionável na cena",

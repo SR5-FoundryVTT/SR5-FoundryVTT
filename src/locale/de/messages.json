@@ -4,30 +4,21 @@
             "Common": {
                 "Cancel": "Abbrechen",
                 "Ok": "OK"
-            },
-            "RangedWeaponTest": {
-                "EnvironmentalOverwriteSet": "Umgebungsmodifikatoren wurden manuell auf einen fixen Wert gesetzt!"
             }
         },
         "Errors": {
             "CantConnectICToGrid": "IC-Akteure können nicht mit einem Gitter-Netzwerk verbunden werden.",
             "CantConnectToPAN": "Das ausgewählte Dokument kann nicht zu einem PAN-Netzwerk hinzugefügt werden.",
             "CantConnectToWAN": "Das ausgewählte Dokument kann nicht zu einem WAN-Netzwerk hinzugefügt werden.",
-            "CantEditAppliedItemEffects": "Aktive Effekte, die über Items zugefügt wurden, können nicht direkt editiert werden.",
             "CantExecuteTest": "Du kannst diesen Test nicht ausführen. Dies könnte damit zusammenhängen, dass du ein Spieler bist oder nicht ausreichend Berechtigungen hast.",
             "DefaultInventoryCantBeRemoved": "Das Standardinventar kann nicht entfernt werden.",
             "InventoryAlreadyExists": "Es existiert bereits ein Inventar mit diesem Namen",
-            "KeyNotModifiableByActiveEffect": "Aktiver Effekt Modus Modifizieren kann nur auf mod Felder angewendet werden.",
             "LinkLockedReboot": "Ein verbindungsgesperrter Akteur kann nicht neu gestartet werden",
-            "MarkCouldNotBePlaced": "Interner Fehler: Die Marken konnten nicht platziert werden.",
             "MarksCantBePlacedBy": "Der aktive Akteur kann keine Marken platzieren.",
             "MarksCantBePlacedOn": "Der als Ziel ausgewählte Akteur kann keine Marken empfangen.",
             "MarksCantBePlacedWithoutPersona": "Der ausgewählte Akteur hat keine aktive Persona.",
             "MasterDeviceIsMissing": "Das Mastergerät fehlt. Es werden lokale Gerätewerte verwendet.",
-            "MissingItemForOpposedTest": "Probe kann nicht durchgeführt werden, da der ausführende Gegenstand jetzt fehlt",
-            "MissingSkill": "Der Charakter verfügt nicht über die benötigte Fertigkeit.",
             "NoAvailableActorFound": "Es wurde kein verfügbarer Akteur für diese Aktion gefunden",
-            "SkillWithoutAttribute": "Die Fertigkeit hat kein konfiguriertes Attribut.",
             "SourceFieldEmpty": "Das Quelle-Feld ist leer, bitte gib einen gültigen Text für die Quelle ein.",
             "TestExpectsVehicleOnly": "Diese Probe kann nur mit einem Fahrzeug-Akteur geworfen werden",
             "TooManyActionsWithCategory": "Es darf nur eine Aktion mit der Kategorie {category} pro Akteur geben."
@@ -53,18 +44,15 @@
                 "Starting": "Beginne mit dem Hinzufügen der ausgestatteten Geräte zum PAN"
             },
             "CantModifyHostContent": "Hostdaten können nicht von einem IC-Akteur aus verändert werden",
-            "ConsumedEquippedAmmo": "Kugeln von ausgerüsteter Munition abgezogen",
             "DeletingStorageReferences": {
                 "Finished": "Referenzen wurden erfolgreich gelöscht.",
                 "Item": "Lösche Referenzen zu Item",
                 "Start": "Lösche Netzwerk und Marken Referenzen"
             },
-            "ResetProgressiveRecoil": "Kummulativer Rückstoß zurückgesetzt auf 0 abgefeuerte Kugeln",
             "VehicleCannotBeOwnDriver": "Ein Fahrzeug kann nicht der Fahrer von sich selbst sein (dafür ist der Pilot da)"
         },
         "Warnings": {
             "ActorMissingRequirements": "Der Akteur muss die Voraussetzung der Fertigkeit erfüllen: erwacht oder emergiert",
-            "AlreadyExistingInventory": "Ein Inventar mit diesem Namen existiert bereits",
             "AlreadyJoinedNetwork": "bereits mit dem Netzwerk {name} verbunden",
             "BulkImportPerformanceWarning": "Wenn du eine große Anzahl von Items importiert hast, kann Foundry langsam laufen, bis du deinen Browser aktualisierst. Es wird empfohlen, jetzt zu aktualisieren.",
             "CantCombineBuyHitsWithEdge": "Erfolge kaufen kann nicht mit zweiter Chance kombiniert werden.",
@@ -81,12 +69,9 @@
             "CantSpendMultiplePointsOfEdge": "Es kann nur ein Punkt Edge für eine Probe oder Handlung gleichzeitig ausgegeben werden.",
             "CompilationNotConcluded": "Kompilieren unvollständig. Warte auf Gegenprobe des Sprites, um Schwund zu bestimmen",
             "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge-Punkte können nicht auf Proben ohne Akteur angewendet werden.",
-            "HostItemOnlyAcceptIC": "Nur IC Akteure können einem Host zugefügt werden",
             "InvalidCompilationLevel": "Resonanz-Attribut zu niedrig für Sprite-Stufe",
-            "InvalidMarksCount": "Du hast versucht, eine falsche Anzahl von Marken zu setzen",
             "InvalidSummoningForce": "Gewählte Kraft hält sich nicht an die Regeln",
             "MissingPdfPager": "Um das Quell-PDF anzuzeigen, muss das Modul pdfpager installiert sein und ein PDF mit passendem Code erstellt werden.",
-            "NegativeLimitValue": "Limit-Werte müssen über Null liegen",
             "NoActorCreatePermission": "Du hast keine Berechtigung, Akteure zu erstellen.",
             "NoFireModeConfigured": "Fernwaffe hat keinen Feuermodus konfiguriert. Verwende Einzelfeuer.",
             "NoSelectableToken": "Charakter hat kein auswählbares Token auf der Karte",

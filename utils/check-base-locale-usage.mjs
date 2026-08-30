@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const PROJECT_ROOT = path.join(__dirname, '..');
-const SEARCH_EXTENSIONS = ['.js', '.ts', '.hbs', '.html'];
+const SEARCH_EXTENSIONS = ['.js', '.ts', '.hbs', '.html', '.json'];
 
 /**
  * Recursively get all files with specific extensions from a directory
@@ -67,7 +67,7 @@ function getProjectFiles() {
  * @param {string} key - The localization key to classify
  * @returns {boolean} - True when Foundry consumes the key implicitly
  */
-function isImplicitlyConsumed(key) {
+export function isImplicitlyConsumed(key) {
     const segments = key.split('.');
     return ['TYPES', 'SETTINGS', 'CONTROLS'].includes(segments[0]) || segments.includes('FIELDS');
 }
@@ -75,33 +75,38 @@ function isImplicitlyConsumed(key) {
 /**
  * Collect every `SR5.*` path that appears in the project sources.
  * @param {Map<string, string>} fileContents - Map of file paths to their contents
- * @returns {Set<string>} - Set of referenced paths, leaves and branches alike
+ * @returns {{ paths: Set<string>, interpolatedPrefixes: Set<string> }} - Referenced paths and incomplete path segments
  */
-function collectReferencedPaths(fileContents) {
-    const referenced = new Set();
+export function collectReferencedPaths(fileContents) {
+    const paths = new Set();
+    const interpolatedPrefixes = new Set();
 
     for (const content of fileContents.values()) {
         for (const match of content.matchAll(/SR5(?:\.[A-Za-z0-9_]+)+/g)) {
-            referenced.add(match[0]);
+            paths.add(match[0]);
+        }
+        for (const match of content.matchAll(/SR5(?:\.[A-Za-z0-9_]+)+(?=\$\{)/g)) {
+            interpolatedPrefixes.add(match[0]);
         }
     }
 
-    return referenced;
+    return { paths, interpolatedPrefixes };
 }
 
 /**
  * Check if a key is used in the project sources. A key counts as used when it is referenced outright, or when an
  * ancestor is, since keys below a referenced branch are built dynamically (`SR5.Skill.${name}`).
  * @param {string} key - The localization key to search for
- * @param {Set<string>} referenced - Paths collected by collectReferencedPaths
+ * @param {{ paths: Set<string>, interpolatedPrefixes: Set<string> }} references - Paths collected by collectReferencedPaths
  * @returns {boolean} - True if key is referenced
  */
-function isKeyUsed(key, referenced) {
-    if (referenced.has(key)) return true;
+export function isKeyUsed(key, { paths, interpolatedPrefixes }) {
+    if (paths.has(key)) return true;
+    if ([...interpolatedPrefixes].some((prefix) => key.startsWith(prefix))) return true;
 
     const segments = key.split('.');
     for (let index = segments.length - 1; index > 1; index -= 1) {
-        if (referenced.has(segments.slice(0, index).join('.'))) return true;
+        if (paths.has(segments.slice(0, index).join('.'))) return true;
     }
 
     return false;
@@ -149,7 +154,7 @@ async function main() {
 
     // Check each key for usage
     console.log('Checking for unused localization keys...\n');
-    const referenced = collectReferencedPaths(fileContents);
+    const references = collectReferencedPaths(fileContents);
     const unusedKeys = [];
     let implicitCount = 0;
 
@@ -159,7 +164,7 @@ async function main() {
             continue;
         }
 
-        if (!isKeyUsed(key, referenced)) {
+        if (!isKeyUsed(key, references)) {
             unusedKeys.push(key);
         }
     }
@@ -200,4 +205,4 @@ async function main() {
     console.log(`✨ Check complete! Total unused: ${unusedKeys.length}/${checkedCount} checked (${allKeys.length} total, ${implicitCount} implicit)`);
 }
 
-main();
+if (process.argv[1] === __filename) main();

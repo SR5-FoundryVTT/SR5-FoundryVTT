@@ -456,9 +456,6 @@
             },
             "Vehicle": "Veículo"
         },
-        "VehicleImport": {
-            "MissingPermission": "Você não tem permissão para criar atores"
-        },
         "Vision": {
             "AstralPerception": "Percepção Astral",
             "AugmentedReality": "Realidade Aumentada",

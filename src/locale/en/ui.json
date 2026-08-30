@@ -63,7 +63,6 @@
             "EditSkill": "Edit Skill",
             "MoveItem": "Move Item",
             "Source": "Open Reference",
-            "View": "View",
             "ViewItem": "View Item"
         },
         "Keybindings": {
@@ -98,23 +97,12 @@
         },
         "Labels": {
             "Action": {
-                "ActiveTest": "Test",
-                "Category": "Category",
-                "DamageResistanceTest": "Damage Resistance Test",
                 "ForceReboot": "Force Reboot",
                 "MatrixAction": "Matrix Action",
-                "Modifier": "Modifier",
                 "Modifiers": "Modifiers",
-                "OpposedTest": "Opposed Test",
-                "SpiritType": "Spirit Type",
-                "SpriteType": "Sprite Type"
-            },
-            "Actions": {
-                "BruteForce": "Brute Force",
-                "HackOnTheFly": "Hack on the Fly"
+                "OpposedTest": "Opposed Test"
             },
             "ActorSheet": {
-                "AddNetwork": "Direct Connect Network",
                 "AddOneMark": "Add One Mark",
                 "ColdSim": "Cold Sim",
                 "Compilations": "Compilations",
@@ -123,18 +111,12 @@
                 "CreateInventory": "Create inventory place",
                 "CritterPowers": "Critter Powers",
                 "DeviceRating": "Device Rating",
-                "DeviceSetup": "Device Setup",
                 "DisabledOptionCritterPowers": "Optional Critter Powers - Disabled",
                 "DisabledOptionSpritePowers": "Optional Sprite Powers - Disabled",
                 "DisplayingPersona": "Displaying Persona",
                 "EnabledOptionCritterPowers": "Optional Critter Powers - Enabled",
                 "EnabledOptionSpritePowers": "Optional Sprite Powers - Enabled",
-                "Hacking": "Hacking",
-                "ICConfiguration": "IC Configuration",
                 "Icons": "Icons",
-                "ManageNetwork": "Manage Network",
-                "MarkNetwork": "Mark Network",
-                "MarkedIcons": "Marked Icons",
                 "Matrix": "Matrix",
                 "MatrixActions": "Matrix Actions",
                 "Network": "Network",
@@ -142,34 +124,23 @@
                 "NoNetwork": "No Network",
                 "NotorietyShort": "N",
                 "Offline": "Offline",
-                "OpenSourceDocument": "Open Source",
                 "OwnedIcons": "Owned Icons",
                 "Persona": "Persona",
-                "PersonalInventory": "On Person",
                 "PhysicalTrack": "Physical Track",
                 "PublicAwarenessShort": "PA",
                 "RemoveOneMark": "Remove One Mark",
                 "ResetActorForNewRun": "New Run Reset",
                 "Rituals": "Rituals",
-                "RollDroneInfiltration": "Drone Infiltration",
-                "RollDronePerception": "Drone Perception",
-                "RollPilotVehicleTest": "Pilot Vehicle",
                 "SetMonitor": "Monitor must be set manually.",
-                "SetupPAN": "Add Devices to PAN",
-                "Spells": "Spells",
-                "SpiritConfiguration": "Spirit Configuration",
-                "SpriteConfiguration": "Sprite Configuration",
                 "SpritePowers": "Sprite Powers",
                 "StreetCredShort": "SC",
                 "StunTrack": "Stun Track",
-                "TestKBoardModifiers": "{skip}: skip dialog. {descr}: show only description.",
-                "VehicleConfiguration": "Vehicle Configuration"
+                "TestKBoardModifiers": "{skip}: skip dialog. {descr}: show only description."
             },
             "Documents": {
                 "Actor": "Actor",
                 "Item": "Item",
-                "Scene": "Scene",
-                "Token": "Token"
+                "Scene": "Scene"
             },
             "Inventory": {
                 "All": "All",
@@ -179,12 +150,7 @@
             "Item": {
                 "AvailabilityAdjustment": "Scale Availability w/ Rating",
                 "CostAdjustment": "Scale Cost w/ Rating",
-                "EssenceAdjustment": "Scale Essence w/ Rating",
                 "Network": "Network"
-            },
-            "MarkPlacement": {
-                "PlaceOnDevice": "Place on device",
-                "PlaceOnMainIcon": "Place on persona/host"
             },
             "Matrix": {
                 "AttackShort": "A",
@@ -205,19 +171,14 @@
                 "TestEffects": "Applied effects"
             },
             "Sheet": {
-                "AddOne": "Add One",
                 "ClearNetwork": "Clear network from all devices",
                 "ItemEffects": "Item Effects",
                 "MissingNetworkDevices": "Drag&Drop a network device to add it",
-                "NetworkDevices": "Networked Devices",
                 "NotVisible": "Not Visible",
-                "PAN": "PAN",
                 "RebootDevice": "Reboot",
                 "RemoveImprovisedDevices": "Remove improvised devices",
-                "SubtractOne": "Subtract One",
                 "Type": "Type",
-                "Visible": "Visible",
-                "WAN": "WAN"
+                "Visible": "Visible"
             },
             "Sidebar": {
                 "Changelog": "Changelog",
@@ -269,75 +230,46 @@
             "Actor": {
                 "AddOneService": "Add One Service",
                 "Blitz": "Use a point of Edge to roll the Maximum (5) number of dice for initiative",
-                "ConnectNetwork": "Enter this host/grid",
-                "Critter": "Allow the use of critter powers",
-                "DefaultCategoryVisibility": "Show item categories even if no item has been added to them",
                 "Description": "Description of this Actor",
                 "DisconnectNetwork": "Leave this host/grid",
-                "MarkTarget": "Place additional marks on this target",
-                "MatrixConnectionToggle": "Change Matrix Connection status: Augmented Reality, Cold Sim, or Hot Sim",
                 "MatrixRunningSilentToggle": "Change your matrix device between Running Silent and Displaying your Persona",
-                "Metatype": "As NPC the metatype will also apply attribute quick modifiers",
                 "MiscConfig": "Miscellaneous Settings & Modifiers",
-                "MissingSummoner": "Missing Summoner",
-                "MissingTechnomancer": "Missing Technomancer",
-                "NPC": "Mark actor as NPC to get additional features",
-                "NetworksTab": "Grids & Hosts",
                 "NoCombatant": "Initiative Roll (Must be in an Encounter)",
                 "PickControlledTokenAsDriver": "Pick the currently Controlled Token Actor as the Driver",
                 "PickControlledTokenAsSummoner": "Pick the currently Controlled Token Actor as the Summoner",
                 "PickControlledTokenAsTechnomancer": "Pick the currently Controlled Token Actor as the Compiler (Technomancer)",
-                "PlaceMark": "Action to be used to place marks on already marked targets",
                 "RebootPersonaAndClearAllMarks": "Reboot your Persona and clear all Marks you have placed",
                 "RemoveAllNetworks": "Remove all networks",
                 "RemoveFavorite": "Remove this from your favorites bar",
                 "RemoveNetwork": "Remove network",
                 "RemoveOneService": "Remove One Service",
                 "RemoveSkillSet": "Remove the current skill set as well as all skills and skill groups sourced from it",
-                "ResetActorForNewRun": "Reset damage, edge, etc. for a new run",
-                "RollInitiative": "Roll Initiative",
-                "SetupPAN": "Add all Equipped Wireless Devices to this character's Persona"
+                "RollInitiative": "Roll Initiative"
             },
             "CallInAction": {
-                "ActorType": "Type of actor to call in",
                 "LinkActor": "Drag&Drop an Actor to Call In"
             },
             "CompilationTest": {
-                "Level": "Level of the compiled sprite",
-                "PreparedSprite": "Use a prepared sprite actor instead of creating a generic one",
-                "SpriteType": "Type of the compiled sprite"
+                "Level": "Level of the compiled sprite"
             },
             "Contact": {
                 "LinkActor": "Drag&Drop an Actor to link this Contact"
             },
             "Effect": {
-                "AlterApplyToWithChanges": "Remove changes before changing what the effect applies to.",
-                "ApplyTo": "Changes of this effect will apply to this target only",
                 "ApplyValueEditor": "Apply value edit",
                 "CancelValueEditor": "Cancel value edit",
                 "CreateEffect": "Create Effect",
                 "DeleteEffect": "Delete Effect",
-                "DocumentEffects": "Effects directly on this document",
                 "EditEffect": "Edit Effect",
                 "HelpLinkEnglishOnly": "Help (External link, English only)",
-                "ItemEffects": "Effects collected from items on this document",
-                "OnlyAllFilteredUsed": "This effect will only apply for tests matching all selections",
-                "OnlyFilteredUsed": "This effect will only apply for tests matching at least one selection",
-                "OnlyForItemTest": "Only affect test of parent item",
-                "OnlyForWireless": "This effect will apply only for items that have wireless enabled",
                 "OpenValueEditor": "Open value editor",
                 "PriorityFieldDisabled": "Custom priority is not supported at this time"
             },
             "Item": {
-                "ActionCategories": "Select action categories to use instead of the test's default categories. Using Active Effects you can use categories to modify test values",
-                "ActionModifier": "Select pool modifiers to use instead of test's default modifiers",
-                "ActionRollMode": "Default roll mode when casting this action. Will overwrite global chat setting",
                 "AddQuantity": "Add 1 Qty. {qtySome}: Add 5 Qty. {qtyMany}: Add 20 Qty.",
-                "AmmoReplaceDamage": "Set to replace weapon damage instead of modifying it",
                 "AvailabilityAdjustment": "Adjust actual availability based on the item rating",
                 "CostAdjustment": "Adjust actual cost based on the item rating",
                 "DisabledForPreparedActor": "Disabled because the prepared actor cannot be edited by your current user",
-                "EssenceAdjustment": "Adjust actual essence cost based on the item rating",
                 "RemoveQuantity": "Remove 1 Qty. {qtySome}: Remove 5 Qty. {qtyMany}: Remove 20 Qty.",
                 "ToggleFavorite": "Favorite this and display it in the Favorites Bar",
                 "ToggleVisibility": "Toggle the Visibility of this during Play Mode"
@@ -347,7 +279,6 @@
             },
             "RangedAttack": {
                 "Recoil": "Progressive Recoil",
-                "RecoilAfterAttack": "Progressive Recoil including this attack",
                 "RecoilBeforeAttack": "Progressive Recoil now, before attacking",
                 "RecoilCompensation": "Total RC, including actor and item RC",
                 "ResetRecoil": "Reset progressive recoil to none"
@@ -363,9 +294,7 @@
                 "DragOnCanvas": "Drag spirit on canvas",
                 "Force": "Force of the summoned spirit",
                 "OptionalPowerCount": "Informational count for optional spirit powers (floor(force / 3)).",
-                "PreparedSpirit": "Use a prepared spirit actor instead of creating a generic one",
-                "ReagentDrams": "Drams of reagents used for altering summoning limit",
-                "SpiritType": "Type of the summoned spirit"
+                "ReagentDrams": "Drams of reagents used for altering summoning limit"
             },
             "Test": {
                 "BuyHits": "Do not roll dice. Buy hits using ⌊dice pool / 4⌋.",
@@ -373,11 +302,8 @@
                 "ExtendedInterval": "Game time between rolls. Zero rolls this as a normal, non extended test.",
                 "Limit": "Calculated limit value",
                 "LimitIgnored": "Limit is currently ignored for this test",
-                "Modifier": "Sum of all modifiers applied to dice pool",
                 "Pool": "Amount of dice to roll",
                 "PushTheLimit": "Apply push the limit edge rules",
-                "ResultOverrideGlitches": "Override glitches for this test result.",
-                "ResultOverrideHits": "Override hits for this test result.",
                 "RollMode": "FoundryVTT chat message roll visibility",
                 "Threshold": "Calculated threshold value"
             },

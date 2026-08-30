@@ -30,11 +30,7 @@
             }
         },
         "Host": {
-            "Attributes": "Attribute",
             "CustomAttributes": "Eigene Attributsaufteilung",
-            "DropICActor": "Drag&Drop IC Acteure in gewünschter Reihenfolge",
-            "ICOrder": "IC-Reihenfolge",
-            "MissingIC": "Fehlende IC",
             "Rating": "Host-Stufe"
         },
         "IC": {
@@ -94,26 +90,16 @@
                 "LivingPersona": "Lebende Persona",
                 "Marks": "Marken",
                 "MatrixDefense": "Matrix Verteidigung",
-                "MatrixFullDefenseAttribute": "Matrix Vollverteidigungsattribut",
-                "MatrixTarget": "Matrixziel",
                 "Network": "Netzwerk",
-                "Networks": "Netzwerke",
                 "OverwatchScore": "Overwatch-Wert",
                 "OverwatchScoreTrackerTitle": "Mr. Johnsons Baby-Monitor",
-                "Personas": "Personas",
                 "PublicGrid": "Öffentliches Gitter",
                 "RunningSilent": "Auf Schleichfahrt",
-                "RunningSilentControlledByDevice": "Schleichtfahrt wird vom aktiven Matrixgerät gesteuert:",
                 "Wireless": "WiFi",
                 "WirelessOffline": "Offline",
                 "WirelessOnline": "Online",
                 "WirelessUnavailable": "Kabel"
             }
-        },
-        "MatrixNetworkHackingApplication": {
-            "Icons": "Icons",
-            "Invite": "Einladung anfordern",
-            "Title": "Mit Netzwerk verbinden"
         },
         "MatrixOpposedDeviceDialog": {
             "Title": "Matrixgerät erstellen"
@@ -125,7 +111,6 @@
             "HackOnTheFly": "Eiliges Hacken",
             "InviteMark": "Marke einladen",
             "NetworkType": "Netzwerktyp",
-            "NoNetwork": "Kein Netzwerk",
             "Title": "Netzwerkmanager"
         },
         "RebootConfirmationDialog": {
@@ -133,11 +118,6 @@
             "Confirm": "Neustart",
             "Description": "Sind Sie sicher, dass Sie dieses Gerät neu starten möchten?",
             "Title": "Neustart bestätigen"
-        },
-        "SelectMatrixNetworkDialog": {
-            "Cancel": "Abbrechen",
-            "Connect": "Verbinden",
-            "Title": "Netzwerk auswählen"
         },
         "Sprite": {
             "FIELDS": {

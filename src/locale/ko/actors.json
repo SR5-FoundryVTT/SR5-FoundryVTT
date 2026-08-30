@@ -456,9 +456,6 @@
             },
             "Vehicle": "탑승물"
         },
-        "VehicleImport": {
-            "MissingPermission": "액터 생성 권한이 없음"
-        },
         "Vision": {
             "AstralPerception": "아스트랄 인식",
             "AugmentedReality": "증강 현실",

@@ -10,15 +10,8 @@
                 "EnabledOptionCritterPowers": "Pouvoirs Optionels - Activés",
                 "EnabledOptionSpritePowers": "Pouvoirs Optionels - Activés",
                 "Rituals": "Rituels",
-                "RollDroneInfiltration": "Infiltration du drone",
-                "RollDronePerception": "Perception du drone",
-                "RollPilotVehicleTest": "Pilotage du véhicule",
                 "SetMonitor": "Moniteur doit être installé manuellement",
-                "Spells": "Sorts",
-                "SpiritConfiguration": "Configuration d'esprit",
-                "SpriteConfiguration": "Configuration de sprite",
-                "SpritePowers": "Pouvoirs",
-                "VehicleConfiguration": "Configuration véhicule"
+                "SpritePowers": "Pouvoirs"
             },
             "Item": {
                 "Network": "Réseau"
@@ -48,9 +41,7 @@
             },
             "Test": {
                 "BuyHits": "Ne lance pas de dés. Achète des succès avec ⌊réserve de dés / 4⌋.",
-                "ExtendedInterval": "Temps de jeu entre les lancers. Zéro lance le test comme un test normal, non étendu.",
-                "ResultOverrideGlitches": "Remplace les glitches pour ce résultat de test.",
-                "ResultOverrideHits": "Remplace les succès pour ce résultat de test."
+                "ExtendedInterval": "Temps de jeu entre les lancers. Zéro lance le test comme un test normal, non étendu."
             }
         }
     }

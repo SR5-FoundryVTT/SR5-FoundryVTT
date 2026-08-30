@@ -94,7 +94,6 @@
                 "Moderate": "장거리",
                 "Title": "사거리"
             },
-            "Title": "환경 수정치",
             "Total": "결과",
             "Visibility": {
                 "Good": "명확함",
@@ -124,50 +123,19 @@
             },
             "BulkImporter": {
                 "Title": "일괄 불러오기"
-            },
-            "ImporterSourcesConfig": {
-                "Title": "가져오기 출처 설정"
-            },
-            "Spirit": {
-                "SpiritTypeNotFound": "해당 영혼 유형을 찾을 수 없습니다. chummer에서 내보낸 json으로 github 이슈를 열어주세요."
-            },
-            "Sprite": {
-                "SpriteTypeNotFound": "해당 스프라이트 유형을 찾을 수 없습니다. chummer에서 내보낸 json으로 github 이슈를 열어주세요."
             }
         },
         "KarmaManager": {
-            "Cancel": "취소",
             "CareerKarma": "캐릭터가 누적해온 경력 카르마의 수량",
             "CurrentKarma": "현재 캐릭터가 가지고 있는 카르마의 수량",
             "FinalCareerKarma": "적용 후 캐릭터가 보유하게 될 경력 카르마",
             "FinalCurrentKarma": "적용 후 캐릭터가 보유하게 될 카르마",
             "FinalKarma": "최종 카르마",
             "StartingKarma": "시작 카르마",
-            "Submit": "적용",
             "Title": "카르마 관리"
         },
         "Migration": {
             "BeginMigration": "마이그레이션 시작",
-            "BeginNotification": "버전에서 섀도우런 시스템 마이그레이션 시작",
-            "Complete": "마이그레이션 완료",
-            "DoNotCloseNotification": "게임을 닫거나 FoundryVTT를 종료하지 마세요.",
-            "SuccessConfirm": "닫기",
-            "SuccessDescription": "해당 월드에 있는 컴펜디움 팩이 마이그레이션 과정에서 업데이트 되었습니다.",
-            "SuccessHeader": "마이그레이션 완료",
-            "SuccessNotification": "섀도우런 시스템이 성공적으로 버전에 마이그레이션 되었습니다.",
-            "SuccessPacksInfo": "현재 FoundryVTT의 기술적인 한계로 액터 팩은 수동으로 업데이트 해야합니다.",
-            "SuccessTitle": "성공",
-            "UpdateCompendiumNoUpdateActor": "FoundryVTT의 기술적인 한계로 지금은 액터 팩을 업데이트할 수 없습니다. 이러한 팩은 수동으로 업데이트해야 합니다.",
-            "UpdateCompendiumUpdateMessage": "월드에 있는 모든 컴펜디움도 함께 업데이트 됨",
-            "Version18_0_0": {
-                "Line1": "0.18.0 버전부터 보유한 물품에 있는 지속 효과는 액터에 복사되지 않고, 직접 적용됨.",
-                "Line2": "변경 사항을 적용하기 위해서는 이전에 복사된 효과를 반드시 지우거나 비활성화하여 물품과 액터 모두에 효과가 적용되는 것을 피할 수 있습니다. 기본적으로 물품을 기반으로 한 모든 효과는 삭제될 것입니다.",
-                "Line3": "액터에 직접 생성된 효과는 영향을 받지 않습니다.",
-                "Line4": "효과와 효과 모듈을 많이 사용하지만 '물품 소유 효과'에 대해 잘 모르는 경우,  이 마이그레이션을 설정하여 비활성화하고 비활성화된 효과를 검토하세요. 비활성화된 효과는 표시됩니다.",
-                "Line5": "또한 이제 액터 항목에 활성화된 효과가 적용된다는 점에 유의하세요. 적용된 모든 효과는 액터 효과 탭에서 확인할 수 있습니다.",
-                "OnlyDisable": "비활성한 효과만",
-                "Warning": "기록!"
-            },
             "WarningBackup": "월드를 백업하지 않았다면 아래에 있는 '마이그레이션 시작' 버튼을 누르기 전에 백업하시기 바랍니다.",
             "WarningDescription": "업데이트가 진행되는 동안 월드에 발생할 수 있는 치명적 손상을 막기 위해 GM만 업데이트를 수행하거나 서버나 당신의 브라우저를 닫을 수 있습니다.",
             "WarningHeader": "마이그레이션 경고",
@@ -209,8 +177,7 @@
             "Matrix": {
                 "Noise": "노이즈"
             },
-            "Title": "상황 수정치",
-            "Total": "결과"
+            "Title": "상황 수정치"
         },
         "TimeControl": {
             "Advance": "진행",

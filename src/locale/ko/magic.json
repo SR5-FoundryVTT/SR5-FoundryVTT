@@ -99,11 +99,8 @@
             "Labels": {
                 "Awakened": "각성자",
                 "Emerged": "공명자",
-                "Magic": "마법",
                 "Mundane": "일반인",
                 "PP": "PP",
-                "PowerLevel": "단계",
-                "PowerPoints": "PP",
                 "PowerType": "유형",
                 "Powers": "능력",
                 "SpiritType": "영혼 유형"

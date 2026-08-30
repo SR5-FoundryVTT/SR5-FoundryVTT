@@ -35,7 +35,6 @@
                 "Moderate": "Longue",
                 "Title": "Portée"
             },
-            "Title": "Modificateurs environnementaux",
             "Total": "Résultat",
             "Visibility": {
                 "Good": "Claire",
@@ -54,17 +53,6 @@
         },
         "Migration": {
             "BeginMigration": "Commencer la migration",
-            "BeginNotification": "Commencer la migration de cette version du système Shadowrun",
-            "Complete": "Migration Complète",
-            "DoNotCloseNotification": "Merci de ne pas fermer votre jeu ou éteindre FoundryVTT",
-            "SuccessConfirm": "Fermer",
-            "SuccessDescription": "Les compendiums existants de ce monde ont été mis à jour en même temps que la migration",
-            "SuccessHeader": "Migration effectuée",
-            "SuccessNotification": "Le système Shadowrun a été bien mis à jour",
-            "SuccessPacksInfo": "A cause de limits techniques de FoundryVTT, les packs d'acteurs doivent être mis à jour manuellement",
-            "SuccessTitle": "Succès",
-            "UpdateCompendiumNoUpdateActor": "A cause de limitations techniques avec FoundryVTT, le pack compendium d'acteurs ne peuvent pas être mis à jour. Vous devez mettre à jour ce pack manuellement.",
-            "UpdateCompendiumUpdateMessage": "Chaque compendium pack du monde qui existe ont été mis à jour",
             "WarningBackup": "Attention, nous vous conseillons de faire une copie de votre monde avant de cliquer sur le bouton 'Commencer la migration' ci dessous",
             "WarningDescription": "Seul le MJ peut effectuer la mise à jour. Fermer votre navigateur peut causer des problèmes au monde",
             "WarningHeader": "Attention migration en cours",

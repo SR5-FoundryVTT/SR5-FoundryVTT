@@ -94,7 +94,6 @@
                 "Moderate": "Lang",
                 "Title": "Entfernung"
             },
-            "Title": "Umweltmodifikatoren",
             "Total": "Ergebnis",
             "Visibility": {
                 "Good": "Freie Sicht",
@@ -124,50 +123,19 @@
             },
             "BulkImporter": {
                 "Title": "Massen Import"
-            },
-            "ImporterSourcesConfig": {
-                "Title": "Import Quell Konfiguration"
-            },
-            "Spirit": {
-                "SpiritTypeNotFound": "Die Geisterart wurde nicht gefunden. Bitte öffne ein GitHub-Issue mit deiner Chummer-Export-json."
-            },
-            "Sprite": {
-                "SpriteTypeNotFound": "Der Sprite-Typ wurde nicht gefunden. Bitte öffne ein GitHub-Issue mit deiner Chummer-Export-json."
             }
         },
         "KarmaManager": {
-            "Cancel": "Abbrechen",
             "CareerKarma": "Gesamtes durch den Charakter angesammeltes Karma",
             "CurrentKarma": "Aktuell verfügbares Karma",
             "FinalCareerKarma": "Zukünftiges Gesamtkarma",
             "FinalCurrentKarma": "Zukünftiges verfügbares Karma",
             "FinalKarma": "Karma",
             "StartingKarma": "Start Karma",
-            "Submit": "Bestätigen",
             "Title": "Karma-Verwaltung"
         },
         "Migration": {
             "BeginMigration": "Starte Migration",
-            "BeginNotification": "Starte Shadowrun-System-Migration von Version",
-            "Complete": "Migration vollständig",
-            "DoNotCloseNotification": "Bitte das Spiel nicht schließen oder FoundryVTT herunterfahren.",
-            "SuccessConfirm": "Schließen",
-            "SuccessDescription": "Bestehende Kompendiumspakete, die zu dieser Welt gehören, wurden im Zuge dieser Migration aktualisiert.",
-            "SuccessHeader": "Migration vollständig",
-            "SuccessNotification": "Shadowrun-System erfolgreich migriert zu Version",
-            "SuccessPacksInfo": "Aufgrund technischer Limitierungen von FoundryVTT müssen Kompendien vom Typ Acteur manuell aktualisiert werden.",
-            "SuccessTitle": "Erfolg",
-            "UpdateCompendiumNoUpdateActor": "Aufgrund technischer Limitierungen von FoundryVTT müssen Kompendien vom Typ Acteur manuell aktualisiert werden.",
-            "UpdateCompendiumUpdateMessage": "Alle in der Welt vorhandenen Kompendiumpakete wurden aktualisiert",
-            "Version18_0_0": {
-                "Line1": "Ab Version 0.18.0 werden Effekte auf Akteur Gegenständen direkt angewendet, ohne auf den Akteur kopiert zu werden.",
-                "Line2": "Bisher kopierte Effekte müssen gelöscht oder kopiert werden, um zu verhindern, dass diese Effekte doppelt angewendet werden. Das betrifft alle Effekte mit einem Item im Origin Feld.",
-                "Line3": "Direkt auf dem Akteur erstellte Effekte bleiben bestehen.",
-                "Line4": "Solltest du viele Effekte nutzen, vor allem zusammen mit Effekt-Modulen, und bist unsicher, welche Effekte einen Item-Ursprung haben, setze die Migration auf Deaktivieren. Dadurch werden betroffene Effekte deaktiviert und umbenannt, wodurch diese leicht zu prüfen sind.",
-                "Line5": "Achte außerdem auf aktivierte Effekte in Akteur Gegenständen, die jetzt angewendet werden. Du kannst alle angewendeten Effekte eines Akteurs im Effekts-Tab sehen.",
-                "OnlyDisable": "Effekte nur deaktivieren!",
-                "Warning": "Warnung!"
-            },
             "WarningBackup": "Erstelle ein Backup deiner Welt, bevor du die Migration startest!",
             "WarningDescription": "Nur die SL kann die Aktualisierung durchführen. Während der Aktualisierung darf der Browser nicht geschlossen oder der Server heruntergefahren werden, sonst können irreparablen Schäden in dieser Welt entstehen.",
             "WarningHeader": "Migrationswarnung",
@@ -209,8 +177,7 @@
             "Matrix": {
                 "Noise": "Rauschen"
             },
-            "Title": "Situationsmodifikatoren",
-            "Total": "Ergebnis"
+            "Title": "Situationsmodifikatoren"
         },
         "TimeControl": {
             "Advance": "Vorstellen",

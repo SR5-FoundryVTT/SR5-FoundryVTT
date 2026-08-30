@@ -53,10 +53,7 @@
             "Labels": {
                 "Awakened": "Éveillé",
                 "Emerged": "Émergé",
-                "Magic": "Magie",
                 "Mundane": "Ordinaire",
-                "PowerLevel": "Niveau",
-                "PowerPoints": "PP",
                 "PowerType": "Type",
                 "Powers": "Pouvoirs",
                 "SpiritType": "Type d'esprit"

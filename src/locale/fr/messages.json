@@ -4,22 +4,15 @@
             "Common": {
                 "Cancel": "Annuler",
                 "Ok": "OK"
-            },
-            "RangedWeaponTest": {
-                "EnvironmentalOverwriteSet": "Les modificateurs environnementals ont été déterminés à une valeur fixe"
             }
         },
         "Errors": {
             "LinkLockedReboot": "Un acteur verrouillé par lien ne peut pas être redémarré",
-            "MissingItemForOpposedTest": "Le test opposé ne peut pas être lancé puisque l'objet concerné est manquant",
-            "MissingSkill": "Le personnage n'a pas la compétence demandée",
-            "SkillWithoutAttribute": "La compétence n'a pas d'attribut assigné",
             "SourceFieldEmpty": "Le champ source est vide, merci d'entrer un texte valide pour la source"
         },
         "Warnings": {
             "CantCombineBuyHitsWithEdge": "Acheter des succès ne peut pas être combiné avec Seconde chance.",
             "MissingPdfPager": "Pour que les PDFs soient affichés, le module 'pdfpager' doit être installé et un PDF doit être lié à la fiche",
-            "NegativeLimitValue": "Les valeurs des limites doivent être supérieures à 0",
             "NoActorCreatePermission": "Vous n'avez pas la permission de créer des acteurs.",
             "NoSelectableToken": "Le personnage n'a pas de jeton sélectionnable sur la page",
             "RitualNotConcluded": "Le Rituel a échoué. En attente du jeu du rituel pour déterminer le drain.",

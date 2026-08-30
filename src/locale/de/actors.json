@@ -456,9 +456,6 @@
             },
             "Vehicle": "Fahrzeug"
         },
-        "VehicleImport": {
-            "MissingPermission": "Dir fehlt die Berechtigung, Akteure zu erstellen."
-        },
         "Vision": {
             "AstralPerception": "Astrale Wahrnehmung",
             "AugmentedReality": "Augmented Reality",

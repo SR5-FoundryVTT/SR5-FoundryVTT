@@ -37,7 +37,6 @@
         },
         "DamageApplication": {
             "ApplyDamage": "Aplicar Dano",
-            "ApplyUnmodifiedDamage": "Aplicar Dano Não Mod.",
             "Title": "Aplicação de Dano"
         }
     }

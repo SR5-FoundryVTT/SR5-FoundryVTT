@@ -99,11 +99,8 @@
             "Labels": {
                 "Awakened": "Awakened",
                 "Emerged": "Emerged",
-                "Magic": "Magic",
                 "Mundane": "Mundane",
                 "PP": "PP",
-                "PowerLevel": "Level",
-                "PowerPoints": "PP",
                 "PowerType": "Type",
                 "Powers": "Powers",
                 "SpiritType": "Spirit Type"

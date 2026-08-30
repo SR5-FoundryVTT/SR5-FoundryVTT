@@ -99,11 +99,8 @@
             "Labels": {
                 "Awakened": "Erwacht",
                 "Emerged": "Resonanz",
-                "Magic": "Magie",
                 "Mundane": "Mundan",
                 "PP": "KP",
-                "PowerLevel": "Kraftstufe",
-                "PowerPoints": "Kraftpunkte",
                 "PowerType": "Typ",
                 "Powers": "Kräfte",
                 "SpiritType": "Geisterart"

@@ -4,6 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import localization from './localization.cjs';
+import { collectReferencedPaths, isKeyUsed } from './check-base-locale-usage.mjs';
 
 function createFixture(t, files) {
     const sourceLocaleDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sr5-locales-'));
@@ -112,4 +113,16 @@ test('merges modules in filename order', (t) => {
     const locale = localization.loadLocale('en', { sourceLocaleDir });
     assert.deepEqual(locale.modules, ['a', 'z']);
     assert.deepEqual(locale.data, { SR5: { Alpha: 'A', Zulu: 'Z' } });
+});
+
+test('recognizes JSON references and interpolated localization key segments', () => {
+    const references = collectReferencedPaths(new Map([
+        ['src/module/tours/jsons/tour.json', '{"title":"SR5.Tours.Example.Title"}'],
+        ['src/module/combat.ts', 'game.i18n.localize(`SR5.Combat.ReduceInitBy${suffix}`)'],
+    ]));
+
+    assert.equal(isKeyUsed('SR5.Tours.Example.Title', references), true);
+    assert.equal(isKeyUsed('SR5.Combat.ReduceInitByOne', references), true);
+    assert.equal(isKeyUsed('SR5.Combat.ReduceInitByFive', references), true);
+    assert.equal(isKeyUsed('SR5.Combat.Other', references), false);
 });

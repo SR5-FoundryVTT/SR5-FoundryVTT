@@ -63,7 +63,6 @@
             "EditSkill": "Fertigkeit bearbeiten",
             "MoveItem": "Gegenstand verschieben",
             "Source": "Referenz öffnen",
-            "View": "Öffnen",
             "ViewItem": "Gegenstand öffnen"
         },
         "Keybindings": {
@@ -98,23 +97,12 @@
         },
         "Labels": {
             "Action": {
-                "ActiveTest": "Probe",
-                "Category": "Kategorie",
-                "DamageResistanceTest": "Schadenswiderstandsprobe",
                 "ForceReboot": "Erzwinge Neustart",
                 "MatrixAction": "Matrixhandlung",
-                "Modifier": "Modifikator",
                 "Modifiers": "Modifikatoren",
-                "OpposedTest": "Vergleichende Probe",
-                "SpiritType": "Geister-Art",
-                "SpriteType": "Sprite-Art"
-            },
-            "Actions": {
-                "BruteForce": "Brute Force",
-                "HackOnTheFly": "Eiliges Hacken"
+                "OpposedTest": "Vergleichende Probe"
             },
             "ActorSheet": {
-                "AddNetwork": "Netzwerk Verbinden",
                 "AddOneMark": "Füge eine Marke zu",
                 "ColdSim": "Kaltes SIM",
                 "Compilations": "Kompilieren",
@@ -123,18 +111,12 @@
                 "CreateInventory": "Erstelle Inventar-Ort",
                 "CritterPowers": "Critterkräfte",
                 "DeviceRating": "Gerätestufe",
-                "DeviceSetup": "Gerät einr.",
                 "DisabledOptionCritterPowers": "Optionale Critter Kräfte - Inaktiv",
                 "DisabledOptionSpritePowers": "Optionale Sprite Kräfte - Inaktiv",
                 "DisplayingPersona": "Persona anzeigen",
                 "EnabledOptionCritterPowers": "Optionale Critter Kräfte - Aktiv",
                 "EnabledOptionSpritePowers": "Optionale Sprite Kräfte - Aktiv",
-                "Hacking": "Hacken",
-                "ICConfiguration": "IC-Konfiguration",
                 "Icons": "Icons",
-                "ManageNetwork": "Netzwerk verwalten",
-                "MarkNetwork": "Markiere Netzwerk",
-                "MarkedIcons": "Markierte Icons",
                 "Matrix": "Matrix",
                 "MatrixActions": "Matrix Handlungen",
                 "Network": "Netzwerk",
@@ -142,34 +124,23 @@
                 "NoNetwork": "Kein Netzwerk",
                 "NotorietyShort": "B",
                 "Offline": "Offline",
-                "OpenSourceDocument": "Öffne Referenz",
                 "OwnedIcons": "Icons im Besitz",
                 "Persona": "Persona",
-                "PersonalInventory": "Am Körper",
                 "PhysicalTrack": "Physischer Monitor",
                 "PublicAwarenessShort": "BR",
                 "RemoveOneMark": "Entferne eine Marke",
                 "ResetActorForNewRun": "Reset für neuen Run",
                 "Rituals": "Rituale",
-                "RollDroneInfiltration": "Heimlichkeit",
-                "RollDronePerception": "Wahrnehmung",
-                "RollPilotVehicleTest": "Manövrieren",
                 "SetMonitor": "Monitor muss manuell gesetzt werden",
-                "SetupPAN": "Geräte zum PAN hinzufügen",
-                "Spells": "Zaubersprüche",
-                "SpiritConfiguration": "Geist-Konfiguration",
-                "SpriteConfiguration": "Sprite-Konfiguration",
                 "SpritePowers": "Spritekräfte",
                 "StreetCredShort": "SR",
                 "StunTrack": "Geistiger Monitor",
-                "TestKBoardModifiers": "{skip}: überspringe Dialog. {descr}: zeige nur Beschreibung.",
-                "VehicleConfiguration": "Fahrzeug-Konfiguration"
+                "TestKBoardModifiers": "{skip}: überspringe Dialog. {descr}: zeige nur Beschreibung."
             },
             "Documents": {
                 "Actor": "Akteur",
                 "Item": "Gegenstand",
-                "Scene": "Szene",
-                "Token": "Token"
+                "Scene": "Szene"
             },
             "Inventory": {
                 "All": "Alle",
@@ -179,12 +150,7 @@
             "Item": {
                 "AvailabilityAdjustment": "Skaliere Verfügbarkeit mit Stufe",
                 "CostAdjustment": "Skaliere Kosten mit Stufe",
-                "EssenceAdjustment": "Skaliere Essenz mit Stufe",
                 "Network": "Netzwerk"
-            },
-            "MarkPlacement": {
-                "PlaceOnDevice": "Platziere auf Gerät",
-                "PlaceOnMainIcon": "Platziere auf Persona/Host"
             },
             "Matrix": {
                 "AttackShort": "A",
@@ -205,19 +171,14 @@
                 "TestEffects": "Effekte angewendet"
             },
             "Sheet": {
-                "AddOne": "Eine hinzufügen",
                 "ClearNetwork": "Entferne alle Geräte aus dem Netzwerk",
                 "ItemEffects": "Item-Effekte",
                 "MissingNetworkDevices": "Drag&Drop um ein Netzwerkgerät zuzufügen.",
-                "NetworkDevices": "Geräte im Netzwerk",
                 "NotVisible": "Schleichend",
-                "PAN": "PAN",
                 "RebootDevice": "Neustarten",
                 "RemoveImprovisedDevices": "Improvisierte Geräte entfernen",
-                "SubtractOne": "Eine entfernen",
                 "Type": "Typ",
-                "Visible": "Sichtbar",
-                "WAN": "WAN"
+                "Visible": "Sichtbar"
             },
             "Sidebar": {
                 "Changelog": "Änderungsprotokoll",
@@ -269,75 +230,46 @@
             "Actor": {
                 "AddOneService": "Füge einen Dienst zum Sprite/Geist hinzu",
                 "Blitz": "Nutze einen Punkt Edge um das Maximum der mögliche Initativewürfel zu erhalten",
-                "ConnectNetwork": "Betrete Host / Gitter",
-                "Critter": "Ermöglicht die Nutzung von Critterkräften",
-                "DefaultCategoryVisibility": "Zeige Artikelkategorien an, auch wenn keine Artikel hinzugefügt wurden",
                 "Description": "Beschreibung",
                 "DisconnectNetwork": "Verlasse Host/ Gitter",
-                "MarkTarget": "Platziere Marken auf diesem Ziel",
-                "MatrixConnectionToggle": "Ändere den Matrix-Verbindung: Erweiterte Realität, Kalte Sim oder Heiße Sim",
                 "MatrixRunningSilentToggle": "Wechsle zwischen Schleichfahrt und Anzeige der Persona",
-                "Metatype": "Ein NSC-Akteur bekommt automatische Attributemodifikatoren abhängig vom Metatyp",
                 "MiscConfig": "Verschiedene Einstellungen für den Akteur",
-                "MissingSummoner": "Drag&Drop Charakter oder nutze Beschwörungs-Aktion",
-                "MissingTechnomancer": "Drag&Drop Charakter oder nutze Kompilierungs-Aktion",
-                "NPC": "Makriere Akteur als NSC und ermöglicht weitere NSC-Funktionen",
-                "NetworksTab": "Gitter & Hosts",
                 "NoCombatant": "Initiative Wurf (Muss in einem Kampf sein)",
                 "PickControlledTokenAsDriver": "Wähle das aktuell kontrollierte Token als Fahrer aus",
                 "PickControlledTokenAsSummoner": "Wähle das aktuell kontrollierte Token als Beschwörender aus",
                 "PickControlledTokenAsTechnomancer": "Wähle das aktuell kontrollierte Token als Technomancer aus",
-                "PlaceMark": "Handlung zum Platzieren von Marken auf bereits markierten Zielen",
                 "RebootPersonaAndClearAllMarks": "Starte deine Persona neu und entferne alle von dir platzierten Marken",
                 "RemoveAllNetworks": "Alle Netzwerke entfernen",
                 "RemoveFavorite": "Aus Favoriten entfernen",
                 "RemoveNetwork": "Netzwerk entfernen",
                 "RemoveOneService": "Entferne einen Dienst",
                 "RemoveSkillSet": "Entferne das aktuelle Fertigkeitsset sowie alle daraus stammenden Fertigkeiten und Fertigkeitsgruppen",
-                "ResetActorForNewRun": "Setze Schaden, Edge usw. für einen neuen Run zurück",
-                "RollInitiative": "Werfe Initiative",
-                "SetupPAN": "Füge alle ausgerüsteten Wireless-Geräte zum PAN dieses Charakters hinzu"
+                "RollInitiative": "Werfe Initiative"
             },
             "CallInAction": {
-                "ActorType": "Herbeizurufender Akteurtyp",
                 "LinkActor": "Drag&Drop Akteuer als Vorlage"
             },
             "CompilationTest": {
-                "Level": "Stufe des kompilierten Sprites",
-                "PreparedSprite": "Benutze einen vorbereiteten Sprite-Akteur statt eines generisch Erstellten.",
-                "SpriteType": "Art des kompilierten Sprites"
+                "Level": "Stufe des kompilierten Sprites"
             },
             "Contact": {
                 "LinkActor": "Ziehe einen Akteur per Drag&Drop, um diesen mit diesem Kontakt zu verknüpfen"
             },
             "Effect": {
-                "AlterApplyToWithChanges": "Entferne Änderungen, bevor du änderst, worauf sich der Effekt bezieht.",
-                "ApplyTo": "Änderungen mit diesem Effekt gelten nur für dieses Ziel.",
                 "ApplyValueEditor": "Wertänderung anwenden",
                 "CancelValueEditor": "Wertänderung abbrechen",
                 "CreateEffect": "Erstelle Effekt",
                 "DeleteEffect": "Lösche Effekt",
-                "DocumentEffects": "Auswirkungen direkt auf dieses Dokument.",
                 "EditEffect": "Bearbeite Effekt",
                 "HelpLinkEnglishOnly": "Hilfe (externer Link, nur auf Englisch)",
-                "ItemEffects": "Effekte, die von Items auf diesem Dokument gesammelt werden.",
-                "OnlyAllFilteredUsed": "Dieser Effekt gilt nur für Proben, die allen Auswahlen entsprechen.",
-                "OnlyFilteredUsed": "Dieser Effekt gilt nur für Proben, die mindestens einer Auswahl entsprechen.",
-                "OnlyForItemTest": "Dieser Effekt gilt nur für Proben dieses Items.",
-                "OnlyForWireless": "Dieser Effekt gilt nur für Items, bei denen WiFi aktiviert ist.",
                 "OpenValueEditor": "Werteditor öffnen",
                 "PriorityFieldDisabled": "Eigene Pioritäten werden im Moment nicht unterstützt."
             },
             "Item": {
-                "ActionCategories": "Überschreibe alle Standardkategorien der Probe mit dieser Auswahl. Mit einem Active Effect können dadurch die Werte der Action modifiziert werden.",
-                "ActionModifier": "Überschreibe alle Standardmodifikatoren der Probe mit dieser Auswahl",
-                "ActionRollMode": "Standard Würfelmodus für diese Aktion. Überschreibt globale Chat Einstellung",
                 "AddQuantity": "Füge zu 1. {qtySome}: Füge zu 5. {qtyMany}: Füge zu 20.",
-                "AmmoReplaceDamage": "Setzen um Waffenschaden zu ersetzen anstatt zu modifizieren",
                 "AvailabilityAdjustment": "Berechne Verfügbarkeit abhängig von der Stufe.",
                 "CostAdjustment": "Berechne die tatsächlichen Kosten basierend auf der Stufe",
                 "DisabledForPreparedActor": "Deaktiviert da ein vorbereiteter Akteur verwendet wird",
-                "EssenceAdjustment": "Berechne die tatsächlichen Essenzkosten basierend auf der Stufe",
                 "RemoveQuantity": "Entferne 1. {qtySome}: Entferne 5. {qtyMany}: Entferne 20.",
                 "ToggleFavorite": "Favorit umschalten",
                 "ToggleVisibility": "Sichtbarkeit umschalten"
@@ -347,7 +279,6 @@
             },
             "RangedAttack": {
                 "Recoil": "Kumulativer Rückstoß",
-                "RecoilAfterAttack": "Kumulativer Rückstoß nach diesem Angriff",
                 "RecoilBeforeAttack": "Kumulativer Rückstoß jetzt, vor dem Angriff",
                 "RecoilCompensation": "Gesamte RK, inklusive RK der Waffe",
                 "ResetRecoil": "Setze kumulativen Rückstoß zurück"
@@ -363,9 +294,7 @@
                 "DragOnCanvas": "Ziehe Geist auf Karte",
                 "Force": "Kraft des herbeizurufenden Geistes",
                 "OptionalPowerCount": "Informativer Zähler für optionale Geistkräfte (Abrunden(Kraft / 3)).",
-                "PreparedSpirit": "Nutze einen vorbereiteten Geist-Akteur anstelle eines generisch Erstellten",
-                "ReagentDrams": "Dram aus Reagenzien für das Herbeirufen-Limit",
-                "SpiritType": "Art des herbeizurufenden Geistes"
+                "ReagentDrams": "Dram aus Reagenzien für das Herbeirufen-Limit"
             },
             "Test": {
                 "BuyHits": "Würfelt keine Würfel. Kauft Erfolge mit ⌊Würfelpool / 4⌋.",
@@ -373,11 +302,8 @@
                 "ExtendedInterval": "Spielzeit zwischen den Würfen. Null wirft die Probe als normale, nicht ausgedehnte Probe.",
                 "Limit": "Vollständiger Limitwert",
                 "LimitIgnored": "Das Limit wird für diese Probe derzeit ignoriert",
-                "Modifier": "Summe aller auf den Würfelpool angewendeten Modifikatoren",
                 "Pool": "Anzahl zu werfender Würfel",
                 "PushTheLimit": "Verwende Edge Regel 'Grenzen sprengen'",
-                "ResultOverrideGlitches": "Überschreibt Patzer für dieses Probenergebnis.",
-                "ResultOverrideHits": "Überschreibt Erfolge für dieses Probenergebnis.",
                 "RollMode": "Sichtbarkeit der FoundryVTT-Chat-Nachricht",
                 "Threshold": "Vollständiger Schwellenwert"
             },

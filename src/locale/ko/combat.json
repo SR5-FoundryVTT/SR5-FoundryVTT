@@ -37,7 +37,6 @@
         },
         "DamageApplication": {
             "ApplyDamage": "피해 적용",
-            "ApplyUnmodifiedDamage": "보정치 제외 피해 적용",
             "Title": "피해 적용"
         }
     }

@@ -30,11 +30,7 @@
             }
         },
         "Host": {
-            "Attributes": "Atributos do Host",
             "CustomAttributes": "Atributos Personalizados",
-            "DropICActor": "Arraste e solte um ator GELO na ordem de resposta de segurança",
-            "ICOrder": "Ordem GELO",
-            "MissingIC": "GELO Faltando",
             "Rating": "Nível do Host"
         },
         "IC": {
@@ -94,26 +90,16 @@
                 "LivingPersona": "Persona Viva",
                 "Marks": "Marcas",
                 "MatrixDefense": "Defesa da Matriz",
-                "MatrixFullDefenseAttribute": "Atributo de Defesa Total na Matriz",
-                "MatrixTarget": "Alvo da Matriz",
                 "Network": "Rede",
-                "Networks": "Redes",
                 "OverwatchScore": "Valor de Vigilância",
                 "OverwatchScoreTrackerTitle": "Monitor de Bebê do Sr. Johnson",
-                "Personas": "Personas",
                 "PublicGrid": "Grade Pública",
                 "RunningSilent": "Silenciosamente",
-                "RunningSilentControlledByDevice": "O Modo Silencioso é controlado pelo seu dispositivo de Matriz ativo:",
                 "Wireless": "Conexão Sem Fio",
                 "WirelessOffline": "Offline",
                 "WirelessOnline": "Online",
                 "WirelessUnavailable": "Indisponível"
             }
-        },
-        "MatrixNetworkHackingApplication": {
-            "Icons": "Ícones",
-            "Invite": "Pedir um convite",
-            "Title": "Conectar à rede"
         },
         "MatrixOpposedDeviceDialog": {
             "Title": "Criar Dispositivo de Matriz"
@@ -125,7 +111,6 @@
             "HackOnTheFly": "Hackear na Hora",
             "InviteMark": "Pedir um convite de marca",
             "NetworkType": "Tipo",
-            "NoNetwork": "Não Conectado",
             "Title": "Gerenciador de Rede"
         },
         "RebootConfirmationDialog": {
@@ -133,11 +118,6 @@
             "Confirm": "Reiniciar",
             "Description": "Tem certeza que deseja reiniciar este dispositivo?",
             "Title": "Confirmar Reboot"
-        },
-        "SelectMatrixNetworkDialog": {
-            "Cancel": "Cancelar",
-            "Connect": "Conectar",
-            "Title": "Selecione uma rede"
         },
         "Sprite": {
             "FIELDS": {

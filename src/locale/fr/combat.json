@@ -36,8 +36,7 @@
             "Value": "Valeur Dégâts"
         },
         "DamageApplication": {
-            "ApplyDamage": "Application des dégâts",
-            "ApplyUnmodifiedDamage": "Appliquer les dégâts bruts"
+            "ApplyDamage": "Application des dégâts"
         }
     }
 }

@@ -30,11 +30,7 @@
             }
         },
         "Host": {
-            "Attributes": "Host Attributes",
             "CustomAttributes": "Custom Attributes",
-            "DropICActor": "Drag&Drop an IC actor in order of security response",
-            "ICOrder": "IC Order",
-            "MissingIC": "Missing IC",
             "Rating": "Host Rating"
         },
         "IC": {
@@ -94,26 +90,16 @@
                 "LivingPersona": "Living Persona",
                 "Marks": "Marks",
                 "MatrixDefense": "Matrix Defense",
-                "MatrixFullDefenseAttribute": "Matrix Full Defense Attribute",
-                "MatrixTarget": "Matrix Target",
                 "Network": "Network",
-                "Networks": "Networks",
                 "OverwatchScore": "Overwatch Score",
                 "OverwatchScoreTrackerTitle": "Mr. Johnson's Baby Monitor",
-                "Personas": "Personas",
                 "PublicGrid": "Public Grid",
                 "RunningSilent": "Running Silent",
-                "RunningSilentControlledByDevice": "Running Silent is controlled by your active Matrix Device:",
                 "Wireless": "Wireless",
                 "WirelessOffline": "Offline",
                 "WirelessOnline": "Online",
                 "WirelessUnavailable": "Unavailable"
             }
-        },
-        "MatrixNetworkHackingApplication": {
-            "Icons": "Icons",
-            "Invite": "Ask for invite",
-            "Title": "Connect to Network"
         },
         "MatrixOpposedDeviceDialog": {
             "Title": "Create Matrix Device"
@@ -125,7 +111,6 @@
             "HackOnTheFly": "Hack on the Fly",
             "InviteMark": "Ask to Invite a Mark",
             "NetworkType": "Type",
-            "NoNetwork": "Not Connected",
             "Title": "Network Manager"
         },
         "RebootConfirmationDialog": {
@@ -133,11 +118,6 @@
             "Confirm": "Reboot",
             "Description": "Are you sure you want to reboot this device?",
             "Title": "Confirm Reboot"
-        },
-        "SelectMatrixNetworkDialog": {
-            "Cancel": "Cancel",
-            "Connect": "Connect",
-            "Title": "Select a Network"
         },
         "Sprite": {
             "FIELDS": {

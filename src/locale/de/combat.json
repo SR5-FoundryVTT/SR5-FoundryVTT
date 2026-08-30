@@ -37,7 +37,6 @@
         },
         "DamageApplication": {
             "ApplyDamage": "Schaden anwenden",
-            "ApplyUnmodifiedDamage": "Unmod. Schaden anwenden",
             "Title": "Schaden anwenden"
         }
     }
