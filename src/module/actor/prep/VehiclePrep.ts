@@ -169,7 +169,7 @@ export class VehiclePrep {
         const {attributes} = system;
 
         const recoilCompensation = RangedWeaponRules.vehicleRecoilCompensationValue(attributes.body.value);
-        ModifiableValue.addUnique(system.values.recoil_compensation, 'SR5.RecoilCompensation', recoilCompensation);
+        ModifiableValue.addUnique(system.values.recoil_compensation, 'SR5.Weapon.Labels.RecoilCompensation', recoilCompensation);
         ModifiableValue.calcTotal(system.values.recoil_compensation, {min: 0});
     }
 

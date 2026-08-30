@@ -641,7 +641,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         event.stopPropagation();
         if (!(event.target instanceof HTMLElement)) return;
         if (this.actor.hasHost()) {
-            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            ui.notifications?.info(game.i18n.localize('SR5.Notifications.CantModifyHostContent'));
             return;
         }
 
@@ -659,7 +659,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         event.stopPropagation();
         if (!(event.target instanceof HTMLElement)) return;
         if (this.actor.hasHost()) {
-            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            ui.notifications?.info(game.i18n.localize('SR5.Notifications.CantModifyHostContent'));
             return;
         }
 
@@ -677,7 +677,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         if (!(event.target instanceof HTMLElement)) return;
 
         if (this.actor.hasHost()) {
-            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            ui.notifications?.info(game.i18n.localize('SR5.Notifications.CantModifyHostContent'));
             return;
         }
 
@@ -700,7 +700,7 @@ export class SR5MatrixActorSheet<T extends MatrixActorSheetData = MatrixActorShe
         if (!(event.target instanceof HTMLElement)) return;
 
         if (this.actor.hasHost()) {
-            ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            ui.notifications?.info(game.i18n.localize('SR5.Notifications.CantModifyHostContent'));
             return;
         }
 

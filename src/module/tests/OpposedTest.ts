@@ -47,7 +47,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
         delete (prepared as Partial<T>).opposed;
         delete (prepared as Partial<T>).targetActorsUuid;
 
-        prepared.values.againstNetHits = DataDefaults.createData('value_field', {label: 'SR5.NetHits'});
+        prepared.values.againstNetHits = DataDefaults.createData('value_field', {label: 'SR5.Tests.Labels.NetHits'});
 
         return prepared;
     }
@@ -75,7 +75,7 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
      */
     calculateAgainstNetHits() {
         const base = Math.max(this.against.hits.value - this.hits.value, 0);
-        const againstNetHits = DataDefaults.createData('value_field', {label: 'SR5.NetHits', base});
+        const againstNetHits = DataDefaults.createData('value_field', {label: 'SR5.Tests.Labels.NetHits', base});
         againstNetHits.value = ModifiableValue.calcTotal(againstNetHits, {min: 0});
         return againstNetHits;
     }
@@ -114,8 +114,8 @@ export class OpposedTest<T extends OpposedTestData = OpposedTestData> extends Su
 
             previousMessageId,
 
-            pool: DataDefaults.createData('value_field', {label: 'SR5.DicePool'}),
-            limit: DataDefaults.createData('value_field', {label: 'SR5.Limit'}),
+            pool: DataDefaults.createData('value_field', {label: 'SR5.Tests.Labels.DicePool'}),
+            limit: DataDefaults.createData('value_field', {label: 'SR5.Tests.Limit.Label'}),
             threshold: DataDefaults.createData('value_field', {label: 'SR5.Threshold'}),
             //@ts-expect-error SuccessTest.prepareData is adding missing values, however these aren't actually optional.
             values: {},

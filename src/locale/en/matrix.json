@@ -168,6 +168,42 @@
                 "Standard": "By default"
             },
             "Type": "Type"
+        },
+        "MatrixOpposedDeviceDialog": {
+            "Title": "Create Matrix Device"
+        },
+        "Matrix": {
+            "Attributes": {
+                "Attack": "Attack",
+                "DataProcessing": "Data Proc.",
+                "Firewall": "Firewall",
+                "Sleaze": "Sleaze"
+            },
+            "Labels": {
+                "Agent": "Agent",
+                "CommonProgram": "Common Program",
+                "DirectConnection": "Direct Connection",
+                "Grids": "Grids",
+                "Hosts": "Hosts",
+                "HotSim": "Hot Sim",
+                "LivingPersona": "Living Persona",
+                "Marks": "Marks",
+                "MatrixDefense": "Matrix Defense",
+                "MatrixFullDefenseAttribute": "Matrix Full Defense Attribute",
+                "MatrixTarget": "Matrix Target",
+                "Network": "Network",
+                "Networks": "Networks",
+                "OverwatchScore": "Overwatch Score",
+                "OverwatchScoreTrackerTitle": "Mr. Johnson's Baby Monitor",
+                "Personas": "Personas",
+                "PublicGrid": "Public Grid",
+                "RunningSilent": "Running Silent",
+                "RunningSilentControlledByDevice": "Running Silent is controlled by your active Matrix Device:",
+                "Wireless": "Wireless",
+                "WirelessOffline": "Offline",
+                "WirelessOnline": "Online",
+                "WirelessUnavailable": "Unavailable"
+            }
         }
     }
 }

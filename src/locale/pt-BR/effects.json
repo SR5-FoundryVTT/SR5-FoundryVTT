@@ -131,7 +131,13 @@
                 "Include": "Incluir"
             },
             "Target": "Alvo",
-            "Targets": "Alvos"
+            "Targets": "Alvos",
+            "Labels": {
+                "Effect": "Efeito",
+                "Effects": "Efeitos",
+                "EnforcedMaximum": "Máximo imposto",
+                "EnforcedMinimum": "Mínimo imposto"
+            }
         },
         "StatusEffects": {
             "Running": "Correndo",

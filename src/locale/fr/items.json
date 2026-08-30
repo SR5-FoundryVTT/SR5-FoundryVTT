@@ -41,7 +41,15 @@
                     "label": "Remplacer"
                 }
             },
-            "label": "Munition"
+            "label": "Munition",
+            "Labels": {
+                "AmmoFull": "Munitions plein",
+                "AmmoGelRounds": "Cartouches gel",
+                "Bullet": "Balle",
+                "BulletCount": "Nombre de balles",
+                "Bullets": "Balles",
+                "SpareClips": "Chargeurs restants"
+            }
         },
         "Armor": {
             "FIELDS": {
@@ -100,7 +108,16 @@
                 "NormalWeapons": "Armes normales"
             },
             "Resistances": "Résistances",
-            "label": "Armure"
+            "label": "Armure",
+            "Labels": {
+                "Accessory": "Accessoire",
+                "ArmorHardened": "Durcie",
+                "ArmorHardenedFull": "Armure renforcee",
+                "ArmorValue": "Valeur Blindage",
+                "HardenedArmor": "Armure renforcee",
+                "Immunity": "Immunité",
+                "ImmunityToNormalWeapons": "Immunité aux armes normales"
+            }
         },
         "Device": {
             "FIELDS": {
@@ -109,7 +126,12 @@
                     "label": "Type de périphérique"
                 }
             },
-            "label": "Appareil"
+            "label": "Appareil",
+            "Categories": {
+                "Commlink": "Commlink",
+                "Cyberdeck": "Cyberdeck",
+                "RCC": "RCC (console de contrôle rigger)"
+            }
         },
         "Element": {
             "Acid": "Acide",
@@ -377,6 +399,38 @@
                         "label": "Sans fil"
                     }
                 }
+            },
+            "Cyberware": {
+                "Grades": {
+                    "Label": "Gamme",
+                    "Alpha": "Alphaware",
+                    "Beta": "Betaware",
+                    "Delta": "Deltaware",
+                    "Gamma": "Gammaware",
+                    "Grey": "Greyware",
+                    "Standard": "Standard",
+                    "Used": "D'occasion"
+                }
+            },
+            "Labels": {
+                "Availability": "Dispo",
+                "Capacity": "Capacité",
+                "Conceal": "Dissimulation",
+                "Cost": "Prix",
+                "Equipment": "Équipement",
+                "Gear": "Matériel",
+                "ItemMod": "Mod. objet",
+                "ItemName": "Nom objet",
+                "License": "Permis",
+                "Licenses": "Permis",
+                "Load": "Charger",
+                "Loaded": "Chargé",
+                "ModPoints": "Points de mod",
+                "MountPoint": "Point de fixation",
+                "Rtg": "Ind",
+                "RtgAboveZero": "Ind > 0",
+                "Stock": "Stock",
+                "UnderBarrel": "Sous le canon"
             }
         },
         "ItemTypes": {
@@ -438,7 +492,23 @@
                     "label": "Type de style de vie"
                 }
             },
-            "label": "Style de vie"
+            "label": "Style de vie",
+            "Attributes": {
+                "Comforts": "Conforts",
+                "Guests": "Invités",
+                "Neighborhood": "Voisinnage",
+                "Security": "Securité"
+            },
+            "Types": {
+                "Label": "Type",
+                "Street": "La rue",
+                "Squatter": "Squatteur",
+                "Low": "Bas",
+                "Middle": "Moyen",
+                "High": "Élevé",
+                "Luxury": "Luxueux",
+                "Other": "Autre"
+            }
         },
         "Modification": {
             "FIELDS": {
@@ -505,7 +575,13 @@
                     "label": "Type de qualité"
                 }
             },
-            "label": "Qualité"
+            "label": "Qualité",
+            "Types": {
+                "Label": "Type",
+                "LifeModule": "Module de vie",
+                "Negative": "Négative",
+                "Positive": "Positif"
+            }
         },
         "Weapon": {
             "AmmoCount": "Compteur munition",
@@ -708,7 +784,19 @@
                 "Range": "Portée de l'arme de jet"
             },
             "Type": "Type",
-            "Weapon": "Arme"
+            "Weapon": "Arme",
+            "Labels": {
+                "Accuracy": "Précision",
+                "Barrel": "Canon",
+                "FireMode": "Mode de tir",
+                "Range": "Portée",
+                "Reach": "Allonge",
+                "Recoil": "Recul",
+                "RecoilCompensation": "CR"
+            }
+        },
+        "ModificationTypes": {
+            "Ware": "Implant"
         }
     }
 }

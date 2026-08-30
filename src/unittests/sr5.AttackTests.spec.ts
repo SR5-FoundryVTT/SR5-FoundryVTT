@@ -507,7 +507,7 @@ export const shadowrunAttackTesting = (context: QuenchBatchContext) => {
                 test.calculateBaseValues();
 
                 const normalArmor = test.pool.changes.find(change => change.name === 'SR5.Armor.label');
-                const hardenedArmor = test.pool.changes.find(change => change.name === 'SR5.HardenedArmor');
+                const hardenedArmor = test.pool.changes.find(change => change.name === 'SR5.Armor.Labels.HardenedArmor');
 
                 assert.strictEqual(normalArmor?.value, 6);
                 assert.strictEqual(hardenedArmor?.value, 16);

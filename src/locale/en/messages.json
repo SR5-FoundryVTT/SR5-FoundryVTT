@@ -18,7 +18,6 @@
             "DefaultInventoryCantBeRemoved": "The default inventory can't be removed",
             "LinkLockedReboot": "A link-locked actor cannot be rebooted",
             "InventoryAlreadyExists": "An inventory with this name already exists.",
-            "KeyNotModifyableByActiveEffect": "The active effect mode 'modify' can only affect mod properties.",
             "MarkCouldNotBePlaced": "Internal Error: Your marks couldn't be placed.",
             "MarksCantBePlacedBy": "Only personas can place marks.",
             "MarksCantBePlacedOn": "The chosen actor type can't receive any marks.",
@@ -28,7 +27,10 @@
             "NoAvailableActorFound": "No available actor was found for this action",
             "SkillWithoutAttribute": "The skill has no attribute configured.",
             "TestExpectsVehicleOnly": "This test can only be made with a vehicle type actor",
-            "TooManyActionsWithCategory": "You should have exactly one action with the category {category} on your actor"
+            "TooManyActionsWithCategory": "You should have exactly one action with the category {category} on your actor",
+            "KeyNotModifiableByActiveEffect": "The active effect mode 'modify' can only affect mod properties.",
+            "SourceFieldEmpty": "The Source field is empty, please enter valid text for the source",
+            "MissingItemForOpposedTest": "Opposed Test can't be rolled due to the acting item now missing"
         },
         "Messages": {
             "MarkInvitation": {
@@ -36,13 +38,6 @@
                 "AskForInvite": "Asks for an mark invitation for:",
                 "InviteAccepted": "Feel free to join {networkName}, {userName}!"
             }
-        },
-        "MissingRessource": {
-            "Ammo": "Not enough ammunition to fire",
-            "Edge": "No Edge left to consume",
-            "Initiative": "Not enough initiative score",
-            "SomeAmmo": "Not enough ammunition to fire in selected mode, mode modifiers will be reduced.",
-            "SomeAmmoMelee": "Not enough ammunition left to make a melee attack"
         },
         "Notifications": {
             "AddDevicesToPAN": {
@@ -55,7 +50,10 @@
                 "Item": "Clearing references to item",
                 "Start": "Deleting Network and MARK references"
             },
-            "VehicleCannotBeOwnDriver": "A vehicle cannot be the Driver of itself (that's what Pilot is for)"
+            "VehicleCannotBeOwnDriver": "A vehicle cannot be the Driver of itself (that's what Pilot is for)",
+            "CantModifyHostContent": "Can't change host data from within an IC actor.",
+            "ConsumedEquippedAmmo": "Consumed rounds from equipped ammunition",
+            "ResetProgressiveRecoil": "Reset progressive recoil to zero bullets fired"
         },
         "Warnings": {
             "ActorMissingRequirements": "Actor must match the skills awakened or emerged requirement",
@@ -72,7 +70,6 @@
             "CantReloadWithoutSpareClip": "You're out of spare clips!",
             "CantSecondChanceAGlitch": "Can't second chance this test. Test result is glitched.",
             "CantSecondChanceWithoutNoneHits": "Can't second chance this test. Only hit-dice left.",
-            "CantSpendMulitplePointsOfEdge": "Can't spend multiple points of edge on one test or action",
             "CantCombineBuyHitsWithEdge": "Buy Hits can't be combined with Second Chance.",
             "CompilationNotConcluded": "Compilation incomplete. Wait for sprite to oppose compilation to determine fade.",
             "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge points can't be spent on tests without actors",
@@ -91,7 +88,17 @@
             "SkillCantBeDefault": "This skill can't be rolled as it can't be defaulted",
             "SkillSetDefaultTypeOutsideCompendium": "Only skillsets in the configured skillset compendium will affect actor creation",
             "SummoningNotConcluded": "Summoning incomplete. Wait for spirit to oppose summoning to determine drain.",
-            "TokenSelectionNeeded": "One or more tokens need to be selected"
+            "TokenSelectionNeeded": "One or more tokens need to be selected",
+            "MissingPdfPager": "In order for source PDFs to be shown, the pdf-pager module must be installed and a PDF matching the code created.",
+            "CantSpendMultiplePointsOfEdge": "Can't spend multiple points of edge on one test or action",
+            "NoSelectableToken": "Actor has no selectable token on canvas"
+        },
+        "MissingResources": {
+            "Ammo": "Not enough ammunition to fire",
+            "Edge": "No Edge left to consume",
+            "Initiative": "Not enough initiative score",
+            "SomeAmmo": "Not enough ammunition to fire in selected mode, mode modifiers will be reduced.",
+            "SomeAmmoMelee": "Not enough ammunition left to make a melee attack"
         }
     }
 }

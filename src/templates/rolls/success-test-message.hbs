@@ -67,7 +67,7 @@
             <div class="left-side">
                 {{#if test.opposing}}
                 <div class="test-value metric-row">
-                    <span class="value">{{localize "SR5.OpposingHits"}}:</span>
+                    <span class="value">{{localize "SR5.Tests.Labels.OpposingHits"}}:</span>
                     <span class="value-result">{{test.against.netHits.value}}</span>
                 </div>
                 {{/if}}
@@ -85,7 +85,7 @@
                 {{/if}}
                 {{#if test.opposing}}
                 <div class="test-value metric-row">
-                    <span class="value">{{localize "SR5.OpposingNetHits"}}:</span>
+                    <span class="value">{{localize "SR5.Tests.Labels.OpposingNetHits"}}:</span>
                     <span class="value-result">{{test.againstNetHits.value}}</span>
                 </div>
                 {{/if}}
@@ -103,7 +103,7 @@
                 </div>
                 {{#if test.hasBuyHits}}
                 <div class="test-value metric-row">
-                    <span class="value">{{localize "SR5.BuyHits"}}:</span>
+                    <span class="value">{{localize "SR5.Tests.Labels.BuyHits"}}:</span>
                     <span class="value-result">{{test.boughtHits}}</span>
                 </div>
                 {{/if}}
@@ -146,7 +146,7 @@
         <div class="card-content card-content--damage">
             <div class="left-side">
                 {{> 'systems/shadowrun5e/dist/templates/rolls/parts/DamagePair.hbs'
-                label=(localize "SR5.Damage")
+                label=(localize "SR5.Damage.Label")
                 incomingName=(localize "SR5.Incoming")
                 incomingDamage=test.data.incomingDamage
                 modifiedName=(localize "SR5.Modified")
@@ -159,8 +159,8 @@
         <div class="card-content card-content--damage">
             <div class="left-side">
                 {{> 'systems/shadowrun5e/dist/templates/rolls/parts/DamagePair.hbs'
-                label=(localize "SR5.Damage")
-                incomingName=(localize "SR5.IncomingDrain")
+                label=(localize "SR5.Damage.Label")
+                incomingName=(localize "SR5.Tests.Labels.IncomingDrain")
                 incomingDamage=test.data.incomingDrain
                 modifiedName=(localize "SR5.ModifiedDrain")
                 modifiedDamage=test.data.modifiedDrain
@@ -172,8 +172,8 @@
         <div class="card-content card-content--damage">
             <div class="left-side">
                 {{> 'systems/shadowrun5e/dist/templates/rolls/parts/DamagePair.hbs'
-                label=(localize "SR5.Damage")
-                incomingName=(localize "SR5.IncomingFade")
+                label=(localize "SR5.Damage.Label")
+                incomingName=(localize "SR5.Tests.Labels.IncomingFade")
                 incomingDamage=test.data.incomingFade
                 modifiedName=(localize "SR5.ModifiedFade")
                 modifiedDamage=test.data.modifiedFade
@@ -185,8 +185,8 @@
         <div class="card-content card-content--damage">
             <div class="left-side">
                 {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.hbs'
-                name=(localize "SR5.IncomingDrain")
-                tooltip=(localize "SR5.IncomingDrain")
+                name=(localize "SR5.Tests.Labels.IncomingDrain")
+                tooltip=(localize "SR5.Tests.Labels.IncomingDrain")
                 damage=test.data.drainDamage
                 showAP=true
                 }}
@@ -196,8 +196,8 @@
         <div class="card-content card-content--damage">
             <div class="left-side">
                 {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.hbs'
-                name=(localize "SR5.IncomingFade")
-                tooltip=(localize "SR5.IncomingFade")
+                name=(localize "SR5.Tests.Labels.IncomingFade")
+                tooltip=(localize "SR5.Tests.Labels.IncomingFade")
                 damage=test.data.fadeDamage
                 showAP=true
                 }}
@@ -209,7 +209,7 @@
                 <div class="card-content card-content--damage">
                     <div class="left-side">
                         {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.hbs'
-                        name=(localize "SR5.Damage")
+                        name=(localize "SR5.Damage.Label")
                         tooltip=(localize "SR5.Incoming")
                         damage=test.data.damage
                         showAP=true
@@ -281,7 +281,7 @@
         <div class="card-content card-content--knockdown">
             <div class="left-side">
                 <div class="limit-line">
-                    <span class="key">{{localize "SR5.Target"}}: </span>
+                    <span class="key">{{localize "SR5.Tests.Target.Label"}}: </span>
                     <span class="value">{{localize "SR5.KnockedDown"}}</span>
                 </div>
             </div>
@@ -290,7 +290,7 @@
     </div>
     {{#if test.hasBuyHits}}
     <div class="card-main-content">
-        <div class="card-content card-content--buyhits">{{localize "SR5.BuyHits"}}</div>
+        <div class="card-content card-content--buyhits">{{localize "SR5.Tests.Labels.BuyHits"}}</div>
     </div>
     {{/if}}
     {{#if test.targets}}

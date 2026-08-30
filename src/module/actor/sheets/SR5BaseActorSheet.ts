@@ -750,13 +750,13 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                 : initiative.perception;
             if (initiative.meatspace) {
                 options.push({
-                    label: 'SR5.InitCatMeatspace',
+                    label: 'SR5.Actor.Initiative.Categories.Meatspace',
                     value: 'meatspace'
                 })
             }
             if (this.actor.system.special === 'magic') {
                 options.push({
-                    label: 'SR5.InitCatAstral',
+                    label: 'SR5.Actor.Initiative.Categories.Astral',
                     value: 'astral'
                 })
             }
@@ -766,7 +766,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                     value: 'cold_sim',
                 });
                 options.push({
-                    label: 'SR5.HotSim',
+                    label: 'SR5.Matrix.Labels.HotSim',
                     value: 'hot_sim'
                 });
             }
@@ -777,8 +777,8 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
 
     _prepareInitiativeFormulaModes() {
         const modes = [
-            { id: 'meatspace' as const, label: 'SR5.InitCatMeatspace' },
-            { id: 'astral' as const, label: 'SR5.InitCatAstral' },
+            { id: 'meatspace' as const, label: 'SR5.Actor.Initiative.Categories.Meatspace' },
+            { id: 'astral' as const, label: 'SR5.Actor.Initiative.Categories.Astral' },
             { id: 'matrix' as const, label: 'SR5.Labels.ActorSheet.Matrix' },
         ];
 
@@ -1619,7 +1619,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
         this._filters.showUntrainedSkills = !this._filters.showUntrainedSkills;
         event.target.closest<HTMLElement>('.active-skills-header')!
             .querySelector<HTMLElement>('.skill-rtg-label')!
-            .innerText = game.i18n.localize(this._filters.showUntrainedSkills ? 'SR5.Rtg' : 'SR5.RtgAboveZero');
+            .innerText = game.i18n.localize(this._filters.showUntrainedSkills ? 'SR5.Item.Labels.Rtg' : 'SR5.Item.Labels.RtgAboveZero');
         this.#filterActiveSkillsElements();
     }
 
@@ -2213,7 +2213,7 @@ export class SR5BaseActorSheet<T extends SR5ActorSheetData = SR5ActorSheetData> 
                         path = `system.attributes.${attributeId}`;
                     }
                     const effectData = {
-                        name: `${game.i18n.localize(attribute.label)} ${game.i18n.localize('SR5.Effect')}`,
+                        name: `${game.i18n.localize(attribute.label)} ${game.i18n.localize('SR5.ActiveEffect.Labels.Effect')}`,
                         system: {
                             applyTo: 'actor' as const,
                             changes: [

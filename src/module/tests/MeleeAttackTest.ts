@@ -77,7 +77,7 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
 
         // Consume one ammo per attack.
         if (!this.item.hasAmmo(1)) {
-            ui.notifications?.error('SR5.MissingRessource.SomeAmmoMelee', {localize: true});
+            ui.notifications?.error('SR5.MissingResources.SomeAmmoMelee', {localize: true});
             return false;
         }
 
@@ -103,7 +103,7 @@ export class MeleeAttackTest extends SuccessTest<MeleeAttackData> {
 
         // Notify user about some but not no ammo. Still let them punch though.
         if (!this.item.hasAmmo(1)) {
-            ui.notifications?.warn('SR5.MissingRessource.SomeAmmoMelee', {localize: true});
+            ui.notifications?.warn('SR5.MissingResources.SomeAmmoMelee', {localize: true});
         }
 
         await this.item.useAmmo(1);

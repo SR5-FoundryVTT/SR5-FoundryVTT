@@ -1,6 +1,11 @@
 {
     "SR5": {
-        "COMBAT": {
+        "DamageApplication": {
+            "ApplyDamage": "Schaden anwenden",
+            "ApplyUnmodifiedDamage": "Unmod. Schaden anwenden",
+            "Title": "Schaden anwenden"
+        },
+        "Combat": {
             "CannotSeizeAgain": "Du kannst die Initiative erst zu Beginn deines naechsten Zuges erneut ergreifen.",
             "ModeAstral": "Astral",
             "ModeChangedLabel": "Initiativemodus geaendert",
@@ -25,15 +30,15 @@
             "ToggleActedStatusGMOnly": "Gehandelt-Status umschalten (nur SL)",
             "TrackerTitle": "Zug {round} (Durchgang {pass})"
         },
-        "DamageApplication": {
-            "ApplyDamage": "Schaden anwenden",
-            "ApplyUnmodifiedDamage": "Unmod. Schaden anwenden",
-            "Title": "Schaden anwenden"
-        },
-        "ReputationManager": {
-            "Cancel": "Abbrechen",
-            "Submit": "Bestätigen",
-            "Title": "Rufmanager"
+        "Damage": {
+            "Label": "Schaden",
+            "Types": {
+                "Matrix": "Matrix",
+                "Physical": "Körperlich",
+                "Stun": "Geistig"
+            },
+            "Type": "Art",
+            "Value": "Schaden"
         }
     }
 }

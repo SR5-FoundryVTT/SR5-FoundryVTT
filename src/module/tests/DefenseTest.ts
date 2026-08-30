@@ -81,7 +81,7 @@ export class DefenseTest<T extends DefenseTestData = DefenseTestData> extends Op
             if (!combatant?.initiative) return true;
 
             if (combatant && combatant.initiative + this.data.iniMod < 0) {
-                ui.notifications?.warn('SR5.MissingRessource.Initiative', {localize: true});
+                ui.notifications?.warn('SR5.MissingResources.Initiative', {localize: true});
                 return false;
             }
         }
@@ -145,7 +145,7 @@ export class DefenseTest<T extends DefenseTestData = DefenseTestData> extends Op
 
         actions.push({
             action: 'modifyCombatantInit',
-            label: 'SR5.InitiativeMod',
+            label: 'SR5.Actor.Labels.InitiativeMod',
             value: String(activeDefense.initMod)
         });
 

@@ -70,7 +70,7 @@
             </div>
 
             <div class="list-item-col">
-                <label data-tooltip="{{systemFields.duration.hint}}">{{localize "SR5.Duration"}}:</label>
+                <label data-tooltip="{{systemFields.duration.hint}}">{{localize "SR5.Tests.Duration.Label"}}:</label>
                 {{#if @root.isEditMode}}
                     {{formInput systemFields.duration value=source.system.duration localize=true
                                 classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
@@ -79,7 +79,7 @@
                 {{/if}}
             </div>
             <div class="list-item-col">
-                <label data-tooltip="{{systemFields.range.hint}}">{{localize "SR5.Range"}}:</label>
+                <label data-tooltip="{{systemFields.range.hint}}">{{localize "SR5.Weapon.Labels.Range"}}:</label>
                 {{#if @root.isEditMode}}
                     {{formInput systemFields.range value=source.system.range localize=true
                                 classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
@@ -182,7 +182,7 @@
                         <i class="{{#if (isEquipped item)}}fas fa-circle-check{{else}}far fa-circle{{/if}}"></i>
                     </a>
                     {{#if @root.isEditMode}}
-                        <span data-tooltip="SR5.Wireless">
+                        <span data-tooltip="SR5.Matrix.Labels.Wireless">
                             {{formInput systemFields.technology.fields.wireless value=source.system.technology.wireless
                                         classes="short" localize=true rootId=@root.rootId disabled=@root.isPlayMode}}
                         </span>

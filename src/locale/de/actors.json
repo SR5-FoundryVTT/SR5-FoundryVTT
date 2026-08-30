@@ -209,7 +209,49 @@
                     "label": "Technomancer"
                 }
             },
-            "NoFavoritesSelected": "Keine Favoriten ausgewählt"
+            "NoFavoritesSelected": "Keine Favoriten ausgewählt",
+            "Attributes": {
+                "Agility": "Geschicklichkeit",
+                "Body": "Konstitution",
+                "Charisma": "Charisma",
+                "Edge": "Edge",
+                "Essence": "Essenz",
+                "Intuition": "Intuition",
+                "Logic": "Logik",
+                "Magic": "Magie",
+                "Reaction": "Reaktion",
+                "Resonance": "Resonanz",
+                "Strength": "Stärke",
+                "Willpower": "Willenskraft"
+            },
+            "Initiative": {
+                "Categories": {
+                    "Astral": "Astrale Initiative",
+                    "Matrix": "Matrix-Initiative",
+                    "Meatspace": "Fleischwelt-Initiative"
+                }
+            },
+            "Labels": {
+                "Attribute": "Attribut",
+                "Attributes": "Attribute",
+                "Biography": "Biographie",
+                "DefaultCategoryVisibility": "Zeige leere Item Sektionen",
+                "Initiation": "Initiation",
+                "Initiative": "Initiative",
+                "InitiativeMod": "Initiativmodifikator",
+                "IsCritter": "Critter",
+                "IsFreshImport": "Dieser Eintrag wurde aus Chummer importiert und benötigt eine manuelle Überprüfung.",
+                "IsGrunt": "Scherge",
+                "IsGruntHint": "Verwendet Schergen-Zustandsmonitor-Regeln (SR5 S.378).",
+                "IsNPC": "NSC",
+                "Metatype": "Metatyp",
+                "Movement": "Bewegungsrate",
+                "SheetActor": "Acteur-Blatt",
+                "SpecialAttributes": "Spez. Attribute",
+                "WalkingSpeed": "Gehen",
+                "RunningSpeed": "Rennen",
+                "SprintingBonus": "Sprintbonus"
+            }
         },
         "ActorTypes": {
             "Character": "Charakter",
@@ -278,6 +320,13 @@
                 "Human": "Mensch",
                 "Ork": "Ork",
                 "Troll": "Troll"
+            },
+            "Labels": {
+                "CareerKarma": "Gesamtkarma",
+                "Notoriety": "Schlechter Ruf",
+                "Nuyen": "Nuyen",
+                "PublicAwareness": "Prominenz",
+                "StreetCred": "Straßenruf"
             }
         },
         "Contact": {
@@ -320,7 +369,13 @@
             "Loyalty": "Loyalität",
             "LoyaltyConnectionHelp": "Loyalität / Verbindung",
             "LoyaltyConnectionLabel": "L / V",
-            "Type": "Typ"
+            "Type": "Typ",
+            "Labels": {
+                "ContactType": "Typ",
+                "Contacts": "Kontakte",
+                "Connection": "Verbindung",
+                "Loyalty": "Loyalität"
+            }
         },
         "InventoryRename": {
             "Cancel": "Abbrechen",
@@ -395,7 +450,11 @@
                 "Walker": "Läufer",
                 "Water": "Schiff"
             },
-            "Vehicle": "Fahrzeug"
+            "Vehicle": "Fahrzeug",
+            "Labels": {
+                "ControlRig": "Riggerkontrolle",
+                "VehicleStunImmunity": "Fahrzeugimmunität gegen Betäubungsschaden"
+            }
         },
         "VehicleImport": {
             "MissingPermission": "Dir fehlt die Berechtigung, Akteure zu erstellen."

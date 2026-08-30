@@ -45,8 +45,6 @@
         "ImportIconFolderName": "Dossier d'identification des importateurs",
         "MarkImportsDescription": "Noter les articles fraîchement importés sur les feuilles d'acteur pour souligner qu'ils devraient être examinés",
         "MarkImportsName": "Marquer les importations fraîches",
-        "MustHaveRessourcesOnTest": "Arrêter les tests avec les ressources manquantes",
-        "MustHaveRessourcesOnTestDescription": "Ne permettre aux acteurs disposant de toutes les ressources nécessaires de lancer un test",
         "NoMarking": "Ne marquez pas les importations fraîches",
         "OnlyAllowRollOnDefaultableSkills": "Permettre de lancer les compétences qui ne sont pas par défaut",
         "OnlyAllowRollOnDefaultableSkillsDescription": "Permettre de lancer toutes les compétences, même celles qui ne peuvent pas être selectionées par défaut",
@@ -78,7 +76,9 @@
         "UseDamageConditionDescription": "Marques système des jetons selon leur moniteur de condition",
         "UseDamageConditionName": "Utiliser la manipulation du système pour les effets de statut de jeton",
         "UseImportIconOverridesDescription": "Lorsque vous importez des objets, utilisez les mêmes icônes pour certains types d'articles différents quand cela a du sens.",
-        "UseImportIconOverridesName": "Utiliser l'icône d'importateur par défaut Excédents"
+        "UseImportIconOverridesName": "Utiliser l'icône d'importateur par défaut Excédents",
+        "MustHaveResourcesOnTest": "Arrêter les tests avec les ressources manquantes",
+        "MustHaveResourcesOnTestDescription": "Ne permettre aux acteurs disposant de toutes les ressources nécessaires de lancer un test"
     },
     "TYPES": {
         "Actor": {

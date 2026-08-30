@@ -14,9 +14,9 @@
     <div class="list-item-col {{#if @root.isPlayMode}} skinny-col {{/if}}">
         <label class="skill-rtg-label">
             {{#if (or @root.filters.showUntrainedSkills (not (eq category 'active')))}}
-                {{localize "SR5.Rtg"}}
+                {{localize "SR5.Item.Labels.Rtg"}}
             {{else}}
-                {{localize "SR5.RtgAboveZero"}}
+                {{localize "SR5.Item.Labels.RtgAboveZero"}}
             {{/if}}
         </label>
     </div>

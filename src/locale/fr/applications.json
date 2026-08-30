@@ -8,37 +8,6 @@
             "ReportIssues": "Rapporter les bugs et proposer des changements",
             "Title": "Mise à jour Shadowrun5e"
         },
-        "CompendiaSettings": {
-            "Description": "Ces packs seront utilisés pour le système. Vous pouvez les surcharger avec vos propres packs, mais vous ne devriez pas les supprimer.",
-            "GeneralActionsPack": {
-                "hint": "Ce compendium sera utilisé pour toutes les actions générales, attribut seulement.",
-                "label": "Actions générales"
-            },
-            "ICActionsPack": {
-                "hint": "Ce compendium sera utilisé pour les actions IC, filtrées pour chaque type d'IC",
-                "label": "Actions IC"
-            },
-            "Label": "Packs de compendium",
-            "MatrixActionsPack": {
-                "hint": "Ce compendium sera utilisé pour toutes les actions matricielles.",
-                "label": "Actions matricielles"
-            },
-            "SkillsPacksSection": "Recueils de compétences",
-            "ActionsPacksSection": "Recueils d'actions",
-            "SkillsPack": {
-                "hint": "Ce recueil sera utilisé pour toutes les compétences.",
-                "label": "Compétences"
-            },
-            "SkillGroupsPack": {
-                "hint": "Ce recueil sera utilisé pour les groupes de compétences.",
-                "label": "Groupes de compétences"
-            },
-            "SkillSetsPack": {
-                "hint": "Ce compendium sera utilisé pour les ensembles de compétences.",
-                "label": "Ensembles de compétences"
-            },
-            "Title": "Recueils de systèmes"
-        },
         "CompendiumBrowser": {
             "Filters": {
                 "ClearSearch": "Effacer la recherche",
@@ -146,33 +115,6 @@
             "Submit": "Soumettre",
             "Title": "Gestionnaire de Karma"
         },
-        "MIGRATION": {
-            "BeginMigration": "Commencer la migration",
-            "BeginNotification": "Commencer la migration de cette version du système Shadowrun",
-            "DoNotCloseNotification": "Merci de ne pas fermer votre jeu ou éteindre FoundryVTT",
-            "SuccessConfirm": "Fermer",
-            "SuccessDescription": "Les compendiums existants de ce monde ont été mis à jour en même temps que la migration",
-            "SuccessHeader": "Migration effectuée",
-            "SuccessNotification": "Le système Shadowrun a été bien mis à jour",
-            "SuccessPacksInfo": "A cause de limits techniques de FoundryVTT, les packs d'acteurs doivent être mis à jour manuellement",
-            "SuccessTitle": "Succès",
-            "WarningBackup": "Attention, nous vous conseillons de faire une copie de votre monde avant de cliquer sur le bouton 'Commencer la migration' ci dessous",
-            "WarningDescription": "Seul le MJ peut effectuer la mise à jour. Fermer votre navigateur peut causer des problèmes au monde",
-            "WarningHeader": "Attention migration en cours",
-            "WarningRequired": "Le système Shadowrun 5e doit être mis à jour",
-            "WarningTitle": "Alerte"
-        },
-        "Migrator": {
-            "Version18_0_0": {
-                "Line1": "À partir de la version 0.18.0, les effets des objets possédés s'appliquent directement, sans être copiés sur l'acteur.",
-                "Line2": "Les effets précédemment copiés doivent être supprimés ou désactivés pour éviter que les effets de l'objet et de l'acteur n'appliquent tous deux leurs modifications. Par défaut, tous les effets ayant une origine d'objet seront supprimés.",
-                "Line3": "Les effets créés directement sur les acteurs ne sont pas affectés.",
-                "Line4": "Si vous utilisez beaucoup d'effets, notamment avec des modules d'effets, et que vous ne savez pas exactement quels effets proviennent d'un objet, réglez cette migration sur Désactiver afin d'examiner les effets désactivés. Les effets désactivés seront marqués comme tels.",
-                "Line5": "Notez également que les effets activés sur les objets d'un acteur seront désormais appliqués. Vous pouvez voir tous les effets appliqués dans l'onglet Effets de l'acteur.",
-                "OnlyDisable": "Désactiver uniquement les effets",
-                "Warning": "Remarque !"
-            }
-        },
         "NuyenManager": {
             "Cancel": "Annuler",
             "CurrentNuyen": "Quantité de nuyens dont dispose actuellement le personnage",
@@ -254,6 +196,70 @@
                 "WoundModifierContent": "Cette cellule indique que le remplissage augmente votre modificateur de blessure par le nombre écrit dans la cellule",
                 "WoundModifierTitle": "Modificateur de blessure"
             }
+        },
+        "Migration": {
+            "BeginMigration": "Commencer la migration",
+            "BeginNotification": "Commencer la migration de cette version du système Shadowrun",
+            "DoNotCloseNotification": "Merci de ne pas fermer votre jeu ou éteindre FoundryVTT",
+            "SuccessConfirm": "Fermer",
+            "SuccessDescription": "Les compendiums existants de ce monde ont été mis à jour en même temps que la migration",
+            "SuccessHeader": "Migration effectuée",
+            "SuccessNotification": "Le système Shadowrun a été bien mis à jour",
+            "SuccessPacksInfo": "A cause de limits techniques de FoundryVTT, les packs d'acteurs doivent être mis à jour manuellement",
+            "SuccessTitle": "Succès",
+            "WarningBackup": "Attention, nous vous conseillons de faire une copie de votre monde avant de cliquer sur le bouton 'Commencer la migration' ci dessous",
+            "WarningDescription": "Seul le MJ peut effectuer la mise à jour. Fermer votre navigateur peut causer des problèmes au monde",
+            "WarningHeader": "Attention migration en cours",
+            "WarningRequired": "Le système Shadowrun 5e doit être mis à jour",
+            "WarningTitle": "Alerte",
+            "Version18_0_0": {
+                "Line1": "À partir de la version 0.18.0, les effets des objets possédés s'appliquent directement, sans être copiés sur l'acteur.",
+                "Line2": "Les effets précédemment copiés doivent être supprimés ou désactivés pour éviter que les effets de l'objet et de l'acteur n'appliquent tous deux leurs modifications. Par défaut, tous les effets ayant une origine d'objet seront supprimés.",
+                "Line3": "Les effets créés directement sur les acteurs ne sont pas affectés.",
+                "Line4": "Si vous utilisez beaucoup d'effets, notamment avec des modules d'effets, et que vous ne savez pas exactement quels effets proviennent d'un objet, réglez cette migration sur Désactiver afin d'examiner les effets désactivés. Les effets désactivés seront marqués comme tels.",
+                "Line5": "Notez également que les effets activés sur les objets d'un acteur seront désormais appliqués. Vous pouvez voir tous les effets appliqués dans l'onglet Effets de l'acteur.",
+                "OnlyDisable": "Désactiver uniquement les effets",
+                "Warning": "Remarque !"
+            },
+            "Complete": "Migration Complète",
+            "UpdateCompendiumNoUpdateActor": "A cause de limitations techniques avec FoundryVTT, le pack compendium d'acteurs ne peuvent pas être mis à jour. Vous devez mettre à jour ce pack manuellement.",
+            "UpdateCompendiumUpdateMessage": "Chaque compendium pack du monde qui existe ont été mis à jour"
+        },
+        "CompendiumSettings": {
+            "Description": "Ces packs seront utilisés pour le système. Vous pouvez les surcharger avec vos propres packs, mais vous ne devriez pas les supprimer.",
+            "GeneralActionsPack": {
+                "hint": "Ce compendium sera utilisé pour toutes les actions générales, attribut seulement.",
+                "label": "Actions générales"
+            },
+            "ICActionsPack": {
+                "hint": "Ce compendium sera utilisé pour les actions IC, filtrées pour chaque type d'IC",
+                "label": "Actions IC"
+            },
+            "Label": "Packs de compendium",
+            "MatrixActionsPack": {
+                "hint": "Ce compendium sera utilisé pour toutes les actions matricielles.",
+                "label": "Actions matricielles"
+            },
+            "SkillsPacksSection": "Recueils de compétences",
+            "ActionsPacksSection": "Recueils d'actions",
+            "SkillsPack": {
+                "hint": "Ce recueil sera utilisé pour toutes les compétences.",
+                "label": "Compétences"
+            },
+            "SkillGroupsPack": {
+                "hint": "Ce recueil sera utilisé pour les groupes de compétences.",
+                "label": "Groupes de compétences"
+            },
+            "SkillSetsPack": {
+                "hint": "Ce compendium sera utilisé pour les ensembles de compétences.",
+                "label": "Ensembles de compétences"
+            },
+            "Title": "Recueils de systèmes"
+        },
+        "ReputationManager": {
+            "Cancel": "Annuler",
+            "Submit": "Soumettre",
+            "Title": "Gestionnaire de réputation"
         }
     }
 }

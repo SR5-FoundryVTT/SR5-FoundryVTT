@@ -43,10 +43,10 @@ export class SR5Combat extends Combat<"base"> {
     // =========================================================
 
     static readonly INITIATIVE_MODE_CONFIG = {
-        meatspace: { cls: 'mode-physical', icon: 'fa-solid fa-person-running', label: 'SR5.COMBAT.ModeMeatspace' },
-        astral:    { cls: 'mode-astral',   icon: 'fa-solid fa-star',           label: 'SR5.COMBAT.ModeAstral' },
-        matrix:    { cls: 'mode-matrix',   icon: 'fa-solid fa-laptop-code',    label: 'SR5.COMBAT.ModeMatrix' },
-        unknown:   { cls: 'mode-unknown',  icon: 'fa-solid fa-question',       label: 'SR5.COMBAT.ModeUnknown' }
+        meatspace: { cls: 'mode-physical', icon: 'fa-solid fa-person-running', label: 'SR5.Combat.ModeMeatspace' },
+        astral:    { cls: 'mode-astral',   icon: 'fa-solid fa-star',           label: 'SR5.Combat.ModeAstral' },
+        matrix:    { cls: 'mode-matrix',   icon: 'fa-solid fa-laptop-code',    label: 'SR5.Combat.ModeMatrix' },
+        unknown:   { cls: 'mode-unknown',  icon: 'fa-solid fa-question',       label: 'SR5.Combat.ModeUnknown' }
     } as const;
 
     static override migrateData(source: any) {
@@ -87,7 +87,7 @@ export class SR5Combat extends Combat<"base"> {
         for (const { value, keySuffix, icon } of mapping) {
             options.push({
                 icon,
-                name: game.i18n.localize(`SR5.COMBAT.ReduceInitBy${keySuffix}`),
+                name: game.i18n.localize(`SR5.Combat.ReduceInitBy${keySuffix}`),
                 callback: async (li: JQuery) => {
                     const combatant = game.combat?.combatants.get(li.data("combatant-id") as string);
                     await combatant?.adjustInitiative(-value);
@@ -357,7 +357,7 @@ export class SR5Combat extends Combat<"base"> {
         }
 
         if (!snapshot) {
-            ui.notifications?.warn(game.i18n.localize('SR5.COMBAT.NoHistoryAvailable'));
+            ui.notifications?.warn(game.i18n.localize('SR5.Combat.NoHistoryAvailable'));
             return this;
         }
 
@@ -378,7 +378,7 @@ export class SR5Combat extends Combat<"base"> {
         }
 
         if (!snapshot) {
-            ui.notifications?.warn(game.i18n.localize('SR5.COMBAT.NoHistoryAvailable'));
+            ui.notifications?.warn(game.i18n.localize('SR5.Combat.NoHistoryAvailable'));
             return this;
         }
 
@@ -398,7 +398,7 @@ export class SR5Combat extends Combat<"base"> {
         const history = [...(this.system.history ?? [])];
         const snapshot = history.pop();
         if (!snapshot) {
-            ui.notifications?.warn(game.i18n.localize('SR5.COMBAT.NoHistoryAvailable'));
+            ui.notifications?.warn(game.i18n.localize('SR5.Combat.NoHistoryAvailable'));
             return this;
         }
 
@@ -613,7 +613,7 @@ export class SR5Combat extends Combat<"base"> {
                 {
                     user: game.user.id,
                     speaker: foundry.documents.ChatMessage.implementation.getSpeaker({
-                        alias: game.i18n.localize('SR5.Initiative'),
+                        alias: game.i18n.localize('SR5.Actor.Labels.Initiative'),
                     }),
                     content,
                     flags: { core: { initiativeRoll: true } },
@@ -676,7 +676,7 @@ export class SR5Combat extends Combat<"base"> {
             // UI & Presentation
             modeClass: config.cls,
             modeIcon: config.icon,
-            modeTitle: game.i18n.format('SR5.COMBAT.ModeTitle', { 
+            modeTitle: game.i18n.format('SR5.Combat.ModeTitle', {
                 mode: game.i18n.localize(config.label)
             }),
             totalTooltipHtml: this._buildInitiativeTooltipHtml(token?.actor ?? actor, roll, base),

@@ -168,6 +168,42 @@
                 "Standard": "기본"
             },
             "Type": "유형"
+        },
+        "MatrixOpposedDeviceDialog": {
+            "Title": "매트릭스 장치 생성"
+        },
+        "Matrix": {
+            "Attributes": {
+                "Attack": "공격",
+                "DataProcessing": "데이터 처리",
+                "Firewall": "방화벽",
+                "Sleaze": "슬리즈"
+            },
+            "Labels": {
+                "Agent": "에이전트",
+                "CommonProgram": "일반 프로그램",
+                "DirectConnection": "직접 연결",
+                "Grids": "그리드",
+                "Hosts": "호스트",
+                "HotSim": "핫 심",
+                "LivingPersona": "리빙 페르소나",
+                "Marks": "마커",
+                "MatrixDefense": "매트릭스 방어",
+                "MatrixFullDefenseAttribute": "매트릭스 전력 방어 특성치",
+                "MatrixTarget": "매트릭스 목표",
+                "Network": "네트워크",
+                "Networks": "네트워크",
+                "OverwatchScore": "감시 점수",
+                "OverwatchScoreTrackerTitle": "존슨 씨의 육아 모니터",
+                "Personas": "페르소나",
+                "PublicGrid": "공공 그리드",
+                "RunningSilent": "정숙 실행",
+                "RunningSilentControlledByDevice": "다음의 활성된 매트릭스 장치에 의해 정숙 실행 조작 중:",
+                "Wireless": "무선",
+                "WirelessOffline": "오프라인",
+                "WirelessOnline": "온라인",
+                "WirelessUnavailable": "이용 불가능"
+            }
         }
     }
 }

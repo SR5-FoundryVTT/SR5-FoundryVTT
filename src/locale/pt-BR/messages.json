@@ -18,7 +18,6 @@
             "DefaultInventoryCantBeRemoved": "O inventário padrão não pode ser removido",
             "LinkLockedReboot": "Um ator com bloqueio de conexão não pode ser reiniciado",
             "InventoryAlreadyExists": "Um inventário com este nome já existe.",
-            "KeyNotModifyableByActiveEffect": "O modo de efeito ativo 'modificar' só pode afetar propriedades de mod.",
             "MarkCouldNotBePlaced": "Erro Interno: Suas marcas não puderam ser colocadas.",
             "MarksCantBePlacedBy": "O ator ativo não pode colocar marcas.",
             "MarksCantBePlacedOn": "O tipo de ator escolhido não pode receber marcas.",
@@ -28,7 +27,10 @@
             "NoAvailableActorFound": "Nenhum ator disponível foi encontrado para esta ação",
             "SkillWithoutAttribute": "A pericia não tem um atributo configurado.",
             "TestExpectsVehicleOnly": "Este teste só pode ser feito com um ator do tipo veículo",
-            "TooManyActionsWithCategory": "Você deve ter exatamente uma ação da categoria {category} no seu ator"
+            "TooManyActionsWithCategory": "Você deve ter exatamente uma ação da categoria {category} no seu ator",
+            "KeyNotModifiableByActiveEffect": "O modo de efeito ativo 'modificar' só pode afetar propriedades de mod.",
+            "SourceFieldEmpty": "O campo Fonte está vazio, por favor insira um texto válido para a fonte",
+            "MissingItemForOpposedTest": "O teste oposto não pode ser realizado porque o item usado na ação não está mais disponível"
         },
         "Messages": {
             "MarkInvitation": {
@@ -36,13 +38,6 @@
                 "AskForInvite": "Solicita um convite de marca para:",
                 "InviteAccepted": "Sinta-se à vontade para entrar em {networkName}, {userName}!"
             }
-        },
-        "MissingRessource": {
-            "Ammo": "Munição insuficiente para atirar",
-            "Edge": "Sem Trunfo restante para consumir",
-            "Initiative": "Pontuação de iniciativa insuficiente",
-            "SomeAmmo": "Munição insuficiente para disparar no modo selecionado, os modificadores de modo serão reduzidos.",
-            "SomeAmmoMelee": "Não há munição suficiente para fazer um ataque corpo a corpo"
         },
         "Notifications": {
             "AddDevicesToPAN": {
@@ -55,7 +50,10 @@
                 "Item": "Limpando referências ao item",
                 "Start": "Excluindo referências de rede e Marcas"
             },
-            "VehicleCannotBeOwnDriver": "Um veículo não pode ser o motorista de si mesmo (é para isso que o piloto serve)"
+            "VehicleCannotBeOwnDriver": "Um veículo não pode ser o motorista de si mesmo (é para isso que o piloto serve)",
+            "CantModifyHostContent": "Não é possível alterar os dados do host a partir de um ator GELO.",
+            "ConsumedEquippedAmmo": "Munição equipada consumida",
+            "ResetProgressiveRecoil": "Recuo progressivo reiniciado para zero balas disparadas"
         },
         "Warnings": {
             "ActorMissingRequirements": "O ator deve atender ao requisito de Desperto ou Emergido desta perícia",
@@ -72,7 +70,6 @@
             "CantReloadWithoutSpareClip": "Você está sem carregadores extras!",
             "CantSecondChanceAGlitch": "Não pode ter uma segunda chance neste teste. O resultado do teste é falho.",
             "CantSecondChanceWithoutNoneHits": "Não pode ter uma segunda chance neste teste. Só restam dados de acerto.",
-            "CantSpendMulitplePointsOfEdge": "Não pode gastar vários pontos de trunfo em um teste ou ação",
             "CantCombineBuyHitsWithEdge": "Comprar Acertos não pode ser combinado com Segunda Chance.",
             "CompilationNotConcluded": "Compilação incompleta. Aguarde o sprite se opor à compilação para determinar o enfraquecimento.",
             "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Pontos de trunfo não podem ser gastos em testes sem atores",
@@ -91,7 +88,17 @@
             "SkillCantBeDefault": "Esta pericia não pode ser lançada, pois não pode ser feita sem perícia",
             "SkillSetDefaultTypeOutsideCompendium": "Somente conjuntos de perícias no compêndio de conjuntos configurado afetarão a criação do ator",
             "SummoningNotConcluded": "Invocação incompleta. Aguarde o espírito se opor à invocação para determinar o dreno.",
-            "TokenSelectionNeeded": "Um ou mais tokens precisam ser selecionados"
+            "TokenSelectionNeeded": "Um ou mais tokens precisam ser selecionados",
+            "MissingPdfPager": "Para que os PDFs de origem sejam mostrados, o módulo pdf-pager deve estar instalado e um PDF correspondente ao código criado.",
+            "CantSpendMultiplePointsOfEdge": "Não pode gastar vários pontos de trunfo em um teste ou ação",
+            "NoSelectableToken": "O ator não tem token selecionável na cena"
+        },
+        "MissingResources": {
+            "Ammo": "Munição insuficiente para atirar",
+            "Edge": "Sem Trunfo restante para consumir",
+            "Initiative": "Pontuação de iniciativa insuficiente",
+            "SomeAmmo": "Munição insuficiente para disparar no modo selecionado, os modificadores de modo serão reduzidos.",
+            "SomeAmmoMelee": "Não há munição suficiente para fazer um ataque corpo a corpo"
         }
     }
 }

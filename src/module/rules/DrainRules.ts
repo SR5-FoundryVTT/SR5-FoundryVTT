@@ -47,7 +47,7 @@ export class DrainRules {
 
         drainDamage = foundry.utils.duplicate(drainDamage) as DamageType;
 
-        ModifiableValue.addUnique(drainDamage, 'SR5.Hits', -hits);
+        ModifiableValue.addUnique(drainDamage, 'SR5.Tests.Labels.Hits', -hits);
         ModifiableValue.calcTotal(drainDamage, {min: 0});
 
         return drainDamage;

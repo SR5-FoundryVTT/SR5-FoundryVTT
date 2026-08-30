@@ -76,8 +76,8 @@ export class CombatRules {
 
         // SR5#173  Step3: Defend B.
         const mod = new ModifiableValue(modified);
-        mod.addUnique('SR5.Attacker', attackerHits);
-        mod.addUnique('SR5.Defender', -defenderHits);
+        mod.addUnique('SR5.Tests.Labels.Attacker', attackerHits);
+        mod.addUnique('SR5.Tests.Labels.Defender', -defenderHits);
         ModifiableValue.calcTotal(modified, { min: 0 });
 
         // SR5#173 Step 3: Defend B.

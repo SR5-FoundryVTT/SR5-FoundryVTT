@@ -45,8 +45,6 @@
         "ImportIconFolderName": "아이콘 폴더 불러오기 도구",
         "MarkImportsDescription": "액터 시트에 새로 불러온 물품을 표시하여 검토해야 함을 강조",
         "MarkImportsName": "새로 불러온 물품 표시",
-        "MustHaveRessourcesOnTest": "찾을 수 없는 자원을 사용하는 판정 중단",
-        "MustHaveRessourcesOnTestDescription": "필요한 모든 자원을 가진 액터에게만 판정 허용",
         "NoMarking": "새로 불러온 물품을 표시하지 않음",
         "OnlyAllowRollOnDefaultableSkills": "무리한 시도 가능한 기술 굴림 가능",
         "OnlyAllowRollOnDefaultableSkillsDescription": "알지 못하는 기술도 무리한 시도가 불가능하더라도 굴림 가능",
@@ -78,7 +76,9 @@
         "UseDamageConditionDescription": "시스템이 상태 측정기에 따라 토큰을 표시",
         "UseDamageConditionName": "토큰 상태 효과에 시스템 처리 사용",
         "UseImportIconOverridesDescription": "물품 불러오기 시 서로 다른 물품 유형에 동일한 아이콘을 사용하는 것이 합리적일 경우 사용. 사용자 지정 아이콘을 사용하는 경우 체크 해제.",
-        "UseImportIconOverridesName": "기본 불러오기 아이콘 덮어쓰기 사용"
+        "UseImportIconOverridesName": "기본 불러오기 아이콘 덮어쓰기 사용",
+        "MustHaveResourcesOnTest": "찾을 수 없는 자원을 사용하는 판정 중단",
+        "MustHaveResourcesOnTestDescription": "필요한 모든 자원을 가진 액터에게만 판정 허용"
     },
     "TYPES": {
         "Actor": {

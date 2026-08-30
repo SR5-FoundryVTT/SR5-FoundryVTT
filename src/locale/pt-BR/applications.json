@@ -8,37 +8,6 @@
             "ReportIssues": "Por favor, reporte bugs e solicitações de recursos",
             "Title": "Atualização Shadowrun5e"
         },
-        "CompendiaSettings": {
-            "Description": "Estes pacotes serão usados para o sistema. Você pode substituí-los com seus próprios pacotes, mas você não deve removê-los.",
-            "GeneralActionsPack": {
-                "hint": "Este compêndio será usado para todas as ações gerais, apenas de atributos.",
-                "label": "Ações Gerais"
-            },
-            "ICActionsPack": {
-                "hint": "Este compêndio será usado para ações IC, filtrado para cada tipo IC",
-                "label": "Ações IC"
-            },
-            "Label": "Pacotes de Compêndio",
-            "MatrixActionsPack": {
-                "hint": "Este compêndio será usado para todas as ações matriciais.",
-                "label": "Ações da Matriz"
-            },
-            "SkillsPacksSection": "Compêndios de Perícias",
-            "ActionsPacksSection": "Compêndios de Ações",
-            "SkillsPack": {
-                "hint": "Este compêndio será usado para todas as perícias.",
-                "label": "Perícias"
-            },
-            "SkillGroupsPack": {
-                "hint": "Este compêndio será usado para grupos de perícias.",
-                "label": "Grupos de Perícias"
-            },
-            "SkillSetsPack": {
-                "hint": "Este compêndio será usado para conjuntos de perícias.",
-                "label": "Conjuntos de Perícias"
-            },
-            "Title": "Compêndios do sistema"
-        },
         "CompendiumBrowser": {
             "Filters": {
                 "ClearSearch": "Limpar Pesquisa",
@@ -146,33 +115,6 @@
             "Submit": "Enviar",
             "Title": "Gerenciador de Karma"
         },
-        "MIGRATION": {
-            "BeginMigration": "Iniciar Migração",
-            "BeginNotification": "Iniciando migração do sistema Shadowrun da versão",
-            "DoNotCloseNotification": "Por favor, não feche seu jogo ou desligue o FoundryVTT.",
-            "SuccessConfirm": "Fechar",
-            "SuccessDescription": "Compendios existentes deste mundo foram atualizados no processo de migracao.",
-            "SuccessHeader": "Migração Completa",
-            "SuccessNotification": "Sistema Shadowrun migrado com sucesso para a versão",
-            "SuccessPacksInfo": "Devido às limitações técnicas atuais dentro do FoundryVTT, os pacotes de atores devem ser atualizados manualmente.",
-            "SuccessTitle": "Sucesso",
-            "WarningBackup": "Se você não fez backup do seu mundo, faça isso antes de pressionar o botão 'Iniciar Migração' abaixo.",
-            "WarningDescription": "Apenas o GM pode realizar a atualização e desligar o servidor ou fechar o navegador enquanto a atualização estiver em andamento pode causar danos irreparáveis ao seu mundo.",
-            "WarningHeader": "Aviso de Migração",
-            "WarningRequired": "O sistema Shadowrun 5E deve iniciar uma atualização obrigatória.",
-            "WarningTitle": "Alerta"
-        },
-        "Migrator": {
-            "Version18_0_0": {
-                "Line1": "A partir da versão 0.18.0, os efeitos em itens possuídos serão aplicados diretamente sem que eles precisem ser copiados para o ator.",
-                "Line2": "Efeitos copiados anteriormente devem ser excluídos ou desativados para evitar que tanto os efeitos do item quanto do ator apliquem alterações. Por padrão, todos os efeitos com origem no item serão excluídos.",
-                "Line3": "Efeitos criados diretamente nos atores não são afetados.",
-                "Line4": "Se você usa muito os efeitos e módulos de efeitos e não tem certeza sobre 'efeitos de propriedade do item', você configura esta migração para desativar e revisar seus efeitos desativados. Efeitos desativados serão marcados como tal.",
-                "Line5": "Esteja ciente também de que os efeitos ativados nos itens do ator agora serão aplicados. Você poderá ver todos os efeitos aplicados na guia de efeitos dos atores.",
-                "OnlyDisable": "Desativar Efeitos apenas",
-                "Warning": "ATENÇÃO!"
-            }
-        },
         "NuyenManager": {
             "Cancel": "Cancelar",
             "CurrentNuyen": "A quantidade de Nuyen que o personagem tem atualmente",
@@ -254,6 +196,70 @@
                 "WoundModifierContent": "Esta célula indica que preenchê-la aumenta o seu modificador de ferimento pelo número escrito na célula",
                 "WoundModifierTitle": "Modificador de Ferimento"
             }
+        },
+        "Migration": {
+            "BeginMigration": "Iniciar Migração",
+            "BeginNotification": "Iniciando migração do sistema Shadowrun da versão",
+            "DoNotCloseNotification": "Por favor, não feche seu jogo ou desligue o FoundryVTT.",
+            "SuccessConfirm": "Fechar",
+            "SuccessDescription": "Compendios existentes deste mundo foram atualizados no processo de migracao.",
+            "SuccessHeader": "Migração Completa",
+            "SuccessNotification": "Sistema Shadowrun migrado com sucesso para a versão",
+            "SuccessPacksInfo": "Devido às limitações técnicas atuais dentro do FoundryVTT, os pacotes de atores devem ser atualizados manualmente.",
+            "SuccessTitle": "Sucesso",
+            "WarningBackup": "Se você não fez backup do seu mundo, faça isso antes de pressionar o botão 'Iniciar Migração' abaixo.",
+            "WarningDescription": "Apenas o GM pode realizar a atualização e desligar o servidor ou fechar o navegador enquanto a atualização estiver em andamento pode causar danos irreparáveis ao seu mundo.",
+            "WarningHeader": "Aviso de Migração",
+            "WarningRequired": "O sistema Shadowrun 5E deve iniciar uma atualização obrigatória.",
+            "WarningTitle": "Alerta",
+            "Version18_0_0": {
+                "Line1": "A partir da versão 0.18.0, os efeitos em itens possuídos serão aplicados diretamente sem que eles precisem ser copiados para o ator.",
+                "Line2": "Efeitos copiados anteriormente devem ser excluídos ou desativados para evitar que tanto os efeitos do item quanto do ator apliquem alterações. Por padrão, todos os efeitos com origem no item serão excluídos.",
+                "Line3": "Efeitos criados diretamente nos atores não são afetados.",
+                "Line4": "Se você usa muito os efeitos e módulos de efeitos e não tem certeza sobre 'efeitos de propriedade do item', você configura esta migração para desativar e revisar seus efeitos desativados. Efeitos desativados serão marcados como tal.",
+                "Line5": "Esteja ciente também de que os efeitos ativados nos itens do ator agora serão aplicados. Você poderá ver todos os efeitos aplicados na guia de efeitos dos atores.",
+                "OnlyDisable": "Desativar Efeitos apenas",
+                "Warning": "ATENÇÃO!"
+            },
+            "Complete": "Migração Completa",
+            "UpdateCompendiumNoUpdateActor": "Devido a limitações técnicas dentro do FoundryVTT, os pacotes de compêndio de atores não podem ser atualizados neste momento. Você terá que atualizar esses pacotes manualmente.",
+            "UpdateCompendiumUpdateMessage": "Quaisquer pacotes de compêndio do mundo que existam no mundo também foram atualizados"
+        },
+        "CompendiumSettings": {
+            "Description": "Estes pacotes serão usados para o sistema. Você pode substituí-los com seus próprios pacotes, mas você não deve removê-los.",
+            "GeneralActionsPack": {
+                "hint": "Este compêndio será usado para todas as ações gerais, apenas de atributos.",
+                "label": "Ações Gerais"
+            },
+            "ICActionsPack": {
+                "hint": "Este compêndio será usado para ações IC, filtrado para cada tipo IC",
+                "label": "Ações IC"
+            },
+            "Label": "Pacotes de Compêndio",
+            "MatrixActionsPack": {
+                "hint": "Este compêndio será usado para todas as ações matriciais.",
+                "label": "Ações da Matriz"
+            },
+            "SkillsPacksSection": "Compêndios de Perícias",
+            "ActionsPacksSection": "Compêndios de Ações",
+            "SkillsPack": {
+                "hint": "Este compêndio será usado para todas as perícias.",
+                "label": "Perícias"
+            },
+            "SkillGroupsPack": {
+                "hint": "Este compêndio será usado para grupos de perícias.",
+                "label": "Grupos de Perícias"
+            },
+            "SkillSetsPack": {
+                "hint": "Este compêndio será usado para conjuntos de perícias.",
+                "label": "Conjuntos de Perícias"
+            },
+            "Title": "Compêndios do sistema"
+        },
+        "ReputationManager": {
+            "Cancel": "Cancelar",
+            "Submit": "Enviar",
+            "Title": "Gerenciador de Reputação"
         }
     }
 }

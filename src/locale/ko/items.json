@@ -41,7 +41,15 @@
                     "label": "대체"
                 }
             },
-            "label": "탄약"
+            "label": "탄약",
+            "Labels": {
+                "AmmoFull": "탄약 가득 참",
+                "AmmoGelRounds": "젤 탄약",
+                "Bullet": "발",
+                "BulletCount": "잔탄 수",
+                "Bullets": "발",
+                "SpareClips": "남은 탄창"
+            }
         },
         "Armor": {
             "FIELDS": {
@@ -100,7 +108,16 @@
                 "NormalWeapons": "일반 무기"
             },
             "Resistances": "저항",
-            "label": "방어구"
+            "label": "방어구",
+            "Labels": {
+                "Accessory": "부착물",
+                "ArmorHardened": "단단함",
+                "ArmorHardenedFull": "단단한 갑옷",
+                "ArmorValue": "방어구 수치",
+                "HardenedArmor": "단단한 갑옷",
+                "Immunity": "면역",
+                "ImmunityToNormalWeapons": "일반 무기에 대한 면역"
+            }
         },
         "Device": {
             "FIELDS": {
@@ -109,7 +126,12 @@
                     "label": "장치 유형"
                 }
             },
-            "label": "장치"
+            "label": "장치",
+            "Categories": {
+                "Commlink": "컴링크",
+                "Cyberdeck": "사이버덱",
+                "RCC": "리거 명령 콘솔"
+            }
         },
         "Element": {
             "Acid": "산성",
@@ -377,6 +399,38 @@
                         "label": "무선"
                     }
                 }
+            },
+            "Cyberware": {
+                "Grades": {
+                    "Label": "등급",
+                    "Alpha": "알파웨어",
+                    "Beta": "베타웨어",
+                    "Delta": "델타웨어",
+                    "Gamma": "감마웨어",
+                    "Grey": "그레이웨어",
+                    "Standard": "표준",
+                    "Used": "중고"
+                }
+            },
+            "Labels": {
+                "Availability": "희귀도",
+                "Capacity": "수용량",
+                "Conceal": "은폐도",
+                "Cost": "비용",
+                "Equipment": "도구",
+                "Gear": "장비",
+                "ItemMod": "물품 부착물",
+                "ItemName": "물품 이름",
+                "License": "면허증",
+                "Licenses": "면허증",
+                "Load": "불러오기",
+                "Loaded": "불러옴",
+                "ModPoints": "개조 점수",
+                "MountPoint": "장착 위치",
+                "Rtg": "등급",
+                "RtgAboveZero": "등급 > 0",
+                "Stock": "개머리판",
+                "UnderBarrel": "총열 하부"
             }
         },
         "ItemTypes": {
@@ -438,7 +492,23 @@
                     "label": "생활방식 유형"
                 }
             },
-            "label": "생활방식"
+            "label": "생활방식",
+            "Attributes": {
+                "Comforts": "편의 시설",
+                "Guests": "투숙객",
+                "Neighborhood": "동네",
+                "Security": "보안"
+            },
+            "Types": {
+                "Label": "유형",
+                "Street": "노숙",
+                "Squatter": "불법 거주자",
+                "Low": "하류층",
+                "Middle": "중산층",
+                "High": "상류층",
+                "Luxury": "최상류층",
+                "Other": "기타"
+            }
         },
         "Modification": {
             "FIELDS": {
@@ -505,7 +575,13 @@
                     "label": "특징 유형"
                 }
             },
-            "label": "특징"
+            "label": "특징",
+            "Types": {
+                "Label": "유형",
+                "LifeModule": "인생 모듈",
+                "Negative": "부정적",
+                "Positive": "긍정적"
+            }
         },
         "Weapon": {
             "AmmoCount": "탄약 수량",
@@ -708,7 +784,19 @@
                 "Range": "투척 무기 사거리"
             },
             "Type": "유형",
-            "Weapon": "무기"
+            "Weapon": "무기",
+            "Labels": {
+                "Accuracy": "정확도",
+                "Barrel": "총열",
+                "FireMode": "사격 방식",
+                "Range": "사거리",
+                "Reach": "길이",
+                "Recoil": "반동",
+                "RecoilCompensation": "반동 제어"
+            }
+        },
+        "ModificationTypes": {
+            "Ware": "웨어"
         }
     }
 }

@@ -8,47 +8,47 @@ import {OverwatchScoreTracker} from './apps/gmtools/OverwatchScoreTracker';
  */
 export const registerSystemKeybindings = () => {
     game.keybindings.register("shadowrun5e", "show-situation-modifier-app", {
-        name: "SR5.Keybinding.ShowSituationModifiers.Label",
-        hint: "SR5.Keybinding.ShowSituationModifiers.Hint",
+        name: "SR5.Keybindings.ShowSituationModifiers.Label",
+        hint: "SR5.Keybindings.ShowSituationModifiers.Hint",
         editable: [{ key: "KeyM", modifiers: [] }],
         onDown: () => { SituationModifiersApplication.open(); },
     });
 
     game.keybindings.register("shadowrun5e", "success-test-prompt", {
-        name: "SR5.Keybinding.SuccessTestPrompt.Label",
-        hint: "SR5.Keybinding.SuccessTestPrompt.Hint",
+        name: "SR5.Keybindings.SuccessTestPrompt.Label",
+        hint: "SR5.Keybindings.SuccessTestPrompt.Hint",
         editable: [{ key: "KeyZ", modifiers: [] }],
         onDown: () => { game.shadowrun5e.test.promptSuccessTest(); }
     });
 
     game.keybindings.register("shadowrun5e", "show-overwatch-tracker-app", {
-        name: "SR5.Keybinding.OverwatchScoreTracker.Label",
-        hint: "SR5.Keybinding.OverwatchScoreTracker.Hint",
+        name: "SR5.Keybindings.OverwatchScoreTracker.Label",
+        hint: "SR5.Keybindings.OverwatchScoreTracker.Hint",
         editable: [{ key: "KeyO", modifiers: [] }],
         onDown: () => { OverwatchScoreTracker.open(); },
     });
 
     game.keybindings.register("shadowrun5e", "hide-test-dialog", {
-        name: game.i18n.localize("SR5.Keybinding.HideTestDialog.Label"),
-        hint: game.i18n.localize("SR5.Keybinding.HideTestDialog.Hint"),
+        name: game.i18n.localize("SR5.Keybindings.HideTestDialog.Label"),
+        hint: game.i18n.localize("SR5.Keybindings.HideTestDialog.Hint"),
         editable: [{key: "shiftKey"}]
     });
 
     game.keybindings.register("shadowrun5e", "show-item-card", {
-        name: game.i18n.localize("SR5.Keybinding.ShowItemCard.Label"),
-        hint: game.i18n.localize("SR5.Keybinding.ShowItemCard.Hint"),
+        name: game.i18n.localize("SR5.Keybindings.ShowItemCard.Label"),
+        hint: game.i18n.localize("SR5.Keybindings.ShowItemCard.Hint"),
         editable: [{key: "ctrlKey"}]
     });
 
     game.keybindings.register("shadowrun5e", "add-remove-some-qty", {
-        name: game.i18n.localize("SR5.Keybinding.AddRemoveSomeQty.Label"),
-        hint: game.i18n.localize("SR5.Keybinding.AddRemoveSomeQty.Hint"),
+        name: game.i18n.localize("SR5.Keybindings.AddRemoveSomeQty.Label"),
+        hint: game.i18n.localize("SR5.Keybindings.AddRemoveSomeQty.Hint"),
         editable: [{key: "shiftKey"}]
     });
 
     game.keybindings.register("shadowrun5e", "add-remove-many-qty", {
-        name: game.i18n.localize("SR5.Keybinding.AddRemoveManyQty.Label"),
-        hint: game.i18n.localize("SR5.Keybinding.AddRemoveManyQty.Hint"),
+        name: game.i18n.localize("SR5.Keybindings.AddRemoveManyQty.Label"),
+        hint: game.i18n.localize("SR5.Keybindings.AddRemoveManyQty.Hint"),
         editable: [{key: "ctrlKey"}]
     });
 }

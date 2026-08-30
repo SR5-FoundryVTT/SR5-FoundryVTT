@@ -58,7 +58,7 @@ export const MatrixTestDataFlow = {
      */
     removeMatrixModifiers(test: SuccessTest) {
         const pool = new ModifiableValue(test.data.pool);
-        ['SR5.HotSim', 'SR5.RunningSilent', 'SR5.PublicGrid'].forEach(part => pool.remove(part));
+        ['SR5.Matrix.Labels.HotSim', 'SR5.Matrix.Labels.RunningSilent', 'SR5.Matrix.Labels.PublicGrid'].forEach(part => pool.remove(part));
     },
 
     /**
@@ -71,11 +71,11 @@ export const MatrixTestDataFlow = {
 
             // Apply general matrix modifiers based on commlink/cyberdeck status.
             const matrix = actor.system.matrix!;
-            if (matrix.hot_sim) pool.addUnique('SR5.HotSim', 2);
-            if (matrix.running_silent) pool.addUnique('SR5.RunningSilent', -2);
+            if (matrix.hot_sim) pool.addUnique('SR5.Matrix.Labels.HotSim', 2);
+            if (matrix.running_silent) pool.addUnique('SR5.Matrix.Labels.RunningSilent', -2);
 
             if (!directConnection && actor.network?.isPublicGrid()) {
-                pool.addUnique('SR5.PublicGrid', actor.getPublicGridModifier());
+                pool.addUnique('SR5.Matrix.Labels.PublicGrid', actor.getPublicGridModifier());
             }
         }
     },
@@ -102,7 +102,7 @@ export const MatrixTestDataFlow = {
                 if (marks > 0) {
                     // add damage per mark on the target item
                     ModifiableValue.addUnique(
-                        test.data.damage, "SR5.Marks",
+                        test.data.damage, "SR5.Matrix.Labels.Marks",
                         marks * (targetItem.actor?.getExtraMarkDamageModifier() ?? MatrixRules.getExtraMarkDamageModifier())
                     );
                     test.data.damage.value = ModifiableValue.calcTotal(test.data.damage, { min: 0 })
@@ -114,7 +114,7 @@ export const MatrixTestDataFlow = {
                 if (marks > 0) {
                     // add damage per mark on the target item
                     ModifiableValue.addUnique(
-                        test.data.damage, "SR5.Marks", marks * icon.getExtraMarkDamageModifier()
+                        test.data.damage, "SR5.Matrix.Labels.Marks", marks * icon.getExtraMarkDamageModifier()
                     );
                     test.data.damage.value = ModifiableValue.calcTotal(test.data.damage, { min: 0 })
                 }

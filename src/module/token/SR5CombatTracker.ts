@@ -69,7 +69,7 @@ export class SR5CombatTracker extends CombatTracker {
         const options = super._getEntryContextOptions();
 
         options.splice(1, 0, {
-            name: game.i18n.localize('SR5.COMBAT.SeizeInitiative'),
+            name: game.i18n.localize('SR5.Combat.SeizeInitiative'),
             icon: '<i class="fa-solid fa-angles-up"></i>',
             condition: li => {
                 const combatant = this._getCombatant(li);
@@ -101,7 +101,7 @@ export class SR5CombatTracker extends CombatTracker {
         turn.pad = combatant.system.pad;
         turn.modeClass = modeConfig.cls;
         turn.modeIcon = modeConfig.icon;
-        turn.modeTitle = game.i18n.format('SR5.COMBAT.ModeTitle', { mode: game.i18n.localize(modeConfig.label) });
+        turn.modeTitle = game.i18n.format('SR5.Combat.ModeTitle', { mode: game.i18n.localize(modeConfig.label) });
         turn.seize = combatant.system.seize;
         turn.acted = combatant.system.acted && combatant.combat?.combatant?.id !== combatant.id;
         turn.zeroInitiative = combatant.initiative !== null && combatant.initiative <= 0;
@@ -270,7 +270,7 @@ export class SR5CombatTracker extends CombatTracker {
         if (initiative.meatspace) {
             options.push({
                 value: 'meatspace',
-                label: game.i18n.localize('SR5.COMBAT.ModeMeatspace'),
+                label: game.i18n.localize('SR5.Combat.ModeMeatspace'),
                 icon: 'fa-solid fa-person-running',
                 selected: selectedMode === 'meatspace'
             });
@@ -279,7 +279,7 @@ export class SR5CombatTracker extends CombatTracker {
         if (special === 'magic') {
             options.push({
                 value: 'astral',
-                label: game.i18n.localize('SR5.COMBAT.ModeAstral'),
+                label: game.i18n.localize('SR5.Combat.ModeAstral'),
                 icon: 'fa-solid fa-star',
                 selected: selectedMode === 'astral'
             });
@@ -294,7 +294,7 @@ export class SR5CombatTracker extends CombatTracker {
             });
             options.push({
                 value: 'hot_sim',
-                label: game.i18n.localize('SR5.HotSim'),
+                label: game.i18n.localize('SR5.Matrix.Labels.HotSim'),
                 icon: 'fa-solid fa-laptop-code',
                 selected: selectedMode === 'hot_sim'
             });

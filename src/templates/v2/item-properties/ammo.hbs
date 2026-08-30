@@ -1,8 +1,8 @@
 {{#if item.system.damageType}}
-    <label data-tooltip="SR5.DamageType">{{localizeOb item.system.damageType @root.config.damageTypes}}</label>
+    <label data-tooltip="SR5.Damage.Type">{{localizeOb item.system.damageType @root.config.damageTypes}}</label>
 {{/if}}
 {{#if item.system.damage}}
-    <label>{{localize "SR5.DamageValue"}}&nbsp;{{numberFormat item.system.damage sign=true}}</label>
+    <label>{{localize "SR5.Damage.Value"}}&nbsp;{{numberFormat item.system.damage sign=true}}</label>
 {{/if}}
 {{#if item.system.element}}
     <label data-tooltip="SR5.Element.Label">

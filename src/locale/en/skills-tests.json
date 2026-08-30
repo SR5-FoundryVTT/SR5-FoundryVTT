@@ -51,7 +51,6 @@
         },
         "CallInAction": {
             "ActorType": "Actor Type",
-            "Compilation": "Compilation",
             "Compile": "Compile",
             "CreateCompilation": "Create compilation action",
             "CreateSummoning": "Create summoning action",
@@ -82,7 +81,18 @@
                 }
             },
             "Summon": "Summon",
-            "Summoning": "Summoning"
+            "Compilation": {
+                "Label": "Compilation",
+                "DropSprite": "Drop Sprite",
+                "FixedSprite": "Prep. Sprite",
+                "SpriteType": "Sprite Type"
+            },
+            "Summoning": {
+                "Label": "Summoning",
+                "DropSpirit": "Drop Spirit",
+                "FixedSpirit": "Prep. Spirit",
+                "SpiritType": "Spirit Type"
+            }
         },
         "ExtendedTestManager": {
             "Actions": {
@@ -376,8 +386,6 @@
                 "Interests": "Interests",
                 "Street": "Street"
             },
-            "Groups": {},
-            "Sets": {},
             "Set": {
                 "LogActorDifferences": "Log Actor Differences",
                 "DifferencesLoggedInConsole": "Open your browser console to view differences"
@@ -470,6 +478,12 @@
             "UnarmedCombat": "Unarmed Combat",
             "abbr": {
                 "Native": "N"
+            },
+            "KnowledgeTypes": {
+                "Academic": "Academic",
+                "Interests": "Interests",
+                "Professional": "Professional",
+                "Street": "Street"
             }
         },
         "TestResults": {
@@ -536,7 +550,90 @@
             "SuccessTest": "Success Test",
             "SummonSpiritTest": "Summon Spirit",
             "SuppressionDefenseTest": "Suppression Defense",
-            "ThrownAttackTest": "Thrown Weapon Attack"
+            "ThrownAttackTest": "Thrown Weapon Attack",
+            "Labels": {
+                "ActiveDefense": "Active Defense",
+                "Attacker": "Attacker",
+                "AttackerHits": "Attacker Hits",
+                "AttackerNetHits": "Attacker Net Hits",
+                "BiofeedbackDamage": "Biofeedback Damage",
+                "BuyHits": "Buy Hits",
+                "CanDefault": "Can Default",
+                "Defender": "Defender",
+                "DefenderNetHits": "Defender Net Hits",
+                "DefenseTest": "Defense Test",
+                "DicePool": "Pool",
+                "DicePoolModifier": "Dice Pool Mod",
+                "DontApplyWounds": "Don't Apply Wounds",
+                "ExtendedHits": "Extended Hits",
+                "ExtendedTest": "Extended Test",
+                "FadeAttribute": "Fade Attribute",
+                "FadeValue": "Fade Value",
+                "FullDefense": "Full Defense",
+                "FullMatrixDefense": "Full Matrix Defense",
+                "Hits": "Hits",
+                "IncomingDamage": "Incoming Damage",
+                "IncomingDrain": "Incoming Drain",
+                "IncomingFade": "Incoming Fade",
+                "MeleeWeaponAttack": "Melee Weapon Attack",
+                "NetHits": "Net Hits",
+                "OpposedType": "Type",
+                "OpposingHits": "Opposing Hits",
+                "OpposingNetHits": "Opposing Net Hits",
+                "OriginalDicePool": "Original Dice Pool",
+                "ResultOverride": "Result Override",
+                "ResultOverrideGlitches": "Glitches",
+                "ResultOverrideHits": "Hits",
+                "RollArmor": "Armor",
+                "RollComposure": "Composure",
+                "RollCustom": "Custom",
+                "RollDefense": "Defense",
+                "RollDrain": "Drain",
+                "RollFade": "Fade",
+                "RollJudgeIntentions": "J.Intentions",
+                "RollLiftCarry": "Lift&Carry",
+                "RollMemory": "Memory",
+                "RollMode": "Roll Mode",
+                "RollOneDie": "You can't roll less than 1 die, chummer",
+                "RollSoak": "Damage Resist",
+                "SecondAttribute": "Second Attribute",
+                "SecondChance": "Second Chance",
+                "Soak": "Soak",
+                "SoakTest": "Damage Resist Test",
+                "Successes": "Successes",
+                "Suppressing": "Suppressing",
+                "TargetingNeedsActorWithToken": "The current actor needs a linked token for targeting to work",
+                "UseEdgeForInitiativeRoll": "Use edge rule blitz for initiative",
+                "RangedWeaponAttack": "Range Weapon Attack"
+            },
+            "Duration": {
+                "Label": "Duration",
+                "Types": {
+                    "Instant": "Instant",
+                    "Permanent": "Permanent",
+                    "Sustained": "Sustained"
+                }
+            },
+            "Limit": {
+                "Label": "Limit",
+                "Types": {
+                    "Astral": "Astral",
+                    "Mental": "Mental",
+                    "Physical": "Physical",
+                    "Social": "Social"
+                }
+            },
+            "Target": {
+                "Label": "Target",
+                "Types": {
+                    "Device": "Device",
+                    "File": "File",
+                    "Other": "Other",
+                    "Persona": "Persona",
+                    "Self": "Self",
+                    "Sprite": "Sprite"
+                }
+            }
         }
     }
 }

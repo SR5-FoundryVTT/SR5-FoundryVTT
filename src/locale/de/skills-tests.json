@@ -51,7 +51,6 @@
         },
         "CallInAction": {
             "ActorType": "Akteur-Typ",
-            "Compilation": "Kompilierung",
             "Compile": "Kompilieren",
             "CreateCompilation": "Erstelle Kompilierungs-Aktion",
             "CreateSummoning": "Erstelle Beschwörungs-Aktion",
@@ -82,7 +81,18 @@
                 }
             },
             "Summon": "Beschwören",
-            "Summoning": "Beschwörung"
+            "Compilation": {
+                "Label": "Kompilierung",
+                "DropSprite": "Sprite ablegen",
+                "FixedSprite": "Sprite vorb.",
+                "SpriteType": "Sprite-Art"
+            },
+            "Summoning": {
+                "Label": "Beschwörung",
+                "DropSpirit": "Geist ablegen",
+                "FixedSpirit": "Vorber. Geist",
+                "SpiritType": "Geistart"
+            }
         },
         "ExtendedTestManager": {
             "Actions": {
@@ -376,8 +386,6 @@
                 "Interests": "Hobbywissen",
                 "Street": "Straßenwissen"
             },
-            "Groups": {},
-            "Sets": {},
             "Set": {
                 "LogActorDifferences": "Akteur-Unterschiede protokollieren",
                 "DifferencesLoggedInConsole": "Öffne deine Browser-Konsole, um die Unterschiede anzuzeigen"
@@ -470,6 +478,12 @@
             "UnarmedCombat": "Waffenloser Kampf",
             "abbr": {
                 "Native": "M"
+            },
+            "KnowledgeTypes": {
+                "Academic": "Akademisches Wissen",
+                "Interests": "Hobbywissen",
+                "Professional": "Berufswissen",
+                "Street": "Straßenwissen"
             }
         },
         "TestResults": {
@@ -536,7 +550,90 @@
             "SuccessTest": "Erfolgsprobe",
             "SummonSpiritTest": "Geist Herbeirufen",
             "SuppressionDefenseTest": "Sperrfeuer-Verteidigung",
-            "ThrownAttackTest": "Wurfwaffen-Angriff"
+            "ThrownAttackTest": "Wurfwaffen-Angriff",
+            "Labels": {
+                "ActiveDefense": "Unterbrechungsh.",
+                "Attacker": "Angreifer",
+                "AttackerHits": "Angreifer-Erfolge",
+                "AttackerNetHits": "Angreifer-Netto-Erfolge",
+                "BiofeedbackDamage": "Biofeedback Schaden",
+                "BuyHits": "Erfolge kaufen",
+                "CanDefault": "Improvisierbar",
+                "Defender": "Verteidiger",
+                "DefenderNetHits": "Verteidiger Netto-Erfolge",
+                "DefenseTest": "Verteidigungsprobe",
+                "DicePool": "Würfelpool",
+                "DicePoolModifier": "Würfelpool-Modifikator",
+                "DontApplyWounds": "Wunden nicht anwenden",
+                "ExtendedHits": "Ausged. Erfolge",
+                "ExtendedTest": "Ausged. Probe",
+                "FadeAttribute": "Schwund widerstehen",
+                "FadeValue": "Schwund",
+                "FullDefense": "Volle Abwehr",
+                "FullMatrixDefense": "Volle Matrixabwehr",
+                "Hits": "Erfolge",
+                "IncomingDamage": "Schaden",
+                "IncomingDrain": "Entzug",
+                "IncomingFade": "Schwund",
+                "MeleeWeaponAttack": "Nahkampfangriff",
+                "NetHits": "Nettoerfolge",
+                "OpposedType": "Typ",
+                "OpposingHits": "Gegn. Erfolge",
+                "OpposingNetHits": "Gegn. Nettoerfolge",
+                "OriginalDicePool": "Originaler Würfelpool",
+                "ResultOverride": "Ergebnis-Überschreibung",
+                "ResultOverrideGlitches": "Patzer",
+                "ResultOverrideHits": "Erfolge",
+                "RollArmor": "Panzerung",
+                "RollComposure": "Selbstbeherr.",
+                "RollCustom": "Benutzerdef.",
+                "RollDefense": "Verteidigung",
+                "RollDrain": "Entzug",
+                "RollFade": "Schwund",
+                "RollJudgeIntentions": "Menschenkenntnis",
+                "RollLiftCarry": "Heben&Tragen",
+                "RollMemory": "Erinnerungsverm.",
+                "RollMode": "Würfelmodus",
+                "RollOneDie": "Chummer, du kannst nicht weniger als einen Würfel werfen",
+                "RollSoak": "Einstecken",
+                "SecondAttribute": "Zweites Attribut",
+                "SecondChance": "Zweite Chance",
+                "Soak": "Widerstand",
+                "SoakTest": "Schadenswiderstandsprobe",
+                "Successes": "Erfolge",
+                "Suppressing": "Sperrfeuer",
+                "TargetingNeedsActorWithToken": "Charakter benötigt eine verbundene Figur, um ein Ziel auswählen zu können",
+                "UseEdgeForInitiativeRoll": "Benutze Edge Regel Blitz für Initiative",
+                "RangedWeaponAttack": "Fernkampfangriff"
+            },
+            "Duration": {
+                "Label": "Dauer",
+                "Types": {
+                    "Instant": "Sofort",
+                    "Permanent": "Permanent",
+                    "Sustained": "Aufrechterhalten"
+                }
+            },
+            "Limit": {
+                "Label": "Limit",
+                "Types": {
+                    "Astral": "Astral",
+                    "Mental": "Geistig",
+                    "Physical": "Körperlich",
+                    "Social": "Sozial"
+                }
+            },
+            "Target": {
+                "Label": "Ziel",
+                "Types": {
+                    "Device": "Gerät",
+                    "File": "Datei",
+                    "Other": "Andere",
+                    "Persona": "Persona",
+                    "Self": "Selbst",
+                    "Sprite": "Sprite"
+                }
+            }
         }
     }
 }

@@ -206,17 +206,17 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         data.pushTheLimit ??= false;
         data.secondChance ??= false;
 
-        data.pool ||= DataDefaults.createData('value_field', { label: 'SR5.DicePool' });
+        data.pool ||= DataDefaults.createData('value_field', { label: 'SR5.Tests.Labels.DicePool' });
         data.threshold ||= DataDefaults.createData('value_field', { label: 'SR5.Threshold' });
-        data.limit ||= DataDefaults.createData('value_field', { label: 'SR5.Limit' });
+        data.limit ||= DataDefaults.createData('value_field', { label: 'SR5.Tests.Limit.Label' });
 
         data.values ||= {};
         data.opposed ||= {} as OpposedTestType;
         data.codeTermTraces ??= [];
 
-        data.values.hits ||= DataDefaults.createData('value_field', { label: "SR5.Hits" });
-        data.values.extendedHits ||= DataDefaults.createData('value_field', { label: "SR5.ExtendedHits" });
-        data.values.netHits ||= DataDefaults.createData('value_field', { label: "SR5.NetHits" });
+        data.values.hits ||= DataDefaults.createData('value_field', { label: "SR5.Tests.Labels.Hits" });
+        data.values.extendedHits ||= DataDefaults.createData('value_field', { label: "SR5.Tests.Labels.ExtendedHits" });
+        data.values.netHits ||= DataDefaults.createData('value_field', { label: "SR5.Tests.Labels.NetHits" });
         data.values.glitches ||= DataDefaults.createData('value_field', { label: "SR5.Glitches" });
 
         data.action ||= DataDefaults.createData('action_roll');
@@ -928,7 +928,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             hits.value;
 
         // Calculate a ValueField for standardization.
-        const netHits = DataDefaults.createData('value_field', { label: "SR5.NetHits", base });
+        const netHits = DataDefaults.createData('value_field', { label: "SR5.Tests.Labels.NetHits", base });
         ModifiableValue.calcTotal(netHits, { min: 0 });
 
         return netHits;
@@ -963,7 +963,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
     get extendedHits(): ValueFieldType {
         // Return a default value field, for when no extended hits have been derived yet (or ever).
-        return this.data.values.extendedHits || DataDefaults.createData('value_field', { label: 'SR5.ExtendedHits' });
+        return this.data.values.extendedHits || DataDefaults.createData('value_field', { label: 'SR5.Tests.Labels.ExtendedHits' });
     }
 
     get hasBuyHits(): boolean {
@@ -1012,10 +1012,10 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * Gather hits across multiple extended test executions.
      */
     calculateExtendedHits(): ValueFieldType {
-        if (!this.extended) return DataDefaults.createData('value_field', { label: 'SR5.ExtendedHits' });
+        if (!this.extended) return DataDefaults.createData('value_field', { label: 'SR5.Tests.Labels.ExtendedHits' });
 
         const extendedHits = this.extendedHits;
-        ModifiableValue.addBase(extendedHits, 'SR5.Hits', this.hits.value);
+        ModifiableValue.addBase(extendedHits, 'SR5.Tests.Labels.Hits', this.hits.value);
 
         ModifiableValue.calcTotal(extendedHits, { min: 0 });
 
@@ -1242,7 +1242,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         }
 
         if (this.hasPushTheLimit || this.hasSecondChance) {
-            ui.notifications?.warn('SR5.Warnings.CantSpendMulitplePointsOfEdge', { localize: true });
+            ui.notifications?.warn('SR5.Warnings.CantSpendMultiplePointsOfEdge', { localize: true });
             return false;
         }
 
@@ -1258,7 +1258,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     get canPushTheLimit(): boolean {
         if (this.hasPushTheLimit || this.hasSecondChance) {
-            ui.notifications?.warn('SR5.Warnings.CantSpendMulitplePointsOfEdge', { localize: true });
+            ui.notifications?.warn('SR5.Warnings.CantSpendMultiplePointsOfEdge', { localize: true });
             return false;
         }
 
@@ -1311,13 +1311,13 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         if (this.hasBuyHits) {
             this.data.secondChance = false;
-            parts.remove('SR5.SecondChance');
+            parts.remove('SR5.Tests.Labels.SecondChance');
             return;
         }
 
         // During test lifetime (dialog/recasting) the user might want to remove second chance again.
         if (!this.hasSecondChance) {
-            parts.remove('SR5.SecondChance');
+            parts.remove('SR5.Tests.Labels.SecondChance');
             return;
         }
 
@@ -1333,7 +1333,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
 
         // Apply second chance modifiers.
         // Overwrite existing, as only ONE edge per test is allowed, therefore stacking is not possible.
-        parts.addUniqueBase('SR5.SecondChance', dice);
+        parts.addUniqueBase('SR5.Tests.Labels.SecondChance', dice);
 
         // Add new dice as fully separate Roll.
         const formula = `${dice}ds`;
@@ -1355,7 +1355,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Edge consumption.
         if (this.hasPushTheLimit || this.hasSecondChance) {
             if (this.actor.getEdge().uses <= 0) {
-                ui.notifications?.error(game.i18n.localize('SR5.MissingRessource.Edge'));
+                ui.notifications?.error(game.i18n.localize('SR5.MissingResources.Edge'));
                 return false;
             }
         }
@@ -1689,11 +1689,11 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         // Apply the extended modifier according the current iteration
         const pool = new ModifiableValue(data.pool);
 
-        const currentModifierValue = pool.get('SR5.ExtendedTest') || 0;
+        const currentModifierValue = pool.get('SR5.Tests.Labels.ExtendedTest') || 0;
         const nextModifierValue = TestRules.calcNextExtendedModifier(currentModifierValue);
 
         // A situational modifier, not part of the pool itself, so it stays among the changes.
-        pool.setUnique('SR5.ExtendedTest', nextModifierValue);
+        pool.setUnique('SR5.Tests.Labels.ExtendedTest', nextModifierValue);
 
         ModifiableValue.calcTotal(data.pool, { min: 0 });
 
@@ -1932,7 +1932,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (initiativeMod && (actionType === 'interrupt' || actionType === 'varies')) {
             actions.push({
                 action: 'modifyCombatantInit',
-                label: 'SR5.InitiativeMod',
+                label: 'SR5.Actor.Labels.InitiativeMod',
                 value: String(initiativeMod)
             });
         }
@@ -2112,7 +2112,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         if (token instanceof foundry.canvas.placeables.Token) {
             token.control();
         } else {
-            ui.notifications?.warn(game.i18n.localize('SR5.NoSelectableToken'))
+            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.NoSelectableToken'))
         }
     }
 
@@ -2226,7 +2226,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         })
 
         options.push({
-            name: game.i18n.localize('SR5.SecondChance'),
+            name: game.i18n.localize('SR5.Tests.Labels.SecondChance'),
             callback: secondChance,
             condition: true,
             icon: '<i class="fas fa-meteor"></i>'

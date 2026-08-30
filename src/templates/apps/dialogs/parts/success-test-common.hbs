@@ -26,14 +26,14 @@
         {{> "systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-entry.hbs"
             path="test.data.pool"
             data=test.data.pool
-            label="SR5.DicePool"
+            label="SR5.Tests.Labels.DicePool"
             tooltip="SR5.Tooltips.Test.Pool"
         }}
         {{! --- Limit --- }}
         {{> "systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-entry.hbs"
             path="test.data.limit"
             data=test.data.limit
-            label="SR5.Limit"
+            label="SR5.Tests.Limit.Label"
             tooltip="SR5.Tooltips.Test.Limit"
             usage=test.limitUsage
         }}
@@ -58,7 +58,7 @@
 
         <div class="modify-roll-content">
             <div class="form-group toggle-checkbox-row">
-                <label data-tooltip="SR5.Tooltips.Test.BuyHits">{{localize "SR5.BuyHits"}}</label>
+                <label data-tooltip="SR5.Tooltips.Test.BuyHits">{{localize "SR5.Tests.Labels.BuyHits"}}</label>
                 <input type="checkbox" name="test.data.buyHits" {{#if test.hasBuyHits}}checked{{/if}} />
             </div>
 
@@ -87,7 +87,7 @@
             {{/if}}
 
             <div class="form-group">
-                <label data-tooltip="SR5.Tooltips.Test.RollMode">{{ localize "SR5.RollMode" }}</label>
+                <label data-tooltip="SR5.Tooltips.Test.RollMode">{{ localize "SR5.Tests.Labels.RollMode" }}</label>
                 <select style="color: white" name="test.data.options.rollMode">
                     {{selectOptions rollModes selected=rollMode labelAttr="label" localize=true}}
                 </select>

@@ -51,7 +51,6 @@
         },
         "CallInAction": {
             "ActorType": "액터 유형",
-            "Compilation": "컴파일",
             "Compile": "컴파일",
             "CreateCompilation": "컴파일 행동 생성",
             "CreateSummoning": "소환 행동 생성",
@@ -82,7 +81,18 @@
                 }
             },
             "Summon": "소환",
-            "Summoning": "소환"
+            "Compilation": {
+                "Label": "컴파일",
+                "DropSprite": "스프라이트 배치",
+                "FixedSprite": "준비된 스프라이트",
+                "SpriteType": "스프라이트 유형"
+            },
+            "Summoning": {
+                "Label": "소환",
+                "DropSpirit": "영혼 배치",
+                "FixedSpirit": "준비된 영혼",
+                "SpiritType": "영혼 유형"
+            }
         },
         "ExtendedTestManager": {
             "Actions": {
@@ -376,8 +386,6 @@
                 "Interests": "흥미",
                 "Street": "길거리"
             },
-            "Groups": {},
-            "Sets": {},
             "Set": {
                 "LogActorDifferences": "액터간 차이 기록",
                 "DifferencesLoggedInConsole": "차이점을 보기 위해 사용자의 브라우저 콘솔 열기"
@@ -470,6 +478,12 @@
             "UnarmedCombat": "비무장 전투",
             "abbr": {
                 "Native": "N"
+            },
+            "KnowledgeTypes": {
+                "Academic": "학술적 지식",
+                "Interests": "흥미",
+                "Professional": "전문적 지식",
+                "Street": "길거리 지식"
             }
         },
         "TestResults": {
@@ -536,7 +550,90 @@
             "SuccessTest": "성공 판정",
             "SummonSpiritTest": "영혼 소환",
             "SuppressionDefenseTest": "제압사격 방어",
-            "ThrownAttackTest": "투척 무기 공격"
+            "ThrownAttackTest": "투척 무기 공격",
+            "Labels": {
+                "ActiveDefense": "능동 방어",
+                "Attacker": "공격자",
+                "AttackerHits": "공격자 성공횟수",
+                "AttackerNetHits": "공격자 순 성공횟수",
+                "BiofeedbackDamage": "생체반응 피해",
+                "BuyHits": "성공 구매",
+                "CanDefault": "무리한 시도 가능",
+                "Defender": "방어자",
+                "DefenderNetHits": "방어자 순 성공횟수",
+                "DefenseTest": "방어 판정",
+                "DicePool": "주사위 풀",
+                "DicePoolModifier": "주사위 풀 수정치",
+                "DontApplyWounds": "부상 적용 안함",
+                "ExtendedHits": "연장 판정 성공횟수",
+                "ExtendedTest": "연장 판정",
+                "FadeAttribute": "페이드 특성치",
+                "FadeValue": "페이드 수치",
+                "FullDefense": "전력방어",
+                "FullMatrixDefense": "매트릭스 전력 방어",
+                "Hits": "성공횟수",
+                "IncomingDamage": "기본 피해",
+                "IncomingDrain": "기본 드레인",
+                "IncomingFade": "기본 페이드",
+                "MeleeWeaponAttack": "근거리 무기 공격",
+                "NetHits": "순 성공횟수",
+                "OpposedType": "유형",
+                "OpposingHits": "경쟁 성공횟수",
+                "OpposingNetHits": "경쟁 순 성공",
+                "OriginalDicePool": "기존 주사위 풀",
+                "ResultOverride": "결과 오버라이드",
+                "ResultOverrideGlitches": "글리치",
+                "ResultOverrideHits": "성공",
+                "RollArmor": "방어구",
+                "RollComposure": "평정심",
+                "RollCustom": "맞춤 설정",
+                "RollDefense": "방어",
+                "RollDrain": "드레인",
+                "RollFade": "페이드",
+                "RollJudgeIntentions": "의심",
+                "RollLiftCarry": "들기&운반",
+                "RollMemory": "기억\n",
+                "RollMode": "굴림 방식",
+                "RollOneDie": "1개 미만의 주사위는 굴릴 수 없어, 처머",
+                "RollSoak": "피해 저항",
+                "SecondAttribute": "두 번째 특성치",
+                "SecondChance": "두 번째 기회",
+                "Soak": "피해 저항",
+                "SoakTest": "피해 저항 판정",
+                "Successes": "성공",
+                "Suppressing": "제압 사격",
+                "TargetingNeedsActorWithToken": "현재 액터가 작동하려면 목표에 연결된 토큰이 필요",
+                "UseEdgeForInitiativeRoll": "우선권에 대한 블리츠 엣지 규칙 사용",
+                "RangedWeaponAttack": "원거리 무기 공격"
+            },
+            "Duration": {
+                "Label": "지속력",
+                "Types": {
+                    "Instant": "즉각적",
+                    "Permanent": "영구적",
+                    "Sustained": "지속적"
+                }
+            },
+            "Limit": {
+                "Label": "한계",
+                "Types": {
+                    "Astral": "아스트랄",
+                    "Mental": "정신",
+                    "Physical": "물리",
+                    "Social": "사교"
+                }
+            },
+            "Target": {
+                "Label": "목표",
+                "Types": {
+                    "Device": "장치",
+                    "File": "파일",
+                    "Other": "기타",
+                    "Persona": "페르소나",
+                    "Self": "시전자 적용",
+                    "Sprite": "스프라이트"
+                }
+            }
         }
     }
 }

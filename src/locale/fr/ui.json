@@ -19,7 +19,6 @@
                 "DronePerception": "Perception de drone",
                 "DronePilotVehicle": "Piloter un véhicule (drone)",
                 "EditFile": "Modifier le fichier",
-                "EnterexitHost": "Entrer/Sortir d'un hôte",
                 "EraseMark": "Effacer une marque",
                 "EraseMatrixSignature": "Effacer une signature matricielle",
                 "Fade": "Technodrain",
@@ -49,7 +48,8 @@
                 "Snoop": "Espionner",
                 "SpoofCommand": "Commande de la zone",
                 "SwitchInterfaceMode": "Mode d'interface de commutation",
-                "TraceIcon": "Icône de trace"
+                "TraceIcon": "Icône de trace",
+                "EnterExitHost": "Entrer/Sortir d'un hôte"
             }
         },
         "ContextOptions": {
@@ -66,42 +66,6 @@
             "View": "Voir",
             "ViewItem": "Afficher l'élément"
         },
-        "FOUNDRY": {
-            "Actor": "Acteur",
-            "Item": "Point",
-            "Scene": "Scène",
-            "Token": "Jeton"
-        },
-        "Keybinding": {
-            "AddRemoveManyQty": {
-                "Hint": "Ajouter/supprimer 20 Quantité à la fois",
-                "Label": "Ajouter/supprimer 20"
-            },
-            "AddRemoveSomeQty": {
-                "Hint": "Ajouter/supprimer 5 Quantité à la fois",
-                "Label": "Ajouter/supprimer 5"
-            },
-            "HideTestDialog": {
-                "Hint": "Sauter la boîte de dialogue lors des essais en roulis depuis n'importe quel bouton",
-                "Label": "Masquer la boîte de dialogue d'essai"
-            },
-            "OverwatchScoreTracker": {
-                "Hint": "Ouvrir le tracker de score de surveillance",
-                "Label": "Suivi du Score de Surveillace"
-            },
-            "ShowItemCard": {
-                "Hint": "Afficher uniquement la carte de l'objet dans le chat au lieu de lancer le test",
-                "Label": "Afficher la carte d'élément"
-            },
-            "ShowSituationModifiers": {
-                "Hint": "Modificateurs de situation ouverts pour la sélection",
-                "Label": "Modificateurs de situation"
-            },
-            "SuccessTestPrompt": {
-                "Hint": "Demander de faire un test de réussite standard",
-                "Label": "Test de réussite rapide"
-            }
-        },
         "Labels": {
             "Action": {
                 "ActiveTest": "Test",
@@ -117,7 +81,7 @@
             },
             "Actions": {
                 "BruteForce": "Force brute",
-                "HackontheFly": "Piratage à la volée"
+                "HackOnTheFly": "Piratage à la volée"
             },
             "ActorSheet": {
                 "AddNetwork": "Réseau de connexion directe",
@@ -223,6 +187,12 @@
                 "Changelog": "Changer de journal",
                 "Issues": "Enjeux",
                 "Wiki": "Wiki"
+            },
+            "Documents": {
+                "Actor": "Acteur",
+                "Item": "Point",
+                "Scene": "Scène",
+                "Token": "Jeton"
             }
         },
         "Tabs": {
@@ -382,6 +352,36 @@
                 "Threshold": "Valeur seuil calculée"
             },
             "ToggleEditMode": "Activer le mode d'édition"
+        },
+        "Keybindings": {
+            "AddRemoveManyQty": {
+                "Hint": "Ajouter/supprimer 20 Quantité à la fois",
+                "Label": "Ajouter/supprimer 20"
+            },
+            "AddRemoveSomeQty": {
+                "Hint": "Ajouter/supprimer 5 Quantité à la fois",
+                "Label": "Ajouter/supprimer 5"
+            },
+            "HideTestDialog": {
+                "Hint": "Sauter la boîte de dialogue lors des essais en roulis depuis n'importe quel bouton",
+                "Label": "Masquer la boîte de dialogue d'essai"
+            },
+            "OverwatchScoreTracker": {
+                "Hint": "Ouvrir le tracker de score de surveillance",
+                "Label": "Suivi du Score de Surveillace"
+            },
+            "ShowItemCard": {
+                "Hint": "Afficher uniquement la carte de l'objet dans le chat au lieu de lancer le test",
+                "Label": "Afficher la carte d'élément"
+            },
+            "ShowSituationModifiers": {
+                "Hint": "Modificateurs de situation ouverts pour la sélection",
+                "Label": "Modificateurs de situation"
+            },
+            "SuccessTestPrompt": {
+                "Hint": "Demander de faire un test de réussite standard",
+                "Label": "Test de réussite rapide"
+            }
         }
     }
 }

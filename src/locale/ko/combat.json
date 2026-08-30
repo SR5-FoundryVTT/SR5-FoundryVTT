@@ -1,6 +1,11 @@
 {
     "SR5": {
-        "COMBAT": {
+        "DamageApplication": {
+            "ApplyDamage": "피해 적용",
+            "ApplyUnmodifiedDamage": "보정치 제외 피해 적용",
+            "Title": "피해 적용"
+        },
+        "Combat": {
             "CannotSeizeAgain": "다음 턴 시작 전까지 다시 선제권을 잡을 수 없습니다.",
             "ModeAstral": "아스트랄",
             "ModeChangedLabel": "우선권 모드 변경",
@@ -25,15 +30,15 @@
             "ToggleActedStatusGMOnly": "행동 완료 상태 전환 (GM 전용)",
             "TrackerTitle": "턴 {round} (패스 {pass})"
         },
-        "DamageApplication": {
-            "ApplyDamage": "피해 적용",
-            "ApplyUnmodifiedDamage": "보정치 제외 피해 적용",
-            "Title": "피해 적용"
-        },
-        "ReputationManager": {
-            "Cancel": "취소",
-            "Submit": "적용",
-            "Title": "명성 관리"
+        "Damage": {
+            "Label": "피해",
+            "Types": {
+                "Matrix": "매트릭스",
+                "Physical": "물리",
+                "Stun": "기절"
+            },
+            "Type": "유형",
+            "Value": "피해량"
         }
     }
 }

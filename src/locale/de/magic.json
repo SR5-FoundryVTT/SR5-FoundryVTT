@@ -22,6 +22,12 @@
             "Types": {
                 "Active": "Aktiv",
                 "Passive": "Passiv"
+            },
+            "Labels": {
+                "Echo": "Echo",
+                "Echoes": "Echos",
+                "Metamagic": "Metamagie",
+                "Metamagics": "Metamagie"
             }
         },
         "CritterPower": {
@@ -216,7 +222,15 @@
             "Spells": "Zauber",
             "Type": "Art",
             "TypeMana": "M",
-            "TypePhysical": "P"
+            "TypePhysical": "P",
+            "QuickInfo": {
+                "DrainForce": "Entzug K{sign}{drain}"
+            },
+            "Labels": {
+                "DetectionSpellExtended": "Erweitert",
+                "NormalSpellButton": "Normal",
+                "RecklessSpellButton": "Schnell"
+            }
         },
         "Spirit": {
             "Bound": "Gebunden",
@@ -317,6 +331,20 @@
                 "Water": "Wasser",
                 "Worker": "Insekt: Arbeiter",
                 "Wraith": "Wraith"
+            }
+        },
+        "Magic": {
+            "Labels": {
+                "Awakened": "Erwacht",
+                "Emerged": "Resonanz",
+                "Mundane": "Mundan",
+                "Magic": "Magie",
+                "PowerLevel": "Kraftstufe",
+                "PowerPoints": "Kraftpunkte",
+                "PowerType": "Typ",
+                "Powers": "Kräfte",
+                "PP": "KP",
+                "SpiritType": "Geisterart"
             }
         }
     }

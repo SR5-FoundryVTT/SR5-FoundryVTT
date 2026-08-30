@@ -11,11 +11,11 @@ import AbstractCompendiaSettings from '@/module/settings/AbstractCompendiaSettin
 export default class SR5CompendiaSettings extends AbstractCompendiaSettings {
     getPacks(): PackConfigOrSeparator[] {
         return [
-            { separator: true as const, label: 'SR5.CompendiaSettings.ActionsPacksSection' as const },
+            { separator: true as const, label: 'SR5.CompendiumSettings.ActionsPacksSection' as const },
             CompendiaSettingFlow.getPackSettingConfiguration(FLAGS.GeneralActionsPack),
             CompendiaSettingFlow.getPackSettingConfiguration(FLAGS.MatrixActionsPack),
             CompendiaSettingFlow.getPackSettingConfiguration(FLAGS.ICActionsPack),
-            { separator: true as const, label: 'SR5.CompendiaSettings.SkillsPacksSection' as const },
+            { separator: true as const, label: 'SR5.CompendiumSettings.SkillsPacksSection' as const },
             CompendiaSettingFlow.getPackSettingConfiguration(FLAGS.SkillsPack),
             CompendiaSettingFlow.getPackSettingConfiguration(FLAGS.SkillGroupsPack),
             CompendiaSettingFlow.getPackSettingConfiguration(FLAGS.SkillSetsPack),
@@ -23,6 +23,6 @@ export default class SR5CompendiaSettings extends AbstractCompendiaSettings {
     }
 
     override get title() {
-        return game.i18n.localize('SR5.CompendiaSettings.Title');
+        return game.i18n.localize('SR5.CompendiumSettings.Title');
     }
 }

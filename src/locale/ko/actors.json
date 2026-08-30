@@ -209,7 +209,49 @@
                     "label": "테크노맨서"
                 }
             },
-            "NoFavoritesSelected": "선택된 즐겨찾기 항목 없음"
+            "NoFavoritesSelected": "선택된 즐겨찾기 항목 없음",
+            "Attributes": {
+                "Agility": "민첩",
+                "Body": "신체",
+                "Charisma": "매력",
+                "Edge": "엣지",
+                "Essence": "에센스",
+                "Intuition": "직관력",
+                "Logic": "논리력",
+                "Magic": "마법",
+                "Reaction": "순발력",
+                "Resonance": "공명",
+                "Strength": "근력",
+                "Willpower": "의지력"
+            },
+            "Initiative": {
+                "Categories": {
+                    "Astral": "아스트랄",
+                    "Matrix": "매트릭스",
+                    "Meatspace": "현실"
+                }
+            },
+            "Labels": {
+                "Attribute": "특성치",
+                "Attributes": "특성치",
+                "Biography": "인물 기록",
+                "DefaultCategoryVisibility": "비어있는 범주 보기",
+                "Initiation": "입회",
+                "Initiative": "우선권",
+                "InitiativeMod": "우선권 수정치",
+                "IsCritter": "생명체",
+                "IsFreshImport": "해당 물품은 처머에서 불러와졌기에 수동으로 살펴봐야 합니다.",
+                "IsGrunt": "하수인",
+                "IsGruntHint": "하수인 상태 모니터 규칙(SR5 p.378)을 사용합니다.",
+                "IsNPC": "NPC",
+                "Metatype": "메타인종",
+                "Movement": "이동",
+                "SheetActor": "액터 시트",
+                "SpecialAttributes": "특별 특성치",
+                "WalkingSpeed": "걷기",
+                "RunningSpeed": "달리기",
+                "SprintingBonus": "전력 질주 보너스"
+            }
         },
         "ActorTypes": {
             "Character": "캐릭터",
@@ -278,6 +320,13 @@
                 "Human": "인간",
                 "Ork": "오크",
                 "Troll": "트롤"
+            },
+            "Labels": {
+                "CareerKarma": "경력 카르마",
+                "Notoriety": "악명",
+                "Nuyen": "뉴엔",
+                "PublicAwareness": "대중 인식도",
+                "StreetCred": "길거리 명성"
             }
         },
         "Contact": {
@@ -320,7 +369,13 @@
             "Loyalty": "친밀도",
             "LoyaltyConnectionHelp": "우호도 / 영향력",
             "LoyaltyConnectionLabel": "L / C",
-            "Type": "유형"
+            "Type": "유형",
+            "Labels": {
+                "ContactType": "유형",
+                "Contacts": "연줄",
+                "Connection": "연결",
+                "Loyalty": "친밀도"
+            }
         },
         "InventoryRename": {
             "Cancel": "취소",
@@ -395,7 +450,11 @@
                 "Walker": "워커",
                 "Water": "수상 탑승물"
             },
-            "Vehicle": "탑승물"
+            "Vehicle": "탑승물",
+            "Labels": {
+                "ControlRig": "컨트롤 리그",
+                "VehicleStunImmunity": "탑승물의 기절 피해 면역"
+            }
         },
         "VehicleImport": {
             "MissingPermission": "액터 생성 권한이 없음"

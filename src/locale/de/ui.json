@@ -19,7 +19,6 @@
                 "DronePerception": "Drohnen-Wahrnehmung",
                 "DronePilotVehicle": "Drohne Fahrzeug steuern",
                 "EditFile": "Datei editieren",
-                "EnterexitHost": "Host betreten/verlassen",
                 "EraseMark": "Marke Löschen",
                 "EraseMatrixSignature": "Matrixsignatur löschen",
                 "Fade": "Schwund",
@@ -49,7 +48,8 @@
                 "Snoop": "Übertragung Abfangen",
                 "SpoofCommand": "Befehl vortäuschen",
                 "SwitchInterfaceMode": "Interfacemodus wechseln",
-                "TraceIcon": "Icon Aufspüren"
+                "TraceIcon": "Icon Aufspüren",
+                "EnterExitHost": "Host betreten/verlassen"
             }
         },
         "ContextOptions": {
@@ -66,42 +66,6 @@
             "View": "Öffnen",
             "ViewItem": "Gegenstand öffnen"
         },
-        "FOUNDRY": {
-            "Actor": "Akteur",
-            "Item": "Gegenstand",
-            "Scene": "Szene",
-            "Token": "Token"
-        },
-        "Keybinding": {
-            "AddRemoveManyQty": {
-                "Hint": "Füge zu/Enferne 20 Stück pro Klick",
-                "Label": "Füge zu/Entferne 20"
-            },
-            "AddRemoveSomeQty": {
-                "Hint": "Füge zu/Enferne 5 Stück pro Klick",
-                "Label": "Füge zu/Entferne 5"
-            },
-            "HideTestDialog": {
-                "Hint": "Testdialoge werden einmalig übersprungen",
-                "Label": "Testdialog überspringen"
-            },
-            "OverwatchScoreTracker": {
-                "Hint": "Öffne den Overwatch-Wert-Monitor",
-                "Label": "Overwatch-Wert-Monitor"
-            },
-            "ShowItemCard": {
-                "Hint": "Anstelle eines Tests zeige die Itemkarte im Chat",
-                "Label": "Zeige nur Chatkarte"
-            },
-            "ShowSituationModifiers": {
-                "Hint": "Öffne Situationsmodifikatoren für aktuelle Auswahl",
-                "Label": "Situationsmodifikatoren"
-            },
-            "SuccessTestPrompt": {
-                "Hint": "Öffnet Dialog für eine Erfolgsprobe",
-                "Label": "Erfolgsprobe auslösen"
-            }
-        },
         "Labels": {
             "Action": {
                 "ActiveTest": "Probe",
@@ -117,7 +81,7 @@
             },
             "Actions": {
                 "BruteForce": "Brute Force",
-                "HackontheFly": "Eiliges Hacken"
+                "HackOnTheFly": "Eiliges Hacken"
             },
             "ActorSheet": {
                 "AddNetwork": "Netzwerk Verbinden",
@@ -223,6 +187,12 @@
                 "Changelog": "Änderungsprotokoll",
                 "Issues": "Probleme",
                 "Wiki": "Wiki"
+            },
+            "Documents": {
+                "Actor": "Akteur",
+                "Item": "Gegenstand",
+                "Scene": "Szene",
+                "Token": "Token"
             }
         },
         "Tabs": {
@@ -382,6 +352,36 @@
                 "Threshold": "Vollständiger Schwellenwert"
             },
             "ToggleEditMode": "Umschalter Editiermodus"
+        },
+        "Keybindings": {
+            "AddRemoveManyQty": {
+                "Hint": "Füge zu/Enferne 20 Stück pro Klick",
+                "Label": "Füge zu/Entferne 20"
+            },
+            "AddRemoveSomeQty": {
+                "Hint": "Füge zu/Enferne 5 Stück pro Klick",
+                "Label": "Füge zu/Entferne 5"
+            },
+            "HideTestDialog": {
+                "Hint": "Testdialoge werden einmalig übersprungen",
+                "Label": "Testdialog überspringen"
+            },
+            "OverwatchScoreTracker": {
+                "Hint": "Öffne den Overwatch-Wert-Monitor",
+                "Label": "Overwatch-Wert-Monitor"
+            },
+            "ShowItemCard": {
+                "Hint": "Anstelle eines Tests zeige die Itemkarte im Chat",
+                "Label": "Zeige nur Chatkarte"
+            },
+            "ShowSituationModifiers": {
+                "Hint": "Öffne Situationsmodifikatoren für aktuelle Auswahl",
+                "Label": "Situationsmodifikatoren"
+            },
+            "SuccessTestPrompt": {
+                "Hint": "Öffnet Dialog für eine Erfolgsprobe",
+                "Label": "Erfolgsprobe auslösen"
+            }
         }
     }
 }

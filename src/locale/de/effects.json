@@ -131,7 +131,13 @@
                 "Include": "Einschließen"
             },
             "Target": "Ziel",
-            "Targets": "Ziele"
+            "Targets": "Ziele",
+            "Labels": {
+                "Effect": "Effekt",
+                "Effects": "Effekte",
+                "EnforcedMaximum": "Erzwungenes Maximum",
+                "EnforcedMinimum": "Erzwungenes Minimum"
+            }
         },
         "StatusEffects": {
             "Running": "Laufen",

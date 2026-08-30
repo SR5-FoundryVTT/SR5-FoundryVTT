@@ -22,6 +22,12 @@
             "Types": {
                 "Active": "Actif",
                 "Passive": "Passif"
+            },
+            "Labels": {
+                "Echo": "Écho",
+                "Echoes": "Échos",
+                "Metamagic": "Métamagie",
+                "Metamagics": "Métamagies"
             }
         },
         "CritterPower": {
@@ -216,7 +222,15 @@
             "Spells": "Sorts",
             "Type": "Type",
             "TypeMana": "Mana",
-            "TypePhysical": "Physique"
+            "TypePhysical": "Physique",
+            "QuickInfo": {
+                "DrainForce": "Drain F{sign}{drain}"
+            },
+            "Labels": {
+                "DetectionSpellExtended": "Prolongé",
+                "NormalSpellButton": "Normal",
+                "RecklessSpellButton": "Précipité"
+            }
         },
         "Spirit": {
             "Bound": "Lié",
@@ -317,6 +331,20 @@
                 "Water": "Eau",
                 "Worker": "Insecte Ouvrier",
                 "Wraith": "Spectre"
+            }
+        },
+        "Magic": {
+            "Labels": {
+                "Awakened": "Éveillé",
+                "Emerged": "Émergé",
+                "Mundane": "Ordinaire",
+                "Magic": "Magie",
+                "PowerLevel": "Niveau",
+                "PowerPoints": "PP",
+                "PowerType": "Type",
+                "Powers": "Pouvoirs",
+                "PP": "PP",
+                "SpiritType": "Type d'esprit"
             }
         }
     }

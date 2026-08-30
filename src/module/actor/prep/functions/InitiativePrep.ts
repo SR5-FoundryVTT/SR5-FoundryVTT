@@ -83,7 +83,7 @@ export class InitiativePrep {
             this.prepareFormulaMode(system, 'astral');
         if ('matrix' in system.initiative && 'matrix' in system) {
             if (actorType === 'character' && system.matrix.hot_sim)
-                ModifiableValue.addUniqueBase(system.initiative.matrix.dice, "SR5.HotSim", 1);
+                ModifiableValue.addUniqueBase(system.initiative.matrix.dice, "SR5.Matrix.Labels.HotSim", 1);
 
             this.prepareFormulaMode(system, 'matrix');
         }

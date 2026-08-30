@@ -80,7 +80,7 @@ RESULTS
 ⚠️  Found 894 unused localization keys:
 
 SR5:
-  - SR5.Accessory
+  - SR5.Armor.Labels.Accessory
   - SR5.Actor.FIELDS.magic.label
   - SR5.Weapon.FullReload
   ...

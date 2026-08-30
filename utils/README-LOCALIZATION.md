@@ -25,7 +25,12 @@ npm run locale:base-usage
 
 Add a new key to the appropriate English domain and to the same domain in German, French, Korean, and Brazilian
 Portuguese. Keep an entire `SR5.<namespace>` in one domain file. Root-level `CONTROLS`, `SETTINGS`, and `TYPES` belong
-in `system.json`; generic scalar `SR5` entries belong in `common.json`.
+in `system.json`; `common.json` is limited to genuinely shared scalar `SR5` entries. Domain values belong below their
+canonical feature namespace (for example `SR5.Actor`, `SR5.Weapon`, `SR5.Tests`, or `SR5.Messages`).
+
+The locale check enforces the canonical namespace-to-module ownership, rejects retired key paths, and verifies literal
+`SR5.*` references in source files. Foundry schema paths such as `SR5.Actor.FIELDS.*`, field IDs, `label`, and `hint`
+are integration contracts and must retain their established shape.
 
 Preserve `{placeholder}` names and HTML tag structure exactly. Existing English-equivalent proper names and technical
 terms are valid translations, but empty values and temporary missing markers are not.

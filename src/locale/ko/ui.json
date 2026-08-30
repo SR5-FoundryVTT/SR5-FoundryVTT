@@ -19,7 +19,6 @@
                 "DronePerception": "드론 인식",
                 "DronePilotVehicle": "드론 탑승물 조종",
                 "EditFile": "파일 수정",
-                "EnterexitHost": "호스트 입장/퇴장",
                 "EraseMark": "마크 제거",
                 "EraseMatrixSignature": "매트릭스 흔적 제거",
                 "Fade": "페이드",
@@ -49,7 +48,8 @@
                 "Snoop": "스눕",
                 "SpoofCommand": "스푸프 명령",
                 "SwitchInterfaceMode": "인터페이스 모드 변경",
-                "TraceIcon": "아이콘 추적"
+                "TraceIcon": "아이콘 추적",
+                "EnterExitHost": "호스트 입장/퇴장"
             }
         },
         "ContextOptions": {
@@ -66,42 +66,6 @@
             "View": "보기",
             "ViewItem": "물품 보기"
         },
-        "FOUNDRY": {
-            "Actor": "액터",
-            "Item": "물품",
-            "Scene": "장면",
-            "Token": "토큰"
-        },
-        "Keybinding": {
-            "AddRemoveManyQty": {
-                "Hint": "한번에 20개씩 추가/제거",
-                "Label": "20개 추가/제거"
-            },
-            "AddRemoveSomeQty": {
-                "Hint": "한번에 5개씩 추가/제거",
-                "Label": "5개 추가/제거"
-            },
-            "HideTestDialog": {
-                "Hint": "아무 버튼이나 눌러 판정 굴림 시 확인 상자 생략",
-                "Label": "판정 확인 상자 숨기기"
-            },
-            "OverwatchScoreTracker": {
-                "Hint": "감시 점수 추적기 열기",
-                "Label": "감시 점수 추적기"
-            },
-            "ShowItemCard": {
-                "Hint": "판정 굴림 대신 물품 카드만 보여주기",
-                "Label": "물품 카드 보기"
-            },
-            "ShowSituationModifiers": {
-                "Hint": "선택한 대상에 대한 상황 수정치 열기",
-                "Label": "상황 수정치"
-            },
-            "SuccessTestPrompt": {
-                "Hint": "표준 성공 판정 수행 요청",
-                "Label": "성공 판정 요청"
-            }
-        },
         "Labels": {
             "Action": {
                 "ActiveTest": "판정",
@@ -117,7 +81,7 @@
             },
             "Actions": {
                 "BruteForce": "브루트 포스",
-                "HackontheFly": "즉석 해킹"
+                "HackOnTheFly": "즉석 해킹"
             },
             "ActorSheet": {
                 "AddNetwork": "직접 연결 네트워크",
@@ -223,6 +187,12 @@
                 "Changelog": "변경 기록",
                 "Issues": "문제",
                 "Wiki": "위키"
+            },
+            "Documents": {
+                "Actor": "액터",
+                "Item": "물품",
+                "Scene": "장면",
+                "Token": "토큰"
             }
         },
         "Tabs": {
@@ -382,6 +352,36 @@
                 "Threshold": "계산된 요구 성공횟수 수치"
             },
             "ToggleEditMode": "수정 모드 전환"
+        },
+        "Keybindings": {
+            "AddRemoveManyQty": {
+                "Hint": "한번에 20개씩 추가/제거",
+                "Label": "20개 추가/제거"
+            },
+            "AddRemoveSomeQty": {
+                "Hint": "한번에 5개씩 추가/제거",
+                "Label": "5개 추가/제거"
+            },
+            "HideTestDialog": {
+                "Hint": "아무 버튼이나 눌러 판정 굴림 시 확인 상자 생략",
+                "Label": "판정 확인 상자 숨기기"
+            },
+            "OverwatchScoreTracker": {
+                "Hint": "감시 점수 추적기 열기",
+                "Label": "감시 점수 추적기"
+            },
+            "ShowItemCard": {
+                "Hint": "판정 굴림 대신 물품 카드만 보여주기",
+                "Label": "물품 카드 보기"
+            },
+            "ShowSituationModifiers": {
+                "Hint": "선택한 대상에 대한 상황 수정치 열기",
+                "Label": "상황 수정치"
+            },
+            "SuccessTestPrompt": {
+                "Hint": "표준 성공 판정 수행 요청",
+                "Label": "성공 판정 요청"
+            }
         }
     }
 }

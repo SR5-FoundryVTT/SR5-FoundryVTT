@@ -17,7 +17,7 @@ export const ActiveDefenseRules = {
         // General purpose active defenses. ()
         const activeDefenses: ActiveDefenseData = {
             full_defense: {
-                label: 'SR5.FullDefense',
+                label: 'SR5.Tests.Labels.FullDefense',
                 value: actor.getFullDefenseAttribute()?.value,
                 initMod: -10,
             },

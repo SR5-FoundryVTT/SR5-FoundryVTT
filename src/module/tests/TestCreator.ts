@@ -385,12 +385,12 @@ export const TestCreator = {
         if (!Number.isFinite(accuracy) || accuracy === 0) return;
 
         const hasAccuracyBasePart = data.limit.changes.some(change =>
-            ModifiableValue.isBaseChange(change) && change.name === 'SR5.Accuracy');
+            ModifiableValue.isBaseChange(change) && change.name === 'SR5.Weapon.Labels.Accuracy');
 
         if (hasAccuracyBasePart) return;
 
         data.limit.base = 0;
-        ModifiableValue.addUniqueBase(data.limit, 'SR5.Accuracy', accuracy);
+        ModifiableValue.addUniqueBase(data.limit, 'SR5.Weapon.Labels.Accuracy', accuracy);
     },
 
     /**
@@ -529,7 +529,7 @@ export const TestCreator = {
 
         // Include pool modifiers for opposed and resist tests.
         if (action.mod) {
-            ModifiableValue.addUnique(data.pool, 'SR5.DicePoolModifier', action.mod);
+            ModifiableValue.addUnique(data.pool, 'SR5.Tests.Labels.DicePoolModifier', action.mod);
         }
 
         // Include pool modifiers that have been collected on the action item.
@@ -544,8 +544,8 @@ export const TestCreator = {
             ModifiableValue.addUniqueBase(data.pool, 'SR5.Armor.label', armor.rating.value);
             TestCreator.addCodeTermTrace(data, { ...armor.rating, label: 'SR5.Armor.label' });
             if (armor.hardened.value) {
-                ModifiableValue.addUniqueBase(data.pool, 'SR5.HardenedArmor', armor.hardened.value);
-                TestCreator.addCodeTermTrace(data, { ...armor.hardened, label: 'SR5.HardenedArmor' });
+                ModifiableValue.addUniqueBase(data.pool, 'SR5.Armor.Labels.HardenedArmor', armor.hardened.value);
+                TestCreator.addCodeTermTrace(data, { ...armor.hardened, label: 'SR5.Armor.Labels.HardenedArmor' });
             }
         }
 

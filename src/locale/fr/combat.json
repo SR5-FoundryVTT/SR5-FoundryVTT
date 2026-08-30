@@ -1,6 +1,11 @@
 {
     "SR5": {
-        "COMBAT": {
+        "DamageApplication": {
+            "ApplyDamage": "Application des dégâts",
+            "ApplyUnmodifiedDamage": "Appliquer les dégâts bruts",
+            "Title": "Application des dégâts"
+        },
+        "Combat": {
             "CannotSeizeAgain": "Vous ne pouvez pas reprendre l'initiative avant le debut de votre prochain tour.",
             "ModeAstral": "Astral",
             "ModeChangedLabel": "Mode d'initiative modifie",
@@ -25,15 +30,15 @@
             "ToggleActedStatusGMOnly": "Basculer le statut a agi (MJ uniquement)",
             "TrackerTitle": "Tour {round} (Passe {pass})"
         },
-        "DamageApplication": {
-            "ApplyDamage": "Application des dégâts",
-            "ApplyUnmodifiedDamage": "Appliquer les dégâts bruts",
-            "Title": "Application des dégâts"
-        },
-        "ReputationManager": {
-            "Cancel": "Annuler",
-            "Submit": "Soumettre",
-            "Title": "Gestionnaire de réputation"
+        "Damage": {
+            "Label": "Dégâts",
+            "Types": {
+                "Matrix": "Matrice",
+                "Physical": "Physique",
+                "Stun": "Etourdi."
+            },
+            "Type": "Type",
+            "Value": "Valeur Dégâts"
         }
     }
 }

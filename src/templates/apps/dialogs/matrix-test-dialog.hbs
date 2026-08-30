@@ -5,8 +5,8 @@
         <div>
             {{#if test.data.marks}}
             <div class="form-group matrix-marks-icon-row">
-                <label>{{localize "SR5.Marks"}}</label>
-                <div class="matrix-marks-icon-group" role="radiogroup" aria-label="{{localize 'SR5.Marks'}}">
+                <label>{{localize "SR5.Matrix.Labels.Marks"}}</label>
+                <div class="matrix-marks-icon-group" role="radiogroup" aria-label="{{localize 'SR5.Matrix.Labels.Marks'}}">
                     <label class="matrix-marks-icon-option">
                         <input class="matrix-marks-icon-input" type="radio" name="test.data.marks" value="1" data-dtype="Number" {{#if (eq test.data.marks 1)}}checked{{/if}}/>
                         <span class="matrix-marks-icon-face">
@@ -33,7 +33,7 @@
                 <input type="checkbox" class="checkbox" name="test.data.sameGrid" {{checked test.data.sameGrid}} {{#if test.data.sameGridDisabled}}disabled data-tooltip="SR5.Tooltips.MatrixTest.SameGridDisabled"{{/if}}/>
             </div>
             <div class="form-group">
-                <label>{{localize "SR5.DirectConnection"}}</label>
+                <label>{{localize "SR5.Matrix.Labels.DirectConnection"}}</label>
                 <input type="checkbox" class="checkbox" name="test.data.directConnection" {{checked test.data.directConnection}}/>
             </div>
             {{#if test.controller}}
@@ -49,7 +49,7 @@
             {{#if test.persona}}
             <!-- Persona targeted -->
             <div class="form-group">
-                <label>{{localize "SR5.Target"}}</label>
+                <label>{{localize "SR5.Tests.Target.Label"}}</label>
                 <div>{{speakerName test.persona}}</div>
             </div>
             {{/if}}

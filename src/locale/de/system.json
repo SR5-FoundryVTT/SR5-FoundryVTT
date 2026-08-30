@@ -45,8 +45,6 @@
         "ImportIconFolderName": "Importer Icon-Ordner",
         "MarkImportsDescription": "Hervorheben von frisch importierten Einträgen in Akteur-Blättern, um zu verdeutlichen, dass sie überprüft werden sollten.",
         "MarkImportsName": "Markiere frische Importe",
-        "MustHaveRessourcesOnTest": "Proben nur mit ausreichenden Ressourcen möglich",
-        "MustHaveRessourcesOnTestDescription": "Eine Probe kann nur durchgeführt werden wenn alle Ressourcen dafür vorhanden sind.",
         "NoMarking": "Kein Hervorheben von frischen Importen",
         "OnlyAllowRollOnDefaultableSkills": "Nur improvisierbare unbekannte Fertigkeitsproben",
         "OnlyAllowRollOnDefaultableSkillsDescription": "Wenn deaktiviert, können unbekannte Fertigkeiten auch getestet werden, wenn sie nicht improvisierbar sind.",
@@ -78,7 +76,9 @@
         "UseDamageConditionDescription": "Das System markiert die Token entsprechend ihrem Zustandsmonitor",
         "UseDamageConditionName": "Systembehandlung für Token-Statuseffekte verwenden",
         "UseImportIconOverridesDescription": "Beim Importieren von Items die gleichen Symbole für verschiedene Itemtypen verwenden, wenn dies sinnvoll ist. Deaktivieren wenn benutzerdefinierte Symbole verwendet werden.",
-        "UseImportIconOverridesName": "Standard Importer Icon benutzen"
+        "UseImportIconOverridesName": "Standard Importer Icon benutzen",
+        "MustHaveResourcesOnTest": "Proben nur mit ausreichenden Ressourcen möglich",
+        "MustHaveResourcesOnTestDescription": "Eine Probe kann nur durchgeführt werden wenn alle Ressourcen dafür vorhanden sind."
     },
     "TYPES": {
         "Actor": {

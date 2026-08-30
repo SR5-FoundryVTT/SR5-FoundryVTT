@@ -935,10 +935,10 @@ export class SR5Item<SubType extends Item.ConfiguredSubType = Item.ConfiguredSub
 
     getRollName(): string {
         if (this.isRangedWeapon()) {
-            return game.i18n.localize('SR5.RangeWeaponAttack');
+            return game.i18n.localize('SR5.Tests.Labels.RangedWeaponAttack');
         }
         if (this.isMeleeWeapon()) {
-            return game.i18n.localize('SR5.MeleeWeaponAttack');
+            return game.i18n.localize('SR5.Tests.Labels.MeleeWeaponAttack');
         }
         if (this.isCombatSpell()) {
             return game.i18n.localize('SR5.Spell.Attack');

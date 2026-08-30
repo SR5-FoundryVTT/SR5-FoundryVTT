@@ -135,7 +135,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
         const snapshotTestData = (value: number, extendedModifier: number) => ({
             pool: {
                 base: value - extendedModifier, value,
-                changes: [{ name: 'SR5.ExtendedTest', value: extendedModifier, enabled: true }],
+                changes: [{ name: 'SR5.Tests.Labels.ExtendedTest', value: extendedModifier, enabled: true }],
             },
         }) as any;
 
@@ -603,7 +603,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             record.cumulativeRollCount = 2;
 
             const data = ExtendedTestFlow._prepareRollData(record)!;
-            const change = data.pool.changes.find(entry => entry.name === 'SR5.ExtendedTest')!;
+            const change = data.pool.changes.find(entry => entry.name === 'SR5.Tests.Labels.ExtendedTest')!;
 
             assert.isDefined(change, 'the extended modifier is a change on the pool');
             assert.strictEqual(change.value, -2);
@@ -615,7 +615,7 @@ export const shadowrunExtendedTests = (context: QuenchBatchContext) => {
             // The first roll carries no modifier at all, rather than a zero valued one.
             record.cumulativeRollCount = 0;
             const first = ExtendedTestFlow._prepareRollData(record)!;
-            assert.isUndefined(first.pool.changes.find(entry => entry.name === 'SR5.ExtendedTest'));
+            assert.isUndefined(first.pool.changes.find(entry => entry.name === 'SR5.Tests.Labels.ExtendedTest'));
             assert.strictEqual(first.pool.value, 12);
         });
 

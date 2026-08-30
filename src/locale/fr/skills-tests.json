@@ -51,7 +51,6 @@
         },
         "CallInAction": {
             "ActorType": "Type d'acteur",
-            "Compilation": "Compilation",
             "Compile": "Compiler",
             "CreateCompilation": "Créer une action de compilation",
             "CreateSummoning": "Créer une action d'appel",
@@ -82,7 +81,18 @@
                 }
             },
             "Summon": "Invoquer",
-            "Summoning": "Invocation"
+            "Compilation": {
+                "Label": "Compilation",
+                "DropSprite": "Déposer le sprite",
+                "FixedSprite": "Sprite préparé",
+                "SpriteType": "Type de sprite"
+            },
+            "Summoning": {
+                "Label": "Invocation",
+                "DropSpirit": "Déposer l'esprit",
+                "FixedSpirit": "Esprit préparé",
+                "SpiritType": "Type d'esprit"
+            }
         },
         "ExtendedTestManager": {
             "Actions": {
@@ -376,8 +386,6 @@
                 "Interests": "Hobbies",
                 "Street": "Rue"
             },
-            "Groups": {},
-            "Sets": {},
             "Set": {
                 "LogActorDifferences": "Journaliser les différences de l'acteur",
                 "DifferencesLoggedInConsole": "Ouvrez votre console de navigateur pour afficher les différences"
@@ -470,6 +478,12 @@
             "UnarmedCombat": "Combat à mains nues",
             "abbr": {
                 "Native": "N"
+            },
+            "KnowledgeTypes": {
+                "Academic": "Connaissances académiques",
+                "Interests": "Hobbies",
+                "Professional": "Connaissances pro.",
+                "Street": "Connaissances de la rue"
             }
         },
         "TestResults": {
@@ -536,7 +550,90 @@
             "SuccessTest": "Test de réussite",
             "SummonSpiritTest": "Invoquer l'Esprit",
             "SuppressionDefenseTest": "Suppression de la défense",
-            "ThrownAttackTest": "Attaque d'armes lancées"
+            "ThrownAttackTest": "Attaque d'armes lancées",
+            "Labels": {
+                "ActiveDefense": "Défense active",
+                "Attacker": "Attaquant",
+                "AttackerHits": "Succès de l'attaquant",
+                "AttackerNetHits": "Succès nets de l'attaquant",
+                "BiofeedbackDamage": "Dégâts de biofeedback",
+                "BuyHits": "Acheter des succès",
+                "CanDefault": "Par défaut",
+                "Defender": "Défenseur",
+                "DefenderNetHits": "Succès nets du défenseur",
+                "DefenseTest": "Test de défense",
+                "DicePool": "Réserve de dés",
+                "DicePoolModifier": "Modif. réserve de dés",
+                "DontApplyWounds": "Ne pas appliquer les blessures",
+                "ExtendedHits": "Succès étendus",
+                "ExtendedTest": "Test étendu",
+                "FadeAttribute": "Attribut de technodrain",
+                "FadeValue": "Valeur de technodrain",
+                "FullDefense": "Défense totale",
+                "FullMatrixDefense": "Défense matricielle totale",
+                "Hits": "Succès",
+                "IncomingDamage": "Dégâts en approche",
+                "IncomingDrain": "Drain entrant",
+                "IncomingFade": "Technodrain entrant",
+                "MeleeWeaponAttack": "Attaque arme de mélée",
+                "NetHits": "Succès excédentaires",
+                "OpposedType": "Type",
+                "OpposingHits": "Succès adverses",
+                "OpposingNetHits": "Succès nets adverses",
+                "OriginalDicePool": "Réserve de dés originale",
+                "ResultOverride": "Substitution du résultat",
+                "ResultOverrideGlitches": "Complications",
+                "ResultOverrideHits": "Succès",
+                "RollArmor": "Armure",
+                "RollComposure": "Sang-Froid",
+                "RollCustom": "Personnalisé",
+                "RollDefense": "Défense",
+                "RollDrain": "Drain",
+                "RollFade": "Technodrain",
+                "RollJudgeIntentions": "J. Intentions",
+                "RollLiftCarry": "Soulever&Porter",
+                "RollMemory": "Mémoire",
+                "RollMode": "Mode de lancer",
+                "RollOneDie": "Tu ne peux pas lancer moins d'un dé, chummer",
+                "RollSoak": "Résistance aux dégâts",
+                "SecondAttribute": "Second Attribut",
+                "SecondChance": "Seconde Chance",
+                "Soak": "Encaisser",
+                "SoakTest": "Test de résistance aux dégâts",
+                "Successes": "Succès",
+                "Suppressing": "Suppression",
+                "TargetingNeedsActorWithToken": "Le personnage actuel a besoin d'être lié à un token pour que le ciblage fonctionne",
+                "UseEdgeForInitiativeRoll": "Utiliser la règle du Blitz (Chance) pour l'initiative",
+                "RangedWeaponAttack": "Attaque arme à distance"
+            },
+            "Duration": {
+                "Label": "Durée",
+                "Types": {
+                    "Instant": "Instantané",
+                    "Permanent": "Permanent",
+                    "Sustained": "Maintenu"
+                }
+            },
+            "Limit": {
+                "Label": "Limite",
+                "Types": {
+                    "Astral": "Astral",
+                    "Mental": "Mentale",
+                    "Physical": "Physique",
+                    "Social": "Sociale"
+                }
+            },
+            "Target": {
+                "Label": "Cible",
+                "Types": {
+                    "Device": "Appareil",
+                    "File": "Fichier",
+                    "Other": "Autre",
+                    "Persona": "Persona",
+                    "Self": "Soi-même",
+                    "Sprite": "Sprite"
+                }
+            }
         }
     }
 }

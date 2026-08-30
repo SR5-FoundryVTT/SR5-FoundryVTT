@@ -60,9 +60,9 @@ export const SheetFlow = {
                 // NOTE: compilation is not an actual item type. It's a call_in_action sub type
                 return game.i18n.localize('SR5.CallInAction.CreateCompilation');
             case 'effect':
-                return formatStrict('SR5.Create', { type: 'SR5.Effect' });
+                return formatStrict('SR5.Create', { type: 'SR5.ActiveEffect.Labels.Effect' });
             default:
-                return formatStrict('SR5.Create', { type : 'SR5.FOUNDRY.Item' });
+                return formatStrict('SR5.Create', { type : 'SR5.Labels.Documents.Item' });
         }
 
     },

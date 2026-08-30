@@ -122,7 +122,7 @@ export class SR5Combatant extends Combatant<"base"> {
 
         // Re-seizing / un-seizing is a GM-only correction (SR5 rule guard).
         if (seized && !game.user?.isGM) {
-            ui.notifications.warn(game.i18n.localize('SR5.COMBAT.CannotSeizeAgain'));
+            ui.notifications.warn(game.i18n.localize('SR5.Combat.CannotSeizeAgain'));
             return;
         }
 
@@ -241,12 +241,12 @@ export class SR5Combatant extends Combatant<"base"> {
                 combatantImage: this.token?.texture?.src ?? this.actor?.img ?? null,
                 previousModeClass: prevConfig.cls,
                 previousModeIcon: prevConfig.icon,
-                previousModeTitle: game.i18n.format('SR5.COMBAT.ModeTitle', { mode: game.i18n.localize(prevConfig.label) }),
+                previousModeTitle: game.i18n.format('SR5.Combat.ModeTitle', { mode: game.i18n.localize(prevConfig.label) }),
                 currentModeClass: currConfig.cls,
                 currentModeIcon: currConfig.icon,
-                currentModeTitle: game.i18n.format('SR5.COMBAT.ModeTitle', { mode: game.i18n.localize(currConfig.label) }),
-                previousInitiativeTitle: game.i18n.format('SR5.COMBAT.ModeChangePreviousInitiative'),
-                currentInitiativeTitle: game.i18n.format('SR5.COMBAT.ModeChangeNewInitiative'),
+                currentModeTitle: game.i18n.format('SR5.Combat.ModeTitle', { mode: game.i18n.localize(currConfig.label) }),
+                previousInitiativeTitle: game.i18n.format('SR5.Combat.ModeChangePreviousInitiative'),
+                currentInitiativeTitle: game.i18n.format('SR5.Combat.ModeChangeNewInitiative'),
                 previousInitiative: data.previousInit,
                 currentInitiative: data.currentInit,
                 adjustment: this._formatSigned(data.totalAdjust),
@@ -259,7 +259,7 @@ export class SR5Combatant extends Combatant<"base"> {
         const messageData = {
             content,
             speaker: foundry.documents.ChatMessage.implementation.getSpeaker({
-                alias: game.i18n.localize('SR5.COMBAT.ModeChangedLabel'),
+                alias: game.i18n.localize('SR5.Combat.ModeChangedLabel'),
             }),
             flags: { core: { initiativeRoll: true } },
             sound: hasDiceRoll ? CONFIG.sounds.dice : undefined,

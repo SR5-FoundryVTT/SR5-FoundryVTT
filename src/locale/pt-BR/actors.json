@@ -209,7 +209,49 @@
                     "label": "Tecnomante"
                 }
             },
-            "NoFavoritesSelected": "Nenhum favorito foi selecionado"
+            "NoFavoritesSelected": "Nenhum favorito foi selecionado",
+            "Attributes": {
+                "Agility": "Agilidade",
+                "Body": "Corpo",
+                "Charisma": "Carisma",
+                "Edge": "Trunfo",
+                "Essence": "Essência",
+                "Intuition": "Intuição",
+                "Logic": "Lógica",
+                "Magic": "Magia",
+                "Reaction": "Reação",
+                "Resonance": "Ressonância",
+                "Strength": "Força",
+                "Willpower": "Vontade"
+            },
+            "Initiative": {
+                "Categories": {
+                    "Astral": "Astral",
+                    "Matrix": "Matriz",
+                    "Meatspace": "Espaço Real"
+                }
+            },
+            "Labels": {
+                "Attribute": "Atributo",
+                "Attributes": "Atributos",
+                "Biography": "Bio",
+                "DefaultCategoryVisibility": "Mostrar categorias vazias",
+                "Initiation": "Iniciação",
+                "Initiative": "Iniciativa",
+                "InitiativeMod": "Modificador de Iniciativa",
+                "IsCritter": "Criatura",
+                "IsFreshImport": "Este item foi importado do Chummer e precisa de revisão manual.",
+                "IsGrunt": "Soldado",
+                "IsGruntHint": "Usa as regras de monitor de condição para soldados (SR5 p.378).",
+                "IsNPC": "NPC",
+                "Metatype": "Metatipo",
+                "Movement": "Movimento",
+                "SheetActor": "Ficha de ator",
+                "SpecialAttributes": "Atributos Especiais",
+                "WalkingSpeed": "Caminhando",
+                "RunningSpeed": "Correndo",
+                "SprintingBonus": "Bônus de corrida"
+            }
         },
         "ActorTypes": {
             "Character": "Personagem",
@@ -278,6 +320,13 @@
                 "Human": "Humano",
                 "Ork": "Ork",
                 "Troll": "Troll"
+            },
+            "Labels": {
+                "CareerKarma": "Karma de Carreira",
+                "Notoriety": "Notoriedade",
+                "Nuyen": "Nuyen",
+                "PublicAwareness": "Consciência Pública",
+                "StreetCred": "Crédito de Rua"
             }
         },
         "Contact": {
@@ -320,7 +369,13 @@
             "Loyalty": "Lealdade",
             "LoyaltyConnectionHelp": "Lealdade / Conexão",
             "LoyaltyConnectionLabel": "L / C",
-            "Type": "Tipo"
+            "Type": "Tipo",
+            "Labels": {
+                "ContactType": "Tipo",
+                "Contacts": "Contatos",
+                "Connection": "Conexão",
+                "Loyalty": "Lealdade"
+            }
         },
         "InventoryRename": {
             "Cancel": "Cancelar",
@@ -395,7 +450,11 @@
                 "Walker": "Andador",
                 "Water": "Embarcação"
             },
-            "Vehicle": "Veículo"
+            "Vehicle": "Veículo",
+            "Labels": {
+                "ControlRig": "Control Rig",
+                "VehicleStunImmunity": "Imunidade de veículos a dano de atordoamento"
+            }
         },
         "VehicleImport": {
             "MissingPermission": "Você não tem permissão para criar atores"

@@ -19,7 +19,6 @@
                 "DronePerception": "Percepção de Drone",
                 "DronePilotVehicle": "Pilotar Veículo (Drone)",
                 "EditFile": "Editar Arquivo",
-                "EnterexitHost": "Entrar/Sair do Host",
                 "EraseMark": "Apagar Marca",
                 "EraseMatrixSignature": "Apagar Assinatura da Matriz",
                 "Fade": "Enfraquecimento",
@@ -49,7 +48,8 @@
                 "Snoop": "Bisbilhotar",
                 "SpoofCommand": "Falsificar Comando",
                 "SwitchInterfaceMode": "Alternar Modo de Interface",
-                "TraceIcon": "Rastrear Ícone"
+                "TraceIcon": "Rastrear Ícone",
+                "EnterExitHost": "Entrar/Sair do Host"
             }
         },
         "ContextOptions": {
@@ -66,42 +66,6 @@
             "View": "Ver",
             "ViewItem": "Ver Item"
         },
-        "FOUNDRY": {
-            "Actor": "Ator",
-            "Item": "Item",
-            "Scene": "Cena",
-            "Token": "Token"
-        },
-        "Keybinding": {
-            "AddRemoveManyQty": {
-                "Hint": "Adicionar/Remover 20 Qty de cada vez",
-                "Label": "Adicionar/Remover 20"
-            },
-            "AddRemoveSomeQty": {
-                "Hint": "Adicionar/Remover 5 Qty de cada vez",
-                "Label": "Adicionar/Remover 5"
-            },
-            "HideTestDialog": {
-                "Hint": "Pular diálogo ao rolar testes de qualquer botão",
-                "Label": "Ocultar Diálogo de Teste"
-            },
-            "OverwatchScoreTracker": {
-                "Hint": "Abrir monitor de valor de vigilância",
-                "Label": "Monitor de Valor de Vigilância"
-            },
-            "ShowItemCard": {
-                "Hint": "Mostrar apenas o cartão do item no chat em vez de rolar o teste",
-                "Label": "Mostrar Cartão do Item"
-            },
-            "ShowSituationModifiers": {
-                "Hint": "Abrir modificadores de situação para seleção",
-                "Label": "Modificadores de Situação"
-            },
-            "SuccessTestPrompt": {
-                "Hint": "Prompt para fazer um teste de sucesso padrão",
-                "Label": "Prompt Teste de Sucesso"
-            }
-        },
         "Labels": {
             "Action": {
                 "ActiveTest": "Teste",
@@ -117,7 +81,7 @@
             },
             "Actions": {
                 "BruteForce": "Força Bruta",
-                "HackontheFly": "Hackear na Hora"
+                "HackOnTheFly": "Hackear na Hora"
             },
             "ActorSheet": {
                 "AddNetwork": "Conectar rede direta",
@@ -223,6 +187,12 @@
                 "Changelog": "Registro de Alterações",
                 "Issues": "Problemas",
                 "Wiki": "Wiki"
+            },
+            "Documents": {
+                "Actor": "Ator",
+                "Item": "Item",
+                "Scene": "Cena",
+                "Token": "Token"
             }
         },
         "Tabs": {
@@ -382,6 +352,36 @@
                 "Threshold": "Valor do limite calculado"
             },
             "ToggleEditMode": "Modo de edição"
+        },
+        "Keybindings": {
+            "AddRemoveManyQty": {
+                "Hint": "Adicionar/Remover 20 Qty de cada vez",
+                "Label": "Adicionar/Remover 20"
+            },
+            "AddRemoveSomeQty": {
+                "Hint": "Adicionar/Remover 5 Qty de cada vez",
+                "Label": "Adicionar/Remover 5"
+            },
+            "HideTestDialog": {
+                "Hint": "Pular diálogo ao rolar testes de qualquer botão",
+                "Label": "Ocultar Diálogo de Teste"
+            },
+            "OverwatchScoreTracker": {
+                "Hint": "Abrir monitor de valor de vigilância",
+                "Label": "Monitor de Valor de Vigilância"
+            },
+            "ShowItemCard": {
+                "Hint": "Mostrar apenas o cartão do item no chat em vez de rolar o teste",
+                "Label": "Mostrar Cartão do Item"
+            },
+            "ShowSituationModifiers": {
+                "Hint": "Abrir modificadores de situação para seleção",
+                "Label": "Modificadores de Situação"
+            },
+            "SuccessTestPrompt": {
+                "Hint": "Prompt para fazer um teste de sucesso padrão",
+                "Label": "Prompt Teste de Sucesso"
+            }
         }
     }
 }

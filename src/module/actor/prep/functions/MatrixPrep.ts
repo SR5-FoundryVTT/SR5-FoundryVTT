@@ -69,7 +69,7 @@ export class MatrixPrep {
                 matrix.name = device.name;
             } else {
                 // if we didn't have a Living Persona device, set the name to Living Persona as a basic thing
-                matrix.name = game.i18n.localize('SR5.LivingPersona');
+                matrix.name = game.i18n.localize('SR5.Matrix.Labels.LivingPersona');
             }
         }
 

@@ -77,7 +77,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
      */
     applyArmorPoolModifier() {
         ModifiableValue.remove(this.data.pool, 'SR5.Armor.label');
-        ModifiableValue.remove(this.data.pool, 'SR5.HardenedArmor');
+        ModifiableValue.remove(this.data.pool, 'SR5.Armor.Labels.HardenedArmor');
 
         if (!this.data.action.armor || !this.actor) return;
 
@@ -95,8 +95,8 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
         }
 
         if (addHardenedArmor) {
-            ModifiableValue.addUniqueBase(this.data.pool, 'SR5.HardenedArmor', armor.hardened.value);
-            TestCreator.addCodeTermTrace(this.data, { ...armor.hardened, label: 'SR5.HardenedArmor' });
+            ModifiableValue.addUniqueBase(this.data.pool, 'SR5.Armor.Labels.HardenedArmor', armor.hardened.value);
+            TestCreator.addCodeTermTrace(this.data, { ...armor.hardened, label: 'SR5.Armor.Labels.HardenedArmor' });
         }
     }
 
@@ -162,7 +162,7 @@ export class PhysicalResistTest extends SuccessTest<PhysicalResistTestData> {
             const hardenedHits = CombatRules.hardenedAutoHits(this.actor, this.data.modifiedDamage);
 
             if (hardenedHits > 0) {
-                hits.addUnique('SR5.HardenedArmor', hardenedHits);
+                hits.addUnique('SR5.Armor.Labels.HardenedArmor', hardenedHits);
             }
             hits.calcTotal();
         }

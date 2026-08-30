@@ -43,7 +43,7 @@ export const FadeRules = {
 
         fadeDamage = foundry.utils.duplicate(fadeDamage) as DamageType;
 
-        ModifiableValue.addUnique(fadeDamage, 'SR5.Hits', -hits);
+        ModifiableValue.addUnique(fadeDamage, 'SR5.Tests.Labels.Hits', -hits);
         ModifiableValue.calcTotal(fadeDamage, {min: 0});
 
         return fadeDamage;

@@ -4,11 +4,11 @@
         <hr/>
         <div>
             <div class="form-group">
-                <label>{{localize 'SR5.IncomingDrain'}}</label>
+                <label>{{localize 'SR5.Tests.Labels.IncomingDrain'}}</label>
                 <input type="number" value="{{test.data.incomingDrain.value}}" name="test.data.incomingDrain"/>
             </div>
             <div class="form-group">
-                <label>{{localize 'SR5.DamageType'}}</label>
+                <label>{{localize 'SR5.Damage.Type'}}</label>
                 <select name="test.data.incomingDrain.type.base">
                     {{selectOptions config.damageTypes selected=test.data.incomingDrain.type.base localize=true}}
                 </select>

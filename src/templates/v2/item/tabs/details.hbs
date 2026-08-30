@@ -69,7 +69,7 @@
                 </div>
                 <div class="list-item">
                     <div class="list-item-start skinny">
-                        <label>{{localize "SR5.Damage"}}</label>
+                        <label>{{localize "SR5.Damage.Label"}}</label>
                     </div>
                     <div class="list-item-col">
                         {{formInput systemFields.damage value=source.system.damage
@@ -197,7 +197,7 @@
                 {{#if (eq system.category 'range')}}
                     <div class="list-item">
                         <div class="list-item-start skinny">
-                            <label>{{localize "SR5.FireMode"}}</label>
+                            <label>{{localize "SR5.Weapon.Labels.FireMode"}}</label>
                         </div>
                         <div class="list-item-col">
                             <label data-tooltip="{{systemFields.range.fields.modes.fields.single_shot.hint}}">
@@ -574,7 +574,7 @@
                             {{formInput systemFields.action.fields.type value=source.system.action.type localize=true
                                         classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                             <label style="text-wrap: nowrap;">
-                                {{localize "SR5.ExtendedTest"}}&nbsp;{{formInput systemFields.action.fields.extended.fields.value
+                                {{localize "SR5.Tests.Labels.ExtendedTest"}}&nbsp;{{formInput systemFields.action.fields.extended.fields.value
                                                                                  value=source.system.action.extended.value
                                                                                  classes="short" rootId=@root.rootId disabled=@root.isPlayMode}}
                                 {{> 'systems/shadowrun5e/dist/templates/apps/partials/interval-units.hbs'
@@ -690,12 +690,12 @@
                 {{/if}}
                 <div class="list-item list-item-header">
                     <div class="list-item-start skinny">
-                        <label>{{localize "SR5.Damage"}}</label>
+                        <label>{{localize "SR5.Damage.Label"}}</label>
                     </div>
                 </div>
                 <div class="list-item">
                     <div class="list-item-start skinny">
-                        <label>{{localize "SR5.DamageType"}}</label>
+                        <label>{{localize "SR5.Damage.Type"}}</label>
                     </div>
                     <div class="list-item-col">
                         {{formInput systemFields.action.fields.damage.fields.type.fields.base

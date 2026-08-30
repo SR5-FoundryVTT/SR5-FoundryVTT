@@ -1,6 +1,11 @@
 {
     "SR5": {
-        "COMBAT": {
+        "DamageApplication": {
+            "ApplyDamage": "Apply Damage",
+            "ApplyUnmodifiedDamage": "Apply Unmod. Damage",
+            "Title": "Damage Application"
+        },
+        "Combat": {
             "CannotSeizeAgain": "You cannot seize initiative again until the start of your next turn.",
             "ModeAstral": "Astral",
             "ModeChangedLabel": "Initiative Mode Updated",
@@ -25,15 +30,15 @@
             "ToggleActedStatusGMOnly": "Toggle Acted Status (GM Only)",
             "TrackerTitle": "Turn {round} (Pass {pass})"
         },
-        "DamageApplication": {
-            "ApplyDamage": "Apply Damage",
-            "ApplyUnmodifiedDamage": "Apply Unmod. Damage",
-            "Title": "Damage Application"
-        },
-        "ReputationManager": {
-            "Cancel": "Cancel",
-            "Submit": "Submit",
-            "Title": "Reputation Manager"
+        "Damage": {
+            "Label": "Damage",
+            "Types": {
+                "Matrix": "Matrix",
+                "Physical": "Physical",
+                "Stun": "Stun"
+            },
+            "Type": "Type",
+            "Value": "Damage Value"
         }
     }
 }

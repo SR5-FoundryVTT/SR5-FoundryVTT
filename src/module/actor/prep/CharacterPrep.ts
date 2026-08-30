@@ -82,7 +82,7 @@ export class CharacterPrep {
         system.values.recoil_compensation.base = baseRc;
 
         const mod = new ModifiableValue(system.values.recoil_compensation);
-        mod.addUnique("SR5.RecoilCompensation", recoilCompensation);
+        mod.addUnique("SR5.Weapon.Labels.RecoilCompensation", recoilCompensation);
         mod.calcTotal({ min: 0 });
     }
 
@@ -90,7 +90,7 @@ export class CharacterPrep {
         const { attributes } = system;
 
         // This is necessary to support critter actor types. Should we keep it?
-        attributes.initiation = DataDefaults.createData('attribute_field', { base: system.magic.initiation, label: "SR5.Initiation", hidden: true });;
+        attributes.initiation = DataDefaults.createData('attribute_field', { base: system.magic.initiation, label: "SR5.Actor.Labels.Initiation", hidden: true });;
         attributes.submersion = DataDefaults.createData('attribute_field', { base: system.technomancer.submersion, label: "SR5.Submersion", hidden: true });;
     }
 }

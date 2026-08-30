@@ -18,7 +18,6 @@
             "DefaultInventoryCantBeRemoved": "기본 소지품 위치는 삭제할 수 없습니다.",
             "LinkLockedReboot": "링크 잠금 상태의 액터는 재부팅할 수 없습니다.",
             "InventoryAlreadyExists": "해당 이름의 소지품 위치가 이미 존재합니다.",
-            "KeyNotModifyableByActiveEffect": "활성 효과 모드 '수정'은 모드 속성에만 영향을 미칠 수 있습니다.",
             "MarkCouldNotBePlaced": "내부 오류: 당신의 마커는 배치될 수 없습니다.",
             "MarksCantBePlacedBy": "활성화된 액터는 마커를 배치할 수 없습니다.",
             "MarksCantBePlacedOn": "선택된 유형의 액터는 마커를 받을 수 없습니다.",
@@ -28,7 +27,10 @@
             "NoAvailableActorFound": "해당 행동에 사용할 수 있는 액터를 찾을 수 없음",
             "SkillWithoutAttribute": "해당 기술에 특성치 설정이 없습니다.",
             "TestExpectsVehicleOnly": "해당 판정은 탑승물 유형의 액터만 사용 가능",
-            "TooManyActionsWithCategory": "액터에는 {category} 범주의 행동이 정확히 하나 있어야 합니다"
+            "TooManyActionsWithCategory": "액터에는 {category} 범주의 행동이 정확히 하나 있어야 합니다",
+            "KeyNotModifiableByActiveEffect": "활성 효과 모드 '수정'은 모드 속성에만 영향을 미칠 수 있습니다.",
+            "SourceFieldEmpty": "출처 부분이 비어있으니 출처에 대한 유효한 문자를 입력해주시기 바랍니다.",
+            "MissingItemForOpposedTest": "행동 주체인 물품을 찾을 수 없어 대항 판정을 수행할 수 없음"
         },
         "Messages": {
             "MarkInvitation": {
@@ -36,13 +38,6 @@
                 "AskForInvite": "다음에 대한 마크 초대 요청:",
                 "InviteAccepted": "{userName} 님이 {networkName} 네트워크에 참가했습니다!"
             }
-        },
-        "MissingRessource": {
-            "Ammo": "사격을 위한 탄약이 충분하지 않음",
-            "Edge": "소비 할 수 있는 엣지가 없음",
-            "Initiative": "우선권 점수가 충분하지 않음",
-            "SomeAmmo": "선택된 사격 방식으로 사격하기에 탄약이 충분하지 않음, 사격 방식 수정치가 감소",
-            "SomeAmmoMelee": "근거리 공격 수행을 위한 탄약이 충분하지 않음"
         },
         "Notifications": {
             "AddDevicesToPAN": {
@@ -55,7 +50,10 @@
                 "Item": "물품에 있는 참조 정리",
                 "Start": "네트워크와 마크 참조 삭제"
             },
-            "VehicleCannotBeOwnDriver": "탑승물은 스스로의 조종자가 될 수 없음(그건 조종 특성치의 역할)"
+            "VehicleCannotBeOwnDriver": "탑승물은 스스로의 조종자가 될 수 없음(그건 조종 특성치의 역할)",
+            "CantModifyHostContent": "IC 액터 내에서 호스트 데이터를 변경할 수 없습니다.",
+            "ConsumedEquippedAmmo": "장착 탄약에서 소모한 탄환 수",
+            "ResetProgressiveRecoil": "점진적 반동을 발사된 탄환 0발로 초기화"
         },
         "Warnings": {
             "ActorMissingRequirements": "액터는 ‘각성’ 또는 ‘공명’ 기술 요건과 일치해야 함",
@@ -72,7 +70,6 @@
             "CantReloadWithoutSpareClip": "남은 탄창이 없습니다!",
             "CantSecondChanceAGlitch": "해당 판정에는 두 번째 기회가 없습니다. 판정 결과는 글리치입니다.",
             "CantSecondChanceWithoutNoneHits": "해당 판정에는 두 번째 기회가 없습니다.  성공 주사위만 남았습니다.",
-            "CantSpendMulitplePointsOfEdge": "한 번의 판정 또는 행동에 엣지를 여러 번 소비할 수 없습니다.",
             "CantCombineBuyHitsWithEdge": "성공 구매는 두 번째 기회와 함께 사용할 수 없습니다.",
             "CompilationNotConcluded": "컴파일이 완료되지 않았습니다. 페이드 결정을 위해 스프라이트가 컴파일 경쟁 판정을 완료하길 기다려야 합니다.",
             "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "액터 없이 판정에서 엣지 점수를 소비할 수 없습니다.",
@@ -91,7 +88,17 @@
             "SkillCantBeDefault": "해당 기술은 무리한 시도를 할 수 없음",
             "SkillSetDefaultTypeOutsideCompendium": "설정된 기술 설정 컨펜디움에 포함된 기술 설정만 액터 생성에 영향을 줌",
             "SummoningNotConcluded": "소환이 완료되지 않았습니다. 드레인 결정을 위해 영혼 경쟁 판정이 완료되길 기다려야 합니다.",
-            "TokenSelectionNeeded": "하나 이상의 토큰이 선택되어야 함"
+            "TokenSelectionNeeded": "하나 이상의 토큰이 선택되어야 함",
+            "MissingPdfPager": "출처 PDF를 표시하기 위해서는 pdfpager 모듈을 설치하고, 코드와 일치하는 PDF를 만들어야 합니다.",
+            "CantSpendMultiplePointsOfEdge": "한 번의 판정 또는 행동에 엣지를 여러 번 소비할 수 없습니다.",
+            "NoSelectableToken": "캔버스 위에 액터가 선택할 수 있는 토큰이 없음"
+        },
+        "MissingResources": {
+            "Ammo": "사격을 위한 탄약이 충분하지 않음",
+            "Edge": "소비 할 수 있는 엣지가 없음",
+            "Initiative": "우선권 점수가 충분하지 않음",
+            "SomeAmmo": "선택된 사격 방식으로 사격하기에 탄약이 충분하지 않음, 사격 방식 수정치가 감소",
+            "SomeAmmoMelee": "근거리 공격 수행을 위한 탄약이 충분하지 않음"
         }
     }
 }

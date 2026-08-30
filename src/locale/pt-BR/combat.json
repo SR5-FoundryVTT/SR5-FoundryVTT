@@ -1,6 +1,11 @@
 {
     "SR5": {
-        "COMBAT": {
+        "DamageApplication": {
+            "ApplyDamage": "Aplicar Dano",
+            "ApplyUnmodifiedDamage": "Aplicar Dano Não Mod.",
+            "Title": "Aplicação de Dano"
+        },
+        "Combat": {
             "CannotSeizeAgain": "Voce nao pode tomar a iniciativa novamente ate o inicio do seu proximo turno.",
             "ModeAstral": "Astral",
             "ModeChangedLabel": "Modo de Iniciativa Alterado",
@@ -25,15 +30,15 @@
             "ToggleActedStatusGMOnly": "Alternar status de Ja Agiu (Somente GM)",
             "TrackerTitle": "Turno {round} (Passagem {pass})"
         },
-        "DamageApplication": {
-            "ApplyDamage": "Aplicar Dano",
-            "ApplyUnmodifiedDamage": "Aplicar Dano Não Mod.",
-            "Title": "Aplicação de Dano"
-        },
-        "ReputationManager": {
-            "Cancel": "Cancelar",
-            "Submit": "Enviar",
-            "Title": "Gerenciador de Reputação"
+        "Damage": {
+            "Label": "Dano",
+            "Types": {
+                "Matrix": "Matriz",
+                "Physical": "Físico",
+                "Stun": "Atord."
+            },
+            "Type": "Tipo",
+            "Value": "Valor do Dano"
         }
     }
 }

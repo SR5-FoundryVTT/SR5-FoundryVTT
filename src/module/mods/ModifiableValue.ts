@@ -159,16 +159,16 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
     /**
      * Calculate the total value by applying changes in priority order.
      * @param {{min?: number, max?: number, decimal?: boolean}} [options] - Optional bounds to enforce on the final value.
-     * @param {number} [options.min] - If provided, enforces a minimum value (adds an `SR5.EnforcedMinimum` change).
-     * @param {number} [options.max] - If provided, enforces a maximum value (adds an `SR5.EnforcedMaximum` change).
+     * @param {number} [options.min] - If provided, enforces a minimum value (adds an `SR5.ActiveEffect.Labels.EnforcedMinimum` change).
+     * @param {number} [options.max] - If provided, enforces a maximum value (adds an `SR5.ActiveEffect.Labels.EnforcedMaximum` change).
      * @param {boolean} [options.decimal] - If false, the final value will be rounded up.
      * @returns {number} The computed total (rounded up per SR5 rules).
      */
     calcTotal(options?: { min?: number; max?: number, decimal?: boolean }): number {
         this._field.value = this._field.base;
 
-        this.remove('SR5.EnforcedMaximum');
-        this.remove('SR5.EnforcedMinimum');
+        this.remove('SR5.ActiveEffect.Labels.EnforcedMaximum');
+        this.remove('SR5.ActiveEffect.Labels.EnforcedMinimum');
 
         this._field.changes.sort((a, b) => a.priority - b.priority);
         for (let i = 0; i < this._field.changes.length; i++) {
@@ -215,13 +215,13 @@ export class ModifiableValue<Field extends ModifiableValueType = ModifiableValue
 
         if (options?.max != null && this._field.value > options.max) {
             this._markPreviousChangesMasked(this._field.changes.length);
-            this.addUnique('SR5.EnforcedMaximum', options.max, { type: 'downgrade', priority: ModifiableValue.TOP_PRIORITY });
+            this.addUnique('SR5.ActiveEffect.Labels.EnforcedMaximum', options.max, { type: 'downgrade', priority: ModifiableValue.TOP_PRIORITY });
             this._field.value = options.max;
         }
 
         if (options?.min != null && this._field.value < options.min) {
             this._markPreviousChangesMasked(this._field.changes.length);
-            this.addUnique('SR5.EnforcedMinimum', options.min, { type: 'upgrade', priority: ModifiableValue.TOP_PRIORITY });
+            this.addUnique('SR5.ActiveEffect.Labels.EnforcedMinimum', options.min, { type: 'upgrade', priority: ModifiableValue.TOP_PRIORITY });
             this._field.value = options.min;
         }
 

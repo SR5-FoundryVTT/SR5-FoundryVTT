@@ -8,37 +8,6 @@
             "ReportIssues": "Please report bugs and feature requests",
             "Title": "Shadowrun5e Update"
         },
-        "CompendiaSettings": {
-            "Description": "These packs will be used for the system. You can override them with your own packs, but you should not remove them.",
-            "GeneralActionsPack": {
-                "hint": "This compendium will be used for all general, attribute only actions.",
-                "label": "General Actions"
-            },
-            "ICActionsPack": {
-                "hint": "This compendium will be used for IC actions, filtered for each IC type",
-                "label": "IC Actions"
-            },
-            "Label": "Compendium Packs",
-            "MatrixActionsPack": {
-                "hint": "This compendium will be used for all matrix actions.",
-                "label": "Matrix Actions"
-            },
-            "SkillsPacksSection": "Skills Compendiums",
-            "ActionsPacksSection": "Actions Compendiums",
-            "SkillsPack": {
-                "hint": "This compendium will be used for all skills.",
-                "label": "Skills"
-            },
-            "SkillGroupsPack": {
-                "hint": "This compendium will be used for skill groups.",
-                "label": "Skill Groups"
-            },
-            "SkillSetsPack": {
-                "hint": "This compendium will be used for skill sets.",
-                "label": "Skill Sets"
-            },
-            "Title": "System compendiums"
-        },
         "CompendiumBrowser": {
             "Filters": {
                 "ClearSearch": "Clear Search",
@@ -146,33 +115,6 @@
             "Submit": "Submit",
             "Title": "Karma Manager"
         },
-        "MIGRATION": {
-            "BeginMigration": "Begin Migration",
-            "BeginNotification": "Beginning Shadowrun system migration from version",
-            "DoNotCloseNotification": "Please do not close your game or shut down FoundryVTT.",
-            "SuccessConfirm": "Close",
-            "SuccessDescription": "Existing compendium packs belonging to this world have been updated in the process of this migration.",
-            "SuccessHeader": "Migration Complete",
-            "SuccessNotification": "Shadowrun system successfully migrated to version",
-            "SuccessPacksInfo": "Due to current technical limitations within FoundryVTT, actor packs must be updated manually.",
-            "SuccessTitle": "Success",
-            "WarningBackup": "If you have not backed up your world, do so before you press the 'Begin Migration' button below.",
-            "WarningDescription": "Only the GM can perform the update and shutting down the server or closing your browser while the update is in progress may cause irreparable damage to your world.",
-            "WarningHeader": "Migration Warning",
-            "WarningRequired": "The Shadowrun 5E system must begin a required update.",
-            "WarningTitle": "Alert"
-        },
-        "Migrator": {
-            "Version18_0_0": {
-                "Line1": "From version 0.18.0 onwards effects on owned items will directly apply without them having to be copied to the actor.",
-                "Line2": "Previously copied effects must be deleted or disabled to avoid both item and actor effects applying changes. By default all effects with an item origin will be deleted.",
-                "Line3": "Effects created directly on actors aren't affected.",
-                "Line4": "Should you heavily use effects and effects modules and aren't sure about 'item owned effects', you set this migration to disable and review your disabled effects. Disabled effects will be marked as such.",
-                "Line5": "Also be aware that enabled effects on actor items will now be applied. You'll be able to see all applied effects in the actors effects tab.",
-                "OnlyDisable": "Disable Effects only",
-                "Warning": "NOTE!"
-            }
-        },
         "NuyenManager": {
             "Cancel": "Cancel",
             "CurrentNuyen": "Amount of Nuyen the Character currently has",
@@ -254,6 +196,70 @@
                 "WoundModifierContent": "This cell denotes that filling it increases your wound modifier by the number written in the cell",
                 "WoundModifierTitle": "Wound Modifier"
             }
+        },
+        "Migration": {
+            "BeginMigration": "Begin Migration",
+            "BeginNotification": "Beginning Shadowrun system migration from version",
+            "DoNotCloseNotification": "Please do not close your game or shut down FoundryVTT.",
+            "SuccessConfirm": "Close",
+            "SuccessDescription": "Existing compendium packs belonging to this world have been updated in the process of this migration.",
+            "SuccessHeader": "Migration Complete",
+            "SuccessNotification": "Shadowrun system successfully migrated to version",
+            "SuccessPacksInfo": "Due to current technical limitations within FoundryVTT, actor packs must be updated manually.",
+            "SuccessTitle": "Success",
+            "WarningBackup": "If you have not backed up your world, do so before you press the 'Begin Migration' button below.",
+            "WarningDescription": "Only the GM can perform the update and shutting down the server or closing your browser while the update is in progress may cause irreparable damage to your world.",
+            "WarningHeader": "Migration Warning",
+            "WarningRequired": "The Shadowrun 5E system must begin a required update.",
+            "WarningTitle": "Alert",
+            "Version18_0_0": {
+                "Line1": "From version 0.18.0 onwards effects on owned items will directly apply without them having to be copied to the actor.",
+                "Line2": "Previously copied effects must be deleted or disabled to avoid both item and actor effects applying changes. By default all effects with an item origin will be deleted.",
+                "Line3": "Effects created directly on actors aren't affected.",
+                "Line4": "Should you heavily use effects and effects modules and aren't sure about 'item owned effects', you set this migration to disable and review your disabled effects. Disabled effects will be marked as such.",
+                "Line5": "Also be aware that enabled effects on actor items will now be applied. You'll be able to see all applied effects in the actors effects tab.",
+                "OnlyDisable": "Disable Effects only",
+                "Warning": "NOTE!"
+            },
+            "Complete": "Migration Complete",
+            "UpdateCompendiumNoUpdateActor": "Due to technical limitations within FoundryVTT, actor compendium packs are unable to be updated at this time. You will have to manually update these packs.",
+            "UpdateCompendiumUpdateMessage": "Any world compendium packs that exist in the world were also updated"
+        },
+        "CompendiumSettings": {
+            "Description": "These packs will be used for the system. You can override them with your own packs, but you should not remove them.",
+            "GeneralActionsPack": {
+                "hint": "This compendium will be used for all general, attribute only actions.",
+                "label": "General Actions"
+            },
+            "ICActionsPack": {
+                "hint": "This compendium will be used for IC actions, filtered for each IC type",
+                "label": "IC Actions"
+            },
+            "Label": "Compendium Packs",
+            "MatrixActionsPack": {
+                "hint": "This compendium will be used for all matrix actions.",
+                "label": "Matrix Actions"
+            },
+            "SkillsPacksSection": "Skills Compendiums",
+            "ActionsPacksSection": "Actions Compendiums",
+            "SkillsPack": {
+                "hint": "This compendium will be used for all skills.",
+                "label": "Skills"
+            },
+            "SkillGroupsPack": {
+                "hint": "This compendium will be used for skill groups.",
+                "label": "Skill Groups"
+            },
+            "SkillSetsPack": {
+                "hint": "This compendium will be used for skill sets.",
+                "label": "Skill Sets"
+            },
+            "Title": "System compendiums"
+        },
+        "ReputationManager": {
+            "Cancel": "Cancel",
+            "Submit": "Submit",
+            "Title": "Reputation Manager"
         }
     }
 }

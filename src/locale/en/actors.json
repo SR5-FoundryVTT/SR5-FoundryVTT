@@ -209,7 +209,49 @@
                     "label": "Technomancer"
                 }
             },
-            "NoFavoritesSelected": "No favorites have been selected"
+            "NoFavoritesSelected": "No favorites have been selected",
+            "Attributes": {
+                "Agility": "Agility",
+                "Body": "Body",
+                "Charisma": "Charisma",
+                "Edge": "Edge",
+                "Essence": "Essence",
+                "Intuition": "Intuition",
+                "Logic": "Logic",
+                "Magic": "Magic",
+                "Reaction": "Reaction",
+                "Resonance": "Resonance",
+                "Strength": "Strength",
+                "Willpower": "Willpower"
+            },
+            "Initiative": {
+                "Categories": {
+                    "Astral": "Astral",
+                    "Matrix": "Matrix",
+                    "Meatspace": "Meatspace"
+                }
+            },
+            "Labels": {
+                "Attribute": "Attribute",
+                "Attributes": "Attributes",
+                "Biography": "Bio",
+                "DefaultCategoryVisibility": "Show empty categories",
+                "Initiation": "Initiation",
+                "Initiative": "Initiative",
+                "InitiativeMod": "Initiative Modifier",
+                "IsCritter": "Critter",
+                "IsFreshImport": "This item was imported from Chummer and needs manual review.",
+                "IsGrunt": "Grunt",
+                "IsGruntHint": "Use grunt condition monitor rules (SR5 p.378).",
+                "IsNPC": "NPC",
+                "Metatype": "Metatype",
+                "Movement": "Movement",
+                "SheetActor": "Actor sheet",
+                "SpecialAttributes": "Special Attributes",
+                "WalkingSpeed": "Walking",
+                "RunningSpeed": "Running",
+                "SprintingBonus": "Sprinting Bonus"
+            }
         },
         "ActorTypes": {
             "Character": "Character",
@@ -278,6 +320,13 @@
                 "Human": "Human",
                 "Ork": "Ork",
                 "Troll": "Troll"
+            },
+            "Labels": {
+                "CareerKarma": "Career Karma",
+                "Notoriety": "Notoriety",
+                "Nuyen": "Nuyen",
+                "PublicAwareness": "Public Awareness",
+                "StreetCred": "Street Cred"
             }
         },
         "Contact": {
@@ -320,7 +369,13 @@
             "Loyalty": "Loyalty",
             "LoyaltyConnectionHelp": "Loyalty / Connection",
             "LoyaltyConnectionLabel": "L / C",
-            "Type": "Type"
+            "Type": "Type",
+            "Labels": {
+                "ContactType": "Type",
+                "Contacts": "Contacts",
+                "Connection": "Connection",
+                "Loyalty": "Loyalty"
+            }
         },
         "InventoryRename": {
             "Cancel": "Cancel",
@@ -395,7 +450,11 @@
                 "Walker": "Walker",
                 "Water": "Watercraft"
             },
-            "Vehicle": "Vehicle"
+            "Vehicle": "Vehicle",
+            "Labels": {
+                "ControlRig": "Control Rig",
+                "VehicleStunImmunity": "Vehicle Immunity to Stun Damage"
+            }
         },
         "VehicleImport": {
             "MissingPermission": "You are missing the permission to create actors"

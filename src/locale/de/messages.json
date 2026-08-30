@@ -18,7 +18,6 @@
             "DefaultInventoryCantBeRemoved": "Das Standardinventar kann nicht entfernt werden.",
             "LinkLockedReboot": "Ein verbindungsgesperrter Akteur kann nicht neu gestartet werden",
             "InventoryAlreadyExists": "Es existiert bereits ein Inventar mit diesem Namen",
-            "KeyNotModifyableByActiveEffect": "Aktiver Effekt Modus Modifizieren kann nur auf mod Felder angewendet werden.",
             "MarkCouldNotBePlaced": "Interner Fehler: Die Marken konnten nicht platziert werden.",
             "MarksCantBePlacedBy": "Der aktive Akteur kann keine Marken platzieren.",
             "MarksCantBePlacedOn": "Der als Ziel ausgewählte Akteur kann keine Marken empfangen.",
@@ -28,7 +27,10 @@
             "NoAvailableActorFound": "Es wurde kein verfügbarer Akteur für diese Aktion gefunden",
             "SkillWithoutAttribute": "Die Fertigkeit hat kein konfiguriertes Attribut.",
             "TestExpectsVehicleOnly": "Diese Probe kann nur mit einem Fahrzeug-Akteur geworfen werden",
-            "TooManyActionsWithCategory": "Es darf nur eine Aktion mit der Kategorie {category} pro Akteur geben."
+            "TooManyActionsWithCategory": "Es darf nur eine Aktion mit der Kategorie {category} pro Akteur geben.",
+            "KeyNotModifiableByActiveEffect": "Aktiver Effekt Modus Modifizieren kann nur auf mod Felder angewendet werden.",
+            "SourceFieldEmpty": "Das Quelle-Feld ist leer, bitte gib einen gültigen Text für die Quelle ein.",
+            "MissingItemForOpposedTest": "Probe kann nicht durchgeführt werden, da der ausführende Gegenstand jetzt fehlt"
         },
         "Messages": {
             "MarkInvitation": {
@@ -36,13 +38,6 @@
                 "AskForInvite": "Fragt nach einer Markeneinladung für:",
                 "InviteAccepted": "Willkommen im Netzwerk {networkName}, {userName}!"
             }
-        },
-        "MissingRessource": {
-            "Ammo": "Nicht genug Munition zum Feuern",
-            "Edge": "Kein Edge übrig",
-            "Initiative": "Zu geringer Initiative-Wert",
-            "SomeAmmo": "Nicht genug Munition für ausgewählten Feuermodus, Feuermodus-Modifikatoren werden reduziert",
-            "SomeAmmoMelee": "Nicht genug Munition übrig, um zu zuschlagen"
         },
         "Notifications": {
             "AddDevicesToPAN": {
@@ -55,7 +50,10 @@
                 "Item": "Lösche Referenzen zu Item",
                 "Start": "Lösche Netzwerk und Marken Referenzen"
             },
-            "VehicleCannotBeOwnDriver": "Ein Fahrzeug kann nicht der Fahrer von sich selbst sein (dafür ist der Pilot da)"
+            "VehicleCannotBeOwnDriver": "Ein Fahrzeug kann nicht der Fahrer von sich selbst sein (dafür ist der Pilot da)",
+            "CantModifyHostContent": "Hostdaten können nicht von einem IC-Akteur aus verändert werden",
+            "ConsumedEquippedAmmo": "Kugeln von ausgerüsteter Munition abgezogen",
+            "ResetProgressiveRecoil": "Kummulativer Rückstoß zurückgesetzt auf 0 abgefeuerte Kugeln"
         },
         "Warnings": {
             "ActorMissingRequirements": "Der Akteur muss die Voraussetzung der Fertigkeit erfüllen: erwacht oder emergiert",
@@ -72,7 +70,6 @@
             "CantReloadWithoutSpareClip": "Dir sind die Ersatzmagazine ausgegangen!",
             "CantSecondChanceAGlitch": "Kann zweite Chance nicht anwenden. Testergebnis ist ein Patzer.",
             "CantSecondChanceWithoutNoneHits": "Kann zweite Chance nicht anwenden. Keine Würfel ohne Erfolg übrig.",
-            "CantSpendMulitplePointsOfEdge": "Es kann nur ein Punkt Edge für eine Probe oder Handlung gleichzeitig ausgegeben werden.",
             "CantCombineBuyHitsWithEdge": "Erfolge kaufen kann nicht mit zweiter Chance kombiniert werden.",
             "CompilationNotConcluded": "Kompilieren unvollständig. Warte auf Gegenprobe des Sprites, um Schwund zu bestimmen",
             "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge-Punkte können nicht auf Proben ohne Akteur angewendet werden.",
@@ -91,7 +88,17 @@
             "SkillCantBeDefault": "Auf diese Fertigkeit kann keine Probe abgelegt werden, da sie nicht improvisiert werden kann",
             "SkillSetDefaultTypeOutsideCompendium": "Nur Skillsets im konfigurierten Skillset Kompendium beeinflussen neue Akteure.",
             "SummoningNotConcluded": "Herbeirufung unvollständig. Warte auf Gegenprobe des Geists, um Entzug zu bestimmen.",
-            "TokenSelectionNeeded": "Ein oder mehrere Tokens müssen ausgewählt sein"
+            "TokenSelectionNeeded": "Ein oder mehrere Tokens müssen ausgewählt sein",
+            "MissingPdfPager": "Um das Quell-PDF anzuzeigen, muss das Modul pdfpager installiert sein und ein PDF mit passendem Code erstellt werden.",
+            "CantSpendMultiplePointsOfEdge": "Es kann nur ein Punkt Edge für eine Probe oder Handlung gleichzeitig ausgegeben werden.",
+            "NoSelectableToken": "Charakter hat kein auswählbares Token auf der Karte"
+        },
+        "MissingResources": {
+            "Ammo": "Nicht genug Munition zum Feuern",
+            "Edge": "Kein Edge übrig",
+            "Initiative": "Zu geringer Initiative-Wert",
+            "SomeAmmo": "Nicht genug Munition für ausgewählten Feuermodus, Feuermodus-Modifikatoren werden reduziert",
+            "SomeAmmoMelee": "Nicht genug Munition übrig, um zu zuschlagen"
         }
     }
 }

@@ -41,7 +41,15 @@
                     "label": "Ersetze"
                 }
             },
-            "label": "Munition"
+            "label": "Munition",
+            "Labels": {
+                "AmmoFull": "Vollgeladen",
+                "AmmoGelRounds": "Gelmunition",
+                "Bullet": "Kugel",
+                "BulletCount": "Kugeln",
+                "Bullets": "Kugeln",
+                "SpareClips": "Ersatzmagazine"
+            }
         },
         "Armor": {
             "FIELDS": {
@@ -100,7 +108,16 @@
                 "NormalWeapons": "Normale Waffen"
             },
             "Resistances": "Resistenzen",
-            "label": "Panzerung"
+            "label": "Panzerung",
+            "Labels": {
+                "Accessory": "Zubehör",
+                "ArmorHardened": "Verstärkt",
+                "ArmorHardenedFull": "Verstärkte Panzerung",
+                "ArmorValue": "Panzerungswert",
+                "HardenedArmor": "Verstärkte Panzerung",
+                "Immunity": "Immunität",
+                "ImmunityToNormalWeapons": "Immunität gegen normale Waffen"
+            }
         },
         "Device": {
             "FIELDS": {
@@ -109,7 +126,12 @@
                     "label": "Kategorie"
                 }
             },
-            "label": "Gerät"
+            "label": "Gerät",
+            "Categories": {
+                "Commlink": "Kommlink",
+                "Cyberdeck": "Cyberdeck",
+                "RCC": "Riggerkonsole"
+            }
         },
         "Element": {
             "Acid": "Säure",
@@ -377,6 +399,38 @@
                         "label": "Kabellos"
                     }
                 }
+            },
+            "Cyberware": {
+                "Grades": {
+                    "Label": "Kategorie",
+                    "Alpha": "Alphaware",
+                    "Beta": "Betaware",
+                    "Delta": "Deltaware",
+                    "Gamma": "Gammaware",
+                    "Grey": "Greyware",
+                    "Standard": "Standard",
+                    "Used": "Gebraucht"
+                }
+            },
+            "Labels": {
+                "Availability": "Verf.",
+                "Capacity": "Kapazität",
+                "Conceal": "Tarnbarkeit",
+                "Cost": "Kosten",
+                "Equipment": "Ausrüstung",
+                "Gear": "Ausrüstung",
+                "ItemMod": "Gegenstands-Mod",
+                "ItemName": "Gegenstandsname",
+                "License": "Lizenz",
+                "Licenses": "Lizenzen",
+                "Load": "Laden",
+                "Loaded": "Geladen",
+                "ModPoints": "Upgradepunkte",
+                "MountPoint": "Halterung",
+                "Rtg": "Stufe",
+                "RtgAboveZero": "Stf > 0",
+                "Stock": "Schulterstütze",
+                "UnderBarrel": "Unterlaufmontiert"
             }
         },
         "ItemTypes": {
@@ -438,7 +492,23 @@
                     "label": "Art"
                 }
             },
-            "label": "Lebensstil"
+            "label": "Lebensstil",
+            "Attributes": {
+                "Comforts": "Komfort & Grundversorgung",
+                "Guests": "Gäste",
+                "Neighborhood": "Wohngegend",
+                "Security": "Sicherheit"
+            },
+            "Types": {
+                "Label": "Typ",
+                "Street": "Auf der Straße",
+                "Squatter": "Squatter",
+                "Low": "Unterschicht",
+                "Middle": "Mittelschicht",
+                "High": "Oberschicht",
+                "Luxury": "Luxus",
+                "Other": "Anderer"
+            }
         },
         "Modification": {
             "FIELDS": {
@@ -505,7 +575,13 @@
                     "label": "Art"
                 }
             },
-            "label": "Qualität"
+            "label": "Qualität",
+            "Types": {
+                "Label": "Typ",
+                "LifeModule": "Lebensmodul",
+                "Negative": "Nachteil",
+                "Positive": "Vorteil"
+            }
         },
         "Weapon": {
             "AmmoCount": "Munition",
@@ -708,7 +784,19 @@
                 "Range": "Wurfwaffenreichweite"
             },
             "Type": "Typ",
-            "Weapon": "Waffen"
+            "Weapon": "Waffen",
+            "Labels": {
+                "Accuracy": "Präz.",
+                "Barrel": "Laufmontiert",
+                "FireMode": "Feuermodus",
+                "Range": "Reichweite",
+                "Reach": "Reichweite",
+                "Recoil": "Rückstoß",
+                "RecoilCompensation": "Rückstoßkomp."
+            }
+        },
+        "ModificationTypes": {
+            "Ware": "Implantat"
         }
     }
 }

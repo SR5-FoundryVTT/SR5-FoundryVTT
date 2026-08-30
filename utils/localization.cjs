@@ -24,6 +24,25 @@ const MODULES = Object.freeze([
     'ui',
 ]);
 const EXPECTED_BASE_KEY_COUNT = 2545;
+const MODULE_NAMESPACES = Object.freeze({
+    actors: Object.freeze(['Actor', 'ActorTypes', 'Character', 'Contact', 'InventoryRename', 'MovementTypes', 'Vehicle', 'VehicleImport', 'Vision']),
+    items: Object.freeze(['Ammo', 'Armor', 'Device', 'Element', 'Item', 'ItemTypes', 'Lifestyle', 'Modification', 'ModificationTypes', 'MoveInventoryDialog', 'Program', 'Quality', 'Weapon']),
+    'skills-tests': Object.freeze(['ActionCategory', 'ActionType', 'CallInAction', 'ExtendedTestManager', 'ModifierTypes', 'Skill', 'TestResults', 'Tests']),
+    combat: Object.freeze(['Combat', 'Damage', 'DamageApplication']),
+    magic: Object.freeze(['AdeptPower', 'CritterPower', 'Magic', 'Ritual', 'Spell', 'Spirit']),
+    matrix: Object.freeze(['ComplexForm', 'Grid', 'Host', 'IC', 'Matrix', 'MatrixNetworkHackingApplication', 'MatrixOpposedDeviceDialog', 'NetworkManager', 'RebootConfirmationDialog', 'SelectMatrixNetworkDialog', 'Sprite', 'SpritePower']),
+    effects: Object.freeze(['ActiveEffect', 'StatusEffects']),
+    applications: Object.freeze(['ChangelogApplication', 'CompendiumBrowser', 'CompendiumSettings', 'Compendiums', 'DeleteConfirmationApplication', 'EnvModifiersApplication', 'GMRequest', 'Import', 'KarmaManager', 'Migration', 'NuyenManager', 'OverwatchScoreTracker', 'ReputationManager', 'SituationalModifiersApplication', 'TimeControl', 'Tours']),
+    messages: Object.freeze(['Dialogs', 'Errors', 'Messages', 'MissingResources', 'Notifications', 'Warnings']),
+    ui: Object.freeze(['Content', 'ContextOptions', 'Keybindings', 'Labels', 'Tabs', 'Tooltips']),
+});
+const LEGACY_PATH_PREFIXES = Object.freeze([
+    'SR5.COMBAT.', 'SR5.FOUNDRY.', 'SR5.MIGRATION.', 'SR5.Migrator.', 'SR5.DIALOG.', 'SR5.MissingRessource.',
+    'SR5.CompendiaSettings.', 'SR5.Keybinding.', 'SETTINGS.MustHaveRessourcesOnTest',
+    'SR5.Errors.KeyNotModifyableByActiveEffect', 'SR5.Warnings.CantSpendMulitplePointsOfEdge',
+    'SR5.Content.Actions.EnterexitHost', 'SR5.Labels.Actions.HackontheFly', 'SR5.RangeWeaponAttack',
+]);
+const DYNAMIC_REFERENCE_PREFIXES = Object.freeze(['SR5.Skill.Groups', 'SR5.Skill.Sets']);
 
 function isPlainObject(value) {
     return value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -80,6 +99,55 @@ function assertModuleShape(locale, moduleName, fragment) {
     if (roots.length !== 1 || roots[0] !== 'SR5' || !isPlainObject(fragment.SR5)) {
         throw new Error(`${locale}/${moduleName}.json must contain only an SR5 object`);
     }
+
+    if (moduleName === 'common') {
+        const nested = Object.entries(fragment.SR5)
+            .filter(([, value]) => isPlainObject(value))
+            .map(([key]) => key);
+        if (nested.length) throw new Error(`${locale}/common.json must contain only shared scalar SR5 keys: ${nested.join(', ')}`);
+        return;
+    }
+
+    const actualNamespaces = Object.keys(fragment.SR5).sort();
+    const expectedNamespaces = [...MODULE_NAMESPACES[moduleName]].sort();
+    if (JSON.stringify(actualNamespaces) !== JSON.stringify(expectedNamespaces)) {
+        throw new Error(
+            `${locale}/${moduleName}.json namespace set differs from the required set. ` +
+            `Expected ${expectedNamespaces.join(', ')}; found ${actualNamespaces.join(', ')}`,
+        );
+    }
+}
+
+function validateSourceReferences(baseFlat, errors) {
+    const sourceRoot = path.join(PROJECT_ROOT, 'src');
+    const supportedExtensions = new Set(['.ts', '.hbs', '.json']);
+    const files = [];
+    function visit(directory) {
+        for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+            if (entry.name === 'locale') continue;
+            const filePath = path.join(directory, entry.name);
+            if (entry.isDirectory()) visit(filePath);
+            else if (supportedExtensions.has(path.extname(entry.name))) files.push(filePath);
+        }
+    }
+    visit(sourceRoot);
+
+    const referencePattern = /['"`](SR5(?:\.[A-Za-z0-9_]+)+)['"`]/g;
+    for (const filePath of files) {
+        const content = fs.readFileSync(filePath, 'utf8');
+        for (const legacyPrefix of LEGACY_PATH_PREFIXES) {
+            if (content.includes(legacyPrefix)) {
+                errors.push(`${path.relative(PROJECT_ROOT, filePath)} references retired localization path prefix "${legacyPrefix}"`);
+            }
+        }
+        for (const match of content.matchAll(referencePattern)) {
+            const reference = match[1];
+            if (DYNAMIC_REFERENCE_PREFIXES.some((prefix) => reference.startsWith(prefix))) continue;
+            if (reference in baseFlat) continue;
+            if (Object.keys(baseFlat).some((key) => key.startsWith(`${reference}.`))) continue;
+            errors.push(`${path.relative(PROJECT_ROOT, filePath)} references unknown localization key "${reference}"`);
+        }
+    }
 }
 
 function loadLocale(locale) {
@@ -132,6 +200,11 @@ function validateLocales() {
     if (baseKeys.length !== EXPECTED_BASE_KEY_COUNT) {
         errors.push(`English locale has ${baseKeys.length} keys; expected ${EXPECTED_BASE_KEY_COUNT}`);
     }
+    for (const key of baseKeys) {
+        if (LEGACY_PATH_PREFIXES.some((prefix) => key.startsWith(prefix))) {
+            errors.push(`English locale contains retired localization key "${key}"`);
+        }
+    }
 
     for (const locale of LOCALES) {
         let loaded;
@@ -174,6 +247,8 @@ function validateLocales() {
         }
     }
 
+    validateSourceReferences(baseFlat, errors);
+
     if (errors.length) throw new Error(errors.join('\n'));
     return { keyCount: baseKeys.length, locales: [...LOCALES] };
 }
@@ -194,6 +269,7 @@ module.exports = {
     DIST_LOCALE_DIR,
     EXPECTED_BASE_KEY_COUNT,
     LOCALES,
+    MODULE_NAMESPACES,
     MODULES,
     SOURCE_LOCALE_DIR,
     buildLocales,

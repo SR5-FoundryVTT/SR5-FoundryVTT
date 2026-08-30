@@ -45,8 +45,6 @@
         "ImportIconFolderName": "Pasta de Ícones do Importador",
         "MarkImportsDescription": "Demarcar itens recém-importados nas fichas de ator para destacar que eles devem ser revisados",
         "MarkImportsName": "Marcar Importações Recentes",
-        "MustHaveRessourcesOnTest": "Parar Testes com recursos faltando",
-        "MustHaveRessourcesOnTestDescription": "Permitir apenas atores com todos os recursos necessários para rolar um teste",
         "NoMarking": "Não Marcar Importações Recentes",
         "OnlyAllowRollOnDefaultableSkills": "Permite rolar perícias desconhecidas, mesmo sem uso padrão",
         "OnlyAllowRollOnDefaultableSkillsDescription": "Quando desmarcado, perícias desconhecidas podem ser roladas, mesmo que não pudessem normalmente.",
@@ -78,7 +76,9 @@
         "UseDamageConditionDescription": "O sistema marca tokens de acordo com o monitor de condição deles",
         "UseDamageConditionName": "Usar tratamento do sistema para efeitos de status do token",
         "UseImportIconOverridesDescription": "Ao importar itens, use os mesmos ícones para alguns tipos de itens diferentes quando fizer sentido. Desmarque se estiver usando ícones personalizados.",
-        "UseImportIconOverridesName": "Usar Substituições de Ícone do Importador Padrão"
+        "UseImportIconOverridesName": "Usar Substituições de Ícone do Importador Padrão",
+        "MustHaveResourcesOnTest": "Parar Testes com recursos faltando",
+        "MustHaveResourcesOnTestDescription": "Permitir apenas atores com todos os recursos necessários para rolar um teste"
     },
     "TYPES": {
         "Actor": {

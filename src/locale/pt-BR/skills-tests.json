@@ -51,7 +51,6 @@
         },
         "CallInAction": {
             "ActorType": "Tipo de Ator",
-            "Compilation": "Compilação",
             "Compile": "Compilar",
             "CreateCompilation": "Criar ação de compilação",
             "CreateSummoning": "Criar ação de invocação",
@@ -82,7 +81,18 @@
                 }
             },
             "Summon": "Invocar",
-            "Summoning": "Invocação"
+            "Compilation": {
+                "Label": "Compilação",
+                "DropSprite": "Soltar Sprite",
+                "FixedSprite": "Sprite preparado",
+                "SpriteType": "Tipo de Sprite"
+            },
+            "Summoning": {
+                "Label": "Invocação",
+                "DropSpirit": "Largar Espírito",
+                "FixedSpirit": "Prep. Espírito",
+                "SpiritType": "Tipo de Espírito"
+            }
         },
         "ExtendedTestManager": {
             "Actions": {
@@ -376,8 +386,6 @@
                 "Interests": "Interesses",
                 "Street": "Rua"
             },
-            "Groups": {},
-            "Sets": {},
             "Set": {
                 "LogActorDifferences": "Registrar diferenças do ator",
                 "DifferencesLoggedInConsole": "Abra o console do navegador para ver as diferenças"
@@ -470,6 +478,12 @@
             "UnarmedCombat": "Combate Desarmado",
             "abbr": {
                 "Native": "N"
+            },
+            "KnowledgeTypes": {
+                "Academic": "Acadêmico",
+                "Interests": "Interesses",
+                "Professional": "Profissional",
+                "Street": "Rua"
             }
         },
         "TestResults": {
@@ -536,7 +550,90 @@
             "SuccessTest": "Teste de Sucesso",
             "SummonSpiritTest": "Invocar Espírito",
             "SuppressionDefenseTest": "Defesa de Supressão",
-            "ThrownAttackTest": "Ataque de Arma Lançada"
+            "ThrownAttackTest": "Ataque de Arma Lançada",
+            "Labels": {
+                "ActiveDefense": "Defesa Ativa",
+                "Attacker": "Atacante",
+                "AttackerHits": "Acertos do Atacante",
+                "AttackerNetHits": "Acertos Líquidos do Atacante",
+                "BiofeedbackDamage": "Dano de Biofeedback",
+                "BuyHits": "Comprar Acertos",
+                "CanDefault": "Pode Usar Sem Perícia",
+                "Defender": "Defensor",
+                "DefenderNetHits": "Acertos Excedentes do Defensor",
+                "DefenseTest": "Teste de Defesa",
+                "DicePool": "Parada de Dados",
+                "DicePoolModifier": "Mod. da Parada de Dados",
+                "DontApplyWounds": "Não Aplicar Ferimentos",
+                "ExtendedHits": "Sucessos Estendidos",
+                "ExtendedTest": "Teste Estendido",
+                "FadeAttribute": "Atributo de Enfraq",
+                "FadeValue": "Valor de Enfraq",
+                "FullDefense": "Defesa Total",
+                "FullMatrixDefense": "Defesa Matriz Completa",
+                "Hits": "Acertos",
+                "IncomingDamage": "Dano Recebido",
+                "IncomingDrain": "Dreno Recebido",
+                "IncomingFade": "Enfraquecimento Recebido",
+                "MeleeWeaponAttack": "Ataque com Arma Corpo-a-corpo",
+                "NetHits": "Acertos Excedentes",
+                "OpposedType": "Tipo",
+                "OpposingHits": "Acertos de Oposição",
+                "OpposingNetHits": "Acertos Excedentes de Oposição",
+                "OriginalDicePool": "Grupo Original de Dados",
+                "ResultOverride": "Substituição de Resultado",
+                "ResultOverrideGlitches": "Falhas",
+                "ResultOverrideHits": "Acertos",
+                "RollArmor": "Armadura",
+                "RollComposure": "Compostura",
+                "RollCustom": "Personalizado",
+                "RollDefense": "Defesa",
+                "RollDrain": "Drenar",
+                "RollFade": "Enfraq",
+                "RollJudgeIntentions": "J.Intenção",
+                "RollLiftCarry": "Erg/Carreg",
+                "RollMemory": "Memória",
+                "RollMode": "Modo de Rolagem",
+                "RollOneDie": "Você não pode rolar menos de 1 dado, chapa",
+                "RollSoak": "Resistir Dano",
+                "SecondAttribute": "Segundo Atributo",
+                "SecondChance": "Segunda Chance",
+                "Soak": "Resistir Dano",
+                "SoakTest": "Teste de Resistência a Danos",
+                "Successes": "Sucessos",
+                "Suppressing": "Suprimindo",
+                "TargetingNeedsActorWithToken": "O ator atual precisa de um token vinculado para o direcionamento funcionar",
+                "UseEdgeForInitiativeRoll": "Use a regra de vantagem blitz para iniciativa",
+                "RangedWeaponAttack": "Ataque à Distância"
+            },
+            "Duration": {
+                "Label": "Duração",
+                "Types": {
+                    "Instant": "Instantâneo",
+                    "Permanent": "Permanente",
+                    "Sustained": "Sustentado"
+                }
+            },
+            "Limit": {
+                "Label": "Limite",
+                "Types": {
+                    "Astral": "Astral",
+                    "Mental": "Mental",
+                    "Physical": "Físico",
+                    "Social": "Social"
+                }
+            },
+            "Target": {
+                "Label": "Alvo",
+                "Types": {
+                    "Device": "Dispositivo",
+                    "File": "Arquivo",
+                    "Other": "Outro",
+                    "Persona": "Persona",
+                    "Self": "Auto",
+                    "Sprite": "Sprite"
+                }
+            }
         }
     }
 }

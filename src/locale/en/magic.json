@@ -22,6 +22,12 @@
             "Types": {
                 "Active": "Active",
                 "Passive": "Passive"
+            },
+            "Labels": {
+                "Echo": "Echo",
+                "Echoes": "Echoes",
+                "Metamagic": "Metamagic",
+                "Metamagics": "Metamagics"
             }
         },
         "CritterPower": {
@@ -216,7 +222,15 @@
             "Spells": "Spells",
             "Type": "Type",
             "TypeMana": "Mana",
-            "TypePhysical": "Physical"
+            "TypePhysical": "Physical",
+            "QuickInfo": {
+                "DrainForce": "Drain F{sign}{drain}"
+            },
+            "Labels": {
+                "DetectionSpellExtended": "Extended",
+                "NormalSpellButton": "Normal",
+                "RecklessSpellButton": "Reckless"
+            }
         },
         "Spirit": {
             "Bound": "Bound",
@@ -317,6 +331,20 @@
                 "Water": "Water",
                 "Worker": "Insect Worker",
                 "Wraith": "Wraith"
+            }
+        },
+        "Magic": {
+            "Labels": {
+                "Awakened": "Awakened",
+                "Emerged": "Emerged",
+                "Mundane": "Mundane",
+                "Magic": "Magic",
+                "PowerLevel": "Level",
+                "PowerPoints": "PP",
+                "PowerType": "Type",
+                "Powers": "Powers",
+                "PP": "PP",
+                "SpiritType": "Spirit Type"
             }
         }
     }

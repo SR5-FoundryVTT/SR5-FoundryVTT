@@ -76,10 +76,10 @@ export class Helpers {
         if (typeof atts === 'boolean') return atts;
         // array of labels to check for on the incoming data
         const matrixLabels = [
-            'SR5.MatrixAttrFirewall',
-            'SR5.MatrixAttrDataProc',
-            'SR5.MatrixAttrSleaze',
-            'SR5.MatrixAttrAttack',
+            'SR5.Matrix.Attributes.Firewall',
+            'SR5.Matrix.Attributes.DataProcessing',
+            'SR5.Matrix.Attributes.Sleaze',
+            'SR5.Matrix.Attributes.Attack',
             'SR5.Skill.Computer',
             'SR5.Skill.Hacking',
             'SR5.Skill.Cybercombat',
@@ -895,7 +895,7 @@ export class Helpers {
      * @returns translation
      */
     static getAttributeTranslation(attribute: string): string {
-        return game.i18n.localize(`SR5.Attr${this.capitalizeFirstLetter(attribute)}` as Translation)
+        return game.i18n.localize(`SR5.Actor.Attributes.${this.capitalizeFirstLetter(attribute)}` as Translation)
     }
 
     /**

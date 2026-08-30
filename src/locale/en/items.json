@@ -41,7 +41,15 @@
                     "label": "Replace"
                 }
             },
-            "label": "Ammo"
+            "label": "Ammo",
+            "Labels": {
+                "AmmoFull": "Ammo Full",
+                "AmmoGelRounds": "Gel Rounds",
+                "Bullet": "Round",
+                "BulletCount": "Bullet Count",
+                "Bullets": "Rounds",
+                "SpareClips": "Spare Clips"
+            }
         },
         "Armor": {
             "FIELDS": {
@@ -100,7 +108,16 @@
                 "NormalWeapons": "Normal Weapons"
             },
             "Resistances": "Resistances",
-            "label": "Armor"
+            "label": "Armor",
+            "Labels": {
+                "Accessory": "Accessory",
+                "ArmorHardened": "Hardened",
+                "ArmorHardenedFull": "Hardened Armor",
+                "ArmorValue": "Armor Value",
+                "HardenedArmor": "Hardened Armor",
+                "Immunity": "Immunity",
+                "ImmunityToNormalWeapons": "Immunity To Normal Weapons"
+            }
         },
         "Device": {
             "FIELDS": {
@@ -109,7 +126,12 @@
                     "label": "Device Type"
                 }
             },
-            "label": "Device"
+            "label": "Device",
+            "Categories": {
+                "Commlink": "Commlink",
+                "Cyberdeck": "Cyberdeck",
+                "RCC": "Rigger Command Console"
+            }
         },
         "Element": {
             "Acid": "Acid",
@@ -377,6 +399,38 @@
                         "label": "Wireless"
                     }
                 }
+            },
+            "Cyberware": {
+                "Grades": {
+                    "Label": "Grade",
+                    "Alpha": "Alphaware",
+                    "Beta": "Betaware",
+                    "Delta": "Deltaware",
+                    "Gamma": "Gammaware",
+                    "Grey": "Greyware",
+                    "Standard": "Standard",
+                    "Used": "Used"
+                }
+            },
+            "Labels": {
+                "Availability": "Avail",
+                "Capacity": "Capacity",
+                "Conceal": "Conceal",
+                "Cost": "Cost",
+                "Equipment": "Equipment",
+                "Gear": "Gear",
+                "ItemMod": "Item Mod",
+                "ItemName": "Item Name",
+                "License": "License",
+                "Licenses": "Licenses",
+                "Load": "Load",
+                "Loaded": "Loaded",
+                "ModPoints": "Mod Points",
+                "MountPoint": "Mount Point",
+                "Rtg": "Rtg",
+                "RtgAboveZero": "Rtg > 0",
+                "Stock": "Stock",
+                "UnderBarrel": "Under Barrel"
             }
         },
         "ItemTypes": {
@@ -438,7 +492,23 @@
                     "label": "Lifestyle Type"
                 }
             },
-            "label": "Lifestyle"
+            "label": "Lifestyle",
+            "Attributes": {
+                "Comforts": "Comforts",
+                "Guests": "Guests",
+                "Neighborhood": "Neighborhood",
+                "Security": "Security"
+            },
+            "Types": {
+                "Label": "Type",
+                "Street": "Street",
+                "Squatter": "Squatter",
+                "Low": "Low",
+                "Middle": "Medium",
+                "High": "High",
+                "Luxury": "Luxury",
+                "Other": "Other"
+            }
         },
         "Modification": {
             "FIELDS": {
@@ -505,7 +575,13 @@
                     "label": "Quality Type"
                 }
             },
-            "label": "Quality"
+            "label": "Quality",
+            "Types": {
+                "Label": "Type",
+                "LifeModule": "Life Module",
+                "Negative": "Negative",
+                "Positive": "Positive"
+            }
         },
         "Weapon": {
             "AmmoCount": "Ammo Count",
@@ -708,7 +784,19 @@
                 "Range": "Thrown Weapon Range"
             },
             "Type": "Type",
-            "Weapon": "Weapon"
+            "Weapon": "Weapon",
+            "Labels": {
+                "Accuracy": "Accuracy",
+                "Barrel": "Barrel",
+                "FireMode": "Fire Mode",
+                "Range": "Range",
+                "Reach": "Reach",
+                "Recoil": "Recoil",
+                "RecoilCompensation": "RC"
+            }
+        },
+        "ModificationTypes": {
+            "Ware": "Ware"
         }
     }
 }
