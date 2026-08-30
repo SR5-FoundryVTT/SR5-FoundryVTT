@@ -18,7 +18,7 @@ function readJson(filePath) {
 }
 
 function readLegacyLocale(locale) {
-    const content = execFileSync('git', ['show', `HEAD:public/locale/${locale}/config.json`], {
+    const content = execFileSync('git', ['show', `origin/master:public/locale/${locale}/config.json`], {
         cwd: projectRoot,
         encoding: 'utf8',
     });
@@ -110,8 +110,13 @@ const baseFlat = localization.flattenObject(base);
 for (const [locale, language] of targets) {
     const legacy = readLegacyLocale(locale);
     const legacyFlat = localization.flattenObject(legacy);
+    const currentFlat = localization.flattenObject(localization.loadLocale(locale).data);
     const missing = Object.entries(baseFlat)
-        .filter(([key]) => !(key in legacyFlat) || (typeof legacyFlat[key] === 'string' && !legacyFlat[key].trim()))
+        .filter(([key, value]) => {
+            const originallyMissing = !(key in legacyFlat)
+                || (typeof legacyFlat[key] === 'string' && !legacyFlat[key].trim());
+            return originallyMissing && currentFlat[key] === value;
+        })
         .map(([key, value], index) => ({ index, key, value }));
     const batches = batchesOf(missing);
     console.log(`${locale}: translating ${missing.length} strings in ${batches.length} batches`);

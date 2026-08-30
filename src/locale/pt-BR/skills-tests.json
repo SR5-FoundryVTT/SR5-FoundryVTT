@@ -58,26 +58,26 @@
             "FIELDS": {
                 "actor_type": {
                     "hint": "Type of Actor this action summons",
-                    "label": "Type"
+                    "label": "Tipo"
                 },
                 "spirit": {
                     "force": {
                         "hint": "Force of Spirit to Summon. Disabled if a Spirit Actor is set",
-                        "label": "Force"
+                        "label": "Força"
                     },
                     "type": {
                         "hint": "Type of Spirit to Summon. Disabled if a Spirit Actor is set",
-                        "label": "Spirit Type"
+                        "label": "Tipo de Espírito"
                     }
                 },
                 "sprite": {
                     "level": {
                         "hint": "Level of Sprite to Summon. Disabled if a Sprite Actor is set",
-                        "label": "Level"
+                        "label": "Nível"
                     },
                     "type": {
                         "hint": "Type of Sprite to Compile. Disabled if a Sprite Actor is set",
-                        "label": "Sprite Type"
+                        "label": "Tipo de Sprite"
                     }
                 }
             },
@@ -236,7 +236,7 @@
             "JudgeIntentions": "J. Intenções",
             "LiftCarry": "Erg/Carreg",
             "MarkDamage": "Per Mark Damage",
-            "Marks": "Marks",
+            "Marks": "Marcas",
             "MatrixDice": "Dados de Inic. da Matriz",
             "MatrixInit": "Inic. da Matriz",
             "MatrixTrack": "Monitor da Matriz",
@@ -266,7 +266,7 @@
         "Skill": {
             "FIELDS": {
                 "type": {
-                    "label": "Type",
+                    "label": "Tipo",
                     "hint": "Defines what kind of skill configurations are available"
                 },
                 "skill": {
@@ -279,25 +279,25 @@
                         "hint": "Type of knowledge skill"
                     },
                     "rating": {
-                        "label": "Rating",
+                        "label": "Nível",
                         "hint": "Rating of this entry"
                     },
                     "defaulting": {
-                        "label": "Defaulting",
+                        "label": "Padrão",
                         "hint": "If this skill can be defaulted"
                     },
                     "attribute": {
-                        "label": "Attribute",
+                        "label": "Atributo",
                         "hint": "Attribute used by this skill"
                     },
                     "limit": {
                         "attribute": {
-                            "label": "Limit",
+                            "label": "Limite",
                             "hint": "Limit to use for this skill action. Leave empty to use default attribute limit."
                         }
                     },
                     "specializations": {
-                        "label": "Specialization",
+                        "label": "Especialização",
                         "hint": "Specialization for this skill, if any"
                     },
                     "language": {
@@ -315,11 +315,11 @@
                     "label": "Skill Group",
                     "hint": "Configuration for a skill group",
                     "skills": {
-                        "label": "Skills",
+                        "label": "Perícias",
                         "hint": "Skills that are part of this group"
                     },
                     "rating": {
-                        "label": "Rating",
+                        "label": "Nível",
                         "hint": "Rating of this skill group"
                     }
                 },
@@ -331,18 +331,18 @@
                         "hint": "Add this skill set to newly created actors"
                     },
                     "skills": {
-                        "label": "Skills",
+                        "label": "Perícias",
                         "hint": "Skills that are part of this set",
                         "name": {
-                            "label": "Name",
+                            "label": "Nome",
                             "hint": "Name of the skill"
                         },
                         "rating": {
-                            "label": "Rating",
+                            "label": "Nível",
                             "hint": "Rating of this skill"
                         },
                         "specializations": {
-                            "label": "Specialization",
+                            "label": "Especialização",
                             "hint": "Specializations granted to this skill when the set is applied"
                         }
                     },
@@ -350,31 +350,31 @@
                         "label": "Skill Groups",
                         "hint": "Skill groups that are part of this set",
                         "name": {
-                            "label": "Name",
+                            "label": "Nome",
                             "hint": "Name of the skill group"
                         },
                         "rating": {
-                            "label": "Rating",
+                            "label": "Nível",
                             "hint": "Rating of this skill group"
                         }
                     }
                 }
             },
             "Types": {
-                "Skill": "Skill",
+                "Skill": "Perícia",
                 "Group": "Skill Group",
                 "Set": "Skill Set"
             },
             "Category": {
-                "Active": "Active",
+                "Active": "Ativo",
                 "Knowledge": "Knowledge",
                 "Language": "Language"
             },
             "KnowledgeType": {
-                "Academic": "Academic",
-                "Professional": "Professional",
-                "Interests": "Interests",
-                "Street": "Street"
+                "Academic": "Acadêmico",
+                "Professional": "Profissional",
+                "Interests": "Interesses",
+                "Street": "Rua"
             },
             "Groups": {},
             "Sets": {},

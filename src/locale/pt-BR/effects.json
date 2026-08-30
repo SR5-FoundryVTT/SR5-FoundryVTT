@@ -21,7 +21,7 @@
                 },
                 "applyTo": {
                     "hint": "Apply-To different Targets",
-                    "label": "Apply-To"
+                    "label": "Aplicar a"
                 },
                 "onlyForEquipped": {
                     "hint": "Apply for equipped item only",

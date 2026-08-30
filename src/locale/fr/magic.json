@@ -8,7 +8,7 @@
                 },
                 "level": {
                     "hint": "Level of this Adept Power (if applicable)",
-                    "label": "Level"
+                    "label": "Niveau"
                 },
                 "pp": {
                     "hint": "Number of Power Points this Power Costs",
@@ -48,7 +48,7 @@
             "FIELDS": {
                 "duration": {
                     "hint": "Duration of the Critter Power",
-                    "label": "Duration"
+                    "label": "Durée"
                 },
                 "karma": {
                     "hint": "Karma cost of the Critter Power",
@@ -64,7 +64,7 @@
                 },
                 "range": {
                     "hint": "Range of the Critter Power",
-                    "label": "Range"
+                    "label": "Portée"
                 }
             },
             "IsOptional": "Optionel",
@@ -94,7 +94,7 @@
             "FIELDS": {
                 "descriptors": {
                     "hint": "Descriptors for the Ritual",
-                    "label": "Descriptors"
+                    "label": "Descripteurs"
                 },
                 "type": {
                     "hint": "Type of Ritual to Perform",
@@ -151,11 +151,11 @@
                 },
                 "drain": {
                     "hint": "Drain Value of the spell, this is is added to the Force of the spell to Resist Drain",
-                    "label": "Drain Value"
+                    "label": "Valeur drain"
                 },
                 "duration": {
                     "hint": "Duration of the Spell",
-                    "label": "Duration"
+                    "label": "Durée"
                 },
                 "illusion": {
                     "sense": {
@@ -170,24 +170,24 @@
                 "manipulation": {
                     "damaging": {
                         "hint": "If the Spell deals Damage",
-                        "label": "Damaging"
+                        "label": "Destruction"
                     },
                     "environmental": {
                         "hint": "These spells don’t really have a target, and they don’t really affect targets directly. They just affect an area.",
-                        "label": "Environmental"
+                        "label": "Environnemental"
                     },
                     "mental": {
                         "hint": "If the Spell affects targets Mentally",
-                        "label": "Mental"
+                        "label": "Mentale"
                     },
                     "physical": {
                         "hint": "These spells affect physical forms and are usually defended against",
-                        "label": "Physical"
+                        "label": "Physique"
                     }
                 },
                 "range": {
                     "hint": "Range of the Spell",
-                    "label": "Range"
+                    "label": "Portée"
                 },
                 "ritual": {
                     "type": {

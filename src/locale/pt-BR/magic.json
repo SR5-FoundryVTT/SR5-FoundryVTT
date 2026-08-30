@@ -8,7 +8,7 @@
                 },
                 "level": {
                     "hint": "Level of this Adept Power (if applicable)",
-                    "label": "Level"
+                    "label": "Nível"
                 },
                 "pp": {
                     "hint": "Number of Power Points this Power Costs",
@@ -48,11 +48,11 @@
             "FIELDS": {
                 "duration": {
                     "hint": "Duration of the Critter Power",
-                    "label": "Duration"
+                    "label": "Duração"
                 },
                 "karma": {
                     "hint": "Karma cost of the Critter Power",
-                    "label": "Karma"
+                    "label": "Carma"
                 },
                 "optional": {
                     "hint": "If the Critter Power is Optional",
@@ -94,7 +94,7 @@
             "FIELDS": {
                 "descriptors": {
                     "hint": "Descriptors for the Ritual",
-                    "label": "Descriptors"
+                    "label": "Descritores"
                 },
                 "type": {
                     "hint": "Type of Ritual to Perform",
@@ -138,11 +138,11 @@
                 "detection": {
                     "extended": {
                         "hint": "If the Spell is Extended",
-                        "label": "Extended"
+                        "label": "Estendido"
                     },
                     "passive": {
                         "hint": "If the Spell is Passive",
-                        "label": "Passive"
+                        "label": "Passivo"
                     },
                     "type": {
                         "hint": "How the Spell affects targets",
@@ -151,11 +151,11 @@
                 },
                 "drain": {
                     "hint": "Drain Value of the spell, this is is added to the Force of the spell to Resist Drain",
-                    "label": "Drain Value"
+                    "label": "Valor de Dreno"
                 },
                 "duration": {
                     "hint": "Duration of the Spell",
-                    "label": "Duration"
+                    "label": "Duração"
                 },
                 "illusion": {
                     "sense": {
@@ -170,11 +170,11 @@
                 "manipulation": {
                     "damaging": {
                         "hint": "If the Spell deals Damage",
-                        "label": "Damaging"
+                        "label": "Danoso"
                     },
                     "environmental": {
                         "hint": "These spells don’t really have a target, and they don’t really affect targets directly. They just affect an area.",
-                        "label": "Environmental"
+                        "label": "Ambiental"
                     },
                     "mental": {
                         "hint": "If the Spell affects targets Mentally",
@@ -182,7 +182,7 @@
                     },
                     "physical": {
                         "hint": "These spells affect physical forms and are usually defended against",
-                        "label": "Physical"
+                        "label": "Físico"
                     }
                 },
                 "range": {

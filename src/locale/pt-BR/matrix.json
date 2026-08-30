@@ -3,13 +3,13 @@
         "ComplexForm": {
             "Durations": {
                 "Immediate": "Immediate",
-                "Permanent": "Permanent",
-                "Sustained": "Sustained"
+                "Permanent": "Permanente",
+                "Sustained": "Sustentado"
             },
             "FIELDS": {
                 "duration": {
                     "hint": "Immediate (it happens instantly with no lasting effects), Sustained (you can sustain it), or Permanent (if you sustain it for its Level in Combat Turns, its effects remain after you stop sustaining it).",
-                    "label": "Duration"
+                    "label": "Duração"
                 },
                 "fade": {
                     "hint": "The Fading Value is added to the Level chosen when threading to determine the amount of damage to be resisted",
@@ -17,7 +17,7 @@
                 },
                 "target": {
                     "hint": "Valid Target types for the Complex Form",
-                    "label": "Target"
+                    "label": "Alvo"
                 }
             }
         },
@@ -41,10 +41,10 @@
             "FIELDS": {
                 "host": {
                     "hint": "On which host this IC is running",
-                    "label": "Host",
+                    "label": "Central",
                     "rating": {
                         "hint": "Rating of the Host we are running on",
-                        "label": "Rating"
+                        "label": "Nível"
                     }
                 },
                 "icType": {
@@ -88,18 +88,18 @@
             "ConnectedTo": "Connected To",
             "HackOnTheFly": "Hack on the Fly",
             "InviteMark": "Ask to Invite a Mark",
-            "NetworkType": "Type",
+            "NetworkType": "Tipo",
             "NoNetwork": "Not Connected",
             "Title": "Network Manager"
         },
         "RebootConfirmationDialog": {
-            "Cancel": "Cancel",
+            "Cancel": "Cancelar",
             "Confirm": "Reboot",
             "Description": "Are you sure you want to reboot this device?",
             "Title": "Confirm Reboot"
         },
         "SelectMatrixNetworkDialog": {
-            "Cancel": "Cancel",
+            "Cancel": "Cancelar",
             "Connect": "Connect",
             "Title": "Select a Network"
         },
@@ -107,23 +107,23 @@
             "FIELDS": {
                 "level": {
                     "hint": "Level of the Sprite",
-                    "label": "Level"
+                    "label": "Nível"
                 },
                 "registered": {
                     "hint": "If the Sprite is Registered",
-                    "label": "Registered"
+                    "label": "Registrada"
                 },
                 "services": {
                     "hint": "Number of Services the Sprite has",
-                    "label": "Services"
+                    "label": "Serviços"
                 },
                 "spriteType": {
                     "hint": "Type of the Sprite",
-                    "label": "Sprite Type"
+                    "label": "Tipo de Sprite"
                 },
                 "technomancerUuid": {
                     "hint": "Technomancer who compiled this Sprite",
-                    "label": "Technomancer"
+                    "label": "Tecnomante"
                 }
             },
             "Level": "Nível",
@@ -145,16 +145,16 @@
         },
         "SpritePower": {
             "Durations": {
-                "Always": "Always",
-                "Instant": "Instant",
-                "Permanent": "Permanent",
-                "Special": "Special",
-                "Sustained": "Sustained"
+                "Always": "Sempre",
+                "Instant": "Instantâneo",
+                "Permanent": "Permanente",
+                "Special": "Especial",
+                "Sustained": "Sustentado"
             },
             "FIELDS": {
                 "duration": {
                     "hint": "Duration of the Sprite Power",
-                    "label": "Duration"
+                    "label": "Duração"
                 },
                 "optional": {
                     "hint": "If the Sprite Power is Optional",

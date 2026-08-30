@@ -6,7 +6,7 @@
                     "edge": {
                         "base": {
                             "hint": "Edge is a character’s luck, the favor of the gods, that unexplainable factor that allows her to beat the odds.",
-                            "label": "Edge"
+                            "label": "Trunfo"
                         }
                     }
                 },
@@ -18,19 +18,19 @@
                 },
                 "full_defense_attribute": {
                     "hint": "Attribute to use when using the Full Defense interrupt action",
-                    "label": "Full Defense Attribute"
+                    "label": "Atributo de Defesa Total"
                 },
                 "magic": {
                     "attribute": {
                         "hint": "Attribute the Mage/Adept uses when resisting Drain",
-                        "label": "Drain Attribute"
+                        "label": "Atributo de Dreno"
                     },
-                    "label": "Magic"
+                    "label": "Magia"
                 },
                 "modifiers": {
                     "armor": {
                         "hint": "Modifies total armor value",
-                        "label": "Armor"
+                        "label": "Armadura"
                     },
                     "astral_initiative": {
                         "hint": "Modifies astral initiative base",
@@ -42,35 +42,35 @@
                     },
                     "astral_limit": {
                         "hint": "Modifies astral limit",
-                        "label": "Astral Limit"
+                        "label": "Limite Astral"
                     },
                     "composure": {
                         "hint": "Modifies composure tests pool",
-                        "label": "Composure"
+                        "label": "Compostura"
                     },
                     "defense": {
                         "hint": "Modifies defense tests pool",
-                        "label": "Defense"
+                        "label": "Defesa"
                     },
                     "defense_block": {
                         "hint": "Adds to the defense modifier for active blocking",
-                        "label": "Defense (Block)"
+                        "label": "Defesa (Bloqueio)"
                     },
                     "defense_dodge": {
                         "hint": "Adds to the defense modifier for active dodging",
-                        "label": "Defense (Dodge)"
+                        "label": "Defesa (Esquiva)"
                     },
                     "defense_melee": {
                         "hint": "Adds to the defense modifier for melee defense",
-                        "label": "Defense (Melee)"
+                        "label": "Defesa (Corpo-a-Corpo)"
                     },
                     "defense_parry": {
                         "hint": "Adds to the defense modifier for active parrying",
-                        "label": "Defense (Parry)"
+                        "label": "Defesa (Aparar)"
                     },
                     "defense_ranged": {
                         "hint": "Adds to the defense modifier for ranged attack",
-                        "label": "Defense (Ranged)"
+                        "label": "Defesa (Distância)"
                     },
                     "drain": {
                         "hint": "Modifies drain tests pool",
@@ -110,7 +110,7 @@
                     },
                     "matrix_track": {
                         "hint": "Modifies matrix damage track",
-                        "label": "Matrix Track"
+                        "label": "Monitor da Matriz"
                     },
                     "meat_initiative": {
                         "hint": "Modifies physical initiative base",
@@ -122,11 +122,11 @@
                     },
                     "memory": {
                         "hint": "Modifies memory tests pool",
-                        "label": "Memory"
+                        "label": "Memória"
                     },
                     "mental_limit": {
                         "hint": "Modifies mental limit",
-                        "label": "Mental Limit"
+                        "label": "Limite Mental"
                     },
                     "multi_defense": {
                         "hint": "Modifies defense tests pool for multiple defenses per combat turn",
@@ -142,15 +142,15 @@
                     },
                     "physical_limit": {
                         "hint": "Modifies physical limit",
-                        "label": "Physical Limit"
+                        "label": "Limite Físico"
                     },
                     "physical_overflow_track": {
                         "hint": "Modifies physical overflow damage track",
-                        "label": "Physical Overflow Track"
+                        "label": "Monitor de Excesso de Dano"
                     },
                     "physical_track": {
                         "hint": "Modifies physical damage track",
-                        "label": "Physical Track"
+                        "label": "Monitor Físico"
                     },
                     "place_three_marks": {
                         "hint": "Modifies the modifier to place three marks at the same time",
@@ -166,15 +166,15 @@
                     },
                     "reach": {
                         "hint": "Modifies reach of melee attacks",
-                        "label": "Reach"
+                        "label": "Alcance"
                     },
                     "recoil": {
                         "hint": "Modifies recoil tests pool",
-                        "label": "Recoil"
+                        "label": "Recuo"
                     },
                     "run": {
                         "hint": "Modifies running distance by multiples of the agility attribute",
-                        "label": "Run"
+                        "label": "Correr"
                     },
                     "soak": {
                         "hint": "Modifies physical damage resist tests pool",
@@ -182,31 +182,31 @@
                     },
                     "social_limit": {
                         "hint": "Modifies social limit",
-                        "label": "Social Limit"
+                        "label": "Limite Social"
                     },
                     "stun_track": {
                         "hint": "Modifies stun damage track",
-                        "label": "Stun Track"
+                        "label": "Monitor de Atordoamento"
                     },
                     "walk": {
                         "hint": "Modifies walking distance by multiples of the agility attribute",
-                        "label": "Walk"
+                        "label": "Caminhar"
                     },
                     "wound_tolerance": {
                         "hint": "Modifies damage per wound modifier",
-                        "label": "Wound Tolerance"
+                        "label": "Tolerância à Ferida"
                     }
                 },
                 "special": {
                     "hint": "Select if the character is Awakened (mage/adept) or Emerged (technomancer)",
-                    "label": "Awakened/Emerged"
+                    "label": "Desperto/Emergido"
                 },
                 "technomancer": {
                     "attribute": {
                         "hint": "Attribute the Technomancer uses when resisting Fade",
-                        "label": "Fade Attribute"
+                        "label": "Atributo de Enfraq"
                     },
-                    "label": "Technomancer"
+                    "label": "Tecnomante"
                 }
             },
             "NoFavoritesSelected": "No favorites have been selected"
@@ -221,17 +221,17 @@
         "Character": {
             "FIELDS": {
                 "is_critter": {
-                    "hint": "Allow the use of critter powers",
+                    "hint": "Permitir o uso de poderes de criatura",
                     "label": "Is Critter"
                 },
                 "is_npc": {
-                    "hint": "Mark actor as NPC to get additional features",
+                    "hint": "Marque o ator como NPC para obter recursos adicionais",
                     "label": "Is NPC"
                 },
                 "karma": {
                     "max": {
                         "hint": "Amount of Karma this Character has accumulated",
-                        "label": "Career Karma"
+                        "label": "Carma de Carreira"
                     },
                     "value": {
                         "hint": "Amount of Karma this Character has available",
@@ -244,11 +244,11 @@
                 },
                 "metatype": {
                     "hint": "Metatype of the Character. If an NPC, this will adjust attributes",
-                    "label": "Metatype"
+                    "label": "Metatipo"
                 },
                 "notoriety": {
                     "hint": "The negative side of the character’s reputation",
-                    "label": "Notoriety"
+                    "label": "Notoriedade"
                 },
                 "npc": {
                     "is_grunt": {
@@ -262,11 +262,11 @@
                 },
                 "public_awareness": {
                     "hint": "How well the character is known among the media, authorities, and public at large",
-                    "label": "Public Awareness"
+                    "label": "Consciência Pública"
                 },
                 "street_cred": {
                     "hint": "A character’s lifetime accomplishments",
-                    "label": "Street Cred"
+                    "label": "Crédito de Rua"
                 }
             },
             "Modifiers": {
@@ -287,31 +287,31 @@
             "FIELDS": {
                 "blackmail": {
                     "hint": "You have something that can be held over the contact to get them to do business.",
-                    "label": "Blackmail"
+                    "label": "Chantagem"
                 },
                 "connection": {
                     "hint": "This measures the contact’s influence on a scale of 1 to 12. The higher the Connection Rating, the more juice the contact has.",
-                    "label": "Connection"
+                    "label": "Conexão"
                 },
                 "family": {
                     "hint": "Blood is always thicker than water, this is true for having family as contacts.",
-                    "label": "Family"
+                    "label": "Família"
                 },
                 "group": {
                     "hint": "Contact is a Group; could be a gang, corp, or some nerds",
-                    "label": "Group"
+                    "label": "Grupo"
                 },
                 "linkedActor": {
                     "hint": "Actor that this Contact represents",
-                    "label": "Actor"
+                    "label": "Ator"
                 },
                 "loyalty": {
                     "hint": "This shows you how much you can trust the contact, measured on a scale of 1 to 6. The higher the Loyalty Rating, the more the contact is willing to do for you",
-                    "label": "Loyalty"
+                    "label": "Lealdade"
                 },
                 "type": {
                     "hint": "Contact Type determines what kind of access they have for gear, jobs, info, etc.",
-                    "label": "Type"
+                    "label": "Tipo"
                 }
             },
             "Family": "Família",
@@ -323,7 +323,7 @@
             "Type": "Tipo"
         },
         "InventoryRename": {
-            "Cancel": "Cancel",
+            "Cancel": "Cancelar",
             "NewName": "New Name",
             "Submit": "Submit",
             "Title": "Rename Inventory"

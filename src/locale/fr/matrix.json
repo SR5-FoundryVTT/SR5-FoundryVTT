@@ -4,20 +4,20 @@
             "Durations": {
                 "Immediate": "Immediate",
                 "Permanent": "Permanent",
-                "Sustained": "Sustained"
+                "Sustained": "Maintenu"
             },
             "FIELDS": {
                 "duration": {
                     "hint": "Immediate (it happens instantly with no lasting effects), Sustained (you can sustain it), or Permanent (if you sustain it for its Level in Combat Turns, its effects remain after you stop sustaining it).",
-                    "label": "Duration"
+                    "label": "Durée"
                 },
                 "fade": {
                     "hint": "The Fading Value is added to the Level chosen when threading to determine the amount of damage to be resisted",
-                    "label": "Fade"
+                    "label": "Technodrain"
                 },
                 "target": {
                     "hint": "Valid Target types for the Complex Form",
-                    "label": "Target"
+                    "label": "Cible"
                 }
             }
         },
@@ -44,7 +44,7 @@
                     "label": "Host",
                     "rating": {
                         "hint": "Rating of the Host we are running on",
-                        "label": "Rating"
+                        "label": "Indice"
                     }
                 },
                 "icType": {
@@ -55,7 +55,7 @@
             "MissingHost": "Drag&Drop a host item",
             "Type": "Type",
             "Types": {
-                "Acid": "Acid",
+                "Acid": "Acide",
                 "Binder": "Binder",
                 "BlackIC": "Black IC",
                 "Blaster": "Blaster",
@@ -93,13 +93,13 @@
             "Title": "Network Manager"
         },
         "RebootConfirmationDialog": {
-            "Cancel": "Cancel",
+            "Cancel": "Annuler",
             "Confirm": "Reboot",
             "Description": "Are you sure you want to reboot this device?",
             "Title": "Confirm Reboot"
         },
         "SelectMatrixNetworkDialog": {
-            "Cancel": "Cancel",
+            "Cancel": "Annuler",
             "Connect": "Connect",
             "Title": "Select a Network"
         },
@@ -107,15 +107,15 @@
             "FIELDS": {
                 "level": {
                     "hint": "Level of the Sprite",
-                    "label": "Level"
+                    "label": "Niveau"
                 },
                 "registered": {
                     "hint": "If the Sprite is Registered",
-                    "label": "Registered"
+                    "label": "Inscrit"
                 },
                 "services": {
                     "hint": "Number of Services the Sprite has",
-                    "label": "Services"
+                    "label": "Tâches"
                 },
                 "spriteType": {
                     "hint": "Type of the Sprite",
@@ -145,16 +145,16 @@
         },
         "SpritePower": {
             "Durations": {
-                "Always": "Always",
-                "Instant": "Instant",
+                "Always": "Toujours",
+                "Instant": "Instantané",
                 "Permanent": "Permanent",
-                "Special": "Special",
-                "Sustained": "Sustained"
+                "Special": "Spécial",
+                "Sustained": "Maintenu"
             },
             "FIELDS": {
                 "duration": {
                     "hint": "Duration of the Sprite Power",
-                    "label": "Duration"
+                    "label": "Durée"
                 },
                 "optional": {
                     "hint": "If the Sprite Power is Optional",

@@ -27,7 +27,7 @@
             "ActionsPacksSection": "Actions Compendiums",
             "SkillsPack": {
                 "hint": "This compendium will be used for all skills.",
-                "label": "Skills"
+                "label": "Compétences"
             },
             "SkillGroupsPack": {
                 "hint": "This compendium will be used for skill groups.",
@@ -65,7 +65,7 @@
             "sr5modification": "Modifications",
             "sr5trait": "Quality & Powers",
             "sr5ware": "Bioware & Cyberware",
-            "sr5weapon": "Weapons"
+            "sr5weapon": "Armes"
         },
         "DeleteConfirmationApplication": {
             "Cancel": "Non",
@@ -136,7 +136,7 @@
             }
         },
         "KarmaManager": {
-            "Cancel": "Cancel",
+            "Cancel": "Annuler",
             "CareerKarma": "Amount of Career Karma the Character has accumulated",
             "CurrentKarma": "Amount of Karma the Character currently has",
             "FinalCareerKarma": "Career Karma the Character will have upon submitting",
@@ -174,7 +174,7 @@
             }
         },
         "NuyenManager": {
-            "Cancel": "Cancel",
+            "Cancel": "Annuler",
             "CurrentNuyen": "Amount of Nuyen the Character currently has",
             "FinalNuyen": "Final Amount of Nuyen upon Submitting",
             "Submit": "Submit",
@@ -191,9 +191,9 @@
         },
         "SituationalModifiersApplication": {
             "Category": {
-                "Magic": "Magic",
-                "Matrix": "Matrix",
-                "Physical": "Physical"
+                "Magic": "Magie",
+                "Matrix": "Matrice",
+                "Physical": "Physique"
             },
             "ClearLocalAll": "Remove local modifiers",
             "ClearLocalAllTokens": "Remove all token modifiers on scene",
@@ -203,8 +203,8 @@
             "Matrix": {
                 "Noise": "Noise"
             },
-            "Title": "Situational Modifiers",
-            "Total": "Result"
+            "Title": "Modificateurs situationnels",
+            "Total": "Résultat"
         },
         "TimeControl": {
             "Advance": "Avancer",

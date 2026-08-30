@@ -67,13 +67,13 @@
                     },
                     "type": {
                         "hint": "Type of Spirit to Summon. Disabled if a Spirit Actor is set",
-                        "label": "Spirit Type"
+                        "label": "Type d'esprit"
                     }
                 },
                 "sprite": {
                     "level": {
                         "hint": "Level of Sprite to Summon. Disabled if a Sprite Actor is set",
-                        "label": "Level"
+                        "label": "Niveau"
                     },
                     "type": {
                         "hint": "Type of Sprite to Compile. Disabled if a Sprite Actor is set",
@@ -82,7 +82,7 @@
                 }
             },
             "Summon": "Summon",
-            "Summoning": "Summoning"
+            "Summoning": "Invocation"
         },
         "ExtendedTestManager": {
             "Actions": {
@@ -251,7 +251,7 @@
             "PhysicalOverflowTrack": "Moniteur de surplus physique",
             "PhysicalTrack": "Moniteur Physique",
             "PublicGrid": "Public Grid",
-            "Reach": "Reach",
+            "Reach": "Allonge",
             "Recoil": "Recul",
             "Run": "Courir",
             "Soak": "Encaisser",
@@ -279,25 +279,25 @@
                         "hint": "Type of knowledge skill"
                     },
                     "rating": {
-                        "label": "Rating",
+                        "label": "Indice",
                         "hint": "Rating of this entry"
                     },
                     "defaulting": {
-                        "label": "Defaulting",
+                        "label": "Par défaut",
                         "hint": "If this skill can be defaulted"
                     },
                     "attribute": {
-                        "label": "Attribute",
+                        "label": "Attribut",
                         "hint": "Attribute used by this skill"
                     },
                     "limit": {
                         "attribute": {
-                            "label": "Limit",
+                            "label": "Limite",
                             "hint": "Limit to use for this skill action. Leave empty to use default attribute limit."
                         }
                     },
                     "specializations": {
-                        "label": "Specialization",
+                        "label": "Spécialisation",
                         "hint": "Specialization for this skill, if any"
                     },
                     "language": {
@@ -315,11 +315,11 @@
                     "label": "Skill Group",
                     "hint": "Configuration for a skill group",
                     "skills": {
-                        "label": "Skills",
+                        "label": "Compétences",
                         "hint": "Skills that are part of this group"
                     },
                     "rating": {
-                        "label": "Rating",
+                        "label": "Indice",
                         "hint": "Rating of this skill group"
                     }
                 },
@@ -331,18 +331,18 @@
                         "hint": "Add this skill set to newly created actors"
                     },
                     "skills": {
-                        "label": "Skills",
+                        "label": "Compétences",
                         "hint": "Skills that are part of this set",
                         "name": {
-                            "label": "Name",
+                            "label": "Nom",
                             "hint": "Name of the skill"
                         },
                         "rating": {
-                            "label": "Rating",
+                            "label": "Indice",
                             "hint": "Rating of this skill"
                         },
                         "specializations": {
-                            "label": "Specialization",
+                            "label": "Spécialisation",
                             "hint": "Specializations granted to this skill when the set is applied"
                         }
                     },
@@ -350,30 +350,30 @@
                         "label": "Skill Groups",
                         "hint": "Skill groups that are part of this set",
                         "name": {
-                            "label": "Name",
+                            "label": "Nom",
                             "hint": "Name of the skill group"
                         },
                         "rating": {
-                            "label": "Rating",
+                            "label": "Indice",
                             "hint": "Rating of this skill group"
                         }
                     }
                 }
             },
             "Types": {
-                "Skill": "Skill",
+                "Skill": "Compétence",
                 "Group": "Skill Group",
                 "Set": "Skill Set"
             },
             "Category": {
-                "Active": "Active",
+                "Active": "Actif",
                 "Knowledge": "Knowledge",
                 "Language": "Language"
             },
             "KnowledgeType": {
-                "Academic": "Academic",
-                "Professional": "Professional",
-                "Interests": "Interests",
+                "Academic": "Connaissances académiques",
+                "Professional": "Connaissances pro.",
+                "Interests": "Hobbies",
                 "Street": "Street"
             },
             "Groups": {},
@@ -509,13 +509,13 @@
             "DrainTest": "Drain Test",
             "DroneInfiltrationTest": "Drone Infiltration Test",
             "DronePerceptionTest": "Drone Perception Test",
-            "ExtendedTest": "Extended Test",
+            "ExtendedTest": "Test étendu",
             "FadeTest": "Fade Test",
             "HackOnTheFlyTest": "Hack on the Fly",
             "MatrixDefenseTest": "Matrix Defense",
             "MatrixResistTest": "Matrix Damage Resist",
             "MatrixTest": "Matrix Test",
-            "MeleeAttackTest": "Melee Weapon Attack",
+            "MeleeAttackTest": "Attaque arme de mélée",
             "NaturalRecoveryPhysicalTest": "Natural Recovery Physical",
             "NaturalRecoveryStunTest": "Natural Recovery Stun",
             "OpposedBruteForceTest": "Oppose Brute Force",
@@ -525,14 +525,14 @@
             "OpposedMatrixTest": "Opposed Matrix Test",
             "OpposedRitualTest": "Seal the Ritual",
             "OpposedSummonSpiritTest": "Oppose Summoning",
-            "OpposedTest": "Opposed Test",
+            "OpposedTest": "Test opposé",
             "PhysicalDefenseTest": "Physical Defense",
             "PhysicalResistTest": "Physical Damage Resist",
             "PilotVehicleTest": "Pilot Vehicle Test",
             "RangedAttackTest": "Ranged Weapon Attack",
-            "RitualSpellcastingTest": "Ritual Spellcasting",
+            "RitualSpellcastingTest": "Magie rituelle",
             "SkillTest": "Skill Test",
-            "SpellCastingTest": "Spellcasting",
+            "SpellCastingTest": "Lancement de sorts",
             "SuccessTest": "Success Test",
             "SummonSpiritTest": "Summon Spirit",
             "SuppressionDefenseTest": "Suppression Defense",

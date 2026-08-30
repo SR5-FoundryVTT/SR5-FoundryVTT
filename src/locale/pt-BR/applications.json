@@ -21,13 +21,13 @@
             "Label": "Compendium Packs",
             "MatrixActionsPack": {
                 "hint": "This compendium will be used for all matrix actions.",
-                "label": "Matrix Actions"
+                "label": "Ações da Matriz"
             },
             "SkillsPacksSection": "Skills Compendiums",
             "ActionsPacksSection": "Actions Compendiums",
             "SkillsPack": {
                 "hint": "This compendium will be used for all skills.",
-                "label": "Skills"
+                "label": "Perícias"
             },
             "SkillGroupsPack": {
                 "hint": "This compendium will be used for skill groups.",
@@ -136,7 +136,7 @@
             }
         },
         "KarmaManager": {
-            "Cancel": "Cancel",
+            "Cancel": "Cancelar",
             "CareerKarma": "Amount of Career Karma the Character has accumulated",
             "CurrentKarma": "Amount of Karma the Character currently has",
             "FinalCareerKarma": "Career Karma the Character will have upon submitting",
@@ -174,7 +174,7 @@
             }
         },
         "NuyenManager": {
-            "Cancel": "Cancel",
+            "Cancel": "Cancelar",
             "CurrentNuyen": "Amount of Nuyen the Character currently has",
             "FinalNuyen": "Final Amount of Nuyen upon Submitting",
             "Submit": "Submit",

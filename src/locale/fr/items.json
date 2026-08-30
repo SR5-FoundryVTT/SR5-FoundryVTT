@@ -4,11 +4,11 @@
             "FIELDS": {
                 "accuracy": {
                     "hint": "Accuracy modifier of this Ammo",
-                    "label": "Accuracy"
+                    "label": "Précision"
                 },
                 "ap": {
                     "hint": "Armor Penetration of this Ammo. This may be added to the Weapon's AP or replace it",
-                    "label": "AP"
+                    "label": "PA"
                 },
                 "blast": {
                     "dropoff": {
@@ -17,12 +17,12 @@
                     },
                     "radius": {
                         "hint": "Blast Radius of this Ammo, in Meters",
-                        "label": "Blast Radius"
+                        "label": "Rayon d'explosion"
                     }
                 },
                 "damage": {
                     "hint": "Damage dealt by this ammo. This may be added to the Weapon's Damage or replace it",
-                    "label": "Damage"
+                    "label": "Dégâts"
                 },
                 "damageType": {
                     "hint": "Type of damage dealt by this Ammo.",
@@ -30,7 +30,7 @@
                 },
                 "element": {
                     "hint": "Element the damage of this Element does.",
-                    "label": "Element"
+                    "label": "Élément"
                 },
                 "replaceAP": {
                     "hint": "If this Ammo should replace the AP of the Weapon",
@@ -41,7 +41,7 @@
                     "label": "Replace"
                 }
             },
-            "label": "Ammo"
+            "label": "Munition"
         },
         "Armor": {
             "FIELDS": {
@@ -109,7 +109,7 @@
                     "label": "Device Type"
                 }
             },
-            "label": "Device"
+            "label": "Appareil"
         },
         "Element": {
             "Acid": "Acide",
@@ -311,7 +311,7 @@
                 },
                 "capacity": {
                     "hint": "Capacity of the Cyberware/Bioware",
-                    "label": "Capacity"
+                    "label": "Capacité"
                 },
                 "description": {
                     "base": {
@@ -329,7 +329,7 @@
                 },
                 "grade": {
                     "hint": "Grade of the Cyberware/Bioware",
-                    "label": "Grade"
+                    "label": "Gamme"
                 },
                 "technology": {
                     "availability": {
@@ -339,7 +339,7 @@
                     "conceal": {
                         "base": {
                             "hint": "How hidden this device is to other people",
-                            "label": "Conceal"
+                            "label": "Dissimulation"
                         }
                     },
                     "condition_monitor": {
@@ -350,11 +350,11 @@
                     },
                     "cost": {
                         "hint": "Amount of money this item costs",
-                        "label": "Cost"
+                        "label": "Prix"
                     },
                     "equipped": {
                         "hint": "If the Item is Equipped",
-                        "label": "Equipped"
+                        "label": "Équipé"
                     },
                     "master": {
                         "hint": "Master Device that this Item is Slaved to, forming a PAN or WAN",
@@ -366,7 +366,7 @@
                     },
                     "rating": {
                         "hint": "The Device Rating of the item, this factors into matrix actions.",
-                        "label": "Rating"
+                        "label": "Indice"
                     },
                     "show_quantity": {
                         "hint": "If the Quantity of this Item should be shown on the Actor sheet and the header of the Item sheet",
@@ -374,7 +374,7 @@
                     },
                     "wireless": {
                         "hint": "The Wireless state of the item",
-                        "label": "Wireless"
+                        "label": "Sans fil"
                     }
                 }
             }
@@ -392,10 +392,10 @@
             "Device": "Appareil",
             "Echo": "Echo",
             "Equipment": "Équipement",
-            "Gear": "Gear",
+            "Gear": "Matériel",
             "Grid": "Grid",
             "Host": "Host",
-            "License": "License",
+            "License": "Permis",
             "Lifestyle": "Style de vie",
             "Metamagic": "Metamagic",
             "Modification": "Modification",
@@ -411,7 +411,7 @@
             "FIELDS": {
                 "comforts": {
                     "hint": "Comforts level of the Lifestyle",
-                    "label": "Comforts"
+                    "label": "Conforts"
                 },
                 "cost": {
                     "hint": "Cost of the Lifestyle per month",
@@ -419,11 +419,11 @@
                 },
                 "guests": {
                     "hint": "Guests staying in the same Lifestyle",
-                    "label": "Guests"
+                    "label": "Invités"
                 },
                 "neighborhood": {
                     "hint": "Neighborhood level of the Lifestyle",
-                    "label": "Neighborhood"
+                    "label": "Voisinnage"
                 },
                 "permanent": {
                     "hint": "If this Lifestyle is a Permanent Lifestyle",
@@ -431,20 +431,20 @@
                 },
                 "security": {
                     "hint": "Security level of the Lifestyle",
-                    "label": "Security"
+                    "label": "Securité"
                 },
                 "type": {
                     "hint": "Type of Lifestyle",
                     "label": "Lifestyle Type"
                 }
             },
-            "label": "Lifestyle"
+            "label": "Style de vie"
         },
         "Modification": {
             "FIELDS": {
                 "accuracy": {
                     "hint": "Accuracy/Limit Modifier to apply",
-                    "label": "Accuracy"
+                    "label": "Précision"
                 },
                 "conceal": {
                     "hint": "Concealability Modifier to apply",
@@ -460,7 +460,7 @@
                 },
                 "mount_point": {
                     "hint": "Mount Point on the weapon this attaches to",
-                    "label": "Mount Point"
+                    "label": "Point de fixation"
                 },
                 "rc": {
                     "hint": "Recoil Compensation Modifier to apply",
@@ -468,7 +468,7 @@
                 },
                 "slots": {
                     "hint": "Number of Slots (Vehicles) or Points (Drones) this takes up",
-                    "label": "Slots"
+                    "label": "Emplacements de modification"
                 },
                 "type": {
                     "hint": "Type of Modification",
@@ -477,7 +477,7 @@
             }
         },
         "MoveInventoryDialog": {
-            "Cancel": "Cancel",
+            "Cancel": "Annuler",
             "Move": "Move",
             "Title": "Choose an inventory"
         },
@@ -498,14 +498,14 @@
                 },
                 "rating": {
                     "hint": "Rating of this Quality",
-                    "label": "Rating"
+                    "label": "Indice"
                 },
                 "type": {
                     "hint": "The Type of Quality this represents (Positive/Negative/Life Module)",
                     "label": "Quality Type"
                 }
             },
-            "label": "Quality"
+            "label": "Qualité"
         },
         "Weapon": {
             "AmmoCount": "Compteur munition",
@@ -532,7 +532,7 @@
                 "melee": {
                     "reach": {
                         "hint": "Reach of the Weapon, this is used as a modifier in combat",
-                        "label": "Reach"
+                        "label": "Allonge"
                     }
                 },
                 "range": {
@@ -551,7 +551,7 @@
                         },
                         "single_shot": {
                             "hint": "If the Weapon supports Single Shot (SS)",
-                            "label": "Single Shot"
+                            "label": "Coup par coup"
                         }
                     },
                     "ranges": {
@@ -676,7 +676,7 @@
                     "LightMachinegun": "Light Machinegun",
                     "LightPistol": "Light Pistol",
                     "MachinePistol": "Machine Pistol",
-                    "Manual": "Manual",
+                    "Manual": "Manuel",
                     "MediumCrossbow": "Medium Crossbow",
                     "MediumHeavyMachinegun": "Medium/Heavy Machinegun",
                     "MissileLauncher": "Missile Launcher",
@@ -696,7 +696,7 @@
                 "Long": "Longue",
                 "Medium": "Moyenne",
                 "Modes": "Modes",
-                "Range": "Range",
+                "Range": "Portée",
                 "Ranges": "Portée",
                 "Short": "Courte"
             },
