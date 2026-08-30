@@ -1,0 +1,97 @@
+{
+    "SR5": {
+        "Dialogs": {
+            "Common": {
+                "Cancel": "취소",
+                "Ok": "확인"
+            },
+            "RangedWeaponTest": {
+                "EnvironmentalOverwriteSet": "환경 수정치가 수동으로 고정 값으로 설정되었습니다!"
+            }
+        },
+        "Errors": {
+            "CantConnectICToGrid": "IC 액터는 그리드 네트워크에 연결될 수 없음",
+            "CantConnectToPAN": "해당 문서는 PAN 네트워크에 추가할 수 없음",
+            "CantConnectToWAN": "해당 문서는 WAN 네트워크에 추가할 수 없음",
+            "CantEditAppliedItemEffects": "물품에 의해 적용된 활성 효과는 편집할 수 없습니다.",
+            "CantExecuteTest": "해당 판정을 실행할 수 없습니다. 이는 사용자가 플레이어이거나 권한이 부족하기 때문일 수 있습니다.",
+            "DefaultInventoryCantBeRemoved": "기본 소지품 위치는 삭제할 수 없습니다.",
+            "LinkLockedReboot": "링크 잠금 상태의 액터는 재부팅할 수 없습니다.",
+            "InventoryAlreadyExists": "해당 이름의 소지품 위치가 이미 존재합니다.",
+            "KeyNotModifyableByActiveEffect": "활성 효과 모드 '수정'은 모드 속성에만 영향을 미칠 수 있습니다.",
+            "MarkCouldNotBePlaced": "내부 오류: 당신의 마커는 배치될 수 없습니다.",
+            "MarksCantBePlacedBy": "활성화된 액터는 마커를 배치할 수 없습니다.",
+            "MarksCantBePlacedOn": "선택된 유형의 액터는 마커를 받을 수 없습니다.",
+            "MarksCantBePlacedWithoutPersona": "선택한 액터는 활성된 페르소나를 가지고 있지 않습니다.",
+            "MasterDeviceIsMissing": "마스터 장치가 없습니다. 로컬 장치 값으로 대체됩니다.",
+            "MissingSkill": "액터가 요구되는 기술을 가지고 있지 않습니다.",
+            "NoAvailableActorFound": "해당 행동에 사용할 수 있는 액터를 찾을 수 없음",
+            "SkillWithoutAttribute": "해당 기술에 특성치 설정이 없습니다.",
+            "TestExpectsVehicleOnly": "해당 판정은 탑승물 유형의 액터만 사용 가능",
+            "TooManyActionsWithCategory": "액터에 {category} 범주의 해동이 정확히 하나 있어야 함"
+        },
+        "Messages": {
+            "MarkInvitation": {
+                "AcceptInvite": "수락",
+                "AskForInvite": "다음에 대한 마크 초대 요청:",
+                "InviteAccepted": "{networkName}에 자유롭게 참여하세요, {userName}!"
+            }
+        },
+        "MissingRessource": {
+            "Ammo": "사격을 위한 탄약이 충분하지 않음",
+            "Edge": "소비 할 수 있는 엣지가 없음",
+            "Initiative": "우선권 점수가 충분하지 않음",
+            "SomeAmmo": "선택된 사격 방식으로 사격하기에 탄약이 충분하지 않음, 사격 방식 수정치가 감소",
+            "SomeAmmoMelee": "근거리 공격 수행을 위한 탄약이 충분하지 않음"
+        },
+        "Notifications": {
+            "AddDevicesToPAN": {
+                "Adding": "추가",
+                "FinishedAddingItems": "PAN에 장치 추가를 완료했습니다. 연결이 변경된 물품 시트는 닫았다가 다시 열어주세요.",
+                "Starting": "PAN에 장착한 장치 추가 시작"
+            },
+            "DeletingStorageReferences": {
+                "Finished": "참조 정리 완료",
+                "Item": "물품에 있는 참조 정리",
+                "Start": "네트워크와 마크 참조 삭제"
+            },
+            "VehicleCannotBeOwnDriver": "탑승물은 스스로의 조종자가 될 수 없음(그건 조종 특성치의 역할)"
+        },
+        "Warnings": {
+            "ActorMissingRequirements": "액터는 ‘각성’ 또는 ‘공명’ 기술 요건과 일치해야 함",
+            "AlreadyExistingInventory": "해당 이름의 소지품 위치가 이미 존재",
+            "AlreadyJoinedNetwork": "{name} 은/는 이미 네트워크에 접속함",
+            "BulkImportPerformanceWarning": "한 번에 다수의 물품을 불러올 경우 브라우저를 새로고침 하기 전까지 Foundry가 느려질 수 있습니다. 즉시 새로고침 하는 것을 추천합니다.",
+            "CantEditDefaultInventory": "기본 소지품 위치의 이름은 변경할 수 없음",
+            "CantExtendTest": "연장 할 수 없는 판정 유형",
+            "CantExtendTestFurther": "주사위가 남거나 요구 성공횟수 도달 시 판정을 연장할 수 없음",
+            "CantRecoverPhysicalWithStunDamage": "기절 피해가 남아있어 물리 피해를 회복할 수 없음",
+            "CantReloadAtAllDueToAmmo": "남은 탄약이 없습니다!",
+            "CantReloadFullyDueToAmmo": "탄약이 부족하여 완전히 재장전할 수 없습니다!",
+            "CantReloadPartialDueToAmmo": "복잡한 재장전 행동에 필요한 탄약이 부족합니다!",
+            "CantReloadWithoutSpareClip": "남은 탄창이 없습니다!",
+            "CantSecondChanceAGlitch": "해당 판정에는 두 번째 기회가 없습니다. 판정 결과는 글리치입니다.",
+            "CantSecondChanceWithoutNoneHits": "해당 판정에는 두 번째 기회가 없습니다.  성공 주사위만 남았습니다.",
+            "CantSpendMulitplePointsOfEdge": "한 번의 판정 또는 행동에 엣지를 여러 번 소비할 수 없습니다.",
+            "CantCombineBuyHitsWithEdge": "성공 구매는 두 번째 기회와 함께 사용할 수 없습니다.",
+            "CompilationNotConcluded": "컴파일이 완료되지 않았습니다. 페이드 결정을 위해 스프라이트가 컴파일 경쟁 판정을 완료하길 기다려야 합니다.",
+            "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "액터 없이 판정에서 엣지 점수를 소비할 수 없습니다.",
+            "HostItemOnlyAcceptIC": "호스트에는 IC 액터만 추가할 수 있음",
+            "InvalidCompilationLevel": "공명 특성치가 스프라이트의 단계보다 낮음",
+            "InvalidMarksCount": "잘못된 수의 마커를 배치하려고 함",
+            "InvalidSummoningForce": "선택한 강도의 수치가 규칙을 위반",
+            "NegativeLimitValue": "한계치는 반드시 양수여야 함",
+            "NoFireModeConfigured": "원거리 무기에 사격방식 설정이 없습니다. 단발로 사격합니다.",
+            "NoActorCreatePermission": "액터를 생성할 권한이 없습니다.",
+            "OnlyGMCanDoThis": "GM 유저만 가능",
+            "RitualInvalidForce": "의식 강도가 유효하지 않거나 오두막 등급보다 높습니다.",
+            "RitualNotConcluded": "의식이 완료되지 않았습니다. 드레인 결정을 위해 의식 경쟁 판정이 완료되길 기다려야 합니다.",
+            "RitualNotEnoughReagents": "시약이 충분하지 않습니다.",
+            "SkillAlreadyExists": "액터 {actorName} ({actorUuid})에 이미 {name} 기술이 존재함. 각 기술 범주별로 고유한 기술 이름을 사용해야 함.",
+            "SkillCantBeDefault": "해당 기술은 무리한 시도를 할 수 없음",
+            "SkillSetDefaultTypeOutsideCompendium": "설정된 기술 설정 컨펜디움에 포함된 기술 설정만 액터 생성에 영향을 줌",
+            "SummoningNotConcluded": "소환이 완료되지 않았습니다. 드레인 결정을 위해 영혼 경쟁 판정이 완료되길 기다려야 합니다.",
+            "TokenSelectionNeeded": "하나 이상의 토큰이 선택되어야 함"
+        }
+    }
+}

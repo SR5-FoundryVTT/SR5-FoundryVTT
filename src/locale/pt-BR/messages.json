@@ -1,0 +1,97 @@
+{
+    "SR5": {
+        "Dialogs": {
+            "Common": {
+                "Cancel": "Cancelar",
+                "Ok": "OK"
+            },
+            "RangedWeaponTest": {
+                "EnvironmentalOverwriteSet": "Os modificadores ambientais foram definidos manualmente para um valor fixo!"
+            }
+        },
+        "Errors": {
+            "CantConnectICToGrid": "IC actors can't be connected to a grid network",
+            "CantConnectToPAN": "Given document can't be added to PAN network",
+            "CantConnectToWAN": "Given document can't be added to WAN network",
+            "CantEditAppliedItemEffects": "Você não pode editar um efeito ativo que foi aplicado por um item.",
+            "CantExecuteTest": "You can't execute this test. This might be related to you being a player or lacking permissions.",
+            "DefaultInventoryCantBeRemoved": "O inventário padrão não pode ser removido",
+            "LinkLockedReboot": "Um ator com bloqueio de conexão não pode ser reiniciado",
+            "InventoryAlreadyExists": "Um inventário com este nome já existe.",
+            "KeyNotModifyableByActiveEffect": "O modo de efeito ativo 'modificar' só pode afetar propriedades de mod.",
+            "MarkCouldNotBePlaced": "Erro Interno: Suas marcas não puderam ser colocadas.",
+            "MarksCantBePlacedBy": "O ator ativo não pode colocar marcas.",
+            "MarksCantBePlacedOn": "O tipo de ator escolhido não pode receber marcas.",
+            "MarksCantBePlacedWithoutPersona": "The chosen actor doesn't have an active persona.",
+            "MasterDeviceIsMissing": "The master device is missing. Falling back to local device values.",
+            "MissingSkill": "O ator não possui a pericia solicitada.",
+            "NoAvailableActorFound": "Nenhum ator disponível foi encontrado para esta ação",
+            "SkillWithoutAttribute": "A pericia não tem um atributo configurado.",
+            "TestExpectsVehicleOnly": "Este teste só pode ser feito com um ator do tipo veículo",
+            "TooManyActionsWithCategory": "You should have exactly one action with the category {category} on your actor"
+        },
+        "Messages": {
+            "MarkInvitation": {
+                "AcceptInvite": "Accept",
+                "AskForInvite": "Asks for an mark invitation for:",
+                "InviteAccepted": "Feel free to join {networkName}, {userName}!"
+            }
+        },
+        "MissingRessource": {
+            "Ammo": "Munição insuficiente para atirar",
+            "Edge": "Sem Trunfo restante para consumir",
+            "Initiative": "Pontuação de iniciativa insuficiente",
+            "SomeAmmo": "Munição insuficiente para disparar no modo selecionado, os modificadores de modo serão reduzidos.",
+            "SomeAmmoMelee": "Não há munição suficiente para fazer um ataque corpo a corpo"
+        },
+        "Notifications": {
+            "AddDevicesToPAN": {
+                "Adding": "Adding",
+                "FinishedAddingItems": "Finished adding devices to PAN. Please close and reopen any item sheets that changed connections.",
+                "Starting": "Starting to add equipped devices to PAN"
+            },
+            "DeletingStorageReferences": {
+                "Finished": "Finished clearing references",
+                "Item": "Clearing references to item",
+                "Start": "Deleting Network and MARK references"
+            },
+            "VehicleCannotBeOwnDriver": "A vehicle cannot be the Driver of itself (that's what Pilot is for)"
+        },
+        "Warnings": {
+            "ActorMissingRequirements": "Actor must match the skills awakened or emerged requirement",
+            "AlreadyExistingInventory": "Um inventário com este nome já existe",
+            "AlreadyJoinedNetwork": "{name} already joined this network",
+            "BulkImportPerformanceWarning": "Se você importou um grande número de itens, o Foundry pode funcionar lentamente até que você atualize seu navegador. É recomendado atualizar agora.",
+            "CantEditDefaultInventory": "O inventário padrão não pode ser renomeado",
+            "CantExtendTest": "O tipo de teste não pode ser estendido.",
+            "CantExtendTestFurther": "O teste não pode ser estendido por falta de dados ou limite alcançado",
+            "CantRecoverPhysicalWithStunDamage": "Não pode se recuperar de dano físico com dano atordoante ainda presente",
+            "CantReloadAtAllDueToAmmo": "Você não tem mais munição!",
+            "CantReloadFullyDueToAmmo": "Você não tinha munição suficiente para recarregar completamente!",
+            "CantReloadPartialDueToAmmo": "Você não tinha munição suficiente para uma ação de recarga complexa!",
+            "CantReloadWithoutSpareClip": "Você está sem carregadores extras!",
+            "CantSecondChanceAGlitch": "Não pode ter uma segunda chance neste teste. O resultado do teste é falho.",
+            "CantSecondChanceWithoutNoneHits": "Não pode ter uma segunda chance neste teste. Só restam dados de acerto.",
+            "CantSpendMulitplePointsOfEdge": "Não pode gastar vários pontos de trunfo em um teste ou ação",
+            "CantCombineBuyHitsWithEdge": "Comprar Acertos não pode ser combinado com Segunda Chance.",
+            "CompilationNotConcluded": "Compilação incompleta. Aguarde o sprite se opor à compilação para determinar o enfraquecimento.",
+            "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Pontos de trunfo não podem ser gastos em testes sem atores",
+            "HostItemOnlyAcceptIC": "Apenas atores GELOs podem ser adicionados aos hosts",
+            "InvalidCompilationLevel": "Atributo de ressonância muito baixo para este nível de sprite",
+            "InvalidMarksCount": "Você está tentando colocar um número estranho de marcas",
+            "InvalidSummoningForce": "O valor da força escolhido não adere às regras",
+            "NegativeLimitValue": "Os valores do limite devem ser números positivos",
+            "NoFireModeConfigured": "A arma de fogo não tem modo de fogo configurado. Usará tiro único.",
+            "NoActorCreatePermission": "Você não tem permissão para criar atores.",
+            "OnlyGMCanDoThis": "Only a GM user can do this",
+            "RitualInvalidForce": "A força do ritual é inválida ou maior do que a nível do seu alojamento.",
+            "RitualNotConcluded": "Ritual incompleto. Aguarde o ritual se opor à conjuração para determinar o dreno.",
+            "RitualNotEnoughReagents": "Não foram oferecidos reagentes suficientes.",
+            "SkillAlreadyExists": "A perícia {name} já existe no ator {actorName} ({actorUuid}). Use cada nome de perícia apenas uma vez por categoria.",
+            "SkillCantBeDefault": "Esta pericia não pode ser lançada, pois não pode ser feita sem perícia",
+            "SkillSetDefaultTypeOutsideCompendium": "Only skillsets in the configured skillset compendium will affect actor creation",
+            "SummoningNotConcluded": "Invocação incompleta. Aguarde o espírito se opor à invocação para determinar o dreno.",
+            "TokenSelectionNeeded": "Um ou mais tokens precisam ser selecionados"
+        }
+    }
+}

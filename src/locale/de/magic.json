@@ -1,0 +1,323 @@
+{
+    "SR5": {
+        "AdeptPower": {
+            "FIELDS": {
+                "drain": {
+                    "hint": "Ob diese Adeptenkraft Entzug verursacht",
+                    "label": "Entzug"
+                },
+                "level": {
+                    "hint": "Level der Adeptenkraft",
+                    "label": "Level"
+                },
+                "pp": {
+                    "hint": "Kosten in Kraftpunkten",
+                    "label": "Kraftpunkte"
+                },
+                "type": {
+                    "hint": "Art der Adeptenkraft",
+                    "label": "Art"
+                }
+            },
+            "Types": {
+                "Active": "Aktiv",
+                "Passive": "Passiv"
+            }
+        },
+        "CritterPower": {
+            "Categories": {
+                "Drake": "Drake",
+                "Echoes": "Echos",
+                "Emergent": "Emergent",
+                "FreeSpirit": "Freier Geist",
+                "Mundane": "Mundan",
+                "Paranormal": "Paranormal",
+                "ParanormalInfected": "Paranormal/Infizierte",
+                "Shapeshifter": "Gestaltwandler",
+                "Weakness": "Schwäche"
+            },
+            "Category": "Kategorie",
+            "Duration": "Dauer",
+            "Durations": {
+                "Always": "Immer",
+                "Instant": "Sofort",
+                "Permanent": "Permanent",
+                "Special": "Speziell",
+                "Sustained": "Aufrechterhalten"
+            },
+            "FIELDS": {
+                "duration": {
+                    "hint": "Dauer der Critter Kraft",
+                    "label": "Dauer"
+                },
+                "karma": {
+                    "hint": "Karma Kosten der Critter Kraft",
+                    "label": "Karma"
+                },
+                "optional": {
+                    "hint": "Ist die Critter Kraft optional?",
+                    "label": "Optional"
+                },
+                "powerType": {
+                    "hint": "Art der Critter Kraft",
+                    "label": "Art"
+                },
+                "range": {
+                    "hint": "Reichweite der Critter Kraft",
+                    "label": "Reichweite"
+                }
+            },
+            "IsOptional": "Optional",
+            "Karma": "Karma",
+            "OptionalSelectionCount": "Optionale Kräfte",
+            "Optional": {
+                "DisabledOption": "Optional, inaktiv",
+                "EnabledOption": "Optional, aktiv",
+                "Standard": "Standard"
+            },
+            "Range": "Reichweite",
+            "Ranges": {
+                "LineOfSight": "Blickfeld",
+                "LineOfSightArea": "Blickfeld (F)",
+                "Self": "Selbst",
+                "Special": "Speziell",
+                "Touch": "Berührung"
+            },
+            "Type": "Art",
+            "Types": {
+                "Mana": "Mana",
+                "Physical": "Physisch"
+            }
+        },
+        "Ritual": {
+            "Anchored": "Verankert",
+            "FIELDS": {
+                "descriptors": {
+                    "hint": "Beschreibung des Rituals",
+                    "label": "Beschreibung"
+                },
+                "type": {
+                    "hint": "Art des Rituals",
+                    "label": "Art"
+                }
+            },
+            "MaterialLink": "Materielle Verbindung",
+            "Minion": "Diener",
+            "Spell": "Zauber",
+            "Spotter": "Beobachter"
+        },
+        "Spell": {
+            "Attack": "Zauberangriff",
+            "Cast": "Zaubern",
+            "CatCombat": "Kampf",
+            "CatDetection": "Wahrnehmung",
+            "CatHealth": "Heilung",
+            "CatIllusion": "Illusion",
+            "CatManipulation": "Manipulation",
+            "CatRitual": "Ritual",
+            "Category": "Kategorie",
+            "CombatDirect": "Direkt",
+            "CombatIndirect": "Indirekt",
+            "Defense": "Zauberverteidigung",
+            "DefenseDirectMana": "Zauberverteidigung (Direkt, Mana)",
+            "DefenseDirectPhysical": "Zauberverteidigung (Direkt, Physisch)",
+            "DetectionArea": "Ungerichtet",
+            "DetectionDirectional": "Gerichtet",
+            "DetectionPsychic": "Übersinnlich",
+            "FIELDS": {
+                "category": {
+                    "hint": "Zauberkategorie",
+                    "label": "Kategorie"
+                },
+                "combat": {
+                    "type": {
+                        "hint": "Ist der Zauber Indirekt oder Direkt",
+                        "label": "Kamppfzauberart"
+                    }
+                },
+                "detection": {
+                    "extended": {
+                        "hint": "Angehaltener Zauber",
+                        "label": "Angehalten"
+                    },
+                    "passive": {
+                        "hint": "Passiver Zauber",
+                        "label": "Passiv"
+                    },
+                    "type": {
+                        "hint": "Art des Wahrnehmungszaubers",
+                        "label": "Wahrnehmungszauberart"
+                    }
+                },
+                "drain": {
+                    "hint": "Entzugswert des Zaubers. Wird auf die Kraftstufe angerechnet, um dem Entzug zu widerstehen",
+                    "label": "Entzugswert"
+                },
+                "duration": {
+                    "hint": "Dauer des Zaubers",
+                    "label": "Dauer"
+                },
+                "illusion": {
+                    "sense": {
+                        "hint": "Vom Zauber betroffener Sinn",
+                        "label": "Sinn"
+                    },
+                    "type": {
+                        "hint": "Art des Illusionszaubers",
+                        "label": "Illusionszauberart"
+                    }
+                },
+                "manipulation": {
+                    "damaging": {
+                        "hint": "Verursacht der Zauber Schaden?",
+                        "label": "Schadend"
+                    },
+                    "environmental": {
+                        "hint": "Betrifft der Zauber kein spezifisches Ziel, sondern die Umgebung.",
+                        "label": "Umgebung"
+                    },
+                    "mental": {
+                        "hint": "Beeinträchtigt der Zauber den Geist eines Ziels?",
+                        "label": "Mental"
+                    },
+                    "physical": {
+                        "hint": "Beeinträchtigt der Zauber den physischen Körper eines Ziels?",
+                        "label": "Physisch"
+                    }
+                },
+                "range": {
+                    "hint": "Reichweite des Zaubers",
+                    "label": "Reichweite"
+                },
+                "ritual": {
+                    "type": {
+                        "hint": "Art des Rituals",
+                        "label": "Ritualart"
+                    }
+                },
+                "type": {
+                    "hint": "Ist es Mana oder Physischer Zauber",
+                    "label": "Zauberart"
+                }
+            },
+            "IllusionMultiSense": "Vollsensorisch",
+            "IllusionObvious": "Offensichtlich",
+            "IllusionRealistic": "Realistisch",
+            "IllusionSingleSense": "Monosensorisch",
+            "ManipulationDamaging": "Schaden",
+            "ManipulationEnvironmental": "Umgebung",
+            "ManipulationMental": "Mental",
+            "ManipulationPhysical": "Physisch",
+            "Range": "Reichweite",
+            "RangeLos": "BF",
+            "RangeLosA": "BF (F)",
+            "RangeTouch": "B",
+            "Spell": "Zauber",
+            "Spells": "Zauber",
+            "Type": "Art",
+            "TypeMana": "M",
+            "TypePhysical": "P"
+        },
+        "Spirit": {
+            "Bound": "Gebunden",
+            "Force": "Kraft",
+            "ForceAppliesSetting": "Kraft wird angewendet auf",
+            "ForceAppliesSettingHint": "Legt fest, welche Geistattribute den Kraftbonus erhalten.",
+            "HalfValueSkill": "Halber Fertigkeitswert",
+            "HalfValueSkillHint": "Aktive Fertigkeiten auf EIN nutzen ⌈Kraft/2⌉.",
+            "InitiativeFormulaAstral": "Astrale Initiativformel",
+            "InitiativeFormulaAstralHint": "Wähle die Terme der astralen Initiative.",
+            "InitiativeFormulaMeatspace": "Fleischwelt-Initiativformel",
+            "InitiativeFormulaMeatspaceHint": "Wähle die Terme der Fleischwelt-Initiative.",
+            "MissingSummoner": "Kein aktiver Beschwörer",
+            "Services": "Dienste",
+            "Summoner": "Beschwörer",
+            "Type": "Art",
+            "Types": {
+                "Abomination": "Abscheulichkeit",
+                "Air": "Luft",
+                "Aircraft": "Flugzeug",
+                "Airwave": "Radiowelle",
+                "Ally": "Verbündete",
+                "Anansi": "Anansi",
+                "Anarch": "Anarch",
+                "Arboreal": "Arboreal",
+                "Automotive": "Bodenfahrzeug",
+                "Barren": "Ödnis",
+                "Beasts": "Tier",
+                "Blackjack": "Blackjack",
+                "BladeSummoned": "Klinge-Beschworen",
+                "Blood": "Blut",
+                "BloodShade": "Blutschatten",
+                "Boggle": "Zersetzer",
+                "Bone": "Knochen",
+                "Bugul": "Bugul",
+                "Carcass": "Kadaver",
+                "Caretaker": "Insekt: Pfleger",
+                "Ceramic": "Keramik",
+                "Chindi": "Chindi",
+                "CorpsCadavre": "Corps Cadavre",
+                "Corpse": "Leiche",
+                "Crawler": "Crawler (Dämon)",
+                "Croki": "Croki",
+                "Detritus": "Geröll",
+                "Duende": "Duende",
+                "Earth": "Erde",
+                "Ejerian": "Ejerian",
+                "Elvar": "Elvar",
+                "Energy": "Energie",
+                "Erinyes": "Erinyes",
+                "Fire": "Feuer",
+                "Ghasts": "Ghasts (Dämon)",
+                "GreenMan": "Grüner Mann",
+                "Gremlin": "Gremlin",
+                "Guardian": "Beschützer",
+                "Guidance": "Ratgeber",
+                "GumToad": "Gum Toad (Dämon)",
+                "Homunculus": "Homunkulus",
+                "Hopper": "Hopper",
+                "HorrorShow": "Horror Show",
+                "Imp": "Imp",
+                "Jarl": "Jarl",
+                "Kappa": "Kappa",
+                "Kokopelli": "Kokopelli",
+                "Man": "Mensch",
+                "MasterShedim": "Meistershedim",
+                "Metal": "Metall",
+                "Morbi": "Morbi",
+                "Muse": "Muse",
+                "Nightmare": "Nachtmahr",
+                "Nocnitsa": "Nocnitsa",
+                "Noxious": "Smog",
+                "Nuclear": "Nuklear",
+                "Nymph": "Insekt: Nymphe",
+                "Palefire": "Fahlfeuer",
+                "Phantom": "Phantom",
+                "Plague": "Seuche",
+                "Plant": "Pflanze",
+                "Preta": "Preta",
+                "Queen": "Insekt: Königin/Mutter",
+                "Rot": "Fäulnis",
+                "Scout": "Insekt: Späher",
+                "Shade": "Nachtschatten",
+                "Shedim": "Shedim",
+                "Ship": "Schiff",
+                "Sludge": "Schlamm",
+                "Soldier": "Insekt: Soldat",
+                "Stabber": "Stabber",
+                "Succubus": "Sukkubus",
+                "Task": "Helfer",
+                "Train": "Eisenbahn",
+                "TsuchigumoWarrior": "Tsuchigumo Warrior",
+                "Tungak": "Tungak",
+                "Unbreakable": "Unzerbrechlich",
+                "Vrygoths": "Vrygoths",
+                "VucubCaquix": "Vucub Caquix",
+                "Watcher": "Beobachter",
+                "Water": "Wasser",
+                "Worker": "Insekt: Arbeiter",
+                "Wraith": "Wraith"
+            }
+        }
+    }
+}

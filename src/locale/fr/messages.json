@@ -1,0 +1,97 @@
+{
+    "SR5": {
+        "Dialogs": {
+            "Common": {
+                "Cancel": "Annuler",
+                "Ok": "OK"
+            },
+            "RangedWeaponTest": {
+                "EnvironmentalOverwriteSet": "Les modificateurs environnementals ont été déterminés à une valeur fixe"
+            }
+        },
+        "Errors": {
+            "CantConnectICToGrid": "IC actors can't be connected to a grid network",
+            "CantConnectToPAN": "Given document can't be added to PAN network",
+            "CantConnectToWAN": "Given document can't be added to WAN network",
+            "CantEditAppliedItemEffects": "You can't edit an active effect that's been applied by an item.",
+            "CantExecuteTest": "You can't execute this test. This might be related to you being a player or lacking permissions.",
+            "DefaultInventoryCantBeRemoved": "The default inventory can't be removed",
+            "LinkLockedReboot": "Un acteur verrouillé par lien ne peut pas être redémarré",
+            "InventoryAlreadyExists": "An inventory with this name already exists.",
+            "KeyNotModifyableByActiveEffect": "The active effect mode 'modify' can only affect mod properties.",
+            "MarkCouldNotBePlaced": "Internal Error: Your marks couldn't be placed.",
+            "MarksCantBePlacedBy": "Only personas can place marks.",
+            "MarksCantBePlacedOn": "The chosen actor type can't receive any marks.",
+            "MarksCantBePlacedWithoutPersona": "The chosen actor doesn't have an active persona.",
+            "MasterDeviceIsMissing": "The master device is missing. Falling back to local device values.",
+            "MissingSkill": "Le personnage n'a pas la compétence demandée",
+            "NoAvailableActorFound": "No available actor was found for this action",
+            "SkillWithoutAttribute": "La compétence n'a pas d'attribut assigné",
+            "TestExpectsVehicleOnly": "This test can only be made with a vehicle type actor",
+            "TooManyActionsWithCategory": "You should have exactly one action with the category {category} on your actor"
+        },
+        "Messages": {
+            "MarkInvitation": {
+                "AcceptInvite": "Accept",
+                "AskForInvite": "Asks for an mark invitation for:",
+                "InviteAccepted": "Feel free to join {networkName}, {userName}!"
+            }
+        },
+        "MissingRessource": {
+            "Ammo": "Not enough ammunition to fire",
+            "Edge": "No Edge left to consume",
+            "Initiative": "Not enough initiative score",
+            "SomeAmmo": "Not enough ammunition to fire in selected mode, mode modifiers will be reduced.",
+            "SomeAmmoMelee": "Not enough ammunition left to make a melee attack"
+        },
+        "Notifications": {
+            "AddDevicesToPAN": {
+                "Adding": "Adding",
+                "FinishedAddingItems": "Finished adding devices to PAN. Please close and reopen any item sheets that changed connections.",
+                "Starting": "Starting to add equipped devices to PAN"
+            },
+            "DeletingStorageReferences": {
+                "Finished": "Finished clearing references",
+                "Item": "Clearing references to item",
+                "Start": "Deleting Network and MARK references"
+            },
+            "VehicleCannotBeOwnDriver": "A vehicle cannot be the Driver of itself (that's what Pilot is for)"
+        },
+        "Warnings": {
+            "ActorMissingRequirements": "Actor must match the skills awakened or emerged requirement",
+            "AlreadyExistingInventory": "An inventory with this name already exists",
+            "AlreadyJoinedNetwork": "{name} already joined this network",
+            "BulkImportPerformanceWarning": "If you imported a large number of items, Foundry may run slowly until you refresh your browser. It is recommended to refresh now.",
+            "CantEditDefaultInventory": "The default inventory can't be renamed",
+            "CantExtendTest": "Test type can't be extended.",
+            "CantExtendTestFurther": "Test can't be extended either by dice left or threshold reached",
+            "CantRecoverPhysicalWithStunDamage": "Cant recover from physical damage with stun damage still present",
+            "CantReloadAtAllDueToAmmo": "You have no ammo left!",
+            "CantReloadFullyDueToAmmo": "You didn't have enough ammo to fully reload!",
+            "CantReloadPartialDueToAmmo": "You didn't have enough ammo for a complex reload action!",
+            "CantReloadWithoutSpareClip": "You're out of spare clips!",
+            "CantSecondChanceAGlitch": "Can't second chance this test. Test result is glitched.",
+            "CantSecondChanceWithoutNoneHits": "Can't second chance this test. Only hit-dice left.",
+            "CantSpendMulitplePointsOfEdge": "Can't spend multiple points of edge on one test or action",
+            "CantCombineBuyHitsWithEdge": "Acheter des succès ne peut pas être combiné avec Seconde chance.",
+            "CompilationNotConcluded": "Compilation incomplete. Wait for sprite to oppose compilation to determine fade.",
+            "EdgeRulesCantBeAppliedOnTestsWithoutAnActor": "Edge points can't be spent on tests without actors",
+            "HostItemOnlyAcceptIC": "Only IC actors can be added to hosts",
+            "InvalidCompilationLevel": "Resonance attribute to low for this sprite level",
+            "InvalidMarksCount": "You've trying to place a strange number of marks",
+            "InvalidSummoningForce": "Force value chosen doesn't adhere to the rules",
+            "NegativeLimitValue": "Les valeurs des limites doivent être supérieures à 0",
+            "NoFireModeConfigured": "Ranged weapon has no firemode configured. Will use single shot.",
+            "NoActorCreatePermission": "Vous n'avez pas la permission de créer des acteurs.",
+            "OnlyGMCanDoThis": "Only a GM user can do this",
+            "RitualInvalidForce": "Ritual force is invalid or greater then your lodges rating.",
+            "RitualNotConcluded": "Le Rituel a échoué. En attente du jeu du rituel pour déterminer le drain.",
+            "RitualNotEnoughReagents": "Pas assez de réactifs offerts.",
+            "SkillAlreadyExists": "La compétence {name} existe déjà sur l'acteur {actorName} ({actorUuid}). Utilisez chaque nom de compétence une seule fois par catégorie.",
+            "SkillCantBeDefault": "Cette compétence ne peut pas être lancée sans l'avoir apprise",
+            "SkillSetDefaultTypeOutsideCompendium": "Only skillsets in the configured skillset compendium will affect actor creation",
+            "SummoningNotConcluded": "Summoning incomplete. Wait for spirit to oppose summoning to determine drain.",
+            "TokenSelectionNeeded": "Un ou plusieurs jetons doivent être selectionnés"
+        }
+    }
+}

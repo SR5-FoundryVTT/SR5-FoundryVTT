@@ -3,6 +3,7 @@ const gulp = require('gulp');
 const tasks = require('./gulp.tasks');
 
 gulp.task('assets', tasks.assets);
+gulp.task('locales', tasks.locales);
 gulp.task('build', tasks.buildProd);
 gulp.task('build:prod', tasks.buildProd);
 gulp.task('build:dev', tasks.buildDev);

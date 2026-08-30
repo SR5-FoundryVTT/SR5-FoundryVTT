@@ -1,0 +1,410 @@
+{
+    "SR5": {
+        "Actor": {
+            "FIELDS": {
+                "attributes": {
+                    "edge": {
+                        "base": {
+                            "hint": "엣지는 캐릭터의 운, 신의 가호, 불가능해 보이는 확률을 뚫고 역경을 극복하게 해주는 설명할 수 없는 요소를 의미한다.",
+                            "label": "엣지"
+                        }
+                    }
+                },
+                "category_visibility": {
+                    "default": {
+                        "hint": "빈 탭과 소지품 항목을 표시",
+                        "label": "빈 항목 보이기"
+                    }
+                },
+                "full_defense_attribute": {
+                    "hint": "전력 방어 방해 행동에 사용되는 특성치",
+                    "label": "전력 방어 특성치"
+                },
+                "magic": {
+                    "attribute": {
+                        "hint": "마법사/달인이 드레인 저항에 사용하는 특성치",
+                        "label": "드레인 특성치"
+                    },
+                    "label": "마법"
+                },
+                "modifiers": {
+                    "armor": {
+                        "hint": "총 방어구 수치 수정",
+                        "label": "방어구"
+                    },
+                    "astral_initiative": {
+                        "hint": "아스트랄 우선권 기본값 수정",
+                        "label": "아스트랄 우선권"
+                    },
+                    "astral_initiative_dice": {
+                        "hint": "아스트랄 우선권 주사위 수정",
+                        "label": "아스트랄 우선권 주사위"
+                    },
+                    "astral_limit": {
+                        "hint": "아스트랄 한계 수정",
+                        "label": "아스트랄 한계"
+                    },
+                    "composure": {
+                        "hint": "평정심 판정 풀 수정",
+                        "label": "평정심"
+                    },
+                    "defense": {
+                        "hint": "방어 판중 풀 수정",
+                        "label": "방어"
+                    },
+                    "defense_block": {
+                        "hint": "능동적 방어에 방어 수정치 추가",
+                        "label": "방어 (막기)"
+                    },
+                    "defense_dodge": {
+                        "hint": "능동적 회피에 방어 수정치 추가",
+                        "label": "방어 (회피)"
+                    },
+                    "defense_melee": {
+                        "hint": "근접전 방어에 방어 수정치 추가",
+                        "label": "방어 (근접전)"
+                    },
+                    "defense_parry": {
+                        "hint": "능동적 쳐내기에 방어 수정치 추가",
+                        "label": "방어 (쳐내기)"
+                    },
+                    "defense_ranged": {
+                        "hint": "원거리 공격에 대한 방어 수정치 추가",
+                        "label": "방어 (원거리전)"
+                    },
+                    "drain": {
+                        "hint": "드레인 판정 풀 수정",
+                        "label": "드레인"
+                    },
+                    "essence": {
+                        "hint": "에센스 특성치 수정",
+                        "label": "에센스"
+                    },
+                    "fade": {
+                        "hint": "페이드 판정 풀 수정",
+                        "label": "페이드"
+                    },
+                    "global": {
+                        "hint": "피해 감소 판정을 제외한 모든 판정 풀 수정",
+                        "label": "전체"
+                    },
+                    "judge_intentions": {
+                        "hint": "의심 판정 풀 수정",
+                        "label": "의심"
+                    },
+                    "lift_carry": {
+                        "hint": "들기&운반 판정 풀 수정",
+                        "label": "들기/운반"
+                    },
+                    "mark_damage": {
+                        "hint": "자신에게 배치된 마크 당 피해량 수정",
+                        "label": "마크 피해"
+                    },
+                    "matrix_initiative": {
+                        "hint": "매트릭스 우선권 기본값 수정",
+                        "label": "매트릭스 우선권"
+                    },
+                    "matrix_initiative_dice": {
+                        "hint": "매트릭스 우선권 주사위 수정",
+                        "label": "매트릭스 우선권 주사위"
+                    },
+                    "matrix_track": {
+                        "hint": "매트릭스 피해 추적기 수정",
+                        "label": "매트릭스 추적기"
+                    },
+                    "meat_initiative": {
+                        "hint": "현실 우선권 기본값 수정",
+                        "label": "현실 우선권"
+                    },
+                    "meat_initiative_dice": {
+                        "hint": "현실 우선권 주사위 수정",
+                        "label": "현실 우선권 주사위"
+                    },
+                    "memory": {
+                        "hint": "기억 판정 풀 수정",
+                        "label": "기억"
+                    },
+                    "mental_limit": {
+                        "hint": "정신 한계 수정",
+                        "label": "정신 한계"
+                    },
+                    "multi_defense": {
+                        "hint": "전투 턴당 다중 방어에 대한 방어 판정 풀을 수정",
+                        "label": "다중 방어"
+                    },
+                    "pain_tolerance_physical": {
+                        "hint": "첫 번째 상처 수정치 적용 전에 무시될 피해를 수정",
+                        "label": "통증 내성 (물리)"
+                    },
+                    "pain_tolerance_stun": {
+                        "hint": "첫 번째 상처 수정치 적용 전에 무시될 피해를 수정",
+                        "label": "통증 내성 (기절)"
+                    },
+                    "physical_limit": {
+                        "hint": "물리 한계 수정",
+                        "label": "물리 한계"
+                    },
+                    "physical_overflow_track": {
+                        "hint": "물리 치명상 피해 수정",
+                        "label": "치명상 추적기"
+                    },
+                    "physical_track": {
+                        "hint": "물리 피해 추적기",
+                        "label": "물리 추적기"
+                    },
+                    "place_three_marks": {
+                        "hint": "한번에 마크 3개를 배치하려 할 때의 수정치 수정",
+                        "label": "마크 3개 배치"
+                    },
+                    "place_two_marks": {
+                        "hint": "한 번에 마크 2개를 배치하려 할 때의 수정치 수정",
+                        "label": "마크 2개 배치"
+                    },
+                    "public_grid": {
+                        "hint": "공공 그리드에 연결할 경우 수정치를 수정",
+                        "label": "공공 그리드"
+                    },
+                    "reach": {
+                        "hint": "근접 공격의 길이를 수정",
+                        "label": "길이"
+                    },
+                    "recoil": {
+                        "hint": "반동 판정 풀 수정",
+                        "label": "반동"
+                    },
+                    "run": {
+                        "hint": "민첩 특성치 배수에 의한 달리기 범위 수정",
+                        "label": "달리기"
+                    },
+                    "soak": {
+                        "hint": "물리 피해 저항 판정 풀 수정",
+                        "label": "피해 저항"
+                    },
+                    "social_limit": {
+                        "hint": "사교 한계 수정",
+                        "label": "사교 한계"
+                    },
+                    "stun_track": {
+                        "hint": "기절 피해 추적기 수정",
+                        "label": "기절 추적기"
+                    },
+                    "walk": {
+                        "hint": "민첩 특성치 배수에 의한 걷기 범위 수정",
+                        "label": "걷기"
+                    },
+                    "wound_tolerance": {
+                        "hint": "부상당 피해 수치 수정",
+                        "label": "부상 내성"
+                    }
+                },
+                "special": {
+                    "hint": "캐릭터가 각성자 (마법사/달인)이거나 공명자 (테크노맨서)일 경우 선택",
+                    "label": "각성자/공명자"
+                },
+                "technomancer": {
+                    "attribute": {
+                        "hint": "테크노맨서가 페이드 저항에 사용하는 특성치",
+                        "label": "페이드 특성치"
+                    },
+                    "label": "테크노맨서"
+                }
+            },
+            "NoFavoritesSelected": "선택된 즐겨찾기 항목 없음"
+        },
+        "ActorTypes": {
+            "Character": "캐릭터",
+            "IC": "IC",
+            "Spirit": "영혼",
+            "Sprite": "스프라이트",
+            "Vehicle": "탑승물"
+        },
+        "Character": {
+            "FIELDS": {
+                "is_critter": {
+                    "hint": "생물 능력 사용 허용",
+                    "label": "생명체"
+                },
+                "is_npc": {
+                    "hint": "액터를 NPC로 표시하여 추가 기능 제공",
+                    "label": "NPC"
+                },
+                "karma": {
+                    "max": {
+                        "hint": "해당 캐릭터가 지금까지 누적한 카르마의 양",
+                        "label": "카르마 이력"
+                    },
+                    "value": {
+                        "hint": "해당 캐릭터가 이용 가능한 카르마의 양",
+                        "label": "현재 카르마"
+                    }
+                },
+                "matrix_full_defense_attribute": {
+                    "hint": "매트릭스 전력 방어 행동 사용 시 추가할 특성치",
+                    "label": "매트릭스 전력 방어 특성치"
+                },
+                "metatype": {
+                    "hint": "캐릭터의 메타인종. NPC의 경우 설정에 따라 특성치가 조정된다.",
+                    "label": "메타인종"
+                },
+                "notoriety": {
+                    "hint": "해당 캐릭터의 평판에서 부정적인 측면",
+                    "label": "악명"
+                },
+                "npc": {
+                    "is_grunt": {
+                        "hint": "해당 액터에게 하수인 규칙 적용",
+                        "label": "하수인"
+                    }
+                },
+                "nuyen": {
+                    "hint": "해당 캐릭터가 보유한 뉴엔의 양",
+                    "label": "뉴엔"
+                },
+                "public_awareness": {
+                    "hint": "언론, 당국 및 일반 대중 사이에서 해당 캐릭터에 대한 인지도 수준",
+                    "label": "대중 인식도"
+                },
+                "street_cred": {
+                    "hint": "해당 캐릭터가 생애동안 이룩한 업적",
+                    "label": "길거리 명성"
+                }
+            },
+            "Modifiers": {
+                "NPCMetatypeAttribute": "NPC 메타인종 특성치"
+            },
+            "Types": {
+                "Dwarf": "드워프",
+                "Elf": "엘프",
+                "Human": "인간",
+                "Ork": "오크",
+                "Troll": "트롤"
+            }
+        },
+        "Contact": {
+            "Blackmail": "협박",
+            "Connection": "영향력",
+            "DropActor": "해당 연줄과 연결할 액터 끌어서 놓기",
+            "FIELDS": {
+                "blackmail": {
+                    "hint": "상대방이 거래를 하도록 유도할 수 있는 무언가를 가지고 있다.",
+                    "label": "협박"
+                },
+                "connection": {
+                    "hint": "연줄의 영향력을 1부터 12까지의 척도로 측정한 수치이다. 영향력 등급이 높을수록 해당 연줄의 영향력도 커진다.",
+                    "label": "영향력"
+                },
+                "family": {
+                    "hint": "피는 언제나 물보다 진하며 가족을 연줄로 두는 경우라면 특히 더 그렇다.",
+                    "label": "가족"
+                },
+                "group": {
+                    "hint": "연출은 갱, 기업, 특정 분야의 너드들 같은 그룹일 수도 있다.",
+                    "label": "집단"
+                },
+                "linkedActor": {
+                    "hint": "이 연줄에 해당하는 액터",
+                    "label": "액터"
+                },
+                "loyalty": {
+                    "hint": "연줄을 얼마나 믿을 수 있는지 1부터 6까지의 척도로 측정한 수치이다. 신뢰도 등급이 높을수록 연락처가 해당 연줄은 당신을 위해 더 많은 일을 기꺼이 해줄 수 있다.",
+                    "label": "신뢰도"
+                },
+                "type": {
+                    "hint": "연줄 유형은 대상이 어떤 장비, 작업, 정보 등에 접근할 수 있는지 결정한다.",
+                    "label": "유형"
+                }
+            },
+            "Family": "가족",
+            "Group": "그룹",
+            "LinkedActor": "액터",
+            "Loyalty": "친밀도",
+            "LoyaltyConnectionHelp": "우호도 / 영향력",
+            "LoyaltyConnectionLabel": "L / C",
+            "Type": "유형"
+        },
+        "InventoryRename": {
+            "Cancel": "취소",
+            "NewName": "새로운 이름",
+            "Submit": "적용",
+            "Title": "소지품 위치 이름 재설정"
+        },
+        "MovementTypes": {
+            "Run": "달리기",
+            "Sprint": "전력질주"
+        },
+        "Vehicle": {
+            "Categories": {
+                "Anthro": "인간형",
+                "Huge": "초대형",
+                "Large": "대형",
+                "Medium": "중형",
+                "Micro": "마이크로",
+                "Mini": "초소형",
+                "Missile": "미사일",
+                "Small": "소형"
+            },
+            "Category": "범주",
+            "ChaseEnvironment": "추적 환경",
+            "Clearsight": "클리어 사이트",
+            "ControlMode": "조작 방식",
+            "ControlModes": {
+                "Autopilot": "자동 조종",
+                "Manual": "수동 조종",
+                "Remote": "원격 조종",
+                "Rigger": "리거 조종"
+            },
+            "Driver": "조종자",
+            "DamagedVehicle": "손상된 탑승물",
+            "Drone": "드론",
+            "Environments": {
+                "Handling": "조작력",
+                "Speed": "속력"
+            },
+            "IsDrone": "은/는 드론",
+            "IsOffRoad": "은/는 비포장 도로 주행 중",
+            "Maneuvering": "기동",
+            "MissingDriver": "액터를 끌어서 놓아 조종자로 지정",
+            "ModificationCategoryTypes": {
+                "body": "몸체",
+                "cosmetic": "외장",
+                "electromagnetic": "전자기품",
+                "powertrain": "Powertrain",
+                "protection": "보호",
+                "weapons": "무기"
+            },
+            "OffRoad": "비도로",
+            "OnRoad": "도로",
+            "Stats": {
+                "Acceleration": "가속력",
+                "Handling": "조작력",
+                "OffRoadAcceleration": "가속력 (비포장도로)",
+                "OffRoadHandling": "조작력 (비포장도로)",
+                "OffRoadSpeed": "속력 (비포장도로)",
+                "Pilot": "조종력",
+                "Seats": "좌석",
+                "Sensor": "감지기",
+                "Speed": "속력"
+            },
+            "Stealth": "잠입",
+            "Type": "유형",
+            "Types": {
+                "Aerospace": "우주선",
+                "Air": "항공기",
+                "Exotic": "희귀 탑승물",
+                "Ground": "지상 탑승물",
+                "Walker": "워커",
+                "Water": "수상 탑승물"
+            },
+            "Vehicle": "탑승물"
+        },
+        "VehicleImport": {
+            "MissingPermission": "액터 생성 권한이 없음"
+        },
+        "Vision": {
+            "AstralPerception": "아스트랄 인식",
+            "AugmentedReality": "증강 현실",
+            "LowLight": "저광 시야",
+            "ThermographicVision": "열화상 시야"
+        }
+    }
+}

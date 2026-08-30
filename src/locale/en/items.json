@@ -1,0 +1,714 @@
+{
+    "SR5": {
+        "Ammo": {
+            "FIELDS": {
+                "accuracy": {
+                    "hint": "Accuracy modifier of this Ammo",
+                    "label": "Accuracy"
+                },
+                "ap": {
+                    "hint": "Armor Penetration of this Ammo. This may be added to the Weapon's AP or replace it",
+                    "label": "AP"
+                },
+                "blast": {
+                    "dropoff": {
+                        "hint": "Blast Dropoff modifies the Damage per Meter",
+                        "label": "Blast Dropoff"
+                    },
+                    "radius": {
+                        "hint": "Blast Radius of this Ammo, in Meters",
+                        "label": "Blast Radius"
+                    }
+                },
+                "damage": {
+                    "hint": "Damage dealt by this ammo. This may be added to the Weapon's Damage or replace it",
+                    "label": "Damage"
+                },
+                "damageType": {
+                    "hint": "Type of damage dealt by this Ammo.",
+                    "label": "Damage type"
+                },
+                "element": {
+                    "hint": "Element the damage of this Element does.",
+                    "label": "Element"
+                },
+                "replaceAP": {
+                    "hint": "If this Ammo should replace the AP of the Weapon",
+                    "label": "Replace"
+                },
+                "replaceDamage": {
+                    "hint": "If this Ammo should replace the Damage of the weapon",
+                    "label": "Replace"
+                }
+            },
+            "label": "Ammo"
+        },
+        "Armor": {
+            "FIELDS": {
+                "armor": {
+                    "accessory": {
+                        "hint": "If this Armor is an Accessory (adds its value to the actor's base Armor)",
+                        "label": "Accessory"
+                    },
+                    "acid": {
+                        "hint": "Extra Armor against attacks with Acid",
+                        "label": "Acid Resistance"
+                    },
+                    "cold": {
+                        "hint": "Extra Armor against attacks with Cold",
+                        "label": "Insulation"
+                    },
+                    "electricity": {
+                        "hint": "Extra Armor against attacks with Electricity",
+                        "label": "Nonconductivity"
+                    },
+                    "fire": {
+                        "hint": "Extra Armor against attacks with Fire",
+                        "label": "Fire Resistance"
+                    },
+                    "hardened": {
+                        "hint": "If this Armor is Hardened",
+                        "label": "Hardened Armor"
+                    },
+                    "is_hardened": {
+                        "hint": "If this Armor grants hardened protection",
+                        "label": "Hardened Active"
+                    },
+                    "immunities": {
+                        "hint": "Damage sources this armor grants Immunity against",
+                        "label": "Immunities"
+                    },
+                    "pollutant": {
+                        "hint": "Extra Armor against attacks with Pollutant",
+                        "label": "Chemical Protection"
+                    },
+                    "radiation": {
+                        "hint": "Extra Armor against attacks with Radiation",
+                        "label": "Radiation Resistance"
+                    },
+                    "value": {
+                        "hint": "Amount of Armor that this item provides",
+                        "label": "Armor Value"
+                    },
+                    "water": {
+                        "hint": "Extra Armor against attacks with Water",
+                        "label": "Water Protection"
+                    }
+                }
+            },
+            "Immunity": {
+                "NormalWeapons": "Normal Weapons"
+            },
+            "Resistances": "Resistances",
+            "label": "Armor"
+        },
+        "Device": {
+            "FIELDS": {
+                "category": {
+                    "hint": "The type of Device",
+                    "label": "Device Type"
+                }
+            },
+            "label": "Device"
+        },
+        "Element": {
+            "Acid": "Acid",
+            "Cold": "Cold",
+            "Electricity": "Electricity",
+            "Fire": "Fire",
+            "Pollutant": "Pollutant",
+            "Radiation": "Radiation",
+            "Water": "Water",
+            "Label": "Element"
+        },
+        "Item": {
+            "FIELDS": {
+                "action": {
+                    "armor": {
+                        "hint": "If the actor's Armor should be added to the test",
+                        "label": "Armor"
+                    },
+                    "attribute": {
+                        "hint": "The Attribute used by the test",
+                        "label": "Attribute"
+                    },
+                    "attribute2": {
+                        "hint": "The Other Attribute used by this test",
+                        "label": "Other Attribute"
+                    },
+                    "categories": {
+                        "hint": "Action Categories that this test incorporates. These actions can be targeted with Active Effects",
+                        "label": "Categories"
+                    },
+                    "damage": {
+                        "ap": {
+                            "attribute": {
+                                "hint": "Attribute to use with the AP calculation",
+                                "label": "AP Attribute"
+                            },
+                            "base": {
+                                "hint": "Armor Penetration of the Damage",
+                                "label": "AP"
+                            },
+                            "base_formula_operator": {
+                                "hint": "How the AP base value should affect the Attribute",
+                                "label": "Operator"
+                            }
+                        },
+                        "attribute": {
+                            "hint": "Attribute to use with the Damage calculation",
+                            "label": "Damage Attribute"
+                        },
+                        "base": {
+                            "hint": "The base amount of Damage that this action does",
+                            "label": "Base Damage"
+                        },
+                        "base_formula_operator": {
+                            "hint": "How the Damage base value should affect the Attribute",
+                            "label": "Operator"
+                        },
+                        "biofeedback": {
+                            "hint": "If this action deals Biofeedback damage as well. This can be targeted with Active Effects",
+                            "label": "Biofeedback"
+                        },
+                        "element": {
+                            "base": {
+                                "hint": "The Element the type of damage is. Leave blank for no element.",
+                                "label": "Element"
+                            }
+                        },
+                        "normal_weapon": {
+                            "hint": "If this damage is considered a normal (non-magical) weapon attack",
+                            "label": "Normal Weapon"
+                        },
+                        "type": {
+                            "base": {
+                                "hint": "Type of Damage that this action does",
+                                "label": "Damage Type"
+                            }
+                        }
+                    },
+                    "extended": {
+                        "hint": "Game time between rolls of this extended action. Zero rolls it as a normal test.",
+                        "label": "Extended Test",
+                        "unit": {
+                            "hint": "Time unit of the extended test interval.",
+                            "label": "Interval Unit"
+                        },
+                        "value": {
+                            "hint": "Game time between rolls. Zero rolls this as a normal, non extended test.",
+                            "label": "Interval"
+                        }
+                    },
+                    "initiative_mod": {
+                        "hint": "Initiative modifier applied when taking this action",
+                        "label": "Initiative Modifier"
+                    },
+                    "limit": {
+                        "attribute": {
+                            "hint": "The Specific Limit on the Actor used for the test.",
+                            "label": "Limit"
+                        },
+                        "base": {
+                            "hint": "Limit value used for the test. This is added if a specific limit is selected",
+                            "label": "Limit Value"
+                        }
+                    },
+                    "mod": {
+                        "hint": "Any modifiers applied to the test",
+                        "label": "Modifier"
+                    },
+                    "modifiers": {
+                        "hint": "Action Modifiers that affect this test.",
+                        "label": "Modifiers"
+                    },
+                    "opposed": {
+                        "armor": {
+                            "hint": "If the actor's Armor should be added to the Opposed Test",
+                            "label": "Armor"
+                        },
+                        "attribute": {
+                            "hint": "The Attribute used by the Opposed Test",
+                            "label": "Attribute"
+                        },
+                        "attribute2": {
+                            "hint": "The Other Attribute used by this Opposed Test",
+                            "label": "Other Attribute"
+                        },
+                        "mod": {
+                            "hint": "Any modifiers applied to the Opposed Test",
+                            "label": "Modifier"
+                        },
+                        "resist": {
+                            "armor": {
+                                "hint": "If the actor's Armor should be added to the Resist Test",
+                                "label": "Armor"
+                            },
+                            "attribute": {
+                                "hint": "The Attribute used by the Resist Test",
+                                "label": "Attribute"
+                            },
+                            "attribute2": {
+                                "hint": "The Other Attribute used by this Resist Test",
+                                "label": "Other Attribute"
+                            },
+                            "test": {
+                                "hint": "Test the target takes to resist damage after the Opposed Test",
+                                "label": "Resist Test"
+                            }
+                        },
+                        "skill": {
+                            "hint": "Skill used by Opposed Test. Leave blank if no skill is used",
+                            "label": "Skill"
+                        },
+                        "test": {
+                            "hint": "The Test that the target of the action needs to take",
+                            "label": "Opposed Test"
+                        }
+                    },
+                    "roll_mode": {
+                        "hint": "The Roll Mode of the test. Leave blank if it should use the user-selected Roll Mode",
+                        "label": "Roll Mode"
+                    },
+                    "skill": {
+                        "hint": "Skill used by this action. Leave blank if no skill is used",
+                        "label": "Skill"
+                    },
+                    "spec": {
+                        "hint": "If the skill specialization modifier (+2) should be applied to this test",
+                        "label": "Specialized"
+                    },
+                    "test": {
+                        "hint": "Specific type of test to use for this Action",
+                        "label": "Test Type"
+                    },
+                    "threshold": {
+                        "base": {
+                            "hint": "The Threshold that the test needs to reach",
+                            "label": "Threshold Value"
+                        }
+                    },
+                    "type": {
+                        "hint": "Type of action that this skill uses",
+                        "label": "Action Type"
+                    }
+                },
+                "ammo": {
+                    "clip_type": {
+                        "hint": "The type of Reloading mechanism that the weapon uses",
+                        "label": "Weapon Reload Type"
+                    },
+                    "spare_clips": {
+                        "max": {
+                            "hint": "The Maximum number of Spare Clips the actor holds for this Weapon",
+                            "label": "Maximum Spare Reloads"
+                        },
+                        "value": {
+                            "hint": "The number of Spare Clips the actor has left",
+                            "label": "Current Spare Reloads"
+                        }
+                    }
+                },
+                "capacity": {
+                    "hint": "Capacity of the Cyberware/Bioware",
+                    "label": "Capacity"
+                },
+                "description": {
+                    "base": {
+                        "hint": "Description of the Item",
+                        "label": "Description"
+                    },
+                    "source": {
+                        "hint": "Source of the Item, this can be a PDF Page, URL, or Journal",
+                        "label": "Source"
+                    }
+                },
+                "essence": {
+                    "hint": "Essence cost of the Cyberware/Bioware",
+                    "label": "Essence"
+                },
+                "grade": {
+                    "hint": "Grade of the Cyberware/Bioware",
+                    "label": "Grade"
+                },
+                "technology": {
+                    "availability": {
+                        "hint": "The Availability attribute of the Item, this determines how easy it is to get it",
+                        "label": "Availability"
+                    },
+                    "conceal": {
+                        "base": {
+                            "hint": "How hidden this device is to other people",
+                            "label": "Conceal"
+                        }
+                    },
+                    "condition_monitor": {
+                        "value": {
+                            "hint": "Current Damage done to the Item's Condition Monitor",
+                            "label": "Condition Monitor Damage"
+                        }
+                    },
+                    "cost": {
+                        "hint": "Amount of money this item costs",
+                        "label": "Cost"
+                    },
+                    "equipped": {
+                        "hint": "If the Item is Equipped",
+                        "label": "Equipped"
+                    },
+                    "master": {
+                        "hint": "Master Device that this Item is Slaved to, forming a PAN or WAN",
+                        "label": "Master Device"
+                    },
+                    "quantity": {
+                        "hint": "The amount of items this Item represents",
+                        "label": "Quantity"
+                    },
+                    "rating": {
+                        "hint": "The Device Rating of the item, this factors into matrix actions.",
+                        "label": "Rating"
+                    },
+                    "show_quantity": {
+                        "hint": "If the Quantity of this Item should be shown on the Actor sheet and the header of the Item sheet",
+                        "label": "Show Quantity"
+                    },
+                    "wireless": {
+                        "hint": "The Wireless state of the item",
+                        "label": "Wireless"
+                    }
+                }
+            }
+        },
+        "ItemTypes": {
+            "Action": "Action",
+            "AdeptPower": "Adept Power",
+            "Ammo": "Ammo",
+            "Armor": "Armor",
+            "Bioware": "Bioware",
+            "ComplexForm": "Complex Form",
+            "Contact": "Contact",
+            "CritterPower": "Critter Power",
+            "Cyberware": "Cyberware",
+            "Device": "Device",
+            "Echo": "Echo",
+            "Equipment": "Equipment",
+            "Gear": "Gear",
+            "Grid": "Grid",
+            "Host": "Host",
+            "License": "License",
+            "Lifestyle": "Lifestyle",
+            "Metamagic": "Metamagic",
+            "Modification": "Modification",
+            "Program": "Program",
+            "Quality": "Quality",
+            "Ritual": "Ritual",
+            "Sin": "SIN",
+            "Spell": "Spell",
+            "SpritePower": "Sprite Power",
+            "Weapon": "Weapon"
+        },
+        "Lifestyle": {
+            "FIELDS": {
+                "comforts": {
+                    "hint": "Comforts level of the Lifestyle",
+                    "label": "Comforts"
+                },
+                "cost": {
+                    "hint": "Cost of the Lifestyle per month",
+                    "label": "Lifestyle Cost"
+                },
+                "guests": {
+                    "hint": "Guests staying in the same Lifestyle",
+                    "label": "Guests"
+                },
+                "neighborhood": {
+                    "hint": "Neighborhood level of the Lifestyle",
+                    "label": "Neighborhood"
+                },
+                "permanent": {
+                    "hint": "If this Lifestyle is a Permanent Lifestyle",
+                    "label": "Permanent"
+                },
+                "security": {
+                    "hint": "Security level of the Lifestyle",
+                    "label": "Security"
+                },
+                "type": {
+                    "hint": "Type of Lifestyle",
+                    "label": "Lifestyle Type"
+                }
+            },
+            "label": "Lifestyle"
+        },
+        "Modification": {
+            "FIELDS": {
+                "accuracy": {
+                    "hint": "Accuracy/Limit Modifier to apply",
+                    "label": "Accuracy"
+                },
+                "conceal": {
+                    "hint": "Concealability Modifier to apply",
+                    "label": "Concealability"
+                },
+                "dice_pool": {
+                    "hint": "Dice Pool Modifier to apply",
+                    "label": "Dice Pool"
+                },
+                "modification_category": {
+                    "hint": "Category this Modification belongs to",
+                    "label": "Modification Category"
+                },
+                "mount_point": {
+                    "hint": "Mount Point on the weapon this attaches to",
+                    "label": "Mount Point"
+                },
+                "rc": {
+                    "hint": "Recoil Compensation Modifier to apply",
+                    "label": "Recoil Compensation"
+                },
+                "slots": {
+                    "hint": "Number of Slots (Vehicles) or Points (Drones) this takes up",
+                    "label": "Slots"
+                },
+                "type": {
+                    "hint": "Type of Modification",
+                    "label": "Mod Type"
+                }
+            }
+        },
+        "MoveInventoryDialog": {
+            "Cancel": "Cancel",
+            "Move": "Move",
+            "Title": "Choose an inventory"
+        },
+        "Program": {
+            "FIELDS": {
+                "type": {
+                    "hint": "Type of Program, for visual organization only",
+                    "label": "Program Type"
+                }
+            },
+            "label": "Program"
+        },
+        "Quality": {
+            "FIELDS": {
+                "karma": {
+                    "hint": "Amount of Karma this Quality is worth",
+                    "label": "Karma"
+                },
+                "rating": {
+                    "hint": "Rating of this Quality",
+                    "label": "Rating"
+                },
+                "type": {
+                    "hint": "The Type of Quality this represents (Positive/Negative/Life Module)",
+                    "label": "Quality Type"
+                }
+            },
+            "label": "Quality"
+        },
+        "Weapon": {
+            "AmmoCount": "Ammo Count",
+            "Category": {
+                "Melee": "Melee",
+                "Range": "Range",
+                "Thrown": "Thrown"
+            },
+            "Cliptype": {
+                "BeltFed": "Belt Fed",
+                "Bow": "Bow",
+                "BreakAction": "Break Action",
+                "Cylinder": "Cylinder",
+                "Drum": "Drum",
+                "InternalMagazin": "Internal Magazine",
+                "MuzzleLoader": "Muzzle Loader",
+                "RemovableClip": "Removable Clip"
+            },
+            "FIELDS": {
+                "category": {
+                    "hint": "The type of Weapon this item represents. Different types require different configurations",
+                    "label": "Weapon Type"
+                },
+                "melee": {
+                    "reach": {
+                        "hint": "Reach of the Weapon, this is used as a modifier in combat",
+                        "label": "Reach"
+                    }
+                },
+                "range": {
+                    "modes": {
+                        "burst_fire": {
+                            "hint": "If the Weapon supports Burst-Fire (BF)",
+                            "label": "Burst-Fire"
+                        },
+                        "full_auto": {
+                            "hint": "If the Weapon supports Full-Auto (FA)",
+                            "label": "Full-Auto"
+                        },
+                        "semi_auto": {
+                            "hint": "If the Weapon supports Semi-Automatic (SA)",
+                            "label": "Semi-Auto"
+                        },
+                        "single_shot": {
+                            "hint": "If the Weapon supports Single Shot (SS)",
+                            "label": "Single Shot"
+                        }
+                    },
+                    "ranges": {
+                        "attribute": {
+                            "hint": "Actor's Attribute to multiply the above Range's by",
+                            "label": "Range Attribute"
+                        },
+                        "category": {
+                            "hint": "Determine the Ranges of the Weapon based on its category. Select 'Manual' if the weapon uses custom values",
+                            "label": "Range Category"
+                        },
+                        "extreme": {
+                            "hint": "Extreme Range distance for the Weapon, in meters",
+                            "label": "Extreme Range"
+                        },
+                        "long": {
+                            "hint": "Long Range distance for the Weapon, in meters",
+                            "label": "Long Range"
+                        },
+                        "medium": {
+                            "hint": "Medium Range distance for the Weapon, in meters",
+                            "label": "Medium Range"
+                        },
+                        "short": {
+                            "hint": "Short Range distance for the Weapon, in meters",
+                            "label": "Short Range"
+                        }
+                    },
+                    "rc": {
+                        "base": {
+                            "hint": "Recoil Compensation of the Weapon",
+                            "label": "Recoil Compensation"
+                        }
+                    }
+                },
+                "thrown": {
+                    "blast": {
+                        "dropoff": {
+                            "hint": "The Damage Reduction per meter from the blast",
+                            "label": "Blast Dropoff (per m)"
+                        },
+                        "radius": {
+                            "hint": "Radius of the Weapon's attack, in meters",
+                            "label": "Blast Radius (m)"
+                        }
+                    },
+                    "ranges": {
+                        "attribute": {
+                            "hint": "Actor's Attribute to multiply the above Range's by",
+                            "label": "Range Attribute"
+                        },
+                        "category": {
+                            "hint": "Determine the Ranges of the Weapon based on its category. Select 'Manual' if the weapon uses custom values",
+                            "label": "Range Category"
+                        },
+                        "extreme": {
+                            "hint": "Extreme Range distance for the Weapon, in meters",
+                            "label": "Extreme Range"
+                        },
+                        "long": {
+                            "hint": "Long Range distance for the Weapon, in meters",
+                            "label": "Long Range"
+                        },
+                        "medium": {
+                            "hint": "Medium Range distance for the Weapon, in meters",
+                            "label": "Medium Range"
+                        },
+                        "short": {
+                            "hint": "Short Range distance for the Weapon, in meters",
+                            "label": "Short Range"
+                        }
+                    }
+                }
+            },
+            "FullReload": "Full",
+            "Mod": "Mod",
+            "Mode": {
+                "Mode": "Modes",
+                "Short": {
+                    "BurstFire": "BF",
+                    "BurstFireLong": "BF-LB",
+                    "BurstFireShort": "BF",
+                    "FullAuto": "FA",
+                    "FullAutoLong": "FA-L",
+                    "FullAutoShort": "FA",
+                    "SemiAuto": "SA",
+                    "SemiAutoBurst": "SA-BF",
+                    "SemiAutoShort": "SA",
+                    "SingleShot": "SS",
+                    "SingleShotShort": "SS"
+                },
+                "Full": {
+                    "BurstFire": "Burst Fire",
+                    "BurstFireLong": "Long Burst",
+                    "FullAuto": "Full Auto",
+                    "FullAutoLong": "Full Auto (Complex)",
+                    "FullAutoShort": "Full Auto (Simple)",
+                    "SemiAuto": "Semi-Automatic",
+                    "SemiAutoBurst": "Semi-Automatic Burst",
+                    "SemiAutoShort": "Semi-Automatic",
+                    "SingleShot": "Single Shot",
+                    "Suppressing": "Suppressive Fire"
+                }
+            },
+            "Mods": "Mods",
+            "PartialReload": "Partial",
+            "Range": {
+                "Category": {
+                    "AerodynamicThrownGrenade": "Aerodynamic Grenade",
+                    "AssaultCannon": "Assault Cannon",
+                    "AssaultRifle": "Assault Rifle",
+                    "Bow": "Bow",
+                    "Carbine": "Carbine",
+                    "Flamethrower": "Flamethrower",
+                    "GrenadeLauncher": "Grenade Launcher",
+                    "HarpoonGun": "Harpoon Gun",
+                    "HarpoonGunUnderwater": "Harpoon Gun (Underwater)",
+                    "HeavyCrossbow": "Heavy Crossbow",
+                    "HeavyPistol": "Heavy Pistol",
+                    "HoldOutPistol": "Hold-Out Pistol",
+                    "LightCrossbow": "Light Crossbow",
+                    "LightMachinegun": "Light Machinegun",
+                    "LightPistol": "Light Pistol",
+                    "MachinePistol": "Machine Pistol",
+                    "Manual": "Manual",
+                    "MediumCrossbow": "Medium Crossbow",
+                    "MediumHeavyMachinegun": "Medium/Heavy Machinegun",
+                    "MissileLauncher": "Missile Launcher",
+                    "Net": "Net",
+                    "SMG": "SMG",
+                    "ShotgunFlechette": "Shotgun (Flechette)",
+                    "ShotgunSlug": "Shotgun (Slug)",
+                    "Shuriken": "Shuriken",
+                    "SniperRifle": "Sniper Rifle",
+                    "SportingRifle": "Sporting Rifle",
+                    "SprayPen": "Spray Pen",
+                    "StandardThrownGrenade": "Standard Grenade",
+                    "Taser": "Taser",
+                    "ThrownKnife": "Thrown Knife"
+                },
+                "Extreme": "Extreme",
+                "Long": "Long",
+                "Medium": "Medium",
+                "Modes": "Modes",
+                "Range": "Range",
+                "Ranges": "Ranges",
+                "Short": "Short"
+            },
+            "Reach": "Reach",
+            "Reload": "Reload",
+            "ResetSpareReloads": "Reset Spare Reloads",
+            "SpareReloads": "Spare Reloads",
+            "Thrown": {
+                "Range": "Thrown Weapon Range"
+            },
+            "Type": "Type",
+            "Weapon": "Weapon"
+        }
+    }
+}

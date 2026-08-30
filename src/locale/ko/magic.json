@@ -1,0 +1,323 @@
+{
+    "SR5": {
+        "AdeptPower": {
+            "FIELDS": {
+                "drain": {
+                    "hint": "해당 달인 능력 사용 후 드레인이 유발됨",
+                    "label": "드레인"
+                },
+                "level": {
+                    "hint": "해당 달인 능력의 단계 (해당되는 경우)",
+                    "label": "단계"
+                },
+                "pp": {
+                    "hint": "해당 능력에 소모되는 능력 점수",
+                    "label": "능력 점수"
+                },
+                "type": {
+                    "hint": "달인 능력 유형",
+                    "label": "능력 유형"
+                }
+            },
+            "Types": {
+                "Active": "활성형",
+                "Passive": "자동형"
+            }
+        },
+        "CritterPower": {
+            "Categories": {
+                "Drake": "드레이크",
+                "Echoes": "에코",
+                "Emergent": "공명자",
+                "FreeSpirit": "영혼 해방",
+                "Mundane": "일반인",
+                "Paranormal": "초자연",
+                "ParanormalInfected": "초자연/감염",
+                "Shapeshifter": "변신수",
+                "Weakness": "약점"
+            },
+            "Category": "범주",
+            "Duration": "지속력",
+            "Durations": {
+                "Always": "항시적",
+                "Instant": "즉각적",
+                "Permanent": "영구적",
+                "Special": "특수",
+                "Sustained": "지속적"
+            },
+            "FIELDS": {
+                "duration": {
+                    "hint": "해당 생명체 능력의 지속력",
+                    "label": "지속력"
+                },
+                "karma": {
+                    "hint": "해당 생명체 능력의 카르마 비용",
+                    "label": "카르마"
+                },
+                "optional": {
+                    "hint": "해당 생명체 능력이 추가 능력일 경우 선택",
+                    "label": "추가 능력"
+                },
+                "powerType": {
+                    "hint": "생명체 능력 유형",
+                    "label": "능력 유형"
+                },
+                "range": {
+                    "hint": "해당 생명체 능력의 사거리",
+                    "label": "사거리"
+                }
+            },
+            "IsOptional": "능력 설정",
+            "Karma": "카르마",
+            "OptionalSelectionCount": "선택 능력",
+            "Optional": {
+                "DisabledOption": "추가 능력, 사용 불가능",
+                "EnabledOption": "추가 능력, 사용 가능",
+                "Standard": "기본"
+            },
+            "Range": "사거리",
+            "Ranges": {
+                "LineOfSight": "시야 범위 내",
+                "LineOfSightArea": "시야 범위 내 (A)",
+                "Self": "시전자 적용",
+                "Special": "특수",
+                "Touch": "접촉"
+            },
+            "Type": "유형",
+            "Types": {
+                "Mana": "마나",
+                "Physical": "물리"
+            }
+        },
+        "Ritual": {
+            "Anchored": "고정형",
+            "FIELDS": {
+                "descriptors": {
+                    "hint": "해당 의식의 핵심어",
+                    "label": "핵심어"
+                },
+                "type": {
+                    "hint": "수행할 의식의 유형",
+                    "label": "의식 유형"
+                }
+            },
+            "MaterialLink": "물질 연결",
+            "Minion": "하수인",
+            "Spell": "주문",
+            "Spotter": "관측자"
+        },
+        "Spell": {
+            "Attack": "주문 공격",
+            "Cast": "주문 시전",
+            "CatCombat": "전투",
+            "CatDetection": "탐지",
+            "CatHealth": "의료",
+            "CatIllusion": "환영",
+            "CatManipulation": "조작",
+            "CatRitual": "의식",
+            "Category": "범주",
+            "CombatDirect": "직접",
+            "CombatIndirect": "간접",
+            "Defense": "주문 방어",
+            "DefenseDirectMana": "주문 방어 (직접, 마나)",
+            "DefenseDirectPhysical": "주문 방어 (간접, 물리)",
+            "DetectionArea": "범위형",
+            "DetectionDirectional": "지향형",
+            "DetectionPsychic": "초자연",
+            "FIELDS": {
+                "category": {
+                    "hint": "주문이 속한 범주",
+                    "label": "범주"
+                },
+                "combat": {
+                    "type": {
+                        "hint": "주문의 직접 또는 간접 유형",
+                        "label": "전투 주문 유형"
+                    }
+                },
+                "detection": {
+                    "extended": {
+                        "hint": "주문의 연장 여부",
+                        "label": "연장"
+                    },
+                    "passive": {
+                        "hint": "주문의 수동형 여부",
+                        "label": "수동형"
+                    },
+                    "type": {
+                        "hint": "주문이 목표에게 영향을 미치는 방식",
+                        "label": "탐지 주문 유형"
+                    }
+                },
+                "drain": {
+                    "hint": "해당 주문의 드레인 수치, 드레인 저항 시 주문의 강도에 합쳐짐",
+                    "label": "드레인 수치"
+                },
+                "duration": {
+                    "hint": "주문의 지속력",
+                    "label": "지속력"
+                },
+                "illusion": {
+                    "sense": {
+                        "hint": "주문이 영향을 미치는 감각",
+                        "label": "감각"
+                    },
+                    "type": {
+                        "hint": "환각 주문의 유형",
+                        "label": "환각 주문 유형"
+                    }
+                },
+                "manipulation": {
+                    "damaging": {
+                        "hint": "주문의 피해 유무",
+                        "label": "손상"
+                    },
+                    "environmental": {
+                        "hint": "해당 주문들은 특정 목표를 지정하지 않고 목표에게 직접적인 영향을 미치지 않음. 대신 일정 범위 전체에 영향을 줌.",
+                        "label": "환경"
+                    },
+                    "mental": {
+                        "hint": "주문이 목표의 정신에 영향을 미치는지 여부",
+                        "label": "정신"
+                    },
+                    "physical": {
+                        "hint": "이 주문들은 물리적 형태에 영향을 미치며, 보통 이에 대한 방어 판정을 수행",
+                        "label": "물리"
+                    }
+                },
+                "range": {
+                    "hint": "주문의 거리",
+                    "label": "거리"
+                },
+                "ritual": {
+                    "type": {
+                        "hint": "수행할 의식의 유형",
+                        "label": "의식 유형"
+                    }
+                },
+                "type": {
+                    "hint": "주문의 유형(물리 또는 마나 기반) 여부",
+                    "label": "주문 유형"
+                }
+            },
+            "IllusionMultiSense": "다중 감각",
+            "IllusionObvious": "명백함",
+            "IllusionRealistic": "현실적",
+            "IllusionSingleSense": "단일 감각",
+            "ManipulationDamaging": "손상",
+            "ManipulationEnvironmental": "환경",
+            "ManipulationMental": "정신",
+            "ManipulationPhysical": "물리",
+            "Range": "사거리",
+            "RangeLos": "시선 방향",
+            "RangeLosA": "시선 방향 (A)",
+            "RangeTouch": "접촉",
+            "Spell": "주문",
+            "Spells": "주문",
+            "Type": "유형",
+            "TypeMana": "마나",
+            "TypePhysical": "물리"
+        },
+        "Spirit": {
+            "Bound": "속박",
+            "Force": "강도",
+            "ForceAppliesSetting": "포스 적용 대상",
+            "ForceAppliesSettingHint": "포스 보너스를 받는 정령 속성을 지정합니다.",
+            "HalfValueSkill": "절반값 기술",
+            "HalfValueSkillHint": "활성화된 기술은 ⌈강도/2⌉를 사용합니다.",
+            "InitiativeFormulaAstral": "아스트랄 우선권 공식",
+            "InitiativeFormulaAstralHint": "아스트랄 우선권의 항목을 선택하세요.",
+            "InitiativeFormulaMeatspace": "현실 우선권 공식",
+            "InitiativeFormulaMeatspaceHint": "현실 우선권의 항목을 선택하세요.",
+            "MissingSummoner": "유효한 소환자 없음",
+            "Services": "봉사",
+            "Summoner": "소환자",
+            "Type": "유형",
+            "Types": {
+                "Abomination": "어보미네이션",
+                "Air": "공기",
+                "Aircraft": "항공기",
+                "Airwave": "전파",
+                "Ally": "협력하는 영혼",
+                "Anansi": "아난시",
+                "Anarch": "무질서",
+                "Arboreal": "수목",
+                "Automotive": "자동차",
+                "Barren": "황무지",
+                "Beasts": "야수",
+                "Blackjack": "블랙잭",
+                "BladeSummoned": "칼날로 소환된 것",
+                "Blood": "혈액",
+                "BloodShade": "블러드 셰이드",
+                "Boggle": "혼란",
+                "Bone": "뼈",
+                "Bugul": "부굴",
+                "Carcass": "동물 사체",
+                "Caretaker": "곤충 경비병",
+                "Ceramic": "도자기",
+                "Chindi": "친디",
+                "CorpsCadavre": "콥스 카다브르",
+                "Corpse": "시체",
+                "Crawler": "크롤러 (악마)",
+                "Croki": "크로키",
+                "Detritus": "폐기물",
+                "Duende": "두엔데",
+                "Earth": "대지",
+                "Ejerian": "에제리안",
+                "Elvar": "엘발",
+                "Energy": "기운",
+                "Erinyes": "에리니에스",
+                "Fire": "화염",
+                "Ghasts": "가스트 (악마)",
+                "GreenMan": "그린맨",
+                "Gremlin": "그렘린",
+                "Guardian": "수호자",
+                "Guidance": "안내자",
+                "GumToad": "굼 토드 (악마)",
+                "Homunculus": "호문쿨루스",
+                "Hopper": "호퍼",
+                "HorrorShow": "호러 쇼",
+                "Imp": "임프",
+                "Jarl": "야를",
+                "Kappa": "갓파",
+                "Kokopelli": "코코펠리",
+                "Man": "인간",
+                "MasterShedim": "마스터 쉐딤",
+                "Metal": "금속",
+                "Morbi": "질병",
+                "Muse": "뮤즈",
+                "Nightmare": "악몽",
+                "Nocnitsa": "노크니차",
+                "Noxious": "유독",
+                "Nuclear": "핵",
+                "Nymph": "곤충 유충",
+                "Palefire": "창백한 불꽃",
+                "Phantom": "유령",
+                "Plague": "전염병",
+                "Plant": "식물",
+                "Preta": "망령",
+                "Queen": "곤충 여왕",
+                "Rot": "부패",
+                "Scout": "곤충 정찰병",
+                "Shade": "섀이드",
+                "Shedim": "쉐딤",
+                "Ship": "선박",
+                "Sludge": "진창",
+                "Soldier": "곤충 병사",
+                "Stabber": "암살자",
+                "Succubus": "서큐버스",
+                "Task": "태스크",
+                "Train": "열차",
+                "TsuchigumoWarrior": "전사 츠치구모",
+                "Tungak": "퉁각",
+                "Unbreakable": "언브레이커블",
+                "Vrygoths": "브리고스",
+                "VucubCaquix": "부쿱 카킥스",
+                "Watcher": "감시자",
+                "Water": "물",
+                "Worker": "곤충 일꾼",
+                "Wraith": "유령"
+            }
+        }
+    }
+}

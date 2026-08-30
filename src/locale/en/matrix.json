@@ -1,0 +1,173 @@
+{
+    "SR5": {
+        "ComplexForm": {
+            "Durations": {
+                "Immediate": "Immediate",
+                "Permanent": "Permanent",
+                "Sustained": "Sustained"
+            },
+            "FIELDS": {
+                "duration": {
+                    "hint": "Immediate (it happens instantly with no lasting effects), Sustained (you can sustain it), or Permanent (if you sustain it for its Level in Combat Turns, its effects remain after you stop sustaining it).",
+                    "label": "Duration"
+                },
+                "fade": {
+                    "hint": "The Fading Value is added to the Level chosen when threading to determine the amount of damage to be resisted",
+                    "label": "Fade"
+                },
+                "target": {
+                    "hint": "Valid Target types for the Complex Form",
+                    "label": "Target"
+                }
+            }
+        },
+        "Grid": {
+            "FIELDS": {
+                "category": {
+                    "hint": "Public Grids apply a negative modifier while connected, Local and Global Grids have no modifiers",
+                    "label": "Grid Type"
+                }
+            }
+        },
+        "Host": {
+            "Attributes": "Host Attributes",
+            "CustomAttributes": "Custom Attributes",
+            "DropICActor": "Drag&Drop an IC actor in order of security response",
+            "ICOrder": "IC Order",
+            "MissingIC": "Missing IC",
+            "Rating": "Host Rating"
+        },
+        "IC": {
+            "FIELDS": {
+                "host": {
+                    "hint": "On which host this IC is running",
+                    "label": "Host",
+                    "rating": {
+                        "hint": "Rating of the Host we are running on",
+                        "label": "Rating"
+                    }
+                },
+                "icType": {
+                    "hint": "Type of IC",
+                    "label": "IC Type"
+                }
+            },
+            "MissingHost": "Drag&Drop a host item",
+            "Type": "Type",
+            "Types": {
+                "Acid": "Acid",
+                "Binder": "Binder",
+                "BlackIC": "Black IC",
+                "Blaster": "Blaster",
+                "Bloodhound": "Bloodhound",
+                "BlueGoo": "Bloo Goo",
+                "Catapult": "Catapult",
+                "Crash": "Crash",
+                "Flicker": "Flicker",
+                "Jammer": "Jammer",
+                "Killer": "Killer",
+                "Marker": "Marker",
+                "Patrol": "Patrol",
+                "Probe": "Probe",
+                "Scramble": "Scramble",
+                "Shocker": "Shocker",
+                "Sleuther": "Sleuther",
+                "Sparky": "Sparky",
+                "TarBaby": "Tar Baby",
+                "Track": "Track"
+            }
+        },
+        "MatrixNetworkHackingApplication": {
+            "Icons": "Icons",
+            "Invite": "Ask for invite",
+            "Title": "Connect to Network"
+        },
+        "NetworkManager": {
+            "AvailableNetworks": "Available Networks",
+            "BruteForce": "Brute Force",
+            "ConnectedTo": "Connected To",
+            "HackOnTheFly": "Hack on the Fly",
+            "InviteMark": "Ask to Invite a Mark",
+            "NetworkType": "Type",
+            "NoNetwork": "Not Connected",
+            "Title": "Network Manager"
+        },
+        "RebootConfirmationDialog": {
+            "Cancel": "Cancel",
+            "Confirm": "Reboot",
+            "Description": "Are you sure you want to reboot this device?",
+            "Title": "Confirm Reboot"
+        },
+        "SelectMatrixNetworkDialog": {
+            "Cancel": "Cancel",
+            "Connect": "Connect",
+            "Title": "Select a Network"
+        },
+        "Sprite": {
+            "FIELDS": {
+                "level": {
+                    "hint": "Level of the Sprite",
+                    "label": "Level"
+                },
+                "registered": {
+                    "hint": "If the Sprite is Registered",
+                    "label": "Registered"
+                },
+                "services": {
+                    "hint": "Number of Services the Sprite has",
+                    "label": "Services"
+                },
+                "spriteType": {
+                    "hint": "Type of the Sprite",
+                    "label": "Sprite Type"
+                },
+                "technomancerUuid": {
+                    "hint": "Technomancer who compiled this Sprite",
+                    "label": "Technomancer"
+                }
+            },
+            "Level": "Level",
+            "LevelAppliesSettingHint": "Control which sprite attributes receive the Level bonus.",
+            "MissingTechnomancer": "Missing Technomancer",
+            "Registered": "Registered",
+            "Services": "Services",
+            "Technomancer": "Technomancer",
+            "Type": "Type",
+            "Types": {
+                "Companion": "Companion",
+                "Courier": "Courier",
+                "Crack": "Crack",
+                "Data": "Data",
+                "Fault": "Fault",
+                "Generalist": "Generalist",
+                "Machine": "Machine"
+            }
+        },
+        "SpritePower": {
+            "Durations": {
+                "Always": "Always",
+                "Instant": "Instant",
+                "Permanent": "Permanent",
+                "Special": "Special",
+                "Sustained": "Sustained"
+            },
+            "FIELDS": {
+                "duration": {
+                    "hint": "Duration of the Sprite Power",
+                    "label": "Duration"
+                },
+                "optional": {
+                    "hint": "If the Sprite Power is Optional",
+                    "label": "Optional"
+                }
+            },
+            "IsOptional": "Optionality",
+            "Optional": {
+                "DisabledOption": "Optional, disabled",
+                "EnabledOption": "Optional, enabled",
+                "Standard": "By default"
+            },
+            "Type": "Type"
+        }
+    }
+}

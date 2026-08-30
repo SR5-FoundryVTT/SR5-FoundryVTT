@@ -1,0 +1,542 @@
+{
+    "SR5": {
+        "ActionCategory": {
+            "Addiction": "Abhängigkeits-Handlungen",
+            "AddictionMental": "Abhängigkeit Geistig",
+            "AddictionPhysical": "Abhängigkeit Physisch",
+            "Attack": "Angriffs-Handlungen",
+            "AttackMatrix": "Matrixangriff",
+            "AttackMelee": "Nahkampf-Handlungen",
+            "AttackRanged": "Fernkampf-Handlungen",
+            "AttackThrown": "Wurfwaffen-Handlungen",
+            "BruteForce": "Brute Force",
+            "Climbing": "Kletter-Handlungen",
+            "Compiling": "Kompilier-Handlungen",
+            "ComplexForm": "Komplexe Form-Handlungen",
+            "Defense": "Verteidgungs-Handlungen",
+            "DefenseMatrix": "Matrixverteidigung",
+            "DefenseSuppression": "Verteidigung gegen Sperrfeuer",
+            "Drain": "Entzugs-Handlungen",
+            "Fade": "Schwund-Handlungen",
+            "HackOnTheFly": "Eiliges Hacken",
+            "Magic": "Magische Handlungen",
+            "Matrix": "Matrix-Handlungen",
+            "Recovery": "Genesungs-Handlungen",
+            "RecoveryPhysical": "Genesung Physisch",
+            "RecoveryStun": "Genesung Geistig",
+            "Resist": "Widerstehen-Handlungen",
+            "ResistBiofeedback": "Biofeedback Widerstand",
+            "ResistDisease": "Krankheit widerstehen",
+            "ResistMatrix": "Matrix widerstehen",
+            "ResistToxin": "Gift widerstehen",
+            "Resonance": "Resonanz-Handlungen",
+            "Rigging": "Rigger-Handlungen",
+            "Social": "Soziale Handlungen",
+            "SpellCombat": "Spruchzauberei Kampf",
+            "SpellDetection": "Spruchzauberei Wahrnehmung",
+            "SpellHealing": "Spruchzauberei Heilung",
+            "SpellIllusion": "Spruchzauberei Illusion",
+            "SpellManipulation": "Spruchzauberei Manipulation",
+            "SpellRitual": "Spruchzauberei Ritual",
+            "Summoning": "BeschwörungsHandlungen"
+        },
+        "ActionType": {
+            "Label": "Handlung",
+            "Complex": "Komplexe",
+            "Free": "Freie",
+            "Interrupt": "Interrupt",
+            "None": "Keine",
+            "Simple": "Einfache",
+            "Varies": "Variiert"
+        },
+        "CallInAction": {
+            "ActorType": "Akteur-Typ",
+            "Compilation": "Kompilierung",
+            "Compile": "Kompilieren",
+            "CreateCompilation": "Erstelle Kompilierungs-Aktion",
+            "CreateSummoning": "Erstelle Beschwörungs-Aktion",
+            "FIELDS": {
+                "actor_type": {
+                    "hint": "Akteur-Typ auswählen",
+                    "label": "Akteur-Typ"
+                },
+                "spirit": {
+                    "force": {
+                        "hint": "Kraft des Geistes auswählen",
+                        "label": "Kraft"
+                    },
+                    "type": {
+                        "hint": "Typ des Geistes auswählen",
+                        "label": "Typ"
+                    }
+                },
+                "sprite": {
+                    "level": {
+                        "hint": "Kraft des Sprites auswählen",
+                        "label": "Kraft"
+                    },
+                    "type": {
+                        "hint": "Typ des Sprites auswählen",
+                        "label": "Typ"
+                    }
+                }
+            },
+            "Summon": "Beschwören",
+            "Summoning": "Beschwörung"
+        },
+        "ExtendedTestManager": {
+            "Actions": {
+                "Cancel": "Probe abbrechen",
+                "Complete": "Als abgeschlossen markieren",
+                "Delete": "Löschen",
+                "Edit": "Bearbeiten",
+                "Pause": "Pausieren",
+                "Reactivate": "Test reaktivieren",
+                "Resume": "Fortsetzen",
+                "Roll": "Würfeln"
+            },
+            "ActivityLog": "Aktivitätsprotokoll",
+            "Actor": "Akteur",
+            "AdvanceTime": "Spielzeit beim Würfeln vorstellen",
+            "AdvanceTimeTooltip": "Stellt die Weltzeit nach jedem Wurf um das Probenintervall vor.",
+            "CanEdit": "Bearbeiten",
+            "CanRoll": "Würfeln",
+            "CanView": "Ansehen",
+            "BaseThreshold": "Basisschwelle",
+            "ConfirmCancel": "Den ausgedehnten Test \"{name}\" abbrechen? Der Test wird beendet, ein SL kann ihn später reaktivieren.",
+            "ConfirmDelete": "Die ausgedehnte Probe \"{name}\" löschen?",
+            "CreateTest": "Neue ausgedehnte Probe",
+            "Creator": "Erstellt von",
+            "CumulativeModifier": "Kumulativer Würfelpool-Modifikator von −1",
+            "CumulativeModifierTooltip": "Reduziert den Würfelpool mit jedem durchgeführten Wurf um 1. SR5 S. 48.",
+            "CumulativeRollCount": "Vorherige Würfe",
+            "Due": "Fällig",
+            "DueTooltip": "Seit dem letzten Wurf vergangene Spielzeit-Intervalle",
+            "DueMessage": {
+                "Header": "Ausgedehnte Probe kann fortgesetzt werden",
+                "OpenManager": "Verwaltung öffnen",
+                "Overdue": "{count} Intervalle vergangen",
+                "Rolls": "Würfe"
+            },
+            "EditTest": "Ausgedehnte Probe bearbeiten",
+            "Filters": {
+                "Actor": "Akteur",
+                "Advanced": "Weitere Filter",
+                "AllActors": "Alle Akteure",
+                "AllStatuses": "Alle Status",
+                "AllVisibilities": "Öffentlich und privat",
+                "Created": "Erstellt innerhalb",
+                "Mine": "Nur meine",
+                "Private": "Privat",
+                "Search": "Name oder Notizen suchen...",
+                "Status": "Status",
+                "Updated": "Aktualisiert innerhalb",
+                "Visibility": "Sichtbarkeit"
+            },
+            "GameTime": "Spielzeit",
+            "Interval": "Intervall",
+            "LastUpdate": "Letzte Aktualisierung",
+            "Log": {
+                "cancel": "Abgebrochen",
+                "complete": "Abgeschlossen",
+                "create": "Erstellt",
+                "fail": "Fehlgeschlagen",
+                "pause": "Pausiert",
+                "resume": "Fortgesetzt",
+                "roll": "Gewürfelt",
+                "update": "Aktualisiert"
+            },
+            "Name": "Name",
+            "NewTest": "Ausgedehnte Probe",
+            "NoActor": "Keiner",
+            "NoTests": "Keine ausgedehnten Proben vorhanden.",
+            "Notes": "Notizen",
+            "NotesPlaceholder": "Freitext zu dieser Probe. Durchsuchbar.",
+            "Notifications": {
+                "Completed": "Ausgedehnte Probe \"{name}\" abgeschlossen!",
+                "Failed": "Ausgedehnte Probe \"{name}\" fehlgeschlagen: Der Würfelpool ist erschöpft.",
+                "NoEditPermission": "Du darfst diese ausgedehnte Probe nicht bearbeiten.",
+                "NoRollPermission": "Du darfst für diese ausgedehnte Probe nicht würfeln.",
+                "NotActive": "Dieser ausgedehnte Test ist nicht aktiv. Setze ihn zuerst fort oder reaktiviere ihn.",
+                "NotDue": "Es ist noch nicht genug Spielzeit für den nächsten Wurf dieser ausgedehnten Probe vergangen.",
+                "Registered": "Ausgedehnte Probe \"{name}\" wird jetzt in der Verwaltung für ausgedehnte Proben verfolgt."
+            },
+            "OpenMessage": "Chatnachricht öffnen",
+            "Periods": {
+                "any": "Beliebiger Zeitraum",
+                "day": "Letzter Tag",
+                "hour": "Letzte Stunde",
+                "month": "Letzter Monat",
+                "week": "Letzte Woche"
+            },
+            "PoolUsed": "Pool",
+            "RealTime": "Echtzeit",
+            "Rolls": "Durchgeführte Würfe",
+            "SaveTest": "Speichern",
+            "SectionDetails": "Details",
+            "SectionRules": "Regeln",
+            "Sort": {
+                "accumulatedHits": "Angesammelte Erfolge",
+                "createdAt": "Erstellt",
+                "createdWorldTime": "Spielzeit-Beginn",
+                "interval": "Intervall",
+                "name": "Name",
+                "progress": "Fortschritt",
+                "rollCount": "Würfe",
+                "status": "Status",
+                "threshold": "Schwellenwert",
+                "updatedAt": "Aktualisiert"
+            },
+            "SortBy": "Sortieren nach",
+            "SortDirection": "Sortierreihenfolge umschalten",
+            "StartedGameTime": "Begonnen (Spielzeit)",
+            "Status": {
+                "active": "Aktiv",
+                "cancelled": "Abgebrochen",
+                "completed": "Abgeschlossen",
+                "failed": "Fehlgeschlagen",
+                "paused": "Pausiert"
+            },
+            "Title": "Ausgedehnte Proben",
+            "User": "Benutzer",
+            "UserPermissions": "Benutzerrechte",
+            "UserPermissionsHint": "Spielleiter, der Ersteller und Besitzer des verknüpften Akteurs haben immer vollen Zugriff. Die Ansehen-Kontrollkästchen gelten nur bei der Sichtbarkeit \"Ausgewählte Benutzer\".",
+            "Visibility": {
+                "gmAndOwner": "SL und Besitzer",
+                "gmOnly": "Nur SL",
+                "public": "Öffentlich",
+                "selectedUsers": "Ausgewählte Benutzer"
+            }
+        },
+        "ModifierTypes": {
+            "Armor": "Panzerung",
+            "AstralDice": "Astrale Initiative-Würfel",
+            "AstralInit": "Astrale Initiative-Wert",
+            "AstralLimit": "Astrales Limit",
+            "BackgroundCount": "Hintergrundstrahlung",
+            "Composure": "Selbstbeherrschung",
+            "ControlRigRating": "Riggerkontrollstufe",
+            "Defense": "Verteidigung",
+            "DefenseBlock": "Verteidigung (Blocken)",
+            "DefenseDodge": "Verteidigung (Ausweichen)",
+            "DefenseMelee": "Verteidigung (Nahkampf)",
+            "DefenseMulti": "Verteidigung (Volle Abwehr)",
+            "DefenseParry": "Verteidigung (Parieren)",
+            "DefenseRanged": "Verteidigung (Fernkampf)",
+            "DifferentGrid": "Anderes Gitter",
+            "Drain": "Entzug",
+            "Environmental": "Umwelt",
+            "EnvironmentalLight": "Umwelt (Licht)",
+            "EnvironmentalRange": "Umwelt (Reichweite)",
+            "EnvironmentalVisibility": "Umwelt (Sicht)",
+            "EnvironmentalWind": "Umwelt (Wind)",
+            "Essence": "Essenz",
+            "Fade": "Schwund",
+            "Global": "Global",
+            "JudgeIntentions": "Menschenkenntnis",
+            "LiftCarry": "Heben&Tragen",
+            "MarkDamage": "Schaden pro Marke",
+            "Marks": "Marken",
+            "MatrixDice": "Matrix-Initiative-Würfel",
+            "MatrixInit": "Matrix-Initiative-Wert",
+            "MatrixTrack": "Matrix-Monitor",
+            "MeatSpaceDice": "Fleischwelt-Initiative-Würfel",
+            "MeatSpaceInit": "Fleischwelt-Initiative-Wert",
+            "Memory": "Erinnerungsvermögen",
+            "MentalLimit": "Geistiges Limit",
+            "Noise": "Rauschen",
+            "PainTolerancePhysical": "Schmerztoleranz (Körperlich)",
+            "PainToleranceStun": "Schmerztoleranz (Geistig)",
+            "PhysicalLimit": "Körperliches Limit",
+            "PhysicalOverflowTrack": "Körperlicher Überschuss-Monitor",
+            "PhysicalTrack": "Körperlicher Monitor",
+            "PublicGrid": "Öffentliches Gitter",
+            "Reach": "Reichweite",
+            "Recoil": "Rückstoß",
+            "Run": "Laufen",
+            "Soak": "Einstecken",
+            "SocialLimit": "Soziales Limit",
+            "StunTrack": "Geistiger Monitor",
+            "ThreeMarks": "Drei Marken",
+            "TwoMarks": "Zwei Marken",
+            "Walk": "Gehen",
+            "WoundTolerance": "Wunden-Toleranz",
+            "Wounds": "Wunden"
+        },
+        "Skill": {
+            "FIELDS": {
+                "type": {
+                    "label": "Typ",
+                    "hint": "Definiert, welche Art von Fertigkeitskonfigurationen verfügbar sind"
+                },
+                "skill": {
+                    "category": {
+                        "label": "Kategorie",
+                        "hint": "Kategorie dieser Fertigkeit"
+                    },
+                    "knowledgeType": {
+                        "label": "Wissensart",
+                        "hint": "Art dieser Wissensfertigkeit"
+                    },
+                    "rating": {
+                        "label": "Stufe",
+                        "hint": "Stufe dieses Eintrags"
+                    },
+                    "defaulting": {
+                        "label": "Improvisieren",
+                        "hint": "Ob für diese Fertigkeit improvisiert werden kann"
+                    },
+                    "attribute": {
+                        "label": "Attribut",
+                        "hint": "Attribut, das von dieser Fertigkeit verwendet wird"
+                    },
+                    "limit": {
+                        "attribute": {
+                            "label": "Limit",
+                            "hint": "Limit für diese Fertigkeitsaktion. Leer lassen, um das Standard-Attributslimit zu verwenden."
+                        }
+                    },
+                    "specializations": {
+                        "label": "Spezialisierung",
+                        "hint": "Spezialisierung für diese Fertigkeit, falls vorhanden"
+                    },
+                    "language": {
+                        "isNative": {
+                            "label": "Muttersprache",
+                            "hint": "Markiert diese Sprache als Muttersprache"
+                        }
+                    },
+                    "requirement": {
+                        "label": "Voraussetzung",
+                        "hint": "Was der Akteur sein muss, damit diese Fertigkeit verfügbar ist"
+                    }
+                },
+                "group": {
+                    "label": "Fertigkeitsgruppe",
+                    "hint": "Konfiguration für eine Fertigkeitsgruppe",
+                    "skills": {
+                        "label": "Fertigkeiten",
+                        "hint": "Fertigkeiten, die Teil dieser Gruppe sind"
+                    },
+                    "rating": {
+                        "label": "Stufe",
+                        "hint": "Stufe dieser Fertigkeitsgruppe"
+                    }
+                },
+                "set": {
+                    "label": "Fertigkeitsset",
+                    "hint": "Konfiguration für ein Fertigkeitsset",
+                    "default": {
+                        "label": "Bei neuen Akteuren verwenden",
+                        "hint": "Dieses Fertigkeitsset neu erstellten Akteuren hinzufügen"
+                    },
+                    "skills": {
+                        "label": "Fertigkeiten",
+                        "hint": "Fertigkeiten, die Teil dieses Sets sind",
+                        "name": {
+                            "label": "Name",
+                            "hint": "Name der Fertigkeit"
+                        },
+                        "rating": {
+                            "label": "Stufe",
+                            "hint": "Stufe dieser Fertigkeit"
+                        },
+                        "specializations": {
+                            "label": "Spezialisierungen",
+                            "hint": "Spezialisierungen, die dieser Fertigkeit beim Anwenden des Sets gewährt werden"
+                        }
+                    },
+                    "groups": {
+                        "label": "Fertigkeitsgruppen",
+                        "hint": "Fertigkeitsgruppen, die Teil dieses Sets sind",
+                        "name": {
+                            "label": "Name",
+                            "hint": "Name der Fertigkeitsgruppe"
+                        },
+                        "rating": {
+                            "label": "Stufe",
+                            "hint": "Stufe dieser Fertigkeitsgruppe"
+                        }
+                    }
+                }
+            },
+            "Types": {
+                "Skill": "Fertigkeit",
+                "Group": "Fertigkeitsgruppe",
+                "Set": "Fertigkeitsset"
+            },
+            "Category": {
+                "Active": "Aktiv",
+                "Knowledge": "Wissen",
+                "Language": "Sprache"
+            },
+            "KnowledgeType": {
+                "Academic": "Akademisches Wissen",
+                "Professional": "Berufswissen",
+                "Interests": "Hobbywissen",
+                "Street": "Straßenwissen"
+            },
+            "Groups": {},
+            "Sets": {},
+            "Set": {
+                "LogActorDifferences": "Akteur-Unterschiede protokollieren",
+                "DifferencesLoggedInConsole": "Öffne deine Browser-Konsole, um die Unterschiede anzuzeigen"
+            },
+            "AeronauticsMechanic": "Luftfahrtmechanik",
+            "Alchemy": "Alchemie",
+            "AnimalHandling": "Tierführung",
+            "Arcana": "Arkana",
+            "Archery": "Projektilwaffen",
+            "Armorer": "Waffenbau",
+            "Artificing": "Fokusherstellung",
+            "Artisan": "Handwerk",
+            "Assensing": "Askennen",
+            "AstralCombat": "Astralkampf",
+            "Automatics": "Schnellfeuerwaffen",
+            "AutomotiveMechanic": "Fahrzeugmechanik",
+            "Banishing": "Verbannen",
+            "Binding": "Binden",
+            "Biotechnology": "Biotechnologie",
+            "Blades": "Klingenwaffen",
+            "Chemistry": "Chemie",
+            "Clubs": "Knüppel",
+            "Compiling": "Kompilieren",
+            "Computer": "Computer",
+            "Con": "Überreden",
+            "Counterspelling": "Antimagie",
+            "Cybercombat": "Matrixkampf",
+            "Cybertechnology": "Kybernetik",
+            "Decompiling": "Dekompilieren",
+            "Demolitions": "Sprengstoffe",
+            "Disenchanting": "Entzaubern",
+            "Disguise": "Verkleiden",
+            "Diving": "Tauchen",
+            "ElectronicWarfare": "Elektronische Kriegsführung",
+            "EscapeArtist": "Entfesseln",
+            "Etiquette": "Gebräuche",
+            "ExoticMeleeWeapon": "Exotische Nahkampfwaffe",
+            "ExoticRangedWeapon": "Exotische Fernkampfwaffe",
+            "FirstAid": "Erste Hilfe",
+            "Flight": "Fliegen",
+            "Forgery": "Fälschen",
+            "FreeFall": "Freifall",
+            "Gunnery": "Geschütze",
+            "Gymnastics": "Akrobatik",
+            "Hacking": "Hacking",
+            "Hardware": "Hardware",
+            "HeavyWeapons": "Schwere Waffen",
+            "Impersonation": "Verkörperung",
+            "IndustrialMechanic": "Industriemechanik",
+            "Instruction": "Unterricht",
+            "Intimidation": "Einschüchtern",
+            "Leadership": "Führung",
+            "Locksmith": "Schlosser",
+            "Longarms": "Gewehre",
+            "Medicine": "Medizin",
+            "Native": "Nativ",
+            "NauticalMechanic": "Seefahrtmechanik",
+            "Navigation": "Navigation",
+            "Negotiation": "Verhandlung",
+            "Palming": "Fingerfertigkeit",
+            "Perception": "Wahrnehmung",
+            "Performance": "Vorführung",
+            "PilotAerospace": "Raumfahrzeuge",
+            "PilotAircraft": "Flugzeuge",
+            "PilotExoticVehicle": "Exotisches Fahrzeug",
+            "PilotGroundCraft": "Bodenfahrzeuge",
+            "PilotWalker": "Läufer",
+            "PilotWatercraft": "Schiffe",
+            "Pistols": "Pistolen",
+            "Registering": "Registrieren",
+            "RitualSpellcasting": "Ritualzauberei",
+            "Running": "Laufen",
+            "Skill": "Fertigkeit",
+            "SkillGroup": "Fertigkeitsgruppe",
+            "Skills": "Fertigkeiten",
+            "Sneaking": "Schleichen",
+            "Software": "Software",
+            "Spellcasting": "Spruchzauberei",
+            "Summoning": "Herbeirufen",
+            "Survival": "Überleben",
+            "Swimming": "Schwimmen",
+            "Teamwork": {
+                "Glitched": "Glitched",
+                "ParticipantActor": "Choose actor",
+                "RollIt": "Roll it",
+                "TakePart": "Take part"
+            },
+            "ThrowingWeapons": "Wurfwaffen",
+            "Tracking": "Spurenlesen",
+            "UnarmedCombat": "Waffenloser Kampf",
+            "abbr": {
+                "Native": "M"
+            }
+        },
+        "TestResults": {
+            "AttackBlockedByHardenedArmor": "Angriff trifft, wird aber von verstärkter Panzerung abgewehrt",
+            "AttackBlockedByVehicleArmor": "Angriff trifft, wird aber von Fahrzeugpanzerung abgewehrt",
+            "AttackDodged": "Ausgewichen",
+            "AttackDoesNoPhysicalDamageToVehicle": "Angriff trifft, verursacht aber keinen körperlichen Schaden am Fahrzeug",
+            "AttackHits": "Treffer",
+            "AttackResisted": "Angriff widerstanden",
+            "BruteForceFailure": "Brute Force fehlgeschlagen!",
+            "BruteForceSuccess": "Brute Force erfolgreich!",
+            "CheckOverwatchScoreFailure": "Overwatch Wert prüfen fehlgeschlagen!",
+            "CheckOverwatchScoreSuccess": "Overwatch Wert prüfen erfolgreich!",
+            "Failure": "Misserfolg!",
+            "HackOnTheFlyFailure": "Eiliges Hacken fehlgeschlagen!",
+            "HackOnTheFlySuccess": "Eiliges Hacken erfolgreich!",
+            "ResistedAllDamage": "Kein Schaden!",
+            "ResistedSomeDamage": "Schaden!",
+            "Results": "Ergebnis",
+            "RitualFailure": "Das Ritual war zu stark für dich",
+            "RitualSuccess": "Das Ritual ist besiegelt",
+            "SoakBlockedByHardenedArmor": "Durch verstärkte Rüstung abgewehrt",
+            "SpiritSummonFailure": "Geist entkommen!",
+            "SpiritSummonSuccess": "Geist beschworen!",
+            "SpriteCompilationFailure": "Sprite entkommen!",
+            "SpriteCompilationSuccess": "Sprite kompiliert!",
+            "Success": "Erfolg!"
+        },
+        "Tests": {
+            "AttributeOnlyTest": "Attributsprobe",
+            "BiofeedbackResistTest": "Biofeedback Widerstehen",
+            "BruteForceTest": "Brute Force",
+            "CheckOverwatchScoreTest": "Prüfe Overwatch-Wert",
+            "CombatSpellDefenseTest": "Kampfzauber-Verteidigung",
+            "CompileSpriteTest": "Sprite kompilieren",
+            "ComplexFormTest": "Komplexe Form weben",
+            "DrainTest": "Entzugswiderstand",
+            "DroneInfiltrationTest": "Heimlichkeit",
+            "DronePerceptionTest": "Wahrnehmung",
+            "ExtendedTest": "Ausgedehnte Probe",
+            "FadeTest": "Schwundwiderstand",
+            "HackOnTheFlyTest": "Eiliges Hacken",
+            "MatrixDefenseTest": "Matrix Verteidigung",
+            "MatrixResistTest": "Matrix Schadenswiderstand",
+            "MatrixTest": "Matrix Probe",
+            "MeleeAttackTest": "Nahkampfangriff",
+            "NaturalRecoveryPhysicalTest": "Natürliche körperliche Genesung",
+            "NaturalRecoveryStunTest": "Natürliche geistige Genesung",
+            "OpposedBruteForceTest": "Widerstehe Brute Force",
+            "OpposedCheckOverwatchScoreTest": "Widerstehe Overwatch-Wert prüfen",
+            "OpposedCompileSpriteTest": "Widerstehe Kompilierung",
+            "OpposedHackOnTheFlyTest": "Widerstehe Eiliges Hacken",
+            "OpposedMatrixTest": "Vergleichende Matrix-Probe",
+            "OpposedRitualTest": "Besiegel das Ritual",
+            "OpposedSummonSpiritTest": "Widerstehe Herbeirufung",
+            "OpposedTest": "Vergleichende Probe",
+            "PhysicalDefenseTest": "Physische Verteidigung",
+            "PhysicalResistTest": "Physischer Schadenswiderstand",
+            "PilotVehicleTest": "Manövrieren",
+            "RangedAttackTest": "Fernkampfangriff",
+            "RitualSpellcastingTest": "Ritualzauber",
+            "SkillTest": "Fertigkeitenprobe",
+            "SpellCastingTest": "Spruchzauberei",
+            "SuccessTest": "Erfolgsprobe",
+            "SummonSpiritTest": "Geist Herbeirufen",
+            "SuppressionDefenseTest": "Sperrfeuer-Verteidigung",
+            "ThrownAttackTest": "Wurfwaffen-Angriff"
+        }
+    }
+}

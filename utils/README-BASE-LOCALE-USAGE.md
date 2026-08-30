@@ -2,15 +2,17 @@
 
 ## Overview
 
-The `check-base-locale-usage.mjs` script scans the entire project to identify localization keys in the English base locale (`public/locale/en/config.json`) that are not being used anywhere in the codebase.
+The `check-base-locale-usage.mjs` script assembles the modular English source locale from `src/locale/en` and scans the
+project for localization keys that are not used anywhere in the codebase.
 
 ## Usage
 
 ```bash
-npm run check:base-locale-usage
+npm run locale:base-usage
 ```
 
 Or run directly:
+
 ```bash
 node utils/check-base-locale-usage.mjs
 ```
@@ -25,15 +27,16 @@ node utils/check-base-locale-usage.mjs
 ### Localization Key Format
 
 Localization keys are always fully flattened when used in code. For example:
+
 ```json
 {
-  "SR5": {
-    "Weapon": {
-      "Range": {
-        "Distance": "Weapon Distance in feet"
-      }
+    "SR5": {
+        "Weapon": {
+            "Range": {
+                "Distance": "Weapon Distance in feet"
+            }
+        }
     }
-  }
 }
 ```
 
@@ -42,6 +45,7 @@ Would be used in code as: `SR5.Weapon.Range.Distance`
 ## Output Format
 
 The script outputs:
+
 - Total number of localization keys found in the base locale
 - Number of project files scanned
 - Progress indicator while checking
@@ -100,6 +104,7 @@ TYPES:
 ## Performance
 
 The script:
+
 - Loads all file contents into memory for fast searching
 - Displays progress every 100 keys checked
 - Excludes `node_modules`, `dist`, and `.git` directories

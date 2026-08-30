@@ -1,0 +1,714 @@
+{
+    "SR5": {
+        "Ammo": {
+            "FIELDS": {
+                "accuracy": {
+                    "hint": "해당 탄약의 정확도 수정치",
+                    "label": "정확도"
+                },
+                "ap": {
+                    "hint": "해당 탄약의 장갑 관통력을 나타낸다. 이 수치는 무기의 AP에 더해지거나 대체할 수 있다.",
+                    "label": "AP"
+                },
+                "blast": {
+                    "dropoff": {
+                        "hint": "폭발 반경 감소 미터 당 수정되는 피해량",
+                        "label": "폭발 감소 반경"
+                    },
+                    "radius": {
+                        "hint": "해당 탄약의 폭발 반경, 미터로 표시됨",
+                        "label": "폭발 반경"
+                    }
+                },
+                "damage": {
+                    "hint": "해당 탄약에 의해 가해지는 피해량이다. 이 피해량은 무기의 피해량에 더해지거나 대체될 수 있다.",
+                    "label": "피해량"
+                },
+                "damageType": {
+                    "hint": "해당 탄약에 의해 가해지는 피해의 유형이다.",
+                    "label": "피해 유형"
+                },
+                "element": {
+                    "hint": "해당 속성이 입히는 피해이다.",
+                    "label": "속성"
+                },
+                "replaceAP": {
+                    "hint": "해당 탄약이 무기의 AP를 대체",
+                    "label": "대체"
+                },
+                "replaceDamage": {
+                    "hint": "해당 탄약이 무기의 피해량을 대체",
+                    "label": "대체"
+                }
+            },
+            "label": "탄약"
+        },
+        "Armor": {
+            "FIELDS": {
+                "armor": {
+                    "accessory": {
+                        "hint": "해당 방어구가 보조품일 경우 선택 (수치가 액터의 기본 방어도에 더해짐)",
+                        "label": "보조 방어구"
+                    },
+                    "acid": {
+                        "hint": "산성 공격에 대한 추가 방어도 제공",
+                        "label": "산성 저항"
+                    },
+                    "cold": {
+                        "hint": "냉기 공격에 대한 추가 방어도 제공",
+                        "label": "단열 처리"
+                    },
+                    "electricity": {
+                        "hint": "전기 공격에 대한 추가 방어도 제공",
+                        "label": "비전도체"
+                    },
+                    "fire": {
+                        "hint": "화염 공격에 대한 추가 방어도 제공",
+                        "label": "내화성 소재"
+                    },
+                    "hardened": {
+                        "hint": "해당 방어구는 강화됨",
+                        "label": "강화 방어구"
+                    },
+                    "is_hardened": {
+                        "hint": "이 방어구가 강화 방어를 제공하는지 여부",
+                        "label": "강화 적용"
+                    },
+                    "immunities": {
+                        "hint": "Damage sources this armor grants Immunity against",
+                        "label": "Immunities"
+                    },
+                    "pollutant": {
+                        "hint": "Extra Armor against attacks with Pollutant",
+                        "label": "Chemical Protection"
+                    },
+                    "radiation": {
+                        "hint": "방사선 공격에 대한 추가 방어도 제공",
+                        "label": "방사선 차단"
+                    },
+                    "value": {
+                        "hint": "해당 물품이 제공하는 방어도",
+                        "label": "방어도 수치"
+                    },
+                    "water": {
+                        "hint": "Extra Armor against attacks with Water",
+                        "label": "Water Protection"
+                    }
+                }
+            },
+            "Immunity": {
+                "NormalWeapons": "Normal Weapons"
+            },
+            "Resistances": "저항",
+            "label": "방어구"
+        },
+        "Device": {
+            "FIELDS": {
+                "category": {
+                    "hint": "장치 유형",
+                    "label": "장치 유형"
+                }
+            },
+            "label": "장치"
+        },
+        "Element": {
+            "Acid": "산성",
+            "Cold": "냉기",
+            "Electricity": "전기",
+            "Fire": "화염",
+            "Pollutant": "Pollutant",
+            "Radiation": "방사능",
+            "Water": "Water",
+            "Label": "속성"
+        },
+        "Item": {
+            "FIELDS": {
+                "action": {
+                    "armor": {
+                        "hint": "해당 판정에 액터의 방어구를 적용할지 여부",
+                        "label": "방어구"
+                    },
+                    "attribute": {
+                        "hint": "해당 판정에 사용되는 특성치",
+                        "label": "특성치"
+                    },
+                    "attribute2": {
+                        "hint": "해당 판정에 사용되는 다른 특성치",
+                        "label": "기타 특성치"
+                    },
+                    "categories": {
+                        "hint": "해당 판정에 포함되는 행동 범주이다. 이 행동들은 활성 효과의 대상이 될 수 있다.",
+                        "label": "범주"
+                    },
+                    "damage": {
+                        "ap": {
+                            "attribute": {
+                                "hint": "AP 계산에 사용되는 특성치",
+                                "label": "AP 특성치"
+                            },
+                            "base": {
+                                "hint": "피해의 장갑 관통력",
+                                "label": "AP"
+                            },
+                            "base_formula_operator": {
+                                "hint": "기본 AP 수치가 특성치에 영향을 주는 방식",
+                                "label": "Operator"
+                            }
+                        },
+                        "attribute": {
+                            "hint": "피해량 계산에 사용되는 특성치",
+                            "label": "피해 특성치"
+                        },
+                        "base": {
+                            "hint": "해당 행동이 가하는 기본 피해량",
+                            "label": "기본 피해량"
+                        },
+                        "base_formula_operator": {
+                            "hint": "기본 피해량이 특성치에 영향을 주는 방식",
+                            "label": "Operator"
+                        },
+                        "biofeedback": {
+                            "hint": "해당 행동이 생체반응 피해를 함께 입히는지 여부. 해당 항목은 활성 효과의 대상으로 지정될 수 있음",
+                            "label": "생체반응"
+                        },
+                        "element": {
+                            "base": {
+                                "hint": "피해의 속성 유형. 속성이 없을 경우 빈칸으로 설정.",
+                                "label": "속성"
+                            }
+                        },
+                        "normal_weapon": {
+                            "hint": "If this damage is considered a normal (non-magical) weapon attack",
+                            "label": "Normal Weapon"
+                        },
+                        "type": {
+                            "base": {
+                                "hint": "해당 행동이 가하는 피해의 유형",
+                                "label": "피해 유형"
+                            }
+                        }
+                    },
+                    "extended": {
+                        "hint": "이 연장 행동의 굴림 사이 게임 시간입니다. 0이면 일반 판정으로 굴립니다.",
+                        "label": "연장 판정",
+                        "unit": {
+                            "hint": "연장 판정 간격의 시간 단위입니다.",
+                            "label": "간격 단위"
+                        },
+                        "value": {
+                            "hint": "굴림 사이의 게임 시간입니다. 0이면 연장되지 않는 일반 판정으로 굴립니다.",
+                            "label": "간격"
+                        }
+                    },
+                    "initiative_mod": {
+                        "hint": "이 행동을 수행할 때 적용되는 우선권 수정치",
+                        "label": "우선권 수정치"
+                    },
+                    "limit": {
+                        "attribute": {
+                            "hint": "해당 판정에서 액터에 적용되는 특정 한계.",
+                            "label": "한계"
+                        },
+                        "base": {
+                            "hint": "해당 판정에 사용되는 한계치. 특정 한계가 선택된 경우 이 수치가 합산됨",
+                            "label": "한계치"
+                        }
+                    },
+                    "mod": {
+                        "hint": "해당 판정에 적용되는 모든 수정치",
+                        "label": "수정치"
+                    },
+                    "modifiers": {
+                        "hint": "해당 판정에 영향을 주는 수정치이다.",
+                        "label": "수정치"
+                    },
+                    "opposed": {
+                        "armor": {
+                            "hint": "경쟁 판정에 액터의 방어구 수치 합산 여부",
+                            "label": "방어구"
+                        },
+                        "attribute": {
+                            "hint": "경쟁 판정에 사용되는 특성치",
+                            "label": "특성치"
+                        },
+                        "attribute2": {
+                            "hint": "경장 판정에 사용되는 기타 특성치",
+                            "label": "기타 특성치"
+                        },
+                        "mod": {
+                            "hint": "해당 경쟁 판정에 합산되는 모든 수정치",
+                            "label": "수정치"
+                        },
+                        "resist": {
+                            "armor": {
+                                "hint": "저항 판정에 액터의 방어구 수치를 합산할지 여부",
+                                "label": "방어구"
+                            },
+                            "attribute": {
+                                "hint": "해당 저항 판정에 사용되는 특성치",
+                                "label": "특성치"
+                            },
+                            "attribute2": {
+                                "hint": "해당 저항 판정에 사용되는 다른 특성치",
+                                "label": "기타 특성치"
+                            },
+                            "test": {
+                                "hint": "경쟁 판정 이후 목표가 피해 저항을 위해 수행하는 판정",
+                                "label": "저항 판정"
+                            }
+                        },
+                        "skill": {
+                            "hint": "경쟁 판정에 사용되는 기술. 기술이 없을 경우 빈칸으로 두어야함",
+                            "label": "기술"
+                        },
+                        "test": {
+                            "hint": "행동의 목표가 수행해야 하는 판정",
+                            "label": "경쟁 판정"
+                        }
+                    },
+                    "roll_mode": {
+                        "hint": "해당 판정의 굴림 방식. 사용자가 선택한 방식을 사용하려면 빈칸으로 두어야함",
+                        "label": "굴림 방식"
+                    },
+                    "skill": {
+                        "hint": "해당 행동에 사용되는 기술. 사용되는 기술이 없는 경우 비워 두시오.",
+                        "label": "기술"
+                    },
+                    "spec": {
+                        "hint": "해당 판정에 기술 전문화 수정치(+2)를 적용할지 여부",
+                        "label": "전문화"
+                    },
+                    "test": {
+                        "hint": "이 행동에 사용할 특정한 유형의 판정",
+                        "label": "판정 유형"
+                    },
+                    "threshold": {
+                        "base": {
+                            "hint": "해당 판정에서 요구되는 성공횟수",
+                            "label": "요구 성공횟수"
+                        }
+                    },
+                    "type": {
+                        "hint": "해당 기술에 사용하는 행동 유형",
+                        "label": "행동 유형"
+                    }
+                },
+                "ammo": {
+                    "clip_type": {
+                        "hint": "해당 무기에 사용되는 재장전 방식의 유형",
+                        "label": "무기 재장전 방식"
+                    },
+                    "spare_clips": {
+                        "max": {
+                            "hint": "액터가 가지고 있는 해당 무기에 맞는 여분 탄창의 최대 수",
+                            "label": "최대 여분 탄창"
+                        },
+                        "value": {
+                            "hint": "액터가 가지고 있는 남은 여분 탄창 수",
+                            "label": "남은 여분 탄창"
+                        }
+                    }
+                },
+                "capacity": {
+                    "hint": "사이버웨어/바이오웨어의 수용량",
+                    "label": "수용량"
+                },
+                "description": {
+                    "base": {
+                        "hint": "물품에 대한 설명",
+                        "label": "설명"
+                    },
+                    "source": {
+                        "hint": "항목의 출처, 이는 PDF 페이지, URL 또는 저널일 수 있음",
+                        "label": "출처"
+                    }
+                },
+                "essence": {
+                    "hint": "사이버웨어/바이오웨어의 에센스 비용",
+                    "label": "에센스"
+                },
+                "grade": {
+                    "hint": "사이버웨어/바이어웨어의 등급",
+                    "label": "등급"
+                },
+                "technology": {
+                    "availability": {
+                        "hint": "해당 물품의 희귀도 특성치, 얼마나 구하기 쉬운지를 결정함",
+                        "label": "희귀도"
+                    },
+                    "conceal": {
+                        "base": {
+                            "hint": "해당 장치가 다른 사람들에게 노출되는 정도",
+                            "label": "은폐도"
+                        }
+                    },
+                    "condition_monitor": {
+                        "value": {
+                            "hint": "물품의 상태 감시창에 누적된 현재 피해량",
+                            "label": "상태 감시창 피해량"
+                        }
+                    },
+                    "cost": {
+                        "hint": "해당 물품의 가격",
+                        "label": "가격"
+                    },
+                    "equipped": {
+                        "hint": "물품의 장착 여부",
+                        "label": "장착됨"
+                    },
+                    "master": {
+                        "hint": "해당 물품이 종속화되어 PAN 또는 WAN이 구성된 마스터 장치",
+                        "label": "마스터 장치"
+                    },
+                    "quantity": {
+                        "hint": "물품의 보유 수량",
+                        "label": "수량"
+                    },
+                    "rating": {
+                        "hint": "물품의 장치 등급, 매트릭스 행동에 반영됨.",
+                        "label": "등급"
+                    },
+                    "show_quantity": {
+                        "hint": "캐릭터 및 물품 시트에 수량 표시 여부",
+                        "label": "수량 보기"
+                    },
+                    "wireless": {
+                        "hint": "물품의 무선 상태",
+                        "label": "무선"
+                    }
+                }
+            }
+        },
+        "ItemTypes": {
+            "Action": "행동",
+            "AdeptPower": "달인 능력",
+            "Ammo": "탄약",
+            "Armor": "방어구",
+            "Bioware": "바이오웨어",
+            "ComplexForm": "컴플렉스 폼",
+            "Contact": "연줄",
+            "CritterPower": "생명체 능력",
+            "Cyberware": "사이버웨어",
+            "Device": "장치",
+            "Echo": "에코",
+            "Equipment": "도구",
+            "Gear": "장비",
+            "Grid": "그리드",
+            "Host": "호스트",
+            "License": "면허증",
+            "Lifestyle": "생활방식",
+            "Metamagic": "메타마법",
+            "Modification": "개조품",
+            "Program": "프로그램",
+            "Quality": "특징",
+            "Ritual": "의식",
+            "Sin": "SIN",
+            "Spell": "주문",
+            "SpritePower": "스프라이트 능력",
+            "Weapon": "무기"
+        },
+        "Lifestyle": {
+            "FIELDS": {
+                "comforts": {
+                    "hint": "생활방식의 편안함 수준",
+                    "label": "편안함"
+                },
+                "cost": {
+                    "hint": "생활방식의 월간 유지 비용",
+                    "label": "생활방식 비용"
+                },
+                "guests": {
+                    "hint": "같은 생활방식을 공유하는 인원",
+                    "label": "동거인"
+                },
+                "neighborhood": {
+                    "hint": "생활방식의 이웃 수준",
+                    "label": "이웃"
+                },
+                "permanent": {
+                    "hint": "생활방식의 영구 보유 여부",
+                    "label": "영구 보유"
+                },
+                "security": {
+                    "hint": "생활방식의 보안 수준",
+                    "label": "보안"
+                },
+                "type": {
+                    "hint": "생활방식의 유형",
+                    "label": "생활방식 유형"
+                }
+            },
+            "label": "생활방식"
+        },
+        "Modification": {
+            "FIELDS": {
+                "accuracy": {
+                    "hint": "적용할 정확도/한계 수정치",
+                    "label": "정확도"
+                },
+                "conceal": {
+                    "hint": "적용할 은폐도 수정치",
+                    "label": "은폐도"
+                },
+                "dice_pool": {
+                    "hint": "적용할 주사위 풀 수정치",
+                    "label": "주사위 풀"
+                },
+                "modification_category": {
+                    "hint": "해당 개조품이 속한 범주",
+                    "label": "개조 범주"
+                },
+                "mount_point": {
+                    "hint": "해당 개조품의 무기 상 부착 위치",
+                    "label": "장착 위치"
+                },
+                "rc": {
+                    "hint": "적용할 반동 제어 수정치",
+                    "label": "반동 제어"
+                },
+                "slots": {
+                    "hint": "소모되는 슬롯(차량용) 또는 포인트(드론용) 수치",
+                    "label": "슬롯"
+                },
+                "type": {
+                    "hint": "개조의 유형",
+                    "label": "개조 유형"
+                }
+            }
+        },
+        "MoveInventoryDialog": {
+            "Cancel": "취소",
+            "Move": "이동",
+            "Title": "소지품 위치 선택"
+        },
+        "Program": {
+            "FIELDS": {
+                "type": {
+                    "hint": "프로그램의 유형, 단순 정리용",
+                    "label": "프로그램 유형"
+                }
+            },
+            "label": "프로그램"
+        },
+        "Quality": {
+            "FIELDS": {
+                "karma": {
+                    "hint": "해당 특징의 카르마 비용",
+                    "label": "카르마"
+                },
+                "rating": {
+                    "hint": "해당 특징의 등급",
+                    "label": "등급"
+                },
+                "type": {
+                    "hint": "이 특징을 나타내는 유형 (긍정적/부정적/인생 모듈)",
+                    "label": "특징 유형"
+                }
+            },
+            "label": "특징"
+        },
+        "Weapon": {
+            "AmmoCount": "탄약 수량",
+            "Category": {
+                "Melee": "근거리",
+                "Range": "원거리",
+                "Thrown": "투척"
+            },
+            "Cliptype": {
+                "BeltFed": "탄띠",
+                "Bow": "활",
+                "BreakAction": "중절식",
+                "Cylinder": "실린더",
+                "Drum": "드럼",
+                "InternalMagazin": "내장형 탄창",
+                "MuzzleLoader": "전장식 장전",
+                "RemovableClip": "분리식 탄창"
+            },
+            "FIELDS": {
+                "category": {
+                    "hint": "이 물품을 나타내는 무기 유형. 유형에 따라 설정 구성이 달라짐",
+                    "label": "무기 유형"
+                },
+                "melee": {
+                    "reach": {
+                        "hint": "무기의 길이, 전투 시 수정치로 사용",
+                        "label": "길이"
+                    }
+                },
+                "range": {
+                    "modes": {
+                        "burst_fire": {
+                            "hint": "해당 무기의 점사 (BF) 지원 여부",
+                            "label": "점사"
+                        },
+                        "full_auto": {
+                            "hint": "해당 무기의 자동 사격 (FA) 지원 여부",
+                            "label": "자동 사격"
+                        },
+                        "semi_auto": {
+                            "hint": "해당 무기의 반자동 사격 (SA) 지원 여부",
+                            "label": "반자동 사격"
+                        },
+                        "single_shot": {
+                            "hint": "해당 무기의 단발 사격 (SS) 지원 여부",
+                            "label": "단발 사격"
+                        }
+                    },
+                    "ranges": {
+                        "attribute": {
+                            "hint": "위 사거리에 곱해질 액터의 특성치",
+                            "label": "거리 특성치"
+                        },
+                        "category": {
+                            "hint": "범주에 따라 해당 무기의 사거리가 결정됨. 해당 무기에 사용자 지정 수치를 사용할 경우 '수동'을 선택",
+                            "label": "거리 범주"
+                        },
+                        "extreme": {
+                            "hint": "해당 무기의 초장거리 판정 거리 (미터)",
+                            "label": "초장거리"
+                        },
+                        "long": {
+                            "hint": "해당 무기의 장거리 판정 거리 (미터)",
+                            "label": "장거리"
+                        },
+                        "medium": {
+                            "hint": "해당 무기의 중거리 판정 거리 (미터)",
+                            "label": "중거리"
+                        },
+                        "short": {
+                            "hint": "해당 무기의 단거리 판정 거리 (미터)",
+                            "label": "단거리"
+                        }
+                    },
+                    "rc": {
+                        "base": {
+                            "hint": "해당 무기의 반동 제어력",
+                            "label": "반동 제어"
+                        }
+                    }
+                },
+                "thrown": {
+                    "blast": {
+                        "dropoff": {
+                            "hint": "폭발 지점으로부터 미터당 적용되는 피해 감소량",
+                            "label": "폭발 위력 감소율 (m당)"
+                        },
+                        "radius": {
+                            "hint": "무기의 공격 범위 (미터)",
+                            "label": "폭발 범위 (m)"
+                        }
+                    },
+                    "ranges": {
+                        "attribute": {
+                            "hint": "위 사거리에 곱해질 액터의 특성치",
+                            "label": "사거리 특성치"
+                        },
+                        "category": {
+                            "hint": "범주에 따라 해당 무기의 사거리가 결정됨. 해당 무기에 사용자 지정 수치를 사용할 경우 '수동'을 선택",
+                            "label": "거리 범주"
+                        },
+                        "extreme": {
+                            "hint": "해당 무기의 초장거리 판정 거리 (미터)",
+                            "label": "초장거리"
+                        },
+                        "long": {
+                            "hint": "해당 무기의 장거리 판정 거리 (미터)",
+                            "label": "장거리"
+                        },
+                        "medium": {
+                            "hint": "해당 무기의 중거리 판정 거리 (미터)",
+                            "label": "중거리"
+                        },
+                        "short": {
+                            "hint": "해당 무기의 단거리 판정 거리 (미터)",
+                            "label": "단거리"
+                        }
+                    }
+                }
+            },
+            "FullReload": "완전 장전",
+            "Mod": "부착물",
+            "Mode": {
+                "Mode": "사격방식",
+                "Short": {
+                    "BurstFire": "BF",
+                    "BurstFireLong": "BF-LB",
+                    "BurstFireShort": "BF",
+                    "FullAuto": "FA",
+                    "FullAutoLong": "FA-L",
+                    "FullAutoShort": "FA",
+                    "SemiAuto": "SA",
+                    "SemiAutoBurst": "SA-BF",
+                    "SemiAutoShort": "SA",
+                    "SingleShot": "SS",
+                    "SingleShotShort": "SS"
+                },
+                "Full": {
+                    "BurstFire": "점사",
+                    "BurstFireLong": "긴 점사",
+                    "FullAuto": "완전 자동",
+                    "FullAutoLong": "완전 자동 (복잡)",
+                    "FullAutoShort": "완전 자동 (단순)",
+                    "SemiAuto": "반자동",
+                    "SemiAutoBurst": "반자동 점사",
+                    "SemiAutoShort": "반자동",
+                    "SingleShot": "단발",
+                    "Suppressing": "제압 사격"
+                }
+            },
+            "Mods": "부착물",
+            "PartialReload": "일부 장전",
+            "Range": {
+                "Category": {
+                    "AerodynamicThrownGrenade": "유체역학 수류탄",
+                    "AssaultCannon": "돌격용 기관포",
+                    "AssaultRifle": "돌격용 소총",
+                    "Bow": "활",
+                    "Carbine": "카빈",
+                    "Flamethrower": "화염방사기",
+                    "GrenadeLauncher": "유탄 발사기",
+                    "HarpoonGun": "작살총",
+                    "HarpoonGunUnderwater": "작살총 (수중)",
+                    "HeavyCrossbow": "대형 쇠뇌",
+                    "HeavyPistol": "중량형 권총",
+                    "HoldOutPistol": "호신용 권총",
+                    "LightCrossbow": "소형 쇠뇌",
+                    "LightMachinegun": "경기관총",
+                    "LightPistol": "경량형 권총",
+                    "MachinePistol": "기관권총",
+                    "Manual": "수동",
+                    "MediumCrossbow": "중형 쇠뇌",
+                    "MediumHeavyMachinegun": "다목적/중 기관총",
+                    "MissileLauncher": "미사일 발사기",
+                    "Net": "그물",
+                    "SMG": "SMG",
+                    "ShotgunFlechette": "산탄총 (플레셰트)",
+                    "ShotgunSlug": "산탄총 (슬러그)",
+                    "Shuriken": "표창",
+                    "SniperRifle": "저격총",
+                    "SportingRifle": "스포츠용 소총",
+                    "SprayPen": "스프레이 펜",
+                    "StandardThrownGrenade": "표준형 수류탄",
+                    "Taser": "테이저",
+                    "ThrownKnife": "투척용 나이프"
+                },
+                "Extreme": "초장거리",
+                "Long": "장거리",
+                "Medium": "중거리",
+                "Modes": "모드",
+                "Range": "사거리",
+                "Ranges": "사거리",
+                "Short": "단거리"
+            },
+            "Reach": "길이",
+            "Reload": "재장전",
+            "ResetSpareReloads": "여분 탄창 초기화",
+            "SpareReloads": "여분 탄창 재장전",
+            "Thrown": {
+                "Range": "투척 무기 사거리"
+            },
+            "Type": "유형",
+            "Weapon": "무기"
+        }
+    }
+}

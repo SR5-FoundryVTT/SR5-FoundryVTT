@@ -1,0 +1,542 @@
+{
+    "SR5": {
+        "ActionCategory": {
+            "Addiction": "Addiction Actions",
+            "AddictionMental": "Mental Addiction",
+            "AddictionPhysical": "Physical Addiction",
+            "Attack": "Attack Actions",
+            "AttackMatrix": "Attack Matrix",
+            "AttackMelee": "Attack Melee",
+            "AttackRanged": "Attack Ranged",
+            "AttackThrown": "Attack Thrown",
+            "BruteForce": "Matrix Brute Force",
+            "Climbing": "Climbing Actions",
+            "Compiling": "Compiling Actions",
+            "ComplexForm": "Complex Form Actions",
+            "Defense": "Defense Actions",
+            "DefenseMatrix": "Defense Matrix",
+            "DefenseSuppression": "Defense Suppression",
+            "Drain": "Drain Actions",
+            "Fade": "Fade Actions",
+            "HackOnTheFly": "Matrix Hack on the Fly",
+            "Magic": "Magic Actions",
+            "Matrix": "Matrix Actions",
+            "Recovery": "Recovery Actions",
+            "RecoveryPhysical": "Recovery Physical",
+            "RecoveryStun": "Recovery Stun",
+            "Resist": "Resisting Actions",
+            "ResistBiofeedback": "Resist Biofeedback",
+            "ResistDisease": "Resisting Disease",
+            "ResistMatrix": "Resist Matrix",
+            "ResistToxin": "Resisting Toxin",
+            "Resonance": "Resonance Actions",
+            "Rigging": "Rigging Actions",
+            "Social": "Social Actions",
+            "SpellCombat": "Spellcasting Combat",
+            "SpellDetection": "Spellcasting Detection",
+            "SpellHealing": "Spellcasting Healing",
+            "SpellIllusion": "Spellcasting Illusion",
+            "SpellManipulation": "Spellcasting Manipulation",
+            "SpellRitual": "Spellcasting Ritual",
+            "Summoning": "Summoning Actions"
+        },
+        "ActionType": {
+            "Label": "Type",
+            "Complex": "Complex",
+            "Free": "Free",
+            "Interrupt": "Interrupt",
+            "None": "None",
+            "Simple": "Simple",
+            "Varies": "Varies"
+        },
+        "CallInAction": {
+            "ActorType": "Actor Type",
+            "Compilation": "Compilation",
+            "Compile": "Compile",
+            "CreateCompilation": "Create compilation action",
+            "CreateSummoning": "Create summoning action",
+            "FIELDS": {
+                "actor_type": {
+                    "hint": "Type of Actor this action summons",
+                    "label": "Type"
+                },
+                "spirit": {
+                    "force": {
+                        "hint": "Force of Spirit to Summon. Disabled if a Spirit Actor is set",
+                        "label": "Force"
+                    },
+                    "type": {
+                        "hint": "Type of Spirit to Summon. Disabled if a Spirit Actor is set",
+                        "label": "Spirit Type"
+                    }
+                },
+                "sprite": {
+                    "level": {
+                        "hint": "Level of Sprite to Summon. Disabled if a Sprite Actor is set",
+                        "label": "Level"
+                    },
+                    "type": {
+                        "hint": "Type of Sprite to Compile. Disabled if a Sprite Actor is set",
+                        "label": "Sprite Type"
+                    }
+                }
+            },
+            "Summon": "Summon",
+            "Summoning": "Summoning"
+        },
+        "ExtendedTestManager": {
+            "Actions": {
+                "Cancel": "Cancel test",
+                "Complete": "Mark completed",
+                "Delete": "Delete",
+                "Edit": "Edit",
+                "Pause": "Pause",
+                "Reactivate": "Reactivate test",
+                "Resume": "Resume",
+                "Roll": "Roll"
+            },
+            "ActivityLog": "Activity log",
+            "Actor": "Actor",
+            "AdvanceTime": "Advance game time on roll",
+            "AdvanceTimeTooltip": "Advance the world time by the test interval after each roll.",
+            "CanEdit": "Edit",
+            "CanRoll": "Roll",
+            "CanView": "View",
+            "BaseThreshold": "Base Threshold",
+            "ConfirmCancel": "Cancel the extended test \"{name}\"? It ends the test, but a GM can reactivate it later.",
+            "ConfirmDelete": "Delete the extended test \"{name}\"?",
+            "CreateTest": "New Extended Test",
+            "Creator": "Created by",
+            "CumulativeModifier": "Cumulative −1 dice pool modifier",
+            "CumulativeModifierTooltip": "Reduce the dice pool by 1 for each roll performed. SR5 p. 48.",
+            "CumulativeRollCount": "Prior rolls",
+            "Due": "Due",
+            "DueTooltip": "Game time intervals elapsed since the last roll",
+            "DueMessage": {
+                "Header": "Extended test ready to continue",
+                "OpenManager": "Open manager",
+                "Overdue": "{count} intervals elapsed",
+                "Rolls": "Rolls"
+            },
+            "EditTest": "Edit Extended Test",
+            "Filters": {
+                "Actor": "Actor",
+                "Advanced": "More filters",
+                "AllActors": "All actors",
+                "AllStatuses": "All statuses",
+                "AllVisibilities": "Public and private",
+                "Created": "Created within",
+                "Mine": "Only mine",
+                "Private": "Private",
+                "Search": "Search name or notes...",
+                "Status": "Status",
+                "Updated": "Updated within",
+                "Visibility": "Visibility"
+            },
+            "GameTime": "Game Time",
+            "Interval": "Interval",
+            "LastUpdate": "Last update",
+            "Log": {
+                "cancel": "Cancelled",
+                "complete": "Completed",
+                "create": "Created",
+                "fail": "Failed",
+                "pause": "Paused",
+                "resume": "Resumed",
+                "roll": "Rolled",
+                "update": "Updated"
+            },
+            "Name": "Name",
+            "NewTest": "Extended Test",
+            "NoActor": "None",
+            "NoTests": "No extended tests to show.",
+            "Notes": "Notes",
+            "NotesPlaceholder": "Free text about this test. Searchable.",
+            "Notifications": {
+                "Completed": "Extended test \"{name}\" completed!",
+                "Failed": "Extended test \"{name}\" failed: the dice pool is exhausted.",
+                "NoEditPermission": "You are not allowed to edit this extended test.",
+                "NoRollPermission": "You are not allowed to roll this extended test.",
+                "NotActive": "This extended test is not active. Resume or reactivate it first.",
+                "NotDue": "Not enough game time has passed for the next roll of this extended test.",
+                "Registered": "Extended test \"{name}\" is now tracked in the Extended Tests manager."
+            },
+            "OpenMessage": "Open chat message",
+            "Periods": {
+                "any": "Any time",
+                "day": "Last day",
+                "hour": "Last hour",
+                "month": "Last month",
+                "week": "Last week"
+            },
+            "PoolUsed": "Pool",
+            "RealTime": "Real Time",
+            "Rolls": "Rolls performed",
+            "SaveTest": "Save",
+            "SectionDetails": "Details",
+            "SectionRules": "Rules",
+            "Sort": {
+                "accumulatedHits": "Accumulated hits",
+                "createdAt": "Created",
+                "createdWorldTime": "Game start time",
+                "interval": "Interval",
+                "name": "Name",
+                "progress": "Progress",
+                "rollCount": "Rolls",
+                "status": "Status",
+                "threshold": "Threshold",
+                "updatedAt": "Updated"
+            },
+            "SortBy": "Sort by",
+            "SortDirection": "Toggle sort direction",
+            "StartedGameTime": "Started (game time)",
+            "Status": {
+                "active": "Active",
+                "cancelled": "Cancelled",
+                "completed": "Completed",
+                "failed": "Failed",
+                "paused": "Paused"
+            },
+            "Title": "Extended Tests",
+            "User": "User",
+            "UserPermissions": "User Permissions",
+            "UserPermissionsHint": "GMs, the creator and owners of the linked actor always have full access. Viewing checkboxes only apply with visibility \"Selected users\".",
+            "Visibility": {
+                "gmAndOwner": "GM and owner",
+                "gmOnly": "GM only",
+                "public": "Public",
+                "selectedUsers": "Selected users"
+            }
+        },
+        "ModifierTypes": {
+            "Armor": "Armor",
+            "AstralDice": "Astral Init Dice",
+            "AstralInit": "Astral Init",
+            "AstralLimit": "Astral Limit",
+            "BackgroundCount": "Background Count",
+            "Composure": "Composure",
+            "ControlRigRating": "Control Rig Rating",
+            "Defense": "Defense",
+            "DefenseBlock": "Defense (Block)",
+            "DefenseDodge": "Defense (Dodge)",
+            "DefenseMelee": "Defense (Melee)",
+            "DefenseMulti": "Defense (Multi)",
+            "DefenseParry": "Defense (Parry)",
+            "DefenseRanged": "Defense (Ranged)",
+            "DifferentGrid": "Different Grid",
+            "Drain": "Drain",
+            "Environmental": "Environmental",
+            "EnvironmentalLight": "Environmental (Light)",
+            "EnvironmentalRange": "Environmental (Range)",
+            "EnvironmentalVisibility": "Environmental (Visibility)",
+            "EnvironmentalWind": "Environmental (Wind)",
+            "Essence": "Essence",
+            "Fade": "Fade",
+            "Global": "Global",
+            "JudgeIntentions": "J.Intentions",
+            "LiftCarry": "Lift&Carry",
+            "MarkDamage": "Per Mark Damage",
+            "Marks": "Marks",
+            "MatrixDice": "Matrix Init Dice",
+            "MatrixInit": "Matrix Init",
+            "MatrixTrack": "Matrix Track",
+            "MeatSpaceDice": "Meatspace Init Dice",
+            "MeatSpaceInit": "Meatspace Init",
+            "Memory": "Memory",
+            "MentalLimit": "Mental Limit",
+            "Noise": "Noise",
+            "PainTolerancePhysical": "Pain Tolerance Physical",
+            "PainToleranceStun": "Pain Tolerance Stun",
+            "PhysicalLimit": "Physical Limit",
+            "PhysicalOverflowTrack": "Physical Overflow Track",
+            "PhysicalTrack": "Physical Track",
+            "PublicGrid": "Public Grid",
+            "Reach": "Reach",
+            "Recoil": "Recoil",
+            "Run": "Run",
+            "Soak": "Soak",
+            "SocialLimit": "Social Limit",
+            "StunTrack": "Stun Track",
+            "ThreeMarks": "Three Marks",
+            "TwoMarks": "Two Marks",
+            "Walk": "Walk",
+            "WoundTolerance": "Wound Tolerance",
+            "Wounds": "Wounds"
+        },
+        "Skill": {
+            "FIELDS": {
+                "type": {
+                    "label": "Type",
+                    "hint": "Defines what kind of skill configurations are available"
+                },
+                "skill": {
+                    "category": {
+                        "label": "Category",
+                        "hint": "Category of this skill"
+                    },
+                    "knowledgeType": {
+                        "label": "Knowledge Type",
+                        "hint": "Type of knowledge skill"
+                    },
+                    "rating": {
+                        "label": "Rating",
+                        "hint": "Rating of this entry"
+                    },
+                    "defaulting": {
+                        "label": "Defaulting",
+                        "hint": "If this skill can be defaulted"
+                    },
+                    "attribute": {
+                        "label": "Attribute",
+                        "hint": "Attribute used by this skill"
+                    },
+                    "limit": {
+                        "attribute": {
+                            "label": "Limit",
+                            "hint": "Limit to use for this skill action. Leave empty to use default attribute limit."
+                        }
+                    },
+                    "specializations": {
+                        "label": "Specialization",
+                        "hint": "Specialization for this skill, if any"
+                    },
+                    "language": {
+                        "isNative": {
+                            "label": "Native",
+                            "hint": "Marks this language as native"
+                        }
+                    },
+                    "requirement": {
+                        "label": "Requirement",
+                        "hint": "What the actor must be for this skill to be available"
+                    }
+                },
+                "group": {
+                    "label": "Skill Group",
+                    "hint": "Configuration for a skill group",
+                    "skills": {
+                        "label": "Skills",
+                        "hint": "Skills that are part of this group"
+                    },
+                    "rating": {
+                        "label": "Rating",
+                        "hint": "Rating of this skill group"
+                    }
+                },
+                "set": {
+                    "label": "Skill Set",
+                    "hint": "Configuration for a skill set",
+                    "default": {
+                        "label": "Use On New Actors",
+                        "hint": "Add this skill set to newly created actors"
+                    },
+                    "skills": {
+                        "label": "Skills",
+                        "hint": "Skills that are part of this set",
+                        "name": {
+                            "label": "Name",
+                            "hint": "Name of the skill"
+                        },
+                        "rating": {
+                            "label": "Rating",
+                            "hint": "Rating of this skill"
+                        },
+                        "specializations": {
+                            "label": "Specialization",
+                            "hint": "Specializations granted to this skill when the set is applied"
+                        }
+                    },
+                    "groups": {
+                        "label": "Skill Groups",
+                        "hint": "Skill groups that are part of this set",
+                        "name": {
+                            "label": "Name",
+                            "hint": "Name of the skill group"
+                        },
+                        "rating": {
+                            "label": "Rating",
+                            "hint": "Rating of this skill group"
+                        }
+                    }
+                }
+            },
+            "Types": {
+                "Skill": "Skill",
+                "Group": "Skill Group",
+                "Set": "Skill Set"
+            },
+            "Category": {
+                "Active": "Active",
+                "Knowledge": "Knowledge",
+                "Language": "Language"
+            },
+            "KnowledgeType": {
+                "Academic": "Academic",
+                "Professional": "Professional",
+                "Interests": "Interests",
+                "Street": "Street"
+            },
+            "Groups": {},
+            "Sets": {},
+            "Set": {
+                "LogActorDifferences": "Log Actor Differences",
+                "DifferencesLoggedInConsole": "Open your browser console to view differences"
+            },
+            "AeronauticsMechanic": "Aeronautics Mechanic",
+            "Alchemy": "Alchemy",
+            "AnimalHandling": "Animal Handling",
+            "Arcana": "Arcana",
+            "Archery": "Archery",
+            "Armorer": "Armorer",
+            "Artificing": "Artificing",
+            "Artisan": "Artisan",
+            "Assensing": "Assensing",
+            "AstralCombat": "Astral Combat",
+            "Automatics": "Automatics",
+            "AutomotiveMechanic": "Automotive Mechanic",
+            "Banishing": "Banishing",
+            "Binding": "Binding",
+            "Biotechnology": "Biotechnology",
+            "Blades": "Blades",
+            "Chemistry": "Chemistry",
+            "Clubs": "Clubs",
+            "Compiling": "Compiling",
+            "Computer": "Computer",
+            "Con": "Con",
+            "Counterspelling": "Counterspelling",
+            "Cybercombat": "Cybercombat",
+            "Cybertechnology": "Cybertechnology",
+            "Decompiling": "Decompiling",
+            "Demolitions": "Demolitions",
+            "Disenchanting": "Disenchanting",
+            "Disguise": "Disguise",
+            "Diving": "Diving",
+            "ElectronicWarfare": "Electronic Warfare",
+            "EscapeArtist": "Escape Artist",
+            "Etiquette": "Etiquette",
+            "ExoticMeleeWeapon": "Exotic Melee Weapon",
+            "ExoticRangedWeapon": "Exotic Ranged Weapon",
+            "FirstAid": "First Aid",
+            "Flight": "Flight",
+            "Forgery": "Forgery",
+            "FreeFall": "Free-Fall",
+            "Gunnery": "Gunnery",
+            "Gymnastics": "Gymnastics",
+            "Hacking": "Hacking",
+            "Hardware": "Hardware",
+            "HeavyWeapons": "Heavy Weapons",
+            "Impersonation": "Impersonation",
+            "IndustrialMechanic": "Industrial Mechanic",
+            "Instruction": "Instruction",
+            "Intimidation": "Intimidation",
+            "Leadership": "Leadership",
+            "Locksmith": "Locksmith",
+            "Longarms": "Longarms",
+            "Medicine": "Medicine",
+            "Native": "Native",
+            "NauticalMechanic": "Nautical Mechanic",
+            "Navigation": "Navigation",
+            "Negotiation": "Negotiation",
+            "Palming": "Palming",
+            "Perception": "Perception",
+            "Performance": "Performance",
+            "PilotAerospace": "Pilot Aerospace",
+            "PilotAircraft": "Pilot Aircraft",
+            "PilotExoticVehicle": "Pilot Exotic Vehicle",
+            "PilotGroundCraft": "Pilot Ground Craft",
+            "PilotWalker": "Pilot Walker",
+            "PilotWatercraft": "Pilot Watercraft",
+            "Pistols": "Pistols",
+            "Registering": "Registering",
+            "RitualSpellcasting": "Ritual Spellcasting",
+            "Running": "Running",
+            "Skill": "Skill",
+            "SkillGroup": "Skill Group",
+            "Skills": "Skills",
+            "Sneaking": "Sneaking",
+            "Software": "Software",
+            "Spellcasting": "Spellcasting",
+            "Summoning": "Summoning",
+            "Survival": "Survival",
+            "Swimming": "Swimming",
+            "Teamwork": {
+                "Glitched": "Glitched",
+                "ParticipantActor": "Choose actor",
+                "RollIt": "Roll it",
+                "TakePart": "Take part"
+            },
+            "ThrowingWeapons": "Throwing Weapons",
+            "Tracking": "Tracking",
+            "UnarmedCombat": "Unarmed Combat",
+            "abbr": {
+                "Native": "N"
+            }
+        },
+        "TestResults": {
+            "AttackBlockedByHardenedArmor": "Attack Hits But Is Blocked By Hardened Armor",
+            "AttackBlockedByVehicleArmor": "Attack Hits But Is Blocked By Vehicle Armor",
+            "AttackDodged": "Attack Dodged",
+            "AttackDoesNoPhysicalDamageToVehicle": "Attack Hits But Does No Physical Damage To Vehicle",
+            "AttackHits": "Attack Hits",
+            "AttackResisted": "Attack Resisted",
+            "BruteForceFailure": "Brute Force failed!",
+            "BruteForceSuccess": "Brute Force successful!",
+            "CheckOverwatchScoreFailure": "Check Overwatch Score failed!",
+            "CheckOverwatchScoreSuccess": "Check Overwatch Score successful!",
+            "Failure": "Failure!",
+            "HackOnTheFlyFailure": "Hack on the Fly failed!",
+            "HackOnTheFlySuccess": "Hack on the Fly successful!",
+            "ResistedAllDamage": "No Damage taken!",
+            "ResistedSomeDamage": "Damage taken!",
+            "Results": "Results",
+            "RitualFailure": "The ritual was too strong for you",
+            "RitualSuccess": "The ritual is sealed",
+            "SoakBlockedByHardenedArmor": "Blocked By Hardened Armor",
+            "SpiritSummonFailure": "Spirit fled!",
+            "SpiritSummonSuccess": "Spirit summoned!",
+            "SpriteCompilationFailure": "Sprite fled!",
+            "SpriteCompilationSuccess": "Sprite compiled!",
+            "Success": "Success!"
+        },
+        "Tests": {
+            "AttributeOnlyTest": "Attribute-Only Test",
+            "BiofeedbackResistTest": "Biofeedback Resist",
+            "BruteForceTest": "Brute Force",
+            "CheckOverwatchScoreTest": "Check Overwatch Score",
+            "CombatSpellDefenseTest": "Combat Spell Defense",
+            "CompileSpriteTest": "Compile Sprite",
+            "ComplexFormTest": "Threading Complex Form",
+            "DrainTest": "Drain Test",
+            "DroneInfiltrationTest": "Drone Infiltration Test",
+            "DronePerceptionTest": "Drone Perception Test",
+            "ExtendedTest": "Extended Test",
+            "FadeTest": "Fade Test",
+            "HackOnTheFlyTest": "Hack on the Fly",
+            "MatrixDefenseTest": "Matrix Defense",
+            "MatrixResistTest": "Matrix Damage Resist",
+            "MatrixTest": "Matrix Test",
+            "MeleeAttackTest": "Melee Weapon Attack",
+            "NaturalRecoveryPhysicalTest": "Natural Recovery Physical",
+            "NaturalRecoveryStunTest": "Natural Recovery Stun",
+            "OpposedBruteForceTest": "Oppose Brute Force",
+            "OpposedCheckOverwatchScoreTest": "Oppose Check Overwatch Score",
+            "OpposedCompileSpriteTest": "Oppose Compilation",
+            "OpposedHackOnTheFlyTest": "Oppose Hack On The Fly",
+            "OpposedMatrixTest": "Opposed Matrix Test",
+            "OpposedRitualTest": "Seal the Ritual",
+            "OpposedSummonSpiritTest": "Oppose Summoning",
+            "OpposedTest": "Opposed Test",
+            "PhysicalDefenseTest": "Physical Defense",
+            "PhysicalResistTest": "Physical Damage Resist",
+            "PilotVehicleTest": "Pilot Vehicle Test",
+            "RangedAttackTest": "Ranged Weapon Attack",
+            "RitualSpellcastingTest": "Ritual Spellcasting",
+            "SkillTest": "Skill Test",
+            "SpellCastingTest": "Spellcasting",
+            "SuccessTest": "Success Test",
+            "SummonSpiritTest": "Summon Spirit",
+            "SuppressionDefenseTest": "Suppression Defense",
+            "ThrownAttackTest": "Thrown Weapon Attack"
+        }
+    }
+}

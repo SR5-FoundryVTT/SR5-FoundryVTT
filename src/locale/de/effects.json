@@ -1,0 +1,141 @@
+{
+    "SR5": {
+        "ActiveEffect": {
+            "ApplyTo": "Anwenden auf",
+            "ApplyTos": {
+                "TestTargetingThisActor": "Probe, die diesen Akteur als Ziel hat",
+                "TargetedActor": "Anvisierten Akteur",
+                "TestItem": "Probe aus Item"
+            },
+            "CannotAddTestViaItemToActor": "Einem Akteur kann kein Active Effect vom Typ 'Probe aus Item' hinzugefügt werden.",
+            "ValueEditor": "Wert der Änderung bearbeiten",
+            "FIELDS": {
+                "appliedByTest": {
+                    "label": "Anwenden auf Test"
+                },
+                "conditionMode": {
+                    "hint": "Einschließen: Die Probe muss diesen Werten entsprechen; Ausschließen: Die Probe darf diesen Werten nicht entsprechen."
+                },
+                "conditionType": {
+                    "hint": "Welcher Teil der Probe durch diese Bedingung gefiltert wird."
+                },
+                "applyTo": {
+                    "hint": "Anwenden auf verschiedene Ziele",
+                    "label": "Anwenden auf"
+                },
+                "onlyForEquipped": {
+                    "hint": "Nur auf ausgerüstetes Item anwenden",
+                    "label": "Nur ausgerüstet"
+                },
+                "onlyForItemTest": {
+                    "hint": "Nur auf Test des übergeordneten Items anwenden",
+                    "label": "Nur auf Item-Test"
+                },
+                "onlyForWireless": {
+                    "hint": "Nur auf drahtlose online-Items anwenden",
+                    "label": "Nur online"
+                },
+                "selection_attributes": {
+                    "hint": "Nur für Tests mit diesen Attribute",
+                    "label": "Attributs-Filter"
+                },
+                "selection_categories": {
+                    "hint": "Nur für Tests mit diesen Handlungskategorien",
+                    "label": "Handlungs-Kategorien Filter"
+                },
+                "selection_limits": {
+                    "hint": "Nur für Tests mit diesen Limits",
+                    "label": "Limit-Filter"
+                },
+                "selection_skills": {
+                    "hint": "Nur für Tests mit diesen Fertigkeiten",
+                    "label": "Fertigkeits-Filter"
+                },
+                "selection_tests": {
+                    "hint": "Nur für Tests mit diesen Proben",
+                    "label": "Proben-Filter"
+                },
+                "targetName": {
+                    "label": "Zielname"
+                }
+            },
+            "AddCondition": "Bedingung hinzufügen",
+            "AddTarget": "Ziel hinzufügen",
+            "ExpiryTriggers": {
+                "CombatStart": "Kampfbeginn",
+                "CombatEnd": "Kampfende",
+                "TurnStart": "Rundenbeginn",
+                "TurnEnd": "Rundenende",
+                "MyActionStart": "Beginn meiner Handlungsphase",
+                "MyActionEnd": "Ende meiner Handlungsphase"
+            },
+            "Duration": {
+                "Active": "Aktiv",
+                "ActiveDetail": "Die Dauer ist aktiv.",
+                "AwaitingCombatStart": "Bis Kampfbeginn",
+                "AwaitingCombatStartDetail": "Läuft ab, wenn der nächste Kampf beginnt.",
+                "AwaitingCombatEnd": "Bis Kampfende",
+                "AwaitingCombatEndDetail": "Läuft ab, wenn der aktuelle Kampf endet.",
+                "AwaitingTurnStart": "Bis Beginn der Kampfrunde",
+                "AwaitingTurnStartDetail": "Läuft zu Beginn der nächsten Kampfrunde ab.",
+                "AwaitingTurnEnd": "Bis Ende der Kampfrunde",
+                "AwaitingTurnEndDetail": "Läuft am Ende der aktuellen Kampfrunde ab.",
+                "AwaitingMyActionStart": "Bis Beginn der Handlungsphase des Besitzers",
+                "AwaitingMyActionStartDetail": "Läuft zu Beginn der nächsten Handlungsphase des Besitzers ab.",
+                "AwaitingMyActionEnd": "Bis Ende der Handlungsphase des Besitzers",
+                "AwaitingMyActionEndDetail": "Läuft ab, wenn der Besitzer die aktuelle Handlungsphase beendet.",
+                "AwaitingTrigger": "Wartet auf Ablauf-Auslöser",
+                "AwaitingTriggerDetail": "Die Dauer ist abgelaufen und der Effekt wartet auf seinen konfigurierten Auslöser.",
+                "Combat": "Kampf",
+                "GroupCombat": "Kampf",
+                "GroupTime": "Zeit",
+                "UnitTurns": "Kampfrunden",
+                "CombatStart": "Kampfrunde {turn}, Initiative {initiative}",
+                "CombatStartNoInitiative": "Kampfrunde {turn}",
+                "CombatTurn": "{turns} Kampfrunde",
+                "CombatTurns": "{turns} Kampfrunden",
+                "DoesNotExpire": "Läuft nicht ab",
+                "Expired": "Abgelaufen",
+                "ExpiredDetail": "Starte diesen Effekt neu, um seine Dauer erneut zu beginnen.",
+                "ExpiredOpenEditor": "Abgelaufen — Effekt-Editor öffnen",
+                "ExpiryTrigger": "Ablauf-Auslöser",
+                "Remaining": "Verbleibend",
+                "RemainingDetail": "{remaining} verbleibend",
+                "Restart": "Dauer neu starten",
+                "RestartPending": "Neustart bereit",
+                "RestartPendingDetail": "Die Dauer wird neu gestartet, wenn die Änderungen gespeichert werden.",
+                "ExpiryAction": "Ablaufaktion",
+                "ExpiryActionDefault": "Standard ({action})",
+                "ExpiryActionDelete": "Löschen",
+                "ExpiryActionUpdate": "Aktualisieren",
+                "Status": "Status",
+                "Units": "Dauer-Einheiten",
+                "Value": "Dauer"
+            },
+            "AtLeastOneTarget": "Ein Effekt muss mindestens ein Ziel behalten.",
+            "FilterTypes": {
+                "Attributes": "Attribute",
+                "Categories": "Handlungskategorien",
+                "Limits": "Limits",
+                "Skills": "Fertigkeiten",
+                "Tests": "Proben"
+            },
+            "Modes": {
+                "Modify": "Modifizieren"
+            },
+            "New": "Neuer Effekt",
+            "RemoveCondition": "Bedingung entfernen",
+            "RemoveTarget": "Ziel entfernen",
+            "SelectionModes": {
+                "Exclude": "Ausschließen",
+                "Include": "Einschließen"
+            },
+            "Target": "Ziel",
+            "Targets": "Ziele"
+        },
+        "StatusEffects": {
+            "Running": "Laufen",
+            "Sprinting": "Sprint"
+        }
+    }
+}

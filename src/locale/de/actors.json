@@ -1,0 +1,410 @@
+{
+    "SR5": {
+        "Actor": {
+            "FIELDS": {
+                "attributes": {
+                    "edge": {
+                        "base": {
+                            "hint": "Edge is das Glück des Characters, der unerklärbare Faktor, der ihm hilft, in kritischen Situationen zu bestehen.",
+                            "label": "Edge"
+                        }
+                    }
+                },
+                "category_visibility": {
+                    "default": {
+                        "hint": "Sollten leere Tabs und Inventar-Kategorien standardmäßig angezeigt werden?",
+                        "label": "Zeige leere Kategorien"
+                    }
+                },
+                "full_defense_attribute": {
+                    "hint": "Attribut für Unterbrechungshandlung Volle Verteidigung",
+                    "label": "Volle Verteidigung Attribut"
+                },
+                "magic": {
+                    "attribute": {
+                        "hint": "Attribut des Magiers/Adepten für den Entzugswiderstand",
+                        "label": "Entzugs-Attribut"
+                    },
+                    "label": "Magie"
+                },
+                "modifiers": {
+                    "armor": {
+                        "hint": "Modifiziert Panzerungswert",
+                        "label": "Panzerung"
+                    },
+                    "astral_initiative": {
+                        "hint": "Modifiziert Astrala Initiative Basis",
+                        "label": "Astrala Initiative"
+                    },
+                    "astral_initiative_dice": {
+                        "hint": "Modifiziert die Anzahl der Würfel für die Astrala Initiative",
+                        "label": "Astrala Initiative Würfel"
+                    },
+                    "astral_limit": {
+                        "hint": "Modifiziert Astrala Limit",
+                        "label": "Astrala Limit"
+                    },
+                    "composure": {
+                        "hint": "Modifiziert Selbstbeherrschung",
+                        "label": "Selbstbeherrschung"
+                    },
+                    "defense": {
+                        "hint": "Modifiziert Verteidigung",
+                        "label": "Verteidigung"
+                    },
+                    "defense_block": {
+                        "hint": "Modifiziert Verteidigung für aktives Blocken",
+                        "label": "Verteidigung (Blocken)"
+                    },
+                    "defense_dodge": {
+                        "hint": "Modifiziert Verteidigung für aktives Ausweichen",
+                        "label": "Verteidigung (Ausweichen)"
+                    },
+                    "defense_melee": {
+                        "hint": "Modifiziert Verteidigung im Nahkampf",
+                        "label": "Verteidigung (Nahkampf)"
+                    },
+                    "defense_parry": {
+                        "hint": "Modifiziert Verteidigung für aktives Parieren",
+                        "label": "Verteidigung (Parieren)"
+                    },
+                    "defense_ranged": {
+                        "hint": "Modifiziert Verteidigung im Fernkampf",
+                        "label": "Verteidigung (Fernkampf)"
+                    },
+                    "drain": {
+                        "hint": "Modifiziert Entzugswiderstand Pool",
+                        "label": "Entzug"
+                    },
+                    "essence": {
+                        "hint": "Modifiziert Essenz Attribut",
+                        "label": "Essenz"
+                    },
+                    "fade": {
+                        "hint": "Modifiziert Schwundwiderstand Pool",
+                        "label": "Schwund"
+                    },
+                    "global": {
+                        "hint": "Modifiziert alle Testpools, mit Ausnahme von Schadenswiderstandsproben",
+                        "label": "Global"
+                    },
+                    "judge_intentions": {
+                        "hint": "Modifiziert Menschenkenntnis",
+                        "label": "Menschenkenntnis"
+                    },
+                    "lift_carry": {
+                        "hint": "Modifiziert Heben&Tragen",
+                        "label": "Heben&Tragen"
+                    },
+                    "mark_damage": {
+                        "hint": "Modifiziert Schaden pro Marke",
+                        "label": "Schaden pro Marke"
+                    },
+                    "matrix_initiative": {
+                        "hint": "Modifiziert Matrix-Initiative Basis",
+                        "label": "Matrix-Initiative"
+                    },
+                    "matrix_initiative_dice": {
+                        "hint": "Modifiziert Matrix-Initiative Würfel",
+                        "label": "Matrix-Initiative Würfel"
+                    },
+                    "matrix_track": {
+                        "hint": "Modifiziert Matrix-Schadensmonitor",
+                        "label": "Matrix-Monitor"
+                    },
+                    "meat_initiative": {
+                        "hint": "Modifiziert Physische-Initiative Basis",
+                        "label": "Physische-Initiative"
+                    },
+                    "meat_initiative_dice": {
+                        "hint": "Modifiziert Physische-Initiative Würfel",
+                        "label": "Physische-Initiative Würfel"
+                    },
+                    "memory": {
+                        "hint": "Modifiziert Erinnerungsvermögen",
+                        "label": "Erinnerungsvermögen"
+                    },
+                    "mental_limit": {
+                        "hint": "Modifiziert Mentales Limit",
+                        "label": "Mentales Limit"
+                    },
+                    "multi_defense": {
+                        "hint": "Modifiziert Verteidigungsproben für mehrfache Angriffe pro Runde",
+                        "label": "Mehrfachverteidigung"
+                    },
+                    "pain_tolerance_physical": {
+                        "hint": "Modifiziert ignorierten Schaden for dem ersten Wundenmodifikator",
+                        "label": "Schmerzresistenz (Physisch)"
+                    },
+                    "pain_tolerance_stun": {
+                        "hint": "Modifiziert ignorierten Schaden for dem ersten Wundenmodifikator",
+                        "label": "Schmerzresistenz (Geistig)"
+                    },
+                    "physical_limit": {
+                        "hint": "Modifiziert Physisches Limit",
+                        "label": "Physisches Limit"
+                    },
+                    "physical_overflow_track": {
+                        "hint": "Modifiziert Überlauf des physischen Zustandsmonitor",
+                        "label": "Physischer Monitor (Überlauf)"
+                    },
+                    "physical_track": {
+                        "hint": "Modifiziert physischen Schadensmonitor",
+                        "label": "Physischer Monitor"
+                    },
+                    "place_three_marks": {
+                        "hint": "Modifiziert den Platziere-Drei-Marken Modifikator",
+                        "label": "Platziere Drei Marken"
+                    },
+                    "place_two_marks": {
+                        "hint": "Modifiziert den Platziere-Zwei-Marken Modifikator",
+                        "label": "Platziere Zwei Marken"
+                    },
+                    "public_grid": {
+                        "hint": "Modifiziert den Öffentlichen-Gitter Modifikator",
+                        "label": "Öffentliches Gitter"
+                    },
+                    "reach": {
+                        "hint": "Modifiziert Reichweite im Nahkampf",
+                        "label": "Reichweite"
+                    },
+                    "recoil": {
+                        "hint": "Modifiziert angesammelten Rückstoß",
+                        "label": "Rückstoß"
+                    },
+                    "run": {
+                        "hint": "Modifiziert die Laufdistanz um ein Mehrfaches des Geschicklichkeitsattributs",
+                        "label": "Laufen"
+                    },
+                    "soak": {
+                        "hint": "Modifiziert den Pool der Schadenswiderstandsprobe",
+                        "label": "Widerstand"
+                    },
+                    "social_limit": {
+                        "hint": "Modifiziert Soziales Limit",
+                        "label": "Soziales Limit"
+                    },
+                    "stun_track": {
+                        "hint": "Modifiziert den geistigen Zustandsmonitor",
+                        "label": "Geistiger Monitor"
+                    },
+                    "walk": {
+                        "hint": "Modifiziert die Gehdistanz um ein Mehrfaches des Geschicklichkeitsattributs",
+                        "label": "Gehen"
+                    },
+                    "wound_tolerance": {
+                        "hint": "Modifiziert die Schadenskästchen pro Wundenmodifikator",
+                        "label": "Wundentoleranz"
+                    }
+                },
+                "special": {
+                    "hint": "Wähle ob der Charakter Erwacht (Magier/Adept) oder Resonanz (Technomancer) hat.",
+                    "label": "Magie/Resonanz"
+                },
+                "technomancer": {
+                    "attribute": {
+                        "hint": "Attribut des Technomancers für den Schwundwiderstand",
+                        "label": "Schwund Attribut"
+                    },
+                    "label": "Technomancer"
+                }
+            },
+            "NoFavoritesSelected": "Keine Favoriten ausgewählt"
+        },
+        "ActorTypes": {
+            "Character": "Charakter",
+            "IC": "IC",
+            "Spirit": "Geist",
+            "Sprite": "Sprite",
+            "Vehicle": "Fahrzeug"
+        },
+        "Character": {
+            "FIELDS": {
+                "is_critter": {
+                    "hint": "Erlaubt die Nutzung von Critterkräften",
+                    "label": "Ist Critter"
+                },
+                "is_npc": {
+                    "hint": "Nutze NPC-Funktionen für diesen Charakter",
+                    "label": "Ist NPC"
+                },
+                "karma": {
+                    "max": {
+                        "hint": "Insgesamt angesammeltes Karma",
+                        "label": "Gesamtkarma"
+                    },
+                    "value": {
+                        "hint": "Derzeit verfügbares Karma",
+                        "label": "Karma"
+                    }
+                },
+                "matrix_full_defense_attribute": {
+                    "hint": "Nutze dieses Attribut wenn eine Volle Matrixverteidigung genutzt wird",
+                    "label": "Volle Matrixverteidigung Attribut"
+                },
+                "metatype": {
+                    "hint": "Metatyp dieses Charakters. Ist der Charakter ein NPC werden dadurch die Attribute automatisch modifiziert.",
+                    "label": "Metatyp"
+                },
+                "notoriety": {
+                    "hint": "Wie berüchtigt ist der Charakter",
+                    "label": "Berüchtigt"
+                },
+                "npc": {
+                    "is_grunt": {
+                        "hint": "Ist dieser NPC ein Scherge (Grunt)? Wendet Regeln für Schergen-NPCs an",
+                        "label": "Ist Scherge"
+                    }
+                },
+                "nuyen": {
+                    "hint": "Derzeit verfügbares Nuyen",
+                    "label": "Nuyen"
+                },
+                "public_awareness": {
+                    "hint": "Wie bekannt ist der Charakter",
+                    "label": "Bekanntheit"
+                },
+                "street_cred": {
+                    "hint": "Wie viel Straßenruf hat der Charakter",
+                    "label": "Straßenruf"
+                }
+            },
+            "Modifiers": {
+                "NPCMetatypeAttribute": "NPC-Metatyp-Attribute"
+            },
+            "Types": {
+                "Dwarf": "Zwerg",
+                "Elf": "Elf",
+                "Human": "Mensch",
+                "Ork": "Ork",
+                "Troll": "Troll"
+            }
+        },
+        "Contact": {
+            "Blackmail": "Erpressung",
+            "Connection": "Einfluss",
+            "DropActor": "Drag&Drop' einen Akteur um ihn mit dieser Verbindung zu verbinden",
+            "FIELDS": {
+                "blackmail": {
+                    "hint": "Erpressung als Mittel zur Beeinflussung der Verbindung",
+                    "label": "Erpressung"
+                },
+                "connection": {
+                    "hint": "Grad des sozialen Einflusses dieser Verbindung",
+                    "label": "Einfluss"
+                },
+                "family": {
+                    "hint": "Familienbeziehungen der Verbindung",
+                    "label": "Familie"
+                },
+                "group": {
+                    "hint": "Verbindung gehört zur gesamten Gruppe.",
+                    "label": "Gruppe"
+                },
+                "linkedActor": {
+                    "hint": "Verknüpfter Akteur dieser Verbindung",
+                    "label": "Akteur"
+                },
+                "loyalty": {
+                    "hint": "Grad der Loyalität dieser Verbindung",
+                    "label": "Loyalität"
+                },
+                "type": {
+                    "hint": "Bestimmt Art der durch die Verbindung durchführbaren Dienste (Ausrüßtung, Jobs, Informationen, etc.)",
+                    "label": "Typ"
+                }
+            },
+            "Family": "Familie",
+            "Group": "Gruppe",
+            "LinkedActor": "Akteur",
+            "Loyalty": "Loyalität",
+            "LoyaltyConnectionHelp": "Loyalität / Verbindung",
+            "LoyaltyConnectionLabel": "L / V",
+            "Type": "Typ"
+        },
+        "InventoryRename": {
+            "Cancel": "Abbrechen",
+            "NewName": "Neuer Name",
+            "Submit": "Umbenennen",
+            "Title": "Inventar umbenennen"
+        },
+        "MovementTypes": {
+            "Run": "Laufen",
+            "Sprint": "Sprinten"
+        },
+        "Vehicle": {
+            "Categories": {
+                "Anthro": "Anthromorph",
+                "Huge": "Riesig",
+                "Large": "Groß",
+                "Medium": "Mittel",
+                "Micro": "Mikro",
+                "Mini": "Mini",
+                "Missile": "Rakete",
+                "Small": "Klein"
+            },
+            "Category": "Kategorie",
+            "ChaseEnvironment": "Verfolgungsumgebung",
+            "Clearsight": "Clearsight",
+            "ControlMode": "Steuermodus",
+            "ControlModes": {
+                "Autopilot": "Autopilot",
+                "Manual": "Manuell",
+                "Remote": "Fern",
+                "Rigger": "Rigger"
+            },
+            "Driver": "Fahrer",
+            "DamagedVehicle": "Beschädigtes Fahrzeug",
+            "Drone": "Drohne",
+            "Environments": {
+                "Handling": "Handling",
+                "Speed": "Geschwindigkeit"
+            },
+            "IsDrone": "Ist Drohne",
+            "IsOffRoad": "Ist im Gelände",
+            "Maneuvering": "Manövrieren",
+            "MissingDriver": "Fahrer per Drag&Drop zufügen",
+            "ModificationCategoryTypes": {
+                "body": "Body",
+                "cosmetic": "Cosmetic",
+                "electromagnetic": "Electromagnetic",
+                "powertrain": "Powertrain",
+                "protection": "Protection",
+                "weapons": "Weapons"
+            },
+            "OffRoad": "Off-Road",
+            "OnRoad": "Auf Straße",
+            "Stats": {
+                "Acceleration": "Beschleunigung",
+                "Handling": "Handling",
+                "OffRoadAcceleration": "Beschleunigung (Gelände)",
+                "OffRoadHandling": "Handling (Gelände)",
+                "OffRoadSpeed": "Geschw. (Gelände)",
+                "Pilot": "Pilot",
+                "Seats": "Sitze",
+                "Sensor": "Sensor",
+                "Speed": "Geschwindigkeit"
+            },
+            "Stealth": "Heimlichkeit",
+            "Type": "Typ",
+            "Types": {
+                "Aerospace": "Raumfahrzeug",
+                "Air": "Flugzeug",
+                "Exotic": "Exotisches Fahrzeug",
+                "Ground": "Bodenfahrzeug",
+                "Walker": "Läufer",
+                "Water": "Schiff"
+            },
+            "Vehicle": "Fahrzeug"
+        },
+        "VehicleImport": {
+            "MissingPermission": "Dir fehlt die Berechtigung, Akteure zu erstellen."
+        },
+        "Vision": {
+            "AstralPerception": "Astrale Wahrnehmung",
+            "AugmentedReality": "Augmented Reality",
+            "LowLight": "Restlistverstärkung",
+            "ThermographicVision": "Infrarotsicht"
+        }
+    }
+}

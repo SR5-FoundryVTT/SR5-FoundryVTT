@@ -1,0 +1,714 @@
+{
+    "SR5": {
+        "Ammo": {
+            "FIELDS": {
+                "accuracy": {
+                    "hint": "Accuracy modifier of this Ammo",
+                    "label": "Accuracy"
+                },
+                "ap": {
+                    "hint": "Armor Penetration of this Ammo. This may be added to the Weapon's AP or replace it",
+                    "label": "AP"
+                },
+                "blast": {
+                    "dropoff": {
+                        "hint": "Blast Dropoff modifies the Damage per Meter",
+                        "label": "Blast Dropoff"
+                    },
+                    "radius": {
+                        "hint": "Blast Radius of this Ammo, in Meters",
+                        "label": "Blast Radius"
+                    }
+                },
+                "damage": {
+                    "hint": "Damage dealt by this ammo. This may be added to the Weapon's Damage or replace it",
+                    "label": "Damage"
+                },
+                "damageType": {
+                    "hint": "Type of damage dealt by this Ammo.",
+                    "label": "Damage type"
+                },
+                "element": {
+                    "hint": "Element the damage of this Element does.",
+                    "label": "Element"
+                },
+                "replaceAP": {
+                    "hint": "If this Ammo should replace the AP of the Weapon",
+                    "label": "Replace"
+                },
+                "replaceDamage": {
+                    "hint": "If this Ammo should replace the Damage of the weapon",
+                    "label": "Replace"
+                }
+            },
+            "label": "Ammo"
+        },
+        "Armor": {
+            "FIELDS": {
+                "armor": {
+                    "accessory": {
+                        "hint": "Se esta Armadura é um Acessório (soma seu valor à Armadura base do ator)",
+                        "label": "Acessório"
+                    },
+                    "acid": {
+                        "hint": "Armadura extra contra ataques com Ácido",
+                        "label": "Resistência a Ácido"
+                    },
+                    "cold": {
+                        "hint": "Armadura extra contra ataques com Frio",
+                        "label": "Isolamento"
+                    },
+                    "electricity": {
+                        "hint": "Armadura extra contra ataques com Eletricidade",
+                        "label": "Não Condutividade"
+                    },
+                    "fire": {
+                        "hint": "Armadura extra contra ataques com Fogo",
+                        "label": "Resistência a Fogo"
+                    },
+                    "hardened": {
+                        "hint": "Se esta armadura é endurecida",
+                        "label": "Armadura Endurecida"
+                    },
+                    "is_hardened": {
+                        "hint": "Se esta armadura concede proteção endurecida",
+                        "label": "Endurecida Ativa"
+                    },
+                    "immunities": {
+                        "hint": "Fontes de dano contra as quais esta armadura concede Imunidade",
+                        "label": "Imunidades"
+                    },
+                    "pollutant": {
+                        "hint": "Armadura extra contra ataques com Poluentes",
+                        "label": "Proteção Química"
+                    },
+                    "radiation": {
+                        "hint": "Armadura extra contra ataques com Radiação",
+                        "label": "Resistência a Radiação"
+                    },
+                    "value": {
+                        "hint": "Quantidade de Armadura que este item fornece",
+                        "label": "Valor da Armadura"
+                    },
+                    "water": {
+                        "hint": "Armadura extra contra ataques com Água",
+                        "label": "Proteção contra Água"
+                    }
+                }
+            },
+            "Immunity": {
+                "NormalWeapons": "Normal Weapons"
+            },
+            "Resistances": "Resistências",
+            "label": "Armor"
+        },
+        "Device": {
+            "FIELDS": {
+                "category": {
+                    "hint": "The type of Device",
+                    "label": "Device Type"
+                }
+            },
+            "label": "Device"
+        },
+        "Element": {
+            "Acid": "Ácido",
+            "Cold": "Frio",
+            "Electricity": "Elétrico",
+            "Fire": "Fogo",
+            "Pollutant": "Pollutant",
+            "Radiation": "Radiação",
+            "Water": "Water",
+            "Label": "Elemento"
+        },
+        "Item": {
+            "FIELDS": {
+                "action": {
+                    "armor": {
+                        "hint": "Se a Armadura do ator deve ser somada ao teste",
+                        "label": "Armadura"
+                    },
+                    "attribute": {
+                        "hint": "O Atributo usado pelo teste",
+                        "label": "Atributo"
+                    },
+                    "attribute2": {
+                        "hint": "O Outro Atributo usado por este teste",
+                        "label": "Outro Atributo"
+                    },
+                    "categories": {
+                        "hint": "Categorias de Ação que este teste incorpora. Essas ações podem ser alvo de Efeitos Ativos",
+                        "label": "Categorias"
+                    },
+                    "damage": {
+                        "ap": {
+                            "attribute": {
+                                "hint": "Atributo a ser usado no cálculo da PA",
+                                "label": "Atributo de PA"
+                            },
+                            "base": {
+                                "hint": "Penetração de Armadura do Dano",
+                                "label": "PA"
+                            },
+                            "base_formula_operator": {
+                                "hint": "Como o valor base de PA deve afetar o Atributo",
+                                "label": "Operador"
+                            }
+                        },
+                        "attribute": {
+                            "hint": "Atributo a ser usado no cálculo do Dano",
+                            "label": "Atributo de Dano"
+                        },
+                        "base": {
+                            "hint": "A quantidade base de Dano que esta ação causa",
+                            "label": "Dano Base"
+                        },
+                        "base_formula_operator": {
+                            "hint": "Como o valor base de Dano deve afetar o Atributo",
+                            "label": "Operador"
+                        },
+                        "biofeedback": {
+                            "hint": "Se esta ação também causa dano de Biofeedback. Isso pode ser alvo de Efeitos Ativos",
+                            "label": "Biofeedback"
+                        },
+                        "element": {
+                            "base": {
+                                "hint": "O Elemento do tipo de dano. Deixe em branco para nenhum elemento.",
+                                "label": "Elemento"
+                            }
+                        },
+                        "normal_weapon": {
+                            "hint": "Se este dano é considerado um ataque de arma normal (não mágica)",
+                            "label": "Arma Normal"
+                        },
+                        "type": {
+                            "base": {
+                                "hint": "Tipo de Dano que esta ação causa",
+                                "label": "Tipo de Dano"
+                            }
+                        }
+                    },
+                    "extended": {
+                        "hint": "Tempo de jogo entre as rolagens desta ação estendida. Zero a rola como um teste normal.",
+                        "label": "Teste Estendido",
+                        "unit": {
+                            "hint": "Unidade de tempo do intervalo do teste estendido.",
+                            "label": "Unidade do Intervalo"
+                        },
+                        "value": {
+                            "hint": "Tempo de jogo entre as rolagens. Zero rola como um teste normal, não estendido.",
+                            "label": "Intervalo"
+                        }
+                    },
+                    "initiative_mod": {
+                        "hint": "Modificador de iniciativa aplicado ao realizar esta ação",
+                        "label": "Modificador de Iniciativa"
+                    },
+                    "limit": {
+                        "attribute": {
+                            "hint": "O Limite específico do Ator usado para o teste.",
+                            "label": "Limite"
+                        },
+                        "base": {
+                            "hint": "Valor de Limite usado para o teste. Este é somado se um limite específico for selecionado",
+                            "label": "Valor do Limite"
+                        }
+                    },
+                    "mod": {
+                        "hint": "Quaisquer modificadores aplicados ao teste",
+                        "label": "Modificador"
+                    },
+                    "modifiers": {
+                        "hint": "Modificadores de Ação que afetam este teste.",
+                        "label": "Modificadores"
+                    },
+                    "opposed": {
+                        "armor": {
+                            "hint": "Se a Armadura do ator deve ser somada ao Teste de Oposição",
+                            "label": "Armadura"
+                        },
+                        "attribute": {
+                            "hint": "O Atributo usado pelo Teste de Oposição",
+                            "label": "Atributo"
+                        },
+                        "attribute2": {
+                            "hint": "O Outro Atributo usado por este Teste de Oposição",
+                            "label": "Outro Atributo"
+                        },
+                        "mod": {
+                            "hint": "Quaisquer modificadores aplicados ao Teste de Oposição",
+                            "label": "Modificador"
+                        },
+                        "resist": {
+                            "armor": {
+                                "hint": "Se a Armadura do ator deve ser somada ao Teste de Resistência",
+                                "label": "Armadura"
+                            },
+                            "attribute": {
+                                "hint": "O Atributo usado pelo Teste de Resistência",
+                                "label": "Atributo"
+                            },
+                            "attribute2": {
+                                "hint": "O Outro Atributo usado por este Teste de Resistência",
+                                "label": "Outro Atributo"
+                            },
+                            "test": {
+                                "hint": "Teste que o alvo realiza para resistir ao dano após o Teste de Oposição",
+                                "label": "Teste de Resistência"
+                            }
+                        },
+                        "skill": {
+                            "hint": "Perícia usada pelo Teste de Oposição. Deixe em branco se nenhuma perícia for usada",
+                            "label": "Perícia"
+                        },
+                        "test": {
+                            "hint": "O Teste que o alvo da ação precisa realizar",
+                            "label": "Teste de Oposição"
+                        }
+                    },
+                    "roll_mode": {
+                        "hint": "O Modo de Rolagem do teste. Deixe em branco para usar o Modo de Rolagem selecionado pelo usuário",
+                        "label": "Modo de Rolagem"
+                    },
+                    "skill": {
+                        "hint": "Perícia usada por esta ação. Deixe em branco se nenhuma perícia for usada",
+                        "label": "Perícia"
+                    },
+                    "spec": {
+                        "hint": "Se o modificador de especialização da perícia (+2) deve ser aplicado a este teste",
+                        "label": "Especializado"
+                    },
+                    "test": {
+                        "hint": "Tipo específico de teste a ser usado para esta Ação",
+                        "label": "Tipo de Teste"
+                    },
+                    "threshold": {
+                        "base": {
+                            "hint": "O Limiar que o teste precisa alcançar",
+                            "label": "Valor do Limiar"
+                        }
+                    },
+                    "type": {
+                        "hint": "Tipo de ação que esta perícia utiliza",
+                        "label": "Tipo de Ação"
+                    }
+                },
+                "ammo": {
+                    "clip_type": {
+                        "hint": "The type of Reloading mechanism that the weapon uses",
+                        "label": "Weapon Reload Type"
+                    },
+                    "spare_clips": {
+                        "max": {
+                            "hint": "The Maximum number of Spare Clips the actor holds for this Weapon",
+                            "label": "Maximum Spare Reloads"
+                        },
+                        "value": {
+                            "hint": "The number of Spare Clips the actor has left",
+                            "label": "Current Spare Reloads"
+                        }
+                    }
+                },
+                "capacity": {
+                    "hint": "Capacity of the Cyberware/Bioware",
+                    "label": "Capacity"
+                },
+                "description": {
+                    "base": {
+                        "hint": "Description of the Item",
+                        "label": "Description"
+                    },
+                    "source": {
+                        "hint": "Source of the Item, this can be a PDF Page, URL, or Journal",
+                        "label": "Source"
+                    }
+                },
+                "essence": {
+                    "hint": "Essence cost of the Cyberware/Bioware",
+                    "label": "Essence"
+                },
+                "grade": {
+                    "hint": "Grade of the Cyberware/Bioware",
+                    "label": "Grade"
+                },
+                "technology": {
+                    "availability": {
+                        "hint": "The Availability attribute of the Item, this determines how easy it is to get it",
+                        "label": "Availability"
+                    },
+                    "conceal": {
+                        "base": {
+                            "hint": "How hidden this device is to other people",
+                            "label": "Conceal"
+                        }
+                    },
+                    "condition_monitor": {
+                        "value": {
+                            "hint": "Current Damage done to the Item's Condition Monitor",
+                            "label": "Condition Monitor Damage"
+                        }
+                    },
+                    "cost": {
+                        "hint": "Amount of money this item costs",
+                        "label": "Cost"
+                    },
+                    "equipped": {
+                        "hint": "If the Item is Equipped",
+                        "label": "Equipped"
+                    },
+                    "master": {
+                        "hint": "Master Device that this Item is Slaved to, forming a PAN or WAN",
+                        "label": "Master Device"
+                    },
+                    "quantity": {
+                        "hint": "The amount of items this Item represents",
+                        "label": "Quantity"
+                    },
+                    "rating": {
+                        "hint": "The Device Rating of the item, this factors into matrix actions.",
+                        "label": "Rating"
+                    },
+                    "show_quantity": {
+                        "hint": "If the Quantity of this Item should be shown on the Actor sheet and the header of the Item sheet",
+                        "label": "Show Quantity"
+                    },
+                    "wireless": {
+                        "hint": "The Wireless state of the item",
+                        "label": "Wireless"
+                    }
+                }
+            }
+        },
+        "ItemTypes": {
+            "Action": "Ação",
+            "AdeptPower": "Poder de Adepto",
+            "Ammo": "Munição",
+            "Armor": "Armadura",
+            "Bioware": "Biônico",
+            "ComplexForm": "Forma Complexa",
+            "Contact": "Contato",
+            "CritterPower": "Poder de Criatura",
+            "Cyberware": "Cibernético",
+            "Device": "Dispositivo",
+            "Echo": "Eco",
+            "Equipment": "Equipamento",
+            "Gear": "Gear",
+            "Grid": "Grid",
+            "Host": "Central",
+            "License": "License",
+            "Lifestyle": "Estilo de Vida",
+            "Metamagic": "Metamagia",
+            "Modification": "Modificação",
+            "Program": "Programa",
+            "Quality": "Qualidade",
+            "Ritual": "Ritual",
+            "Sin": "SIN",
+            "Spell": "Feitiço",
+            "SpritePower": "Poder de Sprite",
+            "Weapon": "Arma"
+        },
+        "Lifestyle": {
+            "FIELDS": {
+                "comforts": {
+                    "hint": "Comforts level of the Lifestyle",
+                    "label": "Comforts"
+                },
+                "cost": {
+                    "hint": "Cost of the Lifestyle per month",
+                    "label": "Lifestyle Cost"
+                },
+                "guests": {
+                    "hint": "Guests staying in the same Lifestyle",
+                    "label": "Guests"
+                },
+                "neighborhood": {
+                    "hint": "Neighborhood level of the Lifestyle",
+                    "label": "Neighborhood"
+                },
+                "permanent": {
+                    "hint": "If this Lifestyle is a Permanent Lifestyle",
+                    "label": "Permanent"
+                },
+                "security": {
+                    "hint": "Security level of the Lifestyle",
+                    "label": "Security"
+                },
+                "type": {
+                    "hint": "Type of Lifestyle",
+                    "label": "Lifestyle Type"
+                }
+            },
+            "label": "Lifestyle"
+        },
+        "Modification": {
+            "FIELDS": {
+                "accuracy": {
+                    "hint": "Accuracy/Limit Modifier to apply",
+                    "label": "Accuracy"
+                },
+                "conceal": {
+                    "hint": "Concealability Modifier to apply",
+                    "label": "Concealability"
+                },
+                "dice_pool": {
+                    "hint": "Dice Pool Modifier to apply",
+                    "label": "Dice Pool"
+                },
+                "modification_category": {
+                    "hint": "Category this Modification belongs to",
+                    "label": "Modification Category"
+                },
+                "mount_point": {
+                    "hint": "Mount Point on the weapon this attaches to",
+                    "label": "Mount Point"
+                },
+                "rc": {
+                    "hint": "Recoil Compensation Modifier to apply",
+                    "label": "Recoil Compensation"
+                },
+                "slots": {
+                    "hint": "Number of Slots (Vehicles) or Points (Drones) this takes up",
+                    "label": "Slots"
+                },
+                "type": {
+                    "hint": "Type of Modification",
+                    "label": "Mod Type"
+                }
+            }
+        },
+        "MoveInventoryDialog": {
+            "Cancel": "Cancelar",
+            "Move": "Mover",
+            "Title": "Escolha um inventário"
+        },
+        "Program": {
+            "FIELDS": {
+                "type": {
+                    "hint": "Type of Program, for visual organization only",
+                    "label": "Program Type"
+                }
+            },
+            "label": "Program"
+        },
+        "Quality": {
+            "FIELDS": {
+                "karma": {
+                    "hint": "Amount of Karma this Quality is worth",
+                    "label": "Karma"
+                },
+                "rating": {
+                    "hint": "Rating of this Quality",
+                    "label": "Rating"
+                },
+                "type": {
+                    "hint": "The Type of Quality this represents (Positive/Negative/Life Module)",
+                    "label": "Quality Type"
+                }
+            },
+            "label": "Quality"
+        },
+        "Weapon": {
+            "AmmoCount": "Qtd Munição",
+            "Category": {
+                "Melee": "Corpo a Corpo",
+                "Range": "Arma de Fogo",
+                "Thrown": "Arremesso"
+            },
+            "Cliptype": {
+                "BeltFed": "Alimentado por Correia",
+                "Bow": "Arco",
+                "BreakAction": "Ação de Quebra",
+                "Cylinder": "Cilindro",
+                "Drum": "Tambor",
+                "InternalMagazin": "Pente Interna",
+                "MuzzleLoader": "Carregador de Boca",
+                "RemovableClip": "Pente Removível"
+            },
+            "FIELDS": {
+                "category": {
+                    "hint": "The type of Weapon this item represents. Different types require different configurations",
+                    "label": "Weapon Type"
+                },
+                "melee": {
+                    "reach": {
+                        "hint": "Reach of the Weapon, this is used as a modifier in combat",
+                        "label": "Reach"
+                    }
+                },
+                "range": {
+                    "modes": {
+                        "burst_fire": {
+                            "hint": "If the Weapon supports Burst-Fire (BF)",
+                            "label": "Burst-Fire"
+                        },
+                        "full_auto": {
+                            "hint": "If the Weapon supports Full-Auto (FA)",
+                            "label": "Full-Auto"
+                        },
+                        "semi_auto": {
+                            "hint": "If the Weapon supports Semi-Automatic (SA)",
+                            "label": "Semi-Auto"
+                        },
+                        "single_shot": {
+                            "hint": "If the Weapon supports Single Shot (SS)",
+                            "label": "Single Shot"
+                        }
+                    },
+                    "ranges": {
+                        "attribute": {
+                            "hint": "Actor's Attribute to multiply the above Range's by",
+                            "label": "Range Attribute"
+                        },
+                        "category": {
+                            "hint": "Determine the Ranges of the Weapon based on its category. Select 'Manual' if the weapon uses custom values",
+                            "label": "Range Category"
+                        },
+                        "extreme": {
+                            "hint": "Extreme Range distance for the Weapon, in meters",
+                            "label": "Extreme Range"
+                        },
+                        "long": {
+                            "hint": "Long Range distance for the Weapon, in meters",
+                            "label": "Long Range"
+                        },
+                        "medium": {
+                            "hint": "Medium Range distance for the Weapon, in meters",
+                            "label": "Medium Range"
+                        },
+                        "short": {
+                            "hint": "Short Range distance for the Weapon, in meters",
+                            "label": "Short Range"
+                        }
+                    },
+                    "rc": {
+                        "base": {
+                            "hint": "Recoil Compensation of the Weapon",
+                            "label": "Recoil Compensation"
+                        }
+                    }
+                },
+                "thrown": {
+                    "blast": {
+                        "dropoff": {
+                            "hint": "The Damage Reduction per meter from the blast",
+                            "label": "Blast Dropoff (per m)"
+                        },
+                        "radius": {
+                            "hint": "Radius of the Weapon's attack, in meters",
+                            "label": "Blast Radius (m)"
+                        }
+                    },
+                    "ranges": {
+                        "attribute": {
+                            "hint": "Actor's Attribute to multiply the above Range's by",
+                            "label": "Range Attribute"
+                        },
+                        "category": {
+                            "hint": "Determine the Ranges of the Weapon based on its category. Select 'Manual' if the weapon uses custom values",
+                            "label": "Range Category"
+                        },
+                        "extreme": {
+                            "hint": "Extreme Range distance for the Weapon, in meters",
+                            "label": "Extreme Range"
+                        },
+                        "long": {
+                            "hint": "Long Range distance for the Weapon, in meters",
+                            "label": "Long Range"
+                        },
+                        "medium": {
+                            "hint": "Medium Range distance for the Weapon, in meters",
+                            "label": "Medium Range"
+                        },
+                        "short": {
+                            "hint": "Short Range distance for the Weapon, in meters",
+                            "label": "Short Range"
+                        }
+                    }
+                }
+            },
+            "FullReload": "Carregado",
+            "Mod": "Mod",
+            "Mode": {
+                "Mode": "Modos",
+                "Short": {
+                    "BurstFire": "RJ",
+                    "BurstFireLong": "RL",
+                    "BurstFireShort": "RJ",
+                    "FullAuto": "RC",
+                    "FullAutoLong": "EC",
+                    "FullAutoShort": "Auto Completo",
+                    "SemiAuto": "SA",
+                    "SemiAutoBurst": "RS",
+                    "SemiAutoShort": "SA",
+                    "SingleShot": "TS",
+                    "SingleShotShort": "TS"
+                },
+                "Full": {
+                    "BurstFire": "Rajada",
+                    "BurstFireLong": "Rajada Longa",
+                    "FullAuto": "Automático",
+                    "FullAutoLong": "Automático (Complexa)",
+                    "FullAutoShort": "Automático (Simples)",
+                    "SemiAuto": "Semiautomático",
+                    "SemiAutoBurst": "Rajada Semiautomática",
+                    "SemiAutoShort": "Semiautomático",
+                    "SingleShot": "Tiro Único",
+                    "Suppressing": "Fogo de Supressão"
+                }
+            },
+            "Mods": "Mods",
+            "PartialReload": "Parcial",
+            "Range": {
+                "Category": {
+                    "AerodynamicThrownGrenade": "Granada Aerodinâmica",
+                    "AssaultCannon": "Canhão de Assalto",
+                    "AssaultRifle": "Fuzil de Assalto",
+                    "Bow": "Arco",
+                    "Carbine": "Carabina",
+                    "Flamethrower": "Lança-chamas",
+                    "GrenadeLauncher": "Lançador de Granadas",
+                    "HarpoonGun": "Arpão",
+                    "HarpoonGunUnderwater": "Arpão (Subaquático)",
+                    "HeavyCrossbow": "Besta Pesada",
+                    "HeavyPistol": "Pistola Pesada",
+                    "HoldOutPistol": "Pistola de Ocultação",
+                    "LightCrossbow": "Besta Leve",
+                    "LightMachinegun": "Metralhadora Leve",
+                    "LightPistol": "Pistola Leve",
+                    "MachinePistol": "Pistola-Metralhadora",
+                    "Manual": "Manual",
+                    "MediumCrossbow": "Besta Média",
+                    "MediumHeavyMachinegun": "Metralhadora Média/Pesada",
+                    "MissileLauncher": "Lançador de Mísseis",
+                    "Net": "Rede",
+                    "SMG": "SMG",
+                    "ShotgunFlechette": "Escopeta (flechette)",
+                    "ShotgunSlug": "Escopeta (slug)",
+                    "Shuriken": "Shuriken",
+                    "SniperRifle": "Fuzil de Precisão",
+                    "SportingRifle": "Fuzil Esportivo",
+                    "SprayPen": "Caneta Spray",
+                    "StandardThrownGrenade": "Granada Padrão",
+                    "Taser": "Taser",
+                    "ThrownKnife": "Faca de Arremesso"
+                },
+                "Extreme": "Extremo",
+                "Long": "Longo",
+                "Medium": "Médio",
+                "Modes": "Modes",
+                "Range": "Range",
+                "Ranges": "Distâncias",
+                "Short": "Curto"
+            },
+            "Reach": "Alcance",
+            "Reload": "Recarregar",
+            "ResetSpareReloads": "Redefinir recargas sobressalentes",
+            "SpareReloads": "Recargas sobressalentes",
+            "Thrown": {
+                "Range": "Alcance da arma de arremesso"
+            },
+            "Type": "Tipo",
+            "Weapon": "Arma"
+        }
+    }
+}

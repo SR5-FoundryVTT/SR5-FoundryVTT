@@ -1,0 +1,259 @@
+{
+    "SR5": {
+        "ChangelogApplication": {
+            "Changelog": "GitHub에서 새로운 기능들과 수정 사항을 확인하세요.",
+            "IssuesOverview": "문제 개요",
+            "LatestChangelog": "최근 변경 사항",
+            "Reason": "최신 버전으로 업데이트 하셨습니다!",
+            "ReportIssues": "버그 보고나 기능 요청을 부탁드립니다.",
+            "Title": "섀도우런5e 업데이트"
+        },
+        "CompendiaSettings": {
+            "Description": "이 팩들은 시스템에 사용됩니다. 사용자 정의 팩으로 오버라이드 할 수 있지만, 원본 팩을 삭제해서는 안 됩니다.",
+            "GeneralActionsPack": {
+                "hint": "이 컨펜디움은 모든 일반, 특성치 전용 행동에 사용됩니다.",
+                "label": "일반 행동"
+            },
+            "ICActionsPack": {
+                "hint": "이 컨펜디움은 IC 행동에 사용되며, 각 IC 유형별로 필터링 됩니다.",
+                "label": "IC 행동"
+            },
+            "Label": "컴펜디움 팩",
+            "MatrixActionsPack": {
+                "hint": "이 컨펜디움은 모든 매트릭스 행동에 사용됩니다.",
+                "label": "매트릭스 행동"
+            },
+            "SkillsPacksSection": "기술 컨펜디움",
+            "ActionsPacksSection": "행동 컨펜디움",
+            "SkillsPack": {
+                "hint": "이 컨펜디움은 모든 기술에 적용됩니다.",
+                "label": "기술"
+            },
+            "SkillGroupsPack": {
+                "hint": "이 컨펜디움은 모든 기술 묶음에 적용됩니다.",
+                "label": "기술 묶음"
+            },
+            "SkillSetsPack": {
+                "hint": "이 컨펜디움은 기술 설정에 적용됩니다.",
+                "label": "기술 설정"
+            },
+            "Title": "시스템 컨펜디움"
+        },
+        "CompendiumBrowser": {
+            "Filters": {
+                "ClearSearch": "검색 초기화",
+                "SearchPlaceholder": "검색 결과...",
+                "System": "시스템",
+                "World": "월드"
+            },
+            "Tabs": {
+                "Actors": "액터",
+                "Items": "물품",
+                "Settings": "설정"
+            },
+            "Title": "컨펜디움 탐색기"
+        },
+        "Compendiums": {
+            "Folders": {
+                "Root": "SR5e 불러온 항목"
+            },
+            "sr5critter": "생명체 & 영혼 & 스프라이트",
+            "sr5drone": "드론 & 탑승물",
+            "sr5gear": "방어구 & 장비",
+            "sr5magic": "주문 & 컴플렉스 폼",
+            "sr5misc": "기타",
+            "sr5modification": "부착물 추가",
+            "sr5trait": "특징 & 능력",
+            "sr5ware": "바이오웨어 & 사이버웨어",
+            "sr5weapon": "무기"
+        },
+        "DeleteConfirmationApplication": {
+            "Cancel": "아니요",
+            "Consent": "정말 삭제하시겠습니까?",
+            "Delete": "예",
+            "Description": "삭제된 물품은 복구할 수 없습니다!",
+            "Title": "물품 삭제"
+        },
+        "EnvModifiersApplication": {
+            "ClearModifiers": "개인 수정치 초기화",
+            "Extreme": "두 가지 이상의 극단적 상태가 조합됨",
+            "LightGlare": {
+                "Good": "완전 밝음/조명 없음",
+                "Heavy": "완전 어두움/너무 눈부신 조명",
+                "Light": "부분적으로 밝음/약한 조명",
+                "Moderate": "어둑함/적당한 조명",
+                "Title": "빛/조명"
+            },
+            "Modifier": {
+                "Title": "수정치"
+            },
+            "Range": {
+                "Good": "단거리",
+                "Heavy": "초장거리",
+                "Light": "중거리",
+                "Moderate": "장거리",
+                "Title": "사거리"
+            },
+            "Title": "환경 수정치",
+            "Total": "결과",
+            "Visibility": {
+                "Good": "명확함",
+                "Heavy": "심한 비/안개/연기",
+                "Light": "가벼운 비/안개/연기",
+                "Moderate": "적당한 비/안개/연기",
+                "Title": "가시성"
+            },
+            "Wind": {
+                "Good": "없음 또는 산들바람",
+                "Heavy": "강한 풍량",
+                "Light": "약한 풍량",
+                "Moderate": "적당한 풍량",
+                "Title": "풍량"
+            }
+        },
+        "GMRequest": {
+            "General": "GM이 원하는 판정",
+            "RollAttribute": "특성치 확인",
+            "RollSkill": "기술 확인",
+            "Teamwork": "협동 판정",
+            "Threshold": "요구 성공횟수"
+        },
+        "Import": {
+            "ActorImporter": {
+                "Title": "액터 불러오기"
+            },
+            "BulkImporter": {
+                "Title": "일괄 불러오기"
+            },
+            "ImporterSourcesConfig": {
+                "Title": "가져오기 출처 설정"
+            },
+            "Spirit": {
+                "SpiritTypeNotFound": "해당 영혼 유형을 찾을 수 없습니다. chummer에서 내보낸 json으로 github 이슈를 열어주세요."
+            },
+            "Sprite": {
+                "SpriteTypeNotFound": "해당 스프라이트 유형을 찾을 수 없습니다. chummer에서 내보낸 json으로 github 이슈를 열어주세요."
+            }
+        },
+        "KarmaManager": {
+            "Cancel": "취소",
+            "CareerKarma": "캐릭터가 누적해온 경력 카르마의 수량",
+            "CurrentKarma": "현재 캐릭터가 가지고 있는 카르마의 수량",
+            "FinalCareerKarma": "적용 후 캐릭터가 보유하게 될 경력 카르마",
+            "FinalCurrentKarma": "적용 후 캐릭터가 보유하게 될 카르마",
+            "FinalKarma": "최종 카르마",
+            "StartingKarma": "시작 카르마",
+            "Submit": "적용",
+            "Title": "카르마 관리"
+        },
+        "MIGRATION": {
+            "BeginMigration": "마이그레이션 시작",
+            "BeginNotification": "버전에서 섀도우런 시스템 마이그레이션 시작",
+            "DoNotCloseNotification": "게임을 닫거나 FoundryVTT를 종료하지 마세요.",
+            "SuccessConfirm": "닫기",
+            "SuccessDescription": "해당 월드에 있는 컴펜디움 팩이 마이그레이션 과정에서 업데이트 되었습니다.",
+            "SuccessHeader": "마이그레이션 완료",
+            "SuccessNotification": "섀도우런 시스템이 성공적으로 버전에 마이그레이션 되었습니다.",
+            "SuccessPacksInfo": "현재 FoundryVTT의 기술적인 한계로 액터 팩은 수동으로 업데이트 해야합니다.",
+            "SuccessTitle": "성공",
+            "WarningBackup": "월드를 백업하지 않았다면 아래에 있는 '마이그레이션 시작' 버튼을 누르기 전에 백업하시기 바랍니다.",
+            "WarningDescription": "업데이트가 진행되는 동안 월드에 발생할 수 있는 치명적 손상을 막기 위해 GM만 업데이트를 수행하거나 서버나 당신의 브라우저를 닫을 수 있습니다.",
+            "WarningHeader": "마이그레이션 경고",
+            "WarningRequired": "섀도우런 5판 시스템은 필수 업데이트를 시작해야 합니다.",
+            "WarningTitle": "경고"
+        },
+        "Migrator": {
+            "Version18_0_0": {
+                "Line1": "0.18.0 버전부터 보유한 물품에 있는 지속 효과는 액터에 복사되지 않고, 직접 적용됨.",
+                "Line2": "변경 사항을 적용하기 위해서는 이전에 복사된 효과를 반드시 지우거나 비활성화하여 물품과 액터 모두에 효과가 적용되는 것을 피할 수 있습니다. 기본적으로 물품을 기반으로 한 모든 효과는 삭제될 것입니다.",
+                "Line3": "액터에 직접 생성된 효과는 영향을 받지 않습니다.",
+                "Line4": "효과와 효과 모듈을 많이 사용하지만 '물품 소유 효과'에 대해 잘 모르는 경우,  이 마이그레이션을 설정하여 비활성화하고 비활성화된 효과를 검토하세요. 비활성화된 효과는 표시됩니다.",
+                "Line5": "또한 이제 액터 항목에 활성화된 효과가 적용된다는 점에 유의하세요. 적용된 모든 효과는 액터 효과 탭에서 확인할 수 있습니다.",
+                "OnlyDisable": "비활성한 효과만",
+                "Warning": "기록!"
+            }
+        },
+        "NuyenManager": {
+            "Cancel": "취소",
+            "CurrentNuyen": "캐릭터가 현재 보유한 뉴엔의 수량",
+            "FinalNuyen": "적용 시 캐릭터가 보유하게 될 뉴엔의 수량",
+            "Submit": "적용",
+            "Title": "뉴엔 관리"
+        },
+        "OverwatchScoreTracker": {
+            "AddSelect": "선택된 토큰을 연결된 액터에 추가",
+            "CantDeleteUserCharacter": "추적기에서 플레이어 캐릭터 제거할 수 없음",
+            "DeleteScore": "추적기에서 점수 삭제",
+            "GMOnly": "GOD가 당신의 위치를 추적하고 있습니다...",
+            "NotifyNoSelectedTokens": "최소 하나 이상의 연결된 토큰이 선택되어있어야 합니다.",
+            "OnlyLinkedActorsSupported": "연결된 액터만 지원됩니다. 연결되지 않은 액터와 선택된 토큰은 무시됩니다.",
+            "ResetScore": "감시 점수 초기화"
+        },
+        "SituationalModifiersApplication": {
+            "Category": {
+                "Magic": "마법",
+                "Matrix": "매트릭스",
+                "Physical": "물리"
+            },
+            "ClearLocalAll": "현재 수정치 삭제",
+            "ClearLocalAllTokens": "장면에 있는 모든 토큰 수정치 삭제",
+            "Magic": {
+                "BackgroundCount": "배경 수치"
+            },
+            "Matrix": {
+                "Noise": "노이즈"
+            },
+            "Title": "상황 수정치",
+            "Total": "결과"
+        },
+        "TimeControl": {
+            "Advance": "진행",
+            "Amount": "수량",
+            "Apply": "적용",
+            "CustomAmount": "사용자 지정 값",
+            "CustomMinutes": "분",
+            "CustomMinutesTooltip": "월드 시간을 지정한 분만큼 진행합니다",
+            "Day": "일",
+            "GmOnly": "게임 마스터만 월드 시간을 변경할 수 있습니다.",
+            "Hour": "시간",
+            "Minute": "분",
+            "Month": "월",
+            "Presets": {
+                "CombatTurn": "전투 턴",
+                "Day": "1일",
+                "Header": "빠른 진행",
+                "Hour": "1시간",
+                "Minute": "1분",
+                "TenMinutes": "10분",
+                "Week": "1주"
+            },
+            "Preview": "미리 보기",
+            "Rewind": "되감기",
+            "Second": "초",
+            "SetTime": "날짜 및 시간 설정",
+            "Title": "시간 조절",
+            "Unit": "단위",
+            "Year": "년"
+        },
+        "Tours": {
+            "CharacterImport": {
+                "Description": "다음은 chummer 캐릭터를 불러오는 방법에 대한 설명입니다. 세부 사항은 https://github.com/SR5-FoundryVTT/SR5-FoundryVTT/wiki/Chummer-Character-Import 에서 확인",
+                "GeneralContent": "캐릭터를 불러오기 위해서는 chummer 5e에서 json을 내보내야 합니다.",
+                "GeneralTitle": "캐릭터 불러오기",
+                "Title": "캐릭터 불러오기"
+            },
+            "ConditionMonitor": {
+                "ApplyDamageContent": "상자를 좌클릭하면 피해가 적용됩니다. 선택한 상자까지 전부 선택됩니다. 모든 상자가 채워질 경우 상자는 더 이상 채워지지 않습니다. 상자를 우클릭할 경우 측정기에서 모든 피해가 제거됩니다.",
+                "ApplyDamageTitle": "피해 적용과 제거",
+                "Description": "다음은 상태 측정기가 어떻게 작동하는지 설명하고 있습니다.",
+                "GeneralContent": "이것이 상태 측정기입니다. 여러 개의 상자로 구성되어 있습니다. 특정 상자에는 숫자가 쓰여 있습니다. 이러한 상자가 채워질 경우 부상 수정치가 숫자만큼 증가합니다. 모든 감시창의 부상 수정치가 추가됩니다.",
+                "GeneralTitle": "상태 측정기",
+                "RecoveryContent": "상태 측정기 표시를 클릭하면 회복 연장 판정이 시작됩니다. 연장 판정의 결과가 측정기에 자동으로 적용됩니다.",
+                "RecoveryTitle": "회복 판정",
+                "Title": "상태 측정기 안내",
+                "WoundModifierContent": "이 상자를 채우면 부상 수정치가 상자에 적힌 숫자만큼 증가합니다.",
+                "WoundModifierTitle": "부상 수정치"
+            }
+        }
+    }
+}
