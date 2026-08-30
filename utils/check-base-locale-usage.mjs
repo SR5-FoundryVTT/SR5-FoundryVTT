@@ -1,10 +1,5 @@
 #!/usr/bin/env node
 
-/**
- * NOTE: This file and READM-BASE-LOCALE-USAGE.md is fully AI generated.
- * Please review carefully before use and modify as needed.
- */
-
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -15,28 +10,6 @@ const __dirname = path.dirname(__filename);
 
 const PROJECT_ROOT = path.join(__dirname, '..');
 const SEARCH_EXTENSIONS = ['.js', '.ts', '.hbs', '.html'];
-
-/**
- * Recursively flatten a nested object into a flat object with dot-notation keys
- * @param {object} obj - The object to flatten
- * @param {string} prefix - The current key prefix
- * @returns {object} - Flattened object with keys as array
- */
-function flattenObjectToKeys(obj, prefix = '') {
-    const keys = [];
-
-    for (const [key, value] of Object.entries(obj)) {
-        const newKey = prefix ? `${prefix}.${key}` : key;
-
-        if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
-            keys.push(...flattenObjectToKeys(value, newKey));
-        } else {
-            keys.push(newKey);
-        }
-    }
-
-    return keys;
-}
 
 /**
  * Recursively get all files with specific extensions from a directory
@@ -88,18 +61,49 @@ function getProjectFiles() {
 }
 
 /**
- * Check if a key is used in any of the project files
- * @param {string} key - The localization key to search for
- * @param {Map<string, string>} fileContents - Map of file paths to their contents
- * @returns {boolean} - True if key is found in any file
+ * Roots Foundry resolves on its own: document type labels, setting labels, keybinding labels, and the `FIELDS`
+ * label/hint pairs it reads straight off a DataModel schema. None of them ever appear as a literal in our sources, so
+ * reporting them as unused only buries the keys that genuinely are.
+ * @param {string} key - The localization key to classify
+ * @returns {boolean} - True when Foundry consumes the key implicitly
  */
-function isKeyUsed(key, fileContents) {
-    // Search for the key in any of the file contents
+function isImplicitlyConsumed(key) {
+    const segments = key.split('.');
+    return ['TYPES', 'SETTINGS', 'CONTROLS'].includes(segments[0]) || segments.includes('FIELDS');
+}
+
+/**
+ * Collect every `SR5.*` path that appears in the project sources.
+ * @param {Map<string, string>} fileContents - Map of file paths to their contents
+ * @returns {Set<string>} - Set of referenced paths, leaves and branches alike
+ */
+function collectReferencedPaths(fileContents) {
+    const referenced = new Set();
+
     for (const content of fileContents.values()) {
-        if (content.includes(key)) {
-            return true;
+        for (const match of content.matchAll(/SR5(?:\.[A-Za-z0-9_]+)+/g)) {
+            referenced.add(match[0]);
         }
     }
+
+    return referenced;
+}
+
+/**
+ * Check if a key is used in the project sources. A key counts as used when it is referenced outright, or when an
+ * ancestor is, since keys below a referenced branch are built dynamically (`SR5.Skill.${name}`).
+ * @param {string} key - The localization key to search for
+ * @param {Set<string>} referenced - Paths collected by collectReferencedPaths
+ * @returns {boolean} - True if key is referenced
+ */
+function isKeyUsed(key, referenced) {
+    if (referenced.has(key)) return true;
+
+    const segments = key.split('.');
+    for (let index = segments.length - 1; index > 1; index -= 1) {
+        if (referenced.has(segments.slice(0, index).join('.'))) return true;
+    }
+
     return false;
 }
 
@@ -114,7 +118,7 @@ async function main() {
     console.log('Loading modular base locale...');
     const baseConfig = localization.loadLocale(localization.BASE_LOCALE).data;
 
-    const allKeys = flattenObjectToKeys(baseConfig);
+    const allKeys = Object.keys(localization.flattenObject(baseConfig));
     console.log(`Found ${allKeys.length} localization keys`);
     console.log('='.repeat(80));
     console.log();
@@ -145,21 +149,23 @@ async function main() {
 
     // Check each key for usage
     console.log('Checking for unused localization keys...\n');
+    const referenced = collectReferencedPaths(fileContents);
     const unusedKeys = [];
+    let implicitCount = 0;
 
-    let checked = 0;
     for (const key of allKeys) {
-        checked++;
-        if (checked % 100 === 0) {
-            process.stdout.write(`\rProgress: ${checked}/${allKeys.length}`);
+        if (isImplicitlyConsumed(key)) {
+            implicitCount++;
+            continue;
         }
 
-        if (!isKeyUsed(key, fileContents)) {
+        if (!isKeyUsed(key, referenced)) {
             unusedKeys.push(key);
         }
     }
 
-    process.stdout.write(`\rProgress: ${checked}/${allKeys.length}\n\n`);
+    const checkedCount = allKeys.length - implicitCount;
+    console.log(`Skipped ${implicitCount} keys Foundry resolves implicitly; checked ${checkedCount}.\n`);
 
     // Display results
     console.log('='.repeat(80));
@@ -191,7 +197,7 @@ async function main() {
     }
 
     console.log('\n' + '='.repeat(80));
-    console.log(`✨ Check complete! Total unused: ${unusedKeys.length}/${allKeys.length}`);
+    console.log(`✨ Check complete! Total unused: ${unusedKeys.length}/${checkedCount} checked (${allKeys.length} total, ${implicitCount} implicit)`);
 }
 
 main();

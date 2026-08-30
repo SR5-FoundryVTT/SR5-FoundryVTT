@@ -5,52 +5,38 @@ const fs = require('fs');
 const path = require('path');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
+const SYSTEM_MANIFEST = path.join(PROJECT_ROOT, 'system.json');
 const SOURCE_LOCALE_DIR = path.join(PROJECT_ROOT, 'src', 'locale');
 const DIST_LOCALE_DIR = path.join(PROJECT_ROOT, 'dist', 'locale');
 const BASE_LOCALE = 'en';
-const LOCALES = Object.freeze(['en', 'de', 'fr', 'ko', 'pt-BR']);
-const MODULES = Object.freeze([
-    'system',
-    'common',
-    'actors',
-    'items',
-    'tests',
-    'combat',
-    'magic',
-    'matrix',
-    'effects',
-    'applications',
-    'messages',
-    'ui',
-]);
-const EXPECTED_BASE_KEY_COUNT = 2545;
-const MODULE_NAMESPACES = Object.freeze({
-    actors: Object.freeze(['Actor', 'ActorTypes', 'Character', 'Contact', 'InventoryRename', 'MovementTypes', 'Vehicle', 'VehicleImport', 'Vision']),
-    items: Object.freeze(['Ammo', 'Armor', 'Device', 'Element', 'Item', 'ItemTypes', 'Lifestyle', 'Modification', 'ModificationTypes', 'MoveInventoryDialog', 'Program', 'Quality', 'Weapon']),
-    tests: Object.freeze(['ActionCategory', 'ActionType', 'CallInAction', 'ExtendedTestManager', 'ModifierTypes', 'Skill', 'TestResults', 'Tests']),
-    combat: Object.freeze(['Combat', 'Damage', 'DamageApplication']),
-    magic: Object.freeze(['AdeptPower', 'CritterPower', 'Magic', 'Ritual', 'Spell', 'Spirit']),
-    matrix: Object.freeze(['ComplexForm', 'Grid', 'Host', 'IC', 'Matrix', 'MatrixNetworkHackingApplication', 'MatrixOpposedDeviceDialog', 'NetworkManager', 'RebootConfirmationDialog', 'SelectMatrixNetworkDialog', 'Sprite', 'SpritePower']),
-    effects: Object.freeze(['ActiveEffect', 'StatusEffects']),
-    applications: Object.freeze(['ChangelogApplication', 'CompendiumBrowser', 'CompendiumSettings', 'Compendiums', 'DeleteConfirmationApplication', 'EnvModifiersApplication', 'GMRequest', 'Import', 'KarmaManager', 'Migration', 'NuyenManager', 'OverwatchScoreTracker', 'ReputationManager', 'SituationalModifiersApplication', 'TimeControl', 'Tours']),
-    messages: Object.freeze(['Dialogs', 'Errors', 'Messages', 'MissingResources', 'Notifications', 'Warnings']),
-    ui: Object.freeze(['Content', 'ContextOptions', 'Keybindings', 'Labels', 'Tabs', 'Tooltips']),
-});
-const LEGACY_PATH_PREFIXES = Object.freeze([
-    'SR5.COMBAT.', 'SR5.FOUNDRY.', 'SR5.MIGRATION.', 'SR5.Migrator.', 'SR5.DIALOG.', 'SR5.MissingRessource.',
-    'SR5.CompendiaSettings.', 'SR5.Keybinding.', 'SETTINGS.MustHaveRessourcesOnTest',
-    'SR5.Errors.KeyNotModifyableByActiveEffect', 'SR5.Warnings.CantSpendMulitplePointsOfEdge',
-    'SR5.Content.Actions.EnterexitHost', 'SR5.Labels.Actions.HackontheFly', 'SR5.RangeWeaponAttack',
-]);
-const DYNAMIC_REFERENCE_PREFIXES = Object.freeze(['SR5.Skill.Groups', 'SR5.Skill.Sets']);
+const DYNAMIC_NAME_PREFIXES = Object.freeze(['SR5.Skill.Groups', 'SR5.Skill.Sets']);
 
 function isPlainObject(value) {
     return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
 function readJson(filePath) {
-    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    try {
+        return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    } catch (error) {
+        throw new Error(`Unable to parse ${path.relative(PROJECT_ROOT, filePath)}: ${error.message}`);
+    }
 }
+
+function getSupportedLocales() {
+    const manifest = readJson(SYSTEM_MANIFEST);
+    if (!Array.isArray(manifest.languages)) throw new Error('system.json must define a languages array');
+
+    const locales = manifest.languages.map(({ lang }) => lang);
+    if (locales.some((locale) => typeof locale !== 'string' || !locale)) {
+        throw new Error('Every system.json language must define a non-empty lang code');
+    }
+    if (new Set(locales).size !== locales.length) throw new Error('system.json contains duplicate language codes');
+    if (!locales.includes(BASE_LOCALE)) throw new Error(`system.json must include the ${BASE_LOCALE} base locale`);
+    return Object.freeze(locales);
+}
+
+const LOCALES = getSupportedLocales();
 
 function assertAlphabeticalKeys(value, sourceName, prefix = '') {
     if (!isPlainObject(value)) return;
@@ -58,8 +44,7 @@ function assertAlphabeticalKeys(value, sourceName, prefix = '') {
     const keys = Object.keys(value);
     const sortedKeys = [...keys].sort();
     if (JSON.stringify(keys) !== JSON.stringify(sortedKeys)) {
-        const location = prefix || '<root>';
-        throw new Error(`${sourceName} has non-alphabetical keys at "${location}"`);
+        throw new Error(`${sourceName} has non-alphabetical keys at "${prefix || '<root>'}"`);
     }
 
     for (const key of keys) {
@@ -92,8 +77,8 @@ function mergeObject(target, source, sourceName, prefix = '') {
     return target;
 }
 
-function listModuleNames(locale) {
-    const localeDir = path.join(SOURCE_LOCALE_DIR, locale);
+function listModuleNames(locale, sourceLocaleDir = SOURCE_LOCALE_DIR) {
+    const localeDir = path.join(sourceLocaleDir, locale);
     if (!fs.existsSync(localeDir)) throw new Error(`Missing locale directory: ${localeDir}`);
     return fs
         .readdirSync(localeDir, { withFileTypes: true })
@@ -102,95 +87,33 @@ function listModuleNames(locale) {
         .sort();
 }
 
-function assertModuleShape(locale, moduleName, fragment) {
-    if (!isPlainObject(fragment)) throw new Error(`${locale}/${moduleName}.json must contain a JSON object`);
-    const roots = Object.keys(fragment);
-    if (moduleName === 'system') {
-        const allowed = new Set(['CONTROLS', 'SETTINGS', 'TYPES']);
-        const invalid = roots.filter((root) => !allowed.has(root));
-        if (invalid.length) throw new Error(`${locale}/system.json has invalid roots: ${invalid.join(', ')}`);
-        return;
-    }
-    if (roots.length !== 1 || roots[0] !== 'SR5' || !isPlainObject(fragment.SR5)) {
-        throw new Error(`${locale}/${moduleName}.json must contain only an SR5 object`);
-    }
+/**
+ * Load a locale from all of its JSON modules. Module names are discovered from the directory so adding a module does
+ * not require changing the build utility.
+ */
+function loadLocale(locale, { sourceLocaleDir = SOURCE_LOCALE_DIR } = {}) {
+    const modules = listModuleNames(locale, sourceLocaleDir);
+    const data = {};
 
-    if (moduleName === 'common') {
-        const nested = Object.entries(fragment.SR5)
-            .filter(([, value]) => isPlainObject(value))
-            .map(([key]) => key);
-        if (nested.length) throw new Error(`${locale}/common.json must contain only shared scalar SR5 keys: ${nested.join(', ')}`);
-        return;
-    }
-
-    const actualNamespaces = Object.keys(fragment.SR5).sort();
-    const expectedNamespaces = [...MODULE_NAMESPACES[moduleName]].sort();
-    if (JSON.stringify(actualNamespaces) !== JSON.stringify(expectedNamespaces)) {
-        throw new Error(
-            `${locale}/${moduleName}.json namespace set differs from the required set. ` +
-            `Expected ${expectedNamespaces.join(', ')}; found ${actualNamespaces.join(', ')}`,
-        );
-    }
-}
-
-function validateSourceReferences(baseFlat, errors) {
-    const sourceRoot = path.join(PROJECT_ROOT, 'src');
-    const supportedExtensions = new Set(['.ts', '.hbs', '.json']);
-    const files = [];
-    function visit(directory) {
-        for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
-            if (entry.name === 'locale') continue;
-            const filePath = path.join(directory, entry.name);
-            if (entry.isDirectory()) visit(filePath);
-            else if (supportedExtensions.has(path.extname(entry.name))) files.push(filePath);
-        }
-    }
-    visit(sourceRoot);
-
-    const referencePattern = /['"`](SR5(?:\.[A-Za-z0-9_]+)+)['"`]/g;
-    for (const filePath of files) {
-        const content = fs.readFileSync(filePath, 'utf8');
-        for (const legacyPrefix of LEGACY_PATH_PREFIXES) {
-            if (content.includes(legacyPrefix)) {
-                errors.push(`${path.relative(PROJECT_ROOT, filePath)} references retired localization path prefix "${legacyPrefix}"`);
-            }
-        }
-        for (const match of content.matchAll(referencePattern)) {
-            const reference = match[1];
-            if (DYNAMIC_REFERENCE_PREFIXES.some((prefix) => reference.startsWith(prefix))) continue;
-            if (reference in baseFlat) continue;
-            if (Object.keys(baseFlat).some((key) => key.startsWith(`${reference}.`))) continue;
-            errors.push(`${path.relative(PROJECT_ROOT, filePath)} references unknown localization key "${reference}"`);
-        }
-    }
-}
-
-function loadLocale(locale) {
-    const actualModules = listModuleNames(locale);
-    const expectedModules = [...MODULES].sort();
-    if (JSON.stringify(actualModules) !== JSON.stringify(expectedModules)) {
-        throw new Error(
-            `${locale} module set differs from the required set. Expected ${expectedModules.join(', ')}; ` +
-                `found ${actualModules.join(', ')}`,
-        );
-    }
-
-    const merged = {};
-    const ownership = new Map();
-    for (const moduleName of MODULES) {
-        const filePath = path.join(SOURCE_LOCALE_DIR, locale, `${moduleName}.json`);
+    for (const moduleName of modules) {
+        const filePath = path.join(sourceLocaleDir, locale, `${moduleName}.json`);
+        const sourceName = `${locale}/${moduleName}.json`;
         const fragment = readJson(filePath);
-        assertAlphabeticalKeys(fragment, `${locale}/${moduleName}.json`);
-        assertModuleShape(locale, moduleName, fragment);
-        for (const key of Object.keys(flattenObject(fragment))) {
-            if (ownership.has(key)) {
-                throw new Error(`${locale} key "${key}" occurs in both ${ownership.get(key)} and ${moduleName}`);
-            }
-            ownership.set(key, moduleName);
-        }
-        mergeObject(merged, fragment, `${locale}/${moduleName}.json`);
+        if (!isPlainObject(fragment)) throw new Error(`${sourceName} must contain a JSON object`);
+        assertAlphabeticalKeys(fragment, sourceName);
+        mergeObject(data, fragment, sourceName);
     }
-    return { data: merged, ownership };
+
+    return { data, modules };
+}
+
+function compareLocales(baseFlat, localeFlat) {
+    const baseKeys = Object.keys(baseFlat).sort();
+    const localeKeys = Object.keys(localeFlat).sort();
+    return {
+        missing: baseKeys.filter((key) => !(key in localeFlat)),
+        extra: localeKeys.filter((key) => !(key in baseFlat)),
+    };
 }
 
 function extractPlaceholders(value) {
@@ -207,72 +130,123 @@ function equalArray(left, right) {
     return left.length === right.length && left.every((value, index) => value === right[index]);
 }
 
-function validateLocales() {
-    const base = loadLocale(BASE_LOCALE);
-    const baseFlat = flattenObject(base.data);
-    const baseKeys = Object.keys(baseFlat).sort();
-    const errors = [];
+function validateLeafValues(locale, localeFlat, baseFlat, errors) {
+    for (const [key, value] of Object.entries(localeFlat)) {
+        if (typeof value !== 'string') {
+            errors.push(`${locale} key "${key}" is ${typeof value}; localization values must be strings`);
+            continue;
+        }
+        if (!value.trim()) errors.push(`${locale} key "${key}" is empty`);
+        if (value.includes('[MISSING]')) errors.push(`${locale} key "${key}" contains [MISSING]`);
 
-    if (baseKeys.length !== EXPECTED_BASE_KEY_COUNT) {
-        errors.push(`English locale has ${baseKeys.length} keys; expected ${EXPECTED_BASE_KEY_COUNT}`);
-    }
-    for (const key of baseKeys) {
-        if (LEGACY_PATH_PREFIXES.some((prefix) => key.startsWith(prefix))) {
-            errors.push(`English locale contains retired localization key "${key}"`);
+        if (!baseFlat || !(key in baseFlat)) continue;
+        const baseValue = baseFlat[key];
+        if (typeof value !== typeof baseValue) {
+            errors.push(`${locale} key "${key}" is ${typeof value}; expected ${typeof baseValue}`);
+            continue;
+        }
+        if (!equalArray(extractPlaceholders(value), extractPlaceholders(baseValue))) {
+            errors.push(`${locale} key "${key}" does not preserve interpolation placeholders`);
+        }
+        if (!equalArray(extractMarkupTags(value), extractMarkupTags(baseValue))) {
+            errors.push(`${locale} key "${key}" does not preserve HTML tag structure`);
         }
     }
+}
 
-    for (const locale of LOCALES) {
+function validateSourceReferences(baseFlat, errors) {
+    const sourceRoot = path.join(PROJECT_ROOT, 'src');
+    const extensions = new Set(['.cjs', '.hbs', '.js', '.json', '.mjs', '.ts']);
+    const files = [];
+    function visit(directory) {
+        for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+            if (entry.name === 'locale') continue;
+            const filePath = path.join(directory, entry.name);
+            if (entry.isDirectory()) visit(filePath);
+            else if (extensions.has(path.extname(entry.name))) files.push(filePath);
+        }
+    }
+    visit(sourceRoot);
+
+    const branches = new Set();
+    for (const key of Object.keys(baseFlat)) {
+        const segments = key.split('.');
+        for (let index = 1; index < segments.length; index += 1) branches.add(segments.slice(0, index).join('.'));
+    }
+
+    const quotePattern = '[\\x22\\x27\\x60]';
+    const literalPattern = new RegExp(`${quotePattern}(SR5(?:\\.[A-Za-z0-9_]+)+)${quotePattern}`, 'g');
+    const dynamicPattern = /\x60(SR5(?:\.[A-Za-z0-9_.]*)*)\$\{/g;
+    for (const filePath of files) {
+        const content = fs.readFileSync(filePath, 'utf8');
+        const relativePath = path.relative(PROJECT_ROOT, filePath);
+        for (const match of content.matchAll(literalPattern)) {
+            const reference = match[1];
+            // These prefixes name user-configurable skill collections. Helpers fall back to their source name when no
+            // matching SR5 locale key exists.
+            if (DYNAMIC_NAME_PREFIXES.some((prefix) => reference.startsWith(prefix))) continue;
+            if (reference in baseFlat || branches.has(reference)) continue;
+            errors.push(`${relativePath} references unknown localization key "${reference}"`);
+        }
+        for (const match of content.matchAll(dynamicPattern)) {
+            const ancestor = match[1].replace(/[^.]*$/, '').replace(/\.$/, '');
+            if (!ancestor || branches.has(ancestor)) continue;
+            errors.push(`${relativePath} builds a localization key below unknown branch "${ancestor}"`);
+        }
+    }
+}
+
+function resolveLocales(locales) {
+    const requested = locales ?? LOCALES;
+    const uniqueLocales = [...new Set(requested)];
+    const unsupported = uniqueLocales.filter((locale) => !LOCALES.includes(locale));
+    if (unsupported.length) throw new Error(`Unknown locale(s): ${unsupported.join(', ')}`);
+    return uniqueLocales;
+}
+
+/**
+ * Validate source integrity and compare non-English locales to the English canonical locale. Missing keys are
+ * warnings because Foundry loads English as the fallback dictionary for every non-English language.
+ */
+function validateLocales({ sourceLocaleDir = SOURCE_LOCALE_DIR, locales, checkSourceReferences = true } = {}) {
+    const requestedLocales = resolveLocales(locales);
+    const errors = [];
+    const base = loadLocale(BASE_LOCALE, { sourceLocaleDir });
+    const baseFlat = flattenObject(base.data);
+    validateLeafValues(BASE_LOCALE, baseFlat, undefined, errors);
+    const reports = [];
+
+    for (const locale of requestedLocales) {
+        if (locale === BASE_LOCALE) continue;
         let loaded;
         try {
-            loaded = locale === BASE_LOCALE ? base : loadLocale(locale);
+            loaded = loadLocale(locale, { sourceLocaleDir });
         } catch (error) {
             errors.push(error.message);
             continue;
         }
-        const flat = flattenObject(loaded.data);
-        const keys = Object.keys(flat).sort();
-        const missing = baseKeys.filter((key) => !(key in flat));
-        const extra = keys.filter((key) => !(key in baseFlat));
-        if (missing.length) errors.push(`${locale} is missing ${missing.length} keys: ${missing.join(', ')}`);
-        if (extra.length) errors.push(`${locale} has ${extra.length} extra keys: ${extra.join(', ')}`);
 
-        for (const key of baseKeys) {
-            if (!(key in flat)) continue;
-            const value = flat[key];
-            const baseValue = baseFlat[key];
-            if (typeof value !== typeof baseValue) {
-                errors.push(`${locale} key "${key}" is ${typeof value}; expected ${typeof baseValue}`);
-                continue;
-            }
-            if (typeof value !== 'string') continue;
-            if (!value.trim()) errors.push(`${locale} key "${key}" is empty`);
-            if (value.includes('[MISSING]')) errors.push(`${locale} key "${key}" contains [MISSING]`);
-            if (!equalArray(extractPlaceholders(value), extractPlaceholders(baseValue))) {
-                errors.push(`${locale} key "${key}" does not preserve interpolation placeholders`);
-            }
-            if (!equalArray(extractMarkupTags(value), extractMarkupTags(baseValue))) {
-                errors.push(`${locale} key "${key}" does not preserve HTML tag structure`);
-            }
-            if (loaded.ownership.get(key) !== base.ownership.get(key)) {
-                errors.push(
-                    `${locale} key "${key}" belongs to ${loaded.ownership.get(key)}; ` +
-                        `English assigns it to ${base.ownership.get(key)}`,
-                );
-            }
-        }
+        const localeFlat = flattenObject(loaded.data);
+        const report = { locale, ...compareLocales(baseFlat, localeFlat) };
+        reports.push(report);
+        validateLeafValues(locale, localeFlat, baseFlat, errors);
     }
 
-    validateSourceReferences(baseFlat, errors);
-
+    if (checkSourceReferences) validateSourceReferences(baseFlat, errors);
     if (errors.length) throw new Error(errors.join('\n'));
-    return { keyCount: baseKeys.length, locales: [...LOCALES] };
+
+    return {
+        keyCount: Object.keys(baseFlat).length,
+        locales: requestedLocales,
+        reports,
+        warnings: reports.filter((report) => report.missing.length || report.extra.length),
+    };
 }
 
-function buildLocales(outputDir = DIST_LOCALE_DIR) {
-    const validation = validateLocales();
-    for (const locale of LOCALES) {
-        const { data } = loadLocale(locale);
+function buildLocales(outputDir = DIST_LOCALE_DIR, options = {}) {
+    const validation = validateLocales(options);
+    for (const locale of validation.locales) {
+        const { data } = loadLocale(locale, options);
         const localeOutputDir = path.join(outputDir, locale);
         fs.mkdirSync(localeOutputDir, { recursive: true });
         fs.writeFileSync(path.join(localeOutputDir, 'config.json'), `${JSON.stringify(data, null, 4)}\n`, 'utf8');
@@ -283,12 +257,10 @@ function buildLocales(outputDir = DIST_LOCALE_DIR) {
 module.exports = {
     BASE_LOCALE,
     DIST_LOCALE_DIR,
-    EXPECTED_BASE_KEY_COUNT,
     LOCALES,
-    MODULE_NAMESPACES,
-    MODULES,
     SOURCE_LOCALE_DIR,
     buildLocales,
+    compareLocales,
     flattenObject,
     loadLocale,
     validateLocales,

@@ -50,6 +50,7 @@
         "unpack:db": "node ./utils/packs.mjs package unpack",
         "locale:check": "node ./utils/check-localization.mjs",
         "locale:build": "node ./utils/build-locales.mjs",
+        "locale:test": "node --test ./utils/localization.test.mjs",
         "locale:base-usage": "node ./utils/check-base-locale-usage.mjs",
         "typecheck": "tsc -p tsconfig.json --noEmit",
         "typecheck:tests": "tsc -p tsconfig.tests.json --noEmit",
