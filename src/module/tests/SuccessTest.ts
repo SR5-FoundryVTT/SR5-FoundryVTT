@@ -2286,14 +2286,18 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      * By default, item descriptions are hidden in a chat card.
      *
      * This will hide / show them, when called with a card event.
-     * @param event A PointerEvent triggered anywhere from within a chat-card
+     * @param event A PointerEvent triggered by a description control in the current chat-message layout
      */
     static _chatToggleCardDescription(event: Event) {
         event.preventDefault();
         event.stopPropagation();
 
         const currentTarget = event.currentTarget as HTMLElement;
-        const card = $(currentTarget).closest('.chat-card');
+        const target = $(currentTarget);
+        const containingCard = target.closest('.sr5.chat-card');
+        const card = containingCard.length
+            ? containingCard
+            : target.closest('.chat-message').find('.sr5-chat-card--merged').first();
         const element = card.find('.card-description');
         if (element.is(':visible')) element.slideUp(200);
         else element.slideDown(200);

@@ -2,26 +2,195 @@
 @use 'config/mixins';
 @use 'config/variables';
 
+@mixin chat-card-title {
+    @include mixins.systemFonts;
+    color: var(--sr5-card-accent, var(--sr5-theme-label));
+    font-size: var(--font-size-14);
+    letter-spacing: 0.02em;
+}
+
+@mixin chat-card-control {
+    flex: 0 0 auto;
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--sr5-card-text-soft, var(--sr5-theme-text-secondary));
+    background: var(--sr5-theme-surface-elevated-strong);
+    border: 1px solid var(--sr5-card-border-soft, var(--sr5-theme-border));
+    border-radius: 5px;
+    transition: border-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
+
+    &:hover,
+    &:focus-visible {
+        color: var(--sr5-card-accent, var(--sr5-theme-label));
+        border-color: var(--sr5-card-accent, var(--sr5-theme-label));
+        box-shadow: 0 0 8px var(--sr5-theme-accent-glow);
+        outline: none;
+    }
+}
+
 .chat-message {
+    --sr5-message-header-bg: var(--sr5-theme-chat-bg);
     background: var(--sr5-theme-surface-elevated);
     border: 1px solid var(--sr5-theme-chat-border);
     color: var(--sr5-theme-text-primary);
     box-shadow: none;
 
+    &.whisper {
+        --sr5-message-header-bg: var(--sr5-theme-chat-whisper-bg);
+    }
+
+    &.blind {
+        --sr5-message-header-bg: var(--sr5-theme-chat-blind-bg);
+    }
+
     .message-header {
+        background: var(--sr5-message-header-bg);
         color: var(--sr5-theme-text-secondary);
-        border-bottom: 1px solid var(--sr5-theme-chat-border);
+        border-bottom: 1px solid var(--sr5-theme-chat-divider);
     }
 
     .message-content {
+        background: var(--sr5-theme-surface-elevated);
         color: var(--sr5-theme-text-primary);
+    }
+}
+
+// SR5 cards use the Foundry message shell as their single visual card. The system
+// header is promoted into this shell at render time. Its chat texture is limited to
+// the header, leaving the body edge-to-edge on the standard card surface.
+.chat-message:has(.sr5.chat-card),
+.chat-message.sr5-chat-message {
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--sr5-theme-chat-card-border);
+    border-radius: 6px;
+
+    .message-header {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas: 'title metadata';
+        align-items: center;
+        gap: 0.12rem 0.45rem;
+        padding: 0.45rem 0.5rem 0.35rem;
+        line-height: 1.2;
+
+        .message-sender {
+            grid-area: title;
+            min-width: 0;
+            overflow: hidden;
+            color: var(--sr5-theme-label);
+            font-size: var(--font-size-14);
+            font-weight: 700;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
+            .whisper-to {
+                display: block;
+                overflow: hidden;
+                color: var(--sr5-theme-text-secondary);
+                font-size: var(--font-size-11);
+                font-weight: 400;
+                text-overflow: ellipsis;
+            }
+        }
+
+        .message-metadata {
+            grid-area: metadata;
+            align-self: start;
+            min-width: max-content;
+            color: var(--sr5-theme-text-muted);
+        }
+
+        .flavor-text {
+            grid-column: 1 / -1;
+            order: 2;
+            margin: 0.15rem 0 0;
+            color: var(--sr5-theme-text-secondary);
+        }
+
+        .sr5-message-system-header {
+            @include chat-card-title;
+            grid-area: title;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            padding: 0;
+            overflow: hidden;
+            font-weight: 700;
+            background: transparent;
+            border: none;
+
+            .test-name {
+                min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+
+        .card-control {
+            @include chat-card-control;
+        }
+
+        .sr5-message-header-detail {
+            grid-column: 1 / -1;
+            order: 1;
+            margin: 0.2rem 0 0;
+            padding: 0;
+            color: var(--sr5-theme-text-primary);
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+    }
+
+    &.sr5-chat-message--has-system-title .message-header {
+        grid-template-areas:
+            'title metadata'
+            'sender metadata';
+
+        .message-sender {
+            grid-area: sender;
+            color: var(--sr5-theme-text-secondary);
+            font-size: var(--font-size-11);
+            font-weight: 400;
+        }
+    }
+
+    .message-content {
+        width: 100%;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .sr5.chat-card.sr5-chat-card--merged {
+        width: 100%;
+        margin: 0;
+        background: transparent;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .message-content > .initiative-mode-change-card {
+        padding: 0;
+
+        .initiative-mode-change-row-secondary {
+            margin: 0;
+            padding: 0.35rem 0.45rem;
+            border-top: none;
+        }
     }
 }
 
 
 .sr5 {
     &.chat-card {
-        background: var(--sr5-theme-chat-card-bg);
+        background: var(--sr5-theme-surface-elevated);
         background-repeat: repeat;
         background-size: 100% 20px auto;
         color: var(--sr5-theme-text-primary);
@@ -63,7 +232,8 @@
                 font-size: var(--font-size-12);
             }
         }
-        .card-header:first-of-type {
+        &:not(.sr5-chat-card--merged) > .card-header:first-child,
+        > .card-header--title {
             color: var(--sr5-theme-label);
             border-color: var(--sr5-theme-chat-card-border);
         }
@@ -197,30 +367,11 @@
             border-bottom-color: var(--sr5-card-border);
 
             .test-name {
-                @include mixins.systemFonts;
-                color: var(--sr5-card-accent);
-                font-size: var(--font-size-14);
-                letter-spacing: 0.02em;
+                @include chat-card-title;
             }
 
             .card-control {
-                flex: 0 0 auto;
-                width: 24px;
-                height: 24px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                border: 1px solid var(--sr5-card-border-soft);
-                border-radius: 5px;
-                color: var(--sr5-card-text-soft);
-                background: var(--sr5-theme-surface-elevated-strong);
-                transition: border-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
-
-                &:hover {
-                    color: var(--sr5-card-accent);
-                    border-color: var(--sr5-card-accent);
-                    box-shadow: 0 0 8px var(--sr5-theme-accent-glow);
-                }
+                @include chat-card-control;
             }
         }
 
@@ -467,7 +618,6 @@
         }
 
         .test-line {
-            margin-top: 0.25rem;
             display: flex;
             flex-flow: row nowrap;
             justify-content: space-between;
