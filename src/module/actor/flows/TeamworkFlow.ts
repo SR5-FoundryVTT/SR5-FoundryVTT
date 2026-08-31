@@ -13,18 +13,6 @@ export interface TeamworkMessageData {
  
 export class TeamworkTest {
     
-    static async chatLogListeners(chatLog: ChatLog, html) {
-        const elements = $(html).find('.chat-message').toArray();
-
-        for (const element of elements) {
-            const id = $(element).data('messageId');
-            const message = game.messages?.get(id);
-            if (!message) continue;
-
-            await this.chatMessageListeners(message, element);
-        }
-    }
-
     static async chatMessageListeners(message: ChatMessage, html) {
         html = $(html);
         if( !html?.find('.sr5-teamwork-addparticipant') ) return;

@@ -2134,18 +2134,6 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         void item.castAction(event);
     }
 
-    static async chatLogListeners(chatLog: ChatLog, html: HTMLElement | JQuery, data: unknown) {
-        // setup chat listener messages for each message as some need the message context instead of ChatLog context.
-        const elements = $(html).find('.chat-message').toArray();
-
-        for (const element of elements) {
-            const id = $(element).data('messageId');
-            const message = game.messages?.get(id);
-            if (!message) continue;
-            await this.chatMessageListeners(message, element, message.toObject());
-        }
-    }
-
     /**
      * Items with an area of effect will allow users to place a measuring template matching the items blast values.
      *
