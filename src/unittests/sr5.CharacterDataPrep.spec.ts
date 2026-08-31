@@ -332,13 +332,36 @@ export const shadowrunSR5CharacterDataPrep = (context: QuenchBatchContext) => {
                 type: 'character',
                 system: {
                     initiative: { perception: 'matrix' },
-                    matrix: { hot_sim: true },
+                    matrix: { vr: true, hot_sim: true },
                 },
             });
 
             await character.setInitiativeMode('meatspace');
 
             assert.strictEqual(character.system.initiative.perception, 'meatspace');
+            assert.strictEqual(character.system.matrix.vr, false);
+            assert.strictEqual(character.system.matrix.hot_sim, false);
+        });
+
+        it('enables VR when switching to hot-sim or cold-sim initiative mode', async () => {
+            const character = await factory.createActor({
+                type: 'character',
+                system: {
+                    initiative: { perception: 'matrix' },
+                    matrix: { vr: false, hot_sim: true },
+                },
+            });
+
+            await character.setInitiativeMode('hot_sim');
+
+            assert.strictEqual(character.system.initiative.perception, 'matrix');
+            assert.strictEqual(character.system.matrix.vr, true);
+            assert.strictEqual(character.system.matrix.hot_sim, true);
+
+            await character.setInitiativeMode('cold_sim');
+
+            assert.strictEqual(character.system.initiative.perception, 'matrix');
+            assert.strictEqual(character.system.matrix.vr, true);
             assert.strictEqual(character.system.matrix.hot_sim, false);
         });
 
