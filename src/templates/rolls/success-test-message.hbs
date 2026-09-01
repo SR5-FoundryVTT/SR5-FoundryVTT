@@ -65,21 +65,27 @@
         <div class="card-content card-content--parameters {{#if applyGmOnlyContent}}gm-only-content{{/if}}">
             <span class="test-parameter" data-tooltip-source="pool"
                   role="button" tabindex="0" aria-expanded="false">
-                <span class="test-parameter-label">{{localize test.pool.label}}</span>
-                <span class="test-parameter-value">{{test.pool.value}}</span>
+                <span class="test-parameter-content">
+                    <span class="test-parameter-label">{{localize test.pool.label}}</span>
+                    <span class="test-parameter-value">{{test.pool.value}}</span>
+                </span>
             </span>
             {{#if test.hasLimit}}
             <span class="test-parameter" data-tooltip-source="limit"
                   role="button" tabindex="0" aria-expanded="false">
-                <span class="test-parameter-label">{{localize test.limit.label}}</span>
-                <span class="test-parameter-value">{{test.limit.value}}</span>
+                <span class="test-parameter-content">
+                    <span class="test-parameter-label">{{localize test.limit.label}}</span>
+                    <span class="test-parameter-value">{{test.limit.value}}</span>
+                </span>
             </span>
             {{/if}}
             {{#if test.hasThreshold}}
             <span class="test-parameter" data-tooltip-source="threshold"
                   role="button" tabindex="0" aria-expanded="false">
-                <span class="test-parameter-label">{{localize test.threshold.label}}</span>
-                <span class="test-parameter-value">{{test.threshold.value}}</span>
+                <span class="test-parameter-content">
+                    <span class="test-parameter-label">{{localize test.threshold.label}}</span>
+                    <span class="test-parameter-value">{{test.threshold.value}}</span>
+                </span>
             </span>
             {{/if}}
             {{! Modifier breakdowns are added during hydration. }}

@@ -582,6 +582,14 @@
                 cursor: var(--cursor-pointer);
             }
 
+            .test-parameter-content {
+                border-bottom: 1px solid transparent;
+            }
+
+            .test-parameter[aria-expanded='true'] .test-parameter-content {
+                border-bottom-color: var(--sr5-card-text);
+            }
+
             .test-parameter-label {
                 color: var(--sr5-card-text-soft);
                 margin-right: 0.3rem;
