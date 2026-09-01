@@ -63,6 +63,10 @@ export class DrainTest extends SuccessTest<DrainTestData> {
         return false;
     }
 
+    override get _canPlaceBlastTemplate(): boolean {
+        return false;
+    }
+
     override get testCategories(): Shadowrun.ActionCategories[] {
         return ['drain'];
     }
