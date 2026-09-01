@@ -232,7 +232,7 @@ export abstract class MetatypeParserBase<TResult extends ('character' | 'spirit'
 
             system.action.attribute = 'agility';
             system.action.skill = isRanged ? 'exotic_ranged_weapon' : 'unarmed_combat';
-            system.action.damage = weaponParser.parseDamageData(damageText, apText);
+            system.action.damage = weaponParser.parseDamageData(damageText, apText, system.action.damage.normal_weapon);
 
             // --- Push Items ---
             // Loop through all parsed names and create a unique item for each one
