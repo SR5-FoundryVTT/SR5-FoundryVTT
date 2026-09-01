@@ -41,7 +41,7 @@ FoundryVTT Shadowrun 5e system implemented in TypeScript + SCSS + Handlebars tem
 
 ## Integration points to respect
 - Hook registration and global API wiring: `src/module/hooks.ts`.
-- Optional module integrations currently include `routinglib` and `dice-so-nice` (initialized in hooks).
+- Optional module integrations currently include `dice-so-nice` (initialized in hooks).
 - Active-effect and modifier behavior is centered around `DocumentSituationModifiers` and `SR5ActiveEffect` flows/rules.
 - Core mechanics to preserve when changing logic: modifiers, combat/initiative, magic/spirits, matrix/hacking, technomancer, and rigging flows.
 - Compendium source of truth is `packs/_source`; use pack scripts to persist GUI changes.
