@@ -27,10 +27,15 @@
                 {{#if item}}
                 <div class="container__col container__col--item">
                     <div class="document">
-                        <img src="{{item.img}}" data-tooltip="{{item.name}}" />
+                        <a class="chat-document-link" data-entity="Item" data-id="{{item.id}}" data-uuid="{{item.uuid}}">
+                            <img src="{{item.img}}" data-tooltip="{{localizeContent item.name}}" />
+                        </a>
+                        {{!-- An action item usually carries the test's own name; the icon alone says it. --}}
+                        {{#ifne (localizeContent item.name) (localize title)}}
                         <h3 class="header-name">
                             <a class="chat-document-link" data-entity="Item" data-id="{{item.id}}" data-uuid="{{item.uuid}}">{{localizeContent item.name}}</a>
                         </h3>
+                        {{/ifne}}
                     </div>
                 </div>
                 {{/if}}
