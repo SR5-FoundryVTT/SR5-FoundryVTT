@@ -1830,6 +1830,8 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         const linkedTokens = this.actor?.getActiveTokens(true) || [];
         const token = linkedTokens.length >= 1 ? linkedTokens[0] : undefined;
 
+        const description = await this.item?.getChatData() || '';
+
         return {
             title: this.data.title,
             test: this,
@@ -1846,8 +1848,9 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
             resistActions: this._prepareResistActionsTemplateData(),
             resultActions: this._prepareResultActionsTemplateData(),
             previewTemplate: this._canPlaceBlastTemplate,
-            showDescription: this._canShowDescription,
-            description: await this.item?.getChatData() || '',
+            // Without content the toggle would open an empty panel, so drop the control with it.
+            showDescription: this._canShowDescription && this._hasDescriptionContent(description),
+            description,
             // Some message segments are only meant for the gm, when the gm is the one creating the message.
             // When this test doesn't use an actor, don't worry about hiding anything.
             applyGmOnlyContent: GmOnlyMessageContentFlow.applyGmOnlyContent(this.actor),
@@ -1862,6 +1865,20 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
      */
     get _canShowDescription(): boolean {
         return true;
+    }
+
+    /**
+     * Whether the description panel would show anything at all.
+     */
+    _hasDescriptionContent(description: unknown): boolean {
+        if (!description || typeof description !== 'object') return false;
+
+        const { description: text, properties } = description as {
+            description?: { value?: string },
+            properties?: unknown[]
+        };
+
+        return Boolean(text?.value?.trim()) || Boolean(properties?.length);
     }
 
     /**

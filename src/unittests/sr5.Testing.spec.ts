@@ -128,6 +128,27 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             });
         });
 
+        describe('description control visibility', () => {
+            // The control toggles the description panel, so it must not outlive its content.
+            it('hides the control when there is nothing to show', async () => {
+                const test = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: false });
+
+                assert.isFalse(test._hasDescriptionContent(''));
+                assert.isFalse(test._hasDescriptionContent({ description: { value: '  ' } }));
+
+                const templateData = await test._prepareMessageTemplateData();
+                assert.isTrue(test._canShowDescription);
+                assert.isFalse(templateData.showDescription);
+            });
+
+            it('keeps the control for description text or properties', () => {
+                const test = TestCreator.fromPool({ pool: 10 }, { showMessage: false, showDialog: false });
+
+                assert.isTrue(test._hasDescriptionContent({ description: { value: '<p>Text</p>' } }));
+                assert.isTrue(test._hasDescriptionContent({ properties: ['Semi-Auto'] }));
+            });
+        });
+
         describe('limit usage UI state', () => {
             const COMMON_PARTIAL = 'systems/shadowrun5e/dist/templates/apps/dialogs/parts/success-test-common.hbs';
 
