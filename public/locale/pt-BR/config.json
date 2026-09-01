@@ -63,6 +63,8 @@
         "TokenRulerColorRunningDescription": "A cor para a distância dentro da taxa de corrida.",
         "TokenRulerColorSprinting": "Cor de Movimento de Arrancada do Token",
         "TokenRulerColorSprintingDescription": "A cor para a distância acima da taxa de corrida, onde o arrancada é necessário.",
+        "TokenRulerColorPhaseMarker": "Cor do marcador de fase de movimento do Token",
+        "TokenRulerColorPhaseMarkerDescription": "A cor do ponto de passagem que marca o fim de uma fase de ação.",
         "TokenRulerColorWalking": "Cor de Movimento de Caminhada do Token",
         "TokenRulerColorWalkingDescription": "A cor para a distância dentro da taxa de caminhada.",
         "TokenRulerOpacity": "Opacidade do Movimento do Token",

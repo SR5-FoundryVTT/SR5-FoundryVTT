@@ -43,7 +43,9 @@
         "TokenMovementHistoryReset": "Moment de réinitialisation de l'historique de déplacement",
         "TokenMovementHistoryResetDescription": "Choisit quand l'historique de déplacement est effacé pour les combattants pendant le combat",
         "TokenMovementHistoryResetFirstActionPhase": "À ma première phase d'action",
-        "TokenMovementHistoryResetTurnStart": "Réinitialiser au début du tour"
+        "TokenMovementHistoryResetTurnStart": "Réinitialiser au début du tour",
+        "TokenRulerColorPhaseMarker": "Couleur du marqueur de phase de déplacement",
+        "TokenRulerColorPhaseMarkerDescription": "La couleur du point de passage qui marque la fin d'une phase d'action."
     },
     "SR5": {
         "AP": "PA",

@@ -5,6 +5,7 @@ import { Migrator } from "../migrator/Migrator";
 import { CombatRules } from "../rules/CombatRules";
 import { FLAGS, SR, SYSTEM_NAME } from "../constants";
 import { SR5Die } from "../rolls/SR5Die";
+import { SR5TokenDocument } from "../token/SR5TokenDocument";
 import SocketMessageData = Shadowrun.SocketMessageData;
 import BaseCombat = foundry.documents.BaseCombat;
 
@@ -219,6 +220,8 @@ export class SR5Combat extends Combat<"base"> {
             return this;
         }
 
+        await this._recordCurrentMovementPhase();
+
         // Foundry nextRound mainly advances round/turn; SR5 also persists state, clears pass padding, and resets initiative pass.
         await this.createHistorySnapshot();
 
@@ -264,6 +267,8 @@ export class SR5Combat extends Combat<"base"> {
             return this;
         }
 
+        await this._recordCurrentMovementPhase();
+
         // Foundry has no initiative pass concept; SR5 creates a pass transition and reduces initiatives for all combatants.
         // Determine if any combatant has enough initiative for another pass
         const nextTurn = this.turns.findIndex((c) => {
@@ -305,6 +310,8 @@ export class SR5Combat extends Combat<"base"> {
             return this;
         }
 
+        if (!passedPass) await this._recordCurrentMovementPhase();
+
         if (!passedPass && this.combatant?.actor) {
             void foundry.documents.ActiveEffect.registry.refresh('sr5ActionPhaseEnd', { combat: this });
         }
@@ -340,6 +347,12 @@ export class SR5Combat extends Combat<"base"> {
             await this.combatant.turnUpdate(this.pass);
 
         return this;
+    }
+
+    /** Record the active combatant's endpoint before advancing out of an action phase. */
+    private async _recordCurrentMovementPhase(): Promise<void> {
+        if (!this.combatant?.token || this.combatant.system.pad || !this.id) return;
+        await this.combatant.token.recordMovementPhaseMarker(this.id, this.round, this.pass);
     }
 
     override async previousRound(): Promise<this> {
