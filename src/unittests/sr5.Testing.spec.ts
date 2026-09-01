@@ -450,6 +450,7 @@ export const shadowrunTesting = (context: QuenchBatchContext) => {
             assert.isTrue(test.codeTerms.pool.every(term => {
                 return typeof term.tooltipSource === 'string' && term.tooltipSource.length > 0;
             }));
+            assert.isTrue(test.codeTerms.pool.every(term => typeof term.valueText === 'string'));
 
             assert.isTrue(test.codeTerms.threshold.every(term => !term.tooltipSource));
         });

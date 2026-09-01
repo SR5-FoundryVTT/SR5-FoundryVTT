@@ -52,6 +52,7 @@ export interface SuccessTestCodeTermTrace {
 
 export interface SuccessTestCodeTerm {
     text: string;
+    valueText?: string;
     tooltipSource?: string;
 }
 
@@ -464,6 +465,7 @@ export class SuccessTest<T extends SuccessTestData = SuccessTestData> {
         for (const change of valueField.changes.filter(change => ModifiableValue.isBaseChange(change))) {
             terms.push({
                 text: game.i18n.localize(change.name as Translation),
+                valueText: String(change.value),
                 tooltipSource: this.traceSourceForChange(change),
             });
         }
