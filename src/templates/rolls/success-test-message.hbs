@@ -10,8 +10,8 @@
     {{#if (or speaker.source item)}}
     <div class="card-title card-header card-header--entities">
         <div class="container container--fluid">
-            {{#if speaker.source}}
             <div class="container__row">
+                {{#if speaker.source}}
                 <div class="container__col">
                     <div class="document">
                         {{!-- TODO: token id handling, why not uuid? ??? --}}
@@ -23,11 +23,9 @@
                         </h3>
                     </div>
                 </div>
-            </div>
-            {{/if}}
-            {{#if item}}
-            <div class="container__row">
-                <div class="container__col">
+                {{/if}}
+                {{#if item}}
+                <div class="container__col container__col--item">
                     <div class="document">
                         <img src="{{item.img}}" data-tooltip="{{item.name}}" />
                         <h3 class="header-name">
@@ -35,8 +33,8 @@
                         </h3>
                     </div>
                 </div>
+                {{/if}}
             </div>
-            {{/if}}
         </div>
     </div>
     {{/if}}

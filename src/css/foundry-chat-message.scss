@@ -375,6 +375,23 @@
         }
 
         .card-header--entities {
+            .container__row {
+                display: flex;
+                flex-flow: row wrap;
+                align-items: center;
+                justify-content: space-between;
+                gap: 0.2rem 0.6rem;
+            }
+
+            .container__col {
+                flex: 0 1 auto;
+                min-width: 0;
+            }
+
+            .container__col--item .document {
+                flex-direction: row-reverse;
+            }
+
             .container__row + .container__row {
                 padding-top: 0.2rem;
                 border-top: 1px dashed var(--sr5-card-border-soft);
@@ -904,10 +921,15 @@
             .left-side {
                 flex: 1;
                 min-width: 0;
+                flex-flow: row wrap;
+                align-items: center;
+                column-gap: 0.9rem;
             }
 
             .test-value {
                 align-items: center;
+                flex: 1 1 auto;
+                min-width: 0;
             }
 
             .test-value--damage-pair {
