@@ -11,23 +11,21 @@
 
 @mixin chat-card-control {
     flex: 0 0 auto;
-    width: 24px;
-    height: 24px;
+    // Sized by its icon: a fixed box would stretch the row it sits in and drop the
+    // icon below the sibling controls that flow on the first line.
+    padding: 0 0.15rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     color: var(--sr5-card-text-soft, var(--sr5-theme-text-secondary));
-    background: var(--sr5-theme-surface-elevated-strong);
-    border: 1px solid var(--sr5-card-border-soft, var(--sr5-theme-border));
-    border-radius: 5px;
-    transition: border-color 120ms ease, color 120ms ease, box-shadow 120ms ease;
+    background: none;
+    border: none;
+    transition: color 120ms ease;
 
     &:hover,
     &:focus-visible {
         color: var(--sr5-card-accent, var(--sr5-theme-label));
-        border-color: var(--sr5-card-accent, var(--sr5-theme-label));
-        box-shadow: 0 0 8px var(--sr5-theme-accent-glow);
         outline: none;
     }
 }
@@ -133,6 +131,9 @@
 
         .card-control {
             @include chat-card-control;
+            // Foundry's own metadata controls render their icon on the top edge of
+            // the line box rather than its centre; match them, not the line.
+            align-items: flex-start;
         }
 
         .sr5-message-header-detail {
